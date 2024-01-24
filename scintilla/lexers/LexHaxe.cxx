@@ -377,21 +377,6 @@ struct FoldLineState {
 	}
 };
 
-constexpr bool IsStreamCommentStyle(int style) noexcept {
-	return style == SCE_HAXE_COMMENTBLOCK
-		|| style == SCE_HAXE_COMMENTBLOCKDOC
-		|| style == SCE_HAXE_COMMENTTAGAT
-		|| style == SCE_HAXE_TASKMARKER;
-}
-
-constexpr bool IsMultilineStringStyle(int style) noexcept {
-	return style == SCE_HAXE_STRINGDQ
-		|| style == SCE_HAXE_STRINGSQ
-		|| style == SCE_HAXE_OPERATOR2
-		|| style == SCE_HAXE_VARIABLE2
-		|| style == SCE_HAXE_ESCAPECHAR;
-}
-
 void FoldHaxeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + lengthDoc;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
@@ -426,31 +411,19 @@ void FoldHaxeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 		switch (style) {
 		case SCE_HAXE_COMMENTBLOCK:
 		case SCE_HAXE_COMMENTBLOCKDOC:
-			if (!IsStreamCommentStyle(stylePrev)) {
-				levelNext++;
-			} else if (!IsStreamCommentStyle(styleNext)) {
-				levelNext--;
-			}
-			break;
-
 		case SCE_HAXE_REGEX:
-			if (style != stylePrev) {
-				levelNext++;
-			} else if (style != styleNext) {
-				levelNext--;
-			}
-			break;
-
 		case SCE_HAXE_STRINGSQ:
 		case SCE_HAXE_STRINGDQ:
-			if (!IsMultilineStringStyle(stylePrev)) {
+			if (style != stylePrev) {
 				levelNext++;
-			} else if (!IsMultilineStringStyle(styleNext)) {
+			}
+			if (style != styleNext) {
 				levelNext--;
 			}
 			break;
 
 		case SCE_HAXE_OPERATOR:
+		case SCE_HAXE_OPERATOR2:
 			if (ch == '{' || ch == '[' || ch == '(') {
 				levelNext++;
 			} else if (ch == '}' || ch == ']' || ch == ')') {

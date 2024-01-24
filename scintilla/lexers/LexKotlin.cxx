@@ -389,13 +389,6 @@ struct FoldLineState {
 	}
 };
 
-constexpr bool IsMultilineStringStyle(int style) noexcept {
-	return style == SCE_KOTLIN_RAWSTRING
-		|| style == SCE_KOTLIN_OPERATOR2
-		|| style == SCE_KOTLIN_ESCAPECHAR
-		|| style == SCE_KOTLIN_VARIABLE;
-}
-
 void FoldKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + lengthDoc;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
@@ -440,14 +433,16 @@ void FoldKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 		} break;
 
 		case SCE_KOTLIN_RAWSTRING:
-			if (!IsMultilineStringStyle(stylePrev)) {
+			if (style != stylePrev) {
 				levelNext++;
-			} else if (!IsMultilineStringStyle(styleNext)) {
+			}
+			if (style != styleNext) {
 				levelNext--;
 			}
 			break;
 
 		case SCE_KOTLIN_OPERATOR:
+		case SCE_KOTLIN_OPERATOR2:
 			if (ch == '{' || ch == '[' || ch == '(') {
 				levelNext++;
 			} else if (ch == '}' || ch == ']' || ch == ')') {

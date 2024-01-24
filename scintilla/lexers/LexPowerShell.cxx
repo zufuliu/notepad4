@@ -381,21 +381,6 @@ void ColourisePowerShellDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int 
 	sc.Complete();
 }
 
-constexpr bool IsStreamCommentStyle(int style) noexcept {
-	return style == SCE_POWERSHELL_COMMENTBLOCK
-		|| style == SCE_POWERSHELL_COMMENTTAG
-		|| style == SCE_POWERSHELL_DIRECTIVE
-		|| style == SCE_POWERSHELL_TASKMARKER;
-}
-
-constexpr bool IsDoubleStringStyle(int style) noexcept {
-	return style == SCE_POWERSHELL_STRING_DQ
-		|| style == SCE_POWERSHELL_HERE_STRING_DQ
-		|| style == SCE_POWERSHELL_OPERATOR2
-		|| style == SCE_POWERSHELL_ESCAPECHAR
-		|| IsVariableStyle(style);
-}
-
 constexpr int GetLineCommentState(int lineState) noexcept {
 	return lineState & SimpleLineStateMaskLineComment;
 }
@@ -430,32 +415,20 @@ void FoldPowerShellDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 
 		switch (style) {
 		case SCE_POWERSHELL_COMMENTBLOCK:
-			if (!IsStreamCommentStyle(stylePrev)) {
+		case SCE_POWERSHELL_STRING_SQ:
+		case SCE_POWERSHELL_HERE_STRING_SQ:
+		case SCE_POWERSHELL_STRING_DQ:
+		case SCE_POWERSHELL_HERE_STRING_DQ:
+			if (style != stylePrev) {
 				levelNext++;
-			} else if (!IsStreamCommentStyle(styleNext)) {
+			}
+			if (style != styleNext) {
 				levelNext--;
 			}
 			break;
 
-		case SCE_POWERSHELL_STRING_SQ:
-		case SCE_POWERSHELL_HERE_STRING_SQ:
-			if (style != stylePrev && stylePrev != SCE_POWERSHELL_ESCAPECHAR) {
-				++levelNext;
-			} else if (style != styleNext && styleNext != SCE_POWERSHELL_ESCAPECHAR) {
-				--levelNext;
-			}
-			break;
-
-		case SCE_POWERSHELL_STRING_DQ:
-		case SCE_POWERSHELL_HERE_STRING_DQ:
-			if (!IsDoubleStringStyle(stylePrev)) {
-				++levelNext;
-			} else if (!IsDoubleStringStyle(styleNext)) {
-				--levelNext;
-			}
-			break;
-
-		case SCE_POWERSHELL_OPERATOR: {
+		case SCE_POWERSHELL_OPERATOR:
+		case SCE_POWERSHELL_OPERATOR2: {
 			const char ch = styler[startPos - 1];
 			if (ch == '{' || ch == '[' || ch == '(') {
 				levelNext++;

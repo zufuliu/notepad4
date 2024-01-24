@@ -84,7 +84,7 @@ bool IsLongBracket(LexAccessor &styler, Sci_PositionU pos, bool start, int &deli
 }
 
 // https://en.cppreference.com/w/c/io/fprintf
-// 6.4 – String Manipulation https://www.lua.org/manual/5.4/manual.html#6.4
+// 6.4 String Manipulation https://www.lua.org/manual/5.4/manual.html#6.4
 constexpr bool IsFormatSpecifier(char ch) noexcept {
 	return AnyOf(ch, 'a', 'A',
 					'c',
@@ -423,9 +423,9 @@ void FoldLuaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 
 		case SCE_LUA_LITERALSTRING:
 		case SCE_LUA_COMMENT:
-			if (stylePrev != style && stylePrev != SCE_LUA_FORMAT_SPECIFIER) {
+			if (stylePrev != style) {
 				levelNext++;
-			} else if (styleNext != style && styleNext != SCE_LUA_FORMAT_SPECIFIER) {
+			} else if (styleNext != style) {
 				levelNext--;
 			}
 			break;

@@ -32,7 +32,7 @@ class LexAccessor {
 	//const int documentVersion;
 	const Sci_Position lenDoc;
 	unsigned char styleBuf[bufferSize];
-	Sci_Position validLen = 0;
+	Sci_PositionU validLen = 0;
 	Sci_PositionU startSeg = 0;
 	Sci_Position startPosStyling = 0;
 
@@ -157,8 +157,8 @@ public:
 	// Return style value from buffer when in buffer, else retrieve from document.
 	// This is faster and can avoid calls to Flush() as that may be expensive.
 	unsigned char BufferStyleAt(Sci_Position position) const noexcept {
-		const size_t index = position - startPosStyling;
-		if (index < static_cast<size_t>(validLen)) {
+		const Sci_PositionU index = position - startPosStyling;
+		if (index < validLen) {
 			return styleBuf[index];
 		}
 		return pAccess->StyleAt(position);
@@ -230,7 +230,7 @@ public:
 				pAccess->SetStyleFor(len, attr);
 			} else {
 				for (Sci_PositionU i = 0; i < len; i++) {
-					assert((startPosStyling + validLen) < Length());
+					assert((startPosStyling + validLen) < static_cast<Sci_PositionU>(Length()));
 					styleBuf[validLen++] = attr;
 				}
 			}

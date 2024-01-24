@@ -591,20 +591,6 @@ struct FoldLineState {
 	}
 };
 
-constexpr bool IsStreamCommentStyle(int style) noexcept {
-	return style == SCE_JS_COMMENTBLOCK
-		|| style == SCE_JS_COMMENTBLOCKDOC
-		|| style == SCE_JS_COMMENTTAGAT
-		|| style == SCE_JS_COMMENTTAGXML
-		|| style == SCE_JS_TASKMARKER;
-}
-
-constexpr bool IsMultilineStringStyle(int style) noexcept {
-	return style == SCE_JS_STRING_BT
-		|| style == SCE_JS_OPERATOR2
-		|| style == SCE_JS_ESCAPECHAR;
-}
-
 void FoldJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList /*keywordLists*/, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + lengthDoc;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
@@ -639,22 +625,17 @@ void FoldJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Le
 		switch (style) {
 		case SCE_JS_COMMENTBLOCK:
 		case SCE_JS_COMMENTBLOCKDOC:
-			if (!IsStreamCommentStyle(stylePrev)) {
-				levelNext++;
-			} else if (!IsStreamCommentStyle(styleNext)) {
-				levelNext--;
-			}
-			break;
-
 		case SCE_JS_STRING_BT:
-			if (!IsMultilineStringStyle(stylePrev)) {
+			if (style != stylePrev) {
 				levelNext++;
-			} else if (!IsMultilineStringStyle(styleNext)) {
+			}
+			if (style != styleNext) {
 				levelNext--;
 			}
 			break;
 
 		case SCE_JS_OPERATOR:
+		case SCE_JS_OPERATOR2:
 			if (ch == '{' || ch == '[' || ch == '(') {
 				levelNext++;
 			} else if (ch == '}' || ch == ']' || ch == ')') {

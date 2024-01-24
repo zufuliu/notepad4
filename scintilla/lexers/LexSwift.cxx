@@ -490,14 +490,6 @@ struct FoldLineState {
 	}
 };
 
-constexpr bool IsMultilineStringStyle(int style) noexcept {
-	return style == SCE_SWIFT_TRIPLE_STRING
-		|| style == SCE_SWIFT_TRIPLE_STRING_ED
-		|| style == SCE_SWIFT_REGEX_ED
-		|| style == SCE_SWIFT_OPERATOR2
-		|| style == SCE_SWIFT_ESCAPECHAR;
-}
-
 void FoldSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + lengthDoc;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
@@ -543,14 +535,16 @@ void FoldSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 
 		case SCE_SWIFT_TRIPLE_STRING:
 		case SCE_SWIFT_TRIPLE_STRING_ED:
-			if (!IsMultilineStringStyle(stylePrev)) {
+			if (style != stylePrev) {
 				levelNext++;
-			} else if (!IsMultilineStringStyle(styleNext)) {
+			}
+			if (style != styleNext) {
 				levelNext--;
 			}
 			break;
 
 		case SCE_SWIFT_OPERATOR:
+		case SCE_SWIFT_OPERATOR2:
 			if (ch == '{' || ch == '[' || ch == '(') {
 				levelNext++;
 			} else if (ch == '}' || ch == ']' || ch == ')') {

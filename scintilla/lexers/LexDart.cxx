@@ -454,14 +454,6 @@ struct FoldLineState {
 	}
 };
 
-constexpr bool IsMultilineStringStyle(int style) noexcept {
-	return style == SCE_DART_TRIPLE_STRING_SQ
-		|| style == SCE_DART_TRIPLE_STRING_DQ
-		|| style == SCE_DART_OPERATOR2
-		|| style == SCE_DART_VARIABLE2
-		|| style == SCE_DART_ESCAPECHAR;
-}
-
 void FoldDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + lengthDoc;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
@@ -507,23 +499,18 @@ void FoldDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 
 		case SCE_DART_TRIPLE_RAWSTRING_SQ:
 		case SCE_DART_TRIPLE_RAWSTRING_DQ:
-			if (style != stylePrev) {
-				levelNext++;
-			} else if (style != styleNext) {
-				levelNext--;
-			}
-			break;
-
 		case SCE_DART_TRIPLE_STRING_SQ:
 		case SCE_DART_TRIPLE_STRING_DQ:
-			if (!IsMultilineStringStyle(stylePrev)) {
+			if (style != stylePrev) {
 				levelNext++;
-			} else if (!IsMultilineStringStyle(styleNext)) {
+			}
+			if (style != styleNext) {
 				levelNext--;
 			}
 			break;
 
 		case SCE_DART_OPERATOR:
+		case SCE_DART_OPERATOR2:
 			if (ch == '{' || ch == '[' || ch == '(') {
 				levelNext++;
 			} else if (ch == '}' || ch == ']' || ch == ')') {

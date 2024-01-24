@@ -778,24 +778,6 @@ struct FoldLineState {
 	}
 };
 
-constexpr bool IsStreamCommentStyle(int style) noexcept {
-	return style == SCE_CSHARP_COMMENTBLOCK
-		|| style == SCE_CSHARP_COMMENTBLOCKDOC
-		|| style == SCE_CSHARP_COMMENTTAG_XML
-		|| style == SCE_CSHARP_TASKMARKER;
-}
-
-constexpr bool IsMultilineStringStyle(int style) noexcept {
-	return style == SCE_CSHARP_VERBATIM_STRING
-		|| style == SCE_CSHARP_INTERPOLATED_VERBATIM_STRING
-		|| style == SCE_CSHARP_RAWSTRING_ML
-		|| style == SCE_CSHARP_INTERPOLATED_RAWSTRING_ML
-		|| style == SCE_CSHARP_OPERATOR2
-		|| style == SCE_CSHARP_ESCAPECHAR
-		|| style == SCE_CSHARP_FORMAT_SPECIFIER
-		|| style == SCE_CSHARP_PLACEHOLDER;
-}
-
 void FoldCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + lengthDoc;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
@@ -831,25 +813,20 @@ void FoldCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 		switch (style) {
 		case SCE_CSHARP_COMMENTBLOCK:
 		case SCE_CSHARP_COMMENTBLOCKDOC:
-			if (!IsStreamCommentStyle(stylePrev)) {
-				levelNext++;
-			} else if (!IsStreamCommentStyle(styleNext)) {
-				levelNext--;
-			}
-			break;
-
 		case SCE_CSHARP_VERBATIM_STRING:
 		case SCE_CSHARP_INTERPOLATED_VERBATIM_STRING:
 		case SCE_CSHARP_RAWSTRING_ML:
 		case SCE_CSHARP_INTERPOLATED_RAWSTRING_ML:
-			if (!IsMultilineStringStyle(stylePrev)) {
+			if (style != stylePrev) {
 				levelNext++;
-			} else if (!IsMultilineStringStyle(styleNext)) {
+			}
+			if (style != styleNext) {
 				levelNext--;
 			}
 			break;
 
-		case SCE_CSHARP_OPERATOR: {
+		case SCE_CSHARP_OPERATOR:
+		case SCE_CSHARP_OPERATOR2: {
 			const char ch = styler[startPos];
 			if (ch == '{' || ch == '[' || ch == '(') {
 				levelNext++;

@@ -542,21 +542,6 @@ constexpr int GetLineCommentState(int lineState) noexcept {
 	return lineState & SimpleLineStateMaskLineComment;
 }
 
-constexpr bool IsMultilineStringStyle(int style) noexcept {
-	return style == SCE_JULIA_STRING
-		|| style == SCE_JULIA_TRIPLE_STRING
-		|| style == SCE_JULIA_BACKTICKS
-		|| style == SCE_JULIA_TRIPLE_BACKTICKS
-		|| style == SCE_JULIA_RAWSTRING
-		|| style == SCE_JULIA_TRIPLE_RAWSTRING
-		|| style == SCE_JULIA_BYTESTRING
-		|| style == SCE_JULIA_TRIPLE_BYTESTRING
-		|| style == SCE_JULIA_OPERATOR2
-		|| style == SCE_JULIA_VARIABLE2
-		|| style == SCE_JULIA_ESCAPECHAR
-		|| style == SCE_JULIA_FORMAT_SPECIFIER;
-}
-
 void FoldJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + lengthDoc;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
@@ -615,6 +600,7 @@ void FoldJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 			break;
 
 		case SCE_JULIA_OPERATOR:
+		case SCE_JULIA_OPERATOR2:
 			if (ch == '{' || ch == '[' || ch == '(') {
 				levelNext++;
 			} else if (ch == '}' || ch == ']' || ch == ')') {
@@ -630,18 +616,12 @@ void FoldJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 		case SCE_JULIA_TRIPLE_RAWSTRING:
 		case SCE_JULIA_BYTESTRING:
 		case SCE_JULIA_TRIPLE_BYTESTRING:
-			if (!IsMultilineStringStyle(stylePrev)) {
-				levelNext++;
-			} else if (!IsMultilineStringStyle(styleNext)) {
-				levelNext--;
-			}
-			break;
-
 		case SCE_JULIA_REGEX:
 		case SCE_JULIA_TRIPLE_REGEX:
 			if (style != stylePrev) {
 				levelNext++;
-			} else if (style != styleNext) {
+			}
+			if (style != styleNext) {
 				levelNext--;
 			}
 			break;

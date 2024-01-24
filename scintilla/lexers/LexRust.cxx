@@ -516,16 +516,6 @@ struct FoldLineState {
 	}
 };
 
-constexpr bool IsMultilineStringStyle(int style) noexcept {
-	return style == SCE_RUST_STRING
-		|| style == SCE_RUST_BYTESTRING
-		|| style == SCE_RUST_RAW_STRING
-		|| style == SCE_RUST_RAW_BYTESTRING
-		|| style == SCE_RUST_ESCAPECHAR
-		|| style == SCE_RUST_FORMAT_SPECIFIER
-		|| style == SCE_RUST_PLACEHOLDER;
-}
-
 void FoldRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + lengthDoc;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
@@ -574,9 +564,10 @@ void FoldRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 		case SCE_RUST_BYTESTRING:
 		case SCE_RUST_RAW_STRING:
 		case SCE_RUST_RAW_BYTESTRING:
-			if (!IsMultilineStringStyle(stylePrev)) {
+			if (style != stylePrev) {
 				levelNext++;
-			} else if (!IsMultilineStringStyle(styleNext)) {
+			}
+			if (style != styleNext) {
 				levelNext--;
 			}
 			break;
