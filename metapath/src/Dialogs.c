@@ -239,8 +239,9 @@ INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) 
 			WCHAR szFile[MAX_PATH * 2];
 
 			GetDlgItemText(hwnd, IDC_COMMANDLINE, szArgs, COUNTOF(szArgs));
-			ExpandEnvironmentStringsEx(szArgs, COUNTOF(szArgs));
 			ExtractFirstArgument(szArgs, szFile, szArg2);
+			ExpandEnvironmentStringsEx(szFile, COUNTOF(szFile));
+			ExpandEnvironmentStringsEx(szArg2, COUNTOF(szArg2));
 
 			WCHAR szTitle[32];
 			WCHAR szFilter[256];
@@ -302,13 +303,13 @@ INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) 
 					ExtractFirstArgument(arg1 + 1, arg1, arg2);
 					DisplayPath(arg1, IDS_ERR_CMDLINE);
 				} else {
-					ExpandEnvironmentStringsEx(arg1, COUNTOF(arg1));
 					ExtractFirstArgument(arg1, arg1, arg2);
+					ExpandEnvironmentStringsEx(arg2, COUNTOF(arg2));
 
 					SHELLEXECUTEINFO sei;
 					memset(&sei, 0, sizeof(SHELLEXECUTEINFO));
 					sei.cbSize = sizeof(SHELLEXECUTEINFO);
-					sei.fMask = 0;
+					sei.fMask = SEE_MASK_DOENVSUBST;
 					sei.hwnd = hwnd;
 					sei.lpVerb = NULL;
 					sei.lpFile = arg1;
