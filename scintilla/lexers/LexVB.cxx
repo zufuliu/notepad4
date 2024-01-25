@@ -322,7 +322,7 @@ bool IsVBSome(LexAccessor &styler, Sci_Line line, int kind) noexcept {
 #define IsConstLine(line)		IsVBSome(styler, line, 2)
 #define IsVB6Type(line)			IsVBSome(styler, line, 1)
 
-void FoldVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
+void FoldVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList /*keywordLists*/, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + length;
 	int visibleChars = 0;
 	Sci_Line lineCurrent = styler.GetLine(startPos);

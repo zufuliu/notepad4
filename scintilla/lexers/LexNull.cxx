@@ -28,7 +28,7 @@ namespace {
 #define ENABLE_FOLD_NULL_DOCUMENT	1
 
 #if !ENABLE_FOLD_NULL_DOCUMENT
-void ColouriseNullDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int, LexerWordList, Accessor &styler) {
+void ColouriseNullDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/, LexerWordList /*keywordLists*/, Accessor &styler) {
 	// Null language means all style bytes are 0 so just mark the end - no need to fill in.
 #if 1
 	styler.StartAt(startPos + lengthDoc);
@@ -42,7 +42,7 @@ void ColouriseNullDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int, Lexer
 }
 #else
 // indentation based code folding
-void FoldNullDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /* initStyle */, LexerWordList, Accessor &styler) {
+void FoldNullDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/, LexerWordList /*keywordLists*/, Accessor &styler) {
 	const Sci_Position maxPos = startPos + lengthDoc;
 	styler.StartAt(maxPos);
 	if (!styler.GetPropertyInt("fold")) {

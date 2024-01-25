@@ -114,7 +114,7 @@ inline int ColouriseDiffLine(const char (&lineBuffer)[DIFF_BUFFER_START_SIZE]) n
 	return SCE_DIFF_DEFAULT;
 }
 
-void ColouriseDiffDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
+void ColouriseDiffDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList /*keywordLists*/, Accessor &styler) {
 	const bool fold = styler.GetPropertyBool("fold");
 
 	styler.StartAt(startPos);

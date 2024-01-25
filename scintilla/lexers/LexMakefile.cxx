@@ -232,7 +232,7 @@ void ColouriseMakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 
 #define IsCommentLine(line)	IsLexCommentLine(styler, line, SCE_MAKE_COMMENT)
 
-void FoldMakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
+void FoldMakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList /*keywordLists*/, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + length;
 	int visibleChars = 0;
 	Sci_Line lineCurrent = styler.GetLine(startPos);

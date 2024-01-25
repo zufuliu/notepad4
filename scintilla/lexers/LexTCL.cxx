@@ -41,7 +41,7 @@ constexpr bool IsANumberChar(int ch) noexcept {
 	return IsHexDigit(ch) || ch == 'E' || ch == 'e' || ch == '.' || ch == '-' || ch == '+';
 }
 
-void ColouriseTCLDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList keywordLists, Accessor &styler) {
+void ColouriseTCLDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/, LexerWordList keywordLists, Accessor &styler) {
 #define  isComment(s) ((s) == SCE_TCL_COMMENT || (s) == SCE_TCL_COMMENTLINE || (s) == SCE_TCL_COMMENT_BOX || (s) == SCE_TCL_BLOCK_COMMENT)
 	bool commentLevel = false;
 	bool subBrace = false; // substitution begin with a brace ${.....}
