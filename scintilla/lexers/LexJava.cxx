@@ -533,13 +533,11 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			} else if (IsAGraphic(sc.ch) && sc.ch != '\\') {
 				sc.SetState(SCE_JAVA_OPERATOR);
 				if (!nestedState.empty()) {
+					sc.ChangeState(SCE_JAVA_OPERATOR2);
 					if (sc.ch == '{') {
 						nestedState.push_back(SCE_JAVA_DEFAULT);
 					} else if (sc.ch == '}') {
 						const int outerState = TakeAndPop(nestedState);
-						if (outerState != SCE_JAVA_DEFAULT) {
-							sc.ChangeState(SCE_JAVA_OPERATOR2);
-						}
 						sc.ForwardSetState(outerState);
 						continue;
 					}

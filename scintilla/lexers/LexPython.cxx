@@ -809,7 +809,10 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 						}
 					}
 				}
+
+				int style = SCE_PY_OPERATOR;
 				if (interpolating) {
+					style = SCE_PY_OPERATOR2;
 					const FormattedStringState &state = nestedState.back();
 					if (state.parenCount == 0 && IsPyFormattedStringEnd(sc, braceCount)) {
 						fstringPart = (sc.ch == '}') ? FormattedStringPart::End : FormattedStringPart::FormatSpec;
@@ -817,7 +820,7 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 						continue;
 					}
 				}
-				sc.SetState(SCE_PY_OPERATOR);
+				sc.SetState(style);
 				kwType = KeywordType::None;
 			}
 		}

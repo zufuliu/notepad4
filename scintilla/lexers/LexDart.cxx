@@ -408,13 +408,11 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					continue;
 				}
 				if (!nestedState.empty()) {
+					sc.ChangeState(SCE_DART_OPERATOR2);
 					if (sc.ch == '{') {
 						nestedState.push_back(SCE_DART_DEFAULT);
 					} else if (sc.ch == '}') {
 						const int outerState = TakeAndPop(nestedState);
-						if (outerState != SCE_DART_DEFAULT) {
-							sc.ChangeState(SCE_DART_OPERATOR2);
-						}
 						sc.ForwardSetState(outerState);
 						continue;
 					}

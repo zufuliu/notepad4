@@ -331,13 +331,11 @@ void ColouriseHaxeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			} else if (IsAGraphic(sc.ch)) {
 				sc.SetState(SCE_HAXE_OPERATOR);
 				if (!nestedState.empty()) {
+					sc.ChangeState(SCE_HAXE_OPERATOR2);
 					if (sc.ch == '{') {
 						nestedState.push_back(SCE_HAXE_DEFAULT);
 					} else if (sc.ch == '}') {
 						const int outerState = TakeAndPop(nestedState);
-						if (outerState != SCE_HAXE_DEFAULT) {
-							sc.ChangeState(SCE_HAXE_OPERATOR2);
-						}
 						sc.ForwardSetState(outerState);
 						continue;
 					}

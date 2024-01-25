@@ -406,6 +406,7 @@ void ColouriseCoffeeScriptDoc(Sci_PositionU startPos, Sci_Position lengthDoc, in
 			} else if (IsAGraphic(sc.ch)) {
 				sc.SetState(SCE_COFFEESCRIPT_OPERATOR);
 				if (!nestedState.empty()) {
+					sc.ChangeState(SCE_COFFEESCRIPT_OPERATOR2);
 					if (sc.ch == '{') {
 						nestedState.push_back(SCE_COFFEESCRIPT_DEFAULT);
 						jsxTagLevels.push_back(jsxTagLevel);
@@ -413,9 +414,6 @@ void ColouriseCoffeeScriptDoc(Sci_PositionU startPos, Sci_Position lengthDoc, in
 					} else if (sc.ch == '}') {
 						jsxTagLevel = TryTakeAndPop(jsxTagLevels);
 						const int outerState = TakeAndPop(nestedState);
-						if (outerState != SCE_COFFEESCRIPT_DEFAULT) {
-							sc.ChangeState(SCE_COFFEESCRIPT_OPERATOR2);
-						}
 						sc.ForwardSetState(outerState);
 						continue;
 					}

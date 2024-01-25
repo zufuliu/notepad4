@@ -498,13 +498,11 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 
 				sc.SetState(SCE_JULIA_OPERATOR);
 				if (!nestedState.empty()) {
+					sc.ChangeState(SCE_JULIA_OPERATOR2);
 					if (sc.ch == '(') {
 						nestedState.push_back(SCE_JULIA_DEFAULT);
 					} else if (sc.ch == ')') {
 						const int outerState = TakeAndPop(nestedState);
-						if (outerState != SCE_JULIA_DEFAULT) {
-							sc.ChangeState(SCE_JULIA_OPERATOR2);
-						}
 						sc.ForwardSetState(outerState);
 						continue;
 					}

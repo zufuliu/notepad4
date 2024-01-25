@@ -53,13 +53,6 @@ constexpr bool IsSpecialVariable(int ch) noexcept {
 	return ch == '$' || ch == '?' || ch == '^' || ch == '_';
 }
 
-constexpr bool IsVariableStyle(int style) noexcept {
-	return style == SCE_POWERSHELL_VARIABLE
-		|| style == SCE_POWERSHELL_BRACE_VARIABLE
-		|| style == SCE_POWERSHELL_VARIABLE_SCOPE
-		|| style == SCE_POWERSHELL_BUILTIN_VARIABLE;
-}
-
 constexpr bool IsPsIdentifierChar(int ch) noexcept {
 	return IsIdentifierCharEx(ch) || ch == '-';
 }
@@ -75,7 +68,7 @@ constexpr bool IsSpaceEquiv(int state) noexcept {
 void HighlightVariable(StyleContext &sc, std::vector<int> &nestedState) {
 	const int state = sc.state;
 	if (sc.chNext == '(') {
-		sc.SetState((state == SCE_POWERSHELL_DEFAULT) ? SCE_POWERSHELL_OPERATOR : SCE_POWERSHELL_OPERATOR2);
+		sc.SetState(nestedState.empty() ? SCE_POWERSHELL_OPERATOR : SCE_POWERSHELL_OPERATOR2);
 	} else if (sc.chNext == '{') {
 		sc.SetState(SCE_POWERSHELL_BRACE_VARIABLE);
 	} else if (IsVariableCharacter(sc.chNext) || IsSpecialVariable(sc.chNext)) {
@@ -334,13 +327,11 @@ void ColourisePowerShellDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int 
 			} else if (IsAGraphic(sc.ch)) {
 				sc.SetState(SCE_POWERSHELL_OPERATOR);
 				if (!nestedState.empty()) {
+					sc.ChangeState(SCE_POWERSHELL_OPERATOR2);
 					if (sc.ch == '(') {
 						nestedState.push_back(SCE_POWERSHELL_DEFAULT);
 					} else if (sc.ch == ')') {
 						outerStyle = TakeAndPop(nestedState);
-						if (outerStyle != SCE_POWERSHELL_DEFAULT) {
-							sc.ChangeState(SCE_POWERSHELL_OPERATOR2);
-						}
 						sc.ForwardSetState(outerStyle);
 						continue;
 					}

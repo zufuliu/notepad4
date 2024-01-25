@@ -736,7 +736,7 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 						kwType = KeywordType::None;
 					}
 				}
-				sc.SetState(SCE_CSHARP_OPERATOR);
+				sc.SetState(interpolating ? SCE_CSHARP_OPERATOR2 : SCE_CSHARP_OPERATOR);
 			}
 		}
 
