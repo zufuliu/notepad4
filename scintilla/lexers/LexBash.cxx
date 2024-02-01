@@ -338,6 +338,7 @@ public:
 			return;
 		}
 		if (backtickLevel > 0 && !isCShell) {
+			// see https://github.com/ScintillaOrg/lexilla/issues/194
 			/*
 			for $k$ level substitution with $N$ backslashes:
 			* when $N/2^k$ is odd, following dollar is escaped.
