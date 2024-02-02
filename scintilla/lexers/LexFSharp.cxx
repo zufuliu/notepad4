@@ -208,6 +208,7 @@ void ColouriseFSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 	while  (sc.More()) {
 		switch (sc.state) {
 		case SCE_FSHARP_OPERATOR:
+		case SCE_FSHARP_OPERATOR2:
 			sc.SetState(SCE_FSHARP_DEFAULT);
 			break;
 
@@ -351,7 +352,7 @@ void ColouriseFSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 							if (IsPlainString(sc.state) || interpolatorCount >= stringInterpolatorCount) {
 								nestedState.push_back({sc.state, 0, stringInterpolatorCount});
 								sc.Advance(interpolatorCount - stringInterpolatorCount); // outer content
-								sc.SetState(SCE_FSHARP_OPERATOR);
+								sc.SetState(SCE_FSHARP_OPERATOR2);
 								sc.Advance(stringInterpolatorCount - 1); // inner interpolation
 								sc.ForwardSetState(SCE_FSHARP_DEFAULT);
 								stringInterpolatorCount = 0;
@@ -365,7 +366,7 @@ void ColouriseFSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 						}
 						if (interpolating || (sc.chNext != '}' && IsPlainString(sc.state))) {
 							const int state = sc.state;
-							sc.SetState(SCE_FSHARP_OPERATOR);
+							sc.SetState(SCE_FSHARP_OPERATOR2);
 							sc.Advance(stringInterpolatorCount - 1); // inner interpolation
 							sc.ForwardSetState(state);
 							sc.Advance(interpolatorCount - stringInterpolatorCount); // outer content
@@ -486,6 +487,7 @@ void ColouriseFSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 					insideAttribute = false;
 				}
 				if (!nestedState.empty()) {
+					sc.ChangeState(SCE_FSHARP_OPERATOR2);
 					InterpolatedStringState &state = nestedState.back();
 					if (sc.ch == '[' || sc.ch == '(') {
 						++state.parenCount;

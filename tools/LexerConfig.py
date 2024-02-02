@@ -411,7 +411,7 @@ LexerConfigMap = {
 			'SCE_FSHARP_TRIPLE_STRING', 'SCE_FSHARP_INTERPOLATED_TRIPLE_STRING'],
 		'character_style': ['SCE_FSHARP_CHARACTER'],
 		'none_quote_style': 'SCE_FSHARP_IDENTIFIER',
-		'operator_style': ['SCE_FSHARP_OPERATOR'],
+		'operator_style': ['SCE_FSHARP_OPERATOR', 'SCE_FSHARP_OPERATOR2'],
 		'cpp_preprocessor': True,
 		'string_style_range': ['SCE_FSHARP_CHARACTER', 'SCE_FSHARP_FORMAT_SPECIFIER'],
 	},

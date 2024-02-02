@@ -45,7 +45,7 @@ static EDITSTYLE Styles_FSharp[] = {
 	{ SCE_FSHARP_ESCAPECHAR, NP2StyleX_EscapeSequence, L"fore:#0080C0" },
 	{ SCE_FSHARP_FORMAT_SPECIFIER, NP2StyleX_FormatSpecifier, L"fore:#7C5AF3" },
 	{ SCE_FSHARP_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
-	{ SCE_FSHARP_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
+	{ MULTI_STYLE(SCE_FSHARP_OPERATOR, SCE_FSHARP_OPERATOR2, 0, 0), NP2StyleX_Operator, L"fore:#B000B0" },
 };
 
 EDITLEXER lexFSharp = {
@@ -61,7 +61,7 @@ EDITLEXER lexFSharp = {
 		'\\', SCE_FSHARP_ESCAPECHAR, SCE_FSHARP_FORMAT_SPECIFIER,
 		0,
 		SCE_FSHARP_CHARACTER, SCE_FSHARP_IDENTIFIER,
-		SCE_FSHARP_OPERATOR, 0
+		SCE_FSHARP_OPERATOR, SCE_FSHARP_OPERATOR2
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // keywords
 		| KeywordAttr32(1, KeywordAttr_PreSorted) // types
 		| KeywordAttr32(2, KeywordAttr_NoLexer | KeywordAttr_NoAutoComp) // preprocessor
