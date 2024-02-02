@@ -237,8 +237,12 @@ void ColouriseNimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 		case SCE_NIM_TRIPLE_STRING:
 		case SCE_NIM_TRIPLE_FMTSTRING:
 			if (sc.atLineStart && sc.state < SCE_NIM_TRIPLE_STRING) {
-				sc.SetState(SCE_NIM_DEFAULT);
-			} else if (sc.ch == '\\') {
+				if (fmtPart == FormatStringPart::None) {
+					sc.SetState(SCE_NIM_DEFAULT);
+					break;
+				}
+			}
+			if (sc.ch == '\\') {
 				if (sc.state <= SCE_NIM_FMTSTRING) {
 					escSeq.resetEscapeState(sc.state, sc.chNext);
 					sc.SetState(SCE_NIM_ESCAPECHAR);

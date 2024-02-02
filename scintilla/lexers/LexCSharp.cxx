@@ -206,6 +206,7 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 	int chPrevNonWhite = 0;
 	DocTagState docTagState = DocTagState::None;
 	EscapeSequence escSeq;
+	bool closeBrace = false;
 
 	std::vector<InterpolatedStringState> nestedState;
 
@@ -477,8 +478,10 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 		case SCE_CSHARP_RAWSTRING_ML:
 		case SCE_CSHARP_INTERPOLATED_RAWSTRING_ML:
 			if (sc.atLineStart && IsSingleLineString(sc.state)) {
-				sc.SetState(SCE_CSHARP_DEFAULT);
-				break;
+				if (!closeBrace) {
+					sc.SetState(SCE_CSHARP_DEFAULT);
+					break;
+				}
 			}
 			if  (sc.ch == '\\') {
 				if (HasEscapeChar(sc.state)) {
@@ -551,6 +554,7 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 						}
 					}
 				} else if (sc.ch == '}') {
+					closeBrace = false;
 					if (IsInterpolatedString(sc.state)) {
 						const int interpolatorCount = IsPlainString(sc.state) ? 1 : GetMatchedDelimiterCount(styler, sc.currentPos, '}');
 						const bool interpolating = !nestedState.empty() && (interpolatorCount >= stringInterpolatorCount);
@@ -702,6 +706,7 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 				sc.SetState(SCE_CSHARP_IDENTIFIER);
 			} else if (IsAGraphic(sc.ch) && sc.ch != '\\') {
 				const bool interpolating = !nestedState.empty();
+				sc.SetState(interpolating ? SCE_CSHARP_OPERATOR2 : SCE_CSHARP_OPERATOR);
 				if (sc.ch == '(' || sc.ch == '[') {
 					if (interpolating) {
 						nestedState.back().parenCount += 1;
@@ -724,7 +729,8 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 						escSeq.outerState = state.state;
 						stringDelimiterCount = state.delimiterCount;
 						stringInterpolatorCount = state.interpolatorCount;
-						sc.SetState((sc.ch == '}') ? state.state : SCE_CSHARP_FORMAT_SPECIFIER);
+						closeBrace = sc.ch == '}';
+						sc.ChangeState(closeBrace ? state.state : SCE_CSHARP_FORMAT_SPECIFIER);
 						continue;
 					}
 				} else {
@@ -736,7 +742,6 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 						kwType = KeywordType::None;
 					}
 				}
-				sc.SetState(interpolating ? SCE_CSHARP_OPERATOR2 : SCE_CSHARP_OPERATOR);
 			}
 		}
 
