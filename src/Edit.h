@@ -648,4 +648,5 @@ enum LineSelectionMode {
 	LineSelectionMode_None,
 	LineSelectionMode_VisualStudio,
 	LineSelectionMode_Normal,
+	LineSelectionMode_OldVisualStudio,
 };
