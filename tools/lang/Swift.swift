@@ -1,6 +1,6 @@
-// 5.8 https://www.swift.org/
+// 5.10 https://www.swift.org/
 // https://swift.org/documentation/
-// https://github.com/apple/swift
+// https://github.com/apple/swift-evolution
 
 //! keywords		===========================================================
 // Keywords and Punctuation
@@ -62,6 +62,7 @@ Type
 unowned
 weak willSet
 
+macro package
 // Asynchronous Functions and Methods
 async
 // Actor Declaration
@@ -76,18 +77,22 @@ actor nonisolated
 #else
 #endif
 #sourceLocation(file: file-path, line: line-number)
+#sourceLocation()
 #error(diagnostic-message)
 #warning(diagnostic-message)
 #available(availability-arguments)
+#unavailable(availability-arguments)
 
 // Literal Expression
 // https://docs.swift.org/swift-book/documentation/the-swift-programming-language/expressions#Literal-Expression
+// https://developer.apple.com/documentation/swift/macros
 #file
 #fileID
 #filePath
 #line
 #column
 #function
+#externalMacro(module: String,type: String)
 #dsohandle
 // playground-literal
 #colorLiteral(red: expression, green: expression, blue: expression, alpha: expression)
@@ -104,16 +109,18 @@ actor nonisolated
 //! attribute		===========================================================
 // https://docs.swift.org/swift-book/documentation/the-swift-programming-language/attributes
 // Declaration Attributes
+@attached()
 @available()
+@backDeployed()
 @discardableResult
 @dynamicCallable
 @dynamicMemberLookup
+@freestanding()
 @frozen
 @GKInspectable
 @inlinable
 @main
 @nonobjc
-@NSApplicationMain
 @NSCopying
 @NSManaged
 @objc
@@ -122,7 +129,6 @@ actor nonisolated
 @resultBuilder
 @requires_stored_property_inits
 @testable
-@UIApplicationMain
 @unchecked
 @usableFromInline
 @warn_unqualified_access
@@ -158,6 +164,7 @@ protocol Error
 @frozen struct Int16
 @frozen struct Int32
 @frozen struct Int64
+@frozen struct Float16
 typealias Float32 = Float
 typealias Float64 = Double
 @frozen struct SystemRandomNumberGenerator

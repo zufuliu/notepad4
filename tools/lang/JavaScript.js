@@ -1,5 +1,5 @@
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar
-// https://www.ecma-international.org/publications/standards/Ecma-262.htm
+// https://ecma-international.org/publications-and-standards/standards/ecma-262/
 // 2020 https://tc39.es/ecma262/2020/
 // 2021 https://tc39.es/ecma262/2021/
 // 2022 https://tc39.es/ecma262/2022/
