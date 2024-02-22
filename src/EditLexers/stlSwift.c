@@ -51,6 +51,7 @@ static EDITSTYLE Styles_Swift[] = {
 	{ SCE_SWIFT_STRUCT, NP2StyleX_Structure, L"fore:#0080FF" },
 	{ SCE_SWIFT_PROTOCOL, NP2StyleX_Protocol, L"bold; fore:#1E90FF" },
 	{ SCE_SWIFT_ENUM, NP2StyleX_Enumeration, L"fore:#FF8000" },
+	{ SCE_SWIFT_MACRO, NP2StyleX_Macro, L"fore:#808000" },
 	{ SCE_SWIFT_FUNCTION_DEFINITION, NP2StyleX_FunctionDefinition, L"bold; fore:#A46000" },
 	{ SCE_SWIFT_FUNCTION, NP2StyleX_Function, L"fore:#A46000" },
 	{ MULTI_STYLE(SCE_SWIFT_COMMENTBLOCK, SCE_SWIFT_COMMENTLINE, 0, 0), NP2StyleX_Comment, L"fore:#608060" },
