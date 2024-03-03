@@ -1,4 +1,4 @@
-// 3.0 https://dart.dev/
+// 3.3 https://dart.dev/
 // https://dart.dev/guides/language/language-tour
 // 2.13 https://dart.dev/guides/language/spec
 // https://github.com/dart-lang/language
@@ -22,7 +22,7 @@ of on operator
 part
 rethrow return required
 sealed set show static super switch sync
-this throw true try typedef
+this throw true try type typedef
 var
 when while with
 yield

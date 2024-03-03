@@ -6,7 +6,7 @@ static KEYWORDLIST Keywords_Dart = {{
 "abstract as assert async await base break case catch class const continue covariant default deferred do "
 "else enum export extends extension external factory false final finally for get hide "
 "if implements import in interface is late library mixin native new null of on operator part required rethrow return "
-"sealed set show static super switch sync this throw true try typedef var when while with yield "
+"sealed set show static super switch sync this throw true try type typedef var when while with yield "
 
 , // 1 types
 "Function Never bool double dynamic int num void "
