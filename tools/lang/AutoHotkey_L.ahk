@@ -1,4 +1,4 @@
-; 2.0.2 https://www.autohotkey.com/docs/v2/
+; 2.0.11 https://www.autohotkey.com/docs/v2/
 ; https://github.com/Lexikos/AutoHotkey_L-Docs.git
 
 ;! keywords			===========================================================
@@ -26,7 +26,7 @@ this
 Break [LoopLabel]
 Catch [ErrorClass] [as OutputVar]
 Continue [LoopLabel]
-Critical [OnOffNumeric]
+Critical [On Off Numeric]
 Else Statement
 Exit [ExitCode]
 ExitApp [ExitCode]
@@ -39,14 +39,14 @@ Loop Files FilePattern [, Mode]
 Loop Parse String [, Delimiters, OmitChars]
 Loop Read InputFile [, OutputFile]
 Loop Reg KeyName [, Mode]
-OnError Function [, AddRemove]
-OnExit Function [, AddRemove]
+OnError Callback [, AddRemove]
+OnExit Callback [, AddRemove]
 Pause [NewState]
 Reload
 Return [Expression]
 SetTimer [Function, Period, Priority]
-Sleep DelayInMilliseconds
-Suspend [Mode]
+Sleep Delay
+Suspend [NewState]
 Switch [SwitchValue, CaseSense]
 	Case CaseValue1:
 	Case CaseValue2a, CaseValue2b:
@@ -86,7 +86,7 @@ While Expression
 /*@Ahk2Exe-Keep */
 /*@Ahk2Exe-IgnoreBegin */
 /*@Ahk2Exe-IgnoreEnd */
-/*@Ahk2Exe-AddResource FileName , ResourceName */
+/*@Ahk2Exe-AddResource FileName [, ResourceName] */
 /*@Ahk2Exe-Bin [Path\]Name , [Exe_path\][Name], Codepage */
 /*@Ahk2Exe-Base [Path\]Name , [Exe_path\][Name], Codepage */
 /*@Ahk2Exe-ConsoleApp */
@@ -346,7 +346,7 @@ ClipboardAll([Data, Size])
 ClipWait [Timeout, WaitForAnyData]
 EnvGet(EnvVarName)
 EnvSet EnvVar, Value
-OnClipboardChange Function [, AddRemove]
+OnClipboardChange Callback [, AddRemove]
 SysGet(Property)
 SysGetIPAddresses()
 
@@ -423,7 +423,10 @@ LoadPicture(Filename [, Options, &ImageType])
 MenuFromHandle(Handle)
 MsgBox [Text, Title, Options]
 MsgBox([Text, Title, Options])
+OnCommand(NotifyCode, Callback , AddRemove)
+OnEvent(EventName, Callback , AddRemove)
 OnMessage MsgNumber [, Function, MaxThreads]
+OnNotify(NotifyCode, Callback , AddRemove)
 ToolTip [Text, X, Y, WhichToolTip]
 TraySetIcon([FileName, IconNumber, Freeze])
 TrayTip [Text, Title, Options]
@@ -473,7 +476,7 @@ Hotstring("EndChars" [, NewValue])
 Hotstring("MouseReset" [, NewValue])
 Hotstring "Reset"
 ListHotkeys
-Suspend [Mode]
+Suspend [NewState]
 BlockInput OnOff
 BlockInput SendMouse
 BlockInput MouseMove
@@ -794,6 +797,7 @@ Delete([Value])
 Focus()
 GetPos([X, Y, Width, Height])
 Move([X, Y, Width, Height])
+OnCommand(NotifyCode, Callback , AddRemove)
 OnEvent(EventName, Callback [, AddRemove := 1])
 OnNotify(NotifyCode, Callback [, AddRemove := 1])
 Opt(Options)
@@ -890,7 +894,7 @@ Any
 ;! Misc				===========================================================
 ; Directives
 NoMouse EndChars
-Force Ignore Prompt Off
+Force Ignore Prompt On Off
 
 ; Properties
 ; Array
