@@ -6331,6 +6331,7 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) {
 			break;
 
 		case L'Z':
+			// skip path for Notepad.exe
 			ExtractFirstArgument(lp2, lp1, lp2);
 			flagMultiFileArg = TripleBoolean_False;
 			notepadAction = NotepadReplacementAction_Default;
