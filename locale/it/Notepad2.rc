@@ -580,7 +580,7 @@ BEGIN
 			BEGIN
 				MENUITEM "&Nessuna",						IDM_LINE_SELECTION_MODE_NONE
 				MENUITEM "&Visual Studio",				IDM_LINE_SELECTION_MODE_VS
-				MENUITEM "&Old Visual Studio",		IDM_LINE_SELECTION_MODE_OLDVS
+				MENUITEM "Vecchio Visual Studi&o",		IDM_LINE_SELECTION_MODE_OLDVS
 				MENUITEM "Nor&male",					IDM_LINE_SELECTION_MODE_NORMAL
 			END
 		END
@@ -1848,7 +1848,7 @@ file\tPer impostazione predefinita deve essere l'ultimo\n\targomento, senza spaz
 /l[o|p]\tCarica automaticamente i file modificati.\n\
 /q\tForza la creazione di nuovi file senza richieste.\n\
 /ro\tAprire un file in modalità di sola lettura.\n\
-/p\tPrint file with default printer and options.\n\
+/p\tStampa il file con la stampante e le opzioni predefinite.\n\
 /s nome\tSeleziona lo schema sintattico specificato.\n\
 /d\tSeleziona schema File di testo.\n\
 /h\tSeleziona schema Codice sorgente Web.\n\
