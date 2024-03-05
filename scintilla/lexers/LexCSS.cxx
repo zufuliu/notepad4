@@ -83,6 +83,7 @@ void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 
 	int bracketCount = 0;	// attribute selector
 	int parenCount = 0;		// function
+	int selectorLevel = 0;	// nested selector
 	int chBefore = 0;
 	int chPrevNonWhite = 0;
 	int stylePrevNonWhite = SCE_CSS_DEFAULT;
@@ -97,10 +98,12 @@ void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 		1: propertyValue
 		7: bracketCount
 		8: parenCount
+		8: selectorLevel
 		*/
 		propertyValue = lineState & true;
 		bracketCount = (lineState >> 1) & 0x7f;
-		parenCount = lineState >> 8;
+		parenCount = (lineState >> 8) & 0xff;
+		selectorLevel = lineState >> 16;
 	}
 	if (startPos != 0 && IsSpaceEquiv(initStyle)) {
 		LookbackNonWhite(styler, startPos, SCE_CSS_CDO_CDC, chPrevNonWhite, stylePrevNonWhite);
@@ -195,7 +198,7 @@ void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 								} else {
 									sc.ChangeState(SCE_CSS_UNKNOWN_PROPERTY);
 								}
-							} else if (parenCount == 0 && !(chNext == '(')) {
+							} else if (parenCount == selectorLevel && !(chNext == '(')) {
 								sc.ChangeState(SCE_CSS_TAG);
 							}
 						}
@@ -210,6 +213,10 @@ void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 					case SCE_CSS_PSEUDOCLASS:
 						if (!keywordLists[KeywordIndex_PseudoClass].InListPrefixed(s + 1, '(')) {
 							sc.ChangeState(SCE_CSS_UNKNOWN_PSEUDOCLASS);
+						} else if (sc.ch == '(') {
+							if (StrEqualsAny(s + 1, "is", "has", "not", "where", "current")) {
+								++selectorLevel;
+							}
 						}
 						break;
 
@@ -282,7 +289,7 @@ void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				sc.SetState(SCE_CSS_CDO_CDC);
 				sc.Advance((sc.ch == '<') ? 3 : 2);
 			} else if (IsNumberStart(sc.ch, sc.chNext)
-				|| (sc.ch == '#' && (propertyValue || parenCount) && IsHexDigit(sc.chNext))) {
+				|| (sc.ch == '#' && (propertyValue || parenCount > selectorLevel) && IsHexDigit(sc.chNext))) {
 				sc.SetState(SCE_CSS_NUMBER);
 			} else if (sc.chNext == '+' && UnsafeLower(sc.ch) == 'u'
 				&& propertyValue && (chPrevNonWhite == ':' || chPrevNonWhite == ',')
@@ -344,6 +351,9 @@ void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 					if (parenCount > 0) {
 						parenCount--;
 					}
+					if (selectorLevel > 0) {
+						selectorLevel--;
+					}
 					break;
 				case ':':
 					if (parenCount == 0 && !IsProperty(stylePrevNonWhite)) {
@@ -374,7 +384,7 @@ void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				styler.SetLevel(sc.currentLine, lev);
 			}
 
-			const int lineState = (propertyValue & true) | (bracketCount << 1) | (parenCount << 8);
+			const int lineState = (propertyValue & true) | (bracketCount << 1) | (parenCount << 8) | (selectorLevel << 16);
 			styler.SetLineState(sc.currentLine, lineState);
 			levelCurrent = levelNext;
 		}
