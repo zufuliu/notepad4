@@ -54,7 +54,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* [SCSS Style Sheet](tools/lang/SCSS.scss), up to Dart Sass 1.50.
 		* [Less Style Sheet](tools/lang/Less.less), up to Less 4.1.
 		* [HSS Style Sheet](tools/lang/HSS.hss)
-	* [CMake](tools/lang/CMake.cmake), up to CMake 3.25. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#cmake)
+	* [CMake](tools/lang/CMake.cmake), up to CMake 3.29. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#cmake)
 	* [CoffeeScript](tools/lang/CoffeeScript.coffee), CoffeeScript 2.7.
 	* Common Intermediate Language
 	* Configuration / Properties File
