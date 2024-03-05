@@ -482,6 +482,7 @@ typedef sptr_t (*SciFnDirectStatus)(sptr_t ptr, unsigned int iMessage, uptr_t wP
 #define SCFIND_REGEXP 0x00200000
 #define SCFIND_POSIX 0x00400000
 #define SCFIND_CXX11REGEX 0x00800000
+#define SCFIND_REGEX_DOT_ALL 0x10
 #define SCI_FINDTEXTFULL 2196
 #define SCI_FORMATRANGEFULL 2777
 #define SC_CHANGE_HISTORY_DISABLED 0

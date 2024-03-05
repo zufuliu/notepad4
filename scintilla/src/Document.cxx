@@ -3211,7 +3211,7 @@ boost::regex_constants::match_flag_type MatchFlags(const Document *doc, Sci::Pos
 }
 
 template<typename Iterator, typename Regex>
-bool MatchOnLines(const Document *doc, const Regex &regexp, const RESearchRange &resr, RESearch &search) {
+bool MatchOnLines(const Document *doc, const Regex &regexp, const RESearchRange &resr, RESearch &search, FindOption flags) {
 	boost::match_results<Iterator> match;
 
 	bool matched = false;
@@ -3220,7 +3220,10 @@ bool MatchOnLines(const Document *doc, const Regex &regexp, const RESearchRange 
 		const Sci::Position lineEndPos = doc->LineEnd(resr.lineRangeEnd);
 		Iterator itStart(doc, resr.startPos, true);
 		Iterator itEnd(doc, resr.endPos);
-		const boost::regex_constants::match_flag_type flagsMatch = MatchFlags(doc, resr.startPos, resr.endPos, lineStartPos, lineEndPos);
+		boost::regex_constants::match_flag_type flagsMatch = MatchFlags(doc, resr.startPos, resr.endPos, lineStartPos, lineEndPos);
+		if (FlagSet(flags, FindOption::RegexDotAll)) {
+			flagsMatch = flagsMatch & ~boost::regex_constants::match_not_dot_newline;
+		}
 		matched = boost::regex_search(itStart, itEnd, match, regexp, flagsMatch);
 	} else {
 		// Line by line.
@@ -3272,14 +3275,14 @@ Sci::Position BuiltinRegex::CxxRegexFindText(const Document *doc, Sci::Position 
 				previousFlags = flags;
 				cachedPattern.assign(pattern, patternLen);
 			}
-			matched = MatchOnLines<UTF8Iterator>(doc, regexUTF8, resr, search);
+			matched = MatchOnLines<UTF8Iterator>(doc, regexUTF8, resr, search, flags);
 		} else {
 			if (matched) {
 				regexByte.assign(pattern, patternLen, flagsRe);
 				previousFlags = flags;
 				cachedPattern.assign(pattern, patternLen);
 			}
-			matched = MatchOnLines<ByteIterator>(doc, regexByte, resr, search);
+			matched = MatchOnLines<ByteIterator>(doc, regexByte, resr, search, flags);
 		}
 
 		Sci::Position posMatch = -1;

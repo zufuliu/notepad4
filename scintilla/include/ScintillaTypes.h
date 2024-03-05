@@ -275,6 +275,7 @@ enum class FindOption {
 	RegExp = 0x00200000,
 	Posix = 0x00400000,
 	Cxx11RegEx = 0x00800000,
+	RegexDotAll = 0x10,
 };
 
 enum class ChangeHistoryOption {
