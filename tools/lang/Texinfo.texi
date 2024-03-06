@@ -1,5 +1,5 @@
 \input macro-definitions-file
-@c 7.0.3 https://www.gnu.org/software/texinfo/
+@c 7.1 https://www.gnu.org/software/texinfo/
 @c https://www.gnu.org/software/texinfo/manual/texinfo/html_node/Command-List.html
 
 @chapter A
@@ -55,7 +55,6 @@
 @code{sample-code}
 @codequotebacktick on-off
 @codequoteundirected on-off
-@columnfractions
 @comma{}
 @command{command-name}
 @comment comment
@@ -65,6 +64,10 @@
 @copyright{}
 
 @chapter D
+@defblock
+@defline category name arguments…
+@deftypeline category data-type name arguments…
+@end defblock
 @defcodeindex index-name
 @defcv category class name
 @end defcv
@@ -266,7 +269,7 @@
 @inlinefmtifelse{fmt, text, else-text}
 @inlineifclear{var, text}
 @inlineifset{var, text}
-@inlineraw{fmt, raw-text}
+@inlineraw{format, text}
 @insertcopying
 @item
 @itemize mark-generating-character-or-command
@@ -286,6 +289,8 @@
 @latex
 @end latex
 @leq{}
+@linemacro macroname {params}
+@link{nodename, label, manual-name}
 @lisp
 @end lisp
 @listoffloats
@@ -306,6 +311,9 @@
 @chapter N
 @need n
 @node name, [next], [previous], [up]
+@nodedescription
+@nodedescriptionblock
+@end nodedescriptionblock
 @noindent
 @novalidate
 

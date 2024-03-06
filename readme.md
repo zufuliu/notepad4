@@ -133,9 +133,9 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* [Oracle](tools/lang/Oracle.sql), Oracle 20, incomplete.
 	* [Swift](tools/lang/Swift.swift), up to Swift 5.10.
 	* TCL, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#tcl)
-	* [Texinfo](tools/lang/Texinfo.texi), up to Texinfo 7.0.
+	* [Texinfo](tools/lang/Texinfo.texi), up to Texinfo 7.1.
 	* [TOML File](https://toml.io/)
-	* [TypeScript](tools/lang/TypeScript.ts), TypeScript 5.2.
+	* [TypeScript](tools/lang/TypeScript.ts), up to TypeScript 5.4.
 	* Visual Basic, VB6, VB.NET
 	* VBScript
 	* [VHDL](tools/lang/VHDL.vhdl), up to VHDL 2019.
