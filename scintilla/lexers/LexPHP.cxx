@@ -619,6 +619,7 @@ bool PHPLexer::HighlightOperator(HtmlTextBlock block, int stylePrevNonWhite) {
 			propertyValue = 0;
 			lineStateAttribute = 0;
 			parenCount = 0;
+			selectorLevel = 0;
 		} else if (AnyOf<'[', ']'>(sc.ch)) {
 			lineStateAttribute = (sc.ch & 4) ? 0 : LineStateAttributeLine;
 		} else if (sc.ch == '(') {

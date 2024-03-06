@@ -319,6 +319,7 @@ void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 						propertyValue = false;
 						bracketCount = 0;
 						parenCount = 0;
+						selectorLevel = 0;
 					}
 					break;
 				case '}':
@@ -331,6 +332,7 @@ void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 					propertyValue = false;
 					bracketCount = 0;
 					parenCount = 0;
+					selectorLevel = 0;
 					break;
 				case '[':
 					levelNext++;
