@@ -37,6 +37,7 @@ struct EditionCount {
 	}
 };
 
+// EditionSet is ordered from oldest to newest, its not really a set
 using EditionSet = std::vector<EditionCount>;
 using EditionSetOwned = std::unique_ptr<EditionSet>;
 
@@ -80,7 +81,7 @@ struct ChangeLog {
 
 enum class ReversionState { clear, reverting, detached };
 
-class ChangeHistory {
+class ChangeHistory final {
 	ChangeLog changeLog;
 	std::unique_ptr<ChangeLog> changeLogReversions;
 	int historicEpoch = -1;

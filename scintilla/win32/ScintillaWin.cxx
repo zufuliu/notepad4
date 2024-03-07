@@ -14,7 +14,6 @@
 #include <cmath>
 #include <climits>
 
-struct IUnknown;
 #include <stdexcept>
 #include <new>
 #include <string>
@@ -29,6 +28,7 @@ struct IUnknown;
 // WIN32_LEAN_AND_MEAN is defined to avoid including commdlg.h
 // (which defined FindText) to fix GCC LTO ODR violation warning.
 
+struct IUnknown;
 #include <windows.h>
 #include <commctrl.h>
 #include <richedit.h>
@@ -145,6 +145,10 @@ constexpr const WCHAR *callClassName = L"CallTip";
 inline void SetWindowID(HWND hWnd, int identifier) noexcept {
 	::SetWindowLongPtr(hWnd, GWLP_ID, identifier);
 }
+
+constexpr POINT POINTFromLParam(sptr_t lParam) noexcept {
+	return { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
+};
 
 constexpr Point PointFromLParam(LPARAM lParam) noexcept {
 	return Point::FromInts(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
@@ -1639,19 +1643,21 @@ Window::Cursor ScintillaWin::ContextCursor(Point pt) {
 
 #if SCI_EnablePopupMenu
 sptr_t ScintillaWin::ShowContextMenu(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
-	Point pt = PointFromLParam(lParam);
-	POINT rpt = POINTFromPoint(pt);
-	::ScreenToClient(MainHWND(), &rpt);
-	const Point ptClient = PointFromPOINT(rpt);
+	Point ptScreen = PointFromLParam(lParam);
+	Point ptClient;
+	POINT point = POINTFromLParam(lParam);
+	if ((point.x == -1) && (point.y == -1)) {
+		// Caused by keyboard so display menu near caret
+		ptClient = PointMainCaret();
+		point = POINTFromPoint(ptClient);
+		::ClientToScreen(MainHWND(), &point);
+		ptScreen = PointFromPOINT(point);
+	} else {
+		::ScreenToClient(MainHWND(), &point);
+		ptClient = PointFromPOINT(point);
+	}
 	if (ShouldDisplayPopup(ptClient)) {
-		if ((pt.x == -1) && (pt.y == -1)) {
-			// Caused by keyboard so display menu near caret
-			pt = PointMainCaret();
-			POINT spt = POINTFromPoint(pt);
-			::ClientToScreen(MainHWND(), &spt);
-			pt = PointFromPOINT(spt);
-		}
-		ContextMenu(pt);
+		ContextMenu(ptScreen);
 		return 0;
 	}
 	return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
@@ -1731,7 +1737,7 @@ sptr_t ScintillaWin::MouseMessage(unsigned int iMessage, uptr_t wParam, sptr_t l
 			// handle the message but pass it on.
 			RECT rc;
 			GetWindowRect(MainHWND(), &rc);
-			const POINT pt = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
+			const POINT pt = POINTFromLParam(lParam);
 			if (!PtInRect(&rc, pt)) {
 				return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
 			}
@@ -2757,7 +2763,7 @@ void ScintillaWin::NotifyDoubleClick(Point pt, KeyMod modifiers) {
 	::SendMessage(MainHWND(),
 		WM_LBUTTONDBLCLK,
 		FlagSet(modifiers, KeyMod::Shift) ? MK_SHIFT : 0,
-		MAKELPARAM(pt.x, pt.y));
+		MAKELPARAM(static_cast<LONG>(pt.x), static_cast<LONG>(pt.y)));
 }
 
 namespace {
@@ -4139,7 +4145,7 @@ LRESULT CALLBACK ScintillaWin::CTWndProc(HWND hWnd, UINT iMessage, WPARAM wParam
 				::EndPaint(hWnd, &ps);
 				return 0;
 			} else if ((iMessage == WM_NCLBUTTONDOWN) || (iMessage == WM_NCLBUTTONDBLCLK)) {
-				POINT pt = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
+				POINT pt = POINTFromLParam(lParam);
 				ScreenToClient(hWnd, &pt);
 				sciThis->ct.MouseClick(PointFromPOINTEx(pt));
 				sciThis->CallTipClick();

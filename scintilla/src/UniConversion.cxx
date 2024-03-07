@@ -393,19 +393,18 @@ int UTF8ClassifyMulti(const unsigned char *us, size_t len) noexcept {
 }
 
 bool UTF8IsValid(std::string_view svu8) noexcept {
-	const unsigned char *us = reinterpret_cast<const unsigned char *>(svu8.data());
+	const char *s = svu8.data();
 	size_t remaining = svu8.length();
 	while (remaining > 0) {
-		const int utf8Status = UTF8Classify(us, remaining);
+		const int utf8Status = UTF8Classify(s, remaining);
 		if (utf8Status & UTF8MaskInvalid) {
 			return false;
-		} else {
-			const int lenChar = utf8Status & UTF8MaskWidth;
-			us += lenChar;
-			remaining -= lenChar;
 		}
+		const int lenChar = utf8Status & UTF8MaskWidth;
+		s += lenChar;
+		remaining -= lenChar;
 	}
-	return remaining == 0;
+	return true;
 }
 
 // Replace invalid bytes in UTF-8 with the replacement character
@@ -414,7 +413,7 @@ std::string FixInvalidUTF8(const std::string &text) {
 	const char *s = text.c_str();
 	size_t remaining = text.size();
 	while (remaining > 0) {
-		const int utf8Status = UTF8Classify(reinterpret_cast<const unsigned char *>(s), remaining);
+		const int utf8Status = UTF8Classify(s, remaining);
 		if (utf8Status & UTF8MaskInvalid) {
 			// Replacement character 0xFFFD = UTF8:"efbfbd".
 			result.append("\xef\xbf\xbd");
