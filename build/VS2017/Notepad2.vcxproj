@@ -583,6 +583,7 @@
     <ClCompile Include="..\..\scintilla\src\ScintillaBase.cxx" />
     <ClCompile Include="..\..\scintilla\src\Selection.cxx" />
     <ClCompile Include="..\..\scintilla\src\Style.cxx" />
+    <ClCompile Include="..\..\scintilla\src\UndoHistory.cxx" />
     <ClCompile Include="..\..\scintilla\src\UniConversion.cxx" />
     <ClCompile Include="..\..\scintilla\src\UniqueString.cxx" />
     <ClCompile Include="..\..\scintilla\src\ViewStyle.cxx" />
@@ -738,6 +739,7 @@
     <ClInclude Include="..\..\scintilla\src\SparseVector.h" />
     <ClInclude Include="..\..\scintilla\src\SplitVector.h" />
     <ClInclude Include="..\..\scintilla\src\Style.h" />
+    <ClInclude Include="..\..\scintilla\src\UndoHistory.h" />
     <ClInclude Include="..\..\scintilla\src\UniConversion.h" />
     <ClInclude Include="..\..\scintilla\src\UniqueString.h" />
     <ClInclude Include="..\..\scintilla\src\ViewStyle.h" />
