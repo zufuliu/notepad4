@@ -14,6 +14,7 @@
 #include <cmath>
 #include <climits>
 
+struct IUnknown;
 #include <stdexcept>
 #include <new>
 #include <string>
