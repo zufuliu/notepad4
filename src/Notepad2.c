@@ -2543,6 +2543,9 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	EnableCmd(hmenu, IDM_EDIT_BASE64_DECODE, i);
 	EnableCmd(hmenu, IDM_EDIT_BASE64_DECODE_AS_HEX, i);
 
+	EnableCmd(hmenu, IDM_EDIT_JSON_FORMAT, i);
+	EnableCmd(hmenu, IDM_EDIT_JSON_COMPRESS, i);
+
 	EnableCmd(hmenu, IDM_EDIT_NUM2HEX, i);
 	EnableCmd(hmenu, IDM_EDIT_NUM2DEC, i);
 	EnableCmd(hmenu, IDM_EDIT_NUM2BIN, i);
@@ -3777,6 +3780,17 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_EDIT_BASE64_HTML_EMBEDDED_IMAGE:
 		BeginWaitCursor();
 		EditBase64Encode((Base64EncodingFlag)(LOWORD(wParam) - IDM_EDIT_BASE64_ENCODE));
+		EndWaitCursor();
+		break;
+
+	case IDM_EDIT_JSON_FORMAT:
+		BeginWaitCursor();
+		EditJsonFormatOrCompress(true);
+		EndWaitCursor();
+		break;
+	case IDM_EDIT_JSON_COMPRESS:
+		BeginWaitCursor();
+		EditJsonFormatOrCompress(false);
 		EndWaitCursor();
 		break;
 

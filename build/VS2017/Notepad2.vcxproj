@@ -169,6 +169,9 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>false</RunCodeAnalysis>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ReferencePath>$(ReferencePath)</ReferencePath>
+  </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>..\..\scintilla\include;..\..\scintilla\lexlib;..\..\scintilla\src;..\..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -592,6 +595,7 @@
     <ClCompile Include="..\..\scintilla\win32\PlatWin.cxx" />
     <ClCompile Include="..\..\scintilla\win32\ScintillaWin.cxx" />
     <ClCompile Include="..\..\src\Bridge.cpp" />
+    <ClCompile Include="..\..\src\cJSON.c" />
     <ClCompile Include="..\..\src\Dialogs.c" />
     <ClCompile Include="..\..\src\Dlapi.c" />
     <ClCompile Include="..\..\src\Edit.c" />

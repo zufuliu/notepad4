@@ -146,7 +146,7 @@ void	EditUnescapeXHTMLChars(HWND hwnd);
 void	EditChar2Hex(void);
 void	EditHex2Char(void);
 void	EditShowHex(void);
-
+void	EditJsonFormatOrCompress(bool);
 typedef enum Base64EncodingFlag {
 	Base64EncodingFlag_Default,
 	Base64EncodingFlag_UrlSafe,

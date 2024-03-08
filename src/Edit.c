@@ -40,6 +40,7 @@
 #include "Styles.h"
 #include "Dialogs.h"
 #include "resource.h"
+#include "cJSON.h"
 
 extern HWND hwndMain;
 extern HWND hwndEdit;
@@ -2193,6 +2194,38 @@ void EditShowHex(void) {
 	SciCall_SetSel(iSelEnd, iSelEnd + (t - cch));
 	NP2HeapFree(ch);
 	NP2HeapFree(cch);
+}
+
+
+void EditJsonFormatOrCompress(bool should_format) {
+	const size_t len = SciCall_GetSelTextLength();
+	if (len == 0) {
+		return;
+	}
+
+	char *input = (char *)NP2HeapAlloc(len + 1);
+	SciCall_GetSelBytes(input);
+
+	cJSON *root = cJSON_ParseWithOpts(input, NULL, 0);
+	if (root == NULL) {
+		NP2HeapFree(input);
+		//NotifyInvalidJsonSelection();
+		return;
+	}
+
+	char *processed_json;
+	if (should_format) {
+		processed_json = cJSON_Print(root); // 格式化为易读的JSON
+	} else {
+		processed_json = cJSON_PrintUnformatted(root); // 压缩成紧凑格式的JSON
+	}
+
+	cJSON_Delete(root);
+
+	EditReplaceMainSelection(strlen(processed_json), processed_json);
+
+	NP2HeapFree(input);
+	cJSON_free(processed_json); // 使用cJSON提供的内存释放函数
 }
 
 void EditBase64Encode(Base64EncodingFlag encodingFlag){
