@@ -38,9 +38,8 @@ public:
 
 class UndoActionType {
 public:
-	ActionType at : 4;
-	bool mayCoalesce : 1;
-	UndoActionType() noexcept;
+	ActionType at = ActionType::insert;
+	bool mayCoalesce = false;
 };
 
 struct UndoActions {

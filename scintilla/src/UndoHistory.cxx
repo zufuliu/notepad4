@@ -42,22 +42,60 @@ void VectorTruncate(std::vector<T> &v, size_t length) noexcept {
 	v.erase(v.begin() + length, v.end());
 }
 
+#define ScaledVectorUseSimpleElement	1
 constexpr size_t byteMask = UINT8_MAX;
+#if !ScaledVectorUseSimpleElement
 constexpr size_t byteBits = 8;
+#endif
 
 size_t ReadValue(const uint8_t *bytes, size_t length) noexcept {
-	size_t value = 0;
-	for (size_t i = 0; i < length; i++) {
-		value = (value << byteBits) | bytes[i];
+#if ScaledVectorUseSimpleElement
+	switch (length) {
+	case 1:
+		return bytes[0];
+	case 2:
+		return *((uint16_t *)bytes);
+#if defined(_WIN64)
+	case 4:
+		return *((uint32_t *)bytes);
+#endif
+	default:
+		return *((size_t *)bytes);
 	}
+#else
+	size_t value = 0;
+	do {
+		value = (value << byteBits) | *bytes++;
+	} while (--length != 0);
 	return value;
+#endif
 }
 
 void WriteValue(uint8_t *bytes, size_t length, size_t value) noexcept {
-	for (size_t i = 0; i < length; i++) {
-		bytes[length - i - 1] = value & byteMask;
-		value = value >> byteBits;
+#if ScaledVectorUseSimpleElement
+	switch (length) {
+	case 1:
+		bytes[0] = value & byteMask;
+		break;
+	case 2:
+		*((uint16_t *)bytes) = static_cast<uint16_t>(value);
+		break;
+#if defined(_WIN64)
+	case 4:
+		*((uint32_t *)bytes) = static_cast<uint32_t>(value);
+		break;
+#endif
+	default:
+		*((size_t *)bytes) = value;
+		break;
 	}
+#else
+	do {
+		--length;
+		bytes[length] = value & byteMask;
+		value = value >> byteBits;
+	} while (length != 0);
+#endif
 }
 
 size_t ScaledVector::Size() const noexcept {
@@ -73,6 +111,20 @@ intptr_t ScaledVector::SignedValueAt(size_t index) const noexcept {
 }
 
 constexpr SizeMax ElementForValue(size_t value) noexcept {
+#if ScaledVectorUseSimpleElement
+	if (value <= UINT8_MAX) {
+		return { 1, UINT8_MAX };
+	}
+	if (value <= UINT16_MAX) {
+		return { 2, UINT16_MAX };
+	}
+#if defined(_WIN64)
+	if (value <= UINT32_MAX) {
+		return { 4, UINT32_MAX };
+	}
+#endif
+	return { sizeof(size_t), SIZE_MAX };
+#else
 	size_t maxN = byteMask;
 	size_t i = 1;
 	while (value > byteMask) {
@@ -81,6 +133,7 @@ constexpr SizeMax ElementForValue(size_t value) noexcept {
 		maxN = (maxN << byteBits) | byteMask;
 	}
 	return { i, maxN };
+#endif
 }
 
 void ScaledVector::SetValueAt(size_t index, size_t value) {
@@ -89,11 +142,19 @@ void ScaledVector::SetValueAt(size_t index, size_t value) {
 		const SizeMax elementForValue = ElementForValue(value);
 		const size_t length = bytes.size() / element.size;
 		std::vector<uint8_t> bytesNew(elementForValue.size * length);
+#if ScaledVectorUseSimpleElement
+		for (size_t i = 0; i < length; i++) {
+			const uint8_t *source = bytes.data() + i * element.size;
+			uint8_t *destination = bytesNew.data() + i * elementForValue.size;
+			WriteValue(destination, elementForValue.size, ReadValue(source, element.size));
+		}
+#else
 		for (size_t i = 0; i < length; i++) {
 			const uint8_t *source = bytes.data() + i * element.size;
 			uint8_t *destination = bytesNew.data() + (i + 1) * elementForValue.size - element.size;
 			memcpy(destination, source, element.size);
 		}
+#endif
 		std::swap(bytes, bytesNew);
 		element = elementForValue;
 	}
@@ -124,9 +185,6 @@ void ScaledVector::PushBack() {
 
 size_t ScaledVector::SizeInBytes() const noexcept {
 	return bytes.size();
-}
-
-UndoActionType::UndoActionType() noexcept : at(ActionType::insert), mayCoalesce(false) {
 }
 
 UndoActions::UndoActions() noexcept = default;
@@ -315,6 +373,8 @@ const char *UndoHistory::AppendAction(ActionType at, Sci::Position position, con
 	const char *dataNew = lengthData ? scraps->Push(data, lengthData) : nullptr;
 	if (currentAction >= actions.SSize()) {
 		actions.PushBack();
+	} else {
+		actions.Truncate(currentAction + 1);
 	}
 	actions.Create(currentAction, at, position, lengthData, mayCoalesce);
 	currentAction++;
