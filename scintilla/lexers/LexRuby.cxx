@@ -150,7 +150,7 @@ int ClassifyWordRb(Sci_PositionU start, Sci_PositionU end, char ch, char chNext,
 			// 1. <<if test ...>> : normal
 			// 2. <<stmt if test>> : demoted
 			// 3. <<lhs = if ...>> : normal: start a new indent level
-			// 4. <<obj.if = 10>> : color as identifer, since it follows '.'
+			// 4. <<obj.if = 10>> : color as identifier, since it follows '.'
 
 			chAttr = SCE_RB_WORD_DEMOTED;
 		} else {
@@ -864,7 +864,7 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 				// Recognize it bit by bit
 				state = SCE_RB_GLOBAL;
 			} else if (ch == '/' && preferRE) {
-				// Ambigous operator
+				// Ambiguous operator
 				styler.ColorTo(i, state);
 				state = SCE_RB_REGEX;
 				Quote.New();
