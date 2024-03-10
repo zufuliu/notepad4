@@ -180,7 +180,7 @@ void ScaledVector::ReSize(size_t length) {
 }
 
 void ScaledVector::PushBack() {
-	ReSize(Size() + 1);
+	bytes.resize(bytes.size() + element.size);
 }
 
 size_t ScaledVector::SizeInBytes() const noexcept {
@@ -316,8 +316,8 @@ const char *UndoHistory::AppendAction(ActionType at, Sci::Position position, con
 		// Actions not at top level are always coalesced unless this is after return to top level
 		mayCoalesce = true;
 	}
-	bool coalesce = true;
-	if (currentAction >= 1) {
+	bool coalesce = currentAction >= 1;
+	if (coalesce) {
 		int targetAct = currentAction - 1;
 		if (0 == undoSequenceDepth) {
 			// Top level actions may not always be coalesced
@@ -341,9 +341,10 @@ const char *UndoHistory::AppendAction(ActionType at, Sci::Position position, con
 				coalesce = false;
 			} else if (at == ActionType::remove) {
 				if ((lengthData == 1) || (lengthData == 2)) {
-					if ((position + lengthData) == actions.positions.SignedValueAt(targetAct)) {
+					const Sci::Position targetPos = actions.positions.SignedValueAt(targetAct);
+					if ((position + lengthData) == targetPos) {
 						; // Backspace -> OK
-					} else if (position == actions.positions.SignedValueAt(targetAct)) {
+					} else if (position == targetPos) {
 						; // Delete -> OK
 					} else {
 						// Removals must be at same position to coalesce
@@ -362,8 +363,6 @@ const char *UndoHistory::AppendAction(ActionType at, Sci::Position position, con
 			if (!actions.types[targetAct].mayCoalesce)
 				coalesce = false;
 		}
-	} else {
-		coalesce = false;
 	}
 	startSequence = !coalesce;
 	// Maybe close previous action
