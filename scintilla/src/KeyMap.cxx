@@ -20,6 +20,7 @@
 #include "Debugging.h"
 #include "Geometry.h"
 #include "Platform.h"
+
 #include "KeyMap.h"
 
 using namespace Scintilla;
@@ -60,7 +61,7 @@ const std::map<KeyModifiers, Message> &KeyMap::GetKeyMap() const noexcept {
 #endif
 
 // Define a modifier that is exactly Ctrl key on all platforms
-// Most uses of Ctrl map to Cmd on OS X but some can't so use SCI_[S]CTRL_META
+// Most uses of Ctrl map to Cmd on macOS but some can't so use SCI_[S]CTRL_META
 #if OS_X_KEYS
 #define SCI_CTRL_META SCI_META
 #define SCI_SCTRL_META (SCI_META | SCI_SHIFT)

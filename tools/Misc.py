@@ -262,4 +262,5 @@ def find_new_texinfo_commands(path, lang):
 #dump_all_css_properties('all-descriptors.en.json', 'descriptor', 'specification', 'URL')
 #find_new_css_properties('all-properties.en.json', 'all-descriptors.en.json', 'lang/CSS.css')
 
+#group_powershell_commands('.ps1')
 #find_new_texinfo_commands(r'texinfo.texi', 'lang/Texinfo.texi')
