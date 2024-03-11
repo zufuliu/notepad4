@@ -143,16 +143,38 @@ void ScaledVector::SetValueAt(size_t index, size_t value) {
 		const size_t length = bytes.size() / element.size;
 		std::vector<uint8_t> bytesNew(elementForValue.size * length);
 #if ScaledVectorUseSimpleElement
+		const uint8_t *source = bytes.data();
+		uint8_t *destination = bytesNew.data();
 		for (size_t i = 0; i < length; i++) {
-			const uint8_t *source = bytes.data() + i * element.size;
-			uint8_t *destination = bytesNew.data() + i * elementForValue.size;
-			WriteValue(destination, elementForValue.size, ReadValue(source, element.size));
+			switch (element.size) {
+			case 1:
+				destination[0] = source[0];
+				break;
+#if defined(_WIN64)
+			case 2:
+				*((uint16_t *)destination) = *(const uint16_t *)source;
+				break;
+			default:
+				*((uint32_t *)destination) = *(const uint32_t *)source;
+				break;
+#else
+			default:
+				*((uint16_t *)destination) = *(const uint16_t *)source;
+				break;
+#endif
+			}
+			source += element.size;
+			destination += elementForValue.size;
 		}
 #else
+		const uint8_t *source = bytes.data();
+		uint8_t *destination = bytesNew.data();
 		for (size_t i = 0; i < length; i++) {
-			const uint8_t *source = bytes.data() + i * element.size;
-			uint8_t *destination = bytesNew.data() + (i + 1) * elementForValue.size - element.size;
-			memcpy(destination, source, element.size);
+			size_t size = element.size;
+			destination += elementForValue.size - size;
+			do {
+				*destination++ = *source++;
+			} while (--size != 0);
 		}
 #endif
 		std::swap(bytes, bytesNew);
