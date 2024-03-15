@@ -106,10 +106,6 @@ size_t ScaledVector::ValueAt(size_t index) const noexcept {
 	return ReadValue(bytes.data() + index * element.size, element.size);
 }
 
-intptr_t ScaledVector::SignedValueAt(size_t index) const noexcept {
-	return ReadValue(bytes.data() + index * element.size, element.size);
-}
-
 constexpr SizeMax ElementForValue(size_t value) noexcept {
 #if ScaledVectorUseSimpleElement
 	if (value <= UINT8_MAX) {
@@ -256,6 +252,14 @@ size_t UndoActions::LengthTo(size_t index) const noexcept {
 	return sum;
 }
 
+Sci::Position UndoActions::Position(int action) const noexcept {
+	return positions.SignedValueAt(action);
+}
+
+Sci::Position UndoActions::Length(int action) const noexcept {
+	return lengths.SignedValueAt(action);
+}
+
 void ScrapStack::Clear() noexcept {
 	stack.clear();
 	current = 0;
@@ -358,12 +362,12 @@ const char *UndoHistory::AppendAction(ActionType at, Sci::Position position, con
 			} else if ((at != actions.types[targetAct].at)) { // } && (!actions.AtStart(targetAct))) {
 				coalesce = false;
 			} else if ((at == ActionType::insert) &&
-			           (position != (actions.positions.SignedValueAt(targetAct) + actions.lengths.SignedValueAt(targetAct)))) {
+			           (position != (actions.Position(targetAct) + actions.Length(targetAct)))) {
 				// Insertions must be immediately after to coalesce
 				coalesce = false;
 			} else if (at == ActionType::remove) {
 				if ((lengthData == 1) || (lengthData == 2)) {
-					const Sci::Position targetPos = actions.positions.SignedValueAt(targetAct);
+					const Sci::Position targetPos = actions.Position(targetAct);
 					if ((position + lengthData) == targetPos) {
 						; // Backspace -> OK
 					} else if (position == targetPos) {
@@ -391,7 +395,6 @@ const char *UndoHistory::AppendAction(ActionType at, Sci::Position position, con
 	if ((currentAction > 0) && startSequence) {
 		actions.types[PreviousAction()].mayCoalesce = false;
 	}
-	const char *dataNew = lengthData ? scraps->Push(data, lengthData) : nullptr;
 	if (currentAction >= actions.SSize()) {
 		actions.PushBack();
 	} else {
@@ -399,6 +402,7 @@ const char *UndoHistory::AppendAction(ActionType at, Sci::Position position, con
 	}
 	actions.Create(currentAction, at, position, lengthData, mayCoalesce);
 	currentAction++;
+	const char *dataNew = lengthData ? scraps->Push(data, lengthData) : nullptr;
 	return dataNew;
 }
 
@@ -491,16 +495,16 @@ bool UndoHistory::AfterOrAtDetachPoint() const noexcept {
 	return detach && (*detach <= currentAction);
 }
 
-intptr_t UndoHistory::Delta(int action) noexcept {
+intptr_t UndoHistory::Delta(int action) const noexcept {
 	intptr_t sizeChange = 0;
 	for (int act = 0; act < action; act++) {
-		const intptr_t lengthChange = actions.lengths.SignedValueAt(act);
+		const intptr_t lengthChange = actions.Length(act);
 		sizeChange += (actions.types[act].at == ActionType::insert) ? lengthChange : -lengthChange;
 	}
 	return sizeChange;
 }
 
-bool UndoHistory::Validate(intptr_t lengthDocument) noexcept {
+bool UndoHistory::Validate(intptr_t lengthDocument) const noexcept {
 	// Check history for validity
 	const intptr_t sizeChange = Delta(currentAction);
 	if (sizeChange > lengthDocument) {
@@ -510,8 +514,8 @@ bool UndoHistory::Validate(intptr_t lengthDocument) noexcept {
 	const intptr_t lengthOriginal = lengthDocument - sizeChange;
 	intptr_t lengthCurrent = lengthOriginal;
 	for (int act = 0; act < actions.SSize(); act++) {
-		const intptr_t lengthChange = actions.lengths.SignedValueAt(act);
-		if (actions.positions.SignedValueAt(act) > lengthCurrent) {
+		const intptr_t lengthChange = actions.Length(act);
+		if (actions.Position(act) > lengthCurrent) {
 			// Change outside document.
 			return false;
 		}
@@ -547,11 +551,11 @@ int UndoHistory::Type(int action) const noexcept {
 }
 
 Sci::Position UndoHistory::Position(int action) const noexcept {
-	return actions.positions.SignedValueAt(action);
+	return actions.Position(action);
 }
 
 Sci::Position UndoHistory::Length(int action) const noexcept {
-	return actions.lengths.SignedValueAt(action);
+	return actions.Length(action);
 }
 
 std::string_view UndoHistory::Text(int action) noexcept {
@@ -567,9 +571,9 @@ std::string_view UndoHistory::Text(int action) noexcept {
 		position = memory->position;
 	}
 	for (; act < action; act++) {
-		position += actions.lengths.ValueAt(act);
+		position += actions.Length(act);
 	}
-	const size_t length = actions.lengths.ValueAt(action);
+	const size_t length = actions.Length(action);
 	const char *scrap = scraps->TextAt(position);
 	memory = {action, position};
 	return {scrap, length};
@@ -582,7 +586,7 @@ void UndoHistory::PushUndoActionType(int type, Sci::Position position) {
 }
 
 void UndoHistory::ChangeLastUndoActionText(size_t length, const char *text) {
-	assert(actions.lengths.ValueAt(actions.SSize() - 1) == 0);
+	assert(actions.Length(actions.SSize() - 1) == 0);
 	actions.lengths.SetValueAt(actions.SSize() - 1, length);
 	scraps->Push(text, length);
 }
@@ -640,9 +644,9 @@ Action UndoHistory::GetUndoStep() const noexcept {
 	Action acta {
 		actions.types[previousAction].at,
 		actions.types[previousAction].mayCoalesce,
-		actions.positions.SignedValueAt(previousAction),
+		actions.Position(previousAction),
 		nullptr,
-		actions.lengths.SignedValueAt(previousAction)
+		actions.Length(previousAction)
 	};
 	if (acta.lenData) {
 		acta.data = scraps->CurrentText() - acta.lenData;
@@ -651,7 +655,7 @@ Action UndoHistory::GetUndoStep() const noexcept {
 }
 
 void UndoHistory::CompletedUndoStep() noexcept {
-	scraps->MoveBack(actions.lengths.ValueAt(PreviousAction()));
+	scraps->MoveBack(actions.Length(PreviousAction()));
 	currentAction--;
 }
 
@@ -683,9 +687,9 @@ Action UndoHistory::GetRedoStep() const noexcept {
 	Action acta{
 		actions.types[currentAction].at,
 		actions.types[currentAction].mayCoalesce,
-		actions.positions.SignedValueAt(currentAction),
+		actions.Position(currentAction),
 		nullptr,
-		actions.lengths.SignedValueAt(currentAction)
+		actions.Length(currentAction)
 	};
 	if (acta.lenData) {
 		acta.data = scraps->CurrentText();
@@ -694,7 +698,7 @@ Action UndoHistory::GetRedoStep() const noexcept {
 }
 
 void UndoHistory::CompletedRedoStep() noexcept {
-	scraps->MoveForward(actions.lengths.ValueAt(currentAction));
+	scraps->MoveForward(actions.Length(currentAction));
 	currentAction++;
 }
 

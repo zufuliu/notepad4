@@ -24,7 +24,9 @@ class ScaledVector {
 public:
 	[[nodiscard]] size_t Size() const noexcept;
 	[[nodiscard]] size_t ValueAt(size_t index) const noexcept;
-	[[nodiscard]] intptr_t SignedValueAt(size_t index) const noexcept;
+	[[nodiscard]] intptr_t SignedValueAt(size_t index) const noexcept {
+		return ValueAt(index);
+	}
 	void SetValueAt(size_t index, size_t value);
 	void ClearValueAt(size_t index) noexcept;
 	void Clear() noexcept;
@@ -55,6 +57,8 @@ struct UndoActions {
 	void Create(size_t index, ActionType at_, Sci::Position position_, Sci::Position lenData_, bool mayCoalesce_);
 	[[nodiscard]] bool AtStart(size_t index) const noexcept;
 	[[nodiscard]] size_t LengthTo(size_t index) const noexcept;
+	[[nodiscard]] Sci::Position Position(int action) const noexcept;
+	[[nodiscard]] Sci::Position Length(int action) const noexcept;
 };
 
 class ScrapStack {
@@ -118,8 +122,8 @@ public:
 	bool AfterDetachPoint() const noexcept;
 	bool AfterOrAtDetachPoint() const noexcept;
 
-	[[nodiscard]] intptr_t Delta(int action) noexcept;
-	[[nodiscard]] bool Validate(intptr_t lengthDocument) noexcept;
+	[[nodiscard]] intptr_t Delta(int action) const noexcept;
+	[[nodiscard]] bool Validate(intptr_t lengthDocument) const noexcept;
 	void SetCurrent(int action, intptr_t lengthDocument);
 	[[nodiscard]] int Current() const noexcept;
 	[[nodiscard]] int Type(int action) const noexcept;
