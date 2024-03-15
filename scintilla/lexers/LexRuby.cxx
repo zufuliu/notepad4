@@ -205,14 +205,17 @@ bool lookingAtHereDocDelim(LexAccessor &styler, Sci_Position pos, const char *He
 	return false;
 }
 
-//XXX Identical to Perl, put in common area
+// https://docs.ruby-lang.org/en/master/syntax/literals_rdoc.html#label-Percent+Literals
 constexpr char opposite(char ch) noexcept {
-	if (ch == '(')
+	if (ch == '(') {
 		return ')';
-	if (ch == '[')
-		return ']';
-	if (ch == '{')
-		return '}';
+	}
+	if (AnyOf<'[', '{'>(ch)) {
+		return ch + 2;
+	}
+	if (ch == '<') {
+		return '>';
+	}
 	return ch;
 }
 

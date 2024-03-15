@@ -96,9 +96,12 @@ constexpr bool IsBashNumber(int digit, int base) noexcept {
 }
 
 constexpr int opposite(int ch) noexcept {
-	if (ch == '(') return ')';
-	if (ch == '[') return ']';
-	if (ch == '{') return '}';
+	if (ch == '(') {
+		return ')';
+	}
+	if (AnyOf<'[', '{'>(ch)) {
+		return ch + 2;
+	}
 	return ch;
 }
 
