@@ -18,6 +18,7 @@
 *
 ******************************************************************************/
 
+struct IUnknown;
 #include <windows.h>
 #include <shlobj.h>
 #include "DropSource.h"

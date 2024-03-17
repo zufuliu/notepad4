@@ -27,6 +27,7 @@
 #include <memory>
 //#include <mutex>
 
+struct IUnknown;
 #include <windows.h>
 #include <commctrl.h>
 #include <richedit.h>
@@ -199,6 +200,8 @@ static void LoadD2DOnce() noexcept
 		D2D1CreateFactorySig fnD2DCF = DLLFunction<D2D1CreateFactorySig>(hDLLD2D, "D2D1CreateFactory");
 		if (fnD2DCF) {
 #ifdef NDEBUG
+			// A multi threaded factory in case Scintilla is used with multiple GUI threads
+			// fnD2DCF(D2D1_FACTORY_TYPE_MULTI_THREADED,
 			// A single threaded factory as Scintilla always draw on the GUI thread
 			fnD2DCF(D2D1_FACTORY_TYPE_SINGLE_THREADED,
 				__uuidof(ID2D1Factory),
@@ -3395,7 +3398,7 @@ void ListBoxX::SetList(const char *list, const char separator, const char typese
 	Clear();
 	const size_t size = strlen(list);
 	char *words = lti.SetWords(list, size);
-	char *startword = words;
+	const char *startword = words;
 	char *numword = nullptr;
 	char * const end = words + size;
 	for (; words < end; words++) {

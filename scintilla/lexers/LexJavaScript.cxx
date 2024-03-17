@@ -74,6 +74,7 @@ enum class KeywordType {
 	Enum = SCE_JS_ENUM,
 	Function = SCE_JS_FUNCTION_DEFINITION,
 	Label = SCE_JS_LABEL,
+	Return = 0x40,
 };
 
 enum class DocTagState {
@@ -132,7 +133,7 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 	KeywordType kwType = KeywordType::None;
 	int chBeforeIdentifier = 0;
 
-	std::vector<int> nestedState; // string interpolation "${}"
+	std::vector<int> nestedState; // string interpolation `${}`
 	int jsxTagLevel = 0;
 	std::vector<int> jsxTagLevels;// nested JSX tag in expression
 
@@ -227,8 +228,10 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 							kwType = KeywordType::Enum;
 						} else if (StrEqualsAny(s, "break", "continue")) {
 							kwType = KeywordType::Label;
+						} else if (StrEqualsAny(s, "return", "yield")) {
+							kwType = KeywordType::Return;
 						}
-						if (kwType != KeywordType::None) {
+						if (kwType > KeywordType::None && kwType < KeywordType::Return) {
 							const int chNext = sc.GetLineNextChar();
 							if (!(IsJsIdentifierStart(chNext) || chNext == '\\')) {
 								kwType = KeywordType::None;
@@ -251,12 +254,16 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 							sc.ChangeState(SCE_JS_LABEL);
 						}
 					} else if (sc.ch != '.') {
-						if (kwType != KeywordType::None) {
+						if (kwType > KeywordType::None && kwType < KeywordType::Return) {
 							sc.ChangeState(static_cast<int>(kwType));
 						} else {
 							const int chNext = sc.GetDocNextChar(sc.ch == '?');
 							if (chNext == '(') {
-								sc.ChangeState(SCE_JS_FUNCTION);
+								if (kwType != KeywordType::Return && (IsIdentifierCharEx(chBeforeIdentifier) || chBeforeIdentifier == ']')) {
+									sc.ChangeState(SCE_JS_FUNCTION_DEFINITION);
+								} else {
+									sc.ChangeState(SCE_JS_FUNCTION);
+								}
 							} else if (sc.Match('[', ']')
 								|| (chBeforeIdentifier == '<' && (chNext == '>' || chNext == '<'))) {
 								// type[]
@@ -524,6 +531,7 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 			} else if (IsAGraphic(sc.ch) && sc.ch != '\\') {
 				sc.SetState(SCE_JS_OPERATOR);
 				if (!nestedState.empty()) {
+					sc.ChangeState(SCE_JS_OPERATOR2);
 					if (sc.ch == '{') {
 						nestedState.push_back(SCE_JS_DEFAULT);
 						if (enableJsx) {
@@ -535,9 +543,6 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 							jsxTagLevel = TryTakeAndPop(jsxTagLevels);
 						}
 						const int outerState = TakeAndPop(nestedState);
-						if (outerState != SCE_JS_DEFAULT) {
-							sc.ChangeState(SCE_JS_OPERATOR2);
-						}
 						sc.ForwardSetState(outerState);
 						continue;
 					}
@@ -584,21 +589,7 @@ struct FoldLineState {
 	}
 };
 
-constexpr bool IsStreamCommentStyle(int style) noexcept {
-	return style == SCE_JS_COMMENTBLOCK
-		|| style == SCE_JS_COMMENTBLOCKDOC
-		|| style == SCE_JS_COMMENTTAGAT
-		|| style == SCE_JS_COMMENTTAGXML
-		|| style == SCE_JS_TASKMARKER;
-}
-
-constexpr bool IsMultilineStringStyle(int style) noexcept {
-	return style == SCE_JS_STRING_BT
-		|| style == SCE_JS_OPERATOR2
-		|| style == SCE_JS_ESCAPECHAR;
-}
-
-void FoldJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
+void FoldJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList /*keywordLists*/, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + lengthDoc;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	FoldLineState foldPrev(0);
@@ -632,22 +623,17 @@ void FoldJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Le
 		switch (style) {
 		case SCE_JS_COMMENTBLOCK:
 		case SCE_JS_COMMENTBLOCKDOC:
-			if (!IsStreamCommentStyle(stylePrev)) {
-				levelNext++;
-			} else if (!IsStreamCommentStyle(styleNext)) {
-				levelNext--;
-			}
-			break;
-
 		case SCE_JS_STRING_BT:
-			if (!IsMultilineStringStyle(stylePrev)) {
+			if (style != stylePrev) {
 				levelNext++;
-			} else if (!IsMultilineStringStyle(styleNext)) {
+			}
+			if (style != styleNext) {
 				levelNext--;
 			}
 			break;
 
 		case SCE_JS_OPERATOR:
+		case SCE_JS_OPERATOR2:
 			if (ch == '{' || ch == '[' || ch == '(') {
 				levelNext++;
 			} else if (ch == '}' || ch == ']' || ch == ')') {

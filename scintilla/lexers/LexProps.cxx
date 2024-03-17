@@ -35,7 +35,7 @@ constexpr bool IsAssignChar(unsigned char ch) noexcept {
 	return ch == '=' || ch == ':';
 }
 
-void ColourisePropsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
+void ColourisePropsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList /*keywordLists*/, Accessor &styler) {
 	// property lexer.props.allow.initial.spaces
 	//	For properties files, set to 0 to style all lines that start with whitespace in the default style.
 	//	This is not suitable for SciTE .properties files which use indentation for flow control but
@@ -140,7 +140,7 @@ void ColourisePropsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 }
 
 #if ENABLE_FOLD_PROPS_COMMENT
-void FoldPropsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/, LexerWordList, Accessor &styler) {
+void FoldPropsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/, LexerWordList /*keywordLists*/, Accessor &styler) {
 	const Sci_Position endPos = startPos + lengthDoc;
 	const Sci_Line maxLines = styler.GetLine((endPos == styler.Length()) ? endPos : endPos - 1);
 

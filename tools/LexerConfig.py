@@ -336,6 +336,7 @@ LexerConfigMap = {
 		'string_style_range': ['SCE_CSHARP_CHARACTER', 'SCE_CSHARP_PREPROCESSOR_MESSAGE'],
 	},
 	'NP2LEX_CSS': {
+		'tab_settings': TabSettings_Space2,
 		'line_comment_string': ('', '//'),
 		'block_comment_string': ('/*', '*/'),
 		'comment_style_marker': 'SCE_CSS_CDO_CDC',
@@ -410,7 +411,7 @@ LexerConfigMap = {
 			'SCE_FSHARP_TRIPLE_STRING', 'SCE_FSHARP_INTERPOLATED_TRIPLE_STRING'],
 		'character_style': ['SCE_FSHARP_CHARACTER'],
 		'none_quote_style': 'SCE_FSHARP_IDENTIFIER',
-		'operator_style': ['SCE_FSHARP_OPERATOR'],
+		'operator_style': ['SCE_FSHARP_OPERATOR', 'SCE_FSHARP_OPERATOR2'],
 		'cpp_preprocessor': True,
 		'string_style_range': ['SCE_FSHARP_CHARACTER', 'SCE_FSHARP_FORMAT_SPECIFIER'],
 	},
@@ -563,9 +564,10 @@ LexerConfigMap = {
 		'operator_style': ['SCE_JAVA_OPERATOR', 'SCE_JAVA_OPERATOR2'],
 		'extra_word_char': '$:',
 		#'ignore_word_style': ['SCE_JAVA_WORD', 'SCE_JAVA_WORD2', 'SCE_JAVA_DIRECTIVE'],
-		'string_style_range': ['SCE_JAVA_CHARACTER', 'SCE_JAVA_PLACEHOLDER'],
+		'string_style_range': ['SCE_JAVA_STRING', 'SCE_JAVA_CHARACTER'],
 	},
 	'NP2LEX_JAVASCRIPT': {
+		'tab_settings': TabSettings_Space2,
 		'cpp_style_comment': True,
 		'comment_style_marker': 'SCE_JS_TASKMARKER',
 		'shebang_exe_name': 'node',
@@ -578,6 +580,7 @@ LexerConfigMap = {
 		'string_style_range': ['SCE_JSX_TEXT', 'SCE_JS_ESCAPECHAR'],
 	},
 	'NP2LEX_JSON': {
+		'tab_settings': TabSettings_Space2,
 		'cpp_style_comment': True,
 		'comment_style_list': ['SCE_JSON_LINECOMMENT', 'SCE_JSON_BLOCKCOMMENT'],
 		'default_fold_level': ['level1', 'level2', 'level13', 'level4'],
@@ -992,6 +995,7 @@ LexerConfigMap = {
 			'SCE_TEXINFO_TITLE', 'SCE_TEXINFO_CHAPTER', 'SCE_TEXINFO_SECTION', 'SCE_TEXINFO_SECTION1', 'SCE_TEXINFO_SECTION2'],
 	},
 	'NP2LEX_TOML': {
+		'tab_settings': TabSettings_Space2,
 		'line_comment_string': '#',
 		'comment_style_marker': 'SCE_TOML_COMMENT',
 		'default_fold_level': ['table', 'comment'],
@@ -1000,6 +1004,7 @@ LexerConfigMap = {
 		'string_style_range': ['SCE_TOML_STRING_SQ', 'SCE_TOML_ESCAPECHAR'],
 	},
 	'NP2LEX_TYPESCRIPT': {
+		'tab_settings': TabSettings_Space2,
 		'cpp_style_comment': True,
 		'comment_style_marker': 'SCE_JS_TASKMARKER',
 		'default_fold_level': ['class', 'anonymous object', 'method'],

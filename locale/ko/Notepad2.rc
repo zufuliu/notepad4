@@ -580,6 +580,7 @@ BEGIN
 			BEGIN
 				MENUITEM "없음(&N)",						IDM_LINE_SELECTION_MODE_NONE
 				MENUITEM "Visual Studio(&V)",				IDM_LINE_SELECTION_MODE_VS
+				MENUITEM "&Old Visual Studio",		IDM_LINE_SELECTION_MODE_OLDVS
 				MENUITEM "일반(&M)",						IDM_LINE_SELECTION_MODE_NORMAL
 			END
 		END
@@ -1851,6 +1852,7 @@ BEGIN
 /l[o|p]\t수정된 파일을 자동으로 다시 불러옵니다.\n\
 /q\t프롬프트없이 새 파일을 강제로 생성합니다.\n\
 /ro\t파일을 읽기 전용 모드로 엽니다.\n\
+/p\tPrint file with default printer and options.\n\
 /s 이름\t지정된 구문 체계를 선택합니다.\n\
 /d\t텍스트 파일 구성표를 선택합니다.\n\
 /h\t웹 소스 코드 체계를 선택합니다.\n\
@@ -1859,7 +1861,7 @@ BEGIN
 /b\t새 붙여넣기 보드를 열어 클립보드 항목을 수집합니다.\n\
 /n\t항상 새 창을 엽니다 (/ns 단일 파일 인스턴스).\n\
 /r\t창을 재사용합니다 (/rs 단일 파일 인스턴스).\n\
-/p\t창 위치 및 크기를 설정합니다 (/p0, /ps, /pf,l,t,r,b,m).\n\
+/p<flag>\t창 위치 및 크기를 설정합니다 (/p0, /ps, /pf,l,t,r,b,m).\n\
 /t title\t창 제목을 설정합니다.\n\
 /i\t트레이 아이콘으로 시작합니다.\n\
 /o\t창을 맨 위에 둡니다.\n\

@@ -545,18 +545,7 @@ constexpr int GetLineCommentState(int lineState) noexcept {
 	return lineState & SimpleLineStateMaskLineComment;
 }
 
-constexpr bool IsStreamCommentStyle(int style) noexcept {
-	return style == SCE_GO_COMMENTBLOCK
-		|| style == SCE_GO_TASKMARKER;
-}
-
-constexpr bool IsMultilineStringStyle(int style) noexcept {
-	return style == SCE_GO_RAW_STRING
-		|| style == SCE_GO_ESCAPECHAR
-		|| style == SCE_GO_FORMAT_SPECIFIER;
-}
-
-void FoldGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
+void FoldGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList /*keywordLists*/, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + lengthDoc;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
@@ -586,17 +575,11 @@ void FoldGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Le
 
 		switch (style) {
 		case SCE_GO_COMMENTBLOCK:
-			if (!IsStreamCommentStyle(stylePrev)) {
-				levelNext++;
-			} else if (!IsStreamCommentStyle(styleNext)) {
-				levelNext--;
-			}
-			break;
-
 		case SCE_GO_RAW_STRING:
-			if (!IsMultilineStringStyle(stylePrev)) {
+			if (style != stylePrev) {
 				levelNext++;
-			} else if (!IsMultilineStringStyle(styleNext)) {
+			}
+			if (style != styleNext) {
 				levelNext--;
 			}
 			break;

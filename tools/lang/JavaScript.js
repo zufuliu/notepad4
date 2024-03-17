@@ -1,12 +1,14 @@
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar
-// https://www.ecma-international.org/publications/standards/Ecma-262.htm
+// https://ecma-international.org/publications-and-standards/standards/ecma-262/
 // 2020 https://tc39.es/ecma262/2020/
 // 2021 https://tc39.es/ecma262/2021/
 // 2022 https://tc39.es/ecma262/2022/
 // 2023 https://tc39.es/ecma262/2023/
-// 2024 https://tc39.es/ecma262/
+// 2024 https://tc39.es/ecma262/2024/
+// 2025 https://tc39.es/ecma262/
 
 //! keywords
+// https://tc39.es/ecma262/#sec-keywords-and-reserved-words
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar#keywords
 async await
 break
@@ -25,6 +27,7 @@ yield
 let
 static
 
+// https://tc39.es/ecma262/#sec-global-object
 null true false
 globalThis
 Infinity
@@ -46,8 +49,8 @@ enum implements interface package private protected public
 // import.meta // 2020
 
 //! directive		===========================================================
-// https://www.ecma-international.org/ecma-262/11.0/index.html#sec-imports
-// https://www.ecma-international.org/ecma-262/11.0/index.html#sec-exports
+// https://tc39.es/ecma262/#sec-imports
+// https://tc39.es/ecma262/#sec-exports
 import as from
 import(path) // 2020
 export as
@@ -138,6 +141,7 @@ require(path)
  */
 
 //! API				===========================================================
+// https://tc39.es/ecma262/#sec-function-properties-of-the-global-object
 eval(x)
 isFinite(number)
 isNaN(number)
@@ -163,6 +167,7 @@ Object([value]) {
 	getOwnPropertyNames(O)
 	getOwnPropertySymbols(O)
 	getPrototypeOf(O)
+	groupBy(items, callbackfn) // 2024
 	hasOwn(O, P) // 2022
 	is(value1, value2)
 	isExtensible(O)
@@ -376,6 +381,7 @@ String(value) {
 		endsWith(searchString [, endPosition])
 		includes(searchString [, position])
 		indexOf(searchString [, position])
+		isWellFormed() // 2024
 		lastIndexOf(searchString [, position])
 		localeCompare(that [, reserved1 [, reserved2]])
 		match(regexp)
@@ -395,6 +401,7 @@ String(value) {
 		toLocaleUpperCase([reserved1 [, reserved2]])
 		toLowerCase()
 		toUpperCase()
+		toWellFormed() // 2024
 		trim()
 		trimEnd() // 2019
 		trimStart() // 2019
@@ -505,6 +512,7 @@ Array(...items) {
 }
 
 Map([iterable]) {
+	groupBy(items, callbackfn) // 2024
 	prototype:
 		clear()
 		delete(key)
@@ -600,6 +608,7 @@ Atomics {
 	store(typedArray, index, value)
 	sub(typedArray, index, value)
 	wait(typedArray, index, value, timeout)
+	waitAsync(typedArray, index, value, timeout) // 2024
 	wake(typedArray, index, count)
 	xor(typedArray, index, value)
 }
@@ -640,6 +649,7 @@ Promise(executor) {
 	any(iterable) // 2021
 	reject(r)
 	resolve(x)
+	withResolvers() // 2024
 	prototype:
 		catch(onRejected)
 		finally(onFinally)
@@ -810,7 +820,10 @@ EventTarget() {
 	append(param1, param2, /* ... ,*/ paramN)
 	attachShadow(options)
 	before(param1, param2, /* ... ,*/ paramN)
+	checkVisibility([options])
 	closest(selectors)
+	computedStyleMap()
+	getAnimations([options])
 	getAttribute(attributeName)
 	getAttributeNames()
 	getAttributeNode(attrName)
@@ -840,10 +853,14 @@ EventTarget() {
 	replaceChildren(param1, param2, /* ... ,*/ paramN)
 	replaceWith(param1, param2, /* ... ,*/ paramN)
 	requestFullscreen([options])
+	requestPointerLock([options])
 	scroll(x-coord, y-coord)
 	scroll(options)
 	scrollBy(x-coord, y-coord)
 	scrollBy(options)
+	scrollIntoView()
+	scrollIntoView(alignToTop)
+	scrollIntoView(scrollIntoViewOptions)
 	scrollTo(x-coord, y-coord)
 	scrollTo(options)
 	setAttribute(name, value)
@@ -857,51 +874,55 @@ EventTarget() {
 // https://developer.mozilla.org/en-US/docs/Web/API/Document
 Document() {
 	activeElement
+	adoptedStyleSheets
 	body
 	characterSet
 	childElementCount
 	children
+	compatMode
+	contentType
+	cookie
 	currentScript
 	defaultView
 	designMode
+	dir
 	doctype
 	documentElement
 	documentURI
+	domain
 	embeds
 	firstElementChild
 	fonts
 	forms
 	fullscreenElement
+	fullscreenEnabled
 	head
 	hidden
 	images
 	implementation
 	lastElementChild
+	lastModified
 	links
+	location
 	pictureInPictureElement
 	pictureInPictureEnabled
 	plugins
 	pointerLockElement
+	readyState
+	referrer
 	scripts
 	scrollingElement
 	styleSheets
-	visibilityState
-
-	// Extensions
-	cookie
-	defaultView
-	designMode
-	dir
-	domain
-	lastModified
-	location
-	readyState
-	referrer
+	timeline
 	title
 	URL
+	visibilityState
+
 	// Methods
 	adoptNode(externalNode)
 	append(param1, param2, /* ... ,*/ paramN)
+	caretPositionFromPoint(x, y)
+	close()
 	createAttribute(name)
 	createAttributeNS(namespaceURI, qualifiedName)
 	createCDATASection(data)
@@ -916,9 +937,9 @@ Document() {
 	createRange()
 	createTextNode(data)
 	createTreeWalker(root, whatToShow, filter)
-	evaluate(xpathExpression, contextNode, namespaceResolver, resultType, result)
 	elementFromPoint(x, y)
 	elementsFromPoint(x, y)
+	evaluate(xpathExpression, contextNode, namespaceResolver, resultType, result)
 	exitFullscreen()
 	exitPictureInPicture()
 	getAnimations()
@@ -928,33 +949,35 @@ Document() {
 	getElementsByTagName(name)
 	getElementsByTagNameNS(namespace, name)
 	getSelection()
+	hasFocus()
+	hasStorageAccess()
 	importNode(externalNode [, deep])
+	open()
 	prepend(param1, param2, /* ... ,*/ paramN)
 	querySelector(selectors)
 	querySelectorAll(selectors)
 	replaceChildren(param1, param2, /* ... ,*/ paramN)
-	// Extension
-	close()
-	hasFocus()
-	open()
+	requestStorageAccess()
 	write(markup)
 	writeln(line)
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/API/Window
 {
+	caches
 	clientInformation
 	closed
 	console
-	customElements
 	crypto
+	customElements
 	devicePixelRatio
 	document
 	event
 	frameElement
-	fullScreen
 	frames
+	fullScreen
 	history
+	indexedDB
 	innerHeight
 	innerWidth
 	length
@@ -965,6 +988,7 @@ Document() {
 	name
 	navigator
 	opener
+	origin
 	outerHeight
 	outerWidth
 	pageXOffset
@@ -973,10 +997,10 @@ Document() {
 	performance
 	personalbar
 	screen
-	screenX
 	screenLeft
-	screenY
 	screenTop
+	screenX
+	screenY
 	scrollbars
 	scrollX
 	scrollY
@@ -990,6 +1014,8 @@ Document() {
 	window
 	alert(message)
 	blur()
+	cancelAnimationFrame(requestID)
+	cancelIdleCallback(handle)
 	close()
 	confirm(message)
 	focus()
@@ -1003,6 +1029,7 @@ Document() {
 	print()
 	prompt(message, default)
 	requestAnimationFrame(callback)
+	requestIdleCallback(callback[, options])
 	resizeBy(xDelta, yDelta)
 	resizeTo(width, height)
 	scroll(x-coord, y-coord)
@@ -1058,6 +1085,7 @@ FormData([form]) {
 	values()
 }
 
+// https://developer.mozilla.org/en-US/docs/Web/API/Worker
 Worker() {
 	postMessage(message, transfer)
 	terminate()
@@ -1079,6 +1107,7 @@ Worker() {
 	queueMicrotask(function)
 	setInterval(func, delay[, param1, param2, ...])
 	setTimeout(function[, delay, param1, param2, ...])
+	structuredClone(value[, options])
 	reportError(throwable)
 }
 

@@ -835,7 +835,7 @@ bool IsOpenBraceLine(LexAccessor &styler, Sci_Line line) noexcept {
 	return false;
 }
 
-void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
+void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList /*keywordLists*/, Accessor &styler) {
 	const int lexType = styler.GetPropertyInt("lexer.lang", LEX_CPP);
 
 	const Sci_PositionU endPos = startPos + length;

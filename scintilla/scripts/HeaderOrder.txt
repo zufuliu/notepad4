@@ -54,12 +54,14 @@
 #include <numeric>
 #include <chrono>
 #include <regex>
-#include <fstream>
-#include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <fstream>
+#include <iomanip>
+#include <atomic>
 #include <mutex>
+#include <thread>
+#include <future>
 #include <filesystem>
 
 // POSIX
@@ -80,6 +82,7 @@
 #include <commctrl.h>
 #include <richedit.h>
 #include <windowsx.h>
+#include <shellscalingapi.h>
 #include <zmouse.h>
 #include <ole2.h>
 #include <d2d1.h>
@@ -120,6 +123,7 @@
 // lexlib
 #include "StringCopy.h"
 #include "PropSetSimple.h"
+#include "InList.h"
 #include "WordList.h"
 #include "LexAccessor.h"
 #include "Accessor.h"
@@ -146,6 +150,7 @@
 #include "ContractionState.h"
 #include "ChangeHistory.h"
 #include "CellBuffer.h"
+#include "UndoHistory.h"
 #include "PerLine.h"
 #include "CallTip.h"
 #include "KeyMap.h"
@@ -161,6 +166,7 @@
 #include "RESearch.h"
 #include "CaseConvert.h"
 #include "UniConversion.h"
+#include "DBCS.h"
 #include "Selection.h"
 #include "PositionCache.h"
 #include "EditModel.h"
@@ -175,11 +181,13 @@
 // Platform-specific headers
 
 // win32
+#include "WinTypes.h"
 #include "PlatWin.h"
 #include "HanjaDic.h"
 #include "ScintillaWin.h"
 
 // gtk
+#include "Wrappers.h"
 #include "ScintillaGTK.h"
 #include "scintilla-marshal.h"
 #include "ScintillaGTKAccessible.h"

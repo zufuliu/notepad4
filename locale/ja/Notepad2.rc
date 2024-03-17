@@ -580,6 +580,7 @@ BEGIN
 			BEGIN
 				MENUITEM "なし(&N)",						IDM_LINE_SELECTION_MODE_NONE
 				MENUITEM "Visual Studio(&V)",				IDM_LINE_SELECTION_MODE_VS
+				MENUITEM "以前のVisual Studio (&O)",		IDM_LINE_SELECTION_MODE_OLDVS
 				MENUITEM "通常(&M)",						IDM_LINE_SELECTION_MODE_NORMAL
 			END
 		END
@@ -1851,6 +1852,7 @@ BEGIN
 /m 文字列\t文字列一致 (/m- 最後, /mr 正規表現, /mb バックスラッシュ変換)\n\
 /l[o|p]\tファイル変更時に自動で最新内容に再読み込み\n\
 /q\tファイルがない場合、問い合わせずファイル作成\n\
+/p\t既定のプリンターと設定でファイルを印刷\n\
 /ro\tファイルを読み取り専用モードで開く\n\
 /s 設定名\t配色設定を指定 [/s ext]\n\
 /d\tテキストファイルの配色を指定\n\
@@ -1860,7 +1862,7 @@ BEGIN
 /b\tクリップボード履歴表示モードで開く\n\
 /n\t新規ウィンドウで開く (/ns ファイルは単一のインスタンス)\n\
 /r\tウインドウを再利用 (/rs 同じく単一のインスタンス\n\
-/p\tウィンドウの位置とサイズを指定  (/p0, /ps, /pf,l,t,r,b,m).\n\
+/p<フラグ>\tウィンドウの位置とサイズを指定  (/p0, /ps, /pf,l,t,r,b,m).\n\
 /t タイトル\tタイトルバーの文字列を指定 [/t text]\n\
 /i\tシステムトレイ内に起動\n\
 /o\t常に手前に表示\n\

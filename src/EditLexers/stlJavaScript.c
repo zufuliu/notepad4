@@ -41,8 +41,9 @@ NULL
 "append( appendChild( apply( asIntN( asUintN( asin( asinh( assert( assign( "
 "at( atEnd( atan( atan2( atanh( atob( attachShadow( "
 "before( big( bind( blink( blur( bold( btoa( "
-"call( catch( cbrt( ceil( charAt( charCodeAt( clear( clearInterval( clearTimeout( cloneNode( close( closest( clz32( "
-"codePointAt( compareDocumentPosition( compareExchange( compile( concat( confirm( construct( contains( copyWithin( "
+"call( cancelAnimationFrame( cancelIdleCallback( caretPositionFromPoint( catch( cbrt( ceil( "
+"charAt( charCodeAt( checkVisibility( clear( clearInterval( clearTimeout( cloneNode( close( closest( clz32( codePointAt( "
+"compareDocumentPosition( compareExchange( compile( computedStyleMap( concat( confirm( construct( contains( copyWithin( "
 "cos( cosh( count( countReset( create( createAttribute( createAttributeNS( createCDATASection( createComment( "
 "createDocumentFragment( createElement( createElementNS( createExpression( createImageBitmap( "
 "createNSResolver( createNodeIterator( createProcessingInstruction( createRange( createTextNode( createTreeWalker( "
@@ -61,13 +62,13 @@ NULL
 "getOwnPropertyDescriptor( getOwnPropertyDescriptors( getOwnPropertyNames( getOwnPropertySymbols( getPrototypeOf( "
 "getResponseHeader( getRootNode( getSeconds( getSelection( getTime( getTimezoneOffset( "
 "getUTCDate( getUTCDay( getUTCFullYear( getUTCHours( getUTCMilliseconds( getUTCMinutes( getUTCMonth( getUTCSeconds( "
-"getUint16( getUint32( getUint8( getYear( group( groupCollapsed( groupEnd( "
+"getUint16( getUint32( getUint8( getYear( group( groupBy( groupCollapsed( groupEnd( "
 "has( hasAttribute( hasAttributeNS( hasAttributes( hasChildNodes( hasFocus( hasOwn( hasOwnProperty( hasPointerCapture( "
-"hypot( "
+"hasStorageAccess( hypot( "
 "import( importNode( importScripts( imul( "
 "includes( indexOf( info( insertAdjacentElement( insertAdjacentHTML( insertAdjacentText( insertBefore( is( isArray( "
 "isDefaultNamespace( isEqualNode( isExtensible( isFinite( isFrozen( isInteger( isLockFree( isNaN( isPrototypeOf( "
-"isSafeInteger( isSameNode( isSealed( isView( italics( item( "
+"isSafeInteger( isSameNode( isSealed( isView( isWellFormed( italics( item( "
 "join( key( keyFor( keys( "
 "lastIndexOf( lbound( link( load( localeCompare( log( log10( log1p( log2( lookupNamespaceURI( lookupPrefix( "
 "map( match( matchAll( matchMedia( matches( max( min( moveBy( moveFirst( moveNext( moveTo( next( normalize( now( "
@@ -78,30 +79,34 @@ NULL
 "race( random( raw( reduce( reduceRight( register( reject( releasePointerCapture( "
 "remove( removeAttribute( removeAttributeNS( removeAttributeNode( removeChild( removeEventListener( removeItem( "
 "repeat( replace( replaceAll( replaceChild( replaceChildren( replaceWith( reportError( "
-"requestAnimationFrame( requestFullscreen( require( resizeBy( resizeTo( resolve( return( reverse( revocable( round( "
-"scroll( scrollBy( scrollTo( seal( search( send( set( "
+"requestAnimationFrame( requestFullscreen( requestIdleCallback( requestPointerLock( requestStorageAccess( require( "
+"resizeBy( resizeTo( resolve( return( reverse( revocable( round( "
+"scroll( scrollBy( scrollIntoView( scrollTo( seal( search( send( set( "
 "setAttribute( setAttributeNS( setAttributeNode( setAttributeNodeNS( setBigInt64( setBigUint64( setDate( "
 "setFloat32( setFloat64( setFullYear( setHours( setInt16( setInt32( setInt8( setInterval( setItem( "
 "setMilliseconds( setMinutes( setMonth( setPointerCapture( setPrototypeOf( setRequestHeader( setSeconds( "
 "setTime( setTimeout( "
 "setUTCDate( setUTCFullYear( setUTCHours( setUTCMilliseconds( setUTCMinutes( setUTCMonth( setUTCSeconds( "
 "setUint16( setUint32( setUint8( setYear( shift( showOpenFilePicker( showSaveFilePicker( sin( sinh( slice( small( "
-"some( sort( splice( split( sqrt( startsWith( stop( store( strike( stringify( sub( subarray( substr( substring( sup( "
+"some( sort( splice( split( sqrt( startsWith( stop( store( strike( stringify( structuredClone( "
+"sub( subarray( substr( substring( sup( "
 "table( tan( tanh( terminate( test( then( throw( time( timeEnd( timeLog( toArray( toDateString( toExponential( toFixed( "
 "toGMTString( toISOString( toJSON( "
 "toLocaleDateString( toLocaleLowerCase( toLocaleString( toLocaleTimeString( toLocaleUpperCase( toLowerCase( toPrecision( "
-"toReversed( toSorted( toSpliced( toString( toTimeString( toUTCString( toUpperCase( toggleAttribute( "
+"toReversed( toSorted( toSpliced( toString( toTimeString( toUTCString( toUpperCase( toWellFormed( toggleAttribute( "
 "trace( trim( trimEnd( trimLeft( trimRight( trimStart( trunc( "
-"ubound( unescape( unregister( unshift( valueOf( values( wait( wake( warn( with( write( writeln( xor( "
+"ubound( unescape( unregister( unshift( valueOf( values( "
+"wait( waitAsync( wake( warn( with( withResolvers( write( writeln( xor( "
 
 , // 9 properties
-"URL __proto__ activeElement assignedSlot asyncIterator attributes baseURI body buffer byteLength byteOffset "
+"URL __proto__ activeElement adoptedStyleSheets assignedSlot asyncIterator attributes "
+"baseURI body buffer byteLength byteOffset "
 "caches cause characterSet childElementCount childNodes children "
-"classList className clientHeight clientInformation clientLeft clientTop clientWidth closed console constructor cookie "
-"crypto currentScript customElements "
+"classList className clientHeight clientInformation clientLeft clientTop clientWidth closed "
+"compatMode console constructor contentType cookie crypto currentScript customElements "
 "defaultView designMode devicePixelRatio dir doctype document documentElement documentURI domain dotAll embeds event "
-"firstChild firstElementChild flags fonts forms frameElement frames fullScreen fullscreenElement global "
-"hasInstance head hidden history "
+"firstChild firstElementChild flags fonts forms frameElement frames fullScreen fullscreenElement fullscreenEnabled "
+"global hasInstance head hidden history "
 "id ignoreCase images implementation indexedDB innerHTML innerHeight innerWidth isConcatSpreadable isConnected iterator "
 "lastChild lastElementChild lastIndex lastModified length links localName localStorage location locationbar "
 "match matchAll menubar message multiline "
@@ -114,7 +119,7 @@ NULL
 "scheduler screen screenLeft screenTop screenX screenY scripts "
 "scrollHeight scrollLeft scrollTop scrollWidth scrollX scrollY scrollbars scrollingElement search self sessionStorage "
 "shadowRoot size slot source species split status statusText statusbar sticky styleSheets "
-"tagName textContent timeout title toPrimitive toStringTag toolbar top unicode unscopables upload "
+"tagName textContent timeline timeout title toPrimitive toStringTag toolbar top unicode unscopables upload "
 "visibilityState visualViewport window withCredentials "
 
 , // 10 JSDoc
@@ -165,8 +170,9 @@ static EDITSTYLE Styles_JS[] = {
 EDITLEXER lexJavaScript = {
 	SCLEX_JAVASCRIPT, NP2LEX_JAVASCRIPT,
 //Settings++Autogenerated -- start of section automatically generated
-		LexerAttr_Default,
-		TAB_WIDTH_4, INDENT_WIDTH_4,
+		LexerAttr_TabAsSpaces |
+		LexerAttr_NoGlobalTabSettings,
+		TAB_WIDTH_2, INDENT_WIDTH_2,
 		(1 << 0) | (1 << 1) | (1 << 2), // class, anonymous object, method
 		SCE_JS_FUNCTION_DEFINITION,
 		'\\', SCE_JS_ESCAPECHAR, 0,

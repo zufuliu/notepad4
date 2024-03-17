@@ -445,8 +445,9 @@ static INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 			WCHAR szFile[MAX_PATH * 2];
 
 			GetDlgItemText(hwnd, IDC_COMMANDLINE, szArgs, COUNTOF(szArgs));
-			ExpandEnvironmentStringsEx(szArgs, COUNTOF(szArgs));
 			ExtractFirstArgument(szArgs, szFile, szArg2);
+			ExpandEnvironmentStringsEx(szFile, COUNTOF(szFile));
+			ExpandEnvironmentStringsEx(szArg2, COUNTOF(szArg2));
 
 			WCHAR szFilter[256];
 			GetString(IDS_FILTER_EXE, szFilter, COUNTOF(szFilter));
@@ -501,8 +502,8 @@ static INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 				bool bQuickExit = false;
 				WCHAR arg2[MAX_PATH];
 
-				ExpandEnvironmentStringsEx(arg1, COUNTOF(arg1));
 				ExtractFirstArgument(arg1, arg1, arg2);
+				ExpandEnvironmentStringsEx(arg2, COUNTOF(arg2));
 
 				if (StrCaseEqual(arg1, L"notepad2") || StrCaseEqual(arg1, L"notepad2.exe")) {
 					GetModuleFileName(NULL, arg1, COUNTOF(arg1));
@@ -518,7 +519,7 @@ static INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 				SHELLEXECUTEINFO sei;
 				memset(&sei, 0, sizeof(SHELLEXECUTEINFO));
 				sei.cbSize = sizeof(SHELLEXECUTEINFO);
-				sei.fMask = 0;
+				sei.fMask = SEE_MASK_DOENVSUBST;
 				sei.hwnd = hwnd;
 				sei.lpVerb = NULL;
 				sei.lpFile = arg1;

@@ -50,20 +50,20 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* Objective-C/C++, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#objective-cc)
 		* [C Standard Library](tools/lang/C.c), up to C2x.
 		* [C++ STL](tools/lang/CPP.cpp), up to C++20.
-	* [CSS Style Sheet](tools/lang/CSS.css), up to November 2023 snapshot.
+	* [CSS Style Sheet](tools/lang/CSS.css), up to December 2023 snapshot.
 		* [SCSS Style Sheet](tools/lang/SCSS.scss), up to Dart Sass 1.50.
 		* [Less Style Sheet](tools/lang/Less.less), up to Less 4.1.
 		* [HSS Style Sheet](tools/lang/HSS.hss)
-	* [CMake](tools/lang/CMake.cmake), up to CMake 3.25. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#cmake)
+	* [CMake](tools/lang/CMake.cmake), up to CMake 3.29. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#cmake)
 	* [CoffeeScript](tools/lang/CoffeeScript.coffee), CoffeeScript 2.7.
 	* Common Intermediate Language
 	* Configuration / Properties File
 		* Apache Configuration File
 	* [CSV File](https://www.rfc-editor.org/rfc/rfc4180)
 	* [D](tools/lang/D.d), up to D language 2.0.
-	* [Dart](tools/lang/Dart.dart), up to Dart 3.0.
+	* [Dart](tools/lang/Dart.dart), up to Dart 3.3.
 	* Diff/Patch File
-	* [F#](tools/lang/FSharp.fs), up to F# 7.0.
+	* [F#](tools/lang/FSharp.fs), up to F# 8.0.
 	* [Fortran](tools/lang/Fortran.f), up to Fortran 2018.
 	* [GN Build](tools/lang/GN.gn), up to GN 2019-03-13.
 	* [Go](tools/lang/Go.go), up to Go 1.21.
@@ -73,7 +73,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [Groovy](tools/lang/Groovy.groovy), up to Groovy 5.0.
 	* [Haskell](tools/lang/Haskell.hs), up to GHC 9.6.
 	* [Haxe](tools/lang/Haxe.hx), up to Haxe 4.3.
-	* [HTML](tools/lang/html.html), up to [WHATWG](https://html.spec.whatwg.org/multipage/) January 2024. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#html)
+	* [HTML](tools/lang/html.html), up to [WHATWG](https://html.spec.whatwg.org/multipage/) March 2024. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#html)
 		* ASP
 		* ASP.NET
 		* JSP
@@ -83,7 +83,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [Boost Jam](tools/lang/Jamfile.jam), up to Jam 4.4.
 	* [Java](tools/lang/Java.java), up to Java 21. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#java)
 		* [BeanShell](https://github.com/beanshell/beanshell)
-	* [JavaScript](tools/lang/JavaScript.js), up to ECMAScript 2023 with [JSX](https://facebook.github.io/jsx/) and [Web APIs](https://developer.mozilla.org/en-US/docs/Web/API).
+	* [JavaScript](tools/lang/JavaScript.js), up to ECMAScript 2024 with [JSX](https://facebook.github.io/jsx/) and [Web APIs](https://developer.mozilla.org/en-US/docs/Web/API).
 	* [JSON](https://www.json.org) and [JSON5](https://json5.org/) Document
 	* [Julia Script](tools/lang/Julia.jl), up to Julia 1.9. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#julia)
 	* [Kotlin](tools/lang/Kotlin.kt), up to Kotlin 1.9.
@@ -131,11 +131,11 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* [PostgreSQL](tools/lang/PostgreSQL.sql), PostgreSQL 14.
 		* [Transact-SQL](tools/lang/Transact-SQL.sql), SQL Server 2019.
 		* [Oracle](tools/lang/Oracle.sql), Oracle 20, incomplete.
-	* [Swift](tools/lang/Swift.swift), up to Swift 5.8.
+	* [Swift](tools/lang/Swift.swift), up to Swift 5.10.
 	* TCL, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#tcl)
-	* [Texinfo](tools/lang/Texinfo.texi), up to Texinfo 7.0.
+	* [Texinfo](tools/lang/Texinfo.texi), up to Texinfo 7.1.
 	* [TOML File](https://toml.io/)
-	* [TypeScript](tools/lang/TypeScript.ts), TypeScript 5.2.
+	* [TypeScript](tools/lang/TypeScript.ts), up to TypeScript 5.4.
 	* Visual Basic, VB6, VB.NET
 	* VBScript
 	* [VHDL](tools/lang/VHDL.vhdl), up to VHDL 2019.

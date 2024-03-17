@@ -1,4 +1,4 @@
-// 5.2 https://www.typescriptlang.org/docs/
+// 5.4 https://www.typescriptlang.org/docs/
 // 1.8 https://github.com/microsoft/TypeScript/blob/main/doc/
 
 //! keywords		===========================================================

@@ -315,10 +315,15 @@ int actualNumStyle(int numberStyle) noexcept {
 }
 
 constexpr int opposite(int ch) noexcept {
-	if (ch == '(') return ')';
-	if (ch == '[') return ']';
-	if (ch == '{') return '}';
-	if (ch == '<') return '>';
+	if (ch == '(') {
+		return ')';
+	}
+	if (AnyOf<'[', '{'>(ch)) {
+		return ch + 2;
+	}
+	if (ch == '<') {
+		return '>';
+	}
 	return ch;
 }
 
@@ -1551,7 +1556,7 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 
 #define IsCommentLine(line)		IsLexCommentLine(styler, line, SCE_PL_COMMENTLINE)
 
-void FoldPerlDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/, LexerWordList, Accessor &styler) {
+void FoldPerlDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/, LexerWordList /*keywordLists*/, Accessor &styler) {
 	constexpr bool foldPOD = true;//styler.GetPropertyBool("fold.perl.pod", true);
 	constexpr bool foldPackage = true;//styler.GetPropertyBool("fold.perl.package", true);
 

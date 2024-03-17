@@ -53,13 +53,6 @@ constexpr bool IsSpecialVariable(int ch) noexcept {
 	return ch == '$' || ch == '?' || ch == '^' || ch == '_';
 }
 
-constexpr bool IsVariableStyle(int style) noexcept {
-	return style == SCE_POWERSHELL_VARIABLE
-		|| style == SCE_POWERSHELL_BRACE_VARIABLE
-		|| style == SCE_POWERSHELL_VARIABLE_SCOPE
-		|| style == SCE_POWERSHELL_BUILTIN_VARIABLE;
-}
-
 constexpr bool IsPsIdentifierChar(int ch) noexcept {
 	return IsIdentifierCharEx(ch) || ch == '-';
 }
@@ -75,7 +68,7 @@ constexpr bool IsSpaceEquiv(int state) noexcept {
 void HighlightVariable(StyleContext &sc, std::vector<int> &nestedState) {
 	const int state = sc.state;
 	if (sc.chNext == '(') {
-		sc.SetState((state == SCE_POWERSHELL_DEFAULT) ? SCE_POWERSHELL_OPERATOR : SCE_POWERSHELL_OPERATOR2);
+		sc.SetState(nestedState.empty() ? SCE_POWERSHELL_OPERATOR : SCE_POWERSHELL_OPERATOR2);
 	} else if (sc.chNext == '{') {
 		sc.SetState(SCE_POWERSHELL_BRACE_VARIABLE);
 	} else if (IsVariableCharacter(sc.chNext) || IsSpecialVariable(sc.chNext)) {
@@ -334,13 +327,11 @@ void ColourisePowerShellDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int 
 			} else if (IsAGraphic(sc.ch)) {
 				sc.SetState(SCE_POWERSHELL_OPERATOR);
 				if (!nestedState.empty()) {
+					sc.ChangeState(SCE_POWERSHELL_OPERATOR2);
 					if (sc.ch == '(') {
 						nestedState.push_back(SCE_POWERSHELL_DEFAULT);
 					} else if (sc.ch == ')') {
 						outerStyle = TakeAndPop(nestedState);
-						if (outerStyle != SCE_POWERSHELL_DEFAULT) {
-							sc.ChangeState(SCE_POWERSHELL_OPERATOR2);
-						}
 						sc.ForwardSetState(outerStyle);
 						continue;
 					}
@@ -381,26 +372,11 @@ void ColourisePowerShellDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int 
 	sc.Complete();
 }
 
-constexpr bool IsStreamCommentStyle(int style) noexcept {
-	return style == SCE_POWERSHELL_COMMENTBLOCK
-		|| style == SCE_POWERSHELL_COMMENTTAG
-		|| style == SCE_POWERSHELL_DIRECTIVE
-		|| style == SCE_POWERSHELL_TASKMARKER;
-}
-
-constexpr bool IsDoubleStringStyle(int style) noexcept {
-	return style == SCE_POWERSHELL_STRING_DQ
-		|| style == SCE_POWERSHELL_HERE_STRING_DQ
-		|| style == SCE_POWERSHELL_OPERATOR2
-		|| style == SCE_POWERSHELL_ESCAPECHAR
-		|| IsVariableStyle(style);
-}
-
 constexpr int GetLineCommentState(int lineState) noexcept {
 	return lineState & SimpleLineStateMaskLineComment;
 }
 
-void FoldPowerShellDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
+void FoldPowerShellDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList /*keywordLists*/, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + lengthDoc;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
@@ -430,32 +406,20 @@ void FoldPowerShellDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 
 		switch (style) {
 		case SCE_POWERSHELL_COMMENTBLOCK:
-			if (!IsStreamCommentStyle(stylePrev)) {
+		case SCE_POWERSHELL_STRING_SQ:
+		case SCE_POWERSHELL_HERE_STRING_SQ:
+		case SCE_POWERSHELL_STRING_DQ:
+		case SCE_POWERSHELL_HERE_STRING_DQ:
+			if (style != stylePrev) {
 				levelNext++;
-			} else if (!IsStreamCommentStyle(styleNext)) {
+			}
+			if (style != styleNext) {
 				levelNext--;
 			}
 			break;
 
-		case SCE_POWERSHELL_STRING_SQ:
-		case SCE_POWERSHELL_HERE_STRING_SQ:
-			if (style != stylePrev && stylePrev != SCE_POWERSHELL_ESCAPECHAR) {
-				++levelNext;
-			} else if (style != styleNext && styleNext != SCE_POWERSHELL_ESCAPECHAR) {
-				--levelNext;
-			}
-			break;
-
-		case SCE_POWERSHELL_STRING_DQ:
-		case SCE_POWERSHELL_HERE_STRING_DQ:
-			if (!IsDoubleStringStyle(stylePrev)) {
-				++levelNext;
-			} else if (!IsDoubleStringStyle(styleNext)) {
-				--levelNext;
-			}
-			break;
-
-		case SCE_POWERSHELL_OPERATOR: {
+		case SCE_POWERSHELL_OPERATOR:
+		case SCE_POWERSHELL_OPERATOR2: {
 			const char ch = styler[startPos - 1];
 			if (ch == '{' || ch == '[' || ch == '(') {
 				levelNext++;

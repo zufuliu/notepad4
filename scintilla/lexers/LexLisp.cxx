@@ -153,7 +153,7 @@ void ColouriseLispDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 #define IsCommentLine(line)			IsLexCommentLine(styler, line, SCE_LISP_COMMENTLINE)
 #define IsStreamStyle(style)		((style) == SCE_LISP_STRING)
 #define IsStreamCommantStyle(style)	((style) == SCE_LISP_COMMENTBLOCK)
-void FoldListDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
+void FoldListDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList /*keywordLists*/, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + length;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;

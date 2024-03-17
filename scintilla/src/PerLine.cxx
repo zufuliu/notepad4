@@ -279,7 +279,11 @@ Scintilla::FoldLevel LineLevels::GetFoldLevel(Sci::Line line) const noexcept {
 Sci::Line LineLevels::GetFoldParent(Sci::Line line) const noexcept {
 	if (IsValidIndex(line, levels.Length())) {
 		const FoldLevel level = LevelNumberPart(GetFoldLevel(line));
-		if (level == FoldLevel::Base) {
+		// optimized for current block highlighting to avoid checking all previous lines,
+		// bug will occur for negative code folding level,
+		// see https://sourceforge.net/p/scintilla/feature-requests/1444/
+		// and https://github.com/ScintillaOrg/lexilla/issues/224
+		if (level <= FoldLevel::Base) {
 			return -1;
 		}
 		for (Sci::Line lineLook = line - 1; lineLook >= 0; lineLook--) {

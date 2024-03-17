@@ -179,7 +179,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			indentEnded = false;
 			hasKey = false;
 
-			if (sc.state == SCE_YAML_BLOCK_SCALAR || (sc.state == SCE_YAML_TEXT && !braceCount) || sc.state == SCE_YAML_INDENTED_TEXT) {
+			if (sc.state == SCE_YAML_BLOCK_SCALAR || (sc.state == SCE_YAML_TEXT && braceCount == 0) || sc.state == SCE_YAML_INDENTED_TEXT) {
 				indentEnded = true;
 				if (IsYAMLTextBlockEnd(sc.state, indentCount, textIndentCount, sc.currentPos, sc.lineStartNext, styler)) {
 					textIndentCount = 0;
@@ -398,7 +398,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			}
 		}
 		if (sc.atLineEnd) {
-			if (sc.state == SCE_YAML_TEXT && !braceCount) {
+			if (sc.state == SCE_YAML_TEXT && braceCount == 0) {
 				if (lineType == YAMLLineType::BlockSequence) {
 					textIndentCount = hasKey ? indentCount : indentBefore;
 					++textIndentCount;
@@ -440,7 +440,7 @@ struct FoldLineState {
 };
 
 // code folding based on LexNull
-void FoldYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/, LexerWordList, Accessor &styler) {
+void FoldYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/, LexerWordList /*keywordLists*/, Accessor &styler) {
 	const Sci_Position maxPos = startPos + lengthDoc;
 	const Sci_Line docLines = styler.GetLine(styler.Length());
 	const Sci_Line maxLines = (maxPos == styler.Length()) ? docLines : styler.GetLine(maxPos - 1);

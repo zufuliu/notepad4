@@ -580,6 +580,7 @@ BEGIN
 			BEGIN
 				MENUITEM "无(&N)",						IDM_LINE_SELECTION_MODE_NONE
 				MENUITEM "&Visual Studio",				IDM_LINE_SELECTION_MODE_VS
+				MENUITEM "旧版 Visual Studio(&O)",		IDM_LINE_SELECTION_MODE_OLDVS
 				MENUITEM "正常(&M)",						IDM_LINE_SELECTION_MODE_NORMAL
 			END
 		END
@@ -1851,6 +1852,7 @@ BEGIN
 /l[o|p]\t自动重载修改的文件。\n\
 /q\t强制创建新文件而不提示。\n\
 /ro\t以只读模式打开文件。\n\
+/p\t使用默认打印机和选项打印文件。\n\
 /s 名称\t选择指定的文件类型。\n\
 /d\t指定为 文本文件。\n\
 /h\t指定为 Web 源代码。\n\
@@ -1859,7 +1861,7 @@ BEGIN
 /b\t打开新的粘贴板来接收剪贴板中的内容。\n\
 /n\t始终打开一个新窗口 (/ns 单文件实例模式)。\n\
 /r\t重用窗口 (/rs 单文件实例模式)。\n\
-/p\t设置窗口大小和位置 (/p0, /ps, /pf,l,t,r,b,m)。\n\
+/p<标记>\t设置窗口大小和位置 (/p0, /ps, /pf,l,t,r,b,m)。\n\
 /t 标题\t设置窗口标题。\n\
 /i\t启动时最小化到托盘。\n\
 /o\t保持在最前面。\n\

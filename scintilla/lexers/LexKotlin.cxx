@@ -343,13 +343,11 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 			} else if (IsAGraphic(sc.ch)) {
 				sc.SetState(SCE_KOTLIN_OPERATOR);
 				if (!nestedState.empty()) {
+					sc.ChangeState(SCE_KOTLIN_OPERATOR2);
 					if (sc.ch == '{') {
 						nestedState.push_back(SCE_KOTLIN_DEFAULT);
 					} else if (sc.ch == '}') {
 						const int outerState = TakeAndPop(nestedState);
-						if (outerState != SCE_KOTLIN_DEFAULT) {
-							sc.ChangeState(SCE_KOTLIN_OPERATOR2);
-						}
 						sc.ForwardSetState(outerState);
 						continue;
 					}
@@ -389,14 +387,7 @@ struct FoldLineState {
 	}
 };
 
-constexpr bool IsMultilineStringStyle(int style) noexcept {
-	return style == SCE_KOTLIN_RAWSTRING
-		|| style == SCE_KOTLIN_OPERATOR2
-		|| style == SCE_KOTLIN_ESCAPECHAR
-		|| style == SCE_KOTLIN_VARIABLE;
-}
-
-void FoldKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
+void FoldKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList /*keywordLists*/, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + lengthDoc;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	FoldLineState foldPrev(0);
@@ -440,14 +431,16 @@ void FoldKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 		} break;
 
 		case SCE_KOTLIN_RAWSTRING:
-			if (!IsMultilineStringStyle(stylePrev)) {
+			if (style != stylePrev) {
 				levelNext++;
-			} else if (!IsMultilineStringStyle(styleNext)) {
+			}
+			if (style != styleNext) {
 				levelNext--;
 			}
 			break;
 
 		case SCE_KOTLIN_OPERATOR:
+		case SCE_KOTLIN_OPERATOR2:
 			if (ch == '{' || ch == '[' || ch == '(') {
 				levelNext++;
 			} else if (ch == '}' || ch == ']' || ch == ')') {

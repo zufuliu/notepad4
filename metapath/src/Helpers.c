@@ -2131,12 +2131,12 @@ DLGTEMPLATE *LoadThemedDialogTemplate(LPCWSTR lpDialogTemplateID, HINSTANCE hIns
 	const BYTE *pbNew = (BYTE *)wchFaceName;
 
 	BYTE *pb = DialogTemplate_GetFontSizeField(pTemplate);
-	const int cbOld = (int)(bHasFont ? cbFontAttr + 2 * (lstrlen((WCHAR *)(pb + cbFontAttr)) + 1) : 0);
+	const int cbOld = bHasFont ? cbFontAttr + 2 * (lstrlen((WCHAR *)(pb + cbFontAttr)) + 1) : 0;
 
 	const BYTE *pOldControls = (BYTE *)(((DWORD_PTR)pb + cbOld + 3) & ~(DWORD_PTR)3);
 	BYTE *pNewControls = (BYTE *)(((DWORD_PTR)pb + cbNew + 3) & ~(DWORD_PTR)3);
 
-	const WORD nCtrl = bDialogEx ? (WORD)((DLGTEMPLATEEX *)pTemplate)->cDlgItems : (WORD)pTemplate->cdit;
+	const WORD nCtrl = bDialogEx ? ((DLGTEMPLATEEX *)pTemplate)->cDlgItems : pTemplate->cdit;
 
 	if (cbNew != cbOld && nCtrl > 0) {
 		memmove(pNewControls, pOldControls, (size_t)(dwTemplateSize - (pOldControls - (BYTE *)pTemplate)));

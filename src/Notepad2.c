@@ -378,6 +378,13 @@ enum {
 	DefaultPositionFlag_Margin = 128,
 };
 
+typedef enum NotepadReplacementAction {
+	NotepadReplacementAction_None,
+	NotepadReplacementAction_Default,
+	NotepadReplacementAction_PrintDialog,
+	NotepadReplacementAction_PrintDefault,
+} NotepadReplacementAction;
+
 typedef enum MatchTextFlag {
 	MatchTextFlag_None = 0,
 	MatchTextFlag_Default = 1,
@@ -392,6 +399,7 @@ typedef enum RelaunchElevatedFlag {
 	RelaunchElevatedFlag_Manual,
 } RelaunchElevatedFlag;
 
+static NotepadReplacementAction notepadAction = NotepadReplacementAction_None;
 static bool	flagNoReuseWindow		= false;
 static bool	flagReuseWindow			= false;
 static bool bSingleFileInstance		= true;
@@ -997,6 +1005,9 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	if (SciCall_GetLength() == 0) {
 		UpdateToolbar();
 		UpdateStatusbar();
+	}
+	if (notepadAction > NotepadReplacementAction_Default) {
+		PostMessage(hwnd, WM_COMMAND, MAKEWPARAM(IDM_FILE_PRINT, 1), notepadAction);
 	}
 
 #if 0
@@ -2621,7 +2632,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckCmd(hmenu, IDM_SET_SELECTIONASFINDTEXT, iSelectOption & SelectOption_CopySelectionAsFindText);
 	CheckCmd(hmenu, IDM_SET_PASTEBUFFERASFINDTEXT, iSelectOption & SelectOption_CopyPasteBufferAsFindText);
 	i = IDM_LINE_SELECTION_MODE_NONE + iLineSelectionMode;
-	CheckMenuRadioItem(hmenu, IDM_LINE_SELECTION_MODE_NONE, IDM_LINE_SELECTION_MODE_NORMAL, i, MF_BYCOMMAND);
+	CheckMenuRadioItem(hmenu, IDM_LINE_SELECTION_MODE_NONE, IDM_LINE_SELECTION_MODE_OLDVS, i, MF_BYCOMMAND);
 
 	UncheckCmd(hmenu, IDM_VIEW_MARKOCCURRENCES_OFF, bMarkOccurrences);
 	CheckCmd(hmenu, IDM_VIEW_MARKOCCURRENCES_CASE, bMarkOccurrencesMatchCase);
@@ -2939,8 +2950,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			pszTitle = tchUntitled;
 		}
 
-		if (!EditPrint(hwndEdit, pszTitle)) {
+		if (!EditPrint(hwndEdit, pszTitle, lParam & TRUE)) {
 			MsgBoxWarn(MB_OK, IDS_PRINT_ERROR, pszTitle);
+		} else if (lParam) {
+			SendWMCommand(hwnd, IDM_FILE_EXIT);
 		}
 	}
 	break;
@@ -3138,12 +3151,13 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			bLastCopyFromMe = true;
 		}
 		if (SciCall_IsSelectionEmpty() && iLineSelectionMode != LineSelectionMode_None) {
+			const int mode = iLineSelectionMode;
 			Sci_Position iCurrentPos = SciCall_GetCurrentPos();
 			const Sci_Position iCol = SciCall_GetColumn(iCurrentPos) + 1;
-			SciCall_LineCut(iLineSelectionMode & LineSelectionMode_VisualStudio);
+			SciCall_LineCut(mode & LineSelectionMode_VisualStudio);
 			iCurrentPos = SciCall_GetCurrentPos();
 			const Sci_Line iCurLine = SciCall_LineFromPosition(iCurrentPos);
-			EditJumpTo(iCurLine + 1, iCol);
+			EditJumpTo(iCurLine + (mode != LineSelectionMode_OldVisualStudio), iCol);
 		} else {
 			SciCall_Cut(false);
 		}
@@ -4114,6 +4128,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_LINE_SELECTION_MODE_NONE:
 	case IDM_LINE_SELECTION_MODE_VS:
 	case IDM_LINE_SELECTION_MODE_NORMAL:
+	case IDM_LINE_SELECTION_MODE_OLDVS:
 		iLineSelectionMode = LOWORD(wParam) - IDM_LINE_SELECTION_MODE_NONE;
 		if (iLineSelectionMode == LineSelectionMode_None) {
 			SciCall_SetSelectionMode(SC_SEL_STREAM);
@@ -6150,7 +6165,7 @@ CommandParseState ParseCommandLineEncoding(LPCWSTR opt) {
 	return CommandParseState_None;
 }
 
-CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) {
+CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) {
 	LPWSTR opt = lp1 + 1;
 	// only accept /opt, -opt, --opt
 	if (*opt == L'-') {
@@ -6316,9 +6331,10 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepa
 			break;
 
 		case L'Z':
+			// skip path for Notepad.exe
 			ExtractFirstArgument(lp2, lp1, lp2);
 			flagMultiFileArg = TripleBoolean_False;
-			*bIsNotepadReplacement = TRUE;
+			notepadAction = NotepadReplacementAction_Default;
 			state = CommandParseState_Consumed;
 			break;
 
@@ -6476,8 +6492,11 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepa
 		break;
 
 	case L'P': {
-		if (*bIsNotepadReplacement) {
+		if (opt[1] == L'\0' || notepadAction == NotepadReplacementAction_Default) {
+			notepadAction = NotepadReplacementAction_PrintDefault;
 			if (UnsafeUpper(opt[1]) == L'T') {
+				// ignore printer name
+				notepadAction = NotepadReplacementAction_PrintDialog;
 				ExtractFirstArgument(lp2, lp1, lp2);
 			}
 			state = CommandParseState_Consumed;
@@ -6669,7 +6688,6 @@ void ParseCommandLine(void) {
 	}
 
 	bool bIsFileArg = false;
-	BOOL bIsNotepadReplacement = FALSE;
 	LPWSTR lp2 = (LPWSTR)NP2HeapAlloc(cmdSize);
 	while (ExtractFirstArgument(lp3, lp1, lp2)) {
 		// options
@@ -6690,7 +6708,7 @@ void ParseCommandLine(void) {
 					break;
 				}
 			} else if (*lp1 == L'/' || *lp1 == L'-') {
-				state = ParseCommandLineOption(lp1, lp2, &bIsNotepadReplacement);
+				state = ParseCommandLineOption(lp1, lp2);
 			}
 
 			if (state == CommandParseState_Consumed) {

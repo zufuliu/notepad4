@@ -408,13 +408,11 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					continue;
 				}
 				if (!nestedState.empty()) {
+					sc.ChangeState(SCE_DART_OPERATOR2);
 					if (sc.ch == '{') {
 						nestedState.push_back(SCE_DART_DEFAULT);
 					} else if (sc.ch == '}') {
 						const int outerState = TakeAndPop(nestedState);
-						if (outerState != SCE_DART_DEFAULT) {
-							sc.ChangeState(SCE_DART_OPERATOR2);
-						}
 						sc.ForwardSetState(outerState);
 						continue;
 					}
@@ -454,15 +452,7 @@ struct FoldLineState {
 	}
 };
 
-constexpr bool IsMultilineStringStyle(int style) noexcept {
-	return style == SCE_DART_TRIPLE_STRING_SQ
-		|| style == SCE_DART_TRIPLE_STRING_DQ
-		|| style == SCE_DART_OPERATOR2
-		|| style == SCE_DART_VARIABLE2
-		|| style == SCE_DART_ESCAPECHAR;
-}
-
-void FoldDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
+void FoldDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList /*keywordLists*/, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + lengthDoc;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	FoldLineState foldPrev(0);
@@ -507,23 +497,18 @@ void FoldDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 
 		case SCE_DART_TRIPLE_RAWSTRING_SQ:
 		case SCE_DART_TRIPLE_RAWSTRING_DQ:
-			if (style != stylePrev) {
-				levelNext++;
-			} else if (style != styleNext) {
-				levelNext--;
-			}
-			break;
-
 		case SCE_DART_TRIPLE_STRING_SQ:
 		case SCE_DART_TRIPLE_STRING_DQ:
-			if (!IsMultilineStringStyle(stylePrev)) {
+			if (style != stylePrev) {
 				levelNext++;
-			} else if (!IsMultilineStringStyle(styleNext)) {
+			}
+			if (style != styleNext) {
 				levelNext--;
 			}
 			break;
 
 		case SCE_DART_OPERATOR:
+		case SCE_DART_OPERATOR2:
 			if (ch == '{' || ch == '[' || ch == '(') {
 				levelNext++;
 			} else if (ch == '}' || ch == ']' || ch == ')') {

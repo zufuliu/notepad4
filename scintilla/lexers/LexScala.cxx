@@ -412,13 +412,11 @@ void ColouriseScalaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					sc.ChangeState(SCE_SCALA_OPERATOR_PF);
 					sc.Forward();
 				} else if (!nestedState.empty()) {
+					sc.ChangeState(SCE_SCALA_OPERATOR2);
 					if (sc.ch == '{') {
 						nestedState.push_back(SCE_SCALA_DEFAULT);
 					} else if (sc.ch == '}') {
 						const int outerState = TakeAndPop(nestedState);
-						if (outerState != SCE_SCALA_DEFAULT) {
-							sc.ChangeState(SCE_SCALA_OPERATOR2);
-						}
 						sc.ForwardSetState(outerState);
 						continue;
 					}

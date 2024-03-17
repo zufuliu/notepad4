@@ -20,6 +20,7 @@
 *
 ******************************************************************************/
 
+struct IUnknown;
 #include <windows.h>
 #include <windowsx.h>
 #include <shlwapi.h>
@@ -116,7 +117,7 @@ void EditPrintInit() noexcept {
 //
 // EditPrint() - Code from SciTEWin::Print()
 //
-extern "C" bool EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
+extern "C" bool EditPrint(HWND hwnd, LPCWSTR pszDocTitle, BOOL bDefault) {
 	PRINTDLG pdlg;
 	memset(&pdlg, 0, sizeof(PRINTDLG));
 	pdlg.lStructSize = sizeof(PRINTDLG);
@@ -140,12 +141,10 @@ extern "C" bool EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 	} else {
 		pdlg.Flags |= PD_SELECTION;
 	}
-#if 0
-	if (0) {
+	if (bDefault) {
 		// Don't display dialog box, just use the default printer and options
 		pdlg.Flags |= PD_RETURNDEFAULT;
 	}
-#endif
 	if (!PrintDlg(&pdlg)) {
 		return true; // False means error...
 	}

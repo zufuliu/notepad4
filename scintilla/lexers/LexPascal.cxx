@@ -368,7 +368,7 @@ void ClassifyPascalWordFoldPoint(const CharacterSet &setWord, int &levelCurrent,
 
 #define IsCommentLine(line)		IsLexCommentLine(styler, line, SCE_PAS_COMMENTLINE)
 
-void FoldPascalDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
+void FoldPascalDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList /*keywordLists*/, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + length;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int levelPrev = styler.LevelAt(lineCurrent) & SC_FOLDLEVELNUMBERMASK;

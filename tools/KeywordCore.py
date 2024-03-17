@@ -129,6 +129,8 @@ def BuildKeywordContent(rid, lexer, keywordList, keywordCount=16):
 	return output, attrList
 
 def UpdateKeywordFile(rid, path, lexer, keywordList, keywordCount=16, suffix=''):
+	if keywordList is None:
+		return
 	attrList = []
 	if keywordList:
 		output, attrList = BuildKeywordContent(rid, lexer, keywordList, keywordCount=keywordCount)
@@ -2529,12 +2531,7 @@ def parse_verilog_api_file(pathList):
 def parse_wasm_lexer_keywords(path):
 	if not os.path.isfile(path):
 		print('missing file:', path)
-		return [
-			('keywords', [], KeywordAttr.Default),
-			('type', [], KeywordAttr.Default),
-			('instruction', [], KeywordAttr.Default),
-			('full instruction',[], KeywordAttr.NoLexer),
-		]
+		return None
 
 	keywordMap = {
 		'keywords': [],

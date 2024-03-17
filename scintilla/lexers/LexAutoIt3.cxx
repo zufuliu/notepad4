@@ -561,7 +561,7 @@ int GetStyleFirstWord(LexAccessor &styler, Sci_Line szLine) noexcept {
 
 }
 
-void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList, Accessor &styler) {
+void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/, LexerWordList /*keywordLists*/, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + length;
 	constexpr bool foldInComment = false;
 	Sci_Line lineCurrent = styler.GetLine(startPos);

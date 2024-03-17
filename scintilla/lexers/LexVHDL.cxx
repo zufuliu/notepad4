@@ -264,7 +264,9 @@ void ColouriseVHDLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					++parenCount;
 				} else if (sc.ch == ')' || sc.ch == ']' || sc.ch == '}') {
 					paren = true;
-					--parenCount;
+					if (parenCount > 0) {
+						--parenCount;
+					}
 				}
 				sc.SetState((paren || parenCount == 0) ? SCE_VHDL_OPERATOR : SCE_VHDL_OPERATOR2);
 			}
@@ -355,7 +357,7 @@ bool FindCodeFolding(LexAccessor &styler, CodeFolding folding, Sci_PositionU sta
 	return folding != CodeFolding::For;
 }
 
-void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
+void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList /*keywordLists*/, Accessor &styler) {
 	if (startPos != 0) {
 		BacktrackToStart(styler, VHDLLineStateMaskCodeFolding, startPos, lengthDoc, initStyle);
 	}

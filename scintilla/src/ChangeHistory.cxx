@@ -89,7 +89,7 @@ void ChangeStack::SetSavePoint() noexcept {
 }
 
 void ChangeStack::Check() const noexcept {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// Ensure count in steps same as insertions;
 	int sizeSteps = 0;
 	for (const int c : steps) {
@@ -329,8 +329,10 @@ size_t ChangeLog::DeletionCount(Sci::Position start, Sci::Position length) const
 }
 
 void ChangeLog::Check() const noexcept {
+#ifndef NDEBUG
 	assert(insertEdition.Length() == deleteEdition.Length());
 	changeStack.Check();
+#endif
 }
 
 ChangeHistory::ChangeHistory(Sci::Position length) {
@@ -504,11 +506,13 @@ EditionSet ChangeHistory::DeletionsAt(Sci::Position pos) const {
 }
 
 void ChangeHistory::Check() const noexcept {
+#ifndef NDEBUG
 	changeLog.Check();
 	if (changeLogReversions) {
 		changeLogReversions->Check();
 		assert(changeLogReversions->Length() == changeLog.Length());
 	}
+#endif
 }
 
 }

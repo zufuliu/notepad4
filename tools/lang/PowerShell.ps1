@@ -8,7 +8,7 @@
 # https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_language_keywords
 # https://docs.microsoft.com/en-us/powershell/scripting/lang-spec/chapter-02#231-keywords
 begin break
-catch class continue
+catch class clean continue
 data define do dynamicparam dynamicParam
 else elseif end enum exit
 filter finally for foreach from function

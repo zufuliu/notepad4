@@ -79,6 +79,7 @@ JSON Document
 	stylelintrc		Stylelint Configuration File, https://stylelint.io/
 	jsonld			JSON for Linked Data, https://json-ld.org/
 	jsonc			JSON with Comments, https://code.visualstudio.com/docs/languages/json#_json-with-comments
+	json5			JSON5, https://json5.org/
 	arcconfig		Phabricator Arcanist
 	arclint			Phabricator Arcanist
 	jscop			JSCoP File, https://polly.llvm.org/documentation/passes.html
@@ -551,6 +552,7 @@ TypeScript
 	tsx		TypeScript with JSX
 	cts		cjs
 	mts		mjs
+	ets		HarmonyOS ArkTS, https://developer.huawei.com/consumer/cn/arkts/
 
 
 VBScript

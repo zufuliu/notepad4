@@ -580,6 +580,7 @@ BEGIN
 			BEGIN
 				MENUITEM "Aucun",					IDM_LINE_SELECTION_MODE_NONE
 				MENUITEM "&Visual Studio",			IDM_LINE_SELECTION_MODE_VS
+				MENUITEM "&Old Visual Studio",		IDM_LINE_SELECTION_MODE_OLDVS
 				MENUITEM "Nor&mal",					IDM_LINE_SELECTION_MODE_NORMAL
 			END
 		END
@@ -1851,6 +1852,7 @@ fichier\tDoit être le dernier argument, pas de doubles guillemets pour les espa
 /l[o|p]\tRecharge automatiquement les fichiers modifiés.\n\
 /q\tForce la création de nouveau fichier sans demander.\n\
 /ro\tOuvre un fichier en mode lecture seule.\n\
+/p\tPrint file with default printer and options.\n\
 /s nom\tSélectionne le thème spécifié.\n\
 /d\tSélectionne thème dans le fichier spécifié.\n\
 /h\tSélectionne le thème pour le code de type Web.\n\
@@ -1859,7 +1861,7 @@ fichier\tDoit être le dernier argument, pas de doubles guillemets pour les espa
 /b\tOpen new paste board to collect clipboard entries.\n\
 /n\tToujours ouvrir une nouvelle fenêtre (/ns une seule instance de fichier permise).\n\
 /r\tRéutiliser la fenêtre actuelle(/rs une seule instance de fichier permise).\n\
-/p\tRégler la position et la taille de la fenêtre (/p0, /ps, /pf,l,t,r,b,m).\n\
+/p<flag>\tRégler la position et la taille de la fenêtre (/p0, /ps, /pf,l,t,r,b,m).\n\
 /t title\tRégler le titre de la fenêtre.\n\
 /i\tDémarrer en mode réduit dans la barre des tâches.\n\
 /o\tGarder la fenêtre en avant des autres applications.\n\

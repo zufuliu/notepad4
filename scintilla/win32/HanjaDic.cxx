@@ -11,6 +11,7 @@
 #include <string_view>
 #include <memory>
 
+struct IUnknown;
 #include <windows.h>
 #include <ole2.h>
 

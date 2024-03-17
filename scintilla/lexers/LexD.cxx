@@ -642,26 +642,7 @@ struct FoldLineState {
 	}
 };
 
-constexpr bool IsStreamCommentStyle(int style) noexcept {
-	return style == SCE_D_COMMENTBLOCK
-		|| style == SCE_D_COMMENTBLOCKDOC
-		|| style == SCE_D_COMMENTDOCWORD
-		|| style == SCE_D_COMMENTDOCMACRO
-		|| style == SCE_D_TASKMARKER;
-}
-
-constexpr bool IsMultilineStringStyle(int style) noexcept {
-	return style == SCE_D_STRING
-		|| style == SCE_D_HEXSTRING
-		|| style == SCE_D_RAWSTRING
-		|| style == SCE_D_STRING_BT
-		|| style == SCE_D_DELIMITED_STRING
-		|| style == SCE_D_ESCAPECHAR
-		|| style == SCE_D_DELIMITED_ID
-		|| style == SCE_D_FORMAT_SPECIFIER;
-}
-
-void FoldDDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
+void FoldDDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList /*keywordLists*/, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + lengthDoc;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	FoldLineState foldPrev(0);
@@ -695,9 +676,15 @@ void FoldDDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Lex
 		switch (style) {
 		case SCE_D_COMMENTBLOCKDOC:
 		case SCE_D_COMMENTBLOCK:
-			if (!IsStreamCommentStyle(stylePrev)) {
+		case SCE_D_STRING:
+		case SCE_D_HEXSTRING:
+		case SCE_D_RAWSTRING:
+		case SCE_D_STRING_BT:
+		case SCE_D_DELIMITED_STRING:
+			if (style != stylePrev) {
 				levelNext++;
-			} else if (!IsStreamCommentStyle(styleNext)) {
+			}
+			if (style != styleNext) {
 				levelNext--;
 			}
 			break;
@@ -712,18 +699,6 @@ void FoldDDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Lex
 				styleNext = styler.StyleAt(startPos);
 			}
 		} break;
-
-		case SCE_D_STRING:
-		case SCE_D_HEXSTRING:
-		case SCE_D_RAWSTRING:
-		case SCE_D_STRING_BT:
-		case SCE_D_DELIMITED_STRING:
-			if (!IsMultilineStringStyle(stylePrev)) {
-				levelNext++;
-			} else if (!IsMultilineStringStyle(styleNext)) {
-				levelNext--;
-			}
-			break;
 
 		case SCE_D_OPERATOR:
 			if (ch == '{' || ch == '[' || ch == '(') {

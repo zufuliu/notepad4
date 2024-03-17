@@ -472,7 +472,9 @@ void ColouriseVerilogDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int ini
 				} else if (sc.ch == '(' || sc.ch == '[' || sc.ch == '{') {
 					++parenCount;
 				} else if (sc.ch == ')' || sc.ch == ']' || sc.ch == '}') {
-					--parenCount;
+					if (parenCount > 0) {
+						--parenCount;
+					}
 				}
 			}
 		}
@@ -497,7 +499,7 @@ constexpr int GetLineCommentState(int lineState) noexcept {
 	return lineState & VerilogLineStateMaskLineComment;
 }
 
-void FoldVerilogDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
+void FoldVerilogDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList /*keywordLists*/, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + lengthDoc;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;

@@ -580,6 +580,7 @@ BEGIN
 			BEGIN
 				MENUITEM "無(&N)",						IDM_LINE_SELECTION_MODE_NONE
 				MENUITEM "&Visual Studio",				IDM_LINE_SELECTION_MODE_VS
+				MENUITEM "舊版 Visual Studio(&O)",		IDM_LINE_SELECTION_MODE_OLDVS
 				MENUITEM "正常(&M)",						IDM_LINE_SELECTION_MODE_NORMAL
 			END
 		END
@@ -1851,6 +1852,7 @@ BEGIN
 /l[o|p]\t自動載入修改的檔案。\n\
 /q\t強制建立新檔案而不提示。\n\
 /ro\t以唯讀模式打開檔。\n\
+/p\t使用預設印表機和選項列印檔案。\n\
 /s 名稱\t選擇指定的檔案型態。\n\
 /d\t指定為 文字檔案。\n\
 /h\t指定為 Web 原始碼。\n\
@@ -1859,7 +1861,7 @@ BEGIN
 /b\t開啟新的貼上簿來接收剪貼簿中的內容。\n\
 /n\t始終開啟新視窗 (/ns 單個實體模式)。\n\
 /r\t重用視窗 (/rs 單個實體模式)。\n\
-/p\t設定視窗大小與位置 (/p0, /ps, /pf,l,t,r,b,m)。\n\
+/p<標記>\t設定視窗大小與位置 (/p0, /ps, /pf,l,t,r,b,m)。\n\
 /t 標題\t設定視窗標題。\n\
 /i\t啟動時最小化到托盤。\n\
 /o\t保持在最前面。\n\

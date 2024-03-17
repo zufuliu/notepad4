@@ -220,7 +220,7 @@ void EditOpenSelection(OpenSelectionType type);
 extern "C" {
 #endif
 
-bool	EditPrint(HWND hwnd, LPCWSTR pszDocTitle);
+bool	EditPrint(HWND hwnd, LPCWSTR pszDocTitle, BOOL bDefault);
 void	EditPrintSetup(HWND hwnd);
 void	EditCopyAsRTF(HWND hwnd);
 
@@ -648,4 +648,5 @@ enum LineSelectionMode {
 	LineSelectionMode_None,
 	LineSelectionMode_VisualStudio,
 	LineSelectionMode_Normal,
+	LineSelectionMode_OldVisualStudio,
 };

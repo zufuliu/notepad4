@@ -1,0 +1,13 @@
+# pylint --generate-rcfile
+# https://pylint.pycqa.org/en/latest/
+
+[MESSAGES CONTROL]
+disable=
+	bad-indentation,
+	invalid-name,
+	line-too-long,
+	missing-docstring,
+	unused-wildcard-import,
+
+[TYPECHECK]
+ignored-modules=unicodedata

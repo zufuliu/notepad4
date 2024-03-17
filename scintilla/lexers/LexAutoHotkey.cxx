@@ -652,15 +652,15 @@ void ColouriseAHKDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				sc.SetState(SCE_AHK_HOTSTRING_VALUE);
 			} else if (sc.ch == ';') {
 				if (visibleChars == 0 || IsASpaceOrTab(sc.chPrev)) {
+					sc.SetState(SCE_AHK_COMMENTLINE);
 					if (visibleChars == 0) {
 						lineStateLineComment = AHKLineStateMaskLineComment;
-					}
-					sc.SetState(SCE_AHK_COMMENTLINE);
-					if (visibleChars == 0 && sc.chNext == '@') {
-						sc.Forward();
-						if (UnsafeLower(sc.chNext) == 'a') {
-							outerStyle = sc.state;
-							sc.SetState(SCE_AHK_DIRECTIVE_AT);
+						if (sc.chNext == '@') {
+							sc.Forward();
+							if (UnsafeLower(sc.chNext) == 'a') {
+								outerStyle = sc.state;
+								sc.SetState(SCE_AHK_DIRECTIVE_AT);
+							}
 						}
 					}
 				}
@@ -754,24 +754,6 @@ constexpr int GetLineCommentState(int lineState) noexcept {
 	return lineState & AHKLineStateMaskLineComment;
 }
 
-constexpr bool IsStreamCommentStyle(int style) noexcept {
-	return style == SCE_AHK_COMMENTBLOCK
-		|| style == SCE_AHK_DIRECTIVE_AT
-		|| style == SCE_AHK_TASKMARKER;
-}
-
-constexpr bool IsMultilineStringStyle(int style) noexcept {
-	return style == SCE_AHK_SECTION_SQ
-		|| style == SCE_AHK_SECTION_DQ
-		|| style == SCE_AHK_SECTION_NQ
-		|| style == SCE_AHK_SECTION_COMMENT
-		|| style == SCE_AHK_SECTION_OPTION
-		|| style == SCE_AHK_ESCAPECHAR
-		|| style == SCE_AHK_FORMAT_SPECIFIER
-		|| style == SCE_AHK_SENTKEY
-		|| style == SCE_AHK_DYNAMIC_VARIABLE;
-}
-
 void FoldAHKDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList /*keywordLists*/, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + lengthDoc;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
@@ -802,19 +784,13 @@ void FoldAHKDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 
 		switch (style) {
 		case SCE_AHK_COMMENTBLOCK:
-			if (!IsStreamCommentStyle(stylePrev)) {
-				levelNext++;
-			} else if (!IsStreamCommentStyle(styleNext)) {
-				levelNext--;
-			}
-			break;
-
 		case SCE_AHK_SECTION_SQ:
 		case SCE_AHK_SECTION_DQ:
 		case SCE_AHK_SECTION_NQ:
-			if (!IsMultilineStringStyle(stylePrev)) {
+			if (style != stylePrev) {
 				levelNext++;
-			} else if (!IsMultilineStringStyle(styleNext)) {
+			}
+			if (style != styleNext) {
 				levelNext--;
 			}
 			break;

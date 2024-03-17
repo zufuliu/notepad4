@@ -1,4 +1,4 @@
-// F# 7.0 https://fsharp.org/
+// F# 8.0 https://fsharp.org/
 // https://docs.microsoft.com/en-us/dotnet/fsharp/language-reference/
 // https://github.com/fsharp/fslang-design
 

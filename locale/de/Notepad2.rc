@@ -580,6 +580,7 @@ BEGIN
 			BEGIN
 				MENUITEM "&None",					IDM_LINE_SELECTION_MODE_NONE
 				MENUITEM "&Visual Studio",			IDM_LINE_SELECTION_MODE_VS
+				MENUITEM "&Old Visual Studio",		IDM_LINE_SELECTION_MODE_OLDVS
 				MENUITEM "Nor&mal",					IDM_LINE_SELECTION_MODE_NORMAL
 			END
 		END
@@ -1851,6 +1852,7 @@ file\tMust be the last argument, no quoted spaces by default.\n\
 /l[o|p]\tAuto-reload modified files.\n\
 /q\tForce creation of new files without prompt.\n\
 /ro\tOpen file in read only mode.\n\
+/p\tPrint file with default printer and options.\n\
 /s name\tSelect specified syntax scheme.\n\
 /d\tSelect Text File scheme.\n\
 /h\tSelect Web Source Code scheme.\n\
@@ -1859,7 +1861,7 @@ file\tMust be the last argument, no quoted spaces by default.\n\
 /b\tOpen new paste board to collect clipboard entries.\n\
 /n\tAlways open a new window (/ns single file instance).\n\
 /r\tReuse window (/rs single file instance).\n\
-/p\tSet window position and size (/p0, /ps, /pf,l,t,r,b,m).\n\
+/p<flag>\tSet window position and size (/p0, /ps, /pf,l,t,r,b,m).\n\
 /t title\tSet window title.\n\
 /i\tStart as tray icon.\n\
 /o\tKeep window on top.\n\

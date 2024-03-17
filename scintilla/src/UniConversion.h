@@ -76,8 +76,12 @@ inline int UTF8Classify(const unsigned char *us, size_t len) noexcept {
 	}
 	return UTF8ClassifyMulti(us, len);
 }
+inline int UTF8Classify(const char *s, size_t len) noexcept {
+	return UTF8Classify(reinterpret_cast<const unsigned char *>(s), len);
+}
+
 inline int UTF8Classify(std::string_view sv) noexcept {
-	return UTF8Classify(reinterpret_cast<const unsigned char *>(sv.data()), sv.length());
+	return UTF8Classify(sv.data(), sv.length());
 }
 
 // Similar to UTF8Classify but returns a length of 1 for invalid bytes

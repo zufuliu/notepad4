@@ -239,11 +239,13 @@ def find_new_texinfo_commands(path, lang):
 	doc = re.sub(r'@comment\W.+', '', doc)
 	macros = re.findall(r'@r?macro\s+(\w+)', doc)
 	macros.extend(re.findall(r'@alias\s+(\w+)', doc))
-	commands = re.findall(r'@(\w+)', doc)
+	# find inside "Command List" section
+	commands = re.findall(r'@itemx?\s+@@(\w+)', doc)
+	commands += ['c', 'comment', 'rmacro']
 	commands = set(commands) - set(macros)
 	with open('texinfo-new.texi', 'w', encoding='utf-8') as fd:
 		doc = '\n@'.join(sorted(commands - existing))
-		fd.write('mew commands:\n')
+		fd.write('new commands:\n')
 		fd.write(f'@{doc}\n')
 		fd.write('\nunknown commands:\n')
 		doc = '\n@'.join(sorted(existing - commands))
@@ -260,4 +262,5 @@ def find_new_texinfo_commands(path, lang):
 #dump_all_css_properties('all-descriptors.en.json', 'descriptor', 'specification', 'URL')
 #find_new_css_properties('all-properties.en.json', 'all-descriptors.en.json', 'lang/CSS.css')
 
+#group_powershell_commands('.ps1')
 #find_new_texinfo_commands(r'texinfo.texi', 'lang/Texinfo.texi')

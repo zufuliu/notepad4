@@ -785,7 +785,9 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 					sc.SetState(SCE_PY_OPERATOR);
 				}
 			} else if (IsAGraphic(sc.ch) && sc.ch != '\\') {
+				kwType = KeywordType::None;
 				const bool interpolating = !nestedState.empty();
+				sc.SetState(interpolating ? SCE_PY_OPERATOR2 : SCE_PY_OPERATOR);
 				int braceCount = 0;
 				if (sc.ch == '{' || sc.ch == '[' || sc.ch == '(') {
 					if (interpolating) {
@@ -813,12 +815,10 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 					const FormattedStringState &state = nestedState.back();
 					if (state.parenCount == 0 && IsPyFormattedStringEnd(sc, braceCount)) {
 						fstringPart = (sc.ch == '}') ? FormattedStringPart::End : FormattedStringPart::FormatSpec;
-						sc.SetState(state.state);
+						sc.ChangeState(state.state);
 						continue;
 					}
 				}
-				sc.SetState(SCE_PY_OPERATOR);
-				kwType = KeywordType::None;
 			}
 		}
 
