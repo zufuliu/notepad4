@@ -1848,7 +1848,7 @@ BEGIN
 /l[o|p]\t수정된 파일을 자동으로 다시 불러옵니다.\n\
 /q\t프롬프트없이 새 파일을 강제로 생성합니다.\n\
 /ro\t파일을 읽기 전용 모드로 엽니다.\n\
-/p\tPrint file with default printer and options.\n\
+/p\t기본 프린터 및 옵션으로 파일을 인쇄합니다.\n\
 /s 이름\t지정된 구문 체계를 선택합니다.\n\
 /d\t텍스트 파일 구성표를 선택합니다.\n\
 /h\t웹 소스 코드 체계를 선택합니다.\n\
@@ -1964,10 +1964,10 @@ BEGIN
 	IDS_ENCODING_ISO8859_14			"켈트어 (라틴어-8, ISO 8859-14);ISO 8859-14"				// 서유럽어
 	IDS_ENCODING_MAC_THAI			"Mac 태국어;Mac 태국어"										// 동남아시아
 	IDS_ENCODING_TIS620				"태국어 (TIS-620, Windows-874, ISO 8859-11);TIS-620"		// 동남아시아
-	IDS_ENCODING_DOS857				"OEM 터키어 (DOS-857);DOS-857"							// 터키어
-	IDS_ENCODING_ISO8859_9			"라틴-5 (ISO 8859-9);ISO 8859-9"						// 터키어
-	IDS_ENCODING_MAC_TURKISH		"Mac 터키어;Mac 터키어"								// 터키어
-	IDS_ENCODING_WINDOWS1254		"Windows-1254;Windows-1254"								// 터키어
+	IDS_ENCODING_DOS857				"OEM 튀르키예어 (DOS-857);DOS-857"							// 튀르키예어
+	IDS_ENCODING_ISO8859_9			"라틴-5 (ISO 8859-9);ISO 8859-9"						// 튀르키예어
+	IDS_ENCODING_MAC_TURKISH		"Mac 튀르키예어;Mac 튀르키예어"								// 튀르키예어
+	IDS_ENCODING_WINDOWS1254		"Windows-1254;Windows-1254"								// 튀르키예어
 	IDS_ENCODING_MAC_UKRAINIAN		"Mac 우크라이나어;Mac 우크라이나어"							// 키릴 문자
 	IDS_ENCODING_WINDOWS1258		"베트남어 (Windows-1258);Windows-1258"				// 동남아시아
 	IDS_ENCODING_DOS850				"OEM 라틴어-1 (DOS-850);DOS-850"							// 서유럽어
@@ -1979,7 +1979,7 @@ BEGIN
 	IDS_ENCODING_IBM500				"국제 (IBM500);EBCDIC (Intl.)"					// EBCDIC
 	IDS_ENCODING_IBM870				"라틴어-2 (IBM870);EBCDIC (라틴어-2)"						// EBCDIC
 	IDS_ENCODING_CP875				"현대 그리스어 (CP875);EBCDIC (그리스)"					// EBCDIC
-	IDS_ENCODING_IBM1026			"터키어 (라틴어-5) (IBM1026);EBCDIC (라틴어-5)"			// EBCDIC
+	IDS_ENCODING_IBM1026			"튀르키예어 (라틴어-5) (IBM1026);EBCDIC (라틴어-5)"			// EBCDIC
 	IDS_ENCODING_DOS437				"OEM 미국 (DOS-437);DOS-437"					// 서유럽어
 	IDS_ENCODING_DOS858				"OEM 라틴어-1 + 유로 기호 (DOS-858);DOS-858"			// 서유럽어
 	IDS_ENCODING_DOS860				"OEM 포르투칼어 (DOS-860);DOS-860"						// 서유럽어
