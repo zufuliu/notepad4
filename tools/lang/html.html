@@ -1,5 +1,5 @@
 <!--
-https://whatwg.org/ 12 January 2024
+https://whatwg.org/ 15 March 2024
 HTML 4.01 https://www.w3.org/TR/html4/ 27 March 2018
 XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 -->
@@ -33,6 +33,7 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 	tabindex
 	title
 	translate="yes no"
+	writingsuggestions="true false"
 >
 	<head>
 		<title>HTML5</title>
@@ -41,7 +42,7 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 		<!-- Link types https://html.spec.whatwg.org/multipage/links.html#linkTypes -->
 		<link href
 			crossorigin="anonymous use-credentials"
-			rel="alternate canonical author bookmark dns-prefetch external help icon manifest modulepreload license next nofollow noopener noreferrer opener pingback preconnect prefetch preload prerender prev privacy-policy search stylesheet tag terms-of-service"
+			rel="alternate canonical author bookmark dns-prefetch expect external help icon manifest modulepreload license next nofollow noopener noreferrer opener pingback preconnect prefetch preload prerender prev privacy-policy search stylesheet tag terms-of-service"
 			media integrity hreflang type="text/plain text/css"
 			referrerpolicy="no-referrer no-referrer-when-downgrade same-origin origin strict-origin origin-when-cross-origin strict-origin-when-cross-origin unsafe-url"
 			sizes imagesrcset imagesizes as blocking color disabled
@@ -162,6 +163,7 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 		onpagehide
 		onpagereveal
 		onpageshow
+		onpageswap
 		onpopstate
 		onrejectionhandled
 		onstorage
@@ -240,7 +242,7 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 		<picture></picture>
 		<source src type srcset sizes="auto" media width height>
 		<img alt src srcset sizes crossorigin usemap ismap width height
-		decoding="sync async auto" loading="lazy eager" fetchpriority>
+		decoding="sync async auto" loading="lazy eager" referrerpolicy fetchpriority>
 		<!-- https://html.spec.whatwg.org/multipage/iframe-embed-object.html -->
 		<iframe src srcdoc name sandbox allow allowfullscreen allowpaymentrequest width height referrerpolicy loading></iframe>
 		<embed src type width height>
@@ -284,11 +286,12 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 			<!-- https://html.spec.whatwg.org/multipage/input.html#the-input-element -->
 			<input accept="audio/* video/* image/*"
 				alt autocomplete checked dirname disabled form formaction formenctype formmethod formnovalidate formtarget
-				height list max maxlength min minlength multiple name pattern placeholder readonly required size src step
+				height list max maxlength min minlength multiple name pattern placeholder popovertarget popovertargetaction readonly required size src step
 				type="hidden text search tel url email password date month week time datetime-local number range color checkbox radio file submit image reset button"
 				value width title>
 			<!-- https://html.spec.whatwg.org/multipage/form-elements.html#the-button-element -->
-			<button disabled form formaction formenctype formmethod formnovalidate formtarget name type="submit reset button" value></button>
+			<button disabled form formaction formenctype formmethod formnovalidate formtarget name popovertarget popovertargetaction
+				type="submit reset button" value></button>
 			<select autocomplete disabled form multiple name required size>
 				<optgroup disabled label>
 					<option disabled label selected value></option>
@@ -311,7 +314,7 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 		<script src type="text/javascript text/ecmascript text/jscript text/livescript module text/plain text/xml application/octet-stream application/xml"
 			charset nomodule async defer crossorigin integrity referrerpolicy blocking="render" fetchpriority></script>
 		<noscript></noscript>
-		<template shadowrootmode="open closed" shadowrootdelegatesfocus></template>
+		<template shadowrootmode="open closed" shadowrootdelegatesfocus shadowrootclonable></template>
 		<slot name></slot>
 		<!-- https://html.spec.whatwg.org/multipage/canvas.html -->
 		<canvas width height></canvas>
