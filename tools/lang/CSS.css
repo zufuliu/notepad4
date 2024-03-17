@@ -1,5 +1,5 @@
 // 2023 https://www.w3.org/TR/CSS/ 7 December 2023
-// 2024-01-14 https://drafts.csswg.org/
+// 2024-03-16 https://drafts.csswg.org/
 // https://github.com/w3c/csswg-drafts/
 // https://www.w3.org/Style/CSS/all-properties
 // https://www.w3.org/Style/CSS/all-descriptors
@@ -10,20 +10,20 @@
 // https://www.w3.org/TR/css-syntax-3/ 24 December 2021
 !important
 
-// CSS Anchor Positioning https://www.w3.org/TR/css-anchor-position-1/ 29 June 2023
+// CSS Anchor Positioning https://www.w3.org/TR/css-anchor-position-1/ 14 March 2024
 {
-	anchor-name:;
-	anchor-default: implicit;
-	anchor-scroll: none | default;
-	position-fallback: none;
-	position-fallback-bounds: normal;
+	anchor-name: none;
+	anchor-scope: none | all;
+	position-anchor: implicit;
+	inset-area: none;
+
+	position-try-options: none | inset-area();
+	position-try-order: normal | most-width | most-height | most-block-size | most-inline-size;
+	position-try:;
 }
 anchor()
-auto auto-same top left right bottom start end self-start self-end center
 anchor-size()
-width height block inline self-block self-inline
-@position-fallback {}
-@try {}
+@position-try {}
 
 // CSS Animations Level 2 https://www.w3.org/TR/css-animations-2/ 2 June 2023
 // CSS Animations Level 1 https://www.w3.org/TR/css-animations-1/ 2 March 2023
@@ -43,7 +43,7 @@ from to
 	animation:;
 }
 
-// CSS Backgrounds and Borders Module Level 3 https://www.w3.org/TR/css-backgrounds-3/ 19 December 2023
+// CSS Backgrounds and Borders Module Level 3 https://www.w3.org/TR/css-backgrounds-3/ 11 March 2024
 // Box model https://www.w3.org/TR/CSS22/box.html
 {
 	background-color: transparent;
@@ -125,7 +125,9 @@ from to
 	appearance: none | auto | textfield | menulist-button | searchfield | textarea | push-button | slider-horizontal | checkbox | radio | square-button | menulist | listbox | meter | progress-bar | button;
 
 	// https://drafts.csswg.org/css-ui-4/
+	caret-animation: auto | manual;
 	pointer-events: auto | none;
+	field-sizing: fixed | content;
 	input-security: auto | none;
 }
 
@@ -211,12 +213,12 @@ initial inherit unset revert revert-layer
 @scope {}
 :scope
 
-// CSS Color Module Level 5 https://www.w3.org/TR/css-color-5/ 28 June 2022
-// CSS Color Module Level 4 https://www.w3.org/TR/css-color-4/ 1 November 2022
+// CSS Color Module Level 5 https://www.w3.org/TR/css-color-5/ 29 February 2024
+// CSS Color Module Level 4 https://www.w3.org/TR/css-color-4/ 13 February 2024
 // CSS Color Module Level 3 https://www.w3.org/TR/css-color-3/ 18 January 2022
 // Colors and Backgrounds https://www.w3.org/TR/CSS22/colors.html
 {
-	color: color-mix(), color-contrast(), rgb(), rgba(), hsl(), hsla(), hwb(), lab(), oklab(), lch(), oklch(), color(), device-cmyk(), currentColor;
+	color: color-mix(), color-contrast(), rgb(), rgba(), hsl(), hsla(), hwb(), lab(), oklab(), lch(), oklch(), color(), device-cmyk(), contrast-color(), currentColor;
 	color: Canvas, CanvasText, LinkText, VisitedText, ActiveText, ButtonFace, ButtonText, ButtonBorder, Field, FieldText, Highlight, HighlightText, Mark, MarkText, GrayText;
 	opacity: inherit;
 }
@@ -304,21 +306,6 @@ var()
 	list-style-type: symbols();
 }
 
-// CSS Device Adaptation Module Level 1 https://www.w3.org/TR/css-device-adapt-1/ 29 March 2016
-@viewport {
-	width:;
-	min-width:;
-	max-width:;
-	height:;
-	min-height:;
-	max-height:;
-	zoom:;
-	min-zoom:;
-	max-zoom:;
-	user-zoom: zoom fixed;
-	orientation: auto portrait landscape;
-}
-
 // CSS Display Module Level 3 https://www.w3.org/TR/css-display-3/ 30 March 2023
 {
 	display: block | inline | run-in | flow | flow-root | table | flex | grid | ruby | flow | flow-root | list-item | table-row-group | table-header-group | table-footer-group | table-row | table-cell | table-column-group | table-column | table-caption | ruby-base | ruby-text | ruby-base-container |
@@ -370,7 +357,7 @@ step-start step-end steps()
 	stroke-opacity:;
 }
 
-// Filter Effects Module Level 2 https://drafts.fxtf.org/filter-effects-2/ 7 March 2023
+// Filter Effects Module Level 2 https://drafts.fxtf.org/filter-effects-2/ 5 March 2024
 // Filter Effects Module Level 1 https://www.w3.org/TR/filter-effects-1/ 18 December 2018
 {
 	filter: none | blur() | brightness() | contrast() | drop-shadow() | grayscale() | hue-rotate() | invert() | opacity() | sepia() | saturate();
@@ -398,22 +385,24 @@ step-start step-end steps()
 	align-content: flex-start | flex-end | center | space-between | space-around | stretch;
 }
 
-// CSS Fonts Module Level 5 https://www.w3.org/TR/css-fonts-5/ 21 December 2021
-// CSS Fonts Module Level 4 https://www.w3.org/TR/css-fonts-4/ 21 December 2021
+// CSS Fonts Module Level 5 https://www.w3.org/TR/css-fonts-5/ 6 February 2024
+// CSS Fonts Module Level 4 https://www.w3.org/TR/css-fonts-4/ 1 February 2024
 // CSS Fonts Module Level 3 https://www.w3.org/TR/css-fonts-3/ 20 September 2018
 // Fonts https://www.w3.org/TR/CSS22/fonts.html
 {
 	font-family: serif | sans-serif | cursive | fantasy | monospace | system-ui | emoji | math | fangsong | ui-serif | ui-sans-serif | ui-monospace | ui-rounded;
 	font-weight: normal | bold | bolder | lighter;
+	font-width: normal | ultra-condensed | extra-condensed | condensed | semi-condensed | semi-expanded | expanded | extra-expanded | ultra-expanded;
 	font-stretch: normal | ultra-condensed | extra-condensed | condensed | semi-condensed | semi-expanded | expanded | extra-expanded | ultra-expanded;
 	font-style: normal | italic | oblique;
 	font-size: xx-small | x-small | small | medium | large | x-large | xx-large | larger | smaller;
 	font-size-adjust: none | ex-height | cap-height | ch-width | ic-width | ic-height | from-font;
 	font: caption | icon | menu | message-box | small-caption | status-bar;
 
-	font-synthesis-weight:auto | none;
-	font-synthesis-style:auto | none;
-	font-synthesis-small-caps:auto | none;
+	font-synthesis-weight: auto | none;
+	font-synthesis-style: auto | none;
+	font-synthesis-small-caps: auto | none;
+	font-synthesis-position: auto | none;
 	font-synthesis: none | weight | style | small-caps;
 
 	font-kerning: auto | normal | none;
@@ -426,7 +415,7 @@ step-start step-end steps()
 	font-variant: normal | none | petite-caps | all-petite-caps | unicase | titling-caps | ordinal | slashed-zero | ruby | sub | super;
 
 	font-optical-sizing: auto | none;
-	font-palette: none | normal | light | dark;
+	font-palette: none | normal | light | dark | palette-mix();
 }
 @font-face {
 	src: format(), techn(), local(), collection | embedded-opentype | opentype | svg | truetype | woff | woff2, variations | palettes | incremental, feature-opentype | feature-aat | feature-graphite, color-COLRv0 | color-COLRv1 | color-SVG | color-sbix | color-CBDT;
@@ -440,6 +429,7 @@ step-start step-end steps()
 	ascent-override: normal;
 	descent-override: normal;
 	line-gap-override: normal;
+
 	superscript-position-override: normal | from-font;
 	subscript-position-override: normal | from-font;
 	superscript-size-override: normal | from-font;
@@ -460,6 +450,8 @@ step-start step-end steps()
 	base-palette:;
 	override-colors:;
 }
+
+// CSS Font Loading Module Level 3 https://www.w3.org/TR/css-font-loading/ 6 April 2023
 
 // CSS Fragmentation Module Level 4 https://www.w3.org/TR/css-break-4/ 18 December 2018
 // CSS Fragmentation Module Level 3 https://www.w3.org/TR/css-break-3/ 4 December 2018
@@ -488,12 +480,12 @@ step-start step-end steps()
 	bookmark-state: open | closed;
 }
 
-// CSS Generated Content for Paged Media Module https://www.w3.org/TR/css-gcpm-3/ 13 May 2014
+// CSS Generated Content for Paged Media Module https://www.w3.org/TR/css-gcpm-3/ 22 January 2024
 ::footnote-call
 ::footnote-marker
 {
 	string-set: none, counter(), counters(), content(), attr(), string();
-	position: running();
+	position: running() | element();
 	running: none;
 
 	float: footnote;
@@ -754,7 +746,7 @@ all continuous paged visual audio speech tactile grid bitmap interactive static
 	max-device-aspect-ratio:;
 }
 
-// CSS Mobile Text Size Adjustment Module Level 1 https://drafts.csswg.org/css-size-adjust/ 23 June 2022
+// CSS Mobile Text Size Adjustment Module Level 1 https://drafts.csswg.org/css-size-adjust/ 24 January 2024
 {
 	text-size-adjust: auto | none;
 }
@@ -789,6 +781,9 @@ all continuous paged visual audio speech tactile grid bitmap interactive static
 // CSS Nesting Module https://www.w3.org/TR/css-nesting-1/ 14 February 2023
 @scope {}
 @nest {}
+
+// CSS Object Model (CSSOM) https://www.w3.org/TR/cssom-1/ 26 August 2021
+// CSSOM View Module https://www.w3.org/TR/cssom-view-1/ 17 March 2016
 
 // CSS Overflow Module Level 4 https://www.w3.org/TR/css-overflow-4/ 21 March 2023
 // CSS Overflow Module Level 3 https://www.w3.org/TR/css-overflow-3/ 29 March 2023
@@ -1161,6 +1156,8 @@ view()
 	voice-duration: auto;
 }
 
+// CSS Style Attributes https://www.w3.org/TR/css-style-attr/ 07 November 2013
+
 // Tables https://www.w3.org/TR/CSS22/tables.html
 {
 	caption-side: top | bottom;
@@ -1184,14 +1181,12 @@ view()
 	chains: none;
 }
 
-// CSS Text Module Level 4 https://www.w3.org/TR/css-text-4/ 20 October 2023
+// CSS Text Module Level 4 https://www.w3.org/TR/css-text-4/ 19 February 2024
 // CSS Text Module Level 3 https://www.w3.org/TR/css-text-3/ 3 September 2023
 // Text https://www.w3.org/TR/CSS22/text.html
 {
 	text-transform: none | capitalize | uppercase | lowercase | full-width | full-size-kana;
 	word-space-transform: none | space | ideographic-space | auto-phrase;
-	word-boundary-detection: normal | manual | auto();
-	word-boundary-expansion: none | space | ideographic-space;
 
 	white-space: normal | pre | nowrap | pre-wrap | break-spaces | pre-line;
 	white-space-collapse: collapse | discard | preserve | preserve-breaks | preserve-spaces;
@@ -1278,6 +1273,7 @@ view()
 	transform-box: content-box | border-box | fill-box | stroke-box | view-box;
 }
 
+// CSS Transitions Level 2 https://www.w3.org/TR/css-transitions-2/ 5 September 2023
 // CSS Transitions Level 1 https://www.w3.org/TR/css-transitions-1/ 11 October 2018
 {
 	transition-property: none | all;
@@ -1285,10 +1281,12 @@ view()
 	// https://www.w3.org/TR/css-easing-1/
 	transition-timing-function: linear, ease | ease-in | ease-out | ease-in-out | cubic-bezier(), step-start | step-end | steps(), jump-start | jump-end | jump-none | jump-both | start | end;
 	transition-delay:;
+	transition-behavior: normal | allow-discrete;
 	transition:;
 }
+@starting-style {}
 
-// CSS Values and Units Module Level 4 https://www.w3.org/TR/css-values-4/ 18 December 2023
+// CSS Values and Units Module Level 4 https://www.w3.org/TR/css-values-4/ 12 March 2024
 // CSS Values and Units Module Level 3 https://www.w3.org/TR/css-values-3/ 01 December 2022
 mix()
 initial nherit unset
@@ -1302,6 +1300,11 @@ sin() cos() tan() asin() acos() atan() atan2()
 pow() sqrt() hypot() log() exp()
 abs() sign()
 pi infinity NaN
+
+// CSS Viewport Module Level 1 https://www.w3.org/TR/css-viewport-1/ 25 January 2024
+{
+	zoom:;
+}
 
 // CSS View Transitions Module Level 1 https://www.w3.org/TR/css-view-transitions-1/ 5 September 2023
 {
@@ -1396,7 +1399,7 @@ aural speech
 	speak-header: once | always;
 }
 
-// Compatibility https://compat.spec.whatwg.org/ 10 January 2024
+// Compatibility https://compat.spec.whatwg.org/ 24 January 2024
 {
 	touch-action: auto | none | pan-x | pan-left | pan-right | pan-y | pan-up | pan-down | pinch-zoom | manipulation;
 }
