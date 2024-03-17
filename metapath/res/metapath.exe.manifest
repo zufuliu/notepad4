@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
-	<assemblyIdentity name="metapath" processorArchitecture="*" version="4.24.01.5098" type="win32"/>
+	<assemblyIdentity name="metapath" processorArchitecture="*" version="4.24.03.5146" type="win32"/>
 	<description>metapath File Browser</description>
 	<dependency>
 		<dependentAssembly>
