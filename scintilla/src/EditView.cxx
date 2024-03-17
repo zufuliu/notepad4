@@ -1017,8 +1017,12 @@ ColourRGBA SelectionBackground(const EditModel &model, const ViewStyle &vsDraw, 
 	if (!model.primarySelection)
 		element = Element::SelectionSecondaryBack;
 	if (!model.hasFocus) {
-		const auto colour = vsDraw.ElementColour(Element::SelectionInactiveBack);
-		if (colour) {
+		if (inSelection == InSelection::inAdditional) {
+			if (auto colour = vsDraw.ElementColour(Element::SelectionInactiveAdditionalBack)) {
+				return *colour;
+			}
+		}
+		if (auto colour = vsDraw.ElementColour(Element::SelectionInactiveBack)) {
 			return *colour;
 		}
 	}
@@ -1034,8 +1038,12 @@ ColourOptional SelectionForeground(const EditModel &model, const ViewStyle &vsDr
 	if (!model.primarySelection)	// Secondary selection
 		element = Element::SelectionSecondaryText;
 	if (!model.hasFocus) {
-		const auto colour = vsDraw.ElementColour(Element::SelectionInactiveText);
-		if (colour) {
+		if (inSelection == InSelection::inAdditional) {
+			if (auto colour = vsDraw.ElementColour(Element::SelectionInactiveAdditionalText)) {
+				return colour;
+			}
+		}
+		if (auto colour = vsDraw.ElementColour(Element::SelectionInactiveText)) {
 			return colour;
 		} else {
 			return {};
@@ -1950,7 +1958,7 @@ void DrawEdgeLine(Surface *surface, const ViewStyle &vsDraw, const LineLayout *l
 void DrawMarkUnderline(Surface *surface, const EditModel &model, const ViewStyle &vsDraw,
 	Sci::Line line, PRectangle rcLine) {
 	MarkerMask marks = model.GetMark(line);
-	for (int markBit = 0; (markBit < MarkerBitCount) && marks; markBit++) {
+	for (int markBit = 0; (markBit <= MarkerMax) && marks; markBit++) {
 		if ((marks & 1) && (vsDraw.markers[markBit].markType == MarkerSymbol::Underline) &&
 			(vsDraw.markers[markBit].layer == Layer::Base)) {
 			PRectangle rcUnderline = rcLine;
@@ -2071,7 +2079,7 @@ void DrawTranslucentLineState(Surface *surface, const EditModel &model, const Vi
 
 	const MarkerMask marksOfLine = model.GetMark(line);
 	MarkerMask marksDrawnInText = marksOfLine & vsDraw.maskDrawInText;
-	for (int markBit = 0; (markBit < MarkerBitCount) && marksDrawnInText; markBit++) {
+	for (int markBit = 0; (markBit <= MarkerMax) && marksDrawnInText; markBit++) {
 		if ((marksDrawnInText & 1) && (vsDraw.markers[markBit].layer == layer)) {
 			if (vsDraw.markers[markBit].markType == MarkerSymbol::Background) {
 				surface->FillRectangleAligned(rcLine, vsDraw.markers[markBit].back);
@@ -2084,7 +2092,7 @@ void DrawTranslucentLineState(Surface *surface, const EditModel &model, const Vi
 		marksDrawnInText >>= 1;
 	}
 	MarkerMask marksDrawnInLine = marksOfLine & vsDraw.maskInLine;
-	for (int markBit = 0; (markBit < MarkerBitCount) && marksDrawnInLine; markBit++) {
+	for (int markBit = 0; (markBit <= MarkerMax) && marksDrawnInLine; markBit++) {
 		if ((marksDrawnInLine & 1) && (vsDraw.markers[markBit].layer == layer)) {
 			surface->FillRectangleAligned(rcLine, vsDraw.markers[markBit].back);
 		}

@@ -177,6 +177,8 @@ enum class Element {
 	SelectionSecondaryBack = 15,
 	SelectionInactiveText = 16,
 	SelectionInactiveBack = 17,
+	SelectionInactiveAdditionalText = 18,
+	SelectionInactiveAdditionalBack = 19,
 	Caret = 40,
 	CaretAdditional = 41,
 	CaretLineBack = 50,
@@ -248,6 +250,7 @@ enum class IndicFlag {
 enum class AutoCompleteOption {
 	Normal = 0,
 	FixedSize = 1,
+	SelectFirstItem = 2,
 };
 
 enum class IndentView {

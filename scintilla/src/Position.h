@@ -26,6 +26,4 @@ namespace Scintilla::Internal {
 // Bit set of marker numbers.
 using MarkerMask = unsigned int;
 
-constexpr int MarkerBitCount = sizeof(MarkerMask) * 8;
-
 }

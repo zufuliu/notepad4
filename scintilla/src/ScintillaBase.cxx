@@ -370,6 +370,9 @@ void ScintillaBase::AutoCompleteMove(int delta) {
 }
 
 void ScintillaBase::AutoCompleteMoveToCurrentWord() {
+	if (FlagSet(ac.options, AutoCompleteOption::SelectFirstItem)) {
+		return;
+	}
 	const std::string wordCurrent = RangeText(ac.posStart - ac.startLen, sel.MainCaret());
 	ac.Select(wordCurrent.c_str());
 }

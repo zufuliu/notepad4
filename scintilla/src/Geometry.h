@@ -231,6 +231,10 @@ public:
 		return ColourRGBA(co_ | (maximumByte << 24));
 	}
 
+	static constexpr ColourRGBA Grey(unsigned int grey, unsigned int alpha = maximumByte) noexcept {
+		return ColourRGBA(grey, grey, grey, alpha);
+	}
+
 	static constexpr ColourRGBA FromIpRGB(intptr_t co_) noexcept {
 		return ColourRGBA(static_cast<unsigned int>(co_) | (maximumByte << 24));
 	}

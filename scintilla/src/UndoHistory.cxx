@@ -108,9 +108,9 @@ size_t ScaledVector::ValueAt(size_t index) const noexcept {
 
 constexpr SizeMax ElementForValue(size_t value) noexcept {
 #if ScaledVectorUseSimpleElement
-	if (value <= UINT8_MAX) {
-		return { 1, UINT8_MAX };
-	}
+	//if (value <= UINT8_MAX) {
+	//	return { 1, UINT8_MAX };
+	//}
 	if (value <= UINT16_MAX) {
 		return { 2, UINT16_MAX };
 	}

@@ -432,7 +432,7 @@ void MarginView::PaintOneMargin(Surface *surface, PRectangle rc, PRectangle rcOn
 			// Draw all the bar markers first so they are underneath as they often cover
 			// multiple lines for change history and other markers mark individual lines.
 			MarkerMask marksBar = marks;
-			for (int markBit = 0; (markBit < MarkerBitCount) && marksBar; markBit++) {
+			for (int markBit = 0; (markBit <= MarkerMax) && marksBar; markBit++) {
 				if ((marksBar & 1) && (vs.markers[markBit].markType == MarkerSymbol::Bar)) {
 					const MarkerMask mask = 1U << markBit;
 					const bool markBefore = firstSubLine ? (model.GetMark(lineDoc - 1) & mask) : true;
@@ -443,7 +443,7 @@ void MarginView::PaintOneMargin(Surface *surface, PRectangle rc, PRectangle rcOn
 				marksBar >>= 1;
 			}
 			// Draw all the other markers over the bar markers
-			for (int markBit = 0; (markBit < MarkerBitCount) && marks; markBit++) {
+			for (int markBit = 0; (markBit <= MarkerMax) && marks; markBit++) {
 				if ((marks & 1) && (vs.markers[markBit].markType != MarkerSymbol::Bar)) {
 					const LineMarker::FoldPart part = marginStyle.ShowsFolding() ?
 						PartForFoldHighlight(highlightDelimiter, lineDoc, firstSubLine, headWithTail, isExpanded) :
