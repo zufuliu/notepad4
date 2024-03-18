@@ -600,6 +600,8 @@ YAML Document
 	mir				LLVM Machine IR, https://llvm.org/docs/MIRLangRef.html
 	apinotes		Swift API Notes
 	ifs				LLVM IFS (Interface Stubs)
+	gyp				GYP
+	gypi			GYP
 
 Zig Source
 	zig
