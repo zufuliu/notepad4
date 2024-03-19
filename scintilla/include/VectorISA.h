@@ -291,9 +291,25 @@ static inline uint32_t bit_zero_high_u32(uint32_t x, uint32_t index) NP2_noexcep
 static inline bool bittest(const uint32_t *addr, uint32_t index) NP2_noexcept {
 	return (*addr >> index) & true;
 }
+static inline bool bittestandset(uint32_t *addr, uint32_t index) NP2_noexcept {
+	const bool bit = (*addr >> index) & true;
+	*addr |= 1U << index;
+	return bit;
+}
+static inline bool bittestandreset(uint32_t *addr, uint32_t index) NP2_noexcept {
+	const bool bit = (*addr >> index) & true;
+	*addr &= ~(1U << index);
+	return bit;
+}
 #else
 static inline bool bittest(const uint32_t *addr, uint32_t index) NP2_noexcept {
 	return _bittest((const long *)addr, index);
+}
+static inline bool bittestandset(uint32_t *addr, uint32_t index) NP2_noexcept {
+	return _bittestandset((long *)addr, index);
+}
+static inline bool bittestandreset(uint32_t *addr, uint32_t index) NP2_noexcept {
+	return _bittestandreset((long *)addr, index);
 }
 #endif
 

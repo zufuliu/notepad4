@@ -24,6 +24,7 @@
 #include "ScintillaTypes.h"
 
 #include "Debugging.h"
+#include "VectorISA.h"
 #include "Geometry.h"
 #include "Platform.h"
 
@@ -91,7 +92,10 @@ void FontRealised::Realise(Surface &surface, int zoomLevel, Technology technolog
 ViewStyle::ViewStyle(size_t stylesSize_):
 	styles(stylesSize_),
 	markers(MarkerMax + 1),
-	indicators(static_cast<size_t>(IndicatorNumbers::Max) + 1) {
+	indicators(static_cast<size_t>(IndicatorNumbers::Max) + 1),
+	ms(MaxMargin + 1),
+	elementColours(static_cast<size_t>(Element::Max)),
+	elementBaseColours(static_cast<size_t>(Element::Max)) {
 
 	ResetDefaultStyle();
 
@@ -161,21 +165,22 @@ ViewStyle::ViewStyle(size_t stylesSize_):
 	tabWidth = spaceWidth * 8;
 
 	// Default is for no selection foregrounds
-	elementColours.erase(Element::SelectionText);
-	elementColours.erase(Element::SelectionAdditionalText);
-	elementColours.erase(Element::SelectionSecondaryText);
-	elementColours.erase(Element::SelectionInactiveText);
-	elementColours.erase(Element::SelectionInactiveAdditionalText);
+	elementColoursMask = 0;
+	elementBaseColoursMask = (1 << static_cast<int>(Element::SelectionBack))
+		| (1 << static_cast<int>(Element::SelectionAdditionalBack))
+		| (1 << static_cast<int>(Element::SelectionSecondaryBack))
+		| (1 << static_cast<int>(Element::SelectionInactiveBack))
+		| (1 << static_cast<int>(Element::Caret))
+		| (1 << static_cast<int>(Element::CaretAdditional));
 	// Shades of grey for selection backgrounds
-	elementBaseColours[Element::SelectionBack] = ColourRGBA::Grey(light);
+	elementBaseColours[static_cast<unsigned>(Element::SelectionBack)] = ColourRGBA::Grey(light);
 	constexpr unsigned int veryLight = 0xd7U;
-	elementBaseColours[Element::SelectionAdditionalBack] = ColourRGBA::Grey(veryLight);
+	elementBaseColours[static_cast<unsigned>(Element::SelectionAdditionalBack)] = ColourRGBA::Grey(veryLight);
 	constexpr unsigned int halfLight = 0xb0;
-	elementBaseColours[Element::SelectionSecondaryBack] = ColourRGBA::Grey(halfLight);
-	elementBaseColours[Element::SelectionInactiveBack] = ColourRGBA::Grey(mid, quarter);
-
-	foldmarginColour.reset();
-	foldmarginHighlightColour.reset();
+	elementBaseColours[static_cast<unsigned>(Element::SelectionSecondaryBack)] = ColourRGBA::Grey(halfLight);
+	elementBaseColours[static_cast<unsigned>(Element::SelectionInactiveBack)] = ColourRGBA::Grey(mid, quarter);
+	elementBaseColours[static_cast<unsigned>(Element::Caret)] = black;
+	elementBaseColours[static_cast<unsigned>(Element::CaretAdditional)] = ColourRGBA::Grey(half);
 
 	controlCharSymbol = 0;	/* Draw the control characters */
 	controlCharWidth = 0;
@@ -184,18 +189,10 @@ ViewStyle::ViewStyle(size_t stylesSize_):
 	styles[StyleLineNumber].fore = black;
 	styles[StyleLineNumber].back = Platform::Chrome();
 
-	elementBaseColours[Element::Caret] = black;
-	elementBaseColours[Element::CaretAdditional] = ColourRGBA::Grey(half);
-
-	elementColours.erase(Element::CaretLineBack);
-
-	elementColours.erase(Element::HotSpotActive);
 	hotspotUnderline = true;
-
 	marginInside = true;
 	leftMarginWidth = 1;
 	rightMarginWidth = 1;
-	ms.resize(MaxMargin + 1);
 	ms[0] = MarginStyle(MarginType::Number);
 	ms[1] = MarginStyle(MarginType::Symbol, 16, ~MaskFolders);
 	ms[2] = MarginStyle(MarginType::Symbol);
@@ -207,7 +204,6 @@ ViewStyle::ViewStyle(size_t stylesSize_):
 	whitespaceSize = 1;
 	viewIndentationGuides = IndentView::None;
 	viewEOL = false;
-	elementColours.erase(Element::WhiteSpace);
 
 	someStylesProtected = false;
 	someStylesForceCase = false;
@@ -544,7 +540,7 @@ int ViewStyle::GetFrameWidth() const noexcept {
 	return std::clamp(caretLine.frame, 1, lineHeight / 3);
 }
 
-bool ViewStyle::IsLineFrameOpaque(bool caretActive, bool lineContainsCaret) const {
+bool ViewStyle::IsLineFrameOpaque(bool caretActive, bool lineContainsCaret) const noexcept {
 	return lineContainsCaret && (caretActive || caretLine.alwaysShow)
 		&& caretLine.frame != 0 && caretLine.layer == Layer::Base
 		&& ElementIsSet(Element::CaretLineBack);
@@ -556,7 +552,7 @@ bool ViewStyle::IsLineFrameOpaque(bool caretActive, bool lineContainsCaret) cons
 // display itself (as long as it's not an MarkerSymbol::Empty marker).  These are checked in order
 // with the earlier taking precedence.  When multiple markers cause background override,
 // the colour for the highest numbered one is used.
-ColourOptional ViewStyle::Background(MarkerMask marksOfLine, bool caretActive, bool lineContainsCaret) const {
+ColourOptional ViewStyle::Background(MarkerMask marksOfLine, bool caretActive, bool lineContainsCaret) const noexcept {
 	ColourOptional background;
 	if (lineContainsCaret && (caretActive || caretLine.alwaysShow)
 		&& caretLine.frame == 0 && caretLine.layer == Layer::Base) {
@@ -595,16 +591,16 @@ bool ViewStyle::SelectionBackgroundDrawn() const noexcept {
 	return selection.layer == Layer::Base;
 }
 
-bool ViewStyle::SelectionTextDrawn() const {
-	return
-		ElementIsSet(Element::SelectionText) ||
-		ElementIsSet(Element::SelectionAdditionalText) ||
-		ElementIsSet(Element::SelectionSecondaryText) ||
-		ElementIsSet(Element::SelectionInactiveText) ||
-		ElementIsSet(Element::SelectionInactiveAdditionalText);
+bool ViewStyle::SelectionTextDrawn() const noexcept {
+	constexpr unsigned mask = (1 << static_cast<int>(Element::SelectionText))
+		| (1 << static_cast<int>(Element::SelectionAdditionalText))
+		| (1 << static_cast<int>(Element::SelectionSecondaryText))
+		| (1 << static_cast<int>(Element::SelectionInactiveText))
+		| (1 << static_cast<int>(Element::SelectionInactiveAdditionalText));
+	return (elementColoursMask & mask) != 0;
 }
 
-bool ViewStyle::WhitespaceBackgroundDrawn() const {
+bool ViewStyle::WhitespaceBackgroundDrawn() const noexcept {
 	return (viewWhitespace != WhiteSpace::Invisible) && (ElementIsSet(Element::WhiteSpaceBack));
 }
 
@@ -614,7 +610,7 @@ bool ViewStyle::WhiteSpaceVisible(bool inIndent) const noexcept {
 		viewWhitespace == WhiteSpace::VisibleAlways;
 }
 
-ColourRGBA ViewStyle::WrapColour() const {
+ColourRGBA ViewStyle::WrapColour() const noexcept {
 	return ElementColour(Element::WhiteSpace).value_or(styles[StyleDefault].fore).Opaque();
 }
 
@@ -628,23 +624,18 @@ void ViewStyle::AddMultiEdge(int column, ColourRGBA colour) {
 		EdgeProperties(column, colour));
 }
 
-ColourOptional ViewStyle::ElementColour(Element element) const {
-	const auto search = elementColours.find(element);
-	if (search != elementColours.end()) {
-		if (search->second.has_value()) {
-			return search->second;
-		}
+ColourOptional ViewStyle::ElementColour(Element element) const noexcept {
+	const auto index = static_cast<unsigned>(element);
+	if (bittest(&elementColoursMask, index)) {
+		return elementColours[index];
 	}
-	const auto searchBase = elementBaseColours.find(element);
-	if (searchBase != elementBaseColours.end()) {
-		if (searchBase->second.has_value()) {
-			return searchBase->second;
-		}
+	if (bittest(&elementBaseColoursMask, index)) {
+		return elementBaseColours[index];
 	}
 	return {};
 }
 
-ColourRGBA ViewStyle::ElementColourForced(Element element) const {
+ColourRGBA ViewStyle::ElementColourForced(Element element) const noexcept {
 	// Like ElementColour but never returns empty - when not found return opaque black.
 	// This method avoids warnings for unwrapping potentially empty optionals from
 	// Visual C++ Code Analysis
@@ -652,43 +643,35 @@ ColourRGBA ViewStyle::ElementColourForced(Element element) const {
 	return colour.value_or(black);
 }
 
-bool ViewStyle::ResetElement(Element element) {
-	const auto search = elementColours.find(element);
-	const bool changed = (search != elementColours.end()) && (search->second.has_value());
-	elementColours.erase(element);
-	return changed;
-}
-
-namespace {
-
-bool IsDifferentColour(const ColourOptional &colour, const ColourRGBA &test) noexcept {
-	return colour.has_value() && !(*colour == test);
-}
-
-bool SetElementMapColour(ViewStyle::ElementMap &elements, Element element, ColourRGBA colour) {
-	const auto search = elements.find(element);
-	const bool changed = (search == elements.end()) ||
-		IsDifferentColour(search->second, colour);
-	elements[element] = colour;
-	return changed;
-}
-
-}
-
-bool ViewStyle::SetElementColour(Element element, ColourRGBA colour) {
-	return SetElementMapColour(elementColours, element, colour);
-}
-
-bool ViewStyle::ElementIsSet(Element element) const {
-	const auto search = elementColours.find(element);
-	if (search != elementColours.end()) {
-		return search->second.has_value();
+bool ViewStyle::ResetElement(Element element) noexcept {
+	const auto index = static_cast<unsigned>(element);
+	if (bittestandreset(&elementColoursMask, index)) {
+		elementColours[index] = ColourRGBA();
+		return true;
 	}
 	return false;
 }
 
-bool ViewStyle::SetElementBase(Element element, ColourRGBA colour) {
-	return SetElementMapColour(elementBaseColours, element, colour);
+bool ViewStyle::SetElementColour(Element element, ColourRGBA colour) noexcept {
+	const auto index = static_cast<unsigned>(element);
+	if (!bittestandset(&elementColoursMask, index) || elementColours[index] != colour) {
+		elementColours[index] = colour;
+		return true;
+	}
+	return false;
+}
+
+bool ViewStyle::ElementIsSet(Element element) const noexcept {
+	return bittest(&elementColoursMask, static_cast<unsigned>(element));
+}
+
+bool ViewStyle::SetElementBase(Element element, ColourRGBA colour) noexcept {
+	const auto index = static_cast<unsigned>(element);
+	if (!bittestandset(&elementBaseColoursMask, index) || elementBaseColours[index] != colour) {
+		elementBaseColours[index] = colour;
+		return true;
+	}
+	return false;
 }
 
 bool ViewStyle::SetWrapState(Wrap wrapState_) noexcept {

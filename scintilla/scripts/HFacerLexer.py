@@ -33,16 +33,16 @@ def printLexHFile(f):
 					value = str(val)
 				else:
 					val = int(value)
-				autoValue = val + 1
 				if val in valueMap:
 					kind = "Style" if name.startswith("SCE_") else "Lexer"
-					raise Exception(f"Duplicate {kind} Value: {name} = {val}, {valueMap[val]}")
+					raise ValueError(f"Duplicate {kind} Value: {name} = {val}, {valueMap[val]}")
+				autoValue = val + 1
 				valueMap[val] = name
 				if name.startswith("SCE_"):
 					if autoValue == STYLE_FIRSTPREDEFINED:
 						autoValue = STYLE_LASTPREDEFINED + 1
 					if val >= STYLE_FIRSTPREDEFINED and val <= STYLE_LASTPREDEFINED:
-						raise Exception(f"Invalid Style Value: {name} = {val}")
+						raise ValueError(f"Invalid Style Value: {name} = {val}")
 				out.append(f"#define {name} {value}")
 	return out
 

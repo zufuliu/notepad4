@@ -7529,7 +7529,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		return ViewStyle::ElementAllowsTranslucent(static_cast<Element>(wParam));
 
 	case Message::GetElementBaseColour:
-		return vs.elementBaseColours[static_cast<Element>(wParam)].value_or(ColourRGBA()).AsInteger();
+		return vs.elementBaseColours[wParam].AsInteger();
 
 	case Message::SetFontLocale:
 		if (lParam != 0) {

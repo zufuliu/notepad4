@@ -1007,7 +1007,7 @@ constexpr ColourRGBA colourBug(0xff, 0, 0xfe, 0xf0);
 
 // Selection background colours are always defined, the value_or is to show if bug
 
-ColourRGBA SelectionBackground(const EditModel &model, const ViewStyle &vsDraw, InSelection inSelection) {
+ColourRGBA SelectionBackground(const EditModel &model, const ViewStyle &vsDraw, InSelection inSelection) noexcept {
 	if (inSelection == InSelection::inNone)
 		return colourBug;	// Not selected is a bug
 
@@ -1029,7 +1029,7 @@ ColourRGBA SelectionBackground(const EditModel &model, const ViewStyle &vsDraw, 
 	return vsDraw.ElementColour(element).value_or(colourBug);
 }
 
-ColourOptional SelectionForeground(const EditModel &model, const ViewStyle &vsDraw, InSelection inSelection) {
+ColourOptional SelectionForeground(const EditModel &model, const ViewStyle &vsDraw, InSelection inSelection) noexcept {
 	if (inSelection == InSelection::inNone)
 		return {};
 	Element element = Element::SelectionText;
@@ -1043,17 +1043,13 @@ ColourOptional SelectionForeground(const EditModel &model, const ViewStyle &vsDr
 				return colour;
 			}
 		}
-		if (auto colour = vsDraw.ElementColour(Element::SelectionInactiveText)) {
-			return colour;
-		} else {
-			return {};
-		}
+		element = Element::SelectionInactiveText;
 	}
 	return vsDraw.ElementColour(element);
 }
 
 ColourRGBA TextBackground(const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll,
-	ColourOptional background, InSelection inSelection, bool inHotspot, int styleMain, Sci::Position i) {
+	ColourOptional background, InSelection inSelection, bool inHotspot, int styleMain, Sci::Position i) noexcept {
 	if (inSelection && (vsDraw.selection.layer == Layer::Base)) {
 		return SelectionBackground(model, vsDraw, inSelection).Opaque();
 	}
@@ -2933,8 +2929,8 @@ Sci::Position EditView::FormatRange(bool draw, CharacterRangeFull chrg, Scintill
 	vsPrint.viewIndentationGuides = IndentView::None;
 	// Don't show the selection when printing
 	vsPrint.selection.visible = false;
-	vsPrint.elementColours.clear();
-	vsPrint.elementBaseColours.clear();
+	vsPrint.elementColoursMask = 0;
+	vsPrint.elementBaseColoursMask = 0;
 	vsPrint.caretLine.alwaysShow = false;
 	// Don't highlight matching braces using indicators
 	vsPrint.braceHighlightIndicatorSet = false;
