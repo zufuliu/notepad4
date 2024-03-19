@@ -17,8 +17,8 @@
 #include "Accessor.h"
 #include "StyleContext.h"
 #include "CharacterSet.h"
-#include "LexerModule.h"
 #include "StringUtils.h"
+#include "LexerModule.h"
 
 using namespace Lexilla;
 

@@ -24,9 +24,9 @@
 #include "ScintillaTypes.h"
 
 #include "Debugging.h"
-#include "VectorISA.h"
 #include "Geometry.h"
 #include "Platform.h"
+#include "VectorISA.h"
 
 #include "Position.h"
 #include "UniqueString.h"

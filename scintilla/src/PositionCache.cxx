@@ -7,8 +7,8 @@
 
 #include <cstddef>
 #include <cstdlib>
-#include <cassert>
 #include <cstdint>
+#include <cassert>
 #include <cstring>
 #include <cmath>
 #include <climits>
