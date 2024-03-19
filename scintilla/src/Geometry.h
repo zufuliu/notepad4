@@ -286,6 +286,9 @@ public:
 	constexpr bool operator==(const ColourRGBA &other) const noexcept {
 		return co == other.co;
 	}
+	constexpr bool operator!=(const ColourRGBA &other) const noexcept {
+		return co != other.co;
+	}
 
 	constexpr bool IsOpaque() const noexcept {
 		return co >= 0xff000000U;
