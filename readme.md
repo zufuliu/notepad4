@@ -81,7 +81,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* INI Configuration File
 	* [Inno Setup](tools/lang/InnoSetup.iss), up to Inno Setup 6.2.
 	* [Boost Jam](tools/lang/Jamfile.jam), up to Jam 4.4.
-	* [Java](tools/lang/Java.java), up to Java 21. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#java)
+	* [Java](tools/lang/Java.java), up to Java 22. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#java)
 		* [BeanShell](https://github.com/beanshell/beanshell)
 	* [JavaScript](tools/lang/JavaScript.js), up to ECMAScript 2024 with [JSX](https://facebook.github.io/jsx/) and [Web APIs](https://developer.mozilla.org/en-US/docs/Web/API).
 	* [JSON](https://www.json.org) and [JSON5](https://json5.org/) Document

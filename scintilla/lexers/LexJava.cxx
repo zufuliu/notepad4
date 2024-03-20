@@ -344,6 +344,9 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 								sc.ChangeState(SCE_JAVA_CLASS);
 							}
 						}
+					} else if (sc.chNext == '\"') {
+						// template processor
+						sc.ChangeState(SCE_JAVA_FUNCTION);
 					}
 					if (sc.state != SCE_JAVA_WORD && sc.ch != '.') {
 						kwType = KeywordType::None;
