@@ -3438,9 +3438,14 @@ LRESULT ScintillaWin::ImeOnDocumentFeed(LPARAM lParam) const {
 		return 0;
 	}
 
-	const DWORD compStrLen = imc.GetCompositionStringLength(GCS_COMPSTR);
-	const int imeCaretPos = imc.GetImeCaretPos();
-	const Sci::Position compStart = pdoc->GetRelativePositionUTF16(curPos, -imeCaretPos);
+	DWORD compStrLen = 0;
+	Sci::Position compStart = curPos;
+	if (pdoc->TentativeActive()) {
+		// rcFeed contains current composition string
+		compStrLen = imc.GetCompositionStringLength(GCS_COMPSTR);
+		const int imeCaretPos = imc.GetImeCaretPos();
+		compStart = pdoc->GetRelativePositionUTF16(curPos, -imeCaretPos);
+	}
 	const Sci::Position compStrOffset = pdoc->CountUTF16(lineStart, compStart);
 
 	// Fill in reconvert structure.
