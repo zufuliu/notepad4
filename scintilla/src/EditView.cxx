@@ -1007,7 +1007,7 @@ constexpr ColourRGBA colourBug(0xff, 0, 0xfe, 0xf0);
 
 // Selection background colours are always defined, the value_or is to show if bug
 
-ColourRGBA SelectionBackground(const EditModel &model, const ViewStyle &vsDraw, InSelection inSelection) {
+ColourRGBA SelectionBackground(const EditModel &model, const ViewStyle &vsDraw, InSelection inSelection) noexcept {
 	if (inSelection == InSelection::inNone)
 		return colourBug;	// Not selected is a bug
 
@@ -1017,15 +1017,19 @@ ColourRGBA SelectionBackground(const EditModel &model, const ViewStyle &vsDraw, 
 	if (!model.primarySelection)
 		element = Element::SelectionSecondaryBack;
 	if (!model.hasFocus) {
-		const auto colour = vsDraw.ElementColour(Element::SelectionInactiveBack);
-		if (colour) {
+		if (inSelection == InSelection::inAdditional) {
+			if (auto colour = vsDraw.ElementColour(Element::SelectionInactiveAdditionalBack)) {
+				return *colour;
+			}
+		}
+		if (auto colour = vsDraw.ElementColour(Element::SelectionInactiveBack)) {
 			return *colour;
 		}
 	}
 	return vsDraw.ElementColour(element).value_or(colourBug);
 }
 
-ColourOptional SelectionForeground(const EditModel &model, const ViewStyle &vsDraw, InSelection inSelection) {
+ColourOptional SelectionForeground(const EditModel &model, const ViewStyle &vsDraw, InSelection inSelection) noexcept {
 	if (inSelection == InSelection::inNone)
 		return {};
 	Element element = Element::SelectionText;
@@ -1034,18 +1038,18 @@ ColourOptional SelectionForeground(const EditModel &model, const ViewStyle &vsDr
 	if (!model.primarySelection)	// Secondary selection
 		element = Element::SelectionSecondaryText;
 	if (!model.hasFocus) {
-		const auto colour = vsDraw.ElementColour(Element::SelectionInactiveText);
-		if (colour) {
-			return colour;
-		} else {
-			return {};
+		if (inSelection == InSelection::inAdditional) {
+			if (auto colour = vsDraw.ElementColour(Element::SelectionInactiveAdditionalText)) {
+				return colour;
+			}
 		}
+		element = Element::SelectionInactiveText;
 	}
 	return vsDraw.ElementColour(element);
 }
 
 ColourRGBA TextBackground(const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll,
-	ColourOptional background, InSelection inSelection, bool inHotspot, int styleMain, Sci::Position i) {
+	ColourOptional background, InSelection inSelection, bool inHotspot, int styleMain, Sci::Position i) noexcept {
 	if (inSelection && (vsDraw.selection.layer == Layer::Base)) {
 		return SelectionBackground(model, vsDraw, inSelection).Opaque();
 	}
@@ -1950,7 +1954,7 @@ void DrawEdgeLine(Surface *surface, const ViewStyle &vsDraw, const LineLayout *l
 void DrawMarkUnderline(Surface *surface, const EditModel &model, const ViewStyle &vsDraw,
 	Sci::Line line, PRectangle rcLine) {
 	MarkerMask marks = model.GetMark(line);
-	for (int markBit = 0; (markBit < MarkerBitCount) && marks; markBit++) {
+	for (int markBit = 0; (markBit <= MarkerMax) && marks; markBit++) {
 		if ((marks & 1) && (vsDraw.markers[markBit].markType == MarkerSymbol::Underline) &&
 			(vsDraw.markers[markBit].layer == Layer::Base)) {
 			PRectangle rcUnderline = rcLine;
@@ -2071,7 +2075,7 @@ void DrawTranslucentLineState(Surface *surface, const EditModel &model, const Vi
 
 	const MarkerMask marksOfLine = model.GetMark(line);
 	MarkerMask marksDrawnInText = marksOfLine & vsDraw.maskDrawInText;
-	for (int markBit = 0; (markBit < MarkerBitCount) && marksDrawnInText; markBit++) {
+	for (int markBit = 0; (markBit <= MarkerMax) && marksDrawnInText; markBit++) {
 		if ((marksDrawnInText & 1) && (vsDraw.markers[markBit].layer == layer)) {
 			if (vsDraw.markers[markBit].markType == MarkerSymbol::Background) {
 				surface->FillRectangleAligned(rcLine, vsDraw.markers[markBit].back);
@@ -2084,7 +2088,7 @@ void DrawTranslucentLineState(Surface *surface, const EditModel &model, const Vi
 		marksDrawnInText >>= 1;
 	}
 	MarkerMask marksDrawnInLine = marksOfLine & vsDraw.maskInLine;
-	for (int markBit = 0; (markBit < MarkerBitCount) && marksDrawnInLine; markBit++) {
+	for (int markBit = 0; (markBit <= MarkerMax) && marksDrawnInLine; markBit++) {
 		if ((marksDrawnInLine & 1) && (vsDraw.markers[markBit].layer == layer)) {
 			surface->FillRectangleAligned(rcLine, vsDraw.markers[markBit].back);
 		}
@@ -2925,8 +2929,8 @@ Sci::Position EditView::FormatRange(bool draw, CharacterRangeFull chrg, Scintill
 	vsPrint.viewIndentationGuides = IndentView::None;
 	// Don't show the selection when printing
 	vsPrint.selection.visible = false;
-	vsPrint.elementColours.clear();
-	vsPrint.elementBaseColours.clear();
+	vsPrint.elementColoursMask = 0;
+	vsPrint.elementBaseColoursMask = 0;
 	vsPrint.caretLine.alwaysShow = false;
 	// Don't highlight matching braces using indicators
 	vsPrint.braceHighlightIndicatorSet = false;

@@ -7,8 +7,8 @@
 
 #include <cstddef>
 #include <cstdlib>
-#include <cassert>
 #include <cstdint>
+#include <cassert>
 #include <cstring>
 #include <cstdio>
 #include <cstdarg>
@@ -40,9 +40,9 @@ struct IUnknown;
 #include "Debugging.h"
 #include "Geometry.h"
 #include "Platform.h"
-#include "UniqueString.h"
 #include "VectorISA.h"
 #include "GraphicUtils.h"
+#include "UniqueString.h"
 #include "XPM.h"
 #include "CharClassify.h"
 #include "UniConversion.h"

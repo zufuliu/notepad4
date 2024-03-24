@@ -76,6 +76,7 @@ public:
 	std::string StringOfRange(Span span);
 	Position ReplaceTarget(std::string_view text);
 	Position ReplaceTargetRE(std::string_view text);
+	Position ReplaceTargetMinimal(std::string_view text);
 	Position SearchInTarget(std::string_view text);
 	Span SpanSearchInTarget(std::string_view text);
 
@@ -239,6 +240,21 @@ public:
 	int CharacterCategoryOptimization();
 	void BeginUndoAction();
 	void EndUndoAction();
+	int UndoActions();
+	void SetUndoSavePoint(int action);
+	int UndoSavePoint();
+	void SetUndoDetach(int action);
+	int UndoDetach();
+	void SetUndoTentative(int action);
+	int UndoTentative();
+	void SetUndoCurrent(int action);
+	int UndoCurrent();
+	void PushUndoActionType(int type, Position pos);
+	void ChangeLastUndoActionText(Position length, const char *text);
+	int UndoActionType(int action);
+	Position UndoActionPosition(int action);
+	int UndoActionText(int action, char *text);
+	std::string UndoActionText(int action);
 	void IndicSetStyle(int indicator, Scintilla::IndicatorStyle indicatorStyle);
 	Scintilla::IndicatorStyle IndicGetStyle(int indicator);
 	void IndicSetFore(int indicator, Colour fore);

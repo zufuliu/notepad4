@@ -231,6 +231,10 @@ public:
 		return ColourRGBA(co_ | (maximumByte << 24));
 	}
 
+	static constexpr ColourRGBA Grey(unsigned int grey, unsigned int alpha = maximumByte) noexcept {
+		return ColourRGBA(grey, grey, grey, alpha);
+	}
+
 	static constexpr ColourRGBA FromIpRGB(intptr_t co_) noexcept {
 		return ColourRGBA(static_cast<unsigned int>(co_) | (maximumByte << 24));
 	}
@@ -281,6 +285,9 @@ public:
 
 	constexpr bool operator==(const ColourRGBA &other) const noexcept {
 		return co == other.co;
+	}
+	constexpr bool operator!=(const ColourRGBA &other) const noexcept {
+		return co != other.co;
 	}
 
 	constexpr bool IsOpaque() const noexcept {

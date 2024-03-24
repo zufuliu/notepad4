@@ -32,8 +32,8 @@
 #include "Geometry.h"
 #include "Platform.h"
 
-#include "SciLexer.h"
 #include "Scintilla.h"
+#include "SciLexer.h"
 
 //#include "CharacterCategory.h"
 #include "LexerModule.h"
@@ -370,6 +370,9 @@ void ScintillaBase::AutoCompleteMove(int delta) {
 }
 
 void ScintillaBase::AutoCompleteMoveToCurrentWord() {
+	if (FlagSet(ac.options, AutoCompleteOption::SelectFirstItem)) {
+		return;
+	}
 	const std::string wordCurrent = RangeText(ac.posStart - ac.startLen, sel.MainCaret());
 	ac.Select(wordCurrent.c_str());
 }
