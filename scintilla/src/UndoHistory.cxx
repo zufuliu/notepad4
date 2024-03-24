@@ -586,7 +586,7 @@ void UndoHistory::PushUndoActionType(int type, Sci::Position position) {
 }
 
 void UndoHistory::ChangeLastUndoActionText(size_t length, const char *text) {
-	assert(actions.Length(actions.SSize() - 1) == 0);
+	assert(actions.lengths.ValueAt(actions.SSize() - 1) == 0);
 	actions.lengths.SetValueAt(actions.SSize() - 1, length);
 	scraps->Push(text, length);
 }
