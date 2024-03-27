@@ -10,7 +10,7 @@ namespace Scintilla::Internal {
 
 constexpr int UTF8MaxBytes = 4;
 
-constexpr int unicodeReplacementChar = 0xFFFD;
+constexpr wchar_t unicodeReplacementChar = 0xFFFD;
 
 size_t UTF8Length(std::wstring_view wsv) noexcept;
 size_t UTF8PositionFromUTF16Position(std::string_view u8Text, size_t positionUTF16) noexcept;

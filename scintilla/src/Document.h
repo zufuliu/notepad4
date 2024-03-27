@@ -252,6 +252,12 @@ struct CharacterExtracted {
 	}
 };
 
+struct CharacterWideInfo {
+	unsigned int lenCharacters = 0;
+	unsigned int lenBytes = 0;
+	wchar_t buffer[2]{};
+};
+
 /**
  */
 class Document : PerLine, public Scintilla::IDocument, public Scintilla::ILoader, public Scintilla::IDocumentEditable {
@@ -565,7 +571,7 @@ public:
 		cb.Allocate(newSize);
 	}
 
-	CharacterExtracted ExtractCharacter(Sci::Position position) const noexcept;
+	void ExtractCharacter(Sci::Position position, CharacterWideInfo &charInfo) const noexcept;
 
 	bool IsWordStartAt(Sci::Position pos) const noexcept;
 	bool IsWordEndAt(Sci::Position pos) const noexcept;
