@@ -3188,9 +3188,9 @@ bool MatchOnLines(const Document *doc, const Regex &regexp, const RESearchRange 
 Sci::Position BuiltinRegex::CxxRegexFindText(const Document *doc, Sci::Position minPos, Sci::Position maxPos, const char *pattern, FindOption flags, Sci::Position *length) {
 	const RESearchRange resr(doc, minPos, maxPos);
 	try {
-		boost::regex::flag_type flagsRe = boost::regex::ECMAScript;
+		boost::wregex::flag_type flagsRe = boost::wregex::ECMAScript;
 		if (!FlagSet(flags, FindOption::MatchCase)) {
-			flagsRe = flagsRe | boost::regex::icase;
+			flagsRe = flagsRe | boost::wregex::icase;
 		}
 
 		// Clear the RESearch so can fill in matches
@@ -3255,7 +3255,7 @@ bool MatchOnLines(const Document *doc, const Regex &regexp, const RESearchRange 
 
 	// MSVC and libc++ have problems with ^ and $ matching line ends inside a range.
 	// CRLF line ends are also a problem as ^ and $ only treat LF as a line end.
-	// The std::regex::multiline option was added to C++17 to improve behaviour but
+	// The std::wregex::multiline option was added to C++17 to improve behaviour but
 	// has not been implemented by compiler runtimes with MSVC always in multiline
 	// mode and libc++ and libstdc++ always in single-line mode.
 	// If multiline regex worked well then the line by line iteration could be removed
@@ -3313,15 +3313,15 @@ Sci::Position BuiltinRegex::CxxRegexFindText(const Document *doc, Sci::Position 
 	const RESearchRange resr(doc, minPos, maxPos);
 	try {
 		//const ElapsedPeriod ep;
-		std::regex::flag_type flagsRe = std::regex::ECMAScript;
+		std::wregex::flag_type flagsRe = std::wregex::ECMAScript;
 		// Flags that appear to have no effect:
-		// | std::regex::collate | std::regex::extended;
+		// | std::wregex::collate | std::wregex::extended;
 		if (!FlagSet(flags, FindOption::MatchCase)) {
-			flagsRe = flagsRe | std::regex::icase;
+			flagsRe = flagsRe | std::wregex::icase;
 		}
 
 #if defined(REGEX_MULTILINE) && !defined(_MSC_VER)
-		flagsRe = flagsRe | std::regex::multiline;
+		flagsRe = flagsRe | std::wregex::multiline;
 #endif
 
 		// Clear the RESearch so can fill in matches
