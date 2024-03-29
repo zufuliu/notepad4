@@ -2122,7 +2122,7 @@ void Document::ExtractCharacter(Sci::Position position, CharacterWideInfo &charI
 		if (dbcsCodePage && IsDBCSLeadByteNoExcept(leadByte)) {
 			const unsigned char trailByte = cb.UCharAt(position + 1);
 			if (IsDBCSTrailByteNoExcept(trailByte)) {
-				widthCharBytes = 1;
+				widthCharBytes = 2;
 				charBytes[1] = static_cast<char>(trailByte);
 			}
 		}
