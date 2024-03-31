@@ -464,7 +464,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	}
 	virtual void NotifyParent(Scintilla::NotificationData scn) noexcept = 0;
 	virtual void NotifyStyleToNeeded(Sci::Position endStyleNeeded);
-	void NotifyChar(int ch, Scintilla::CharacterSource charSource) noexcept;
+	void NotifyChar(int ch, Scintilla::CharacterSource charSource, bool handled = false) noexcept;
 	void NotifySavePoint(bool isSavePoint) noexcept;
 	void NotifyModifyAttempt() noexcept;
 	virtual void NotifyDoubleClick(Point pt, Scintilla::KeyMod modifiers);

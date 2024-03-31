@@ -2065,8 +2065,8 @@ void Editor::InsertCharacter(std::string_view sv, CharacterSource charSource) {
 	}
 
 	// We don't handle inline IME tentative input characters
+	int ch = static_cast<unsigned char>(sv[0]);
 	if (!handled && charSource != CharacterSource::TentativeInput && sel.Count() == 1) {
-		int ch = static_cast<unsigned char>(sv[0]);
 		if (pdoc->dbcsCodePage != CpUtf8) {
 			if (sv.length() > 1) {
 				// DBCS code page or DBCS font character set.
@@ -2084,8 +2084,10 @@ void Editor::InsertCharacter(std::string_view sv, CharacterSource charSource) {
 				ch = utf32[0];
 			}
 		}
-		NotifyChar(ch, charSource);
+	} else {
+		handled = true;
 	}
+	NotifyChar(ch, charSource, handled);
 
 	if (recordingMacro && charSource != CharacterSource::TentativeInput) {
 		std::string copy(sv); // ensure NUL-terminated
@@ -2459,11 +2461,12 @@ void Editor::NotifyErrorOccurred(Document *, void *, Status status) noexcept {
 	errorStatus = status;
 }
 
-void Editor::NotifyChar(int ch, CharacterSource charSource) noexcept {
+void Editor::NotifyChar(int ch, CharacterSource charSource, bool handled) noexcept {
 	NotificationData scn = {};
 	scn.nmhdr.code = Notification::CharAdded;
 	scn.ch = ch;
 	scn.characterSource = charSource;
+	scn.listType = handled;
 	NotifyParent(scn);
 }
 

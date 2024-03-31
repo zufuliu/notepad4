@@ -5126,11 +5126,12 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			break;
 
 		case SCN_CHARADDED: {
-			//if (SciCall_IsMultipleSelection()) {
-			//	// not work for multiple selection.
-			//	return 0;
-			//}
-			// tentative input characters already ignored in Editor::InsertCharacter()
+			// fix cursor flash on typing when "Hide pointer while typing" is enabled
+			DisableDelayedStatusBarRedraw();
+			// ignore tentative input character and multiple selection, see Editor::InsertCharacter()
+			if (scn->listType) {
+				return 0;
+			}
 			const int ch = scn->ch;
 			if (ch < 0x80) {
 				// Auto indent
