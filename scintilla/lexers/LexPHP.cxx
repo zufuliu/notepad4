@@ -1069,9 +1069,15 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			break;
 
 		case SCE_H_COMMENT:
-			if (sc.Match('-', '-', '>')) {
-				sc.Advance(3);
-				sc.SetState(SCE_H_DEFAULT);
+			if (sc.Match('-', '-')) {
+				do {
+					sc.Forward();
+				} while (sc.ch == '-');
+				// https://html.spec.whatwg.org/multipage/parsing.html#parse-error-incorrectly-closed-comment
+				if (sc.ch == '>' || sc.Match('!', '>')) {
+					sc.Forward((sc.ch == '>') ? 1 : 2);
+					sc.SetState(SCE_H_DEFAULT);
+				}
 			}
 			break;
 
@@ -1221,6 +1227,12 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 					if (chNext == '-' && sc.GetRelative(3) == '-') {
 						sc.SetState(SCE_H_COMMENT);
 						sc.Advance(3);
+						// https://html.spec.whatwg.org/multipage/parsing.html#parse-error-abrupt-closing-of-empty-comment
+						if (sc.chNext == '>' || sc.MatchNext('-', '>')) {
+							sc.Forward((sc.chNext == '>') ? 2 : 3);
+							sc.SetState(SCE_H_DEFAULT);
+							continue;
+						}
 					} else if (chNext == '[' && styler.Match(sc.currentPos + 3, "CDATA[")) {
 						// <![CDATA[ ]]>
 						sc.SetState(SCE_H_CDATA);

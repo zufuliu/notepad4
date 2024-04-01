@@ -657,6 +657,13 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				state = SCE_H_COMMENT; // wait for a pending command
 				styler.ColorTo(i + 3, SCE_H_COMMENT);
 				i += 2; // follow styling after the --
+				chNext = styler.SafeGetUCharAt(i + 1);
+				if ((chNext == '>') || (chNext == '-' && styler.SafeGetUCharAt(i + 2) == '>')) {
+					// https://html.spec.whatwg.org/multipage/parsing.html#parse-error-abrupt-closing-of-empty-comment
+					i -= (ch == '>') ? 2 : 1;
+					chPrev = '-';
+					ch = '-';
+				}
 			} else if (isWordCdata(i + 1, styler)) {
 				state = SCE_H_CDATA;
 			} else {
@@ -847,7 +854,11 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			}
 			break;
 		case SCE_H_COMMENT:
-			if ((scriptLanguage != eScriptComment) && (chPrev2 == '-') && (chPrev == '-') && (ch == '>')) {
+			if ((scriptLanguage != eScriptComment) && (chPrev2 == '-') && (chPrev == '-') && (ch == '>' || (ch == '!' && chNext == '>'))) {
+				// https://html.spec.whatwg.org/multipage/parsing.html#parse-error-incorrectly-closed-comment
+				if (ch == '!') {
+					i += 1;
+				}
 				styler.ColorTo(i + 1, StateToPrint);
 				state = SCE_H_DEFAULT;
 				levelCurrent--;

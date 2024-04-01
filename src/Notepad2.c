@@ -5127,6 +5127,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 		case SCN_CHARADDED: {
 			// fix cursor flash on typing when "Hide pointer while typing" is enabled
+			// this prevents WM_SETCURSOR & WM_MOUSEMOVE send to Scintilla window
 			DisableDelayedStatusBarRedraw();
 			// ignore tentative input character and multiple selection, see Editor::InsertCharacter()
 			if (scn->listType) {
