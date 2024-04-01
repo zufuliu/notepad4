@@ -660,7 +660,9 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				chNext = styler.SafeGetUCharAt(i + 1);
 				if ((chNext == '>') || (chNext == '-' && styler.SafeGetUCharAt(i + 2) == '>')) {
 					// https://html.spec.whatwg.org/multipage/parsing.html#parse-error-abrupt-closing-of-empty-comment
-					i -= (ch == '>') ? 2 : 1;
+					if (chNext == '-') {
+						i += 1;
+					}
 					chPrev = '-';
 					ch = '-';
 				}
