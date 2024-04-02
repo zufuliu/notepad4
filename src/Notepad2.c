@@ -3578,15 +3578,15 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_EDIT_INSERT_ENCODING: {
-		char msz[64];
+		char msz[32] = {'\0'};
 		const char *enc = mEncoding[iCurrentEncoding].pszParseNames;
 		const char *sep = strchr(enc, ',');
 		if (sep != NULL) {
-			strncpy(msz, enc, (sep - enc));
+			strncpy(msz, enc, min_z(sep - enc, COUNTOF(msz) - 1));
 		} else {
 			WideCharToMultiByte(CP_UTF8, 0, mEncoding[iCurrentEncoding].wchLabel, -1, msz, COUNTOF(msz), NULL, NULL);
 		}
-		if (pLexCurrent->iLexer == SCLEX_PYTHON) {
+		if (pLexCurrent->iLexer == SCLEX_PYTHON || pLexCurrent->iLexer == SCLEX_RUBY) {
 			const Sci_Position iCurrentPos = SciCall_GetCurrentPos();
 			const Sci_Line iCurLine = SciCall_LineFromPosition(iCurrentPos);
 			const Sci_Position iCurrentLinePos = iCurrentPos - SciCall_PositionFromLine(iCurLine);
