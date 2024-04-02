@@ -1073,6 +1073,7 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				do {
 					sc.Forward();
 				} while (sc.ch == '-');
+				// close HTML comment with --!>
 				// https://html.spec.whatwg.org/multipage/parsing.html#parse-error-incorrectly-closed-comment
 				if (sc.ch == '>' || sc.Match('!', '>')) {
 					sc.Forward((sc.ch == '>') ? 1 : 2);
@@ -1227,6 +1228,7 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 					if (chNext == '-' && sc.GetRelative(3) == '-') {
 						sc.SetState(SCE_H_COMMENT);
 						sc.Advance(3);
+						// handle empty comment: <!-->, <!--->
 						// https://html.spec.whatwg.org/multipage/parsing.html#parse-error-abrupt-closing-of-empty-comment
 						if (sc.chNext == '>' || sc.MatchNext('-', '>')) {
 							sc.Forward((sc.chNext == '>') ? 2 : 3);

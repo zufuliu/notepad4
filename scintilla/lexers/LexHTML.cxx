@@ -657,14 +657,17 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				state = SCE_H_COMMENT; // wait for a pending command
 				styler.ColorTo(i + 3, SCE_H_COMMENT);
 				i += 2; // follow styling after the --
-				chNext = styler.SafeGetUCharAt(i + 1);
-				if ((chNext == '>') || (chNext == '-' && styler.SafeGetUCharAt(i + 2) == '>')) {
+				if (!isXml) {
+					// handle empty comment: <!-->, <!--->
 					// https://html.spec.whatwg.org/multipage/parsing.html#parse-error-abrupt-closing-of-empty-comment
-					if (chNext == '-') {
-						i += 1;
+					chNext = styler.SafeGetUCharAt(i + 1);
+					if ((chNext == '>') || (chNext == '-' && styler.SafeGetUCharAt(i + 2) == '>')) {
+						if (chNext == '-') {
+							i += 1;
+						}
+						chPrev = '-';
+						ch = '-';
 					}
-					chPrev = '-';
-					ch = '-';
 				}
 			} else if (isWordCdata(i + 1, styler)) {
 				state = SCE_H_CDATA;
@@ -856,7 +859,8 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			}
 			break;
 		case SCE_H_COMMENT:
-			if ((scriptLanguage != eScriptComment) && (chPrev2 == '-') && (chPrev == '-') && (ch == '>' || (ch == '!' && chNext == '>'))) {
+			if ((scriptLanguage != eScriptComment) && (chPrev2 == '-') && (chPrev == '-') && (ch == '>' || (!isXml && ch == '!' && chNext == '>'))) {
+				// close HTML comment with --!>
 				// https://html.spec.whatwg.org/multipage/parsing.html#parse-error-incorrectly-closed-comment
 				if (ch == '!') {
 					i += 1;
