@@ -84,6 +84,8 @@ public:
 		} else {
 			atLineStart = false;
 			atLineEnd = true;
+			//! different from official Lexilla which set them to space.
+			// zero is consistent of GetRelative() and GetRelativeCharacter().
 			chPrev = 0;
 			ch = 0;
 			chNext = 0;
