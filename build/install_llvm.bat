@@ -1,8 +1,8 @@
 @ECHO OFF
 @rem used for AppVeyor and GitHub Actions
 
-curl -fsSL -o "LLVM-18.1.2-win64.exe" "https://github.com/llvm/llvm-project/releases/download/llvmorg-18.1.2/LLVM-18.1.2-win64.exe"
-"LLVM-18.1.2-win64.exe" /S
+curl -fsSL -o "LLVM-18.1.3-win64.exe" "https://github.com/llvm/llvm-project/releases/download/llvmorg-18.1.3/LLVM-18.1.3-win64.exe"
+"LLVM-18.1.3-win64.exe" /S
 
 IF /I "%~1" == "latest" (
 git clone -q --depth=1 --branch=main https://github.com/zufuliu/llvm-utils.git
