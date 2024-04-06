@@ -125,7 +125,7 @@ enum class KeywordType {
 	Record = SCE_CSHARP_RECORD,
 	Label = SCE_CSHARP_LABEL,
 	Return = 0x40,
-	While,
+	While = 0x41,
 };
 
 constexpr bool IsUnicodeEscape(int ch, int chNext) noexcept {

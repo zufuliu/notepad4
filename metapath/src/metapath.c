@@ -3633,9 +3633,9 @@ void LoadLaunchSetings(void) {
 	LoadIniSection(INI_SECTION_NAME_TARGET_APPLICATION, pIniSectionBuf, cchIniSection);
 	IniSectionParse(pIniSection, pIniSectionBuf);
 
-	int iValue = IniSectionGetInt(pIniSection, L"UseTargetApplication", UseTargetApplication_Magic);
+	int iValue = IniSectionGetInt(pIniSection, L"UseTargetApplication", UseTargetApplication_NotSet);
 	iUseTargetApplication = (UseTargetApplication)iValue;
-	if (iUseTargetApplication != UseTargetApplication_Magic) {
+	if (iUseTargetApplication != UseTargetApplication_NotSet) {
 		IniSectionGetString(pIniSection, L"TargetApplicationPath", szTargetApplication, szTargetApplication, COUNTOF(szTargetApplication));
 		IniSectionGetString(pIniSection, L"TargetApplicationParams", szTargetApplicationParams, szTargetApplicationParams, COUNTOF(szTargetApplicationParams));
 		iValue = IniSectionGetInt(pIniSection, L"TargetApplicationMode", (int)iTargetApplicationMode);

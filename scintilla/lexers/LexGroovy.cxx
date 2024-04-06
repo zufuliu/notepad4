@@ -80,7 +80,7 @@ enum class KeywordType {
 	Enum = SCE_GROOVY_ENUM,
 	Trait = SCE_GROOVY_TRAIT,
 	Return = 0x40,
-	While,
+	While = 0x41,
 };
 
 static_assert(DefaultNestedStateBaseStyle + 1 == SCE_GROOVY_STRING_DQ);

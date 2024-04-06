@@ -88,7 +88,7 @@ enum class KeywordType {
 	Record = SCE_JAVA_RECORD,
 	Label = SCE_JAVA_LABEL,
 	Return = 0x40,
-	While,
+	While = 0x41,
 };
 
 static_assert(DefaultNestedStateBaseStyle + 1 == SCE_JAVA_TEMPLATE);

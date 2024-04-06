@@ -67,7 +67,7 @@ enum class KeywordType {
 	Enum = SCE_DART_ENUM,
 	Label = SCE_DART_LABEL,
 	Return = 0x40,
-	While,
+	While = 0x41,
 };
 
 static_assert(DefaultNestedStateBaseStyle + 1 == SCE_DART_STRING_SQ);

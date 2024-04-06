@@ -182,7 +182,7 @@ inline uint8_t GetCharAfterDelimiter(LexAccessor &styler, Sci_PositionU &startPo
 // https://html.spec.whatwg.org/multipage/grouping-content.html#the-ol-element
 // https://pandoc.org/MANUAL.html#ordered-lists
 enum class OrderedListType {
-	None,
+	None = 0,
 	Decimal,
 	LowerRoman,
 	UpperRoman,

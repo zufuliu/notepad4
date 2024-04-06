@@ -103,8 +103,7 @@ typedef enum StartupDirectory {
 typedef enum UseTargetApplication {
 	UseTargetApplication_None = 0,
 	UseTargetApplication_Use,
-	UseTargetApplication_NotSet = 4,
-	UseTargetApplication_Magic,
+	UseTargetApplication_NotSet,
 } UseTargetApplication;
 
 typedef enum TargetApplicationMode {

@@ -347,7 +347,7 @@ enum class WrapBreak {
 	Before = 1,
 	After = 2,
 	Both = 3,
-	Undefined,
+	Undefined = 4,
 };
 
 constexpr uint8_t ASCIIWrapBreakTable[128] = {

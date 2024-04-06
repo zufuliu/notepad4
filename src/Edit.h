@@ -637,7 +637,7 @@ void FoldAltArrow(int key, int mode);
 void EditGotoBlock(int menu);
 
 enum SelectOption {
-	SelectOption_None,
+	SelectOption_None = 0,
 	SelectOption_EnableMultipleSelection = 1,
 	SelectOption_CopySelectionAsFindText = 2,
 	SelectOption_CopyPasteBufferAsFindText = 4,
