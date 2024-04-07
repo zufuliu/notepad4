@@ -135,7 +135,7 @@ int ClassifyWordRb(Sci_PositionU start, Sci_PositionU end, char ch, char chNext,
 		chAttr = SCE_RB_MODULE_NAME;
 	} else if (StrEqual(prevWord, "def")) {
 		chAttr = SCE_RB_DEF_NAME;
-		if (ch == '.') {
+		if (ch == '.' || (ch == ':' && chNext == ':')) {
 			if (StrEqual(s, "self")) {
 				style = SCE_RB_WORD_DEMOTED;
 			} else if (IsUpperCase(s[0])) {
