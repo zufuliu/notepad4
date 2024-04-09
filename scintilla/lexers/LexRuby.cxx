@@ -590,7 +590,7 @@ bool sureThisIsNotHeredoc(Sci_Position lt2StartPos, LexAccessor &styler) {
 				return definitely_not_a_here_doc;
 			} else {
 				const char ch = styler[j];
-				if (ch == '#' || IsEOLChar(ch) || ch == '.' || ch == ',') {
+				if (ch == '#' || IsEOLChar(ch) || ch == '.' || ch == ',' || IsLowerCase(ch)) {
 					// This is OK, so break and continue;
 					break;
 				} else {
