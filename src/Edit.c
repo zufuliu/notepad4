@@ -4735,18 +4735,14 @@ static bool CopySelectionAsFindText(HWND hwnd, LPEDITFINDREPLACE lpefr, bool bFi
 	}
 
 	if (StrNotEmptyA(lpszSelection)) {
-		const UINT cpEdit = SciCall_GetCodePage();
-		// Check lpszSelection and truncate bad chars
-		//char *lpsz = strpbrk(lpszSelection, "\r\n\t");
-		//if (lpsz) {
-		//	*lpsz = '\0';
-		//}
-
 		char *lpszEscSel = (char *)NP2HeapAlloc((2 * NP2_FIND_REPLACE_LIMIT));
 		if (AddBackslashA(lpszEscSel, lpszSelection)) {
 			lpefr->bTransformBS = !(lpefr->fuFlags & SCFIND_REGEXP);
+		} else {
+			lpefr->bTransformBS = false;
 		}
 
+		const UINT cpEdit = SciCall_GetCodePage();
 		SetDlgItemTextA2W(cpEdit, hwnd, IDC_FINDTEXT, lpszEscSel);
 		NP2HeapFree(lpszEscSel);
 	}
