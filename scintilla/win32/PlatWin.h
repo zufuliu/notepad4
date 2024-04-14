@@ -186,7 +186,7 @@ inline UINT DpiForWindow(WindowID wid) noexcept {
 	return GetWindowDPI(HwndFromWindowID(wid));
 }
 
-HCURSOR LoadReverseArrowCursor(UINT dpi) noexcept;
+HCURSOR LoadReverseArrowCursor(UINT dpi, int cursorBaseSize) noexcept;
 
 class MouseWheelDelta {
 	int wheelDelta = 0;

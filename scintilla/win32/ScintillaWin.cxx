@@ -358,6 +358,7 @@ class GlobalMemory;
 class ReverseArrowCursor {
 	HCURSOR cursor {};
 	UINT dpi = USER_DEFAULT_SCREEN_DPI;
+	UINT cursorBaseSize = 32;
 
 public:
 	ReverseArrowCursor() noexcept = default;
@@ -372,16 +373,17 @@ public:
 		}
 	}
 
-	HCURSOR Load(UINT dpi_) noexcept {
-		if (cursor)	 {
-			if (dpi == dpi_) {
+	HCURSOR Load(UINT dpi_, UINT cursorBaseSize_) noexcept {
+		if (cursor)	{
+			if (dpi == dpi_ && cursorBaseSize == cursorBaseSize_) {
 				return cursor;
 			}
 			::DestroyCursor(cursor);
 		}
 
 		dpi = dpi_;
-		cursor = LoadReverseArrowCursor(dpi_);
+		cursorBaseSize = cursorBaseSize_;
+		cursor = LoadReverseArrowCursor(dpi_, cursorBaseSize_);
 		return cursor ? cursor : ::LoadCursor({}, IDC_ARROW);
 	}
 };
@@ -419,6 +421,7 @@ class ScintillaWin final :
 	MouseWheelDelta horizontalWheelDelta;
 
 	UINT dpi = USER_DEFAULT_SCREEN_DPI;
+	UINT cursorBaseSize = 32;
 	ReverseArrowCursor reverseArrowCursor;
 
 	PRectangle rectangleClient;
@@ -846,7 +849,7 @@ void ScintillaWin::DisplayCursor(Window::Cursor c) noexcept {
 		c = static_cast<Window::Cursor>(cursorMode);
 	}
 	if (c == Window::Cursor::reverseArrow) {
-		::SetCursor(reverseArrowCursor.Load(dpi));
+		::SetCursor(reverseArrowCursor.Load(dpi, cursorBaseSize));
 	} else {
 		wMain.SetCursor(c);
 	}
@@ -3469,6 +3472,27 @@ void ScintillaWin::GetMouseParameters() noexcept {
 		// no horizontal scrolling configuration on Windows XP
 		charsPerScroll = (linesPerScroll == WHEEL_PAGESCROLL) ? 3 : linesPerScroll;
 	}
+
+	// https://learn.microsoft.com/en-us/answers/questions/815036/windows-cursor-size
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+	DWORD type = REG_DWORD;
+	DWORD size = sizeof(DWORD);
+	[[maybe_unused]] const LSTATUS status = RegGetValue(HKEY_CURRENT_USER, L"Control Panel\\Cursors", L"CursorBaseSize", RRF_RT_REG_DWORD, &type, &cursorBaseSize, &size);
+
+#else
+	HKEY hKey;
+	LSTATUS status = RegOpenKeyEx(HKEY_CURRENT_USER, L"Control Panel\\Cursors", 0, KEY_READ, &hKey);
+	if (status == ERROR_SUCCESS) {
+		DWORD baseSize = 0;
+		DWORD type = REG_DWORD;
+		DWORD size = sizeof(DWORD);
+		status = RegQueryValueEx(hKey, L"CursorBaseSize", nullptr, &type, (LPBYTE)(&baseSize), &size);
+		if (status == ERROR_SUCCESS && type == REG_DWORD) {
+			cursorBaseSize = baseSize;
+		}
+		RegCloseKey(hKey);
+	}
+#endif
 }
 
 void ScintillaWin::CopyToGlobal(GlobalMemory &gmUnicode, const SelectionText &selectedText, CopyEncoding encoding) const {

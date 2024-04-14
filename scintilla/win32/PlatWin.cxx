@@ -2887,15 +2887,19 @@ void FlipBitmap(HBITMAP bitmap, int width, int height) noexcept {
 
 }
 
-HCURSOR LoadReverseArrowCursor(UINT dpi) noexcept {
+HCURSOR LoadReverseArrowCursor(UINT dpi, int cursorBaseSize) noexcept {
 	HCURSOR reverseArrowCursor {};
 
 	bool created = false;
 	HCURSOR cursor = ::LoadCursor({}, IDC_ARROW);
 
-	if (dpi != g_uSystemDPI) {
-		const int width = SystemMetricsForDpi(SM_CXCURSOR, dpi);
-		const int height = SystemMetricsForDpi(SM_CYCURSOR, dpi);
+	if (dpi != g_uSystemDPI || cursorBaseSize > 32) {
+		int width = SystemMetricsForDpi(SM_CXCURSOR, dpi);
+		int height = SystemMetricsForDpi(SM_CYCURSOR, dpi);
+		if (cursorBaseSize > width || cursorBaseSize > height) {
+			width = MulDiv(cursorBaseSize, dpi, g_uSystemDPI);
+			height = width;
+		}
 		HCURSOR copy = static_cast<HCURSOR>(::CopyImage(cursor, IMAGE_CURSOR, width, height, LR_COPYFROMRESOURCE | LR_COPYRETURNORG));
 		if (copy) {
 			created = copy != cursor;
