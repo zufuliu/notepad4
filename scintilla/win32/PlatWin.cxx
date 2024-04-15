@@ -2893,12 +2893,15 @@ HCURSOR LoadReverseArrowCursor(UINT dpi, int cursorBaseSize) noexcept {
 	bool created = false;
 	HCURSOR cursor = ::LoadCursor({}, IDC_ARROW);
 
-	if (dpi != g_uSystemDPI || cursorBaseSize > 32) {
-		int width = SystemMetricsForDpi(SM_CXCURSOR, dpi);
-		int height = SystemMetricsForDpi(SM_CYCURSOR, dpi);
-		if (cursorBaseSize > width || cursorBaseSize > height) {
+	if (dpi != g_uSystemDPI || cursorBaseSize > defaultCursorBaseSize) {
+		int width;
+		int height;
+		if (cursorBaseSize > defaultCursorBaseSize) {
 			width = MulDiv(cursorBaseSize, dpi, g_uSystemDPI);
 			height = width;
+		} else {
+			width = SystemMetricsForDpi(SM_CXCURSOR, dpi);
+			height = SystemMetricsForDpi(SM_CYCURSOR, dpi);
 		}
 		HCURSOR copy = static_cast<HCURSOR>(::CopyImage(cursor, IMAGE_CURSOR, width, height, LR_COPYFROMRESOURCE | LR_COPYRETURNORG));
 		if (copy) {

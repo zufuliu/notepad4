@@ -358,7 +358,7 @@ class GlobalMemory;
 class ReverseArrowCursor {
 	HCURSOR cursor {};
 	UINT dpi = USER_DEFAULT_SCREEN_DPI;
-	UINT cursorBaseSize = 32;
+	UINT cursorBaseSize = defaultCursorBaseSize;
 
 public:
 	ReverseArrowCursor() noexcept = default;
@@ -421,7 +421,7 @@ class ScintillaWin final :
 	MouseWheelDelta horizontalWheelDelta;
 
 	UINT dpi = USER_DEFAULT_SCREEN_DPI;
-	UINT cursorBaseSize = 32;
+	UINT cursorBaseSize = defaultCursorBaseSize;
 	ReverseArrowCursor reverseArrowCursor;
 
 	PRectangle rectangleClient;
