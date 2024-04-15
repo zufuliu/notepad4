@@ -41,7 +41,14 @@
 
 #define VERSION_BUILD_INFO_LIB		L",\nScintilla 5.4.3."
 #define VERSION_BUILD_INFO_FORMAT	L"Compiled on " __DATE__ L" with %s %d.%d.%d" VERSION_BUILD_INFO_LIB
-#if defined(__clang__)
+#if defined(__INTEL_LLVM_COMPILER)
+#define VERSION_BUILD_TOOL_NAME     L""
+#define VERSION_BUILD_TOOL_MAJOR    L""
+#define VERSION_BUILD_TOOL_MINOR    L""
+#define VERSION_BUILD_TOOL_PATCH    L""
+#undef VERSION_BUILD_INFO_FORMAT
+#define VERSION_BUILD_INFO_FORMAT   L"Compiled on " __DATE__ L" with %s" __VERSION__
+#elif defined(__clang__)
 #define VERSION_BUILD_TOOL_NAME		L"Clang"
 #define VERSION_BUILD_TOOL_MAJOR	__clang_major__
 #define VERSION_BUILD_TOOL_MINOR	__clang_minor__
