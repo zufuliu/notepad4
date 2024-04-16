@@ -37,8 +37,13 @@
 #define VERSION_EMAIL_DISPLAY		L"florian.balmer@gmail.com"
 #define VERSION_NEWPAGE_DISPLAY		L"https://github.com/zufuliu/notepad2"
 
-#define VERSION_BUILD_INFO_FORMAT	L"Compiled on " __DATE__ L" with %s %d.%d.%d."
-#if defined(__clang__)
+#define VERSION_BUILD_INFO_FORMAT   L"Compiled on " __DATE__ L" with %s %d.%d.%d."
+#if defined(__INTEL_LLVM_COMPILER)
+#define VERSION_BUILD_TOOL_NAME     L"oneAPI"
+#define VERSION_BUILD_TOOL_MAJOR    (__INTEL_LLVM_COMPILER / 10000)
+#define VERSION_BUILD_TOOL_MINOR    ((__INTEL_LLVM_COMPILER / 100) % 100)
+#define VERSION_BUILD_TOOL_PATCH    (__INTEL_LLVM_COMPILER % 100)
+#elif defined(__clang__)
 #define VERSION_BUILD_TOOL_NAME		L"Clang"
 #define VERSION_BUILD_TOOL_MAJOR	__clang_major__
 #define VERSION_BUILD_TOOL_MINOR	__clang_minor__
