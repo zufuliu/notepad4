@@ -65,10 +65,10 @@ extern int iCurrentEncoding;
 extern MRULIST mruFind;
 extern MRULIST mruReplace;
 
-static DStringW wchPrefixSelection;
-static DStringW wchAppendSelection;
-static DStringW wchPrefixLines;
-static DStringW wchAppendLines;
+static LPWSTR wchPrefixSelection;
+static LPWSTR wchAppendSelection;
+static LPWSTR wchPrefixLines;
+static LPWSTR wchAppendLines;
 
 // see TransliterateText()
 #if defined(_MSC_VER) && (_WIN32_WINNT >= _WIN32_WINNT_WIN7)
@@ -99,10 +99,10 @@ wcsftimeSig GetFunctionPointer_wcsftime(void) {
 #endif
 
 void Edit_ReleaseResources(void) {
-	DStringW_Free(&wchPrefixSelection);
-	DStringW_Free(&wchAppendSelection);
-	DStringW_Free(&wchPrefixLines);
-	DStringW_Free(&wchAppendLines);
+	NP2HeapFree(wchPrefixSelection);
+	NP2HeapFree(wchAppendSelection);
+	NP2HeapFree(wchPrefixLines);
+	NP2HeapFree(wchAppendLines);
 #if NP2_DYNAMIC_LOAD_ELSCORE_DLL
 	if (hELSCoreDLL != NULL) {
 		FreeLibrary(hELSCoreDLL);
@@ -6152,9 +6152,9 @@ static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		hFontHover = CreateFontIndirect(&lf);
 
 		MultilineEditSetup(hwnd, IDC_MODIFY_LINE_PREFIX);
-		SetDlgItemText(hwnd, IDC_MODIFY_LINE_PREFIX, wchPrefixLines.buffer);
+		SetDlgItemText(hwnd, IDC_MODIFY_LINE_PREFIX, wchPrefixLines);
 		MultilineEditSetup(hwnd, IDC_MODIFY_LINE_APPEND);
-		SetDlgItemText(hwnd, IDC_MODIFY_LINE_APPEND, wchAppendLines.buffer);
+		SetDlgItemText(hwnd, IDC_MODIFY_LINE_APPEND, wchAppendLines);
 		if (skipEmptyLine) {
 			CheckDlgButton(hwnd, IDC_MODIFY_LINE_SKIP_EMPTY, BST_CHECKED);
 		}
@@ -6304,10 +6304,12 @@ static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDOK: {
-			DStringW_GetDlgItemText(&wchPrefixLines, hwnd, IDC_MODIFY_LINE_PREFIX);
-			DStringW_GetDlgItemText(&wchAppendLines, hwnd, IDC_MODIFY_LINE_APPEND);
+			NP2HeapFree(wchPrefixLines);
+			NP2HeapFree(wchAppendLines);
+			wchPrefixLines = GetDlgItemFullText(hwnd, IDC_MODIFY_LINE_PREFIX);
+			wchAppendLines = GetDlgItemFullText(hwnd, IDC_MODIFY_LINE_APPEND);
 			skipEmptyLine = IsButtonChecked(hwnd, IDC_MODIFY_LINE_SKIP_EMPTY);
-			EditModifyLines(wchPrefixLines.buffer, wchAppendLines.buffer, skipEmptyLine);
+			EditModifyLines(wchPrefixLines, wchAppendLines, skipEmptyLine);
 			EndDialog(hwnd, IDOK);
 		}
 		break;
@@ -6385,9 +6387,9 @@ static INT_PTR CALLBACK EditEncloseSelectionDlgProc(HWND hwnd, UINT umsg, WPARAM
 		ResizeDlg_InitY2(hwnd, cxEncloseSelectionDlg, cyEncloseSelectionDlg, IDC_RESIZEGRIP2, IDC_MODIFY_LINE_PREFIX, IDC_MODIFY_LINE_APPEND);
 
 		MultilineEditSetup(hwnd, IDC_MODIFY_LINE_PREFIX);
-		SetDlgItemText(hwnd, IDC_MODIFY_LINE_PREFIX, wchPrefixSelection.buffer);
+		SetDlgItemText(hwnd, IDC_MODIFY_LINE_PREFIX, wchPrefixSelection);
 		MultilineEditSetup(hwnd, IDC_MODIFY_LINE_APPEND);
-		SetDlgItemText(hwnd, IDC_MODIFY_LINE_APPEND, wchAppendSelection.buffer);
+		SetDlgItemText(hwnd, IDC_MODIFY_LINE_APPEND, wchAppendSelection);
 		CenterDlgInParent(hwnd);
 	}
 	return TRUE;
@@ -6421,10 +6423,12 @@ static INT_PTR CALLBACK EditEncloseSelectionDlgProc(HWND hwnd, UINT umsg, WPARAM
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDOK: {
-			DStringW_GetDlgItemText(&wchPrefixSelection, hwnd, IDC_MODIFY_LINE_PREFIX);
-			DStringW_GetDlgItemText(&wchAppendSelection, hwnd, IDC_MODIFY_LINE_APPEND);
+			NP2HeapFree(wchPrefixSelection);
+			NP2HeapFree(wchAppendSelection);
+			wchPrefixSelection = GetDlgItemFullText(hwnd, IDC_MODIFY_LINE_PREFIX);
+			wchAppendSelection = GetDlgItemFullText(hwnd, IDC_MODIFY_LINE_APPEND);
 
-			EditEncloseSelection(wchPrefixSelection.buffer, wchAppendSelection.buffer);
+			EditEncloseSelection(wchPrefixSelection, wchAppendSelection);
 			EndDialog(hwnd, IDOK);
 		}
 		break;
@@ -6499,13 +6503,12 @@ static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam
 		switch (LOWORD(wParam)) {
 		case IDC_MODIFY_LINE_PREFIX: {
 			if (HIWORD(wParam) == EN_CHANGE) {
-				DStringW wszOpen = DSTRINGW_INIT;
+				LPWSTR wszOpen = GetDlgItemFullText(hwnd, IDC_MODIFY_LINE_PREFIX);
 				bool bClear = true;
 
-				DStringW_GetDlgItemText(&wszOpen, hwnd, IDC_MODIFY_LINE_PREFIX);
-				const int len = lstrlen(wszOpen.buffer);
+				const int len = lstrlen(wszOpen);
 				if (len >= 3) {
-					LPCWSTR pwCur = StrChr(wszOpen.buffer, L'<');
+					LPCWSTR pwCur = StrChr(wszOpen, L'<');
 					if (pwCur != NULL) {
 						LPWSTR wchIns = (LPWSTR)NP2HeapAlloc((len + 5) * sizeof(WCHAR));
 						StrCpyExW(wchIns, L"</");
@@ -6546,20 +6549,18 @@ static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam
 				if (bClear) {
 					SetDlgItemText(hwnd, IDC_MODIFY_LINE_APPEND, L"");
 				}
-				DStringW_Free(&wszOpen);
+				NP2HeapFree(wszOpen);
 			}
 		}
 		break;
 
 		case IDOK: {
-			DStringW wszOpen = DSTRINGW_INIT;
-			DStringW wszClose = DSTRINGW_INIT;
-			DStringW_GetDlgItemText(&wszOpen, hwnd, IDC_MODIFY_LINE_PREFIX);
-			DStringW_GetDlgItemText(&wszClose, hwnd, IDC_MODIFY_LINE_APPEND);
+			LPWSTR wszOpen = GetDlgItemFullText(hwnd, IDC_MODIFY_LINE_PREFIX);
+			LPWSTR wszClose = GetDlgItemFullText(hwnd, IDC_MODIFY_LINE_APPEND);
 
-			EditEncloseSelection(wszOpen.buffer, wszClose.buffer);
-			DStringW_Free(&wszOpen);
-			DStringW_Free(&wszClose);
+			EditEncloseSelection(wszOpen, wszClose);
+			NP2HeapFree(wszOpen);
+			NP2HeapFree(wszClose);
 			EndDialog(hwnd, IDOK);
 		}
 		break;

@@ -604,25 +604,6 @@ NP2_inline LSTATUS Registry_CreateKey(HKEY hKey, LPCWSTR lpSubKey, PHKEY phkResu
 LSTATUS Registry_DeleteTree(HKEY hKey, LPCWSTR lpSubKey);
 #endif
 
-
-typedef struct DStringW {
-	LPWSTR buffer;
-	INT capacity;
-} DStringW;
-
-#define DSTRINGW_INIT	{ NULL, 0 };
-
-NP2_inline void DStringW_Free(DStringW *s) {
-	if (s->buffer) {
-		NP2HeapFree(s->buffer);
-	}
-}
-
-int DStringW_GetWindowText(DStringW *s, HWND hwnd);
-NP2_inline int DStringW_GetDlgItemText(DStringW *s, HWND hwndDlg, int nCtlId) {
-	return DStringW_GetWindowText(s, GetDlgItem(hwndDlg, nCtlId));
-}
-
 NP2_inline bool KeyboardIsKeyDown(int key) {
 	return (GetKeyState(key) & 0x8000) != 0;
 }
@@ -867,8 +848,9 @@ void	FormatNumber(LPWSTR lpNumberStr, size_t Value);
 void	FormatNumber64(LPWSTR lpNumberStr, uint64_t Value);
 #endif
 
-UINT	GetDlgItemTextA2W(UINT uCP, HWND hDlg, int nIDDlgItem, LPSTR lpString, int nMaxCount);
-void	SetDlgItemTextA2W(UINT uCP, HWND hDlg, int nIDDlgItem, LPCSTR lpString);
+LPWSTR GetDlgItemFullText(HWND hwndDlg, int nCtlId);
+int GetDlgItemTextA2W(UINT uCP, HWND hDlg, int nIDDlgItem, LPSTR lpString, int nMaxCount);
+void SetDlgItemTextA2W(UINT uCP, HWND hDlg, int nIDDlgItem, LPCSTR lpString);
 void ComboBox_AddStringA2W(UINT uCP, HWND hwnd, LPCSTR lpString);
 
 //==== MRU Functions ==========================================================

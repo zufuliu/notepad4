@@ -325,26 +325,6 @@ LSTATUS Registry_DeleteTree(HKEY hKey, LPCWSTR lpSubKey) {
 }
 #endif
 
-int DStringW_GetWindowText(DStringW *s, HWND hwnd) {
-	int len = GetWindowTextLength(hwnd);
-	if (len == 0) {
-		if (s->buffer != NULL) {
-			s->buffer[0] = L'\0';
-		}
-	} else {
-		if (len + 1 > s->capacity || s->buffer == NULL) {
-			len = (int)((len + 1) * sizeof(WCHAR));
-			LPWSTR buffer = (s->buffer == NULL) ? (LPWSTR)NP2HeapAlloc(len) : (LPWSTR)NP2HeapReAlloc(s->buffer, len);
-			if (buffer != NULL) {
-				s->buffer = buffer;
-				s->capacity = (int)(NP2HeapSize(buffer) / sizeof(WCHAR));
-			}
-		}
-		len = GetWindowText(hwnd, s->buffer, s->capacity);
-	}
-	return len;
-}
-
 int ParseCommaList(LPCWSTR str, int result[], int count) {
 	if (StrIsEmpty(str)) {
 		return 0;
@@ -2303,19 +2283,31 @@ void FormatNumber(LPWSTR lpNumberStr, size_t value) {
 	}
 }
 
+LPWSTR GetDlgItemFullText(HWND hwndDlg, int nCtlId) {
+	hwndDlg = GetDlgItem(hwndDlg, nCtlId);
+	int len = GetWindowTextLength(hwndDlg);
+	if (len == 0) {
+		return NULL;
+	}
+	len += 1;
+	LPWSTR buffer = (LPWSTR)NP2HeapAlloc(len*sizeof(WCHAR));
+	GetWindowText(hwndDlg, buffer, len);
+	return buffer;
+}
+
 //=============================================================================
 //
 // A2W: Convert Dialog Item Text form Unicode to UTF-8 and vice versa
 //
-UINT GetDlgItemTextA2W(UINT uCP, HWND hDlg, int nIDDlgItem, LPSTR lpString, int nMaxCount) {
-	DStringW wsz = DSTRINGW_INIT;
-	const int iRet = DStringW_GetDlgItemText(&wsz, hDlg, nIDDlgItem);
+int GetDlgItemTextA2W(UINT uCP, HWND hDlg, int nIDDlgItem, LPSTR lpString, int nMaxCount) {
+	LPWSTR wsz = GetDlgItemFullText(hDlg, nIDDlgItem);
 	memset(lpString, 0, nMaxCount);
-	if (iRet) {
-		WideCharToMultiByte(uCP, 0, wsz.buffer, -1, lpString, nMaxCount - 2, NULL, NULL);
+	int len = 0;
+	if (wsz) {
+		len = WideCharToMultiByte(uCP, 0, wsz, -1, lpString, nMaxCount, NULL, NULL) - 1;
+		NP2HeapFree(wsz);
 	}
-	DStringW_Free(&wsz);
-	return iRet;
+	return len;
 }
 
 void SetDlgItemTextA2W(UINT uCP, HWND hDlg, int nIDDlgItem, LPCSTR lpString) {
