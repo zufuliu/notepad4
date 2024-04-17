@@ -142,7 +142,9 @@ int SystemMetricsForDpi(int nIndex, UINT dpi) NP2F_noexcept {
 	}
 
 	int value = ::GetSystemMetrics(nIndex);
-	value = (dpi == g_uSystemDPI) ? value : ::MulDiv(value, dpi, g_uSystemDPI);
+	if (dpi != g_uSystemDPI) {
+		value = ::MulDiv(value, dpi, g_uSystemDPI);
+	}
 	return value;
 }
 
@@ -2897,7 +2899,7 @@ HCURSOR LoadReverseArrowCursor(UINT dpi, int cursorBaseSize) noexcept {
 		int width;
 		int height;
 		if (cursorBaseSize > defaultCursorBaseSize) {
-			width = MulDiv(cursorBaseSize, dpi, g_uSystemDPI);
+			width = ::MulDiv(cursorBaseSize, dpi, USER_DEFAULT_SCREEN_DPI);
 			height = width;
 		} else {
 			width = SystemMetricsForDpi(SM_CXCURSOR, dpi);
