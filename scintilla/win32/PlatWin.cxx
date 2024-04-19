@@ -2889,11 +2889,22 @@ void FlipBitmap(HBITMAP bitmap, int width, int height) noexcept {
 
 }
 
-HCURSOR LoadReverseArrowCursor(UINT dpi, int cursorBaseSize) noexcept {
-	HCURSOR reverseArrowCursor {};
-
+HCURSOR LoadReverseArrowCursor(HCURSOR cursor, UINT dpi) noexcept {
 	bool created = false;
-	HCURSOR cursor = ::LoadCursor({}, IDC_ARROW);
+	// https://learn.microsoft.com/en-us/answers/questions/815036/windows-cursor-size
+	constexpr DWORD defaultCursorBaseSize = 32;
+	DWORD cursorBaseSize = 0;
+	HKEY hKey {};
+	LSTATUS status = ::RegOpenKeyExW(HKEY_CURRENT_USER, L"Control Panel\\Cursors", 0, KEY_READ, &hKey);
+	if (status == ERROR_SUCCESS) {
+		DWORD baseSize = 0;
+		DWORD type = REG_DWORD;
+		DWORD size = sizeof(DWORD);
+		status = ::RegQueryValueExW(hKey, L"CursorBaseSize", nullptr, &type, reinterpret_cast<LPBYTE>(&baseSize), &size);
+		if (status == ERROR_SUCCESS && type == REG_DWORD) {
+			cursorBaseSize = baseSize;
+		}
+	}
 
 	if (dpi != g_uSystemDPI || cursorBaseSize > defaultCursorBaseSize) {
 		int width;
@@ -2905,14 +2916,45 @@ HCURSOR LoadReverseArrowCursor(UINT dpi, int cursorBaseSize) noexcept {
 			width = SystemMetricsForDpi(SM_CXCURSOR, dpi);
 			height = SystemMetricsForDpi(SM_CYCURSOR, dpi);
 		}
+		if (hKey) {
+			// workaround CopyImage() for system cursor
+			// https://learn.microsoft.com/en-us/answers/questions/1315176/how-to-copy-system-cursors-properly
+			WCHAR cursorPath[MAX_PATH]{};
+			DWORD size = sizeof(cursorPath);
+			DWORD type = REG_SZ;
+			status = ::RegQueryValueExW(hKey, L"Arrow", nullptr, &type, reinterpret_cast<LPBYTE>(cursorPath), &size);
+			if (status == ERROR_SUCCESS && (type == REG_SZ || type == REG_EXPAND_SZ)) {
+				LPCWSTR path = cursorPath;
+				WCHAR expansion[MAX_PATH];
+				if (type == REG_EXPAND_SZ) {
+					size = ::ExpandEnvironmentStringsW(cursorPath, expansion, MAX_PATH);
+					if (size > 0 && size <= MAX_PATH) {
+						path = expansion;
+					}
+				}
+				HCURSOR load = static_cast<HCURSOR>(::LoadImage({}, path, IMAGE_CURSOR, width, height, LR_LOADFROMFILE));
+				if (load) {
+					created = true;
+					cursor = load;
+				}
+			}
+		}
 		HCURSOR copy = static_cast<HCURSOR>(::CopyImage(cursor, IMAGE_CURSOR, width, height, LR_COPYFROMRESOURCE | LR_COPYRETURNORG));
-		if (copy) {
-			created = copy != cursor;
+		if (copy && copy != cursor) {
+			if (created) {
+				::DestroyCursor(cursor);
+			}
+			created = true;
 			cursor = copy;
 		}
 	}
 
+	if (hKey) {
+		::RegCloseKey(hKey);
+	}
+
 	ICONINFO info;
+	HCURSOR reverseArrowCursor {};
 	if (::GetIconInfo(cursor, &info)) {
 		BITMAP bmp{};
 		if (::GetObject(info.hbmMask, sizeof(bmp), &bmp)) {
@@ -2958,6 +3000,7 @@ void Window::SetCursor(Cursor curs) noexcept {
 	case Cursor::reverseArrow:
 	case Cursor::arrow:
 	case Cursor::invalid:	// Should not occur, but just in case.
+	default:
 		::SetCursor(::LoadCursor({}, IDC_ARROW));
 		break;
 	}
