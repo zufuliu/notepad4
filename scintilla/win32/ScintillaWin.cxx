@@ -317,8 +317,9 @@ public:
 	IMContext &operator=(const IMContext &) = delete;
 	IMContext &operator=(IMContext &&) = delete;
 	~IMContext() {
-		if (hIMC)
+		if (hIMC) {
 			::ImmReleaseContext(hwnd, hIMC);
+		}
 	}
 
 	operator bool() const noexcept {
@@ -732,7 +733,6 @@ ScintillaWin::ScintillaWin(HWND hwnd) noexcept {
 ScintillaWin::~ScintillaWin() {
 	if (sysCaretBitmap) {
 		::DeleteObject(sysCaretBitmap);
-		sysCaretBitmap = {};
 	}
 }
 
