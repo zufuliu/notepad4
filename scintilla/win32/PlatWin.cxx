@@ -2892,10 +2892,10 @@ HCURSOR LoadReverseArrowCursor(HCURSOR cursor, UINT dpi) noexcept {
 	constexpr DWORD maxCursorBaseSize = 16*(1 + 15); // 16*(1 + CursorSize)
 	DWORD cursorBaseSize = 0;
 	HKEY hKey {};
-	LSTATUS status = ::RegOpenKeyExW(HKEY_CURRENT_USER, L"Control Panel\\Cursors", 0, KEY_READ, &hKey);
+	LSTATUS status = ::RegOpenKeyExW(HKEY_CURRENT_USER, L"Control Panel\\Cursors", 0, KEY_QUERY_VALUE, &hKey);
 	if (status == ERROR_SUCCESS) {
 		DWORD baseSize = 0;
-		DWORD type = REG_DWORD;
+		DWORD type = REG_NONE;
 		DWORD size = sizeof(DWORD);
 		status = ::RegQueryValueExW(hKey, L"CursorBaseSize", nullptr, &type, reinterpret_cast<LPBYTE>(&baseSize), &size);
 		if (status == ERROR_SUCCESS && type == REG_DWORD) {
@@ -2919,7 +2919,7 @@ HCURSOR LoadReverseArrowCursor(HCURSOR cursor, UINT dpi) noexcept {
 			// https://learn.microsoft.com/en-us/answers/questions/1315176/how-to-copy-system-cursors-properly
 			WCHAR cursorPath[MAX_PATH]{};
 			DWORD size = sizeof(cursorPath);
-			DWORD type = REG_SZ;
+			DWORD type = REG_NONE;
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 			status = ::RegGetValueW(hKey, nullptr, L"Arrow", RRF_RT_REG_SZ, &type, cursorPath, &size);
 			if (status == ERROR_SUCCESS && type == REG_SZ) {
@@ -2991,11 +2991,11 @@ HCURSOR LoadReverseArrowCursor(HCURSOR cursor, UINT dpi) noexcept {
 #else // draw reverse arrow cursor
 namespace {
 
-std::optional<DWORD> RegGetDWORD(HKEY hKey, LPCWSTR key) noexcept {
+std::optional<DWORD> RegGetDWORD(HKEY hKey, LPCWSTR valueName) noexcept {
 	DWORD value = 0;
-	DWORD type = REG_DWORD;
+	DWORD type = REG_NONE;
 	DWORD size = sizeof(DWORD);
-	const LSTATUS status = ::RegQueryValueExW(hKey, key, nullptr, &type, reinterpret_cast<LPBYTE>(&value), &size);
+	const LSTATUS status = ::RegQueryValueExW(hKey, valueName, nullptr, &type, reinterpret_cast<LPBYTE>(&value), &size);
 	if (status == ERROR_SUCCESS && type == REG_DWORD) {
 		return value;
 	}
@@ -3010,7 +3010,7 @@ HCURSOR LoadReverseArrowCursor(HCURSOR cursor, UINT dpi) noexcept {
 	constexpr DWORD maxCursorBaseSize = 16*(1 + 15); // 16*(1 + CursorSize)
 	DWORD cursorBaseSize = 0;
 	HKEY hKey {};
-	LSTATUS status = ::RegOpenKeyExW(HKEY_CURRENT_USER, L"Control Panel\\Cursors", 0, KEY_READ, &hKey);
+	LSTATUS status = ::RegOpenKeyExW(HKEY_CURRENT_USER, L"Control Panel\\Cursors", 0, KEY_QUERY_VALUE, &hKey);
 	if (status == ERROR_SUCCESS) {
 		if (auto baseSize = RegGetDWORD(hKey, L"CursorBaseSize")) {
 			// CursorBaseSize is multiple of 16
@@ -3059,7 +3059,6 @@ HCURSOR LoadReverseArrowCursor(HCURSOR cursor, UINT dpi) noexcept {
 
 	// Draw something on the DIB section.
 	HBITMAP hOldBitmap = SelectBitmap(hMemDC, hBitmap);
-	const double scale = width/32.0;
 	// polygon colour and coordinates from C:\Windows\Cursors\arrow.svg
 	COLORREF fillColour = RGB(0xff, 0xff, 0xfe);
 	COLORREF strokeColour = RGB(0, 0, 1);
@@ -3073,7 +3072,7 @@ HCURSOR LoadReverseArrowCursor(HCURSOR cursor, UINT dpi) noexcept {
 		32 - 1.26394, 32 - 30.57485,
 	};
 
-	status = ::RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Accessibility", 0, KEY_READ, &hKey);
+	status = ::RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Accessibility", 0, KEY_QUERY_VALUE, &hKey);
 	if (status == ERROR_SUCCESS) {
 		if (auto cursorType = RegGetDWORD(hKey, L"CursorType")) {
 			switch (*cursorType) {
@@ -3093,6 +3092,7 @@ HCURSOR LoadReverseArrowCursor(HCURSOR cursor, UINT dpi) noexcept {
 	}
 
 	POINT points[std::size(arrow)/2];
+	const double scale = width/32.0;
 	for (size_t i = 0, index = 0; i < std::size(arrow); i += 2, index++) {
 		points[index].x = std::lround(arrow[i] * scale);
 		points[index].y = std::lround(arrow[i + 1] * scale);

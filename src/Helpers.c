@@ -277,7 +277,7 @@ void IniSectionSetQuotedString(IniSectionOnSave *section, LPCWSTR key, LPCWSTR v
 
 LPWSTR Registry_GetString(HKEY hKey, LPCWSTR valueName) {
 	LPWSTR lpszText = NULL;
-	DWORD type = REG_SZ;
+	DWORD type = REG_NONE;
 	DWORD size = 0;
 
 	LSTATUS status = RegQueryValueEx(hKey, valueName, NULL, &type, NULL, &size);
