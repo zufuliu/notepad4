@@ -31,7 +31,7 @@ constexpr bool IsCommentChar(unsigned char ch) noexcept {
 	return ch == '#' || ch == ';' || ch == '!';
 }
 
-constexpr bool IsAssignChar(unsigned char ch) noexcept {
+constexpr bool isAssignChar(unsigned char ch) noexcept {
 	return ch == '=' || ch == ':';
 }
 
@@ -79,13 +79,13 @@ void ColourisePropsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			++i;
 			styler.ColorTo(i, SCE_PROPS_DEFVAL);
 			const char chNext = styler[i];
-			if (IsAssignChar(chNext)) {
+			if (isAssignChar(chNext)) {
 				styler.ColorTo(i + 1, SCE_PROPS_ASSIGNMENT);
 			}
 		} else if (allowInitialSpaces || !isspacechar(ch)) {
 			while (i < lineStartNext) {
 				ch = styler[i];
-				if (IsAssignChar(ch)) {
+				if (isAssignChar(ch)) {
 					styler.ColorTo(i, SCE_PROPS_KEY);
 					++i;
 					styler.ColorTo(i, SCE_PROPS_ASSIGNMENT);

@@ -3062,14 +3062,14 @@ HCURSOR LoadReverseArrowCursor(HCURSOR cursor, UINT dpi) noexcept {
 	// polygon colour and coordinates from C:\Windows\Cursors\arrow.svg
 	COLORREF fillColour = RGB(0xff, 0xff, 0xfe);
 	COLORREF strokeColour = RGB(0, 0, 1);
-	static constexpr double arrow[] = {
-		32 - 12.73606,32 - 19.04075,
-		32 - 7.80159, 32 - 19.04075,
-		32 - 9.82813, 32 - 14.91828,
-		32 - 6.88341, 32 - 13.42515,
-		32 - 4.62301, 32 - 18.05872,
-		32 - 1.26394, 32 - 14.78295,
-		32 - 1.26394, 32 - 30.57485,
+	static constexpr float arrow[] = {
+		32.0f - 12.73606f,32.0f - 19.04075f,
+		32.0f - 7.80159f, 32.0f - 19.04075f,
+		32.0f - 9.82813f, 32.0f - 14.91828f,
+		32.0f - 6.88341f, 32.0f - 13.42515f,
+		32.0f - 4.62301f, 32.0f - 18.05872f,
+		32.0f - 1.26394f, 32.0f - 14.78295f,
+		32.0f - 1.26394f, 32.0f - 30.57485f,
 	};
 
 	status = ::RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Accessibility", 0, KEY_QUERY_VALUE, &hKey);
@@ -3092,7 +3092,7 @@ HCURSOR LoadReverseArrowCursor(HCURSOR cursor, UINT dpi) noexcept {
 	}
 
 	POINT points[std::size(arrow)/2];
-	const double scale = width/32.0;
+	const float scale = width/32.0f;
 	for (size_t i = 0, index = 0; i < std::size(arrow); i += 2, index++) {
 		points[index].x = std::lround(arrow[i] * scale);
 		points[index].y = std::lround(arrow[i + 1] * scale);
