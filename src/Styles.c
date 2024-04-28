@@ -5015,7 +5015,7 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 		if (fDragging) {
 			HTREEITEM htiTarget = TreeView_GetDropHilight(hwndTV);
 			TreeView_SelectDropTarget(hwndTV, NULL);
-			TreeView_SetInsertMark(hwndTV, NULL, TRUE);
+			TreeView_SetInsertMark(hwndTV, 0, TRUE);
 
 			if (hDraggingNode != NULL && htiTarget != NULL && hDraggingNode != htiTarget) {
 				Lexer_OnDragDrop(hwndTV, hFavoriteNode, hDraggingNode, htiTarget);
@@ -5030,7 +5030,7 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 	case WM_CANCELMODE:
 		if (fDragging) {
 			TreeView_SelectDropTarget(hwndTV, NULL);
-			TreeView_SetInsertMark(hwndTV, NULL, TRUE);
+			TreeView_SetInsertMark(hwndTV, 0, TRUE);
 			ReleaseCapture();
 			DestroyCursor(SetCursor(LoadCursor(NULL, IDC_ARROW)));
 			fDragging = false;
