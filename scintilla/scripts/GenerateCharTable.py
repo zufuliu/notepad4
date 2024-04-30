@@ -201,7 +201,7 @@ def GenerateJsonCharClass():
 			state = SCE_JSON_IDENTIFIER
 			mask = JsonMask_Identifier
 		else:
-			charClass = JsonChar_None
+			state = SCE_JSON_OPERATOR
 
 		value = charClass | mask | (state << 5)
 		table[i] = value
