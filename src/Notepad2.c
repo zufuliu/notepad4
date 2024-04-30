@@ -3788,27 +3788,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_EDIT_NUM2HEX:
-		BeginWaitCursor();
-		EditConvertNumRadix(16);
-		EndWaitCursor();
-		break;
-
 	case IDM_EDIT_NUM2DEC:
-		BeginWaitCursor();
-		EditConvertNumRadix(10);
-		EndWaitCursor();
-		break;
-
 	case IDM_EDIT_NUM2BIN:
-		BeginWaitCursor();
-		EditConvertNumRadix(2);
-		EndWaitCursor();
-		break;
-
 	case IDM_EDIT_NUM2OCT:
-		BeginWaitCursor();
-		EditConvertNumRadix(8);
-		EndWaitCursor();
+		EditConvertNumRadix(LOWORD(wParam));
 		break;
 
 	case IDM_EDIT_FINDMATCHINGBRACE: {

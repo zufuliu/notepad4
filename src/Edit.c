@@ -2367,6 +2367,12 @@ void EditConvertNumRadix(int radix) {
 		return;
 	}
 
+	NP2_static_assert(IDM_EDIT_NUM2DEC - IDM_EDIT_NUM2BIN == 1);
+	NP2_static_assert(IDM_EDIT_NUM2OCT - IDM_EDIT_NUM2BIN == 2);
+	NP2_static_assert(IDM_EDIT_NUM2HEX - IDM_EDIT_NUM2BIN == 3);
+	radix -= IDM_EDIT_NUM2BIN;
+	radix = (radix == 1) ? 10 : (2 << radix);
+
 	char *ch = (char *)NP2HeapAlloc(count + 1);
 	char *tch = (char *)NP2HeapAlloc(2 + count * 4 + 8 + 1);
 	Sci_Position cch = 0;
