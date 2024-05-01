@@ -654,7 +654,7 @@ DocumentStyledText GetDocumentStyledText(uint8_t (&styleMap)[STYLE_MAX + 1], Sci
 	for (size_t offset = 0; offset < textLength; offset++) {
 		const uint8_t style = styledText[offset];
 		styleUsed[style >> 5] |= (1U << (style & 31));
-		maxStyle = std::max<unsigned int>(style, maxStyle);
+		maxStyle = max_u(style, maxStyle);
 	}
 
 	++maxStyle;
