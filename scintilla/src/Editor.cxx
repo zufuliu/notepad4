@@ -5859,36 +5859,22 @@ Sci::Line Editor::WrapCount(Sci::Line line) {
 }
 
 void Editor::AddStyledText(const char *buffer, Sci::Position appendLength) {
-	// The buffer consists of alternating character bytes and style bytes
+	// see GetTextRange(), buffer := [textLength style bytes] [textLength character bytes] NUL
 	const Sci::Position textLength = appendLength / 2;
-	std::string text(textLength, '\0');
-	for (Sci::Position i = 0; i < textLength; i++) {
-		text[i] = buffer[i * 2];
-	}
-	const Sci::Position lengthInserted = pdoc->InsertString(CurrentPosition(), text);
-	for (Sci::Position i = 0; i < textLength; i++) {
-		text[i] = buffer[i * 2 + 1];
-	}
+	const Sci::Position lengthInserted = pdoc->InsertString(CurrentPosition(), buffer + textLength + 1, textLength);
 	pdoc->StartStyling(CurrentPosition());
-	pdoc->SetStyles(textLength, reinterpret_cast<const unsigned char*>(text.c_str()));
+	pdoc->SetStyles(textLength, reinterpret_cast<const unsigned char*>(buffer));
 	SetEmptySelection(sel.MainCaret() + lengthInserted);
 }
 
-Sci::Position Editor::GetStyledText(char *buffer, Sci::Position cpMin, Sci::Position cpMax) const noexcept {
-	Sci::Position iPlace = 0;
-	for (Sci::Position iChar = cpMin; iChar < cpMax; iChar++) {
-		buffer[iPlace++] = pdoc->CharAt(iChar);
-		buffer[iPlace++] = pdoc->StyleAt(iChar);
-	}
-	buffer[iPlace] = '\0';
-	buffer[iPlace + 1] = '\0';
-	return iPlace;
-}
-
-Sci::Position Editor::GetTextRange(char *buffer, Sci::Position cpMin, Sci::Position cpMax) const noexcept {
+Sci::Position Editor::GetTextRange(char *buffer, Sci::Position cpMin, Sci::Position cpMax, bool style) const noexcept {
 	const Sci::Position cpEnd = (cpMax == -1) ? pdoc->Length() : cpMax;
 	PLATFORM_ASSERT(cpEnd <= pdoc->Length());
 	const Sci::Position len = cpEnd - cpMin; 	// No -1 as cpMin and cpMax are referring to inter character positions
+	if (style) {
+		pdoc->GetStyleRange(reinterpret_cast<unsigned char *>(buffer), cpMin, len);
+		buffer += len ;
+	}
 	pdoc->GetCharRange(buffer, cpMin, len);
 	// Spec says copied text is terminated with a NUL
 	buffer[len] = '\0';
@@ -6771,7 +6757,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 
 	case Message::GetStyledTextFull:
 		if (const TextRangeFull *tr = static_cast<TextRangeFull *>(PtrFromSPtr(lParam))) {
-			return GetStyledText(tr->lpstrText, tr->chrg.cpMin, tr->chrg.cpMax);
+			return GetTextRange(tr->lpstrText, tr->chrg.cpMin, tr->chrg.cpMax, true);
 		}
 		return 0;
 

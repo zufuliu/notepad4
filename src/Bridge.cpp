@@ -642,7 +642,7 @@ void GetStyleDefinitionFor(int style, StyleDefinition &definition) noexcept {
 
 DocumentStyledText GetDocumentStyledText(uint8_t (&styleMap)[STYLE_MAX + 1], Sci_Position startPos, Sci_Position endPos) noexcept {
 	SciCall_EnsureStyledTo(endPos);
-	std::unique_ptr<char[]> styledText = make_unique_for_overwrite<char[]>(2*(endPos - startPos + 1));
+	std::unique_ptr<char[]> styledText = make_unique_for_overwrite<char[]>(2*(endPos - startPos) + 1);
 	const UINT cpEdit = SciCall_GetCodePage();
 	const Sci_TextRangeFull tr { { startPos, endPos }, styledText.get() };
 	const size_t textLength = SciCall_GetStyledTextFull(&tr);
@@ -651,12 +651,10 @@ DocumentStyledText GetDocumentStyledText(uint8_t (&styleMap)[STYLE_MAX + 1], Sci
 	styleUsed[STYLE_DEFAULT >> 5] |= (1U << (STYLE_DEFAULT & 31));
 	unsigned maxStyle = STYLE_DEFAULT;
 
-	for (size_t offset = 1; offset < textLength; offset += 2) {
+	for (size_t offset = 0; offset < textLength; offset++) {
 		const uint8_t style = styledText[offset];
 		styleUsed[style >> 5] |= (1U << (style & 31));
-		if (style > maxStyle) {
-			maxStyle = style;
-		}
+		maxStyle = std::max<unsigned int>(style, maxStyle);
 	}
 
 	++maxStyle;
@@ -890,9 +888,9 @@ std::string SaveToStreamRTF(Sci_Position startPos, Sci_Position endPos) {
 		os += std::string_view{fmtbuf, fmtlen};
 	}
 
-	for (size_t offset = 0; offset < textLength; offset += 2) {
-		const char ch = styledText[offset];
-		uint8_t style = styledText[offset + 1];
+	const char * const textBuffer = styledText.get() + textLength;
+	for (size_t offset = 0; offset < textLength; offset++) {
+		uint8_t style = styledText[offset];
 		style = styleMap[style];
 		if (style != styleCurrent) {
 			styleCurrent = style;
@@ -909,6 +907,7 @@ std::string SaveToStreamRTF(Sci_Position startPos, Sci_Position endPos) {
 			}
 		}
 
+		const char ch = textBuffer[offset];
 		std::string_view sv;
 		column++;
 		if (ch == '{') {
@@ -931,11 +930,11 @@ std::string SaveToStreamRTF(Sci_Position startPos, Sci_Position endPos) {
 		} else if (ch == '\r' || ch == '\n') {
 			sv = RTF_EOL;
 			column = 0;
-			if (ch == '\r' && styledText[offset + 2] == '\n') {
-				offset += 2;
+			if (ch == '\r' && textBuffer[offset + 1] == '\n') {
+				offset += 1;
 			}
 			// check eolFilled on next line
-			const Sci_Line line = SciCall_LineFromPosition(startPos + offset/2);
+			const Sci_Line line = SciCall_LineFromPosition(startPos + offset);
 			const Sci_Position pos = SciCall_PositionFromLine(line + 2);
 			if (pos < endPos) {
 				uint8_t eolStyle = styledText[2*(pos - startPos) - 1];
@@ -960,10 +959,10 @@ std::string SaveToStreamRTF(Sci_Position startPos, Sci_Position endPos) {
 				}
 			}
 		} else if (static_cast<signed char>(ch) < 0 && cpEdit == SC_CP_UTF8) {
-			const Sci_Position pos = startPos + offset/2;
+			const Sci_Position pos = startPos + offset;
 			Sci_Position width = 0;
 			const unsigned int u32 = SciCall_GetCharacterAndWidth(pos, &width);
-			offset += 2*(width - 1);
+			offset += width - 1;
 			if (u32 < 0x10000) {
 				fmtlen = sprintf(fmtbuf, "\\u%d?", static_cast<short>(u32));
 			} else {
