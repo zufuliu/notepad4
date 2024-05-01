@@ -2526,6 +2526,8 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	EnableCmd(hmenu, IDM_EDIT_URLENCODE, i);
 	EnableCmd(hmenu, IDM_EDIT_URLDECODE, i);
+	EnableCmd(hmenu, IDM_EDIT_CODE_COMPRESS, i);
+	EnableCmd(hmenu, IDM_EDIT_CODE_PRETTY, i);
 
 	EnableCmd(hmenu, IDM_EDIT_XHTML_ESCAPE_CHAR, i);
 	EnableCmd(hmenu, IDM_EDIT_XHTML_UNESCAPE_CHAR, i);
@@ -2536,6 +2538,8 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	EnableCmd(hmenu, IDM_EDIT_CHAR2HEX, i);
 	EnableCmd(hmenu, IDM_EDIT_HEX2CHAR, i);
 	EnableCmd(hmenu, IDM_EDIT_SHOW_HEX, i);
+	EnableCmd(hmenu, IDM_EDIT_CODE_COMPRESS, i);
+	EnableCmd(hmenu, IDM_EDIT_CODE_PRETTY, i);
 
 	EnableCmd(hmenu, IDM_EDIT_BASE64_ENCODE, i);
 	EnableCmd(hmenu, IDM_EDIT_BASE64_SAFE_ENCODE, i);
@@ -3769,6 +3773,13 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_EDIT_SHOW_HEX:
 		BeginWaitCursor();
 		EditShowHex();
+		EndWaitCursor();
+		break;
+
+	case IDM_EDIT_CODE_COMPRESS:
+	case IDM_EDIT_CODE_PRETTY:
+		BeginWaitCursor();
+		EditFormatCode(LOWORD(wParam));
 		EndWaitCursor();
 		break;
 

@@ -133,6 +133,7 @@ void 	EditDetectEOLMode(LPCSTR lpData, DWORD cbData, struct EditFileIOStatus *st
 bool	EditLoadFile(LPWSTR pszFile, struct EditFileIOStatus *status);
 bool	EditSaveFile(HWND hwnd, LPCWSTR pszFile, int saveFlag, struct EditFileIOStatus *status);
 
+void	EditReplaceMainSelection(Sci_Position cchText, LPCSTR pszText);
 void	EditInvertCase(void);
 void	EditMapTextCase(int menu);
 void	EditSentenceCase(void);
@@ -223,6 +224,7 @@ extern "C" {
 bool	EditPrint(HWND hwnd, LPCWSTR pszDocTitle, BOOL bDefault);
 void	EditPrintSetup(HWND hwnd);
 void	EditCopyAsRTF(HWND hwnd);
+void	EditFormatCode(int menu);
 
 #ifdef __cplusplus
 }
