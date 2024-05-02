@@ -3098,14 +3098,6 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 		CurrentWordCharSet['@' >> 5] |= (1 << ('@' & 31));
 		break;
 
-	case NP2LEX_JSON:
-		CommentStyleMask[SCE_JSON_LINECOMMENT >> 5] |= (1U << (SCE_JSON_LINECOMMENT & 31));
-		CommentStyleMask[SCE_JSON_BLOCKCOMMENT >> 5] |= (1U << (SCE_JSON_BLOCKCOMMENT & 31));
-		AllStringStyleMask[SCE_JSON_STRING_DQ >> 5] |= (1U << (SCE_JSON_STRING_DQ & 31));
-		AllStringStyleMask[SCE_JSON_STRING_SQ >> 5] |= (1U << (SCE_JSON_STRING_SQ & 31));
-		AllStringStyleMask[SCE_JSON_ESCAPECHAR >> 5] |= (1U << (SCE_JSON_ESCAPECHAR & 31));
-		break;
-
 	case NP2LEX_JULIA:
 		CurrentWordCharSet['$' >> 5] |= (1 << ('$' & 31));
 		CurrentWordCharSet[':' >> 5] |= (1 << (':' & 31));
