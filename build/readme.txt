@@ -10,6 +10,18 @@ echo | clang -dM -E -xc++ -
 echo | clang-cl -Xclang -dM -E -Xclang -xc++ -
 echo | gcc -dM -E -xc++ -
 
+lexlib, src
+cl /utf-8 /W4 /c /EHsc /std:c++20 /Ox /GS- /GR- /Gv /FAcs /DNDEBUG /DUNICODE /DNOMINMAX /I../include
+lexers
+cl /utf-8 /W4 /c /EHsc /std:c++20 /Ox /GS- /GR- /Gv /FAcs /DNDEBUG /DUNICODE /DNOMINMAX /I../include /I../lexlib
+lexilla
+cl /utf-8 /W4 /c /EHsc /std:c++20 /Ox /GS- /GR- /Gv /FAcs /DNDEBUG /DUNICODE /DNOMINMAX /I../include /I../lexlib /I../../scintilla/include
+win32
+cl /utf-8 /W4 /c /EHsc /std:c++20 /Ox /GS- /GR- /Gv /FAcs /DNDEBUG /DUNICODE /DNOMINMAX /I../include /I../src
+src
+cl /utf-8 /W4 /wd4996 /c /Ox /GS- /GR- /Gv /FAcs /DNDEBUG /DUNICODE /DNOMINMAX /I../scintilla/include
+cl /utf-8 /W4 /wd4996 /c /EHsc /std:c++20 /Ox /GS- /GR- /Gv /FAcs /DNDEBUG /DUNICODE /DNOMINMAX /I../scintilla/include Bridge.cpp
+
 https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html
 https://devblogs.microsoft.com/cppblog/addresssanitizer-asan-for-windows-with-msvc/
 	1. add <LLVM Dir>\lib\clang\<version>\lib\windows to Linker -> General -> Additional Library Directories
