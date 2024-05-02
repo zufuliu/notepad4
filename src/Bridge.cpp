@@ -1045,8 +1045,10 @@ bool AddStyleSeparator(int ch, int chPrev, int style, LPCEDITLEXER pLex) noexcep
 
 std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLength) {
 	std::string output;
+	std::string braceStack(1, '\0'); // sentinel
 	uint32_t blockLevel = 0;
 	int chPrev = 0;
+	int chPrevNonWhite = 0;
 	char eol[4]{};
 	unsigned eolWidth = SciCall_GetEOLMode();
 	if (eolWidth == SC_EOL_CR) {
@@ -1061,12 +1063,17 @@ std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLen
 		eol[1] = '\n';
 	}
 
+	constexpr uint8_t braceObject = '{' + 1;
+	constexpr uint8_t braceTemplate = '{' + 2;
+	constexpr uint8_t bracketArray = '[' + 1;
+	uint8_t braceTop = '\0';
+
 	int stylePrev = static_cast<uint8_t>(styledText[0]);
 	const char * const textBuffer = styledText + textLength;
 	for (size_t offset = 0; offset < textLength; offset++) {
 		const uint8_t style = styledText[offset];
 		if (style == 0) {
-			stylePrev = style;
+			stylePrev = 0;
 			continue;
 		}
 
@@ -1081,25 +1088,62 @@ std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLen
 			if (ch == ':') {
 				spaceOption |= SpaceOption_SpaceAfter;
 			} else if (ch == ',') {
-				if (pLex->iLexer == SCLEX_JSON) {
+				if (pLex->iLexer == SCLEX_JSON || braceTop == braceObject || braceTop == bracketArray) {
 					spaceOption |= SpaceOption_NewLineAfter;
 				} else {
 					spaceOption |= SpaceOption_SpaceAfter;
 				}
 			} else if (ch == ';') {
-				spaceOption |= SpaceOption_NewLineAfter;
-			} else if (ch == '{' || (ch == '[' && pLex->iLexer == SCLEX_JSON)) {
-				spaceOption |= SpaceOption_NewLineAfter | SpaceOption_IndentAfter;
-				if (pLex->iLexer == SCLEX_CSS) {
-					spaceOption |= SpaceOption_SpaceBefore;
+				if (braceTop == '(') {
+					spaceOption |= SpaceOption_SpaceAfter; // for (;;)
+				} else {
+					spaceOption |= SpaceOption_NewLineAfter;
 				}
-			} else if (ch == '}' || (ch == ']' && pLex->iLexer == SCLEX_JSON)) {
-				spaceOption |= SpaceOption_NewLineBefore | SpaceOption_NewLineAfter;
-				if (blockLevel > 0) {
-					--blockLevel;
+			} else if (ch == '{' || ch == '[') {
+				if (ch == '{' && (chPrev == ')' || pLex->iLexer == SCLEX_CSS)) {
+					spaceOption |= SpaceOption_SpaceBefore; // if (...){}, selector {rule}
+				}
+				if (pLex->iLexer == SCLEX_JAVASCRIPT) {
+					if (chPrev == '$' && style == stylePrev) {
+						braceTop = braceTemplate; // ${}
+					} else if (chPrevNonWhite == '=' || chPrevNonWhite == '(' || chPrevNonWhite == ',' || chPrevNonWhite == '['
+						|| (chPrevNonWhite == ':' && (braceTop == braceObject || braceTop == bracketArray))) {
+						braceTop = ch + 1;
+						spaceOption |= SpaceOption_NewLineAfter | SpaceOption_IndentAfter;
+					} else {
+						braceTop = ch;
+						if (ch == '{') {
+							spaceOption |= SpaceOption_NewLineAfter | SpaceOption_IndentAfter;
+						}
+					}
+					braceStack.push_back(static_cast<char>(braceTop));
+				} else if (ch == '{' || pLex->iLexer == SCLEX_JSON) {
+					spaceOption |= SpaceOption_NewLineAfter | SpaceOption_IndentAfter;
+				}
+			} else if (ch == '}' || ch == ']') {
+				if ((ch == '}' && braceTop != braceTemplate) || (ch == ']' && (braceTop == bracketArray || pLex->iLexer == SCLEX_JSON))) {
+					spaceOption |= SpaceOption_NewLineBefore | SpaceOption_NewLineAfter;
+					if (blockLevel > 0) {
+						--blockLevel;
+					}
+				}
+				if (pLex->iLexer == SCLEX_JAVASCRIPT && static_cast<uint8_t>(ch - braceTop) < 3) {
+					braceStack.pop_back();
+					braceTop = braceStack.back();
+				}
+			} else if (ch == '(' || ch == ')') {
+				if (pLex->iLexer == SCLEX_JAVASCRIPT) {
+					if (ch == '(') {
+						braceTop = '(';
+						braceStack.push_back(static_cast<char>(braceTop));
+					} else if (braceTop == '(') {
+						braceStack.pop_back();
+						braceTop = braceStack.back();
+					}
 				}
 			}
-			if (chPrev == '\n' && (ch == ',' || ch == ')' || ch == ';')) {
+			if (chPrev == '\n' && (ch == ',' || ch == ')' || ch == ';' || ch == '=' || ch == ':'
+				|| ((ch == ']' || ch == '}') && chPrevNonWhite == ch - 2))) { // empty [], {}
 				chPrev = '\0';
 				output.erase(output.end() - eolWidth, output.end());
 			}
@@ -1130,6 +1174,9 @@ std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLen
 				offset += 1;
 			}
 		} else {
+			if (ch > ' ' && style > pLex->commentStyleMarker) {
+				chPrevNonWhite = ch;
+			}
 			chPrev = ch;
 			output += static_cast<char>(ch);
 		}
