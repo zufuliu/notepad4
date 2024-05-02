@@ -1136,6 +1136,10 @@ std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLen
 		if (spaceOption & SpaceOption_NewLineAfter) {
 			blockLevel += spaceOption & SpaceOption_IndentAfter;
 			chPrev = '\n';
+			// don't add indentation inside comment and string
+			if (style <= pLex->commentStyleMarker || (style >= pLex->stringStyleFirst && style <= pLex->stringStyleLast)) {
+				chPrev = '\r';
+			}
 			output += std::string_view{eol, eolWidth};
 		} else if (spaceOption & SpaceOption_SpaceAfter) {
 			chPrev = ' ';
