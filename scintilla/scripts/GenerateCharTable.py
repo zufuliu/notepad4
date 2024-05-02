@@ -161,11 +161,10 @@ def GenerateJsonCharClass():
 	# https://www.ecma-international.org/ecma-262/#sec-ecmascript-language-lexical-grammar
 	for i in range(0x21, 0x80):
 		ch = chr(i)
-		state = SCE_JSON_DEFAULT
+		state = SCE_JSON_OPERATOR
 		mask = 0
 		charClass = JsonChar_Ignore
 		if ch in operator:
-			state = SCE_JSON_OPERATOR
 			if ch in '{[':
 				charClass = JsonChar_BraceOpen
 			elif ch in '}]':
@@ -181,7 +180,6 @@ def GenerateJsonCharClass():
 		elif ch == '/':
 			charClass = JsonChar_Slash
 		elif ch == '.':
-			state = SCE_JSON_OPERATOR
 			mask = JsonMask_Number
 			charClass = JsonChar_Dot
 		elif ch.isdigit():
@@ -196,8 +194,6 @@ def GenerateJsonCharClass():
 			state = SCE_JSON_IDENTIFIER
 			mask = JsonMask_Identifier
 			charClass = JsonChar_WordStart
-		else:
-			state = SCE_JSON_OPERATOR
 
 		value = charClass | mask | (state << 5)
 		table[i] = value
