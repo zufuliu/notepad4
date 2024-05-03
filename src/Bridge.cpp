@@ -1049,18 +1049,13 @@ std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLen
 	uint32_t blockLevel = 0;
 	int chPrev = 0;
 	int chPrevNonWhite = 0;
-	char eol[4]{};
+	char eol[2] = {'\r', '\n'};
 	unsigned eolWidth = SciCall_GetEOLMode();
-	if (eolWidth == SC_EOL_CR) {
-		eolWidth = 1;
-		eol[0] = '\r';
-	} else if (eolWidth == SC_EOL_LF) {
-		eolWidth = 1;
-		eol[0] = '\n';
-	} else {
+	if (eolWidth == SC_EOL_CRLF) {
 		eolWidth = 2;
-		eol[0] = '\r';
-		eol[1] = '\n';
+	} else {
+		eol[0] = eol[eolWidth - 1];
+		eolWidth = 1;
 	}
 
 	constexpr uint8_t braceObject = '{' + 1;

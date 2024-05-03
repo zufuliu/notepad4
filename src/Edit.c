@@ -2779,8 +2779,9 @@ void EditMoveDown(void) {
 
 		if (bLastLine) {
 			SciCall_BeginUndoAction();
-			const int iEOLMode = SciCall_GetEOLMode();
-			LPCSTR lineEnd = (iEOLMode == SC_EOL_LF) ? "\n" : "\r\n";
+			const unsigned iEOLMode = SciCall_GetEOLMode();
+			LPCSTR lineEnd = "\r\n";
+			lineEnd += (iEOLMode >> 1);
 			SciCall_AppendText((iEOLMode == SC_EOL_CRLF) ? 2 : 1, lineEnd);
 		}
 
@@ -3945,9 +3946,9 @@ void EditWrapToColumn(int nColumn/*, int nTabWidth*/) {
 
 	LPWSTR pszConvW = (LPWSTR)NP2HeapAlloc(cchTextW * sizeof(WCHAR) * 3 + 2);
 
-	const int iEOLMode = SciCall_GetEOLMode();
-	LPCWSTR wszEOL = (iEOLMode == SC_EOL_LF) ? L"\n" : L"\r\n";
-	const int cchEOL = (iEOLMode == SC_EOL_CRLF) ? 2 : 1;
+	const unsigned iEOLMode = SciCall_GetEOLMode();
+	unsigned wszEOL = '\r' | ('\n' << 16);
+	wszEOL >>= 16*(iEOLMode >> 1);
 
 #define ISDELIMITER(wc) StrChr(L",;.:-+%&\xA6|/*?!\"\'~\xB4#=", wc)
 #define ISWHITE(wc)		IsASpaceOrTab(wc)
@@ -3964,8 +3965,8 @@ void EditWrapToColumn(int nColumn/*, int nTabWidth*/) {
 		//	WCHAR w2 = pszTextW[iTextW + 1];
 		//
 		//	if (iLineLength + iNextWordLen + 1 > nColumn) {
-		//		memcpy(pszConvW + cchConvW, wszEOL, 2*sizeof(WCHAR));
-		//		cchConvW += cchEOL;
+		//		memcpy(pszConvW + cchConvW, &wszEOL, 2*sizeof(WCHAR));
+		//		cchConvW += (iEOLMode == SC_EOL_CRLF) ? 2 : 1;
 		//		iLineLength = 0;
 		//		bModified = true;
 		//	}
@@ -3983,8 +3984,8 @@ void EditWrapToColumn(int nColumn/*, int nTabWidth*/) {
 		//
 		//	if (iNextWordLen > 0) {
 		//		if (iLineLength + iNextWordLen + 1 > nColumn) {
-		//			memcpy(pszConvW + cchConvW, wszEOL, 2*sizeof(WCHAR));
-		//			cchConvW += cchEOL;
+		//			memcpy(pszConvW + cchConvW, &wszEOL, 2*sizeof(WCHAR));
+		//			cchConvW += (iEOLMode == SC_EOL_CRLF) ? 2 : 1;
 		//			iLineLength = 0;
 		//			bModified = true;
 		//		}
@@ -4009,8 +4010,8 @@ void EditWrapToColumn(int nColumn/*, int nTabWidth*/) {
 			//	iNextWordLen++;
 			if (iNextWordLen > 0) {
 				if (iLineLength + iNextWordLen + 1 > nColumn) {
-					memcpy(pszConvW + cchConvW, wszEOL, 2*sizeof(WCHAR));
-					cchConvW += cchEOL;
+					memcpy(pszConvW + cchConvW, &wszEOL, 2*sizeof(WCHAR));
+					cchConvW += (iEOLMode == SC_EOL_CRLF) ? 2 : 1;
 					iLineLength = 0;
 					bModified = true;
 				} else {
@@ -4067,9 +4068,9 @@ void EditJoinLinesEx(void) {
 	const struct Sci_TextRangeFull tr = { { iSelStart, iSelEnd }, pszText };
 	SciCall_GetTextRangeFull(&tr);
 
-	const int iEOLMode = SciCall_GetEOLMode();
-	LPCSTR szEOL = (iEOLMode == SC_EOL_LF) ? "\n" : "\r\n";
-	const int cchEOL = (iEOLMode == SC_EOL_CRLF) ? 2 : 1;
+	const unsigned iEOLMode = SciCall_GetEOLMode();
+	unsigned szEOL = '\r' | ('\n' << 8);
+	szEOL >>= 8*(iEOLMode >> 1);
 
 	Sci_Position cchJoin = 0;
 	bool bModified = false;
@@ -4088,11 +4089,11 @@ void EditJoinLinesEx(void) {
 				}
 				if (pszText[i + 1] != '\0') {
 					if (cchJoin != 0) {
-						memcpy(pszJoin + cchJoin, szEOL, 2);
-						cchJoin += cchEOL;
+						memcpy(pszJoin + cchJoin, &szEOL, 2);
+						cchJoin += (iEOLMode == SC_EOL_CRLF) ? 2 : 1;
 					}
-					memcpy(pszJoin + cchJoin, szEOL, 2);
-					cchJoin += cchEOL;
+					memcpy(pszJoin + cchJoin, &szEOL, 2);
+					cchJoin += (iEOLMode == SC_EOL_CRLF) ? 2 : 1;
 				}
 			}
 		} else {
@@ -4326,28 +4327,21 @@ void EditSortLines(EditSortFlag iSortFlags) {
 		}
 	}
 
-	const int iEOLMode = SciCall_GetEOLMode();
+	const unsigned iEOLMode = SciCall_GetEOLMode();
+	unsigned szEOL = '\r' | ('\n' << 8);
+	szEOL >>= 8*(iEOLMode >> 1);
+
 	char *pszOut = pmszBuf;
 	cchTotal = 0;
 	for (Sci_Line i = 0; i < iLineCount; i++) {
 		LPCWSTR pwszLine = pLines[i].pwszLine;
 		if (pwszLine) {
 			const UINT cbLine = WideCharToMultiByte(cpEdit, 0, pwszLine, -1, pszOut, (int)cbPmszBuf, NULL, NULL);
-			cchTotal += cbLine;
+			cchTotal += cbLine - 1;
 			pszOut += cbLine - 1;
-			switch (iEOLMode) {
-			default: // SC_EOL_CRLF
-				++cchTotal;
-				*pszOut++ = '\r';
-				*pszOut++ = '\n';
-				break;
-			case SC_EOL_LF:
-				*pszOut++ = '\n';
-				break;
-			case SC_EOL_CR:
-				*pszOut++ = '\r';
-				break;
-			}
+			memcpy(pszOut, &szEOL, 2);
+			cchTotal += (iEOLMode == SC_EOL_CRLF) ? 2 : 1;
+			pszOut += (iEOLMode == SC_EOL_CRLF) ? 2 : 1;
 		}
 	}
 	if (cchTotal != 0) {

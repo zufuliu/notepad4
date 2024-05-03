@@ -93,7 +93,7 @@ int MsgBox(UINT uType, UINT uIdMsg, ...) {
 			0,
 			NULL);
 		StrTrim(lpMsgBuf, L" \a\b\f\n\r\t\v");
-		StrCatBuff(szText, L"\n", COUNTOF(szText));
+		StrCatBuff(szText, L"\r\n", COUNTOF(szText));
 		StrCatBuff(szText, lpMsgBuf, COUNTOF(szText));
 		LocalFree(lpMsgBuf);
 		const WCHAR wcht = szText[lstrlen(szText) - 1];
