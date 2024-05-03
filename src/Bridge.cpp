@@ -1024,11 +1024,15 @@ enum {
 	SpaceOption_SpaceAfter = 4,
 	SpaceOption_NewLineBefore = 8,
 	SpaceOption_NewLineAfter = 16,
+	SpaceOption_DanglingStmt = 32,
 };
 
-bool AddStyleSeparator(int ch, int chPrev, int style, LPCEDITLEXER pLex) noexcept {
+bool AddStyleSeparator(LPCEDITLEXER pLex, int ch, int chPrev, int style) noexcept {
+	if (style >= pLex->stringStyleFirst && style <= pLex->stringStyleLast) {
+		return false;
+	}
 	// a++ + ++b, a-- - --b
-	if ((ch == '+' || ch == '-') && ch == chPrev) {
+	if (ch == chPrev && (ch == '+' || ch == '-')) {
 		return true;
 	}
 	// var a; property: 1 #111
@@ -1047,6 +1051,7 @@ std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLen
 	std::string output;
 	std::string braceStack(1, '\0'); // sentinel
 	uint32_t blockLevel = 0;
+	uint32_t indentPrev = 0;
 	int chPrev = 0;
 	int chPrevNonWhite = 0;
 	char eol[2] = {'\r', '\n'};
@@ -1063,7 +1068,7 @@ std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLen
 	constexpr uint8_t bracketArray = '[' + 1;
 	uint8_t braceTop = '\0';
 
-	int stylePrev = static_cast<uint8_t>(styledText[0]);
+	uint8_t stylePrev = styledText[0];
 	const char * const textBuffer = styledText + textLength;
 	for (size_t offset = 0; offset < textLength; offset++) {
 		const uint8_t style = styledText[offset];
@@ -1075,7 +1080,16 @@ std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLen
 		int spaceOption = SpaceOption_None;
 		const uint8_t ch = textBuffer[offset];
 		if (style != stylePrev && style > pLex->commentStyleMarker) {
-			if (AddStyleSeparator(ch, chPrev, style, pLex)) {
+			if (chPrev == ')') {
+				if (stylePrev == pLex->operatorStyle || stylePrev == pLex->operatorStyle2) {
+					if (pLex->iLexer == SCLEX_JAVASCRIPT) {
+						spaceOption = SpaceOption_NewLineBefore | SpaceOption_DanglingStmt;
+						indentPrev++; // if () statement
+					} else {
+						spaceOption = SpaceOption_SpaceAfter;
+					}
+				}
+			} else if (AddStyleSeparator(pLex, ch, chPrev, style)) {
 				spaceOption = SpaceOption_SpaceBefore;
 			}
 		}
@@ -1137,7 +1151,7 @@ std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLen
 					}
 				}
 			}
-			if (chPrev == '\n' && (ch == ',' || ch == ')' || ch == ';' || ch == '=' || ch == ':'
+			if (chPrev == '\n' && (ch == ',' || ch == ')' || ch == ';' || ch == '=' || ch == ':' || ch == '.'
 				|| ((ch == ']' || ch == '}') && chPrevNonWhite == ch - 2))) { // empty [], {}
 				chPrev = '\0';
 				output.erase(output.end() - eolWidth, output.end());
@@ -1151,8 +1165,9 @@ std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLen
 				output += ' ';
 			}
 		}
-		if (chPrev == '\n' && blockLevel > 0) {
-			uint32_t count = blockLevel;
+		if (chPrev == '\n') {
+			uint32_t count = (spaceOption & SpaceOption_DanglingStmt) ? indentPrev : blockLevel;
+			indentPrev = count;
 			char indent = '\t';
 			if (fvCurFile.bTabsAsSpaces) {
 				indent = ' ';
@@ -1221,7 +1236,7 @@ extern "C" void EditFormatCode(int menu) {
 				if (style > pLex->commentStyleMarker) {
 					const uint8_t ch = textBuffer[offset];
 					if (style != stylePrev) {
-						if (AddStyleSeparator(ch, chPrev, style, pLex)) {
+						if (AddStyleSeparator(pLex, ch, chPrev, style)) {
 							styledText[index++] = ' ';
 						}
 					}
