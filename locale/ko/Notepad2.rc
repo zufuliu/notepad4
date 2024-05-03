@@ -627,7 +627,7 @@ BEGIN
 		END
 		POPUP "창 옵션(&P)"
 		BEGIN
-			MENUITEM "항상 맨 위(&T)\tAlt+Shift+T",	IDM_VIEW_ALWAYSONTOP
+			MENUITEM "항상 맨 위에(&T)\tAlt+Shift+T",	IDM_VIEW_ALWAYSONTOP
 			MENUITEM "트레이로 최소화(&Z)",			IDM_VIEW_MINTOTRAY
 			MENUITEM SEPARATOR
 			MENUITEM "창 재사용(&R)",				IDM_VIEW_REUSEWINDOW
@@ -708,8 +708,8 @@ BEGIN
 		MENUITEM SEPARATOR
 		POPUP "선택시 동작(&O)"
 		BEGIN
-			MENUITEM "Code &Compress",						IDM_EDIT_CODE_COMPRESS
-			MENUITEM "Code &Pretty",						IDM_EDIT_CODE_PRETTY
+			MENUITEM "코드 압축(&C)",						IDM_EDIT_CODE_COMPRESS
+			MENUITEM "코드 정돈(&P)",						IDM_EDIT_CODE_PRETTY
 			MENUITEM SEPARATOR
 			MENUITEM "파일, 폴더, 링크, 기타 열기(&O)",		CMD_OPEN_PATH_OR_LINK
 			MENUITEM "폴더 내용 열기(&F)",				CMD_OPEN_CONTAINING_FOLDER
@@ -1768,7 +1768,7 @@ $\t줄의 끝\n\
 *? or +?\t""?"" 및 ""+""의 게으른 수량자\n\
 (\t그룹의 시작\n\
 )\t그룹의 끝\n\
-\\n\t교체시 영역을 나타냄 (n은 1-9)"
+\\n\t교체 시 영역을 나타냄 (n은 1-9)"
 
 	IDS_WILDCARDHELP        "와일드카드 검색\n\n\
 *\t0개 이상의 문자와 일치합니다.\n\
@@ -1809,7 +1809,7 @@ BEGIN
     IDT_FILE_ADDTOFAV       "즐겨찾기에 추가"
     IDT_VIEW_TOGGLEFOLDS    "접기 전환"
     IDT_FILE_LAUNCH         "문서 실행"
-    IDT_VIEW_ALWAYSONTOP    "항상 맨 위"
+    IDT_VIEW_ALWAYSONTOP    "항상 맨 위에"
 END
 
 STRINGTABLE
@@ -1883,7 +1883,7 @@ BEGIN
     IDS_PRINT_COLOR         "일반|색상 반전 (어두운 배경)|흰색 바탕에 검은색|흰색 바탕에 컬러|흰색 바탕에 컬러 (줄 번호 제외)|현재 화면 색상 (WYSIWYG)"
     IDS_PRINT_PAGENUM       "%s 페이지"
     IDS_PRINT_ERROR         """%s"" 인쇄 중 오류가 발생했습니다!"
-    IDS_FAV_SUCCESS         "현재 파일에 대한 바로가기가 즐겨찾기 디렉터리에 생성되었습니다."
+    IDS_FAV_SUCCESS         "현재 파일에 대한 바로 가기가 즐겨찾기 디렉터리에 생성되었습니다."
     IDS_FAV_FAILURE         "현재 파일에 대한 바로 가기를 만들 수 없습니다.\n같은 이름의 다른 파일이 없는지 확인하십시오."
     IDS_READONLY_MODIFY     """%s""의 속성을 수정할 수 없습니다."
 END
@@ -2031,7 +2031,7 @@ BEGIN
 	IDS_EOLMODENAME_CR				"클래식 macOS (CR)"
 
 	IDS_CONFIG_THEME_TITLE_DEFAULT	"구성표 사용자 정의 - 기본 테마"
-	IDS_CONFIG_THEME_TITLE_DARK		"구성표 사용자 정의 - 다크 테마"
+	IDS_CONFIG_THEME_TITLE_DARK		"구성표 사용자 정의 - 어두운 테마"
 	IDS_FAVORITE_SCHEMES_TITLE		"즐겨찾기"
 	IDS_CUSTOMIZE_SCHEMES_HELP		"확장자는 세미콜론(;)으로 구분되어야 합니다.\r\n\
 \r\n\
