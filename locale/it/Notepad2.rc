@@ -708,8 +708,8 @@ BEGIN
 		MENUITEM SEPARATOR
 		POPUP "A&zioni sulla Selezione"
 		BEGIN
-			MENUITEM "Code &Compress",						IDM_EDIT_CODE_COMPRESS
-			MENUITEM "Code &Pretty",						IDM_EDIT_CODE_PRETTY
+			MENUITEM "Comp&rimere il Codice",						IDM_EDIT_CODE_COMPRESS
+			MENUITEM "Abbe&llire il Codice",						IDM_EDIT_CODE_PRETTY
 			MENUITEM SEPARATOR
 			MENUITEM "&Apri File, Cartella, Link, ecc...",		CMD_OPEN_PATH_OR_LINK
 			MENUITEM "Apri &cartella contenente",				CMD_OPEN_CONTAINING_FOLDER
