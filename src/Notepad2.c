@@ -2417,35 +2417,38 @@ void MsgNotifyZoom(void) {
 //
 void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(lParam);
-
 	HMENU hmenu = (HMENU)wParam;
 
-	int i = StrNotEmpty(szCurFile);
+	const bool hasPath = StrNotEmpty(szCurFile);
+	static const uint16_t menuRequiresPath[] = {
+		CMD_RECODEDEFAULT,
+		CMD_RELOADANSI,
+		CMD_RELOADNOFILEVARS,
+		CMD_RELOADOEM,
+		CMD_RELOADUTF8,
+		IDM_FILE_ADDTOFAV,
+		IDM_FILE_CREATELINK,
+		IDM_FILE_LAUNCH,
+		IDM_FILE_OPEN_CONTAINING_FOLDER,
+		IDM_FILE_PROPERTIES,
+		IDM_FILE_READONLY_FILE,
+		IDM_FILE_REVERT,
+		IDM_RECODE_SELECT,
+	};
+	for (unsigned k = 0; k < COUNTOF(menuRequiresPath); k++) {
+		EnableCmd(hmenu, menuRequiresPath[k], hasPath);
+	}
+
 	EnableCmd(hmenu, IDM_FILE_SAVE, IsDocumentModified());
-	EnableCmd(hmenu, IDM_FILE_REVERT, i);
-	EnableCmd(hmenu, CMD_RELOADUTF8, i);
-	EnableCmd(hmenu, CMD_RELOADANSI, i);
-	EnableCmd(hmenu, CMD_RELOADOEM, i);
-	EnableCmd(hmenu, CMD_RELOADNOFILEVARS, i);
-	EnableCmd(hmenu, CMD_RECODEDEFAULT, i);
 #if defined(_WIN64)
 	DisableCmd(hmenu, IDM_FILE_LARGE_FILE_MODE, bLargeFileMode);
 	DisableCmd(hmenu, IDM_FILE_LARGE_FILE_MODE_RELOAD, bLargeFileMode);
 #endif
-	EnableCmd(hmenu, IDM_FILE_LAUNCH, i);
-	EnableCmd(hmenu, IDM_FILE_PROPERTIES, i);
-	EnableCmd(hmenu, IDM_FILE_CREATELINK, i);
-	EnableCmd(hmenu, IDM_FILE_ADDTOFAV, i);
-
 	EnableCmd(hmenu, IDM_FILE_RELAUNCH_ELEVATED, IsVistaAndAbove() && !fIsElevated);
-	EnableCmd(hmenu, IDM_FILE_OPEN_CONTAINING_FOLDER, i);
-	EnableCmd(hmenu, IDM_FILE_READONLY_FILE, i);
 	CheckCmd(hmenu, IDM_FILE_READONLY_FILE, bReadOnlyFile);
 	CheckCmd(hmenu, IDM_FILE_READONLY_MODE, bReadOnlyMode);
 
-	EnableCmd(hmenu, IDM_RECODE_SELECT, i);
-
-	i = IDM_ENCODING_ANSI - 1;
+	int i = IDM_ENCODING_ANSI - 1;
 	if (iCurrentEncoding <= CPI_UTF8SIGN) {
 		const UINT mask = ((IDM_ENCODING_ANSI - IDM_ENCODING_ANSI + 1) << CPI_DEFAULT*4)
 			| ((IDM_ENCODING_UNICODE - IDM_ENCODING_ANSI + 1) << CPI_UNICODEBOM*4)
@@ -2595,22 +2598,9 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	EnableCmd(hmenu, CMD_CTRLBACK, i);
 	EnableCmd(hmenu, CMD_CTRLDEL, i);
 	EnableCmd(hmenu, CMD_TIMESTAMPS, i);
-	//EnableCmd(hmenu, IDM_VIEW_FOLD_DEFAULT, i && bShowCodeFolding);
-	//EnableCmd(hmenu, IDM_VIEW_FOLD_CURRENT_BLOCK, i && bShowCodeFolding);
-	//EnableCmd(hmenu, IDM_VIEW_FOLD_ALL, i && bShowCodeFolding);
-	//EnableCmd(hmenu, IDM_VIEW_FOLD_CURRENT_LEVEL, i && bShowCodeFolding);
-	//EnableCmd(hmenu, IDM_VIEW_FOLD_LEVEL1, i && bShowCodeFolding);
-	//EnableCmd(hmenu, IDM_VIEW_FOLD_LEVEL2, i && bShowCodeFolding);
-	//EnableCmd(hmenu, IDM_VIEW_FOLD_LEVEL3, i && bShowCodeFolding);
-	//EnableCmd(hmenu, IDM_VIEW_FOLD_LEVEL4, i && bShowCodeFolding);
-	//EnableCmd(hmenu, IDM_VIEW_FOLD_LEVEL5, i && bShowCodeFolding);
-	//EnableCmd(hmenu, IDM_VIEW_FOLD_LEVEL6, i && bShowCodeFolding);
-	//EnableCmd(hmenu, IDM_VIEW_FOLD_LEVEL7, i && bShowCodeFolding);
-	//EnableCmd(hmenu, IDM_VIEW_FOLD_LEVEL8, i && bShowCodeFolding);
-	//EnableCmd(hmenu, IDM_VIEW_FOLD_LEVEL9, i && bShowCodeFolding);
-	//EnableCmd(hmenu, IDM_VIEW_FOLD_LEVEL10, i && bShowCodeFolding);
-	CheckCmd(hmenu, IDM_VIEW_SHOW_FOLDING, bShowCodeFolding);
+	EnableCmd(hmenu, IDM_EDIT_COMPLETEWORD, i);
 
+	CheckCmd(hmenu, IDM_VIEW_SHOW_FOLDING, bShowCodeFolding);
 	CheckCmd(hmenu, IDM_VIEW_USE2NDGLOBALSTYLE, bUse2ndGlobalStyle);
 	CheckCmd(hmenu, IDM_VIEW_USEDEFAULT_CODESTYLE, pLexCurrent->bUseDefaultCodeStyle);
 	i = IDM_VIEW_STYLE_THEME_DEFAULT + np2StyleTheme;
@@ -2629,7 +2619,6 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckCmd(hmenu, IDM_VIEW_SHOWINDENTGUIDES, bShowIndentGuides);
 	CheckCmd(hmenu, IDM_VIEW_LINENUMBERS, bShowLineNumbers);
 	CheckCmd(hmenu, IDM_VIEW_MARGIN, bShowBookmarkMargin);
-	EnableCmd(hmenu, IDM_EDIT_COMPLETEWORD, i);
 	CheckCmd(hmenu, IDM_VIEW_AUTOCOMPLETION_IGNORECASE, autoCompletionConfig.bIgnoreCase);
 	CheckCmd(hmenu, IDM_SET_LATEX_INPUT_METHOD, autoCompletionConfig.bLaTeXInputMethod);
 	CheckCmd(hmenu, IDM_SET_MULTIPLE_SELECTION, iSelectOption & SelectOption_EnableMultipleSelection);
@@ -2677,7 +2666,6 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckCmd(hmenu, IDM_VIEW_ALWAYSONTOP, IsTopMost());
 	CheckCmd(hmenu, IDM_VIEW_MINTOTRAY, bMinimizeToTray);
 	CheckCmd(hmenu, IDM_VIEW_TRANSPARENT, bTransparentMode);
-	EnableCmd(hmenu, IDM_VIEW_TRANSPARENT, i);
 	i = IDM_VIEW_SCROLLPASTLASTLINE_ONE + iEndAtLastLine;
 	CheckMenuRadioItem(hmenu, IDM_VIEW_SCROLLPASTLASTLINE_ONE, IDM_VIEW_SCROLLPASTLASTLINE_QUARTER, i, MF_BYCOMMAND);
 
@@ -2772,10 +2760,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(lParam);
 
 	switch (LOWORD(wParam)) {
+	case IDT_FILE_NEW:
 	case IDM_FILE_NEW:
 		FileLoad(FileLoadFlag_New, L"");
 		break;
 
+	case IDT_FILE_OPEN:
 	case IDM_FILE_OPEN:
 		FileLoad(FileLoadFlag_Default, L"");
 		break;
@@ -2791,10 +2781,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 		break;
 
+	case IDT_FILE_SAVE:
 	case IDM_FILE_SAVE:
 		FileSave(FileSaveFlag_SaveAlways);
 		break;
 
+	case IDT_FILE_SAVEAS:
 	case IDM_FILE_SAVEAS:
 		FileSave((FileSaveFlag)(FileSaveFlag_SaveAlways | FileSaveFlag_SaveAs));
 		break;
@@ -2803,6 +2795,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		AutoSave_DoWork(FileSaveFlag_SaveAlways);
 		break;
 
+	case IDT_FILE_SAVECOPY:
 	case IDM_FILE_SAVECOPY:
 		FileSave((FileSaveFlag)(FileSaveFlag_SaveAlways | FileSaveFlag_SaveAs | FileSaveFlag_SaveCopy));
 		break;
@@ -2839,6 +2832,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		UpdateWindowTitle();
 		break;
 
+	case IDT_FILE_BROWSE:
 	case IDM_FILE_BROWSE:
 		TryBrowseFile(hwnd, szCurFile, true);
 		break;
@@ -2886,6 +2880,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		OpenContainingFolder(hwnd, szCurFile, true);
 		break;
 
+	case IDT_FILE_LAUNCH:
 	case IDM_FILE_LAUNCH: {
 		if (StrIsEmpty(szCurFile)) {
 			break;
@@ -2941,6 +2936,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		EditPrintSetup(hwndEdit);
 		break;
 
+	case IDT_FILE_PRINT:
 	case IDM_FILE_PRINT: {
 		SHFILEINFO shfi;
 		WCHAR *pszTitle;
@@ -2992,6 +2988,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	}
 	break;
 
+	case IDT_FILE_OPENFAV:
 	case IDM_FILE_OPENFAV:
 		if (FileSave(FileSaveFlag_Ask)) {
 			WCHAR tchSelItem[MAX_PATH];
@@ -3011,6 +3008,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 		break;
 
+	case IDT_FILE_ADDTOFAV:
 	case IDM_FILE_ADDTOFAV:
 		if (StrNotEmpty(szCurFile)) {
 			SHFILEINFO shfi;
@@ -3048,6 +3046,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 		break;
 
+	case IDT_FILE_EXIT:
 	case IDM_FILE_EXIT:
 		ExitApplication(hwnd);
 		break;
@@ -3142,14 +3141,17 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		SelectDefLineEndingDlg(hwnd, &iDefaultEOLMode);
 		break;
 
+	case IDT_EDIT_UNDO:
 	case IDM_EDIT_UNDO:
 		SciCall_Undo();
 		break;
 
+	case IDT_EDIT_REDO:
 	case IDM_EDIT_REDO:
 		SciCall_Redo();
 		break;
 
+	case IDT_EDIT_CUT:
 	case IDM_EDIT_CUT:
 		if (flagPasteBoard) {
 			bLastCopyFromMe = true;
@@ -3174,6 +3176,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	//	SciCall_Cut(true);
 	//	break;
 
+	case IDT_EDIT_COPY:
 	case IDM_EDIT_COPY:
 		if (flagPasteBoard) {
 			bLastCopyFromMe = true;
@@ -3210,6 +3213,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		UpdateToolbar();
 		break;
 
+	case IDT_EDIT_PASTE:
 	case IDM_EDIT_PASTE:
 	//case IDM_EDIT_PASTE_BINARY:
 		SciCall_Paste(LOWORD(wParam) == IDM_EDIT_PASTE_BINARY);
@@ -3247,6 +3251,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 		break;
 
+	case IDT_EDIT_DELETE:
 	case IDM_EDIT_DELETE:
 		SciCall_Clear();
 		break;
@@ -3905,9 +3910,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		SciCall_MarkerDeleteAll(MarkerNumber_Bookmark);
 		break;
 
+	case IDT_EDIT_FIND:
+	case IDT_EDIT_REPLACE:
 	case IDM_EDIT_FIND:
 	case IDM_EDIT_REPLACE: {
-		const bool bReplace = LOWORD(wParam) == IDM_EDIT_REPLACE;
+		const bool bReplace = (LOWORD(wParam) == IDM_EDIT_REPLACE) || (LOWORD(wParam) == IDT_EDIT_REPLACE);
 		if (!IsWindow(hDlgFindReplace)) {
 			hDlgFindReplace = EditFindReplaceDlg(hwndEdit, &efrData, bReplace);
 		} else {
@@ -3995,11 +4002,13 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		EditGotoBlock(LOWORD(wParam));
 		break;
 
+	case IDT_VIEW_SCHEME:
 	case IDM_VIEW_SCHEME:
 	case IDM_VIEW_SCHEME_FAVORITE:
 		Style_SelectLexerDlg(hwndEdit, LOWORD(wParam) == IDM_VIEW_SCHEME_FAVORITE);
 		break;
 
+	case IDT_VIEW_SCHEMECONFIG:
 	case IDM_VIEW_SCHEME_CONFIG:
 		Style_ConfigDlg(hwndEdit);
 		break;
@@ -4022,6 +4031,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		Style_SetDefaultFont(hwndEdit, LOWORD(wParam) == IDM_VIEW_DEFAULT_CODE_FONT);
 		break;
 
+	case IDT_VIEW_WORDWRAP:
 	case IDM_VIEW_WORDWRAP: {
 		fWordWrapG = fvCurFile.fWordWrap = !fvCurFile.fWordWrap;
 		SciCall_SetWrapMode(fvCurFile.fWordWrap ? iWordWrapMode : SC_WRAP_NONE);
@@ -4262,10 +4272,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		SciCall_SetCaretLineHighlightSubLine(bHighlightCurrentSubLine);
 		break;
 
+	case IDT_VIEW_ZOOMIN:
 	case IDM_VIEW_ZOOMIN:
 		SciCall_ZoomIn();
 		break;
 
+	case IDT_VIEW_ZOOMOUT:
 	case IDM_VIEW_ZOOMOUT:
 		SciCall_ZoomOut();
 		break;
@@ -4340,6 +4352,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		IniSetBoolEx(INI_SECTION_NAME_FLAGS, L"UseXPFileDialog", bUseXPFileDialog, false);
 		break;
 
+	case IDT_VIEW_ALWAYSONTOP:
 	case IDM_VIEW_ALWAYSONTOP:
 		if (IsTopMost()) {
 			bAlwaysOnTop = false;
@@ -4633,22 +4646,13 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case CMD_RELOADANSI:
-		if (StrNotEmpty(szCurFile)) {
-			iSrcEncoding = CPI_DEFAULT;
-			FileLoad(FileLoadFlag_Reload, szCurFile);
-		}
-		break;
-
 	case CMD_RELOADOEM:
-		if (StrNotEmpty(szCurFile)) {
-			iSrcEncoding = CPI_OEM;
-			FileLoad(FileLoadFlag_Reload, szCurFile);
-		}
-		break;
-
 	case CMD_RELOADUTF8:
 		if (StrNotEmpty(szCurFile)) {
-			iSrcEncoding = CPI_UTF8;
+			iSrcEncoding = LOWORD(wParam) - CMD_RELOADANSI;
+			if (iSrcEncoding > CPI_OEM) {
+				iSrcEncoding = CPI_UTF8;
+			}
 			FileLoad(FileLoadFlag_Reload, szCurFile);
 		}
 		break;
@@ -4901,110 +4905,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_SET_SYSTEM_INTEGRATION:
 		SystemIntegrationDlg(hwnd);
-		break;
-
-	case IDT_FILE_NEW:
-		SendWMCommandOrBeep(hwnd, IDM_FILE_NEW);
-		break;
-
-	case IDT_FILE_OPEN:
-		SendWMCommandOrBeep(hwnd, IDM_FILE_OPEN);
-		break;
-
-	case IDT_FILE_BROWSE:
-		SendWMCommandOrBeep(hwnd, IDM_FILE_BROWSE);
-		break;
-
-	case IDT_FILE_SAVE:
-		SendWMCommandOrBeep(hwnd, IDM_FILE_SAVE);
-		break;
-
-	case IDT_EDIT_UNDO:
-		SendWMCommandOrBeep(hwnd, IDM_EDIT_UNDO);
-		break;
-
-	case IDT_EDIT_REDO:
-		SendWMCommandOrBeep(hwnd, IDM_EDIT_REDO);
-		break;
-
-	case IDT_EDIT_CUT:
-		SendWMCommandOrBeep(hwnd, IDM_EDIT_CUT);
-		break;
-
-	case IDT_EDIT_COPY:
-		if (IsCmdEnabled(hwnd, IDM_EDIT_COPY)) {
-			SendWMCommand(hwnd, IDM_EDIT_COPY);
-		} else {
-			SendWMCommand(hwnd, IDM_EDIT_COPYALL);
-		}
-		break;
-
-	case IDT_EDIT_PASTE:
-		SendWMCommandOrBeep(hwnd, IDM_EDIT_PASTE);
-		break;
-
-	case IDT_EDIT_FIND:
-		SendWMCommandOrBeep(hwnd, IDM_EDIT_FIND);
-		break;
-
-	case IDT_EDIT_REPLACE:
-		SendWMCommandOrBeep(hwnd, IDM_EDIT_REPLACE);
-		break;
-
-	case IDT_VIEW_WORDWRAP:
-		SendWMCommandOrBeep(hwnd, IDM_VIEW_WORDWRAP);
-		break;
-
-	case IDT_VIEW_ZOOMIN:
-		SendWMCommandOrBeep(hwnd, IDM_VIEW_ZOOMIN);
-		break;
-
-	case IDT_VIEW_ZOOMOUT:
-		SendWMCommandOrBeep(hwnd, IDM_VIEW_ZOOMOUT);
-		break;
-
-	case IDT_VIEW_SCHEME:
-		SendWMCommandOrBeep(hwnd, IDM_VIEW_SCHEME);
-		break;
-
-	case IDT_VIEW_SCHEMECONFIG:
-		SendWMCommandOrBeep(hwnd, IDM_VIEW_SCHEME_CONFIG);
-		break;
-
-	case IDT_FILE_EXIT:
-		ExitApplication(hwnd);
-		break;
-
-	case IDT_FILE_SAVEAS:
-		SendWMCommandOrBeep(hwnd, IDM_FILE_SAVEAS);
-		break;
-
-	case IDT_FILE_SAVECOPY:
-		SendWMCommandOrBeep(hwnd, IDM_FILE_SAVECOPY);
-		break;
-
-	case IDT_EDIT_DELETE:
-		SendWMCommandOrBeep(hwnd, IDM_EDIT_DELETE);
-		break;
-
-	case IDT_FILE_PRINT:
-		SendWMCommandOrBeep(hwnd, IDM_FILE_PRINT);
-		break;
-
-	case IDT_FILE_OPENFAV:
-		SendWMCommandOrBeep(hwnd, IDM_FILE_OPENFAV);
-		break;
-
-	case IDT_FILE_ADDTOFAV:
-		SendWMCommandOrBeep(hwnd, IDM_FILE_ADDTOFAV);
-		break;
-
-	case IDT_FILE_LAUNCH:
-		SendWMCommandOrBeep(hwnd, IDM_FILE_LAUNCH);
-		break;
-
-	case IDT_VIEW_ALWAYSONTOP:
-		SendWMCommandOrBeep(hwnd, IDM_VIEW_ALWAYSONTOP);
 		break;
 
 	default: {
@@ -7085,7 +6985,9 @@ void UpdateToolbar(void) {
 #define EnableTool(id, b)		SendMessage(hwnd, TB_ENABLEBUTTON, id, MAKELPARAM(((b) ? 1 : 0), 0))
 #define CheckTool(id, b)		SendMessage(hwnd, TB_CHECKBUTTON, id, MAKELPARAM(b, 0))
 	HWND hwnd = hwndToolbar;
-	EnableTool(IDT_FILE_ADDTOFAV, StrNotEmpty(szCurFile));
+	const bool hasPath = StrNotEmpty(szCurFile);
+	EnableTool(IDT_FILE_ADDTOFAV, hasPath);
+	EnableTool(IDT_FILE_LAUNCH, hasPath);
 
 	EnableTool(IDT_FILE_SAVE, IsDocumentModified());
 	EnableTool(IDT_EDIT_UNDO, SciCall_CanUndo());
@@ -7096,13 +6998,8 @@ void UpdateToolbar(void) {
 	EnableTool(IDT_EDIT_CUT, nonEmpty);
 	EnableTool(IDT_EDIT_COPY, nonEmpty);
 	EnableTool(IDT_EDIT_FIND, nonEmpty);
-	//EnableTool(IDT_EDIT_FINDNEXT, nonEmpty);
-	//EnableTool(IDT_EDIT_FINDPREV, nonEmpty && StrNotEmptyA(efrData.szFind));
 	EnableTool(IDT_EDIT_REPLACE, nonEmpty);
 	EnableTool(IDT_EDIT_DELETE, nonEmpty);
-
-	EnableTool(IDT_VIEW_TOGGLEFOLDS, nonEmpty && bShowCodeFolding);
-	EnableTool(IDT_FILE_LAUNCH, nonEmpty);
 
 	CheckTool(IDT_VIEW_WORDWRAP, fvCurFile.fWordWrap);
 	CheckTool(IDT_VIEW_ALWAYSONTOP, IsTopMost());
