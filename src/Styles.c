@@ -1228,12 +1228,12 @@ static inline void Style_SetDefaultStyle(int index) {
 	Style_SetStyles(pLexGlobal->Styles[index].iStyle, pLexGlobal->Styles[index].szValue);
 }
 
-static void Style_SetAllStyle(PEDITLEXER pLex, int offset) {
+static void Style_SetAllStyle(PEDITLEXER pLex, UINT offset) {
 	if (!IsStyleLoaded(pLex)) {
 		Style_LoadOne(pLex);
 	}
 
-	const int high = offset << 8;
+	const UINT high = offset << 8;
 	const UINT iStyleCount = pLex->iStyleCount;
 	// first style is the default style.
 	for (UINT i = 1; i < iStyleCount; i++) {
