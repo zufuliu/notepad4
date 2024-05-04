@@ -50,6 +50,7 @@ extern "C" {
 
 // Global settings...
 #if NP2_FORCE_COMPILE_C_AS_CPP
+extern HWND hwndMain;
 extern PrintHeaderOption iPrintHeader;
 extern PrintFooterOption iPrintFooter;
 extern int iPrintColor;
@@ -58,6 +59,7 @@ extern RECT pageSetupMargin;
 extern HWND hwndStatus;
 extern WCHAR defaultTextFontName[LF_FACESIZE];
 #else
+extern "C" HWND hwndMain;
 extern "C" PrintHeaderOption iPrintHeader;
 extern "C" PrintFooterOption iPrintFooter;
 extern "C" int iPrintColor;
@@ -620,9 +622,7 @@ make_unique_for_overwrite(std::size_t n) {
 #endif
 
 struct DocumentStyledText {
-	std::unique_ptr<char[]> styledText;
 	std::unique_ptr<StyleDefinition[]> styleList;
-	size_t textLength;
 	unsigned styleCount;
 	UINT cpEdit;
 };
@@ -640,13 +640,7 @@ void GetStyleDefinitionFor(int style, StyleDefinition &definition) noexcept {
 	SciCall_StyleGetFont(style, definition.fontFace);
 }
 
-DocumentStyledText GetDocumentStyledText(uint8_t (&styleMap)[STYLE_MAX + 1], Sci_Position startPos, Sci_Position endPos) noexcept {
-	SciCall_EnsureStyledTo(endPos);
-	std::unique_ptr<char[]> styledText = make_unique_for_overwrite<char[]>(2*(endPos - startPos) + 1);
-	const UINT cpEdit = SciCall_GetCodePage();
-	const Sci_TextRangeFull tr { { startPos, endPos }, styledText.get() };
-	const size_t textLength = SciCall_GetStyledTextFull(&tr);
-
+DocumentStyledText GetDocumentStyledText(uint8_t (&styleMap)[STYLE_MAX + 1], const char *styledText, size_t textLength) noexcept {
 	uint32_t styleUsed[8]{}; // bitmap for styles used in the range
 	styleUsed[STYLE_DEFAULT >> 5] |= (1U << (STYLE_DEFAULT & 31));
 	unsigned maxStyle = STYLE_DEFAULT;
@@ -691,7 +685,8 @@ DocumentStyledText GetDocumentStyledText(uint8_t (&styleMap)[STYLE_MAX + 1], Sci
 		}
 	}
 
-	return { std::move(styledText), std::move(styleList), textLength, styleCount, cpEdit };
+	const UINT cpEdit = SciCall_GetCodePage();
+	return { std::move(styleList), styleCount, cpEdit };
 }
 
 // code based SciTE's ExportRTF.cxx
@@ -779,9 +774,9 @@ constexpr int GetRTFFontSize(int size) noexcept {
 	return size / (SC_FONT_SIZE_MULTIPLIER / 2);
 }
 
-std::string SaveToStreamRTF(Sci_Position startPos, Sci_Position endPos) {
+std::string SaveToStreamRTF(const char *styledText, size_t textLength, Sci_Position startPos, Sci_Position endPos) {
 	uint8_t styleMap[STYLE_MAX + 1];
-	const auto [styledText, styleList, textLength, styleCount, cpEdit] = GetDocumentStyledText(styleMap, startPos, endPos);
+	const auto [styleList, styleCount, cpEdit] = GetDocumentStyledText(styleMap, styledText, textLength);
 	const std::unique_ptr<std::string[]> styles = make_unique_for_overwrite<std::string[]>(styleCount);
 	const std::unique_ptr<LPCSTR[]> fontList = make_unique_for_overwrite<LPCSTR[]>(styleCount);
 	const std::unique_ptr<COLORREF[]> colorList = make_unique_for_overwrite<COLORREF[]>(2*styleCount);
@@ -888,7 +883,7 @@ std::string SaveToStreamRTF(Sci_Position startPos, Sci_Position endPos) {
 		os += std::string_view{fmtbuf, fmtlen};
 	}
 
-	const char * const textBuffer = styledText.get() + textLength;
+	const char * const textBuffer = styledText + textLength;
 	for (size_t offset = 0; offset < textLength; offset++) {
 		uint8_t style = styledText[offset];
 		style = styleMap[style];
@@ -988,33 +983,6 @@ std::string SaveToStreamRTF(Sci_Position startPos, Sci_Position endPos) {
 
 }
 
-// code from SciTEWin::CopyAsRTF()
-extern "C" void EditCopyAsRTF(HWND hwnd) {
-	const Sci_Position startPos = SciCall_GetSelectionStart();
-	const Sci_Position endPos = SciCall_GetSelectionEnd();
-	if (startPos == endPos) {
-		return;
-	}
-	try {
-		const std::string rtf = SaveToStreamRTF(startPos, endPos);
-		//printf("%s:\n%s\n", __func__, rtf.c_str());
-		const size_t len = rtf.length() + 1; // +1 for NUL
-		HGLOBAL handle = ::GlobalAlloc(GMEM_MOVEABLE | GMEM_ZEROINIT, len);
-		if (handle) {
-			::OpenClipboard(hwnd);
-			::EmptyClipboard();
-			char *ptr = static_cast<char *>(::GlobalLock(handle));
-			if (ptr) {
-				memcpy(ptr, rtf.c_str(), len);
-				::GlobalUnlock(handle);
-			}
-			::SetClipboardData(::RegisterClipboardFormat(CF_RTF), handle);
-			::CloseClipboard();
-		}
-	} catch (...) {
-	}
-}
-
 namespace {
 
 enum {
@@ -1086,7 +1054,7 @@ std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLen
 				if (stylePrev == pLex->operatorStyle || stylePrev == pLex->operatorStyle2) {
 					if (pLex->iLexer != SCLEX_CSS) {
 						spaceOption = SpaceOption_NewLineBefore | SpaceOption_DanglingStmt;
-						indentPrev++; // if () statement
+						indentPrev++; // if (), for (), while () statement
 					} else if (ch != ':') { // :not([class]):hover
 						spaceOption = SpaceOption_SpaceBefore; // property: function() value
 					}
@@ -1217,7 +1185,7 @@ std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLen
 
 extern "C" void EditFormatCode(int menu) {
 	LPCEDITLEXER pLex = pLexCurrent;
-	if (pLex->iLexer != SCLEX_JSON && pLex->iLexer != SCLEX_CSS && pLex->iLexer != SCLEX_JAVASCRIPT) {
+	if (menu != IDM_EDIT_COPYRTF && pLex->iLexer != SCLEX_JSON && pLex->iLexer != SCLEX_CSS && pLex->iLexer != SCLEX_JAVASCRIPT) {
 		return;
 	}
 	const Sci_Position startPos = SciCall_GetSelectionStart();
@@ -1226,13 +1194,30 @@ extern "C" void EditFormatCode(int menu) {
 		return;
 	}
 
-	SciCall_EnsureStyledTo(endPos);
 	try {
+		SciCall_EnsureStyledTo(endPos);
 		const std::unique_ptr<char[]> styledText = make_unique_for_overwrite<char[]>(2*(endPos - startPos) + 1);
 		const Sci_TextRangeFull tr { { startPos, endPos }, styledText.get() };
 		const size_t textLength = SciCall_GetStyledTextFull(&tr);
 
-		if (menu == IDM_EDIT_CODE_COMPRESS) {
+		if (menu == IDM_EDIT_COPYRTF) {
+			// code from SciTEWin::CopyAsRTF()
+			const std::string output = SaveToStreamRTF(styledText.get(), textLength, startPos, endPos);
+			//printf("%s:\n%s\n", __func__, rtf.c_str());
+			const size_t len = output.length() + 1; // +1 for NUL
+			HGLOBAL handle = ::GlobalAlloc(GMEM_MOVEABLE | GMEM_ZEROINIT, len);
+			if (handle) {
+				::OpenClipboard(hwndMain);
+				::EmptyClipboard();
+				char *ptr = static_cast<char *>(::GlobalLock(handle));
+				if (ptr) {
+					memcpy(ptr, output.c_str(), len);
+					::GlobalUnlock(handle);
+				}
+				::SetClipboardData(::RegisterClipboardFormat(CF_RTF), handle);
+				::CloseClipboard();
+			}
+		} else if (menu == IDM_EDIT_CODE_COMPRESS) {
 			size_t index = 0;
 			int chPrev = 0;
 			int stylePrev = static_cast<uint8_t>(styledText[0]);

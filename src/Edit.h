@@ -223,7 +223,6 @@ extern "C" {
 
 bool	EditPrint(HWND hwnd, LPCWSTR pszDocTitle, BOOL bDefault);
 void	EditPrintSetup(HWND hwnd);
-void	EditCopyAsRTF(HWND hwnd);
 void	EditFormatCode(int menu);
 
 #ifdef __cplusplus
