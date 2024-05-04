@@ -362,6 +362,7 @@ enum {
 };
 
 // in EditAutoC.c
+extern const uint32_t DefaultWordCharSet[8];
 void	EditCompleteUpdateConfig(void);
 bool	IsDocWordChar(uint32_t ch);
 bool	IsAutoCompletionWordCharacter(uint32_t ch);

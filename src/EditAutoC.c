@@ -512,7 +512,7 @@ extern EditAutoCompletionConfig autoCompletionConfig;
 
 // CharClassify::SetDefaultCharClasses()
 // tools/GenerateTable.py
-static const uint32_t DefaultWordCharSet[8] = {
+const uint32_t DefaultWordCharSet[8] = {
 0x00000000U, 0x03ff0000U, 0x87fffffeU, 0x07fffffeU,
 0xffffffffU, 0xffffffffU, 0xffffffffU, 0xffffffffU
 };

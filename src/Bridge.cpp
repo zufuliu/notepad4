@@ -1028,16 +1028,18 @@ enum {
 };
 
 bool AddStyleSeparator(LPCEDITLEXER pLex, int ch, int chPrev, int style) noexcept {
-	if (style >= pLex->stringStyleFirst && style <= pLex->stringStyleLast) {
+	if ((style >= pLex->stringStyleFirst && style <= pLex->stringStyleLast)
+		|| (pLex->iLexer == SCLEX_JSON && (style == SCE_JSON_PROPERTYNAME))
+		|| (pLex->iLexer == SCLEX_JAVASCRIPT && (style == SCE_JS_KEY || style == SCE_JS_OPERATOR_PF))) {
 		return false;
 	}
-	// a++ + ++b, a-- - --b
+	// a++ + ++b, a + +1, a-- - --b, a - -1
 	if (ch == chPrev && (ch == '+' || ch == '-')) {
 		return true;
 	}
-	// var a; property: 1 #111
-	if (IsAlphaNumeric(chPrev) || chPrev == '_') {
-		if (IsAlphaNumeric(ch) || ch == '_' || ch == '$' || ch == '#') {
+	// var name; return .5; CSS property: 1 #1 .5 --name;
+	if (BitTestEx(DefaultWordCharSet, chPrev)) {
+		if (BitTestEx(DefaultWordCharSet, ch) || ch == '$' || ch == '#') {
 			return true;
 		}
 		if ((ch == '.' || ch == '-') && style != pLex->operatorStyle && style != pLex->operatorStyle2) {
@@ -1082,11 +1084,11 @@ std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLen
 		if (style != stylePrev && style > pLex->commentStyleMarker) {
 			if (chPrev == ')') {
 				if (stylePrev == pLex->operatorStyle || stylePrev == pLex->operatorStyle2) {
-					if (pLex->iLexer == SCLEX_JAVASCRIPT) {
+					if (pLex->iLexer != SCLEX_CSS) {
 						spaceOption = SpaceOption_NewLineBefore | SpaceOption_DanglingStmt;
 						indentPrev++; // if () statement
-					} else {
-						spaceOption = SpaceOption_SpaceAfter;
+					} else if (ch != ':') { // :not([class]):hover
+						spaceOption = SpaceOption_SpaceBefore; // property: function() value
 					}
 				}
 			} else if (AddStyleSeparator(pLex, ch, chPrev, style)) {
@@ -1095,7 +1097,7 @@ std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLen
 		}
 		if (style == pLex->operatorStyle || style == pLex->operatorStyle2) {
 			if (ch == ':') {
-				spaceOption |= SpaceOption_SpaceAfter;
+				spaceOption |= SpaceOption_SpaceAfter; // property: value
 			} else if (ch == ',') {
 				if (pLex->iLexer == SCLEX_JSON || braceTop == braceObject || braceTop == bracketArray) {
 					spaceOption |= SpaceOption_NewLineAfter;
@@ -1151,7 +1153,12 @@ std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLen
 					}
 				}
 			}
-			if (chPrev == '\n' && (ch == ',' || ch == ')' || ch == ';' || ch == '=' || ch == ':' || ch == '.'
+			if (chPrev == '\n' && (ch == ','
+				|| ch == ')' // JavaScript: function({})
+				|| ch == ';' // JavaScript: {};
+				|| ch == '=' // JavaScript: let {} = value, const {} = value
+				|| ch == ':' // JavaScript: ternary operator
+				|| (ch == '.' && pLex->iLexer != SCLEX_CSS) // JavaScript: {}.property, [].property; CSS: .class {rule}
 				|| ((ch == ']' || ch == '}') && chPrevNonWhite == ch - 2))) { // empty [], {}
 				chPrev = '\0';
 				output.erase(output.end() - eolWidth, output.end());
@@ -1173,9 +1180,8 @@ std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLen
 				indent = ' ';
 				count *= fvCurFile.iTabWidth;
 			}
-			while (count != 0) {
-				--count;
-				output += indent;
+			if (count != 0) {
+				output.resize(output.length() + count, indent);
 			}
 		}
 		if (ch == '\r' || ch == '\n') {
