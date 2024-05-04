@@ -1149,7 +1149,7 @@ std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLen
 				count *= fvCurFile.iTabWidth;
 			}
 			if (count != 0) {
-				output.resize(output.length() + count, indent);
+				output.append(count, indent);
 			}
 		}
 		if (ch == '\r' || ch == '\n') {

@@ -1606,21 +1606,6 @@ static constexpr Sci::Position NextTab(Sci::Position pos, Sci::Position tabSize)
 	return ((pos / tabSize) + 1) * tabSize;
 }
 
-static std::string CreateIndentation(Sci::Position indent, int tabSize, bool insertSpaces) {
-	std::string indentation;
-	if (!insertSpaces) {
-		while (indent >= tabSize) {
-			indentation += '\t';
-			indent -= tabSize;
-		}
-	}
-	while (indent > 0) {
-		indentation += ' ';
-		indent--;
-	}
-	return indentation;
-}
-
 int SCI_METHOD Document::GetLineIndentation(Sci_Line line) const noexcept {
 	int indent = 0;
 	if (IsValidIndex(line, LinesTotal())) {
@@ -1643,7 +1628,17 @@ Sci::Position Document::SetLineIndentation(Sci::Line line, Sci::Position indent)
 	const int indentOfLine = GetLineIndentation(line);
 	indent = std::max<Sci::Position>(indent, 0);
 	if (indent != indentOfLine) {
-		const std::string linebuf = CreateIndentation(indent, tabInChars, !useTabs);
+		std::string linebuf;
+		if (useTabs) {
+			const Sci::Position count = indent / tabInChars;
+			indent = indent % tabInChars;
+			if (count != 0) {
+				linebuf.append(count, '\t');
+			}
+		}
+		if (indent != 0) {
+			linebuf.append(indent, ' ');
+		}
 		const Sci::Position thisLineStart = LineStart(line);
 		const Sci::Position indentPos = GetLineIndentPosition(line);
 		const UndoGroup ug(this);
