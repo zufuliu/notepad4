@@ -36,6 +36,7 @@ Checks: [
     -readability-identifier-length,
     -readability-implicit-bool-conversion,
     -readability-magic-numbers,
+    -readability-math-missing-parentheses,
     -readability-suspicious-call-argument,
     -readability-uppercase-literal-suffix,
     -misc-confusable-identifiers,
