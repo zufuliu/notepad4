@@ -605,7 +605,7 @@ extern "C" void EditPrintSetup(HWND hwnd) {
 	NP2HeapFree(pDlgTemplate);
 }
 
-namespace {
+namespace { // copy as RTF
 
 #if (__cplusplus > 201703L || (defined(_MSVC_LANG) && _MSVC_LANG > 201703L)) && ( \
 	(defined(_MSC_VER) && _MSC_VER >= 1920 && (defined(_WIN64) || !defined(__clang__))) || \
@@ -983,7 +983,7 @@ std::string SaveToStreamRTF(const char *styledText, size_t textLength, Sci_Posit
 
 }
 
-namespace {
+namespace { // code pretty
 
 enum {
 	SpaceOption_None = 0,
@@ -1080,7 +1080,7 @@ std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLen
 				}
 			} else if (ch == '{' || ch == '[') {
 				if (ch == '{' && (chPrev == ')' || pLex->iLexer == SCLEX_CSS)) {
-					spaceOption |= SpaceOption_SpaceBefore; // if (...){}, selector {rule}
+					spaceOption |= SpaceOption_SpaceBefore; // if (...){}, CSS: selector {rule}
 				}
 				if (pLex->iLexer == SCLEX_JAVASCRIPT) {
 					if (chPrev == '$' && style == stylePrev) {
@@ -1203,7 +1203,7 @@ extern "C" void EditFormatCode(int menu) {
 		if (menu == IDM_EDIT_COPYRTF) {
 			// code from SciTEWin::CopyAsRTF()
 			const std::string output = SaveToStreamRTF(styledText.get(), textLength, startPos, endPos);
-			//printf("%s:\n%s\n", __func__, rtf.c_str());
+			//printf("%s:\n%s\n", __func__, output.c_str());
 			const size_t len = output.length() + 1; // +1 for NUL
 			HGLOBAL handle = ::GlobalAlloc(GMEM_MOVEABLE | GMEM_ZEROINIT, len);
 			if (handle) {
