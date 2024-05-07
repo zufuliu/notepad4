@@ -883,7 +883,7 @@ std::string SaveToStreamRTF(const char *styledText, size_t textLength, Sci_Posit
 		os += std::string_view{fmtbuf, fmtlen};
 	}
 
-	const char * const textBuffer = styledText + textLength;
+	const char * const textBuffer = styledText + textLength + 1;
 	for (size_t offset = 0; offset < textLength; offset++) {
 		uint8_t style = styledText[offset];
 		style = styleMap[style];
@@ -1039,7 +1039,7 @@ std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLen
 	uint8_t braceTop = '\0';
 
 	uint8_t stylePrev = styledText[0];
-	const char * const textBuffer = styledText + textLength;
+	const char * const textBuffer = styledText + textLength + 1;
 	for (size_t offset = 0; offset < textLength; offset++) {
 		const uint8_t style = styledText[offset];
 		if (style == 0) {
@@ -1221,7 +1221,7 @@ extern "C" void EditFormatCode(int menu) {
 			size_t index = 0;
 			int chPrev = 0;
 			int stylePrev = static_cast<uint8_t>(styledText[0]);
-			const char * const textBuffer = styledText.get() + textLength;
+			const char * const textBuffer = styledText.get() + textLength + 1;
 			for (size_t offset = 0; offset < textLength; offset++) {
 				const uint8_t style = styledText[offset];
 				if (style > pLex->commentStyleMarker) {

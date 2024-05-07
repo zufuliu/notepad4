@@ -5859,7 +5859,7 @@ Sci::Line Editor::WrapCount(Sci::Line line) {
 }
 
 void Editor::AddStyledText(const char *buffer, Sci::Position appendLength) {
-	// see GetTextRange(), buffer := [textLength style bytes] [textLength character bytes] NUL
+	// see GetTextRange(), buffer := [textLength style bytes] NUL [textLength character bytes] NUL
 	const Sci::Position textLength = appendLength / 2;
 	const Sci::Position lengthInserted = pdoc->InsertString(CurrentPosition(), buffer + textLength + 1, textLength);
 	pdoc->StartStyling(CurrentPosition());
@@ -5873,7 +5873,8 @@ Sci::Position Editor::GetTextRange(char *buffer, Sci::Position cpMin, Sci::Posit
 	const Sci::Position len = cpEnd - cpMin; 	// No -1 as cpMin and cpMax are referring to inter character positions
 	if (style) {
 		pdoc->GetStyleRange(reinterpret_cast<unsigned char *>(buffer), cpMin, len);
-		buffer += len ;
+		buffer[len] = '\0';
+		buffer += len + 1;
 	}
 	pdoc->GetCharRange(buffer, cpMin, len);
 	// Spec says copied text is terminated with a NUL
