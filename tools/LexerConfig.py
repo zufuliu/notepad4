@@ -341,7 +341,7 @@ LexerConfigMap = {
 		'block_comment_string': ('/*', '*/'),
 		'comment_style_marker': 'SCE_CSS_CDO_CDC',
 		'escape_char_style': 'SCE_CSS_ESCAPECHAR',
-		'operator_style': ['SCE_CSS_OPERATOR'],
+		'operator_style': ['SCE_CSS_OPERATOR', 'SCE_CSS_OPERATOR2'],
 		'extra_word_char': '-$@',
 		#'ignore_word_style': ['SCE_CSS_PROPERTY', 'SCE_CSS_PSEUDOCLASS', 'SCE_CSS_PSEUDOELEMENT'],
 		'string_style_range': ['SCE_CSS_ESCAPECHAR', 'SCE_CSS_URL'],

@@ -302,7 +302,7 @@ static EDITSTYLE Styles_CSS[] = {
 	{ SCE_CSS_VALUE, NP2StyleX_Value, L"fore:#3A6EA5" },
 	{ SCE_CSS_VARIABLE, NP2StyleX_Variable, L"italic; fore:#003CE6" },
 	{ MULTI_STYLE(SCE_CSS_NUMBER, SCE_CSS_DIMENSION, SCE_CSS_UNICODE_RANGE, 0), NP2StyleX_Number, L"fore:#007F7F" },
-	{ SCE_CSS_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
+	{ MULTI_STYLE(SCE_CSS_OPERATOR, SCE_CSS_OPERATOR2, 0, 0), NP2StyleX_Operator, L"fore:#B000B0" },
 };
 
 EDITLEXER lexCSS = {
@@ -316,7 +316,7 @@ EDITLEXER lexCSS = {
 		'\\', SCE_CSS_ESCAPECHAR, 0,
 		0,
 		0, 0,
-		SCE_CSS_OPERATOR, 0
+		SCE_CSS_OPERATOR, SCE_CSS_OPERATOR2
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // properties
 		| KeywordAttr32(1, KeywordAttr_PreSorted) // at rules
 		| KeywordAttr32(2, KeywordAttr_PreSorted) // pseudo classes
