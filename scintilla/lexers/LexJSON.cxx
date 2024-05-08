@@ -59,6 +59,9 @@ bool IsJsonProperty(LexAccessor &styler, Sci_PositionU startPos, uint8_t chNext)
 void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const bool fold = styler.GetPropertyBool("fold");
 
+	// JSON5 line continuation
+	bool lineContinuation = false;
+	bool atLineStart = true;
 	int state = initStyle;
 	uint8_t chNext = styler[startPos];
 	styler.StartAt(startPos);
@@ -68,6 +71,12 @@ void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0) {
 		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
+		if (state == SCE_JSON_STRING_DQ || state == SCE_JSON_STRING_SQ) {
+			const Sci_Position pos = styler.LineEnd(lineCurrent - 1) - 1;
+			if (pos > 0 && styler[pos] == '\\') {
+				lineContinuation = true;
+			}
+		}
 	}
 	int levelNext = levelCurrent;
 
@@ -75,9 +84,6 @@ void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 	char buf[MaxLexWordLength + 1];
 	int wordLen = 0;
 
-	// JSON5 line continuation
-	bool lineContinuation = false;
-	bool atLineStart = true;
 	assert(startPos == static_cast<Sci_PositionU>(styler.LineStart(lineCurrent)));
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
 	const Sci_PositionU endPos = startPos + lengthDoc;
@@ -148,12 +154,11 @@ void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					state = SCE_JSON_DEFAULT;
 				}
 			} else if (ch == '\\') {
-				styler.ColorTo(currentPos, state);
 				if (IsEOLChar(chNext)) {
 					lineContinuation = true;
-					styler.ColorTo(startPos, SCE_JSON_ESCAPECHAR);
 				} else {
 					// highlight any character as escape sequence
+					styler.ColorTo(currentPos, state);
 					++startPos;
 					if (chNext == 'u' || chNext == 'x') {
 						int count = (chNext == 'x') ? 2 : 4;

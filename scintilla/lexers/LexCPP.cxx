@@ -147,16 +147,9 @@ void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 
 	if (AnyOf(initStyle, SCE_C_COMMENTLINE, SCE_C_COMMENTLINEDOC, SCE_C_PREPROCESSOR, SCE_C_STRING, SCE_C_CHARACTER)) {
 		// Set continuationLine if last character of previous line is '\'
-		if (lineCurrent > 0) {
-			const char chBack = styler.SafeGetCharAt(startPos - 1);
-			const char chBack2 = styler.SafeGetCharAt(startPos - 2);
-			char lineEndChar = '!';
-			if (chBack2 == '\r' && chBack == '\n') {
-				lineEndChar = styler.SafeGetCharAt(startPos - 3);
-			} else if (chBack == '\n' || chBack == '\r') {
-				lineEndChar = chBack2;
-			}
-			continuationLine = lineEndChar == '\\';
+		const Sci_Position pos = styler.LineEnd(lineCurrent - 1) - 1;
+		if (pos > 0 && styler[pos] == '\\') {
+			continuationLine = true;
 		}
 	}
 
