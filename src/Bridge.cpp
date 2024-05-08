@@ -787,7 +787,7 @@ std::string SaveToStreamRTF(const char *styledText, size_t textLength, Sci_Posit
 	}
 
 	char fmtbuf[RTF_MAX_STYLEDEF];
-	fmtbuf[0] = '\0';
+	memset(fmtbuf, 0, 4);
 	unsigned fmtlen = sprintf(fmtbuf, RTF_HEADEROPEN RTF_FONTDEFOPEN, legacyACP);
 	std::string os(fmtbuf, fmtlen);
 
@@ -993,74 +993,96 @@ enum {
 	SpaceOption_NewLineBefore = 8,
 	SpaceOption_NewLineAfter = 16,
 	SpaceOption_DanglingStmt = 32,
+	SpaceOption_KeepNewLine = 64,
+	SpaceOption_PushBrace = 128,
+	SpaceOption_PopBrace = 256,
 };
 
-bool AddStyleSeparator(LPCEDITLEXER pLex, int ch, int chPrev, int style) noexcept {
+int AddStyleSeparator(LPCEDITLEXER pLex, int ch, int chPrev, int style) noexcept {
 	if ((style >= pLex->stringStyleFirst && style <= pLex->stringStyleLast)
 		|| (pLex->iLexer == SCLEX_JSON && (style == SCE_JSON_PROPERTYNAME))
 		|| (pLex->iLexer == SCLEX_JAVASCRIPT && (style == SCE_JS_KEY || style == SCE_JS_OPERATOR_PF))) {
-		return false;
+		return SpaceOption_None;
 	}
 	// a++ + ++b, a + +1, a-- - --b, a - -1
-	if (ch == chPrev && (ch == '+' || ch == '-')) {
-		return true;
+	if (ch == '+' || ch == '-') {
+		if (style == SCE_CSS_OPERATOR2 && pLex->iLexer == SCLEX_CSS) {
+			// '+' and '-' inside calc() function requires space on both side
+			return SpaceOption_SpaceBefore | SpaceOption_SpaceAfter;
+		}
+		if (ch == chPrev) {
+			return SpaceOption_SpaceBefore;
+		}
 	}
 	// var name; return .5; CSS property: 1 #1 .5 --name;
-	if (BitTestEx(DefaultWordCharSet, chPrev)) {
+	else if (BitTestEx(DefaultWordCharSet, chPrev)) {
 		if (BitTestEx(DefaultWordCharSet, ch) || ch == '$' || ch == '#') {
-			return true;
+			return SpaceOption_SpaceBefore;
 		}
 		if ((ch == '.' || ch == '-') && style != pLex->operatorStyle && style != pLex->operatorStyle2) {
-			return true;
+			return SpaceOption_SpaceBefore;
 		}
 	}
-	return false;
+	return SpaceOption_None;
 }
 
 std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLength) {
+	char fmtbuf[128];
 	std::string output;
 	std::string braceStack(1, '\0'); // sentinel
+	memset(fmtbuf, 0, 4);
+
+	unsigned fmtlen = 0;
 	uint32_t blockLevel = 0;
 	uint32_t indentPrev = 0;
 	int chPrev = 0;
 	int chPrevNonWhite = 0;
-	char eol[2] = {'\r', '\n'};
-	unsigned eolWidth = SciCall_GetEOLMode();
-	if (eolWidth == SC_EOL_CRLF) {
-		eolWidth = 2;
-	} else {
-		eol[0] = eol[eolWidth - 1];
-		eolWidth = 1;
-	}
 
+	unsigned eol = '\r' | ('\n' << 8);
+	unsigned eolWidth = SciCall_GetEOLMode();
+	eol >>= 8*(eolWidth >> 1);
+	eolWidth = (eolWidth == SC_EOL_CRLF) ? 2 : 1;
+
+	constexpr unsigned maxFmtLen = sizeof(fmtbuf) - 4 - 4; // \r\n + 4 + \r\n
 	constexpr uint8_t braceObject = '{' + 1;
 	constexpr uint8_t braceTemplate = '{' + 2;
 	constexpr uint8_t bracketArray = '[' + 1;
-	uint8_t braceTop = '\0';
 
+	uint8_t braceTop = '\0';
 	uint8_t stylePrev = styledText[0];
+	int styleBefore = stylePrev;
 	const char * const textBuffer = styledText + textLength + 1;
 	for (size_t offset = 0; offset < textLength; offset++) {
 		const uint8_t style = styledText[offset];
 		if (style == 0) {
-			stylePrev = 0;
+			styleBefore = 0;
 			continue;
+		}
+		if (fmtlen >= maxFmtLen) {
+			// keep eol in the buffer
+			output += std::string_view{fmtbuf, fmtlen - 2};
+			memcpy(fmtbuf, &fmtbuf[fmtlen - 2], 2);
+			fmtlen = 2;
 		}
 
 		int spaceOption = SpaceOption_None;
 		const uint8_t ch = textBuffer[offset];
-		if (style != stylePrev && style > pLex->commentStyleMarker) {
+		if (style <= pLex->commentStyleMarker) {
+			// keep new line after block comment
+			if (styledText[offset + 1] == 0 && (textBuffer[offset + 1] == '\n' || textBuffer[offset + 1] == '\r')) {
+				spaceOption = SpaceOption_KeepNewLine;
+			}
+		} else if (style != styleBefore) {
+			spaceOption = AddStyleSeparator(pLex, ch, chPrev, style);
 			if (chPrev == ')') {
 				if (stylePrev == pLex->operatorStyle || stylePrev == pLex->operatorStyle2) {
 					if (pLex->iLexer != SCLEX_CSS) {
-						spaceOption = SpaceOption_NewLineBefore | SpaceOption_DanglingStmt;
+						spaceOption |= SpaceOption_NewLineBefore | SpaceOption_DanglingStmt;
 						indentPrev++; // if (), for (), while () statement
 					} else if (ch != ':') { // :not([class]):hover
-						spaceOption = SpaceOption_SpaceBefore; // property: function() value
+						spaceOption |= SpaceOption_SpaceBefore; // property: function() value
 					}
 				}
-			} else if (AddStyleSeparator(pLex, ch, chPrev, style)) {
-				spaceOption = SpaceOption_SpaceBefore;
 			}
 		}
 		if (style == pLex->operatorStyle || style == pLex->operatorStyle2) {
@@ -1083,7 +1105,8 @@ std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLen
 					spaceOption |= SpaceOption_SpaceBefore; // if (...){}, CSS: selector {rule}
 				}
 				if (pLex->iLexer == SCLEX_JAVASCRIPT) {
-					if (chPrev == '$' && style == stylePrev) {
+					spaceOption |= SpaceOption_PushBrace;
+					if (chPrev == '$' && style == styleBefore) {
 						braceTop = braceTemplate; // ${}
 					} else if (chPrevNonWhite == '=' || chPrevNonWhite == '(' || chPrevNonWhite == ',' || chPrevNonWhite == '['
 						|| (chPrevNonWhite == ':' && (braceTop == braceObject || braceTop == bracketArray))) {
@@ -1095,7 +1118,6 @@ std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLen
 							spaceOption |= SpaceOption_NewLineAfter | SpaceOption_IndentAfter;
 						}
 					}
-					braceStack.push_back(static_cast<char>(braceTop));
 				} else if (ch == '{' || pLex->iLexer == SCLEX_JSON) {
 					spaceOption |= SpaceOption_NewLineAfter | SpaceOption_IndentAfter;
 				}
@@ -1107,17 +1129,15 @@ std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLen
 					}
 				}
 				if (pLex->iLexer == SCLEX_JAVASCRIPT && static_cast<uint8_t>(ch - braceTop) < 3) {
-					braceStack.pop_back();
-					braceTop = braceStack.back();
+					spaceOption |= SpaceOption_PopBrace;
 				}
 			} else if (ch == '(' || ch == ')') {
 				if (pLex->iLexer == SCLEX_JAVASCRIPT) {
 					if (ch == '(') {
 						braceTop = '(';
-						braceStack.push_back(static_cast<char>(braceTop));
+						spaceOption |= SpaceOption_PushBrace;
 					} else if (braceTop == '(') {
-						braceStack.pop_back();
-						braceTop = braceStack.back();
+						spaceOption |= SpaceOption_PopBrace;
 					}
 				}
 			}
@@ -1129,15 +1149,22 @@ std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLen
 				|| (ch == '.' && pLex->iLexer != SCLEX_CSS) // JavaScript: {}.property, [].property; CSS: .class {rule}
 				|| ((ch == ']' || ch == '}') && chPrevNonWhite == ch - 2))) { // empty [], {}
 				chPrev = '\0';
-				output.erase(output.end() - eolWidth, output.end());
+				fmtlen -= eolWidth;
+			}
+			if (spaceOption & SpaceOption_PushBrace) {
+				braceStack.push_back(static_cast<char>(braceTop));
+			} else if (spaceOption & SpaceOption_PopBrace) {
+				braceStack.pop_back();
+				braceTop = braceStack.back();
 			}
 		}
 		if (chPrev > ' ') {
 			if (spaceOption & SpaceOption_NewLineBefore) {
 				chPrev = '\n';
-				output += std::string_view{eol, eolWidth};
+				memcpy(&fmtbuf[fmtlen], &eol, 2);
+				fmtlen += eolWidth;
 			} else if (spaceOption & SpaceOption_SpaceBefore) {
-				output += ' ';
+				fmtbuf[fmtlen++] = ' ';
 			}
 		}
 		if (chPrev == '\n') {
@@ -1149,6 +1176,8 @@ std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLen
 				count *= fvCurFile.iTabWidth;
 			}
 			if (count != 0) {
+				output += std::string_view{fmtbuf, fmtlen};
+				fmtlen = 0;
 				output.append(count, indent);
 			}
 		}
@@ -1162,21 +1191,27 @@ std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLen
 				chPrevNonWhite = ch;
 			}
 			chPrev = ch;
-			output += static_cast<char>(ch);
+			fmtbuf[fmtlen++] = static_cast<char>(ch);
 		}
-		if (spaceOption & SpaceOption_NewLineAfter) {
+		if (spaceOption & (SpaceOption_NewLineAfter | SpaceOption_KeepNewLine)) {
 			blockLevel += spaceOption & SpaceOption_IndentAfter;
 			chPrev = '\n';
 			// don't add indentation inside comment and string
-			if (style <= pLex->commentStyleMarker || (style >= pLex->stringStyleFirst && style <= pLex->stringStyleLast)) {
+			if (((spaceOption & SpaceOption_KeepNewLine) == 0 && style <= pLex->commentStyleMarker)
+				|| (style >= pLex->stringStyleFirst && style <= pLex->stringStyleLast)) {
 				chPrev = '\r';
 			}
-			output += std::string_view{eol, eolWidth};
+			memcpy(&fmtbuf[fmtlen], &eol, 2);
+			fmtlen += eolWidth;
 		} else if (spaceOption & SpaceOption_SpaceAfter) {
 			chPrev = ' ';
-			output += ' ';
+			fmtbuf[fmtlen++] = ' ';
 		}
 		stylePrev = style;
+		styleBefore = style;
+	}
+	if (fmtlen != 0) {
+		output += std::string_view{fmtbuf, fmtlen};
 	}
 	return output;
 }
@@ -1226,13 +1261,19 @@ extern "C" void EditFormatCode(int menu) {
 				const uint8_t style = styledText[offset];
 				if (style > pLex->commentStyleMarker) {
 					const uint8_t ch = textBuffer[offset];
+					int spaceOption = SpaceOption_None;
 					if (style != stylePrev) {
-						if (AddStyleSeparator(pLex, ch, chPrev, style)) {
+						spaceOption = AddStyleSeparator(pLex, ch, chPrev, style);
+						if (spaceOption & SpaceOption_SpaceBefore) {
 							styledText[index++] = ' ';
 						}
 					}
 					chPrev = ch;
 					styledText[index++] = static_cast<char>(ch);
+					if (spaceOption & SpaceOption_SpaceAfter) {
+						chPrev = ' ';
+						styledText[index++] = ' ';
+					}
 				}
 				stylePrev = style;
 			}
