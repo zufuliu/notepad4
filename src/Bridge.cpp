@@ -1015,11 +1015,11 @@ int AddStyleSeparator(LPCEDITLEXER pLex, int ch, int chPrev, int style) noexcept
 		}
 	}
 	// var name; return .5; CSS property: 1 #1 .5 --name;
-	else if (BitTestEx(DefaultWordCharSet, chPrev)) {
-		if (BitTestEx(DefaultWordCharSet, ch) || ch == '$' || ch == '#') {
+	if (BitTestEx(DefaultWordCharSet, chPrev)) {
+		if (BitTestEx(DefaultWordCharSet, ch) || ch == '$' || ch == '#' || (ch == '-' && pLex->iLexer == SCLEX_CSS)) {
 			return SpaceOption_SpaceBefore;
 		}
-		if ((ch == '.' || ch == '-') && style != pLex->operatorStyle && style != pLex->operatorStyle2) {
+		if (ch == '.' && style != pLex->operatorStyle && style != pLex->operatorStyle2) {
 			return SpaceOption_SpaceBefore;
 		}
 	}
@@ -1066,6 +1066,7 @@ std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLen
 		}
 
 		int spaceOption = SpaceOption_None;
+		unsigned operatorLen = 0;
 		const uint8_t ch = textBuffer[offset];
 		if (style <= pLex->commentStyleMarker) {
 			// keep new line after block comment
@@ -1083,11 +1084,17 @@ std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLen
 						spaceOption |= SpaceOption_SpaceBefore; // property: function() value
 					}
 				}
+			} else if (stylePrev == SCE_CSS_AT_RULE && pLex->iLexer == SCLEX_CSS) {
+				spaceOption |= SpaceOption_SpaceBefore;
 			}
 		}
 		if (style == pLex->operatorStyle || style == pLex->operatorStyle2) {
 			if (ch == ':') {
 				spaceOption |= SpaceOption_SpaceAfter; // property: value
+				if (pLex->iLexer == SCLEX_JAVASCRIPT && braceTop != braceObject
+					&& (stylePrev != SCE_JS_KEY && stylePrev != SCE_JS_LABEL && (stylePrev != SCE_JS_WORD || chPrev != 't'))) {
+					spaceOption |= SpaceOption_SpaceBefore; // ternary operator, not set: / get:
+				}
 			} else if (ch == ',') {
 				if (pLex->iLexer == SCLEX_JSON || braceTop == braceObject || braceTop == bracketArray) {
 					spaceOption |= SpaceOption_NewLineAfter;
@@ -1131,13 +1138,36 @@ std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLen
 				if (pLex->iLexer == SCLEX_JAVASCRIPT && static_cast<uint8_t>(ch - braceTop) < 3) {
 					spaceOption |= SpaceOption_PopBrace;
 				}
-			} else if (ch == '(' || ch == ')') {
-				if (pLex->iLexer == SCLEX_JAVASCRIPT) {
+			} else if (pLex->iLexer != SCLEX_JSON) {
+				if (pLex->iLexer == SCLEX_CSS) {
+					const uint8_t chNext = textBuffer[offset + 1];
+					if (style == SCE_CSS_OPERATOR2
+						|| ch == '>' // child combinator
+						|| (ch == '&' && chNext != ':') // nesting selector
+						|| (ch == '~' && chNext != '=') // subsequent-sibling combinator
+						|| (ch == '|' && chNext == '|') // column combinator
+						// next-sibling combinator
+						|| (ch == '+' && styledText[offset + 1] != SCE_CSS_NUMBER && styledText[offset + 1] != SCE_CSS_DIMENSION)
+						) {
+						spaceOption |= SpaceOption_SpaceBefore | SpaceOption_SpaceAfter;
+						if (ch == '|') {
+							operatorLen = 2;
+						}
+					} else if (ch == '!') {
+						spaceOption |= SpaceOption_SpaceBefore; // !important
+					}
+				} else {
 					if (ch == '(') {
 						braceTop = '(';
 						spaceOption |= SpaceOption_PushBrace;
-					} else if (braceTop == '(') {
-						spaceOption |= SpaceOption_PopBrace;
+						if (stylePrev == SCE_JS_WORD && chPrev != 't') {
+							// not set(), get(); TODO: handle function(), delete()
+							spaceOption |= SpaceOption_SpaceBefore;
+						}
+					} else if (ch == ')') {
+						if (braceTop == '(') {
+							spaceOption |= SpaceOption_PopBrace;
+						}
 					}
 				}
 			}
@@ -1190,8 +1220,15 @@ std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLen
 			if (ch > ' ' && style > pLex->commentStyleMarker) {
 				chPrevNonWhite = ch;
 			}
-			chPrev = ch;
-			fmtbuf[fmtlen++] = static_cast<char>(ch);
+			if (operatorLen > 1) {
+				memcpy(&fmtbuf[fmtlen], textBuffer + offset, operatorLen);
+				fmtlen += operatorLen;
+				offset += operatorLen - 1;
+				chPrevNonWhite = chPrev = static_cast<uint8_t>(fmtbuf[fmtlen - 1]);
+			} else {
+				chPrev = ch;
+				fmtbuf[fmtlen++] = static_cast<char>(ch);
+			}
 		}
 		if (spaceOption & (SpaceOption_NewLineAfter | SpaceOption_KeepNewLine)) {
 			blockLevel += spaceOption & SpaceOption_IndentAfter;
