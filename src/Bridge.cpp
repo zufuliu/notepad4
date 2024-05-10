@@ -1059,10 +1059,10 @@ std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLen
 			continue;
 		}
 		if (fmtlen >= maxFmtLen) {
-			// keep eol in the buffer
-			output += std::string_view{fmtbuf, fmtlen - 2};
-			memcpy(fmtbuf, &fmtbuf[fmtlen - 2], 2);
-			fmtlen = 2;
+			// keep last character and eol in the buffer
+			output += std::string_view{fmtbuf, fmtlen - 4};
+			memcpy(fmtbuf, &fmtbuf[fmtlen - 4], 4);
+			fmtlen = 4;
 		}
 
 		int spaceOption = SpaceOption_None;
@@ -1084,14 +1084,17 @@ std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLen
 						spaceOption |= SpaceOption_SpaceBefore; // property: function() value
 					}
 				}
-			} else if (stylePrev == SCE_CSS_AT_RULE && pLex->iLexer == SCLEX_CSS) {
+			} else if ((stylePrev == SCE_CSS_AT_RULE && pLex->iLexer == SCLEX_CSS)
+				|| (stylePrev == SCE_JS_WORD && pLex->iLexer == SCLEX_JAVASCRIPT
+					&& (style <= SCE_JS_OPERATOR_PF || ch == '{' || ch == '[' || ch == '!' || ch == '~' || (ch == '(' && chPrev != 't')))) {
+				// not set(), get(); TODO: handle function(), delete()
 				spaceOption |= SpaceOption_SpaceBefore;
 			}
 		}
 		if (style == pLex->operatorStyle || style == pLex->operatorStyle2) {
 			if (ch == ':') {
 				spaceOption |= SpaceOption_SpaceAfter; // property: value
-				if (pLex->iLexer == SCLEX_JAVASCRIPT && braceTop != braceObject
+				if (pLex->iLexer == SCLEX_JAVASCRIPT
 					&& (stylePrev != SCE_JS_KEY && stylePrev != SCE_JS_LABEL && (stylePrev != SCE_JS_WORD || chPrev != 't'))) {
 					spaceOption |= SpaceOption_SpaceBefore; // ternary operator, not set: / get:
 				}
@@ -1156,17 +1159,58 @@ std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLen
 					} else if (ch == '!') {
 						spaceOption |= SpaceOption_SpaceBefore; // !important
 					}
-				} else {
+				} else if (pLex->iLexer == SCLEX_JAVASCRIPT) {
 					if (ch == '(') {
 						braceTop = '(';
 						spaceOption |= SpaceOption_PushBrace;
-						if (stylePrev == SCE_JS_WORD && chPrev != 't') {
-							// not set(), get(); TODO: handle function(), delete()
-							spaceOption |= SpaceOption_SpaceBefore;
-						}
 					} else if (ch == ')') {
 						if (braceTop == '(') {
 							spaceOption |= SpaceOption_PopBrace;
+						}
+					} else if (ch != '.' && ch != '~' && ch != '$') {
+						// https://tc39.es/ecma262/#sec-punctuators
+						// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators
+						// !		!=		!==
+						// %		%=
+						// &	&&	&=		&&=
+						// *	**	*=		**=
+						// +	++	+=
+						// -	--	-=
+						// /		/=
+						// <	<<	<=		<<=
+						// =	=>	==		===
+						// >	>>	>=		>>=	>>>		>>>=
+						// ?	?.	??		??=
+						// ^		^=
+						// |	||	|=		||=
+						uint8_t chNext = textBuffer[offset + 1];
+						if (chNext == '=' || (ch != '!' && ch == chNext)) {
+							operatorLen = 2;
+							spaceOption |= SpaceOption_SpaceBefore | SpaceOption_SpaceAfter;
+							chNext = textBuffer[offset + 2];
+							if (chNext == '=' || chNext == '>') {
+								operatorLen = 3;
+								if (chNext == '>' && textBuffer[offset + 3] == '=') {
+									operatorLen = 4;
+								}
+							}
+						} else if ((ch == '+' || ch == '-') && styledText[offset + 1] == SCE_JS_NUMBER) {
+							// detect unary / binary operator, similar to FollowExpression()
+							if (stylePrev == SCE_JS_WORD) {
+								spaceOption |= SpaceOption_SpaceBefore;
+							} else if (chPrevNonWhite == ')' || chPrevNonWhite == ']'
+								|| (stylePrev >= SCE_JS_NUMBER && stylePrev <= SCE_JS_OPERATOR_PF)
+								|| (stylePrev >= SCE_JS_IDENTIFIER &&stylePrev <= SCE_JS_CONSTANT)) {
+								spaceOption |= SpaceOption_SpaceBefore | SpaceOption_SpaceAfter;
+							}
+						} else if (ch == '*' && stylePrev == SCE_JS_WORD) {
+							// yield*, function*
+							spaceOption |= SpaceOption_SpaceAfter;
+						} else if (ch != '!' && (ch != '?' || chNext != '.')) {
+							spaceOption |= SpaceOption_SpaceBefore | SpaceOption_SpaceAfter;
+							if (ch == '=' && chNext == '>') {
+								operatorLen = 2;
+							}
 						}
 					}
 				}
@@ -1180,6 +1224,9 @@ std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLen
 				|| ((ch == ']' || ch == '}') && chPrevNonWhite == ch - 2))) { // empty [], {}
 				chPrev = '\0';
 				fmtlen -= eolWidth;
+				if ((spaceOption & SpaceOption_NewLineBefore) == 0) {
+					chPrev = static_cast<uint8_t>(fmtbuf[fmtlen - 1]);
+				}
 			}
 			if (spaceOption & SpaceOption_PushBrace) {
 				braceStack.push_back(static_cast<char>(braceTop));
