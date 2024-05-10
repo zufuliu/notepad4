@@ -64,7 +64,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [Dart](tools/lang/Dart.dart), up to Dart 3.3.
 	* Diff/Patch File
 	* [F#](tools/lang/FSharp.fs), up to F# 8.0.
-	* [Fortran](tools/lang/Fortran.f), up to Fortran 2018.
+	* [Fortran](tools/lang/Fortran.f), up to Fortran 2023.
 	* [GN Build](tools/lang/GN.gn), up to GN 2019-03-13.
 	* [Go](tools/lang/Go.go), up to Go 1.21.
 		* [Go+ (GoPlus)](https://goplus.org/) and the Q language

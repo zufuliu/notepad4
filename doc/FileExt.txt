@@ -283,8 +283,11 @@ Fortran Source
 	f95
 	f03
 	f08
+	f18
+	f77
 	f2k
 	hf
+	cuf
 
 F# Source
 	fs

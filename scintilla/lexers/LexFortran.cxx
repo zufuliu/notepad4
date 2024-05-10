@@ -66,7 +66,7 @@ enum {
 enum class KeywordType {
 	None = 0,
 	Change,		// change team
-	Select,		// select type
+	Select,		// select type, enumeration type
 	Else,		// else if
 	Module,		// module function, module subroutine
 	End,
@@ -173,7 +173,7 @@ void ColouriseFortranDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int ini
 							kwType = KeywordType::End;
 						} else if (StrEqual(s, "module")) {
 							kwType = KeywordType::Module;
-						} else if (StrEqual(s, "select")) {
+						} else if (StrEqualsAny(s, "select", "enumeration")) {
 							kwType = KeywordType::Select;
 						} else if (StrEqualsAny(s, "function", "subroutine")) {
 							kwType = KeywordType::Function;
@@ -304,7 +304,7 @@ void ColouriseFortranDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int ini
 				sc.SetState(SCE_F_IDENTIFIER);
 			} else if (sc.ch == '.' && IsAlpha(sc.chNext)) {
 				sc.SetState(SCE_F_OPERATOR2);
-			} else if (isoperator(sc.ch)) {
+			} else if (IsAGraphic(sc.ch)) {
 				kwType = KeywordType::None;
 				if (sc.ch == '(' || sc.ch == '[' || sc.ch == '{') {
 					++parenCount;
