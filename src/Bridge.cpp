@@ -1159,7 +1159,7 @@ std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLen
 					} else if (ch == '!') {
 						spaceOption |= SpaceOption_SpaceBefore; // !important
 					}
-				} else if (pLex->iLexer == SCLEX_JAVASCRIPT) {
+				} else {
 					if (ch == '(') {
 						braceTop = '(';
 						spaceOption |= SpaceOption_PushBrace;

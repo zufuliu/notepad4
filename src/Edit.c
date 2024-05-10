@@ -1841,7 +1841,7 @@ void EditURLDecode(void) {
 	UrlUnescape(pszTextW, pszUnescapedW, &cchUnescapedW, URL_UNESCAPE_AS_UTF8);
 	if (!IsWin8AndAbove()) {
 		char *ptr = pszUnescaped;
-		WCHAR *t = pszUnescapedW;
+		LPCWSTR t = pszUnescapedW;
 		WCHAR ch;
 		while ((ch = *t++) != 0) {
 			if (ch > 0xff) {
