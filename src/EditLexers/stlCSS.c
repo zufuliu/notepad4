@@ -153,7 +153,10 @@ static KEYWORDLIST Keywords_CSS = {{
 "nth-fragment( part( placeholder postfix prefix region selection shadow slot( spelling-error target-text "
 "view-transition view-transition-group( view-transition-image-pair( view-transition-new( view-transition-old( "
 
-, // 4 color names
+, // 4 math functions
+"abs( acos( asin( atan( atan2( calc( clamp( cos( exp( hypot( log( max( min( mod( pow( rem( round( sign( sin( sqrt( tan( "
+
+, // 5 color names
 "aliceblue antiquewhite aqua aquamarine azure beige bisque black blanchedalmond blue blueviolet brown burlywood "
 "cadetblue chartreuse chocolate coral cornflowerblue cornsilk crimson cyan "
 "darkblue darkcyan darkgoldenrod darkgray darkgreen darkgrey darkkhaki darkmagenta darkolivegreen darkorange darkorchid "
@@ -176,24 +179,24 @@ static KEYWORDLIST Keywords_CSS = {{
 "webgray webgreen webgrey webmaroon webpurple wheat white whitesmoke x11gray x11green x11grey x11maroon x11purple "
 "yellow yellowgreen "
 
-, // 5 values
+, // 6 values
 "ActiveText ButtonBorder ButtonFace ButtonText CSS( Canvas CanvasText Field FieldText GrayText Highlight HighlightText "
 "LinkText Mark MarkText NaN VisitedText "
-"above abs( absolute absolute-colorimetric accumulate acos( add additive adjust( alias "
+"above absolute absolute-colorimetric accumulate add additive adjust( alias "
 "all-petite-caps all-scroll all-small-caps allow-discrete allow-end alpha alpha( alphabetic alphamix( "
 "alternate alternate-reverse always anchor( anchor-size( and annotation( anywhere append( arcs argb( arguments armenian "
-"as asin( at atan( atan2( attr( audio aural auto auto-flow auto-phrase "
+"as at attr( audio aural auto auto-flow auto-phrase "
 "average( avoid avoid-column avoid-flex avoid-line avoid-page avoid-region "
 "back backwards balance balance-all bar baseline behind below bevel bidi-override bitmap "
 "blackness( blink block block-end block-start blue( blur( bold bolder boolean( border-box both both-edges bounding-box "
 "braille break break-all break-spaces break-word brightness( browser bullets butt button "
-"calc( calc-args( calc-name( call( cap cap-height capitalize caption ceil( cell center center-left center-right central "
-"ch-width change( character-variant( checkbox child child( circle circle( clamp( clone close-quote coarse code "
-"col-resize collapse collection "
+"calc-args( calc-name( call( cap cap-height capitalize caption ceil( cell center center-left center-right central "
+"ch-width change( character-variant( checkbox child child( circle circle( clone close-quote coarse code col-resize "
+"collapse collection "
 "color( color-CBDT color-COLRv0 color-COLRv1 color-SVG color-burn color-contrast( color-dodge color-mix( color-sbix "
 "column column-reverse common-ligatures compact compatible( complement( compress condensed conic-gradient( "
 "content( content-box content-exists( contents context-menu contextual continuous contrast( contrast-color( convert( "
-"copy cos( counter( counters( cover create crisp-edges crispEdges crop cross cross-fade( crosshair css "
+"copy counter( counters( cover create crisp-edges crispEdges crop cross cross-fade( crosshair css "
 "cubic-bezier( currentColor cursive custom cyclic "
 "dark darken darken( dashed dashes data-uri( "
 "decimal decimal-leading-zero deep-merge( deep-remove( default( dense desaturate( device-cmyk( "
@@ -201,7 +204,7 @@ static KEYWORDLIST Keywords_CSS = {{
 "domain( dot dotted double double-circle down drop drop-shadow( "
 "e-resize each( each-line ease ease-in ease-in-out ease-out economy element( ellipse( ellipsis "
 "embed embed( embedded-opentype embossed emoji escape( evenodd ew-resize "
-"ex ex-height exact exclude exclusion exclusion( exp( expanded extends extra-condensed extra-expanded extract( "
+"ex ex-height exact exclude exclusion exclusion( expanded extends extra-condensed extra-expanded extract( "
 "fade fade( fade-in( fade-out( fadein( fadeout( false fangsong fantasy far-left far-right fast faster "
 "feature-aat feature-exists( feature-graphite feature-opentype female "
 "fill-box filled fine first-baseline fit-content( fixed flat flex-end flex-start flip floor( flow-root "
@@ -211,7 +214,7 @@ static KEYWORDLIST Keywords_CSS = {{
 "grab grabbing grayscale( green( greyscale( groove "
 "handheld hanging hard-light hardlight( has-key( help hidden hide high high-quality higher historical-ligatures "
 "horizontal horizontal-tb hsl( hsla( hss-height hss-width hsv( hsva( hsvhue( hsvsaturation( hsvvalue( "
-"hue hue( hue-rotate( hwb( hypot( "
+"hue hue( hue-rotate( hwb( "
 "ic-height ic-width icon ideograph-alpha ideograph-numeric ideographic ideographic-ink ideographic-space ie-hex-str( if( "
 "image( image-height( image-set( image-size( image-width( implicit important in increment incremental index( "
 "infinite infinity inherit initial initial-only "
@@ -223,14 +226,14 @@ static KEYWORDLIST Keywords_CSS = {{
 "lab( landscape large larger last last-baseline layer( layout lch( "
 "leader( leading left-side leftwards legacy length( less level light lighten lighten( lighter lightness( "
 "line line-through linear linear-gradient( linearRGB lining-nums list list-item listbox literal-punctuation "
-"load-css( local local( log( loose loud low lower lower-alpha lower-greek lower-latin lower-roman lowercase ltr "
+"load-css( local local( loose loud low lower lower-alpha lower-greek lower-latin lower-roman lowercase ltr "
 "luma( luminance luminance( luminosity "
 "male mandatory manipulation manual map margin-box "
-"match-parent match-self match-source math mathematical matrix( matrix3d( max( max-content maximum "
+"match-parent match-self match-source math mathematical matrix( matrix3d( max-content maximum "
 "media( media-document( medium menu menulist menulist-button merge merge( message-box meta meter middle "
-"min( min-color-index min-content min-monochrome minimal-ui minimum minmax( miter miter-clip "
-"mix mix( mixed mixin-exists( mod( moderate module-functions( module-variables( monospace more "
-"most-block-size most-height most-inline-size most-width move multiple multiply multiply( "
+"min-color-index min-content min-monochrome minimal-ui minimum minmax( miter miter-clip mix mix( mixed mixin-exists( "
+"moderate module-functions( module-variables( monospace more most-block-size most-height most-inline-size most-width "
+"move multiple multiply multiply( "
 "n-resize name( narrow ne-resize nearest negation( nest( nesw-resize neutral never nherit no-autospace "
 "no-clip no-close-quote no-common-ligatures no-compress no-contextual no-discretionary-ligatures no-drop "
 "no-historical-ligature no-limit no-open-quote no-preference no-punctuation no-repeat nonzero normal not not-allowed "
@@ -240,29 +243,29 @@ static KEYWORDLIST Keywords_CSS = {{
 "outer outset outside outside-shape over overlay overlay( overline "
 "p3 padding-box paged paginate paint painted palette-mix( palettes pan-down pan-left pan-right pan-up pan-x pan-y "
 "parent parse( path( percentage( perceptual perspective( petite-caps pi pi( pinch-zoom pixelated plaintext "
-"polygon( portrait pow( "
+"polygon( portrait "
 "pre pre-line pre-wrap preserve preserve-3d preserve-breaks preserve-parent-color preserve-spaces pretty print "
 "progress progress-bar progressive projection proportional-nums proportional-width proximity punctuation push-button "
 "quote( "
 "radial-gradient( radio raise random( range( ray( rec2020 rect rect( red( reduce reduced reference regexp( "
-"relative relative-colorimetric rem( remove( "
+"relative relative-colorimetric remove( "
 "repeat repeat-x repeat-y repeating-conic-gradient( repeating-linear-gradient( repeating-radial-gradient( "
 "replace replace( reverse revert revert-layer rgb( rgba( ridge right-side rightwards "
-"rotate( rotate-left rotate-right rotate3d( rotateX( rotateY( rotateZ( round round( row row-resize row-reverse rtl "
+"rotate( rotate-left rotate-right rotate3d( rotateX( rotateY( rotateZ( round row row-resize row-reverse rtl "
 "ruby ruby-base ruby-base-container ruby-text ruby-text-container run-in running( "
 "s-resize sRGB safe same sans-serif saturate( saturation saturation( "
 "scale( scale-down scale3d( scaleX( scaleY( scaleZ( screen screen( scroll scroll( scroll-position se-resize searchfield "
 "select( selector selector( self-end self-start semi-condensed semi-expanded separate separator( sepia( serif sesame "
-"set( set-nth( shade( show sideways sideways-lr sideways-rl sign( silent simple-selectors( simplified sin( size( "
+"set( set-nth( shade( show sideways sideways-lr sideways-rl silent simple-selectors( simplified size( "
 "skew( skewX( skewY( slash( slashed-zero slice slice( slider-horizontal slow slower "
 "small small-caps small-caption smaller smooth snap snap-block snap-inline soft soft-light softlight( solid "
 "space space-adjacent space-all space-around space-between space-end space-evenly space-first space-start spaces span "
-"speech spell-out spin( spread sqrt( square square-button srgb "
+"speech spell-out spin( spread square square-button srgb "
 "stable stacked-fractions standalone standard start state static status-bar step-end step-start steps( sticky "
 "stretch strict string string( stripes( stroke-box strong stupid style style( styleset( stylistic( "
 "sub subgrid subtract subtractive super supports( svg svg-gradient( sw-resize swap swash( symbolic symbols( system-ui "
 "table table-caption table-cell table-column table-column-group table-footer-group table-header-group "
-"table-row table-row-group tabular-nums tactile tan( target-counter( target-counters( target-text( "
+"table-row table-row-group tabular-nums tactile target-counter( target-counters( target-text( "
 "techn( text text-bottom text-top textarea textfield thick thin through tint( titling-caps "
 "to to-lower-case( to-upper-case( traditional translate( translate3d( translateX( translateY( translateZ( "
 "triangle trim-adjacent trim-all trim-auto trim-end trim-inner trim-start true truetype tty tv type( type-of( "
@@ -275,7 +278,7 @@ static KEYWORDLIST Keywords_CSS = {{
 "x-fast x-high x-large x-loud x-low x-slow x-small x-soft x-strong x-weak xx-large xx-small xywh( young "
 "zero-if-extrinsic zero-if-scroll zip( zoom-in zoom-out "
 
-, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
+, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 //--Autogenerated -- end of section automatically generated
 }};
 
@@ -321,8 +324,9 @@ EDITLEXER lexCSS = {
 		| KeywordAttr32(1, KeywordAttr_PreSorted) // at rules
 		| KeywordAttr32(2, KeywordAttr_PreSorted) // pseudo classes
 		| KeywordAttr32(3, KeywordAttr_PreSorted) // pseudo elements
-		| KeywordAttr32(4, KeywordAttr_NoLexer) // color names
-		| KeywordAttr32(5, KeywordAttr_NoLexer) // values
+		| KeywordAttr32(4, KeywordAttr_PreSorted) // math functions
+		| KeywordAttr32(5, KeywordAttr_NoLexer) // color names
+		| KeywordAttr32(6, KeywordAttr_NoLexer) // values
 		, SCE_CSS_CDO_CDC,
 		SCE_CSS_ESCAPECHAR, SCE_CSS_URL,
 //Settings--Autogenerated -- end of section automatically generated

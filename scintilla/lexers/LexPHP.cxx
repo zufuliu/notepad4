@@ -766,7 +766,7 @@ bool PHPLexer::ClassifyCssWord() {
 	const int chNext = sc.GetDocNextChar(sc.ch == '(');
 	if (sc.ch == '(') {
 		sc.ChangeState(css_style(SCE_CSS_FUNCTION));
-		if (StrEqual(s, "url") && !(chNext == '\'' || chNext == '\"')) {
+		if (StrEqual(s, "url") && !AnyOf(chNext, '\'', '\"', ')')) {
 			parenCount++;
 			sc.SetState(css_style(SCE_CSS_OPERATOR));
 			sc.ForwardSetState(css_style(SCE_CSS_URL));

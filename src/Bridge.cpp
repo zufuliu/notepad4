@@ -1007,7 +1007,7 @@ int AddStyleSeparator(LPCEDITLEXER pLex, int ch, int chPrev, int style) noexcept
 	// a++ + ++b, a + +1, a-- - --b, a - -1
 	if (ch == '+' || ch == '-') {
 		if (style == SCE_CSS_OPERATOR2 && pLex->iLexer == SCLEX_CSS) {
-			// '+' and '-' inside calc() function requires space on both side
+			// '+' and '-' inside math function requires space on both side
 			return SpaceOption_SpaceBefore | SpaceOption_SpaceAfter;
 		}
 		if (ch == chPrev) {
@@ -1017,6 +1017,7 @@ int AddStyleSeparator(LPCEDITLEXER pLex, int ch, int chPrev, int style) noexcept
 	// var name; return .5; CSS property: 1 #1 .5 --name;
 	if (BitTestEx(DefaultWordCharSet, chPrev)) {
 		if (BitTestEx(DefaultWordCharSet, ch) || ch == '$' || ch == '#' || (ch == '-' && pLex->iLexer == SCLEX_CSS)) {
+			// TODO: improve CSS An+B when B is negative, https://www.w3.org/TR/css-syntax-3/#anb-microsyntax
 			return SpaceOption_SpaceBefore;
 		}
 		if (ch == '.' && style != pLex->operatorStyle && style != pLex->operatorStyle2) {
@@ -1126,6 +1127,9 @@ std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLen
 						braceTop = ch;
 						if (ch == '{') {
 							spaceOption |= SpaceOption_NewLineAfter | SpaceOption_IndentAfter;
+							if (stylePrev >= SCE_JS_IDENTIFIER) {
+								spaceOption |= SpaceOption_SpaceBefore;
+							}
 						}
 					}
 				} else if (ch == '{' || pLex->iLexer == SCLEX_JSON) {

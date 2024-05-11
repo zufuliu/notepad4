@@ -10,7 +10,7 @@
 // https://www.w3.org/TR/css-syntax-3/ 24 December 2021
 !important
 
-// CSS Anchor Positioning https://www.w3.org/TR/css-anchor-position-1/ 14 March 2024
+// CSS Anchor Positioning https://www.w3.org/TR/css-anchor-position-1/ 26 March 2024
 {
 	anchor-name: none;
 	anchor-scope: none | all;
@@ -131,8 +131,8 @@ from to
 	input-security: auto | none;
 }
 
-// CSS Box Model Module Level 4 https://www.w3.org/TR/css-box-4/ 3 November 2022
-// CSS Box Model Module Level 3 https://www.w3.org/TR/css-box-3/ 6 April 2023
+// CSS Box Model Module Level 4 https://www.w3.org/TR/css-box-4/ 1 April 2024
+// CSS Box Model Module Level 3 https://www.w3.org/TR/css-box-3/ 11 April 2024
 // Box model https://www.w3.org/TR/CSS22/box.html
 {
 	margin-top: auto;
@@ -236,7 +236,7 @@ initial inherit unset revert revert-layer
 	color-adjust:;
 }
 
-// Compositing and Blending Level 1 https://www.w3.org/TR/compositing-1/ 13 January 2015
+// Compositing and Blending Level 1 https://www.w3.org/TR/compositing-1/ 21 March 2024
 {
 	mix-blend-mode: normal | multiply | screen | overlay | darken | lighten | color-dodge | color-burn | hard-light | soft-light | difference | exclusion | hue | saturation | color | luminosity;
 	isolation: auto | isolate;
@@ -357,7 +357,7 @@ step-start step-end steps()
 	stroke-opacity:;
 }
 
-// Filter Effects Module Level 2 https://drafts.fxtf.org/filter-effects-2/ 5 March 2024
+// Filter Effects Module Level 2 https://drafts.fxtf.org/filter-effects-2/ 11 March 2024
 // Filter Effects Module Level 1 https://www.w3.org/TR/filter-effects-1/ 18 December 2018
 {
 	filter: none | blur() | brightness() | contrast() | drop-shadow() | grayscale() | hue-rotate() | invert() | opacity() | sepia() | saturate();
@@ -885,7 +885,7 @@ all continuous paged visual audio speech tactile grid bitmap interactive static
 	presentation-level: same | increment;
 }
 
-// CSS Properties and Values API Level 1 https://www.w3.org/TR/css-properties-values-api-1/ 13 October 2020
+// CSS Properties and Values API Level 1 https://www.w3.org/TR/css-properties-values-api-1/ 26 March 2024
 @property {
 	syntax:;
 	inherits: true | false;
@@ -1287,18 +1287,18 @@ view()
 @starting-style {}
 
 // CSS Values and Units Module Level 4 https://www.w3.org/TR/css-values-4/ 12 March 2024
-// CSS Values and Units Module Level 3 https://www.w3.org/TR/css-values-3/ 01 December 2022
+// CSS Values and Units Module Level 3 https://www.w3.org/TR/css-values-3/ 22 March 2024
 mix()
 initial nherit unset
 url()
 left center right top center bottom
-calc()
 attr()
-min() max() clamp()
-round() mod() rem()
-sin() cos() tan() asin() acos() atan() atan2()
-pow() sqrt() hypot() log() exp()
-abs() sign()
+//! math function that requires space on both side of '+' and '-', https://www.w3.org/TR/css-values-4/#calc-syntax
+= calc() min() max() clamp()
+= round() mod() rem()
+= sin() cos() tan() asin() acos() atan() atan2()
+= pow() sqrt() hypot() log() exp()
+= abs() sign()
 pi infinity NaN
 
 // CSS Viewport Module Level 1 https://www.w3.org/TR/css-viewport-1/ 25 January 2024
