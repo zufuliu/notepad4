@@ -56,7 +56,7 @@ namespace BOOST_REGEX_DETAIL_NS{
       static char   checker(...);
       static T* get();
 
-      static const bool value = sizeof(checker(get())) > 1;
+      static constexpr bool value = sizeof(checker(get())) > 1;
    };
    
 

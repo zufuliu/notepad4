@@ -264,8 +264,8 @@ basic_regex_creator<charT, traits>::basic_regex_creator(regex_data<charT, traits
 {
    m_pdata->m_data.clear();
    m_pdata->m_status = ::boost::regex_constants::error_ok;
-   static const charT w = 'w';
-   static const charT s = 's';
+   const charT w = 'w';
+   const charT s = 's';
    static const charT l[5] = { 'l', 'o', 'w', 'e', 'r', };
    static const charT u[5] = { 'u', 'p', 'p', 'e', 'r', };
    static const charT a[5] = { 'a', 'l', 'p', 'h', 'a', };
@@ -1467,7 +1467,7 @@ bool basic_regex_creator<charT, traits>::is_bad_repeat(re_syntax_base* pt)
          unsigned state_id = static_cast<re_repeat*>(pt)->state_id;
          if(state_id >= sizeof(m_bad_repeats) * CHAR_BIT)
             return true;  // run out of bits, assume we can't traverse this one.
-         static const std::uintmax_t one = 1uL;
+         constexpr std::uintmax_t one = 1uL;
          return m_bad_repeats & (one << state_id);
       }
    default:
@@ -1487,7 +1487,7 @@ void basic_regex_creator<charT, traits>::set_bad_repeat(re_syntax_base* pt)
    case syntax_element_long_set_rep:
       {
          unsigned state_id = static_cast<re_repeat*>(pt)->state_id;
-         static const std::uintmax_t one = 1uL;
+         constexpr std::uintmax_t one = 1uL;
          if(state_id <= sizeof(m_bad_repeats) * CHAR_BIT)
             m_bad_repeats |= (one << state_id);
       }

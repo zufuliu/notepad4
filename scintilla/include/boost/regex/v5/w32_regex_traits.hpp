@@ -408,11 +408,11 @@ class w32_regex_traits_implementation : public w32_regex_traits_char_layer<charT
 {
 public:
    typedef typename w32_regex_traits<charT>::char_class_type char_class_type;
-   static const char_class_type mask_word = 0x0400; // must be C1_DEFINED << 1
-   static const char_class_type mask_unicode = 0x0800; // must be C1_DEFINED << 2
-   static const char_class_type mask_horizontal = 0x1000; // must be C1_DEFINED << 3
-   static const char_class_type mask_vertical = 0x2000; // must be C1_DEFINED << 4
-   static const char_class_type mask_base = 0x3ff;  // all the masks used by the CT_CTYPE1 group
+   static constexpr char_class_type mask_word = 0x0400; // must be C1_DEFINED << 1
+   static constexpr char_class_type mask_unicode = 0x0800; // must be C1_DEFINED << 2
+   static constexpr char_class_type mask_horizontal = 0x1000; // must be C1_DEFINED << 3
+   static constexpr char_class_type mask_vertical = 0x2000; // must be C1_DEFINED << 4
+   static constexpr char_class_type mask_base = 0x3ff;  // all the masks used by the CT_CTYPE1 group
 
    typedef std::basic_string<charT> string_type;
    typedef charT char_type;
@@ -586,7 +586,7 @@ w32_regex_traits_implementation<charT>::w32_regex_traits_implementation(::boost:
          w32_regex_traits_implementation<charT>::mask_word,
          w32_regex_traits_implementation<charT>::mask_unicode,
       };
-      static const string_type null_string;
+      constexpr string_type null_string;
       for(unsigned int j = 0; j <= 13; ++j)
       {
          string_type s(::boost::BOOST_REGEX_DETAIL_NS::w32_cat_get(cat, this->m_locale, j+300, null_string));

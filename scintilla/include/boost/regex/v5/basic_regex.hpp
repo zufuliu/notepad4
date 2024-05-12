@@ -58,7 +58,7 @@ void bubble_down_one(I first, I last)
    }
 }
 
-static const int hash_value_mask = 1 << (std::numeric_limits<int>::digits - 1);
+static constexpr int hash_value_mask = 1 << (std::numeric_limits<int>::digits - 1);
 
 template <class Iterator>
 inline int hash_value_from_capture_name(Iterator i, Iterator j)

@@ -50,7 +50,7 @@ inline const char*  get_default_syntax(regex_constants::syntax_type n)
 {
    // if the user hasn't supplied a message catalog, then this supplies
    // default "messages" for us to load in the range 1-100.
-   const char* messages[] = {
+   static const char* messages[] = {
          "",
          "(",
          ")",
@@ -155,7 +155,7 @@ inline regex_constants::syntax_type  get_default_syntax_type(char c)
    // char_syntax determines how the compiler treats a given character
    // in a regular expression.
    //
-   static regex_constants::syntax_type char_syntax[] = {
+   static const regex_constants::syntax_type char_syntax[] = {
       regex_constants::syntax_char,        /**/
       regex_constants::syntax_char,        /**/
       regex_constants::syntax_char,        /**/
@@ -350,7 +350,7 @@ inline regex_constants::escape_syntax_type  get_default_escape_syntax_type(char 
    // char_syntax determines how the compiler treats a given character
    // in a regular expression.
    //
-   static regex_constants::escape_syntax_type char_syntax[] = {
+   static const regex_constants::escape_syntax_type char_syntax[] = {
       regex_constants::escape_type_identity,        /**/
       regex_constants::escape_type_identity,        /**/
       regex_constants::escape_type_identity,        /**/
@@ -542,7 +542,7 @@ inline regex_constants::escape_syntax_type  get_default_escape_syntax_type(char 
 // is charT c a combining character?
 inline bool  is_combining_implementation(std::uint_least16_t c)
 {
-   const std::uint_least16_t combining_ranges[] = { 0x0300, 0x0361,
+   static const std::uint_least16_t combining_ranges[] = { 0x0300, 0x0361,
                            0x0483, 0x0486,
                            0x0903, 0x0903,
                            0x093E, 0x0940,
@@ -894,12 +894,12 @@ template<> inline wchar_t  global_upper<wchar_t>(wchar_t c) { return do_global_u
 template <class charT>
 int global_value(charT c)
 {
-   static const charT zero = '0';
-   static const charT nine = '9';
-   static const charT a = 'a';
-   static const charT f = 'f';
-   static const charT A = 'A';
-   static const charT F = 'F';
+   constexpr charT zero = '0';
+   constexpr charT nine = '9';
+   constexpr charT a = 'a';
+   constexpr charT f = 'f';
+   constexpr charT A = 'A';
+   constexpr charT F = 'F';
 
    if(c > f) return -1;
    if(c >= a) return 10 + (c - a);
