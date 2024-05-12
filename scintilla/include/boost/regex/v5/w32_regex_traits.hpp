@@ -586,7 +586,7 @@ w32_regex_traits_implementation<charT>::w32_regex_traits_implementation(::boost:
          w32_regex_traits_implementation<charT>::mask_word,
          w32_regex_traits_implementation<charT>::mask_unicode,
       };
-      constexpr string_type null_string;
+      const string_type null_string;
       for(unsigned int j = 0; j <= 13; ++j)
       {
          string_type s(::boost::BOOST_REGEX_DETAIL_NS::w32_cat_get(cat, this->m_locale, j+300, null_string));

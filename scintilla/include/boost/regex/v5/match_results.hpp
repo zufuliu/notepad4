@@ -503,7 +503,7 @@ public:
 
    void  set_named_subs(std::shared_ptr<named_sub_type> subs)
    {
-      m_named_subs = subs;
+      m_named_subs = std::move(subs);
    }
 
 private:

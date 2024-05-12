@@ -75,8 +75,6 @@ public:
    static constexpr bool value = answer::value;
 };
 
-template <class I>
-constexpr bool is_random_access_iterator<I>::value;
 
 }
 
