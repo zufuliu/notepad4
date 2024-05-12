@@ -231,10 +231,13 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 						} else if (StrEqualsAny(s, "return", "yield")) {
 							kwType = KeywordType::Return;
 						}
-						if (kwType > KeywordType::None && kwType < KeywordType::Return) {
+						if (chBefore == '.' || (kwType > KeywordType::None && kwType < KeywordType::Return)) {
 							const int chNext = sc.GetLineNextChar();
 							if (!(IsJsIdentifierStart(chNext) || chNext == '\\')) {
 								kwType = KeywordType::None;
+								if (chBefore == '.' && chNext == '(') {
+									sc.ChangeState(SCE_JS_FUNCTION);
+								}
 							}
 						}
 					} else if (keywordLists[KeywordIndex_FutureReservedWord].InList(s)) {

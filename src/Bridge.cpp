@@ -1101,7 +1101,7 @@ std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLen
 			} else if ((stylePrev == SCE_CSS_AT_RULE && pLex->iLexer == SCLEX_CSS)
 				|| (stylePrev == SCE_JS_WORD && pLex->iLexer == SCLEX_JAVASCRIPT
 					&& (style <= SCE_JS_OPERATOR_PF || ch == '{' || ch == '[' || ch == '!' || ch == '~' || (ch == '(' && chPrev != 't')))) {
-				// not set(), get(); TODO: handle function(), delete()
+				// not set(), get();
 				spaceOption |= SpaceOption_SpaceBefore;
 			}
 		}
