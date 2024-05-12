@@ -103,15 +103,23 @@ public:
    bool empty() const
    { return m_subs.size() < 2; }
    // element access:
-   difference_type length(int sub = 0) const
+private:
+   difference_type do_get_length(int sub = 0) const
    {
-      if(m_is_singular)
+      if (m_is_singular)
          raise_logic_error();
       sub += 2;
-      if((sub < (int)m_subs.size()) && (sub > 0))
+      if ((sub < (int)m_subs.size()) && (sub > 0))
          return m_subs[sub].length();
       return 0;
    }
+public:
+   template <class Integer>
+   typename std::enable_if<std::is_integral<Integer>::value, difference_type>::type length(Integer sub) const
+   {
+      return do_get_length(static_cast<int>(sub));
+   }
+   difference_type length() const { return do_get_length(0); }
    difference_type length(const char_type* sub) const
    {
       if(m_is_singular)
@@ -167,7 +175,8 @@ public:
    {
       return position(sub.c_str());
    }
-   string_type str(int sub = 0) const
+private:
+   string_type do_get_string(int sub = 0) const
    {
       if(m_is_singular)
          raise_logic_error();
@@ -183,6 +192,13 @@ public:
       }
       return result;
    }
+public:
+   template <class Integer>
+   typename std::enable_if<std::is_integral<Integer>::value, string_type>::type str(Integer sub) const
+   {
+      return do_get_string(static_cast<int>(sub));
+   }
+   string_type str() const { return do_get_string(0); }
    string_type str(const char_type* sub) const
    {
       return (*this)[sub].str();
@@ -202,7 +218,8 @@ public:
    {
       return (*this)[sub].str();
    }
-   const_reference operator[](int sub) const
+   private:
+   const_reference get_at(int sub) const
    {
       if(m_is_singular && m_subs.empty())
          raise_logic_error();
@@ -212,6 +229,12 @@ public:
          return m_subs[sub];
       }
       return m_null;
+   }
+public:
+   template <class Integer>
+   typename std::enable_if<std::is_integral<Integer>::value, const_reference>::type operator[](Integer sub) const
+   {
+      return get_at(static_cast<int>(sub));
    }
    //
    // Named sub-expressions:

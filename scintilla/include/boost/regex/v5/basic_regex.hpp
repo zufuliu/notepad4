@@ -488,7 +488,7 @@ public:
    }
    //
    // swap:
-   void  swap(basic_regex& that)throw()
+   void  swap(basic_regex& that)noexcept
    {
       m_pimpl.swap(that.m_pimpl);
    }
@@ -533,7 +533,21 @@ public:
          return status() - that.status();
       if(flags() != that.flags())
          return flags() - that.flags();
-      return str().compare(that.str());
+      
+      const char_type* i = m_pimpl->begin();
+      const char_type* j = that.m_pimpl->begin();
+      while ((i != m_pimpl->end()) && (j != that.m_pimpl->end()))
+      {
+         if (*i != *j)
+            return *i < *j ? -1 : 1;
+         ++i;
+         ++j;
+      }
+      if (i != m_pimpl->end())
+         return *i > static_cast<char_type>(0) ? 1 : -1;
+      if (j != that.m_pimpl->end())
+         return *j > static_cast<char_type>(0) ? -1 : 1;
+      return 0;
    }
    bool  operator==(const basic_regex& e)const
    { 

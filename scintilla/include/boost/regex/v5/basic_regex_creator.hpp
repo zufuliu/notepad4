@@ -248,7 +248,7 @@ private:
    void fixup_recursions(re_syntax_base* state);
    void create_startmaps(re_syntax_base* state);
    int calculate_backstep(re_syntax_base* state);
-   void create_startmap(re_syntax_base* state, unsigned char* l_map, unsigned int* pnull, unsigned char mask);
+   void create_startmap(re_syntax_base* state, unsigned char* l_map, unsigned int* pnull, unsigned char mask, unsigned recursion_count = 0);
    unsigned get_restart_type(re_syntax_base* state);
    void set_all_masks(unsigned char* bits, unsigned char);
    bool is_bad_repeat(re_syntax_base* pt);
@@ -1074,7 +1074,7 @@ struct recursion_saver
 };
 
 template <class charT, class traits>
-void basic_regex_creator<charT, traits>::create_startmap(re_syntax_base* state, unsigned char* l_map, unsigned int* pnull, unsigned char mask)
+void basic_regex_creator<charT, traits>::create_startmap(re_syntax_base* state, unsigned char* l_map, unsigned int* pnull, unsigned char mask, unsigned recursion_count)
 {
    recursion_saver saved_recursions(&m_recursion_checks);
    int not_last_jump = 1;
@@ -1084,6 +1084,28 @@ void basic_regex_creator<charT, traits>::create_startmap(re_syntax_base* state, 
 
    // track case sensitivity:
    bool l_icase = m_icase;
+
+   if (recursion_count > BOOST_REGEX_MAX_RECURSION_DEPTH)
+   {
+      // Oops error:
+      if (0 == this->m_pdata->m_status) // update the error code if not already set
+         this->m_pdata->m_status = boost::regex_constants::error_complexity;
+      //
+      // clear the expression, we should be empty:
+      //
+      this->m_pdata->m_expression = 0;
+      this->m_pdata->m_expression_len = 0;
+      //
+      // and throw if required:
+      //
+      if (0 == (this->flags() & regex_constants::no_except))
+      {
+         std::string message = "Expression complexity exceeded.";
+         boost::regex_error e(message, boost::regex_constants::error_complexity, 0);
+         e.raise();
+      }
+      return;
+   }
 
    while(state)
    {
@@ -1122,7 +1144,7 @@ void basic_regex_creator<charT, traits>::create_startmap(re_syntax_base* state, 
          }
          // now figure out if we can match a NULL string at this point:
          if(pnull)
-            create_startmap(state->next.p, 0, pnull, mask);
+            create_startmap(state->next.p, 0, pnull, mask, ++recursion_count);
          return;
       }
       case syntax_element_recurse:
@@ -1184,7 +1206,7 @@ void basic_regex_creator<charT, traits>::create_startmap(re_syntax_base* state, 
       case syntax_element_word_start:
       {
          // recurse, then AND with all the word characters:
-         create_startmap(state->next.p, l_map, pnull, mask);
+         create_startmap(state->next.p, l_map, pnull, mask, ++recursion_count);
          if(l_map)
          {
             l_map[0] |= mask_init;
@@ -1199,7 +1221,7 @@ void basic_regex_creator<charT, traits>::create_startmap(re_syntax_base* state, 
       case syntax_element_word_end:
       {
          // recurse, then AND with all the word characters:
-         create_startmap(state->next.p, l_map, pnull, mask);
+         create_startmap(state->next.p, l_map, pnull, mask, ++recursion_count);
          if(l_map)
          {
             l_map[0] |= mask_init;
@@ -1291,11 +1313,11 @@ void basic_regex_creator<charT, traits>::create_startmap(re_syntax_base* state, 
                   return;
                }
                set_bad_repeat(state);
-               create_startmap(state->next.p, l_map, pnull, mask);
+               create_startmap(state->next.p, l_map, pnull, mask, ++recursion_count);
                if((state->type == syntax_element_alt)
                   || (static_cast<re_repeat*>(state)->min == 0)
                   || (not_last_jump == 0))
-                  create_startmap(rep->alt.p, l_map, pnull, mask);
+                  create_startmap(rep->alt.p, l_map, pnull, mask, ++recursion_count);
             }
          }
          return;
@@ -1354,7 +1376,7 @@ void basic_regex_creator<charT, traits>::create_startmap(re_syntax_base* state, 
             if(ok && ((m_recursion_checks[static_cast<re_brace*>(state)->index] & 2u) == 0))
             {
                m_recursion_checks[static_cast<re_brace*>(state)->index] |= 2u;
-               create_startmap(p->next.p, l_map, pnull, mask);
+               create_startmap(p->next.p, l_map, pnull, mask, ++recursion_count);
             }
          }
          state = state->next.p;

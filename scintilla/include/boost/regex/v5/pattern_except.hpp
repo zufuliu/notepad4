@@ -52,7 +52,7 @@ public:
       , m_position(0)
    {
    }
-   ~regex_error() noexcept override {}
+   ~regex_error() noexcept override = default;
    regex_constants::error_type code()const
    { return m_error_code; }
    std::ptrdiff_t position()const
