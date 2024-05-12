@@ -993,9 +993,8 @@ enum {
 	SpaceOption_NewLineBefore = 8,
 	SpaceOption_NewLineAfter = 16,
 	SpaceOption_DanglingStmt = 32,
-	SpaceOption_KeepNewLine = 64,
-	SpaceOption_PushBrace = 128,
-	SpaceOption_PopBrace = 256,
+	SpaceOption_PushBrace = 64,
+	SpaceOption_PopBrace = 128,
 };
 
 int AddStyleSeparator(LPCEDITLEXER pLex, int ch, int chPrev, int style) noexcept {
@@ -1036,8 +1035,10 @@ std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLen
 	unsigned fmtlen = 0;
 	uint32_t blockLevel = 0;
 	uint32_t indentPrev = 0;
-	int chPrev = 0;
-	int chPrevNonWhite = 0;
+	uint8_t chPrev = 0;
+	uint8_t chPrevNonWhite = 0;
+	bool commentEndEOL = false;
+	bool defaultCase = false;
 
 	unsigned eol = '\r' | ('\n' << 8);
 	unsigned eolWidth = SciCall_GetEOLMode();
@@ -1051,14 +1052,9 @@ std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLen
 
 	uint8_t braceTop = '\0';
 	uint8_t stylePrev = styledText[0];
-	int styleBefore = stylePrev;
+	uint8_t styleBefore = stylePrev;
 	const char * const textBuffer = styledText + textLength + 1;
 	for (size_t offset = 0; offset < textLength; offset++) {
-		const uint8_t style = styledText[offset];
-		if (style == 0) {
-			styleBefore = 0;
-			continue;
-		}
 		if (fmtlen >= maxFmtLen) {
 			// keep last character and eol in the buffer
 			output += std::string_view{fmtbuf, fmtlen - 4};
@@ -1066,23 +1062,40 @@ std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLen
 			fmtlen = 4;
 		}
 
+		const uint8_t style = styledText[offset];
+		if (style == 0) {
+			styleBefore = 0;
+			continue;
+		}
+
 		int spaceOption = SpaceOption_None;
 		unsigned operatorLen = 0;
 		const uint8_t ch = textBuffer[offset];
 		if (style <= pLex->commentStyleMarker) {
-			// keep new line after block comment
-			if (styledText[offset + 1] == 0 && (textBuffer[offset + 1] == '\n' || textBuffer[offset + 1] == '\r')) {
-				spaceOption = SpaceOption_KeepNewLine;
+			if (ch == '/' && (chPrev == '\n' || styleBefore == 0 || styleBefore > pLex->commentStyleMarker) && textBuffer[offset + 1] == '/') {
+				commentEndEOL = true; // fix indentation after comment line
+			} else if (styledText[offset + 1] == 0 && (textBuffer[offset + 1] == '\n' || textBuffer[offset + 1] == '\r')) {
+				commentEndEOL = true; // keep new line after block comment
+				spaceOption = SpaceOption_NewLineAfter;
 			}
 		} else if (style != styleBefore) {
 			spaceOption = AddStyleSeparator(pLex, ch, chPrev, style);
+			if (style == SCE_JS_WORD && pLex->iLexer == SCLEX_JAVASCRIPT && (ch == 'c' || ch == 'd')) {
+				if ((textBuffer[offset + 1] == 'a' || textBuffer[offset + 1] == 'e')
+					&& (textBuffer[offset + 2] == 's' || textBuffer[offset + 2] == 'f')) {
+					defaultCase = true;
+					spaceOption |= SpaceOption_NewLineBefore;
+				}
+			}
 			if (chPrev == ')') {
-				if (stylePrev == pLex->operatorStyle || stylePrev == pLex->operatorStyle2) {
-					if (pLex->iLexer != SCLEX_CSS) {
+				if (pLex->iLexer != SCLEX_JSON && (stylePrev == pLex->operatorStyle || stylePrev == pLex->operatorStyle2)) {
+					if (pLex->iLexer == SCLEX_CSS) {
+						if ((ch == '+' || ch == '-') || (ch != ':' && style != SCE_CSS_OPERATOR)) { // :not([class]):hover
+							spaceOption |= SpaceOption_SpaceBefore; // CSS property: function() value
+						}
+					} else if (style != SCE_JS_OPERATOR && style != SCE_JS_OPERATOR2) {
 						spaceOption |= SpaceOption_NewLineBefore | SpaceOption_DanglingStmt;
 						indentPrev++; // if (), for (), while () statement
-					} else if (ch != ':') { // :not([class]):hover
-						spaceOption |= SpaceOption_SpaceBefore; // property: function() value
 					}
 				}
 			} else if ((stylePrev == SCE_CSS_AT_RULE && pLex->iLexer == SCLEX_CSS)
@@ -1095,9 +1108,13 @@ std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLen
 		if (style == pLex->operatorStyle || style == pLex->operatorStyle2) {
 			if (ch == ':') {
 				spaceOption |= SpaceOption_SpaceAfter; // property: value
-				if (pLex->iLexer == SCLEX_JAVASCRIPT
-					&& (stylePrev != SCE_JS_KEY && stylePrev != SCE_JS_LABEL && (stylePrev != SCE_JS_WORD || chPrev != 't'))) {
-					spaceOption |= SpaceOption_SpaceBefore; // ternary operator, not set: / get:
+				if (pLex->iLexer == SCLEX_JAVASCRIPT) {
+					if (defaultCase && braceTop == '{') {
+						defaultCase = false;
+						spaceOption |= SpaceOption_NewLineAfter;
+					} else if (stylePrev != SCE_JS_KEY && stylePrev != SCE_JS_LABEL && (stylePrev != SCE_JS_WORD || chPrev != 't')) {
+						spaceOption |= SpaceOption_SpaceBefore; // ternary operator, not set: / get:
+					}
 				}
 			} else if (ch == ',') {
 				if (pLex->iLexer == SCLEX_JSON || braceTop == braceObject || braceTop == bracketArray) {
@@ -1150,15 +1167,18 @@ std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLen
 					const uint8_t chNext = textBuffer[offset + 1];
 					if (style == SCE_CSS_OPERATOR2
 						|| ch == '>' // child combinator
-						|| (ch == '&' && chNext != ':') // nesting selector
+						|| (ch == '&' && chNext != ':' && chNext != '.' && chNext != ')') // nesting selector, &:hover, &.class, :not(&)
 						|| (ch == '~' && chNext != '=') // subsequent-sibling combinator
 						|| (ch == '|' && chNext == '|') // column combinator
 						// next-sibling combinator
 						|| (ch == '+' && styledText[offset + 1] != SCE_CSS_NUMBER && styledText[offset + 1] != SCE_CSS_DIMENSION)
 						) {
-						spaceOption |= SpaceOption_SpaceBefore | SpaceOption_SpaceAfter;
+						spaceOption |= SpaceOption_SpaceAfter;
 						if (ch == '|') {
 							operatorLen = 2;
+						}
+						if (chPrev != '(') { // :has(> img)
+							spaceOption |= SpaceOption_SpaceBefore;
 						}
 					} else if (ch == '!') {
 						spaceOption |= SpaceOption_SpaceBefore; // !important
@@ -1198,13 +1218,13 @@ std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLen
 									operatorLen = 4;
 								}
 							}
-						} else if ((ch == '+' || ch == '-') && styledText[offset + 1] == SCE_JS_NUMBER) {
+						} else if (ch == '+' || ch == '-') {
 							// detect unary / binary operator, similar to FollowExpression()
 							if (stylePrev == SCE_JS_WORD) {
 								spaceOption |= SpaceOption_SpaceBefore;
 							} else if (chPrevNonWhite == ')' || chPrevNonWhite == ']'
 								|| (stylePrev >= SCE_JS_NUMBER && stylePrev <= SCE_JS_OPERATOR_PF)
-								|| (stylePrev >= SCE_JS_IDENTIFIER &&stylePrev <= SCE_JS_CONSTANT)) {
+								|| (stylePrev >= SCE_JS_IDENTIFIER && stylePrev <= SCE_JS_CONSTANT)) {
 								spaceOption |= SpaceOption_SpaceBefore | SpaceOption_SpaceAfter;
 							}
 						} else if (ch == '*' && stylePrev == SCE_JS_WORD) {
@@ -1229,7 +1249,7 @@ std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLen
 				chPrev = '\0';
 				fmtlen -= eolWidth;
 				if ((spaceOption & SpaceOption_NewLineBefore) == 0) {
-					chPrev = static_cast<uint8_t>(fmtbuf[fmtlen - 1]);
+					chPrev = fmtbuf[fmtlen - 1];
 				}
 			}
 			if (spaceOption & SpaceOption_PushBrace) {
@@ -1275,20 +1295,22 @@ std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLen
 				memcpy(&fmtbuf[fmtlen], textBuffer + offset, operatorLen);
 				fmtlen += operatorLen;
 				offset += operatorLen - 1;
-				chPrevNonWhite = chPrev = static_cast<uint8_t>(fmtbuf[fmtlen - 1]);
+				chPrevNonWhite = chPrev = fmtbuf[fmtlen - 1];
 			} else {
 				chPrev = ch;
 				fmtbuf[fmtlen++] = static_cast<char>(ch);
 			}
 		}
-		if (spaceOption & (SpaceOption_NewLineAfter | SpaceOption_KeepNewLine)) {
+		if (spaceOption & SpaceOption_NewLineAfter) {
 			blockLevel += spaceOption & SpaceOption_IndentAfter;
 			chPrev = '\n';
 			// don't add indentation inside comment and string
-			if (((spaceOption & SpaceOption_KeepNewLine) == 0 && style <= pLex->commentStyleMarker)
+			if ((!commentEndEOL && style <= pLex->commentStyleMarker)
 				|| (style >= pLex->stringStyleFirst && style <= pLex->stringStyleLast)) {
 				chPrev = '\r';
 			}
+			commentEndEOL = false;
+			defaultCase = false;
 			memcpy(&fmtbuf[fmtlen], &eol, 2);
 			fmtlen += eolWidth;
 		} else if (spaceOption & SpaceOption_SpaceAfter) {
