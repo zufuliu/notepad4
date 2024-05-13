@@ -744,7 +744,7 @@ void GetRTFNextControl(const char **style, char *control) noexcept {
 	}
 	const size_t len = pos - *style;
 	memcpy(control, *style, len);
-	*(control + len) = '\0';
+	control[len] = '\0';
 	*style = pos;
 }
 
@@ -1341,7 +1341,7 @@ extern "C" void EditFormatCode(int menu) {
 
 	try {
 		SciCall_EnsureStyledTo(endPos);
-		const std::unique_ptr<char[]> styledText = make_unique_for_overwrite<char[]>(2*(endPos - startPos) + 1);
+		const std::unique_ptr<char[]> styledText = make_unique_for_overwrite<char[]>(2*(endPos - startPos) + 2);
 		const Sci_TextRangeFull tr { { startPos, endPos }, styledText.get() };
 		const size_t textLength = SciCall_GetStyledTextFull(&tr);
 
