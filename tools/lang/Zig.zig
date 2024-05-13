@@ -1,18 +1,18 @@
-// 0.11 https://ziglang.org/
+// 0.12 https://ziglang.org/
 // https://ziglang.org/documentation/master/
 
 //! keywords			=======================================================
 // https://ziglang.org/documentation/master/#Keyword-Reference
 addrspace align allowzero and anyframe anytype asm async await
 break
-catch comptime const continue
+callconv catch comptime const continue
 defer
 else enum errdefer error export extern
 fn for
 if inline
 linksection
 noalias noinline nosuspend
-or orelse
+opaque or orelse
 packed pub
 resume return
 struct suspend switch
@@ -42,7 +42,7 @@ anyerror
 
 //! api					=======================================================
 // https://ziglang.org/documentation/master/std/
-// https://ziglang.org/documentation/master/std/#A;std:debug
+// https://ziglang.org/documentation/master/std/#std.debug
 std.debug {
 	fn assert(ok: bool) void
 	fn print(comptime fmt: []const u8, args: anytype) void

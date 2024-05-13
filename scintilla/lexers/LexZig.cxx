@@ -54,7 +54,7 @@ struct EscapeSequence {
 	}
 };
 
-// https://ziglang.org/documentation/master/std/#A;std:fmt.format
+// https://ziglang.org/documentation/master/std/#std.fmt.format
 enum class FormatArgument {
 	None,
 	Digit,

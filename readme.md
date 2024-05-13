@@ -149,7 +149,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* SGML and DTD
 		* Apple Property List
 	* [YAML Document](https://yaml.org/)
-	* [Zig](tools/lang/Zig.zig), up to Zig 0.11.
+	* [Zig](tools/lang/Zig.zig), up to Zig 0.12.
 	* Many Others
 * Toggle fold for specific level, shortcuts: <kbd>Alt</kbd>+<kbd>Number</kbd>
 * Toggle fold for current block without scrolling back to the block start line, shortcut: <kbd>Alt</kbd>+<kbd>C</kbd>, or context menu "Toggle Fold"
