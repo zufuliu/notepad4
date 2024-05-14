@@ -4887,9 +4887,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		if (!GetWindowTextLength(hwndFind)) {
 			SetDlgItemTextA2W(CP_UTF8, hwnd, IDC_FINDTEXT, lpefr->szFindUTF8);
 		}
-		if (lpefr->bTransformBS) {
-			CheckDlgButton(hwnd, IDC_FINDTRANSFORMBS, BST_CHECKED);
-		}
+		CheckDlgButton(hwnd, IDC_FINDTRANSFORMBS, lpefr->bTransformBS ? BST_CHECKED : BST_UNCHECKED);
 		// focus on replace box when selected text is not empty.
 		PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)((hasFindText && hwndRepl)? hwndRepl : hwndFind), TRUE);
 	}
