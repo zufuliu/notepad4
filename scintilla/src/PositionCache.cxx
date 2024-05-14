@@ -57,6 +57,7 @@
 #include "Selection.h"
 #include "PositionCache.h"
 #include "EditModel.h"
+//#include "ElapsedPeriod.h"
 
 using namespace Scintilla;
 using namespace Scintilla::Internal;
@@ -944,9 +945,12 @@ void SpecialRepresentations::Clear() noexcept {
 void SpecialRepresentations::SetDefaultRepresentations(int dbcsCodePage) {
 	Clear();
 
+	//const ElapsedPeriod period;
 	// C0 control set
-	for (size_t j = 0; j < std::size(repsC0) - 1; j++) {
-		const char c[2] = { static_cast<char>(j), '\0' };
+	for (unsigned j = 0; j < std::size(repsC0) - 1; j++) {
+		//const char c[2] = { static_cast<char>(j), '\0' };
+		char c[4];
+		memcpy(c, &j, 4);
 		const char *rep = repsC0[j];
 		SetRepresentation(std::string_view(c, 1), std::string_view(rep, (rep[2] == '\0') ? 2 : 3));
 	}
@@ -971,8 +975,11 @@ void SpecialRepresentations::SetDefaultRepresentations(int dbcsCodePage) {
 			"DCS", "PU1", "PU2", "STS", "CCH", "MW", "SPA", "EPA",
 			"SOS", "SGCI", "SCI", "CSI", "ST", "OSC", "PM", "APC"
 		};
-		for (size_t j = 0; j < std::size(repsC1); j++) {
-			const char c1[3] = { '\xc2', static_cast<char>(0x80 + j), '\0' };
+		for (unsigned j = 0; j < std::size(repsC1); j++) {
+			//const char c1[3] = { '\xc2', static_cast<char>(0x80 + j), '\0' };
+			char c1[4];
+			const unsigned key = 0x80c2 + (j << 8);
+			memcpy(c1, &key, 4);
 			const char *rep = repsC1[j];
 			const size_t len = (rep[2] == '\0') ? 2 : ((rep[3] == '\0') ? 3 : 4);
 			SetRepresentation(std::string_view(c1, 2), std::string_view(rep, len));
@@ -982,14 +989,18 @@ void SpecialRepresentations::SetDefaultRepresentations(int dbcsCodePage) {
 	}
 	if (dbcsCodePage) {
 		// UTF-8 invalid bytes or DBCS invalid single bytes.
-		for (int k = 0x80; k < 0x100; k++) {
+		for (unsigned k = 0x80; k < 0x100; k++) {
 			if (!IsDBCSValidSingleByte(dbcsCodePage, k)) {
-				const char hiByte[2] = { static_cast<char>(k), '\0' };
+				//const char hiByte[2] = { static_cast<char>(k), '\0' };
+				char hiByte[4];
+				memcpy(hiByte, &k, 4);
 				const char hexits[4] = { 'x', "0123456789ABCDEF"[k >> 4], "0123456789ABCDEF"[k & 15], '\0' };
 				SetRepresentation(std::string_view(hiByte, 1), std::string_view(hexits, 3));
 			}
 		}
 	}
+	//const double duration = period.Duration()*1e3;
+	//printf("%s %d duration=%.6f\n", __func__, SetRepresentationImpl, duration);
 }
 
 void BreakFinder::Insert(Sci::Position val) {
