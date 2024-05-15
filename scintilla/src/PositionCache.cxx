@@ -823,7 +823,7 @@ LineLayout *LineLayoutCache::Retrieve(Sci::Line lineNumber, Sci::Line lineCaret,
 namespace {
 
 // Simply pack the (maximum 4) character bytes into an int
-#if 0 //! use the loop code to pass AddressSanitizer
+#if 1 //! use the loop code to pass AddressSanitizer
 constexpr unsigned int KeyFromString(std::string_view charBytes) noexcept {
 	PLATFORM_ASSERT(charBytes.length() <= 4);
 	unsigned int k = 0;
@@ -835,12 +835,9 @@ constexpr unsigned int KeyFromString(std::string_view charBytes) noexcept {
 
 #else
 inline unsigned int KeyFromString(std::string_view charBytes) noexcept {
-	unsigned int k = 0;
-	if (!charBytes.empty()) {
-		k = loadbe_u32(charBytes.data());
-		if (const size_t diff = 4 - charBytes.length()) {
-			k >>= diff*8;
-		}
+	unsigned int k = loadbe_u32(charBytes.data());
+	if (const size_t diff = 4 - charBytes.length()) {
+		k >>= diff*8;
 	}
 	return k;
 }
@@ -856,7 +853,7 @@ void SpecialRepresentations::SetRepresentation(std::string_view charBytes, std::
 		const bool inserted = mapReprs.insert_or_assign(key, Representation(value)).second;
 		if (inserted) {
 			// New entry so increment for first byte
-			const unsigned char ucStart = charBytes.empty() ? 0 : charBytes[0];
+			const unsigned char ucStart = charBytes[0];
 			startByteHasReprs[ucStart]++;
 			if (key > maxKey) {
 				maxKey = key;
@@ -899,7 +896,7 @@ void SpecialRepresentations::ClearRepresentation(std::string_view charBytes) {
 		const auto it = mapReprs.find(key);
 		if (it != mapReprs.end()) {
 			mapReprs.erase(it);
-			const unsigned char ucStart = charBytes.empty() ? 0 : charBytes[0];
+			const unsigned char ucStart = charBytes[0];
 			startByteHasReprs[ucStart]--;
 			if (key == maxKey && startByteHasReprs[ucStart] == 0) {
 				maxKey = mapReprs.empty() ? 0 : mapReprs.crbegin()->first;
@@ -925,7 +922,7 @@ const Representation *SpecialRepresentations::GetRepresentation(std::string_view
 
 const Representation *SpecialRepresentations::RepresentationFromCharacter(std::string_view charBytes) const {
 	if (charBytes.length() <= 4) {
-		const unsigned char ucStart = charBytes.empty() ? 0 : charBytes[0];
+		const unsigned char ucStart = charBytes[0];
 		if (!startByteHasReprs[ucStart]) {
 			return nullptr;
 		}
@@ -1000,7 +997,7 @@ void SpecialRepresentations::SetDefaultRepresentations(int dbcsCodePage) {
 		}
 	}
 	//const double duration = period.Duration()*1e3;
-	//printf("%s %d duration=%.6f\n", __func__, SetRepresentationImpl, duration);
+	//printf("%s duration=%.6f\n", __func__, duration);
 }
 
 void BreakFinder::Insert(Sci::Position val) {
