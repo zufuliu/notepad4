@@ -118,7 +118,7 @@ void ColouriseWinHexDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 			if (fold) {
 				levelNext = sci::max(levelNext, SC_FOLDLEVELBASE);
 				const int levelUse = levelCurrent;
-				int lev = levelUse | levelNext << 16;
+				int lev = levelUse | (levelNext << 16);
 				if (levelUse < levelNext) {
 					lev |= SC_FOLDLEVELHEADERFLAG;
 				}

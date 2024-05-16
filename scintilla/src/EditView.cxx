@@ -2972,10 +2972,10 @@ Sci::Position EditView::FormatRange(bool draw, CharacterRangeFull chrg, Scintill
 
 	// Turn off change history marker backgrounds
 	constexpr unsigned int changeMarkers =
-		1u << static_cast<unsigned int>(MarkerOutline::HistoryRevertedToOrigin) |
-		1u << static_cast<unsigned int>(MarkerOutline::HistorySaved) |
-		1u << static_cast<unsigned int>(MarkerOutline::HistoryModified) |
-		1u << static_cast<unsigned int>(MarkerOutline::HistoryRevertedToModified);
+		(1u << static_cast<unsigned int>(MarkerOutline::HistoryRevertedToOrigin)) |
+		(1u << static_cast<unsigned int>(MarkerOutline::HistorySaved)) |
+		(1u << static_cast<unsigned int>(MarkerOutline::HistoryModified)) |
+		(1u << static_cast<unsigned int>(MarkerOutline::HistoryRevertedToModified));
 	vsPrint.maskInLine &= ~changeMarkers;
 
 	const Sci::Line linePrintStart = model.pdoc->SciLineFromPosition(chrg.cpMin);
