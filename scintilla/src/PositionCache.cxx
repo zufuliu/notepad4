@@ -1023,7 +1023,7 @@ BreakFinder::BreakFinder(const LineLayout *ll_, const Selection *psel, Range lin
 	saeNext(0),
 	pdoc(model.pdoc),
 	encodingFamily(pdoc->CodePageFamily()),
-	reprs(model.reprs) {
+	reprs(model.reprs.get()) {
 
 	// Search for first visible break
 	// First find the first visible character
@@ -1123,12 +1123,12 @@ TextSegment BreakFinder::Next() {
 			//	}
  			//}
 			repr = nullptr;
-			if (reprs.MayContains(ch)) {
+			if (reprs->MayContains(ch)) {
 				// Special case \r\n line ends if there is a representation
-				if (ch == '\r' && reprs.ContainsCrLf() && chars[1] == '\n') {
+				if (ch == '\r' && reprs->ContainsCrLf() && chars[1] == '\n') {
 					charWidth = 2;
 				}
-				repr = reprs.GetRepresentation(std::string_view(chars, charWidth));
+				repr = reprs->GetRepresentation(std::string_view(chars, charWidth));
 			}
 			if (((nextBreak > 0) && (ll->styles[nextBreak] != ll->styles[nextBreak - 1])) ||
 				repr ||

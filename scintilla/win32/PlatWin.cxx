@@ -1500,7 +1500,7 @@ public:
 	int PixelDivisions() const noexcept override;
 	int DeviceHeightFont(int points) const noexcept override;
 	void SCICALL LineDraw(Point start, Point end, Stroke stroke) override;
-	static ID2D1PathGeometry *Geometry(const Point *pts, size_t npts, D2D1_FIGURE_BEGIN figureBegin) noexcept;
+	static ID2D1PathGeometry *GeometricFigure(const Point *pts, size_t npts, D2D1_FIGURE_BEGIN figureBegin) noexcept;
 	void SCICALL PolyLine(const Point *pts, size_t npts, Stroke stroke) override;
 	void SCICALL Polygon(const Point *pts, size_t npts, FillStroke fillStroke) override;
 	void SCICALL RectangleDraw(PRectangle rc, FillStroke fillStroke) override;
@@ -1696,7 +1696,7 @@ void SurfaceD2D::LineDraw(Point start, Point end, Stroke stroke) {
 	ReleaseUnknown(pStrokeStyle);
 }
 
-ID2D1PathGeometry *SurfaceD2D::Geometry(const Point *pts, size_t npts, D2D1_FIGURE_BEGIN figureBegin) noexcept {
+ID2D1PathGeometry *SurfaceD2D::GeometricFigure(const Point *pts, size_t npts, D2D1_FIGURE_BEGIN figureBegin) noexcept {
 	ID2D1PathGeometry *geometry = nullptr;
 	HRESULT hr = pD2DFactory->CreatePathGeometry(&geometry);
 	if (SUCCEEDED(hr) && geometry) {
@@ -1722,7 +1722,7 @@ void SurfaceD2D::PolyLine(const Point *pts, size_t npts, Stroke stroke) {
 		return;
 	}
 
-	ID2D1PathGeometry *geometry = Geometry(pts, npts, D2D1_FIGURE_BEGIN_HOLLOW);
+	ID2D1PathGeometry *geometry = GeometricFigure(pts, npts, D2D1_FIGURE_BEGIN_HOLLOW);
 	PLATFORM_ASSERT(geometry);
 	if (!geometry) {
 		return;
@@ -1752,7 +1752,7 @@ void SurfaceD2D::PolyLine(const Point *pts, size_t npts, Stroke stroke) {
 void SurfaceD2D::Polygon(const Point *pts, size_t npts, FillStroke fillStroke) {
 	PLATFORM_ASSERT(pRenderTarget && (npts > 2));
 	if (pRenderTarget) {
-		ID2D1PathGeometry *geometry = Geometry(pts, npts, D2D1_FIGURE_BEGIN_FILLED);
+		ID2D1PathGeometry *geometry = GeometricFigure(pts, npts, D2D1_FIGURE_BEGIN_FILLED);
 		PLATFORM_ASSERT(geometry);
 		if (geometry) {
 			D2DPenColourAlpha(fillStroke.fill.colour);
