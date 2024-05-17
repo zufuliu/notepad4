@@ -35,6 +35,9 @@ struct EscapeSequence {
 		if (chNext == 'x') {
 			digitsLeft = 3;
 			hex = true;
+		} else if (chNext == 'u') {
+			digitsLeft = 9;
+			hex = true;
 		} else if (IsOctalDigit(chNext)) {
 			digitsLeft = 3;
 			hex = false;
