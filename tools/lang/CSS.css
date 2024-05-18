@@ -1,5 +1,5 @@
 // 2023 https://www.w3.org/TR/CSS/ 7 December 2023
-// 2024-03-16 https://drafts.csswg.org/
+// 2024-05-18 https://drafts.csswg.org/
 // https://github.com/w3c/csswg-drafts/
 // https://www.w3.org/Style/CSS/all-properties
 // https://www.w3.org/Style/CSS/all-descriptors
@@ -14,8 +14,9 @@
 {
 	anchor-name: none;
 	anchor-scope: none | all;
-	position-anchor: implicit;
+	position-anchor: auto;
 	inset-area: none;
+	position-visibility: always | anchors-valid | anchors-visible | no-overflow;
 
 	position-try-options: none | inset-area();
 	position-try-order: normal | most-width | most-height | most-block-size | most-inline-size;
@@ -480,7 +481,7 @@ step-start step-end steps()
 	bookmark-state: open | closed;
 }
 
-// CSS Generated Content for Paged Media Module https://www.w3.org/TR/css-gcpm-3/ 22 January 2024
+// CSS Generated Content for Paged Media Module https://www.w3.org/TR/css-gcpm-3/ 25 January 2024
 ::footnote-call
 ::footnote-marker
 {
@@ -761,16 +762,18 @@ all continuous paged visual audio speech tactile grid bitmap interactive static
 	offset: auto | reverse;
 }
 
-// CSS Multi-column Layout Module Level 1 https://www.w3.org/TR/css-multicol-1/ 12 October 2021
+// CSS Multi-column Layout Module Level 1 https://www.w3.org/TR/css-multicol-1/ 16 May 2024
 {
 	column-width: auto;
 	column-count: auto;
 	columns:;
+
 	column-gap:;
 	column-rule-color: currentColor;
 	column-rule-style:;
 	column-rule-width:;
 	column-rule:;
+
 	column-span: none | all;
 	column-fill: auto | balance | balance-all;
 }
@@ -1306,10 +1309,15 @@ pi infinity NaN
 	zoom:;
 }
 
+// CSS View Transitions Module Level 2 https://www.w3.org/TR/css-view-transitions-2/ 16 May 2024
 // CSS View Transitions Module Level 1 https://www.w3.org/TR/css-view-transitions-1/ 5 September 2023
 {
+	view-transition-class: none;
 	view-transition-name: none;
 }
+@view-transition {}
+:active-view-transition
+:active-view-transition-type()
 ::view-transition
 ::view-transition-group()
 ::view-transition-image-pair()
