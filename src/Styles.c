@@ -1228,12 +1228,12 @@ static inline void Style_SetDefaultStyle(int index) {
 	Style_SetStyles(pLexGlobal->Styles[index].iStyle, pLexGlobal->Styles[index].szValue);
 }
 
-static void Style_SetAllStyle(PEDITLEXER pLex, int offset) {
+static void Style_SetAllStyle(PEDITLEXER pLex, UINT offset) {
 	if (!IsStyleLoaded(pLex)) {
 		Style_LoadOne(pLex);
 	}
 
-	const int high = offset << 8;
+	const UINT high = offset << 8;
 	const UINT iStyleCount = pLex->iStyleCount;
 	// first style is the default style.
 	for (UINT i = 1; i < iStyleCount; i++) {
@@ -3515,7 +3515,7 @@ bool Style_SelectColor(HWND hwnd, LPWSTR lpszStyle, int cchStyle, bool bFore) {
 		if (StrNotEmpty(szNewStyle)) {
 			lstrcat(szNewStyle, L"; ");
 		}
-		wsprintf(tch, L"fore:#%06X", iRGBResult);
+		wsprintf(tch, L"fore:#%06X", (unsigned)iRGBResult);
 		lstrcat(szNewStyle, tch);
 		Style_StrCopyBack(szNewStyle, lpszStyle, tch);
 	} else {
@@ -3523,7 +3523,7 @@ bool Style_SelectColor(HWND hwnd, LPWSTR lpszStyle, int cchStyle, bool bFore) {
 		if (StrNotEmpty(szNewStyle)) {
 			lstrcat(szNewStyle, L"; ");
 		}
-		wsprintf(tch, L"back:#%06X", iRGBResult);
+		wsprintf(tch, L"back:#%06X", (unsigned)iRGBResult);
 		lstrcat(szNewStyle, tch);
 	}
 
@@ -5015,7 +5015,7 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 		if (fDragging) {
 			HTREEITEM htiTarget = TreeView_GetDropHilight(hwndTV);
 			TreeView_SelectDropTarget(hwndTV, NULL);
-			TreeView_SetInsertMark(hwndTV, NULL, TRUE);
+			TreeView_SetInsertMark(hwndTV, 0, TRUE);
 
 			if (hDraggingNode != NULL && htiTarget != NULL && hDraggingNode != htiTarget) {
 				Lexer_OnDragDrop(hwndTV, hFavoriteNode, hDraggingNode, htiTarget);
@@ -5030,7 +5030,7 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 	case WM_CANCELMODE:
 		if (fDragging) {
 			TreeView_SelectDropTarget(hwndTV, NULL);
-			TreeView_SetInsertMark(hwndTV, NULL, TRUE);
+			TreeView_SetInsertMark(hwndTV, 0, TRUE);
 			ReleaseCapture();
 			DestroyCursor(SetCursor(LoadCursor(NULL, IDC_ARROW)));
 			fDragging = false;

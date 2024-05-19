@@ -2,7 +2,7 @@
 // See License.txt for details about distribution and modification.
 #pragma once
 
-#if defined(__cplusplus)
+#if defined(__cplusplus) || (defined(__STDC_VERSION__) && __STDC_VERSION__ > 201710L)
 #undef NULL
 #define NULL	nullptr
 #else

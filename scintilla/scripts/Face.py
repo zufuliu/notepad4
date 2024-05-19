@@ -68,9 +68,11 @@ class Face:
 	def ReadFromFile(self, name):
 		currentCategory = ""
 		currentComment = []
-		currentCommentFinished = 0
+		currentCommentFinished = False
 		maxInt = (1 << 31) - 1
 		lineno = 0
+		autoValue = 0
+		valueMap = None
 		with open(name, encoding='utf-8') as fd:
 			lines = fd.readlines()
 		for line in lines:
@@ -80,11 +82,11 @@ class Face:
 				if line[0] == "#":
 					if line[1] == " ":
 						if currentCommentFinished:
+							currentCommentFinished = False
 							currentComment = []
-							currentCommentFinished = 0
 						currentComment.append(line[2:])
 				else:
-					currentCommentFinished = 1
+					currentCommentFinished = True
 					featureType, featureVal = line.split(" ", 1)
 					if featureType in ("fun", "get", "set"):
 						try:
@@ -103,7 +105,7 @@ class Face:
 							"Category": currentCategory, "Comment": currentComment
 						}
 						if currentCategory != 'Deprecated' and value in self.values:
-							raise Exception(f"Duplicate value {value} {name} on line: {lineno}")
+							raise ValueError(f"Duplicate value {value} {name} on line: {lineno}")
 						self.values[value] = 1
 						self.order.append(name)
 						currentComment = []
@@ -116,7 +118,7 @@ class Face:
 							"Category": currentCategory, "Comment": currentComment
 						}
 						if value in self.events:
-							raise Exception(f"Duplicate event {value} {name} on line: {lineno}")
+							raise ValueError(f"Duplicate event {value} {name} on line: {lineno}")
 						self.events[value] = 1
 						self.order.append(name)
 					elif featureType == "cat":
@@ -124,15 +126,26 @@ class Face:
 					elif featureType == "val":
 						try:
 							name, value = featureVal.split("=", 1)
+							val = 0
 							if value:
-								if value[0] == '-':
+								val = int(value, 0)
+								if val < 0:
 									# add parenthesis for negative value
-									value = '(' + value + ')'
-								elif int(value, 0) > maxInt:
+									value = f'({value})'
+								elif val > maxInt:
 									# unsigned value
 									value = value + 'U'
 							else:
 								value = 'auto'
+							if name.startswith('SC_'):
+								if value == 'auto':
+									val = autoValue
+									value = str(val)
+								if valueMap is not None:
+									if val in valueMap:
+										raise ValueError(f"Duplicate Value: {name} = {val}, {valueMap[val]} on line: {lineno}")
+									autoValue = val + 1
+									valueMap[val] = name
 						except ValueError:
 							print(f"Failure line {lineno}: {featureVal}")
 							raise
@@ -142,6 +155,8 @@ class Face:
 							"Value": value }
 						self.order.append(name)
 					elif featureType in ("enu", "lex"):
+						autoValue = 0
+						valueMap = {}
 						name, value = featureVal.split("=", 1)
 						self.features[name] = {
 							"FeatureType": featureType,

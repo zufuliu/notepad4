@@ -34,11 +34,11 @@ enum class DrawPhase {
 };
 
 enum class LayoutLineOption {
-	AutoUpdate,
-	ManualUpdate,
-	IdleUpdate,
-	KeepPosition,
-	Printing,
+	AutoUpdate = 0,
+	ManualUpdate = 1,
+	IdleUpdate = 2,
+	KeepPosition = 3,
+	Printing = 4,
 	CallerMultiThreaded = 8,
 	DisablePartialLayout = 16,
 };

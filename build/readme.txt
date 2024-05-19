@@ -10,15 +10,33 @@ echo | clang -dM -E -xc++ -
 echo | clang-cl -Xclang -dM -E -Xclang -xc++ -
 echo | gcc -dM -E -xc++ -
 
+lexlib, src
+cl /utf-8 /W4 /c /EHsc /std:c++20 /Ox /GS- /GR- /Gv /FAcs /DNDEBUG /DUNICODE /DNOMINMAX /I../include
+lexers
+cl /utf-8 /W4 /c /EHsc /std:c++20 /Ox /GS- /GR- /Gv /FAcs /DNDEBUG /DUNICODE /DNOMINMAX /I../include /I../lexlib
+lexilla
+cl /utf-8 /W4 /c /EHsc /std:c++20 /Ox /GS- /GR- /Gv /FAcs /DNDEBUG /DUNICODE /DNOMINMAX /I../include /I../lexlib /I../../scintilla/include
+win32
+cl /utf-8 /W4 /c /EHsc /std:c++20 /Ox /GS- /GR- /Gv /FAcs /DNDEBUG /DUNICODE /DNOMINMAX /I../include /I../src
+src
+cl /utf-8 /W4 /wd4996 /c /Ox /GS- /GR- /Gv /FAcs /DNDEBUG /DUNICODE /DNOMINMAX /I../scintilla/include
+cl /utf-8 /W4 /wd4996 /c /EHsc /std:c++20 /Ox /GS- /GR- /Gv /FAcs /DNDEBUG /DUNICODE /DNOMINMAX /I../scintilla/include Bridge.cpp
+
+https://clang.llvm.org/docs/AddressSanitizer.html
 https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html
-https://devblogs.microsoft.com/cppblog/addresssanitizer-asan-for-windows-with-msvc/
+https://github.com/google/sanitizers/wiki/AddressSanitizer
+https://learn.microsoft.com/en-us/cpp/sanitizers/asan
 	1. add <LLVM Dir>\lib\clang\<version>\lib\windows to Linker -> General -> Additional Library Directories
 	2. add -fsanitize=address,undefined,integer to LLVM -> Additional Compiler Options or C/C++ -> Command Line
-	3. Linker -> Input -> Additional Dependencies for -fsanitize=address:
+	3. change C/C++ -> Code Generation -> Runtime Library to Multi-threaded DLL (/MD)
+	4. add _DISABLE_STL_ANNOTATION to C/C++ -> Preprocessor -> Preprocessor Definitions to fix missing stl_asan.lib
+	5. change C/C++ -> Optimization -> Omit Frame Pointers to No (/Oy-)
+	6. Linker -> Input -> Additional Dependencies for -fsanitize=address:
 		clang_rt.asan_dynamic-x86_64.lib
 		clang_rt.asan_dynamic_runtime_thunk-x86_64.lib
 		copy clang_rt.asan_dynamic-x86_64.dll to exe folder
 
+https://github.com/google/sanitizers/wiki/AddressSanitizerFlags#run-time-flags
 SetEnvironmentVariable(UBSAN_OPTIONS, L"log_path=" WC_NOTEPAD2 L"-UBSan.log");
 SetEnvironmentVariable(UBSAN_OPTIONS, L"log_path=" WC_METAPATH L"-UBSan.log");
 SetEnvironmentVariable(UBSAN_OPTIONS, L"log_path=" WC_NOTEPAD2 L"-UBSan.log,print_stacktrace=1");

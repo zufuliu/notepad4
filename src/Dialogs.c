@@ -93,7 +93,7 @@ int MsgBox(UINT uType, UINT uIdMsg, ...) {
 			0,
 			NULL);
 		StrTrim(lpMsgBuf, L" \a\b\f\n\r\t\v");
-		StrCatBuff(szText, L"\n", COUNTOF(szText));
+		StrCatBuff(szText, L"\r\n", COUNTOF(szText));
 		StrCatBuff(szText, lpMsgBuf, COUNTOF(szText));
 		LocalFree(lpMsgBuf);
 		const WCHAR wcht = szText[lstrlen(szText) - 1];
@@ -2632,7 +2632,7 @@ static INT_PTR CALLBACK InfoBoxDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 		case IDYES:
 		case IDNO:
 			if (IsButtonChecked(hwnd, IDC_INFOBOXCHECK)) {
-				LPINFOBOX lpib = (LPINFOBOX)GetWindowLongPtr(hwnd, DWLP_USER);
+				const LPCINFOBOX lpib = (LPCINFOBOX)GetWindowLongPtr(hwnd, DWLP_USER);
 				IniSetBool(INI_SECTION_NAME_SUPPRESSED_MESSAGES, lpib->lpstrSetting, SuppressMmessage_Suppress);
 			}
 			EndDialog(hwnd, LOWORD(wParam));
@@ -2762,7 +2762,7 @@ int GetSystemIntegrationStatus(struct SystemIntegrationInfo *info) {
 	}
 
 	// replace Windows Notepad
-	status = RegOpenKeyEx(HKEY_LOCAL_MACHINE, NP2RegSubKey_ReplaceNotepad, 0, KEY_READ, &hKey);
+	status = RegOpenKeyEx(HKEY_LOCAL_MACHINE, NP2RegSubKey_ReplaceNotepad, 0, KEY_QUERY_VALUE, &hKey);
 	if (status == ERROR_SUCCESS) {
 		LPWSTR command = Registry_GetString(hKey, L"Debugger");
 		if (command != NULL) {

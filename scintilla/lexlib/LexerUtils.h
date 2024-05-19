@@ -6,12 +6,10 @@ namespace Lexilla {
 
 template<int valueBit, int maxStateCount, int countBit, int baseStyle>
 int PackLineState(const std::vector<int>& states) noexcept {
-	constexpr size_t countMask = (1 << countBit) - 1;
 	size_t index = states.size();
-	int count = static_cast<int>(sci::min(index, countMask));
-	int lineState = count;
-	lineState <<= countBit;
-	count = sci::min(count, maxStateCount);
+	const int backCount = sci::min(static_cast<int>(index), maxStateCount);
+	int lineState = 0;
+	int count = backCount;
 	while (count != 0) {
 		--count;
 		--index;
@@ -21,6 +19,7 @@ int PackLineState(const std::vector<int>& states) noexcept {
 		}
 		lineState = (lineState << valueBit) | state;
 	}
+	lineState = (lineState << countBit) | backCount;
 	return lineState;
 }
 

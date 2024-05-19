@@ -19,14 +19,15 @@ static KEYWORDLIST Keywords_Awk = {{
 "adequate_math_precision( assert( beginfile( bits2str( chr( cliff_rand( ctime( disable_assigns( "
 "endfile( endgrent( endpwent( "
 "getgrent( getgrgid( getgrnam( getgruser( getlocaltime( getopt( getpwent( getpwnam( getpwuid( intdiv0( isnumeric( join( "
-"ord( process_array( quicksort( quicksort_swap( readfile( rewind( round( shell_quote( walk_array( zerofile( "
+"ord( process_array( quicksort( quicksort_swap( readfile( rewind( round( shell_quote( tocsv( tocsv_rec( walk_array( "
+"zerofile( "
 
 , // 4 misc
-"AWKBUFSIZE AWKLIBPATH AWKPATH AWKREADFUNC AWK_HASH "
+"AWKBUFSIZE AWKLIBPATH AWKPATH AWKREADFUNC AWK_HASH BUFFERPIPE "
 "GAWK_LOCALE_DIR GAWK_MSEC_SLEEP GAWK_MSG_SRC GAWK_NO_DFA GAWK_READ_TIMEOUT GAWK_SOCK_RETRIES GAWK_STACKSIZE "
 "INT_CHAIN_MAX NONFATAL POSIXLY_CORRECT READ_TIMEOUT RETRY STR_CHAIN_MAX TIDYMEM api_major api_minor argv array awk "
 "builtin egid errno euid extension gawk gid gmp_version identifiers mpfr_version number "
-"pgrpid pid platform ppid prec_max prec_min pty regexp scalar sorted_in strftime string strnum "
+"pgrpid pid platform pma ppid prec_max prec_min pty regexp scalar sorted_in strftime string strnum "
 "uid unassigned untyped user version "
 
 , NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL

@@ -41,7 +41,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [AutoHotkey_L](tools/lang/AutoHotkey_L.ahk) and [AutoHotkey_H](tools/lang/AutoHotkey_H.ahk) Script, up to v2.
 	* [AutoIt3](tools/lang/AutoIt3.au3) Script, up to 3.3.16.
 	* [AviSynth Script](tools/lang/AviSynth.avs), up to AviSynth 2.6, AviSynth+ 3.6, GScript 1.1.
-	* [AWK](tools/lang/Awk.awk), up to GNU AWK 5.2.
+	* [AWK](tools/lang/Awk.awk), up to GNU AWK 5.3.
 	* [Batch Script](tools/lang/Batch.bat), [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#batch)
 	* [blockdiag](tools/lang/blockdiag.diag), seqdiag, actdiag and nwdiag
 	* [C#](tools/lang/CSharp.cs), up to C# 12.0. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#c)
@@ -64,7 +64,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [Dart](tools/lang/Dart.dart), up to Dart 3.3.
 	* Diff/Patch File
 	* [F#](tools/lang/FSharp.fs), up to F# 8.0.
-	* [Fortran](tools/lang/Fortran.f), up to Fortran 2018.
+	* [Fortran](tools/lang/Fortran.f), up to Fortran 2023.
 	* [GN Build](tools/lang/GN.gn), up to GN 2019-03-13.
 	* [Go](tools/lang/Go.go), up to Go 1.21.
 		* [Go+ (GoPlus)](https://goplus.org/) and the Q language
@@ -81,7 +81,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* INI Configuration File
 	* [Inno Setup](tools/lang/InnoSetup.iss), up to Inno Setup 6.2.
 	* [Boost Jam](tools/lang/Jamfile.jam), up to Jam 4.4.
-	* [Java](tools/lang/Java.java), up to Java 21. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#java)
+	* [Java](tools/lang/Java.java), up to Java 22. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#java)
 		* [BeanShell](https://github.com/beanshell/beanshell)
 	* [JavaScript](tools/lang/JavaScript.js), up to ECMAScript 2024 with [JSX](https://facebook.github.io/jsx/) and [Web APIs](https://developer.mozilla.org/en-US/docs/Web/API).
 	* [JSON](https://www.json.org) and [JSON5](https://json5.org/) Document
@@ -97,7 +97,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* Borland bmake
 		* qmake
 		* ninja
-	* Markdown, up to [CommonMark](https://spec.commonmark.org/) 0.30, with following extensions:
+	* Markdown, up to [CommonMark](https://spec.commonmark.org/) 0.31, with following extensions:
 		* [GitHub Flavored Markdown](https://github.github.com/gfm/)
 		* [GitLab Flavored Markdown](https://docs.gitlab.com/ee/user/markdown.html)
 		* [Pandoc’s Markdown](https://pandoc.org/MANUAL.html#pandocs-markdown)
@@ -149,7 +149,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* SGML and DTD
 		* Apple Property List
 	* [YAML Document](https://yaml.org/)
-	* [Zig](tools/lang/Zig.zig), up to Zig 0.11.
+	* [Zig](tools/lang/Zig.zig), up to Zig 0.12.
 	* Many Others
 * Toggle fold for specific level, shortcuts: <kbd>Alt</kbd>+<kbd>Number</kbd>
 * Toggle fold for current block without scrolling back to the block start line, shortcut: <kbd>Alt</kbd>+<kbd>C</kbd>, or context menu "Toggle Fold"
@@ -167,7 +167,9 @@ Latest development builds (artifacts in Release configuration for each compiler 
 * Experimental support for RTL layout (GDI) and bidirectional (Direct2D), useful for Arabic and Hebrew
 * Support using fractional font size
 * Support full screen mode
+* Support compress & pretty for CSS, JavaScript, JSON and JSON5
 * Support copy as RTF
+* Support text transliteration
 * Support drag and drop file from Visual Studio, Android Studio, IntelliJ IDEA, etc.
 * Other various major or minor changes and tweaks
 

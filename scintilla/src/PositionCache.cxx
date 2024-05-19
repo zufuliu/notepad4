@@ -7,8 +7,8 @@
 
 #include <cstddef>
 #include <cstdlib>
-#include <cassert>
 #include <cstdint>
+#include <cassert>
 #include <cstring>
 #include <cmath>
 #include <climits>
@@ -57,6 +57,7 @@
 #include "Selection.h"
 #include "PositionCache.h"
 #include "EditModel.h"
+//#include "ElapsedPeriod.h"
 
 using namespace Scintilla;
 using namespace Scintilla::Internal;
@@ -347,7 +348,7 @@ enum class WrapBreak {
 	Before = 1,
 	After = 2,
 	Both = 3,
-	Undefined,
+	Undefined = 4,
 };
 
 constexpr uint8_t ASCIIWrapBreakTable[128] = {
@@ -822,7 +823,7 @@ LineLayout *LineLayoutCache::Retrieve(Sci::Line lineNumber, Sci::Line lineCaret,
 namespace {
 
 // Simply pack the (maximum 4) character bytes into an int
-#if 0
+#if 1 //! use the loop code to pass AddressSanitizer
 constexpr unsigned int KeyFromString(std::string_view charBytes) noexcept {
 	PLATFORM_ASSERT(charBytes.length() <= 4);
 	unsigned int k = 0;
@@ -834,12 +835,9 @@ constexpr unsigned int KeyFromString(std::string_view charBytes) noexcept {
 
 #else
 inline unsigned int KeyFromString(std::string_view charBytes) noexcept {
-	unsigned int k = 0;
-	if (!charBytes.empty()) {
-		k = loadbe_u32(charBytes.data());
-		if (const size_t diff = 4 - charBytes.length()) {
-			k >>= diff*8;
-		}
+	unsigned int k = loadbe_u32(charBytes.data());
+	if (const size_t diff = 4 - charBytes.length()) {
+		k >>= diff*8;
 	}
 	return k;
 }
@@ -855,7 +853,7 @@ void SpecialRepresentations::SetRepresentation(std::string_view charBytes, std::
 		const bool inserted = mapReprs.insert_or_assign(key, Representation(value)).second;
 		if (inserted) {
 			// New entry so increment for first byte
-			const unsigned char ucStart = charBytes.empty() ? 0 : charBytes[0];
+			const unsigned char ucStart = charBytes[0];
 			startByteHasReprs[ucStart]++;
 			if (key > maxKey) {
 				maxKey = key;
@@ -898,7 +896,7 @@ void SpecialRepresentations::ClearRepresentation(std::string_view charBytes) {
 		const auto it = mapReprs.find(key);
 		if (it != mapReprs.end()) {
 			mapReprs.erase(it);
-			const unsigned char ucStart = charBytes.empty() ? 0 : charBytes[0];
+			const unsigned char ucStart = charBytes[0];
 			startByteHasReprs[ucStart]--;
 			if (key == maxKey && startByteHasReprs[ucStart] == 0) {
 				maxKey = mapReprs.empty() ? 0 : mapReprs.crbegin()->first;
@@ -924,7 +922,7 @@ const Representation *SpecialRepresentations::GetRepresentation(std::string_view
 
 const Representation *SpecialRepresentations::RepresentationFromCharacter(std::string_view charBytes) const {
 	if (charBytes.length() <= 4) {
-		const unsigned char ucStart = charBytes.empty() ? 0 : charBytes[0];
+		const unsigned char ucStart = charBytes[0];
 		if (!startByteHasReprs[ucStart]) {
 			return nullptr;
 		}
@@ -944,9 +942,12 @@ void SpecialRepresentations::Clear() noexcept {
 void SpecialRepresentations::SetDefaultRepresentations(int dbcsCodePage) {
 	Clear();
 
+	//const ElapsedPeriod period;
 	// C0 control set
-	for (size_t j = 0; j < std::size(repsC0) - 1; j++) {
-		const char c[2] = { static_cast<char>(j), '\0' };
+	for (unsigned j = 0; j < std::size(repsC0) - 1; j++) {
+		//const char c[2] = { static_cast<char>(j), '\0' };
+		char c[4];
+		memcpy(c, &j, 4);
 		const char *rep = repsC0[j];
 		SetRepresentation(std::string_view(c, 1), std::string_view(rep, (rep[2] == '\0') ? 2 : 3));
 	}
@@ -971,8 +972,11 @@ void SpecialRepresentations::SetDefaultRepresentations(int dbcsCodePage) {
 			"DCS", "PU1", "PU2", "STS", "CCH", "MW", "SPA", "EPA",
 			"SOS", "SGCI", "SCI", "CSI", "ST", "OSC", "PM", "APC"
 		};
-		for (size_t j = 0; j < std::size(repsC1); j++) {
-			const char c1[3] = { '\xc2', static_cast<char>(0x80 + j), '\0' };
+		for (unsigned j = 0; j < std::size(repsC1); j++) {
+			//const char c1[3] = { '\xc2', static_cast<char>(0x80 + j), '\0' };
+			char c1[4];
+			const unsigned key = 0x80c2 + (j << 8);
+			memcpy(c1, &key, 4);
 			const char *rep = repsC1[j];
 			const size_t len = (rep[2] == '\0') ? 2 : ((rep[3] == '\0') ? 3 : 4);
 			SetRepresentation(std::string_view(c1, 2), std::string_view(rep, len));
@@ -982,14 +986,18 @@ void SpecialRepresentations::SetDefaultRepresentations(int dbcsCodePage) {
 	}
 	if (dbcsCodePage) {
 		// UTF-8 invalid bytes or DBCS invalid single bytes.
-		for (int k = 0x80; k < 0x100; k++) {
+		for (unsigned k = 0x80; k < 0x100; k++) {
 			if (!IsDBCSValidSingleByte(dbcsCodePage, k)) {
-				const char hiByte[2] = { static_cast<char>(k), '\0' };
+				//const char hiByte[2] = { static_cast<char>(k), '\0' };
+				char hiByte[4];
+				memcpy(hiByte, &k, 4);
 				const char hexits[4] = { 'x', "0123456789ABCDEF"[k >> 4], "0123456789ABCDEF"[k & 15], '\0' };
 				SetRepresentation(std::string_view(hiByte, 1), std::string_view(hexits, 3));
 			}
 		}
 	}
+	//const double duration = period.Duration()*1e3;
+	//printf("%s duration=%.6f\n", __func__, duration);
 }
 
 void BreakFinder::Insert(Sci::Position val) {
@@ -1015,7 +1023,7 @@ BreakFinder::BreakFinder(const LineLayout *ll_, const Selection *psel, Range lin
 	saeNext(0),
 	pdoc(model.pdoc),
 	encodingFamily(pdoc->CodePageFamily()),
-	reprs(model.reprs) {
+	reprs(model.reprs.get()) {
 
 	// Search for first visible break
 	// First find the first visible character
@@ -1115,12 +1123,12 @@ TextSegment BreakFinder::Next() {
 			//	}
  			//}
 			repr = nullptr;
-			if (reprs.MayContains(ch)) {
+			if (reprs->MayContains(ch)) {
 				// Special case \r\n line ends if there is a representation
-				if (ch == '\r' && reprs.ContainsCrLf() && chars[1] == '\n') {
+				if (ch == '\r' && reprs->ContainsCrLf() && chars[1] == '\n') {
 					charWidth = 2;
 				}
-				repr = reprs.GetRepresentation(std::string_view(chars, charWidth));
+				repr = reprs->GetRepresentation(std::string_view(chars, charWidth));
 			}
 			if (((nextBreak > 0) && (ll->styles[nextBreak] != ll->styles[nextBreak - 1])) ||
 				repr ||

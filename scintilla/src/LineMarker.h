@@ -17,7 +17,7 @@ struct LineMarkerPod {
 	Scintilla::MarkerSymbol markType = Scintilla::MarkerSymbol::Circle;
 	ColourRGBA fore = black;
 	ColourRGBA back = white;
-	ColourRGBA backSelected = ColourRGBA(0xff, 0x00, 0x00);
+	ColourRGBA backSelected = ColourRGBA(maximumByte, 0x00, 0x00);
 	Scintilla::Layer layer = Scintilla::Layer::Base;
 	XYPOSITION strokeWidth = 1.0f;
 	/** Some platforms, notably PLAT_CURSES, do not support Scintilla's native

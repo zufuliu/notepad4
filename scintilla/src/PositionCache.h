@@ -282,7 +282,7 @@ class BreakFinder {
 	int saeNext;
 	const Document *pdoc;
 	const EncodingFamily encodingFamily;
-	const SpecialRepresentations &reprs;
+	const SpecialRepresentations *reprs;
 	void Insert(Sci::Position val);
 public:
 	// If a whole run is longer than lengthStartSubdivision then subdivide

@@ -1,9 +1,10 @@
-// Java SE 21 https://docs.oracle.com/en/java/javase/index.html
+// Java SE 22 https://docs.oracle.com/en/java/javase/index.html
 // JDK https://openjdk.org/projects/jdk/
 // https://docs.oracle.com/javase/specs/index.html
 // https://github.com/beanshell/beanshell/wiki/Basic-syntax
 
 //! keywords		===========================================================
+// https://docs.oracle.com/javase/specs/jls/se22/html/jls-3.html#jls-3.9
 abstract assert
 break
 case catch
@@ -45,7 +46,7 @@ boolean byte char double float int long short void
 
 //! directive		===========================================================
 // Module Declarations
-// https://docs.oracle.com/javase/specs/jls/se21/html/jls-7.html#jls-7.7
+// https://docs.oracle.com/javase/specs/jls/se22/html/jls-7.html#jls-7.7
 open module
 requires
 exports to
@@ -55,7 +56,7 @@ provides with
 transitive static
 
 //! API				===========================================================
-// https://docs.oracle.com/en/java/javase/21/docs/api/index.html
+// https://docs.oracle.com/en/java/javase/22/docs/api/index.html
 
 module java.base {
 
@@ -590,7 +591,7 @@ module gradle {
 }
 
 //! Javadoc			===========================================================
-// https://docs.oracle.com/en/java/javase/21/docs/specs/javadoc/doc-comment-spec.html
+// https://docs.oracle.com/en/java/javase/22/docs/specs/javadoc/doc-comment-spec.html
 /**
  * @author name-text
  * {@code text}
@@ -601,6 +602,7 @@ module gradle {
  * {@index word description }								JDK 9
  * {@index "phrase" description }							JDK 9
  * {@inheritDoc}
+ * {@inheritDoc supertype}									JDK 22
  * {@link module/package.class#member label}
  * {@linkplain module/package.class#member label}
  * {@literal text}

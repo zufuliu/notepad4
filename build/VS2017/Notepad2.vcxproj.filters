@@ -357,6 +357,9 @@
     <ClCompile Include="..\..\scintilla\src\Style.cxx">
       <Filter>Scintilla\src</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\scintilla\src\UndoHistory.cxx">
+      <Filter>Scintilla\src</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\scintilla\src\UniConversion.cxx">
       <Filter>Scintilla\src</Filter>
     </ClCompile>
@@ -816,6 +819,9 @@
       <Filter>Scintilla\src</Filter>
     </ClInclude>
     <ClInclude Include="..\..\scintilla\src\Style.h">
+      <Filter>Scintilla\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\scintilla\src\UndoHistory.h">
       <Filter>Scintilla\src</Filter>
     </ClInclude>
     <ClInclude Include="..\..\scintilla\src\UniConversion.h">

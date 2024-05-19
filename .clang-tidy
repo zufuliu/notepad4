@@ -3,7 +3,7 @@
 # https://clang.llvm.org/extra/clang-tidy/checks/list.html
 # --enable-check-profile
 # Checks: -*,clang-diagnostic-*,
-Checks: >
+Checks: [
     clang-diagnostic-*,
     clang-analyzer-*,
     bugprone-*,
@@ -36,22 +36,24 @@ Checks: >
     -readability-identifier-length,
     -readability-implicit-bool-conversion,
     -readability-magic-numbers,
+    -readability-math-missing-parentheses,
     -readability-suspicious-call-argument,
     -readability-uppercase-literal-suffix,
     -misc-confusable-identifiers,
     -misc-include-cleaner,
     -misc-non-private-member-variables-in-classes,
-#     -misc-use-anonymous-namespace,
-#     -modernize-deprecated-headers,
-#     -modernize-return-braced-init-list,
-#     -modernize-use-auto,
-#     -modernize-use-default-member-init,
-#     -readability-braces-around-statements,
-#     -readability-else-after-return,
-#     -readability-named-parameter,
-#     -readability-simplify-boolean-expr,
-#     -bugprone-reserved-identifier,
-#     -misc-const-correctness,
+    # -misc-use-anonymous-namespace,
+    # -modernize-deprecated-headers,
+    # -modernize-return-braced-init-list,
+    # -modernize-use-auto,
+    # -modernize-use-default-member-init,
+    # -readability-braces-around-statements,
+    # -readability-else-after-return,
+    # -readability-named-parameter,
+    # -readability-simplify-boolean-expr,
+    # -bugprone-reserved-identifier,
+    # -misc-const-correctness,
+    ]
 
 WarningsAsErrors: ''
 HeaderFilterRegex: '.*'

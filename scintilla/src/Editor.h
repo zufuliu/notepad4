@@ -464,7 +464,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	}
 	virtual void NotifyParent(Scintilla::NotificationData scn) noexcept = 0;
 	virtual void NotifyStyleToNeeded(Sci::Position endStyleNeeded);
-	void NotifyChar(int ch, Scintilla::CharacterSource charSource) noexcept;
+	void NotifyChar(int ch, Scintilla::CharacterSource charSource, bool handled = false) noexcept;
 	void NotifySavePoint(bool isSavePoint) noexcept;
 	void NotifyModifyAttempt() noexcept;
 	virtual void NotifyDoubleClick(Point pt, Scintilla::KeyMod modifiers);
@@ -623,8 +623,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 
 	Sci::Line WrapCount(Sci::Line line);
 	void AddStyledText(const char *buffer, Sci::Position appendLength);
-	Sci::Position GetStyledText(char *buffer, Sci::Position cpMin, Sci::Position cpMax) const noexcept;
-	Sci::Position GetTextRange(char *buffer, Sci::Position cpMin, Sci::Position cpMax) const noexcept;
+	Sci::Position GetTextRange(char *buffer, Sci::Position cpMin, Sci::Position cpMax, bool style = false) const noexcept;
 
 	virtual sptr_t DefWndProc(Scintilla::Message iMessage, Scintilla::uptr_t wParam, Scintilla::sptr_t lParam) = 0;
 	bool ValidMargin(Scintilla::uptr_t wParam) const noexcept;
@@ -677,6 +676,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 
 	static Scintilla::sptr_t StringResult(Scintilla::sptr_t lParam, const char *val) noexcept;
 	static Scintilla::sptr_t BytesResult(Scintilla::sptr_t lParam, const unsigned char *val, size_t len) noexcept;
+	static Scintilla::sptr_t BytesResult(Scintilla::sptr_t lParam, std::string_view sv) noexcept;
 
 	// Set a variable controlling appearance to a value and invalidates the display
 	// if a change was made. Avoids extra text and the possibility of mistyping.

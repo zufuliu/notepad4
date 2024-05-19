@@ -138,6 +138,10 @@ Web Source Code
 	asp				Active Server Page
 	aspx			Active Server Page Extended File
 	jsp				Java Server Page
+	rhtml			ERB, HTML with embedded Ruby
+	vue				Vue Single-File Components, https://vuejs.org/guide/scaling-up/sfc.html
+	hbs				Ember Template, https://guides.emberjs.com/release/components/
+	svelte			Svelte Template, https://svelte.dev/docs/introduction
 	mht				MHTML Web Archive
 	htd				Adobe ExtendScript HTML file
 	htt				Hypertext Template File
@@ -275,15 +279,18 @@ Diff File
 
 Fortran Source
 	f
-	for
+	for				https://gcc.gnu.org/onlinedocs/gfortran/GNU-Fortran-and-GCC.html
 	ftn
 	fpp
 	f90
 	f95
 	f03
 	f08
+	f18
+	f77
 	f2k
 	hf
+	cuf				CUDA Fortran, https://github.com/llvm/llvm-project/blob/main/flang/lib/Frontend/FrontendOptions.cpp
 
 F# Source
 	fs
@@ -600,6 +607,8 @@ YAML Document
 	mir				LLVM Machine IR, https://llvm.org/docs/MIRLangRef.html
 	apinotes		Swift API Notes
 	ifs				LLVM IFS (Interface Stubs)
+	gyp				GYP
+	gypi			GYP
 
 Zig Source
 	zig

@@ -2417,35 +2417,38 @@ void MsgNotifyZoom(void) {
 //
 void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(lParam);
-
 	HMENU hmenu = (HMENU)wParam;
 
-	int i = StrNotEmpty(szCurFile);
+	const bool hasPath = StrNotEmpty(szCurFile);
+	static const uint16_t menuRequiresPath[] = {
+		CMD_RECODEDEFAULT,
+		CMD_RELOADANSI,
+		CMD_RELOADNOFILEVARS,
+		CMD_RELOADOEM,
+		CMD_RELOADUTF8,
+		IDM_FILE_ADDTOFAV,
+		IDM_FILE_CREATELINK,
+		IDM_FILE_LAUNCH,
+		IDM_FILE_OPEN_CONTAINING_FOLDER,
+		IDM_FILE_PROPERTIES,
+		IDM_FILE_READONLY_FILE,
+		IDM_FILE_REVERT,
+		IDM_RECODE_SELECT,
+	};
+	for (unsigned k = 0; k < COUNTOF(menuRequiresPath); k++) {
+		EnableCmd(hmenu, menuRequiresPath[k], hasPath);
+	}
+
 	EnableCmd(hmenu, IDM_FILE_SAVE, IsDocumentModified());
-	EnableCmd(hmenu, IDM_FILE_REVERT, i);
-	EnableCmd(hmenu, CMD_RELOADUTF8, i);
-	EnableCmd(hmenu, CMD_RELOADANSI, i);
-	EnableCmd(hmenu, CMD_RELOADOEM, i);
-	EnableCmd(hmenu, CMD_RELOADNOFILEVARS, i);
-	EnableCmd(hmenu, CMD_RECODEDEFAULT, i);
 #if defined(_WIN64)
 	DisableCmd(hmenu, IDM_FILE_LARGE_FILE_MODE, bLargeFileMode);
 	DisableCmd(hmenu, IDM_FILE_LARGE_FILE_MODE_RELOAD, bLargeFileMode);
 #endif
-	EnableCmd(hmenu, IDM_FILE_LAUNCH, i);
-	EnableCmd(hmenu, IDM_FILE_PROPERTIES, i);
-	EnableCmd(hmenu, IDM_FILE_CREATELINK, i);
-	EnableCmd(hmenu, IDM_FILE_ADDTOFAV, i);
-
 	EnableCmd(hmenu, IDM_FILE_RELAUNCH_ELEVATED, IsVistaAndAbove() && !fIsElevated);
-	EnableCmd(hmenu, IDM_FILE_OPEN_CONTAINING_FOLDER, i);
-	EnableCmd(hmenu, IDM_FILE_READONLY_FILE, i);
 	CheckCmd(hmenu, IDM_FILE_READONLY_FILE, bReadOnlyFile);
 	CheckCmd(hmenu, IDM_FILE_READONLY_MODE, bReadOnlyMode);
 
-	EnableCmd(hmenu, IDM_RECODE_SELECT, i);
-
-	i = IDM_ENCODING_ANSI - 1;
+	int i = IDM_ENCODING_ANSI - 1;
 	if (iCurrentEncoding <= CPI_UTF8SIGN) {
 		const UINT mask = ((IDM_ENCODING_ANSI - IDM_ENCODING_ANSI + 1) << CPI_DEFAULT*4)
 			| ((IDM_ENCODING_UNICODE - IDM_ENCODING_ANSI + 1) << CPI_UNICODEBOM*4)
@@ -2464,149 +2467,138 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	EnableCmd(hmenu, IDM_EDIT_UNDO, SciCall_CanUndo());
 	EnableCmd(hmenu, IDM_EDIT_REDO, SciCall_CanRedo());
 
-	i = !SciCall_IsSelectionEmpty();
-	const bool canPaste = SciCall_CanPaste();
-	const bool nonEmpty = SciCall_GetLength() != 0;
-
-	EnableCmd(hmenu, IDM_EDIT_CUT, nonEmpty);
-	//EnableCmd(hmenu, IDM_EDIT_CUT_BINARY, i);
-	EnableCmd(hmenu, IDM_EDIT_COPY, nonEmpty);
-	//EnableCmd(hmenu, IDM_EDIT_COPY_BINARY, i);
-	EnableCmd(hmenu, IDM_EDIT_COPYALL, nonEmpty);
-	EnableCmd(hmenu, IDM_EDIT_SELECTALL, nonEmpty);
-	EnableCmd(hmenu, IDM_EDIT_COPYADD, i);
-	EnableCmd(hmenu, IDM_EDIT_PASTE, canPaste);
-	//EnableCmd(hmenu, IDM_EDIT_PASTE_BINARY, canPaste);
-	EnableCmd(hmenu, IDM_EDIT_SWAP, i || canPaste);
-	EnableCmd(hmenu, IDM_EDIT_DELETE, nonEmpty);
-	EnableCmd(hmenu, IDM_EDIT_CLEARDOCUMENT, nonEmpty);
-	EnableCmd(hmenu, IDM_EDIT_COPYRTF, i);
-
 	OpenClipboard(hwnd);
 	EnableCmd(hmenu, IDM_EDIT_CLEARCLIPBOARD, CountClipboardFormats());
 	CloseClipboard();
 
-	EnableCmd(hmenu, CMD_OPEN_PATH_OR_LINK, nonEmpty);
-	EnableCmd(hmenu, CMD_OPEN_CONTAINING_FOLDER, nonEmpty);
-	EnableCmd(hmenu, CMD_ONLINE_SEARCH_GOOGLE, i);
-	EnableCmd(hmenu, CMD_ONLINE_SEARCH_BING, i);
-	EnableCmd(hmenu, CMD_ONLINE_SEARCH_WIKI, i);
-	EnableCmd(hmenu, CMD_CUSTOM_ACTION1, i);
-	EnableCmd(hmenu, CMD_CUSTOM_ACTION2, i);
+	const bool nonEmpty = SciCall_GetLength() != 0;
+	static const uint16_t menuRequiresDoc[] = {
+		BME_EDIT_BOOKMARKCLEAR,
+		BME_EDIT_BOOKMARKNEXT,
+		BME_EDIT_BOOKMARKPREV,
+		BME_EDIT_BOOKMARKSELECT,
+		BME_EDIT_BOOKMARKTOGGLE,
+		CMD_CTRLBACK,
+		CMD_CTRLDEL,
+		CMD_OPEN_CONTAINING_FOLDER,
+		CMD_OPEN_PATH_OR_LINK,
+		CMD_TIMESTAMPS,
+		IDM_EDIT_CLEARDOCUMENT,
+		IDM_EDIT_COMPLETEWORD,
+		IDM_EDIT_COPY,
+		IDM_EDIT_COPYALL,
+		IDM_EDIT_CUT,
+		IDM_EDIT_DELETE,
+		IDM_EDIT_DELETELINELEFT,
+		IDM_EDIT_DELETELINERIGHT,
+		IDM_EDIT_FIND,
+		IDM_EDIT_FINDMATCHINGBRACE,
+		IDM_EDIT_FINDNEXT,
+		IDM_EDIT_FINDNEXT,
+		IDM_EDIT_FINDPREV,
+		IDM_EDIT_GOTOLINE,
+		IDM_EDIT_GOTO_BLOCK_END,
+		IDM_EDIT_GOTO_BLOCK_START,
+		IDM_EDIT_GOTO_NEXT_BLOCK,
+		IDM_EDIT_GOTO_NEXT_BLOCK,
+		IDM_EDIT_GOTO_NEXT_SIBLING_BLOCK,
+		IDM_EDIT_GOTO_PREVIOUS_BLOCK,
+		IDM_EDIT_GOTO_PREV_SIBLING_BLOCK,
+		IDM_EDIT_REPLACE,
+		IDM_EDIT_REPLACENEXT,
+		IDM_EDIT_SAVEFIND,
+		IDM_EDIT_SELECTALL,
+		IDM_EDIT_SELECTLINE,
+		IDM_EDIT_SELECTLINE_BLOCK,
+		IDM_EDIT_SELECTWORD,
+		IDM_EDIT_SELTODOCEND,
+		IDM_EDIT_SELTODOCSTART,
+		IDM_EDIT_SELTOMATCHINGBRACE,
+		IDM_EDIT_SELTONEXT,
+		IDM_EDIT_SELTOPREV,
+	};
+	for (unsigned k = 0; k < COUNTOF(menuRequiresDoc); k++) {
+		EnableCmd(hmenu, menuRequiresDoc[k], nonEmpty);
+	}
 
-	EnableCmd(hmenu, IDM_EDIT_SORTLINES, EditGetSelectedLineCount() > 1);
+	const bool hasSel = !SciCall_IsSelectionEmpty();
+	static const uint16_t menuRequiresSelection[] = {
+		// IDM_EDIT_COPY_BINARY,
+		// IDM_EDIT_CUT_BINARY,
+		CMD_CUSTOM_ACTION1,
+		CMD_CUSTOM_ACTION2,
+		CMD_JUMP2SELEND,
+		CMD_JUMP2SELSTART,
+		CMD_ONLINE_SEARCH_BING,
+		CMD_ONLINE_SEARCH_GOOGLE,
+		CMD_ONLINE_SEARCH_WIKI,
+		IDM_EDIT_BASE64_DECODE,
+		IDM_EDIT_BASE64_DECODE_AS_HEX,
+		IDM_EDIT_BASE64_ENCODE,
+		IDM_EDIT_BASE64_HTML_EMBEDDED_IMAGE,
+		IDM_EDIT_BASE64_SAFE_ENCODE,
+		IDM_EDIT_CHAR2HEX,
+		IDM_EDIT_CODE_COMPRESS,
+		IDM_EDIT_CODE_PRETTY,
+		IDM_EDIT_COLUMNWRAP,
+		IDM_EDIT_CONVERTLOWERCASE,
+		IDM_EDIT_CONVERTSPACES,
+		IDM_EDIT_CONVERTSPACES2,
+		IDM_EDIT_CONVERTTABS,
+		IDM_EDIT_CONVERTTABS2,
+		IDM_EDIT_CONVERTUPPERCASE,
+		IDM_EDIT_COPYADD,
+		IDM_EDIT_COPYRTF,
+		IDM_EDIT_ESCAPECCHARS,
+		IDM_EDIT_HEX2CHAR,
+		IDM_EDIT_INVERTCASE,
+		IDM_EDIT_JOINLINES,
+		IDM_EDIT_JOINLINESEX,
+		IDM_EDIT_MAP_BENGALI_LATIN,
+		IDM_EDIT_MAP_CYRILLIC_LATIN,
+		IDM_EDIT_MAP_DEVANAGARI_LATIN,
+		IDM_EDIT_MAP_FULLWIDTH,
+		IDM_EDIT_MAP_HALFWIDTH,
+		IDM_EDIT_MAP_HANGUL_DECOMPOSITION,
+		IDM_EDIT_MAP_HANJA_HANGUL,
+		IDM_EDIT_MAP_HIRAGANA,
+		IDM_EDIT_MAP_KATAKANA,
+		IDM_EDIT_MAP_MALAYALAM_LATIN,
+		IDM_EDIT_MAP_SIMPLIFIED_CHINESE,
+		IDM_EDIT_MAP_TRADITIONAL_CHINESE,
+		IDM_EDIT_NUM2BIN,
+		IDM_EDIT_NUM2DEC,
+		IDM_EDIT_NUM2HEX,
+		IDM_EDIT_NUM2OCT,
+		IDM_EDIT_SENTENCECASE,
+		IDM_EDIT_SHOW_HEX,
+		IDM_EDIT_SPLITLINES,
+		IDM_EDIT_TITLECASE,
+		IDM_EDIT_UNESCAPECCHARS,
+		IDM_EDIT_URLDECODE,
+		IDM_EDIT_URLENCODE,
+		IDM_EDIT_XHTML_ESCAPE_CHAR,
+		IDM_EDIT_XHTML_UNESCAPE_CHAR,
+		IDM_VIEW_SHOWEXCERPT,
+	};
+	for (unsigned k = 0; k < COUNTOF(menuRequiresSelection); k++) {
+		EnableCmd(hmenu, menuRequiresSelection[k], hasSel);
+	}
 
-	EnableCmd(hmenu, IDM_EDIT_COLUMNWRAP, i);
-	EnableCmd(hmenu, IDM_EDIT_SPLITLINES, i);
-	EnableCmd(hmenu, IDM_EDIT_JOINLINES, i);
-	EnableCmd(hmenu, IDM_EDIT_JOINLINESEX, i);
+	const bool canPaste = SciCall_CanPaste();
+	EnableCmd(hmenu, IDM_EDIT_PASTE, canPaste);
+	//EnableCmd(hmenu, IDM_EDIT_PASTE_BINARY, canPaste);
+	EnableCmd(hmenu, IDM_EDIT_SWAP, hasSel || canPaste);
 
-	EnableCmd(hmenu, IDM_EDIT_CONVERTUPPERCASE, i);
-	EnableCmd(hmenu, IDM_EDIT_CONVERTLOWERCASE, i);
-	EnableCmd(hmenu, IDM_EDIT_INVERTCASE, i);
-	EnableCmd(hmenu, IDM_EDIT_TITLECASE, i);
-	EnableCmd(hmenu, IDM_EDIT_SENTENCECASE, i);
-	EnableCmd(hmenu, IDM_EDIT_MAP_FULLWIDTH, i);
-	EnableCmd(hmenu, IDM_EDIT_MAP_HALFWIDTH, i);
-	EnableCmd(hmenu, IDM_EDIT_MAP_SIMPLIFIED_CHINESE, i);
-	EnableCmd(hmenu, IDM_EDIT_MAP_TRADITIONAL_CHINESE, i);
-	EnableCmd(hmenu, IDM_EDIT_MAP_HIRAGANA, i);
-	EnableCmd(hmenu, IDM_EDIT_MAP_KATAKANA, i);
-	EnableCmd(hmenu, IDM_EDIT_MAP_MALAYALAM_LATIN, i && IsWin7AndAbove());
-	EnableCmd(hmenu, IDM_EDIT_MAP_DEVANAGARI_LATIN, i && IsWin7AndAbove());
-	EnableCmd(hmenu, IDM_EDIT_MAP_CYRILLIC_LATIN, i && IsWin7AndAbove());
-	EnableCmd(hmenu, IDM_EDIT_MAP_BENGALI_LATIN, i && IsWin7AndAbove());
-	EnableCmd(hmenu, IDM_EDIT_MAP_HANGUL_DECOMPOSITION, i && IsWin7AndAbove());
-	EnableCmd(hmenu, IDM_EDIT_MAP_HANJA_HANGUL, i);
-
-	EnableCmd(hmenu, IDM_EDIT_CONVERTTABS, i);
-	EnableCmd(hmenu, IDM_EDIT_CONVERTSPACES, i);
-	EnableCmd(hmenu, IDM_EDIT_CONVERTTABS2, i);
-	EnableCmd(hmenu, IDM_EDIT_CONVERTSPACES2, i);
-
-	EnableCmd(hmenu, IDM_EDIT_URLENCODE, i);
-	EnableCmd(hmenu, IDM_EDIT_URLDECODE, i);
-
-	EnableCmd(hmenu, IDM_EDIT_XHTML_ESCAPE_CHAR, i);
-	EnableCmd(hmenu, IDM_EDIT_XHTML_UNESCAPE_CHAR, i);
-
-	EnableCmd(hmenu, IDM_EDIT_ESCAPECCHARS, i);
-	EnableCmd(hmenu, IDM_EDIT_UNESCAPECCHARS, i);
-
-	EnableCmd(hmenu, IDM_EDIT_CHAR2HEX, i);
-	EnableCmd(hmenu, IDM_EDIT_HEX2CHAR, i);
-	EnableCmd(hmenu, IDM_EDIT_SHOW_HEX, i);
-
-	EnableCmd(hmenu, IDM_EDIT_BASE64_ENCODE, i);
-	EnableCmd(hmenu, IDM_EDIT_BASE64_SAFE_ENCODE, i);
-	EnableCmd(hmenu, IDM_EDIT_BASE64_HTML_EMBEDDED_IMAGE, i);
-	EnableCmd(hmenu, IDM_EDIT_BASE64_DECODE, i);
-	EnableCmd(hmenu, IDM_EDIT_BASE64_DECODE_AS_HEX, i);
-
-	EnableCmd(hmenu, IDM_EDIT_NUM2HEX, i);
-	EnableCmd(hmenu, IDM_EDIT_NUM2DEC, i);
-	EnableCmd(hmenu, IDM_EDIT_NUM2BIN, i);
-	EnableCmd(hmenu, IDM_EDIT_NUM2OCT, i);
-
-	//EnableCmd(hmenu, IDM_EDIT_INCREASENUM, i);
-	//EnableCmd(hmenu, IDM_EDIT_DECREASENUM, i);
-
-	EnableCmd(hmenu, IDM_VIEW_SHOWEXCERPT, i);
+	i = EditGetSelectedLineCount() > 1;
+	EnableCmd(hmenu, IDM_EDIT_SORTLINES, i);
+	EnableCmd(hmenu, IDM_EDIT_REMOVEDUPLICATELINE, i);
+	EnableCmd(hmenu, IDM_EDIT_MERGEDUPLICATELINE, i);
 
 	DisableCmd(hmenu, IDM_EDIT_LINECOMMENT, (pLexCurrent->lexerAttr & LexerAttr_NoLineComment));
 	DisableCmd(hmenu, IDM_EDIT_STREAMCOMMENT, (pLexCurrent->lexerAttr & LexerAttr_NoBlockComment));
 
-	i = nonEmpty;
-	EnableCmd(hmenu, IDM_EDIT_FIND, i);
-	EnableCmd(hmenu, IDM_EDIT_SAVEFIND, i);
-	EnableCmd(hmenu, IDM_EDIT_FINDNEXT, i);
-	EnableCmd(hmenu, IDM_EDIT_FINDPREV, i && StrNotEmptyA(efrData.szFind));
-	EnableCmd(hmenu, IDM_EDIT_REPLACE, i);
-	EnableCmd(hmenu, IDM_EDIT_REPLACENEXT, i);
-	EnableCmd(hmenu, IDM_EDIT_SELECTWORD, i);
-	EnableCmd(hmenu, IDM_EDIT_SELECTLINE, i);
-	EnableCmd(hmenu, IDM_EDIT_SELECTLINE_BLOCK, i);
-	EnableCmd(hmenu, IDM_EDIT_SELTODOCEND, i);
-	EnableCmd(hmenu, IDM_EDIT_SELTODOCSTART, i);
-	EnableCmd(hmenu, IDM_EDIT_SELTONEXT, i && StrNotEmptyA(efrData.szFind));
-	EnableCmd(hmenu, IDM_EDIT_SELTOPREV, i && StrNotEmptyA(efrData.szFind));
-	EnableCmd(hmenu, IDM_EDIT_FINDMATCHINGBRACE, i);
-	EnableCmd(hmenu, IDM_EDIT_SELTOMATCHINGBRACE, i);
-	EnableCmd(hmenu, CMD_JUMP2SELSTART, i);
-	EnableCmd(hmenu, CMD_JUMP2SELEND, i);
-	EnableCmd(hmenu, BME_EDIT_BOOKMARKPREV, i);
-	EnableCmd(hmenu, BME_EDIT_BOOKMARKNEXT, i);
-	EnableCmd(hmenu, BME_EDIT_BOOKMARKTOGGLE, i);
-	EnableCmd(hmenu, BME_EDIT_BOOKMARKSELECT, i);
-	EnableCmd(hmenu, BME_EDIT_BOOKMARKCLEAR, i);
-	EnableCmd(hmenu, IDM_EDIT_GOTOLINE, nonEmpty);
-	EnableCmd(hmenu, IDM_EDIT_GOTO_BLOCK_START, nonEmpty);
-	EnableCmd(hmenu, IDM_EDIT_GOTO_BLOCK_END, nonEmpty);
-	EnableCmd(hmenu, IDM_EDIT_GOTO_PREVIOUS_BLOCK, nonEmpty);
-	EnableCmd(hmenu, IDM_EDIT_GOTO_NEXT_BLOCK, nonEmpty);
-	EnableCmd(hmenu, IDM_EDIT_GOTO_PREV_SIBLING_BLOCK, nonEmpty);
-	EnableCmd(hmenu, IDM_EDIT_GOTO_NEXT_SIBLING_BLOCK, nonEmpty);
-	EnableCmd(hmenu, IDM_EDIT_DELETELINELEFT, i);
-	EnableCmd(hmenu, IDM_EDIT_DELETELINERIGHT, i);
-	EnableCmd(hmenu, CMD_CTRLBACK, i);
-	EnableCmd(hmenu, CMD_CTRLDEL, i);
-	EnableCmd(hmenu, CMD_TIMESTAMPS, i);
-	//EnableCmd(hmenu, IDM_VIEW_FOLD_DEFAULT, i && bShowCodeFolding);
-	//EnableCmd(hmenu, IDM_VIEW_FOLD_CURRENT_BLOCK, i && bShowCodeFolding);
-	//EnableCmd(hmenu, IDM_VIEW_FOLD_ALL, i && bShowCodeFolding);
-	//EnableCmd(hmenu, IDM_VIEW_FOLD_CURRENT_LEVEL, i && bShowCodeFolding);
-	//EnableCmd(hmenu, IDM_VIEW_FOLD_LEVEL1, i && bShowCodeFolding);
-	//EnableCmd(hmenu, IDM_VIEW_FOLD_LEVEL2, i && bShowCodeFolding);
-	//EnableCmd(hmenu, IDM_VIEW_FOLD_LEVEL3, i && bShowCodeFolding);
-	//EnableCmd(hmenu, IDM_VIEW_FOLD_LEVEL4, i && bShowCodeFolding);
-	//EnableCmd(hmenu, IDM_VIEW_FOLD_LEVEL5, i && bShowCodeFolding);
-	//EnableCmd(hmenu, IDM_VIEW_FOLD_LEVEL6, i && bShowCodeFolding);
-	//EnableCmd(hmenu, IDM_VIEW_FOLD_LEVEL7, i && bShowCodeFolding);
-	//EnableCmd(hmenu, IDM_VIEW_FOLD_LEVEL8, i && bShowCodeFolding);
-	//EnableCmd(hmenu, IDM_VIEW_FOLD_LEVEL9, i && bShowCodeFolding);
-	//EnableCmd(hmenu, IDM_VIEW_FOLD_LEVEL10, i && bShowCodeFolding);
 	CheckCmd(hmenu, IDM_VIEW_SHOW_FOLDING, bShowCodeFolding);
-
 	CheckCmd(hmenu, IDM_VIEW_USE2NDGLOBALSTYLE, bUse2ndGlobalStyle);
 	CheckCmd(hmenu, IDM_VIEW_USEDEFAULT_CODESTYLE, pLexCurrent->bUseDefaultCodeStyle);
 	i = IDM_VIEW_STYLE_THEME_DEFAULT + np2StyleTheme;
@@ -2625,7 +2617,6 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckCmd(hmenu, IDM_VIEW_SHOWINDENTGUIDES, bShowIndentGuides);
 	CheckCmd(hmenu, IDM_VIEW_LINENUMBERS, bShowLineNumbers);
 	CheckCmd(hmenu, IDM_VIEW_MARGIN, bShowBookmarkMargin);
-	EnableCmd(hmenu, IDM_EDIT_COMPLETEWORD, i);
 	CheckCmd(hmenu, IDM_VIEW_AUTOCOMPLETION_IGNORECASE, autoCompletionConfig.bIgnoreCase);
 	CheckCmd(hmenu, IDM_SET_LATEX_INPUT_METHOD, autoCompletionConfig.bLaTeXInputMethod);
 	CheckCmd(hmenu, IDM_SET_MULTIPLE_SELECTION, iSelectOption & SelectOption_EnableMultipleSelection);
@@ -2673,7 +2664,6 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckCmd(hmenu, IDM_VIEW_ALWAYSONTOP, IsTopMost());
 	CheckCmd(hmenu, IDM_VIEW_MINTOTRAY, bMinimizeToTray);
 	CheckCmd(hmenu, IDM_VIEW_TRANSPARENT, bTransparentMode);
-	EnableCmd(hmenu, IDM_VIEW_TRANSPARENT, i);
 	i = IDM_VIEW_SCROLLPASTLASTLINE_ONE + iEndAtLastLine;
 	CheckMenuRadioItem(hmenu, IDM_VIEW_SCROLLPASTLASTLINE_ONE, IDM_VIEW_SCROLLPASTLASTLINE_QUARTER, i, MF_BYCOMMAND);
 
@@ -2682,6 +2672,8 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	EnableCmd(hmenu, IDM_SET_RENDER_TECH_D2D, i);
 	EnableCmd(hmenu, IDM_SET_RENDER_TECH_D2DRETAIN, i);
 	EnableCmd(hmenu, IDM_SET_RENDER_TECH_D2DDC, i);
+	EnableCmd(hmenu, IDM_SET_USE_XP_FILE_DIALOG, i);
+	CheckCmd(hmenu, IDM_SET_USE_XP_FILE_DIALOG, bUseXPFileDialog);
 	i = IDM_SET_RENDER_TECH_GDI + iRenderingTechnology;
 	CheckMenuRadioItem(hmenu, IDM_SET_RENDER_TECH_GDI, IDM_SET_RENDER_TECH_D2DDC, i, MF_BYCOMMAND);
 	// RTL Layout
@@ -2704,9 +2696,6 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckCmd(hmenu, IDM_VIEW_CHANGENOTIFY, (iFileWatchingMode != FileWatchingMode_None));
 	CheckCmd(hmenu, IDM_SET_FILE_AUTOSAVE, (iAutoSaveOption & AutoSaveOption_Periodic) && dwAutoSavePeriod != 0);
 
-	EnableCmd(hmenu, IDM_SET_USE_XP_FILE_DIALOG, IsVistaAndAbove());
-	CheckCmd(hmenu, IDM_SET_USE_XP_FILE_DIALOG, bUseXPFileDialog);
-
 	if (StrNotEmpty(szTitleExcerpt)) {
 		i = IDM_VIEW_SHOWEXCERPT;
 	} else {
@@ -2718,18 +2707,21 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckMenuRadioItem(hmenu, IDM_VIEW_NOESCFUNC, IDM_VIEW_ESCEXIT, i, MF_BYCOMMAND);
 
 	i = StrNotEmpty(szIniFile);
-	CheckCmd(hmenu, IDM_VIEW_SAVESETTINGS, bSaveSettings && i);
-	EnableCmd(hmenu, CMD_OPENINIFILE, i);
+	const uint16_t menuRequiresIni[] = {
+		CMD_OPENINIFILE,
+		IDM_VIEW_NOSAVEFINDREPL,
+		IDM_VIEW_NOSAVERECENT,
+		IDM_VIEW_REUSEWINDOW,
+		IDM_VIEW_SAVESETTINGS,
+		IDM_VIEW_SINGLEFILEINSTANCE,
+		IDM_VIEW_STICKY_WINDOW_POSITION,
+	};
+	for (unsigned k = 0; k < COUNTOF(menuRequiresIni); k++) {
+		EnableCmd(hmenu, menuRequiresIni[k], i);
+	}
 
-	EnableCmd(hmenu, IDM_VIEW_REUSEWINDOW, i);
-	EnableCmd(hmenu, IDM_VIEW_STICKY_WINDOW_POSITION, i);
-	EnableCmd(hmenu, IDM_VIEW_SINGLEFILEINSTANCE, i);
-	EnableCmd(hmenu, IDM_VIEW_NOSAVERECENT, i);
-	EnableCmd(hmenu, IDM_VIEW_NOSAVEFINDREPL, i);
-	EnableCmd(hmenu, IDM_VIEW_SAVESETTINGS, i);
-
-	i = i || StrNotEmpty(szIniFile2);
-	EnableCmd(hmenu, IDM_VIEW_SAVESETTINGSNOW, i);
+	CheckCmd(hmenu, IDM_VIEW_SAVESETTINGS, i && bSaveSettings);
+	EnableCmd(hmenu, IDM_VIEW_SAVESETTINGSNOW, i || StrNotEmpty(szIniFile2));
 
 	Style_UpdateSchemeMenu(hmenu);
 }
@@ -2768,10 +2760,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(lParam);
 
 	switch (LOWORD(wParam)) {
+	case IDT_FILE_NEW:
 	case IDM_FILE_NEW:
 		FileLoad(FileLoadFlag_New, L"");
 		break;
 
+	case IDT_FILE_OPEN:
 	case IDM_FILE_OPEN:
 		FileLoad(FileLoadFlag_Default, L"");
 		break;
@@ -2787,10 +2781,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 		break;
 
+	case IDT_FILE_SAVE:
 	case IDM_FILE_SAVE:
 		FileSave(FileSaveFlag_SaveAlways);
 		break;
 
+	case IDT_FILE_SAVEAS:
 	case IDM_FILE_SAVEAS:
 		FileSave((FileSaveFlag)(FileSaveFlag_SaveAlways | FileSaveFlag_SaveAs));
 		break;
@@ -2799,6 +2795,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		AutoSave_DoWork(FileSaveFlag_SaveAlways);
 		break;
 
+	case IDT_FILE_SAVECOPY:
 	case IDM_FILE_SAVECOPY:
 		FileSave((FileSaveFlag)(FileSaveFlag_SaveAlways | FileSaveFlag_SaveAs | FileSaveFlag_SaveCopy));
 		break;
@@ -2835,6 +2832,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		UpdateWindowTitle();
 		break;
 
+	case IDT_FILE_BROWSE:
 	case IDM_FILE_BROWSE:
 		TryBrowseFile(hwnd, szCurFile, true);
 		break;
@@ -2882,6 +2880,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		OpenContainingFolder(hwnd, szCurFile, true);
 		break;
 
+	case IDT_FILE_LAUNCH:
 	case IDM_FILE_LAUNCH: {
 		if (StrIsEmpty(szCurFile)) {
 			break;
@@ -2937,6 +2936,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		EditPrintSetup(hwndEdit);
 		break;
 
+	case IDT_FILE_PRINT:
 	case IDM_FILE_PRINT: {
 		SHFILEINFO shfi;
 		WCHAR *pszTitle;
@@ -2988,6 +2988,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	}
 	break;
 
+	case IDT_FILE_OPENFAV:
 	case IDM_FILE_OPENFAV:
 		if (FileSave(FileSaveFlag_Ask)) {
 			WCHAR tchSelItem[MAX_PATH];
@@ -3007,6 +3008,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 		break;
 
+	case IDT_FILE_ADDTOFAV:
 	case IDM_FILE_ADDTOFAV:
 		if (StrNotEmpty(szCurFile)) {
 			SHFILEINFO shfi;
@@ -3044,6 +3046,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 		break;
 
+	case IDT_FILE_EXIT:
 	case IDM_FILE_EXIT:
 		ExitApplication(hwnd);
 		break;
@@ -3138,14 +3141,17 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		SelectDefLineEndingDlg(hwnd, &iDefaultEOLMode);
 		break;
 
+	case IDT_EDIT_UNDO:
 	case IDM_EDIT_UNDO:
 		SciCall_Undo();
 		break;
 
+	case IDT_EDIT_REDO:
 	case IDM_EDIT_REDO:
 		SciCall_Redo();
 		break;
 
+	case IDT_EDIT_CUT:
 	case IDM_EDIT_CUT:
 		if (flagPasteBoard) {
 			bLastCopyFromMe = true;
@@ -3170,6 +3176,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	//	SciCall_Cut(true);
 	//	break;
 
+	case IDT_EDIT_COPY:
 	case IDM_EDIT_COPY:
 		if (flagPasteBoard) {
 			bLastCopyFromMe = true;
@@ -3206,10 +3213,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		UpdateToolbar();
 		break;
 
-	case IDM_EDIT_COPYRTF:
-		EditCopyAsRTF(hwndMain);
-		break;
-
+	case IDT_EDIT_PASTE:
 	case IDM_EDIT_PASTE:
 	//case IDM_EDIT_PASTE_BINARY:
 		SciCall_Paste(LOWORD(wParam) == IDM_EDIT_PASTE_BINARY);
@@ -3247,6 +3251,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 		break;
 
+	case IDT_EDIT_DELETE:
 	case IDM_EDIT_DELETE:
 		SciCall_Clear();
 		break;
@@ -3295,14 +3300,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_EDIT_REMOVEDUPLICATELINE:
-		BeginWaitCursor();
-		EditSortLines((EditSortFlag)(EditSortFlag_DontSort | EditSortFlag_RemoveDuplicate));
-		EndWaitCursor();
-		break;
-
 	case IDM_EDIT_MERGEDUPLICATELINE:
 		BeginWaitCursor();
-		EditSortLines((EditSortFlag)(EditSortFlag_DontSort | EditSortFlag_MergeDuplicate));
+		EditSortLines((EditSortFlag)(EditSortFlag_DontSort | ((LOWORD(wParam) == IDM_EDIT_REMOVEDUPLICATELINE) ? EditSortFlag_RemoveDuplicate : EditSortFlag_MergeDuplicate)));
 		EndWaitCursor();
 		break;
 
@@ -3333,6 +3333,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		SciCall_DelLineRight();
 		break;
 
+	case IDM_EDIT_UNINDENT:
 	case IDM_EDIT_INDENT: {
 		const Sci_Line iLineSelStart = SciCall_LineFromPosition(SciCall_GetSelectionStart());
 		const Sci_Line iLineSelEnd = SciCall_LineFromPosition(SciCall_GetSelectionEnd());
@@ -3341,20 +3342,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		if (iLineSelStart == iLineSelEnd) {
 			SciCall_VCHome();
 		}
-		SciCall_Tab();
-		SciCall_SetTabIndents(fvCurFile.bTabIndents);
-	}
-	break;
-
-	case IDM_EDIT_UNINDENT: {
-		const Sci_Line iLineSelStart = SciCall_LineFromPosition(SciCall_GetSelectionStart());
-		const Sci_Line iLineSelEnd = SciCall_LineFromPosition(SciCall_GetSelectionEnd());
-
-		SciCall_SetTabIndents(true);
-		if (iLineSelStart == iLineSelEnd) {
-			SciCall_VCHome();
+		if (LOWORD(wParam) == IDM_EDIT_INDENT) {
+			SciCall_Tab();
+		} else {
+			SciCall_BackTab();
 		}
-		SciCall_BackTab();
 		SciCall_SetTabIndents(fvCurFile.bTabIndents);
 	}
 	break;
@@ -3404,14 +3396,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_EDIT_MERGEBLANKLINES:
-		BeginWaitCursor();
-		EditRemoveBlankLines(true);
-		EndWaitCursor();
-		break;
-
 	case IDM_EDIT_REMOVEBLANKLINES:
 		BeginWaitCursor();
-		EditRemoveBlankLines(false);
+		EditRemoveBlankLines(LOWORD(wParam) == IDM_EDIT_MERGEBLANKLINES);
 		EndWaitCursor();
 		break;
 
@@ -3506,26 +3493,16 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_EDIT_CONVERTTABS:
+	case IDM_EDIT_CONVERTTABS2:
 		BeginWaitCursor();
-		EditTabsToSpaces(fvCurFile.iTabWidth, false);
+		EditTabsToSpaces(fvCurFile.iTabWidth, LOWORD(wParam) == IDM_EDIT_CONVERTTABS2);
 		EndWaitCursor();
 		break;
 
 	case IDM_EDIT_CONVERTSPACES:
-		BeginWaitCursor();
-		EditSpacesToTabs(fvCurFile.iTabWidth, false);
-		EndWaitCursor();
-		break;
-
-	case IDM_EDIT_CONVERTTABS2:
-		BeginWaitCursor();
-		EditTabsToSpaces(fvCurFile.iTabWidth, true);
-		EndWaitCursor();
-		break;
-
 	case IDM_EDIT_CONVERTSPACES2:
 		BeginWaitCursor();
-		EditSpacesToTabs(fvCurFile.iTabWidth, true);
+		EditSpacesToTabs(fvCurFile.iTabWidth, LOWORD(wParam) == IDM_EDIT_CONVERTSPACES2);
 		EndWaitCursor();
 		break;
 
@@ -3578,15 +3555,15 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_EDIT_INSERT_ENCODING: {
-		char msz[64];
+		char msz[32] = {'\0'};
 		const char *enc = mEncoding[iCurrentEncoding].pszParseNames;
 		const char *sep = strchr(enc, ',');
 		if (sep != NULL) {
-			strncpy(msz, enc, (sep - enc));
+			strncpy(msz, enc, min_z(sep - enc, COUNTOF(msz) - 1));
 		} else {
 			WideCharToMultiByte(CP_UTF8, 0, mEncoding[iCurrentEncoding].wchLabel, -1, msz, COUNTOF(msz), NULL, NULL);
 		}
-		if (pLexCurrent->iLexer == SCLEX_PYTHON) {
+		if (pLexCurrent->iLexer == SCLEX_PYTHON || pLexCurrent->iLexer == SCLEX_RUBY) {
 			const Sci_Position iCurrentPos = SciCall_GetCurrentPos();
 			const Sci_Line iCurLine = SciCall_LineFromPosition(iCurrentPos);
 			const Sci_Position iCurrentLinePos = iCurrentPos - SciCall_PositionFromLine(iCurLine);
@@ -3772,6 +3749,14 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		EndWaitCursor();
 		break;
 
+	case IDM_EDIT_COPYRTF:
+	case IDM_EDIT_CODE_COMPRESS:
+	case IDM_EDIT_CODE_PRETTY:
+		BeginWaitCursor();
+		EditFormatCode(LOWORD(wParam));
+		EndWaitCursor();
+		break;
+
 	case IDM_EDIT_BASE64_ENCODE:
 	case IDM_EDIT_BASE64_SAFE_ENCODE:
 	case IDM_EDIT_BASE64_HTML_EMBEDDED_IMAGE:
@@ -3788,27 +3773,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_EDIT_NUM2HEX:
-		BeginWaitCursor();
-		EditConvertNumRadix(16);
-		EndWaitCursor();
-		break;
-
 	case IDM_EDIT_NUM2DEC:
-		BeginWaitCursor();
-		EditConvertNumRadix(10);
-		EndWaitCursor();
-		break;
-
 	case IDM_EDIT_NUM2BIN:
-		BeginWaitCursor();
-		EditConvertNumRadix(2);
-		EndWaitCursor();
-		break;
-
 	case IDM_EDIT_NUM2OCT:
-		BeginWaitCursor();
-		EditConvertNumRadix(8);
-		EndWaitCursor();
+		EditConvertNumRadix(LOWORD(wParam));
 		break;
 
 	case IDM_EDIT_FINDMATCHINGBRACE: {
@@ -3914,9 +3882,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		SciCall_MarkerDeleteAll(MarkerNumber_Bookmark);
 		break;
 
+	case IDT_EDIT_FIND:
+	case IDT_EDIT_REPLACE:
 	case IDM_EDIT_FIND:
 	case IDM_EDIT_REPLACE: {
-		const bool bReplace = LOWORD(wParam) == IDM_EDIT_REPLACE;
+		const bool bReplace = (LOWORD(wParam) == IDM_EDIT_REPLACE) || (LOWORD(wParam) == IDT_EDIT_REPLACE);
 		if (!IsWindow(hDlgFindReplace)) {
 			hDlgFindReplace = EditFindReplaceDlg(hwndEdit, &efrData, bReplace);
 		} else {
@@ -4004,11 +3974,13 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		EditGotoBlock(LOWORD(wParam));
 		break;
 
+	case IDT_VIEW_SCHEME:
 	case IDM_VIEW_SCHEME:
 	case IDM_VIEW_SCHEME_FAVORITE:
 		Style_SelectLexerDlg(hwndEdit, LOWORD(wParam) == IDM_VIEW_SCHEME_FAVORITE);
 		break;
 
+	case IDT_VIEW_SCHEMECONFIG:
 	case IDM_VIEW_SCHEME_CONFIG:
 		Style_ConfigDlg(hwndEdit);
 		break;
@@ -4031,6 +4003,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		Style_SetDefaultFont(hwndEdit, LOWORD(wParam) == IDM_VIEW_DEFAULT_CODE_FONT);
 		break;
 
+	case IDT_VIEW_WORDWRAP:
 	case IDM_VIEW_WORDWRAP: {
 		fWordWrapG = fvCurFile.fWordWrap = !fvCurFile.fWordWrap;
 		SciCall_SetWrapMode(fvCurFile.fWordWrap ? iWordWrapMode : SC_WRAP_NONE);
@@ -4271,10 +4244,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		SciCall_SetCaretLineHighlightSubLine(bHighlightCurrentSubLine);
 		break;
 
+	case IDT_VIEW_ZOOMIN:
 	case IDM_VIEW_ZOOMIN:
 		SciCall_ZoomIn();
 		break;
 
+	case IDT_VIEW_ZOOMOUT:
 	case IDM_VIEW_ZOOMOUT:
 		SciCall_ZoomOut();
 		break;
@@ -4349,6 +4324,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		IniSetBoolEx(INI_SECTION_NAME_FLAGS, L"UseXPFileDialog", bUseXPFileDialog, false);
 		break;
 
+	case IDT_VIEW_ALWAYSONTOP:
 	case IDM_VIEW_ALWAYSONTOP:
 		if (IsTopMost()) {
 			bAlwaysOnTop = false;
@@ -4642,22 +4618,13 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case CMD_RELOADANSI:
-		if (StrNotEmpty(szCurFile)) {
-			iSrcEncoding = CPI_DEFAULT;
-			FileLoad(FileLoadFlag_Reload, szCurFile);
-		}
-		break;
-
 	case CMD_RELOADOEM:
-		if (StrNotEmpty(szCurFile)) {
-			iSrcEncoding = CPI_OEM;
-			FileLoad(FileLoadFlag_Reload, szCurFile);
-		}
-		break;
-
 	case CMD_RELOADUTF8:
 		if (StrNotEmpty(szCurFile)) {
-			iSrcEncoding = CPI_UTF8;
+			iSrcEncoding = LOWORD(wParam) - CMD_RELOADANSI;
+			if (iSrcEncoding > CPI_OEM) {
+				iSrcEncoding = CPI_UTF8;
+			}
 			FileLoad(FileLoadFlag_Reload, szCurFile);
 		}
 		break;
@@ -4853,23 +4820,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case CMD_JUMP2SELSTART:
-		if (!SciCall_IsRectangleSelection()) {
-			const Sci_Position iAnchorPos = SciCall_GetAnchor();
-			const Sci_Position iCursorPos = SciCall_GetCurrentPos();
-			if (iCursorPos > iAnchorPos) {
-				const int mode = SciCall_GetSelectionMode();
-				SciCall_SetSel(iCursorPos, iAnchorPos);
-				SciCall_SetSelectionMode(mode);
-				SciCall_ChooseCaretX();
-			}
-		}
-		break;
-
 	case CMD_JUMP2SELEND:
 		if (!SciCall_IsRectangleSelection()) {
 			const Sci_Position iAnchorPos = SciCall_GetAnchor();
 			const Sci_Position iCursorPos = SciCall_GetCurrentPos();
-			if (iCursorPos < iAnchorPos) {
+			if ((LOWORD(wParam) == CMD_JUMP2SELSTART && iCursorPos > iAnchorPos) || (LOWORD(wParam) != CMD_JUMP2SELSTART && iCursorPos < iAnchorPos)) {
 				const int mode = SciCall_GetSelectionMode();
 				SciCall_SetSel(iCursorPos, iAnchorPos);
 				SciCall_SetSelectionMode(mode);
@@ -4910,110 +4865,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_SET_SYSTEM_INTEGRATION:
 		SystemIntegrationDlg(hwnd);
-		break;
-
-	case IDT_FILE_NEW:
-		SendWMCommandOrBeep(hwnd, IDM_FILE_NEW);
-		break;
-
-	case IDT_FILE_OPEN:
-		SendWMCommandOrBeep(hwnd, IDM_FILE_OPEN);
-		break;
-
-	case IDT_FILE_BROWSE:
-		SendWMCommandOrBeep(hwnd, IDM_FILE_BROWSE);
-		break;
-
-	case IDT_FILE_SAVE:
-		SendWMCommandOrBeep(hwnd, IDM_FILE_SAVE);
-		break;
-
-	case IDT_EDIT_UNDO:
-		SendWMCommandOrBeep(hwnd, IDM_EDIT_UNDO);
-		break;
-
-	case IDT_EDIT_REDO:
-		SendWMCommandOrBeep(hwnd, IDM_EDIT_REDO);
-		break;
-
-	case IDT_EDIT_CUT:
-		SendWMCommandOrBeep(hwnd, IDM_EDIT_CUT);
-		break;
-
-	case IDT_EDIT_COPY:
-		if (IsCmdEnabled(hwnd, IDM_EDIT_COPY)) {
-			SendWMCommand(hwnd, IDM_EDIT_COPY);
-		} else {
-			SendWMCommand(hwnd, IDM_EDIT_COPYALL);
-		}
-		break;
-
-	case IDT_EDIT_PASTE:
-		SendWMCommandOrBeep(hwnd, IDM_EDIT_PASTE);
-		break;
-
-	case IDT_EDIT_FIND:
-		SendWMCommandOrBeep(hwnd, IDM_EDIT_FIND);
-		break;
-
-	case IDT_EDIT_REPLACE:
-		SendWMCommandOrBeep(hwnd, IDM_EDIT_REPLACE);
-		break;
-
-	case IDT_VIEW_WORDWRAP:
-		SendWMCommandOrBeep(hwnd, IDM_VIEW_WORDWRAP);
-		break;
-
-	case IDT_VIEW_ZOOMIN:
-		SendWMCommandOrBeep(hwnd, IDM_VIEW_ZOOMIN);
-		break;
-
-	case IDT_VIEW_ZOOMOUT:
-		SendWMCommandOrBeep(hwnd, IDM_VIEW_ZOOMOUT);
-		break;
-
-	case IDT_VIEW_SCHEME:
-		SendWMCommandOrBeep(hwnd, IDM_VIEW_SCHEME);
-		break;
-
-	case IDT_VIEW_SCHEMECONFIG:
-		SendWMCommandOrBeep(hwnd, IDM_VIEW_SCHEME_CONFIG);
-		break;
-
-	case IDT_FILE_EXIT:
-		ExitApplication(hwnd);
-		break;
-
-	case IDT_FILE_SAVEAS:
-		SendWMCommandOrBeep(hwnd, IDM_FILE_SAVEAS);
-		break;
-
-	case IDT_FILE_SAVECOPY:
-		SendWMCommandOrBeep(hwnd, IDM_FILE_SAVECOPY);
-		break;
-
-	case IDT_EDIT_DELETE:
-		SendWMCommandOrBeep(hwnd, IDM_EDIT_DELETE);
-		break;
-
-	case IDT_FILE_PRINT:
-		SendWMCommandOrBeep(hwnd, IDM_FILE_PRINT);
-		break;
-
-	case IDT_FILE_OPENFAV:
-		SendWMCommandOrBeep(hwnd, IDM_FILE_OPENFAV);
-		break;
-
-	case IDT_FILE_ADDTOFAV:
-		SendWMCommandOrBeep(hwnd, IDM_FILE_ADDTOFAV);
-		break;
-
-	case IDT_FILE_LAUNCH:
-		SendWMCommandOrBeep(hwnd, IDM_FILE_LAUNCH);
-		break;
-
-	case IDT_VIEW_ALWAYSONTOP:
-		SendWMCommandOrBeep(hwnd, IDM_VIEW_ALWAYSONTOP);
 		break;
 
 	default: {
@@ -5126,11 +4977,13 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			break;
 
 		case SCN_CHARADDED: {
-			//if (SciCall_IsMultipleSelection()) {
-			//	// not work for multiple selection.
-			//	return 0;
-			//}
-			// tentative input characters already ignored in Editor::InsertCharacter()
+			// fix cursor flash on typing when "Hide pointer while typing" is enabled
+			// this prevents WM_SETCURSOR & WM_MOUSEMOVE send to Scintilla window
+			DisableDelayedStatusBarRedraw();
+			// ignore tentative input character and multiple selection, see Editor::InsertCharacter()
+			if (scn->listType) {
+				return 0;
+			}
 			const int ch = scn->ch;
 			if (ch < 0x80) {
 				// Auto indent
@@ -7092,7 +6945,9 @@ void UpdateToolbar(void) {
 #define EnableTool(id, b)		SendMessage(hwnd, TB_ENABLEBUTTON, id, MAKELPARAM(((b) ? 1 : 0), 0))
 #define CheckTool(id, b)		SendMessage(hwnd, TB_CHECKBUTTON, id, MAKELPARAM(b, 0))
 	HWND hwnd = hwndToolbar;
-	EnableTool(IDT_FILE_ADDTOFAV, StrNotEmpty(szCurFile));
+	const bool hasPath = StrNotEmpty(szCurFile);
+	EnableTool(IDT_FILE_ADDTOFAV, hasPath);
+	EnableTool(IDT_FILE_LAUNCH, hasPath);
 
 	EnableTool(IDT_FILE_SAVE, IsDocumentModified());
 	EnableTool(IDT_EDIT_UNDO, SciCall_CanUndo());
@@ -7103,13 +6958,8 @@ void UpdateToolbar(void) {
 	EnableTool(IDT_EDIT_CUT, nonEmpty);
 	EnableTool(IDT_EDIT_COPY, nonEmpty);
 	EnableTool(IDT_EDIT_FIND, nonEmpty);
-	//EnableTool(IDT_EDIT_FINDNEXT, nonEmpty);
-	//EnableTool(IDT_EDIT_FINDPREV, nonEmpty && StrNotEmptyA(efrData.szFind));
 	EnableTool(IDT_EDIT_REPLACE, nonEmpty);
 	EnableTool(IDT_EDIT_DELETE, nonEmpty);
-
-	EnableTool(IDT_VIEW_TOGGLEFOLDS, nonEmpty && bShowCodeFolding);
-	EnableTool(IDT_FILE_LAUNCH, nonEmpty);
 
 	CheckTool(IDT_VIEW_WORDWRAP, fvCurFile.fWordWrap);
 	CheckTool(IDT_VIEW_ALWAYSONTOP, IsTopMost());

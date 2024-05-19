@@ -512,7 +512,7 @@ extern EditAutoCompletionConfig autoCompletionConfig;
 
 // CharClassify::SetDefaultCharClasses()
 // tools/GenerateTable.py
-static const uint32_t DefaultWordCharSet[8] = {
+const uint32_t DefaultWordCharSet[8] = {
 0x00000000U, 0x03ff0000U, 0x87fffffeU, 0x07fffffeU,
 0xffffffffU, 0xffffffffU, 0xffffffffU, 0xffffffffU
 };
@@ -2550,8 +2550,12 @@ void EditToggleCommentLine(bool alternative) {
 void EditEncloseSelectionNewLine(LPCWSTR pwszOpen, LPCWSTR pwszClose) {
 	WCHAR start[64] = L"";
 	WCHAR end[64] = L"";
-	const int iEOLMode = SciCall_GetEOLMode();
-	LPCWSTR lineEnd = (iEOLMode == SC_EOL_LF) ? L"\n" : ((iEOLMode == SC_EOL_CR) ? L"\r" : L"\r\n");
+	WCHAR lineEnd[4] = {L'\r', L'\n'};
+	const unsigned iEOLMode = SciCall_GetEOLMode();
+	if (iEOLMode != SC_EOL_CRLF) {
+		lineEnd[0] = lineEnd[iEOLMode - 1];
+		lineEnd[1] = L'\0';
+	}
 
 	Sci_Position pos = SciCall_GetSelectionStart();
 	Sci_Line line = SciCall_LineFromPosition(pos);
@@ -2892,8 +2896,23 @@ void EditInsertScriptShebangLine(void) {
 	const Sci_Position iCurrentPos = SciCall_GetCurrentPos();
 	if (iCurrentPos == 0 && (name != NULL || pLexCurrent->iLexer == SCLEX_BASH)) {
 		const int iEOLMode = SciCall_GetEOLMode();
-		LPCSTR lineEnd = (iEOLMode == SC_EOL_LF) ? "\n" : ((iEOLMode == SC_EOL_CR) ? "\r" : "\r\n");
-		strcat(line, lineEnd);
+		char *ptr = line;
+		ptr += strlen(line);
+		switch (iEOLMode) {
+		default: // SC_EOL_CRLF
+			ptr[0] = '\r';
+			ptr[1] = '\n';
+			ptr[2]= '\0';
+			break;
+		case SC_EOL_LF:
+			ptr[0] = '\n';
+			ptr[1] = '\0';
+			break;
+		case SC_EOL_CR:
+			ptr[0] = '\r';
+			ptr[1] = '\0';
+			break;
+		}
 	}
 	SciCall_ReplaceSel(line);
 }
@@ -3096,14 +3115,6 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 		CurrentWordCharSet['#' >> 5] |= (1 << ('#' & 31));
 		CurrentWordCharSet['$' >> 5] |= (1 << ('$' & 31));
 		CurrentWordCharSet['@' >> 5] |= (1 << ('@' & 31));
-		break;
-
-	case NP2LEX_JSON:
-		CommentStyleMask[SCE_JSON_LINECOMMENT >> 5] |= (1U << (SCE_JSON_LINECOMMENT & 31));
-		CommentStyleMask[SCE_JSON_BLOCKCOMMENT >> 5] |= (1U << (SCE_JSON_BLOCKCOMMENT & 31));
-		AllStringStyleMask[SCE_JSON_STRING_DQ >> 5] |= (1U << (SCE_JSON_STRING_DQ & 31));
-		AllStringStyleMask[SCE_JSON_STRING_SQ >> 5] |= (1U << (SCE_JSON_STRING_SQ & 31));
-		AllStringStyleMask[SCE_JSON_ESCAPECHAR >> 5] |= (1U << (SCE_JSON_ESCAPECHAR & 31));
 		break;
 
 	case NP2LEX_JULIA:

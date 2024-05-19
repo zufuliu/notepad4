@@ -135,17 +135,16 @@ def GenerateUnicodeControlCharacters():
 		print(utf8str, f'U+{ord(ucc):04X}', unicodedata.category(ucc), UnicodeData.getCharacterName(ucc))
 
 def GenerateJsonCharClass():
-	keywords = ["false", "null", "true", "Infinity", "NaN"]
-	wordStart = [item[0] for item in keywords]
 	operator = "{}[]:,+-"
 
 	SCE_JSON_DEFAULT = 0
-	SCE_JSON_STRING_DQ = 1
-	SCE_JSON_OPERATOR = 2
-	SCE_JSON_NUMBER = 3
-	SCE_JSON_MAYBE_KEYWORD = 4
+	SCE_JSON_LINECOMMENT = 1
+	SCE_JSON_BLOCKCOMMENT = 2
+	SCE_JSON_OPERATOR = 3
+	SCE_JSON_NUMBER = 4
 	SCE_JSON_IDENTIFIER = 5
-	SCE_JSON_STRING_SQ = 6
+	SCE_JSON_STRING_DQ = 6
+	SCE_JSON_STRING_SQ = 7
 
 	JsonChar_None = 0
 	JsonChar_BraceOpen = 1
@@ -159,15 +158,13 @@ def GenerateJsonCharClass():
 	JsonMask_Identifier = 1 << 4
 
 	table = [0] * 128
-	assert SCE_JSON_STRING_SQ - SCE_JSON_STRING_DQ == abs(ord('\'') - ord('\"'))
 	# https://www.ecma-international.org/ecma-262/#sec-ecmascript-language-lexical-grammar
 	for i in range(0x21, 0x80):
 		ch = chr(i)
-		state = SCE_JSON_DEFAULT
+		state = SCE_JSON_OPERATOR
 		mask = 0
 		charClass = JsonChar_Ignore
 		if ch in operator:
-			state = SCE_JSON_OPERATOR
 			if ch in '{[':
 				charClass = JsonChar_BraceOpen
 			elif ch in '}]':
@@ -183,30 +180,25 @@ def GenerateJsonCharClass():
 		elif ch == '/':
 			charClass = JsonChar_Slash
 		elif ch == '.':
-			state = SCE_JSON_OPERATOR
 			mask = JsonMask_Number
 			charClass = JsonChar_Dot
 		elif ch.isdigit():
 			state = SCE_JSON_NUMBER
 			mask = JsonMask_Number | JsonMask_Identifier
-		elif ch in wordStart:
-			state = SCE_JSON_MAYBE_KEYWORD
-			mask = JsonMask_Number | JsonMask_Identifier
-			charClass = JsonChar_WordStart
 		elif ch.isalpha() or ch == '_':
 			state = SCE_JSON_IDENTIFIER
 			mask = JsonMask_Number | JsonMask_Identifier
+			charClass = JsonChar_WordStart
 		elif ch in '$\\':
 			# '\\': UnicodeEscapeSequence
 			state = SCE_JSON_IDENTIFIER
 			mask = JsonMask_Identifier
-		else:
-			charClass = JsonChar_None
+			charClass = JsonChar_WordStart
 
 		value = charClass | mask | (state << 5)
 		table[i] = value
 
-	nonAscii = (SCE_JSON_IDENTIFIER << 5) | JsonMask_Identifier | JsonChar_Ignore
+	nonAscii = (SCE_JSON_IDENTIFIER << 5) | JsonMask_Identifier | JsonChar_WordStart
 	table.extend([nonAscii]*128)
 	lines = MultiStageTable.dumpArray(table, 16)
 	Regenerate("../lexers/LexJSON.cxx", "//", lines)

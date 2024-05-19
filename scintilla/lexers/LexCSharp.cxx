@@ -125,7 +125,7 @@ enum class KeywordType {
 	Record = SCE_CSHARP_RECORD,
 	Label = SCE_CSHARP_LABEL,
 	Return = 0x40,
-	While,
+	While = 0x41,
 };
 
 constexpr bool IsUnicodeEscape(int ch, int chNext) noexcept {
@@ -881,7 +881,7 @@ void FoldCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 			}
 
 			const int levelUse = levelCurrent;
-			int lev = levelUse | levelNext << 16;
+			int lev = levelUse | (levelNext << 16);
 			if (levelUse < levelNext) {
 				lev |= SC_FOLDLEVELHEADERFLAG;
 			}

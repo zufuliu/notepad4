@@ -39,9 +39,14 @@
 #define HELP_LINK_FEATURE_REQUEST	L"https://github.com/zufuliu/notepad2/issues"
 #define HELP_LINK_ONLINE_WIKI		L"https://github.com/zufuliu/notepad2/wiki"
 
-#define VERSION_BUILD_INFO_LIB		L",\nScintilla 5.4.1."
+#define VERSION_BUILD_INFO_LIB		L",\nScintilla 5.5.0."
 #define VERSION_BUILD_INFO_FORMAT	L"Compiled on " __DATE__ L" with %s %d.%d.%d" VERSION_BUILD_INFO_LIB
-#if defined(__clang__)
+#if defined(__INTEL_LLVM_COMPILER)
+#define VERSION_BUILD_TOOL_NAME		L"Intel oneAPI"
+#define VERSION_BUILD_TOOL_MAJOR	(__INTEL_LLVM_COMPILER / 10000)
+#define VERSION_BUILD_TOOL_MINOR	((__INTEL_LLVM_COMPILER / 100) % 100)
+#define VERSION_BUILD_TOOL_PATCH	(__INTEL_LLVM_COMPILER % 100)
+#elif defined(__clang__)
 #define VERSION_BUILD_TOOL_NAME		L"Clang"
 #define VERSION_BUILD_TOOL_MAJOR	__clang_major__
 #define VERSION_BUILD_TOOL_MINOR	__clang_minor__

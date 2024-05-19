@@ -341,7 +341,7 @@ LexerConfigMap = {
 		'block_comment_string': ('/*', '*/'),
 		'comment_style_marker': 'SCE_CSS_CDO_CDC',
 		'escape_char_style': 'SCE_CSS_ESCAPECHAR',
-		'operator_style': ['SCE_CSS_OPERATOR'],
+		'operator_style': ['SCE_CSS_OPERATOR', 'SCE_CSS_OPERATOR2'],
 		'extra_word_char': '-$@',
 		#'ignore_word_style': ['SCE_CSS_PROPERTY', 'SCE_CSS_PSEUDOCLASS', 'SCE_CSS_PSEUDOELEMENT'],
 		'string_style_range': ['SCE_CSS_ESCAPECHAR', 'SCE_CSS_URL'],
@@ -582,12 +582,12 @@ LexerConfigMap = {
 	'NP2LEX_JSON': {
 		'tab_settings': TabSettings_Space2,
 		'cpp_style_comment': True,
-		'comment_style_list': ['SCE_JSON_LINECOMMENT', 'SCE_JSON_BLOCKCOMMENT'],
+		'comment_style_marker': 'SCE_JSON_BLOCKCOMMENT',
 		'default_fold_level': ['level1', 'level2', 'level13', 'level4'],
 		'escape_char_style': 'SCE_JSON_ESCAPECHAR',
 		'operator_style': ['SCE_JSON_OPERATOR'],
 		#'ignore_word_style': ['SCE_JSON_KEYWORD'],
-		'string_style_list': ['SCE_JSON_STRING_DQ', 'SCE_JSON_STRING_SQ', 'SCE_JSON_ESCAPECHAR'],
+		'string_style_range': ['SCE_JSON_STRING_DQ', 'SCE_JSON_ESCAPECHAR'],
 	},
 	'NP2LEX_JULIA': {
 		'line_comment_string': '#',

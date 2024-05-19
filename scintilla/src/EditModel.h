@@ -28,7 +28,7 @@ public:
 	bool primarySelection;
 	int xOffset;		///< Horizontal scrolled amount in pixels
 
-	SpecialRepresentations reprs;
+	std::unique_ptr<SpecialRepresentations> reprs;
 	Caret caret;
 	SelectionPosition posDrag;
 	Sci::Position braces[2];

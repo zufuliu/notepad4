@@ -1,4 +1,4 @@
-# 5.2 https://www.gnu.org/software/gawk/manual/
+# 5.3 https://www.gnu.org/software/gawk/manual/
 
 #! keywords			===========================================================
 # https://www.gnu.org/software/gawk/manual/html_node/BEGIN_002fEND.html#BEGIN_002fEND
@@ -111,6 +111,8 @@ function getlocaltime(time, ret, now, i)
 function readfile(file, tmp, save_rs)
 function shell_quote(s, SINGLE, QSINGLE, i, X, n, ret)
 function isnumeric(x, f)
+function tocsv(fields, sep, i, j, nfields, result)
+function tocsv_rec(sep, i, fields)
 
 # Data file Management
 # https://www.gnu.org/software/gawk/manual/html_node/Data-File-Management.html
@@ -164,9 +166,9 @@ array regexp number string strnum unassigned untyped
 argv egid errno euid FS gid
 identifiers array builtin extension scalar untyped user
 platform
-pgrpid pid ppid strftime uid version
+pgrpid pid pma ppid strftime uid version
 gmp_version mpfr_version prec_max prec_min api_major api_minor
-NONFATAL pty READ_TIMEOUT RETRY sorted_in
+BUFFERPIPE NONFATAL pty READ_TIMEOUT RETRY sorted_in
 
 # Environment Variables
 AWKPATH AWKLIBPATH

@@ -277,7 +277,7 @@ void IniSectionSetQuotedString(IniSectionOnSave *section, LPCWSTR key, LPCWSTR v
 
 LPWSTR Registry_GetString(HKEY hKey, LPCWSTR valueName) {
 	LPWSTR lpszText = NULL;
-	DWORD type = REG_SZ;
+	DWORD type = REG_NONE;
 	DWORD size = 0;
 
 	LSTATUS status = RegQueryValueEx(hKey, valueName, NULL, &type, NULL, &size);
@@ -324,26 +324,6 @@ LSTATUS Registry_DeleteTree(HKEY hKey, LPCWSTR lpSubKey) {
 	return status;
 }
 #endif
-
-int DStringW_GetWindowText(DStringW *s, HWND hwnd) {
-	int len = GetWindowTextLength(hwnd);
-	if (len == 0) {
-		if (s->buffer != NULL) {
-			s->buffer[0] = L'\0';
-		}
-	} else {
-		if (len + 1 > s->capacity || s->buffer == NULL) {
-			len = (int)((len + 1) * sizeof(WCHAR));
-			LPWSTR buffer = (s->buffer == NULL) ? (LPWSTR)NP2HeapAlloc(len) : (LPWSTR)NP2HeapReAlloc(s->buffer, len);
-			if (buffer != NULL) {
-				s->buffer = buffer;
-				s->capacity = (int)(NP2HeapSize(buffer) / sizeof(WCHAR));
-			}
-		}
-		len = GetWindowText(hwnd, s->buffer, s->capacity);
-	}
-	return len;
-}
 
 int ParseCommaList(LPCWSTR str, int result[], int count) {
 	if (StrIsEmpty(str)) {
@@ -2303,19 +2283,31 @@ void FormatNumber(LPWSTR lpNumberStr, size_t value) {
 	}
 }
 
+LPWSTR GetDlgItemFullText(HWND hwndDlg, int nCtlId) {
+	hwndDlg = GetDlgItem(hwndDlg, nCtlId);
+	int len = GetWindowTextLength(hwndDlg);
+	if (len == 0) {
+		return NULL;
+	}
+	len += 1;
+	LPWSTR buffer = (LPWSTR)NP2HeapAlloc(len*sizeof(WCHAR));
+	GetWindowText(hwndDlg, buffer, len);
+	return buffer;
+}
+
 //=============================================================================
 //
 // A2W: Convert Dialog Item Text form Unicode to UTF-8 and vice versa
 //
-UINT GetDlgItemTextA2W(UINT uCP, HWND hDlg, int nIDDlgItem, LPSTR lpString, int nMaxCount) {
-	DStringW wsz = DSTRINGW_INIT;
-	const int iRet = DStringW_GetDlgItemText(&wsz, hDlg, nIDDlgItem);
+int GetDlgItemTextA2W(UINT uCP, HWND hDlg, int nIDDlgItem, LPSTR lpString, int nMaxCount) {
+	LPWSTR wsz = GetDlgItemFullText(hDlg, nIDDlgItem);
 	memset(lpString, 0, nMaxCount);
-	if (iRet) {
-		WideCharToMultiByte(uCP, 0, wsz.buffer, -1, lpString, nMaxCount - 2, NULL, NULL);
+	int len = 0;
+	if (wsz) {
+		len = WideCharToMultiByte(uCP, 0, wsz, -1, lpString, nMaxCount, NULL, NULL) - 1;
+		NP2HeapFree(wsz);
 	}
-	DStringW_Free(&wsz);
-	return iRet;
+	return len;
 }
 
 void SetDlgItemTextA2W(UINT uCP, HWND hDlg, int nIDDlgItem, LPCSTR lpString) {
@@ -2613,20 +2605,14 @@ bool GetThemedDialogFont(LPWSTR lpFaceName, WORD *wSize) {
 #else
 
 	bool bSucceed = false;
-	const UINT iLogPixelsY = g_uSystemDPI;
+	int lfHeight = 0;
 
 	if (IsAppThemed()) {
 		HTHEME hTheme = OpenThemeData(NULL, L"WINDOWSTYLE;WINDOW");
 		if (hTheme) {
 			LOGFONT lf;
 			if (S_OK == GetThemeSysFont(hTheme, TMT_MSGBOXFONT, &lf)) {
-				if (lf.lfHeight < 0) {
-					lf.lfHeight = -lf.lfHeight;
-				}
-				*wSize = (WORD)MulDiv(lf.lfHeight, 72, iLogPixelsY);
-				if (*wSize < 8) {
-					*wSize = 8;
-				}
+				lfHeight = lf.lfHeight;
 				lstrcpyn(lpFaceName, lf.lfFaceName, LF_FACESIZE);
 				bSucceed = true;
 			}
@@ -2644,21 +2630,23 @@ bool GetThemedDialogFont(LPWSTR lpFaceName, WORD *wSize) {
 		}
 #endif
 		if (SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0)) {
-			if (ncm.lfMessageFont.lfHeight < 0) {
-				ncm.lfMessageFont.lfHeight = -ncm.lfMessageFont.lfHeight;
-			}
-			*wSize = (WORD)MulDiv(ncm.lfMessageFont.lfHeight, 72, iLogPixelsY);
-			if (*wSize < 8) {
-				*wSize = 8;
-			}
+			lfHeight = ncm.lfMessageFont.lfHeight;
 			lstrcpyn(lpFaceName, ncm.lfMessageFont.lfFaceName, LF_FACESIZE);
 			bSucceed = true;
 		}
 	}
 
-	if (bSucceed && !IsVistaAndAbove()) {
-		// Windows 2000, XP, 2003
-		lstrcpy(lpFaceName, L"Tahoma");
+	if (bSucceed) {
+		if (lfHeight < 0) {
+			lfHeight = -lfHeight;
+		}
+		lfHeight = MulDiv(lfHeight, 72, g_uSystemDPI);
+		lfHeight = max_i(lfHeight, 8);
+		*wSize = (WORD)lfHeight;
+		if (!IsVistaAndAbove()) {
+			// Windows 2000, XP, 2003
+			lstrcpy(lpFaceName, L"Tahoma");
+		}
 	}
 	return bSucceed;
 #endif

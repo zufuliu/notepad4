@@ -133,6 +133,7 @@ void 	EditDetectEOLMode(LPCSTR lpData, DWORD cbData, struct EditFileIOStatus *st
 bool	EditLoadFile(LPWSTR pszFile, struct EditFileIOStatus *status);
 bool	EditSaveFile(HWND hwnd, LPCWSTR pszFile, int saveFlag, struct EditFileIOStatus *status);
 
+void	EditReplaceMainSelection(Sci_Position cchText, LPCSTR pszText);
 void	EditInvertCase(void);
 void	EditMapTextCase(int menu);
 void	EditSentenceCase(void);
@@ -222,7 +223,7 @@ extern "C" {
 
 bool	EditPrint(HWND hwnd, LPCWSTR pszDocTitle, BOOL bDefault);
 void	EditPrintSetup(HWND hwnd);
-void	EditCopyAsRTF(HWND hwnd);
+void	EditFormatCode(int menu);
 
 #ifdef __cplusplus
 }
@@ -360,6 +361,7 @@ enum {
 };
 
 // in EditAutoC.c
+extern const uint32_t DefaultWordCharSet[8];
 void	EditCompleteUpdateConfig(void);
 bool	IsDocWordChar(uint32_t ch);
 bool	IsAutoCompletionWordCharacter(uint32_t ch);
@@ -637,7 +639,7 @@ void FoldAltArrow(int key, int mode);
 void EditGotoBlock(int menu);
 
 enum SelectOption {
-	SelectOption_None,
+	SelectOption_None = 0,
 	SelectOption_EnableMultipleSelection = 1,
 	SelectOption_CopySelectionAsFindText = 2,
 	SelectOption_CopyPasteBufferAsFindText = 4,

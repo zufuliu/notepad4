@@ -35,6 +35,9 @@ struct EscapeSequence {
 		if (chNext == 'x') {
 			digitsLeft = 3;
 			hex = true;
+		} else if (chNext == 'u') {
+			digitsLeft = 9;
+			hex = true;
 		} else if (IsOctalDigit(chNext)) {
 			digitsLeft = 3;
 			hex = false;
@@ -460,7 +463,7 @@ void FoldAwkDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*
 			}
 
 			const int levelUse = levelCurrent;
-			int lev = levelUse | levelNext << 16;
+			int lev = levelUse | (levelNext << 16);
 			if (levelUse < levelNext) {
 				lev |= SC_FOLDLEVELHEADERFLAG;
 			}

@@ -48,12 +48,16 @@ constexpr bool isSafeAlpha(char ch) noexcept {
 	return IsAlpha(ch) || ch == '_';
 }
 
+constexpr bool isSafeAlphaOrHigh(char ch) noexcept {
+	return isHighBitChar(ch) || isSafeAlpha(ch);
+}
+
 constexpr bool isSafeAlnum(char ch) noexcept {
 	return IsAlphaNumeric(ch) || ch == '_';
 }
 
 constexpr bool isSafeAlnumOrHigh(char ch) noexcept {
-	return isHighBitChar(ch) || IsAlphaNumeric(ch) || ch == '_';
+	return isHighBitChar(ch) || isSafeAlnum(ch);
 }
 
 constexpr bool isSafeDigit(char ch) noexcept {
@@ -64,7 +68,7 @@ constexpr bool isSafeWordcharOrHigh(char ch) noexcept {
 	// Error: scintilla's KeyWords.h includes '.' as a word-char
 	// we want to separate things that can take methods from the
 	// methods.
-	return isHighBitChar(ch) || IsAlphaNumeric(ch) || ch == '_';
+	return isHighBitChar(ch) || isSafeAlnum(ch);
 }
 
 constexpr bool isEscapeSequence(char ch) noexcept {
@@ -131,7 +135,7 @@ int ClassifyWordRb(Sci_PositionU start, Sci_PositionU end, char ch, char chNext,
 		chAttr = SCE_RB_MODULE_NAME;
 	} else if (StrEqual(prevWord, "def")) {
 		chAttr = SCE_RB_DEF_NAME;
-		if (ch == '.') {
+		if (ch == '.' || (ch == ':' && chNext == ':')) {
 			if (StrEqual(s, "self")) {
 				style = SCE_RB_WORD_DEMOTED;
 			} else if (IsUpperCase(s[0])) {
@@ -558,7 +562,7 @@ bool sureThisIsNotHeredoc(Sci_Position lt2StartPos, LexAccessor &styler) {
 		j += 1;
 	}
 
-	if (isSafeAlnum(styler[j])) {
+	if (isSafeAlnumOrHigh(styler[j])) {
 		// Init target_end because some compilers think it won't
 		// be initialized by the time it's used
 		target_start = target_end = j;
@@ -567,7 +571,7 @@ bool sureThisIsNotHeredoc(Sci_Position lt2StartPos, LexAccessor &styler) {
 		return definitely_not_a_here_doc;
 	}
 	for (; j < lengthDoc; j++) {
-		if (!isSafeAlnum(styler[j])) {
+		if (!isSafeAlnumOrHigh(styler[j])) {
 			if (target_quote && styler[j] != target_quote) {
 				// unquoted end
 				return definitely_not_a_here_doc;
@@ -586,7 +590,7 @@ bool sureThisIsNotHeredoc(Sci_Position lt2StartPos, LexAccessor &styler) {
 				return definitely_not_a_here_doc;
 			} else {
 				const char ch = styler[j];
-				if (ch == '#' || IsEOLChar(ch) || ch == '.' || ch == ',') {
+				if (ch == '#' || IsEOLChar(ch) || ch == '.' || ch == ',' || IsLowerCase(ch)) {
 					// This is OK, so break and continue;
 					break;
 				} else {
@@ -815,7 +819,7 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 				styler.ColorTo(i, state);
 				state = SCE_RB_NUMBER;
 				is_real_number = true;
-			} else if (isHighBitChar(ch) || iswordstart(ch)) {
+			} else if (isSafeAlphaOrHigh(ch)) {
 				styler.ColorTo(i, state);
 				state = SCE_RB_WORD;
 			} else if (ch == '#') {
@@ -883,7 +887,7 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 				chNext = chNext2;
 				styler.ColorTo(i + 1, SCE_RB_OPERATOR);
 
-				if (!(AnyOf(chNext2, '\"', '\'', '`', '_', '-', '~') || isSafeAlpha(chNext2))) {
+				if (!(AnyOf(chNext2, '\"', '\'', '`', '-', '~') || isSafeAlphaOrHigh(chNext2))) {
 					// It's definitely not a here-doc,
 					// based on Ruby's lexer/parser in the
 					// heredoc_identifier routine.
@@ -1217,7 +1221,7 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 					preferRE = false;
 					advance_char(i, ch, chNext, chNext2);
 				}
-			} else if (isSafeAlnumOrHigh(ch) || ch == '_' || (ch == '.' && isSafeDigit(chNext))) {
+			} else if (isSafeAlnumOrHigh(ch) || (ch == '.' && isSafeDigit(chNext))) {
 				// Keep going
 			} else if (ch == '.' && chNext == '.') {
 				styler.ColorTo(i, state);
@@ -1285,7 +1289,7 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 						HereDoc.Delimiter[HereDoc.DelimiterLength] = '\0';
 					}
 				} else { // an unquoted here-doc delimiter
-					if (isSafeAlnumOrHigh(ch) || ch == '_') {
+					if (isSafeAlnumOrHigh(ch)) {
 						HereDoc.Delimiter[HereDoc.DelimiterLength++] = ch;
 						HereDoc.Delimiter[HereDoc.DelimiterLength] = '\0';
 					} else {

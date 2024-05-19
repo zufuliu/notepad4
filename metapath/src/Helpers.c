@@ -227,7 +227,7 @@ void IniSectionSetString(IniSectionOnSave *section, LPCWSTR key, LPCWSTR value) 
 
 LPWSTR Registry_GetString(HKEY hKey, LPCWSTR valueName) {
 	LPWSTR lpszText = NULL;
-	DWORD type = REG_SZ;
+	DWORD type = REG_NONE;
 	DWORD size = 0;
 
 	LSTATUS status = RegQueryValueEx(hKey, valueName, NULL, &type, NULL, &size);
@@ -2002,20 +2002,14 @@ bool GetThemedDialogFont(LPWSTR lpFaceName, WORD *wSize) {
 #else
 
 	bool bSucceed = false;
-	const UINT iLogPixelsY = g_uSystemDPI;
+	int lfHeight = 0;
 
 	if (IsAppThemed()) {
 		HTHEME hTheme = OpenThemeData(NULL, L"WINDOWSTYLE;WINDOW");
 		if (hTheme) {
 			LOGFONT lf;
 			if (S_OK == GetThemeSysFont(hTheme, TMT_MSGBOXFONT, &lf)) {
-				if (lf.lfHeight < 0) {
-					lf.lfHeight = -lf.lfHeight;
-				}
-				*wSize = (WORD)MulDiv(lf.lfHeight, 72, iLogPixelsY);
-				if (*wSize < 8) {
-					*wSize = 8;
-				}
+				lfHeight = lf.lfHeight;
 				lstrcpyn(lpFaceName, lf.lfFaceName, LF_FACESIZE);
 				bSucceed = true;
 			}
@@ -2033,21 +2027,23 @@ bool GetThemedDialogFont(LPWSTR lpFaceName, WORD *wSize) {
 		}
 #endif
 		if (SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0)) {
-			if (ncm.lfMessageFont.lfHeight < 0) {
-				ncm.lfMessageFont.lfHeight = -ncm.lfMessageFont.lfHeight;
-			}
-			*wSize = (WORD)MulDiv(ncm.lfMessageFont.lfHeight, 72, iLogPixelsY);
-			if (*wSize < 8) {
-				*wSize = 8;
-			}
+			lfHeight = ncm.lfMessageFont.lfHeight;
 			lstrcpyn(lpFaceName, ncm.lfMessageFont.lfFaceName, LF_FACESIZE);
 			bSucceed = true;
 		}
 	}
 
-	if (bSucceed && !IsVistaAndAbove()) {
-		// Windows 2000, XP, 2003
-		lstrcpy(lpFaceName, L"Tahoma");
+	if (bSucceed) {
+		if (lfHeight < 0) {
+			lfHeight = -lfHeight;
+		}
+		lfHeight = MulDiv(lfHeight, 72, g_uSystemDPI);
+		lfHeight = max_i(lfHeight, 8);
+		*wSize = (WORD)lfHeight;
+		if (!IsVistaAndAbove()) {
+			// Windows 2000, XP, 2003
+			lstrcpy(lpFaceName, L"Tahoma");
+		}
 	}
 	return bSucceed;
 #endif

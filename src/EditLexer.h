@@ -58,7 +58,7 @@ enum {
 #define KeywordAttr64(index, value)		((uint64_t)(value) << ((index)*4))
 
 typedef struct EDITSTYLE {
-	const int iStyle;
+	const unsigned iStyle;
 	// set with EDITSTYLE_HOLE() or EDITSTYLE_HOLEX()
 		const uint16_t rid;
 		const uint16_t iNameLen;
@@ -70,7 +70,7 @@ typedef struct EDITSTYLE {
 #define EDITSTYLE_BufferSize(iStyleCount)	((iStyleCount) * MAX_EDITSTYLE_VALUE_SIZE * sizeof(wchar_t))
 #define	MULTI_STYLE(a, b, c, d)			((a) | ((b) << 8) | ((c) << 16) | ((d) << 24))
 #define	MULTI_STYLE8(a, b, c, d, e, f, g, h) \
-	(MULTI_STYLE(a, b, c, d) | ((int64_t)MULTI_STYLE(e, f, g, h) << 32))
+	(MULTI_STYLE(a, b, c, d) | ((uint64_t)MULTI_STYLE(e, f, g, h) << 32))
 
 typedef struct KEYWORDLIST {
 	const char * const pszKeyWords[KEYWORDSET_MAX + 1];

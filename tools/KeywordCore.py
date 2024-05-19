@@ -779,23 +779,27 @@ def parse_css_api_file(pathList):
 	}
 
 	values = []
+	functions = []
 	for path in pathList:
 		for line in read_file(path).splitlines():
 			line = line.strip()
 			if not line or line.startswith('//'):
 				continue
-			if line[0] == '@':
+			marker = line[0]
+			if marker == '@':
 				rule = line.split()[0][1:]
 				keywordMap['at rules'].append(rule)
-			elif line[0] == '!':
+			elif marker == '!':
 				values.append(line[1:])
-			elif line[0] == ':':
+			elif marker == ':':
 				line = line.rstrip(')')
 				if line[1] == ':':
 					keywordMap['pseudo elements'].append(line[2:])
 				else:
 					keywordMap['pseudo classes'].append(line[1:])
-			elif line[0].isalpha():
+			elif marker == '=':
+				functions.extend(item[:-1] for item in line[1:].split())
+			elif marker.isalpha():
 				line = re.sub(r'\(.*?\)', '(', line)
 				index = line.find(':')
 				if index > 0:
@@ -808,14 +812,15 @@ def parse_css_api_file(pathList):
 	items = []
 	for value in keywordMap.values():
 		items.extend(value)
-	keywordMap['values'] = set(values) - ColorNameList - set(items)
+	values = set(values) - ColorNameList - set(items) - set(functions)
 	return [
 		('properties', keywordMap['properties'], KeywordAttr.Default),
 		('at rules', keywordMap['at rules'], KeywordAttr.Special),
 		('pseudo classes', keywordMap['pseudo classes'], KeywordAttr.Special),
 		('pseudo elements', keywordMap['pseudo elements'], KeywordAttr.Special),
+		('math functions', functions, KeywordAttr.Default),
 		('color names', ColorNameList, KeywordAttr.NoLexer),
-		('values', keywordMap['values'], KeywordAttr.NoLexer),
+		('values', values, KeywordAttr.NoLexer),
 	]
 
 def parse_dlang_api_file(path):

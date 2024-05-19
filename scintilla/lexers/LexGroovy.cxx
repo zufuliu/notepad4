@@ -80,7 +80,7 @@ enum class KeywordType {
 	Enum = SCE_GROOVY_ENUM,
 	Trait = SCE_GROOVY_TRAIT,
 	Return = 0x40,
-	While,
+	While = 0x41,
 };
 
 static_assert(DefaultNestedStateBaseStyle + 1 == SCE_GROOVY_STRING_DQ);
@@ -644,7 +644,7 @@ void FoldGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 			}
 
 			const int levelUse = levelCurrent;
-			int lev = levelUse | levelNext << 16;
+			int lev = levelUse | (levelNext << 16);
 			if (levelUse < levelNext) {
 				lev |= SC_FOLDLEVELHEADERFLAG;
 			}

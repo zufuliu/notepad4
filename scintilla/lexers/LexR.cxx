@@ -383,7 +383,7 @@ void FoldSimpleDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initSty
 			}
 
 			const int levelUse = levelCurrent;
-			int lev = levelUse | levelNext << 16;
+			int lev = levelUse | (levelNext << 16);
 			if (levelUse < levelNext) {
 				lev |= SC_FOLDLEVELHEADERFLAG;
 			}

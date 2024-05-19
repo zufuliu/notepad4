@@ -54,7 +54,7 @@ struct EscapeSequence {
 	}
 };
 
-// https://ziglang.org/documentation/master/std/#A;std:fmt.format
+// https://ziglang.org/documentation/master/std/#std.fmt.format
 enum class FormatArgument {
 	None,
 	Digit,
@@ -387,7 +387,7 @@ void FoldZigDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 			}
 
 			const int levelUse = levelCurrent;
-			int lev = levelUse | levelNext << 16;
+			int lev = levelUse | (levelNext << 16);
 			if (levelUse < levelNext) {
 				lev |= SC_FOLDLEVELHEADERFLAG;
 			}

@@ -317,8 +317,9 @@ public:
 	IMContext &operator=(const IMContext &) = delete;
 	IMContext &operator=(IMContext &&) = delete;
 	~IMContext() {
-		if (hIMC)
+		if (hIMC) {
 			::ImmReleaseContext(hwnd, hIMC);
+		}
 	}
 
 	operator bool() const noexcept {
@@ -340,6 +341,11 @@ public:
 		return ::ImmGetCompositionStringW(hIMC, dwIndex, nullptr, 0) > 0;
 	}
 
+	LONG GetCompositionStringLength(DWORD dwIndex) const noexcept {
+		const LONG byteLen = ::ImmGetCompositionStringW(hIMC, dwIndex, nullptr, 0);
+		return byteLen / sizeof(wchar_t);
+	}
+
 	std::wstring GetCompositionString(DWORD dwIndex) const {
 		const LONG byteLen = ::ImmGetCompositionStringW(hIMC, dwIndex, nullptr, 0);
 		std::wstring wcs(byteLen / sizeof(wchar_t), 0);
@@ -352,7 +358,7 @@ class GlobalMemory;
 
 class ReverseArrowCursor {
 	HCURSOR cursor {};
-	UINT dpi = USER_DEFAULT_SCREEN_DPI;
+	bool valid = false;
 
 public:
 	ReverseArrowCursor() noexcept = default;
@@ -367,17 +373,22 @@ public:
 		}
 	}
 
-	HCURSOR Load(UINT dpi_) noexcept {
-		if (cursor)	 {
-			if (dpi == dpi_) {
+	void Invalidate() noexcept {
+		valid = false;
+	}
+
+	HCURSOR Load(UINT dpi) noexcept {
+		if (cursor)	{
+			if (valid) {
 				return cursor;
 			}
 			::DestroyCursor(cursor);
 		}
 
-		dpi = dpi_;
-		cursor = LoadReverseArrowCursor(dpi_);
-		return cursor ? cursor : ::LoadCursor({}, IDC_ARROW);
+		valid = true;
+		HCURSOR arrow = ::LoadCursor({}, IDC_ARROW);
+		cursor = LoadReverseArrowCursor(arrow, dpi);
+		return cursor ? cursor : arrow;
 	}
 };
 
@@ -722,7 +733,6 @@ ScintillaWin::ScintillaWin(HWND hwnd) noexcept {
 ScintillaWin::~ScintillaWin() {
 	if (sysCaretBitmap) {
 		::DeleteObject(sysCaretBitmap);
-		sysCaretBitmap = {};
 	}
 }
 
@@ -2325,6 +2335,7 @@ sptr_t ScintillaWin::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 
 		case WM_DPICHANGED:
 			dpi = HIWORD(wParam);
+			reverseArrowCursor.Invalidate();
 			vs.fontsValid = false;
 			InvalidateStyleRedraw();
 			break;
@@ -2333,6 +2344,7 @@ sptr_t ScintillaWin::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 			const UINT dpiNow = GetWindowDPI(MainHWND());
 			if (dpi != dpiNow) {
 				dpi = dpiNow;
+				reverseArrowCursor.Invalidate();
 				vs.fontsValid = false;
 				InvalidateStyleRedraw();
 			}
@@ -2759,7 +2771,7 @@ void ScintillaWin::NotifyDoubleClick(Point pt, KeyMod modifiers) {
 	//Platform::DebugPrintf("ScintillaWin Double click 0\n");
 	ScintillaBase::NotifyDoubleClick(pt, modifiers);
 	// Send myself a WM_LBUTTONDBLCLK, so the container can handle it too.
-	const POINT point = POINTFromPointEx(pt);
+	const POINT point = POINTFromPoint(pt);
 	::SendMessage(MainHWND(),
 		WM_LBUTTONDBLCLK,
 		FlagSet(modifiers, KeyMod::Shift) ? MK_SHIFT : 0,
@@ -3433,9 +3445,14 @@ LRESULT ScintillaWin::ImeOnDocumentFeed(LPARAM lParam) const {
 		return 0;
 	}
 
-	const size_t compStrLen = imc.GetCompositionString(GCS_COMPSTR).size();
-	const int imeCaretPos = imc.GetImeCaretPos();
-	const Sci::Position compStart = pdoc->GetRelativePositionUTF16(curPos, -imeCaretPos);
+	DWORD compStrLen = 0;
+	Sci::Position compStart = curPos;
+	if (pdoc->TentativeActive()) {
+		// rcFeed contains current composition string
+		compStrLen = imc.GetCompositionStringLength(GCS_COMPSTR);
+		const int imeCaretPos = imc.GetImeCaretPos();
+		compStart = pdoc->GetRelativePositionUTF16(curPos, -imeCaretPos);
+	}
 	const Sci::Position compStrOffset = pdoc->CountUTF16(lineStart, compStart);
 
 	// Fill in reconvert structure.
@@ -3443,7 +3460,7 @@ LRESULT ScintillaWin::ImeOnDocumentFeed(LPARAM lParam) const {
 	rc->dwVersion = 0; //constant
 	rc->dwStrLen = static_cast<DWORD>(rcFeed.length());
 	rc->dwStrOffset = sizeof(RECONVERTSTRING); //constant
-	rc->dwCompStrLen = static_cast<DWORD>(compStrLen);
+	rc->dwCompStrLen = compStrLen;
 	rc->dwCompStrOffset = static_cast<DWORD>(compStrOffset) * sizeof(wchar_t);
 	rc->dwTargetStrLen = rc->dwCompStrLen;
 	rc->dwTargetStrOffset = rc->dwCompStrOffset;
@@ -3452,6 +3469,8 @@ LRESULT ScintillaWin::ImeOnDocumentFeed(LPARAM lParam) const {
 }
 
 void ScintillaWin::GetMouseParameters() noexcept {
+	// mouse pointer size and colour may changed
+	reverseArrowCursor.Invalidate();
 	::SystemParametersInfo(SPI_GETMOUSEVANISH, 0, &typingWithoutCursor, 0);
 	// This retrieves the number of lines per scroll as configured in the Mouse Properties sheet in Control Panel
 	::SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &linesPerScroll, 0);

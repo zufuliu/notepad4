@@ -13,7 +13,7 @@ def increase_style_resource_id_value(path, delta=100):
 		fp.write(updated)
 
 def generate_lexer_menu_resource_id(path):
-	dummy = {'id': 41000}
+	dummy = {'id': 40700}
 	def get_value():
 		result = str(dummy['id'])
 		dummy['id'] += 1

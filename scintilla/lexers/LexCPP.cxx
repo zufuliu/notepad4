@@ -147,16 +147,9 @@ void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 
 	if (AnyOf(initStyle, SCE_C_COMMENTLINE, SCE_C_COMMENTLINEDOC, SCE_C_PREPROCESSOR, SCE_C_STRING, SCE_C_CHARACTER)) {
 		// Set continuationLine if last character of previous line is '\'
-		if (lineCurrent > 0) {
-			const char chBack = styler.SafeGetCharAt(startPos - 1);
-			const char chBack2 = styler.SafeGetCharAt(startPos - 2);
-			char lineEndChar = '!';
-			if (chBack2 == '\r' && chBack == '\n') {
-				lineEndChar = styler.SafeGetCharAt(startPos - 3);
-			} else if (chBack == '\n' || chBack == '\r') {
-				lineEndChar = chBack2;
-			}
-			continuationLine = lineEndChar == '\\';
+		const Sci_Position pos = styler.LineEnd(lineCurrent - 1) - 1;
+		if (pos > 0 && styler[pos] == '\\') {
+			continuationLine = true;
 		}
 	}
 
@@ -315,7 +308,6 @@ void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 				} else if (iswordchar(s[0]) && (IsASpace(sc.ch) || sc.ch == '[' || sc.ch == ')' || sc.ch == '>'
 					|| sc.ch == '*' || sc.ch == '&' || sc.ch == ':')) {
 					bool is_class = false;
-					Sci_PositionU pos = sc.currentPos;
 					const int next_char = nextChar;
 
 					if (sc.ch == ':' && sc.chNext == ':') { // C++
@@ -326,6 +318,7 @@ void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 							if (!IsUpperCase(s[0])) is_class = false;
 						}
 					} else if (next_char == ')' || next_char == '>' || next_char == '[' || next_char == '*' || next_char == '&') {
+						Sci_PositionU pos = sc.currentPos;
 						while (IsASpace(styler.SafeGetCharAt(pos))) pos++;
 						pos++;
 						while (IsASpace(styler.SafeGetCharAt(pos))) pos++;
@@ -967,7 +960,7 @@ void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexe
 		if (atEOL || (i == endPos - 1)) {
 			levelNext = sci::max(levelNext, SC_FOLDLEVELBASE);
 			const int levelUse = levelCurrent;
-			int lev = levelUse | levelNext << 16;
+			int lev = levelUse | (levelNext << 16);
 			if (levelUse < levelNext)
 				lev |= SC_FOLDLEVELHEADERFLAG;
 			styler.SetLevel(lineCurrent, lev);

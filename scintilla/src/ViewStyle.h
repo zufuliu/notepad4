@@ -187,9 +187,10 @@ public:
 	int ctrlCharPadding; // the padding around control character text blobs
 	int lastSegItalicsOffset; // the offset so as not to clip italic characters at EOLs
 
-	using ElementMap = std::map<Scintilla::Element, ColourOptional>;
-	ElementMap elementColours;
-	ElementMap elementBaseColours;
+	uint32_t elementColoursMask;
+	uint32_t elementBaseColoursMask;
+	std::vector<ColourRGBA> elementColours;
+	std::vector<ColourRGBA> elementBaseColours;
 
 	WrapAppearance wrap;
 
@@ -218,25 +219,25 @@ public:
 	bool ValidStyle(size_t styleIndex) const noexcept;
 	void CalcLargestMarkerHeight() noexcept;
 	int GetFrameWidth() const noexcept;
-	bool IsLineFrameOpaque(bool caretActive, bool lineContainsCaret) const;
-	ColourOptional Background(MarkerMask marksOfLine, bool caretActive, bool lineContainsCaret) const;
-	bool SelectionTextDrawn() const;
+	bool IsLineFrameOpaque(bool caretActive, bool lineContainsCaret) const noexcept;
+	ColourOptional Background(MarkerMask marksOfLine, bool caretActive, bool lineContainsCaret) const noexcept;
+	bool SelectionTextDrawn() const noexcept;
 	bool SelectionBackgroundDrawn() const noexcept;
-	bool WhitespaceBackgroundDrawn() const;
-	ColourRGBA WrapColour() const;
+	bool WhitespaceBackgroundDrawn() const noexcept;
+	ColourRGBA WrapColour() const noexcept;
 
 	void AddMultiEdge(int column, ColourRGBA colour);
 
-	ColourOptional ElementColour(Scintilla::Element element) const;
-	ColourRGBA ElementColourForced(Scintilla::Element element) const;
+	ColourOptional ElementColour(Scintilla::Element element) const noexcept;
+	ColourRGBA ElementColourForced(Scintilla::Element element) const noexcept;
 	static constexpr bool ElementAllowsTranslucent(Scintilla::Element element) noexcept {
 		return (element >= Scintilla::Element::SelectionText && element <= Scintilla::Element::WhiteSpace)
 			|| element == Scintilla::Element::HotSpotActive;
 	}
-	bool ResetElement(Scintilla::Element element);
-	bool SetElementColour(Scintilla::Element element, ColourRGBA colour);
-	bool ElementIsSet(Scintilla::Element element) const;
-	bool SetElementBase(Scintilla::Element element, ColourRGBA colour);
+	bool ResetElement(Scintilla::Element element) noexcept;
+	bool SetElementColour(Scintilla::Element element, ColourRGBA colour) noexcept;
+	bool ElementIsSet(Scintilla::Element element) const noexcept;
+	bool SetElementBase(Scintilla::Element element, ColourRGBA colour) noexcept;
 
 	bool SetWrapState(Scintilla::Wrap wrapState_) noexcept;
 	bool SetWrapVisualFlags(Scintilla::WrapVisualFlag wrapVisualFlags_) noexcept;

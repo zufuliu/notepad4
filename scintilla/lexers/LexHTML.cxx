@@ -34,13 +34,12 @@ namespace {
 enum script_type { eScriptNone = 0, eScriptJS, eScriptVBS, eScriptXML, eScriptSGML, eScriptSGMLblock, eScriptComment };
 enum script_mode { eHtml = 0, eNonHtmlScript, eNonHtmlPreProc, eNonHtmlScriptPreProc };
 
-inline void GetTextSegment(LexAccessor &styler, Sci_PositionU start, Sci_PositionU end, char *s, size_t len) noexcept {
-	styler.GetRangeLowered(start, end, s, len);
-}
+// Put an upper limit to bound time taken for unexpected text.
+constexpr Sci_PositionU maxLengthCheck = 200;
 
 script_type segIsScriptingIndicator(LexAccessor &styler, Sci_PositionU start, Sci_PositionU end, script_type prevValue) {
 	char s[128];
-	GetTextSegment(styler, start, end, s, sizeof(s));
+	styler.GetRangeLowered(start, end, s, sizeof(s));
 	//Platform::DebugPrintf("Scripting indicator [%s]\n", s);
 	if (strstr(s, "vbs"))
 		return eScriptVBS;
@@ -48,8 +47,7 @@ script_type segIsScriptingIndicator(LexAccessor &styler, Sci_PositionU start, Sc
 	// https://mimesniff.spec.whatwg.org/#javascript-mime-type
 	if (strstr(s, "javas") || strstr(s, "ecmas") || strstr(s, "module") || strstr(s, "jscr"))
 		return eScriptJS;
-	if (strstr(s, "xml")) {
-		const char *xml = strstr(s, "xml");
+	if (const char *xml = strstr(s, "xml")) {
 		for (const char *t = s; t < xml; t++) {
 			if (!IsASpace(*t)) {
 				return prevValue;
@@ -61,7 +59,7 @@ script_type segIsScriptingIndicator(LexAccessor &styler, Sci_PositionU start, Sc
 	return prevValue;
 }
 
-script_type ScriptOfState(int state) noexcept {
+constexpr script_type ScriptOfState(int state) noexcept {
 	if ((state >= SCE_HB_START && state <= SCE_HB_OPERATOR) || state == SCE_H_ASPAT || state == SCE_H_XCCOMMENT) {
 		return eScriptVBS;
 	}
@@ -145,13 +143,13 @@ constexpr bool isCommentASPState(int state) noexcept {
 }
 
 bool classifyAttribHTML(script_mode inScriptType, Sci_PositionU start, Sci_PositionU end, const WordList &keywords, const WordList &keywordsEvent, LexAccessor &styler) {
-	char chAttr = SCE_H_ATTRIBUTEUNKNOWN;
+	int chAttr = SCE_H_ATTRIBUTEUNKNOWN;
 	bool isLanguageType = false;
 	if (IsNumberChar(styler[start])) {
 		chAttr = SCE_H_NUMBER;
 	} else {
 		char s[128];
-		GetTextSegment(styler, start, end, s, sizeof(s));
+		styler.GetRangeLowered(start, end, s, sizeof(s));
 		if (keywords.InList(s) || keywordsEvent.InList(s))
 			chAttr = SCE_H_ATTRIBUTE;
 		if (inScriptType == eNonHtmlScript) {
@@ -212,7 +210,7 @@ int classifyTagHTML(Sci_PositionU start, Sci_PositionU end, const WordList &keyw
 	withSpace[i] = '\0';
 
 	// No keywords -> all are known
-	char chAttr = SCE_H_TAGUNKNOWN;
+	int chAttr = SCE_H_TAGUNKNOWN;
 	bool customElement = false;
 	if (tag[0] == '!') {
 		chAttr = SCE_H_SGML_DEFAULT;
@@ -229,11 +227,11 @@ int classifyTagHTML(Sci_PositionU start, Sci_PositionU end, const WordList &keyw
 		if (allowScripts && StrEqual(tag, "script")) {
 			// check to see if this is a self-closing tag by sniffing ahead
 			bool isSelfClose = false;
-			for (Sci_PositionU cPos = end - 1; cPos < end + 200; cPos++) {
+			for (Sci_PositionU cPos = end - 1; cPos < end + maxLengthCheck; cPos++) {
 				const char ch = styler.SafeGetCharAt(cPos);
 				if (ch == '\0' || ch == '>')
 					break;
-				else if (ch == '/' && styler.SafeGetCharAt(cPos + 1) == '>') {
+				if (ch == '/' && styler.SafeGetCharAt(cPos + 1) == '>') {
 					isSelfClose = true;
 					break;
 				}
@@ -253,7 +251,7 @@ int classifyTagHTML(Sci_PositionU start, Sci_PositionU end, const WordList &keyw
 void classifyWordHTJS(Sci_PositionU start, Sci_PositionU end, const WordList &keywords, LexAccessor &styler, script_mode inScriptType) {
 	char s[127 + 1];
 	styler.GetRange(start, end, s, sizeof(s));
-	char chAttr = SCE_HJ_WORD;
+	int chAttr = SCE_HJ_WORD;
 	if (keywords.InList(s)) {
 		chAttr = SCE_HJ_KEYWORD;
 	}
@@ -261,9 +259,9 @@ void classifyWordHTJS(Sci_PositionU start, Sci_PositionU end, const WordList &ke
 }
 
 int classifyWordHTVB(Sci_PositionU start, Sci_PositionU end, const WordList &keywords, LexAccessor &styler, script_mode inScriptType) {
-	char chAttr = SCE_HB_IDENTIFIER;
+	int chAttr = SCE_HB_IDENTIFIER;
 	char s[128];
-	GetTextSegment(styler, start, end, s, sizeof(s));
+	styler.GetRangeLowered(start, end, s, sizeof(s));
 	if (keywords.InList(s)) {
 		chAttr = SCE_HB_WORD;
 		if (StrEqual(s, "rem"))
@@ -312,11 +310,10 @@ constexpr bool issgmlwordchar(int ch) noexcept {
 }
 
 constexpr bool InTagState(int state) noexcept {
-	return state == SCE_H_TAG || state == SCE_H_TAGUNKNOWN ||
-	       state == SCE_H_SCRIPT ||
-	       state == SCE_H_ATTRIBUTE || state == SCE_H_ATTRIBUTEUNKNOWN ||
-	       state == SCE_H_NUMBER || state == SCE_H_OTHER ||
-	       state == SCE_H_DOUBLESTRING || state == SCE_H_SINGLESTRING;
+	return AnyOf(state, SCE_H_TAG, SCE_H_TAGUNKNOWN, SCE_H_SCRIPT,
+				SCE_H_ATTRIBUTE, SCE_H_ATTRIBUTEUNKNOWN,
+				SCE_H_NUMBER, SCE_H_OTHER,
+				SCE_H_DOUBLESTRING, SCE_H_SINGLESTRING);
 }
 
 constexpr bool IsCommentState(const int state) noexcept {
@@ -324,8 +321,8 @@ constexpr bool IsCommentState(const int state) noexcept {
 }
 
 constexpr bool IsScriptCommentState(const int state) noexcept {
-	return state == SCE_HJ_COMMENT || state == SCE_HJ_COMMENTLINE || state == SCE_HJA_COMMENT ||
-		   state == SCE_HJA_COMMENTLINE || state == SCE_HB_COMMENTLINE || state == SCE_HBA_COMMENTLINE;
+	return AnyOf(state, SCE_HJ_COMMENT, SCE_HJ_COMMENTLINE, SCE_HJA_COMMENT,
+				SCE_HJA_COMMENTLINE, SCE_HB_COMMENTLINE, SCE_HBA_COMMENTLINE);
 }
 
 constexpr bool IsHTMLWordChar(int ch) noexcept {
@@ -359,7 +356,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 
 	// If inside a tag, it may be a script tag, so reread from the start of line starting tag to ensure any language tags are seen
 	if (InTagState(state)) {
-		while ((startPos > 0) && (InTagState(styler.StyleAt(startPos - 1)))) {
+		while ((startPos > 0) && (InTagState(styler.StyleIndexAt(startPos - 1)))) {
 			const Sci_Position backLineStart = styler.LineStart(styler.GetLine(startPos-1));
 			length += startPos - backLineStart;
 			startPos = backLineStart;
@@ -440,7 +437,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 		Sci_Position back = startPos;
 		int style = 0;
 		while (--back) {
-			style = styler.StyleAt(back);
+			style = styler.StyleIndexAt(back);
 			if (style < SCE_HJ_DEFAULT || style > SCE_HJ_COMMENTDOC)
 				// includes SCE_HJ_COMMENT & SCE_HJ_COMMENTLINE
 				break;
@@ -657,6 +654,18 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				state = SCE_H_COMMENT; // wait for a pending command
 				styler.ColorTo(i + 3, SCE_H_COMMENT);
 				i += 2; // follow styling after the --
+				if (!isXml) {
+					// handle empty comment: <!-->, <!--->
+					// https://html.spec.whatwg.org/multipage/parsing.html#parse-error-abrupt-closing-of-empty-comment
+					chNext = styler.SafeGetUCharAt(i + 1);
+					if ((chNext == '>') || (chNext == '-' && styler.SafeGetUCharAt(i + 2) == '>')) {
+						if (chNext == '-') {
+							i += 1;
+						}
+						chPrev = '-';
+						ch = '-';
+					}
+				}
 			} else if (isWordCdata(i + 1, styler)) {
 				state = SCE_H_CDATA;
 			} else {
@@ -723,7 +732,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				// in HTML, fold on tag open and unfold on tag close
 				tagOpened = true;
 				tagClosing = (chNext == '/');
-				if (foldXmlAtTagOpen && !(chNext == '/' || chNext == '?' || chNext == '!' || chNext == '-' || chNext == '%')) {
+				if (foldXmlAtTagOpen && !AnyOf(chNext, '/', '?', '!', '-', '%')) {
 					levelCurrent++;
 				}
 				if (foldXmlAtTagOpen && chNext == '/') {
@@ -847,7 +856,12 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			}
 			break;
 		case SCE_H_COMMENT:
-			if ((scriptLanguage != eScriptComment) && (chPrev2 == '-') && (chPrev == '-') && (ch == '>')) {
+			if ((scriptLanguage != eScriptComment) && (chPrev2 == '-') && (chPrev == '-') && (ch == '>' || (!isXml && ch == '!' && chNext == '>'))) {
+				// close HTML comment with --!>
+				// https://html.spec.whatwg.org/multipage/parsing.html#parse-error-incorrectly-closed-comment
+				if (ch == '!') {
+					i += 1;
+				}
 				styler.ColorTo(i + 1, StateToPrint);
 				state = SCE_H_DEFAULT;
 				levelCurrent--;

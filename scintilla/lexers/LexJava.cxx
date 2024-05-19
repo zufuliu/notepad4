@@ -88,7 +88,7 @@ enum class KeywordType {
 	Record = SCE_JAVA_RECORD,
 	Label = SCE_JAVA_LABEL,
 	Return = 0x40,
-	While,
+	While = 0x41,
 };
 
 static_assert(DefaultNestedStateBaseStyle + 1 == SCE_JAVA_TEMPLATE);
@@ -344,6 +344,9 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 								sc.ChangeState(SCE_JAVA_CLASS);
 							}
 						}
+					} else if (sc.chNext == '\"') {
+						// template processor
+						sc.ChangeState(SCE_JAVA_FUNCTION);
 					}
 					if (sc.state != SCE_JAVA_WORD && sc.ch != '.') {
 						kwType = KeywordType::None;
@@ -650,7 +653,7 @@ void FoldJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 			}
 
 			const int levelUse = levelCurrent;
-			int lev = levelUse | levelNext << 16;
+			int lev = levelUse | (levelNext << 16);
 			if (levelUse < levelNext) {
 				lev |= SC_FOLDLEVELHEADERFLAG;
 			}

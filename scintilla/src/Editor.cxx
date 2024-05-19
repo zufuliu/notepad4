@@ -210,7 +210,7 @@ void Editor::Finalise() noexcept {
 }
 
 void Editor::SetRepresentations() {
-	reprs.SetDefaultRepresentations(pdoc->dbcsCodePage);
+	reprs->SetDefaultRepresentations(pdoc->dbcsCodePage);
 }
 
 void Editor::DropGraphics() noexcept {
@@ -2065,8 +2065,8 @@ void Editor::InsertCharacter(std::string_view sv, CharacterSource charSource) {
 	}
 
 	// We don't handle inline IME tentative input characters
+	int ch = static_cast<unsigned char>(sv[0]);
 	if (!handled && charSource != CharacterSource::TentativeInput && sel.Count() == 1) {
-		int ch = static_cast<unsigned char>(sv[0]);
 		if (pdoc->dbcsCodePage != CpUtf8) {
 			if (sv.length() > 1) {
 				// DBCS code page or DBCS font character set.
@@ -2084,8 +2084,10 @@ void Editor::InsertCharacter(std::string_view sv, CharacterSource charSource) {
 				ch = utf32[0];
 			}
 		}
-		NotifyChar(ch, charSource);
+	} else {
+		handled = true;
 	}
+	NotifyChar(ch, charSource, handled);
 
 	if (recordingMacro && charSource != CharacterSource::TentativeInput) {
 		std::string copy(sv); // ensure NUL-terminated
@@ -2459,11 +2461,12 @@ void Editor::NotifyErrorOccurred(Document *, void *, Status status) noexcept {
 	errorStatus = status;
 }
 
-void Editor::NotifyChar(int ch, CharacterSource charSource) noexcept {
+void Editor::NotifyChar(int ch, CharacterSource charSource, bool handled) noexcept {
 	NotificationData scn = {};
 	scn.nmhdr.code = Notification::CharAdded;
 	scn.ch = ch;
 	scn.characterSource = charSource;
+	scn.listType = handled;
 	NotifyParent(scn);
 }
 
@@ -5856,36 +5859,23 @@ Sci::Line Editor::WrapCount(Sci::Line line) {
 }
 
 void Editor::AddStyledText(const char *buffer, Sci::Position appendLength) {
-	// The buffer consists of alternating character bytes and style bytes
+	// see GetTextRange(), buffer := [textLength style bytes] NUL [textLength character bytes] NUL
 	const Sci::Position textLength = appendLength / 2;
-	std::string text(textLength, '\0');
-	for (Sci::Position i = 0; i < textLength; i++) {
-		text[i] = buffer[i * 2];
-	}
-	const Sci::Position lengthInserted = pdoc->InsertString(CurrentPosition(), text);
-	for (Sci::Position i = 0; i < textLength; i++) {
-		text[i] = buffer[i * 2 + 1];
-	}
+	const Sci::Position lengthInserted = pdoc->InsertString(CurrentPosition(), buffer + textLength + 1, textLength);
 	pdoc->StartStyling(CurrentPosition());
-	pdoc->SetStyles(textLength, reinterpret_cast<const unsigned char*>(text.c_str()));
+	pdoc->SetStyles(textLength, reinterpret_cast<const unsigned char*>(buffer));
 	SetEmptySelection(sel.MainCaret() + lengthInserted);
 }
 
-Sci::Position Editor::GetStyledText(char *buffer, Sci::Position cpMin, Sci::Position cpMax) const noexcept {
-	Sci::Position iPlace = 0;
-	for (Sci::Position iChar = cpMin; iChar < cpMax; iChar++) {
-		buffer[iPlace++] = pdoc->CharAt(iChar);
-		buffer[iPlace++] = pdoc->StyleAt(iChar);
-	}
-	buffer[iPlace] = '\0';
-	buffer[iPlace + 1] = '\0';
-	return iPlace;
-}
-
-Sci::Position Editor::GetTextRange(char *buffer, Sci::Position cpMin, Sci::Position cpMax) const noexcept {
+Sci::Position Editor::GetTextRange(char *buffer, Sci::Position cpMin, Sci::Position cpMax, bool style) const noexcept {
 	const Sci::Position cpEnd = (cpMax == -1) ? pdoc->Length() : cpMax;
 	PLATFORM_ASSERT(cpEnd <= pdoc->Length());
 	const Sci::Position len = cpEnd - cpMin; 	// No -1 as cpMin and cpMax are referring to inter character positions
+	if (style) {
+		pdoc->GetStyleRange(reinterpret_cast<unsigned char *>(buffer), cpMin, len);
+		buffer[len] = '\0';
+		buffer += len + 1;
+	}
 	pdoc->GetCharRange(buffer, cpMin, len);
 	// Spec says copied text is terminated with a NUL
 	buffer[len] = '\0';
@@ -6111,6 +6101,15 @@ sptr_t Editor::BytesResult(sptr_t lParam, const unsigned char *val, size_t len) 
 			*ptr = 0;
 	}
 	return val ? len : 0;
+}
+
+sptr_t Editor::BytesResult(Scintilla::sptr_t lParam, std::string_view sv) noexcept {
+	// No NUL termination: sv.length() is number of valid/displayed bytes
+	if (lParam && !sv.empty()) {
+		char *ptr = CharPtrFromSPtr(lParam);
+		memcpy(ptr, sv.data(), sv.length());
+	}
+	return sv.length();
 }
 
 sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
@@ -6556,6 +6555,56 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		pdoc->EndUndoAction();
 		return 0;
 
+	case Message::GetUndoActions:
+		return pdoc->UndoActions();
+
+	case Message::SetUndoSavePoint:
+		pdoc->SetUndoSavePoint(static_cast<int>(wParam));
+		break;
+
+	case Message::GetUndoSavePoint:
+		return pdoc->UndoSavePoint();
+
+	case Message::SetUndoDetach:
+		pdoc->SetUndoDetach(static_cast<int>(wParam));
+		break;
+
+	case Message::GetUndoDetach:
+		return pdoc->UndoDetach();
+
+	case Message::SetUndoTentative:
+		pdoc->SetUndoTentative(static_cast<int>(wParam));
+		break;
+
+	case Message::GetUndoTentative:
+		return pdoc->UndoTentative();
+
+	case Message::SetUndoCurrent:
+		pdoc->SetUndoCurrent(static_cast<int>(wParam));
+		break;
+
+	case Message::GetUndoCurrent:
+		return pdoc->UndoCurrent();
+
+	case Message::GetUndoActionType:
+		return pdoc->UndoActionType(static_cast<int>(wParam));
+
+	case Message::GetUndoActionPosition:
+		return pdoc->UndoActionPosition(static_cast<int>(wParam));
+
+	case Message::GetUndoActionText: {
+		const std::string_view text = pdoc->UndoActionText(static_cast<int>(wParam));
+		return BytesResult(lParam, text);
+	}
+
+	case Message::PushUndoActionType:
+		pdoc->PushUndoActionType(static_cast<int>(wParam), lParam);
+		break;
+
+	case Message::ChangeLastUndoActionText:
+		pdoc->ChangeLastUndoActionText(wParam, CharPtrFromSPtr(lParam));
+		break;
+
 	case Message::GetCaretPeriod:
 		return caret.period;
 
@@ -6709,7 +6758,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 
 	case Message::GetStyledTextFull:
 		if (const TextRangeFull *tr = static_cast<TextRangeFull *>(PtrFromSPtr(lParam))) {
-			return GetStyledText(tr->lpstrText, tr->chrg.cpMin, tr->chrg.cpMax);
+			return GetTextRange(tr->lpstrText, tr->chrg.cpMin, tr->chrg.cpMax, true);
 		}
 		return 0;
 
@@ -7470,7 +7519,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		return ViewStyle::ElementAllowsTranslucent(static_cast<Element>(wParam));
 
 	case Message::GetElementBaseColour:
-		return vs.elementBaseColours[static_cast<Element>(wParam)].value_or(ColourRGBA()).AsInteger();
+		return vs.elementBaseColours[wParam].AsInteger();
 
 	case Message::SetFontLocale:
 		if (lParam != 0) {
@@ -8219,11 +8268,11 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		return vs.controlCharSymbol;
 
 	case Message::SetRepresentation:
-		reprs.SetRepresentation(ConstCharPtrFromUPtr(wParam), ConstCharPtrFromSPtr(lParam));
+		reprs->SetRepresentation(ConstCharPtrFromUPtr(wParam), ConstCharPtrFromSPtr(lParam));
 		break;
 
 	case Message::GetRepresentation: {
-			const Representation *repr = reprs.RepresentationFromCharacter(
+			const Representation *repr = reprs->RepresentationFromCharacter(
 				ConstCharPtrFromUPtr(wParam));
 			if (repr) {
 				return StringResult(lParam, repr->stringRep);
@@ -8232,7 +8281,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		}
 
 	case Message::ClearRepresentation:
-		reprs.ClearRepresentation(ConstCharPtrFromUPtr(wParam));
+		reprs->ClearRepresentation(ConstCharPtrFromUPtr(wParam));
 		break;
 
 	case Message::ClearAllRepresentations:
@@ -8240,11 +8289,11 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case Message::SetRepresentationAppearance:
-		reprs.SetRepresentationAppearance(ConstCharPtrFromUPtr(wParam), static_cast<RepresentationAppearance>(lParam));
+		reprs->SetRepresentationAppearance(ConstCharPtrFromUPtr(wParam), static_cast<RepresentationAppearance>(lParam));
 		break;
 
 	case Message::GetRepresentationAppearance: {
-		const Representation *repr = reprs.RepresentationFromCharacter(ConstCharPtrFromUPtr(wParam));
+		const Representation *repr = reprs->RepresentationFromCharacter(ConstCharPtrFromUPtr(wParam));
 		if (repr) {
 			return static_cast<sptr_t>(repr->appearance);
 		}
@@ -8252,11 +8301,11 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 	}
 
 	case Message::SetRepresentationColour:
-		reprs.SetRepresentationColour(ConstCharPtrFromUPtr(wParam), ColourRGBA(static_cast<unsigned int>(lParam)));
+		reprs->SetRepresentationColour(ConstCharPtrFromUPtr(wParam), ColourRGBA(static_cast<unsigned int>(lParam)));
 		break;
 
 	case Message::GetRepresentationColour: {
-		const Representation *repr = reprs.RepresentationFromCharacter(ConstCharPtrFromUPtr(wParam));
+		const Representation *repr = reprs->RepresentationFromCharacter(ConstCharPtrFromUPtr(wParam));
 		if (repr) {
 			return repr->colour.AsInteger();
 		}

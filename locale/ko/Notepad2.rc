@@ -217,7 +217,7 @@ BEGIN
 			MENUITEM "복제(&D)\tAlt+D",				IDM_EDIT_SELECTIONDUPLICATE
 			MENUITEM SEPARATOR
 			MENUITEM "줄 주석 전환(&O)\tCtrl+/",	IDM_EDIT_LINECOMMENT
-			MENUITEM "Toggle Block &Comment\tCtrl+Q",	IDM_EDIT_STREAMCOMMENT
+			MENUITEM "블록 설명 전환(&C)\tCtrl+Q",	IDM_EDIT_STREAMCOMMENT
 			MENUITEM "들여쓰기(&I)\tTab",					IDM_EDIT_INDENT
 			MENUITEM "들여쓰기 해제(&U)\tShift+Tab",			IDM_EDIT_UNINDENT
 			MENUITEM SEPARATOR
@@ -580,7 +580,7 @@ BEGIN
 			BEGIN
 				MENUITEM "없음(&N)",						IDM_LINE_SELECTION_MODE_NONE
 				MENUITEM "Visual Studio(&V)",				IDM_LINE_SELECTION_MODE_VS
-				MENUITEM "&Old Visual Studio",		IDM_LINE_SELECTION_MODE_OLDVS
+				MENUITEM "이전 Visual Studio(&O)",		IDM_LINE_SELECTION_MODE_OLDVS
 				MENUITEM "일반(&M)",						IDM_LINE_SELECTION_MODE_NORMAL
 			END
 		END
@@ -627,7 +627,7 @@ BEGIN
 		END
 		POPUP "창 옵션(&P)"
 		BEGIN
-			MENUITEM "항상 맨 위(&T)\tAlt+Shift+T",	IDM_VIEW_ALWAYSONTOP
+			MENUITEM "항상 맨 위에(&T)\tAlt+Shift+T",	IDM_VIEW_ALWAYSONTOP
 			MENUITEM "트레이로 최소화(&Z)",			IDM_VIEW_MINTOTRAY
 			MENUITEM SEPARATOR
 			MENUITEM "창 재사용(&R)",				IDM_VIEW_REUSEWINDOW
@@ -708,6 +708,9 @@ BEGIN
 		MENUITEM SEPARATOR
 		POPUP "선택시 동작(&O)"
 		BEGIN
+			MENUITEM "코드 압축(&C)",						IDM_EDIT_CODE_COMPRESS
+			MENUITEM "코드 정돈(&P)",						IDM_EDIT_CODE_PRETTY
+			MENUITEM SEPARATOR
 			MENUITEM "파일, 폴더, 링크, 기타 열기(&O)",		CMD_OPEN_PATH_OR_LINK
 			MENUITEM "폴더 내용 열기(&F)",				CMD_OPEN_CONTAINING_FOLDER
 			MENUITEM SEPARATOR
@@ -1630,7 +1633,7 @@ BEGIN
     AUTOCHECKBOX    "텍스트 자동 들여쓰기",IDC_AUTO_INDENT_TEXT,231,7,200,10,WS_TABSTOP
     AUTOCHECKBOX    "HTML 및 XML 태그 자동 닫기",IDC_AUTO_CLOSE_TAGS,231,19,200,10,WS_TABSTOP
     AUTOCHECKBOX    "해당하는 경우 쉼표(,)를 입력한 후 공백을 자동으로 삽입",IDC_AUTO_INSERT_SPACE_COMMA,231,31,218,10,WS_TABSTOP
-    AUTOCHECKBOX    "Insert space after comment marker on toggle line comment.",IDC_AUTO_INSERT_SPACE_COMMENT,231,43,218,10,WS_TABSTOP
+    AUTOCHECKBOX    "줄 주석을 전환할 때 댓글 마커 뒤에 공백을 삽입합니다.",IDC_AUTO_INSERT_SPACE_COMMENT,231,43,218,10,WS_TABSTOP
     GROUPBOX        "괄호 및 따옴표 자동 완성",IDC_STATIC,231,56,218,49
     AUTOCHECKBOX    "( )",IDC_AUTO_INSERT_PARENTHESIS,238,68,40,10,WS_TABSTOP
     AUTOCHECKBOX    "{ }",IDC_AUTO_INSERT_BRACE,290,68,40,10,WS_TABSTOP
@@ -1765,7 +1768,7 @@ $\t줄의 끝\n\
 *? or +?\t""?"" 및 ""+""의 게으른 수량자\n\
 (\t그룹의 시작\n\
 )\t그룹의 끝\n\
-\\n\t교체시 영역을 나타냄 (n은 1-9)\n\n\
+\\n\t교체 시 영역을 나타냄 (n은 1-9)\n\n\
 Boost Perl Regex Syntax:\n\
 a|b\tMatches either a or b\n\
 {n}\tMatches preceding exactly n times\n\
@@ -1810,7 +1813,7 @@ BEGIN
     IDT_FILE_ADDTOFAV       "즐겨찾기에 추가"
     IDT_VIEW_TOGGLEFOLDS    "접기 전환"
     IDT_FILE_LAUNCH         "문서 실행"
-    IDT_VIEW_ALWAYSONTOP    "항상 맨 위"
+    IDT_VIEW_ALWAYSONTOP    "항상 맨 위에"
 END
 
 STRINGTABLE
@@ -1852,7 +1855,7 @@ BEGIN
 /l[o|p]\t수정된 파일을 자동으로 다시 불러옵니다.\n\
 /q\t프롬프트없이 새 파일을 강제로 생성합니다.\n\
 /ro\t파일을 읽기 전용 모드로 엽니다.\n\
-/p\tPrint file with default printer and options.\n\
+/p\t기본 프린터 및 옵션으로 파일을 인쇄합니다.\n\
 /s 이름\t지정된 구문 체계를 선택합니다.\n\
 /d\t텍스트 파일 구성표를 선택합니다.\n\
 /h\t웹 소스 코드 체계를 선택합니다.\n\
@@ -1884,7 +1887,7 @@ BEGIN
     IDS_PRINT_COLOR         "일반|색상 반전 (어두운 배경)|흰색 바탕에 검은색|흰색 바탕에 컬러|흰색 바탕에 컬러 (줄 번호 제외)|현재 화면 색상 (WYSIWYG)"
     IDS_PRINT_PAGENUM       "%s 페이지"
     IDS_PRINT_ERROR         """%s"" 인쇄 중 오류가 발생했습니다!"
-    IDS_FAV_SUCCESS         "현재 파일에 대한 바로가기가 즐겨찾기 디렉터리에 생성되었습니다."
+    IDS_FAV_SUCCESS         "현재 파일에 대한 바로 가기가 즐겨찾기 디렉터리에 생성되었습니다."
     IDS_FAV_FAILURE         "현재 파일에 대한 바로 가기를 만들 수 없습니다.\n같은 이름의 다른 파일이 없는지 확인하십시오."
     IDS_READONLY_MODIFY     """%s""의 속성을 수정할 수 없습니다."
 END
@@ -1968,10 +1971,10 @@ BEGIN
 	IDS_ENCODING_ISO8859_14			"켈트어 (라틴어-8, ISO 8859-14);ISO 8859-14"				// 서유럽어
 	IDS_ENCODING_MAC_THAI			"Mac 태국어;Mac 태국어"										// 동남아시아
 	IDS_ENCODING_TIS620				"태국어 (TIS-620, Windows-874, ISO 8859-11);TIS-620"		// 동남아시아
-	IDS_ENCODING_DOS857				"OEM 터키어 (DOS-857);DOS-857"							// 터키어
-	IDS_ENCODING_ISO8859_9			"라틴-5 (ISO 8859-9);ISO 8859-9"						// 터키어
-	IDS_ENCODING_MAC_TURKISH		"Mac 터키어;Mac 터키어"								// 터키어
-	IDS_ENCODING_WINDOWS1254		"Windows-1254;Windows-1254"								// 터키어
+	IDS_ENCODING_DOS857				"OEM 튀르키예어 (DOS-857);DOS-857"							// 튀르키예어
+	IDS_ENCODING_ISO8859_9			"라틴-5 (ISO 8859-9);ISO 8859-9"						// 튀르키예어
+	IDS_ENCODING_MAC_TURKISH		"Mac 튀르키예어;Mac 튀르키예어"								// 튀르키예어
+	IDS_ENCODING_WINDOWS1254		"Windows-1254;Windows-1254"								// 튀르키예어
 	IDS_ENCODING_MAC_UKRAINIAN		"Mac 우크라이나어;Mac 우크라이나어"							// 키릴 문자
 	IDS_ENCODING_WINDOWS1258		"베트남어 (Windows-1258);Windows-1258"				// 동남아시아
 	IDS_ENCODING_DOS850				"OEM 라틴어-1 (DOS-850);DOS-850"							// 서유럽어
@@ -1983,7 +1986,7 @@ BEGIN
 	IDS_ENCODING_IBM500				"국제 (IBM500);EBCDIC (Intl.)"					// EBCDIC
 	IDS_ENCODING_IBM870				"라틴어-2 (IBM870);EBCDIC (라틴어-2)"						// EBCDIC
 	IDS_ENCODING_CP875				"현대 그리스어 (CP875);EBCDIC (그리스)"					// EBCDIC
-	IDS_ENCODING_IBM1026			"터키어 (라틴어-5) (IBM1026);EBCDIC (라틴어-5)"			// EBCDIC
+	IDS_ENCODING_IBM1026			"튀르키예어 (라틴어-5) (IBM1026);EBCDIC (라틴어-5)"			// EBCDIC
 	IDS_ENCODING_DOS437				"OEM 미국 (DOS-437);DOS-437"					// 서유럽어
 	IDS_ENCODING_DOS858				"OEM 라틴어-1 + 유로 기호 (DOS-858);DOS-858"			// 서유럽어
 	IDS_ENCODING_DOS860				"OEM 포르투칼어 (DOS-860);DOS-860"						// 서유럽어
@@ -2032,7 +2035,7 @@ BEGIN
 	IDS_EOLMODENAME_CR				"클래식 macOS (CR)"
 
 	IDS_CONFIG_THEME_TITLE_DEFAULT	"구성표 사용자 정의 - 기본 테마"
-	IDS_CONFIG_THEME_TITLE_DARK		"구성표 사용자 정의 - 다크 테마"
+	IDS_CONFIG_THEME_TITLE_DARK		"구성표 사용자 정의 - 어두운 테마"
 	IDS_FAVORITE_SCHEMES_TITLE		"즐겨찾기"
 	IDS_CUSTOMIZE_SCHEMES_HELP		"확장자는 세미콜론(;)으로 구분되어야 합니다.\r\n\
 \r\n\

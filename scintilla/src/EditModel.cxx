@@ -77,6 +77,7 @@ EditModel::EditModel() : durationWrapOneUnit(0.01 / 64), durationWrapOneThread(0
 	hotspotSingleLine = true;
 	hoverIndicatorPos = Sci::invalidPosition;
 	wrapWidth = LineLayout::wrapWidthInfinite;
+	reprs = std::make_unique<SpecialRepresentations>();
 	// before setting a lexer, style buffer is useless.
 	pdoc = new Document(DocumentOption::StylesNone);
 	pdoc->AddRef();
