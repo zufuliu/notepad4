@@ -18,6 +18,7 @@
 *
 ******************************************************************************/
 
+struct IUnknown;
 #include <windows.h>
 #include <windowsx.h>
 #include <shlwapi.h>
@@ -6472,7 +6473,7 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) {
 			opt += CSTRLEN(L"sysmru=");
 			if (opt[1] == L'\0') {
 				const UINT value = opt[0] - L'0';
-				if (value <= true) {
+				if (value <= TRUE) {
 					flagUseSystemMRU = (TripleBoolean)value;
 					state = CommandParseState_Consumed;
 				}
@@ -7305,7 +7306,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 			bRestoreView = true;
 			keepTitleExcerpt = true;
 			keepCurrentLexer = true;
-			flagReadOnlyMode |= bReadOnlyMode;
+			flagReadOnlyMode |= (int)bReadOnlyMode;
 		}
 		fSuccess = true;
 	}

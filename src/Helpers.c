@@ -20,6 +20,7 @@
 *
 ******************************************************************************/
 
+struct IUnknown;
 #include <windows.h>
 #include <windowsx.h>
 #include <dlgs.h>
@@ -247,7 +248,7 @@ bool IniSectionGetBoolImpl(IniSection *section, LPCWSTR key, int keyLen, bool bD
 	LPCWSTR value = IniSectionGetValueImpl(section, key, keyLen);
 	if (value) {
 		const UINT t = *value - L'0';
-		if (t <= true) {
+		if (t <= TRUE) {
 			return t & true;
 		}
 	}
