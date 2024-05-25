@@ -1000,7 +1000,7 @@ bool EditLoadFile(LPWSTR pszFile, EditFileIOStatus *status) {
 	//        is about fileSize*2, buffers we allocated below can be reused by system to served
 	//        as Scintilla's style buffer when calling SciCall_SetLexer() inside Style_SetLexer().
 	//     3. Extra memory when moving gaps on editing, it may require more than 2/3 physical memory.
-	// large file TODO: https://github.com/zufuliu/notepad2/issues/125
+	// large file TODO: https://github.com/zufuliu/notepad4/issues/125
 	// [ ] [> 4 GiB] use SetFilePointerEx() and ReadFile()/WriteFile() to read/write file.
 	// [-] [> 2 GiB] fix encoding conversion with MultiByteToWideChar() and WideCharToMultiByte().
 	LONGLONG maxFileSize = INT64_C(4) << 30;

@@ -1816,7 +1816,7 @@ STRINGTABLE
 BEGIN
     IDS_ERR_LOADFILE        "加载“%s”时出错"
     IDS_ERR_SAVEFILE        "保存“%s”时出错"
-    IDS_ERR_BROWSE          "没有找到文件浏览器插件。\nmetapath 文件浏览器插件可以从如下地址下载:\nhttps://github.com/zufuliu/notepad2/releases\n\n是否立即打开下载页面？"
+    IDS_ERR_BROWSE          "没有找到文件浏览器插件。\nmetapath 文件浏览器插件可以从如下地址下载:\nhttps://github.com/zufuliu/notepad4/releases\n\n是否立即打开下载页面？"
     IDS_ERR_MRUDLG          "没有权限访问选中的文件！\n要从列表中移除它吗？"
     IDS_ERR_CREATELINK      "创建桌面快捷方式时出错。"
     IDS_ERR_PREVWINDISABLED "现有的 Notepad2 窗口正忙或有一个活动的对话框。\n要打开一个新的窗口吗？"

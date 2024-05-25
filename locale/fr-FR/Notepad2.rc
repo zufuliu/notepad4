@@ -1816,7 +1816,7 @@ STRINGTABLE
 BEGIN
     IDS_ERR_LOADFILE        "Erreur lors du chargement de ""%s""."
     IDS_ERR_SAVEFILE        "Erreur lors de la sauvegarde de ""%s""."
-    IDS_ERR_BROWSE          "Aucun plugin pour exploration de fichier n'a été trouvé.\nLe plugin Metapath File Browser peut être téléchargé à partir de l'adresse suivante : \nhttps://github.com/zufuliu/notepad2/releases.\n\nVoulez-vous ouvrir la page de téléchargement ?"
+    IDS_ERR_BROWSE          "Aucun plugin pour exploration de fichier n'a été trouvé.\nLe plugin Metapath File Browser peut être téléchargé à partir de l'adresse suivante : \nhttps://github.com/zufuliu/notepad4/releases.\n\nVoulez-vous ouvrir la page de téléchargement ?"
     IDS_ERR_MRUDLG          "Impossible d'accéder au fichier spécifié !\nVoulez-vous le supprimer de la liste ?"
     IDS_ERR_CREATELINK      "Echec lors de la création du raccourci sur le bureau."
     IDS_ERR_PREVWINDISABLED "La fenêtre Notepad2 existante est occupée ou a une fenêtre de dialogue encore ouverte.\nVoulez-vous en ouvrir une autre ?"

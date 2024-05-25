@@ -444,12 +444,12 @@ static inline bool IsTopMost(void) {
 	return (bAlwaysOnTop || flagAlwaysOnTop == TripleBoolean_True) && flagAlwaysOnTop != TripleBoolean_False;
 }
 
-// temporary fix for https://github.com/zufuliu/notepad2/issues/77: force InvalidateStyleRedraw().
+// temporary fix for https://github.com/zufuliu/notepad4/issues/77: force InvalidateStyleRedraw().
 static inline void InvalidateStyleRedraw(void) {
 	SciCall_SetViewEOL(bViewEOLs);
 }
 
-// temporary fix for https://github.com/zufuliu/notepad2/issues/134: Direct2D on arm32
+// temporary fix for https://github.com/zufuliu/notepad4/issues/134: Direct2D on arm32
 static inline int GetDefualtRenderingTechnology(void) {
 #if defined(__arm__) || defined(_ARM_) || defined(_M_ARM)
 	return SC_TECHNOLOGY_DIRECTWRITERETAIN;

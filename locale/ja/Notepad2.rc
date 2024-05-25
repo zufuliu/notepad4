@@ -1816,7 +1816,7 @@ STRINGTABLE
 BEGIN
     IDS_ERR_LOADFILE        "読込失敗 ""%s"""
     IDS_ERR_SAVEFILE        "保存失敗 ""%s"""
-    IDS_ERR_BROWSE          "ファイラーのプラグインがありません。\nこのプラグイン metapath は https://github.com/zufuliu/notepad2/releases でダウンロードできます。\nこのサイトを開きますか？"
+    IDS_ERR_BROWSE          "ファイラーのプラグインがありません。\nこのプラグイン metapath は https://github.com/zufuliu/notepad4/releases でダウンロードできます。\nこのサイトを開きますか？"
     IDS_ERR_MRUDLG          "選択したファイルにアクセスできませんでした。\n一覧から消去しますか？"
     IDS_ERR_CREATELINK      "デスクトップへのショートカット作成時にエラーが発生しました。"
     IDS_ERR_PREVWINDISABLED "現在 Notepad2 のウィンドウはビジー状態か､ダイアログが出たままのようです。\n新しいウィンドウを開きますか？"

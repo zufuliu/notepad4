@@ -1816,7 +1816,7 @@ STRINGTABLE
 BEGIN
     IDS_ERR_LOADFILE        "Errore nel caricamento ""%s""."
     IDS_ERR_SAVEFILE        "Errore nel salvataggio ""%s""."
-    IDS_ERR_BROWSE          "Non è stato trovato alcun plug-in del browser file.\nIl plug-in metapath può essere scaricato da\nhttps://github.com/zufuliu/notepad2/releases.\n\nApri pagina di download?"
+    IDS_ERR_BROWSE          "Non è stato trovato alcun plug-in del browser file.\nIl plug-in metapath può essere scaricato da\nhttps://github.com/zufuliu/notepad4/releases.\n\nApri pagina di download?"
     IDS_ERR_MRUDLG          "Nessun accesso al file selezionato!\nVuoi rimuoverlo dall'elenco?"
     IDS_ERR_CREATELINK      "Errore durante la creazione del collegamento desktop."
     IDS_ERR_PREVWINDISABLED "La finestra di Notepad2 esistente è occupata o ha una finestra di dialogo attiva.\nVuoi aprire un'altra finestra di Notepad2?"

@@ -30,14 +30,14 @@
 #define VERSION_WEBPAGE_DISPLAY		L"flo's freeware - https://www.flos-freeware.ch"
 #define VERSION_EMAIL_DISPLAY		L"florian.balmer@gmail.com"
 #define VERSION_MODPAGE_DISPLAY		L"https://xhmikosr.github.io/notepad2-mod/"
-#define VERSION_NEWPAGE_DISPLAY		L"https://github.com/zufuliu/notepad2"
+#define VERSION_NEWPAGE_DISPLAY		L"https://github.com/zufuliu/notepad4"
 #define VERSION_SCIPAGE_DISPLAY		L"https://www.scintilla.org/"
 
-#define HELP_LINK_LATEST_RELEASE	L"https://github.com/zufuliu/notepad2/releases"
-#define HELP_LINK_LATEST_BUILD		L"https://github.com/zufuliu/notepad2/actions"
-#define HELP_LINK_REPORT_ISSUE		L"https://github.com/zufuliu/notepad2/issues"
-#define HELP_LINK_FEATURE_REQUEST	L"https://github.com/zufuliu/notepad2/issues"
-#define HELP_LINK_ONLINE_WIKI		L"https://github.com/zufuliu/notepad2/wiki"
+#define HELP_LINK_LATEST_RELEASE	L"https://github.com/zufuliu/notepad4/releases"
+#define HELP_LINK_LATEST_BUILD		L"https://github.com/zufuliu/notepad4/actions"
+#define HELP_LINK_REPORT_ISSUE		L"https://github.com/zufuliu/notepad4/issues"
+#define HELP_LINK_FEATURE_REQUEST	L"https://github.com/zufuliu/notepad4/issues"
+#define HELP_LINK_ONLINE_WIKI		L"https://github.com/zufuliu/notepad4/wiki"
 
 #define VERSION_BUILD_INFO_LIB		L",\nScintilla 5.5.0."
 #define VERSION_BUILD_INFO_FORMAT	L"Compiled on " __DATE__ L" with %s %d.%d.%d" VERSION_BUILD_INFO_LIB

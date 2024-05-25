@@ -85,7 +85,7 @@ lexerList = [
 
 	('NP2LEX_SCALA', 'stlScala.c', 'LexScala.cxx', 'Scala.scala', 1, parse_scala_api_file),
 	('NP2LEX_SMALI', 'stlSmali.c', 'LexSmali.cxx', '', 0, parse_smali_api_file),
-	# TODO: SQL Dialect, https://github.com/zufuliu/notepad2/issues/31
+	# TODO: SQL Dialect, https://github.com/zufuliu/notepad4/issues/31
 	('NP2LEX_SQL', 'stlSQL.c', 'LexSQL.cxx', [
 							'MySQL.sql',
 							'Oracle.sql',

@@ -18,4 +18,4 @@
 | i18n | all above languages include French | winget | `winget install -e "Notepad2"` |
 | 한국어 | https://teus.me/category/IT/Notepad2 | winget | `winget install zufuliu.notepad2` |
 
-Latest development builds (artifacts in Release configuration for each compiler and platform) are available at https://github.com/zufuliu/notepad2/actions and https://ci.appveyor.com/project/zufuliu/notepad2.
+Latest development builds (artifacts in Release configuration for each compiler and platform) are available at https://github.com/zufuliu/notepad4/actions and https://ci.appveyor.com/project/zufuliu/notepad4.
