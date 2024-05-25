@@ -21,7 +21,7 @@ matrix:
 before_build:
   - cmd: |
       ECHO Update Version Hash
-      "c:/Program Files/Git/usr/bin/sed" -i "s/\(.\+\)[0-9a-f]\{8\}\(.\+\)/\1%APPVEYOR_REPO_COMMIT:~0,8%\2/gm" ./src/VersionRev.h ./metapath/src/VersionRev.h
+      "c:/Program Files/Git/usr/bin/sed" -i "s/\(.\+\)[0-9a-f]\{8\}\(.\+\)/\1%APPVEYOR_REPO_COMMIT:~0,8%\2/gm" ./src/VersionRev.h ./matepath/src/VersionRev.h
 
 for:
   - # MSVC Release

@@ -1,4 +1,4 @@
-💡Tips: To keep your current settings, do **NOT** replace *Notepad2.ini*, *metapath.ini* or any theme (INI) files with the bundled one, but please mind the breaking changes if any.
+💡Tips: To keep your current settings, do **NOT** replace *Notepad2.ini*, *matepath.ini* or any theme (INI) files with the bundled one, but please mind the breaking changes if any.
 
 ## Changes Since
 

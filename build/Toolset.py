@@ -59,9 +59,9 @@ def update_all_copyright_year():
 	print('update copyright year to:', year)
 	for path in [
 		'../doc/License.txt',
-		'../metapath/doc/License.txt',
-		'../metapath/src/metapath.rc',
-		'../metapath/src/version.h',
+		'../matepath/doc/License.txt',
+		'../matepath/src/matepath.rc',
+		'../matepath/src/version.h',
 		'../scintilla/License.txt',
 		'../src/Notepad2.rc',
 		'../src/Version.h',
@@ -165,7 +165,7 @@ def generate_compile_commands(target, avx2=False, cxx=False):
 		('../scintilla/lexlib', ['../include']),
 		('../scintilla/src', ['../include', '../lexlib']),
 		('../scintilla/win32', ['../include', '../src']),
-		('../metapath/src', []),
+		('../matepath/src', []),
 	]
 
 	def include_path(folder, path):
@@ -184,7 +184,7 @@ def generate_compile_commands(target, avx2=False, cxx=False):
 
 #update_all_project_toolset()
 #update_all_copyright_year()
-#dump_static_linked_function('bin/Release/x64/metapath.map')
+#dump_static_linked_function('bin/Release/x64/matepath.map')
 #dump_static_linked_function('bin/Release/x64/Notepad2.map')
 generate_compile_commands('x86_64-pc-windows-msvc', cxx=True)
 #generate_compile_commands('x86_64-w64-windows-gnu')

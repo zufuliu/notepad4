@@ -1,0 +1,120 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{09c8c803-091e-4c41-b9f8-8e6d46b6699e}</UniqueIdentifier>
+      <Extensions>c;cpp</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{d43b46ea-31c8-4541-94a9-fede452eeea6}</UniqueIdentifier>
+      <Extensions>h;hpp</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{7e6b5fa7-c442-45fb-99c1-460a43be21d8}</UniqueIdentifier>
+      <Extensions>rc;manifest;ver;bmp;ico;cur</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\matepath\src\Dialogs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\matepath\src\Dlapi.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\matepath\src\DropSource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\matepath\src\Helpers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\matepath\src\matepath.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\matepath\src\compiler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\matepath\src\config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\matepath\src\Dialogs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\matepath\src\Dlapi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\matepath\src\DropSource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\matepath\src\Helpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\matepath\src\matepath.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\matepath\src\resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\matepath\src\version.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\matepath\src\VersionRev.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="..\..\matepath\res\matepath.exe.manifest">
+      <Filter>Resource Files</Filter>
+    </Manifest>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\matepath\src\matepath.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\matepath\res\Cross1.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\matepath\res\Cross2.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\matepath\res\Crosshair.cur">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\matepath\res\Folder.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\matepath\res\Goto.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\matepath\res\Items.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\matepath\res\matepath.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\matepath\res\OpenFolder16.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\matepath\res\Options.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\matepath\res\Options2.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\matepath\res\Progs.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\matepath\res\Run.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\matepath\res\Toolbar16.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\matepath\src\matepath.ver">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+</Project>

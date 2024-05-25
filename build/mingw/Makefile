@@ -148,10 +148,10 @@ endif
 # Name root build folder
 export BINFOLDER := ../bin/$(if $(CLANG),Clang,)$(CONFIG)_$(ARCH)
 
-all: metapath scintilla notepad2
+all: matepath scintilla notepad2
 
-metapath:
-	$(MAKE) -f metapath.mk
+matepath:
+	$(MAKE) -f matepath.mk
 
 scintilla:
 	$(MAKE) -f scintilla.mk
@@ -160,7 +160,7 @@ notepad2: scintilla
 	$(MAKE) -f notepad2.mk
 
 clean:
-	$(MAKE) -f metapath.mk clean
+	$(MAKE) -f matepath.mk clean
 	$(MAKE) -f scintilla.mk clean
 	$(MAKE) -f notepad2.mk clean
 	@$(RM) -rf $(BINFOLDER)/obj

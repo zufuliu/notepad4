@@ -695,7 +695,7 @@ BEGIN
 	POPUP "工具(&T)"
 	BEGIN
 		MENUITEM "執行工具前儲存(&V)",				IDM_VIEW_SAVEBEFORERUNNINGTOOLS
-		MENUITEM "使用 metapath 開啟資料夾(&M)",	IDM_SET_OPEN_FOLDER_METAPATH
+		MENUITEM "使用 matepath 開啟資料夾(&M)",	IDM_SET_OPEN_FOLDER_MATEPATH
 		MENUITEM SEPARATOR
 		MENUITEM "以管理員身份運行(&A)",		IDM_FILE_RELAUNCH_ELEVATED
 		MENUITEM "重新啟動(&R)",				IDM_FILE_RESTART
@@ -1816,7 +1816,7 @@ STRINGTABLE
 BEGIN
     IDS_ERR_LOADFILE        "載入「%s」時發生錯誤"
     IDS_ERR_SAVEFILE        "儲存「%s」時發生錯誤"
-    IDS_ERR_BROWSE          "找不到檔案瀏覽器外掛程式。\nmetapath 檔案瀏覽器外掛程式可以從下址下載:\nhttps://github.com/zufuliu/notepad4/releases\n\n是否立即開啟下載頁面？"
+    IDS_ERR_BROWSE          "找不到檔案瀏覽器外掛程式。\nmatepath 檔案瀏覽器外掛程式可以從下址下載:\nhttps://github.com/zufuliu/notepad4/releases\n\n是否立即開啟下載頁面？"
     IDS_ERR_MRUDLG          "無法存取選取的檔案！\n是否從清單中移除？"
     IDS_ERR_CREATELINK      "建立桌面捷徑時發生錯誤。"
     IDS_ERR_PREVWINDISABLED "現有的 Notepad2 視窗正忙或有一個活動的對話框。\n要開啟新的視窗嗎？"

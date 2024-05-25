@@ -695,7 +695,7 @@ BEGIN
 	POPUP "도구(&T)"
 	BEGIN
 		MENUITEM "도구 실행 전에 저장(&V)",	IDM_VIEW_SAVEBEFORERUNNINGTOOLS
-		MENUITEM "metapath를 사용하여 폴더 열기(&M)",IDM_SET_OPEN_FOLDER_METAPATH
+		MENUITEM "matepath를 사용하여 폴더 열기(&M)",IDM_SET_OPEN_FOLDER_MATEPATH
 		MENUITEM SEPARATOR
 		MENUITEM "관리자 권한으로 열기(&A)",		IDM_FILE_RELAUNCH_ELEVATED
 		MENUITEM "다시 시작(&R)",					IDM_FILE_RESTART
@@ -1816,7 +1816,7 @@ STRINGTABLE
 BEGIN
     IDS_ERR_LOADFILE        """%s"" 파일을 불러오는 도중 오류가 발생했습니다."
     IDS_ERR_SAVEFILE        """%s"" 파일을 저장하는 도중 오류가 발생했습니다."
-    IDS_ERR_BROWSE          "파일 탐색 플러그인이 없습니다.\nMetapath 파일 탐색 플러그인은\nttps://github.com/zufuliu/notepad4/releases에서 다운로드할 수 있습니다.\n다운로드 페이지를 여시겠습니까?"
+    IDS_ERR_BROWSE          "파일 탐색 플러그인이 없습니다.\nmatepath 파일 탐색 플러그인은\nttps://github.com/zufuliu/notepad4/releases에서 다운로드할 수 있습니다.\n다운로드 페이지를 여시겠습니까?"
     IDS_ERR_MRUDLG          "선택한 파일에 액세스할 수 없습니다!\n목록에서 제거하시겠습니까?"
     IDS_ERR_CREATELINK      "바탕화면 링크를 만드는 동안 오류가 발생했습니다."
     IDS_ERR_PREVWINDISABLED "기존 Notepad2 창이 사용 중이거나 활성 대화 상자가 있습니다.\n다른 Notepad2 창을 여시겠습니까?"

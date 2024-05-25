@@ -8,11 +8,11 @@ buildFolder = os.getcwd()
 buildEnv = {}
 
 notepad2_config_h = os.path.abspath('../src/config.h')
-metapath_config_h = os.path.abspath('../metapath/src/config.h')
+matepath_config_h = os.path.abspath('../matepath/src/config.h')
 projectDir = os.path.abspath('VS2017')
 localeDir = os.path.abspath('../locale')
 notepad2_rc = os.path.abspath('../src/Notepad2.rc')
-metapath_rc = os.path.abspath('../metapath/src/metapath.rc')
+matepath_rc = os.path.abspath('../matepath/src/matepath.rc')
 
 activeLocaleList = ['i18n', 'en', 'it', 'ja', 'ko', 'zh-Hans', 'zh-Hant']
 defaultConfig = {
@@ -57,7 +57,7 @@ def update_config_file(override):
 	output.append('')
 	content = '\n'.join(output).encode('utf-8')
 	update_raw_file(notepad2_config_h, content)
-	update_raw_file(metapath_config_h, content)
+	update_raw_file(matepath_config_h, content)
 
 
 def format_duration(duration):
@@ -141,7 +141,7 @@ def prepare_build_environment():
 	for path in ['../License.txt',
 		'../doc/Notepad2.ini',
 		'../doc/Notepad2 DarkTheme.ini',
-		'../metapath/doc/metapath.ini']:
+		'../matepath/doc/matepath.ini']:
 		target = os.path.join(zipDir, os.path.basename(path))
 		if not os.path.exists(target):
 			src = os.path.join(buildFolder, path)
@@ -151,7 +151,7 @@ def prepare_build_environment():
 	backupDir = os.path.join(localeDir, 'en')
 	if not os.path.exists(backupDir):
 		os.makedirs(backupDir)
-		shutil.copyfile(metapath_rc, os.path.join(backupDir, 'metapath.rc'))
+		shutil.copyfile(matepath_rc, os.path.join(backupDir, 'matepath.rc'))
 		shutil.copyfile(notepad2_rc, os.path.join(backupDir, 'Notepad2.rc'))
 
 def clean_build_temporary():
@@ -169,14 +169,14 @@ def clean_build_temporary():
 			pass
 
 # copy from locale/Locale.py
-def restore_resource_include_path(path, metapath):
+def restore_resource_include_path(path, matepath):
 	with open(path, encoding='utf-8', newline='\n') as fd:
 		doc = fd.read()
-	if metapath:
+	if matepath:
 		# include path
-		doc = doc.replace('../../metapath/src/', '')
+		doc = doc.replace('../../matepath/src/', '')
 		# resource path
-		doc = doc.replace(r'..\\metapath\\', '')
+		doc = doc.replace(r'..\\matepath\\', '')
 	else:
 		# include path
 		doc = doc.replace('../../src/', '')
@@ -189,9 +189,9 @@ def restore_resource_include_path(path, metapath):
 def copy_back_localized_resources(language):
 	print(f'Locale: copy back localized resources for {language}.')
 	folder = os.path.join(localeDir, language)
-	shutil.copyfile(os.path.join(folder, 'metapath.rc'), metapath_rc)
+	shutil.copyfile(os.path.join(folder, 'matepath.rc'), matepath_rc)
 	shutil.copyfile(os.path.join(folder, 'Notepad2.rc'), notepad2_rc)
-	restore_resource_include_path(metapath_rc, True)
+	restore_resource_include_path(matepath_rc, True)
 	restore_resource_include_path(notepad2_rc, False)
 
 def build_main_project(arch):
@@ -216,10 +216,10 @@ def make_release_artifact(locale, suffix='', hd=False):
 			continue
 		folder = os.path.join(outDir, arch)
 		notepad2_exe = os.path.join(folder, 'Notepad2.exe')
-		metapath_exe = os.path.join(folder, 'metapath.exe')
-		if os.path.isfile(notepad2_exe) and os.path.isfile(metapath_exe):
+		matepath_exe = os.path.join(folder, 'matepath.exe')
+		if os.path.isfile(notepad2_exe) and os.path.isfile(matepath_exe):
 			shutil.copyfile(notepad2_exe, os.path.join(zipDir, 'Notepad2.exe'))
-			shutil.copyfile(metapath_exe, os.path.join(zipDir, 'metapath.exe'))
+			shutil.copyfile(matepath_exe, os.path.join(zipDir, 'matepath.exe'))
 			target = os.path.join(zipDir, 'locale')
 			if os.path.exists(target):
 				shutil.rmtree(target)

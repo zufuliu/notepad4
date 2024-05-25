@@ -178,7 +178,7 @@ int		iPrintColor;
 int		iPrintZoom = 100;
 RECT	pageSetupMargin;
 static bool bSaveBeforeRunningTools;
-bool bOpenFolderWithMetapath;
+bool bOpenFolderWithMatepath;
 FileWatchingMode iFileWatchingMode;
 bool	iFileWatchingMethod;
 bool	bFileWatchingKeepAtEnd;
@@ -2692,7 +2692,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckCmd(hmenu, IDM_VIEW_NOSAVERECENT, bSaveRecentFiles);
 	CheckCmd(hmenu, IDM_VIEW_NOSAVEFINDREPL, bSaveFindReplace);
 	CheckCmd(hmenu, IDM_VIEW_SAVEBEFORERUNNINGTOOLS, bSaveBeforeRunningTools);
-	CheckCmd(hmenu, IDM_SET_OPEN_FOLDER_METAPATH, bOpenFolderWithMetapath);
+	CheckCmd(hmenu, IDM_SET_OPEN_FOLDER_MATEPATH, bOpenFolderWithMatepath);
 
 	CheckCmd(hmenu, IDM_VIEW_CHANGENOTIFY, (iFileWatchingMode != FileWatchingMode_None));
 	CheckCmd(hmenu, IDM_SET_FILE_AUTOSAVE, (iAutoSaveOption & AutoSaveOption_Periodic) && dwAutoSavePeriod != 0);
@@ -4455,8 +4455,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		bSaveBeforeRunningTools = !bSaveBeforeRunningTools;
 		break;
 
-	case IDM_SET_OPEN_FOLDER_METAPATH:
-		bOpenFolderWithMetapath = !bOpenFolderWithMetapath;
+	case IDM_SET_OPEN_FOLDER_MATEPATH:
+		bOpenFolderWithMatepath = !bOpenFolderWithMatepath;
 		break;
 
 	case IDM_VIEW_CHANGENOTIFY:
@@ -5547,7 +5547,7 @@ void LoadSettings(void) {
 	pageSetupMargin.bottom = max_i(iValue, -1);
 
 	bSaveBeforeRunningTools = IniSectionGetBool(pIniSection, L"SaveBeforeRunningTools", false);
-	bOpenFolderWithMetapath = IniSectionGetBool(pIniSection, L"OpenFolderWithMetapath", true);
+	bOpenFolderWithMatepath = IniSectionGetBool(pIniSection, L"OpenFolderWithMatepath", true);
 
 	iValue = IniSectionGetInt(pIniSection, L"FileWatchingMode", FileWatchingMode_AutoReload);
 	iFileWatchingMode = (FileWatchingMode)clamp_i(iValue, FileWatchingMode_None, FileWatchingMode_AutoReload);
@@ -5856,7 +5856,7 @@ void SaveSettings(bool bSaveSettingsNow) {
 	IniSectionSetIntEx(pIniSection, L"PrintMarginBottom", pageSetupMargin.bottom, -1);
 
 	IniSectionSetBoolEx(pIniSection, L"SaveBeforeRunningTools", bSaveBeforeRunningTools, false);
-	IniSectionSetBoolEx(pIniSection, L"OpenFolderWithMetapath", bOpenFolderWithMetapath, true);
+	IniSectionSetBoolEx(pIniSection, L"OpenFolderWithMatepath", bOpenFolderWithMatepath, true);
 
 	IniSectionSetIntEx(pIniSection, L"FileWatchingMode", iFileWatchingMode, FileWatchingMode_AutoReload);
 	IniSectionSetBoolEx(pIniSection, L"FileWatchingMethod", iFileWatchingMethod, false);

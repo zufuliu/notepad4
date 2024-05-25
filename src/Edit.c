@@ -6964,7 +6964,7 @@ void TryBrowseFile(HWND hwnd, LPCWSTR pszFile, bool bWarn) {
 		ExtractFirstArgument(tchTemp, tchExeFile, tchParam);
 	}
 	if (StrIsEmpty(tchExeFile)) {
-		lstrcpy(tchExeFile, L"metapath.exe");
+		lstrcpy(tchExeFile, L"matepath.exe");
 	}
 	if (PathIsRelative(tchExeFile)) {
 		GetProgramRealPath(tchTemp, COUNTOF(tchTemp));
@@ -7090,7 +7090,7 @@ char* EditGetStringAroundCaret(LPCSTR delimiters) {
 	return EditGetTextRange(iLineStart, iLineEnd);
 }
 
-extern bool bOpenFolderWithMetapath;
+extern bool bOpenFolderWithMatepath;
 
 static DWORD EditOpenSelectionCheckFile(LPCWSTR link, LPWSTR path, int cchFilePath, LPWSTR wchDirectory) {
 	if (StrHasPrefix(link, L"//")) {
@@ -7300,7 +7300,7 @@ void EditOpenSelection(OpenSelectionType type) {
 		break;
 
 		case OpenSelectionType_Folder:
-			if (bOpenFolderWithMetapath) {
+			if (bOpenFolderWithMatepath) {
 				TryBrowseFile(hwndMain, link, false);
 			} else {
 				OpenContainingFolder(hwndMain, link, false);

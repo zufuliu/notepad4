@@ -695,7 +695,7 @@ BEGIN
 	POPUP "ツール(&T)"
 	BEGIN
 		MENUITEM "ツールを実行する前に保存(&V)",	IDM_VIEW_SAVEBEFORERUNNINGTOOLS
-		MENUITEM "フォルダを開くのにメタパスを使用(&M)",IDM_SET_OPEN_FOLDER_METAPATH
+		MENUITEM "フォルダを開くのにメタパスを使用(&M)",IDM_SET_OPEN_FOLDER_MATEPATH
 		MENUITEM SEPARATOR
 		MENUITEM "管理者権限で再起動(&A)",		IDM_FILE_RELAUNCH_ELEVATED
 		MENUITEM "再起動(&R)",					IDM_FILE_RESTART
@@ -1816,7 +1816,7 @@ STRINGTABLE
 BEGIN
     IDS_ERR_LOADFILE        "読込失敗 ""%s"""
     IDS_ERR_SAVEFILE        "保存失敗 ""%s"""
-    IDS_ERR_BROWSE          "ファイラーのプラグインがありません。\nこのプラグイン metapath は https://github.com/zufuliu/notepad4/releases でダウンロードできます。\nこのサイトを開きますか？"
+    IDS_ERR_BROWSE          "ファイラーのプラグインがありません。\nこのプラグイン matepath は https://github.com/zufuliu/notepad4/releases でダウンロードできます。\nこのサイトを開きますか？"
     IDS_ERR_MRUDLG          "選択したファイルにアクセスできませんでした。\n一覧から消去しますか？"
     IDS_ERR_CREATELINK      "デスクトップへのショートカット作成時にエラーが発生しました。"
     IDS_ERR_PREVWINDISABLED "現在 Notepad2 のウィンドウはビジー状態か､ダイアログが出たままのようです。\n新しいウィンドウを開きますか？"

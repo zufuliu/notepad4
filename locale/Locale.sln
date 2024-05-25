@@ -5,33 +5,33 @@ VisualStudioVersion = 15.0.28307.1145
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Notepad2(zh-Hans)", "zh-Hans\Notepad2(zh-Hans).vcxproj", "{14E1F7FB-7F84-4D06-AF55-378DFD7519DF}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "metapath(zh-Hans)", "zh-Hans\metapath(zh-Hans).vcxproj", "{F37FF010-CCB6-4FCB-9598-66076C15BFBD}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "matepath(zh-Hans)", "zh-Hans\matepath(zh-Hans).vcxproj", "{F37FF010-CCB6-4FCB-9598-66076C15BFBD}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "metapath(zh-Hant)", "zh-Hant\metapath(zh-Hant).vcxproj", "{CABE59DA-EB79-453A-8C8D-641185E27C92}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "matepath(zh-Hant)", "zh-Hant\matepath(zh-Hant).vcxproj", "{CABE59DA-EB79-453A-8C8D-641185E27C92}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Notepad2(zh-Hant)", "zh-Hant\Notepad2(zh-Hant).vcxproj", "{5961C11A-D947-490D-BCC3-44737DF1B963}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "metapath(ja)", "ja\metapath(ja).vcxproj", "{362DE0C4-8E6C-4F57-88B6-CC9A64A980B6}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "matepath(ja)", "ja\matepath(ja).vcxproj", "{362DE0C4-8E6C-4F57-88B6-CC9A64A980B6}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Notepad2(ja)", "ja\Notepad2(ja).vcxproj", "{9E56DFFA-0B13-423B-81F0-E14E22D0036A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "metapath(de)", "de\metapath(de).vcxproj", "{EED85EA9-5126-49AF-BCCC-92CD800C59B0}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "matepath(de)", "de\matepath(de).vcxproj", "{EED85EA9-5126-49AF-BCCC-92CD800C59B0}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Notepad2(de)", "de\Notepad2(de).vcxproj", "{9031D111-7030-4805-8C7E-9D78ACABA39D}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "metapath(it)", "it\metapath(it).vcxproj", "{4F1A92C8-4CF4-4789-893D-CC4CD30D42BF}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "matepath(it)", "it\matepath(it).vcxproj", "{4F1A92C8-4CF4-4789-893D-CC4CD30D42BF}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Notepad2(it)", "it\Notepad2(it).vcxproj", "{F11D583E-ABFE-4749-B077-D103C4099652}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "metapath(ko)", "ko\metapath(ko).vcxproj", "{E64357C9-65A2-4BF9-91E0-BC52CB8A9350}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "matepath(ko)", "ko\matepath(ko).vcxproj", "{E64357C9-65A2-4BF9-91E0-BC52CB8A9350}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Notepad2(ko)", "ko\Notepad2(ko).vcxproj", "{5ED22073-A1C4-4439-AD95-15000C7CDC1B}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "metapath(pt-BR)", "pt-BR\metapath(pt-BR).vcxproj", "{35B785D2-D1DF-47CD-BB7B-58691809398F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "matepath(pt-BR)", "pt-BR\matepath(pt-BR).vcxproj", "{35B785D2-D1DF-47CD-BB7B-58691809398F}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Notepad2(pt-BR)", "pt-BR\Notepad2(pt-BR).vcxproj", "{AF5C3157-21A9-40A9-AC21-27BD1EFC6826}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "metapath(fr-FR)", "fr-FR\metapath(fr-FR).vcxproj", "{E9FD4BB7-406E-41B6-ABF3-C1A3F3AA677F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "matepath(fr-FR)", "fr-FR\matepath(fr-FR).vcxproj", "{E9FD4BB7-406E-41B6-ABF3-C1A3F3AA677F}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Notepad2(fr-FR)", "fr-FR\Notepad2(fr-FR).vcxproj", "{B56E86E2-F6AB-4615-BE4A-C9612D14BDFA}"
 EndProject

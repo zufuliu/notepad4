@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.28307.1145
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Notepad2", "Notepad2.vcxproj", "{B69A8C7E-A22D-45DA-9997-2D1403C7AEE8}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "metapath", "metapath.vcxproj", "{D4FC99E4-DA51-B5E0-B47A-B846746940E4}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "matepath", "matepath.vcxproj", "{D4FC99E4-DA51-B5E0-B47A-B846746940E4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -95,10 +95,10 @@ if [[ "$newmanifest" != "$(<"$manifestfile")" ]]; then
   echo "$newmanifest" > "$manifestfile"
 fi
 
-# Update metapath's manifest and version information
+# Update matepath's manifest and version information
 if [[ $# -ne 0 ]]; then
-  versionfile="./metapath/src/VersionRev.h"
-  manifestfile="./metapath/res/metapath.exe.manifest"
+  versionfile="./matepath/src/VersionRev.h"
+  manifestfile="./matepath/res/matepath.exe.manifest"
   if [[ ! -f "$versionfile" ]] || [[ "$version_info" != "$(<"$versionfile")" ]]; then
     echo "$version_info" > "$versionfile"
   fi
