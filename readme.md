@@ -1,11 +1,11 @@
-# Notepad2-zufuliu and metapath-zufuliu
+# Notepad4 and matepath
 
 Notepad4 (Notepad2⨯2) is a light-weight Scintilla based text editor for Windows with syntax highlighting, code folding, auto-completion and API list for many programming languages and documents, it's based on Florian's [Notepad2](https://www.flos-freeware.ch/notepad2.html) and XhmikosR's [Notepad2-mod](https://xhmikosr.github.io/notepad2-mod/). matepath is a file browser plugin and based on Florian's [metapath](https://www.flos-freeware.ch/archive.html).
 
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](License.txt) [![Latest release](https://img.shields.io/github/release/zufuliu/notepad4.svg)](https://github.com/zufuliu/notepad4/releases) [![Downloads](https://img.shields.io/github/downloads/zufuliu/notepad4/total.svg)](https://github.com/zufuliu/notepad4/releases)
 
 ## Binaries
-Latest development builds (artifacts in Release configuration for each compiler and platform) are available on [GitHub Actions](https://github.com/zufuliu/notepad4/actions) and [AppVeyor](https://ci.appveyor.com/project/zufuliu/notepad4). Or you can build from source, see [Wiki](https://github.com/zufuliu/notepad4/wiki/Build-Notepad2).
+Latest development builds (artifacts in Release configuration for each compiler and platform) are available on [GitHub Actions](https://github.com/zufuliu/notepad4/actions) and [AppVeyor](https://ci.appveyor.com/project/zufuliu/notepad4). Or you can build from source, see [Wiki](https://github.com/zufuliu/notepad4/wiki/Build-Notepad4).
 
 | GitHub Actions (MSVC, Clang, GCC) | AppVeyor (MSVC, Clang) |
 | --------------- | -------- |
@@ -18,10 +18,10 @@ Latest development builds (artifacts in Release configuration for each compiler 
 
 * Support for bookmarks
 * Option to mark all occurrences of a word or selection, and show matched count
-* [Enhanced auto-completion for words and functions](https://github.com/zufuliu/notepad4/wiki/Auto-Completion-in-Notepad2)
-* [Context-based auto-completion for some words](https://github.com/zufuliu/notepad4/wiki/Auto-Completion-in-Notepad2#context-based-auto-completion)
-* [Enhanced auto indentation](https://github.com/zufuliu/notepad4/wiki/Auto-Completion-in-Notepad2#auto-indent-text)
-* [Auto completion for braces, brackets and quotes](https://github.com/zufuliu/notepad4/wiki/Auto-Completion-in-Notepad2#auto-insert-text)
+* [Enhanced auto-completion for words and functions](https://github.com/zufuliu/notepad4/wiki/Auto-Completion-in-Notepad4)
+* [Context-based auto-completion for some words](https://github.com/zufuliu/notepad4/wiki/Auto-Completion-in-Notepad4#context-based-auto-completion)
+* [Enhanced auto indentation](https://github.com/zufuliu/notepad4/wiki/Auto-Completion-in-Notepad4#auto-indent-text)
+* [Auto completion for braces, brackets and quotes](https://github.com/zufuliu/notepad4/wiki/Auto-Completion-in-Notepad4#auto-insert-text)
 * [Color preview via CallTip and click CallTip to open color dialog](https://github.com/zufuliu/notepad4/wiki/CallTip)
 * Support Base64 encoding and decoding
 * Syntax highlighting, code folding and API list for (see built-in [file extension list](doc/FileExt.txt)):
@@ -192,7 +192,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 * [Florian's Notepad2 website](https://www.flos-freeware.ch/notepad2.html)
 * [XhmikosR's Notepad2-mod website](https://xhmikosr.github.io/notepad2-mod/)
 * [Scintilla's website](https://www.scintilla.org/)
-* [Build Notepad2 and metapath](https://github.com/zufuliu/notepad4/wiki/Build-Notepad2)
+* [Build Notepad4 and matepath](https://github.com/zufuliu/notepad4/wiki/Build-Notepad4)
 * [Localization](https://github.com/zufuliu/notepad4/wiki/Localization)
 	* [French (France)](https://github.com/zufuliu/notepad4/tree/main/locale/fr) by [@VoilierBleu](https://github.com/VoilierBleu)
 	* [Italiano](https://github.com/zufuliu/notepad4/tree/main/locale/it) by [@Matteo-Nigro](https://github.com/Matteo-Nigro)
@@ -201,4 +201,4 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [中文 (简体)](https://github.com/zufuliu/notepad4/tree/main/locale/zh-Hans)
 	* [한국어](https://github.com/zufuliu/notepad4/tree/main/locale/ko) by [@VenusGirl](https://github.com/VenusGirl)
 	* [한국어](https://teus.me/category/IT/Notepad2) by [@bluenlive](https://github.com/bluenlive)
-* [Notepad2 Wiki](https://github.com/zufuliu/notepad4/wiki)
+* [Notepad4 Wiki](https://github.com/zufuliu/notepad4/wiki)

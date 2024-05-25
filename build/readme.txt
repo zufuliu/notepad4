@@ -1,5 +1,5 @@
-Build Notepad2 and metapath
-	https://github.com/zufuliu/notepad4/wiki/Build-Notepad2
+Build Notepad4 and matepath
+	https://github.com/zufuliu/notepad4/wiki/Build-Notepad4
 	https://github.com/zufuliu/notepad4/wiki/Localization
 
 echo | clang -dM -E -
