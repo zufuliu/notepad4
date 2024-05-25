@@ -15,7 +15,7 @@ jobs:
 
     - name: Update Version Hash
       run: |
-        "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./metapath/src/VersionRev.h
+        "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./matepath/src/VersionRev.h
 
     - name: MSVC x64 Release
       run: |
@@ -79,7 +79,7 @@ jobs:
 
     - name: Update Version Hash
       run: |
-        "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./metapath/src/VersionRev.h
+        "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./matepath/src/VersionRev.h
 
     - name: Install v141_xp Toolset
       continue-on-error: true
@@ -159,7 +159,7 @@ jobs:
 
     - name: Update Version Hash
       run: |
-        "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./metapath/src/VersionRev.h
+        "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./matepath/src/VersionRev.h
 
     - name: Install LLVM
       run: |
@@ -213,7 +213,7 @@ jobs:
 
     - name: Update Version Hash
       run: |
-        "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./metapath/src/VersionRev.h
+        "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./matepath/src/VersionRev.h
 
     - name: Install v141_xp Toolset
       continue-on-error: true
@@ -283,7 +283,7 @@ jobs:
 
     - name: Update Version Hash
       run: |
-        "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./metapath/src/VersionRev.h
+        "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./matepath/src/VersionRev.h
 
     - name: Install llvm-mingw
       run: |
@@ -352,7 +352,7 @@ jobs:
 
     - name: Update Version Hash
       run: |
-        "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./metapath/src/VersionRev.h
+        "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./matepath/src/VersionRev.h
 
     - name: Install GCC and Clang
       run: |
@@ -406,7 +406,7 @@ jobs:
 
     - name: Update Version Hash
       run: |
-        "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./metapath/src/VersionRev.h
+        "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./matepath/src/VersionRev.h
 
     - name: Install GCC and Clang
       run: |
@@ -460,7 +460,7 @@ jobs:
 
     - name: Update Version Hash
       run: |
-        "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./metapath/src/VersionRev.h
+        "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./matepath/src/VersionRev.h
 
     - name: Install GCC and Clang
       run: |
