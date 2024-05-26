@@ -940,7 +940,7 @@ void EscapeRegex(LPSTR pszOut, LPCSTR pszIn);
 size_t Base64Encode(char *output, const uint8_t *src, size_t length, bool urlSafe);
 size_t Base64Decode(uint8_t *output, const uint8_t *src, size_t length);
 
-//==== MinimizeToTray Functions - see comments in Helpers.c ===================
+//==== MinimizeToTray Functions - see comments in Helpers.cpp ===================
 bool GetDoAnimateMinimize(void);
 void MinimizeWndToTray(HWND hwnd);
 void RestoreWndFromTray(HWND hwnd);

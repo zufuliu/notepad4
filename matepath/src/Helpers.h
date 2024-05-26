@@ -643,7 +643,7 @@ INT_PTR ThemedDialogBoxParam(HINSTANCE hInstance, LPCWSTR lpTemplate, HWND hWndP
 //==== File Dialog Hook =========================================================
 UINT_PTR CALLBACK OpenSaveFileDlgHookProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-//==== MinimizeToTray Functions - see comments in Helpers.c ===================
+//==== MinimizeToTray Functions - see comments in Helpers.cpp ===================
 bool GetDoAnimateMinimize(void);
 void MinimizeWndToTray(HWND hwnd);
 void RestoreWndFromTray(HWND hwnd);

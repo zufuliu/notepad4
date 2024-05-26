@@ -518,7 +518,7 @@ def updateDBCSCharClassifyTable(filename):
 	Regenerate(filename, "//dbcs", output)
 
 if __name__ == '__main__':
-	buildANSICharClassifyTable('../../src/EditEncoding.c')
+	buildANSICharClassifyTable('../../src/EditEncoding.cpp')
 	updateCharClassifyTable("../src/CharClassify.cxx", "../src/CharClassify.h")
 	updateDBCSCharClassifyTable("../src/CharClassify.cxx")
 	updateCharacterCategoryTable("../lexlib/CharacterCategory.cxx")

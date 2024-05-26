@@ -545,6 +545,6 @@ bool IsCharacterCaseSensitive(uint32_t ch) {
 updateCaseConvert()
 #checkUnicodeCaseSensitivity('caseList.cpp')
 #updateCaseSensitivity('CaseSensitivity.cpp', True)
-#updateCaseSensitivity('../../src/EditEncoding.c')
+#updateCaseSensitivity('../../src/EditEncoding.cpp')
 #updateCaseSensitivityBlock('caseBlock.cpp', True)
-updateCaseSensitivityBlock('../../src/EditEncoding.c')
+updateCaseSensitivityBlock('../../src/EditEncoding.cpp')
