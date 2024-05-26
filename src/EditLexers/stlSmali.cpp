@@ -21,19 +21,19 @@ static KEYWORDLIST Keywords_Smail = {{
 "boolean byte char double float int long short void "
 
 , // 1 Type Keyword
-NULL
+nullptr
 , // 2 Preprocessor
-NULL
+nullptr
 , // 3 Directive
-NULL
+nullptr
 , // 4 Attribute
-NULL
+nullptr
 , // 5 Class
-NULL
+nullptr
 , // 6 Interface
-NULL
+nullptr
 , // 7 Enumeration
-NULL
+nullptr
 , // 8 Constant
 "init clinit value "
 
@@ -115,7 +115,7 @@ NULL
 , // 11 Instruction
 "from16 high16 jumbo range 2addr lit16 lit8 "
 
-, NULL, NULL, NULL, NULL
+, nullptr, nullptr, nullptr, nullptr
 }};
 
 static EDITSTYLE Styles_Smail[] = {

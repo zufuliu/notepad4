@@ -4,9 +4,7 @@
 // https://www.latex-project.org/
 
 static KEYWORDLIST Keywords_TEX = {{
-NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
-
-, NULL, NULL, NULL, NULL, NULL, NULL, NULL
+nullptr
 }};
 
 static EDITSTYLE Styles_TEX[] = {

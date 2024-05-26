@@ -10,18 +10,18 @@ static KEYWORDLIST Keywords_BOO = {{
 ,	// preprocessor
 "__eval__ __switch__ enumerate filter len typeof map max min property using getter required lock range zip checked unchecked rawArrayIndexing normalArrayIndexing array matrix yieldAll"
 ,	// directive
-NULL
+nullptr
 ,	// attribute
-NULL
+nullptr
 ,	// class
-NULL
+nullptr
 ,	// interface
-NULL
+nullptr
 ,	// enumeration
-NULL
+nullptr
 ,	// constant
-NULL
+nullptr
 
-, NULL, NULL, NULL, NULL, NULL, NULL
-, NULL
+, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr
+, nullptr
 }};

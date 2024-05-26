@@ -2,7 +2,7 @@
 #include "EditStyleX.h"
 
 static KEYWORDLIST Keywords_NULL = {{
-NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
+nullptr
 }};
 
 static EDITSTYLE Styles_Global[] = {
@@ -57,8 +57,8 @@ EDITLEXER lexGlobal = {
 	SCLEX_NULL, NP2LEX_GLOBAL,
 	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"Global Styles", Styles_Global),
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
 	Styles_Global
 };
 
@@ -66,8 +66,8 @@ EDITLEXER lex2ndGlobal = {
 	SCLEX_NULL, NP2LEX_2NDGLOBAL,
 	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"2nd Global Styles", Styles_2ndGlobal),
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
 	Styles_2ndGlobal
 };
 

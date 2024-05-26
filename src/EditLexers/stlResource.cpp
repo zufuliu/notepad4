@@ -17,26 +17,26 @@ static KEYWORDLIST Keywords_RC = {{
 "PRELOAD LOADONCALL FIXED DISCARDABLE PURE IMPURE SHARED NONSHARED "
 
 , // 1 Type keyword
-NULL
+nullptr
 , // 2 Preprocessor
 "define undef ifdef ifndef if elif else endif include pragma error code_page "
 "warning "
 
 , // 3 Directive
-NULL
+nullptr
 , // 4 Attribute
-NULL
+nullptr
 , // 5 Class
-NULL
+nullptr
 , // 6 Interface
-NULL
+nullptr
 , // 7 Enumeration
-NULL
+nullptr
 
 , // 8 Constant
 "RC_INVOKED "
 
-, NULL, NULL, NULL, NULL, NULL, NULL
+, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr
 
 , // 15 Code Snippet
 "defined() code_page() __has_include() "

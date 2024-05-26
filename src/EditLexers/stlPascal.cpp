@@ -20,9 +20,9 @@ static KEYWORDLIST Keywords_Pascal = {{
 , // 3 Function
 "assert exclude include copy move insert delete setlength fillchar seek read readln write writeln rewrite reset close blockwrite blockread erase rename truncate append flush str val halt error runerror getdir chdir mkdir rmdir "
 
-, NULL, NULL, NULL, NULL, NULL
+, nullptr, nullptr, nullptr, nullptr, nullptr
 
-, NULL, NULL, NULL, NULL, NULL, NULL, NULL
+, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr
 }};
 
 static EDITSTYLE Styles_Pascal[] = {

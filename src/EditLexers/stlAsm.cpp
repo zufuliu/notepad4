@@ -154,7 +154,7 @@ static KEYWORDLIST Keywords_ASM = {{
 "define elif else endif error if ifdef ifndef import include line pragma undef using "
 "warning message assert unassert include_next ident sccs "
 
-, NULL, NULL, NULL, NULL, NULL, NULL
+, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr
 }};
 
 static EDITSTYLE Styles_ASM[] = {

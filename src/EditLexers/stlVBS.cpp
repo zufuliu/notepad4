@@ -21,9 +21,9 @@ static KEYWORDLIST Keywords_VBS = {{
 "Err WScript"
 
 , // 3 Preprocessor
-NULL
+nullptr
 , // 4 Attribute/Property
-NULL
+nullptr
 
 , // 5 VB Const
 // String
@@ -50,9 +50,9 @@ NULL
 // Miscellaneous
 "vbObjectError"
 
-, NULL, NULL, NULL
+, nullptr, nullptr, nullptr
 
-, NULL, NULL, NULL, NULL, NULL, NULL, NULL
+, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr
 }};
 
 static EDITSTYLE Styles_VBS[] = {

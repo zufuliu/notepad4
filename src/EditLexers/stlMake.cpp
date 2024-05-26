@@ -43,9 +43,9 @@ static KEYWORDLIST Keywords_MAK = {{
 , // 7 ninja
 "rule build default "
 
-, NULL
+, nullptr
 
-, NULL, NULL, NULL, NULL, NULL, NULL, NULL
+, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr
 }};
 
 static EDITSTYLE Styles_MAK[] = {

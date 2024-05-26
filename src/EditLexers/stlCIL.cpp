@@ -38,17 +38,17 @@ static KEYWORDLIST Keywords_CIL = {{
 "line"
 
 , // 3 directive
-NULL
+nullptr
 , // 4 Attribute
-NULL
+nullptr
 , // 5 Class
-NULL
+nullptr
 , // 6 Interface
-NULL
+nullptr
 , // 7 Enumeration
-NULL
+nullptr
 , // 8 Constant
-NULL
+nullptr
 
 , // 9 Directive
 "addon assembly cctor class corflags ctor custom data emitbyte entrypoint "
@@ -73,7 +73,7 @@ NULL
 "reqmin reqopt reqrefuse reqsecobj "
 "tls "
 
-, NULL, NULL, NULL, NULL
+, nullptr, nullptr, nullptr, nullptr
 
 , // 15 Code Snippet
 "ctor() "

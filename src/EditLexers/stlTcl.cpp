@@ -28,9 +28,9 @@ static KEYWORDLIST Keywords_Tcl = {{
 "import inherit itcl itk itk_component itk_initialize itk_interior itk_option iwidgets keep "
 "method private protected public"
 
-, NULL, NULL, NULL, NULL, NULL, NULL
+, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr
 
-, NULL, NULL, NULL, NULL, NULL, NULL, NULL
+, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr
 }};
 
 static EDITSTYLE Styles_Tcl[] = {

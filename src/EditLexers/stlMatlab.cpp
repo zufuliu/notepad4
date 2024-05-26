@@ -32,9 +32,9 @@ static KEYWORDLIST Keywords_Matlab = {{
 , // 4 UI
 "axes figure uicontrol uimenu "
 
-, NULL, NULL, NULL, NULL
+, nullptr, nullptr, nullptr, nullptr
 
-, NULL, NULL, NULL, NULL, NULL, NULL, NULL
+, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr
 }};
 
 static EDITSTYLE Styles_Matlab[] = {

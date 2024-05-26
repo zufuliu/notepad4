@@ -34,10 +34,10 @@ static KEYWORDLIST Keywords_HTML = {{
 "Static Stop String Sub Then To True Type Unload Until Variant WEnd While With WithEvents Xor"
 
 , // 3 Python
-NULL
+nullptr
 
 , // 4 PHP
-NULL
+nullptr
 
 , // 5 SGML/DTD
 "doctype DOCTYPE PUBLIC SYSTEM "
@@ -129,7 +129,7 @@ NULL
 "row col rowgroup colgroup any "
 "command context toolbar soft hard "
 
-, NULL, NULL, NULL, NULL, NULL, NULL, NULL
+, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr
 }};
 
 static EDITSTYLE Styles_HTML[] = {

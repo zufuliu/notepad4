@@ -20,8 +20,8 @@ static KEYWORDLIST Keywords_IDL = {{
 ,	// constant
 ""
 
-, NULL, NULL, NULL, NULL, NULL, NULL
-, NULL
+, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr
+, nullptr
 }};
 
 static EDITSTYLE Styles_IDL[] = {

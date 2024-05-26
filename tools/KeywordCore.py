@@ -96,7 +96,7 @@ def BuildKeywordContent(rid, lexer, keywordList, keywordCount=16):
 				print(rid, comment, 'string exceeds 64 KiB:', length)
 			output.extend('"' + line + ' "' for line in lines)
 		else:
-			output.append('NULL')
+			output.append('nullptr')
 		if index + 1 < keywordCount:
 			output.append("")
 
@@ -123,7 +123,7 @@ def BuildKeywordContent(rid, lexer, keywordList, keywordCount=16):
 
 	count = keywordCount - len(keywordList)
 	if count:
-		output.append(", NULL" * count)
+		output.append(", nullptr" * count)
 	if attrList:
 		AllKeywordAttrList[rid] = attrList
 	return output, attrList

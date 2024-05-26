@@ -3,19 +3,19 @@
 
 static KEYWORDLIST Keywords_XML = {{
 // Tag
-NULL
+nullptr
 
 , // 1 JavaScript
-NULL
+nullptr
 
 , // 2 VBScript
-NULL
+nullptr
 
 , // 3 Python
-NULL
+nullptr
 
 , // 4 PHP
-NULL
+nullptr
 
 , // 5 SGML/DTD
 "doctype DOCTYPE PUBLIC SYSTEM "
@@ -31,13 +31,13 @@ NULL
 "lang id name type value "
 
 , // 7 Event Handler
-NULL
+nullptr
 
 , // 8 Value
 "utf-8 UTF-8 ISO-8859-1 "
 "true false yes no on off "
 
-, NULL, NULL, NULL, NULL, NULL, NULL, NULL
+, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr
 }};
 
 static EDITSTYLE Styles_XML[] = {

@@ -8,9 +8,9 @@ static KEYWORDLIST Keywords_LISP = {{
 "nil car cdr list "
 "cond defun defvar defmacro let setq setf and or not equal if while lambda loop when "
 ,
-NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
 
-NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
+nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr
 }};
 
 static EDITSTYLE Styles_LISP[] = {
