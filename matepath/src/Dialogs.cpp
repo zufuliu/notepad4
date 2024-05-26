@@ -2553,9 +2553,9 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 				WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_TARGET_APPLICATION);
 				IniSectionOnSave section = { pIniSectionBuf };
 				IniSectionOnSave * const pIniSection = &section;
-				const bool useTarget = IsButtonChecked(hwnd, IDC_LAUNCH);
+				const bool ignoreTarget = IsButtonChecked(hwnd, IDC_LAUNCH);
 
-				if (useTarget) {
+				if (ignoreTarget) {
 					iUseTargetApplication = UseTargetApplication_None;
 					iTargetApplicationMode = TargetApplicationMode_None;
 					StrCpyExW(szTargetApplication, L"");
@@ -2573,12 +2573,12 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 					}
 				}
 
-				IniSectionSetBool(pIniSection, L"UseTargetApplication", useTarget);
+				IniSectionSetBool(pIniSection, L"UseTargetApplication", !ignoreTarget);
 				IniSectionSetInt(pIniSection, L"TargetApplicationMode", (int)iTargetApplicationMode);
 				IniSectionSetString(pIniSection, L"TargetApplicationPath", szTargetApplication);
 				IniSectionSetString(pIniSection, L"TargetApplicationParams", szTargetApplicationParams);
 
-				if (IsButtonChecked(hwnd, IDC_SENDDROPMSG) && useTarget) {
+				if (iTargetApplicationMode == TargetApplicationMode_SendMsg) {
 					lstrcpy(szTargetApplicationWndClass, szTargetWndClass);
 				} else {
 					StrCpyExW(szTargetApplicationWndClass, L"");
