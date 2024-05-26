@@ -40,7 +40,7 @@
 #endif
 
 // force compile C as CPP
-#define NP2_FORCE_COMPILE_C_AS_CPP		0
+#define NP2_FORCE_COMPILE_C_AS_CPP		1
 
 // official Scintilla use std::call_once(), which increases binary about 12 KiB.
 #define USE_STD_CALL_ONCE		0

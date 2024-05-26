@@ -8,7 +8,7 @@ import subprocess
 
 app = os.path.basename(__file__)
 localeDir = os.getcwd()
-notepad2_src = os.path.abspath('../src/Notepad2.rc')
+notepad4_src = os.path.abspath('../src/Notepad4.rc')
 matepath_src = os.path.abspath('../matepath/src/matepath.rc')
 
 def get_available_locales():
@@ -64,35 +64,35 @@ def make_new_localization(language):
 		os.makedirs(target)
 
 	matepath_dest = os.path.join(target, 'matepath.rc')
-	notepad2_dest = os.path.join(target, 'Notepad2.rc')
+	notepad4_dest = os.path.join(target, 'Notepad4.rc')
 	shutil.copyfile(matepath_src, matepath_dest)
-	shutil.copyfile(notepad2_src, notepad2_dest)
+	shutil.copyfile(notepad4_src, notepad4_dest)
 
 	update_resource_include_path(matepath_dest, True)
-	update_resource_include_path(notepad2_dest, False)
+	update_resource_include_path(notepad4_dest, False)
 
 	src_lang = 'zh-Hans'
 	src_folder = os.path.join(localeDir, src_lang)
 	matepath_vcxproj_src = os.path.join(src_folder, f'matepath({src_lang}).vcxproj')
-	notepad2_vcxproj_src = os.path.join(src_folder, f'Notepad2({src_lang}).vcxproj')
+	notepad4_vcxproj_src = os.path.join(src_folder, f'Notepad4({src_lang}).vcxproj')
 	matepath_vcxproj = os.path.join(target, f'matepath({language}).vcxproj')
-	notepad2_vcxproj = os.path.join(target, f'Notepad2({language}).vcxproj')
+	notepad4_vcxproj = os.path.join(target, f'Notepad4({language}).vcxproj')
 
 	shutil.copyfile(matepath_vcxproj_src, matepath_vcxproj)
 	shutil.copyfile(matepath_vcxproj_src + '.filters', matepath_vcxproj + '.filters')
-	shutil.copyfile(notepad2_vcxproj_src, notepad2_vcxproj)
-	shutil.copyfile(notepad2_vcxproj_src + '.filters', notepad2_vcxproj + '.filters')
+	shutil.copyfile(notepad4_vcxproj_src, notepad4_vcxproj)
+	shutil.copyfile(notepad4_vcxproj_src + '.filters', notepad4_vcxproj + '.filters')
 
 	patch_vc_project_file(matepath_vcxproj, src_lang, language)
-	patch_vc_project_file(notepad2_vcxproj, src_lang, language)
+	patch_vc_project_file(notepad4_vcxproj, src_lang, language)
 
 	matepath_dest = os.path.basename(matepath_dest)
-	notepad2_dest = os.path.basename(notepad2_dest)
+	notepad4_dest = os.path.basename(notepad4_dest)
 	matepath_vcxproj = os.path.basename(matepath_vcxproj)
-	notepad2_vcxproj = os.path.basename(notepad2_vcxproj)
+	notepad4_vcxproj = os.path.basename(notepad4_vcxproj)
 	print(f"""{app}: resources and projects added for {language}.
-    Please manually update language tags in {matepath_dest} and {notepad2_dest},
-    and open Locale.sln with Visual Studio to add project {matepath_vcxproj} and {notepad2_vcxproj}.""")
+    Please manually update language tags in {matepath_dest} and {notepad4_dest},
+    and open Locale.sln with Visual Studio to add project {matepath_vcxproj} and {notepad4_vcxproj}.""")
 
 
 def restore_resource_include_path(path, matepath):
@@ -122,14 +122,14 @@ def copy_back_localized_resources(language):
 	else:
 		os.makedirs(backupDir)
 		shutil.copyfile(matepath_src, os.path.join(backupDir, 'matepath.rc'))
-		shutil.copyfile(notepad2_src, os.path.join(backupDir, 'Notepad2.rc'))
+		shutil.copyfile(notepad4_src, os.path.join(backupDir, 'Notepad4.rc'))
 
 	folder = os.path.join(localeDir, language)
 	shutil.copyfile(os.path.join(folder, 'matepath.rc'), matepath_src)
-	shutil.copyfile(os.path.join(folder, 'Notepad2.rc'), notepad2_src)
+	shutil.copyfile(os.path.join(folder, 'Notepad4.rc'), notepad4_src)
 
 	restore_resource_include_path(matepath_src, True)
-	restore_resource_include_path(notepad2_src, False)
+	restore_resource_include_path(notepad4_src, False)
 
 	print(f"""{app}: resources for building standalone localized program for {language} are ready.
     you can copy English resources back by run: {app} back en""")
@@ -436,12 +436,12 @@ def extract_resource_string(language, reversion):
 	extractor = StringExtractor()
 	if language == 'en':
 		extractor.extract(matepath_src, reversion)
-		extractor.extract(notepad2_src, reversion)
+		extractor.extract(notepad4_src, reversion)
 	else:
 		folder = os.path.join(localeDir, language)
 		path = os.path.join(folder, 'matepath.rc')
 		extractor.extract(path, reversion)
-		path = os.path.join(folder, 'Notepad2.rc')
+		path = os.path.join(folder, 'Notepad4.rc')
 		extractor.extract(path, reversion)
 
 

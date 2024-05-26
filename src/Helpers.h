@@ -1,7 +1,7 @@
 /******************************************************************************
 *
 *
-* Notepad2
+* Notepad4
 *
 * Helpers.h
 *   Definitions for general helper functions and macros
@@ -587,8 +587,8 @@ NP2_inline void IniSectionSetBoolEx(IniSectionOnSave *section, LPCWSTR key, bool
 	}
 }
 
-#define NP2RegSubKey_ContextMenu	L"*\\shell\\Notepad2"
-#define NP2RegSubKey_JumpList		L"Applications\\Notepad2.exe"
+#define NP2RegSubKey_ContextMenu	L"*\\shell\\Notepad4"
+#define NP2RegSubKey_JumpList		L"Applications\\Notepad4.exe"
 
 LPWSTR Registry_GetString(HKEY hKey, LPCWSTR valueName);
 LSTATUS Registry_SetString(HKEY hKey, LPCWSTR valueName, LPCWSTR lpszText);

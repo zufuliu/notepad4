@@ -63,7 +63,7 @@ def update_all_copyright_year():
 		'../matepath/src/matepath.rc',
 		'../matepath/src/version.h',
 		'../scintilla/License.txt',
-		'../src/Notepad2.rc',
+		'../src/Notepad4.rc',
 		'../src/Version.h',
 		'../License.txt']:
 		update_copyright_year(path, year)
@@ -185,7 +185,7 @@ def generate_compile_commands(target, avx2=False, cxx=False):
 #update_all_project_toolset()
 #update_all_copyright_year()
 #dump_static_linked_function('bin/Release/x64/matepath.map')
-#dump_static_linked_function('bin/Release/x64/Notepad2.map')
+#dump_static_linked_function('bin/Release/x64/Notepad4.map')
 generate_compile_commands('x86_64-pc-windows-msvc', cxx=True)
 #generate_compile_commands('x86_64-w64-windows-gnu')
 #run-clang-tidy --quiet -j4 1>tidy.log

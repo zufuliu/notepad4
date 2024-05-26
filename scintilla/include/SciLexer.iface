@@ -143,7 +143,7 @@ val SCLEX_CIL=127
 val SCLEX_FSHARP=132
 val SCLEX_JULIA=133
 
-# Notepad2 custom lexers
+# Notepad4 custom lexers
 val SCLEX_AUTOHOTKEY=200
 val SCLEX_SCILAB=201
 val SCLEX_TEXINFO=202

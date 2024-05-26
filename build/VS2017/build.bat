@@ -1,10 +1,10 @@
 @ECHO OFF
 @rem ******************************************************************************
 @rem *
-@rem * Notepad2-mod
+@rem * Notepad4
 @rem *
-@rem * build_vs2017.bat
-@rem *   Batch file used to build Notepad2 with MSVC 2017, 2019
+@rem * build.bat
+@rem *   Batch file used to build Notepad4 with MSVC 2017, 2019, 2022
 @rem *
 @rem * See License.txt for details about distribution and modification.
 @rem *
@@ -179,7 +179,7 @@ ENDLOCAL
 
 
 :END
-TITLE Building Notepad2 with MSVC - Finished!
+TITLE Building Notepad4 with MSVC - Finished!
 ENDLOCAL
 EXIT /B
 
@@ -209,9 +209,9 @@ EXIT /B
 
 :SUBMSVC
 ECHO.
-TITLE Building Notepad2 with MSVC - %~1 "%~2|%~3"...
+TITLE Building Notepad4 with MSVC - %~1 "%~2|%~3"...
 CD /D %~dp0
-"MSBuild.exe" /nologo Notepad2.sln /target:Notepad2;%~1 /property:Configuration=%~2;Platform=%~3^ /consoleloggerparameters:Verbosity=minimal /maxcpucount /nodeReuse:true
+"MSBuild.exe" /nologo Notepad4.sln /target:Notepad4;%~1 /property:Configuration=%~2;Platform=%~3^ /consoleloggerparameters:Verbosity=minimal /maxcpucount /nodeReuse:true
 IF %ERRORLEVEL% NEQ 0 CALL :SUBMSG "ERROR" "Compilation failed!"
 EXIT /B
 

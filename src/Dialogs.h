@@ -1,10 +1,10 @@
 /******************************************************************************
 *
 *
-* Notepad2
+* Notepad4
 *
 * Dialogs.h
-*   Definitions for Notepad2 dialog boxes
+*   Definitions for Notepad4 dialog boxes
 *
 * See Readme.txt for more information about this source code.
 * Please send me your comments to this work.

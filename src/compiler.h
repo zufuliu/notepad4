@@ -1,4 +1,4 @@
-// This file is part of Notepad2.
+// This file is part of Notepad4.
 // See License.txt for details about distribution and modification.
 #pragma once
 
@@ -106,7 +106,7 @@ typedef _Bool	bool;
 #endif
 
 // force compile C as CPP: /TP for MSVC and clang-cl, -x c++ for GCC and clang
-#define NP2_FORCE_COMPILE_C_AS_CPP	0
+#define NP2_FORCE_COMPILE_C_AS_CPP	1
 
 #define PP_CONCAT_(x, y)	x##y
 #define PP_CONCAT(x, y)		PP_CONCAT_(x, y)

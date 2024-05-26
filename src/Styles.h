@@ -1,7 +1,7 @@
 /******************************************************************************
 *
 *
-* Notepad2
+* Notepad4
 *
 * Styles.h
 *   Scintilla Style Management

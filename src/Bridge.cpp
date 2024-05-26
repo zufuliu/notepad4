@@ -1,7 +1,7 @@
 /******************************************************************************
 *
 *
-* Notepad2
+* Notepad4
 *
 * Bridge.cpp
 *   Functionalities implemented in C++:
@@ -39,7 +39,7 @@ extern "C" {
 
 #include "Helpers.h"
 #include "Dialogs.h"
-#include "Notepad2.h"
+#include "Notepad4.h"
 #include "Edit.h"
 #include "Styles.h"
 

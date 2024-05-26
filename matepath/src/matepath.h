@@ -21,7 +21,7 @@
 
 //==== Main Window ============================================================
 #define WC_MATEPATH L"matepath"
-#define WC_NOTEPAD2 L"Notepad2"
+#define WC_NOTEPAD4 L"Notepad4"
 #define MY_APPUSERMODELID	L"matepath File Browser"
 
 #define WS_MATEPATH ((WS_OVERLAPPEDWINDOW ^ \

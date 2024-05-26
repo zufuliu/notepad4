@@ -15,6 +15,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
+# https://github.com/XhmikosR/notepad2-mod/blob/master/version.sh
 
 # This is the last svn changeset, the number and hash can be automatically
 # calculated, but it is slow to do that. So it is better to have it hardcoded.
@@ -22,7 +23,7 @@ svnrev=990
 svnhash="b27830c304eff6b778094307cfad005b6ac5f2f2"
 
 versionfile="./src/VersionRev.h"
-manifestfile="./res/Notepad2.exe.manifest"
+manifestfile="./res/Notepad4.exe.manifest"
 
 # If we are not inside a git repo use hardcoded values
 if ! git rev-parse --git-dir > /dev/null 2>&1; then

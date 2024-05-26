@@ -51,8 +51,8 @@ for:
           CALL "build\make_zip.bat" MSVC ARM Release 1
 
     artifacts:
-      - path: 'build\Notepad2*.zip'
-        name: Notepad2_MSVC
+      - path: 'build\Notepad4*.zip'
+        name: Notepad4_MSVC
 
   - # Clang Release
     matrix:
@@ -75,5 +75,5 @@ for:
           CALL "build\make_zip.bat" LLVM ARM64 Release 1
 
     artifacts:
-      - path: 'build\Notepad2*.zip'
-        name: Notepad2_Clang_MSVC
+      - path: 'build\Notepad4*.zip'
+        name: Notepad4_Clang_MSVC

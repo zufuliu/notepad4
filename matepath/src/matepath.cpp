@@ -1080,7 +1080,7 @@ void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	const int cy = rc->bottom - rc->top;
 	SetWindowPos(hwnd, NULL, rc->left, rc->top, cx, cy, SWP_NOZORDER | SWP_NOACTIVATE);
 	if (bShowToolbar) {
-		// on Window 8.1 when move Notepad2 to another monitor with same scaling settings
+		// on Window 8.1 when move Notepad4 to another monitor with same scaling settings
 		// WM_DPICHANGED is sent with same DPI, and WM_SIZE is not sent after WM_DPICHANGED.
 		SetWindowPos(hwndReBar, NULL, 0, 0, cx, cyReBar, SWP_NOZORDER);
 	}
@@ -3127,7 +3127,7 @@ bool CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) {
 			if (S_OK == SHGetKnownFolderPath(rfidList[i], KF_FLAG_DEFAULT, NULL, &pszPath))
 #endif
 			{
-				PathCombine(tchBuild, pszPath, WC_NOTEPAD2);
+				PathCombine(tchBuild, pszPath, WC_NOTEPAD4);
 				CoTaskMemFree(pszPath);
 				PathAppend(tchBuild, tchFileExpanded);
 				if (PathIsFile(tchBuild)) {
@@ -3152,7 +3152,7 @@ bool CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) {
 		};
 		for (UINT i = 0; i < COUNTOF(csidlList); i++) {
 			if (S_OK == SHGetFolderPath(NULL, csidlList[i], NULL, SHGFP_TYPE_CURRENT, tchBuild)) {
-				PathAppend(tchBuild, WC_NOTEPAD2);
+				PathAppend(tchBuild, WC_NOTEPAD4);
 				PathAppend(tchBuild, tchFileExpanded);
 				if (PathIsFile(tchBuild)) {
 					lstrcpy(lpszFile, tchBuild);
@@ -3648,9 +3648,9 @@ void LoadLaunchSetings(void) {
 	} else if (iUseTargetApplication != UseTargetApplication_None && StrIsEmpty(szTargetApplication)) {
 		iUseTargetApplication = UseTargetApplication_Use;
 		iTargetApplicationMode = TargetApplicationMode_SendMsg;
-		lstrcpy(szTargetApplication, L"Notepad2.exe");
+		lstrcpy(szTargetApplication, L"Notepad4.exe");
 		StrCpyExW(szTargetApplicationParams, L"");
-		lstrcpy(szTargetApplicationWndClass, WC_NOTEPAD2);
+		lstrcpy(szTargetApplicationWndClass, WC_NOTEPAD4);
 		StrCpyExW(szDDEMsg, L"");
 		StrCpyExW(szDDEApp, L"");
 		StrCpyExW(szDDETopic, L"");

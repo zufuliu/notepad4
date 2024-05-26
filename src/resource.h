@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
-// Used by Notepad2.rc
+// Used by Notepad4.rc
 //
 #define IDR_RT_MANIFEST					1
 // Icon, Accelerator, Menu
