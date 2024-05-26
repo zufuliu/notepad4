@@ -16,6 +16,6 @@
 | zh-Hans | 中文 (简体) | Win32 | 🟠legacy Windows XP, Server 2003 |
 | zh-Hant | 中文 (繁體) |
 | i18n | all above languages include French | winget | `winget install -e "Notepad4"` |
-| 한국어 | https://teus.me/category/IT/Notepad2 | winget | `winget install zufuliu.notepad4` |
+| 한국어 | https://teus.me/Notepad4 | winget | `winget install zufuliu.notepad4` |
 
 Latest development builds (artifacts in Release configuration for each compiler and platform) are available at https://github.com/zufuliu/notepad4/actions and https://ci.appveyor.com/project/zufuliu/notepad4.

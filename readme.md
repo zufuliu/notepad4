@@ -200,5 +200,5 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [中文 (繁體)](https://github.com/zufuliu/notepad4/tree/main/locale/zh-Hant)
 	* [中文 (简体)](https://github.com/zufuliu/notepad4/tree/main/locale/zh-Hans)
 	* [한국어](https://github.com/zufuliu/notepad4/tree/main/locale/ko) by [@VenusGirl](https://github.com/VenusGirl)
-	* [한국어](https://teus.me/category/IT/Notepad2) by [@bluenlive](https://github.com/bluenlive)
+	* [한국어](https://teus.me/Notepad4) by [@bluenlive](https://github.com/bluenlive)
 * [Notepad4 Wiki](https://github.com/zufuliu/notepad4/wiki)

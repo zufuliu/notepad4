@@ -242,15 +242,13 @@ EXIT /B
 :SubGetVersion
 rem Get the version
 FOR /F "tokens=3,4" %%K IN (
-  'FINDSTR /I /L /C:"define VERSION_MAJOR" "..\src\Version.h"') DO (SET "VerMajor=%%K")
-FOR /F "tokens=3,4" %%K IN (
   'FINDSTR /I /L /C:"define VERSION_MINOR" "..\src\VersionRev.h"') DO (SET "VerMinor=%%K")
 FOR /F "tokens=3,4" %%K IN (
   'FINDSTR /I /L /C:"define VERSION_BUILD" "..\src\VersionRev.h"') DO (SET "VerBuild=%%K")
 FOR /F "tokens=3,4" %%K IN (
   'FINDSTR /I /L /C:"define VERSION_REV " "..\src\VersionRev.h"') DO (SET "VerRev=%%K")
 
-SET NP2_VER=v%VerMajor%.%VerMinor%.%VerBuild%r%VerRev%
+SET NP2_VER=v%VerMinor%.%VerBuild%r%VerRev%
 EXIT /B
 
 

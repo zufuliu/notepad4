@@ -101,14 +101,7 @@ def zip_folder_inner(folder, output):
 			print('make zip fail:', retcode, os.path.basename(output))
 
 def get_app_version():
-	major, minor, build, reversion = ['']*4
-	path = os.path.join(buildFolder, '../src/Version.h')
-	with open(path, encoding='utf-8') as fd:
-		for line in fd.read().splitlines():
-			if line.startswith('#define VERSION_MAJOR'):
-				major = line.split()[2]
-				break
-
+	minor, build, reversion = ['']*3
 	path = os.path.join(buildFolder, '../src/VersionRev.h')
 	with open(path, encoding='utf-8') as fd:
 		for line in fd.read().splitlines():
@@ -122,7 +115,7 @@ def get_app_version():
 					build = value
 				elif key == 'VERSION_REV':
 					reversion = value
-	return f'v{major}.{minor}.{build}r{reversion}'
+	return f'v{minor}.{build}r{reversion}'
 
 def prepare_build_environment():
 	app_version = get_app_version()
