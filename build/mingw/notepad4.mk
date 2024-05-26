@@ -16,8 +16,8 @@ LDFLAGS += -L"$(BINFOLDER)/obj"
 
 LDLIBS += -limm32
 
-editlexers_src = $(wildcard $(editlexers_dir)/*.c)
-editlexers_obj = $(patsubst $(editlexers_dir)/%.c,$(OBJDIR)/%.obj,$(editlexers_src))
+editlexers_src = $(wildcard $(editlexers_dir)/*.cpp)
+editlexers_obj = $(patsubst $(editlexers_dir)/%.cpp,$(OBJDIR)/%.obj,$(editlexers_src))
 
 c_src = $(wildcard $(SRCDIR)/*.c)
 c_obj = $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.obj,$(c_src))
@@ -36,8 +36,8 @@ $(OBJDIR):
 $(NAME): $(editlexers_obj) $(c_obj) $(cpp_obj) $(rc_obj)
 	$(CXX) $^ $(LDFLAGS) -lscintilla $(LDLIBS) -o $(BINFOLDER)/$@
 
-$(editlexers_obj): $(OBJDIR)/%.obj: $(editlexers_dir)/%.c
-	$(CC) -c $(CPPFLAGS) $(CFLAGS) $(INCDIR) $< -o $(OBJDIR)/$*.obj
+$(editlexers_obj): $(OBJDIR)/%.obj: $(editlexers_dir)/%.cpp
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCDIR) $< -o $(OBJDIR)/$*.obj
 
 $(c_obj): $(OBJDIR)/%.obj: $(SRCDIR)/%.c
 	$(CC) -c $(CPPFLAGS) $(CFLAGS) $(INCDIR) $< -o $(OBJDIR)/$*.obj

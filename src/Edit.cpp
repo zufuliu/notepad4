@@ -3107,12 +3107,12 @@ void EditAlignText(EditAlignMode nMode) {
 	}
 
 	if (iMaxLength < BUFSIZE_ALIGN) {
-		typedef struct EditAlignTextVar {
+		struct EditAlignTextVar {
 			char tchLineBuf[BUFSIZE_ALIGN * kMaxMultiByteCount];
 			WCHAR wchLineBuf[BUFSIZE_ALIGN];
 			LPWSTR pWords[BUFSIZE_ALIGN];
 			WCHAR wchNewLineBuf[BUFSIZE_ALIGN * 3];
-		} EditAlignTextVar;
+		};
 		EditAlignTextVar * const var = (EditAlignTextVar *)NP2HeapAlloc(sizeof(EditAlignTextVar));
 		SciCall_BeginUndoAction();
 		for (Sci_Line iLine = iLineStart; iLine <= iLineEnd; iLine++) {
