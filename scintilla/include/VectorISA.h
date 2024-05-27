@@ -317,7 +317,6 @@ static inline bool BitTestEx(const uint32_t *start, uint32_t value) NP2_noexcept
 	return bittest(start + (value >> 5), value & 31);
 }
 
-#if defined(__cplusplus)
 namespace np2 {
 inline auto ctz(uint32_t x) noexcept { return np2_ctz(x); }
 inline auto clz(uint32_t x) noexcept { return np2_clz(x); }
@@ -330,4 +329,3 @@ inline auto bsr(uint64_t x) noexcept { return np2_bsr64(x); }
 inline auto popcount(uint64_t x) noexcept { return np2_popcount64(x); }
 #endif
 }
-#endif

@@ -450,7 +450,7 @@ def build_charset_function(latex_charset, emoji_charset, output):
 	latex_charset = make_char_equals(latex_punctuation)
 	emoji_charset = make_char_equals(emoji_punctuation)
 	output.extend(f"""
-static inline bool IsLaTeXInputSequenceChar(char ch) {{
+constexpr bool IsLaTeXInputSequenceChar(char ch) noexcept {{
 	return (ch >= 'a' && ch <= 'z')
 		|| (ch >= 'A' && ch <= 'Z')
 		|| (ch >= '0' && ch <= '9')

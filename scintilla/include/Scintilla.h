@@ -9,9 +9,7 @@
  * file which contains any comments about the definitions. HFacer.py does the generation. */
 #pragma once
 
-#ifdef __cplusplus
 extern "C" {
-#endif
 
 #if defined(_WIN32)
 void Scintilla_LoadDpiForWindow(void);
@@ -20,16 +18,10 @@ int Scintilla_RegisterClasses(void *hInstance);
 int Scintilla_ReleaseResources(void);
 #endif
 
-#ifdef __cplusplus
 }
-#endif
 
 // Include header that defines basic numeric types.
-#if defined(__cplusplus)
 #include <cstdint>
-#else
-#include <stdint.h>
-#endif
 
 // Define uptr_t, an unsigned integer type large enough to hold a pointer.
 typedef uintptr_t uptr_t;
@@ -1334,13 +1326,6 @@ struct Sci_RangeToFormatFull {
 	struct Sci_Rectangle rcPage;
 	struct Sci_CharacterRangeFull chrg;
 };
-
-#ifndef __cplusplus
-/* For the GTK platform, g-ir-scanner needs to have these typedefs. This
- * is not required in C++ code and actually seems to break ScintillaEditPy */
-typedef struct Sci_NotifyHeader Sci_NotifyHeader;
-typedef struct SCNotification SCNotification;
-#endif
 
 struct Sci_NotifyHeader {
 	/* Compatible with Windows NMHDR.

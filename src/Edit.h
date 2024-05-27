@@ -217,17 +217,9 @@ typedef enum OpenSelectionType {
 void EditOpenSelection(OpenSelectionType type);
 
 // in Bridge.cpp
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-bool	EditPrint(HWND hwnd, LPCWSTR pszDocTitle, BOOL bDefault);
-void	EditPrintSetup(HWND hwnd);
-void	EditFormatCode(int menu);
-
-#ifdef __cplusplus
-}
-#endif
+bool	EditPrint(HWND hwnd, LPCWSTR pszDocTitle, BOOL bDefault) noexcept;
+void	EditPrintSetup(HWND hwnd) noexcept;
+void	EditFormatCode(int menu) noexcept;
 
 enum {
 	MarkerNumber_Bookmark = 0,

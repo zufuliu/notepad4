@@ -487,7 +487,7 @@ int DirList_GetItem(HWND hwnd, int iItem, LPDLITEM lpdli) {
 		if (S_OK == SHGetDataFromIDList(lplvid->lpsf, (PCUITEMID_CHILD)lplvid->pidl, SHGDFIL_FINDDATA, &fd, sizeof(WIN32_FIND_DATA))) {
 			lpdli->ntype = (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ? DLE_DIR : DLE_FILE;
 		}
-		//lplvid->lpsf->lpVtbl->GetAttributesOf(lplvid->lpsf, 1, &lplvid->pidl, &dwAttributes);
+		//lplvid->lpsf->GetAttributesOf(lplvid->lpsf, 1, &lplvid->pidl, &dwAttributes);
 		//lpdli->ntype = (dwAttributes & SFGAO_FOLDER) ? DLE_DIR : DLE_FILE;
 	}
 

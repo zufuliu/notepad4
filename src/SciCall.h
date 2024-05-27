@@ -25,9 +25,7 @@ NP2_inline void InitScintillaHandle(HWND hwnd) NP2_noexcept {
 	g_hScintilla = (HANDLE)SendMessage(hwnd, SCI_GETDIRECTPOINTER, 0, 0);
 }
 
-#if defined(__cplusplus)
 extern "C"
-#endif
 LRESULT SCI_METHOD Scintilla_DirectFunction(HANDLE handle, UINT msg, WPARAM wParam, LPARAM lParam);
 #define SciCall(m, w, l)	Scintilla_DirectFunction(g_hScintilla, (m), (w), (l))
 
