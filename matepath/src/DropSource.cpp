@@ -39,15 +39,11 @@ STDMETHODIMP CDropSource::QueryInterface(REFIID iid, PVOID *ppv) noexcept {
 }
 
 STDMETHODIMP_(ULONG) CDropSource::AddRef() noexcept {
-	return ++m_refs;
+	return 1; // do nothing
 }
 
 STDMETHODIMP_(ULONG) CDropSource::Release() noexcept {
-	const ULONG refs = --m_refs;
-	if (refs == 0) {
-		delete this;
-	}
-	return refs;
+	return 1; // do nothing
 }
 
 /******************************************************************************
@@ -67,9 +63,4 @@ STDMETHODIMP CDropSource::QueryContinueDrag(BOOL fEscapePressed, DWORD grfKeySta
 
 STDMETHODIMP CDropSource::GiveFeedback(DWORD /*dwEffect*/) noexcept {
 	return DRAGDROP_S_USEDEFAULTCURSORS;
-}
-
-// GCC warns -Wlto-type-mismatch for LPDROPSOURCE.
-HANDLE CreateDropSource(void) {
-	return (new CDropSource);
 }

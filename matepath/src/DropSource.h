@@ -30,7 +30,4 @@ public:
 	/* IDropSource methods */
 	STDMETHODIMP QueryContinueDrag(BOOL fEscapePressed, DWORD grfKeyState) noexcept override;
 	STDMETHODIMP GiveFeedback(DWORD /*dwEffect*/) noexcept override;
-
-private:
-	ULONG m_refs = 1;
 };

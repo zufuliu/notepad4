@@ -27,6 +27,7 @@ struct IUnknown;
 #include <commctrl.h>
 #include "Helpers.h"
 #include "Dlapi.h"
+#include "DropSource.h"
 
 //==== DirList ================================================================
 
@@ -582,8 +583,6 @@ bool DirList_PropertyDlg(HWND hwnd, int iItem) {
 //
 //  Execute an OLE Drag & Drop Operation in response to LVN_BEGIN(R)DRAG
 //
-extern HANDLE CreateDropSource(void);
-
 void DirList_DoDragDrop(HWND hwnd, LPARAM lParam) {
 	const NM_LISTVIEW *pnmlv = (NM_LISTVIEW *)lParam;
 
@@ -596,13 +595,12 @@ void DirList_DoDragDrop(HWND hwnd, LPARAM lParam) {
 		LPLV_ITEMDATA lplvid = (LPLV_ITEMDATA)lvi.lParam;
 		LPDATAOBJECT lpdo;
 		if (SUCCEEDED(lplvid->lpsf->GetUIObjectOf(GetParent(hwnd), 1, (PCUITEMID_CHILD_ARRAY)(&lplvid->pidl), IID_IDataObject, nullptr, reinterpret_cast<void **>(&lpdo)))) {
-			LPDROPSOURCE lpds = (LPDROPSOURCE)CreateDropSource();
+			CDropSource lpds;
 			DWORD dwEffect;
 
-			DoDragDrop(lpdo, lpds, DROPEFFECT_COPY | DROPEFFECT_MOVE | DROPEFFECT_LINK, &dwEffect);
+			DoDragDrop(lpdo, &lpds, DROPEFFECT_COPY | DROPEFFECT_MOVE | DROPEFFECT_LINK, &dwEffect);
 
 			lpdo->Release();
-			lpds->Release();
 		}
 	}
 }
