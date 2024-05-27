@@ -39,9 +39,6 @@
 #pragma warning(pop)
 #endif
 
-// force compile C as CPP
-#define NP2_FORCE_COMPILE_C_AS_CPP		1
-
 // official Scintilla use std::call_once(), which increases binary about 12 KiB.
 #define USE_STD_CALL_ONCE		0
 #if !USE_STD_CALL_ONCE && (_WIN32_WINNT >= _WIN32_WINNT_VISTA)
@@ -64,24 +61,12 @@
 
 #else
 #define NP2_HAS_GETDPIFORWINDOW					0
-#if NP2_FORCE_COMPILE_C_AS_CPP
-#define NP2F_noexcept noexcept
 extern UINT GetWindowDPI(HWND hwnd) noexcept;
 extern int SystemMetricsForDpi(int nIndex, UINT dpi) noexcept;
 extern BOOL AdjustWindowRectForDpi(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT dpi) noexcept;
-#else
-#define NP2F_noexcept
-extern "C" UINT GetWindowDPI(HWND hwnd);
-extern "C" int SystemMetricsForDpi(int nIndex, UINT dpi);
-extern "C" BOOL AdjustWindowRectForDpi(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT dpi);
-#endif
 #endif
 
-#if NP2_FORCE_COMPILE_C_AS_CPP
 extern WCHAR defaultTextFontName[LF_FACESIZE];
-#else
-extern "C" WCHAR defaultTextFontName[LF_FACESIZE];
-#endif
 
 namespace Scintilla::Internal {
 

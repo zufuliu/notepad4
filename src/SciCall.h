@@ -19,11 +19,7 @@
 #include "Scintilla.h"
 #include "compiler.h"
 
-#if defined(__cplusplus) && !NP2_FORCE_COMPILE_C_AS_CPP
-extern "C" HANDLE g_hScintilla;
-#else
 extern HANDLE g_hScintilla;
-#endif
 
 NP2_inline void InitScintillaHandle(HWND hwnd) NP2_noexcept {
 	g_hScintilla = (HANDLE)SendMessage(hwnd, SCI_GETDIRECTPOINTER, 0, 0);

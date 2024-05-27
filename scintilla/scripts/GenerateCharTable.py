@@ -6,6 +6,7 @@ import UnicodeData
 
 def GenerateUTF8Table():
 	# for UTF8ClassifyTable in UniConversion.cxx
+	# see https://sourceforge.net/p/scintilla/feature-requests/1211/
 	def BytesFromLead(leadByte):
 		# Single byte or invalid
 		if leadByte < 0xC2:

@@ -57,18 +57,10 @@ struct IUnknown;
 #if _WIN32_WINNT >= _WIN32_WINNT_WIN8
 #define kSystemLibraryLoadFlags		LOAD_LIBRARY_SEARCH_SYSTEM32
 #else
-#if NP2_FORCE_COMPILE_C_AS_CPP
 extern DWORD kSystemLibraryLoadFlags;
-#else
-extern "C" DWORD kSystemLibraryLoadFlags;
-#endif
 #endif
 
-#if NP2_FORCE_COMPILE_C_AS_CPP
 extern UINT g_uSystemDPI;
-#else
-extern "C" UINT g_uSystemDPI;
-#endif
 
 using namespace Scintilla;
 
@@ -121,7 +113,7 @@ void Scintilla_LoadDpiForWindow(void) {
 	}
 }
 
-UINT GetWindowDPI(HWND hwnd) NP2F_noexcept {
+UINT GetWindowDPI(HWND hwnd) noexcept {
 	if (fnGetDpiForWindow) {
 		return fnGetDpiForWindow(hwnd);
 	}
@@ -136,7 +128,7 @@ UINT GetWindowDPI(HWND hwnd) NP2F_noexcept {
 	return g_uSystemDPI;
 }
 
-int SystemMetricsForDpi(int nIndex, UINT dpi) NP2F_noexcept {
+int SystemMetricsForDpi(int nIndex, UINT dpi) noexcept {
 	if (fnGetSystemMetricsForDpi) {
 		return fnGetSystemMetricsForDpi(nIndex, dpi);
 	}
@@ -148,7 +140,7 @@ int SystemMetricsForDpi(int nIndex, UINT dpi) NP2F_noexcept {
 	return value;
 }
 
-BOOL AdjustWindowRectForDpi(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT dpi) NP2F_noexcept {
+BOOL AdjustWindowRectForDpi(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT dpi) noexcept {
 	if (fnAdjustWindowRectExForDpi) {
 		return fnAdjustWindowRectExForDpi(lpRect, dwStyle, FALSE, dwExStyle, dpi);
 	}

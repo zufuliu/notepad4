@@ -105,9 +105,6 @@ typedef _Bool	bool;
 	#define NP2_inline	static inline
 #endif
 
-// force compile C as CPP: /TP for MSVC and clang-cl, -x c++ for GCC and clang
-#define NP2_FORCE_COMPILE_C_AS_CPP	1
-
 #define PP_CONCAT_(x, y)	x##y
 #define PP_CONCAT(x, y)		PP_CONCAT_(x, y)
 

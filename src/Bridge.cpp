@@ -33,23 +33,14 @@ struct IUnknown;
 
 #include "SciCall.h"
 #include "VectorISA.h"
-#if !NP2_FORCE_COMPILE_C_AS_CPP
-extern "C" {
-#endif
-
 #include "Helpers.h"
 #include "Dialogs.h"
 #include "Notepad4.h"
 #include "Edit.h"
 #include "Styles.h"
-
-#if !NP2_FORCE_COMPILE_C_AS_CPP
-}
-#endif
 #include "resource.h"
 
 // Global settings...
-#if NP2_FORCE_COMPILE_C_AS_CPP
 extern HWND hwndMain;
 extern PrintHeaderOption iPrintHeader;
 extern PrintFooterOption iPrintFooter;
@@ -58,16 +49,6 @@ extern int iPrintZoom;
 extern RECT pageSetupMargin;
 extern HWND hwndStatus;
 extern WCHAR defaultTextFontName[LF_FACESIZE];
-#else
-extern "C" HWND hwndMain;
-extern "C" PrintHeaderOption iPrintHeader;
-extern "C" PrintFooterOption iPrintFooter;
-extern "C" int iPrintColor;
-extern "C" int iPrintZoom;
-extern "C" RECT pageSetupMargin;
-extern "C" HWND hwndStatus;
-extern "C" WCHAR defaultTextFontName[LF_FACESIZE];
-#endif
 
 namespace {
 
