@@ -70,6 +70,6 @@ STDMETHODIMP CDropSource::GiveFeedback(DWORD /*dwEffect*/) noexcept {
 }
 
 // GCC warns -Wlto-type-mismatch for LPDROPSOURCE.
-extern "C" HANDLE CreateDropSource(void) {
+HANDLE CreateDropSource(void) {
 	return (new CDropSource);
 }

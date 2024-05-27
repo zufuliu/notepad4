@@ -1781,7 +1781,6 @@ bool PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath) {
 	WCHAR tchPath[MAX_PATH];
 	tchPath[0] = L'\0';
 
-#if defined(__cplusplus)
 	if (SUCCEEDED(CoCreateInstance(IID_IShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLink, reinterpret_cast<LPVOID *>(&psl)))) {
 		IPersistFile *ppf;
 
@@ -1793,19 +1792,6 @@ bool PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath) {
 		}
 		psl->Release();
 	}
-#else
-	if (SUCCEEDED(CoCreateInstance(&CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, &IID_IShellLink, (LPVOID *)(&psl)))) {
-		IPersistFile *ppf;
-
-		if (SUCCEEDED(psl->lpVtbl->QueryInterface(psl, &IID_IPersistFile, (void **)(&ppf)))) {
-			if (SUCCEEDED(ppf->lpVtbl->Load(ppf, pszLnkFile, STGM_READ))) {
-				hr = psl->lpVtbl->GetPath(psl, tchPath, COUNTOF(tchPath), NULL, 0);
-			}
-			ppf->lpVtbl->Release(ppf);
-		}
-		psl->lpVtbl->Release(psl);
-	}
-#endif
 
 	if (hr == S_OK && StrNotEmpty(tchPath)) {
 		ExpandEnvironmentStringsEx(tchPath, COUNTOF(tchPath));
@@ -1877,7 +1863,6 @@ bool PathCreateDeskLnk(LPCWSTR pszDocument) {
 
 	IShellLink *psl;
 	bool bSucceeded = false;
-#if defined(__cplusplus)
 	if (SUCCEEDED(CoCreateInstance(IID_IShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLink, reinterpret_cast<LPVOID *>(&psl)))) {
 		IPersistFile *ppf;
 
@@ -1893,24 +1878,6 @@ bool PathCreateDeskLnk(LPCWSTR pszDocument) {
 		}
 		psl->Release();
 	}
-#else
-	if (SUCCEEDED(CoCreateInstance(&CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, &IID_IShellLink, (LPVOID *)(&psl)))) {
-		IPersistFile *ppf;
-
-		if (SUCCEEDED(psl->lpVtbl->QueryInterface(psl, &IID_IPersistFile, (void **)(&ppf)))) {
-			psl->lpVtbl->SetPath(psl, tchExeFile);
-			psl->lpVtbl->SetArguments(psl, tchArguments);
-			psl->lpVtbl->SetDescription(psl, tchDescription);
-
-			if (SUCCEEDED(ppf->lpVtbl->Save(ppf, tchLnkFileName, TRUE))) {
-				bSucceeded = true;
-			}
-
-			ppf->lpVtbl->Release(ppf);
-		}
-		psl->lpVtbl->Release(psl);
-	}
-#endif
 
 	return bSucceeded;
 }
@@ -1939,7 +1906,6 @@ bool PathCreateFavLnk(LPCWSTR pszName, LPCWSTR pszTarget, LPCWSTR pszDir) {
 
 	IShellLink *psl;
 	bool bSucceeded = false;
-#if defined(__cplusplus)
 	if (SUCCEEDED(CoCreateInstance(IID_IShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLink, reinterpret_cast<LPVOID *>(&psl)))) {
 		IPersistFile *ppf;
 
@@ -1953,21 +1919,6 @@ bool PathCreateFavLnk(LPCWSTR pszName, LPCWSTR pszTarget, LPCWSTR pszDir) {
 		}
 		psl->Release();
 	}
-#else
-	if (SUCCEEDED(CoCreateInstance(&CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, &IID_IShellLink, (LPVOID *)(&psl)))) {
-		IPersistFile *ppf;
-
-		if (SUCCEEDED(psl->lpVtbl->QueryInterface(psl, &IID_IPersistFile, (void **)(&ppf)))) {
-			psl->lpVtbl->SetPath(psl, pszTarget);
-			if (SUCCEEDED(ppf->lpVtbl->Save(ppf, tchLnkFileName, TRUE))) {
-				bSucceeded = true;
-			}
-
-			ppf->lpVtbl->Release(ppf);
-		}
-		psl->lpVtbl->Release(psl);
-	}
-#endif
 
 	return bSucceeded;
 }

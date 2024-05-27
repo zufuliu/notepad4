@@ -6731,12 +6731,7 @@ bool CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) {
 		};
 		for (UINT i = 0; i < COUNTOF(rfidList); i++) {
 			LPWSTR pszPath = NULL;
-#if defined(__cplusplus)
-			if (S_OK == SHGetKnownFolderPath(*rfidList[i], KF_FLAG_DEFAULT, nullptr, &pszPath))
-#else
-			if (S_OK == SHGetKnownFolderPath(rfidList[i], KF_FLAG_DEFAULT, NULL, &pszPath))
-#endif
-			{
+			if (S_OK == SHGetKnownFolderPath(*rfidList[i], KF_FLAG_DEFAULT, nullptr, &pszPath)) {
 				PathCombine(tchBuild, pszPath, WC_NOTEPAD4);
 				CoTaskMemFree(pszPath);
 				PathAppend(tchBuild, tchFileExpanded);
