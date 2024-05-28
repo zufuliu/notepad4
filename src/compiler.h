@@ -41,14 +41,6 @@ typedef _Bool	bool;
 #define NP2_assume(expr)
 #endif
 
-#if defined(__cplusplus)
-#define NP2_static_assert(expr)		static_assert(expr)
-#elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
-#define NP2_static_assert(expr)		_Static_assert(expr, #expr)
-#else
-#define NP2_static_assert(expr)		_STATIC_ASSERT(expr)
-#endif
-
 // suppress clang-tidy [bugprone-multi-level-implicit-pointer-conversion] warning
 #if defined(__cplusplus)
 #define NP2_void_pointer(expr)		(reinterpret_cast<void *>(expr))
@@ -88,15 +80,6 @@ typedef _Bool	bool;
 #define NP2_IGNORE_WARNING_DEPRECATED_DECLARATIONS	_Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
 #else
 #define NP2_IGNORE_WARNING_DEPRECATED_DECLARATIONS	__pragma(warning(disable: 4996))
-#endif
-
-// suppress [-Wimplicit-fallthrough] warning in C source
-#if defined(__cplusplus)
-#define FALLTHROUGH_ATTR		[[fallthrough]]
-#elif (defined(__GNUC__) && __GNUC__ >= 7) || (defined(__clang__) && __clang_major__ >= 10)
-#define FALLTHROUGH_ATTR		__attribute__((fallthrough))
-#else
-#define FALLTHROUGH_ATTR
 #endif
 
 #if defined(__cplusplus) || defined(_MSC_VER)

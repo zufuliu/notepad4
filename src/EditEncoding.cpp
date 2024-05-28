@@ -560,7 +560,7 @@ void Encoding_InitDefaults(void) {
 }
 
 int Encoding_MapIniSetting(bool bLoad, UINT iSetting) {
-	NP2_static_assert(CPI_UTF7 == 8);
+	static_assert(CPI_UTF7 == 8);
 	if (iSetting == CPI_UTF7) {
 		return iSetting;
 	}
@@ -2321,9 +2321,9 @@ int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, int *enco
 			bReverse = true;
 		}
 
-		NP2_static_assert(CPI_UNICODE + 1 == CPI_UNICODEBE);
-		NP2_static_assert(CPI_UNICODEBOM + 2 == CPI_UNICODE);
-		NP2_static_assert(CPI_UNICODEBEBOM + 2 == CPI_UNICODEBE);
+		static_assert(CPI_UNICODE + 1 == CPI_UNICODEBE);
+		static_assert(CPI_UNICODEBOM + 2 == CPI_UNICODE);
+		static_assert(CPI_UNICODEBEBOM + 2 == CPI_UNICODEBE);
 		iEncoding = CPI_UNICODE + bReverse;
 		iEncoding -= bBOM << 1;
 		return iEncoding;
@@ -2334,7 +2334,7 @@ int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, int *enco
 	const bool utf8Sig = IsUTF8Signature(lpData);
 	if (Encoding_IsUTF8(iSrcEncoding) // reload as UTF-8
 		|| (iSrcEncoding < CPI_FIRST && utf8Sig)) {
-		NP2_static_assert(CPI_UTF8 + 1 == CPI_UTF8SIGN);
+		static_assert(CPI_UTF8 + 1 == CPI_UTF8SIGN);
 		iEncoding = CPI_UTF8 + utf8Sig;
 		return iEncoding;
 	}

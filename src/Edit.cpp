@@ -2368,9 +2368,9 @@ void EditConvertNumRadix(int radix) {
 		return;
 	}
 
-	NP2_static_assert(IDM_EDIT_NUM2DEC - IDM_EDIT_NUM2BIN == 1);
-	NP2_static_assert(IDM_EDIT_NUM2OCT - IDM_EDIT_NUM2BIN == 2);
-	NP2_static_assert(IDM_EDIT_NUM2HEX - IDM_EDIT_NUM2BIN == 3);
+	static_assert(IDM_EDIT_NUM2DEC - IDM_EDIT_NUM2BIN == 1);
+	static_assert(IDM_EDIT_NUM2OCT - IDM_EDIT_NUM2BIN == 2);
+	static_assert(IDM_EDIT_NUM2HEX - IDM_EDIT_NUM2BIN == 3);
 	radix -= IDM_EDIT_NUM2BIN;
 	radix = (radix == 1) ? 10 : (2 << radix);
 
@@ -3426,7 +3426,7 @@ void EditToggleLineComments(LPCWSTR pwszComment, int commentFlag) {
 			switch (iAction) {
 			case CommentAction_None:
 				iAction = CommentAction_Delete;
-				FALLTHROUGH_ATTR;
+				[[fallthrough]];
 				// fall through
 			case CommentAction_Delete: {
 				Sci_Position iCommentPos = iIndentPos;
@@ -3453,7 +3453,7 @@ void EditToggleLineComments(LPCWSTR pwszComment, int commentFlag) {
 			switch (iAction) {
 			case CommentAction_None:
 				iAction = CommentAction_Add;
-				FALLTHROUGH_ATTR;
+				[[fallthrough]];
 				// fall through
 			case CommentAction_Add: {
 				const Sci_Position iCommentPos = SciCall_FindColumn(iLine, iCommentCol);

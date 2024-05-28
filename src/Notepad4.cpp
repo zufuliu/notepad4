@@ -1597,7 +1597,7 @@ void UpdateWindowTitle(void) {
 	}
 
 	WCHAR szAppName[128];
-	NP2_static_assert(IDS_APPTITLE + 1 == IDS_APPTITLE_PASTEBOARD);
+	static_assert(IDS_APPTITLE + 1 == IDS_APPTITLE_PASTEBOARD);
 	GetString(IDS_APPTITLE + (UINT)flagPasteBoard, szAppName, COUNTOF(szAppName));
 
 	if (fIsElevated) {
@@ -5212,7 +5212,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			HMENU hmenu = NULL;
 			HMENU subMenu = NULL;
 			if (lpTbNotify->iItem == IDT_FILE_OPEN) {
-				NP2_static_assert(IDM_RECENT_HISTORY_START + MRU_MAXITEMS == IDM_RECENT_HISTORY_END);
+				static_assert(IDM_RECENT_HISTORY_START + MRU_MAXITEMS == IDM_RECENT_HISTORY_END);
 				if (mruFile.iSize <= 0) {
 					return TBDDRET_TREATPRESSED;
 				}

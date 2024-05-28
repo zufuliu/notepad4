@@ -2510,7 +2510,7 @@ HBITMAP BitmapCache_Get(BitmapCache *cache, LPCWSTR path) {
 		}
 	}
 	if (index == cache->count) {
-		NP2_static_assert(sizeof(cache->used)*8 >= MRU_MAXITEMS);
+		static_assert(sizeof(cache->used)*8 >= MRU_MAXITEMS);
 		if (index < MRU_MAXITEMS) {
 			cache->count += 1;
 		} else {

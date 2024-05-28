@@ -21,14 +21,6 @@ typedef _Bool	bool;
 	#endif
 #endif
 
-#if defined(__cplusplus)
-#define NP2_static_assert(expr)		static_assert(expr)
-#elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
-#define NP2_static_assert(expr)		_Static_assert(expr, #expr)
-#else
-#define NP2_static_assert(expr)		_STATIC_ASSERT(expr)
-#endif
-
 // suppress clang-tidy [bugprone-multi-level-implicit-pointer-conversion] warning
 #if defined(__cplusplus)
 #define NP2_void_pointer(expr)		(reinterpret_cast<void *>(expr))

@@ -1412,15 +1412,15 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 			break;
 
 		case NP2LEX_BASH: {
-			NP2_static_assert(IDM_LEXER_CSHELL - IDM_LEXER_BASH == 1);
-			NP2_static_assert(IDM_LEXER_M4 - IDM_LEXER_BASH == 2);
+			static_assert(IDM_LEXER_CSHELL - IDM_LEXER_BASH == 1);
+			static_assert(IDM_LEXER_M4 - IDM_LEXER_BASH == 2);
 			dialect = np2LexLangIndex - IDM_LEXER_BASH;
 		} break;
 
 		case NP2LEX_CSS: {
-			NP2_static_assert(IDM_LEXER_SCSS - IDM_LEXER_CSS == 1);
-			NP2_static_assert(IDM_LEXER_LESS - IDM_LEXER_CSS == 2);
-			NP2_static_assert(IDM_LEXER_HSS - IDM_LEXER_CSS == 3);
+			static_assert(IDM_LEXER_SCSS - IDM_LEXER_CSS == 1);
+			static_assert(IDM_LEXER_LESS - IDM_LEXER_CSS == 2);
+			static_assert(IDM_LEXER_HSS - IDM_LEXER_CSS == 3);
 			dialect = np2LexLangIndex - IDM_LEXER_CSS;
 		} break;
 
@@ -1429,19 +1429,19 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 			break;
 
 		case NP2LEX_JAVASCRIPT: {
-			NP2_static_assert(IDM_LEXER_JAVASCRIPT_JSX - IDM_LEXER_JAVASCRIPT == 1);
+			static_assert(IDM_LEXER_JAVASCRIPT_JSX - IDM_LEXER_JAVASCRIPT == 1);
 			dialect = np2LexLangIndex - IDM_LEXER_JAVASCRIPT;
 		} break;
 
 		case NP2LEX_MARKDOWN: {
-			NP2_static_assert(IDM_LEXER_MARKDOWN_GITLAB - IDM_LEXER_MARKDOWN_GITHUB == 1);
-			NP2_static_assert(IDM_LEXER_MARKDOWN_PANDOC - IDM_LEXER_MARKDOWN_GITHUB == 2);
+			static_assert(IDM_LEXER_MARKDOWN_GITLAB - IDM_LEXER_MARKDOWN_GITHUB == 1);
+			static_assert(IDM_LEXER_MARKDOWN_PANDOC - IDM_LEXER_MARKDOWN_GITHUB == 2);
 			dialect = np2LexLangIndex - IDM_LEXER_MARKDOWN_GITHUB;
 		} break;
 
 		case NP2LEX_MATLAB: {
-			NP2_static_assert(IDM_LEXER_OCTAVE - IDM_LEXER_MATLAB == 1);
-			NP2_static_assert(IDM_LEXER_SCILAB - IDM_LEXER_MATLAB == 2);
+			static_assert(IDM_LEXER_OCTAVE - IDM_LEXER_MATLAB == 1);
+			static_assert(IDM_LEXER_SCILAB - IDM_LEXER_MATLAB == 2);
 			dialect = np2LexLangIndex - IDM_LEXER_MATLAB;
 		} break;
 
@@ -1450,7 +1450,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 			break;
 
 		case NP2LEX_TYPESCRIPT: {
-			NP2_static_assert(IDM_LEXER_TYPESCRIPT_TSX - IDM_LEXER_TYPESCRIPT == 1);
+			static_assert(IDM_LEXER_TYPESCRIPT_TSX - IDM_LEXER_TYPESCRIPT == 1);
 			dialect = np2LexLangIndex - IDM_LEXER_TYPESCRIPT;
 		} break;
 		}

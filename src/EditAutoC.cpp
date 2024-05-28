@@ -1242,8 +1242,8 @@ static AddWordResult AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyl
 	case NP2LEX_GROOVY:
 	case NP2LEX_JAVA:
 		if (ch == '@') {
-			NP2_static_assert(JavaKeywordIndex_Annotation == GroovyKeywordIndex_Annotation);
-			NP2_static_assert(JavaKeywordIndex_Javadoc == GroovyKeywordIndex_GroovyDoc);
+			static_assert(JavaKeywordIndex_Annotation == GroovyKeywordIndex_Annotation);
+			static_assert(JavaKeywordIndex_Javadoc == GroovyKeywordIndex_GroovyDoc);
 			if (iCurrentStyle == SCE_JAVA_DEFAULT) {
 				WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[JavaKeywordIndex_Annotation]);
 				return AddWordResult_IgnoreLexer;
