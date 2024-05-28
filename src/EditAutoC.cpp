@@ -160,7 +160,7 @@ struct WordNode {
 static inline void WordList_AddBuffer(struct WordList *pWList) {
 	struct WordListBuffer *buffer = (struct WordListBuffer *)NP2HeapAlloc(pWList->capacity);
 	buffer->next = pWList->buffer;
-	pWList->offset = NP2_align_up(sizeof(struct WordListBuffer), NP2_alignof(struct WordNode));
+	pWList->offset = NP2_align_up(sizeof(struct WordListBuffer), alignof(struct WordNode));
 	pWList->buffer = buffer;
 }
 
@@ -247,7 +247,7 @@ void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, UINT len) {
 	pWList->pListHead = root;
 	pWList->nWordCount++;
 	pWList->nTotalLen += len + 1;
-	pWList->offset += NP2_align_up(len + 1 + sizeof(struct WordNode), NP2_alignof(struct WordNode));
+	pWList->offset += NP2_align_up(len + 1 + sizeof(struct WordNode), alignof(struct WordNode));
 }
 
 void WordList_Free(struct WordList *pWList) {
@@ -865,7 +865,7 @@ static void AutoC_AddDocWord(struct WordList *pWList, const uint32_t ignoredStyl
 
 			if (wordEnd - iPosFind >= iRootLen) {
 				char wordBuf[NP2_AUTOC_WORD_BUFFER_SIZE];
-				char *pWord = wordBuf + NP2DefaultPointerAlignment;
+				char *pWord = wordBuf + 16; // avoid overlap in memcpy()
 				bool bChanged = false;
 				const struct Sci_TextRangeFull tr = { { iPosFind, min_pos(iPosFind + NP2_AUTOC_MAX_WORD_LENGTH, wordEnd) }, pWord };
 				int wordLength = (int)SciCall_GetTextRangeFull(&tr);

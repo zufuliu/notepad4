@@ -10,26 +10,6 @@
 	#endif
 #endif
 
-#if defined(__cplusplus)
-#define NP2_alignas(n)		alignas(n)
-#elif defined(__GNUC__) || defined(__clang__)
-#define NP2_alignas(n)		__attribute__((aligned(n)))
-#elif defined(_MSC_VER)
-#define NP2_alignas(n)		__declspec(align(n))
-#else
-#define NP2_alignas(n)		_Alignas(n)
-#endif
-
-#if defined(__cplusplus)
-#define NP2_alignof(t)		alignof(t)
-#elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
-#define NP2_alignof(t)		_Alignof(t)
-#else
-#define NP2_alignof(t)		__alignof(t)
-#endif
-
-#define NP2DefaultPointerAlignment		16	// alignof(max_align_t)
-
 #if defined(__clang__)
 #define NP2_align_up(value, alignment)		__builtin_align_up(value, alignment)
 #define NP2_align_ptr(ptr, alignment)		__builtin_align_up(ptr, alignment)

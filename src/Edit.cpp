@@ -536,7 +536,7 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 	}
 
 	if (ptr < end) {
-		NP2_alignas(32) uint8_t buffer[2*sizeof(__m256i)];
+		alignas(32) uint8_t buffer[2*sizeof(__m256i)];
 		ZeroMemory_32x2(buffer);
 		__movsb(buffer, ptr, end - ptr);
 
@@ -617,7 +617,7 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 	}
 
 	if (ptr < end) {
-		NP2_alignas(16) uint8_t buffer[4*sizeof(__m128i)];
+		alignas(16) uint8_t buffer[4*sizeof(__m128i)];
 		ZeroMemory_16x4(buffer);
 		__movsb(buffer, ptr, end - ptr);
 
@@ -697,7 +697,7 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 	}
 
 	if (ptr < end) {
-		NP2_alignas(16) uint8_t buffer[2*sizeof(__m128i)];
+		alignas(16) uint8_t buffer[2*sizeof(__m128i)];
 		ZeroMemory_16x2(buffer);
 		__movsb(buffer, ptr, end - ptr);
 
@@ -4218,14 +4218,14 @@ void EditSortLines(EditSortFlag iSortFlags) {
 	Sci_Position iTargetStart = SciCall_PositionFromLine(iLineStart);
 	Sci_Position iTargetEnd = SciCall_PositionFromLine(iLineEnd + 1);
 	const size_t cbPmszBuf = iTargetEnd - iTargetStart + 2*iLineCount + 1; // 2 for CR LF
-	size_t cchTextW = cbPmszBuf*sizeof(WCHAR) + iLineCount*NP2_alignof(WCHAR *);
+	size_t cchTextW = cbPmszBuf*sizeof(WCHAR) + iLineCount*alignof(WCHAR *);
 	if (iSortFlags & EditSortFlag_IgnoreCase) {
 		cchTextW += cchTextW;
 	}
 	char * const pmszBuf = (char *)NP2HeapAlloc(cbPmszBuf);
 	SORTLINE * const pLines = (SORTLINE *)NP2HeapAlloc(sizeof(SORTLINE) * iLineCount);
 	WCHAR * const pszTextW = (WCHAR *)NP2HeapAlloc(cchTextW);
-	size_t cchTotal = NP2_alignof(WCHAR *)/sizeof(WCHAR); // first pointer reserved for empty line
+	size_t cchTotal = alignof(WCHAR *)/sizeof(WCHAR); // first pointer reserved for empty line
 
 	for (Sci_Line i = 0, iLine = iLineStart; iLine <= iLineEnd; i++, iLine++) {
 		SciCall_GetLine(iLine, pmszBuf);
@@ -4243,7 +4243,7 @@ void EditSortLines(EditSortFlag iSortFlags) {
 		if (p >= pmszBuf) {
 			LPWSTR pwszLine = pszTextW + cchTotal;
 			const UINT cchLine = MultiByteToWideChar(cpEdit, 0, pmszBuf, -1, pwszLine, (int)cbPmszBuf);
-			cchTotal += NP2_align_up(cchLine, NP2_alignof(WCHAR *)/sizeof(WCHAR));
+			cchTotal += NP2_align_up(cchLine, alignof(WCHAR *)/sizeof(WCHAR));
 			pLines[i].pwszLine = pwszLine;
 			if (iSortFlags & EditSortFlag_IgnoreCase) {
 				// convert to uppercase for case insensitive comparison
@@ -4254,7 +4254,7 @@ void EditSortLines(EditSortFlag iSortFlags) {
 #else
 				const UINT charsConverted = LCMapString(LOCALE_USER_DEFAULT, LCMAP_UPPERCASE, pwszLine, cchLine, pwszSortLine, (int)cbPmszBuf);
 #endif
-				cchTotal += NP2_align_up(charsConverted, NP2_alignof(WCHAR *)/sizeof(WCHAR));
+				cchTotal += NP2_align_up(charsConverted, alignof(WCHAR *)/sizeof(WCHAR));
 				pwszLine = pwszSortLine;
 			}
 
