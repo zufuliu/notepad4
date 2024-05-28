@@ -99,7 +99,7 @@ def GenerateUTF8Table():
 	print(f'UTF8_4ByteMask: 0x{UTF8_4ByteMask:016x}')
 
 def GenerateUnicodeControlCharacters():
-	# for kUnicodeControlCharacterTable in Edit.c
+	# for kUnicodeControlCharacterTable in Edit.cpp
 	ucc_table = [
 		"\u200E", # U+200E	LRM		Left-to-right mark
 		"\u200F", # U+200F	RLM		Right-to-left mark

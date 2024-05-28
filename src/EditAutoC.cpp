@@ -2818,7 +2818,7 @@ void EditToggleCommentBlock(bool alternative) {
 	}
 }
 
-// see Style_SniffShebang() in Styles.c
+// see Style_SniffShebang() in Styles.cpp
 void EditInsertScriptShebangLine(void) {
 	const char *prefix = "#!/usr/bin/env ";
 	const char *name = NULL;

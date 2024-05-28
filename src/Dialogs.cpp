@@ -3,7 +3,7 @@
 *
 * Notepad4
 *
-* Dialogs.c
+* Dialogs.cpp
 *   Notepad4 dialog boxes implementation
 *
 * See Readme.txt for more information about this source code.

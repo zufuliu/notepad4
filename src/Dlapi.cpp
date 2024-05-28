@@ -3,7 +3,7 @@
 *
 * Notepad4
 *
-* Dlapi.c
+* Dlapi.cpp
 *   Directory Listing APIs used in Notepad4
 *
 * See Readme.txt for more information about this source code.

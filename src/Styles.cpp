@@ -354,7 +354,7 @@ int		cyStyleCustomizeDlg;
 #define ALL_FILE_EXTENSIONS_BYTE_SIZE	((MATCH_LEXER_COUNT * MAX_EDITLEXER_EXT_SIZE) * sizeof(WCHAR))
 static LPWSTR g_AllFileExtensions = NULL;
 
-// Notepad4.c
+// Notepad4.cpp
 extern HWND hwndMain;
 extern int	iCurrentEncoding;
 extern int	g_DOSEncoding;

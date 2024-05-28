@@ -57,4 +57,4 @@ extern const char * const EmojiInputSequenceString;
  * @param length Length for the input sequence without the prefix '\'.
  * @return Returns the corresponding Unicode characters or zero when the input sequence is not found.
  */
-uint32_t GetLaTeXInputUnicodeCharacter(const char *sequence, size_t length);
+uint32_t GetLaTeXInputUnicodeCharacter(const char *sequence, size_t length) noexcept;

@@ -352,7 +352,7 @@ enum {
 	AutoCompleteCondition_OnCharDeleted = 2,
 };
 
-// in EditAutoC.c
+// in EditAutoC.cpp
 extern const uint32_t DefaultWordCharSet[8];
 void	EditCompleteUpdateConfig(void);
 bool	IsDocWordChar(uint32_t ch);
@@ -502,7 +502,7 @@ static inline bool IsZeroFlagsCodePage(UINT page) {
 		;
 }
 
-// in EditEncoding.c
+// in EditEncoding.cpp
 extern NP2ENCODING mEncoding[];
 static inline bool Encoding_IsUnicode(int iEncoding) {
 	return iEncoding == CPI_UNICODEBOM
@@ -519,7 +519,7 @@ static inline bool Encoding_IsUTF8(int iEncoding) {
 void	Encoding_ReleaseResources(void);
 bool	EditSetNewEncoding(int iEncoding, int iNewEncoding, BOOL bNoUI, bool bSetSavePoint);
 void	EditOnCodePageChanged(UINT oldCodePage, bool showControlCharacter, LPEDITFINDREPLACE lpefr);
-const char* GetFoldDisplayEllipsis(UINT cpEdit, UINT acp);
+const char* GetFoldDisplayEllipsis(UINT cpEdit, UINT acp) noexcept;
 void	Encoding_InitDefaults(void);
 int 	Encoding_MapIniSetting(bool bLoad, UINT iSetting);
 void	Encoding_GetLabel(int iEncoding);

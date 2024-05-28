@@ -212,7 +212,7 @@ def buildFoldDisplayEllipsis():
 	utf8Text = bytesToHex(utf8Text)
 
 	output = []
-	output.append("const char* GetFoldDisplayEllipsis(UINT cpEdit, UINT acp) {")
+	output.append("const char* GetFoldDisplayEllipsis(UINT cpEdit, UINT acp) noexcept {")
 	output.append("\tswitch (cpEdit) {")
 	output.append("\tcase SC_CP_UTF8:")
 	output.append(f'\t\treturn "{utf8Text}";')
@@ -293,7 +293,7 @@ def buildANSICharClassifyTable(filename):
 	output.append("};")
 	output.append("")
 
-	output.append("static inline const uint8_t* GetANSICharClassifyTable(UINT acp, int *length) {")
+	output.append("static inline const uint8_t* GetANSICharClassifyTable(UINT acp, int *length) noexcept {")
 	lines = f"""const UINT diff = acp - 1250;
 if (diff <= 1258 - 1250) {{
 	return ANSICharClassifyTable + diff*32;

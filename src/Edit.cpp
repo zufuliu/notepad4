@@ -3,7 +3,7 @@
 *
 * Notepad4
 *
-* Edit.c
+* Edit.cpp
 *   Text File Editing Helper Stuff
 *
 * See Readme.txt for more information about this source code.

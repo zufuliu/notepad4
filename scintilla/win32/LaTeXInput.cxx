@@ -23,7 +23,7 @@ constexpr uint32_t array_size([[maybe_unused]] const T (&a)[N]) noexcept {
 #include "LaTeXInputData.h"
 
 #if 0
-uint32_t GetLaTeXInputUnicodeCharacter(const char *sequence, size_t length) {
+uint32_t GetLaTeXInputUnicodeCharacter(const char *sequence, size_t length) noexcept {
 #if NP2_ENABLE_LATEX_LIKE_EMOJI_INPUT
 	static_assert(LaTeXHashMultiplier == EmojiHashMultiplier);
 	const char firstChar = *sequence;
@@ -109,7 +109,7 @@ uint32_t GetLaTeXInputUnicodeCharacter(const char *sequence, size_t length) {
 }
 
 #else
-uint32_t GetLaTeXInputUnicodeCharacter(const char *sequence, size_t length) {
+uint32_t GetLaTeXInputUnicodeCharacter(const char *sequence, size_t length) noexcept {
 	uint8_t firstChar = sequence[0];
 #if NP2_ENABLE_LATEX_LIKE_EMOJI_INPUT
 	uint32_t start;
