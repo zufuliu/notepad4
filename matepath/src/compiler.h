@@ -13,14 +13,6 @@ typedef _Bool	bool;
 #define nullptr	NULL
 #endif
 
-#ifndef NP2_noexcept
-	#if defined(__cplusplus)
-		#define NP2_noexcept noexcept
-	#else
-		#define NP2_noexcept
-	#endif
-#endif
-
 // suppress clang-tidy [bugprone-multi-level-implicit-pointer-conversion] warning
 #if defined(__cplusplus)
 #define NP2_void_pointer(expr)		(reinterpret_cast<void *>(expr))

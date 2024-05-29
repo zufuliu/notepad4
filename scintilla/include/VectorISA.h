@@ -2,14 +2,6 @@
 // See License.txt for details about distribution and modification.
 #pragma once
 
-#ifndef NP2_noexcept
-	#if defined(__cplusplus)
-		#define NP2_noexcept noexcept
-	#else
-		#define NP2_noexcept
-	#endif
-#endif
-
 #if defined(__clang__)
 #define NP2_align_up(value, alignment)		__builtin_align_up(value, alignment)
 #define NP2_align_ptr(ptr, alignment)		__builtin_align_up(ptr, alignment)
@@ -77,14 +69,14 @@
 	#define np2_ctz(x)		_tzcnt_u32(x)
 	#define np2_ctz64(x)	_tzcnt_u64(x)
 #else
-	static inline uint32_t np2_ctz(uint32_t value) NP2_noexcept {
+	inline uint32_t np2_ctz(uint32_t value) noexcept {
 		unsigned long trailing;
 		_BitScanForward(&trailing, value);
 		return trailing;
 	}
 
 #if defined(_WIN64)
-	static inline uint32_t np2_ctz64(uint64_t value) NP2_noexcept {
+	inline uint32_t np2_ctz64(uint64_t value) noexcept {
 		unsigned long trailing;
 		_BitScanForward64(&trailing, value);
 		return trailing;
@@ -103,14 +95,14 @@
 #endif
 
 #else
-	static inline uint32_t np2_bsr(uint32_t value) NP2_noexcept {
+	inline uint32_t np2_bsr(uint32_t value) noexcept {
 		unsigned long trailing;
 		_BitScanReverse(&trailing, value);
 		return trailing;
 	}
 
 #if defined(_WIN64)
-	static inline uint32_t np2_bsr64(uint64_t value) NP2_noexcept {
+	inline uint32_t np2_bsr64(uint64_t value) noexcept {
 		unsigned long trailing;
 		_BitScanReverse64(&trailing, value);
 		return trailing;
@@ -144,7 +136,7 @@
 	// https://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetParallel
 	// Bit Twiddling Hacks copyright 1997-2005 Sean Eron Anderson
 	// see also https://github.com/WojciechMula/sse-popcount
-	static __forceinline uint32_t bth_popcount(uint32_t v) NP2_noexcept {
+	constexpr uint32_t bth_popcount(uint32_t v) noexcept {
 		v = v - ((v >> 1) & 0x55555555U);
 		v = (v & 0x33333333U) + ((v >> 2) & 0x33333333U);
 		return (((v + (v >> 4)) & 0x0F0F0F0FU) * 0x01010101U) >> 24;
@@ -154,7 +146,7 @@
 	#define np2_popcount(x)		bth_popcount(x)
 
 #if defined(_WIN64)
-	static __forceinline uint64_t bth_popcount64(uint64_t v) NP2_noexcept {
+	constexpr uint64_t bth_popcount64(uint64_t v) noexcept {
 		v = v - ((v >> 1) & UINT64_C(0x5555555555555555));
 		v = (v & UINT64_C(0x3333333333333333)) + ((v >> 2) & UINT64_C(0x3333333333333333));
 		return (((v + (v >> 4)) & UINT64_C(0x0F0F0F0F0F0F0F0F)) * UINT64_C(0x0101010101010101)) >> 56;
@@ -223,20 +215,20 @@
 #define rotr8(x)				_rotr((x), 8)
 #define rotl8(x)				_rotl((x), 8)
 #else
-static inline uint32_t rotr8(uint32_t x) NP2_noexcept {
+constexpr uint32_t rotr8(uint32_t x) noexcept {
 	return ((x & 0xff) << 24) | (x >> 8);
 }
-static inline uint32_t rotl8(uint32_t x) NP2_noexcept {
+constexpr uint32_t rotl8(uint32_t x) noexcept {
 	return (x >> 24) | (x << 8);
 }
 #endif
 
-static inline uint32_t loadle_u32(const void *ptr) NP2_noexcept {
+inline uint32_t loadle_u32(const void *ptr) noexcept {
 	return *((const uint32_t *)ptr);
 }
 
 #if NP2_USE_AVX2
-static inline uint32_t loadbe_u32(const void *ptr) NP2_noexcept {
+inline uint32_t loadbe_u32(const void *ptr) noexcept {
 #if defined(__GNUC__)
 	return __builtin_bswap32(loadle_u32(ptr));
 #else
@@ -254,46 +246,46 @@ static inline uint32_t loadbe_u32(const void *ptr) NP2_noexcept {
 //#define bit_zero_high_u32(x, index)	_bextr_u32((x), 0, (index))		// BMI1
 #else
 
-static inline uint32_t loadbe_u32(const void *ptr) NP2_noexcept {
+inline uint32_t loadbe_u32(const void *ptr) noexcept {
 	return bswap32(loadle_u32(ptr));
 }
 
-static inline uint32_t andn_u32(uint32_t a, uint32_t b) NP2_noexcept {
+constexpr uint32_t andn_u32(uint32_t a, uint32_t b) noexcept {
 	return (~a) & b;
 }
 
-static inline uint32_t bit_zero_high_u32(uint32_t x, uint32_t index) NP2_noexcept {
+constexpr uint32_t bit_zero_high_u32(uint32_t x, uint32_t index) noexcept {
 	return x & ((1U << index) - 1);
 }
 #endif
 
 #if NP2_TARGET_ARM
-static inline bool bittest(const uint32_t *addr, uint32_t index) NP2_noexcept {
+inline bool bittest(const uint32_t *addr, uint32_t index) noexcept {
 	return (*addr >> index) & true;
 }
-static inline bool bittestandset(uint32_t *addr, uint32_t index) NP2_noexcept {
+inline bool bittestandset(uint32_t *addr, uint32_t index) noexcept {
 	const bool bit = (*addr >> index) & true;
 	*addr |= 1U << index;
 	return bit;
 }
-static inline bool bittestandreset(uint32_t *addr, uint32_t index) NP2_noexcept {
+inline bool bittestandreset(uint32_t *addr, uint32_t index) noexcept {
 	const bool bit = (*addr >> index) & true;
 	*addr &= ~(1U << index);
 	return bit;
 }
 #else
-static inline bool bittest(const uint32_t *addr, uint32_t index) NP2_noexcept {
+inline bool bittest(const uint32_t *addr, uint32_t index) noexcept {
 	return _bittest((const long *)addr, index);
 }
-static inline bool bittestandset(uint32_t *addr, uint32_t index) NP2_noexcept {
+inline bool bittestandset(uint32_t *addr, uint32_t index) noexcept {
 	return _bittestandset((long *)addr, index);
 }
-static inline bool bittestandreset(uint32_t *addr, uint32_t index) NP2_noexcept {
+inline bool bittestandreset(uint32_t *addr, uint32_t index) noexcept {
 	return _bittestandreset((long *)addr, index);
 }
 #endif
 
-static inline bool BitTestEx(const uint32_t *start, uint32_t value) NP2_noexcept {
+inline bool BitTestEx(const uint32_t *start, uint32_t value) noexcept {
 	return bittest(start + (value >> 5), value & 31);
 }
 

@@ -172,9 +172,9 @@ extern UINT g_uSystemDPI;
 
 #else
 #define NP2_HAS_GETDPIFORWINDOW				0
-extern UINT GetWindowDPI(HWND hwnd) NP2_noexcept;
-extern int SystemMetricsForDpi(int nIndex, UINT dpi) NP2_noexcept;
-extern BOOL AdjustWindowRectForDpi(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT dpi) NP2_noexcept;
+UINT GetWindowDPI(HWND hwnd) noexcept;
+int SystemMetricsForDpi(int nIndex, UINT dpi) noexcept;
+BOOL AdjustWindowRectForDpi(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT dpi) noexcept;
 #endif
 
 #if defined(NP2_ENABLE_HIDPI_IMAGE_RESOURCE) && NP2_ENABLE_HIDPI_IMAGE_RESOURCE

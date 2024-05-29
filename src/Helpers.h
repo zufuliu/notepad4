@@ -888,10 +888,10 @@ typedef struct BitmapCache {
 	HBITMAP items[MRU_MAXITEMS];
 } BitmapCache;
 
-static inline void BitmapCache_Invalidate(BitmapCache *cache) {
+inline void BitmapCache_Invalidate(BitmapCache *cache) noexcept {
 	cache->invalid = true; // mark all cache as invalid
 }
-static inline void BitmapCache_StartUse(BitmapCache *cache) {
+inline void BitmapCache_StartUse(BitmapCache *cache) noexcept {
 	cache->used = 0; // mark all cache as unused
 }
 void BitmapCache_Empty(BitmapCache *cache);

@@ -178,25 +178,27 @@ DWORD		g_uWinVer;
 UINT		g_uCurrentDPI = USER_DEFAULT_SCREEN_DPI;
 UINT		g_uSystemDPI = USER_DEFAULT_SCREEN_DPI;
 #if !NP2_HAS_GETDPIFORWINDOW
+namespace {
 // scintilla\win32\PlatWin.cxx
-typedef UINT (WINAPI *GetDpiForWindowSig)(HWND hwnd);
-static GetDpiForWindowSig fnGetDpiForWindow = NULL;
+using GetDpiForWindowSig = UINT (WINAPI *)(HWND hwnd);
+GetDpiForWindowSig fnGetDpiForWindow = nullptr;
 
 #ifndef DPI_ENUMS_DECLARED
 #define MDT_EFFECTIVE_DPI	0
 #endif
 
-typedef HRESULT (WINAPI *GetDpiForMonitorSig)(HMONITOR hmonitor, /*MONITOR_DPI_TYPE*/int dpiType, UINT *dpiX, UINT *dpiY);
-static HMODULE hShcoreDLL = NULL;
-static GetDpiForMonitorSig fnGetDpiForMonitor = NULL;
+using GetDpiForMonitorSig = HRESULT (WINAPI *)(HMONITOR hmonitor, /*MONITOR_DPI_TYPE*/int dpiType, UINT *dpiX, UINT *dpiY);
+HMODULE hShcoreDLL {};
+GetDpiForMonitorSig fnGetDpiForMonitor = nullptr;
 
-typedef int (WINAPI *GetSystemMetricsForDpiSig)(int nIndex, UINT dpi);
-static GetSystemMetricsForDpiSig fnGetSystemMetricsForDpi = NULL;
+using GetSystemMetricsForDpiSig = int (WINAPI *)(int nIndex, UINT dpi);
+GetSystemMetricsForDpiSig fnGetSystemMetricsForDpi = nullptr;
 
-typedef BOOL (WINAPI *AdjustWindowRectExForDpiSig)(LPRECT lpRect, DWORD dwStyle, BOOL bMenu, DWORD dwExStyle, UINT dpi);
-static AdjustWindowRectExForDpiSig fnAdjustWindowRectExForDpi = NULL;
+using AdjustWindowRectExForDpiSig = BOOL (WINAPI *)(LPRECT lpRect, DWORD dwStyle, BOOL bMenu, DWORD dwExStyle, UINT dpi);
+AdjustWindowRectExForDpiSig fnAdjustWindowRectExForDpi = nullptr;
+}
 
-static void LoadDpiForWindow(void) NP2_noexcept;
+static void LoadDpiForWindow() noexcept;
 #endif // NP2_HAS_GETDPIFORWINDOW
 
 WCHAR g_wchAppUserModelID[64] = L"";
@@ -3892,7 +3894,7 @@ void SnapToDefaultPos(HWND hwnd) {
 
 #if !NP2_HAS_GETDPIFORWINDOW
 // scintilla\win32\PlatWin.cxx
-static void LoadDpiForWindow(void) NP2_noexcept {
+static void LoadDpiForWindow() noexcept {
 	HMODULE user32 = GetModuleHandleW(L"user32.dll");
 	fnGetDpiForWindow = DLLFunction(GetDpiForWindowSig, user32, "GetDpiForWindow");
 	fnGetSystemMetricsForDpi = DLLFunction(GetSystemMetricsForDpiSig, user32, "GetSystemMetricsForDpi");
@@ -3916,7 +3918,7 @@ static void LoadDpiForWindow(void) NP2_noexcept {
 	}
 }
 
-UINT GetWindowDPI(HWND hwnd) NP2_noexcept {
+UINT GetWindowDPI(HWND hwnd) noexcept {
 	if (fnGetDpiForWindow) {
 		return fnGetDpiForWindow(hwnd);
 	}
@@ -3931,7 +3933,7 @@ UINT GetWindowDPI(HWND hwnd) NP2_noexcept {
 	return g_uSystemDPI;
 }
 
-int SystemMetricsForDpi(int nIndex, UINT dpi) NP2_noexcept {
+int SystemMetricsForDpi(int nIndex, UINT dpi) noexcept {
 	if (fnGetSystemMetricsForDpi) {
 		return fnGetSystemMetricsForDpi(nIndex, dpi);
 	}
@@ -3941,7 +3943,7 @@ int SystemMetricsForDpi(int nIndex, UINT dpi) NP2_noexcept {
 	return value;
 }
 
-BOOL AdjustWindowRectForDpi(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT dpi) NP2_noexcept {
+BOOL AdjustWindowRectForDpi(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT dpi) noexcept {
 	if (fnAdjustWindowRectExForDpi) {
 		return fnAdjustWindowRectExForDpi(lpRect, dwStyle, FALSE, dwExStyle, dpi);
 	}

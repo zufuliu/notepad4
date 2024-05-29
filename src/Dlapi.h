@@ -91,7 +91,7 @@ bool DriveBox_PropertyDlg(HWND hwnd);
 bool DriveBox_DeleteItem(HWND hwnd, LPARAM lParam);
 bool DriveBox_GetDispInfo(HWND hwnd, LPARAM lParam);
 
-static inline LPITEMIDLIST IL_Next(LPITEMIDLIST pidl) {
+inline LPITEMIDLIST IL_Next(LPITEMIDLIST pidl) noexcept {
 	return (LPITEMIDLIST)((LPBYTE)(pidl) + pidl->mkid.cb);
 }
 

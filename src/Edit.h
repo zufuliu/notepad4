@@ -119,12 +119,12 @@ void	EditReplaceDocument(HANDLE pdoc);
 char*	EditGetClipboardText(HWND hwnd); // LocalFree()
 bool	EditCopyAppend(HWND hwnd);
 
-static inline int GetScintillaEOLMode(int mode) {
-	const UINT mask = (SC_EOL_CRLF << 2*0) | (SC_EOL_LF << 2*1) | (SC_EOL_CR << 2*2);
+constexpr int GetScintillaEOLMode(int mode) noexcept {
+	constexpr UINT mask = (SC_EOL_CRLF << 2*0) | (SC_EOL_LF << 2*1) | (SC_EOL_CR << 2*2);
 	return (mask >> (mode << 1)) & 3;
 }
-static inline int GetSettingsEOLMode(int mode) {
-	const UINT mask = (0 << 2*SC_EOL_CRLF) | (1 << 2*SC_EOL_LF) | (2 << 2*SC_EOL_CR);
+constexpr int GetSettingsEOLMode(int mode) noexcept {
+	constexpr UINT mask = (0 << 2*SC_EOL_CRLF) | (1 << 2*SC_EOL_LF) | (2 << 2*SC_EOL_CR);
 	return (mask >> (mode << 1)) & 3;
 }
 
@@ -461,7 +461,7 @@ typedef struct NP2ENCODING {
 #define LOCALE_SNAME				0x0000005c	// _WIN32_WINNT >= _WIN32_WINNT_VISTA
 #endif
 
-static inline BOOL GetLegacyACP(UINT *acp) {
+inline BOOL GetLegacyACP(UINT *acp) noexcept {
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 	return GetLocaleInfoEx(LOCALE_NAME_SYSTEM_DEFAULT, LOCALE_IUSEUTF8LEGACYACP | LOCALE_RETURN_NUMBER,
 		(LPWSTR)(acp), sizeof(UINT) / sizeof(WCHAR));
@@ -471,7 +471,7 @@ static inline BOOL GetLegacyACP(UINT *acp) {
 #endif
 }
 
-static inline BOOL GetLegacyOEMCP(UINT *oemcp) {
+inline BOOL GetLegacyOEMCP(UINT *oemcp) noexcept {
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 	return GetLocaleInfoEx(LOCALE_NAME_SYSTEM_DEFAULT, LOCALE_IUSEUTF8LEGACYOEMCP | LOCALE_RETURN_NUMBER,
 		(LPWSTR)(oemcp), sizeof(UINT) / sizeof(WCHAR));
@@ -482,12 +482,12 @@ static inline BOOL GetLegacyOEMCP(UINT *oemcp) {
 }
 
 // 932 Shift-JIS, 936 GBK, 949 UHC, 950 Big5, 1361 Johab
-static inline bool IsDBCSCodePage(UINT page) {
+constexpr bool IsDBCSCodePage(UINT page) noexcept {
 	return page == 932 || page == 936 || page == 949 || page == 950 || page == 1361;
 }
 
 // dwFlags must be 0 for MultiByteToWideChar() and WideCharToMultiByte()
-static inline bool IsZeroFlagsCodePage(UINT page) {
+constexpr bool IsZeroFlagsCodePage(UINT page) noexcept {
 	return page == CP_UTF8
 		|| page == CP_UTF7
 		|| page == 54936	// GB18030
@@ -504,14 +504,14 @@ static inline bool IsZeroFlagsCodePage(UINT page) {
 
 // in EditEncoding.cpp
 extern NP2ENCODING mEncoding[];
-static inline bool Encoding_IsUnicode(int iEncoding) {
+constexpr bool Encoding_IsUnicode(int iEncoding) noexcept {
 	return iEncoding == CPI_UNICODEBOM
 		|| iEncoding == CPI_UNICODEBEBOM
 		|| iEncoding == CPI_UNICODE
 		|| iEncoding == CPI_UNICODEBE;
 }
 
-static inline bool Encoding_IsUTF8(int iEncoding) {
+constexpr bool Encoding_IsUTF8(int iEncoding) noexcept {
 	return iEncoding == CPI_UTF8
 		|| iEncoding == CPI_UTF8SIGN;
 }
@@ -544,12 +544,12 @@ bool	IsUTF7(const char *pTest, DWORD nLength);
 #define BOM_UTF8		0xBFBBEF
 #define BOM_UTF16LE		0xFEFF
 #define BOM_UTF16BE		0xFFFE
-static inline bool IsUTF8Signature(const char *p) {
+inline bool IsUTF8Signature(const char *p) noexcept {
 	//return p[0] == '\xEF' && p[1] == '\xBB' && p[2] == '\xBF';
 	return (*((const UINT *)p) & 0xFFFFFF) == BOM_UTF8;
 }
 
-static inline BOOL Encoding_HasBOM(int iEncoding) {
+constexpr BOOL Encoding_HasBOM(int iEncoding) noexcept {
 	return (iEncoding == CPI_UNICODEBOM
 		|| iEncoding == CPI_UNICODEBEBOM
 		|| iEncoding == CPI_UTF8SIGN) ? iEncoding : FALSE;
@@ -610,7 +610,7 @@ void	FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv);
 void	FileVars_Apply(LPFILEVARS lpfv);
 bool	FileVars_ParseInt(LPCSTR pszData, LPCSTR pszName, int *piValue);
 bool	FileVars_ParseStr(LPCSTR pszData, LPCSTR pszName, char *pszValue, int cchValue);
-static inline int FileVars_GetEncoding(LPCFILEVARS lpfv) {
+inline int FileVars_GetEncoding(LPCFILEVARS lpfv) noexcept {
 	return (lpfv->mask & FV_ENCODING) ? lpfv->iEncoding : CPI_NONE;
 }
 
