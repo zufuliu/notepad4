@@ -2513,7 +2513,7 @@ void LoadSettings(void) {
 	bSaveSettings = IniSectionGetBool(pIniSection, L"SaveSettings", true);
 	// TODO: sort loading order by item frequency to reduce IniSectionUnsafeGetValue() calls
 	int iValue = IniSectionGetInt(pIniSection, L"StartupDirectory", StartupDirectory_MRU);
-	iStartupDir = (StartupDirectory)clamp_i(iValue, StartupDirectory_None, StartupDirectory_Favorite);
+	iStartupDir = clamp(static_cast<StartupDirectory>(iValue), StartupDirectory_None, StartupDirectory_Favorite);
 	IniSectionGetString(pIniSection, L"MRUDirectory", L"", szMRUDirectory, COUNTOF(szMRUDirectory));
 
 	LPCWSTR strValue = IniSectionGetValue(pIniSection, L"OpenWithDir");
@@ -2580,7 +2580,7 @@ void LoadSettings(void) {
 	bWindowLayoutRTL = IniSectionGetBool(pIniSection, L"WindowLayoutRTL", false);
 
 	iValue = IniSectionGetInt(pIniSection, L"EscFunction", EscFunction_None);
-	iEscFunction = (EscFunction)clamp_i(iValue, EscFunction_None, EscFunction_Exit);
+	iEscFunction = clamp(static_cast<EscFunction>(iValue), EscFunction_None, EscFunction_Exit);
 
 	if (IsVistaAndAbove()) {
 		bUseXPFileDialog = IniSectionGetBool(pIniSection, L"UseXPFileDialog", false);
@@ -2594,7 +2594,7 @@ void LoadSettings(void) {
 	}
 
 	iValue = IniSectionGetInt(pIniSection, L"SortOptions", DS_NAME);
-	nSortFlags = clamp_i(iValue, DS_NAME, DS_LASTMOD);
+	nSortFlags = clamp(iValue, DS_NAME, DS_LASTMOD);
 
 	fSortRev = IniSectionGetBool(pIniSection, L"SortReverse", false);
 
@@ -3081,7 +3081,7 @@ void LoadFlags(void) {
 	flagNoFadeHidden = IniSectionGetBool(pIniSection, L"NoFadeHidden", false);
 
 	const int iValue = IniSectionGetInt(pIniSection, L"OpacityLevel", 75);
-	iOpacityLevel = validate_i(iValue, 0, 100, 75);
+	iOpacityLevel = validate(iValue, 0, 100, 75);
 
 	if (StrIsEmpty(g_wchAppUserModelID)) {
 		LPCWSTR strValue = IniSectionGetValue(pIniSection, L"ShellAppUserModelID");
@@ -3637,7 +3637,7 @@ void LoadLaunchSetings(void) {
 		IniSectionGetString(pIniSection, L"TargetApplicationPath", szTargetApplication, szTargetApplication, COUNTOF(szTargetApplication));
 		IniSectionGetString(pIniSection, L"TargetApplicationParams", szTargetApplicationParams, szTargetApplicationParams, COUNTOF(szTargetApplicationParams));
 		iValue = IniSectionGetInt(pIniSection, L"TargetApplicationMode", (int)iTargetApplicationMode);
-		iTargetApplicationMode = (TargetApplicationMode)clamp_i(iValue, TargetApplicationMode_None, TargetApplicationMode_UseDDE);
+		iTargetApplicationMode = clamp(static_cast<TargetApplicationMode>(iValue), TargetApplicationMode_None, TargetApplicationMode_UseDDE);
 		IniSectionGetString(pIniSection, L"TargetApplicationWndClass", szTargetApplicationWndClass, szTargetApplicationWndClass, COUNTOF(szTargetApplicationWndClass));
 		IniSectionGetString(pIniSection, L"DDEMessage", szDDEMsg, szDDEMsg, COUNTOF(szDDEMsg));
 		IniSectionGetString(pIniSection, L"DDEApplication", szDDEApp, szDDEApp, COUNTOF(szDDEApp));

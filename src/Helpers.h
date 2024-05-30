@@ -70,11 +70,13 @@ NP2_inline double max_d(double x, double y) {
 	return (x > y) ? x : y;
 }
 
-NP2_inline int clamp_i(int x, int lower, int upper) {
+template <class T>
+constexpr T clamp(T x, T lower, T upper) noexcept {
 	return (x < lower) ? lower : (x > upper) ? upper : x;
 }
 
-NP2_inline int validate_i(int x, int lower, int upper, int defaultValue) {
+template <typename T>
+constexpr T validate(T x, T lower, T upper, T defaultValue) noexcept {
 	return (x < lower || x > upper) ? defaultValue : x;
 }
 

@@ -619,9 +619,9 @@ void Style_LoadTabSettings(LPCEDITLEXER pLex) {
 	LPCWSTR lpSection = pLex->pszName;
 	const UINT lexerAttr = pLex->lexerAttr;
 	int iValue = IniGetInt(lpSection, L"TabWidth", pLex->defaultTabWidth);
-	tabSettings.schemeTabWidth = clamp_i(iValue, TAB_WIDTH_MIN, TAB_WIDTH_MAX);
+	tabSettings.schemeTabWidth = clamp(iValue, TAB_WIDTH_MIN, TAB_WIDTH_MAX);
 	iValue = IniGetInt(lpSection, L"IndentWidth", pLex->defaultIndentWidth);
-	tabSettings.schemeIndentWidth = clamp_i(iValue, INDENT_WIDTH_MIN, INDENT_WIDTH_MAX);
+	tabSettings.schemeIndentWidth = clamp(iValue, INDENT_WIDTH_MIN, INDENT_WIDTH_MAX);
 	tabSettings.schemeTabsAsSpaces = IniGetInt(lpSection, L"TabsAsSpaces", LexerAttr_GetTabAsSpaces(lexerAttr));
 	tabSettings.schemeUseGlobalTabSettings = IniGetInt(lpSection, L"UseGlobalTabSettings", LexerAttr_GetGlobalTabSettings(lexerAttr));
 }
@@ -776,7 +776,7 @@ void Style_Load(void) {
 	iDefaultLexerIndex = Style_GetMatchLexerIndex(iValue + NP2LEX_TEXTFILE);
 
 	iValue = IniSectionGetInt(pIniSection, L"StyleTheme", StyleTheme_Default);
-	np2StyleTheme = clamp_i(iValue, StyleTheme_Default, StyleTheme_Max);
+	np2StyleTheme = clamp<int>(iValue, StyleTheme_Default, StyleTheme_Max);
 
 	// auto select
 	bAutoSelect = IniSectionGetBool(pIniSection, L"AutoSelect", true);
@@ -3342,7 +3342,7 @@ bool Style_StrGetAlphaEx(bool outline, LPCWSTR lpszStyle, int *alpha) {
 		p += outline ? CSTRLEN(L"outline:") : CSTRLEN(L"alpha:");
 		int iValue;
 		if (CRTStrToInt(p, &iValue)) {
-			*alpha = clamp_i(iValue, SC_ALPHA_TRANSPARENT, SC_ALPHA_OPAQUE);
+			*alpha = clamp(iValue, SC_ALPHA_TRANSPARENT, SC_ALPHA_OPAQUE);
 			return true;
 		}
 	}

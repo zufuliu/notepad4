@@ -7385,13 +7385,13 @@ void FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 			}
 
 			if (FileVars_ParseInt(tch, "tab-width", &i)) {
-				lpfv->iTabWidth = clamp_i(i, TAB_WIDTH_MIN, TAB_WIDTH_MAX);
+				lpfv->iTabWidth = clamp(i, TAB_WIDTH_MIN, TAB_WIDTH_MAX);
 				mask |= FV_TABWIDTH;
 			}
 
 			if (FileVars_ParseInt(tch, "*basic-indent", &i) ||
 				FileVars_ParseInt(tch, "*basic-offset", &i)) {
-				lpfv->iIndentWidth = clamp_i(i, INDENT_WIDTH_MIN, INDENT_WIDTH_MAX);
+				lpfv->iIndentWidth = clamp(i, INDENT_WIDTH_MIN, INDENT_WIDTH_MAX);
 				mask |= FV_INDENTWIDTH;
 			}
 
@@ -7411,7 +7411,7 @@ void FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 			}
 
 			if (FileVars_ParseInt(tch, "fill-column", &i)) {
-				lpfv->iLongLinesLimit = clamp_i(i, 0, NP2_LONG_LINE_LIMIT);
+				lpfv->iLongLinesLimit = clamp(i, 0, NP2_LONG_LINE_LIMIT);
 				mask |= FV_LONGLINESLIMIT;
 			}
 

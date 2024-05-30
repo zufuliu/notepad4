@@ -867,7 +867,7 @@ void CenterDlgInParentEx(HWND hDlg, HWND hParent) {
 		y = rcParent.top + 60;
 	}
 
-	SetWindowPos(hDlg, NULL, clamp_i(x, xMin, xMax), clamp_i(y, yMin, yMax), 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+	SetWindowPos(hDlg, NULL, clamp(x, xMin, xMax), clamp(y, yMin, yMax), 0, 0, SWP_NOZORDER | SWP_NOSIZE);
 }
 
 void SetToRightBottomEx(HWND hDlg, HWND hParent) {
@@ -953,7 +953,7 @@ void SetDlgPos(HWND hDlg, int xDlg, int yDlg) {
 	const int x = rcParent.left + xDlg;
 	const int y = rcParent.top + yDlg;
 
-	SetWindowPos(hDlg, NULL, clamp_i(x, xMin, xMax), clamp_i(y, yMin, yMax), 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+	SetWindowPos(hDlg, NULL, clamp(x, xMin, xMax), clamp(y, yMin, yMax), 0, 0, SWP_NOZORDER | SWP_NOSIZE);
 }
 
 //=============================================================================
@@ -1148,7 +1148,7 @@ int ResizeDlg_CalcDeltaY2(HWND hwnd, int dy, int cy, int nCtlId1, int nCtlId2) {
 	const int cyMin = hMin1 - h1;
 	const int cyMax = dy + h2 - hMin2;
 	cy = dy - MulDiv(dy, 100 - cy, 100);
-	cy = clamp_i(cy, cyMin, cyMax);
+	cy = clamp(cy, cyMin, cyMax);
 	return cy;
 }
 
@@ -1401,7 +1401,7 @@ int Toolbar_SetButtons(HWND hwnd, LPCWSTR lpszButtons, LPCTBBUTTON ptbb, int ctb
 		LPWSTR end;
 		int iCmd = (int)wcstol(p, &end, 10);
 		if (p != end) {
-			iCmd = clamp_i(iCmd, 0, ctbb);
+			iCmd = clamp(iCmd, 0, ctbb);
 			SendMessage(hwnd, TB_ADDBUTTONS, 1, (LPARAM)&ptbb[iCmd]);
 			p = end;
 			++count;
