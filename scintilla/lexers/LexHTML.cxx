@@ -574,7 +574,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 
 		/////////////////////////////////////
 		// handle the start of PHP pre-processor = Non-HTML
-		else if ((state != SCE_H_ASPAT) &&
+		else if ((state != SCE_H_ASPAT && state != SCE_H_CDATA) &&
 		         (ch == '<') &&
 		         (chNext == '?') &&
 				 !IsScriptCommentState(state)) {
