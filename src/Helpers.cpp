@@ -31,7 +31,7 @@ struct IUnknown;
 #include <commdlg.h>
 #include <uxtheme.h>
 #include <vssym32.h>
-#include <stdio.h>
+#include <cstdio>
 #include "config.h"
 #include "Helpers.h"
 #include "VectorISA.h"

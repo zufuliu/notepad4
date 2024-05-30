@@ -29,10 +29,10 @@ struct IUnknown;
 #include <uxtheme.h>
 #include <vssym32.h>
 #endif
-#include <time.h>
-#include <stdio.h>
-#include <limits.h>
-#include <inttypes.h>
+#include <ctime>
+#include <cstdio>
+#include <climits>
+#include <cinttypes>
 #include "SciCall.h"
 #include "VectorISA.h"
 #include "Helpers.h"

@@ -6,9 +6,9 @@ struct IUnknown;
 #include <shellapi.h>
 #include <commctrl.h>
 #include <commdlg.h>
-#include <limits.h>
-#include <inttypes.h>
-#include <stdio.h>
+#include <climits>
+#include <cinttypes>
+#include <cstdio>
 #include "SciCall.h"
 #include "VectorISA.h"
 #include "Helpers.h"

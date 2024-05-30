@@ -6,7 +6,7 @@ struct IUnknown;
 #include <shellapi.h>
 #include <commctrl.h>
 #include <commdlg.h>
-#include <stdio.h>
+#include <cstdio>
 #include "SciCall.h"
 #include "VectorISA.h"
 #include "Helpers.h"

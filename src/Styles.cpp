@@ -27,8 +27,8 @@ struct IUnknown;
 #include <commctrl.h>
 #include <commdlg.h>
 #include <uxtheme.h>
-#include <stdio.h>
-#include <math.h>
+#include <cstdio>
+#include <cmath>
 #include "SciCall.h"
 #include "config.h"
 #include "Helpers.h"

@@ -1,6 +1,6 @@
 #pragma once
 #ifndef RC_INVOKED
-#include <stdlib.h>
+#include <cstdlib>
 #include "compiler.h"
 #include "Scintilla.h"
 #include "SciLexer.h"

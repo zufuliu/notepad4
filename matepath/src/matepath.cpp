@@ -27,7 +27,7 @@ struct IUnknown;
 #include <shellapi.h>
 #include <commdlg.h>
 #include <uxtheme.h>
-#include <stdio.h>
+#include <cstdio>
 #include "config.h"
 #include "Helpers.h"
 #include "Dlapi.h"
