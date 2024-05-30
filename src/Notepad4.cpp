@@ -3912,7 +3912,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			break;
 		}
 
-		if (StrIsEmptyA(efrData.szFind)) {
+		if (StrIsEmpty(efrData.szFind)) {
 			if (LOWORD(wParam) != IDM_EDIT_REPLACENEXT) {
 				SendWMCommand(hwnd, IDM_EDIT_FIND);
 			} else {
@@ -7547,7 +7547,7 @@ bool FileSave(FileSaveFlag saveFlag) {
 			char tchText[2048] = "";
 			SciCall_GetText(COUNTOF(tchText) - 1, tchText);
 			StrTrimA(tchText, " \t\n\r"); // failure means not empty.
-			if (StrIsEmptyA(tchText)) {
+			if (StrIsEmpty(tchText)) {
 				bIsEmptyNewFile = true;
 			}
 		}

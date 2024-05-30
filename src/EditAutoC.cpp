@@ -422,7 +422,7 @@ void WordList_AddListEx(struct WordList *pWList, LPCSTR pList) {
 }
 
 static inline void WordList_AddList(struct WordList *pWList, LPCSTR pList) {
-	if (StrNotEmptyA(pList)) {
+	if (StrNotEmpty(pList)) {
 		WordList_AddListEx(pWList, pList);
 	}
 }
@@ -958,7 +958,7 @@ static void AutoC_AddKeyword(struct WordList *pWList, int iCurrentStyle) {
 		uint64_t attr = pLexCurrent->keywordAttr;
 		for (UINT i = 0; i < KEYWORDSET_MAX + 1; attr >>= 4, i++) {
 			const char *pKeywords = pLexCurrent->pKeyWords->pszKeyWords[i];
-			if (!(attr & KeywordAttr_NoAutoComp) && StrNotEmptyA(pKeywords)) {
+			if (!(attr & KeywordAttr_NoAutoComp) && StrNotEmpty(pKeywords)) {
 				WordList_AddListEx(pWList, pKeywords);
 			}
 		}
@@ -1002,7 +1002,7 @@ static void AutoC_AddKeyword(struct WordList *pWList, int iCurrentStyle) {
 		uint64_t attr = pLex->keywordAttr;
 		for (UINT i = 0; i < KEYWORDSET_MAX + 1; attr >>= 4, i++) {
 			const char *pKeywords = pLex->pKeyWords->pszKeyWords[i];
-			if (!(attr & KeywordAttr_NoAutoComp) && StrNotEmptyA(pKeywords)) {
+			if (!(attr & KeywordAttr_NoAutoComp) && StrNotEmpty(pKeywords)) {
 				WordList_AddListEx(pWList, pKeywords);
 			}
 		}

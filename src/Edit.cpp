@@ -3318,13 +3318,13 @@ void EditEncloseSelection(LPCWSTR pwszOpen, LPCWSTR pwszClose) {
 	SciCall_BeginUndoAction();
 	len = 0;
 
-	if (StrNotEmptyA(mszOpen)) {
+	if (StrNotEmpty(mszOpen)) {
 		len = (int)strlen(mszOpen);
 		SciCall_SetTargetRange(iSelStart, iSelStart);
 		SciCall_ReplaceTarget(len, mszOpen);
 	}
 
-	if (StrNotEmptyA(mszClose)) {
+	if (StrNotEmpty(mszClose)) {
 		SciCall_SetTargetRange(iSelEnd + len, iSelEnd + len);
 		SciCall_ReplaceTarget(-1, mszClose);
 	}
@@ -4718,7 +4718,7 @@ static bool CopySelectionAsFindText(HWND hwnd, LPEDITFINDREPLACE lpefr, bool bFi
 	}
 
 	// only for manually selected text
-	const bool hasFindText = StrNotEmptyA(lpszSelection);
+	const bool hasFindText = StrNotEmpty(lpszSelection);
 
 	// First time you bring up find/replace dialog,
 	// copy content from clipboard to find box when nothing is selected in the editor.
@@ -4735,7 +4735,7 @@ static bool CopySelectionAsFindText(HWND hwnd, LPEDITFINDREPLACE lpefr, bool bFi
 		}
 	}
 
-	if (StrNotEmptyA(lpszSelection)) {
+	if (StrNotEmpty(lpszSelection)) {
 		char *lpszEscSel = (char *)NP2HeapAlloc((2 * NP2_FIND_REPLACE_LIMIT));
 		if (AddBackslashA(lpszEscSel, lpszSelection)) {
 			lpefr->bTransformBS = !(lpefr->fuFlags & SCFIND_REGEXP);
@@ -5039,13 +5039,13 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			}
 
 			// Save MRUs
-			if (StrNotEmptyA(lpefr->szFind)) {
+			if (StrNotEmpty(lpefr->szFind)) {
 				if (GetDlgItemTextA2W(CP_UTF8, hwnd, IDC_FINDTEXT, lpefr->szFindUTF8, COUNTOF(lpefr->szFindUTF8))) {
 					ComboBox_GetText(hwndFind, tch, COUNTOF(tch));
 					MRU_AddMultiline(&mruFind, tch);
 				}
 			}
-			if (StrNotEmptyA(lpefr->szReplace)) {
+			if (StrNotEmpty(lpefr->szReplace)) {
 				if (GetDlgItemTextA2W(CP_UTF8, hwnd, IDC_REPLACETEXT, lpefr->szReplaceUTF8, COUNTOF(lpefr->szReplaceUTF8))) {
 					ComboBox_GetText(hwndRepl, tch, COUNTOF(tch));
 					MRU_AddMultiline(&mruReplace, tch);
@@ -5286,7 +5286,7 @@ static void EscapeWildcards(char *szFind2) {
 }
 
 int EditPrepareFind(char *szFind2, LPCEDITFINDREPLACE lpefr) {
-	if (StrIsEmptyA(lpefr->szFind)) {
+	if (StrIsEmpty(lpefr->szFind)) {
 		return NP2_InvalidSearchFlags;
 	}
 
@@ -5296,7 +5296,7 @@ int EditPrepareFind(char *szFind2, LPCEDITFINDREPLACE lpefr) {
 		const UINT cpEdit = SciCall_GetCodePage();
 		TransformBackslashes(szFind2, (searchFlags & SCFIND_REGEXP), cpEdit);
 	}
-	if (StrIsEmptyA(szFind2)) {
+	if (StrIsEmpty(szFind2)) {
 		InfoBoxWarn(MB_OK, L"MsgNotFound", IDS_NOTFOUND);
 		return NP2_InvalidSearchFlags;
 	}
@@ -6742,7 +6742,7 @@ void EditInsertUnicodeControlCharacter(int menu) {
 void EditShowUnicodeControlCharacter(bool bShow) {
 	for (UINT i = 0; i < COUNTOF(kUnicodeControlCharacterTable); i++) {
 		const UnicodeControlCharacter ucc = kUnicodeControlCharacterTable[i];
-		if (StrIsEmptyA(ucc.representation)) {
+		if (StrIsEmpty(ucc.representation)) {
 			// built-in
 			continue;
 		}

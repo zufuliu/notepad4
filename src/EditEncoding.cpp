@@ -478,7 +478,7 @@ bool EditSetNewEncoding(int iEncoding, int iNewEncoding, BOOL bNoUI, bool bSetSa
 void EditOnCodePageChanged(UINT oldCodePage, bool showControlCharacter, LPEDITFINDREPLACE lpefr) {
 	const UINT cpEdit = SciCall_GetCodePage();
 	const UINT acp = GetACP();
-	const bool lastFind = StrNotEmptyA(lpefr->szFind); // need to convert last find & replace string.
+	const bool lastFind = StrNotEmpty(lpefr->szFind); // need to convert last find & replace string.
 
 	if (oldCodePage == SC_CP_UTF8) {
 		if (lastFind) {
@@ -2534,7 +2534,7 @@ bool IsStringCaseSensitiveW(LPCWSTR pszTextW) {
 }
 
 bool IsStringCaseSensitiveA(LPCSTR pszText) {
-	if (StrIsEmptyA(pszText)) {
+	if (StrIsEmpty(pszText)) {
 		return false;
 	}
 

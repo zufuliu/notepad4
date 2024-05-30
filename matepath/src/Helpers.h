@@ -40,27 +40,27 @@ constexpr T validate(T x, T lower, T upper, T defaultValue) noexcept {
 	return (x < lower || x > upper) ? defaultValue : x;
 }
 
-NP2_inline bool StrIsEmpty(LPCWSTR s) {
-	return s == NULL || *s == L'\0';
+constexpr bool StrIsEmpty(LPCWSTR s) noexcept {
+	return s == nullptr || *s == L'\0';
 }
 
-NP2_inline bool StrNotEmpty(LPCWSTR s) {
-	return s != NULL && *s != L'\0';
+constexpr bool StrNotEmpty(LPCWSTR s) noexcept {
+	return s != nullptr && *s != L'\0';
 }
 
-NP2_inline int ToUpperA(int ch) {
+constexpr int ToUpperA(int ch) noexcept {
 	return (ch >= 'a' && ch <= 'z') ? (ch - 'a' + 'A') : ch;
 }
 
-NP2_inline int ToLowerA(int ch) {
+constexpr int ToLowerA(int ch) noexcept {
 	return (ch >= 'A' && ch <= 'Z') ? (ch - 'A' + 'a') : ch;
 }
 
-NP2_inline bool StrEqual(LPCWSTR s1, LPCWSTR s2) {
+inline bool StrEqual(LPCWSTR s1, LPCWSTR s2) noexcept {
 	return wcscmp(s1, s2) == 0;
 }
 
-NP2_inline bool StrCaseEqual(LPCWSTR s1, LPCWSTR s2) {
+inline bool StrCaseEqual(LPCWSTR s1, LPCWSTR s2) noexcept {
 	return _wcsicmp(s1, s2) == 0;
 }
 

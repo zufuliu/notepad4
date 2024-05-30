@@ -80,95 +80,95 @@ constexpr T validate(T x, T lower, T upper, T defaultValue) noexcept {
 	return (x < lower || x > upper) ? defaultValue : x;
 }
 
-NP2_inline bool StrIsEmptyA(LPCSTR s) {
-	return s == NULL || *s == '\0';
+constexpr bool StrIsEmpty(LPCSTR s) noexcept {
+	return s == nullptr || *s == '\0';
 }
 
-NP2_inline bool StrIsEmpty(LPCWSTR s) {
-	return s == NULL || *s == L'\0';
+constexpr bool StrIsEmpty(LPCWSTR s) noexcept {
+	return s == nullptr || *s == L'\0';
 }
 
-NP2_inline bool StrNotEmptyA(LPCSTR s) {
-	return s != NULL && *s != '\0';
+constexpr bool StrNotEmpty(LPCSTR s) noexcept {
+	return s != nullptr && *s != '\0';
 }
 
-NP2_inline bool StrNotEmpty(LPCWSTR s) {
-	return s != NULL && *s != L'\0';
+constexpr bool StrNotEmpty(LPCWSTR s) noexcept {
+	return s != nullptr && *s != L'\0';
 }
 
 // see scintilla/lexlib/CharacterSet.h
 #define UnsafeLower(ch)		((ch) | 0x20)
 #define UnsafeUpper(ch)		((ch) & ~0x20)
 
-NP2_inline bool IsEOLChar(int ch) {
+constexpr bool IsEOLChar(int ch) noexcept {
 	return ch == '\r' || ch == '\n';
 }
 
-NP2_inline bool IsASpace(int ch) {
+constexpr bool IsASpace(int ch) noexcept {
 	return ch == ' ' || (ch >= 0x09 && ch <= 0x0d);
 }
 
-NP2_inline bool IsASpaceOrTab(int ch) {
+constexpr bool IsASpaceOrTab(int ch) noexcept {
 	return ch == ' ' || ch == '\t';
 }
 
-NP2_inline bool IsADigit(int ch) {
+constexpr bool IsADigit(int ch) noexcept {
 	return ch >= '0' && ch <= '9';
 }
 
-NP2_inline bool IsOctalDigit(int ch) {
+constexpr bool IsOctalDigit(int ch) noexcept {
 	return ch >= '0' && ch <= '7';
 }
 
-NP2_inline bool IsLowerCase(int ch) {
+constexpr bool IsLowerCase(int ch) noexcept {
 	return ch >= 'a' && ch <= 'z';
 }
 
-NP2_inline bool IsUpperCase(int ch) {
+constexpr bool IsUpperCase(int ch) noexcept {
 	return ch >= 'A' && ch <= 'Z';
 }
 
-NP2_inline bool IsAlpha(int ch) {
+constexpr bool IsAlpha(int ch) noexcept {
 	return (ch >= 'a' && ch <= 'z')
 		|| (ch >= 'A' && ch <= 'Z');
 }
 
-NP2_inline bool IsAlphaNumeric(int ch) {
+constexpr bool IsAlphaNumeric(int ch) noexcept {
 	return (ch >= '0' && ch <= '9')
 		|| (ch >= 'a' && ch <= 'z')
 		|| (ch >= 'A' && ch <= 'Z');
 }
 
-NP2_inline bool IsPunctuation(int ch) {
+constexpr bool IsPunctuation(int ch) noexcept {
 	return (ch > 32 && ch < '0')
 		|| (ch > '9' && ch < 'A')
 		|| (ch > 'Z' && ch < 'a')
 		|| (ch > 'z' && ch < 127);
 }
 
-NP2_inline bool IsHtmlTagChar(int ch) {
+constexpr bool IsHtmlTagChar(int ch) noexcept {
 	return IsAlphaNumeric(ch) || ch == ':' || ch == '_' || ch == '-' || ch == '.';
 }
 
-NP2_inline bool IsSchemeNameChar(int ch) {
+constexpr bool IsSchemeNameChar(int ch) noexcept {
 	return IsAlphaNumeric(ch) || ch == '+' || ch == '-' || ch == '.';
 }
 
-NP2_inline int ToUpperA(int ch) {
+constexpr int ToUpperA(int ch) noexcept {
 	return (ch >= 'a' && ch <= 'z') ? (ch - 'a' + 'A') : ch;
 }
 
-NP2_inline int ToLowerA(int ch) {
+constexpr int ToLowerA(int ch) noexcept {
 	return (ch >= 'A' && ch <= 'Z') ? (ch - 'A' + 'a') : ch;
 }
 
-NP2_inline bool IsHexDigit(int ch) {
+constexpr bool IsHexDigit(int ch) noexcept {
 	return (ch >= '0' && ch <= '9')
 		|| (ch >= 'A' && ch <= 'F')
 		|| (ch >= 'a' && ch <= 'f');
 }
 
-NP2_inline int GetHexDigit(int ch) {
+constexpr int GetHexDigit(int ch) noexcept {
 	unsigned int diff = ch - '0';
 	if (diff < 10) {
 		return diff;
@@ -180,11 +180,11 @@ NP2_inline int GetHexDigit(int ch) {
 	return -1;
 }
 
-NP2_inline bool StrEqual(LPCWSTR s1, LPCWSTR s2) {
+inline bool StrEqual(LPCWSTR s1, LPCWSTR s2) noexcept {
 	return wcscmp(s1, s2) == 0;
 }
 
-NP2_inline bool StrCaseEqual(LPCWSTR s1, LPCWSTR s2) {
+inline bool StrCaseEqual(LPCWSTR s1, LPCWSTR s2) noexcept {
 	return _wcsicmp(s1, s2) == 0;
 }
 
