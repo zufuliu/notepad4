@@ -6018,7 +6018,7 @@ static INT_PTR CALLBACK EditLineNumDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 		WCHAR tchLines[64];
 		WCHAR tchFmt[64];
 
-		PosToStrW(iCurLine, tchLn);
+		PosToStr(iCurLine, tchLn);
 		SetDlgItemText(hwnd, IDC_LINENUM, tchLn);
 
 		FormatNumber(tchLn, iMaxLine);

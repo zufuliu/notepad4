@@ -13,14 +13,6 @@ typedef _Bool	bool;
 #define nullptr	NULL
 #endif
 
-#ifndef NP2_noexcept
-	#if defined(__cplusplus)
-		#define NP2_noexcept noexcept
-	#else
-		#define NP2_noexcept
-	#endif
-#endif
-
 #if defined(__GNUC__) || defined(__clang__)
 #define NP2_unreachable()	__builtin_unreachable()
 #else

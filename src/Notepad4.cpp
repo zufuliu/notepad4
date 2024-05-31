@@ -7171,7 +7171,7 @@ void UpdateLineNumberWidth(void) {
 		char tchLines[32];
 
 		const Sci_Line iLines = SciCall_GetLineCount();
-		PosToStrA(iLines, tchLines + 2);
+		PosToStr(iLines, tchLines + 2);
 		tchLines[0] = '_';
 		tchLines[1] = '_';
 
@@ -8247,8 +8247,8 @@ void GetRelaunchParameters(LPWSTR szParameters, LPCWSTR lpszFile, bool newWind, 
 #if defined(_WIN64)
 			WCHAR tchLn[32];
 			WCHAR tchCol[32];
-			PosToStrW(line, tchLn);
-			PosToStrW(col, tchCol);
+			PosToStr(line, tchLn);
+			PosToStr(col, tchCol);
 			wsprintf(tch, L" -g %s,%s", tchLn, tchCol);
 #else
 			wsprintf(tch, L" -g %d,%d", (int)line, (int)col);
