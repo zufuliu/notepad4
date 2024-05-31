@@ -22,11 +22,13 @@
 #include <cstdint>
 #include "compiler.h"
 
-NP2_inline int min_i(int x, int y) {
+template <typename T>
+constexpr T min(T x, T y) noexcept {
 	return (x < y) ? x : y;
 }
 
-NP2_inline int max_i(int x, int y) {
+template <typename T>
+constexpr T max(T x, T y) noexcept {
 	return (x > y) ? x : y;
 }
 
@@ -183,7 +185,7 @@ BOOL AdjustWindowRectForDpi(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT 
 NP2_inline int GetBitmapResourceIdForCurrentDPI(int resourceId)	{
 	if (g_uCurrentDPI > USER_DEFAULT_SCREEN_DPI + USER_DEFAULT_SCREEN_DPI/4) {
 		int scale = (g_uCurrentDPI + USER_DEFAULT_SCREEN_DPI/4 - 1) / (USER_DEFAULT_SCREEN_DPI/2);
-		scale = min_i(scale, 6);
+		scale = min(scale, 6);
 		resourceId += scale - 2;
 	}
 	return resourceId;

@@ -789,7 +789,7 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 	}
 #endif
 
-	const size_t linesMax = max_z(max_z(lineCountCRLF, lineCountCR), lineCountLF);
+	const size_t linesMax = max(max(lineCountCRLF, lineCountCR), lineCountLF);
 	// values must kept in same order as SC_EOL_CRLF, SC_EOL_CR, SC_EOL_LF
 	const size_t linesCount[3] = { lineCountCRLF, lineCountCR, lineCountLF };
 	int iEOLMode = status->iEOLMode;
@@ -831,7 +831,7 @@ void EditDetectIndentation(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 #endif
 
 	// code based on SciTEBase::DiscoverIndentSetting().
-	cbData = min_u(cbData, 1*1024*1024);
+	cbData = min<DWORD>(cbData, 1*1024*1024);
 	const uint8_t *ptr = (const uint8_t *)lpData;
 	const uint8_t * const end = ptr + cbData;
 	#define MAX_DETECTED_TAB_WIDTH	8
@@ -873,7 +873,7 @@ labelStart:
 				prevIndentCount = indentCount;
 				// TODO: fix other (e.g. function argument) alignment spaces.
 				if (delta <= MAX_DETECTED_TAB_WIDTH) {
-					prevTabWidth = min_i(delta, indentCount);
+					prevTabWidth = min(delta, indentCount);
 				} else {
 					prevTabWidth = 0;
 				}
@@ -2711,10 +2711,10 @@ void EditMoveUp(void) {
 		return;
 	}
 
-	const Sci_Line iLineSrc = min_pos(iCurLine, iAnchorLine) - 1;
+	const Sci_Line iLineSrc = min(iCurLine, iAnchorLine) - 1;
 	if (iLineSrc >= 0) {
-		Sci_Line iLineDest = max_pos(iCurLine, iAnchorLine);
-		if (max_pos(iCurPos, iAnchorPos) <= SciCall_PositionFromLine(iLineDest)) {
+		Sci_Line iLineDest = max(iCurLine, iAnchorLine);
+		if (max(iCurPos, iAnchorPos) <= SciCall_PositionFromLine(iLineDest)) {
 			iLineDest--;
 		}
 
@@ -2763,8 +2763,8 @@ void EditMoveDown(void) {
 		return;
 	}
 
-	Sci_Line iLineSrc = max_pos(iCurLine, iAnchorLine) + 1;
-	if (max_pos(iCurPos, iAnchorPos) <= SciCall_PositionFromLine(iLineSrc - 1)) {
+	Sci_Line iLineSrc = max(iCurLine, iAnchorLine) + 1;
+	if (max(iCurPos, iAnchorPos) <= SciCall_PositionFromLine(iLineSrc - 1)) {
 		iLineSrc--;
 	}
 
@@ -3101,8 +3101,8 @@ void EditAlignText(EditAlignMode nMode) {
 			++iLineEndPos;
 			const Sci_Position iEndCol = SciCall_GetColumn(iLineEndPos);
 			const Sci_Position iIndentCol = SciCall_GetLineIndentation(iLine);
-			iMinIndent = min_pos(iMinIndent, iIndentCol);
-			iMaxLength = max_pos(iMaxLength, iEndCol);
+			iMinIndent = min(iMinIndent, iIndentCol);
+			iMaxLength = max(iMaxLength, iEndCol);
 		}
 	}
 
@@ -3402,7 +3402,7 @@ void EditToggleLineComments(LPCWSTR pwszComment, int commentFlag) {
 
 			if (iLineIndentPos != iLineEndPos) {
 				const Sci_Position iIndentColumn = SciCall_GetColumn(iLineIndentPos);
-				iCommentCol = min_pos(iCommentCol, iIndentColumn);
+				iCommentCol = min(iCommentCol, iIndentColumn);
 			}
 		}
 	}
@@ -3419,7 +3419,7 @@ void EditToggleLineComments(LPCWSTR pwszComment, int commentFlag) {
 		const Sci_Position iLineEndPos = SciCall_GetLineEndPosition(iLine);
 
 		char tchBuf[32] = "";
-		const struct Sci_TextRangeFull tr = { { iIndentPos, min_pos(iIndentPos + 31, iLineEndPos) }, tchBuf };
+		const struct Sci_TextRangeFull tr = { { iIndentPos, min(iIndentPos + 31, iLineEndPos) }, tchBuf };
 		SciCall_GetTextRangeFull(&tr);
 
 		if (StrStartsWithCaseEx(tchBuf, mszComment, cchComment) && (commentEnd != ' ' || (uint8_t)(tchBuf[cchComment]) <= ' ')) {
@@ -3540,7 +3540,7 @@ void EditPadWithSpaces(bool bSkipEmpty, bool bNoUndoGroup) {
 
 		for (Sci_Line iLine = iLineStart; iLine <= iLineEnd; iLine++) {
 			const Sci_Position iPos = SciCall_GetLineEndPosition(iLine);
-			iMaxColumn = max_pos(iMaxColumn, SciCall_GetColumn(iPos));
+			iMaxColumn = max(iMaxColumn, SciCall_GetColumn(iPos));
 		}
 	} else {
 		const Sci_Position iCurPos = SciCall_GetCurrentPos();
@@ -3558,7 +3558,7 @@ void EditPadWithSpaces(bool bSkipEmpty, bool bNoUndoGroup) {
 		for (Sci_Line iLine = iLineStart; iLine <= iLineEnd; iLine++) {
 			const Sci_Position iPos = SciCall_GetLineSelEndPosition(iLine);
 			if (iPos >= 0) {
-				iMaxColumn = max_pos(iMaxColumn, SciCall_GetColumn(iPos));
+				iMaxColumn = max(iMaxColumn, SciCall_GetColumn(iPos));
 			}
 		}
 	}
@@ -4184,9 +4184,9 @@ void EditSortLines(EditSortFlag iSortFlags) {
 		iRcCurCol = SciCall_GetColumn(iCurPos);
 		iRcAnchorCol = SciCall_GetColumn(iAnchorPos);
 
-		iLineStart = min_pos(iRcCurLine, iRcAnchorLine);
-		iLineEnd = max_pos(iRcCurLine, iRcAnchorLine);
-		iSortColumn = min_pos(iRcCurCol, iRcAnchorCol);
+		iLineStart = min(iRcCurLine, iRcAnchorLine);
+		iLineEnd = max(iRcCurLine, iRcAnchorLine);
+		iSortColumn = min(iRcCurCol, iRcAnchorCol);
 	} else {
 		iSelStart = SciCall_GetSelectionStart();
 		const Sci_Position iSelEnd = SciCall_GetSelectionEnd();
@@ -4407,7 +4407,7 @@ void EditJumpTo(Sci_Line iNewLine, Sci_Position iNewCol) {
 	} else {
 		--iNewLine;
 		const Sci_Position iLineEndPos = SciCall_GetLineEndPosition(iNewLine);
-		iNewCol = min_pos(iNewCol, iLineEndPos);
+		iNewCol = min(iNewCol, iLineEndPos);
 		iNewCol = SciCall_FindColumn(iNewLine, iNewCol - 1);
 	}
 
@@ -4514,7 +4514,7 @@ void EditGetExcerpt(LPWSTR lpszExcerpt, DWORD cchExcerpt) {
 	WCHAR tch[256] = L"";
 	DWORD cch = 0;
 	const Sci_Position iSelStart = SciCall_GetSelectionStart();
-	const Sci_Position iSelEnd = min_pos(min_pos(SciCall_GetSelectionEnd(), iSelStart + COUNTOF(tch)), SciCall_GetLength());
+	const Sci_Position iSelEnd = min(min<Sci_Position>(SciCall_GetSelectionEnd(), iSelStart + COUNTOF(tch)), SciCall_GetLength());
 	const Sci_Position iSelCount = iSelEnd - iSelStart;
 
 	char *pszText = (char *)NP2HeapAlloc(iSelCount + 2);
@@ -5371,7 +5371,7 @@ void EditFindNext(LPCEDITFINDREPLACE lpefr, bool fExtendSelection) {
 		if (!fExtendSelection) {
 			EditSelectEx(ttf.chrgText.cpMin, ttf.chrgText.cpMax);
 		} else {
-			EditSelectEx(min_pos(iSelAnchor, iSelPos), ttf.chrgText.cpMax);
+			EditSelectEx(min(iSelAnchor, iSelPos), ttf.chrgText.cpMax);
 		}
 	}
 
@@ -5414,7 +5414,7 @@ void EditFindPrev(LPCEDITFINDREPLACE lpefr, bool fExtendSelection) {
 		if (!fExtendSelection) {
 			EditSelectEx(ttf.chrgText.cpMin, ttf.chrgText.cpMax);
 		} else {
-			EditSelectEx(max_pos(iSelPos, iSelAnchor), ttf.chrgText.cpMin);
+			EditSelectEx(max(iSelPos, iSelAnchor), ttf.chrgText.cpMin);
 		}
 	}
 }
@@ -5504,7 +5504,7 @@ bool EditReplace(HWND hwnd, LPCEDITFINDREPLACE lpefr) {
 extern EditMarkAllStatus editMarkAllStatus;
 extern HANDLE idleTaskTimer;
 #define EditMarkAll_MeasuredSize		(1024*1024)
-#define EditMarkAll_MinDuration			1
+#define EditMarkAll_MinDuration			1.0
 // (100 / 64) => 2 MiB on second search.
 // increment search size will return to normal after several runs
 // when selection no longer changed, this make continuous selecting smooth.
@@ -5595,7 +5595,7 @@ static Sci_Line EditMarkAll_Bookmark(Sci_Line bookmarkLine, const Sci_Position *
 		for (UINT i = 0; i < index; i += 2) {
 			Sci_Line line = SciCall_LineFromPosition(ranges[i]);
 			const Sci_Line lineEnd = SciCall_LineFromPosition(ranges[i] + ranges[i + 1]);
-			line = max_pos(bookmarkLine + 1, line);
+			line = max(bookmarkLine + 1, line);
 			while (line <= lineEnd) {
 				SciCall_MarkerAdd(line, MarkerNumber_Bookmark);
 				++line;
@@ -5623,7 +5623,7 @@ void EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer) {
 	Sci_Position iStartPos = status->iStartPos;
 	Sci_Position iMaxLength = status->incrementSize * EditMarkAll_MeasuredSize;
 	iMaxLength += iStartPos + status->iSelCount;
-	iMaxLength = min_pos(iMaxLength, iLength);
+	iMaxLength = min(iMaxLength, iLength);
 	if (iMaxLength < iLength) {
 		// match on whole line to avoid rewinding.
 		iMaxLength = SciCall_PositionFromLine(SciCall_LineFromPosition(iMaxLength) + 1);
@@ -5635,7 +5635,7 @@ void EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer) {
 	// rewind start position
 	const int findFlag = status->findFlag;
 	if (findFlag & NP2_MarkAllMultiline) {
-		iStartPos = max_pos(iStartPos - status->iSelCount + 1, status->lastMatchPos);
+		iStartPos = max(iStartPos - status->iSelCount + 1, status->lastMatchPos);
 	}
 
 	Sci_Position cpMin = iStartPos;
@@ -5682,7 +5682,7 @@ void EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer) {
 		bookmarkLine = EditMarkAll_Bookmark(bookmarkLine, ranges, index, findFlag, matchCount);
 	}
 
-	iStartPos = max_pos(iStartPos, cpMin);
+	iStartPos = max(iStartPos, cpMin);
 	const bool pending = iStartPos < iLength;
 	if (pending) {
 		// dynamic compute increment search size, see ActionDuration in Scintilla.
@@ -5692,7 +5692,7 @@ void EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer) {
 		const double durationOne = (EditMarkAll_MeasuredSize * period) / iMaxLength;
 		const double alpha = 0.25;
 		const double duration_ = alpha * durationOne + (1.0 - alpha) * status->duration;
-		const double duration = max_d(duration_, EditMarkAll_MinDuration);
+		const double duration = max(duration_, EditMarkAll_MinDuration);
 		const int incrementSize = 1 + (int)(WaitableTimer_IdleTaskTimeSlot / duration);
 		//printf("match %3u (%zd, %zd) length=%.3f / %zd, one=%.3f, duration=%.3f / %.3f, increment=%d\n", EditMarkAll_Runs,
 		//	status->iStartPos, iStartPos, period, iMaxLength, durationOne, duration, duration_, incrementSize);
@@ -5800,11 +5800,11 @@ void EditBookmarkSelectAll(void) {
 		// set main selection near current line to ensure caret is visible after delete selected lines.
 		size_t main = 0;
 		size_t selection = 0;
-		Sci_Line minDiff = abs_pos(line - iCurLine);
+		Sci_Line minDiff = abs(line - iCurLine);
 		while ((line = SciCall_MarkerNext(line + 1, MarkerBitmask_Bookmark)) >= 0) {
 			SciCall_AddSelection(SciCall_PositionFromLine(line), SciCall_PositionFromLine(line + 1));
 			++selection;
-			const Sci_Line diff = abs_pos(line - iCurLine);
+			const Sci_Line diff = abs(line - iCurLine);
 			if (diff < minDiff) {
 				minDiff = diff;
 				main = selection;
@@ -7143,7 +7143,7 @@ void EditOpenSelection(OpenSelectionType type) {
 		return;
 	}
 
-	LPWSTR wszSelection = (LPWSTR)NP2HeapAlloc((max_pos(MAX_PATH, cchSelection) + 32) * sizeof(WCHAR));
+	LPWSTR wszSelection = (LPWSTR)NP2HeapAlloc((max<size_t>(MAX_PATH, cchSelection) + 32) * sizeof(WCHAR));
 	LPWSTR link = wszSelection + 16;
 	const UINT cpEdit = SciCall_GetCodePage();
 	MultiByteToWideChar(cpEdit, 0, mszSelection, -1, link, (int)cchSelection);
@@ -7368,7 +7368,7 @@ void FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 	}
 
 	char tch[512 + 1];
-	const DWORD len = min_u(cbData, sizeof(tch) - 1);
+	const DWORD len = min<DWORD>(cbData, sizeof(tch) - 1);
 	memcpy(tch, lpData, len);
 	tch[len] = '\0';
 	const bool utf8Sig = IsUTF8Signature(tch);
@@ -7794,7 +7794,7 @@ static void FinishBatchFold(void) {
 bool EditIsLineContainsStyle(Sci_Line line, int style) {
 	Sci_Position lineStart = SciCall_PositionFromLine(line);
 	Sci_Position lineEnd = SciCall_PositionFromLine(line + 1);
-	lineEnd = min_pos(lineEnd, lineStart + MAX_FUNCTION_DEFINITION_POSITION);
+	lineEnd = min(lineEnd, lineStart + MAX_FUNCTION_DEFINITION_POSITION);
 	do {
 		const int value = SciCall_GetStyleIndexAt(lineStart);
 		if (value == style) {

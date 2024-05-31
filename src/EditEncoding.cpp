@@ -591,7 +591,7 @@ int Encoding_MapIniSetting(bool bLoad, UINT iSetting) {
 		}
 		if (IsValidCodePage(iSetting)) {
 			iSetting = Encoding_GetIndex(iSetting);
-			return max_i(iSetting, CPI_FIRST);
+			return max<int>(iSetting, CPI_FIRST);
 		}
 		return CPI_DEFAULT; // unknown encoding
 	}
@@ -1044,7 +1044,7 @@ bool MaybeBinaryFile(const uint8_t *ptr, DWORD length) {
 	Treat the file as binary when we find two adjacent C0 control characters
 	(very common in file header) or some (currently set to 8) C0 control characters. */
 
-	length = min_u(length, 1024);
+	length = min<DWORD>(length, 1024);
 	const uint8_t * const end = ptr + length;
 	UINT count = 0;
 	while (ptr < end) {
@@ -1073,9 +1073,9 @@ static inline BOOL IsValidWideChar(LPCWSTR lpWide, DWORD cchWide) {
 static int DetectUnicode(char *pTest, DWORD nLength, bool ascii) {
 	if (ascii) {
 		// find ASCII inside first or last 4 KiB text
-		const DWORD size = 4096;
-		if (memchr(pTest, 0, min_u(nLength, size)) == NULL
-			&& (nLength <= size || memchr(pTest + (nLength - size), 0, size) == NULL)) {
+		constexpr DWORD size = 4096;
+		if (memchr(pTest, 0, min(nLength, size)) == nullptr
+			&& (nLength <= size || memchr(pTest + (nLength - size), 0, size) == nullptr)) {
 			return CPI_DEFAULT;
 		}
 	}

@@ -64,7 +64,7 @@ uint32_t WordList_SortKey(const void *pWord, uint32_t len) {
 #if 0
 	uint32_t high = 0;
 	const uint8_t *ptr = (const uint8_t *)pWord;
-	len = min_u(len, NP2_AUTOC_SORT_KEY_LENGTH);
+	len = min<uint32_t>(len, NP2_AUTOC_SORT_KEY_LENGTH);
 	for (uint32_t i = 0; i < len; i++) {
 		high = (high << 8) | *ptr++;
 	}
@@ -87,7 +87,7 @@ uint32_t WordList_SortKeyCase(const void *pWord, uint32_t len) {
 #if 1
 	uint32_t high = 0;
 	const uint8_t *ptr = (const uint8_t *)pWord;
-	len = min_u(len, NP2_AUTOC_SORT_KEY_LENGTH);
+	len = min<uint32_t>(len, NP2_AUTOC_SORT_KEY_LENGTH);
 	for (uint32_t i = 0; i < len; i++) {
 		const uint8_t ch = *ptr++;
 		high = (high << 8) | ch;
@@ -388,7 +388,7 @@ void WordList_AddListEx(struct WordList *pWList, LPCSTR pList) {
 		} while (!WordList_IsSeparator(ch));
 
 		UINT lenSub = (UINT)(sub - pList - 1);
-		lenSub = min_u(NP2_AUTOC_MAX_WORD_LENGTH - len, lenSub);
+		lenSub = min<UINT>(NP2_AUTOC_MAX_WORD_LENGTH - len, lenSub);
 		memcpy(word + len, pList, lenSub);
 		len += lenSub;
 		pList = sub;
@@ -867,7 +867,7 @@ static void AutoC_AddDocWord(struct WordList *pWList, const uint32_t ignoredStyl
 				char wordBuf[NP2_AUTOC_WORD_BUFFER_SIZE];
 				char *pWord = wordBuf + 16; // avoid overlap in memcpy()
 				bool bChanged = false;
-				const struct Sci_TextRangeFull tr = { { iPosFind, min_pos(iPosFind + NP2_AUTOC_MAX_WORD_LENGTH, wordEnd) }, pWord };
+				const struct Sci_TextRangeFull tr = { { iPosFind, min(iPosFind + NP2_AUTOC_MAX_WORD_LENGTH, wordEnd) }, pWord };
 				int wordLength = (int)SciCall_GetTextRangeFull(&tr);
 
 				const Sci_Position before = SciCall_PositionBefore(iPosFind);
@@ -1717,7 +1717,7 @@ static bool EditCompleteWordCore(int iCondition, bool autoInsert) {
 		//SciCall_AutoCSetTypeSeparator('\t');
 		SciCall_AutoCSetFillUps(autoCompletionConfig.szAutoCompleteFillUp);
 		//SciCall_AutoCSetDropRestOfWord(true); // delete orginal text: pRoot
-		SciCall_AutoCSetMaxHeight(min_u(pWList.nWordCount, autoCompletionConfig.iVisibleItemCount)); // visible rows
+		SciCall_AutoCSetMaxHeight(min(pWList.nWordCount, autoCompletionConfig.iVisibleItemCount)); // visible rows
 		SciCall_AutoCSetCancelAtStart(false); // don't cancel the list when deleting character
 		SciCall_AutoCSetChooseSingle(autoInsert);
 		SciCall_AutoCShow(pWList.iStartLen, pList);
@@ -1913,7 +1913,7 @@ static inline bool IsHtmlVoidTag(const char *word, int length) {
 void EditAutoCloseXMLTag(void) {
 	char tchBuf[512];
 	const Sci_Position iCurPos = SciCall_GetCurrentPos();
-	const Sci_Position iStartPos = max_pos(0, iCurPos - (COUNTOF(tchBuf) - 1));
+	const Sci_Position iStartPos = max<Sci_Position>(0, iCurPos - (COUNTOF(tchBuf) - 1));
 	const Sci_Position iSize = iCurPos - iStartPos;
 	bool shouldAutoClose = false;
 	bool autoClosed = false;

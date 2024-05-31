@@ -22,51 +22,13 @@
 #include <cstdint>
 #include "compiler.h"
 
-NP2_inline int min_i(int x, int y) {
+template <typename T>
+constexpr T min(T x, T y) noexcept {
 	return (x < y) ? x : y;
 }
 
-NP2_inline int max_i(int x, int y) {
-	return (x > y) ? x : y;
-}
-
-NP2_inline UINT min_u(UINT x, UINT y) {
-	return (x < y) ? x : y;
-}
-
-NP2_inline UINT max_u(UINT x, UINT y) {
-	return (x > y) ? x : y;
-}
-
-NP2_inline size_t min_z(size_t x, size_t y) {
-	return (x < y) ? x : y;
-}
-
-NP2_inline size_t max_z(size_t x, size_t y) {
-	return (x > y) ? x : y;
-}
-
-NP2_inline long min_l(long x, long y) {
-	return (x < y) ? x : y;
-}
-
-NP2_inline long max_l(long x, long y) {
-	return (x > y) ? x : y;
-}
-
-NP2_inline float min_f(float x, float y) {
-	return (x < y) ? x : y;
-}
-
-NP2_inline float max_f(float x, float y) {
-	return (x > y) ? x : y;
-}
-
-NP2_inline double min_d(double x, double y) {
-	return (x < y) ? x : y;
-}
-
-NP2_inline double max_d(double x, double y) {
+template <typename T>
+constexpr T max(T x, T y) noexcept {
 	return (x > y) ? x : y;
 }
 
@@ -411,7 +373,7 @@ NP2_inline DWORD GetCurrentIconHandleFlags(void) {
 NP2_inline int GetBitmapResourceIdForCurrentDPI(int resourceId)	{
 	if (g_uCurrentDPI > USER_DEFAULT_SCREEN_DPI + USER_DEFAULT_SCREEN_DPI/4) {
 		int scale = (g_uCurrentDPI + USER_DEFAULT_SCREEN_DPI/4 - 1) / (USER_DEFAULT_SCREEN_DPI/2);
-		scale = min_i(scale, 6);
+		scale = min(scale, 6);
 		resourceId += scale - 2;
 	}
 	return resourceId;

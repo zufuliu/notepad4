@@ -35,19 +35,7 @@ NP2_inline COLORREF ColorAlpha(COLORREF rgb, UINT alpha) NP2_noexcept {
 	return rgb | (alpha << 24);
 }
 
-NP2_inline Sci_Position min_pos(Sci_Position x, Sci_Position y) NP2_noexcept {
-	return (x < y) ? x : y;
-}
-
-NP2_inline Sci_Position max_pos(Sci_Position x, Sci_Position y) NP2_noexcept {
-	return (x > y) ? x : y;
-}
-
 #if defined(_WIN64)
-NP2_inline Sci_Position abs_pos(Sci_Position x) NP2_noexcept {
-	return llabs(x);
-}
-
 NP2_inline void PosToStrW(Sci_Position pos, LPWSTR tch) NP2_noexcept {
 	_i64tow(pos, tch, 10);
 }
@@ -56,10 +44,6 @@ NP2_inline void PosToStrA(Sci_Position pos, LPSTR tch) NP2_noexcept {
 	_i64toa(pos, tch, 10);
 }
 #else
-NP2_inline Sci_Position abs_pos(Sci_Position x) NP2_noexcept {
-	return labs(x);
-}
-
 NP2_inline void PosToStrW(Sci_Position pos, LPWSTR tch) NP2_noexcept {
 	_ltow(pos, tch, 10);
 }

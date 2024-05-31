@@ -836,7 +836,7 @@ static void Style_LoadAll(bool bReload, bool onlyCustom) {
 		GetPrivateProfileSection(INI_SECTION_NAME_CUSTOM_COLORS, pIniSectionBuf, cchIniSection, themePath);
 		IniSectionParseArray(pIniSection, pIniSectionBuf, FALSE);
 
-		const UINT count = min_u(pIniSection->count, MAX_CUSTOM_COLOR_COUNT);
+		const UINT count = min<UINT>(pIniSection->count, MAX_CUSTOM_COLOR_COUNT);
 		for (UINT i = 0; i < count; i++) {
 			const IniKeyValueNode *node = &pIniSection->nodeList[i];
 			const UINT n = (UINT)(wcstol(node->key, NULL, 10) - 1);
@@ -1123,7 +1123,7 @@ static void Style_ResetAll(bool resetColor) {
 
 static inline int ScaleStylePixel(int value, int scale, int minValue) {
 	value = (scale == USER_DEFAULT_SCREEN_DPI*100) ? value : MulDiv(value, scale, USER_DEFAULT_SCREEN_DPI*100);
-	return max_i(value, minValue);
+	return max(value, minValue);
 }
 
 #define CodeFoldingMarkerList	MULTI_STYLE8(	\
@@ -3197,7 +3197,7 @@ bool Style_StrGetFontSize(LPCWSTR lpszStyle, int *size) {
 			int iValue = (int)lroundf(value * SC_FONT_SIZE_MULTIPLIER);
 			iValue += (*p == L'+' || *p == '-')? iBaseFontSize : 0;
 			// scintilla/src/ViewStyle.h GetFontSizeZoomed()
-			iValue = max_i(iValue, 2 * SC_FONT_SIZE_MULTIPLIER);
+			iValue = max(iValue, 2 * SC_FONT_SIZE_MULTIPLIER);
 			*size = iValue;
 			return true;
 		}
@@ -5218,8 +5218,8 @@ void EditShowCallTip(Sci_Position position) {
 	const ShowCallTip colorFormat = callTipInfo.showCallTip;
 	if (colorFormat != ShowCallTip_None) {
 		char text[32] = {0};
-		const Sci_Position startPos = max_pos(0, position - 10);
-		const Sci_Position endPos = min_pos(position + 10, SciCall_GetLength());
+		const Sci_Position startPos = max<Sci_Position>(0, position - 10);
+		const Sci_Position endPos = min(position + 10, SciCall_GetLength());
 		const struct Sci_TextRangeFull tr = { { startPos, endPos }, text + 8};
 		SciCall_GetTextRangeFull(&tr);
 		char * const p = text + 8 + position - startPos;

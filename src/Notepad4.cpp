@@ -771,7 +771,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 		SystemParametersInfo(SPI_GETWORKAREA, 0, &rc, 0);
 		wi.y = rc.top + 16;
 		wi.cy = rc.bottom - rc.top - 32;
-		wi.cx = min_i(rc.right - rc.left - 32, wi.cy);
+		wi.cx = min<int>(rc.right - rc.left - 32, wi.cy);
 		wi.x = (flagDefaultPos == DefaultPositionFlag_DefaultLeft) ? rc.left + 16 : rc.right - wi.cx - 16;
 	} else {
 		// fit window into working area of current monitor
@@ -811,7 +811,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 		if (!IntersectRect(&rc2, &rc, &mi.rcWork)) {
 			wi.y = mi.rcWork.top + 16;
 			wi.cy = mi.rcWork.bottom - mi.rcWork.top - 32;
-			wi.cx = min_i(mi.rcWork.right - mi.rcWork.left - 32, wi.cy);
+			wi.cx = min<int>(mi.rcWork.right - mi.rcWork.left - 32, wi.cy);
 			wi.x = mi.rcWork.right - wi.cx - 16;
 		}
 	}
@@ -1678,7 +1678,7 @@ void UpdateBookmarkMarginWidth(void) {
 	// see LineMarker::Draw() for minDim.
 	const int width = bShowBookmarkMargin ? SciCall_TextHeight() - 2 : 0;
 	// 16px for XPM bookmark symbol.
-	//const int width = bShowBookmarkMargin ? max_i(SciCall_TextHeight() - 2, 16) : 0;
+	//const int width = bShowBookmarkMargin ? max(SciCall_TextHeight() - 2, 16) : 0;
 	SciCall_SetMarginWidth(MarginNumber_Bookmark, width);
 }
 
@@ -3560,7 +3560,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		const char *enc = mEncoding[iCurrentEncoding].pszParseNames;
 		const char *sep = strchr(enc, ',');
 		if (sep != NULL) {
-			strncpy(msz, enc, min_z(sep - enc, COUNTOF(msz) - 1));
+			strncpy(msz, enc, min<size_t>(sep - enc, COUNTOF(msz) - 1));
 		} else {
 			WideCharToMultiByte(CP_UTF8, 0, mEncoding[iCurrentEncoding].wchLabel, -1, msz, COUNTOF(msz), NULL, NULL);
 		}
@@ -3815,14 +3815,14 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 		if (iBrace2 >= 0) {
 			Sci_Position iAnchorPos = SciCall_GetAnchor();
-			const Sci_Position iMinPos = min_pos(iAnchorPos, iCurPos);
-			const Sci_Position iMaxPos = max_pos(iAnchorPos, iCurPos);
+			const Sci_Position iMinPos = min(iAnchorPos, iCurPos);
+			const Sci_Position iMaxPos = max(iAnchorPos, iCurPos);
 			if (iBrace2 > iPos) {
-				iAnchorPos = min_pos(iPos, iMinPos);
-				iCurPos = max_pos(iBrace2 + 1, iMaxPos);
+				iAnchorPos = min(iPos, iMinPos);
+				iCurPos = max(iBrace2 + 1, iMaxPos);
 			} else {
-				iAnchorPos = max_pos(iPos + 1, iMaxPos);
-				iCurPos = min_pos(iBrace2, iMinPos);
+				iAnchorPos = max(iPos + 1, iMaxPos);
+				iCurPos = min(iBrace2, iMinPos);
 			}
 			SciCall_SetSel(iAnchorPos, iCurPos);
 		}
@@ -4949,7 +4949,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 							const Sci_Position col1 = SciCall_GetColumn(iPos);
 							const Sci_Position col2 = SciCall_GetColumn(iBrace2);
 							SciCall_BraceHighlight(iPos, iBrace2);
-							SciCall_SetHighlightGuide(min_pos(col1, col2));
+							SciCall_SetHighlightGuide(min(col1, col2));
 						} else {
 							SciCall_BraceBadLight(iPos);
 							SciCall_SetHighlightGuide(0);
@@ -4963,7 +4963,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 								const Sci_Position col1 = SciCall_GetColumn(iPos);
 								const Sci_Position col2 = SciCall_GetColumn(iBrace2);
 								SciCall_BraceHighlight(iPos, iBrace2);
-								SciCall_SetHighlightGuide(min_pos(col1, col2));
+								SciCall_SetHighlightGuide(min(col1, col2));
 							} else {
 								SciCall_BraceBadLight(iPos);
 								SciCall_SetHighlightGuide(0);
@@ -5448,16 +5448,16 @@ void LoadSettings(void) {
 	autoCompletionConfig.fCompleteScope = iValue & 15;
 	autoCompletionConfig.fScanWordScope = iValue >> 4;
 	iValue = IniSectionGetInt(pIniSection, L"AutoCScanWordsTimeout", AUTOC_SCAN_WORDS_DEFAULT_TIMEOUT);
-	autoCompletionConfig.dwScanWordsTimeout = max_i(iValue, AUTOC_SCAN_WORDS_MIN_TIMEOUT);
+	autoCompletionConfig.dwScanWordsTimeout = max(iValue, AUTOC_SCAN_WORDS_MIN_TIMEOUT);
 	autoCompletionConfig.bEnglistIMEModeOnly = IniSectionGetBool(pIniSection, L"AutoCEnglishIMEModeOnly", false);
 	autoCompletionConfig.bIgnoreCase = IniSectionGetBool(pIniSection, L"AutoCIgnoreCase", false);
 	autoCompletionConfig.bLaTeXInputMethod = IniSectionGetBool(pIniSection, L"LaTeXInputMethod", false);
 	iValue = IniSectionGetInt(pIniSection, L"AutoCVisibleItemCount", 16);
-	autoCompletionConfig.iVisibleItemCount = max_i(iValue, MIN_AUTO_COMPLETION_VISIBLE_ITEM_COUNT);
+	autoCompletionConfig.iVisibleItemCount = max(iValue, MIN_AUTO_COMPLETION_VISIBLE_ITEM_COUNT);
 	iValue = IniSectionGetInt(pIniSection, L"AutoCMinWordLength", 1);
-	autoCompletionConfig.iMinWordLength = max_i(iValue, MIN_AUTO_COMPLETION_WORD_LENGTH);
+	autoCompletionConfig.iMinWordLength = max(iValue, MIN_AUTO_COMPLETION_WORD_LENGTH);
 	iValue = IniSectionGetInt(pIniSection, L"AutoCMinNumberLength", 3);
-	autoCompletionConfig.iMinNumberLength = max_i(iValue, MIN_AUTO_COMPLETION_NUMBER_LENGTH);
+	autoCompletionConfig.iMinNumberLength = max(iValue, MIN_AUTO_COMPLETION_NUMBER_LENGTH);
 	autoCompletionConfig.fAutoCompleteFillUpMask = IniSectionGetInt(pIniSection, L"AutoCFillUpMask", AutoCompleteFillUpMask_Default);
 	autoCompletionConfig.fAutoInsertMask = IniSectionGetInt(pIniSection, L"AutoInsertMask", AutoInsertMask_Default);
 	iValue = IniSectionGetInt(pIniSection, L"AsmLineCommentChar", AsmLineCommentChar_Semicolon);
@@ -5535,16 +5535,16 @@ void LoadSettings(void) {
 	iPrintZoom = clamp(iValue, SC_MIN_ZOOM_LEVEL, SC_MAX_ZOOM_LEVEL);
 
 	iValue = IniSectionGetInt(pIniSection, L"PrintMarginLeft", -1);
-	pageSetupMargin.left = max_i(iValue, -1);
+	pageSetupMargin.left = max(iValue, -1);
 
 	iValue = IniSectionGetInt(pIniSection, L"PrintMarginTop", -1);
-	pageSetupMargin.top = max_i(iValue, -1);
+	pageSetupMargin.top = max(iValue, -1);
 
 	iValue = IniSectionGetInt(pIniSection, L"PrintMarginRight", -1);
-	pageSetupMargin.right = max_i(iValue, -1);
+	pageSetupMargin.right = max(iValue, -1);
 
 	iValue = IniSectionGetInt(pIniSection, L"PrintMarginBottom", -1);
-	pageSetupMargin.bottom = max_i(iValue, -1);
+	pageSetupMargin.bottom = max(iValue, -1);
 
 	bSaveBeforeRunningTools = IniSectionGetBool(pIniSection, L"SaveBeforeRunningTools", false);
 	bOpenFolderWithMatepath = IniSectionGetBool(pIniSection, L"OpenFolderWithMatepath", true);
@@ -7486,7 +7486,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 			if (bRestoreView) {
 				SciCall_SetSel(iAnchorPos, iCurPos);
 				const Sci_Line iCurLine = iLine - SciCall_LineFromPosition(SciCall_GetCurrentPos());
-				if (abs_pos(iCurLine) > 5) {
+				if (abs(iCurLine) > 5) {
 					EditJumpTo(iLine, iCol);
 				} else {
 					SciCall_EnsureVisible(iDocTopLine);
@@ -8341,7 +8341,7 @@ void SnapToDefaultPos(HWND hwnd) {
 
 	const int y = mi.rcWork.top + 16;
 	const int cy = mi.rcWork.bottom - mi.rcWork.top - 32;
-	const int cx = min_i(mi.rcWork.right - mi.rcWork.left - 32, cy);
+	const int cx = min<int>(mi.rcWork.right - mi.rcWork.left - 32, cy);
 	int x = mi.rcWork.right - cx - 16;
 
 	WINDOWPLACEMENT wndpl;

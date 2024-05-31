@@ -2392,18 +2392,18 @@ static INT_PTR CALLBACK AutoCompletionSettingsDlgProc(HWND hwnd, UINT umsg, WPAR
 			autoCompletionConfig.bIgnoreCase = IsButtonChecked(hwnd, IDC_AUTOC_CASE_INSENSITIVE);
 
 			int mask = GetDlgItemInt(hwnd, IDC_AUTOC_VISIBLE_ITEM_COUNT, NULL, FALSE);
-			autoCompletionConfig.iVisibleItemCount = max_i(mask, MIN_AUTO_COMPLETION_VISIBLE_ITEM_COUNT);
+			autoCompletionConfig.iVisibleItemCount = max(mask, MIN_AUTO_COMPLETION_VISIBLE_ITEM_COUNT);
 
 			mask = GetDlgItemInt(hwnd, IDC_AUTOC_MIN_WORD_LENGTH, NULL, FALSE);
-			autoCompletionConfig.iMinWordLength = max_i(mask, MIN_AUTO_COMPLETION_WORD_LENGTH);
+			autoCompletionConfig.iMinWordLength = max(mask, MIN_AUTO_COMPLETION_WORD_LENGTH);
 
 			mask = GetDlgItemInt(hwnd, IDC_AUTOC_MIN_NUMBER_LENGTH, NULL, FALSE);
-			autoCompletionConfig.iMinNumberLength = max_i(mask, MIN_AUTO_COMPLETION_NUMBER_LENGTH);
+			autoCompletionConfig.iMinNumberLength = max(mask, MIN_AUTO_COMPLETION_NUMBER_LENGTH);
 
 			WCHAR wch[32];
 			GetDlgItemText(hwnd, IDC_AUTOC_SCAN_WORDS_TIMEOUT, wch, COUNTOF(wch));
 			if (CRTStrToInt(wch, &mask)) {
-				autoCompletionConfig.dwScanWordsTimeout = max_i(mask, AUTOC_SCAN_WORDS_MIN_TIMEOUT);
+				autoCompletionConfig.dwScanWordsTimeout = max(mask, AUTOC_SCAN_WORDS_MIN_TIMEOUT);
 			}
 
 			mask = AutoCompleteScope_Other;

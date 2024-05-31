@@ -1006,8 +1006,8 @@ void ResizeDlg_InitEx(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDir
 		break;
 	}
 
-	cxFrame = max_i(cxFrame, pm->mmiPtMinX);
-	cyFrame = max_i(cyFrame, pm->mmiPtMinY);
+	cxFrame = max(cxFrame, pm->mmiPtMinX);
+	cyFrame = max(cyFrame, pm->mmiPtMinY);
 
 	SetProp(hwnd, RESIZEDLG_PROP_KEY, (HANDLE)pm);
 
@@ -1366,7 +1366,7 @@ int StatusCalcPaneWidth(HWND hwnd, LPCWSTR lpsz) {
 // Toolbar_Get/SetButtons()
 //
 int Toolbar_GetButtons(HWND hwnd, int cmdBase, LPWSTR lpszButtons, int cchButtons) {
-	const int count = min_i(MAX_TOOLBAR_ITEM_COUNT_WITH_SEPARATOR, (int)SendMessage(hwnd, TB_BUTTONCOUNT, 0, 0));
+	const int count = min(MAX_TOOLBAR_ITEM_COUNT_WITH_SEPARATOR, static_cast<int>(SendMessage(hwnd, TB_BUTTONCOUNT, 0, 0)));
 	const int maxCch = cchButtons - 3; // two digits, one space and NULL
 	int len = 0;
 
@@ -1385,7 +1385,7 @@ int Toolbar_GetButtons(HWND hwnd, int cmdBase, LPWSTR lpszButtons, int cchButton
 }
 
 int Toolbar_SetButtons(HWND hwnd, LPCWSTR lpszButtons, LPCTBBUTTON ptbb, int ctbb) {
-	int count = (int)SendMessage(hwnd, TB_BUTTONCOUNT, 0, 0);
+	int count = static_cast<int>(SendMessage(hwnd, TB_BUTTONCOUNT, 0, 0));
 	if (StrIsEmpty(lpszButtons)) {
 		return count;
 	}
@@ -2593,7 +2593,7 @@ bool GetThemedDialogFont(LPWSTR lpFaceName, WORD *wSize) {
 			lfHeight = -lfHeight;
 		}
 		lfHeight = MulDiv(lfHeight, 72, g_uSystemDPI);
-		lfHeight = max_i(lfHeight, 8);
+		lfHeight = max(lfHeight, 8);
 		*wSize = (WORD)lfHeight;
 		if (!IsVistaAndAbove()) {
 			// Windows 2000, XP, 2003

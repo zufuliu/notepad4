@@ -442,7 +442,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 		if (!IntersectRect(&rc2, &rc, &mi.rcWork)) {
 			wi.y = mi.rcWork.top + 16;
 			wi.cy = mi.rcWork.bottom - mi.rcWork.top - 32;
-			wi.cx = min_i(mi.rcWork.right - mi.rcWork.left - 32, wi.cy);
+			wi.cx = min<int>(mi.rcWork.right - mi.rcWork.left - 32, wi.cy);
 			wi.x = mi.rcWork.right - wi.cx - 16;
 		}
 	}
@@ -1168,7 +1168,7 @@ void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	}
 
 	HDWP hdwp = BeginDeferWindowPos(2);
-	DeferWindowPos(hdwp, hwndDriveBox, NULL, x, y, cx, max_i(cy, 100), SWP_NOZORDER | SWP_NOACTIVATE);
+	DeferWindowPos(hdwp, hwndDriveBox, nullptr, x, y, cx, max(cy, 100), SWP_NOZORDER | SWP_NOACTIVATE);
 
 	if (bShowDriveBox) {
 		GetWindowRect(hwndDriveBox, &rc);
@@ -1594,7 +1594,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			if (iItem > 0) {
 				iItem--;
 			}
-			iItem = min_i(iItem, ListView_GetItemCount(hwndDirList) - 1);
+			iItem = min(iItem, ListView_GetItemCount(hwndDirList) - 1);
 			ListView_SetItemState(hwndDirList, iItem, LVIS_FOCUSED, LVIS_FOCUSED);
 			ListView_EnsureVisible(hwndDirList, iItem, FALSE);
 
@@ -2362,7 +2362,7 @@ bool ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, bool bUpdateHistory) {
 		if (!fUpdate) {
 			ListView_EnsureVisible(hwndDirList, 0, FALSE);
 		} else {
-			const int iJump = min_i(iTopItem + ListView_GetCountPerPage(hwndDirList), cItems - 1);
+			const int iJump = min(iTopItem + ListView_GetCountPerPage(hwndDirList), cItems - 1);
 			ListView_EnsureVisible(hwndDirList, iJump, TRUE);
 			ListView_EnsureVisible(hwndDirList, iTopItem, TRUE);
 		}
