@@ -253,7 +253,7 @@ LSTATUS Registry_SetString(HKEY hKey, LPCWSTR valueName, LPCWSTR lpszText) noexc
 
 #if _WIN32_WINNT < _WIN32_WINNT_VISTA
 LSTATUS Registry_DeleteTree(HKEY hKey, LPCWSTR lpSubKey) noexcept {
-	typedef LSTATUS (WINAPI *RegDeleteTreeSig)(HKEY hKey, LPCWSTR lpSubKey);
+	using RegDeleteTreeSig = LSTATUS (WINAPI *)(HKEY hKey, LPCWSTR lpSubKey);
 	RegDeleteTreeSig pfnRegDeleteTree = DLLFunctionEx(RegDeleteTreeSig, L"advapi32.dll", "RegDeleteTreeW");
 
 	LSTATUS status;
@@ -1115,9 +1115,9 @@ bool PathGetRealPath(HANDLE hFile, LPCWSTR lpszSrc, LPWSTR lpszDest) noexcept {
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 			DWORD cch = GetFinalPathNameByHandleW(hFile, path, COUNTOF(path), FILE_NAME_OPENED);
 #else
-			typedef DWORD (WINAPI *GetFinalPathNameByHandleSig)(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, DWORD dwFlags);
-			static GetFinalPathNameByHandleSig pfnGetFinalPathNameByHandle = NULL;
-			if (pfnGetFinalPathNameByHandle == NULL) {
+			using GetFinalPathNameByHandleSig = DWORD (WINAPI *)(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, DWORD dwFlags);
+			static GetFinalPathNameByHandleSig pfnGetFinalPathNameByHandle = nullptr;
+			if (pfnGetFinalPathNameByHandle == nullptr) {
 				pfnGetFinalPathNameByHandle = DLLFunctionEx(GetFinalPathNameByHandleSig, L"kernel32.dll", "GetFinalPathNameByHandleW");
 			}
 			DWORD cch = pfnGetFinalPathNameByHandle(hFile, path, COUNTOF(path), FILE_NAME_OPENED);

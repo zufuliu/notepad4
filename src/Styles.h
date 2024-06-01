@@ -33,20 +33,20 @@
 
 #define MAX_INI_SECTION_SIZE_STYLES			(8 * 1024)
 
-typedef enum LineHighlightMode {
+enum LineHighlightMode {
 	LineHighlightMode_None = 0,
 	LineHighlightMode_BackgroundColor,
 	LineHighlightMode_OutlineFrame,
-} LineHighlightMode;
+};
 
-typedef enum CaretStyle {
+enum CaretStyle {
 	CaretStyle_Block = 0,
 	CaretStyle_LineWidth1,
 	CaretStyle_LineWidth2,
 	CaretStyle_LineWidth3,
-} CaretStyle;
+};
 
-typedef enum StyleDefinitionMask {
+enum StyleDefinitionMask {
 	StyleDefinitionMask_None = 0,
 	StyleDefinitionMask_FontFace = 1 << 0,
 	StyleDefinitionMask_FontSize = 1 << 1,
@@ -54,9 +54,9 @@ typedef enum StyleDefinitionMask {
 	StyleDefinitionMask_BackColor = 1 << 3,
 	StyleDefinitionMask_FontWeight = 1 << 4,
 	StyleDefinitionMask_Charset = 1 << 5,
-} StyleDefinitionMask;
+};
 
-typedef struct StyleDefinition {
+struct StyleDefinition {
 	UINT mask;
 	int fontSize;
 	COLORREF foreColor;
@@ -72,7 +72,7 @@ typedef struct StyleDefinition {
 	int charset;
 	WCHAR fontWide[LF_FACESIZE];
 	char fontFace[LF_FACESIZE * kMaxMultiByteCount];
-} StyleDefinition;
+};
 
 extern PEDITLEXER pLexCurrent;
 extern int np2LexLangIndex;

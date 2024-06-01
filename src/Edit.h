@@ -49,15 +49,15 @@ typedef struct EDITFINDREPLACE {
 
 typedef const EDITFINDREPLACE * LPCEDITFINDREPLACE;
 
-typedef enum EditAlignMode {
+enum EditAlignMode {
 	EditAlignMode_Left = 0,
 	EditAlignMode_Right = 1,
 	EditAlignMode_Center = 2,
 	EditAlignMode_Justify = 3,
 	EditAlignMode_JustifyEx = 4,
-} EditAlignMode;
+};
 
-typedef enum EditSortFlag {
+enum EditSortFlag {
 	EditSortFlag_Ascending = 0,
 	EditSortFlag_Descending = 1,
 	EditSortFlag_IgnoreCase = 2,
@@ -69,7 +69,7 @@ typedef enum EditSortFlag {
 	EditSortFlag_MergeDuplicate = 128,
 	EditSortFlag_RemoveDuplicate = 256,
 	EditSortFlag_RemoveUnique = 512,
-} EditSortFlag;
+};
 
 // wrap indent
 enum {
@@ -129,9 +129,9 @@ constexpr int GetSettingsEOLMode(int mode) noexcept {
 }
 
 struct EditFileIOStatus;
-void 	EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) noexcept;
-bool	EditLoadFile(LPWSTR pszFile, EditFileIOStatus *status);
-bool	EditSaveFile(HWND hwnd, LPCWSTR pszFile, int saveFlag, EditFileIOStatus *status) noexcept;
+void 	EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus &status) noexcept;
+bool	EditLoadFile(LPWSTR pszFile, EditFileIOStatus &status);
+bool	EditSaveFile(HWND hwnd, LPCWSTR pszFile, int saveFlag, EditFileIOStatus &status) noexcept;
 
 void	EditReplaceMainSelection(Sci_Position cchText, LPCSTR pszText) noexcept;
 void	EditInvertCase() noexcept;
@@ -148,11 +148,11 @@ void	EditChar2Hex() noexcept;
 void	EditHex2Char() noexcept;
 void	EditShowHex() noexcept;
 
-typedef enum Base64EncodingFlag {
+enum Base64EncodingFlag {
 	Base64EncodingFlag_Default,
 	Base64EncodingFlag_UrlSafe,
 	Base64EncodingFlag_HtmlEmbeddedImage,
-} Base64EncodingFlag;
+};
 void	EditBase64Encode(Base64EncodingFlag encodingFlag) noexcept;
 void	EditBase64Decode(bool decodeAsHex) noexcept;
 void	EditConvertNumRadix(int radix) noexcept;
@@ -207,13 +207,13 @@ bool	EditAlignDlg(HWND hwnd, EditAlignMode *piAlignMode) noexcept;
 void	EditSelectionAction(int action) noexcept;
 void	TryBrowseFile(HWND hwnd, LPCWSTR pszFile, bool bWarn) noexcept;
 
-typedef enum OpenSelectionType {
+enum OpenSelectionType {
 	OpenSelectionType_None,
 	OpenSelectionType_Link,
 	OpenSelectionType_File,
 	OpenSelectionType_Folder,
 	OpenSelectionType_ContainingFolder,
-} OpenSelectionType;
+};
 void EditOpenSelection(OpenSelectionType type);
 
 // in Bridge.cpp
@@ -237,7 +237,7 @@ enum {
 	MarkerBitmask_Bookmark = 1 << MarkerNumber_Bookmark,
 };
 
-typedef struct EditMarkAllStatus {
+struct EditMarkAllStatus {
 	bool pending;
 	bool ignoreSelectionUpdate;
 	bool bookmarkForFindAll;
@@ -251,7 +251,7 @@ typedef struct EditMarkAllStatus {
 	Sci_Position iStartPos;		// previous stop position
 	Sci_Line bookmarkLine;		// previous bookmark line
 	StopWatch watch;			// used to dynamic compute increment size
-} EditMarkAllStatus;
+};
 
 void EditMarkAll_ClearEx(int findFlag, Sci_Position iSelCount, LPSTR pszText);
 NP2_inline void EditMarkAll_Clear(void) {
@@ -287,7 +287,7 @@ enum {
 };
 
 // auto insert
-typedef enum AutoInsertCharacter {
+enum AutoInsertCharacter {
 	AutoInsertCharacter_Parenthesis,
 	AutoInsertCharacter_Brace,
 	AutoInsertCharacter_SquareBracket,
@@ -296,7 +296,7 @@ typedef enum AutoInsertCharacter {
 	AutoInsertCharacter_SingleQuote,
 	AutoInsertCharacter_Backtick,
 	AutoInsertCharacter_Comma,
-} AutoInsertCharacter;
+};
 enum {
 	AutoInsertMask_Parenthesis = 1,			// ()
 	AutoInsertMask_Brace = 2,				// {}
@@ -324,7 +324,7 @@ enum {
 #define MIN_AUTO_COMPLETION_WORD_LENGTH			1
 #define MIN_AUTO_COMPLETION_NUMBER_LENGTH		0
 
-typedef struct EditAutoCompletionConfig {
+struct EditAutoCompletionConfig {
 	bool bIndentText;
 	bool bCloseTags;
 	bool bCompleteWord;
@@ -344,7 +344,7 @@ typedef struct EditAutoCompletionConfig {
 	UINT iPreviousItemCount;		// status
 	char szAutoCompleteFillUp[MAX_AUTO_COMPLETION_FILLUP_LENGTH + 4];
 	WCHAR wszAutoCompleteFillUp[MAX_AUTO_COMPLETION_FILLUP_LENGTH];
-} EditAutoCompletionConfig;
+};
 
 enum {
 	AutoCompleteCondition_Normal = 0,
@@ -366,19 +366,19 @@ void	EditToggleCommentLine(bool alternative);
 void	EditToggleCommentBlock(bool alternative);
 void	EditInsertScriptShebangLine() noexcept;
 
-typedef enum CallTipType {
+enum CallTipType {
 	CallTipType_None,
 	CallTipType_Notification,
 	CallTipType_ColorHex,
-} CallTipType;
+};
 
-typedef enum ShowCallTip {
+enum ShowCallTip {
 	ShowCallTip_None,
 	ShowCallTip_ColorRGBA,
 	ShowCallTip_ColorARGB,
 	ShowCallTip_ColorBGRA,
 	ShowCallTip_ColorABGR,
-} ShowCallTip;
+};
 
 struct CallTipInfo {
 	ShowCallTip showCallTip;
@@ -431,14 +431,14 @@ enum {
 	EncodingFlag_Invalid = 8,
 };
 
-typedef struct NP2ENCODING {
+struct NP2ENCODING {
 	const UINT uFlags;
 	/*const*/UINT uCodePage;
 	// string format: [normal name + ','] + [lower case parse name + ',']+
 	const char * const pszParseNames;
 	const UINT idsName;
 	LPWSTR wchLabel;
-} NP2ENCODING;
+};
 
 // see UniConversion.h and https://www.unicode.org/faq/utf_bom.html
 #define SURROGATE_LEAD_FIRST		0xD800
@@ -560,7 +560,7 @@ int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, int *enco
 bool IsStringCaseSensitiveW(LPCWSTR pszTextW) noexcept;
 bool IsStringCaseSensitiveA(LPCSTR pszText) noexcept;
 
-//void SciInitThemes(HWND hwnd);
+//void SciInitThemes(HWND hwnd) noexcept;
 
 #define FV_TABWIDTH				1
 #define FV_INDENTWIDTH			2
@@ -573,7 +573,7 @@ bool IsStringCaseSensitiveA(LPCSTR pszText) noexcept;
 #define FV_MaskHasTabIndentWidth	(FV_TABWIDTH | FV_INDENTWIDTH)
 #define FV_MaskHasFileTabSettings	(FV_TABWIDTH | FV_INDENTWIDTH | FV_TABSASSPACES)
 
-typedef struct EditTabSettings {
+struct EditTabSettings {
 	int 	globalTabWidth;
 	int 	globalIndentWidth;
 	bool	globalTabsAsSpaces;
@@ -585,7 +585,7 @@ typedef struct EditTabSettings {
 	int		schemeIndentWidth;
 	bool	schemeTabsAsSpaces;
 	bool	schemeUseGlobalTabSettings;
-} EditTabSettings;
+};
 
 typedef struct FILEVARS {
 	int 	mask;
@@ -614,18 +614,18 @@ inline int FileVars_GetEncoding(LPCFILEVARS lpfv) noexcept {
 	return (lpfv->mask & FV_ENCODING) ? lpfv->iEncoding : CPI_NONE;
 }
 
-typedef enum {
+enum FOLD_ACTION {
 	FOLD_ACTION_FOLD	= SC_FOLDACTION_CONTRACT,
 	FOLD_ACTION_EXPAND	= SC_FOLDACTION_EXPAND,
 	FOLD_ACTION_SNIFF	= SC_FOLDACTION_TOGGLE,
-} FOLD_ACTION;
+};
 
 void FoldExpandRange(Sci_Line lineStart, Sci_Line lineEnd) noexcept;
 void FoldToggleAll(FOLD_ACTION action) noexcept;
-void FoldToggleLevel(int lev, FOLD_ACTION action);
+void FoldToggleLevel(int lev, FOLD_ACTION action) noexcept;
 void FoldToggleCurrentBlock(FOLD_ACTION action) noexcept;
-void FoldToggleCurrentLevel(FOLD_ACTION action);
-void FoldToggleDefault(FOLD_ACTION action);
+void FoldToggleCurrentLevel(FOLD_ACTION action) noexcept;
+void FoldToggleDefault(FOLD_ACTION action) noexcept;
 void FoldClickAt(Sci_Position pos, int mode) noexcept;
 void FoldAltArrow(int key, int mode) noexcept;
 void EditGotoBlock(int menu) noexcept;

@@ -130,12 +130,12 @@ COLORREF	colorNoFilter;
 COLORREF	colorFilter;
 COLORREF	colorCustom[16];
 
-typedef struct WININFO {
+struct WININFO {
 	int x;
 	int y;
 	int cx;
 	int cy;
-} WININFO;
+};
 
 static WININFO wi;
 
@@ -3900,18 +3900,18 @@ static void LoadDpiForWindow() noexcept {
 	fnGetSystemMetricsForDpi = DLLFunction(GetSystemMetricsForDpiSig, user32, "GetSystemMetricsForDpi");
 	fnAdjustWindowRectExForDpi = DLLFunction(AdjustWindowRectExForDpiSig, user32, "AdjustWindowRectExForDpi");
 
-	typedef UINT (WINAPI *GetDpiForSystemSig)(void);
+	using GetDpiForSystemSig = UINT (WINAPI *)(void);
 	GetDpiForSystemSig fnGetDpiForSystem = DLLFunction(GetDpiForSystemSig, user32, "GetDpiForSystem");
 	if (fnGetDpiForSystem) {
 		g_uSystemDPI = fnGetDpiForSystem();
 	} else {
-		HDC hDC = GetDC(NULL);
+		HDC hDC = GetDC(nullptr);
 		g_uSystemDPI = GetDeviceCaps(hDC, LOGPIXELSY);
-		ReleaseDC(NULL, hDC);
+		ReleaseDC(nullptr, hDC);
 	}
 
 	if (!fnGetDpiForWindow) {
-		hShcoreDLL = LoadLibraryExW(L"shcore.dll", NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
+		hShcoreDLL = LoadLibraryExW(L"shcore.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
 		if (hShcoreDLL) {
 			fnGetDpiForMonitor = DLLFunction(GetDpiForMonitorSig, hShcoreDLL, "GetDpiForMonitor");
 		}

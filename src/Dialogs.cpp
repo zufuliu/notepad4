@@ -2186,7 +2186,7 @@ static INT_PTR CALLBACK WarnLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 	return FALSE;
 }
 
-bool WarnLineEndingDlg(HWND hwnd, struct EditFileIOStatus *status) noexcept {
+bool WarnLineEndingDlg(HWND hwnd, EditFileIOStatus *status) noexcept {
 	MessageBeep(MB_ICONEXCLAMATION);
 	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_WARNLINEENDS), hwnd, WarnLineEndingDlgProc, (LPARAM)status);
 	return iResult == IDOK;
@@ -2584,12 +2584,12 @@ bool AutoSaveSettingsDlg(HWND hwnd) noexcept {
 // InfoBoxDlgProc()
 //
 //
-typedef struct INFOBOX {
+struct INFOBOX {
 	LPWSTR lpstrMessage;
 	LPCWSTR lpstrSetting;
 	LPCWSTR idiIcon;
 	bool   bDisableCheckBox;
-} INFOBOX, *LPINFOBOX;
+};
 
 typedef const INFOBOX * LPCINFOBOX;
 
@@ -2716,7 +2716,7 @@ struct SystemIntegrationInfo {
 
 #define NP2RegSubKey_ReplaceNotepad	L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\notepad.exe"
 
-int GetSystemIntegrationStatus(struct SystemIntegrationInfo *info) noexcept {
+int GetSystemIntegrationStatus(SystemIntegrationInfo &info) noexcept {
 	int mask = 0;
 	WCHAR tchModule[MAX_PATH];
 	GetModuleFileName(NULL, tchModule, COUNTOF(tchModule));
@@ -2725,7 +2725,7 @@ int GetSystemIntegrationStatus(struct SystemIntegrationInfo *info) noexcept {
 	HKEY hKey;
 	LSTATUS status = RegOpenKeyEx(HKEY_CLASSES_ROOT, NP2RegSubKey_ContextMenu, 0, KEY_READ, &hKey);
 	if (status == ERROR_SUCCESS) {
-		info->lpszText = Registry_GetDefaultString(hKey);
+		info.lpszText = Registry_GetDefaultString(hKey);
 		HKEY hSubKey;
 		status = RegOpenKeyEx(hKey, L"command", 0, KEY_READ, &hSubKey);
 		if (status == ERROR_SUCCESS) {
@@ -2744,7 +2744,7 @@ int GetSystemIntegrationStatus(struct SystemIntegrationInfo *info) noexcept {
 	// jump list
 	status = RegOpenKeyEx(HKEY_CLASSES_ROOT, NP2RegSubKey_JumpList, 0, KEY_READ, &hKey);
 	if (status == ERROR_SUCCESS) {
-		info->lpszName = Registry_GetString(hKey, L"FriendlyAppName");
+		info.lpszName = Registry_GetString(hKey, L"FriendlyAppName");
 		HKEY hSubKey;
 		status = RegOpenKeyEx(hKey, L"shell\\open\\command", 0, KEY_READ, &hSubKey);
 		if (status == ERROR_SUCCESS) {
@@ -2901,8 +2901,8 @@ INT_PTR CALLBACK SystemIntegrationDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		struct SystemIntegrationInfo info = {NULL, NULL};
-		const int mask = GetSystemIntegrationStatus(&info);
+		SystemIntegrationInfo info{};
+		const int mask = GetSystemIntegrationStatus(info);
 		SetWindowLongPtr(hwnd, DWLP_USER, mask);
 
 		HWND hwndCtl = GetDlgItem(hwnd, IDC_CONTEXT_MENU_TEXT);

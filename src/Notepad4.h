@@ -23,11 +23,11 @@
 #define WC_NOTEPAD4 L"Notepad4"
 #define MY_APPUSERMODELID	L"Notepad4 Text Editor"
 
-typedef enum TripleBoolean {
+enum TripleBoolean {
 	TripleBoolean_False = 0,
 	TripleBoolean_True,
 	TripleBoolean_NotSet,
-} TripleBoolean;
+};
 
 enum {
 	ReadOnlyMode_None = 0,
@@ -35,15 +35,15 @@ enum {
 	ReadOnlyMode_AllFile,
 };
 
-typedef enum FileWatchingMode {
+enum FileWatchingMode {
 	FileWatchingMode_None = 0,
 	FileWatchingMode_ShowMessage,
 	FileWatchingMode_AutoReload,
-} FileWatchingMode;
+};
 
 //==== Data Type for WM_COPYDATA ==============================================
 #define DATA_NOTEPAD4_PARAMS 0xFB10
-typedef struct NP2PARAMS {
+struct NP2PARAMS {
 	bool	flagFileSpecified;
 	bool	flagReadOnlyMode;
 	bool	flagLexerSpecified;
@@ -58,7 +58,7 @@ typedef struct NP2PARAMS {
 	int		flagSetEncoding;
 	int		flagSetEOLMode;
 	WCHAR wchData;
-} NP2PARAMS, *LPNP2PARAMS;
+};
 
 //==== Toolbar Style ==========================================================
 #define WS_TOOLBAR (WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS |				\
@@ -135,29 +135,29 @@ NP2SettingsVersion_V1 = 1,
 NP2SettingsVersion_Current = NP2SettingsVersion_V1,
 };
 
-typedef enum EscFunction {
+enum EscFunction {
 	EscFunction_None = 0,
 	EscFunction_Minimize,
 	EscFunction_Exit,
-} EscFunction;
+};
 
-typedef enum TitlePathNameFormat {
+enum TitlePathNameFormat {
 	TitlePathNameFormat_NameOnly = 0,
 	TitlePathNameFormat_NameFirst,
 	TitlePathNameFormat_FullPath,
-} TitlePathNameFormat;
+};
 
-typedef enum PrintHeaderOption {
+enum PrintHeaderOption {
 	PrintHeaderOption_FilenameAndDateTime = 0,
 	PrintHeaderOption_FilenameAndDate,
 	PrintHeaderOption_Filename,
 	PrintHeaderOption_LeaveBlank,
-} PrintHeaderOption;
+};
 
-typedef enum PrintFooterOption {
+enum PrintFooterOption {
 	PrintFooterOption_PageNumber = 0,
 	PrintFooterOption_LeaveBlank,
-} PrintFooterOption;
+};
 
 #define INI_SECTION_NAME_NOTEPAD4				L"Notepad4"
 #define INI_SECTION_NAME_SETTINGS				L"Settings"
@@ -247,23 +247,23 @@ struct EditFileIOStatus {
 	Sci_Line linesCount[3];	// load output: CR+LF, LF, CR
 };
 
-typedef enum FileLoadFlag {
+enum FileLoadFlag {
 	FileLoadFlag_Default = 0,
 	FileLoadFlag_DontSave = 1,
 	FileLoadFlag_New = 2,
 	FileLoadFlag_Reload = 4,
-} FileLoadFlag;
+};
 
-typedef enum FileSaveFlag {
+enum FileSaveFlag {
 	FileSaveFlag_Default = 0,
 	FileSaveFlag_SaveAlways = 1,
 	FileSaveFlag_Ask = 2,
 	FileSaveFlag_SaveAs = 4,
 	FileSaveFlag_SaveCopy = 8,
 	FileSaveFlag_EndSession = 16,
-} FileSaveFlag;
+};
 
-bool FileIO(bool fLoad, LPWSTR pszFile, int flag, EditFileIOStatus *status);
+bool FileIO(bool fLoad, LPWSTR pszFile, int flag, EditFileIOStatus &status);
 bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile);
 bool FileSave(FileSaveFlag saveFlag);
 BOOL OpenFileDlg(LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) noexcept;

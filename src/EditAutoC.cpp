@@ -28,7 +28,7 @@ struct IUnknown;
 // memory buffer
 struct WordListBuffer;
 struct WordListBuffer {
-	struct WordListBuffer *next;
+	WordListBuffer *next;
 };
 
 struct WordNode;
@@ -39,7 +39,7 @@ struct WordList {
 	uint32_t (*WL_SortKeyFunc)(const void *, uint32_t);
 #endif
 
-	struct WordNode *pListHead;
+	WordNode *pListHead;
 	LPCSTR pWordStart;
 	UINT iStartLen;
 #if NP2_AUTOC_CACHE_SORT_KEY
@@ -51,7 +51,7 @@ struct WordList {
 
 	UINT offset;
 	UINT capacity;
-	struct WordListBuffer *buffer;
+	WordListBuffer *buffer;
 };
 
 // TODO: replace _stricmp() and _strnicmp() with other functions
@@ -116,10 +116,10 @@ uint32_t WordList_SortKeyCase(const void *pWord, uint32_t len) noexcept {
 // Tree
 struct WordNode {
 	union {
-		struct WordNode *link[2];
+		WordNode *link[2];
 		struct {
-			struct WordNode *left;
-			struct WordNode *right;
+			WordNode *left;
+			WordNode *right;
 		};
 	};
 #if NP2_AUTOC_USE_WORD_POINTER
@@ -134,7 +134,7 @@ struct WordNode {
 
 #define NP2_TREE_HEIGHT_LIMIT	32
 // store word right after the node as most word are short.
-#define WordNode_GetWord(node)		((char *)(node) + sizeof(struct WordNode))
+#define WordNode_GetWord(node)		((char *)(node) + sizeof(WordNode))
 // TODO: since the tree is sorted, nodes greater than some level can be deleted to reduce total words.
 // or only limit word count in WordList_GetList().
 
@@ -142,35 +142,35 @@ struct WordNode {
 // see also https://en.wikipedia.org/wiki/AA_tree
 #define aa_tree_skew(t) \
 	if ((t)->level && (t)->left && (t)->level == (t)->left->level) {\
-		struct WordNode *save = (t)->left;					\
+		WordNode *save = (t)->left;					\
 		(t)->left = save->right;							\
 		save->right = (t);									\
 		(t) = save;											\
 	}
 #define aa_tree_split(t) \
 	if ((t)->level && (t)->right && (t)->right->right && (t)->level == (t)->right->right->level) {\
-		struct WordNode *save = (t)->right;					\
+		WordNode *save = (t)->right;					\
 		(t)->right = save->left;							\
 		save->left = (t);									\
 		(t) = save;											\
 		++(t)->level;										\
 	}
 
-#define WordList_AddNode(pWList)	((struct WordNode *)((char *)((pWList)->buffer) + (pWList)->offset))
+#define WordList_AddNode(pWList)	((WordNode *)((char *)((pWList)->buffer) + (pWList)->offset))
 static inline void WordList_AddBuffer(struct WordList *pWList) {
-	struct WordListBuffer *buffer = (struct WordListBuffer *)NP2HeapAlloc(pWList->capacity);
+	WordListBuffer *buffer = static_cast<WordListBuffer *>(NP2HeapAlloc(pWList->capacity));
 	buffer->next = pWList->buffer;
-	pWList->offset = NP2_align_up(sizeof(struct WordListBuffer), alignof(struct WordNode));
+	pWList->offset = NP2_align_up(sizeof(WordListBuffer), alignof(WordNode));
 	pWList->buffer = buffer;
 }
 
 void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, UINT len) {
-	struct WordNode *root = pWList->pListHead;
+	WordNode *root = pWList->pListHead;
 #if NP2_AUTOC_CACHE_SORT_KEY
 	const UINT sortKey = (pWList->iStartLen > NP2_AUTOC_SORT_KEY_LENGTH) ? 0 : pWList->WL_SortKeyFunc(pWord, len);
 #endif
 	if (root == NULL) {
-		struct WordNode *node = WordList_AddNode(pWList);
+		WordNode *node = WordList_AddNode(pWList);
 		char *word = WordNode_GetWord(node);
 		memcpy(word, pWord, len);
 #if NP2_AUTOC_USE_WORD_POINTER
@@ -183,8 +183,8 @@ void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, UINT len) {
 		node->level = 1;
 		root = node;
 	} else {
-		struct WordNode *iter = root;
-		struct WordNode *path[NP2_TREE_HEIGHT_LIMIT] = { NULL };
+		WordNode *iter = root;
+		WordNode *path[NP2_TREE_HEIGHT_LIMIT] = { NULL };
 		int top = 0;
 		int dir;
 
@@ -209,12 +209,12 @@ void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, UINT len) {
 			iter = iter->link[dir];
 		}
 
-		if (pWList->capacity < pWList->offset + len + 1 + sizeof(struct WordNode)) {
+		if (pWList->capacity < pWList->offset + len + 1 + sizeof(WordNode)) {
 			pWList->capacity <<= 1;
 			WordList_AddBuffer(pWList);
 		}
 
-		struct WordNode *node = WordList_AddNode(pWList);
+		WordNode *node = WordList_AddNode(pWList);
 		char *word = WordNode_GetWord(node);
 		memcpy(word, pWord, len);
 #if NP2_AUTOC_USE_WORD_POINTER
@@ -247,21 +247,21 @@ void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, UINT len) {
 	pWList->pListHead = root;
 	pWList->nWordCount++;
 	pWList->nTotalLen += len + 1;
-	pWList->offset += NP2_align_up(len + 1 + sizeof(struct WordNode), alignof(struct WordNode));
+	pWList->offset += NP2_align_up(len + 1 + sizeof(WordNode), alignof(WordNode));
 }
 
 void WordList_Free(struct WordList *pWList) {
-	struct WordListBuffer *buffer = pWList->buffer;
+	WordListBuffer *buffer = pWList->buffer;
 	while (buffer) {
-		struct WordListBuffer * const next = buffer->next;
+		WordListBuffer * const next = buffer->next;
 		NP2HeapFree(buffer);
 		buffer = next;
 	}
 }
 
 char* WordList_GetList(struct WordList *pWList) {
-	struct WordNode *root = pWList->pListHead;
-	struct WordNode *path[NP2_TREE_HEIGHT_LIMIT] = { NULL };
+	WordNode *root = pWList->pListHead;
+	WordNode *path[NP2_TREE_HEIGHT_LIMIT] = { NULL };
 	int top = 0;
 	char *buf = (char *)NP2HeapAlloc(pWList->nTotalLen + 1);// additional separator
 	char * const pList = buf;
@@ -719,7 +719,7 @@ extern EDITLEXER lexPython;
 extern EDITLEXER lexVBScript;
 extern HANDLE idleTaskTimer;
 
-typedef enum HtmlTextBlock {
+enum HtmlTextBlock {
 	HtmlTextBlock_Tag,
 	HtmlTextBlock_CDATA,
 	HtmlTextBlock_SGML,
@@ -728,7 +728,7 @@ typedef enum HtmlTextBlock {
 	HtmlTextBlock_Python,
 	HtmlTextBlock_PHP,
 	HtmlTextBlock_CSS,
-} HtmlTextBlock;
+};
 
 static HtmlTextBlock GetCurrentHtmlTextBlockEx(int iLexer, int iCurrentStyle) noexcept {
 	if (iLexer == SCLEX_PHPSCRIPT) {
@@ -807,7 +807,7 @@ static void AutoC_AddDocWord(struct WordList *pWList, const uint32_t ignoredStyl
 
 	const Sci_Position iCurrentPos = SciCall_GetCurrentPos() - iRootLen - (prefix ? 1 : 0);
 	const Sci_Position iDocLen = SciCall_GetLength();
-	struct Sci_TextToFindFull ft = { { 0, iDocLen }, pFind, { 0, 0 } };
+	Sci_TextToFindFull ft = { { 0, iDocLen }, pFind, { 0, 0 } };
 
 	Sci_Position iPosFind = SciCall_FindTextFull(findFlag, &ft);
 	HANDLE timer = idleTaskTimer;
@@ -867,7 +867,7 @@ static void AutoC_AddDocWord(struct WordList *pWList, const uint32_t ignoredStyl
 				char wordBuf[NP2_AUTOC_WORD_BUFFER_SIZE];
 				char *pWord = wordBuf + 16; // avoid overlap in memcpy()
 				bool bChanged = false;
-				const struct Sci_TextRangeFull tr = { { iPosFind, min(iPosFind + NP2_AUTOC_MAX_WORD_LENGTH, wordEnd) }, pWord };
+				const Sci_TextRangeFull tr = { { iPosFind, min(iPosFind + NP2_AUTOC_MAX_WORD_LENGTH, wordEnd) }, pWord };
 				int wordLength = (int)SciCall_GetTextRangeFull(&tr);
 
 				const Sci_Position before = SciCall_PositionBefore(iPosFind);
@@ -1015,11 +1015,11 @@ static void AutoC_AddKeyword(struct WordList *pWList, int iCurrentStyle) {
 	}
 }
 
-typedef enum AddWordResult {
+enum AddWordResult {
 	AddWordResult_None,
 	AddWordResult_Finish,
 	AddWordResult_IgnoreLexer,
-} AddWordResult;
+};
 
 static AddWordResult AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int iPrevStyle, int ch, int chPrev) {
 #if NP2_ENABLE_LATEX_LIKE_EMOJI_INPUT
@@ -1581,7 +1581,7 @@ static bool EditCompleteWordCore(int iCondition, bool autoInsert) {
 		pRoot = (char *)NP2HeapAlloc(iCurrentPos - iStartWordPos + 1);
 	}
 
-	const struct Sci_TextRangeFull tr = { { iStartWordPos, iCurrentPos }, pRoot };
+	const Sci_TextRangeFull tr = { { iStartWordPos, iCurrentPos }, pRoot };
 	SciCall_GetTextRangeFull(&tr);
 	iRootLen = (int)strlen(pRoot);
 
@@ -1948,7 +1948,7 @@ void EditAutoCloseXMLTag(void) {
 	}
 
 	if (shouldAutoClose) {
-		const struct Sci_TextRangeFull tr = { { iStartPos, iCurPos }, tchBuf };
+		const Sci_TextRangeFull tr = { { iStartPos, iCurPos }, tchBuf };
 		SciCall_GetTextRangeFull(&tr);
 
 		if (tchBuf[iSize - 2] != '/') {
@@ -2004,11 +2004,11 @@ void EditAutoCloseXMLTag(void) {
 	}
 }
 
-typedef enum AutoIndentType {
+enum AutoIndentType {
 	AutoIndentType_None,
 	AutoIndentType_IndentOnly,
 	AutoIndentType_IndentAndClose,
-} AutoIndentType;
+};
 
 static const char *EditKeywordIndent(LPCEDITLEXER pLex, const char *head, AutoIndentType *indent) noexcept {
 	char word[16] = "";
@@ -2603,13 +2603,13 @@ static bool EditUncommentBlock(LPCWSTR pwszOpen, LPCWSTR pwszClose, bool newLine
 		WideCharToMultiByte(cpEdit, 0, pwszClose, -1, mszClose, COUNTOF(mszClose), NULL, NULL);
 
 		// find inner most comment block for current selection
-		struct Sci_TextToFindFull ttfClose = { { iSelStart, iEndPos }, mszClose, { 0, 0 } };
+		Sci_TextToFindFull ttfClose = { { iSelStart, iEndPos }, mszClose, { 0, 0 } };
 		iEndPos = SciCall_FindTextFull(SCFIND_NONE, &ttfClose);
 		if (iEndPos < 0) {
 			return false;
 		}
 
-		struct Sci_TextToFindFull ttfOpen = { { iSelEnd, iStartPos + 1 }, mszOpen, { 0, 0 } };
+		Sci_TextToFindFull ttfOpen = { { iSelEnd, iStartPos + 1 }, mszOpen, { 0, 0 } };
 		iStartPos = SciCall_FindTextFull(SCFIND_NONE, &ttfOpen);
 		if (iStartPos < 0 || ttfOpen.chrgText.cpMax > iEndPos) {
 			return false;

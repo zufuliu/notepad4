@@ -244,18 +244,18 @@ inline void IniSetBoolEx(LPCWSTR lpSection, LPCWSTR lpName, bool b, bool bDefaul
 	WritePrivateProfileSection(lpSection, lpBuf, szIniFile)
 
 struct IniKeyValueNode;
-typedef struct IniKeyValueNode {
-	struct IniKeyValueNode *next;
+struct IniKeyValueNode {
+	IniKeyValueNode *next;
 	UINT hash;
 	LPCWSTR key;
 	LPCWSTR value;
-} IniKeyValueNode;
+};
 
 // https://en.wikipedia.org/wiki/Sentinel_node
 // https://en.wikipedia.org/wiki/Sentinel_value
 #define IniSectionImplUseSentinelNode	1
 
-typedef struct IniSection {
+struct IniSection {
 	UINT count;
 	UINT capacity;
 	IniKeyValueNode *head;
@@ -263,7 +263,7 @@ typedef struct IniSection {
 	IniKeyValueNode *sentinel;
 #endif
 	IniKeyValueNode *nodeList;
-} IniSection;
+};
 
 NP2_inline void IniSectionInit(IniSection *section, UINT capacity) {
 	section->count = 0;
@@ -327,9 +327,9 @@ NP2_inline void IniSectionGetStringEx(IniSection *section, LPCWSTR key, LPCWSTR 
 	IniSectionGetStringImpl(section, key, 0, lpDefault, lpReturnedString, cchReturnedString);
 }
 
-typedef struct IniSectionOnSave {
+struct IniSectionOnSave {
 	LPWSTR next;
-} IniSectionOnSave;
+};
 
 void IniSectionSetString(IniSectionOnSave *section, LPCWSTR key, LPCWSTR value);
 
@@ -390,11 +390,11 @@ inline void EndWaitCursor() noexcept {
 	DestroyCursor(SetCursor(LoadCursor(nullptr, IDC_ARROW)));
 }
 
-typedef struct BackgroundWorker {
+struct BackgroundWorker {
 	HWND hwnd;
 	HANDLE eventCancel;
 	HANDLE workerThread;
-} BackgroundWorker;
+};
 
 void BackgroundWorker_Init(BackgroundWorker *worker, HWND hwnd);
 void BackgroundWorker_Cancel(BackgroundWorker *worker);

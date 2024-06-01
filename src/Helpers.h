@@ -195,11 +195,11 @@ int ParseCommaList(LPCWSTR str, int result[], int count) noexcept;
 int ParseCommaList64(LPCWSTR str, int64_t result[], int count) noexcept;
 LPCSTR GetCurrentLogTime() noexcept;
 
-typedef struct StopWatch {
+struct StopWatch {
 	LARGE_INTEGER freq; // not changed after system boot
 	LARGE_INTEGER begin;
 	LARGE_INTEGER end;
-} StopWatch;
+};
 
 #define StopWatch_Start(watch) do { \
 		QueryPerformanceFrequency(&(watch).freq);	\
@@ -432,18 +432,18 @@ inline void IniSetBoolEx(LPCWSTR lpSection, LPCWSTR lpName, bool b, bool bDefaul
 	WritePrivateProfileSection(lpSection, lpBuf, szIniFile)
 
 struct IniKeyValueNode;
-typedef struct IniKeyValueNode {
-	struct IniKeyValueNode *next;
+struct IniKeyValueNode {
+	IniKeyValueNode *next;
 	UINT hash;
 	LPCWSTR key;
 	LPCWSTR value;
-} IniKeyValueNode;
+};
 
 // https://en.wikipedia.org/wiki/Sentinel_node
 // https://en.wikipedia.org/wiki/Sentinel_value
 #define IniSectionImplUseSentinelNode	1
 
-typedef struct IniSection {
+struct IniSection {
 	UINT count;
 	UINT capacity;
 	IniKeyValueNode *head;
@@ -451,7 +451,7 @@ typedef struct IniSection {
 	IniKeyValueNode *sentinel;
 #endif
 	IniKeyValueNode *nodeList;
-} IniSection;
+};
 
 NP2_inline void IniSectionInit(IniSection *section, UINT capacity) {
 	section->count = 0;
@@ -516,9 +516,9 @@ NP2_inline void IniSectionGetStringEx(IniSection *section, LPCWSTR key, LPCWSTR 
 	IniSectionGetStringImpl(section, key, 0, lpDefault, lpReturnedString, cchReturnedString);
 }
 
-typedef struct IniSectionOnSave {
+struct IniSectionOnSave {
 	LPWSTR next;
-} IniSectionOnSave;
+};
 
 void IniSectionSetString(IniSectionOnSave *section, LPCWSTR key, LPCWSTR value);
 void IniSectionSetQuotedString(IniSectionOnSave *section, LPCWSTR key, LPCWSTR value);
@@ -589,11 +589,11 @@ NP2_inline HANDLE WaitableTimer_New(DWORD milliseconds) {
 #define WaitableTimer_Continue(timer)	\
 	(WaitForSingleObject((timer), 0) != WAIT_OBJECT_0)
 
-typedef struct BackgroundWorker {
+struct BackgroundWorker {
 	HWND hwnd;
 	HANDLE eventCancel;
 	HANDLE workerThread;
-} BackgroundWorker;
+};
 
 void BackgroundWorker_Init(BackgroundWorker *worker, HWND hwnd);
 void BackgroundWorker_Cancel(BackgroundWorker *worker);
@@ -843,13 +843,13 @@ void MRU_Save(LPCMRULIST pmru);
 void MRU_MergeSave(LPMRULIST pmru, bool keep);
 void MRU_AddToCombobox(LPCMRULIST pmru, HWND hwnd);
 
-typedef struct BitmapCache {
+struct BitmapCache {
 	UINT count;
 	UINT used;
 	bool invalid;
 	int iconIndex[MRU_MAXITEMS];
 	HBITMAP items[MRU_MAXITEMS];
-} BitmapCache;
+};
 
 inline void BitmapCache_Invalidate(BitmapCache *cache) noexcept {
 	cache->invalid = true; // mark all cache as invalid

@@ -34,12 +34,12 @@ static WCHAR wchANSI[16];
 static WCHAR wchOEM [16];
 static LPWSTR g_AllEncodingLabel = NULL;
 
-typedef struct NP2EncodingGroup {
+struct NP2EncodingGroup {
 	bool bMapped;		// map code page to index in mEncoding array.
 	const UINT idsName;	// resource id for group name
 	// presorted encoding list, code pages before been mapped to index.
 	int encodings[10];	// use fixed array to simplify code
-} NP2EncodingGroup;
+};
 
 // https://docs.microsoft.com/en-us/windows/desktop/Intl/code-page-identifiers
 // https://www.iana.org/assignments/character-sets/character-sets.xhtml
@@ -1399,9 +1399,9 @@ bool IsUTF8(const char *pTest, DWORD nLength) {
 	};
 
 	/* state table */
-	typedef enum {
+	enum utf8_state{
 		kSTART = 0, kA, kB, kC, kD, kE, kF, kG, kERROR, kNumOfStates
-	} utf8_state;
+	};
 
 	static const uint8_t state_table[] = {
 		/*							   kSTART, kA,     kB,     kC,     kD,     kE,     kF,     kG,     kERROR */

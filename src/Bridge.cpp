@@ -314,7 +314,7 @@ bool EditPrint(HWND hwnd, LPCWSTR pszDocTitle, BOOL bDefault) noexcept {
 	}
 
 	// We must substract the physical margins from the printable area
-	struct Sci_RangeToFormatFull frPrint;
+	Sci_RangeToFormatFull frPrint;
 	frPrint.hdc = hdc;
 	frPrint.hdcTarget = hdc;
 	frPrint.rc.left		= rectMargins.left - rectPhysMargins.left;

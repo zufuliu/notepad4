@@ -87,12 +87,12 @@ static HMODULE hELSCoreDLL = NULL;
 #if NP2_DYNAMIC_LOAD_wcsftime
 static HMODULE hCrtDLL = NULL;
 
-typedef size_t (__cdecl *wcsftimeSig)(wchar_t *str, size_t count, const wchar_t *format, const struct tm *time);
+using wcsftimeSig = size_t (__cdecl *)(wchar_t *str, size_t count, const wchar_t *format, const struct tm *time);
 wcsftimeSig GetFunctionPointer_wcsftime(void) noexcept {
-	if (hCrtDLL == NULL) {
-		hCrtDLL = LoadLibraryExW(L"ucrtbase.dll", NULL, kSystemLibraryLoadFlags);
-		if (hCrtDLL == NULL) {
-			hCrtDLL = LoadLibraryExW(L"msvcrt.dll", NULL, kSystemLibraryLoadFlags);
+	if (hCrtDLL == nullptr) {
+		hCrtDLL = LoadLibraryExW(L"ucrtbase.dll", nullptr, kSystemLibraryLoadFlags);
+		if (hCrtDLL == nullptr) {
+			hCrtDLL = LoadLibraryExW(L"msvcrt.dll", nullptr, kSystemLibraryLoadFlags);
 		}
 	}
 	return DLLFunction(wcsftimeSig, hCrtDLL, "wcsftime");
@@ -105,7 +105,7 @@ void Edit_ReleaseResources(void) noexcept {
 	NP2HeapFree(wchPrefixLines);
 	NP2HeapFree(wchAppendLines);
 #if NP2_DYNAMIC_LOAD_ELSCORE_DLL
-	if (hELSCoreDLL != NULL) {
+	if (hELSCoreDLL != nullptr) {
 		FreeLibrary(hELSCoreDLL);
 	}
 #endif
@@ -472,7 +472,7 @@ bool EditCopyAppend(HWND hwnd) noexcept {
 //
 // EditDetectEOLMode()
 //
-void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) noexcept {
+void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus &status) noexcept {
 	/* '\r' and '\n' is not reused (e.g. as trailing byte in DBCS) by any known encoding,
 	it's safe to check whole data byte by byte.*/
 
@@ -792,7 +792,7 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) no
 	const size_t linesMax = max(max(lineCountCRLF, lineCountCR), lineCountLF);
 	// values must kept in same order as SC_EOL_CRLF, SC_EOL_CR, SC_EOL_LF
 	const size_t linesCount[3] = { lineCountCRLF, lineCountCR, lineCountLF };
-	int iEOLMode = status->iEOLMode;
+	int iEOLMode = status.iEOLMode;
 	if (linesMax != linesCount[iEOLMode]) {
 		if (linesMax == lineCountCRLF) {
 			iEOLMode = SC_EOL_CRLF;
@@ -809,12 +809,12 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) no
 	printf("%s CR+LF:%u, LF: %u, CR: %u\n", __func__, (UINT)lineCountCRLF, (UINT)lineCountLF, (UINT)lineCountCR);
 #endif
 
-	status->iEOLMode = iEOLMode;
-	status->bInconsistent = ((!!lineCountCRLF) + (!!lineCountCR) + (!!lineCountLF)) > 1;
-	status->totalLineCount = lineCountCRLF + lineCountCR + lineCountLF + 1;
-	status->linesCount[0] = lineCountCRLF;
-	status->linesCount[1] = lineCountLF;
-	status->linesCount[2] = lineCountCR;
+	status.iEOLMode = iEOLMode;
+	status.bInconsistent = ((!!lineCountCRLF) + (!!lineCountCR) + (!!lineCountLF)) > 1;
+	status.totalLineCount = lineCountCRLF + lineCountCR + lineCountLF + 1;
+	status.linesCount[0] = lineCountCRLF;
+	status.linesCount[1] = lineCountLF;
+	status.linesCount[2] = lineCountCR;
 }
 
 void EditDetectIndentation(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) noexcept {
@@ -966,7 +966,7 @@ labelStart:
 //
 // EditLoadFile()
 //
-bool EditLoadFile(LPWSTR pszFile, EditFileIOStatus *status) {
+bool EditLoadFile(LPWSTR pszFile, EditFileIOStatus &status) {
 	HANDLE hFile = CreateFile(pszFile,
 					   GENERIC_READ,
 					   FILE_SHARE_READ | FILE_SHARE_WRITE,
@@ -1022,7 +1022,7 @@ bool EditLoadFile(LPWSTR pszFile, EditFileIOStatus *status) {
 
 	if (fileSize.QuadPart > maxFileSize) {
 		CloseHandle(hFile);
-		status->bFileTooBig = true;
+		status.bFileTooBig = true;
 		WCHAR tchDocSize[32];
 		WCHAR tchMaxSize[32];
 		WCHAR tchDocBytes[32];
@@ -1046,23 +1046,23 @@ bool EditLoadFile(LPWSTR pszFile, EditFileIOStatus *status) {
 		return false;
 	}
 
-	status->iEOLMode = GetScintillaEOLMode(iDefaultEOLMode);
-	status->bInconsistent = false;
-	status->totalLineCount = 1;
+	status.iEOLMode = GetScintillaEOLMode(iDefaultEOLMode);
+	status.bInconsistent = false;
+	status.totalLineCount = 1;
 
 	int encodingFlag = EncodingFlag_None;
 	int iEncoding = EditDetermineEncoding(pszFile, lpData, cbData, &encodingFlag);
 	if (iEncoding == CPI_DEFAULT && encodingFlag == EncodingFlag_UTF7) {
 		iEncoding = Encoding_GetAnsiIndex();
 	}
-	status->iEncoding = iEncoding;
-	status->bBinaryFile = encodingFlag & EncodingFlag_Binary;
+	status.iEncoding = iEncoding;
+	status.bBinaryFile = encodingFlag & EncodingFlag_Binary;
 	UINT uFlags = mEncoding[iEncoding].uFlags;
 
 	if (cbData == 0) {
 		SciCall_SetCodePage((uFlags & NCP_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8);
 		EditSetEmptyText();
-		SciCall_SetEOLMode(status->iEOLMode);
+		SciCall_SetEOLMode(status.iEOLMode);
 		NP2HeapFree(lpData);
 		return true;
 	}
@@ -1081,7 +1081,7 @@ bool EditLoadFile(LPWSTR pszFile, EditFileIOStatus *status) {
 		if (cbData == 0) {
 			const UINT legacyACP = mEncoding[CPI_DEFAULT].uCodePage;
 			cbData = WideCharToMultiByte(legacyACP, 0, pszTextW, -1, lpDataUTF8, (int)NP2HeapSize(lpDataUTF8), NULL, NULL);
-			status->bUnicodeErr = true;
+			status.bUnicodeErr = true;
 		}
 		if (cbData != 0) {
 			// remove the NULL terminator.
@@ -1116,7 +1116,7 @@ bool EditLoadFile(LPWSTR pszFile, EditFileIOStatus *status) {
 			lpData = result;
 			cbData = back;
 			uFlags = 0;
-			status->iEncoding = Encoding_GetIndex(legacyACP);
+			status.iEncoding = Encoding_GetIndex(legacyACP);
 		}
 	}
 
@@ -1125,7 +1125,7 @@ bool EditLoadFile(LPWSTR pszFile, EditFileIOStatus *status) {
 		EditDetectIndentation(lpDataUTF8, cbData, &fvCurFile);
 	}
 	SciCall_SetCodePage((uFlags & NCP_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8);
-	EditSetNewText(lpDataUTF8, cbData, status->totalLineCount);
+	EditSetNewText(lpDataUTF8, cbData, status.totalLineCount);
 
 	NP2HeapFree(lpData);
 	return true;
@@ -1135,7 +1135,7 @@ bool EditLoadFile(LPWSTR pszFile, EditFileIOStatus *status) {
 //
 // EditSaveFile()
 //
-bool EditSaveFile(HWND hwnd, LPCWSTR pszFile, int saveFlag, EditFileIOStatus *status) noexcept {
+bool EditSaveFile(HWND hwnd, LPCWSTR pszFile, int saveFlag, EditFileIOStatus &status) noexcept {
 	HANDLE hFile = CreateFile(pszFile,
 					   GENERIC_READ | GENERIC_WRITE,
 					   FILE_SHARE_READ | FILE_SHARE_WRITE,
@@ -1180,7 +1180,7 @@ bool EditSaveFile(HWND hwnd, LPCWSTR pszFile, int saveFlag, EditFileIOStatus *st
 	// get text
 	DWORD cbData = (DWORD)SciCall_GetLength();
 	char *lpData = NULL;
-	int iEncoding = status->iEncoding;
+	int iEncoding = status.iEncoding;
 	UINT uFlags = mEncoding[iEncoding].uFlags;
 
 	if (cbData == 0) {
@@ -1287,7 +1287,7 @@ bool EditSaveFile(HWND hwnd, LPCWSTR pszFile, int saveFlag, EditFileIOStatus *st
 				dwLastIOError = GetLastError();
 			} else {
 				bWriteSuccess = FALSE;
-				status->bCancelDataLoss = true;
+				status.bCancelDataLoss = true;
 			}
 		} else {
 			SetEndOfFile(hFile);
@@ -1339,7 +1339,7 @@ static inline char *EditGetTextRange(Sci_Position iStartPos, Sci_Position iEndPo
 	}
 
 	char *mszBuf = (char *)NP2HeapAlloc(len + 1);
-	const struct Sci_TextRangeFull tr = { { iStartPos, iEndPos }, mszBuf };
+	const Sci_TextRangeFull tr = { { iStartPos, iEndPos }, mszBuf };
 	SciCall_GetTextRangeFull(&tr);
 	return mszBuf;
 }
@@ -1425,10 +1425,10 @@ static const GUID WIN10_ELS_GUID_TRANSLITERATION_HANGUL_DECOMPOSITION =
 
 static int TransliterateText(const GUID *pGuid, LPCWSTR pszTextW, int cchTextW, LPWSTR *pszMappedW) noexcept {
 #if NP2_DYNAMIC_LOAD_ELSCORE_DLL
-typedef HRESULT (WINAPI *MappingGetServicesSig)(PMAPPING_ENUM_OPTIONS pOptions, PMAPPING_SERVICE_INFO *prgServices, DWORD *pdwServicesCount);
-typedef HRESULT (WINAPI *MappingFreeServicesSig)(PMAPPING_SERVICE_INFO pServiceInfo);
-typedef HRESULT (WINAPI *MappingRecognizeTextSig)(PMAPPING_SERVICE_INFO pServiceInfo, LPCWSTR pszText, DWORD dwLength, DWORD dwIndex, PMAPPING_OPTIONS pOptions, PMAPPING_PROPERTY_BAG pbag);
-typedef HRESULT (WINAPI *MappingFreePropertyBagSig)(PMAPPING_PROPERTY_BAG pBag);
+using MappingGetServicesSig = HRESULT (WINAPI *)(PMAPPING_ENUM_OPTIONS pOptions, PMAPPING_SERVICE_INFO *prgServices, DWORD *pdwServicesCount);
+using MappingFreeServicesSig = HRESULT (WINAPI *)(PMAPPING_SERVICE_INFO pServiceInfo);
+using MappingRecognizeTextSig = HRESULT (WINAPI *)(PMAPPING_SERVICE_INFO pServiceInfo, LPCWSTR pszText, DWORD dwLength, DWORD dwIndex, PMAPPING_OPTIONS pOptions, PMAPPING_PROPERTY_BAG pbag);
+using MappingFreePropertyBagSig = HRESULT (WINAPI *)(PMAPPING_PROPERTY_BAG pBag);
 
 	static int triedLoadingELSCore = 0;
 	static MappingGetServicesSig pfnMappingGetServices;
@@ -2547,7 +2547,7 @@ void EditTabsToSpaces(int nTabWidth, bool bOnlyIndentingWS) noexcept {
 	char *pszText = (char *)NP2HeapAlloc(iSelCount + 1);
 	LPWSTR pszTextW = (LPWSTR)NP2HeapAlloc((iSelCount + 1) * sizeof(WCHAR));
 
-	const struct Sci_TextRangeFull tr = { { iSelStart, iSelEnd }, pszText};
+	const Sci_TextRangeFull tr = { { iSelStart, iSelEnd }, pszText};
 	SciCall_GetTextRangeFull(&tr);
 
 	const UINT cpEdit = SciCall_GetCodePage();
@@ -2616,7 +2616,7 @@ void EditSpacesToTabs(int nTabWidth, bool bOnlyIndentingWS) noexcept {
 	char *pszText = (char *)NP2HeapAlloc(iSelCount + 1);
 	LPWSTR pszTextW = (LPWSTR)NP2HeapAlloc((iSelCount + 1) * sizeof(WCHAR));
 
-	const struct Sci_TextRangeFull tr = { { iSelStart, iSelEnd }, pszText };
+	const Sci_TextRangeFull tr = { { iSelStart, iSelEnd }, pszText };
 	SciCall_GetTextRangeFull(&tr);
 
 	const UINT cpEdit = SciCall_GetCodePage();
@@ -2873,7 +2873,7 @@ enum {
 	EditModifyLinesSubstitution_NumberZero = 'I',
 };
 
-typedef struct EditModifyLinesText {
+struct EditModifyLinesText {
 	int length;
 	int lineCount;
 	uint8_t substitution;
@@ -2882,7 +2882,7 @@ typedef struct EditModifyLinesText {
 	Sci_Line number;
 	char *mszPrefix;
 	const char *mszSuffix;
-} EditModifyLinesText;
+};
 
 static void EditModifyLinesText_Parse(EditModifyLinesText *text, LPCWSTR pszTextW, Sci_Line iLineStart, Sci_Line iLineEnd, UINT cpEdit, int iEOLMode) {
 	memset(text, 0, sizeof(EditModifyLinesText));
@@ -3419,7 +3419,7 @@ void EditToggleLineComments(LPCWSTR pwszComment, int commentFlag) noexcept {
 		const Sci_Position iLineEndPos = SciCall_GetLineEndPosition(iLine);
 
 		char tchBuf[32] = "";
-		const struct Sci_TextRangeFull tr = { { iIndentPos, min(iIndentPos + 31, iLineEndPos) }, tchBuf };
+		const Sci_TextRangeFull tr = { { iIndentPos, min(iIndentPos + 31, iLineEndPos) }, tchBuf };
 		SciCall_GetTextRangeFull(&tr);
 
 		if (StrStartsWithCaseEx(tchBuf, mszComment, cchComment) && (commentEnd != ' ' || (uint8_t)(tchBuf[cchComment]) <= ' ')) {
@@ -3938,7 +3938,7 @@ void EditWrapToColumn(int nColumn/*, int nTabWidth*/) noexcept {
 	char *pszText = (char *)NP2HeapAlloc(iSelCount + 1 + 2);
 	LPWSTR pszTextW = (LPWSTR)NP2HeapAlloc((iSelCount + 1 + 2) * sizeof(WCHAR));
 
-	const struct Sci_TextRangeFull tr = { { iSelStart, iSelEnd }, pszText };
+	const Sci_TextRangeFull tr = { { iSelStart, iSelEnd }, pszText };
 	SciCall_GetTextRangeFull(&tr);
 
 	const UINT cpEdit = SciCall_GetCodePage();
@@ -4066,7 +4066,7 @@ void EditJoinLinesEx() noexcept {
 	char *pszText = (char *)NP2HeapAlloc(iSelCount + 1 + 2);
 	char *pszJoin = (char *)NP2HeapAlloc(NP2HeapSize(pszText));
 
-	const struct Sci_TextRangeFull tr = { { iSelStart, iSelEnd }, pszText };
+	const Sci_TextRangeFull tr = { { iSelStart, iSelEnd }, pszText };
 	SciCall_GetTextRangeFull(&tr);
 
 	const unsigned iEOLMode = SciCall_GetEOLMode();
@@ -4115,13 +4115,13 @@ void EditJoinLinesEx() noexcept {
 //
 // EditSortLines()
 //
-typedef struct SORTLINE {
+struct SORTLINE {
 	LPCWSTR pwszLine;
 	LPCWSTR pwszSortEntry;
 	LPCWSTR pwszSortLine;
 	int iLine;
 	EditSortFlag iSortFlags;
-} SORTLINE;
+};
 
 static int __cdecl CmpSortLine(const void *p1, const void *p2) noexcept {
 	const SORTLINE *s1 = (const SORTLINE *)p1;
@@ -4520,7 +4520,7 @@ void EditGetExcerpt(LPWSTR lpszExcerpt, DWORD cchExcerpt) noexcept {
 	char *pszText = (char *)NP2HeapAlloc(iSelCount + 2);
 	LPWSTR pszTextW = (LPWSTR)NP2HeapAlloc((iSelCount + 1) * sizeof(WCHAR));
 
-	const struct Sci_TextRangeFull tr = { { iSelStart, iSelEnd }, pszText };
+	const Sci_TextRangeFull tr = { { iSelStart, iSelEnd }, pszText };
 	SciCall_GetTextRangeFull(&tr);
 	const UINT cpEdit = SciCall_GetCodePage();
 	MultiByteToWideChar(cpEdit, 0, pszText, (int)iSelCount, pszTextW, (int)(NP2HeapSize(pszTextW) / sizeof(WCHAR)));
@@ -5349,7 +5349,7 @@ void EditFindNext(LPCEDITFINDREPLACE lpefr, bool fExtendSelection) noexcept {
 	const Sci_Position iSelPos = SciCall_GetCurrentPos();
 	const Sci_Position iSelAnchor = SciCall_GetAnchor();
 
-	struct Sci_TextToFindFull ttf = { { SciCall_GetSelectionEnd(), SciCall_GetLength() }, szFind2, { 0, 0 } };
+	Sci_TextToFindFull ttf = { { SciCall_GetSelectionEnd(), SciCall_GetLength() }, szFind2, { 0, 0 } };
 	Sci_Position iPos = SciCall_FindTextFull(searchFlags, &ttf);
 	bool bSuppressNotFound = false;
 
@@ -5391,7 +5391,7 @@ void EditFindPrev(LPCEDITFINDREPLACE lpefr, bool fExtendSelection) noexcept {
 	const Sci_Position iSelPos = SciCall_GetCurrentPos();
 	const Sci_Position iSelAnchor = SciCall_GetAnchor();
 
-	struct Sci_TextToFindFull ttf = { { SciCall_GetSelectionStart(), 0 }, szFind2, { 0, 0 } };
+	Sci_TextToFindFull ttf = { { SciCall_GetSelectionStart(), 0 }, szFind2, { 0, 0 } };
 	Sci_Position iPos = SciCall_FindTextFull(searchFlags, &ttf);
 	const Sci_Position iLength = SciCall_GetLength();
 	bool bSuppressNotFound = false;
@@ -5435,7 +5435,7 @@ bool EditReplace(HWND hwnd, LPCEDITFINDREPLACE lpefr) noexcept {
 	const Sci_Position iSelStart = SciCall_GetSelectionStart();
 	const Sci_Position iSelEnd = SciCall_GetSelectionEnd();
 
-	struct Sci_TextToFindFull ttf = { { iSelStart, SciCall_GetLength() }, szFind2, { 0, 0 } };
+	Sci_TextToFindFull ttf = { { iSelStart, SciCall_GetLength() }, szFind2, { 0, 0 } };
 	Sci_Position iPos = SciCall_FindTextFull(searchFlags, &ttf);
 	bool bSuppressNotFound = false;
 
@@ -5639,7 +5639,7 @@ void EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer) {
 	}
 
 	Sci_Position cpMin = iStartPos;
-	struct Sci_TextToFindFull ttf = { { cpMin, iMaxLength }, status->pszText, { 0, 0 } };
+	Sci_TextToFindFull ttf = { { cpMin, iMaxLength }, status->pszText, { 0, 0 } };
 
 	Sci_Position matchCount = status->matchCount;
 	UINT index = 0;
@@ -5846,7 +5846,7 @@ bool EditReplaceAll(HWND hwnd, LPCEDITFINDREPLACE lpefr, bool bShowInfo) noexcep
 #endif
 
 	const bool bRegexStartOfLine = bReplaceRE && (szFind2[0] == '^');
-	struct Sci_TextToFindFull ttf = { { 0, SciCall_GetLength() }, szFind2, { 0, 0 } };
+	Sci_TextToFindFull ttf = { { 0, SciCall_GetLength() }, szFind2, { 0, 0 } };
 	Sci_Position iCount = 0;
 	while (SciCall_FindTextFull(searchFlags, &ttf) >= 0) {
 		if (++iCount == 1) {
@@ -5927,7 +5927,7 @@ bool EditReplaceAllInSelection(HWND hwnd, LPCEDITFINDREPLACE lpefr, bool bShowIn
 	SendMessage(hwnd, WM_SETREDRAW, FALSE, 0);
 
 	const bool bRegexStartOfLine = bReplaceRE && (szFind2[0] == '^');
-	struct Sci_TextToFindFull ttf = { { SciCall_GetSelectionStart(), SciCall_GetLength() }, szFind2, { 0, 0 } };
+	Sci_TextToFindFull ttf = { { SciCall_GetSelectionStart(), SciCall_GetLength() }, szFind2, { 0, 0 } };
 	Sci_Position iCount = 0;
 	while (SciCall_FindTextFull(searchFlags, &ttf) >= 0) {
 		if (ttf.chrgText.cpMax <= SciCall_GetSelectionEnd()) {
@@ -6690,10 +6690,10 @@ void EditUpdateTimestampMatchTemplate(HWND hwnd) noexcept {
 	}
 }
 
-typedef struct UnicodeControlCharacter {
+struct UnicodeControlCharacter {
 	char uccUTF8[4];
 	char representation[5];
-} UnicodeControlCharacter;
+};
 
 // https://en.wikipedia.org/wiki/Unicode_control_characters
 // https://www.unicode.org/charts/PDF/U2000.pdf
@@ -7035,7 +7035,7 @@ char *EditGetStringAroundCaret(LPCSTR delimiters) noexcept {
 		return EditGetTextRange(iLineStart, iLineEnd);
 	}
 
-	struct Sci_TextToFindFull ft = { { iCurrentPos, 0 }, delimiters, { 0, 0 } };
+	Sci_TextToFindFull ft = { { iCurrentPos, 0 }, delimiters, { 0, 0 } };
 	const int findFlag = NP2_RegexDefaultFlags;
 
 	// forward
@@ -7323,7 +7323,7 @@ void EditOpenSelection(OpenSelectionType type) {
 				EscapeRegex(lpstrText, lpszArgs);
 				strcat(lpstrText, "[\'\"]?");
 
-				struct Sci_TextToFindFull ft = { { 0, SciCall_GetLength() }, mszSelection, { 0, 0 } };
+				Sci_TextToFindFull ft = { { 0, SciCall_GetLength() }, mszSelection, { 0, 0 } };
 				Sci_Position iPos = SciCall_FindTextFull(NP2_RegexDefaultFlags, &ft);
 				if (iPos < 0) {
 					lpstrText = mszSelection + 2;
@@ -7637,19 +7637,19 @@ bool FileVars_ParseStr(LPCSTR pszData, LPCSTR pszName, char *pszValue, int cchVa
 //
 // SciInitThemes()
 //
-static WNDPROC pfnSciWndProc = NULL;
+static WNDPROC pfnSciWndProc = nullptr;
 
-static LRESULT CALLBACK SciThemedWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
+static LRESULT CALLBACK SciThemedWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept;
 
-void SciInitThemes(HWND hwnd) {
-	pfnSciWndProc = (WNDPROC)SetWindowLongPtr(hwnd, GWLP_WNDPROC, (LONG_PTR)SciThemedWndProc);
+void SciInitThemes(HWND hwnd) noexcept {
+	pfnSciWndProc = reinterpret_cast<WNDPROC>(SetWindowLongPtr(hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(SciThemedWndProc)));
 }
 
 //=============================================================================
 //
 // SciThemedWndProc()
 //
-LRESULT CALLBACK SciThemedWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+LRESULT CALLBACK SciThemedWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	static RECT rcContent;
 
 	switch (umsg) {
@@ -7659,9 +7659,9 @@ LRESULT CALLBACK SciThemedWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 			if (IsAppThemed()) {
 				HTHEME hTheme = OpenThemeData(hwnd, L"edit");
 				if (hTheme) {
-					NCCALCSIZE_PARAMS *csp = (NCCALCSIZE_PARAMS *)lParam;
+					NCCALCSIZE_PARAMS *csp = reinterpret_cast<NCCALCSIZE_PARAMS *>(lParam);
 					RECT rcClient;
-					const HRESULT hr = GetThemeBackgroundContentRect(hTheme, NULL, EP_EDITTEXT, ETS_NORMAL, &csp->rgrc[0], &rcClient);
+					const HRESULT hr = GetThemeBackgroundContentRect(hTheme, nullptr, EP_EDITTEXT, ETS_NORMAL, &csp->rgrc[0], &rcClient);
 					const bool bSuccess = hr == S_OK;
 					if (bSuccess) {
 						InflateRect(&rcClient, -1, -1);
@@ -7719,7 +7719,7 @@ LRESULT CALLBACK SciThemedWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 					nState = ETS_NORMAL;
 				}
 
-				DrawThemeBackground(hTheme, hdc, EP_EDITTEXT, nState, &rcBorder, NULL);
+				DrawThemeBackground(hTheme, hdc, EP_EDITTEXT, nState, &rcBorder, nullptr);
 				CloseThemeData(hTheme);
 
 				ReleaseDC(hwnd, hdc);
@@ -7741,35 +7741,37 @@ LRESULT CALLBACK SciThemedWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 // Folding Functions
 //
 //
+namespace {
+
 #define FOLD_CHILDREN SCMOD_CTRL
 #define FOLD_SIBLINGS SCMOD_SHIFT
 // max position to find function definition style on a line.
 #define MAX_FUNCTION_DEFINITION_POSITION	64
 // max level for Toggle Folds -> Current Level for indentation based lexers.
 #define MAX_EDIT_TOGGLE_FOLD_LEVEL		63
+
 struct FoldLevelStack {
 	int levelCount; // 1-based level number at current header line
 	int levelStack[MAX_EDIT_TOGGLE_FOLD_LEVEL];
+	void Push(int level) noexcept {
+		while (levelCount != 0 && level <= levelStack[levelCount - 1]) {
+			--levelCount;
+		}
+
+		levelStack[levelCount] = level;
+		++levelCount;
+	}
 };
 
-static void FoldLevelStack_Push(struct FoldLevelStack *levelStack, int level) {
-	while (levelStack->levelCount != 0 && level <= levelStack->levelStack[levelStack->levelCount - 1]) {
-		--levelStack->levelCount;
-	}
-
-	levelStack->levelStack[levelStack->levelCount] = level;
-	++levelStack->levelCount;
-}
-
-static FOLD_ACTION FoldToggleNode(Sci_Line line, FOLD_ACTION expanding) noexcept {
+FOLD_ACTION FoldToggleNode(Sci_Line line, FOLD_ACTION expanding) noexcept {
 	const BOOL fExpanded = SciCall_GetFoldExpanded(line);
 	FOLD_ACTION action = expanding;
 	if (action == FOLD_ACTION_SNIFF) {
 		action = fExpanded ? FOLD_ACTION_FOLD : FOLD_ACTION_EXPAND;
 	}
 
-	if ((int)action != fExpanded) {
-		SciCall_FoldLine(line, (int)action);
+	if (static_cast<int>(action) != fExpanded) {
+		SciCall_FoldLine(line, static_cast<int>(action));
 		if (expanding == FOLD_ACTION_SNIFF) {
 			// header without children not changed after toggle (issue #48).
 			const BOOL after = SciCall_GetFoldExpanded(line);
@@ -7781,14 +7783,16 @@ static FOLD_ACTION FoldToggleNode(Sci_Line line, FOLD_ACTION expanding) noexcept
 	return expanding;
 }
 
-static void FinishBatchFold() noexcept {
+void FinishBatchFold() noexcept {
 	SendMessage(hwndEdit, WM_SETREDRAW, TRUE, 0);
 	SciCall_SetXCaretPolicy(CARET_SLOP | CARET_STRICT | CARET_EVEN, 50);
 	SciCall_SetYCaretPolicy(CARET_SLOP | CARET_STRICT | CARET_EVEN, 5);
 	SciCall_ScrollCaret();
 	SciCall_SetXCaretPolicy(CARET_SLOP | CARET_EVEN, 50);
 	SciCall_SetYCaretPolicy(CARET_EVEN, 0);
-	InvalidateRect(hwndEdit, NULL, TRUE);
+	InvalidateRect(hwndEdit, nullptr, TRUE);
+}
+
 }
 
 bool EditIsLineContainsStyle(Sci_Line line, int style) noexcept {
@@ -7822,7 +7826,7 @@ void FoldToggleAll(FOLD_ACTION action) noexcept {
 	StopWatch watch;
 	StopWatch_Start(watch);
 #endif
-	SciCall_FoldAll((int)action | SC_FOLDACTION_CONTRACT_EVERY_LEVEL);
+	SciCall_FoldAll(static_cast<int>(action) | SC_FOLDACTION_CONTRACT_EVERY_LEVEL);
 #if 0
 	StopWatch_Stop(watch);
 	StopWatch_ShowLog(&watch, __func__);
@@ -7830,7 +7834,7 @@ void FoldToggleAll(FOLD_ACTION action) noexcept {
 	FinishBatchFold();
 }
 
-void FoldToggleLevel(int lev, FOLD_ACTION action) {
+void FoldToggleLevel(int lev, FOLD_ACTION action) noexcept {
 	SciCall_ColouriseAll();
 	const Sci_Line lineCount = SciCall_GetLineCount();
 	Sci_Line line = 0;
@@ -7841,13 +7845,13 @@ void FoldToggleLevel(int lev, FOLD_ACTION action) {
 	StopWatch_Start(watch);
 #endif
 	if (pLexCurrent->lexerAttr & LexerAttr_IndentBasedFolding) {
-		struct FoldLevelStack levelStack = { 0, { 0 }};
+		FoldLevelStack levelStack{};
 		++lev;
 		while (line < lineCount) {
 			int level = SciCall_GetFoldLevel(line);
 			if (level & SC_FOLDLEVELHEADERFLAG) {
 				level &= SC_FOLDLEVELNUMBERMASK;
-				FoldLevelStack_Push(&levelStack, level);
+				levelStack.Push(level);
 				if (lev == levelStack.levelCount) {
 					action = FoldToggleNode(line, action);
 					line = SciCall_GetLastChildEx(line, level);
@@ -7892,7 +7896,7 @@ void FoldToggleCurrentBlock(FOLD_ACTION action) noexcept {
 	FinishBatchFold();
 }
 
-void FoldToggleCurrentLevel(FOLD_ACTION action) {
+void FoldToggleCurrentLevel(FOLD_ACTION action) noexcept {
 	Sci_Line line = SciCall_LineFromPosition(SciCall_GetCurrentPos());
 	int level = SciCall_GetFoldLevel(line);
 
@@ -7921,7 +7925,7 @@ void FoldToggleCurrentLevel(FOLD_ACTION action) {
 	FoldToggleLevel(level, action);
 }
 
-void FoldToggleDefault(FOLD_ACTION action) {
+void FoldToggleDefault(FOLD_ACTION action) noexcept {
 	SciCall_ColouriseAll();
 	const int ignoreInner = pLexCurrent->defaultFoldIgnoreInner;
 	const UINT levelMask = pLexCurrent->defaultFoldLevelMask;
@@ -7935,12 +7939,12 @@ void FoldToggleDefault(FOLD_ACTION action) {
 	StopWatch_Start(watch);
 #endif
 	if (pLexCurrent->lexerAttr & LexerAttr_IndentBasedFolding) {
-		struct FoldLevelStack levelStack = { 0, { 0 }};
+		FoldLevelStack levelStack{};
 		while (line < lineCount) {
 			int level = SciCall_GetFoldLevel(line);
 			if (level & SC_FOLDLEVELHEADERFLAG) {
 				level &= SC_FOLDLEVELNUMBERMASK;
-				FoldLevelStack_Push(&levelStack, level);
+				levelStack.Push(level);
 				const int lev = levelStack.levelCount;
 				if (levelMask & (1U << lev)) {
 					action = FoldToggleNode(line, action);

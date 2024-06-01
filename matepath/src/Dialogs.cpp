@@ -1003,7 +1003,7 @@ struct SystemIntegrationInfo {
 	LPWSTR lpszName;
 };
 
-int GetSystemIntegrationStatus(struct SystemIntegrationInfo *info) noexcept {
+int GetSystemIntegrationStatus(SystemIntegrationInfo &info) noexcept {
 	int mask = 0;
 	WCHAR tchModule[MAX_PATH];
 	GetModuleFileName(NULL, tchModule, COUNTOF(tchModule));
@@ -1012,7 +1012,7 @@ int GetSystemIntegrationStatus(struct SystemIntegrationInfo *info) noexcept {
 	HKEY hKey;
 	LSTATUS status = RegOpenKeyEx(HKEY_CLASSES_ROOT, NP2RegSubKey_ContextMenu, 0, KEY_READ, &hKey);
 	if (status == ERROR_SUCCESS) {
-		info->lpszText = Registry_GetDefaultString(hKey);
+		info.lpszText = Registry_GetDefaultString(hKey);
 		HKEY hSubKey;
 		status = RegOpenKeyEx(hKey, L"command", 0, KEY_READ, &hSubKey);
 		if (status == ERROR_SUCCESS) {
@@ -1031,7 +1031,7 @@ int GetSystemIntegrationStatus(struct SystemIntegrationInfo *info) noexcept {
 	// jump list
 	status = RegOpenKeyEx(HKEY_CLASSES_ROOT, NP2RegSubKey_JumpList, 0, KEY_READ, &hKey);
 	if (status == ERROR_SUCCESS) {
-		info->lpszName = Registry_GetString(hKey, L"FriendlyAppName");
+		info.lpszName = Registry_GetString(hKey, L"FriendlyAppName");
 		HKEY hSubKey;
 		status = RegOpenKeyEx(hKey, L"shell\\open\\command", 0, KEY_READ, &hSubKey);
 		if (status == ERROR_SUCCESS) {
@@ -1124,8 +1124,8 @@ INT_PTR CALLBACK ProgPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 		Edit_SetText(hwndCtl, tchFavoritesDir);
 		SHAutoComplete(hwndCtl, SHACF_FILESYSTEM);
 
-		struct SystemIntegrationInfo info = {NULL, NULL};
-		const int mask = GetSystemIntegrationStatus(&info);
+		SystemIntegrationInfo info{};
+		const int mask = GetSystemIntegrationStatus(info);
 
 		hwndCtl = GetDlgItem(hwnd, IDC_CONTEXT_MENU_TEXT);
 		if (StrIsEmpty(info.lpszText)) {

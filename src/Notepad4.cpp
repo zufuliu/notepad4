@@ -145,7 +145,7 @@ EditAutoCompletionConfig autoCompletionConfig;
 int iSelectOption;
 static int iLineSelectionMode;
 static bool bShowCodeFolding;
-extern struct CallTipInfo callTipInfo;
+extern CallTipInfo callTipInfo;
 static bool bViewWhiteSpace;
 static bool bViewEOLs;
 
@@ -206,13 +206,13 @@ static bool bShowStatusbar;
 static bool bInFullScreenMode;
 static int iFullScreenMode;
 
-typedef struct WININFO {
+struct WININFO {
 	int x;
 	int y;
 	int cx;
 	int cy;
 	BOOL max;
-} WININFO;
+};
 
 static WININFO wi;
 
@@ -334,7 +334,7 @@ struct CachedStatusItem {
 	WCHAR tchItemFormat[128]; // IDS_STATUSITEM_FORMAT
 	WCHAR tchLexerName[MAX_EDITLEXER_NAME_SIZE];
 };
-static struct CachedStatusItem cachedStatusItem;
+static CachedStatusItem cachedStatusItem;
 
 #define UpdateStatusBarCacheLineColumn()	cachedStatusItem.updateMask |= (((1 << StatusItem_Find) - 1) | (1 << StatusItem_DocSize))
 #define DisableDelayedStatusBarRedraw()		cachedStatusItem.updateMask |= (1 << StatusItem_ItemCount)
@@ -379,26 +379,26 @@ enum {
 	DefaultPositionFlag_Margin = 128,
 };
 
-typedef enum NotepadReplacementAction {
+enum NotepadReplacementAction {
 	NotepadReplacementAction_None,
 	NotepadReplacementAction_Default,
 	NotepadReplacementAction_PrintDialog,
 	NotepadReplacementAction_PrintDefault,
-} NotepadReplacementAction;
+};
 
-typedef enum MatchTextFlag {
+enum MatchTextFlag {
 	MatchTextFlag_None = 0,
 	MatchTextFlag_Default = 1,
 	MatchTextFlag_FindUp = 2,
 	MatchTextFlag_Regex = 4,
 	MatchTextFlag_TransformBS = 8,
-} MatchTextFlag;
+};
 
-typedef enum RelaunchElevatedFlag {
+enum RelaunchElevatedFlag {
 	RelaunchElevatedFlag_None = 0,
 	RelaunchElevatedFlag_Startup,
 	RelaunchElevatedFlag_Manual,
-} RelaunchElevatedFlag;
+};
 
 static NotepadReplacementAction notepadAction = NotepadReplacementAction_None;
 static bool	flagNoReuseWindow		= false;
@@ -1278,7 +1278,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		SetDlgItemInt(hwnd, IDC_REUSELOCK, GetTickCount(), FALSE);
 
 		if (pcds->dwData == DATA_NOTEPAD4_PARAMS) {
-			LPNP2PARAMS params = (LPNP2PARAMS)NP2HeapAlloc(pcds->cbData);
+			NP2PARAMS *params = static_cast<NP2PARAMS *>(NP2HeapAlloc(pcds->cbData));
 			memcpy(params, pcds->lpData, pcds->cbData);
 
 			if (params->flagReadOnlyMode) {
@@ -4217,7 +4217,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_VIEW_MATCHBRACES:
 		bMatchBraces = !bMatchBraces;
 		if (bMatchBraces) {
-			struct SCNotification scn;
+			SCNotification scn;
 			scn.nmhdr.hwndFrom = hwndEdit;
 			scn.nmhdr.idFrom = IDC_EDIT;
 			scn.nmhdr.code = SCN_UPDATEUI;
@@ -4898,7 +4898,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(wParam);
 
 	LPNMHDR pnmh = (LPNMHDR)lParam;
-	const struct SCNotification * const scn = (struct SCNotification *)lParam;
+	const SCNotification * const scn = reinterpret_cast<SCNotification *>(lParam);
 
 	switch (pnmh->idFrom) {
 	case IDC_EDIT:
@@ -5987,12 +5987,12 @@ void ClearWindowPositionHistory() noexcept {
 // ParseCommandLine()
 //
 //
-typedef enum CommandParseState {
+enum CommandParseState {
 	CommandParseState_None,
 	CommandParseState_Consumed,
 	CommandParseState_Argument,
 	CommandParseState_Unknown,
-} CommandParseState;
+};
 
 CommandParseState ParseCommandLineEncoding(LPCWSTR opt) noexcept {
 	int flag = IDM_ENCODING_UNICODE;
@@ -6979,7 +6979,7 @@ void UpdateStatusbar() noexcept {
 	StopWatch watch;
 	StopWatch_Start(watch);
 #endif
-	struct Sci_TextToFindFull ft = { { SciCall_PositionFromLine(iLine), iPos }, NULL, { 0, 0 } };
+	Sci_TextToFindFull ft = { { SciCall_PositionFromLine(iLine), iPos }, nullptr, { 0, 0 } };
 	SciCall_CountCharactersAndColumns(&ft);
 	const Sci_Position iChar = ft.chrgText.cpMin + 1;
 	const Sci_Position iCol = ft.chrgText.cpMax + 1;
@@ -7239,7 +7239,7 @@ void ToggleFullScreenMode() noexcept {
 //	FileIO()
 //
 //
-bool FileIO(bool fLoad, LPWSTR pszFile, int flag, EditFileIOStatus *status) {
+bool FileIO(bool fLoad, LPWSTR pszFile, int flag, EditFileIOStatus &status) {
 	BeginWaitCursor();
 
 	WCHAR tch[MAX_PATH + 128];
@@ -7365,8 +7365,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 	GetLongPathName(szFileName, szFileName, COUNTOF(szFileName));
 	PathGetLnkPath(szFileName, szFileName);
 
-	EditFileIOStatus status;
-	memset(&status, 0, sizeof(status));
+	EditFileIOStatus status{};
 	status.iEncoding = iCurrentEncoding;
 	status.iEOLMode = iCurrentEOLMode;
 
@@ -7402,7 +7401,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 			return false;
 		}
 	} else {
-		fSuccess = FileIO(true, szFileName, 0, &status);
+		fSuccess = FileIO(true, szFileName, 0, status);
 		if (fSuccess) {
 			iCurrentEncoding = status.iEncoding;
 			iCurrentEOLMode = status.iEOLMode;
@@ -7579,8 +7578,7 @@ bool FileSave(FileSaveFlag saveFlag) {
 
 	bool fSuccess = false;
 	WCHAR tchFile[MAX_PATH];
-	EditFileIOStatus status;
-	memset(&status, 0, sizeof(status));
+	EditFileIOStatus status{};
 	status.iEncoding = iCurrentEncoding;
 	status.iEOLMode = iCurrentEOLMode;
 
@@ -7597,7 +7595,7 @@ bool FileSave(FileSaveFlag saveFlag) {
 			}
 		}
 		if (!(saveFlag & FileSaveFlag_SaveAs)) {
-			fSuccess = FileIO(false, szCurFile, saveFlag & FileSaveFlag_EndSession, &status);
+			fSuccess = FileIO(false, szCurFile, saveFlag & FileSaveFlag_EndSession, status);
 			if (!fSuccess) {
 				saveFlag = (FileSaveFlag)(saveFlag | FileSaveFlag_SaveAs);
 			}
@@ -7615,7 +7613,7 @@ bool FileSave(FileSaveFlag saveFlag) {
 		}
 
 		if (SaveFileDlg(Untitled, tchFile, COUNTOF(tchFile), tchInitialDir)) {
-			fSuccess = FileIO(false, tchFile, saveFlag & (FileSaveFlag_SaveCopy | FileSaveFlag_EndSession), &status);
+			fSuccess = FileIO(false, tchFile, saveFlag & (FileSaveFlag_SaveCopy | FileSaveFlag_EndSession), status);
 			if (fSuccess) {
 				if (!(saveFlag & FileSaveFlag_SaveCopy)) {
 					lstrcpy(szCurFile, tchFile);
@@ -7647,7 +7645,7 @@ bool FileSave(FileSaveFlag saveFlag) {
 			return false;
 		}
 	} else if (!fSuccess) {
-		fSuccess = FileIO(false, szCurFile, saveFlag & FileSaveFlag_EndSession, &status);
+		fSuccess = FileIO(false, szCurFile, saveFlag & FileSaveFlag_EndSession, status);
 	}
 
 	if (fSuccess) {
@@ -7940,7 +7938,8 @@ bool ActivatePrevInst() noexcept {
 					cb += (lstrlen(lpSchemeArg) + 1) * sizeof(WCHAR);
 				}
 
-				LPNP2PARAMS params = (LPNP2PARAMS)GlobalAlloc(GPTR, cb);
+				static_assert(__is_standard_layout(NP2PARAMS));
+				NP2PARAMS *params = static_cast<NP2PARAMS *>(GlobalAlloc(GPTR, cb));
 				params->flagFileSpecified = false;
 				params->flagReadOnlyMode = flagReadOnlyMode & ReadOnlyMode_Current;
 				params->flagLexerSpecified = flagLexerSpecified;
@@ -8026,7 +8025,7 @@ bool ActivatePrevInst() noexcept {
 					cb += (cchTitleExcerpt + 1) * sizeof(WCHAR);
 				}
 
-				LPNP2PARAMS params = (LPNP2PARAMS)GlobalAlloc(GPTR, cb);
+				NP2PARAMS *params = static_cast<NP2PARAMS *>(GlobalAlloc(GPTR, cb));
 				lstrcpy(&params->wchData, lpFileArg);
 				params->flagFileSpecified = true;
 				params->flagReadOnlyMode = flagReadOnlyMode & ReadOnlyMode_Current;

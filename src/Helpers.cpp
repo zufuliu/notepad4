@@ -308,7 +308,7 @@ LSTATUS Registry_SetInt(HKEY hKey, LPCWSTR valueName, DWORD value) noexcept {
 
 #if _WIN32_WINNT < _WIN32_WINNT_VISTA
 LSTATUS Registry_DeleteTree(HKEY hKey, LPCWSTR lpSubKey) noexcept {
-	typedef LSTATUS (WINAPI *RegDeleteTreeSig)(HKEY hKey, LPCWSTR lpSubKey);
+	using RegDeleteTreeSig = LSTATUS (WINAPI *)(HKEY hKey, LPCWSTR lpSubKey);
 	RegDeleteTreeSig pfnRegDeleteTree = DLLFunctionEx(RegDeleteTreeSig, L"advapi32.dll", "RegDeleteTreeW");
 
 	LSTATUS status;
@@ -1533,9 +1533,9 @@ bool PathGetRealPath(HANDLE hFile, LPCWSTR lpszSrc, LPWSTR lpszDest) noexcept {
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 			DWORD cch = GetFinalPathNameByHandleW(hFile, path, COUNTOF(path), FILE_NAME_OPENED);
 #else
-			typedef DWORD (WINAPI *GetFinalPathNameByHandleSig)(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, DWORD dwFlags);
-			static GetFinalPathNameByHandleSig pfnGetFinalPathNameByHandle = NULL;
-			if (pfnGetFinalPathNameByHandle == NULL) {
+			using GetFinalPathNameByHandleSig = DWORD (WINAPI *)(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, DWORD dwFlags);
+			static GetFinalPathNameByHandleSig pfnGetFinalPathNameByHandle = nullptr;
+			if (pfnGetFinalPathNameByHandle == nullptr) {
 				pfnGetFinalPathNameByHandle = DLLFunctionEx(GetFinalPathNameByHandleSig, L"kernel32.dll", "GetFinalPathNameByHandleW");
 			}
 			DWORD cch = pfnGetFinalPathNameByHandle(hFile, path, COUNTOF(path), FILE_NAME_OPENED);
@@ -1600,9 +1600,9 @@ static inline BOOL PathGetFileId(HANDLE hFile, FILE_ID_INFO *fileId) noexcept {
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 		success = GetFileInformationByHandleEx(hFile, (FILE_INFO_BY_HANDLE_CLASS)FileIdInfo, fileId, sizeof(FILE_ID_INFO));
 #else
-		typedef BOOL (WINAPI *GetFileInformationByHandleExSig)(HANDLE hFile, int FileInformationClass, LPVOID lpFileInformation, DWORD dwBufferSize);
-		static GetFileInformationByHandleExSig pfnGetFileInformationByHandleEx = NULL;
-		if (pfnGetFileInformationByHandleEx == NULL) {
+		using GetFileInformationByHandleExSig = BOOL (WINAPI *)(HANDLE hFile, int FileInformationClass, LPVOID lpFileInformation, DWORD dwBufferSize);
+		static GetFileInformationByHandleExSig pfnGetFileInformationByHandleEx = nullptr;
+		if (pfnGetFileInformationByHandleEx == nullptr) {
 			pfnGetFileInformationByHandleEx = DLLFunctionEx(GetFileInformationByHandleExSig, L"kernel32.dll", "GetFileInformationByHandleEx");
 		}
 		success = pfnGetFileInformationByHandleEx(hFile, FileIdInfo, fileId, sizeof(FILE_ID_INFO));

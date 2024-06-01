@@ -329,7 +329,7 @@ static const COLORREF defaultCustomColor[MAX_CUSTOM_COLOR_COUNT] = {
 	//RGB(0x00, 0x7F, 0x7F),	// Class, Trait
 };
 static COLORREF customColor[MAX_CUSTOM_COLOR_COUNT];
-struct CallTipInfo callTipInfo;
+CallTipInfo callTipInfo;
 static bool bCustomColorLoaded = false;
 
 bool	bUse2ndGlobalStyle;
@@ -3281,9 +3281,9 @@ BOOL Style_StrGetLocale(LPCWSTR lpszStyle, LPWSTR lpszLocale, int cchLocale) noe
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 		return IsValidLocaleName(lpszLocale);
 #else
-		typedef BOOL (WINAPI *IsValidLocaleNameSig)(LPCWSTR lpLocaleName);
+		using IsValidLocaleNameSig = BOOL (WINAPI *)(LPCWSTR lpLocaleName);
 		IsValidLocaleNameSig pfnIsValidLocaleName = DLLFunctionEx(IsValidLocaleNameSig, L"kernel32.dll", "IsValidLocaleName");
-		if (pfnIsValidLocaleName != NULL) {
+		if (pfnIsValidLocaleName != nullptr) {
 			return pfnIsValidLocaleName(lpszLocale);
 		}
 #endif
@@ -3869,7 +3869,7 @@ static inline int Lexer_GetSchemeGroup(LPCEDITLEXER pLex) {
 }
 
 static HTREEITEM Style_AddAllLexerToTreeView(HWND hwndTV, bool withStyles, bool withCheckBox) {
-	struct SchemeGroupInfo groupList[26 + 2];
+	SchemeGroupInfo groupList[26 + 2];
 	int groupCount = 2;
 	groupList[0].group = SchemeGroup_Global;
 	groupList[0].count = withStyles ? LEXER_INDEX_GENERAL : LEXER_INDEX_MATCH;
@@ -3941,7 +3941,7 @@ static HTREEITEM Style_AddAllLexerToTreeView(HWND hwndTV, bool withStyles, bool 
 
 	iLexer = LEXER_INDEX_GENERAL - groupList[0].count;
 	for (int i = 0; i < groupCount; i++) {
-		const struct SchemeGroupInfo info = groupList[i];
+		const SchemeGroupInfo info = groupList[i];
 		const int group = info.group;
 		const int count = info.count;
 
@@ -4089,7 +4089,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 		hFontTitle = CreateFontIndirect(&lf);
 		SendDlgItemMessage(hwnd, IDC_TITLE, WM_SETFONT, (WPARAM)hFontTitle, TRUE);
 
-		struct StyleConfigDlgParam *param = (struct StyleConfigDlgParam *)lParam;
+		StyleConfigDlgParam *param = reinterpret_cast<StyleConfigDlgParam *>(lParam);
 		param->hFontTitle = hFontTitle;
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
 		CenterDlgInParent(hwnd);
@@ -4531,7 +4531,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 				break;
 
 			case IDC_PREVIEW: {
-				struct StyleConfigDlgParam *param = (struct StyleConfigDlgParam *)GetWindowLongPtr(hwnd, DWLP_USER);
+				StyleConfigDlgParam *param = reinterpret_cast<StyleConfigDlgParam *>(GetWindowLongPtr(hwnd, DWLP_USER));
 				param->bApply = true;
 				Style_SetLexer(pLexCurrent, false);
 			}
@@ -4564,7 +4564,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 // Style_ConfigDlg()
 //
 void Style_ConfigDlg(HWND hwnd) {
-	struct StyleConfigDlgParam param;
+	StyleConfigDlgParam param;
 
 	Style_LoadAll(false, false);
 	// Backup Styles
@@ -5220,7 +5220,7 @@ void EditShowCallTip(Sci_Position position) noexcept {
 		char text[32] = {0};
 		const Sci_Position startPos = max<Sci_Position>(0, position - 10);
 		const Sci_Position endPos = min(position + 10, SciCall_GetLength());
-		const struct Sci_TextRangeFull tr = { { startPos, endPos }, text + 8};
+		const Sci_TextRangeFull tr = { { startPos, endPos }, text + 8};
 		SciCall_GetTextRangeFull(&tr);
 		char * const p = text + 8 + position - startPos;
 		char *s = p;

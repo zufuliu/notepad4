@@ -79,7 +79,7 @@ inline bool SciCall_GetReadOnly() noexcept {
 	return (bool)SciCall(SCI_GETREADONLY, 0, 0);
 }
 
-inline Sci_Position SciCall_GetTextRangeFull(const struct Sci_TextRangeFull *tr) noexcept {
+inline Sci_Position SciCall_GetTextRangeFull(const Sci_TextRangeFull *tr) noexcept {
 	return SciCall(SCI_GETTEXTRANGEFULL, 0, (LPARAM)tr);
 }
 
@@ -115,7 +115,7 @@ inline int SciCall_GetStyleIndexAt(Sci_Position position) noexcept {
 	return (int)SciCall(SCI_GETSTYLEINDEXAT, position, 0);
 }
 
-inline size_t SciCall_GetStyledTextFull(const struct Sci_TextRangeFull *tr) noexcept {
+inline size_t SciCall_GetStyledTextFull(const Sci_TextRangeFull *tr) noexcept {
 	return SciCall(SCI_GETSTYLEDTEXTFULL, 0, (LPARAM)(tr));
 }
 
@@ -178,7 +178,7 @@ inline Sci_Position SciCall_ReplaceTargetRE(Sci_Position length, const char *tex
 	return SciCall(SCI_REPLACETARGETRE, length, (LPARAM)text);
 }
 
-inline Sci_Position SciCall_FindTextFull(int searchFlags, struct Sci_TextToFindFull *ft) noexcept {
+inline Sci_Position SciCall_FindTextFull(int searchFlags, Sci_TextToFindFull *ft) noexcept {
 	return SciCall(SCI_FINDTEXTFULL, searchFlags, (LPARAM)ft);
 }
 
@@ -430,7 +430,7 @@ inline Sci_Position SciCall_CountCharacters(Sci_Position start, Sci_Position end
 	return SciCall(SCI_COUNTCHARACTERS, start, end);
 }
 
-inline void SciCall_CountCharactersAndColumns(struct Sci_TextToFindFull *ft) noexcept {
+inline void SciCall_CountCharactersAndColumns(Sci_TextToFindFull *ft) noexcept {
 	SciCall(SCI_COUNTCHARACTERSANDCOLUMNS, 0, (LPARAM)ft);
 }
 
@@ -1258,7 +1258,7 @@ inline void SciCall_UsePopUp(int popUpMode) noexcept {
 
 // Printing
 
-inline Sci_Position SciCall_FormatRangeFull(bool draw, const struct Sci_RangeToFormatFull *fr) noexcept {
+inline Sci_Position SciCall_FormatRangeFull(bool draw, const Sci_RangeToFormatFull *fr) noexcept {
 	return SciCall(SCI_FORMATRANGEFULL, draw, (LPARAM)fr);
 }
 
