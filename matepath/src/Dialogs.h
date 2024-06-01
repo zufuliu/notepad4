@@ -22,13 +22,13 @@
 #include "compiler.h"
 
 extern bool bWindowLayoutRTL;
-NP2_inline void InitWindowCommon(HWND hwnd) {
+inline void InitWindowCommon(HWND hwnd) noexcept {
 	if (bWindowLayoutRTL) {
 		SetWindowLayoutRTL(hwnd, true);
 	}
 }
 
-int MsgBox(UINT uType, UINT uIdMsg, ...);
+int MsgBox(UINT uType, UINT uIdMsg, ...) noexcept;
 #define MsgBoxInfo(uType, uIdMsg, ...)		MsgBox(MB_ICONINFORMATION | (uType), (uIdMsg), ##__VA_ARGS__)
 #define MsgBoxWarn(uType, uIdMsg, ...)		MsgBox(MB_ICONEXCLAMATION | (uType), (uIdMsg), ##__VA_ARGS__)
 #define MsgBoxAsk(uType, uIdMsg, ...)		MsgBox(MB_ICONQUESTION | (uType), (uIdMsg), ##__VA_ARGS__)

@@ -56,7 +56,7 @@ extern LANGID uiLanguage;
 extern int iWrapColumn;
 extern bool bUseXPFileDialog;
 
-static inline HWND GetMsgBoxParent(void) {
+static inline HWND GetMsgBoxParent(void) noexcept {
 	HWND hwnd = GetActiveWindow();
 	return (hwnd == NULL) ? hwndMain : hwnd;
 }
@@ -65,7 +65,7 @@ static inline HWND GetMsgBoxParent(void) {
 //
 // MsgBox()
 //
-int MsgBox(UINT uType, UINT uIdMsg, ...) {
+int MsgBox(UINT uType, UINT uIdMsg, ...) noexcept {
 	WCHAR szBuf[1024];
 	WCHAR szText[1024];
 
@@ -2593,13 +2593,13 @@ typedef struct INFOBOX {
 
 typedef const INFOBOX * LPCINFOBOX;
 
-typedef enum SuppressMmessage {
+enum SuppressMmessage {
 	SuppressMmessage_None = 0,
 	SuppressMmessage_Suppress,
 	SuppressMmessage_Never,
-} SuppressMmessage;
+};
 
-static INT_PTR CALLBACK InfoBoxDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+static INT_PTR CALLBACK InfoBoxDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
@@ -2634,7 +2634,7 @@ static INT_PTR CALLBACK InfoBoxDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 		case IDNO:
 			if (IsButtonChecked(hwnd, IDC_INFOBOXCHECK)) {
 				const LPCINFOBOX lpib = (LPCINFOBOX)GetWindowLongPtr(hwnd, DWLP_USER);
-				IniSetBool(INI_SECTION_NAME_SUPPRESSED_MESSAGES, lpib->lpstrSetting, SuppressMmessage_Suppress);
+				IniSetBool(INI_SECTION_NAME_SUPPRESSED_MESSAGES, lpib->lpstrSetting, true);
 			}
 			EndDialog(hwnd, LOWORD(wParam));
 			break;
@@ -2649,7 +2649,7 @@ static INT_PTR CALLBACK InfoBoxDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 // InfoBox()
 //
 //
-INT_PTR InfoBox(UINT uType, LPCWSTR lpstrSetting, UINT uidMessage, ...) {
+INT_PTR InfoBox(UINT uType, LPCWSTR lpstrSetting, UINT uidMessage, ...) noexcept {
 	const UINT icon = uType & MB_ICONMASK;
 	uType &= MB_TYPEMASK;
 	const SuppressMmessage iMode = (SuppressMmessage)IniGetInt(INI_SECTION_NAME_SUPPRESSED_MESSAGES, lpstrSetting, SuppressMmessage_None);

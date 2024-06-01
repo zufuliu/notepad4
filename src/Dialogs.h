@@ -20,13 +20,13 @@
 #pragma once
 
 extern bool bWindowLayoutRTL;
-NP2_inline void InitWindowCommon(HWND hwnd) {
+inline void InitWindowCommon(HWND hwnd) noexcept {
 	if (bWindowLayoutRTL) {
 		SetWindowLayoutRTL(hwnd, true);
 	}
 }
 
-int 	MsgBox(UINT uType, UINT uIdMsg, ...);
+int 	MsgBox(UINT uType, UINT uIdMsg, ...) noexcept;
 #define MsgBoxInfo(uType, uIdMsg, ...)		MsgBox(MB_ICONINFORMATION | (uType), (uIdMsg), ##__VA_ARGS__)
 #define MsgBoxWarn(uType, uIdMsg, ...)		MsgBox(MB_ICONEXCLAMATION | (uType), (uIdMsg), ##__VA_ARGS__)
 #define MsgBoxAsk(uType, uIdMsg, ...)		MsgBox(MB_ICONQUESTION | (uType), (uIdMsg), ##__VA_ARGS__)
@@ -58,7 +58,7 @@ void	ZoomLevelDlg(HWND hwnd, bool bBottom);
 bool	AutoCompletionSettingsDlg(HWND hwnd);
 bool	AutoSaveSettingsDlg(HWND hwnd);
 
-INT_PTR InfoBox(UINT uType, LPCWSTR lpstrSetting, UINT uidMessage, ...);
+INT_PTR InfoBox(UINT uType, LPCWSTR lpstrSetting, UINT uidMessage, ...) noexcept;
 #define InfoBoxInfo(uType, lpstrSetting, uidMessage, ...)	InfoBox(MB_ICONINFORMATION | (uType), (lpstrSetting), (uidMessage), ##__VA_ARGS__)
 #define InfoBoxWarn(uType, lpstrSetting, uidMessage, ...)	InfoBox(MB_ICONEXCLAMATION | (uType), (lpstrSetting), (uidMessage), ##__VA_ARGS__)
 #define InfoBoxAsk(uType, lpstrSetting, uidMessage, ...)	InfoBox(MB_ICONQUESTION | (uType), (lpstrSetting), (uidMessage), ##__VA_ARGS__)

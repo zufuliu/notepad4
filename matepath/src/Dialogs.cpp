@@ -40,7 +40,7 @@ extern HWND hwndMain;
 extern LANGID uiLanguage;
 #endif
 
-static inline HWND GetMsgBoxParent(void) {
+static inline HWND GetMsgBoxParent(void) noexcept {
 	HWND hwnd = GetActiveWindow();
 	return (hwnd == NULL) ? hwndMain : hwnd;
 }
@@ -49,7 +49,7 @@ static inline HWND GetMsgBoxParent(void) {
 //
 // MsgBox()
 //
-int MsgBox(UINT uType, UINT uIdMsg, ...) {
+int MsgBox(UINT uType, UINT uIdMsg, ...) noexcept {
 	WCHAR szBuf[256 * 2];
 	WCHAR szText[256 * 2];
 

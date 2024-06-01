@@ -38,7 +38,7 @@ struct IUnknown;
 #include "GraphicUtils.h"
 #include "resource.h"
 
-LPCSTR GetCurrentLogTime() {
+LPCSTR GetCurrentLogTime() noexcept {
 	static char buf[16];
 	SYSTEMTIME lt;
 	GetLocalTime(&lt);
@@ -64,7 +64,7 @@ void StopWatch_ShowLog(const StopWatch *watch, LPCSTR msg) {
 #endif
 }
 
-void DebugPrintf(const char *fmt, ...) {
+void DebugPrintf(const char *fmt, ...) noexcept {
 	char buf[1024] = "";
 	va_list va;
 	va_start(va, fmt);
@@ -73,7 +73,7 @@ void DebugPrintf(const char *fmt, ...) {
 	DebugPrint(buf);
 }
 
-void IniClearSectionEx(LPCWSTR lpSection, LPCWSTR lpszIniFile, bool bDelete) {
+void IniClearSectionEx(LPCWSTR lpSection, LPCWSTR lpszIniFile, bool bDelete) noexcept {
 	if (StrIsEmpty(lpszIniFile)) {
 		return;
 	}
@@ -81,7 +81,7 @@ void IniClearSectionEx(LPCWSTR lpSection, LPCWSTR lpszIniFile, bool bDelete) {
 	WritePrivateProfileSection(lpSection, (bDelete ? NULL : L""), lpszIniFile);
 }
 
-void IniClearAllSectionEx(LPCWSTR lpszPrefix, LPCWSTR lpszIniFile, bool bDelete) {
+void IniClearAllSectionEx(LPCWSTR lpszPrefix, LPCWSTR lpszIniFile, bool bDelete) noexcept {
 	if (StrIsEmpty(lpszIniFile)) {
 		return;
 	}
@@ -276,7 +276,7 @@ void IniSectionSetQuotedString(IniSectionOnSave *section, LPCWSTR key, LPCWSTR v
 	section->next = p;
 }
 
-LPWSTR Registry_GetString(HKEY hKey, LPCWSTR valueName) {
+LPWSTR Registry_GetString(HKEY hKey, LPCWSTR valueName) noexcept {
 	LPWSTR lpszText = NULL;
 	DWORD type = REG_NONE;
 	DWORD size = 0;
@@ -294,20 +294,20 @@ LPWSTR Registry_GetString(HKEY hKey, LPCWSTR valueName) {
 	return lpszText;
 }
 
-LSTATUS Registry_SetString(HKEY hKey, LPCWSTR valueName, LPCWSTR lpszText) {
+LSTATUS Registry_SetString(HKEY hKey, LPCWSTR valueName, LPCWSTR lpszText) noexcept {
 	DWORD len = lstrlen(lpszText);
 	len = len ? ((len + 1)*sizeof(WCHAR)) : 0;
 	const LSTATUS status = RegSetValueEx(hKey, valueName, 0, REG_SZ, (const BYTE *)lpszText, len);
 	return status;
 }
 
-LSTATUS Registry_SetInt(HKEY hKey, LPCWSTR valueName, DWORD value) {
+LSTATUS Registry_SetInt(HKEY hKey, LPCWSTR valueName, DWORD value) noexcept {
 	const LSTATUS status = RegSetValueEx(hKey, valueName, 0, REG_DWORD, (const BYTE *)(&value), sizeof(DWORD));
 	return status;
 }
 
 #if _WIN32_WINNT < _WIN32_WINNT_VISTA
-LSTATUS Registry_DeleteTree(HKEY hKey, LPCWSTR lpSubKey) {
+LSTATUS Registry_DeleteTree(HKEY hKey, LPCWSTR lpSubKey) noexcept {
 	typedef LSTATUS (WINAPI *RegDeleteTreeSig)(HKEY hKey, LPCWSTR lpSubKey);
 	RegDeleteTreeSig pfnRegDeleteTree = DLLFunctionEx(RegDeleteTreeSig, L"advapi32.dll", "RegDeleteTreeW");
 
@@ -326,7 +326,7 @@ LSTATUS Registry_DeleteTree(HKEY hKey, LPCWSTR lpSubKey) {
 }
 #endif
 
-int ParseCommaList(LPCWSTR str, int result[], int count) {
+int ParseCommaList(LPCWSTR str, int result[], int count) noexcept {
 	if (StrIsEmpty(str)) {
 		return 0;
 	}
@@ -348,7 +348,7 @@ int ParseCommaList(LPCWSTR str, int result[], int count) {
 	return index;
 }
 
-int ParseCommaList64(LPCWSTR str, int64_t result[], int count) {
+int ParseCommaList64(LPCWSTR str, int64_t result[], int count) noexcept {
 	if (StrIsEmpty(str)) {
 		return 0;
 	}
@@ -370,7 +370,7 @@ int ParseCommaList64(LPCWSTR str, int64_t result[], int count) {
 	return index;
 }
 
-bool FindUserResourcePath(LPCWSTR path, LPWSTR outPath) {
+bool FindUserResourcePath(LPCWSTR path, LPWSTR outPath) noexcept {
 	// similar to CheckIniFile()
 	WCHAR tchFileExpanded[MAX_PATH];
 	ExpandEnvironmentStrings(path, tchFileExpanded, COUNTOF(tchFileExpanded));
@@ -401,7 +401,7 @@ bool FindUserResourcePath(LPCWSTR path, LPWSTR outPath) {
 	return false;
 }
 
-HBITMAP LoadBitmapFile(LPCWSTR path) {
+HBITMAP LoadBitmapFile(LPCWSTR path) noexcept {
 	WCHAR szTmp[MAX_PATH];
 	if (!FindUserResourcePath(path, szTmp)) {
 		return NULL;
@@ -411,7 +411,7 @@ HBITMAP LoadBitmapFile(LPCWSTR path) {
 	return hbmp;
 }
 
-HBITMAP EnlargeImageForDPI(HBITMAP hbmp, UINT dpi) {
+HBITMAP EnlargeImageForDPI(HBITMAP hbmp, UINT dpi) noexcept {
 	BITMAP bmp;
 	if (dpi > USER_DEFAULT_SCREEN_DPI && GetObject(hbmp, sizeof(BITMAP), &bmp)) {
 		const int width = MulDiv(dpi, bmp.bmWidth, USER_DEFAULT_SCREEN_DPI);
@@ -425,7 +425,7 @@ HBITMAP EnlargeImageForDPI(HBITMAP hbmp, UINT dpi) {
 	return hbmp;
 }
 
-HBITMAP ResizeImageForCurrentDPI(HBITMAP hbmp) {
+HBITMAP ResizeImageForCurrentDPI(HBITMAP hbmp) noexcept {
 	BITMAP bmp;
 	if (GetObject(hbmp, sizeof(BITMAP), &bmp)) {
 		// assume 16x16 at 100% scaling
@@ -487,7 +487,7 @@ void BackgroundWorker_Destroy(BackgroundWorker *worker) {
 //
 // PrivateSetCurrentProcessExplicitAppUserModelID()
 //
-HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(PCWSTR AppID) {
+HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(PCWSTR AppID) noexcept {
 	if (StrIsEmpty(AppID)) {
 		return S_OK;
 	}
@@ -513,7 +513,7 @@ HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(PCWSTR AppID) {
 //
 // IsElevated()
 //
-bool IsElevated(void) {
+bool IsElevated() noexcept {
 	bool bIsElevated = false;
 	HANDLE hToken = NULL;
 
@@ -536,7 +536,7 @@ bool IsElevated(void) {
 // BitmapMergeAlpha()
 // Merge alpha channel into color channel
 //
-bool BitmapMergeAlpha(HBITMAP hbmp, COLORREF crDest) {
+bool BitmapMergeAlpha(HBITMAP hbmp, COLORREF crDest) noexcept {
 	BITMAP bmp;
 	if (GetObject(hbmp, sizeof(BITMAP), &bmp)) {
 		if (bmp.bmBitsPixel == 32) {
@@ -600,7 +600,7 @@ bool BitmapMergeAlpha(HBITMAP hbmp, COLORREF crDest) {
 // BitmapAlphaBlend()
 // Perform alpha blending to color channel only
 //
-bool BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha) {
+bool BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha) noexcept {
 	BITMAP bmp;
 	if (GetObject(hbmp, sizeof(BITMAP), &bmp)) {
 		if (bmp.bmBitsPixel == 32) {
@@ -706,7 +706,7 @@ bool BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha) {
 // BitmapGrayScale()
 // Gray scale color channel only
 //
-bool BitmapGrayScale(HBITMAP hbmp) {
+bool BitmapGrayScale(HBITMAP hbmp) noexcept {
 	BITMAP bmp;
 	if (GetObject(hbmp, sizeof(BITMAP), &bmp)) {
 		if (bmp.bmBitsPixel == 32) {
@@ -730,7 +730,7 @@ bool BitmapGrayScale(HBITMAP hbmp) {
 // VerifyContrast()
 // Check if two colors can be distinguished
 //
-bool VerifyContrast(COLORREF cr1, COLORREF cr2) {
+bool VerifyContrast(COLORREF cr1, COLORREF cr2) noexcept {
 #if NP2_USE_AVX2
 	__m128i i32x4Fore = unpack_color_epi32_sse4_si32(cr1);
 	__m128i i32x4Back = unpack_color_epi32_sse4_si32(cr2);
@@ -765,7 +765,7 @@ bool VerifyContrast(COLORREF cr1, COLORREF cr2) {
 // IsFontAvailable()
 // Test if a certain font is installed on the system
 //
-static int CALLBACK EnumFontFamExProc(CONST LOGFONT *plf, CONST TEXTMETRIC *ptm, DWORD fontType, LPARAM lParam) {
+static int CALLBACK EnumFontFamExProc(CONST LOGFONT *plf, CONST TEXTMETRIC *ptm, DWORD fontType, LPARAM lParam) noexcept {
 	UNREFERENCED_PARAMETER(plf);
 	UNREFERENCED_PARAMETER(ptm);
 	UNREFERENCED_PARAMETER(fontType);
@@ -774,7 +774,7 @@ static int CALLBACK EnumFontFamExProc(CONST LOGFONT *plf, CONST TEXTMETRIC *ptm,
 	return FALSE;
 }
 
-BOOL IsFontAvailable(LPCWSTR lpszFontName) {
+BOOL IsFontAvailable(LPCWSTR lpszFontName) noexcept {
 	BOOL fFound = FALSE;
 
 	LOGFONT lf;
@@ -793,7 +793,7 @@ BOOL IsFontAvailable(LPCWSTR lpszFontName) {
 //
 // SetClipData()
 //
-void SetClipData(HWND hwnd, LPCWSTR pszData) {
+void SetClipData(HWND hwnd, LPCWSTR pszData) noexcept {
 	if (OpenClipboard(hwnd)) {
 		EmptyClipboard();
 		HANDLE hData = GlobalAlloc(GHND, sizeof(WCHAR) * (lstrlen(pszData) + 1));
@@ -809,7 +809,7 @@ void SetClipData(HWND hwnd, LPCWSTR pszData) {
 //
 // SetWindowTransparentMode()
 //
-void SetWindowTransparentMode(HWND hwnd, bool bTransparentMode, int iOpacityLevel) {
+void SetWindowTransparentMode(HWND hwnd, bool bTransparentMode, int iOpacityLevel) noexcept {
 	// https://docs.microsoft.com/en-us/windows/win32/winmsg/using-windows#using-layered-windows
 	DWORD exStyle = GetWindowExStyle(hwnd);
 	exStyle = bTransparentMode ? (exStyle | WS_EX_LAYERED) : (exStyle & ~WS_EX_LAYERED);
@@ -822,7 +822,7 @@ void SetWindowTransparentMode(HWND hwnd, bool bTransparentMode, int iOpacityLeve
 	RedrawWindow(hwnd, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
 }
 
-void SetWindowLayoutRTL(HWND hwnd, bool bRTL) {
+void SetWindowLayoutRTL(HWND hwnd, bool bRTL) noexcept {
 	// https://docs.microsoft.com/en-us/windows/win32/winmsg/window-features#window-layout-and-mirroring
 	DWORD exStyle = GetWindowExStyle(hwnd);
 	exStyle = bRTL ? (exStyle | WS_EX_LAYOUTRTL) : (exStyle & ~WS_EX_LAYOUTRTL);
@@ -835,7 +835,7 @@ void SetWindowLayoutRTL(HWND hwnd, bool bRTL) {
 //
 // CenterDlgInParentEx()
 //
-void CenterDlgInParentEx(HWND hDlg, HWND hParent) {
+void CenterDlgInParentEx(HWND hDlg, HWND hParent) noexcept {
 	RECT rcDlg;
 	RECT rcParent;
 
@@ -870,7 +870,7 @@ void CenterDlgInParentEx(HWND hDlg, HWND hParent) {
 	SetWindowPos(hDlg, NULL, clamp(x, xMin, xMax), clamp(y, yMin, yMax), 0, 0, SWP_NOZORDER | SWP_NOSIZE);
 }
 
-void SetToRightBottomEx(HWND hDlg, HWND hParent) {
+void SetToRightBottomEx(HWND hDlg, HWND hParent) noexcept {
 	RECT rcDlg;
 	RECT rcParent;
 	RECT rcClient;
@@ -889,7 +889,7 @@ void SetToRightBottomEx(HWND hDlg, HWND hParent) {
 // Why doesn’t the "Automatically move pointer to the default button in a dialog box"
 // work for nonstandard dialog boxes, and how do I add it to my own nonstandard dialog boxes?
 // https://blogs.msdn.microsoft.com/oldnewthing/20130826-00/?p=3413/
-void SnapToDefaultButton(HWND hwndBox) {
+void SnapToDefaultButton(HWND hwndBox) noexcept {
 	BOOL fSnapToDefButton = FALSE;
 	if (SystemParametersInfo(SPI_GETSNAPTODEFBUTTON, 0, &fSnapToDefButton, 0) && fSnapToDefButton) {
 		// get child window at the top of the Z order.
@@ -913,7 +913,7 @@ void SnapToDefaultButton(HWND hwndBox) {
 //
 // GetDlgPos()
 //
-void GetDlgPos(HWND hDlg, LPINT xDlg, LPINT yDlg) {
+void GetDlgPos(HWND hDlg, LPINT xDlg, LPINT yDlg) noexcept {
 	RECT rcDlg;
 	GetWindowRect(hDlg, &rcDlg);
 
@@ -930,7 +930,7 @@ void GetDlgPos(HWND hDlg, LPINT xDlg, LPINT yDlg) {
 //
 // SetDlgPos()
 //
-void SetDlgPos(HWND hDlg, int xDlg, int yDlg) {
+void SetDlgPos(HWND hDlg, int xDlg, int yDlg) noexcept {
 	RECT rcDlg;
 	GetWindowRect(hDlg, &rcDlg);
 
@@ -1108,7 +1108,7 @@ void ResizeDlg_GetMinMaxInfo(HWND hwnd, LPARAM lParam) {
 #endif
 }
 
-static inline int GetDlgCtlHeight(HWND hwndDlg, int nCtlId) {
+static inline int GetDlgCtlHeight(HWND hwndDlg, int nCtlId) noexcept {
 	RECT rc;
 	GetWindowRect(GetDlgItem(hwndDlg, nCtlId), &rc);
 	const int height = rc.bottom - rc.top;
@@ -1175,7 +1175,7 @@ void ResizeDlgCtl(HWND hwndDlg, int nCtlId, int dx, int dy) {
 // https://docs.microsoft.com/en-us/windows/desktop/Controls/subclassing-overview
 // https://support.microsoft.com/en-us/help/102589/how-to-use-the-enter-key-from-edit-controls-in-a-dialog-box
 // Ctrl+A: https://stackoverflow.com/questions/10127054/select-all-text-in-edit-contol-by-clicking-ctrla
-static LRESULT CALLBACK MultilineEditProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData) {
+static LRESULT CALLBACK MultilineEditProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData) noexcept {
 	UNREFERENCED_PARAMETER(dwRefData);
 
 	switch (umsg) {
@@ -1231,7 +1231,7 @@ static LRESULT CALLBACK MultilineEditProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 	return DefSubclassProc(hwnd, umsg, wParam, lParam);
 }
 
-void MultilineEditSetup(HWND hwndDlg, int nCtlId) {
+void MultilineEditSetup(HWND hwndDlg, int nCtlId) noexcept {
 	SetWindowSubclass(GetDlgItem(hwndDlg, nCtlId), MultilineEditProc, 0, 0);
 }
 
@@ -1239,7 +1239,7 @@ void MultilineEditSetup(HWND hwndDlg, int nCtlId) {
 //
 // MakeBitmapButton()
 //
-void MakeBitmapButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, int wBmpId) {
+void MakeBitmapButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, int wBmpId) noexcept {
 #if NP2_ENABLE_HIDPI_IMAGE_RESOURCE
 	if (hInstance) {
 		wBmpId = GetBitmapResourceIdForCurrentDPI(wBmpId);
@@ -1263,7 +1263,7 @@ void MakeBitmapButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, int wBmpId) {
 //
 // MakeColorPickButton()
 //
-void MakeColorPickButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, COLORREF crColor) {
+void MakeColorPickButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, COLORREF crColor) noexcept {
 	HWND hwndCtl = GetDlgItem(hwnd, nCtlId);
 	BUTTON_IMAGELIST bi;
 	HIMAGELIST himlOld = NULL;
@@ -1313,7 +1313,7 @@ void MakeColorPickButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, COLORREF cr
 //
 // DeleteBitmapButton()
 //
-void DeleteBitmapButton(HWND hwnd, int nCtlId) {
+void DeleteBitmapButton(HWND hwnd, int nCtlId) noexcept {
 	HWND hwndCtl = GetDlgItem(hwnd, nCtlId);
 	BUTTON_IMAGELIST bi;
 	if (Button_GetImageList(hwndCtl, &bi)) {
@@ -1325,7 +1325,7 @@ void DeleteBitmapButton(HWND hwnd, int nCtlId) {
 //
 // SendWMSize()
 //
-LRESULT SendWMSize(HWND hwnd) {
+LRESULT SendWMSize(HWND hwnd) noexcept {
 	RECT rc;
 	GetClientRect(hwnd, &rc);
 	return SendMessage(hwnd, WM_SIZE, SIZE_RESTORED, MAKELPARAM(rc.right, rc.bottom));
@@ -1335,7 +1335,7 @@ LRESULT SendWMSize(HWND hwnd) {
 //
 // StatusSetTextID()
 //
-BOOL StatusSetTextID(HWND hwnd, UINT nPart, UINT uID) {
+BOOL StatusSetTextID(HWND hwnd, UINT nPart, UINT uID) noexcept {
 	WCHAR szText[256];
 	GetString(uID, szText, COUNTOF(szText));
 	return (BOOL)SendMessage(hwnd, SB_SETTEXT, nPart, (LPARAM)szText);
@@ -1345,7 +1345,7 @@ BOOL StatusSetTextID(HWND hwnd, UINT nPart, UINT uID) {
 //
 // StatusCalcPaneWidth()
 //
-int StatusCalcPaneWidth(HWND hwnd, LPCWSTR lpsz) {
+int StatusCalcPaneWidth(HWND hwnd, LPCWSTR lpsz) noexcept {
 	HDC hdc = GetDC(hwnd);
 	HFONT hfont = (HFONT)SendMessage(hwnd, WM_GETFONT, 0, 0);
 	HFONT hfold = (HFONT)SelectObject(hdc, hfont);
@@ -1365,7 +1365,7 @@ int StatusCalcPaneWidth(HWND hwnd, LPCWSTR lpsz) {
 //
 // Toolbar_Get/SetButtons()
 //
-int Toolbar_GetButtons(HWND hwnd, int cmdBase, LPWSTR lpszButtons, int cchButtons) {
+int Toolbar_GetButtons(HWND hwnd, int cmdBase, LPWSTR lpszButtons, int cchButtons) noexcept {
 	const int count = min(MAX_TOOLBAR_ITEM_COUNT_WITH_SEPARATOR, static_cast<int>(SendMessage(hwnd, TB_BUTTONCOUNT, 0, 0)));
 	const int maxCch = cchButtons - 3; // two digits, one space and NULL
 	int len = 0;
@@ -1384,7 +1384,7 @@ int Toolbar_GetButtons(HWND hwnd, int cmdBase, LPWSTR lpszButtons, int cchButton
 	return count;
 }
 
-int Toolbar_SetButtons(HWND hwnd, LPCWSTR lpszButtons, LPCTBBUTTON ptbb, int ctbb) {
+int Toolbar_SetButtons(HWND hwnd, LPCWSTR lpszButtons, LPCTBBUTTON ptbb, int ctbb) noexcept {
 	int count = static_cast<int>(SendMessage(hwnd, TB_BUTTONCOUNT, 0, 0));
 	if (StrIsEmpty(lpszButtons)) {
 		return count;
@@ -1420,7 +1420,7 @@ int Toolbar_SetButtons(HWND hwnd, LPCWSTR lpszButtons, LPCTBBUTTON ptbb, int ctb
 //
 // IsCmdEnabled()
 //
-bool IsCmdEnabled(HWND hwnd, UINT uId) {
+bool IsCmdEnabled(HWND hwnd, UINT uId) noexcept {
 	HMENU hmenu = GetMenu(hwnd);
 	SendMessage(hwnd, WM_INITMENU, (WPARAM)hmenu, 0);
 	const UINT ustate = GetMenuState(hmenu, uId, MF_BYCOMMAND);
@@ -1431,7 +1431,7 @@ bool IsCmdEnabled(HWND hwnd, UINT uId) {
 	return !(ustate & (MF_GRAYED | MF_DISABLED));
 }
 
-INT GetCheckedRadioButton(HWND hwnd, int nIDFirstButton, int nIDLastButton) {
+INT GetCheckedRadioButton(HWND hwnd, int nIDFirstButton, int nIDLastButton) noexcept {
 	for (int i = nIDFirstButton; i <= nIDLastButton; i++) {
 		if (IsButtonChecked(hwnd, i)) {
 			return i;
@@ -1441,7 +1441,7 @@ INT GetCheckedRadioButton(HWND hwnd, int nIDFirstButton, int nIDLastButton) {
 }
 
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
-HMODULE LoadLocalizedResourceDLL(LANGID lang, LPCWSTR dllName) {
+HMODULE LoadLocalizedResourceDLL(LANGID lang, LPCWSTR dllName) noexcept {
 	if (lang == LANG_USER_DEFAULT) {
 		lang = GetUserDefaultUILanguage();
 	}
@@ -1491,7 +1491,7 @@ HMODULE LoadLocalizedResourceDLL(LANGID lang, LPCWSTR dllName) {
 }
 
 #if NP2_ENABLE_TEST_LOCALIZATION_LAYOUT
-void GetLocaleDefaultUIFont(LANGID lang, LPWSTR lpFaceName, WORD *wSize) {
+void GetLocaleDefaultUIFont(LANGID lang, LPWSTR lpFaceName, WORD *wSize) noexcept {
 	LPCWSTR font;
 	const LANGID subLang = SUBLANGID(lang);
 	switch (PRIMARYLANGID(lang)) {
@@ -1520,7 +1520,7 @@ void GetLocaleDefaultUIFont(LANGID lang, LPWSTR lpFaceName, WORD *wSize) {
 #endif
 #endif // NP2_ENABLE_APP_LOCALIZATION_DLL
 
-bool PathGetRealPath(HANDLE hFile, LPCWSTR lpszSrc, LPWSTR lpszDest) {
+bool PathGetRealPath(HANDLE hFile, LPCWSTR lpszSrc, LPWSTR lpszDest) noexcept {
 	WCHAR path[8 + MAX_PATH] = L"";
 	if (IsVistaAndAbove()) {
 		const bool closing = hFile == NULL;
@@ -1582,19 +1582,19 @@ bool PathGetRealPath(HANDLE hFile, LPCWSTR lpszSrc, LPWSTR lpszDest) {
 
 #if _WIN32_WINNT < _WIN32_WINNT_WIN8
 #if defined(_MSC_BUILD) && !defined(FILE_INVALID_FILE_ID)
-typedef struct FILE_ID_128 {
+struct FILE_ID_128 {
 	BYTE Identifier[16];
-} FILE_ID_128;
+};
 #endif // Win32 XP v141_xp toolset with Windows 7 SDK.
 
 enum { FileIdInfo = 0x12 };
-typedef struct FILE_ID_INFO {
+struct FILE_ID_INFO {
 	ULONGLONG VolumeSerialNumber;
 	FILE_ID_128 FileId;
-} FILE_ID_INFO;
+};
 #endif
 
-static inline BOOL PathGetFileId(HANDLE hFile, FILE_ID_INFO *fileId) {
+static inline BOOL PathGetFileId(HANDLE hFile, FILE_ID_INFO *fileId) noexcept {
 	BOOL success = FALSE;
 	if (IsWin8AndAbove()) {
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
@@ -1622,7 +1622,7 @@ static inline BOOL PathGetFileId(HANDLE hFile, FILE_ID_INFO *fileId) {
 	return success;
 }
 
-bool PathEquivalent(LPCWSTR pszPath1, LPCWSTR pszPath2) {
+bool PathEquivalent(LPCWSTR pszPath1, LPCWSTR pszPath2) noexcept {
 	if (PathEqual(pszPath1, pszPath2)) {
 		// TODO: support WSL case sensitive path created by FILE_FLAG_POSIX_SEMANTICS
 		// https://devblogs.microsoft.com/commandline/per-directory-case-sensitivity-and-wsl/
@@ -1659,7 +1659,7 @@ bool PathEquivalent(LPCWSTR pszPath1, LPCWSTR pszPath2) {
 //
 // PathRelativeToApp()
 //
-void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, DWORD dwAttrTo, bool bUnexpandEnv, bool bUnexpandMyDocs) {
+void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, DWORD dwAttrTo, bool bUnexpandEnv, bool bUnexpandMyDocs) noexcept {
 	WCHAR wchPath[MAX_PATH];
 
 	if (!PathIsRelative(lpszSrc)) {
@@ -1716,7 +1716,7 @@ void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, DWORD dwAttrTo, bool bU
 //
 // PathAbsoluteFromApp()
 //
-void PathAbsoluteFromApp(LPCWSTR lpszSrc, LPWSTR lpszDest, bool bExpandEnv) {
+void PathAbsoluteFromApp(LPCWSTR lpszSrc, LPWSTR lpszDest, bool bExpandEnv) noexcept {
 	WCHAR wchPath[MAX_PATH];
 
 	if (StrHasPrefix(lpszSrc, L"%CSIDL:MYDOCUMENTS%")) {
@@ -1923,7 +1923,7 @@ bool PathCreateFavLnk(LPCWSTR pszName, LPCWSTR pszTarget, LPCWSTR pszDir) {
 	return bSucceeded;
 }
 
-void OpenContainingFolder(HWND hwnd, LPCWSTR pszFile, bool bSelect) {
+void OpenContainingFolder(HWND hwnd, LPCWSTR pszFile, bool bSelect) noexcept {
 	WCHAR wchDirectory[MAX_PATH];
 	lstrcpyn(wchDirectory, pszFile, COUNTOF(wchDirectory));
 
@@ -2002,7 +2002,7 @@ void OpenContainingFolder(HWND hwnd, LPCWSTR pszFile, bool bSelect) {
 //
 // ExtractFirstArgument()
 //
-bool ExtractFirstArgument(LPCWSTR lpArgs, LPWSTR lpArg1, LPWSTR lpArg2) {
+bool ExtractFirstArgument(LPCWSTR lpArgs, LPWSTR lpArg1, LPWSTR lpArg2) noexcept {
 	bool bQuoted = false;
 
 	lstrcpy(lpArg1, lpArgs);
@@ -2051,7 +2051,7 @@ bool ExtractFirstArgument(LPCWSTR lpArgs, LPWSTR lpArg1, LPWSTR lpArg2) {
 //
 // PrepareFilterStr()
 //
-void PrepareFilterStr(LPWSTR lpFilter) {
+void PrepareFilterStr(LPWSTR lpFilter) noexcept {
 	LPWSTR psz = StrEnd(lpFilter);
 	while (psz != lpFilter) {
 		--psz;
@@ -2065,7 +2065,7 @@ void PrepareFilterStr(LPWSTR lpFilter) {
 //
 // StrTab2Space() - in place conversion
 //
-void StrTab2Space(LPWSTR lpsz) {
+void StrTab2Space(LPWSTR lpsz) noexcept {
 	WCHAR *c = lpsz;
 	while ((c = StrChr(c, L'\t')) != NULL) {
 		*c++ = L' ';
@@ -2076,7 +2076,7 @@ void StrTab2Space(LPWSTR lpsz) {
 //
 // PathFixBackslashes() - in place conversion
 //
-bool PathFixBackslashes(LPWSTR lpsz) {
+bool PathFixBackslashes(LPWSTR lpsz) noexcept {
 	WCHAR *c = lpsz;
 	bool bFixed = false;
 	while ((c = StrChr(c, L'/')) != NULL) {
@@ -2096,7 +2096,7 @@ bool PathFixBackslashes(LPWSTR lpsz) {
 //
 // Adjusted for Windows 95
 //
-void ExpandEnvironmentStringsEx(LPWSTR lpSrc, DWORD dwSrc) {
+void ExpandEnvironmentStringsEx(LPWSTR lpSrc, DWORD dwSrc) noexcept {
 	WCHAR szBuf[312];
 
 	if (ExpandEnvironmentStrings(lpSrc, szBuf, COUNTOF(szBuf))) {
@@ -2111,7 +2111,7 @@ void ExpandEnvironmentStringsEx(LPWSTR lpSrc, DWORD dwSrc) {
 //	Return a default name when the file has been removed, and always append
 //	a filename extension
 //
-DWORD_PTR SHGetFileInfo2(LPCWSTR pszPath, DWORD dwFileAttributes, SHFILEINFO *psfi, UINT cbFileInfo, UINT uFlags) {
+DWORD_PTR SHGetFileInfo2(LPCWSTR pszPath, DWORD dwFileAttributes, SHFILEINFO *psfi, UINT cbFileInfo, UINT uFlags) noexcept {
 	if (PathIsFile(pszPath)) {
 		const DWORD_PTR dw = SHGetFileInfo(pszPath, dwFileAttributes, psfi, cbFileInfo, uFlags);
 		if (lstrlen(psfi->szDisplayName) < lstrlen(PathFindFileName(pszPath))) {
@@ -2128,7 +2128,7 @@ DWORD_PTR SHGetFileInfo2(LPCWSTR pszPath, DWORD dwFileAttributes, SHFILEINFO *ps
 	}
 }
 
-void StripMnemonic(LPWSTR pszMenu) {
+void StripMnemonic(LPWSTR pszMenu) noexcept {
 	LPWSTR prev = pszMenu;
 	do {
 		LPWSTR p = StrChr(prev, L'&');
@@ -2164,7 +2164,7 @@ void StripMnemonic(LPWSTR pszMenu) {
 // FormatNumber()
 //
 #ifndef _WIN64
-void FormatNumber64(LPWSTR lpNumberStr, uint64_t value) {
+void FormatNumber64(LPWSTR lpNumberStr, uint64_t value) noexcept {
 	_i64tow(value, lpNumberStr, 10);
 	// https://docs.microsoft.com/en-us/windows/desktop/Intl/locale-sthousand
 	// https://docs.microsoft.com/en-us/windows/desktop/Intl/locale-sgrouping
@@ -2187,7 +2187,7 @@ void FormatNumber64(LPWSTR lpNumberStr, uint64_t value) {
 }
 #endif
 
-void FormatNumber(LPWSTR lpNumberStr, size_t value) {
+void FormatNumber(LPWSTR lpNumberStr, size_t value) noexcept {
 	if (value < 10) {
 		lpNumberStr[0] = (WCHAR)(value + L'0');
 		lpNumberStr[1] = L'\0';
@@ -2235,7 +2235,7 @@ void FormatNumber(LPWSTR lpNumberStr, size_t value) {
 	}
 }
 
-LPWSTR GetDlgItemFullText(HWND hwndDlg, int nCtlId) {
+LPWSTR GetDlgItemFullText(HWND hwndDlg, int nCtlId) noexcept {
 	hwndDlg = GetDlgItem(hwndDlg, nCtlId);
 	int len = GetWindowTextLength(hwndDlg);
 	if (len == 0) {
@@ -2251,7 +2251,7 @@ LPWSTR GetDlgItemFullText(HWND hwndDlg, int nCtlId) {
 //
 // A2W: Convert Dialog Item Text form Unicode to UTF-8 and vice versa
 //
-int GetDlgItemTextA2W(UINT uCP, HWND hDlg, int nIDDlgItem, LPSTR lpString, int nMaxCount) {
+int GetDlgItemTextA2W(UINT uCP, HWND hDlg, int nIDDlgItem, LPSTR lpString, int nMaxCount) noexcept {
 	LPWSTR wsz = GetDlgItemFullText(hDlg, nIDDlgItem);
 	memset(lpString, 0, nMaxCount);
 	int len = 0;
@@ -2262,7 +2262,7 @@ int GetDlgItemTextA2W(UINT uCP, HWND hDlg, int nIDDlgItem, LPSTR lpString, int n
 	return len;
 }
 
-void SetDlgItemTextA2W(UINT uCP, HWND hDlg, int nIDDlgItem, LPCSTR lpString) {
+void SetDlgItemTextA2W(UINT uCP, HWND hDlg, int nIDDlgItem, LPCSTR lpString) noexcept {
 	const int len = lpString ? (int)strlen(lpString) : 0;
 	if (len) {
 		LPWSTR wsz = (LPWSTR)NP2HeapAlloc((len + 1) * sizeof(WCHAR));
@@ -2274,7 +2274,7 @@ void SetDlgItemTextA2W(UINT uCP, HWND hDlg, int nIDDlgItem, LPCSTR lpString) {
 	}
 }
 
-void ComboBox_AddStringA2W(UINT uCP, HWND hwnd, LPCSTR lpString) {
+void ComboBox_AddStringA2W(UINT uCP, HWND hwnd, LPCSTR lpString) noexcept {
 	const int len = lpString ? (int)strlen(lpString) : 0;
 	if (len) {
 		LPWSTR wsz = (LPWSTR)NP2HeapAlloc((len + 1) * sizeof(WCHAR));
@@ -2549,7 +2549,7 @@ HBITMAP BitmapCache_Get(BitmapCache *cache, LPCWSTR path) {
  Based on code of MFC helper class CDialogTemplate
 
 */
-bool GetThemedDialogFont(LPWSTR lpFaceName, WORD *wSize) {
+bool GetThemedDialogFont(LPWSTR lpFaceName, WORD *wSize) noexcept {
 #if NP2_ENABLE_APP_LOCALIZATION_DLL && NP2_ENABLE_TEST_LOCALIZATION_LAYOUT
 	extern LANGID uiLanguage;
 	GetLocaleDefaultUIFont(uiLanguage, lpFaceName, wSize);
@@ -2604,19 +2604,21 @@ bool GetThemedDialogFont(LPWSTR lpFaceName, WORD *wSize) {
 #endif
 }
 
-static inline bool DialogTemplate_IsDialogEx(const DLGTEMPLATE *pTemplate) {
+namespace {
+
+bool DialogTemplate_IsDialogEx(const DLGTEMPLATE *pTemplate) noexcept {
 	return ((DLGTEMPLATEEX *)pTemplate)->signature == 0xFFFF;
 }
 
-static inline BOOL DialogTemplate_HasFont(const DLGTEMPLATE *pTemplate) {
+BOOL DialogTemplate_HasFont(const DLGTEMPLATE *pTemplate) noexcept {
 	return (DS_SETFONT & (DialogTemplate_IsDialogEx(pTemplate) ? ((DLGTEMPLATEEX *)pTemplate)->style : pTemplate->style));
 }
 
-static inline int DialogTemplate_FontAttrSize(bool bDialogEx) {
-	return (int)sizeof(WORD) * (bDialogEx ? 3 : 1);
+constexpr int DialogTemplate_FontAttrSize(bool bDialogEx) noexcept {
+	return sizeof(WORD) * (bDialogEx ? 3 : 1);
 }
 
-static inline BYTE *DialogTemplate_GetFontSizeField(const DLGTEMPLATE *pTemplate) {
+BYTE *DialogTemplate_GetFontSizeField(const DLGTEMPLATE *pTemplate) noexcept {
 	const bool bDialogEx = DialogTemplate_IsDialogEx(pTemplate);
 	WORD *pw;
 
@@ -2643,7 +2645,9 @@ static inline BYTE *DialogTemplate_GetFontSizeField(const DLGTEMPLATE *pTemplate
 	return (BYTE *)pw;
 }
 
-DLGTEMPLATE *LoadThemedDialogTemplate(LPCWSTR lpDialogTemplateID, HINSTANCE hInstance) {
+}
+
+DLGTEMPLATE *LoadThemedDialogTemplate(LPCWSTR lpDialogTemplateID, HINSTANCE hInstance) noexcept {
 	HRSRC hRsrc = FindResource(hInstance, lpDialogTemplateID, RT_DIALOG);
 	if (hRsrc == NULL) {
 		return NULL;
@@ -2698,7 +2702,7 @@ DLGTEMPLATE *LoadThemedDialogTemplate(LPCWSTR lpDialogTemplateID, HINSTANCE hIns
 	return pTemplate;
 }
 
-INT_PTR ThemedDialogBoxParam(HINSTANCE hInstance, LPCWSTR lpTemplate, HWND hWndParent, DLGPROC lpDialogFunc, LPARAM dwInitParam) {
+INT_PTR ThemedDialogBoxParam(HINSTANCE hInstance, LPCWSTR lpTemplate, HWND hWndParent, DLGPROC lpDialogFunc, LPARAM dwInitParam) noexcept {
 	DLGTEMPLATE *pDlgTemplate = LoadThemedDialogTemplate(lpTemplate, hInstance);
 	const INT_PTR ret = DialogBoxIndirectParam(hInstance, pDlgTemplate, hWndParent, lpDialogFunc, dwInitParam);
 	if (pDlgTemplate) {
@@ -2708,7 +2712,7 @@ INT_PTR ThemedDialogBoxParam(HINSTANCE hInstance, LPCWSTR lpTemplate, HWND hWndP
 	return ret;
 }
 
-HWND CreateThemedDialogParam(HINSTANCE hInstance, LPCWSTR lpTemplate, HWND hWndParent, DLGPROC lpDialogFunc, LPARAM dwInitParam) {
+HWND CreateThemedDialogParam(HINSTANCE hInstance, LPCWSTR lpTemplate, HWND hWndParent, DLGPROC lpDialogFunc, LPARAM dwInitParam) noexcept {
 	DLGTEMPLATE *pDlgTemplate = LoadThemedDialogTemplate(lpTemplate, hInstance);
 	HWND hwnd = CreateDialogIndirectParam(hInstance, pDlgTemplate, hWndParent, lpDialogFunc, dwInitParam);
 	if (pDlgTemplate) {
@@ -2723,7 +2727,7 @@ HWND CreateThemedDialogParam(HINSTANCE hInstance, LPCWSTR lpTemplate, HWND hWndP
 // File Dialog Hook for GetOpenFileName/GetSaveFileName
 // https://docs.microsoft.com/en-us/windows/win32/dlgbox/open-and-save-as-dialog-boxes
 //
-static LRESULT CALLBACK OpenSaveFileDlgSubProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData) {
+static LRESULT CALLBACK OpenSaveFileDlgSubProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData) noexcept {
 	UNREFERENCED_PARAMETER(dwRefData);
 
 	switch (umsg) {
@@ -2747,7 +2751,7 @@ static LRESULT CALLBACK OpenSaveFileDlgSubProc(HWND hwnd, UINT umsg, WPARAM wPar
 	return DefSubclassProc(hwnd, umsg, wParam, lParam);
 }
 
-UINT_PTR CALLBACK OpenSaveFileDlgHookProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+UINT_PTR CALLBACK OpenSaveFileDlgHookProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	UNREFERENCED_PARAMETER(wParam);
 
 	switch (umsg) {
@@ -2775,7 +2779,7 @@ UINT_PTR CALLBACK OpenSaveFileDlgHookProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 /**
  * Convert C style \a, \b, \f, \n, \r, \t, \v, \xhh and \uhhhh into their indicated characters.
  */
-unsigned int UnSlash(char *s, UINT cpEdit) {
+unsigned int UnSlash(char *s, UINT cpEdit) noexcept {
 	const char * const start = s;
 	char *o = s;
 
@@ -2862,7 +2866,7 @@ unsigned int UnSlash(char *s, UINT cpEdit) {
  * Convert C style \0oo into their indicated characters.
  * This is used to get control characters into the regular expression engine.
  */
-unsigned int UnSlashLowOctal(char *s) {
+unsigned int UnSlashLowOctal(char *s) noexcept {
 	const char * const start = s;
 	char *o = s;
 
@@ -2883,7 +2887,7 @@ unsigned int UnSlashLowOctal(char *s) {
 	return (unsigned int)(o - start);
 }
 
-void TransformBackslashes(char *pszInput, BOOL bRegEx, UINT cpEdit) {
+void TransformBackslashes(char *pszInput, BOOL bRegEx, UINT cpEdit) noexcept {
 	if (bRegEx) {
 		UnSlashLowOctal(pszInput);
 	} else {
@@ -2891,7 +2895,7 @@ void TransformBackslashes(char *pszInput, BOOL bRegEx, UINT cpEdit) {
 	}
 }
 
-bool AddBackslashA(char *pszOut, const char *pszInput) {
+bool AddBackslashA(char *pszOut, const char *pszInput) noexcept {
 	bool hasEscapeChar = false;
 	bool hasSlash = false;
 	char *lpszEsc = pszOut;
@@ -2923,7 +2927,7 @@ bool AddBackslashA(char *pszOut, const char *pszInput) {
 	return hasEscapeChar;
 }
 
-bool AddBackslashW(LPWSTR pszOut, LPCWSTR pszInput) {
+bool AddBackslashW(LPWSTR pszOut, LPCWSTR pszInput) noexcept {
 	bool hasEscapeChar = false;
 	bool hasSlash = false;
 	LPWSTR lpszEsc = pszOut;
@@ -2955,7 +2959,7 @@ bool AddBackslashW(LPWSTR pszOut, LPCWSTR pszInput) {
 	return hasEscapeChar;
 }
 
-size_t Base64Encode(char *output, const uint8_t *src, size_t length, bool urlSafe) {
+size_t Base64Encode(char *output, const uint8_t *src, size_t length, bool urlSafe) noexcept {
 	char table[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 	if (urlSafe) {
 		table[62] = '-';
@@ -2998,7 +3002,7 @@ static const uint8_t Base64DecodingTable[128] = {
  41,  42,  43,  44,  45,  46,  47,  48,  49,  50,  51, 128, 128, 128, 128, 128,
 };
 
-size_t Base64Decode(uint8_t *output, const uint8_t *src, size_t length) {
+size_t Base64Decode(uint8_t *output, const uint8_t *src, size_t length) noexcept {
 	uint32_t value = 0;
 	uint8_t *p = output;
 	size_t i = 0;
@@ -3084,7 +3088,7 @@ size_t Base64Decode(uint8_t *output, const uint8_t *src, size_t length) {
 // all current versions of the shell. If explorer isn't running, we try our
 // best to work with a 3rd party shell. If we still can't find anything, we
 // return a rect in the lower right hand corner of the screen
-static void GetTrayWndRect(LPRECT lpTrayRect) {
+static void GetTrayWndRect(LPRECT lpTrayRect) noexcept {
 	// First, we'll use a quick hack method. We know that the taskbar is a window
 	// of class Shell_TrayWnd, and the status tray is a child of this of class
 	// TrayNotifyWnd. This provides us a window rect to minimize to. Note, however,
@@ -3166,7 +3170,7 @@ static void GetTrayWndRect(LPRECT lpTrayRect) {
 }
 
 // Check to see if the animation has been disabled
-/*static */bool GetDoAnimateMinimize(void) {
+/*static */bool GetDoAnimateMinimize() noexcept {
 	ANIMATIONINFO ai;
 
 	ai.cbSize = sizeof(ai);
@@ -3175,7 +3179,7 @@ static void GetTrayWndRect(LPRECT lpTrayRect) {
 	return ai.iMinAnimate != 0;
 }
 
-void MinimizeWndToTray(HWND hwnd) {
+void MinimizeWndToTray(HWND hwnd) noexcept {
 	if (GetDoAnimateMinimize()) {
 		RECT rcFrom;
 		RECT rcTo;
@@ -3197,7 +3201,7 @@ void MinimizeWndToTray(HWND hwnd) {
 	ShowWindow(hwnd, SW_HIDE);
 }
 
-void RestoreWndFromTray(HWND hwnd) {
+void RestoreWndFromTray(HWND hwnd) noexcept {
 	if (GetDoAnimateMinimize()) {
 		// Get the rect of the tray and the window. Note that the window rect
 		// is still valid even though the window is hidden

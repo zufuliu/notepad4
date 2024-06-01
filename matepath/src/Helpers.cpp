@@ -40,7 +40,7 @@ struct IUnknown;
 #include "Dlapi.h"
 #include "resource.h"
 
-void IniClearSectionEx(LPCWSTR lpSection, LPCWSTR lpszIniFile, bool bDelete) {
+void IniClearSectionEx(LPCWSTR lpSection, LPCWSTR lpszIniFile, bool bDelete) noexcept {
 	if (StrIsEmpty(lpszIniFile)) {
 		return;
 	}
@@ -48,7 +48,7 @@ void IniClearSectionEx(LPCWSTR lpSection, LPCWSTR lpszIniFile, bool bDelete) {
 	WritePrivateProfileSection(lpSection, (bDelete ? NULL : L""), lpszIniFile);
 }
 
-void IniClearAllSectionEx(LPCWSTR lpszPrefix, LPCWSTR lpszIniFile, bool bDelete) {
+void IniClearAllSectionEx(LPCWSTR lpszPrefix, LPCWSTR lpszIniFile, bool bDelete) noexcept {
 	if (StrIsEmpty(lpszIniFile)) {
 		return;
 	}
@@ -226,7 +226,7 @@ void IniSectionSetString(IniSectionOnSave *section, LPCWSTR key, LPCWSTR value) 
 	section->next = p;
 }
 
-LPWSTR Registry_GetString(HKEY hKey, LPCWSTR valueName) {
+LPWSTR Registry_GetString(HKEY hKey, LPCWSTR valueName) noexcept {
 	LPWSTR lpszText = NULL;
 	DWORD type = REG_NONE;
 	DWORD size = 0;
@@ -244,7 +244,7 @@ LPWSTR Registry_GetString(HKEY hKey, LPCWSTR valueName) {
 	return lpszText;
 }
 
-LSTATUS Registry_SetString(HKEY hKey, LPCWSTR valueName, LPCWSTR lpszText) {
+LSTATUS Registry_SetString(HKEY hKey, LPCWSTR valueName, LPCWSTR lpszText) noexcept {
 	DWORD len = lstrlen(lpszText);
 	len = len ? ((len + 1)*sizeof(WCHAR)) : 0;
 	const LSTATUS status = RegSetValueEx(hKey, valueName, 0, REG_SZ, (const BYTE *)lpszText, len);
@@ -252,7 +252,7 @@ LSTATUS Registry_SetString(HKEY hKey, LPCWSTR valueName, LPCWSTR lpszText) {
 }
 
 #if _WIN32_WINNT < _WIN32_WINNT_VISTA
-LSTATUS Registry_DeleteTree(HKEY hKey, LPCWSTR lpSubKey) {
+LSTATUS Registry_DeleteTree(HKEY hKey, LPCWSTR lpSubKey) noexcept {
 	typedef LSTATUS (WINAPI *RegDeleteTreeSig)(HKEY hKey, LPCWSTR lpSubKey);
 	RegDeleteTreeSig pfnRegDeleteTree = DLLFunctionEx(RegDeleteTreeSig, L"advapi32.dll", "RegDeleteTreeW");
 
@@ -271,7 +271,7 @@ LSTATUS Registry_DeleteTree(HKEY hKey, LPCWSTR lpSubKey) {
 }
 #endif
 
-int ParseCommaList(LPCWSTR str, int result[], int count) {
+int ParseCommaList(LPCWSTR str, int result[], int count) noexcept {
 	if (StrIsEmpty(str)) {
 		return 0;
 	}
@@ -293,7 +293,7 @@ int ParseCommaList(LPCWSTR str, int result[], int count) {
 	return index;
 }
 
-bool FindUserResourcePath(LPCWSTR path, LPWSTR outPath) {
+bool FindUserResourcePath(LPCWSTR path, LPWSTR outPath) noexcept {
 	// similar to CheckIniFile()
 	WCHAR tchFileExpanded[MAX_PATH];
 	ExpandEnvironmentStrings(path, tchFileExpanded, COUNTOF(tchFileExpanded));
@@ -324,7 +324,7 @@ bool FindUserResourcePath(LPCWSTR path, LPWSTR outPath) {
 	return false;
 }
 
-HBITMAP LoadBitmapFile(LPCWSTR path) {
+HBITMAP LoadBitmapFile(LPCWSTR path) noexcept {
 	WCHAR szTmp[MAX_PATH];
 	if (!FindUserResourcePath(path, szTmp)) {
 		return NULL;
@@ -334,7 +334,7 @@ HBITMAP LoadBitmapFile(LPCWSTR path) {
 	return hbmp;
 }
 
-HBITMAP ResizeImageForCurrentDPI(HBITMAP hbmp) {
+HBITMAP ResizeImageForCurrentDPI(HBITMAP hbmp) noexcept {
 	BITMAP bmp;
 	if (GetObject(hbmp, sizeof(BITMAP), &bmp)) {
 		// assume 16x16 at 100% scaling
@@ -396,7 +396,7 @@ void BackgroundWorker_Destroy(BackgroundWorker *worker) {
 //
 // PrivateSetCurrentProcessExplicitAppUserModelID()
 //
-HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(PCWSTR AppID) {
+HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(PCWSTR AppID) noexcept {
 	if (StrIsEmpty(AppID)) {
 		return S_OK;
 	}
@@ -422,7 +422,7 @@ HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(PCWSTR AppID) {
 //
 // IsElevated()
 //
-bool IsElevated(void) {
+bool IsElevated() noexcept {
 	bool bIsElevated = false;
 	HANDLE hToken = NULL;
 
@@ -444,7 +444,7 @@ bool IsElevated(void) {
 //
 //  ExeNameFromWnd()
 //
-bool ExeNameFromWnd(HWND hwnd, LPWSTR szExeName, DWORD cchExeName) {
+bool ExeNameFromWnd(HWND hwnd, LPWSTR szExeName, DWORD cchExeName) noexcept {
 	DWORD dwProcessId;
 	GetWindowThreadProcessId(hwnd, &dwProcessId);
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
@@ -463,7 +463,7 @@ bool ExeNameFromWnd(HWND hwnd, LPWSTR szExeName, DWORD cchExeName) {
 ////  Is32bitExe()
 ////
 /*
-bool Is32bitExe(LPCWSTR lpszExeName) {
+bool Is32bitExe(LPCWSTR lpszExeName) noexcept {
 	SHFILEINFO shfi;
 	DWORD dwExeType;
 	WCHAR tch[MAX_PATH];
@@ -483,7 +483,7 @@ bool Is32bitExe(LPCWSTR lpszExeName) {
 //  BitmapAlphaBlend()
 //  Perform alpha blending to color channel only
 //
-bool BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha) {
+bool BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha) noexcept {
 	BITMAP bmp;
 	if (GetObject(hbmp, sizeof(BITMAP), &bmp)) {
 		if (bmp.bmBitsPixel == 32) {
@@ -588,7 +588,7 @@ bool BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha) {
 //
 //  CenterDlgInParentEx()
 //
-void CenterDlgInParentEx(HWND hDlg, HWND hParent) {
+void CenterDlgInParentEx(HWND hDlg, HWND hParent) noexcept {
 	RECT rcDlg;
 	RECT rcParent;
 
@@ -626,7 +626,7 @@ void CenterDlgInParentEx(HWND hDlg, HWND hParent) {
 // Why doesn’t the "Automatically move pointer to the default button in a dialog box"
 // work for nonstandard dialog boxes, and how do I add it to my own nonstandard dialog boxes?
 // https://blogs.msdn.microsoft.com/oldnewthing/20130826-00/?p=3413/
-void SnapToDefaultButton(HWND hwndBox) {
+void SnapToDefaultButton(HWND hwndBox) noexcept {
 	BOOL fSnapToDefButton = FALSE;
 	if (SystemParametersInfo(SPI_GETSNAPTODEFBUTTON, 0, &fSnapToDefButton, 0) && fSnapToDefButton) {
 		// get child window at the top of the Z order.
@@ -650,7 +650,7 @@ void SnapToDefaultButton(HWND hwndBox) {
 //
 // GetDlgPos()
 //
-void GetDlgPos(HWND hDlg, LPINT xDlg, LPINT yDlg) {
+void GetDlgPos(HWND hDlg, LPINT xDlg, LPINT yDlg) noexcept {
 	RECT rcDlg;
 	GetWindowRect(hDlg, &rcDlg);
 
@@ -667,7 +667,7 @@ void GetDlgPos(HWND hDlg, LPINT xDlg, LPINT yDlg) {
 //
 // SetDlgPos()
 //
-void SetDlgPos(HWND hDlg, int xDlg, int yDlg) {
+void SetDlgPos(HWND hDlg, int xDlg, int yDlg) noexcept {
 	RECT rcDlg;
 	GetWindowRect(hDlg, &rcDlg);
 
@@ -869,7 +869,7 @@ void ResizeDlgCtl(HWND hwndDlg, int nCtlId, int dx, int dy) {
 //
 //  MakeBitmapButton()
 //
-void MakeBitmapButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, int wBmpId) {
+void MakeBitmapButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, int wBmpId) noexcept {
 #if NP2_ENABLE_HIDPI_IMAGE_RESOURCE
 	if (hInstance) {
 		wBmpId = GetBitmapResourceIdForCurrentDPI(wBmpId);
@@ -893,7 +893,7 @@ void MakeBitmapButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, int wBmpId) {
 //
 //  DeleteBitmapButton()
 //
-void DeleteBitmapButton(HWND hwnd, int nCtlId) {
+void DeleteBitmapButton(HWND hwnd, int nCtlId) noexcept {
 	HWND hwndCtl = GetDlgItem(hwnd, nCtlId);
 	BUTTON_IMAGELIST bi;
 	if (Button_GetImageList(hwndCtl, &bi)) {
@@ -905,7 +905,7 @@ void DeleteBitmapButton(HWND hwnd, int nCtlId) {
 //
 // SetClipData()
 //
-void SetClipData(HWND hwnd, LPCWSTR pszData) {
+void SetClipData(HWND hwnd, LPCWSTR pszData) noexcept {
 	if (OpenClipboard(hwnd)) {
 		EmptyClipboard();
 		HANDLE hData = GlobalAlloc(GHND, sizeof(WCHAR) * (lstrlen(pszData) + 1));
@@ -921,7 +921,7 @@ void SetClipData(HWND hwnd, LPCWSTR pszData) {
 //
 //  SetWindowTransparentMode()
 //
-void SetWindowTransparentMode(HWND hwnd, bool bTransparentMode, int iOpacityLevel) {
+void SetWindowTransparentMode(HWND hwnd, bool bTransparentMode, int iOpacityLevel) noexcept {
 	// https://docs.microsoft.com/en-us/windows/win32/winmsg/using-windows#using-layered-windows
 	DWORD exStyle = GetWindowExStyle(hwnd);
 	exStyle = bTransparentMode ? (exStyle | WS_EX_LAYERED) : (exStyle & ~WS_EX_LAYERED);
@@ -934,7 +934,7 @@ void SetWindowTransparentMode(HWND hwnd, bool bTransparentMode, int iOpacityLeve
 	RedrawWindow(hwnd, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
 }
 
-void SetWindowLayoutRTL(HWND hwnd, bool bRTL) {
+void SetWindowLayoutRTL(HWND hwnd, bool bRTL) noexcept {
 	// https://docs.microsoft.com/en-us/windows/win32/winmsg/window-features#window-layout-and-mirroring
 	DWORD exStyle = GetWindowExStyle(hwnd);
 	exStyle = bRTL ? (exStyle | WS_EX_LAYOUTRTL) : (exStyle & ~WS_EX_LAYOUTRTL);
@@ -947,7 +947,7 @@ void SetWindowLayoutRTL(HWND hwnd, bool bRTL) {
 //
 //  Toolbar_Get/SetButtons()
 //
-int Toolbar_GetButtons(HWND hwnd, int cmdBase, LPWSTR lpszButtons, int cchButtons) {
+int Toolbar_GetButtons(HWND hwnd, int cmdBase, LPWSTR lpszButtons, int cchButtons) noexcept {
 	const int count = min(MAX_TOOLBAR_ITEM_COUNT_WITH_SEPARATOR, static_cast<int>(SendMessage(hwnd, TB_BUTTONCOUNT, 0, 0)));
 	const int maxCch = cchButtons - 3; // two digits, one space and NULL
 	int len = 0;
@@ -966,7 +966,7 @@ int Toolbar_GetButtons(HWND hwnd, int cmdBase, LPWSTR lpszButtons, int cchButton
 	return count;
 }
 
-int Toolbar_SetButtons(HWND hwnd, LPCWSTR lpszButtons, LPCTBBUTTON ptbb, int ctbb) {
+int Toolbar_SetButtons(HWND hwnd, LPCWSTR lpszButtons, LPCTBBUTTON ptbb, int ctbb) noexcept {
 	int count = static_cast<int>(SendMessage(hwnd, TB_BUTTONCOUNT, 0, 0));
 	if (StrIsEmpty(lpszButtons)) {
 		return count;
@@ -1002,7 +1002,7 @@ int Toolbar_SetButtons(HWND hwnd, LPCWSTR lpszButtons, LPCTBBUTTON ptbb, int ctb
 //
 //  Toolbar_SetButtonImage()
 //
-void Toolbar_SetButtonImage(HWND hwnd, int idCommand, int iImage) {
+void Toolbar_SetButtonImage(HWND hwnd, int idCommand, int iImage) noexcept {
 	TBBUTTONINFO tbbi;
 
 	tbbi.cbSize = sizeof(TBBUTTONINFO);
@@ -1016,14 +1016,14 @@ void Toolbar_SetButtonImage(HWND hwnd, int idCommand, int iImage) {
 //
 //  SendWMSize()
 //
-LRESULT SendWMSize(HWND hwnd) {
+LRESULT SendWMSize(HWND hwnd) noexcept {
 	RECT rc;
 	GetClientRect(hwnd, &rc);
 	return SendMessage(hwnd, WM_SIZE, SIZE_RESTORED, MAKELPARAM(rc.right, rc.bottom));
 }
 
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
-HMODULE LoadLocalizedResourceDLL(LANGID lang, LPCWSTR dllName) {
+HMODULE LoadLocalizedResourceDLL(LANGID lang, LPCWSTR dllName) noexcept {
 	if (lang == LANG_USER_DEFAULT) {
 		lang = GetUserDefaultUILanguage();
 	}
@@ -1073,7 +1073,7 @@ HMODULE LoadLocalizedResourceDLL(LANGID lang, LPCWSTR dllName) {
 }
 
 #if NP2_ENABLE_TEST_LOCALIZATION_LAYOUT
-void GetLocaleDefaultUIFont(LANGID lang, LPWSTR lpFaceName, WORD *wSize) {
+void GetLocaleDefaultUIFont(LANGID lang, LPWSTR lpFaceName, WORD *wSize) noexcept {
 	LPCWSTR font;
 	const LANGID subLang = SUBLANGID(lang);
 	switch (PRIMARYLANGID(lang)) {
@@ -1102,7 +1102,7 @@ void GetLocaleDefaultUIFont(LANGID lang, LPWSTR lpFaceName, WORD *wSize) {
 #endif
 #endif // NP2_ENABLE_APP_LOCALIZATION_DLL
 
-bool PathGetRealPath(HANDLE hFile, LPCWSTR lpszSrc, LPWSTR lpszDest) {
+bool PathGetRealPath(HANDLE hFile, LPCWSTR lpszSrc, LPWSTR lpszDest) noexcept {
 	WCHAR path[8 + MAX_PATH] = L"";
 	if (IsVistaAndAbove()) {
 		const bool closing = hFile == NULL;
@@ -1166,7 +1166,7 @@ bool PathGetRealPath(HANDLE hFile, LPCWSTR lpszSrc, LPWSTR lpszDest) {
 //
 //  PathRelativeToApp()
 //
-void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, DWORD dwAttrTo, bool bUnexpandEnv, bool bUnexpandMyDocs) {
+void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, DWORD dwAttrTo, bool bUnexpandEnv, bool bUnexpandMyDocs) noexcept {
 	WCHAR wchPath[MAX_PATH];
 
 	if (!PathIsRelative(lpszSrc)) {
@@ -1223,7 +1223,7 @@ void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, DWORD dwAttrTo, bool bU
 //
 //  PathAbsoluteFromApp()
 //
-void PathAbsoluteFromApp(LPCWSTR lpszSrc, LPWSTR lpszDest, bool bExpandEnv) {
+void PathAbsoluteFromApp(LPCWSTR lpszSrc, LPWSTR lpszDest, bool bExpandEnv) noexcept {
 	WCHAR wchPath[MAX_PATH];
 
 	if (StrHasPrefix(lpszSrc, L"%CSIDL:MYDOCUMENTS%")) {
@@ -1350,7 +1350,7 @@ bool PathCreateLnk(LPCWSTR pszLnkDir, LPCWSTR pszPath) {
 	return bSucceeded;
 }
 
-void OpenContainingFolder(HWND hwnd, LPCWSTR pszFile, bool bSelect) {
+void OpenContainingFolder(HWND hwnd, LPCWSTR pszFile, bool bSelect) noexcept {
 	WCHAR wchDirectory[MAX_PATH];
 	lstrcpyn(wchDirectory, pszFile, COUNTOF(wchDirectory));
 
@@ -1429,7 +1429,7 @@ void OpenContainingFolder(HWND hwnd, LPCWSTR pszFile, bool bSelect) {
 //
 //  ExtractFirstArgument()
 //
-bool ExtractFirstArgument(LPCWSTR lpArgs, LPWSTR lpArg1, LPWSTR lpArg2) {
+bool ExtractFirstArgument(LPCWSTR lpArgs, LPWSTR lpArg1, LPWSTR lpArg2) noexcept {
 	bool bQuoted = false;
 
 	lstrcpy(lpArg1, lpArgs);
@@ -1478,7 +1478,7 @@ bool ExtractFirstArgument(LPCWSTR lpArgs, LPWSTR lpArg1, LPWSTR lpArg2) {
 //
 //  PrepareFilterStr()
 //
-void PrepareFilterStr(LPWSTR lpFilter) {
+void PrepareFilterStr(LPWSTR lpFilter) noexcept {
 	LPWSTR psz = StrEnd(lpFilter);
 	while (psz != lpFilter) {
 		--psz;
@@ -1492,7 +1492,7 @@ void PrepareFilterStr(LPWSTR lpFilter) {
 //
 //  StrTab2Space() - in place conversion
 //
-void StrTab2Space(LPWSTR lpsz) {
+void StrTab2Space(LPWSTR lpsz) noexcept {
 	WCHAR *c = lpsz;
 	while ((c = StrChr(c, L'\t')) != NULL) {
 		*c++ = L' ';
@@ -1503,7 +1503,7 @@ void StrTab2Space(LPWSTR lpsz) {
 //
 // PathFixBackslashes() - in place conversion
 //
-bool PathFixBackslashes(LPWSTR lpsz) {
+bool PathFixBackslashes(LPWSTR lpsz) noexcept {
 	WCHAR *c = lpsz;
 	bool bFixed = false;
 	while ((c = StrChr(c, L'/')) != NULL) {
@@ -1523,7 +1523,7 @@ bool PathFixBackslashes(LPWSTR lpsz) {
 //
 //  Adjusted for Windows 95
 //
-void ExpandEnvironmentStringsEx(LPWSTR lpSrc, DWORD dwSrc) {
+void ExpandEnvironmentStringsEx(LPWSTR lpSrc, DWORD dwSrc) noexcept {
 	WCHAR szBuf[312];
 
 	if (ExpandEnvironmentStrings(lpSrc, szBuf, COUNTOF(szBuf))) {
@@ -1540,7 +1540,7 @@ void ExpandEnvironmentStringsEx(LPWSTR lpSrc, DWORD dwSrc) {
 extern WCHAR tchFavoritesDir[MAX_PATH];
 extern WCHAR szCurDir[MAX_PATH + 40];
 
-bool SearchPathEx(LPCWSTR lpFileName, DWORD nBufferLength, LPWSTR lpBuffer) {
+bool SearchPathEx(LPCWSTR lpFileName, DWORD nBufferLength, LPWSTR lpBuffer) noexcept {
 	if (StrEqualExW(lpFileName, L"..") || StrEqualExW(lpFileName, L".")) {
 		if (StrEqualExW(lpFileName, L"..") && PathIsRoot(szCurDir)) {
 			StrCpyExW(lpBuffer, L"*.*");
@@ -1561,7 +1561,7 @@ bool SearchPathEx(LPCWSTR lpFileName, DWORD nBufferLength, LPWSTR lpBuffer) {
 //
 //  FormatNumber()
 //
-void FormatNumber(LPWSTR lpNumberStr, UINT value) {
+void FormatNumber(LPWSTR lpNumberStr, UINT value) noexcept {
 	_ltow(value, lpNumberStr, 10);
 	if (value < 1000) {
 		return;
@@ -1591,7 +1591,7 @@ void FormatNumber(LPWSTR lpNumberStr, UINT value) {
 //
 //  GetDefaultFavoritesDir()
 //
-void GetDefaultFavoritesDir(LPWSTR lpFavDir, int cchFavDir) {
+void GetDefaultFavoritesDir(LPWSTR lpFavDir, int cchFavDir) noexcept {
 	PIDLIST_ABSOLUTE pidl;
 
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
@@ -1611,7 +1611,7 @@ void GetDefaultFavoritesDir(LPWSTR lpFavDir, int cchFavDir) {
 //
 //  GetDefaultOpenWithDir()
 //
-void GetDefaultOpenWithDir(LPWSTR lpOpenWithDir, int cchOpenWithDir) {
+void GetDefaultOpenWithDir(LPWSTR lpOpenWithDir, int cchOpenWithDir) noexcept {
 	PIDLIST_ABSOLUTE pidl;
 
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
@@ -1634,7 +1634,7 @@ void GetDefaultOpenWithDir(LPWSTR lpOpenWithDir, int cchOpenWithDir) {
 //  Creates a HDROP to generate a WM_DROPFILES message
 //
 //
-HDROP CreateDropHandle(LPCWSTR lpFileName) {
+HDROP CreateDropHandle(LPCWSTR lpFileName) noexcept {
 	HGLOBAL hDrop = GlobalAlloc(GMEM_ZEROINIT | GMEM_MOVEABLE | GMEM_DDESHARE, sizeof(DROPFILES) + sizeof(WCHAR) * (lstrlen(lpFileName) + 2));
 	LPDROPFILES lpdf = (LPDROPFILES)GlobalLock(hDrop);
 
@@ -1657,7 +1657,7 @@ HDROP CreateDropHandle(LPCWSTR lpFileName) {
 //  Execute a DDE command (Msg, App, Topic)
 //
 //
-HDDEDATA CALLBACK DdeCallback(UINT uType, UINT uFmt, HCONV hconv, HSZ hsz1, HSZ hsz2, HDDEDATA hdata, ULONG_PTR dwData1, ULONG_PTR dwData2) {
+HDDEDATA CALLBACK DdeCallback(UINT uType, UINT uFmt, HCONV hconv, HSZ hsz1, HSZ hsz2, HDDEDATA hdata, ULONG_PTR dwData1, ULONG_PTR dwData2) noexcept {
 	UNREFERENCED_PARAMETER(uFmt);
 	UNREFERENCED_PARAMETER(hconv);
 	UNREFERENCED_PARAMETER(hsz1);
@@ -1675,7 +1675,7 @@ HDDEDATA CALLBACK DdeCallback(UINT uType, UINT uFmt, HCONV hconv, HSZ hsz1, HSZ 
 	}
 }
 
-bool ExecDDECommand(LPCWSTR lpszCmdLine, LPCWSTR lpszDDEMsg, LPCWSTR lpszDDEApp, LPCWSTR lpszDDETopic) {
+bool ExecDDECommand(LPCWSTR lpszCmdLine, LPCWSTR lpszDDEMsg, LPCWSTR lpszDDEApp, LPCWSTR lpszDDETopic) noexcept {
 	if (StrIsEmpty(lpszCmdLine) || StrIsEmpty(lpszDDEMsg) || StrIsEmpty(lpszDDEApp) || StrIsEmpty(lpszDDETopic)) {
 		return false;
 	}
@@ -1965,7 +1965,7 @@ void MRU_AddToCombobox(LPCMRULIST pmru, HWND hwnd) {
   Modify dialog templates to use current theme font
   Based on code of MFC helper class CDialogTemplate
 */
-bool GetThemedDialogFont(LPWSTR lpFaceName, WORD *wSize) {
+bool GetThemedDialogFont(LPWSTR lpFaceName, WORD *wSize) noexcept {
 #if NP2_ENABLE_APP_LOCALIZATION_DLL && NP2_ENABLE_TEST_LOCALIZATION_LAYOUT
 	extern LANGID uiLanguage;
 	GetLocaleDefaultUIFont(uiLanguage, lpFaceName, wSize);
@@ -2020,19 +2020,21 @@ bool GetThemedDialogFont(LPWSTR lpFaceName, WORD *wSize) {
 #endif
 }
 
-static inline bool DialogTemplate_IsDialogEx(const DLGTEMPLATE *pTemplate) {
+namespace {
+
+bool DialogTemplate_IsDialogEx(const DLGTEMPLATE *pTemplate) noexcept {
 	return ((DLGTEMPLATEEX *)pTemplate)->signature == 0xFFFF;
 }
 
-static inline BOOL DialogTemplate_HasFont(const DLGTEMPLATE *pTemplate) {
+BOOL DialogTemplate_HasFont(const DLGTEMPLATE *pTemplate) noexcept {
 	return (DS_SETFONT & (DialogTemplate_IsDialogEx(pTemplate) ? ((DLGTEMPLATEEX *)pTemplate)->style : pTemplate->style));
 }
 
-static inline int DialogTemplate_FontAttrSize(bool bDialogEx) {
-	return (int)sizeof(WORD) * (bDialogEx ? 3 : 1);
+constexpr int DialogTemplate_FontAttrSize(bool bDialogEx) noexcept {
+	return sizeof(WORD) * (bDialogEx ? 3 : 1);
 }
 
-static inline BYTE *DialogTemplate_GetFontSizeField(const DLGTEMPLATE *pTemplate) {
+BYTE *DialogTemplate_GetFontSizeField(const DLGTEMPLATE *pTemplate) noexcept {
 	const bool bDialogEx = DialogTemplate_IsDialogEx(pTemplate);
 	WORD *pw;
 
@@ -2059,7 +2061,9 @@ static inline BYTE *DialogTemplate_GetFontSizeField(const DLGTEMPLATE *pTemplate
 	return (BYTE *)pw;
 }
 
-DLGTEMPLATE *LoadThemedDialogTemplate(LPCWSTR lpDialogTemplateID, HINSTANCE hInstance) {
+}
+
+DLGTEMPLATE *LoadThemedDialogTemplate(LPCWSTR lpDialogTemplateID, HINSTANCE hInstance) noexcept {
 	HRSRC hRsrc = FindResource(hInstance, lpDialogTemplateID, RT_DIALOG);
 	if (hRsrc == NULL) {
 		return NULL;
@@ -2115,7 +2119,7 @@ DLGTEMPLATE *LoadThemedDialogTemplate(LPCWSTR lpDialogTemplateID, HINSTANCE hIns
 	return pTemplate;
 }
 
-INT_PTR ThemedDialogBoxParam(HINSTANCE hInstance, LPCWSTR lpTemplate, HWND hWndParent, DLGPROC lpDialogFunc, LPARAM dwInitParam) {
+INT_PTR ThemedDialogBoxParam(HINSTANCE hInstance, LPCWSTR lpTemplate, HWND hWndParent, DLGPROC lpDialogFunc, LPARAM dwInitParam) noexcept {
 	DLGTEMPLATE *pDlgTemplate = LoadThemedDialogTemplate(lpTemplate, hInstance);
 	const INT_PTR ret = DialogBoxIndirectParam(hInstance, pDlgTemplate, hWndParent, lpDialogFunc, dwInitParam);
 	if (pDlgTemplate) {
@@ -2130,7 +2134,7 @@ INT_PTR ThemedDialogBoxParam(HINSTANCE hInstance, LPCWSTR lpTemplate, HWND hWndP
 // File Dialog Hook for GetOpenFileName/GetSaveFileName
 // https://docs.microsoft.com/en-us/windows/win32/dlgbox/open-and-save-as-dialog-boxes
 //
-static LRESULT CALLBACK OpenSaveFileDlgSubProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData) {
+static LRESULT CALLBACK OpenSaveFileDlgSubProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData) noexcept {
 	UNREFERENCED_PARAMETER(dwRefData);
 
 	switch (umsg) {
@@ -2154,7 +2158,7 @@ static LRESULT CALLBACK OpenSaveFileDlgSubProc(HWND hwnd, UINT umsg, WPARAM wPar
 	return DefSubclassProc(hwnd, umsg, wParam, lParam);
 }
 
-UINT_PTR CALLBACK OpenSaveFileDlgHookProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+UINT_PTR CALLBACK OpenSaveFileDlgHookProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	UNREFERENCED_PARAMETER(wParam);
 
 	switch (umsg) {
@@ -2221,7 +2225,7 @@ UINT_PTR CALLBACK OpenSaveFileDlgHookProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 // all current versions of the shell. If explorer isn't running, we try our
 // best to work with a 3rd party shell. If we still can't find anything, we
 // return a rect in the lower right hand corner of the screen
-static void GetTrayWndRect(LPRECT lpTrayRect) {
+static void GetTrayWndRect(LPRECT lpTrayRect) noexcept {
 	// First, we'll use a quick hack method. We know that the taskbar is a window
 	// of class Shell_TrayWnd, and the status tray is a child of this of class
 	// TrayNotifyWnd. This provides us a window rect to minimize to. Note, however,
@@ -2302,7 +2306,7 @@ static void GetTrayWndRect(LPRECT lpTrayRect) {
 }
 
 // Check to see if the animation has been disabled
-/*static */bool GetDoAnimateMinimize(void) {
+/*static */bool GetDoAnimateMinimize() noexcept {
 	ANIMATIONINFO ai;
 
 	ai.cbSize = sizeof(ai);
@@ -2311,7 +2315,7 @@ static void GetTrayWndRect(LPRECT lpTrayRect) {
 	return ai.iMinAnimate != 0;
 }
 
-void MinimizeWndToTray(HWND hwnd) {
+void MinimizeWndToTray(HWND hwnd) noexcept {
 	if (GetDoAnimateMinimize()) {
 		RECT rcFrom;
 		RECT rcTo;
@@ -2333,7 +2337,7 @@ void MinimizeWndToTray(HWND hwnd) {
 	ShowWindow(hwnd, SW_HIDE);
 }
 
-void RestoreWndFromTray(HWND hwnd) {
+void RestoreWndFromTray(HWND hwnd) noexcept {
 	if (GetDoAnimateMinimize()) {
 		// Get the rect of the tray and the window. Note that the window rect
 		// is still valid even though the window is hidden
