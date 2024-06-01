@@ -81,7 +81,7 @@ int MsgBox(UINT uType, UINT uIdMsg, ...) noexcept {
 //
 // BFFCallBack()
 //
-static int CALLBACK BFFCallBack(HWND hwnd, UINT umsg, LPARAM lParam, LPARAM lpData) {
+static int CALLBACK BFFCallBack(HWND hwnd, UINT umsg, LPARAM lParam, LPARAM lpData) noexcept {
 	UNREFERENCED_PARAMETER(lParam);
 	UNREFERENCED_PARAMETER(lpData);
 
@@ -96,7 +96,7 @@ static int CALLBACK BFFCallBack(HWND hwnd, UINT umsg, LPARAM lParam, LPARAM lpDa
 //
 // GetDirectory()
 //
-bool GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase) {
+bool GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase) noexcept {
 	WCHAR szTitle[256];
 	StrCpyExW(szTitle, L"");
 	GetString(iTitle, szTitle, COUNTOF(szTitle));
@@ -133,9 +133,9 @@ bool GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase
 // GetDirectory2()
 //
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-bool GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, REFKNOWNFOLDERID iBase)
+bool GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, REFKNOWNFOLDERID iBase) noexcept
 #else
-bool GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, int iBase)
+bool GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, int iBase) noexcept
 #endif
 {
 	WCHAR szTitle[256];
@@ -343,7 +343,7 @@ INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) 
 //  RunDlg()
 //
 //
-void RunDlg(HWND hwnd) {
+void RunDlg(HWND hwnd) noexcept {
 	ThemedDialogBox(g_hInstance, MAKEINTRESOURCE(IDD_RUN), hwnd, RunDlgProc);
 }
 
@@ -452,11 +452,11 @@ INT_PTR CALLBACK GotoDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 //  GotoDlg()
 //
 //
-void GotoDlg(HWND hwnd) {
+void GotoDlg(HWND hwnd) noexcept {
 	ThemedDialogBox(g_hInstance, MAKEINTRESOURCE(IDD_GOTO), hwnd, GotoDlgProc);
 }
 
-void OpenHelpLink(HWND hwnd, int cmd) {
+void OpenHelpLink(HWND hwnd, int cmd) noexcept {
 	LPCWSTR link = NULL;
 	switch (cmd) {
 	case IDC_WEBPAGE_LINK:
@@ -475,7 +475,7 @@ void OpenHelpLink(HWND hwnd, int cmd) {
 	}
 }
 
-static inline LPCWSTR GetProcessorArchitecture(void) {
+static inline LPCWSTR GetProcessorArchitecture(void) noexcept {
 	SYSTEM_INFO info;
 	GetNativeSystemInfo(&info);
 #ifndef PROCESSOR_ARCHITECTURE_ARM64
@@ -501,7 +501,7 @@ static inline LPCWSTR GetProcessorArchitecture(void) {
 //
 //  AboutDlgProc()
 //
-INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		WCHAR wch[128];
@@ -629,7 +629,7 @@ extern StartupDirectory iStartupDir;
 extern EscFunction iEscFunction;
 extern bool bReuseWindow;
 
-static INT_PTR CALLBACK GeneralPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+static INT_PTR CALLBACK GeneralPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	UNREFERENCED_PARAMETER(wParam);
 	UNREFERENCED_PARAMETER(lParam);
 
@@ -718,7 +718,7 @@ static INT_PTR CALLBACK GeneralPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 //  AdvancedPageProc
 //
 //
-static INT_PTR CALLBACK AdvancedPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+static INT_PTR CALLBACK AdvancedPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	switch (umsg) {
 	case WM_INITDIALOG:
 		if (bWindowLayoutRTL) {
@@ -832,7 +832,9 @@ extern UINT		languageResID;
 #endif
 extern WCHAR g_wchAppUserModelID[64];
 
-static INT_PTR CALLBACK ItemsPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+namespace {
+
+INT_PTR CALLBACK ItemsPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	static bool m_bDefColorNoFilter;
 	static bool m_bDefColorFilter;
 
@@ -1001,7 +1003,7 @@ struct SystemIntegrationInfo {
 	LPWSTR lpszName;
 };
 
-int GetSystemIntegrationStatus(struct SystemIntegrationInfo *info) {
+int GetSystemIntegrationStatus(struct SystemIntegrationInfo *info) noexcept {
 	int mask = 0;
 	WCHAR tchModule[MAX_PATH];
 	GetModuleFileName(NULL, tchModule, COUNTOF(tchModule));
@@ -1052,7 +1054,7 @@ int GetSystemIntegrationStatus(struct SystemIntegrationInfo *info) {
 	return mask;
 }
 
-void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName) {
+void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName) noexcept {
 	WCHAR tchModule[MAX_PATH];
 	GetModuleFileName(NULL, tchModule, COUNTOF(tchModule));
 	WCHAR command[300];
@@ -1098,7 +1100,7 @@ void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName)
 //  ProgPageProc
 //
 //
-static INT_PTR CALLBACK ProgPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+INT_PTR CALLBACK ProgPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		MakeBitmapButton(hwnd, IDC_BROWSE_Q, g_exeInstance, IDB_OPEN_FOLDER16);
@@ -1274,6 +1276,8 @@ static INT_PTR CALLBACK ProgPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 	return FALSE;
 }
 
+}
+
 //=============================================================================
 //
 //  OptionsPropSheet
@@ -1286,7 +1290,7 @@ extern WCHAR tchFilter[128];
 extern bool bNegFilter;
 extern int cxFileFilterDlg;
 
-INT_PTR OptionsPropSheet(HWND hwnd, HINSTANCE hInstance) {
+INT_PTR OptionsPropSheet(HWND hwnd, HINSTANCE hInstance) noexcept {
 	PROPSHEETHEADER psh;
 	PROPSHEETPAGE psp[4];
 	INT_PTR nResult;
@@ -1524,7 +1528,7 @@ INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 //  GetFilterDlg()
 //
 //
-bool GetFilterDlg(HWND hwnd) {
+bool GetFilterDlg(HWND hwnd) noexcept {
 	WCHAR tchOldFilter[DL_FILTER_BUFSIZE];
 
 	lstrcpy(tchOldFilter, tchFilter);
@@ -2138,7 +2142,7 @@ INT_PTR CALLBACK NewDirDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPara
 //  NewDirDlg()
 //
 //
-bool NewDirDlg(HWND hwnd, LPWSTR pszNewDir) {
+bool NewDirDlg(HWND hwnd, LPWSTR pszNewDir) noexcept {
 	FILEOPDLGDATA fod;
 
 	if (IDOK == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_NEWDIR), hwnd, NewDirDlgProc, (LPARAM)&fod)) {

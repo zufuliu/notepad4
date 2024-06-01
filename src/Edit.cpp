@@ -88,7 +88,7 @@ static HMODULE hELSCoreDLL = NULL;
 static HMODULE hCrtDLL = NULL;
 
 typedef size_t (__cdecl *wcsftimeSig)(wchar_t *str, size_t count, const wchar_t *format, const struct tm *time);
-wcsftimeSig GetFunctionPointer_wcsftime(void) {
+wcsftimeSig GetFunctionPointer_wcsftime(void) noexcept {
 	if (hCrtDLL == NULL) {
 		hCrtDLL = LoadLibraryExW(L"ucrtbase.dll", NULL, kSystemLibraryLoadFlags);
 		if (hCrtDLL == NULL) {
@@ -99,7 +99,7 @@ wcsftimeSig GetFunctionPointer_wcsftime(void) {
 }
 #endif
 
-void Edit_ReleaseResources(void) {
+void Edit_ReleaseResources(void) noexcept {
 	NP2HeapFree(wchPrefixSelection);
 	NP2HeapFree(wchAppendSelection);
 	NP2HeapFree(wchPrefixLines);
@@ -116,7 +116,7 @@ void Edit_ReleaseResources(void) {
 #endif
 }
 
-static inline void NotifyRectangleSelection(void) {
+static inline void NotifyRectangleSelection(void) noexcept {
 	MsgBoxWarn(MB_OK, IDS_SELRECT);
 	//ShowNotificationMessage(SC_NOTIFICATIONPOSITION_CENTER, IDS_SELRECT);
 }
@@ -149,7 +149,7 @@ void EditSetNewText(LPCSTR lpstrText, DWORD cbText, Sci_Line lineCount) {
 #if defined(_WIN64)
 	// enable conversion between line endings
 	if (bLargeFileMode || cbText + lineCount >= MAX_NON_UTF8_SIZE) {
-		const int mask = SC_DOCUMENTOPTION_TEXT_LARGE | SC_DOCUMENTOPTION_STYLES_NONE;
+		constexpr int mask = SC_DOCUMENTOPTION_TEXT_LARGE | SC_DOCUMENTOPTION_STYLES_NONE;
 		const int options = SciCall_GetDocumentOptions();
 		if ((options & mask) != mask) {
 			HANDLE pdoc = SciCall_CreateDocument(cbText + 1, options | mask);
@@ -190,7 +190,7 @@ void EditSetNewText(LPCSTR lpstrText, DWORD cbText, Sci_Line lineCount) {
 //
 // EditConvertText()
 //
-bool EditConvertText(UINT cpSource, UINT cpDest, bool bSetSavePoint) {
+bool EditConvertText(UINT cpSource, UINT cpDest, bool bSetSavePoint) noexcept {
 	if (cpSource == cpDest) {
 		return true;
 	}
@@ -295,7 +295,7 @@ void EditConvertToLargeMode(void) {
 //
 // EditGetClipboardText()
 //
-char* EditGetClipboardText(HWND hwnd) {
+char* EditGetClipboardText(HWND hwnd) noexcept {
 	if (!IsClipboardFormatAvailable(CF_UNICODETEXT) || !OpenClipboard(GetParent(hwnd))) {
 		return NULL;
 	}
@@ -353,7 +353,7 @@ char* EditGetClipboardText(HWND hwnd) {
 	return pmch;
 }
 
-LPWSTR EditGetClipboardTextW(void) {
+LPWSTR EditGetClipboardTextW(void) noexcept {
 	if (!IsClipboardFormatAvailable(CF_UNICODETEXT) || !OpenClipboard(hwndMain)) {
 		return NULL;
 	}
@@ -405,7 +405,7 @@ LPWSTR EditGetClipboardTextW(void) {
 //
 // EditCopyAppend()
 //
-bool EditCopyAppend(HWND hwnd) {
+bool EditCopyAppend(HWND hwnd) noexcept {
 	if (!IsClipboardFormatAvailable(CF_UNICODETEXT)) {
 		SciCall_Copy(false);
 		return true;
@@ -472,7 +472,7 @@ bool EditCopyAppend(HWND hwnd) {
 //
 // EditDetectEOLMode()
 //
-void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
+void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) noexcept {
 	/* '\r' and '\n' is not reused (e.g. as trailing byte in DBCS) by any known encoding,
 	it's safe to check whole data byte by byte.*/
 
@@ -817,7 +817,7 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 	status->linesCount[2] = lineCountCR;
 }
 
-void EditDetectIndentation(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
+void EditDetectIndentation(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) noexcept {
 	if ((lpfv->mask & FV_MaskHasFileTabSettings) == FV_MaskHasFileTabSettings) {
 		return;
 	}
@@ -1135,7 +1135,7 @@ bool EditLoadFile(LPWSTR pszFile, EditFileIOStatus *status) {
 //
 // EditSaveFile()
 //
-bool EditSaveFile(HWND hwnd, LPCWSTR pszFile, int saveFlag, EditFileIOStatus *status) {
+bool EditSaveFile(HWND hwnd, LPCWSTR pszFile, int saveFlag, EditFileIOStatus *status) noexcept {
 	HANDLE hFile = CreateFile(pszFile,
 					   GENERIC_READ | GENERIC_WRITE,
 					   FILE_SHARE_READ | FILE_SHARE_WRITE,
@@ -1311,7 +1311,7 @@ bool EditSaveFile(HWND hwnd, LPCWSTR pszFile, int saveFlag, EditFileIOStatus *st
 	return false;
 }
 
-void EditReplaceRange(Sci_Position iSelStart, Sci_Position iSelEnd, Sci_Position cchText, LPCSTR pszText) {
+void EditReplaceRange(Sci_Position iSelStart, Sci_Position iSelEnd, Sci_Position cchText, LPCSTR pszText) noexcept {
 	Sci_Position iCurPos = SciCall_GetCurrentPos();
 	Sci_Position iAnchorPos = SciCall_GetAnchor();
 
@@ -1328,11 +1328,11 @@ void EditReplaceRange(Sci_Position iSelStart, Sci_Position iSelEnd, Sci_Position
 	SciCall_SetSel(iAnchorPos, iCurPos);
 }
 
-void EditReplaceMainSelection(Sci_Position cchText, LPCSTR pszText) {
+void EditReplaceMainSelection(Sci_Position cchText, LPCSTR pszText) noexcept {
 	EditReplaceRange(SciCall_GetSelectionStart(), SciCall_GetSelectionEnd(), cchText, pszText);
 }
 
-static inline char *EditGetTextRange(Sci_Position iStartPos, Sci_Position iEndPos) {
+static inline char *EditGetTextRange(Sci_Position iStartPos, Sci_Position iEndPos) noexcept {
 	const Sci_Position len = iEndPos - iStartPos;
 	if (len <= 0) {
 		return NULL;
@@ -1348,7 +1348,7 @@ static inline char *EditGetTextRange(Sci_Position iStartPos, Sci_Position iEndPo
 //
 // EditInvertCase()
 //
-void EditInvertCase(void) {
+void EditInvertCase() noexcept {
 	const Sci_Position iSelCount = SciCall_GetSelTextLength();
 	if (iSelCount == 0) {
 		return;
@@ -1423,7 +1423,7 @@ static const GUID ELS_GUID_TRANSLITERATION_BENGALI_TO_LATIN =
 static const GUID WIN10_ELS_GUID_TRANSLITERATION_HANGUL_DECOMPOSITION =
 	{ 0x4BA2A721, 0xE43D, 0x41b7, { 0xB3, 0x30, 0x53, 0x6A, 0xE1, 0xE4, 0x88, 0x63 } };
 
-static int TransliterateText(const GUID *pGuid, LPCWSTR pszTextW, int cchTextW, LPWSTR *pszMappedW) {
+static int TransliterateText(const GUID *pGuid, LPCWSTR pszTextW, int cchTextW, LPWSTR *pszMappedW) noexcept {
 #if NP2_DYNAMIC_LOAD_ELSCORE_DLL
 typedef HRESULT (WINAPI *MappingGetServicesSig)(PMAPPING_ENUM_OPTIONS pOptions, PMAPPING_SERVICE_INFO *prgServices, DWORD *pdwServicesCount);
 typedef HRESULT (WINAPI *MappingFreeServicesSig)(PMAPPING_SERVICE_INFO pServiceInfo);
@@ -1506,7 +1506,7 @@ typedef HRESULT (WINAPI *MappingFreePropertyBagSig)(PMAPPING_PROPERTY_BAG pBag);
 }
 
 #if _WIN32_WINNT < _WIN32_WINNT_WIN7
-static bool EditTitleCase(LPWSTR pszTextW, int cchTextW) {
+static bool EditTitleCase(LPWSTR pszTextW, int cchTextW) noexcept {
 	bool bChanged = false;
 #if 1
 	// BOOKMARK_EDITION
@@ -1569,7 +1569,7 @@ static bool EditTitleCase(LPWSTR pszTextW, int cchTextW) {
 //
 // EditMapTextCase()
 //
-void EditMapTextCase(int menu) {
+void EditMapTextCase(int menu) noexcept {
 	const Sci_Position iSelCount = SciCall_GetSelTextLength();
 	if (iSelCount == 0) {
 		return;
@@ -1691,7 +1691,7 @@ void EditMapTextCase(int menu) {
 //
 // EditSentenceCase()
 //
-void EditSentenceCase(void) {
+void EditSentenceCase() noexcept {
 	const Sci_Position iSelCount = SciCall_GetSelTextLength();
 	if (iSelCount == 0) {
 		return;
@@ -1752,7 +1752,7 @@ void EditSentenceCase(void) {
 //
 // EditURLEncode()
 //
-LPWSTR EditURLEncodeSelection(int *pcchEscaped) {
+LPWSTR EditURLEncodeSelection(int *pcchEscaped) noexcept {
 	*pcchEscaped = 0;
 	const Sci_Position iSelCount = SciCall_GetSelTextLength();
 	if (iSelCount == 0) {
@@ -1788,7 +1788,7 @@ LPWSTR EditURLEncodeSelection(int *pcchEscaped) {
 	return pszEscapedW;
 }
 
-void EditURLEncode(void) {
+void EditURLEncode() noexcept {
 	const Sci_Position iSelCount = SciCall_GetSelTextLength();
 	if (iSelCount == 0) {
 		return;
@@ -1817,7 +1817,7 @@ void EditURLEncode(void) {
 //
 // EditURLDecode()
 //
-void EditURLDecode(void) {
+void EditURLDecode() noexcept {
 	const Sci_Position iSelCount = SciCall_GetSelTextLength();
 	if (iSelCount == 0) {
 		return;
@@ -1869,7 +1869,7 @@ void EditURLDecode(void) {
 //
 // EditEscapeCChars()
 //
-void EditEscapeCChars(HWND hwnd) {
+void EditEscapeCChars(HWND hwnd) noexcept {
 	if (SciCall_IsSelectionEmpty()) {
 		return;
 	}
@@ -1902,7 +1902,7 @@ void EditEscapeCChars(HWND hwnd) {
 //
 // EditUnescapeCChars()
 //
-void EditUnescapeCChars(HWND hwnd) {
+void EditUnescapeCChars(HWND hwnd) noexcept {
 	if (SciCall_IsSelectionEmpty()) {
 		return;
 	}
@@ -1944,7 +1944,7 @@ void EditUnescapeCChars(HWND hwnd) {
 //
 // EditEscapeXHTMLChars()
 //
-void EditEscapeXHTMLChars(HWND hwnd) {
+void EditEscapeXHTMLChars(HWND hwnd) noexcept {
 	if (SciCall_IsSelectionEmpty()) {
 		return;
 	}
@@ -1995,7 +1995,7 @@ void EditEscapeXHTMLChars(HWND hwnd) {
 //
 // EditUnescapeXHTMLChars()
 //
-void EditUnescapeXHTMLChars(HWND hwnd) {
+void EditUnescapeXHTMLChars(HWND hwnd) noexcept {
 	if (SciCall_IsSelectionEmpty()) {
 		return;
 	}
@@ -2055,7 +2055,7 @@ void EditUnescapeXHTMLChars(HWND hwnd) {
 #define BMP_UNICODE_HEX_DIGIT	4
 #define MAX_UNICODE_HEX_DIGIT	8
 
-void EditChar2Hex(void) {
+void EditChar2Hex() noexcept {
 	Sci_Position count = SciCall_GetSelTextLength();
 	if (count == 0) {
 		return;
@@ -2101,7 +2101,7 @@ void EditChar2Hex(void) {
 //
 // EditHex2Char()
 //
-void EditHex2Char(void) {
+void EditHex2Char() noexcept {
 	Sci_Position count = SciCall_GetSelTextLength();
 	if (count == 0) {
 		return;
@@ -2164,7 +2164,7 @@ void EditHex2Char(void) {
 	NP2HeapFree(wch);
 }
 
-void EditShowHex(void) {
+void EditShowHex() noexcept {
 	const Sci_Position count = SciCall_GetSelTextLength();
 	if (count == 0) {
 		return;
@@ -2196,7 +2196,7 @@ void EditShowHex(void) {
 	NP2HeapFree(cch);
 }
 
-void EditBase64Encode(Base64EncodingFlag encodingFlag){
+void EditBase64Encode(Base64EncodingFlag encodingFlag) noexcept {
 	const size_t len = SciCall_GetSelTextLength();
 	if (len == 0) {
 		return;
@@ -2236,7 +2236,7 @@ void EditBase64Encode(Base64EncodingFlag encodingFlag){
 	NP2HeapFree(output);
 }
 
-void EditBase64Decode(bool decodeAsHex) {
+void EditBase64Decode(bool decodeAsHex) noexcept {
 	size_t len = SciCall_GetSelTextLength();
 	if (len == 0) {
 		return;
@@ -2296,7 +2296,7 @@ void EditBase64Decode(bool decodeAsHex) {
 //
 // EditConvertNumRadix()
 //
-static int ConvertNumRadix(char *tch, uint64_t num, int radix) {
+static int ConvertNumRadix(char *tch, uint64_t num, int radix) noexcept {
 	switch (radix) {
 	case 16:
 		return sprintf(tch, "0x%" PRIx64, num);
@@ -2358,7 +2358,7 @@ static int ConvertNumRadix(char *tch, uint64_t num, int radix) {
 	return 0;
 }
 
-void EditConvertNumRadix(int radix) {
+void EditConvertNumRadix(int radix) noexcept {
 	const Sci_Position count = SciCall_GetSelTextLength();
 	if (count == 0) {
 		return;
@@ -2528,7 +2528,7 @@ void EditModifyNumber(bool bIncrease) {
 //
 // EditTabsToSpaces()
 //
-void EditTabsToSpaces(int nTabWidth, bool bOnlyIndentingWS) {
+void EditTabsToSpaces(int nTabWidth, bool bOnlyIndentingWS) noexcept {
 	if (SciCall_IsSelectionEmpty()) {
 		return;
 	}
@@ -2597,7 +2597,7 @@ void EditTabsToSpaces(int nTabWidth, bool bOnlyIndentingWS) {
 //
 // EditSpacesToTabs()
 //
-void EditSpacesToTabs(int nTabWidth, bool bOnlyIndentingWS) {
+void EditSpacesToTabs(int nTabWidth, bool bOnlyIndentingWS) noexcept {
 	if (SciCall_IsSelectionEmpty()) {
 		return;
 	}
@@ -2687,7 +2687,7 @@ void EditSpacesToTabs(int nTabWidth, bool bOnlyIndentingWS) {
 //
 // EditMoveUp()
 //
-void EditMoveUp(void) {
+void EditMoveUp() noexcept {
 	Sci_Position iCurPos = SciCall_GetCurrentPos();
 	Sci_Position iAnchorPos = SciCall_GetAnchor();
 	Sci_Line iCurLine = SciCall_LineFromPosition(iCurPos);
@@ -2737,7 +2737,7 @@ void EditMoveUp(void) {
 //
 // EditMoveDown()
 //
-void EditMoveDown(void) {
+void EditMoveDown() noexcept {
 	Sci_Position iCurPos = SciCall_GetCurrentPos();
 	Sci_Position iAnchorPos = SciCall_GetAnchor();
 	Sci_Line iCurLine = SciCall_LineFromPosition(iCurPos);
@@ -2809,7 +2809,7 @@ void EditMoveDown(void) {
 }
 
 // only convert CR+LF
-static void ConvertWinEditLineEndingsEx(char *s, int iEOLMode, int *lineCount) {
+static void ConvertWinEditLineEndingsEx(char *s, int iEOLMode, int *lineCount) noexcept {
 	int count = 0;
 	if (iEOLMode != SC_EOL_CRLF) {
 		char *p = s;
@@ -2862,7 +2862,7 @@ static void ConvertWinEditLineEndingsEx(char *s, int iEOLMode, int *lineCount) {
 	}
 }
 
-static inline void ConvertWinEditLineEndings(char *s, int iEOLMode) {
+static inline void ConvertWinEditLineEndings(char *s, int iEOLMode) noexcept {
 	ConvertWinEditLineEndingsEx(s, iEOLMode, NULL);
 }
 
@@ -3060,7 +3060,7 @@ void EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend, bool skipEmptyLine)
 //
 // EditAlignText()
 //
-void EditAlignText(EditAlignMode nMode) {
+void EditAlignText(EditAlignMode nMode) noexcept {
 	if (SciCall_IsRectangleSelection()) {
 		NotifyRectangleSelection();
 		return;
@@ -3281,7 +3281,7 @@ void EditAlignText(EditAlignMode nMode) {
 //
 // EditEncloseSelection()
 //
-void EditEncloseSelection(LPCWSTR pwszOpen, LPCWSTR pwszClose) {
+void EditEncloseSelection(LPCWSTR pwszOpen, LPCWSTR pwszClose) noexcept {
 	if (SciCall_IsRectangleSelection()) {
 		NotifyRectangleSelection();
 		return;
@@ -3361,7 +3361,7 @@ void EditEncloseSelection(LPCWSTR pwszOpen, LPCWSTR pwszClose) {
 //
 // EditToggleLineComments()
 //
-void EditToggleLineComments(LPCWSTR pwszComment, int commentFlag) {
+void EditToggleLineComments(LPCWSTR pwszComment, int commentFlag) noexcept {
 	if (SciCall_IsRectangleSelection()) {
 		NotifyRectangleSelection();
 		return;
@@ -3503,7 +3503,7 @@ void EditToggleLineComments(LPCWSTR pwszComment, int commentFlag) {
 //
 // EditPadWithSpaces()
 //
-void EditPadWithSpaces(bool bSkipEmpty, bool bNoUndoGroup) {
+void EditPadWithSpaces(bool bSkipEmpty, bool bNoUndoGroup) noexcept {
 	Sci_Position iMaxColumn = 0;
 	bool bReducedSelection = false;
 
@@ -3627,7 +3627,7 @@ void EditPadWithSpaces(bool bSkipEmpty, bool bNoUndoGroup) {
 //
 // EditStripFirstCharacter()
 //
-void EditStripFirstCharacter(void) {
+void EditStripFirstCharacter() noexcept {
 	if (SciCall_IsRectangleSelection()) {
 		NotifyRectangleSelection();
 		return;
@@ -3663,7 +3663,7 @@ void EditStripFirstCharacter(void) {
 //
 // EditStripLastCharacter()
 //
-void EditStripLastCharacter(void) {
+void EditStripLastCharacter() noexcept {
 	if (SciCall_IsRectangleSelection()) {
 		NotifyRectangleSelection();
 		return;
@@ -3702,7 +3702,7 @@ void EditStripLastCharacter(void) {
 //
 // EditStripTrailingBlanks()
 //
-void EditStripTrailingBlanks(HWND hwnd, bool bIgnoreSelection) {
+void EditStripTrailingBlanks(HWND hwnd, bool bIgnoreSelection) noexcept {
 	// Check if there is any selection... simply use a regular expression replace!
 	if (!bIgnoreSelection && !SciCall_IsSelectionEmpty()) {
 		if (!SciCall_IsRectangleSelection()) {
@@ -3743,7 +3743,7 @@ void EditStripTrailingBlanks(HWND hwnd, bool bIgnoreSelection) {
 //
 // EditStripLeadingBlanks()
 //
-void EditStripLeadingBlanks(HWND hwnd, bool bIgnoreSelection) {
+void EditStripLeadingBlanks(HWND hwnd, bool bIgnoreSelection) noexcept {
 	// Check if there is any selection... simply use a regular expression replace!
 	if (!bIgnoreSelection && !SciCall_IsSelectionEmpty()) {
 		if (!SciCall_IsRectangleSelection()) {
@@ -3775,7 +3775,7 @@ void EditStripLeadingBlanks(HWND hwnd, bool bIgnoreSelection) {
 //
 // EditCompressSpaces()
 //
-void EditCompressSpaces(void) {
+void EditCompressSpaces() noexcept {
 	if (SciCall_IsRectangleSelection()) {
 		NotifyRectangleSelection();
 		return;
@@ -3863,7 +3863,7 @@ void EditCompressSpaces(void) {
 //
 // EditRemoveBlankLines()
 //
-void EditRemoveBlankLines(bool bMerge) {
+void EditRemoveBlankLines(bool bMerge) noexcept {
 	if (SciCall_IsRectangleSelection()) {
 		NotifyRectangleSelection();
 		return;
@@ -3919,7 +3919,7 @@ void EditRemoveBlankLines(bool bMerge) {
 //
 // EditWrapToColumn()
 //
-void EditWrapToColumn(int nColumn/*, int nTabWidth*/) {
+void EditWrapToColumn(int nColumn/*, int nTabWidth*/) noexcept {
 	if (SciCall_IsSelectionEmpty()) {
 		return;
 	}
@@ -4048,7 +4048,7 @@ void EditWrapToColumn(int nColumn/*, int nTabWidth*/) {
 //
 // EditJoinLinesEx()
 //
-void EditJoinLinesEx(void) {
+void EditJoinLinesEx() noexcept {
 	if (SciCall_IsSelectionEmpty()) {
 		return;
 	}
@@ -4123,7 +4123,7 @@ typedef struct SORTLINE {
 	EditSortFlag iSortFlags;
 } SORTLINE;
 
-static int __cdecl CmpSortLine(const void *p1, const void *p2) {
+static int __cdecl CmpSortLine(const void *p1, const void *p2) noexcept {
 	const SORTLINE *s1 = (const SORTLINE *)p1;
 	const SORTLINE *s2 = (const SORTLINE *)p2;
 	const EditSortFlag iSortFlags = s1->iSortFlags;
@@ -4153,13 +4153,13 @@ static int __cdecl CmpSortLine(const void *p1, const void *p2) {
 	return cmp;
 }
 
-static int __cdecl DontSortLine(const void *p1, const void *p2) {
+static int __cdecl DontSortLine(const void *p1, const void *p2) noexcept {
 	const SORTLINE *s1 = (const SORTLINE *)p1;
 	const SORTLINE *s2 = (const SORTLINE *)p2;
 	return s1->iLine - s2->iLine;
 }
 
-void EditSortLines(EditSortFlag iSortFlags) {
+void EditSortLines(EditSortFlag iSortFlags) noexcept {
 	Sci_Position iCurPos = SciCall_GetCurrentPos();
 	Sci_Position iAnchorPos = SciCall_GetAnchor();
 	if (iCurPos == iAnchorPos) {
@@ -4400,7 +4400,7 @@ void EditSortLines(EditSortFlag iSortFlags) {
 //
 // EditJumpTo()
 //
-void EditJumpTo(Sci_Line iNewLine, Sci_Position iNewCol) {
+void EditJumpTo(Sci_Line iNewLine, Sci_Position iNewCol) noexcept {
 	// Jumpt to end with line set to -1
 	if (iNewLine < 0 || iNewLine > SciCall_GetLineCount()) {
 		iNewCol = SciCall_GetLength();
@@ -4419,7 +4419,7 @@ void EditJumpTo(Sci_Line iNewLine, Sci_Position iNewCol) {
 //
 // EditSelectEx()
 //
-void EditSelectEx(Sci_Position iAnchorPos, Sci_Position iCurrentPos) {
+void EditSelectEx(Sci_Position iAnchorPos, Sci_Position iCurrentPos) noexcept {
 	const Sci_Line iNewLine = SciCall_LineFromPosition(iCurrentPos);
 	const Sci_Line iAnchorLine = (iAnchorPos == iCurrentPos)? iNewLine : SciCall_LineFromPosition(iAnchorPos);
 
@@ -4447,7 +4447,7 @@ void EditSelectEx(Sci_Position iAnchorPos, Sci_Position iCurrentPos) {
 //
 // EditFixPositions()
 //
-void EditFixPositions(void) {
+void EditFixPositions() noexcept {
 	const Sci_Position iMaxPos = SciCall_GetLength();
 	Sci_Position iCurrentPos = SciCall_GetCurrentPos();
 	const Sci_Position iAnchorPos = SciCall_GetAnchor();
@@ -4472,13 +4472,13 @@ void EditFixPositions(void) {
 //
 // EditEnsureSelectionVisible()
 //
-void EditEnsureSelectionVisible(void) {
+void EditEnsureSelectionVisible() noexcept {
 	const Sci_Position iAnchorPos = SciCall_GetAnchor();
 	const Sci_Position iCurrentPos = SciCall_GetCurrentPos();
 	EditSelectEx(iAnchorPos, iCurrentPos);
 }
 
-void EditEnsureConsistentLineEndings(void) {
+void EditEnsureConsistentLineEndings() noexcept {
 	const int iEOLMode = SciCall_GetEOLMode();
 	if (iEOLMode == SC_EOL_CRLF) {
 #if defined(_WIN64)
@@ -4505,7 +4505,7 @@ void EditEnsureConsistentLineEndings(void) {
 //
 // EditGetExcerpt()
 //
-void EditGetExcerpt(LPWSTR lpszExcerpt, DWORD cchExcerpt) {
+void EditGetExcerpt(LPWSTR lpszExcerpt, DWORD cchExcerpt) noexcept {
 	if (SciCall_IsSelectionEmpty() || SciCall_IsRectangleSelection()) {
 		StrCpyExW(lpszExcerpt, L"");
 		return;
@@ -4553,7 +4553,7 @@ void EditGetExcerpt(LPWSTR lpszExcerpt, DWORD cchExcerpt) {
 	NP2HeapFree(pszTextW);
 }
 
-void EditSelectWord(void) {
+void EditSelectWord() noexcept {
 	const Sci_Position iPos = SciCall_GetCurrentPos();
 
 	if (SciCall_IsSelectionEmpty()) {
@@ -4587,7 +4587,7 @@ void EditSelectWord(void) {
 	SciCall_SetSel(iLineStart, iLineEnd);
 }
 
-void EditSelectLines(bool currentBlock, bool lineSelection) {
+void EditSelectLines(bool currentBlock, bool lineSelection) noexcept {
 	if (lineSelection && !currentBlock) {
 		SciCall_SetSelectionMode(SC_SEL_LINES);
 		return;
@@ -4639,7 +4639,7 @@ void EditSelectLines(bool currentBlock, bool lineSelection) {
 	SciCall_ChooseCaretX();
 }
 
-static LRESULT CALLBACK AddBackslashEditProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData) {
+static LRESULT CALLBACK AddBackslashEditProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData) noexcept {
 	UNREFERENCED_PARAMETER(dwRefData);
 
 	switch (umsg) {
@@ -4673,7 +4673,7 @@ static LRESULT CALLBACK AddBackslashEditProc(HWND hwnd, UINT umsg, WPARAM wParam
 	return DefSubclassProc(hwnd, umsg, wParam, lParam);
 }
 
-void AddBackslashComboBoxSetup(HWND hwndDlg, int nCtlId) {
+void AddBackslashComboBoxSetup(HWND hwndDlg, int nCtlId) noexcept {
 	HWND hwnd = GetDlgItem(hwndDlg, nCtlId);
 	COMBOBOXINFO info;
 	info.cbSize = sizeof(COMBOBOXINFO);
@@ -4688,7 +4688,7 @@ extern bool bFindReplaceUseMonospacedFont;
 extern bool bFindReplaceFindAllBookmark;
 extern int iSelectOption;
 
-static void FindReplaceSetFont(HWND hwnd, bool monospaced, HFONT *hFontFindReplaceEdit) {
+static void FindReplaceSetFont(HWND hwnd, bool monospaced, HFONT *hFontFindReplaceEdit) noexcept {
 	HWND hwndFind = GetDlgItem(hwnd, IDC_FINDTEXT);
 	HWND hwndRepl = GetDlgItem(hwnd, IDC_REPLACETEXT);
 	HFONT font = NULL;
@@ -4708,7 +4708,7 @@ static void FindReplaceSetFont(HWND hwnd, bool monospaced, HFONT *hFontFindRepla
 	}
 }
 
-static bool CopySelectionAsFindText(HWND hwnd, LPEDITFINDREPLACE lpefr, bool bFirstTime) {
+static bool CopySelectionAsFindText(HWND hwnd, LPEDITFINDREPLACE lpefr, bool bFirstTime) noexcept {
 	const Sci_Position cchSelection = SciCall_GetSelTextLength();
 	char *lpszSelection = NULL;
 
@@ -5246,7 +5246,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 //
 // EditFindReplaceDlg()
 //
-HWND EditFindReplaceDlg(HWND hwnd, LPEDITFINDREPLACE lpefr, bool bReplace) {
+HWND EditFindReplaceDlg(HWND hwnd, LPEDITFINDREPLACE lpefr, bool bReplace) noexcept {
 	lpefr->hwnd = hwnd;
 	HWND hDlg = CreateThemedDialogParam(g_hInstance,
 								   (bReplace) ? MAKEINTRESOURCE(IDD_REPLACE) : MAKEINTRESOURCE(IDD_FIND),
@@ -5260,7 +5260,7 @@ HWND EditFindReplaceDlg(HWND hwnd, LPEDITFINDREPLACE lpefr, bool bReplace) {
 
 // Wildcard search uses the regexp engine to perform a simple search with * ?
 // as wildcards instead of more advanced and user-unfriendly regexp syntax.
-static void EscapeWildcards(char *szFind2) {
+static void EscapeWildcards(char *szFind2) noexcept {
 	char szWildcardEscaped[NP2_FIND_REPLACE_LIMIT];
 	int iSource = 0;
 	int iDest = 0;
@@ -5285,7 +5285,7 @@ static void EscapeWildcards(char *szFind2) {
 	strncpy(szFind2, szWildcardEscaped, COUNTOF(szWildcardEscaped));
 }
 
-int EditPrepareFind(char *szFind2, LPCEDITFINDREPLACE lpefr) {
+int EditPrepareFind(char *szFind2, LPCEDITFINDREPLACE lpefr) noexcept {
 	if (StrIsEmpty(lpefr->szFind)) {
 		return NP2_InvalidSearchFlags;
 	}
@@ -5311,7 +5311,7 @@ int EditPrepareFind(char *szFind2, LPCEDITFINDREPLACE lpefr) {
 	return searchFlags;
 }
 
-int EditPrepareReplace(HWND hwnd, char *szFind2, char **pszReplace2, BOOL *bReplaceRE, LPCEDITFINDREPLACE lpefr) {
+int EditPrepareReplace(HWND hwnd, char *szFind2, char **pszReplace2, BOOL *bReplaceRE, LPCEDITFINDREPLACE lpefr) noexcept {
 	const int searchFlags = EditPrepareFind(szFind2, lpefr);
 	if (searchFlags == NP2_InvalidSearchFlags) {
 		return searchFlags;
@@ -5339,7 +5339,7 @@ int EditPrepareReplace(HWND hwnd, char *szFind2, char **pszReplace2, BOOL *bRepl
 //
 // EditFindNext()
 //
-void EditFindNext(LPCEDITFINDREPLACE lpefr, bool fExtendSelection) {
+void EditFindNext(LPCEDITFINDREPLACE lpefr, bool fExtendSelection) noexcept {
 	char szFind2[NP2_FIND_REPLACE_LIMIT];
 	const int searchFlags = EditPrepareFind(szFind2, lpefr);
 	if (searchFlags == NP2_InvalidSearchFlags) {
@@ -5381,7 +5381,7 @@ void EditFindNext(LPCEDITFINDREPLACE lpefr, bool fExtendSelection) {
 //
 // EditFindPrev()
 //
-void EditFindPrev(LPCEDITFINDREPLACE lpefr, bool fExtendSelection) {
+void EditFindPrev(LPCEDITFINDREPLACE lpefr, bool fExtendSelection) noexcept {
 	char szFind2[NP2_FIND_REPLACE_LIMIT];
 	const int searchFlags = EditPrepareFind(szFind2, lpefr);
 	if (searchFlags == NP2_InvalidSearchFlags) {
@@ -5423,7 +5423,7 @@ void EditFindPrev(LPCEDITFINDREPLACE lpefr, bool fExtendSelection) {
 //
 // EditReplace()
 //
-bool EditReplace(HWND hwnd, LPCEDITFINDREPLACE lpefr) {
+bool EditReplace(HWND hwnd, LPCEDITFINDREPLACE lpefr) noexcept {
 	BOOL bReplaceRE;
 	char szFind2[NP2_FIND_REPLACE_LIMIT];
 	char *pszReplace2;
@@ -5776,7 +5776,7 @@ void EditFindAll(LPCEDITFINDREPLACE lpefr, bool selectAll) {
 	EditMarkAll_Start(FALSE, searchFlags, strlen(szFind2), szFind2);
 }
 
-void EditToggleBookmarkAt(Sci_Position iPos) {
+void EditToggleBookmarkAt(Sci_Position iPos) noexcept {
 	if (iPos < 0) {
 		iPos = SciCall_GetCurrentPos();
 	}
@@ -5791,7 +5791,7 @@ void EditToggleBookmarkAt(Sci_Position iPos) {
 	}
 }
 
-void EditBookmarkSelectAll(void) {
+void EditBookmarkSelectAll() noexcept {
 	Sci_Line line = SciCall_MarkerNext(0, MarkerBitmask_Bookmark);
 	if (line >= 0) {
 		editMarkAllStatus.ignoreSelectionUpdate = true;
@@ -5814,7 +5814,7 @@ void EditBookmarkSelectAll(void) {
 	}
 }
 
-static void ShwowReplaceCount(Sci_Position iCount) {
+static void ShwowReplaceCount(Sci_Position iCount) noexcept {
 	if (iCount > 0) {
 		WCHAR tchNum[32];
 		FormatNumber(tchNum, iCount);
@@ -5828,7 +5828,7 @@ static void ShwowReplaceCount(Sci_Position iCount) {
 //
 // EditReplaceAll()
 //
-bool EditReplaceAll(HWND hwnd, LPCEDITFINDREPLACE lpefr, bool bShowInfo) {
+bool EditReplaceAll(HWND hwnd, LPCEDITFINDREPLACE lpefr, bool bShowInfo) noexcept {
 	BOOL bReplaceRE;
 	char szFind2[NP2_FIND_REPLACE_LIMIT];
 	char *pszReplace2;
@@ -5908,7 +5908,7 @@ bool EditReplaceAll(HWND hwnd, LPCEDITFINDREPLACE lpefr, bool bShowInfo) {
 //
 // EditReplaceAllInSelection()
 //
-bool EditReplaceAllInSelection(HWND hwnd, LPCEDITFINDREPLACE lpefr, bool bShowInfo) {
+bool EditReplaceAllInSelection(HWND hwnd, LPCEDITFINDREPLACE lpefr, bool bShowInfo) noexcept {
 	if (SciCall_IsRectangleSelection()) {
 		NotifyRectangleSelection();
 		return false;
@@ -6002,7 +6002,7 @@ bool EditReplaceAllInSelection(HWND hwnd, LPCEDITFINDREPLACE lpefr, bool bShowIn
 //
 // EditLineNumDlgProc()
 //
-static INT_PTR CALLBACK EditLineNumDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+static INT_PTR CALLBACK EditLineNumDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	UNREFERENCED_PARAMETER(lParam);
 
 	switch (umsg) {
@@ -6110,7 +6110,7 @@ static INT_PTR CALLBACK EditLineNumDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 //
 // EditLinenumDlg()
 //
-bool EditLineNumDlg(HWND hwnd) {
+bool EditLineNumDlg(HWND hwnd) noexcept {
 	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_LINENUM), GetParent(hwnd), EditLineNumDlgProc, (LPARAM)hwnd);
 	return iResult == IDOK;
 }
@@ -6327,7 +6327,7 @@ static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 //
 // EditModifyLinesDlg()
 //
-void EditModifyLinesDlg(HWND hwnd) {
+void EditModifyLinesDlg(HWND hwnd) noexcept {
 	ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_MODIFYLINES), hwnd, EditModifyLinesDlgProc, 0);
 }
 
@@ -6336,7 +6336,7 @@ void EditModifyLinesDlg(HWND hwnd) {
 // EditAlignDlgProc()
 //
 //
-static INT_PTR CALLBACK EditAlignDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+static INT_PTR CALLBACK EditAlignDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
@@ -6370,7 +6370,7 @@ static INT_PTR CALLBACK EditAlignDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 //
 // EditAlignDlg()
 //
-bool EditAlignDlg(HWND hwnd, EditAlignMode *piAlignMode) {
+bool EditAlignDlg(HWND hwnd, EditAlignMode *piAlignMode) noexcept {
 	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_ALIGN), hwnd, EditAlignDlgProc, (LPARAM)piAlignMode);
 	return iResult == IDOK;
 }
@@ -6446,7 +6446,7 @@ static INT_PTR CALLBACK EditEncloseSelectionDlgProc(HWND hwnd, UINT umsg, WPARAM
 //
 // EditEncloseSelectionDlg()
 //
-void EditEncloseSelectionDlg(HWND hwnd) {
+void EditEncloseSelectionDlg(HWND hwnd) noexcept {
 	ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_ENCLOSESELECTION), hwnd, EditEncloseSelectionDlgProc, 0);
 }
 
@@ -6578,11 +6578,11 @@ static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam
 //
 // EditInsertTagDlg()
 //
-void EditInsertTagDlg(HWND hwnd) {
+void EditInsertTagDlg(HWND hwnd) noexcept {
 	ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_INSERTTAG), hwnd, EditInsertTagDlgProc, 0);
 }
 
-static inline int GetDaylightSavingTimeFlag(void) {
+static inline int GetDaylightSavingTimeFlag() noexcept {
 	// https://en.cppreference.com/w/c/chrono/tm
 	// https://learn.microsoft.com/en-us/windows/win32/api/timezoneapi/nf-timezoneapi-gettimezoneinformation
 #if 0//_WIN32_WINNT >= _WIN32_WINNT_VISTA
@@ -6594,7 +6594,7 @@ static inline int GetDaylightSavingTimeFlag(void) {
 #endif
 }
 
-void EditInsertDateTime(bool bShort) {
+void EditInsertDateTime(bool bShort) noexcept {
 	WCHAR tchDateTime[256];
 	WCHAR tchTemplate[256];
 
@@ -6636,7 +6636,7 @@ void EditInsertDateTime(bool bShort) {
 	SciCall_ReplaceSel(mszBuf);
 }
 
-void EditUpdateTimestampMatchTemplate(HWND hwnd) {
+void EditUpdateTimestampMatchTemplate(HWND hwnd) noexcept {
 	WCHAR wchFind[256] = {0};
 	IniGetString(INI_SECTION_NAME_FLAGS, L"TimeStamp", L"\\$Date:[^\\$]+\\$ | $Date: %Y/%m/%d %H:%M:%S $", wchFind, COUNTOF(wchFind));
 
@@ -6729,7 +6729,7 @@ static const UnicodeControlCharacter kUnicodeControlCharacterTable[] = {
 	{ "\xd8\x9c", "ALM" },		// U+061C	ALM		Arabic letter mark
 };
 
-void EditInsertUnicodeControlCharacter(int menu) {
+void EditInsertUnicodeControlCharacter(int menu) noexcept {
 	menu = menu - IDM_INSERT_UNICODE_LRM;
 	const UnicodeControlCharacter ucc = kUnicodeControlCharacterTable[menu];
 	if (ucc.uccUTF8[1] != '\0' && iCurrentEncoding == CPI_DEFAULT) {
@@ -6739,7 +6739,7 @@ void EditInsertUnicodeControlCharacter(int menu) {
 	SciCall_ReplaceSel(ucc.uccUTF8);
 }
 
-void EditShowUnicodeControlCharacter(bool bShow) {
+void EditShowUnicodeControlCharacter(bool bShow) noexcept {
 	for (UINT i = 0; i < COUNTOF(kUnicodeControlCharacterTable); i++) {
 		const UnicodeControlCharacter ucc = kUnicodeControlCharacterTable[i];
 		if (StrIsEmpty(ucc.representation)) {
@@ -6759,7 +6759,7 @@ void EditShowUnicodeControlCharacter(bool bShow) {
 // EditSortDlgProc()
 //
 //
-static INT_PTR CALLBACK EditSortDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+static INT_PTR CALLBACK EditSortDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
@@ -6892,12 +6892,12 @@ static INT_PTR CALLBACK EditSortDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 //
 // EditSortDlg()
 //
-bool EditSortDlg(HWND hwnd, EditSortFlag *piSortFlags) {
+bool EditSortDlg(HWND hwnd, EditSortFlag *piSortFlags) noexcept {
 	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_SORT), hwnd, EditSortDlgProc, (LPARAM)piSortFlags);
 	return iResult == IDOK;
 }
 
-void EditSelectionAction(int action) {
+void EditSelectionAction(int action) noexcept {
 	const LPCWSTR kActionKeys[] = {
 		L"GoogleSearchUrl",
 		L"BingSearchUrl",
@@ -6955,7 +6955,7 @@ void EditSelectionAction(int action) {
 	NP2HeapFree(lpszArgs);
 }
 
-void TryBrowseFile(HWND hwnd, LPCWSTR pszFile, bool bWarn) {
+void TryBrowseFile(HWND hwnd, LPCWSTR pszFile, bool bWarn) noexcept {
 	WCHAR tchParam[MAX_PATH + 4] = L"";
 	WCHAR tchExeFile[MAX_PATH + 4] = L"";
 	WCHAR tchTemp[MAX_PATH + 4];
@@ -7010,7 +7010,7 @@ void TryBrowseFile(HWND hwnd, LPCWSTR pszFile, bool bWarn) {
 	}
 }
 
-char* EditGetStringAroundCaret(LPCSTR delimiters) {
+char *EditGetStringAroundCaret(LPCSTR delimiters) noexcept {
 	const Sci_Position iCurrentPos = SciCall_GetCurrentPos();
 	const Sci_Line iLine = SciCall_LineFromPosition(iCurrentPos);
 	Sci_Position iLineStart = SciCall_PositionFromLine(iLine);
@@ -7092,7 +7092,7 @@ char* EditGetStringAroundCaret(LPCSTR delimiters) {
 
 extern bool bOpenFolderWithMatepath;
 
-static DWORD EditOpenSelectionCheckFile(LPCWSTR link, LPWSTR path, int cchFilePath, LPWSTR wchDirectory) {
+static DWORD EditOpenSelectionCheckFile(LPCWSTR link, LPWSTR path, int cchFilePath, LPWSTR wchDirectory) noexcept {
 	if (StrHasPrefix(link, L"//")) {
 		// issue #454, treat as link
 		lstrcpy(path, L"http:");
@@ -7461,7 +7461,7 @@ void FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 	lpfv->mask = mask;
 }
 
-void EditSetWrapStartIndent(int tabWidth, int indentWidth) {
+void EditSetWrapStartIndent(int tabWidth, int indentWidth) noexcept {
 	int indent = 0;
 	switch (iWordWrapIndent) {
 	case EditWrapIndent_OneCharacter:
@@ -7480,7 +7480,7 @@ void EditSetWrapStartIndent(int tabWidth, int indentWidth) {
 	SciCall_SetWrapStartIndent(indent);
 }
 
-void EditSetWrapIndentMode(int tabWidth, int indentWidth) {
+void EditSetWrapIndentMode(int tabWidth, int indentWidth) noexcept {
 	int indentMode;
 	switch (iWordWrapIndent) {
 	case EditWrapIndent_SameAsSubline:
@@ -7761,7 +7761,7 @@ static void FoldLevelStack_Push(struct FoldLevelStack *levelStack, int level) {
 	++levelStack->levelCount;
 }
 
-static FOLD_ACTION FoldToggleNode(Sci_Line line, FOLD_ACTION expanding) {
+static FOLD_ACTION FoldToggleNode(Sci_Line line, FOLD_ACTION expanding) noexcept {
 	const BOOL fExpanded = SciCall_GetFoldExpanded(line);
 	FOLD_ACTION action = expanding;
 	if (action == FOLD_ACTION_SNIFF) {
@@ -7781,7 +7781,7 @@ static FOLD_ACTION FoldToggleNode(Sci_Line line, FOLD_ACTION expanding) {
 	return expanding;
 }
 
-static void FinishBatchFold(void) {
+static void FinishBatchFold() noexcept {
 	SendMessage(hwndEdit, WM_SETREDRAW, TRUE, 0);
 	SciCall_SetXCaretPolicy(CARET_SLOP | CARET_STRICT | CARET_EVEN, 50);
 	SciCall_SetYCaretPolicy(CARET_SLOP | CARET_STRICT | CARET_EVEN, 5);
@@ -7791,7 +7791,7 @@ static void FinishBatchFold(void) {
 	InvalidateRect(hwndEdit, NULL, TRUE);
 }
 
-bool EditIsLineContainsStyle(Sci_Line line, int style) {
+bool EditIsLineContainsStyle(Sci_Line line, int style) noexcept {
 	Sci_Position lineStart = SciCall_PositionFromLine(line);
 	Sci_Position lineEnd = SciCall_PositionFromLine(line + 1);
 	lineEnd = min(lineEnd, lineStart + MAX_FUNCTION_DEFINITION_POSITION);
@@ -7805,7 +7805,7 @@ bool EditIsLineContainsStyle(Sci_Line line, int style) {
 	return false;
 }
 
-void FoldExpandRange(Sci_Line lineStart, Sci_Line lineEnd) {
+void FoldExpandRange(Sci_Line lineStart, Sci_Line lineEnd) noexcept {
 	for (Sci_Line line = lineStart; line <= lineEnd; line++) {
 		const int level = SciCall_GetFoldLevel(line);
 		if ((level & SC_FOLDLEVELHEADERFLAG) != 0 && !SciCall_GetFoldExpanded(line)) {
@@ -7815,7 +7815,7 @@ void FoldExpandRange(Sci_Line lineStart, Sci_Line lineEnd) {
 	}
 }
 
-void FoldToggleAll(FOLD_ACTION action) {
+void FoldToggleAll(FOLD_ACTION action) noexcept {
 	//SciCall_ColouriseAll();
 	SendMessage(hwndEdit, WM_SETREDRAW, FALSE, 0);
 #if 0
@@ -7877,7 +7877,7 @@ void FoldToggleLevel(int lev, FOLD_ACTION action) {
 	FinishBatchFold();
 }
 
-void FoldToggleCurrentBlock(FOLD_ACTION action) {
+void FoldToggleCurrentBlock(FOLD_ACTION action) noexcept {
 	Sci_Line line = SciCall_LineFromPosition(SciCall_GetCurrentPos());
 	const int level = SciCall_GetFoldLevel(line);
 
@@ -7975,7 +7975,7 @@ void FoldToggleDefault(FOLD_ACTION action) {
 	FinishBatchFold();
 }
 
-static void FoldPerformAction(Sci_Line ln, int mode, FOLD_ACTION action) {
+static void FoldPerformAction(Sci_Line ln, int mode, FOLD_ACTION action) noexcept {
 	if (mode & (FOLD_CHILDREN | FOLD_SIBLINGS)) {
 		// ln/lvNode: line and level of the source of this fold action
 		const Sci_Line lnNode = ln;
@@ -8007,7 +8007,7 @@ static void FoldPerformAction(Sci_Line ln, int mode, FOLD_ACTION action) {
 	}
 }
 
-void FoldClickAt(Sci_Position pos, int mode) {
+void FoldClickAt(Sci_Position pos, int mode) noexcept {
 	static struct {
 		Sci_Line ln;
 		int mode;
@@ -8043,7 +8043,7 @@ void FoldClickAt(Sci_Position pos, int mode) {
 	}
 }
 
-void FoldAltArrow(int key, int mode) {
+void FoldAltArrow(int key, int mode) noexcept {
 	// Because Alt-Shift is already in use (and because the sibling fold feature
 	// is not as useful from the keyboard), only the Ctrl modifier is supported
 
@@ -8077,7 +8077,7 @@ void FoldAltArrow(int key, int mode) {
 	}
 }
 
-void EditGotoBlock(int menu) {
+void EditGotoBlock(int menu) noexcept {
 	const Sci_Position iCurPos = SciCall_GetCurrentPos();
 	const Sci_Line iCurLine = SciCall_LineFromPosition(iCurPos);
 

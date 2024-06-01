@@ -33,24 +33,24 @@ int MsgBox(UINT uType, UINT uIdMsg, ...) noexcept;
 #define MsgBoxWarn(uType, uIdMsg, ...)		MsgBox(MB_ICONEXCLAMATION | (uType), (uIdMsg), ##__VA_ARGS__)
 #define MsgBoxAsk(uType, uIdMsg, ...)		MsgBox(MB_ICONQUESTION | (uType), (uIdMsg), ##__VA_ARGS__)
 
-bool GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase);
+bool GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase) noexcept;
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-bool GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, REFKNOWNFOLDERID iBase);
+bool GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, REFKNOWNFOLDERID iBase) noexcept;
 #else
-bool GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, int iBase);
+bool GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, int iBase) noexcept;
 #endif
 
-void RunDlg(HWND hwnd);
-void GotoDlg(HWND hwnd);
+void RunDlg(HWND hwnd) noexcept;
+void GotoDlg(HWND hwnd) noexcept;
 
-void OpenHelpLink(HWND hwnd, int cmd);
-INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
-INT_PTR OptionsPropSheet(HWND hwnd, HINSTANCE hInstance);
+void OpenHelpLink(HWND hwnd, int cmd) noexcept;
+INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept;
+INT_PTR OptionsPropSheet(HWND hwnd, HINSTANCE hInstance) noexcept;
 
-bool GetFilterDlg(HWND hwnd);
+bool GetFilterDlg(HWND hwnd) noexcept;
 bool RenameFileDlg(HWND hwnd);
 bool CopyMoveDlg(HWND hwnd, UINT *wFunc);
 bool OpenWithDlg(HWND hwnd, LPCDLITEM lpdliParam);
-bool NewDirDlg(HWND hwnd, LPWSTR pszNewDir);
+bool NewDirDlg(HWND hwnd, LPWSTR pszNewDir) noexcept;
 
 INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);

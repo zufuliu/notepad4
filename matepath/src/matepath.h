@@ -130,11 +130,11 @@ typedef enum TargetApplicationMode {
 #define MAX_INI_SECTION_SIZE_TARGET_APPLICATION	(4 * 1024)
 
 //==== Function Declarations ==================================================
-BOOL InitApplication(HINSTANCE hInstance);
+BOOL InitApplication(HINSTANCE hInstance) noexcept;
 void InitInstance(HINSTANCE hInstance, int nCmdShow);
-bool ActivatePrevInst(void);
-void GetRelaunchParameters(LPWSTR szParameters);
-void ShowNotifyIcon(HWND hwnd, bool bAdd);
+bool ActivatePrevInst() noexcept;
+void GetRelaunchParameters(LPWSTR szParameters) noexcept;
+void ShowNotifyIcon(HWND hwnd, bool bAdd) noexcept;
 
 bool ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, bool bUpdateHistory);
 void SetUILanguage(int resID);
@@ -142,30 +142,30 @@ void LoadSettings(void);
 void SaveSettingsNow(void);
 void SaveSettings(bool bSaveSettingsNow);
 void SaveWindowPosition(WCHAR *pIniSectionBuf);
-void ClearWindowPositionHistory(void);
-void ParseCommandLine(void);
+void ClearWindowPositionHistory(void) noexcept;
+void ParseCommandLine(void) noexcept;
 void LoadFlags(void);
 void LoadLaunchSetings(void);
 
-bool CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule);
-bool CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule);
-bool FindIniFile(void);
-bool TestIniFile(void);
-bool CreateIniFile(LPCWSTR lpszIniFile);
+bool CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) noexcept;
+bool CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule) noexcept;
+bool FindIniFile(void) noexcept;
+bool TestIniFile(void) noexcept;
+bool CreateIniFile(LPCWSTR lpszIniFile) noexcept;
 
 bool DisplayPath(LPCWSTR lpPath, UINT uIdError);
 bool DisplayLnkFile(LPCWSTR pszLnkFile, LPCWSTR pszResPath);
 
 void LaunchTarget(LPCWSTR lpFileName, bool bOpenNew);
 void SnapToTarget(HWND hwnd);
-void SnapToDefaultPos(HWND hwnd);
+void SnapToDefaultPos(HWND hwnd) noexcept;
 
 LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
 LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam);
-void CreateBars(HWND hwnd, HINSTANCE hInstance);
-void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam);
-void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam);
-void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam);
+void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept;
+void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept;
+void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept;
+void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept;
 void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam);
 LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam);
 LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam);

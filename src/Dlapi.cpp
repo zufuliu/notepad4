@@ -1017,7 +1017,7 @@ bool DriveBox_GetDispInfo(HWND hwnd, LPARAM lParam) {
 // If cb2 is zero, the size of pidl2 is retrieved using
 // IL_GetSize(pidl2)
 //
-LPITEMIDLIST IL_Create(LPCITEMIDLIST pidl1, UINT cb1, LPCITEMIDLIST pidl2, UINT cb2) {
+LPITEMIDLIST IL_Create(LPCITEMIDLIST pidl1, UINT cb1, LPCITEMIDLIST pidl2, UINT cb2) noexcept {
 	if (!pidl2) {
 		return NULL;
 	}
@@ -1051,7 +1051,7 @@ LPITEMIDLIST IL_Create(LPCITEMIDLIST pidl1, UINT cb1, LPCITEMIDLIST pidl2, UINT 
 // Retrieves the number of bytes in a pidl
 // Does not add space for zero terminators !!
 //
-UINT IL_GetSize(LPCITEMIDLIST pidl) {
+UINT IL_GetSize(LPCITEMIDLIST pidl) noexcept {
 	if (!pidl) {
 		return 0;
 	}

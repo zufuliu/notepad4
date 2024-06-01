@@ -368,7 +368,7 @@ LPWSTR Registry_GetString(HKEY hKey, LPCWSTR valueName) noexcept;
 LSTATUS Registry_SetString(HKEY hKey, LPCWSTR valueName, LPCWSTR lpszText) noexcept;
 #define Registry_GetDefaultString(hKey)				Registry_GetString((hKey), nullptr)
 #define Registry_SetDefaultString(hKey, lpszText)	Registry_SetString((hKey), nullptr, (lpszText))
-NP2_inline LSTATUS Registry_CreateKey(HKEY hKey, LPCWSTR lpSubKey, PHKEY phkResult) noexcept {
+inline LSTATUS Registry_CreateKey(HKEY hKey, LPCWSTR lpSubKey, PHKEY phkResult) noexcept {
 	return RegCreateKeyEx(hKey, lpSubKey, 0, nullptr, 0, KEY_WRITE, nullptr, phkResult, nullptr);
 }
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
@@ -402,7 +402,7 @@ void BackgroundWorker_Destroy(BackgroundWorker *worker);
 #define BackgroundWorker_Continue(worker)	\
 	(WaitForSingleObject((worker)->eventCancel, 0) != WAIT_OBJECT_0)
 
-HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(PCWSTR AppID) noexcept;
+HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(LPCWSTR AppID) noexcept;
 bool IsElevated() noexcept;
 bool ExeNameFromWnd(HWND hwnd, LPWSTR szExeName, DWORD cchExeName) noexcept;
 //bool Is32bitExe(LPCWSTR lpszExeName) noexcept;
@@ -419,7 +419,7 @@ bool BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha) noexcept;
 bool BitmapGrayScale(HBITMAP hbmp) noexcept;
 
 void CenterDlgInParentEx(HWND hDlg, HWND hParent) noexcept;
-NP2_inline void CenterDlgInParent(HWND hDlg) noexcept {
+inline void CenterDlgInParent(HWND hDlg) noexcept {
 	CenterDlgInParentEx(hDlg, GetParent(hDlg));
 }
 void SnapToDefaultButton(HWND hwndBox) noexcept;
@@ -506,18 +506,18 @@ constexpr bool IsChineseTraditionalSubLang(LANGID subLang) noexcept {
 		wsprintf((lpOutput), (lpFormat), __VA_ARGS__);			\
 	} while (0)
 
-NP2_inline bool PathIsFile(LPCWSTR pszPath) noexcept {
+inline bool PathIsFile(LPCWSTR pszPath) noexcept {
 	// note: INVALID_FILE_ATTRIBUTES is -1.
 	return (GetFileAttributes(pszPath) & FILE_ATTRIBUTE_DIRECTORY) == 0;
 }
 
-NP2_inline bool PathIsSymbolicLink(LPCWSTR pszPath) noexcept {
+inline bool PathIsSymbolicLink(LPCWSTR pszPath) noexcept {
 	// assume file exists, no check for INVALID_FILE_ATTRIBUTES.
 	return (GetFileAttributes(pszPath) & FILE_ATTRIBUTE_REPARSE_POINT) != 0;
 }
 
 // https://docs.microsoft.com/en-us/windows/win32/intl/handling-sorting-in-your-applications#sort-strings-ordinally
-NP2_inline bool PathEqual(LPCWSTR pszPath1, LPCWSTR pszPath2) noexcept {
+inline bool PathEqual(LPCWSTR pszPath1, LPCWSTR pszPath2) noexcept {
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 	// the function maps case using the operating system uppercasing table
 	return CompareStringOrdinal(pszPath1, -1, pszPath2, -1, TRUE) == CSTR_EQUAL;
@@ -528,7 +528,7 @@ NP2_inline bool PathEqual(LPCWSTR pszPath1, LPCWSTR pszPath2) noexcept {
 
 // similar to realpath() and std::filesystem::canonical()
 bool PathGetRealPath(HANDLE hFile, LPCWSTR lpszSrc, LPWSTR lpszDest) noexcept;
-NP2_inline void GetProgramRealPath(LPWSTR tchModule, DWORD nSize) noexcept {
+inline void GetProgramRealPath(LPWSTR tchModule, DWORD nSize) noexcept {
 	GetModuleFileName(nullptr, tchModule, nSize);
 	// for symbolic link, module path is link's path not target's.
 	if (PathIsSymbolicLink(tchModule)) {
@@ -548,7 +548,7 @@ void OpenContainingFolder(HWND hwnd, LPCWSTR pszFile, bool bSelect) noexcept;
 #define KnownFolderId_ComputerFolder	FOLDERID_ComputerFolder
 #endif
 
-NP2_inline void TrimString(LPWSTR lpString) noexcept {
+inline void TrimString(LPWSTR lpString) noexcept {
 	StrTrim(lpString, L" ");
 }
 

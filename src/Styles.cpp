@@ -469,12 +469,12 @@ enum {
 	StyleControl_All = StyleControl_Font | StyleControl_Fore | StyleControl_Back | StyleControl_EOLFilled,
 };
 
-static inline bool IsGlobalBaseStyleIndex(int rid, int index) {
+static constexpr bool IsGlobalBaseStyleIndex(int rid, int index) noexcept {
 	return (rid == NP2LEX_GLOBAL || rid == NP2LEX_2NDGLOBAL)
 		&& (index == GlobalStyleIndex_DefaultCode || index == GlobalStyleIndex_DefaultText);
 }
 
-static inline UINT GetLexerStyleControlMask(int rid, int index) {
+static inline UINT GetLexerStyleControlMask(int rid, int index) noexcept {
 	switch (rid) {
 	case NP2LEX_GLOBAL:
 	case NP2LEX_2NDGLOBAL:
@@ -510,7 +510,7 @@ static inline UINT GetLexerStyleControlMask(int rid, int index) {
 	}
 }
 
-static inline void FindSystemDefaultCodeFont(void) {
+static inline void FindSystemDefaultCodeFont() noexcept {
 	LPCWSTR const commonCodeFontName[] = {
 		L"DejaVu Sans Mono",
 		L"Cascadia Mono",
@@ -531,12 +531,12 @@ static inline void FindSystemDefaultCodeFont(void) {
 	lstrcpy(systemCodeFontName, L"Courier New");
 }
 
-static inline void FindSystemDefaultTextFont(void) {
+static inline void FindSystemDefaultTextFont() noexcept {
 	WORD wSize;
 	GetThemedDialogFont(systemTextFontName, &wSize);
 }
 
-void Style_DetectBaseFontSize(HMONITOR hMonitor) {
+void Style_DetectBaseFontSize(HMONITOR hMonitor) noexcept {
 	MONITORINFO mi;
 	mi.cbSize = sizeof(mi);
 	GetMonitorInfo(hMonitor, &mi);
@@ -577,7 +577,7 @@ void Style_DetectBaseFontSize(HMONITOR hMonitor) {
 	iBaseFontSize = size;
 }
 
-HFONT Style_CreateCodeFont(UINT dpi) {
+HFONT Style_CreateCodeFont(UINT dpi) noexcept {
 	const int size = SciCall_StyleGetSizeFractional(STYLE_DEFAULT);
 	const int height = -MulDiv(size, dpi, 72*SC_FONT_SIZE_MULTIPLIER);
 	HFONT font = CreateFont(height,
@@ -593,7 +593,7 @@ HFONT Style_CreateCodeFont(UINT dpi) {
 	return font;
 }
 
-void Style_ReleaseResources(void) {
+void Style_ReleaseResources() noexcept {
 	NP2HeapFree(g_AllFileExtensions);
 	for (UINT iLexer = 0; iLexer < ALL_LEXER_COUNT; iLexer++) {
 		PEDITLEXER pLex = pLexArray[iLexer];
@@ -607,7 +607,7 @@ static inline bool IsStyleLoaded(LPCEDITLEXER pLex) {
 	return pLex->iStyleTheme == np2StyleTheme && pLex->szStyleBuf != NULL;
 }
 
-static inline LPCWSTR GetStyleThemeFilePath(void) {
+static inline LPCWSTR GetStyleThemeFilePath() noexcept {
 	return (np2StyleTheme == StyleTheme_Dark) ? darkStyleThemeFilePath : szIniFile;
 }
 
@@ -673,7 +673,7 @@ static void Style_LoadOneEx(PEDITLEXER pLex, IniSection *pIniSection, WCHAR *pIn
 	}
 }
 
-void Style_SetFavoriteSchemes(void) {
+void Style_SetFavoriteSchemes() noexcept {
 	int favorite[MAX_FAVORITE_SCHEMES_COUNT];
 	const int count = ParseCommaList(favoriteSchemesConfig, favorite, MAX_FAVORITE_SCHEMES_COUNT);
 	UINT index = LEXER_INDEX_GENERAL;
@@ -699,7 +699,7 @@ void Style_SetFavoriteSchemes(void) {
 	}
 }
 
-void Style_GetFavoriteSchemes(void) {
+void Style_GetFavoriteSchemes() noexcept {
 	WCHAR *wch = favoriteSchemesConfig;
 	int len = 0;
 	int count = 0;
@@ -1099,7 +1099,7 @@ bool Style_Export(HWND hwnd) {
 	return false;
 }
 
-static void Style_ResetAll(bool resetColor) {
+static void Style_ResetAll(bool resetColor) noexcept {
 	if (resetColor) {
 		memcpy(customColor, defaultCustomColor, MAX_CUSTOM_COLOR_COUNT * sizeof(COLORREF));
 	}
@@ -1121,7 +1121,7 @@ static void Style_ResetAll(bool resetColor) {
 	fStylesModified |= STYLESMODIFIED_ALL_STYLE | STYLESMODIFIED_FILE_EXT | STYLESMODIFIED_COLOR;
 }
 
-static inline int ScaleStylePixel(int value, int scale, int minValue) {
+static inline int ScaleStylePixel(int value, int scale, int minValue) noexcept {
 	value = (scale == USER_DEFAULT_SCREEN_DPI*100) ? value : MulDiv(value, scale, USER_DEFAULT_SCREEN_DPI*100);
 	return max(value, minValue);
 }
@@ -1201,7 +1201,7 @@ void Style_OnStyleThemeChanged(int theme) {
 	Style_SetLexer(pLexCurrent, false);
 }
 
-void Style_UpdateCaret(void) {
+void Style_UpdateCaret() noexcept {
 	int iValue = (int)iCaretStyle;
 	// caret style and width
 	const int style = (iValue ? CARETSTYLE_LINE : CARETSTYLE_BLOCK)
@@ -1225,7 +1225,7 @@ void Style_UpdateCaret(void) {
 	SciCall_SetCaretPeriod(iValue);
 }
 
-static inline void Style_SetDefaultStyle(int index) {
+static inline void Style_SetDefaultStyle(int index) noexcept {
 	Style_SetStyles(pLexGlobal->Styles[index].iStyle, pLexGlobal->Styles[index].szValue);
 }
 
@@ -1250,7 +1250,7 @@ static void Style_SetAllStyle(PEDITLEXER pLex, UINT offset) {
 
 // parse a style attribute separated by ';'
 // e.g.: 'bold', 'bold;', '; bold' and '; bold;'
-static bool Style_StrGetAttributeEx(LPCWSTR lpszStyle, LPCWSTR key, int keyLen) {
+static bool Style_StrGetAttributeEx(LPCWSTR lpszStyle, LPCWSTR key, int keyLen) noexcept {
 	LPCWSTR p = StrStr(lpszStyle, key);
 	while (p != NULL) {
 		WCHAR chPrev = (p == lpszStyle) ? L';' : p[-1];
@@ -1284,7 +1284,7 @@ static bool Style_StrGetAttributeEx(LPCWSTR lpszStyle, LPCWSTR key, int keyLen) 
 #define Style_StrGetEOLFilled(lpszStyle)		Style_StrGetAttribute((lpszStyle), L"eolfilled")
 
 // set default colors to avoid showing white (COLOR_WINDOW or COLOR_3DFACE) window or margin while loading big file.
-void Style_InitDefaultColor(void) {
+void Style_InitDefaultColor() noexcept {
 	PEDITLEXER pLexNew = pLexArray[iDefaultLexerIndex];
 	const int index = pLexNew->bUseDefaultCodeStyle ? GlobalStyleIndex_DefaultCode : GlobalStyleIndex_DefaultText;
 	LPCWSTR szValue = pLexGlobal->Styles[index].szValue;
@@ -1336,7 +1336,7 @@ LPCWSTR Style_FindStyleValue(LPCEDITLEXER pLex, UINT style) {
 	return NULL;
 }
 
-void Style_DefineIndicator(int index, int indicator, int indicatorStyle) {
+void Style_DefineIndicator(int index, int indicator, int indicatorStyle) noexcept {
 	LPCWSTR szValue = pLexGlobal->Styles[index].szValue;
 	COLORREF rgb;
 	int iValue;
@@ -1806,7 +1806,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 // find lexer from script interpreter, which must be first line of the file.
 // Style_SniffShebang()
 //
-PEDITLEXER Style_SniffShebang(char *pchText) {
+PEDITLEXER Style_SniffShebang(char *pchText) noexcept {
 	if (pchText[0] == '#' && pchText[1] == '!') {
 		size_t len = 0;
 		char *pch = pchText + CSTRLEN("#!");
@@ -2036,7 +2036,7 @@ int Style_GetDocTypeLanguage(void) {
 	return 0;
 }
 
-bool MatchCPPKeyword(const char *p, int index) {
+bool MatchCPPKeyword(const char *p, int index) noexcept {
 	if (*p < 'a' || *p > 'z') {
 		return false;
 	}
@@ -2227,7 +2227,7 @@ PEDITLEXER Style_AutoDetect(BOOL bDotFile) {
 //
 // Style_GetCurrentLexerName()
 //
-LPCWSTR Style_GetCurrentLexerName(LPWSTR lpszName, int cchName) {
+LPCWSTR Style_GetCurrentLexerName(LPWSTR lpszName, int cchName) noexcept {
 	if (np2LexLangIndex == 0) {
 #if NP2_ENABLE_LOCALIZE_LEXER_NAME
 		if (GetString(pLexCurrent->rid, lpszName, cchName)) {
@@ -2793,7 +2793,7 @@ void Style_SetLexerByLangIndex(int lang) {
 	}
 }
 
-void Style_UpdateSchemeMenu(HMENU hmenu) {
+void Style_UpdateSchemeMenu(HMENU hmenu) noexcept {
 	int lang = np2LexLangIndex;
 	if (lang == 0) {
 		bool update = true;
@@ -2875,7 +2875,7 @@ void Style_SetLexerFromID(int rid) {
 	Style_SetLexer(pLexArray[iLexer], true);
 }
 
-int Style_GetMatchLexerIndex(int rid) {
+int Style_GetMatchLexerIndex(int rid) noexcept {
 	for (UINT iLexer = LEXER_INDEX_MATCH; iLexer < ALL_LEXER_COUNT; iLexer++) {
 		if (pLexArray[iLexer]->rid == rid) {
 			return iLexer;
@@ -2905,7 +2905,7 @@ void Style_ToggleUseDefaultCodeStyle(void) {
 //
 // Style_SetLongLineColors()
 //
-void Style_SetLongLineColors(void) {
+void Style_SetLongLineColors() noexcept {
 	LPCWSTR szValue = pLexGlobal->Styles[GlobalStyleIndex_LongLineMarker].szValue;
 
 	const bool foreColor = SciCall_GetEdgeMode() == EDGE_LINE;
@@ -2921,7 +2921,7 @@ void Style_SetLongLineColors(void) {
 //
 // Style_HighlightCurrentLine()
 //
-void Style_HighlightCurrentLine(void) {
+void Style_HighlightCurrentLine() noexcept {
 	if (iHighlightCurrentLine != LineHighlightMode_None) {
 		LPCWSTR szValue = pLexGlobal->Styles[GlobalStyleIndex_CurrentLine].szValue;
 		const bool outline = iHighlightCurrentLine == LineHighlightMode_OutlineFrame;
@@ -2953,7 +2953,7 @@ void Style_HighlightCurrentLine(void) {
 //
 extern bool flagSimpleIndentGuides;
 
-void Style_SetIndentGuides(bool bShow) {
+void Style_SetIndentGuides(bool bShow) noexcept {
 	int iIndentView = SC_IV_NONE;
 	if (bShow) {
 		if (!flagSimpleIndentGuides) {
@@ -2969,7 +2969,7 @@ void Style_SetIndentGuides(bool bShow) {
 	SciCall_SetIndentationGuides(iIndentView);
 }
 
-void Style_SetBookmark(void) {
+void Style_SetBookmark() noexcept {
 	if (!bBookmarkColorUpdated) {
 #if BookmarkUsingPixmapImage
 		const int marker = bShowBookmarkMargin ? SC_MARK_PIXMAP : SC_MARK_BACKGROUND;
@@ -3019,7 +3019,7 @@ void Style_SetBookmark(void) {
 //
 // Style_GetOpenDlgFilterStr()
 //
-static void AddLexFilterStr(LPWSTR szFilter, LPCEDITLEXER pLex, LPCWSTR lpszExt, int *length, int lexers[], int *index) {
+static void AddLexFilterStr(LPWSTR szFilter, LPCEDITLEXER pLex, LPCWSTR lpszExt, int *length, int lexers[], int *index) noexcept {
 	LPCWSTR p = pLex->szExtensions;
 	if (StrIsEmpty(p)) {
 		p = pLex->pszDefExt;
@@ -3090,7 +3090,7 @@ static void AddLexFilterStr(LPWSTR szFilter, LPCEDITLEXER pLex, LPCWSTR lpszExt,
 	*index += 1;
 }
 
-LPWSTR Style_GetOpenDlgFilterStr(bool open, LPCWSTR lpszFile, int lexers[]) {
+LPWSTR Style_GetOpenDlgFilterStr(bool open, LPCWSTR lpszFile, int lexers[]) noexcept {
 	int length = (MAX_FAVORITE_SCHEMES_COUNT + 2 + LEXER_INDEX_GENERAL - LEXER_INDEX_MATCH)
 				*(MAX_EDITLEXER_NAME_SIZE + MAX_EDITLEXER_EXT_SIZE*3*2);
 	LPWSTR szFilter = (LPWSTR)NP2HeapAlloc(length * sizeof(WCHAR));
@@ -3132,7 +3132,7 @@ LPWSTR Style_GetOpenDlgFilterStr(bool open, LPCWSTR lpszFile, int lexers[]) {
 //
 // Style_StrGetFont()
 //
-bool Style_StrGetFontEx(LPCWSTR lpszStyle, LPWSTR lpszFont, int cchFont, bool bDefaultStyle) {
+bool Style_StrGetFontEx(LPCWSTR lpszStyle, LPWSTR lpszFont, int cchFont, bool bDefaultStyle) noexcept {
 	LPWSTR p = StrStr(lpszStyle, L"font:");
 
 	if (p != NULL) {
@@ -3165,7 +3165,7 @@ bool Style_StrGetFontEx(LPCWSTR lpszStyle, LPWSTR lpszFont, int cchFont, bool bD
 	return false;
 }
 
-static inline bool Style_StrGetFont(LPCWSTR lpszStyle, LPWSTR lpszFont, int cchFont) {
+static inline bool Style_StrGetFont(LPCWSTR lpszStyle, LPWSTR lpszFont, int cchFont) noexcept {
 	return Style_StrGetFontEx(lpszStyle, lpszFont, cchFont, false);
 }
 
@@ -3173,7 +3173,7 @@ static inline bool Style_StrGetFont(LPCWSTR lpszStyle, LPWSTR lpszFont, int cchF
 //
 // Style_StrGetCharSet()
 //
-bool Style_StrGetCharSet(LPCWSTR lpszStyle, int *charset) {
+bool Style_StrGetCharSet(LPCWSTR lpszStyle, int *charset) noexcept {
 	LPCWSTR p = StrStr(lpszStyle, L"charset:");
 
 	if (p != NULL) {
@@ -3187,7 +3187,7 @@ bool Style_StrGetCharSet(LPCWSTR lpszStyle, int *charset) {
 //
 // Style_StrGetSize()
 //
-bool Style_StrGetFontSize(LPCWSTR lpszStyle, int *size) {
+bool Style_StrGetFontSize(LPCWSTR lpszStyle, int *size) noexcept {
 	LPCWSTR p = StrStr(lpszStyle, L"size:");
 
 	if (p != NULL) {
@@ -3205,7 +3205,7 @@ bool Style_StrGetFontSize(LPCWSTR lpszStyle, int *size) {
 	return false;
 }
 
-bool Style_StrGetSize(LPCWSTR lpszStyle, int *size) {
+bool Style_StrGetSize(LPCWSTR lpszStyle, int *size) noexcept {
 	LPCWSTR p = StrStr(lpszStyle, L"size:");
 
 	if (p != NULL) {
@@ -3219,7 +3219,7 @@ bool Style_StrGetSize(LPCWSTR lpszStyle, int *size) {
 // https://docs.microsoft.com/en-us/windows/desktop/api/dwrite/ne-dwrite-dwrite_font_weight
 #define MIN_FONT_WEIGHT		0
 #define MAX_FONT_WEIGHT		1000
-bool Style_StrGetFontWeight(LPCWSTR lpszStyle, int *weight) {
+bool Style_StrGetFontWeight(LPCWSTR lpszStyle, int *weight) noexcept {
 	if (Style_StrGetBold(lpszStyle)) {
 		*weight = FW_BOLD;
 		return true;
@@ -3238,7 +3238,7 @@ bool Style_StrGetFontWeight(LPCWSTR lpszStyle, int *weight) {
 //
 // Style_StrGetValueEx()
 //
-static bool Style_StrGetValueEx(LPCWSTR lpszStyle, LPCWSTR key, int keyLen, LPWSTR lpszValue, int cchValue) {
+static bool Style_StrGetValueEx(LPCWSTR lpszStyle, LPCWSTR key, int keyLen, LPWSTR lpszValue, int cchValue) noexcept {
 	LPWSTR p = StrStr(lpszStyle, key);
 
 	if (p != NULL) {
@@ -3257,7 +3257,7 @@ static bool Style_StrGetValueEx(LPCWSTR lpszStyle, LPCWSTR key, int keyLen, LPWS
 	return false;
 }
 
-static void Style_StrCopyValueEx(LPWSTR szNewStyle, LPCWSTR lpszStyle, LPCWSTR key, int keyLen, LPWSTR lpszValue, int cchValue) {
+static void Style_StrCopyValueEx(LPWSTR szNewStyle, LPCWSTR lpszStyle, LPCWSTR key, int keyLen, LPWSTR lpszValue, int cchValue) noexcept {
 	if (Style_StrGetValueEx(lpszStyle, key, keyLen, lpszValue, cchValue)) {
 		if (*szNewStyle) {
 			lstrcat(szNewStyle, L"; ");
@@ -3267,7 +3267,7 @@ static void Style_StrCopyValueEx(LPWSTR szNewStyle, LPCWSTR lpszStyle, LPCWSTR k
 	}
 }
 
-static void Style_StrCopyAttributeEx(LPWSTR szNewStyle, LPCWSTR lpszStyle, LPCWSTR key, int keyLen) {
+static void Style_StrCopyAttributeEx(LPWSTR szNewStyle, LPCWSTR lpszStyle, LPCWSTR key, int keyLen) noexcept {
 	if (Style_StrGetAttributeEx(lpszStyle, key, keyLen)) {
 		if (*szNewStyle) {
 			lstrcat(szNewStyle, L"; ");
@@ -3276,7 +3276,7 @@ static void Style_StrCopyAttributeEx(LPWSTR szNewStyle, LPCWSTR lpszStyle, LPCWS
 	}
 }
 
-BOOL Style_StrGetLocale(LPCWSTR lpszStyle, LPWSTR lpszLocale, int cchLocale) {
+BOOL Style_StrGetLocale(LPCWSTR lpszStyle, LPWSTR lpszLocale, int cchLocale) noexcept {
 	if (Style_StrGetValueEx(lpszStyle, L"locale:", CSTRLEN(L"locale:"), lpszLocale, cchLocale)) {
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 		return IsValidLocaleName(lpszLocale);
@@ -3315,7 +3315,7 @@ BOOL Style_StrGetLocale(LPCWSTR lpszStyle, LPWSTR lpszLocale, int cchLocale) {
 //
 // Style_StrGetColor()
 //
-bool Style_StrGetColor(bool bFore, LPCWSTR lpszStyle, COLORREF *rgb) {
+bool Style_StrGetColor(bool bFore, LPCWSTR lpszStyle, COLORREF *rgb) noexcept {
 	LPCWSTR p = StrStr(lpszStyle, (bFore ? L"fore:" : L"back:"));
 
 	if (p != NULL) {
@@ -3335,7 +3335,7 @@ bool Style_StrGetColor(bool bFore, LPCWSTR lpszStyle, COLORREF *rgb) {
 //
 // Style_StrGetAlphaEx()
 //
-bool Style_StrGetAlphaEx(bool outline, LPCWSTR lpszStyle, int *alpha) {
+bool Style_StrGetAlphaEx(bool outline, LPCWSTR lpszStyle, int *alpha) noexcept {
 	LPCWSTR p = StrStr(lpszStyle, (outline ? L"outline:" : L"alpha:"));
 
 	if (p != NULL) {
@@ -3353,7 +3353,7 @@ bool Style_StrGetAlphaEx(bool outline, LPCWSTR lpszStyle, int *alpha) {
 //
 // Style_SelectFont()
 //
-bool Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, bool bDefaultStyle) {
+bool Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, bool bDefaultStyle) noexcept {
 	CHOOSEFONT cf;
 	LOGFONT lf;
 	int iValue;
@@ -3472,7 +3472,7 @@ void Style_SetDefaultFont(HWND hwnd, bool bCode) {
 //
 // Style_SelectColor()
 //
-bool Style_SelectColor(HWND hwnd, LPWSTR lpszStyle, int cchStyle, bool bFore) {
+bool Style_SelectColor(HWND hwnd, LPWSTR lpszStyle, int cchStyle, bool bFore) noexcept {
 	CHOOSECOLOR cc;
 	memset(&cc, 0, sizeof(CHOOSECOLOR));
 
@@ -3540,7 +3540,7 @@ bool Style_SelectColor(HWND hwnd, LPWSTR lpszStyle, int cchStyle, bool bFore) {
 //
 // Style_SetStyles()
 //
-void Style_SetStyles(int iStyle, LPCWSTR lpszStyle) {
+void Style_SetStyles(int iStyle, LPCWSTR lpszStyle) noexcept {
 	WCHAR tch[LF_FACESIZE];
 	int iValue;
 	COLORREF rgb;
@@ -5105,7 +5105,7 @@ void Style_SelectLexerDlg(HWND hwnd, bool favorite) {
 	}
 }
 
-static INT_PTR CALLBACK SelectCSVOptionsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+static INT_PTR CALLBACK SelectCSVOptionsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	UNREFERENCED_PARAMETER(lParam);
 	switch (umsg) {
 	case WM_INITDIALOG: {
@@ -5159,7 +5159,7 @@ static INT_PTR CALLBACK SelectCSVOptionsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 					option = ch;
 				}
 			} else if (index > IDC_CSV_DELIMITER_COMMA) {
-				const uint32_t mask = ('\t' << ((IDC_CSV_DELIMITER_TAB - IDC_CSV_DELIMITER_COMMA - 1)*8))
+				constexpr uint32_t mask = ('\t' << ((IDC_CSV_DELIMITER_TAB - IDC_CSV_DELIMITER_COMMA - 1)*8))
 					| (' ' << ((IDC_CSV_DELIMITER_SPACE - IDC_CSV_DELIMITER_COMMA - 1)*8))
 					| (';' << ((IDC_CSV_DELIMITER_SEMICOLON - IDC_CSV_DELIMITER_COMMA - 1)*8))
 					| ('|' << ((IDC_CSV_DELIMITER_PIPE - IDC_CSV_DELIMITER_COMMA - 1)*8));
@@ -5198,12 +5198,12 @@ static INT_PTR CALLBACK SelectCSVOptionsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 	return FALSE;
 }
 
-bool SelectCSVOptionsDlg(void) {
+bool SelectCSVOptionsDlg() noexcept {
 	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_CSV_OPTIONS), hwndMain, SelectCSVOptionsDlgProc, 0);
 	return iResult == IDOK;
 }
 
-void EditShowCallTip(Sci_Position position) {
+void EditShowCallTip(Sci_Position position) noexcept {
 	if (callTipInfo.type > CallTipType_Notification) {
 		if (SciCall_CallTipActive() && position >= callTipInfo.startPos && position < callTipInfo.endPos) {
 			return;

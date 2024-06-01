@@ -487,7 +487,7 @@ void BackgroundWorker_Destroy(BackgroundWorker *worker) {
 //
 // PrivateSetCurrentProcessExplicitAppUserModelID()
 //
-HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(PCWSTR AppID) noexcept {
+HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(LPCWSTR AppID) noexcept {
 	if (StrIsEmpty(AppID)) {
 		return S_OK;
 	}
@@ -499,7 +499,7 @@ HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(PCWSTR AppID) noexcept {
 #if _WIN32_WINNT >= _WIN32_WINNT_WIN7
 	return SetCurrentProcessExplicitAppUserModelID(AppID);
 #else
-	typedef HRESULT (WINAPI *SetCurrentProcessExplicitAppUserModelIDSig)(PCWSTR AppID);
+	using SetCurrentProcessExplicitAppUserModelIDSig = HRESULT (WINAPI *)(LPCWSTR AppID);
 	SetCurrentProcessExplicitAppUserModelIDSig pfnSetCurrentProcessExplicitAppUserModelID =
 		DLLFunctionEx(SetCurrentProcessExplicitAppUserModelIDSig, L"shell32.dll", "SetCurrentProcessExplicitAppUserModelID");
 	if (pfnSetCurrentProcessExplicitAppUserModelID) {

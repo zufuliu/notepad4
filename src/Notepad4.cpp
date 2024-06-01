@@ -436,21 +436,21 @@ TripleBoolean flagUseSystemMRU		= TripleBoolean_NotSet;
 static RelaunchElevatedFlag flagRelaunchElevated = RelaunchElevatedFlag_None;
 static bool	flagDisplayHelp			= false;
 
-static inline bool IsDocumentModified(void) {
+static inline bool IsDocumentModified(void) noexcept {
 	return bDocumentModified || iCurrentEncoding != iOriginalEncoding;
 }
 
-static inline bool IsTopMost(void) {
+static inline bool IsTopMost(void) noexcept {
 	return (bAlwaysOnTop || flagAlwaysOnTop == TripleBoolean_True) && flagAlwaysOnTop != TripleBoolean_False;
 }
 
 // temporary fix for https://github.com/zufuliu/notepad4/issues/77: force InvalidateStyleRedraw().
-static inline void InvalidateStyleRedraw(void) {
+static inline void InvalidateStyleRedraw(void) noexcept {
 	SciCall_SetViewEOL(bViewEOLs);
 }
 
 // temporary fix for https://github.com/zufuliu/notepad4/issues/134: Direct2D on arm32
-static inline int GetDefualtRenderingTechnology(void) {
+static inline int GetDefualtRenderingTechnology(void) noexcept {
 #if defined(__arm__) || defined(_ARM_) || defined(_M_ARM)
 	return SC_TECHNOLOGY_DIRECTWRITERETAIN;
 #else
@@ -463,7 +463,7 @@ static inline int GetDefualtRenderingTechnology(void) {
 // WinMain()
 //
 //
-static void CleanUpResources(bool initialized) {
+static void CleanUpResources(bool initialized) noexcept {
 	if (tchToolbarBitmap != NULL) {
 		LocalFree(tchToolbarBitmap);
 	}
@@ -496,7 +496,7 @@ static void CleanUpResources(bool initialized) {
 	OleUninitialize();
 }
 
-static void DispatchMessageMain(MSG *msg) {
+static void DispatchMessageMain(MSG *msg) noexcept {
 	if (IsWindow(hDlgFindReplace) && (msg->hwnd == hDlgFindReplace || IsChild(hDlgFindReplace, msg->hwnd))) {
 		if (TranslateAccelerator(hDlgFindReplace, hAccFindReplace, msg) || IsDialogMessage(hDlgFindReplace, msg)) {
 			return;
@@ -509,7 +509,7 @@ static void DispatchMessageMain(MSG *msg) {
 	}
 }
 
-BOOL WINAPI ConsoleHandlerRoutine(DWORD dwCtrlType) {
+BOOL WINAPI ConsoleHandlerRoutine(DWORD dwCtrlType) noexcept {
 	if (dwCtrlType == CTRL_C_EVENT) {
 		SendWMCommand(hwndMain, IDM_FILE_EXIT);
 		return TRUE;
@@ -698,7 +698,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 // InitApplication()
 //
 //
-BOOL InitApplication(HINSTANCE hInstance) {
+BOOL InitApplication(HINSTANCE hInstance) noexcept {
 	WNDCLASSEX wc;
 	wc.cbSize        = sizeof(WNDCLASSEX);
 	wc.style		 = CS_BYTEALIGNWINDOW | CS_DBLCLKS;
@@ -1017,13 +1017,13 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 #endif
 }
 
-static inline void NP2MinimizeWind(HWND hwnd) {
+static inline void NP2MinimizeWind(HWND hwnd) noexcept {
 	MinimizeWndToTray(hwnd);
 	ShowNotifyIcon(hwnd, true);
 	SetNotifyIconTitle(hwnd);
 }
 
-static inline void NP2RestoreWind(HWND hwnd) {
+static inline void NP2RestoreWind(HWND hwnd) noexcept {
 	ShowNotifyIcon(hwnd, false);
 	RestoreWndFromTray(hwnd);
 	if (flagJumpTo) {
@@ -1588,7 +1588,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-void UpdateWindowTitle(void) {
+void UpdateWindowTitle() noexcept {
 	static WCHAR szCachedFile[MAX_PATH] = L"";
 	static WCHAR szCachedDisplayName[MAX_PATH] = L"";
 
@@ -1669,12 +1669,12 @@ void UpdateWindowTitle(void) {
 	SetWindowText(hwndMain, szTitle);
 }
 
-static inline void UpdateDocumentModificationStatus(void) {
+static inline void UpdateDocumentModificationStatus() noexcept {
 	UpdateWindowTitle();
 	UpdateToolbar();
 }
 
-void UpdateBookmarkMarginWidth(void) {
+void UpdateBookmarkMarginWidth() noexcept {
 	// see LineMarker::Draw() for minDim.
 	const int width = bShowBookmarkMargin ? SciCall_TextHeight() - 2 : 0;
 	// 16px for XPM bookmark symbol.
@@ -1682,12 +1682,12 @@ void UpdateBookmarkMarginWidth(void) {
 	SciCall_SetMarginWidth(MarginNumber_Bookmark, width);
 }
 
-void UpdateFoldMarginWidth(void) {
+void UpdateFoldMarginWidth() noexcept {
 	const int width = bShowCodeFolding ? SciCall_TextWidth(STYLE_LINENUMBER, "+_") : 0;
 	SciCall_SetMarginWidth(MarginNumber_CodeFolding, width);
 }
 
-void SetWrapVisualFlags(void) {
+void SetWrapVisualFlags() noexcept {
 	if (bShowWordWrapSymbols) {
 		int wrapVisualFlags = 0;
 		int wrapVisualFlagsLocation = 0;
@@ -1726,7 +1726,7 @@ void SetWrapVisualFlags(void) {
 	}
 }
 
-static void EditFrameOnThemeChanged(void) {
+static void EditFrameOnThemeChanged() noexcept {
 	if (IsAppThemed()) {
 		SetWindowExStyle(hwndEdit, GetWindowExStyle(hwndEdit) & ~WS_EX_CLIENTEDGE);
 		SetWindowPos(hwndEdit, NULL, 0, 0, 0, 0, SWP_NOZORDER | SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE);
@@ -1757,7 +1757,7 @@ static void EditFrameOnThemeChanged(void) {
 //
 // EditCreate()
 //
-void EditCreate(HWND hwndParent) {
+void EditCreate(HWND hwndParent) noexcept {
 	HWND hwnd = CreateWindowEx(WS_EX_CLIENTEDGE,
 						  L"Scintilla",
 						  NULL,
@@ -1881,7 +1881,7 @@ void EditCreate(HWND hwndParent) {
 	SciCall_SetAutoInsertMask(autoCompletionConfig.fAutoInsertMask);
 }
 
-void EditReplaceDocument(HANDLE pdoc) {
+void EditReplaceDocument(HANDLE pdoc) noexcept {
 	const UINT cpEdit = SciCall_GetCodePage();
 	SciCall_SetDocPointer(pdoc);
 	// reduce reference count to 1
@@ -1973,7 +1973,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 // CreateBars() - Create Toolbar and Statusbar
 //
 //
-void CreateBars(HWND hwnd, HINSTANCE hInstance) {
+void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 	const BOOL bIsAppThemed = IsAppThemed();
 
 	const DWORD dwToolbarStyle = WS_TOOLBAR;
@@ -2133,7 +2133,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 	cyReBarFrame = bIsAppThemed ? 0 : 2;
 }
 
-void RecreateBars(HWND hwnd, HINSTANCE hInstance) {
+void RecreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 	Toolbar_GetButtons(hwndToolbar, TOOLBAR_COMMAND_BASE, tchToolbarButtons, COUNTOF(tchToolbarButtons));
 
 	DestroyWindow(hwndToolbar);
@@ -2182,7 +2182,7 @@ void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 // MsgThemeChanged() - Handle WM_THEMECHANGED
 //
 //
-void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
+void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	UNREFERENCED_PARAMETER(wParam);
 	UNREFERENCED_PARAMETER(lParam);
 
@@ -2205,7 +2205,7 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 // MsgSize() - Handles WM_SIZE
 //
 //
-void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) {
+void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	UNREFERENCED_PARAMETER(hwnd);
 	if (wParam == SIZE_MINIMIZED) {
 		return;
@@ -2255,7 +2255,7 @@ void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	UpdateStatusbar();
 }
 
-void UpdateStatusBarCache(int item) {
+void UpdateStatusBarCache(int item) noexcept {
 	cachedStatusItem.updateMask |= (1 << item);
 	switch (item) {
 	case StatusItem_Lexer:
@@ -2370,7 +2370,7 @@ void SetUILanguage(int menu) {
 }
 #endif
 
-bool IsIMEInNativeMode(void) {
+bool IsIMEInNativeMode() noexcept {
 	bool result = false;
 	HIMC himc = ImmGetContext(hwndEdit);
 	if (himc) {
@@ -2416,7 +2416,7 @@ void MsgNotifyZoom(void) {
 // MsgInitMenu() - Handles WM_INITMENU
 //
 //
-void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
+void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	UNREFERENCED_PARAMETER(lParam);
 	HMENU hmenu = (HMENU)wParam;
 
@@ -2727,7 +2727,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	Style_UpdateSchemeMenu(hmenu);
 }
 
-static void ConvertLineEndings(int iNewEOLMode) {
+static void ConvertLineEndings(int iNewEOLMode) noexcept {
 	iCurrentEOLMode = iNewEOLMode;
 	SciCall_SetEOLMode(iNewEOLMode);
 	EditEnsureConsistentLineEndings();
@@ -2735,7 +2735,7 @@ static void ConvertLineEndings(int iNewEOLMode) {
 	UpdateWindowTitle();
 }
 
-static inline bool IsBraceMatchChar(uint32_t ch) {
+static inline bool IsBraceMatchChar(uint32_t ch) noexcept {
 #if 0
 	return ch == '(' || ch == ')'
 		|| ch == '[' || ch == ']'
@@ -2748,7 +2748,7 @@ static inline bool IsBraceMatchChar(uint32_t ch) {
 #endif
 }
 
-static inline void HandleTabCompletion(void) {
+static inline void HandleTabCompletion() noexcept {
 	SciCall_TabCompletion((autoCompletionConfig.bLaTeXInputMethod * TAB_COMPLETION_LATEX) | TAB_COMPLETION_DEFAULT);
 }
 
@@ -5324,7 +5324,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	return 0;
 }
 
-static void GetWindowPositionSectionName(HMONITOR hMonitor, WCHAR sectionName[96]) {
+static void GetWindowPositionSectionName(HMONITOR hMonitor, WCHAR (&sectionName)[96]) noexcept {
 	MONITORINFO mi;
 	mi.cbSize = sizeof(mi);
 	GetMonitorInfo(hMonitor, &mi);
@@ -5950,7 +5950,7 @@ void SaveWindowPosition(WCHAR *pIniSectionBuf) {
 	SaveIniSection(sectionName, pIniSectionBuf);
 }
 
-void ClearWindowPositionHistory(void) {
+void ClearWindowPositionHistory() noexcept {
 	cxRunDlg = 0;
 	cxEncodingDlg = 0;
 	cyEncodingDlg = 0;
@@ -5994,7 +5994,7 @@ typedef enum CommandParseState {
 	CommandParseState_Unknown,
 } CommandParseState;
 
-CommandParseState ParseCommandLineEncoding(LPCWSTR opt) {
+CommandParseState ParseCommandLineEncoding(LPCWSTR opt) noexcept {
 	int flag = IDM_ENCODING_UNICODE;
 	if (*opt == '-') {
 		++opt;
@@ -6019,7 +6019,7 @@ CommandParseState ParseCommandLineEncoding(LPCWSTR opt) {
 	return CommandParseState_None;
 }
 
-CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) {
+CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) noexcept {
 	LPWSTR opt = lp1 + 1;
 	// only accept /opt, -opt, --opt
 	if (*opt == L'-') {
@@ -6513,7 +6513,7 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) {
 	return state;
 }
 
-void ParseCommandLine(void) {
+void ParseCommandLine() noexcept {
 	LPWSTR lpCmdLine = GetCommandLine();
 	const size_t cmdSize = sizeof(WCHAR) * (lstrlen(lpCmdLine) + 1);
 
@@ -6709,7 +6709,7 @@ void LoadFlags(void) {
 // FindIniFile()
 //
 //
-bool CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) {
+bool CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) noexcept {
 	WCHAR tchFileExpanded[MAX_PATH];
 	ExpandEnvironmentStrings(lpszFile, tchFileExpanded, COUNTOF(tchFileExpanded));
 
@@ -6774,7 +6774,7 @@ bool CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) {
 	return false;
 }
 
-bool CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule, LPCWSTR redirectKey) {
+bool CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule, LPCWSTR redirectKey) noexcept {
 	WCHAR tch[MAX_PATH];
 	if (GetPrivateProfileString(INI_SECTION_NAME_NOTEPAD4, redirectKey, L"", tch, COUNTOF(tch), lpszFile)) {
 		if (CheckIniFile(tch, lpszModule)) {
@@ -6794,7 +6794,7 @@ bool CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule, LPCWSTR redirectK
 	return false;
 }
 
-bool FindIniFile(void) {
+bool FindIniFile() noexcept {
 	if (StrEqualExW(szIniFile, L"*?")) {
 		return false;
 	}
@@ -6839,7 +6839,7 @@ bool FindIniFile(void) {
 	return true;
 }
 
-bool TestIniFile(void) {
+bool TestIniFile() noexcept {
 	if (StrEqualExW(szIniFile, L"*?")) {
 		StrCpyExW(szIniFile2, L"");
 		StrCpyExW(szIniFile, L"");
@@ -6877,7 +6877,7 @@ bool TestIniFile(void) {
 	return true;
 }
 
-void FindExtraIniFile(LPWSTR lpszIniFile, LPCWSTR defaultName, LPCWSTR redirectKey) {
+void FindExtraIniFile(LPWSTR lpszIniFile, LPCWSTR defaultName, LPCWSTR redirectKey) noexcept {
 	if (StrNotEmpty(szIniFile)) {
 		WCHAR tch[MAX_PATH];
 		if (GetPrivateProfileString(INI_SECTION_NAME_NOTEPAD4, redirectKey, L"", tch, COUNTOF(tch), szIniFile)) {
@@ -6900,7 +6900,7 @@ void FindExtraIniFile(LPWSTR lpszIniFile, LPCWSTR defaultName, LPCWSTR redirectK
 	lstrcpy(PathFindFileName(lpszIniFile), defaultName);
 }
 
-bool CreateIniFile(LPCWSTR lpszIniFile) {
+bool CreateIniFile(LPCWSTR lpszIniFile) noexcept {
 	if (StrNotEmpty(lpszIniFile)) {
 		WCHAR *pwchTail = StrRChr(lpszIniFile, NULL, L'\\');
 
@@ -6933,7 +6933,7 @@ bool CreateIniFile(LPCWSTR lpszIniFile) {
 // UpdateToolbar()
 //
 //
-void UpdateToolbar(void) {
+void UpdateToolbar() noexcept {
 	if (!bShowToolbar || !bInitDone) {
 		return;
 	}
@@ -6966,7 +6966,7 @@ void UpdateToolbar(void) {
 // UpdateStatusbar()
 //
 //
-void UpdateStatusbar(void) {
+void UpdateStatusbar() noexcept {
 	if (!bShowStatusbar || !bInitDone) {
 		return;
 	}
@@ -7162,7 +7162,7 @@ void UpdateStatusbar(void) {
 // UpdateLineNumberWidth()
 //
 //
-void UpdateLineNumberWidth(void) {
+void UpdateLineNumberWidth() noexcept {
 	int width = 0;
 	if (bShowLineNumbers) {
 #if NP2_DEBUG_CODE_FOLDING
@@ -7182,7 +7182,7 @@ void UpdateLineNumberWidth(void) {
 }
 
 // based on SciTEWin::FullScreenToggle()
-void ToggleFullScreenMode(void) {
+void ToggleFullScreenMode() noexcept {
 	static bool bSaved;
 	static WINDOWPLACEMENT wndpl;
 	static DWORD mainStyle;
@@ -7684,7 +7684,7 @@ bool FileSave(FileSaveFlag saveFlag) {
 	return fSuccess;
 }
 
-void EditApplyDefaultEncoding(LPCEDITLEXER pLex, BOOL bLexerChanged) {
+void EditApplyDefaultEncoding(LPCEDITLEXER pLex, BOOL bLexerChanged) noexcept {
 	int iEncoding;
 	int iEOLMode;
 	switch (pLex->rid) {
@@ -7746,7 +7746,7 @@ void EditApplyDefaultEncoding(LPCEDITLEXER pLex, BOOL bLexerChanged) {
 // OpenFileDlg()
 //
 //
-void SetupInitialOpenSaveDir(LPWSTR tchInitialDir, DWORD cchInitialDir, LPCWSTR lpstrInitialDir) {
+void SetupInitialOpenSaveDir(LPWSTR tchInitialDir, DWORD cchInitialDir, LPCWSTR lpstrInitialDir) noexcept {
 	tchInitialDir[0] = L'\0';
 	if (StrNotEmpty(lpstrInitialDir)) {
 		lstrcpy(tchInitialDir, lpstrInitialDir);
@@ -7770,7 +7770,7 @@ void SetupInitialOpenSaveDir(LPWSTR tchInitialDir, DWORD cchInitialDir, LPCWSTR 
 	}
 }
 
-BOOL OpenFileDlg(LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) {
+BOOL OpenFileDlg(LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) noexcept {
 	WCHAR tchInitialDir[MAX_PATH];
 	SetupInitialOpenSaveDir(tchInitialDir, COUNTOF(tchInitialDir), lpstrInitialDir);
 	WCHAR szFile[MAX_PATH];
@@ -7811,7 +7811,7 @@ BOOL OpenFileDlg(LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) {
 // SaveFileDlg()
 //
 //
-BOOL SaveFileDlg(bool Untitled, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) {
+BOOL SaveFileDlg(bool Untitled, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) noexcept {
 	WCHAR tchInitialDir[MAX_PATH];
 	SetupInitialOpenSaveDir(tchInitialDir, COUNTOF(tchInitialDir), lpstrInitialDir);
 	WCHAR szNewFile[MAX_PATH];
@@ -7856,7 +7856,7 @@ BOOL SaveFileDlg(bool Untitled, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInit
 *
 *
 ******************************************************************************/
-static BOOL CALLBACK EnumWindProcReuseWindow(HWND hwnd, LPARAM lParam) {
+static BOOL CALLBACK EnumWindProcReuseWindow(HWND hwnd, LPARAM lParam) noexcept {
 	BOOL bContinue = TRUE;
 	WCHAR szClassName[64];
 
@@ -7874,7 +7874,7 @@ static BOOL CALLBACK EnumWindProcReuseWindow(HWND hwnd, LPARAM lParam) {
 	return bContinue;
 }
 
-static BOOL CALLBACK EnumWindProcSingleFileInstance(HWND hwnd, LPARAM lParam) {
+static BOOL CALLBACK EnumWindProcSingleFileInstance(HWND hwnd, LPARAM lParam) noexcept {
 	BOOL bContinue = TRUE;
 	WCHAR szClassName[64];
 
@@ -7899,7 +7899,7 @@ static BOOL CALLBACK EnumWindProcSingleFileInstance(HWND hwnd, LPARAM lParam) {
 	return bContinue;
 }
 
-bool ActivatePrevInst(void) {
+bool ActivatePrevInst() noexcept {
 	if ((flagNoReuseWindow && !flagSingleFileInstance) || flagStartAsTrayIcon || flagNewFromClipboard || flagPasteBoard) {
 		return false;
 	}
@@ -8080,7 +8080,7 @@ bool ActivatePrevInst(void) {
 // RelaunchMultiInst()
 //
 //
-bool RelaunchMultiInst(void) {
+bool RelaunchMultiInst() noexcept {
 	if (flagMultiFileArg == TripleBoolean_True && cFileList > 1) {
 		LPWSTR lpCmdLineNew = StrDup(GetCommandLine());
 		const size_t cmdSize = sizeof(WCHAR) * (lstrlen(lpCmdLineNew) + 1);
@@ -8131,7 +8131,7 @@ bool RelaunchMultiInst(void) {
 	return false;
 }
 
-void GetRelaunchParameters(LPWSTR szParameters, LPCWSTR lpszFile, bool newWind, bool emptyWind) {
+void GetRelaunchParameters(LPWSTR szParameters, LPCWSTR lpszFile, bool newWind, bool emptyWind) noexcept {
 	WCHAR tch[64];
 	wsprintf(tch, L"-appid=\"%s\"", g_wchAppUserModelID);
 	lstrcpy(szParameters, tch);
@@ -8331,7 +8331,7 @@ bool RelaunchElevated(void) {
 // Aligns Notepad4 to the default window position on the current screen
 //
 //
-void SnapToDefaultPos(HWND hwnd) {
+void SnapToDefaultPos(HWND hwnd) noexcept {
 	RECT rcOld;
 	GetWindowRect(hwnd, &rcOld);
 
@@ -8373,7 +8373,7 @@ void SnapToDefaultPos(HWND hwnd) {
 // ShowNotifyIcon()
 //
 //
-void ShowNotifyIcon(HWND hwnd, bool bAdd) {
+void ShowNotifyIcon(HWND hwnd, bool bAdd) noexcept {
 	if (bAdd && (hTrayIcon == NULL || uTrayIconDPI != g_uCurrentDPI)) {
 		if (hTrayIcon) {
 			DestroyIcon(hTrayIcon);
@@ -8405,7 +8405,7 @@ void ShowNotifyIcon(HWND hwnd, bool bAdd) {
 // SetNotifyIconTitle()
 //
 //
-void SetNotifyIconTitle(HWND hwnd) {
+void SetNotifyIconTitle(HWND hwnd) noexcept {
 	NOTIFYICONDATA nid;
 	memset(&nid, 0, sizeof(NOTIFYICONDATA));
 	nid.cbSize = sizeof(NOTIFYICONDATA);
@@ -8432,7 +8432,7 @@ void SetNotifyIconTitle(HWND hwnd) {
 	Shell_NotifyIcon(NIM_MODIFY, &nid);
 }
 
-void ShowNotificationA(int notifyPos, LPCSTR lpszText) {
+void ShowNotificationA(int notifyPos, LPCSTR lpszText) noexcept {
 	callTipInfo.type = CallTipType_Notification;
 	//SciCall_CallTipSetBack(callTipInfo.backColor);
 	//SciCall_CallTipSetFore(callTipInfo.foreColor);
@@ -8440,7 +8440,7 @@ void ShowNotificationA(int notifyPos, LPCSTR lpszText) {
 	SciCall_ShowNotification(notifyPos, lpszText);
 }
 
-void ShowNotificationW(int notifyPos, LPCWSTR lpszText) {
+void ShowNotificationW(int notifyPos, LPCWSTR lpszText) noexcept {
 	const int cpEdit = SciCall_GetCodePage();
 	const int wchLen = lstrlen(lpszText);
 	const int cchLen = wchLen*kMaxMultiByteCount + 1;
@@ -8450,7 +8450,7 @@ void ShowNotificationW(int notifyPos, LPCWSTR lpszText) {
 	NP2HeapFree(cchText);
 }
 
-void ShowNotificationMessage(int notifyPos, UINT uidMessage, ...) {
+void ShowNotificationMessage(int notifyPos, UINT uidMessage, ...) noexcept {
 	WCHAR wchFormat[1024] = L"";
 	WCHAR wchMessage[2048] = L"";
 	GetString(uidMessage, wchFormat, COUNTOF(wchFormat));
@@ -8468,7 +8468,7 @@ void ShowNotificationMessage(int notifyPos, UINT uidMessage, ...) {
 // InstallFileWatching()
 //
 //
-void InstallFileWatching(bool terminate) {
+void InstallFileWatching(bool terminate) noexcept {
 	terminate = terminate || iFileWatchingMode == FileWatchingMode_None || StrIsEmpty(szCurFile);
 	// Terminate
 	if (bRunningWatch) {
@@ -8508,7 +8508,7 @@ void InstallFileWatching(bool terminate) {
 	}
 }
 
-static inline bool IsCurrentFileChangedOutsideApp(void) {
+static inline bool IsCurrentFileChangedOutsideApp(void) noexcept {
 	// Check if the file has been changed
 	WIN32_FIND_DATA fdUpdated;
 	if (!GetFileAttributesEx(szCurFile, GetFileExInfoStandard, &fdUpdated)) {
@@ -8520,7 +8520,7 @@ static inline bool IsCurrentFileChangedOutsideApp(void) {
 	return changed;
 }
 
-static void CheckCurrentFileChangedOutsideApp(void) {
+static void CheckCurrentFileChangedOutsideApp() noexcept {
 	// Check if the changes affect the current file
 	if (IsCurrentFileChangedOutsideApp()) {
 		// Shutdown current watching and give control to main window
@@ -8547,7 +8547,7 @@ static void CheckCurrentFileChangedOutsideApp(void) {
 // WatchTimerProc()
 //
 //
-void CALLBACK WatchTimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime) {
+void CALLBACK WatchTimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime) noexcept {
 	UNREFERENCED_PARAMETER(hwnd);
 	UNREFERENCED_PARAMETER(uMsg);
 	UNREFERENCED_PARAMETER(idEvent);
@@ -8583,7 +8583,7 @@ void CALLBACK WatchTimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTim
 // PasteBoardTimer()
 //
 //
-void CALLBACK PasteBoardTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime) {
+void CALLBACK PasteBoardTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime) noexcept {
 	UNREFERENCED_PARAMETER(hwnd);
 	UNREFERENCED_PARAMETER(uMsg);
 	UNREFERENCED_PARAMETER(idEvent);

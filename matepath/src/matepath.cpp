@@ -222,7 +222,7 @@ bool		flagNoFadeHidden	= false;
 static int	iOpacityLevel		= 75;
 static bool	flagPosParam		= false;
 
-static inline bool HasFilter(void) {
+static inline bool HasFilter(void) noexcept {
 	return !StrEqualExW(tchFilter, L"*.*") || bNegFilter;
 }
 
@@ -231,7 +231,7 @@ static inline bool HasFilter(void) {
 //  WinMain()
 //
 //
-static void CleanUpResources(bool initialized) {
+static void CleanUpResources(bool initialized) noexcept {
 	if (tchToolbarBitmap != NULL) {
 		LocalFree(tchToolbarBitmap);
 	}
@@ -260,7 +260,7 @@ static void CleanUpResources(bool initialized) {
 	OleUninitialize();
 }
 
-BOOL WINAPI ConsoleHandlerRoutine(DWORD dwCtrlType) {
+BOOL WINAPI ConsoleHandlerRoutine(DWORD dwCtrlType) noexcept {
 	if (dwCtrlType == CTRL_C_EVENT) {
 		ShowNotifyIcon(hwndMain, false);
 		SendMessage(hwndMain, WM_CLOSE, 0, 0);
@@ -369,7 +369,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 //  InitApplication()
 //
 //
-BOOL InitApplication(HINSTANCE hInstance) {
+BOOL InitApplication(HINSTANCE hInstance) noexcept {
 	WNDCLASSEX wc;
 	wc.cbSize        = sizeof(WNDCLASSEX);
 	wc.style         = CS_BYTEALIGNWINDOW;
@@ -895,10 +895,10 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 //  CreateBars() - Create Toolbar and Statusbar
 //
 //
-void CreateBars(HWND hwnd, HINSTANCE hInstance) {
+void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 	const BOOL bIsAppThemed = IsAppThemed();
 
-	const DWORD dwToolbarStyle = WS_TOOLBAR | TBSTYLE_FLAT | CCS_ADJUSTABLE;
+	constexpr DWORD dwToolbarStyle = WS_TOOLBAR | TBSTYLE_FLAT | CCS_ADJUSTABLE;
 	hwndToolbar = CreateWindowEx(0, TOOLBARCLASSNAME, NULL, dwToolbarStyle,
 								 0, 0, 0, 0, hwnd, (HMENU)IDC_TOOLBAR, hInstance, NULL);
 
@@ -1055,7 +1055,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 	cyDriveBoxFrame = bIsAppThemed ? 0 : 2;
 }
 
-void RecreateBars(HWND hwnd, HINSTANCE hInstance) {
+void RecreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 	Toolbar_GetButtons(hwndToolbar, TOOLBAR_COMMAND_BASE, tchToolbarButtons, COUNTOF(tchToolbarButtons));
 
 	DestroyWindow(hwndToolbar);
@@ -1069,7 +1069,7 @@ void RecreateBars(HWND hwnd, HINSTANCE hInstance) {
 // MsgDPIChanged() - Handle WM_DPICHANGED
 //
 //
-void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
+void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	g_uCurrentDPI = HIWORD(wParam);
 	const RECT* const rc = (RECT *)lParam;
 
@@ -1095,7 +1095,7 @@ void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 //  MsgThemeChanged() - Handles WM_THEMECHANGED
 //
 //
-void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
+void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	UNREFERENCED_PARAMETER(wParam);
 	UNREFERENCED_PARAMETER(lParam);
 
@@ -1130,7 +1130,7 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 //  MsgSize() - Handles WM_SIZE
 //
 //
-void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) {
+void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	UNREFERENCED_PARAMETER(hwnd);
 
 	if (wParam == SIZE_MINIMIZED) {
@@ -1138,7 +1138,7 @@ void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	}
 
 	RECT rc;
-	const int x = 0;
+	constexpr int x = 0;
 	int y = 0;
 	const int cx = LOWORD(lParam);
 	int cy = HIWORD(lParam);
@@ -2293,7 +2293,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	return 0;
 }
 
-void SetWindowPathTitle(HWND hwnd, LPCWSTR lpszFile) {
+void SetWindowPathTitle(HWND hwnd, LPCWSTR lpszFile) noexcept {
 	WCHAR szTitle[MAX_PATH] = L"";
 	if (StrNotEmpty(lpszFile)) {
 		if (!PathIsRoot(lpszFile)) {
@@ -2397,7 +2397,7 @@ bool ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, bool bUpdateHistory) {
 	return true;
 }
 
-static void GetWindowPositionSectionName(HMONITOR hMonitor, WCHAR sectionName[96]) {
+static void GetWindowPositionSectionName(HMONITOR hMonitor, WCHAR (&sectionName)[96]) noexcept {
 	MONITORINFO mi;
 	mi.cbSize = sizeof(mi);
 	GetMonitorInfo(hMonitor, &mi);
@@ -2860,7 +2860,7 @@ void SaveWindowPosition(WCHAR *pIniSectionBuf) {
 	SaveIniSection(sectionName, pIniSectionBuf);
 }
 
-void ClearWindowPositionHistory(void) {
+void ClearWindowPositionHistory(void) noexcept {
 	cxRunDlg = 0;
 	cxGotoDlg = 0;
 	cxFileFilterDlg = 0;
@@ -2880,13 +2880,13 @@ void ClearWindowPositionHistory(void) {
 //  ParseCommandLine()
 //
 //
-typedef enum CommandParseState {
+enum CommandParseState {
 	CommandParseState_None,
 	CommandParseState_Consumed,
 	CommandParseState_Argument,
-} CommandParseState;
+};
 
-CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) {
+CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) noexcept {
 	LPWSTR opt = lp1 + 1;
 	// only accept /opt, -opt, --opt
 	if (*opt == L'-') {
@@ -2993,7 +2993,7 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) {
 	return state;
 }
 
-void ParseCommandLine(void) {
+void ParseCommandLine(void) noexcept {
 	LPWSTR lpCmdLine = GetCommandLine();
 	const size_t cmdSize = sizeof(WCHAR) * (lstrlen(lpCmdLine) + 1);
 
@@ -3101,7 +3101,7 @@ void LoadFlags(void) {
 //  FindIniFile()
 //
 //
-bool CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) {
+bool CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) noexcept {
 	WCHAR tchFileExpanded[MAX_PATH];
 	ExpandEnvironmentStrings(lpszFile, tchFileExpanded, COUNTOF(tchFileExpanded));
 
@@ -3166,7 +3166,7 @@ bool CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) {
 	return false;
 }
 
-bool CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule) {
+bool CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule) noexcept {
 	WCHAR tch[MAX_PATH];
 	if (GetPrivateProfileString(INI_SECTION_NAME_MATEPATH, L"matepath.ini", L"", tch, COUNTOF(tch), lpszFile)) {
 		if (CheckIniFile(tch, lpszModule)) {
@@ -3186,7 +3186,7 @@ bool CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule) {
 	return false;
 }
 
-bool FindIniFile(void) {
+bool FindIniFile(void) noexcept {
 	if (StrEqualExW(szIniFile, L"*?")) {
 		return false;
 	}
@@ -3231,7 +3231,7 @@ bool FindIniFile(void) {
 	return true;
 }
 
-bool TestIniFile(void) {
+bool TestIniFile(void) noexcept {
 	if (StrEqualExW(szIniFile, L"*?")) {
 		StrCpyExW(szIniFile2, L"");
 		StrCpyExW(szIniFile, L"");
@@ -3268,7 +3268,7 @@ bool TestIniFile(void) {
 	return true;
 }
 
-bool CreateIniFile(LPCWSTR lpszIniFile) {
+bool CreateIniFile(LPCWSTR lpszIniFile) noexcept {
 	if (StrNotEmpty(lpszIniFile)) {
 		WCHAR *pwchTail = StrRChr(lpszIniFile, NULL, L'\\');
 
@@ -3447,7 +3447,7 @@ bool DisplayLnkFile(LPCWSTR pszLnkFile, LPCWSTR pszResPath) {
 *
 *
 ******************************************************************************/
-static BOOL CALLBACK EnumWindProcReuseWindow(HWND hwnd, LPARAM lParam) {
+static BOOL CALLBACK EnumWindProcReuseWindow(HWND hwnd, LPARAM lParam) noexcept {
 	BOOL bContinue = TRUE;
 	WCHAR szClassName[64];
 
@@ -3463,7 +3463,7 @@ static BOOL CALLBACK EnumWindProcReuseWindow(HWND hwnd, LPARAM lParam) {
 	return bContinue;
 }
 
-bool ActivatePrevInst(void) {
+bool ActivatePrevInst() noexcept {
 	if (flagNoReuseWindow || flagStartAsTrayIcon) {
 		return false;
 	}
@@ -3518,7 +3518,7 @@ bool ActivatePrevInst(void) {
 	return false;
 }
 
-void GetRelaunchParameters(LPWSTR szParameters) {
+void GetRelaunchParameters(LPWSTR szParameters) noexcept {
 	StrCpyExW(szParameters, L" -f");
 	if (StrNotEmpty(szIniFile)) {
 		lstrcat(szParameters, L" \"");
@@ -3567,7 +3567,7 @@ void GetRelaunchParameters(LPWSTR szParameters) {
 //  ShowNotifyIcon()
 //
 //
-void ShowNotifyIcon(HWND hwnd, bool bAdd) {
+void ShowNotifyIcon(HWND hwnd, bool bAdd) noexcept {
 	if (bAdd && (hTrayIcon == NULL || uTrayIconDPI != g_uCurrentDPI)) {
 		if (hTrayIcon) {
 			DestroyIcon(hTrayIcon);
@@ -3605,7 +3605,7 @@ void ShowNotifyIcon(HWND hwnd, bool bAdd) {
 WCHAR szGlobalWndClass[256] = L"";
 bool bLoadLaunchSetingsLoaded = false;
 
-static BOOL CALLBACK EnumWindProcTargetApplication(HWND hwnd, LPARAM lParam) {
+static BOOL CALLBACK EnumWindProcTargetApplication(HWND hwnd, LPARAM lParam) noexcept {
 	BOOL bContinue = TRUE;
 	WCHAR szClassName[64];
 
@@ -3854,7 +3854,7 @@ void SnapToTarget(HWND hwnd) {
 //  Aligns matepath to the default window position on the current screen
 //
 //
-void SnapToDefaultPos(HWND hwnd) {
+void SnapToDefaultPos(HWND hwnd) noexcept {
 	RECT rcOld;
 	GetWindowRect(hwnd, &rcOld);
 
@@ -3865,8 +3865,8 @@ void SnapToDefaultPos(HWND hwnd) {
 
 	int x = mi.rcWork.left + 16;
 	const int y = mi.rcWork.top + 16;
-	const int cx = 272;
-	const int cy = 640;
+	constexpr int cx = 272;
+	constexpr int cy = 640;
 
 	WINDOWPLACEMENT wndpl;
 	wndpl.length = sizeof(WINDOWPLACEMENT);

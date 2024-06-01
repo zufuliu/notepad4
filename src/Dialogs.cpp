@@ -120,7 +120,7 @@ int MsgBox(UINT uType, UINT uIdMsg, ...) noexcept {
 //
 // DisplayCmdLineHelp()
 //
-void DisplayCmdLineHelp(HWND hwnd) {
+void DisplayCmdLineHelp(HWND hwnd) noexcept {
 	WCHAR szTitle[32];
 	WCHAR szText[2048];
 
@@ -152,7 +152,7 @@ void DisplayCmdLineHelp(HWND hwnd) {
 	MessageBoxIndirect(&mbp);
 }
 
-void OpenHelpLink(HWND hwnd, int cmd) {
+void OpenHelpLink(HWND hwnd, int cmd) noexcept {
 	LPCWSTR link = NULL;
 	switch (cmd) {
 	case IDC_WEBPAGE_LINK:
@@ -193,7 +193,7 @@ void OpenHelpLink(HWND hwnd, int cmd) {
 	}
 }
 
-static inline LPCWSTR GetProcessorArchitecture(void) {
+static inline LPCWSTR GetProcessorArchitecture(void) noexcept {
 	SYSTEM_INFO info;
 	GetNativeSystemInfo(&info);
 #ifndef PROCESSOR_ARCHITECTURE_ARM64
@@ -219,7 +219,7 @@ static inline LPCWSTR GetProcessorArchitecture(void) {
 //
 // BFFCallBack()
 //
-static int CALLBACK BFFCallBack(HWND hwnd, UINT umsg, LPARAM lParam, LPARAM lpData) {
+static int CALLBACK BFFCallBack(HWND hwnd, UINT umsg, LPARAM lParam, LPARAM lpData) noexcept {
 	UNREFERENCED_PARAMETER(lParam);
 
 	if (umsg == BFFM_INITIALIZED) {
@@ -233,7 +233,7 @@ static int CALLBACK BFFCallBack(HWND hwnd, UINT umsg, LPARAM lParam, LPARAM lpDa
 //
 // GetDirectory()
 //
-bool GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase) {
+bool GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase) noexcept {
 	WCHAR szTitle[256];
 	StrCpyExW(szTitle, L"");
 	GetString(iTitle, szTitle, COUNTOF(szTitle));
@@ -558,7 +558,7 @@ static INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 //
 // RunDlg()
 //
-void RunDlg(HWND hwnd, LPCWSTR lpstrDefault) {
+void RunDlg(HWND hwnd, LPCWSTR lpstrDefault) noexcept {
 	ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_RUN), hwnd, RunDlgProc, (LPARAM)lpstrDefault);
 }
 
@@ -878,7 +878,7 @@ static INT_PTR CALLBACK FavoritesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 //
 // FavoritesDlg()
 //
-bool FavoritesDlg(HWND hwnd, LPWSTR lpstrFile) {
+bool FavoritesDlg(HWND hwnd, LPWSTR lpstrFile) noexcept {
 	DLITEM dliFavorite;
 	dliFavorite.mask = DLI_FILENAME;
 
@@ -987,7 +987,7 @@ extern bool bSaveRecentFiles;
 extern int cxFileMRUDlg;
 extern int cyFileMRUDlg;
 
-static DWORD WINAPI FileMRUIconThread(LPVOID lpParam) {
+static DWORD WINAPI FileMRUIconThread(LPVOID lpParam) noexcept {
 	BackgroundWorker *worker = (BackgroundWorker *)lpParam;
 
 	WCHAR tch[MAX_PATH] = L"";
@@ -1310,7 +1310,7 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 // FileMRUDlg()
 //
 //
-bool FileMRUDlg(HWND hwnd, LPWSTR lpstrFile) {
+bool FileMRUDlg(HWND hwnd, LPWSTR lpstrFile) noexcept {
 	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_FILEMRU), hwnd, FileMRUDlgProc, (LPARAM)lpstrFile);
 	return iResult == IDOK;
 }
@@ -1325,7 +1325,7 @@ extern bool iFileWatchingMethod;
 extern bool bFileWatchingKeepAtEnd;
 extern bool bResetFileWatching;
 
-static INT_PTR CALLBACK ChangeNotifyDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+static INT_PTR CALLBACK ChangeNotifyDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	UNREFERENCED_PARAMETER(lParam);
 
 	switch (umsg) {
@@ -1366,7 +1366,7 @@ static INT_PTR CALLBACK ChangeNotifyDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 //
 // ChangeNotifyDlg()
 //
-bool ChangeNotifyDlg(HWND hwnd) {
+bool ChangeNotifyDlg(HWND hwnd) noexcept {
 	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_CHANGENOTIFY), hwnd, ChangeNotifyDlgProc, 0);
 	return iResult == IDOK;
 }
@@ -1376,7 +1376,7 @@ bool ChangeNotifyDlg(HWND hwnd) {
 // ColumnWrapDlgProc()
 //
 //
-static INT_PTR CALLBACK ColumnWrapDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+static INT_PTR CALLBACK ColumnWrapDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	UNREFERENCED_PARAMETER(lParam);
 
 	switch (umsg) {
@@ -1422,7 +1422,7 @@ static INT_PTR CALLBACK ColumnWrapDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 //
 // ColumnWrapDlg()
 //
-bool ColumnWrapDlg(HWND hwnd) {
+bool ColumnWrapDlg(HWND hwnd) noexcept {
 	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_COLUMNWRAP), hwnd, ColumnWrapDlgProc, 0);
 	return iResult == IDOK;
 }
@@ -1440,7 +1440,7 @@ extern bool bShowWordWrapSymbols;
 extern bool bWordWrapSelectSubLine;
 extern bool bHighlightCurrentSubLine;
 
-static INT_PTR CALLBACK WordWrapSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+static INT_PTR CALLBACK WordWrapSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	UNREFERENCED_PARAMETER(lParam);
 
 	switch (umsg) {
@@ -1518,7 +1518,7 @@ static INT_PTR CALLBACK WordWrapSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 //
 // WordWrapSettingsDlg()
 //
-bool WordWrapSettingsDlg(HWND hwnd) {
+bool WordWrapSettingsDlg(HWND hwnd) noexcept {
 	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_WORDWRAP), hwnd, WordWrapSettingsDlgProc, 0);
 	return iResult == IDOK;
 }
@@ -1531,7 +1531,7 @@ bool WordWrapSettingsDlg(HWND hwnd) {
 extern int iLongLineMode;
 extern int iLongLinesLimitG;
 
-static INT_PTR CALLBACK LongLineSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+static INT_PTR CALLBACK LongLineSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	UNREFERENCED_PARAMETER(lParam);
 
 	switch (umsg) {
@@ -1583,7 +1583,7 @@ static INT_PTR CALLBACK LongLineSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 //
 // LongLineSettingsDlg()
 //
-bool LongLineSettingsDlg(HWND hwnd) {
+bool LongLineSettingsDlg(HWND hwnd) noexcept {
 	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_LONGLINES), hwnd, LongLineSettingsDlgProc, 0);
 	return iResult == IDOK;
 }
@@ -1593,7 +1593,7 @@ bool LongLineSettingsDlg(HWND hwnd) {
 // TabSettingsDlgProc()
 //
 //
-static void SyncGlobalTabSettings(HWND hwnd) {
+static void SyncGlobalTabSettings(HWND hwnd) noexcept {
 	const bool useGlobal = IsButtonChecked(hwnd, IDC_SCHEME_USE_GLOBAL_TAB);
 	if (useGlobal) {
 		WCHAR wch[16];
@@ -1612,7 +1612,7 @@ static void SyncGlobalTabSettings(HWND hwnd) {
 	EnableWindow(GetDlgItem(hwnd, IDC_SCHEME_TAB_AS_SPACE), !useGlobal);
 }
 
-static void SyncSchemeTabSettings(HWND hwnd) {
+static void SyncSchemeTabSettings(HWND hwnd) noexcept {
 	const bool useScheme = IsButtonChecked(hwnd, IDC_FILE_USE_SCHEME_TAB);
 	if (useScheme) {
 		WCHAR wch[16];
@@ -1812,7 +1812,7 @@ static INT_PTR CALLBACK TabSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 //
 // TabSettingsDlg()
 //
-bool TabSettingsDlg(HWND hwnd) {
+bool TabSettingsDlg(HWND hwnd) noexcept {
 	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_TABSETTINGS), hwnd, TabSettingsDlgProc, 0);
 	return iResult == IDOK;
 }
@@ -1906,7 +1906,7 @@ static INT_PTR CALLBACK SelectDefEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 //
 // SelectDefEncodingDlg()
 //
-bool SelectDefEncodingDlg(HWND hwnd, int *pidREncoding) {
+bool SelectDefEncodingDlg(HWND hwnd, int *pidREncoding) noexcept {
 	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_DEFENCODING), hwnd, SelectDefEncodingDlgProc, (LPARAM)(pidREncoding));
 	return iResult == IDOK;
 }
@@ -2040,7 +2040,7 @@ static INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 extern int cxEncodingDlg;
 extern int cyEncodingDlg;
 
-bool SelectEncodingDlg(HWND hwnd, int *pidREncoding, UINT uidLabel) {
+bool SelectEncodingDlg(HWND hwnd, int *pidREncoding, UINT uidLabel) noexcept {
 	ENCODEDLG dd;
 
 	dd.bRecodeOnly = (uidLabel == IDS_SELRECT_RELOAD_ENCODING);
@@ -2065,7 +2065,7 @@ bool SelectEncodingDlg(HWND hwnd, int *pidREncoding, UINT uidLabel) {
 //
 // SelectDefLineEndingDlgProc()
 //
-static INT_PTR CALLBACK SelectDefLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+static INT_PTR CALLBACK SelectDefLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
@@ -2123,12 +2123,12 @@ static INT_PTR CALLBACK SelectDefLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM 
 //
 // SelectDefLineEndingDlg()
 //
-bool SelectDefLineEndingDlg(HWND hwnd, int *iOption) {
+bool SelectDefLineEndingDlg(HWND hwnd, int *iOption) noexcept {
 	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_DEFEOLMODE), hwnd, SelectDefLineEndingDlgProc, (LPARAM)iOption);
 	return iResult == IDOK;
 }
 
-static INT_PTR CALLBACK WarnLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+static INT_PTR CALLBACK WarnLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
@@ -2186,13 +2186,13 @@ static INT_PTR CALLBACK WarnLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 	return FALSE;
 }
 
-bool WarnLineEndingDlg(HWND hwnd, struct EditFileIOStatus *status) {
+bool WarnLineEndingDlg(HWND hwnd, struct EditFileIOStatus *status) noexcept {
 	MessageBeep(MB_ICONEXCLAMATION);
 	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_WARNLINEENDS), hwnd, WarnLineEndingDlgProc, (LPARAM)status);
 	return iResult == IDOK;
 }
 
-void InitZoomLevelComboBox(HWND hwnd, int nCtlId, int zoomLevel) {
+void InitZoomLevelComboBox(HWND hwnd, int nCtlId, int zoomLevel) noexcept {
 	WCHAR tch[16];
 	int selIndex = -1;
 	static const short levelList[] = {
@@ -2219,13 +2219,13 @@ void InitZoomLevelComboBox(HWND hwnd, int nCtlId, int zoomLevel) {
 	}
 }
 
-bool GetZoomLevelComboBoxValue(HWND hwnd, int nCtrId, int *zoomLevel) {
+bool GetZoomLevelComboBoxValue(HWND hwnd, int nCtrId, int *zoomLevel) noexcept {
 	WCHAR tch[16];
 	GetDlgItemText(hwnd, nCtrId, tch, COUNTOF(tch));
 	return CRTStrToInt(tch, zoomLevel) && *zoomLevel >= SC_MIN_ZOOM_LEVEL && *zoomLevel <= SC_MAX_ZOOM_LEVEL;
 }
 
-static INT_PTR CALLBACK ZoomLevelDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+static INT_PTR CALLBACK ZoomLevelDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		const int zoomLevel = SciCall_GetZoom();
@@ -2261,7 +2261,7 @@ static INT_PTR CALLBACK ZoomLevelDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 	return FALSE;
 }
 
-void ZoomLevelDlg(HWND hwnd, bool bBottom) {
+void ZoomLevelDlg(HWND hwnd, bool bBottom) noexcept {
 	ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_ZOOMLEVEL), hwnd, ZoomLevelDlgProc, bBottom);
 }
 
@@ -2493,7 +2493,7 @@ static INT_PTR CALLBACK AutoCompletionSettingsDlgProc(HWND hwnd, UINT umsg, WPAR
 	return FALSE;
 }
 
-bool AutoCompletionSettingsDlg(HWND hwnd) {
+bool AutoCompletionSettingsDlg(HWND hwnd) noexcept {
 	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_AUTOCOMPLETION), hwnd, AutoCompletionSettingsDlgProc, 0);
 	return iResult == IDOK;
 }
@@ -2574,7 +2574,7 @@ static INT_PTR CALLBACK AutoSaveSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 	return FALSE;
 }
 
-bool AutoSaveSettingsDlg(HWND hwnd) {
+bool AutoSaveSettingsDlg(HWND hwnd) noexcept {
 	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_AUTOSAVE), hwnd, AutoSaveSettingsDlgProc, 0);
 	return iResult == IDOK;
 }
@@ -2700,6 +2700,8 @@ extern bool fIsElevated;
 extern TripleBoolean flagUseSystemMRU;
 extern WCHAR g_wchAppUserModelID[64];
 
+namespace {
+
 enum {
 	SystemIntegration_ContextMenu = 1,
 	SystemIntegration_JumpList = 2,
@@ -2714,7 +2716,7 @@ struct SystemIntegrationInfo {
 
 #define NP2RegSubKey_ReplaceNotepad	L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\notepad.exe"
 
-int GetSystemIntegrationStatus(struct SystemIntegrationInfo *info) {
+int GetSystemIntegrationStatus(struct SystemIntegrationInfo *info) noexcept {
 	int mask = 0;
 	WCHAR tchModule[MAX_PATH];
 	GetModuleFileName(NULL, tchModule, COUNTOF(tchModule));
@@ -2778,7 +2780,7 @@ int GetSystemIntegrationStatus(struct SystemIntegrationInfo *info) {
 	return mask;
 }
 
-void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName) {
+void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName) noexcept {
 	WCHAR tchModule[MAX_PATH];
 	GetModuleFileName(NULL, tchModule, COUNTOF(tchModule));
 	WCHAR command[300];
@@ -2894,7 +2896,7 @@ void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName)
 	}
 }
 
-static INT_PTR CALLBACK SystemIntegrationDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+INT_PTR CALLBACK SystemIntegrationDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	UNREFERENCED_PARAMETER(lParam);
 
 	switch (umsg) {
@@ -2987,6 +2989,8 @@ static INT_PTR CALLBACK SystemIntegrationDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 	return FALSE;
 }
 
-void SystemIntegrationDlg(HWND hwnd) {
+}
+
+void SystemIntegrationDlg(HWND hwnd) noexcept {
 	ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_SYSTEM_INTEGRATION), hwnd, SystemIntegrationDlgProc, 0);
 }

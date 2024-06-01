@@ -601,7 +601,7 @@ void BackgroundWorker_Destroy(BackgroundWorker *worker);
 #define BackgroundWorker_Continue(worker)	\
 	(WaitForSingleObject((worker)->eventCancel, 0) != WAIT_OBJECT_0)
 
-HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(PCWSTR AppID) noexcept;
+HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(LPCWSTR AppID) noexcept;
 bool IsElevated() noexcept;
 
 #define SetExplorerTheme(hwnd)		SetWindowTheme((hwnd), L"Explorer", nullptr)

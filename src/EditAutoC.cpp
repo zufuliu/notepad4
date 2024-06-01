@@ -60,7 +60,7 @@ struct WordList {
 #if NP2_AUTOC_CACHE_SORT_KEY
 #define NP2_AUTOC_SORT_KEY_LENGTH	4
 
-uint32_t WordList_SortKey(const void *pWord, uint32_t len) {
+uint32_t WordList_SortKey(const void *pWord, uint32_t len) noexcept {
 #if 0
 	uint32_t high = 0;
 	const uint8_t *ptr = (const uint8_t *)pWord;
@@ -83,7 +83,7 @@ uint32_t WordList_SortKey(const void *pWord, uint32_t len) {
 	return high;
 }
 
-uint32_t WordList_SortKeyCase(const void *pWord, uint32_t len) {
+uint32_t WordList_SortKeyCase(const void *pWord, uint32_t len) noexcept {
 #if 1
 	uint32_t high = 0;
 	const uint8_t *ptr = (const uint8_t *)pWord;
@@ -471,7 +471,7 @@ void WordList_AddSubWord(struct WordList *pWList, LPSTR pWord, UINT wordLength, 
 }
 
 
-static inline bool IsCppCommentStyle(int style) {
+static constexpr bool IsCppCommentStyle(int style) noexcept {
 	return style == SCE_C_COMMENT
 		|| style == SCE_C_COMMENTLINE
 		|| style == SCE_C_COMMENTDOC
@@ -480,13 +480,13 @@ static inline bool IsCppCommentStyle(int style) {
 		|| style == SCE_C_COMMENTDOC_TAG_XML;
 }
 
-static inline bool IsSpecialStart(int ch) {
+static constexpr bool IsSpecialStart(int ch) noexcept {
 	return ch == ':' || ch == '.' || ch == '#' || ch == '@'
 		|| ch == '<' || ch == '\\' || ch == '/' || ch == '-'
 		|| ch == '>' || ch == '$' || ch == '%';
 }
 
-static inline bool IsSpecialStartChar(int ch, int chPrev) {
+static constexpr bool IsSpecialStartChar(int ch, int chPrev) noexcept {
 	return (ch == '.')	// member
 		|| (ch == '#')	// preprocessor
 		|| (ch == '@') // Java/PHP/Doxygen Doc Tag
@@ -531,31 +531,31 @@ static uint32_t PlainTextStyleMask[8];
 #define js_style(style)		((style) + SCE_PHP_LABEL + 1)
 #define css_style(style)	((style) + SCE_PHP_LABEL + SCE_JS_LABEL + 2)
 
-static inline bool IsDefaultWordChar(uint32_t ch) {
+static inline bool IsDefaultWordChar(uint32_t ch) noexcept {
 	return BitTestEx(DefaultWordCharSet, ch);
 }
 
-bool IsDocWordChar(uint32_t ch) {
+bool IsDocWordChar(uint32_t ch) noexcept {
 	return BitTestEx(CurrentWordCharSet, ch);
 }
 
-static inline bool IsCharacterPrefix(int ch) {
+static inline bool IsCharacterPrefix(int ch) noexcept {
 	return BitTestEx(CharacterPrefixMask, ch);
 }
 
-static inline bool IsRawStringStyle(int style) {
+static inline bool IsRawStringStyle(int style) noexcept {
 	return BitTestEx(RawStringStyleMask, style);
 }
 
-static inline bool IsGenericTypeStyle(int style) {
+static inline bool IsGenericTypeStyle(int style) noexcept {
 	return BitTestEx(GenericTypeStyleMask, style);
 }
 
-static inline bool IsCommentStyle(int style) {
+static inline bool IsCommentStyle(int style) noexcept {
 	return BitTestEx(CommentStyleMask, style);
 }
 
-bool IsAutoCompletionWordCharacter(uint32_t ch) {
+bool IsAutoCompletionWordCharacter(uint32_t ch) noexcept {
 	if (ch < 0x80) {
 		return IsDocWordChar(ch);
 	}
@@ -563,7 +563,7 @@ bool IsAutoCompletionWordCharacter(uint32_t ch) {
 	return cc == CharacterClass_Word;
 }
 
-static inline bool IsEscapeCharacter(int ch) {
+static constexpr bool IsEscapeCharacter(int ch) noexcept {
 	return ch == '0'	// '\0'
 		|| ch == 'a'	// '\a'
 		|| ch == 'b'	// '\b'
@@ -579,11 +579,11 @@ static inline bool IsEscapeCharacter(int ch) {
 }
 
 // https://en.wikipedia.org/wiki/Printf_format_string
-static inline bool IsPrintfFormatSpecifier(int ch) {
+static constexpr bool IsPrintfFormatSpecifier(int ch) noexcept {
 	return IsAlpha(ch);
 }
 
-static bool IsEscapeCharOrFormatSpecifier(Sci_Position before, int ch, int chPrev, int style, bool punctuation) {
+static bool IsEscapeCharOrFormatSpecifier(Sci_Position before, int ch, int chPrev, int style, bool punctuation) noexcept {
 	// style for chPrev, style for ch is zero on typing
 	const int stylePrev = SciCall_GetStyleIndexAt(before);
 	if (stylePrev == 0) {
@@ -630,7 +630,7 @@ static bool IsEscapeCharOrFormatSpecifier(Sci_Position before, int ch, int chPre
 	return false;
 }
 
-static inline bool NeedSpaceAfterKeyword(const char *word, Sci_Position length) {
+static inline bool NeedSpaceAfterKeyword(const char *word, Sci_Position length) noexcept {
 	const char *p = strstr(
 		" if for try using while elseif switch foreach synchronized "
 		, word);
@@ -730,7 +730,7 @@ typedef enum HtmlTextBlock {
 	HtmlTextBlock_CSS,
 } HtmlTextBlock;
 
-static HtmlTextBlock GetCurrentHtmlTextBlockEx(int iLexer, int iCurrentStyle) {
+static HtmlTextBlock GetCurrentHtmlTextBlockEx(int iLexer, int iCurrentStyle) noexcept {
 	if (iLexer == SCLEX_PHPSCRIPT) {
 		if (iCurrentStyle >= css_style(SCE_CSS_DEFAULT)) {
 			return HtmlTextBlock_CSS;
@@ -759,7 +759,7 @@ static HtmlTextBlock GetCurrentHtmlTextBlockEx(int iLexer, int iCurrentStyle) {
 	return HtmlTextBlock_Tag;
 }
 
-static HtmlTextBlock GetCurrentHtmlTextBlock(int iLexer) {
+static HtmlTextBlock GetCurrentHtmlTextBlock(int iLexer) noexcept {
 	const Sci_Position iCurrentPos = SciCall_GetCurrentPos();
 	const int iCurrentStyle = SciCall_GetStyleIndexAt(iCurrentPos);
 	return GetCurrentHtmlTextBlockEx(iLexer, iCurrentStyle);
@@ -1434,7 +1434,7 @@ static AddWordResult AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyl
 	return AddWordResult_None;
 }
 
-void EditCompleteUpdateConfig(void) {
+void EditCompleteUpdateConfig() noexcept {
 	int i = 0;
 	const int mask = autoCompletionConfig.fAutoCompleteFillUpMask;
 	if (mask & AutoCompleteFillUpMask_Space) {
@@ -1752,7 +1752,7 @@ void EditCompleteWord(int iCondition, bool autoInsert) {
 	}
 }
 
-static bool CanAutoCloseSingleQuote(int chPrev, int iCurrentStyle) {
+static bool CanAutoCloseSingleQuote(int chPrev, int iCurrentStyle) noexcept {
 	const int iLexer = pLexCurrent->iLexer;
 	if (iCurrentStyle == 0) {
 		if (iLexer == SCLEX_VISUALBASIC || iLexer == SCLEX_VBSCRIPT) {
@@ -1801,7 +1801,7 @@ static bool CanAutoCloseSingleQuote(int chPrev, int iCurrentStyle) {
 	return true;
 }
 
-bool EditIsOpenBraceMatched(Sci_Position pos, Sci_Position startPos) {
+bool EditIsOpenBraceMatched(Sci_Position pos, Sci_Position startPos) noexcept {
 	// SciCall_GetEndStyled() is SciCall_GetCurrentPos() - 1
 	// only find close brace with same style in next 4KiB text
 	SciCall_EnsureStyledTo(pos + 1024*4);
@@ -1821,7 +1821,7 @@ bool EditIsOpenBraceMatched(Sci_Position pos, Sci_Position startPos) {
 	return false;
 }
 
-void EditAutoCloseBraceQuote(int ch, AutoInsertCharacter what) {
+void EditAutoCloseBraceQuote(int ch, AutoInsertCharacter what) noexcept {
 	const Sci_Position iCurPos = SciCall_GetCurrentPos();
 	const int chPrev = SciCall_GetCharAt(iCurPos - 2);
 	const int chNext = SciCall_GetCharAt(iCurPos);
@@ -1899,7 +1899,7 @@ void EditAutoCloseBraceQuote(int ch, AutoInsertCharacter what) {
 	}
 }
 
-static inline bool IsHtmlVoidTag(const char *word, int length) {
+static inline bool IsHtmlVoidTag(const char *word, int length) noexcept {
 	// same as htmlVoidTagList in scintilla/lexlib/DocUtils.h
 	const char *p = StrStrIA(
 		// void elements
@@ -2010,7 +2010,7 @@ typedef enum AutoIndentType {
 	AutoIndentType_IndentAndClose,
 } AutoIndentType;
 
-static const char *EditKeywordIndent(LPCEDITLEXER pLex, const char *head, AutoIndentType *indent) {
+static const char *EditKeywordIndent(LPCEDITLEXER pLex, const char *head, AutoIndentType *indent) noexcept {
 	char word[16] = "";
 	char word_low[16] = "";
 	int length = 0;
@@ -2180,7 +2180,7 @@ static const char *EditKeywordIndent(LPCEDITLEXER pLex, const char *head, AutoIn
 	return endPart;
 }
 
-void EditAutoIndent(void) {
+void EditAutoIndent() noexcept {
 	const Sci_Position iCurPos = SciCall_GetCurrentPos();
 	//const Sci_Position iAnchorPos = SciCall_GetAnchor();
 	const Sci_Line iCurLine = SciCall_LineFromPosition(iCurPos);
@@ -2548,7 +2548,7 @@ void EditToggleCommentLine(bool alternative) {
 	}
 }
 
-void EditEncloseSelectionNewLine(LPCWSTR pwszOpen, LPCWSTR pwszClose) {
+void EditEncloseSelectionNewLine(LPCWSTR pwszOpen, LPCWSTR pwszClose) noexcept {
 	WCHAR start[64] = L"";
 	WCHAR end[64] = L"";
 	WCHAR lineEnd[4] = {L'\r', L'\n'};
@@ -2576,7 +2576,7 @@ void EditEncloseSelectionNewLine(LPCWSTR pwszOpen, LPCWSTR pwszClose) {
 	EditEncloseSelection(start, end);
 }
 
-static bool EditUncommentBlock(LPCWSTR pwszOpen, LPCWSTR pwszClose, bool newLine) {
+static bool EditUncommentBlock(LPCWSTR pwszOpen, LPCWSTR pwszClose, bool newLine) noexcept {
 	const Sci_Position iSelStart = SciCall_GetSelectionStart();
 	int style = SciCall_GetStyleIndexAt(iSelStart);
 	if (IsCommentStyle(style)) {
@@ -2819,7 +2819,7 @@ void EditToggleCommentBlock(bool alternative) {
 }
 
 // see Style_SniffShebang() in Styles.cpp
-void EditInsertScriptShebangLine(void) {
+void EditInsertScriptShebangLine() noexcept {
 	const char *prefix = "#!/usr/bin/env ";
 	const char *name = NULL;
 
@@ -2918,7 +2918,7 @@ void EditInsertScriptShebangLine(void) {
 	SciCall_ReplaceSel(line);
 }
 
-void InitAutoCompletionCache(LPCEDITLEXER pLex) {
+void InitAutoCompletionCache(LPCEDITLEXER pLex) noexcept {
 	np2_LexKeyword = NULL;
 	memset(CharacterPrefixMask, 0, sizeof(CharacterPrefixMask));
 	memset(RawStringStyleMask, 0, sizeof(RawStringStyleMask));

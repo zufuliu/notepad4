@@ -181,46 +181,46 @@ typedef enum PrintFooterOption {
 extern WCHAR szCurFile[MAX_PATH + 40];
 
 //==== Function Declarations ==================================================
-BOOL InitApplication(HINSTANCE hInstance);
+BOOL InitApplication(HINSTANCE hInstance) noexcept;
 void InitInstance(HINSTANCE hInstance, int nCmdShow);
-bool ActivatePrevInst(void);
-void GetRelaunchParameters(LPWSTR szParameters, LPCWSTR lpszFile, bool newWind, bool emptyWind);
-bool RelaunchMultiInst(void);
+bool ActivatePrevInst() noexcept;
+void GetRelaunchParameters(LPWSTR szParameters, LPCWSTR lpszFile, bool newWind, bool emptyWind) noexcept;
+bool RelaunchMultiInst() noexcept;
 bool RelaunchElevated(void);
-void SnapToDefaultPos(HWND hwnd);
-void ShowNotifyIcon(HWND hwnd, bool bAdd);
-void SetNotifyIconTitle(HWND hwnd);
+void SnapToDefaultPos(HWND hwnd) noexcept;
+void ShowNotifyIcon(HWND hwnd, bool bAdd) noexcept;
+void SetNotifyIconTitle(HWND hwnd) noexcept;
 
-void ShowNotificationA(int notifyPos, LPCSTR lpszText);
-void ShowNotificationW(int notifyPos, LPCWSTR lpszText);
-void ShowNotificationMessage(int notifyPos, UINT uidMessage, ...);
+void ShowNotificationA(int notifyPos, LPCSTR lpszText) noexcept;
+void ShowNotificationW(int notifyPos, LPCWSTR lpszText) noexcept;
+void ShowNotificationMessage(int notifyPos, UINT uidMessage, ...) noexcept;
 
-void InstallFileWatching(bool terminate);
-void CALLBACK WatchTimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
-void CALLBACK PasteBoardTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
+void InstallFileWatching(bool terminate) noexcept;
+void CALLBACK WatchTimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime) noexcept;
+void CALLBACK PasteBoardTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime) noexcept;
 
 void LoadSettings(void);
 void SaveSettingsNow(bool bOnlySaveStyle, bool bQuiet);
 void SaveSettings(bool bSaveSettingsNow);
 void SaveWindowPosition(WCHAR *pIniSectionBuf);
-void ClearWindowPositionHistory(void);
-void ParseCommandLine(void);
+void ClearWindowPositionHistory() noexcept;
+void ParseCommandLine() noexcept;
 void LoadFlags(void);
 
-bool CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule);
-bool CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule, LPCWSTR redirectKey);
-bool FindIniFile(void);
-bool TestIniFile(void);
-bool CreateIniFile(LPCWSTR lpszIniFile);
-void FindExtraIniFile(LPWSTR lpszIniFile, LPCWSTR defaultName, LPCWSTR redirectKey);
+bool CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) noexcept;
+bool CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule, LPCWSTR redirectKey) noexcept;
+bool FindIniFile() noexcept;
+bool TestIniFile() noexcept;
+bool CreateIniFile(LPCWSTR lpszIniFile) noexcept;
+void FindExtraIniFile(LPWSTR lpszIniFile, LPCWSTR defaultName, LPCWSTR redirectKey) noexcept;
 
-void UpdateWindowTitle(void);
-void UpdateStatusbar(void);
-void UpdateStatusBarCache(int item);
-void UpdateToolbar(void);
-void UpdateFoldMarginWidth(void);
-void UpdateLineNumberWidth(void);
-void UpdateBookmarkMarginWidth(void);
+void UpdateWindowTitle() noexcept;
+void UpdateStatusbar() noexcept;
+void UpdateStatusBarCache(int item) noexcept;
+void UpdateToolbar() noexcept;
+void UpdateFoldMarginWidth() noexcept;
+void UpdateLineNumberWidth() noexcept;
+void UpdateBookmarkMarginWidth() noexcept;
 
 enum {
 	FullScreenMode_OnStartup = 1,
@@ -229,9 +229,9 @@ enum {
 	FullScreenMode_Default = FullScreenMode_HideCaption,
 };
 
-void ToggleFullScreenMode(void);
+void ToggleFullScreenMode() noexcept;
 
-typedef struct EditFileIOStatus {
+struct EditFileIOStatus {
 	int iEncoding;		// load output, save input
 	int iEOLMode;		// load output
 
@@ -245,7 +245,7 @@ typedef struct EditFileIOStatus {
 	bool bInconsistent;	// load output
 	Sci_Line totalLineCount; // load output, sum(linesCount) + 1
 	Sci_Line linesCount[3];	// load output: CR+LF, LF, CR
-} EditFileIOStatus;
+};
 
 typedef enum FileLoadFlag {
 	FileLoadFlag_Default = 0,
@@ -266,8 +266,8 @@ typedef enum FileSaveFlag {
 bool FileIO(bool fLoad, LPWSTR pszFile, int flag, EditFileIOStatus *status);
 bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile);
 bool FileSave(FileSaveFlag saveFlag);
-BOOL OpenFileDlg(LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir);
-BOOL SaveFileDlg(bool Untitled, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir);
+BOOL OpenFileDlg(LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) noexcept;
+BOOL SaveFileDlg(bool Untitled, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) noexcept;
 
 enum {
 	AutoSaveOption_None = 0,
@@ -286,10 +286,10 @@ LPCWSTR AutoSave_GetDefaultFolder(void);
 
 LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
 LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam);
-void	CreateBars(HWND hwnd, HINSTANCE hInstance);
+void	CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept;
 void	MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam);
-void	MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam);
-void	MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam);
-void	MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam);
+void	MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept;
+void	MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept;
+void	MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept;
 LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam);
 LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam);

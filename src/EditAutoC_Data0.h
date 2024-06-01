@@ -104,7 +104,7 @@ static NP2_KEYWORDS kwPList = {
 
 static NP2_KEYWORDS *np2_LexKeyword;
 
-static inline void UpdateLexerExtraKeywords() {
+static inline void UpdateLexerExtraKeywords() noexcept {
 	if (np2LexLangIndex == 0) {
 		return;
 	}

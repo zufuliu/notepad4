@@ -99,6 +99,6 @@ inline LPITEMIDLIST IL_Next(LPITEMIDLIST pidl) noexcept {
 	return (LPITEMIDLIST)((LPBYTE)(pidl) + pidl->mkid.cb);
 }
 
-LPITEMIDLIST IL_Create(LPCITEMIDLIST pidl1, UINT cb1, LPCITEMIDLIST pidl2, UINT cb2);
-UINT IL_GetSize(LPCITEMIDLIST pidl);
+LPITEMIDLIST IL_Create(LPCITEMIDLIST pidl1, UINT cb1, LPCITEMIDLIST pidl2, UINT cb2) noexcept;
+UINT IL_GetSize(LPCITEMIDLIST pidl) noexcept;
 bool IL_GetDisplayName(LPSHELLFOLDER lpsf, LPCITEMIDLIST pidl, DWORD dwFlags, LPWSTR lpszDisplayName, int nDisplayName);
