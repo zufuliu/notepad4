@@ -574,14 +574,14 @@ inline bool KeyboardIsKeyDown(int key) noexcept {
 
 #define WaitableTimer_IdleTaskTimeSlot		100
 #define WaitableTimer_IdleTaskDelayTime		50
-#define WaitableTimer_Create()				CreateWaitableTimer(NULL, TRUE, NULL)
+#define WaitableTimer_Create()				CreateWaitableTimer(nullptr, TRUE, nullptr)
 #define WaitableTimer_Destroy(timer)		CloseHandle(timer)
-NP2_inline void WaitableTimer_Set(HANDLE timer, DWORD milliseconds) {
+inline void WaitableTimer_Set(HANDLE timer, DWORD milliseconds) noexcept {
 	LARGE_INTEGER dueTime;
 	dueTime.QuadPart = -INT64_C(10*1000)*milliseconds; // convert to 100ns
-	SetWaitableTimer(timer, &dueTime, 0, NULL, NULL, FALSE);
+	SetWaitableTimer(timer, &dueTime, 0, nullptr, nullptr, FALSE);
 }
-NP2_inline HANDLE WaitableTimer_New(DWORD milliseconds) {
+inline HANDLE WaitableTimer_New(DWORD milliseconds) noexcept {
 	HANDLE timer = WaitableTimer_Create();
 	WaitableTimer_Set(timer, milliseconds);
 	return timer;
@@ -656,8 +656,8 @@ NP2_inline void ResizeDlg_InitY2(HWND hwnd, int cxFrame, int cyFrame, int nIdGri
 }
 int ResizeDlg_CalcDeltaY2(HWND hwnd, int dy, int cy, int nCtlId1, int nCtlId2);
 
-HDWP DeferCtlPos(HDWP hdwp, HWND hwndDlg, int nCtlId, int dx, int dy, UINT uFlags);
-void ResizeDlgCtl(HWND hwndDlg, int nCtlId, int dx, int dy);
+HDWP DeferCtlPos(HDWP hdwp, HWND hwndDlg, int nCtlId, int dx, int dy, UINT uFlags) noexcept;
+void ResizeDlgCtl(HWND hwndDlg, int nCtlId, int dx, int dy) noexcept;
 
 #define SendWMCommandEx(hwnd, id, extra)	SendMessage(hwnd, WM_COMMAND, MAKEWPARAM((id), (extra)), 0)
 #define SendWMCommand(hwnd, id)				SendWMCommandEx(hwnd, (id), 1)

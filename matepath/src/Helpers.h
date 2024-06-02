@@ -443,8 +443,8 @@ NP2_inline void ResizeDlg_InitY(HWND hwnd, int cyFrame, int nIdGrip) {
 void ResizeDlg_Destroy(HWND hwnd, int *cxFrame, int *cyFrame);
 void ResizeDlg_Size(HWND hwnd, LPARAM lParam, int *cx, int *cy);
 void ResizeDlg_GetMinMaxInfo(HWND hwnd, LPARAM lParam);
-HDWP DeferCtlPos(HDWP hdwp, HWND hwndDlg, int nCtlId, int dx, int dy, UINT uFlags);
-void ResizeDlgCtl(HWND hwndDlg, int nCtlId, int dx, int dy);
+HDWP DeferCtlPos(HDWP hdwp, HWND hwndDlg, int nCtlId, int dx, int dy, UINT uFlags) noexcept;
+void ResizeDlgCtl(HWND hwndDlg, int nCtlId, int dx, int dy) noexcept;
 void MakeBitmapButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, int wBmpId) noexcept;
 void DeleteBitmapButton(HWND hwnd, int nCtlId) noexcept;
 void SetClipData(HWND hwnd, LPCWSTR pszData) noexcept;

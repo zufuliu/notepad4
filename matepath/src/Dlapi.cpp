@@ -67,8 +67,8 @@ void DirList_Init(HWND hwnd, LPCWSTR pszHeader) {
 	// Setup dl
 	BackgroundWorker_Init(&lpdl->worker, hwnd);
 	lpdl->cbidl = 0;
-	lpdl->pidl = NULL;
-	lpdl->lpsf = NULL;
+	lpdl->pidl = nullptr;
+	lpdl->lpsf = nullptr;
 	StrCpyExW(lpdl->szPath, L"");
 
 	SHFILEINFO shfi;
@@ -175,9 +175,9 @@ int DirList_Fill(HWND hwnd, LPCWSTR lpszDir, DWORD grfFlags, LPCWSTR lpszFileSpe
 	lstrcpy(wszDir, lpszDir);
 
 	// Get Desktop Folder
-	LPSHELLFOLDER lpsfDesktop = NULL;
-	PIDLIST_RELATIVE pidl = NULL;
-	LPSHELLFOLDER lpsf = NULL;
+	LPSHELLFOLDER lpsfDesktop = nullptr;
+	PIDLIST_RELATIVE pidl = nullptr;
+	LPSHELLFOLDER lpsf = nullptr;
 	if (S_OK == SHGetDesktopFolder(&lpsfDesktop)) {
 		// Convert wszDir into a pidl
 		ULONG chParsed = 0;
@@ -701,7 +701,7 @@ void DirList_CreateFilter(PDL_FILTER pdlf, LPCWSTR lpszFileSpec, bool bExcludeFi
 	pdlf->pFilter[0] = pdlf->tFilterBuf;    // Zeile zum Ausprobieren
 
 	WCHAR *p;
-	while ((p = StrChr(pdlf->pFilter[pdlf->nCount - 1], L';')) != NULL) {
+	while ((p = StrChr(pdlf->pFilter[pdlf->nCount - 1], L';')) != nullptr) {
 		*p = L'\0';                              // Replace L';' by L'\0'
 		pdlf->pFilter[pdlf->nCount] = (p + 1);  // Next position after L';'
 		pdlf->nCount++;                         // Increase number of filters
@@ -715,7 +715,7 @@ void DirList_CreateFilter(PDL_FILTER pdlf, LPCWSTR lpszFileSpec, bool bExcludeFi
 //  Check if a specified item matches a given filter
 //
 bool DirList_MatchFilter(LPSHELLFOLDER lpsf, LPCITEMIDLIST pidl, LPCDL_FILTER pdlf) {
-	// Immediately return true if lpszFileSpec is *.* or NULL
+	// Immediately return true if lpszFileSpec is *.* or nullptr
 	if (pdlf->nCount == 0 && !pdlf->bExcludeFilter) {
 		return true;
 	}
@@ -795,9 +795,9 @@ int DriveBox_Fill(HWND hwnd) {
 	// Get pidl to [My Computer]
 	PIDLIST_ABSOLUTE pidl;
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-	if (S_OK == SHGetKnownFolderIDList(KnownFolderId_ComputerFolder, KF_FLAG_DEFAULT, NULL, &pidl))
+	if (S_OK == SHGetKnownFolderIDList(KnownFolderId_ComputerFolder, KF_FLAG_DEFAULT, nullptr, &pidl))
 #else
-	if (S_OK == SHGetFolderLocation(hwnd, CSIDL_DRIVES, NULL, SHGFP_TYPE_DEFAULT, &pidl))
+	if (S_OK == SHGetFolderLocation(hwnd, CSIDL_DRIVES, nullptr, SHGFP_TYPE_DEFAULT, &pidl))
 #endif
 	{
 		// Get Desktop Folder
@@ -1046,14 +1046,14 @@ bool DriveBox_GetDispInfo(HWND hwnd, LPARAM lParam) {
 //
 // Creates an ITEMIDLIST by concatenating pidl1 and pidl2
 // cb1 and cb2 indicate the sizes of the pidls, where cb1
-// can be zero and pidl1 can be NULL
+// can be zero and pidl1 can be nullptr
 //
 // If cb2 is zero, the size of pidl2 is retrieved using
 // IL_GetSize(pidl2)
 //
 LPITEMIDLIST IL_Create(LPCITEMIDLIST pidl1, UINT cb1, LPCITEMIDLIST pidl2, UINT cb2) noexcept {
 	if (!pidl2) {
-		return NULL;
+		return nullptr;
 	}
 
 	if (!cb2) {
@@ -1072,7 +1072,7 @@ LPITEMIDLIST IL_Create(LPCITEMIDLIST pidl1, UINT cb1, LPCITEMIDLIST pidl2, UINT 
 		memcpy((char *)pidl, (const char *)pidl1, cb1);
 	}
 
-	// pidl2 can't be NULL here
+	// pidl2 can't be nullptr here
 	memcpy((char *)pidl + cb1, (const char *)pidl2, cb2);
 
 	return pidl;

@@ -71,10 +71,10 @@ static TBBUTTON tbbMainWnd[] = {
 static HWND hwndDriveBox;
 HWND	hwndDirList;
 HWND	hwndMain;
-static HICON hTrayIcon = NULL;
+static HICON hTrayIcon = nullptr;
 static UINT uTrayIconDPI = 0;
 
-static HANDLE hChangeHandle = NULL;
+static HANDLE hChangeHandle = nullptr;
 HISTORY	mHistory;
 
 WCHAR	szIniFile[MAX_PATH] = L"";
@@ -86,9 +86,9 @@ WCHAR	szQuickviewParams[MAX_PATH];
 WCHAR	tchFavoritesDir[MAX_PATH];
 WCHAR	tchOpenWithDir[MAX_PATH];
 static WCHAR tchToolbarButtons[MAX_TOOLBAR_BUTTON_CONFIG_BUFFER_SIZE];
-static LPWSTR tchToolbarBitmap = NULL;
-static LPWSTR tchToolbarBitmapHot = NULL;
-static LPWSTR tchToolbarBitmapDisabled = NULL;
+static LPWSTR tchToolbarBitmap = nullptr;
+static LPWSTR tchToolbarBitmapHot = nullptr;
+static LPWSTR tchToolbarBitmapDisabled = nullptr;
 bool	bClearReadOnly;
 bool	bRenameOnCollision;
 bool	bSingleClick;
@@ -151,8 +151,8 @@ static DWORD dwFillMask;
 static int nSortFlags;
 static bool fSortRev;
 
-static LPWSTR lpPathArg = NULL;
-static LPWSTR lpFilterArg = NULL;
+static LPWSTR lpPathArg = nullptr;
+static LPWSTR lpFilterArg = nullptr;
 
 static UINT wFuncCopyMove = FO_COPY;
 
@@ -232,13 +232,13 @@ static inline bool HasFilter(void) noexcept {
 //
 //
 static void CleanUpResources(bool initialized) noexcept {
-	if (tchToolbarBitmap != NULL) {
+	if (tchToolbarBitmap != nullptr) {
 		LocalFree(tchToolbarBitmap);
 	}
-	if (tchToolbarBitmapHot != NULL) {
+	if (tchToolbarBitmapHot != nullptr) {
 		LocalFree(tchToolbarBitmapHot);
 	}
-	if (tchToolbarBitmapDisabled != NULL) {
+	if (tchToolbarBitmapDisabled != nullptr) {
 		LocalFree(tchToolbarBitmapDisabled);
 	}
 	if (hTrayIcon) {
@@ -316,7 +316,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	PrivateSetCurrentProcessExplicitAppUserModelID(g_wchAppUserModelID);
 
 	// Init OLE and Common Controls
-	OleInitialize(NULL);
+	OleInitialize(nullptr);
 
 	INITCOMMONCONTROLSEX icex;
 	icex.dwSize = sizeof(INITCOMMONCONTROLSEX);
@@ -353,7 +353,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	HACCEL hAcc = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_MAINWND));
 	MSG msg;
 
-	while (GetMessage(&msg, NULL, 0, 0)) {
+	while (GetMessage(&msg, nullptr, 0, 0)) {
 		if (!TranslateAccelerator(hwnd, hAcc, &msg)) {
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
@@ -378,11 +378,11 @@ BOOL InitApplication(HINSTANCE hInstance) noexcept {
 	wc.cbWndExtra    = 0;
 	wc.hInstance     = hInstance;
 	wc.hIcon         = LoadIcon(hInstance, MAKEINTRESOURCE(IDR_MAINWND));
-	wc.hCursor       = LoadCursor(NULL, IDC_ARROW);
+	wc.hCursor       = LoadCursor(nullptr, IDC_ARROW);
 	wc.hbrBackground = (HBRUSH)(COLOR_3DFACE + 1);
-	wc.lpszMenuName  = NULL;
+	wc.lpszMenuName  = nullptr;
 	wc.lpszClassName = WC_MATEPATH;
-	wc.hIconSm       = NULL;
+	wc.hIconSm       = nullptr;
 
 	return RegisterClassEx(&wc);
 }
@@ -456,10 +456,10 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 				   wi.y,
 				   wi.cx,
 				   wi.cy,
-				   NULL,
-				   NULL,
+				   nullptr,
+				   nullptr,
 				   hInstance,
-				   NULL);
+				   nullptr);
 	if (bAlwaysOnTop) {
 		SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 	}
@@ -482,7 +482,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 		// Use a startup directory
 		if (iStartupDir == StartupDirectory_MRU) {
 			if (!StrIsEmpty(szMRUDirectory)) {
-				GetModuleFileName(NULL, szMRUDirectory, COUNTOF(szMRUDirectory));
+				GetModuleFileName(nullptr, szMRUDirectory, COUNTOF(szMRUDirectory));
 				PathRemoveFileSpec(szMRUDirectory);
 			}
 			DisplayPath(szMRUDirectory, IDS_ERR_STARTUPDIR);
@@ -514,7 +514,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 	case WM_CREATE: {
 		// Init directory watching
 		if (iAutoRefreshRate) {
-			SetTimer(hwnd, ID_TIMER, iAutoRefreshRate, NULL);
+			SetTimer(hwnd, ID_TIMER, iAutoRefreshRate, nullptr);
 		}
 		return MsgCreate(hwnd, wParam, lParam);
 	}
@@ -630,7 +630,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		DragQueryFile(hDrop, 0, szBuf, COUNTOF(szBuf));
 		DisplayPath(szBuf, IDS_ERR_DROP1);
 
-		//if (DragQueryFile(hDrop, (UINT)(-1), NULL, 0) > 1) {
+		//if (DragQueryFile(hDrop, (UINT)(-1), nullptr, 0) > 1) {
 		//	MsgBoxWarn(MB_OK, IDS_ERR_DROP2);
 		//}
 
@@ -689,7 +689,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		}
 		TrackPopupMenuEx(hMenuPopup,
 						 TPM_LEFTBUTTON | TPM_RIGHTBUTTON,
-						 pt.x + 1, pt.y + 1, hwnd, NULL);
+						 pt.x + 1, pt.y + 1, hwnd, nullptr);
 		DestroyMenu(hmenu);
 	}
 	break;
@@ -740,7 +740,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			SetMenuDefaultItem(hMenuPopup, IDM_TRAY_RESTORE, FALSE);
 			const int iCmd = TrackPopupMenu(hMenuPopup,
 								  TPM_NONOTIFY | TPM_RETURNCMD | TPM_LEFTBUTTON | TPM_RIGHTBUTTON,
-								  pt.x, pt.y, 0, hwnd, NULL);
+								  pt.x, pt.y, 0, hwnd, nullptr);
 
 			PostMessage(hwnd, WM_NULL, 0, 0);
 
@@ -766,7 +766,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case APPM_CENTER_MESSAGE_BOX: {
-		HWND box = FindWindow(L"#32770", NULL);
+		HWND box = FindWindow(L"#32770", nullptr);
 		HWND parent = GetParent(box);
 		// MessageBox belongs to us.
 		if (parent == (HWND)wParam || parent == hwnd) {
@@ -801,17 +801,17 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	hwndDirList = CreateWindowEx(
 					  WS_EX_CLIENTEDGE,
 					  WC_LISTVIEW,
-					  NULL,
+					  nullptr,
 					  WS_DIRLIST,
 					  0, 0, 0, 0,
 					  hwnd,
 					  (HMENU)IDC_DIRLIST,
 					  hInstance,
-					  NULL);
+					  nullptr);
 
 	if (IsAppThemed()) {
 		SetWindowExStyle(hwndDirList, GetWindowExStyle(hwndDirList) & ~WS_EX_CLIENTEDGE);
-		SetWindowPos(hwndDirList, NULL, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
+		SetWindowPos(hwndDirList, nullptr, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
 	}
 	InitWindowCommon(hwndDirList);
 
@@ -819,13 +819,13 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	hwndDriveBox = CreateWindowEx(
 					   0,
 					   WC_COMBOBOXEX,
-					   NULL,
+					   nullptr,
 					   dwDriveBoxStyle,
 					   0, 0, 0, GetSystemMetrics(SM_CYFULLSCREEN),
 					   hwnd,
 					   (HMENU)IDC_DRIVEBOX,
 					   hInstance,
-					   NULL);
+					   nullptr);
 
 	// Create Toolbar and Statusbar
 	CreateBars(hwnd, hInstance);
@@ -835,14 +835,14 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	DriveBox_Init(hwndDriveBox);
 	ComboBox_SetExtendedUI(hwndDriveBox, TRUE);
 	// DirList
-	LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT, LVCFMT_LEFT, 0, NULL, -1, 0, 0, 0
+	LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT, LVCFMT_LEFT, 0, nullptr, -1, 0, 0, 0
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 			, 0, 0, 0
 #endif
 	};
 	ListView_SetExtendedListViewStyle(hwndDirList, LVS_EX_DOUBLEBUFFER | LVS_EX_LABELTIP);
 	ListView_InsertColumn(hwndDirList, 0, &lvc);
-	DirList_Init(hwndDirList, NULL);
+	DirList_Init(hwndDirList, nullptr);
 	if (bTrackSelect) {
 		ListView_SetExtendedListViewStyleEx(hwndDirList,
 											LVS_EX_TRACKSELECT | LVS_EX_ONECLICKACTIVATE,
@@ -899,20 +899,20 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 	const BOOL bIsAppThemed = IsAppThemed();
 
 	constexpr DWORD dwToolbarStyle = WS_TOOLBAR | TBSTYLE_FLAT | CCS_ADJUSTABLE;
-	hwndToolbar = CreateWindowEx(0, TOOLBARCLASSNAME, NULL, dwToolbarStyle,
-								 0, 0, 0, 0, hwnd, (HMENU)IDC_TOOLBAR, hInstance, NULL);
+	hwndToolbar = CreateWindowEx(0, TOOLBARCLASSNAME, nullptr, dwToolbarStyle,
+								 0, 0, 0, 0, hwnd, (HMENU)IDC_TOOLBAR, hInstance, nullptr);
 
 	SendMessage(hwndToolbar, TB_BUTTONSTRUCTSIZE, sizeof(TBBUTTON), 0);
 
 	// Add normal Toolbar Bitmap
-	HBITMAP hbmp = NULL;
-	HBITMAP hbmpCopy = NULL;
+	HBITMAP hbmp = nullptr;
+	HBITMAP hbmpCopy = nullptr;
 	bool bExternalBitmap = false;
 
-	if (tchToolbarBitmap != NULL) {
+	if (tchToolbarBitmap != nullptr) {
 		hbmp = LoadBitmapFile(tchToolbarBitmap);
 	}
-	if (hbmp != NULL) {
+	if (hbmp != nullptr) {
 		bExternalBitmap = true;
 	} else {
 		const int resource = GetBitmapResourceIdForCurrentDPI(IDB_TOOLBAR16);
@@ -931,9 +931,9 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 	SendMessage(hwndToolbar, TB_SETIMAGELIST, 0, (LPARAM)himl);
 
 	// Optionally add hot Toolbar Bitmap
-	if (tchToolbarBitmapHot != NULL) {
+	if (tchToolbarBitmapHot != nullptr) {
 		hbmp = LoadBitmapFile(tchToolbarBitmapHot);
-		if (hbmp != NULL) {
+		if (hbmp != nullptr) {
 			if (bAutoScaleToolbar) {
 				hbmp = ResizeImageForCurrentDPI(hbmp);
 			}
@@ -946,9 +946,9 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 	}
 
 	// Optionally add disabled Toolbar Bitmap
-	if (tchToolbarBitmapDisabled != NULL) {
+	if (tchToolbarBitmapDisabled != nullptr) {
 		hbmp = LoadBitmapFile(tchToolbarBitmapDisabled);
-		if (hbmp != NULL) {
+		if (hbmp != nullptr) {
 			if (bAutoScaleToolbar) {
 				hbmp = ResizeImageForCurrentDPI(hbmp);
 			}
@@ -987,7 +987,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 
 	for (UINT i = 0; i < count; i++) {
 		const IniKeyValueNode *node = &pIniSection->nodeList[i];
-		const UINT n = (UINT)wcstol(node->key, NULL, 10);
+		const UINT n = static_cast<UINT>(wcstol(node->key, nullptr, 10));
 		if (n == 0 || n >= COUNTOF(tbbMainWnd)) {
 			continue;
 		}
@@ -1018,17 +1018,17 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 	//SendMessage(hwndToolbar, TB_SETINDENT, 2, 0);
 
 	const DWORD dwStatusbarStyle = bShowStatusbar ? (WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE) : (WS_CHILD | WS_CLIPSIBLINGS);
-	hwndStatus = CreateStatusWindow(dwStatusbarStyle, NULL, hwnd, IDC_STATUSBAR);
+	hwndStatus = CreateStatusWindow(dwStatusbarStyle, nullptr, hwnd, IDC_STATUSBAR);
 
 	// Create ReBar and add Toolbar
 	const DWORD dwReBarStyle = bShowToolbar ? (WS_REBAR | WS_VISIBLE) : WS_REBAR;
-	hwndReBar = CreateWindowEx(WS_EX_TOOLWINDOW, REBARCLASSNAME, NULL, dwReBarStyle,
-							   0, 0, 0, 0, hwnd, (HMENU)IDC_REBAR, hInstance, NULL);
+	hwndReBar = CreateWindowEx(WS_EX_TOOLWINDOW, REBARCLASSNAME, nullptr, dwReBarStyle,
+							   0, 0, 0, 0, hwnd, (HMENU)IDC_REBAR, hInstance, nullptr);
 
 	REBARINFO rbi;
 	rbi.cbSize = sizeof(REBARINFO);
 	rbi.fMask  = 0;
-	rbi.himl   = (HIMAGELIST)NULL;
+	rbi.himl   = nullptr;
 	SendMessage(hwndReBar, RB_SETBARINFO, 0, (LPARAM)&rbi);
 
 	REBARBANDINFO rbBand;
@@ -1039,7 +1039,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 	if (bIsAppThemed) {
 		rbBand.fStyle |= RBBS_CHILDEDGE;
 	}
-	rbBand.hbmBack = NULL;
+	rbBand.hbmBack = nullptr;
 	rbBand.lpText     = (LPWSTR)L"Toolbar";
 	rbBand.hwndChild  = hwndToolbar;
 	rbBand.cxMinChild = (rc.right - rc.left) * COUNTOF(tbbMainWnd);
@@ -1047,7 +1047,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 	rbBand.cx         = 0;
 	SendMessage(hwndReBar, RB_INSERTBAND, (WPARAM)(-1), (LPARAM)&rbBand);
 
-	SetWindowPos(hwndReBar, NULL, 0, 0, 0, 0, SWP_NOZORDER);
+	SetWindowPos(hwndReBar, nullptr, 0, 0, 0, 0, SWP_NOZORDER);
 	GetWindowRect(hwndReBar, &rc);
 	cyReBar = rc.bottom - rc.top;
 
@@ -1080,11 +1080,11 @@ void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 
 	const int cx = rc->right - rc->left;
 	const int cy = rc->bottom - rc->top;
-	SetWindowPos(hwnd, NULL, rc->left, rc->top, cx, cy, SWP_NOZORDER | SWP_NOACTIVATE);
+	SetWindowPos(hwnd, nullptr, rc->left, rc->top, cx, cy, SWP_NOZORDER | SWP_NOACTIVATE);
 	if (bShowToolbar) {
 		// on Window 8.1 when move Notepad4 to another monitor with same scaling settings
 		// WM_DPICHANGED is sent with same DPI, and WM_SIZE is not sent after WM_DPICHANGED.
-		SetWindowPos(hwndReBar, NULL, 0, 0, cx, cyReBar, SWP_NOZORDER);
+		SetWindowPos(hwndReBar, nullptr, 0, 0, cx, cyReBar, SWP_NOZORDER);
 	}
 
 	StatusSetText(hwndStatus, ID_FILEINFO, chStatus);
@@ -1103,7 +1103,7 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 
 	if (IsAppThemed()) {
 		SetWindowExStyle(hwndDirList, GetWindowExStyle(hwndDirList) & ~WS_EX_CLIENTEDGE);
-		SetWindowPos(hwndDirList, NULL, 0, 0, 0, 0, SWP_NOZORDER | SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE);
+		SetWindowPos(hwndDirList, nullptr, 0, 0, 0, 0, SWP_NOZORDER | SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE);
 		if (bFullRowSelect) {
 			SetExplorerTheme(hwndDirList);
 		} else {
@@ -1111,7 +1111,7 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 		}
 	} else {
 		SetWindowExStyle(hwndDirList, GetWindowExStyle(hwndDirList) | WS_EX_CLIENTEDGE);
-		SetWindowPos(hwndDirList, NULL, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
+		SetWindowPos(hwndDirList, nullptr, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
 	}
 
 	// recreate toolbar and statusbar
@@ -1150,7 +1150,7 @@ void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 		//cy -= (rc.bottom - rc.top);
 
 		//SendMessage(hwndToolbar, TB_GETITEMRECT, 0, (LPARAM)&rc);
-		SetWindowPos(hwndReBar, NULL, 0, 0, cx, cyReBar, SWP_NOZORDER);
+		SetWindowPos(hwndReBar, nullptr, 0, 0, cx, cyReBar, SWP_NOZORDER);
 		// the ReBar automatically sets the correct height
 		// calling SetWindowPos() with the height of one toolbar button
 		// causes the control not to temporarily use the whole client area
@@ -1176,7 +1176,7 @@ void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 		cy -= (rc.bottom - rc.top) + cyDriveBoxFrame;
 	}
 
-	DeferWindowPos(hdwp, hwndDirList, NULL, x, y, cx, cy, SWP_NOZORDER | SWP_NOACTIVATE);
+	DeferWindowPos(hdwp, hwndDirList, nullptr, x, y, cx, cy, SWP_NOZORDER | SWP_NOACTIVATE);
 	EndDeferWindowPos(hdwp);
 
 	// Rebuild DirList Columns
@@ -1185,7 +1185,7 @@ void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	GetClientRect(hwndStatus, &rc);
 	const int aWidth[1] = { -1 };
 	SendMessage(hwndStatus, SB_SETPARTS, COUNTOF(aWidth), (LPARAM)aWidth);
-	InvalidateRect(hwndStatus, NULL, TRUE);
+	InvalidateRect(hwndStatus, nullptr, TRUE);
 }
 
 //=============================================================================
@@ -1322,9 +1322,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		sei.cbSize = sizeof(SHELLEXECUTEINFO);
 		sei.fMask = 0;
 		sei.hwnd = hwnd;
-		sei.lpVerb = NULL;
+		sei.lpVerb = nullptr;
 		sei.lpFile = dli.szFileName;
-		sei.lpParameters = NULL;
+		sei.lpParameters = nullptr;
 		sei.lpDirectory = szCurDir;
 		sei.nShow = SW_SHOWNORMAL;
 
@@ -1363,7 +1363,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		sei.cbSize = sizeof(SHELLEXECUTEINFO);
 		sei.fMask = 0;
 		sei.hwnd = hwnd;
-		sei.lpVerb = NULL;
+		sei.lpVerb = nullptr;
 		sei.lpFile = szQuickview;
 		sei.lpParameters = szParam;
 		sei.lpDirectory = szCurDir;
@@ -1426,10 +1426,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		HANDLE hFile = CreateFile(szNewFile,
 						   GENERIC_READ | GENERIC_WRITE,
 						   FILE_SHARE_READ | FILE_SHARE_WRITE,
-						   NULL,
+						   nullptr,
 						   CREATE_ALWAYS,
 						   FILE_ATTRIBUTE_NORMAL,
-						   NULL);
+						   nullptr);
 
 		if (hFile != INVALID_HANDLE_VALUE) {
 			CloseHandle(hFile);
@@ -1457,7 +1457,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		WCHAR tchNewDir[MAX_PATH];
 
 		if (NewDirDlg(hwnd, tchNewDir)) {
-			if (!CreateDirectory(tchNewDir, NULL)) {
+			if (!CreateDirectory(tchNewDir, nullptr)) {
 				MsgBoxWarn(MB_OK, IDS_ERR_NEWDIR);
 			}
 		}
@@ -1473,7 +1473,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			break;
 		}
 
-		if (GetDirectory(hwnd, IDS_CREATELINK, tchLinkDestination, NULL)) {
+		if (GetDirectory(hwnd, IDS_CREATELINK, tchLinkDestination, nullptr)) {
 			if (!PathCreateLnk(tchLinkDestination, dli.szFileName)) {
 				MsgBoxWarn(MB_OK, IDS_ERR_CREATELINK);
 			}
@@ -1525,7 +1525,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		FormatString(tch, fmt, IDS_SAVEFILE, dli.szDisplayName);
 		StatusSetText(hwndStatus, ID_MENUHELP, tch);
 		StatusSetSimple(hwndStatus, TRUE);
-		InvalidateRect(hwndStatus, NULL, TRUE);
+		InvalidateRect(hwndStatus, nullptr, TRUE);
 		UpdateWindow(hwndStatus);
 
 		const BOOL bSuccess = CopyFile(dli.szFileName, szNewFile, FALSE);
@@ -1577,7 +1577,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		shfos.hwnd = hwnd;
 		shfos.wFunc = FO_DELETE;
 		shfos.pFrom = tch;
-		shfos.pTo = NULL;
+		shfos.pTo = nullptr;
 		if (fUseRecycleBin && (LOWORD(wParam) != IDM_FILE_DELETE2)) {
 			shfos.fFlags = FOF_ALLOWUNDO;
 		}
@@ -1622,7 +1622,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_FILE_CHANGEDIR: {
 		WCHAR tch[MAX_PATH];
 
-		if (GetDirectory(hwnd, IDS_GETDIRECTORY, tch, NULL)) {
+		if (GetDirectory(hwnd, IDS_GETDIRECTORY, tch, nullptr)) {
 			if (!ChangeDirectory(hwnd, tch, true)) {
 				MsgBoxWarn(MB_OK, IDS_ERR_CD);
 			}
@@ -1651,9 +1651,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		WCHAR szModuleName[MAX_PATH];
 		WCHAR szParameters[1024];
 
-		GetModuleFileName(NULL, szModuleName, COUNTOF(szModuleName));
+		GetModuleFileName(nullptr, szModuleName, COUNTOF(szModuleName));
 		GetRelaunchParameters(szParameters);
-		const LONG_PTR result = (LONG_PTR)ShellExecute(hwnd, NULL, szModuleName, szParameters, NULL, SW_SHOWNORMAL);
+		const LONG_PTR result = (LONG_PTR)ShellExecute(hwnd, nullptr, szModuleName, szParameters, nullptr, SW_SHOWNORMAL);
 		if (result > 32 && LOWORD(wParam) == IDM_FILE_RESTART) {
 			DestroyWindow(hwnd);
 		}
@@ -1732,7 +1732,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_VIEW_UPDATE:
-		ChangeDirectory(hwnd, NULL, true);
+		ChangeDirectory(hwnd, nullptr, true);
 		break;
 
 	case IDM_VIEW_FAVORITES:
@@ -1749,8 +1749,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		sei.hwnd = hwnd;
 		sei.lpVerb = L"open";
 		sei.lpFile = tchFavoritesDir;
-		sei.lpParameters = NULL;
-		sei.lpDirectory = NULL;
+		sei.lpParameters = nullptr;
+		sei.lpDirectory = nullptr;
 		sei.nShow = SW_SHOWNORMAL;
 
 		// Run favorites directory
@@ -1899,8 +1899,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				if (GetFileAttributes(szFullPath) != INVALID_FILE_ATTRIBUTES) {
 					WCHAR szDir[MAX_PATH];
 					lstrcpy(szDir, szFullPath);
-					WCHAR *p = StrRChr(szDir, NULL, L'\\');
-					if (p != NULL) {
+					WCHAR *p = StrRChr(szDir, nullptr, L'\\');
+					if (p != nullptr) {
 						p[1] = L'\0';
 						if (!PathIsRoot(szDir)) {
 							*p = L'\0';
@@ -1908,7 +1908,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 						SetCurrentDirectory(szDir);
 						SendWMCommand(hwnd, IDM_VIEW_UPDATE);
-						if (!DirList_SelectItem(hwndDirList, NULL, szFullPath)) {
+						if (!DirList_SelectItem(hwndDirList, nullptr, szFullPath)) {
 							ListView_EnsureVisible(hwndDirList, 0, FALSE);
 						}
 					}
@@ -2181,11 +2181,11 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 					FileTimeToLocalFileTime(&fd.ftLastWriteTime, &ft);
 					FileTimeToSystemTime(&ft, &st);
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-					GetDateFormatEx(LOCALE_NAME_USER_DEFAULT, DATE_SHORTDATE, &st, NULL, tchdate, COUNTOF(tchdate), NULL);
-					GetTimeFormatEx(LOCALE_NAME_USER_DEFAULT, 0, &st, NULL, tchtime, COUNTOF(tchtime));
+					GetDateFormatEx(LOCALE_NAME_USER_DEFAULT, DATE_SHORTDATE, &st, nullptr, tchdate, COUNTOF(tchdate), nullptr);
+					GetTimeFormatEx(LOCALE_NAME_USER_DEFAULT, 0, &st, nullptr, tchtime, COUNTOF(tchtime));
 #else
-					GetDateFormat(LOCALE_USER_DEFAULT, DATE_SHORTDATE, &st, NULL, tchdate, COUNTOF(tchdate));
-					GetTimeFormat(LOCALE_USER_DEFAULT, 0, &st, NULL, tchtime, COUNTOF(tchtime));
+					GetDateFormat(LOCALE_USER_DEFAULT, DATE_SHORTDATE, &st, nullptr, tchdate, COUNTOF(tchdate));
+					GetTimeFormat(LOCALE_USER_DEFAULT, 0, &st, nullptr, tchtime, COUNTOF(tchtime));
 #endif
 
 					WCHAR tchattr[6];
@@ -2318,7 +2318,7 @@ bool ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, bool bUpdateHistory) {
 		return false;
 	}
 
-	const bool fUpdate = lpszNewDir != NULL;
+	const bool fUpdate = lpszNewDir != nullptr;
 	if (fUpdate) {
 		// Update call
 		WCHAR szTest[MAX_PATH];
@@ -2519,13 +2519,13 @@ void LoadSettings(void) {
 	LPCWSTR strValue = IniSectionGetValue(pIniSection, L"OpenWithDir");
 	if (StrIsEmpty(strValue)) {
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-		LPWSTR pszPath = NULL;
-		if (S_OK == SHGetKnownFolderPath(KnownFolderId_Desktop, KF_FLAG_DEFAULT, NULL, &pszPath)) {
+		LPWSTR pszPath = nullptr;
+		if (S_OK == SHGetKnownFolderPath(KnownFolderId_Desktop, KF_FLAG_DEFAULT, nullptr, &pszPath)) {
 			lstrcpy(tchOpenWithDir, pszPath);
 			CoTaskMemFree(pszPath);
 		}
 #else
-		SHGetFolderPath(NULL, CSIDL_DESKTOPDIRECTORY, NULL, SHGFP_TYPE_CURRENT, tchOpenWithDir);
+		SHGetFolderPath(nullptr, CSIDL_DESKTOPDIRECTORY, nullptr, SHGFP_TYPE_CURRENT, tchOpenWithDir);
 #endif
 	} else {
 		PathAbsoluteFromApp(strValue, tchOpenWithDir, true);
@@ -2534,13 +2534,13 @@ void LoadSettings(void) {
 	strValue = IniSectionGetValue(pIniSection, L"Favorites");
 	if (StrIsEmpty(strValue)) {
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-		LPWSTR pszPath = NULL;
-		if (S_OK == SHGetKnownFolderPath(KnownFolderId_Documents, KF_FLAG_DEFAULT, NULL, &pszPath)) {
+		LPWSTR pszPath = nullptr;
+		if (S_OK == SHGetKnownFolderPath(KnownFolderId_Documents, KF_FLAG_DEFAULT, nullptr, &pszPath)) {
 			lstrcpy(tchFavoritesDir, pszPath);
 			CoTaskMemFree(pszPath);
 		}
 #else
-		SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, tchFavoritesDir);
+		SHGetFolderPath(nullptr, CSIDL_PERSONAL, nullptr, SHGFP_TYPE_CURRENT, tchFavoritesDir);
 #endif
 	} else {
 		PathAbsoluteFromApp(strValue, tchFavoritesDir, true);
@@ -3122,7 +3122,7 @@ bool CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) noexcept {
 			&FOLDERID_Profile,
 		};
 		for (UINT i = 0; i < COUNTOF(rfidList); i++) {
-			LPWSTR pszPath = NULL;
+			LPWSTR pszPath = nullptr;
 			if (S_OK == SHGetKnownFolderPath(*rfidList[i], KF_FLAG_DEFAULT, nullptr, &pszPath)) {
 				PathCombine(tchBuild, pszPath, WC_NOTEPAD4);
 				CoTaskMemFree(pszPath);
@@ -3148,7 +3148,7 @@ bool CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) noexcept {
 			CSIDL_PROFILE,
 		};
 		for (UINT i = 0; i < COUNTOF(csidlList); i++) {
-			if (S_OK == SHGetFolderPath(NULL, csidlList[i], NULL, SHGFP_TYPE_CURRENT, tchBuild)) {
+			if (S_OK == SHGetFolderPath(nullptr, csidlList[i], nullptr, SHGFP_TYPE_CURRENT, tchBuild)) {
 				PathAppend(tchBuild, WC_NOTEPAD4);
 				PathAppend(tchBuild, tchFileExpanded);
 				if (PathIsFile(tchBuild)) {
@@ -3270,23 +3270,23 @@ bool TestIniFile(void) noexcept {
 
 bool CreateIniFile(LPCWSTR lpszIniFile) noexcept {
 	if (StrNotEmpty(lpszIniFile)) {
-		WCHAR *pwchTail = StrRChr(lpszIniFile, NULL, L'\\');
+		WCHAR *pwchTail = StrRChr(lpszIniFile, nullptr, L'\\');
 
-		if (pwchTail != NULL) {
+		if (pwchTail != nullptr) {
 			*pwchTail = L'\0';
-			SHCreateDirectoryEx(NULL, lpszIniFile, NULL);
+			SHCreateDirectoryEx(nullptr, lpszIniFile, nullptr);
 			*pwchTail = L'\\';
 		}
 
 		HANDLE hFile = CreateFile(lpszIniFile,
 						   GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
-						   NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+						   nullptr, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 		if (hFile != INVALID_HANDLE_VALUE) {
 			LARGE_INTEGER fileSize;
 			fileSize.QuadPart = 0;
 			if (GetFileSizeEx(hFile, &fileSize) && fileSize.QuadPart < 2) {
 				DWORD dw;
-				WriteFile(hFile, (LPCVOID)L"\xFEFF[matepath]\r\n", 26, &dw, NULL);
+				WriteFile(hFile, L"\xFEFF[matepath]\r\n", 26, &dw, nullptr);
 			}
 			CloseHandle(hFile);
 			return true;
@@ -3314,7 +3314,7 @@ bool DisplayPath(LPCWSTR lpPath, UINT uIdError) {
 	if (!SearchPathEx(szTmp, COUNTOF(szPath), szPath)) {
 		lstrcpy(szPath, szTmp);
 	}
-	PathGetRealPath(NULL, szPath, szPath);
+	PathGetRealPath(nullptr, szPath, szPath);
 
 	if (PathGetLnkPath(szPath, szTmp)) {
 		return DisplayLnkFile(szPath, szTmp);
@@ -3338,8 +3338,8 @@ bool DisplayPath(LPCWSTR lpPath, UINT uIdError) {
 			SHFILEINFO shfi;
 			SHGetFileInfo(szPath, 0, &shfi, sizeof(SHFILEINFO), SHGFI_DISPLAYNAME);
 
-			WCHAR *p = StrRChr(szPath, NULL, L'\\');
-			if (p != NULL) {
+			WCHAR *p = StrRChr(szPath, nullptr, L'\\');
+			if (p != nullptr) {
 				p[1] = L'\0';
 				if (!PathIsRoot(szPath)) {
 					*p = L'\0';
@@ -3371,7 +3371,7 @@ bool DisplayLnkFile(LPCWSTR pszLnkFile, LPCWSTR pszResPath) {
 	if (!SearchPathEx(pszResPath, COUNTOF(szPath), szPath)) {
 		lstrcpy(szPath, pszResPath);
 	}
-	PathGetRealPath(NULL, szPath, szPath);
+	PathGetRealPath(nullptr, szPath, szPath);
 
 	const DWORD dwAttr = GetFileAttributes(szPath);
 	if (dwAttr != INVALID_FILE_ATTRIBUTES) {
@@ -3391,8 +3391,8 @@ bool DisplayLnkFile(LPCWSTR pszLnkFile, LPCWSTR pszResPath) {
 		SHFILEINFO shfi;
 		SHGetFileInfo(szPath, 0, &shfi, sizeof(SHFILEINFO), SHGFI_DISPLAYNAME);
 
-		WCHAR *p = StrRChr(szPath, NULL, L'\\');
-		if (p != NULL) {
+		WCHAR *p = StrRChr(szPath, nullptr, L'\\');
+		if (p != nullptr) {
 			p[1] = L'\0';
 			if (!PathIsRoot(szPath)) {
 				*p = L'\0';
@@ -3468,11 +3468,11 @@ bool ActivatePrevInst() noexcept {
 		return false;
 	}
 
-	HWND hwnd = NULL;
+	HWND hwnd = nullptr;
 	EnumWindows(EnumWindProcReuseWindow, (LPARAM)&hwnd);
 
 	// Found a window
-	if (hwnd != NULL) {
+	if (hwnd != nullptr) {
 		// Enabled
 		if (IsWindowEnabled(hwnd)) {
 			if (IsIconic(hwnd)) {
@@ -3568,10 +3568,10 @@ void GetRelaunchParameters(LPWSTR szParameters) noexcept {
 //
 //
 void ShowNotifyIcon(HWND hwnd, bool bAdd) noexcept {
-	if (bAdd && (hTrayIcon == NULL || uTrayIconDPI != g_uCurrentDPI)) {
+	if (bAdd && (hTrayIcon == nullptr || uTrayIconDPI != g_uCurrentDPI)) {
 		if (hTrayIcon) {
 			DestroyIcon(hTrayIcon);
-			hTrayIcon = NULL;
+			hTrayIcon = nullptr;
 		}
 		uTrayIconDPI = g_uCurrentDPI;
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
@@ -3670,13 +3670,13 @@ void LaunchTarget(LPCWSTR lpFileName, bool bOpenNew) {
 	}
 
 	if (iUseTargetApplication != UseTargetApplication_None && iTargetApplicationMode == TargetApplicationMode_SendMsg) {
-		HWND hwnd = NULL;
-		if (!bOpenNew) { // hwnd == NULL
+		HWND hwnd = nullptr;
+		if (!bOpenNew) { // hwnd == nullptr
 			EnumWindows(EnumWindProcTargetApplication, (LPARAM)&hwnd);
 		}
 
 		// Found a window
-		if (hwnd != NULL && IsWindowEnabled(hwnd)) {
+		if (hwnd != nullptr && IsWindowEnabled(hwnd)) {
 			if (IsIconic(hwnd)) {
 				ShowWindowAsync(hwnd, SW_RESTORE);
 			}
@@ -3724,7 +3724,7 @@ void LaunchTarget(LPCWSTR lpFileName, bool bOpenNew) {
 			sei.cbSize = sizeof(SHELLEXECUTEINFO);
 			sei.fMask = 0;
 			sei.hwnd = hwndMain;
-			sei.lpVerb = NULL;
+			sei.lpVerb = nullptr;
 			sei.lpFile = szFile;
 			sei.lpParameters = szParam;
 			sei.lpDirectory = szCurDir;
@@ -3774,13 +3774,13 @@ void LaunchTarget(LPCWSTR lpFileName, bool bOpenNew) {
 		sei.cbSize = sizeof(SHELLEXECUTEINFO);
 		sei.fMask = 0;
 		sei.hwnd = hwndMain;
-		sei.lpVerb = NULL;
+		sei.lpVerb = nullptr;
 		if (iUseTargetApplication != UseTargetApplication_None) {
 			sei.lpFile = szFile;
 			sei.lpParameters = szParam;
 		} else {
 			sei.lpFile = lpParam;
-			sei.lpParameters = NULL;
+			sei.lpParameters = nullptr;
 		}
 		sei.lpDirectory = szCurDir;
 		sei.nShow = SW_SHOWNORMAL;
@@ -3801,11 +3801,11 @@ void SnapToTarget(HWND hwnd) {
 		LoadLaunchSetings();
 	}
 
-	HWND hwnd2 = NULL;
+	HWND hwnd2 = nullptr;
 	EnumWindows(EnumWindProcTargetApplication, (LPARAM)&hwnd2);
 
 	// Found a window
-	if (hwnd2 != NULL) {
+	if (hwnd2 != nullptr) {
 		if (IsIconic(hwnd2) || IsZoomed(hwnd2)) {
 			SendMessage(hwnd2, WM_SYSCOMMAND, SC_RESTORE, 0);
 		}
@@ -3842,7 +3842,7 @@ void SnapToTarget(HWND hwnd) {
 				DrawAnimatedRects(hwnd, IDANI_CAPTION, &rcOld, &rcNew);
 			}
 
-			SetWindowPos(hwnd, NULL, rcNew.left, rcNew.top, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+			SetWindowPos(hwnd, nullptr, rcNew.left, rcNew.top, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
 		}
 	}
 }

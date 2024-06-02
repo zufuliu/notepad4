@@ -42,7 +42,7 @@ extern LANGID uiLanguage;
 
 static inline HWND GetMsgBoxParent(void) noexcept {
 	HWND hwnd = GetActiveWindow();
-	return (hwnd == NULL) ? hwndMain : hwnd;
+	return (hwnd == nullptr) ? hwndMain : hwnd;
 }
 
 //=============================================================================
@@ -110,7 +110,7 @@ bool GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase
 
 	BROWSEINFO bi;
 	bi.hwndOwner = hwndParent;
-	bi.pidlRoot = NULL;
+	bi.pidlRoot = nullptr;
 	bi.pszDisplayName = pszFolder;
 	bi.lpszTitle = szTitle;
 	bi.ulFlags = BIF_RETURNONLYFSDIRS | BIF_NEWDIALOGSTYLE;
@@ -144,9 +144,9 @@ bool GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, int iBase) noe
 
 	PIDLIST_ABSOLUTE pidlRoot;
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-	if (S_OK != SHGetKnownFolderIDList(iBase, KF_FLAG_DEFAULT, NULL, &pidlRoot))
+	if (S_OK != SHGetKnownFolderIDList(iBase, KF_FLAG_DEFAULT, nullptr, &pidlRoot))
 #else
-	if (S_OK != SHGetFolderLocation(hwndParent, iBase, NULL, SHGFP_TYPE_DEFAULT, &pidlRoot))
+	if (S_OK != SHGetFolderLocation(hwndParent, iBase, nullptr, SHGFP_TYPE_DEFAULT, &pidlRoot))
 #endif
 	{
 		return false;
@@ -158,12 +158,12 @@ bool GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, int iBase) noe
 	bi.pszDisplayName = pszFolder;
 	bi.lpszTitle = szTitle;
 	bi.ulFlags = BIF_RETURNONLYFSDIRS | BIF_NEWDIALOGSTYLE;
-	bi.lpfn = NULL;
+	bi.lpfn = nullptr;
 	bi.lParam = 0;
 	bi.iImage = 0;
 
 	PIDLIST_ABSOLUTE pidl = SHBrowseForFolder(&bi);
-	const bool fOk = pidl != NULL;
+	const bool fOk = pidl != nullptr;
 	if (fOk) {
 		SHGetPathFromIDList(pidl, pszFolder);
 		CoTaskMemFree((LPVOID)pidl);
@@ -224,7 +224,7 @@ INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) 
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_SEARCHEXE, dx, 0, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_COMMANDLINE, dx, 0, SWP_NOMOVE);
 		EndDeferWindowPos(hdwp);
-		InvalidateRect(GetDlgItem(hwnd, IDC_RUNDESC), NULL, TRUE);
+		InvalidateRect(GetDlgItem(hwnd, IDC_RUNDESC), nullptr, TRUE);
 	}
 	return TRUE;
 
@@ -283,7 +283,7 @@ INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) 
 			WCHAR args[MAX_PATH];
 
 			if (GetDlgItemText(hwnd, IDC_COMMANDLINE, args, MAX_PATH)) {
-				if (ExtractFirstArgument(args, args, NULL)) {
+				if (ExtractFirstArgument(args, args, nullptr)) {
 					if (StrNotEmpty(args)) {
 						bEnableOK = true;
 					}
@@ -312,7 +312,7 @@ INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) 
 					sei.cbSize = sizeof(SHELLEXECUTEINFO);
 					sei.fMask = SEE_MASK_DOENVSUBST;
 					sei.hwnd = hwnd;
-					sei.lpVerb = NULL;
+					sei.lpVerb = nullptr;
 					sei.lpFile = arg1;
 					sei.lpParameters = arg2;
 					sei.lpDirectory = szCurDir;
@@ -403,7 +403,7 @@ INT_PTR CALLBACK GotoDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_GOTODESC, dx, 0, SWP_NOMOVE);
 		EndDeferWindowPos(hdwp);
 
-		InvalidateRect(GetDlgItem(hwnd, IDC_GOTODESC), NULL, TRUE);
+		InvalidateRect(GetDlgItem(hwnd, IDC_GOTODESC), nullptr, TRUE);
 	}
 	return TRUE;
 
@@ -457,7 +457,7 @@ void GotoDlg(HWND hwnd) noexcept {
 }
 
 void OpenHelpLink(HWND hwnd, int cmd) noexcept {
-	LPCWSTR link = NULL;
+	LPCWSTR link = nullptr;
 	switch (cmd) {
 	case IDC_WEBPAGE_LINK:
 		link = L"https://www.flos-freeware.ch";
@@ -471,7 +471,7 @@ void OpenHelpLink(HWND hwnd, int cmd) noexcept {
 	}
 
 	if (StrNotEmpty(link)) {
-		ShellExecute(hwnd, L"open", link, NULL, NULL, SW_SHOWNORMAL);
+		ShellExecute(hwnd, L"open", link, nullptr, nullptr, SW_SHOWNORMAL);
 	}
 }
 
@@ -517,7 +517,7 @@ INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 		SetDlgItemText(hwnd, IDC_BUILD_INFO, wch);
 
 		HFONT hFontTitle = (HFONT)SendDlgItemMessage(hwnd, IDC_VERSION, WM_GETFONT, 0, 0);
-		if (hFontTitle == NULL) {
+		if (hFontTitle == nullptr) {
 			hFontTitle = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
 		}
 
@@ -528,7 +528,7 @@ INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 		SendDlgItemMessage(hwnd, IDC_VERSION, WM_SETFONT, (WPARAM)hFontTitle, TRUE);
 		SetWindowLongPtr(hwnd, DWLP_USER, (LONG_PTR)(hFontTitle));
 
-		if (GetDlgItem(hwnd, IDC_WEBPAGE_LINK) == NULL) {
+		if (GetDlgItem(hwnd, IDC_WEBPAGE_LINK) == nullptr) {
 			SetDlgItemText(hwnd, IDC_WEBPAGE_TEXT, VERSION_WEBPAGE_DISPLAY);
 			ShowWindow(GetDlgItem(hwnd, IDC_WEBPAGE_TEXT), SW_SHOWNORMAL);
 		} else {
@@ -536,7 +536,7 @@ INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 			SetDlgItemText(hwnd, IDC_WEBPAGE_LINK, wch);
 		}
 
-		if (GetDlgItem(hwnd, IDC_EMAIL_LINK) == NULL) {
+		if (GetDlgItem(hwnd, IDC_EMAIL_LINK) == nullptr) {
 			SetDlgItemText(hwnd, IDC_EMAIL_TEXT, VERSION_EMAIL_DISPLAY);
 			ShowWindow(GetDlgItem(hwnd, IDC_EMAIL_TEXT), SW_SHOWNORMAL);
 		} else {
@@ -544,7 +544,7 @@ INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 			SetDlgItemText(hwnd, IDC_EMAIL_LINK, wch);
 		}
 
-		if (GetDlgItem(hwnd, IDC_NEW_PAGE_LINK) == NULL) {
+		if (GetDlgItem(hwnd, IDC_NEW_PAGE_LINK) == nullptr) {
 			SetDlgItemText(hwnd, IDC_NEW_PAGE_TEXT, VERSION_NEWPAGE_DISPLAY);
 			ShowWindow(GetDlgItem(hwnd, IDC_NEW_PAGE_TEXT), SW_SHOWNORMAL);
 		} else {
@@ -900,14 +900,14 @@ INT_PTR CALLBACK ItemsPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPara
 		case IDC_COLOR_CUST1:
 			m_bDefColorNoFilter = !IsButtonChecked(hwnd, IDC_COLOR_CUST1);
 			EnableWindow(GetDlgItem(hwnd, IDC_COLOR_PICK1), !m_bDefColorNoFilter);
-			InvalidateRect(GetDlgItem(hwnd, IDC_COLOR_SAMP1), NULL, TRUE);
+			InvalidateRect(GetDlgItem(hwnd, IDC_COLOR_SAMP1), nullptr, TRUE);
 			break;
 
 		case IDC_COLOR_DEF2:
 		case IDC_COLOR_CUST2:
 			m_bDefColorFilter = !IsButtonChecked(hwnd, IDC_COLOR_CUST2);
 			EnableWindow(GetDlgItem(hwnd, IDC_COLOR_PICK2), !m_bDefColorFilter);
-			InvalidateRect(GetDlgItem(hwnd, IDC_COLOR_SAMP2), NULL, TRUE);
+			InvalidateRect(GetDlgItem(hwnd, IDC_COLOR_SAMP2), nullptr, TRUE);
 			break;
 
 		case IDC_COLOR_PICK1:
@@ -925,7 +925,7 @@ INT_PTR CALLBACK ItemsPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPara
 				m_hbrNoFilter = CreateSolidBrush(m_colorNoFilter);
 			}
 
-			InvalidateRect(GetDlgItem(hwnd, IDC_COLOR_SAMP1), NULL, TRUE);
+			InvalidateRect(GetDlgItem(hwnd, IDC_COLOR_SAMP1), nullptr, TRUE);
 			break;
 
 		case IDC_COLOR_PICK2:
@@ -943,7 +943,7 @@ INT_PTR CALLBACK ItemsPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPara
 				m_hbrFilter = CreateSolidBrush(m_colorFilter);
 			}
 
-			InvalidateRect(GetDlgItem(hwnd, IDC_COLOR_SAMP2), NULL, TRUE);
+			InvalidateRect(GetDlgItem(hwnd, IDC_COLOR_SAMP2), nullptr, TRUE);
 			break;
 		}
 		return TRUE;
@@ -1006,7 +1006,7 @@ struct SystemIntegrationInfo {
 int GetSystemIntegrationStatus(SystemIntegrationInfo &info) noexcept {
 	int mask = 0;
 	WCHAR tchModule[MAX_PATH];
-	GetModuleFileName(NULL, tchModule, COUNTOF(tchModule));
+	GetModuleFileName(nullptr, tchModule, COUNTOF(tchModule));
 
 	// context menu
 	HKEY hKey;
@@ -1017,8 +1017,8 @@ int GetSystemIntegrationStatus(SystemIntegrationInfo &info) noexcept {
 		status = RegOpenKeyEx(hKey, L"command", 0, KEY_READ, &hSubKey);
 		if (status == ERROR_SUCCESS) {
 			LPWSTR command = Registry_GetDefaultString(hSubKey);
-			if (command != NULL) {
-				if (StrStrI(command, tchModule) != NULL) {
+			if (command != nullptr) {
+				if (StrStrI(command, tchModule) != nullptr) {
 					mask |= SystemIntegration_ContextMenu;
 				}
 				NP2HeapFree(command);
@@ -1036,12 +1036,12 @@ int GetSystemIntegrationStatus(SystemIntegrationInfo &info) noexcept {
 		status = RegOpenKeyEx(hKey, L"shell\\open\\command", 0, KEY_READ, &hSubKey);
 		if (status == ERROR_SUCCESS) {
 			LPWSTR command = Registry_GetDefaultString(hSubKey);
-			if (command != NULL) {
+			if (command != nullptr) {
 				LPWSTR userId = Registry_GetString(hKey, L"AppUserModelID");
-				if (userId != NULL && StrEqual(userId, g_wchAppUserModelID) && StrStrI(command, tchModule) != NULL) {
+				if (userId != nullptr && StrEqual(userId, g_wchAppUserModelID) && StrStrI(command, tchModule) != nullptr) {
 					mask |= SystemIntegration_JumpList;
 				}
-				if (userId != NULL) {
+				if (userId != nullptr) {
 					NP2HeapFree(userId);
 				}
 				NP2HeapFree(command);
@@ -1056,7 +1056,7 @@ int GetSystemIntegrationStatus(SystemIntegrationInfo &info) noexcept {
 
 void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName) noexcept {
 	WCHAR tchModule[MAX_PATH];
-	GetModuleFileName(NULL, tchModule, COUNTOF(tchModule));
+	GetModuleFileName(nullptr, tchModule, COUNTOF(tchModule));
 	WCHAR command[300];
 	wsprintf(command, L"\"%s\" \"%%1\"", tchModule);
 
@@ -1391,7 +1391,7 @@ INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		ResizeDlg_InitX(hwnd, cxFileFilterDlg, IDC_RESIZEGRIP3);
-		MakeBitmapButton(hwnd, IDC_BROWSEFILTER, NULL, OBM_COMBO);
+		MakeBitmapButton(hwnd, IDC_BROWSEFILTER, nullptr, OBM_COMBO);
 
 		HWND hwndCtl = GetDlgItem(hwnd, IDC_FILTER);
 		Edit_LimitText(hwndCtl, COUNTOF(tchFilter) - 1);
@@ -1469,9 +1469,9 @@ INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 				RECT rc;
 
 				GetWindowRect(GetDlgItem(hwnd, IDC_BROWSEFILTER), &rc);
-				//MapWindowPoints(hwnd, NULL, (POINT*)&rc, 2);
+				//MapWindowPoints(hwnd, nullptr, (POINT*)&rc, 2);
 				// Seems that TrackPopupMenuEx() works with client coords...?
-				const DWORD dwCmd = TrackPopupMenuEx(hMenu, TPM_RETURNCMD | TPM_LEFTBUTTON | TPM_RIGHTBUTTON, rc.left + 1, rc.bottom + 1, hwnd, NULL);
+				const DWORD dwCmd = TrackPopupMenuEx(hMenu, TPM_RETURNCMD | TPM_LEFTBUTTON | TPM_RIGHTBUTTON, rc.left + 1, rc.bottom + 1, hwnd, nullptr);
 
 				if (dwCmd) {
 					WCHAR tchName[256];
@@ -1898,14 +1898,14 @@ INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 		InitWindowCommon(hwndLV);
 		//SetExplorerTheme(hwndLV);
 		ListView_SetExtendedListViewStyle(hwndLV, /*LVS_EX_FULLROWSELECT | */LVS_EX_DOUBLEBUFFER | LVS_EX_LABELTIP);
-		LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT, LVCFMT_LEFT, 0, NULL, -1, 0, 0, 0
+		LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT, LVCFMT_LEFT, 0, nullptr, -1, 0, 0, 0
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 			, 0, 0, 0
 #endif
 		};
 		ListView_InsertColumn(hwndLV, 0, &lvc);
-		DirList_Init(hwndLV, NULL);
-		DirList_Fill(hwndLV, tchOpenWithDir, DL_ALLOBJECTS, NULL, false, flagNoFadeHidden, DS_NAME, false);
+		DirList_Init(hwndLV, nullptr);
+		DirList_Fill(hwndLV, tchOpenWithDir, DL_ALLOBJECTS, nullptr, false, flagNoFadeHidden, DS_NAME, false);
 		DirList_StartIconThread(hwndLV);
 		ListView_SetItemState(hwndLV, 0, LVIS_FOCUSED, LVIS_FOCUSED);
 
@@ -1979,7 +1979,7 @@ INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 		case IDC_GETOPENWITHDIR: {
 			HWND hwndLV = GetDlgItem(hwnd, IDC_OPENWITHDIR);
 			if (GetDirectory(hwnd, IDS_OPENWITH, tchOpenWithDir, tchOpenWithDir)) {
-				DirList_Fill(hwndLV, tchOpenWithDir, DL_ALLOBJECTS, NULL, false, flagNoFadeHidden, DS_NAME, false);
+				DirList_Fill(hwndLV, tchOpenWithDir, DL_ALLOBJECTS, nullptr, false, flagNoFadeHidden, DS_NAME, false);
 				DirList_StartIconThread(hwndLV);
 				ListView_EnsureVisible(hwndLV, 0, FALSE);
 				ListView_SetItemState(hwndLV, 0, LVIS_FOCUSED, LVIS_FOCUSED);
@@ -2057,7 +2057,7 @@ bool OpenWithDlg(HWND hwnd, LPCDLITEM lpdliParam) {
 			sei.cbSize = sizeof(SHELLEXECUTEINFO);
 			sei.fMask = 0;
 			sei.hwnd = hwnd;
-			sei.lpVerb = NULL;
+			sei.lpVerb = nullptr;
 			sei.lpFile = dliOpenWith.szFileName;
 			sei.lpParameters = szDestination;
 			sei.lpDirectory = szCurDir;
@@ -2190,7 +2190,7 @@ static INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_FINDWINDESC, dx, 0, SWP_NOMOVE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_WINTITLE, dx, 0, SWP_NOMOVE);
 		EndDeferWindowPos(hdwp);
-		InvalidateRect(GetDlgItem(hwnd, IDC_FINDWINDESC), NULL, TRUE);
+		InvalidateRect(GetDlgItem(hwnd, IDC_FINDWINDESC), nullptr, TRUE);
 	}
 	return TRUE;
 
@@ -2215,7 +2215,7 @@ static INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 	break;
 
 	case WM_LBUTTONUP: {
-		SetCursor(LoadCursor(NULL, IDC_ARROW));
+		SetCursor(LoadCursor(nullptr, IDC_ARROW));
 		SendDlgItemMessage(hwnd, IDC_CROSSCURSOR, STM_SETICON, (WPARAM)hIconCross1, 0);
 		ReleaseCapture();
 		bHasCapture = false;
@@ -2335,7 +2335,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 	case WM_INITDIALOG: {
 		ResizeDlg_InitX(hwnd, cxTargetApplicationDlg, IDC_RESIZEGRIP4);
 		// ToolTip for browse button
-		HWND hwndToolTip = CreateWindowEx(0, TOOLTIPS_CLASS, NULL, 0, 0, 0, 0, 0, hwnd, NULL, g_hInstance, NULL);
+		HWND hwndToolTip = CreateWindowEx(0, TOOLTIPS_CLASS, nullptr, 0, 0, 0, 0, 0, hwnd, nullptr, g_hInstance, nullptr);
 
 		TOOLINFO ti;
 		memset(&ti, 0, sizeof(TOOLINFO));
@@ -2351,7 +2351,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 		}
 
 		// ToolTip for find window button
-		//hwndToolTip = CreateWindowEx(0, TOOLTIPS_CLASS, NULL, 0, 0, 0, 0, 0, hwnd, NULL, g_hInstance, NULL);
+		//hwndToolTip = CreateWindowEx(0, TOOLTIPS_CLASS, nullptr, 0, 0, 0, 0, 0, hwnd, nullptr, g_hInstance, nullptr);
 		//memset(&ti, 0, sizeof(TOOLINFO));
 		//ti.cbSize   = sizeof(TOOLINFO);
 		//ti.uFlags   = TTF_IDISHWND | TTF_SUBCLASS;
@@ -2487,7 +2487,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 		//	WCHAR tchArgs[MAX_PATH * 2];
 		//
 		//	if (GetDlgItemText(hwnd, IDC_COMMANDLINE, tchArgs, COUNTOF(tchArgs))) {
-		//		if (ExtractFirstArgument(tchArgs, tchArgs, NULL)) {
+		//		if (ExtractFirstArgument(tchArgs, tchArgs, nullptr)) {
 		//			if (StrNotEmpty(tchArgs)) {
 		//				bEnableOK = true;
 		//			}

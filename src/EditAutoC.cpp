@@ -169,7 +169,7 @@ void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, UINT len) {
 #if NP2_AUTOC_CACHE_SORT_KEY
 	const UINT sortKey = (pWList->iStartLen > NP2_AUTOC_SORT_KEY_LENGTH) ? 0 : pWList->WL_SortKeyFunc(pWord, len);
 #endif
-	if (root == NULL) {
+	if (root == nullptr) {
 		WordNode *node = WordList_AddNode(pWList);
 		char *word = WordNode_GetWord(node);
 		memcpy(word, pWord, len);
@@ -184,7 +184,7 @@ void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, UINT len) {
 		root = node;
 	} else {
 		WordNode *iter = root;
-		WordNode *path[NP2_TREE_HEIGHT_LIMIT] = { NULL };
+		WordNode *path[NP2_TREE_HEIGHT_LIMIT]{};
 		int top = 0;
 		int dir;
 
@@ -203,7 +203,7 @@ void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, UINT len) {
 				return;
 			}
 			dir = dir < 0;
-			if (iter->link[dir] == NULL) {
+			if (iter->link[dir] == nullptr) {
 				break;
 			}
 			iter = iter->link[dir];
@@ -261,7 +261,7 @@ void WordList_Free(struct WordList *pWList) {
 
 char* WordList_GetList(struct WordList *pWList) {
 	WordNode *root = pWList->pListHead;
-	WordNode *path[NP2_TREE_HEIGHT_LIMIT] = { NULL };
+	WordNode *path[NP2_TREE_HEIGHT_LIMIT]{};
 	int top = 0;
 	char *buf = (char *)NP2HeapAlloc(pWList->nTotalLen + 1);// additional separator
 	char * const pList = buf;
@@ -634,7 +634,7 @@ static inline bool NeedSpaceAfterKeyword(const char *word, Sci_Position length) 
 	const char *p = strstr(
 		" if for try using while elseif switch foreach synchronized "
 		, word);
-	return p != NULL && p[-1] == ' ' && p[length] == ' ';
+	return p != nullptr && p[-1] == ' ' && p[length] == ' ';
 }
 
 enum {
@@ -973,7 +973,7 @@ static void AutoC_AddKeyword(struct WordList *pWList, int iCurrentStyle) {
 	}
 
 	// embedded script
-	LPCEDITLEXER pLex = NULL;
+	LPCEDITLEXER pLex = nullptr;
 	if (iLexer == SCLEX_HTML || iLexer == SCLEX_PHPSCRIPT) {
 		const HtmlTextBlock block = GetCurrentHtmlTextBlockEx(iLexer, iCurrentStyle);
 		switch (block) {
@@ -998,7 +998,7 @@ static void AutoC_AddKeyword(struct WordList *pWList, int iCurrentStyle) {
 	} else if (pLexCurrent->rid == NP2LEX_TYPESCRIPT) {
 		pLex = &lexJavaScript;
 	}
-	if (pLex != NULL) {
+	if (pLex != nullptr) {
 		uint64_t attr = pLex->keywordAttr;
 		for (UINT i = 0; i < KEYWORDSET_MAX + 1; attr >>= 4, i++) {
 			const char *pKeywords = pLex->pKeyWords->pszKeyWords[i];
@@ -1907,7 +1907,7 @@ static inline bool IsHtmlVoidTag(const char *word, int length) noexcept {
 		// end tag can be omitted
 		" p "
 		, word);
-	return p != NULL && p[-1] == ' ' && p[length] == ' ';
+	return p != nullptr && p[-1] == ' ' && p[length] == ' ';
 }
 
 void EditAutoCloseXMLTag(void) {
@@ -2014,7 +2014,7 @@ static const char *EditKeywordIndent(LPCEDITLEXER pLex, const char *head, AutoIn
 	char word[16] = "";
 	char word_low[16] = "";
 	int length = 0;
-	const char *endPart = NULL;
+	const char *endPart = nullptr;
 	*indent = AutoIndentType_None;
 
 	while (*head && length < 15) {
@@ -2082,7 +2082,7 @@ static const char *EditKeywordIndent(LPCEDITLEXER pLex, const char *head, AutoIn
 	case NP2LEX_JULIA: {
 		LPCSTR pKeywords = pLex->pKeyWords->pszKeyWords[JuliaKeywordIndex_CodeFolding];
 		LPCSTR p = strstr(pKeywords, word);
-		if (p == pKeywords || (p != NULL && p[-1] == ' ')) {
+		if (p == pKeywords || (p != nullptr && p[-1] == ' ')) {
 			*indent = AutoIndentType_IndentAndClose;
 			endPart = "end";
 		}
@@ -2126,7 +2126,7 @@ static const char *EditKeywordIndent(LPCEDITLEXER pLex, const char *head, AutoIn
 					endPart = "end_try_catch";
 				}
 			}
-			if (endPart == NULL) {
+			if (endPart == nullptr) {
 				endPart = "end";
 			}
 		}
@@ -2159,13 +2159,13 @@ static const char *EditKeywordIndent(LPCEDITLEXER pLex, const char *head, AutoIn
 			endPart = "END CASE;";
 		} else if (StrEqualExA(word_low, "begin")) {
 			*indent = AutoIndentType_IndentAndClose;
-			if (StrStrIA(head, "transaction") != NULL) {
+			if (StrStrIA(head, "transaction") != nullptr) {
 				endPart = "COMMIT;";
 			} else {
 				endPart = "END";
 			}
 		} else if (StrEqualExA(word_low, "start")) {
-			if (StrStrIA(head, "transaction") != NULL) {
+			if (StrStrIA(head, "transaction") != nullptr) {
 				*indent = AutoIndentType_IndentAndClose;
 				endPart = "COMMIT;";
 			}
@@ -2205,7 +2205,7 @@ void EditAutoIndent() noexcept {
 			return;
 		}
 		char *pLineBuf = (char *)NP2HeapAlloc(2 * iPrevLineLength + 1 + fvCurFile.iIndentWidth * 2 + 2 + 64);
-		if (pLineBuf == NULL) {
+		if (pLineBuf == nullptr) {
 			return;
 		}
 
@@ -2241,7 +2241,7 @@ void EditAutoIndent() noexcept {
 		}
 
 		char *pPos;
-		const char *endPart = NULL;
+		const char *endPart = nullptr;
 		for (pPos = pLineBuf; *pPos; pPos++) {
 			if (!IsASpaceOrTab(*pPos)) {
 				if (indent == AutoIndentType_None && IsAlpha(*pPos)) { // indent on keywords
@@ -2348,7 +2348,7 @@ void EditAutoIndent() noexcept {
 }
 
 void EditToggleCommentLine(bool alternative) {
-	LPCWSTR pwszComment = NULL;
+	LPCWSTR pwszComment = nullptr;
 	switch (pLexCurrent->rid) {
 	case NP2LEX_ASM: {
 		switch (autoCompletionConfig.iAsmLineCommentChar) {
@@ -2541,7 +2541,7 @@ void EditToggleCommentLine(bool alternative) {
 //CommentLine--Autogenerated -- end of section automatically generated
 	}
 
-	if (pwszComment != NULL) {
+	if (pwszComment != nullptr) {
 		EditToggleLineComments(pwszComment, autoCompletionConfig.fAutoInsertMask & AutoInsertMask_SpaceAfterComment);
 	} else if (!alternative) {
 		EditToggleCommentBlock(true);
@@ -2599,8 +2599,8 @@ static bool EditUncommentBlock(LPCWSTR pwszOpen, LPCWSTR pwszClose, bool newLine
 		const UINT cpEdit = SciCall_GetCodePage();
 		char mszOpen[64] = "";
 		char mszClose[64] = "";
-		WideCharToMultiByte(cpEdit, 0, pwszOpen, -1, mszOpen, COUNTOF(mszOpen), NULL, NULL);
-		WideCharToMultiByte(cpEdit, 0, pwszClose, -1, mszClose, COUNTOF(mszClose), NULL, NULL);
+		WideCharToMultiByte(cpEdit, 0, pwszOpen, -1, mszOpen, COUNTOF(mszOpen), nullptr, nullptr);
+		WideCharToMultiByte(cpEdit, 0, pwszClose, -1, mszClose, COUNTOF(mszClose), nullptr, nullptr);
 
 		// find inner most comment block for current selection
 		Sci_TextToFindFull ttfClose = { { iSelStart, iEndPos }, mszClose, { 0, 0 } };
@@ -2641,8 +2641,8 @@ static bool EditUncommentBlock(LPCWSTR pwszOpen, LPCWSTR pwszClose, bool newLine
 }
 
 void EditToggleCommentBlock(bool alternative) {
-	LPCWSTR pwszOpen = NULL;
-	LPCWSTR pwszClose = NULL;
+	LPCWSTR pwszOpen = nullptr;
+	LPCWSTR pwszClose = nullptr;
 	bool newLine = false;
 	switch (pLexCurrent->rid) {
 	case NP2LEX_BLOCKDIAG:
@@ -2802,7 +2802,7 @@ void EditToggleCommentBlock(bool alternative) {
 //CommentBlock--Autogenerated -- end of section automatically generated
 	}
 
-	if (pwszOpen != NULL) {
+	if (pwszOpen != nullptr) {
 		if (!EditUncommentBlock(pwszOpen, pwszClose, newLine)) {
 			if (newLine) {
 				EditEncloseSelectionNewLine(pwszOpen, pwszClose);
@@ -2821,7 +2821,7 @@ void EditToggleCommentBlock(bool alternative) {
 // see Style_SniffShebang() in Styles.cpp
 void EditInsertScriptShebangLine() noexcept {
 	const char *prefix = "#!/usr/bin/env ";
-	const char *name = NULL;
+	const char *name = nullptr;
 
 	switch (pLexCurrent->rid) {
 	case NP2LEX_BASH:
@@ -2890,12 +2890,12 @@ void EditInsertScriptShebangLine() noexcept {
 
 	char line[128];
 	strcpy(line, prefix);
-	if (name != NULL) {
+	if (name != nullptr) {
 		strcat(line, name);
 	}
 
 	const Sci_Position iCurrentPos = SciCall_GetCurrentPos();
-	if (iCurrentPos == 0 && (name != NULL || pLexCurrent->iLexer == SCLEX_BASH)) {
+	if (iCurrentPos == 0 && (name != nullptr || pLexCurrent->iLexer == SCLEX_BASH)) {
 		const int iEOLMode = SciCall_GetEOLMode();
 		char *ptr = line;
 		ptr += strlen(line);
@@ -2919,7 +2919,7 @@ void EditInsertScriptShebangLine() noexcept {
 }
 
 void InitAutoCompletionCache(LPCEDITLEXER pLex) noexcept {
-	np2_LexKeyword = NULL;
+	np2_LexKeyword = nullptr;
 	memset(CharacterPrefixMask, 0, sizeof(CharacterPrefixMask));
 	memset(RawStringStyleMask, 0, sizeof(RawStringStyleMask));
 	memset(GenericTypeStyleMask, 0, sizeof(GenericTypeStyleMask));

@@ -50,7 +50,7 @@ void StopWatch_Show(const StopWatch *watch, LPCWSTR msg) {
 	const double elapsed = StopWatch_Get(watch);
 	WCHAR buf[256];
 	swprintf(buf, COUNTOF(buf), L"%s: %.6f", msg, elapsed);
-	MessageBox(NULL, buf, L"Notepad4", MB_OK);
+	MessageBox(nullptr, buf, L"Notepad4", MB_OK);
 }
 
 void StopWatch_ShowLog(const StopWatch *watch, LPCSTR msg) {
@@ -78,7 +78,7 @@ void IniClearSectionEx(LPCWSTR lpSection, LPCWSTR lpszIniFile, bool bDelete) noe
 		return;
 	}
 
-	WritePrivateProfileSection(lpSection, (bDelete ? NULL : L""), lpszIniFile);
+	WritePrivateProfileSection(lpSection, (bDelete ? nullptr : L""), lpszIniFile);
 }
 
 void IniClearAllSectionEx(LPCWSTR lpszPrefix, LPCWSTR lpszIniFile, bool bDelete) noexcept {
@@ -90,7 +90,7 @@ void IniClearAllSectionEx(LPCWSTR lpszPrefix, LPCWSTR lpszIniFile, bool bDelete)
 	GetPrivateProfileSectionNames(sections, COUNTOF(sections), lpszIniFile);
 
 	LPCWSTR p = sections;
-	LPCWSTR value = bDelete ? NULL : L"";
+	LPCWSTR value = bDelete ? nullptr : L"";
 	const int len = lstrlen(lpszPrefix);
 
 	while (*p) {
@@ -117,7 +117,7 @@ bool IniSectionParseArray(IniSection *section, LPWSTR lpCachedIniSection, BOOL q
 
 	do {
 		LPWSTR v = StrChr(p, L'=');
-		if (v != NULL) {
+		if (v != nullptr) {
 			*v++ = L'\0';
 			const int valueLen = lstrlen(v);
 			IniKeyValueNode *node = &section->nodeList[count];
@@ -150,7 +150,7 @@ bool IniSectionParse(IniSection *section, LPWSTR lpCachedIniSection) {
 
 	do {
 		LPWSTR v = StrChr(p, L'=');
-		if (v != NULL) {
+		if (v != nullptr) {
 			*v++ = L'\0';
 			const UINT keyLen = (UINT)(v - p - 1);
 			IniKeyValueNode *node = &section->nodeList[count];
@@ -189,18 +189,18 @@ LPCWSTR IniSectionUnsafeGetValue(IniSection *section, LPCWSTR key, int keyLen) {
 
 	const UINT hash = keyLen | ((*(const UINT *)key) << 8);
 	IniKeyValueNode *node = section->head;
-	IniKeyValueNode *prev = NULL;
+	IniKeyValueNode *prev = nullptr;
 #if IniSectionImplUseSentinelNode
 	section->sentinel->hash = hash;
 	while (true) {
 		if (node->hash == hash) {
 			if (node == section->sentinel) {
-				return NULL;
+				return nullptr;
 			}
 			if (StrEqual(node->key, key)) {
 				// remove the node
 				--section->count;
-				if (prev == NULL) {
+				if (prev == nullptr) {
 					section->head = node->next;
 				} else {
 					prev->next = node->next;
@@ -216,7 +216,7 @@ LPCWSTR IniSectionUnsafeGetValue(IniSection *section, LPCWSTR key, int keyLen) {
 		if (node->hash == hash && StrEqual(node->key, key)) {
 			// remove the node
 			--section->count;
-			if (prev == NULL) {
+			if (prev == nullptr) {
 				section->head = node->next;
 			} else {
 				prev->next = node->next;
@@ -226,14 +226,14 @@ LPCWSTR IniSectionUnsafeGetValue(IniSection *section, LPCWSTR key, int keyLen) {
 		prev = node;
 		node = node->next;
 	} while (node);
-	return NULL;
+	return nullptr;
 #endif
 }
 
 void IniSectionGetStringImpl(IniSection *section, LPCWSTR key, int keyLen, LPCWSTR lpDefault, LPWSTR lpReturnedString, int cchReturnedString) {
 	LPCWSTR value = IniSectionGetValueImpl(section, key, keyLen);
 	// allow empty string value
-	lstrcpyn(lpReturnedString, ((value == NULL) ? lpDefault : value), cchReturnedString);
+	lstrcpyn(lpReturnedString, ((value == nullptr) ? lpDefault : value), cchReturnedString);
 }
 
 int IniSectionGetIntImpl(IniSection *section, LPCWSTR key, int keyLen, int iDefault) {
@@ -277,18 +277,18 @@ void IniSectionSetQuotedString(IniSectionOnSave *section, LPCWSTR key, LPCWSTR v
 }
 
 LPWSTR Registry_GetString(HKEY hKey, LPCWSTR valueName) noexcept {
-	LPWSTR lpszText = NULL;
+	LPWSTR lpszText = nullptr;
 	DWORD type = REG_NONE;
 	DWORD size = 0;
 
-	LSTATUS status = RegQueryValueEx(hKey, valueName, NULL, &type, NULL, &size);
+	LSTATUS status = RegQueryValueEx(hKey, valueName, nullptr, &type, nullptr, &size);
 	if (status == ERROR_SUCCESS && type == REG_SZ && size != 0) {
 		size = (size + 1)*sizeof(WCHAR);
 		lpszText = (LPWSTR)NP2HeapAlloc(size);
-		status = RegQueryValueEx(hKey, valueName, NULL, &type, (LPBYTE)lpszText, &size);
+		status = RegQueryValueEx(hKey, valueName, nullptr, &type, (LPBYTE)lpszText, &size);
 		if (status != ERROR_SUCCESS || type != REG_SZ || size == 0) {
 			NP2HeapFree(lpszText);
-			lpszText = NULL;
+			lpszText = nullptr;
 		}
 	}
 	return lpszText;
@@ -312,7 +312,7 @@ LSTATUS Registry_DeleteTree(HKEY hKey, LPCWSTR lpSubKey) noexcept {
 	RegDeleteTreeSig pfnRegDeleteTree = DLLFunctionEx(RegDeleteTreeSig, L"advapi32.dll", "RegDeleteTreeW");
 
 	LSTATUS status;
-	if (pfnRegDeleteTree != NULL) {
+	if (pfnRegDeleteTree != nullptr) {
 		status = pfnRegDeleteTree(hKey, lpSubKey);
 	} else {
 		status = RegDeleteKey(hKey, lpSubKey);
@@ -404,10 +404,10 @@ bool FindUserResourcePath(LPCWSTR path, LPWSTR outPath) noexcept {
 HBITMAP LoadBitmapFile(LPCWSTR path) noexcept {
 	WCHAR szTmp[MAX_PATH];
 	if (!FindUserResourcePath(path, szTmp)) {
-		return NULL;
+		return nullptr;
 	}
 
-	HBITMAP hbmp = (HBITMAP)LoadImage(NULL, szTmp, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE);
+	HBITMAP hbmp = (HBITMAP)LoadImage(nullptr, szTmp, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE);
 	return hbmp;
 }
 
@@ -417,7 +417,7 @@ HBITMAP EnlargeImageForDPI(HBITMAP hbmp, UINT dpi) noexcept {
 		const int width = MulDiv(dpi, bmp.bmWidth, USER_DEFAULT_SCREEN_DPI);
 		const int height = MulDiv(dpi, bmp.bmHeight, USER_DEFAULT_SCREEN_DPI);
 		HBITMAP hCopy = (HBITMAP)CopyImage(hbmp, IMAGE_BITMAP, width, height, LR_COPYRETURNORG | LR_COPYDELETEORG);
-		if (hCopy != NULL) {
+		if (hCopy != nullptr) {
 			hbmp = hCopy;
 		}
 	}
@@ -436,7 +436,7 @@ HBITMAP ResizeImageForCurrentDPI(HBITMAP hbmp) noexcept {
 		// keep aspect ratio
 		const int width = MulDiv(height, bmp.bmWidth, bmp.bmHeight);
 		HBITMAP hCopy = (HBITMAP)CopyImage(hbmp, IMAGE_BITMAP, width, height, LR_COPYRETURNORG | LR_COPYDELETEORG);
-		if (hCopy != NULL) {
+		if (hCopy != nullptr) {
 #if 0
 			BITMAP bmp2;
 			if (GetObject(hCopy, sizeof(BITMAP), &bmp2)) {
@@ -464,7 +464,7 @@ void BackgroundWorker_Stop(BackgroundWorker *worker) {
 	if (workerThread) {
 		while (WaitForSingleObject(workerThread, 0) != WAIT_OBJECT_0) {
 			MSG msg;
-			if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+			if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
 			}
@@ -515,7 +515,7 @@ HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(LPCWSTR AppID) noexcept {
 //
 bool IsElevated() noexcept {
 	bool bIsElevated = false;
-	HANDLE hToken = NULL;
+	HANDLE hToken = nullptr;
 
 	if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken)) {
 		TOKEN_ELEVATION te;
@@ -782,9 +782,9 @@ BOOL IsFontAvailable(LPCWSTR lpszFontName) noexcept {
 	lstrcpyn(lf.lfFaceName, lpszFontName, LF_FACESIZE);
 	lf.lfCharSet = DEFAULT_CHARSET;
 
-	HDC hDC = GetDC(NULL);
+	HDC hDC = GetDC(nullptr);
 	EnumFontFamiliesEx(hDC, &lf, EnumFontFamExProc, (LPARAM)&fFound, 0);
-	ReleaseDC(NULL, hDC);
+	ReleaseDC(nullptr, hDC);
 
 	return fFound;
 }
@@ -819,7 +819,7 @@ void SetWindowTransparentMode(HWND hwnd, bool bTransparentMode, int iOpacityLeve
 		SetLayeredWindowAttributes(hwnd, 0, bAlpha, LWA_ALPHA);
 	}
 	// Ask the window and its children to repaint
-	RedrawWindow(hwnd, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
+	RedrawWindow(hwnd, nullptr, nullptr, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
 }
 
 void SetWindowLayoutRTL(HWND hwnd, bool bRTL) noexcept {
@@ -828,7 +828,7 @@ void SetWindowLayoutRTL(HWND hwnd, bool bRTL) noexcept {
 	exStyle = bRTL ? (exStyle | WS_EX_LAYOUTRTL) : (exStyle & ~WS_EX_LAYOUTRTL);
 	SetWindowExStyle(hwnd, exStyle);
 	// update layout in the client area
-	InvalidateRect(hwnd, NULL, TRUE);
+	InvalidateRect(hwnd, nullptr, TRUE);
 }
 
 //=============================================================================
@@ -867,7 +867,7 @@ void CenterDlgInParentEx(HWND hDlg, HWND hParent) noexcept {
 		y = rcParent.top + 60;
 	}
 
-	SetWindowPos(hDlg, NULL, clamp(x, xMin, xMax), clamp(y, yMin, yMax), 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+	SetWindowPos(hDlg, nullptr, clamp(x, xMin, xMax), clamp(y, yMin, yMax), 0, 0, SWP_NOZORDER | SWP_NOSIZE);
 }
 
 void SetToRightBottomEx(HWND hDlg, HWND hParent) noexcept {
@@ -883,7 +883,7 @@ void SetToRightBottomEx(HWND hDlg, HWND hParent) noexcept {
 	const int height = (rcDlg.bottom - rcDlg.top) + ((rcParent.bottom - rcParent.top) - (rcClient.bottom - rcClient.top)) / 2;
 	const int x = rcParent.right - width;
 	const int y = rcParent.bottom - height;
-	SetWindowPos(hDlg, NULL, x, y, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+	SetWindowPos(hDlg, nullptr, x, y, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
 }
 
 // Why doesn’t the "Automatically move pointer to the default button in a dialog box"
@@ -893,9 +893,9 @@ void SnapToDefaultButton(HWND hwndBox) noexcept {
 	BOOL fSnapToDefButton = FALSE;
 	if (SystemParametersInfo(SPI_GETSNAPTODEFBUTTON, 0, &fSnapToDefButton, 0) && fSnapToDefButton) {
 		// get child window at the top of the Z order.
-		// for all our MessageBoxs it's the OK or YES button or NULL.
+		// for all our MessageBoxs it's the OK or YES button or nullptr.
 		HWND btn = GetWindow(hwndBox, GW_CHILD);
-		if (btn != NULL) {
+		if (btn != nullptr) {
 			WCHAR className[8] = L"";
 			GetClassName(btn, className, COUNTOF(className));
 			if (StrCaseEqual(className, L"Button")) {
@@ -953,7 +953,7 @@ void SetDlgPos(HWND hDlg, int xDlg, int yDlg) noexcept {
 	const int x = rcParent.left + xDlg;
 	const int y = rcParent.top + yDlg;
 
-	SetWindowPos(hDlg, NULL, clamp(x, xMin, xMax), clamp(y, yMin, yMax), 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+	SetWindowPos(hDlg, nullptr, clamp(x, xMin, xMax), clamp(y, yMin, yMax), 0, 0, SWP_NOZORDER | SWP_NOSIZE);
 }
 
 //=============================================================================
@@ -1011,20 +1011,20 @@ void ResizeDlg_InitEx(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDir
 
 	SetProp(hwnd, RESIZEDLG_PROP_KEY, (HANDLE)pm);
 
-	SetWindowPos(hwnd, NULL, rc.left, rc.top, cxFrame, cyFrame, SWP_NOZORDER);
+	SetWindowPos(hwnd, nullptr, rc.left, rc.top, cxFrame, cyFrame, SWP_NOZORDER);
 
 	SetWindowStyle(hwnd, style);
-	SetWindowPos(hwnd, NULL, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
+	SetWindowPos(hwnd, nullptr, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
 
 	WCHAR wch[64];
 	GetMenuString(GetSystemMenu(GetParent(hwnd), FALSE), SC_SIZE, wch, COUNTOF(wch), MF_BYCOMMAND);
 	InsertMenu(GetSystemMenu(hwnd, FALSE), SC_CLOSE, MF_BYCOMMAND | MF_STRING | MF_ENABLED, SC_SIZE, wch);
-	InsertMenu(GetSystemMenu(hwnd, FALSE), SC_CLOSE, MF_BYCOMMAND | MF_SEPARATOR, 0, NULL);
+	InsertMenu(GetSystemMenu(hwnd, FALSE), SC_CLOSE, MF_BYCOMMAND | MF_SEPARATOR, 0, nullptr);
 
 	HWND hwndCtl = GetDlgItem(hwnd, nIdGrip);
 	SetWindowStyle(hwndCtl, GetWindowStyle(hwndCtl) | SBS_SIZEGRIP | WS_CLIPSIBLINGS);
 	const int cGrip = SystemMetricsForDpi(SM_CXHTHUMB, dpi);
-	SetWindowPos(hwndCtl, NULL, pm->cxClient - cGrip, pm->cyClient - cGrip, cGrip, cGrip, SWP_NOZORDER);
+	SetWindowPos(hwndCtl, nullptr, pm->cxClient - cGrip, pm->cyClient - cGrip, cGrip, cGrip, SWP_NOZORDER);
 }
 
 void ResizeDlg_Destroy(HWND hwnd, int *cxFrame, int *cyFrame) {
@@ -1152,24 +1152,24 @@ int ResizeDlg_CalcDeltaY2(HWND hwnd, int dy, int cy, int nCtlId1, int nCtlId2) {
 	return cy;
 }
 
-HDWP DeferCtlPos(HDWP hdwp, HWND hwndDlg, int nCtlId, int dx, int dy, UINT uFlags) {
+HDWP DeferCtlPos(HDWP hdwp, HWND hwndDlg, int nCtlId, int dx, int dy, UINT uFlags) noexcept {
 	HWND hwndCtl = GetDlgItem(hwndDlg, nCtlId);
 	RECT rc;
 	GetWindowRect(hwndCtl, &rc);
-	MapWindowPoints(NULL, hwndDlg, (LPPOINT)&rc, 2);
+	MapWindowPoints(nullptr, hwndDlg, (LPPOINT)&rc, 2);
 	if (uFlags & SWP_NOSIZE) {
-		return DeferWindowPos(hdwp, hwndCtl, NULL, rc.left + dx, rc.top + dy, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+		return DeferWindowPos(hdwp, hwndCtl, nullptr, rc.left + dx, rc.top + dy, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
 	}
-	return DeferWindowPos(hdwp, hwndCtl, NULL, 0, 0, rc.right - rc.left + dx, rc.bottom - rc.top + dy, SWP_NOZORDER | SWP_NOMOVE);
+	return DeferWindowPos(hdwp, hwndCtl, nullptr, 0, 0, rc.right - rc.left + dx, rc.bottom - rc.top + dy, SWP_NOZORDER | SWP_NOMOVE);
 }
 
-void ResizeDlgCtl(HWND hwndDlg, int nCtlId, int dx, int dy) {
+void ResizeDlgCtl(HWND hwndDlg, int nCtlId, int dx, int dy) noexcept {
 	HWND hwndCtl = GetDlgItem(hwndDlg, nCtlId);
 	RECT rc;
 	GetWindowRect(hwndCtl, &rc);
-	MapWindowPoints(NULL, hwndDlg, (LPPOINT)&rc, 2);
-	SetWindowPos(hwndCtl, NULL, 0, 0, rc.right - rc.left + dx, rc.bottom - rc.top + dy, SWP_NOZORDER | SWP_NOMOVE);
-	InvalidateRect(hwndCtl, NULL, TRUE);
+	MapWindowPoints(nullptr, hwndDlg, (LPPOINT)&rc, 2);
+	SetWindowPos(hwndCtl, nullptr, 0, 0, rc.right - rc.left + dx, rc.bottom - rc.top + dy, SWP_NOZORDER | SWP_NOMOVE);
+	InvalidateRect(hwndCtl, nullptr, TRUE);
 }
 
 // https://docs.microsoft.com/en-us/windows/desktop/Controls/subclassing-overview
@@ -1266,7 +1266,7 @@ void MakeBitmapButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, int wBmpId) no
 void MakeColorPickButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, COLORREF crColor) noexcept {
 	HWND hwndCtl = GetDlgItem(hwnd, nCtlId);
 	BUTTON_IMAGELIST bi;
-	HIMAGELIST himlOld = NULL;
+	HIMAGELIST himlOld = nullptr;
 	COLORMAP colormap[2];
 
 	if (Button_GetImageList(hwndCtl, &bi)) {
@@ -1302,7 +1302,7 @@ void MakeColorPickButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, COLORREF cr
 	bi.uAlign = BUTTON_IMAGELIST_ALIGN_RIGHT;
 
 	Button_SetImageList(hwndCtl, &bi);
-	InvalidateRect(hwndCtl, NULL, TRUE);
+	InvalidateRect(hwndCtl, nullptr, TRUE);
 
 	if (himlOld) {
 		ImageList_Destroy(himlOld);
@@ -1446,7 +1446,7 @@ HMODULE LoadLocalizedResourceDLL(LANGID lang, LPCWSTR dllName) noexcept {
 		lang = GetUserDefaultUILanguage();
 	}
 
-	LPCWSTR folder = NULL;
+	LPCWSTR folder = nullptr;
 	const LANGID subLang = SUBLANGID(lang);
 	switch (PRIMARYLANGID(lang)) {
 	case LANG_ENGLISH:
@@ -1474,8 +1474,8 @@ HMODULE LoadLocalizedResourceDLL(LANGID lang, LPCWSTR dllName) noexcept {
 		break;
 	}
 
-	if (folder == NULL) {
-		return NULL;
+	if (folder == nullptr) {
+		return nullptr;
 	}
 
 	WCHAR path[MAX_PATH];
@@ -1486,7 +1486,7 @@ HMODULE LoadLocalizedResourceDLL(LANGID lang, LPCWSTR dllName) noexcept {
 	PathAppend(path, dllName);
 
 	const DWORD flags = IsVistaAndAbove() ? (LOAD_LIBRARY_AS_DATAFILE_EXCLUSIVE | LOAD_LIBRARY_AS_IMAGE_RESOURCE) : LOAD_LIBRARY_AS_DATAFILE;
-	HMODULE hDLL = LoadLibraryEx(path, NULL, flags);
+	HMODULE hDLL = LoadLibraryEx(path, nullptr, flags);
 	return hDLL;
 }
 
@@ -1523,11 +1523,11 @@ void GetLocaleDefaultUIFont(LANGID lang, LPWSTR lpFaceName, WORD *wSize) noexcep
 bool PathGetRealPath(HANDLE hFile, LPCWSTR lpszSrc, LPWSTR lpszDest) noexcept {
 	WCHAR path[8 + MAX_PATH] = L"";
 	if (IsVistaAndAbove()) {
-		const bool closing = hFile == NULL;
+		const bool closing = hFile == nullptr;
 		if (closing) {
 			hFile = CreateFile(lpszSrc, FILE_READ_ATTRIBUTES,
 				FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-				NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+				nullptr, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, nullptr);
 		}
 		if (hFile != INVALID_HANDLE_VALUE) {
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
@@ -1560,7 +1560,7 @@ bool PathGetRealPath(HANDLE hFile, LPCWSTR lpszSrc, LPWSTR lpszDest) noexcept {
 		}
 	}
 
-	DWORD cch = GetFullPathName(lpszSrc, COUNTOF(path), path, NULL);
+	DWORD cch = GetFullPathName(lpszSrc, COUNTOF(path), path, nullptr);
 	if (cch > 0 && cch < COUNTOF(path)) {
 		WCHAR *p = path;
 		if (StrHasPrefix(path, L"\\\\?\\")) {
@@ -1635,13 +1635,13 @@ bool PathEquivalent(LPCWSTR pszPath1, LPCWSTR pszPath2) noexcept {
 	// combine the identifier and the volume serial number for each file and compare them.
 	HANDLE hFile1 = CreateFile(pszPath1, FILE_READ_ATTRIBUTES,
 						FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-						NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+						nullptr, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, nullptr);
 	if (hFile1 != INVALID_HANDLE_VALUE) {
 		FILE_ID_INFO info1;
 		if (PathGetFileId(hFile1, &info1)) {
 			HANDLE hFile2 = CreateFile(pszPath2, FILE_READ_ATTRIBUTES,
 								FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-								NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+								nullptr, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, nullptr);
 			if (hFile2 != INVALID_HANDLE_VALUE) {
 				FILE_ID_INFO info2;
 				if (PathGetFileId(hFile2, &info2)) {
@@ -1665,18 +1665,18 @@ void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, DWORD dwAttrTo, bool bU
 	if (!PathIsRelative(lpszSrc)) {
 		WCHAR wchAppPath[MAX_PATH];
 		WCHAR wchWinDir[MAX_PATH];
-		GetModuleFileName(NULL, wchAppPath, COUNTOF(wchAppPath));
+		GetModuleFileName(nullptr, wchAppPath, COUNTOF(wchAppPath));
 		PathRemoveFileSpec(wchAppPath);
 
 		if (bUnexpandMyDocs) {
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-			LPWSTR wchUserFiles = NULL;
-			if (S_OK != SHGetKnownFolderPath(KnownFolderId_Documents, KF_FLAG_DEFAULT, NULL, &wchUserFiles)) {
+			LPWSTR wchUserFiles = nullptr;
+			if (S_OK != SHGetKnownFolderPath(KnownFolderId_Documents, KF_FLAG_DEFAULT, nullptr, &wchUserFiles)) {
 				return;
 			}
 #else
 			WCHAR wchUserFiles[MAX_PATH];
-			if (S_OK != SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, wchUserFiles)) {
+			if (S_OK != SHGetFolderPath(nullptr, CSIDL_PERSONAL, nullptr, SHGFP_TYPE_CURRENT, wchUserFiles)) {
 				return;
 			}
 #endif
@@ -1691,7 +1691,7 @@ void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, DWORD dwAttrTo, bool bU
 		}
 		if (lpszSrc != wchPath) {
 			GetWindowsDirectory(wchWinDir, COUNTOF(wchWinDir));
-			if (!PathCommonPrefix(wchAppPath, wchWinDir, NULL)
+			if (!PathCommonPrefix(wchAppPath, wchWinDir, nullptr)
 				&& PathRelativePathTo(wchPath, wchAppPath, FILE_ATTRIBUTE_DIRECTORY, lpszSrc, dwAttrTo)) {
 				lpszSrc = wchPath;
 			}
@@ -1721,8 +1721,8 @@ void PathAbsoluteFromApp(LPCWSTR lpszSrc, LPWSTR lpszDest, bool bExpandEnv) noex
 
 	if (StrHasPrefix(lpszSrc, L"%CSIDL:MYDOCUMENTS%")) {
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-		LPWSTR pszPath = NULL;
-		if (S_OK != SHGetKnownFolderPath(KnownFolderId_Documents, KF_FLAG_DEFAULT, NULL, &pszPath)) {
+		LPWSTR pszPath = nullptr;
+		if (S_OK != SHGetKnownFolderPath(KnownFolderId_Documents, KF_FLAG_DEFAULT, nullptr, &pszPath)) {
 			return;
 		}
 		lpszSrc += CSTRLEN("%CSIDL:MYDOCUMENTS%");
@@ -1732,7 +1732,7 @@ void PathAbsoluteFromApp(LPCWSTR lpszSrc, LPWSTR lpszDest, bool bExpandEnv) noex
 		PathCombine(wchPath, pszPath, lpszSrc);
 		CoTaskMemFree(pszPath);
 #else
-		if (S_OK != SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, wchPath)) {
+		if (S_OK != SHGetFolderPath(nullptr, CSIDL_PERSONAL, nullptr, SHGFP_TYPE_CURRENT, wchPath)) {
 			return;
 		}
 		PathAppend(wchPath, lpszSrc + CSTRLEN("%CSIDL:MYDOCUMENTS%"));
@@ -1748,7 +1748,7 @@ void PathAbsoluteFromApp(LPCWSTR lpszSrc, LPWSTR lpszDest, bool bExpandEnv) noex
 	WCHAR wchResult[MAX_PATH];
 	lpszSrc = wchPath;
 	if (PathIsRelative(wchPath)) {
-		GetModuleFileName(NULL, wchResult, COUNTOF(wchResult));
+		GetModuleFileName(nullptr, wchResult, COUNTOF(wchResult));
 		PathRemoveFileSpec(wchResult);
 		PathAppend(wchResult, wchPath);
 		lpszSrc = wchResult;
@@ -1820,7 +1820,7 @@ bool PathCreateDeskLnk(LPCWSTR pszDocument) {
 
 	// init strings
 	WCHAR tchExeFile[MAX_PATH];
-	GetModuleFileName(NULL, tchExeFile, COUNTOF(tchExeFile));
+	GetModuleFileName(nullptr, tchExeFile, COUNTOF(tchExeFile));
 
 	WCHAR tchDocTemp[MAX_PATH];
 	lstrcpy(tchDocTemp, pszDocument);
@@ -1831,13 +1831,13 @@ bool PathCreateDeskLnk(LPCWSTR pszDocument) {
 	lstrcat(tchArguments, tchDocTemp);
 
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-	LPWSTR tchLinkDir = NULL;
-	if (S_OK != SHGetKnownFolderPath(KnownFolderId_Desktop, KF_FLAG_DEFAULT, NULL, &tchLinkDir)) {
+	LPWSTR tchLinkDir = nullptr;
+	if (S_OK != SHGetKnownFolderPath(KnownFolderId_Desktop, KF_FLAG_DEFAULT, nullptr, &tchLinkDir)) {
 		return false;
 	}
 #else
 	WCHAR tchLinkDir[MAX_PATH];
-	if (S_OK != SHGetFolderPath(NULL, CSIDL_DESKTOPDIRECTORY, NULL, SHGFP_TYPE_CURRENT, tchLinkDir)) {
+	if (S_OK != SHGetFolderPath(nullptr, CSIDL_DESKTOPDIRECTORY, nullptr, SHGFP_TYPE_CURRENT, tchLinkDir)) {
 		return false;
 	}
 #endif
@@ -1927,7 +1927,7 @@ void OpenContainingFolder(HWND hwnd, LPCWSTR pszFile, bool bSelect) noexcept {
 	WCHAR wchDirectory[MAX_PATH];
 	lstrcpyn(wchDirectory, pszFile, COUNTOF(wchDirectory));
 
-	LPCWSTR path = NULL;
+	LPCWSTR path = nullptr;
 	DWORD dwAttributes = GetFileAttributes(pszFile);
 	if (bSelect || dwAttributes == INVALID_FILE_ATTRIBUTES || !(dwAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
 		PathRemoveFileSpec(wchDirectory);
@@ -1949,7 +1949,7 @@ void OpenContainingFolder(HWND hwnd, LPCWSTR pszFile, bool bSelect) noexcept {
 	PIDLIST_ABSOLUTE pidl = ILCreateFromPath(wchDirectory);
 	if (pidl) {
 		HRESULT hr;
-		PIDLIST_ABSOLUTE pidlEntry = path ? ILCreateFromPath(path) : NULL;
+		PIDLIST_ABSOLUTE pidlEntry = path ? ILCreateFromPath(path) : nullptr;
 		if (pidlEntry) {
 			hr = SHOpenFolderAndSelectItems(pidl, 1, (PCUITEMID_CHILD_ARRAY)(&pidlEntry), 0);
 			CoTaskMemFree((LPVOID)pidlEntry);
@@ -1974,7 +1974,7 @@ void OpenContainingFolder(HWND hwnd, LPCWSTR pszFile, bool bSelect) noexcept {
 #endif
 		} else {
 			// open parent folder and select the folder
-			hr = SHOpenFolderAndSelectItems(pidl, 0, NULL, 0);
+			hr = SHOpenFolderAndSelectItems(pidl, 0, nullptr, 0);
 		}
 		CoTaskMemFree((LPVOID)pidl);
 		if (hr == S_OK) {
@@ -1983,7 +1983,7 @@ void OpenContainingFolder(HWND hwnd, LPCWSTR pszFile, bool bSelect) noexcept {
 	}
 
 #if 0
-	if (path == NULL) {
+	if (path == nullptr) {
 		path = wchDirectory;
 	}
 
@@ -1993,7 +1993,7 @@ void OpenContainingFolder(HWND hwnd, LPCWSTR pszFile, bool bSelect) noexcept {
 	lstrcat(szParameters, L"\"");
 	lstrcat(szParameters, path);
 	lstrcat(szParameters, L"\"");
-	ShellExecute(hwnd, L"open", L"explorer", szParameters, NULL, SW_SHOW);
+	ShellExecute(hwnd, L"open", L"explorer", szParameters, nullptr, SW_SHOW);
 	NP2HeapFree(szParameters);
 #endif
 }
@@ -2067,7 +2067,7 @@ void PrepareFilterStr(LPWSTR lpFilter) noexcept {
 //
 void StrTab2Space(LPWSTR lpsz) noexcept {
 	WCHAR *c = lpsz;
-	while ((c = StrChr(c, L'\t')) != NULL) {
+	while ((c = StrChr(c, L'\t')) != nullptr) {
 		*c++ = L' ';
 	}
 }
@@ -2079,7 +2079,7 @@ void StrTab2Space(LPWSTR lpsz) noexcept {
 bool PathFixBackslashes(LPWSTR lpsz) noexcept {
 	WCHAR *c = lpsz;
 	bool bFixed = false;
-	while ((c = StrChr(c, L'/')) != NULL) {
+	while ((c = StrChr(c, L'/')) != nullptr) {
 		if (c != lpsz && c[-1] == L':' && c[1] == L'/') {
 			c += 2;
 		} else {
@@ -2132,7 +2132,7 @@ void StripMnemonic(LPWSTR pszMenu) noexcept {
 	LPWSTR prev = pszMenu;
 	do {
 		LPWSTR p = StrChr(prev, L'&');
-		if (p == NULL) {
+		if (p == nullptr) {
 			break;
 		}
 		if (p[1] == L'&') {
@@ -2239,7 +2239,7 @@ LPWSTR GetDlgItemFullText(HWND hwndDlg, int nCtlId) noexcept {
 	hwndDlg = GetDlgItem(hwndDlg, nCtlId);
 	int len = GetWindowTextLength(hwndDlg);
 	if (len == 0) {
-		return NULL;
+		return nullptr;
 	}
 	len += 1;
 	LPWSTR buffer = (LPWSTR)NP2HeapAlloc(len*sizeof(WCHAR));
@@ -2256,7 +2256,7 @@ int GetDlgItemTextA2W(UINT uCP, HWND hDlg, int nIDDlgItem, LPSTR lpString, int n
 	memset(lpString, 0, nMaxCount);
 	int len = 0;
 	if (wsz) {
-		len = WideCharToMultiByte(uCP, 0, wsz, -1, lpString, nMaxCount, NULL, NULL) - 1;
+		len = WideCharToMultiByte(uCP, 0, wsz, -1, lpString, nMaxCount, nullptr, nullptr) - 1;
 		NP2HeapFree(wsz);
 	}
 	return len;
@@ -2306,11 +2306,11 @@ static inline bool MRU_Equal(int flags, LPCWSTR psz1, LPCWSTR psz2) {
 
 void MRU_Add(LPMRULIST pmru, LPCWSTR pszNew) {
 	const int flags = pmru->iFlags;
-	LPWSTR tchItem = NULL;
+	LPWSTR tchItem = nullptr;
 	int i;
 	for (i = 0; i < MRU_MAXITEMS; i++) {
 		WCHAR * const item = pmru->pszItems[i];
-		if (item == NULL) {
+		if (item == nullptr) {
 			break;
 		}
 		if (MRU_Equal(flags, item, pszNew)) {
@@ -2327,7 +2327,7 @@ void MRU_Add(LPMRULIST pmru, LPCWSTR pszNew) {
 	for (; i > 0; i--) {
 		pmru->pszItems[i] = pmru->pszItems[i - 1];
 	}
-	if (tchItem == NULL) {
+	if (tchItem == nullptr) {
 		tchItem = StrDup(pszNew);
 	}
 	pmru->pszItems[0] = tchItem;
@@ -2525,13 +2525,13 @@ HBITMAP BitmapCache_Get(BitmapCache *cache, LPCWSTR path) {
 
 	cache->used |= 1U << index;
 	HBITMAP hbmp = cache->items[index];
-	if (hbmp == NULL) {
-		HDC bitmapDC = CreateCompatibleDC(NULL);
+	if (hbmp == nullptr) {
+		HDC bitmapDC = CreateCompatibleDC(nullptr);
 		int width = 0;
 		int height = 0;
 		ImageList_GetIconSize(imageList, &width, &height);
 		const BITMAPINFO bmi = { {sizeof(BITMAPINFOHEADER), width, -height, 1, 32, BI_RGB, 0, 0, 0, 0, 0}, {{ 0, 0, 0, 0 }} };
-		hbmp = CreateDIBSection(NULL, &bmi, DIB_RGB_COLORS, NULL, NULL, 0);
+		hbmp = CreateDIBSection(nullptr, &bmi, DIB_RGB_COLORS, nullptr, nullptr, 0);
 		HBITMAP oldBitmap = SelectBitmap(bitmapDC, hbmp);
 		ImageList_Draw(imageList, iIcon, bitmapDC, 0, 0, ILD_TRANSPARENT);
 		SelectBitmap(bitmapDC, oldBitmap);
@@ -2560,7 +2560,7 @@ bool GetThemedDialogFont(LPWSTR lpFaceName, WORD *wSize) noexcept {
 	int lfHeight = 0;
 
 	if (IsAppThemed()) {
-		HTHEME hTheme = OpenThemeData(NULL, L"WINDOWSTYLE;WINDOW");
+		HTHEME hTheme = OpenThemeData(nullptr, L"WINDOWSTYLE;WINDOW");
 		if (hTheme) {
 			LOGFONT lf;
 			if (S_OK == GetThemeSysFont(hTheme, TMT_MSGBOXFONT, &lf)) {
@@ -2649,18 +2649,18 @@ BYTE *DialogTemplate_GetFontSizeField(const DLGTEMPLATE *pTemplate) noexcept {
 
 DLGTEMPLATE *LoadThemedDialogTemplate(LPCWSTR lpDialogTemplateID, HINSTANCE hInstance) noexcept {
 	HRSRC hRsrc = FindResource(hInstance, lpDialogTemplateID, RT_DIALOG);
-	if (hRsrc == NULL) {
-		return NULL;
+	if (hRsrc == nullptr) {
+		return nullptr;
 	}
 
 	HGLOBAL hRsrcMem = LoadResource(hInstance, hRsrc);
 	const DLGTEMPLATE *pRsrcMem = (DLGTEMPLATE *)LockResource(hRsrcMem);
 	const UINT dwTemplateSize = (UINT)SizeofResource(hInstance, hRsrc);
 
-	DLGTEMPLATE *pTemplate = dwTemplateSize ? (DLGTEMPLATE *)NP2HeapAlloc(dwTemplateSize + LF_FACESIZE * 2) : NULL;
-	if (pTemplate == NULL) {
+	DLGTEMPLATE *pTemplate = dwTemplateSize ? (DLGTEMPLATE *)NP2HeapAlloc(dwTemplateSize + LF_FACESIZE * 2) : nullptr;
+	if (pTemplate == nullptr) {
 		FreeResource(hRsrcMem);
-		return NULL;
+		return nullptr;
 	}
 
 	memcpy((BYTE *)pTemplate, pRsrcMem, (size_t)dwTemplateSize);
@@ -2833,7 +2833,7 @@ unsigned int UnSlash(char *s, UINT cpEdit) noexcept {
 			if (value) {
 				WCHAR val[2] = { (WCHAR)value, 0 };
 				char ch[8];
-				WideCharToMultiByte(cpEdit, 0, val, -1, ch, sizeof(ch), NULL, NULL);
+				WideCharToMultiByte(cpEdit, 0, val, -1, ch, sizeof(ch), nullptr, nullptr);
 				const char *pch = ch;
 				*o = *pch++;
 				while (*pch) {
@@ -3094,9 +3094,9 @@ static void GetTrayWndRect(LPRECT lpTrayRect) noexcept {
 	// TrayNotifyWnd. This provides us a window rect to minimize to. Note, however,
 	// that this is not guaranteed to work on future versions of the shell. If we
 	// use this method, make sure we have a backup!
-	HWND hShellTrayWnd = FindWindowEx(NULL, NULL, L"Shell_TrayWnd", NULL);
+	HWND hShellTrayWnd = FindWindowEx(nullptr, nullptr, L"Shell_TrayWnd", nullptr);
 	if (hShellTrayWnd) {
-		HWND hTrayNotifyWnd = FindWindowEx(hShellTrayWnd, NULL, L"TrayNotifyWnd", NULL);
+		HWND hTrayNotifyWnd = FindWindowEx(hShellTrayWnd, nullptr, L"TrayNotifyWnd", nullptr);
 		if (hTrayNotifyWnd) {
 			GetWindowRect(hTrayNotifyWnd, lpTrayRect);
 			return;
@@ -3149,7 +3149,7 @@ static void GetTrayWndRect(LPRECT lpTrayRect) noexcept {
 	// Note that if the 3rd party shell supports the same configuration as
 	// explorer (the icons hosted in NotifyTrayWnd, which is a child window of
 	// Shell_TrayWnd), we would already have caught it above
-	hShellTrayWnd = FindWindowEx(NULL, NULL, L"Shell_TrayWnd", NULL);
+	hShellTrayWnd = FindWindowEx(nullptr, nullptr, L"Shell_TrayWnd", nullptr);
 	if (hShellTrayWnd) {
 		GetWindowRect(hShellTrayWnd, lpTrayRect);
 		if (lpTrayRect->right - lpTrayRect->left > DEFAULT_RECT_WIDTH) {
