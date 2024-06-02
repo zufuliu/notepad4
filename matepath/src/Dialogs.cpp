@@ -364,8 +364,7 @@ INT_PTR CALLBACK GotoDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		ComboBox_LimitText(hwndGoto, MAX_PATH - 1);
 		ComboBox_SetExtendedUI(hwndGoto, TRUE);
 
-		for (int i = 0; i < HISTORY_ITEMS; i++) {
-			LPCWSTR path = mHistory.psz[i];
+		for (LPCWSTR path : mHistory.psz) {
 			if (path) {
 				const int iItem = ComboBox_FindStringExact(hwndGoto, -1, path);
 				if (iItem != CB_ERR) {
@@ -1545,14 +1544,12 @@ bool GetFilterDlg(HWND hwnd) noexcept {
 }
 
 // Data structure used in file operation dialogs
-typedef struct FILEOPDLGDATA {
+struct FILEOPDLGDATA {
 	WCHAR szSource[MAX_PATH];
 	WCHAR szDestination[MAX_PATH];
 	LPMRULIST pmru;
 	UINT wFunc;
-} FILEOPDLGDATA, *LPFILEOPDLGDATA;
-
-typedef const FILEOPDLGDATA * LPCFILEOPDLGDATA;
+};
 
 extern int cxRenameFileDlg;
 //=============================================================================
@@ -1565,7 +1562,7 @@ INT_PTR CALLBACK RenameFileDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
 		ResizeDlg_InitX(hwnd, cxRenameFileDlg, IDC_RESIZEGRIP2);
-		const LPCFILEOPDLGDATA lpfod = (LPCFILEOPDLGDATA)lParam;
+		const FILEOPDLGDATA * const lpfod = reinterpret_cast<const FILEOPDLGDATA *>(lParam);
 
 		SetDlgItemText(hwnd, IDC_OLDNAME, lpfod->szSource);
 
@@ -1611,7 +1608,7 @@ INT_PTR CALLBACK RenameFileDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 			if (!Edit_GetModify(hwndCtl)) {
 				EndDialog(hwnd, IDCANCEL);
 			} else {
-				LPFILEOPDLGDATA lpfod = (LPFILEOPDLGDATA)GetWindowLongPtr(hwnd, DWLP_USER);
+				FILEOPDLGDATA * const lpfod = reinterpret_cast<FILEOPDLGDATA *>(GetWindowLongPtr(hwnd, DWLP_USER));
 				Edit_GetText(hwndCtl, lpfod->szDestination, COUNTOF(lpfod->szDestination) - 1);
 				EndDialog(hwnd, IDOK);
 			}
@@ -1697,7 +1694,7 @@ INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 		ResizeDlg_InitX(hwnd, cxCopyMoveDlg, IDC_RESIZEGRIP5);
 		MakeBitmapButton(hwnd, IDC_BROWSEDESTINATION, g_exeInstance, IDB_OPEN_FOLDER16);
 
-		const LPCFILEOPDLGDATA lpfod = (LPCFILEOPDLGDATA)lParam;
+		const FILEOPDLGDATA * const lpfod = reinterpret_cast<const FILEOPDLGDATA *>(lParam);
 		SetDlgItemText(hwnd, IDC_SOURCE, lpfod->szSource);
 
 		HWND hwndDest = GetDlgItem(hwnd, IDC_DESTINATION);
@@ -1750,7 +1747,7 @@ INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 	case WM_NOTIFY: {
 		LPNMHDR pnmhdr = (LPNMHDR)lParam;
 		if (pnmhdr->idFrom == IDC_EMPTY_MRU && (pnmhdr->code == NM_CLICK || pnmhdr->code == NM_RETURN)) {
-			const LPCFILEOPDLGDATA lpfod = (LPCFILEOPDLGDATA)lParam;
+			const FILEOPDLGDATA * const lpfod = reinterpret_cast<const FILEOPDLGDATA *>(GetWindowLongPtr(hwnd, DWLP_USER));
 			WCHAR tch[MAX_PATH];
 			HWND hwndDest = GetDlgItem(hwnd, IDC_DESTINATION);
 			ComboBox_GetText(hwndDest, tch, COUNTOF(tch));
@@ -1782,7 +1779,7 @@ INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 
 		case IDOK: {
 			/*text*/
-			LPFILEOPDLGDATA lpfod = (LPFILEOPDLGDATA)GetWindowLongPtr(hwnd, DWLP_USER);
+			FILEOPDLGDATA * const lpfod = reinterpret_cast<FILEOPDLGDATA *>(GetWindowLongPtr(hwnd, DWLP_USER));
 			HWND hwndDest = GetDlgItem(hwnd, IDC_DESTINATION);
 			if (ComboBox_GetText(hwndDest, lpfod->szDestination, COUNTOF(lpfod->szDestination) - 1)) {
 				lpfod->wFunc = IsButtonChecked(hwnd, IDC_FUNCCOPY) ? FO_COPY : FO_MOVE;
@@ -2121,7 +2118,7 @@ INT_PTR CALLBACK NewDirDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPara
 			break;
 
 		case IDOK: {
-			LPFILEOPDLGDATA lpfod = (LPFILEOPDLGDATA)GetWindowLongPtr(hwnd, DWLP_USER);
+			FILEOPDLGDATA * const lpfod = reinterpret_cast<FILEOPDLGDATA *>(GetWindowLongPtr(hwnd, DWLP_USER));
 			GetDlgItemText(hwnd, IDC_NEWDIR, lpfod->szDestination, COUNTOF(lpfod->szDestination) - 1);
 			EndDialog(hwnd, IDOK);
 		}

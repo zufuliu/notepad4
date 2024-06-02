@@ -33,7 +33,7 @@
 #define NP2_MarkAllSelectAll	0x00004000
 #define NP2_FromFindAll			0x00008000
 
-typedef struct EDITFINDREPLACE {
+struct EDITFINDREPLACE {
 	char	szFind[512];
 	char	szReplace[512];
 	char	szFindUTF8[512 * kMaxMultiByteCount];
@@ -45,9 +45,7 @@ typedef struct EDITFINDREPLACE {
 	bool	bReplaceClose;
 	bool	bNoFindWrap;
 	bool	bWildcardSearch;
-} EDITFINDREPLACE, *LPEDITFINDREPLACE;
-
-typedef const EDITFINDREPLACE * LPCEDITFINDREPLACE;
+};
 
 enum EditAlignMode {
 	EditAlignMode_Left = 0,
@@ -187,13 +185,13 @@ void	EditGetExcerpt(LPWSTR lpszExcerpt, DWORD cchExcerpt) noexcept;
 
 void	EditSelectWord() noexcept;
 void	EditSelectLines(bool currentBlock, bool lineSelection) noexcept;
-HWND	EditFindReplaceDlg(HWND hwnd, LPEDITFINDREPLACE lpefr, bool bReplace) noexcept;
-void	EditFindNext(LPCEDITFINDREPLACE lpefr, bool fExtendSelection) noexcept;
-void	EditFindPrev(LPCEDITFINDREPLACE lpefr, bool fExtendSelection) noexcept;
-void	EditFindAll(LPCEDITFINDREPLACE lpefr, bool selectAll);
-bool	EditReplace(HWND hwnd, LPCEDITFINDREPLACE lpefr) noexcept;
-bool	EditReplaceAll(HWND hwnd, LPCEDITFINDREPLACE lpefr, bool bShowInfo) noexcept;
-bool	EditReplaceAllInSelection(HWND hwnd, LPCEDITFINDREPLACE lpefr, bool bShowInfo) noexcept;
+HWND	EditFindReplaceDlg(HWND hwnd, EDITFINDREPLACE *lpefr, bool bReplace) noexcept;
+void	EditFindNext(const EDITFINDREPLACE *lpefr, bool fExtendSelection) noexcept;
+void	EditFindPrev(const EDITFINDREPLACE *lpefr, bool fExtendSelection) noexcept;
+void	EditFindAll(const EDITFINDREPLACE *lpefr, bool selectAll);
+bool	EditReplace(HWND hwnd, const EDITFINDREPLACE *lpefr) noexcept;
+bool	EditReplaceAll(HWND hwnd, const EDITFINDREPLACE *lpefr, bool bShowInfo) noexcept;
+bool	EditReplaceAllInSelection(HWND hwnd, const EDITFINDREPLACE *lpefr, bool bShowInfo) noexcept;
 bool	EditLineNumDlg(HWND hwnd) noexcept;
 void	EditModifyLinesDlg(HWND hwnd) noexcept;
 void	EditEncloseSelectionDlg(HWND hwnd) noexcept;
@@ -517,8 +515,8 @@ constexpr bool Encoding_IsUTF8(int iEncoding) noexcept {
 }
 
 void	Encoding_ReleaseResources() noexcept;
-bool	EditSetNewEncoding(int iEncoding, int iNewEncoding, BOOL bNoUI, bool bSetSavePoint);
-void	EditOnCodePageChanged(UINT oldCodePage, bool showControlCharacter, LPEDITFINDREPLACE lpefr) noexcept;
+bool	EditSetNewEncoding(int iEncoding, int iNewEncoding, BOOL bNoUI, bool bSetSavePoint) noexcept;
+void	EditOnCodePageChanged(UINT oldCodePage, bool showControlCharacter, EDITFINDREPLACE *lpefr) noexcept;
 const char* GetFoldDisplayEllipsis(UINT cpEdit, UINT acp) noexcept;
 void	Encoding_InitDefaults() noexcept;
 int 	Encoding_MapIniSetting(bool bLoad, UINT iSetting) noexcept;

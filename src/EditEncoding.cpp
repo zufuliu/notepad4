@@ -448,7 +448,7 @@ static inline bool IsValidEncoding(const NP2ENCODING *encoding) noexcept {
 //
 // EditSetNewEncoding()
 //
-bool EditSetNewEncoding(int iEncoding, int iNewEncoding, BOOL bNoUI, bool bSetSavePoint) {
+bool EditSetNewEncoding(int iEncoding, int iNewEncoding, BOOL bNoUI, bool bSetSavePoint) noexcept {
 	if (iEncoding != iNewEncoding) {
 		if (iEncoding != CPI_DEFAULT && iNewEncoding != CPI_DEFAULT) {
 			return true;
@@ -475,7 +475,7 @@ bool EditSetNewEncoding(int iEncoding, int iNewEncoding, BOOL bNoUI, bool bSetSa
 	return false;
 }
 
-void EditOnCodePageChanged(UINT oldCodePage, bool showControlCharacter, LPEDITFINDREPLACE lpefr) noexcept {
+void EditOnCodePageChanged(UINT oldCodePage, bool showControlCharacter, EDITFINDREPLACE *lpefr) noexcept {
 	const UINT cpEdit = SciCall_GetCodePage();
 	const UINT acp = GetACP();
 	const bool lastFind = StrNotEmpty(lpefr->szFind); // need to convert last find & replace string.
@@ -565,7 +565,7 @@ int Encoding_MapIniSetting(bool bLoad, UINT iSetting) noexcept {
 		return iSetting;
 	}
 	if (iSetting < 8) {
-		const UINT maskLoad = (CPI_DEFAULT << 4*0)
+		constexpr UINT maskLoad = (CPI_DEFAULT << 4*0)
 			| (CPI_UNICODEBOM << 4*1)
 			| (CPI_UNICODEBEBOM << 4*2)
 			| (CPI_UTF8 << 4*3)
@@ -573,7 +573,7 @@ int Encoding_MapIniSetting(bool bLoad, UINT iSetting) noexcept {
 			| (CPI_OEM << 4*5)
 			| (CPI_UNICODE << 4*6)
 			| (CPI_UNICODEBE << 4*7);
-		const UINT maskStore = (0 << CPI_DEFAULT*4)
+		constexpr UINT maskStore = (0 << CPI_DEFAULT*4)
 			| (1 << CPI_UNICODEBOM*4)
 			| (2 << CPI_UNICODEBEBOM*4)
 			| (3 << CPI_UTF8*4)
@@ -661,13 +661,13 @@ bool Encoding_IsValid(int iEncoding) noexcept {
 		&& IsValidEncoding(&mEncoding[iEncoding]);
 }
 
-typedef struct ENCODINGENTRY {
+struct ENCODINGENTRY {
 	int id;
-	WCHAR wch[256];
-} ENCODINGENTRY, *PENCODINGENTRY;
+	WCHAR wch[256 - 2];
+};
 
 static int __cdecl CmpEncoding(const void *s1, const void *s2) noexcept {
-	return wcscmp(((PENCODINGENTRY)s1)->wch, ((PENCODINGENTRY)s2)->wch);
+	return wcscmp(static_cast<const ENCODINGENTRY *>(s1)->wch, static_cast<const ENCODINGENTRY *>(s2)->wch);
 }
 
 int Encoding_GetIndex(UINT codePage) noexcept {
@@ -695,7 +695,7 @@ static inline int GetEncodingImageIndex(const NP2ENCODING *encoding) noexcept {
 }
 
 void Encoding_AddToTreeView(HWND hwnd, int idSel, bool bRecodeOnly) noexcept {
-	PENCODINGENTRY pEE = (PENCODINGENTRY)NP2HeapAlloc(COUNTOF(sEncodingGroupList) * sizeof(ENCODINGENTRY));
+	ENCODINGENTRY *pEE = static_cast<ENCODINGENTRY *>(NP2HeapAlloc(COUNTOF(sEncodingGroupList) * sizeof(ENCODINGENTRY)));
 	for (int i = 0; i < (int)COUNTOF(sEncodingGroupList); i++) {
 		NP2EncodingGroup *group = &sEncodingGroupList[i];
 		pEE[i].id = i;
@@ -863,8 +863,8 @@ bool Encoding_GetFromTreeView(HWND hwnd, int *pidEncoding, bool bQuiet) noexcept
 }
 
 #if 0
-void Encoding_AddToListView(HWND hwnd, int idSel, bool bRecodeOnly) {
-	PENCODINGENTRY pEE = (PENCODINGENTRY)NP2HeapAlloc(COUNTOF(mEncoding) * sizeof(ENCODINGENTRY));
+void Encoding_AddToListView(HWND hwnd, int idSel, bool bRecodeOnly) noexcept {
+	ENCODINGENTRY *pEE = static_cast<ENCODINGENTRY *>(NP2HeapAlloc(COUNTOF(sEncodingGroupList) * sizeof(ENCODINGENTRY)));
 	for (int i = 0; i < (int)COUNTOF(mEncoding); i++) {
 		pEE[i].id = i;
 		GetString(mEncoding[i].idsName, pEE[i].wch, COUNTOF(pEE[i].wch));
@@ -921,7 +921,7 @@ void Encoding_AddToListView(HWND hwnd, int idSel, bool bRecodeOnly) {
 	}
 }
 
-bool Encoding_GetFromListView(HWND hwnd, int *pidEncoding) {
+bool Encoding_GetFromListView(HWND hwnd, int *pidEncoding) noexcept {
 	LVITEM lvi;
 
 	lvi.iItem = ListView_GetNextItem(hwnd, -1, LVNI_ALL | LVNI_SELECTED);
@@ -939,8 +939,8 @@ bool Encoding_GetFromListView(HWND hwnd, int *pidEncoding) {
 	return false;
 }
 
-void Encoding_AddToComboboxEx(HWND hwnd, int idSel, bool bRecodeOnly) {
-	PENCODINGENTRY pEE = (PENCODINGENTRY)NP2HeapAlloc(COUNTOF(mEncoding) * sizeof(ENCODINGENTRY));
+void Encoding_AddToComboboxEx(HWND hwnd, int idSel, bool bRecodeOnly) noexcept {
+	ENCODINGENTRY *pEE = static_cast<ENCODINGENTRY *>(NP2HeapAlloc(COUNTOF(sEncodingGroupList) * sizeof(ENCODINGENTRY)));
 	for (int i = 0; i < (int)COUNTOF(mEncoding); i++) {
 		pEE[i].id = i;
 		GetString(mEncoding[i].idsName, pEE[i].wch, COUNTOF(pEE[i].wch));
@@ -997,7 +997,7 @@ void Encoding_AddToComboboxEx(HWND hwnd, int idSel, bool bRecodeOnly) {
 	}
 }
 
-bool Encoding_GetFromComboboxEx(HWND hwnd, int *pidEncoding) {
+bool Encoding_GetFromComboboxEx(HWND hwnd, int *pidEncoding) noexcept {
 	COMBOBOXEXITEM cbei;
 
 	cbei.iItem = ComboBox_GetCurSel(hwnd);
@@ -1070,7 +1070,7 @@ static inline BOOL IsValidWideChar(LPCWSTR lpWide, DWORD cchWide) noexcept {
 }
 #endif
 
-static int DetectUnicode(char *pTest, DWORD nLength, bool ascii) {
+static int DetectUnicode(char *pTest, DWORD nLength, bool ascii) noexcept {
 	if (ascii) {
 		// find ASCII inside first or last 4 KiB text
 		constexpr DWORD size = 4096;
@@ -1114,7 +1114,7 @@ static int DetectUnicode(char *pTest, DWORD nLength, bool ascii) {
 }
 
 #if 0
-static int DetectUTF16Latin1(const char *pTest, DWORD nLength) {
+static int DetectUTF16Latin1(const char *pTest, DWORD nLength) noexcept {
 	const char *pt = pTest;
 	const char * const end = pt + nLength;
 
@@ -1376,7 +1376,7 @@ static int DetectUTF16LatinExt(const char *pTest, DWORD nLength) noexcept {
 }
 
 #if 0
-bool IsUTF8(const char *pTest, DWORD nLength) {
+bool IsUTF8(const char *pTest, DWORD nLength) noexcept {
 	static const uint8_t byte_class_table[256] = {
 		/* 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F */
 		/* 00 */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -1564,7 +1564,7 @@ __attribute__((__always_inline__)) static inline
 #else
 static __forceinline
 #endif
-bool z_validate_vec_avx2(__m256i bytes, __m256i shifted_bytes, uint32_t *last_cont) {
+bool z_validate_vec_avx2(__m256i bytes, __m256i shifted_bytes, uint32_t *last_cont) noexcept {
 	// Error lookup tables for the first, second, and third nibbles
 	// Simple macro to make a vector lookup table for use with vpshufb. Since
 	// AVX2 is two 16-byte halves, we duplicate the input values.
@@ -1652,7 +1652,7 @@ bool z_validate_vec_avx2(__m256i bytes, __m256i shifted_bytes, uint32_t *last_co
 	return true;
 }
 
-static inline bool z_validate_utf8_avx2(const char *data, uint32_t len) {
+static inline bool z_validate_utf8_avx2(const char *data, uint32_t len) noexcept {
 	// Keep continuation bits from the previous iteration that carry over to
 	// each input chunk vector
 	uint32_t last_cont = 0;

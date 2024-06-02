@@ -79,7 +79,7 @@ int MsgBox(UINT uType, UINT uIdMsg, ...) noexcept {
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
 	const LANGID lang = uiLanguage;
 #else
-	const LANGID lang = LANG_USER_DEFAULT;
+	constexpr LANGID lang = LANG_USER_DEFAULT;
 #endif
 
 	if (uType & MB_SERVICE_NOTIFICATION) {
@@ -1822,17 +1822,15 @@ bool TabSettingsDlg(HWND hwnd) noexcept {
 // SelectDefEncodingDlgProc()
 //
 //
-typedef struct ENCODEDLG {
+struct ENCODEDLG {
 	bool bRecodeOnly;
 	int  idEncoding;
 	int  cxDlg;
 	int  cyDlg;
 	UINT uidLabel;
-} ENCODEDLG, *PENCODEDLG;
+};
 
-typedef const ENCODEDLG *LPCENCODEDLG;
-
-static INT_PTR CALLBACK SelectDefEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+static INT_PTR CALLBACK SelectDefEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
@@ -1920,7 +1918,7 @@ static INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
-		const LPCENCODEDLG pdd = (LPCENCODEDLG)lParam;
+		const ENCODEDLG * const pdd = reinterpret_cast<const ENCODEDLG*>(lParam);
 		ResizeDlg_Init(hwnd, pdd->cxDlg, pdd->cyDlg, IDC_RESIZEGRIP);
 
 		WCHAR wch[256];
@@ -1958,7 +1956,7 @@ static INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 	return TRUE;
 
 	case WM_DESTROY: {
-		PENCODEDLG pdd = (PENCODEDLG)GetWindowLongPtr(hwnd, DWLP_USER);
+		ENCODEDLG * pdd = reinterpret_cast<ENCODEDLG *>(GetWindowLongPtr(hwnd, DWLP_USER));
 		ResizeDlg_Destroy(hwnd, &pdd->cxDlg, &pdd->cyDlg);
 		HIMAGELIST himl = TreeView_GetImageList(GetDlgItem(hwnd, IDC_ENCODINGLIST), TVSIL_NORMAL);
 		ImageList_Destroy(himl);
@@ -2013,7 +2011,7 @@ static INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 		switch (LOWORD(wParam)) {
 		case IDOK: {
 			HWND hwndTV = GetDlgItem(hwnd, IDC_ENCODINGLIST);
-			PENCODEDLG pdd = (PENCODEDLG)GetWindowLongPtr(hwnd, DWLP_USER);
+			ENCODEDLG * pdd = reinterpret_cast<ENCODEDLG *>(GetWindowLongPtr(hwnd, DWLP_USER));
 			if (Encoding_GetFromTreeView(hwndTV, &pdd->idEncoding, false)) {
 				EndDialog(hwnd, IDOK);
 			} else {
@@ -2267,7 +2265,7 @@ void ZoomLevelDlg(HWND hwnd, bool bBottom) noexcept {
 
 extern EditAutoCompletionConfig autoCompletionConfig;
 
-static INT_PTR CALLBACK AutoCompletionSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+static INT_PTR CALLBACK AutoCompletionSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	UNREFERENCED_PARAMETER(lParam);
 
 	switch (umsg) {
@@ -2555,7 +2553,7 @@ static INT_PTR CALLBACK AutoSaveSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 			GetDlgItemText(hwnd, IDC_AUTOSAVE_PERIOD, tch, COUNTOF(tch));
 			float period = 0;
 			StrToFloat(tch, &period);
-			dwAutoSavePeriod = (DWORD)(period * 1000);
+			dwAutoSavePeriod = static_cast<int>(period * 1000);
 			EndDialog(hwnd, IDOK);
 		}
 		break;
@@ -2584,6 +2582,8 @@ bool AutoSaveSettingsDlg(HWND hwnd) noexcept {
 // InfoBoxDlgProc()
 //
 //
+namespace {
+
 struct INFOBOX {
 	LPWSTR lpstrMessage;
 	LPCWSTR lpstrSetting;
@@ -2591,19 +2591,17 @@ struct INFOBOX {
 	bool   bDisableCheckBox;
 };
 
-typedef const INFOBOX * LPCINFOBOX;
-
 enum SuppressMmessage {
 	SuppressMmessage_None = 0,
 	SuppressMmessage_Suppress,
 	SuppressMmessage_Never,
 };
 
-static INT_PTR CALLBACK InfoBoxDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
+INT_PTR CALLBACK InfoBoxDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
-		const LPCINFOBOX lpib = (LPCINFOBOX)lParam;
+		const INFOBOX * const lpib = reinterpret_cast<const INFOBOX *>(lParam);
 
 		SendDlgItemMessage(hwnd, IDC_INFOBOXICON, STM_SETICON, (WPARAM)LoadIcon(nullptr, lpib->idiIcon), 0);
 		SetDlgItemText(hwnd, IDC_INFOBOXTEXT, lpib->lpstrMessage);
@@ -2633,7 +2631,7 @@ static INT_PTR CALLBACK InfoBoxDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 		case IDYES:
 		case IDNO:
 			if (IsButtonChecked(hwnd, IDC_INFOBOXCHECK)) {
-				const LPCINFOBOX lpib = (LPCINFOBOX)GetWindowLongPtr(hwnd, DWLP_USER);
+				const INFOBOX * const lpib = reinterpret_cast<const INFOBOX *>(GetWindowLongPtr(hwnd, DWLP_USER));
 				IniSetBool(INI_SECTION_NAME_SUPPRESSED_MESSAGES, lpib->lpstrSetting, true);
 			}
 			EndDialog(hwnd, LOWORD(wParam));
@@ -2642,6 +2640,8 @@ static INT_PTR CALLBACK InfoBoxDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 		return TRUE;
 	}
 	return FALSE;
+}
+
 }
 
 //=============================================================================

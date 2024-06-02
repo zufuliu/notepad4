@@ -611,7 +611,7 @@ static inline LPCWSTR GetStyleThemeFilePath() noexcept {
 	return (np2StyleTheme == StyleTheme_Dark) ? darkStyleThemeFilePath : szIniFile;
 }
 
-static inline void FindDarkThemeFile(void) {
+static inline void FindDarkThemeFile() noexcept {
 	FindExtraIniFile(darkStyleThemeFilePath, L"Notepad4 DarkTheme.ini", L"DarkTheme.ini");
 }
 
@@ -722,7 +722,7 @@ void Style_GetFavoriteSchemes() noexcept {
 	}
 }
 
-static int __cdecl CmpEditLexerByOrder(const void *p1, const void *p2) {
+static int __cdecl CmpEditLexerByOrder(const void *p1, const void *p2) noexcept {
 	LPCEDITLEXER pLex1 = *(LPCEDITLEXER *)(p1);
 	LPCEDITLEXER pLex2 = *(LPCEDITLEXER *)(p2);
 	int cmp = pLex2->iFavoriteOrder - pLex1->iFavoriteOrder;
@@ -735,7 +735,7 @@ static int __cdecl CmpEditLexerByOrder(const void *p1, const void *p2) {
 	return cmp;
 }
 
-static int __cdecl CmpEditLexerByName(const void *p1, const void *p2) {
+static int __cdecl CmpEditLexerByName(const void *p1, const void *p2) noexcept {
 	LPCEDITLEXER pLex1 = *(LPCEDITLEXER *)(p1);
 	LPCEDITLEXER pLex2 = *(LPCEDITLEXER *)(p2);
 	// TODO: sort by localized name
@@ -3907,7 +3907,7 @@ static HTREEITEM Style_AddAllLexerToTreeView(HWND hwndTV, bool withStyles, bool 
 	TreeView_SetExtendedStyle(hwndTV, TVS_EX_DOUBLEBUFFER, TVS_EX_DOUBLEBUFFER);
 	SetExplorerTheme(hwndTV);
 
-	const DWORD iconFlags = SHGFI_USEFILEATTRIBUTES | SHGFI_SMALLICON | SHGFI_SYSICONINDEX;
+	constexpr DWORD iconFlags = SHGFI_USEFILEATTRIBUTES | SHGFI_SMALLICON | SHGFI_SYSICONINDEX;
 	SHFILEINFO shfi;
 	HIMAGELIST himl = (HIMAGELIST)SHGetFileInfo(L"C:\\", 0, &shfi, sizeof(SHFILEINFO), iconFlags);
 	TreeView_SetImageList(hwndTV, himl, TVSIL_NORMAL);
@@ -4018,7 +4018,7 @@ static HTREEITEM Style_AddAllLexerToTreeView(HWND hwndTV, bool withStyles, bool 
 	return hFavoriteNode;
 }
 
-static void Style_ResetStyle(LPCEDITLEXER pLex, PEDITSTYLE pStyle) {
+static void Style_ResetStyle(LPCEDITLEXER pLex, EDITSTYLE *pStyle) {
 	if (np2StyleTheme != StyleTheme_Default) {
 		// reload style from external file
 		LPCWSTR themePath = GetStyleThemeFilePath();
@@ -4045,7 +4045,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 	static bool fLexerSelected;
 	static int iCurrentStyleIndex;
 	static PEDITLEXER pCurrentLexer;
-	static PEDITSTYLE pCurrentStyle;
+	static EDITSTYLE *pCurrentStyle;
 	//static HBRUSH hbrFore;
 	//static HBRUSH hbrBack;
 
@@ -4177,7 +4177,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 						pCurrentLexer = (PEDITLEXER)lpnmtv->itemNew.lParam;
 					} else {
 						pCurrentLexer = (PEDITLEXER)item.lParam;
-						pCurrentStyle = (PEDITSTYLE)lpnmtv->itemNew.lParam;
+						pCurrentStyle = reinterpret_cast<EDITSTYLE *>(lpnmtv->itemNew.lParam);
 					}
 				}
 				if (hParent == nullptr || fLexerSelected) {
@@ -4701,7 +4701,7 @@ static void Lexer_OnCheckStateChanged(HWND hwndTV, HTREEITEM hFavoriteNode, HTRE
 	if (checked) {
 		// append node into Favorite Schemes
 		if (!found) {
-			const DWORD iconFlags = SHGFI_USEFILEATTRIBUTES | SHGFI_SMALLICON | SHGFI_SYSICONINDEX;
+			constexpr DWORD iconFlags = SHGFI_USEFILEATTRIBUTES | SHGFI_SMALLICON | SHGFI_SYSICONINDEX;
 			hTreeNode = TreeView_GetLastVisible(hwndTV);
 			hParent = Style_AddLexerToTreeView(hwndTV, pLex, iconFlags, hFavoriteNode, hInsertAfter, false);
 			TreeView_SetCheckState(hwndTV, hParent, TRUE);
@@ -4815,7 +4815,7 @@ static void Lexer_OnDragDrop(HWND hwndTV, HTREEITEM hFavoriteNode, HTREEITEM hDr
 	HTREEITEM hInsertAfter = expanded ? ((htiTarget == hFavoriteNode)? TVI_FIRST : htiTarget) : hLastChild;
 	PEDITLEXER pLex = (PEDITLEXER)lParam;
 
-	const DWORD iconFlags = SHGFI_USEFILEATTRIBUTES | SHGFI_SMALLICON | SHGFI_SYSICONINDEX;
+	constexpr DWORD iconFlags = SHGFI_USEFILEATTRIBUTES | SHGFI_SMALLICON | SHGFI_SYSICONINDEX;
 	hTreeNode = Style_AddLexerToTreeView(hwndTV, pLex, iconFlags, hFavoriteNode, hInsertAfter, false);
 	TreeView_SetCheckState(hwndTV, hTreeNode, TRUE);
 	if (expanded) {

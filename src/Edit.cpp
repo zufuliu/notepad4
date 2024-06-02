@@ -4708,7 +4708,7 @@ static void FindReplaceSetFont(HWND hwnd, bool monospaced, HFONT *hFontFindRepla
 	}
 }
 
-static bool CopySelectionAsFindText(HWND hwnd, LPEDITFINDREPLACE lpefr, bool bFirstTime) noexcept {
+static bool CopySelectionAsFindText(HWND hwnd, EDITFINDREPLACE *lpefr, bool bFirstTime) noexcept {
 	const Sci_Position cchSelection = SciCall_GetSelTextLength();
 	char *lpszSelection = nullptr;
 
@@ -4778,7 +4778,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		// Load MRUs
 		MRU_AddToCombobox(&mruFind, hwndFind);
 
-		LPEDITFINDREPLACE lpefr = (LPEDITFINDREPLACE)lParam;
+		EDITFINDREPLACE * const lpefr = reinterpret_cast<EDITFINDREPLACE *>(lParam);
 		// don't copy selection after toggle find & replace on this window.
 		bool hasFindText = false;
 		if (bSwitchedFindReplace != 3) {
@@ -4882,7 +4882,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 	case APPM_COPYDATA: {
 		HWND hwndFind = GetDlgItem(hwnd, IDC_FINDTEXT);
 		HWND hwndRepl = GetDlgItem(hwnd, IDC_REPLACETEXT);
-		LPEDITFINDREPLACE lpefr = (LPEDITFINDREPLACE)GetWindowLongPtr(hwnd, DWLP_USER);
+		EDITFINDREPLACE * const lpefr = reinterpret_cast<EDITFINDREPLACE *>(GetWindowLongPtr(hwnd, DWLP_USER));
 
 		const bool hasFindText = CopySelectionAsFindText(hwnd, lpefr, false);
 		if (!GetWindowTextLength(hwndFind)) {
@@ -4989,7 +4989,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		case IDC_REPLACEINSEL:
 		case IDACC_SELTONEXT:
 		case IDACC_SELTOPREV: {
-			LPEDITFINDREPLACE lpefr = (LPEDITFINDREPLACE)GetWindowLongPtr(hwnd, DWLP_USER);
+			EDITFINDREPLACE * const lpefr = reinterpret_cast<EDITFINDREPLACE *>(GetWindowLongPtr(hwnd, DWLP_USER));
 			HWND hwndFind = GetDlgItem(hwnd, IDC_FINDTEXT);
 			HWND hwndRepl = GetDlgItem(hwnd, IDC_REPLACETEXT);
 			const bool bIsFindDlg = (hwndRepl == nullptr);
@@ -5152,7 +5152,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 
 		case IDACC_SAVEFIND: {
 			SendWMCommand(hwndMain, IDM_EDIT_SAVEFIND);
-			LPCEDITFINDREPLACE lpefr = (LPCEDITFINDREPLACE)GetWindowLongPtr(hwnd, DWLP_USER);
+			const EDITFINDREPLACE * const lpefr = reinterpret_cast<const EDITFINDREPLACE *>(GetWindowLongPtr(hwnd, DWLP_USER));
 			SetDlgItemTextA2W(CP_UTF8, hwnd, IDC_FINDTEXT, lpefr->szFindUTF8);
 			CheckDlgButton(hwnd, IDC_FINDREGEXP, BST_UNCHECKED);
 			CheckDlgButton(hwnd, IDC_FINDTRANSFORMBS, BST_UNCHECKED);
@@ -5162,7 +5162,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 
 		case IDC_TOGGLEFINDREPLACE: {
 			bSwitchedFindReplace |= 2;
-			LPEDITFINDREPLACE lpefr = (LPEDITFINDREPLACE)GetWindowLongPtr(hwnd, DWLP_USER);
+			EDITFINDREPLACE * const lpefr = reinterpret_cast<EDITFINDREPLACE *>(GetWindowLongPtr(hwnd, DWLP_USER));
 			GetDlgPos(hwnd, &xFindReplaceDlgSave, &yFindReplaceDlgSave);
 			memcpy(&efrSave, lpefr, sizeof(EDITFINDREPLACE));
 			GetDlgItemTextA2W(CP_UTF8, hwnd, IDC_FINDTEXT, lpefr->szFindUTF8, COUNTOF(lpefr->szFindUTF8));
@@ -5246,7 +5246,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 //
 // EditFindReplaceDlg()
 //
-HWND EditFindReplaceDlg(HWND hwnd, LPEDITFINDREPLACE lpefr, bool bReplace) noexcept {
+HWND EditFindReplaceDlg(HWND hwnd, EDITFINDREPLACE *lpefr, bool bReplace) noexcept {
 	lpefr->hwnd = hwnd;
 	HWND hDlg = CreateThemedDialogParam(g_hInstance,
 								   (bReplace) ? MAKEINTRESOURCE(IDD_REPLACE) : MAKEINTRESOURCE(IDD_FIND),
@@ -5285,7 +5285,7 @@ static void EscapeWildcards(char *szFind2) noexcept {
 	strncpy(szFind2, szWildcardEscaped, COUNTOF(szWildcardEscaped));
 }
 
-int EditPrepareFind(char *szFind2, LPCEDITFINDREPLACE lpefr) noexcept {
+int EditPrepareFind(char *szFind2, const EDITFINDREPLACE *lpefr) noexcept {
 	if (StrIsEmpty(lpefr->szFind)) {
 		return NP2_InvalidSearchFlags;
 	}
@@ -5311,7 +5311,7 @@ int EditPrepareFind(char *szFind2, LPCEDITFINDREPLACE lpefr) noexcept {
 	return searchFlags;
 }
 
-int EditPrepareReplace(HWND hwnd, char *szFind2, char **pszReplace2, BOOL *bReplaceRE, LPCEDITFINDREPLACE lpefr) noexcept {
+int EditPrepareReplace(HWND hwnd, char *szFind2, char **pszReplace2, BOOL *bReplaceRE, const EDITFINDREPLACE *lpefr) noexcept {
 	const int searchFlags = EditPrepareFind(szFind2, lpefr);
 	if (searchFlags == NP2_InvalidSearchFlags) {
 		return searchFlags;
@@ -5339,7 +5339,7 @@ int EditPrepareReplace(HWND hwnd, char *szFind2, char **pszReplace2, BOOL *bRepl
 //
 // EditFindNext()
 //
-void EditFindNext(LPCEDITFINDREPLACE lpefr, bool fExtendSelection) noexcept {
+void EditFindNext(const EDITFINDREPLACE *lpefr, bool fExtendSelection) noexcept {
 	char szFind2[NP2_FIND_REPLACE_LIMIT];
 	const int searchFlags = EditPrepareFind(szFind2, lpefr);
 	if (searchFlags == NP2_InvalidSearchFlags) {
@@ -5381,7 +5381,7 @@ void EditFindNext(LPCEDITFINDREPLACE lpefr, bool fExtendSelection) noexcept {
 //
 // EditFindPrev()
 //
-void EditFindPrev(LPCEDITFINDREPLACE lpefr, bool fExtendSelection) noexcept {
+void EditFindPrev(const EDITFINDREPLACE *lpefr, bool fExtendSelection) noexcept {
 	char szFind2[NP2_FIND_REPLACE_LIMIT];
 	const int searchFlags = EditPrepareFind(szFind2, lpefr);
 	if (searchFlags == NP2_InvalidSearchFlags) {
@@ -5423,7 +5423,7 @@ void EditFindPrev(LPCEDITFINDREPLACE lpefr, bool fExtendSelection) noexcept {
 //
 // EditReplace()
 //
-bool EditReplace(HWND hwnd, LPCEDITFINDREPLACE lpefr) noexcept {
+bool EditReplace(HWND hwnd, const EDITFINDREPLACE *lpefr) noexcept {
 	BOOL bReplaceRE;
 	char szFind2[NP2_FIND_REPLACE_LIMIT];
 	char *pszReplace2;
@@ -5756,7 +5756,7 @@ void EditMarkAll(BOOL bChanged, bool matchCase, bool wholeWord, bool bookmark) {
 	EditMarkAll_Start(bChanged, findFlag, iSelCount, pszText);
 }
 
-void EditFindAll(LPCEDITFINDREPLACE lpefr, bool selectAll) {
+void EditFindAll(const EDITFINDREPLACE *lpefr, bool selectAll) {
 	char *szFind2 = (char *)NP2HeapAlloc(NP2_FIND_REPLACE_LIMIT);
 	int searchFlags = EditPrepareFind(szFind2, lpefr);
 	if (searchFlags == NP2_InvalidSearchFlags) {
@@ -5828,7 +5828,7 @@ static void ShwowReplaceCount(Sci_Position iCount) noexcept {
 //
 // EditReplaceAll()
 //
-bool EditReplaceAll(HWND hwnd, LPCEDITFINDREPLACE lpefr, bool bShowInfo) noexcept {
+bool EditReplaceAll(HWND hwnd, const EDITFINDREPLACE *lpefr, bool bShowInfo) noexcept {
 	BOOL bReplaceRE;
 	char szFind2[NP2_FIND_REPLACE_LIMIT];
 	char *pszReplace2;
@@ -5908,7 +5908,7 @@ bool EditReplaceAll(HWND hwnd, LPCEDITFINDREPLACE lpefr, bool bShowInfo) noexcep
 //
 // EditReplaceAllInSelection()
 //
-bool EditReplaceAllInSelection(HWND hwnd, LPCEDITFINDREPLACE lpefr, bool bShowInfo) noexcept {
+bool EditReplaceAllInSelection(HWND hwnd, const EDITFINDREPLACE *lpefr, bool bShowInfo) noexcept {
 	if (SciCall_IsRectangleSelection()) {
 		NotifyRectangleSelection();
 		return false;
@@ -6740,8 +6740,7 @@ void EditInsertUnicodeControlCharacter(int menu) noexcept {
 }
 
 void EditShowUnicodeControlCharacter(bool bShow) noexcept {
-	for (UINT i = 0; i < COUNTOF(kUnicodeControlCharacterTable); i++) {
-		const UnicodeControlCharacter ucc = kUnicodeControlCharacterTable[i];
+	for (const auto ucc : kUnicodeControlCharacterTable) {
 		if (StrIsEmpty(ucc.representation)) {
 			// built-in
 			continue;
@@ -7036,7 +7035,7 @@ char *EditGetStringAroundCaret(LPCSTR delimiters) noexcept {
 	}
 
 	Sci_TextToFindFull ft = { { iCurrentPos, 0 }, delimiters, { 0, 0 } };
-	const int findFlag = NP2_RegexDefaultFlags;
+	constexpr int findFlag = NP2_RegexDefaultFlags;
 
 	// forward
 	if (iCurrentPos < iLineEnd) {
