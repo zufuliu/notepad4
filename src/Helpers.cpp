@@ -452,35 +452,35 @@ HBITMAP ResizeImageForCurrentDPI(HBITMAP hbmp) noexcept {
 }
 
 
-void BackgroundWorker_Init(BackgroundWorker *worker, HWND hwnd) {
-	worker->hwnd = hwnd;
-	worker->eventCancel = CreateEvent(NULL, TRUE, FALSE, NULL);
-	worker->workerThread = NULL;
+void BackgroundWorker::Init(HWND owner) noexcept {
+	hwnd = owner;
+	eventCancel = CreateEvent(nullptr, TRUE, FALSE, nullptr);
+	workerThread = nullptr;
 }
 
-void BackgroundWorker_Stop(BackgroundWorker *worker) {
-	SetEvent(worker->eventCancel);
-	HANDLE workerThread = InterlockedExchangePointer(&worker->workerThread, NULL);
-	if (workerThread) {
-		while (WaitForSingleObject(workerThread, 0) != WAIT_OBJECT_0) {
+void BackgroundWorker::Stop() noexcept {
+	SetEvent(eventCancel);
+	HANDLE worker = InterlockedExchangePointer(&workerThread, nullptr);
+	if (worker) {
+		while (WaitForSingleObject(worker, 0) != WAIT_OBJECT_0) {
 			MSG msg;
 			if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
 			}
 		}
-		CloseHandle(workerThread);
+		CloseHandle(worker);
 	}
 }
 
-void BackgroundWorker_Cancel(BackgroundWorker *worker) {
-	BackgroundWorker_Stop(worker);
-	ResetEvent(worker->eventCancel);
+void BackgroundWorker::Cancel() noexcept {
+	Stop();
+	ResetEvent(eventCancel);
 }
 
-void BackgroundWorker_Destroy(BackgroundWorker *worker) {
-	BackgroundWorker_Stop(worker);
-	CloseHandle(worker->eventCancel);
+void BackgroundWorker::Destroy() noexcept {
+	Stop();
+	CloseHandle(eventCancel);
 }
 
 //=============================================================================

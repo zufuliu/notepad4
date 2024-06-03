@@ -988,7 +988,7 @@ extern int cxFileMRUDlg;
 extern int cyFileMRUDlg;
 
 static DWORD WINAPI FileMRUIconThread(LPVOID lpParam) noexcept {
-	BackgroundWorker *worker = (BackgroundWorker *)lpParam;
+	const BackgroundWorker * const worker = reinterpret_cast<const BackgroundWorker *>(lpParam);
 
 	WCHAR tch[MAX_PATH] = L"";
 	DWORD dwFlags = SHGFI_SMALLICON | SHGFI_SYSICONINDEX | SHGFI_ATTRIBUTES | SHGFI_ATTR_SPECIFIED;
@@ -1000,7 +1000,7 @@ static DWORD WINAPI FileMRUIconThread(LPVOID lpParam) noexcept {
 	LV_ITEM lvi;
 	memset(&lvi, 0, sizeof(LV_ITEM));
 
-	while (iItem < iMaxItem && BackgroundWorker_Continue(worker)) {
+	while (iItem < iMaxItem && worker->Continue()) {
 		lvi.mask = LVIF_TEXT;
 		lvi.pszText = tch;
 		lvi.cchTextMax = COUNTOF(tch);
@@ -1066,9 +1066,9 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 		HWND hwndLV = GetDlgItem(hwnd, IDC_FILEMRU);
 		InitWindowCommon(hwndLV);
 
-		BackgroundWorker *worker = (BackgroundWorker *)GlobalAlloc(GPTR, sizeof(BackgroundWorker));
-		SetProp(hwnd, L"it", (HANDLE)worker);
-		BackgroundWorker_Init(worker, hwndLV);
+		BackgroundWorker *worker = static_cast<BackgroundWorker *>(GlobalAlloc(GPTR, sizeof(BackgroundWorker)));
+		SetProp(hwnd, L"it", worker);
+		worker->Init(hwndLV);
 
 		ResizeDlg_Init(hwnd, cxFileMRUDlg, cyFileMRUDlg, IDC_RESIZEGRIP);
 
@@ -1102,8 +1102,8 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 	return TRUE;
 
 	case WM_DESTROY: {
-		BackgroundWorker *worker = (BackgroundWorker *)GetProp(hwnd, L"it");
-		BackgroundWorker_Destroy(worker);
+		BackgroundWorker *worker = static_cast<BackgroundWorker *>(GetProp(hwnd, L"it"));
+		worker->Destroy();
 		RemoveProp(hwnd, L"it");
 		GlobalFree(worker);
 
@@ -1224,8 +1224,8 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDC_FILEMRU_UPDATE_VIEW: {
-			BackgroundWorker *worker = (BackgroundWorker *)GetProp(hwnd, L"it");
-			BackgroundWorker_Cancel(worker);
+			BackgroundWorker *worker = static_cast<BackgroundWorker *>(GetProp(hwnd, L"it"));
+			worker->Cancel();
 
 			HWND hwndLV = GetDlgItem(hwnd, IDC_FILEMRU);
 			ListView_DeleteAllItems(hwndLV);
@@ -1631,7 +1631,7 @@ static void SyncSchemeTabSettings(HWND hwnd) noexcept {
 	EnableWindow(GetDlgItem(hwnd, IDC_FILE_TAB_AS_SPACE), !useScheme);
 }
 
-static INT_PTR CALLBACK TabSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+static INT_PTR CALLBACK TabSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	UNREFERENCED_PARAMETER(lParam);
 
 	switch (umsg) {

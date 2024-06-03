@@ -394,13 +394,15 @@ struct BackgroundWorker {
 	HWND hwnd;
 	HANDLE eventCancel;
 	HANDLE workerThread;
-};
 
-void BackgroundWorker_Init(BackgroundWorker *worker, HWND hwnd);
-void BackgroundWorker_Cancel(BackgroundWorker *worker);
-void BackgroundWorker_Destroy(BackgroundWorker *worker);
-#define BackgroundWorker_Continue(worker)	\
-	(WaitForSingleObject((worker)->eventCancel, 0) != WAIT_OBJECT_0)
+	void Init(HWND owner) noexcept;
+	void Stop() noexcept;
+	void Cancel() noexcept;
+	void Destroy() noexcept;
+	bool Continue() const noexcept {
+		return WaitForSingleObject(eventCancel, 0) != WAIT_OBJECT_0;
+	}
+};
 
 HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(LPCWSTR AppID) noexcept;
 bool IsElevated() noexcept;

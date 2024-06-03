@@ -53,7 +53,7 @@ static const WCHAR *pDirListProp = L"DirListData";
 //
 // Initializes the DLDATA structure and sets up the listview control
 //
-void DirList_Init(HWND hwnd, LPCWSTR pszHeader) {
+void DirList_Init(HWND hwnd, LPCWSTR pszHeader) noexcept {
 	UNREFERENCED_PARAMETER(pszHeader);
 
 	// Allocate DirListData Property
@@ -61,7 +61,7 @@ void DirList_Init(HWND hwnd, LPCWSTR pszHeader) {
 	SetProp(hwnd, pDirListProp, (HANDLE)lpdl);
 
 	// Setup dl
-	BackgroundWorker_Init(&lpdl->worker, hwnd);
+	lpdl->worker.Init(hwnd);
 	lpdl->cbidl = 0;
 	lpdl->pidl = nullptr;
 	lpdl->lpsf = nullptr;
@@ -97,7 +97,7 @@ void DirList_Init(HWND hwnd, LPCWSTR pszHeader) {
 void DirList_Destroy(HWND hwnd) {
 	LPDLDATA lpdl = (LPDLDATA)GetProp(hwnd, pDirListProp);
 
-	BackgroundWorker_Destroy(&lpdl->worker);
+	lpdl->worker.Destroy();
 
 	if (lpdl->pidl) {
 		CoTaskMemFree((LPVOID)(lpdl->pidl));
@@ -118,11 +118,11 @@ void DirList_Destroy(HWND hwnd) {
 //
 // Start thread to extract file icons in the background
 //
-void DirList_StartIconThread(HWND hwnd) {
+void DirList_StartIconThread(HWND hwnd) noexcept {
 	LPDLDATA lpdl = (LPDLDATA)GetProp(hwnd, pDirListProp);
 
-	BackgroundWorker_Cancel(&lpdl->worker);
-	lpdl->worker.workerThread = CreateThread(NULL, 0, DirList_IconThread, (LPVOID)lpdl, 0, NULL);
+	lpdl->worker.Cancel();
+	lpdl->worker.workerThread = CreateThread(nullptr, 0, DirList_IconThread, lpdl, 0, nullptr);
 }
 
 //=============================================================================
@@ -146,7 +146,7 @@ int DirList_Fill(HWND hwnd, LPCWSTR lpszDir, DWORD grfFlags, LPCWSTR lpszFileSpe
 	lpdl->iDefIconFile = shfi.iIcon;
 
 	// First of all terminate running icon thread
-	BackgroundWorker_Cancel(&lpdl->worker);
+	lpdl->worker.Cancel();
 
 	// A Directory is strongly required
 	if (StrIsEmpty(lpszDir)) {
@@ -265,14 +265,14 @@ int DirList_Fill(HWND hwnd, LPCWSTR lpszDir, DWORD grfFlags, LPCWSTR lpszFileSpe
 //
 DWORD WINAPI DirList_IconThread(LPVOID lpParam) {
 	LPDLDATA lpdl = (LPDLDATA)lpParam;
-	BackgroundWorker *worker = &lpdl->worker;
+	const BackgroundWorker &worker = lpdl->worker;
 
 	// Exit immediately if DirList_Fill() hasn't been called
 	if (!lpdl->lpsf) {
 		return 0;
 	}
 
-	HWND hwnd = worker->hwnd;
+	HWND hwnd = worker.hwnd;
 	const int iMaxItem = ListView_GetItemCount(hwnd);
 
 	// Get IShellIcon
@@ -280,7 +280,7 @@ DWORD WINAPI DirList_IconThread(LPVOID lpParam) {
 	lpdl->lpsf->QueryInterface(IID_IShellIcon, reinterpret_cast<void **>(&lpshi));
 
 	int iItem = 0;
-	while (iItem < iMaxItem && BackgroundWorker_Continue(worker)) {
+	while (iItem < iMaxItem && worker.Continue()) {
 		LV_ITEM lvi;
 		lvi.iItem = iItem;
 		lvi.mask = LVIF_PARAM;
@@ -443,7 +443,7 @@ int CALLBACK DirList_CompareProcRw(LPARAM lp1, LPARAM lp2, LPARAM lFlags) {
 //
 // Sorts the listview control by the specified order
 //
-BOOL DirList_Sort(HWND hwnd, int lFlags, bool fRev) {
+BOOL DirList_Sort(HWND hwnd, int lFlags, bool fRev) noexcept {
 	return ListView_SortItems(hwnd, (fRev? DirList_CompareProcRw : DirList_CompareProcFw), lFlags);
 }
 
@@ -508,7 +508,7 @@ int DirList_GetItem(HWND hwnd, int iItem, LPDLITEM lpdli) {
 //
 // Retrieves extended infomration on a dirlist item
 //
-int DirList_GetItemEx(HWND hwnd, int iItem, LPWIN32_FIND_DATA pfd) {
+int DirList_GetItemEx(HWND hwnd, int iItem, LPWIN32_FIND_DATA pfd) noexcept {
 	if (iItem < 0) {
 		if (ListView_GetSelectedCount(hwnd)) {
 			iItem = ListView_GetNextItem(hwnd, -1, LVNI_ALL | LVNI_SELECTED);
@@ -590,7 +590,7 @@ bool DirList_PropertyDlg(HWND hwnd, int iItem) {
 //
 // Get long pathname for currently displayed directory
 //
-bool DirList_GetLongPathName(HWND hwnd, LPWSTR lpszLongPath) {
+bool DirList_GetLongPathName(HWND hwnd, LPWSTR lpszLongPath) noexcept {
 	WCHAR tch[MAX_PATH];
 	const LPCDLDATA lpdl = (LPCDLDATA)GetProp(hwnd, pDirListProp);
 	if (SHGetPathFromIDList((PCIDLIST_ABSOLUTE)(lpdl->pidl), tch)) {
@@ -730,7 +730,7 @@ typedef const DC_ITEMDATA * LPCDC_ITEMDATA;
 //
 // Initializes the drive box
 //
-bool DriveBox_Init(HWND hwnd) {
+bool DriveBox_Init(HWND hwnd) noexcept {
 	SHFILEINFO shfi;
 	HIMAGELIST hil = (HIMAGELIST)SHGetFileInfo(L"C:\\", 0, &shfi, sizeof(SHFILEINFO), SHGFI_SMALLICON | SHGFI_SYSICONINDEX);
 	SendMessage(hwnd, CBEM_SETIMAGELIST, 0, (LPARAM)hil);
@@ -771,7 +771,7 @@ int DriveBox_Fill(HWND hwnd) {
 			LPSHELLFOLDER lpsf; // Workspace == CSIDL_DRIVES
 			if (S_OK == lpsfDesktop->BindToObject(pidl, nullptr, IID_IShellFolder, reinterpret_cast<void **>(&lpsf))) {
 				// Create an Enumeration object for lpsf
-				const DWORD grfFlags = SHCONTF_FOLDERS;
+				constexpr DWORD grfFlags = SHCONTF_FOLDERS;
 				LPENUMIDLIST lpe;
 				if (S_OK == lpsf->EnumObjects(hwnd, grfFlags, &lpe)) {
 					// Enumerate the contents of [My Computer]
