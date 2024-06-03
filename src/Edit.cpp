@@ -4899,14 +4899,14 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			DeleteObject(hFontFindReplaceEdit);
 			hFontFindReplaceEdit = nullptr;
 		}
-		ResizeDlg_Destroy(hwnd, &cxFindReplaceDlg, NULL);
+		ResizeDlg_Destroy(hwnd, &cxFindReplaceDlg, nullptr);
 		return FALSE;
 
 	case WM_SIZE: {
 		int dx;
 
 		const bool isReplace = GetDlgItem(hwnd, IDC_REPLACETEXT) != nullptr;
-		ResizeDlg_Size(hwnd, lParam, &dx, NULL);
+		ResizeDlg_Size(hwnd, lParam, &dx, nullptr);
 		HDWP hdwp = BeginDeferWindowPos(isReplace ? 13 : 9);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP2, dx, 0, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, 0, SWP_NOSIZE);
@@ -6380,7 +6380,7 @@ bool EditAlignDlg(HWND hwnd, EditAlignMode *piAlignMode) noexcept {
 // EditEncloseSelectionDlgProc()
 //
 //
-static INT_PTR CALLBACK EditEncloseSelectionDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+static INT_PTR CALLBACK EditEncloseSelectionDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		ResizeDlg_InitY2(hwnd, cxEncloseSelectionDlg, cyEncloseSelectionDlg, IDC_RESIZEGRIP2, IDC_MODIFY_LINE_PREFIX, IDC_MODIFY_LINE_APPEND);
@@ -6455,7 +6455,7 @@ void EditEncloseSelectionDlg(HWND hwnd) noexcept {
 // EditInsertTagDlgProc()
 //
 //
-static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		ResizeDlg_InitY2(hwnd, cxInsertTagDlg, cyInsertTagDlg, IDC_RESIZEGRIP2, IDC_MODIFY_LINE_PREFIX, IDC_MODIFY_LINE_APPEND);

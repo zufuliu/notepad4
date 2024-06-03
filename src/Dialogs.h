@@ -35,7 +35,7 @@ int 	MsgBox(UINT uType, UINT uIdMsg, ...) noexcept;
 void	DisplayCmdLineHelp(HWND hwnd) noexcept;
 void	OpenHelpLink(HWND hwnd, int cmd) noexcept;
 bool	GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase) noexcept;
-INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
+INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept;
 void	RunDlg(HWND hwnd, LPCWSTR lpstrDefault) noexcept;
 bool	OpenWithDlg(HWND hwnd, LPCWSTR lpstrFile);
 bool	FavoritesDlg(HWND hwnd, LPWSTR lpstrFile) noexcept;

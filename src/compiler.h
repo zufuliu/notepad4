@@ -15,8 +15,10 @@ typedef _Bool	bool;
 
 #if defined(__GNUC__) || defined(__clang__)
 #define NP2_unreachable()	__builtin_unreachable()
+#define NP2_memchr			__builtin_memchr
 #else
 #define NP2_unreachable()	__assume(0)
+#define NP2_memchr			__builtin_char_memchr
 #endif
 
 #if defined(__clang__)

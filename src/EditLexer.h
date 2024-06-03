@@ -76,7 +76,7 @@ struct KEYWORDLIST {
 	const char * const pszKeyWords[KEYWORDSET_MAX + 1];
 };
 
-typedef struct EDITLEXER {
+struct EDITLEXER {
 	const int iLexer;
 	const int rid;
 	// default settings for this scheme, auto generated from LexerConfig.py
@@ -114,9 +114,10 @@ typedef struct EDITLEXER {
 	const wchar_t * const pszDefExt;
 	const KEYWORDLIST * const pKeyWords;
 	EDITSTYLE * const Styles;
-} EDITLEXER, *PEDITLEXER;
+};
 
-typedef const EDITLEXER *LPCEDITLEXER;
+using PEDITLEXER = EDITLEXER *;
+using LPCEDITLEXER = const EDITLEXER *;
 
 #endif  // !RC_INVOKED
 

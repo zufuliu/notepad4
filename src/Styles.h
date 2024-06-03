@@ -84,24 +84,24 @@ void	Style_Load(void);
 void	Style_Save(void);
 bool	Style_Import(HWND hwnd);
 bool	Style_Export(HWND hwnd);
-void	Style_LoadTabSettings(LPCEDITLEXER pLex);
-void	Style_SaveTabSettings(LPCEDITLEXER pLex);
+void	Style_LoadTabSettings(LPCEDITLEXER pLex) noexcept;
+void	Style_SaveTabSettings(LPCEDITLEXER pLex) noexcept;
 void	EditApplyDefaultEncoding(LPCEDITLEXER pLex, BOOL bLexerChanged) noexcept;
 void	InitAutoCompletionCache(LPCEDITLEXER pLex) noexcept;
 
 void	Style_DetectBaseFontSize(HMONITOR hMonitor) noexcept;
 HFONT	Style_CreateCodeFont(UINT dpi) noexcept;
-void	Style_OnDPIChanged(LPCEDITLEXER pLex);
+void	Style_OnDPIChanged(LPCEDITLEXER pLex) noexcept;
 void	Style_OnStyleThemeChanged(int theme);
 void	Style_InitDefaultColor() noexcept;
 void	Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged);
 bool	Style_SetLexerFromFile(LPCWSTR lpszFile);
 void	Style_SetLexerFromName(LPCWSTR lpszFile, LPCWSTR lpszName);
-bool	Style_CanOpenFile(LPCWSTR lpszFile);
+bool	Style_CanOpenFile(LPCWSTR lpszFile) noexcept;
 void	Style_SetLexerFromID(int rid);
 int		Style_GetMatchLexerIndex(int rid) noexcept;
 
-int		Style_GetDocTypeLanguage(void);
+int		Style_GetDocTypeLanguage() noexcept;
 LPCWSTR Style_GetCurrentLexerName(LPWSTR lpszName, int cchName) noexcept;
 void	Style_SetLexerByLangIndex(int lang);
 void	Style_UpdateSchemeMenu(HMENU hmenu) noexcept;
@@ -145,7 +145,7 @@ bool	Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, bool bDefaultSt
 bool	Style_SelectColor(HWND hwnd, LPWSTR lpszStyle, int cchStyle, bool bFore) noexcept;
 void	Style_SetStyles(int iStyle, LPCWSTR lpszStyle) noexcept;
 
-int 	Style_GetLexerIconId(LPCEDITLEXER pLex, DWORD iconFlags);
+int 	Style_GetLexerIconId(LPCEDITLEXER pLex, DWORD iconFlags) noexcept;
 void	Style_ConfigDlg(HWND hwnd);
 void	Style_SelectLexerDlg(HWND hwnd, bool favorite);
 bool	SelectCSVOptionsDlg(void) noexcept;

@@ -269,7 +269,7 @@ bool GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase
 //
 // AboutDlgProc()
 //
-INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		WCHAR wch[128];
@@ -398,7 +398,7 @@ INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 // RunDlgProc()
 //
 extern int cxRunDlg;
-static INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+static INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		ResizeDlg_InitX(hwnd, cxRunDlg, IDC_RESIZEGRIP3);
@@ -414,14 +414,14 @@ static INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 	return TRUE;
 
 	case WM_DESTROY:
-		ResizeDlg_Destroy(hwnd, &cxRunDlg, NULL);
+		ResizeDlg_Destroy(hwnd, &cxRunDlg, nullptr);
 		DeleteBitmapButton(hwnd, IDC_SEARCHEXE);
 		return FALSE;
 
 	case WM_SIZE: {
 		int dx;
 
-		ResizeDlg_Size(hwnd, lParam, &dx, NULL);
+		ResizeDlg_Size(hwnd, lParam, &dx, nullptr);
 		HDWP hdwp = BeginDeferWindowPos(6);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP3, dx, 0, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, 0, SWP_NOSIZE);
@@ -895,7 +895,7 @@ bool FavoritesDlg(HWND hwnd, LPWSTR lpstrFile) noexcept {
 // AddToFavDlgProc()
 //
 //
-static INT_PTR CALLBACK AddToFavDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+static INT_PTR CALLBACK AddToFavDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
@@ -910,13 +910,13 @@ static INT_PTR CALLBACK AddToFavDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 	return TRUE;
 
 	case WM_DESTROY:
-		ResizeDlg_Destroy(hwnd, &cxAddFavoritesDlg, NULL);
+		ResizeDlg_Destroy(hwnd, &cxAddFavoritesDlg, nullptr);
 		return FALSE;
 
 	case WM_SIZE: {
 		int dx;
 
-		ResizeDlg_Size(hwnd, lParam, &dx, NULL);
+		ResizeDlg_Size(hwnd, lParam, &dx, nullptr);
 		HDWP hdwp = BeginDeferWindowPos(5);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP, dx, 0, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, 0, SWP_NOSIZE);
@@ -1914,7 +1914,7 @@ bool SelectDefEncodingDlg(HWND hwnd, int *pidREncoding) noexcept {
 // SelectEncodingDlgProc()
 //
 //
-static INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+static INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);

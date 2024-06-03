@@ -636,25 +636,25 @@ void SetDlgPos(HWND hDlg, int xDlg, int yDlg) noexcept;
 #define ResizeDlgDirection_Both		0
 #define ResizeDlgDirection_OnlyX	1
 #define ResizeDlgDirection_OnlyY	2
-void ResizeDlg_InitEx(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDirection);
-NP2_inline void ResizeDlg_Init(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip) {
+void ResizeDlg_InitEx(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDirection) noexcept;
+inline void ResizeDlg_Init(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip) noexcept {
 	ResizeDlg_InitEx(hwnd, cxFrame, cyFrame, nIdGrip, ResizeDlgDirection_Both);
 }
-NP2_inline void ResizeDlg_InitX(HWND hwnd, int cxFrame, int nIdGrip) {
+inline void ResizeDlg_InitX(HWND hwnd, int cxFrame, int nIdGrip) noexcept {
 	ResizeDlg_InitEx(hwnd, cxFrame, 0, nIdGrip, ResizeDlgDirection_OnlyX);
 }
-NP2_inline void ResizeDlg_InitY(HWND hwnd, int cyFrame, int nIdGrip) {
+inline void ResizeDlg_InitY(HWND hwnd, int cyFrame, int nIdGrip) noexcept {
 	ResizeDlg_InitEx(hwnd, 0, cyFrame, nIdGrip, ResizeDlgDirection_OnlyY);
 }
-void ResizeDlg_Destroy(HWND hwnd, int *cxFrame, int *cyFrame);
-void ResizeDlg_Size(HWND hwnd, LPARAM lParam, int *cx, int *cy);
-void ResizeDlg_GetMinMaxInfo(HWND hwnd, LPARAM lParam);
+void ResizeDlg_Destroy(HWND hwnd, int *cxFrame, int *cyFrame) noexcept;
+void ResizeDlg_Size(HWND hwnd, LPARAM lParam, int *cx, int *cy) noexcept;
+void ResizeDlg_GetMinMaxInfo(HWND hwnd, LPARAM lParam) noexcept;
 
-void ResizeDlg_InitY2Ex(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDirection, int nCtlId1, int nCtlId2);
-NP2_inline void ResizeDlg_InitY2(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int nCtlId1, int nCtlId2) {
+void ResizeDlg_InitY2Ex(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDirection, int nCtlId1, int nCtlId2) noexcept;
+inline void ResizeDlg_InitY2(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int nCtlId1, int nCtlId2) noexcept {
 	ResizeDlg_InitY2Ex(hwnd, cxFrame, cyFrame, nIdGrip, ResizeDlgDirection_Both, nCtlId1, nCtlId2);
 }
-int ResizeDlg_CalcDeltaY2(HWND hwnd, int dy, int cy, int nCtlId1, int nCtlId2);
+int ResizeDlg_CalcDeltaY2(HWND hwnd, int dy, int cy, int nCtlId1, int nCtlId2) noexcept;
 
 HDWP DeferCtlPos(HDWP hdwp, HWND hwndDlg, int nCtlId, int dx, int dy, UINT uFlags) noexcept;
 void ResizeDlgCtl(HWND hwndDlg, int nCtlId, int dx, int dy) noexcept;

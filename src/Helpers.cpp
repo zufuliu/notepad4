@@ -966,7 +966,7 @@ void SetDlgPos(HWND hDlg, int xDlg, int yDlg) noexcept {
 // TODO: all dimensions no longer valid after window DPI changed.
 #define NP2_ENABLE_RESIZEDLG_TEMP_FIX	0
 
-typedef struct RESIZEDLG {
+struct RESIZEDLG {
 	int direction;
 	UINT dpi;
 	int cxClient;
@@ -976,13 +976,11 @@ typedef struct RESIZEDLG {
 	int mmiPtMaxX;	// only Y direction
 	int mmiPtMaxY;	// only X direction
 	int attrs[MAX_RESIZEDLG_ATTR_COUNT];
-} RESIZEDLG, *PRESIZEDLG;
+};
 
-typedef const RESIZEDLG * LPCRESIZEDLG;
-
-void ResizeDlg_InitEx(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDirection) {
+void ResizeDlg_InitEx(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDirection) noexcept {
 	const UINT dpi = GetWindowDPI(hwnd);
-	RESIZEDLG *pm = (RESIZEDLG *)NP2HeapAlloc(sizeof(RESIZEDLG));
+	RESIZEDLG * const pm = static_cast<RESIZEDLG *>(NP2HeapAlloc(sizeof(RESIZEDLG)));
 	pm->direction = iDirection;
 	pm->dpi = dpi;
 
@@ -1009,7 +1007,7 @@ void ResizeDlg_InitEx(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDir
 	cxFrame = max(cxFrame, pm->mmiPtMinX);
 	cyFrame = max(cyFrame, pm->mmiPtMinY);
 
-	SetProp(hwnd, RESIZEDLG_PROP_KEY, (HANDLE)pm);
+	SetProp(hwnd, RESIZEDLG_PROP_KEY, pm);
 
 	SetWindowPos(hwnd, nullptr, rc.left, rc.top, cxFrame, cyFrame, SWP_NOZORDER);
 
@@ -1027,8 +1025,8 @@ void ResizeDlg_InitEx(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDir
 	SetWindowPos(hwndCtl, nullptr, pm->cxClient - cGrip, pm->cyClient - cGrip, cGrip, cGrip, SWP_NOZORDER);
 }
 
-void ResizeDlg_Destroy(HWND hwnd, int *cxFrame, int *cyFrame) {
-	PRESIZEDLG pm = (PRESIZEDLG)GetProp(hwnd, RESIZEDLG_PROP_KEY);
+void ResizeDlg_Destroy(HWND hwnd, int *cxFrame, int *cyFrame) noexcept {
+	RESIZEDLG * const pm = static_cast<RESIZEDLG *>(GetProp(hwnd, RESIZEDLG_PROP_KEY));
 
 	RECT rc;
 	GetWindowRect(hwnd, &rc);
@@ -1043,8 +1041,8 @@ void ResizeDlg_Destroy(HWND hwnd, int *cxFrame, int *cyFrame) {
 	NP2HeapFree(pm);
 }
 
-void ResizeDlg_Size(HWND hwnd, LPARAM lParam, int *cx, int *cy) {
-	PRESIZEDLG pm = (PRESIZEDLG)GetProp(hwnd, RESIZEDLG_PROP_KEY);
+void ResizeDlg_Size(HWND hwnd, LPARAM lParam, int *cx, int *cy) noexcept {
+	RESIZEDLG * const pm = static_cast<RESIZEDLG *>(GetProp(hwnd, RESIZEDLG_PROP_KEY));
 	const int cxClient = LOWORD(lParam);
 	const int cyClient = HIWORD(lParam);
 #if NP2_ENABLE_RESIZEDLG_TEMP_FIX
@@ -1071,9 +1069,9 @@ void ResizeDlg_Size(HWND hwnd, LPARAM lParam, int *cx, int *cy) {
 #endif
 }
 
-void ResizeDlg_GetMinMaxInfo(HWND hwnd, LPARAM lParam) {
-	LPCRESIZEDLG pm = (LPCRESIZEDLG)GetProp(hwnd, RESIZEDLG_PROP_KEY);
-	LPMINMAXINFO lpmmi = (LPMINMAXINFO)lParam;
+void ResizeDlg_GetMinMaxInfo(HWND hwnd, LPARAM lParam) noexcept {
+	const RESIZEDLG *pm = static_cast<RESIZEDLG *>(GetProp(hwnd, RESIZEDLG_PROP_KEY));
+	LPMINMAXINFO lpmmi = reinterpret_cast<LPMINMAXINFO>(lParam);
 #if NP2_ENABLE_RESIZEDLG_TEMP_FIX
 	const UINT dpi = GetWindowDPI(hwnd);
 	const UINT old = pm->dpi;
@@ -1115,16 +1113,16 @@ static inline int GetDlgCtlHeight(HWND hwndDlg, int nCtlId) noexcept {
 	return height;
 }
 
-void ResizeDlg_InitY2Ex(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDirection, int nCtlId1, int nCtlId2) {
+void ResizeDlg_InitY2Ex(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDirection, int nCtlId1, int nCtlId2) noexcept {
 	const int hMin1 = GetDlgCtlHeight(hwnd, nCtlId1);
 	const int hMin2 = GetDlgCtlHeight(hwnd, nCtlId2);
 	ResizeDlg_InitEx(hwnd, cxFrame, cyFrame, nIdGrip, iDirection);
-	PRESIZEDLG pm = (PRESIZEDLG)GetProp(hwnd, RESIZEDLG_PROP_KEY);
+	RESIZEDLG * const pm = static_cast<RESIZEDLG *>(GetProp(hwnd, RESIZEDLG_PROP_KEY));
 	pm->attrs[0] = hMin1;
 	pm->attrs[1] = hMin2;
 }
 
-int ResizeDlg_CalcDeltaY2(HWND hwnd, int dy, int cy, int nCtlId1, int nCtlId2) {
+int ResizeDlg_CalcDeltaY2(HWND hwnd, int dy, int cy, int nCtlId1, int nCtlId2) noexcept {
 	if (dy == 0) {
 		return 0;
 	}
@@ -1132,7 +1130,7 @@ int ResizeDlg_CalcDeltaY2(HWND hwnd, int dy, int cy, int nCtlId1, int nCtlId2) {
 		return MulDiv(dy, cy, 100);
 	}
 
-	const LPCRESIZEDLG pm = (LPCRESIZEDLG)GetProp(hwnd, RESIZEDLG_PROP_KEY);
+	const RESIZEDLG * const pm = static_cast<RESIZEDLG *>(GetProp(hwnd, RESIZEDLG_PROP_KEY));
 #if NP2_ENABLE_RESIZEDLG_TEMP_FIX
 	const UINT dpi = GetWindowDPI(hwnd);
 	const int hMin1 = MulDiv(pm->attrs[0], dpi, pm->dpi);

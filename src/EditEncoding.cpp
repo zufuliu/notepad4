@@ -1074,8 +1074,8 @@ static int DetectUnicode(char *pTest, DWORD nLength, bool ascii) noexcept {
 	if (ascii) {
 		// find ASCII inside first or last 4 KiB text
 		constexpr DWORD size = 4096;
-		if (memchr(pTest, 0, min(nLength, size)) == nullptr
-			&& (nLength <= size || memchr(pTest + (nLength - size), 0, size) == nullptr)) {
+		if (NP2_memchr(pTest, 0, min(nLength, size)) == nullptr
+			&& (nLength <= size || NP2_memchr(pTest + (nLength - size), 0, size) == nullptr)) {
 			return CPI_DEFAULT;
 		}
 	}
