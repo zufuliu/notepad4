@@ -487,11 +487,6 @@ bool BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha) noexcept {
 	BITMAP bmp;
 	if (GetObject(hbmp, sizeof(BITMAP), &bmp)) {
 		if (bmp.bmBitsPixel == 32) {
-			//StopWatch watch;
-			//StopWatch_Start(watch);
-			//FILE *fp = fopen("bitmap.dat", "wb");
-			//fwrite(bmp.bmBits, 1, bmp.bmHeight*bmp.bmWidth*4, fp);
-			//fclose(fp);
 #if NP2_USE_AVX2
 #if 1
 			#define BitmapAlphaBlend_Tag	"avx2 4x1"
@@ -575,8 +570,6 @@ bool BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha) noexcept {
 				prgba[x].rgbBlue = ((prgba[x].rgbBlue * alpha) + blue) >> 8;
 			}
 #endif
-			//StopWatch_Stop(watch);
-			//StopWatch_ShowLog(&watch, "BitmapAlphaBlend " BitmapAlphaBlend_Tag);
 			#undef BitmapAlphaBlend_Tag
 			return true;
 		}

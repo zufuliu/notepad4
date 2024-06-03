@@ -1872,14 +1872,14 @@ static inline int did_cpu_supports_ssse3() noexcept {
 bool IsUTF8(const char *pTest, DWORD nLength) noexcept {
 #if 0
 	StopWatch watch;
-	StopWatch_Start(watch);
+	watch.Start();
 #endif
 
 #if NP2_USE_AVX2
 	const bool result = z_validate_utf8_avx2(pTest, nLength);
 #if 0
-	StopWatch_Stop(watch);
-	StopWatch_ShowLog(&watch, "UTF8 time");
+	watch.Stop();
+	watch.ShowLog("UTF8 time");
 #endif
 	return result;
 	// end NP2_USE_AVX2
@@ -1889,8 +1889,8 @@ bool IsUTF8(const char *pTest, DWORD nLength) noexcept {
 	if (did_cpu_supports_ssse3()) {
 		const bool result = z_validate_utf8_sse4(pTest, nLength);
 #if 0
-		StopWatch_Stop(watch);
-		StopWatch_ShowLog(&watch, "UTF8 time");
+		watch.Stop();
+		watch.ShowLog("UTF8 time");
 #endif
 		return result;
 	}
@@ -2041,8 +2041,8 @@ bool IsUTF8(const char *pTest, DWORD nLength) noexcept {
 	}
 
 #if 0
-	StopWatch_Stop(watch);
-	StopWatch_ShowLog(&watch, "UTF8 time");
+	watch.Stop();
+	watch.ShowLog("UTF8 time");
 #endif
 
 	return state == UTF8_ACCEPT;

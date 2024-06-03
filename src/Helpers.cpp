@@ -46,15 +46,15 @@ LPCSTR GetCurrentLogTime() noexcept {
 	return buf;
 }
 
-void StopWatch_Show(const StopWatch *watch, LPCWSTR msg) {
-	const double elapsed = StopWatch_Get(watch);
+void StopWatch::Show(LPCWSTR msg) const noexcept {
+	const double elapsed = Get();
 	WCHAR buf[256];
 	swprintf(buf, COUNTOF(buf), L"%s: %.6f", msg, elapsed);
 	MessageBox(nullptr, buf, L"Notepad4", MB_OK);
 }
 
-void StopWatch_ShowLog(const StopWatch *watch, LPCSTR msg) {
-	const double elapsed = StopWatch_Get(watch);
+void StopWatch::ShowLog(LPCSTR msg) const noexcept {
+	const double elapsed = Get();
 #if 0
 	char buf[256];
 	snprintf(buf, COUNTOF(buf), "%s %s: %.6f\n", "Notepad4", msg, elapsed);
@@ -541,7 +541,7 @@ bool BitmapMergeAlpha(HBITMAP hbmp, COLORREF crDest) noexcept {
 	if (GetObject(hbmp, sizeof(BITMAP), &bmp)) {
 		if (bmp.bmBitsPixel == 32) {
 			//StopWatch watch;
-			//StopWatch_Start(watch);
+			//watch.Start();
 #if NP2_USE_AVX2
 			#define BitmapMergeAlpha_Tag	"sse4 2x1"
 			const ULONG count = (bmp.bmHeight * bmp.bmWidth) / 2;
@@ -586,8 +586,8 @@ bool BitmapMergeAlpha(HBITMAP hbmp, COLORREF crDest) noexcept {
 				prgba[x].rgbReserved = 0xFF;
 			}
 #endif
-			//StopWatch_Stop(watch);
-			//StopWatch_ShowLog(&watch, "BitmapMergeAlpha " BitmapMergeAlpha_Tag);
+			//watch.Stop();
+			//watch.ShowLog("BitmapMergeAlpha " BitmapMergeAlpha_Tag);
 			#undef BitmapMergeAlpha_Tag
 			return true;
 		}
@@ -605,7 +605,7 @@ bool BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha) noexcept {
 	if (GetObject(hbmp, sizeof(BITMAP), &bmp)) {
 		if (bmp.bmBitsPixel == 32) {
 			//StopWatch watch;
-			//StopWatch_Start(watch);
+			//watch.Start();
 			//FILE *fp = fopen("bitmap.dat", "wb");
 			//fwrite(bmp.bmBits, 1, bmp.bmHeight*bmp.bmWidth*4, fp);
 			//fclose(fp);
@@ -692,8 +692,8 @@ bool BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha) noexcept {
 				prgba[x].rgbBlue = ((prgba[x].rgbBlue * alpha) + blue) >> 8;
 			}
 #endif
-			//StopWatch_Stop(watch);
-			//StopWatch_ShowLog(&watch, "BitmapAlphaBlend " BitmapAlphaBlend_Tag);
+			//watch.Stop();
+			//watch.ShowLog("BitmapAlphaBlend " BitmapAlphaBlend_Tag);
 			#undef BitmapAlphaBlend_Tag
 			return true;
 		}

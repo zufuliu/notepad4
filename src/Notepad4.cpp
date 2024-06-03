@@ -724,7 +724,7 @@ BOOL InitApplication(HINSTANCE hInstance) noexcept {
 void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 #if 0
 	StopWatch watch;
-	StopWatch_Start(watch);
+	watch.Start();
 #endif
 	const bool defaultPos = (wi.x == CW_USEDEFAULT || wi.y == CW_USEDEFAULT || wi.cx == CW_USEDEFAULT || wi.cy == CW_USEDEFAULT);
 	RECT rc = { wi.x, wi.y, (defaultPos ? CW_USEDEFAULT : (wi.x + wi.cx)), (defaultPos ? CW_USEDEFAULT : (wi.y + wi.cy)) };
@@ -1012,8 +1012,8 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	}
 
 #if 0
-	StopWatch_Stop(watch);
-	StopWatch_ShowLog(&watch, "InitInstance() time");
+	watch.Stop();
+	watch.ShowLog("InitInstance() time");
 #endif
 }
 
@@ -6977,7 +6977,7 @@ void UpdateStatusbar() noexcept {
 
 #if 0
 	StopWatch watch;
-	StopWatch_Start(watch);
+	watch.Start();
 #endif
 	Sci_TextToFindFull ft = { { SciCall_PositionFromLine(iLine), iPos }, nullptr, { 0, 0 } };
 	SciCall_CountCharactersAndColumns(&ft);
@@ -7003,8 +7003,8 @@ void UpdateStatusbar() noexcept {
 		iLineColumn = cachedStatusItem.iLineColumn;
 	}
 #if 0
-	StopWatch_Stop(watch);
-	StopWatch_ShowLog(&watch, "CountCharacters time");
+	watch.Stop();
+	watch.ShowLog("CountCharacters time");
 #endif
 
 	WCHAR tchCurLine[32];

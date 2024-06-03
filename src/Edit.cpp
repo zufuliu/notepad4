@@ -166,13 +166,13 @@ void EditSetNewText(LPCSTR lpstrText, DWORD cbText, Sci_Line lineCount) {
 		SciCall_SetModEventMask(SC_MOD_NONE);
 #if 0
 		StopWatch watch;
-		StopWatch_Start(watch);
+		watch.Start();
 #endif
 		SciCall_AllocateLines(lineCount);
 		SciCall_AppendText(cbText, lpstrText);
 #if 0
-		StopWatch_Stop(watch);
-		StopWatch_ShowLog(&watch, "AddText time");
+		watch.Stop();
+		watch.ShowLog("AddText time");
 #endif
 		SciCall_SetModEventMask(SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT);
 		SendMessage(hwndEdit, WM_SETREDRAW, TRUE, 0);
@@ -481,7 +481,7 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus &status) no
 	size_t lineCountLF = 0;
 #if 0
 	StopWatch watch;
-	StopWatch_Start(watch);
+	watch.Start();
 #endif
 
 	const uint8_t *ptr = (const uint8_t *)lpData;
@@ -804,8 +804,8 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus &status) no
 	}
 
 #if 0
-	StopWatch_Stop(watch);
-	StopWatch_ShowLog(&watch, "EOL time");
+	watch.Stop();
+	watch.ShowLog("EOL time");
 	printf("%s CR+LF:%u, LF: %u, CR: %u\n", __func__, (UINT)lineCountCRLF, (UINT)lineCountLF, (UINT)lineCountCR);
 #endif
 
@@ -827,7 +827,7 @@ void EditDetectIndentation(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) noexcep
 
 #if 0
 	StopWatch watch;
-	StopWatch_Start(watch);
+	watch.Start();
 #endif
 
 	// code based on SciTEBase::DiscoverIndentSetting().
@@ -953,8 +953,8 @@ labelStart:
 	}
 
 #if 0
-	StopWatch_Stop(watch);
-	const double duration = StopWatch_Get(&watch);
+	watch.Stop();
+	const double duration = watch.Get();
 	printf("indentation %u, duration=%.06f, tab width=%d\n", (UINT)cbData, duration, prevTabWidth);
 	for (int i = 0; i < MAX_DETECTED_TAB_WIDTH + 2; i++) {
 		printf("\tindentLineCount[%d] = %u\n", i, indentLineCount[i]);
@@ -5686,8 +5686,8 @@ void EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer) {
 	const bool pending = iStartPos < iLength;
 	if (pending) {
 		// dynamic compute increment search size, see ActionDuration in Scintilla.
-		QueryPerformanceCounter(&status->watch.end);
-		const double period = StopWatch_Get(&status->watch);
+		status->watch.Stop();
+		const double period = status->watch.Get();
 		iMaxLength = iStartPos - status->iStartPos;
 		const double durationOne = (EditMarkAll_MeasuredSize * period) / iMaxLength;
 		const double alpha = 0.25;
@@ -5842,7 +5842,7 @@ bool EditReplaceAll(HWND hwnd, const EDITFINDREPLACE *lpefr, bool bShowInfo) noe
 	SendMessage(hwnd, WM_SETREDRAW, FALSE, 0);
 #if 0
 	StopWatch watch;
-	StopWatch_Start(watch);
+	watch.Start();
 #endif
 
 	const bool bRegexStartOfLine = bReplaceRE && (szFind2[0] == '^');
@@ -5883,8 +5883,8 @@ bool EditReplaceAll(HWND hwnd, const EDITFINDREPLACE *lpefr, bool bShowInfo) noe
 	}
 
 #if 0
-	StopWatch_Stop(watch);
-	StopWatch_ShowLog(&watch, "EditReplaceAll() time");
+	watch.Stop();
+	watch.ShowLog("EditReplaceAll() time");
 #endif
 	SendMessage(hwnd, WM_SETREDRAW, TRUE, 0);
 	if (iCount) {
@@ -7823,12 +7823,12 @@ void FoldToggleAll(FOLD_ACTION action) noexcept {
 	SendMessage(hwndEdit, WM_SETREDRAW, FALSE, 0);
 #if 0
 	StopWatch watch;
-	StopWatch_Start(watch);
+	watch.Start();
 #endif
 	SciCall_FoldAll(static_cast<int>(action) | SC_FOLDACTION_CONTRACT_EVERY_LEVEL);
 #if 0
-	StopWatch_Stop(watch);
-	StopWatch_ShowLog(&watch, __func__);
+	watch.Stop();
+	watch.ShowLog(__func__);
 #endif
 	FinishBatchFold();
 }
@@ -7841,7 +7841,7 @@ void FoldToggleLevel(int lev, FOLD_ACTION action) noexcept {
 	SendMessage(hwndEdit, WM_SETREDRAW, FALSE, 0);
 #if 0
 	StopWatch watch;
-	StopWatch_Start(watch);
+	watch.Start();
 #endif
 	if (pLexCurrent->lexerAttr & LexerAttr_IndentBasedFolding) {
 		FoldLevelStack levelStack{};
@@ -7874,8 +7874,8 @@ void FoldToggleLevel(int lev, FOLD_ACTION action) noexcept {
 	}
 
 #if 0
-	StopWatch_Stop(watch);
-	StopWatch_ShowLog(&watch, __func__);
+	watch.Stop();
+	watch.ShowLog(__func__);
 #endif
 	FinishBatchFold();
 }
@@ -7935,7 +7935,7 @@ void FoldToggleDefault(FOLD_ACTION action) noexcept {
 	SendMessage(hwndEdit, WM_SETREDRAW, FALSE, 0);
 #if 0
 	StopWatch watch;
-	StopWatch_Start(watch);
+	watch.Start();
 #endif
 	if (pLexCurrent->lexerAttr & LexerAttr_IndentBasedFolding) {
 		FoldLevelStack levelStack{};
@@ -7972,8 +7972,8 @@ void FoldToggleDefault(FOLD_ACTION action) noexcept {
 	}
 
 #if 0
-	StopWatch_Stop(watch);
-	StopWatch_ShowLog(&watch, __func__);
+	watch.Stop();
+	watch.ShowLog(__func__);
 #endif
 	FinishBatchFold();
 }

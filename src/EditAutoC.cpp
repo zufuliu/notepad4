@@ -375,7 +375,7 @@ static inline bool WordList_IsSeparator(uint8_t ch) {
 
 void WordList_AddListEx(struct WordList *pWList, LPCSTR pList) {
 	//StopWatch watch;
-	//StopWatch_Start(watch);
+	//watch.Start();
 	char word[NP2_AUTOC_WORD_BUFFER_SIZE];
 	const UINT iStartLen = pWList->iStartLen;
 	UINT len = 0;
@@ -416,8 +416,8 @@ void WordList_AddListEx(struct WordList *pWList, LPCSTR pList) {
 		}
 	}
 
-	//StopWatch_Stop(watch);
-	//const double duration = StopWatch_Get(&watch);
+	//watch.Stop();
+	//const double duration = watch.Get();
 	//printf("%s duration=%.6f\n", __func__, duration);
 }
 
@@ -1587,7 +1587,7 @@ static bool EditCompleteWordCore(int iCondition, bool autoInsert) {
 
 #if 0
 	StopWatch watch;
-	StopWatch_Start(watch);
+	watch.Start();
 #endif
 
 	bool bIgnoreLexer = (pRoot[0] >= '0' && pRoot[0] <= '9'); // number
@@ -1694,8 +1694,8 @@ static bool EditCompleteWordCore(int iCondition, bool autoInsert) {
 	}
 
 #if 0
-	StopWatch_Stop(watch);
-	const double elapsed = StopWatch_Get(&watch);
+	watch.Stop();
+	const double elapsed = watch.Get();
 	printf("Notepad4 AddDocWord(%u, %u): %.6f\n", pWList.nWordCount, pWList.nTotalLen, elapsed);
 #endif
 

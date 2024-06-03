@@ -199,33 +199,29 @@ struct StopWatch {
 	LARGE_INTEGER freq; // not changed after system boot
 	LARGE_INTEGER begin;
 	LARGE_INTEGER end;
+
+	void Start() noexcept {
+		QueryPerformanceFrequency(&freq);
+		QueryPerformanceCounter(&begin);
+	}
+	void Reset() noexcept {
+		begin.QuadPart = 0;
+		end.QuadPart = 0;
+	}
+	void Restart() noexcept {
+		end.QuadPart = 0;
+		QueryPerformanceCounter(&begin);
+	}
+	void Stop() noexcept {
+		QueryPerformanceCounter(&end);
+	}
+	double Get() const noexcept {
+		const LONGLONG diff = end.QuadPart - begin.QuadPart;
+		return (diff * 1000) / static_cast<double>(freq.QuadPart);
+	}
+	void Show(LPCWSTR msg) const noexcept;
+	void ShowLog(LPCSTR msg) const noexcept;
 };
-
-#define StopWatch_Start(watch) do { \
-		QueryPerformanceFrequency(&(watch).freq);	\
-		QueryPerformanceCounter(&(watch).begin);	\
-	} while (0)
-
-#define StopWatch_Reset(watch) do { \
-		(watch).begin.QuadPart = 0;	\
-		(watch).end.QuadPart = 0;	\
-	} while (0)
-
-#define StopWatch_Restart(watch) do { \
-		(watch).end.QuadPart = 0;					\
-		QueryPerformanceCounter(&(watch).begin);	\
-	} while (0)
-
-#define StopWatch_Stop(watch) \
-	QueryPerformanceCounter(&(watch).end)
-
-NP2_inline double StopWatch_Get(const StopWatch *watch) {
-	const LONGLONG diff = watch->end.QuadPart - watch->begin.QuadPart;
-	return (diff * 1000) / (double)(watch->freq.QuadPart);
-}
-
-void StopWatch_Show(const StopWatch *watch, LPCWSTR msg);
-void StopWatch_ShowLog(const StopWatch *watch, LPCSTR msg);
 
 #define DebugPrint(msg)		OutputDebugStringA(msg)
 #if defined(__GNUC__) || defined(__clang__)
