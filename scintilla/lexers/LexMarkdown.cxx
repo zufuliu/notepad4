@@ -139,24 +139,6 @@ constexpr bool IsMarkdownSpace(int ch) noexcept {
 	return IsSpaceOrTab(ch) || IsEOLChar(ch);
 }
 
-constexpr bool IsBlockStartChar(int ch) noexcept {
-	return ch == '>' // block quote
-		|| ch == '#' // ATX header
-		|| ch == '<' // html block
-		|| ch == '*' // thematic break, bullet list
-		|| ch == '-' // thematic break, bullet list, setext header
-		|| ch == '_' // thematic break
-		|| ch == '=' // setext header
-		|| ch == '+' // bullet list
-		|| ch == '`' // fenced code block
-		|| ch == '~' // fenced code block, definition list
-		|| ch == '\t'// indented code block or list item
-		|| ch == '[' // link reference definition
-		|| ch == ':' // definition list
-		|| ch == '$' // display math
-		|| IsADigit(ch);// ordered list
-}
-
 inline uint8_t GetCharAfterSpace(LexAccessor &styler, Sci_PositionU &startPos, int count) noexcept {
 	Sci_PositionU pos = startPos;
 	uint8_t ch = styler.SafeGetCharAt(pos);
@@ -1854,17 +1836,17 @@ bool MarkdownLexer::HighlightCriticMarkup() {
 
 void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	if (startPos != 0) {
-		Sci_PositionU pos = startPos;
-		const uint8_t ch = GetCharAfterSpace(styler, pos, 4);
-		if (initStyle == SCE_MARKDOWN_INDENTED_BLOCK || IsBlockStartChar(ch) || pos - startPos == 4) {
-			// backtrack to previous line for better coloring on typing.
-			const Sci_PositionU endPos = startPos + lengthDoc;
-			const Sci_Line currentLine = styler.GetLine(startPos);
-			startPos = styler.LineStart(currentLine - 1);
-			lengthDoc = endPos - startPos;
-			initStyle = (startPos == 0) ? 0 : styler.StyleAt(startPos - 1);
+		// backtrack to previous line for better coloring on typing.
+		const Sci_PositionU endPos = startPos + lengthDoc;
+		Sci_Line currentLine = styler.GetLine(startPos) - 1;
+		if (currentLine > 0 && (styler.GetLineState(currentLine) & LineStateEmptyLine) != 0) {
+			--currentLine; // fix typing after indented code block
 		}
+		startPos = styler.LineStart(currentLine);
+		lengthDoc = endPos - startPos;
+		initStyle = 0;
 		if (startPos != 0) {
+			initStyle = styler.StyleAt(startPos - 1);
 			BacktrackToStart(styler, LineStateNestedStateLine, startPos, lengthDoc, initStyle);
 		}
 	}
