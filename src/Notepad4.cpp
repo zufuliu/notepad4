@@ -436,21 +436,21 @@ TripleBoolean flagUseSystemMRU		= TripleBoolean_NotSet;
 static RelaunchElevatedFlag flagRelaunchElevated = RelaunchElevatedFlag_None;
 static bool	flagDisplayHelp			= false;
 
-static inline bool IsDocumentModified(void) noexcept {
+static inline bool IsDocumentModified() noexcept {
 	return bDocumentModified || iCurrentEncoding != iOriginalEncoding;
 }
 
-static inline bool IsTopMost(void) noexcept {
+static inline bool IsTopMost() noexcept {
 	return (bAlwaysOnTop || flagAlwaysOnTop == TripleBoolean_True) && flagAlwaysOnTop != TripleBoolean_False;
 }
 
 // temporary fix for https://github.com/zufuliu/notepad4/issues/77: force InvalidateStyleRedraw().
-static inline void InvalidateStyleRedraw(void) noexcept {
+static inline void InvalidateStyleRedraw() noexcept {
 	SciCall_SetViewEOL(bViewEOLs);
 }
 
 // temporary fix for https://github.com/zufuliu/notepad4/issues/134: Direct2D on arm32
-static inline int GetDefualtRenderingTechnology(void) noexcept {
+static inline int GetDefualtRenderingTechnology() noexcept {
 #if defined(__arm__) || defined(_ARM_) || defined(_M_ARM)
 	return SC_TECHNOLOGY_DIRECTWRITERETAIN;
 #else
@@ -1094,7 +1094,7 @@ void MsgDropFiles(HWND hwnd, UINT umsg, WPARAM wParam) {
 }
 
 #if NP2_ENABLE_DOT_LOG_FEATURE
-static inline bool IsFileStartsWithDotLog(void) {
+static inline bool IsFileStartsWithDotLog() noexcept {
 	char tch[5] = "";
 	const Sci_Position len = SciCall_GetText(COUNTOF(tch) - 1, tch);
 	// upper case
@@ -2284,7 +2284,7 @@ void UpdateStatusBarCache(int item) noexcept {
 }
 
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
-void ValidateUILangauge(void) {
+void ValidateUILangauge() noexcept {
 	const LANGID subLang = SUBLANGID(uiLanguage);
 	switch (PRIMARYLANGID(uiLanguage)) {
 	case LANG_ENGLISH:
@@ -2319,7 +2319,7 @@ void ValidateUILangauge(void) {
 	}
 }
 
-void SetUILanguage(int menu) {
+void SetUILanguage(int menu) noexcept {
 	LANGID lang = uiLanguage;
 	switch (menu) {
 	case IDM_LANG_USER_DEFAULT:
@@ -8507,7 +8507,7 @@ void InstallFileWatching(bool terminate) noexcept {
 	}
 }
 
-static inline bool IsCurrentFileChangedOutsideApp(void) noexcept {
+static inline bool IsCurrentFileChangedOutsideApp() noexcept {
 	// Check if the file has been changed
 	WIN32_FIND_DATA fdUpdated;
 	if (!GetFileAttributesEx(szCurFile, GetFileExInfoStandard, &fdUpdated)) {

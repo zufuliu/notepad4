@@ -148,4 +148,4 @@ void	Style_SetStyles(int iStyle, LPCWSTR lpszStyle) noexcept;
 int 	Style_GetLexerIconId(LPCEDITLEXER pLex, DWORD iconFlags) noexcept;
 void	Style_ConfigDlg(HWND hwnd);
 void	Style_SelectLexerDlg(HWND hwnd, bool favorite);
-bool	SelectCSVOptionsDlg(void) noexcept;
+bool	SelectCSVOptionsDlg() noexcept;

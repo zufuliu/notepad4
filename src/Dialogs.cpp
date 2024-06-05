@@ -56,7 +56,7 @@ extern LANGID uiLanguage;
 extern int iWrapColumn;
 extern bool bUseXPFileDialog;
 
-static inline HWND GetMsgBoxParent(void) noexcept {
+static inline HWND GetMsgBoxParent() noexcept {
 	HWND hwnd = GetActiveWindow();
 	return (hwnd == nullptr) ? hwndMain : hwnd;
 }
@@ -193,7 +193,7 @@ void OpenHelpLink(HWND hwnd, int cmd) noexcept {
 	}
 }
 
-static inline LPCWSTR GetProcessorArchitecture(void) noexcept {
+static inline LPCWSTR GetProcessorArchitecture() noexcept {
 	SYSTEM_INFO info;
 	GetNativeSystemInfo(&info);
 #ifndef PROCESSOR_ARCHITECTURE_ARM64

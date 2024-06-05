@@ -102,7 +102,7 @@ enum {
 	EditWrapSymbol_DefaultValue = EditWrapSymbolBefore_NearBorder,
 };
 
-void	Edit_ReleaseResources(void) noexcept;
+void	Edit_ReleaseResources() noexcept;
 void	EditCreate(HWND hwndParent) noexcept;
 void	EditSetNewText(LPCSTR lpstrText, DWORD cbText, Sci_Line lineCount);
 
@@ -525,7 +525,7 @@ int 	Encoding_Match(LPCWSTR pwszTest) noexcept;
 int 	Encoding_MatchA(LPCSTR pchTest) noexcept;
 bool	Encoding_IsValid(int iEncoding) noexcept;
 int		Encoding_GetIndex(UINT codePage) noexcept;
-int		Encoding_GetAnsiIndex(void) noexcept;
+int		Encoding_GetAnsiIndex() noexcept;
 void	Encoding_AddToTreeView(HWND hwnd, int idSel, bool bRecodeOnly) noexcept;
 bool	Encoding_GetFromTreeView(HWND hwnd, int *pidEncoding, bool bQuiet) noexcept;
 #if 0

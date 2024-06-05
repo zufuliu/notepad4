@@ -679,7 +679,7 @@ int Encoding_GetIndex(UINT codePage) noexcept {
 	return CPI_NONE;
 }
 
-int Encoding_GetAnsiIndex(void) noexcept {
+int Encoding_GetAnsiIndex() noexcept {
 	int iEncoding = CPI_DEFAULT;
 	const UINT acp = GetACP();
 	if (acp == CP_UTF8) {
@@ -2185,7 +2185,7 @@ Return value :
 	size (in bytes) of a NULL-terminated UTF-8 string.
 	1 if invalid NULL-terminated UTF-8 string
 --*/
-INT UTF8_mbslen_bytes(LPCSTR utf8_string) {
+INT UTF8_mbslen_bytes(LPCSTR utf8_string) noexcept {
 	INT length = 0;
 	const uint8_t *pt = (const uint8_t *)utf8_string;
 
@@ -2220,7 +2220,7 @@ Return value :
 	size (in characters) of a UTF-8 string.
 	-1 if invalid UTF-8 string
 --*/
-INT UTF8_mbslen(LPCSTR source, INT byte_length) {
+INT UTF8_mbslen(LPCSTR source, INT byte_length) noexcept {
 	INT wchar_length = 0;
 	const uint8_t *pt = (const uint8_t *)utf8_string;
 

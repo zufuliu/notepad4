@@ -222,7 +222,7 @@ bool		flagNoFadeHidden	= false;
 static int	iOpacityLevel		= 75;
 static bool	flagPosParam		= false;
 
-static inline bool HasFilter(void) noexcept {
+static inline bool HasFilter() noexcept {
 	return !StrEqualExW(tchFilter, L"*.*") || bNegFilter;
 }
 
@@ -2409,7 +2409,7 @@ static void GetWindowPositionSectionName(HMONITOR hMonitor, WCHAR (&sectionName)
 }
 
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
-void ValidateUILangauge(void) {
+void ValidateUILangauge() noexcept {
 	const LANGID subLang = SUBLANGID(uiLanguage);
 	switch (PRIMARYLANGID(uiLanguage)) {
 	case LANG_ENGLISH:
@@ -2444,7 +2444,7 @@ void ValidateUILangauge(void) {
 	}
 }
 
-void SetUILanguage(int resID) {
+void SetUILanguage(int resID) noexcept {
 	LANGID lang = uiLanguage;
 	switch (resID) {
 	case IDS_LANG_USER_DEFAULT:
@@ -2860,7 +2860,7 @@ void SaveWindowPosition(WCHAR *pIniSectionBuf) {
 	SaveIniSection(sectionName, pIniSectionBuf);
 }
 
-void ClearWindowPositionHistory(void) noexcept {
+void ClearWindowPositionHistory() noexcept {
 	cxRunDlg = 0;
 	cxGotoDlg = 0;
 	cxFileFilterDlg = 0;
@@ -2993,7 +2993,7 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) noexcept {
 	return state;
 }
 
-void ParseCommandLine(void) noexcept {
+void ParseCommandLine() noexcept {
 	LPWSTR lpCmdLine = GetCommandLine();
 	const size_t cmdSize = sizeof(WCHAR) * (lstrlen(lpCmdLine) + 1);
 
@@ -3186,7 +3186,7 @@ bool CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule) noexcept {
 	return false;
 }
 
-bool FindIniFile(void) noexcept {
+bool FindIniFile() noexcept {
 	if (StrEqualExW(szIniFile, L"*?")) {
 		return false;
 	}
@@ -3231,7 +3231,7 @@ bool FindIniFile(void) noexcept {
 	return true;
 }
 
-bool TestIniFile(void) noexcept {
+bool TestIniFile() noexcept {
 	if (StrEqualExW(szIniFile, L"*?")) {
 		StrCpyExW(szIniFile2, L"");
 		StrCpyExW(szIniFile, L"");

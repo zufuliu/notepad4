@@ -88,7 +88,7 @@ static HMODULE hELSCoreDLL = nullptr;
 static HMODULE hCrtDLL = nullptr;
 
 using wcsftimeSig = size_t (__cdecl *)(wchar_t *str, size_t count, const wchar_t *format, const struct tm *time);
-wcsftimeSig GetFunctionPointer_wcsftime(void) noexcept {
+wcsftimeSig GetFunctionPointer_wcsftime() noexcept {
 	if (hCrtDLL == nullptr) {
 		hCrtDLL = LoadLibraryExW(L"ucrtbase.dll", nullptr, kSystemLibraryLoadFlags);
 		if (hCrtDLL == nullptr) {
@@ -99,7 +99,7 @@ wcsftimeSig GetFunctionPointer_wcsftime(void) noexcept {
 }
 #endif
 
-void Edit_ReleaseResources(void) noexcept {
+void Edit_ReleaseResources() noexcept {
 	NP2HeapFree(wchPrefixSelection);
 	NP2HeapFree(wchAppendSelection);
 	NP2HeapFree(wchPrefixLines);
@@ -116,7 +116,7 @@ void Edit_ReleaseResources(void) noexcept {
 #endif
 }
 
-static inline void NotifyRectangleSelection(void) noexcept {
+static inline void NotifyRectangleSelection() noexcept {
 	MsgBoxWarn(MB_OK, IDS_SELRECT);
 	//ShowNotificationMessage(SC_NOTIFICATIONPOSITION_CENTER, IDS_SELRECT);
 }
@@ -353,7 +353,7 @@ char* EditGetClipboardText(HWND hwnd) noexcept {
 	return pmch;
 }
 
-LPWSTR EditGetClipboardTextW(void) noexcept {
+LPWSTR EditGetClipboardTextW() noexcept {
 	if (!IsClipboardFormatAvailable(CF_UNICODETEXT) || !OpenClipboard(hwndMain)) {
 		return nullptr;
 	}

@@ -137,20 +137,20 @@ void GetRelaunchParameters(LPWSTR szParameters) noexcept;
 void ShowNotifyIcon(HWND hwnd, bool bAdd) noexcept;
 
 bool ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, bool bUpdateHistory);
-void SetUILanguage(int resID);
+void SetUILanguage(int resID) noexcept;
 void LoadSettings(void);
 void SaveSettingsNow(void);
 void SaveSettings(bool bSaveSettingsNow);
 void SaveWindowPosition(WCHAR *pIniSectionBuf);
-void ClearWindowPositionHistory(void) noexcept;
-void ParseCommandLine(void) noexcept;
+void ClearWindowPositionHistory() noexcept;
+void ParseCommandLine() noexcept;
 void LoadFlags(void);
 void LoadLaunchSetings(void);
 
 bool CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) noexcept;
 bool CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule) noexcept;
-bool FindIniFile(void) noexcept;
-bool TestIniFile(void) noexcept;
+bool FindIniFile() noexcept;
+bool TestIniFile() noexcept;
 bool CreateIniFile(LPCWSTR lpszIniFile) noexcept;
 
 bool DisplayPath(LPCWSTR lpPath, UINT uIdError);

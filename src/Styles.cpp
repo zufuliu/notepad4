@@ -3655,7 +3655,7 @@ void Style_Parse(StyleDefinition *style, LPCWSTR lpszStyle) noexcept {
 	style->mask = mask;
 }
 
-void Style_SetParsed(const StyleDefinition *style, int iStyle) {
+void Style_SetParsed(const StyleDefinition *style, int iStyle) noexcept {
 	const UINT mask = style->mask;
 
 	// Font
