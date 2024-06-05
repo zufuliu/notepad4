@@ -2486,43 +2486,43 @@ void MRU_AddToCombobox(LPCMRULIST pmru, HWND hwnd) {
 	}
 }
 
-void BitmapCache_Empty(BitmapCache *cache) {
-	for (UINT i = 0; i < cache->count; i++) {
-		DeleteObject(cache->items[i]);
+void BitmapCache::Empty() noexcept {
+	for (UINT i = 0; i < count; i++) {
+		DeleteObject(items[i]);
 	}
-	memset(cache, 0, sizeof(BitmapCache));
+	memset(this, 0, sizeof(BitmapCache));
 }
 
-HBITMAP BitmapCache_Get(BitmapCache *cache, LPCWSTR path) {
-	if (cache->invalid) {
-		BitmapCache_Empty(cache);
+HBITMAP BitmapCache::Get(LPCWSTR path) noexcept {
+	if (invalid) {
+		Empty();
 	}
 
 	SHFILEINFO shfi;
-	HIMAGELIST imageList = (HIMAGELIST)SHGetFileInfo(path, FILE_ATTRIBUTE_NORMAL, &shfi, sizeof(SHFILEINFO), SHGFI_USEFILEATTRIBUTES | SHGFI_SYSICONINDEX | SHGFI_SMALLICON);
+	HIMAGELIST imageList = reinterpret_cast<HIMAGELIST>(SHGetFileInfo(path, FILE_ATTRIBUTE_NORMAL, &shfi, sizeof(SHFILEINFO), SHGFI_USEFILEATTRIBUTES | SHGFI_SYSICONINDEX | SHGFI_SMALLICON));
 	const int iIcon = shfi.iIcon;
 	UINT index = 0;
-	for (; index < cache->count; index++) {
-		if (cache->iconIndex[index] == iIcon) {
+	for (; index < count; index++) {
+		if (iconIndex[index] == iIcon) {
 			break;
 		}
 	}
-	if (index == cache->count) {
-		static_assert(sizeof(cache->used)*8 >= MRU_MAXITEMS);
+	if (index == count) {
+		static_assert(sizeof(used)*8 >= MRU_MAXITEMS);
 		if (index < MRU_MAXITEMS) {
-			cache->count += 1;
+			count += 1;
 		} else {
 			// find first zero bit in used, omitted zero check as used can't be UINT32_MAX
-			// index = __builtin_stdc_trailing_ones(cache->used);
-			index = np2_ctz(~cache->used);
-			DeleteObject(cache->items[index]);
-			cache->items[index] = NULL;
+			// index = __builtin_stdc_trailing_ones(used);
+			index = np2_ctz(~used);
+			DeleteObject(items[index]);
+			items[index] = nullptr;
 		}
-		cache->iconIndex[index] = iIcon;
+		iconIndex[index] = iIcon;
 	}
 
-	cache->used |= 1U << index;
-	HBITMAP hbmp = cache->items[index];
+	used |= 1U << index;
+	HBITMAP hbmp = items[index];
 	if (hbmp == nullptr) {
 		HDC bitmapDC = CreateCompatibleDC(nullptr);
 		int width = 0;
@@ -2534,7 +2534,7 @@ HBITMAP BitmapCache_Get(BitmapCache *cache, LPCWSTR path) {
 		ImageList_Draw(imageList, iIcon, bitmapDC, 0, 0, ILD_TRANSPARENT);
 		SelectBitmap(bitmapDC, oldBitmap);
 		DeleteDC(bitmapDC);
-		cache->items[index] = hbmp;
+		items[index] = hbmp;
 	}
 
 	return hbmp;

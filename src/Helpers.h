@@ -847,16 +847,15 @@ struct BitmapCache {
 	bool invalid;
 	int iconIndex[MRU_MAXITEMS];
 	HBITMAP items[MRU_MAXITEMS];
+	void Invalidate() noexcept {
+		invalid = true; // mark all cache as invalid
+	}
+	void StartUse() noexcept {
+		used = 0; // mark all cache as unused
+	}
+	void Empty() noexcept;
+	HBITMAP Get(LPCWSTR path) noexcept;
 };
-
-inline void BitmapCache_Invalidate(BitmapCache *cache) noexcept {
-	cache->invalid = true; // mark all cache as invalid
-}
-inline void BitmapCache_StartUse(BitmapCache *cache) noexcept {
-	cache->used = 0; // mark all cache as unused
-}
-void BitmapCache_Empty(BitmapCache *cache);
-HBITMAP BitmapCache_Get(BitmapCache *cache, LPCWSTR path);
 
 //==== Themed Dialogs =========================================================
 #ifndef DLGTEMPLATEEX

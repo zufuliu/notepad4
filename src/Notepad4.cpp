@@ -1167,7 +1167,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			MRU_MergeSave(&mruFile, bSaveRecentFiles);
 			MRU_MergeSave(&mruFind, bSaveFindReplace);
 			MRU_MergeSave(&mruReplace, bSaveFindReplace);
-			BitmapCache_Empty(&bitmapCache);
+			bitmapCache.Empty();
 
 			// Remove tray icon if necessary
 			ShowNotifyIcon(hwnd, false);
@@ -1216,14 +1216,14 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_SETTINGCHANGE:
-		BitmapCache_Invalidate(&bitmapCache);
+		bitmapCache.Invalidate();
 		// TODO: detect system theme and high contrast mode changes
 		SendMessage(hwndEdit, WM_SETTINGCHANGE, wParam, lParam);
 		Style_SetLexer(pLexCurrent, false); // override base elements
 		break;
 
 	case WM_SYSCOLORCHANGE:
-		BitmapCache_Invalidate(&bitmapCache);
+		bitmapCache.Invalidate();
 		SendMessage(hwndToolbar, WM_SYSCOLORCHANGE, wParam, lParam);
 		SendMessage(hwndEdit, WM_SYSCOLORCHANGE, wParam, lParam);
 		Style_SetLexer(pLexCurrent, false); // override base elements
@@ -2153,7 +2153,7 @@ void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	const Sci_Line iVisTopLine = SciCall_GetFirstVisibleLine();
 	const Sci_Line iDocTopLine = SciCall_DocLineFromVisible(iVisTopLine);
 
-	BitmapCache_Invalidate(&bitmapCache);
+	bitmapCache.Invalidate();
 	// recreate toolbar and statusbar
 	RecreateBars(hwnd, g_hInstance);
 	const int cx = rc->right - rc->left;
@@ -5217,13 +5217,13 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 					return TBDDRET_TREATPRESSED;
 				}
 				hmenu = subMenu = CreatePopupMenu();
-				BitmapCache_StartUse(&bitmapCache);
+				bitmapCache.StartUse();
 				MENUITEMINFO mii;
 				mii.cbSize = sizeof(MENUITEMINFO);
 				mii.fMask = MIIM_ID | MIIM_STRING | MIIM_BITMAP;
 				for (int i = 0; i < mruFile.iSize; i++) {
 					LPCWSTR path = mruFile.pszItems[i];
-					HBITMAP hbmp = BitmapCache_Get(&bitmapCache, path);
+					HBITMAP hbmp = bitmapCache.Get(path);
 					mii.wID = i + IDM_RECENT_HISTORY_START;
 					mii.dwTypeData = (LPWSTR)path;
 					mii.hbmpItem = hbmp;
