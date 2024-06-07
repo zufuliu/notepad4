@@ -2499,7 +2499,7 @@ bool AutoCompletionSettingsDlg(HWND hwnd) noexcept {
 extern int iAutoSaveOption;
 extern DWORD dwAutoSavePeriod;
 
-static INT_PTR CALLBACK AutoSaveSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+static INT_PTR CALLBACK AutoSaveSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	UNREFERENCED_PARAMETER(lParam);
 
 	switch (umsg) {

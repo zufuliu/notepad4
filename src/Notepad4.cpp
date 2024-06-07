@@ -260,7 +260,7 @@ static BitmapCache bitmapCache;
 
 DWORD	dwLastIOError;
 WCHAR	szCurFile[MAX_PATH + 40];
-FILEVARS	fvCurFile;
+EditFileVars fvCurFile;
 static bool bDocumentModified = false;
 static bool bReadOnlyFile = false;
 bool bReadOnlyMode = false; // save call to SciCall_GetReadOnly()
@@ -4048,7 +4048,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_VIEW_TABSETTINGS:
 		if (TabSettingsDlg(hwnd)) {
-			FileVars_Apply(&fvCurFile);
+			fvCurFile.Apply();
 		}
 		break;
 
@@ -7318,7 +7318,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 		if (!keepTitleExcerpt) {
 			StrCpyExW(szTitleExcerpt, L"");
 		}
-		FileVars_Init(NULL, 0, &fvCurFile);
+		fvCurFile.Init(nullptr, 0);
 		EditSetEmptyText();
 		bDocumentModified = false;
 		bReadOnlyFile = false;
@@ -7380,7 +7380,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 			if (hFile != INVALID_HANDLE_VALUE) {
 				fSuccess = true;
 				CloseHandle(hFile);
-				FileVars_Init(NULL, 0, &fvCurFile);
+				fvCurFile.Init(nullptr, 0);
 				EditSetEmptyText();
 				iCurrentEOLMode = GetScintillaEOLMode(iDefaultEOLMode);
 				SciCall_SetEOLMode(iCurrentEOLMode);
@@ -7460,7 +7460,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 			if (fvCurFile.mask & FV_MaskHasFileTabSettings) {
 				fvCurFile.mask &= ~FV_MaskHasFileTabSettings;
 				Style_LoadTabSettings(pLexCurrent);
-				FileVars_Apply(&fvCurFile);
+				fvCurFile.Apply();
 			}
 		}
 		// open file in read only mode
@@ -8612,7 +8612,7 @@ void CALLBACK PasteBoardTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTi
 	}
 }
 
-void AutoSave_Start(bool reset) {
+void AutoSave_Start(bool reset) noexcept {
 	if ((iAutoSaveOption & AutoSaveOption_Periodic) && dwAutoSavePeriod != 0) {
 		if (reset || !bAutoSaveTimerSet) {
 			bAutoSaveTimerSet = true;
@@ -8626,7 +8626,7 @@ void AutoSave_Start(bool reset) {
 	}
 }
 
-void AutoSave_Stop(BOOL keepBackup) {
+void AutoSave_Stop(BOOL keepBackup) noexcept {
 	dwCurrentDocReversion = 0;
 	dwLastSavedDocReversion = 0;
 	if (bAutoSaveTimerSet) {
@@ -8650,7 +8650,7 @@ void AutoSave_Stop(BOOL keepBackup) {
 	}
 }
 
-LPCWSTR AutoSave_GetDefaultFolder(void) {
+LPCWSTR AutoSave_GetDefaultFolder() noexcept {
 	LPWSTR szFolder = szAutoSaveFolder;
 	if (StrIsEmpty(szFolder)) {
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
@@ -8683,7 +8683,7 @@ LPCWSTR AutoSave_GetDefaultFolder(void) {
 	return szFolder;
 }
 
-void AutoSave_DoWork(FileSaveFlag saveFlag) {
+void AutoSave_DoWork(FileSaveFlag saveFlag) noexcept {
 	if (!(saveFlag & FileSaveFlag_SaveAlways) && (!IsDocumentModified() || dwCurrentDocReversion == dwLastSavedDocReversion)) {
 		return;
 	}

@@ -104,9 +104,9 @@ enum {
 
 void	Edit_ReleaseResources() noexcept;
 void	EditCreate(HWND hwndParent) noexcept;
-void	EditSetNewText(LPCSTR lpstrText, DWORD cbText, Sci_Line lineCount);
+void	EditSetNewText(LPCSTR lpstrText, DWORD cbText, Sci_Line lineCount) noexcept;
 
-static inline void EditSetEmptyText(void) {
+static inline void EditSetEmptyText()  noexcept{
 	EditSetNewText("", 0, 1);
 }
 
@@ -128,7 +128,7 @@ constexpr int GetSettingsEOLMode(int mode) noexcept {
 
 struct EditFileIOStatus;
 void 	EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus &status) noexcept;
-bool	EditLoadFile(LPWSTR pszFile, EditFileIOStatus &status);
+bool	EditLoadFile(LPWSTR pszFile, EditFileIOStatus &status) noexcept;
 bool	EditSaveFile(HWND hwnd, LPCWSTR pszFile, int saveFlag, EditFileIOStatus &status) noexcept;
 
 void	EditReplaceMainSelection(Sci_Position cchText, LPCSTR pszText) noexcept;
@@ -554,7 +554,7 @@ constexpr BOOL Encoding_HasBOM(int iEncoding) noexcept {
 }
 
 LPSTR RecodeAsUTF8(LPSTR lpData, DWORD *cbData, UINT codePage, DWORD flags) noexcept;
-int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, int *encodingFlag);
+int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, int *encodingFlag) noexcept;
 bool IsStringCaseSensitiveW(LPCWSTR pszTextW) noexcept;
 bool IsStringCaseSensitiveA(LPCSTR pszText) noexcept;
 
@@ -585,7 +585,7 @@ struct EditTabSettings {
 	bool	schemeUseGlobalTabSettings;
 };
 
-typedef struct FILEVARS {
+struct EditFileVars {
 	int 	mask;
 	int 	iTabWidth;
 	int 	iIndentWidth;
@@ -596,21 +596,20 @@ typedef struct FILEVARS {
 	int 	iEncoding;
 	char	tchEncoding[32];
 	char	tchMode[32];
-} FILEVARS, *LPFILEVARS;
+	void Init(LPCSTR lpData, DWORD cbData) noexcept;
+	void Apply() noexcept;
+	int GetEncoding() const noexcept {
+		return (mask & FV_ENCODING) ? iEncoding : CPI_NONE;
+	}
+};
 
-typedef const FILEVARS * LPCFILEVARS;
 extern EditTabSettings tabSettings;
-extern FILEVARS fvCurFile;
+extern EditFileVars fvCurFile;
 
 void	EditSetWrapStartIndent(int tabWidth, int indentWidth) noexcept;
 void	EditSetWrapIndentMode(int tabWidth, int indentWidth) noexcept;
-void	FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv);
-void	FileVars_Apply(LPFILEVARS lpfv);
-bool	FileVars_ParseInt(LPCSTR pszData, LPCSTR pszName, int *piValue);
-bool	FileVars_ParseStr(LPCSTR pszData, LPCSTR pszName, char *pszValue, int cchValue);
-inline int FileVars_GetEncoding(LPCFILEVARS lpfv) noexcept {
-	return (lpfv->mask & FV_ENCODING) ? lpfv->iEncoding : CPI_NONE;
-}
+bool	FileVars_ParseInt(LPCSTR pszData, LPCSTR pszName, int *piValue) noexcept;
+bool	FileVars_ParseStr(LPCSTR pszData, LPCSTR pszName, char *pszValue, int cchValue) noexcept;
 
 enum FOLD_ACTION {
 	FOLD_ACTION_FOLD	= SC_FOLDACTION_CONTRACT,

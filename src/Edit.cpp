@@ -133,7 +133,7 @@ extern bool bLargeFileMode;
 extern int iWrapColumn;
 extern int iWordWrapIndent;
 
-void EditSetNewText(LPCSTR lpstrText, DWORD cbText, Sci_Line lineCount) {
+void EditSetNewText(LPCSTR lpstrText, DWORD cbText, Sci_Line lineCount) noexcept {
 	bFreezeAppTitle = true;
 	bReadOnlyMode = false;
 	iWrapColumn = 0;
@@ -159,7 +159,7 @@ void EditSetNewText(LPCSTR lpstrText, DWORD cbText, Sci_Line lineCount) {
 	}
 #endif
 
-	FileVars_Apply(&fvCurFile);
+	fvCurFile.Apply();
 
 	if (cbText > 0) {
 		SendMessage(hwndEdit, WM_SETREDRAW, FALSE, 0);
@@ -268,7 +268,7 @@ void EditConvertToLargeMode(void) {
 	SciCall_ClearMarker();
 
 	EditReplaceDocument(pdoc);
-	FileVars_Apply(&fvCurFile);
+	fvCurFile.Apply();
 
 	if (length > 0) {
 		SendMessage(hwndEdit, WM_SETREDRAW, FALSE, 0);
@@ -817,8 +817,8 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus &status) no
 	status.linesCount[2] = lineCountCR;
 }
 
-void EditDetectIndentation(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) noexcept {
-	if ((lpfv->mask & FV_MaskHasFileTabSettings) == FV_MaskHasFileTabSettings) {
+void EditDetectIndentation(LPCSTR lpData, DWORD cbData, EditFileVars &fv) noexcept {
+	if ((fv.mask & FV_MaskHasFileTabSettings) == FV_MaskHasFileTabSettings) {
 		return;
 	}
 	if (!tabSettings.bDetectIndentation) {
@@ -943,12 +943,12 @@ labelStart:
 #endif
 	if (prevTabWidth != 0) {
 		const bool bTabsAsSpaces = prevTabWidth <= MAX_DETECTED_TAB_WIDTH;
-		lpfv->mask |= FV_TABSASSPACES;
-		lpfv->bTabsAsSpaces = bTabsAsSpaces;
+		fv.mask |= FV_TABSASSPACES;
+		fv.bTabsAsSpaces = bTabsAsSpaces;
 		if (bTabsAsSpaces) {
-			lpfv->mask |= FV_MaskHasTabIndentWidth;
-			lpfv->iTabWidth = prevTabWidth;
-			lpfv->iIndentWidth = prevTabWidth;
+			fv.mask |= FV_MaskHasTabIndentWidth;
+			fv.iTabWidth = prevTabWidth;
+			fv.iIndentWidth = prevTabWidth;
 		}
 	}
 
@@ -966,7 +966,7 @@ labelStart:
 //
 // EditLoadFile()
 //
-bool EditLoadFile(LPWSTR pszFile, EditFileIOStatus &status) {
+bool EditLoadFile(LPWSTR pszFile, EditFileIOStatus &status) noexcept {
 	HANDLE hFile = CreateFile(pszFile,
 					   GENERIC_READ,
 					   FILE_SHARE_READ | FILE_SHARE_WRITE,
@@ -1090,7 +1090,7 @@ bool EditLoadFile(LPWSTR pszFile, EditFileIOStatus &status) {
 
 		NP2HeapFree(lpData);
 		lpData = lpDataUTF8;
-		FileVars_Init(lpData, cbData, &fvCurFile);
+		fvCurFile.Init(lpData, cbData);
 	} else if (uFlags & NCP_UTF8) {
 		if (uFlags & NCP_UTF8_SIGN) {
 			lpDataUTF8 += 3;
@@ -1122,7 +1122,7 @@ bool EditLoadFile(LPWSTR pszFile, EditFileIOStatus &status) {
 
 	if (cbData) {
 		EditDetectEOLMode(lpDataUTF8, cbData, status);
-		EditDetectIndentation(lpDataUTF8, cbData, &fvCurFile);
+		EditDetectIndentation(lpDataUTF8, cbData, fvCurFile);
 	}
 	SciCall_SetCodePage((uFlags & NCP_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8);
 	EditSetNewText(lpDataUTF8, cbData, status.totalLineCount);
@@ -1215,9 +1215,9 @@ bool EditSaveFile(HWND hwnd, LPCWSTR pszFile, int saveFlag, EditFileIOStatus &st
 #if 0
 		// FIXME: move checks in front of disk file access
 		if ((uFlags & (NCP_UNICODE | NCP_UTF8_SIGN)) == 0) {
-			FILEVARS fv;
-			FileVars_Init(lpData, cbData, &fv);
-			const int iAltEncoding = FileVars_GetEncoding(&fv);
+			EditFileVars fv;
+			fv.Init(lpData, cbData);
+			const int iAltEncoding = fv.GetEncoding();
 			if (iAltEncoding >= CPI_FIRST && iAltEncoding != iEncoding
 				&& !((uFlags & NCP_UTF8) && (mEncoding[iAltEncoding].uFlags & NCP_UTF8))) {
 				Encoding_GetLabel(iAltEncoding);
@@ -7357,13 +7357,13 @@ extern bool fWordWrapG;
 extern int iWordWrapMode;
 extern int iLongLinesLimitG;
 
-void FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
-	memset(lpfv, 0, sizeof(FILEVARS));
-	// see FileVars_Apply() for other Tab settings.
+void EditFileVars::Init(LPCSTR lpData, DWORD cbData) noexcept {
+	memset(this, 0, sizeof(EditFileVars));
+	// see Apply() for other Tab settings.
 	tabSettings.schemeUseGlobalTabSettings = true;
-	lpfv->bTabIndents = tabSettings.bTabIndents;
-	lpfv->fWordWrap = fWordWrapG;
-	lpfv->iLongLinesLimit = iLongLinesLimitG;
+	bTabIndents = tabSettings.bTabIndents;
+	fWordWrap = fWordWrapG;
+	iLongLinesLimit = iLongLinesLimitG;
 
 	if (lpData == nullptr || cbData == 0 || (fNoFileVariables && bNoEncodingTags)) {
 		return;
@@ -7377,7 +7377,7 @@ void FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 
 	// parse file variables at the beginning or end of the file.
 	bool beginning = true;
-	int mask = 0;
+	mask = 0;
 	while (true) {
 		if (!fNoFileVariables) {
 			// Emacs file variables
@@ -7387,47 +7387,47 @@ void FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 			}
 
 			if (FileVars_ParseInt(tch, "tab-width", &i)) {
-				lpfv->iTabWidth = clamp(i, TAB_WIDTH_MIN, TAB_WIDTH_MAX);
+				iTabWidth = clamp(i, TAB_WIDTH_MIN, TAB_WIDTH_MAX);
 				mask |= FV_TABWIDTH;
 			}
 
 			if (FileVars_ParseInt(tch, "*basic-indent", &i) ||
 				FileVars_ParseInt(tch, "*basic-offset", &i)) {
-				lpfv->iIndentWidth = clamp(i, INDENT_WIDTH_MIN, INDENT_WIDTH_MAX);
+				iIndentWidth = clamp(i, INDENT_WIDTH_MIN, INDENT_WIDTH_MAX);
 				mask |= FV_INDENTWIDTH;
 			}
 
 			if (FileVars_ParseInt(tch, "indent-tabs-mode", &i)) {
-				lpfv->bTabsAsSpaces = i == 0;
+				bTabsAsSpaces = i == 0;
 				mask |= FV_TABSASSPACES;
 			}
 
 			if (FileVars_ParseInt(tch, "*tab-always-indent", &i)) {
-				lpfv->bTabIndents = i != 0;
+				bTabIndents = i != 0;
 				mask |= FV_TABINDENTS;
 			}
 
 			if (FileVars_ParseInt(tch, "truncate-lines", &i)) {
-				lpfv->fWordWrap = i == 0;
+				fWordWrap = i == 0;
 				mask |= FV_WORDWRAP;
 			}
 
 			if (FileVars_ParseInt(tch, "fill-column", &i)) {
-				lpfv->iLongLinesLimit = clamp(i, 0, NP2_LONG_LINE_LIMIT);
+				iLongLinesLimit = clamp(i, 0, NP2_LONG_LINE_LIMIT);
 				mask |= FV_LONGLINESLIMIT;
 			}
 
-			if (FileVars_ParseStr(tch, "mode", lpfv->tchMode, COUNTOF(lpfv->tchMode))) {
+			if (FileVars_ParseStr(tch, "mode", tchMode, COUNTOF(tchMode))) {
 				mask |= FV_MODE;
 			}
 		}
 
 		if (!utf8Sig && !bNoEncodingTags) {
-			if (FileVars_ParseStr(tch, "encoding", lpfv->tchEncoding, COUNTOF(lpfv->tchEncoding)) || // XML
-				FileVars_ParseStr(tch, "charset", lpfv->tchEncoding, COUNTOF(lpfv->tchEncoding)) || // HTML
-				FileVars_ParseStr(tch, "coding", lpfv->tchEncoding, COUNTOF(lpfv->tchEncoding)) || // Emacs
-				FileVars_ParseStr(tch, "fileencoding", lpfv->tchEncoding, COUNTOF(lpfv->tchEncoding)) || // Vim
-				FileVars_ParseStr(tch, "/*!40101 SET NAMES ", lpfv->tchEncoding, COUNTOF(lpfv->tchEncoding))) {
+			if (FileVars_ParseStr(tch, "encoding", tchEncoding, COUNTOF(tchEncoding)) || // XML
+				FileVars_ParseStr(tch, "charset", tchEncoding, COUNTOF(tchEncoding)) || // HTML
+				FileVars_ParseStr(tch, "coding", tchEncoding, COUNTOF(tchEncoding)) || // Emacs
+				FileVars_ParseStr(tch, "fileencoding", tchEncoding, COUNTOF(tchEncoding)) || // Vim
+				FileVars_ParseStr(tch, "/*!40101 SET NAMES ", tchEncoding, COUNTOF(tchEncoding))) {
 				// MySQL dump: /*!40101 SET NAMES utf8mb4 */;
 				// CSS @charset "UTF-8"; is not supported.
 				mask |= FV_ENCODING;
@@ -7445,22 +7445,20 @@ void FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 
 	const int has = mask & FV_MaskHasTabIndentWidth;
 	if (has == FV_TABWIDTH || has == FV_INDENTWIDTH) {
-		if (has == FV_TABWIDTH) {
-			lpfv->iIndentWidth = lpfv->iTabWidth;
-		} else {
-			lpfv->iTabWidth = lpfv->iIndentWidth;
-		}
 		mask |= FV_MaskHasTabIndentWidth;
+		if (has == FV_TABWIDTH) {
+			iIndentWidth = iTabWidth;
+		} else {
+			iTabWidth = iIndentWidth;
+		}
 	}
 	if (mask & FV_ENCODING) {
-		int iEncoding = Encoding_MatchA(lpfv->tchEncoding);
+		iEncoding = Encoding_MatchA(tchEncoding);
 		// should never match UTF-16 or UTF-32.
 		if (Encoding_IsUnicode(iEncoding)) {
 			iEncoding = CPI_NONE;
 		}
-		lpfv->iEncoding = iEncoding;
 	}
-	lpfv->mask = mask;
 }
 
 void EditSetWrapStartIndent(int tabWidth, int indentWidth) noexcept {
@@ -7506,43 +7504,42 @@ void EditSetWrapIndentMode(int tabWidth, int indentWidth) noexcept {
 //
 // FileVars_Apply()
 //
-void FileVars_Apply(LPFILEVARS lpfv) {
-	const int mask = lpfv->mask;
+void EditFileVars::Apply() noexcept {
 	if (tabSettings.schemeUseGlobalTabSettings) {
 		if (!(mask & FV_TABWIDTH)) {
-			lpfv->iTabWidth = tabSettings.globalTabWidth;
+			iTabWidth = tabSettings.globalTabWidth;
 		}
 		if (!(mask & FV_INDENTWIDTH)) {
-			lpfv->iIndentWidth = tabSettings.globalIndentWidth;
+			iIndentWidth = tabSettings.globalIndentWidth;
 		}
 		if (!(mask & FV_TABSASSPACES)) {
-			lpfv->bTabsAsSpaces = tabSettings.globalTabsAsSpaces;
+			bTabsAsSpaces = tabSettings.globalTabsAsSpaces;
 		}
 	} else {
 		if (!(mask & FV_TABWIDTH)) {
-			lpfv->iTabWidth = tabSettings.schemeTabWidth;
+			iTabWidth = tabSettings.schemeTabWidth;
 		}
 		if (!(mask & FV_INDENTWIDTH)) {
-			lpfv->iIndentWidth = tabSettings.schemeIndentWidth;
+			iIndentWidth = tabSettings.schemeIndentWidth;
 		}
 		if (!(mask & FV_TABSASSPACES)) {
-			lpfv->bTabsAsSpaces = tabSettings.schemeTabsAsSpaces;
+			bTabsAsSpaces = tabSettings.schemeTabsAsSpaces;
 		}
 	}
 
-	SciCall_SetTabWidth(lpfv->iTabWidth);
-	SciCall_SetIndent(lpfv->iIndentWidth);
-	SciCall_SetUseTabs(!lpfv->bTabsAsSpaces);
-	SciCall_SetTabIndents(lpfv->bTabIndents);
+	SciCall_SetTabWidth(iTabWidth);
+	SciCall_SetIndent(iIndentWidth);
+	SciCall_SetUseTabs(!bTabsAsSpaces);
+	SciCall_SetTabIndents(bTabIndents);
 	SciCall_SetBackSpaceUnIndents(tabSettings.bBackspaceUnindents);
 
-	SciCall_SetWrapMode(lpfv->fWordWrap ? iWordWrapMode : SC_WRAP_NONE);
-	EditSetWrapIndentMode(lpfv->iTabWidth, lpfv->iIndentWidth);
+	SciCall_SetWrapMode(fWordWrap ? iWordWrapMode : SC_WRAP_NONE);
+	EditSetWrapIndentMode(iTabWidth, iIndentWidth);
 
-	SciCall_SetEdgeColumn(lpfv->iLongLinesLimit);
+	SciCall_SetEdgeColumn(iLongLinesLimit);
 }
 
-static LPCSTR FileVars_Find(LPCSTR pszData, LPCSTR pszName) {
+static LPCSTR FileVars_Find(LPCSTR pszData, LPCSTR pszName) noexcept {
 	const bool suffix = *pszName == '*';
 	if (suffix) {
 		++pszName;
@@ -7572,7 +7569,7 @@ static LPCSTR FileVars_Find(LPCSTR pszData, LPCSTR pszName) {
 //
 // FileVars_ParseInt()
 //
-bool FileVars_ParseInt(LPCSTR pszData, LPCSTR pszName, int *piValue) {
+bool FileVars_ParseInt(LPCSTR pszData, LPCSTR pszName, int *piValue) noexcept {
 	LPCSTR pvStart = FileVars_Find(pszData, pszName);
 	if (pvStart) {
 		while (*pvStart == ':' || *pvStart == '=' || *pvStart == '\"' || *pvStart == '\'' || *pvStart == ' ' || *pvStart == '\t') {
@@ -7580,7 +7577,7 @@ bool FileVars_ParseInt(LPCSTR pszData, LPCSTR pszName, int *piValue) {
 		}
 
 		char *pvEnd;
-		*piValue = (int)strtol(pvStart, &pvEnd, 10);
+		*piValue = static_cast<int>(strtol(pvStart, &pvEnd, 10));
 		if (pvEnd != pvStart) {
 			return true;
 		}
@@ -7604,7 +7601,7 @@ bool FileVars_ParseInt(LPCSTR pszData, LPCSTR pszName, int *piValue) {
 //
 // FileVars_ParseStr()
 //
-bool FileVars_ParseStr(LPCSTR pszData, LPCSTR pszName, char *pszValue, int cchValue) {
+bool FileVars_ParseStr(LPCSTR pszData, LPCSTR pszName, char *pszValue, int cchValue) noexcept {
 	LPCSTR pvStart = FileVars_Find(pszData, pszName);
 	if (pvStart) {
 		bool bQuoted = false;

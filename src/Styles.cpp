@@ -1379,7 +1379,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 		if ((fvCurFile.mask & FV_MaskHasFileTabSettings) != FV_MaskHasFileTabSettings) {
 			// otherwise, the same tab settings already applied in EditSetNewText().
 			Style_LoadTabSettings(pLexNew);
-			FileVars_Apply(&fvCurFile);
+			fvCurFile.Apply();
 		}
 
 		// change empty file to use scheme default encoding and line ending

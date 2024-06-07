@@ -279,10 +279,10 @@ enum {
 	AutoSaveDefaultPeriod = 5000,
 };
 
-void	AutoSave_Start(bool reset);
-void	AutoSave_Stop(BOOL keepBackup);
-void	AutoSave_DoWork(FileSaveFlag saveFlag);
-LPCWSTR AutoSave_GetDefaultFolder(void);
+void	AutoSave_Start(bool reset) noexcept;
+void	AutoSave_Stop(BOOL keepBackup) noexcept;
+void	AutoSave_DoWork(FileSaveFlag saveFlag) noexcept;
+LPCWSTR AutoSave_GetDefaultFolder() noexcept;
 
 LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
 LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam);

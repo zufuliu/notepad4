@@ -2272,7 +2272,7 @@ LPSTR RecodeAsUTF8(LPSTR lpData, DWORD *cbData, UINT codePage, DWORD flags) noex
 	return lpData;
 }
 
-int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, int *encodingFlag) {
+int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, int *encodingFlag) noexcept {
 	// TODO: scheme default encoding
 	LPCWSTR const pszExt = PathFindExtension(pszFile);
 	int preferedEncoding = CPI_NONE;
@@ -2291,7 +2291,7 @@ int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, int *enco
 	int iEncoding = CPI_DEFAULT;
 	// default encoding for empty file.
 	if (cbData == 0) {
-		FileVars_Init(NULL, 0, &fvCurFile);
+		fvCurFile.Init(nullptr, 0);
 		*encodingFlag = EncodingFlag_UTF7;
 		if (iSrcEncoding >= CPI_FIRST) {
 			iEncoding = iSrcEncoding;
@@ -2329,7 +2329,7 @@ int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, int *enco
 		return iEncoding;
 	}
 
-	FileVars_Init(lpData, cbData, &fvCurFile);
+	fvCurFile.Init(lpData, cbData);
 	// check UTF-8 BOM
 	const bool utf8Sig = IsUTF8Signature(lpData);
 	if (Encoding_IsUTF8(iSrcEncoding) // reload as UTF-8
@@ -2367,7 +2367,7 @@ int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, int *enco
 	}
 
 	// treat as unreliable encoding declaration as we don't follow strict parse rules.
-	const int sniffedEncoding = FileVars_GetEncoding(&fvCurFile);
+	const int sniffedEncoding = fvCurFile.GetEncoding();
 	// check 7-bit ASCII
 	const char * const multiData = CheckUTF7(lpData, cbData);
 	if (multiData == nullptr) {
