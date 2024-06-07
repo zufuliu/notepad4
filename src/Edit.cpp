@@ -2808,8 +2808,9 @@ void EditMoveDown() noexcept {
 	}
 }
 
+namespace {
 // only convert CR+LF
-static void ConvertWinEditLineEndingsEx(char *s, int iEOLMode, int *lineCount) noexcept {
+void ConvertWinEditLineEndingsEx(char *s, int iEOLMode, int *lineCount) noexcept {
 	int count = 0;
 	if (iEOLMode != SC_EOL_CRLF) {
 		char *p = s;
@@ -2862,7 +2863,7 @@ static void ConvertWinEditLineEndingsEx(char *s, int iEOLMode, int *lineCount) n
 	}
 }
 
-static inline void ConvertWinEditLineEndings(char *s, int iEOLMode) noexcept {
+inline void ConvertWinEditLineEndings(char *s, int iEOLMode) noexcept {
 	ConvertWinEditLineEndingsEx(s, iEOLMode, nullptr);
 }
 
@@ -2882,90 +2883,88 @@ struct EditModifyLinesText {
 	Sci_Line number;
 	char *mszPrefix;
 	const char *mszSuffix;
+	void Parse(LPCWSTR pszTextW, Sci_Line iLineStart, Sci_Line iLineEnd, UINT cpEdit, int iEOLMode) noexcept;
+	void Insert(char *mszInsert, Sci_Line iLine, Sci_Position position) noexcept;
 };
 
-static void EditModifyLinesText_Parse(EditModifyLinesText *text, LPCWSTR pszTextW, Sci_Line iLineStart, Sci_Line iLineEnd, UINT cpEdit, int iEOLMode) {
-	memset(text, 0, sizeof(EditModifyLinesText));
-	int length = lstrlen(pszTextW);
+void EditModifyLinesText::Parse(LPCWSTR pszTextW, Sci_Line iLineStart, Sci_Line iLineEnd, UINT cpEdit, int iEOLMode) noexcept {
+	memset(this, 0, sizeof(EditModifyLinesText));
+	length = lstrlen(pszTextW);
 	if (length == 0) {
 		return;
 	}
 
 	length = length * kMaxMultiByteCount + 1;
-	char *mszPrefix = (char *)NP2HeapAlloc(length);
+	mszPrefix = static_cast<char *>(NP2HeapAlloc(length));
 	WideCharToMultiByte(cpEdit, 0, pszTextW, -1, mszPrefix, length, nullptr, nullptr);
-	ConvertWinEditLineEndingsEx(mszPrefix, iEOLMode, &(text->lineCount));
+	ConvertWinEditLineEndingsEx(mszPrefix, iEOLMode, &lineCount);
 
-	text->length = length;
-	text->mszPrefix = mszPrefix;
 	char *p = mszPrefix;
 	while ((p = strstr(p, "$(")) != nullptr) {
 		char * const back = p;
 		p += CSTRLEN("$(");
-		const bool padZero = *p == '0';
+		padZero = *p == '0';
 		if (padZero) {
 			p++;
 		}
 		if ((*p == 'L' || *p == 'N' || *p == 'I') && p[1] == ')') {
 			*back = '\0';
-			Sci_Line number = 0;
-			Sci_Line lineCount;
-			const uint8_t substitution = *p;
+			number = 0;
+			Sci_Line count;
+			substitution = *p;
 			if (substitution == EditModifyLinesSubstitution_LineNumber) {
-				lineCount = iLineEnd + 1;
+				count = iLineEnd + 1;
 			} else {
 				number = substitution == EditModifyLinesSubstitution_NumberOne;
-				lineCount = iLineEnd - iLineStart + number;
+				count = iLineEnd - iLineStart + number;
 			}
-			int numWidth = 1;
-			while (lineCount >= 10) {
+			numWidth = 1;
+			while (count >= 10) {
 				++numWidth;
-				lineCount /= 10;
+				count /= 10;
 			}
 
-			text->substitution = substitution;
-			text->padZero = padZero;
-			text->numWidth = numWidth;
-			text->number = number;
-			text->mszSuffix = p + 2;
+			mszSuffix = p + 2;
 			break;
 		}
 	}
 }
 
-static void EditModifyLinesText_Insert(EditModifyLinesText *text, char *mszInsert, Sci_Line iLine, Sci_Position position) {
-	strcpy(mszInsert, text->mszPrefix);
-	if (text->substitution != EditModifyLinesSubstitution_None) {
+void EditModifyLinesText::Insert(char *mszInsert, Sci_Line iLine, Sci_Position position) noexcept {
+	strcpy(mszInsert, mszPrefix);
+	if (substitution != EditModifyLinesSubstitution_None) {
 		char tchNum[64];
-		const int numWidth = text->numWidth;
-		const Sci_Line number = (text->substitution == EditModifyLinesSubstitution_LineNumber) ? iLine + 1 : text->number;
+		const int width = numWidth;
+		const Sci_Line value = (substitution == EditModifyLinesSubstitution_LineNumber) ? iLine + 1 : number;
 #if defined(_WIN64)
-		if (text->padZero) {
-			sprintf(tchNum, "%0*" PRId64, numWidth, number);
+		if (padZero) {
+			sprintf(tchNum, "%0*" PRId64, width, value);
 		} else {
-			sprintf(tchNum, "%*" PRId64, numWidth, number);
+			sprintf(tchNum, "%*" PRId64, width, value);
 		}
 #else
-		if (text->padZero) {
-			sprintf(tchNum, "%0*d", numWidth, (int)(number));
+		if (padZero) {
+			sprintf(tchNum, "%0*d", width, static_cast<int>(value));
 		} else {
-			sprintf(tchNum, "%*d", numWidth, (int)(number));
+			sprintf(tchNum, "%*d", width, static_cast<int>(value));
 		}
 #endif
 		strcat(mszInsert, tchNum);
-		strcat(mszInsert, text->mszSuffix);
-		text->number++;
+		strcat(mszInsert, mszSuffix);
+		number++;
 	}
 
 	SciCall_SetTargetRange(position, position);
 	SciCall_ReplaceTarget(-1, mszInsert);
 }
 
+}
+
 //=============================================================================
 //
 // EditModifyLines()
 //
-void EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend, bool skipEmptyLine) {
+void EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend, bool skipEmptyLine) noexcept {
 	if (SciCall_IsRectangleSelection()) {
 		NotifyRectangleSelection();
 		return;
@@ -2995,8 +2994,8 @@ void EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend, bool skipEmptyLine)
 
 	EditModifyLinesText prefix;
 	EditModifyLinesText suffix;
-	EditModifyLinesText_Parse(&prefix, pwszPrefix, iLineStart, iLineEnd, cpEdit, iEOLMode);
-	EditModifyLinesText_Parse(&suffix, pwszAppend, iLineStart, iLineEnd, cpEdit, iEOLMode);
+	prefix.Parse(pwszPrefix, iLineStart, iLineEnd, cpEdit, iEOLMode);
+	suffix.Parse(pwszAppend, iLineStart, iLineEnd, cpEdit, iEOLMode);
 
 	char *mszInsert = (char *)NP2HeapAlloc(prefix.length + suffix.length + 64);
 	SciCall_BeginUndoAction();
@@ -3008,14 +3007,14 @@ void EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend, bool skipEmptyLine)
 		}
 		if (prefix.length != 0) {
 			iLineDest += prefix.lineCount;
-			EditModifyLinesText_Insert(&prefix, mszInsert, iLine, iStartPos);
+			prefix.Insert(mszInsert, iLine, iStartPos);
 		}
 		if (suffix.length != 0) {
 			if (prefix.length != 0) {
 				iEndPos = SciCall_GetLineEndPosition(iLineDest);
 			}
 			iLineDest += suffix.lineCount;
-			EditModifyLinesText_Insert(&suffix, mszInsert, iLine, iEndPos);
+			suffix.Insert(mszInsert, iLine, iEndPos);
 		}
 	}
 	SciCall_EndUndoAction();
@@ -4115,6 +4114,8 @@ void EditJoinLinesEx() noexcept {
 //
 // EditSortLines()
 //
+namespace {
+
 struct SORTLINE {
 	LPCWSTR pwszLine;
 	LPCWSTR pwszSortEntry;
@@ -4123,7 +4124,7 @@ struct SORTLINE {
 	EditSortFlag iSortFlags;
 };
 
-static int __cdecl CmpSortLine(const void *p1, const void *p2) noexcept {
+int __cdecl CmpSortLine(const void *p1, const void *p2) noexcept {
 	const SORTLINE *s1 = (const SORTLINE *)p1;
 	const SORTLINE *s2 = (const SORTLINE *)p2;
 	const EditSortFlag iSortFlags = s1->iSortFlags;
@@ -4153,10 +4154,12 @@ static int __cdecl CmpSortLine(const void *p1, const void *p2) noexcept {
 	return cmp;
 }
 
-static int __cdecl DontSortLine(const void *p1, const void *p2) noexcept {
+int __cdecl DontSortLine(const void *p1, const void *p2) noexcept {
 	const SORTLINE *s1 = (const SORTLINE *)p1;
 	const SORTLINE *s2 = (const SORTLINE *)p2;
 	return s1->iLine - s2->iLine;
+}
+
 }
 
 void EditSortLines(EditSortFlag iSortFlags) noexcept {
@@ -6127,7 +6130,7 @@ extern int cyEncloseSelectionDlg;
 extern int cxInsertTagDlg;
 extern int cyInsertTagDlg;
 
-static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	static DWORD id_hover;
 	static DWORD id_capture;
 	static bool skipEmptyLine;

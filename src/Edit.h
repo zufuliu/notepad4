@@ -161,7 +161,7 @@ void	EditSpacesToTabs(int nTabWidth, bool bOnlyIndentingWS) noexcept;
 
 void	EditMoveUp() noexcept;
 void	EditMoveDown() noexcept;
-void	EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend, bool skipEmptyLine);
+void	EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend, bool skipEmptyLine) noexcept;
 void	EditAlignText(EditAlignMode nMode) noexcept;
 void	EditEncloseSelection(LPCWSTR pwszOpen, LPCWSTR pwszClose) noexcept;
 void	EditToggleLineComments(LPCWSTR pwszComment, int commentFlag) noexcept;
