@@ -302,7 +302,7 @@ static struct WatchFileInformation {
 
 static EDITFINDREPLACE efrData;
 bool	bReplaceInitialized = false;
-EditMarkAllStatus editMarkAllStatus;
+EditMarkAll editMarkAll;
 HANDLE idleTaskTimer;
 
 static EditSortFlag iSortOptions = EditSortFlag_Ascending;
@@ -663,22 +663,22 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 	// create the timer first, to make flagMatchText working.
 	HANDLE timer = idleTaskTimer = WaitableTimer_Create();
-	QueryPerformanceFrequency(&editMarkAllStatus.watch.freq);
+	QueryPerformanceFrequency(&editMarkAll.watch.freq);
 	InitInstance(hInstance, nShowCmd);
 	hAccMain = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_MAINWND));
 	hAccFindReplace = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_ACCFINDREPLACE));
 	MSG msg;
 
 	while (true) {
-		if (editMarkAllStatus.pending) {
+		if (editMarkAll.pending) {
 			WaitableTimer_Set(timer, WaitableTimer_IdleTaskDelayTime);
-			while (editMarkAllStatus.pending && WaitableTimer_Continue(timer)) {
+			while (editMarkAll.pending && WaitableTimer_Continue(timer)) {
 				if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
 					DispatchMessageMain(&msg);
 				}
 			}
-			if (editMarkAllStatus.pending) {
-				EditMarkAll_Continue(&editMarkAllStatus, timer);
+			if (editMarkAll.pending) {
+				editMarkAll.Continue(timer);
 			}
 		}
 		if (GetMessage(&msg, nullptr, 0, 0)) {
@@ -1033,13 +1033,6 @@ static inline void NP2RestoreWind(HWND hwnd) noexcept {
 	ShowOwnedPopups(hwnd, TRUE);
 }
 
-static inline void EditMarkAll_Stop(void) {
-	editMarkAllStatus.pending = false;
-	editMarkAllStatus.matchCount = 0;
-	WaitableTimer_Set(idleTaskTimer, 0);
-	EditMarkAll_Clear();
-}
-
 static inline void ExitApplication(HWND hwnd) {
 	if (FileSave(FileSaveFlag_Ask)) {
 		DestroyWindow(hwnd);
@@ -1144,7 +1137,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 	case WM_DESTROY:
 	case WM_ENDSESSION:
 		if (!bShutdownOK) {
-			EditMarkAll_Stop();
+			editMarkAll.Stop();
 			AutoSave_Stop(TRUE);
 			// Terminate file watching
 			InstallFileWatching(true);
@@ -1976,7 +1969,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 	const BOOL bIsAppThemed = IsAppThemed();
 
-	const DWORD dwToolbarStyle = WS_TOOLBAR;
+	constexpr DWORD dwToolbarStyle = WS_TOOLBAR;
 	hwndToolbar = CreateWindowEx(0, TOOLBARCLASSNAME, nullptr, dwToolbarStyle,
 								 0, 0, 0, 0, hwnd, (HMENU)IDC_TOOLBAR, hInstance, nullptr);
 
@@ -2147,7 +2140,7 @@ void RecreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 // MsgDPIChanged() - Handle WM_DPICHANGED
 //
 //
-void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
+void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	g_uCurrentDPI = HIWORD(wParam);
 	const RECT* const rc = (RECT *)lParam;
 	const Sci_Line iVisTopLine = SciCall_GetFirstVisibleLine();
@@ -2211,7 +2204,7 @@ void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 		return;
 	}
 
-	const int x = 0;
+	constexpr int x = 0;
 	int y = 0;
 
 	const int cx = LOWORD(lParam);
@@ -2386,7 +2379,7 @@ bool IsIMEInNativeMode() noexcept {
 	return result;
 }
 
-void MsgNotifyZoom(void) {
+void MsgNotifyZoom() noexcept {
 	const Sci_Line iVisTopLine = SciCall_GetFirstVisibleLine();
 	const Sci_Line iDocTopLine = SciCall_DocLineFromVisible(iVisTopLine);
 	iZoomLevel = SciCall_GetZoom();
@@ -2451,7 +2444,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 
 	int i = IDM_ENCODING_ANSI - 1;
 	if (iCurrentEncoding <= CPI_UTF8SIGN) {
-		const UINT mask = ((IDM_ENCODING_ANSI - IDM_ENCODING_ANSI + 1) << CPI_DEFAULT*4)
+		constexpr UINT mask = ((IDM_ENCODING_ANSI - IDM_ENCODING_ANSI + 1) << CPI_DEFAULT*4)
 			| ((IDM_ENCODING_UNICODE - IDM_ENCODING_ANSI + 1) << CPI_UNICODEBOM*4)
 			| ((IDM_ENCODING_UNICODEREV - IDM_ENCODING_ANSI + 1) << CPI_UNICODEBEBOM*4)
 			| ((IDM_ENCODING_UTF8 - IDM_ENCODING_ANSI + 1) << CPI_UTF8*4)
@@ -3064,7 +3057,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				break;
 			}
 		} else {
-			const UINT mask = (CPI_DEFAULT << 4*(IDM_ENCODING_ANSI - IDM_ENCODING_ANSI))
+			constexpr UINT mask = (CPI_DEFAULT << 4*(IDM_ENCODING_ANSI - IDM_ENCODING_ANSI))
 				| (CPI_UNICODEBOM << 4*(IDM_ENCODING_UNICODE - IDM_ENCODING_ANSI))
 				| (CPI_UNICODEBEBOM << 4*(IDM_ENCODING_UNICODEREV - IDM_ENCODING_ANSI))
 				| (CPI_UTF8 << 4*(IDM_ENCODING_UTF8 - IDM_ENCODING_ANSI))
@@ -3840,7 +3833,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 
 		if (iNextLine >= 0) {
-			editMarkAllStatus.ignoreSelectionUpdate = true;
+			editMarkAll.ignoreSelectionUpdate = true;
 			SciCall_EnsureVisible(iNextLine);
 			SciCall_GotoLine(iNextLine);
 			SciCall_SetYCaretPolicy(CARET_SLOP | CARET_STRICT | CARET_EVEN, 10);
@@ -3861,7 +3854,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 
 		if (iNextLine >= 0) {
-			editMarkAllStatus.ignoreSelectionUpdate = true;
+			editMarkAll.ignoreSelectionUpdate = true;
 			SciCall_EnsureVisible(iNextLine);
 			SciCall_GotoLine(iNextLine);
 			SciCall_SetYCaretPolicy(CARET_SLOP | CARET_STRICT | CARET_EVEN, 10);
@@ -4128,9 +4121,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			break;
 		}
 		if (bMarkOccurrences) {
-			EditMarkAll(FALSE, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords, bMarkOccurrencesBookmark);
+			editMarkAll.MarkAll(FALSE, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords, bMarkOccurrencesBookmark);
 		} else {
-			EditMarkAll_Clear();
+			editMarkAll.Clear();
 		}
 		UpdateStatusbar();
 		break;
@@ -4918,21 +4911,21 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 					}
 
 					// mark occurrences of text currently selected
-					if (editMarkAllStatus.ignoreSelectionUpdate) {
-						editMarkAllStatus.ignoreSelectionUpdate = false;
+					if (editMarkAll.ignoreSelectionUpdate) {
+						editMarkAll.ignoreSelectionUpdate = false;
 					} else if (bMarkOccurrences) {
 						if (SciCall_IsSelectionEmpty()) {
-							if (editMarkAllStatus.matchCount) {
-								EditMarkAll_Clear();
+							if (editMarkAll.matchCount) {
+								editMarkAll.Clear();
 							}
 						} else {
-							EditMarkAll((scn->updated & SC_UPDATE_CONTENT), bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords, bMarkOccurrencesBookmark);
+							editMarkAll.MarkAll((scn->updated & SC_UPDATE_CONTENT), bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords, bMarkOccurrencesBookmark);
 						}
 					}
 				} else if (scn->updated & SC_UPDATE_CONTENT) {
 					// cachedStatusItem.updateMask is already set in SCN_MODIFIED.
-					if (editMarkAllStatus.matchCount) {
-						EditMarkAll(TRUE, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords, bMarkOccurrencesBookmark);
+					if (editMarkAll.matchCount) {
+						editMarkAll.MarkAll(TRUE, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords, bMarkOccurrencesBookmark);
 					}
 				}
 				if (cachedStatusItem.updateMask) {
@@ -5280,7 +5273,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				return TRUE;
 
 			case StatusItem_EolMode: {
-				const UINT mask = (SC_EOL_LF << 2*SC_EOL_CRLF) | (SC_EOL_CR << 2*SC_EOL_LF) | (SC_EOL_CRLF << 2*SC_EOL_CR);
+				constexpr UINT mask = (SC_EOL_LF << 2*SC_EOL_CRLF) | (SC_EOL_CR << 2*SC_EOL_LF) | (SC_EOL_CRLF << 2*SC_EOL_CR);
 				iCurrentEOLMode = (mask >> (iCurrentEOLMode << 1)) & 3;
 				ConvertLineEndings(iCurrentEOLMode);
 				return TRUE;
@@ -7062,8 +7055,8 @@ void UpdateStatusbar() noexcept {
 
 	// find all and mark occurrences
 	WCHAR tchMatchesCount[32];
-	FormatNumber(tchMatchesCount, editMarkAllStatus.matchCount);
-	if (editMarkAllStatus.pending) {
+	FormatNumber(tchMatchesCount, editMarkAll.matchCount);
+	if (editMarkAll.pending) {
 		lstrcat(tchMatchesCount, L" ...");
 	}
 
@@ -7239,7 +7232,7 @@ void ToggleFullScreenMode() noexcept {
 //	FileIO()
 //
 //
-bool FileIO(bool fLoad, LPWSTR pszFile, int flag, EditFileIOStatus &status) {
+bool FileIO(bool fLoad, LPWSTR pszFile, int flag, EditFileIOStatus &status) noexcept {
 	BeginWaitCursor();
 
 	WCHAR tch[MAX_PATH + 128];

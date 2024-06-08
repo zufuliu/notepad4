@@ -263,7 +263,7 @@ enum FileSaveFlag {
 	FileSaveFlag_EndSession = 16,
 };
 
-bool FileIO(bool fLoad, LPWSTR pszFile, int flag, EditFileIOStatus &status);
+bool FileIO(bool fLoad, LPWSTR pszFile, int flag, EditFileIOStatus &status) noexcept;
 bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile);
 bool FileSave(FileSaveFlag saveFlag);
 BOOL OpenFileDlg(LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) noexcept;
@@ -287,7 +287,7 @@ LPCWSTR AutoSave_GetDefaultFolder() noexcept;
 LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
 LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam);
 void	CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept;
-void	MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam);
+void	MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept;
 void	MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept;
 void	MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept;
 void	MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept;

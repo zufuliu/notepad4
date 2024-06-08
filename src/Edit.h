@@ -106,7 +106,7 @@ void	Edit_ReleaseResources() noexcept;
 void	EditCreate(HWND hwndParent) noexcept;
 void	EditSetNewText(LPCSTR lpstrText, DWORD cbText, Sci_Line lineCount) noexcept;
 
-static inline void EditSetEmptyText()  noexcept{
+static inline void EditSetEmptyText() noexcept{
 	EditSetNewText("", 0, 1);
 }
 
@@ -188,7 +188,7 @@ void	EditSelectLines(bool currentBlock, bool lineSelection) noexcept;
 HWND	EditFindReplaceDlg(HWND hwnd, EDITFINDREPLACE *lpefr, bool bReplace) noexcept;
 void	EditFindNext(const EDITFINDREPLACE *lpefr, bool fExtendSelection) noexcept;
 void	EditFindPrev(const EDITFINDREPLACE *lpefr, bool fExtendSelection) noexcept;
-void	EditFindAll(const EDITFINDREPLACE *lpefr, bool selectAll);
+void	EditFindAll(const EDITFINDREPLACE *lpefr, bool selectAll) noexcept;
 bool	EditReplace(HWND hwnd, const EDITFINDREPLACE *lpefr) noexcept;
 bool	EditReplaceAll(HWND hwnd, const EDITFINDREPLACE *lpefr, bool bShowInfo) noexcept;
 bool	EditReplaceAllInSelection(HWND hwnd, const EDITFINDREPLACE *lpefr, bool bShowInfo) noexcept;
@@ -235,29 +235,31 @@ enum {
 	MarkerBitmask_Bookmark = 1 << MarkerNumber_Bookmark,
 };
 
-struct EditMarkAllStatus {
+struct EditMarkAll {
 	bool pending;
 	bool ignoreSelectionUpdate;
 	bool bookmarkForFindAll;
-	int findFlag;
+	int markFlag;
 	int incrementSize;			// increment search size
-	Sci_Position iSelCount;		// length for pszText
+	Sci_Position length;		// length for pszText
 	LPSTR pszText;				// pattern or text to find
 	double duration;			// search duration in milliseconds
 	Sci_Position matchCount;	// total match count
 	Sci_Position lastMatchPos;	// last matching position
-	Sci_Position iStartPos;		// previous stop position
-	Sci_Line bookmarkLine;		// previous bookmark line
+	Sci_Position prevStopPos;	// previous stop position
+	Sci_Line prevBookmarkLine;	// previous bookmark line
 	StopWatch watch;			// used to dynamic compute increment size
+
+	void Reset(int findFlag, Sci_Position iSelCount, LPSTR text) noexcept;
+	void Clear() noexcept {
+		Reset(0, 0, nullptr);
+	}
+	void Start(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPSTR text) noexcept;
+	void Continue(HANDLE timer) noexcept;
+	void Stop() noexcept;
+	void MarkAll(BOOL bChanged, bool matchCase, bool wholeWord, bool bookmark) noexcept;
 };
 
-void EditMarkAll_ClearEx(int findFlag, Sci_Position iSelCount, LPSTR pszText);
-NP2_inline void EditMarkAll_Clear(void) {
-	EditMarkAll_ClearEx(0, 0, NULL);
-}
-void EditMarkAll_Start(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPSTR pszText);
-void EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer);
-void EditMarkAll(BOOL bChanged, bool matchCase, bool wholeWord, bool bookmark);
 void EditToggleBookmarkAt(Sci_Position iPos) noexcept;
 void EditBookmarkSelectAll() noexcept;
 

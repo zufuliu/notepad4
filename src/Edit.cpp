@@ -5500,11 +5500,10 @@ bool EditReplace(HWND hwnd, const EDITFINDREPLACE *lpefr) noexcept {
 
 //=============================================================================
 //
-// EditMarkAll()
 // Mark all occurrences of the text currently selected (originally by Aleksandar Lekov)
 //
 
-extern EditMarkAllStatus editMarkAllStatus;
+extern EditMarkAll editMarkAll;
 extern HANDLE idleTaskTimer;
 #define EditMarkAll_MeasuredSize		(1024*1024)
 #define EditMarkAll_MinDuration			1.0
@@ -5515,53 +5514,53 @@ extern HANDLE idleTaskTimer;
 #define EditMarkAll_RangeCacheCount		256
 //static UINT EditMarkAll_Runs;
 
-void EditMarkAll_ClearEx(int findFlag, Sci_Position iSelCount, LPSTR pszText) {
-	if (editMarkAllStatus.matchCount != 0) {
+void EditMarkAll::Reset(int findFlag, Sci_Position iSelCount, LPSTR text) noexcept {
+	if (matchCount != 0) {
 		// clear existing indicator
 		SciCall_SetIndicatorCurrent(IndicatorNumber_MarkOccurrence);
 		SciCall_IndicatorClearRange(0, SciCall_GetLength());
 		UpdateStatusBarCache(StatusItem_Find);
 	}
-	if (editMarkAllStatus.bookmarkLine >= 0 || editMarkAllStatus.bookmarkForFindAll) {
-		if ((findFlag | editMarkAllStatus.findFlag) & NP2_MarkAllBookmark) {
-			if ((findFlag & (NP2_MarkAllBookmark | NP2_FromFindAll)) != 0 || !editMarkAllStatus.bookmarkForFindAll) {
+	if (prevBookmarkLine >= 0 || bookmarkForFindAll) {
+		if ((findFlag | markFlag) & NP2_MarkAllBookmark) {
+			if ((findFlag & (NP2_MarkAllBookmark | NP2_FromFindAll)) != 0 || !bookmarkForFindAll) {
 				SciCall_MarkerDeleteAll(MarkerNumber_Bookmark);
 			}
 		}
 	}
-	if (editMarkAllStatus.pszText) {
-		NP2HeapFree(editMarkAllStatus.pszText);
+	if (pszText) {
+		NP2HeapFree(pszText);
 	}
 
-	editMarkAllStatus.pending = false;
-	editMarkAllStatus.ignoreSelectionUpdate = false;
-	editMarkAllStatus.findFlag = findFlag;
-	editMarkAllStatus.incrementSize = 1;
-	editMarkAllStatus.iSelCount= iSelCount;
-	editMarkAllStatus.pszText = pszText;
+	pending = false;
+	ignoreSelectionUpdate = false;
+	markFlag = findFlag;
+	incrementSize = 1;
+	length = iSelCount;
+	pszText = text;
 	// timing for increment search is only useful for current search.
-	editMarkAllStatus.duration = EditMarkAll_DefaultDuration;
-	editMarkAllStatus.matchCount = 0;
-	editMarkAllStatus.lastMatchPos = 0;
-	editMarkAllStatus.iStartPos = 0;
-	editMarkAllStatus.bookmarkLine = -1;
+	duration = EditMarkAll_DefaultDuration;
+	matchCount = 0;
+	lastMatchPos = 0;
+	prevStopPos = 0;
+	prevBookmarkLine = -1;
 }
 
-void EditMarkAll_Start(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPSTR pszText) {
-	if (!bChanged && (findFlag == editMarkAllStatus.findFlag
-		&& iSelCount == editMarkAllStatus.iSelCount
+void EditMarkAll::Start(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPSTR text) noexcept {
+	if (!bChanged && (findFlag == markFlag
+		&& iSelCount == length
 		// _stricmp() is not safe for DBCS string.
-		&& memcmp(pszText, editMarkAllStatus.pszText, iSelCount) == 0)) {
-		NP2HeapFree(pszText);
+		&& memcmp(text, pszText, iSelCount) == 0)) {
+		NP2HeapFree(text);
 		return;
 	}
 
-	EditMarkAll_ClearEx(findFlag, iSelCount, pszText);
+	Reset(findFlag, iSelCount, text);
 	if ((findFlag & SCFIND_REGEXP) && iSelCount == 1) {
-		const char ch = *pszText;
+		const char ch = *text;
 		if (ch == '^' || ch == '$') {
 			const Sci_Line lineCount = SciCall_GetLineCount();
-			editMarkAllStatus.matchCount = lineCount - (ch == '^');
+			matchCount = lineCount - (ch == '^');
 			UpdateStatusBarCache(StatusItem_Find);
 			UpdateStatusbar();
 			return;
@@ -5570,13 +5569,20 @@ void EditMarkAll_Start(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPST
 
 	//EditMarkAll_Runs = 0;
 	if (findFlag & NP2_MarkAllBookmark) {
-		editMarkAllStatus.bookmarkForFindAll = (findFlag & NP2_FromFindAll) != 0;
+		bookmarkForFindAll = (findFlag & NP2_FromFindAll) != 0;
 		Style_SetBookmark();
 	}
-	EditMarkAll_Continue(&editMarkAllStatus, idleTaskTimer);
+	Continue(idleTaskTimer);
 }
 
-static Sci_Line EditMarkAll_Bookmark(Sci_Line bookmarkLine, const Sci_Position *ranges, UINT index, int findFlag, Sci_Position matchCount) {
+void EditMarkAll::Stop() noexcept {
+	pending = false;
+	matchCount = 0;
+	WaitableTimer_Set(idleTaskTimer, 0);
+	Clear();
+}
+
+static Sci_Line EditMarkAll_Bookmark(Sci_Line bookmarkLine, const Sci_Position *ranges, UINT index, int findFlag, Sci_Position matchCount) noexcept {
 	if (findFlag & NP2_MarkAllSelectAll) {
 		UINT i = 0;
 		if (matchCount == (Sci_Position)(index/2)) {
@@ -5617,15 +5623,15 @@ static Sci_Line EditMarkAll_Bookmark(Sci_Line bookmarkLine, const Sci_Position *
 	return bookmarkLine;
 }
 
-void EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer) {
+void EditMarkAll::Continue(HANDLE timer) noexcept {
 	// use increment search to ensure FindText() terminated in expected time.
 	//++EditMarkAll_Runs;
 	//printf("match %3u %s\n", EditMarkAll_Runs, GetCurrentLogTime());
-	QueryPerformanceCounter(&status->watch.begin);
+	QueryPerformanceCounter(&watch.begin);
 	const Sci_Position iLength = SciCall_GetLength();
-	Sci_Position iStartPos = status->iStartPos;
-	Sci_Position iMaxLength = status->incrementSize * EditMarkAll_MeasuredSize;
-	iMaxLength += iStartPos + status->iSelCount;
+	Sci_Position iStartPos = prevStopPos;
+	Sci_Position iMaxLength = incrementSize * EditMarkAll_MeasuredSize;
+	iMaxLength += iStartPos + length;
 	iMaxLength = min(iMaxLength, iLength);
 	if (iMaxLength < iLength) {
 		// match on whole line to avoid rewinding.
@@ -5636,18 +5642,18 @@ void EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer) {
 	}
 
 	// rewind start position
-	const int findFlag = status->findFlag;
+	const int findFlag = markFlag;
 	if (findFlag & NP2_MarkAllMultiline) {
-		iStartPos = max(iStartPos - status->iSelCount + 1, status->lastMatchPos);
+		iStartPos = max(iStartPos - length + 1, lastMatchPos);
 	}
 
 	Sci_Position cpMin = iStartPos;
-	Sci_TextToFindFull ttf = { { cpMin, iMaxLength }, status->pszText, { 0, 0 } };
+	Sci_TextToFindFull ttf = { { cpMin, iMaxLength }, pszText, { 0, 0 } };
 
-	Sci_Position matchCount = status->matchCount;
+	Sci_Position matchCount_ = matchCount;
 	UINT index = 0;
 	Sci_Position ranges[EditMarkAll_RangeCacheCount*2];
-	Sci_Line bookmarkLine = status->bookmarkLine;
+	Sci_Line bookmarkLine = prevBookmarkLine;
 
 	SciCall_SetIndicatorCurrent(IndicatorNumber_MarkOccurrence);
 	WaitableTimer_Set(timer, WaitableTimer_IdleTaskTimeSlot);
@@ -5659,7 +5665,7 @@ void EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer) {
 			break;
 		}
 
-		++matchCount;
+		++matchCount_;
 		const Sci_Position iSelCount = ttf.chrgText.cpMax - iPos;
 		if (iSelCount == 0) {
 			// empty regex
@@ -5675,47 +5681,44 @@ void EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer) {
 			ranges[index + 1] = iSelCount;
 			index += 2;
 			if (index == COUNTOF(ranges)) {
-				bookmarkLine = EditMarkAll_Bookmark(bookmarkLine, ranges, index, findFlag, matchCount);
+				bookmarkLine = EditMarkAll_Bookmark(bookmarkLine, ranges, index, findFlag, matchCount_);
 				index = 0;
 			}
 		}
 		cpMin = ttf.chrgText.cpMax;
 	}
 	if (index) {
-		bookmarkLine = EditMarkAll_Bookmark(bookmarkLine, ranges, index, findFlag, matchCount);
+		bookmarkLine = EditMarkAll_Bookmark(bookmarkLine, ranges, index, findFlag, matchCount_);
 	}
 
 	iStartPos = max(iStartPos, cpMin);
-	const bool pending = iStartPos < iLength;
+	pending = iStartPos < iLength;
 	if (pending) {
 		// dynamic compute increment search size, see ActionDuration in Scintilla.
-		status->watch.Stop();
-		const double period = status->watch.Get();
-		iMaxLength = iStartPos - status->iStartPos;
+		watch.Stop();
+		const double period = watch.Get();
+		iMaxLength = iStartPos - prevStopPos;
 		const double durationOne = (EditMarkAll_MeasuredSize * period) / iMaxLength;
 		const double alpha = 0.25;
-		const double duration_ = alpha * durationOne + (1.0 - alpha) * status->duration;
-		const double duration = max(duration_, EditMarkAll_MinDuration);
-		const int incrementSize = 1 + (int)(WaitableTimer_IdleTaskTimeSlot / duration);
+		const double duration_ = alpha * durationOne + (1.0 - alpha) * duration;
+		duration = max(duration_, EditMarkAll_MinDuration);
+		incrementSize = 1 + static_cast<int>(WaitableTimer_IdleTaskTimeSlot / duration);
 		//printf("match %3u (%zd, %zd) length=%.3f / %zd, one=%.3f, duration=%.3f / %.3f, increment=%d\n", EditMarkAll_Runs,
-		//	status->iStartPos, iStartPos, period, iMaxLength, durationOne, duration, duration_, incrementSize);
-		status->incrementSize = incrementSize;
-		status->duration = duration;
+		//	prevStopPos, iStartPos, period, iMaxLength, durationOne, duration, duration_, incrementSize);
 	}
 
-	status->pending = pending;
-	status->ignoreSelectionUpdate = matchCount && (findFlag & NP2_MarkAllSelectAll);
-	status->lastMatchPos = cpMin;
-	status->iStartPos = iStartPos;
-	status->bookmarkLine = bookmarkLine;
-	if (!pending || matchCount != status->matchCount) {
-		status->matchCount = matchCount;
+	ignoreSelectionUpdate = matchCount_ && (findFlag & NP2_MarkAllSelectAll);
+	lastMatchPos = cpMin;
+	prevStopPos = iStartPos;
+	prevBookmarkLine = bookmarkLine;
+	if (!pending || matchCount_ != matchCount) {
+		matchCount = matchCount_;
 		UpdateStatusBarCache(StatusItem_Find);
 		UpdateStatusbar();
 	}
 }
 
-void EditMarkAll(BOOL bChanged, bool matchCase, bool wholeWord, bool bookmark) {
+void EditMarkAll::MarkAll(BOOL bChanged, bool matchCase, bool wholeWord, bool bookmark) noexcept {
 	// get current selection
 	Sci_Position iSelStart = SciCall_GetSelectionStart();
 	const Sci_Position iSelEnd = SciCall_GetSelectionEnd();
@@ -5723,13 +5726,13 @@ void EditMarkAll(BOOL bChanged, bool matchCase, bool wholeWord, bool bookmark) {
 
 	// if nothing selected or multiple lines are selected exit
 	if (iSelCount == 0 || SciCall_LineFromPosition(iSelStart) != SciCall_LineFromPosition(iSelEnd)) {
-		EditMarkAll_Clear();
+		Clear();
 		return;
 	}
 
 	iSelCount = SciCall_GetSelTextLength();
-	char *pszText = (char *)NP2HeapAlloc(iSelCount + 1);
-	SciCall_GetSelText(pszText);
+	char *text = (char *)NP2HeapAlloc(iSelCount + 1);
+	SciCall_GetSelText(text);
 
 	// exit if selection is not a word and Match whole words only is enabled
 	if (wholeWord) {
@@ -5737,29 +5740,29 @@ void EditMarkAll(BOOL bChanged, bool matchCase, bool wholeWord, bool bookmark) {
 		const bool dbcs = !(cpEdit == CP_UTF8 || cpEdit == 0);
 		// CharClassify::SetDefaultCharClasses()
 		for (iSelStart = 0; iSelStart < iSelCount; ++iSelStart) {
-			const unsigned char ch = pszText[iSelStart];
+			const unsigned char ch = text[iSelStart];
 			if (dbcs && IsDBCSLeadByteEx(cpEdit, ch)) {
 				++iSelStart;
 			} else if (!IsDocWordChar(ch)) {
-				NP2HeapFree(pszText);
-				EditMarkAll_Clear();
+				NP2HeapFree(text);
+				Clear();
 				return;
 			}
 		}
 	}
 	if (!matchCase) {
-		const bool sensitive = IsStringCaseSensitiveA(pszText);
+		const bool sensitive = IsStringCaseSensitiveA(text);
 		//printf("%s sensitive=%d\n", __func__, sensitive);
 		matchCase = !sensitive;
 	}
 
-	const int findFlag = (((int)matchCase) * SCFIND_MATCHCASE)
-		| (((int)wholeWord) * SCFIND_WHOLEWORD)
-		| (((int)bookmark) * NP2_MarkAllBookmark);
-	EditMarkAll_Start(bChanged, findFlag, iSelCount, pszText);
+	const int findFlag = (static_cast<int>(matchCase) * SCFIND_MATCHCASE)
+		| (static_cast<int>(wholeWord) * SCFIND_WHOLEWORD)
+		| (static_cast<int>(bookmark) * NP2_MarkAllBookmark);
+	Start(bChanged, findFlag, iSelCount, text);
 }
 
-void EditFindAll(const EDITFINDREPLACE *lpefr, bool selectAll) {
+void EditFindAll(const EDITFINDREPLACE *lpefr, bool selectAll) noexcept {
 	char *szFind2 = (char *)NP2HeapAlloc(NP2_FIND_REPLACE_LIMIT);
 	int searchFlags = EditPrepareFind(szFind2, lpefr);
 	if (searchFlags == NP2_InvalidSearchFlags) {
@@ -5776,7 +5779,7 @@ void EditFindAll(const EDITFINDREPLACE *lpefr, bool selectAll) {
 	if (lpefr->bTransformBS && strpbrk(szFind2, "\r\n") != nullptr) {
 		searchFlags |= NP2_MarkAllMultiline;
 	}
-	EditMarkAll_Start(FALSE, searchFlags, strlen(szFind2), szFind2);
+	editMarkAll.Start(FALSE, searchFlags, strlen(szFind2), szFind2);
 }
 
 void EditToggleBookmarkAt(Sci_Position iPos) noexcept {
@@ -5797,7 +5800,7 @@ void EditToggleBookmarkAt(Sci_Position iPos) noexcept {
 void EditBookmarkSelectAll() noexcept {
 	Sci_Line line = SciCall_MarkerNext(0, MarkerBitmask_Bookmark);
 	if (line >= 0) {
-		editMarkAllStatus.ignoreSelectionUpdate = true;
+		editMarkAll.ignoreSelectionUpdate = true;
 		const Sci_Line iCurLine = SciCall_LineFromPosition(SciCall_GetCurrentPos());
 		SciCall_SetSelection(SciCall_PositionFromLine(line), SciCall_PositionFromLine(line + 1));
 		// set main selection near current line to ensure caret is visible after delete selected lines.
