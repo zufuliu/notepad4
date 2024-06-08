@@ -5668,7 +5668,7 @@ void LoadSettings(void) {
 	Style_Load();
 }
 
-void SaveSettingsNow(bool bOnlySaveStyle, bool bQuiet) {
+void SaveSettingsNow(bool bOnlySaveStyle, bool bQuiet) noexcept {
 	bool bCreateFailure = false;
 
 	if (StrIsEmpty(szIniFile)) {
@@ -5721,7 +5721,7 @@ void SaveSettingsNow(bool bOnlySaveStyle, bool bQuiet) {
 // SaveSettings()
 //
 //
-void SaveSettings(bool bSaveSettingsNow) {
+void SaveSettings(bool bSaveSettingsNow) noexcept {
 	if (!CreateIniFile(szIniFile)) {
 		return;
 	}
@@ -5738,147 +5738,146 @@ void SaveSettings(bool bSaveSettingsNow) {
 		memset(pIniSectionBuf, 0, 2*sizeof(WCHAR));
 	}
 
-	IniSectionOnSave section = { pIniSectionBuf };
-	IniSectionOnSave * const pIniSection = &section;
+	IniSectionBuilder section = { pIniSectionBuf };
 
-	//IniSectionSetInt(pIniSection, L"SettingsVersion", NP2SettingsVersion_Current);
-	IniSectionSetBoolEx(pIniSection, L"SaveSettings", bSaveSettings, true);
+	//section.SetInt(L"SettingsVersion", NP2SettingsVersion_Current);
+	section.SetBoolEx(L"SaveSettings", bSaveSettings, true);
 
 	PathRelativeToApp(tchOpenWithDir, wchTmp, FILE_ATTRIBUTE_DIRECTORY, true, flagPortableMyDocs);
-	IniSectionSetString(pIniSection, L"OpenWithDir", wchTmp);
+	section.SetString(L"OpenWithDir", wchTmp);
 	PathRelativeToApp(tchFavoritesDir, wchTmp, FILE_ATTRIBUTE_DIRECTORY, true, flagPortableMyDocs);
-	IniSectionSetString(pIniSection, L"Favorites", wchTmp);
-	IniSectionSetIntEx(pIniSection, L"PathNameFormat", (int)iPathNameFormat, TitlePathNameFormat_NameFirst);
+	section.SetString(L"Favorites", wchTmp);
+	section.SetIntEx(L"PathNameFormat", (int)iPathNameFormat, TitlePathNameFormat_NameFirst);
 	if (!bStickyWindowPosition) {
-		IniSectionSetInt(pIniSection, L"WindowPosX", wi.x);
-		IniSectionSetInt(pIniSection, L"WindowPosY", wi.y);
+		section.SetInt(L"WindowPosX", wi.x);
+		section.SetInt(L"WindowPosY", wi.y);
 	}
 
-	IniSectionSetBoolEx(pIniSection, L"SaveRecentFiles", bSaveRecentFiles, false);
-	IniSectionSetBoolEx(pIniSection, L"SaveFindReplace", bSaveFindReplace, false);
-	IniSectionSetBoolEx(pIniSection, L"CloseFind", efrData.bFindClose, false);
-	IniSectionSetBoolEx(pIniSection, L"CloseReplace", efrData.bReplaceClose, false);
-	IniSectionSetBoolEx(pIniSection, L"NoFindWrap", efrData.bNoFindWrap, false);
-	IniSectionSetBoolEx(pIniSection, L"FindReplaceTransparentMode", bFindReplaceTransparentMode, true);
-	IniSectionSetBoolEx(pIniSection, L"FindReplaceUseMonospacedFont", bFindReplaceUseMonospacedFont, false);
-	IniSectionSetBoolEx(pIniSection, L"FindReplaceFindAllBookmark", bFindReplaceFindAllBookmark, false);
+	section.SetBoolEx(L"SaveRecentFiles", bSaveRecentFiles, false);
+	section.SetBoolEx(L"SaveFindReplace", bSaveFindReplace, false);
+	section.SetBoolEx(L"CloseFind", efrData.bFindClose, false);
+	section.SetBoolEx(L"CloseReplace", efrData.bReplaceClose, false);
+	section.SetBoolEx(L"NoFindWrap", efrData.bNoFindWrap, false);
+	section.SetBoolEx(L"FindReplaceTransparentMode", bFindReplaceTransparentMode, true);
+	section.SetBoolEx(L"FindReplaceUseMonospacedFont", bFindReplaceUseMonospacedFont, false);
+	section.SetBoolEx(L"FindReplaceFindAllBookmark", bFindReplaceFindAllBookmark, false);
 	if (bSaveFindReplace) {
-		IniSectionSetBoolEx(pIniSection, L"FindReplaceMatchCase", (efrData.fuFlags & SCFIND_MATCHCASE), false);
-		IniSectionSetBoolEx(pIniSection, L"FindReplaceMatchWholeWorldOnly", (efrData.fuFlags & SCFIND_WHOLEWORD), false);
-		IniSectionSetBoolEx(pIniSection, L"FindReplaceMatchBeginingWordOnly", (efrData.fuFlags & SCFIND_WORDSTART), false);
-		IniSectionSetBoolEx(pIniSection, L"FindReplaceRegExpSearch", (efrData.fuFlags & SCFIND_REGEXP), false);
-		IniSectionSetBoolEx(pIniSection, L"FindReplaceTransformBackslash", efrData.bTransformBS, false);
-		IniSectionSetBoolEx(pIniSection, L"FindReplaceWildcardSearch", efrData.bWildcardSearch, false);
+		section.SetBoolEx(L"FindReplaceMatchCase", (efrData.fuFlags & SCFIND_MATCHCASE), false);
+		section.SetBoolEx(L"FindReplaceMatchWholeWorldOnly", (efrData.fuFlags & SCFIND_WHOLEWORD), false);
+		section.SetBoolEx(L"FindReplaceMatchBeginingWordOnly", (efrData.fuFlags & SCFIND_WORDSTART), false);
+		section.SetBoolEx(L"FindReplaceRegExpSearch", (efrData.fuFlags & SCFIND_REGEXP), false);
+		section.SetBoolEx(L"FindReplaceTransformBackslash", efrData.bTransformBS, false);
+		section.SetBoolEx(L"FindReplaceWildcardSearch", efrData.bWildcardSearch, false);
 	}
 
-	IniSectionSetBoolEx(pIniSection, L"WordWrap", fWordWrapG, true);
-	IniSectionSetIntEx(pIniSection, L"WordWrapMode", iWordWrapMode, SC_WRAP_AUTO);
-	IniSectionSetIntEx(pIniSection, L"WordWrapIndent", iWordWrapIndent, EditWrapIndent_None);
-	IniSectionSetIntEx(pIniSection, L"WordWrapSymbols", iWordWrapSymbols, EditWrapSymbol_DefaultValue);
-	IniSectionSetBoolEx(pIniSection, L"ShowWordWrapSymbols", bShowWordWrapSymbols, false);
-	IniSectionSetBoolEx(pIniSection, L"WordWrapSelectSubLine", bWordWrapSelectSubLine, false);
-	IniSectionSetBoolEx(pIniSection, L"ShowUnicodeControlCharacter", bShowUnicodeControlCharacter, false);
-	IniSectionSetBoolEx(pIniSection, L"MatchBraces", bMatchBraces, true);
-	IniSectionSetBoolEx(pIniSection, L"HighlightCurrentBlock", bHighlightCurrentBlock, true);
+	section.SetBoolEx(L"WordWrap", fWordWrapG, true);
+	section.SetIntEx(L"WordWrapMode", iWordWrapMode, SC_WRAP_AUTO);
+	section.SetIntEx(L"WordWrapIndent", iWordWrapIndent, EditWrapIndent_None);
+	section.SetIntEx(L"WordWrapSymbols", iWordWrapSymbols, EditWrapSymbol_DefaultValue);
+	section.SetBoolEx(L"ShowWordWrapSymbols", bShowWordWrapSymbols, false);
+	section.SetBoolEx(L"WordWrapSelectSubLine", bWordWrapSelectSubLine, false);
+	section.SetBoolEx(L"ShowUnicodeControlCharacter", bShowUnicodeControlCharacter, false);
+	section.SetBoolEx(L"MatchBraces", bMatchBraces, true);
+	section.SetBoolEx(L"HighlightCurrentBlock", bHighlightCurrentBlock, true);
 	int iValue = (int)iHighlightCurrentLine + ((int)bHighlightCurrentSubLine*10);
-	IniSectionSetIntEx(pIniSection, L"HighlightCurrentLine", iValue, 10 + LineHighlightMode_OutlineFrame);
-	IniSectionSetBoolEx(pIniSection, L"ShowIndentGuides", bShowIndentGuides, false);
+	section.SetIntEx(L"HighlightCurrentLine", iValue, 10 + LineHighlightMode_OutlineFrame);
+	section.SetBoolEx(L"ShowIndentGuides", bShowIndentGuides, false);
 
-	IniSectionSetBoolEx(pIniSection, L"AutoIndent", autoCompletionConfig.bIndentText, true);
-	IniSectionSetBoolEx(pIniSection, L"AutoCloseTags", autoCompletionConfig.bCloseTags, true);
-	IniSectionSetBoolEx(pIniSection, L"AutoCompleteWords", autoCompletionConfig.bCompleteWord, true);
-	IniSectionSetBoolEx(pIniSection, L"AutoCScanWordsInDocument", autoCompletionConfig.bScanWordsInDocument, true);
+	section.SetBoolEx(L"AutoIndent", autoCompletionConfig.bIndentText, true);
+	section.SetBoolEx(L"AutoCloseTags", autoCompletionConfig.bCloseTags, true);
+	section.SetBoolEx(L"AutoCompleteWords", autoCompletionConfig.bCompleteWord, true);
+	section.SetBoolEx(L"AutoCScanWordsInDocument", autoCompletionConfig.bScanWordsInDocument, true);
 	iValue = autoCompletionConfig.fCompleteScope | (autoCompletionConfig.fScanWordScope << 4);
-	IniSectionSetIntEx(pIniSection, L"AutoCompleteScope", iValue, AutoCompleteScope_Default);
-	IniSectionSetIntEx(pIniSection, L"AutoCScanWordsTimeout", autoCompletionConfig.dwScanWordsTimeout, AUTOC_SCAN_WORDS_DEFAULT_TIMEOUT);
-	IniSectionSetBoolEx(pIniSection, L"AutoCEnglishIMEModeOnly", autoCompletionConfig.bEnglistIMEModeOnly, false);
-	IniSectionSetBoolEx(pIniSection, L"AutoCIgnoreCase", autoCompletionConfig.bIgnoreCase, false);
-	IniSectionSetBoolEx(pIniSection, L"LaTeXInputMethod", autoCompletionConfig.bLaTeXInputMethod, false);
-	IniSectionSetIntEx(pIniSection, L"AutoCVisibleItemCount", autoCompletionConfig.iVisibleItemCount, 16);
-	IniSectionSetIntEx(pIniSection, L"AutoCMinWordLength", autoCompletionConfig.iMinWordLength, 1);
-	IniSectionSetIntEx(pIniSection, L"AutoCMinNumberLength", autoCompletionConfig.iMinNumberLength, 3);
-	IniSectionSetIntEx(pIniSection, L"AutoCFillUpMask", autoCompletionConfig.fAutoCompleteFillUpMask, AutoCompleteFillUpMask_Default);
-	IniSectionSetIntEx(pIniSection, L"AutoInsertMask", autoCompletionConfig.fAutoInsertMask, AutoInsertMask_Default);
-	IniSectionSetIntEx(pIniSection, L"AsmLineCommentChar", autoCompletionConfig.iAsmLineCommentChar, AsmLineCommentChar_Semicolon);
-	IniSectionSetStringEx(pIniSection, L"AutoCFillUpPunctuation", autoCompletionConfig.wszAutoCompleteFillUp, AUTO_COMPLETION_FILLUP_DEFAULT);
-	IniSectionSetIntEx(pIniSection, L"SelectOption", iSelectOption, SelectOption_Default);
-	IniSectionSetIntEx(pIniSection, L"LineSelection", iLineSelectionMode, LineSelectionMode_VisualStudio);
-	IniSectionSetIntEx(pIniSection, L"TabWidth", tabSettings.globalTabWidth, TAB_WIDTH_4);
-	IniSectionSetIntEx(pIniSection, L"IndentWidth", tabSettings.globalIndentWidth, INDENT_WIDTH_4);
-	IniSectionSetBoolEx(pIniSection, L"TabsAsSpaces", tabSettings.globalTabsAsSpaces, false);
-	IniSectionSetBoolEx(pIniSection, L"TabIndents", tabSettings.bTabIndents, true);
-	IniSectionSetIntEx(pIniSection, L"BackspaceUnindents", tabSettings.bBackspaceUnindents, 2);
-	IniSectionSetBoolEx(pIniSection, L"DetectIndentation", tabSettings.bDetectIndentation, true);
-	IniSectionSetBoolEx(pIniSection, L"MarkLongLines", bMarkLongLines, false);
-	IniSectionSetIntEx(pIniSection, L"LongLinesLimit", iLongLinesLimitG, 80);
-	IniSectionSetIntEx(pIniSection, L"LongLineMode", iLongLineMode, EDGE_LINE);
-	IniSectionSetIntEx(pIniSection, L"ZoomLevel", iZoomLevel, 100);
-	IniSectionSetBoolEx(pIniSection, L"ShowBookmarkMargin", bShowBookmarkMargin, false);
-	IniSectionSetBoolEx(pIniSection, L"ShowLineNumbers", bShowLineNumbers, true);
-	IniSectionSetBoolEx(pIniSection, L"ShowCodeFolding", bShowCodeFolding, true);
-	IniSectionSetBoolEx(pIniSection, L"MarkOccurrences", bMarkOccurrences, true);
-	IniSectionSetBoolEx(pIniSection, L"MarkOccurrencesMatchCase", bMarkOccurrencesMatchCase, false);
-	IniSectionSetBoolEx(pIniSection, L"MarkOccurrencesMatchWholeWords", bMarkOccurrencesMatchWords, false);
-	IniSectionSetBoolEx(pIniSection, L"MarkOccurrencesBookmark", bMarkOccurrencesBookmark, false);
-	IniSectionSetBoolEx(pIniSection, L"ViewWhiteSpace", bViewWhiteSpace, false);
-	IniSectionSetBoolEx(pIniSection, L"ViewEOLs", bViewEOLs, false);
-	IniSectionSetIntEx(pIniSection, L"ShowCallTip", (int)callTipInfo.showCallTip, ShowCallTip_None);
+	section.SetIntEx(L"AutoCompleteScope", iValue, AutoCompleteScope_Default);
+	section.SetIntEx(L"AutoCScanWordsTimeout", autoCompletionConfig.dwScanWordsTimeout, AUTOC_SCAN_WORDS_DEFAULT_TIMEOUT);
+	section.SetBoolEx(L"AutoCEnglishIMEModeOnly", autoCompletionConfig.bEnglistIMEModeOnly, false);
+	section.SetBoolEx(L"AutoCIgnoreCase", autoCompletionConfig.bIgnoreCase, false);
+	section.SetBoolEx(L"LaTeXInputMethod", autoCompletionConfig.bLaTeXInputMethod, false);
+	section.SetIntEx(L"AutoCVisibleItemCount", autoCompletionConfig.iVisibleItemCount, 16);
+	section.SetIntEx(L"AutoCMinWordLength", autoCompletionConfig.iMinWordLength, 1);
+	section.SetIntEx(L"AutoCMinNumberLength", autoCompletionConfig.iMinNumberLength, 3);
+	section.SetIntEx(L"AutoCFillUpMask", autoCompletionConfig.fAutoCompleteFillUpMask, AutoCompleteFillUpMask_Default);
+	section.SetIntEx(L"AutoInsertMask", autoCompletionConfig.fAutoInsertMask, AutoInsertMask_Default);
+	section.SetIntEx(L"AsmLineCommentChar", autoCompletionConfig.iAsmLineCommentChar, AsmLineCommentChar_Semicolon);
+	section.SetStringEx(L"AutoCFillUpPunctuation", autoCompletionConfig.wszAutoCompleteFillUp, AUTO_COMPLETION_FILLUP_DEFAULT);
+	section.SetIntEx(L"SelectOption", iSelectOption, SelectOption_Default);
+	section.SetIntEx(L"LineSelection", iLineSelectionMode, LineSelectionMode_VisualStudio);
+	section.SetIntEx(L"TabWidth", tabSettings.globalTabWidth, TAB_WIDTH_4);
+	section.SetIntEx(L"IndentWidth", tabSettings.globalIndentWidth, INDENT_WIDTH_4);
+	section.SetBoolEx(L"TabsAsSpaces", tabSettings.globalTabsAsSpaces, false);
+	section.SetBoolEx(L"TabIndents", tabSettings.bTabIndents, true);
+	section.SetIntEx(L"BackspaceUnindents", tabSettings.bBackspaceUnindents, 2);
+	section.SetBoolEx(L"DetectIndentation", tabSettings.bDetectIndentation, true);
+	section.SetBoolEx(L"MarkLongLines", bMarkLongLines, false);
+	section.SetIntEx(L"LongLinesLimit", iLongLinesLimitG, 80);
+	section.SetIntEx(L"LongLineMode", iLongLineMode, EDGE_LINE);
+	section.SetIntEx(L"ZoomLevel", iZoomLevel, 100);
+	section.SetBoolEx(L"ShowBookmarkMargin", bShowBookmarkMargin, false);
+	section.SetBoolEx(L"ShowLineNumbers", bShowLineNumbers, true);
+	section.SetBoolEx(L"ShowCodeFolding", bShowCodeFolding, true);
+	section.SetBoolEx(L"MarkOccurrences", bMarkOccurrences, true);
+	section.SetBoolEx(L"MarkOccurrencesMatchCase", bMarkOccurrencesMatchCase, false);
+	section.SetBoolEx(L"MarkOccurrencesMatchWholeWords", bMarkOccurrencesMatchWords, false);
+	section.SetBoolEx(L"MarkOccurrencesBookmark", bMarkOccurrencesBookmark, false);
+	section.SetBoolEx(L"ViewWhiteSpace", bViewWhiteSpace, false);
+	section.SetBoolEx(L"ViewEOLs", bViewEOLs, false);
+	section.SetIntEx(L"ShowCallTip", (int)callTipInfo.showCallTip, ShowCallTip_None);
 
 	if (iDefaultEncoding != CPI_GLOBAL_DEFAULT) {
 		iValue = Encoding_MapIniSetting(false, iDefaultEncoding);
-		IniSectionSetInt(pIniSection, L"DefaultEncoding", iValue);
+		section.SetInt(L"DefaultEncoding", iValue);
 	}
-	IniSectionSetBoolEx(pIniSection, L"SkipUnicodeDetection", bSkipUnicodeDetection, true);
-	IniSectionSetBoolEx(pIniSection, L"LoadANSIasUTF8", bLoadANSIasUTF8, true);
-	IniSectionSetBoolEx(pIniSection, L"LoadASCIIasUTF8", bLoadASCIIasUTF8, true);
-	IniSectionSetBoolEx(pIniSection, L"LoadNFOasOEM", bLoadNFOasOEM, true);
-	IniSectionSetBoolEx(pIniSection, L"NoEncodingTags", bNoEncodingTags, false);
+	section.SetBoolEx(L"SkipUnicodeDetection", bSkipUnicodeDetection, true);
+	section.SetBoolEx(L"LoadANSIasUTF8", bLoadANSIasUTF8, true);
+	section.SetBoolEx(L"LoadASCIIasUTF8", bLoadASCIIasUTF8, true);
+	section.SetBoolEx(L"LoadNFOasOEM", bLoadNFOasOEM, true);
+	section.SetBoolEx(L"NoEncodingTags", bNoEncodingTags, false);
 
-	IniSectionSetIntEx(pIniSection, L"DefaultEOLMode", iDefaultEOLMode, 0);
-	IniSectionSetBoolEx(pIniSection, L"WarnLineEndings", bWarnLineEndings, true);
-	IniSectionSetBoolEx(pIniSection, L"FixLineEndings", bFixLineEndings, false);
-	IniSectionSetBoolEx(pIniSection, L"FixTrailingBlanks", bAutoStripBlanks, false);
+	section.SetIntEx(L"DefaultEOLMode", iDefaultEOLMode, 0);
+	section.SetBoolEx(L"WarnLineEndings", bWarnLineEndings, true);
+	section.SetBoolEx(L"FixLineEndings", bFixLineEndings, false);
+	section.SetBoolEx(L"FixTrailingBlanks", bAutoStripBlanks, false);
 
-	IniSectionSetIntEx(pIniSection, L"PrintHeader", (int)iPrintHeader, PrintHeaderOption_FilenameAndDate);
-	IniSectionSetIntEx(pIniSection, L"PrintFooter", (int)iPrintFooter, PrintFooterOption_PageNumber);
-	IniSectionSetIntEx(pIniSection, L"PrintColorMode", iPrintColor, SC_PRINT_COLOURONWHITE);
-	IniSectionSetIntEx(pIniSection, L"PrintZoom", iPrintZoom, 100);
-	IniSectionSetIntEx(pIniSection, L"PrintMarginLeft", pageSetupMargin.left, -1);
-	IniSectionSetIntEx(pIniSection, L"PrintMarginTop", pageSetupMargin.top, -1);
-	IniSectionSetIntEx(pIniSection, L"PrintMarginRight", pageSetupMargin.right, -1);
-	IniSectionSetIntEx(pIniSection, L"PrintMarginBottom", pageSetupMargin.bottom, -1);
+	section.SetIntEx(L"PrintHeader", (int)iPrintHeader, PrintHeaderOption_FilenameAndDate);
+	section.SetIntEx(L"PrintFooter", (int)iPrintFooter, PrintFooterOption_PageNumber);
+	section.SetIntEx(L"PrintColorMode", iPrintColor, SC_PRINT_COLOURONWHITE);
+	section.SetIntEx(L"PrintZoom", iPrintZoom, 100);
+	section.SetIntEx(L"PrintMarginLeft", pageSetupMargin.left, -1);
+	section.SetIntEx(L"PrintMarginTop", pageSetupMargin.top, -1);
+	section.SetIntEx(L"PrintMarginRight", pageSetupMargin.right, -1);
+	section.SetIntEx(L"PrintMarginBottom", pageSetupMargin.bottom, -1);
 
-	IniSectionSetBoolEx(pIniSection, L"SaveBeforeRunningTools", bSaveBeforeRunningTools, false);
-	IniSectionSetBoolEx(pIniSection, L"OpenFolderWithMatepath", bOpenFolderWithMatepath, true);
+	section.SetBoolEx(L"SaveBeforeRunningTools", bSaveBeforeRunningTools, false);
+	section.SetBoolEx(L"OpenFolderWithMatepath", bOpenFolderWithMatepath, true);
 
-	IniSectionSetIntEx(pIniSection, L"FileWatchingMode", iFileWatchingMode, FileWatchingMode_AutoReload);
-	IniSectionSetBoolEx(pIniSection, L"FileWatchingMethod", iFileWatchingMethod, false);
-	IniSectionSetBoolEx(pIniSection, L"FileWatchingKeepAtEnd", bFileWatchingKeepAtEnd, false);
-	IniSectionSetBoolEx(pIniSection, L"ResetFileWatching", bResetFileWatching, false);
-	IniSectionSetIntEx(pIniSection, L"AutoSaveOption", iAutoSaveOption, AutoSaveOption_Default);
-	IniSectionSetIntEx(pIniSection, L"AutoSavePeriod", dwAutoSavePeriod, AutoSaveDefaultPeriod);
+	section.SetIntEx(L"FileWatchingMode", iFileWatchingMode, FileWatchingMode_AutoReload);
+	section.SetBoolEx(L"FileWatchingMethod", iFileWatchingMethod, false);
+	section.SetBoolEx(L"FileWatchingKeepAtEnd", bFileWatchingKeepAtEnd, false);
+	section.SetBoolEx(L"ResetFileWatching", bResetFileWatching, false);
+	section.SetIntEx(L"AutoSaveOption", iAutoSaveOption, AutoSaveOption_Default);
+	section.SetIntEx(L"AutoSavePeriod", dwAutoSavePeriod, AutoSaveDefaultPeriod);
 
-	IniSectionSetIntEx(pIniSection, L"EscFunction", (int)iEscFunction, EscFunction_None);
-	IniSectionSetBoolEx(pIniSection, L"AlwaysOnTop", bAlwaysOnTop, false);
-	IniSectionSetBoolEx(pIniSection, L"MinimizeToTray", bMinimizeToTray, false);
-	IniSectionSetBoolEx(pIniSection, L"TransparentMode", bTransparentMode, false);
-	IniSectionSetIntEx(pIniSection, L"EndAtLastLine", iEndAtLastLine, 1);
-	IniSectionSetBoolEx(pIniSection, L"EditLayoutRTL", bEditLayoutRTL, false);
-	IniSectionSetBoolEx(pIniSection, L"WindowLayoutRTL", bWindowLayoutRTL, false);
-	IniSectionSetIntEx(pIniSection, L"RenderingTechnology", iRenderingTechnology, GetDefualtRenderingTechnology());
-	IniSectionSetIntEx(pIniSection, L"Bidirectional", iBidirectional, SC_BIDIRECTIONAL_DISABLED);
-	IniSectionSetIntEx(pIniSection, L"FontQuality", iFontQuality, SC_EFF_QUALITY_LCD_OPTIMIZED);
+	section.SetIntEx(L"EscFunction", (int)iEscFunction, EscFunction_None);
+	section.SetBoolEx(L"AlwaysOnTop", bAlwaysOnTop, false);
+	section.SetBoolEx(L"MinimizeToTray", bMinimizeToTray, false);
+	section.SetBoolEx(L"TransparentMode", bTransparentMode, false);
+	section.SetIntEx(L"EndAtLastLine", iEndAtLastLine, 1);
+	section.SetBoolEx(L"EditLayoutRTL", bEditLayoutRTL, false);
+	section.SetBoolEx(L"WindowLayoutRTL", bWindowLayoutRTL, false);
+	section.SetIntEx(L"RenderingTechnology", iRenderingTechnology, GetDefualtRenderingTechnology());
+	section.SetIntEx(L"Bidirectional", iBidirectional, SC_BIDIRECTIONAL_DISABLED);
+	section.SetIntEx(L"FontQuality", iFontQuality, SC_EFF_QUALITY_LCD_OPTIMIZED);
 	iValue = (int)iCaretStyle + ((int)bBlockCaretForOVRMode)*10 + ((int)bBlockCaretOutSelection)*100;
-	IniSectionSetIntEx(pIniSection, L"CaretStyle", iValue, CaretStyle_LineWidth1);
-	IniSectionSetIntEx(pIniSection, L"CaretBlinkPeriod", iCaretBlinkPeriod, -1);
-	IniSectionSetBoolEx(pIniSection, L"UseInlineIME", bUseInlineIME, false);
+	section.SetIntEx(L"CaretStyle", iValue, CaretStyle_LineWidth1);
+	section.SetIntEx(L"CaretBlinkPeriod", iCaretBlinkPeriod, -1);
+	section.SetBoolEx(L"UseInlineIME", bUseInlineIME, false);
 	Toolbar_GetButtons(hwndToolbar, TOOLBAR_COMMAND_BASE, tchToolbarButtons, COUNTOF(tchToolbarButtons));
-	IniSectionSetStringEx(pIniSection, L"ToolbarButtons", tchToolbarButtons, DefaultToolbarButtons);
-	IniSectionSetBoolEx(pIniSection, L"ShowMenu", bShowMenu, true);
-	IniSectionSetBoolEx(pIniSection, L"ShowToolbar", bShowToolbar, true);
-	IniSectionSetBoolEx(pIniSection, L"AutoScaleToolbar", bAutoScaleToolbar, true);
-	IniSectionSetBoolEx(pIniSection, L"ShowStatusbar", bShowStatusbar, true);
-	IniSectionSetIntEx(pIniSection, L"FullScreenMode", iFullScreenMode, FullScreenMode_Default);
+	section.SetStringEx(L"ToolbarButtons", tchToolbarButtons, DefaultToolbarButtons);
+	section.SetBoolEx(L"ShowMenu", bShowMenu, true);
+	section.SetBoolEx(L"ShowToolbar", bShowToolbar, true);
+	section.SetBoolEx(L"AutoScaleToolbar", bAutoScaleToolbar, true);
+	section.SetBoolEx(L"ShowStatusbar", bShowStatusbar, true);
+	section.SetIntEx(L"FullScreenMode", iFullScreenMode, FullScreenMode_Default);
 
 	SaveIniSection(INI_SECTION_NAME_SETTINGS, pIniSectionBuf);
 	NP2HeapFree(pIniSectionBuf);
@@ -5886,9 +5885,8 @@ void SaveSettings(bool bSaveSettingsNow) {
 	Style_Save();
 }
 
-void SaveWindowPosition(WCHAR *pIniSectionBuf) {
-	IniSectionOnSave section = { pIniSectionBuf };
-	IniSectionOnSave *const pIniSection = &section;
+void SaveWindowPosition(WCHAR *pIniSectionBuf) noexcept{
+	IniSectionBuilder section = { pIniSectionBuf };
 
 	WCHAR sectionName[96];
 	GetWindowPositionSectionName(hCurrentMonitor, sectionName);
@@ -5906,39 +5904,39 @@ void SaveWindowPosition(WCHAR *pIniSectionBuf) {
 		wi.max = (IsZoomed(hwndMain) || (wndpl.flags & WPF_RESTORETOMAXIMIZED));
 	}
 
-	IniSectionSetInt(pIniSection, L"WindowPosX", wi.x);
-	IniSectionSetInt(pIniSection, L"WindowPosY", wi.y);
-	IniSectionSetInt(pIniSection, L"WindowSizeX", wi.cx);
-	IniSectionSetInt(pIniSection, L"WindowSizeY", wi.cy);
-	IniSectionSetBoolEx(pIniSection, L"WindowMaximized", wi.max, false);
+	section.SetInt(L"WindowPosX", wi.x);
+	section.SetInt(L"WindowPosY", wi.y);
+	section.SetInt(L"WindowSizeX", wi.cx);
+	section.SetInt(L"WindowSizeY", wi.cy);
+	section.SetBoolEx(L"WindowMaximized", wi.max, false);
 
-	IniSectionSetIntEx(pIniSection, L"RunDlgSizeX", cxRunDlg, 0);
-	IniSectionSetIntEx(pIniSection, L"EncodingDlgSizeX", cxEncodingDlg, 0);
-	IniSectionSetIntEx(pIniSection, L"EncodingDlgSizeY", cyEncodingDlg, 0);
+	section.SetIntEx(L"RunDlgSizeX", cxRunDlg, 0);
+	section.SetIntEx(L"EncodingDlgSizeX", cxEncodingDlg, 0);
+	section.SetIntEx(L"EncodingDlgSizeY", cyEncodingDlg, 0);
 
-	IniSectionSetIntEx(pIniSection, L"FileMRUDlgSizeX", cxFileMRUDlg, 0);
-	IniSectionSetIntEx(pIniSection, L"FileMRUDlgSizeY", cyFileMRUDlg, 0);
-	IniSectionSetIntEx(pIniSection, L"OpenWithDlgSizeX", cxOpenWithDlg, 0);
-	IniSectionSetIntEx(pIniSection, L"OpenWithDlgSizeY", cyOpenWithDlg, 0);
-	IniSectionSetIntEx(pIniSection, L"FavoritesDlgSizeX", cxFavoritesDlg, 0);
-	IniSectionSetIntEx(pIniSection, L"FavoritesDlgSizeY", cyFavoritesDlg, 0);
-	IniSectionSetIntEx(pIniSection, L"AddFavoritesDlgSizeX", cxAddFavoritesDlg, 0);
+	section.SetIntEx(L"FileMRUDlgSizeX", cxFileMRUDlg, 0);
+	section.SetIntEx(L"FileMRUDlgSizeY", cyFileMRUDlg, 0);
+	section.SetIntEx(L"OpenWithDlgSizeX", cxOpenWithDlg, 0);
+	section.SetIntEx(L"OpenWithDlgSizeY", cyOpenWithDlg, 0);
+	section.SetIntEx(L"FavoritesDlgSizeX", cxFavoritesDlg, 0);
+	section.SetIntEx(L"FavoritesDlgSizeY", cyFavoritesDlg, 0);
+	section.SetIntEx(L"AddFavoritesDlgSizeX", cxAddFavoritesDlg, 0);
 
-	IniSectionSetIntEx(pIniSection, L"ModifyLinesDlgSizeX", cxModifyLinesDlg, 0);
-	IniSectionSetIntEx(pIniSection, L"ModifyLinesDlgSizeY", cyModifyLinesDlg, 0);
-	IniSectionSetIntEx(pIniSection, L"EncloseSelectionDlgSizeX", cxEncloseSelectionDlg, 0);
-	IniSectionSetIntEx(pIniSection, L"EncloseSelectionDlgSizeY", cyEncloseSelectionDlg, 0);
-	IniSectionSetIntEx(pIniSection, L"InsertTagDlgSizeX", cxInsertTagDlg, 0);
-	IniSectionSetIntEx(pIniSection, L"InsertTagDlgSizeY", cyInsertTagDlg, 0);
+	section.SetIntEx(L"ModifyLinesDlgSizeX", cxModifyLinesDlg, 0);
+	section.SetIntEx(L"ModifyLinesDlgSizeY", cyModifyLinesDlg, 0);
+	section.SetIntEx(L"EncloseSelectionDlgSizeX", cxEncloseSelectionDlg, 0);
+	section.SetIntEx(L"EncloseSelectionDlgSizeY", cyEncloseSelectionDlg, 0);
+	section.SetIntEx(L"InsertTagDlgSizeX", cxInsertTagDlg, 0);
+	section.SetIntEx(L"InsertTagDlgSizeY", cyInsertTagDlg, 0);
 
-	IniSectionSetIntEx(pIniSection, L"FindReplaceDlgPosX", xFindReplaceDlg, 0);
-	IniSectionSetIntEx(pIniSection, L"FindReplaceDlgPosY", yFindReplaceDlg, 0);
-	IniSectionSetIntEx(pIniSection, L"FindReplaceDlgSizeX", cxFindReplaceDlg, 0);
+	section.SetIntEx(L"FindReplaceDlgPosX", xFindReplaceDlg, 0);
+	section.SetIntEx(L"FindReplaceDlgPosY", yFindReplaceDlg, 0);
+	section.SetIntEx(L"FindReplaceDlgSizeX", cxFindReplaceDlg, 0);
 
-	IniSectionSetIntEx(pIniSection, L"StyleSelectDlgSizeX", cxStyleSelectDlg, 0);
-	IniSectionSetIntEx(pIniSection, L"StyleSelectDlgSizeY", cyStyleSelectDlg, 0);
-	IniSectionSetIntEx(pIniSection, L"StyleCustomizeDlgSizeX", cxStyleCustomizeDlg, 0);
-	IniSectionSetIntEx(pIniSection, L"StyleCustomizeDlgSizeY", cyStyleCustomizeDlg, 0);
+	section.SetIntEx(L"StyleSelectDlgSizeX", cxStyleSelectDlg, 0);
+	section.SetIntEx(L"StyleSelectDlgSizeY", cyStyleSelectDlg, 0);
+	section.SetIntEx(L"StyleCustomizeDlgSizeX", cxStyleCustomizeDlg, 0);
+	section.SetIntEx(L"StyleCustomizeDlgSizeY", cyStyleCustomizeDlg, 0);
 
 	SaveIniSection(sectionName, pIniSectionBuf);
 }

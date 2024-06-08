@@ -2703,7 +2703,7 @@ void LoadSettings(void) {
 	colorCustom[15] = GetSysColor(COLOR_3DFACE);
 }
 
-void SaveSettingsNow(void) {
+void SaveSettingsNow() noexcept {
 	bool bCreateFailure = false;
 
 	if (StrIsEmpty(szIniFile)) {
@@ -2745,7 +2745,7 @@ void SaveSettingsNow(void) {
 //  SaveSettings()
 //
 //
-void SaveSettings(bool bSaveSettingsNow) {
+void SaveSettings(bool bSaveSettingsNow) noexcept {
 	if (!CreateIniFile(szIniFile)) {
 		return;
 	}
@@ -2763,67 +2763,65 @@ void SaveSettings(bool bSaveSettingsNow) {
 	SaveWindowPosition(pIniSectionBuf);
 	memset(pIniSectionBuf, 0, 2*sizeof(WCHAR));
 
-	IniSectionOnSave section = { pIniSectionBuf };
-	IniSectionOnSave * const pIniSection = &section;
+	IniSectionBuilder section = { pIniSectionBuf };
 
-	IniSectionSetBoolEx(pIniSection, L"SaveSettings", bSaveSettings, true);
-	IniSectionSetIntEx(pIniSection, L"StartupDirectory", (int)iStartupDir, StartupDirectory_MRU);
+	section.SetBoolEx(L"SaveSettings", bSaveSettings, true);
+	section.SetIntEx(L"StartupDirectory", (int)iStartupDir, StartupDirectory_MRU);
 	if (iStartupDir == StartupDirectory_MRU) {
-		IniSectionSetString(pIniSection, L"MRUDirectory", szCurDir);
+		section.SetString(L"MRUDirectory", szCurDir);
 	}
 	PathRelativeToApp(tchFavoritesDir, wchTmp, FILE_ATTRIBUTE_DIRECTORY, true, flagPortableMyDocs);
-	IniSectionSetString(pIniSection, L"Favorites", wchTmp);
+	section.SetString(L"Favorites", wchTmp);
 	PathRelativeToApp(szQuickview, wchTmp, FILE_ATTRIBUTE_DIRECTORY, true, flagPortableMyDocs);
-	IniSectionSetString(pIniSection, L"Quikview.exe", wchTmp);
-	IniSectionSetStringEx(pIniSection, L"QuikviewParams", szQuickviewParams, L"");
+	section.SetString(L"Quikview.exe", wchTmp);
+	section.SetStringEx(L"QuikviewParams", szQuickviewParams, L"");
 	PathRelativeToApp(tchOpenWithDir, wchTmp, FILE_ATTRIBUTE_DIRECTORY, true, flagPortableMyDocs);
-	IniSectionSetString(pIniSection, L"OpenWithDir", wchTmp);
-	IniSectionSetInt(pIniSection, L"WindowPosX", wi.x);
-	IniSectionSetInt(pIniSection, L"WindowPosY", wi.y);
+	section.SetString(L"OpenWithDir", wchTmp);
+	section.SetInt(L"WindowPosX", wi.x);
+	section.SetInt(L"WindowPosY", wi.y);
 
-	IniSectionSetBoolEx(pIniSection, L"SingleClick", bSingleClick, true);
-	IniSectionSetBoolEx(pIniSection, L"OpenFileInSameWindow", bOpenFileInSameWindow, false);
-	IniSectionSetBoolEx(pIniSection, L"TrackSelect", bTrackSelect, true);
-	IniSectionSetBoolEx(pIniSection, L"FullRowSelect", bFullRowSelect, false);
-	IniSectionSetBoolEx(pIniSection, L"UseRecycleBin", fUseRecycleBin, true);
-	IniSectionSetBoolEx(pIniSection, L"NoConfirmDelete", fNoConfirmDelete, false);
-	IniSectionSetBoolEx(pIniSection, L"ClearReadOnly", bClearReadOnly, true);
-	IniSectionSetBoolEx(pIniSection, L"RenameOnCollision", bRenameOnCollision, false);
-	IniSectionSetBoolEx(pIniSection, L"FocusEdit", bFocusEdit, true);
-	IniSectionSetBoolEx(pIniSection, L"AlwaysOnTop", bAlwaysOnTop, false);
-	IniSectionSetBoolEx(pIniSection, L"MinimizeToTray", bMinimizeToTray, false);
-	IniSectionSetBoolEx(pIniSection, L"TransparentMode", bTransparentMode, false);
-	IniSectionSetBoolEx(pIniSection, L"WindowLayoutRTL", bWindowLayoutRTL, false);
-	IniSectionSetIntEx(pIniSection, L"EscFunction", (int)iEscFunction, EscFunction_None);
+	section.SetBoolEx(L"SingleClick", bSingleClick, true);
+	section.SetBoolEx(L"OpenFileInSameWindow", bOpenFileInSameWindow, false);
+	section.SetBoolEx(L"TrackSelect", bTrackSelect, true);
+	section.SetBoolEx(L"FullRowSelect", bFullRowSelect, false);
+	section.SetBoolEx(L"UseRecycleBin", fUseRecycleBin, true);
+	section.SetBoolEx(L"NoConfirmDelete", fNoConfirmDelete, false);
+	section.SetBoolEx(L"ClearReadOnly", bClearReadOnly, true);
+	section.SetBoolEx(L"RenameOnCollision", bRenameOnCollision, false);
+	section.SetBoolEx(L"FocusEdit", bFocusEdit, true);
+	section.SetBoolEx(L"AlwaysOnTop", bAlwaysOnTop, false);
+	section.SetBoolEx(L"MinimizeToTray", bMinimizeToTray, false);
+	section.SetBoolEx(L"TransparentMode", bTransparentMode, false);
+	section.SetBoolEx(L"WindowLayoutRTL", bWindowLayoutRTL, false);
+	section.SetIntEx(L"EscFunction", (int)iEscFunction, EscFunction_None);
 
 	if (IsVistaAndAbove()) {
-		IniSectionSetBoolEx(pIniSection, L"UseXPFileDialog", bUseXPFileDialog, false);
+		section.SetBoolEx(L"UseXPFileDialog", bUseXPFileDialog, false);
 	}
 
-	IniSectionSetIntEx(pIniSection, L"FillMask", dwFillMask, DL_ALLOBJECTS);
-	IniSectionSetIntEx(pIniSection, L"SortOptions", nSortFlags, DS_NAME);
-	IniSectionSetBoolEx(pIniSection, L"SortReverse", fSortRev, false);
-	IniSectionSetStringEx(pIniSection, L"FileFilter", tchFilter, L"*.*");
-	IniSectionSetBoolEx(pIniSection, L"NegativeFilter", bNegFilter, false);
-	IniSectionSetBoolEx(pIniSection, L"DefColorNoFilter", bDefColorNoFilter, true);
-	IniSectionSetBoolEx(pIniSection, L"DefColorFilter", bDefColorFilter, true);
-	IniSectionSetIntEx(pIniSection, L"ColorNoFilter", colorNoFilter, GetSysColor(COLOR_WINDOWTEXT));
-	IniSectionSetIntEx(pIniSection, L"ColorFilter", colorFilter, GetSysColor(COLOR_HIGHLIGHT));
+	section.SetIntEx(L"FillMask", dwFillMask, DL_ALLOBJECTS);
+	section.SetIntEx(L"SortOptions", nSortFlags, DS_NAME);
+	section.SetBoolEx(L"SortReverse", fSortRev, false);
+	section.SetStringEx(L"FileFilter", tchFilter, L"*.*");
+	section.SetBoolEx(L"NegativeFilter", bNegFilter, false);
+	section.SetBoolEx(L"DefColorNoFilter", bDefColorNoFilter, true);
+	section.SetBoolEx(L"DefColorFilter", bDefColorFilter, true);
+	section.SetIntEx(L"ColorNoFilter", colorNoFilter, GetSysColor(COLOR_WINDOWTEXT));
+	section.SetIntEx(L"ColorFilter", colorFilter, GetSysColor(COLOR_HIGHLIGHT));
 
 	Toolbar_GetButtons(hwndToolbar, TOOLBAR_COMMAND_BASE, tchToolbarButtons, COUNTOF(tchToolbarButtons));
-	IniSectionSetStringEx(pIniSection, L"ToolbarButtons", tchToolbarButtons, DefaultToolbarButtons);
-	IniSectionSetBoolEx(pIniSection, L"ShowToolbar", bShowToolbar, true);
-	IniSectionSetBoolEx(pIniSection, L"AutoScaleToolbar", bAutoScaleToolbar, true);
-	IniSectionSetBoolEx(pIniSection, L"ShowStatusbar", bShowStatusbar, true);
-	IniSectionSetBoolEx(pIniSection, L"ShowDriveBox", bShowDriveBox, true);
+	section.SetStringEx(L"ToolbarButtons", tchToolbarButtons, DefaultToolbarButtons);
+	section.SetBoolEx(L"ShowToolbar", bShowToolbar, true);
+	section.SetBoolEx(L"AutoScaleToolbar", bAutoScaleToolbar, true);
+	section.SetBoolEx(L"ShowStatusbar", bShowStatusbar, true);
+	section.SetBoolEx(L"ShowDriveBox", bShowDriveBox, true);
 
 	SaveIniSection(INI_SECTION_NAME_SETTINGS, pIniSectionBuf);
 	NP2HeapFree(pIniSectionBuf);
 }
 
-void SaveWindowPosition(WCHAR *pIniSectionBuf) {
-	IniSectionOnSave section = { pIniSectionBuf };
-	IniSectionOnSave * const pIniSection = &section;
+void SaveWindowPosition(WCHAR *pIniSectionBuf) noexcept {
+	IniSectionBuilder section = { pIniSectionBuf };
 
 	WCHAR sectionName[96];
 	HMONITOR hMonitor = MonitorFromWindow(hwndMain, MONITOR_DEFAULTTONEAREST);
@@ -2841,21 +2839,21 @@ void SaveWindowPosition(WCHAR *pIniSectionBuf) {
 		wi.cy = wndpl.rcNormalPosition.bottom - wndpl.rcNormalPosition.top;
 	}
 
-	IniSectionSetInt(pIniSection, L"WindowPosX", wi.x);
-	IniSectionSetInt(pIniSection, L"WindowPosY", wi.y);
-	IniSectionSetInt(pIniSection, L"WindowSizeX", wi.cx);
-	IniSectionSetInt(pIniSection, L"WindowSizeY", wi.cy);
+	section.SetInt(L"WindowPosX", wi.x);
+	section.SetInt(L"WindowPosY", wi.y);
+	section.SetInt(L"WindowSizeX", wi.cx);
+	section.SetInt(L"WindowSizeY", wi.cy);
 
-	IniSectionSetIntEx(pIniSection, L"RunDlgSizeX", cxRunDlg, 0);
-	IniSectionSetIntEx(pIniSection, L"GotoDlgSizeX", cxGotoDlg, 0);
-	IniSectionSetIntEx(pIniSection, L"FileFilterDlgX", cxFileFilterDlg, 0);
-	IniSectionSetIntEx(pIniSection, L"RenameFileDlgX", cxRenameFileDlg, 0);
-	IniSectionSetIntEx(pIniSection, L"NewDirectoryDlgX", cxNewDirectoryDlg, 0);
-	IniSectionSetIntEx(pIniSection, L"OpenWithDlgSizeX", cxOpenWithDlg, 0);
-	IniSectionSetIntEx(pIniSection, L"OpenWithDlgSizeY", cyOpenWithDlg, 0);
-	IniSectionSetIntEx(pIniSection, L"CopyMoveDlgSizeX", cxCopyMoveDlg, 0);
-	IniSectionSetIntEx(pIniSection, L"TargetApplicationDlgSizeX", cxTargetApplicationDlg, 0);
-	IniSectionSetIntEx(pIniSection, L"FindWindowDlgSizeX", cxFindWindowDlg, 0);
+	section.SetIntEx(L"RunDlgSizeX", cxRunDlg, 0);
+	section.SetIntEx(L"GotoDlgSizeX", cxGotoDlg, 0);
+	section.SetIntEx(L"FileFilterDlgX", cxFileFilterDlg, 0);
+	section.SetIntEx(L"RenameFileDlgX", cxRenameFileDlg, 0);
+	section.SetIntEx(L"NewDirectoryDlgX", cxNewDirectoryDlg, 0);
+	section.SetIntEx(L"OpenWithDlgSizeX", cxOpenWithDlg, 0);
+	section.SetIntEx(L"OpenWithDlgSizeY", cyOpenWithDlg, 0);
+	section.SetIntEx(L"CopyMoveDlgSizeX", cxCopyMoveDlg, 0);
+	section.SetIntEx(L"TargetApplicationDlgSizeX", cxTargetApplicationDlg, 0);
+	section.SetIntEx(L"FindWindowDlgSizeX", cxFindWindowDlg, 0);
 
 	SaveIniSection(sectionName, pIniSectionBuf);
 }

@@ -255,25 +255,25 @@ bool IniSectionGetBoolImpl(IniSection *section, LPCWSTR key, int keyLen, bool bD
 	return bDefault;
 }
 
-void IniSectionSetString(IniSectionOnSave *section, LPCWSTR key, LPCWSTR value) {
-	LPWSTR p = section->next;
+void IniSectionBuilder::SetString(LPCWSTR key, LPCWSTR value) noexcept {
+	LPWSTR p = next;
 	lstrcpy(p, key);
 	lstrcat(p, L"=");
 	lstrcat(p, value);
 	p = StrEnd(p) + 1;
 	*p = L'\0';
-	section->next = p;
+	next = p;
 }
 
-void IniSectionSetQuotedString(IniSectionOnSave *section, LPCWSTR key, LPCWSTR value) {
-	LPWSTR p = section->next;
+void IniSectionBuilder::SetQuotedString(LPCWSTR key, LPCWSTR value) noexcept {
+	LPWSTR p = next;
 	lstrcpy(p, key);
 	lstrcat(p, L"=\"");
 	lstrcat(p, value);
 	lstrcat(p, L"\"");
 	p = StrEnd(p) + 1;
 	*p = L'\0';
-	section->next = p;
+	next = p;
 }
 
 LPWSTR Registry_GetString(HKEY hKey, LPCWSTR valueName) noexcept {
@@ -2434,8 +2434,7 @@ void MRU_Save(LPCMRULIST pmru) {
 
 	WCHAR tchName[16];
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_MRU);
-	IniSectionOnSave section = { pIniSectionBuf };
-	IniSectionOnSave * const pIniSection = &section;
+	IniSectionBuilder section = { pIniSectionBuf };
 	const int iFlags = pmru->iFlags;
 
 	for (int i = 0; i < pmru->iSize; i++) {
@@ -2443,14 +2442,14 @@ void MRU_Save(LPCMRULIST pmru) {
 		if (StrNotEmpty(tchItem)) {
 			wsprintf(tchName, L"%02i", i + 1);
 			if (iFlags & MRUFlags_QuoteValue) {
-				IniSectionSetQuotedString(pIniSection, tchName, tchItem);
+				section.SetQuotedString(tchName, tchItem);
 			} else {
 				WCHAR tchPath[MAX_PATH];
 				if (iFlags & MRUFlags_RelativePath) {
 					PathRelativeToApp(tchItem, tchPath, 0, true, iFlags & MRUFlags_PortableMyDocs);
 					tchItem = tchPath;
 				}
-				IniSectionSetString(pIniSection, tchName, tchItem);
+				section.SetString(tchName, tchItem);
 			}
 		}
 	}
@@ -2829,7 +2828,7 @@ unsigned int UnSlash(char *s, UINT cpEdit) noexcept {
 				s++;
 			}
 			if (value) {
-				WCHAR val[2] = { (WCHAR)value, 0 };
+				const WCHAR val[2] = { static_cast<WCHAR>(value), 0 };
 				char ch[8];
 				WideCharToMultiByte(cpEdit, 0, val, -1, ch, sizeof(ch), nullptr, nullptr);
 				const char *pch = ch;

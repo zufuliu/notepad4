@@ -216,14 +216,14 @@ bool IniSectionGetBoolImpl(IniSection *section, LPCWSTR key, int keyLen, bool bD
 	return bDefault;
 }
 
-void IniSectionSetString(IniSectionOnSave *section, LPCWSTR key, LPCWSTR value) {
-	LPWSTR p = section->next;
+void IniSectionBuilder::SetString(LPCWSTR key, LPCWSTR value) noexcept {
+	LPWSTR p = next;
 	lstrcpy(p, key);
 	lstrcat(p, L"=");
 	lstrcat(p, value);
 	p = StrEnd(p) + 1;
 	*p = L'\0';
-	section->next = p;
+	next = p;
 }
 
 LPWSTR Registry_GetString(HKEY hKey, LPCWSTR valueName) noexcept {
@@ -1929,14 +1929,13 @@ void MRU_Save(LPCMRULIST pmru) {
 
 	WCHAR tchName[16];
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_MRU);
-	IniSectionOnSave section = { pIniSectionBuf };
-	IniSectionOnSave * const pIniSection = &section;
+	IniSectionBuilder section = { pIniSectionBuf };
 
 	for (int i = 0; i < pmru->iSize; i++) {
 		LPCWSTR tchItem = pmru->pszItems[i];
 		if (StrNotEmpty(tchItem)) {
 			wsprintf(tchName, L"%02i", i + 1);
-			IniSectionSetString(pIniSection, tchName, tchItem);
+			section.SetString(tchName, tchItem);
 		}
 	}
 

@@ -2552,8 +2552,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 				MsgBoxInfo(MB_OK, IDS_ERR_INVALIDTARGET);
 			} else {
 				WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_TARGET_APPLICATION);
-				IniSectionOnSave section = { pIniSectionBuf };
-				IniSectionOnSave * const pIniSection = &section;
+				IniSectionBuilder section = { pIniSectionBuf };
 				const bool ignoreTarget = IsButtonChecked(hwnd, IDC_LAUNCH);
 
 				if (ignoreTarget) {
@@ -2574,19 +2573,19 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 					}
 				}
 
-				IniSectionSetBool(pIniSection, L"UseTargetApplication", !ignoreTarget);
-				IniSectionSetInt(pIniSection, L"TargetApplicationMode", (int)iTargetApplicationMode);
-				IniSectionSetString(pIniSection, L"TargetApplicationPath", szTargetApplication);
-				IniSectionSetString(pIniSection, L"TargetApplicationParams", szTargetApplicationParams);
+				section.SetBool(L"UseTargetApplication", !ignoreTarget);
+				section.SetInt(L"TargetApplicationMode", (int)iTargetApplicationMode);
+				section.SetString(L"TargetApplicationPath", szTargetApplication);
+				section.SetString(L"TargetApplicationParams", szTargetApplicationParams);
 
 				if (iTargetApplicationMode == TargetApplicationMode_SendMsg) {
 					lstrcpy(szTargetApplicationWndClass, szTargetWndClass);
 				} else {
 					StrCpyExW(szTargetApplicationWndClass, L"");
 				}
-				IniSectionSetString(pIniSection, L"TargetApplicationWndClass", szTargetApplicationWndClass);
+				section.SetString(L"TargetApplicationWndClass", szTargetApplicationWndClass);
 
-				if (IsButtonChecked(hwnd, IDC_USEDDE)) {
+				if (iTargetApplicationMode == TargetApplicationMode_UseDDE) {
 					GetDlgItemText(hwnd, IDC_DDEMSG, szDDEMsg, COUNTOF(szDDEMsg));
 					GetDlgItemText(hwnd, IDC_DDEAPP, szDDEApp, COUNTOF(szDDEApp));
 					GetDlgItemText(hwnd, IDC_DDETOPIC, szDDETopic, COUNTOF(szDDETopic));
@@ -2596,9 +2595,9 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 					StrCpyExW(szDDETopic, L"");
 				}
 
-				IniSectionSetString(pIniSection, L"DDEMessage", szDDEMsg);
-				IniSectionSetString(pIniSection, L"DDEApplication", szDDEApp);
-				IniSectionSetString(pIniSection, L"DDETopic", szDDETopic);
+				section.SetString(L"DDEMessage", szDDEMsg);
+				section.SetString(L"DDEApplication", szDDEApp);
+				section.SetString(L"DDETopic", szDDETopic);
 
 				SaveIniSection(INI_SECTION_NAME_TARGET_APPLICATION, pIniSectionBuf);
 				NP2HeapFree(pIniSectionBuf);

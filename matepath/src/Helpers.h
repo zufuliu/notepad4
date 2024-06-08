@@ -327,39 +327,33 @@ NP2_inline void IniSectionGetStringEx(IniSection *section, LPCWSTR key, LPCWSTR 
 	IniSectionGetStringImpl(section, key, 0, lpDefault, lpReturnedString, cchReturnedString);
 }
 
-struct IniSectionOnSave {
+struct IniSectionBuilder {
 	LPWSTR next;
+	void SetString(LPCWSTR key, LPCWSTR value) noexcept;
+	void SetInt(LPCWSTR key, int i) noexcept {
+		WCHAR tch[16];
+		_ltow(i, tch, 10);
+		SetString(key, tch);
+	}
+	void SetBool(LPCWSTR key, bool b) noexcept {
+		SetString(key, (b ? L"1" : L"0"));
+	}
+	void SetStringEx(LPCWSTR key, LPCWSTR value, LPCWSTR lpDefault) noexcept {
+		if (!StrCaseEqual(value, lpDefault)) {
+			SetString(key, value);
+		}
+	}
+	void SetIntEx(LPCWSTR key, int i, int iDefault) noexcept {
+		if (i != iDefault) {
+			SetInt(key, i);
+		}
+	}
+	void SetBoolEx(LPCWSTR key, bool b, bool bDefault) noexcept {
+		if (b != bDefault) {
+			SetString(key, (b ? L"1" : L"0"));
+		}
+	}
 };
-
-void IniSectionSetString(IniSectionOnSave *section, LPCWSTR key, LPCWSTR value);
-
-NP2_inline void IniSectionSetInt(IniSectionOnSave *section, LPCWSTR key, int i) {
-	WCHAR tch[16];
-	_ltow(i, tch, 10);
-	IniSectionSetString(section, key, tch);
-}
-
-NP2_inline void IniSectionSetBool(IniSectionOnSave *section, LPCWSTR key, bool b) {
-	IniSectionSetString(section, key, (b ? L"1" : L"0"));
-}
-
-NP2_inline void IniSectionSetStringEx(IniSectionOnSave *section, LPCWSTR key, LPCWSTR value, LPCWSTR lpDefault) {
-	if (!StrCaseEqual(value, lpDefault)) {
-		IniSectionSetString(section, key, value);
-	}
-}
-
-NP2_inline void IniSectionSetIntEx(IniSectionOnSave *section, LPCWSTR key, int i, int iDefault) {
-	if (i != iDefault) {
-		IniSectionSetInt(section, key, i);
-	}
-}
-
-NP2_inline void IniSectionSetBoolEx(IniSectionOnSave *section, LPCWSTR key, bool b, bool bDefault) {
-	if (b != bDefault) {
-		IniSectionSetString(section, key, (b ? L"1" : L"0"));
-	}
-}
 
 #define NP2RegSubKey_ContextMenu	L"Folder\\shell\\matepath"
 #define NP2RegSubKey_JumpList		L"Applications\\matepath.exe"

@@ -81,9 +81,9 @@ extern int np2StyleTheme;
 
 void	Style_ReleaseResources() noexcept;
 void	Style_Load(void);
-void	Style_Save(void);
+void	Style_Save() noexcept;
 bool	Style_Import(HWND hwnd);
-bool	Style_Export(HWND hwnd);
+bool	Style_Export(HWND hwnd) noexcept;
 void	Style_LoadTabSettings(LPCEDITLEXER pLex) noexcept;
 void	Style_SaveTabSettings(LPCEDITLEXER pLex) noexcept;
 void	EditApplyDefaultEncoding(LPCEDITLEXER pLex, BOOL bLexerChanged) noexcept;

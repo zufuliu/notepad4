@@ -200,9 +200,9 @@ void CALLBACK WatchTimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTim
 void CALLBACK PasteBoardTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime) noexcept;
 
 void LoadSettings(void);
-void SaveSettingsNow(bool bOnlySaveStyle, bool bQuiet);
-void SaveSettings(bool bSaveSettingsNow);
-void SaveWindowPosition(WCHAR *pIniSectionBuf);
+void SaveSettingsNow(bool bOnlySaveStyle, bool bQuiet) noexcept;
+void SaveSettings(bool bSaveSettingsNow) noexcept;
+void SaveWindowPosition(WCHAR *pIniSectionBuf) noexcept;
 void ClearWindowPositionHistory() noexcept;
 void ParseCommandLine() noexcept;
 void LoadFlags(void);
