@@ -357,13 +357,13 @@ extern const uint32_t DefaultWordCharSet[8];
 void	EditCompleteUpdateConfig() noexcept;
 bool	IsDocWordChar(uint32_t ch) noexcept;
 bool	IsAutoCompletionWordCharacter(uint32_t ch) noexcept;
-void	EditCompleteWord(int iCondition, bool autoInsert);
+void	EditCompleteWord(int iCondition, bool autoInsert) noexcept;
 bool	EditIsOpenBraceMatched(Sci_Position pos, Sci_Position startPos) noexcept;
 void	EditAutoCloseBraceQuote(int ch, AutoInsertCharacter what) noexcept;
-void	EditAutoCloseXMLTag(void);
+void	EditAutoCloseXMLTag() noexcept;
 void	EditAutoIndent() noexcept;
-void	EditToggleCommentLine(bool alternative);
-void	EditToggleCommentBlock(bool alternative);
+void	EditToggleCommentLine(bool alternative) noexcept;
+void	EditToggleCommentBlock(bool alternative) noexcept;
 void	EditInsertScriptShebangLine() noexcept;
 
 enum CallTipType {
