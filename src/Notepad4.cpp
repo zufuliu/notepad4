@@ -253,9 +253,9 @@ static LPWSTR lpFileArg = nullptr;
 static LPWSTR lpSchemeArg = nullptr;
 static LPWSTR lpMatchArg = nullptr;
 static LPWSTR lpEncodingArg = nullptr;
-MRULIST mruFile;
-MRULIST mruFind;
-MRULIST mruReplace;
+MRUList mruFile;
+MRUList mruFind;
+MRUList mruReplace;
 static BitmapCache bitmapCache;
 
 DWORD	dwLastIOError;
@@ -1033,7 +1033,7 @@ static inline void NP2RestoreWind(HWND hwnd) noexcept {
 	ShowOwnedPopups(hwnd, TRUE);
 }
 
-static inline void ExitApplication(HWND hwnd) {
+static inline void ExitApplication(HWND hwnd) noexcept {
 	if (FileSave(FileSaveFlag_Ask)) {
 		DestroyWindow(hwnd);
 	}
@@ -1157,9 +1157,9 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			// call SaveSettings() when hwndToolbar is still valid
 			SaveSettings(false);
 
-			MRU_MergeSave(&mruFile, bSaveRecentFiles);
-			MRU_MergeSave(&mruFind, bSaveFindReplace);
-			MRU_MergeSave(&mruReplace, bSaveFindReplace);
+			mruFile.MergeSave(bSaveRecentFiles);
+			mruFind.MergeSave(bSaveFindReplace);
+			mruReplace.MergeSave(bSaveFindReplace);
 			bitmapCache.Empty();
 
 			// Remove tray icon if necessary
@@ -1888,7 +1888,7 @@ void EditReplaceDocument(HANDLE pdoc) noexcept {
 // MsgCreate() - Handles WM_CREATE
 //
 //
-LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
+LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	UNREFERENCED_PARAMETER(wParam);
 	hwndMain = hwnd;
 	g_uCurrentDPI = GetWindowDPI(hwnd);
@@ -1955,9 +1955,9 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	// File MRU
 	const int flags = MRUFlags_FilePath | (((int)flagRelativeFileMRU) * MRUFlags_RelativePath) | (((int)flagPortableMyDocs) * MRUFlags_PortableMyDocs);
-	MRU_Init(&mruFile, MRU_KEY_RECENT_FILES, flags);
-	MRU_Init(&mruFind, MRU_KEY_RECENT_FIND, MRUFlags_QuoteValue);
-	MRU_Init(&mruReplace, MRU_KEY_RECENT_REPLACE, MRUFlags_QuoteValue);
+	mruFile.Init(MRU_KEY_RECENT_FILES, flags);
+	mruFind.Init(MRU_KEY_RECENT_FIND, MRUFlags_QuoteValue);
+	mruReplace.Init(MRU_KEY_RECENT_REPLACE, MRUFlags_QuoteValue);
 	return 0;
 }
 
@@ -2049,7 +2049,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 	// Load toolbar labels
 	IniSectionParser section;
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_TOOLBAR_LABELS);
-	const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
+	const DWORD cchIniSection = static_cast<DWORD>(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
 
 	section.Init(COUNTOF(tbbMainWnd));
 	LoadIniSection(INI_SECTION_NAME_TOOLBAR_LABELS, pIniSectionBuf, cchIniSection);
@@ -4866,8 +4866,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			if (path) {
 				if (!PathIsFile(path)) {
 					if (IDYES == MsgBoxWarn(MB_YESNO, IDS_ERR_MRUDLG)) {
-						MRU_DeleteFileFromStore(&mruFile, path);
-						MRU_Delete(&mruFile, index);
+						mruFile.DeleteFileFromStore(path);
+						mruFile.Delete(index);
 					}
 				} else if (FileSave(FileSaveFlag_Ask)) {
 					FileLoad(FileLoadFlag_DontSave, path);
@@ -5334,7 +5334,7 @@ static void GetWindowPositionSectionName(HMONITOR hMonitor, WCHAR (&sectionName)
 void LoadSettings() noexcept {
 	IniSectionParser section;
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_SETTINGS);
-	const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
+	const DWORD cchIniSection = static_cast<DWORD>(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
 	section.Init(128);
 
 	LoadIniSection(INI_SECTION_NAME_SETTINGS, pIniSectionBuf, cchIniSection);
@@ -6616,7 +6616,7 @@ void ParseCommandLine() noexcept {
 void LoadFlags() noexcept {
 	IniSectionParser section;
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_FLAGS);
-	const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
+	const DWORD cchIniSection = static_cast<DWORD>(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
 	section.Init(64);
 
 	LoadIniSection(INI_SECTION_NAME_FLAGS, pIniSectionBuf, cchIniSection);
@@ -7430,7 +7430,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 			UpdateLineNumberWidth();
 		}
 
-		MRU_Add(&mruFile, szFileName);
+		mruFile.Add(szFileName);
 		if (flagUseSystemMRU == TripleBoolean_True) {
 			SHAddToRecentDocs(SHARD_PATHW, szFileName);
 		}
@@ -7521,7 +7521,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 // FileSave()
 //
 //
-bool FileSave(FileSaveFlag saveFlag) {
+bool FileSave(FileSaveFlag saveFlag) noexcept {
 	const bool Untitled = StrIsEmpty(szCurFile);
 	bool bIsEmptyNewFile = false;
 
@@ -7639,7 +7639,7 @@ bool FileSave(FileSaveFlag saveFlag) {
 		if (!(saveFlag & FileSaveFlag_SaveCopy)) {
 			bDocumentModified = false;
 			iOriginalEncoding = iCurrentEncoding;
-			MRU_Add(&mruFile, szCurFile);
+			mruFile.Add(szCurFile);
 			if (flagUseSystemMRU == TripleBoolean_True) {
 				SHAddToRecentDocs(SHARD_PATHW, szCurFile);
 			}
@@ -8255,7 +8255,7 @@ void GetRelaunchParameters(LPWSTR szParameters, LPCWSTR lpszFile, bool newWind, 
 // RelaunchElevated()
 //
 //
-bool RelaunchElevated(void) {
+bool RelaunchElevated() noexcept {
 	if (!IsVistaAndAbove() || fIsElevated || flagRelaunchElevated == RelaunchElevatedFlag_None || flagDisplayHelp) {
 		return false;
 	}

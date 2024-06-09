@@ -186,7 +186,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow);
 bool ActivatePrevInst() noexcept;
 void GetRelaunchParameters(LPWSTR szParameters, LPCWSTR lpszFile, bool newWind, bool emptyWind) noexcept;
 bool RelaunchMultiInst() noexcept;
-bool RelaunchElevated(void);
+bool RelaunchElevated() noexcept;
 void SnapToDefaultPos(HWND hwnd) noexcept;
 void ShowNotifyIcon(HWND hwnd, bool bAdd) noexcept;
 void SetNotifyIconTitle(HWND hwnd) noexcept;
@@ -265,7 +265,7 @@ enum FileSaveFlag {
 
 bool FileIO(bool fLoad, LPWSTR pszFile, int flag, EditFileIOStatus &status) noexcept;
 bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile);
-bool FileSave(FileSaveFlag saveFlag);
+bool FileSave(FileSaveFlag saveFlag) noexcept;
 BOOL OpenFileDlg(LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) noexcept;
 BOOL SaveFileDlg(bool Untitled, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) noexcept;
 
@@ -285,7 +285,7 @@ void	AutoSave_DoWork(FileSaveFlag saveFlag) noexcept;
 LPCWSTR AutoSave_GetDefaultFolder() noexcept;
 
 LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
-LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam);
+LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept;
 void	CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept;
 void	MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept;
 void	MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept;

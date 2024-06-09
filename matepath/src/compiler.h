@@ -2,17 +2,6 @@
 // See License.txt for details about distribution and modification.
 #pragma once
 
-#if defined(__cplusplus) || (defined(__STDC_VERSION__) && __STDC_VERSION__ > 201710L)
-#undef NULL
-#define NULL	nullptr
-#else
-//#include <stdbool.h>
-typedef _Bool	bool;
-#define false	0
-#define true	1
-#define nullptr	NULL
-#endif
-
 // suppress clang-tidy [bugprone-multi-level-implicit-pointer-conversion] warning
 #if defined(__cplusplus)
 #define NP2_void_pointer(expr)		(reinterpret_cast<void *>(expr))

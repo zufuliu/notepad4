@@ -2,17 +2,6 @@
 // See License.txt for details about distribution and modification.
 #pragma once
 
-#if defined(__cplusplus) || (defined(__STDC_VERSION__) && __STDC_VERSION__ > 201710L)
-#undef NULL
-#define NULL	nullptr
-#else
-//#include <stdbool.h>
-typedef _Bool	bool;
-#define false	0
-#define true	1
-#define nullptr	NULL
-#endif
-
 #if defined(__GNUC__) || defined(__clang__)
 #define NP2_unreachable()	__builtin_unreachable()
 #define NP2_memchr			__builtin_memchr

@@ -1830,15 +1830,15 @@ void HistoryList::UpdateToolbar(HWND hwnd, int cmdBack, int cmdForward) const no
 //
 //  MRU functions
 //
-void MRU_Init(LPMRULIST pmru, LPCWSTR pszRegKey, int iFlags) {
-	pmru->iSize = 0;
-	pmru->iFlags = iFlags;
-	pmru->szRegKey = pszRegKey;
-	memset(NP2_void_pointer(pmru->pszItems), 0, sizeof(pmru->pszItems));
-	MRU_Load(pmru);
+void MRUList::Init(LPCWSTR pszRegKey, int flags) noexcept {
+	iSize = 0;
+	iFlags = flags;
+	szRegKey = pszRegKey;
+	memset(NP2_void_pointer(pszItems), 0, sizeof(pszItems));
+	Load();
 }
 
-static inline bool MRU_Equal(int flags, LPCWSTR psz1, LPCWSTR psz2) {
+static inline bool MRU_Equal(int flags, LPCWSTR psz1, LPCWSTR psz2) noexcept {
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 	return CompareStringOrdinal(psz1, -1, psz2, -1, flags & MRUFlags_FilePath) == CSTR_EQUAL;
 #else
@@ -1846,12 +1846,12 @@ static inline bool MRU_Equal(int flags, LPCWSTR psz1, LPCWSTR psz2) {
 #endif
 }
 
-void MRU_Add(LPMRULIST pmru, LPCWSTR pszNew) {
-	const int flags = pmru->iFlags;
+void MRUList::Add(LPCWSTR pszNew) noexcept {
+	const int flags = iFlags;
 	LPWSTR tchItem = nullptr;
 	int i;
 	for (i = 0; i < MRU_MAXITEMS; i++) {
-		WCHAR * const item = pmru->pszItems[i];
+		WCHAR * const item = pszItems[i];
 		if (item == nullptr) {
 			break;
 		}
@@ -1862,98 +1862,98 @@ void MRU_Add(LPMRULIST pmru, LPCWSTR pszNew) {
 	}
 	if (i == MRU_MAXITEMS) {
 		--i;
-		LocalFree(pmru->pszItems[i]);
-	} else if (i == pmru->iSize) {
-		pmru->iSize += 1;
+		LocalFree(pszItems[i]);
+	} else if (i == iSize) {
+		iSize += 1;
 	}
 	for (; i > 0; i--) {
-		pmru->pszItems[i] = pmru->pszItems[i - 1];
+		pszItems[i] = pszItems[i - 1];
 	}
 	if (tchItem == nullptr) {
 		tchItem = StrDup(pszNew);
 	}
-	pmru->pszItems[0] = tchItem;
+	pszItems[0] = tchItem;
 }
 
-void MRU_Delete(LPMRULIST pmru, int iIndex) {
-	if (iIndex < 0 || iIndex >= pmru->iSize) {
+void MRUList::Delete(int iIndex) noexcept {
+	if (iIndex < 0 || iIndex >= iSize) {
 		return;
 	}
-	LocalFree(pmru->pszItems[iIndex]);
-	pmru->pszItems[iIndex] = NULL;
-	pmru->iSize -= 1;
-	for (int i = iIndex; i < pmru->iSize; i++) {
-		pmru->pszItems[i] = pmru->pszItems[i + 1];
-		pmru->pszItems[i + 1] = NULL;
+	LocalFree(pszItems[iIndex]);
+	pszItems[iIndex] = nullptr;
+	iSize -= 1;
+	for (int i = iIndex; i < iSize; i++) {
+		pszItems[i] = pszItems[i + 1];
+		pszItems[i + 1] = nullptr;
 	}
 }
 
-void MRU_Empty(LPMRULIST pmru, bool save) {
-	for (int i = 0; i < pmru->iSize; i++) {
-		LocalFree(pmru->pszItems[i]);
-		pmru->pszItems[i] = NULL;
+void MRUList::Empty(bool save) noexcept {
+	for (int i = 0; i < iSize; i++) {
+		LocalFree(pszItems[i]);
+		pszItems[i] = nullptr;
 	}
-	pmru->iSize = 0;
+	iSize = 0;
 	if (save && StrNotEmpty(szIniFile)) {
-		IniClearSection(pmru->szRegKey);
+		IniClearSection(szRegKey);
 	}
 }
 
-void MRU_Load(LPMRULIST pmru) {
+void MRUList::Load() noexcept {
 	if (StrIsEmpty(szIniFile)) {
 		return;
 	}
 
 	IniSectionParser section;
-	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_MRU);
-	const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
+	WCHAR *pIniSectionBuf = static_cast<WCHAR *>(NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_MRU));
+	const DWORD cchIniSection = static_cast<DWORD>(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
 
 	section.Init(MRU_MAXITEMS);
-	LoadIniSection(pmru->szRegKey, pIniSectionBuf, cchIniSection);
+	LoadIniSection(szRegKey, pIniSectionBuf, cchIniSection);
 	section.ParseArray(pIniSectionBuf);
 	UINT n = 0;
 
 	for (UINT i = 0; i < section.count; i++) {
 		LPCWSTR tchItem = section.nodeList[i].value;
 		if (StrNotEmpty(tchItem)) {
-			pmru->pszItems[n++] = StrDup(tchItem);
+			pszItems[n++] = StrDup(tchItem);
 		}
 	}
 
-	pmru->iSize = n;
+	iSize = n;
 	section.Free();
 	NP2HeapFree(pIniSectionBuf);
 }
 
-void MRU_Save(LPCMRULIST pmru) {
+void MRUList::Save() const noexcept {
 	if (StrIsEmpty(szIniFile)) {
 		return;
 	}
-	if (pmru->iSize <= 0) {
-		IniClearSection(pmru->szRegKey);
+	if (iSize <= 0) {
+		IniClearSection(szRegKey);
 		return;
 	}
 
 	WCHAR tchName[16];
-	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_MRU);
+	WCHAR *pIniSectionBuf = static_cast<WCHAR *>(NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_MRU));
 	IniSectionBuilder section = { pIniSectionBuf };
 
-	for (int i = 0; i < pmru->iSize; i++) {
-		LPCWSTR tchItem = pmru->pszItems[i];
+	for (int i = 0; i < iSize; i++) {
+		LPCWSTR tchItem = pszItems[i];
 		if (StrNotEmpty(tchItem)) {
 			wsprintf(tchName, L"%02i", i + 1);
 			section.SetString(tchName, tchItem);
 		}
 	}
 
-	SaveIniSection(pmru->szRegKey, pIniSectionBuf);
+	SaveIniSection(szRegKey, pIniSectionBuf);
 	NP2HeapFree(pIniSectionBuf);
 }
 
-void MRU_AddToCombobox(LPCMRULIST pmru, HWND hwnd) {
-	for (int i = 0; i < pmru->iSize; i++) {
-		LPCWSTR path = pmru->pszItems[i];
-		ComboBox_AddString(hwnd, path);
+void MRUList::AddToCombobox(HWND hwnd) const noexcept {
+	for (int i = 0; i < iSize; i++) {
+		LPCWSTR str = pszItems[i];
+		ComboBox_AddString(hwnd, str);
 	}
 }
 

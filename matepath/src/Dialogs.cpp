@@ -1436,7 +1436,7 @@ INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 
 			IniSectionParser section;
 			WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_FILTERS);
-			const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
+			const DWORD cchIniSection = static_cast<DWORD>(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
 			section.Init(128);
 
 			LoadIniSection(INI_SECTION_NAME_FILTERS, pIniSectionBuf, cchIniSection);
@@ -1546,7 +1546,7 @@ bool GetFilterDlg(HWND hwnd) noexcept {
 struct FILEOPDLGDATA {
 	WCHAR szSource[MAX_PATH];
 	WCHAR szDestination[MAX_PATH];
-	LPMRULIST pmru;
+	MRUList *pmru;
 	UINT wFunc;
 };
 
@@ -1685,7 +1685,7 @@ bool RenameFileDlg(HWND hwnd) {
 //
 extern int cxCopyMoveDlg;
 
-INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
@@ -1697,7 +1697,7 @@ INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 		SetDlgItemText(hwnd, IDC_SOURCE, lpfod->szSource);
 
 		HWND hwndDest = GetDlgItem(hwnd, IDC_DESTINATION);
-		MRU_AddToCombobox(lpfod->pmru, hwndDest);
+		lpfod->pmru->AddToCombobox(hwndDest);
 		ComboBox_SetCurSel(hwndDest, 0);
 		ComboBox_LimitText(hwndDest, MAX_PATH - 1);
 		ComboBox_SetExtendedUI(hwndDest, TRUE);
@@ -1751,7 +1751,7 @@ INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 			HWND hwndDest = GetDlgItem(hwnd, IDC_DESTINATION);
 			ComboBox_GetText(hwndDest, tch, COUNTOF(tch));
 			ComboBox_ResetContent(hwnd);
-			MRU_Empty(lpfod->pmru, true);
+			lpfod->pmru->Empty(true);
 			ComboBox_SetText(hwndDest, tch);
 		}
 	}
@@ -1813,10 +1813,10 @@ bool CopyMoveDlg(HWND hwnd, UINT *wFunc) {
 	}
 
 	FILEOPDLGDATA fod;
-	MRULIST mru;
+	MRUList mru;
 	fod.pmru = &mru;
 	fod.wFunc = *wFunc;
-	MRU_Init(&mru, MRU_KEY_COPY_MOVE_HISTORY, MRUFlags_FilePath);
+	mru.Init(MRU_KEY_COPY_MOVE_HISTORY, MRUFlags_FilePath);
 	lstrcpy(fod.szSource, PathFindFileName(dli.szFileName));
 
 	const INT_PTR result = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_COPYMOVE), hwnd, CopyMoveDlgProc, (LPARAM)&fod);
@@ -1836,8 +1836,8 @@ bool CopyMoveDlg(HWND hwnd, UINT *wFunc) {
 		}
 
 		// Save item
-		MRU_Add(&mru, fod.szDestination);
-		MRU_Save(&mru);
+		mru.Add(fod.szDestination);
+		mru.Save();
 		ExpandEnvironmentStringsEx(fod.szDestination, COUNTOF(fod.szDestination));
 
 		// Double null terminated strings are essential!!!
@@ -1873,7 +1873,7 @@ bool CopyMoveDlg(HWND hwnd, UINT *wFunc) {
 		*wFunc = fod.wFunc; // save state for next call
 	}
 
-	MRU_Empty(&mru, false);
+	mru.Empty(false);
 	return result == IDOK;
 }
 

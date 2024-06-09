@@ -982,7 +982,7 @@ bool AddToFavDlg(HWND hwnd, LPCWSTR lpszName, LPCWSTR lpszTarget) {
 // FileMRUDlgProc()
 //
 //
-extern MRULIST mruFile;
+extern MRUList mruFile;
 extern bool bSaveRecentFiles;
 extern int cxFileMRUDlg;
 extern int cyFileMRUDlg;
@@ -1058,7 +1058,7 @@ static DWORD WINAPI FileMRUIconThread(LPVOID lpParam) noexcept {
 	return 0;
 }
 
-static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
@@ -1210,11 +1210,11 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 			}
 		} else if (pnmhdr->idFrom == IDC_EMPTY_MRU) {
 			if ((pnmhdr->code == NM_CLICK || pnmhdr->code == NM_RETURN)) {
-				MRU_Empty(&mruFile, false);
+				mruFile.Empty(false);
 				if (StrNotEmpty(szCurFile)) {
-					MRU_Add(&mruFile, szCurFile);
+					mruFile.Add(szCurFile);
 				}
-				MRU_Save(&mruFile);
+				mruFile.Save();
 				SendWMCommand(hwnd, IDC_FILEMRU_UPDATE_VIEW);
 			}
 		}
@@ -1276,8 +1276,8 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 				if (!PathIsFile(tch)) {
 					// Ask...
 					if (IDYES == MsgBoxWarn(MB_YESNO, IDS_ERR_MRUDLG)) {
-						MRU_DeleteFileFromStore(&mruFile, tch);
-						MRU_Delete(&mruFile, lvi.iItem);
+						mruFile.DeleteFileFromStore(tch);
+						mruFile.Delete(lvi.iItem);
 
 						// must use recreate the list, index might change...
 						//ListView_DeleteItem(hwndLV, lvi.iItem);

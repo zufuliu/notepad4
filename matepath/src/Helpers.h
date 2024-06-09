@@ -568,22 +568,20 @@ enum {
 // MRU_MAXITEMS * (MAX_PATH + 4)
 #define MAX_INI_SECTION_SIZE_MRU	(8 * 1024)
 
-typedef struct MRULIST {
+struct MRUList {
 	int		iSize;
 	int		iFlags;
 	LPCWSTR szRegKey;
 	LPWSTR pszItems[MRU_MAXITEMS];
-} MRULIST, *PMRULIST, *LPMRULIST;
 
-typedef const MRULIST *LPCMRULIST;
-
-void MRU_Init(LPMRULIST pmru, LPCWSTR pszRegKey, int iFlags);
-void MRU_Add(LPMRULIST pmru, LPCWSTR pszNew);
-void MRU_Delete(LPMRULIST pmru, int iIndex);
-void MRU_Empty(LPMRULIST pmru, bool save);
-void MRU_Load(LPMRULIST pmru);
-void MRU_Save(LPCMRULIST pmru);
-void MRU_AddToCombobox(LPCMRULIST pmru, HWND hwnd);
+	void Init(LPCWSTR pszRegKey, int flags) noexcept;
+	void Add(LPCWSTR pszNew) noexcept;
+	void Delete(int iIndex) noexcept;
+	void Empty(bool save) noexcept;
+	void Load() noexcept;
+	void Save() const noexcept;
+	void AddToCombobox(HWND hwnd) const noexcept;
+};
 
 //==== Themed Dialogs =========================================================
 #ifndef DLGTEMPLATEEX
