@@ -451,80 +451,52 @@ struct IniKeyValueNode {
 
 // https://en.wikipedia.org/wiki/Sentinel_node
 // https://en.wikipedia.org/wiki/Sentinel_value
-#define IniSectionImplUseSentinelNode	1
+#define IniSectionParserUseSentinelNode	1
 
-struct IniSection {
+struct IniSectionParser {
 	UINT count;
 	UINT capacity;
 	IniKeyValueNode *head;
-#if IniSectionImplUseSentinelNode
+#if IniSectionParserUseSentinelNode
 	IniKeyValueNode *sentinel;
 #endif
 	IniKeyValueNode *nodeList;
+
+	void Init(UINT capacity_) noexcept;
+	void Free() const noexcept {
+		NP2HeapFree(nodeList);
+	}
+	void Clear() noexcept {
+		count = 0;
+		head = nullptr;
+	}
+	bool ParseArray(LPWSTR lpCachedIniSection, BOOL quoted) noexcept;
+	bool Parse(LPWSTR lpCachedIniSection) noexcept;
+	LPCWSTR UnsafeGetValue(LPCWSTR key, int keyLen) noexcept;
+	LPCWSTR GetValueImpl(LPCWSTR key, int keyLen) noexcept {
+		return count ? UnsafeGetValue(key, keyLen) : nullptr;
+	}
+	void GetStringImpl(LPCWSTR key, int keyLen, LPCWSTR lpDefault, LPWSTR lpReturnedString, int cchReturnedString) noexcept;
+	int GetIntImpl(LPCWSTR key, int keyLen, int iDefault) noexcept;
+	bool GetBoolImpl(LPCWSTR key, int keyLen, bool bDefault) noexcept;
+
+	template <size_t N>
+	LPCWSTR GetValue(const wchar_t (&key)[N]) noexcept {
+		return GetValueImpl(key, static_cast<int>(N - 1));
+	}
+	template <size_t N>
+	int GetInt(const wchar_t (&key)[N], int iDefault) noexcept {
+		return GetIntImpl(key, static_cast<int>(N - 1), iDefault);
+	}
+	template <size_t N>
+	bool GetBool(const wchar_t (&key)[N], bool bDefault) noexcept {
+		return GetBoolImpl(key, static_cast<int>(N - 1), bDefault);
+	}
+	template <size_t N>
+	void GetString(const wchar_t (&key)[N], LPCWSTR lpDefault, LPWSTR lpReturnedString, int cchReturnedString) noexcept {
+		GetStringImpl(key, static_cast<int>(N - 1), lpDefault, lpReturnedString, cchReturnedString);
+	}
 };
-
-NP2_inline void IniSectionInit(IniSection *section, UINT capacity) {
-	section->count = 0;
-	section->capacity = capacity;
-	section->head = NULL;
-#if IniSectionImplUseSentinelNode
-	section->nodeList = (IniKeyValueNode *)NP2HeapAlloc((capacity + 1) * sizeof(IniKeyValueNode));
-	section->sentinel = &section->nodeList[capacity];
-#else
-	section->nodeList = (IniKeyValueNode *)NP2HeapAlloc(capacity * sizeof(IniKeyValueNode));
-#endif
-}
-
-NP2_inline void IniSectionFree(IniSection *section) {
-	NP2HeapFree(section->nodeList);
-}
-
-NP2_inline void IniSectionClear(IniSection *section) {
-	section->count = 0;
-	section->head = NULL;
-}
-
-NP2_inline bool IniSectionIsEmpty(const IniSection *section) {
-	return section->count == 0;
-}
-
-bool IniSectionParseArray(IniSection *section, LPWSTR lpCachedIniSection, BOOL quoted);
-bool IniSectionParse(IniSection *section, LPWSTR lpCachedIniSection);
-LPCWSTR IniSectionUnsafeGetValue(IniSection *section, LPCWSTR key, int keyLen);
-
-NP2_inline LPCWSTR IniSectionGetValueImpl(IniSection *section, LPCWSTR key, int keyLen) {
-	return section->count ? IniSectionUnsafeGetValue(section, key, keyLen) : NULL;
-}
-
-void IniSectionGetStringImpl(IniSection *section, LPCWSTR key, int keyLen, LPCWSTR lpDefault, LPWSTR lpReturnedString, int cchReturnedString);
-int IniSectionGetIntImpl(IniSection *section, LPCWSTR key, int keyLen, int iDefault);
-bool IniSectionGetBoolImpl(IniSection *section, LPCWSTR key, int keyLen, bool bDefault);
-
-
-#define IniSectionGetValue(section, key) \
-	IniSectionGetValueImpl(section, key, CSTRLEN(key))
-#define IniSectionGetInt(section, key, iDefault) \
-	IniSectionGetIntImpl(section, key, CSTRLEN(key), (iDefault))
-#define IniSectionGetBool(section, key, bDefault) \
-	IniSectionGetBoolImpl(section, key, CSTRLEN(key), (bDefault))
-#define IniSectionGetString(section, key, lpDefault, lpReturnedString, cchReturnedString) \
-	IniSectionGetStringImpl(section, key, CSTRLEN(key), (lpDefault), (lpReturnedString), (cchReturnedString))
-
-NP2_inline LPCWSTR IniSectionGetValueEx(IniSection *section, LPCWSTR key) {
-	return IniSectionGetValueImpl(section, key, 0);
-}
-
-NP2_inline int IniSectionGetIntEx(IniSection *section, LPCWSTR key, int iDefault) {
-	return IniSectionGetIntImpl(section, key, 0, iDefault);
-}
-
-NP2_inline bool IniSectionGetBoolEx(IniSection *section, LPCWSTR key, bool bDefault) {
-	return IniSectionGetBoolImpl(section, key, 0, bDefault);
-}
-
-NP2_inline void IniSectionGetStringEx(IniSection *section, LPCWSTR key, LPCWSTR lpDefault, LPWSTR lpReturnedString, int cchReturnedString) {
-	IniSectionGetStringImpl(section, key, 0, lpDefault, lpReturnedString, cchReturnedString);
-}
 
 struct IniSectionBuilder {
 	LPWSTR next;
@@ -725,7 +697,9 @@ constexpr bool IsChineseTraditionalSubLang(LANGID subLang) noexcept {
 		|| subLang == SUBLANG_CHINESE_MACAU;
 }
 
-#define GetString(id, pb, cb)	LoadString(g_hInstance, id, pb, cb)
+inline int GetString(UINT uID, LPWSTR lpBuffer, int cchBufferMax) noexcept {
+	return LoadString(g_hInstance, uID, lpBuffer, cchBufferMax);
+}
 #define StrEnd(pStart)			((pStart) + lstrlen(pStart))
 
 /**

@@ -643,7 +643,7 @@ static inline void SaveLexTabSettings(IniSectionBuilder &section, LPCEDITLEXER p
 	section.SetBoolEx(L"UseGlobalTabSettings", tabSettings.schemeUseGlobalTabSettings, LexerAttr_GetGlobalTabSettings(lexerAttr));
 }
 
-static void Style_LoadOneEx(PEDITLEXER pLex, IniSection *pIniSection, WCHAR *pIniSectionBuf, int cchIniSection) {
+static void Style_LoadOneEx(PEDITLEXER pLex, IniSectionParser &section, WCHAR *pIniSectionBuf, int cchIniSection) noexcept {
 	pLex->iStyleTheme = (uint8_t)np2StyleTheme;
 	LPCWSTR themePath = GetStyleThemeFilePath();
 	GetPrivateProfileSection(pLex->pszName, pIniSectionBuf, cchIniSection, themePath);
@@ -654,16 +654,16 @@ static void Style_LoadOneEx(PEDITLEXER pLex, IniSection *pIniSection, WCHAR *pIn
 		szValue = (LPWSTR)NP2HeapAlloc(EDITSTYLE_BufferSize(iStyleCount));
 		pLex->szStyleBuf = szValue;
 	}
-	if (!IniSectionParse(pIniSection, pIniSectionBuf)) {
+	if (!section.Parse(pIniSectionBuf)) {
 		for (UINT i = 0; i < iStyleCount; szValue += MAX_EDITSTYLE_VALUE_SIZE, i++) {
 			pLex->Styles[i].szValue = szValue;
 			lstrcpy(szValue, pLex->Styles[i].pszDefault);
 		}
 	} else {
-		pLex->bUseDefaultCodeStyle = IniSectionGetBool(pIniSection, L"UseDefaultCodeStyle", pLex->bUseDefaultCodeStyle);
+		pLex->bUseDefaultCodeStyle = section.GetBool(L"UseDefaultCodeStyle", pLex->bUseDefaultCodeStyle);
 		for (UINT i = 0; i < iStyleCount; szValue += MAX_EDITSTYLE_VALUE_SIZE, i++) {
 			pLex->Styles[i].szValue = szValue;
-			LPCWSTR value = IniSectionGetValueImpl(pIniSection, pLex->Styles[i].pszName, pLex->Styles[i].iNameLen);
+			LPCWSTR value = section.GetValueImpl(pLex->Styles[i].pszName, pLex->Styles[i].iNameLen);
 			if (value != nullptr) {
 				lstrcpyn(szValue, value, MAX_EDITSTYLE_VALUE_SIZE);
 			} else {
@@ -749,45 +749,44 @@ static int __cdecl CmpEditLexerByName(const void *p1, const void *p2) noexcept {
 //
 // Style_Load()
 //
-void Style_Load(void) {
-	IniSection section;
+void Style_Load() noexcept {
+	IniSectionParser section;
 	g_AllFileExtensions = (LPWSTR)NP2HeapAlloc(ALL_FILE_EXTENSIONS_BYTE_SIZE);
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_STYLES);
 	const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
-	IniSection * const pIniSection = &section;
-	IniSectionInit(pIniSection, 128);
+	section.Init(128);
 
 	LoadIniSection(INI_SECTION_NAME_STYLES, pIniSectionBuf, cchIniSection);
-	IniSectionParse(pIniSection, pIniSectionBuf);
+	section.Parse(pIniSectionBuf);
 
 	// 2nd default
-	bUse2ndGlobalStyle = IniSectionGetBool(pIniSection, L"Use2ndGlobalStyle", false);
+	bUse2ndGlobalStyle = section.GetBool(L"Use2ndGlobalStyle", false);
 	pLexGlobal = bUse2ndGlobalStyle ? &lex2ndGlobal : &lexGlobal;
 
 	// favorite schemes
-	LPCWSTR strValue = IniSectionGetValue(pIniSection, L"FavoriteSchemes");
+	LPCWSTR strValue = section.GetValue(L"FavoriteSchemes");
 	if (StrNotEmpty(strValue)) {
 		lstrcpyn(favoriteSchemesConfig, strValue, MAX_FAVORITE_SCHEMES_CONFIG_SIZE);
 		Style_SetFavoriteSchemes();
 	}
 
 	// default scheme
-	int iValue = IniSectionGetInt(pIniSection, L"DefaultScheme", 0);
+	int iValue = section.GetInt(L"DefaultScheme", 0);
 	iDefaultLexerIndex = Style_GetMatchLexerIndex(iValue + NP2LEX_TEXTFILE);
 
-	iValue = IniSectionGetInt(pIniSection, L"StyleTheme", StyleTheme_Default);
+	iValue = section.GetInt(L"StyleTheme", StyleTheme_Default);
 	np2StyleTheme = clamp<int>(iValue, StyleTheme_Default, StyleTheme_Max);
 
 	// auto select
-	bAutoSelect = IniSectionGetBool(pIniSection, L"AutoSelect", true);
+	bAutoSelect = section.GetBool(L"AutoSelect", true);
 
 	// file extensions
 	LoadIniSection(INI_SECTION_NAME_FILE_EXTENSIONS, pIniSectionBuf, cchIniSection);
-	IniSectionParse(pIniSection, pIniSectionBuf);
+	section.Parse(pIniSectionBuf);
 	for (UINT iLexer = 0; iLexer < MATCH_LEXER_COUNT; iLexer++) {
 		PEDITLEXER pLex = pLexArray[iLexer + LEXER_INDEX_MATCH];
 		pLex->szExtensions = g_AllFileExtensions + (iLexer * MAX_EDITLEXER_EXT_SIZE);
-		LPCWSTR value = IniSectionGetValueImpl(pIniSection, pLex->pszName, pLex->iNameLen);
+		LPCWSTR value = section.GetValueImpl(pLex->pszName, pLex->iNameLen);
 		if (StrIsEmpty(value)) {
 			lstrcpy(pLex->szExtensions, pLex->pszDefExt);
 		} else {
@@ -799,33 +798,31 @@ void Style_Load(void) {
 		FindDarkThemeFile();
 	}
 
-	Style_LoadOneEx(pLexGlobal, pIniSection, pIniSectionBuf, cchIniSection);
-	Style_LoadOneEx(pLexArray[iDefaultLexerIndex], pIniSection, pIniSectionBuf, cchIniSection);
+	Style_LoadOneEx(pLexGlobal, section, pIniSectionBuf, cchIniSection);
+	Style_LoadOneEx(pLexArray[iDefaultLexerIndex], section, pIniSectionBuf, cchIniSection);
 
 	FindSystemDefaultCodeFont();
 	FindSystemDefaultTextFont();
 
-	IniSectionFree(pIniSection);
+	section.Free();
 	NP2HeapFree(pIniSectionBuf);
 }
 
-static void Style_LoadOne(PEDITLEXER pLex) {
-	IniSection section;
+static void Style_LoadOne(PEDITLEXER pLex) noexcept {
+	IniSectionParser section;
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_STYLES);
 	const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
-	IniSection * const pIniSection = &section;
-	IniSectionInit(pIniSection, 128);
-	Style_LoadOneEx(pLex, pIniSection, pIniSectionBuf, cchIniSection);
-	IniSectionFree(pIniSection);
+	section.Init(128);
+	Style_LoadOneEx(pLex, section, pIniSectionBuf, cchIniSection);
+	section.Free();
 	NP2HeapFree(pIniSectionBuf);
 }
 
-static void Style_LoadAll(bool bReload, bool onlyCustom) {
-	IniSection section;
+static void Style_LoadAll(bool bReload, bool onlyCustom) noexcept {
+	IniSectionParser section;
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_STYLES);
 	const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
-	IniSection * const pIniSection = &section;
-	IniSectionInit(pIniSection, 128);
+	section.Init(128);
 
 	// Custom colors
 	if (bReload || !bCustomColorLoaded) {
@@ -834,13 +831,13 @@ static void Style_LoadAll(bool bReload, bool onlyCustom) {
 		memcpy(customColor, defaultCustomColor, MAX_CUSTOM_COLOR_COUNT * sizeof(COLORREF));
 
 		GetPrivateProfileSection(INI_SECTION_NAME_CUSTOM_COLORS, pIniSectionBuf, cchIniSection, themePath);
-		IniSectionParseArray(pIniSection, pIniSectionBuf, FALSE);
+		section.ParseArray(pIniSectionBuf, FALSE);
 
-		const UINT count = min<UINT>(pIniSection->count, MAX_CUSTOM_COLOR_COUNT);
+		const UINT count = min<UINT>(section.count, MAX_CUSTOM_COLOR_COUNT);
 		for (UINT i = 0; i < count; i++) {
-			const IniKeyValueNode *node = &pIniSection->nodeList[i];
-			const UINT n = static_cast<UINT>(wcstol(node->key, nullptr, 10) - 1);
-			LPCWSTR wch = node->value;
+			const IniKeyValueNode &node = section.nodeList[i];
+			const UINT n = static_cast<UINT>(wcstol(node.key, nullptr, 10) - 1);
+			LPCWSTR wch = node.value;
 			if (n < MAX_CUSTOM_COLOR_COUNT && *wch == L'#') {
 				int irgb;
 				if (HexStrToInt(wch + 1, &irgb)) {
@@ -854,12 +851,12 @@ static void Style_LoadAll(bool bReload, bool onlyCustom) {
 		for (UINT iLexer = 0; iLexer < ALL_LEXER_COUNT; iLexer++) {
 			PEDITLEXER pLex = pLexArray[iLexer];
 			if (bReload || !IsStyleLoaded(pLex)) {
-				Style_LoadOneEx(pLex, pIniSection, pIniSectionBuf, cchIniSection);
+				Style_LoadOneEx(pLex, section, pIniSectionBuf, cchIniSection);
 			}
 		}
 	}
 
-	IniSectionFree(pIniSection);
+	section.Free();
 	NP2HeapFree(pIniSectionBuf);
 }
 
@@ -960,7 +957,7 @@ void Style_Save() noexcept {
 //
 // Style_Import()
 //
-bool Style_Import(HWND hwnd) {
+bool Style_Import(HWND hwnd) noexcept {
 	WCHAR szFile[MAX_PATH * 2] = L"";
 	WCHAR szFilter[256];
 
@@ -983,22 +980,21 @@ bool Style_Import(HWND hwnd) {
 	}
 
 	if (GetOpenFileName(&ofn)) {
-		IniSection section;
+		IniSectionParser section;
 		WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_STYLES);
 		const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
-		IniSection * const pIniSection = &section;
 
-		IniSectionInit(pIniSection, 128);
+		section.Init(128);
 		// file extensions
 		if (GetPrivateProfileSection(INI_SECTION_NAME_FILE_EXTENSIONS, pIniSectionBuf, cchIniSection, szFile)) {
-			if (IniSectionParse(pIniSection, pIniSectionBuf)) {
+			if (section.Parse(pIniSectionBuf)) {
 				for (UINT iLexer = LEXER_INDEX_MATCH; iLexer < ALL_LEXER_COUNT; iLexer++) {
 					PEDITLEXER pLex = pLexArray[iLexer];
-					LPCWSTR value = IniSectionGetValueImpl(pIniSection, pLex->pszName, pLex->iNameLen);
+					LPCWSTR value = section.GetValueImpl(pLex->pszName, pLex->iNameLen);
 					if (StrNotEmpty(value)) {
 						lstrcpyn(pLex->szExtensions, value, MAX_EDITLEXER_EXT_SIZE);
 					}
-					if (pIniSection->count == 0) {
+					if (section.count == 0) {
 						break;
 					}
 				}
@@ -1008,24 +1004,24 @@ bool Style_Import(HWND hwnd) {
 		for (UINT iLexer = 0; iLexer < ALL_LEXER_COUNT; iLexer++) {
 			PEDITLEXER pLex = pLexArray[iLexer];
 			if (GetPrivateProfileSection(pLex->pszName, pIniSectionBuf, cchIniSection, szFile)) {
-				if (!IniSectionParse(pIniSection, pIniSectionBuf)) {
+				if (!section.Parse(pIniSectionBuf)) {
 					continue;
 				}
-				pLex->bUseDefaultCodeStyle = IniSectionGetBool(pIniSection, L"UseDefaultCodeStyle", pLex->bUseDefaultCodeStyle);
+				pLex->bUseDefaultCodeStyle = section.GetBool(L"UseDefaultCodeStyle", pLex->bUseDefaultCodeStyle);
 				const UINT iStyleCount = pLex->iStyleCount;
 				for (UINT i = 0; i < iStyleCount; i++) {
-					LPCWSTR value = IniSectionGetValueImpl(pIniSection, pLex->Styles[i].pszName, pLex->Styles[i].iNameLen);
+					LPCWSTR value = section.GetValueImpl(pLex->Styles[i].pszName, pLex->Styles[i].iNameLen);
 					if (value != nullptr) {
 						lstrcpyn(pLex->Styles[i].szValue, value, MAX_EDITSTYLE_VALUE_SIZE);
 					}
-					if (pIniSection->count == 0) {
+					if (section.count == 0) {
 						break;
 					}
 				}
 			}
 		}
 
-		IniSectionFree(pIniSection);
+		section.Free();
 		NP2HeapFree(pIniSectionBuf);
 		return true;
 	}
@@ -1179,7 +1175,7 @@ void Style_OnDPIChanged(LPCEDITLEXER pLex) noexcept {
 	} while (iMarkerIDs);
 }
 
-void Style_OnStyleThemeChanged(int theme) {
+void Style_OnStyleThemeChanged(int theme) noexcept {
 	if (theme == np2StyleTheme) {
 		return;
 	}
@@ -1225,7 +1221,7 @@ static inline void Style_SetDefaultStyle(int index) noexcept {
 	Style_SetStyles(pLexGlobal->Styles[index].iStyle, pLexGlobal->Styles[index].szValue);
 }
 
-static void Style_SetAllStyle(PEDITLEXER pLex, UINT offset) {
+static void Style_SetAllStyle(PEDITLEXER pLex, UINT offset) noexcept {
 	if (!IsStyleLoaded(pLex)) {
 		Style_LoadOne(pLex);
 	}
@@ -1353,7 +1349,7 @@ void Style_DefineIndicator(int index, int indicator, int indicatorStyle) noexcep
 // set current lexer
 // Style_SetLexer()
 //
-void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
+void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) noexcept {
 	int iValue;
 
 	// Select default if nullptr is specified
@@ -2486,7 +2482,7 @@ static PEDITLEXER Style_GetLexerFromFile(LPCWSTR lpszFile, bool bCGIGuess, LPCWS
 	return pLexNew;
 }
 
-bool Style_SetLexerFromFile(LPCWSTR lpszFile) {
+bool Style_SetLexerFromFile(LPCWSTR lpszFile) noexcept {
 	BOOL bDotFile = FALSE;
 	LPCWSTR lpszExt = nullptr;
 	PEDITLEXER pLexNew = nullptr;
@@ -2602,7 +2598,7 @@ bool Style_SetLexerFromFile(LPCWSTR lpszFile) {
 // find lexer from file name or extension
 // Style_SetLexerFromName()
 //
-void Style_SetLexerFromName(LPCWSTR lpszFile, LPCWSTR lpszName) {
+void Style_SetLexerFromName(LPCWSTR lpszFile, LPCWSTR lpszName) noexcept {
 	PEDITLEXER pLexNew = Style_MatchLexer(lpszName, false);
 	if (pLexNew == nullptr) {
 		pLexNew = Style_MatchLexer(lpszName, true);
@@ -2684,7 +2680,7 @@ bool Style_MaybeBinaryFile(LPCWSTR lpszFile) noexcept {
 }
 #endif
 
-void Style_SetLexerByLangIndex(int lang) {
+void Style_SetLexerByLangIndex(int lang) noexcept {
 	const int langIndex = np2LexLangIndex;
 	PEDITLEXER pLex = nullptr;
 	np2LexLangIndex = lang;
@@ -2865,7 +2861,7 @@ void Style_UpdateSchemeMenu(HMENU hmenu) noexcept {
 //
 // Style_SetLexerFromID()
 //
-void Style_SetLexerFromID(int rid) {
+void Style_SetLexerFromID(int rid) noexcept {
 	const int iLexer = Style_GetMatchLexerIndex(rid);
 	np2LexLangIndex = Style_GetDocTypeLanguage();
 	Style_SetLexer(pLexArray[iLexer], true);
@@ -2884,13 +2880,13 @@ int Style_GetMatchLexerIndex(int rid) noexcept {
 //
 // Style_ToggleUse2ndDefault()
 //
-void Style_ToggleUse2ndGlobalStyle(void) {
+void Style_ToggleUse2ndGlobalStyle() noexcept {
 	bUse2ndGlobalStyle = !bUse2ndGlobalStyle;
 	pLexGlobal = bUse2ndGlobalStyle ? &lex2ndGlobal : &lexGlobal;
 	Style_SetLexer(pLexCurrent, false);
 }
 
-void Style_ToggleUseDefaultCodeStyle(void) {
+void Style_ToggleUseDefaultCodeStyle() noexcept {
 	pLexCurrent->bStyleChanged = true;
 	pLexCurrent->bUseDefaultCodeStyle = !pLexCurrent->bUseDefaultCodeStyle;
 	fStylesModified |= STYLESMODIFIED_SOME_STYLE;
@@ -3455,7 +3451,7 @@ bool Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, bool bDefaultSt
 //
 // Style_SetDefaultFont()
 //
-void Style_SetDefaultFont(HWND hwnd, bool bCode) {
+void Style_SetDefaultFont(HWND hwnd, bool bCode) noexcept {
 	const int iIdx = bCode ? GlobalStyleIndex_DefaultCode : GlobalStyleIndex_DefaultText;
 	if (Style_SelectFont(hwnd, pLexGlobal->Styles[iIdx].szValue, MAX_EDITSTYLE_VALUE_SIZE, true)) {
 		fStylesModified |= STYLESMODIFIED_SOME_STYLE;
@@ -4035,7 +4031,7 @@ static void Style_ResetStyle(LPCEDITLEXER pLex, EDITSTYLE *pStyle) noexcept {
 //
 // Style_ConfigDlgProc()
 //
-static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	static HWND hwndTV;
 	static bool fDragging;
 	static bool fLexerSelected;
@@ -4559,7 +4555,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 //
 // Style_ConfigDlg()
 //
-void Style_ConfigDlg(HWND hwnd) {
+void Style_ConfigDlg(HWND hwnd) noexcept {
 	StyleConfigDlgParam param;
 
 	Style_LoadAll(false, false);
@@ -5084,7 +5080,7 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 //
 // Style_SelectLexerDlg()
 //
-void Style_SelectLexerDlg(HWND hwnd, bool favorite) {
+void Style_SelectLexerDlg(HWND hwnd, bool favorite) noexcept {
 	const LPCEDITLEXER pLex = pLexCurrent;
 	const int langIndex = np2LexLangIndex;
 	if (IDOK == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_STYLESELECT), GetParent(hwnd), Style_SelectLexerDlgProc, favorite)) {
@@ -5284,7 +5280,7 @@ void EditShowCallTip(Sci_Position position) noexcept {
 	// show "Ctrl + click to follow link"?
 }
 
-void EditClickCallTip(HWND hwnd) {
+void EditClickCallTip(HWND hwnd) noexcept {
 	SciCall_CallTipCancel();
 	const CallTipType type = callTipInfo.type;
 	callTipInfo.type = CallTipType_None;

@@ -53,4 +53,4 @@ bool CopyMoveDlg(HWND hwnd, UINT *wFunc);
 bool OpenWithDlg(HWND hwnd, LPCDLITEM lpdliParam);
 bool NewDirDlg(HWND hwnd, LPWSTR pszNewDir) noexcept;
 
-INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
+INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept;

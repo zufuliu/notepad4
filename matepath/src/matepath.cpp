@@ -975,24 +975,22 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 
 #if NP2_ENABLE_CUSTOMIZE_TOOLBAR_LABELS
 	// Load toolbar labels
-	IniSection section;
+	IniSectionParser section;
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_TOOLBAR_LABELS);
 	const int cchIniSection = (int)NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
-	IniSection * const pIniSection = &section;
 
-	IniSectionInit(pIniSection, COUNTOF(tbbMainWnd));
+	section.Init(COUNTOF(tbbMainWnd));
 	LoadIniSection(INI_SECTION_NAME_TOOLBAR_LABELS, pIniSectionBuf, cchIniSection);
-	IniSectionParseArray(pIniSection, pIniSectionBuf);
-	const UINT count = pIniSection->count;
+	section.ParseArray(pIniSectionBuf);
 
-	for (UINT i = 0; i < count; i++) {
-		const IniKeyValueNode *node = &pIniSection->nodeList[i];
-		const UINT n = static_cast<UINT>(wcstol(node->key, nullptr, 10));
+	for (UINT i = 0; i < section.count; i++) {
+		const IniKeyValueNode &node = section.nodeList[i];
+		const UINT n = static_cast<UINT>(wcstol(node.key, nullptr, 10));
 		if (n == 0 || n >= COUNTOF(tbbMainWnd)) {
 			continue;
 		}
 
-		LPCWSTR tchDesc = node->value;
+		LPCWSTR tchDesc = node.value;
 		if (StrNotEmpty(tchDesc)) {
 			tbbMainWnd[n].iString = SendMessage(hwndToolbar, TB_ADDSTRING, 0, (LPARAM)tchDesc);
 			tbbMainWnd[n].fsStyle |= BTNS_AUTOSIZE | BTNS_SHOWTEXT;
@@ -1001,7 +999,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 		}
 	}
 
-	IniSectionFree(pIniSection);
+	section.Free();
 	NP2HeapFree(pIniSectionBuf);
 #endif // NP2_ENABLE_CUSTOMIZE_TOOLBAR_LABELS
 
@@ -2500,23 +2498,22 @@ void SetUILanguage(int resID) noexcept {
 //  LoadSettings()
 //
 //
-void LoadSettings(void) {
-	IniSection section;
+void LoadSettings() noexcept {
+	IniSectionParser section;
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_SETTINGS);
 	const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
-	IniSection * const pIniSection = &section;
 
-	IniSectionInit(pIniSection, 128);
+	section.Init(128);
 	LoadIniSection(INI_SECTION_NAME_SETTINGS, pIniSectionBuf, cchIniSection);
-	IniSectionParse(pIniSection, pIniSectionBuf);
+	section.Parse(pIniSectionBuf);
 
-	bSaveSettings = IniSectionGetBool(pIniSection, L"SaveSettings", true);
+	bSaveSettings = section.GetBool(L"SaveSettings", true);
 	// TODO: sort loading order by item frequency to reduce IniSectionUnsafeGetValue() calls
-	int iValue = IniSectionGetInt(pIniSection, L"StartupDirectory", StartupDirectory_MRU);
+	int iValue = section.GetInt(L"StartupDirectory", StartupDirectory_MRU);
 	iStartupDir = clamp(static_cast<StartupDirectory>(iValue), StartupDirectory_None, StartupDirectory_Favorite);
-	IniSectionGetString(pIniSection, L"MRUDirectory", L"", szMRUDirectory, COUNTOF(szMRUDirectory));
+	section.GetString(L"MRUDirectory", L"", szMRUDirectory, COUNTOF(szMRUDirectory));
 
-	LPCWSTR strValue = IniSectionGetValue(pIniSection, L"OpenWithDir");
+	LPCWSTR strValue = section.GetValue(L"OpenWithDir");
 	if (StrIsEmpty(strValue)) {
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 		LPWSTR pszPath = nullptr;
@@ -2531,7 +2528,7 @@ void LoadSettings(void) {
 		PathAbsoluteFromApp(strValue, tchOpenWithDir, true);
 	}
 
-	strValue = IniSectionGetValue(pIniSection, L"Favorites");
+	strValue = section.GetValue(L"Favorites");
 	if (StrIsEmpty(strValue)) {
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 		LPWSTR pszPath = nullptr;
@@ -2546,7 +2543,7 @@ void LoadSettings(void) {
 		PathAbsoluteFromApp(strValue, tchFavoritesDir, true);
 	}
 
-	strValue = IniSectionGetValue(pIniSection, L"Quikview.exe");
+	strValue = section.GetValue(L"Quikview.exe");
 	if (StrIsEmpty(strValue)) {
 		GetSystemDirectory(szQuickview, COUNTOF(szQuickview));
 		PathAddBackslash(szQuickview);
@@ -2556,56 +2553,56 @@ void LoadSettings(void) {
 	}
 
 	bHasQuickview = PathIsFile(szQuickview);
-	IniSectionGetString(pIniSection, L"QuikviewParams", L"", szQuickviewParams, COUNTOF(szQuickviewParams));
+	section.GetString(L"QuikviewParams", L"", szQuickviewParams, COUNTOF(szQuickviewParams));
 
 	POINT pt;
-	pt.x = IniSectionGetInt(pIniSection, L"WindowPosX", 0);
-	pt.y = IniSectionGetInt(pIniSection, L"WindowPosY", 0);
+	pt.x = section.GetInt(L"WindowPosX", 0);
+	pt.y = section.GetInt(L"WindowPosY", 0);
 
-	bSingleClick = IniSectionGetBool(pIniSection, L"SingleClick", true);
-	bOpenFileInSameWindow = IniSectionGetBool(pIniSection, L"OpenFileInSameWindow", false);
+	bSingleClick = section.GetBool(L"SingleClick", true);
+	bOpenFileInSameWindow = section.GetBool(L"OpenFileInSameWindow", false);
 	iDefaultOpenMenu = bOpenFileInSameWindow ? IDM_FILE_OPENSAME : IDM_FILE_OPENNEW;
 	iShiftOpenMenu = bOpenFileInSameWindow ? IDM_FILE_OPENNEW : IDM_FILE_OPENSAME;
 
-	bTrackSelect = IniSectionGetBool(pIniSection, L"TrackSelect", true);
-	bFullRowSelect = IniSectionGetBool(pIniSection, L"FullRowSelect", false);
-	fUseRecycleBin = IniSectionGetBool(pIniSection, L"UseRecycleBin", true);
-	fNoConfirmDelete = IniSectionGetBool(pIniSection, L"NoConfirmDelete", false);
-	bClearReadOnly = IniSectionGetBool(pIniSection, L"ClearReadOnly", true);
-	bRenameOnCollision = IniSectionGetBool(pIniSection, L"RenameOnCollision", false);
-	bFocusEdit = IniSectionGetBool(pIniSection, L"FocusEdit", true);
-	bAlwaysOnTop = IniSectionGetBool(pIniSection, L"AlwaysOnTop", false);
-	bMinimizeToTray = IniSectionGetBool(pIniSection, L"MinimizeToTray", false);
-	bTransparentMode = IniSectionGetBool(pIniSection, L"TransparentMode", false);
-	bWindowLayoutRTL = IniSectionGetBool(pIniSection, L"WindowLayoutRTL", false);
+	bTrackSelect = section.GetBool(L"TrackSelect", true);
+	bFullRowSelect = section.GetBool(L"FullRowSelect", false);
+	fUseRecycleBin = section.GetBool(L"UseRecycleBin", true);
+	fNoConfirmDelete = section.GetBool(L"NoConfirmDelete", false);
+	bClearReadOnly = section.GetBool(L"ClearReadOnly", true);
+	bRenameOnCollision = section.GetBool(L"RenameOnCollision", false);
+	bFocusEdit = section.GetBool(L"FocusEdit", true);
+	bAlwaysOnTop = section.GetBool(L"AlwaysOnTop", false);
+	bMinimizeToTray = section.GetBool(L"MinimizeToTray", false);
+	bTransparentMode = section.GetBool(L"TransparentMode", false);
+	bWindowLayoutRTL = section.GetBool(L"WindowLayoutRTL", false);
 
-	iValue = IniSectionGetInt(pIniSection, L"EscFunction", EscFunction_None);
+	iValue = section.GetInt(L"EscFunction", EscFunction_None);
 	iEscFunction = clamp(static_cast<EscFunction>(iValue), EscFunction_None, EscFunction_Exit);
 
 	if (IsVistaAndAbove()) {
-		bUseXPFileDialog = IniSectionGetBool(pIniSection, L"UseXPFileDialog", false);
+		bUseXPFileDialog = section.GetBool(L"UseXPFileDialog", false);
 	} else {
 		bUseXPFileDialog = true;
 	}
 
-	dwFillMask = IniSectionGetInt(pIniSection, L"FillMask", DL_ALLOBJECTS);
+	dwFillMask = section.GetInt(L"FillMask", DL_ALLOBJECTS);
 	if (dwFillMask & ~DL_ALLOBJECTS) {
 		dwFillMask = DL_ALLOBJECTS;
 	}
 
-	iValue = IniSectionGetInt(pIniSection, L"SortOptions", DS_NAME);
+	iValue = section.GetInt(L"SortOptions", DS_NAME);
 	nSortFlags = clamp(iValue, DS_NAME, DS_LASTMOD);
 
-	fSortRev = IniSectionGetBool(pIniSection, L"SortReverse", false);
+	fSortRev = section.GetBool(L"SortReverse", false);
 
 	if (!lpFilterArg) {
-		strValue = IniSectionGetValue(pIniSection, L"FileFilter");
+		strValue = section.GetValue(L"FileFilter");
 		if (StrIsEmpty(strValue)) {
 			StrCpyEx(tchFilter, L"*.*");
 		} else {
 			lstrcpyn(tchFilter, strValue, COUNTOF(tchFilter));
 		}
-		bNegFilter = IniSectionGetBool(pIniSection, L"NegativeFilter", false);
+		bNegFilter = section.GetBool(L"NegativeFilter", false);
 	} else { // ignore filter if /m was specified
 		if (*lpFilterArg == L'-') {
 			bNegFilter = true;
@@ -2616,38 +2613,38 @@ void LoadSettings(void) {
 		}
 	}
 
-	bDefColorNoFilter = IniSectionGetBool(pIniSection, L"DefColorNoFilter", true);
-	bDefColorFilter = IniSectionGetBool(pIniSection, L"DefColorFilter", true);
+	bDefColorNoFilter = section.GetBool(L"DefColorNoFilter", true);
+	bDefColorFilter = section.GetBool(L"DefColorFilter", true);
 
-	colorNoFilter = IniSectionGetInt(pIniSection, L"ColorNoFilter", GetSysColor(COLOR_WINDOWTEXT));
-	colorFilter = IniSectionGetInt(pIniSection, L"ColorFilter", GetSysColor(COLOR_HIGHLIGHT));
+	colorNoFilter = section.GetInt(L"ColorNoFilter", GetSysColor(COLOR_WINDOWTEXT));
+	colorFilter = section.GetInt(L"ColorFilter", GetSysColor(COLOR_HIGHLIGHT));
 
-	strValue = IniSectionGetValue(pIniSection, L"ToolbarButtons");
+	strValue = section.GetValue(L"ToolbarButtons");
 	if (StrIsEmpty(strValue)) {
 		memcpy(tchToolbarButtons, DefaultToolbarButtons, sizeof(DefaultToolbarButtons));
 	} else {
 		lstrcpyn(tchToolbarButtons, strValue, COUNTOF(tchToolbarButtons));
 	}
 
-	bShowToolbar = IniSectionGetBool(pIniSection, L"ShowToolbar", true);
-	bAutoScaleToolbar = IniSectionGetBool(pIniSection, L"AutoScaleToolbar", true);
-	bShowStatusbar = IniSectionGetBool(pIniSection, L"ShowStatusbar", true);
-	bShowDriveBox = IniSectionGetBool(pIniSection, L"ShowDriveBox", true);
+	bShowToolbar = section.GetBool(L"ShowToolbar", true);
+	bAutoScaleToolbar = section.GetBool(L"AutoScaleToolbar", true);
+	bShowStatusbar = section.GetBool(L"ShowStatusbar", true);
+	bShowDriveBox = section.GetBool(L"ShowDriveBox", true);
 
 	// toolbar image
 	{
 		LoadIniSection(INI_SECTION_NAME_TOOLBAR_IMAGES, pIniSectionBuf, cchIniSection);
-		IniSectionParse(pIniSection, pIniSectionBuf);
+		section.Parse(pIniSectionBuf);
 
-		strValue = IniSectionGetValue(pIniSection, L"BitmapDefault");
+		strValue = section.GetValue(L"BitmapDefault");
 		if (StrNotEmpty(strValue)) {
 			tchToolbarBitmap = StrDup(strValue);
 		}
-		strValue = IniSectionGetValue(pIniSection, L"BitmapHot");
+		strValue = section.GetValue(L"BitmapHot");
 		if (StrNotEmpty(strValue)) {
 			tchToolbarBitmapHot = StrDup(strValue);
 		}
-		strValue = IniSectionGetValue(pIniSection, L"BitmapDisabled");
+		strValue = section.GetValue(L"BitmapDisabled");
 		if (StrNotEmpty(strValue)) {
 			tchToolbarBitmapDisabled = StrDup(strValue);
 		}
@@ -2659,29 +2656,29 @@ void LoadSettings(void) {
 		HMONITOR hMonitor = MonitorFromPoint(pt, MONITOR_DEFAULTTONEAREST);
 		GetWindowPositionSectionName(hMonitor, sectionName);
 		LoadIniSection(sectionName, pIniSectionBuf, cchIniSection);
-		IniSectionParse(pIniSection, pIniSectionBuf);
+		section.Parse(pIniSectionBuf);
 
 		// ignore window position if /p was specified
 		if (!flagPosParam) {
-			wi.x	= IniSectionGetInt(pIniSection, L"WindowPosX", CW_USEDEFAULT);
-			wi.y	= IniSectionGetInt(pIniSection, L"WindowPosY", CW_USEDEFAULT);
-			wi.cx	= IniSectionGetInt(pIniSection, L"WindowSizeX", CW_USEDEFAULT);
-			wi.cy	= IniSectionGetInt(pIniSection, L"WindowSizeY", CW_USEDEFAULT);
+			wi.x	= section.GetInt(L"WindowPosX", CW_USEDEFAULT);
+			wi.y	= section.GetInt(L"WindowPosY", CW_USEDEFAULT);
+			wi.cx	= section.GetInt(L"WindowSizeX", CW_USEDEFAULT);
+			wi.cy	= section.GetInt(L"WindowSizeY", CW_USEDEFAULT);
 		}
 
-		cxRunDlg = IniSectionGetInt(pIniSection, L"RunDlgSizeX", 0);
-		cxGotoDlg = IniSectionGetInt(pIniSection, L"GotoDlgSizeX", 0);
-		cxFileFilterDlg = IniSectionGetInt(pIniSection, L"FileFilterDlgX", 0);
-		cxRenameFileDlg = IniSectionGetInt(pIniSection, L"RenameFileDlgX", 0);
-		cxNewDirectoryDlg = IniSectionGetInt(pIniSection, L"NewDirectoryDlgX", 0);
-		cxOpenWithDlg = IniSectionGetInt(pIniSection, L"OpenWithDlgSizeX", 0);
-		cyOpenWithDlg = IniSectionGetInt(pIniSection, L"OpenWithDlgSizeY", 0);
-		cxCopyMoveDlg = IniSectionGetInt(pIniSection, L"CopyMoveDlgSizeX", 0);
-		cxTargetApplicationDlg = IniSectionGetInt(pIniSection, L"TargetApplicationDlgSizeX", 0);
-		cxFindWindowDlg = IniSectionGetInt(pIniSection, L"FindWindowDlgSizeX", 0);
+		cxRunDlg = section.GetInt(L"RunDlgSizeX", 0);
+		cxGotoDlg = section.GetInt(L"GotoDlgSizeX", 0);
+		cxFileFilterDlg = section.GetInt(L"FileFilterDlgX", 0);
+		cxRenameFileDlg = section.GetInt(L"RenameFileDlgX", 0);
+		cxNewDirectoryDlg = section.GetInt(L"NewDirectoryDlgX", 0);
+		cxOpenWithDlg = section.GetInt(L"OpenWithDlgSizeX", 0);
+		cyOpenWithDlg = section.GetInt(L"OpenWithDlgSizeY", 0);
+		cxCopyMoveDlg = section.GetInt(L"CopyMoveDlgSizeX", 0);
+		cxTargetApplicationDlg = section.GetInt(L"TargetApplicationDlgSizeX", 0);
+		cxFindWindowDlg = section.GetInt(L"FindWindowDlgSizeX", 0);
 	}
 
-	IniSectionFree(pIniSection);
+	section.Free();
 	NP2HeapFree(pIniSectionBuf);
 
 	// Initialize custom colors for ChooseColor()
@@ -3054,35 +3051,34 @@ void ParseCommandLine() noexcept {
 //  LoadFlags()
 //
 //
-void LoadFlags(void) {
-	IniSection section;
+void LoadFlags() noexcept {
+	IniSectionParser section;
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_FLAGS);
 	const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
-	IniSection * const pIniSection = &section;
 
-	IniSectionInit(pIniSection, 16);
+	section.Init(16);
 	LoadIniSection(INI_SECTION_NAME_FLAGS, pIniSectionBuf, cchIniSection);
-	IniSectionParse(pIniSection, pIniSectionBuf);
+	section.Parse(pIniSectionBuf);
 
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
-	uiLanguage = (LANGID)IniSectionGetInt(pIniSection, L"UILanguage", LANG_USER_DEFAULT);
+	uiLanguage = (LANGID)section.GetInt(L"UILanguage", LANG_USER_DEFAULT);
 	ValidateUILangauge();
 #endif
 
-	bReuseWindow = IniSectionGetBool(pIniSection, L"ReuseWindow", false);
+	bReuseWindow = section.GetBool(L"ReuseWindow", false);
 	if (!flagNoReuseWindow) {
 		flagNoReuseWindow = !bReuseWindow;
 	}
 
-	flagPortableMyDocs = IniSectionGetBool(pIniSection, L"PortableMyDocs", true);
-	iAutoRefreshRate = IniSectionGetInt(pIniSection, L"AutoRefreshRate", 3000);
-	flagNoFadeHidden = IniSectionGetBool(pIniSection, L"NoFadeHidden", false);
+	flagPortableMyDocs = section.GetBool(L"PortableMyDocs", true);
+	iAutoRefreshRate = section.GetInt(L"AutoRefreshRate", 3000);
+	flagNoFadeHidden = section.GetBool(L"NoFadeHidden", false);
 
-	const int iValue = IniSectionGetInt(pIniSection, L"OpacityLevel", 75);
+	const int iValue = section.GetInt(L"OpacityLevel", 75);
 	iOpacityLevel = validate(iValue, 0, 100, 75);
 
 	if (StrIsEmpty(g_wchAppUserModelID)) {
-		LPCWSTR strValue = IniSectionGetValue(pIniSection, L"ShellAppUserModelID");
+		LPCWSTR strValue = section.GetValue(L"ShellAppUserModelID");
 		if (StrNotEmpty(strValue)) {
 			lstrcpyn(g_wchAppUserModelID, strValue, COUNTOF(g_wchAppUserModelID));
 		} else {
@@ -3090,7 +3086,7 @@ void LoadFlags(void) {
 		}
 	}
 
-	IniSectionFree(pIniSection);
+	section.Free();
 	NP2HeapFree(pIniSectionBuf);
 }
 
@@ -3619,27 +3615,26 @@ static BOOL CALLBACK EnumWindProcTargetApplication(HWND hwnd, LPARAM lParam) noe
 	return bContinue;
 }
 
-void LoadLaunchSetings(void) {
-	IniSection section;
+void LoadLaunchSetings() noexcept {
+	IniSectionParser section;
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_TARGET_APPLICATION);
 	const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
-	IniSection * const pIniSection = &section;
 
-	IniSectionInit(pIniSection, 16);
+	section.Init(16);
 	LoadIniSection(INI_SECTION_NAME_TARGET_APPLICATION, pIniSectionBuf, cchIniSection);
-	IniSectionParse(pIniSection, pIniSectionBuf);
+	section.Parse(pIniSectionBuf);
 
-	int iValue = IniSectionGetInt(pIniSection, L"UseTargetApplication", UseTargetApplication_NotSet);
+	int iValue = section.GetInt(L"UseTargetApplication", UseTargetApplication_NotSet);
 	if (iValue != UseTargetApplication_NotSet) {
 		iUseTargetApplication = (UseTargetApplication)iValue;
-		IniSectionGetString(pIniSection, L"TargetApplicationPath", szTargetApplication, szTargetApplication, COUNTOF(szTargetApplication));
-		IniSectionGetString(pIniSection, L"TargetApplicationParams", szTargetApplicationParams, szTargetApplicationParams, COUNTOF(szTargetApplicationParams));
-		iValue = IniSectionGetInt(pIniSection, L"TargetApplicationMode", (int)iTargetApplicationMode);
+		section.GetString(L"TargetApplicationPath", szTargetApplication, szTargetApplication, COUNTOF(szTargetApplication));
+		section.GetString(L"TargetApplicationParams", szTargetApplicationParams, szTargetApplicationParams, COUNTOF(szTargetApplicationParams));
+		iValue = section.GetInt(L"TargetApplicationMode", (int)iTargetApplicationMode);
 		iTargetApplicationMode = clamp(static_cast<TargetApplicationMode>(iValue), TargetApplicationMode_None, TargetApplicationMode_UseDDE);
-		IniSectionGetString(pIniSection, L"TargetApplicationWndClass", szTargetApplicationWndClass, szTargetApplicationWndClass, COUNTOF(szTargetApplicationWndClass));
-		IniSectionGetString(pIniSection, L"DDEMessage", szDDEMsg, szDDEMsg, COUNTOF(szDDEMsg));
-		IniSectionGetString(pIniSection, L"DDEApplication", szDDEApp, szDDEApp, COUNTOF(szDDEApp));
-		IniSectionGetString(pIniSection, L"DDETopic", szDDETopic, szDDETopic, COUNTOF(szDDETopic));
+		section.GetString(L"TargetApplicationWndClass", szTargetApplicationWndClass, szTargetApplicationWndClass, COUNTOF(szTargetApplicationWndClass));
+		section.GetString(L"DDEMessage", szDDEMsg, szDDEMsg, COUNTOF(szDDEMsg));
+		section.GetString(L"DDEApplication", szDDEApp, szDDEApp, COUNTOF(szDDEApp));
+		section.GetString(L"DDETopic", szDDETopic, szDDETopic, COUNTOF(szDDETopic));
 	} else if (iUseTargetApplication != UseTargetApplication_None && StrIsEmpty(szTargetApplication)) {
 		iUseTargetApplication = UseTargetApplication_Use;
 		iTargetApplicationMode = TargetApplicationMode_SendMsg;
@@ -3652,7 +3647,7 @@ void LoadLaunchSetings(void) {
 	}
 
 	lstrcpy(szGlobalWndClass, szTargetApplicationWndClass);
-	IniSectionFree(pIniSection);
+	section.Free();
 	NP2HeapFree(pIniSectionBuf);
 	bLoadLaunchSetingsLoaded = true;
 }
@@ -3794,7 +3789,7 @@ void LaunchTarget(LPCWSTR lpFileName, bool bOpenNew) {
 //  Aligns matepath to either side of target window
 //
 //
-void SnapToTarget(HWND hwnd) {
+void SnapToTarget(HWND hwnd) noexcept {
 	if (!bLoadLaunchSetingsLoaded) {
 		LoadLaunchSetings();
 	}

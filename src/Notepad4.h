@@ -199,13 +199,13 @@ void InstallFileWatching(bool terminate) noexcept;
 void CALLBACK WatchTimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime) noexcept;
 void CALLBACK PasteBoardTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime) noexcept;
 
-void LoadSettings(void);
+void LoadSettings() noexcept;
 void SaveSettingsNow(bool bOnlySaveStyle, bool bQuiet) noexcept;
 void SaveSettings(bool bSaveSettingsNow) noexcept;
 void SaveWindowPosition(WCHAR *pIniSectionBuf) noexcept;
 void ClearWindowPositionHistory() noexcept;
 void ParseCommandLine() noexcept;
-void LoadFlags(void);
+void LoadFlags() noexcept;
 
 bool CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) noexcept;
 bool CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule, LPCWSTR redirectKey) noexcept;

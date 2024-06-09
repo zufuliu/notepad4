@@ -111,7 +111,7 @@ static inline void EditSetEmptyText() noexcept{
 }
 
 bool	EditConvertText(UINT cpSource, UINT cpDest, bool bSetSavePoint) noexcept;
-void	EditConvertToLargeMode(void);
+void	EditConvertToLargeMode() noexcept;
 void	EditReplaceDocument(HANDLE pdoc) noexcept;
 
 char*	EditGetClipboardText(HWND hwnd) noexcept; // LocalFree()
@@ -391,7 +391,7 @@ struct CallTipInfo {
 	//COLORREF foreColor;
 };
 void	EditShowCallTip(Sci_Position position) noexcept;
-void	EditClickCallTip(HWND hwnd);
+void	EditClickCallTip(HWND hwnd) noexcept;
 
 #define NCP_DEFAULT					1
 #define NCP_UTF8					2

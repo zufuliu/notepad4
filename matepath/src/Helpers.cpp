@@ -72,97 +72,107 @@ void IniClearAllSectionEx(LPCWSTR lpszPrefix, LPCWSTR lpszIniFile, bool bDelete)
 //
 //  Manipulation of (cached) ini file sections
 //
-bool IniSectionParseArray(IniSection *section, LPWSTR lpCachedIniSection) {
-	IniSectionClear(section);
+void IniSectionParser::Init(UINT capacity_) noexcept {
+	count = 0;
+	capacity = capacity_;
+	head = nullptr;
+#if IniSectionParserUseSentinelNode
+	nodeList = static_cast<IniKeyValueNode *>(NP2HeapAlloc((capacity_ + 1) * sizeof(IniKeyValueNode)));
+	sentinel = &nodeList[capacity_];
+#else
+	nodeList = static_cast<IniKeyValueNode *>(NP2HeapAlloc(capacity_ * sizeof(IniKeyValueNode)));
+#endif
+}
+
+bool IniSectionParser::ParseArray(LPWSTR lpCachedIniSection) noexcept {
+	Clear();
 	if (StrIsEmpty(lpCachedIniSection)) {
 		return false;
 	}
 
-	const UINT capacity = section->capacity;
 	LPWSTR p = lpCachedIniSection;
-	UINT count = 0;
+	UINT index = 0;
 
 	do {
 		LPWSTR v = StrChr(p, L'=');
 		if (v != nullptr) {
 			*v++ = L'\0';
-			IniKeyValueNode *node = &section->nodeList[count];
-			node->key = p;
-			node->value = v;
-			++count;
+			IniKeyValueNode &node = nodeList[index];
+			node.key = p;
+			node.value = v;
+			++index;
 			p = v;
 		}
 		p = StrEnd(p) + 1;
-	} while (*p && count < capacity);
+	} while (*p && index < capacity);
 
-	section->count = count;
-	return count != 0;
+	count = index;
+	return index != 0;
 }
 
-bool IniSectionParse(IniSection *section, LPWSTR lpCachedIniSection) {
-	IniSectionClear(section);
+bool IniSectionParser::Parse(LPWSTR lpCachedIniSection) noexcept {
+	Clear();
 	if (StrIsEmpty(lpCachedIniSection)) {
 		return false;
 	}
 
-	const UINT capacity = section->capacity;
 	LPWSTR p = lpCachedIniSection;
-	UINT count = 0;
+	UINT index = 0;
 
 	do {
 		LPWSTR v = StrChr(p, L'=');
 		if (v != nullptr) {
 			*v++ = L'\0';
 			const UINT keyLen = (UINT)(v - p - 1);
-			IniKeyValueNode *node = &section->nodeList[count];
-			node->hash = keyLen | ((*(const UINT *)p) << 8);
-			node->key = p;
-			node->value = v;
-			++count;
+			IniKeyValueNode &node = nodeList[index];
+			node.hash = keyLen | ((*(const UINT *)p) << 8);
+			node.key = p;
+			node.value = v;
+			++index;
 			p = v;
 		}
 		p = StrEnd(p) + 1;
-	} while (*p && count < capacity);
+	} while (*p && index < capacity);
 
-	if (count == 0) {
+	if (index == 0) {
 		return false;
 	}
 
-	section->count = count;
-	section->head = &section->nodeList[0];
-	--count;
-#if IniSectionImplUseSentinelNode
-	section->nodeList[count].next = section->sentinel;
+	count = index;
+	head = &nodeList[0];
+	--index;
+#if IniSectionParserUseSentinelNode
+	nodeList[index].next = sentinel;
 #else
-	section->nodeList[count].next = NULL;
+	nodeList[index].next = nullptr;
 #endif
-	while (count != 0) {
-		section->nodeList[count - 1].next = &section->nodeList[count];
-		--count;
+	while (index != 0) {
+		nodeList[index - 1].next = &nodeList[index];
+		--index;
 	}
 	return true;
 }
 
-LPCWSTR IniSectionUnsafeGetValue(IniSection *section, LPCWSTR key, int keyLen) {
+LPCWSTR IniSectionParser::UnsafeGetValue(LPCWSTR key, int keyLen) noexcept {
 	if (keyLen == 0) {
 		keyLen = lstrlen(key);
 	}
 
 	const UINT hash = keyLen | ((*(const UINT *)key) << 8);
-	IniKeyValueNode *node = section->head;
+	IniKeyValueNode *node = head;
 	IniKeyValueNode *prev = nullptr;
-#if IniSectionImplUseSentinelNode
-	section->sentinel->hash = hash;
+#if IniSectionParserUseSentinelNode
+	sentinel->hash = hash;
 	while (true) {
 		if (node->hash == hash) {
-			if (node == section->sentinel) {
+			if (node == sentinel) {
 				return nullptr;
 			}
 			if (StrEqual(node->key, key)) {
 				// remove the node
-				--section->count;
+				--count;
 				if (prev == nullptr) {
-					section->head = node->next;
+					head = node->next;
 				} else {
 					prev->next = node->next;
 				}
@@ -176,9 +186,9 @@ LPCWSTR IniSectionUnsafeGetValue(IniSection *section, LPCWSTR key, int keyLen) {
 	do {
 		if (node->hash == hash && StrEqual(node->key, key)) {
 			// remove the node
-			--section->count;
+			--count;
 			if (prev == nullptr) {
-				section->head = node->next;
+				head = node->next;
 			} else {
 				prev->next = node->next;
 			}
@@ -191,22 +201,22 @@ LPCWSTR IniSectionUnsafeGetValue(IniSection *section, LPCWSTR key, int keyLen) {
 #endif
 }
 
-void IniSectionGetStringImpl(IniSection *section, LPCWSTR key, int keyLen, LPCWSTR lpDefault, LPWSTR lpReturnedString, int cchReturnedString) {
-	LPCWSTR value = IniSectionGetValueImpl(section, key, keyLen);
+void IniSectionParser::GetStringImpl(LPCWSTR key, int keyLen, LPCWSTR lpDefault, LPWSTR lpReturnedString, int cchReturnedString) noexcept {
+	LPCWSTR value = GetValueImpl(key, keyLen);
 	// allow empty string value
 	lstrcpyn(lpReturnedString, ((value == nullptr) ? lpDefault : value), cchReturnedString);
 }
 
-int IniSectionGetIntImpl(IniSection *section, LPCWSTR key, int keyLen, int iDefault) {
-	LPCWSTR value = IniSectionGetValueImpl(section, key, keyLen);
+int IniSectionParser::GetIntImpl(LPCWSTR key, int keyLen, int iDefault) noexcept {
+	LPCWSTR value = GetValueImpl(key, keyLen);
 	if (value && CRTStrToInt(value, &keyLen)) {
 		return keyLen;
 	}
 	return iDefault;
 }
 
-bool IniSectionGetBoolImpl(IniSection *section, LPCWSTR key, int keyLen, bool bDefault) {
-	LPCWSTR value = IniSectionGetValueImpl(section, key, keyLen);
+bool IniSectionParser::GetBoolImpl(LPCWSTR key, int keyLen, bool bDefault) noexcept {
+	LPCWSTR value = GetValueImpl(key, keyLen);
 	if (value) {
 		const UINT t = *value - L'0';
 		if (t <= TRUE) {
@@ -1894,27 +1904,24 @@ void MRU_Load(LPMRULIST pmru) {
 		return;
 	}
 
-	IniSection section;
+	IniSectionParser section;
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_MRU);
 	const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
-	IniSection * const pIniSection = &section;
 
-	IniSectionInit(pIniSection, MRU_MAXITEMS);
+	section.Init(MRU_MAXITEMS);
 	LoadIniSection(pmru->szRegKey, pIniSectionBuf, cchIniSection);
-	IniSectionParseArray(pIniSection, pIniSectionBuf);
-	const UINT count = pIniSection->count;
+	section.ParseArray(pIniSectionBuf);
 	UINT n = 0;
 
-	for (UINT i = 0; i < count; i++) {
-		const IniKeyValueNode *node = &pIniSection->nodeList[i];
-		LPCWSTR tchItem = node->value;
+	for (UINT i = 0; i < section.count; i++) {
+		LPCWSTR tchItem = section.nodeList[i].value;
 		if (StrNotEmpty(tchItem)) {
 			pmru->pszItems[n++] = StrDup(tchItem);
 		}
 	}
 
 	pmru->iSize = n;
-	IniSectionFree(pIniSection);
+	section.Free();
 	NP2HeapFree(pIniSectionBuf);
 }
 

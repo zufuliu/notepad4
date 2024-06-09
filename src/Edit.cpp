@@ -244,7 +244,7 @@ bool EditConvertText(UINT cpSource, UINT cpDest, bool bSetSavePoint) noexcept {
 }
 
 #if defined(_WIN64)
-void EditConvertToLargeMode(void) {
+void EditConvertToLargeMode() noexcept {
 	int options = SciCall_GetDocumentOptions();
 	if (options & SC_DOCUMENTOPTION_TEXT_LARGE) {
 		return;

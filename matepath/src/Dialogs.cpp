@@ -1384,7 +1384,7 @@ INT_PTR OptionsPropSheet(HWND hwnd, HINSTANCE hInstance) noexcept {
 //  GetFilterDlgProc()
 //
 //
-INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	UNREFERENCED_PARAMETER(lParam);
 
 	switch (umsg) {
@@ -1434,22 +1434,21 @@ INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 
 			HMENU hMenu = CreatePopupMenu();
 
-			IniSection section;
+			IniSectionParser section;
 			WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_FILTERS);
 			const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
-			IniSection * const pIniSection = &section;
-			IniSectionInit(pIniSection, 128);
+			section.Init(128);
 
 			LoadIniSection(INI_SECTION_NAME_FILTERS, pIniSectionBuf, cchIniSection);
-			IniSectionParseArray(pIniSection, pIniSectionBuf);
+			section.ParseArray(pIniSectionBuf);
 
 			DWORD dwIndex = 0;
 			DWORD dwCheck = 0xFFFF; // index of current filter
-			for (UINT i = 0; i < pIniSection->count; i++, dwIndex++) {
-				const IniKeyValueNode *node = &pIniSection->nodeList[i];
-				LPCWSTR pszFilterValue = node->value;
+			for (UINT i = 0; i < section.count; i++, dwIndex++) {
+				const IniKeyValueNode &node = section.nodeList[i];
+				LPCWSTR pszFilterValue = node.value;
 				if (*pszFilterValue) {
-					AppendMenu(hMenu, MF_ENABLED | MF_STRING, 1234 + dwIndex, node->key);
+					AppendMenu(hMenu, MF_ENABLED | MF_STRING, 1234 + dwIndex, node.key);
 					// Find description for current filter
 					const bool negFilter = IsButtonChecked(hwnd, IDC_NEGFILTER);
 					if ((!negFilter || *pszFilterValue == L'-') && StrCaseEqual(pszFilterValue + negFilter, szTypedFilter)) {
@@ -1457,7 +1456,7 @@ INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 					}
 				}
 			}
-			IniSectionFree(pIniSection);
+			section.Free();
 			NP2HeapFree(pIniSectionBuf);
 
 			if (dwCheck != 0xFFFF) { // check description for current filter
@@ -2323,7 +2322,7 @@ extern WCHAR szDDEMsg[256];
 extern WCHAR szDDEApp[256];
 extern WCHAR szDDETopic[256];
 
-INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	UNREFERENCED_PARAMETER(lParam);
 
 	static WCHAR szTargetWndClass[256] = L"";

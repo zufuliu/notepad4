@@ -138,14 +138,14 @@ void ShowNotifyIcon(HWND hwnd, bool bAdd) noexcept;
 
 bool ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, bool bUpdateHistory);
 void SetUILanguage(int resID) noexcept;
-void LoadSettings(void);
+void LoadSettings() noexcept;
 void SaveSettingsNow() noexcept;
 void SaveSettings(bool bSaveSettingsNow) noexcept;
 void SaveWindowPosition(WCHAR *pIniSectionBuf) noexcept;
 void ClearWindowPositionHistory() noexcept;
 void ParseCommandLine() noexcept;
-void LoadFlags(void);
-void LoadLaunchSetings(void);
+void LoadFlags() noexcept;
+void LoadLaunchSetings() noexcept;
 
 bool CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) noexcept;
 bool CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule) noexcept;
@@ -157,7 +157,7 @@ bool DisplayPath(LPCWSTR lpPath, UINT uIdError);
 bool DisplayLnkFile(LPCWSTR pszLnkFile, LPCWSTR pszResPath);
 
 void LaunchTarget(LPCWSTR lpFileName, bool bOpenNew);
-void SnapToTarget(HWND hwnd);
+void SnapToTarget(HWND hwnd) noexcept;
 void SnapToDefaultPos(HWND hwnd) noexcept;
 
 LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);

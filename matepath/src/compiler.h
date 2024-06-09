@@ -53,12 +53,6 @@ typedef _Bool	bool;
 #define NP2_IGNORE_WARNING_DEPRECATED_DECLARATIONS	__pragma(warning(disable: 4996))
 #endif
 
-#if defined(__cplusplus) || defined(_MSC_VER)
-	#define NP2_inline	inline
-#else
-	#define NP2_inline	static inline
-#endif
-
 #define PP_CONCAT_(x, y)	x##y
 #define PP_CONCAT(x, y)		PP_CONCAT_(x, y)
 
