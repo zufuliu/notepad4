@@ -161,7 +161,7 @@ void SnapToTarget(HWND hwnd) noexcept;
 void SnapToDefaultPos(HWND hwnd) noexcept;
 
 LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
-LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam);
+LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept;
 void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept;
 void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept;
 void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept;

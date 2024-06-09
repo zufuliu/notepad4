@@ -75,7 +75,7 @@ static HICON hTrayIcon = nullptr;
 static UINT uTrayIconDPI = 0;
 
 static HANDLE hChangeHandle = nullptr;
-HISTORY	mHistory;
+HistoryList	mHistory;
 
 WCHAR	szIniFile[MAX_PATH] = L"";
 WCHAR	szIniFile2[MAX_PATH] = L"";
@@ -529,7 +529,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			DirList_Destroy(hwndDirList);
 			DragAcceptFiles(hwnd, FALSE);
 
-			History_Empty(&mHistory);
+			mHistory.Empty();
 
 			SaveSettings(false);
 
@@ -793,7 +793,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 //  MsgCreate() - Handles WM_CREATE
 //
 //
-LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
+LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	UNREFERENCED_PARAMETER(wParam);
 	hwndMain = hwnd;
 	g_uCurrentDPI = GetWindowDPI(hwnd);
@@ -859,8 +859,8 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	// Drag & Drop
 	DragAcceptFiles(hwnd, TRUE);
 	// History
-	History_Init(&mHistory);
-	History_UpdateToolbar(&mHistory, hwndToolbar, IDT_HISTORY_BACK, IDT_HISTORY_FORWARD);
+	mHistory.Init();
+	mHistory.UpdateToolbar(hwndToolbar, IDT_HISTORY_BACK, IDT_HISTORY_FORWARD);
 	// ToolTip with Current Directory
 	TOOLINFO ti;
 	memset(&ti, 0, sizeof(TOOLINFO));
@@ -1940,29 +1940,29 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDT_HISTORY_BACK:
-		if (History_CanBack(&mHistory)) {
+		if (mHistory.CanBack()) {
 			WCHAR tch[MAX_PATH];
-			History_Back(&mHistory, tch, COUNTOF(tch));
+			mHistory.Back(tch, COUNTOF(tch));
 			if (!ChangeDirectory(hwnd, tch, false)) {
 				MsgBoxWarn(MB_OK, IDS_ERR_CD);
 			}
 		} else {
 			MessageBeep(MB_OK);
 		}
-		History_UpdateToolbar(&mHistory, hwndToolbar, IDT_HISTORY_BACK, IDT_HISTORY_FORWARD);
+		mHistory.UpdateToolbar(hwndToolbar, IDT_HISTORY_BACK, IDT_HISTORY_FORWARD);
 		break;
 
 	case IDT_HISTORY_FORWARD:
-		if (History_CanForward(&mHistory)) {
+		if (mHistory.CanForward()) {
 			WCHAR tch[MAX_PATH];
-			History_Forward(&mHistory, tch, COUNTOF(tch));
+			mHistory.Forward(tch, COUNTOF(tch));
 			if (!ChangeDirectory(hwnd, tch, false)) {
 				MsgBoxWarn(MB_OK, IDS_ERR_CD);
 			}
 		} else {
 			MessageBeep(MB_OK);
 		}
-		History_UpdateToolbar(&mHistory, hwndToolbar, IDT_HISTORY_BACK, IDT_HISTORY_FORWARD);
+		mHistory.UpdateToolbar(hwndToolbar, IDT_HISTORY_BACK, IDT_HISTORY_FORWARD);
 		break;
 
 	case IDT_UP_DIR: {
@@ -2246,7 +2246,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDC_TOOLBAR:
 		switch (pnmh->code) {
 		case TBN_ENDADJUST:
-			History_UpdateToolbar(&mHistory, hwndToolbar, IDT_HISTORY_BACK, IDT_HISTORY_FORWARD);
+			mHistory.UpdateToolbar(hwndToolbar, IDT_HISTORY_BACK, IDT_HISTORY_FORWARD);
 			Toolbar_SetButtonImage(hwndToolbar, IDT_VIEW_FILTER, HasFilter() ? TB_DEL_FILTER_BMP : TB_ADD_FILTER_BMP);
 			break;
 
@@ -2386,8 +2386,8 @@ bool ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, bool bUpdateHistory) {
 
 		// Update History
 		if (bUpdateHistory) {
-			History_Add(&mHistory, szCurDir);
-			History_UpdateToolbar(&mHistory, hwndToolbar, IDT_HISTORY_BACK, IDT_HISTORY_FORWARD);
+			mHistory.Add(szCurDir);
+			mHistory.UpdateToolbar(hwndToolbar, IDT_HISTORY_BACK, IDT_HISTORY_FORWARD);
 		}
 	}
 	EndWaitCursor();

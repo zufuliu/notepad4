@@ -352,7 +352,7 @@ void RunDlg(HWND hwnd) noexcept {
 //  GotoDlgProc()
 //
 //
-extern HISTORY mHistory;
+extern HistoryList mHistory;
 extern int cxGotoDlg;
 
 INT_PTR CALLBACK GotoDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
@@ -364,7 +364,7 @@ INT_PTR CALLBACK GotoDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		ComboBox_LimitText(hwndGoto, MAX_PATH - 1);
 		ComboBox_SetExtendedUI(hwndGoto, TRUE);
 
-		for (LPCWSTR path : mHistory.psz) {
+		for (LPCWSTR path : mHistory.pszItems) {
 			if (path) {
 				const int iItem = ComboBox_FindStringExact(hwndGoto, -1, path);
 				if (iItem != CB_ERR) {

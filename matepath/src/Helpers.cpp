@@ -1724,55 +1724,55 @@ bool ExecDDECommand(LPCWSTR lpszCmdLine, LPCWSTR lpszDDEMsg, LPCWSTR lpszDDEApp,
 //  History Functions
 //
 //
-void History_Init(PHISTORY ph) {
-	memset(ph, 0, sizeof(HISTORY));
-	ph->iCurItem = -1;
+void HistoryList::Init() noexcept {
+	iCurItem = -1;
+	memset(NP2_void_pointer(pszItems), 0, sizeof(pszItems));
 }
 
-void History_Empty(PHISTORY ph) {
+void HistoryList::Empty() noexcept {
 	for (int i = 0; i < HISTORY_ITEMS; i++) {
-		if (ph->psz[i]) {
-			LocalFree(ph->psz[i]);
-			ph->psz[i] = NULL;
+		if (pszItems[i]) {
+			LocalFree(pszItems[i]);
+			pszItems[i] = nullptr;
 		}
 	}
 }
 
-bool History_Add(PHISTORY ph, LPCWSTR pszNew) {
+bool HistoryList::Add(LPCWSTR pszNew) noexcept {
 	// Item to be added is equal to current item
-	if (ph->iCurItem >= 0 && ph->iCurItem < HISTORY_ITEMS) {
-		if (ph->psz[ph->iCurItem] != NULL && PathEqual(pszNew, ph->psz[ph->iCurItem])) {
+	if (iCurItem >= 0 && iCurItem < HISTORY_ITEMS) {
+		if (pszItems[iCurItem] != nullptr && PathEqual(pszNew, pszItems[iCurItem])) {
 			return false;
 		}
 	}
 
-	if (ph->iCurItem < (HISTORY_ITEMS - 1)) {
-		ph->iCurItem++;
-		for (int i = ph->iCurItem; i < HISTORY_ITEMS; i++) {
-			if (ph->psz[i]) {
-				LocalFree(ph->psz[i]);
-				ph->psz[i] = NULL;
+	if (iCurItem < (HISTORY_ITEMS - 1)) {
+		iCurItem++;
+		for (int i = iCurItem; i < HISTORY_ITEMS; i++) {
+			if (pszItems[i]) {
+				LocalFree(pszItems[i]);
+				pszItems[i] = nullptr;
 			}
 		}
 	} else {
 		// Shift
-		if (ph->psz[0]) {
-			LocalFree(ph->psz[0]);
+		if (pszItems[0]) {
+			LocalFree(pszItems[0]);
 		}
 
-		memmove(NP2_void_pointer(ph->psz), NP2_void_pointer(ph->psz + 1), (HISTORY_ITEMS - 1) * sizeof(WCHAR *));
+		memmove(NP2_void_pointer(pszItems), NP2_void_pointer(pszItems + 1), (HISTORY_ITEMS - 1) * sizeof(LPWSTR));
 	}
 
-	ph->psz[ph->iCurItem] = StrDup(pszNew);
+	pszItems[iCurItem] = StrDup(pszNew);
 
 	return true;
 }
 
-bool History_Forward(PHISTORY ph, LPWSTR pszItem, int cItem) {
-	if (ph->iCurItem < (HISTORY_ITEMS - 1)) {
-		if (ph->psz[ph->iCurItem + 1]) {
-			ph->iCurItem++;
-			lstrcpyn(pszItem, ph->psz[ph->iCurItem], cItem);
+bool HistoryList::Forward(LPWSTR pszItem, int cItem) noexcept {
+	if (iCurItem < (HISTORY_ITEMS - 1)) {
+		if (pszItems[iCurItem + 1]) {
+			iCurItem++;
+			lstrcpyn(pszItem, pszItems[iCurItem], cItem);
 			return true;
 		}
 	}
@@ -1780,11 +1780,11 @@ bool History_Forward(PHISTORY ph, LPWSTR pszItem, int cItem) {
 	return false;
 }
 
-bool History_Back(PHISTORY ph, LPWSTR pszItem, int cItem) {
-	if (ph->iCurItem > 0) {
-		if (ph->psz[ph->iCurItem - 1]) {
-			ph->iCurItem--;
-			lstrcpyn(pszItem, ph->psz[ph->iCurItem], cItem);
+bool HistoryList::Back(LPWSTR pszItem, int cItem) noexcept {
+	if (iCurItem > 0) {
+		if (pszItems[iCurItem - 1]) {
+			iCurItem--;
+			lstrcpyn(pszItem, pszItems[iCurItem], cItem);
 			return true;
 		}
 	}
@@ -1792,9 +1792,9 @@ bool History_Back(PHISTORY ph, LPWSTR pszItem, int cItem) {
 	return false;
 }
 
-bool History_CanForward(LCPHISTORY ph) {
-	if (ph->iCurItem < (HISTORY_ITEMS - 1)) {
-		if (ph->psz[ph->iCurItem + 1]) {
+bool HistoryList::CanForward() const noexcept {
+	if (iCurItem < (HISTORY_ITEMS - 1)) {
+		if (pszItems[iCurItem + 1]) {
 			return true;
 		}
 	}
@@ -1802,9 +1802,9 @@ bool History_CanForward(LCPHISTORY ph) {
 	return false;
 }
 
-bool History_CanBack(LCPHISTORY ph) {
-	if (ph->iCurItem > 0) {
-		if (ph->psz[ph->iCurItem - 1]) {
+bool HistoryList::CanBack() const noexcept {
+	if (iCurItem > 0) {
+		if (pszItems[iCurItem - 1]) {
 			return true;
 		}
 	}
@@ -1812,14 +1812,14 @@ bool History_CanBack(LCPHISTORY ph) {
 	return false;
 }
 
-void History_UpdateToolbar(LCPHISTORY ph, HWND hwnd, int cmdBack, int cmdForward) {
-	if (History_CanBack(ph)) {
+void HistoryList::UpdateToolbar(HWND hwnd, int cmdBack, int cmdForward) const noexcept {
+	if (CanBack()) {
 		SendMessage(hwnd, TB_ENABLEBUTTON, cmdBack, MAKELPARAM(1, 0));
 	} else {
 		SendMessage(hwnd, TB_ENABLEBUTTON, cmdBack, MAKELPARAM(0, 0));
 	}
 
-	if (History_CanForward(ph)) {
+	if (CanForward()) {
 		SendMessage(hwnd, TB_ENABLEBUTTON, cmdForward, MAKELPARAM(1, 0));
 	} else {
 		SendMessage(hwnd, TB_ENABLEBUTTON, cmdForward, MAKELPARAM(0, 0));
