@@ -2041,24 +2041,24 @@ static const char *EditKeywordIndent(LPCEDITLEXER pLex, const char *head, AutoIn
 	//case NP2LEX_AUTOIT3:
 	case NP2LEX_BASH:
 		if (np2LexLangIndex == IDM_LEXER_CSHELL) {
-			if (StrEqualExA(word, "if")) {
+			if (StrEqualEx(word, "if")) {
 				*indent = AutoIndentType_IndentAndClose;
 				endPart = "endif";
-			} else if (StrEqualExA(word, "switch")) {
+			} else if (StrEqualEx(word, "switch")) {
 				*indent = AutoIndentType_IndentAndClose;
 				endPart = "endsw";
-			} else if (StrEqualExA(word, "foreach") || StrEqualExA(word, "while")) {
+			} else if (StrEqualEx(word, "foreach") || StrEqualEx(word, "while")) {
 				*indent = AutoIndentType_IndentAndClose;
 				endPart = "end";
 			}
 		} else {
-			if (StrEqualExA(word, "if")) {
+			if (StrEqualEx(word, "if")) {
 				*indent = AutoIndentType_IndentAndClose;
 				endPart = "fi";
-			} else if (StrEqualExA(word, "case")) {
+			} else if (StrEqualEx(word, "case")) {
 				*indent = AutoIndentType_IndentAndClose;
 				endPart = "esac";
-			} else if (StrEqualExA(word, "do")) {
+			} else if (StrEqualEx(word, "do")) {
 				*indent = AutoIndentType_IndentAndClose;
 				endPart = "done";
 			}
@@ -2066,19 +2066,19 @@ static const char *EditKeywordIndent(LPCEDITLEXER pLex, const char *head, AutoIn
 		break;
 
 	case NP2LEX_CMAKE:
-		if (StrEqualExA(word, "function")) {
+		if (StrEqualEx(word, "function")) {
 			*indent = AutoIndentType_IndentAndClose;
 			endPart = "endfunction()";
-		} else if (StrEqualExA(word, "macro")) {
+		} else if (StrEqualEx(word, "macro")) {
 			*indent = AutoIndentType_IndentAndClose;
 			endPart = "endmacro()";
-		} else if (StrEqualExA(word, "if")) {
+		} else if (StrEqualEx(word, "if")) {
 			*indent = AutoIndentType_IndentAndClose;
 			endPart = "endif()";
-		} else if (StrEqualExA(word, "foreach")) {
+		} else if (StrEqualEx(word, "foreach")) {
 			*indent = AutoIndentType_IndentAndClose;
 			endPart = "endforeach()";
-		} else if (StrEqualExA(word, "while")) {
+		} else if (StrEqualEx(word, "while")) {
 			*indent = AutoIndentType_IndentAndClose;
 			endPart = "endwhile()";
 		}
@@ -2098,40 +2098,40 @@ static const char *EditKeywordIndent(LPCEDITLEXER pLex, const char *head, AutoIn
 	} break;
 
 	case NP2LEX_LUA:
-		if (StrEqualExA(word, "function") || StrEqualExA(word, "if") || StrEqualExA(word, "do")) {
+		if (StrEqualEx(word, "function") || StrEqualEx(word, "if") || StrEqualEx(word, "do")) {
 			*indent = AutoIndentType_IndentAndClose;
 			endPart = "end";
 		}
 		break;
 
 	case NP2LEX_MAKEFILE:
-		if (StrEqualExA(word, "if")) {
+		if (StrEqualEx(word, "if")) {
 			*indent = AutoIndentType_IndentAndClose;
 			endPart = "endif";
-		} else if (StrEqualExA(word, "define")) {
+		} else if (StrEqualEx(word, "define")) {
 			*indent = AutoIndentType_IndentAndClose;
 			endPart = "endef";
-		} else if (StrEqualExA(word, "for")) {
+		} else if (StrEqualEx(word, "for")) {
 			*indent = AutoIndentType_IndentAndClose;
 			endPart = "endfor";
 		}
 		break;
 	case NP2LEX_MATLAB:
-		if (StrEqualExA(word, "function")) {
+		if (StrEqualEx(word, "function")) {
 			*indent = AutoIndentType_IndentOnly;
 			// 'end' is optional
-		} else if (StrEqualExA(word, "if") || StrEqualExA(word, "for") || StrEqualExA(word, "while") || StrEqualExA(word, "switch") || StrEqualExA(word, "try")) {
+		} else if (StrEqualEx(word, "if") || StrEqualEx(word, "for") || StrEqualEx(word, "while") || StrEqualEx(word, "switch") || StrEqualEx(word, "try")) {
 			*indent = AutoIndentType_IndentAndClose;
 			if (np2LexLangIndex == IDM_LEXER_OCTAVE) {
-				if (StrEqualExA(word, "if")) {
+				if (StrEqualEx(word, "if")) {
 					endPart = "endif";
-				} else if (StrEqualExA(word, "for")) {
+				} else if (StrEqualEx(word, "for")) {
 					endPart = "endfor";
-				} else if (StrEqualExA(word, "while")) {
+				} else if (StrEqualEx(word, "while")) {
 					endPart = "endwhile";
-				} else if (StrEqualExA(word, "switch")) {
+				} else if (StrEqualEx(word, "switch")) {
 					endPart = "endswitch";
-				} else if (StrEqualExA(word, "try")) {
+				} else if (StrEqualEx(word, "try")) {
 					endPart = "end_try_catch";
 				}
 			}
@@ -2144,36 +2144,36 @@ static const char *EditKeywordIndent(LPCEDITLEXER pLex, const char *head, AutoIn
 	//case NP2LEX_NSIS:
 	//case NP2LEX_PASCAL:
 	case NP2LEX_RUBY:
-		if (StrEqualExA(word, "if") || StrEqualExA(word, "do") || StrEqualExA(word, "while") || StrEqualExA(word, "for")) {
+		if (StrEqualEx(word, "if") || StrEqualEx(word, "do") || StrEqualEx(word, "while") || StrEqualEx(word, "for")) {
 			*indent = AutoIndentType_IndentAndClose;
 			endPart = "end";
 		}
 		break;
 
 	case NP2LEX_SQL:
-		if (StrEqualExA(word_low, "if")) {
+		if (StrEqualEx(word_low, "if")) {
 			*indent = AutoIndentType_IndentAndClose;
 			endPart = "END IF;";
-		} else if (StrEqualExA(word_low, "while")) {
+		} else if (StrEqualEx(word_low, "while")) {
 			*indent = AutoIndentType_IndentAndClose;
 			endPart = "END WHILE;";
-		} else if (StrEqualExA(word_low, "repeat")) {
+		} else if (StrEqualEx(word_low, "repeat")) {
 			*indent = AutoIndentType_IndentAndClose;
 			endPart = "END REPEAT;";
-		} else if (StrEqualExA(word_low, "loop") || StrEqualExA(word_low, "for")) {
+		} else if (StrEqualEx(word_low, "loop") || StrEqualEx(word_low, "for")) {
 			*indent = AutoIndentType_IndentAndClose;
 			endPart = "END LOOP;";
-		} else if (StrEqualExA(word_low, "case")) {
+		} else if (StrEqualEx(word_low, "case")) {
 			*indent = AutoIndentType_IndentAndClose;
 			endPart = "END CASE;";
-		} else if (StrEqualExA(word_low, "begin")) {
+		} else if (StrEqualEx(word_low, "begin")) {
 			*indent = AutoIndentType_IndentAndClose;
 			if (StrStrIA(head, "transaction") != nullptr) {
 				endPart = "COMMIT;";
 			} else {
 				endPart = "END";
 			}
-		} else if (StrEqualExA(word_low, "start")) {
+		} else if (StrEqualEx(word_low, "start")) {
 			if (StrStrIA(head, "transaction") != nullptr) {
 				*indent = AutoIndentType_IndentAndClose;
 				endPart = "COMMIT;";

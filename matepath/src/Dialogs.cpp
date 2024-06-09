@@ -98,7 +98,7 @@ static int CALLBACK BFFCallBack(HWND hwnd, UINT umsg, LPARAM lParam, LPARAM lpDa
 //
 bool GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase) noexcept {
 	WCHAR szTitle[256];
-	StrCpyExW(szTitle, L"");
+	StrCpyEx(szTitle, L"");
 	GetString(iTitle, szTitle, COUNTOF(szTitle));
 
 	WCHAR szBase[MAX_PATH];
@@ -139,7 +139,7 @@ bool GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, int iBase) noe
 #endif
 {
 	WCHAR szTitle[256];
-	StrCpyExW(szTitle, L"");
+	StrCpyEx(szTitle, L"");
 	GetString(iTitle, szTitle, COUNTOF(szTitle));
 
 	PIDLIST_ABSOLUTE pidlRoot;
@@ -1236,7 +1236,7 @@ INT_PTR CALLBACK ProgPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 				PathAddBackslash(szQuickview);
 				lstrcat(szQuickview, L"Viewers\\Quikview.exe");
 				PathQuoteSpaces(szQuickview);
-				StrCpyExW(szQuickviewParams, L"");
+				StrCpyEx(szQuickviewParams, L"");
 			} else {
 				ExtractFirstArgument(tch, szQuickview, szQuickviewParams);
 			}
@@ -1367,7 +1367,7 @@ INT_PTR OptionsPropSheet(HWND hwnd, HINSTANCE hInstance) noexcept {
 			SetListViewTheme(hwndDirList);
 		}
 
-		if (!StrEqualExW(tchFilter, L"*.*") || bNegFilter) {
+		if (!StrEqualEx(tchFilter, L"*.*") || bNegFilter) {
 			ListView_SetTextColor(hwndDirList, bDefColorFilter ? GetSysColor(COLOR_WINDOWTEXT) : colorFilter);
 			ListView_RedrawItems(hwndDirList, 0, ListView_GetItemCount(hwndDirList) - 1);
 		} else {
@@ -1506,7 +1506,7 @@ INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 			if (GetDlgItemText(hwnd, IDC_FILTER, tchFilter, COUNTOF(tchFilter) - 1)) {
 				bNegFilter = IsButtonChecked(hwnd, IDC_NEGFILTER);
 			} else {
-				StrCpyExW(tchFilter, L"*.*");
+				StrCpyEx(tchFilter, L"*.*");
 				bNegFilter = false;
 			}
 			EndDialog(hwnd, IDOK);
@@ -2558,8 +2558,8 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 				if (ignoreTarget) {
 					iUseTargetApplication = UseTargetApplication_None;
 					iTargetApplicationMode = TargetApplicationMode_None;
-					StrCpyExW(szTargetApplication, L"");
-					StrCpyExW(szTargetApplicationParams, L"");
+					StrCpyEx(szTargetApplication, L"");
+					StrCpyEx(szTargetApplicationParams, L"");
 				} else {
 					iUseTargetApplication = UseTargetApplication_Use;
 					GetDlgItemText(hwnd, IDC_TARGETPATH, tch, COUNTOF(tch));
@@ -2581,7 +2581,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 				if (iTargetApplicationMode == TargetApplicationMode_SendMsg) {
 					lstrcpy(szTargetApplicationWndClass, szTargetWndClass);
 				} else {
-					StrCpyExW(szTargetApplicationWndClass, L"");
+					StrCpyEx(szTargetApplicationWndClass, L"");
 				}
 				section.SetString(L"TargetApplicationWndClass", szTargetApplicationWndClass);
 
@@ -2590,9 +2590,9 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 					GetDlgItemText(hwnd, IDC_DDEAPP, szDDEApp, COUNTOF(szDDEApp));
 					GetDlgItemText(hwnd, IDC_DDETOPIC, szDDETopic, COUNTOF(szDDETopic));
 				} else {
-					StrCpyExW(szDDEMsg, L"");
-					StrCpyExW(szDDEApp, L"");
-					StrCpyExW(szDDETopic, L"");
+					StrCpyEx(szDDEMsg, L"");
+					StrCpyEx(szDDEApp, L"");
+					StrCpyEx(szDDETopic, L"");
 				}
 
 				section.SetString(L"DDEMessage", szDDEMsg);

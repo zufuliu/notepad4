@@ -2268,7 +2268,7 @@ static void Style_UpdateLexerLang(LPCEDITLEXER pLex, LPCWSTR lpszExt, LPCWSTR lp
 		break;
 
 	case NP2LEX_CONFIG:
-		if (StrHasPrefixCase(lpszName, L"httpd") || StrCaseEqual(lpszExt, L"htaccess")) {
+		if (StrStartsWithCase(lpszName, L"httpd") || StrCaseEqual(lpszExt, L"htaccess")) {
 			np2LexLangIndex = IDM_LEXER_APACHE;
 		}
 		break;
@@ -2322,7 +2322,7 @@ static void Style_UpdateLexerLang(LPCEDITLEXER pLex, LPCWSTR lpszExt, LPCWSTR lp
 			np2LexLangIndex = Style_GetDocTypeLanguage();
 		} else if (StrCaseEqual(L"xsd", lpszExt)) {
 			np2LexLangIndex = IDM_LEXER_XSD;
-		} else if (StrHasPrefixCase(lpszExt, L"xsl")) {
+		} else if (StrStartsWithCase(lpszExt, L"xsl")) {
 			np2LexLangIndex = IDM_LEXER_XSLT;
 		} else if (StrCaseEqual(L"dtd", lpszExt)) {
 			np2LexLangIndex = IDM_LEXER_DTD;
@@ -2382,7 +2382,7 @@ PEDITLEXER Style_MatchLexer(LPCWSTR lpszMatch, bool bCheckNames) noexcept {
 		if (cch >= 3) {
 			for (UINT iLexer = LEXER_INDEX_MATCH; iLexer < ALL_LEXER_COUNT; iLexer++) {
 				PEDITLEXER pLex = pLexArray[iLexer];
-				if (StrHasPrefixCaseEx(pLex->pszName, lpszMatch, cch)) {
+				if (_wcsnicmp(pLex->pszName, lpszMatch, cch) == 0) {
 					return pLex;
 				}
 			}
@@ -2433,7 +2433,7 @@ static PEDITLEXER Style_GetLexerFromFile(LPCWSTR lpszFile, bool bCGIGuess, LPCWS
 		}
 
 		// MySQL ini/cnf
-		else if (StrHasPrefixCase(lpszName, L"my") && (StrCaseEqual(lpszExt, L"ini") || StrCaseEqual(lpszExt, L"cnf"))) {
+		else if (StrStartsWithCase(lpszName, L"my") && (StrCaseEqual(lpszExt, L"ini") || StrCaseEqual(lpszExt, L"cnf"))) {
 			pLexNew = &lexConfig;
 		}
 
@@ -2449,17 +2449,17 @@ static PEDITLEXER Style_GetLexerFromFile(LPCWSTR lpszFile, bool bCGIGuess, LPCWS
 			if (pDotFile) {
 				*pDotFile = TRUE;
 			}
-			if (StrHasPrefix(lpszExt, L"bash") || StrEqualExW(lpszExt, L"profile")) { // .bash_history, .bash_logout, .bash_profile, .bashrc, .profile
+			if (StrStartsWith(lpszExt, L"bash") || StrEqualEx(lpszExt, L"profile")) { // .bash_history, .bash_logout, .bash_profile, .bashrc, .profile
 				pLexNew = &lexBash;
 			}
 		}
 	}
 
 	if (!pLexNew) {
-		if (StrHasPrefixCase(lpszName, L"Readme")) {
+		if (StrStartsWithCase(lpszName, L"Readme")) {
 			pLexNew = &lexTextFile;
 		}
-		else if (StrHasPrefixCase(lpszName, L"Makefile") || StrHasPrefixCase(lpszName, L"Kbuild")) {
+		else if (StrStartsWithCase(lpszName, L"Makefile") || StrStartsWithCase(lpszName, L"Kbuild")) {
 			pLexNew = &lexMakefile;
 		}
 		else if (StrCaseEqual(lpszName, L"Cakefile")) {
@@ -2472,10 +2472,10 @@ static PEDITLEXER Style_GetLexerFromFile(LPCWSTR lpszFile, bool bCGIGuess, LPCWS
 			pLexNew = &lexBash;
 		}
 		// Boost build
-		else if (StrCaseEqual(lpszName, L"Jamroot") || StrHasPrefixCase(lpszName, L"Jamfile")) {
+		else if (StrCaseEqual(lpszName, L"Jamroot") || StrStartsWithCase(lpszName, L"Jamfile")) {
 			pLexNew = &lexJamfile;
 		}
-		else if (StrHasPrefixCase(lpszName, L"Kconfig") || StrHasPrefixCase(lpszName, L"Doxyfile")) {
+		else if (StrStartsWithCase(lpszName, L"Kconfig") || StrStartsWithCase(lpszName, L"Doxyfile")) {
 			pLexNew = &lexConfig;
 		}
 	}
@@ -3144,15 +3144,15 @@ bool Style_StrGetFontEx(LPCWSTR lpszStyle, LPWSTR lpszFont, int cchFont, bool bD
 		TrimString(lpszFont);
 
 		if (bDefaultStyle) {
-			if (StrEqualExW(lpszFont, L"$(Text)")) {
+			if (StrEqualEx(lpszFont, L"$(Text)")) {
 				lstrcpyn(lpszFont, systemTextFontName, cchFont);
-			} else if (StrEqualExW(lpszFont, L"$(Code)") || !IsFontAvailable(lpszFont)) {
+			} else if (StrEqualEx(lpszFont, L"$(Code)") || !IsFontAvailable(lpszFont)) {
 				lstrcpyn(lpszFont, systemCodeFontName, cchFont);
 			}
 		} else {
-			if (StrEqualExW(lpszFont, L"$(Text)")) {
+			if (StrEqualEx(lpszFont, L"$(Text)")) {
 				lstrcpyn(lpszFont, defaultTextFontName, cchFont);
-			} else if (StrEqualExW(lpszFont, L"$(Code)") || !IsFontAvailable(lpszFont)) {
+			} else if (StrEqualEx(lpszFont, L"$(Code)") || !IsFontAvailable(lpszFont)) {
 				lstrcpyn(lpszFont, defaultCodeFontName, cchFont);
 			}
 		}
@@ -3494,7 +3494,7 @@ bool Style_SelectColor(HWND hwnd, LPWSTR lpszStyle, int cchStyle, bool bFore) no
 	WCHAR szNewStyle[MAX_LEXER_STYLE_EDIT_SIZE];
 	WCHAR tch[MAX_STYLE_VALUE_LENGTH];
 
-	StrCpyExW(szNewStyle, L"");
+	StrCpyEx(szNewStyle, L"");
 	Style_StrCopyFont(szNewStyle, lpszStyle, tch);
 	Style_StrCopyCharSet(szNewStyle, lpszStyle, tch);
 	Style_StrCopyLocale(szNewStyle, lpszStyle, tch);
@@ -3725,7 +3725,7 @@ int Style_GetLexerIconId(LPCEDITLEXER pLex, DWORD iconFlags) noexcept {
 	}
 
 	WCHAR pszFile[MAX_PATH];
-	StrCpyExW(pszFile, L"*.");
+	StrCpyEx(pszFile, L"*.");
 
 	// TODO: avoid copying all extensions then find separators.
 	// we only need the first extension, it's usually very short.
@@ -3742,7 +3742,7 @@ int Style_GetLexerIconId(LPCEDITLEXER pLex, DWORD iconFlags) noexcept {
 
 	// check for ; at beginning
 	if (p == pszFile + 2) {
-		StrCpyExW(p, L"txt");
+		StrCpyEx(p, L"txt");
 	}
 
 	SHFILEINFO shfi;
@@ -4021,7 +4021,7 @@ static void Style_ResetStyle(LPCEDITLEXER pLex, EDITSTYLE *pStyle) noexcept {
 		WCHAR wch[MAX_EDITSTYLE_VALUE_SIZE] = L"";
 		// use "NULL" to distinguish between empty style value like: Keyword=
 		GetPrivateProfileString(pLex->pszName, pStyle->pszName, L"NULL", wch, COUNTOF(wch), themePath);
-		if (!StrEqualExW(wch, L"NULL")) {
+		if (!StrEqualEx(wch, L"NULL")) {
 			lstrcpy(pStyle->szValue, wch);
 			return;
 		}

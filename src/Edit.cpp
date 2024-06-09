@@ -3421,7 +3421,7 @@ void EditToggleLineComments(LPCWSTR pwszComment, int commentFlag) noexcept {
 		const Sci_TextRangeFull tr = { { iIndentPos, min(iIndentPos + 31, iLineEndPos) }, tchBuf };
 		SciCall_GetTextRangeFull(&tr);
 
-		if (StrStartsWithCaseEx(tchBuf, mszComment, cchComment) && (commentEnd != ' ' || (uint8_t)(tchBuf[cchComment]) <= ' ')) {
+		if (_strnicmp(tchBuf, mszComment, cchComment) == 0 && (commentEnd != ' ' || (uint8_t)(tchBuf[cchComment]) <= ' ')) {
 			switch (iAction) {
 			case CommentAction_None:
 				iAction = CommentAction_Delete;
@@ -4510,7 +4510,7 @@ void EditEnsureConsistentLineEndings() noexcept {
 //
 void EditGetExcerpt(LPWSTR lpszExcerpt, DWORD cchExcerpt) noexcept {
 	if (SciCall_IsSelectionEmpty() || SciCall_IsRectangleSelection()) {
-		StrCpyExW(lpszExcerpt, L"");
+		StrCpyEx(lpszExcerpt, L"");
 		return;
 	}
 
@@ -5321,7 +5321,7 @@ int EditPrepareReplace(HWND hwnd, char *szFind2, char **pszReplace2, BOOL *bRepl
 	}
 
 	*bReplaceRE = (searchFlags & SCFIND_REGEXP);
-	if (StrEqualExA(lpefr->szReplace, "^c")) {
+	if (StrEqualEx(lpefr->szReplace, "^c")) {
 		*bReplaceRE = FALSE;
 		*pszReplace2 = EditGetClipboardText(hwnd);
 	} else {
@@ -6516,7 +6516,7 @@ static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam
 					LPCWSTR pwCur = StrChr(wszOpen, L'<');
 					if (pwCur != nullptr) {
 						LPWSTR wchIns = (LPWSTR)NP2HeapAlloc((len + 5) * sizeof(WCHAR));
-						StrCpyExW(wchIns, L"</");
+						StrCpyEx(wchIns, L"</");
 						int	cchIns = 2;
 
 						++pwCur;
@@ -7098,7 +7098,7 @@ char *EditGetStringAroundCaret(LPCSTR delimiters) noexcept {
 extern bool bOpenFolderWithMatepath;
 
 static DWORD EditOpenSelectionCheckFile(LPCWSTR link, LPWSTR path, int cchFilePath, LPWSTR wchDirectory) noexcept {
-	if (StrHasPrefix(link, L"//")) {
+	if (StrStartsWith(link, L"//")) {
 		// issue #454, treat as link
 		lstrcpy(path, L"http:");
 		lstrcpy(path + CSTRLEN(L"http:"), link);
@@ -7259,7 +7259,7 @@ void EditOpenSelection(OpenSelectionType type) {
 			lstrcpy(wszSelection + CSTRLEN(L"mailto:"), link);
 			type = OpenSelectionType_Link;
 			link = wszSelection;
-		} else if (StrHasPrefix(link, L"www.")) {
+		} else if (StrStartsWith(link, L"www.")) {
 			lstrcpy(wszSelection, L"http://"); // browser should auto switch to https
 			lstrcpy(wszSelection + CSTRLEN(L"http://"), link);
 			type = OpenSelectionType_Link;

@@ -1091,7 +1091,7 @@ static inline bool IsFileStartsWithDotLog() noexcept {
 	char tch[5] = "";
 	const Sci_Position len = SciCall_GetText(COUNTOF(tch) - 1, tch);
 	// upper case
-	return len == 4 && StrEqualExA(tch, ".LOG");
+	return len == 4 && StrEqualEx(tch, ".LOG");
 }
 #endif
 
@@ -1602,7 +1602,7 @@ void UpdateWindowTitle() noexcept {
 
 	WCHAR szTitle[512];
 	if (IsDocumentModified()) {
-		StrCpyExW(szTitle, L"* ");
+		StrCpyEx(szTitle, L"* ");
 	} else {
 		szTitle[0] = L'\0';
 	}
@@ -1636,8 +1636,8 @@ void UpdateWindowTitle() noexcept {
 			lstrcat(szTitle, szCurFile);
 		}
 	} else {
-		StrCpyExW(szCachedFile, L"");
-		StrCpyExW(szCachedDisplayName, L"");
+		StrCpyEx(szCachedFile, L"");
+		StrCpyEx(szCachedDisplayName, L"");
 		WCHAR szUntitled[128];
 		GetString(IDS_UNTITLED, szUntitled, COUNTOF(szUntitled));
 		lstrcat(szTitle, szUntitled);
@@ -4427,7 +4427,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_VIEW_SHOWFILENAMEFIRST:
 	case IDM_VIEW_SHOWFULLPATH:
 		iPathNameFormat = (TitlePathNameFormat)(LOWORD(wParam) - IDM_VIEW_SHOWFILENAMEONLY);
-		StrCpyExW(szTitleExcerpt, L"");
+		StrCpyEx(szTitleExcerpt, L"");
 		UpdateWindowTitle();
 		break;
 
@@ -5675,7 +5675,7 @@ void SaveSettingsNow(bool bOnlySaveStyle, bool bQuiet) noexcept {
 		if (StrNotEmpty(szIniFile2)) {
 			if (CreateIniFile(szIniFile2)) {
 				lstrcpy(szIniFile, szIniFile2);
-				StrCpyExW(szIniFile2, L"");
+				StrCpyEx(szIniFile2, L"");
 			} else {
 				bCreateFailure = true;
 			}
@@ -5990,13 +5990,13 @@ CommandParseState ParseCommandLineEncoding(LPCWSTR opt) noexcept {
 	if (*opt == '-') {
 		++opt;
 	}
-	if (StrHasPrefixCase(opt, L"LE")){
+	if (StrStartsWithCase(opt, L"LE")){
 		flag = IDM_ENCODING_UNICODE;
 		opt += CSTRLEN(L"LE");
 		if (*opt == '-') {
 			++opt;
 		}
-	} else if (StrHasPrefixCase(opt, L"BE")) {
+	} else if (StrStartsWithCase(opt, L"BE")) {
 		flag = IDM_ENCODING_UNICODEREV;
 		opt += CSTRLEN(L"BE");
 		if (*opt == '-') {
@@ -6204,7 +6204,7 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) noexcept {
 
 		case L'F':
 			if (chNext == L'0' || chNext == L'O') {
-				StrCpyExW(szIniFile, L"*?");
+				StrCpyEx(szIniFile, L"*?");
 				state = CommandParseState_Consumed;
 			}
 			break;
@@ -6265,7 +6265,7 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) noexcept {
 		if (StrCaseEqual(opt, L"ANSI")) {
 			flagSetEncoding = IDM_ENCODING_ANSI - IDM_ENCODING_ANSI + 1;
 			state = CommandParseState_Consumed;
-		} else if (StrHasPrefixCase(opt, L"appid=")) {
+		} else if (StrStartsWithCase(opt, L"appid=")) {
 			// Shell integration
 			opt += CSTRLEN(L"appid=");
 			lstrcpyn(g_wchAppUserModelID, opt, COUNTOF(g_wchAppUserModelID));
@@ -6348,7 +6348,7 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) noexcept {
 			break;
 		}
 
-		if (StrHasPrefixCase(opt, L"POS")) {
+		if (StrStartsWithCase(opt, L"POS")) {
 			opt += CSTRLEN(L"POS");
 		} else {
 			++opt;
@@ -6460,7 +6460,7 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) noexcept {
 
 	case L'S':
 		// Shell integration
-		if (StrHasPrefixCase(opt, L"sysmru=")) {
+		if (StrStartsWithCase(opt, L"sysmru=")) {
 			opt += CSTRLEN(L"sysmru=");
 			if (opt[1] == L'\0') {
 				const UINT value = opt[0] - L'0';
@@ -6473,7 +6473,7 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) noexcept {
 		break;
 
 	case L'U':
-		if (StrHasPrefixCase(opt, L"UTF")) {
+		if (StrStartsWithCase(opt, L"UTF")) {
 			opt += CSTRLEN(L"UTF");
 			if (*opt == '-') {
 				++opt;
@@ -6494,7 +6494,7 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) noexcept {
 				opt += 2;
 				state = ParseCommandLineEncoding(opt);
 			}
-		} else if (StrHasPrefixCase(opt, L"UNICODE")) {
+		} else if (StrStartsWithCase(opt, L"UNICODE")) {
 			opt += CSTRLEN(L"UNICODE");
 			state = ParseCommandLineEncoding(opt);
 		}
@@ -6786,7 +6786,7 @@ bool CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule, LPCWSTR redirectK
 }
 
 bool FindIniFile() noexcept {
-	if (StrEqualExW(szIniFile, L"*?")) {
+	if (StrEqualEx(szIniFile, L"*?")) {
 		return false;
 	}
 
@@ -6831,9 +6831,9 @@ bool FindIniFile() noexcept {
 }
 
 bool TestIniFile() noexcept {
-	if (StrEqualExW(szIniFile, L"*?")) {
-		StrCpyExW(szIniFile2, L"");
-		StrCpyExW(szIniFile, L"");
+	if (StrEqualEx(szIniFile, L"*?")) {
+		StrCpyEx(szIniFile2, L"");
+		StrCpyEx(szIniFile, L"");
 		return false;
 	}
 
@@ -6861,7 +6861,7 @@ bool TestIniFile() noexcept {
 
 	if ((dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0) {
 		lstrcpy(szIniFile2, szIniFile);
-		StrCpyExW(szIniFile, L"");
+		StrCpyEx(szIniFile, L"");
 		return false;
 	}
 
@@ -7303,11 +7303,11 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 	}
 
 	if (loadFlag & FileLoadFlag_New) {
-		StrCpyExW(szCurFile, L"");
+		StrCpyEx(szCurFile, L"");
 		SetDlgItemText(hwndMain, IDC_FILENAME, szCurFile);
 		SetDlgItemInt(hwndMain, IDC_REUSELOCK, GetTickCount(), FALSE);
 		if (!keepTitleExcerpt) {
-			StrCpyExW(szTitleExcerpt, L"");
+			StrCpyEx(szTitleExcerpt, L"");
 		}
 		fvCurFile.Init(nullptr, 0);
 		EditSetEmptyText();
@@ -7404,7 +7404,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 		SetDlgItemText(hwndMain, IDC_FILENAME, szCurFile);
 		SetDlgItemInt(hwndMain, IDC_REUSELOCK, GetTickCount(), FALSE);
 		if (!keepTitleExcerpt) {
-			StrCpyExW(szTitleExcerpt, L"");
+			StrCpyEx(szTitleExcerpt, L"");
 		}
 		iOriginalEncoding = iCurrentEncoding;
 		bDocumentModified = false;
@@ -7611,7 +7611,7 @@ bool FileSave(FileSaveFlag saveFlag) {
 					SetDlgItemText(hwndMain, IDC_FILENAME, szCurFile);
 					SetDlgItemInt(hwndMain, IDC_REUSELOCK, GetTickCount(), FALSE);
 					if (!fKeepTitleExcerpt) {
-						StrCpyExW(szTitleExcerpt, L"");
+						StrCpyEx(szTitleExcerpt, L"");
 					}
 					if (flagLexerSpecified) {
 						if (pLexCurrent->rid == iInitialLexer) {
@@ -8078,7 +8078,7 @@ bool RelaunchMultiInst() noexcept {
 		LPWSTR lp2 = (LPWSTR)NP2HeapAlloc(cmdSize);
 
 		StrTab2Space(lpCmdLineNew);
-		StrCpyExW(lpCmdLineNew + cchiFileList, L"");
+		StrCpyEx(lpCmdLineNew + cchiFileList, L"");
 
 		LPWSTR pwch = StrEnd(lpCmdLineNew) - 1;
 		int i = 0;
@@ -8416,7 +8416,7 @@ void SetNotifyIconTitle(HWND hwnd) noexcept {
 	}
 
 	if (IsDocumentModified()) {
-		StrCpyExW(nid.szTip, L"* ");
+		StrCpyEx(nid.szTip, L"* ");
 	}
 	StrCatBuff(nid.szTip, tchTitle, COUNTOF(nid.szTip));
 	Shell_NotifyIcon(NIM_MODIFY, &nid);

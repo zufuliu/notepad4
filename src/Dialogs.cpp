@@ -235,7 +235,7 @@ static int CALLBACK BFFCallBack(HWND hwnd, UINT umsg, LPARAM lParam, LPARAM lpDa
 //
 bool GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase) noexcept {
 	WCHAR szTitle[256];
-	StrCpyExW(szTitle, L"");
+	StrCpyEx(szTitle, L"");
 	GetString(iTitle, szTitle, COUNTOF(szTitle));
 
 	WCHAR szBase[MAX_PATH];
@@ -1249,7 +1249,7 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 			ListView_SetItemState(hwndLV, 0, LVIS_FOCUSED, LVIS_FOCUSED);
 			ListView_SetColumnWidth(hwndLV, 0, LVSCW_AUTOSIZE_USEHEADER);
 
-			worker->workerThread = CreateThread(NULL, 0, FileMRUIconThread, (LPVOID)worker, 0, NULL);
+			worker->workerThread = CreateThread(nullptr, 0, FileMRUIconThread, worker, 0, nullptr);
 		}
 		break;
 

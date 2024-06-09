@@ -69,7 +69,7 @@ void DirList_Init(HWND hwnd, LPCWSTR pszHeader) noexcept {
 	lpdl->cbidl = 0;
 	lpdl->pidl = nullptr;
 	lpdl->lpsf = nullptr;
-	StrCpyExW(lpdl->szPath, L"");
+	StrCpyEx(lpdl->szPath, L"");
 
 	SHFILEINFO shfi;
 	// Add Imagelists
@@ -691,7 +691,7 @@ bool DirList_IsFileSelected(HWND hwnd) {
 //
 void DirList_CreateFilter(PDL_FILTER pdlf, LPCWSTR lpszFileSpec, bool bExcludeFilter) {
 	memset(pdlf, 0, sizeof(DL_FILTER));
-	if (StrIsEmpty(lpszFileSpec) || StrEqualExW(lpszFileSpec, L"*.*")) {
+	if (StrIsEmpty(lpszFileSpec) || StrEqualEx(lpszFileSpec, L"*.*")) {
 		return;
 	}
 

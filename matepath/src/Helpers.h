@@ -66,11 +66,20 @@ inline bool StrCaseEqual(LPCWSTR s1, LPCWSTR s2) noexcept {
 	return _wcsicmp(s1, s2) == 0;
 }
 
-#define StrCpyExW(s, t)						memcpy((s), (t), STRSIZE(t))
-#define StrEqualExW(s, t)					(memcmp((s), (t), STRSIZE(t)) == 0)
-#define StrHasPrefix(s, prefix)				(memcmp((s), (prefix), STRSIZE(prefix) - sizeof(WCHAR)) == 0)
-#define StrHasPrefixCase(s, prefix)			(_wcsnicmp((s), (prefix), CSTRLEN(prefix)) == 0)
-#define StrHasPrefixCaseEx(s, prefix, len)	(_wcsnicmp((s), (prefix), (len)) == 0)
+template <typename T, size_t N>
+inline void StrCpyEx(T *s, const T (&t)[N]) noexcept {
+	memcpy(s, t, N*sizeof(T));
+}
+
+template <typename T, size_t N>
+constexpr bool StrEqualEx(const T *s, const T (&t)[N]) noexcept {
+	return __builtin_memcmp(s, t, N*sizeof(T)) == 0;
+}
+
+template <typename T, size_t N>
+constexpr bool StrStartsWith(const T *s, const T (&t)[N]) noexcept {
+	return __builtin_memcmp(s, t, (N - 1)*sizeof(T)) == 0;
+}
 
 inline bool CRTStrToInt(LPCWSTR str, int *value) noexcept {
 	LPWSTR end;

@@ -94,7 +94,7 @@ void IniClearAllSectionEx(LPCWSTR lpszPrefix, LPCWSTR lpszIniFile, bool bDelete)
 	const int len = lstrlen(lpszPrefix);
 
 	while (*p) {
-		if (StrHasPrefixCaseEx(p, lpszPrefix, len)) {
+		if (_wcsnicmp(p, lpszPrefix, len) == 0) {
 			WritePrivateProfileSection(p, value, lpszIniFile);
 		}
 		p = StrEnd(p) + 1;
@@ -1542,10 +1542,10 @@ bool PathGetRealPath(HANDLE hFile, LPCWSTR lpszSrc, LPWSTR lpszDest) noexcept {
 			if (closing) {
 				CloseHandle(hFile);
 			}
-			if (cch != 0 && StrHasPrefix(path, L"\\\\?\\")) {
+			if (cch != 0 && StrStartsWith(path, L"\\\\?\\")) {
 				cch -= CSTRLEN(L"\\\\?\\");
 				WCHAR *p = path + CSTRLEN(L"\\\\?\\");
-				if (StrHasPrefix(p, L"UNC\\")) {
+				if (StrStartsWith(p, L"UNC\\")) {
 					cch -= 2;
 					p += 2;
 					*p = L'\\'; // replace 'C' with backslash
@@ -1561,10 +1561,10 @@ bool PathGetRealPath(HANDLE hFile, LPCWSTR lpszSrc, LPWSTR lpszDest) noexcept {
 	DWORD cch = GetFullPathName(lpszSrc, COUNTOF(path), path, nullptr);
 	if (cch > 0 && cch < COUNTOF(path)) {
 		WCHAR *p = path;
-		if (StrHasPrefix(path, L"\\\\?\\")) {
+		if (StrStartsWith(path, L"\\\\?\\")) {
 			cch -= CSTRLEN(L"\\\\?\\");
 			p += CSTRLEN(L"\\\\?\\");
-			if (StrHasPrefix(p, L"UNC\\")) {
+			if (StrStartsWith(p, L"UNC\\")) {
 				cch -= 2;
 				p += 2;
 				*p = L'\\'; // replace 'C' with backslash
@@ -1717,7 +1717,7 @@ void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, DWORD dwAttrTo, bool bU
 void PathAbsoluteFromApp(LPCWSTR lpszSrc, LPWSTR lpszDest, bool bExpandEnv) noexcept {
 	WCHAR wchPath[MAX_PATH];
 
-	if (StrHasPrefix(lpszSrc, L"%CSIDL:MYDOCUMENTS%")) {
+	if (StrStartsWith(lpszSrc, L"%CSIDL:MYDOCUMENTS%")) {
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 		LPWSTR pszPath = nullptr;
 		if (S_OK != SHGetKnownFolderPath(KnownFolderId_Documents, KF_FLAG_DEFAULT, nullptr, &pszPath)) {
@@ -1825,7 +1825,7 @@ bool PathCreateDeskLnk(LPCWSTR pszDocument) {
 	PathQuoteSpaces(tchDocTemp);
 
 	WCHAR tchArguments[MAX_PATH + 16];
-	StrCpyExW(tchArguments, L"-n ");
+	StrCpyEx(tchArguments, L"-n ");
 	lstrcat(tchArguments, tchDocTemp);
 
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
