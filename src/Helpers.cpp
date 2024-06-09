@@ -1679,7 +1679,7 @@ void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, DWORD dwAttrTo, bool bU
 		if (bUnexpandMyDocs) {
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 			LPWSTR wchUserFiles = nullptr;
-			if (S_OK != SHGetKnownFolderPath(KnownFolderId_Documents, KF_FLAG_DEFAULT, nullptr, &wchUserFiles)) {
+			if (S_OK != SHGetKnownFolderPath(FOLDERID_Documents, KF_FLAG_DEFAULT, nullptr, &wchUserFiles)) {
 				return;
 			}
 #else
@@ -1730,7 +1730,7 @@ void PathAbsoluteFromApp(LPCWSTR lpszSrc, LPWSTR lpszDest, bool bExpandEnv) noex
 	if (StrStartsWith(lpszSrc, L"%CSIDL:MYDOCUMENTS%")) {
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 		LPWSTR pszPath = nullptr;
-		if (S_OK != SHGetKnownFolderPath(KnownFolderId_Documents, KF_FLAG_DEFAULT, nullptr, &pszPath)) {
+		if (S_OK != SHGetKnownFolderPath(FOLDERID_Documents, KF_FLAG_DEFAULT, nullptr, &pszPath)) {
 			return;
 		}
 		lpszSrc += CSTRLEN("%CSIDL:MYDOCUMENTS%");
@@ -1840,7 +1840,7 @@ bool PathCreateDeskLnk(LPCWSTR pszDocument) {
 
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 	LPWSTR tchLinkDir = nullptr;
-	if (S_OK != SHGetKnownFolderPath(KnownFolderId_Desktop, KF_FLAG_DEFAULT, nullptr, &tchLinkDir)) {
+	if (S_OK != SHGetKnownFolderPath(FOLDERID_Desktop, KF_FLAG_DEFAULT, nullptr, &tchLinkDir)) {
 		return false;
 	}
 #else

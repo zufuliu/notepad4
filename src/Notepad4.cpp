@@ -5347,7 +5347,7 @@ void LoadSettings() noexcept {
 	if (StrIsEmpty(strValue)) {
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 		LPWSTR pszPath = nullptr;
-		if (S_OK == SHGetKnownFolderPath(KnownFolderId_Desktop, KF_FLAG_DEFAULT, nullptr, &pszPath)) {
+		if (S_OK == SHGetKnownFolderPath(FOLDERID_Desktop, KF_FLAG_DEFAULT, nullptr, &pszPath)) {
 			lstrcpy(tchOpenWithDir, pszPath);
 			CoTaskMemFree(pszPath);
 		}
@@ -5362,7 +5362,7 @@ void LoadSettings() noexcept {
 	if (StrIsEmpty(strValue)) {
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 		LPWSTR pszPath = nullptr;
-		if (S_OK == SHGetKnownFolderPath(KnownFolderId_Documents, KF_FLAG_DEFAULT, nullptr, &pszPath)) {
+		if (S_OK == SHGetKnownFolderPath(FOLDERID_Documents, KF_FLAG_DEFAULT, nullptr, &pszPath)) {
 			lstrcpy(tchFavoritesDir, pszPath);
 			CoTaskMemFree(pszPath);
 		}
@@ -8642,7 +8642,7 @@ LPCWSTR AutoSave_GetDefaultFolder() noexcept {
 	if (StrIsEmpty(szFolder)) {
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 		LPWSTR pszPath = nullptr;
-		const HRESULT hr = SHGetKnownFolderPath(KnownFolderId_LocalAppData, KF_FLAG_DEFAULT, nullptr, &pszPath);
+		const HRESULT hr = SHGetKnownFolderPath(FOLDERID_LocalAppData, KF_FLAG_DEFAULT, nullptr, &pszPath);
 		if (hr == S_OK) {
 			PathCombine(szFolder, pszPath, WC_NOTEPAD4);
 			CoTaskMemFree(pszPath);

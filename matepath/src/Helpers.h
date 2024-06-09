@@ -522,12 +522,6 @@ bool PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath);
 bool PathCreateLnk(LPCWSTR pszLnkDir, LPCWSTR pszPath);
 void OpenContainingFolder(HWND hwnd, LPCWSTR pszFile, bool bSelect) noexcept;
 
-#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-#define KnownFolderId_Desktop			FOLDERID_Desktop
-#define KnownFolderId_Documents			FOLDERID_Documents
-#define KnownFolderId_ComputerFolder	FOLDERID_ComputerFolder
-#endif
-
 inline void TrimString(LPWSTR lpString) noexcept {
 	StrTrim(lpString, L" ");
 }

@@ -1179,7 +1179,7 @@ void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, DWORD dwAttrTo, bool bU
 		if (bUnexpandMyDocs) {
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 			LPWSTR wchUserFiles = nullptr;
-			if (S_OK != SHGetKnownFolderPath(KnownFolderId_Documents, KF_FLAG_DEFAULT, nullptr, &wchUserFiles)) {
+			if (S_OK != SHGetKnownFolderPath(FOLDERID_Documents, KF_FLAG_DEFAULT, nullptr, &wchUserFiles)) {
 				return;
 			}
 #else
@@ -1230,7 +1230,7 @@ void PathAbsoluteFromApp(LPCWSTR lpszSrc, LPWSTR lpszDest, bool bExpandEnv) noex
 	if (StrStartsWith(lpszSrc, L"%CSIDL:MYDOCUMENTS%")) {
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 		LPWSTR pszPath = nullptr;
-		if (S_OK != SHGetKnownFolderPath(KnownFolderId_Documents, KF_FLAG_DEFAULT, nullptr, &pszPath)) {
+		if (S_OK != SHGetKnownFolderPath(FOLDERID_Documents, KF_FLAG_DEFAULT, nullptr, &pszPath)) {
 			return;
 		}
 		lpszSrc += CSTRLEN("%CSIDL:MYDOCUMENTS%");
@@ -1596,7 +1596,7 @@ void GetDefaultFavoritesDir(LPWSTR lpFavDir, int cchFavDir) noexcept {
 	PIDLIST_ABSOLUTE pidl;
 
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-	if (S_OK == SHGetKnownFolderIDList(KnownFolderId_Documents, KF_FLAG_DEFAULT, nullptr, &pidl))
+	if (S_OK == SHGetKnownFolderIDList(FOLDERID_Documents, KF_FLAG_DEFAULT, nullptr, &pidl))
 #else
 	if (S_OK == SHGetFolderLocation(nullptr, CSIDL_PERSONAL, nullptr, SHGFP_TYPE_DEFAULT, &pidl))
 #endif
@@ -1616,7 +1616,7 @@ void GetDefaultOpenWithDir(LPWSTR lpOpenWithDir, int cchOpenWithDir) noexcept {
 	PIDLIST_ABSOLUTE pidl;
 
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-	if (S_OK == SHGetKnownFolderIDList(KnownFolderId_Desktop, KF_FLAG_DEFAULT, nullptr, &pidl))
+	if (S_OK == SHGetKnownFolderIDList(FOLDERID_Desktop, KF_FLAG_DEFAULT, nullptr, &pidl))
 #else
 	if (S_OK == SHGetFolderLocation(nullptr, CSIDL_DESKTOPDIRECTORY, nullptr, SHGFP_TYPE_DEFAULT, &pidl))
 #endif

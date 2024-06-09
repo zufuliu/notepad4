@@ -759,7 +759,7 @@ int DriveBox_Fill(HWND hwnd) {
 	// Get pidl to [My Computer]
 	PIDLIST_ABSOLUTE pidl;
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-	if (S_OK == SHGetKnownFolderIDList(KnownFolderId_ComputerFolder, KF_FLAG_DEFAULT, nullptr, &pidl))
+	if (S_OK == SHGetKnownFolderIDList(FOLDERID_ComputerFolder, KF_FLAG_DEFAULT, nullptr, &pidl))
 #else
 	if (S_OK == SHGetFolderLocation(hwnd, CSIDL_DRIVES, nullptr, SHGFP_TYPE_DEFAULT, &pidl))
 #endif
