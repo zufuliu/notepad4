@@ -43,6 +43,7 @@ Checks: [
     -misc-include-cleaner,
     -misc-non-private-member-variables-in-classes,
     -misc-use-anonymous-namespace,
+    -misc-use-internal-linkage,
     # -modernize-return-braced-init-list,
     # -modernize-use-auto,
     # -modernize-use-default-member-init,

@@ -71,7 +71,7 @@ def update_all_copyright_year():
 	for path in glob.glob('../locale/*/*.rc'):
 		update_copyright_year(path, year)
 
-def dump_static_linked_function(path):
+def dump_static_linked_function(path, dumpAll=True):
 	result = {}
 	with open(path, encoding='utf-8') as fd:
 		for line in fd.readlines():
@@ -79,7 +79,7 @@ def dump_static_linked_function(path):
 				items = line.split()
 				func = items[1]
 				obj = items[-1]
-				if items[3] == 'f' and '<lambda_' not in func and items[4] != 'i':
+				if dumpAll or (items[3] == 'f' and '<lambda_' not in func and items[4] != 'i'):
 					if obj in result:
 						result[obj].append(func)
 					else:
@@ -185,7 +185,9 @@ def generate_compile_commands(target, avx2=False, cxx=False):
 #update_all_project_toolset()
 #update_all_copyright_year()
 #dump_static_linked_function('bin/Release/x64/matepath.map')
+#dump_static_linked_function('bin/Release/Win32/matepath.map')
 #dump_static_linked_function('bin/Release/x64/Notepad4.map')
+#dump_static_linked_function('bin/Release/Win32/Notepad4.map')
 generate_compile_commands('x86_64-pc-windows-msvc', cxx=True)
 #generate_compile_commands('x86_64-w64-windows-gnu')
 #run-clang-tidy --quiet -j4 1>tidy.log
