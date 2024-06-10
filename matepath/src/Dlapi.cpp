@@ -102,7 +102,7 @@ void DirList_Destroy(HWND hwnd) {
 	lpdl->worker.Destroy();
 
 	if (lpdl->pidl) {
-		CoTaskMemFree((LPVOID)(lpdl->pidl));
+		CoTaskMemFree(lpdl->pidl);
 	}
 
 	if (lpdl->lpsf) {
@@ -224,7 +224,7 @@ int DirList_Fill(HWND hwnd, LPCWSTR lpszDir, DWORD grfFlags, LPCWSTR lpszFileSpe
 	} // SHGetDesktopFolder()
 
 	if (lpdl->pidl) {
-		CoTaskMemFree((LPVOID)(lpdl->pidl));
+		CoTaskMemFree(lpdl->pidl);
 	}
 
 	if (lpdl->lpsf) {
@@ -382,7 +382,7 @@ bool DirList_DeleteItem(HWND hwnd, LPARAM lParam) {
 	if (ListView_GetItem(hwnd, &lvi)) {
 		// Free mem
 		LPLV_ITEMDATA lplvid = (LPLV_ITEMDATA)lvi.lParam;
-		CoTaskMemFree((LPVOID)(lplvid->pidl));
+		CoTaskMemFree(lplvid->pidl);
 		lplvid->lpsf->Release();
 		CoTaskMemFree(lplvid);
 		return true;
@@ -858,7 +858,7 @@ int DriveBox_Fill(HWND hwnd) {
 
 				lpsf->Release();
 			} // IShellFolder::BindToObject()
-			CoTaskMemFree((LPVOID)pidl);
+			CoTaskMemFree(pidl);
 		} // SHGetDesktopFolder()
 
 		lpsfDesktop->Release();
@@ -994,7 +994,7 @@ bool DriveBox_DeleteItem(HWND hwnd, LPARAM lParam) {
 	LPDC_ITEMDATA lpdcid = (LPDC_ITEMDATA)cbei.lParam;
 
 	// Free pidl
-	CoTaskMemFree((LPVOID)(lpdcid->pidl));
+	CoTaskMemFree(lpdcid->pidl);
 	// Release lpsf
 	lpdcid->lpsf->Release();
 	// Free lpdcid itself

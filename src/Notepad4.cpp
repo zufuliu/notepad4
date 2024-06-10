@@ -7066,7 +7066,7 @@ void UpdateStatusbar() noexcept {
 		tchSelChar, tchSelByte, tchLinesSelected, tchMatchesCount);
 
 	LPCWSTR items[StatusItem_ItemCount];
-	memset(NP2_void_pointer(&items[0]), 0, StatusItem_Lexer * sizeof(LPCWSTR));
+	memset(NP2_void_pointer(items), 0, StatusItem_Lexer * sizeof(LPCWSTR));
 	LPWSTR start = itemText;
 	UINT index = 0;
 	for (int i = 0; i < len; i++) {

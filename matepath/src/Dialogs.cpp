@@ -121,7 +121,7 @@ bool GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase
 	PIDLIST_ABSOLUTE pidl = SHBrowseForFolder(&bi);
 	if (pidl) {
 		SHGetPathFromIDList(pidl, pszFolder);
-		CoTaskMemFree((LPVOID)pidl);
+		CoTaskMemFree(pidl);
 		return true;
 	}
 
@@ -166,10 +166,10 @@ bool GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, int iBase) noe
 	const bool fOk = pidl != nullptr;
 	if (fOk) {
 		SHGetPathFromIDList(pidl, pszFolder);
-		CoTaskMemFree((LPVOID)pidl);
+		CoTaskMemFree(pidl);
 	}
 
-	CoTaskMemFree((LPVOID)pidlRoot);
+	CoTaskMemFree(pidlRoot);
 	return fOk;
 }
 
@@ -1333,16 +1333,16 @@ INT_PTR OptionsPropSheet(HWND hwnd, HINSTANCE hInstance) noexcept {
 	nResult = PropertySheet(&psh);
 
 	if (psp[0].pResource) {
-		NP2HeapFree((LPVOID)psp[0].pResource);
+		NP2HeapFree(const_cast<DLGTEMPLATE *>(psp[0].pResource));
 	}
 	if (psp[1].pResource) {
-		NP2HeapFree((LPVOID)psp[1].pResource);
+		NP2HeapFree(const_cast<DLGTEMPLATE *>(psp[1].pResource));
 	}
 	if (psp[2].pResource) {
-		NP2HeapFree((LPVOID)psp[2].pResource);
+		NP2HeapFree(const_cast<DLGTEMPLATE *>(psp[2].pResource));
 	}
 	if (psp[3].pResource) {
-		NP2HeapFree((LPVOID)psp[3].pResource);
+		NP2HeapFree(const_cast<DLGTEMPLATE *>(psp[3].pResource));
 	}
 
 	// Apply the results

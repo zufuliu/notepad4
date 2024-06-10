@@ -1374,13 +1374,13 @@ void OpenContainingFolder(HWND hwnd, LPCWSTR pszFile, bool bSelect) noexcept {
 		return;
 	}
 
-	PCIDLIST_ABSOLUTE pidl = ILCreateFromPath(wchDirectory);
+	PIDLIST_ABSOLUTE pidl = ILCreateFromPath(wchDirectory);
 	if (pidl) {
 		HRESULT hr;
-		PCIDLIST_ABSOLUTE pidlEntry = path ? ILCreateFromPath(path) : nullptr;
+		PIDLIST_ABSOLUTE pidlEntry = path ? ILCreateFromPath(path) : nullptr;
 		if (pidlEntry) {
 			hr = SHOpenFolderAndSelectItems(pidl, 1, (PCUITEMID_CHILD_ARRAY)(&pidlEntry), 0);
-			CoTaskMemFree((LPVOID)pidlEntry);
+			CoTaskMemFree(pidlEntry);
 		} else if (!bSelect) {
 #if 0
 			// Use an invalid item to open the folder?
@@ -1404,7 +1404,7 @@ void OpenContainingFolder(HWND hwnd, LPCWSTR pszFile, bool bSelect) noexcept {
 			// open parent folder and select the folder
 			hr = SHOpenFolderAndSelectItems(pidl, 0, nullptr, 0);
 		}
-		CoTaskMemFree((LPVOID)pidl);
+		CoTaskMemFree(pidl);
 		if (hr == S_OK) {
 			return;
 		}
@@ -1602,7 +1602,7 @@ void GetDefaultFavoritesDir(LPWSTR lpFavDir, int cchFavDir) noexcept {
 #endif
 	{
 		SHGetPathFromIDList(pidl, lpFavDir);
-		CoTaskMemFree((LPVOID)pidl);
+		CoTaskMemFree(pidl);
 	} else {
 		GetWindowsDirectory(lpFavDir, cchFavDir);
 	}
@@ -1622,7 +1622,7 @@ void GetDefaultOpenWithDir(LPWSTR lpOpenWithDir, int cchOpenWithDir) noexcept {
 #endif
 	{
 		SHGetPathFromIDList(pidl, lpOpenWithDir);
-		CoTaskMemFree((LPVOID)pidl);
+		CoTaskMemFree(pidl);
 	} else {
 		GetWindowsDirectory(lpOpenWithDir, cchOpenWithDir);
 	}

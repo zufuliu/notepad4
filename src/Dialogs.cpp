@@ -258,7 +258,7 @@ bool GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase
 	PIDLIST_ABSOLUTE pidl = SHBrowseForFolder(&bi);
 	if (pidl) {
 		SHGetPathFromIDList(pidl, pszFolder);
-		CoTaskMemFree((LPVOID)pidl);
+		CoTaskMemFree(pidl);
 		return true;
 	}
 
@@ -1145,7 +1145,7 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 
 			case LVN_GETDISPINFO: {
 				/*
-				LV_DISPINFO *lpdi = (LPVOID)lParam;
+				LV_DISPINFO *lpdi = reinterpret_cast<LV_DISPINFO *>(lParam);
 
 				if (lpdi->item.mask & LVIF_IMAGE) {
 					WCHAR tch[MAX_PATH];
