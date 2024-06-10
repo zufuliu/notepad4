@@ -50,7 +50,7 @@ INT_PTR OptionsPropSheet(HWND hwnd, HINSTANCE hInstance) noexcept;
 bool GetFilterDlg(HWND hwnd) noexcept;
 bool RenameFileDlg(HWND hwnd);
 bool CopyMoveDlg(HWND hwnd, UINT *wFunc);
-bool OpenWithDlg(HWND hwnd, LPCDLITEM lpdliParam);
+bool OpenWithDlg(HWND hwnd, const DirListItem *lpdliParam);
 bool NewDirDlg(HWND hwnd, LPWSTR pszNewDir) noexcept;
 
 INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept;

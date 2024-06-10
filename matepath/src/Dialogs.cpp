@@ -193,7 +193,7 @@ INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) 
 		MakeBitmapButton(hwnd, IDC_SEARCHEXE, g_exeInstance, IDB_OPEN_FOLDER16);
 
 		HWND hwndCtl = GetDlgItem(hwnd, IDC_COMMANDLINE);
-		DLITEM dli;
+		DirListItem dli;
 		dli.mask = DLI_FILENAME;
 		if (DirList_GetItem(hwndDirList, -1, &dli) >= 0) {
 			LPWSTR psz = PathFindFileName(dli.szFileName);
@@ -1630,7 +1630,7 @@ INT_PTR CALLBACK RenameFileDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 //
 //
 bool RenameFileDlg(HWND hwnd) {
-	DLITEM dli;
+	DirListItem dli;
 
 	dli.mask = DLI_FILENAME;
 	if (DirList_GetItem(hwndDirList, -1, &dli) < 0) {
@@ -1805,7 +1805,7 @@ INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 //
 //
 bool CopyMoveDlg(HWND hwnd, UINT *wFunc) {
-	DLITEM dli;
+	DirListItem dli;
 
 	dli.mask = DLI_FILENAME;
 	if (DirList_GetItem(hwndDirList, -1, &dli) < 0) {
@@ -1985,7 +1985,7 @@ INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 		break;
 
 		case IDOK: {
-			LPDLITEM lpdli = (LPDLITEM)GetWindowLongPtr(hwnd, DWLP_USER);
+			DirListItem *lpdli = reinterpret_cast<DirListItem *>(GetWindowLongPtr(hwnd, DWLP_USER));
 			lpdli->mask = DLI_FILENAME | DLI_TYPE;
 			lpdli->ntype = DLE_NONE;
 			DirList_GetItem(GetDlgItem(hwnd, IDC_OPENWITHDIR), (-1), lpdli);
@@ -2013,8 +2013,8 @@ INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 //  OpenWithDlg()
 //
 //
-bool OpenWithDlg(HWND hwnd, LPCDLITEM lpdliParam) {
-	DLITEM dliOpenWith;
+bool OpenWithDlg(HWND hwnd, const DirListItem *lpdliParam) {
+	DirListItem dliOpenWith;
 	dliOpenWith.mask = DLI_FILENAME;
 
 	if (IDOK == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_OPENWITH), hwnd, OpenWithDlgProc, (LPARAM)&dliOpenWith)) {

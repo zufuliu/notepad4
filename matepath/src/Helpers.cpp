@@ -1394,7 +1394,7 @@ void OpenContainingFolder(HWND hwnd, LPCWSTR pszFile, bool bSelect) noexcept {
 			sei.hwnd = hwnd;
 			//sei.lpVerb = L"explore";
 			sei.lpVerb = L"open";
-			sei.lpIDList = (void *)pidl;
+			sei.lpIDList = pidl;
 			sei.nShow = SW_SHOW;
 
 			const BOOL result = ShellExecuteEx(&sei);

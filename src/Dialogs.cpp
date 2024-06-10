@@ -674,7 +674,7 @@ static INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 		break;
 
 		case IDOK: {
-			LPDLITEM lpdli = (LPDLITEM)GetWindowLongPtr(hwnd, DWLP_USER);
+			DirListItem *lpdli = reinterpret_cast<DirListItem *>(GetWindowLongPtr(hwnd, DWLP_USER));
 			lpdli->mask = DLI_FILENAME | DLI_TYPE;
 			lpdli->ntype = DLE_NONE;
 			DirList_GetItem(GetDlgItem(hwnd, IDC_OPENWITHDIR), (-1), lpdli);
@@ -703,7 +703,7 @@ static INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 // OpenWithDlg()
 //
 bool OpenWithDlg(HWND hwnd, LPCWSTR lpstrFile) {
-	DLITEM dliOpenWith;
+	DirListItem dliOpenWith;
 	dliOpenWith.mask = DLI_FILENAME;
 
 	if (IDOK == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_OPENWITH), hwnd, OpenWithDlgProc, (LPARAM)&dliOpenWith)) {
@@ -850,7 +850,7 @@ static INT_PTR CALLBACK FavoritesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 		break;
 
 		case IDOK: {
-			LPDLITEM lpdli = (LPDLITEM)GetWindowLongPtr(hwnd, DWLP_USER);
+			DirListItem *lpdli = reinterpret_cast<DirListItem *>(GetWindowLongPtr(hwnd, DWLP_USER));
 			lpdli->mask = DLI_FILENAME | DLI_TYPE;
 			lpdli->ntype = DLE_NONE;
 			DirList_GetItem(GetDlgItem(hwnd, IDC_FAVORITESDIR), (-1), lpdli);
@@ -879,7 +879,7 @@ static INT_PTR CALLBACK FavoritesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 // FavoritesDlg()
 //
 bool FavoritesDlg(HWND hwnd, LPWSTR lpstrFile) noexcept {
-	DLITEM dliFavorite;
+	DirListItem dliFavorite;
 	dliFavorite.mask = DLI_FILENAME;
 
 	if (IDOK == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_FAVORITES), hwnd, FavoritesDlgProc, (LPARAM)&dliFavorite)) {

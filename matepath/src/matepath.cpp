@@ -595,7 +595,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		// Check Change Notification Handle
 		if (WAIT_OBJECT_0 == WaitForSingleObject(hChangeHandle, 0)) {
 			// Store information about currently selected item
-			DLITEM dli;
+			DirListItem dli;
 			dli.mask = DLI_ALL;
 			dli.ntype = DLE_NONE;
 			DirList_GetItem(hwndDirList, -1, &dli);
@@ -1198,7 +1198,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	HMENU hmenu = (HMENU)wParam;
 
 	int i = ListView_GetSelectedCount(hwndDirList);
-	DLITEM dli;
+	DirListItem dli;
 	dli.mask = DLI_TYPE;
 	dli.ntype = DLE_NONE;
 	DirList_GetItem(hwndDirList, -1, &dli);
@@ -1268,7 +1268,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_FILE_OPENSAME:
 	case IDM_FILE_OPENNEW: {
-		DLITEM dli = { DLI_ALL, DLE_NONE, L"", L"" };
+		DirListItem dli = { DLI_ALL, DLE_NONE, L"", L"" };
 		DirList_GetItem(hwndDirList, -1, &dli);
 
 		switch (dli.ntype) {
@@ -1309,7 +1309,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			return 0;
 		}
 
-		DLITEM dli;
+		DirListItem dli;
 		dli.mask = DLI_FILENAME;
 		if (DirList_GetItem(hwndDirList, -1, &dli) < 0) {
 			break;
@@ -1336,7 +1336,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			return 0;
 		}
 
-		DLITEM dli;
+		DirListItem dli;
 		dli.mask = DLI_FILENAME;
 		if (DirList_GetItem(hwndDirList, -1, &dli) < 0) {
 			break;
@@ -1377,7 +1377,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			return 0;
 		}
 
-		DLITEM dli;
+		DirListItem dli;
 		dli.mask = DLI_FILENAME;
 		if (DirList_GetItem(hwndDirList, -1, &dli) < 0) {
 			break;
@@ -1465,7 +1465,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_FILE_CREATELINK: {
 		WCHAR tchLinkDestination[MAX_PATH];
 
-		DLITEM dli;
+		DirListItem dli;
 		dli.mask = DLI_FILENAME;
 		if (DirList_GetItem(hwndDirList, -1, &dli) < 0) {
 			break;
@@ -1485,7 +1485,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			return 0;
 		}
 
-		DLITEM dli;
+		DirListItem dli;
 		dli.mask = DLI_ALL;
 		if (DirList_GetItem(hwndDirList, -1, &dli) < 0) {
 			break;
@@ -1558,7 +1558,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_FILE_DELETE:
 	case IDM_FILE_DELETE2:
 	case IDM_FILE_DELETE3: {
-		DLITEM dli;
+		DirListItem dli;
 		dli.mask = DLI_ALL;
 
 		int iItem = DirList_GetItem(hwndDirList, -1, &dli);
@@ -1634,7 +1634,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_FILE_EXPLORER: {
 		if (ListView_GetSelectedCount(hwndDirList)) {
-			DLITEM dli;
+			DirListItem dli;
 			dli.mask = DLI_FILENAME;
 			DirList_GetItem(hwndDirList, -1, &dli);
 			OpenContainingFolder(hwnd, dli.szFileName, true);
@@ -1691,7 +1691,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_VIEW_FILTER:
 		if (GetFilterDlg(hwnd)) {
 			// Store information about currently selected item
-			DLITEM dli;
+			DirListItem dli;
 			dli.mask = DLI_ALL;
 			dli.ntype = DLE_NONE;
 			DirList_GetItem(hwndDirList, -1, &dli);
@@ -1713,7 +1713,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			bNegFilter = false;
 
 			// Store information about currently selected item
-			DLITEM dli;
+			DirListItem dli;
 			dli.mask = DLI_ALL;
 			dli.ntype = DLE_NONE;
 			DirList_GetItem(hwndDirList, -1, &dli);
@@ -1832,7 +1832,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_POP_COPY_PATHNAME:
 	case IDM_POP_COPY_FILENAME: {
-		DLITEM dli;
+		DirListItem dli;
 		dli.mask = DLI_FILENAME;
 		DirList_GetItem(hwndDirList, -1, &dli);
 
@@ -1886,7 +1886,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case ACC_GOTOTARGET: {
-		DLITEM dli = { DLI_ALL, DLE_NONE, L"", L"" };
+		DirListItem dli = { DLI_ALL, DLE_NONE, L"", L"" };
 		DirList_GetItem(hwndDirList, -1, &dli);
 
 		if (dli.ntype == DLE_FILE) {
@@ -1995,7 +1995,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		const int iItem = ListView_GetNextItem(hwndDirList, -1, LVNI_ALL | LVNI_FOCUSED);
 		const int d = ListView_GetSelectedCount(hwndDirList) ? 1 : 0;
 
-		DLITEM dli;
+		DirListItem dli;
 		dli.ntype = DLE_NONE;
 		dli.mask = DLI_TYPE | DLI_FILENAME;
 
@@ -2031,7 +2031,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		const int iItem = ListView_GetNextItem(hwndDirList, -1, LVNI_ALL | LVNI_FOCUSED);
 		const int d = (ListView_GetSelectedCount(hwndDirList) || iItem == 0) ? 1 : 0;
 
-		DLITEM dli;
+		DirListItem dli;
 		dli.ntype = DLE_NONE;
 		dli.mask = DLI_TYPE | DLI_FILENAME;
 
@@ -2158,7 +2158,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				WCHAR tch[64];
 				if ((pnmlv->uNewState & LVIS_SELECTED)) {
 					WIN32_FIND_DATA fd;
-					DLITEM dli;
+					DirListItem dli;
 					dli.mask  = DLI_FILENAME;
 					dli.ntype = DLE_NONE;
 					DirList_GetItem(hwndDirList, -1, &dli);
