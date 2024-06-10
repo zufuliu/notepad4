@@ -264,7 +264,7 @@ LSTATUS Registry_SetString(HKEY hKey, LPCWSTR valueName, LPCWSTR lpszText) noexc
 #if _WIN32_WINNT < _WIN32_WINNT_VISTA
 LSTATUS Registry_DeleteTree(HKEY hKey, LPCWSTR lpSubKey) noexcept {
 	using RegDeleteTreeSig = LSTATUS (WINAPI *)(HKEY hKey, LPCWSTR lpSubKey);
-	RegDeleteTreeSig pfnRegDeleteTree = DLLFunctionEx(RegDeleteTreeSig, L"advapi32.dll", "RegDeleteTreeW");
+	RegDeleteTreeSig pfnRegDeleteTree = DLLFunctionEx<RegDeleteTreeSig>(L"advapi32.dll", "RegDeleteTreeW");
 
 	LSTATUS status;
 	if (pfnRegDeleteTree != nullptr) {
@@ -420,7 +420,7 @@ HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(LPCWSTR AppID) noexcept {
 #else
 	using SetCurrentProcessExplicitAppUserModelIDSig = HRESULT (WINAPI *)(LPCWSTR AppID);
 	SetCurrentProcessExplicitAppUserModelIDSig pfnSetCurrentProcessExplicitAppUserModelID =
-		DLLFunctionEx(SetCurrentProcessExplicitAppUserModelIDSig, L"shell32.dll", "SetCurrentProcessExplicitAppUserModelID");
+		DLLFunctionEx<SetCurrentProcessExplicitAppUserModelIDSig>(L"shell32.dll", "SetCurrentProcessExplicitAppUserModelID");
 	if (pfnSetCurrentProcessExplicitAppUserModelID) {
 		return pfnSetCurrentProcessExplicitAppUserModelID(AppID);
 	}
@@ -1119,7 +1119,7 @@ bool PathGetRealPath(HANDLE hFile, LPCWSTR lpszSrc, LPWSTR lpszDest) noexcept {
 			using GetFinalPathNameByHandleSig = DWORD (WINAPI *)(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, DWORD dwFlags);
 			static GetFinalPathNameByHandleSig pfnGetFinalPathNameByHandle = nullptr;
 			if (pfnGetFinalPathNameByHandle == nullptr) {
-				pfnGetFinalPathNameByHandle = DLLFunctionEx(GetFinalPathNameByHandleSig, L"kernel32.dll", "GetFinalPathNameByHandleW");
+				pfnGetFinalPathNameByHandle = DLLFunctionEx<GetFinalPathNameByHandleSig>(L"kernel32.dll", "GetFinalPathNameByHandleW");
 			}
 			DWORD cch = pfnGetFinalPathNameByHandle(hFile, path, COUNTOF(path), FILE_NAME_OPENED);
 #endif

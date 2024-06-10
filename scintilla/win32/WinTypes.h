@@ -42,17 +42,10 @@ struct UnknownReleaser {
 /// This avoids undefined and conditionally defined behaviour.
 template<typename T>
 inline T DLLFunction(HMODULE hModule, LPCSTR lpProcName) noexcept {
-#if 1
-#if (defined(__GNUC__) && __GNUC__ >= 8) || (defined(__clang__) && __clang_major__ >= 18)
-	#pragma GCC diagnostic push
-	#pragma GCC diagnostic ignored "-Wcast-function-type"
-	return reinterpret_cast<T>(::GetProcAddress(hModule, lpProcName));
-	#pragma GCC diagnostic pop
-#else
-	return reinterpret_cast<T>(::GetProcAddress(hModule, lpProcName));
-#endif
-#else
 	FARPROC function = ::GetProcAddress(hModule, lpProcName);
+#if defined(__clang__) || defined(__GNUC__) || (_MSC_VER >= 1926)
+	return __builtin_bit_cast(T, function);
+#else
 	static_assert(sizeof(T) == sizeof(function));
 	T fp {};
 	memcpy(&fp, &function, sizeof(T));

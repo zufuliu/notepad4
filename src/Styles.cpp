@@ -3274,7 +3274,7 @@ BOOL Style_StrGetLocale(LPCWSTR lpszStyle, LPWSTR lpszLocale, int cchLocale) noe
 		return IsValidLocaleName(lpszLocale);
 #else
 		using IsValidLocaleNameSig = BOOL (WINAPI *)(LPCWSTR lpLocaleName);
-		IsValidLocaleNameSig pfnIsValidLocaleName = DLLFunctionEx(IsValidLocaleNameSig, L"kernel32.dll", "IsValidLocaleName");
+		IsValidLocaleNameSig pfnIsValidLocaleName = DLLFunctionEx<IsValidLocaleNameSig>(L"kernel32.dll", "IsValidLocaleName");
 		if (pfnIsValidLocaleName != nullptr) {
 			return pfnIsValidLocaleName(lpszLocale);
 		}

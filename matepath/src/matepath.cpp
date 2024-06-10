@@ -3889,12 +3889,12 @@ void SnapToDefaultPos(HWND hwnd) noexcept {
 // scintilla\win32\PlatWin.cxx
 static void LoadDpiForWindow() noexcept {
 	HMODULE user32 = GetModuleHandleW(L"user32.dll");
-	fnGetDpiForWindow = DLLFunction(GetDpiForWindowSig, user32, "GetDpiForWindow");
-	fnGetSystemMetricsForDpi = DLLFunction(GetSystemMetricsForDpiSig, user32, "GetSystemMetricsForDpi");
-	fnAdjustWindowRectExForDpi = DLLFunction(AdjustWindowRectExForDpiSig, user32, "AdjustWindowRectExForDpi");
+	fnGetDpiForWindow = DLLFunction<GetDpiForWindowSig>(user32, "GetDpiForWindow");
+	fnGetSystemMetricsForDpi = DLLFunction<GetSystemMetricsForDpiSig>(user32, "GetSystemMetricsForDpi");
+	fnAdjustWindowRectExForDpi = DLLFunction<AdjustWindowRectExForDpiSig>(user32, "AdjustWindowRectExForDpi");
 
 	using GetDpiForSystemSig = UINT (WINAPI *)(void);
-	GetDpiForSystemSig fnGetDpiForSystem = DLLFunction(GetDpiForSystemSig, user32, "GetDpiForSystem");
+	GetDpiForSystemSig fnGetDpiForSystem = DLLFunction<GetDpiForSystemSig>(user32, "GetDpiForSystem");
 	if (fnGetDpiForSystem) {
 		g_uSystemDPI = fnGetDpiForSystem();
 	} else {
@@ -3906,7 +3906,7 @@ static void LoadDpiForWindow() noexcept {
 	if (!fnGetDpiForWindow) {
 		hShcoreDLL = LoadLibraryExW(L"shcore.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
 		if (hShcoreDLL) {
-			fnGetDpiForMonitor = DLLFunction(GetDpiForMonitorSig, hShcoreDLL, "GetDpiForMonitor");
+			fnGetDpiForMonitor = DLLFunction<GetDpiForMonitorSig>(hShcoreDLL, "GetDpiForMonitor");
 		}
 	}
 }

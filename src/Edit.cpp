@@ -95,7 +95,7 @@ wcsftimeSig GetFunctionPointer_wcsftime() noexcept {
 			hCrtDLL = LoadLibraryExW(L"msvcrt.dll", nullptr, kSystemLibraryLoadFlags);
 		}
 	}
-	return DLLFunction(wcsftimeSig, hCrtDLL, "wcsftime");
+	return DLLFunction<wcsftimeSig>(hCrtDLL, "wcsftime");
 }
 #endif
 
@@ -1440,10 +1440,10 @@ using MappingFreePropertyBagSig = HRESULT (WINAPI *)(PMAPPING_PROPERTY_BAG pBag)
 		triedLoadingELSCore = 1;
 		hELSCoreDLL = LoadLibraryExW(L"elscore.dll", nullptr, kSystemLibraryLoadFlags);
 		if (hELSCoreDLL != nullptr) {
-			pfnMappingGetServices = DLLFunction(MappingGetServicesSig, hELSCoreDLL, "MappingGetServices");
-			pfnMappingFreeServices = DLLFunction(MappingFreeServicesSig, hELSCoreDLL, "MappingFreeServices");
-			pfnMappingRecognizeText = DLLFunction(MappingRecognizeTextSig, hELSCoreDLL, "MappingRecognizeText");
-			pfnMappingFreePropertyBag = DLLFunction(MappingFreePropertyBagSig, hELSCoreDLL, "MappingFreePropertyBag");
+			pfnMappingGetServices = DLLFunction<MappingGetServicesSig>(hELSCoreDLL, "MappingGetServices");
+			pfnMappingFreeServices = DLLFunction<MappingFreeServicesSig>(hELSCoreDLL, "MappingFreeServices");
+			pfnMappingRecognizeText = DLLFunction<MappingRecognizeTextSig>(hELSCoreDLL, "MappingRecognizeText");
+			pfnMappingFreePropertyBag = DLLFunction<MappingFreePropertyBagSig>(hELSCoreDLL, "MappingFreePropertyBag");
 			if (pfnMappingGetServices == nullptr || pfnMappingFreeServices == nullptr || pfnMappingRecognizeText == nullptr || pfnMappingFreePropertyBag == nullptr) {
 				FreeLibrary(hELSCoreDLL);
 				hELSCoreDLL = nullptr;

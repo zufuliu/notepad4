@@ -635,7 +635,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 #if _WIN32_WINNT < _WIN32_WINNT_WIN8
 	// see LoadD2D() in PlatWin.cxx
-	kSystemLibraryLoadFlags = (DLLFunctionEx(FARPROC, L"kernel32.dll", "SetDefaultDllDirectories") != nullptr) ? LOAD_LIBRARY_SEARCH_SYSTEM32 : 0;
+	kSystemLibraryLoadFlags = (DLLFunctionEx<FARPROC>(L"kernel32.dll", "SetDefaultDllDirectories") != nullptr) ? LOAD_LIBRARY_SEARCH_SYSTEM32 : 0;
 #endif
 
 #if NP2_ENABLE_APP_LOCALIZATION_DLL

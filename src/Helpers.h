@@ -295,26 +295,23 @@ extern WCHAR szIniFile[MAX_PATH];
 #define LOAD_LIBRARY_AS_IMAGE_RESOURCE	0x00000020
 #endif
 
-#if (defined(__GNUC__) && __GNUC__ >= 8) || (defined(__clang__) && __clang_major__ >= 18)
-// GCC statement expression
-#define DLLFunction(funcSig, hModule, funcName) __extension__({			\
-	_Pragma("GCC diagnostic push")										\
-	_Pragma("GCC diagnostic ignored \"-Wcast-function-type\"")			\
-	funcSig PP_CONCAT(temp, __LINE__) = (funcSig)GetProcAddress((hModule), (funcName));\
-	_Pragma("GCC diagnostic pop")										\
-	PP_CONCAT(temp, __LINE__);											\
-	})
-#define DLLFunctionEx(funcSig, dllName, funcName) __extension__({		\
-	_Pragma("GCC diagnostic push")										\
-	_Pragma("GCC diagnostic ignored \"-Wcast-function-type\"")			\
-	funcSig PP_CONCAT(temp, __LINE__) = (funcSig)GetProcAddress(GetModuleHandleW(dllName), (funcName));\
-	_Pragma("GCC diagnostic pop")										\
-	PP_CONCAT(temp, __LINE__);											\
-	})
+template<typename T>
+inline T DLLFunction(HMODULE hModule, LPCSTR lpProcName) noexcept {
+	FARPROC function = ::GetProcAddress(hModule, lpProcName);
+#if defined(__clang__) || defined(__GNUC__) || (_MSC_VER >= 1926)
+	return __builtin_bit_cast(T, function);
 #else
-#define DLLFunction(funcSig, hModule, funcName)		(funcSig)GetProcAddress((hModule), (funcName))
-#define DLLFunctionEx(funcSig, dllName, funcName)	(funcSig)GetProcAddress(GetModuleHandleW(dllName), (funcName))
+	static_assert(sizeof(T) == sizeof(function));
+	T fp {};
+	memcpy(&fp, &function, sizeof(T));
+	return fp;
 #endif
+}
+
+template<typename T>
+inline T DLLFunctionEx(LPCWSTR lpDllName, LPCSTR lpProcName) noexcept {
+	return DLLFunction<T>(::GetModuleHandleW(lpDllName), lpProcName);
+}
 
 #ifndef SEE_MASK_NOZONECHECKS
 #define SEE_MASK_NOZONECHECKS		0x00800000		// NTDDI_VERSION >= NTDDI_WINXPSP1
