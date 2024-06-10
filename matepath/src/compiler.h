@@ -5,22 +5,9 @@
 // suppress clang-tidy [bugprone-multi-level-implicit-pointer-conversion] warning
 #define NP2_void_pointer(expr)		(reinterpret_cast<void *>(expr))
 
-#if (defined(__GNUC__) || defined(__clang__)) && !defined(__cplusplus)
-// https://stackoverflow.com/questions/19452971/array-size-macro-that-rejects-pointers
-// trigger error for pointer: GCC: void value not ignored as it ought to be. Clang: invalid operands to binary expression.
-#define COUNTOF(ar)	_Generic(&(ar), __typeof__((ar)[0]) **: (void)0, default: _countof(ar))
-// trigger warning for non-literal string: GCC: division by zero [-Wdiv-by-zero]. Clang: division by zero is undefined [-Wdivision-by-zero].
-#if !defined(__clang__)
-#define CSTRLEN(s)	(__builtin_constant_p(s) ? (_countof(s) - 1) : (1 / 0))
-#else
-// Clang complains when above CSTRLEN() is used in certain macros, such as EDITLEXER_HOLE()
-#define CSTRLEN(s)	(COUNTOF(s) - 1)
-#endif
-#else
-// C++ template based version of _countof(), or plain old unsafe version
+// C++ template based version of _countof()
 #define COUNTOF(ar)	_countof(ar)
 #define CSTRLEN(s)	(_countof(s) - 1)
-#endif
 
 // https://docs.microsoft.com/en-us/cpp/preprocessor/pragma-directives-and-the-pragma-keyword
 #if defined(__GNUC__) || defined(__clang__)
