@@ -603,7 +603,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 		}
 
 		// handle the start of ASP pre-processor = Non-HTML
-		else if (!isCommentASPState(state) && (ch == '<') && (chNext == '%')) {
+		else if (state != SCE_H_CDATA && !isCommentASPState(state) && (ch == '<') && (chNext == '%')) {
 			styler.ColorTo(i, StateToPrint);
 			beforePreProc = state;
 			if (inScriptType == eNonHtmlScript)
