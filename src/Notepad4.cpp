@@ -5342,7 +5342,7 @@ void LoadSettings() noexcept {
 
 	//const int iSettingsVersion = section.GetInt(L"SettingsVersion", NP2SettingsVersion_Current);
 	bSaveSettings = section.GetBool(L"SaveSettings", true);
-	// TODO: sort loading order by item frequency to reduce IniSectionUnsafeGetValue() calls
+	// TODO: sort loading order by item frequency to reduce UnsafeGetValue() calls
 	LPCWSTR strValue = section.GetValue(L"OpenWithDir");
 	if (StrIsEmpty(strValue)) {
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
@@ -6647,7 +6647,7 @@ void LoadFlags() noexcept {
 	flagRelativeFileMRU = section.GetBool(L"RelativeFileMRU", true);
 	flagPortableMyDocs = section.GetBool(L"PortableMyDocs", flagRelativeFileMRU);
 
-	section.GetString(L"DefaultDirectory", L"", tchDefaultDir, COUNTOF(tchDefaultDir));
+	section.GetString(L"DefaultDirectory", L"", tchDefaultDir);
 
 	dwFileCheckInterval = section.GetInt(L"FileCheckInterval", 1000);
 	dwAutoReloadTimeout = section.GetInt(L"AutoReloadTimeout", 1000);

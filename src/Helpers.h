@@ -489,9 +489,9 @@ struct IniSectionParser {
 	bool GetBool(const wchar_t (&key)[N], bool bDefault) noexcept {
 		return GetBoolImpl(key, static_cast<int>(N - 1), bDefault);
 	}
-	template <size_t N>
-	void GetString(const wchar_t (&key)[N], LPCWSTR lpDefault, LPWSTR lpReturnedString, int cchReturnedString) noexcept {
-		GetStringImpl(key, static_cast<int>(N - 1), lpDefault, lpReturnedString, cchReturnedString);
+	template <size_t N, size_t M>
+	void GetString(const wchar_t (&key)[N], LPCWSTR lpDefault, wchar_t (&lpReturnedString)[M]) noexcept {
+		GetStringImpl(key, static_cast<int>(N - 1), lpDefault, lpReturnedString, static_cast<int>(M));
 	}
 };
 

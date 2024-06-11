@@ -2508,10 +2508,10 @@ void LoadSettings() noexcept {
 	section.Parse(pIniSectionBuf);
 
 	bSaveSettings = section.GetBool(L"SaveSettings", true);
-	// TODO: sort loading order by item frequency to reduce IniSectionUnsafeGetValue() calls
+	// TODO: sort loading order by item frequency to reduce UnsafeGetValue() calls
 	int iValue = section.GetInt(L"StartupDirectory", StartupDirectory_MRU);
 	iStartupDir = clamp(static_cast<StartupDirectory>(iValue), StartupDirectory_None, StartupDirectory_Favorite);
-	section.GetString(L"MRUDirectory", L"", szMRUDirectory, COUNTOF(szMRUDirectory));
+	section.GetString(L"MRUDirectory", L"", szMRUDirectory);
 
 	LPCWSTR strValue = section.GetValue(L"OpenWithDir");
 	if (StrIsEmpty(strValue)) {
@@ -2553,7 +2553,7 @@ void LoadSettings() noexcept {
 	}
 
 	bHasQuickview = PathIsFile(szQuickview);
-	section.GetString(L"QuikviewParams", L"", szQuickviewParams, COUNTOF(szQuickviewParams));
+	section.GetString(L"QuikviewParams", L"", szQuickviewParams);
 
 	POINT pt;
 	pt.x = section.GetInt(L"WindowPosX", 0);
@@ -3627,14 +3627,14 @@ void LoadLaunchSetings() noexcept {
 	int iValue = section.GetInt(L"UseTargetApplication", UseTargetApplication_NotSet);
 	if (iValue != UseTargetApplication_NotSet) {
 		iUseTargetApplication = (UseTargetApplication)iValue;
-		section.GetString(L"TargetApplicationPath", szTargetApplication, szTargetApplication, COUNTOF(szTargetApplication));
-		section.GetString(L"TargetApplicationParams", szTargetApplicationParams, szTargetApplicationParams, COUNTOF(szTargetApplicationParams));
+		section.GetString(L"TargetApplicationPath", szTargetApplication, szTargetApplication);
+		section.GetString(L"TargetApplicationParams", szTargetApplicationParams, szTargetApplicationParams);
 		iValue = section.GetInt(L"TargetApplicationMode", (int)iTargetApplicationMode);
 		iTargetApplicationMode = clamp(static_cast<TargetApplicationMode>(iValue), TargetApplicationMode_None, TargetApplicationMode_UseDDE);
-		section.GetString(L"TargetApplicationWndClass", szTargetApplicationWndClass, szTargetApplicationWndClass, COUNTOF(szTargetApplicationWndClass));
-		section.GetString(L"DDEMessage", szDDEMsg, szDDEMsg, COUNTOF(szDDEMsg));
-		section.GetString(L"DDEApplication", szDDEApp, szDDEApp, COUNTOF(szDDEApp));
-		section.GetString(L"DDETopic", szDDETopic, szDDETopic, COUNTOF(szDDETopic));
+		section.GetString(L"TargetApplicationWndClass", szTargetApplicationWndClass, szTargetApplicationWndClass);
+		section.GetString(L"DDEMessage", szDDEMsg, szDDEMsg);
+		section.GetString(L"DDEApplication", szDDEApp, szDDEApp);
+		section.GetString(L"DDETopic", szDDETopic, szDDETopic);
 	} else if (iUseTargetApplication != UseTargetApplication_None && StrIsEmpty(szTargetApplication)) {
 		iUseTargetApplication = UseTargetApplication_Use;
 		iTargetApplicationMode = TargetApplicationMode_SendMsg;

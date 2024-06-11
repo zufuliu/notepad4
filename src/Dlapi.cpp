@@ -44,7 +44,7 @@ struct DLDATA {
 
 //==== Property Name ==========================================================
 static const WCHAR *pDirListProp = L"DirListData";
-
+// same as ILNext()
 static inline LPCITEMIDLIST IL_Next(LPCITEMIDLIST pidl) noexcept {
 	return reinterpret_cast<LPCITEMIDLIST>(reinterpret_cast<const char *>(pidl) + pidl->mkid.cb);
 }
