@@ -107,7 +107,7 @@ class HanjaDic {
 			hr = CoCreateInstance(CLSID_HanjaDic, nullptr,
 				//CLSCTX_INPROC_SERVER, __uuidof(IHanjaDic),
 				CLSCTX_INPROC_SERVER, IID_IHanjaDic,
-				reinterpret_cast<LPVOID *>(&instance));
+				AsPPVArgs(&instance));
 			if (SUCCEEDED(hr)) {
 				HJinterface.reset(instance);
 				hr = instance->OpenMainDic();

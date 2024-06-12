@@ -187,7 +187,7 @@ int DirList_Fill(HWND hwnd, LPCWSTR lpszDir, DWORD grfFlags, LPCWSTR lpszFileSpe
 		ULONG dwAttributes = 0;
 		if (S_OK == lpsfDesktop->ParseDisplayName(hwnd, nullptr, wszDir, &chParsed, &pidl, &dwAttributes)) {
 			// Bind pidl to IShellFolder
-			if (S_OK == lpsfDesktop->BindToObject(pidl, nullptr, IID_IShellFolder, reinterpret_cast<void **>(&lpsf))) {
+			if (S_OK == lpsfDesktop->BindToObject(pidl, nullptr, IID_IShellFolder, AsPPVArgs(&lpsf))) {
 				// Create an Enumeration object for lpsf
 				LPENUMIDLIST lpe = nullptr;
 				if (S_OK == lpsf->EnumObjects(hwnd, grfFlags, &lpe)) {
@@ -279,7 +279,7 @@ DWORD WINAPI DirList_IconThread(LPVOID lpParam) {
 
 	// Get IShellIcon
 	IShellIcon *lpshi;
-	lpdl->lpsf->QueryInterface(IID_IShellIcon, reinterpret_cast<void **>(&lpshi));
+	lpdl->lpsf->QueryInterface(IID_IShellIcon, AsPPVArgs(&lpshi));
 
 	int iItem = 0;
 	while (iItem < iMaxItem && worker.Continue()) {
@@ -563,7 +563,7 @@ bool DirList_PropertyDlg(HWND hwnd, int iItem) {
 	LV_ITEMDATA *lplvid = reinterpret_cast<LV_ITEMDATA *>(lvi.lParam);
 	LPCONTEXTMENU lpcm;
 
-	if (S_OK == lplvid->lpsf->GetUIObjectOf(GetParent(hwnd), 1, (PCUITEMID_CHILD_ARRAY)(&lplvid->pidl), IID_IContextMenu, nullptr, reinterpret_cast<void **>(&lpcm))) {
+	if (S_OK == lplvid->lpsf->GetUIObjectOf(GetParent(hwnd), 1, (PCUITEMID_CHILD_ARRAY)(&lplvid->pidl), IID_IContextMenu, nullptr, AsPPVArgs(&lpcm))) {
 		CMINVOKECOMMANDINFO cmi;
 		cmi.cbSize = sizeof(CMINVOKECOMMANDINFO);
 		cmi.fMask = 0;
@@ -762,7 +762,7 @@ int DriveBox_Fill(HWND hwnd) {
 		if (S_OK == SHGetDesktopFolder(&lpsfDesktop)) {
 			// Bind pidl to IShellFolder
 			LPSHELLFOLDER lpsf; // Workspace == CSIDL_DRIVES
-			if (S_OK == lpsfDesktop->BindToObject(pidl, nullptr, IID_IShellFolder, reinterpret_cast<void **>(&lpsf))) {
+			if (S_OK == lpsfDesktop->BindToObject(pidl, nullptr, IID_IShellFolder, AsPPVArgs(&lpsf))) {
 				// Create an Enumeration object for lpsf
 				constexpr DWORD grfFlags = SHCONTF_FOLDERS;
 				LPENUMIDLIST lpe;
@@ -914,7 +914,7 @@ bool DriveBox_PropertyDlg(HWND hwnd) {
 	const DC_ITEMDATA * const lpdcid = reinterpret_cast<const DC_ITEMDATA *>(cbei.lParam);
 	LPCONTEXTMENU lpcm;
 
-	if (S_OK == lpdcid->lpsf->GetUIObjectOf(GetParent(hwnd), 1, (PCUITEMID_CHILD_ARRAY)(&lpdcid->pidl), IID_IContextMenu, nullptr, reinterpret_cast<void **>(&lpcm))) {
+	if (S_OK == lpdcid->lpsf->GetUIObjectOf(GetParent(hwnd), 1, (PCUITEMID_CHILD_ARRAY)(&lpdcid->pidl), IID_IContextMenu, nullptr, AsPPVArgs(&lpcm))) {
 		CMINVOKECOMMANDINFO cmi;
 		cmi.cbSize = sizeof(CMINVOKECOMMANDINFO);
 		cmi.fMask = 0;

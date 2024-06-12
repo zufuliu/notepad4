@@ -1789,10 +1789,10 @@ bool PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath) {
 	WCHAR tchPath[MAX_PATH];
 	tchPath[0] = L'\0';
 
-	if (SUCCEEDED(CoCreateInstance(IID_IShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLink, reinterpret_cast<LPVOID *>(&psl)))) {
+	if (SUCCEEDED(CoCreateInstance(IID_IShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLink, AsPPVArgs(&psl)))) {
 		IPersistFile *ppf;
 
-		if (SUCCEEDED(psl->QueryInterface(IID_IPersistFile, reinterpret_cast<void **>(&ppf)))) {
+		if (SUCCEEDED(psl->QueryInterface(IID_IPersistFile, AsPPVArgs(&ppf)))) {
 			if (SUCCEEDED(ppf->Load(pszLnkFile, STGM_READ))) {
 				hr = psl->GetPath(tchPath, COUNTOF(tchPath), nullptr, 0);
 			}
@@ -1871,10 +1871,10 @@ bool PathCreateDeskLnk(LPCWSTR pszDocument) {
 
 	IShellLink *psl;
 	bool bSucceeded = false;
-	if (SUCCEEDED(CoCreateInstance(IID_IShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLink, reinterpret_cast<LPVOID *>(&psl)))) {
+	if (SUCCEEDED(CoCreateInstance(IID_IShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLink, AsPPVArgs(&psl)))) {
 		IPersistFile *ppf;
 
-		if (SUCCEEDED(psl->QueryInterface(IID_IPersistFile, reinterpret_cast<void **>(&ppf)))) {
+		if (SUCCEEDED(psl->QueryInterface(IID_IPersistFile, AsPPVArgs(&ppf)))) {
 			psl->SetPath(tchExeFile);
 			psl->SetArguments(tchArguments);
 			psl->SetDescription(tchDescription);
@@ -1914,10 +1914,10 @@ bool PathCreateFavLnk(LPCWSTR pszName, LPCWSTR pszTarget, LPCWSTR pszDir) {
 
 	IShellLink *psl;
 	bool bSucceeded = false;
-	if (SUCCEEDED(CoCreateInstance(IID_IShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLink, reinterpret_cast<LPVOID *>(&psl)))) {
+	if (SUCCEEDED(CoCreateInstance(IID_IShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLink, AsPPVArgs(&psl)))) {
 		IPersistFile *ppf;
 
-		if (SUCCEEDED(psl->QueryInterface(IID_IPersistFile, reinterpret_cast<void **>(&ppf)))) {
+		if (SUCCEEDED(psl->QueryInterface(IID_IPersistFile, AsPPVArgs(&ppf)))) {
 			psl->SetPath(pszTarget);
 			if (SUCCEEDED(ppf->Save(tchLnkFileName, TRUE))) {
 				bSucceeded = true;

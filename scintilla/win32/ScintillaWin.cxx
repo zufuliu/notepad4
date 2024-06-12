@@ -3138,7 +3138,7 @@ STDMETHODIMP FormatEnumerator::Clone(IEnumFORMATETC **ppenum) {
 	} catch (...) {
 		return E_OUTOFMEMORY;
 	}
-	return pfe->QueryInterface(IID_IEnumFORMATETC, reinterpret_cast<PVOID *>(ppenum));
+	return pfe->QueryInterface(IID_IEnumFORMATETC, AsPPVArgs(ppenum));
 }
 
 FormatEnumerator::FormatEnumerator(ULONG pos_, const CLIPFORMAT formats_[], size_t formatsLen_) {
@@ -3225,7 +3225,7 @@ STDMETHODIMP DataObject::EnumFormatEtc(DWORD dwDirection, IEnumFORMATETC **ppEnu
 
 		const CLIPFORMAT formats[] = { CF_UNICODETEXT, CF_TEXT };
 		FormatEnumerator *pfe = new FormatEnumerator(0, formats, std::size(formats));
-		return pfe->QueryInterface(IID_IEnumFORMATETC, reinterpret_cast<PVOID *>(ppEnum));
+		return pfe->QueryInterface(IID_IEnumFORMATETC, AsPPVArgs(ppEnum));
 	} catch (std::bad_alloc &) {
 		sci->errorStatus = Status::BadAlloc;
 		return E_OUTOFMEMORY;

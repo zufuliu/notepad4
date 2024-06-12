@@ -58,4 +58,11 @@ inline T DLLFunctionEx(LPCWSTR lpDllName, LPCSTR lpProcName) noexcept {
 	return DLLFunction<T>(::GetModuleHandleW(lpDllName), lpProcName);
 }
 
+// similar to IID_PPV_ARGS() but without __uuidof() check
+template <class T>
+inline void** AsPPVArgs(T** pp) noexcept {
+	static_assert(__is_base_of(IUnknown, T));
+	return reinterpret_cast<void **>(pp);
+}
+
 }

@@ -26,7 +26,6 @@ struct IUnknown;
 #define NP2_AUTOC_INIT_BUFFER_SIZE	(4096)
 
 // memory buffer
-struct WordListBuffer;
 struct WordListBuffer {
 	WordListBuffer *next;
 };
