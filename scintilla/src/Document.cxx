@@ -1700,7 +1700,7 @@ Sci::Position Document::CountCharacters(Sci::Position startPos, Sci::Position en
 }
 
 void Document::CountCharactersAndColumns(sptr_t lParam) const noexcept {
-	TextToFindFull *ft = reinterpret_cast<TextToFindFull *>(lParam);
+	TextToFindFull *ft = AsPointer<TextToFindFull *>(lParam);
 	const Sci::Position startPos = ft->chrg.cpMin;
 	const Sci::Position endPos = ft->chrg.cpMax;
 	Sci::Position count = ft->chrgText.cpMin;

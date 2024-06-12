@@ -84,7 +84,7 @@ def ParametersArgsCallname(v):
 	if param1Type:
 		castName = param1Name
 		if param1Type.endswith("*"):
-			castName = "reinterpret_cast<uintptr_t>(" + param1Name + ")"
+			castName = "AsInteger<uintptr_t>(" + param1Name + ")"
 		elif param1Type not in basicTypes:
 			castName = "static_cast<uintptr_t>(" + param1Name + ")"
 		if IsEnumeration(param1TypeBase):
@@ -252,7 +252,7 @@ def CXXMethods(f):
 				retCast = ""
 				retCastEnd = ""
 				if retType.endswith("*"):
-					retCast = "reinterpret_cast<" + retType + ">("
+					retCast = "AsPointer<" + retType + ">("
 					retCastEnd = ")"
 				elif retType not in basicTypes or retType in ["int", "Colour", "ColourAlpha"]:
 					if IsEnumeration(retType):

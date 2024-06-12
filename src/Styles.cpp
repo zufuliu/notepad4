@@ -4081,7 +4081,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 		hFontTitle = CreateFontIndirect(&lf);
 		SendDlgItemMessage(hwnd, IDC_TITLE, WM_SETFONT, (WPARAM)hFontTitle, TRUE);
 
-		StyleConfigDlgParam *param = reinterpret_cast<StyleConfigDlgParam *>(lParam);
+		StyleConfigDlgParam *param = AsPointer<StyleConfigDlgParam *>(lParam);
 		param->hFontTitle = hFontTitle;
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
 		CenterDlgInParent(hwnd);
@@ -4169,7 +4169,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 						pCurrentLexer = (PEDITLEXER)lpnmtv->itemNew.lParam;
 					} else {
 						pCurrentLexer = (PEDITLEXER)item.lParam;
-						pCurrentStyle = reinterpret_cast<EDITSTYLE *>(lpnmtv->itemNew.lParam);
+						pCurrentStyle = AsPointer<EDITSTYLE *>(lpnmtv->itemNew.lParam);
 					}
 				}
 				if (hParent == nullptr || fLexerSelected) {
@@ -4523,7 +4523,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 				break;
 
 			case IDC_PREVIEW: {
-				StyleConfigDlgParam *param = reinterpret_cast<StyleConfigDlgParam *>(GetWindowLongPtr(hwnd, DWLP_USER));
+				StyleConfigDlgParam *param = AsPointer<StyleConfigDlgParam *>(GetWindowLongPtr(hwnd, DWLP_USER));
 				param->bApply = true;
 				Style_SetLexer(pLexCurrent, false);
 			}

@@ -2,6 +2,22 @@
 // See License.txt for details about distribution and modification.
 #pragma once
 
+template <typename T, typename V>
+inline T AsPointer(V value) noexcept {
+#if defined(__clang__)
+	static_assert(__is_pointer(T) && __is_integral(V) && sizeof(V) == sizeof(nullptr));
+#endif
+	return reinterpret_cast<T>(value);
+}
+
+template <typename T, typename V>
+inline T AsInteger(V value) noexcept {
+#if defined(__clang__)
+	static_assert(__is_pointer(V) && __is_integral(T));
+#endif
+	return reinterpret_cast<T>(value);
+}
+
 // suppress clang-tidy [bugprone-multi-level-implicit-pointer-conversion] warning
 #define NP2_void_pointer(expr)		(reinterpret_cast<void *>(expr))
 

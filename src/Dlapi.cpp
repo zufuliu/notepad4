@@ -287,7 +287,7 @@ DWORD WINAPI DirList_IconThread(LPVOID lpParam) {
 		lvi.iItem = iItem;
 		lvi.mask = LVIF_PARAM;
 		if (ListView_GetItem(hwnd, &lvi)) {
-			LV_ITEMDATA *lplvid = reinterpret_cast<LV_ITEMDATA *>(lvi.lParam);
+			LV_ITEMDATA *lplvid = AsPointer<LV_ITEMDATA *>(lvi.lParam);
 			lvi.mask = LVIF_IMAGE;
 
 			if (!lpshi || S_OK != lpshi->GetIconOf((PCUITEMID_CHILD)(lplvid->pidl), GIL_FORSHELL, &lvi.iImage)) {
@@ -353,8 +353,8 @@ bool DirList_GetDispInfo(HWND hwnd, LPARAM lParam, bool bNoFadeHidden) {
 	UNREFERENCED_PARAMETER(hwnd);
 	UNREFERENCED_PARAMETER(bNoFadeHidden);
 
-	LV_DISPINFO *lpdi = reinterpret_cast<LV_DISPINFO *>(lParam);
-	LV_ITEMDATA *lplvid = reinterpret_cast<LV_ITEMDATA *>(lpdi->item.lParam);
+	LV_DISPINFO *lpdi = AsPointer<LV_DISPINFO *>(lParam);
+	LV_ITEMDATA *lplvid = AsPointer<LV_ITEMDATA *>(lpdi->item.lParam);
 
 	// SubItem 0 is handled only
 	if (lpdi->item.iSubItem != 0) {
@@ -389,7 +389,7 @@ bool DirList_DeleteItem(HWND hwnd, LPARAM lParam) {
 
 	if (ListView_GetItem(hwnd, &lvi)) {
 		// Free mem
-		LV_ITEMDATA *lplvid = reinterpret_cast<LV_ITEMDATA *>(lvi.lParam);
+		LV_ITEMDATA *lplvid = AsPointer<LV_ITEMDATA *>(lvi.lParam);
 		CoTaskMemFree(lplvid->pidl);
 		lplvid->lpsf->Release();
 		CoTaskMemFree(lplvid);
@@ -406,8 +406,8 @@ bool DirList_DeleteItem(HWND hwnd, LPARAM lParam) {
 // Compares two list items
 //
 int CALLBACK DirList_CompareProcFw(LPARAM lp1, LPARAM lp2, LPARAM lFlags) {
-	const LV_ITEMDATA * const lplvid1 = reinterpret_cast<const LV_ITEMDATA *>(lp1);
-	const LV_ITEMDATA * const lplvid2 = reinterpret_cast<const LV_ITEMDATA *>(lp2);
+	const LV_ITEMDATA * const lplvid1 = AsPointer<const LV_ITEMDATA *>(lp1);
+	const LV_ITEMDATA * const lplvid2 = AsPointer<const LV_ITEMDATA *>(lp2);
 
 	HRESULT hr = lplvid1->lpsf->CompareIDs(lFlags, (PCUIDLIST_RELATIVE)(lplvid1->pidl), (PCUIDLIST_RELATIVE)(lplvid2->pidl));
 	int result = (short)HRESULT_CODE(hr);
@@ -423,8 +423,8 @@ int CALLBACK DirList_CompareProcFw(LPARAM lp1, LPARAM lp2, LPARAM lFlags) {
 }
 
 int CALLBACK DirList_CompareProcRw(LPARAM lp1, LPARAM lp2, LPARAM lFlags) {
-	const LV_ITEMDATA * const lplvid1 = reinterpret_cast<const LV_ITEMDATA *>(lp1);
-	const LV_ITEMDATA * const lplvid2 = reinterpret_cast<const LV_ITEMDATA *>(lp2);
+	const LV_ITEMDATA * const lplvid1 = AsPointer<const LV_ITEMDATA *>(lp1);
+	const LV_ITEMDATA * const lplvid2 = AsPointer<const LV_ITEMDATA *>(lp2);
 
 	HRESULT hr = lplvid1->lpsf->CompareIDs(lFlags, (PCUIDLIST_RELATIVE)(lplvid1->pidl), (PCUIDLIST_RELATIVE)(lplvid2->pidl));
 	int result = -(short)HRESULT_CODE(hr);
@@ -476,7 +476,7 @@ int DirList_GetItem(HWND hwnd, int iItem, DirListItem *lpdli) {
 		return -1;
 	}
 
-	LV_ITEMDATA *lplvid = reinterpret_cast<LV_ITEMDATA *>(lvi.lParam);
+	LV_ITEMDATA *lplvid = AsPointer<LV_ITEMDATA *>(lvi.lParam);
 
 	// Filename
 	if (lpdli->mask & DLI_FILENAME) {
@@ -528,7 +528,7 @@ int DirList_GetItemEx(HWND hwnd, int iItem, LPWIN32_FIND_DATA pfd) noexcept {
 		return -1;
 	}
 
-	LV_ITEMDATA *lplvid = reinterpret_cast<LV_ITEMDATA *>(lvi.lParam);
+	LV_ITEMDATA *lplvid = AsPointer<LV_ITEMDATA *>(lvi.lParam);
 	if (S_OK == SHGetDataFromIDList(lplvid->lpsf, (PCUITEMID_CHILD)(lplvid->pidl), SHGDFIL_FINDDATA, pfd, sizeof(WIN32_FIND_DATA))) {
 		return iItem;
 	}
@@ -560,7 +560,7 @@ bool DirList_PropertyDlg(HWND hwnd, int iItem) {
 	}
 
 	bool bSuccess = true;
-	LV_ITEMDATA *lplvid = reinterpret_cast<LV_ITEMDATA *>(lvi.lParam);
+	LV_ITEMDATA *lplvid = AsPointer<LV_ITEMDATA *>(lvi.lParam);
 	LPCONTEXTMENU lpcm;
 
 	if (S_OK == lplvid->lpsf->GetUIObjectOf(GetParent(hwnd), 1, (PCUITEMID_CHILD_ARRAY)(&lplvid->pidl), IID_IContextMenu, nullptr, AsPPVArgs(&lpcm))) {
@@ -796,7 +796,7 @@ int DriveBox_Fill(HWND hwnd) {
 									cbei2.iItem = 0;
 
 									while ((SendMessage(hwnd, CBEM_GETITEM, 0, (LPARAM)&cbei2))) {
-										const DC_ITEMDATA * const lpdcid2 = reinterpret_cast<const DC_ITEMDATA *>(cbei2.lParam);
+										const DC_ITEMDATA * const lpdcid2 = AsPointer<const DC_ITEMDATA *>(cbei2.lParam);
 										hr = lpdcid->lpsf->CompareIDs(0, (PCUIDLIST_RELATIVE)(lpdcid->pidl), (PCUIDLIST_RELATIVE)(lpdcid2->pidl));
 										if ((short)HRESULT_CODE(hr) < 0) {
 											break;
@@ -844,7 +844,7 @@ bool DriveBox_GetSelDrive(HWND hwnd, LPWSTR lpszDrive, int nDrive, bool fNoSlash
 	cbei.mask = CBEIF_LPARAM;
 	cbei.iItem = i;
 	SendMessage(hwnd, CBEM_GETITEM, 0, (LPARAM)&cbei);
-	const DC_ITEMDATA * const lpdcid = reinterpret_cast<const DC_ITEMDATA *>(cbei.lParam);
+	const DC_ITEMDATA * const lpdcid = AsPointer<const DC_ITEMDATA *>(cbei.lParam);
 
 	// Get File System Path for Drive
 	IL_GetDisplayName(lpdcid->lpsf, lpdcid->pidl, SHGDN_FORPARSING, lpszDrive, nDrive);
@@ -876,7 +876,7 @@ bool DriveBox_SelectDrive(HWND hwnd, LPCWSTR lpszPath) {
 		// Get DC_ITEMDATA* of Item i
 		cbei.iItem = i;
 		SendMessage(hwnd, CBEM_GETITEM, 0, (LPARAM)&cbei);
-		const DC_ITEMDATA * const lpdcid = reinterpret_cast<const DC_ITEMDATA *>(cbei.lParam);
+		const DC_ITEMDATA * const lpdcid = AsPointer<const DC_ITEMDATA *>(cbei.lParam);
 
 		// Get File System Path for Drive
 		IL_GetDisplayName(lpdcid->lpsf, lpdcid->pidl, SHGDN_FORPARSING, szRoot, COUNTOF(szRoot));
@@ -911,7 +911,7 @@ bool DriveBox_PropertyDlg(HWND hwnd) {
 	cbei.mask = CBEIF_LPARAM;
 	cbei.iItem = iItem;
 	SendMessage(hwnd, CBEM_GETITEM, 0, (LPARAM)&cbei);
-	const DC_ITEMDATA * const lpdcid = reinterpret_cast<const DC_ITEMDATA *>(cbei.lParam);
+	const DC_ITEMDATA * const lpdcid = AsPointer<const DC_ITEMDATA *>(cbei.lParam);
 	LPCONTEXTMENU lpcm;
 
 	if (S_OK == lpdcid->lpsf->GetUIObjectOf(GetParent(hwnd), 1, (PCUITEMID_CHILD_ARRAY)(&lpdcid->pidl), IID_IContextMenu, nullptr, AsPPVArgs(&lpcm))) {
@@ -949,7 +949,7 @@ bool DriveBox_DeleteItem(HWND hwnd, LPARAM lParam) {
 
 	cbei.mask = CBEIF_LPARAM;
 	SendMessage(hwnd, CBEM_GETITEM, 0, (LPARAM)&cbei);
-	DC_ITEMDATA * const lpdcid = reinterpret_cast<DC_ITEMDATA *>(cbei.lParam);
+	DC_ITEMDATA * const lpdcid = AsPointer<DC_ITEMDATA *>(cbei.lParam);
 
 	// Free pidl
 	CoTaskMemFree(lpdcid->pidl);
@@ -969,7 +969,7 @@ bool DriveBox_GetDispInfo(HWND hwnd, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(hwnd);
 
 	NMCOMBOBOXEX *lpnmcbe = (NMCOMBOBOXEX *)lParam;
-	const DC_ITEMDATA * const lpdcid = reinterpret_cast<const DC_ITEMDATA *>(lpnmcbe->ceItem.lParam);
+	const DC_ITEMDATA * const lpdcid = AsPointer<const DC_ITEMDATA *>(lpnmcbe->ceItem.lParam);
 
 	if (!lpdcid) {
 		return false;

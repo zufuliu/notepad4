@@ -811,7 +811,7 @@ void ResizeDlg_Size(HWND hwnd, LPARAM lParam, int *cx, int *cy) noexcept {
 
 void ResizeDlg_GetMinMaxInfo(HWND hwnd, LPARAM lParam) noexcept {
 	const RESIZEDLG * const pm = static_cast<RESIZEDLG *>(GetProp(hwnd, RESIZEDLG_PROP_KEY));
-	LPMINMAXINFO lpmmi = reinterpret_cast<LPMINMAXINFO>(lParam);
+	LPMINMAXINFO lpmmi = AsPointer<LPMINMAXINFO>(lParam);
 #if NP2_ENABLE_RESIZEDLG_TEMP_FIX
 	const UINT dpi = GetWindowDPI(hwnd);
 	const UINT old = pm->dpi;

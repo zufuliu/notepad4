@@ -1081,7 +1081,7 @@ void ResizeDlg_Size(HWND hwnd, LPARAM lParam, int *cx, int *cy) noexcept {
 
 void ResizeDlg_GetMinMaxInfo(HWND hwnd, LPARAM lParam) noexcept {
 	const RESIZEDLG *pm = static_cast<RESIZEDLG *>(GetProp(hwnd, RESIZEDLG_PROP_KEY));
-	LPMINMAXINFO lpmmi = reinterpret_cast<LPMINMAXINFO>(lParam);
+	LPMINMAXINFO lpmmi = AsPointer<LPMINMAXINFO>(lParam);
 #if NP2_ENABLE_RESIZEDLG_TEMP_FIX
 	const UINT dpi = GetWindowDPI(hwnd);
 	const UINT old = pm->dpi;
@@ -2503,7 +2503,7 @@ HBITMAP BitmapCache::Get(LPCWSTR path) noexcept {
 	}
 
 	SHFILEINFO shfi;
-	HIMAGELIST imageList = reinterpret_cast<HIMAGELIST>(SHGetFileInfo(path, FILE_ATTRIBUTE_NORMAL, &shfi, sizeof(SHFILEINFO), SHGFI_USEFILEATTRIBUTES | SHGFI_SYSICONINDEX | SHGFI_SMALLICON));
+	HIMAGELIST imageList = AsPointer<HIMAGELIST>(SHGetFileInfo(path, FILE_ATTRIBUTE_NORMAL, &shfi, sizeof(SHFILEINFO), SHGFI_USEFILEATTRIBUTES | SHGFI_SYSICONINDEX | SHGFI_SMALLICON));
 	const int iIcon = shfi.iIcon;
 	UINT index = 0;
 	for (; index < count; index++) {

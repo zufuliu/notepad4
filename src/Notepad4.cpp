@@ -4889,7 +4889,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(wParam);
 
 	LPNMHDR pnmh = (LPNMHDR)lParam;
-	const SCNotification * const scn = reinterpret_cast<SCNotification *>(lParam);
+	const SCNotification * const scn = AsPointer<SCNotification *>(lParam);
 
 	switch (pnmh->idFrom) {
 	case IDC_EDIT:

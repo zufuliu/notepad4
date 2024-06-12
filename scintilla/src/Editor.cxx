@@ -1862,7 +1862,7 @@ Sci::Position Editor::FormatRange([[maybe_unused]] Scintilla::Message iMessage, 
 	}
 
 	const bool draw = wParam != 0;
-	const RangeToFormatFull *pfr = static_cast<const RangeToFormatFull *>(PtrFromSPtr(lParam));
+	const RangeToFormatFull *pfr = AsPointer<const RangeToFormatFull *>(lParam);
 	const AutoSurface surface(pfr->hdc, this, true);
 	const AutoSurface surfaceMeasure(pfr->hdcTarget, this, true);
 	return view.FormatRange(draw, pfr->chrg, pfr->rc, surface, surfaceMeasure, *this, vs);
@@ -2091,7 +2091,7 @@ void Editor::InsertCharacter(std::string_view sv, CharacterSource charSource) {
 
 	if (recordingMacro && charSource != CharacterSource::TentativeInput) {
 		std::string copy(sv); // ensure NUL-terminated
-		NotifyMacroRecord(Message::ReplaceSel, 0, reinterpret_cast<sptr_t>(copy.data()));
+		NotifyMacroRecord(Message::ReplaceSel, 0, AsInteger<sptr_t>(copy.data()));
 	}
 }
 
@@ -3240,7 +3240,7 @@ void Editor::NewLine() {
 			NotifyChar(ch, CharacterSource::DirectInput);
 			if (recordingMacro) {
 				const char txt[2] = { ch, '\0' };
-				NotifyMacroRecord(Message::ReplaceSel, 0, reinterpret_cast<sptr_t>(txt));
+				NotifyMacroRecord(Message::ReplaceSel, 0, AsInteger<sptr_t>(txt));
 			}
 		}
 	}
@@ -4143,7 +4143,7 @@ Sci::Position Editor::FindTextFull(
 	///< @c FindOption::WordStart, @c FindOption::RegExp or @c FindOption::Posix.
 	sptr_t lParam) {	///< @c TextToFindFull structure: The text to search for in the given range.
 
-	TextToFindFull *ft = static_cast<TextToFindFull *>(PtrFromSPtr(lParam));
+	TextToFindFull *ft = AsPointer<TextToFindFull *>(lParam);
 #if 1
 	Sci::Position lengthFound = strlen(ft->lpstrText);
 	if (!pdoc->HasCaseFolder())
@@ -6054,10 +6054,6 @@ constexpr Selection::SelTypes SelTypeFromMode(SelectionMode mode) noexcept {
 	return static_cast<Selection::SelTypes>(static_cast<int>(mode) + 1);
 }
 
-sptr_t SPtrFromPtr(void *ptr) noexcept {
-	return reinterpret_cast<sptr_t>(ptr);
-}
-
 }
 
 void Editor::SetSelectionMode(uptr_t wParam, bool setMoveExtends) {
@@ -6453,7 +6449,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		return FindTextFull(wParam, lParam);
 
 	case Message::GetTextRangeFull:
-		if (const TextRangeFull *tr = static_cast<const TextRangeFull *>(PtrFromSPtr(lParam))) {
+		if (const TextRangeFull *tr = AsPointer<const TextRangeFull *>(lParam)) {
 			return GetTextRange(tr->lpstrText, tr->chrg.cpMin, tr->chrg.cpMax);
 		}
 		return 0;
@@ -6671,7 +6667,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		return pdoc->UCharAt(PositionFromUPtr(wParam));
 
 	case Message::GetCharacterAndWidth:
-		return pdoc->GetCharacterAndWidth(wParam, reinterpret_cast<Sci_Position *>(lParam));
+		return pdoc->GetCharacterAndWidth(wParam, AsPointer<Sci_Position *>(lParam));
 
 	case Message::GetCharacterClass:
 		return static_cast<int>(pdoc->GetCharacterClass(static_cast<unsigned int>(wParam)));
@@ -6757,7 +6753,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case Message::GetStyledTextFull:
-		if (const TextRangeFull *tr = static_cast<TextRangeFull *>(PtrFromSPtr(lParam))) {
+		if (const TextRangeFull *tr = AsPointer<TextRangeFull *>(lParam)) {
 			return GetTextRange(tr->lpstrText, tr->chrg.cpMin, tr->chrg.cpMax, true);
 		}
 		return 0;
@@ -8112,11 +8108,11 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case Message::GetDocPointer:
-		return SPtrFromPtr(pdoc->AsDocumentEditable());
+		return AsInteger<sptr_t>(pdoc->AsDocumentEditable());
 
 	case Message::SetDocPointer:
 		CancelModes();
-		SetDocPointer(static_cast<Document *>(static_cast<IDocumentEditable *>(PtrFromSPtr(lParam))));
+		SetDocPointer(static_cast<Document *>(AsPointer<IDocumentEditable *>(lParam)));
 		return 0;
 
 	case Message::CreateDocument: {
@@ -8124,15 +8120,15 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 			doc->AddRef();
 			doc->Allocate(PositionFromUPtr(wParam));
 			pcs = ContractionStateCreate(pdoc->IsLarge());
-			return SPtrFromPtr(doc->AsDocumentEditable());
+			return AsInteger<sptr_t>(doc->AsDocumentEditable());
 		}
 
 	case Message::AddRefDocument:
-		(static_cast<IDocumentEditable *>(PtrFromSPtr(lParam)))->AddRef();
+		(AsPointer<IDocumentEditable *>(lParam))->AddRef();
 		break;
 
 	case Message::ReleaseDocument:
-		(static_cast<IDocumentEditable *>(PtrFromSPtr(lParam)))->Release();
+		(AsPointer<IDocumentEditable *>(lParam))->Release();
 		break;
 
 	case Message::GetDocumentOptions:
@@ -8144,7 +8140,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 			doc->Allocate(PositionFromUPtr(wParam));
 			doc->SetUndoCollection(false);
 			pcs = ContractionStateCreate(pdoc->IsLarge());
-			return reinterpret_cast<sptr_t>(doc);
+			return AsInteger<sptr_t>(doc);
 		}
 
 	case Message::SetModEventMask:
@@ -8358,10 +8354,10 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		return convertPastes ? 1 : 0;
 
 	case Message::GetCharacterPointer:
-		return reinterpret_cast<sptr_t>(pdoc->BufferPointer());
+		return AsInteger<sptr_t>(pdoc->BufferPointer());
 
 	case Message::GetRangePointer:
-		return reinterpret_cast<sptr_t>(pdoc->RangePointer(PositionFromUPtr(wParam), lParam));
+		return AsInteger<sptr_t>(pdoc->RangePointer(PositionFromUPtr(wParam), lParam));
 
 	case Message::GetGapPosition:
 		return pdoc->GapPosition();

@@ -674,7 +674,7 @@ static INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 		break;
 
 		case IDOK: {
-			DirListItem *lpdli = reinterpret_cast<DirListItem *>(GetWindowLongPtr(hwnd, DWLP_USER));
+			DirListItem *lpdli = AsPointer<DirListItem *>(GetWindowLongPtr(hwnd, DWLP_USER));
 			lpdli->mask = DLI_FILENAME | DLI_TYPE;
 			lpdli->ntype = DLE_NONE;
 			DirList_GetItem(GetDlgItem(hwnd, IDC_OPENWITHDIR), (-1), lpdli);
@@ -850,7 +850,7 @@ static INT_PTR CALLBACK FavoritesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 		break;
 
 		case IDOK: {
-			DirListItem *lpdli = reinterpret_cast<DirListItem *>(GetWindowLongPtr(hwnd, DWLP_USER));
+			DirListItem *lpdli = AsPointer<DirListItem *>(GetWindowLongPtr(hwnd, DWLP_USER));
 			lpdli->mask = DLI_FILENAME | DLI_TYPE;
 			lpdli->ntype = DLE_NONE;
 			DirList_GetItem(GetDlgItem(hwnd, IDC_FAVORITESDIR), (-1), lpdli);
@@ -988,7 +988,7 @@ extern int cxFileMRUDlg;
 extern int cyFileMRUDlg;
 
 static DWORD WINAPI FileMRUIconThread(LPVOID lpParam) noexcept {
-	const BackgroundWorker * const worker = reinterpret_cast<const BackgroundWorker *>(lpParam);
+	const BackgroundWorker * const worker = static_cast<const BackgroundWorker *>(lpParam);
 
 	WCHAR tch[MAX_PATH] = L"";
 	DWORD dwFlags = SHGFI_SMALLICON | SHGFI_SYSICONINDEX | SHGFI_ATTRIBUTES | SHGFI_ATTR_SPECIFIED;
@@ -1145,7 +1145,7 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 
 			case LVN_GETDISPINFO: {
 				/*
-				LV_DISPINFO *lpdi = reinterpret_cast<LV_DISPINFO *>(lParam);
+				LV_DISPINFO *lpdi = AsPointer<LV_DISPINFO *>(lParam);
 
 				if (lpdi->item.mask & LVIF_IMAGE) {
 					WCHAR tch[MAX_PATH];
@@ -1918,7 +1918,7 @@ static INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
-		const ENCODEDLG * const pdd = reinterpret_cast<const ENCODEDLG*>(lParam);
+		const ENCODEDLG * const pdd = AsPointer<const ENCODEDLG*>(lParam);
 		ResizeDlg_Init(hwnd, pdd->cxDlg, pdd->cyDlg, IDC_RESIZEGRIP);
 
 		WCHAR wch[256];
@@ -1956,7 +1956,7 @@ static INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 	return TRUE;
 
 	case WM_DESTROY: {
-		ENCODEDLG * pdd = reinterpret_cast<ENCODEDLG *>(GetWindowLongPtr(hwnd, DWLP_USER));
+		ENCODEDLG * pdd = AsPointer<ENCODEDLG *>(GetWindowLongPtr(hwnd, DWLP_USER));
 		ResizeDlg_Destroy(hwnd, &pdd->cxDlg, &pdd->cyDlg);
 		HIMAGELIST himl = TreeView_GetImageList(GetDlgItem(hwnd, IDC_ENCODINGLIST), TVSIL_NORMAL);
 		ImageList_Destroy(himl);
@@ -2011,7 +2011,7 @@ static INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 		switch (LOWORD(wParam)) {
 		case IDOK: {
 			HWND hwndTV = GetDlgItem(hwnd, IDC_ENCODINGLIST);
-			ENCODEDLG * pdd = reinterpret_cast<ENCODEDLG *>(GetWindowLongPtr(hwnd, DWLP_USER));
+			ENCODEDLG * pdd = AsPointer<ENCODEDLG *>(GetWindowLongPtr(hwnd, DWLP_USER));
 			if (Encoding_GetFromTreeView(hwndTV, &pdd->idEncoding, false)) {
 				EndDialog(hwnd, IDOK);
 			} else {
@@ -2601,7 +2601,7 @@ INT_PTR CALLBACK InfoBoxDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
-		const INFOBOX * const lpib = reinterpret_cast<const INFOBOX *>(lParam);
+		const INFOBOX * const lpib = AsPointer<const INFOBOX *>(lParam);
 
 		SendDlgItemMessage(hwnd, IDC_INFOBOXICON, STM_SETICON, (WPARAM)LoadIcon(nullptr, lpib->idiIcon), 0);
 		SetDlgItemText(hwnd, IDC_INFOBOXTEXT, lpib->lpstrMessage);
@@ -2631,7 +2631,7 @@ INT_PTR CALLBACK InfoBoxDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 		case IDYES:
 		case IDNO:
 			if (IsButtonChecked(hwnd, IDC_INFOBOXCHECK)) {
-				const INFOBOX * const lpib = reinterpret_cast<const INFOBOX *>(GetWindowLongPtr(hwnd, DWLP_USER));
+				const INFOBOX * const lpib = AsPointer<const INFOBOX *>(GetWindowLongPtr(hwnd, DWLP_USER));
 				IniSetBool(INI_SECTION_NAME_SUPPRESSED_MESSAGES, lpib->lpstrSetting, true);
 			}
 			EndDialog(hwnd, LOWORD(wParam));

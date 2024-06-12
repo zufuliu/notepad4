@@ -159,12 +159,13 @@ inline HWND HwndFromWindow(const Window &w) noexcept {
 	return HwndFromWindowID(w.GetID());
 }
 
-inline void *PointerFromWindow(HWND hWnd) noexcept {
-	return reinterpret_cast<void *>(::GetWindowLongPtr(hWnd, 0));
+template <class T>
+inline T PointerFromWindow(HWND hWnd) noexcept {
+	return AsPointer<T>(::GetWindowLongPtr(hWnd, 0));
 }
 
 inline void SetWindowPointer(HWND hWnd, void *ptr) noexcept {
-	::SetWindowLongPtr(hWnd, 0, reinterpret_cast<LONG_PTR>(ptr));
+	::SetWindowLongPtr(hWnd, 0, AsInteger<LONG_PTR>(ptr));
 }
 
 inline UINT DpiForWindow(WindowID wid) noexcept {

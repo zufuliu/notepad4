@@ -1087,7 +1087,7 @@ sptr_t ScintillaBase::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case Message::SetILexer:
-		DocumentLexState()->SetInstance(static_cast<ILexer5 *>(PtrFromSPtr(lParam)));
+		DocumentLexState()->SetInstance(AsPointer<ILexer5 *>(lParam));
 		break;
 
 	case Message::GetLexer:
@@ -1126,8 +1126,8 @@ sptr_t ScintillaBase::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		return StringResult(lParam, DocumentLexState()->GetName());
 
 	case Message::PrivateLexerCall:
-		return reinterpret_cast<sptr_t>(
-			DocumentLexState()->PrivateCall(static_cast<int>(wParam), PtrFromSPtr(lParam)));
+		return AsInteger<sptr_t>(
+			DocumentLexState()->PrivateCall(static_cast<int>(wParam), AsPointer<void *>(lParam)));
 
 	case Message::PropertyNames:
 		return StringResult(lParam, DocumentLexState()->PropertyNames());

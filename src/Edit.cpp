@@ -4781,7 +4781,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		// Load MRUs
 		mruFind.AddToCombobox(hwndFind);
 
-		EDITFINDREPLACE * const lpefr = reinterpret_cast<EDITFINDREPLACE *>(lParam);
+		EDITFINDREPLACE * const lpefr = AsPointer<EDITFINDREPLACE *>(lParam);
 		// don't copy selection after toggle find & replace on this window.
 		bool hasFindText = false;
 		if (bSwitchedFindReplace != 3) {
@@ -4885,7 +4885,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 	case APPM_COPYDATA: {
 		HWND hwndFind = GetDlgItem(hwnd, IDC_FINDTEXT);
 		HWND hwndRepl = GetDlgItem(hwnd, IDC_REPLACETEXT);
-		EDITFINDREPLACE * const lpefr = reinterpret_cast<EDITFINDREPLACE *>(GetWindowLongPtr(hwnd, DWLP_USER));
+		EDITFINDREPLACE * const lpefr = AsPointer<EDITFINDREPLACE *>(GetWindowLongPtr(hwnd, DWLP_USER));
 
 		const bool hasFindText = CopySelectionAsFindText(hwnd, lpefr, false);
 		if (!GetWindowTextLength(hwndFind)) {
@@ -4992,7 +4992,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		case IDC_REPLACEINSEL:
 		case IDACC_SELTONEXT:
 		case IDACC_SELTOPREV: {
-			EDITFINDREPLACE * const lpefr = reinterpret_cast<EDITFINDREPLACE *>(GetWindowLongPtr(hwnd, DWLP_USER));
+			EDITFINDREPLACE * const lpefr = AsPointer<EDITFINDREPLACE *>(GetWindowLongPtr(hwnd, DWLP_USER));
 			HWND hwndFind = GetDlgItem(hwnd, IDC_FINDTEXT);
 			HWND hwndRepl = GetDlgItem(hwnd, IDC_REPLACETEXT);
 			const bool bIsFindDlg = (hwndRepl == nullptr);
@@ -5155,7 +5155,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 
 		case IDACC_SAVEFIND: {
 			SendWMCommand(hwndMain, IDM_EDIT_SAVEFIND);
-			const EDITFINDREPLACE * const lpefr = reinterpret_cast<const EDITFINDREPLACE *>(GetWindowLongPtr(hwnd, DWLP_USER));
+			const EDITFINDREPLACE * const lpefr = AsPointer<const EDITFINDREPLACE *>(GetWindowLongPtr(hwnd, DWLP_USER));
 			SetDlgItemTextA2W(CP_UTF8, hwnd, IDC_FINDTEXT, lpefr->szFindUTF8);
 			CheckDlgButton(hwnd, IDC_FINDREGEXP, BST_UNCHECKED);
 			CheckDlgButton(hwnd, IDC_FINDTRANSFORMBS, BST_UNCHECKED);
@@ -5165,7 +5165,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 
 		case IDC_TOGGLEFINDREPLACE: {
 			bSwitchedFindReplace |= 2;
-			EDITFINDREPLACE * const lpefr = reinterpret_cast<EDITFINDREPLACE *>(GetWindowLongPtr(hwnd, DWLP_USER));
+			EDITFINDREPLACE * const lpefr = AsPointer<EDITFINDREPLACE *>(GetWindowLongPtr(hwnd, DWLP_USER));
 			GetDlgPos(hwnd, &xFindReplaceDlgSave, &yFindReplaceDlgSave);
 			memcpy(&efrSave, lpefr, sizeof(EDITFINDREPLACE));
 			GetDlgItemTextA2W(CP_UTF8, hwnd, IDC_FINDTEXT, lpefr->szFindUTF8, COUNTOF(lpefr->szFindUTF8));
@@ -7648,7 +7648,7 @@ static WNDPROC pfnSciWndProc = nullptr;
 static LRESULT CALLBACK SciThemedWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept;
 
 void SciInitThemes(HWND hwnd) noexcept {
-	pfnSciWndProc = reinterpret_cast<WNDPROC>(SetWindowLongPtr(hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(SciThemedWndProc)));
+	pfnSciWndProc = AsPointer<WNDPROC>(SetWindowLongPtr(hwnd, GWLP_WNDPROC, AsInteger<LONG_PTR>(SciThemedWndProc)));
 }
 
 //=============================================================================
@@ -7665,7 +7665,7 @@ LRESULT CALLBACK SciThemedWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 			if (IsAppThemed()) {
 				HTHEME hTheme = OpenThemeData(hwnd, L"edit");
 				if (hTheme) {
-					NCCALCSIZE_PARAMS *csp = reinterpret_cast<NCCALCSIZE_PARAMS *>(lParam);
+					NCCALCSIZE_PARAMS *csp = AsPointer<NCCALCSIZE_PARAMS *>(lParam);
 					RECT rcClient;
 					const HRESULT hr = GetThemeBackgroundContentRect(hTheme, nullptr, EP_EDITTEXT, ETS_NORMAL, &csp->rgrc[0], &rcClient);
 					const bool bSuccess = hr == S_OK;
