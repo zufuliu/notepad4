@@ -7066,7 +7066,7 @@ void UpdateStatusbar() noexcept {
 		tchSelChar, tchSelByte, tchLinesSelected, tchMatchesCount);
 
 	LPCWSTR items[StatusItem_ItemCount];
-	memset(NP2_void_pointer(items), 0, StatusItem_Lexer * sizeof(LPCWSTR));
+	memset(AsVoidPointer(items), 0, StatusItem_Lexer * sizeof(LPCWSTR));
 	LPWSTR start = itemText;
 	UINT index = 0;
 	for (int i = 0; i < len; i++) {
@@ -7082,7 +7082,7 @@ void UpdateStatusbar() noexcept {
 	}
 
 	items[index] = start;
-	memcpy(NP2_void_pointer(&items[StatusItem_Lexer]), NP2_void_pointer(&cachedStatusItem.pszLexerName), (StatusItem_Zoom - StatusItem_Lexer)*sizeof(LPCWSTR));
+	memcpy(AsVoidPointer(&items[StatusItem_Lexer]), AsVoidPointer(&cachedStatusItem.pszLexerName), (StatusItem_Zoom - StatusItem_Lexer)*sizeof(LPCWSTR));
 	items[StatusItem_Zoom] = cachedStatusItem.tchZoom;
 	items[StatusItem_DocSize] = tchDocSize;
 
@@ -8633,7 +8633,7 @@ void AutoSave_Stop(BOOL keepBackup) noexcept {
 		}
 
 		autoSaveCount = 0;
-		memset(NP2_void_pointer(autoSavePathList), 0, sizeof(LPWSTR) * AllAutoSaveCount);
+		memset(AsVoidPointer(autoSavePathList), 0, sizeof(LPWSTR) * AllAutoSaveCount);
 	}
 }
 
@@ -8786,7 +8786,7 @@ void AutoSave_DoWork(FileSaveFlag saveFlag) noexcept {
 				}
 				LocalFree(old);
 			}
-			memmove(NP2_void_pointer(autoSavePathList), NP2_void_pointer(autoSavePathList + 1), (AllAutoSaveCount - 1) * sizeof(LPWSTR));
+			memmove(AsVoidPointer(autoSavePathList), AsVoidPointer(autoSavePathList + 1), (AllAutoSaveCount - 1) * sizeof(LPWSTR));
 			autoSavePathList[AllAutoSaveCount - 1] = nullptr;
 			--autoSaveCount;
 		}

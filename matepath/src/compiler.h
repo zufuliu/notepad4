@@ -19,7 +19,10 @@ inline T AsInteger(V value) noexcept {
 }
 
 // suppress clang-tidy [bugprone-multi-level-implicit-pointer-conversion] warning
-#define NP2_void_pointer(expr)		(reinterpret_cast<void *>(expr))
+template <typename T>
+inline void* AsVoidPointer(T** pp) noexcept {
+	return reinterpret_cast<void *>(pp);
+}
 
 // C++ template based version of _countof()
 #define COUNTOF(ar)	_countof(ar)

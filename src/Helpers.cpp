@@ -2300,7 +2300,7 @@ void MRUList::Init(LPCWSTR pszRegKey, int flags) noexcept {
 	iSize = 0;
 	iFlags = flags;
 	szRegKey = pszRegKey;
-	memset(NP2_void_pointer(pszItems), 0, sizeof(pszItems));
+	memset(AsVoidPointer(pszItems), 0, sizeof(pszItems));
 	Load();
 }
 

@@ -1726,7 +1726,7 @@ bool ExecDDECommand(LPCWSTR lpszCmdLine, LPCWSTR lpszDDEMsg, LPCWSTR lpszDDEApp,
 //
 void HistoryList::Init() noexcept {
 	iCurItem = -1;
-	memset(NP2_void_pointer(pszItems), 0, sizeof(pszItems));
+	memset(AsVoidPointer(pszItems), 0, sizeof(pszItems));
 }
 
 void HistoryList::Empty() noexcept {
@@ -1760,7 +1760,7 @@ bool HistoryList::Add(LPCWSTR pszNew) noexcept {
 			LocalFree(pszItems[0]);
 		}
 
-		memmove(NP2_void_pointer(pszItems), NP2_void_pointer(pszItems + 1), (HISTORY_ITEMS - 1) * sizeof(LPWSTR));
+		memmove(AsVoidPointer(pszItems), AsVoidPointer(pszItems + 1), (HISTORY_ITEMS - 1) * sizeof(LPWSTR));
 	}
 
 	pszItems[iCurItem] = StrDup(pszNew);
@@ -1834,7 +1834,7 @@ void MRUList::Init(LPCWSTR pszRegKey, int flags) noexcept {
 	iSize = 0;
 	iFlags = flags;
 	szRegKey = pszRegKey;
-	memset(NP2_void_pointer(pszItems), 0, sizeof(pszItems));
+	memset(AsVoidPointer(pszItems), 0, sizeof(pszItems));
 	Load();
 }
 

@@ -3877,8 +3877,8 @@ static HTREEITEM Style_AddAllLexerToTreeView(HWND hwndTV, bool withStyles, bool 
 
 	// all general schemes
 	PEDITLEXER generalLex[GENERAL_LEXER_COUNT];
-	memcpy(NP2_void_pointer(generalLex), NP2_void_pointer(pLexArray + LEXER_INDEX_GENERAL), sizeof(generalLex));
-	qsort(NP2_void_pointer(generalLex), GENERAL_LEXER_COUNT, sizeof(PEDITLEXER), CmpEditLexerByName);
+	memcpy(AsVoidPointer(generalLex), AsVoidPointer(pLexArray + LEXER_INDEX_GENERAL), sizeof(generalLex));
+	qsort(AsVoidPointer(generalLex), GENERAL_LEXER_COUNT, sizeof(PEDITLEXER), CmpEditLexerByName);
 
 	iLexer = 0;
 	while (iLexer < GENERAL_LEXER_COUNT) {
@@ -4847,7 +4847,7 @@ static void Style_GetFavoriteSchemesFromTreeView(HWND hwndTV, HTREEITEM hFavorit
 		wch[len] = L'\0';
 	}
 
-	qsort(NP2_void_pointer(pLexArray + LEXER_INDEX_GENERAL), GENERAL_LEXER_COUNT, sizeof(PEDITLEXER), CmpEditLexerByOrder);
+	qsort(AsVoidPointer(pLexArray + LEXER_INDEX_GENERAL), GENERAL_LEXER_COUNT, sizeof(PEDITLEXER), CmpEditLexerByOrder);
 }
 
 //=============================================================================
