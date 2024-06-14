@@ -13,8 +13,8 @@
 #pragma comment(lib, "gdi32.lib")
 #endif
 
-// cl /EHsc /std:c++20 /DNDEBUG /Ox /Ot /FAcs /GS- /GR- /Gv /W4 /arch:AVX2 GraphicTest.cpp
-// clang-cl /EHsc /std:c++20 /DNDEBUG /Ox /Ot /FA /GS- /GR- /Gv /W4 -march=x86-64-v3 GraphicTest.cpp
+// cl /EHsc /std:c++20 /DNDEBUG /O2 /FAcs /GS- /GR- /Gv /W4 /arch:AVX2 GraphicTest.cpp
+// clang-cl /EHsc /std:c++20 /DNDEBUG /O2 /FA /GS- /GR- /Gv /W4 -march=x86-64-v3 GraphicTest.cpp
 // g++ -S -std=gnu++20 -DNDEBUG -O3 -fno-rtti -Wall -Wextra -march=x86-64-v3 GraphicTest.cpp
 
 struct ColourRGBA {
