@@ -654,7 +654,7 @@ void DeleteBitmapButton(HWND hwnd, int nCtlId) noexcept;
 #define ComboBox_GetEditSelEnd(hwnd)			HIWORD(ComboBox_GetEditSel(hwnd))
 
 #define StatusSetSimple(hwnd, b)				SendMessage(hwnd, SB_SIMPLE, (b), 0)
-#define StatusSetText(hwnd, nPart, lpszText)	SendMessage(hwnd, SB_SETTEXT, (nPart), (LPARAM)(lpszText))
+#define StatusSetText(hwnd, nPart, lpszText)	SendMessage(hwnd, SB_SETTEXT, (nPart), AsInteger<LPARAM>(lpszText))
 BOOL StatusSetTextID(HWND hwnd, UINT nPart, UINT uID) noexcept;
 int  StatusCalcPaneWidth(HWND hwnd, LPCWSTR lpsz) noexcept;
 

@@ -537,7 +537,7 @@ void Encoding_InitDefaults() noexcept {
 	}
 
 	CHARSETINFO ci;
-	if (TranslateCharsetInfo((DWORD *)(UINT_PTR)iDefaultCodePage, &ci, TCI_SRCCODEPAGE)) {
+	if (TranslateCharsetInfo(AsPointer<DWORD *>(static_cast<UINT_PTR>(iDefaultCodePage)), &ci, TCI_SRCCODEPAGE)) {
 		iDefaultCharSet = ci.ciCharset;
 	} else {
 		iDefaultCharSet = ANSI_CHARSET;
@@ -610,7 +610,7 @@ void Encoding_GetLabel(int iEncoding) noexcept {
 			pwsz = wch;
 		}
 		if (g_AllEncodingLabel == nullptr) {
-			g_AllEncodingLabel = (LPWSTR)NP2HeapAlloc(COUNTOF(mEncoding) * MAX_ENCODING_LABEL_SIZE * sizeof(WCHAR));
+			g_AllEncodingLabel = static_cast<LPWSTR>(NP2HeapAlloc(COUNTOF(mEncoding) * MAX_ENCODING_LABEL_SIZE * sizeof(WCHAR)));
 		}
 		mEncoding[iEncoding].wchLabel = g_AllEncodingLabel + iEncoding * MAX_ENCODING_LABEL_SIZE;
 		lstrcpyn(mEncoding[iEncoding].wchLabel, pwsz, MAX_ENCODING_LABEL_SIZE);
@@ -1021,7 +1021,7 @@ bool Encoding_GetFromComboboxEx(HWND hwnd, int *pidEncoding) noexcept {
 //
 UINT CodePageFromCharSet(UINT uCharSet) noexcept {
 	CHARSETINFO ci;
-	if (TranslateCharsetInfo((DWORD *)(UINT_PTR)uCharSet, &ci, TCI_SRCCHARSET)) {
+	if (TranslateCharsetInfo(AsPointer<DWORD *>(static_cast<UINT_PTR>(uCharSet)), &ci, TCI_SRCCHARSET)) {
 		return ci.ciACP;
 	}
 	return GetACP();
@@ -1085,13 +1085,13 @@ static int DetectUnicode(char *pTest, DWORD nLength, bool ascii) noexcept {
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 	if (i != 0xFFFF && (i & IS_TEXT_UNICODE_ILLEGAL_CHARS) == 0) {
 		if (i & IS_TEXT_UNICODE_UNICODE_MASK) {
-			if (IsValidWideChar((LPCWSTR)(pTest), nLength/2)) {
+			if (IsValidWideChar(reinterpret_cast<LPCWSTR>(pTest), nLength/2)) {
 				return CPI_UNICODE;
 			}
 		}
 		if (i & IS_TEXT_UNICODE_REVERSE_MASK) {
 			_swab(pTest, pTest, nLength);
-			if (IsValidWideChar((LPCWSTR)(pTest), nLength/2)) {
+			if (IsValidWideChar(reinterpret_cast<LPCWSTR>(pTest), nLength/2)) {
 				return CPI_UNICODEBE;
 			}
 			_swab(pTest, pTest, nLength);
@@ -1254,7 +1254,7 @@ static int DetectUTF16LatinExt(const char *pTest, DWORD nLength) noexcept {
 	__m256i test = _mm256_set1_epi16(-0x0800); // 0xF800
 	uint32_t expected = 0xAAAAAAAA;
 	do {
-		const __m256i chunk = _mm256_loadu_si256((__m256i *)pt);
+		const __m256i chunk = _mm256_loadu_si256(reinterpret_cast<const __m256i *>(pt));
 		pt += sizeof(__m256i);
 		if (_mm256_testz_si256(chunk, test) == 0)
 		//if (andn_u32(mask, expected) != 0)
@@ -1288,8 +1288,8 @@ static int DetectUTF16LatinExt(const char *pTest, DWORD nLength) noexcept {
 	const __m128i zero = _mm_setzero_si128();
 	uint32_t expected = 0xAAAA;
 	do {
-		const __m128i chunk1 = _mm_loadu_si128((__m128i *)pt);
-		const __m128i chunk2 = _mm_loadu_si128((__m128i *)(pt + sizeof(__m128i)));
+		const __m128i chunk1 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(pt));
+		const __m128i chunk2 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(pt + sizeof(__m128i)));
 		pt += 2*sizeof(__m128i);
 		uint32_t mask = ~_mm_movemask_epi8(_mm_cmpeq_epi8(_mm_and_si128(_mm_or_si128(chunk1, chunk2), test), zero));
 		if ((mask & expected) != 0) {
@@ -1424,7 +1424,7 @@ bool IsUTF8(const char *pTest, DWORD nLength) noexcept {
 
 	utf8_state current = kSTART;
 
-	const uint8_t *pt = (const uint8_t *)pTest;
+	const uint8_t *pt = reinterpret_cast<const uint8_t *>(pTest);
 	const uint8_t * const end = pt + nLength;
 
 	while (pt < end) {
@@ -1664,7 +1664,7 @@ static inline bool z_validate_utf8_avx2(const char *data, uint32_t len) noexcept
 		// Since we don't want to read the memory before the data pointer
 		// (which might not even be mapped), for the first chunk of input just
 		// use vector instructions.
-		__m256i shifted_bytes = _mm256_loadu_si256((__m256i *)data);
+		__m256i shifted_bytes = _mm256_loadu_si256(reinterpret_cast<const __m256i *>(data));
 		//__m256i shl_16 = _mm256_permute2x128_si256(shifted_bytes, _mm256_setzero_si256(), 0x03);
 		//shifted_bytes = _mm256_alignr_epi8(shifted_bytes, shl_16, 15);
 		shifted_bytes = _mm256_slli_si256(shifted_bytes, 1);
@@ -1672,11 +1672,11 @@ static inline bool z_validate_utf8_avx2(const char *data, uint32_t len) noexcept
 		// Loop over input in sizeof(__m256i)-byte chunks, as long as we can safely read
 		// that far into memory
 		for (; offset + sizeof(__m256i) < len; offset += sizeof(__m256i)) {
-			const __m256i bytes = _mm256_loadu_si256((__m256i *)(data + offset));
+			const __m256i bytes = _mm256_loadu_si256(reinterpret_cast<const __m256i *>(data + offset));
 			if (!z_validate_vec_avx2(bytes, shifted_bytes, &last_cont)) {
 				return false;
 			}
-			shifted_bytes = _mm256_loadu_si256((__m256i *)(data + offset + sizeof(__m256i) - 1));
+			shifted_bytes = _mm256_loadu_si256(reinterpret_cast<const __m256i *>(data + offset + sizeof(__m256i) - 1));
 		}
 	}
 
@@ -1684,16 +1684,16 @@ static inline bool z_validate_utf8_avx2(const char *data, uint32_t len) noexcept
 	// just fill in a buffer, reading bytes only up to len, and load from that.
 	if (offset < len) {
 		uint8_t buffer[sizeof(__m256i) + 1];
-		_mm256_storeu_si256((__m256i *)buffer, _mm256_setzero_si256());
+		_mm256_storeu_si256(reinterpret_cast<__m256i *>(buffer), _mm256_setzero_si256());
 		buffer[sizeof(__m256i)] = 0;
 
 		if (offset != 0) {
 			buffer[0] = data[offset - 1];
 		}
-		__movsb(buffer + 1, (const uint8_t *)(data + offset), len - offset);
+		__movsb(buffer + 1, reinterpret_cast<const uint8_t *>(data + offset), len - offset);
 
-		const __m256i shifted_bytes = _mm256_loadu_si256((__m256i *)buffer);
-		const __m256i bytes = _mm256_loadu_si256((__m256i *)(buffer + 1));
+		const __m256i shifted_bytes = _mm256_loadu_si256(reinterpret_cast<__m256i *>(buffer));
+		const __m256i bytes = _mm256_loadu_si256(reinterpret_cast<__m256i *>(buffer + 1));
 		if (!z_validate_vec_avx2(bytes, shifted_bytes, &last_cont)) {
 			return false;
 		}
@@ -1820,18 +1820,18 @@ static inline bool z_validate_utf8_sse4(const char *data, uint32_t len) noexcept
 		// Since we don't want to read the memory before the data pointer
 		// (which might not even be mapped), for the first chunk of input just
 		// use vector instructions.
-		__m128i shifted_bytes = _mm_loadu_si128((__m128i *)data);
+		__m128i shifted_bytes = _mm_loadu_si128(reinterpret_cast<const __m128i *>(data));
 		//shifted_bytes = _mm_alignr_epi8(shifted_bytes, _mm_setzero_si128(), 15);
 		shifted_bytes = _mm_slli_si128(shifted_bytes, 1);
 
 		// Loop over input in sizeof(__m128i)-byte chunks, as long as we can safely read
 		// that far into memory
 		for (; offset + sizeof(__m128i) < len; offset += sizeof(__m128i)) {
-			const __m128i bytes = _mm_loadu_si128((__m128i *)(data + offset));
+			const __m128i bytes = _mm_loadu_si128(reinterpret_cast<const __m128i *>(data + offset));
 			if (!z_validate_vec_sse4(bytes, shifted_bytes, &last_cont)) {
 				return false;
 			}
-			shifted_bytes = _mm_loadu_si128((__m128i *)(data + offset + sizeof(__m128i) - 1));
+			shifted_bytes = _mm_loadu_si128(reinterpret_cast<const __m128i *>(data + offset + sizeof(__m128i) - 1));
 		}
 	}
 
@@ -1839,16 +1839,16 @@ static inline bool z_validate_utf8_sse4(const char *data, uint32_t len) noexcept
 	// just fill in a buffer, reading bytes only up to len, and load from that.
 	if (offset < len) {
 		uint8_t buffer[sizeof(__m128i) + 1];
-		_mm_storeu_ps((float *)buffer, _mm_setzero_ps());
+		_mm_storeu_ps(reinterpret_cast<float *>(buffer), _mm_setzero_ps());
 		buffer[sizeof(__m128i)] = 0;
 
 		if (offset != 0) {
 			buffer[0] = data[offset - 1];
 		}
-		__movsb(buffer + 1, (const uint8_t *)(data + offset), len - offset);
+		__movsb(buffer + 1, reinterpret_cast<const uint8_t *>(data + offset), len - offset);
 
-		const __m128i shifted_bytes = _mm_loadu_si128((__m128i *)(buffer));
-		const __m128i bytes = _mm_loadu_si128((__m128i *)(buffer + 1));
+		const __m128i shifted_bytes = _mm_loadu_si128(reinterpret_cast<__m128i *>(buffer));
+		const __m128i bytes = _mm_loadu_si128(reinterpret_cast<__m128i *>(buffer + 1));
 		if (!z_validate_vec_sse4(bytes, shifted_bytes, &last_cont)) {
 			return false;
 		}
@@ -1922,13 +1922,13 @@ bool IsUTF8(const char *pTest, DWORD nLength) noexcept {
 		12,36,12,12,12,12,12,12,12,12,12,12,
 	};
 
-	const uint8_t *pt = (const uint8_t *)pTest;
+	const uint8_t *pt = reinterpret_cast<const uint8_t *>(pTest);
 	const uint8_t * const end = pt + nLength;
 	UINT state = UTF8_ACCEPT;
 
 #if 0 // NP2_USE_AVX2
 	while (pt + sizeof(__m256i) <= end) {
-		const __m256i chunk = _mm256_loadu_si256((__m256i *)pt);
+		const __m256i chunk = _mm256_loadu_si256(reinterpret_cast<const __m256i *>(pt));
 		const uint32_t mask = _mm256_movemask_epi8(chunk);
 		if (mask) {
 			// skip leading and trailing ASCII
@@ -1952,8 +1952,8 @@ bool IsUTF8(const char *pTest, DWORD nLength) noexcept {
 	// end NP2_USE_AVX2
 #elif NP2_USE_SSE2
 	while (pt + 2*sizeof(__m128i) <= end) {
-		const __m128i chunk1 = _mm_loadu_si128((__m128i *)pt);
-		const __m128i chunk2 = _mm_loadu_si128((__m128i *)(pt + sizeof(__m128i)));
+		const __m128i chunk1 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(pt));
+		const __m128i chunk2 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(pt + sizeof(__m128i)));
 		const uint32_t mask = _mm_movemask_epi8(chunk1)
 			| (((uint32_t)_mm_movemask_epi8(chunk2)) << sizeof(__m128i));
 		if (mask) {
@@ -1978,7 +1978,7 @@ bool IsUTF8(const char *pTest, DWORD nLength) noexcept {
 	// end NP2_USE_SSE2
 #elif defined(_WIN64)
 	while (pt + sizeof(uint64_t) <= end) {
-		const uint64_t val = *((const uint64_t *)pt);
+		const uint64_t val = *(reinterpret_cast<const uint64_t *>(pt));
 		if (val & UINT64_C(0x8080808080808080)) {
 #if 0
 			state = utf8_dfa[256 + state + utf8_dfa[pt[0]]];
@@ -2011,7 +2011,7 @@ bool IsUTF8(const char *pTest, DWORD nLength) noexcept {
 	// end _WIN64
 #else
 	while (pt + sizeof(uint32_t) <= end) {
-		const uint32_t val = *((const uint32_t *)pt);
+		const uint32_t val = *(reinterpret_cast<const uint32_t *>(pt));
 		if (val & 0x80808080U) {
 #if 0
 			state = utf8_dfa[256 + state + utf8_dfa[pt[0]]];
@@ -2055,8 +2055,8 @@ static const char *CheckUTF7(const char *pTest, DWORD nLength) noexcept {
 	if (nLength >= 2*sizeof(__m256i)) {
 		const char * const end = pt + nLength - 2*sizeof(__m256i);
 		do {
-			const __m256i chunk1 = _mm256_loadu_si256((__m256i *)pt);
-			const __m256i chunk2 = _mm256_loadu_si256((__m256i *)(pt + sizeof(__m256i)));
+			const __m256i chunk1 = _mm256_loadu_si256(reinterpret_cast<const __m256i *>(pt));
+			const __m256i chunk2 = _mm256_loadu_si256(reinterpret_cast<const __m256i *>(pt + sizeof(__m256i)));
 			const uint32_t mask = _mm256_movemask_epi8(_mm256_or_si256(chunk1, chunk2));
 			if (mask) {
 				return pt;
@@ -2068,12 +2068,12 @@ static const char *CheckUTF7(const char *pTest, DWORD nLength) noexcept {
 	nLength &= 2*sizeof(__m256i) - 1;
 	if (nLength != 0) {
 		uint32_t mask = 0;
-		__m256i chunk = _mm256_loadu_si256((__m256i *)pt);
+		__m256i chunk = _mm256_loadu_si256(reinterpret_cast<const __m256i *>(pt));
 		uint32_t last = _mm256_movemask_epi8(chunk);
 		if (nLength > sizeof(__m256i)) {
 			nLength &= sizeof(__m256i) - 1;
 			mask = last;
-			chunk = _mm256_loadu_si256((__m256i *)(pt + sizeof(__m256i)));
+			chunk = _mm256_loadu_si256(reinterpret_cast<const __m256i *>(pt + sizeof(__m256i)));
 			last = _mm256_movemask_epi8(chunk);
 		}
 		mask |= bit_zero_high_u32(last, nLength);
@@ -2085,10 +2085,10 @@ static const char *CheckUTF7(const char *pTest, DWORD nLength) noexcept {
 	if (nLength >= 4*sizeof(__m128i)) {
 		const char * const end = pt + nLength - 4*sizeof(__m128i);
 		do {
-			const __m128i chunk1 = _mm_loadu_si128((__m128i *)pt);
-			const __m128i chunk2 = _mm_loadu_si128((__m128i *)(pt + sizeof(__m128i)));
-			const __m128i chunk3 = _mm_loadu_si128((__m128i *)(pt + 2*sizeof(__m128i)));
-			const __m128i chunk4 = _mm_loadu_si128((__m128i *)(pt + 3*sizeof(__m128i)));
+			const __m128i chunk1 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(pt));
+			const __m128i chunk2 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(pt + sizeof(__m128i)));
+			const __m128i chunk3 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(pt + 2*sizeof(__m128i)));
+			const __m128i chunk4 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(pt + 3*sizeof(__m128i)));
 			const uint32_t mask = _mm_movemask_epi8(_mm_or_si128(_mm_or_si128(_mm_or_si128(chunk1, chunk2), chunk3), chunk4));
 			if (mask) {
 				return pt;
@@ -2105,14 +2105,14 @@ static const char *CheckUTF7(const char *pTest, DWORD nLength) noexcept {
 		#pragma clang loop unroll(disable)
 #endif
 		for (UINT i = 0; i < nLength / sizeof(__m128i); i++) {
-			chunk = _mm_or_si128(chunk, _mm_loadu_si128((__m128i *)pt));
+			chunk = _mm_or_si128(chunk, _mm_loadu_si128(reinterpret_cast<const __m128i *>(pt)));
 			pt += sizeof(__m128i);
 		}
 
 		uint32_t mask = _mm_movemask_epi8(chunk);
 		nLength &= sizeof(__m128i) - 1;
 		if (nLength != 0) {
-			const uint32_t last = _mm_movemask_epi8(_mm_loadu_si128((__m128i *)pt));
+			const uint32_t last = _mm_movemask_epi8(_mm_loadu_si128(reinterpret_cast<const __m128i *>(pt)));
 			mask |= bit_zero_high_u32(last, nLength);
 		}
 		return mask ? end : nullptr;
@@ -2124,7 +2124,7 @@ static const char *CheckUTF7(const char *pTest, DWORD nLength) noexcept {
 	nLength &= sizeof(uint64_t) - 1;
 	nLength = (sizeof(uint64_t) - nLength)*8;
 	do {
-		uint64_t value = *((const uint64_t *)pt);
+		uint64_t value = *(reinterpret_cast<const uint64_t *>(pt));
 		pt += sizeof(uint64_t);
 		value &= UINT64_C(0x8080808080808080);
 		if (value != 0) {
@@ -2144,7 +2144,7 @@ static const char *CheckUTF7(const char *pTest, DWORD nLength) noexcept {
 	nLength &= sizeof(uint32_t) - 1;
 	nLength = (sizeof(uint32_t) - nLength)*8;
 	do {
-		uint32_t value = *((const uint32_t *)pt);
+		uint32_t value = *(reinterpret_cast<const uint32_t *>(pt));
 		pt += sizeof(uint32_t);
 		value &= 0x80808080U;
 		if (value != 0) {
@@ -2187,7 +2187,7 @@ Return value :
 --*/
 INT UTF8_mbslen_bytes(LPCSTR utf8_string) noexcept {
 	INT length = 0;
-	const uint8_t *pt = (const uint8_t *)utf8_string;
+	const uint8_t *pt = reinterpret_cast<const uint8_t *>(utf8_string);
 
 	while (*pt) {
 		INT code_size;
@@ -2222,7 +2222,7 @@ Return value :
 --*/
 INT UTF8_mbslen(LPCSTR source, INT byte_length) noexcept {
 	INT wchar_length = 0;
-	const uint8_t *pt = (const uint8_t *)utf8_string;
+	const uint8_t *pt = reinterpret_cast<const uint8_t *>(utf8_string);
 
 	while (byte_length > 0) {
 		INT code_size;
@@ -2259,10 +2259,10 @@ INT UTF8_mbslen(LPCSTR source, INT byte_length) noexcept {
 
 
 LPSTR RecodeAsUTF8(LPSTR lpData, DWORD *cbData, UINT codePage, DWORD flags) noexcept {
-	LPWSTR lpDataWide = (LPWSTR)NP2HeapAlloc(*cbData * sizeof(WCHAR) + 16);
+	LPWSTR lpDataWide = static_cast<LPWSTR>(NP2HeapAlloc(*cbData * sizeof(WCHAR) + 16));
 	const int cbDataWide = MultiByteToWideChar(codePage, flags, lpData, *cbData, lpDataWide, (int)(NP2HeapSize(lpDataWide) / sizeof(WCHAR)));
 	if (cbDataWide) {
-		lpData = (char *)NP2HeapAlloc(cbDataWide * kMaxMultiByteCount + 16);
+		lpData = static_cast<char *>(NP2HeapAlloc(cbDataWide * kMaxMultiByteCount + 16));
 		*cbData = WideCharToMultiByte(CP_UTF8, 0, lpDataWide, cbDataWide, lpData, (int)NP2HeapSize(lpData), nullptr, nullptr);
 	} else {
 		lpData = nullptr;
@@ -2308,7 +2308,7 @@ int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, int *enco
 	}
 
 	// check Unicode / UTF-16 BOM
-	const UINT bom = *((const uint16_t *)lpData);
+	const UINT bom = *(reinterpret_cast<const uint16_t *>(lpData));
 	if (cbData < MAX_NON_UTF8_SIZE && (Encoding_IsUnicode(iSrcEncoding) // reload as UTF-16
 		|| (iSrcEncoding < CPI_FIRST && (cbData & 1) == 0 && (bom == BOM_UTF16LE || bom == BOM_UTF16BE)))) {
 		bool bBOM = iSrcEncoding < CPI_FIRST;
@@ -2448,7 +2448,7 @@ int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, int *enco
 		}
 	}
 	// detect binary file
-	if (iEncoding == CPI_DEFAULT && MaybeBinaryFile((const uint8_t *)lpData, cbData)) {
+	if (iEncoding == CPI_DEFAULT && MaybeBinaryFile(reinterpret_cast<const uint8_t *>(lpData), cbData)) {
 		*encodingFlag = EncodingFlag_Binary;
 	}
 
@@ -2538,15 +2538,15 @@ bool IsStringCaseSensitiveA(LPCSTR pszText) noexcept {
 		return false;
 	}
 
-	const uint8_t *ptr = (const uint8_t *)pszText;
+	const char *ptr = pszText;
 	uint8_t ch;
 	while ((ch = *ptr) != 0) {
 		if (ch & 0x80) {
 			// convert to Unicode
 			const UINT cpEdit = SciCall_GetCodePage();
-			LPCSTR start = (LPCSTR)ptr;
+			LPCSTR start = ptr;
 			const size_t length = strlen(start) + 1;
-			LPWSTR pszTextW = (LPWSTR)NP2HeapAlloc(length * sizeof(WCHAR));
+			LPWSTR pszTextW = static_cast<LPWSTR>(NP2HeapAlloc(length * sizeof(WCHAR)));
 			MultiByteToWideChar(cpEdit, 0, start, -1, pszTextW, (int)(length));
 			const bool result = IsStringCaseSensitiveW(pszTextW);
 			NP2HeapFree(pszTextW);

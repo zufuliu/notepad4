@@ -571,7 +571,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 	case WM_NCMBUTTONDOWN:
 	case WM_NCRBUTTONUP:
 	case WM_NCMBUTTONUP: {
-		HWND hwndTT = (HWND)SendMessage(hwndToolbar, TB_GETTOOLTIPS, 0, 0);
+		HWND hwndTT = AsPointer<HWND>(SendMessage(hwndToolbar, TB_GETTOOLTIPS, 0, 0));
 
 		if (wParam != HTCAPTION) {
 			SendMessage(hwndTT, TTM_POP, 0, 0);
@@ -587,7 +587,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		msg.pt.x = GET_X_LPARAM(lParam);
 		msg.pt.y = GET_Y_LPARAM(lParam);
 
-		SendMessage(hwndTT, TTM_RELAYEVENT, 0, (LPARAM)&msg);
+		SendMessage(hwndTT, TTM_RELAYEVENT, 0, AsInteger<LPARAM>(&msg));
 	}
 	return DefWindowProc(hwnd, umsg, wParam, lParam);
 
@@ -620,7 +620,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 	case WM_DROPFILES: {
 		WCHAR szBuf[MAX_PATH + 40];
-		HDROP hDrop = (HDROP)wParam;
+		HDROP hDrop = AsPointer<HDROP>(wParam);
 
 		if (IsIconic(hwnd)) {
 			ShowWindow(hwnd, SW_RESTORE);
@@ -639,10 +639,10 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 	break;
 
 	case WM_COPYDATA: {
-		PCOPYDATASTRUCT pcds = (PCOPYDATASTRUCT)lParam;
+		PCOPYDATASTRUCT pcds = AsPointer<PCOPYDATASTRUCT>(lParam);
 
 		if (pcds->dwData == DATA_MATEPATH_PATHARG) {
-			LPWSTR lpsz = (LPWSTR)NP2HeapAlloc(pcds->cbData);
+			LPWSTR lpsz = static_cast<LPWSTR>(NP2HeapAlloc(pcds->cbData));
 			memcpy(lpsz, pcds->lpData, pcds->cbData);
 
 			DisplayPath(lpsz, IDS_ERR_CMDLINE);
@@ -653,7 +653,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 	return TRUE;
 
 	case WM_CONTEXTMENU: {
-		const int nID = GetDlgCtrlID((HWND)wParam);
+		const int nID = GetDlgCtrlID(AsPointer<HWND>(wParam));
 
 		if (!(nID == IDC_DIRLIST || nID == IDC_DRIVEBOX || nID == IDC_TOOLBAR || nID == IDC_STATUSBAR || nID == IDC_REBAR)) {
 			return DefWindowProc(hwnd, umsg, wParam, lParam);
@@ -769,7 +769,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		HWND box = FindWindow(L"#32770", nullptr);
 		HWND parent = GetParent(box);
 		// MessageBox belongs to us.
-		if (parent == (HWND)wParam || parent == hwnd) {
+		if (parent == AsPointer<HWND>(wParam) || parent == hwnd) {
 			CenterDlgInParentEx(box, parent);
 			SnapToDefaultButton(box);
 		}
@@ -797,7 +797,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	UNREFERENCED_PARAMETER(wParam);
 	hwndMain = hwnd;
 	g_uCurrentDPI = GetWindowDPI(hwnd);
-	HINSTANCE hInstance = ((LPCREATESTRUCT)lParam)->hInstance;
+	HINSTANCE hInstance = (AsPointer<LPCREATESTRUCT>(lParam))->hInstance;
 	hwndDirList = CreateWindowEx(
 					  WS_EX_CLIENTEDGE,
 					  WC_LISTVIEW,
@@ -867,11 +867,11 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	ti.cbSize = sizeof(TOOLINFO);
 	ti.uFlags = TTF_IDISHWND;
 	ti.hwnd = hwnd;
-	ti.uId = (UINT_PTR)hwnd;
+	ti.uId = AsInteger<UINT_PTR>(hwnd);
 	ti.lpszText = LPSTR_TEXTCALLBACK;
 
-	HWND hwndTT = (HWND)SendMessage(hwndToolbar, TB_GETTOOLTIPS, 0, 0);
-	SendMessage(hwndTT, TTM_ADDTOOL, 0, (LPARAM)&ti);
+	HWND hwndTT = AsPointer<HWND>(SendMessage(hwndToolbar, TB_GETTOOLTIPS, 0, 0));
+	SendMessage(hwndTT, TTM_ADDTOOL, 0, AsInteger<LPARAM>(&ti));
 
 	// System Menu
 	HMENU hmenu = GetSystemMenu(hwnd, FALSE);
@@ -916,7 +916,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 		bExternalBitmap = true;
 	} else {
 		const int resource = GetBitmapResourceIdForCurrentDPI(IDB_TOOLBAR16);
-		hbmp = (HBITMAP)LoadImage(g_exeInstance, MAKEINTRESOURCE(resource), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
+		hbmp = static_cast<HBITMAP>(LoadImage(g_exeInstance, MAKEINTRESOURCE(resource), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION));
 	}
 	if (bAutoScaleToolbar) {
 		hbmp = ResizeImageForCurrentDPI(hbmp);
@@ -928,7 +928,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 	HIMAGELIST himl = ImageList_Create(bmp.bmHeight, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
 	ImageList_AddMasked(himl, hbmp, CLR_DEFAULT);
 	DeleteObject(hbmp);
-	SendMessage(hwndToolbar, TB_SETIMAGELIST, 0, (LPARAM)himl);
+	SendMessage(hwndToolbar, TB_SETIMAGELIST, 0, AsInteger<LPARAM>(himl));
 
 	// Optionally add hot Toolbar Bitmap
 	if (tchToolbarBitmapHot != nullptr) {
@@ -941,7 +941,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 			himl = ImageList_Create(bmp.bmHeight, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
 			ImageList_AddMasked(himl, hbmp, CLR_DEFAULT);
 			DeleteObject(hbmp);
-			SendMessage(hwndToolbar, TB_SETHOTIMAGELIST, 0, (LPARAM)himl);
+			SendMessage(hwndToolbar, TB_SETHOTIMAGELIST, 0, AsInteger<LPARAM>(himl));
 		}
 	}
 
@@ -956,7 +956,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 			himl = ImageList_Create(bmp.bmHeight, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
 			ImageList_AddMasked(himl, hbmp, CLR_DEFAULT);
 			DeleteObject(hbmp);
-			SendMessage(hwndToolbar, TB_SETDISABLEDIMAGELIST, 0, (LPARAM)himl);
+			SendMessage(hwndToolbar, TB_SETDISABLEDIMAGELIST, 0, AsInteger<LPARAM>(himl));
 			bExternalBitmap = true;
 		}
 	}
@@ -966,7 +966,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 		if (fProcessed) {
 			himl = ImageList_Create(bmp.bmHeight, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
 			ImageList_AddMasked(himl, hbmpCopy, CLR_DEFAULT);
-			SendMessage(hwndToolbar, TB_SETDISABLEDIMAGELIST, 0, (LPARAM)himl);
+			SendMessage(hwndToolbar, TB_SETDISABLEDIMAGELIST, 0, AsInteger<LPARAM>(himl));
 		}
 	}
 	if (hbmpCopy) {
@@ -976,7 +976,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 #if NP2_ENABLE_CUSTOMIZE_TOOLBAR_LABELS
 	// Load toolbar labels
 	IniSectionParser section;
-	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_TOOLBAR_LABELS);
+	WCHAR *pIniSectionBuf = static_cast<WCHAR *>(NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_TOOLBAR_LABELS));
 	const DWORD cchIniSection = static_cast<DWORD>NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
 
 	section.Init(COUNTOF(tbbMainWnd));
@@ -992,7 +992,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 
 		LPCWSTR tchDesc = node.value;
 		if (StrNotEmpty(tchDesc)) {
-			tbbMainWnd[n].iString = SendMessage(hwndToolbar, TB_ADDSTRING, 0, (LPARAM)tchDesc);
+			tbbMainWnd[n].iString = SendMessage(hwndToolbar, TB_ADDSTRING, 0, AsInteger<LPARAM>(tchDesc));
 			tbbMainWnd[n].fsStyle |= BTNS_AUTOSIZE | BTNS_SHOWTEXT;
 		} else {
 			tbbMainWnd[n].fsStyle &= ~(BTNS_AUTOSIZE | BTNS_SHOWTEXT);
@@ -1012,7 +1012,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 	}
 
 	RECT rc;
-	SendMessage(hwndToolbar, TB_GETITEMRECT, 0, (LPARAM)&rc);
+	SendMessage(hwndToolbar, TB_GETITEMRECT, 0, AsInteger<LPARAM>(&rc));
 	//SendMessage(hwndToolbar, TB_SETINDENT, 2, 0);
 
 	const DWORD dwStatusbarStyle = bShowStatusbar ? (WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE) : (WS_CHILD | WS_CLIPSIBLINGS);
@@ -1027,7 +1027,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 	rbi.cbSize = sizeof(REBARINFO);
 	rbi.fMask  = 0;
 	rbi.himl   = nullptr;
-	SendMessage(hwndReBar, RB_SETBARINFO, 0, (LPARAM)&rbi);
+	SendMessage(hwndReBar, RB_SETBARINFO, 0, AsInteger<LPARAM>(&rbi));
 
 	REBARBANDINFO rbBand;
 	rbBand.cbSize  = sizeof(REBARBANDINFO);
@@ -1038,12 +1038,12 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 		rbBand.fStyle |= RBBS_CHILDEDGE;
 	}
 	rbBand.hbmBack = nullptr;
-	rbBand.lpText     = (LPWSTR)L"Toolbar";
+	rbBand.lpText     = const_cast<LPWSTR>(L"Toolbar");
 	rbBand.hwndChild  = hwndToolbar;
 	rbBand.cxMinChild = (rc.right - rc.left) * COUNTOF(tbbMainWnd);
 	rbBand.cyMinChild = (rc.bottom - rc.top) + 2 * rc.top;
 	rbBand.cx         = 0;
-	SendMessage(hwndReBar, RB_INSERTBAND, (WPARAM)(-1), (LPARAM)&rbBand);
+	SendMessage(hwndReBar, RB_INSERTBAND, (WPARAM)(-1), AsInteger<LPARAM>(&rbBand));
 
 	SetWindowPos(hwndReBar, nullptr, 0, 0, 0, 0, SWP_NOZORDER);
 	GetWindowRect(hwndReBar, &rc);
@@ -1069,11 +1069,11 @@ void RecreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 //
 void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	g_uCurrentDPI = HIWORD(wParam);
-	const RECT* const rc = (RECT *)lParam;
+	const RECT* const rc = AsPointer<RECT *>(lParam);
 
 	// recreate toolbar and statusbar
 	WCHAR chStatus[255];
-	SendMessage(hwndStatus, SB_GETTEXT, ID_FILEINFO, (LPARAM)chStatus);
+	SendMessage(hwndStatus, SB_GETTEXT, ID_FILEINFO, AsInteger<LPARAM>(chStatus));
 	RecreateBars(hwnd, g_hInstance);
 
 	const int cx = rc->right - rc->left;
@@ -1114,7 +1114,7 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 
 	// recreate toolbar and statusbar
 	WCHAR chStatus[255];
-	SendMessage(hwndStatus, SB_GETTEXT, ID_FILEINFO, (LPARAM)chStatus);
+	SendMessage(hwndStatus, SB_GETTEXT, ID_FILEINFO, AsInteger<LPARAM>(chStatus));
 	RecreateBars(hwnd, hInstance);
 
 	RECT rc;
@@ -1182,7 +1182,7 @@ void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 
 	GetClientRect(hwndStatus, &rc);
 	const int aWidth[1] = { -1 };
-	SendMessage(hwndStatus, SB_SETPARTS, COUNTOF(aWidth), (LPARAM)aWidth);
+	SendMessage(hwndStatus, SB_SETPARTS, COUNTOF(aWidth), AsInteger<LPARAM>(aWidth));
 	InvalidateRect(hwndStatus, nullptr, TRUE);
 }
 
@@ -1195,7 +1195,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(hwnd);
 	UNREFERENCED_PARAMETER(lParam);
 
-	HMENU hmenu = (HMENU)wParam;
+	HMENU hmenu = AsPointer<HMENU>(wParam);
 
 	int i = ListView_GetSelectedCount(hwndDirList);
 	DirListItem dli;
@@ -1651,7 +1651,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 		GetModuleFileName(nullptr, szModuleName, COUNTOF(szModuleName));
 		GetRelaunchParameters(szParameters);
-		const LONG_PTR result = (LONG_PTR)ShellExecute(hwnd, nullptr, szModuleName, szParameters, nullptr, SW_SHOWNORMAL);
+		const LONG_PTR result = AsInteger<LONG_PTR>(ShellExecute(hwnd, nullptr, szModuleName, szParameters, nullptr, SW_SHOWNORMAL));
 		if (result > 32 && LOWORD(wParam) == IDM_FILE_RESTART) {
 			DestroyWindow(hwnd);
 		}
@@ -2127,7 +2127,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(wParam);
 
-	LPNMHDR pnmh = (LPNMHDR)lParam;
+	LPNMHDR pnmh = AsPointer<LPNMHDR>(lParam);
 
 	switch (pnmh->idFrom) {
 	case IDC_DIRLIST:
@@ -2150,7 +2150,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			break;
 
 		case LVN_ITEMCHANGED: {
-			const NM_LISTVIEW *pnmlv = (NM_LISTVIEW *)lParam;
+			const NM_LISTVIEW *pnmlv = AsPointer<NM_LISTVIEW *>(lParam);
 
 			if ((pnmlv->uNewState & (LVIS_SELECTED | LVIS_FOCUSED)) !=
 					(pnmlv->uOldState & (LVIS_SELECTED | LVIS_FOCUSED))) {
@@ -2255,7 +2255,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			return TRUE;
 
 		case TBN_GETBUTTONINFO: {
-			LPTBNOTIFY lpTbNotify = (LPTBNOTIFY)lParam;
+			LPTBNOTIFY lpTbNotify = AsPointer<LPTBNOTIFY>(lParam);
 			if (lpTbNotify->iItem < (int)COUNTOF(tbbMainWnd)) {
 				WCHAR tch[128];
 				GetString(tbbMainWnd[lpTbNotify->iItem].idCommand, tch, COUNTOF(tch));
@@ -2275,7 +2275,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	default:
 		switch (pnmh->code) {
 		case TTN_NEEDTEXT: {
-			LPTOOLTIPTEXT pTTT = (LPTOOLTIPTEXT)lParam;
+			LPTOOLTIPTEXT pTTT = AsPointer<LPTOOLTIPTEXT>(lParam);
 			if (pTTT->uFlags & TTF_IDISHWND) {
 				PathCompactPathEx(pTTT->szText, szCurDir, COUNTOF(pTTT->szText), 0);
 			} else {
@@ -2500,7 +2500,7 @@ void SetUILanguage(int resID) noexcept {
 //
 void LoadSettings() noexcept {
 	IniSectionParser section;
-	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_SETTINGS);
+	WCHAR *pIniSectionBuf = static_cast<WCHAR *>(NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_SETTINGS));
 	const DWORD cchIniSection = static_cast<DWORD>(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
 
 	section.Init(128);
@@ -2756,7 +2756,7 @@ void SaveSettings(bool bSaveSettingsNow) noexcept {
 	}
 
 	WCHAR wchTmp[MAX_PATH];
-	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_SETTINGS);
+	WCHAR *pIniSectionBuf = static_cast<WCHAR *>(NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_SETTINGS));
 	SaveWindowPosition(pIniSectionBuf);
 	memset(pIniSectionBuf, 0, 2*sizeof(WCHAR));
 
@@ -2923,7 +2923,7 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) noexcept {
 					NP2HeapFree(lpFilterArg);
 				}
 
-				lpFilterArg = (LPWSTR)NP2HeapAlloc(sizeof(WCHAR) * (lstrlen(lp1) + 1));
+				lpFilterArg = static_cast<LPWSTR>(NP2HeapAlloc(sizeof(WCHAR) * (lstrlen(lp1) + 1)));
 				lstrcpy(lpFilterArg, lp1);
 				state = CommandParseState_Consumed;
 			}
@@ -3006,8 +3006,8 @@ void ParseCommandLine() noexcept {
 	// Good old console can also send args separated by Tabs
 	StrTab2Space(lpCmdLine);
 
-	LPWSTR lp1 = (LPWSTR)NP2HeapAlloc(cmdSize);
-	LPWSTR lp3 = (LPWSTR)NP2HeapAlloc(cmdSize);
+	LPWSTR lp1 = static_cast<LPWSTR>(NP2HeapAlloc(cmdSize));
+	LPWSTR lp3 = static_cast<LPWSTR>(NP2HeapAlloc(cmdSize));
 
 	// Start with 2nd argument
 	if (!(ExtractFirstArgument(lpCmdLine, lp1, lp3) && *lp3)) {
@@ -3016,7 +3016,7 @@ void ParseCommandLine() noexcept {
 		return;
 	}
 
-	LPWSTR lp2 = (LPWSTR)NP2HeapAlloc(cmdSize);
+	LPWSTR lp2 = static_cast<LPWSTR>(NP2HeapAlloc(cmdSize));
 	while (ExtractFirstArgument(lp3, lp1, lp2)) {
 		// options
 		if (*lp1 == L'/' || *lp1 == L'-') {
@@ -3033,7 +3033,7 @@ void ParseCommandLine() noexcept {
 				GlobalFree(lpPathArg);
 			}
 
-			lpPathArg = (LPWSTR)GlobalAlloc(GPTR, sizeof(WCHAR) * (MAX_PATH + 2));
+			lpPathArg = static_cast<LPWSTR>(GlobalAlloc(GPTR, sizeof(WCHAR) * (MAX_PATH + 2)));
 			lstrcpyn(lpPathArg, lp3, MAX_PATH);
 			PathFixBackslashes(lpPathArg);
 			StrTrim(lpPathArg, L" \"");
@@ -3053,7 +3053,7 @@ void ParseCommandLine() noexcept {
 //
 void LoadFlags() noexcept {
 	IniSectionParser section;
-	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_FLAGS);
+	WCHAR *pIniSectionBuf = static_cast<WCHAR *>(NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_FLAGS));
 	const DWORD cchIniSection = static_cast<DWORD>(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
 
 	section.Init(16);
@@ -3447,7 +3447,7 @@ static BOOL CALLBACK EnumWindProcReuseWindow(HWND hwnd, LPARAM lParam) noexcept 
 
 	if (GetClassName(hwnd, szClassName, COUNTOF(szClassName))) {
 		if (StrCaseEqual(szClassName, WC_MATEPATH)) {
-			*(HWND *)lParam = hwnd;
+			*AsPointer<HWND *>(lParam) = hwnd;
 			if (IsWindowEnabled(hwnd)) {
 				bContinue = FALSE;
 			}
@@ -3463,7 +3463,7 @@ bool ActivatePrevInst() noexcept {
 	}
 
 	HWND hwnd = nullptr;
-	EnumWindows(EnumWindProcReuseWindow, (LPARAM)&hwnd);
+	EnumWindows(EnumWindProcReuseWindow, AsInteger<LPARAM>(&hwnd));
 
 	// Found a window
 	if (hwnd != nullptr) {
@@ -3496,7 +3496,7 @@ bool ActivatePrevInst() noexcept {
 				cds.lpData = lpPathArg;
 
 				// Send lpPathArg to previous instance
-				SendMessage(hwnd, WM_COPYDATA, 0, (LPARAM)&cds);
+				SendMessage(hwnd, WM_COPYDATA, 0, AsInteger<LPARAM>(&cds));
 
 				GlobalFree(lpPathArg);
 			}
@@ -3605,7 +3605,7 @@ static BOOL CALLBACK EnumWindProcTargetApplication(HWND hwnd, LPARAM lParam) noe
 
 	if (GetClassName(hwnd, szClassName, COUNTOF(szClassName))) {
 		if (StrCaseEqual(szClassName, szGlobalWndClass)) {
-			*(HWND *)lParam = hwnd;
+			*AsPointer<HWND *>(lParam) = hwnd;
 			if (IsWindowEnabled(hwnd)) {
 				bContinue = FALSE;
 			}
@@ -3617,7 +3617,7 @@ static BOOL CALLBACK EnumWindProcTargetApplication(HWND hwnd, LPARAM lParam) noe
 
 void LoadLaunchSetings() noexcept {
 	IniSectionParser section;
-	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_TARGET_APPLICATION);
+	WCHAR *pIniSectionBuf = static_cast<WCHAR *>(NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_TARGET_APPLICATION));
 	const DWORD cchIniSection = static_cast<DWORD>(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
 
 	section.Init(16);
@@ -3665,7 +3665,7 @@ void LaunchTarget(LPCWSTR lpFileName, bool bOpenNew) {
 	if (iUseTargetApplication != UseTargetApplication_None && iTargetApplicationMode == TargetApplicationMode_SendMsg) {
 		HWND hwnd = nullptr;
 		if (!bOpenNew) { // hwnd == nullptr
-			EnumWindows(EnumWindProcTargetApplication, (LPARAM)&hwnd);
+			EnumWindows(EnumWindProcTargetApplication, AsInteger<LPARAM>(&hwnd));
 		}
 
 		// Found a window
@@ -3679,7 +3679,7 @@ void LaunchTarget(LPCWSTR lpFileName, bool bOpenNew) {
 
 			if (lpFileName) {
 				HDROP hDrop = CreateDropHandle(lpFileName);
-				PostMessage(hwnd, WM_DROPFILES, (WPARAM)hDrop, 0);
+				PostMessage(hwnd, WM_DROPFILES, AsInteger<WPARAM>(hDrop), 0);
 			}
 		} else { // Either no window or disabled - run target.exe
 			if (hwnd) { // disabled window
@@ -3693,7 +3693,7 @@ void LaunchTarget(LPCWSTR lpFileName, bool bOpenNew) {
 			if (PathGetLnkPath(lpFileName, szTmp)) {
 				lpParam = szTmp;
 			} else {
-				lpParam = (LPWSTR)lpFileName;
+				lpParam = const_cast<LPWSTR>(lpFileName);
 			}
 
 			//if (Is32bitExe(szTargetApplication))
@@ -3741,7 +3741,7 @@ void LaunchTarget(LPCWSTR lpFileName, bool bOpenNew) {
 		if (PathGetLnkPath(lpFileName, szTmp)) {
 			lpParam = szTmp;
 		} else {
-			lpParam = (LPWSTR)lpFileName;
+			lpParam = const_cast<LPWSTR>(lpFileName);
 		}
 
 		//if (Is32bitExe(szTargetApplication))
@@ -3795,7 +3795,7 @@ void SnapToTarget(HWND hwnd) noexcept {
 	}
 
 	HWND hwnd2 = nullptr;
-	EnumWindows(EnumWindProcTargetApplication, (LPARAM)&hwnd2);
+	EnumWindows(EnumWindProcTargetApplication, AsInteger<LPARAM>(&hwnd2));
 
 	// Found a window
 	if (hwnd2 != nullptr) {

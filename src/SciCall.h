@@ -22,7 +22,7 @@
 extern HANDLE g_hScintilla;
 
 inline void InitScintillaHandle(HWND hwnd) noexcept {
-	g_hScintilla = (HANDLE)SendMessage(hwnd, SCI_GETDIRECTPOINTER, 0, 0);
+	g_hScintilla = AsPointer<HANDLE>(SendMessage(hwnd, SCI_GETDIRECTPOINTER, 0, 0));
 }
 
 extern "C"
@@ -56,7 +56,7 @@ inline void PosToStr(Sci_Position pos, LPSTR tch) noexcept {
 // Text retrieval and modification
 
 inline Sci_Position SciCall_GetText(Sci_Position length, char *text) noexcept {
-	return SciCall(SCI_GETTEXT, length, (LPARAM)text);
+	return SciCall(SCI_GETTEXT, length, AsInteger<LPARAM>(text));
 }
 
 inline void SciCall_SetSavePoint() noexcept {
@@ -64,11 +64,11 @@ inline void SciCall_SetSavePoint() noexcept {
 }
 
 inline Sci_Position SciCall_GetLine(Sci_Line line, char *text) noexcept {
-	return SciCall(SCI_GETLINE, line, (LPARAM)text);
+	return SciCall(SCI_GETLINE, line, AsInteger<LPARAM>(text));
 }
 
 inline void SciCall_ReplaceSel(const char *text) noexcept {
-	SciCall(SCI_REPLACESEL, 0, (LPARAM)text);
+	SciCall(SCI_REPLACESEL, 0, AsInteger<LPARAM>(text));
 }
 
 inline void SciCall_SetReadOnly(bool readOnly) noexcept {
@@ -80,19 +80,19 @@ inline bool SciCall_GetReadOnly() noexcept {
 }
 
 inline Sci_Position SciCall_GetTextRangeFull(const Sci_TextRangeFull *tr) noexcept {
-	return SciCall(SCI_GETTEXTRANGEFULL, 0, (LPARAM)tr);
+	return SciCall(SCI_GETTEXTRANGEFULL, 0, AsInteger<LPARAM>(tr));
 }
 
 inline void SciCall_AddText(Sci_Position length, const char *text) noexcept {
-	SciCall(SCI_ADDTEXT, length, (LPARAM)text);
+	SciCall(SCI_ADDTEXT, length, AsInteger<LPARAM>(text));
 }
 
 inline void SciCall_AppendText(Sci_Position length, const char *text) noexcept {
-	SciCall(SCI_APPENDTEXT, length, (LPARAM)text);
+	SciCall(SCI_APPENDTEXT, length, AsInteger<LPARAM>(text));
 }
 
 inline void SciCall_InsertText(Sci_Position pos, const char *text) noexcept {
-	SciCall(SCI_INSERTTEXT, pos, (LPARAM)text);
+	SciCall(SCI_INSERTTEXT, pos, AsInteger<LPARAM>(text));
 }
 
 inline void SciCall_ClearAll() noexcept {
@@ -116,11 +116,11 @@ inline int SciCall_GetStyleIndexAt(Sci_Position position) noexcept {
 }
 
 inline size_t SciCall_GetStyledTextFull(const Sci_TextRangeFull *tr) noexcept {
-	return SciCall(SCI_GETSTYLEDTEXTFULL, 0, (LPARAM)(tr));
+	return SciCall(SCI_GETSTYLEDTEXTFULL, 0, AsInteger<LPARAM>(tr));
 }
 
 inline int SciCall_GetCharacterAndWidth(Sci_Position position, Sci_Position *width) noexcept {
-	return (int)SciCall(SCI_GETCHARACTERANDWIDTH, position, (LPARAM)width);
+	return (int)SciCall(SCI_GETCHARACTERANDWIDTH, position, AsInteger<LPARAM>(width));
 }
 
 inline int SciCall_GetCharacterAt(Sci_Position position) noexcept {
@@ -167,23 +167,23 @@ inline void SciCall_SetSearchFlags(int searchFlags) noexcept {
 }
 
 inline Sci_Position SciCall_SearchInTarget(Sci_Position length, const char *text) noexcept {
-	return SciCall(SCI_SEARCHINTARGET, length, (LPARAM)text);
+	return SciCall(SCI_SEARCHINTARGET, length, AsInteger<LPARAM>(text));
 }
 
 inline Sci_Position SciCall_ReplaceTarget(Sci_Position length, const char *text) noexcept {
-	return SciCall(SCI_REPLACETARGET, length, (LPARAM)text);
+	return SciCall(SCI_REPLACETARGET, length, AsInteger<LPARAM>(text));
 }
 
 inline Sci_Position SciCall_ReplaceTargetRE(Sci_Position length, const char *text) noexcept {
-	return SciCall(SCI_REPLACETARGETRE, length, (LPARAM)text);
+	return SciCall(SCI_REPLACETARGETRE, length, AsInteger<LPARAM>(text));
 }
 
 inline Sci_Position SciCall_FindTextFull(int searchFlags, Sci_TextToFindFull *ft) noexcept {
-	return SciCall(SCI_FINDTEXTFULL, searchFlags, (LPARAM)ft);
+	return SciCall(SCI_FINDTEXTFULL, searchFlags, AsInteger<LPARAM>(ft));
 }
 
 inline Sci_Position SciCall_ReplaceTargetEx(BOOL regex, Sci_Position length, const char *text) noexcept {
-	return SciCall(regex ? SCI_REPLACETARGETRE : SCI_REPLACETARGET, length, (LPARAM)text);
+	return SciCall(regex ? SCI_REPLACETARGETRE : SCI_REPLACETARGET, length, AsInteger<LPARAM>(text));
 }
 
 // Overtype
@@ -343,11 +343,11 @@ inline Sci_Position SciCall_GetSelTextLength() noexcept {
 }
 
 inline Sci_Position SciCall_GetSelText(char *buffer) noexcept {
-	return SciCall(SCI_GETSELTEXT, FALSE, (LPARAM)buffer);
+	return SciCall(SCI_GETSELTEXT, FALSE, AsInteger<LPARAM>(buffer));
 }
 
 inline Sci_Position SciCall_GetSelBytes(char *buffer) noexcept {
-	return SciCall(SCI_GETSELTEXT, TRUE, (LPARAM)buffer);
+	return SciCall(SCI_GETSELTEXT, TRUE, AsInteger<LPARAM>(buffer));
 }
 
 inline bool SciCall_IsRectangleSelection() noexcept {
@@ -379,7 +379,7 @@ inline Sci_Position SciCall_PositionAfter(Sci_Position position) noexcept {
 }
 
 inline int SciCall_TextWidth(int style, const char *text) noexcept {
-	return (int)SciCall(SCI_TEXTWIDTH, style, (LPARAM)text);
+	return (int)SciCall(SCI_TEXTWIDTH, style, AsInteger<LPARAM>(text));
 }
 
 inline int SciCall_TextHeight() noexcept {
@@ -431,7 +431,7 @@ inline Sci_Position SciCall_CountCharacters(Sci_Position start, Sci_Position end
 }
 
 inline void SciCall_CountCharactersAndColumns(Sci_TextToFindFull *ft) noexcept {
-	SciCall(SCI_COUNTCHARACTERSANDCOLUMNS, 0, (LPARAM)ft);
+	SciCall(SCI_COUNTCHARACTERSANDCOLUMNS, 0, AsInteger<LPARAM>(ft));
 }
 
 // Multiple Selection and Virtual Space
@@ -602,7 +602,7 @@ inline Sci_Position SciCall_WordEndPosition(Sci_Position position, bool onlyWord
 }
 
 inline void SciCall_SetCharClassesEx(int length, const unsigned char *characters) noexcept {
-	SciCall(SCI_SETCHARCLASSESEX, length, (LPARAM)characters);
+	SciCall(SCI_SETCHARCLASSESEX, length, AsInteger<LPARAM>(characters));
 }
 
 // Styling
@@ -638,11 +638,11 @@ inline void SciCall_CopyStyles(size_t sourceIndex, LPARAM destStyles) noexcept {
 }
 
 inline void SciCall_StyleSetFont(int style, const char *fontName) noexcept {
-	SciCall(SCI_STYLESETFONT, style, (LPARAM)fontName);
+	SciCall(SCI_STYLESETFONT, style, AsInteger<LPARAM>(fontName));
 }
 
 inline void SciCall_StyleGetFont(int style, char *fontName) noexcept {
-	SciCall(SCI_STYLEGETFONT, style, (LPARAM)fontName);
+	SciCall(SCI_STYLEGETFONT, style, AsInteger<LPARAM>(fontName));
 }
 
 inline void SciCall_StyleSetSizeFractional(int style, int sizeHundredthPoints) noexcept {
@@ -794,11 +794,11 @@ inline void SciCall_SetCaretSticky(int useCaretStickyBehaviour) noexcept {
 // Character representations
 
 inline void SciCall_SetRepresentation(const char *encodedCharacter, const char *representation) noexcept {
-	SciCall(SCI_SETREPRESENTATION, (WPARAM)encodedCharacter, (LPARAM)representation);
+	SciCall(SCI_SETREPRESENTATION, AsInteger<WPARAM>(encodedCharacter), AsInteger<LPARAM>(representation));
 }
 
 inline void SciCall_ClearRepresentation(const char *encodedCharacter) noexcept {
-	SciCall(SCI_CLEARREPRESENTATION, (WPARAM)encodedCharacter, 0);
+	SciCall(SCI_CLEARREPRESENTATION, AsInteger<WPARAM>(encodedCharacter), 0);
 }
 
 // Margins
@@ -870,7 +870,7 @@ inline void SciCall_SetFontQuality(int fontQuality) noexcept {
 }
 
 inline void SciCall_SetFontLocale(const char *localeName) noexcept {
-	SciCall(SCI_SETFONTLOCALE, 0, (LPARAM)localeName);
+	SciCall(SCI_SETFONTLOCALE, 0, AsInteger<LPARAM>(localeName));
 }
 
 inline void SciCall_SetIMEInteraction(int imeInteraction) noexcept {
@@ -969,7 +969,7 @@ inline void SciCall_MarkerDefine(int markerNumber, int markerSymbol) noexcept {
 }
 
 inline void SciCall_MarkerDefinePixmap(int markerNumber, const char *pixmap) noexcept {
-	SciCall(SCI_MARKERDEFINEPIXMAP, markerNumber, (LPARAM)pixmap);
+	SciCall(SCI_MARKERDEFINEPIXMAP, markerNumber, AsInteger<LPARAM>(pixmap));
 }
 
 inline int SciCall_MarkerSymbolDefined(int markerNumber) noexcept {
@@ -1065,7 +1065,7 @@ inline void SciCall_IndicatorFillRange(Sci_Position start, Sci_Position length) 
 // Autocompletion
 
 inline void SciCall_AutoCShow(Sci_Position lengthEntered, const char *itemList) noexcept {
-	SciCall(SCI_AUTOCSHOW, lengthEntered, (LPARAM)itemList);
+	SciCall(SCI_AUTOCSHOW, lengthEntered, AsInteger<LPARAM>(itemList));
 }
 
 inline void SciCall_AutoCCancel() noexcept {
@@ -1089,7 +1089,7 @@ inline void SciCall_AutoCSetCancelAtStart(bool cancel) noexcept {
 }
 
 inline void SciCall_AutoCSetFillUps(const char *characterSet) noexcept {
-	SciCall(SCI_AUTOCSETFILLUPS, 0, (LPARAM)characterSet);
+	SciCall(SCI_AUTOCSETFILLUPS, 0, AsInteger<LPARAM>(characterSet));
 }
 
 inline void SciCall_AutoCSetChooseSingle(bool chooseSingle) noexcept {
@@ -1127,7 +1127,7 @@ inline void SciCall_SetAutoInsertMask(int mask) noexcept {
 // Call tips
 
 inline void SciCall_CallTipShow(Sci_Position pos, const char *definition) noexcept {
-	SciCall(SCI_CALLTIPSHOW, pos, (LPARAM)definition);
+	SciCall(SCI_CALLTIPSHOW, pos, AsInteger<LPARAM>(definition));
 }
 
 inline void SciCall_CallTipCancel() noexcept {
@@ -1151,7 +1151,7 @@ inline void SciCall_CallTipUseStyle(int tabSize) noexcept {
 }
 
 inline void SciCall_ShowNotification(int notifyPos, const char *definition) noexcept {
-	SciCall(SCI_SHOWNOTIFICATION, notifyPos, (LPARAM)definition);
+	SciCall(SCI_SHOWNOTIFICATION, notifyPos, AsInteger<LPARAM>(definition));
 }
 
 // Keyboard commands
@@ -1259,7 +1259,7 @@ inline void SciCall_UsePopUp(int popUpMode) noexcept {
 // Printing
 
 inline Sci_Position SciCall_FormatRangeFull(bool draw, const Sci_RangeToFormatFull *fr) noexcept {
-	return SciCall(SCI_FORMATRANGEFULL, draw, (LPARAM)fr);
+	return SciCall(SCI_FORMATRANGEFULL, draw, AsInteger<LPARAM>(fr));
 }
 
 inline void SciCall_SetPrintMagnification(int magnification) noexcept {
@@ -1273,21 +1273,21 @@ inline void SciCall_SetPrintColorMode(int mode) noexcept {
 // Direct access
 
 inline const char* SciCall_GetRangePointer(Sci_Position start, Sci_Position lengthRange) noexcept {
-	return (const char *)SciCall(SCI_GETRANGEPOINTER, start, lengthRange);
+	return AsPointer<const char *>(SciCall(SCI_GETRANGEPOINTER, start, lengthRange));
 }
 
 // Multiple views
 
 inline void SciCall_SetDocPointer(HANDLE doc) noexcept {
-	SciCall(SCI_SETDOCPOINTER, 0, (LPARAM)doc);
+	SciCall(SCI_SETDOCPOINTER, 0, AsInteger<LPARAM>(doc));
 }
 
 inline HANDLE SciCall_CreateDocument(Sci_Position bytes, int documentOptions) noexcept {
-	return (HANDLE)SciCall(SCI_CREATEDOCUMENT, bytes, documentOptions);
+	return AsPointer<HANDLE>(SciCall(SCI_CREATEDOCUMENT, bytes, documentOptions));
 }
 
 inline void SciCall_ReleaseDocument(HANDLE doc) noexcept {
-	SciCall(SCI_RELEASEDOCUMENT, 0, (LPARAM)doc);
+	SciCall(SCI_RELEASEDOCUMENT, 0, AsInteger<LPARAM>(doc));
 }
 
 inline int SciCall_GetDocumentOptions() noexcept {
@@ -1337,11 +1337,11 @@ inline void SciCall_FoldAll(int action) noexcept {
 }
 
 inline void SciCall_ToggleFoldShowText(Sci_Line line, const char *text) noexcept {
-	SciCall(SCI_TOGGLEFOLDSHOWTEXT, line, (LPARAM)text);
+	SciCall(SCI_TOGGLEFOLDSHOWTEXT, line, AsInteger<LPARAM>(text));
 }
 
 inline void SciCall_SetDefaultFoldDisplayText(const char *text) noexcept {
-	SciCall(SCI_SETDEFAULTFOLDDISPLAYTEXT, 0, (LPARAM)text);
+	SciCall(SCI_SETDEFAULTFOLDDISPLAYTEXT, 0, AsInteger<LPARAM>(text));
 }
 
 inline void SciCall_FoldDisplayTextSetStyle(int style) noexcept {
@@ -1449,11 +1449,11 @@ inline void SciCall_EnsureStyledTo(Sci_Position end) noexcept {
 }
 
 inline void SciCall_SetProperty(const char *key, const char *value) noexcept {
-	SciCall(SCI_SETPROPERTY, (WPARAM)key, (LPARAM)value);
+	SciCall(SCI_SETPROPERTY, AsInteger<WPARAM>(key), AsInteger<LPARAM>(value));
 }
 
 inline void SciCall_SetKeywords(int keywordSet, const char *keywords) noexcept {
-	SciCall(SCI_SETKEYWORDS, keywordSet, (LPARAM)keywords);
+	SciCall(SCI_SETKEYWORDS, keywordSet, AsInteger<LPARAM>(keywords));
 }
 
 // Notifications

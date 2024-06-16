@@ -171,13 +171,13 @@
 
 #define ZeroMemory_32x1(buffer) do { \
 	const __m256i zero = _mm256_setzero_si256();						\
-	_mm256_store_si256((__m256i *)(buffer), zero);						\
+	_mm256_store_si256(reinterpret_cast<__m256i *>(buffer), zero);		\
 } while (0)
 
 #define ZeroMemory_32x2(buffer) do { \
-	const __m256i zero = _mm256_setzero_si256();						\
-	_mm256_store_si256((__m256i *)(buffer), zero);						\
-	_mm256_store_si256((__m256i *)((buffer) + sizeof(__m256i)), zero);	\
+	const __m256i zero = _mm256_setzero_si256();										\
+	_mm256_store_si256(reinterpret_cast<__m256i *>(buffer), zero);						\
+	_mm256_store_si256(reinterpret_cast<__m256i *>((buffer) + sizeof(__m256i)), zero);	\
 } while (0)
 #endif
 
@@ -187,17 +187,17 @@
 #define mm_cmple_epu8(a, b)		mm_cmpge_epu8((b), (a))
 
 #define ZeroMemory_16x2(buffer) do { \
-	const __m128 zero = _mm_setzero_ps();						\
-	_mm_store_ps((float *)(buffer), zero);						\
-	_mm_store_ps((float *)((buffer) + sizeof(__m128)), zero);	\
+	const __m128 zero = _mm_setzero_ps();										\
+	_mm_store_ps(reinterpret_cast<float *>(buffer), zero);						\
+	_mm_store_ps(reinterpret_cast<float *>((buffer) + sizeof(__m128)), zero);	\
 } while (0)
 
 #define ZeroMemory_16x4(buffer) do { \
-	const __m128 zero = _mm_setzero_ps();						\
-	_mm_store_ps((float *)(buffer), zero);						\
-	_mm_store_ps((float *)((buffer) + sizeof(__m128)), zero);	\
-	_mm_store_ps((float *)((buffer) + 2*sizeof(__m128)), zero);	\
-	_mm_store_ps((float *)((buffer) + 3*sizeof(__m128)), zero);	\
+	const __m128 zero = _mm_setzero_ps();										\
+	_mm_store_ps(reinterpret_cast<float *>(buffer), zero);						\
+	_mm_store_ps(reinterpret_cast<float *>((buffer) + sizeof(__m128)), zero);	\
+	_mm_store_ps(reinterpret_cast<float *>((buffer) + 2*sizeof(__m128)), zero);	\
+	_mm_store_ps(reinterpret_cast<float *>((buffer) + 3*sizeof(__m128)), zero);	\
 } while (0)
 #endif
 
@@ -224,7 +224,7 @@ constexpr uint32_t rotl8(uint32_t x) noexcept {
 #endif
 
 inline uint32_t loadle_u32(const void *ptr) noexcept {
-	return *((const uint32_t *)ptr);
+	return *(reinterpret_cast<const uint32_t *>(ptr));
 }
 
 #if NP2_USE_AVX2
@@ -275,13 +275,13 @@ inline bool bittestandreset(uint32_t *addr, uint32_t index) noexcept {
 }
 #else
 inline bool bittest(const uint32_t *addr, uint32_t index) noexcept {
-	return _bittest((const long *)addr, index);
+	return _bittest(reinterpret_cast<const long *>(addr), index);
 }
 inline bool bittestandset(uint32_t *addr, uint32_t index) noexcept {
-	return _bittestandset((long *)addr, index);
+	return _bittestandset(reinterpret_cast<long *>(addr), index);
 }
 inline bool bittestandreset(uint32_t *addr, uint32_t index) noexcept {
-	return _bittestandreset((long *)addr, index);
+	return _bittestandreset(reinterpret_cast<long *>(addr), index);
 }
 #endif
 

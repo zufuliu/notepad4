@@ -7,6 +7,7 @@ Checks: [
     clang-diagnostic-*,
     clang-analyzer-*,
     bugprone-*,
+    cppcoreguidelines-pro-type-cstyle-cast,
     cppcoreguidelines-slicing,
     modernize-*,
     performance-*,

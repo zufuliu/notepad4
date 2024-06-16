@@ -803,7 +803,7 @@ static void AutoC_AddDocWord(WordList &pWList, const uint32_t (&ignoredStyleMask
 		memset(onStack, 0, sizeof(onStack));
 		pFind = onStack;
 	} else {
-		pFind = (char *)NP2HeapAlloc(iRootLen + 2);
+		pFind = static_cast<char *>(NP2HeapAlloc(iRootLen + 2));
 	}
 
 	pFind[0] = prefix;
@@ -1586,7 +1586,7 @@ static bool EditCompleteWordCore(int iCondition, bool autoInsert) noexcept {
 		memset(onStack, 0, sizeof(onStack));
 		pRoot = onStack;
 	} else {
-		pRoot = (char *)NP2HeapAlloc(iCurrentPos - iStartWordPos + 1);
+		pRoot = static_cast<char *>(NP2HeapAlloc(iCurrentPos - iStartWordPos + 1));
 	}
 
 	const Sci_TextRangeFull tr = { { iStartWordPos, iCurrentPos }, pRoot };
@@ -2212,7 +2212,7 @@ void EditAutoIndent() noexcept {
 		if (iPrevLineLength < 2) {
 			return;
 		}
-		char *pLineBuf = (char *)NP2HeapAlloc(2 * iPrevLineLength + 1 + fvCurFile.iIndentWidth * 2 + 2 + 64);
+		char *pLineBuf = static_cast<char *>(NP2HeapAlloc(2 * iPrevLineLength + 1 + fvCurFile.iIndentWidth * 2 + 2 + 64));
 		if (pLineBuf == nullptr) {
 			return;
 		}

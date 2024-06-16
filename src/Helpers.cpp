@@ -164,7 +164,7 @@ bool IniSectionParser::Parse(LPWSTR lpCachedIniSection) noexcept {
 			*v++ = L'\0';
 			const UINT keyLen = (UINT)(v - p - 1);
 			IniKeyValueNode &node = nodeList[index];
-			node.hash = keyLen | ((*(const UINT *)p) << 8);
+			node.hash = keyLen | ((*reinterpret_cast<const UINT *>(p)) << 8);
 			node.key = p;
 			node.value = v;
 			++index;
@@ -197,7 +197,7 @@ LPCWSTR IniSectionParser::UnsafeGetValue(LPCWSTR key, int keyLen) noexcept {
 		keyLen = lstrlen(key);
 	}
 
-	const UINT hash = keyLen | ((*(const UINT *)key) << 8);
+	const UINT hash = keyLen | ((*reinterpret_cast<const UINT *>(key)) << 8);
 	IniKeyValueNode *node = head;
 	IniKeyValueNode *prev = nullptr;
 #if IniSectionParserUseSentinelNode
@@ -294,8 +294,8 @@ LPWSTR Registry_GetString(HKEY hKey, LPCWSTR valueName) noexcept {
 	LSTATUS status = RegQueryValueEx(hKey, valueName, nullptr, &type, nullptr, &size);
 	if (status == ERROR_SUCCESS && type == REG_SZ && size != 0) {
 		size = (size + 1)*sizeof(WCHAR);
-		lpszText = (LPWSTR)NP2HeapAlloc(size);
-		status = RegQueryValueEx(hKey, valueName, nullptr, &type, (LPBYTE)lpszText, &size);
+		lpszText = static_cast<LPWSTR>(NP2HeapAlloc(size));
+		status = RegQueryValueEx(hKey, valueName, nullptr, &type, reinterpret_cast<LPBYTE>(lpszText), &size);
 		if (status != ERROR_SUCCESS || type != REG_SZ || size == 0) {
 			NP2HeapFree(lpszText);
 			lpszText = nullptr;
@@ -307,12 +307,12 @@ LPWSTR Registry_GetString(HKEY hKey, LPCWSTR valueName) noexcept {
 LSTATUS Registry_SetString(HKEY hKey, LPCWSTR valueName, LPCWSTR lpszText) noexcept {
 	DWORD len = lstrlen(lpszText);
 	len = len ? ((len + 1)*sizeof(WCHAR)) : 0;
-	const LSTATUS status = RegSetValueEx(hKey, valueName, 0, REG_SZ, (const BYTE *)lpszText, len);
+	const LSTATUS status = RegSetValueEx(hKey, valueName, 0, REG_SZ, reinterpret_cast<const BYTE *>(lpszText), len);
 	return status;
 }
 
 LSTATUS Registry_SetInt(HKEY hKey, LPCWSTR valueName, DWORD value) noexcept {
-	const LSTATUS status = RegSetValueEx(hKey, valueName, 0, REG_DWORD, (const BYTE *)(&value), sizeof(DWORD));
+	const LSTATUS status = RegSetValueEx(hKey, valueName, 0, REG_DWORD, reinterpret_cast<const BYTE *>(&value), sizeof(DWORD));
 	return status;
 }
 
@@ -344,7 +344,7 @@ int ParseCommaList(LPCWSTR str, int result[], int count) noexcept {
 	int index = 0;
 	while (index < count) {
 		LPWSTR end;
-		result[index] = (int)wcstol(str, &end, 10);
+		result[index] = static_cast<int>(wcstol(str, &end, 10));
 		if (str == end) {
 			break;
 		}
@@ -417,7 +417,7 @@ HBITMAP LoadBitmapFile(LPCWSTR path) noexcept {
 		return nullptr;
 	}
 
-	HBITMAP hbmp = (HBITMAP)LoadImage(nullptr, szTmp, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE);
+	HBITMAP hbmp = static_cast<HBITMAP>(LoadImage(nullptr, szTmp, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE));
 	return hbmp;
 }
 
@@ -426,7 +426,7 @@ HBITMAP EnlargeImageForDPI(HBITMAP hbmp, UINT dpi) noexcept {
 	if (dpi > USER_DEFAULT_SCREEN_DPI && GetObject(hbmp, sizeof(BITMAP), &bmp)) {
 		const int width = MulDiv(dpi, bmp.bmWidth, USER_DEFAULT_SCREEN_DPI);
 		const int height = MulDiv(dpi, bmp.bmHeight, USER_DEFAULT_SCREEN_DPI);
-		HBITMAP hCopy = (HBITMAP)CopyImage(hbmp, IMAGE_BITMAP, width, height, LR_COPYRETURNORG | LR_COPYDELETEORG);
+		HBITMAP hCopy = static_cast<HBITMAP>(CopyImage(hbmp, IMAGE_BITMAP, width, height, LR_COPYRETURNORG | LR_COPYDELETEORG));
 		if (hCopy != nullptr) {
 			hbmp = hCopy;
 		}
@@ -445,7 +445,7 @@ HBITMAP ResizeImageForCurrentDPI(HBITMAP hbmp) noexcept {
 		}
 		// keep aspect ratio
 		const int width = MulDiv(height, bmp.bmWidth, bmp.bmHeight);
-		HBITMAP hCopy = (HBITMAP)CopyImage(hbmp, IMAGE_BITMAP, width, height, LR_COPYRETURNORG | LR_COPYDELETEORG);
+		HBITMAP hCopy = static_cast<HBITMAP>(CopyImage(hbmp, IMAGE_BITMAP, width, height, LR_COPYRETURNORG | LR_COPYDELETEORG));
 		if (hCopy != nullptr) {
 #if 0
 			BITMAP bmp2;
@@ -555,7 +555,7 @@ bool BitmapMergeAlpha(HBITMAP hbmp, COLORREF crDest) noexcept {
 #if NP2_USE_AVX2
 			#define BitmapMergeAlpha_Tag	"sse4 2x1"
 			const ULONG count = (bmp.bmHeight * bmp.bmWidth) / 2;
-			uint64_t *prgba = (uint64_t *)bmp.bmBits;
+			uint64_t *prgba = static_cast<uint64_t *>(bmp.bmBits);
 
 			const __m128i i16x8Back = rgba_to_bgra_epi16x8_sse4_si32(crDest);
 			for (ULONG x = 0; x < count; x++, prgba++) {
@@ -569,7 +569,7 @@ bool BitmapMergeAlpha(HBITMAP hbmp, COLORREF crDest) noexcept {
 #elif NP2_USE_SSE2
 			#define BitmapMergeAlpha_Tag	"sse2 1x1"
 			const ULONG count = bmp.bmHeight * bmp.bmWidth;
-			uint32_t *prgba = (uint32_t *)bmp.bmBits;
+			uint32_t *prgba = static_cast<uint32_t *>(bmp.bmBits);
 
 			const __m128i i16x4Back = rgba_to_bgra_epi16_sse2_si32(crDest);
 			for (ULONG x = 0; x < count; x++, prgba++) {
@@ -583,7 +583,7 @@ bool BitmapMergeAlpha(HBITMAP hbmp, COLORREF crDest) noexcept {
 #else
 			#define BitmapMergeAlpha_Tag	"scalar"
 			const ULONG count = bmp.bmHeight * bmp.bmWidth;
-			RGBQUAD *prgba = (RGBQUAD *)bmp.bmBits;
+			RGBQUAD *prgba = static_cast<RGBQUAD *>(bmp.bmBits);
 
 			const BYTE red = GetRValue(crDest);
 			const BYTE green = GetGValue(crDest);
@@ -623,7 +623,7 @@ bool BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha) noexcept {
 #if 1
 			#define BitmapAlphaBlend_Tag	"avx2 4x1"
 			const ULONG count = (bmp.bmHeight * bmp.bmWidth) / 4;
-			__m128i *prgba = (__m128i *)bmp.bmBits;
+			__m128i *prgba = static_cast<__m128i *>(bmp.bmBits);
 
 			const __m256i i16x16Alpha = _mm256_broadcastw_epi16(_mm_cvtsi32_si128(alpha));
 			const __m256i i16x16Back = _mm256_broadcastq_epi64(_mm_mullo_epi16(rgba_to_bgra_epi16_sse4_si32(crDest), mm_xor_alpha_epi16(_mm256_castsi256_si128(i16x16Alpha))));
@@ -641,7 +641,7 @@ bool BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha) noexcept {
 #else
 			#define BitmapAlphaBlend_Tag	"sse4 2x1"
 			const ULONG count = (bmp.bmHeight * bmp.bmWidth) / 2;
-			uint64_t *prgba = (uint64_t *)bmp.bmBits;
+			uint64_t *prgba = static_cast<uint64_t *>(bmp.bmBits);
 
 			const __m128i i16x8Alpha = _mm_broadcastw_epi16(_mm_cvtsi32_si128(alpha));
 			const __m128i i16x8Back = _mm_mullo_epi16(rgba_to_bgra_epi16x8_sse4_si32(crDest), mm_xor_alpha_epi16(i16x8Alpha));
@@ -652,13 +652,13 @@ bool BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha) noexcept {
 				i16x8Fore = mm_div_epu16_by_255(i16x8Fore);
 				i16x8Fore = _mm_blend_epi16(origin, i16x8Fore, 0x77);
 				i16x8Fore = pack_color_epi16_sse2_si128(i16x8Fore);
-				_mm_storel_epi64((__m128i *)prgba, i16x8Fore);
+				_mm_storel_epi64(reinterpret_cast<__m128i *>(prgba), i16x8Fore);
 			}
 #endif // NP2_USE_AVX2
 #elif NP2_USE_SSE2
 			#define BitmapAlphaBlend_Tag	"sse2 1x4"
 			const ULONG count = (bmp.bmHeight * bmp.bmWidth) / 4;
-			__m128i *prgba = (__m128i *)bmp.bmBits;
+			__m128i *prgba = static_cast<__m128i *>(bmp.bmBits);
 
 			const __m128i i16x8Alpha = _mm_shuffle_epi32(mm_setlo_alpha_epi16(alpha), 0x44);
 			__m128i i16x8Back = _mm_shuffle_epi32(rgba_to_bgra_epi16_sse2_si32(crDest), 0x44);
@@ -691,7 +691,7 @@ bool BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha) noexcept {
 #else
 			#define BitmapAlphaBlend_Tag	"scalar"
 			const ULONG count = bmp.bmHeight * bmp.bmWidth;
-			RGBQUAD *prgba = (RGBQUAD *)bmp.bmBits;
+			RGBQUAD *prgba = static_cast<RGBQUAD *>(bmp.bmBits);
 
 			const WORD red = GetRValue(crDest) * (255 ^ alpha);
 			const WORD green = GetGValue(crDest) * (255 ^ alpha);
@@ -721,7 +721,7 @@ bool BitmapGrayScale(HBITMAP hbmp) noexcept {
 	if (GetObject(hbmp, sizeof(BITMAP), &bmp)) {
 		if (bmp.bmBitsPixel == 32) {
 			const ULONG count = bmp.bmHeight * bmp.bmWidth;
-			RGBQUAD *prgba = (RGBQUAD *)bmp.bmBits;
+			RGBQUAD *prgba = static_cast<RGBQUAD *>(bmp.bmBits);
 
 			for (ULONG x = 0; x < count; x++) {
 				// gray = 0.299*red + 0.587*green + 0.114*blue
@@ -780,7 +780,7 @@ static int CALLBACK EnumFontFamExProc(CONST LOGFONT *plf, CONST TEXTMETRIC *ptm,
 	UNREFERENCED_PARAMETER(ptm);
 	UNREFERENCED_PARAMETER(fontType);
 
-	*((PBOOL)lParam) = TRUE;
+	*(AsPointer<PBOOL>(lParam)) = TRUE;
 	return FALSE;
 }
 
@@ -793,7 +793,7 @@ BOOL IsFontAvailable(LPCWSTR lpszFontName) noexcept {
 	lf.lfCharSet = DEFAULT_CHARSET;
 
 	HDC hDC = GetDC(nullptr);
-	EnumFontFamiliesEx(hDC, &lf, EnumFontFamExProc, (LPARAM)&fFound, 0);
+	EnumFontFamiliesEx(hDC, &lf, EnumFontFamExProc, AsInteger<LPARAM>(&fFound), 0);
 	ReleaseDC(nullptr, hDC);
 
 	return fFound;
@@ -807,7 +807,7 @@ void SetClipData(HWND hwnd, LPCWSTR pszData) noexcept {
 	if (OpenClipboard(hwnd)) {
 		EmptyClipboard();
 		HANDLE hData = GlobalAlloc(GHND, sizeof(WCHAR) * (lstrlen(pszData) + 1));
-		WCHAR *pData = (WCHAR *)GlobalLock(hData);
+		WCHAR *pData = static_cast<WCHAR *>(GlobalLock(hData));
 		lstrcpyn(pData, pszData, (int)(GlobalSize(hData) / sizeof(WCHAR)));
 		GlobalUnlock(hData);
 		SetClipboardData(CF_UNICODETEXT, hData);
@@ -1164,7 +1164,7 @@ HDWP DeferCtlPos(HDWP hdwp, HWND hwndDlg, int nCtlId, int dx, int dy, UINT uFlag
 	HWND hwndCtl = GetDlgItem(hwndDlg, nCtlId);
 	RECT rc;
 	GetWindowRect(hwndCtl, &rc);
-	MapWindowPoints(nullptr, hwndDlg, (LPPOINT)&rc, 2);
+	MapWindowPoints(nullptr, hwndDlg, reinterpret_cast<LPPOINT>(&rc), 2);
 	if (uFlags & SWP_NOSIZE) {
 		return DeferWindowPos(hdwp, hwndCtl, nullptr, rc.left + dx, rc.top + dy, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
 	}
@@ -1175,7 +1175,7 @@ void ResizeDlgCtl(HWND hwndDlg, int nCtlId, int dx, int dy) noexcept {
 	HWND hwndCtl = GetDlgItem(hwndDlg, nCtlId);
 	RECT rc;
 	GetWindowRect(hwndCtl, &rc);
-	MapWindowPoints(nullptr, hwndDlg, (LPPOINT)&rc, 2);
+	MapWindowPoints(nullptr, hwndDlg, reinterpret_cast<LPPOINT>(&rc), 2);
 	SetWindowPos(hwndCtl, nullptr, 0, 0, rc.right - rc.left + dx, rc.bottom - rc.top + dy, SWP_NOZORDER | SWP_NOMOVE);
 	InvalidateRect(hwndCtl, nullptr, TRUE);
 }
@@ -1216,7 +1216,7 @@ static LRESULT CALLBACK MultilineEditProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 			}
 			// TODO: find first control when hwnd is last tab item on this dialog.
 			if (hwndCtl != hwnd) {
-				PostMessage(hwndParent, WM_NEXTDLGCTL, (WPARAM)hwndCtl, TRUE);
+				PostMessage(hwndParent, WM_NEXTDLGCTL, AsInteger<WPARAM>(hwndCtl), TRUE);
 			}
 		}
 		break;
@@ -1254,7 +1254,7 @@ void MakeBitmapButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, int wBmpId) no
 	}
 #endif
 	HWND hwndCtl = GetDlgItem(hwnd, nCtlId);
-	HBITMAP hBmp = (HBITMAP)LoadImage(hInstance, MAKEINTRESOURCE(wBmpId), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
+	HBITMAP hBmp = static_cast<HBITMAP>(LoadImage(hInstance, MAKEINTRESOURCE(wBmpId), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION));
 	hBmp = ResizeImageForCurrentDPI(hBmp);
 	BITMAP bmp;
 	GetObject(hBmp, sizeof(BITMAP), &bmp);
@@ -1346,7 +1346,7 @@ LRESULT SendWMSize(HWND hwnd) noexcept {
 BOOL StatusSetTextID(HWND hwnd, UINT nPart, UINT uID) noexcept {
 	WCHAR szText[256];
 	GetString(uID, szText, COUNTOF(szText));
-	return (BOOL)SendMessage(hwnd, SB_SETTEXT, nPart, (LPARAM)szText);
+	return static_cast<BOOL>(SendMessage(hwnd, SB_SETTEXT, nPart, AsInteger<LPARAM>(szText)));
 }
 
 //=============================================================================
@@ -1355,8 +1355,8 @@ BOOL StatusSetTextID(HWND hwnd, UINT nPart, UINT uID) noexcept {
 //
 int StatusCalcPaneWidth(HWND hwnd, LPCWSTR lpsz) noexcept {
 	HDC hdc = GetDC(hwnd);
-	HFONT hfont = (HFONT)SendMessage(hwnd, WM_GETFONT, 0, 0);
-	HFONT hfold = (HFONT)SelectObject(hdc, hfont);
+	HFONT hfont = GetWindowFont(hwnd);
+	HFONT hfold = SelectFont(hdc, hfont);
 	const int mmode = SetMapMode(hdc, MM_TEXT);
 
 	SIZE size;
@@ -1380,7 +1380,7 @@ int Toolbar_GetButtons(HWND hwnd, int cmdBase, LPWSTR lpszButtons, int cchButton
 
 	for (int i = 0; i < count && len < maxCch; i++) {
 		TBBUTTON tbb;
-		SendMessage(hwnd, TB_GETBUTTON, i, (LPARAM)&tbb);
+		SendMessage(hwnd, TB_GETBUTTON, i, AsInteger<LPARAM>(&tbb));
 		const int iCmd = (tbb.idCommand == 0) ? 0 : tbb.idCommand - cmdBase + 1;
 		len += wsprintf(lpszButtons + len, L"%i ", iCmd);
 	}
@@ -1407,10 +1407,10 @@ int Toolbar_SetButtons(HWND hwnd, LPCWSTR lpszButtons, LPCTBBUTTON ptbb, int ctb
 	--ctbb;
 	while (true) {
 		LPWSTR end;
-		int iCmd = (int)wcstol(p, &end, 10);
+		int iCmd = static_cast<int>(wcstol(p, &end, 10));
 		if (p != end) {
 			iCmd = clamp(iCmd, 0, ctbb);
-			SendMessage(hwnd, TB_ADDBUTTONS, 1, (LPARAM)&ptbb[iCmd]);
+			SendMessage(hwnd, TB_ADDBUTTONS, 1, AsInteger<LPARAM>(&ptbb[iCmd]));
 			p = end;
 			++count;
 			//if (count == MAX_TOOLBAR_ITEM_COUNT_WITH_SEPARATOR) {
@@ -1430,7 +1430,7 @@ int Toolbar_SetButtons(HWND hwnd, LPCWSTR lpszButtons, LPCTBBUTTON ptbb, int ctb
 //
 bool IsCmdEnabled(HWND hwnd, UINT uId) noexcept {
 	HMENU hmenu = GetMenu(hwnd);
-	SendMessage(hwnd, WM_INITMENU, (WPARAM)hmenu, 0);
+	SendMessage(hwnd, WM_INITMENU, AsInteger<WPARAM>(hmenu), 0);
 	const UINT ustate = GetMenuState(hmenu, uId, MF_BYCOMMAND);
 
 	if (ustate == 0xFFFFFFFF) {
@@ -1964,7 +1964,7 @@ void OpenContainingFolder(HWND hwnd, LPCWSTR pszFile, bool bSelect) noexcept {
 		} else if (!bSelect) {
 #if 0
 			// Use an invalid item to open the folder?
-			hr = SHOpenFolderAndSelectItems(pidl, 1, (LPCITEMIDLIST *)(&pidl), 0);
+			hr = SHOpenFolderAndSelectItems(pidl, 1, (PCUITEMID_CHILD_ARRAY)(&pidl), 0);
 #else
 			SHELLEXECUTEINFO sei;
 			memset(&sei, 0, sizeof(SHELLEXECUTEINFO));
@@ -1996,7 +1996,7 @@ void OpenContainingFolder(HWND hwnd, LPCWSTR pszFile, bool bSelect) noexcept {
 	}
 
 	// open a new explorer window every time
-	LPWSTR szParameters = (LPWSTR)NP2HeapAlloc((lstrlen(path) + 64) * sizeof(WCHAR));
+	LPWSTR szParameters = static_cast<LPWSTR>(NP2HeapAlloc((lstrlen(path) + 64) * sizeof(WCHAR)));
 	lstrcpy(szParameters, bSelect ? L"/select," : L"");
 	lstrcat(szParameters, L"\"");
 	lstrcat(szParameters, path);
@@ -2250,7 +2250,7 @@ LPWSTR GetDlgItemFullText(HWND hwndDlg, int nCtlId) noexcept {
 		return nullptr;
 	}
 	len += 1;
-	LPWSTR buffer = (LPWSTR)NP2HeapAlloc(len*sizeof(WCHAR));
+	LPWSTR buffer = static_cast<LPWSTR>(NP2HeapAlloc(len*sizeof(WCHAR)));
 	GetWindowText(hwndDlg, buffer, len);
 	return buffer;
 }
@@ -2273,7 +2273,7 @@ int GetDlgItemTextA2W(UINT uCP, HWND hDlg, int nIDDlgItem, LPSTR lpString, int n
 void SetDlgItemTextA2W(UINT uCP, HWND hDlg, int nIDDlgItem, LPCSTR lpString) noexcept {
 	const int len = lpString ? (int)strlen(lpString) : 0;
 	if (len) {
-		LPWSTR wsz = (LPWSTR)NP2HeapAlloc((len + 1) * sizeof(WCHAR));
+		LPWSTR wsz = static_cast<LPWSTR>(NP2HeapAlloc((len + 1) * sizeof(WCHAR)));
 		MultiByteToWideChar(uCP, 0, lpString, -1, wsz, len);
 		SetDlgItemText(hDlg, nIDDlgItem, wsz);
 		NP2HeapFree(wsz);
@@ -2285,7 +2285,7 @@ void SetDlgItemTextA2W(UINT uCP, HWND hDlg, int nIDDlgItem, LPCSTR lpString) noe
 void ComboBox_AddStringA2W(UINT uCP, HWND hwnd, LPCSTR lpString) noexcept {
 	const int len = lpString ? (int)strlen(lpString) : 0;
 	if (len) {
-		LPWSTR wsz = (LPWSTR)NP2HeapAlloc((len + 1) * sizeof(WCHAR));
+		LPWSTR wsz = static_cast<LPWSTR>(NP2HeapAlloc((len + 1) * sizeof(WCHAR)));
 		MultiByteToWideChar(uCP, 0, lpString, -1, wsz, len);
 		ComboBox_AddString(hwnd, wsz);
 		NP2HeapFree(wsz);
@@ -2656,10 +2656,10 @@ DLGTEMPLATE *LoadThemedDialogTemplate(LPCWSTR lpDialogTemplateID, HINSTANCE hIns
 	}
 
 	HGLOBAL hRsrcMem = LoadResource(hInstance, hRsrc);
-	const DLGTEMPLATE *pRsrcMem = (DLGTEMPLATE *)LockResource(hRsrcMem);
+	const DLGTEMPLATE *pRsrcMem = static_cast<DLGTEMPLATE *>(LockResource(hRsrcMem));
 	const UINT dwTemplateSize = (UINT)SizeofResource(hInstance, hRsrc);
 
-	DLGTEMPLATE *pTemplate = dwTemplateSize ? (DLGTEMPLATE *)NP2HeapAlloc(dwTemplateSize + LF_FACESIZE * 2) : nullptr;
+	DLGTEMPLATE *pTemplate = dwTemplateSize ? static_cast<DLGTEMPLATE *>(NP2HeapAlloc(dwTemplateSize + LF_FACESIZE * 2)) : nullptr;
 	if (pTemplate == nullptr) {
 		FreeResource(hRsrcMem);
 		return nullptr;
@@ -2758,7 +2758,7 @@ UINT_PTR CALLBACK OpenSaveFileDlgHookProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 
 	switch (umsg) {
 	case WM_NOTIFY: {
-		LPOFNOTIFY pOFNOTIFY = (LPOFNOTIFY)lParam;
+		LPOFNOTIFY pOFNOTIFY = AsPointer<LPOFNOTIFY>(lParam);
 		switch (pOFNOTIFY->hdr.code) {
 		case CDN_INITDONE:
 			// OFN_OVERWRITEPROMPT is tested before OFNHookProc making "D:\d" like folder path trigger a prompt.

@@ -65,10 +65,10 @@ inline UINT GetLocaleMeasurement() noexcept {
 	UINT measurement = MeasurementInternational;
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 	GetLocaleInfoEx(LOCALE_NAME_USER_DEFAULT, LOCALE_IMEASURE | LOCALE_RETURN_NUMBER,
-		(LPWSTR)(&measurement), sizeof(UINT) / sizeof(WCHAR));
+		reinterpret_cast<LPWSTR>(&measurement), sizeof(UINT) / sizeof(WCHAR));
 #else
 	GetLocaleInfoW(LOCALE_USER_DEFAULT, LOCALE_IMEASURE | LOCALE_RETURN_NUMBER,
-		(LPWSTR)(&measurement), sizeof(UINT) / sizeof(WCHAR));
+		reinterpret_cast<LPWSTR>(&measurement), sizeof(UINT) / sizeof(WCHAR));
 #endif
 	return measurement;
 }
@@ -208,11 +208,11 @@ bool EditPrint(HWND hwnd, LPCWSTR pszDocTitle, BOOL bDefault) noexcept {
 	// area of the page.
 
 	// Convert device coordinates into logical coordinates
-	DPtoLP(hdc, (LPPOINT)&rectMargins, 2);
-	DPtoLP(hdc, (LPPOINT)&rectPhysMargins, 2);
+	DPtoLP(hdc, reinterpret_cast<LPPOINT>(&rectMargins), 2);
+	DPtoLP(hdc, reinterpret_cast<LPPOINT>(&rectPhysMargins), 2);
 
 	// Convert page size to logical units and we're done!
-	DPtoLP(hdc, (LPPOINT) &ptPage, 1);
+	DPtoLP(hdc, reinterpret_cast<LPPOINT>(&ptPage), 1);
 
 	const int fontSize = SciCall_StyleGetSizeFractional(STYLE_DEFAULT);
 
@@ -228,7 +228,7 @@ bool EditPrint(HWND hwnd, LPCWSTR pszDocTitle, BOOL bDefault) noexcept {
 							DEFAULT_QUALITY,
 							DEFAULT_PITCH,
 							defaultTextFontName);
-	SelectObject(hdc, fontHeader);
+	SelectFont(hdc, fontHeader);
 	GetTextMetrics(hdc, &tm);
 	headerLineHeight = tm.tmHeight + tm.tmExternalLeading;
 
@@ -247,7 +247,7 @@ bool EditPrint(HWND hwnd, LPCWSTR pszDocTitle, BOOL bDefault) noexcept {
 							DEFAULT_QUALITY,
 							DEFAULT_PITCH,
 							defaultTextFontName);
-	SelectObject(hdc, fontFooter);
+	SelectFont(hdc, fontFooter);
 	GetTextMetrics(hdc, &tm);
 	footerLineHeight = tm.tmHeight + tm.tmExternalLeading;
 
@@ -362,7 +362,7 @@ bool EditPrint(HWND hwnd, LPCWSTR pszDocTitle, BOOL bDefault) noexcept {
 
 			SetTextColor(hdc, RGB(0, 0, 0));
 			SetBkColor(hdc, RGB(255, 255, 255));
-			SelectObject(hdc, fontHeader);
+			SelectFont(hdc, fontHeader);
 			const UINT ta = SetTextAlign(hdc, TA_BOTTOM);
 			RECT rcw = {
 				frPrint.rc.left, frPrint.rc.top - headerLineHeight - headerLineHeight / 2,
@@ -379,7 +379,7 @@ bool EditPrint(HWND hwnd, LPCWSTR pszDocTitle, BOOL bDefault) noexcept {
 			if (iPrintHeader == PrintHeaderOption_FilenameAndDateTime || iPrintHeader == PrintHeaderOption_FilenameAndDate) {
 				SIZE sizeInfo;
 				const int len = lstrlen(dateString);
-				SelectObject(hdc, fontFooter);
+				SelectFont(hdc, fontFooter);
 				GetTextExtentPoint32(hdc, dateString, len, &sizeInfo);
 				rcw.left = frPrint.rc.right - 10 - sizeInfo.cx;
 				ExtTextOut(hdc, rcw.left + 5, rcw.bottom,
@@ -390,10 +390,10 @@ bool EditPrint(HWND hwnd, LPCWSTR pszDocTitle, BOOL bDefault) noexcept {
 			SetTextAlign(hdc, ta);
 			if (iPrintHeader != PrintHeaderOption_LeaveBlank) {
 				HPEN pen = CreatePen(0, 1, RGB(0, 0, 0));
-				HPEN penOld = (HPEN)SelectObject(hdc, pen);
+				HPEN penOld = SelectPen(hdc, pen);
 				MoveToEx(hdc, frPrint.rc.left, frPrint.rc.top - headerLineHeight / 4, nullptr);
 				LineTo(hdc, frPrint.rc.right, frPrint.rc.top - headerLineHeight / 4);
-				SelectObject(hdc, penOld);
+				SelectPen(hdc, penOld);
 				DeleteObject(pen);
 			}
 		}
@@ -408,7 +408,7 @@ bool EditPrint(HWND hwnd, LPCWSTR pszDocTitle, BOOL bDefault) noexcept {
 			SetBkColor(hdc, RGB(255, 255, 255));
 
 			if (iPrintFooter == PrintFooterOption_PageNumber) {
-				SelectObject(hdc, fontFooter);
+				SelectFont(hdc, fontFooter);
 				const UINT ta = SetTextAlign(hdc, TA_TOP);
 				const RECT rcw = {
 					frPrint.rc.left, frPrint.rc.bottom + footerLineHeight / 2,
@@ -424,11 +424,11 @@ bool EditPrint(HWND hwnd, LPCWSTR pszDocTitle, BOOL bDefault) noexcept {
 
 				SetTextAlign(hdc, ta);
 				HPEN pen = ::CreatePen(0, 1, RGB(0, 0, 0));
-				HPEN penOld = (HPEN)SelectObject(hdc, pen);
+				HPEN penOld = SelectPen(hdc, pen);
 				SetBkColor(hdc, RGB(0, 0, 0));
 				MoveToEx(hdc, frPrint.rc.left, frPrint.rc.bottom + footerLineHeight / 4, nullptr);
 				LineTo(hdc, frPrint.rc.right, frPrint.rc.bottom + footerLineHeight / 4);
-				SelectObject(hdc, penOld);
+				SelectPen(hdc, penOld);
 				DeleteObject(pen);
 			}
 

@@ -1041,7 +1041,7 @@ static inline void ExitApplication(HWND hwnd) noexcept {
 
 void MsgDropFiles(HWND hwnd, UINT umsg, WPARAM wParam) {
 	UNREFERENCED_PARAMETER(umsg);
-	HDROP hDrop = (HDROP)wParam;
+	HDROP hDrop = AsPointer<HDROP>(wParam);
 	// fix drag & drop file from 32-bit app to 64-bit Notepad4 before Win 10
 #if defined(_WIN64) && (_WIN32_WINNT < _WIN32_WINNT_WIN10)
 	if (umsg == WM_DROPFILES && !bReadOnlyMode) {
@@ -1242,7 +1242,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			const int h = mi.rcMonitor.bottom - mi.rcMonitor.top;
 			const UINT dpi = g_uCurrentDPI;
 
-			LPMINMAXINFO pmmi = (LPMINMAXINFO)lParam;
+			LPMINMAXINFO pmmi = AsPointer<LPMINMAXINFO>(lParam);
 			const int padding = 2*SystemMetricsForDpi(SM_CXPADDEDBORDER, dpi);
 			pmmi->ptMaxSize.x = w + padding + 2*SystemMetricsForDpi(SM_CXSIZEFRAME, dpi);
 			pmmi->ptMaxSize.y = h + padding + SystemMetricsForDpi(SM_CYCAPTION, dpi) + 2*SystemMetricsForDpi(SM_CYSIZEFRAME, dpi);
@@ -1263,7 +1263,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_COPYDATA: {
-		PCOPYDATASTRUCT pcds = (PCOPYDATASTRUCT)lParam;
+		PCOPYDATASTRUCT pcds = AsPointer<PCOPYDATASTRUCT>(lParam);
 
 		// Reset Change Notify
 		//bPendingChangeNotify = false;
@@ -1356,7 +1356,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 	return TRUE;
 
 	case WM_CONTEXTMENU: {
-		const int nID = GetDlgCtrlID((HWND)wParam);
+		const int nID = GetDlgCtrlID(AsPointer<HWND>(wParam));
 
 		if (!(nID == IDC_EDIT || nID == IDC_STATUSBAR || nID == IDC_REBAR || nID == IDC_TOOLBAR)) {
 			return DefWindowProc(hwnd, umsg, wParam, lParam);
@@ -1481,8 +1481,8 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_CHANGECBCHAIN:
-		if ((HWND)wParam == hwndNextCBChain) {
-			hwndNextCBChain = (HWND)lParam;
+		if (AsPointer<HWND>(wParam) == hwndNextCBChain) {
+			hwndNextCBChain = AsPointer<HWND>(lParam);
 		}
 		if (hwndNextCBChain) {
 			SendMessage(hwndNextCBChain, WM_CHANGECBCHAIN, lParam, wParam);
@@ -1550,7 +1550,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		HWND box = FindWindow(L"#32770", nullptr);
 		HWND parent = GetParent(box);
 		// MessageBox belongs to us.
-		if (parent == (HWND)wParam || parent == hwnd) {
+		if (parent == AsPointer<HWND>(wParam) || parent == hwnd) {
 			CenterDlgInParentEx(box, parent);
 			SnapToDefaultButton(box);
 		}
@@ -1901,7 +1901,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	// a white/black window fades out on startup when using Direct2D.
 	EditCreate(hwnd);
 
-	HINSTANCE hInstance = ((LPCREATESTRUCT)lParam)->hInstance;
+	HINSTANCE hInstance = (AsPointer<LPCREATESTRUCT>(lParam))->hInstance;
 	hwndEditFrame = CreateWindowEx(
 						WS_EX_CLIENTEDGE,
 						WC_LISTVIEW,
@@ -1985,14 +1985,14 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 		bExternalBitmap = true;
 	} else {
 		const int resource = GetBitmapResourceIdForCurrentDPI(IDB_TOOLBAR16);
-		hbmp = (HBITMAP)LoadImage(g_exeInstance, MAKEINTRESOURCE(resource), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
+		hbmp = static_cast<HBITMAP>(LoadImage(g_exeInstance, MAKEINTRESOURCE(resource), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION));
 	}
 	if (bAutoScaleToolbar) {
 		hbmp = ResizeImageForCurrentDPI(hbmp);
 	}
 	HBITMAP hbmpCopy = nullptr;
 	if (!bExternalBitmap) {
-		hbmpCopy = (HBITMAP)CopyImage(hbmp, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
+		hbmpCopy = static_cast<HBITMAP>(CopyImage(hbmp, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION));
 	}
 	BITMAP bmp;
 	GetObject(hbmp, sizeof(BITMAP), &bmp);
@@ -2000,7 +2000,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 	HIMAGELIST himl = ImageList_Create(bmp.bmHeight, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
 	ImageList_AddMasked(himl, hbmp, CLR_DEFAULT);
 	DeleteObject(hbmp);
-	SendMessage(hwndToolbar, TB_SETIMAGELIST, 0, (LPARAM)himl);
+	SendMessage(hwndToolbar, TB_SETIMAGELIST, 0, AsInteger<LPARAM>(himl));
 
 	// Optionally add hot Toolbar Bitmap
 	if (tchToolbarBitmapHot != nullptr) {
@@ -2013,7 +2013,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 			himl = ImageList_Create(bmp.bmHeight, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
 			ImageList_AddMasked(himl, hbmp, CLR_DEFAULT);
 			DeleteObject(hbmp);
-			SendMessage(hwndToolbar, TB_SETHOTIMAGELIST, 0, (LPARAM)himl);
+			SendMessage(hwndToolbar, TB_SETHOTIMAGELIST, 0, AsInteger<LPARAM>(himl));
 		}
 	}
 
@@ -2028,7 +2028,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 			himl = ImageList_Create(bmp.bmHeight, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
 			ImageList_AddMasked(himl, hbmp, CLR_DEFAULT);
 			DeleteObject(hbmp);
-			SendMessage(hwndToolbar, TB_SETDISABLEDIMAGELIST, 0, (LPARAM)himl);
+			SendMessage(hwndToolbar, TB_SETDISABLEDIMAGELIST, 0, AsInteger<LPARAM>(himl));
 			bExternalBitmap = true;
 		}
 	}
@@ -2038,7 +2038,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 		if (fProcessed) {
 			himl = ImageList_Create(bmp.bmHeight, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
 			ImageList_AddMasked(himl, hbmpCopy, CLR_DEFAULT);
-			SendMessage(hwndToolbar, TB_SETDISABLEDIMAGELIST, 0, (LPARAM)himl);
+			SendMessage(hwndToolbar, TB_SETDISABLEDIMAGELIST, 0, AsInteger<LPARAM>(himl));
 		}
 	}
 	if (hbmpCopy) {
@@ -2048,7 +2048,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 #if NP2_ENABLE_CUSTOMIZE_TOOLBAR_LABELS
 	// Load toolbar labels
 	IniSectionParser section;
-	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_TOOLBAR_LABELS);
+	WCHAR *pIniSectionBuf = static_cast<WCHAR *>(NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_TOOLBAR_LABELS));
 	const DWORD cchIniSection = static_cast<DWORD>(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
 
 	section.Init(COUNTOF(tbbMainWnd));
@@ -2064,7 +2064,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 
 		LPCWSTR tchDesc = node.value;
 		if (StrNotEmpty(tchDesc)) {
-			tbbMainWnd[n].iString = SendMessage(hwndToolbar, TB_ADDSTRING, 0, (LPARAM)tchDesc);
+			tbbMainWnd[n].iString = SendMessage(hwndToolbar, TB_ADDSTRING, 0, AsInteger<LPARAM>(tchDesc));
 			tbbMainWnd[n].fsStyle |= BTNS_AUTOSIZE | BTNS_SHOWTEXT;
 		} else {
 			tbbMainWnd[n].fsStyle &= ~(BTNS_AUTOSIZE | BTNS_SHOWTEXT);
@@ -2083,7 +2083,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 	}
 
 	RECT rc;
-	SendMessage(hwndToolbar, TB_GETITEMRECT, 0, (LPARAM)&rc);
+	SendMessage(hwndToolbar, TB_GETITEMRECT, 0, AsInteger<LPARAM>(&rc));
 	//SendMessage(hwndToolbar, TB_SETINDENT, 2, 0);
 
 	cachedStatusItem.updateMask = ((1 << StatusItem_ItemCount) - 1) ^ (1 << StatusItem_Empty);
@@ -2100,7 +2100,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 	rbi.cbSize = sizeof(REBARINFO);
 	rbi.fMask = 0;
 	rbi.himl = nullptr;
-	SendMessage(hwndReBar, RB_SETBARINFO, 0, (LPARAM)&rbi);
+	SendMessage(hwndReBar, RB_SETBARINFO, 0, AsInteger<LPARAM>(&rbi));
 
 	REBARBANDINFO rbBand;
 	rbBand.cbSize = sizeof(REBARBANDINFO);
@@ -2111,12 +2111,12 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 		rbBand.fStyle |= RBBS_CHILDEDGE;
 	}
 	rbBand.hbmBack = nullptr;
-	rbBand.lpText = (LPWSTR)L"Toolbar";
+	rbBand.lpText = const_cast<LPWSTR>(L"Toolbar");
 	rbBand.hwndChild = hwndToolbar;
 	rbBand.cxMinChild = (rc.right - rc.left) * COUNTOF(tbbMainWnd);
 	rbBand.cyMinChild = (rc.bottom - rc.top) + 2 * rc.top;
 	rbBand.cx		= 0;
-	SendMessage(hwndReBar, RB_INSERTBAND, (WPARAM)(-1), (LPARAM)&rbBand);
+	SendMessage(hwndReBar, RB_INSERTBAND, (WPARAM)(-1), AsInteger<LPARAM>(&rbBand));
 
 	SetWindowPos(hwndReBar, nullptr, 0, 0, 0, 0, SWP_NOZORDER);
 	GetWindowRect(hwndReBar, &rc);
@@ -2140,7 +2140,7 @@ void RecreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 //
 void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	g_uCurrentDPI = HIWORD(wParam);
-	const RECT* const rc = (RECT *)lParam;
+	const RECT* const rc = AsPointer<RECT *>(lParam);
 	const Sci_Line iVisTopLine = SciCall_GetFirstVisibleLine();
 	const Sci_Line iDocTopLine = SciCall_DocLineFromVisible(iVisTopLine);
 
@@ -2409,7 +2409,7 @@ void MsgNotifyZoom() noexcept {
 //
 void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	UNREFERENCED_PARAMETER(lParam);
-	HMENU hmenu = (HMENU)wParam;
+	HMENU hmenu = AsPointer<HMENU>(wParam);
 
 	const bool hasPath = StrNotEmpty(szCurFile);
 	static const uint16_t menuRequiresPath[] = {
@@ -2839,7 +2839,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 		WCHAR szModuleName[MAX_PATH];
 		GetModuleFileName(nullptr, szModuleName, COUNTOF(szModuleName));
-		LPWSTR szParameters = (LPWSTR)NP2HeapAlloc(sizeof(WCHAR) * 1024);
+		LPWSTR szParameters = static_cast<LPWSTR>(NP2HeapAlloc(sizeof(WCHAR) * 1024));
 		GetRelaunchParameters(szParameters, szCurFile, true, emptyWind);
 
 		SHELLEXECUTEINFO sei;
@@ -4213,7 +4213,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			scn.nmhdr.idFrom = IDC_EDIT;
 			scn.nmhdr.code = SCN_UPDATEUI;
 			scn.updated = SC_UPDATE_APP_CUSTOM;
-			SendMessage(hwnd, WM_NOTIFY, IDC_EDIT, (LPARAM)&scn);
+			SendMessage(hwnd, WM_NOTIFY, IDC_EDIT, AsInteger<LPARAM>(&scn));
 		} else {
 			SciCall_BraceHighlight(INVALID_POSITION, INVALID_POSITION);
 		}
@@ -4888,7 +4888,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(wParam);
 
-	LPNMHDR pnmh = (LPNMHDR)lParam;
+	LPNMHDR pnmh = AsPointer<LPNMHDR>(lParam);
 	const SCNotification * const scn = AsPointer<SCNotification *>(lParam);
 
 	switch (pnmh->idFrom) {
@@ -5034,7 +5034,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 			LPCSTR text = scn->text;
 			// function/array/template/generic
-			LPSTR braces = (LPSTR)strpbrk(text, "([{<");
+			LPSTR braces = const_cast<LPSTR>(strpbrk(text, "([{<"));
 			const Sci_Position iCurPos = SciCall_GetCurrentPos();
 			Sci_Position offset;
 			bool closeBrace = false;
@@ -5183,7 +5183,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			return TRUE;
 
 		case TBN_GETBUTTONINFO: {
-			LPTBNOTIFY lpTbNotify = (LPTBNOTIFY)lParam;
+			LPTBNOTIFY lpTbNotify = AsPointer<LPTBNOTIFY>(lParam);
 			if ((UINT)lpTbNotify->iItem < COUNTOF(tbbMainWnd)) {
 				WCHAR tch[128];
 				GetString(tbbMainWnd[lpTbNotify->iItem].idCommand, tch, COUNTOF(tch));
@@ -5199,7 +5199,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			return FALSE;
 
 		case TBN_DROPDOWN: {
-			LPTBNOTIFY lpTbNotify = (LPTBNOTIFY)lParam;
+			LPTBNOTIFY lpTbNotify = AsPointer<LPTBNOTIFY>(lParam);
 			HMENU hmenu = nullptr;
 			HMENU subMenu = nullptr;
 			if (lpTbNotify->iItem == IDT_FILE_OPEN) {
@@ -5216,7 +5216,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 					LPCWSTR path = mruFile.pszItems[i];
 					HBITMAP hbmp = bitmapCache.Get(path);
 					mii.wID = i + IDM_RECENT_HISTORY_START;
-					mii.dwTypeData = (LPWSTR)path;
+					mii.dwTypeData = const_cast<LPWSTR>(path);
 					mii.hbmpItem = hbmp;
 					InsertMenuItem(subMenu, i, TRUE, &mii);
 				}
@@ -5226,8 +5226,8 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			}
 			TPMPARAMS tpm;
 			tpm.cbSize = sizeof(TPMPARAMS);
-			SendMessage(hwndToolbar, TB_GETRECT, lpTbNotify->iItem, (LPARAM)&tpm.rcExclude);
-			MapWindowPoints(hwndToolbar, HWND_DESKTOP, (LPPOINT)&tpm.rcExclude, 2);
+			SendMessage(hwndToolbar, TB_GETRECT, lpTbNotify->iItem, AsInteger<LPARAM>(&tpm.rcExclude));
+			MapWindowPoints(hwndToolbar, HWND_DESKTOP, reinterpret_cast<LPPOINT>(&tpm.rcExclude), 2);
 			TrackPopupMenuEx(subMenu,
 							TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_VERTICAL,
 							tpm.rcExclude.left, tpm.rcExclude.bottom, hwnd, &tpm);
@@ -5240,7 +5240,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDC_STATUSBAR:
 		switch (pnmh->code) {
 		case NM_CLICK: {
-			LPNMMOUSE pnmm = (LPNMMOUSE)lParam;
+			LPNMMOUSE pnmm = AsPointer<LPNMMOUSE>(lParam);
 			switch (pnmm->dwItemSpec) {
 			case StatusItem_EolMode:
 				EditEnsureConsistentLineEndings();
@@ -5256,7 +5256,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 
 		case NM_DBLCLK: {
-			LPNMMOUSE pnmm = (LPNMMOUSE)lParam;
+			LPNMMOUSE pnmm = AsPointer<LPNMMOUSE>(lParam);
 			switch (pnmm->dwItemSpec) {
 			case StatusItem_Line:
 				EditLineNumDlg(hwndEdit);
@@ -5297,7 +5297,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	default:
 		switch (pnmh->code) {
 		case TTN_NEEDTEXT: {
-			LPTOOLTIPTEXT pTTT = (LPTOOLTIPTEXT)lParam;
+			LPTOOLTIPTEXT pTTT = AsPointer<LPTOOLTIPTEXT>(lParam);
 			if (pTTT->uFlags & TTF_IDISHWND) {
 				//nop;
 			} else {
@@ -5333,7 +5333,7 @@ static void GetWindowPositionSectionName(HMONITOR hMonitor, WCHAR (&sectionName)
 //
 void LoadSettings() noexcept {
 	IniSectionParser section;
-	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_SETTINGS);
+	WCHAR *pIniSectionBuf = static_cast<WCHAR *>(NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_SETTINGS));
 	const DWORD cchIniSection = static_cast<DWORD>(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
 	section.Init(128);
 
@@ -5729,7 +5729,7 @@ void SaveSettings(bool bSaveSettingsNow) noexcept {
 	}
 
 	WCHAR wchTmp[MAX_PATH];
-	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_SETTINGS);
+	WCHAR *pIniSectionBuf = static_cast<WCHAR *>(NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_SETTINGS));
 	if (!bStickyWindowPosition) {
 		SaveWindowPosition(pIniSectionBuf);
 		memset(pIniSectionBuf, 0, 2*sizeof(WCHAR));
@@ -6519,8 +6519,8 @@ void ParseCommandLine() noexcept {
 	// Good old console can also send args separated by Tabs
 	StrTab2Space(lpCmdLine);
 
-	LPWSTR lp1 = (LPWSTR)NP2HeapAlloc(cmdSize);
-	LPWSTR lp3 = (LPWSTR)NP2HeapAlloc(cmdSize);
+	LPWSTR lp1 = static_cast<LPWSTR>(NP2HeapAlloc(cmdSize));
+	LPWSTR lp3 = static_cast<LPWSTR>(NP2HeapAlloc(cmdSize));
 
 	// Start with 2nd argument
 	if (!(ExtractFirstArgument(lpCmdLine, lp1, lp3) && *lp3)) {
@@ -6530,7 +6530,7 @@ void ParseCommandLine() noexcept {
 	}
 
 	bool bIsFileArg = false;
-	LPWSTR lp2 = (LPWSTR)NP2HeapAlloc(cmdSize);
+	LPWSTR lp2 = static_cast<LPWSTR>(NP2HeapAlloc(cmdSize));
 	while (ExtractFirstArgument(lp3, lp1, lp2)) {
 		// options
 		if (!bIsFileArg) {
@@ -6564,13 +6564,13 @@ void ParseCommandLine() noexcept {
 
 		// pathname
 		{
-			LPWSTR lpFileBuf = (LPWSTR)NP2HeapAlloc(cmdSize);
+			LPWSTR lpFileBuf = static_cast<LPWSTR>(NP2HeapAlloc(cmdSize));
 
 			if (lpFileArg) {
 				NP2HeapFree(lpFileArg);
 			}
 
-			lpFileArg = (LPWSTR)NP2HeapAlloc(sizeof(WCHAR) * (MAX_PATH + 2)); // changed for ActivatePrevInst() needs
+			lpFileArg = static_cast<LPWSTR>(NP2HeapAlloc(sizeof(WCHAR) * (MAX_PATH + 2))); // changed for ActivatePrevInst() needs
 			if (flagMultiFileArg == TripleBoolean_True) {
 				// multiple file arguments with quoted spaces
 				lstrcpyn(lpFileArg, lp1, MAX_PATH);
@@ -6615,7 +6615,7 @@ void ParseCommandLine() noexcept {
 //
 void LoadFlags() noexcept {
 	IniSectionParser section;
-	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_FLAGS);
+	WCHAR *pIniSectionBuf = static_cast<WCHAR *>(NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_FLAGS));
 	const DWORD cchIniSection = static_cast<DWORD>(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
 	section.Init(64);
 
@@ -7091,8 +7091,8 @@ void UpdateStatusbar() noexcept {
 	HWND hwnd = hwndStatus;
 	// inline StatusCalcPaneWidth() function
 	HDC hdc = GetDC(hwnd);
-	HFONT hfont = (HFONT)SendMessage(hwnd, WM_GETFONT, 0, 0);
-	HFONT hfold = (HFONT)SelectObject(hdc, hfont);
+	HFONT hfont = GetWindowFont(hwnd);
+	HFONT hfold = SelectFont(hdc, hfont);
 	const int mmode = SetMapMode(hdc, MM_TEXT);
 	int totalWidth = 0;
 	for (int i = 0; i < StatusItem_ItemCount; i++) {
@@ -7131,7 +7131,7 @@ void UpdateStatusbar() noexcept {
 	if (updateMask == 0) {
 		SendMessage(hwnd, WM_SETREDRAW, FALSE, 0);
 	}
-	SendMessage(hwnd, SB_SETPARTS, COUNTOF(aWidth), (LPARAM)aWidth);
+	SendMessage(hwnd, SB_SETPARTS, COUNTOF(aWidth), AsInteger<LPARAM>(aWidth));
 	for (int i = 0; i < StatusItem_ItemCount; i++) {
 		LPCWSTR lpsz = items[i];
 		if (lpsz) {
@@ -7849,7 +7849,7 @@ static BOOL CALLBACK EnumWindProcReuseWindow(HWND hwnd, LPARAM lParam) noexcept 
 		if (StrCaseEqual(szClassName, wchWndClass)) {
 			const DWORD dwReuseLock = GetDlgItemInt(hwnd, IDC_REUSELOCK, nullptr, FALSE);
 			if (GetTickCount() - dwReuseLock >= REUSEWINDOWLOCKTIMEOUT) {
-				*(HWND *)lParam = hwnd;
+				*AsPointer<HWND *>(lParam) = hwnd;
 				if (IsWindowEnabled(hwnd)) {
 					bContinue = FALSE;
 				}
@@ -7874,7 +7874,7 @@ static BOOL CALLBACK EnumWindProcSingleFileInstance(HWND hwnd, LPARAM lParam) no
 				WCHAR tchFileName[MAX_PATH] = L"";
 				GetDlgItemText(hwnd, IDC_FILENAME, tchFileName, COUNTOF(tchFileName));
 				if (PathEquivalent(tchFileName, lpFileArg)) {
-					*(HWND *)lParam = hwnd;
+					*AsPointer<HWND *>(lParam) = hwnd;
 				} else {
 					bContinue = TRUE;
 				}
@@ -7901,7 +7901,7 @@ bool ActivatePrevInst() noexcept {
 		GetLongPathName(lpFileArg, lpFileArg, MAX_PATH);
 
 		HWND hwnd = nullptr;
-		EnumWindows(EnumWindProcSingleFileInstance, (LPARAM)&hwnd);
+		EnumWindows(EnumWindProcSingleFileInstance, AsInteger<LPARAM>(&hwnd));
 
 		if (hwnd != nullptr) {
 			// Enabled
@@ -7952,7 +7952,7 @@ bool ActivatePrevInst() noexcept {
 				cds.cbData = (DWORD)GlobalSize(params);
 				cds.lpData = params;
 
-				SendMessage(hwnd, WM_COPYDATA, 0, (LPARAM)&cds);
+				SendMessage(hwnd, WM_COPYDATA, 0, AsInteger<LPARAM>(&cds));
 				GlobalFree(params);
 
 				return true;
@@ -7971,7 +7971,7 @@ bool ActivatePrevInst() noexcept {
 	}
 
 	HWND hwnd = nullptr;
-	EnumWindows(EnumWindProcReuseWindow, (LPARAM)&hwnd);
+	EnumWindows(EnumWindProcReuseWindow, AsInteger<LPARAM>(&hwnd));
 
 	// Found a window
 	if (hwnd != nullptr) {
@@ -8045,7 +8045,7 @@ bool ActivatePrevInst() noexcept {
 				cds.cbData = (DWORD)GlobalSize(params);
 				cds.lpData = params;
 
-				SendMessage(hwnd, WM_COPYDATA, 0, (LPARAM)&cds);
+				SendMessage(hwnd, WM_COPYDATA, 0, AsInteger<LPARAM>(&cds));
 				GlobalFree(params);
 				NP2HeapFree(lpFileArg);
 			}
@@ -8070,8 +8070,8 @@ bool RelaunchMultiInst() noexcept {
 	if (flagMultiFileArg == TripleBoolean_True && cFileList > 1) {
 		LPWSTR lpCmdLineNew = StrDup(GetCommandLine());
 		const size_t cmdSize = sizeof(WCHAR) * (lstrlen(lpCmdLineNew) + 1);
-		LPWSTR lp1 = (LPWSTR)NP2HeapAlloc(cmdSize);
-		LPWSTR lp2 = (LPWSTR)NP2HeapAlloc(cmdSize);
+		LPWSTR lp1 = static_cast<LPWSTR>(NP2HeapAlloc(cmdSize));
+		LPWSTR lp2 = static_cast<LPWSTR>(NP2HeapAlloc(cmdSize));
 
 		StrTab2Space(lpCmdLineNew);
 		StrCpyEx(lpCmdLineNew + cchiFileList, L"");
@@ -8272,16 +8272,16 @@ bool RelaunchElevated() noexcept {
 			}
 
 			exit = PathEqual(tchFile, szCurFile);
-			lpArg1 = (LPWSTR)NP2HeapAlloc(sizeof(WCHAR) * MAX_PATH);
+			lpArg1 = static_cast<LPWSTR>(NP2HeapAlloc(sizeof(WCHAR) * MAX_PATH));
 			GetModuleFileName(nullptr, lpArg1, MAX_PATH);
-			lpArg2 = (LPWSTR)NP2HeapAlloc(sizeof(WCHAR) * 1024);
+			lpArg2 = static_cast<LPWSTR>(NP2HeapAlloc(sizeof(WCHAR) * 1024));
 			GetRelaunchParameters(lpArg2, tchFile, !exit, false);
 			exit = !IsDocumentModified();
 		} else {
 			const LPCWSTR lpCmdLine = GetCommandLine();
 			const size_t cmdSize = sizeof(WCHAR) * (lstrlen(lpCmdLine) + 1);
-			lpArg1 = (LPWSTR)NP2HeapAlloc(cmdSize);
-			lpArg2 = (LPWSTR)NP2HeapAlloc(cmdSize);
+			lpArg1 = static_cast<LPWSTR>(NP2HeapAlloc(cmdSize));
+			lpArg2 = static_cast<LPWSTR>(NP2HeapAlloc(cmdSize));
 			ExtractFirstArgument(lpCmdLine, lpArg1, lpArg2);
 		}
 
@@ -8430,7 +8430,7 @@ void ShowNotificationW(int notifyPos, LPCWSTR lpszText) noexcept {
 	const int cpEdit = SciCall_GetCodePage();
 	const int wchLen = lstrlen(lpszText);
 	const int cchLen = wchLen*kMaxMultiByteCount + 1;
-	char *cchText = (char *)NP2HeapAlloc(cchLen);
+	char *cchText = static_cast<char *>(NP2HeapAlloc(cchLen));
 	WideCharToMultiByte(cpEdit, 0, lpszText, -1, cchText, cchLen, nullptr, nullptr);
 	ShowNotificationA(notifyPos, cchText);
 	NP2HeapFree(cchText);
@@ -8743,7 +8743,7 @@ void AutoSave_DoWork(FileSaveFlag saveFlag) noexcept {
 	}
 
 	DWORD length = cbData + COUNTOF(suffix)*kMaxMultiByteCount + 1;
-	char *lpData = (char *)NP2HeapAlloc(length);
+	char *lpData = static_cast<char *>(NP2HeapAlloc(length));
 	if (metaLen) {
 		lstrcpy(suffix, L"AutoSave for ");
 		lstrcat(suffix, szCurFile);

@@ -71,10 +71,10 @@ void DirList_Init(HWND hwnd, LPCWSTR pszHeader) noexcept {
 
 	SHFILEINFO shfi;
 	// Add Imagelists
-	HIMAGELIST hil = (HIMAGELIST)SHGetFileInfo(L"C:\\", 0, &shfi, sizeof(SHFILEINFO), SHGFI_SMALLICON | SHGFI_SYSICONINDEX);
+	HIMAGELIST hil = AsPointer<HIMAGELIST>(SHGetFileInfo(L"C:\\", 0, &shfi, sizeof(SHFILEINFO), SHGFI_SMALLICON | SHGFI_SYSICONINDEX));
 	ListView_SetImageList(hwnd, hil, LVSIL_SMALL);
 
-	hil = (HIMAGELIST)SHGetFileInfo(L"C:\\", 0, &shfi, sizeof(SHFILEINFO), SHGFI_LARGEICON | SHGFI_SYSICONINDEX);
+	hil = AsPointer<HIMAGELIST>(SHGetFileInfo(L"C:\\", 0, &shfi, sizeof(SHFILEINFO), SHGFI_LARGEICON | SHGFI_SYSICONINDEX));
 	ListView_SetImageList(hwnd, hil, LVSIL_NORMAL);
 
 	// Initialize default icons - done in DirList_Fill()
@@ -206,15 +206,11 @@ int DirList_Fill(HWND hwnd, LPCWSTR lpszDir, DWORD grfFlags, LPCWSTR lpszFileSpe
 								LV_ITEMDATA *lplvid = static_cast<LV_ITEMDATA *>(CoTaskMemAlloc(sizeof(LV_ITEMDATA)));
 								lplvid->pidl = pidlEntry;
 								lplvid->lpsf = lpsf;
-
 								lpsf->AddRef();
-
-								lvi.lParam = (LPARAM)lplvid;
-
+								lvi.lParam = AsInteger<LPARAM>(lplvid);
 								// Setup default Icon - Folder or File
 								lvi.iImage = (dwAttributes & SFGAO_FOLDER) ? lpdl->iDefIconFolder : lpdl->iDefIconFile;
 								ListView_InsertItem(hwnd, &lvi);
-
 								lvi.iItem++;
 							}
 						}
@@ -380,7 +376,7 @@ bool DirList_GetDispInfo(HWND hwnd, LPARAM lParam, bool bNoFadeHidden) {
 // from the control
 //
 bool DirList_DeleteItem(HWND hwnd, LPARAM lParam) {
-	const NM_LISTVIEW *lpnmlv = (NM_LISTVIEW *)lParam;
+	const NM_LISTVIEW *lpnmlv = AsPointer<NM_LISTVIEW *>(lParam);
 
 	LV_ITEM lvi;
 	lvi.iItem = lpnmlv->iItem;
@@ -725,8 +721,8 @@ struct DC_ITEMDATA {
 //
 bool DriveBox_Init(HWND hwnd) noexcept {
 	SHFILEINFO shfi;
-	HIMAGELIST hil = (HIMAGELIST)SHGetFileInfo(L"C:\\", 0, &shfi, sizeof(SHFILEINFO), SHGFI_SMALLICON | SHGFI_SYSICONINDEX);
-	SendMessage(hwnd, CBEM_SETIMAGELIST, 0, (LPARAM)hil);
+	DWORD_PTR hil = SHGetFileInfo(L"C:\\", 0, &shfi, sizeof(SHFILEINFO), SHGFI_SMALLICON | SHGFI_SYSICONINDEX);
+	SendMessage(hwnd, CBEM_SETIMAGELIST, 0, hil);
 	SendMessage(hwnd, CBEM_SETEXTENDEDSTYLE, CBES_EX_NOSIZELIMIT, CBES_EX_NOSIZELIMIT);
 
 	return true;
@@ -795,7 +791,7 @@ int DriveBox_Fill(HWND hwnd) {
 									cbei2.mask = CBEIF_LPARAM;
 									cbei2.iItem = 0;
 
-									while ((SendMessage(hwnd, CBEM_GETITEM, 0, (LPARAM)&cbei2))) {
+									while ((SendMessage(hwnd, CBEM_GETITEM, 0, AsInteger<LPARAM>(&cbei2)))) {
 										const DC_ITEMDATA * const lpdcid2 = AsPointer<const DC_ITEMDATA *>(cbei2.lParam);
 										hr = lpdcid->lpsf->CompareIDs(0, (PCUIDLIST_RELATIVE)(lpdcid->pidl), (PCUIDLIST_RELATIVE)(lpdcid2->pidl));
 										if ((short)HRESULT_CODE(hr) < 0) {
@@ -805,8 +801,8 @@ int DriveBox_Fill(HWND hwnd) {
 									}
 
 									cbei.iItem = cbei2.iItem;
-									cbei.lParam = (LPARAM)lpdcid;
-									SendMessage(hwnd, CBEM_INSERTITEM, 0, (LPARAM)&cbei);
+									cbei.lParam = AsInteger<LPARAM>(lpdcid);
+									SendMessage(hwnd, CBEM_INSERTITEM, 0, AsInteger<LPARAM>(&cbei));
 								}
 							}
 						}
@@ -843,7 +839,7 @@ bool DriveBox_GetSelDrive(HWND hwnd, LPWSTR lpszDrive, int nDrive, bool fNoSlash
 	COMBOBOXEXITEM cbei;
 	cbei.mask = CBEIF_LPARAM;
 	cbei.iItem = i;
-	SendMessage(hwnd, CBEM_GETITEM, 0, (LPARAM)&cbei);
+	SendMessage(hwnd, CBEM_GETITEM, 0, AsInteger<LPARAM>(&cbei));
 	const DC_ITEMDATA * const lpdcid = AsPointer<const DC_ITEMDATA *>(cbei.lParam);
 
 	// Get File System Path for Drive
@@ -875,7 +871,7 @@ bool DriveBox_SelectDrive(HWND hwnd, LPCWSTR lpszPath) {
 		WCHAR szRoot[64] = L"";
 		// Get DC_ITEMDATA* of Item i
 		cbei.iItem = i;
-		SendMessage(hwnd, CBEM_GETITEM, 0, (LPARAM)&cbei);
+		SendMessage(hwnd, CBEM_GETITEM, 0, AsInteger<LPARAM>(&cbei));
 		const DC_ITEMDATA * const lpdcid = AsPointer<const DC_ITEMDATA *>(cbei.lParam);
 
 		// Get File System Path for Drive
@@ -910,7 +906,7 @@ bool DriveBox_PropertyDlg(HWND hwnd) {
 	COMBOBOXEXITEM cbei;
 	cbei.mask = CBEIF_LPARAM;
 	cbei.iItem = iItem;
-	SendMessage(hwnd, CBEM_GETITEM, 0, (LPARAM)&cbei);
+	SendMessage(hwnd, CBEM_GETITEM, 0, AsInteger<LPARAM>(&cbei));
 	const DC_ITEMDATA * const lpdcid = AsPointer<const DC_ITEMDATA *>(cbei.lParam);
 	LPCONTEXTMENU lpcm;
 
@@ -943,12 +939,12 @@ bool DriveBox_PropertyDlg(HWND hwnd) {
 // DriveBox_DeleteItem
 //
 bool DriveBox_DeleteItem(HWND hwnd, LPARAM lParam) {
-	const NMCOMBOBOXEX *lpnmcbe = (NMCOMBOBOXEX *)lParam;
+	const NMCOMBOBOXEX *lpnmcbe = AsPointer<NMCOMBOBOXEX *>(lParam);
 	COMBOBOXEXITEM cbei;
 	cbei.iItem = lpnmcbe->ceItem.iItem;
 
 	cbei.mask = CBEIF_LPARAM;
-	SendMessage(hwnd, CBEM_GETITEM, 0, (LPARAM)&cbei);
+	SendMessage(hwnd, CBEM_GETITEM, 0, AsInteger<LPARAM>(&cbei));
 	DC_ITEMDATA * const lpdcid = AsPointer<DC_ITEMDATA *>(cbei.lParam);
 
 	// Free pidl
@@ -968,7 +964,7 @@ bool DriveBox_DeleteItem(HWND hwnd, LPARAM lParam) {
 bool DriveBox_GetDispInfo(HWND hwnd, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(hwnd);
 
-	NMCOMBOBOXEX *lpnmcbe = (NMCOMBOBOXEX *)lParam;
+	NMCOMBOBOXEX *lpnmcbe = AsPointer<NMCOMBOBOXEX *>(lParam);
 	const DC_ITEMDATA * const lpdcid = AsPointer<const DC_ITEMDATA *>(lpnmcbe->ceItem.lParam);
 
 	if (!lpdcid) {
@@ -1023,15 +1019,15 @@ LPITEMIDLIST IL_Create(LPCITEMIDLIST pidl1, UINT cb1, LPCITEMIDLIST pidl2, UINT 
 	}
 
 	// Allocate Memory
-	LPITEMIDLIST pidl = (LPITEMIDLIST)CoTaskMemAlloc(cb1 + cb2);
+	LPITEMIDLIST pidl = static_cast<LPITEMIDLIST>(CoTaskMemAlloc(cb1 + cb2));
 
 	// Init new ITEMIDLIST
 	if (pidl1) {
-		memcpy((char *)pidl, (const char *)pidl1, cb1);
+		memcpy(reinterpret_cast<char *>(pidl), reinterpret_cast<const char *>(pidl1), cb1);
 	}
 
 	// pidl2 can't be nullptr here
-	memcpy((char *)pidl + cb1, (const char *)pidl2, cb2);
+	memcpy(reinterpret_cast<char *>(pidl) + cb1, reinterpret_cast<const char *>(pidl2), cb2);
 
 	return pidl;
 }

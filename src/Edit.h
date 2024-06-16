@@ -464,20 +464,20 @@ struct NP2ENCODING {
 inline BOOL GetLegacyACP(UINT *acp) noexcept {
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 	return GetLocaleInfoEx(LOCALE_NAME_SYSTEM_DEFAULT, LOCALE_IUSEUTF8LEGACYACP | LOCALE_RETURN_NUMBER,
-		(LPWSTR)(acp), sizeof(UINT) / sizeof(WCHAR));
+		reinterpret_cast<LPWSTR>(acp), sizeof(UINT) / sizeof(WCHAR));
 #else
 	return GetLocaleInfoW(LOCALE_SYSTEM_DEFAULT, LOCALE_IUSEUTF8LEGACYACP | LOCALE_RETURN_NUMBER,
-		(LPWSTR)(acp), sizeof(UINT) / sizeof(WCHAR));
+		reinterpret_cast<LPWSTR>(acp), sizeof(UINT) / sizeof(WCHAR));
 #endif
 }
 
 inline BOOL GetLegacyOEMCP(UINT *oemcp) noexcept {
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 	return GetLocaleInfoEx(LOCALE_NAME_SYSTEM_DEFAULT, LOCALE_IUSEUTF8LEGACYOEMCP | LOCALE_RETURN_NUMBER,
-		(LPWSTR)(oemcp), sizeof(UINT) / sizeof(WCHAR));
+		reinterpret_cast<LPWSTR>(oemcp), sizeof(UINT) / sizeof(WCHAR));
 #else
 	return GetLocaleInfoW(LOCALE_SYSTEM_DEFAULT, LOCALE_IUSEUTF8LEGACYOEMCP | LOCALE_RETURN_NUMBER,
-		(LPWSTR)(oemcp), sizeof(UINT) / sizeof(WCHAR));
+		reinterpret_cast<LPWSTR>(oemcp), sizeof(UINT) / sizeof(WCHAR));
 #endif
 }
 
@@ -546,7 +546,7 @@ bool	IsUTF7(const char *pTest, DWORD nLength) noexcept;
 #define BOM_UTF16BE		0xFFFE
 inline bool IsUTF8Signature(const char *p) noexcept {
 	//return p[0] == '\xEF' && p[1] == '\xBB' && p[2] == '\xBF';
-	return (*((const UINT *)p) & 0xFFFFFF) == BOM_UTF8;
+	return (*(reinterpret_cast<const UINT *>(p)) & 0xFFFFFF) == BOM_UTF8;
 }
 
 constexpr BOOL Encoding_HasBOM(int iEncoding) noexcept {
