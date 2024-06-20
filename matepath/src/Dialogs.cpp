@@ -2340,7 +2340,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 		ti.hwnd     = hwnd;
 		ti.uId      = AsInteger<UINT_PTR>(GetDlgItem(hwnd, IDC_BROWSE));
 		ti.hinst    = g_hInstance;
-		ti.lpszText = (LPWSTR)IDS_SEARCHEXE;
+		ti.lpszText = MAKEINTRESOURCE(IDS_SEARCHEXE);
 
 		if (!SendMessage(hwndToolTip, TTM_ADDTOOL, 0, AsInteger<LPARAM>(&ti))) {
 			DestroyWindow(hwndToolTip);
@@ -2354,9 +2354,9 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 		//ti.hwnd     = hwnd;
 		//ti.uId      = AsInteger<UINT_PTR>(GetDlgItem(hwnd, IDC_FINDWIN));
 		//ti.hinst    = g_hInstance;
-		//ti.lpszText = (LPWSTR)IDS_FINDWINTITLE;
+		//ti.lpszText = MAKEINTRESOURCE(IDS_FINDWINTITLE);
 		//
-		//if (!SendMessage(hwndToolTip, TTM_ADDTOOL, 0, (LPARAM)&ti)) {
+		//if (!SendMessage(hwndToolTip, TTM_ADDTOOL, 0, AsInteger<LPARAM>(&ti))) {
 		//	DestroyWindow(hwndToolTip);
 		//}
 

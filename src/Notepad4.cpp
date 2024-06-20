@@ -708,7 +708,7 @@ BOOL InitApplication(HINSTANCE hInstance) noexcept {
 	wc.hInstance	 = hInstance;
 	wc.hIcon		 = LoadIcon(hInstance, MAKEINTRESOURCE(IDR_MAINWND));
 	wc.hCursor		 = LoadCursor(nullptr, IDC_ARROW);
-	wc.hbrBackground = (HBRUSH)(COLOR_3DFACE + 1);
+	wc.hbrBackground = AsPointer<HBRUSH, ULONG_PTR>(COLOR_3DFACE + 1);
 	wc.lpszMenuName	 = MAKEINTRESOURCE(IDR_MAINWND);
 	wc.lpszClassName = wchWndClass;
 	wc.hIconSm       = nullptr;
@@ -1057,7 +1057,7 @@ void MsgDropFiles(HWND hwnd, UINT umsg, WPARAM wParam) {
 		}
 	}
 #endif
-	//if (DragQueryFile(hDrop, (UINT)(-1), nullptr, 0) > 1) {
+	//if (DragQueryFile(hDrop, UINT_MAX, nullptr, 0) > 1) {
 	//	MsgBoxWarn(MB_OK, IDS_ERR_DROP);
 	//}
 	WCHAR szBuf[MAX_PATH + 40];
@@ -1757,7 +1757,7 @@ void EditCreate(HWND hwndParent) noexcept {
 						  WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS,
 						  0, 0, 0, 0,
 						  hwndParent,
-						  (HMENU)IDC_EDIT,
+						  AsPointer<HMENU, ULONG_PTR>(IDC_EDIT),
 						  g_hInstance,
 						  nullptr);
 	hwndEdit = hwnd;
@@ -1909,7 +1909,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 						WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
 						0, 0, 0, 0,
 						hwnd,
-						(HMENU)IDC_EDITFRAME,
+						AsPointer<HMENU, ULONG_PTR>(IDC_EDITFRAME),
 						hInstance,
 						nullptr);
 
@@ -1920,25 +1920,25 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 
 	// Window Initialization
 
-	(void)CreateWindow(
+	(void)CreateWindowEx(0,
 		WC_STATIC,
 		nullptr,
 		WS_CHILD | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
 		0, 0, 10, 10,
 		hwnd,
-		(HMENU)IDC_FILENAME,
+		AsPointer<HMENU, ULONG_PTR>(IDC_FILENAME),
 		hInstance,
 		nullptr);
 
 	SetDlgItemText(hwnd, IDC_FILENAME, szCurFile);
 
-	(void)CreateWindow(
+	(void)CreateWindowEx(0,
 		WC_STATIC,
 		nullptr,
 		WS_CHILD | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
 		10, 10, 10, 10,
 		hwnd,
-		(HMENU)IDC_REUSELOCK,
+		AsPointer<HMENU, ULONG_PTR>(IDC_REUSELOCK),
 		hInstance,
 		nullptr);
 
@@ -1971,7 +1971,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 
 	constexpr DWORD dwToolbarStyle = WS_TOOLBAR;
 	hwndToolbar = CreateWindowEx(0, TOOLBARCLASSNAME, nullptr, dwToolbarStyle,
-								 0, 0, 0, 0, hwnd, (HMENU)IDC_TOOLBAR, hInstance, nullptr);
+								 0, 0, 0, 0, hwnd, AsPointer<HMENU, ULONG_PTR>(IDC_TOOLBAR), hInstance, nullptr);
 
 	SendMessage(hwndToolbar, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0);
 
@@ -2094,7 +2094,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 	// Create ReBar and add Toolbar
 	const DWORD dwReBarStyle = bShowToolbar ? (WS_REBAR | WS_VISIBLE) : WS_REBAR;
 	hwndReBar = CreateWindowEx(WS_EX_TOOLWINDOW, REBARCLASSNAME, nullptr, dwReBarStyle,
-							   0, 0, 0, 0, hwnd, (HMENU)IDC_REBAR, hInstance, nullptr);
+							   0, 0, 0, 0, hwnd, AsPointer<HMENU, ULONG_PTR>(IDC_REBAR), hInstance, nullptr);
 
 	REBARINFO rbi;
 	rbi.cbSize = sizeof(REBARINFO);

@@ -827,23 +827,6 @@ struct BitmapCache {
 };
 
 //==== Themed Dialogs =========================================================
-#ifndef DLGTEMPLATEEX
-#pragma pack(push, 1)
-struct DLGTEMPLATEEX {
-	WORD	dlgVer;
-	WORD	signature;
-	DWORD	helpID;
-	DWORD	exStyle;
-	DWORD	style;
-	WORD	cDlgItems;
-	short	x;
-	short	y;
-	short	cx;
-	short	cy;
-};
-#pragma pack(pop)
-#endif
-
 bool	GetThemedDialogFont(LPWSTR lpFaceName, WORD *wSize) noexcept;
 DLGTEMPLATE *LoadThemedDialogTemplate(LPCWSTR lpDialogTemplateID, HINSTANCE hInstance) noexcept;
 #define ThemedDialogBox(hInstance, lpTemplate, hWndParent, lpDialogFunc) \

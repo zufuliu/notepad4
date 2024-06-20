@@ -1080,7 +1080,7 @@ void ResizeDlg_Size(HWND hwnd, LPARAM lParam, int *cx, int *cy) noexcept {
 }
 
 void ResizeDlg_GetMinMaxInfo(HWND hwnd, LPARAM lParam) noexcept {
-	const RESIZEDLG *pm = static_cast<RESIZEDLG *>(GetProp(hwnd, RESIZEDLG_PROP_KEY));
+	const RESIZEDLG * const pm = static_cast<RESIZEDLG *>(GetProp(hwnd, RESIZEDLG_PROP_KEY));
 	LPMINMAXINFO lpmmi = AsPointer<LPMINMAXINFO>(lParam);
 #if NP2_ENABLE_RESIZEDLG_TEMP_FIX
 	const UINT dpi = GetWindowDPI(hwnd);
@@ -1281,7 +1281,7 @@ void MakeColorPickButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, COLORREF cr
 		himlOld = bi.himl;
 	}
 
-	if (IsWindowEnabled(hwndCtl) && crColor != (COLORREF)(-1)) {
+	if (IsWindowEnabled(hwndCtl) && crColor != UINT_MAX) {
 		colormap[0].from = RGB(0x00, 0x00, 0x00);
 		colormap[0].to	 = GetSysColor(COLOR_3DSHADOW);
 		if (crColor == RGB(0xFF, 0xFF, 0xFF)) {
@@ -1959,12 +1959,12 @@ void OpenContainingFolder(HWND hwnd, LPCWSTR pszFile, bool bSelect) noexcept {
 		HRESULT hr;
 		PIDLIST_ABSOLUTE pidlEntry = path ? ILCreateFromPath(path) : nullptr;
 		if (pidlEntry) {
-			hr = SHOpenFolderAndSelectItems(pidl, 1, (PCUITEMID_CHILD_ARRAY)(&pidlEntry), 0);
+			hr = SHOpenFolderAndSelectItems(pidl, 1, reinterpret_cast<PCUITEMID_CHILD_ARRAY>(&pidlEntry), 0);
 			CoTaskMemFree(pidlEntry);
 		} else if (!bSelect) {
 #if 0
 			// Use an invalid item to open the folder?
-			hr = SHOpenFolderAndSelectItems(pidl, 1, (PCUITEMID_CHILD_ARRAY)(&pidl), 0);
+			hr = SHOpenFolderAndSelectItems(pidl, 1, reinterpret_cast<PCUITEMID_CHILD_ARRAY>(&pidl), 0);
 #else
 			SHELLEXECUTEINFO sei;
 			memset(&sei, 0, sizeof(SHELLEXECUTEINFO));
@@ -2608,43 +2608,58 @@ bool GetThemedDialogFont(LPWSTR lpFaceName, WORD *wSize) noexcept {
 
 namespace {
 
+// https://learn.microsoft.com/en-us/windows/win32/dlgbox/dlgtemplateex
+#pragma pack(push, 1)
+struct DLGTEMPLATEEX {
+	WORD	dlgVer;
+	WORD	signature;
+	DWORD	helpID;
+	DWORD	exStyle;
+	DWORD	style;
+	WORD	cDlgItems;
+	short	x;
+	short	y;
+	short	cx;
+	short	cy;
+};
+#pragma pack(pop)
+
 bool DialogTemplate_IsDialogEx(const DLGTEMPLATE *pTemplate) noexcept {
-	return ((DLGTEMPLATEEX *)pTemplate)->signature == 0xFFFF;
+	return (reinterpret_cast<const DLGTEMPLATEEX *>(pTemplate))->signature == 0xFFFF;
 }
 
-BOOL DialogTemplate_HasFont(const DLGTEMPLATE *pTemplate) noexcept {
-	return (DS_SETFONT & (DialogTemplate_IsDialogEx(pTemplate) ? ((DLGTEMPLATEEX *)pTemplate)->style : pTemplate->style));
+BOOL DialogTemplate_HasFont(const DLGTEMPLATE *pTemplate, bool bDialogEx) noexcept {
+	return (DS_SETFONT & (bDialogEx ? (reinterpret_cast<const DLGTEMPLATEEX *>(pTemplate))->style : pTemplate->style));
 }
 
-constexpr int DialogTemplate_FontAttrSize(bool bDialogEx) noexcept {
+constexpr DWORD DialogTemplate_FontAttrSize(bool bDialogEx) noexcept {
 	return sizeof(WORD) * (bDialogEx ? 3 : 1);
 }
 
-BYTE *DialogTemplate_GetFontSizeField(const DLGTEMPLATE *pTemplate) noexcept {
-	const bool bDialogEx = DialogTemplate_IsDialogEx(pTemplate);
+BYTE *DialogTemplate_GetFontSizeField(DLGTEMPLATE *pTemplate, bool bDialogEx) noexcept {
 	WORD *pw;
 
 	if (bDialogEx) {
-		pw = (WORD *)((DLGTEMPLATEEX *)pTemplate + 1);
+		pw = reinterpret_cast<WORD *>(reinterpret_cast<DLGTEMPLATEEX *>(pTemplate) + 1);
 	} else {
-		pw = (WORD *)(pTemplate + 1);
+		pw = reinterpret_cast<WORD *>(pTemplate + 1);
 	}
-
-	if (*pw == (WORD)(-1)) {
+	// menu
+	if (*pw == 0xFFFF) {
 		pw += 2;
 	} else {
 		while (*pw++){}
 	}
-
-	if (*pw == (WORD)(-1)) {
+	// window class
+	if (*pw == 0xFFFF) {
 		pw += 2;
 	} else {
 		while (*pw++){}
 	}
-
+	// title
 	while (*pw++){}
 
-	return (BYTE *)pw;
+	return reinterpret_cast<BYTE *>(pw);
 }
 
 }
@@ -2657,15 +2672,15 @@ DLGTEMPLATE *LoadThemedDialogTemplate(LPCWSTR lpDialogTemplateID, HINSTANCE hIns
 
 	HGLOBAL hRsrcMem = LoadResource(hInstance, hRsrc);
 	const DLGTEMPLATE *pRsrcMem = static_cast<DLGTEMPLATE *>(LockResource(hRsrcMem));
-	const UINT dwTemplateSize = (UINT)SizeofResource(hInstance, hRsrc);
+	const DWORD dwTemplateSize = SizeofResource(hInstance, hRsrc);
 
-	DLGTEMPLATE *pTemplate = dwTemplateSize ? static_cast<DLGTEMPLATE *>(NP2HeapAlloc(dwTemplateSize + LF_FACESIZE * 2)) : nullptr;
+	DLGTEMPLATE *pTemplate = dwTemplateSize ? static_cast<DLGTEMPLATE *>(NP2HeapAlloc(dwTemplateSize + LF_FACESIZE*sizeof(WCHAR))) : nullptr;
 	if (pTemplate == nullptr) {
 		FreeResource(hRsrcMem);
 		return nullptr;
 	}
 
-	memcpy((BYTE *)pTemplate, pRsrcMem, (size_t)dwTemplateSize);
+	memcpy(reinterpret_cast<BYTE *>(pTemplate), pRsrcMem, dwTemplateSize);
 	FreeResource(hRsrcMem);
 
 	WCHAR wchFaceName[LF_FACESIZE];
@@ -2675,31 +2690,31 @@ DLGTEMPLATE *LoadThemedDialogTemplate(LPCWSTR lpDialogTemplateID, HINSTANCE hIns
 	}
 
 	const bool bDialogEx = DialogTemplate_IsDialogEx(pTemplate);
-	const BOOL bHasFont = DialogTemplate_HasFont(pTemplate);
-	const int cbFontAttr = DialogTemplate_FontAttrSize(bDialogEx);
+	const BOOL bHasFont = DialogTemplate_HasFont(pTemplate, bDialogEx);
+	const DWORD cbFontAttr = DialogTemplate_FontAttrSize(bDialogEx);
 
 	if (bDialogEx) {
-		((DLGTEMPLATEEX *)pTemplate)->style |= DS_SHELLFONT;
+		(reinterpret_cast<DLGTEMPLATEEX *>(pTemplate))->style |= DS_SHELLFONT;
 	} else {
 		pTemplate->style |= DS_SHELLFONT;
 	}
 
-	const int cbNew = cbFontAttr + (int)((lstrlen(wchFaceName) + 1) * sizeof(WCHAR));
-	const BYTE *pbNew = (BYTE *)wchFaceName;
+	const DWORD cbNew = cbFontAttr + ((lstrlen(wchFaceName) + 1) * sizeof(WCHAR));
+	const BYTE *pbNew = reinterpret_cast<BYTE *>(wchFaceName);
 
-	BYTE *pb = DialogTemplate_GetFontSizeField(pTemplate);
-	const int cbOld = bHasFont ? cbFontAttr + 2 * (lstrlen((WCHAR *)(pb + cbFontAttr)) + 1) : 0;
+	BYTE *pb = DialogTemplate_GetFontSizeField(pTemplate, bDialogEx);
+	const DWORD cbOld = bHasFont ? cbFontAttr + sizeof(WCHAR) * (lstrlen(reinterpret_cast<WCHAR *>(pb + cbFontAttr)) + 1) : 0;
 
-	const BYTE *pOldControls = (BYTE *)(((DWORD_PTR)pb + cbOld + 3) & ~(DWORD_PTR)3);
-	BYTE *pNewControls = (BYTE *)(((DWORD_PTR)pb + cbNew + 3) & ~(DWORD_PTR)3);
+	const BYTE *pOldControls = reinterpret_cast<BYTE *>((AsInteger<DWORD_PTR>(pb) + cbOld + 3) & ~(DWORD_PTR)3);
+	BYTE *pNewControls = reinterpret_cast<BYTE *>((AsInteger<DWORD_PTR>(pb) + cbNew + 3) & ~(DWORD_PTR)3);
 
-	const WORD nCtrl = bDialogEx ? ((DLGTEMPLATEEX *)pTemplate)->cDlgItems : pTemplate->cdit;
+	const WORD nCtrl = bDialogEx ? (reinterpret_cast<DLGTEMPLATEEX *>(pTemplate))->cDlgItems : pTemplate->cdit;
 	if (cbNew != cbOld && nCtrl > 0) {
-		memmove(pNewControls, pOldControls, (size_t)(dwTemplateSize - (pOldControls - (BYTE *)pTemplate)));
+		memmove(pNewControls, pOldControls, dwTemplateSize - (pOldControls - reinterpret_cast<BYTE *>(pTemplate)));
 	}
 
-	*(WORD *)pb = wFontSize;
-	memmove(pb + cbFontAttr, pbNew, (size_t)(cbNew - cbFontAttr));
+	*reinterpret_cast<WORD *>(pb) = wFontSize;
+	memmove(pb + cbFontAttr, pbNew, cbNew - cbFontAttr);
 
 	return pTemplate;
 }

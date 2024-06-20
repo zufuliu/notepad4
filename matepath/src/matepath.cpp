@@ -379,7 +379,7 @@ BOOL InitApplication(HINSTANCE hInstance) noexcept {
 	wc.hInstance     = hInstance;
 	wc.hIcon         = LoadIcon(hInstance, MAKEINTRESOURCE(IDR_MAINWND));
 	wc.hCursor       = LoadCursor(nullptr, IDC_ARROW);
-	wc.hbrBackground = (HBRUSH)(COLOR_3DFACE + 1);
+	wc.hbrBackground = AsPointer<HBRUSH, ULONG_PTR>(COLOR_3DFACE + 1);
 	wc.lpszMenuName  = nullptr;
 	wc.lpszClassName = WC_MATEPATH;
 	wc.hIconSm       = nullptr;
@@ -630,7 +630,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		DragQueryFile(hDrop, 0, szBuf, COUNTOF(szBuf));
 		DisplayPath(szBuf, IDS_ERR_DROP1);
 
-		//if (DragQueryFile(hDrop, (UINT)(-1), nullptr, 0) > 1) {
+		//if (DragQueryFile(hDrop, UINT_MAX, nullptr, 0) > 1) {
 		//	MsgBoxWarn(MB_OK, IDS_ERR_DROP2);
 		//}
 
@@ -805,7 +805,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 					  WS_DIRLIST,
 					  0, 0, 0, 0,
 					  hwnd,
-					  (HMENU)IDC_DIRLIST,
+					  AsPointer<HMENU, ULONG_PTR>(IDC_DIRLIST),
 					  hInstance,
 					  nullptr);
 
@@ -823,7 +823,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 					   dwDriveBoxStyle,
 					   0, 0, 0, GetSystemMetrics(SM_CYFULLSCREEN),
 					   hwnd,
-					   (HMENU)IDC_DRIVEBOX,
+					   AsPointer<HMENU, ULONG_PTR>(IDC_DRIVEBOX),
 					   hInstance,
 					   nullptr);
 
@@ -900,7 +900,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 
 	constexpr DWORD dwToolbarStyle = WS_TOOLBAR | TBSTYLE_FLAT | CCS_ADJUSTABLE;
 	hwndToolbar = CreateWindowEx(0, TOOLBARCLASSNAME, nullptr, dwToolbarStyle,
-								 0, 0, 0, 0, hwnd, (HMENU)IDC_TOOLBAR, hInstance, nullptr);
+								 0, 0, 0, 0, hwnd, AsPointer<HMENU, ULONG_PTR>(IDC_TOOLBAR), hInstance, nullptr);
 
 	SendMessage(hwndToolbar, TB_BUTTONSTRUCTSIZE, sizeof(TBBUTTON), 0);
 
@@ -1021,7 +1021,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 	// Create ReBar and add Toolbar
 	const DWORD dwReBarStyle = bShowToolbar ? (WS_REBAR | WS_VISIBLE) : WS_REBAR;
 	hwndReBar = CreateWindowEx(WS_EX_TOOLWINDOW, REBARCLASSNAME, nullptr, dwReBarStyle,
-							   0, 0, 0, 0, hwnd, (HMENU)IDC_REBAR, hInstance, nullptr);
+							   0, 0, 0, 0, hwnd, AsPointer<HMENU, ULONG_PTR>(IDC_REBAR), hInstance, nullptr);
 
 	REBARINFO rbi;
 	rbi.cbSize = sizeof(REBARINFO);

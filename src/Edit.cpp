@@ -1245,7 +1245,7 @@ bool EditSaveFile(HWND hwnd, LPCWSTR pszFile, int saveFlag, EditFileIOStatus &st
 			}
 
 			if (uFlags & NCP_UNICODE_REVERSE) {
-				_swab(reinterpret_cast<char *>(lpDataWide), reinterpret_cast<char *>(lpDataWide), int(cbDataWide * sizeof(WCHAR)));
+				_swab(reinterpret_cast<char *>(lpDataWide), reinterpret_cast<char *>(lpDataWide), static_cast<int>(cbDataWide * sizeof(WCHAR)));
 			}
 
 			bWriteSuccess = WriteFile(hFile, lpDataWide, cbDataWide * sizeof(WCHAR), &dwBytesWritten, nullptr);
@@ -1368,10 +1368,10 @@ void EditInvertCase() noexcept {
 	bool bChanged = false;
 	for (int i = 0; i < cchTextW; i++) {
 		if (IsCharUpper(pszTextW[i])) {
-			pszTextW[i] = LOWORD(CharLower((LPWSTR)(LONG_PTR)MAKELONG(pszTextW[i], 0)));
+			pszTextW[i] = LOWORD(CharLower(AsPointer<LPWSTR, LONG_PTR>(MAKELONG(pszTextW[i], 0))));
 			bChanged = true;
 		} else if (IsCharLower(pszTextW[i])) {
-			pszTextW[i] = LOWORD(CharUpper((LPWSTR)(LONG_PTR)MAKELONG(pszTextW[i], 0)));
+			pszTextW[i] = LOWORD(CharUpper(AsPointer<LPWSTR, LONG_PTR>(MAKELONG(pszTextW[i], 0))));
 			bChanged = true;
 		}
 	}
@@ -1521,12 +1521,12 @@ static bool EditTitleCase(LPWSTR pszTextW, int cchTextW) noexcept {
 		} else {
 			if (bNewWord) {
 				if (IsCharLower(ch)) {
-					pszTextW[i] = LOWORD(CharUpper((LPWSTR)(LONG_PTR)MAKELONG(ch, 0)));
+					pszTextW[i] = LOWORD(CharUpper(AsPointer<LPWSTR, LONG_PTR>(MAKELONG(ch, 0))));
 					bChanged = true;
 				}
 			} else {
 				if (IsCharUpper(ch)) {
-					pszTextW[i] = LOWORD(CharLower((LPWSTR)(LONG_PTR)MAKELONG(ch, 0)));
+					pszTextW[i] = LOWORD(CharLower(AsPointer<LPWSTR, LONG_PTR>(MAKELONG(ch, 0))));
 					bChanged = true;
 				}
 			}
@@ -1546,12 +1546,12 @@ static bool EditTitleCase(LPWSTR pszTextW, int cchTextW) noexcept {
 		} else {
 			if (bNewWord) {
 				if (IsCharLower(ch)) {
-					pszTextW[i] = LOWORD(CharUpper((LPWSTR)(LONG_PTR)MAKELONG(ch, 0)));
+					pszTextW[i] = LOWORD(CharUpper(AsPointer<LPWSTR, LONG_PTR>(MAKELONG(ch, 0))));
 					bChanged = true;
 				}
 			} else {
 				if (IsCharUpper(ch)) {
-					pszTextW[i] = LOWORD(CharLower((LPWSTR)(LONG_PTR)MAKELONG(ch, 0)));
+					pszTextW[i] = LOWORD(CharLower(AsPointer<LPWSTR, LONG_PTR>(MAKELONG(ch, 0))));
 					bChanged = true;
 				}
 			}
@@ -1718,13 +1718,13 @@ void EditSentenceCase() noexcept {
 			if (IsCharAlphaNumeric(ch)) {
 				if (bNewSentence) {
 					if (IsCharLower(ch)) {
-						pszTextW[i] = LOWORD(CharUpper((LPWSTR)(LONG_PTR)MAKELONG(ch, 0)));
+						pszTextW[i] = LOWORD(CharUpper(AsPointer<LPWSTR, LONG_PTR>(MAKELONG(ch, 0))));
 						bChanged = true;
 					}
 					bNewSentence = false;
 				} else {
 					if (IsCharUpper(ch)) {
-						pszTextW[i] = LOWORD(CharLower((LPWSTR)(LONG_PTR)MAKELONG(ch, 0)));
+						pszTextW[i] = LOWORD(CharLower(AsPointer<LPWSTR, LONG_PTR>(MAKELONG(ch, 0))));
 						bChanged = true;
 					}
 				}

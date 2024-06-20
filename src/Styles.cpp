@@ -4483,11 +4483,11 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 
 				GetDlgItemText(hwnd, IDC_STYLEEDIT, tch, COUNTOF(tch));
 
-				COLORREF cr = static_cast<COLORREF>(-1);
+				COLORREF cr = UINT_MAX;
 				Style_StrGetForeColor(tch, &cr);
 				MakeColorPickButton(hwnd, IDC_STYLEFORE, g_exeInstance, cr);
 
-				cr = static_cast<COLORREF>(-1);
+				cr = UINT_MAX;
 				Style_StrGetBackColor(tch, &cr);
 				MakeColorPickButton(hwnd, IDC_STYLEBACK, g_exeInstance, cr);
 			}

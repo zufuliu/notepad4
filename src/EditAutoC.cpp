@@ -150,7 +150,7 @@ struct WordNode {
 // store word right after the node as most word are short.
 #define WordNode_GetWord(node)		(reinterpret_cast<char *>(node) + sizeof(WordNode))
 // TODO: since the tree is sorted, nodes greater than some level can be deleted to reduce total words.
-// or only limit word count in WordList_GetList().
+// or only limit word count in WordList::GetList().
 
 // Andersson Tree, source from https://www.eternallyconfuzzled.com/tuts/datastructures/jsw_tut_andersson.aspx
 // see also https://en.wikipedia.org/wiki/AA_tree

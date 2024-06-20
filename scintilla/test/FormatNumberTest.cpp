@@ -65,7 +65,7 @@ struct FormatResult {
 
 FormatResult FormatNumber(char *number, uint64_t value) noexcept {
 	if (value < 10) {
-		number[0] = (char)(value + '0');
+		number[0] = static_cast<char>(value + '0');
 		number[1] = '\0';
 		return {0, 1};
 	}
@@ -74,11 +74,11 @@ FormatResult FormatNumber(char *number, uint64_t value) noexcept {
 	char *ptr = end;
 	*ptr = '\0';
 	do {
-		*--ptr = (char)((value % 10) + '0');
+		*--ptr = static_cast<char>((value % 10) + '0');
 		value /= 10;
 	} while (value != 0);
-	const int offset = int(ptr - number);
-	const int len = (offset >= 0) ? int(end - ptr) : 0;
+	const int offset = static_cast<int>(ptr - number);
+	const int len = (offset >= 0) ? static_cast<int>(end - ptr) : 0;
 	if (ptr != number) {
 		do {
 			*number++ = *ptr++;
@@ -89,7 +89,7 @@ FormatResult FormatNumber(char *number, uint64_t value) noexcept {
 
 FormatResult FormatComma(char *number, uint64_t value) noexcept {
 	if (value < 10) {
-		number[0] = (char)(value + '0');
+		number[0] = static_cast<char>(value + '0');
 		number[1] = '\0';
 		return {0, 1};
 	}
@@ -104,11 +104,11 @@ FormatResult FormatComma(char *number, uint64_t value) noexcept {
 			*--ptr = ',';
 		}
 		++count;
-		*--ptr = (char)((value % 10) + '0');
+		*--ptr = static_cast<char>((value % 10) + '0');
 		value /= 10;
 	} while (value != 0);
-	const int offset = int(ptr - number);
-	const int len = (offset >= 0) ? int(end - ptr) : 0;
+	const int offset = static_cast<int>(ptr - number);
+	const int len = (offset >= 0) ? static_cast<int>(end - ptr) : 0;
 	if (ptr != number) {
 		do {
 			*number++ = *ptr++;
