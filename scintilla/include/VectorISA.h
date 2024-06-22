@@ -4,14 +4,10 @@
 
 #if defined(__clang__)
 #define NP2_align_up(value, alignment)		__builtin_align_up(value, alignment)
-#define NP2_align_ptr(ptr, alignment)		__builtin_align_up(ptr, alignment)
 #define NP2_is_aligned(value, alignment)	__builtin_is_aligned(value, alignment)
-#define NP2_is_aligned_ptr(ptr, alignment)	__builtin_is_aligned(ptr, alignment)
 #else
 #define NP2_align_up(value, alignment)		(((value) + (alignment) - 1) & ~((alignment) - 1))
-#define NP2_align_ptr(ptr, alignment)		((void *)NP2_align_up((uintptr_t)(ptr), alignment))
 #define NP2_is_aligned(value, alignment)	(((value) & ((alignment) - 1)) == 0)
-#define NP2_is_aligned_ptr(ptr, alignment)	NP2_is_aligned((uintptr_t)(ptr), alignment)
 #endif
 
 // https://docs.microsoft.com/en-us/cpp/intrinsics/compiler-intrinsics
@@ -158,13 +154,14 @@
 #endif
 
 // https://graphics.stanford.edu/~seander/bithacks.html#IntegerLog10
-#define np2_ilog10_lower(x)		(((uint32_t)np2_bsr(x) + 1)*77 >> 8)
+#define np2_ilog10_lower(x)		((static_cast<uint32_t>(np2_bsr(x)) + 1)*77 >> 8)
 #define np2_ilog10_upper(x)		(np2_ilog10_lower(x) + 1)
-#define np2_ilog10_lower64(x)	(((uint32_t)np2_bsr64(x) + 1)*77 >> 8)
+#define np2_ilog10_lower64(x)	((static_cast<uint32_t>(np2_bsr64(x)) + 1)*77 >> 8)
 #define np2_ilog10_upper64(x)	(np2_ilog10_lower64(x) + 1)
 
 // https://stackoverflow.com/questions/32945410/sse2-intrinsics-comparing-unsigned-integers
 #if NP2_USE_AVX2
+#define mm256_movemask_epi8(a)		static_cast<uint32_t>(_mm256_movemask_epi8(a))
 #define mm256_cmpge_epu8(a, b) \
 	_mm256_cmpeq_epi8(_mm256_max_epu8((a), (b)), (a))
 #define mm256_cmple_epu8(a, b)	mm256_cmpge_epu8((b), (a))
@@ -182,6 +179,7 @@
 #endif
 
 #if NP2_USE_SSE2
+#define mm_movemask_epi8(a)		static_cast<uint32_t>(_mm_movemask_epi8(a))
 #define mm_cmpge_epu8(a, b) \
 	_mm_cmpeq_epi8(_mm_max_epu8((a), (b)), (a))
 #define mm_cmple_epu8(a, b)		mm_cmpge_epu8((b), (a))

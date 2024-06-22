@@ -378,7 +378,7 @@ uint32_t Proportional_sse4_align(ColourRGBA a, ColourRGBA b, double t) noexcept 
 	__m128i i32x4Back = rgba_to_abgr_epi32_sse4_si32(b.AsInteger());
 	// a + t * (b - a)
 	__m128 f32x4Fore = _mm_cvtepi32_ps(_mm_sub_epi32(i32x4Back, i32x4Fore));
-	f32x4Fore = _mm_mul_ps(f32x4Fore, _mm_set1_ps((float)t));
+	f32x4Fore = _mm_mul_ps(f32x4Fore, _mm_set1_ps(static_cast<float>(t)));
 	f32x4Fore = _mm_add_ps(f32x4Fore, _mm_cvtepi32_ps(i32x4Fore));
 	// component * alpha / 255
 	//__m128 f32x4Alpha = _mm_shuffle_ps(f32x4Fore, f32x4Fore, 0);
@@ -396,7 +396,7 @@ uint32_t Proportional_sse4_blend(ColourRGBA a, ColourRGBA b, double t) noexcept 
 	__m128i i32x4Back = rgba_to_bgra_epi32_sse4_si32(b.AsInteger());
 	// a + t * (b - a)
 	__m128 f32x4Fore = _mm_cvtepi32_ps(_mm_sub_epi32(i32x4Back, i32x4Fore));
-	f32x4Fore = _mm_mul_ps(f32x4Fore, _mm_set1_ps((float)t));
+	f32x4Fore = _mm_mul_ps(f32x4Fore, _mm_set1_ps(static_cast<float>(t)));
 	f32x4Fore = _mm_add_ps(f32x4Fore, _mm_cvtepi32_ps(i32x4Fore));
 	// component * alpha / 255
 	__m128 f32x4Alpha = _mm_shuffle_ps(f32x4Fore, f32x4Fore, 0xff);
@@ -413,7 +413,7 @@ uint32_t Proportional_sse2(ColourRGBA a, ColourRGBA b, double t) noexcept {
 	__m128i i32x4Back = rgba_to_abgr_epi32_sse2_si32(b.AsInteger());
 	// a + t * (b - a)
 	__m128 f32x4Fore = _mm_cvtepi32_ps(_mm_sub_epi32(i32x4Back, i32x4Fore));
-	f32x4Fore = _mm_mul_ps(f32x4Fore, _mm_set1_ps((float)t));
+	f32x4Fore = _mm_mul_ps(f32x4Fore, _mm_set1_ps(static_cast<float>(t)));
 	f32x4Fore = _mm_add_ps(f32x4Fore, _mm_cvtepi32_ps(i32x4Fore));
 	// component * alpha / 255
 	const uint32_t alpha = _mm_cvttss_si32(f32x4Fore);
@@ -520,9 +520,9 @@ void TestBitmapAlphaBlend(const char *path, const uint32_t crDest, const BYTE al
 		const WORD blue = GetBValue(crDest) * (255 ^ alpha);
 		for (size_t x = 0; x < pixelCount; x++, prgba++) {
 			RGBQUAD quad = *prgba;
-			quad.rgbRed = (BYTE)(((quad.rgbRed * alpha) + red) / 255);
-			quad.rgbGreen = (BYTE)(((quad.rgbGreen * alpha) + green) / 255);
-			quad.rgbBlue = (BYTE)(((quad.rgbBlue * alpha) + blue) / 255);
+			quad.rgbRed = static_cast<BYTE>(((quad.rgbRed * alpha) + red) / 255);
+			quad.rgbGreen = static_cast<BYTE>(((quad.rgbGreen * alpha) + green) / 255);
+			quad.rgbBlue = static_cast<BYTE>(((quad.rgbBlue * alpha) + blue) / 255);
 			scalar[x] = RGBQuadToUInt32(quad);
 		}
 	}

@@ -644,7 +644,7 @@ static inline void SaveLexTabSettings(IniSectionBuilder &section, LPCEDITLEXER p
 }
 
 static void Style_LoadOneEx(PEDITLEXER pLex, IniSectionParser &section, WCHAR *pIniSectionBuf, int cchIniSection) noexcept {
-	pLex->iStyleTheme = (uint8_t)np2StyleTheme;
+	pLex->iStyleTheme = static_cast<uint8_t>(np2StyleTheme);
 	LPCWSTR themePath = GetStyleThemeFilePath();
 	GetPrivateProfileSection(pLex->pszName, pIniSectionBuf, cchIniSection, themePath);
 
@@ -1169,7 +1169,7 @@ void Style_OnDPIChanged(LPCEDITLEXER pLex) noexcept {
 	iValue = ScaleStylePixel(100, scale, 100);
 	uint64_t iMarkerIDs = CodeFoldingMarkerList;
 	do {
-		const int marker = (int)(iMarkerIDs & 0xff);
+		const int marker = static_cast<int>(iMarkerIDs & 0xff);
 		SciCall_MarkerSetStrokeWidth(marker, iValue);
 		iMarkerIDs >>= 8;
 	} while (iMarkerIDs);
@@ -1194,7 +1194,7 @@ void Style_OnStyleThemeChanged(int theme) noexcept {
 }
 
 void Style_UpdateCaret() noexcept {
-	int iValue = (int)iCaretStyle;
+	int iValue = static_cast<int>(iCaretStyle);
 	// caret style and width
 	const int style = (iValue ? CARETSTYLE_LINE : CARETSTYLE_BLOCK)
 		| (bBlockCaretForOVRMode ? CARETSTYLE_OVERSTRIKE_BLOCK : CARETSTYLE_OVERSTRIKE_BAR)
@@ -1203,7 +1203,7 @@ void Style_UpdateCaret() noexcept {
 	// caret width
 	if (iValue != 0) {
 		DWORD width = 0;
-		if (SystemParametersInfo(SPI_GETCARETWIDTH, 0, &width, 0) && width > (DWORD)iValue) {
+		if (SystemParametersInfo(SPI_GETCARETWIDTH, 0, &width, 0) && width > static_cast<DWORD>(iValue)) {
 			// use system caret width
 			iValue = width;
 		} else if (iValue == 1) {
@@ -1213,7 +1213,7 @@ void Style_UpdateCaret() noexcept {
 		SciCall_SetCaretWidth(iValue);
 	}
 
-	iValue = (iCaretBlinkPeriod < 0)? (int)GetCaretBlinkTime() : iCaretBlinkPeriod;
+	iValue = (iCaretBlinkPeriod < 0)? static_cast<int>(GetCaretBlinkTime()) : iCaretBlinkPeriod;
 	SciCall_SetCaretPeriod(iValue);
 }
 
@@ -1668,7 +1668,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) noexcept {
 		foreColor = ColorAlpha(foreColor, SC_ALPHA_OPAQUE);
 		backColor = ColorAlpha(backColor, SC_ALPHA_OPAQUE);
 		do {
-			const int marker = (int)(iMarkerIDs & 0xff);
+			const int marker = static_cast<int>(iMarkerIDs & 0xff);
 			SciCall_MarkerSetBackTranslucent(marker, foreColor);
 			SciCall_MarkerSetForeTranslucent(marker, backColor);
 			SciCall_MarkerSetBackSelectedTranslucent(marker, highlightColor);
@@ -2174,9 +2174,9 @@ PEDITLEXER Style_AutoDetect(BOOL bDotFile) noexcept {
 				notJson |= *p;
 				if (shellWord != 3) {
 					if (StrStartsWith(p, "if") || StrStartsWith(p, "fi") || StrStartsWith(p, "do")) {
-						if (((uint8_t)p[2]) <= ' ') {
+						if (static_cast<uint8_t>(p[2]) <= ' ') {
 							shellWord |= (p[0] == 'f') ? 2 : 1;
-						} else if (StrStartsWith(p, "done") && ((uint8_t)p[4]) <= ' ') {
+						} else if (StrStartsWith(p, "done") && static_cast<uint8_t>(p[4]) <= ' ') {
 							shellWord |= 2;
 						}
 					}
@@ -2516,7 +2516,7 @@ bool Style_SetLexerFromFile(LPCWSTR lpszFile) noexcept {
 						pLexNew = &lexHTML;
 					} else {
 						const uint8_t start = p[1];
-						if ((signed char)start < 0 || start == '!' || start == '?' || IsHtmlTagChar(start) || start == '/') {
+						if (static_cast<signed char>(start) < 0 || start == '!' || start == '?' || IsHtmlTagChar(start) || start == '/') {
 							// <!-- comment -->, <!CDATA[[]]>, <?instruction?>, <tag></tag>
 							pLexNew = &lexXML;
 						}
@@ -3186,7 +3186,7 @@ bool Style_StrGetFontSize(LPCWSTR lpszStyle, int *size) noexcept {
 		p += CSTRLEN(L"size:");
 		float value;
 		if (StrToFloat(p, &value)) {
-			int iValue = (int)lroundf(value * SC_FONT_SIZE_MULTIPLIER);
+			int iValue = static_cast<int>(lroundf(value * SC_FONT_SIZE_MULTIPLIER));
 			iValue += (*p == L'+' || *p == '-')? iBaseFontSize : 0;
 			// scintilla/src/ViewStyle.h GetFontSizeZoomed()
 			iValue = max(iValue, 2 * SC_FONT_SIZE_MULTIPLIER);
@@ -3360,7 +3360,7 @@ bool Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, bool bDefaultSt
 		lstrcpyn(lf.lfFaceName, tch, COUNTOF(lf.lfFaceName));
 	}
 	if (Style_StrGetCharSet(lpszStyle, &iValue)) {
-		lf.lfCharSet = (BYTE)iValue;
+		lf.lfCharSet = static_cast<BYTE>(iValue);
 	}
 	if (Style_StrGetForeColor(lpszStyle, &rgb)) {
 		cf.rgbColors = rgb;
@@ -3410,7 +3410,7 @@ bool Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, bool bDefaultSt
 	iValue = cf.iPointSize % 10;
 	if (iValue != 0) {
 		tch[0] = '.';
-		tch[1] = (WCHAR)(L'0' + iValue);
+		tch[1] = static_cast<WCHAR>(L'0' + iValue);
 		tch[2] = 0;
 		lstrcat(szNewStyle, tch);
 	}
@@ -3508,7 +3508,7 @@ bool Style_SelectColor(HWND hwnd, LPWSTR lpszStyle, int cchStyle, bool bFore) no
 		if (StrNotEmpty(szNewStyle)) {
 			lstrcat(szNewStyle, L"; ");
 		}
-		wsprintf(tch, L"fore:#%06X", (unsigned)iRGBResult);
+		wsprintf(tch, L"fore:#%06X", static_cast<unsigned>(iRGBResult));
 		lstrcat(szNewStyle, tch);
 		Style_StrCopyBack(szNewStyle, lpszStyle, tch);
 	} else {
@@ -3516,7 +3516,7 @@ bool Style_SelectColor(HWND hwnd, LPWSTR lpszStyle, int cchStyle, bool bFore) no
 		if (StrNotEmpty(szNewStyle)) {
 			lstrcat(szNewStyle, L"; ");
 		}
-		wsprintf(tch, L"back:#%06X", (unsigned)iRGBResult);
+		wsprintf(tch, L"back:#%06X", static_cast<unsigned>(iRGBResult));
 		lstrcat(szNewStyle, tch);
 	}
 
@@ -3942,7 +3942,7 @@ static HTREEITEM Style_AddAllLexerToTreeView(HWND hwndTV, bool withStyles, bool 
 			if (group == SchemeGroup_Favorite) {
 				GetString(IDS_FAVORITE_SCHEMES_TITLE, szTitle, COUNTOF(szTitle));
 			} else {
-				szTitle[0] = (WCHAR)group;
+				szTitle[0] = static_cast<WCHAR>(group);
 				szTitle[1] = L'\0';
 			}
 

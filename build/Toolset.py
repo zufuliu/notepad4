@@ -123,6 +123,7 @@ def generate_compile_commands(target, avx2=False, cxx=False):
 	defines = ['NDEBUG', '_WINDOWS', 'NOMINMAX', 'WIN32_LEAN_AND_MEAN', 'STRICT_TYPED_ITEMIDS',
 		'UNICODE', '_UNICODE', '_CRT_SECURE_NO_WARNINGS', '_SCL_SECURE_NO_WARNINGS']
 	warnings = ['-Wextra', '-Wshadow', '-Wimplicit-fallthrough', '-Wformat=2', '-Wundef', '-Wcomma']
+	cxxwarn = ['-Wold-style-cast']
 
 	target_flag = '--target=' + target
 	msvc = 'msvc' in target
@@ -157,7 +158,9 @@ def generate_compile_commands(target, avx2=False, cxx=False):
 	cflags.extend(defines)
 	cxxflags.extend(defines)
 	cflags.extend(warnings)
-	cxxflags.extend(warnings)
+	cxxflags.extend(warnings + cxxwarn)
+	if cxx:
+		cflags.extend(cxxwarn)
 
 	config = [
 		('../src', ['../scintilla/include']),
@@ -188,6 +191,14 @@ def generate_compile_commands(target, avx2=False, cxx=False):
 #dump_static_linked_function('bin/Release/Win32/matepath.map')
 #dump_static_linked_function('bin/Release/x64/Notepad4.map')
 #dump_static_linked_function('bin/Release/Win32/Notepad4.map')
-generate_compile_commands('x86_64-pc-windows-msvc', cxx=True)
+generate_compile_commands('x86_64-pc-windows-msvc', avx2=True)
+#generate_compile_commands('x86_64-pc-windows-msvc')
+#generate_compile_commands('i686-pc-windows-msvc')
+#generate_compile_commands('aarch64-pc-windows-msvc')
+#generate_compile_commands('arm-pc-windows-msvc')
+#generate_compile_commands('x86_64-w64-windows-gnu', avx2=True)
 #generate_compile_commands('x86_64-w64-windows-gnu')
+#generate_compile_commands('i686-w64-windows-gnu')
+#generate_compile_commands('aarch64-w64-windows-gnu')
+#generate_compile_commands('armv7-w64-windows-gnu')
 #run-clang-tidy --quiet -j4 1>tidy.log

@@ -588,7 +588,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
 		hResDLL = LoadLocalizedResourceDLL(uiLanguage, WC_NOTEPAD4 L".dll");
 		if (hResDLL) {
-			g_hInstance = (HINSTANCE)hResDLL;
+			g_hInstance = hResDLL;
 		}
 #endif
 		DisplayCmdLineHelp(nullptr);
@@ -641,7 +641,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
 	hResDLL = LoadLocalizedResourceDLL(uiLanguage, WC_NOTEPAD4 L".dll");
 	if (hResDLL) {
-		g_hInstance = hInstance = (HINSTANCE)hResDLL;
+		g_hInstance = hInstance = hResDLL;
 	}
 #endif
 
@@ -690,7 +690,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 	WaitableTimer_Destroy(timer);
 	CleanUpResources(true);
-	return (int)(msg.wParam);
+	return static_cast<int>(msg.wParam);
 }
 
 //=============================================================================
@@ -702,7 +702,7 @@ BOOL InitApplication(HINSTANCE hInstance) noexcept {
 	WNDCLASSEX wc;
 	wc.cbSize        = sizeof(WNDCLASSEX);
 	wc.style		 = CS_BYTEALIGNWINDOW | CS_DBLCLKS;
-	wc.lpfnWndProc	 = (WNDPROC)MainWndProc;
+	wc.lpfnWndProc	 = MainWndProc;
 	wc.cbClsExtra	 = 0;
 	wc.cbWndExtra	 = 0;
 	wc.hInstance	 = hInstance;
@@ -896,7 +896,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	}
 
 	if (!bFileLoadCalled) {
-		bOpened = FileLoad((FileLoadFlag)(FileLoadFlag_DontSave | FileLoadFlag_New), L"");
+		bOpened = FileLoad(static_cast<FileLoadFlag>(FileLoadFlag_DontSave | FileLoadFlag_New), L"");
 	}
 	if (!bOpened) {
 		UpdateStatusBarCache(StatusItem_Encoding);
@@ -1185,7 +1185,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		if (iAutoSaveOption & AutoSaveOption_Shutdown) {
 			AutoSave_DoWork(FileSaveFlag_SaveCopy);
 		}
-		if (FileSave((FileSaveFlag)(FileSaveFlag_Ask | FileSaveFlag_EndSession))) {
+		if (FileSave(static_cast<FileSaveFlag>(FileSaveFlag_Ask | FileSaveFlag_EndSession))) {
 			return TRUE;
 		}
 		return FALSE;
@@ -1447,7 +1447,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 					&& (bFileWatchingKeepAtEnd || (SciCall_LineFromPosition(SciCall_GetCurrentPos()) + 1 == SciCall_GetLineCount()));
 
 				iWeakSrcEncoding = iCurrentEncoding;
-				if (FileLoad((FileLoadFlag)(FileLoadFlag_DontSave | FileLoadFlag_Reload), szCurFile)) {
+				if (FileLoad(static_cast<FileLoadFlag>(FileLoadFlag_DontSave | FileLoadFlag_Reload), szCurFile)) {
 					if (bIsTail) {
 						EditJumpTo(INVALID_POSITION, 0);
 					}
@@ -1591,7 +1591,7 @@ void UpdateWindowTitle() noexcept {
 
 	WCHAR szAppName[128];
 	static_assert(IDS_APPTITLE + 1 == IDS_APPTITLE_PASTEBOARD);
-	GetString(IDS_APPTITLE + (UINT)flagPasteBoard, szAppName, COUNTOF(szAppName));
+	GetString(IDS_APPTITLE + static_cast<UINT>(flagPasteBoard), szAppName, COUNTOF(szAppName));
 
 	if (fIsElevated) {
 		WCHAR szElevatedAppName[128];
@@ -1954,7 +1954,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	DragAcceptFiles(hwnd, TRUE);
 
 	// File MRU
-	const int flags = MRUFlags_FilePath | (((int)flagRelativeFileMRU) * MRUFlags_RelativePath) | (((int)flagPortableMyDocs) * MRUFlags_PortableMyDocs);
+	const int flags = MRUFlags_FilePath | (static_cast<int>(flagRelativeFileMRU) * MRUFlags_RelativePath) | (static_cast<int>(flagPortableMyDocs) * MRUFlags_PortableMyDocs);
 	mruFile.Init(MRU_KEY_RECENT_FILES, flags);
 	mruFind.Init(MRU_KEY_RECENT_FIND, MRUFlags_QuoteValue);
 	mruReplace.Init(MRU_KEY_RECENT_REPLACE, MRUFlags_QuoteValue);
@@ -1973,7 +1973,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 	hwndToolbar = CreateWindowEx(0, TOOLBARCLASSNAME, nullptr, dwToolbarStyle,
 								 0, 0, 0, 0, hwnd, AsPointer<HMENU, ULONG_PTR>(IDC_TOOLBAR), hInstance, nullptr);
 
-	SendMessage(hwndToolbar, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0);
+	SendMessage(hwndToolbar, TB_BUTTONSTRUCTSIZE, sizeof(TBBUTTON), 0);
 
 	bool bExternalBitmap = false;
 	// Add normal Toolbar Bitmap
@@ -2116,7 +2116,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 	rbBand.cxMinChild = (rc.right - rc.left) * COUNTOF(tbbMainWnd);
 	rbBand.cyMinChild = (rc.bottom - rc.top) + 2 * rc.top;
 	rbBand.cx		= 0;
-	SendMessage(hwndReBar, RB_INSERTBAND, (WPARAM)(-1), AsInteger<LPARAM>(&rbBand));
+	SendMessage(hwndReBar, RB_INSERTBAND, static_cast<WPARAM>(-1), AsInteger<LPARAM>(&rbBand));
 
 	SetWindowPos(hwndReBar, nullptr, 0, 0, 0, 0, SWP_NOZORDER);
 	GetWindowRect(hwndReBar, &rc);
@@ -2600,7 +2600,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	i = IDM_VIEW_FONTQUALITY_DEFAULT + iFontQuality;
 	CheckMenuRadioItem(hmenu, IDM_VIEW_FONTQUALITY_DEFAULT, IDM_VIEW_FONTQUALITY_CLEARTYPE, i, MF_BYCOMMAND);
 	CheckCmd(hmenu, IDM_VIEW_CARET_STYLE_BLOCK_OVR, bBlockCaretForOVRMode);
-	i = IDM_VIEW_CARET_STYLE_BLOCK + (int)iCaretStyle;
+	i = IDM_VIEW_CARET_STYLE_BLOCK + static_cast<int>(iCaretStyle);
 	CheckMenuRadioItem(hmenu, IDM_VIEW_CARET_STYLE_BLOCK, IDM_VIEW_CARET_STYLE_WIDTH3, i, MF_BYCOMMAND);
 	CheckCmd(hmenu, IDM_VIEW_CARET_STYLE_NOBLINK, iCaretBlinkPeriod == 0);
 	UncheckCmd(hmenu, IDM_VIEW_CARET_STYLE_SELECTION, bBlockCaretOutSelection);
@@ -2624,7 +2624,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	EnableCmd(hmenu, IDM_VIEW_MARKOCCURRENCES_CASE, bMarkOccurrences);
 	EnableCmd(hmenu, IDM_VIEW_MARKOCCURRENCES_WORD, bMarkOccurrences);
 	EnableCmd(hmenu, IDM_VIEW_MARKOCCURRENCES_BOOKMARK, bMarkOccurrences);
-	i = IDM_VIEW_SHOWCALLTIP_OFF + (int)callTipInfo.showCallTip;
+	i = IDM_VIEW_SHOWCALLTIP_OFF + static_cast<int>(callTipInfo.showCallTip);
 	CheckMenuRadioItem(hmenu, IDM_VIEW_SHOWCALLTIP_OFF, IDM_VIEW_SHOWCALLTIP_ABGR, i, MF_BYCOMMAND);
 
 	CheckCmd(hmenu, IDM_VIEW_SHOWWHITESPACE, bViewWhiteSpace);
@@ -2645,7 +2645,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 
 	CheckCmd(hmenu, IDM_VIEW_MATCHBRACES, bMatchBraces);
 	CheckCmd(hmenu, IDM_VIEW_HIGHLIGHTCURRENT_BLOCK, bHighlightCurrentBlock);
-	i = IDM_VIEW_HIGHLIGHTCURRENTLINE_NONE + (int)iHighlightCurrentLine;
+	i = IDM_VIEW_HIGHLIGHTCURRENTLINE_NONE + static_cast<int>(iHighlightCurrentLine);
 	CheckMenuRadioItem(hmenu, IDM_VIEW_HIGHLIGHTCURRENTLINE_NONE, IDM_VIEW_HIGHLIGHTCURRENTLINE_FRAME, i, MF_BYCOMMAND);
 	CheckCmd(hmenu, IDM_VIEW_HIGHLIGHTCURRENTLINE_SUBLINE, bHighlightCurrentSubLine);
 
@@ -2691,11 +2691,11 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	if (StrNotEmpty(szTitleExcerpt)) {
 		i = IDM_VIEW_SHOWEXCERPT;
 	} else {
-		i = IDM_VIEW_SHOWFILENAMEONLY + (int)iPathNameFormat;
+		i = IDM_VIEW_SHOWFILENAMEONLY + static_cast<int>(iPathNameFormat);
 	}
 	CheckMenuRadioItem(hmenu, IDM_VIEW_SHOWFILENAMEONLY, IDM_VIEW_SHOWEXCERPT, i, MF_BYCOMMAND);
 
-	i = IDM_VIEW_NOESCFUNC + (int)iEscFunction;
+	i = IDM_VIEW_NOESCFUNC + static_cast<int>(iEscFunction);
 	CheckMenuRadioItem(hmenu, IDM_VIEW_NOESCFUNC, IDM_VIEW_ESCEXIT, i, MF_BYCOMMAND);
 
 	i = StrNotEmpty(szIniFile);
@@ -2769,7 +2769,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			}
 
 			iWeakSrcEncoding = iCurrentEncoding;
-			FileLoad((FileLoadFlag)(FileLoadFlag_DontSave | FileLoadFlag_Reload), szCurFile);
+			FileLoad(static_cast<FileLoadFlag>(FileLoadFlag_DontSave | FileLoadFlag_Reload), szCurFile);
 		}
 		break;
 
@@ -2780,7 +2780,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDT_FILE_SAVEAS:
 	case IDM_FILE_SAVEAS:
-		FileSave((FileSaveFlag)(FileSaveFlag_SaveAlways | FileSaveFlag_SaveAs));
+		FileSave(static_cast<FileSaveFlag>(FileSaveFlag_SaveAlways | FileSaveFlag_SaveAs));
 		break;
 
 	case IDM_FILE_SAVEBACKUP:
@@ -2789,7 +2789,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDT_FILE_SAVECOPY:
 	case IDM_FILE_SAVECOPY:
-		FileSave((FileSaveFlag)(FileSaveFlag_SaveAlways | FileSaveFlag_SaveAs | FileSaveFlag_SaveCopy));
+		FileSave(static_cast<FileSaveFlag>(FileSaveFlag_SaveAlways | FileSaveFlag_SaveAs | FileSaveFlag_SaveCopy));
 		break;
 
 	case IDM_FILE_READONLY_FILE:
@@ -3112,7 +3112,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 			if (SelectEncodingDlg(hwnd, &iNewEncoding, IDS_SELRECT_RELOAD_ENCODING)) {
 				iSrcEncoding = iNewEncoding;
-				FileLoad((FileLoadFlag)(FileLoadFlag_DontSave | FileLoadFlag_Reload), szCurFile);
+				FileLoad(static_cast<FileLoadFlag>(FileLoadFlag_DontSave | FileLoadFlag_Reload), szCurFile);
 			}
 		}
 		break;
@@ -3294,7 +3294,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_EDIT_REMOVEDUPLICATELINE:
 	case IDM_EDIT_MERGEDUPLICATELINE:
 		BeginWaitCursor();
-		EditSortLines((EditSortFlag)(EditSortFlag_DontSort | ((LOWORD(wParam) == IDM_EDIT_REMOVEDUPLICATELINE) ? EditSortFlag_RemoveDuplicate : EditSortFlag_MergeDuplicate)));
+		EditSortLines(static_cast<EditSortFlag>(EditSortFlag_DontSort | ((LOWORD(wParam) == IDM_EDIT_REMOVEDUPLICATELINE) ? EditSortFlag_RemoveDuplicate : EditSortFlag_MergeDuplicate)));
 		EndWaitCursor();
 		break;
 
@@ -3507,7 +3507,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		if (S_OK == CoCreateGuid(&guid)) {
 			char guidBuf[37] = {0};
 			sprintf(guidBuf, "%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",
-					(unsigned int)(guid.Data1), guid.Data2, guid.Data3,
+					static_cast<unsigned int>(guid.Data1), guid.Data2, guid.Data3,
 					guid.Data4[0], guid.Data4[1],
 					guid.Data4[2], guid.Data4[3], guid.Data4[4],
 					guid.Data4[5], guid.Data4[6], guid.Data4[7]
@@ -3617,7 +3617,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 #else
 		GetSystemTimeAsFileTime(&ft);
 #endif
-		uint64_t timestamp = (((uint64_t)(ft.dwHighDateTime)) << 32) | ft.dwLowDateTime;
+		uint64_t timestamp = (static_cast<uint64_t>(ft.dwHighDateTime) << 32) | ft.dwLowDateTime;
 		// Between Jan 1, 1601 and Jan 1, 1970 there are 11644473600 seconds
 		timestamp -= UINT64_C(11644473600) * 1000 * 1000 * 10;
 		switch (LOWORD(wParam)) {
@@ -3753,7 +3753,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_EDIT_BASE64_SAFE_ENCODE:
 	case IDM_EDIT_BASE64_HTML_EMBEDDED_IMAGE:
 		BeginWaitCursor();
-		EditBase64Encode((Base64EncodingFlag)(LOWORD(wParam) - IDM_EDIT_BASE64_ENCODE));
+		EditBase64Encode(static_cast<Base64EncodingFlag>(LOWORD(wParam) - IDM_EDIT_BASE64_ENCODE));
 		EndWaitCursor();
 		break;
 
@@ -4201,7 +4201,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_VIEW_SHOWCALLTIP_ARGB:
 	case IDM_VIEW_SHOWCALLTIP_BGRA:
 	case IDM_VIEW_SHOWCALLTIP_ABGR:
-		callTipInfo.showCallTip = (ShowCallTip)(LOWORD(wParam) - IDM_VIEW_SHOWCALLTIP_OFF);
+		callTipInfo.showCallTip = static_cast<ShowCallTip>(LOWORD(wParam) - IDM_VIEW_SHOWCALLTIP_OFF);
 		SciCall_SetMouseDwellTime((callTipInfo.showCallTip == ShowCallTip_None)? SC_TIME_FOREVER : CallTipDefaultMouseDwellTime);
 		break;
 
@@ -4227,7 +4227,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_VIEW_HIGHLIGHTCURRENTLINE_NONE:
 	case IDM_VIEW_HIGHLIGHTCURRENTLINE_BACK:
 	case IDM_VIEW_HIGHLIGHTCURRENTLINE_FRAME:
-		iHighlightCurrentLine = (LineHighlightMode)(LOWORD(wParam) - IDM_VIEW_HIGHLIGHTCURRENTLINE_NONE);
+		iHighlightCurrentLine = static_cast<LineHighlightMode>(LOWORD(wParam) - IDM_VIEW_HIGHLIGHTCURRENTLINE_NONE);
 		Style_HighlightCurrentLine();
 		break;
 
@@ -4407,7 +4407,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_VIEW_CARET_STYLE_WIDTH1:
 	case IDM_VIEW_CARET_STYLE_WIDTH2:
 	case IDM_VIEW_CARET_STYLE_WIDTH3:
-		iCaretStyle = (CaretStyle)(LOWORD(wParam) - IDM_VIEW_CARET_STYLE_BLOCK);
+		iCaretStyle = static_cast<CaretStyle>(LOWORD(wParam) - IDM_VIEW_CARET_STYLE_BLOCK);
 		Style_UpdateCaret();
 		break;
 
@@ -4424,7 +4424,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_VIEW_SHOWFILENAMEONLY:
 	case IDM_VIEW_SHOWFILENAMEFIRST:
 	case IDM_VIEW_SHOWFULLPATH:
-		iPathNameFormat = (TitlePathNameFormat)(LOWORD(wParam) - IDM_VIEW_SHOWFILENAMEONLY);
+		iPathNameFormat = static_cast<TitlePathNameFormat>(LOWORD(wParam) - IDM_VIEW_SHOWFILENAMEONLY);
 		StrCpyEx(szTitleExcerpt, L"");
 		UpdateWindowTitle();
 		break;
@@ -4470,7 +4470,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_VIEW_NOESCFUNC:
 	case IDM_VIEW_ESCMINIMIZE:
 	case IDM_VIEW_ESCEXIT:
-		iEscFunction = (EscFunction)(LOWORD(wParam) - IDM_VIEW_NOESCFUNC);
+		iEscFunction = static_cast<EscFunction>(LOWORD(wParam) - IDM_VIEW_NOESCFUNC);
 		break;
 
 	case IDM_VIEW_SAVESETTINGS:
@@ -4999,7 +4999,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 					index = (index + (index >> 4)) & 15;
 					index = (UINT64_C(0x102370000500064) >> (4*index)) & 15;
 					if (autoCompletionConfig.fAutoInsertMask & (1U << index)) {
-						EditAutoCloseBraceQuote(ch, (AutoInsertCharacter)index);
+						EditAutoCloseBraceQuote(ch, static_cast<AutoInsertCharacter>(index));
 					}
 					return 0;
 				}
@@ -5184,7 +5184,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 		case TBN_GETBUTTONINFO: {
 			LPTBNOTIFY lpTbNotify = AsPointer<LPTBNOTIFY>(lParam);
-			if ((UINT)lpTbNotify->iItem < COUNTOF(tbbMainWnd)) {
+			if (static_cast<UINT>(lpTbNotify->iItem) < COUNTOF(tbbMainWnd)) {
 				WCHAR tch[128];
 				GetString(tbbMainWnd[lpTbNotify->iItem].idCommand, tch, COUNTOF(tch));
 				lstrcpyn(lpTbNotify->pszText, tch, lpTbNotify->cchText);
@@ -5302,7 +5302,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				//nop;
 			} else {
 				WCHAR tch[128];
-				GetString((UINT)pnmh->idFrom, tch, COUNTOF(tch));
+				GetString(static_cast<UINT>(pnmh->idFrom), tch, COUNTOF(tch));
 				lstrcpyn(pTTT->szText, tch, COUNTOF(pTTT->szText));
 			}
 		}
@@ -5469,7 +5469,7 @@ void LoadSettings() noexcept {
 	tabSettings.globalIndentWidth = clamp(iValue, INDENT_WIDTH_MIN, INDENT_WIDTH_MAX);
 	tabSettings.globalTabsAsSpaces = section.GetBool(L"TabsAsSpaces", false);
 	tabSettings.bTabIndents = section.GetBool(L"TabIndents", true);
-	tabSettings.bBackspaceUnindents = (uint8_t)section.GetInt(L"BackspaceUnindents", 2);
+	tabSettings.bBackspaceUnindents = static_cast<uint8_t>(section.GetInt(L"BackspaceUnindents", 2));
 	tabSettings.bDetectIndentation = section.GetBool(L"DetectIndentation", true);
 	// for toolbar state
 	fvCurFile.bTabsAsSpaces = tabSettings.globalTabsAsSpaces;
@@ -5495,7 +5495,7 @@ void LoadSettings() noexcept {
 
 	bViewWhiteSpace = section.GetBool(L"ViewWhiteSpace", false);
 	bViewEOLs = section.GetBool(L"ViewEOLs", false);
-	callTipInfo.showCallTip = (ShowCallTip)section.GetInt(L"ShowCallTip", ShowCallTip_None);
+	callTipInfo.showCallTip = static_cast<ShowCallTip>(section.GetInt(L"ShowCallTip", ShowCallTip_None));
 
 	iValue = section.GetInt(L"DefaultEncoding", -1);
 	iDefaultEncoding = Encoding_MapIniSetting(true, iValue);
@@ -5744,7 +5744,7 @@ void SaveSettings(bool bSaveSettingsNow) noexcept {
 	section.SetString(L"OpenWithDir", wchTmp);
 	PathRelativeToApp(tchFavoritesDir, wchTmp, FILE_ATTRIBUTE_DIRECTORY, true, flagPortableMyDocs);
 	section.SetString(L"Favorites", wchTmp);
-	section.SetIntEx(L"PathNameFormat", (int)iPathNameFormat, TitlePathNameFormat_NameFirst);
+	section.SetIntEx(L"PathNameFormat", static_cast<int>(iPathNameFormat), TitlePathNameFormat_NameFirst);
 	if (!bStickyWindowPosition) {
 		section.SetInt(L"WindowPosX", wi.x);
 		section.SetInt(L"WindowPosY", wi.y);
@@ -5776,7 +5776,7 @@ void SaveSettings(bool bSaveSettingsNow) noexcept {
 	section.SetBoolEx(L"ShowUnicodeControlCharacter", bShowUnicodeControlCharacter, false);
 	section.SetBoolEx(L"MatchBraces", bMatchBraces, true);
 	section.SetBoolEx(L"HighlightCurrentBlock", bHighlightCurrentBlock, true);
-	int iValue = (int)iHighlightCurrentLine + ((int)bHighlightCurrentSubLine*10);
+	int iValue = static_cast<int>(iHighlightCurrentLine) + (static_cast<int>(bHighlightCurrentSubLine)*10);
 	section.SetIntEx(L"HighlightCurrentLine", iValue, 10 + LineHighlightMode_OutlineFrame);
 	section.SetBoolEx(L"ShowIndentGuides", bShowIndentGuides, false);
 
@@ -5818,7 +5818,7 @@ void SaveSettings(bool bSaveSettingsNow) noexcept {
 	section.SetBoolEx(L"MarkOccurrencesBookmark", bMarkOccurrencesBookmark, false);
 	section.SetBoolEx(L"ViewWhiteSpace", bViewWhiteSpace, false);
 	section.SetBoolEx(L"ViewEOLs", bViewEOLs, false);
-	section.SetIntEx(L"ShowCallTip", (int)callTipInfo.showCallTip, ShowCallTip_None);
+	section.SetIntEx(L"ShowCallTip", static_cast<int>(callTipInfo.showCallTip), ShowCallTip_None);
 
 	if (iDefaultEncoding != CPI_GLOBAL_DEFAULT) {
 		iValue = Encoding_MapIniSetting(false, iDefaultEncoding);
@@ -5835,8 +5835,8 @@ void SaveSettings(bool bSaveSettingsNow) noexcept {
 	section.SetBoolEx(L"FixLineEndings", bFixLineEndings, false);
 	section.SetBoolEx(L"FixTrailingBlanks", bAutoStripBlanks, false);
 
-	section.SetIntEx(L"PrintHeader", (int)iPrintHeader, PrintHeaderOption_FilenameAndDate);
-	section.SetIntEx(L"PrintFooter", (int)iPrintFooter, PrintFooterOption_PageNumber);
+	section.SetIntEx(L"PrintHeader", static_cast<int>(iPrintHeader), PrintHeaderOption_FilenameAndDate);
+	section.SetIntEx(L"PrintFooter", static_cast<int>(iPrintFooter), PrintFooterOption_PageNumber);
 	section.SetIntEx(L"PrintColorMode", iPrintColor, SC_PRINT_COLOURONWHITE);
 	section.SetIntEx(L"PrintZoom", iPrintZoom, 100);
 	section.SetIntEx(L"PrintMarginLeft", pageSetupMargin.left, -1);
@@ -5854,7 +5854,7 @@ void SaveSettings(bool bSaveSettingsNow) noexcept {
 	section.SetIntEx(L"AutoSaveOption", iAutoSaveOption, AutoSaveOption_Default);
 	section.SetIntEx(L"AutoSavePeriod", dwAutoSavePeriod, AutoSaveDefaultPeriod);
 
-	section.SetIntEx(L"EscFunction", (int)iEscFunction, EscFunction_None);
+	section.SetIntEx(L"EscFunction", static_cast<int>(iEscFunction), EscFunction_None);
 	section.SetBoolEx(L"AlwaysOnTop", bAlwaysOnTop, false);
 	section.SetBoolEx(L"MinimizeToTray", bMinimizeToTray, false);
 	section.SetBoolEx(L"TransparentMode", bTransparentMode, false);
@@ -5864,7 +5864,7 @@ void SaveSettings(bool bSaveSettingsNow) noexcept {
 	section.SetIntEx(L"RenderingTechnology", iRenderingTechnology, GetDefualtRenderingTechnology());
 	section.SetIntEx(L"Bidirectional", iBidirectional, SC_BIDIRECTIONAL_DISABLED);
 	section.SetIntEx(L"FontQuality", iFontQuality, SC_EFF_QUALITY_LCD_OPTIMIZED);
-	iValue = (int)iCaretStyle + ((int)bBlockCaretForOVRMode)*10 + ((int)bBlockCaretOutSelection)*100;
+	iValue = static_cast<int>(iCaretStyle) + static_cast<int>(bBlockCaretForOVRMode)*10 + static_cast<int>(bBlockCaretOutSelection)*100;
 	section.SetIntEx(L"CaretStyle", iValue, CaretStyle_LineWidth1);
 	section.SetIntEx(L"CaretBlinkPeriod", iCaretBlinkPeriod, -1);
 	section.SetBoolEx(L"UseInlineIME", bUseInlineIME, false);
@@ -6324,10 +6324,10 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) noexcept {
 				}
 
 				lpMatchArg = StrDup(lp1);
-				flagMatchText = (MatchTextFlag)(MatchTextFlag_Default
-					| ((int)bFindUp * MatchTextFlag_FindUp)
-					| ((int)bRegex * MatchTextFlag_Regex)
-					| ((int)bTransBS * MatchTextFlag_TransformBS));
+				flagMatchText = static_cast<MatchTextFlag>(MatchTextFlag_Default
+					| (static_cast<int>(bFindUp) * MatchTextFlag_FindUp)
+					| (static_cast<int>(bRegex) * MatchTextFlag_Regex)
+					| (static_cast<int>(bTransBS) * MatchTextFlag_TransformBS));
 				state = CommandParseState_Consumed;
 			}
 		}
@@ -6462,7 +6462,7 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) noexcept {
 			if (opt[1] == L'\0') {
 				const UINT value = opt[0] - L'0';
 				if (value <= TRUE) {
-					flagUseSystemMRU = (TripleBoolean)value;
+					flagUseSystemMRU = static_cast<TripleBoolean>(value);
 					state = CommandParseState_Consumed;
 				}
 			}
@@ -7288,7 +7288,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 			bRestoreView = true;
 			keepTitleExcerpt = true;
 			keepCurrentLexer = true;
-			flagReadOnlyMode |= (int)bReadOnlyMode;
+			flagReadOnlyMode |= static_cast<int>(bReadOnlyMode);
 		}
 		fSuccess = true;
 	}
@@ -7576,7 +7576,7 @@ bool FileSave(FileSaveFlag saveFlag) noexcept {
 		if (bReadOnlyFile) {
 			UpdateWindowTitle();
 			if (MsgBoxWarn(MB_YESNO, IDS_READONLY_SAVE, szCurFile) == IDYES) {
-				saveFlag = (FileSaveFlag)(saveFlag | FileSaveFlag_SaveAs);
+				saveFlag = static_cast<FileSaveFlag>(saveFlag | FileSaveFlag_SaveAs);
 			} else {
 				return false;
 			}
@@ -7584,7 +7584,7 @@ bool FileSave(FileSaveFlag saveFlag) noexcept {
 		if (!(saveFlag & FileSaveFlag_SaveAs)) {
 			fSuccess = FileIO(false, szCurFile, saveFlag & FileSaveFlag_EndSession, status);
 			if (!fSuccess) {
-				saveFlag = (FileSaveFlag)(saveFlag | FileSaveFlag_SaveAs);
+				saveFlag = static_cast<FileSaveFlag>(saveFlag | FileSaveFlag_SaveAs);
 			}
 		}
 	}
@@ -7890,7 +7890,7 @@ bool ActivatePrevInst() noexcept {
 	}
 
 	if (flagSingleFileInstance && lpFileArg) {
-		ExpandEnvironmentStringsEx(lpFileArg, (DWORD)(NP2HeapSize(lpFileArg) / sizeof(WCHAR)));
+		ExpandEnvironmentStringsEx(lpFileArg, static_cast<DWORD>(NP2HeapSize(lpFileArg) / sizeof(WCHAR)));
 
 		if (PathIsRelative(lpFileArg)) {
 			WCHAR tchTmp[MAX_PATH];
@@ -7949,7 +7949,7 @@ bool ActivatePrevInst() noexcept {
 
 				COPYDATASTRUCT cds;
 				cds.dwData = DATA_NOTEPAD4_PARAMS;
-				cds.cbData = (DWORD)GlobalSize(params);
+				cds.cbData = static_cast<DWORD>(GlobalSize(params));
 				cds.lpData = params;
 
 				SendMessage(hwnd, WM_COPYDATA, 0, AsInteger<LPARAM>(&cds));
@@ -7992,7 +7992,7 @@ bool ActivatePrevInst() noexcept {
 			SetForegroundWindow(hwnd);
 
 			if (lpFileArg) {
-				ExpandEnvironmentStringsEx(lpFileArg, (DWORD)(NP2HeapSize(lpFileArg) / sizeof(WCHAR)));
+				ExpandEnvironmentStringsEx(lpFileArg, static_cast<DWORD>(NP2HeapSize(lpFileArg) / sizeof(WCHAR)));
 
 				if (PathIsRelative(lpFileArg)) {
 					WCHAR tchTmp[MAX_PATH];
@@ -8042,7 +8042,7 @@ bool ActivatePrevInst() noexcept {
 
 				COPYDATASTRUCT cds;
 				cds.dwData = DATA_NOTEPAD4_PARAMS;
-				cds.cbData = (DWORD)GlobalSize(params);
+				cds.cbData = static_cast<DWORD>(GlobalSize(params));
 				cds.lpData = params;
 
 				SendMessage(hwnd, WM_COPYDATA, 0, AsInteger<LPARAM>(&cds));
@@ -8197,7 +8197,7 @@ void GetRelaunchParameters(LPWSTR szParameters, LPCWSTR lpszFile, bool newWind, 
 			const char *enc = mEncoding[iCurrentEncoding].pszParseNames;
 			const char *sep = strchr(enc, ',');
 			memset(tch, 0, sizeof(tch));
-			MultiByteToWideChar(CP_UTF8, 0, enc, (int)(sep - enc), tch, COUNTOF(tch));
+			MultiByteToWideChar(CP_UTF8, 0, enc, static_cast<int>(sep - enc), tch, COUNTOF(tch));
 			lstrcat(szParameters, L" -e \"");
 			lstrcat(szParameters, tch);
 			lstrcat(szParameters, L"\"");
@@ -8237,7 +8237,7 @@ void GetRelaunchParameters(LPWSTR szParameters, LPCWSTR lpszFile, bool newWind, 
 			PosToStr(col, tchCol);
 			wsprintf(tch, L" -g %s,%s", tchLn, tchCol);
 #else
-			wsprintf(tch, L" -g %d,%d", (int)line, (int)col);
+			wsprintf(tch, L" -g %d,%d", static_cast<int>(line), static_cast<int>(col));
 #endif
 			lstrcat(szParameters, tch);
 		}
@@ -8370,7 +8370,7 @@ void ShowNotifyIcon(HWND hwnd, bool bAdd) noexcept {
 		LoadIconMetric(g_exeInstance, MAKEINTRESOURCE(IDR_MAINWND), LIM_SMALL, &hTrayIcon);
 #else
 		const int size = SystemMetricsForDpi(SM_CXSMICON, uTrayIconDPI);
-		hTrayIcon = (HICON)LoadImage(g_exeInstance, MAKEINTRESOURCE(IDR_MAINWND), IMAGE_ICON, size, size, LR_DEFAULTCOLOR);
+		hTrayIcon = static_cast<HICON>(LoadImage(g_exeInstance, MAKEINTRESOURCE(IDR_MAINWND), IMAGE_ICON, size, size, LR_DEFAULTCOLOR));
 #endif
 	}
 
@@ -8675,7 +8675,7 @@ void AutoSave_DoWork(FileSaveFlag saveFlag) noexcept {
 		return;
 	}
 
-	const DWORD cbData = (DWORD)SciCall_GetLength();
+	const DWORD cbData = static_cast<DWORD>(SciCall_GetLength());
 	if (cbData == 0) {
 		return;
 	}

@@ -55,7 +55,7 @@ enum {
 #define LexerAttr_GetTabAsSpaces(attr)			((attr) & LexerAttr_TabAsSpaces)
 #define LexerAttr_GetGlobalTabSettings(attr)	(!((attr) & LexerAttr_NoGlobalTabSettings))
 #define KeywordAttr32(index, value)		((value) << ((index)*4))
-#define KeywordAttr64(index, value)		((uint64_t)(value) << ((index)*4))
+#define KeywordAttr64(index, value)		(static_cast<uint64_t>(value) << ((index)*4))
 
 struct EDITSTYLE {
 	const unsigned iStyle;
@@ -70,7 +70,7 @@ struct EDITSTYLE {
 #define EDITSTYLE_BufferSize(iStyleCount)	((iStyleCount) * MAX_EDITSTYLE_VALUE_SIZE * sizeof(wchar_t))
 #define	MULTI_STYLE(a, b, c, d)			((a) | ((b) << 8) | ((c) << 16) | ((d) << 24))
 #define	MULTI_STYLE8(a, b, c, d, e, f, g, h) \
-	(MULTI_STYLE(a, b, c, d) | ((uint64_t)MULTI_STYLE(e, f, g, h) << 32))
+	(MULTI_STYLE(a, b, c, d) | (static_cast<uint64_t>(MULTI_STYLE(e, f, g, h)) << 32))
 
 struct KEYWORDLIST {
 	const char * const pszKeyWords[KEYWORDSET_MAX + 1];

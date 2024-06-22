@@ -208,11 +208,11 @@ inline __m128i unpack_color_epi16_sse4_si32(uint32_t color) noexcept {
 }
 
 inline __m128i unpack_color_epi16_sse4_ptr32(const uint32_t *color) noexcept {
-	return _mm_cvtepu8_epi16(*((__m128i *)color));
+	return _mm_cvtepu8_epi16(*(reinterpret_cast<const __m128i *>(color)));
 }
 
 inline __m128i unpack_color_epi16_sse4_ptr64(const uint64_t *color) noexcept {
-	return _mm_cvtepu8_epi16(*((__m128i *)color));
+	return _mm_cvtepu8_epi16(*(reinterpret_cast<const __m128i *>(color)));
 }
 
 inline __m128i unpack_color_epi32_sse4_si32(uint32_t color) noexcept {

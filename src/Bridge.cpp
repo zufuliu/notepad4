@@ -486,7 +486,7 @@ static UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam, LPA
 			p1 = p2;
 		}
 
-		ComboBox_SetCurSel(hwndCtl, (int)iPrintHeader);
+		ComboBox_SetCurSel(hwndCtl, static_cast<int>(iPrintHeader));
 		ComboBox_SetExtendedUI(hwndCtl, TRUE);
 
 		// Set footer options
@@ -502,7 +502,7 @@ static UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam, LPA
 			p1 = p2;
 		}
 
-		ComboBox_SetCurSel(hwndCtl, (int)iPrintFooter);
+		ComboBox_SetCurSel(hwndCtl, static_cast<int>(iPrintFooter));
 		ComboBox_SetExtendedUI(hwndCtl, TRUE);
 
 		// Set color options
@@ -536,9 +536,9 @@ static UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam, LPA
 				iPrintZoom = 100;
 			}
 
-			iPrintHeader = (PrintHeaderOption)SendDlgItemMessage(hwnd, IDC_PAGESETUP_HEADER_LIST, CB_GETCURSEL, 0, 0);
-			iPrintFooter = (PrintFooterOption)SendDlgItemMessage(hwnd, IDC_PAGESETUP_FOOTER_LIST, CB_GETCURSEL, 0, 0);
-			iPrintColor	 = (int)SendDlgItemMessage(hwnd, IDC_PAGESETUP_COLOR_MODE_LIST, CB_GETCURSEL, 0, 0);
+			iPrintHeader = static_cast<PrintHeaderOption>(SendDlgItemMessage(hwnd, IDC_PAGESETUP_HEADER_LIST, CB_GETCURSEL, 0, 0));
+			iPrintFooter = static_cast<PrintFooterOption>(SendDlgItemMessage(hwnd, IDC_PAGESETUP_FOOTER_LIST, CB_GETCURSEL, 0, 0));
+			iPrintColor	 = static_cast<int>(SendDlgItemMessage(hwnd, IDC_PAGESETUP_COLOR_MODE_LIST, CB_GETCURSEL, 0, 0));
 		}
 		break;
 

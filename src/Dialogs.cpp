@@ -345,7 +345,7 @@ INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 		switch (pnmhdr->code) {
 		case NM_CLICK:
 		case NM_RETURN:
-			OpenHelpLink(hwnd, (int)(pnmhdr->idFrom));
+			OpenHelpLink(hwnd, static_cast<int>(pnmhdr->idFrom));
 			break;
 		}
 	}
@@ -1330,7 +1330,7 @@ static INT_PTR CALLBACK ChangeNotifyDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 
 	switch (umsg) {
 	case WM_INITDIALOG:
-		CheckRadioButton(hwnd, IDC_CHANGENOTIFY_NONE, IDC_CHANGENOTIFY_AUTO_RELOAD, IDC_CHANGENOTIFY_NONE + (int)iFileWatchingMode);
+		CheckRadioButton(hwnd, IDC_CHANGENOTIFY_NONE, IDC_CHANGENOTIFY_AUTO_RELOAD, IDC_CHANGENOTIFY_NONE + static_cast<int>(iFileWatchingMode));
 		if (iFileWatchingMethod) {
 			CheckDlgButton(hwnd, IDC_CHANGENOTIFY_LOG_FILE, BST_CHECKED);
 		}
@@ -1346,7 +1346,7 @@ static INT_PTR CALLBACK ChangeNotifyDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDOK:
-			iFileWatchingMode = (FileWatchingMode)(GetCheckedRadioButton(hwnd, IDC_CHANGENOTIFY_NONE, IDC_CHANGENOTIFY_AUTO_RELOAD) - IDC_CHANGENOTIFY_NONE);
+			iFileWatchingMode = static_cast<FileWatchingMode>(GetCheckedRadioButton(hwnd, IDC_CHANGENOTIFY_NONE, IDC_CHANGENOTIFY_AUTO_RELOAD) - IDC_CHANGENOTIFY_NONE);
 			iFileWatchingMethod = IsButtonChecked(hwnd, IDC_CHANGENOTIFY_LOG_FILE);
 			bFileWatchingKeepAtEnd = IsButtonChecked(hwnd, IDC_CHANGENOTIFY_KEEP_AT_END);
 			bResetFileWatching = IsButtonChecked(hwnd, IDC_CHANGENOTIFY_RESET_WATCH);
@@ -1482,16 +1482,16 @@ static INT_PTR CALLBACK WordWrapSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDOK: {
-			iWordWrapIndent = (int)SendDlgItemMessage(hwnd, IDC_WRAP_INDENT, CB_GETCURSEL, 0, 0);
+			iWordWrapIndent = static_cast<int>(SendDlgItemMessage(hwnd, IDC_WRAP_INDENT, CB_GETCURSEL, 0, 0));
 			bShowWordWrapSymbols = false;
-			int iSel = (int)SendDlgItemMessage(hwnd, IDC_WRAP_SYMBOL_BEFORE, CB_GETCURSEL, 0, 0);
-			const int iSel2 = (int)SendDlgItemMessage(hwnd, IDC_WRAP_SYMBOL_AFTER, CB_GETCURSEL, 0, 0);
+			int iSel = static_cast<int>(SendDlgItemMessage(hwnd, IDC_WRAP_SYMBOL_BEFORE, CB_GETCURSEL, 0, 0));
+			const int iSel2 = static_cast<int>(SendDlgItemMessage(hwnd, IDC_WRAP_SYMBOL_AFTER, CB_GETCURSEL, 0, 0));
 			if (iSel > 0 || iSel2 > 0) {
 				bShowWordWrapSymbols = true;
 				iWordWrapSymbols = iSel + iSel2 * 10;
 			}
 
-			iSel = (int)SendDlgItemMessage(hwnd, IDC_WRAP_MODE, CB_GETCURSEL, 0, 0);
+			iSel = static_cast<int>(SendDlgItemMessage(hwnd, IDC_WRAP_MODE, CB_GETCURSEL, 0, 0));
 			if (iSel != SC_WRAP_NONE) {
 				iWordWrapMode = iSel;
 			}
@@ -2100,7 +2100,7 @@ static INT_PTR CALLBACK SelectDefLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM 
 		switch (LOWORD(wParam)) {
 		case IDOK: {
 			int *piOption = AsPointer<int *>(GetWindowLongPtr(hwnd, DWLP_USER));
-			*piOption = (int)SendDlgItemMessage(hwnd, IDC_EOLMODELIST, CB_GETCURSEL, 0, 0);
+			*piOption = static_cast<int>(SendDlgItemMessage(hwnd, IDC_EOLMODELIST, CB_GETCURSEL, 0, 0));
 			bWarnLineEndings = IsButtonChecked(hwnd, IDC_WARNINCONSISTENTEOLS);
 			bFixLineEndings = IsButtonChecked(hwnd, IDC_CONSISTENTEOLS);
 			bAutoStripBlanks = IsButtonChecked(hwnd, IDC_AUTOSTRIPBLANKS);
@@ -2167,7 +2167,7 @@ static INT_PTR CALLBACK WarnLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 		switch (LOWORD(wParam)) {
 		case IDOK: {
 			EditFileIOStatus *status = AsPointer<EditFileIOStatus *>(GetWindowLongPtr(hwnd, DWLP_USER));
-			const int iEOLMode = (int)SendDlgItemMessage(hwnd, IDC_EOLMODELIST, CB_GETCURSEL, 0, 0);
+			const int iEOLMode = static_cast<int>(SendDlgItemMessage(hwnd, IDC_EOLMODELIST, CB_GETCURSEL, 0, 0));
 			status->iEOLMode = iEOLMode;
 			bWarnLineEndings = IsButtonChecked(hwnd, IDC_WARNINCONSISTENTEOLS);
 			EndDialog(hwnd, IDOK);
@@ -2200,7 +2200,7 @@ void InitZoomLevelComboBox(HWND hwnd, int nCtlId, int zoomLevel) noexcept {
 
 	HWND hwndCtl = GetDlgItem(hwnd, nCtlId);
 	ComboBox_LimitText(hwndCtl, 8);
-	for (int i = 0; i < (int)COUNTOF(levelList); i++) {
+	for (UINT i = 0; i < COUNTOF(levelList); i++) {
 		const int level = levelList[i];
 		if (zoomLevel == level) {
 			selIndex = i;
@@ -2652,7 +2652,7 @@ INT_PTR CALLBACK InfoBoxDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 INT_PTR InfoBox(UINT uType, LPCWSTR lpstrSetting, UINT uidMessage, ...) noexcept {
 	const UINT icon = uType & MB_ICONMASK;
 	uType &= MB_TYPEMASK;
-	const SuppressMmessage iMode = (SuppressMmessage)IniGetInt(INI_SECTION_NAME_SUPPRESSED_MESSAGES, lpstrSetting, SuppressMmessage_None);
+	const SuppressMmessage iMode = static_cast<SuppressMmessage>(IniGetInt(INI_SECTION_NAME_SUPPRESSED_MESSAGES, lpstrSetting, SuppressMmessage_None));
 	if (StrNotEmpty(lpstrSetting) && iMode == SuppressMmessage_Suppress) {
 		return (uType == MB_YESNO) ? IDYES : IDOK;
 	}

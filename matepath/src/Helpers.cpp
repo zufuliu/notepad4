@@ -123,7 +123,7 @@ bool IniSectionParser::Parse(LPWSTR lpCachedIniSection) noexcept {
 		LPWSTR v = StrChr(p, L'=');
 		if (v != nullptr) {
 			*v++ = L'\0';
-			const UINT keyLen = (UINT)(v - p - 1);
+			const UINT keyLen = static_cast<UINT>(v - p - 1);
 			IniKeyValueNode &node = nodeList[index];
 			node.hash = keyLen | ((*reinterpret_cast<const UINT *>(p)) << 8);
 			node.key = p;
@@ -911,7 +911,7 @@ void SetClipData(HWND hwnd, LPCWSTR pszData) noexcept {
 		EmptyClipboard();
 		HANDLE hData = GlobalAlloc(GHND, sizeof(WCHAR) * (lstrlen(pszData) + 1));
 		WCHAR *pData = static_cast<WCHAR *>(GlobalLock(hData));
-		lstrcpyn(pData, pszData, (int)(GlobalSize(hData) / sizeof(WCHAR)));
+		lstrcpyn(pData, pszData, static_cast<int>(GlobalSize(hData) / sizeof(WCHAR)));
 		GlobalUnlock(hData);
 		SetClipboardData(CF_UNICODETEXT, hData);
 		CloseClipboard();
@@ -928,7 +928,7 @@ void SetWindowTransparentMode(HWND hwnd, bool bTransparentMode, int iOpacityLeve
 	exStyle = bTransparentMode ? (exStyle | WS_EX_LAYERED) : (exStyle & ~WS_EX_LAYERED);
 	SetWindowExStyle(hwnd, exStyle);
 	if (bTransparentMode) {
-		const BYTE bAlpha = (BYTE)(iOpacityLevel * 255 / 100);
+		const BYTE bAlpha = static_cast<BYTE>(iOpacityLevel * 255 / 100);
 		SetLayeredWindowAttributes(hwnd, 0, bAlpha, LWA_ALPHA);
 	}
 	// Ask the window and its children to repaint
@@ -1669,7 +1669,7 @@ HDDEDATA CALLBACK DdeCallback(UINT uType, UINT uFmt, HCONV hconv, HSZ hsz1, HSZ 
 
 	switch (uType) {
 	case XTYP_ADVDATA:
-		return (HDDEDATA)DDE_FACK;
+		return AsPointer<HDDEDATA, ULONG_PTR>(DDE_FACK);
 
 	default:
 		return nullptr;
@@ -2007,7 +2007,7 @@ bool GetThemedDialogFont(LPWSTR lpFaceName, WORD *wSize) noexcept {
 		}
 		lfHeight = MulDiv(lfHeight, 72, g_uSystemDPI);
 		lfHeight = max(lfHeight, 8);
-		*wSize = (WORD)lfHeight;
+		*wSize = static_cast<WORD>(lfHeight);
 		if (!IsVistaAndAbove()) {
 			// Windows 2000, XP, 2003
 			lstrcpy(lpFaceName, L"Tahoma");
@@ -2116,8 +2116,8 @@ DLGTEMPLATE *LoadThemedDialogTemplate(LPCWSTR lpDialogTemplateID, HINSTANCE hIns
 	BYTE *pb = DialogTemplate_GetFontSizeField(pTemplate, bDialogEx);
 	const DWORD cbOld = bHasFont ? cbFontAttr + sizeof(WCHAR) * (lstrlen(reinterpret_cast<WCHAR *>(pb + cbFontAttr)) + 1) : 0;
 
-	const BYTE *pOldControls = reinterpret_cast<BYTE *>((AsInteger<DWORD_PTR>(pb) + cbOld + 3) & ~(DWORD_PTR)3);
-	BYTE *pNewControls = reinterpret_cast<BYTE *>((AsInteger<DWORD_PTR>(pb) + cbNew + 3) & ~(DWORD_PTR)3);
+	const BYTE *pOldControls = reinterpret_cast<BYTE *>(NP2_align_up(AsInteger<DWORD_PTR>(pb) + cbOld, sizeof(DWORD)));
+	BYTE *pNewControls = reinterpret_cast<BYTE *>(NP2_align_up(AsInteger<DWORD_PTR>(pb) + cbNew, sizeof(DWORD)));
 
 	const WORD nCtrl = bDialogEx ? (reinterpret_cast<DLGTEMPLATEEX *>(pTemplate))->cDlgItems : pTemplate->cdit;
 	if (cbNew != cbOld && nCtrl > 0) {

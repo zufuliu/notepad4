@@ -276,7 +276,7 @@ void RGBAImage::BGRAFromRGBA(unsigned char *pixelsBGRA, const unsigned char *pix
 		i16x8Color = _mm_blend_epi16(i16x8Alpha, i16x8Color, 0x77);
 
 		i16x8Color = pack_color_epi16_sse2_si128(i16x8Color);
-		_mm_storel_epi64((__m128i *)pbgra, i16x8Color);
+		_mm_storel_epi64(reinterpret_cast<__m128i *>(pbgra), i16x8Color);
 	}
 
 #elif NP2_USE_SSE2

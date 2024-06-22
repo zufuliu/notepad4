@@ -328,7 +328,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
 	hResDLL = LoadLocalizedResourceDLL(uiLanguage, WC_MATEPATH L".dll");
 	if (hResDLL) {
-		g_hInstance = hInstance = (HINSTANCE)hResDLL;
+		g_hInstance = hInstance = hResDLL;
 	}
 #endif
 
@@ -361,7 +361,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	}
 
 	CleanUpResources(true);
-	return (int)(msg.wParam);
+	return static_cast<int>(msg.wParam);
 }
 
 //=============================================================================
@@ -373,7 +373,7 @@ BOOL InitApplication(HINSTANCE hInstance) noexcept {
 	WNDCLASSEX wc;
 	wc.cbSize        = sizeof(WNDCLASSEX);
 	wc.style         = CS_BYTEALIGNWINDOW;
-	wc.lpfnWndProc   = (WNDPROC)MainWndProc;
+	wc.lpfnWndProc   = MainWndProc;
 	wc.cbClsExtra    = 0;
 	wc.cbWndExtra    = 0;
 	wc.hInstance     = hInstance;
@@ -1043,7 +1043,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 	rbBand.cxMinChild = (rc.right - rc.left) * COUNTOF(tbbMainWnd);
 	rbBand.cyMinChild = (rc.bottom - rc.top) + 2 * rc.top;
 	rbBand.cx         = 0;
-	SendMessage(hwndReBar, RB_INSERTBAND, (WPARAM)(-1), AsInteger<LPARAM>(&rbBand));
+	SendMessage(hwndReBar, RB_INSERTBAND, static_cast<WPARAM>(-1), AsInteger<LPARAM>(&rbBand));
 
 	SetWindowPos(hwndReBar, nullptr, 0, 0, 0, 0, SWP_NOZORDER);
 	GetWindowRect(hwndReBar, &rc);
@@ -2168,7 +2168,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 						GetFileAttributesEx(dli.szFileName, GetFileExInfoStandard, &fd);
 					}
 
-					const LONGLONG isize = (((LONGLONG)fd.nFileSizeHigh) << 32) | fd.nFileSizeLow;
+					const LONGLONG isize = (static_cast<LONGLONG>(fd.nFileSizeHigh) << 32) | fd.nFileSizeLow;
 					WCHAR tchsize[64];
 					StrFormatByteSize(isize, tchsize, COUNTOF(tchsize));
 
@@ -2256,7 +2256,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 		case TBN_GETBUTTONINFO: {
 			LPTBNOTIFY lpTbNotify = AsPointer<LPTBNOTIFY>(lParam);
-			if (lpTbNotify->iItem < (int)COUNTOF(tbbMainWnd)) {
+			if (static_cast<UINT>(lpTbNotify->iItem) < COUNTOF(tbbMainWnd)) {
 				WCHAR tch[128];
 				GetString(tbbMainWnd[lpTbNotify->iItem].idCommand, tch, COUNTOF(tch));
 				lstrcpyn(lpTbNotify->pszText, tch, lpTbNotify->cchText);
@@ -2280,7 +2280,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				PathCompactPathEx(pTTT->szText, szCurDir, COUNTOF(pTTT->szText), 0);
 			} else {
 				WCHAR tch[128];
-				GetString((UINT)pnmh->idFrom, tch, COUNTOF(tch));
+				GetString(static_cast<UINT>(pnmh->idFrom), tch, COUNTOF(tch));
 				lstrcpyn(pTTT->szText, tch, COUNTOF(pTTT->szText));
 			}
 		}
@@ -2763,7 +2763,7 @@ void SaveSettings(bool bSaveSettingsNow) noexcept {
 	IniSectionBuilder section = { pIniSectionBuf };
 
 	section.SetBoolEx(L"SaveSettings", bSaveSettings, true);
-	section.SetIntEx(L"StartupDirectory", (int)iStartupDir, StartupDirectory_MRU);
+	section.SetIntEx(L"StartupDirectory", static_cast<int>(iStartupDir), StartupDirectory_MRU);
 	if (iStartupDir == StartupDirectory_MRU) {
 		section.SetString(L"MRUDirectory", szCurDir);
 	}
@@ -2790,7 +2790,7 @@ void SaveSettings(bool bSaveSettingsNow) noexcept {
 	section.SetBoolEx(L"MinimizeToTray", bMinimizeToTray, false);
 	section.SetBoolEx(L"TransparentMode", bTransparentMode, false);
 	section.SetBoolEx(L"WindowLayoutRTL", bWindowLayoutRTL, false);
-	section.SetIntEx(L"EscFunction", (int)iEscFunction, EscFunction_None);
+	section.SetIntEx(L"EscFunction", static_cast<int>(iEscFunction), EscFunction_None);
 
 	if (IsVistaAndAbove()) {
 		section.SetBoolEx(L"UseXPFileDialog", bUseXPFileDialog, false);
@@ -3061,7 +3061,7 @@ void LoadFlags() noexcept {
 	section.Parse(pIniSectionBuf);
 
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
-	uiLanguage = (LANGID)section.GetInt(L"UILanguage", LANG_USER_DEFAULT);
+	uiLanguage = static_cast<LANGID>(section.GetInt(L"UILanguage", LANG_USER_DEFAULT));
 	ValidateUILangauge();
 #endif
 
@@ -3481,7 +3481,7 @@ bool ActivatePrevInst() noexcept {
 			SetForegroundWindow(hwnd);
 
 			if (lpPathArg) {
-				ExpandEnvironmentStringsEx(lpPathArg, (DWORD)(GlobalSize(lpPathArg) / sizeof(WCHAR)));
+				ExpandEnvironmentStringsEx(lpPathArg, static_cast<DWORD>(GlobalSize(lpPathArg) / sizeof(WCHAR)));
 
 				if (PathIsRelative(lpPathArg)) {
 					WCHAR tchTmp[MAX_PATH];
@@ -3492,7 +3492,7 @@ bool ActivatePrevInst() noexcept {
 
 				COPYDATASTRUCT cds;
 				cds.dwData = DATA_MATEPATH_PATHARG;
-				cds.cbData = (DWORD)GlobalSize(lpPathArg);
+				cds.cbData = static_cast<DWORD>(GlobalSize(lpPathArg));
 				cds.lpData = lpPathArg;
 
 				// Send lpPathArg to previous instance
@@ -3572,7 +3572,7 @@ void ShowNotifyIcon(HWND hwnd, bool bAdd) noexcept {
 		LoadIconMetric(g_exeInstance, MAKEINTRESOURCE(IDR_MAINWND), LIM_SMALL, &hTrayIcon);
 #else
 		const int size = SystemMetricsForDpi(SM_CXSMICON, uTrayIconDPI);
-		hTrayIcon = (HICON)LoadImage(g_exeInstance, MAKEINTRESOURCE(IDR_MAINWND), IMAGE_ICON, size, size, LR_DEFAULTCOLOR);
+		hTrayIcon = static_cast<HICON>(LoadImage(g_exeInstance, MAKEINTRESOURCE(IDR_MAINWND), IMAGE_ICON, size, size, LR_DEFAULTCOLOR));
 #endif
 	}
 
@@ -3626,10 +3626,10 @@ void LoadLaunchSetings() noexcept {
 
 	int iValue = section.GetInt(L"UseTargetApplication", UseTargetApplication_NotSet);
 	if (iValue != UseTargetApplication_NotSet) {
-		iUseTargetApplication = (UseTargetApplication)iValue;
+		iUseTargetApplication = static_cast<UseTargetApplication>(iValue);
 		section.GetString(L"TargetApplicationPath", szTargetApplication, szTargetApplication);
 		section.GetString(L"TargetApplicationParams", szTargetApplicationParams, szTargetApplicationParams);
-		iValue = section.GetInt(L"TargetApplicationMode", (int)iTargetApplicationMode);
+		iValue = section.GetInt(L"TargetApplicationMode", static_cast<int>(iTargetApplicationMode));
 		iTargetApplicationMode = clamp(static_cast<TargetApplicationMode>(iValue), TargetApplicationMode_None, TargetApplicationMode_UseDDE);
 		section.GetString(L"TargetApplicationWndClass", szTargetApplicationWndClass, szTargetApplicationWndClass);
 		section.GetString(L"DDEMessage", szDDEMsg, szDDEMsg);

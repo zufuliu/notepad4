@@ -76,7 +76,7 @@ inline void SciCall_SetReadOnly(bool readOnly) noexcept {
 }
 
 inline bool SciCall_GetReadOnly() noexcept {
-	return (bool)SciCall(SCI_GETREADONLY, 0, 0);
+	return static_cast<bool>(SciCall(SCI_GETREADONLY, 0, 0));
 }
 
 inline Sci_Position SciCall_GetTextRangeFull(const Sci_TextRangeFull *tr) noexcept {
@@ -108,11 +108,11 @@ inline void SciCall_ClearDocumentStyle() noexcept {
 }
 
 inline int SciCall_GetCharAt(Sci_Position position) noexcept {
-	return (int)SciCall(SCI_GETCHARAT, position, 0);
+	return static_cast<int>(SciCall(SCI_GETCHARAT, position, 0));
 }
 
 inline int SciCall_GetStyleIndexAt(Sci_Position position) noexcept {
-	return (int)SciCall(SCI_GETSTYLEINDEXAT, position, 0);
+	return static_cast<int>(SciCall(SCI_GETSTYLEINDEXAT, position, 0));
 }
 
 inline size_t SciCall_GetStyledTextFull(const Sci_TextRangeFull *tr) noexcept {
@@ -120,11 +120,11 @@ inline size_t SciCall_GetStyledTextFull(const Sci_TextRangeFull *tr) noexcept {
 }
 
 inline int SciCall_GetCharacterAndWidth(Sci_Position position, Sci_Position *width) noexcept {
-	return (int)SciCall(SCI_GETCHARACTERANDWIDTH, position, AsInteger<LPARAM>(width));
+	return static_cast<int>(SciCall(SCI_GETCHARACTERANDWIDTH, position, AsInteger<LPARAM>(width)));
 }
 
 inline int SciCall_GetCharacterAt(Sci_Position position) noexcept {
-	return (int)SciCall(SCI_GETCHARACTERANDWIDTH, position, 0);
+	return static_cast<int>(SciCall(SCI_GETCHARACTERANDWIDTH, position, 0));
 }
 
 // same as CharacterClass in ILexer.h
@@ -137,7 +137,7 @@ enum CharacterClass {
 };
 
 inline CharacterClass SciCall_GetCharacterClass(UINT character) noexcept {
-	return (CharacterClass)SciCall(SCI_GETCHARACTERCLASS, character, 0);
+	return static_cast<CharacterClass>(SciCall(SCI_GETCHARACTERCLASS, character, 0));
 }
 
 // Searching and replacing
@@ -189,7 +189,7 @@ inline Sci_Position SciCall_ReplaceTargetEx(BOOL regex, Sci_Position length, con
 // Overtype
 
 inline BOOL SciCall_GetOvertype() noexcept {
-	return (BOOL)SciCall(SCI_GETOVERTYPE, 0, 0);
+	return static_cast<BOOL>(SciCall(SCI_GETOVERTYPE, 0, 0));
 }
 
 // Cut, copy and paste
@@ -211,7 +211,7 @@ inline void SciCall_Clear() noexcept {
 }
 
 inline bool SciCall_CanPaste() noexcept {
-	return (bool)SciCall(SCI_CANPASTE, 0, 0);
+	return static_cast<bool>(SciCall(SCI_CANPASTE, 0, 0));
 }
 
 inline void SciCall_CopyAllowLine() noexcept {
@@ -233,7 +233,7 @@ inline void SciCall_Undo() noexcept {
 }
 
 inline bool SciCall_CanUndo() noexcept {
-	return (bool)SciCall(SCI_CANUNDO, 0, 0);
+	return static_cast<bool>(SciCall(SCI_CANUNDO, 0, 0));
 }
 
 inline void SciCall_EmptyUndoBuffer() noexcept {
@@ -245,7 +245,7 @@ inline void SciCall_Redo() noexcept {
 }
 
 inline bool SciCall_CanRedo() noexcept {
-	return (bool)SciCall(SCI_CANREDO, 0, 0);
+	return static_cast<bool>(SciCall(SCI_CANREDO, 0, 0));
 }
 
 inline void SciCall_SetUndoCollection(bool collectUndo) noexcept {
@@ -351,7 +351,7 @@ inline Sci_Position SciCall_GetSelBytes(char *buffer) noexcept {
 }
 
 inline bool SciCall_IsRectangleSelection() noexcept {
-	return (bool)SciCall(SCI_SELECTIONISRECTANGLE, 0, 0);
+	return static_cast<bool>(SciCall(SCI_SELECTIONISRECTANGLE, 0, 0));
 }
 
 inline void SciCall_SetSelectionMode(int selectionMode) noexcept {
@@ -359,7 +359,7 @@ inline void SciCall_SetSelectionMode(int selectionMode) noexcept {
 }
 
 inline int SciCall_GetSelectionMode() noexcept {
-	return (int)SciCall(SCI_GETSELECTIONMODE, 0, 0);
+	return static_cast<int>(SciCall(SCI_GETSELECTIONMODE, 0, 0));
 }
 
 inline Sci_Position SciCall_GetLineSelStartPosition(Sci_Line line) noexcept {
@@ -379,11 +379,11 @@ inline Sci_Position SciCall_PositionAfter(Sci_Position position) noexcept {
 }
 
 inline int SciCall_TextWidth(int style, const char *text) noexcept {
-	return (int)SciCall(SCI_TEXTWIDTH, style, AsInteger<LPARAM>(text));
+	return static_cast<int>(SciCall(SCI_TEXTWIDTH, style, AsInteger<LPARAM>(text)));
 }
 
 inline int SciCall_TextHeight() noexcept {
-	return (int)SciCall(SCI_TEXTHEIGHT, 0, 0);
+	return static_cast<int>(SciCall(SCI_TEXTHEIGHT, 0, 0));
 }
 
 inline Sci_Position SciCall_GetColumn(Sci_Position position) noexcept {
@@ -399,11 +399,11 @@ inline Sci_Position SciCall_PositionFromPoint(int x, int y) noexcept {
 }
 
 inline int SciCall_PointXFromPosition(Sci_Position pos) noexcept {
-	return (int)SciCall(SCI_POINTXFROMPOSITION, 0, pos);
+	return static_cast<int>(SciCall(SCI_POINTXFROMPOSITION, 0, pos));
 }
 
 inline int SciCall_PointYFromPosition(Sci_Position pos) noexcept {
-	return (int)SciCall(SCI_POINTYFROMPOSITION, 0, pos);
+	return static_cast<int>(SciCall(SCI_POINTYFROMPOSITION, 0, pos));
 }
 
 inline void SciCall_ChooseCaretX() noexcept {
@@ -461,7 +461,7 @@ inline bool SciCall_IsMultipleSelection() noexcept {
 }
 
 inline bool SciCall_IsSelectionEmpty() noexcept {
-	return (bool)SciCall(SCI_GETSELECTIONEMPTY, 0, 0);
+	return static_cast<bool>(SciCall(SCI_GETSELECTIONEMPTY, 0, 0));
 }
 
 inline void SciCall_ClearSelections() noexcept {
@@ -511,7 +511,7 @@ inline void SciCall_SetXOffset(int xOffset) noexcept {
 }
 
 inline int SciCall_GetXOffset() noexcept {
-	return (int)SciCall(SCI_GETXOFFSET, 0, 0);
+	return static_cast<int>(SciCall(SCI_GETXOFFSET, 0, 0));
 }
 
 inline void SciCall_LineScroll(Sci_Position columns, Sci_Line lines) noexcept {
@@ -580,7 +580,7 @@ inline void SciCall_SetEOLMode(int eolMode) noexcept {
 }
 
 inline int SciCall_GetEOLMode() noexcept {
-	return (int)SciCall(SCI_GETEOLMODE, 0, 0);
+	return static_cast<int>(SciCall(SCI_GETEOLMODE, 0, 0));
 }
 
 inline void SciCall_ConvertEOLs(int eolMode) noexcept {
@@ -620,7 +620,7 @@ inline void SciCall_StartStyling(Sci_Position start) noexcept {
 }
 
 inline int SciCall_GetLineState(Sci_Line line) noexcept {
-	return (int)SciCall(SCI_GETLINESTATE, line, 0);
+	return static_cast<int>(SciCall(SCI_GETLINESTATE, line, 0));
 }
 
 // Style definition
@@ -650,7 +650,7 @@ inline void SciCall_StyleSetSizeFractional(int style, int sizeHundredthPoints) n
 }
 
 inline int SciCall_StyleGetSizeFractional(int style) noexcept {
-	return (int)SciCall(SCI_STYLEGETSIZEFRACTIONAL, style, 0);
+	return static_cast<int>(SciCall(SCI_STYLEGETSIZEFRACTIONAL, style, 0));
 }
 
 inline void SciCall_StyleSetWeight(int style, int weight) noexcept {
@@ -658,7 +658,7 @@ inline void SciCall_StyleSetWeight(int style, int weight) noexcept {
 }
 
 inline int SciCall_StyleGetWeight(int style) noexcept {
-	return (int)SciCall(SCI_STYLEGETWEIGHT, style, 0);
+	return static_cast<int>(SciCall(SCI_STYLEGETWEIGHT, style, 0));
 }
 
 inline void SciCall_StyleSetItalic(int style, bool italic) noexcept {
@@ -666,7 +666,7 @@ inline void SciCall_StyleSetItalic(int style, bool italic) noexcept {
 }
 
 inline bool SciCall_StyleGetItalic(int style) noexcept {
-	return (bool)SciCall(SCI_STYLEGETITALIC, style, 0);
+	return static_cast<bool>(SciCall(SCI_STYLEGETITALIC, style, 0));
 }
 
 inline void SciCall_StyleSetUnderline(int style, bool underline) noexcept {
@@ -674,7 +674,7 @@ inline void SciCall_StyleSetUnderline(int style, bool underline) noexcept {
 }
 
 inline bool SciCall_StyleGetUnderline(int style) noexcept {
-	return (bool)SciCall(SCI_STYLEGETUNDERLINE, style, 0);
+	return static_cast<bool>(SciCall(SCI_STYLEGETUNDERLINE, style, 0));
 }
 
 inline void SciCall_StyleSetStrike(int style, bool strike) noexcept {
@@ -682,7 +682,7 @@ inline void SciCall_StyleSetStrike(int style, bool strike) noexcept {
 }
 
 inline bool SciCall_StyleGetStrike(int style) noexcept {
-	return (bool)SciCall(SCI_STYLEGETSTRIKE, style, 0);
+	return static_cast<bool>(SciCall(SCI_STYLEGETSTRIKE, style, 0));
 }
 
 inline void SciCall_StyleSetOverline(int style, bool overline) noexcept {
@@ -694,7 +694,7 @@ inline void SciCall_StyleSetFore(int style, COLORREF fore) noexcept {
 }
 
 inline COLORREF SciCall_StyleGetFore(int style) noexcept {
-	return (COLORREF)SciCall(SCI_STYLEGETFORE, style, 0);
+	return static_cast<COLORREF>(SciCall(SCI_STYLEGETFORE, style, 0));
 }
 
 inline void SciCall_StyleSetBack(int style, COLORREF back) noexcept {
@@ -702,7 +702,7 @@ inline void SciCall_StyleSetBack(int style, COLORREF back) noexcept {
 }
 
 inline COLORREF SciCall_StyleGetBack(int style) noexcept {
-	return (COLORREF)SciCall(SCI_STYLEGETBACK, style, 0);
+	return static_cast<COLORREF>(SciCall(SCI_STYLEGETBACK, style, 0));
 }
 
 inline void SciCall_StyleSetEOLFilled(int style, bool eolFilled) noexcept {
@@ -710,7 +710,7 @@ inline void SciCall_StyleSetEOLFilled(int style, bool eolFilled) noexcept {
 }
 
 inline bool SciCall_StyleGetEOLFilled(int style) noexcept {
-	return (bool)SciCall(SCI_STYLEGETEOLFILLED, style, 0);
+	return static_cast<bool>(SciCall(SCI_STYLEGETEOLFILLED, style, 0));
 }
 
 inline void SciCall_StyleSetCharacterSet(int style, int characterSet) noexcept {
@@ -718,7 +718,7 @@ inline void SciCall_StyleSetCharacterSet(int style, int characterSet) noexcept {
 }
 
 inline int SciCall_StyleGetCharacterSet(int style) noexcept {
-	return (int)SciCall(SCI_STYLEGETCHARACTERSET, style, 0);
+	return static_cast<int>(SciCall(SCI_STYLEGETCHARACTERSET, style, 0));
 }
 
 inline void SciCall_StyleSetHotSpot(int style, bool hotspot) noexcept {
@@ -726,7 +726,7 @@ inline void SciCall_StyleSetHotSpot(int style, bool hotspot) noexcept {
 }
 
 inline bool SciCall_StyleGetHotSpot(int style) noexcept {
-	return (bool)SciCall(SCI_STYLEGETHOTSPOT, style, 0);
+	return static_cast<bool>(SciCall(SCI_STYLEGETHOTSPOT, style, 0));
 }
 
 inline void SciCall_StyleSetCheckMonospaced(int style, bool checkMonospaced) noexcept {
@@ -740,7 +740,7 @@ inline void SciCall_SetElementColor(int element, COLORREF color) noexcept {
 }
 
 inline COLORREF SciCall_GetElementColour(int element) noexcept {
-	return (COLORREF)SciCall(SCI_GETELEMENTCOLOUR, element, 0);
+	return static_cast<COLORREF>(SciCall(SCI_GETELEMENTCOLOUR, element, 0));
 }
 
 inline void SciCall_ResetElementColor(int element) noexcept {
@@ -812,7 +812,7 @@ inline void SciCall_SetMarginWidth(int margin, int pixelWidth) noexcept {
 }
 
 inline int SciCall_GetMarginWidth(int margin) noexcept {
-	return (int)SciCall(SCI_GETMARGINWIDTHN, margin, 0);
+	return static_cast<int>(SciCall(SCI_GETMARGINWIDTHN, margin, 0));
 }
 
 inline void SciCall_SetMarginMask(int margin, int mask) noexcept {
@@ -846,7 +846,7 @@ inline void SciCall_SetCodePage(UINT codePage) noexcept {
 }
 
 inline UINT SciCall_GetCodePage() noexcept {
-	return (UINT)SciCall(SCI_GETCODEPAGE, 0, 0);
+	return static_cast<UINT>(SciCall(SCI_GETCODEPAGE, 0, 0));
 }
 
 inline void SciCall_SetTechnology(int technology) noexcept {
@@ -854,7 +854,7 @@ inline void SciCall_SetTechnology(int technology) noexcept {
 }
 
 inline int SciCall_GetTechnology() noexcept {
-	return (int)SciCall(SCI_GETTECHNOLOGY, 0, 0);
+	return static_cast<int>(SciCall(SCI_GETTECHNOLOGY, 0, 0));
 }
 
 inline void SciCall_SetBidirectional(int bidirectional) noexcept {
@@ -862,7 +862,7 @@ inline void SciCall_SetBidirectional(int bidirectional) noexcept {
 }
 
 inline int SciCall_GetBidirectional() noexcept {
-	return (int)SciCall(SCI_GETBIDIRECTIONAL, 0, 0);
+	return static_cast<int>(SciCall(SCI_GETBIDIRECTIONAL, 0, 0));
 }
 
 inline void SciCall_SetFontQuality(int fontQuality) noexcept {
@@ -911,7 +911,7 @@ inline void SciCall_SetTabWidth(int tabWidth) noexcept {
 }
 
 inline int SciCall_GetTabWidth() noexcept {
-	return (int)SciCall(SCI_GETTABWIDTH, 0, 0);
+	return static_cast<int>(SciCall(SCI_GETTABWIDTH, 0, 0));
 }
 
 inline void SciCall_SetTabMinimumWidth(int pixels) noexcept {
@@ -923,7 +923,7 @@ inline void SciCall_SetUseTabs(bool useTabs) noexcept {
 }
 
 inline bool SciCall_GetUseTabs() noexcept {
-	return (bool)SciCall(SCI_GETUSETABS, 0, 0);
+	return static_cast<bool>(SciCall(SCI_GETUSETABS, 0, 0));
 }
 
 inline void SciCall_SetIndent(int indentSize) noexcept {
@@ -955,7 +955,7 @@ inline void SciCall_SetIndentationGuides(int indentView) noexcept {
 }
 
 inline int SciCall_GetIndentationGuides() noexcept {
-	return (int)SciCall(SCI_GETINDENTATIONGUIDES, 0, 0);
+	return static_cast<int>(SciCall(SCI_GETINDENTATIONGUIDES, 0, 0));
 }
 
 inline void SciCall_SetHighlightGuide(Sci_Position column) noexcept {
@@ -973,7 +973,7 @@ inline void SciCall_MarkerDefinePixmap(int markerNumber, const char *pixmap) noe
 }
 
 inline int SciCall_MarkerSymbolDefined(int markerNumber) noexcept {
-	return (int)SciCall(SCI_MARKERSYMBOLDEFINED, markerNumber, 0);
+	return static_cast<int>(SciCall(SCI_MARKERSYMBOLDEFINED, markerNumber, 0));
 }
 
 inline void SciCall_MarkerSetForeTranslucent(int markerNumber, COLORREF fore) noexcept {
@@ -1001,7 +1001,7 @@ inline void SciCall_MarkerEnableHighlight(bool enabled) noexcept {
 }
 
 inline int SciCall_MarkerAdd(Sci_Line line, int markerNumber) noexcept {
-	return (int)SciCall(SCI_MARKERADD, line, markerNumber);
+	return static_cast<int>(SciCall(SCI_MARKERADD, line, markerNumber));
 }
 
 inline void SciCall_MarkerDelete(Sci_Line line, int markerNumber) noexcept {
@@ -1017,7 +1017,7 @@ inline void SciCall_ClearMarker() noexcept {
 }
 
 inline Sci_MarkerMask SciCall_MarkerGet(Sci_Line line) noexcept {
-	return (Sci_MarkerMask)SciCall(SCI_MARKERGET, line, 0);
+	return static_cast<Sci_MarkerMask>(SciCall(SCI_MARKERGET, line, 0));
 }
 
 inline Sci_Line SciCall_MarkerNext(Sci_Line line, Sci_MarkerMask markerMask) noexcept {
@@ -1073,7 +1073,7 @@ inline void SciCall_AutoCCancel() noexcept {
 }
 
 inline bool SciCall_AutoCActive() noexcept {
-	return (bool)SciCall(SCI_AUTOCACTIVE, 0, 0);
+	return static_cast<bool>(SciCall(SCI_AUTOCACTIVE, 0, 0));
 }
 
 inline void SciCall_AutoCSetSeparator(char separatorCharacter) noexcept {
@@ -1135,7 +1135,7 @@ inline void SciCall_CallTipCancel() noexcept {
 }
 
 inline bool SciCall_CallTipActive() noexcept {
-	return (bool)SciCall(SCI_CALLTIPACTIVE, 0, 0);
+	return static_cast<bool>(SciCall(SCI_CALLTIPACTIVE, 0, 0));
 }
 
 inline void SciCall_CallTipSetBack(COLORREF back) noexcept {
@@ -1291,7 +1291,7 @@ inline void SciCall_ReleaseDocument(HANDLE doc) noexcept {
 }
 
 inline int SciCall_GetDocumentOptions() noexcept {
-	return (int)SciCall(SCI_GETDOCUMENTOPTIONS, 0, 0);
+	return static_cast<int>(SciCall(SCI_GETDOCUMENTOPTIONS, 0, 0));
 }
 
 // Folding
@@ -1301,11 +1301,11 @@ inline Sci_Line SciCall_DocLineFromVisible(Sci_Line displayLine) noexcept {
 }
 
 inline bool SciCall_GetLineVisible(Sci_Line line) noexcept {
-	return (bool)SciCall(SCI_GETLINEVISIBLE, line, 0);
+	return static_cast<bool>(SciCall(SCI_GETLINEVISIBLE, line, 0));
 }
 
 inline int SciCall_GetFoldLevel(Sci_Line line) noexcept {
-	return (int)SciCall(SCI_GETFOLDLEVEL, line, 0);
+	return static_cast<int>(SciCall(SCI_GETFOLDLEVEL, line, 0));
 }
 
 inline void SciCall_SetFoldFlags(int flags) noexcept {
@@ -1325,7 +1325,7 @@ inline Sci_Line SciCall_GetFoldParent(Sci_Line line) noexcept {
 }
 
 inline BOOL SciCall_GetFoldExpanded(Sci_Line line) noexcept {
-	return (BOOL)SciCall(SCI_GETFOLDEXPANDED, line, 0);
+	return static_cast<BOOL>(SciCall(SCI_GETFOLDEXPANDED, line, 0));
 }
 
 inline void SciCall_FoldLine(Sci_Line line, int action) noexcept {
@@ -1379,7 +1379,7 @@ inline void SciCall_SetWrapIndentMode(int wrapIndentMode) noexcept {
 }
 
 inline int SciCall_GetWrapIndentMode() noexcept {
-	return (int)SciCall(SCI_GETWRAPINDENTMODE, 0, 0);
+	return static_cast<int>(SciCall(SCI_GETWRAPINDENTMODE, 0, 0));
 }
 
 inline void SciCall_SetWrapStartIndent(int indent) noexcept {
@@ -1405,7 +1405,7 @@ inline void SciCall_SetZoom(int percent) noexcept {
 }
 
 inline int SciCall_GetZoom() noexcept {
-	return (int)SciCall(SCI_GETZOOM, 0, 0);
+	return static_cast<int>(SciCall(SCI_GETZOOM, 0, 0));
 }
 
 inline void SciCall_ZoomIn() noexcept {
@@ -1423,7 +1423,7 @@ inline void SciCall_SetEdgeMode(int edgeMode) noexcept {
 }
 
 inline int SciCall_GetEdgeMode() noexcept {
-	return (int)SciCall(SCI_GETEDGEMODE, 0, 0);
+	return static_cast<int>(SciCall(SCI_GETEDGEMODE, 0, 0));
 }
 
 inline void SciCall_SetEdgeColumn(int column) noexcept {

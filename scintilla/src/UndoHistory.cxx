@@ -54,13 +54,13 @@ size_t ReadValue(const uint8_t *bytes, size_t length) noexcept {
 	case 1:
 		return bytes[0];
 	case 2:
-		return *((uint16_t *)bytes);
+		return *reinterpret_cast<const uint16_t *>(bytes);
 #if defined(_WIN64)
 	case 4:
-		return *((uint32_t *)bytes);
+		return *reinterpret_cast<const uint32_t *>(bytes);
 #endif
 	default:
-		return *((size_t *)bytes);
+		return *reinterpret_cast<const size_t *>(bytes);
 	}
 #else
 	size_t value = 0;
@@ -78,15 +78,15 @@ void WriteValue(uint8_t *bytes, size_t length, size_t value) noexcept {
 		bytes[0] = value & byteMask;
 		break;
 	case 2:
-		*((uint16_t *)bytes) = static_cast<uint16_t>(value);
+		*reinterpret_cast<uint16_t *>(bytes) = static_cast<uint16_t>(value);
 		break;
 #if defined(_WIN64)
 	case 4:
-		*((uint32_t *)bytes) = static_cast<uint32_t>(value);
+		*reinterpret_cast<uint32_t *>(bytes) = static_cast<uint32_t>(value);
 		break;
 #endif
 	default:
-		*((size_t *)bytes) = value;
+		*reinterpret_cast<size_t *>(bytes) = value;
 		break;
 	}
 #else
@@ -148,14 +148,14 @@ void ScaledVector::SetValueAt(size_t index, size_t value) {
 				break;
 #if defined(_WIN64)
 			case 2:
-				*((uint16_t *)destination) = *(const uint16_t *)source;
+				*reinterpret_cast<uint16_t *>(destination) = *reinterpret_cast<const uint16_t *>(source);
 				break;
 			default:
-				*((uint32_t *)destination) = *(const uint32_t *)source;
+				*reinterpret_cast<uint32_t *>(destination) = *reinterpret_cast<const uint32_t *>(source);
 				break;
 #else
 			default:
-				*((uint16_t *)destination) = *(const uint16_t *)source;
+				*reinterpret_cast<uint16_t *>(destination) = *reinterpret_cast<const uint16_t *>(source);
 				break;
 #endif
 			}

@@ -37,7 +37,7 @@ LineMarker::LineMarker(const LineMarker &other) : LineMarkerPod(other) {
 
 LineMarker &LineMarker::operator=(const LineMarker &other) {
 	if (this != &other) {
-		(LineMarkerPod &)(*this) = other;
+		static_cast<LineMarkerPod &>(*this) = other;
 		CopyImage(other);
 	}
 	return *this;

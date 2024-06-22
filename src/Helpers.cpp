@@ -162,7 +162,7 @@ bool IniSectionParser::Parse(LPWSTR lpCachedIniSection) noexcept {
 		LPWSTR v = StrChr(p, L'=');
 		if (v != nullptr) {
 			*v++ = L'\0';
-			const UINT keyLen = (UINT)(v - p - 1);
+			const UINT keyLen = static_cast<UINT>(v - p - 1);
 			IniKeyValueNode &node = nodeList[index];
 			node.hash = keyLen | ((*reinterpret_cast<const UINT *>(p)) << 8);
 			node.key = p;
@@ -808,7 +808,7 @@ void SetClipData(HWND hwnd, LPCWSTR pszData) noexcept {
 		EmptyClipboard();
 		HANDLE hData = GlobalAlloc(GHND, sizeof(WCHAR) * (lstrlen(pszData) + 1));
 		WCHAR *pData = static_cast<WCHAR *>(GlobalLock(hData));
-		lstrcpyn(pData, pszData, (int)(GlobalSize(hData) / sizeof(WCHAR)));
+		lstrcpyn(pData, pszData, static_cast<int>(GlobalSize(hData) / sizeof(WCHAR)));
 		GlobalUnlock(hData);
 		SetClipboardData(CF_UNICODETEXT, hData);
 		CloseClipboard();
@@ -825,7 +825,7 @@ void SetWindowTransparentMode(HWND hwnd, bool bTransparentMode, int iOpacityLeve
 	exStyle = bTransparentMode ? (exStyle | WS_EX_LAYERED) : (exStyle & ~WS_EX_LAYERED);
 	SetWindowExStyle(hwnd, exStyle);
 	if (bTransparentMode) {
-		const BYTE bAlpha = (BYTE)(iOpacityLevel * 255 / 100);
+		const BYTE bAlpha = static_cast<BYTE>(iOpacityLevel * 255 / 100);
 		SetLayeredWindowAttributes(hwnd, 0, bAlpha, LWA_ALPHA);
 	}
 	// Ask the window and its children to repaint
@@ -1606,7 +1606,7 @@ static inline BOOL PathGetFileId(HANDLE hFile, FILE_ID_INFO *fileId) noexcept {
 	BOOL success = FALSE;
 	if (IsWin8AndAbove()) {
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-		success = GetFileInformationByHandleEx(hFile, (FILE_INFO_BY_HANDLE_CLASS)FileIdInfo, fileId, sizeof(FILE_ID_INFO));
+		success = GetFileInformationByHandleEx(hFile, static_cast<FILE_INFO_BY_HANDLE_CLASS>(FileIdInfo), fileId, sizeof(FILE_ID_INFO));
 #else
 		using GetFileInformationByHandleExSig = BOOL (WINAPI *)(HANDLE hFile, int FileInformationClass, LPVOID lpFileInformation, DWORD dwBufferSize);
 		static GetFileInformationByHandleExSig pfnGetFileInformationByHandleEx = nullptr;
@@ -2197,7 +2197,7 @@ void FormatNumber64(LPWSTR lpNumberStr, uint64_t value) noexcept {
 
 void FormatNumber(LPWSTR lpNumberStr, size_t value) noexcept {
 	if (value < 10) {
-		lpNumberStr[0] = (WCHAR)(value + L'0');
+		lpNumberStr[0] = static_cast<WCHAR>(value + L'0');
 		lpNumberStr[1] = L'\0';
 		return;
 	}
@@ -2233,7 +2233,7 @@ void FormatNumber(LPWSTR lpNumberStr, size_t value) noexcept {
 			*--ptr = sep;
 		}
 		++count;
-		*--ptr = (WCHAR)((value % 10) + L'0');
+		*--ptr = static_cast<WCHAR>((value % 10) + L'0');
 		value /= 10;
 	} while (value != 0);
 	if (ptr != lpNumberStr) {
@@ -2271,7 +2271,7 @@ int GetDlgItemTextA2W(UINT uCP, HWND hDlg, int nIDDlgItem, LPSTR lpString, int n
 }
 
 void SetDlgItemTextA2W(UINT uCP, HWND hDlg, int nIDDlgItem, LPCSTR lpString) noexcept {
-	const int len = lpString ? (int)strlen(lpString) : 0;
+	const int len = lpString ? static_cast<int>(strlen(lpString)) : 0;
 	if (len) {
 		LPWSTR wsz = static_cast<LPWSTR>(NP2HeapAlloc((len + 1) * sizeof(WCHAR)));
 		MultiByteToWideChar(uCP, 0, lpString, -1, wsz, len);
@@ -2283,7 +2283,7 @@ void SetDlgItemTextA2W(UINT uCP, HWND hDlg, int nIDDlgItem, LPCSTR lpString) noe
 }
 
 void ComboBox_AddStringA2W(UINT uCP, HWND hwnd, LPCSTR lpString) noexcept {
-	const int len = lpString ? (int)strlen(lpString) : 0;
+	const int len = lpString ? static_cast<int>(strlen(lpString)) : 0;
 	if (len) {
 		LPWSTR wsz = static_cast<LPWSTR>(NP2HeapAlloc((len + 1) * sizeof(WCHAR)));
 		MultiByteToWideChar(uCP, 0, lpString, -1, wsz, len);
@@ -2596,7 +2596,7 @@ bool GetThemedDialogFont(LPWSTR lpFaceName, WORD *wSize) noexcept {
 		}
 		lfHeight = MulDiv(lfHeight, 72, g_uSystemDPI);
 		lfHeight = max(lfHeight, 8);
-		*wSize = (WORD)lfHeight;
+		*wSize = static_cast<WORD>(lfHeight);
 		if (!IsVistaAndAbove()) {
 			// Windows 2000, XP, 2003
 			lstrcpy(lpFaceName, L"Tahoma");
@@ -2705,8 +2705,8 @@ DLGTEMPLATE *LoadThemedDialogTemplate(LPCWSTR lpDialogTemplateID, HINSTANCE hIns
 	BYTE *pb = DialogTemplate_GetFontSizeField(pTemplate, bDialogEx);
 	const DWORD cbOld = bHasFont ? cbFontAttr + sizeof(WCHAR) * (lstrlen(reinterpret_cast<WCHAR *>(pb + cbFontAttr)) + 1) : 0;
 
-	const BYTE *pOldControls = reinterpret_cast<BYTE *>((AsInteger<DWORD_PTR>(pb) + cbOld + 3) & ~(DWORD_PTR)3);
-	BYTE *pNewControls = reinterpret_cast<BYTE *>((AsInteger<DWORD_PTR>(pb) + cbNew + 3) & ~(DWORD_PTR)3);
+	const BYTE *pOldControls = reinterpret_cast<BYTE *>(NP2_align_up(AsInteger<DWORD_PTR>(pb) + cbOld, sizeof(DWORD)));
+	BYTE *pNewControls = reinterpret_cast<BYTE *>(NP2_align_up(AsInteger<DWORD_PTR>(pb) + cbNew, sizeof(DWORD)));
 
 	const WORD nCtrl = bDialogEx ? (reinterpret_cast<DLGTEMPLATEEX *>(pTemplate))->cDlgItems : pTemplate->cdit;
 	if (cbNew != cbOld && nCtrl > 0) {
@@ -2876,7 +2876,7 @@ unsigned int UnSlash(char *s, UINT cpEdit) noexcept {
 	}
 
 	*o = '\0';
-	return (unsigned int)(o - start);
+	return static_cast<unsigned int>(o - start);
 }
 
 /**
@@ -2889,7 +2889,7 @@ unsigned int UnSlashLowOctal(char *s) noexcept {
 
 	while (*s) {
 		if ((s[0] == '\\') && (s[1] == '0') && IsOctalDigit(s[2]) && IsOctalDigit(s[3])) {
-			*o = (char)(8 * (s[2] - '0') + (s[3] - '0'));
+			*o = static_cast<char>(8 * (s[2] - '0') + (s[3] - '0'));
 			s += 3;
 		} else {
 			*o = *s;
@@ -2901,7 +2901,7 @@ unsigned int UnSlashLowOctal(char *s) noexcept {
 	}
 
 	*o = '\0';
-	return (unsigned int)(o - start);
+	return static_cast<unsigned int>(o - start);
 }
 
 void TransformBackslashes(char *pszInput, BOOL bRegEx, UINT cpEdit) noexcept {
@@ -2953,7 +2953,7 @@ bool AddBackslashW(LPWSTR pszOut, LPCWSTR pszInput) noexcept {
 		WCHAR ch = *lpsz++;
 		const WCHAR index = ch - '\a';
 		if (index <= '\r' - '\a') {
-			ch = (uint8_t)("abtnvfr"[index]);
+			ch = static_cast<uint8_t>("abtnvfr"[index]);
 			hasEscapeChar = true;
 			*lpszEsc++ = '\\';
 			*lpszEsc++ = ch;
@@ -3025,20 +3025,20 @@ size_t Base64Decode(uint8_t *output, const uint8_t *src, size_t length) noexcept
 	size_t i = 0;
 	while(i < length) {
 		uint8_t ch = *src;
-		if ((signed char)(ch) < 0) {
+		if (static_cast<signed char>(ch) < 0) {
 			break;
 		}
 		ch = Base64DecodingTable[ch];
-		if ((signed char)(ch) < 0) {
+		if (static_cast<signed char>(ch) < 0) {
 			break;
 		}
 		value = (value << 6) | ch;
 		++src;
 		i++;
 		if ((i & 3) == 0) {
-			*p++ = (uint8_t)(value >> 16);
-			*p++ = (uint8_t)(value >> 8);
-			*p++ = (uint8_t)(value);
+			*p++ = static_cast<uint8_t>(value >> 16);
+			*p++ = static_cast<uint8_t>(value >> 8);
+			*p++ = static_cast<uint8_t>(value);
 			value = 0;
 		}
 	}
@@ -3046,10 +3046,10 @@ size_t Base64Decode(uint8_t *output, const uint8_t *src, size_t length) noexcept
 	if (i != 0) {
 		if (i == 3) {
 			value >>= (8 - 6);
-			*p++ = (uint8_t)(value >> 8);
-			*p++ = (uint8_t)(value);
+			*p++ = static_cast<uint8_t>(value >> 8);
+			*p++ = static_cast<uint8_t>(value);
 		} else {
-			*p++ = (uint8_t)(value >> (16 - 12));
+			*p++ = static_cast<uint8_t>(value >> (16 - 12));
 		}
 	}
 	return p - output;

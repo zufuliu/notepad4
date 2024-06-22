@@ -709,14 +709,14 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 	styler.StartSegment(startPos);
 
 	constexpr uint64_t q_states = SCE_RB_STRING_Q
-							 | ((uint64_t)SCE_RB_STRING_QQ << 6)
-							 | ((uint64_t)SCE_RB_STRING_QR << 12)
-							 | ((uint64_t)SCE_RB_STRING_W << 18)
-							 | ((uint64_t)SCE_RB_STRING_QW << 24)
-							 | ((uint64_t)SCE_RB_STRING_QX << 30)
-							 | ((uint64_t)SCE_RB_STRING_I << 36)
-							 | ((uint64_t)SCE_RB_STRING_QI << 42)
-							 | ((uint64_t)SCE_RB_STRING_QS << 48);
+							 | (static_cast<uint64_t>(SCE_RB_STRING_QQ) << 6)
+							 | (static_cast<uint64_t>(SCE_RB_STRING_QR) << 12)
+							 | (static_cast<uint64_t>(SCE_RB_STRING_W) << 18)
+							 | (static_cast<uint64_t>(SCE_RB_STRING_QW) << 24)
+							 | (static_cast<uint64_t>(SCE_RB_STRING_QX) << 30)
+							 | (static_cast<uint64_t>(SCE_RB_STRING_I) << 36)
+							 | (static_cast<uint64_t>(SCE_RB_STRING_QI) << 42)
+							 | (static_cast<uint64_t>(SCE_RB_STRING_QS) << 48);
 	constexpr const char* q_chars = "qQrwWxiIs";
 
 	// In most cases a value of 2 should be ample for the code in the

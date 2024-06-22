@@ -89,17 +89,17 @@ static_assert(sizeof(RECT) == sizeof(__m128i));
 
 inline PRectangle PRectangleFromRectEx(RECT rc) noexcept {
 	PRectangle prc;
-	const __m128i i32x4 = _mm_load_si128((__m128i *)(&rc));
+	const __m128i i32x4 = _mm_load_si128(reinterpret_cast<__m128i *>(&rc));
 	const __m256d f64x4 = _mm256_cvtepi32_pd(i32x4);
-	_mm256_storeu_pd((double *)(&prc), f64x4);
+	_mm256_storeu_pd(reinterpret_cast<double *>(&prc), f64x4);
 	return prc;
 }
 
 inline RECT RectFromPRectangleEx(PRectangle prc) noexcept {
 	RECT rc;
-	const __m256d f64x4 = _mm256_load_pd((double *)(&prc));
+	const __m256d f64x4 = _mm256_load_pd(reinterpret_cast<double *>(&prc));
 	const __m128i i32x4 = _mm256_cvttpd_epi32(f64x4);
-	_mm_storeu_si128((__m128i *)(&rc), i32x4);
+	_mm_storeu_si128(reinterpret_cast<__m128i *>(&rc), i32x4);
 	return rc;
 }
 

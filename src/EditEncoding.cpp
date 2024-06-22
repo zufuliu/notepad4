@@ -537,7 +537,7 @@ void Encoding_InitDefaults() noexcept {
 	}
 
 	CHARSETINFO ci;
-	if (TranslateCharsetInfo(AsPointer<DWORD *>(static_cast<UINT_PTR>(iDefaultCodePage)), &ci, TCI_SRCCODEPAGE)) {
+	if (TranslateCharsetInfo(AsPointer<DWORD *, UINT_PTR>(iDefaultCodePage), &ci, TCI_SRCCODEPAGE)) {
 		iDefaultCharSet = ci.ciCharset;
 	} else {
 		iDefaultCharSet = ANSI_CHARSET;
@@ -586,7 +586,7 @@ int Encoding_MapIniSetting(bool bLoad, UINT iSetting) noexcept {
 	}
 
 	if (bLoad) {
-		if ((int)iSetting < 0) {
+		if (static_cast<int>(iSetting) < 0) {
 			return CPI_GLOBAL_DEFAULT; // default encoding
 		}
 		if (IsValidCodePage(iSetting)) {
@@ -643,7 +643,7 @@ int Encoding_MatchA(LPCSTR pchTest) noexcept {
 	*pchDst++ = ',';
 	*pchDst = '\0';
 
-	for (int i = 0; i < (int)COUNTOF(mEncoding); i++) {
+	for (UINT i = 0; i < COUNTOF(mEncoding); i++) {
 		const NP2ENCODING *encoding = &mEncoding[i];
 		if (strstr(encoding->pszParseNames, chTest)) {
 			if (IsValidEncoding(encoding)) {
@@ -657,7 +657,7 @@ int Encoding_MatchA(LPCSTR pchTest) noexcept {
 }
 
 bool Encoding_IsValid(int iEncoding) noexcept {
-	return (UINT)iEncoding < COUNTOF(mEncoding)
+	return static_cast<UINT>(iEncoding) < COUNTOF(mEncoding)
 		&& IsValidEncoding(&mEncoding[iEncoding]);
 }
 
@@ -671,7 +671,7 @@ static int __cdecl CmpEncoding(const void *s1, const void *s2) noexcept {
 }
 
 int Encoding_GetIndex(UINT codePage) noexcept {
-	for (int i = CPI_UTF8; i < (int)COUNTOF(mEncoding); i++) {
+	for (UINT i = CPI_UTF8; i < COUNTOF(mEncoding); i++) {
 		if (mEncoding[i].uCodePage == codePage) {
 			return i;
 		}
@@ -696,7 +696,7 @@ static inline int GetEncodingImageIndex(const NP2ENCODING *encoding) noexcept {
 
 void Encoding_AddToTreeView(HWND hwnd, int idSel, bool bRecodeOnly) noexcept {
 	ENCODINGENTRY *pEE = static_cast<ENCODINGENTRY *>(NP2HeapAlloc(COUNTOF(sEncodingGroupList) * sizeof(ENCODINGENTRY)));
-	for (int i = 0; i < (int)COUNTOF(sEncodingGroupList); i++) {
+	for (UINT i = 0; i < COUNTOF(sEncodingGroupList); i++) {
 		NP2EncodingGroup *group = &sEncodingGroupList[i];
 		pEE[i].id = i;
 		GetString(group->idsName, pEE[i].wch, COUNTOF(pEE[i].wch));
@@ -849,7 +849,7 @@ bool Encoding_GetFromTreeView(HWND hwnd, int *pidEncoding, bool bQuiet) noexcept
 		item.hItem = hTreeNode;
 		TreeView_GetItem(hwnd, &item);
 		if (item.lParam > 0) {
-			const int id = (int)(item.lParam - 1);
+			const int id = static_cast<int>(item.lParam - 1);
 			if (Encoding_IsValid(id)) {
 				*pidEncoding = id;
 				return true;
@@ -865,7 +865,7 @@ bool Encoding_GetFromTreeView(HWND hwnd, int *pidEncoding, bool bQuiet) noexcept
 #if 0
 void Encoding_AddToListView(HWND hwnd, int idSel, bool bRecodeOnly) noexcept {
 	ENCODINGENTRY *pEE = static_cast<ENCODINGENTRY *>(NP2HeapAlloc(COUNTOF(sEncodingGroupList) * sizeof(ENCODINGENTRY)));
-	for (int i = 0; i < (int)COUNTOF(mEncoding); i++) {
+	for (UINT i = 0; i < COUNTOF(mEncoding); i++) {
 		pEE[i].id = i;
 		GetString(mEncoding[i].idsName, pEE[i].wch, COUNTOF(pEE[i].wch));
 	}
@@ -878,7 +878,7 @@ void Encoding_AddToListView(HWND hwnd, int idSel, bool bRecodeOnly) noexcept {
 	lvi.pszText = wchBuf;
 
 	int iSelItem = -1;
-	for (int i = 0; i < (int)COUNTOF(mEncoding); i++) {
+	for (UINT i = 0; i < COUNTOF(mEncoding); i++) {
 		const int id = pEE[i].id;
 		const NP2ENCODING *encoding = &mEncoding[id];
 		if (!bRecodeOnly || (encoding->uFlags & NCP_RECODE)) {
@@ -901,7 +901,7 @@ void Encoding_AddToListView(HWND hwnd, int idSel, bool bRecodeOnly) noexcept {
 			}
 
 			lvi.iImage = GetEncodingImageIndex(encoding);
-			lvi.lParam = (LPARAM)id;
+			lvi.lParam = AsInteger<LPARAM>(id);
 			ListView_InsertItem(hwnd, &lvi);
 
 			if (idSel == id) {
@@ -929,8 +929,8 @@ bool Encoding_GetFromListView(HWND hwnd, int *pidEncoding) noexcept {
 	lvi.mask = LVIF_PARAM;
 
 	if (ListView_GetItem(hwnd, &lvi)) {
-		if (Encoding_IsValid((int)lvi.lParam)) {
-			*pidEncoding = (int)lvi.lParam;
+		if (Encoding_IsValid(static_cast<int>(lvi.lParam))) {
+			*pidEncoding = static_cast<int>(lvi.lParam);
 			return true;
 		}
 		MsgBoxWarn(MB_OK, IDS_ERR_ENCODINGNA);
@@ -941,7 +941,7 @@ bool Encoding_GetFromListView(HWND hwnd, int *pidEncoding) noexcept {
 
 void Encoding_AddToComboboxEx(HWND hwnd, int idSel, bool bRecodeOnly) noexcept {
 	ENCODINGENTRY *pEE = static_cast<ENCODINGENTRY *>(NP2HeapAlloc(COUNTOF(sEncodingGroupList) * sizeof(ENCODINGENTRY)));
-	for (int i = 0; i < (int)COUNTOF(mEncoding); i++) {
+	for (UINT i = 0; i < COUNTOF(mEncoding); i++) {
 		pEE[i].id = i;
 		GetString(mEncoding[i].idsName, pEE[i].wch, COUNTOF(pEE[i].wch));
 	}
@@ -958,7 +958,7 @@ void Encoding_AddToComboboxEx(HWND hwnd, int idSel, bool bRecodeOnly) noexcept {
 	cbei.iSelectedImage = 0;
 
 	int iSelItem = -1;
-	for (int i = 0; i < (int)COUNTOF(mEncoding); i++) {
+	for (UINT i = 0; i < COUNTOF(mEncoding); i++) {
 		const int id = pEE[i].id;
 		const NP2ENCODING *encoding = &mEncoding[id];
 		if (!bRecodeOnly || (encoding->uFlags & NCP_RECODE)) {
@@ -981,11 +981,11 @@ void Encoding_AddToComboboxEx(HWND hwnd, int idSel, bool bRecodeOnly) noexcept {
 			}
 
 			cbei.iImage = GetEncodingImageIndex(encoding);
-			cbei.lParam = (LPARAM)id;
-			SendMessage(hwnd, CBEM_INSERTITEM, 0, (LPARAM)&cbei);
+			cbei.lParam = AsInteger<LPARAM>(id);
+			SendMessage(hwnd, CBEM_INSERTITEM, 0, AsInteger<LPARAM>(&cbei));
 
 			if (idSel == id) {
-				iSelItem = (int)cbei.iItem;
+				iSelItem = static_cast<int>(cbei.iItem);
 			}
 		}
 	}
@@ -1003,9 +1003,9 @@ bool Encoding_GetFromComboboxEx(HWND hwnd, int *pidEncoding) noexcept {
 	cbei.iItem = ComboBox_GetCurSel(hwnd);
 	cbei.mask = CBEIF_LPARAM;
 
-	if (SendMessage(hwnd, CBEM_GETITEM, 0, (LPARAM)&cbei)) {
-		if (Encoding_IsValid((int)cbei.lParam)) {
-			*pidEncoding = (int)cbei.lParam;
+	if (SendMessage(hwnd, CBEM_GETITEM, 0, AsInteger<LPARAM>(&cbei))) {
+		if (Encoding_IsValid(static_cast<int>(cbei.lParam))) {
+			*pidEncoding = static_cast<int>(cbei.lParam);
 			return true;
 		}
 		MsgBoxWarn(MB_OK, IDS_ERR_ENCODINGNA);
@@ -1021,7 +1021,7 @@ bool Encoding_GetFromComboboxEx(HWND hwnd, int *pidEncoding) noexcept {
 //
 UINT CodePageFromCharSet(UINT uCharSet) noexcept {
 	CHARSETINFO ci;
-	if (TranslateCharsetInfo(AsPointer<DWORD *>(static_cast<UINT_PTR>(uCharSet)), &ci, TCI_SRCCHARSET)) {
+	if (TranslateCharsetInfo(AsPointer<DWORD *, UINT_PTR>(uCharSet), &ci, TCI_SRCCHARSET)) {
 		return ci.ciACP;
 	}
 	return GetACP();
@@ -1030,10 +1030,10 @@ UINT CodePageFromCharSet(UINT uCharSet) noexcept {
 
 static constexpr bool IsC0ControlChar(uint8_t ch) noexcept {
 #if 1
-	return ch < 32 && ((uint8_t)(ch - 0x09)) > (0x0d - 0x09);
+	return ch < 32 && (static_cast<uint8_t>(ch - 0x09)) > (0x0d - 0x09);
 #else
 	// exclude whitespace and separator
-	return ch < 0x1c && ((uint8_t)(ch - 0x09)) > (0x0d - 0x09);
+	return ch < 0x1c && (static_cast<uint8_t>(ch - 0x09)) > (0x0d - 0x09);
 #endif
 }
 
@@ -1125,7 +1125,7 @@ static int DetectUTF16Latin1(const char *pTest, DWORD nLength) noexcept {
 	__m256i test = _mm256_set1_epi16(-0x0100); // 0xFF00
 	uint32_t expected = 0xAAAAAAAA;
 	do {
-		const __m256i chunk = _mm256_loadu_si256((__m256i *)pt);
+		const __m256i chunk = _mm256_loadu_si256(reinterpret_cast<const __m256i *>(pt));
 		pt += sizeof(__m256i);
 		if (_mm256_testz_si256(chunk, test) == 0)
 		//if (andn_u32(mask, expected) != 0)
@@ -1158,8 +1158,8 @@ static int DetectUTF16Latin1(const char *pTest, DWORD nLength) noexcept {
 	const __m128i zero = _mm_setzero_si128();
 	uint32_t expected = 0xAAAA;
 	do {
-		const __m128i chunk1 = _mm_loadu_si128((__m128i *)pt);
-		const __m128i chunk2 = _mm_loadu_si128((__m128i *)(pt + sizeof(__m128i)));
+		const __m128i chunk1 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(pt));
+		const __m128i chunk2 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(pt + sizeof(__m128i)));
 		pt += 2*sizeof(__m128i);
 		uint32_t mask = ~_mm_movemask_epi8(_mm_cmpeq_epi8(_mm_or_si128(chunk1, chunk2), zero));
 		if ((mask & expected) != 0) {
@@ -1192,7 +1192,7 @@ static int DetectUTF16Latin1(const char *pTest, DWORD nLength) noexcept {
 	nLength = (sizeof(uint64_t) - nLength)*8;
 	uint64_t expected = UINT64_C(0xFF00FF00FF00FF00);
 	do {
-		uint64_t value = *((const uint64_t *)pt);
+		uint64_t value = *(reinterpret_cast<const uint64_t *>(pt));
 		pt += sizeof(uint64_t);
 		if ((value & expected) != 0) {
 			if (pt > end) {
@@ -1217,7 +1217,7 @@ static int DetectUTF16Latin1(const char *pTest, DWORD nLength) noexcept {
 	nLength = (sizeof(uint32_t) - nLength)*8;
 	uint32_t expected = 0xFF00FF00U;
 	do {
-		uint32_t value = *((const uint32_t *)pt);
+		uint32_t value = *(reinterpret_cast<const uint32_t *>(pt));
 		pt += sizeof(uint32_t);
 		if ((value & expected) != 0) {
 			if (pt > end) {
@@ -1323,7 +1323,7 @@ static int DetectUTF16LatinExt(const char *pTest, DWORD nLength) noexcept {
 	nLength = (sizeof(uint64_t) - nLength)*8;
 	uint64_t expected = UINT64_C(0xF800F800F800F800);
 	do {
-		uint64_t value = *((const uint64_t *)pt);
+		uint64_t value = *(reinterpret_cast<const uint64_t *>(pt));
 		pt += sizeof(uint64_t);
 		if ((value & expected) != 0) {
 			if (pt > end) {
@@ -1349,7 +1349,7 @@ static int DetectUTF16LatinExt(const char *pTest, DWORD nLength) noexcept {
 	nLength = (sizeof(uint32_t) - nLength)*8;
 	uint32_t expected = 0xF800F800U;
 	do {
-		uint32_t value = *((const uint32_t *)pt);
+		uint32_t value = *(reinterpret_cast<const uint32_t *>(pt));
 		pt += sizeof(uint32_t);
 		if ((value & expected) != 0) {
 			if (pt > end) {
@@ -1623,16 +1623,16 @@ bool z_validate_vec_avx2(__m256i bytes, __m256i shifted_bytes, uint32_t *last_co
 	// of required continuation bytes (and thus before the bit that
 	// will be cleared by a carry). This leader byte will not be
 	// in the continuation mask, despite being required. QEDish.
-	req += (uint64_t)set << 1;
+	req += static_cast<uint64_t>(set) << 1;
 	set &= _mm256_movemask_epi8(_mm256_slli_epi16(bytes, 2));
-	req += (uint64_t)set << 2;
+	req += static_cast<uint64_t>(set) << 2;
 	set &= _mm256_movemask_epi8(_mm256_slli_epi16(bytes, 3));
-	req += (uint64_t)set << 3;
+	req += static_cast<uint64_t>(set) << 3;
 
 	// Check that continuation bytes match. We must cast req from uint64_t
 	// (which holds the carry mask in the upper half) to uint32_t, which
 	// zeroes out the upper bits
-	if (cont != (uint32_t)req) {
+	if (cont != static_cast<uint32_t>(req)) {
 		return false;
 	}
 
@@ -1777,7 +1777,7 @@ bool z_validate_vec_sse4(__m128i bytes, __m128i shifted_bytes, uint32_t *last_co
 	// Check that continuation bytes match. We must cast req from uint32_t
 	// (which holds the carry mask in the upper half) to uint16_t, which
 	// zeroes out the upper bits
-	if (cont != (uint16_t)req) {
+	if (cont != static_cast<uint16_t>(req)) {
 		return false;
 	}
 
@@ -1954,8 +1954,7 @@ bool IsUTF8(const char *pTest, DWORD nLength) noexcept {
 	while (pt + 2*sizeof(__m128i) <= end) {
 		const __m128i chunk1 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(pt));
 		const __m128i chunk2 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(pt + sizeof(__m128i)));
-		const uint32_t mask = _mm_movemask_epi8(chunk1)
-			| (((uint32_t)_mm_movemask_epi8(chunk2)) << sizeof(__m128i));
+		const uint32_t mask = mm_movemask_epi8(chunk1) | (mm_movemask_epi8(chunk2) << sizeof(__m128i));
 		if (mask) {
 			// skip leading and trailing ASCII
 			const DWORD trailing = (state != UTF8_ACCEPT)? 0 : np2_ctz(mask);
@@ -2260,10 +2259,10 @@ INT UTF8_mbslen(LPCSTR source, INT byte_length) noexcept {
 
 LPSTR RecodeAsUTF8(LPSTR lpData, DWORD *cbData, UINT codePage, DWORD flags) noexcept {
 	LPWSTR lpDataWide = static_cast<LPWSTR>(NP2HeapAlloc(*cbData * sizeof(WCHAR) + 16));
-	const int cbDataWide = MultiByteToWideChar(codePage, flags, lpData, *cbData, lpDataWide, (int)(NP2HeapSize(lpDataWide) / sizeof(WCHAR)));
+	const int cbDataWide = MultiByteToWideChar(codePage, flags, lpData, *cbData, lpDataWide, static_cast<int>(NP2HeapSize(lpDataWide) / sizeof(WCHAR)));
 	if (cbDataWide) {
 		lpData = static_cast<char *>(NP2HeapAlloc(cbDataWide * kMaxMultiByteCount + 16));
-		*cbData = WideCharToMultiByte(CP_UTF8, 0, lpDataWide, cbDataWide, lpData, (int)NP2HeapSize(lpData), nullptr, nullptr);
+		*cbData = WideCharToMultiByte(CP_UTF8, 0, lpDataWide, cbDataWide, lpData, static_cast<int>(NP2HeapSize(lpData)), nullptr, nullptr);
 	} else {
 		lpData = nullptr;
 		*cbData = 0;
@@ -2400,7 +2399,7 @@ int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, int *enco
 	}
 
 	// avoid validating initial ASCII for multi-byte encoding
-	const DWORD multiLen = (DWORD)(lpData + cbData - multiData);
+	const DWORD multiLen = static_cast<DWORD>(lpData + cbData - multiData);
 	//printf("%s initial ASCII: %u=%u - %u\n", __func__, (unsigned)(cbData - multiLen), (unsigned)cbData, (unsigned)multiLen);
 	// prefer UTF-8 when no encoding specified
 	if (IsUTF8(multiData, multiLen)) {
@@ -2416,7 +2415,7 @@ int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, int *enco
 		sniffedEncoding,
 		iDefaultEncoding,
 	};
-	for (int i = 0; i < (int)COUNTOF(encodings); i++) {
+	for (UINT i = 0; i < COUNTOF(encodings); i++) {
 		iEncoding = encodings[i];
 		if (iEncoding > CPI_DEFAULT && (mEncoding[iEncoding].uFlags & NCP_8BIT) != 0) {
 			const UINT codePage = mEncoding[iEncoding].uCodePage;
@@ -2547,7 +2546,7 @@ bool IsStringCaseSensitiveA(LPCSTR pszText) noexcept {
 			LPCSTR start = ptr;
 			const size_t length = strlen(start) + 1;
 			LPWSTR pszTextW = static_cast<LPWSTR>(NP2HeapAlloc(length * sizeof(WCHAR)));
-			MultiByteToWideChar(cpEdit, 0, start, -1, pszTextW, (int)(length));
+			MultiByteToWideChar(cpEdit, 0, start, -1, pszTextW, static_cast<int>(length));
 			const bool result = IsStringCaseSensitiveW(pszTextW);
 			NP2HeapFree(pszTextW);
 			return result;

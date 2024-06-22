@@ -406,14 +406,14 @@ int CALLBACK DirList_CompareProcFw(LPARAM lp1, LPARAM lp2, LPARAM lFlags) {
 	const LV_ITEMDATA * const lplvid2 = AsPointer<const LV_ITEMDATA *>(lp2);
 
 	HRESULT hr = lplvid1->lpsf->CompareIDs(lFlags, reinterpret_cast<PCUIDLIST_RELATIVE>(lplvid1->pidl), reinterpret_cast<PCUIDLIST_RELATIVE>(lplvid2->pidl));
-	int result = (short)HRESULT_CODE(hr);
+	int result = static_cast<short>(HRESULT_CODE(hr));
 
 	if (result != 0 || lFlags == 0) {
 		return result;
 	}
 
 	hr = lplvid1->lpsf->CompareIDs(0, reinterpret_cast<PCUIDLIST_RELATIVE>(lplvid1->pidl), reinterpret_cast<PCUIDLIST_RELATIVE>(lplvid2->pidl));
-	result = (short)HRESULT_CODE(hr);
+	result = static_cast<short>(HRESULT_CODE(hr));
 
 	return result;
 }
@@ -423,14 +423,14 @@ int CALLBACK DirList_CompareProcRw(LPARAM lp1, LPARAM lp2, LPARAM lFlags) {
 	const LV_ITEMDATA * const lplvid2 = AsPointer<const LV_ITEMDATA *>(lp2);
 
 	HRESULT hr = lplvid1->lpsf->CompareIDs(lFlags, reinterpret_cast<PCUIDLIST_RELATIVE>(lplvid1->pidl), reinterpret_cast<PCUIDLIST_RELATIVE>(lplvid2->pidl));
-	int result = -(short)HRESULT_CODE(hr);
+	int result = -static_cast<short>(HRESULT_CODE(hr));
 
 	if (result != 0) {
 		return result;
 	}
 
 	hr = lplvid1->lpsf->CompareIDs(0, reinterpret_cast<PCUIDLIST_RELATIVE>(lplvid1->pidl), reinterpret_cast<PCUIDLIST_RELATIVE>(lplvid2->pidl));
-	result = -(short)HRESULT_CODE(hr);
+	result = -static_cast<short>(HRESULT_CODE(hr));
 
 	return result;
 }
@@ -794,7 +794,7 @@ int DriveBox_Fill(HWND hwnd) {
 									while ((SendMessage(hwnd, CBEM_GETITEM, 0, AsInteger<LPARAM>(&cbei2)))) {
 										const DC_ITEMDATA * const lpdcid2 = AsPointer<const DC_ITEMDATA *>(cbei2.lParam);
 										hr = lpdcid->lpsf->CompareIDs(0, reinterpret_cast<PCUIDLIST_RELATIVE>(lpdcid->pidl), reinterpret_cast<PCUIDLIST_RELATIVE>(lpdcid2->pidl));
-										if ((short)HRESULT_CODE(hr) < 0) {
+										if (static_cast<short>(HRESULT_CODE(hr)) < 0) {
 											break;
 										}
 										cbei2.iItem++;

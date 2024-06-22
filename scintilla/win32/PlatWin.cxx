@@ -939,7 +939,7 @@ inline DWORD Proportional(ColourRGBA a, ColourRGBA b, XYPOSITION t) noexcept {
 	const __m128i i32x4Back = rgba_to_abgr_epi32_sse4_si32(b.AsInteger());
 	// a + t * (b - a)
 	__m128 f32x4Fore = _mm_cvtepi32_ps(_mm_sub_epi32(i32x4Back, i32x4Fore));
-	f32x4Fore = _mm_mul_ps(f32x4Fore, _mm_set1_ps((float)t));
+	f32x4Fore = _mm_mul_ps(f32x4Fore, _mm_set1_ps(static_cast<float>(t)));
 	f32x4Fore = _mm_add_ps(f32x4Fore, _mm_cvtepi32_ps(i32x4Fore));
 	// component * alpha / 255
 	const __m128 f32x4Alpha = _mm_broadcastss_ps(f32x4Fore);
@@ -957,7 +957,7 @@ inline DWORD Proportional(ColourRGBA a, ColourRGBA b, XYPOSITION t) noexcept {
 	const __m128i i32x4Back = rgba_to_abgr_epi32_sse2_si32(b.AsInteger());
 	// a + t * (b - a)
 	__m128 f32x4Fore = _mm_cvtepi32_ps(_mm_sub_epi32(i32x4Back, i32x4Fore));
-	f32x4Fore = _mm_mul_ps(f32x4Fore, _mm_set1_ps((float)t));
+	f32x4Fore = _mm_mul_ps(f32x4Fore, _mm_set1_ps(static_cast<float>(t)));
 	f32x4Fore = _mm_add_ps(f32x4Fore, _mm_cvtepi32_ps(i32x4Fore));
 	// component * alpha / 255
 	const uint32_t alpha = _mm_cvttss_si32(f32x4Fore);
@@ -1367,7 +1367,7 @@ inline D2D1_RECT_F RectangleFromPRectangleEx(PRectangle prc) noexcept {
 	D2D1_RECT_F rc;
 	const __m256d f64x4 = _mm256_load_pd(reinterpret_cast<double *>(&prc));
 	const __m128 f32x4 = _mm256_cvtpd_ps(f64x4);
-	_mm_storeu_ps((float *)(&rc), f32x4);
+	_mm_storeu_ps(reinterpret_cast<float *>(&rc), f32x4);
 	return rc;
 }
 
