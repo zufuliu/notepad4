@@ -319,7 +319,7 @@ bool Document::SetLineEndTypesAllowed(LineEndType lineEndBitSet_) {
 	}
 }
 
-void Document::SetSavePoint() noexcept {
+void Document::SetSavePoint() {
 	cb.SetSavePoint();
 	NotifySavePoint(true);
 }

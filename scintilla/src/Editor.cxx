@@ -1944,7 +1944,7 @@ void Editor::AddChar(char ch) {
 	InsertCharacter(std::string_view(s, 1), CharacterSource::DirectInput);
 }
 
-void Editor::FilterSelections() {
+void Editor::FilterSelections() noexcept {
 	if (!additionalSelectionTyping && (sel.Count() > 1)) {
 		InvalidateWholeSelection();
 		sel.DropAdditionalRanges();

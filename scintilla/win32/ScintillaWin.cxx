@@ -551,7 +551,7 @@ class ScintillaWin final :
 	bool HaveMouseCapture() const noexcept override;
 	void SetTrackMouseLeaveEvent(bool on) noexcept;
 	void HideCursorIfPreferred() noexcept;
-	void UpdateBaseElements() override;
+	void UpdateBaseElements() noexcept override;
 	bool SCICALL PaintContains(PRectangle rc) const noexcept override;
 	void ScrollText(Sci::Line linesToMove) override;
 	void NotifyCaretMove() noexcept override;
@@ -2596,7 +2596,7 @@ void ScintillaWin::HideCursorIfPreferred() noexcept {
 	}
 }
 
-void ScintillaWin::UpdateBaseElements() {
+void ScintillaWin::UpdateBaseElements() noexcept {
 	struct ElementToIndex { Element element; int nIndex; };
 	constexpr ElementToIndex eti[] = {
 		{ Element::List, COLOR_WINDOWTEXT },

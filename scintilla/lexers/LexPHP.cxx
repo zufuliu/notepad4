@@ -171,7 +171,7 @@ struct PHPLexer {
 	int selectorLevel = 0;	// nested selector
 	int chBefore = 0;
 
-	PHPLexer(Sci_PositionU startPos, Sci_PositionU lengthDoc, int initStyle, Accessor &styler):
+	PHPLexer(Sci_PositionU startPos, Sci_PositionU lengthDoc, int initStyle, Accessor &styler) noexcept:
 		sc(startPos, lengthDoc, initStyle, styler) {}
 
 	void SaveOuterStyle(int style) {

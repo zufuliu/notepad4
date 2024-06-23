@@ -762,7 +762,7 @@ uint64_t EditView::LayoutLine(const EditModel &model, Surface *surface, const Vi
 
 		validity = LineLayout::ValidLevel::lines;
 		if (partialLine && option == LayoutLineOption::AutoUpdate && linesWrapped != ll->lines) {
-			(const_cast<EditModel &>(model)).OnLineWrapped(line, ll->lines);
+			const_cast<EditModel &>(model).OnLineWrapped(line, ll->lines);
 		}
 	}
 	ll->validity = validity;

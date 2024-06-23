@@ -608,7 +608,7 @@ Sci::Line CellBuffer::LineFromPositionIndex(Sci::Position pos, LineCharacterInde
 	return plv->LineFromPositionIndex(pos, lineCharacterIndex);
 }
 
-void CellBuffer::SetSavePoint() noexcept {
+void CellBuffer::SetSavePoint() {
 	uh->SetSavePoint();
 	if (changeHistory) {
 		changeHistory->SetSavePoint();

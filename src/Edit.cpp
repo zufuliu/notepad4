@@ -914,7 +914,7 @@ labelStart:
 			ptr += sizeof(__m128i);
 		}
 #endif
-		const uint32_t mask = ((1 << '\r') - 1) ^ (1 << '\n');
+		constexpr uint32_t mask = ((1 << '\r') - 1) ^ (1 << '\n');
 		uint8_t ch;
 		while (ptr < end && ((ch = *ptr++) > '\r' || ((mask >> ch) & 1) != 0)) {
 			// nop
@@ -5703,7 +5703,7 @@ void EditMarkAll::Continue(HANDLE timer) noexcept {
 		const double period = watch.Get();
 		iMaxLength = iStartPos - prevStopPos;
 		const double durationOne = (EditMarkAll_MeasuredSize * period) / iMaxLength;
-		const double alpha = 0.25;
+		constexpr double alpha = 0.25;
 		const double duration_ = alpha * durationOne + (1.0 - alpha) * duration;
 		duration = max(duration_, EditMarkAll_MinDuration);
 		incrementSize = 1 + static_cast<int>(WaitableTimer_IdleTaskTimeSlot / duration);

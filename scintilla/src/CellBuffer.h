@@ -163,7 +163,7 @@ public:
 
 	/// The save point is a marker in the undo stack where the container has stated that
 	/// the buffer was saved. Undo and redo can move over the save point.
-	void SetSavePoint() noexcept;
+	void SetSavePoint();
 	bool IsSavePoint() const noexcept;
 
 	void TentativeStart() noexcept;

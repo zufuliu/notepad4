@@ -222,7 +222,7 @@ constexpr uint32_t rotl8(uint32_t x) noexcept {
 #endif
 
 inline uint32_t loadle_u32(const void *ptr) noexcept {
-	return *(reinterpret_cast<const uint32_t *>(ptr));
+	return *(static_cast<const uint32_t *>(ptr));
 }
 
 #if NP2_USE_AVX2

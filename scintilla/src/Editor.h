@@ -428,7 +428,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	void SetScrollBars();
 	void ChangeSize();
 
-	void FilterSelections();
+	void FilterSelections() noexcept;
 	Sci::Position RealizeVirtualSpace(Sci::Position position, Sci::Position virtualSpace);
 	SelectionPosition RealizeVirtualSpace(SelectionPosition position);
 	void AddChar(char ch);
@@ -569,7 +569,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	virtual void SetMouseCapture(bool on) noexcept = 0;
 	virtual bool HaveMouseCapture() const noexcept = 0;
 	void SetFocusState(bool focusState);
-	virtual void UpdateBaseElements() = 0;
+	virtual void UpdateBaseElements() noexcept = 0;
 
 	Sci::Position SCICALL PositionAfterArea(PRectangle rcArea) const noexcept;
 	void StyleToPositionInView(Sci::Position pos);

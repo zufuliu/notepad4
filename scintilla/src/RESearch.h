@@ -17,7 +17,7 @@ public:
 
 class RESearch {
 public:
-	explicit RESearch(const CharClassify *charClassTable);
+	explicit RESearch(const CharClassify *charClassTable) noexcept;
 	// No dynamic allocation so default copy constructor and assignment operator are OK.
 	void Clear() noexcept;
 	const char *Compile(const char *pattern, size_t length, Scintilla::FindOption flags);

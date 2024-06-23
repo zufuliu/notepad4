@@ -43,7 +43,7 @@ inline T AsInteger(V value) noexcept {
 // suppress clang-tidy [bugprone-multi-level-implicit-pointer-conversion] warning
 template <typename T>
 inline void* AsVoidPointer(T** pp) noexcept {
-	return reinterpret_cast<void *>(pp);
+	return static_cast<void *>(pp);
 }
 
 // C++ template based version of _countof()

@@ -4834,10 +4834,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		const int y = wndpl.rcNormalPosition.top;
 		const int cx = wndpl.rcNormalPosition.right - wndpl.rcNormalPosition.left;
 		const int cy = wndpl.rcNormalPosition.bottom - wndpl.rcNormalPosition.top;
-		const BOOL max = IsZoomed(hwnd) || (wndpl.flags & WPF_RESTORETOMAXIMIZED);
+		const BOOL maximized = IsZoomed(hwnd) || (wndpl.flags & WPF_RESTORETOMAXIMIZED);
 
 		WCHAR wszWinPos[64];
-		wsprintf(wszWinPos, L"/pos %i,%i,%i,%i,%i", x, y, cx, cy, max);
+		wsprintf(wszWinPos, L"/pos %i,%i,%i,%i,%i", x, y, cx, cy, maximized);
 
 		SetClipData(hwnd, wszWinPos);
 		UpdateToolbar();

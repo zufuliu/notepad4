@@ -258,7 +258,7 @@ using namespace Scintilla::Internal;
  * 0-9, a-z, A-Z and _
  */
 
-RESearch::RESearch(const CharClassify *charClassTable) {
+RESearch::RESearch(const CharClassify *charClassTable) noexcept {
 	charClass = charClassTable;
 	lineStartPos = 0;
 	lineEndPos = 0;

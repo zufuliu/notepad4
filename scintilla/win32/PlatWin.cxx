@@ -3397,15 +3397,15 @@ class ListBoxX final : public ListBox {
 	int MinClientWidth() const noexcept;
 	int TextOffset() const noexcept;
 	POINT GetClientExtent() const noexcept;
-	POINT MinTrackSize() const;
-	POINT MaxTrackSize() const;
+	POINT MinTrackSize() const noexcept;
+	POINT MaxTrackSize() const noexcept;
 	void SetRedraw(bool on) noexcept;
 	void OnDoubleClick();
 	void OnSelChange();
 	void ResizeToCursor();
 	void StartResize(WPARAM) noexcept;
 	LRESULT NcHitTest(WPARAM, LPARAM) const noexcept;
-	void CentreItem(int n);
+	void CentreItem(int n) noexcept;
 	void Paint(HDC) noexcept;
 	static LRESULT CALLBACK ControlWndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 
@@ -3808,14 +3808,14 @@ int ListBoxX::MinClientWidth() const noexcept {
 	return 12 * (aveCharWidth + aveCharWidth / 3);
 }
 
-POINT ListBoxX::MinTrackSize() const {
+POINT ListBoxX::MinTrackSize() const noexcept {
 	PRectangle rc = PRectangle::FromInts(0, 0, MinClientWidth(), ItemHeight());
 	AdjustWindowRect(&rc);
 	POINT ret = { static_cast<LONG>(rc.Width()), static_cast<LONG>(rc.Height()) };
 	return ret;
 }
 
-POINT ListBoxX::MaxTrackSize() const {
+POINT ListBoxX::MaxTrackSize() const noexcept {
 	const int width = maxCharWidth * maxItemCharacters + static_cast<int>(TextInset.x) * 2 +
 		TextOffset() + SystemMetricsForDpi(SM_CXVSCROLL, dpi);
 	PRectangle rc = PRectangle::FromInts(0, 0,
@@ -4016,7 +4016,7 @@ POINT ListBoxX::GetClientExtent() const noexcept {
 	return ret;
 }
 
-void ListBoxX::CentreItem(int n) {
+void ListBoxX::CentreItem(int n) noexcept {
 	// If below mid point, scroll up to centre, but with more items below if uneven
 	if (n >= 0) {
 		const POINT extent = GetClientExtent();

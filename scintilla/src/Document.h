@@ -430,7 +430,7 @@ public:
 	void AddUndoAction(Sci::Position token, bool mayCoalesce) {
 		cb.AddUndoAction(token, mayCoalesce);
 	}
-	void SetSavePoint() noexcept;
+	void SetSavePoint();
 	bool IsSavePoint() const noexcept {
 		return cb.IsSavePoint();
 	}
