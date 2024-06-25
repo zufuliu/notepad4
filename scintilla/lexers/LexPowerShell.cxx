@@ -68,7 +68,7 @@ constexpr bool IsSpaceEquiv(int state) noexcept {
 void HighlightVariable(StyleContext &sc, std::vector<int> &nestedState) {
 	const int state = sc.state;
 	if (sc.chNext == '(') {
-		sc.SetState(nestedState.empty() ? SCE_POWERSHELL_OPERATOR : SCE_POWERSHELL_OPERATOR2);
+		sc.SetState((state == SCE_POWERSHELL_DEFAULT && nestedState.empty()) ? SCE_POWERSHELL_OPERATOR : SCE_POWERSHELL_OPERATOR2);
 	} else if (sc.chNext == '{') {
 		sc.SetState(SCE_POWERSHELL_BRACE_VARIABLE);
 	} else if (IsVariableCharacter(sc.chNext) || IsSpecialVariable(sc.chNext)) {
