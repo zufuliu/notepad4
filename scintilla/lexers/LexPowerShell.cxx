@@ -130,7 +130,7 @@ void ColourisePowerShellDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int 
 			break;
 
 		case SCE_POWERSHELL_HERE_STRING_SQ:
-			if (sc.Match('\'', '@')) {
+			if (sc.atLineStart && sc.Match('\'', '@')) {
 				sc.Forward();
 				sc.ForwardSetState(SCE_POWERSHELL_DEFAULT);
 			}
@@ -144,7 +144,7 @@ void ColourisePowerShellDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int 
 				sc.Forward();
 			} else if (sc.ch == '$') {
 				HighlightVariable(sc, nestedState);
-			} else if (sc.ch == '\"' && (sc.state != SCE_POWERSHELL_HERE_STRING_DQ || sc.chNext == '@')) {
+			} else if (sc.ch == '\"' && (sc.state != SCE_POWERSHELL_HERE_STRING_DQ || (sc.atLineStart && sc.chNext == '@'))) {
 				if (sc.state == SCE_POWERSHELL_HERE_STRING_DQ) {
 					sc.Forward();
 				}
