@@ -4745,12 +4745,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			SciCall_GetSelText(mszSelection);
 			mszSelection[cchSelection] = 0; // zero terminate
 
-			// Check lpszSelection and truncate newlines
-			char *lpsz = strpbrk(mszSelection, "\r\n");
-			if (lpsz) {
-				*lpsz = '\0';
-			}
-
 			const UINT cpEdit = SciCall_GetCodePage();
 			strcpy(efrData.szFind, mszSelection);
 
