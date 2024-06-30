@@ -83,6 +83,7 @@ lexerList = [
 	('NP2LEX_RUBY', 'stlRuby.cpp', 'LexRuby.cxx', 'Ruby.rb', 0, parse_ruby_api_file),
 	('NP2LEX_RUST', 'stlRust.cpp', 'LexRust.cxx', 'Rust.rs', 0, parse_rust_api_file),
 
+	('NP2LEX_SAS', 'stlSAS.cpp', 'LexSAS.cxx', 'SAS.sas', 0, parse_sas_api_file),
 	('NP2LEX_SCALA', 'stlScala.cpp', 'LexScala.cxx', 'Scala.scala', 1, parse_scala_api_file),
 	('NP2LEX_SMALI', 'stlSmali.cpp', 'LexSmali.cxx', '', 0, parse_smali_api_file),
 	# TODO: SQL Dialect, https://github.com/zufuliu/notepad4/issues/31

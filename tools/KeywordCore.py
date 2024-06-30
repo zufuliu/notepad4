@@ -2207,6 +2207,24 @@ def parse_rust_api_file(path):
 		('function', keywordMap['function'], KeywordAttr.NoLexer),
 	]
 
+def parse_sas_api_file(path):
+	sections = read_api_file(path, '/*')
+	keywordMap = {}
+	for key, doc in sections:
+		key = key.split()[0]
+		if key == 'keywords':
+			keywordMap[key] = doc.split()
+		elif key == 'macro':
+			keywordMap[key] = re.findall(r'%(\w+\(?)', doc)
+		elif key == 'functions':
+			keywordMap[key] = re.findall(r'\w+\(?', doc)
+
+	return [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('macro', keywordMap['macro'], KeywordAttr.NoAutoComp | KeywordAttr.Special),
+		('functions', keywordMap['functions'], KeywordAttr.Default),
+	]
+
 def parse_scala_api_file(path):
 	sections = read_api_file(path, '//')
 	keywordMap = {}

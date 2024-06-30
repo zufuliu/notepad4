@@ -127,6 +127,7 @@ extern EDITLEXER lexRebol;
 extern EDITLEXER lexResourceScript;
 extern EDITLEXER lexRust;
 
+extern EDITLEXER lexSAS;
 extern EDITLEXER lexScala;
 extern EDITLEXER lexBash;
 extern EDITLEXER lexSwift;
@@ -239,6 +240,7 @@ static PEDITLEXER pLexArray[] = {
 	&lexResourceScript,
 	&lexRust,
 
+	&lexSAS,
 	&lexScala,
 	&lexBash,
 	&lexSwift,

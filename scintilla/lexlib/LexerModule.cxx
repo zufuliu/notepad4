@@ -86,6 +86,7 @@ extern LexerModule lmRebol;
 extern LexerModule lmRLang;
 extern LexerModule lmRuby;
 extern LexerModule lmRust;
+extern LexerModule lmSAS;
 extern LexerModule lmScala;
 extern LexerModule lmSmali;
 extern LexerModule lmSQL;
@@ -169,6 +170,7 @@ const LexerModule * const lexerCatalogue[] = {
 	&lmRLang,
 	&lmRuby,
 	&lmRust,
+	&lmSAS,
 	&lmScala,
 	&lmSmali,
 	&lmSQL,

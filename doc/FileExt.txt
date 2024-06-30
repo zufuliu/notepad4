@@ -512,6 +512,10 @@ Rust Source
 	rs
 
 
+SAS File
+	sas
+	sps				https://libguides.library.kent.edu/SAS/syntax
+
 Scala Script
 	scala
 	sbt				Scala Build Tool

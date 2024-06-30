@@ -921,6 +921,15 @@ LexerConfigMap = {
 		'string_style_range': ['SCE_RUST_CHARACTER', 'SCE_RUST_FORMAT_SPECIFIER'],
 	},
 
+	'NP2LEX_SAS': {
+		'block_comment_string': ('/*', '*/'),
+		'comment_style_marker': 'SCE_SAS_COMMENTBLOCK',
+		'indent_based_folding': True,
+		'indent_guide_style': 'forward',
+		'default_fold_level': ['level1'],
+		'operator_style': ['SCE_SAS_OPERATOR'],
+		'string_style_range': ['SCE_SAS_STRINGDQ', 'SCE_SAS_STRINGSQ'],
+	},
 	'NP2LEX_SCALA': {
 		'cpp_style_comment': True,
 		'comment_style_marker': 'SCE_SCALA_TASKMARKER',

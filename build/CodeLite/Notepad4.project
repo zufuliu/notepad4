@@ -75,6 +75,7 @@
       <File Name="../../scintilla/lexers/LexRebol.cxx"/>
       <File Name="../../scintilla/lexers/LexRuby.cxx"/>
       <File Name="../../scintilla/lexers/LexRust.cxx"/>
+      <File Name="../../scintilla/lexers/LexSAS.cxx"/>
       <File Name="../../scintilla/lexers/LexScala.cxx"/>
       <File Name="../../scintilla/lexers/LexSmali.cxx"/>
       <File Name="../../scintilla/lexers/LexSQL.cxx"/>
@@ -258,6 +259,7 @@
       <File Name="../../src/EditLexers/stlResource.cpp"/>
       <File Name="../../src/EditLexers/stlRuby.cpp"/>
       <File Name="../../src/EditLexers/stlRust.cpp"/>
+      <File Name="../../src/EditLexers/stlSAS.cpp"/>
       <File Name="../../src/EditLexers/stlScala.cpp"/>
       <File Name="../../src/EditLexers/stlSmali.cpp"/>
       <File Name="../../src/EditLexers/stlSQL.cpp"/>

@@ -210,6 +210,9 @@
     <ClCompile Include="..\..\scintilla\lexers\LexRust.cxx">
       <Filter>Scintilla\lexers</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\scintilla\lexers\LexSAS.cxx">
+      <Filter>Scintilla\lexers</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\scintilla\lexers\LexScala.cxx">
       <Filter>Scintilla\lexers</Filter>
     </ClCompile>
@@ -586,6 +589,9 @@
       <Filter>Source Files\EditLexers</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\EditLexers\stlRust.cpp">
+      <Filter>Source Files\EditLexers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\EditLexers\stlSAS.cpp">
       <Filter>Source Files\EditLexers</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\EditLexers\stlScala.cpp">

@@ -534,6 +534,7 @@
     <ClCompile Include="..\..\scintilla\lexers\LexRebol.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexRuby.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexRust.cxx" />
+    <ClCompile Include="..\..\scintilla\lexers\LexSAS.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexScala.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexSmali.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexSQL.cxx" />
@@ -660,6 +661,7 @@
     <ClCompile Include="..\..\src\EditLexers\stlResource.cpp" />
     <ClCompile Include="..\..\src\EditLexers\stlRuby.cpp" />
     <ClCompile Include="..\..\src\EditLexers\stlRust.cpp" />
+    <ClCompile Include="..\..\src\EditLexers\stlSAS.cpp" />
     <ClCompile Include="..\..\src\EditLexers\stlScala.cpp" />
     <ClCompile Include="..\..\src\EditLexers\stlSmali.cpp" />
     <ClCompile Include="..\..\src\EditLexers\stlSQL.cpp" />

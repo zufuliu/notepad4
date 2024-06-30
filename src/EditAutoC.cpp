@@ -505,6 +505,7 @@ static constexpr bool IsSpecialStartChar(int ch, int chPrev) noexcept {
 		|| (ch == '$') // variable
 		|| (ch == '`') // VHDL, Verilog directive
 		|| (ch == '\'')// VHDL attribute
+		|| (ch == '%') // SAS macro
 		|| (chPrev == '\\' && (ch == '^' || ch == ':'))// LaTeX input, Emoji input
 		// TODO: show emoji list after typing ':'.
 		|| (chPrev == '<' && ch == '/')	// HTML/XML Close Tag
@@ -701,6 +702,7 @@ enum {
 	PythonKeywordIndex_Decorator = 7,
 	RebolKeywordIndex_Directive = 1,
 	RubyKeywordIndex_PredefinedVariable = 4,
+	SASKeywordIndex_Macro = 1,
 	ScalaKeywordIndex_Annotation = 3,
 	ScalaKeywordIndex_Scaladoc = 5,
 	SmaliKeywordIndex_Directive = 9,
@@ -1371,6 +1373,13 @@ static AddWordResult AutoC_AddSpecWord(WordList &pWList, int iCurrentStyle, int 
 	case NP2LEX_RUBY:
 		if (ch == '$') {
 			pWList.AddList(pLex->pKeyWords->pszKeyWords[RubyKeywordIndex_PredefinedVariable]);
+			return AddWordResult_IgnoreLexer;
+		}
+		break;
+
+	case NP2LEX_SAS:
+		if (ch == '%') {
+			pWList.AddList(pLex->pKeyWords->pszKeyWords[SASKeywordIndex_Macro]);
 			return AddWordResult_IgnoreLexer;
 		}
 		break;
@@ -2731,6 +2740,7 @@ void EditToggleCommentBlock(bool alternative) noexcept {
 	case NP2LEX_NSIS:
 	case NP2LEX_RESOURCESCRIPT:
 	case NP2LEX_RUST:
+	case NP2LEX_SAS:
 	case NP2LEX_SCALA:
 	case NP2LEX_SQL:
 	case NP2LEX_SWIFT:

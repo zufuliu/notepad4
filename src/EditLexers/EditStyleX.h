@@ -134,7 +134,7 @@
 #define NP2StyleX_FunctionDefinition	EDITSTYLE_HOLE(FunctionDefinition, L"Function Definition")
 #define NP2StyleX_Protocol				EDITSTYLE_HOLE(Protocol, L"Protocol")
 #define NP2StyleX_MethodDefinition		EDITSTYLE_HOLE(MethodDefinition, L"Method Definition")
-
+#define NP2StyleX_MacroKeyword			EDITSTYLE_HOLE(MacroKeyword, L"Macro Keyword")
 #define NP2StyleX_Label					EDITSTYLE_HOLE(Label, L"Label")
 #define NP2StyleX_Command				EDITSTYLE_HOLE(Command, L"Command")
 #define NP2StyleX_RawString				EDITSTYLE_HOLE(RawString, L"Raw String")
@@ -145,6 +145,7 @@
 #define NP2StyleX_TripleQuotedString	EDITSTYLE_HOLE(TripleQuotedString, L"Triple Quoted String")
 #define NP2StyleX_BasicFunction			EDITSTYLE_HOLE(BasicFunction, L"Basic Function")
 #define NP2StyleX_PredefinedVariable	EDITSTYLE_HOLE(PredefinedVariable, L"Predefined Variable")
+#define NP2StyleX_MacroFunction			EDITSTYLE_HOLE(MacroFunction, L"Macro Function")
 
 #define NP2StyleX_ReservedWord			EDITSTYLE_HOLE(ReservedWord, L"Reserved Word")
 #define NP2StyleX_EscapeSequence		EDITSTYLE_HOLE(EscapeSequence, L"Escape Sequence")
