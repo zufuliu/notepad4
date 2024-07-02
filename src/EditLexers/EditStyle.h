@@ -113,7 +113,6 @@
 #define NP2STYLE_MethodDefinition		63438
 #define NP2STYLE_MacroKeyword			63439
 #define NP2STYLE_Label					63440
-#define NP2STYLE_Label					63440
 #define NP2STYLE_Command				63441
 #define NP2STYLE_RawString				63442
 #define NP2STYLE_HexString				63443
