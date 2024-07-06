@@ -124,13 +124,13 @@ BEGIN
 	POPUP "+"
 	BEGIN
 		MENUITEM "새 파일(&N)...",				IDM_FILE_NEW
-		MENUITEM "새 디렉토리(&W)...",			IDM_FILE_NEWDIR
+		MENUITEM "새 디렉터리(&W)...",			IDM_FILE_NEWDIR
 		MENUITEM SEPARATOR
 		MENUITEM "파일 필터(&L)...",				IDM_VIEW_FILTER
 		MENUITEM "필터 초기화(&R)",				IDM_VIEW_FILTERALL
 		POPUP "보기(&S)"
 		BEGIN
-			MENUITEM "디렉토리(&D)",			IDM_VIEW_FOLDERS
+			MENUITEM "디렉터리(&D)",			IDM_VIEW_FOLDERS
 			MENUITEM "파일(&F)",					IDM_VIEW_FILES
 			MENUITEM "시스템 개체(&S)",			IDM_VIEW_HIDDEN
 		END
@@ -147,10 +147,10 @@ BEGIN
 		MENUITEM "탐색기에서 열기(&E)",			IDM_FILE_EXPLORER
 		MENUITEM "즐겨찾기로 이동(&F)",				IDM_VIEW_FAVORITES
 		MENUITEM "즐겨찾기 편집(&O)",				IDM_VIEW_EDITFAVORITES
-		MENUITEM "디렉토리(&D)...",				IDM_FILE_CHANGEDIR
+		MENUITEM "디렉터리(&D)...",				IDM_FILE_CHANGEDIR
 		MENUITEM "이동(&G)...",					IDM_FILE_GOTO
 		MENUITEM SEPARATOR
-		MENUITEM "드라이브 보이기(&V)",				IDM_VIEW_DRIVEBOX
+		MENUITEM "드라이브 표시(&V)",				IDM_VIEW_DRIVEBOX
 		MENUITEM "맨 위에 유지(&K)",				IDM_VIEW_ALWAYSONTOP
 		MENUITEM SEPARATOR
 		MENUITEM "설정 저장(&I)",				IDM_VIEW_SAVESETTINGS
@@ -159,17 +159,17 @@ BEGIN
 	END
 	POPUP "+"
 	BEGIN
-		MENUITEM "디렉토리(&D)...",				IDM_FILE_CHANGEDIR
+		MENUITEM "디렉터리(&D)...",				IDM_FILE_CHANGEDIR
 		MENUITEM "드라이브 속성(&P)",			IDM_FILE_DRIVEPROP
 		MENUITEM SEPARATOR
-		MENUITEM "드라이브 보이기(&V)",				IDM_VIEW_DRIVEBOX
+		MENUITEM "드라이브 표시(&V)",				IDM_VIEW_DRIVEBOX
 	END
 	POPUP "+"
 	BEGIN
-		MENUITEM "도구 모음 보이기(&T)",				IDM_VIEW_TOOLBAR
+		MENUITEM "도구 모음 표시(&T)",				IDM_VIEW_TOOLBAR
 		MENUITEM "도구 모음 편집(&E)...",		IDM_VIEW_CUSTOMIZETB
-		MENUITEM "도구모음 자동 크기 조정(&A)",			IDM_VIEW_AUTO_SCALE_TOOLBAR
-		MENUITEM "상태 표시줄 보이기(&S)",				IDM_VIEW_STATUSBAR
+		MENUITEM "도구 모음 자동 크기 조정(&A)",			IDM_VIEW_AUTO_SCALE_TOOLBAR
+		MENUITEM "상태 표시줄 표시(&S)",				IDM_VIEW_STATUSBAR
 	END
 	POPUP "+"
 	BEGIN
@@ -260,7 +260,7 @@ BEGIN
     ICON            IDR_MAINWND,IDC_STATIC,7,7,20,20
     LTEXT           "",IDC_VERSION,45,7,200,8
     LTEXT           "",IDC_BUILD_INFO,45,18,200,8
-    LTEXT           "Copyright © 2011-2024 Zufu Liu and all contributors.",IDC_STATIC,45,30,200,8
+    LTEXT           "Copyright © 2011-2024 Zufu Liu 및 모든 기여자들.",IDC_STATIC,45,30,200,8
     LTEXT           "",IDC_NEW_PAGE_TEXT,45,40,200,8,NOT WS_VISIBLE | WS_DISABLED
     CONTROL         "",IDC_NEW_PAGE_LINK,"SysLink",WS_TABSTOP,45,40,200,10
     LTEXT           "Copyright © 1996-2012 Florian Balmer.",IDC_STATIC,45,52,200,8
@@ -292,7 +292,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     CONTROL         "",IDC_OPENWITHDIR,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SHAREIMAGELISTS | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,7,7,151,69
     PUSHBUTTON      "",IDC_GETOPENWITHDIR,7,83,13,13
-    LTEXT           "즐겨 찾는 응용프로그램에 대한 링크가 있는 디렉토리를 지정하려면 여기를 클릭하십시오.",IDC_OPENWITHDESCR,26,83,132,18
+    LTEXT           "즐겨찾는 응용 프로그램에 대한 링크가 있는 디렉터리를 지정하려면 여기를 클릭하세요.",IDC_OPENWITHDESCR,26,83,132,18
     DEFPUSHBUTTON   "확인",IDOK,52,107,50,14
     PUSHBUTTON      "취소",IDCANCEL,108,107,50,14
     SCROLLBAR       IDC_RESIZEGRIP3,7,112,10,10
@@ -304,7 +304,7 @@ CAPTION "이동"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     ICON            IDI_GOTO,IDC_STATIC,7,7,20,20
-    LTEXT           "열려는 파일 또는 디렉토리의 이름을 입력하거나 목록에서 최근에 방문한 디렉토리를 선택하십시오.",IDC_GOTODESC,35,7,182,17
+    LTEXT           "열려는 파일 또는 디렉터리의 이름을 입력하거나 목록에서 최근에 방문한 디렉터리를 선택하세요.",IDC_GOTODESC,35,7,182,17
     COMBOBOX        IDC_GOTO,7,35,210,126,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     DEFPUSHBUTTON   "확인",IDOK,111,66,50,14,WS_DISABLED
     PUSHBUTTON      "취소",IDCANCEL,167,66,50,14
@@ -316,10 +316,10 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "파일 필터"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "새 파일 필터를 지정하십시오. 여러 필터를 ;로 분리(&F)",IDC_STATIC,7,7,190,8
+    LTEXT           "새 파일 필터를 지정합니다. 여러 필터를 ;로 분리(&F)",IDC_STATIC,7,7,190,8
     EDITTEXT        IDC_FILTER,7,22,171,14,ES_AUTOHSCROLL
     PUSHBUTTON      "",IDC_BROWSEFILTER,183,22,14,14
-    AUTOCHECKBOX    "필터와 일치하는 파일을 제외(&E).",IDC_NEGFILTER,7,40,170,10,WS_TABSTOP
+    AUTOCHECKBOX    "필터와 일치하는 파일 제외(&E).",IDC_NEGFILTER,7,40,170,10,WS_TABSTOP
     DEFPUSHBUTTON   "확인",IDOK,91,58,50,14
     PUSHBUTTON      "취소",IDCANCEL,147,58,50,14
     SCROLLBAR       IDC_RESIZEGRIP3,7,58,10,10
@@ -344,7 +344,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "새 디렉토리"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "새 디렉토리의 이름 입력:",IDC_STATIC,7,7,158,8
+    LTEXT           "새 디렉터리의 이름 입력:",IDC_STATIC,7,7,158,8
     EDITTEXT        IDC_NEWDIR,7,22,158,14,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "확인",IDOK,59,45,50,14,WS_DISABLED
     PUSHBUTTON      "취소",IDCANCEL,115,45,50,14
@@ -388,7 +388,7 @@ BEGIN
     AUTOCHECKBOX    "matepath가 시작될 때 기존 창을 다시 사용(&T).",IDC_REUSEWINDOW,10,133,220,10,WS_TABSTOP
     CONTROL         "<a>창 위치 기록 지우기</a>",IDC_CLEARWINPOS,"SysLink",WS_TABSTOP,20,145,103,12
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,161,205,1
-    AUTOCHECKBOX    "종료시 설정 저장(&S).",IDC_SAVESETTINGS,10,170,100,10,WS_TABSTOP
+    AUTOCHECKBOX    "종료 시 설정 저장(&S).",IDC_SAVESETTINGS,10,170,100,10,WS_TABSTOP
     CONTROL         "<a>matepath 정보</a>",IDC_ABOUT,"SysLink",WS_TABSTOP,130,170,80,12
 END
 
@@ -400,14 +400,14 @@ BEGIN
     ICON            IDI_OPTIONS2,IDC_STATIC,10,10,20,20
     AUTOCHECKBOX    "오른쪽에서 왼쪽 레이아웃을 사용(&R).",IDC_RTL_LAYOUT,10,34,190,10,WS_TABSTOP
     LTEXT           "matepath에 대한 고급 프로그램 설정을 지정.",IDC_STATIC,40,15,200,8
-    AUTOCHECKBOX    "시작 디렉토리 사용(&U):",IDC_STARTUPDIR,10,46,104,10,WS_GROUP | WS_TABSTOP
+    AUTOCHECKBOX    "시작 디렉터리 사용(&U):",IDC_STARTUPDIR,10,46,104,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "가장 최근 사용(&R).",IDC_GOTOMRU,114,46,90,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON """즐겨 찾기"" 폴더(&F).",IDC_GOTOFAV,114,58,90,10,WS_TABSTOP
+    AUTORADIOBUTTON """즐겨찾기"" 폴더(&F).",IDC_GOTOFAV,114,58,90,10,WS_TABSTOP
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,76,205,1
     AUTOCHECKBOX    "저장된 파일의 읽기 전용 속성을 지우기&C).",IDC_CLEARREADONLY,10,85,172,10,WS_TABSTOP
-    AUTOCHECKBOX    "이름 충돌시 복사된 파일의 이름을 바꾸기(&N).",IDC_RENAMEONCOLLISION,10,97,164,10,WS_TABSTOP
+    AUTOCHECKBOX    "이름 충돌 시 복사된 파일의 이름을 바꾸기(&N).",IDC_RENAMEONCOLLISION,10,97,164,10,WS_TABSTOP
     AUTOCHECKBOX    "삭제된 파일을 휴지통으로 이동(&M).",IDC_USERECYCLEBIN,10,109,160,10,WS_TABSTOP
-    AUTOCHECKBOX    "파일 삭제를 확인하지 않음 (권장하지 않음)(&D).",IDC_NOCONFIRMDELETE,10,121,184,10,WS_TABSTOP
+    AUTOCHECKBOX    "파일 삭제 확인 안 함 (권장하지 않음)(&D).",IDC_NOCONFIRMDELETE,10,121,184,10,WS_TABSTOP
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,139,205,1
     AUTOCHECKBOX    """Esc"" 키 사용(&E)...",IDC_ESCFUNCTION,10,148,104,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "창 최소화(&W).",IDC_ESCMIN,114,148,74,10,WS_GROUP | WS_TABSTOP
@@ -421,7 +421,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     ICON            IDI_ITEMS,IDC_STATIC,10,10,21,20
     LTEXT           "matepath 외형",IDC_STATIC,40,15,160,8
-    GROUPBOX        "디렉토리 목록에 있는 항목의 외형",IDC_STATIC,10,41,205,109
+    GROUPBOX        "디렉터리 목록에 있는 항목의 외형",IDC_STATIC,10,41,205,109
     LTEXT           "필터 없음이 설정된 경우 이 텍스트 색상을 사용:",IDC_STATIC,20,54,170,8
     AUTORADIOBUTTON "Windows 기본 색상(&W).",IDC_COLOR_DEF1,20,68,96,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "사용자 지정 색상(&C):",IDC_COLOR_CUST1,20,82,75,10,WS_TABSTOP
@@ -449,15 +449,15 @@ BEGIN
     LTEXT           "기본 ""빠른 보기"" 프로그램 (Ctrl+Q)(&D):",IDC_STATIC,10,41,180,8
     EDITTEXT        IDC_QUICKVIEW,10,52,191,14,ES_AUTOHSCROLL
     PUSHBUTTON      "",IDC_BROWSE_Q,204,52,14,14,BS_BITMAP
-    LTEXT           "즐겨 찾는 폴더 (F11)(&F):",IDC_STATIC,10,76,120,8
+    LTEXT           "즐겨찾는 폴더 (F11)(&F):",IDC_STATIC,10,76,120,8
     EDITTEXT        IDC_FAVORITES,10,87,191,14,ES_AUTOHSCROLL
     PUSHBUTTON      "",IDC_BROWSE_F,204,87,14,14,BS_BITMAP
     GROUPBOX        "시스템 통합 (관리자 권한 필요)",IDC_GROUP_SYSTEM_INTEGRATION,7,111,218,72
-    AUTOCHECKBOX    "Windows 탐색기 상황에 맞는 메뉴에 matepath추가.",IDC_ENABLE_CONTEXT_MENU,14,124,204,10,WS_TABSTOP
+    AUTOCHECKBOX    "Windows 탐색기 상황에 맞는 메뉴에 matepath 추가.",IDC_ENABLE_CONTEXT_MENU,14,124,204,10,WS_TABSTOP
     LTEXT           "상황에 맞는 메뉴 항목:",IDC_STATIC,28,139,70,8
     EDITTEXT        IDC_CONTEXT_MENU_TEXT,100,136,118,14,ES_AUTOHSCROLL | WS_TABSTOP
     AUTOCHECKBOX    "작업표시줄 점프 목록 활성화.",IDC_ENABLE_JUMP_LIST,14,152,204,10,WS_TABSTOP
-    LTEXT           "응용프로그램 이름:",IDC_STATIC,28,167,70,8
+    LTEXT           "응용 프로그램 이름:",IDC_STATIC,28,167,70,8
     EDITTEXT        IDC_APPLICATION_NAME,100,164,118,14,ES_AUTOHSCROLL | WS_TABSTOP
 END
 
@@ -467,7 +467,7 @@ CAPTION "대상 응용 프로그램"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     AUTORADIOBUTTON "특정 대상 응용 프로그램 사용 안 함, 선택한 파일만 실행.",IDC_LAUNCH,7,7,260,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "다음 대상 응용 프로그램을 사용:",IDC_TARGET,7,21,160,10,WS_TABSTOP
+    AUTORADIOBUTTON "다음 대상 응용 프로그램 사용:",IDC_TARGET,7,21,160,10,WS_TABSTOP
     LTEXT           "대상 응용 프로그램이 이미 실행 중인 경우 다음 작업을 지정",IDC_STATIC,7,64,260,8
     EDITTEXT        IDC_TARGETPATH,20,35,226,14,ES_AUTOHSCROLL
     PUSHBUTTON      "",IDC_BROWSE,251,35,14,14,BS_BITMAP
@@ -523,8 +523,8 @@ STRINGTABLE
 BEGIN
 	IDT_HISTORY_BACK		"뒤로"
 	IDT_HISTORY_FORWARD		"앞으로"
-	IDT_UP_DIR				"상위 디렉토리"
-	IDT_ROOT_DIR			"루트 디렉토리"
+	IDT_UP_DIR				"상위 디렉터리"
+	IDT_ROOT_DIR			"루트 디렉터리"
 	IDT_VIEW_FAVORITES		"즐겨찾기"
 	IDT_FILE_PREV			"이전 파일"
 	IDT_FILE_NEXT			"다음 파일"
@@ -548,21 +548,21 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_ERR_CD              "지정된 디렉토리에 액세스할 수 없습니다.\n디스크 또는 네트워크 연결을 확인하십시오."
-    IDS_ERR_FILE            """%s""에 액세스할 수 없습니다.\n다른 응용 프로그램에서 파일을 사용할 수 있습니다.\n디스크 또는 네트워크 연결을 확인하십시오."
-    IDS_ERR_NEW             "파일을 생성할 수 없습니다.\n디스크 또는 네트워크 연결을 확인하십시오."
-    IDS_ERR_NEWDIR          "디렉토리를 생성할 수 없습니다.\n디스크 또는 네트워크 연결을 확인하십시오."
+    IDS_ERR_CD              "지정된 디렉터리에 액세스할 수 없습니다.\n디스크 또는 네트워크 연결을 확인하세요."
+    IDS_ERR_FILE            """%s""에 액세스할 수 없습니다.\n다른 응용 프로그램에서 파일을 사용할 수 있습니다.\n디스크 또는 네트워크 연결을 확인하세요."
+    IDS_ERR_NEW             "파일을 생성할 수 없습니다.\n디스크 또는 네트워크 연결을 확인하세요."
+    IDS_ERR_NEWDIR          "디렉터리를 생성할 수 없습니다.\n디스크 또는 네트워크 연결을 확인하세요."
     IDS_ERR_SAVEAS1         """%s"" 저장 중 오류입니다.\이미 존재하는 파일이 쓰기 금지되어 있을 수 있습니다."
     IDS_ERR_SAVEAS2         "저장된 파일의 읽기 전용 속성을 제거하는 동안 오류가 발생했습니다."
     IDS_ERR_CMDLINE         "명령 줄에 지정된 파일 또는 디렉터리에 액세스하는 동안 오류가 발생했습니다."
-    IDS_ERR_STARTUPDIR      "시작 디렉토리에 액세스할 수 없습니다."
-    IDS_ERR_DROP1           "끌어온 파일 또는 디렉토리에 액세스할 수 없습니다."
-    //IDS_ERR_DROP2           "한 번에 하나의 파일 또는 디렉토리만 삭제할 수 있습니다."
-    IDS_ERR_FAVORITES       """즐겨찾기"" 폴더에 액세스할 수 없습니다.\n""옵션"" 대화 상자에서 유효한 디렉토리를 지정하십시오."
-    //IDS_ERR_LNK_GETPATH     "링크된 개체에 사용할 수 있는 유효한 파일 시스템 경로가 없습니다.\n링크가 파일이나 디렉토리를 참조하지 않는 것 같습니다."
-    IDS_ERR_LNK_NOACCESS    "링크된 개체의 파일 시스템 경로에 액세스할 수 없습니다.\n디스크 또는 네트워크 연결을 확인하십시오."
+    IDS_ERR_STARTUPDIR      "시작 디렉터리에 액세스할 수 없습니다."
+    IDS_ERR_DROP1           "끌어온 파일 또는 디렉터리에 액세스할 수 없습니다."
+    //IDS_ERR_DROP2           "한 번에 하나의 파일 또는 디렉터리만 삭제할 수 있습니다."
+    IDS_ERR_FAVORITES       """즐겨찾기"" 폴더에 액세스할 수 없습니다.\n""옵션"" 대화 상자에서 유효한 디렉터리를 지정하세요."
+    //IDS_ERR_LNK_GETPATH     "링크된 개체에 사용할 수 있는 유효한 파일 시스템 경로가 없습니다.\n링크가 파일이나 디렉터리를 참조하지 않는 것 같습니다."
+    IDS_ERR_LNK_NOACCESS    "링크된 개체의 파일 시스템 경로에 액세스할 수 없습니다.\n디스크 또는 네트워크 연결을 확인하세요."
     IDS_ERR_CREATELINK      "지정된 링크를 생성하는 동안 오류가 발생했습니다.\n대상 디렉토리가 쓰기 금지되어 있을 수 있습니다."
-    IDS_ERR_FILTER          "추가 필터를 지정하지 않았습니다.\n자세한 내용은 matepath readme 파일을 참조하십시오."
+    IDS_ERR_FILTER          "추가 필터를 지정하지 않았습니다.\n자세한 내용은 matepath readme 파일을 참조하세요."
     IDS_ERR_PREVWINDISABLED "기존 matepath창이 사용 중이거나 활성 대화 상자가 있습니다.\n다른 matepath 창을 여시겠습니까?"
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
 	IDS_CHANGE_LANG_RESTART	"UI 언어를 변경하려면 matepath를 다시 시작해야합니다. 지금 다시 시작하시겠습니까?"
@@ -572,7 +572,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_ERR_TARGETDISABLED  "기존 대상 창이 사용 중이거나 활성 대화 상자가 있습니다.\n새 창을 여시겠습니까?"
-    IDS_ERR_INVALIDTARGET   "모든 필수 필드를 작성했는지 확인하십시오.\n적절한 옵션이 활성화된 경우 대상 창도 찾아야 합니다."
+    IDS_ERR_INVALIDTARGET   "모든 필수 필드를 작성했는지 확인하세요.\n적절한 옵션이 활성화된 경우 대상 창도 찾아야 합니다."
     IDS_ERR_INIOPEN         "matepath 구성 파일에 액세스할 수 없습니다."
     IDS_ERR_INICREATE       "구성 파일을 만드는 동안 오류가 발생했습니다."
     IDS_ERR_INIWRITE        "설정이 저장되지 않았습니다!\n구성 파일에 대한 쓰기 액세스 권한이 없습니다."
@@ -586,15 +586,15 @@ BEGIN
     IDS_NEWFILE             "새 파일"
     IDS_FILTER_ALL          "모든 파일 (*.*)|*.*|"
     IDS_FILTER_EXE          "실행 파일 (*.exe;*.com;*.bat;*.lnk;*.pif)|*.exe;*.com;*.bat;*.lnk;*.pif|모든 파일 (*.*)|*.*|"
-    IDS_GETDIRECTORY        "새 디렉토리 선택."
-    IDS_FAVORITES           """즐겨찾기"" 디렉토리 지정."
+    IDS_GETDIRECTORY        "새 디렉터리 선택."
+    IDS_FAVORITES           """즐겨찾기"" 디렉터리 지정."
 END
 
 STRINGTABLE
 BEGIN
-    IDS_OPENWITH            "즐겨 찾는 응용 프로그램에 대한 링크가 있는 디렉토리를 선택하십시오."
-    IDS_COPYMOVE            "대상 디렉토리를 선택하십시오."
-    IDS_CREATELINK          "새 링크의 대상 디렉토리를 선택하십시오."
+    IDS_OPENWITH            "즐겨찾는 응용 프로그램에 대한 링크가 있는 디렉토리를 선택하세요."
+    IDS_COPYMOVE            "대상 디렉터리를 선택하세요."
+    IDS_CREATELINK          "새 링크의 대상 디렉토리를 선택하세요."
     IDS_SAVESETTINGS        "현재 프로그램 설정이 저장되었습니다."
 END
 
