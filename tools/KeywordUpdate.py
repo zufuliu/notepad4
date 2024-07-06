@@ -18,6 +18,7 @@ lexerList = [
 	('NP2LEX_BASH', 'stlBash.cpp', 'LexBash.cxx', ['Bash.sh', 'CShell.csh'], 0, parse_bash_api_file),
 	('NP2LEX_BATCH', 'stlBatch.cpp', 'LexBatch.cxx', 'Batch.bat', 0, parse_batch_api_file),
 
+	('NP2LEX_CANGJIE', 'stlCangjie.cpp', 'LexCangjie.cxx', 'Cangjie.cj', 0, parse_cangjie_api_file),
 	('NP2LEX_CIL', 'stlCIL.cpp', 'LexCIL.cxx', '', 0, None),
 	('NP2LEX_CMAKE', 'stlCMake.cpp', 'LexCMake.cxx', 'CMake.cmake', 0, parse_cmake_api_file),
 	('NP2LEX_CONFIG', 'stlDefault.cpp', 'LexConfig.cxx', '', (0, 'Config'), None),

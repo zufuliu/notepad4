@@ -254,6 +254,20 @@ LexerConfigMap = {
 		'string_style_range': ['SCE_GRAPHVIZ_STRING', 'SCE_GRAPHVIZ_ESCAPECHAR'],
 	},
 
+	'NP2LEX_CANGJIE': {
+		'cpp_style_comment': True,
+		'comment_style_marker': 'SCE_CANGJIE_TASKMARKER',
+		'default_fold_level': ['class', 'function'],
+		'default_fold_ignore_inner': 'SCE_CANGJIE_FUNCTION_DEFINITION',
+		'escape_char_style': 'SCE_CANGJIE_ESCAPECHAR',
+		'raw_string_style': ['SCE_CANGJIE_RAWSTRING_SQ', 'SCE_CANGJIE_RAWSTRING_DQ'],
+		'character_style': ['SCE_CANGJIE_RUNE_SQ', 'SCE_CANGJIE_RUNE_DQ'],
+		'character_prefix': ['r'],
+		'angle_bracket_generic': True,
+		'generic_type_style': ['SCE_CANGJIE_CLASS', 'SCE_CANGJIE_INTERFACE', 'SCE_CANGJIE_STRUCT', 'SCE_CANGJIE_ENUM', 'SCE_CANGJIE_WORD2'],
+		'operator_style': ['SCE_CANGJIE_OPERATOR', 'SCE_CANGJIE_OPERATOR2'],
+		'string_style_range': ['SCE_CANGJIE_STRING_SQ', 'SCE_CANGJIE_ESCAPECHAR'],
+	},
 	'NP2LEX_CIL': {
 		'cpp_style_comment': True,
 		'comment_style_marker': 'SCE_CIL_COMMENTBLOCK',

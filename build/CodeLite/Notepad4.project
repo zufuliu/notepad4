@@ -26,6 +26,7 @@
       <File Name="../../scintilla/lexers/LexAwk.cxx"/>
       <File Name="../../scintilla/lexers/LexBash.cxx"/>
       <File Name="../../scintilla/lexers/LexBatch.cxx"/>
+      <File Name="../../scintilla/lexers/LexCangjie.cxx"/>
       <File Name="../../scintilla/lexers/LexCIL.cxx"/>
       <File Name="../../scintilla/lexers/LexCMake.cxx"/>
       <File Name="../../scintilla/lexers/LexCoffeeScript.cxx"/>
@@ -212,6 +213,7 @@
       <File Name="../../src/EditLexers/stlBash.cpp"/>
       <File Name="../../src/EditLexers/stlBatch.cpp"/>
       <File Name="../../src/EditLexers/stlBlockdiag.cpp"/>
+      <File Name="../../src/EditLexers/stlCangjie.cpp"/>
       <File Name="../../src/EditLexers/stlCIL.cpp"/>
       <File Name="../../src/EditLexers/stlCMake.cpp"/>
       <File Name="../../src/EditLexers/stlCoffeeScript.cpp"/>

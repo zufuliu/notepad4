@@ -73,6 +73,7 @@ extern EDITLEXER lexAwk;
 extern EDITLEXER lexBatch;
 extern EDITLEXER lexBlockdiag;
 
+extern EDITLEXER lexCangjie;
 extern EDITLEXER lexCIL;
 extern EDITLEXER lexCMake;
 extern EDITLEXER lexCoffeeScript;
@@ -186,6 +187,7 @@ static PEDITLEXER pLexArray[] = {
 	&lexBatch,
 	&lexBlockdiag,
 
+	&lexCangjie,
 	&lexCIL,
 	&lexCMake,
 	&lexCoffeeScript,

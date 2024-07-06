@@ -2,7 +2,7 @@
 /* SAS Viya 2024.06 https://go.documentation.sas.com/doc/en/pgmsascdc/v_052/pgmsaswlcm/home.htm */
 /* SAS 9.4 / Viya 3.5 https://documentation.sas.com/doc/en/pgmsascdc/9.4_3.5/pgmsashome/home.htm */
 
-/*! keywords =============================================================== */
+/*! keywords 		======================================================== */
 /* Operators */
 /* https://go.documentation.sas.com/doc/en/pgmsascdc/v_052/lepg/titlepage.htm */
 eq ne gt lt ge le in
@@ -110,7 +110,7 @@ update where
 validate
 where
 
-/*! macro ================================================================== */
+/*! macro 			======================================================== */
 /* Macro Language */
 /* https://go.documentation.sas.com/doc/en/pgmsascdc/v_052/mcrolref/titlepage.htm */
 %include
@@ -189,7 +189,7 @@ where
 %ds2csv(argument-1=value-1, argument-2=value-2 <,argument-3=value-3 ...>)
 %tslit(literal text)
 
-/*! functions ============================================================== */
+/*! functions 		======================================================== */
 /* Functions and CALL Routines */
 /* https://go.documentation.sas.com/doc/en/pgmsascdc/v_052/lefunctionsref/titlepage.htm */
 abs()

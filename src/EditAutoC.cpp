@@ -671,6 +671,8 @@ enum {
 	CSSKeywordIndex_PseudoElement = 3,
 	CSharpKeywordIndex_Preprocessor = 3,
 	CSharpKeywordIndex_CommentTag = 10,
+	CangjieKeywordIndex_Macro = 2,
+	CangjieKeywordIndex_Annotation = 3,
 	DKeywordIndex_Preprocessor = 2,
 	DKeywordIndex_Attribute = 3,
 	DartKeywordIndex_Metadata = 4,
@@ -1105,6 +1107,14 @@ static AddWordResult AutoC_AddSpecWord(WordList &pWList, int iCurrentStyle, int 
 		}
 		break;
 
+	case NP2LEX_CANGJIE:
+		if (ch == '@' && iCurrentStyle == SCE_CANGJIE_DEFAULT) {
+			pWList.AddList(pLex->pKeyWords->pszKeyWords[CangjieKeywordIndex_Macro]);
+			pWList.AddList(pLex->pKeyWords->pszKeyWords[CangjieKeywordIndex_Annotation]);
+			return AddWordResult_IgnoreLexer;
+		}
+		break;
+
 	case NP2LEX_CSS:
 		if (ch == '@' && iCurrentStyle == SCE_CSS_DEFAULT) {
 			pWList.AddList(pLex->pKeyWords->pszKeyWords[CSSKeywordIndex_AtRule]);
@@ -1378,7 +1388,7 @@ static AddWordResult AutoC_AddSpecWord(WordList &pWList, int iCurrentStyle, int 
 		break;
 
 	case NP2LEX_SAS:
-		if (ch == '%') {
+		if (ch == '%' && iCurrentStyle == SCE_SAS_DEFAULT) {
 			pWList.AddList(pLex->pKeyWords->pszKeyWords[SASKeywordIndex_Macro]);
 			return AddWordResult_IgnoreLexer;
 		}
@@ -2460,6 +2470,7 @@ void EditToggleCommentLine(bool alternative) noexcept {
 	case NP2LEX_ACTIONSCRIPT:
 	case NP2LEX_ASYMPTOTE:
 	case NP2LEX_BLOCKDIAG:
+	case NP2LEX_CANGJIE:
 	case NP2LEX_CIL:
 	case NP2LEX_CPP:
 	case NP2LEX_CSHARP:
@@ -2723,6 +2734,7 @@ void EditToggleCommentBlock(bool alternative) noexcept {
 	case NP2LEX_ASYMPTOTE:
 	case NP2LEX_AUTOHOTKEY:
 	case NP2LEX_AVISYNTH:
+	case NP2LEX_CANGJIE:
 	case NP2LEX_CIL:
 	case NP2LEX_CPP:
 	case NP2LEX_CSHARP:
@@ -2989,6 +3001,17 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) noexcept {
 		CurrentWordCharSet['$' >> 5] |= (1 << ('$' & 31));
 		CurrentWordCharSet['-' >> 5] |= (1 << ('-' & 31));
 		RawStringStyleMask[SCE_SH_STRING_SQ >> 5] |= (1U << (SCE_SH_STRING_SQ & 31));
+		break;
+
+	case NP2LEX_CANGJIE:
+		CharacterPrefixMask['r' >> 5] |= (1 << ('r' & 31));
+		RawStringStyleMask[SCE_CANGJIE_RAWSTRING_SQ >> 5] |= (1U << (SCE_CANGJIE_RAWSTRING_SQ & 31));
+		RawStringStyleMask[SCE_CANGJIE_RAWSTRING_DQ >> 5] |= (1U << (SCE_CANGJIE_RAWSTRING_DQ & 31));
+		GenericTypeStyleMask[SCE_CANGJIE_CLASS >> 5] |= (1U << (SCE_CANGJIE_CLASS & 31));
+		GenericTypeStyleMask[SCE_CANGJIE_INTERFACE >> 5] |= (1U << (SCE_CANGJIE_INTERFACE & 31));
+		GenericTypeStyleMask[SCE_CANGJIE_STRUCT >> 5] |= (1U << (SCE_CANGJIE_STRUCT & 31));
+		GenericTypeStyleMask[SCE_CANGJIE_ENUM >> 5] |= (1U << (SCE_CANGJIE_ENUM & 31));
+		GenericTypeStyleMask[SCE_CANGJIE_WORD2 >> 5] |= (1U << (SCE_CANGJIE_WORD2 & 31));
 		break;
 
 	case NP2LEX_CPP:

@@ -37,6 +37,7 @@ extern LexerModule lmAviSynth;
 extern LexerModule lmAwk;
 extern LexerModule lmBash;
 extern LexerModule lmBatch;
+extern LexerModule lmCangjie;
 extern LexerModule lmCIL;
 extern LexerModule lmCMake;
 extern LexerModule lmCoffeeScript;
@@ -121,6 +122,7 @@ const LexerModule * const lexerCatalogue[] = {
 	&lmAwk,
 	&lmBash,
 	&lmBatch,
+	&lmCangjie,
 	&lmCIL,
 	&lmCMake,
 	&lmCoffeeScript,

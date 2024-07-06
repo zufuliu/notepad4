@@ -223,6 +223,9 @@ blockdiag
 	diag
 
 
+Cangjie Source
+	cj
+
 CIL Assembly
 	il
 

@@ -399,12 +399,8 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				}
 			} else if (IsNumberStartEx(sc.chPrev, sc.ch, sc.chNext)) {
 				sc.SetState(SCE_SWIFT_NUMBER);
-			} else if ((sc.ch == '@' || sc.ch == '`') && IsIdentifierStartEx(sc.chNext)) {
-				chBefore = chPrevNonWhite;
-				if (chPrevNonWhite != '.') {
-					chBeforeIdentifier = chPrevNonWhite;
-				}
-				sc.SetState((sc.ch == '@') ? SCE_SWIFT_ATTRIBUTE : SCE_SWIFT_IDENTIFIER_BT);
+			} else if (sc.ch == '@' && IsIdentifierStartEx(sc.chNext)) {
+				sc.SetState(SCE_SWIFT_ATTRIBUTE);
 			} else if (sc.ch == '$' && IsIdentifierCharEx(sc.chNext)) {
 				sc.SetState(SCE_SWIFT_VARIABLE);
 			} else if (sc.ch == '#') {
@@ -425,12 +421,12 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 						}
 					}
 				}
-			} else if (IsIdentifierStartEx(sc.ch)) {
+			} else if (IsIdentifierStartEx(sc.ch) || (sc.ch == '`' && IsIdentifierStartEx(sc.chNext))) {
 				chBefore = chPrevNonWhite;
 				if (chPrevNonWhite != '.') {
 					chBeforeIdentifier = chPrevNonWhite;
 				}
-				sc.SetState(SCE_SWIFT_IDENTIFIER);
+				sc.SetState((sc.ch == '`') ? SCE_SWIFT_IDENTIFIER_BT : SCE_SWIFT_IDENTIFIER);
 			} else if (sc.ch == '+' || sc.ch == '-') {
 				if (sc.ch == sc.chNext) {
 					// highlight ++ and -- as different style to simplify regex detection.
