@@ -2433,22 +2433,27 @@ int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, int *enco
 
 	// test system ANSI code page
 	iEncoding = CPI_DEFAULT;
+	bool tryUnicode = false;
 	const UINT acp = GetACP();
 	if (acp == CP_UTF8 || !IsValidMultiByte(acp, multiData, multiLen)) {
+		tryUnicode = true;
 		*encodingFlag = EncodingFlag_Invalid;
-		// check UTF-16 without BOM
-		if ((cbData & 1) == 0 && fvCurFile.mask == 0) {
-			iEncoding = DetectUnicode(lpData, cbData, bSkipUnicodeDetection);
-#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-			if (iEncoding == CPI_UNICODEBE) {
-				*encodingFlag = EncodingFlag_Reversed;
-			}
-#endif
-		}
 	}
 	// detect binary file
-	if (iEncoding == CPI_DEFAULT && MaybeBinaryFile(reinterpret_cast<const uint8_t *>(lpData), cbData)) {
+	if (MaybeBinaryFile(reinterpret_cast<const uint8_t *>(lpData), cbData)) {
+		tryUnicode = true;
 		*encodingFlag = EncodingFlag_Binary;
+	}
+	// check UTF-16 without BOM
+	if (tryUnicode && (cbData & 1) == 0 && fvCurFile.mask == 0) {
+		iEncoding = DetectUnicode(lpData, cbData, bSkipUnicodeDetection);
+		if (iEncoding != CPI_DEFAULT) {
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+			*encodingFlag = (iEncoding == CPI_UNICODEBE) ? EncodingFlag_Reversed : EncodingFlag_Invalid;
+#else
+			*encodingFlag = EncodingFlag_Invalid;
+#endif
+		}
 	}
 
 	// unknown encoding
