@@ -7624,7 +7624,7 @@ bool FileVars_ParseStr(LPCSTR pszData, LPCSTR pszName, char *pszValue, int cchVa
 		strncpy(tch, pvStart, COUNTOF(tch) - 1);
 
 		char *pvEnd = tch;
-		while (IsAlphaNumeric(*pvEnd) || *pvEnd == '+' || *pvEnd == '-' || *pvEnd == '/' || *pvEnd == '_' || (bQuoted && *pvEnd == ' ')) {
+		while (IsAlphaNumeric(*pvEnd) || *pvEnd == '+' || *pvEnd == '-' || *pvEnd == '/' || *pvEnd == '_' || *pvEnd == '#' || (bQuoted && *pvEnd == ' ')) {
 			pvEnd++;
 		}
 		*pvEnd = '\0';
