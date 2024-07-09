@@ -62,7 +62,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* Apache Configuration File
 	* [CSV File](https://www.rfc-editor.org/rfc/rfc4180)
 	* [D](tools/lang/D.d), up to D language 2.0.
-	* [Dart](tools/lang/Dart.dart), up to Dart 3.3.
+	* [Dart](tools/lang/Dart.dart), up to Dart 3.4.
 	* Diff/Patch File
 	* [F#](tools/lang/FSharp.fs), up to F# 8.0.
 	* [Fortran](tools/lang/Fortran.f), up to Fortran 2023.
@@ -87,7 +87,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [JavaScript](tools/lang/JavaScript.js), up to ECMAScript 2024 with [JSX](https://facebook.github.io/jsx/) and [Web APIs](https://developer.mozilla.org/en-US/docs/Web/API).
 	* [JSON](https://www.json.org) and [JSON5](https://json5.org/) Document
 	* [Julia Script](tools/lang/Julia.jl), up to Julia 1.9. [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#julia)
-	* [Kotlin](tools/lang/Kotlin.kt), up to Kotlin 1.9.
+	* [Kotlin](tools/lang/Kotlin.kt), up to Kotlin 2.0.
 	* LaTeX
 	* Lisp Script (Common Lisp, Clojure, Scheme, etc.)
 	* [LLVM IR](tools/lang/LLVM.ll), up to LLVM 16.
@@ -118,7 +118,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* Windows Rescouce Script
 	* [R](tools/lang/R.r), up to R 4.2.
 	* [REBOL](tools/lang/Rebol.r) 3 and [Red](tools/lang/Red.red)
-	* [Ruby](tools/lang/Ruby.rb), up to Ruby 3.2. [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#ruby)
+	* [Ruby](tools/lang/Ruby.rb), up to Ruby 3.3. [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#ruby)
 	* [Rust](tools/lang/Rust.rs), up to Rust 1.38. [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#rust)
 	* [SAS](tools/lang/SAS.sas), up to SAS Viya 2024.06.
 	* [Scala](tools/lang/Scala.scala), up to Scala 3.2.
@@ -151,7 +151,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* SGML and DTD
 		* Apple Property List
 	* [YAML Document](https://yaml.org/)
-	* [Zig](tools/lang/Zig.zig), up to Zig 0.12.
+	* [Zig](tools/lang/Zig.zig), up to Zig 0.13.
 	* Many Others
 * Toggle fold for specific level, shortcuts: <kbd>Alt</kbd>+<kbd>Number</kbd>
 * Toggle fold for current block without scrolling back to the block start line, shortcut: <kbd>Alt</kbd>+<kbd>C</kbd>, or context menu "Toggle Fold"
