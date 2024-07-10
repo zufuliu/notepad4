@@ -63,11 +63,12 @@ enum {
 
 enum class KeywordType {
 	None = SCE_KOTLIN_DEFAULT,
+	Label = SCE_KOTLIN_LABEL,
+	ThisSuper = SCE_KOTLIN_IDENTIFIER,
 	Annotation = SCE_KOTLIN_ANNOTATION,
 	Class = SCE_KOTLIN_CLASS,
 	Interface = SCE_KOTLIN_INTERFACE,
 	Enum = SCE_KOTLIN_ENUM,
-	Label = SCE_KOTLIN_LABEL,
 	Return = 0x40,
 };
 
@@ -131,6 +132,7 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 		case SCE_KOTLIN_LABEL:
 		case SCE_KOTLIN_IDENTIFIER:
 		case SCE_KOTLIN_ANNOTATION:
+		case SCE_KOTLIN_CLASS:
 			if (!IsIdentifierCharEx(sc.ch)) {
 				switch (sc.state) {
 				case SCE_KOTLIN_VARIABLE:
@@ -154,10 +156,12 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 							if (visibleChars == sc.LengthCurrent()) {
 								lineStateLineType = KotlinLineStateMaskImport;
 							}
-						} else if (StrEqualsAny(s, "break", "continue", "return", "this", "super")) {
+						} else if (sc.ch == '@' && StrEqualsAny(s, "break", "continue", "return")) {
 							kwType = KeywordType::Label;
+						} else if (sc.ch == '@' && StrEqualsAny(s, "this", "super")) {
+							kwType = KeywordType::ThisSuper;
 						} else if (StrEqualsAny(s, "class", "typealias")) {
-							if (!(kwType == KeywordType::Annotation || kwType == KeywordType::Enum)) {
+							if (kwType != KeywordType::Annotation && kwType != KeywordType::Enum) {
 								kwType = KeywordType::Class;
 							}
 						} else if (StrEqual(s, "enum")) {
@@ -169,9 +173,9 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 						} else if (StrEqual(s, "return")) {
 							kwType = KeywordType::Return;
 						}
-						if (kwType > KeywordType::None && kwType < KeywordType::Return) {
+						if (kwType > KeywordType::ThisSuper && kwType < KeywordType::Return) {
 							const int chNext = sc.GetDocNextChar();
-							if (!((kwType == KeywordType::Label) ? (chNext == '@') : IsIdentifierStartEx(chNext))) {
+							if (!IsIdentifierStartEx(chNext)) {
 								kwType = KeywordType::None;
 							}
 						}
@@ -199,13 +203,15 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 									sc.ChangeState(SCE_KOTLIN_FUNCTION);
 								}
 							} else if (sc.Match(':', ':')
-								|| (chBeforeIdentifier == '<' && (chNext == '>' || chNext == '<'))) {
+								|| (chBeforeIdentifier == '<' && (chNext == '>' || chNext == '<'))
+								|| (chBeforeIdentifier == ':' && (sc.ch == '?' && chNext != '.'))) {
 								// type::class
 								// type<type>
 								// type<type?>
 								// type<type<type>>
 								// type<type, type>
 								// class type: type, interface {}
+								// identifier: type?
 								sc.ChangeState(SCE_KOTLIN_CLASS);
 							}
 						}
@@ -330,7 +336,16 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 			} else if (IsNumberStart(sc.ch, sc.chNext)) {
 				sc.SetState(SCE_KOTLIN_NUMBER);
 			} else if (sc.ch == '@' && IsIdentifierStartEx(sc.chNext)) {
-				sc.SetState((kwType == KeywordType::Label) ? SCE_KOTLIN_LABEL : SCE_KOTLIN_ANNOTATION);
+				int state;
+				if (kwType == KeywordType::ThisSuper || chPrevNonWhite == '>') {
+					// super<type>@class
+					state = SCE_KOTLIN_CLASS;
+					sc.SetState(SCE_KOTLIN_OPERATOR);
+					sc.Forward();
+				} else {
+					state = (kwType == KeywordType::Label) ? SCE_KOTLIN_LABEL : SCE_KOTLIN_ANNOTATION;
+				}
+				sc.SetState(state);
 				kwType = KeywordType::None;
 			} else if (sc.ch == '`') {
 				sc.SetState(SCE_KOTLIN_BACKTICKS);
