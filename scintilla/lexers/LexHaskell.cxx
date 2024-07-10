@@ -59,9 +59,9 @@ constexpr bool IsHaskellIdentifierChar(int ch) noexcept {
 
 enum class KeywordType {
 	None = SCE_HA_DEFAULT,
+	Pragma = SCE_HA_PRAGMA,
 	Module = SCE_HA_MODULE,
 	Class = SCE_HA_CLASS,
-	Pragma = SCE_HA_PRAGMA,
 };
 
 enum {

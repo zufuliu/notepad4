@@ -63,9 +63,9 @@ enum {
 
 enum class KeywordType {
 	None = SCE_DART_DEFAULT,
+	Label = SCE_DART_LABEL,
 	Class = SCE_DART_CLASS,
 	Enum = SCE_DART_ENUM,
-	Label = SCE_DART_LABEL,
 	Return = 0x40,
 	While = 0x41,
 };

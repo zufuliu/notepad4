@@ -69,12 +69,12 @@ enum {
 
 enum class KeywordType {
 	None = SCE_GO_DEFAULT,
+	Label = SCE_GO_LABEL,
+	Identifier = SCE_GO_IDENTIFIER,
 	Type = SCE_GO_TYPE,
 	Struct = SCE_GO_STRUCT,
 	Interface = SCE_GO_INTERFACE,
 	Constant = SCE_GO_CONSTANT,
-	Identifier = SCE_GO_IDENTIFIER,
-	Label = SCE_GO_LABEL,
 };
 
 enum class GoFunction {

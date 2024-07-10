@@ -67,12 +67,12 @@ enum {
 
 enum class KeywordType {
 	None = 0,
+	Const = SCE_PHP_WORD2,
 	Class = SCE_PHP_CLASS,
 	Interface = SCE_PHP_INTERFACE,
 	Trait = SCE_PHP_TRAIT,
 	Enum = SCE_PHP_ENUM,
 	Function = SCE_PHP_FUNCTION_DEFINITION,
-	Const = SCE_PHP_WORD2,
 	Constant = SCE_PHP_CONSTANT,
 	Label = SCE_PHP_LABEL,
 };

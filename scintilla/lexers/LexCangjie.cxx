@@ -150,7 +150,7 @@ void ColouriseCangjieDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int ini
 					if (sc.ch == '`') {
 						sc.Forward();
 					}
-				} else if (sc.state != SCE_CANGJIE_VARIABLE)  {
+				} else if (sc.state != SCE_CANGJIE_VARIABLE) {
 					char s[128];
 					sc.GetCurrent(s, sizeof(s));
 					if (sc.state == SCE_CANGJIE_MACRO) {

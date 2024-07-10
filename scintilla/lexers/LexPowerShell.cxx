@@ -38,11 +38,11 @@ enum {
 
 enum class KeywordType {
 	None = SCE_POWERSHELL_DEFAULT,
-	Attribute = SCE_POWERSHELL_ATTRIBUTE,
+	Label = SCE_POWERSHELL_LABEL,
 	Class = SCE_POWERSHELL_CLASS,
 	Enum = SCE_POWERSHELL_ENUM,
+	Attribute = SCE_POWERSHELL_ATTRIBUTE,
 	Function = SCE_POWERSHELL_FUNCTION_DEFINITION,
-	Label = SCE_POWERSHELL_LABEL,
 };
 
 constexpr bool IsVariableCharacter(int ch) noexcept {

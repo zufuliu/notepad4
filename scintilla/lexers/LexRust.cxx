@@ -82,13 +82,13 @@ enum {
 
 enum class KeywordType {
 	None = SCE_RUST_DEFAULT,
+	Type = SCE_RUST_TYPE,
 	Struct = SCE_RUST_STRUCT,
 	Trait = SCE_RUST_TRAIT,
 	Enum = SCE_RUST_ENUMERATION,
-	Type = SCE_RUST_TYPE,
 	Union = SCE_RUST_UNION,
-	Constant = SCE_RUST_CONSTANT,
 	Function = SCE_RUST_FUNCTION_DEFINITION,
+	Constant = SCE_RUST_CONSTANT,
 };
 
 constexpr bool IsSpaceEquiv(int state) noexcept {

@@ -82,10 +82,10 @@ enum class DocTagState {
 enum class KeywordType {
 	None = SCE_JAVA_DEFAULT,
 	Annotation = SCE_JAVA_ANNOTATION,
+	Record = SCE_JAVA_RECORD,
 	Class = SCE_JAVA_CLASS,
 	Interface = SCE_JAVA_INTERFACE,
 	Enum = SCE_JAVA_ENUM,
-	Record = SCE_JAVA_RECORD,
 	Label = SCE_JAVA_LABEL,
 	Return = 0x40,
 	While = 0x41,
