@@ -2733,7 +2733,7 @@ static inline bool IsBraceMatchChar(uint32_t ch) noexcept {
 		|| ch == '{' || ch == '}'
 		|| ch == '<' || ch == '>';
 #else
-	// tools/GenerateTable.py
+	// see GenerateBraceMatchTable() in tools/GenerateTable.py
 	static const uint32_t table[8] = { 0, 0x50000300, 0x28000000, 0x28000000 };
 	return BitTestEx(table, ch);
 #endif
@@ -4987,7 +4987,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 					}
 					return 0;
 				}
-				// Auto close braces/quotes
+				// Auto close braces/quotes, see GenerateAutoInsertMask() in tools/GenerateTable.py
 				uint32_t index = ch - '\"';
 				if (index == '{' - '\"' || (index < 63 && (UINT64_C(0x4200000004000461) & (UINT64_C(1) << index)))) {
 					index = (index + (index >> 4)) & 15;

@@ -1966,6 +1966,7 @@ void Editor::InsertCharacter(std::string_view sv, CharacterSource charSource) {
 		if (charSource == CharacterSource::DirectInput && sv.length() == 1 && !sel.Empty() && !sel.IsRectangular()) {
 			const uint8_t ch = sv[0];
 			uint32_t index = ch - '\"';
+			// see GenerateAutoInsertMask() in tools/GenerateTable.py
 			if (index == '{' - '\"' || (index < 63 && (UINT64_C(0x4200000000000061) & (UINT64_C(1) << index)))) {
 				index = (index + (index >> 5)) & 7;
 				index = (0x60501204U >> (4*index)) & 15;

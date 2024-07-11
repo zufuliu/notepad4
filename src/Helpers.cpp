@@ -3007,7 +3007,7 @@ size_t Base64Encode(char *output, const uint8_t *src, size_t length, bool urlSaf
 	return p - output;
 }
 
-// see tools/GenerateTable.py
+// see GenerateBase64Table() in tools/GenerateTable.py
 static const uint8_t Base64DecodingTable[128] = {
 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128,
 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128,

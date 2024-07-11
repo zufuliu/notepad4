@@ -521,7 +521,7 @@ static constexpr bool IsSpecialStartChar(int ch, int chPrev) noexcept {
 extern EditAutoCompletionConfig autoCompletionConfig;
 
 // CharClassify::SetDefaultCharClasses()
-// tools/GenerateTable.py
+// see GenerateDefaultWordCharSet() in tools/GenerateTable.py
 const uint32_t DefaultWordCharSet[8] = {
 0x00000000U, 0x03ff0000U, 0x87fffffeU, 0x07fffffeU,
 0xffffffffU, 0xffffffffU, 0xffffffffU, 0xffffffffU
@@ -1876,6 +1876,7 @@ void EditAutoCloseBraceQuote(int ch, AutoInsertCharacter what) noexcept {
 		}
 	}
 
+	// see GenerateAutoInsertMask() in tools/GenerateTable.py
 	ch += (169U >> (2*what)) & 3; // 0b10101001
 	switch (what) {
 	case AutoInsertCharacter_SquareBracket:

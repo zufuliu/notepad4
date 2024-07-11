@@ -6707,7 +6707,7 @@ struct UnicodeControlCharacter {
 
 // https://en.wikipedia.org/wiki/Unicode_control_characters
 // https://www.unicode.org/charts/PDF/U2000.pdf
-// scintilla/scripts/GenerateCharTable.py
+// see GenerateUnicodeControlCharacters() in scintilla/scripts/GenerateCharTable.py
 static const UnicodeControlCharacter kUnicodeControlCharacterTable[] = {
 	{ "\xe2\x80\x8e", "LRM" },	// U+200E	LRM		Left-to-right mark
 	{ "\xe2\x80\x8f", "RLM" },	// U+200F	RLM		Right-to-left mark
