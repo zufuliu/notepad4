@@ -1,5 +1,5 @@
 // 2023 https://www.w3.org/TR/CSS/ 7 December 2023
-// 2024-05-18 https://drafts.csswg.org/
+// 2024-07-14 https://drafts.csswg.org/
 // https://github.com/w3c/csswg-drafts/
 // https://www.w3.org/Style/CSS/all-properties
 // https://www.w3.org/Style/CSS/all-descriptors
@@ -19,6 +19,7 @@
 	position-visibility: always | anchors-valid | anchors-visible | no-overflow;
 
 	position-try-options: none | inset-area();
+	position-try-fallbacks: none | flip-block | flip-inline | flip-start;
 	position-try-order: normal | most-width | most-height | most-block-size | most-inline-size;
 	position-try:;
 }
@@ -262,7 +263,7 @@ supports()
 
 // CSS Containment Module Level 3 https://www.w3.org/TR/css-contain-3/ 18 August 2022
 // CSS Containment Module Level 2 https://www.w3.org/TR/css-contain-2/ 17 September 2022
-// CSS Containment Module Level 1 https://www.w3.org/TR/css-contain-1/ 25 October 2022
+// CSS Containment Module Level 1 https://www.w3.org/TR/css-contain-1/ 25 June 2024
 {
 	contain: none | strict | content | size | inline-size | layout | style | paint;
 	container-type: normal | style | state | size | inline-size | block-size;
@@ -678,7 +679,7 @@ counters()
 
 // Media Queries Level 5 https://www.w3.org/TR/mediaqueries-5/ 18 December 2021
 // Media Queries Level 4 https://www.w3.org/TR/mediaqueries-4/ 25 December 2021
-// Media Queries Level 3 https://www.w3.org/TR/mediaqueries-3/ 05 April 2022
+// Media Queries Level 3 https://www.w3.org/TR/mediaqueries-3/ 21 May 2024
 // https://www.w3.org/TR/CSS22/media.html
 @custom-media {}
 // 7.3 Recognized media types
@@ -1184,16 +1185,16 @@ view()
 	chains: none;
 }
 
-// CSS Text Module Level 4 https://www.w3.org/TR/css-text-4/ 19 February 2024
+// CSS Text Module Level 4 https://www.w3.org/TR/css-text-4/ 29 May 2024
 // CSS Text Module Level 3 https://www.w3.org/TR/css-text-3/ 3 September 2023
 // Text https://www.w3.org/TR/CSS22/text.html
 {
-	text-transform: none | capitalize | uppercase | lowercase | full-width | full-size-kana;
+	text-transform: none | capitalize | uppercase | lowercase | full-width | full-size-kana | math-auto;
 	word-space-transform: none | space | ideographic-space | auto-phrase;
 
-	white-space: normal | pre | nowrap | pre-wrap | break-spaces | pre-line;
-	white-space-collapse: collapse | discard | preserve | preserve-breaks | preserve-spaces;
-	white-space-trim: none | trim-inner | discard-before | discard-after;
+	white-space: normal | pre | pre-wrap | pre-line;
+	white-space-collapse: collapse | discard | preserve | preserve-breaks | preserve-spaces | break-spaces;
+	white-space-trim: none | discard-before || discard-after || discard-inner;
 	tab-size:;
 
 	word-break: normal | keep-all | break-all | manual | auto-phrase | break-word;
@@ -1315,7 +1316,10 @@ pi infinity NaN
 	view-transition-class: none;
 	view-transition-name: none;
 }
-@view-transition {}
+@view-transition {
+	navigation: auto | none;
+	types: none;
+}
 :active-view-transition
 :active-view-transition-type()
 ::view-transition

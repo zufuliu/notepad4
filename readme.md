@@ -51,7 +51,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* [C Standard Library](tools/lang/C.c), up to C2x.
 		* [C++ STL](tools/lang/CPP.cpp), up to C++20.
 	* [Cangjie (仓颉)](tools/lang/Cangjie.cj), up to June 2024.
-	* [CSS Style Sheet](tools/lang/CSS.css), up to December 2023 snapshot.
+	* [CSS Style Sheet](tools/lang/CSS.css), up to July 2024.
 		* [SCSS Style Sheet](tools/lang/SCSS.scss), up to Dart Sass 1.50.
 		* [Less Style Sheet](tools/lang/Less.less), up to Less 4.1.
 		* [HSS Style Sheet](tools/lang/HSS.hss)
@@ -74,7 +74,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [Groovy](tools/lang/Groovy.groovy), up to Groovy 5.0.
 	* [Haskell](tools/lang/Haskell.hs), up to GHC 9.6.
 	* [Haxe](tools/lang/Haxe.hx), up to Haxe 4.3.
-	* [HTML](tools/lang/html.html), up to [WHATWG](https://html.spec.whatwg.org/multipage/) March 2024. [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#html)
+	* [HTML](tools/lang/html.html), up to [WHATWG](https://html.spec.whatwg.org/multipage/) July 2024. [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#html)
 		* ASP
 		* ASP.NET
 		* JSP
