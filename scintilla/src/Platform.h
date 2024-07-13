@@ -346,7 +346,7 @@ public:
 	virtual void ClearRegisteredImages() noexcept = 0;
 	virtual void SetDelegate(IListBoxDelegate *lbDelegate) noexcept = 0;
 	virtual void SetList(const char* list, char separator, char typesep) = 0;
-	virtual void SCICALL SetOptions(ListOptions options_) noexcept = 0;
+	virtual void SCICALL SetOptions(const ListOptions &options_) noexcept = 0;
 };
 
 /**

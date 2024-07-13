@@ -3443,7 +3443,7 @@ public:
 	void ClearRegisteredImages() noexcept override;
 	void SetDelegate(IListBoxDelegate *lbDelegate) noexcept override;
 	void SetList(const char *list, char separator, char typesep) override;
-	void SCICALL SetOptions(ListOptions options_) noexcept override;
+	void SCICALL SetOptions(const ListOptions &options_) noexcept override;
 	void Draw(const DRAWITEMSTRUCT *pDrawItem);
 	LRESULT WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam);
 	static LRESULT CALLBACK StaticWndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam);
@@ -3778,7 +3778,7 @@ void ListBoxX::SetList(const char *list, const char separator, const char typese
 	SetRedraw(true);
 }
 
-void ListBoxX::SetOptions(ListOptions options_) noexcept {
+void ListBoxX::SetOptions(const ListOptions &options_) noexcept {
 	colorText = ColourOfElement(options_.fore, COLOR_WINDOWTEXT);
 	colorBackground = ColourOfElement(options_.back, COLOR_WINDOW);
 	colorHighlightText = ColourOfElement(options_.foreSelected, COLOR_HIGHLIGHTTEXT);

@@ -5164,7 +5164,12 @@ void Editor::TickFor(TickReason reason) {
 		break;
 	case TickReason::scroll:
 		// Auto scroll
-		ButtonMoveWithModifiers(ptMouseLast, 0, KeyMod::Norm);
+		if (HaveMouseCapture()) {
+			ButtonMoveWithModifiers(ptMouseLast, 0, KeyMod::Norm);
+		} else {
+			// Capture cancelled so cancel timer
+			FineTickerCancel(TickReason::scroll);
+		}
 		break;
 	case TickReason::widen:
 		SetScrollBars();
