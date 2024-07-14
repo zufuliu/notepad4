@@ -1,4 +1,4 @@
-// This file is part of Notepad2.
+// This file is part of Notepad4.
 // See License.txt for details about distribution and modification.
 //! Lexer for Nim
 
@@ -144,8 +144,8 @@ enum {
 
 enum class KeywordType {
 	None = SCE_NIM_DEFAULT,
-	Type = SCE_NIM_TYPE,
 	Pragma = SCE_NIM_PRAGMA,
+	Type = SCE_NIM_TYPE,
 	Function = SCE_NIM_FUNCTION_DEFINITION,
 };
 

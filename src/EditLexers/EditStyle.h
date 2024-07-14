@@ -111,7 +111,7 @@
 #define NP2STYLE_FunctionDefinition		63436
 #define NP2STYLE_Protocol				63437
 #define NP2STYLE_MethodDefinition		63438
-
+#define NP2STYLE_MacroKeyword			63439
 #define NP2STYLE_Label					63440
 #define NP2STYLE_Command				63441
 #define NP2STYLE_RawString				63442
@@ -122,6 +122,7 @@
 #define NP2STYLE_TripleQuotedString		63447
 #define NP2STYLE_BasicFunction			63448
 #define NP2STYLE_PredefinedVariable		63449
+#define NP2STYLE_MacroFunction			63450
 
 #define NP2STYLE_ReservedWord			63451
 #define NP2STYLE_EscapeSequence			63452

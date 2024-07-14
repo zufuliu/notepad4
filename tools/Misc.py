@@ -253,7 +253,7 @@ def find_new_texinfo_commands(path, lang):
 
 #increase_style_resource_id_value('../src/EditLexers/EditStyle.h')
 #generate_lexer_menu_resource_id('../src/resource.h')
-#check_encoding_list('../src/EditEncoding.c')
+#check_encoding_list('../src/EditEncoding.cpp')
 #diff_iso_encoding('iso-8859.log')
 
 # https://www.w3.org/Style/CSS/all-properties.en.json

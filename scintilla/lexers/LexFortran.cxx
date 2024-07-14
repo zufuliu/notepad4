@@ -1,4 +1,4 @@
-// This file is part of Notepad2.
+// This file is part of Notepad4.
 // See License.txt for details about distribution and modification.
 //! Lexer for Fortran
 
@@ -71,8 +71,8 @@ enum class KeywordType {
 	Module,		// module function, module subroutine
 	End,
 	Type,
-	Call = SCE_F_FUNCTION,
 	Function = SCE_F_FUNCTION_DEFINITION,
+	Call = SCE_F_FUNCTION,
 };
 
 void ColouriseFortranDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {

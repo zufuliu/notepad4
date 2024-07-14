@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
-// Used by Notepad2.rc
+// Used by Notepad4.rc
 //
 #define IDR_RT_MANIFEST					1
 // Icon, Accelerator, Menu
@@ -421,7 +421,7 @@
 //
 #define IDM_SET_USE_XP_FILE_DIALOG		40042
 #define IDM_SET_LATEX_INPUT_METHOD		40043
-#define IDM_SET_OPEN_FOLDER_METAPATH	40044
+#define IDM_SET_OPEN_FOLDER_MATEPATH	40044
 #define IDM_VIEW_CLEARWINPOS			40045
 #define IDM_SET_RENDER_TECH_GDI			40046
 #define IDM_SET_RENDER_TECH_D2D			40047

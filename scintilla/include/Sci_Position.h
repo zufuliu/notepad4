@@ -7,11 +7,7 @@
 // The License.txt file describes the conditions under which this software may be distributed.
 #pragma once
 
-#if defined(__cplusplus)
 #include <cstddef>
-#else
-#include <stddef.h>
-#endif
 
 // Basic signed type used throughout interface
 typedef ptrdiff_t Sci_Position;
@@ -26,7 +22,6 @@ typedef size_t Sci_PositionU;
 	#define SCI_METHOD
 #endif
 
-#if defined(__cplusplus)
 namespace sci {
 
 template <typename T>
@@ -45,4 +40,3 @@ constexpr T clamp(T x, T lower, T upper) noexcept {
 }
 
 }
-#endif

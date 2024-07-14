@@ -1,4 +1,4 @@
-version: '4.24.x.{build}'
+version: '24.x.{build}'
 
 image:
   - Visual Studio 2017
@@ -21,7 +21,7 @@ matrix:
 before_build:
   - cmd: |
       ECHO Update Version Hash
-      "c:/Program Files/Git/usr/bin/sed" -i "s/\(.\+\)[0-9a-f]\{8\}\(.\+\)/\1%APPVEYOR_REPO_COMMIT:~0,8%\2/gm" ./src/VersionRev.h ./metapath/src/VersionRev.h
+      "c:/Program Files/Git/usr/bin/sed" -i "s/\(.\+\)[0-9a-f]\{8\}\(.\+\)/\1%APPVEYOR_REPO_COMMIT:~0,8%\2/gm" ./src/VersionRev.h ./matepath/src/VersionRev.h
 
 for:
   - # MSVC Release
@@ -51,8 +51,8 @@ for:
           CALL "build\make_zip.bat" MSVC ARM Release 1
 
     artifacts:
-      - path: 'build\Notepad2*.zip'
-        name: Notepad2_MSVC
+      - path: 'build\Notepad4*.zip'
+        name: Notepad4_MSVC
 
   - # Clang Release
     matrix:
@@ -75,5 +75,5 @@ for:
           CALL "build\make_zip.bat" LLVM ARM64 Release 1
 
     artifacts:
-      - path: 'build\Notepad2*.zip'
-        name: Notepad2_Clang_MSVC
+      - path: 'build\Notepad4*.zip'
+        name: Notepad4_Clang_MSVC

@@ -1,7 +1,7 @@
 /******************************************************************************
 *
 *
-* Notepad2
+* Notepad4
 *
 * Edit.h
 *   Text File Editing Helper Stuff
@@ -33,7 +33,7 @@
 #define NP2_MarkAllSelectAll	0x00004000
 #define NP2_FromFindAll			0x00008000
 
-typedef struct EDITFINDREPLACE {
+struct EDITFINDREPLACE {
 	char	szFind[512];
 	char	szReplace[512];
 	char	szFindUTF8[512 * kMaxMultiByteCount];
@@ -45,19 +45,17 @@ typedef struct EDITFINDREPLACE {
 	bool	bReplaceClose;
 	bool	bNoFindWrap;
 	bool	bWildcardSearch;
-} EDITFINDREPLACE, *LPEDITFINDREPLACE;
+};
 
-typedef const EDITFINDREPLACE * LPCEDITFINDREPLACE;
-
-typedef enum EditAlignMode {
+enum EditAlignMode {
 	EditAlignMode_Left = 0,
 	EditAlignMode_Right = 1,
 	EditAlignMode_Center = 2,
 	EditAlignMode_Justify = 3,
 	EditAlignMode_JustifyEx = 4,
-} EditAlignMode;
+};
 
-typedef enum EditSortFlag {
+enum EditSortFlag {
 	EditSortFlag_Ascending = 0,
 	EditSortFlag_Descending = 1,
 	EditSortFlag_IgnoreCase = 2,
@@ -69,7 +67,7 @@ typedef enum EditSortFlag {
 	EditSortFlag_MergeDuplicate = 128,
 	EditSortFlag_RemoveDuplicate = 256,
 	EditSortFlag_RemoveUnique = 512,
-} EditSortFlag;
+};
 
 // wrap indent
 enum {
@@ -104,130 +102,122 @@ enum {
 	EditWrapSymbol_DefaultValue = EditWrapSymbolBefore_NearBorder,
 };
 
-void	Edit_ReleaseResources(void);
-void	EditCreate(HWND hwndParent);
-void	EditSetNewText(LPCSTR lpstrText, DWORD cbText, Sci_Line lineCount);
+void	Edit_ReleaseResources() noexcept;
+void	EditCreate(HWND hwndParent) noexcept;
+void	EditSetNewText(LPCSTR lpstrText, DWORD cbText, Sci_Line lineCount) noexcept;
 
-static inline void EditSetEmptyText(void) {
+static inline void EditSetEmptyText() noexcept{
 	EditSetNewText("", 0, 1);
 }
 
-bool	EditConvertText(UINT cpSource, UINT cpDest, bool bSetSavePoint);
-void	EditConvertToLargeMode(void);
-void	EditReplaceDocument(HANDLE pdoc);
+bool	EditConvertText(UINT cpSource, UINT cpDest, bool bSetSavePoint) noexcept;
+void	EditConvertToLargeMode() noexcept;
+void	EditReplaceDocument(HANDLE pdoc) noexcept;
 
-char*	EditGetClipboardText(HWND hwnd); // LocalFree()
-bool	EditCopyAppend(HWND hwnd);
+char*	EditGetClipboardText(HWND hwnd) noexcept; // LocalFree()
+bool	EditCopyAppend(HWND hwnd) noexcept;
 
-static inline int GetScintillaEOLMode(int mode) {
-	const UINT mask = (SC_EOL_CRLF << 2*0) | (SC_EOL_LF << 2*1) | (SC_EOL_CR << 2*2);
+constexpr int GetScintillaEOLMode(int mode) noexcept {
+	constexpr UINT mask = (SC_EOL_CRLF << 2*0) | (SC_EOL_LF << 2*1) | (SC_EOL_CR << 2*2);
 	return (mask >> (mode << 1)) & 3;
 }
-static inline int GetSettingsEOLMode(int mode) {
-	const UINT mask = (0 << 2*SC_EOL_CRLF) | (1 << 2*SC_EOL_LF) | (2 << 2*SC_EOL_CR);
+constexpr int GetSettingsEOLMode(int mode) noexcept {
+	constexpr UINT mask = (0 << 2*SC_EOL_CRLF) | (1 << 2*SC_EOL_LF) | (2 << 2*SC_EOL_CR);
 	return (mask >> (mode << 1)) & 3;
 }
 
 struct EditFileIOStatus;
-void 	EditDetectEOLMode(LPCSTR lpData, DWORD cbData, struct EditFileIOStatus *status);
-bool	EditLoadFile(LPWSTR pszFile, struct EditFileIOStatus *status);
-bool	EditSaveFile(HWND hwnd, LPCWSTR pszFile, int saveFlag, struct EditFileIOStatus *status);
+void 	EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus &status) noexcept;
+bool	EditLoadFile(LPWSTR pszFile, EditFileIOStatus &status) noexcept;
+bool	EditSaveFile(HWND hwnd, LPCWSTR pszFile, int saveFlag, EditFileIOStatus &status) noexcept;
 
-void	EditReplaceMainSelection(Sci_Position cchText, LPCSTR pszText);
-void	EditInvertCase(void);
-void	EditMapTextCase(int menu);
-void	EditSentenceCase(void);
+void	EditReplaceMainSelection(Sci_Position cchText, LPCSTR pszText) noexcept;
+void	EditInvertCase() noexcept;
+void	EditMapTextCase(int menu) noexcept;
+void	EditSentenceCase() noexcept;
 
-void	EditURLEncode(void);
-void	EditURLDecode(void);
-void	EditEscapeCChars(HWND hwnd);
-void	EditUnescapeCChars(HWND hwnd);
-void	EditEscapeXHTMLChars(HWND hwnd);
-void	EditUnescapeXHTMLChars(HWND hwnd);
-void	EditChar2Hex(void);
-void	EditHex2Char(void);
-void	EditShowHex(void);
+void	EditURLEncode() noexcept;
+void	EditURLDecode() noexcept;
+void	EditEscapeCChars(HWND hwnd) noexcept;
+void	EditUnescapeCChars(HWND hwnd) noexcept;
+void	EditEscapeXHTMLChars(HWND hwnd) noexcept;
+void	EditUnescapeXHTMLChars(HWND hwnd) noexcept;
+void	EditChar2Hex() noexcept;
+void	EditHex2Char() noexcept;
+void	EditShowHex() noexcept;
 
-typedef enum Base64EncodingFlag {
+enum Base64EncodingFlag {
 	Base64EncodingFlag_Default,
 	Base64EncodingFlag_UrlSafe,
 	Base64EncodingFlag_HtmlEmbeddedImage,
-} Base64EncodingFlag;
-void	EditBase64Encode(Base64EncodingFlag encodingFlag);
-void	EditBase64Decode(bool decodeAsHex);
-void	EditConvertNumRadix(int radix);
+};
+void	EditBase64Encode(Base64EncodingFlag encodingFlag) noexcept;
+void	EditBase64Decode(bool decodeAsHex) noexcept;
+void	EditConvertNumRadix(int radix) noexcept;
 void	EditModifyNumber(bool bIncrease);
 
-void	EditTabsToSpaces(int nTabWidth, bool bOnlyIndentingWS);
-void	EditSpacesToTabs(int nTabWidth, bool bOnlyIndentingWS);
+void	EditTabsToSpaces(int nTabWidth, bool bOnlyIndentingWS) noexcept;
+void	EditSpacesToTabs(int nTabWidth, bool bOnlyIndentingWS) noexcept;
 
-void	EditMoveUp(void);
-void	EditMoveDown(void);
-void	EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend, bool skipEmptyLine);
-void	EditAlignText(EditAlignMode nMode);
-void	EditEncloseSelection(LPCWSTR pwszOpen, LPCWSTR pwszClose);
-void	EditToggleLineComments(LPCWSTR pwszComment, int commentFlag);
-void	EditPadWithSpaces(bool bSkipEmpty, bool bNoUndoGroup);
-void	EditStripFirstCharacter(void);
-void	EditStripLastCharacter(void);
-void	EditStripTrailingBlanks(HWND hwnd, bool bIgnoreSelection);
-void	EditStripLeadingBlanks(HWND hwnd, bool bIgnoreSelection);
-void	EditCompressSpaces(void);
-void	EditRemoveBlankLines(bool bMerge);
-void	EditWrapToColumn(int nColumn/*, int nTabWidth*/);
-void	EditJoinLinesEx(void);
-void	EditSortLines(EditSortFlag iSortFlags);
+void	EditMoveUp() noexcept;
+void	EditMoveDown() noexcept;
+void	EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend, bool skipEmptyLine) noexcept;
+void	EditAlignText(EditAlignMode nMode) noexcept;
+void	EditEncloseSelection(LPCWSTR pwszOpen, LPCWSTR pwszClose) noexcept;
+void	EditToggleLineComments(LPCWSTR pwszComment, int commentFlag) noexcept;
+void	EditPadWithSpaces(bool bSkipEmpty, bool bNoUndoGroup) noexcept;
+void	EditStripFirstCharacter() noexcept;
+void	EditStripLastCharacter() noexcept;
+void	EditStripTrailingBlanks(HWND hwnd, bool bIgnoreSelection) noexcept;
+void	EditStripLeadingBlanks(HWND hwnd, bool bIgnoreSelection) noexcept;
+void	EditCompressSpaces() noexcept;
+void	EditRemoveBlankLines(bool bMerge) noexcept;
+void	EditWrapToColumn(int nColumn/*, int nTabWidth*/) noexcept;
+void	EditJoinLinesEx() noexcept;
+void	EditSortLines(EditSortFlag iSortFlags) noexcept;
 
-void	EditJumpTo(Sci_Line iNewLine, Sci_Position iNewCol);
-void	EditSelectEx(Sci_Position iAnchorPos, Sci_Position iCurrentPos);
-void	EditFixPositions(void);
-void	EditEnsureSelectionVisible(void);
-void	EditEnsureConsistentLineEndings(void);
-void	EditGetExcerpt(LPWSTR lpszExcerpt, DWORD cchExcerpt);
+void	EditJumpTo(Sci_Line iNewLine, Sci_Position iNewCol) noexcept;
+void	EditSelectEx(Sci_Position iAnchorPos, Sci_Position iCurrentPos) noexcept;
+void	EditFixPositions() noexcept;
+void	EditEnsureSelectionVisible() noexcept;
+void	EditEnsureConsistentLineEndings() noexcept;
+void	EditGetExcerpt(LPWSTR lpszExcerpt, DWORD cchExcerpt) noexcept;
 
-void	EditSelectWord(void);
-void	EditSelectLines(bool currentBlock, bool lineSelection);
-HWND	EditFindReplaceDlg(HWND hwnd, LPEDITFINDREPLACE lpefr, bool bReplace);
-void	EditFindNext(LPCEDITFINDREPLACE lpefr, bool fExtendSelection);
-void	EditFindPrev(LPCEDITFINDREPLACE lpefr, bool fExtendSelection);
-void	EditFindAll(LPCEDITFINDREPLACE lpefr, bool selectAll);
-bool	EditReplace(HWND hwnd, LPCEDITFINDREPLACE lpefr);
-bool	EditReplaceAll(HWND hwnd, LPCEDITFINDREPLACE lpefr, bool bShowInfo);
-bool	EditReplaceAllInSelection(HWND hwnd, LPCEDITFINDREPLACE lpefr, bool bShowInfo);
-bool	EditLineNumDlg(HWND hwnd);
-void	EditModifyLinesDlg(HWND hwnd);
-void	EditEncloseSelectionDlg(HWND hwnd);
-void	EditInsertTagDlg(HWND hwnd);
-void	EditInsertDateTime(bool bShort);
-void	EditUpdateTimestampMatchTemplate(HWND hwnd);
-void	EditInsertUnicodeControlCharacter(int menu);
-void	EditShowUnicodeControlCharacter(bool bShow);
-bool	EditSortDlg(HWND hwnd, EditSortFlag *piSortFlags);
-bool	EditAlignDlg(HWND hwnd, EditAlignMode *piAlignMode);
-void	EditSelectionAction(int action);
-void	TryBrowseFile(HWND hwnd, LPCWSTR pszFile, bool bWarn);
+void	EditSelectWord() noexcept;
+void	EditSelectLines(bool currentBlock, bool lineSelection) noexcept;
+HWND	EditFindReplaceDlg(HWND hwnd, EDITFINDREPLACE *lpefr, bool bReplace) noexcept;
+void	EditFindNext(const EDITFINDREPLACE *lpefr, bool fExtendSelection) noexcept;
+void	EditFindPrev(const EDITFINDREPLACE *lpefr, bool fExtendSelection) noexcept;
+void	EditFindAll(const EDITFINDREPLACE *lpefr, bool selectAll) noexcept;
+bool	EditReplace(HWND hwnd, const EDITFINDREPLACE *lpefr) noexcept;
+bool	EditReplaceAll(HWND hwnd, const EDITFINDREPLACE *lpefr, bool bShowInfo) noexcept;
+bool	EditReplaceAllInSelection(HWND hwnd, const EDITFINDREPLACE *lpefr, bool bShowInfo) noexcept;
+bool	EditLineNumDlg(HWND hwnd) noexcept;
+void	EditModifyLinesDlg(HWND hwnd) noexcept;
+void	EditEncloseSelectionDlg(HWND hwnd) noexcept;
+void	EditInsertTagDlg(HWND hwnd) noexcept;
+void	EditInsertDateTime(bool bShort) noexcept;
+void	EditUpdateTimestampMatchTemplate(HWND hwnd) noexcept;
+void	EditInsertUnicodeControlCharacter(int menu) noexcept;
+void	EditShowUnicodeControlCharacter(bool bShow) noexcept;
+bool	EditSortDlg(HWND hwnd, EditSortFlag *piSortFlags) noexcept;
+bool	EditAlignDlg(HWND hwnd, EditAlignMode *piAlignMode) noexcept;
+void	EditSelectionAction(int action) noexcept;
+void	TryBrowseFile(HWND hwnd, LPCWSTR pszFile, bool bWarn) noexcept;
 
-typedef enum OpenSelectionType {
+enum OpenSelectionType {
 	OpenSelectionType_None,
 	OpenSelectionType_Link,
 	OpenSelectionType_File,
 	OpenSelectionType_Folder,
 	OpenSelectionType_ContainingFolder,
-} OpenSelectionType;
+};
 void EditOpenSelection(OpenSelectionType type);
 
 // in Bridge.cpp
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-bool	EditPrint(HWND hwnd, LPCWSTR pszDocTitle, BOOL bDefault);
-void	EditPrintSetup(HWND hwnd);
-void	EditFormatCode(int menu);
-
-#ifdef __cplusplus
-}
-#endif
+bool	EditPrint(HWND hwnd, LPCWSTR pszDocTitle, BOOL bDefault) noexcept;
+void	EditPrintSetup(HWND hwnd) noexcept;
+void	EditFormatCode(int menu) noexcept;
 
 enum {
 	MarkerNumber_Bookmark = 0,
@@ -245,31 +235,33 @@ enum {
 	MarkerBitmask_Bookmark = 1 << MarkerNumber_Bookmark,
 };
 
-typedef struct EditMarkAllStatus {
+struct EditMarkAll {
 	bool pending;
 	bool ignoreSelectionUpdate;
 	bool bookmarkForFindAll;
-	int findFlag;
+	int markFlag;
 	int incrementSize;			// increment search size
-	Sci_Position iSelCount;		// length for pszText
+	Sci_Position length;		// length for pszText
 	LPSTR pszText;				// pattern or text to find
 	double duration;			// search duration in milliseconds
 	Sci_Position matchCount;	// total match count
 	Sci_Position lastMatchPos;	// last matching position
-	Sci_Position iStartPos;		// previous stop position
-	Sci_Line bookmarkLine;		// previous bookmark line
+	Sci_Position prevStopPos;	// previous stop position
+	Sci_Line prevBookmarkLine;	// previous bookmark line
 	StopWatch watch;			// used to dynamic compute increment size
-} EditMarkAllStatus;
 
-void EditMarkAll_ClearEx(int findFlag, Sci_Position iSelCount, LPSTR pszText);
-NP2_inline void EditMarkAll_Clear(void) {
-	EditMarkAll_ClearEx(0, 0, NULL);
-}
-void EditMarkAll_Start(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPSTR pszText);
-void EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer);
-void EditMarkAll(BOOL bChanged, bool matchCase, bool wholeWord, bool bookmark);
-void EditToggleBookmarkAt(Sci_Position iPos);
-void EditBookmarkSelectAll(void);
+	void Reset(int findFlag, Sci_Position iSelCount, LPSTR text) noexcept;
+	void Clear() noexcept {
+		Reset(0, 0, nullptr);
+	}
+	void Start(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPSTR text) noexcept;
+	void Continue(HANDLE timer) noexcept;
+	void Stop() noexcept;
+	void MarkAll(BOOL bChanged, bool matchCase, bool wholeWord, bool bookmark) noexcept;
+};
+
+void EditToggleBookmarkAt(Sci_Position iPos) noexcept;
+void EditBookmarkSelectAll() noexcept;
 
 // auto completion fill-up characters
 #define MAX_AUTO_COMPLETION_FILLUP_LENGTH	32		// Only 32 ASCII punctuation
@@ -295,7 +287,7 @@ enum {
 };
 
 // auto insert
-typedef enum AutoInsertCharacter {
+enum AutoInsertCharacter {
 	AutoInsertCharacter_Parenthesis,
 	AutoInsertCharacter_Brace,
 	AutoInsertCharacter_SquareBracket,
@@ -304,7 +296,7 @@ typedef enum AutoInsertCharacter {
 	AutoInsertCharacter_SingleQuote,
 	AutoInsertCharacter_Backtick,
 	AutoInsertCharacter_Comma,
-} AutoInsertCharacter;
+};
 enum {
 	AutoInsertMask_Parenthesis = 1,			// ()
 	AutoInsertMask_Brace = 2,				// {}
@@ -332,7 +324,7 @@ enum {
 #define MIN_AUTO_COMPLETION_WORD_LENGTH			1
 #define MIN_AUTO_COMPLETION_NUMBER_LENGTH		0
 
-typedef struct EditAutoCompletionConfig {
+struct EditAutoCompletionConfig {
 	bool bIndentText;
 	bool bCloseTags;
 	bool bCompleteWord;
@@ -352,7 +344,7 @@ typedef struct EditAutoCompletionConfig {
 	UINT iPreviousItemCount;		// status
 	char szAutoCompleteFillUp[MAX_AUTO_COMPLETION_FILLUP_LENGTH + 4];
 	WCHAR wszAutoCompleteFillUp[MAX_AUTO_COMPLETION_FILLUP_LENGTH];
-} EditAutoCompletionConfig;
+};
 
 enum {
 	AutoCompleteCondition_Normal = 0,
@@ -360,33 +352,33 @@ enum {
 	AutoCompleteCondition_OnCharDeleted = 2,
 };
 
-// in EditAutoC.c
+// in EditAutoC.cpp
 extern const uint32_t DefaultWordCharSet[8];
-void	EditCompleteUpdateConfig(void);
-bool	IsDocWordChar(uint32_t ch);
-bool	IsAutoCompletionWordCharacter(uint32_t ch);
-void	EditCompleteWord(int iCondition, bool autoInsert);
-bool	EditIsOpenBraceMatched(Sci_Position pos, Sci_Position startPos);
-void	EditAutoCloseBraceQuote(int ch, AutoInsertCharacter what);
-void	EditAutoCloseXMLTag(void);
-void	EditAutoIndent(void);
-void	EditToggleCommentLine(bool alternative);
-void	EditToggleCommentBlock(bool alternative);
-void	EditInsertScriptShebangLine(void);
+void	EditCompleteUpdateConfig() noexcept;
+bool	IsDocWordChar(uint32_t ch) noexcept;
+bool	IsAutoCompletionWordCharacter(uint32_t ch) noexcept;
+void	EditCompleteWord(int iCondition, bool autoInsert) noexcept;
+bool	EditIsOpenBraceMatched(Sci_Position pos, Sci_Position startPos) noexcept;
+void	EditAutoCloseBraceQuote(int ch, AutoInsertCharacter what) noexcept;
+void	EditAutoCloseXMLTag() noexcept;
+void	EditAutoIndent() noexcept;
+void	EditToggleCommentLine(bool alternative) noexcept;
+void	EditToggleCommentBlock(bool alternative) noexcept;
+void	EditInsertScriptShebangLine() noexcept;
 
-typedef enum CallTipType {
+enum CallTipType {
 	CallTipType_None,
 	CallTipType_Notification,
 	CallTipType_ColorHex,
-} CallTipType;
+};
 
-typedef enum ShowCallTip {
+enum ShowCallTip {
 	ShowCallTip_None,
 	ShowCallTip_ColorRGBA,
 	ShowCallTip_ColorARGB,
 	ShowCallTip_ColorBGRA,
 	ShowCallTip_ColorABGR,
-} ShowCallTip;
+};
 
 struct CallTipInfo {
 	ShowCallTip showCallTip;
@@ -398,8 +390,8 @@ struct CallTipInfo {
 	//COLORREF backColor;
 	//COLORREF foreColor;
 };
-void	EditShowCallTip(Sci_Position position);
-void	EditClickCallTip(HWND hwnd);
+void	EditShowCallTip(Sci_Position position) noexcept;
+void	EditClickCallTip(HWND hwnd) noexcept;
 
 #define NCP_DEFAULT					1
 #define NCP_UTF8					2
@@ -439,14 +431,14 @@ enum {
 	EncodingFlag_Invalid = 8,
 };
 
-typedef struct NP2ENCODING {
+struct NP2ENCODING {
 	const UINT uFlags;
 	/*const*/UINT uCodePage;
 	// string format: [normal name + ','] + [lower case parse name + ',']+
 	const char * const pszParseNames;
 	const UINT idsName;
 	LPWSTR wchLabel;
-} NP2ENCODING;
+};
 
 // see UniConversion.h and https://www.unicode.org/faq/utf_bom.html
 #define SURROGATE_LEAD_FIRST		0xD800
@@ -469,33 +461,33 @@ typedef struct NP2ENCODING {
 #define LOCALE_SNAME				0x0000005c	// _WIN32_WINNT >= _WIN32_WINNT_VISTA
 #endif
 
-static inline BOOL GetLegacyACP(UINT *acp) {
+inline BOOL GetLegacyACP(UINT *acp) noexcept {
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 	return GetLocaleInfoEx(LOCALE_NAME_SYSTEM_DEFAULT, LOCALE_IUSEUTF8LEGACYACP | LOCALE_RETURN_NUMBER,
-		(LPWSTR)(acp), sizeof(UINT) / sizeof(WCHAR));
+		reinterpret_cast<LPWSTR>(acp), sizeof(UINT) / sizeof(WCHAR));
 #else
 	return GetLocaleInfoW(LOCALE_SYSTEM_DEFAULT, LOCALE_IUSEUTF8LEGACYACP | LOCALE_RETURN_NUMBER,
-		(LPWSTR)(acp), sizeof(UINT) / sizeof(WCHAR));
+		reinterpret_cast<LPWSTR>(acp), sizeof(UINT) / sizeof(WCHAR));
 #endif
 }
 
-static inline BOOL GetLegacyOEMCP(UINT *oemcp) {
+inline BOOL GetLegacyOEMCP(UINT *oemcp) noexcept {
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 	return GetLocaleInfoEx(LOCALE_NAME_SYSTEM_DEFAULT, LOCALE_IUSEUTF8LEGACYOEMCP | LOCALE_RETURN_NUMBER,
-		(LPWSTR)(oemcp), sizeof(UINT) / sizeof(WCHAR));
+		reinterpret_cast<LPWSTR>(oemcp), sizeof(UINT) / sizeof(WCHAR));
 #else
 	return GetLocaleInfoW(LOCALE_SYSTEM_DEFAULT, LOCALE_IUSEUTF8LEGACYOEMCP | LOCALE_RETURN_NUMBER,
-		(LPWSTR)(oemcp), sizeof(UINT) / sizeof(WCHAR));
+		reinterpret_cast<LPWSTR>(oemcp), sizeof(UINT) / sizeof(WCHAR));
 #endif
 }
 
 // 932 Shift-JIS, 936 GBK, 949 UHC, 950 Big5, 1361 Johab
-static inline bool IsDBCSCodePage(UINT page) {
+constexpr bool IsDBCSCodePage(UINT page) noexcept {
 	return page == 932 || page == 936 || page == 949 || page == 950 || page == 1361;
 }
 
 // dwFlags must be 0 for MultiByteToWideChar() and WideCharToMultiByte()
-static inline bool IsZeroFlagsCodePage(UINT page) {
+constexpr bool IsZeroFlagsCodePage(UINT page) noexcept {
 	return page == CP_UTF8
 		|| page == CP_UTF7
 		|| page == 54936	// GB18030
@@ -510,65 +502,65 @@ static inline bool IsZeroFlagsCodePage(UINT page) {
 		;
 }
 
-// in EditEncoding.c
+// in EditEncoding.cpp
 extern NP2ENCODING mEncoding[];
-static inline bool Encoding_IsUnicode(int iEncoding) {
+constexpr bool Encoding_IsUnicode(int iEncoding) noexcept {
 	return iEncoding == CPI_UNICODEBOM
 		|| iEncoding == CPI_UNICODEBEBOM
 		|| iEncoding == CPI_UNICODE
 		|| iEncoding == CPI_UNICODEBE;
 }
 
-static inline bool Encoding_IsUTF8(int iEncoding) {
+constexpr bool Encoding_IsUTF8(int iEncoding) noexcept {
 	return iEncoding == CPI_UTF8
 		|| iEncoding == CPI_UTF8SIGN;
 }
 
-void	Encoding_ReleaseResources(void);
-bool	EditSetNewEncoding(int iEncoding, int iNewEncoding, BOOL bNoUI, bool bSetSavePoint);
-void	EditOnCodePageChanged(UINT oldCodePage, bool showControlCharacter, LPEDITFINDREPLACE lpefr);
-const char* GetFoldDisplayEllipsis(UINT cpEdit, UINT acp);
-void	Encoding_InitDefaults(void);
-int 	Encoding_MapIniSetting(bool bLoad, UINT iSetting);
-void	Encoding_GetLabel(int iEncoding);
-int 	Encoding_Match(LPCWSTR pwszTest);
-int 	Encoding_MatchA(LPCSTR pchTest);
-bool	Encoding_IsValid(int iEncoding);
-int		Encoding_GetIndex(UINT codePage);
-int		Encoding_GetAnsiIndex(void);
-void	Encoding_AddToTreeView(HWND hwnd, int idSel, bool bRecodeOnly);
-bool	Encoding_GetFromTreeView(HWND hwnd, int *pidEncoding, bool bQuiet);
+void	Encoding_ReleaseResources() noexcept;
+bool	EditSetNewEncoding(int iEncoding, int iNewEncoding, BOOL bNoUI, bool bSetSavePoint) noexcept;
+void	EditOnCodePageChanged(UINT oldCodePage, bool showControlCharacter, EDITFINDREPLACE *lpefr) noexcept;
+const char* GetFoldDisplayEllipsis(UINT cpEdit, UINT acp) noexcept;
+void	Encoding_InitDefaults() noexcept;
+int 	Encoding_MapIniSetting(bool bLoad, UINT iSetting) noexcept;
+void	Encoding_GetLabel(int iEncoding) noexcept;
+int 	Encoding_Match(LPCWSTR pwszTest) noexcept;
+int 	Encoding_MatchA(LPCSTR pchTest) noexcept;
+bool	Encoding_IsValid(int iEncoding) noexcept;
+int		Encoding_GetIndex(UINT codePage) noexcept;
+int		Encoding_GetAnsiIndex() noexcept;
+void	Encoding_AddToTreeView(HWND hwnd, int idSel, bool bRecodeOnly) noexcept;
+bool	Encoding_GetFromTreeView(HWND hwnd, int *pidEncoding, bool bQuiet) noexcept;
 #if 0
-void	Encoding_AddToListView(HWND hwnd, int idSel, bool bRecodeOnly);
-bool	Encoding_GetFromListView(HWND hwnd, int *pidEncoding);
-void	Encoding_AddToComboboxEx(HWND hwnd, int idSel, bool bRecodeOnly);
-bool	Encoding_GetFromComboboxEx(HWND hwnd, int *pidEncoding);
+void	Encoding_AddToListView(HWND hwnd, int idSel, bool bRecodeOnly) noexcept;
+bool	Encoding_GetFromListView(HWND hwnd, int *pidEncoding) noexcept;
+void	Encoding_AddToComboboxEx(HWND hwnd, int idSel, bool bRecodeOnly) noexcept;
+bool	Encoding_GetFromComboboxEx(HWND hwnd, int *pidEncoding) noexcept;
 #endif
 
-UINT	CodePageFromCharSet(UINT uCharSet);
-bool	IsUTF8(const char *pTest, DWORD nLength);
-bool	IsUTF7(const char *pTest, DWORD nLength);
+UINT	CodePageFromCharSet(UINT uCharSet) noexcept;
+bool	IsUTF8(const char *pTest, DWORD nLength) noexcept;
+bool	IsUTF7(const char *pTest, DWORD nLength) noexcept;
 
 #define BOM_UTF8		0xBFBBEF
 #define BOM_UTF16LE		0xFEFF
 #define BOM_UTF16BE		0xFFFE
-static inline bool IsUTF8Signature(const char *p) {
+inline bool IsUTF8Signature(const char *p) noexcept {
 	//return p[0] == '\xEF' && p[1] == '\xBB' && p[2] == '\xBF';
-	return (*((const UINT *)p) & 0xFFFFFF) == BOM_UTF8;
+	return (*(reinterpret_cast<const UINT *>(p)) & 0xFFFFFF) == BOM_UTF8;
 }
 
-static inline BOOL Encoding_HasBOM(int iEncoding) {
+constexpr BOOL Encoding_HasBOM(int iEncoding) noexcept {
 	return (iEncoding == CPI_UNICODEBOM
 		|| iEncoding == CPI_UNICODEBEBOM
 		|| iEncoding == CPI_UTF8SIGN) ? iEncoding : FALSE;
 }
 
-LPSTR RecodeAsUTF8(LPSTR lpData, DWORD *cbData, UINT codePage, DWORD flags);
-int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, int *encodingFlag);
-bool IsStringCaseSensitiveW(LPCWSTR pszTextW);
-bool IsStringCaseSensitiveA(LPCSTR pszText);
+LPSTR RecodeAsUTF8(LPSTR lpData, DWORD *cbData, UINT codePage, DWORD flags) noexcept;
+int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, int *encodingFlag) noexcept;
+bool IsStringCaseSensitiveW(LPCWSTR pszTextW) noexcept;
+bool IsStringCaseSensitiveA(LPCSTR pszText) noexcept;
 
-//void SciInitThemes(HWND hwnd);
+//void SciInitThemes(HWND hwnd) noexcept;
 
 #define FV_TABWIDTH				1
 #define FV_INDENTWIDTH			2
@@ -581,7 +573,7 @@ bool IsStringCaseSensitiveA(LPCSTR pszText);
 #define FV_MaskHasTabIndentWidth	(FV_TABWIDTH | FV_INDENTWIDTH)
 #define FV_MaskHasFileTabSettings	(FV_TABWIDTH | FV_INDENTWIDTH | FV_TABSASSPACES)
 
-typedef struct EditTabSettings {
+struct EditTabSettings {
 	int 	globalTabWidth;
 	int 	globalIndentWidth;
 	bool	globalTabsAsSpaces;
@@ -593,9 +585,9 @@ typedef struct EditTabSettings {
 	int		schemeIndentWidth;
 	bool	schemeTabsAsSpaces;
 	bool	schemeUseGlobalTabSettings;
-} EditTabSettings;
+};
 
-typedef struct FILEVARS {
+struct EditFileVars {
 	int 	mask;
 	int 	iTabWidth;
 	int 	iIndentWidth;
@@ -606,37 +598,36 @@ typedef struct FILEVARS {
 	int 	iEncoding;
 	char	tchEncoding[32];
 	char	tchMode[32];
-} FILEVARS, *LPFILEVARS;
+	void Init(LPCSTR lpData, DWORD cbData) noexcept;
+	void Apply() noexcept;
+	int GetEncoding() const noexcept {
+		return (mask & FV_ENCODING) ? iEncoding : CPI_NONE;
+	}
+};
 
-typedef const FILEVARS * LPCFILEVARS;
 extern EditTabSettings tabSettings;
-extern FILEVARS fvCurFile;
+extern EditFileVars fvCurFile;
 
-void	EditSetWrapStartIndent(int tabWidth, int indentWidth);
-void	EditSetWrapIndentMode(int tabWidth, int indentWidth);
-void	FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv);
-void	FileVars_Apply(LPFILEVARS lpfv);
-bool	FileVars_ParseInt(LPCSTR pszData, LPCSTR pszName, int *piValue);
-bool	FileVars_ParseStr(LPCSTR pszData, LPCSTR pszName, char *pszValue, int cchValue);
-static inline int FileVars_GetEncoding(LPCFILEVARS lpfv) {
-	return (lpfv->mask & FV_ENCODING) ? lpfv->iEncoding : CPI_NONE;
-}
+void	EditSetWrapStartIndent(int tabWidth, int indentWidth) noexcept;
+void	EditSetWrapIndentMode(int tabWidth, int indentWidth) noexcept;
+bool	FileVars_ParseInt(LPCSTR pszData, LPCSTR pszName, int *piValue) noexcept;
+bool	FileVars_ParseStr(LPCSTR pszData, LPCSTR pszName, char *pszValue, int cchValue) noexcept;
 
-typedef enum {
+enum FOLD_ACTION {
 	FOLD_ACTION_FOLD	= SC_FOLDACTION_CONTRACT,
 	FOLD_ACTION_EXPAND	= SC_FOLDACTION_EXPAND,
 	FOLD_ACTION_SNIFF	= SC_FOLDACTION_TOGGLE,
-} FOLD_ACTION;
+};
 
-void FoldExpandRange(Sci_Line lineStart, Sci_Line lineEnd);
-void FoldToggleAll(FOLD_ACTION action);
-void FoldToggleLevel(int lev, FOLD_ACTION action);
-void FoldToggleCurrentBlock(FOLD_ACTION action);
-void FoldToggleCurrentLevel(FOLD_ACTION action);
-void FoldToggleDefault(FOLD_ACTION action);
-void FoldClickAt(Sci_Position pos, int mode);
-void FoldAltArrow(int key, int mode);
-void EditGotoBlock(int menu);
+void FoldExpandRange(Sci_Line lineStart, Sci_Line lineEnd) noexcept;
+void FoldToggleAll(FOLD_ACTION action) noexcept;
+void FoldToggleLevel(int lev, FOLD_ACTION action) noexcept;
+void FoldToggleCurrentBlock(FOLD_ACTION action) noexcept;
+void FoldToggleCurrentLevel(FOLD_ACTION action) noexcept;
+void FoldToggleDefault(FOLD_ACTION action) noexcept;
+void FoldClickAt(Sci_Position pos, int mode) noexcept;
+void FoldAltArrow(int key, int mode) noexcept;
+void EditGotoBlock(int menu) noexcept;
 
 enum SelectOption {
 	SelectOption_None = 0,

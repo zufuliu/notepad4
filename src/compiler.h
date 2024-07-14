@@ -1,30 +1,13 @@
-// This file is part of Notepad2.
+// This file is part of Notepad4.
 // See License.txt for details about distribution and modification.
 #pragma once
 
-#if defined(__cplusplus) || (defined(__STDC_VERSION__) && __STDC_VERSION__ > 201710L)
-#undef NULL
-#define NULL	nullptr
-#else
-//#include <stdbool.h>
-typedef _Bool	bool;
-#define false	0
-#define true	1
-#define nullptr	NULL
-#endif
-
-#ifndef NP2_noexcept
-	#if defined(__cplusplus)
-		#define NP2_noexcept noexcept
-	#else
-		#define NP2_noexcept
-	#endif
-#endif
-
 #if defined(__GNUC__) || defined(__clang__)
 #define NP2_unreachable()	__builtin_unreachable()
+#define NP2_memchr			__builtin_memchr
 #else
 #define NP2_unreachable()	__assume(0)
+#define NP2_memchr			__builtin_char_memchr
 #endif
 
 #if defined(__clang__)
@@ -41,38 +24,31 @@ typedef _Bool	bool;
 #define NP2_assume(expr)
 #endif
 
-#if defined(__cplusplus)
-#define NP2_static_assert(expr)		static_assert(expr)
-#elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
-#define NP2_static_assert(expr)		_Static_assert(expr, #expr)
-#else
-#define NP2_static_assert(expr)		_STATIC_ASSERT(expr)
+template <typename T, typename V>
+inline T AsPointer(V value) noexcept {
+#if defined(__clang__)
+	static_assert(__is_pointer(T) && __is_integral(V) && sizeof(V) == sizeof(nullptr));
 #endif
+	return reinterpret_cast<T>(value);
+}
+
+template <typename T, typename V>
+inline T AsInteger(V value) noexcept {
+#if defined(__clang__)
+	static_assert(__is_pointer(V) && __is_integral(T));
+#endif
+	return reinterpret_cast<T>(value);
+}
 
 // suppress clang-tidy [bugprone-multi-level-implicit-pointer-conversion] warning
-#if defined(__cplusplus)
-#define NP2_void_pointer(expr)		(reinterpret_cast<void *>(expr))
-#else
-#define NP2_void_pointer(expr)		((void *)(expr))
-#endif
+template <typename T>
+inline void* AsVoidPointer(T** pp) noexcept {
+	return static_cast<void *>(pp);
+}
 
-#if (defined(__GNUC__) || defined(__clang__)) && !defined(__cplusplus)
-// https://stackoverflow.com/questions/19452971/array-size-macro-that-rejects-pointers
-// trigger error for pointer: GCC: void value not ignored as it ought to be. Clang: invalid operands to binary expression.
-#define COUNTOF(ar)	_Generic(&(ar), __typeof__((ar)[0]) **: (void)0, default: _countof(ar))
-// trigger warning for non-literal string: GCC: division by zero [-Wdiv-by-zero]. Clang: division by zero is undefined [-Wdivision-by-zero].
-#if !defined(__clang__)
-#define CSTRLEN(s)	(__builtin_constant_p(s) ? (_countof(s) - 1) : (1 / 0))
-#else
-// Clang complains when above CSTRLEN() is used in certain macros, such as EDITLEXER_HOLE()
-#define CSTRLEN(s)	(COUNTOF(s) - 1)
-#endif
-#else
-// C++ template based version of _countof(), or plain old unsafe version
+// C++ template based version of _countof()
 #define COUNTOF(ar)	_countof(ar)
 #define CSTRLEN(s)	(_countof(s) - 1)
-#endif
-#define STRSIZE(s)	(COUNTOF(s) * sizeof((s)[0]))
 
 // https://docs.microsoft.com/en-us/cpp/preprocessor/pragma-directives-and-the-pragma-keyword
 #if defined(__GNUC__) || defined(__clang__)
@@ -89,24 +65,6 @@ typedef _Bool	bool;
 #else
 #define NP2_IGNORE_WARNING_DEPRECATED_DECLARATIONS	__pragma(warning(disable: 4996))
 #endif
-
-// suppress [-Wimplicit-fallthrough] warning in C source
-#if defined(__cplusplus)
-#define FALLTHROUGH_ATTR		[[fallthrough]]
-#elif (defined(__GNUC__) && __GNUC__ >= 7) || (defined(__clang__) && __clang_major__ >= 10)
-#define FALLTHROUGH_ATTR		__attribute__((fallthrough))
-#else
-#define FALLTHROUGH_ATTR
-#endif
-
-#if defined(__cplusplus) || defined(_MSC_VER)
-	#define NP2_inline	inline
-#else
-	#define NP2_inline	static inline
-#endif
-
-// force compile C as CPP: /TP for MSVC and clang-cl, -x c++ for GCC and clang
-#define NP2_FORCE_COMPILE_C_AS_CPP	0
 
 #define PP_CONCAT_(x, y)	x##y
 #define PP_CONCAT(x, y)		PP_CONCAT_(x, y)

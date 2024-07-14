@@ -1,4 +1,4 @@
-// This file is part of Notepad2.
+// This file is part of Notepad4.
 // See License.txt for details about distribution and modification.
 //! Lexer for Boost Jam.
 
@@ -43,9 +43,9 @@ enum {
 
 enum class KeywordType {
 	None = SCE_JAM_DEFAULT,
-	Rule = SCE_JAM_RULE,
-	Class = SCE_JAM_CLASS,
 	Module = SCE_JAM_MODULE,
+	Class = SCE_JAM_CLASS,
+	Rule = SCE_JAM_RULE,
 };
 
 constexpr bool IsSpaceEquiv(int state) noexcept {

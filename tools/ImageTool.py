@@ -210,8 +210,8 @@ resize_toolbar_bitmap = resize_toolbar_bitmap_whole
 all_bitmap_size = (16, 24, 32, 40, 48)
 all_icon_size = (32, 48, 64, 80, 96)
 
-def make_metapath_toolbar_bitmap(size):
-	images = f'images/metapath/{size}x{size}'
+def make_matepath_toolbar_bitmap(size):
+	images = f'images/matepath/{size}x{size}'
 	common = f'images/{size}x{size}'
 	concat_horizontal([
 		f'{images}/Back.png',			# IDT_HISTORY_BACK
@@ -231,11 +231,11 @@ def make_metapath_toolbar_bitmap(size):
 		f'{images}/Filter.png',			# IDT_VIEW_FILTER TB_ADD_FILTER_BMP
 	], f'Toolbar{size}.bmp')
 
-def make_all_metapath_toolbar_bitmap():
+def make_all_matepath_toolbar_bitmap():
 	for size in all_bitmap_size:
-		make_metapath_toolbar_bitmap(size)
+		make_matepath_toolbar_bitmap(size)
 
-def make_notepad2_toolbar_bitmap(size):
+def make_notepad4_toolbar_bitmap(size):
 	images = f'images/{size}x{size}'
 	concat_horizontal([
 		f'{images}/New.png',			# IDT_FILE_NEW
@@ -266,9 +266,9 @@ def make_notepad2_toolbar_bitmap(size):
 		f'{images}/AlwaysOnTop.png',	# IDT_VIEW_ALWAYSONTOP
 	], f'Toolbar{size}.bmp')
 
-def make_all_notepad2_toolbar_bitmap():
+def make_all_notepad4_toolbar_bitmap():
 	for size in all_bitmap_size:
-		make_notepad2_toolbar_bitmap(size)
+		make_notepad4_toolbar_bitmap(size)
 
 def make_other_bitmap():
 	for size in all_bitmap_size:
@@ -285,18 +285,18 @@ def make_other_bitmap():
 		images = f'images/{size}x{size}'
 		concat_horizontal([f'{images}/Encoding.png', f'{images}/EncodingGray.png'], f'Encoding{size}.bmp', colorDepth)
 
-def make_notepad2_icon_and_cursor():
-	folder = 'images/icon/Notepad2'
+def make_notepad4_icon_and_cursor():
+	folder = 'images/icon/Notepad4'
 	Icon.makeIcon([
 		(f'{folder}/16.png', 32), (f'{folder}/20.png', 32), (f'{folder}/24.png', 32),
 		(f'{folder}/32.png', 32), (f'{folder}/40.png', 32), (f'{folder}/48.png', 32),
 		(f'{folder}/64.png', 32),
 		(f'{folder}/256.png', 'png'),
-	], 'Notepad2.ico')
+	], 'Notepad4.ico')
 	Icon.makeIcon([
 		(f'{folder}/16.png', 32), (f'{folder}/24.png', 32),
 		(f'{folder}/32.png', 32), (f'{folder}/48.png', 32),
-	], 'Notepad2_min.ico')
+	], 'Notepad4_min.ico')
 
 	folder = 'images/icon/Run'
 	Icon.makeIcon([
@@ -318,25 +318,25 @@ def make_notepad2_icon_and_cursor():
 	], 'Copy.cur')
 	Icon.makeCursor([(f'{folder}/32.png', 4, (5, 9))], 'Copy_min.cur')
 
-def make_metapath_icon_and_cursor():
-	folder = 'images/metapath/icon/metapath'
+def make_matepath_icon_and_cursor():
+	folder = 'images/matepath/icon/matepath'
 	Icon.makeIcon([
 		(f'{folder}/16.png', 32), (f'{folder}/20.png', 32), (f'{folder}/24.png', 32),
 		(f'{folder}/32.png', 32), (f'{folder}/40.png', 32), (f'{folder}/48.png', 32),
 		(f'{folder}/64.png', 32),
 		(f'{folder}/256.png', 'png'),
-	], 'metapath.ico')
+	], 'matepath.ico')
 	Icon.makeIcon([
 		(f'{folder}/16.png', 32), (f'{folder}/24.png', 32),
 		(f'{folder}/32.png', 32), (f'{folder}/48.png', 32),
-	], 'metapath_min.ico')
+	], 'matepath_min.ico')
 
 	for name in ('Cross1', 'Cross2', 'Items', 'Options', 'Options2', 'Progs'):
-		folder = f'images/metapath/icon/{name}'
+		folder = f'images/matepath/icon/{name}'
 		Icon.makeIcon([(f'{folder}/{size}.png', 4) for size in all_icon_size], f'{name}.ico')
 		Icon.makeIcon([(f'{folder}/32.png', 4)], f'{name}_min.ico')
 
-	folder = 'images/metapath/icon/Goto'
+	folder = 'images/matepath/icon/Goto'
 	Icon.makeIcon([
 		('images/32x32/Open.png', 4), ('images/48x48/Open.png', 4),
 		(f'{folder}/64.png', 4), (f'{folder}/80.png', 4),
@@ -344,7 +344,7 @@ def make_metapath_icon_and_cursor():
 	], 'Goto.ico', threshold=127, backColor=None)
 	Icon.makeIcon([('images/32x32/Open.png', 4)], 'Goto_min.ico', threshold=127, backColor=None)
 
-	folder = 'images/metapath/cursor/Crosshair'
+	folder = 'images/matepath/cursor/Crosshair'
 	Icon.makeCursor([
 		(f'{folder}/32.png', 4, (15, 16)), (f'{folder}/48.png', 4, (22, 24)),
 		(f'{folder}/64.png', 4, (30, 32)), (f'{folder}/80.png', 4, (37, 40)),
@@ -352,11 +352,11 @@ def make_metapath_icon_and_cursor():
 	], 'Crosshair.cur')
 	Icon.makeCursor([(f'{folder}/32.png', 4, (15, 16))], 'Crosshair_min.cur')
 
-#make_all_metapath_toolbar_bitmap()
-#make_all_notepad2_toolbar_bitmap()
+#make_all_matepath_toolbar_bitmap()
+#make_all_notepad4_toolbar_bitmap()
 #make_other_bitmap()
-#make_notepad2_icon_and_cursor()
-#make_metapath_icon_and_cursor()
+#make_notepad4_icon_and_cursor()
+#make_matepath_icon_and_cursor()
 
 #convert_image('images/16x16/Open.png', 'OpenFolder16.bmp', 4, QuantizeMethod.PngQuant)
 

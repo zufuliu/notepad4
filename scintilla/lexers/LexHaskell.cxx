@@ -1,4 +1,4 @@
-// This file is part of Notepad2.
+// This file is part of Notepad4.
 // See License.txt for details about distribution and modification.
 //! Lexer for Haskell
 
@@ -59,9 +59,9 @@ constexpr bool IsHaskellIdentifierChar(int ch) noexcept {
 
 enum class KeywordType {
 	None = SCE_HA_DEFAULT,
+	Pragma = SCE_HA_PRAGMA,
 	Module = SCE_HA_MODULE,
 	Class = SCE_HA_CLASS,
-	Pragma = SCE_HA_PRAGMA,
 };
 
 enum {

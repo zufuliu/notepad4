@@ -1,4 +1,4 @@
-// This file is part of Notepad2.
+// This file is part of Notepad4.
 // See License.txt for details about distribution and modification.
 //! Lexer for JavaScript, JScript, TypeScript, ActionScript.
 
@@ -69,10 +69,10 @@ enum {
 
 enum class KeywordType {
 	None = SCE_JS_DEFAULT,
+	Function = SCE_JS_FUNCTION_DEFINITION,
 	Class = SCE_JS_CLASS,
 	Interface = SCE_JS_INTERFACE,
 	Enum = SCE_JS_ENUM,
-	Function = SCE_JS_FUNCTION_DEFINITION,
 	Label = SCE_JS_LABEL,
 	Return = 0x40,
 };

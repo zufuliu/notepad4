@@ -1,45 +1,13 @@
-// This file is part of Notepad2.
+// This file is part of Notepad4.
 // See License.txt for details about distribution and modification.
 #pragma once
 
-#ifndef NP2_noexcept
-	#if defined(__cplusplus)
-		#define NP2_noexcept noexcept
-	#else
-		#define NP2_noexcept
-	#endif
-#endif
-
-#if defined(__cplusplus)
-#define NP2_alignas(n)		alignas(n)
-#elif defined(__GNUC__) || defined(__clang__)
-#define NP2_alignas(n)		__attribute__((aligned(n)))
-#elif defined(_MSC_VER)
-#define NP2_alignas(n)		__declspec(align(n))
-#else
-#define NP2_alignas(n)		_Alignas(n)
-#endif
-
-#if defined(__cplusplus)
-#define NP2_alignof(t)		alignof(t)
-#elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
-#define NP2_alignof(t)		_Alignof(t)
-#else
-#define NP2_alignof(t)		__alignof(t)
-#endif
-
-#define NP2DefaultPointerAlignment		16	// alignof(max_align_t)
-
 #if defined(__clang__)
 #define NP2_align_up(value, alignment)		__builtin_align_up(value, alignment)
-#define NP2_align_ptr(ptr, alignment)		__builtin_align_up(ptr, alignment)
 #define NP2_is_aligned(value, alignment)	__builtin_is_aligned(value, alignment)
-#define NP2_is_aligned_ptr(ptr, alignment)	__builtin_is_aligned(ptr, alignment)
 #else
 #define NP2_align_up(value, alignment)		(((value) + (alignment) - 1) & ~((alignment) - 1))
-#define NP2_align_ptr(ptr, alignment)		((void *)NP2_align_up((uintptr_t)(ptr), alignment))
 #define NP2_is_aligned(value, alignment)	(((value) & ((alignment) - 1)) == 0)
-#define NP2_is_aligned_ptr(ptr, alignment)	NP2_is_aligned((uintptr_t)(ptr), alignment)
 #endif
 
 // https://docs.microsoft.com/en-us/cpp/intrinsics/compiler-intrinsics
@@ -97,14 +65,14 @@
 	#define np2_ctz(x)		_tzcnt_u32(x)
 	#define np2_ctz64(x)	_tzcnt_u64(x)
 #else
-	static inline uint32_t np2_ctz(uint32_t value) NP2_noexcept {
+	inline uint32_t np2_ctz(uint32_t value) noexcept {
 		unsigned long trailing;
 		_BitScanForward(&trailing, value);
 		return trailing;
 	}
 
 #if defined(_WIN64)
-	static inline uint32_t np2_ctz64(uint64_t value) NP2_noexcept {
+	inline uint32_t np2_ctz64(uint64_t value) noexcept {
 		unsigned long trailing;
 		_BitScanForward64(&trailing, value);
 		return trailing;
@@ -123,14 +91,14 @@
 #endif
 
 #else
-	static inline uint32_t np2_bsr(uint32_t value) NP2_noexcept {
+	inline uint32_t np2_bsr(uint32_t value) noexcept {
 		unsigned long trailing;
 		_BitScanReverse(&trailing, value);
 		return trailing;
 	}
 
 #if defined(_WIN64)
-	static inline uint32_t np2_bsr64(uint64_t value) NP2_noexcept {
+	inline uint32_t np2_bsr64(uint64_t value) noexcept {
 		unsigned long trailing;
 		_BitScanReverse64(&trailing, value);
 		return trailing;
@@ -164,7 +132,7 @@
 	// https://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetParallel
 	// Bit Twiddling Hacks copyright 1997-2005 Sean Eron Anderson
 	// see also https://github.com/WojciechMula/sse-popcount
-	static __forceinline uint32_t bth_popcount(uint32_t v) NP2_noexcept {
+	constexpr uint32_t bth_popcount(uint32_t v) noexcept {
 		v = v - ((v >> 1) & 0x55555555U);
 		v = (v & 0x33333333U) + ((v >> 2) & 0x33333333U);
 		return (((v + (v >> 4)) & 0x0F0F0F0FU) * 0x01010101U) >> 24;
@@ -174,7 +142,7 @@
 	#define np2_popcount(x)		bth_popcount(x)
 
 #if defined(_WIN64)
-	static __forceinline uint64_t bth_popcount64(uint64_t v) NP2_noexcept {
+	constexpr uint64_t bth_popcount64(uint64_t v) noexcept {
 		v = v - ((v >> 1) & UINT64_C(0x5555555555555555));
 		v = (v & UINT64_C(0x3333333333333333)) + ((v >> 2) & UINT64_C(0x3333333333333333));
 		return (((v + (v >> 4)) & UINT64_C(0x0F0F0F0F0F0F0F0F)) * UINT64_C(0x0101010101010101)) >> 56;
@@ -186,46 +154,48 @@
 #endif
 
 // https://graphics.stanford.edu/~seander/bithacks.html#IntegerLog10
-#define np2_ilog10_lower(x)		(((uint32_t)np2_bsr(x) + 1)*77 >> 8)
+#define np2_ilog10_lower(x)		((static_cast<uint32_t>(np2_bsr(x)) + 1)*77 >> 8)
 #define np2_ilog10_upper(x)		(np2_ilog10_lower(x) + 1)
-#define np2_ilog10_lower64(x)	(((uint32_t)np2_bsr64(x) + 1)*77 >> 8)
+#define np2_ilog10_lower64(x)	((static_cast<uint32_t>(np2_bsr64(x)) + 1)*77 >> 8)
 #define np2_ilog10_upper64(x)	(np2_ilog10_lower64(x) + 1)
 
 // https://stackoverflow.com/questions/32945410/sse2-intrinsics-comparing-unsigned-integers
 #if NP2_USE_AVX2
+#define mm256_movemask_epi8(a)		static_cast<uint32_t>(_mm256_movemask_epi8(a))
 #define mm256_cmpge_epu8(a, b) \
 	_mm256_cmpeq_epi8(_mm256_max_epu8((a), (b)), (a))
 #define mm256_cmple_epu8(a, b)	mm256_cmpge_epu8((b), (a))
 
 #define ZeroMemory_32x1(buffer) do { \
 	const __m256i zero = _mm256_setzero_si256();						\
-	_mm256_store_si256((__m256i *)(buffer), zero);						\
+	_mm256_store_si256(reinterpret_cast<__m256i *>(buffer), zero);		\
 } while (0)
 
 #define ZeroMemory_32x2(buffer) do { \
-	const __m256i zero = _mm256_setzero_si256();						\
-	_mm256_store_si256((__m256i *)(buffer), zero);						\
-	_mm256_store_si256((__m256i *)((buffer) + sizeof(__m256i)), zero);	\
+	const __m256i zero = _mm256_setzero_si256();										\
+	_mm256_store_si256(reinterpret_cast<__m256i *>(buffer), zero);						\
+	_mm256_store_si256(reinterpret_cast<__m256i *>((buffer) + sizeof(__m256i)), zero);	\
 } while (0)
 #endif
 
 #if NP2_USE_SSE2
+#define mm_movemask_epi8(a)		static_cast<uint32_t>(_mm_movemask_epi8(a))
 #define mm_cmpge_epu8(a, b) \
 	_mm_cmpeq_epi8(_mm_max_epu8((a), (b)), (a))
 #define mm_cmple_epu8(a, b)		mm_cmpge_epu8((b), (a))
 
 #define ZeroMemory_16x2(buffer) do { \
-	const __m128 zero = _mm_setzero_ps();						\
-	_mm_store_ps((float *)(buffer), zero);						\
-	_mm_store_ps((float *)((buffer) + sizeof(__m128)), zero);	\
+	const __m128 zero = _mm_setzero_ps();										\
+	_mm_store_ps(reinterpret_cast<float *>(buffer), zero);						\
+	_mm_store_ps(reinterpret_cast<float *>((buffer) + sizeof(__m128)), zero);	\
 } while (0)
 
 #define ZeroMemory_16x4(buffer) do { \
-	const __m128 zero = _mm_setzero_ps();						\
-	_mm_store_ps((float *)(buffer), zero);						\
-	_mm_store_ps((float *)((buffer) + sizeof(__m128)), zero);	\
-	_mm_store_ps((float *)((buffer) + 2*sizeof(__m128)), zero);	\
-	_mm_store_ps((float *)((buffer) + 3*sizeof(__m128)), zero);	\
+	const __m128 zero = _mm_setzero_ps();										\
+	_mm_store_ps(reinterpret_cast<float *>(buffer), zero);						\
+	_mm_store_ps(reinterpret_cast<float *>((buffer) + sizeof(__m128)), zero);	\
+	_mm_store_ps(reinterpret_cast<float *>((buffer) + 2*sizeof(__m128)), zero);	\
+	_mm_store_ps(reinterpret_cast<float *>((buffer) + 3*sizeof(__m128)), zero);	\
 } while (0)
 #endif
 
@@ -243,20 +213,20 @@
 #define rotr8(x)				_rotr((x), 8)
 #define rotl8(x)				_rotl((x), 8)
 #else
-static inline uint32_t rotr8(uint32_t x) NP2_noexcept {
+constexpr uint32_t rotr8(uint32_t x) noexcept {
 	return ((x & 0xff) << 24) | (x >> 8);
 }
-static inline uint32_t rotl8(uint32_t x) NP2_noexcept {
+constexpr uint32_t rotl8(uint32_t x) noexcept {
 	return (x >> 24) | (x << 8);
 }
 #endif
 
-static inline uint32_t loadle_u32(const void *ptr) NP2_noexcept {
-	return *((const uint32_t *)ptr);
+inline uint32_t loadle_u32(const void *ptr) noexcept {
+	return *(static_cast<const uint32_t *>(ptr));
 }
 
 #if NP2_USE_AVX2
-static inline uint32_t loadbe_u32(const void *ptr) NP2_noexcept {
+inline uint32_t loadbe_u32(const void *ptr) noexcept {
 #if defined(__GNUC__)
 	return __builtin_bswap32(loadle_u32(ptr));
 #else
@@ -274,50 +244,49 @@ static inline uint32_t loadbe_u32(const void *ptr) NP2_noexcept {
 //#define bit_zero_high_u32(x, index)	_bextr_u32((x), 0, (index))		// BMI1
 #else
 
-static inline uint32_t loadbe_u32(const void *ptr) NP2_noexcept {
+inline uint32_t loadbe_u32(const void *ptr) noexcept {
 	return bswap32(loadle_u32(ptr));
 }
 
-static inline uint32_t andn_u32(uint32_t a, uint32_t b) NP2_noexcept {
+constexpr uint32_t andn_u32(uint32_t a, uint32_t b) noexcept {
 	return (~a) & b;
 }
 
-static inline uint32_t bit_zero_high_u32(uint32_t x, uint32_t index) NP2_noexcept {
+constexpr uint32_t bit_zero_high_u32(uint32_t x, uint32_t index) noexcept {
 	return x & ((1U << index) - 1);
 }
 #endif
 
 #if NP2_TARGET_ARM
-static inline bool bittest(const uint32_t *addr, uint32_t index) NP2_noexcept {
+inline bool bittest(const uint32_t *addr, uint32_t index) noexcept {
 	return (*addr >> index) & true;
 }
-static inline bool bittestandset(uint32_t *addr, uint32_t index) NP2_noexcept {
+inline bool bittestandset(uint32_t *addr, uint32_t index) noexcept {
 	const bool bit = (*addr >> index) & true;
 	*addr |= 1U << index;
 	return bit;
 }
-static inline bool bittestandreset(uint32_t *addr, uint32_t index) NP2_noexcept {
+inline bool bittestandreset(uint32_t *addr, uint32_t index) noexcept {
 	const bool bit = (*addr >> index) & true;
 	*addr &= ~(1U << index);
 	return bit;
 }
 #else
-static inline bool bittest(const uint32_t *addr, uint32_t index) NP2_noexcept {
-	return _bittest((const long *)addr, index);
+inline bool bittest(const uint32_t *addr, uint32_t index) noexcept {
+	return _bittest(reinterpret_cast<const long *>(addr), index);
 }
-static inline bool bittestandset(uint32_t *addr, uint32_t index) NP2_noexcept {
-	return _bittestandset((long *)addr, index);
+inline bool bittestandset(uint32_t *addr, uint32_t index) noexcept {
+	return _bittestandset(reinterpret_cast<long *>(addr), index);
 }
-static inline bool bittestandreset(uint32_t *addr, uint32_t index) NP2_noexcept {
-	return _bittestandreset((long *)addr, index);
+inline bool bittestandreset(uint32_t *addr, uint32_t index) noexcept {
+	return _bittestandreset(reinterpret_cast<long *>(addr), index);
 }
 #endif
 
-static inline bool BitTestEx(const uint32_t *start, uint32_t value) NP2_noexcept {
+inline bool BitTestEx(const uint32_t *start, uint32_t value) noexcept {
 	return bittest(start + (value >> 5), value & 31);
 }
 
-#if defined(__cplusplus)
 namespace np2 {
 inline auto ctz(uint32_t x) noexcept { return np2_ctz(x); }
 inline auto clz(uint32_t x) noexcept { return np2_clz(x); }
@@ -330,4 +299,3 @@ inline auto bsr(uint64_t x) noexcept { return np2_bsr64(x); }
 inline auto popcount(uint64_t x) noexcept { return np2_popcount64(x); }
 #endif
 }
-#endif

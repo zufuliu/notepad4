@@ -1,4 +1,4 @@
-// This file is part of Notepad2.
+// This file is part of Notepad4.
 // See License.txt for details about distribution and modification.
 //! Lexer for PHP
 
@@ -67,12 +67,12 @@ enum {
 
 enum class KeywordType {
 	None = 0,
+	Const = SCE_PHP_WORD2,
 	Class = SCE_PHP_CLASS,
 	Interface = SCE_PHP_INTERFACE,
 	Trait = SCE_PHP_TRAIT,
 	Enum = SCE_PHP_ENUM,
 	Function = SCE_PHP_FUNCTION_DEFINITION,
-	Const = SCE_PHP_WORD2,
 	Constant = SCE_PHP_CONSTANT,
 	Label = SCE_PHP_LABEL,
 };
@@ -171,7 +171,7 @@ struct PHPLexer {
 	int selectorLevel = 0;	// nested selector
 	int chBefore = 0;
 
-	PHPLexer(Sci_PositionU startPos, Sci_PositionU lengthDoc, int initStyle, Accessor &styler):
+	PHPLexer(Sci_PositionU startPos, Sci_PositionU lengthDoc, int initStyle, Accessor &styler) noexcept:
 		sc(startPos, lengthDoc, initStyle, styler) {}
 
 	void SaveOuterStyle(int style) {

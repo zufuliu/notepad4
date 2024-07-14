@@ -116,7 +116,7 @@ void WordList::Clear() noexcept {
 }
 
 bool WordList::Set(const char *s, KeywordAttr attribute) {
-	// omitted comparison for Notepad2, we don't care whether the list is same as before or not.
+	// omitted comparison for Notepad4, we don't care whether the list is same as before or not.
 	// 1. when we call SciCall_SetKeywords(), the document or lexer already changed.
 	// 2. the comparison is expensive than rebuild the list, especially for a long list.
 

@@ -1,4 +1,4 @@
-// This file is part of Notepad2.
+// This file is part of Notepad4.
 // See License.txt for details about distribution and modification.
 //! Lexer for Julia.
 
@@ -74,10 +74,10 @@ enum {
 
 enum class KeywordType {
 	None = SCE_JULIA_DEFAULT,
+	Macro = SCE_JULIA_MACRO,
 	Keyword = SCE_JULIA_WORD,
 	Type = SCE_JULIA_TYPE,
 	Function = SCE_JULIA_FUNCTION_DEFINITION,
-	Macro = SCE_JULIA_MACRO,
 };
 
 constexpr bool IsJuliaExponent(int base, int ch, int chNext) noexcept {

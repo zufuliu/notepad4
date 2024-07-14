@@ -15,6 +15,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
+# https://github.com/XhmikosR/notepad2-mod/blob/master/version.sh
 
 # This is the last svn changeset, the number and hash can be automatically
 # calculated, but it is slow to do that. So it is better to have it hardcoded.
@@ -22,7 +23,7 @@ svnrev=990
 svnhash="b27830c304eff6b778094307cfad005b6ac5f2f2"
 
 versionfile="./src/VersionRev.h"
-manifestfile="./res/Notepad2.exe.manifest"
+manifestfile="./res/Notepad4.exe.manifest"
 
 # If we are not inside a git repo use hardcoded values
 if ! git rev-parse --git-dir > /dev/null 2>&1; then
@@ -87,23 +88,22 @@ if [[ ! -f "$versionfile" ]] || [[ "$version_info" != "$(<"$versionfile")" ]]; t
 fi
 
 # Update manifest file if version information was changed.
-base_ver="4"
-new_ver="`date +%y.%m`.${ver}"
+base_ver="[0-9][0-9]"
+new_ver="`date +%m`.0.${ver}"
 newmanifest="$(sed -Ee "0,/(${base_ver}\.)([0-9.]+)/s//\1${new_ver}/g" "$manifestfile")"
 if [[ "$newmanifest" != "$(<"$manifestfile")" ]]; then
   # Update the revision number in the manifest file
   echo "$newmanifest" > "$manifestfile"
 fi
 
-# Update metapath's manifest and version information
+# Update matepath's manifest and version information
 if [[ $# -ne 0 ]]; then
-  versionfile="./metapath/src/VersionRev.h"
-  manifestfile="./metapath/res/metapath.exe.manifest"
+  versionfile="./matepath/src/VersionRev.h"
+  manifestfile="./matepath/res/matepath.exe.manifest"
   if [[ ! -f "$versionfile" ]] || [[ "$version_info" != "$(<"$versionfile")" ]]; then
     echo "$version_info" > "$versionfile"
   fi
 
-  base_ver="4"
   newmanifest="$(sed -Ee "0,/(${base_ver}\.)([0-9.]+)/s//\1${new_ver}/g" "$manifestfile")"
   if [[ "$newmanifest" != "$(<"$manifestfile")" ]]; then
     echo "$newmanifest" > "$manifestfile"

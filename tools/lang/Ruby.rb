@@ -1,4 +1,4 @@
-# Ruby 3.2 https://www.ruby-lang.org/en/documentation/
+# Ruby 3.3 https://www.ruby-lang.org/en/documentation/
 # https://docs.ruby-lang.org/en/
 # https://ruby-doc.org/
 # https://rubyreferences.github.io/
@@ -10,31 +10,23 @@ __LINE__
 __FILE__
 BEGIN
 END
-alias
-and
+alias and
 break
 defined?
-else
-elsif
-ensure
+else elsif ensure
 false
 in
-next
-nil
-not
+next nil not
 or
-redo
-rescue
-retry
-return
-self
-super
-then
-true
+redo rescue retry return
+self super
+then true
 undef
 when
-end
 yield
+
+# https://bugs.ruby-lang.org/issues/18980
+it
 
 #! Pre-defined constants	===================================================
 # globals_rdoc.html#label-Pre-defined+global+constants

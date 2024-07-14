@@ -428,7 +428,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	void SetScrollBars();
 	void ChangeSize();
 
-	void FilterSelections();
+	void FilterSelections() noexcept;
 	Sci::Position RealizeVirtualSpace(Sci::Position position, Sci::Position virtualSpace);
 	SelectionPosition RealizeVirtualSpace(SelectionPosition position);
 	void AddChar(char ch);
@@ -569,7 +569,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	virtual void SetMouseCapture(bool on) noexcept = 0;
 	virtual bool HaveMouseCapture() const noexcept = 0;
 	void SetFocusState(bool focusState);
-	virtual void UpdateBaseElements() = 0;
+	virtual void UpdateBaseElements() noexcept = 0;
 
 	Sci::Position SCICALL PositionAfterArea(PRectangle rcArea) const noexcept;
 	void StyleToPositionInView(Sci::Position pos);
@@ -633,20 +633,17 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	void SetSelectionMode(uptr_t wParam, bool setMoveExtends);
 
 	// Coercion functions for transforming WndProc parameters into pointers
-	static void *PtrFromSPtr(Scintilla::sptr_t lParam) noexcept {
-		return reinterpret_cast<void *>(lParam);
-	}
 	static const char *ConstCharPtrFromSPtr(Scintilla::sptr_t lParam) noexcept {
-		return static_cast<const char *>(PtrFromSPtr(lParam));
+		return AsPointer<const char *>(lParam);
 	}
 	static const unsigned char *ConstUCharPtrFromSPtr(Scintilla::sptr_t lParam) noexcept {
-		return static_cast<const unsigned char *>(PtrFromSPtr(lParam));
+		return AsPointer<const unsigned char *>(lParam);
 	}
 	static char *CharPtrFromSPtr(Scintilla::sptr_t lParam) noexcept {
-		return static_cast<char *>(PtrFromSPtr(lParam));
+		return AsPointer<char *>(lParam);
 	}
 	static unsigned char *UCharPtrFromSPtr(Scintilla::sptr_t lParam) noexcept {
-		return static_cast<unsigned char *>(PtrFromSPtr(lParam));
+		return AsPointer<unsigned char *>(lParam);
 	}
 	static std::string_view ViewFromParams(Scintilla::sptr_t lParam, Scintilla::uptr_t wParam) noexcept {
 		if (SPtrFromUPtr(wParam) < 0) {
@@ -654,11 +651,8 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 		}
 		return std::string_view(CharPtrFromSPtr(lParam), wParam);
 	}
-	static void *PtrFromUPtr(Scintilla::uptr_t wParam) noexcept {
-		return reinterpret_cast<void *>(wParam);
-	}
 	static const char *ConstCharPtrFromUPtr(Scintilla::sptr_t wParam) noexcept {
-		return static_cast<const char *>(PtrFromUPtr(wParam));
+		return AsPointer<const char *>(wParam);
 	}
 
 	static constexpr Scintilla::sptr_t SPtrFromUPtr(Scintilla::uptr_t wParam) noexcept {

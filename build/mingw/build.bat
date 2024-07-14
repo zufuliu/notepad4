@@ -43,9 +43,9 @@ IF /I "%~1" == "aarch64"    SET "TARGET=aarch64"    & SHIFT & GOTO CheckSecondAr
 IF /I "%~1" == "armv7"      SET "TARGET=armv7"      & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "Clang"      SET "CLANG=1"           & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "all"        SET "ACTION=all"        & SHIFT & GOTO CheckSecondArg
-IF /I "%~1" == "metapath"   SET "ACTION=metapath"   & SHIFT & GOTO CheckSecondArg
+IF /I "%~1" == "matepath"   SET "ACTION=matepath"   & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "scintilla"  SET "ACTION=scintilla"  & SHIFT & GOTO CheckSecondArg
-IF /I "%~1" == "notepad2"   SET "ACTION=notepad2"   & SHIFT & GOTO CheckSecondArg
+IF /I "%~1" == "notepad4"   SET "ACTION=notepad4"   & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "clean"      SET "ACTION=clean"      & SHIFT & GOTO CheckSecondArg
 
 

@@ -1,4 +1,4 @@
-// This file is part of Notepad2.
+// This file is part of Notepad4.
 // See License.txt for details about distribution and modification.
 //! Lexer for Dart.
 
@@ -63,9 +63,9 @@ enum {
 
 enum class KeywordType {
 	None = SCE_DART_DEFAULT,
+	Label = SCE_DART_LABEL,
 	Class = SCE_DART_CLASS,
 	Enum = SCE_DART_ENUM,
-	Label = SCE_DART_LABEL,
 	Return = 0x40,
 	While = 0x41,
 };

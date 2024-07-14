@@ -15,7 +15,7 @@ jobs:
 
     - name: Update Version Hash
       run: |
-        "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./metapath/src/VersionRev.h
+        "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./matepath/src/VersionRev.h
 
     - name: MSVC x64 Release
       run: |
@@ -48,28 +48,28 @@ jobs:
 
     - uses: actions/upload-artifact@v4
       with:
-          name: Notepad2_MSVC2019_i18n_x64
-          path: 'build\Notepad2_i18n_x64_*.zip'
+          name: Notepad4_MSVC2019_i18n_x64
+          path: 'build\Notepad4_i18n_x64_*.zip'
 
     - uses: actions/upload-artifact@v4
       with:
-          name: Notepad2_MSVC2019_i18n_Win32
-          path: 'build\Notepad2_i18n_Win32_*.zip'
+          name: Notepad4_MSVC2019_i18n_Win32
+          path: 'build\Notepad4_i18n_Win32_*.zip'
 
     - uses: actions/upload-artifact@v4
       with:
-          name: Notepad2_MSVC2019_i18n_AVX2
-          path: 'build\Notepad2_i18n_AVX2_*.zip'
+          name: Notepad4_MSVC2019_i18n_AVX2
+          path: 'build\Notepad4_i18n_AVX2_*.zip'
 
     - uses: actions/upload-artifact@v4
       with:
-          name: Notepad2_MSVC2019_i18n_ARM64
-          path: 'build\Notepad2_i18n_ARM64_*.zip'
+          name: Notepad4_MSVC2019_i18n_ARM64
+          path: 'build\Notepad4_i18n_ARM64_*.zip'
 
     - uses: actions/upload-artifact@v4
       with:
-          name: Notepad2_MSVC2019_en_ARM
-          path: 'build\Notepad2_ARM_*.zip'
+          name: Notepad4_MSVC2019_en_ARM
+          path: 'build\Notepad4_ARM_*.zip'
 
   msvc2022:
     name: Visual C++ 2022
@@ -79,7 +79,7 @@ jobs:
 
     - name: Update Version Hash
       run: |
-        "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./metapath/src/VersionRev.h
+        "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./matepath/src/VersionRev.h
 
     - name: Install v141_xp Toolset
       continue-on-error: true
@@ -128,28 +128,28 @@ jobs:
 
     - uses: actions/upload-artifact@v4
       with:
-          name: Notepad2_MSVC2022_i18n_x64
-          path: 'build\Notepad2_i18n_x64_*.zip'
+          name: Notepad4_MSVC2022_i18n_x64
+          path: 'build\Notepad4_i18n_x64_*.zip'
 
     - uses: actions/upload-artifact@v4
       with:
-          name: Notepad2_MSVC2022_i18n_Win32
-          path: 'build\Notepad2_i18n_Win32_*.zip'
+          name: Notepad4_MSVC2022_i18n_Win32
+          path: 'build\Notepad4_i18n_Win32_*.zip'
 
     - uses: actions/upload-artifact@v4
       with:
-          name: Notepad2_MSVC2022_i18n_AVX2
-          path: 'build\Notepad2_i18n_AVX2_*.zip'
+          name: Notepad4_MSVC2022_i18n_AVX2
+          path: 'build\Notepad4_i18n_AVX2_*.zip'
 
     - uses: actions/upload-artifact@v4
       with:
-          name: Notepad2_MSVC2022_i18n_ARM64
-          path: 'build\Notepad2_i18n_ARM64_*.zip'
+          name: Notepad4_MSVC2022_i18n_ARM64
+          path: 'build\Notepad4_i18n_ARM64_*.zip'
 
     - uses: actions/upload-artifact@v4
       with:
-          name: Notepad2_MSVC2022_en_ARM
-          path: 'build\Notepad2_ARM_*.zip'
+          name: Notepad4_MSVC2022_en_ARM
+          path: 'build\Notepad4_ARM_*.zip'
 
   llvm_msvc2019:
     name: LLVM (Visual C++ 2019)
@@ -159,7 +159,7 @@ jobs:
 
     - name: Update Version Hash
       run: |
-        "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./metapath/src/VersionRev.h
+        "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./matepath/src/VersionRev.h
 
     - name: Install LLVM
       run: |
@@ -187,23 +187,23 @@ jobs:
 
     - uses: actions/upload-artifact@v4
       with:
-          name: Notepad2_Clang_MSVC2019_en_x64
-          path: 'build\Notepad2_LLVM_x64_*.zip'
+          name: Notepad4_Clang_MSVC2019_en_x64
+          path: 'build\Notepad4_LLVM_x64_*.zip'
 
     - uses: actions/upload-artifact@v4
       with:
-          name: Notepad2_Clang_MSVC2019_en_Win32
-          path: 'build\Notepad2_LLVM_Win32_*.zip'
+          name: Notepad4_Clang_MSVC2019_en_Win32
+          path: 'build\Notepad4_LLVM_Win32_*.zip'
 
     - uses: actions/upload-artifact@v4
       with:
-          name: Notepad2_Clang_MSVC2019_en_AVX2
-          path: 'build\Notepad2_LLVM_AVX2_*.zip'
+          name: Notepad4_Clang_MSVC2019_en_AVX2
+          path: 'build\Notepad4_LLVM_AVX2_*.zip'
 
     - uses: actions/upload-artifact@v4
       with:
-          name: Notepad2_Clang_MSVC2019_en_ARM64
-          path: 'build\Notepad2_LLVM_ARM64_*.zip'
+          name: Notepad4_Clang_MSVC2019_en_ARM64
+          path: 'build\Notepad4_LLVM_ARM64_*.zip'
 
   llvm_msvc2022:
     name: LLVM (Visual C++ 2022)
@@ -213,7 +213,7 @@ jobs:
 
     - name: Update Version Hash
       run: |
-        "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./metapath/src/VersionRev.h
+        "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./matepath/src/VersionRev.h
 
     - name: Install v141_xp Toolset
       continue-on-error: true
@@ -257,23 +257,23 @@ jobs:
 
     - uses: actions/upload-artifact@v4
       with:
-          name: Notepad2_Clang_MSVC2022_en_x64
-          path: 'build\Notepad2_LLVM_x64_*.zip'
+          name: Notepad4_Clang_MSVC2022_en_x64
+          path: 'build\Notepad4_LLVM_x64_*.zip'
 
     - uses: actions/upload-artifact@v4
       with:
-          name: Notepad2_Clang_MSVC2022_en_Win32
-          path: 'build\Notepad2_LLVM_Win32_*.zip'
+          name: Notepad4_Clang_MSVC2022_en_Win32
+          path: 'build\Notepad4_LLVM_Win32_*.zip'
 
     - uses: actions/upload-artifact@v4
       with:
-          name: Notepad2_Clang_MSVC2022_en_AVX2
-          path: 'build\Notepad2_LLVM_AVX2_*.zip'
+          name: Notepad4_Clang_MSVC2022_en_AVX2
+          path: 'build\Notepad4_LLVM_AVX2_*.zip'
 
     - uses: actions/upload-artifact@v4
       with:
-          name: Notepad2_Clang_MSVC2022_en_ARM64
-          path: 'build\Notepad2_LLVM_ARM64_*.zip'
+          name: Notepad4_Clang_MSVC2022_en_ARM64
+          path: 'build\Notepad4_LLVM_ARM64_*.zip'
 
   llvm_mingw:
     name: llvm-mingw
@@ -283,7 +283,7 @@ jobs:
 
     - name: Update Version Hash
       run: |
-        "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./metapath/src/VersionRev.h
+        "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./matepath/src/VersionRev.h
 
     - name: Install llvm-mingw
       run: |
@@ -321,28 +321,28 @@ jobs:
 
     - uses: actions/upload-artifact@v4
       with:
-          name: Notepad2_llvm_mingw_en_x64
-          path: 'build\Notepad2_Clang_x64_*.zip'
+          name: Notepad4_llvm_mingw_en_x64
+          path: 'build\Notepad4_Clang_x64_*.zip'
 
     - uses: actions/upload-artifact@v4
       with:
-          name: Notepad2_llvm_mingw_en_Win32
-          path: 'build\Notepad2_Clang_Win32_*.zip'
+          name: Notepad4_llvm_mingw_en_Win32
+          path: 'build\Notepad4_Clang_Win32_*.zip'
 
     - uses: actions/upload-artifact@v4
       with:
-          name: Notepad2_llvm_mingw_en_AVX2
-          path: 'build\Notepad2_Clang_AVX2_*.zip'
+          name: Notepad4_llvm_mingw_en_AVX2
+          path: 'build\Notepad4_Clang_AVX2_*.zip'
 
     - uses: actions/upload-artifact@v4
       with:
-          name: Notepad2_llvm_mingw_en_ARM64
-          path: 'build\Notepad2_Clang_ARM64_*.zip'
+          name: Notepad4_llvm_mingw_en_ARM64
+          path: 'build\Notepad4_Clang_ARM64_*.zip'
 
     - uses: actions/upload-artifact@v4
       with:
-          name: Notepad2_llvm_mingw_en_ARM
-          path: 'build\Notepad2_Clang_ARM_*.zip'
+          name: Notepad4_llvm_mingw_en_ARM
+          path: 'build\Notepad4_Clang_ARM_*.zip'
 
   gcc_ucrt:
     name: ucrt GCC and Clang
@@ -352,7 +352,7 @@ jobs:
 
     - name: Update Version Hash
       run: |
-        "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./metapath/src/VersionRev.h
+        "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./matepath/src/VersionRev.h
 
     - name: Install GCC and Clang
       run: |
@@ -380,23 +380,23 @@ jobs:
 
     - uses: actions/upload-artifact@v4
       with:
-          name: Notepad2_GCC_en_x64_ucrt
-          path: 'build\Notepad2_GCC_x64_*.zip'
+          name: Notepad4_GCC_en_x64_ucrt
+          path: 'build\Notepad4_GCC_x64_*.zip'
 
     - uses: actions/upload-artifact@v4
       with:
-          name: Notepad2_GCC_en_AVX2_ucrt
-          path: 'build\Notepad2_GCC_AVX2_*.zip'
+          name: Notepad4_GCC_en_AVX2_ucrt
+          path: 'build\Notepad4_GCC_AVX2_*.zip'
 
     - uses: actions/upload-artifact@v4
       with:
-          name: Notepad2_Clang_mingw_en_x64_ucrt
-          path: 'build\Notepad2_Clang_x64_*.zip'
+          name: Notepad4_Clang_mingw_en_x64_ucrt
+          path: 'build\Notepad4_Clang_x64_*.zip'
 
     - uses: actions/upload-artifact@v4
       with:
-          name: Notepad2_Clang_mingw_en_AVX2_ucrt
-          path: 'build\Notepad2_Clang_AVX2_*.zip'
+          name: Notepad4_Clang_mingw_en_AVX2_ucrt
+          path: 'build\Notepad4_Clang_AVX2_*.zip'
 
   gcc_x86_64:
     name: 64-bit GCC and Clang
@@ -406,7 +406,7 @@ jobs:
 
     - name: Update Version Hash
       run: |
-        "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./metapath/src/VersionRev.h
+        "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./matepath/src/VersionRev.h
 
     - name: Install GCC and Clang
       run: |
@@ -434,23 +434,23 @@ jobs:
 
     - uses: actions/upload-artifact@v4
       with:
-          name: Notepad2_GCC_en_x64
-          path: 'build\Notepad2_GCC_x64_*.zip'
+          name: Notepad4_GCC_en_x64
+          path: 'build\Notepad4_GCC_x64_*.zip'
 
     - uses: actions/upload-artifact@v4
       with:
-          name: Notepad2_GCC_en_AVX2
-          path: 'build\Notepad2_GCC_AVX2_*.zip'
+          name: Notepad4_GCC_en_AVX2
+          path: 'build\Notepad4_GCC_AVX2_*.zip'
 
     - uses: actions/upload-artifact@v4
       with:
-          name: Notepad2_Clang_mingw_en_x64
-          path: 'build\Notepad2_Clang_x64_*.zip'
+          name: Notepad4_Clang_mingw_en_x64
+          path: 'build\Notepad4_Clang_x64_*.zip'
 
     - uses: actions/upload-artifact@v4
       with:
-          name: Notepad2_Clang_mingw_en_AVX2
-          path: 'build\Notepad2_Clang_AVX2_*.zip'
+          name: Notepad4_Clang_mingw_en_AVX2
+          path: 'build\Notepad4_Clang_AVX2_*.zip'
 
   gcc_i686:
     name: 32-bit GCC and Clang
@@ -460,7 +460,7 @@ jobs:
 
     - name: Update Version Hash
       run: |
-        "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./metapath/src/VersionRev.h
+        "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./matepath/src/VersionRev.h
 
     - name: Install GCC and Clang
       run: |
@@ -478,10 +478,10 @@ jobs:
 
     - uses: actions/upload-artifact@v4
       with:
-          name: Notepad2_GCC_en_Win32
-          path: 'build\Notepad2_GCC_Win32_*.zip'
+          name: Notepad4_GCC_en_Win32
+          path: 'build\Notepad4_GCC_Win32_*.zip'
 
     - uses: actions/upload-artifact@v4
       with:
-          name: Notepad2_Clang_mingw_en_Win32
-          path: 'build\Notepad2_Clang_Win32_*.zip'
+          name: Notepad4_Clang_mingw_en_Win32
+          path: 'build\Notepad4_Clang_Win32_*.zip'

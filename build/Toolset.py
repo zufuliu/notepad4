@@ -59,11 +59,11 @@ def update_all_copyright_year():
 	print('update copyright year to:', year)
 	for path in [
 		'../doc/License.txt',
-		'../metapath/doc/License.txt',
-		'../metapath/src/metapath.rc',
-		'../metapath/src/version.h',
+		'../matepath/doc/License.txt',
+		'../matepath/src/matepath.rc',
+		'../matepath/src/version.h',
 		'../scintilla/License.txt',
-		'../src/Notepad2.rc',
+		'../src/Notepad4.rc',
 		'../src/Version.h',
 		'../License.txt']:
 		update_copyright_year(path, year)
@@ -71,7 +71,7 @@ def update_all_copyright_year():
 	for path in glob.glob('../locale/*/*.rc'):
 		update_copyright_year(path, year)
 
-def dump_static_linked_function(path):
+def dump_static_linked_function(path, dumpAll=True):
 	result = {}
 	with open(path, encoding='utf-8') as fd:
 		for line in fd.readlines():
@@ -79,7 +79,7 @@ def dump_static_linked_function(path):
 				items = line.split()
 				func = items[1]
 				obj = items[-1]
-				if items[3] == 'f' and '<lambda_' not in func and items[4] != 'i':
+				if dumpAll or (items[3] == 'f' and '<lambda_' not in func and items[4] != 'i'):
 					if obj in result:
 						result[obj].append(func)
 					else:
@@ -125,6 +125,7 @@ def generate_compile_commands(target, avx2=False, cxx=False):
 		'BOOST_REGEX_STANDALONE', 'NO_CXX11_REGEX',
 	]
 	warnings = ['-Wextra', '-Wshadow', '-Wimplicit-fallthrough', '-Wformat=2', '-Wundef', '-Wcomma']
+	cxxwarn = ['-Wold-style-cast']
 
 	target_flag = '--target=' + target
 	msvc = 'msvc' in target
@@ -159,7 +160,9 @@ def generate_compile_commands(target, avx2=False, cxx=False):
 	cflags.extend(defines)
 	cxxflags.extend(defines)
 	cflags.extend(warnings)
-	cxxflags.extend(warnings)
+	cxxflags.extend(warnings + cxxwarn)
+	if cxx:
+		cflags.extend(cxxwarn)
 
 	config = [
 		('../src', ['../scintilla/include']),
@@ -167,7 +170,7 @@ def generate_compile_commands(target, avx2=False, cxx=False):
 		('../scintilla/lexlib', ['../include']),
 		('../scintilla/src', ['../include', '../lexlib']),
 		('../scintilla/win32', ['../include', '../src']),
-		('../metapath/src', []),
+		('../matepath/src', []),
 	]
 
 	def include_path(folder, path):
@@ -186,8 +189,18 @@ def generate_compile_commands(target, avx2=False, cxx=False):
 
 #update_all_project_toolset()
 #update_all_copyright_year()
-#dump_static_linked_function('bin/Release/x64/metapath.map')
-#dump_static_linked_function('bin/Release/x64/Notepad2.map')
-generate_compile_commands('x86_64-pc-windows-msvc', cxx=True)
+#dump_static_linked_function('bin/Release/x64/matepath.map')
+#dump_static_linked_function('bin/Release/Win32/matepath.map')
+#dump_static_linked_function('bin/Release/x64/Notepad4.map')
+#dump_static_linked_function('bin/Release/Win32/Notepad4.map')
+generate_compile_commands('x86_64-pc-windows-msvc', avx2=True)
+#generate_compile_commands('x86_64-pc-windows-msvc')
+#generate_compile_commands('i686-pc-windows-msvc')
+#generate_compile_commands('aarch64-pc-windows-msvc')
+#generate_compile_commands('arm-pc-windows-msvc')
+#generate_compile_commands('x86_64-w64-windows-gnu', avx2=True)
 #generate_compile_commands('x86_64-w64-windows-gnu')
+#generate_compile_commands('i686-w64-windows-gnu')
+#generate_compile_commands('aarch64-w64-windows-gnu')
+#generate_compile_commands('armv7-w64-windows-gnu')
 #run-clang-tidy --quiet -j4 1>tidy.log

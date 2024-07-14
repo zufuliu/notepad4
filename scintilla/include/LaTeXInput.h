@@ -1,10 +1,6 @@
-// This file is part of Notepad2.
+// This file is part of Notepad4.
 // See License.txt for details about distribution and modification.
 #pragma once
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 // most system already has an easy way to input Emoji, disable this to reduce binary size.
 #define NP2_ENABLE_LATEX_LIKE_EMOJI_INPUT	1
@@ -31,7 +27,7 @@ enum {
 #endif
 };
 
-static inline bool IsLaTeXInputSequenceChar(char ch) {
+constexpr bool IsLaTeXInputSequenceChar(char ch) noexcept {
 	return (ch >= 'a' && ch <= 'z')
 		|| (ch >= 'A' && ch <= 'Z')
 		|| (ch >= '0' && ch <= '9')
@@ -61,8 +57,4 @@ extern const char * const EmojiInputSequenceString;
  * @param length Length for the input sequence without the prefix '\'.
  * @return Returns the corresponding Unicode characters or zero when the input sequence is not found.
  */
-uint32_t GetLaTeXInputUnicodeCharacter(const char *sequence, size_t length);
-
-#ifdef __cplusplus
-}
-#endif
+uint32_t GetLaTeXInputUnicodeCharacter(const char *sequence, size_t length) noexcept;

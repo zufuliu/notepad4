@@ -1,4 +1,4 @@
-// This file is part of Notepad2.
+// This file is part of Notepad4.
 // See License.txt for details about distribution and modification.
 //! Lexer for C#, Vala.
 
@@ -119,8 +119,8 @@ enum class KeywordType {
 	None = SCE_CSHARP_DEFAULT,
 	Attribute = SCE_CSHARP_ATTRIBUTE,
 	Class = SCE_CSHARP_CLASS,
-	Struct = SCE_CSHARP_STRUCT,
 	Interface = SCE_CSHARP_INTERFACE,
+	Struct = SCE_CSHARP_STRUCT,
 	Enum = SCE_CSHARP_ENUM,
 	Record = SCE_CSHARP_RECORD,
 	Label = SCE_CSHARP_LABEL,

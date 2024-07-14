@@ -57,18 +57,10 @@ struct IUnknown;
 #if _WIN32_WINNT >= _WIN32_WINNT_WIN8
 #define kSystemLibraryLoadFlags		LOAD_LIBRARY_SEARCH_SYSTEM32
 #else
-#if NP2_FORCE_COMPILE_C_AS_CPP
 extern DWORD kSystemLibraryLoadFlags;
-#else
-extern "C" DWORD kSystemLibraryLoadFlags;
-#endif
 #endif
 
-#if NP2_FORCE_COMPILE_C_AS_CPP
 extern UINT g_uSystemDPI;
-#else
-extern "C" UINT g_uSystemDPI;
-#endif
 
 using namespace Scintilla;
 
@@ -121,7 +113,7 @@ void Scintilla_LoadDpiForWindow(void) {
 	}
 }
 
-UINT GetWindowDPI(HWND hwnd) NP2F_noexcept {
+UINT GetWindowDPI(HWND hwnd) noexcept {
 	if (fnGetDpiForWindow) {
 		return fnGetDpiForWindow(hwnd);
 	}
@@ -136,7 +128,7 @@ UINT GetWindowDPI(HWND hwnd) NP2F_noexcept {
 	return g_uSystemDPI;
 }
 
-int SystemMetricsForDpi(int nIndex, UINT dpi) NP2F_noexcept {
+int SystemMetricsForDpi(int nIndex, UINT dpi) noexcept {
 	if (fnGetSystemMetricsForDpi) {
 		return fnGetSystemMetricsForDpi(nIndex, dpi);
 	}
@@ -148,7 +140,7 @@ int SystemMetricsForDpi(int nIndex, UINT dpi) NP2F_noexcept {
 	return value;
 }
 
-BOOL AdjustWindowRectForDpi(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT dpi) NP2F_noexcept {
+BOOL AdjustWindowRectForDpi(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT dpi) noexcept {
 	if (fnAdjustWindowRectExForDpi) {
 		return fnAdjustWindowRectExForDpi(lpRect, dwStyle, FALSE, dwExStyle, dpi);
 	}
@@ -947,7 +939,7 @@ inline DWORD Proportional(ColourRGBA a, ColourRGBA b, XYPOSITION t) noexcept {
 	const __m128i i32x4Back = rgba_to_abgr_epi32_sse4_si32(b.AsInteger());
 	// a + t * (b - a)
 	__m128 f32x4Fore = _mm_cvtepi32_ps(_mm_sub_epi32(i32x4Back, i32x4Fore));
-	f32x4Fore = _mm_mul_ps(f32x4Fore, _mm_set1_ps((float)t));
+	f32x4Fore = _mm_mul_ps(f32x4Fore, _mm_set1_ps(static_cast<float>(t)));
 	f32x4Fore = _mm_add_ps(f32x4Fore, _mm_cvtepi32_ps(i32x4Fore));
 	// component * alpha / 255
 	const __m128 f32x4Alpha = _mm_broadcastss_ps(f32x4Fore);
@@ -965,7 +957,7 @@ inline DWORD Proportional(ColourRGBA a, ColourRGBA b, XYPOSITION t) noexcept {
 	const __m128i i32x4Back = rgba_to_abgr_epi32_sse2_si32(b.AsInteger());
 	// a + t * (b - a)
 	__m128 f32x4Fore = _mm_cvtepi32_ps(_mm_sub_epi32(i32x4Back, i32x4Fore));
-	f32x4Fore = _mm_mul_ps(f32x4Fore, _mm_set1_ps((float)t));
+	f32x4Fore = _mm_mul_ps(f32x4Fore, _mm_set1_ps(static_cast<float>(t)));
 	f32x4Fore = _mm_add_ps(f32x4Fore, _mm_cvtepi32_ps(i32x4Fore));
 	// component * alpha / 255
 	const uint32_t alpha = _mm_cvttss_si32(f32x4Fore);
@@ -1373,9 +1365,9 @@ static_assert(sizeof(D2D1_RECT_F) == sizeof(__m128));
 
 inline D2D1_RECT_F RectangleFromPRectangleEx(PRectangle prc) noexcept {
 	D2D1_RECT_F rc;
-	const __m256d f64x4 = _mm256_load_pd((double *)(&prc));
+	const __m256d f64x4 = _mm256_load_pd(reinterpret_cast<double *>(&prc));
 	const __m128 f32x4 = _mm256_cvtpd_ps(f64x4);
-	_mm_storeu_ps((float *)(&rc), f32x4);
+	_mm_storeu_ps(reinterpret_cast<float *>(&rc), f32x4);
 	return rc;
 }
 
@@ -1395,9 +1387,9 @@ static_assert(sizeof(D2D1_POINT_2F) == sizeof(__m64));
 
 inline D2D1_POINT_2F DPointFromPointEx(Point point) noexcept {
 	D2D1_POINT_2F pt;
-	const __m128d f64x2 = _mm_load_pd((double *)(&point));
+	const __m128d f64x2 = _mm_load_pd(reinterpret_cast<double *>(&point));
 	const __m128 f32x2 = _mm_cvtpd_ps(f64x2);
-	_mm_storel_pi((__m64 *)(&pt), f32x2);
+	_mm_storel_pi(reinterpret_cast<__m64 *>(&pt), f32x2);
 	return pt;
 }
 
@@ -1426,7 +1418,7 @@ inline D2D_COLOR_F ColorFromColourAlpha(ColourRGBA colour) noexcept {
 	__m128 f32x4 = _mm_cvtepi32_ps(i32x4);
 	f32x4 = _mm_div_ps(f32x4, _mm_set1_ps(255.0f));
 	D2D_COLOR_F color;
-	_mm_storeu_ps((float *)&color, f32x4);
+	_mm_storeu_ps(reinterpret_cast<float *>(&color), f32x4);
 	return color;
 }
 
@@ -3405,15 +3397,15 @@ class ListBoxX final : public ListBox {
 	int MinClientWidth() const noexcept;
 	int TextOffset() const noexcept;
 	POINT GetClientExtent() const noexcept;
-	POINT MinTrackSize() const;
-	POINT MaxTrackSize() const;
+	POINT MinTrackSize() const noexcept;
+	POINT MaxTrackSize() const noexcept;
 	void SetRedraw(bool on) noexcept;
 	void OnDoubleClick();
 	void OnSelChange();
 	void ResizeToCursor();
 	void StartResize(WPARAM) noexcept;
 	LRESULT NcHitTest(WPARAM, LPARAM) const noexcept;
-	void CentreItem(int n);
+	void CentreItem(int n) noexcept;
 	void Paint(HDC) noexcept;
 	static LRESULT CALLBACK ControlWndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 
@@ -3451,7 +3443,7 @@ public:
 	void ClearRegisteredImages() noexcept override;
 	void SetDelegate(IListBoxDelegate *lbDelegate) noexcept override;
 	void SetList(const char *list, char separator, char typesep) override;
-	void SCICALL SetOptions(ListOptions options_) noexcept override;
+	void SCICALL SetOptions(const ListOptions &options_) noexcept override;
 	void Draw(const DRAWITEMSTRUCT *pDrawItem);
 	LRESULT WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam);
 	static LRESULT CALLBACK StaticWndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam);
@@ -3786,7 +3778,7 @@ void ListBoxX::SetList(const char *list, const char separator, const char typese
 	SetRedraw(true);
 }
 
-void ListBoxX::SetOptions(ListOptions options_) noexcept {
+void ListBoxX::SetOptions(const ListOptions &options_) noexcept {
 	colorText = ColourOfElement(options_.fore, COLOR_WINDOWTEXT);
 	colorBackground = ColourOfElement(options_.back, COLOR_WINDOW);
 	colorHighlightText = ColourOfElement(options_.foreSelected, COLOR_HIGHLIGHTTEXT);
@@ -3816,14 +3808,14 @@ int ListBoxX::MinClientWidth() const noexcept {
 	return 12 * (aveCharWidth + aveCharWidth / 3);
 }
 
-POINT ListBoxX::MinTrackSize() const {
+POINT ListBoxX::MinTrackSize() const noexcept {
 	PRectangle rc = PRectangle::FromInts(0, 0, MinClientWidth(), ItemHeight());
 	AdjustWindowRect(&rc);
 	POINT ret = { static_cast<LONG>(rc.Width()), static_cast<LONG>(rc.Height()) };
 	return ret;
 }
 
-POINT ListBoxX::MaxTrackSize() const {
+POINT ListBoxX::MaxTrackSize() const noexcept {
 	const int width = maxCharWidth * maxItemCharacters + static_cast<int>(TextInset.x) * 2 +
 		TextOffset() + SystemMetricsForDpi(SM_CXVSCROLL, dpi);
 	PRectangle rc = PRectangle::FromInts(0, 0,
@@ -4024,7 +4016,7 @@ POINT ListBoxX::GetClientExtent() const noexcept {
 	return ret;
 }
 
-void ListBoxX::CentreItem(int n) {
+void ListBoxX::CentreItem(int n) noexcept {
 	// If below mid point, scroll up to centre, but with more items below if uneven
 	if (n >= 0) {
 		const POINT extent = GetClientExtent();
@@ -4050,7 +4042,7 @@ void ListBoxX::Paint(HDC hDC) noexcept {
 	const RECT rc = { 0, 0, extent.x, extent.y };
 	FillRectColour(bitmapDC, &rc, colorBackground);
 	// Paint the entire client area and vertical scrollbar
-	::SendMessage(lb, WM_PRINT, reinterpret_cast<WPARAM>(bitmapDC), PRF_CLIENT | PRF_NONCLIENT);
+	::SendMessage(lb, WM_PRINT, AsInteger<WPARAM>(bitmapDC), PRF_CLIENT | PRF_NONCLIENT);
 	::BitBlt(hDC, 0, 0, extent.x, extent.y, bitmapDC, 0, 0, SRCCOPY);
 	// Select a stock brush to prevent warnings from BoundsChecker
 	SelectBrush(bitmapDC, GetStockBrush(WHITE_BRUSH));
@@ -4061,7 +4053,7 @@ void ListBoxX::Paint(HDC hDC) noexcept {
 
 LRESULT CALLBACK ListBoxX::ControlWndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR /*dwRefData*/) {
 	try {
-		ListBoxX *lbx = static_cast<ListBoxX *>(PointerFromWindow(::GetParent(hWnd)));
+		ListBoxX *lbx = PointerFromWindow<ListBoxX *>(::GetParent(hWnd));
 		switch (iMessage) {
 		case WM_ERASEBKGND:
 			return TRUE;
@@ -4127,7 +4119,7 @@ LRESULT ListBoxX::WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam
 			WS_CHILD | WS_VSCROLL | WS_VISIBLE |
 			LBS_OWNERDRAWFIXED | LBS_NODATA | LBS_NOINTEGRALHEIGHT,
 			0, 0, 150, 80, hWnd,
-			reinterpret_cast<HMENU>(static_cast<ptrdiff_t>(ctrlID)),
+			AsPointer<HMENU>(static_cast<ptrdiff_t>(ctrlID)),
 			hinstanceParent,
 			nullptr);
 		::SetWindowSubclass(lb, ControlWndProc, 0, 0);
@@ -4158,13 +4150,13 @@ LRESULT ListBoxX::WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam
 		break;
 
 	case WM_MEASUREITEM: {
-		MEASUREITEMSTRUCT *pMeasureItem = reinterpret_cast<MEASUREITEMSTRUCT *>(lParam);
+		MEASUREITEMSTRUCT *pMeasureItem = AsPointer<MEASUREITEMSTRUCT *>(lParam);
 		pMeasureItem->itemHeight = ItemHeight();
 	}
 	break;
 
 	case WM_DRAWITEM:
-		Draw(reinterpret_cast<DRAWITEMSTRUCT *>(lParam));
+		Draw(AsPointer<DRAWITEMSTRUCT *>(lParam));
 		break;
 
 	case WM_DESTROY:
@@ -4178,7 +4170,7 @@ LRESULT ListBoxX::WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam
 		return TRUE;
 
 	case WM_GETMINMAXINFO: {
-		MINMAXINFO *minMax = reinterpret_cast<MINMAXINFO*>(lParam);
+		MINMAXINFO *minMax = AsPointer<MINMAXINFO*>(lParam);
 		minMax->ptMaxTrackSize = MaxTrackSize();
 		minMax->ptMinTrackSize = MinTrackSize();
 	}
@@ -4230,7 +4222,7 @@ LRESULT ListBoxX::WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam
 	}
 
 	case WM_NCCALCSIZE: {
-		LPRECT rect = reinterpret_cast<LPRECT>(lParam);
+		LPRECT rect = AsPointer<LPRECT>(lParam);
 		::InflateRect(rect, -ListBoxXFakeFrameSize, -ListBoxXFakeFrameSize);
 		return 0;
 	}
@@ -4284,11 +4276,11 @@ LRESULT ListBoxX::WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam
 
 LRESULT CALLBACK ListBoxX::StaticWndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam) {
 	if (iMessage == WM_CREATE) {
-		CREATESTRUCT *pCreate = reinterpret_cast<CREATESTRUCT *>(lParam);
+		CREATESTRUCT *pCreate = AsPointer<CREATESTRUCT *>(lParam);
 		SetWindowPointer(hWnd, pCreate->lpCreateParams);
 	}
 	// Find C++ object associated with window.
-	ListBoxX *lbx = static_cast<ListBoxX *>(PointerFromWindow(hWnd));
+	ListBoxX *lbx = PointerFromWindow<ListBoxX *>(hWnd);
 	if (lbx) {
 		return lbx->WndProc(hWnd, iMessage, wParam, lParam);
 	} else {

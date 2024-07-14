@@ -1,4 +1,4 @@
-// This file is part of Notepad2.
+// This file is part of Notepad4.
 // See License.txt for details about distribution and modification.
 #define _CRT_SECURE_NO_WARNINGS
 #include <windows.h>
@@ -13,8 +13,8 @@
 #pragma comment(lib, "gdi32.lib")
 #endif
 
-// cl /EHsc /std:c++20 /DNDEBUG /Ox /Ot /FAcs /GS- /GR- /Gv /W4 /arch:AVX2 GraphicTest.cpp
-// clang-cl /EHsc /std:c++20 /DNDEBUG /Ox /Ot /FA /GS- /GR- /Gv /W4 -march=x86-64-v3 GraphicTest.cpp
+// cl /EHsc /std:c++20 /DNDEBUG /O2 /FAcs /GS- /GR- /Gv /W4 /arch:AVX2 GraphicTest.cpp
+// clang-cl /EHsc /std:c++20 /DNDEBUG /O2 /FA /GS- /GR- /Gv /W4 -march=x86-64-v3 GraphicTest.cpp
 // g++ -S -std=gnu++20 -DNDEBUG -O3 -fno-rtti -Wall -Wextra -march=x86-64-v3 GraphicTest.cpp
 
 struct ColourRGBA {
@@ -43,7 +43,7 @@ struct ColourRGBA {
 };
 
 static inline uint32_t RGBQuadToUInt32(RGBQUAD quad) noexcept {
-	return *(uint32_t *)((void *)(&quad));
+	return *reinterpret_cast<const uint32_t *>(&quad);
 }
 
 union DualPixel {
@@ -54,7 +54,7 @@ union DualPixel {
 #if 0 // dump
 void mm_dump_epi8(const char *msg, __m128i i32x4) noexcept {
 	uint8_t dummy[16];
-	_mm_storeu_si128((__m128i *)dummy, i32x4);
+	_mm_storeu_si128(reinterpret_cast<__m128i *>(dummy), i32x4);
 	printf("%s: {%02x %02x %02x %02x}{%02x %02x %02x %02x}{%02x %02x %02x %02x}{%02x %02x %02x %02x}\n", msg,
 		dummy[15], dummy[14], dummy[13], dummy[12], dummy[11], dummy[10], dummy[9], dummy[8],
 		dummy[7],  dummy[6],  dummy[5],  dummy[4],  dummy[3],  dummy[2],  dummy[1], dummy[0]);
@@ -69,7 +69,7 @@ void mm_dump_ps(const char *msg, __m128 f32x4) noexcept {
 #if NP2_USE_AVX2
 void mm256_dump_epi8(const char *msg, __m256i i32x8) noexcept {
 	uint8_t dummy[32];
-	_mm256_storeu_si256((__m256i *)dummy, i32x8);
+	_mm256_storeu_si256(reinterpret_cast<__m256i *>(dummy), i32x8);
 	printf("%s: {%02x %02x %02x %02x}{%02x %02x %02x %02x}{%02x %02x %02x %02x}{%02x %02x %02x %02x} "
 		"{%02x %02x %02x %02x}{%02x %02x %02x %02x}{%02x %02x %02x %02x}{%02x %02x %02x %02x}\n", msg,
 		dummy[31], dummy[30], dummy[29], dummy[28], dummy[27], dummy[26], dummy[25], dummy[24],
@@ -296,7 +296,7 @@ void BGRAFromRGBA_sse4_2x1(void *pixelsBGRA, const void *pixelsRGBA, size_t coun
 		i16x8Color = _mm_blend_epi16(i16x8Alpha, i16x8Color, 0x77);
 
 		i16x8Color = pack_color_epi16_sse2_si128(i16x8Color);
-		_mm_storel_epi64((__m128i *)pbgra, i16x8Color);
+		_mm_storel_epi64(reinterpret_cast<__m128i *>(pbgra), i16x8Color);
 	}
 }
 
@@ -338,7 +338,7 @@ void BGRAFromRGBA_sse2_1x2(void *pixelsBGRA, const void *pixelsRGBA, size_t coun
 		i16x8Color = _mm_andnot_si128(_mm_set_epi32(0x00ff0000, 0, 0x00ff0000, 0), i16x8Color);
 		i16x8Color = _mm_or_si128(i16x8Alpha, i16x8Color);
 		i16x8Color = pack_color_epi16_sse2_si128(i16x8Color);
-		_mm_storel_epi64((__m128i *)pbgra, i16x8Color);
+		_mm_storel_epi64(reinterpret_cast<__m128i *>(pbgra), i16x8Color);
 	}
 }
 
@@ -378,7 +378,7 @@ uint32_t Proportional_sse4_align(ColourRGBA a, ColourRGBA b, double t) noexcept 
 	__m128i i32x4Back = rgba_to_abgr_epi32_sse4_si32(b.AsInteger());
 	// a + t * (b - a)
 	__m128 f32x4Fore = _mm_cvtepi32_ps(_mm_sub_epi32(i32x4Back, i32x4Fore));
-	f32x4Fore = _mm_mul_ps(f32x4Fore, _mm_set1_ps((float)t));
+	f32x4Fore = _mm_mul_ps(f32x4Fore, _mm_set1_ps(static_cast<float>(t)));
 	f32x4Fore = _mm_add_ps(f32x4Fore, _mm_cvtepi32_ps(i32x4Fore));
 	// component * alpha / 255
 	//__m128 f32x4Alpha = _mm_shuffle_ps(f32x4Fore, f32x4Fore, 0);
@@ -396,7 +396,7 @@ uint32_t Proportional_sse4_blend(ColourRGBA a, ColourRGBA b, double t) noexcept 
 	__m128i i32x4Back = rgba_to_bgra_epi32_sse4_si32(b.AsInteger());
 	// a + t * (b - a)
 	__m128 f32x4Fore = _mm_cvtepi32_ps(_mm_sub_epi32(i32x4Back, i32x4Fore));
-	f32x4Fore = _mm_mul_ps(f32x4Fore, _mm_set1_ps((float)t));
+	f32x4Fore = _mm_mul_ps(f32x4Fore, _mm_set1_ps(static_cast<float>(t)));
 	f32x4Fore = _mm_add_ps(f32x4Fore, _mm_cvtepi32_ps(i32x4Fore));
 	// component * alpha / 255
 	__m128 f32x4Alpha = _mm_shuffle_ps(f32x4Fore, f32x4Fore, 0xff);
@@ -413,7 +413,7 @@ uint32_t Proportional_sse2(ColourRGBA a, ColourRGBA b, double t) noexcept {
 	__m128i i32x4Back = rgba_to_abgr_epi32_sse2_si32(b.AsInteger());
 	// a + t * (b - a)
 	__m128 f32x4Fore = _mm_cvtepi32_ps(_mm_sub_epi32(i32x4Back, i32x4Fore));
-	f32x4Fore = _mm_mul_ps(f32x4Fore, _mm_set1_ps((float)t));
+	f32x4Fore = _mm_mul_ps(f32x4Fore, _mm_set1_ps(static_cast<float>(t)));
 	f32x4Fore = _mm_add_ps(f32x4Fore, _mm_cvtepi32_ps(i32x4Fore));
 	// component * alpha / 255
 	const uint32_t alpha = _mm_cvttss_si32(f32x4Fore);
@@ -520,9 +520,9 @@ void TestBitmapAlphaBlend(const char *path, const uint32_t crDest, const BYTE al
 		const WORD blue = GetBValue(crDest) * (255 ^ alpha);
 		for (size_t x = 0; x < pixelCount; x++, prgba++) {
 			RGBQUAD quad = *prgba;
-			quad.rgbRed = (BYTE)(((quad.rgbRed * alpha) + red) / 255);
-			quad.rgbGreen = (BYTE)(((quad.rgbGreen * alpha) + green) / 255);
-			quad.rgbBlue = (BYTE)(((quad.rgbBlue * alpha) + blue) / 255);
+			quad.rgbRed = static_cast<BYTE>(((quad.rgbRed * alpha) + red) / 255);
+			quad.rgbGreen = static_cast<BYTE>(((quad.rgbGreen * alpha) + green) / 255);
+			quad.rgbBlue = static_cast<BYTE>(((quad.rgbBlue * alpha) + blue) / 255);
 			scalar[x] = RGBQuadToUInt32(quad);
 		}
 	}
@@ -555,8 +555,8 @@ void TestBitmapAlphaBlend(const char *path, const uint32_t crDest, const BYTE al
 		std::vector<uint32_t> xmm;
 		xmm.resize(pixelCount);
 		constexpr size_t offset = 0;
-		const __m128i *prgba = (const __m128i *)(data.data() + offset);
-		__m128i *dest = (__m128i *)(xmm.data() + offset);
+		const __m128i *prgba = reinterpret_cast<__m128i *>(data.data() + offset);
+		__m128i *dest = reinterpret_cast<__m128i *>(xmm.data() + offset);
 
 		const __m128i i16x8Alpha = _mm_shuffle_epi32(mm_setlo_alpha_epi16(alpha), 0x44);
 		__m128i i16x8Back = _mm_shuffle_epi32(rgba_to_bgra_epi16_sse2_si32(crDest), 0x44);
@@ -621,8 +621,8 @@ void TestBitmapAlphaBlend(const char *path, const uint32_t crDest, const BYTE al
 	{ // sse4 2x1
 		std::vector<uint32_t> xmm;
 		xmm.resize(pixelCount);
-		const uint64_t *prgba = (uint64_t *)data.data();
-		uint64_t *dest = (uint64_t *)xmm.data();
+		const uint64_t *prgba = reinterpret_cast<uint64_t *>(data.data());
+		uint64_t *dest = reinterpret_cast<uint64_t *>(xmm.data());
 
 		//__m128i i16x8Alpha = _mm_shuffle_epi32(mm_setlo_alpha_epi16(alpha), 0x44);
 		__m128i i16x8Alpha = _mm_broadcastw_epi16(_mm_cvtsi32_si128(alpha));
@@ -635,7 +635,7 @@ void TestBitmapAlphaBlend(const char *path, const uint32_t crDest, const BYTE al
 			i16x8Fore = mm_div_epu16_by_255(i16x8Fore);
 			i16x8Fore = _mm_blend_epi16(origin, i16x8Fore, 0x77);
 			i16x8Fore = pack_color_epi16_sse2_si128(i16x8Fore);
-			_mm_storel_epi64((__m128i *)dest, i16x8Fore);
+			_mm_storel_epi64(reinterpret_cast<__m128i *>(dest), i16x8Fore);
 		}
 		for (size_t x = 0; x < pixelCount; x++) {
 			if (scalar[x] != xmm[x]) {
@@ -647,8 +647,8 @@ void TestBitmapAlphaBlend(const char *path, const uint32_t crDest, const BYTE al
 	{ // avx2 4x1
 		std::vector<uint32_t> xmm;
 		xmm.resize(pixelCount);
-		const __m128i *prgba = (__m128i *)data.data();
-		__m128i *dest = (__m128i *)xmm.data();
+		const __m128i *prgba = reinterpret_cast<__m128i *>(data.data());
+		__m128i *dest = reinterpret_cast<__m128i *>(xmm.data());
 
 		const __m256i i16x16Alpha = _mm256_broadcastw_epi16(_mm_cvtsi32_si128(alpha));
 		const __m256i i16x16Back = _mm256_broadcastq_epi64(_mm_mullo_epi16(rgba_to_bgra_epi16_sse4_si32(crDest), mm_xor_alpha_epi16(_mm256_castsi256_si128(i16x16Alpha))));

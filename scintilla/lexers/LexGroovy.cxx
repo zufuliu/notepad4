@@ -1,4 +1,4 @@
-// This file is part of Notepad2.
+// This file is part of Notepad4.
 // See License.txt for details about distribution and modification.
 //! Lexer for Groovy, Gradle.
 
@@ -77,8 +77,8 @@ enum class KeywordType {
 	Annotation = SCE_GROOVY_ANNOTATION,
 	Class = SCE_GROOVY_CLASS,
 	Interface = SCE_GROOVY_INTERFACE,
-	Enum = SCE_GROOVY_ENUM,
 	Trait = SCE_GROOVY_TRAIT,
+	Enum = SCE_GROOVY_ENUM,
 	Return = 0x40,
 	While = 0x41,
 };

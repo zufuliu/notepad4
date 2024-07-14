@@ -11,11 +11,11 @@ images:
 		Bottom right: Chinese character 宇 (universal)
 
 	res/OpenFolder.bmp	images/Open.svg
-	metapath/res/OpenFolder.bmp
-	metapath/res/Goto.ico
+	matepath/res/OpenFolder.bmp
+	matepath/res/Goto.ico
 
 	res/Run.ico			images/Launch.svg
-	metapath/res/Run.ico
+	matepath/res/Run.ico
 
 	16 color bitmap:
 		res/Prev.bmp		Prev.svg
@@ -26,10 +26,10 @@ images:
 	https://lib.rs/crates/pngquant, https://github.com/kornelski/pngquant
 	https://lib.rs/crates/oxipng, https://github.com/shssoichiro/oxipng
 
-	pngquant --force --verbose 256 --strip --output Notepad2-quant256.png Notepad2.png
-	save Notepad2-quant256.png as Notepad2-q256.png with Paint.NET
-	oxipng --strip all --nc --out Notepad2-256.png Notepad2-q256.png
+	pngquant --force --verbose 256 --strip --output Notepad4-quant256.png Notepad4.png
+	save Notepad4-quant256.png as Notepad4-q256.png with Paint.NET
+	oxipng --strip all --nc --out Notepad4-256.png Notepad4-q256.png
 
-	pngquant --force --verbose 256 --strip --output metapath-quant256.png metapath.png
-	save metapath-quant256.png as metapath-q256.png with Paint.NET
-	oxipng --strip all --nc --out metapath-256.png metapath-q256.png
+	pngquant --force --verbose 256 --strip --output matepath-quant256.png matepath.png
+	save matepath-quant256.png as matepath-q256.png with Paint.NET
+	oxipng --strip all --nc --out matepath-256.png matepath-q256.png

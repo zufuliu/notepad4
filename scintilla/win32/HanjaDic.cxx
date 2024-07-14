@@ -107,7 +107,7 @@ class HanjaDic {
 			hr = CoCreateInstance(CLSID_HanjaDic, nullptr,
 				//CLSCTX_INPROC_SERVER, __uuidof(IHanjaDic),
 				CLSCTX_INPROC_SERVER, IID_IHanjaDic,
-				reinterpret_cast<LPVOID *>(&instance));
+				AsPPVArgs(&instance));
 			if (SUCCEEDED(hr)) {
 				HJinterface.reset(instance);
 				hr = instance->OpenMainDic();
@@ -196,7 +196,7 @@ bool GetHangulOfHanja(std::wstring &inout) noexcept {
 }
 
 #if 0
-// cl /utf-8 /W4 /EHsc /std:c++20 /GS- /GR- /Gv /Ox /FAcs /DNDEBUG /DUNICODE /I../src HanjaDic.cxx
+// cl /utf-8 /W4 /EHsc /std:c++20 /O2 /GS- /GR- /Gv /FAcs /DNDEBUG /DUNICODE /I../src HanjaDic.cxx
 // g++ -Wall -Wextra -std=gnu++20 -O2 -fno-rtti -DNDEBUG -DUNICODE -I../src HanjaDic.cxx -lole32 -loleaut32
 #ifdef _MSC_VER
 #pragma comment(lib, "ole32.lib")

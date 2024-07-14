@@ -282,16 +282,16 @@ def checkUnicodeCaseSensitivity(filename=None):
 #include "../include/VectorISA.h"
 #define COUNTOF(a)		(sizeof(a) / sizeof(a[0]))
 
-typedef struct UnicodeCaseSensitivityRange {
+struct UnicodeCaseSensitivityRange {
 	uint32_t low;
 	uint32_t high;
 	uint32_t offset;
-} UnicodeCaseSensitivityRange;
+};
 
 """)
 		fd.write('\n'.join(output))
 		fd.write(r"""
-bool IsCharacterCaseSensitive(uint32_t ch) {
+bool IsCharacterCaseSensitive(uint32_t ch) noexcept {
 	if (ch < kUnicodeCaseSensitiveFirst) {
 		return BitTestEx(UnicodeCaseSensitivityMask, ch);
 	}
@@ -341,7 +341,7 @@ def updateCaseSensitivity(filename, test=False):
 
 	config = {
 		'tableName': 'UnicodeCaseSensitivityIndex',
-		'function': """static inline bool IsCharacterCaseSensitiveSecond(uint32_t ch) {
+		'function': """static inline bool IsCharacterCaseSensitiveSecond(uint32_t ch) noexcept {
 	const uint32_t lower = ch & 31;
 	ch = (ch - kUnicodeCaseSensitiveFirst) >> 5;""",
 	}
@@ -379,7 +379,7 @@ def updateCaseSensitivity(filename, test=False):
 		fd.write('\n'.join(output))
 		fd.write(r"""
 
-bool IsCharacterCaseSensitive(uint32_t ch)	{
+bool IsCharacterCaseSensitive(uint32_t ch) noexcept {
 	if (ch < kUnicodeCaseSensitiveFirst) {
 		return BitTestEx(UnicodeCaseSensitivityMask, ch);
 	}
@@ -501,7 +501,7 @@ def updateCaseSensitivityBlock(filename, test=False):
 	# when diff < 0, diff >> 8 has 24-bit (or 32-bit using arithmetic shift right) 1s on the right.
 	function = f"""
 // case sensitivity for ch in [kUnicodeCaseSensitiveFirst, kUnicodeCaseSensitiveMax]
-static inline bool IsCharacterCaseSensitiveSecond(uint32_t ch) {{
+static inline bool IsCharacterCaseSensitiveSecond(uint32_t ch) noexcept {{
 	uint32_t block = ch >> {blockSizeBit + 5};
 	uint32_t index = UnicodeCaseSensitivityIndex[block & {hex(blockIndexCount - 1)}];
 	block = index ^ (block >> {blockIndexValueBit - indexBitCount});
@@ -529,7 +529,7 @@ static inline bool IsCharacterCaseSensitiveSecond(uint32_t ch) {{
 		fd.write('\n'.join(output))
 		fd.write(r"""
 
-bool IsCharacterCaseSensitive(uint32_t ch) {
+bool IsCharacterCaseSensitive(uint32_t ch) noexcept {
 	if (ch < kUnicodeCaseSensitiveFirst) {
 		return BitTestEx(UnicodeCaseSensitivityMask, ch);
 	}
@@ -545,6 +545,6 @@ bool IsCharacterCaseSensitive(uint32_t ch) {
 updateCaseConvert()
 #checkUnicodeCaseSensitivity('caseList.cpp')
 #updateCaseSensitivity('CaseSensitivity.cpp', True)
-#updateCaseSensitivity('../../src/EditEncoding.c')
+#updateCaseSensitivity('../../src/EditEncoding.cpp')
 #updateCaseSensitivityBlock('caseBlock.cpp', True)
-updateCaseSensitivityBlock('../../src/EditEncoding.c')
+updateCaseSensitivityBlock('../../src/EditEncoding.cpp')

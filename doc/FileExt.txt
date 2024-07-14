@@ -223,6 +223,9 @@ blockdiag
 	diag
 
 
+Cangjie Source
+	cj
+
 CIL Assembly
 	il
 
@@ -511,6 +514,10 @@ Resource Script
 Rust Source
 	rs
 
+
+SAS File
+	sas
+	sps				https://libguides.library.kent.edu/SAS/syntax
 
 Scala Script
 	scala

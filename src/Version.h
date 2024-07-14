@@ -1,6 +1,6 @@
 /******************************************************************************
 *
-* Notepad2-mod
+* Notepad4
 *
 * Version.h
 *
@@ -18,26 +18,24 @@
 #define DO_STRINGIFY(x)		TEXT(#x)
 #define STRINGIFY(x)		DO_STRINGIFY(x)
 
-#define VERSION_MAJOR				4
-
-#define MY_APPNAME					L"Notepad2"
-#define MY_APPNAME_DESCRIPTION		L"Notepad2 Text Editor"
-#define VERSION_FILEVERSION_NUM		VERSION_MAJOR,VERSION_MINOR,VERSION_BUILD_NUM,VERSION_REV
-#define VERSION_FILEVERSION			STRINGIFY(VERSION_MAJOR) "." STRINGIFY(VERSION_MINOR) "." \
+#define MY_APPNAME					L"Notepad4"
+#define MY_APPNAME_DESCRIPTION		L"Notepad4 Text Editor"
+#define VERSION_FILEVERSION_NUM		VERSION_MINOR,VERSION_BUILD_NUM,0,VERSION_REV
+#define VERSION_FILEVERSION			STRINGIFY(VERSION_MINOR) "." \
 									STRINGIFY(VERSION_BUILD) "." STRINGIFY(VERSION_REV)
-#define VERSION_LEGALCOPYRIGHT		L"\xA9 2004-2024 Florian Balmer and all contributors"
-#define VERSION_COMPANYNAME			L"Florian Balmer et al."
+#define VERSION_LEGALCOPYRIGHT		L"\xA9 2011-2024 Zufu Liu and all contributors"
+#define VERSION_COMPANYNAME			L"Zufu Liu et al."
 #define VERSION_WEBPAGE_DISPLAY		L"flo's freeware - https://www.flos-freeware.ch"
 #define VERSION_EMAIL_DISPLAY		L"florian.balmer@gmail.com"
 #define VERSION_MODPAGE_DISPLAY		L"https://xhmikosr.github.io/notepad2-mod/"
-#define VERSION_NEWPAGE_DISPLAY		L"https://github.com/zufuliu/notepad2"
+#define VERSION_NEWPAGE_DISPLAY		L"https://github.com/zufuliu/notepad4"
 #define VERSION_SCIPAGE_DISPLAY		L"https://www.scintilla.org/"
 
-#define HELP_LINK_LATEST_RELEASE	L"https://github.com/zufuliu/notepad2/releases"
-#define HELP_LINK_LATEST_BUILD		L"https://github.com/zufuliu/notepad2/actions"
-#define HELP_LINK_REPORT_ISSUE		L"https://github.com/zufuliu/notepad2/issues"
-#define HELP_LINK_FEATURE_REQUEST	L"https://github.com/zufuliu/notepad2/issues"
-#define HELP_LINK_ONLINE_WIKI		L"https://github.com/zufuliu/notepad2/wiki"
+#define HELP_LINK_LATEST_RELEASE	L"https://github.com/zufuliu/notepad4/releases"
+#define HELP_LINK_LATEST_BUILD		L"https://github.com/zufuliu/notepad4/actions"
+#define HELP_LINK_REPORT_ISSUE		L"https://github.com/zufuliu/notepad4/issues"
+#define HELP_LINK_FEATURE_REQUEST	L"https://github.com/zufuliu/notepad4/issues"
+#define HELP_LINK_ONLINE_WIKI		L"https://github.com/zufuliu/notepad4/wiki"
 
 #define VERSION_BUILD_INFO_LIB		L",\nScintilla 5.5.0."
 #define VERSION_BUILD_INFO_FORMAT	L"Compiled on " __DATE__ L" with %s %d.%d.%d" VERSION_BUILD_INFO_LIB
@@ -94,6 +92,6 @@
 		#define VERSION_FILEVERSION_ARCH	L" (32-bit) "
 	#endif
 #endif
-#define VERSION_FILEVERSION_LONG	MY_APPNAME VERSION_FILEVERSION_ARCH STRINGIFY(VERSION_MAJOR) L"." \
+#define VERSION_FILEVERSION_LONG	MY_APPNAME VERSION_FILEVERSION_ARCH \
 									STRINGIFY(VERSION_MINOR) L"." STRINGIFY(VERSION_BUILD) \
 									L" " VERSION_REV_FULL

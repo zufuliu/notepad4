@@ -606,7 +606,7 @@ inline bool AllGraphicASCII(std::string_view text) noexcept {
 	if (length >= sizeof(__m128i)) {
 		const char * const xend = end - sizeof(__m128i);
 		do {
-			const __m128i chunk = _mm_loadu_si128((const __m128i *)ptr);
+			const __m128i chunk = _mm_loadu_si128(reinterpret_cast<const __m128i *>(ptr));
 			if (_mm_movemask_epi8(chunk)) {
 				return false;
 			}
@@ -615,7 +615,7 @@ inline bool AllGraphicASCII(std::string_view text) noexcept {
 	}
 #if 0//NP2_USE_AVX2
 	if (const uint32_t remain = length & (sizeof(__m128i) - 1)) {
-		const __m128i chunk = _mm_loadu_si128((const __m128i *)ptr);
+		const __m128i chunk = _mm_loadu_si128(reinterpret_cast<const __m128i *>(ptr));
 		if (bit_zero_high_u32(_mm_movemask_epi8(chunk), remain)) {
 			return false;
 		}
@@ -823,7 +823,7 @@ LineLayout *LineLayoutCache::Retrieve(Sci::Line lineNumber, Sci::Line lineCaret,
 namespace {
 
 // Simply pack the (maximum 4) character bytes into an int
-#if 1 //! use the loop code to pass AddressSanitizer
+#if USE_ADDRESS_SANITIZER
 constexpr unsigned int KeyFromString(std::string_view charBytes) noexcept {
 	PLATFORM_ASSERT(charBytes.length() <= 4);
 	unsigned int k = 0;

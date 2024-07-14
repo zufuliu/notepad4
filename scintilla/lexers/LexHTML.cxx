@@ -339,7 +339,7 @@ constexpr bool IsAttributeContinue(int ch) noexcept {
 
 constexpr bool IsOKBeforeJSRE(int ch) noexcept {
 	// TODO: also handle + and - (except if they're part of ++ or --) and return keywords
-	return AnyOf(ch, '(', '[', '{', '=', ',', ':', ';', '!', '%', '^', '&', '*', '|', '?', '~', '>');
+	return AnyOf(ch, '(', '[', '{', '=', ',', ':', ';', '!', '%', '^', '&', '*', '|', '?', '~', '>', ' ');
 }
 
 void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler, bool isXml) {
@@ -574,7 +574,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 
 		/////////////////////////////////////
 		// handle the start of PHP pre-processor = Non-HTML
-		else if ((state != SCE_H_ASPAT) &&
+		else if ((state != SCE_H_ASPAT && state != SCE_H_CDATA) &&
 		         (ch == '<') &&
 		         (chNext == '?') &&
 				 !IsScriptCommentState(state)) {
@@ -603,7 +603,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 		}
 
 		// handle the start of ASP pre-processor = Non-HTML
-		else if (!isCommentASPState(state) && (ch == '<') && (chNext == '%')) {
+		else if (state != SCE_H_CDATA && !isCommentASPState(state) && (ch == '<') && (chNext == '%')) {
 			styler.ColorTo(i, StateToPrint);
 			beforePreProc = state;
 			if (inScriptType == eNonHtmlScript)

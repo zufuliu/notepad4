@@ -1,4 +1,4 @@
-// This file is part of Notepad2.
+// This file is part of Notepad4.
 // See License.txt for details about distribution and modification.
 //! Lexer for CSV.
 
@@ -31,8 +31,8 @@ enum {
 	CsvRowGroup = 100,
 };
 
-constexpr uint32_t asU4(const char *s) noexcept {
-	return *(const uint32_t *)s;
+inline uint32_t asU4(const char *s) noexcept {
+	return *reinterpret_cast<const uint32_t *>(s);
 }
 
 void ColouriseCSVDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList /*keywordLists*/, Accessor &styler) {

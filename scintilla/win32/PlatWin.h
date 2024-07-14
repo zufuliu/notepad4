@@ -39,9 +39,6 @@
 #pragma warning(pop)
 #endif
 
-// force compile C as CPP
-#define NP2_FORCE_COMPILE_C_AS_CPP		0
-
 // official Scintilla use std::call_once(), which increases binary about 12 KiB.
 #define USE_STD_CALL_ONCE		0
 #if !USE_STD_CALL_ONCE && (_WIN32_WINNT >= _WIN32_WINNT_VISTA)
@@ -64,24 +61,12 @@
 
 #else
 #define NP2_HAS_GETDPIFORWINDOW					0
-#if NP2_FORCE_COMPILE_C_AS_CPP
-#define NP2F_noexcept noexcept
 extern UINT GetWindowDPI(HWND hwnd) noexcept;
 extern int SystemMetricsForDpi(int nIndex, UINT dpi) noexcept;
 extern BOOL AdjustWindowRectForDpi(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT dpi) noexcept;
-#else
-#define NP2F_noexcept
-extern "C" UINT GetWindowDPI(HWND hwnd);
-extern "C" int SystemMetricsForDpi(int nIndex, UINT dpi);
-extern "C" BOOL AdjustWindowRectForDpi(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT dpi);
-#endif
 #endif
 
-#if NP2_FORCE_COMPILE_C_AS_CPP
 extern WCHAR defaultTextFontName[LF_FACESIZE];
-#else
-extern "C" WCHAR defaultTextFontName[LF_FACESIZE];
-#endif
 
 namespace Scintilla::Internal {
 
@@ -104,17 +89,17 @@ static_assert(sizeof(RECT) == sizeof(__m128i));
 
 inline PRectangle PRectangleFromRectEx(RECT rc) noexcept {
 	PRectangle prc;
-	const __m128i i32x4 = _mm_load_si128((__m128i *)(&rc));
+	const __m128i i32x4 = _mm_load_si128(reinterpret_cast<__m128i *>(&rc));
 	const __m256d f64x4 = _mm256_cvtepi32_pd(i32x4);
-	_mm256_storeu_pd((double *)(&prc), f64x4);
+	_mm256_storeu_pd(reinterpret_cast<double *>(&prc), f64x4);
 	return prc;
 }
 
 inline RECT RectFromPRectangleEx(PRectangle prc) noexcept {
 	RECT rc;
-	const __m256d f64x4 = _mm256_load_pd((double *)(&prc));
+	const __m256d f64x4 = _mm256_load_pd(reinterpret_cast<double *>(&prc));
 	const __m128i i32x4 = _mm256_cvttpd_epi32(f64x4);
-	_mm_storeu_si128((__m128i *)(&rc), i32x4);
+	_mm_storeu_si128(reinterpret_cast<__m128i *>(&rc), i32x4);
 	return rc;
 }
 
@@ -142,7 +127,7 @@ static_assert(sizeof(POINT) == sizeof(__int64));
 
 inline POINT POINTFromPointEx(Point point) noexcept {
 	POINT pt;
-	const __m128d f64x2 = _mm_load_pd((double *)(&point));
+	const __m128d f64x2 = _mm_load_pd(reinterpret_cast<double *>(&point));
 	const __m128i i32x2 = _mm_cvttpd_epi32(f64x2);
 	_mm_storeu_si64(&pt, i32x2);
 	return pt;
@@ -152,7 +137,7 @@ inline Point PointFromPOINTEx(POINT point) noexcept {
 	Point pt;
 	const __m128i i32x2 = _mm_loadu_si64(&point);
 	const __m128d f64x2 = _mm_cvtepi32_pd(i32x2);
-	_mm_storeu_pd((double *)(&pt), f64x2);
+	_mm_storeu_pd(reinterpret_cast<double *>(&pt), f64x2);
 	return pt;
 }
 
@@ -174,12 +159,13 @@ inline HWND HwndFromWindow(const Window &w) noexcept {
 	return HwndFromWindowID(w.GetID());
 }
 
-inline void *PointerFromWindow(HWND hWnd) noexcept {
-	return reinterpret_cast<void *>(::GetWindowLongPtr(hWnd, 0));
+template <class T>
+inline T PointerFromWindow(HWND hWnd) noexcept {
+	return AsPointer<T>(::GetWindowLongPtr(hWnd, 0));
 }
 
 inline void SetWindowPointer(HWND hWnd, void *ptr) noexcept {
-	::SetWindowLongPtr(hWnd, 0, reinterpret_cast<LONG_PTR>(ptr));
+	::SetWindowLongPtr(hWnd, 0, AsInteger<LONG_PTR>(ptr));
 }
 
 inline UINT DpiForWindow(WindowID wid) noexcept {

@@ -96,7 +96,7 @@ def BuildKeywordContent(rid, lexer, keywordList, keywordCount=16):
 				print(rid, comment, 'string exceeds 64 KiB:', length)
 			output.extend('"' + line + ' "' for line in lines)
 		else:
-			output.append('NULL')
+			output.append('nullptr')
 		if index + 1 < keywordCount:
 			output.append("")
 
@@ -123,7 +123,7 @@ def BuildKeywordContent(rid, lexer, keywordList, keywordCount=16):
 
 	count = keywordCount - len(keywordList)
 	if count:
-		output.append(", NULL" * count)
+		output.append(", nullptr" * count)
 	if attrList:
 		AllKeywordAttrList[rid] = attrList
 	return output, attrList
@@ -560,6 +560,45 @@ def parse_batch_api_file(path):
 		('upper case keywords / commands', keywordMap['upper case keywords'], KeywordAttr.NoLexer),
 		('environment variables', keywordMap['environment variables'], KeywordAttr.NoLexer),
 		('command options', keywordMap['options'], KeywordAttr.NoLexer),
+	]
+
+def parse_cangjie_api_file(path):
+	sections = read_api_file(path, '//')
+	keywordMap = {
+		'function': ['main()', 'init()']
+	}
+	for key, doc in sections:
+		if key in ('keywords', 'types'):
+			keywordMap[key] = doc.split()
+		elif key in ('macro', 'annotation'):
+			keywordMap[key] = re.findall(r'@(\w+\(?)', doc)
+		elif key == 'api':
+			keywordMap['class'] = re.findall(r'class\s+(\w+)', doc)
+			keywordMap['struct'] = re.findall(r'struct\s+(\w+)', doc)
+			keywordMap['interface'] = re.findall(r'interface\s+(\w+)', doc)
+			keywordMap['enumeration'] = re.findall(r'enum\s+(\w+)', doc)
+			items = re.findall(r'func\s+(\w+)', doc)
+			keywordMap['function'].extend(item + '()' for item in items)
+
+	RemoveDuplicateKeyword(keywordMap, [
+		'keywords',
+		'types',
+		'class',
+		'struct',
+		'interface',
+		'enumeration',
+	])
+
+	return [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('types', keywordMap['types'], KeywordAttr.Default),
+		('macro', keywordMap['macro'], KeywordAttr.NoLexer | KeywordAttr.Special | KeywordAttr.NoAutoComp),
+		('annotation', keywordMap['annotation'], KeywordAttr.Special | KeywordAttr.NoAutoComp),
+		('class', keywordMap['class'], KeywordAttr.Default),
+		('struct', keywordMap['struct'], KeywordAttr.Default),
+		('interface', keywordMap['interface'], KeywordAttr.Default),
+		('enumeration', keywordMap['enumeration'], KeywordAttr.Default),
+		('function', keywordMap['function'], KeywordAttr.NoLexer),
 	]
 
 def parse_coffeescript_api_file(path):
@@ -2205,6 +2244,24 @@ def parse_rust_api_file(path):
 		('macro', keywordMap['macros'], KeywordAttr.NoLexer),
 		('module', keywordMap['modules'], KeywordAttr.NoLexer),
 		('function', keywordMap['function'], KeywordAttr.NoLexer),
+	]
+
+def parse_sas_api_file(path):
+	sections = read_api_file(path, '/*')
+	keywordMap = {}
+	for key, doc in sections:
+		key = key.split()[0]
+		if key == 'keywords':
+			keywordMap[key] = doc.split()
+		elif key == 'macro':
+			keywordMap[key] = re.findall(r'%(\w+\(?)', doc)
+		elif key == 'functions':
+			keywordMap[key] = re.findall(r'\w+\(?', doc)
+
+	return [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('macro', keywordMap['macro'], KeywordAttr.NoAutoComp | KeywordAttr.Special),
+		('functions', keywordMap['functions'], KeywordAttr.Default),
 	]
 
 def parse_scala_api_file(path):

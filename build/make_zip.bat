@@ -1,7 +1,7 @@
 @ECHO OFF
 @rem ******************************************************************************
 @rem *
-@rem * Notepad2-mod
+@rem * Notepad4
 @rem *
 @rem * make_zip.bat
 @rem *   Batch file for creating the zip packages
@@ -184,10 +184,10 @@ EXIT /B
 
 
 :SubZipFiles
-IF NOT EXIST "%1\Notepad2.exe" CALL (:SUBMSG "ERROR" "%1\Notepad2.exe NOT found" & EXIT /B)
-IF NOT EXIST "%1\metapath.exe" CALL (:SUBMSG "ERROR" "%1\metapath.exe NOT found" & EXIT /B)
+IF NOT EXIST "%1\Notepad4.exe" CALL (:SUBMSG "ERROR" "%1\Notepad4.exe NOT found" & EXIT /B)
+IF NOT EXIST "%1\matepath.exe" CALL (:SUBMSG "ERROR" "%1\matepath.exe NOT found" & EXIT /B)
 
-IF "%ZIP_SUFFIX%" == "" (SET "ZIP_NAME=Notepad2") ELSE (SET "ZIP_NAME=Notepad2_%ZIP_SUFFIX%")
+IF "%ZIP_SUFFIX%" == "" (SET "ZIP_NAME=Notepad4") ELSE (SET "ZIP_NAME=Notepad4_%ZIP_SUFFIX%")
 IF /I "%COMPILER%" == "MSVC" (
   SET "ZIP_NAME=%ZIP_NAME%_%2_%NP2_VER%"
 ) ELSE (
@@ -200,9 +200,9 @@ SET "TEMP_ZIP_DIR=temp_zip_dir"
 IF EXIST "%TEMP_ZIP_DIR%"     RD /S /Q "%TEMP_ZIP_DIR%"
 IF NOT EXIST "%TEMP_ZIP_DIR%" MD "%TEMP_ZIP_DIR%"
 
-FOR %%A IN ( "..\License.txt"  "%1\Notepad2.exe"  "%1\metapath.exe" "..\doc\Notepad2.ini" "..\metapath\doc\metapath.ini"
+FOR %%A IN ( "..\License.txt"  "%1\Notepad4.exe"  "%1\matepath.exe" "..\doc\Notepad4.ini" "..\matepath\doc\matepath.ini"
 ) DO COPY /Y /B /V "%%A" "%TEMP_ZIP_DIR%\"
-COPY /Y /B /V "..\doc\Notepad2 DarkTheme.ini" "%TEMP_ZIP_DIR%\"
+COPY /Y /B /V "..\doc\Notepad4 DarkTheme.ini" "%TEMP_ZIP_DIR%\"
 IF "%WITH_LOCALE%" == "1" (
   XCOPY /Q /S /Y "%1\locale" "%TEMP_ZIP_DIR%\locale\"
 )
@@ -242,15 +242,13 @@ EXIT /B
 :SubGetVersion
 rem Get the version
 FOR /F "tokens=3,4" %%K IN (
-  'FINDSTR /I /L /C:"define VERSION_MAJOR" "..\src\Version.h"') DO (SET "VerMajor=%%K")
-FOR /F "tokens=3,4" %%K IN (
   'FINDSTR /I /L /C:"define VERSION_MINOR" "..\src\VersionRev.h"') DO (SET "VerMinor=%%K")
 FOR /F "tokens=3,4" %%K IN (
   'FINDSTR /I /L /C:"define VERSION_BUILD" "..\src\VersionRev.h"') DO (SET "VerBuild=%%K")
 FOR /F "tokens=3,4" %%K IN (
   'FINDSTR /I /L /C:"define VERSION_REV " "..\src\VersionRev.h"') DO (SET "VerRev=%%K")
 
-SET NP2_VER=v%VerMajor%.%VerMinor%.%VerBuild%r%VerRev%
+SET NP2_VER=v%VerMinor%.%VerBuild%r%VerRev%
 EXIT /B
 
 

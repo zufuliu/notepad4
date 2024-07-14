@@ -1,4 +1,4 @@
-// This file is part of Notepad2.
+// This file is part of Notepad4.
 // See License.txt for details about distribution and modification.
 #define _CRT_SECURE_NO_WARNINGS
 #include <windows.h>
@@ -8,8 +8,8 @@
 
 #include "../include/VectorISA.h"
 
-// cl /EHsc /std:c++20 /DNDEBUG /Ox /Ot /FAcs /GS- /GR- /Gv /W4 /arch:AVX2 EncodingTest.cpp
-// clang-cl /EHsc /std:c++20 /DNDEBUG /Ox /Ot /FA /GS- /GR- /Gv /W4 -march=x86-64-v3 EncodingTest.cpp
+// cl /EHsc /std:c++20 /DNDEBUG /O2 /FAcs /GS- /GR- /Gv /W4 /arch:AVX2 EncodingTest.cpp
+// clang-cl /EHsc /std:c++20 /DNDEBUG /O2 /FA /GS- /GR- /Gv /W4 -march=x86-64-v3 EncodingTest.cpp
 // g++ -S -std=gnu++20 -DNDEBUG -O3 -fno-rtti -Wall -Wextra -march=x86-64-v3 EncodingTest.cpp
 
 #define CPI_DEFAULT					0
@@ -68,7 +68,7 @@ constexpr bool GetUTF7(unsigned size) noexcept {
 	return size <= maxUTF7Len;
 }
 void TestUTF7() {
-	printf("UTF-7/%3u %02X\n", maxUTF7Len, (uint8_t)DocUTF16[maxUTF7Len]);
+	printf("UTF-7/%3u %02X\n", maxUTF7Len, static_cast<uint8_t>(DocUTF16[maxUTF7Len]));
 	for (unsigned size = 1; size + 1 < sizeof(DocUTF16); size++) {
 		const EndUTF16Doc dummy(size);
 		const bool detect = CheckUTF7(DocUTF16, size) == nullptr;
@@ -89,7 +89,7 @@ constexpr int GetLatin1BE(unsigned size) noexcept {
 	return size <= maxLatin1Len ? CPI_UNICODEBE : CPI_DEFAULT;
 }
 void TestUTF16Latin1() {
-	printf("Latin-1 UTF-16/%3u %02X %02X\n", maxLatin1Len, (uint8_t)DocUTF16[maxLatin1Len], (uint8_t)DocUTF16[maxLatin1Len + 1]);
+	printf("Latin-1 UTF-16/%3u %02X %02X\n", maxLatin1Len, static_cast<uint8_t>(DocUTF16[maxLatin1Len]), static_cast<uint8_t>(DocUTF16[maxLatin1Len + 1]));
 	for (unsigned size = 2; size + 2 <= sizeof(DocUTF16); size += 2) {
 		const EndUTF16Doc dummy(size);
 		int detect = DetectUTF16Latin1(DocUTF16, size);
@@ -118,7 +118,7 @@ constexpr int GetLatinExtBE(unsigned size) noexcept {
 	return size <= maxLatinExtLen ? CPI_UNICODEBE : CPI_DEFAULT;
 }
 void TestUTF16LatinExt() {
-	printf("Latin-Ext UTF-16/%3u %02X %02X\n", maxLatinExtLen, (uint8_t)DocUTF16[maxLatinExtLen], (uint8_t)DocUTF16[maxLatinExtLen + 1]);
+	printf("Latin-Ext UTF-16/%3u %02X %02X\n", maxLatinExtLen, static_cast<uint8_t>(DocUTF16[maxLatinExtLen]), static_cast<uint8_t>(DocUTF16[maxLatinExtLen + 1]));
 	for (unsigned size = 2; size + 2 <= sizeof(DocUTF16); size += 2) {
 		const EndUTF16Doc dummy(size);
 		int detect = DetectUTF16LatinExt(DocUTF16, size);
@@ -143,7 +143,7 @@ void TestUTF16LatinExt() {
 
 int __cdecl main() {
 	printf("doc size=%u, UTF-7=%u, Latin-1=%u, Latin-Ext=%u\n",
-		(unsigned)sizeof(DocUTF16), maxUTF7Len, maxLatin1Len, maxLatinExtLen);
+		static_cast<unsigned>(sizeof(DocUTF16)), maxUTF7Len, maxLatin1Len, maxLatinExtLen);
 	TestUTF7();
 	TestUTF16Latin1();
 	TestUTF16LatinExt();

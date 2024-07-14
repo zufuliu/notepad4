@@ -1,4 +1,4 @@
-// This file is part of Notepad2.
+// This file is part of Notepad4.
 // See License.txt for details about distribution and modification.
 //! Lexer for PowerShell.
 
@@ -38,11 +38,11 @@ enum {
 
 enum class KeywordType {
 	None = SCE_POWERSHELL_DEFAULT,
-	Attribute = SCE_POWERSHELL_ATTRIBUTE,
+	Label = SCE_POWERSHELL_LABEL,
 	Class = SCE_POWERSHELL_CLASS,
 	Enum = SCE_POWERSHELL_ENUM,
+	Attribute = SCE_POWERSHELL_ATTRIBUTE,
 	Function = SCE_POWERSHELL_FUNCTION_DEFINITION,
-	Label = SCE_POWERSHELL_LABEL,
 };
 
 constexpr bool IsVariableCharacter(int ch) noexcept {
@@ -68,7 +68,7 @@ constexpr bool IsSpaceEquiv(int state) noexcept {
 void HighlightVariable(StyleContext &sc, std::vector<int> &nestedState) {
 	const int state = sc.state;
 	if (sc.chNext == '(') {
-		sc.SetState(nestedState.empty() ? SCE_POWERSHELL_OPERATOR : SCE_POWERSHELL_OPERATOR2);
+		sc.SetState((state == SCE_POWERSHELL_DEFAULT && nestedState.empty()) ? SCE_POWERSHELL_OPERATOR : SCE_POWERSHELL_OPERATOR2);
 	} else if (sc.chNext == '{') {
 		sc.SetState(SCE_POWERSHELL_BRACE_VARIABLE);
 	} else if (IsVariableCharacter(sc.chNext) || IsSpecialVariable(sc.chNext)) {
@@ -130,7 +130,7 @@ void ColourisePowerShellDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int 
 			break;
 
 		case SCE_POWERSHELL_HERE_STRING_SQ:
-			if (sc.Match('\'', '@')) {
+			if (sc.atLineStart && sc.Match('\'', '@')) {
 				sc.Forward();
 				sc.ForwardSetState(SCE_POWERSHELL_DEFAULT);
 			}
@@ -144,7 +144,7 @@ void ColourisePowerShellDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int 
 				sc.Forward();
 			} else if (sc.ch == '$') {
 				HighlightVariable(sc, nestedState);
-			} else if (sc.ch == '\"' && (sc.state != SCE_POWERSHELL_HERE_STRING_DQ || sc.chNext == '@')) {
+			} else if (sc.ch == '\"' && (sc.state != SCE_POWERSHELL_HERE_STRING_DQ || (sc.atLineStart && sc.chNext == '@'))) {
 				if (sc.state == SCE_POWERSHELL_HERE_STRING_DQ) {
 					sc.Forward();
 				}

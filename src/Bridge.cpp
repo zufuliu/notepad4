@@ -1,7 +1,7 @@
 /******************************************************************************
 *
 *
-* Notepad2
+* Notepad4
 *
 * Bridge.cpp
 *   Functionalities implemented in C++:
@@ -33,23 +33,14 @@ struct IUnknown;
 
 #include "SciCall.h"
 #include "VectorISA.h"
-#if !NP2_FORCE_COMPILE_C_AS_CPP
-extern "C" {
-#endif
-
 #include "Helpers.h"
 #include "Dialogs.h"
-#include "Notepad2.h"
+#include "Notepad4.h"
 #include "Edit.h"
 #include "Styles.h"
-
-#if !NP2_FORCE_COMPILE_C_AS_CPP
-}
-#endif
 #include "resource.h"
 
 // Global settings...
-#if NP2_FORCE_COMPILE_C_AS_CPP
 extern HWND hwndMain;
 extern PrintHeaderOption iPrintHeader;
 extern PrintFooterOption iPrintFooter;
@@ -58,16 +49,6 @@ extern int iPrintZoom;
 extern RECT pageSetupMargin;
 extern HWND hwndStatus;
 extern WCHAR defaultTextFontName[LF_FACESIZE];
-#else
-extern "C" HWND hwndMain;
-extern "C" PrintHeaderOption iPrintHeader;
-extern "C" PrintFooterOption iPrintFooter;
-extern "C" int iPrintColor;
-extern "C" int iPrintZoom;
-extern "C" RECT pageSetupMargin;
-extern "C" HWND hwndStatus;
-extern "C" WCHAR defaultTextFontName[LF_FACESIZE];
-#endif
 
 namespace {
 
@@ -84,10 +65,10 @@ inline UINT GetLocaleMeasurement() noexcept {
 	UINT measurement = MeasurementInternational;
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 	GetLocaleInfoEx(LOCALE_NAME_USER_DEFAULT, LOCALE_IMEASURE | LOCALE_RETURN_NUMBER,
-		(LPWSTR)(&measurement), sizeof(UINT) / sizeof(WCHAR));
+		reinterpret_cast<LPWSTR>(&measurement), sizeof(UINT) / sizeof(WCHAR));
 #else
 	GetLocaleInfoW(LOCALE_USER_DEFAULT, LOCALE_IMEASURE | LOCALE_RETURN_NUMBER,
-		(LPWSTR)(&measurement), sizeof(UINT) / sizeof(WCHAR));
+		reinterpret_cast<LPWSTR>(&measurement), sizeof(UINT) / sizeof(WCHAR));
 #endif
 	return measurement;
 }
@@ -119,7 +100,7 @@ void EditPrintInit() noexcept {
 //
 // EditPrint() - Code from SciTEWin::Print()
 //
-extern "C" bool EditPrint(HWND hwnd, LPCWSTR pszDocTitle, BOOL bDefault) {
+bool EditPrint(HWND hwnd, LPCWSTR pszDocTitle, BOOL bDefault) noexcept {
 	PRINTDLG pdlg;
 	memset(&pdlg, 0, sizeof(PRINTDLG));
 	pdlg.lStructSize = sizeof(PRINTDLG);
@@ -227,11 +208,11 @@ extern "C" bool EditPrint(HWND hwnd, LPCWSTR pszDocTitle, BOOL bDefault) {
 	// area of the page.
 
 	// Convert device coordinates into logical coordinates
-	DPtoLP(hdc, (LPPOINT)&rectMargins, 2);
-	DPtoLP(hdc, (LPPOINT)&rectPhysMargins, 2);
+	DPtoLP(hdc, reinterpret_cast<LPPOINT>(&rectMargins), 2);
+	DPtoLP(hdc, reinterpret_cast<LPPOINT>(&rectPhysMargins), 2);
 
 	// Convert page size to logical units and we're done!
-	DPtoLP(hdc, (LPPOINT) &ptPage, 1);
+	DPtoLP(hdc, reinterpret_cast<LPPOINT>(&ptPage), 1);
 
 	const int fontSize = SciCall_StyleGetSizeFractional(STYLE_DEFAULT);
 
@@ -247,7 +228,7 @@ extern "C" bool EditPrint(HWND hwnd, LPCWSTR pszDocTitle, BOOL bDefault) {
 							DEFAULT_QUALITY,
 							DEFAULT_PITCH,
 							defaultTextFontName);
-	SelectObject(hdc, fontHeader);
+	SelectFont(hdc, fontHeader);
 	GetTextMetrics(hdc, &tm);
 	headerLineHeight = tm.tmHeight + tm.tmExternalLeading;
 
@@ -266,7 +247,7 @@ extern "C" bool EditPrint(HWND hwnd, LPCWSTR pszDocTitle, BOOL bDefault) {
 							DEFAULT_QUALITY,
 							DEFAULT_PITCH,
 							defaultTextFontName);
-	SelectObject(hdc, fontFooter);
+	SelectFont(hdc, fontFooter);
 	GetTextMetrics(hdc, &tm);
 	footerLineHeight = tm.tmHeight + tm.tmExternalLeading;
 
@@ -333,7 +314,7 @@ extern "C" bool EditPrint(HWND hwnd, LPCWSTR pszDocTitle, BOOL bDefault) {
 	}
 
 	// We must substract the physical margins from the printable area
-	struct Sci_RangeToFormatFull frPrint;
+	Sci_RangeToFormatFull frPrint;
 	frPrint.hdc = hdc;
 	frPrint.hdcTarget = hdc;
 	frPrint.rc.left		= rectMargins.left - rectPhysMargins.left;
@@ -381,7 +362,7 @@ extern "C" bool EditPrint(HWND hwnd, LPCWSTR pszDocTitle, BOOL bDefault) {
 
 			SetTextColor(hdc, RGB(0, 0, 0));
 			SetBkColor(hdc, RGB(255, 255, 255));
-			SelectObject(hdc, fontHeader);
+			SelectFont(hdc, fontHeader);
 			const UINT ta = SetTextAlign(hdc, TA_BOTTOM);
 			RECT rcw = {
 				frPrint.rc.left, frPrint.rc.top - headerLineHeight - headerLineHeight / 2,
@@ -398,7 +379,7 @@ extern "C" bool EditPrint(HWND hwnd, LPCWSTR pszDocTitle, BOOL bDefault) {
 			if (iPrintHeader == PrintHeaderOption_FilenameAndDateTime || iPrintHeader == PrintHeaderOption_FilenameAndDate) {
 				SIZE sizeInfo;
 				const int len = lstrlen(dateString);
-				SelectObject(hdc, fontFooter);
+				SelectFont(hdc, fontFooter);
 				GetTextExtentPoint32(hdc, dateString, len, &sizeInfo);
 				rcw.left = frPrint.rc.right - 10 - sizeInfo.cx;
 				ExtTextOut(hdc, rcw.left + 5, rcw.bottom,
@@ -409,10 +390,10 @@ extern "C" bool EditPrint(HWND hwnd, LPCWSTR pszDocTitle, BOOL bDefault) {
 			SetTextAlign(hdc, ta);
 			if (iPrintHeader != PrintHeaderOption_LeaveBlank) {
 				HPEN pen = CreatePen(0, 1, RGB(0, 0, 0));
-				HPEN penOld = (HPEN)SelectObject(hdc, pen);
+				HPEN penOld = SelectPen(hdc, pen);
 				MoveToEx(hdc, frPrint.rc.left, frPrint.rc.top - headerLineHeight / 4, nullptr);
 				LineTo(hdc, frPrint.rc.right, frPrint.rc.top - headerLineHeight / 4);
-				SelectObject(hdc, penOld);
+				SelectPen(hdc, penOld);
 				DeleteObject(pen);
 			}
 		}
@@ -427,7 +408,7 @@ extern "C" bool EditPrint(HWND hwnd, LPCWSTR pszDocTitle, BOOL bDefault) {
 			SetBkColor(hdc, RGB(255, 255, 255));
 
 			if (iPrintFooter == PrintFooterOption_PageNumber) {
-				SelectObject(hdc, fontFooter);
+				SelectFont(hdc, fontFooter);
 				const UINT ta = SetTextAlign(hdc, TA_TOP);
 				const RECT rcw = {
 					frPrint.rc.left, frPrint.rc.bottom + footerLineHeight / 2,
@@ -443,11 +424,11 @@ extern "C" bool EditPrint(HWND hwnd, LPCWSTR pszDocTitle, BOOL bDefault) {
 
 				SetTextAlign(hdc, ta);
 				HPEN pen = ::CreatePen(0, 1, RGB(0, 0, 0));
-				HPEN penOld = (HPEN)SelectObject(hdc, pen);
+				HPEN penOld = SelectPen(hdc, pen);
 				SetBkColor(hdc, RGB(0, 0, 0));
 				MoveToEx(hdc, frPrint.rc.left, frPrint.rc.bottom + footerLineHeight / 4, nullptr);
 				LineTo(hdc, frPrint.rc.right, frPrint.rc.bottom + footerLineHeight / 4);
-				SelectObject(hdc, penOld);
+				SelectPen(hdc, penOld);
 				DeleteObject(pen);
 			}
 
@@ -505,7 +486,7 @@ static UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam, LPA
 			p1 = p2;
 		}
 
-		ComboBox_SetCurSel(hwndCtl, (int)iPrintHeader);
+		ComboBox_SetCurSel(hwndCtl, static_cast<int>(iPrintHeader));
 		ComboBox_SetExtendedUI(hwndCtl, TRUE);
 
 		// Set footer options
@@ -521,7 +502,7 @@ static UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam, LPA
 			p1 = p2;
 		}
 
-		ComboBox_SetCurSel(hwndCtl, (int)iPrintFooter);
+		ComboBox_SetCurSel(hwndCtl, static_cast<int>(iPrintFooter));
 		ComboBox_SetExtendedUI(hwndCtl, TRUE);
 
 		// Set color options
@@ -555,9 +536,9 @@ static UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam, LPA
 				iPrintZoom = 100;
 			}
 
-			iPrintHeader = (PrintHeaderOption)SendDlgItemMessage(hwnd, IDC_PAGESETUP_HEADER_LIST, CB_GETCURSEL, 0, 0);
-			iPrintFooter = (PrintFooterOption)SendDlgItemMessage(hwnd, IDC_PAGESETUP_FOOTER_LIST, CB_GETCURSEL, 0, 0);
-			iPrintColor	 = (int)SendDlgItemMessage(hwnd, IDC_PAGESETUP_COLOR_MODE_LIST, CB_GETCURSEL, 0, 0);
+			iPrintHeader = static_cast<PrintHeaderOption>(SendDlgItemMessage(hwnd, IDC_PAGESETUP_HEADER_LIST, CB_GETCURSEL, 0, 0));
+			iPrintFooter = static_cast<PrintFooterOption>(SendDlgItemMessage(hwnd, IDC_PAGESETUP_FOOTER_LIST, CB_GETCURSEL, 0, 0));
+			iPrintColor	 = static_cast<int>(SendDlgItemMessage(hwnd, IDC_PAGESETUP_COLOR_MODE_LIST, CB_GETCURSEL, 0, 0));
 		}
 		break;
 
@@ -568,7 +549,7 @@ static UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam, LPA
 	return 0;
 }
 
-extern "C" void EditPrintSetup(HWND hwnd) {
+void EditPrintSetup(HWND hwnd) noexcept {
 	DLGTEMPLATE *pDlgTemplate = LoadThemedDialogTemplate(MAKEINTRESOURCE(IDD_PAGESETUP), g_hInstance);
 
 	PAGESETUPDLG pdlg;
@@ -608,7 +589,7 @@ extern "C" void EditPrintSetup(HWND hwnd) {
 namespace { // copy as RTF
 
 #if (__cplusplus > 201703L || (defined(_MSVC_LANG) && _MSVC_LANG > 201703L)) && ( \
-	(defined(_MSC_VER) && _MSC_VER >= 1920 && (defined(_WIN64) || !defined(__clang__))) || \
+	(defined(_MSC_VER) && _MSC_VER >= 1928 && (defined(_WIN64) || !defined(__clang__))) || \
 	(defined(_LIBCPP_VERSION) && _LIBCPP_VERSION >= 16000) || \
 	(!defined(_LIBCPP_VERSION) && defined(__GNUC__) && __GNUC__ >= 11) )
 using std::make_unique_for_overwrite; // requires C++20 library support
@@ -648,7 +629,7 @@ DocumentStyledText GetDocumentStyledText(uint8_t (&styleMap)[STYLE_MAX + 1], con
 	for (size_t offset = 0; offset < textLength; offset++) {
 		const uint8_t style = styledText[offset];
 		styleUsed[style >> 5] |= (1U << (style & 31));
-		maxStyle = max_u(style, maxStyle);
+		maxStyle = max<unsigned>(style, maxStyle);
 	}
 
 	++maxStyle;
@@ -1328,7 +1309,7 @@ std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLen
 
 }
 
-extern "C" void EditFormatCode(int menu) {
+void EditFormatCode(int menu) noexcept {
 	LPCEDITLEXER pLex = pLexCurrent;
 	if (menu != IDM_EDIT_COPYRTF && pLex->iLexer != SCLEX_JSON && pLex->iLexer != SCLEX_CSS && pLex->iLexer != SCLEX_JAVASCRIPT) {
 		return;

@@ -8,7 +8,7 @@ static NP2_KEYWORDS kwDoxyDoc = {
 , // C# Attribute
 "type name cref "
 ,
-NULL
+nullptr
 };
 
 // XML Schema
@@ -32,7 +32,7 @@ static NP2_KEYWORDS kwXmlSchema = {
 "equal ordered bounded cardinality numeric " " preserve replace collapse "
 "unqualified qualified strict skip lax prohibited optional required "
 //"blockSet complexDerivationSet XPathExpr URIref "
-, NULL
+, nullptr
 };
 
 // XML Stylesheet
@@ -55,7 +55,7 @@ static NP2_KEYWORDS kwXmlStylesheet = {
 , // value
 "preserve strip unspecified default omit lax single multiple any alphabetic traditional ascending descending "
 "upper-first lower-first text number xml html xhtml NFC NFD NFKC NFKD fully-normalized none "
-, NULL
+, nullptr
 };
 
 // Apache Config
@@ -88,14 +88,14 @@ static NP2_KEYWORDS kwApache = {
 "SSLRandomSeed SSLRenegBufferSize SSLRequire SSLRequireSSL SSLSessionCache SSLSessionCacheTimeout SSLSessionTicketKeyFile SSLStaplingCache SSLStaplingErrorCacheTimeout SSLStaplingFakeTryLater SSLStaplingForceURL SSLStaplingResponderTimeout SSLStaplingResponseMaxAge SSLStaplingResponseTimeSkew SSLStaplingReturnResponderErrors SSLStaplingStandardCacheTimeout SSLStrictSNIVHostCheck SSLUserName SSLUseStapling SSLVerifyClient SSLVerifyDepth StartServers StartThreads Substitute Suexec SuexecUserGroup "
 "ThreadLimit ThreadsPerChild ThreadStackSize TimeOut TraceEnable TransferLog TypesConfig UnDefine UnsetEnv UseCanonicalName UseCanonicalPhysicalPort User UserDir VHostCGIMode VHostCGIPrivs VHostGroup VHostPrivs VHostSecure VHostUser VirtualDocumentRoot VirtualDocumentRootIP VirtualScriptAlias VirtualScriptAliasIP WatchdogInterval Win32DisableAcceptEx XBitHack xml2EncAlias xml2EncDefault xml2StartParse"
 , // Valves
-NULL
-, NULL
+nullptr
+, nullptr
 };
 
 // Apple Property List
 static NP2_KEYWORDS kwPList = {
 "plist array data date dict key real integer string "
-, NULL, NULL, NULL
+, nullptr, nullptr, nullptr
 };
 
 
@@ -104,7 +104,7 @@ static NP2_KEYWORDS kwPList = {
 
 static NP2_KEYWORDS *np2_LexKeyword;
 
-static inline void UpdateLexerExtraKeywords() {
+static inline void UpdateLexerExtraKeywords() noexcept {
 	if (np2LexLangIndex == 0) {
 		return;
 	}

@@ -1,5 +1,5 @@
 # generate test to find valid variable in for loop
-# https://github.com/zufuliu/notepad2/pull/348
+# https://github.com/zufuliu/notepad4/pull/348
 
 def generate_for_var_test(path):
 	with open(path, 'w', encoding='utf-8', newline='\r\n') as fd:

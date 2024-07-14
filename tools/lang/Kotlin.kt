@@ -1,4 +1,4 @@
-// Kotlin 1.9 https://kotlinlang.org/docs/home.html
+// Kotlin 2.0 https://kotlinlang.org/docs/home.html
 
 //! Keywords		===========================================================
 // https://kotlinlang.org/docs/keyword-reference.html

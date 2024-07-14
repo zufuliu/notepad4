@@ -1,7 +1,7 @@
 /******************************************************************************
 *
 *
-* Notepad2
+* Notepad4
 *
 * Dlapi.h
 *   Definitions for Directory Listing APIs
@@ -19,16 +19,14 @@
 ******************************************************************************/
 #pragma once
 
-typedef struct LV_ITEMDATA { // lvid
+struct LV_ITEMDATA {
 	LPITEMIDLIST pidl; // Item Id
 	LPSHELLFOLDER lpsf; // Parent IShellFolder Interface
-} LV_ITEMDATA, *LPLV_ITEMDATA;
+};
 
-typedef const LV_ITEMDATA * LPCLV_ITEMDATA;
-
-void DirList_Init(HWND hwnd, LPCWSTR pszHeader);
+void DirList_Init(HWND hwnd, LPCWSTR pszHeader) noexcept;
 void DirList_Destroy(HWND hwnd);
-void DirList_StartIconThread(HWND hwnd);
+void DirList_StartIconThread(HWND hwnd) noexcept;
 
 #define DL_FOLDERS			32
 #define DL_NONFOLDERS		64
@@ -46,7 +44,7 @@ bool DirList_DeleteItem(HWND hwnd, LPARAM lParam);
 #define DS_TYPE			2
 #define DS_LASTMOD		3
 
-BOOL DirList_Sort(HWND hwnd, int lFlags, bool fRev);
+BOOL DirList_Sort(HWND hwnd, int lFlags, bool fRev) noexcept;
 
 #define DLE_NONE		0
 #define DLE_DIR			1
@@ -57,33 +55,30 @@ BOOL DirList_Sort(HWND hwnd, int lFlags, bool fRev);
 #define DLI_TYPE		4
 #define DLI_ALL			(DLI_FILENAME | DLI_DISPNAME | DLI_TYPE)
 
-typedef struct DLITEM {	// dli
+struct DirListItem {
 	UINT mask;
 	int ntype;
 	WCHAR szFileName[MAX_PATH];
 	WCHAR szDisplayName[MAX_PATH];
-} DLITEM, *LPDLITEM;
+};
 
-int DirList_GetItem(HWND hwnd, int iItem, LPDLITEM lpdli);
-int DirList_GetItemEx(HWND hwnd, int iItem, LPWIN32_FIND_DATA pfd);
+int DirList_GetItem(HWND hwnd, int iItem, DirListItem *lpdli);
+int DirList_GetItemEx(HWND hwnd, int iItem, LPWIN32_FIND_DATA pfd) noexcept;
 bool DirList_PropertyDlg(HWND hwnd, int iItem);
-bool DirList_GetLongPathName(HWND hwnd, LPWSTR lpszLongPath);
+bool DirList_GetLongPathName(HWND hwnd, LPWSTR lpszLongPath) noexcept;
 bool DirList_SelectItem(HWND hwnd, LPCWSTR lpszDisplayName, LPCWSTR lpszFullPath);
 
 #define DL_FILTER_BUFSIZE 128
-typedef struct DL_FILTER { //dlf
+struct DirListFilter {
 	int nCount;
 	bool bExcludeFilter;
 	WCHAR tFilterBuf[DL_FILTER_BUFSIZE];
 	LPWSTR pFilter[DL_FILTER_BUFSIZE];
-} DL_FILTER, *PDL_FILTER;
+	void Create(LPCWSTR lpszFileSpec, bool bExclude) noexcept;
+	bool Match(LPSHELLFOLDER lpsf, LPCITEMIDLIST pidl) const noexcept;
+};
 
-typedef const DL_FILTER * LPCDL_FILTER;
-
-void DirList_CreateFilter(PDL_FILTER pdlf, LPCWSTR lpszFileSpec, bool bExcludeFilter);
-bool DirList_MatchFilter(LPSHELLFOLDER lpsf, LPCITEMIDLIST pidl, LPCDL_FILTER pdlf);
-
-bool DriveBox_Init(HWND hwnd);
+bool DriveBox_Init(HWND hwnd) noexcept;
 int  DriveBox_Fill(HWND hwnd);
 bool DriveBox_GetSelDrive(HWND hwnd, LPWSTR lpszDrive, int nDrive, bool fNoSlash);
 bool DriveBox_SelectDrive(HWND hwnd, LPCWSTR lpszPath);
@@ -91,10 +86,6 @@ bool DriveBox_PropertyDlg(HWND hwnd);
 bool DriveBox_DeleteItem(HWND hwnd, LPARAM lParam);
 bool DriveBox_GetDispInfo(HWND hwnd, LPARAM lParam);
 
-static inline LPITEMIDLIST IL_Next(LPITEMIDLIST pidl) {
-	return (LPITEMIDLIST)((LPBYTE)(pidl) + pidl->mkid.cb);
-}
-
-LPITEMIDLIST IL_Create(LPCITEMIDLIST pidl1, UINT cb1, LPCITEMIDLIST pidl2, UINT cb2);
-UINT IL_GetSize(LPCITEMIDLIST pidl);
+LPITEMIDLIST IL_Create(LPCITEMIDLIST pidl1, UINT cb1, LPCITEMIDLIST pidl2, UINT cb2) noexcept;
+UINT IL_GetSize(LPCITEMIDLIST pidl) noexcept;
 bool IL_GetDisplayName(LPSHELLFOLDER lpsf, LPCITEMIDLIST pidl, DWORD dwFlags, LPWSTR lpszDisplayName, int nDisplayName);

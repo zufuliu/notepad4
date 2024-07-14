@@ -1,4 +1,4 @@
-# Main Makefile for notepad2 project
+# Main Makefile for notepad4 project
 # TODO: remove dependencies on rm, mkdir and which (with del, rmdir, mkdir and where commands).
 
 .PHONY: all
@@ -149,19 +149,19 @@ endif
 # Name root build folder
 export BINFOLDER := ../bin/$(if $(CLANG),Clang,)$(CONFIG)_$(ARCH)
 
-all: metapath scintilla notepad2
+all: matepath scintilla notepad4
 
-metapath:
-	$(MAKE) -f metapath.mk
+matepath:
+	$(MAKE) -f matepath.mk
 
 scintilla:
 	$(MAKE) -f scintilla.mk
 
-notepad2: scintilla
-	$(MAKE) -f notepad2.mk
+notepad4: scintilla
+	$(MAKE) -f notepad4.mk
 
 clean:
-	$(MAKE) -f metapath.mk clean
+	$(MAKE) -f matepath.mk clean
 	$(MAKE) -f scintilla.mk clean
-	$(MAKE) -f notepad2.mk clean
+	$(MAKE) -f notepad4.mk clean
 	@$(RM) -rf $(BINFOLDER)/obj
