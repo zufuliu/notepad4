@@ -10,12 +10,13 @@
 | Localization | Language | Architecture | Minimum System |
 |--|--|--|--|
 | en | English | ARM64 | 🟢Windows 10 on ARM |
-| it | Italiano | ARM | 🔴legacy Windows RT (Windows 8 on ARM) |
-| ja | 日本語 | AVX2 | 🟢64-bit Windows 7, Server 2008 R2 |
-| ko | 한국어 | x64 | 🟡legacy 64-bit Windows Vista, Server 2008 |
-| zh-Hans | 中文 (简体) | Win32 | 🟠legacy Windows XP, Server 2003 |
+| fr-FR | French | ARM | 🔴legacy Windows RT (Windows 8 on ARM) |
+| it | Italiano | AVX2 | 🟢64-bit Windows 7, Server 2008 R2 |
+| ja | 日本語 | x64 | 🟡legacy 64-bit Windows Vista, Server 2008 |
+| ko | 한국어 | Win32 | 🟠legacy Windows XP, Server 2003 |
+| zh-Hans | 中文 (简体) |
 | zh-Hant | 中文 (繁體) |
-| i18n | all above languages include French | winget | `winget install -e "Notepad4"` |
+| i18n | all above languages | winget | `winget install -e "Notepad4"` |
 | 한국어 | https://teus.me/Notepad4 | winget | `winget install zufuliu.notepad4` |
 
 Latest development builds (artifacts in Release configuration for each compiler and platform) are available at https://github.com/zufuliu/notepad4/actions and https://ci.appveyor.com/project/zufuliu/notepad4.
