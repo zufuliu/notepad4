@@ -4514,46 +4514,44 @@ void EditGetExcerpt(LPWSTR lpszExcerpt, DWORD cchExcerpt) noexcept {
 		return;
 	}
 
-	WCHAR tch[256] = L"";
-	DWORD cch = 0;
+	WCHAR tch[256]{};
+	char pszText[256]{};
 	const Sci_Position iSelStart = SciCall_GetSelectionStart();
-	const Sci_Position iSelEnd = min(min<Sci_Position>(SciCall_GetSelectionEnd(), iSelStart + COUNTOF(tch)), SciCall_GetLength());
-	const Sci_Position iSelCount = iSelEnd - iSelStart;
-
-	char *pszText = static_cast<char *>(NP2HeapAlloc(iSelCount + 2));
-	LPWSTR pszTextW = static_cast<LPWSTR>(NP2HeapAlloc((iSelCount + 1) * sizeof(WCHAR)));
+	const Sci_Position iSelEnd = min<Sci_Position>(SciCall_GetSelectionEnd(), iSelStart + COUNTOF(tch) - 1);
 
 	const Sci_TextRangeFull tr = { { iSelStart, iSelEnd }, pszText };
 	SciCall_GetTextRangeFull(&tr);
 	const UINT cpEdit = SciCall_GetCodePage();
-	MultiByteToWideChar(cpEdit, 0, pszText, static_cast<int>(iSelCount), pszTextW, static_cast<int>(NP2HeapSize(pszTextW) / sizeof(WCHAR)));
+	MultiByteToWideChar(cpEdit, 0, pszText, static_cast<int>(iSelEnd - iSelStart), tch, COUNTOF(tch));
 
-	for (WCHAR *p = pszTextW; *p && cch < COUNTOF(tch) - 1; p++) {
-		if (*p == L'\r' || *p == L'\n' || *p == L'\t' || *p == L' ') {
-			tch[cch++] = L' ';
-			while (*(p + 1) == L'\r' || *(p + 1) == L'\n' || *(p + 1) == L'\t' || *(p + 1) == L' ') {
-				p++;
+	DWORD cch = 0;
+	WCHAR chPrev = L'\0';
+	WCHAR *p = tch;
+	while (*p != L'\0') {
+		WCHAR ch = *p++;
+		if (ch <= L' ') {
+			ch = L' ';
+			if (chPrev == L' ') {
+				continue;
 			}
-		} else {
-			tch[cch++] = *p;
+		}
+		if (cch < cchExcerpt - 1) {
+			lpszExcerpt[cch] = ch;
+		}
+		chPrev = ch;
+		cch++;
+		if (cch > cchExcerpt) {
+			cch = cchExcerpt - 1;
+			lpszExcerpt[cchExcerpt - 2] = L'.';
+			lpszExcerpt[cchExcerpt - 3] = L'.';
+			lpszExcerpt[cchExcerpt - 4] = L'.';
+			break;
 		}
 	}
-	tch[cch++] = L'\0';
-	StrTrim(tch, L" ");
-
-	if (cch == 1) {
-		lstrcpy(tch, L" ... ");
+	lpszExcerpt[cch] = L'\0';
+	if (cch == 0) {
+		lstrcpy(lpszExcerpt, L" ... ");
 	}
-
-	if (cch > cchExcerpt) {
-		tch[cchExcerpt - 2] = L'.';
-		tch[cchExcerpt - 3] = L'.';
-		tch[cchExcerpt - 4] = L'.';
-	}
-	lstrcpyn(lpszExcerpt, tch, cchExcerpt);
-
-	NP2HeapFree(pszText);
-	NP2HeapFree(pszTextW);
 }
 
 void EditSelectWord() noexcept {
