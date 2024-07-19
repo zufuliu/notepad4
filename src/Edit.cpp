@@ -4525,7 +4525,7 @@ void EditGetExcerpt(LPWSTR lpszExcerpt, DWORD cchExcerpt) noexcept {
 	MultiByteToWideChar(cpEdit, 0, pszText, static_cast<int>(iSelEnd - iSelStart), tch, COUNTOF(tch));
 
 	DWORD cch = 0;
-	WCHAR chPrev = L'\0';
+	WCHAR chPrev = L' ';
 	WCHAR *p = tch;
 	while (*p != L'\0') {
 		WCHAR ch = *p++;
