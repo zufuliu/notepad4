@@ -614,7 +614,7 @@ BEGIN
 				MENUITEM "Langue du système",		IDM_LANG_USER_DEFAULT
 				MENUITEM "Allemand",					IDM_LANG_GERMAN
 				MENUITEM "Anglais",					IDM_LANG_ENGLISH_US
-				MENUITEM "Français (France)",		IDM_LANG_FRENCH_FRANCE
+				MENUITEM "Français",				IDM_LANG_FRENCH_FRANCE
 				MENUITEM "Italien",				IDM_LANG_ITALIAN
 				MENUITEM "Portuguais (Brésil)",		IDM_LANG_PORTUGUESE_BRAZIL
 				MENUITEM "Japonais",					IDM_LANG_JAPANESE

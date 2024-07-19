@@ -611,7 +611,7 @@ BEGIN
 	IDS_LANG_GERMAN					"Deutsch"
 	IDS_LANG_ITALIAN				"Italiano"
 	IDS_LANG_PORTUGUESE_BRAZIL		"Português (Brasil)"
-	IDS_LANG_FRENCH_FRANCE		    "Français (France)"
+	IDS_LANG_FRENCH_FRANCE		    "Français"
 END
 #endif
 

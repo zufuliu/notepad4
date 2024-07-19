@@ -196,7 +196,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 * [Scintilla's website](https://www.scintilla.org/)
 * [Build Notepad4 and matepath](https://github.com/zufuliu/notepad4/wiki/Build-Notepad4)
 * [Localization](https://github.com/zufuliu/notepad4/wiki/Localization)
-	* [French (France)](https://github.com/zufuliu/notepad4/tree/main/locale/fr-FR) by [@VoilierBleu](https://github.com/VoilierBleu)
+	* [French](https://github.com/zufuliu/notepad4/tree/main/locale/fr) by [@VoilierBleu](https://github.com/VoilierBleu)
 	* [Italiano](https://github.com/zufuliu/notepad4/tree/main/locale/it) by [@Matteo-Nigro](https://github.com/Matteo-Nigro)
 	* [日本語](https://github.com/zufuliu/notepad4/tree/main/locale/ja) by [@maboroshin](https://github.com/maboroshin)
 	* [中文 (繁體)](https://github.com/zufuliu/notepad4/tree/main/locale/zh-Hant)

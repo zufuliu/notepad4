@@ -1038,7 +1038,7 @@ HMODULE LoadLocalizedResourceDLL(LANGID lang, LPCWSTR dllName) noexcept {
 		folder = IsChineseTraditionalSubLang(subLang) ? L"zh-Hant" : L"zh-Hans";
 		break;
 	case LANG_FRENCH:
-		folder = L"fr-FR";
+		folder = L"fr";
 		break;
 	case LANG_GERMAN:
 		folder = L"de";
