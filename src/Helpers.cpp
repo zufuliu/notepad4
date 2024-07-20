@@ -1789,7 +1789,7 @@ bool PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath) {
 	WCHAR tchPath[MAX_PATH];
 	tchPath[0] = L'\0';
 
-	if (SUCCEEDED(CoCreateInstance(IID_IShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLink, AsPPVArgs(&psl)))) {
+	if (SUCCEEDED(CoCreateInstance(CLSID_ShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLink, AsPPVArgs(&psl)))) {
 		IPersistFile *ppf;
 
 		if (SUCCEEDED(psl->QueryInterface(IID_IPersistFile, AsPPVArgs(&ppf)))) {
@@ -1871,7 +1871,7 @@ bool PathCreateDeskLnk(LPCWSTR pszDocument) {
 
 	IShellLink *psl;
 	bool bSucceeded = false;
-	if (SUCCEEDED(CoCreateInstance(IID_IShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLink, AsPPVArgs(&psl)))) {
+	if (SUCCEEDED(CoCreateInstance(CLSID_ShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLink, AsPPVArgs(&psl)))) {
 		IPersistFile *ppf;
 
 		if (SUCCEEDED(psl->QueryInterface(IID_IPersistFile, AsPPVArgs(&ppf)))) {
@@ -1914,7 +1914,7 @@ bool PathCreateFavLnk(LPCWSTR pszName, LPCWSTR pszTarget, LPCWSTR pszDir) {
 
 	IShellLink *psl;
 	bool bSucceeded = false;
-	if (SUCCEEDED(CoCreateInstance(IID_IShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLink, AsPPVArgs(&psl)))) {
+	if (SUCCEEDED(CoCreateInstance(CLSID_ShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLink, AsPPVArgs(&psl)))) {
 		IPersistFile *ppf;
 
 		if (SUCCEEDED(psl->QueryInterface(IID_IPersistFile, AsPPVArgs(&ppf)))) {
