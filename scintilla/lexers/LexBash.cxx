@@ -797,8 +797,8 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				QuoteStack.Start(sc.ch, QuoteStyle::String, SCE_SH_DEFAULT, cmdState);
 				sc.SetState(SCE_SH_STRING_DQ);
 			} else if (sc.ch == '\'') {
-				if (QuoteStack.dialect == ShellDialect::M4 && AnyOf(sc.chNext, 's', 't') && IsAlphaNumeric(sc.chPrev)) {
-					// one's, don't
+				if (QuoteStack.dialect == ShellDialect::M4 && IsIdentifierCharEx(sc.chPrev)) {
+					// treated as apostrophe: one's, don't
 				} else {
 					QuoteStack.State = SCE_SH_DEFAULT;
 					sc.SetState(SCE_SH_STRING_SQ);
