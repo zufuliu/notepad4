@@ -164,14 +164,14 @@ constexpr bool IsBashParamChar(int ch) noexcept {
 	return IsIdentifierChar(ch);
 }
 
-constexpr bool IsBashParamStart(int ch, bool isCShell) noexcept {
+constexpr bool IsBashParamStart(int ch, ShellDialect dialect) noexcept {
 	// https://www.gnu.org/software/bash/manual/bash.html#Special-Parameters
 	// https://zsh.sourceforge.io/Doc/Release/Parameters.html#Parameters
 	// https://man.archlinux.org/man/dash.1#Special_Parameters
 	// https://man.archlinux.org/man/ksh.1#Parameter_Expansion.
 	return IsBashParamChar(ch) || AnyOf(ch, '*', '@', '#', '?', '-', '$', '!')
 	// https://man.archlinux.org/man/tcsh.1.en#Variable_substitution_without_modifiers
-		|| (isCShell && AnyOf(ch, '%', '<'))
+		|| (dialect == ShellDialect::CShell && AnyOf(ch, '%', '<'))
 	;
 }
 
@@ -208,6 +208,7 @@ public:
 	QuoteStyle Style = QuoteStyle::Literal;
 	uint8_t Outer = SCE_SH_DEFAULT;
 	CmdState State = CmdState::Body;
+	uint8_t unused = 0;
 	void Clear() noexcept {
 		Count = 0;
 		Up	  = '\0';
@@ -215,6 +216,7 @@ public:
 		Style = QuoteStyle::Literal;
 		Outer = SCE_SH_DEFAULT;
 		State = CmdState::Body;
+		unused = 0;
 	}
 	void Start(int u, QuoteStyle s, int outer, CmdState state) noexcept {
 		Count = 1;
@@ -231,10 +233,10 @@ public:
 	unsigned Depth = 0;
 	int State = SCE_SH_DEFAULT;
 	unsigned backtickLevel = 0;
+	ShellDialect dialect = ShellDialect::Bash;
 	QuoteCls Current;
 	QuoteCls Stack[BASH_QUOTE_STACK_MAX];
 	bool lineContinuation = false;
-	bool isCShell = false;
 	[[nodiscard]] bool Empty() const noexcept {
 		return Current.Up == '\0';
 	}
@@ -318,7 +320,7 @@ public:
 			}
 		} else {
 			// scalar has no delimiter pair
-			if (!IsBashParamStart(sc.ch, isCShell)) {
+			if (!IsBashParamStart(sc.ch, dialect)) {
 				sc.ChangeState(state); // not scalar
 			}
 			return;
@@ -340,7 +342,7 @@ public:
 			}
 			return;
 		}
-		if (backtickLevel > 0 && !isCShell) {
+		if (backtickLevel > 0 && dialect != ShellDialect::CShell) {
 			// see https://github.com/ScintillaOrg/lexilla/issues/194
 			/*
 			for $k$ level substitution with $N$ backslashes:
@@ -378,6 +380,22 @@ public:
 			sc.Forward();
 		}
 	}
+	bool HandleSingleQuote(StyleContext &sc, CmdState &cmdState) {
+		if (dialect == ShellDialect::M4) {
+			if (Current.Down == '`') {
+				if (sc.chPrev > ' ') {
+					// not command parameter quote
+					return CountDown(sc, cmdState);
+				}
+			} else if (AnyOf(sc.chNext, 's', 't') && IsAlphaNumeric(sc.chPrev)) {
+				// one's, don't
+				return false;
+			}
+		}
+		State = sc.state;
+		sc.SetState(SCE_SH_STRING_SQ);
+		return false;
+	}
 };
 
 void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
@@ -405,7 +423,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 	const Sci_PositionU endPos = startPos + length;
 	CmdState cmdState = CmdState::Start;
 
-	QuoteStack.isCShell = styler.GetPropertyBool("lexer.lang");
+	QuoteStack.dialect = static_cast<ShellDialect>(styler.GetPropertyInt("lexer.lang"));
 	// Always backtracks to the start of a line that is not a continuation
 	// of the previous line (i.e. start of a bash command segment)
 	Sci_Line ln = styler.GetLine(startPos);
@@ -675,8 +693,9 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 					|| QuoteStack.Current.Style == QuoteStyle::Backtick
 					) {	// do nesting for $(command), `command`, ${parameter}
 					if (sc.ch == '\'') {
-						QuoteStack.State = sc.state;
-						sc.SetState(SCE_SH_STRING_SQ);
+						if (QuoteStack.HandleSingleQuote(sc, cmdState)) {
+							continue;
+						}
 					} else if (sc.ch == '\"') {
 						QuoteStack.Push(sc.ch, QuoteStyle::String, sc.state, cmdState);
 						sc.SetState(SCE_SH_STRING_DQ);
@@ -783,8 +802,9 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				QuoteStack.Start(sc.ch, QuoteStyle::String, SCE_SH_DEFAULT, cmdState);
 				sc.SetState(SCE_SH_STRING_DQ);
 			} else if (sc.ch == '\'') {
-				QuoteStack.State = SCE_SH_DEFAULT;
-				sc.SetState(SCE_SH_STRING_SQ);
+				if (QuoteStack.HandleSingleQuote(sc, cmdState)) {
+					continue;
+				}
 			} else if (sc.ch == '`') {
 				QuoteStack.Start(sc.ch, QuoteStyle::Backtick, SCE_SH_DEFAULT, cmdState);
 				sc.SetState(SCE_SH_BACKTICKS);
