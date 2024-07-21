@@ -380,22 +380,6 @@ public:
 			sc.Forward();
 		}
 	}
-	bool HandleSingleQuote(StyleContext &sc, CmdState &cmdState) {
-		if (dialect == ShellDialect::M4) {
-			if (Current.Down == '`') {
-				if (sc.chPrev > ' ') {
-					// not command parameter quote
-					return CountDown(sc, cmdState);
-				}
-			} else if (AnyOf(sc.chNext, 's', 't') && IsAlphaNumeric(sc.chPrev)) {
-				// one's, don't
-				return false;
-			}
-		}
-		State = sc.state;
-		sc.SetState(SCE_SH_STRING_SQ);
-		return false;
-	}
 };
 
 void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
@@ -647,8 +631,13 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 						sc.Forward();
 					}
 				}
-				if ((HereDoc.DelimiterLength == 0 && sc.MatchLineEnd())
-					|| (styler.Match(sc.currentPos, HereDoc.Delimiter) && IsEOLChar(sc.GetRelative(HereDoc.DelimiterLength)))) {
+				int chNext = 0;
+				if (HereDoc.DelimiterLength == 0) {
+					chNext = sc.ch;
+				} else if (styler.Match(sc.currentPos, HereDoc.Delimiter)) {
+					chNext = sc.GetRelative(HereDoc.DelimiterLength);
+				}
+				if (IsEOLChar(chNext) || (chNext == ']' && QuoteStack.dialect == ShellDialect::M4)) {
 					if (HereDoc.DelimiterLength != 0) {
 						sc.SetState(SCE_SH_HERE_DELIM);
 						sc.Forward(HereDoc.DelimiterLength);
@@ -693,8 +682,14 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 					|| QuoteStack.Current.Style == QuoteStyle::Backtick
 					) {	// do nesting for $(command), `command`, ${parameter}
 					if (sc.ch == '\'') {
-						if (QuoteStack.HandleSingleQuote(sc, cmdState)) {
-							continue;
+						if (QuoteStack.dialect == ShellDialect::M4 && QuoteStack.Current.Style == QuoteStyle::Backtick && sc.chPrev > ' ') {
+							// not command parameter quote
+							if (QuoteStack.CountDown(sc, cmdState)) {
+								continue;
+							}
+						} else {
+							QuoteStack.State = sc.state;
+							sc.SetState(SCE_SH_STRING_SQ);
 						}
 					} else if (sc.ch == '\"') {
 						QuoteStack.Push(sc.ch, QuoteStyle::String, sc.state, cmdState);
@@ -802,8 +797,11 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				QuoteStack.Start(sc.ch, QuoteStyle::String, SCE_SH_DEFAULT, cmdState);
 				sc.SetState(SCE_SH_STRING_DQ);
 			} else if (sc.ch == '\'') {
-				if (QuoteStack.HandleSingleQuote(sc, cmdState)) {
-					continue;
+				if (QuoteStack.dialect == ShellDialect::M4 && AnyOf(sc.chNext, 's', 't') && IsAlphaNumeric(sc.chPrev)) {
+					// one's, don't
+				} else {
+					QuoteStack.State = SCE_SH_DEFAULT;
+					sc.SetState(SCE_SH_STRING_SQ);
 				}
 			} else if (sc.ch == '`') {
 				QuoteStack.Start(sc.ch, QuoteStyle::Backtick, SCE_SH_DEFAULT, cmdState);
