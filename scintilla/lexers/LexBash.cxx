@@ -619,7 +619,9 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 					sc.Forward();
 				}
 				sc.SetState(QuoteStack.State);
-				continue;
+				if (QuoteStack.State != SCE_SH_DEFAULT) {
+					continue;
+				}
 			}
 			break;
 		case SCE_SH_HERE_Q:
@@ -682,8 +684,9 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 					|| QuoteStack.Current.Style == QuoteStyle::Backtick
 					) {	// do nesting for $(command), `command`, ${parameter}
 					if (sc.ch == '\'') {
-						if (QuoteStack.dialect == ShellDialect::M4 && QuoteStack.Current.Style == QuoteStyle::Backtick && sc.chPrev > ' ') {
-							// not command parameter quote
+						if (QuoteStack.dialect == ShellDialect::M4 && QuoteStack.Current.Style == QuoteStyle::Backtick
+							&& sc.chPrev > ' ' && !AnyOf(sc.chPrev, '[', '"')) {
+							// not command parameter quote, `sed ['']`
 							if (QuoteStack.CountDown(sc, cmdState)) {
 								continue;
 							}
@@ -768,16 +771,15 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				}
 			} else if (IsIdentifierStart(sc.ch)) {
 				sc.SetState((cmdState == CmdState::Arithmetic)? SCE_SH_IDENTIFIER : SCE_SH_WORD);
-			//} else if (sc.ch == '#' || (sc.ch == '/' && sc.chNext == '/')) {
 			} else if (sc.ch == '#') {
-				if (stylePrev != SCE_SH_WORD && stylePrev != SCE_SH_IDENTIFIER &&
-					IsBashMetaCharacter(sc.chPrev)) {
+				if (IsBashMetaCharacter(sc.chPrev)
+					|| (sc.chPrev == '[' && QuoteStack.dialect == ShellDialect::M4)) {
 					sc.SetState(SCE_SH_COMMENTLINE);
 				} else {
 					sc.SetState(SCE_SH_WORD);
 				}
 				// handle some zsh features within arithmetic expressions only
-				if (cmdState == CmdState::Arithmetic) {
+				if (cmdState == CmdState::Arithmetic && QuoteStack.dialect == ShellDialect::Bash) {
 					if (sc.chPrev == '[') {	// [#8] [##8] output digit setting
 						sc.ChangeState(SCE_SH_WORD);
 						if (sc.chNext == '#') {
@@ -797,7 +799,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				QuoteStack.Start(sc.ch, QuoteStyle::String, SCE_SH_DEFAULT, cmdState);
 				sc.SetState(SCE_SH_STRING_DQ);
 			} else if (sc.ch == '\'') {
-				if (QuoteStack.dialect == ShellDialect::M4 && IsIdentifierCharEx(sc.chPrev)) {
+				if (QuoteStack.dialect == ShellDialect::M4 && stylePrev != SCE_SH_SCALAR && IsIdentifierCharEx(sc.chPrev)) {
 					// treated as apostrophe: one's, don't
 				} else {
 					QuoteStack.State = SCE_SH_DEFAULT;
