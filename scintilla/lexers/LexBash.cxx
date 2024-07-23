@@ -467,7 +467,8 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				char s[128];
 				sc.GetCurrent(s, sizeof(s));
 				// allow keywords ending in a whitespace, meta character or command delimiter
-				const bool keywordEnds = IsBashMetaCharacter(sc.ch) || AnyOf(sc.ch, '{', '}');
+				const bool keywordEnds = IsBashMetaCharacter(sc.ch) || AnyOf(sc.ch, '{', '}')
+					|| (QuoteStack.dialect == ShellDialect::M4 && AnyOf<'[', ']'>(sc.ch));
 				// 'in' or 'do' may be construct keywords
 				if (cmdState == CmdState::Word) {
 					if (StrEqual(s, "in") && keywordEnds) {
@@ -517,13 +518,15 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 					sc.ChangeState(SCE_SH_IDENTIFIER);
 				}
 
-				// m4
-				if (StrEqual(s, "dnl")) {
+				if (StrEqual(s, "dnl")) { // m4
 					sc.ChangeState(SCE_SH_COMMENTLINE);
 					if (sc.atLineEnd) {
 						sc.SetState(SCE_SH_DEFAULT);
 					}
 				} else {
+					if (sc.state == SCE_SH_IDENTIFIER && (sc.ch == '(' || (sc.ch <= ' ' && sc.chNext == '('))) {
+						sc.ChangeState(SCE_SH_FUNCTION);
+					}
 					sc.SetState(SCE_SH_DEFAULT);
 				}
 			}
@@ -785,12 +788,14 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 						if (sc.chNext == '#') {
 							sc.Forward();
 						}
-					} else if (sc.Match('#', '#', '^') && IsUpperCase(sc.GetRelative(3))) {	// ##^A
-						sc.ChangeState(SCE_SH_IDENTIFIER);
-						sc.Advance(3);
-					} else if (sc.chNext == '#' && !IsASpace(sc.GetRelative(2))) {	// ##a
-						sc.ChangeState(SCE_SH_IDENTIFIER);
-						sc.Advance(2);
+					} else if (sc.chNext == '#') {
+						sc.Forward();
+						if (sc.chNext > ' ') { // ##a
+							sc.ChangeState(SCE_SH_IDENTIFIER);
+							if (sc.chNext == '^' && IsUpperCase(sc.GetRelative(2))) { // ##^A
+								sc.Forward();
+							}
+						}
 					} else if (IsIdentifierStart(sc.chNext)) {	// #name
 						sc.ChangeState(SCE_SH_IDENTIFIER);
 					}
@@ -814,11 +819,10 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 			} else if (cmdState != CmdState::Arithmetic && sc.Match('<', '<')) {
 				sc.SetState(SCE_SH_HERE_DELIM);
 				HereDoc.State = 0;
+				HereDoc.Indent = false;
 				if (sc.GetRelative(2) == '-') {	// <<- indent case
 					HereDoc.Indent = true;
 					sc.Forward();
-				} else {
-					HereDoc.Indent = false;
 				}
 			} else if (sc.ch == '-' && // test operator or short and long option
 				cmdState != CmdState::Arithmetic &&
@@ -850,11 +854,15 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 					if (sc.Match('(', '(')) {
 						cmdState = CmdState::Arithmetic;
 						sc.Forward();
-					} else if (sc.Match('[', '[') && IsASpace(sc.GetRelative(2))) {
-						cmdState = CmdState::DoubleBracket;
-						sc.Forward();
-					} else if (sc.ch == '[' && IsASpace(sc.chNext)) {
-						cmdState = CmdState::SingleBracket;
+					} else if (sc.ch == '[') {
+						if (sc.chNext == '[') {
+							sc.Forward();
+						}
+						if (IsASpace(sc.chNext)) {
+							cmdState = (sc.chPrev == '[') ? CmdState::DoubleBracket : CmdState::SingleBracket;
+						} else if (QuoteStack.dialect == ShellDialect::M4) {
+							cmdState = CmdState::Delimiter;
+						}
 					}
 				}
 				// special state -- for ((x;y;z)) in ... looping
