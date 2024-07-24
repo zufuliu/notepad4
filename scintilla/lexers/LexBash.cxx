@@ -152,9 +152,9 @@ constexpr bool IsBashMetaCharacter(int ch) noexcept {
 	return ch <= 32 || AnyOf(ch, '|', '&', ';', '(', ')', '<', '>');
 }
 
-constexpr bool IsBashOperator(int ch) noexcept {
-	return AnyOf(ch, '^', '&', '%', '(', ')', '-', '+', '=', '|', '{', '}', '[', ']', ':', ';', '>', ',', '*', '<', '?', '!', '.', '~', '@');
-}
+//constexpr bool IsBashOperator(int ch) noexcept {
+//	return AnyOf(ch, '^', '&', '%', '(', ')', '-', '+', '=', '|', '{', '}', '[', ']', ':', ';', '>', ',', '*', '<', '?', '!', '.', '~', '@');
+//}
 
 constexpr bool IsTestOperator(const char *s) noexcept {
 	return s[2] == '\0' || (s[3] == '\0' && IsLowerCase(s[1]) && IsLowerCase(s[2]));
@@ -402,6 +402,8 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 	HereDocCls HereDoc;
 
 	QuoteStackCls QuoteStack;
+	memset(&HereDoc, 0, sizeof(HereDoc));
+	memset(&QuoteStack, 0, sizeof(QuoteStack));
 
 	int numBase = 0;
 	const Sci_PositionU endPos = startPos + length;
@@ -411,17 +413,14 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 	// Always backtracks to the start of a line that is not a continuation
 	// of the previous line (i.e. start of a bash command segment)
 	Sci_Line ln = styler.GetLine(startPos);
-	if (ln > 0 && startPos == static_cast<Sci_PositionU>(styler.LineStart(ln))) {
+	while (ln != 0) {
 		ln--;
-	}
-	for (;;) {
-		startPos = styler.LineStart(ln);
 		if (ln == 0 || styler.GetLineState(ln) == static_cast<int>(CmdState::Start)) {
 			break;
 		}
-		ln--;
 	}
 	initStyle = SCE_SH_DEFAULT;
+	startPos = styler.LineStart(ln);
 	StyleContext sc(startPos, endPos - startPos, initStyle, styler);
 
 	while (sc.More()) {
@@ -804,7 +803,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				QuoteStack.Start(sc.ch, QuoteStyle::String, SCE_SH_DEFAULT, cmdState);
 				sc.SetState(SCE_SH_STRING_DQ);
 			} else if (sc.ch == '\'') {
-				if (QuoteStack.dialect == ShellDialect::M4 && stylePrev != SCE_SH_SCALAR && IsIdentifierCharEx(sc.chPrev)) {
+				if (QuoteStack.dialect == ShellDialect::M4 && stylePrev != SCE_SH_SCALAR && IsAlphaNumeric(sc.chPrev)) {
 					// treated as apostrophe: one's, don't
 				} else {
 					QuoteStack.State = SCE_SH_DEFAULT;
@@ -868,25 +867,15 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				// special state -- for ((x;y;z)) in ... looping
 				if (cmdState == CmdState::Word && sc.Match('(', '(')) {
 					cmdState = CmdState::Arithmetic;
-					sc.Forward(2);
-					continue;
+					sc.Forward();
 				}
 				// handle command delimiters in command Start|Body|Word state, also Test if 'test' or '[]'
 				if (cmdState < CmdState::DoubleBracket) {
-					bool isCmdDelim = false;
-					if (IsBashOperator(sc.chNext)) {
-						isCmdDelim = IsBashCmdDelimiter(sc.ch, sc.chNext);
-						if (isCmdDelim) {
-							sc.Forward();
-						}
-					}
-					if (!isCmdDelim) {
-						isCmdDelim = IsBashCmdDelimiter(sc.ch);
-					}
-					if (isCmdDelim) {
+					if (IsBashCmdDelimiter(sc.ch, sc.chNext)) {
 						cmdState = CmdState::Delimiter;
 						sc.Forward();
-						continue;
+					} else if (IsBashCmdDelimiter(sc.ch)) {
+						cmdState = CmdState::Delimiter;
 					}
 				}
 				// handle closing delimiters for test/arithmetic expressions - )),]],]
