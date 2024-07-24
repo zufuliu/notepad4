@@ -196,6 +196,11 @@ constexpr bool IsBashCmdDelimiter(int ch, int chNext) noexcept {
 		|| (ch == '|' && chNext == '&');
 }
 
+constexpr bool IsM4DelimiterPrev(char ch) noexcept {
+	// function(([ ], [[ ]])), case ... in @%:@ (())
+	return AnyOf(ch, '(', '[', ',', '@');
+}
+
 constexpr bool StyleForceBacktrack(int state) noexcept {
 	return AnyOf(state, SCE_SH_HERE_Q, SCE_SH_STRING_SQ, SCE_SH_STRING_DQ, SCE_SH_PARAM, SCE_SH_BACKTICKS);
 }
@@ -850,6 +855,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				}
 				// handle opening delimiters for test/arithmetic expressions - ((,[[,[
 				if (cmdState <= CmdState::Start) {
+					Sci_Position backPos = sc.currentPos;
 					if (sc.Match('(', '(')) {
 						cmdState = CmdState::Arithmetic;
 						sc.Forward();
@@ -861,6 +867,18 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 							cmdState = (sc.chPrev == '[') ? CmdState::DoubleBracket : CmdState::SingleBracket;
 						} else if (QuoteStack.dialect == ShellDialect::M4) {
 							cmdState = CmdState::Delimiter;
+						}
+					}
+					if (QuoteStack.dialect == ShellDialect::M4 && AnyOf(cmdState, CmdState::SingleBracket, CmdState::DoubleBracket, CmdState::Arithmetic)) {
+						while (backPos != 0) {
+							--backPos;
+							const uint8_t style = styler.BufferStyleAt(backPos);
+							if (style > SCE_SH_COMMENTLINE) {
+								if (AnyOf(style, SCE_SH_IDENTIFIER, SCE_SH_FUNCTION) || (style == SCE_SH_OPERATOR && IsM4DelimiterPrev(styler[backPos]))) {
+									cmdState = CmdState::Delimiter;
+								}
+								break;
+							}
 						}
 					}
 				}
