@@ -678,7 +678,7 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 
 	class HereDocCls {
 	public:
-		int State = 0;
+		uint8_t State = 0;
 		// States
 		// 0: '<<' encountered
 		// 1: collect the delimiter
@@ -687,7 +687,7 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 		char Quote = '\0';		// the char after '<<'
 		bool Quoted = false;		// true if Quote in ('\'','"','`')
 		bool CanBeIndented = false;
-		int DelimiterLength = 0;	// strlen(Delimiter)
+		unsigned DelimiterLength = 0;	// strlen(Delimiter)
 		char Delimiter[256] {};	// the Delimiter, limit of 256: from Perl
 	};
 	HereDocCls HereDoc;
@@ -1298,7 +1298,7 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 						preferRE = false;
 					}
 				}
-				if (HereDoc.DelimiterLength >= static_cast<int>(sizeof(HereDoc.Delimiter)) - 1) {
+				if (HereDoc.DelimiterLength >= sizeof(HereDoc.Delimiter) - 1) {
 					styler.ColorTo(i, state);
 					state = SCE_RB_ERROR;
 					preferRE = false;

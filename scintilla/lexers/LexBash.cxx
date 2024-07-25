@@ -175,12 +175,13 @@ constexpr bool IsBashParamStart(int ch, ShellDialect dialect) noexcept {
 	;
 }
 
-constexpr bool IsBashHereDoc(int ch) noexcept {
-	return IsAlpha(ch) || AnyOf(ch, '_', '\\', '-', '+', '!', '%', '*', ',', '.', '/', ':', '?', '@', '[', ']', '^', '`', '{', '}', '~');
-}
+//constexpr bool IsBashHereDoc(int ch) noexcept {
+// return IsAlpha(ch) || AnyOf(ch, '_', '\\', '-', '+', '!', '%', '*', ',', '.', '/', ':', '?', '@', '[', ']', '^', '`', '{', '}', '~');
+//}
 
-constexpr bool IsBashHereDoc2(int ch) noexcept {
-	return IsAlphaNumeric(ch) || AnyOf(ch, '_', '-', '+', '!', '%', '*', ',', '.', '/', ':', '=', '?', '@', '[', ']', '^', '`', '{', '}', '~');
+constexpr bool IsBashHereDoc2(int ch, int backslash) noexcept {
+	//return IsAlphaNumeric(ch) || AnyOf(ch, '_', '-', '+', '!', '%', '*', ',', '.', '/', ':', '=', '?', '@', '[', ']', '^', '`', '{', '}', '~');
+	return ch > ' ' && ((backslash & 1) != 0 || !AnyOf(ch, '\"', '#', '$', '&', '\'', '(', ')', ';', '<', '>', '|'));
 }
 
 constexpr bool IsBashLeftShift(int ch) noexcept {
@@ -390,14 +391,15 @@ public:
 void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	class HereDocCls {	// Class to manage HERE document elements
 	public:
-		int State = 0;		// 0: '<<' encountered
 		// 1: collect the delimiter
 		// 2: here doc text (lines after the delimiter)
-		int Quote = '\0';		// the char after '<<'
+		uint8_t State = 0;		// 0: '<<' encountered
 		bool Quoted = false;		// true if Quote in ('\'','"','`')
 		bool Escaped = false;		// backslash in delimiter, common in configure script
 		bool Indent = false;		// indented delimiter (for <<-)
-		int DelimiterLength = 0;	// strlen(Delimiter)
+		int Quote = '\0';		// the char after '<<'
+		unsigned BackslashCount = 0;
+		unsigned DelimiterLength = 0;	// strlen(Delimiter)
 		char Delimiter[HERE_DELIM_MAX]{};	// the Delimiter
 		void Append(int ch) noexcept {
 			Delimiter[DelimiterLength++] = static_cast<char>(ch);
@@ -568,49 +570,48 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				HereDoc.Quote = sc.chNext;
 				HereDoc.Quoted = false;
 				HereDoc.Escaped = false;
+				HereDoc.BackslashCount = 0;
 				HereDoc.DelimiterLength = 0;
 				HereDoc.Delimiter[0] = '\0';
 				if (sc.chNext == '\'' || sc.chNext == '\"') {	// a quoted here-doc delimiter (' or ")
-					sc.Forward();
 					HereDoc.Quoted = true;
 					HereDoc.State = 1;
-				} else if (IsBashHereDoc(sc.chNext) ||
-					(sc.chNext == '=' && cmdState != CmdState::Arithmetic)) {
-					// an unquoted here-doc delimiter, no special handling
-					HereDoc.State = 1;
+					sc.Forward();
+				} else if (IsBashLeftShift(sc.chNext) ||
+					sc.chNext == '=' || (sc.chNext == ',' && QuoteStack.dialect == ShellDialect::M4)) {
+					// left shift <<$var or <<= cases
+					// m4: changequote(<<,>>)
+					sc.ChangeState(SCE_SH_OPERATOR);
+					sc.ForwardSetState(SCE_SH_DEFAULT);
 				} else if (sc.chNext == '<') {	// HERE string <<<
 					sc.Forward();
 					sc.ForwardSetState(SCE_SH_DEFAULT);
-				} else if (IsASpace(sc.chNext)) {
+				//} else if (IsBashHereDoc(sc.chNext)) {
+				//	// an unquoted here-doc delimiter, no special handling
+				//	HereDoc.State = 1;
+				} else if (!IsASpace(sc.chNext)) {
 					// eat whitespace
-				} else if (IsBashLeftShift(sc.chNext) ||
-					(sc.chNext == '=' && cmdState == CmdState::Arithmetic)) {
-					// left shift <<$var or <<= cases
-					sc.ChangeState(SCE_SH_OPERATOR);
-					sc.ForwardSetState(SCE_SH_DEFAULT);
-				} else {
 					// symbols terminates; deprecated zero-length delimiter
 					HereDoc.State = 1;
 				}
 			} else if (HereDoc.State == 1) { // collect the delimiter
 				// * if single quoted, there's no escape
 				// * if double quoted, there are \\ and \" escapes
-				if ((HereDoc.Quote == '\'' && sc.ch != HereDoc.Quote) ||
-					(HereDoc.Quoted && sc.ch != HereDoc.Quote && sc.ch != '\\') ||
-					(HereDoc.Quote != '\'' && sc.chPrev == '\\') ||
-					(IsBashHereDoc2(sc.ch))) {
-					HereDoc.Append(sc.ch);
-				} else if (HereDoc.Quoted && sc.ch == HereDoc.Quote) {	// closing quote => end of delimiter
+				if (HereDoc.Quoted && sc.ch == HereDoc.Quote && (HereDoc.BackslashCount & 1) == 0) { // closing quote => end of delimiter
 					sc.ForwardSetState(SCE_SH_DEFAULT);
-				} else if (sc.ch == '\\') {
+				} else if (sc.ch == '\\' && HereDoc.Quote != '\'') {
 					HereDoc.Escaped = true;
-					if (HereDoc.Quoted && sc.chNext != HereDoc.Quote && sc.chNext != '\\') {
+					HereDoc.BackslashCount += 1;
+					if ((HereDoc.BackslashCount & 1) == 0 || (HereDoc.Quoted && !AnyOf(sc.chNext, '\"', '\\'))) {
 						// in quoted prefixes only \ and the quote eat the escape
 						HereDoc.Append(sc.ch);
 					} else {
 						// skip escape prefix
 					}
-				} else if (!HereDoc.Quoted) {
+				} else if (HereDoc.Quoted || IsBashHereDoc2(sc.ch, HereDoc.BackslashCount)) {
+					HereDoc.BackslashCount = 0;
+					HereDoc.Append(sc.ch);
+				} else {
 					sc.SetState(SCE_SH_DEFAULT);
 				}
 				if (HereDoc.DelimiterLength >= HERE_DELIM_MAX - 1) {	// force blowup
@@ -692,7 +693,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 					) {	// do nesting for $(command), `command`, ${parameter}
 					if (sc.ch == '\'') {
 						if (QuoteStack.dialect == ShellDialect::M4 && QuoteStack.Current.Style == QuoteStyle::Backtick
-							&& sc.chPrev > ' ' && !AnyOf(sc.chPrev, '[', '"')) {
+							&& sc.chPrev > ' ' && (sc.chNext <= ' ' || AnyOf(sc.chNext, ']', '.', ','))) {
 							// not command parameter quote, `sed ['']`
 							if (QuoteStack.CountDown(sc, cmdState)) {
 								continue;
