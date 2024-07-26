@@ -319,9 +319,6 @@ inline T DLLFunctionEx(LPCWSTR lpDllName, LPCSTR lpProcName) noexcept {
 #ifndef TVS_EX_DOUBLEBUFFER
 #define TVS_EX_DOUBLEBUFFER			0x0004			// NTDDI_VERSION >= NTDDI_VISTA
 #endif
-#ifndef LCMAP_TITLECASE
-#define LCMAP_TITLECASE				0x00000300		// _WIN32_WINNT >= _WIN32_WINNT_WIN7
-#endif
 
 // High DPI Reference
 // https://docs.microsoft.com/en-us/windows/desktop/hidpi/high-dpi-reference
