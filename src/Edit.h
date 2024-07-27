@@ -132,9 +132,7 @@ bool	EditLoadFile(LPWSTR pszFile, EditFileIOStatus &status) noexcept;
 bool	EditSaveFile(HWND hwnd, LPCWSTR pszFile, int saveFlag, EditFileIOStatus &status) noexcept;
 
 void	EditReplaceMainSelection(Sci_Position cchText, LPCSTR pszText) noexcept;
-void	EditInvertCase() noexcept;
 void	EditMapTextCase(int menu) noexcept;
-void	EditSentenceCase() noexcept;
 
 void	EditURLEncode() noexcept;
 void	EditURLDecode() noexcept;

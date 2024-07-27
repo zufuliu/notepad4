@@ -1344,47 +1344,6 @@ static inline char *EditGetTextRange(Sci_Position iStartPos, Sci_Position iEndPo
 	return mszBuf;
 }
 
-//=============================================================================
-//
-// EditInvertCase()
-//
-void EditInvertCase() noexcept {
-	const Sci_Position iSelCount = SciCall_GetSelTextLength();
-	if (iSelCount == 0) {
-		return;
-	}
-	if (SciCall_IsRectangleSelection()) {
-		NotifyRectangleSelection();
-		return;
-	}
-
-	char *pszText = static_cast<char *>(NP2HeapAlloc(iSelCount*kMaxMultiByteCount + 1));
-	LPWSTR pszTextW = static_cast<LPWSTR>(NP2HeapAlloc((iSelCount + 1) * sizeof(WCHAR)));
-
-	SciCall_GetSelText(pszText);
-	const UINT cpEdit = SciCall_GetCodePage();
-	const int cchTextW = MultiByteToWideChar(cpEdit, 0, pszText, static_cast<int>(iSelCount), pszTextW, static_cast<int>(NP2HeapSize(pszTextW) / sizeof(WCHAR)));
-
-	bool bChanged = false;
-	for (int i = 0; i < cchTextW; i++) {
-		if (IsCharUpper(pszTextW[i])) {
-			pszTextW[i] = LOWORD(CharLower(AsPointer<LPWSTR, LONG_PTR>(MAKELONG(pszTextW[i], 0))));
-			bChanged = true;
-		} else if (IsCharLower(pszTextW[i])) {
-			pszTextW[i] = LOWORD(CharUpper(AsPointer<LPWSTR, LONG_PTR>(MAKELONG(pszTextW[i], 0))));
-			bChanged = true;
-		}
-	}
-
-	if (bChanged) {
-		const int cchText = WideCharToMultiByte(cpEdit, 0, pszTextW, cchTextW, pszText, static_cast<int>(NP2HeapSize(pszText)), nullptr, nullptr);
-		EditReplaceMainSelection(cchText, pszText);
-	}
-
-	NP2HeapFree(pszText);
-	NP2HeapFree(pszTextW);
-}
-
 // https://docs.microsoft.com/en-us/windows/win32/intl/transliteration-services
 #include <elscore.h>
 #if defined(__MINGW32__)
@@ -1419,11 +1378,13 @@ static const GUID ELS_GUID_TRANSLITERATION_BENGALI_TO_LATIN =
 #include <elssrvc.h>
 #endif
 
+namespace {
+
 // {4BA2A721-E43D-41b7-B330-536AE1E48863}
-static const GUID WIN10_ELS_GUID_TRANSLITERATION_HANGUL_DECOMPOSITION =
+const GUID WIN10_ELS_GUID_TRANSLITERATION_HANGUL_DECOMPOSITION =
 	{ 0x4BA2A721, 0xE43D, 0x41b7, { 0xB3, 0x30, 0x53, 0x6A, 0xE1, 0xE4, 0x88, 0x63 } };
 
-static int TransliterateText(const GUID *pGuid, LPCWSTR pszTextW, int cchTextW, LPWSTR *pszMappedW) noexcept {
+int TransliterateText(const GUID *pGuid, LPCWSTR pszTextW, int cchTextW, LPWSTR &pszMappedW) noexcept {
 #if NP2_DYNAMIC_LOAD_ELSCORE_DLL
 using MappingGetServicesSig = HRESULT (WINAPI *)(PMAPPING_ENUM_OPTIONS pOptions, PMAPPING_SERVICE_INFO *prgServices, DWORD *pdwServicesCount);
 using MappingFreeServicesSig = HRESULT (WINAPI *)(PMAPPING_SERVICE_INFO pServiceInfo);
@@ -1487,7 +1448,7 @@ using MappingFreePropertyBagSig = HRESULT (WINAPI *)(PMAPPING_PROPERTY_BAG pBag)
 			if (dwServicesCount != 0 && pszTextW[0] != L'\0') {
 				LPWSTR pszConvW = static_cast<LPWSTR>(NP2HeapAlloc(dwDataSize + sizeof(WCHAR)));
 				memcpy(pszConvW, pszTextW, dwDataSize);
-				*pszMappedW = pszConvW;
+				pszMappedW = pszConvW;
 			}
 #if NP2_DYNAMIC_LOAD_ELSCORE_DLL
 			pfnMappingFreePropertyBag(&bag);
@@ -1505,65 +1466,61 @@ using MappingFreePropertyBagSig = HRESULT (WINAPI *)(PMAPPING_PROPERTY_BAG pBag)
 	return dwServicesCount;
 }
 
-#if _WIN32_WINNT < _WIN32_WINNT_WIN7
-static bool EditTitleCase(LPWSTR pszTextW, int cchTextW) noexcept {
-	bool bChanged = false;
-#if 1
-	// BOOKMARK_EDITION
-	//Slightly enhanced function to make Title Case:
-	//Added some '-characters and bPrevWasSpace makes it better (for example "'Don't'" will now work)
-	bool bNewWord = true;
-	bool bPrevWasSpace = true;
-	for (int i = 0; i < cchTextW; i++) {
-		const WCHAR ch = pszTextW[i];
-		if (!IsCharAlphaNumeric(ch) && (!(ch == L'\'' || ch == L'`' || ch == 0xB4 || ch == 0x0384 || ch == 0x2019) || bPrevWasSpace)) {
-			bNewWord = true;
-		} else {
-			if (bNewWord) {
-				if (IsCharLower(ch)) {
-					pszTextW[i] = LOWORD(CharUpper(AsPointer<LPWSTR, LONG_PTR>(MAKELONG(ch, 0))));
-					bChanged = true;
-				}
-			} else {
-				if (IsCharUpper(ch)) {
-					pszTextW[i] = LOWORD(CharLower(AsPointer<LPWSTR, LONG_PTR>(MAKELONG(ch, 0))));
-					bChanged = true;
-				}
-			}
-			bNewWord = false;
-		}
-
-		bPrevWasSpace = IsASpace(ch) || ch == L'[' || ch == L']' || ch == L'(' || ch == L')' || ch == L'{' || ch == L'}';
+int StringMapCase(LPCWSTR pszTextW, int cchTextW, DWORD flags, LPWSTR &pszMappedW) noexcept {
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+	int charsConverted = LCMapStringEx(LOCALE_NAME_USER_DEFAULT, flags, pszTextW, cchTextW, nullptr, 0, nullptr, nullptr, 0);
+	if (charsConverted) {
+		pszMappedW = static_cast<LPWSTR>(NP2HeapAlloc((charsConverted + 1)*sizeof(WCHAR)));
+		charsConverted = LCMapStringEx(LOCALE_NAME_USER_DEFAULT, flags, pszTextW, cchTextW, pszMappedW, charsConverted, nullptr, nullptr, 0);
 	}
 #else
-	bool bNewWord = true;
-	bool bWordEnd = true;
-	for (int i = 0; i < cchTextW; i++) {
-		const WCHAR ch = pszTextW[i];
-		const BOOL bAlphaNumeric = IsCharAlphaNumeric(ch);
-		if (!bAlphaNumeric && (!(ch == L'\'' || ch == L'`' || ch == 0xB4 || ch == 0x0384 || ch == 0x2019) || bWordEnd)) {
-			bNewWord = true;
-		} else {
-			if (bNewWord) {
-				if (IsCharLower(ch)) {
-					pszTextW[i] = LOWORD(CharUpper(AsPointer<LPWSTR, LONG_PTR>(MAKELONG(ch, 0))));
-					bChanged = true;
-				}
-			} else {
-				if (IsCharUpper(ch)) {
-					pszTextW[i] = LOWORD(CharLower(AsPointer<LPWSTR, LONG_PTR>(MAKELONG(ch, 0))));
-					bChanged = true;
-				}
-			}
-			bNewWord = false;
-		}
-		bWordEnd = !bAlphaNumeric;
+	int charsConverted = LCMapString(LOCALE_USER_DEFAULT, flags, pszTextW, cchTextW, nullptr, 0);
+	if (charsConverted) {
+		pszMappedW = static_cast<LPWSTR>(NP2HeapAlloc((charsConverted + 1)*sizeof(WCHAR)));
+		charsConverted = LCMapString(LOCALE_USER_DEFAULT, flags, pszTextW, cchTextW, pszMappedW, charsConverted);
 	}
 #endif
-
-	return bChanged;
+	return charsConverted;
 }
-#endif
+
+// TODO: Unicode Text Segmentation https://www.unicode.org/reports/tr29/
+constexpr wchar_t ToHalfwidth(wchar_t ch) noexcept {
+	if (ch > 0xFF00 && ch < 0xFF5F) {
+		return ch - 0xFEE0;
+	}
+	return ch;
+}
+
+constexpr bool IsWordSingleQuote(wchar_t ch) noexcept {
+	return ch == L'\'' || ch == L'`'
+		|| ch == 0x00B4 // ACUTE ACCENT
+		|| ch == 0x0384 // GREEK TONOS
+		|| ch == 0x2018 // LEFT SINGLE QUOTATION MARK
+		|| ch == 0x2019 // RIGHT SINGLE QUOTATION MARK
+		;
+}
+
+constexpr bool IsWordSpace(wchar_t ch) noexcept {
+	ch = ToHalfwidth(ch);
+	return IsASpace(ch)
+		|| ch == L'[' || ch == L']' || ch == L'(' || ch == L')' || ch == L'{' || ch == L'}'
+		|| ch == 0x0085 // NEXT LINE
+		|| ch == 0x2028 // LINE SEPARATOR
+		|| ch == 0x2029 // PARAGRAPH SEPARATOR
+		;
+}
+
+constexpr bool IsSentenceTerminator(wchar_t ch) noexcept {
+	ch = ToHalfwidth(ch);
+	return ch == L'\r' || ch == L'\n'
+		|| ch == L'.' || ch == L';' || ch == L'!' || ch == L'?'
+		|| ch == 0x0085 // NEXT LINE
+		|| ch == 0x2028 // LINE SEPARATOR
+		|| ch == 0x2029 // PARAGRAPH SEPARATOR
+		;
+}
+
+}
 
 //=============================================================================
 //
@@ -1582,8 +1539,9 @@ void EditMapTextCase(int menu) noexcept {
 	DWORD flags = 0;
 	const GUID *pGuid = nullptr;
 	switch (menu) {
+	case IDM_EDIT_SENTENCECASE:
 	case IDM_EDIT_TITLECASE:
-		flags = IsWin7AndAbove() ? (LCMAP_LINGUISTIC_CASING | LCMAP_TITLECASE) : 0;
+		flags = LCMAP_LINGUISTIC_CASING | LCMAP_LOWERCASE;
 		break;
 	case IDM_EDIT_MAP_FULLWIDTH:
 		flags = LCMAP_FULLWIDTH;
@@ -1624,8 +1582,9 @@ void EditMapTextCase(int menu) noexcept {
 		// implemented in ScintillaWin::SelectionToHangul().
 		SendMessage(hwndEdit, WM_IME_KEYDOWN, VK_HANJA, 0);
 		return;
+	case IDM_EDIT_INVERTCASE:
 	default:
-		NP2_unreachable();
+		break;
 	}
 
 	char *pszText = static_cast<char *>(NP2HeapAlloc(iSelCount*kMaxMultiByteCount + 1));
@@ -1640,26 +1599,54 @@ void EditMapTextCase(int menu) noexcept {
 		int charsConverted = 0;
 		LPWSTR pszMappedW = nullptr;
 		if (pGuid != nullptr && IsWin7AndAbove()) {
-			charsConverted = TransliterateText(pGuid, pszTextW, cchTextW, &pszMappedW);
+			charsConverted = TransliterateText(pGuid, pszTextW, cchTextW, pszMappedW);
 		}
 		if (pszMappedW == nullptr && flags != 0) {
-#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-			charsConverted = LCMapStringEx(LOCALE_NAME_USER_DEFAULT, flags, pszTextW, cchTextW, nullptr, 0, nullptr, nullptr, 0);
-#else
-			charsConverted = LCMapString(LOCALE_USER_DEFAULT, flags, pszTextW, cchTextW, nullptr, 0);
-#endif
+			charsConverted = StringMapCase(pszTextW, cchTextW, flags, pszMappedW);
 			if (charsConverted) {
-				pszMappedW = static_cast<LPWSTR>(NP2HeapAlloc((charsConverted + 1)*sizeof(WCHAR)));
-#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-				charsConverted = LCMapStringEx(LOCALE_NAME_USER_DEFAULT, flags, pszTextW, cchTextW, pszMappedW, charsConverted, nullptr, nullptr, 0);
-#else
-				charsConverted = LCMapString(LOCALE_USER_DEFAULT, flags, pszTextW, cchTextW, pszMappedW, charsConverted);
-#endif
+				if (menu == IDM_EDIT_TITLECASE) {
+					if (IsWin7AndAbove()) {
+						LPWSTR pszConvW = nullptr;
+						charsConverted = StringMapCase(pszMappedW, charsConverted, LCMAP_LINGUISTIC_CASING | LCMAP_TITLECASE, pszConvW);
+						NP2HeapFree(pszMappedW);
+						pszMappedW = pszConvW;
+					} else {
+						bool bNewWord = true;
+						bool bPrevWasSpace = true;
+						for (int i = 0; i < charsConverted; i++) {
+							const WCHAR ch = pszMappedW[i];
+							if (!IsCharAlphaNumeric(ch) && (!IsWordSingleQuote(ch) || bPrevWasSpace)) {
+								bNewWord = true;
+							} else {
+								if (bNewWord && IsCharLower(ch)) {
+									pszMappedW[i] = LOWORD(CharUpper(AsPointer<LPWSTR, LONG_PTR>(ch)));
+								}
+								bNewWord = false;
+							}
+							bPrevWasSpace = IsWordSpace(ch);
+						}
+					}
+				} else if (menu == IDM_EDIT_SENTENCECASE) {
+					bool bNewSentence = true;
+					for (int i = 0; i < charsConverted; i++) {
+						const WCHAR ch = pszMappedW[i];
+						if (IsSentenceTerminator(ch)) {
+							bNewSentence = true;
+						} else if (bNewSentence && IsCharAlphaNumeric(ch)) {
+							if (IsCharLower(ch)) {
+								pszMappedW[i] = LOWORD(CharUpper(AsPointer<LPWSTR, LONG_PTR>(ch)));
+							}
+							bNewSentence = false;
+						}
+					}
+				}
 			}
 		}
 
-		bChanged = !(charsConverted == 0 || StrIsEmpty(pszMappedW) || StrEqual(pszTextW, pszMappedW));
-		if (bChanged) {
+		if (charsConverted == 0 || StrIsEmpty(pszMappedW) || StrEqual(pszTextW, pszMappedW)) {
+			NP2HeapFree(pszMappedW);
+		} else {
+			bChanged = true;
 			NP2HeapFree(pszTextW);
 			pszTextW = pszMappedW;
 			cchTextW = charsConverted;
@@ -1667,67 +1654,17 @@ void EditMapTextCase(int menu) noexcept {
 				NP2HeapFree(pszText);
 				pszText = static_cast<char *>(NP2HeapAlloc(charsConverted*kMaxMultiByteCount + 1));
 			}
-		} else if (pszMappedW != nullptr) {
-			NP2HeapFree(pszMappedW);
 		}
-	}
-
-#if _WIN32_WINNT < _WIN32_WINNT_WIN7
-	else if (menu == IDM_EDIT_TITLECASE) {
-		bChanged = EditTitleCase(pszTextW, cchTextW);
-	}
-#endif
-
-	if (bChanged) {
-		const int cchText = WideCharToMultiByte(cpEdit, 0, pszTextW, cchTextW, pszText, static_cast<int>(NP2HeapSize(pszText)), nullptr, nullptr);
-		EditReplaceMainSelection(cchText, pszText);
-	}
-
-	NP2HeapFree(pszText);
-	NP2HeapFree(pszTextW);
-}
-
-//=============================================================================
-//
-// EditSentenceCase()
-//
-void EditSentenceCase() noexcept {
-	const Sci_Position iSelCount = SciCall_GetSelTextLength();
-	if (iSelCount == 0) {
-		return;
-	}
-	if (SciCall_IsRectangleSelection()) {
-		NotifyRectangleSelection();
-		return;
-	}
-
-	char *pszText = static_cast<char *>(NP2HeapAlloc(iSelCount*kMaxMultiByteCount + 1));
-	LPWSTR pszTextW = static_cast<LPWSTR>(NP2HeapAlloc((iSelCount + 1) * sizeof(WCHAR)));
-
-	SciCall_GetSelText(pszText);
-	const UINT cpEdit = SciCall_GetCodePage();
-	const int cchTextW = MultiByteToWideChar(cpEdit, 0, pszText, static_cast<int>(iSelCount), pszTextW, static_cast<int>(NP2HeapSize(pszTextW) / sizeof(WCHAR)));
-
-	bool bNewSentence = true;
-	bool bChanged = false;
-	for (int i = 0; i < cchTextW; i++) {
-		const WCHAR ch = pszTextW[i];
-		if (ch == L'.' || ch == L';' || ch == L'!' || ch == L'?' || ch == L'\r' || ch == L'\n') {
-			bNewSentence = true;
-		} else {
-			if (IsCharAlphaNumeric(ch)) {
-				if (bNewSentence) {
-					if (IsCharLower(ch)) {
-						pszTextW[i] = LOWORD(CharUpper(AsPointer<LPWSTR, LONG_PTR>(MAKELONG(ch, 0))));
-						bChanged = true;
-					}
-					bNewSentence = false;
-				} else {
-					if (IsCharUpper(ch)) {
-						pszTextW[i] = LOWORD(CharLower(AsPointer<LPWSTR, LONG_PTR>(MAKELONG(ch, 0))));
-						bChanged = true;
-					}
-				}
+	} else {
+		// invert case
+		for (int i = 0; i < cchTextW; i++) {
+			const WCHAR ch = pszTextW[i];
+			if (IsCharUpper(ch)) {
+				pszTextW[i] = LOWORD(CharLower(AsPointer<LPWSTR, LONG_PTR>(ch)));
+				bChanged = true;
+			} else if (IsCharLower(ch)) {
+				pszTextW[i] = LOWORD(CharUpper(AsPointer<LPWSTR, LONG_PTR>(ch)));
+				bChanged = true;
 			}
 		}
 	}

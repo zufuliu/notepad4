@@ -3455,12 +3455,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_EDIT_INVERTCASE:
-		BeginWaitCursor();
-		EditInvertCase();
-		EndWaitCursor();
-		break;
-
 	case IDM_EDIT_TITLECASE:
+	case IDM_EDIT_SENTENCECASE:
 	case IDM_EDIT_MAP_FULLWIDTH:
 	case IDM_EDIT_MAP_HALFWIDTH:
 	case IDM_EDIT_MAP_SIMPLIFIED_CHINESE:
@@ -3475,12 +3471,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_EDIT_MAP_HANJA_HANGUL:
 		BeginWaitCursor();
 		EditMapTextCase(LOWORD(wParam));
-		EndWaitCursor();
-		break;
-
-	case IDM_EDIT_SENTENCECASE:
-		BeginWaitCursor();
-		EditSentenceCase();
 		EndWaitCursor();
 		break;
 
