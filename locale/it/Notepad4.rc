@@ -268,7 +268,7 @@ BEGIN
 			MENUITEM "&Minuscolo\tCtrl+U",				IDM_EDIT_CONVERTLOWERCASE
 			MENUITEM "In&verti maiuscole e minuscole\tCtrl+Alt+U",		IDM_EDIT_INVERTCASE
 			MENUITEM "Prima lettera maius&cola\tCtrl+Alt+I",			IDM_EDIT_TITLECASE
-			MENUITEM "Prima lettera maiuscola nel paragra&fo\tCtrl+Alt+O",		IDM_EDIT_SENTENCECASE
+			MENUITEM "Prima lettera maiuscola nella &frase\tCtrl+Alt+O",		IDM_EDIT_SENTENCECASE
 			MENUITEM SEPARATOR
 			MENUITEM "Spazi in Ta&b nella selezione\tCtrl+Shift+T",		IDM_EDIT_CONVERTSPACES
 			MENUITEM "Tab in Spazi &nella selezione\tCtrl+Shift+S",	IDM_EDIT_CONVERTTABS
