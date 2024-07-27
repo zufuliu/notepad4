@@ -1582,6 +1582,9 @@ void EditMapTextCase(int menu) noexcept {
 	DWORD flags = 0;
 	const GUID *pGuid = nullptr;
 	switch (menu) {
+	case IDM_EDIT_TITLECASE:
+		flags = IsWin7AndAbove() ? (LCMAP_LINGUISTIC_CASING | LCMAP_TITLECASE) : 0;
+		break;
 	case IDM_EDIT_MAP_FULLWIDTH:
 		flags = LCMAP_FULLWIDTH;
 		break;
