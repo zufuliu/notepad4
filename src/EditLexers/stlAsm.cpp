@@ -110,7 +110,7 @@ static KEYWORDLIST Keywords_ASM = {{
 "cvtss2sd cvtss2si cvttpd2dq cvttpd2pi cvttps2dq cvttps2pi cvttsd2si cvttss2si "
 "divpd divps divsd divss dppd dpps extractps haddpd haddps hsubpd hsubps insertps "
 "lddqu ldmxcsr lfence maskmovdqu maskmovq maxpd maxps maxsd maxss mfence minpd minps "
-"minsd minss monitor movapd movaps movd movddup movdqa movdqu movdq2q movhlps "
+"minsd minss monitor movapd movaps movd movq movddup movdqa movdqu movdq2q movhlps "
 "movhpd movhps movlhps movlpd movlps movmskpd movmskps movntdqa movntdq movnti "
 "movntpd movntps movntq movq2dq movsd movshdup movsldup movss movupd movups mpsadbw "
 "mulpd mulps mulsd mulss mwait "
@@ -133,11 +133,6 @@ static KEYWORDLIST Keywords_ASM = {{
 // AMD
 "lzcnt tzcnt prefetch prefetchw skinit vmload vmmcall vmrun vmsave "
 "extrq insertq movntsd movntss "
-// AMD 3DNow!
-"femms pavgusb pf2id pf2iw pfacc pfadd pfcmpeq pfcmpge pfcmpgt "
-"pfmax pfmin pfmul pfnacc pfpnacc pfrcp pfrcpit1 "
-"pfrcpit2 pfrsqit1 pfrsqrt pfsub pfsubr pi2fd pi2fw pmulhrw pswapd "
-//AMD XOP/FMA4
 
 , // 6 Fold Begin
 "do .while .repeat switch if .if if1 if2 ife ifb ifnb ifdef .ifdef ifndef .ifndef ifidn ifidni macro istruc struc struct union dialog proc .def .func .macro .irp .irpc .rept $if %ifnnum %ifidn %ifidni %ifstr %ifctx %imacro %macro %rep .cfi_startproc .seh_proc "

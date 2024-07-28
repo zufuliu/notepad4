@@ -473,7 +473,7 @@ static KEYWORDLIST Keywords_CPP = {{
 "jnc jne jng jnge jnl jnle jno jnp jns jnz jo jp jpe jpo js jz jmp lahf lar lds les "
 "lfs lgs lss lea leave lgdt lidt lldt lmsw lock lods lodsb lodsw lodsd lodsq loop "
 "loope loopne loopnz loopz lsl ltr mov movbe movs movsb movsw movsd movsq movsx "
-"movsxd movzx mul neg nop not or out outs outsb outsw outsd pause pop popa popad "
+"movsxd movzx mul neg nop not npad or out outs outsb outsw outsd pause pop popa popad "
 "popf popfd popfq push pusha pushad pushf pushfd rcl rcr rol ror rdmsr rdpmc rdtsc "
 "rdtscp rep repe repz repne repnz ret retf rsm sahf sal sar shl shr sbb scas scasb "
 "scasw scasd seta setae setb setbe setc sete setg setge setl setle setna setnae "
@@ -484,10 +484,10 @@ static KEYWORDLIST Keywords_CPP = {{
 // AMD
 "clgi invlpga iretq scasq stgi "
 // GNU Assembler Instruction
-"adcl adcb adcq addl addq addw andb andl andq andw bsrl btl btsl cbtw cltd cmpb cmpl "
-"cmpq cmpw decl decq decw divl fldl fstpl idivl imull incl incq incw insl jmpl jmpq "
-"leal leaq lgdtl lidtl ljmp ljmpl lret lretq lretw movabs movb movl movsbl movsl "
-"movswl movw movzb movzbl movzwl mull mulq negl negw notl notq outsl orb orl orw popal popaw "
+"adcl adcb adcq addl addq addw andb andl andq andw bsrl btl btsl cbtw cltd cltq cwtl cmpb cmpl "
+"cmpq cmpw decl decq decw divl divq fldl fstpl idivl imull incl incq incw insl jmpl jmpq "
+"leal leaq lgdtl lidtl ljmp ljmpl lret lretq lretw movabs movabsw movabsq movb movl movsbl movsl movq movslq "
+"movswl movw movzb movzbl movzwl mull mulq negl negw negq notl notq outsl orb orl orw orq popal popaw imulq "
 "popfl popl popq popw pushal pushfl pushfq pushl pushq rclb rcll rcrl retl retq roll "
 "sall salq sarl sarb sbbb sbbl setaeb shldl shll shrb shrdl shrl shrq shrw stosl subb "
 "subl subq subw testb testl testq testw xorb xorl xorq xorw "
@@ -533,13 +533,8 @@ static KEYWORDLIST Keywords_CPP = {{
 // VMX
 "invept invvpid vmcall vmclear vmlaunch vmresume vmptrld vmptrst vmread vmwrite vmxoff vmxon "
 // AMD
-"lzcnt prefetch prefetchw skinit vmload vmmcall vmrun vmsave "
+"lzcnt tzcnt prefetch prefetchw skinit vmload vmmcall vmrun vmsave "
 "extrq insertq movntsd movntss "
-// AMD 3DNow!
-"femms pavgusb pf2id pf2iw pfacc pfadd pfcmpeq pfcmpge pfcmpgt "
-"pfmax pfmin pfmul pfnacc pfpnacc pfrcp pfrcpit1 "
-"pfrcpit2 pfrsqit1 pfrsqrt pfsub pfsubr pi2fd pi2fw pmulhrw pswapd "
-// AMD XOP/FMA4
 
 , // 12 Assembler Register
 "eax ebx ecx edx esi edi esp ebp "
