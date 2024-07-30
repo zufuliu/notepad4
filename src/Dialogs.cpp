@@ -2587,7 +2587,7 @@ namespace {
 struct INFOBOX {
 	LPWSTR lpstrMessage;
 	LPCWSTR lpstrSetting;
-	LPCWSTR idiIcon;
+	HICON hIcon;
 	bool   bDisableCheckBox;
 };
 
@@ -2603,7 +2603,7 @@ INT_PTR CALLBACK InfoBoxDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
 		const INFOBOX * const lpib = AsPointer<const INFOBOX *>(lParam);
 
-		SendDlgItemMessage(hwnd, IDC_INFOBOXICON, STM_SETICON, AsInteger<WPARAM>(LoadIcon(nullptr, lpib->idiIcon)), 0);
+		SendDlgItemMessage(hwnd, IDC_INFOBOXICON, STM_SETICON, AsInteger<WPARAM>(lpib->hIcon), 0);
 		SetDlgItemText(hwnd, IDC_INFOBOXTEXT, lpib->lpstrMessage);
 		if (lpib->bDisableCheckBox) {
 			EnableWindow(GetDlgItem(hwnd, IDC_INFOBOXCHECK), FALSE);
@@ -2669,13 +2669,29 @@ INT_PTR InfoBox(UINT uType, LPCWSTR lpstrSetting, UINT uidMessage, ...) noexcept
 	va_end(va);
 
 	ib.lpstrSetting = lpstrSetting;
-	ib.idiIcon = (icon == MB_ICONINFORMATION) ? IDI_INFORMATION : ((icon == MB_ICONQUESTION) ? IDI_QUESTION : IDI_EXCLAMATION);
+
+#if 0//_WIN32_WINNT >= _WIN32_WINNT_VISTA
+	SHSTOCKICONINFO sii;
+	sii.cbSize = sizeof(SHSTOCKICONINFO);
+	sii.hIcon = nullptr;
+	const SHSTOCKICONID siid = (icon == MB_ICONINFORMATION) ? SIID_INFO : ((icon == MB_ICONQUESTION) ? SIID_HELP : SIID_WARNING);
+	SHGetStockIconInfo(siid, SHGSI_ICON, &sii); //! not implemented in Wine
+	ib.hIcon = sii.hIcon;
+#else
+	LPCWSTR lpszIcon = (icon == MB_ICONINFORMATION) ? IDI_INFORMATION : ((icon == MB_ICONQUESTION) ? IDI_QUESTION : IDI_EXCLAMATION);
+	ib.hIcon = LoadIcon(nullptr, lpszIcon);
+#endif
+
 	ib.bDisableCheckBox = StrIsEmpty(szIniFile) || StrIsEmpty(lpstrSetting) || iMode == SuppressMmessage_Never;
 
 	const WORD idDlg = (uType == MB_YESNO) ? IDD_INFOBOX_YESNO : ((uType == MB_OKCANCEL) ? IDD_INFOBOX_OKCANCEL : IDD_INFOBOX_OK);
 	HWND hwnd = GetMsgBoxParent();
 	MessageBeep(MB_ICONEXCLAMATION);
-	return ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(idDlg), hwnd, InfoBoxDlgProc, AsInteger<LPARAM>(&ib));
+	const INT_PTR result = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(idDlg), hwnd, InfoBoxDlgProc, AsInteger<LPARAM>(&ib));
+#if 0//_WIN32_WINNT >= _WIN32_WINNT_VISTA
+	DestroyIcon(sii.hIcon);
+#endif
+	return result;
 }
 
 /*
