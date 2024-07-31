@@ -357,23 +357,13 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			break;
 
 		case SCE_JAVA_COMMENTLINE:
-			if (sc.atLineStart) {
-				sc.SetState(SCE_JAVA_DEFAULT);
-			} else {
-				HighlightTaskMarker(sc, visibleChars, visibleCharsBefore, SCE_JAVA_TASKMARKER);
-			}
-			break;
-
+		case SCE_JAVA_COMMENTLINEDOC:
 		case SCE_JAVA_COMMENTBLOCK:
-			if (sc.Match('*', '/')) {
-				sc.Forward();
-				sc.ForwardSetState(SCE_JAVA_DEFAULT);
-			} else if (HighlightTaskMarker(sc, visibleChars, visibleCharsBefore, SCE_JAVA_TASKMARKER)) {
-				continue;
-			}
-			break;
-
 		case SCE_JAVA_COMMENTBLOCKDOC:
+			if (sc.atLineStart && (sc.state == SCE_JAVA_COMMENTLINE || sc.state == SCE_JAVA_COMMENTLINEDOC)) {
+				sc.SetState(SCE_JAVA_DEFAULT);
+				break;
+			}
 			switch (docTagState) {
 			case DocTagState::At:
 				docTagState = DocTagState::None;
@@ -382,7 +372,7 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				if (sc.ch == '}') {
 					docTagState = DocTagState::None;
 					sc.SetState(SCE_JAVA_COMMENTTAGAT);
-					sc.ForwardSetState(SCE_JAVA_COMMENTBLOCKDOC);
+					sc.ForwardSetState(escSeq.outerState);
 				}
 				break;
 			case DocTagState::TagOpen:
@@ -391,32 +381,41 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					docTagState = DocTagState::None;
 					sc.SetState(SCE_JAVA_COMMENTTAGHTML);
 					sc.Forward((sc.ch == '/') ? 2 : 1);
-					sc.SetState(SCE_JAVA_COMMENTBLOCKDOC);
+					sc.SetState(escSeq.outerState);
 				}
 				break;
 			default:
 				break;
 			}
-			if (sc.Match('*', '/')) {
+			if ((sc.state == SCE_JAVA_COMMENTBLOCK || sc.state == SCE_JAVA_COMMENTBLOCKDOC) && sc.Match('*', '/')) {
 				sc.Forward();
 				sc.ForwardSetState(SCE_JAVA_DEFAULT);
-			} else if (sc.ch == '@' && IsAlpha(sc.chNext) && IsCommentTagPrev(sc.chPrev)) {
-				docTagState = DocTagState::At;
-				sc.SetState(SCE_JAVA_COMMENTTAGAT);
-			} else if (sc.Match('{', '@') && IsAlpha(sc.GetRelative(2))) {
-				docTagState = DocTagState::InlineAt;
-				sc.SetState(SCE_JAVA_COMMENTTAGAT);
-				sc.Forward();
-			} else if (sc.ch == '<') {
-				if (IsAlpha(sc.chNext)) {
-					docTagState = DocTagState::TagOpen;
-					sc.SetState(SCE_JAVA_COMMENTTAGHTML);
-				} else if (sc.chNext == '/' && IsAlpha(sc.GetRelative(2))) {
-					docTagState = DocTagState::TagClose;
-					sc.SetState(SCE_JAVA_COMMENTTAGHTML);
+				break;
+			}
+			if (docTagState == DocTagState::None && (sc.state == SCE_JAVA_COMMENTLINEDOC || sc.state == SCE_JAVA_COMMENTBLOCKDOC)) {
+				if (sc.ch == '@' && IsAlpha(sc.chNext) && IsCommentTagPrev(sc.chPrev)) {
+					docTagState = DocTagState::At;
+					escSeq.outerState = sc.state;
+					sc.SetState(SCE_JAVA_COMMENTTAGAT);
+				} else if (sc.Match('{', '@') && IsAlpha(sc.GetRelative(2))) {
+					docTagState = DocTagState::InlineAt;
+					escSeq.outerState = sc.state;
+					sc.SetState(SCE_JAVA_COMMENTTAGAT);
 					sc.Forward();
+				} else if (sc.ch == '<') {
+					if (IsAlpha(sc.chNext)) {
+						docTagState = DocTagState::TagOpen;
+						escSeq.outerState = sc.state;
+						sc.SetState(SCE_JAVA_COMMENTTAGHTML);
+					} else if (sc.chNext == '/' && IsAlpha(sc.GetRelative(2))) {
+						docTagState = DocTagState::TagClose;
+						escSeq.outerState = sc.state;
+						sc.SetState(SCE_JAVA_COMMENTTAGHTML);
+						sc.Forward();
+					}
 				}
-			} else if (HighlightTaskMarker(sc, visibleChars, visibleCharsBefore, SCE_JAVA_TASKMARKER)) {
+			}
+			if (docTagState == DocTagState::None && HighlightTaskMarker(sc, visibleChars, visibleCharsBefore, SCE_JAVA_TASKMARKER)) {
 				continue;
 			}
 			break;
@@ -424,7 +423,7 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		case SCE_JAVA_COMMENTTAGAT:
 		case SCE_JAVA_COMMENTTAGHTML:
 			if (!(IsIdentifierChar(sc.ch) || sc.ch == '-' || sc.ch == ':')) {
-				sc.SetState(SCE_JAVA_COMMENTBLOCKDOC);
+				sc.SetState(escSeq.outerState);
 				continue;
 			}
 			break;
@@ -498,22 +497,22 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		}
 
 		if (sc.state == SCE_JAVA_DEFAULT) {
-			if (sc.Match('/', '/')) {
-				visibleCharsBefore = visibleChars;
-				sc.SetState(SCE_JAVA_COMMENTLINE);
-				if (visibleChars == 0) {
-					lineStateLineType = JavaLineStateMaskLineComment;
-				}
-			} else if (sc.Match('/', '*')) {
+			if (sc.ch == '/' && (sc.chNext == '/' || sc.chNext == '*')) {
 				visibleCharsBefore = visibleChars;
 				docTagState = DocTagState::None;
-				sc.SetState(SCE_JAVA_COMMENTBLOCK);
+				const int chNext = sc.chNext;
+				if (chNext == '/' && visibleChars == 0) {
+					lineStateLineType = JavaLineStateMaskLineComment;
+				}
+				sc.SetState((chNext == '/') ? SCE_JAVA_COMMENTLINE : SCE_JAVA_COMMENTBLOCK);
 				sc.Forward(2);
-				if (sc.ch == '*' && sc.chNext != '*') {
-					sc.ChangeState(SCE_JAVA_COMMENTBLOCKDOC);
+				if (sc.ch == chNext && sc.chNext != chNext) {
+					static_assert(SCE_JAVA_COMMENTLINEDOC - SCE_JAVA_COMMENTLINE == SCE_JAVA_COMMENTBLOCKDOC - SCE_JAVA_COMMENTBLOCK);
+					sc.ChangeState(sc.state + SCE_JAVA_COMMENTLINEDOC - SCE_JAVA_COMMENTLINE);
 				}
 				continue;
-			} else if (sc.ch == '\"') {
+			}
+			if (sc.ch == '\"') {
 				insideUrl = false;
 				if (sc.MatchNext('"', '"')) {
 					sc.SetState((sc.chPrev == '.') ? SCE_JAVA_TRIPLE_TEMPLATE : SCE_JAVA_TRIPLE_STRING);
