@@ -313,23 +313,12 @@ void ColouriseGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 			break;
 
 		case SCE_GROOVY_COMMENTLINE:
-			if (sc.atLineStart) {
-				sc.SetState(SCE_GROOVY_DEFAULT);
-			} else {
-				HighlightTaskMarker(sc, visibleChars, visibleCharsBefore, SCE_GROOVY_TASKMARKER);
-			}
-			break;
-
 		case SCE_GROOVY_COMMENTBLOCK:
-			if (sc.Match('*', '/')) {
-				sc.Forward();
-				sc.ForwardSetState(SCE_GROOVY_DEFAULT);
-			} else if (HighlightTaskMarker(sc, visibleChars, visibleCharsBefore, SCE_GROOVY_TASKMARKER)) {
-				continue;
-			}
-			break;
-
 		case SCE_GROOVY_COMMENTBLOCKDOC:
+			if (sc.atLineStart && (sc.state == SCE_GROOVY_COMMENTLINE)) {
+				sc.SetState(SCE_GROOVY_DEFAULT);
+				break;
+			}
 			switch (docTagState) {
 			case DocTagState::At:
 				docTagState = DocTagState::None;
@@ -353,26 +342,31 @@ void ColouriseGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 			default:
 				break;
 			}
-			if (sc.Match('*', '/')) {
+			if ((sc.state == SCE_GROOVY_COMMENTBLOCK || sc.state == SCE_GROOVY_COMMENTBLOCKDOC) && sc.Match('*', '/')) {
 				sc.Forward();
 				sc.ForwardSetState(SCE_GROOVY_DEFAULT);
-			} else if (sc.ch == '@' && IsAlpha(sc.chNext) && IsCommentTagPrev(sc.chPrev)) {
-				docTagState = DocTagState::At;
-				sc.SetState(SCE_GROOVY_COMMENTTAGAT);
-			} else if (sc.Match('{', '@') && IsAlpha(sc.GetRelative(2))) {
-				docTagState = DocTagState::InlineAt;
-				sc.SetState(SCE_GROOVY_COMMENTTAGAT);
-				sc.Forward();
-			} else if (sc.ch == '<') {
-				if (IsAlpha(sc.chNext)) {
-					docTagState = DocTagState::TagOpen;
-					sc.SetState(SCE_GROOVY_COMMENTTAGHTML);
-				} else if (sc.chNext == '/' && IsAlpha(sc.GetRelative(2))) {
-					docTagState = DocTagState::TagClose;
-					sc.SetState(SCE_GROOVY_COMMENTTAGHTML);
+				break;
+			}
+			if (docTagState == DocTagState::None && sc.state == SCE_GROOVY_COMMENTBLOCKDOC) {
+				if (sc.ch == '@' && IsAlpha(sc.chNext) && IsCommentTagPrev(sc.chPrev)) {
+					docTagState = DocTagState::At;
+					sc.SetState(SCE_GROOVY_COMMENTTAGAT);
+				} else if (sc.Match('{', '@') && IsAlpha(sc.GetRelative(2))) {
+					docTagState = DocTagState::InlineAt;
+					sc.SetState(SCE_GROOVY_COMMENTTAGAT);
 					sc.Forward();
+				} else if (sc.ch == '<') {
+					if (IsAlpha(sc.chNext)) {
+						docTagState = DocTagState::TagOpen;
+						sc.SetState(SCE_GROOVY_COMMENTTAGHTML);
+					} else if (sc.chNext == '/' && IsAlpha(sc.GetRelative(2))) {
+						docTagState = DocTagState::TagClose;
+						sc.SetState(SCE_GROOVY_COMMENTTAGHTML);
+						sc.Forward();
+					}
 				}
-			} else if (HighlightTaskMarker(sc, visibleChars, visibleCharsBefore, SCE_GROOVY_TASKMARKER)) {
+			}
+			if (docTagState == DocTagState::None && HighlightTaskMarker(sc, visibleChars, visibleCharsBefore, SCE_GROOVY_TASKMARKER)) {
 				continue;
 			}
 			break;
