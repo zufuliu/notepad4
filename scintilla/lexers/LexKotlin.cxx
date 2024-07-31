@@ -313,7 +313,8 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 				sc.SetState((chNext == '/') ? SCE_KOTLIN_COMMENTLINE : SCE_KOTLIN_COMMENTBLOCK);
 				sc.Forward(2);
 				if (sc.ch == '!' || (sc.ch == chNext && sc.chNext != chNext)) {
-					sc.ChangeState((chNext == '/') ? SCE_KOTLIN_COMMENTLINEDOC : SCE_KOTLIN_COMMENTBLOCKDOC);
+					static_assert(SCE_KOTLIN_COMMENTLINEDOC - SCE_KOTLIN_COMMENTLINE == SCE_KOTLIN_COMMENTBLOCKDOC - SCE_KOTLIN_COMMENTBLOCK);
+					sc.ChangeState(sc.state + SCE_KOTLIN_COMMENTLINEDOC - SCE_KOTLIN_COMMENTLINE);
 				}
 				if (chNext == '/') {
 					if (visibleChars == 0) {

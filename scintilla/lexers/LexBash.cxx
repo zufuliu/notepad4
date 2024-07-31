@@ -391,9 +391,9 @@ public:
 void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	class HereDocCls {	// Class to manage HERE document elements
 	public:
+		uint8_t State = 0;		// 0: '<<' encountered
 		// 1: collect the delimiter
 		// 2: here doc text (lines after the delimiter)
-		uint8_t State = 0;		// 0: '<<' encountered
 		bool Quoted = false;		// true if Quote in ('\'','"','`')
 		bool Escaped = false;		// backslash in delimiter, common in configure script
 		bool Indent = false;		// indented delimiter (for <<-)

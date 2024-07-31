@@ -372,7 +372,8 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					sc.SetState((chNext == '/') ? SCE_SWIFT_COMMENTLINE : SCE_SWIFT_COMMENTBLOCK);
 					sc.Forward(2);
 					if (sc.ch == ':' || sc.ch == '!' || (sc.ch == chNext && sc.chNext != chNext)) {
-						sc.ChangeState((chNext == '/') ? SCE_SWIFT_COMMENTLINEDOC : SCE_SWIFT_COMMENTBLOCKDOC);
+						static_assert(SCE_SWIFT_COMMENTLINEDOC - SCE_SWIFT_COMMENTLINE == SCE_SWIFT_COMMENTBLOCKDOC - SCE_SWIFT_COMMENTBLOCK);
+						sc.ChangeState(sc.state + SCE_SWIFT_COMMENTLINEDOC - SCE_SWIFT_COMMENTLINE);
 					}
 					if (chNext == '/') {
 						if (visibleChars == 0) {
