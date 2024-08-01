@@ -295,22 +295,13 @@ bool EditPrint(HWND hwnd, LPCWSTR pszDocTitle, BOOL bDefault) noexcept {
 	// Set print zoom...
 	SciCall_SetPrintMagnification(iPrintZoom);
 
-	Sci_Position lengthDoc = SciCall_GetLength();
-	const Sci_Position lengthDocMax = lengthDoc;
-	Sci_Position lengthPrinted = 0;
+	Sci_Position lengthDoc = endPos;
+	Sci_Position lengthPrinted = startPos;
 
 	// Requested to print selection
-	if (pdlg.Flags & PD_SELECTION) {
-		if (startPos > endPos) {
-			lengthPrinted = endPos;
-			lengthDoc = startPos;
-		} else {
-			lengthPrinted = startPos;
-			lengthDoc = endPos;
-		}
-
-		lengthPrinted = sci::max<Sci_Position>(lengthPrinted, 0);
-		lengthDoc = sci::min(lengthDoc, lengthDocMax);
+	if (pdlg.Flags & PD_NOSELECTION) {
+		lengthPrinted = 0;
+		lengthDoc = SciCall_GetLength();
 	}
 
 	// We must substract the physical margins from the printable area
