@@ -79,7 +79,7 @@
   <PropertyGroup>
     <LinkIncremental Condition="'$(Configuration)'=='Debug'">true</LinkIncremental>
     <LinkIncremental Condition="'$(Configuration)'=='Release'">false</LinkIncremental>
-    <OutDir>$(SolutionDir)..\build\bin\$(Configuration)\$(Platform)\locale\fr-FR\</OutDir>
+    <OutDir>$(SolutionDir)..\build\bin\$(Configuration)\$(Platform)\locale\fr\</OutDir>
     <IntDir>$(SolutionDir)..\build\bin\$(Configuration)\$(Platform)\obj\$(ProjectName)\</IntDir>
     <GenerateManifest>false</GenerateManifest>
   </PropertyGroup>

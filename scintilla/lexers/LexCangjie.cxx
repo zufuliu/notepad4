@@ -312,7 +312,8 @@ void ColouriseCangjieDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int ini
 				sc.SetState((chNext == '/') ? SCE_CANGJIE_COMMENTLINE : SCE_CANGJIE_COMMENTBLOCK);
 				sc.Forward(2);
 				if (sc.ch == chNext && sc.chNext != chNext) {
-					sc.ChangeState((chNext == '/') ? SCE_CANGJIE_COMMENTLINEDOC : SCE_CANGJIE_COMMENTBLOCKDOC);
+					static_assert(SCE_CANGJIE_COMMENTLINEDOC - SCE_CANGJIE_COMMENTLINE == SCE_CANGJIE_COMMENTBLOCKDOC - SCE_CANGJIE_COMMENTBLOCK);
+					sc.ChangeState(sc.state + SCE_CANGJIE_COMMENTLINEDOC - SCE_CANGJIE_COMMENTLINE);
 				}
 				if (chNext == '/') {
 					if (visibleChars == 0) {

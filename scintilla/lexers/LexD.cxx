@@ -550,7 +550,8 @@ void ColouriseDDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 				sc.SetState((chNext == '/') ? SCE_D_COMMENTLINE : SCE_D_COMMENTBLOCK);
 				sc.Forward(2);
 				if (sc.ch == chNext) {
-					sc.ChangeState((chNext == '/') ? SCE_D_COMMENTLINEDOC : SCE_D_COMMENTBLOCKDOC);
+					static_assert(SCE_D_COMMENTLINEDOC - SCE_D_COMMENTLINE == SCE_D_COMMENTBLOCKDOC - SCE_D_COMMENTBLOCK);
+					sc.ChangeState(sc.state + SCE_D_COMMENTLINEDOC - SCE_D_COMMENTLINE);
 				}
 				if (chNext == '/' && visibleChars == 0) {
 					lineStateLineType = DLineStateMaskLineComment;

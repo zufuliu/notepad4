@@ -344,7 +344,8 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				sc.SetState((chNext == '/') ? SCE_DART_COMMENTLINE : SCE_DART_COMMENTBLOCK);
 				sc.Forward(2);
 				if (sc.ch == chNext && sc.chNext != chNext) {
-					sc.ChangeState((chNext == '/') ? SCE_DART_COMMENTLINEDOC : SCE_DART_COMMENTBLOCKDOC);
+					static_assert(SCE_DART_COMMENTLINEDOC - SCE_DART_COMMENTLINE == SCE_DART_COMMENTBLOCKDOC - SCE_DART_COMMENTBLOCK);
+					sc.ChangeState(sc.state + SCE_DART_COMMENTLINEDOC - SCE_DART_COMMENTLINE);
 				}
 				if (chNext == '/') {
 					if (visibleChars == 0) {

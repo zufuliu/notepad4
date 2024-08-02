@@ -31,9 +31,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "matepath(pt-BR)", "pt-BR\ma
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Notepad4(pt-BR)", "pt-BR\Notepad4(pt-BR).vcxproj", "{AF5C3157-21A9-40A9-AC21-27BD1EFC6826}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "matepath(fr-FR)", "fr-FR\matepath(fr-FR).vcxproj", "{E9FD4BB7-406E-41B6-ABF3-C1A3F3AA677F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "matepath(fr)", "fr\matepath(fr).vcxproj", "{E9FD4BB7-406E-41B6-ABF3-C1A3F3AA677F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Notepad4(fr-FR)", "fr-FR\Notepad4(fr-FR).vcxproj", "{B56E86E2-F6AB-4615-BE4A-C9612D14BDFA}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Notepad4(fr)", "fr\Notepad4(fr).vcxproj", "{B56E86E2-F6AB-4615-BE4A-C9612D14BDFA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

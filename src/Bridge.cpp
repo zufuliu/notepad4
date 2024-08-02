@@ -295,22 +295,13 @@ bool EditPrint(HWND hwnd, LPCWSTR pszDocTitle, BOOL bDefault) noexcept {
 	// Set print zoom...
 	SciCall_SetPrintMagnification(iPrintZoom);
 
-	Sci_Position lengthDoc = SciCall_GetLength();
-	const Sci_Position lengthDocMax = lengthDoc;
-	Sci_Position lengthPrinted = 0;
+	Sci_Position lengthDoc = endPos;
+	Sci_Position lengthPrinted = startPos;
 
 	// Requested to print selection
-	if (pdlg.Flags & PD_SELECTION) {
-		if (startPos > endPos) {
-			lengthPrinted = endPos;
-			lengthDoc = startPos;
-		} else {
-			lengthPrinted = startPos;
-			lengthDoc = endPos;
-		}
-
-		lengthPrinted = sci::max<Sci_Position>(lengthPrinted, 0);
-		lengthDoc = sci::min(lengthDoc, lengthDocMax);
+	if (pdlg.Flags & PD_NOSELECTION) {
+		lengthPrinted = 0;
+		lengthDoc = SciCall_GetLength();
 	}
 
 	// We must substract the physical margins from the printable area
@@ -755,7 +746,7 @@ constexpr int GetRTFFontSize(int size) noexcept {
 	return size / (SC_FONT_SIZE_MULTIPLIER / 2);
 }
 
-std::string SaveToStreamRTF(const char *styledText, size_t textLength, Sci_Position startPos, Sci_Position endPos) {
+void SaveToStreamRTF(std::string &os, const char *styledText, size_t textLength, Sci_Position startPos, Sci_Position endPos) {
 	uint8_t styleMap[STYLE_MAX + 1];
 	const auto [styleList, styleCount, cpEdit] = GetDocumentStyledText(styleMap, styledText, textLength);
 	const std::unique_ptr<std::string[]> styles = make_unique_for_overwrite<std::string[]>(styleCount);
@@ -770,7 +761,7 @@ std::string SaveToStreamRTF(const char *styledText, size_t textLength, Sci_Posit
 	char fmtbuf[RTF_MAX_STYLEDEF];
 	memset(fmtbuf, 0, 4);
 	unsigned fmtlen = sprintf(fmtbuf, RTF_HEADEROPEN RTF_FONTDEFOPEN, legacyACP);
-	std::string os(fmtbuf, fmtlen);
+	os += std::string_view{fmtbuf, fmtlen};
 
 	int fontCount = 0;
 	int colorCount = 0;
@@ -959,7 +950,6 @@ std::string SaveToStreamRTF(const char *styledText, size_t textLength, Sci_Posit
 	}
 
 	os += RTF_PARAGRAPH_END RTF_BODYCLOSE;
-	return os;
 }
 
 }
@@ -1007,9 +997,8 @@ int AddStyleSeparator(LPCEDITLEXER pLex, int ch, int chPrev, int style) noexcept
 	return SpaceOption_None;
 }
 
-std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLength) {
+void CodePretty(std::string &output, LPCEDITLEXER pLex, const char *styledText, size_t textLength) {
 	char fmtbuf[128];
-	std::string output;
 	std::string braceStack(1, '\0'); // sentinel
 	memset(fmtbuf, 0, 4);
 
@@ -1304,7 +1293,6 @@ std::string CodePretty(LPCEDITLEXER pLex, const char *styledText, size_t textLen
 	if (fmtlen != 0) {
 		output += std::string_view{fmtbuf, fmtlen};
 	}
-	return output;
 }
 
 }
@@ -1314,10 +1302,13 @@ void EditFormatCode(int menu) noexcept {
 	if (menu != IDM_EDIT_COPYRTF && pLex->iLexer != SCLEX_JSON && pLex->iLexer != SCLEX_CSS && pLex->iLexer != SCLEX_JAVASCRIPT) {
 		return;
 	}
-	const Sci_Position startPos = SciCall_GetSelectionStart();
-	const Sci_Position endPos = SciCall_GetSelectionEnd();
+	Sci_Position startPos = SciCall_GetSelectionStart();
+	Sci_Position endPos = SciCall_GetSelectionEnd();
+	bool wholeDoc = false;
 	if (startPos == endPos) {
-		return;
+		wholeDoc = true;
+		startPos = 0;
+		endPos = SciCall_GetLength();
 	}
 
 	try {
@@ -1325,10 +1316,13 @@ void EditFormatCode(int menu) noexcept {
 		const std::unique_ptr<char[]> styledText = make_unique_for_overwrite<char[]>(2*(endPos - startPos) + 2);
 		const Sci_TextRangeFull tr { { startPos, endPos }, styledText.get() };
 		const size_t textLength = SciCall_GetStyledTextFull(&tr);
+		std::string output;
+		std::string_view result;
+		bool changed = false;
 
 		if (menu == IDM_EDIT_COPYRTF) {
 			// code from SciTEWin::CopyAsRTF()
-			const std::string output = SaveToStreamRTF(styledText.get(), textLength, startPos, endPos);
+			SaveToStreamRTF(output, styledText.get(), textLength, startPos, endPos);
 			//printf("%s:\n%s\n", __func__, output.c_str());
 			const size_t len = output.length() + 1; // +1 for NUL
 			HGLOBAL handle = ::GlobalAlloc(GMEM_MOVEABLE | GMEM_ZEROINIT, len);
@@ -1370,12 +1364,22 @@ void EditFormatCode(int menu) noexcept {
 			}
 			styledText[index] = '\0';
 			if (index < textLength) {
-				EditReplaceMainSelection(index, styledText.get());
+				changed = true;
+				result = {styledText.get(), index};
 			}
 		} else {
-			const std::string output = CodePretty(pLex, styledText.get(), textLength);
+			CodePretty(output, pLex, styledText.get(), textLength);
 			if (output.length() != textLength) {
-				EditReplaceMainSelection(output.length(), output.c_str());
+				changed = true;
+				result = output;
+			}
+		}
+		if (changed) {
+			if (wholeDoc) {
+				SciCall_TargetWholeDocument();
+				SciCall_ReplaceTarget(result.length(), result.data());
+			} else {
+				EditReplaceMainSelection(result.length(), result.data());
 			}
 		}
 	} catch (...) {

@@ -555,7 +555,8 @@ void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 						sc.SetState((chNext == '/') ? SCE_C_COMMENTLINE : SCE_C_COMMENT);
 						sc.Forward(2);
 						if (sc.ch == '!' || (sc.ch == chNext && sc.chNext != chNext)) {
-							sc.ChangeState((chNext == '/') ? SCE_C_COMMENTLINEDOC : SCE_C_COMMENTDOC);
+							static_assert(SCE_C_COMMENTLINEDOC - SCE_C_COMMENTLINE == SCE_C_COMMENTDOC - SCE_C_COMMENT);
+							sc.ChangeState(sc.state + SCE_C_COMMENTLINEDOC - SCE_C_COMMENTLINE);
 						}
 						continue;
 					} else if (IsNumberStart(sc.ch, sc.chNext)) {

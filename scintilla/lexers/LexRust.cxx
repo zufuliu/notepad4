@@ -398,7 +398,8 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				sc.SetState((chNext == '/') ? SCE_RUST_COMMENTLINE : SCE_RUST_COMMENTBLOCK);
 				sc.Forward(2);
 				if (sc.ch == '!' || (sc.ch == chNext && sc.chNext != chNext)) {
-					sc.ChangeState((chNext == '/') ? SCE_RUST_COMMENTLINEDOC : SCE_RUST_COMMENTBLOCKDOC);
+					static_assert(SCE_RUST_COMMENTLINEDOC - SCE_RUST_COMMENTLINE == SCE_RUST_COMMENTBLOCKDOC - SCE_RUST_COMMENTBLOCK);
+					sc.ChangeState(sc.state + SCE_RUST_COMMENTLINEDOC - SCE_RUST_COMMENTLINE);
 				}
 				if (chNext == '/') {
 					if (visibleChars == 0) {

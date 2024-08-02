@@ -959,10 +959,9 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				break;
 			case DocTagState::InlineAt:
 				if (sc.ch == '}') {
-					const int state = sc.state;
 					docTagState = DocTagState::None;
-					sc.SetState(GetCommentTagStyle(state));
-					sc.ForwardSetState(state);
+					sc.SetState(GetCommentTagStyle(sc.state));
+					sc.ForwardSetState(escSeq.outerState);
 				}
 				break;
 			default:

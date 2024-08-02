@@ -14,7 +14,7 @@ localeDir = os.path.abspath('../locale')
 notepad4_rc = os.path.abspath('../src/Notepad4.rc')
 matepath_rc = os.path.abspath('../matepath/src/matepath.rc')
 
-activeLocaleList = ['i18n', 'en', 'fr-FR', 'it', 'ja', 'ko', 'zh-Hans', 'zh-Hant']
+activeLocaleList = ['i18n', 'en', 'fr', 'it', 'ja', 'ko', 'zh-Hans', 'zh-Hant']
 defaultConfig = {
 	'NP2_ENABLE_CUSTOMIZE_TOOLBAR_LABELS': 0,
 	'NP2_ENABLE_HIDPI_IMAGE_RESOURCE': 1,

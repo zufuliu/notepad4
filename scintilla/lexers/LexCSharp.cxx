@@ -406,45 +406,28 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 			break;
 
 		case SCE_CSHARP_COMMENTLINE:
-			if (sc.atLineStart) {
-				sc.SetState(SCE_CSHARP_DEFAULT);
-			} else {
-				HighlightTaskMarker(sc, visibleChars, visibleCharsBefore, SCE_CSHARP_TASKMARKER);
-			}
-			break;
-
-		case SCE_CSHARP_COMMENTBLOCK:
-			if (sc.Match('*', '/')) {
-				sc.Forward();
-				sc.ForwardSetState(SCE_CSHARP_DEFAULT);
-			} else if (HighlightTaskMarker(sc, visibleChars, visibleCharsBefore, SCE_CSHARP_TASKMARKER)) {
-				continue;
-			}
-			break;
-
 		case SCE_CSHARP_COMMENTLINEDOC:
+		case SCE_CSHARP_COMMENTBLOCK:
 		case SCE_CSHARP_COMMENTBLOCKDOC:
-			if (sc.state == SCE_CSHARP_COMMENTLINEDOC) {
-				if (sc.atLineStart) {
-					sc.SetState(SCE_CSHARP_DEFAULT);
-					break;
-				}
-			} else if (sc.Match('*', '/')) {
-				sc.Forward();
-				sc.ForwardSetState(SCE_CSHARP_DEFAULT);
+			if (sc.atLineStart && (sc.state == SCE_CSHARP_COMMENTLINE || sc.state == SCE_CSHARP_COMMENTLINEDOC)) {
+				sc.SetState(SCE_CSHARP_DEFAULT);
 				break;
 			}
 			if (docTagState != DocTagState::None) {
 				if (sc.Match('/', '>') || sc.ch == '>') {
 					docTagState = DocTagState::None;
-					const int state = sc.state;
 					sc.SetState(SCE_CSHARP_COMMENTTAG_XML);
 					sc.Forward((sc.ch == '/') ? 2 : 1);
-					sc.SetState(state);
+					sc.SetState(escSeq.outerState);
 				}
 			}
+			if ((sc.state == SCE_CSHARP_COMMENTBLOCK || sc.state == SCE_CSHARP_COMMENTBLOCKDOC) && sc.Match('*', '/')) {
+				sc.Forward();
+				sc.ForwardSetState(SCE_CSHARP_DEFAULT);
+				break;
+			}
 			if (docTagState == DocTagState::None) {
-				if (sc.ch == '<') {
+				if (sc.ch == '<' && (sc.state == SCE_CSHARP_COMMENTLINEDOC || sc.state == SCE_CSHARP_COMMENTBLOCKDOC)) {
 					if (IsAlpha(sc.chNext)) {
 						docTagState = DocTagState::XmlOpen;
 						escSeq.outerState = sc.state;
@@ -626,7 +609,8 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 				sc.SetState((chNext == '/') ? SCE_CSHARP_COMMENTLINE : SCE_CSHARP_COMMENTBLOCK);
 				sc.Forward(2);
 				if (sc.ch == chNext && sc.chNext != chNext) {
-					sc.ChangeState((chNext == '/') ? SCE_CSHARP_COMMENTLINEDOC : SCE_CSHARP_COMMENTBLOCKDOC);
+					static_assert(SCE_CSHARP_COMMENTLINEDOC - SCE_CSHARP_COMMENTLINE == SCE_CSHARP_COMMENTBLOCKDOC - SCE_CSHARP_COMMENTBLOCK);
+					sc.ChangeState(sc.state + SCE_CSHARP_COMMENTLINEDOC - SCE_CSHARP_COMMENTLINE);
 				}
 				continue;
 			} else if (sc.ch == '\"' || sc.ch == '$' || sc.ch == '@') {

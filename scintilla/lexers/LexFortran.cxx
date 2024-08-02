@@ -79,6 +79,7 @@ void ColouriseFortranDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int ini
 	int lineState = 0;
 	int visibleChars = 0;
 	int parenCount = 0;
+	bool ifConstruct = false;
 	KeywordType kwType = KeywordType::None;
 	EscapeSequence escSeq;
 
@@ -164,6 +165,9 @@ void ColouriseFortranDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int ini
 							kwType = KeywordType::Else;
 						} else if (StrEqual(s, "change")) {
 							kwType = KeywordType::Change;
+						} else if (ifConstruct && StrEqual(s, "then")) {
+							ifConstruct = false;
+							state = SCE_F_FOLDING_WORD;
 						}
 					} else {
 						if (prevWord == KeywordType::End || prevWord == KeywordType::Module) {
@@ -179,9 +183,8 @@ void ColouriseFortranDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int ini
 							kwType = KeywordType::Function;
 						} else if (state == SCE_F_FOLDING_WORD) {
 							if (StrEqual(s, "if")) {
-								if (prevWord == KeywordType::Else) {
-									state = SCE_F_WORD;
-								}
+								state = SCE_F_WORD; 
+								ifConstruct = prevWord != KeywordType::Else;
 							} else if (StrEqual(s, "type")) {
 								if (chNext == '(' || prevWord == KeywordType::Select) {
 									state = SCE_F_WORD;
@@ -325,6 +328,7 @@ void ColouriseFortranDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int ini
 			lineState &= FortranLineStateLineContinuation;
 			visibleChars = 0;
 			kwType = KeywordType::None;
+			ifConstruct = false;
 		}
 		sc.Forward();
 	}

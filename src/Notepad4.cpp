@@ -2476,6 +2476,8 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 		CMD_OPEN_PATH_OR_LINK,
 		CMD_TIMESTAMPS,
 		IDM_EDIT_CLEARDOCUMENT,
+		IDM_EDIT_CODE_COMPRESS,
+		IDM_EDIT_CODE_PRETTY,
 		IDM_EDIT_COMPLETEWORD,
 		IDM_EDIT_COPY,
 		IDM_EDIT_COPYALL,
@@ -2530,8 +2532,6 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 		IDM_EDIT_BASE64_HTML_EMBEDDED_IMAGE,
 		IDM_EDIT_BASE64_SAFE_ENCODE,
 		IDM_EDIT_CHAR2HEX,
-		IDM_EDIT_CODE_COMPRESS,
-		IDM_EDIT_CODE_PRETTY,
 		IDM_EDIT_COLUMNWRAP,
 		IDM_EDIT_CONVERTLOWERCASE,
 		IDM_EDIT_CONVERTSPACES,
@@ -3455,12 +3455,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_EDIT_INVERTCASE:
-		BeginWaitCursor();
-		EditInvertCase();
-		EndWaitCursor();
-		break;
-
 	case IDM_EDIT_TITLECASE:
+	case IDM_EDIT_SENTENCECASE:
 	case IDM_EDIT_MAP_FULLWIDTH:
 	case IDM_EDIT_MAP_HALFWIDTH:
 	case IDM_EDIT_MAP_SIMPLIFIED_CHINESE:
@@ -3475,12 +3471,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_EDIT_MAP_HANJA_HANGUL:
 		BeginWaitCursor();
 		EditMapTextCase(LOWORD(wParam));
-		EndWaitCursor();
-		break;
-
-	case IDM_EDIT_SENTENCECASE:
-		BeginWaitCursor();
-		EditSentenceCase();
 		EndWaitCursor();
 		break;
 
