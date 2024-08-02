@@ -1611,6 +1611,7 @@ void EditMapTextCase(int menu) noexcept {
 						NP2HeapFree(pszMappedW);
 						pszMappedW = pszConvW;
 					} else {
+						// BOOKMARK_EDITION
 						bool bNewWord = true;
 						bool bPrevWasSpace = true;
 						for (int i = 0; i < charsConverted; i++) {
@@ -3717,82 +3718,61 @@ void EditCompressSpaces() noexcept {
 		return;
 	}
 
-	const Sci_Position iSelStart = SciCall_GetSelectionStart();
-	const Sci_Position iSelEnd = SciCall_GetSelectionEnd();
-	Sci_Position iCurPos = SciCall_GetCurrentPos();
-	Sci_Position iAnchorPos = SciCall_GetAnchor();
-
+	Sci_Position iSelStart = SciCall_GetSelectionStart();
+	Sci_Position iSelEnd = SciCall_GetSelectionEnd();
+	const Sci_Position iLength = SciCall_GetLength();
+	Sci_Position iSelCount;
 	char *pszIn;
-	char *pszOut;
-	bool bIsLineStart;
-	bool bIsLineEnd;
+	char chPrev = '\n';
+	char chNext = '\n';
 
-	if (iSelStart != iSelEnd) {
-		const Sci_Line iLineStart = SciCall_LineFromPosition(iSelStart);
-		const Sci_Line iLineEnd = SciCall_LineFromPosition(iSelEnd);
-		const Sci_Position cch = SciCall_GetSelTextLength() + 1;
-		pszIn = static_cast<char *>(NP2HeapAlloc(cch));
-		pszOut = static_cast<char *>(NP2HeapAlloc(cch));
-		SciCall_GetSelText(pszIn);
-		bIsLineStart = (iSelStart == SciCall_PositionFromLine(iLineStart));
-		bIsLineEnd = (iSelEnd == SciCall_GetLineEndPosition(iLineEnd));
+	if (iSelStart == iSelEnd) {
+		iSelStart = 0;
+		iSelEnd = iLength;
+		iSelCount = iLength;
+		pszIn = static_cast<char *>(NP2HeapAlloc(iSelCount + 2));
+		SciCall_GetText(iSelCount, pszIn);
 	} else {
-		const Sci_Position cch = SciCall_GetLength() + 1;
-		pszIn = static_cast<char *>(NP2HeapAlloc(cch));
-		pszOut = static_cast<char *>(NP2HeapAlloc(cch));
-		SciCall_GetText(cch, pszIn);
-		bIsLineStart = true;
-		bIsLineEnd = true;
+		iSelCount = SciCall_GetSelTextLength();
+		pszIn = static_cast<char *>(NP2HeapAlloc(iSelCount + 2));
+		SciCall_GetSelText(pszIn);
+		if (iSelEnd < iLength) {
+			chNext = static_cast<char>(SciCall_GetCharAt(iSelEnd));
+		}
+		if (iSelStart != 0) {
+			chPrev = static_cast<char>(SciCall_GetCharAt(iSelStart - 1));
+		}
 	}
 
+	pszIn[iSelCount] = chNext;
+	const char * const end = pszIn + iSelCount;
+	char *co = pszIn;
 	bool bModified = false;
-	char *ci;
-	char *co = pszOut;
-	for (ci = pszIn; *ci; ci++) {
-		if (*ci == ' ' || *ci == '\t') {
-			if (*ci == '\t') {
-				bModified = true;
+	for (char *ci = pszIn; ci < end;) {
+		const char ch = *ci++;
+		if (ch != ' ' && ch != '\t') {
+			chPrev = ch;
+			*co++ = ch;
+		} else if (chPrev != '\n' && chPrev != '\r') {
+			while (ci < end && (*ci == ' ' || *ci == '\t')) {
+				++ci;
 			}
-			while (*(ci + 1) == ' ' || *(ci + 1) == '\t') {
-				ci++;
-				bModified = true;
-			}
-			if (!bIsLineStart && (*(ci + 1) != '\n' && *(ci + 1) != '\r')) {
+			if (*ci != '\n' && *ci != '\r') {
+				chPrev = ' ';
 				*co++ = ' ';
-			} else {
-				bModified = true;
+				if (ch == '\t') {
+					bModified = true;
+				}
 			}
-		} else {
-			bIsLineStart = (*ci == '\n' || *ci == '\r');
-			*co++ = *ci;
 		}
-	}
-	if (bIsLineEnd && co > pszOut && *(co - 1) == ' ') {
-		*--co = 0;
-		bModified = true;
 	}
 
-	if (bModified) {
-		if (iSelStart != iSelEnd) {
-			SciCall_TargetFromSelection();
-		} else {
-			SciCall_TargetWholeDocument();
-		}
-		SciCall_ReplaceTarget(-1, pszOut);
-		const Sci_Position iTargetStart = SciCall_GetTargetStart();
-		const Sci_Position iTargetEnd = SciCall_GetTargetEnd();
-		if (iCurPos > iAnchorPos) {
-			iCurPos = iTargetEnd;
-			iAnchorPos = iTargetStart;
-		} else {
-			iCurPos = iTargetStart;
-			iAnchorPos = iTargetEnd;
-		}
-		SciCall_SetSel(iAnchorPos, iCurPos);
+	if (bModified || co < end) {
+		*co = '\0';
+		iSelCount = co - pszIn;
+		EditReplaceRange(iSelStart, iSelEnd, iSelCount, pszIn);
 	}
-
 	NP2HeapFree(pszIn);
-	NP2HeapFree(pszOut);
 }
 
 //=============================================================================
