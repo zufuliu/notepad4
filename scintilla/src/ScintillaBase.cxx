@@ -502,10 +502,10 @@ void ScintillaBase::CallTipShow(Point pt, NotificationPosition notifyPos, const 
 	if (ct.UseStyleCallTip()) {
 		ct.SetForeBack(style.fore, style.back);
 	}
-	if (notifyPos == NotificationPosition::None) {
+	if (notifyPos == NotificationPosition::Default) {
 		ct.innerMarginX = 12;
 		ct.innerMarginY = 10;
-	} else {
+	} else if (notifyPos > NotificationPosition::Default) {
 		ct.innerMarginX = std::max(24, vs.lineHeight);
 		ct.innerMarginY = std::max(20, vs.lineHeight);
 	}
@@ -531,7 +531,7 @@ void ScintillaBase::CallTipShow(Point pt, NotificationPosition notifyPos, const 
 		rc.top += offset;
 		rc.bottom += offset;
 	}
-	if (notifyPos != NotificationPosition::None) {
+	if (notifyPos > NotificationPosition::Default) {
 		const XYPOSITION height = rc.Height();
 		const XYPOSITION width = rc.Width();
 		switch (notifyPos) {

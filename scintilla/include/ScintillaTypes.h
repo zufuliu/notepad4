@@ -290,8 +290,10 @@ enum class ChangeHistoryOption {
 };
 
 enum class NotificationPosition {
-	Bottomright = 0,
-	Center = 1,
+	None = 0,
+	Default = 1,
+	BottomRight = 2,
+	Center = 3,
 };
 
 enum class FoldLevel {

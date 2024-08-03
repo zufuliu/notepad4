@@ -36,12 +36,6 @@ protected:
 #endif
 	};
 
-	enum class NotificationPosition {
-		None,
-		BottomRight,
-		Center,
-	};
-
 #if SCI_EnablePopupMenu
 	Scintilla::PopUp displayPopupMenu;
 	Menu popup;
