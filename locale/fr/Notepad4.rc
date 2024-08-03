@@ -1066,7 +1066,7 @@ BEGIN
     CONTROL         "",IDC_SCI_PAGE_LINK,"SysLink",WS_TABSTOP,45,128,94,10
 END
 
-IDD_FIND DIALOGEX 0, 0, 290, 112
+IDD_FIND DIALOGEX 0, 0, 290, 124
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_NOFAILCREATE | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Trouver le texte"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
@@ -1077,7 +1077,8 @@ BEGIN
     AUTOCHECKBOX    "Rechercher le mot complet seulement",IDC_FINDWORD,7,49,110,10,WS_TABSTOP
     AUTOCHECKBOX    "Trouver le début du mot seulement",IDC_FINDSTART,7,61,124,10,WS_TABSTOP
     AUTOCHECKBOX    "Utiliser des expressions régulières",IDC_FINDREGEXP,7,73,112,10,WS_TABSTOP
-    AUTOCHECKBOX    "Interpréter les anti-slashs",IDC_FINDTRANSFORMBS,7,85,95,10,WS_TABSTOP
+    AUTOCHECKBOX    "Regex dot (.) match new line",IDC_FIND_DOTALL,7,85,124,10,WS_TABSTOP
+    AUTOCHECKBOX    "Interpréter les anti-slashs",IDC_FINDTRANSFORMBS,7,97,95,10,WS_TABSTOP
     AUTOCHECKBOX    "&Don't wrap around",IDC_NOWRAP,132,37,79,10,WS_TABSTOP
     AUTOCHECKBOX    "Fermer après la recherche",IDC_FINDCLOSE,132,49,77,10,WS_TABSTOP
     AUTOCHECKBOX    "Utiliser des jockers",IDC_WILDCARDSEARCH,132,61,74,10,WS_TABSTOP
@@ -1086,19 +1087,20 @@ BEGIN
     PUSHBUTTON      "Trouver tout",IDC_FINDALL,223,41,60,14
     PUSHBUTTON      "Sélectionner tout",IDC_REPLACEALL,223,58,60,14
     CONTROL         "<a>(?)</a>",IDC_REGEXPHELP,"SysLink",0x0,118,73,12,10
-    CONTROL         "<a>(?)</a>",IDC_BACKSLASHHELP,"SysLink",0x0,118,85,12,10
+    CONTROL         "<a>(?)</a>",IDC_BACKSLASHHELP,"SysLink",0x0,118,97,12,10
     CONTROL         "<a>(?)</a>",IDC_WILDCARDHELP,"SysLink",0x0,208,61,12,10
     CONTROL         "<a>Effacer l'historique</a>",IDC_CLEAR_FIND,"SysLink",WS_TABSTOP,173,7,48,10
-    AUTOCHECKBOX    "Lors de la perte de focus, rendre la fenêtre transparente",IDC_TRANSPARENT,7,96,124,10,WS_TABSTOP
+    AUTOCHECKBOX    "Lors de la perte de focus, rendre la fenêtre transparente",IDC_TRANSPARENT,7,108,124,10,WS_TABSTOP
     AUTOCHECKBOX    "Mettre en signet la line courante",IDC_FINDALLBOOKMARK,132,73,90,10,WS_TABSTOP
-    AUTOCHECKBOX    "Utiliser une police de caractères à espacements fixes",IDC_USEMONOSPACEDFONT,132,85,90,10,WS_TABSTOP
-    CONTROL         "<a>Allez à la fenêtre de remplacement (Ctrl+H)</a>",IDC_TOGGLEFINDREPLACE, "SysLink",WS_TABSTOP,140,97,80,10
-    CONTROL         "<a>Sauvegarder la position</a>",IDC_SAVEPOSITION,"SysLink",WS_TABSTOP,223,85,60,10
-    CONTROL         "<a>Réinitaliser la position</a>",IDC_RESETPOSITION,"SysLink",WS_TABSTOP,223,96,60,10
-    SCROLLBAR       IDC_RESIZEGRIP2,230,96,10,10
+    AUTOCHECKBOX    "Use Boost Regex",IDC_FIND_CXXREGEX,132,85,90,10,WS_TABSTOP
+    AUTOCHECKBOX    "Utiliser une police de caractères à espacements fixes",IDC_USEMONOSPACEDFONT,132,97,90,10,WS_TABSTOP
+    CONTROL         "<a>Allez à la fenêtre de remplacement (Ctrl+H)</a>",IDC_TOGGLEFINDREPLACE, "SysLink",WS_TABSTOP,140,109,80,10
+    CONTROL         "<a>Sauvegarder la position</a>",IDC_SAVEPOSITION,"SysLink",WS_TABSTOP,223,97,60,10
+    CONTROL         "<a>Réinitaliser la position</a>",IDC_RESETPOSITION,"SysLink",WS_TABSTOP,223,108,60,10
+    SCROLLBAR       IDC_RESIZEGRIP2,230,108,10,10
 END
 
-IDD_REPLACE DIALOGEX 0, 0, 290, 142
+IDD_REPLACE DIALOGEX 0, 0, 290, 154
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_NOFAILCREATE | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Remplacer le texte"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
@@ -1111,7 +1113,8 @@ BEGIN
     AUTOCHECKBOX    "Rechercher le mot complet seulement",IDC_FINDWORD,7,78,105,10,WS_TABSTOP
     AUTOCHECKBOX    "Trouver le début du mot seulement",IDC_FINDSTART,7,90,124,10,WS_TABSTOP
     AUTOCHECKBOX    "Utiliser des expressions régulières",IDC_FINDREGEXP,7,102,112,10,WS_TABSTOP
-    AUTOCHECKBOX    "Interpréter les anti-slashs",IDC_FINDTRANSFORMBS,7,114,97,10,WS_TABSTOP
+    AUTOCHECKBOX    "Regex dot (.) match new line",IDC_FIND_DOTALL,7,114,124,10,WS_TABSTOP
+    AUTOCHECKBOX    "Interpréter les anti-slashs",IDC_FINDTRANSFORMBS,7,126,97,10,WS_TABSTOP
     AUTOCHECKBOX    "&Don't wrap around",IDC_NOWRAP,132,66,79,10,WS_TABSTOP
     AUTOCHECKBOX    "Fermer après le remplacement",IDC_FINDCLOSE,132,78,90,10,WS_TABSTOP
     AUTOCHECKBOX    "Utiliser des jockers",IDC_WILDCARDSEARCH,132,90,74,10,WS_TABSTOP
@@ -1122,17 +1125,18 @@ BEGIN
     PUSHBUTTON      "Remplacer tout",IDC_REPLACEALL,223,75,60,14
     PUSHBUTTON      "Dans la sélection",IDC_REPLACEINSEL,223,92,60,14
     CONTROL         "<a>(?)</a>",IDC_REGEXPHELP,"SysLink",0x0,118,102,12,10
-    CONTROL         "<a>(?)</a>",IDC_BACKSLASHHELP,"SysLink",0x0,118,114,12,10
+    CONTROL         "<a>(?)</a>",IDC_BACKSLASHHELP,"SysLink",0x0,118,126,12,10
     CONTROL         "<a>(?)</a>",IDC_WILDCARDHELP,"SysLink",0x0,208,90,12,10
     CONTROL         "<a>Effacer l'historique de recherche</a>",IDC_CLEAR_FIND,"SysLink",WS_TABSTOP,173,6,48,10
     CONTROL         "<a>Effacer l'historique de remplacement</a>",IDC_CLEAR_REPLACE,"SysLink",WS_TABSTOP,173,35,48,10
-    AUTOCHECKBOX    "Lors de la perte de focus, rendre la fenêtre transparente",IDC_TRANSPARENT,7,126,124,10,WS_TABSTOP
+    AUTOCHECKBOX    "Lors de la perte de focus, rendre la fenêtre transparente",IDC_TRANSPARENT,7,138,124,10,WS_TABSTOP
     AUTOCHECKBOX    "Mettre en signet la line courante",IDC_FINDALLBOOKMARK,132,102,90,10,WS_TABSTOP
-    AUTOCHECKBOX    "Utiliser une police de caractères à espacements fixes",IDC_USEMONOSPACEDFONT,132,114,90,10,WS_TABSTOP
-    CONTROL         "<a>Allez à la fenêtre de recherche (Ctrl+F)</a>",IDC_TOGGLEFINDREPLACE, "SysLink",WS_TABSTOP,140,127,80,10
-    CONTROL         "<a>Sauvegarder la position</a>",IDC_SAVEPOSITION,"SysLink",WS_TABSTOP,223,114,60,10
-    CONTROL         "<a>Réinitaliser la position</a>",IDC_RESETPOSITION,"SysLink",WS_TABSTOP,223,126,60,10
-    SCROLLBAR       IDC_RESIZEGRIP2,230,126,10,10
+    AUTOCHECKBOX    "Use Boost Regex",IDC_FIND_CXXREGEX,132,114,90,10,WS_TABSTOP
+    AUTOCHECKBOX    "Utiliser une police de caractères à espacements fixes",IDC_USEMONOSPACEDFONT,132,126,90,10,WS_TABSTOP
+    CONTROL         "<a>Allez à la fenêtre de recherche (Ctrl+F)</a>",IDC_TOGGLEFINDREPLACE, "SysLink",WS_TABSTOP,140,139,80,10
+    CONTROL         "<a>Sauvegarder la position</a>",IDC_SAVEPOSITION,"SysLink",WS_TABSTOP,223,126,60,10
+    CONTROL         "<a>Réinitaliser la position</a>",IDC_RESETPOSITION,"SysLink",WS_TABSTOP,223,138,60,10
+    SCROLLBAR       IDC_RESIZEGRIP2,230,138,10,10
 END
 
 IDD_RUN DIALOGEX 0, 0, 234, 86

@@ -4602,6 +4602,7 @@ void AddBackslashComboBoxSetup(HWND hwndDlg, int nCtlId) noexcept {
 
 extern bool bFindReplaceTransparentMode;
 extern int iFindReplaceOpacityLevel;
+extern bool bFindReplaceUseCxxRegex;
 extern bool bFindReplaceUseMonospacedFont;
 extern bool bFindReplaceFindAllBookmark;
 extern int iSelectOption;
@@ -4734,6 +4735,12 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 
 		if (lpefr->fuFlags & SCFIND_REGEXP) {
 			CheckDlgButton(hwnd, IDC_FINDREGEXP, BST_CHECKED);
+		}
+		if (lpefr->fuFlags & SCFIND_REGEX_DOT_ALL) {
+			CheckDlgButton(hwnd, IDC_FIND_DOTALL, BST_CHECKED);
+		}
+		if (bFindReplaceUseCxxRegex) {
+			CheckDlgButton(hwnd, IDC_FIND_CXXREGEX, BST_CHECKED);
 		}
 
 		if (lpefr->bTransformBS) {
@@ -4897,6 +4904,10 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			bFindReplaceFindAllBookmark = IsButtonChecked(hwnd, IDC_FINDALLBOOKMARK);
 			break;
 
+		case IDC_FIND_CXXREGEX:
+			bFindReplaceUseCxxRegex = IsButtonChecked(hwnd, IDC_FIND_CXXREGEX);
+			break;
+
 		case IDOK:
 		case IDC_FINDPREV:
 		case IDC_FINDALL:
@@ -4942,7 +4953,14 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			}
 
 			if (IsButtonChecked(hwnd, IDC_FINDREGEXP)) {
-				lpefr->fuFlags |= NP2_RegexDefaultFlags;
+				if (bFindReplaceUseCxxRegex) {
+					lpefr->fuFlags |= SCFIND_REGEXP | SCFIND_CXX11REGEX;
+					if (IsButtonChecked(hwnd, IDC_FIND_DOTALL)) {
+						lpefr->fuFlags |= SCFIND_REGEX_DOT_ALL;
+					}
+				} else {
+					lpefr->fuFlags |= SCFIND_REGEXP | SCFIND_POSIX;
+				}
 			}
 
 			lpefr->bTransformBS = IsButtonChecked(hwnd, IDC_FINDTRANSFORMBS);
@@ -6957,7 +6975,7 @@ char *EditGetStringAroundCaret(LPCSTR delimiters) noexcept {
 	}
 
 	Sci_TextToFindFull ft = { { iCurrentPos, 0 }, delimiters, { 0, 0 } };
-	constexpr int findFlag = NP2_RegexDefaultFlags;
+	constexpr int findFlag = SCFIND_REGEXP | SCFIND_POSIX;
 
 	// forward
 	if (iCurrentPos < iLineEnd) {
@@ -7245,13 +7263,13 @@ void EditOpenSelection(OpenSelectionType type) {
 				strcat(lpstrText, "[\'\"]?");
 
 				Sci_TextToFindFull ft = { { 0, SciCall_GetLength() }, mszSelection, { 0, 0 } };
-				Sci_Position iPos = SciCall_FindTextFull(NP2_RegexDefaultFlags, &ft);
+				Sci_Position iPos = SciCall_FindTextFull(SCFIND_REGEXP | SCFIND_POSIX, &ft);
 				if (iPos < 0) {
 					lpstrText = mszSelection + 2;
 					lpstrText[0] = 'i';
 					lpstrText[1] = 'd';
 					ft.lpstrText = lpstrText;
-					iPos = SciCall_FindTextFull(NP2_RegexDefaultFlags, &ft);
+					iPos = SciCall_FindTextFull(SCFIND_REGEXP | SCFIND_POSIX, &ft);
 				}
 				NP2HeapFree(mszSelection);
 				if (iPos >= 0) {

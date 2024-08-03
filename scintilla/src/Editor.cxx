@@ -4172,7 +4172,6 @@ Sci::Position Editor::FindTextFull(
 #else
 	const ElapsedPeriod period;
 	uint32_t count = 0;
-	// wParam |= static_cast<int>(FindOption::Cxx11RegEx);
 	while (true) {
 		Sci::Position lengthFound = strlen(ft->lpstrText);
 		if (!pdoc->HasCaseFolder())

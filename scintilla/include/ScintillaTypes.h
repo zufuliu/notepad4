@@ -275,11 +275,11 @@ enum class FindOption {
 	WholeWord = 0x2,
 	MatchCase = 0x4,
 	MatchToWordEnd = 0x8,
-	WordStart = 0x00100000,
-	RegExp = 0x00200000,
-	Posix = 0x00400000,
-	Cxx11RegEx = 0x00800000,
-	RegexDotAll = 0x10,
+	WordStart = 0x10,
+	RegExp = 0x20,
+	Posix = 0x40,
+	Cxx11RegEx = 0x80,
+	RegexDotAll = 0x100,
 };
 
 enum class ChangeHistoryOption {
