@@ -7212,18 +7212,20 @@ void ToggleFullScreenMode() noexcept {
 //	FileIO()
 //
 //
-bool FileIO(bool fLoad, LPWSTR pszFile, int flag, EditFileIOStatus &status) noexcept {
-	BeginWaitCursor();
+bool FileIO(bool fLoad, LPWSTR pszFile, FileSaveFlag flag, EditFileIOStatus &status) noexcept {
+	if (!(flag & FileSaveFlag_EndSession)) {
+		BeginWaitCursor();
 
-	WCHAR tch[MAX_PATH + 128];
-	WCHAR fmt[128];
-	FormatString(tch, fmt, (fLoad ? IDS_LOADFILE : IDS_SAVEFILE), pszFile);
+		WCHAR tch[MAX_PATH + 128];
+		WCHAR fmt[128];
+		FormatString(tch, fmt, (fLoad ? IDS_LOADFILE : IDS_SAVEFILE), pszFile);
 
-	StatusSetText(hwndStatus, STATUS_HELP, tch);
-	StatusSetSimple(hwndStatus, TRUE);
+		StatusSetText(hwndStatus, STATUS_HELP, tch);
+		StatusSetSimple(hwndStatus, TRUE);
 
-	InvalidateRect(hwndStatus, nullptr, TRUE);
-	UpdateWindow(hwndStatus);
+		InvalidateRect(hwndStatus, nullptr, TRUE);
+		UpdateWindow(hwndStatus);
+	}
 
 	if (fLoad) {
 		fLoad = EditLoadFile(pszFile, status);
@@ -7236,8 +7238,10 @@ bool FileIO(bool fLoad, LPWSTR pszFile, int flag, EditFileIOStatus &status) noex
 	const DWORD dwFileAttributes = GetFileAttributes(pszFile);
 	bReadOnlyFile = (dwFileAttributes != INVALID_FILE_ATTRIBUTES) && (dwFileAttributes & FILE_ATTRIBUTE_READONLY);
 
-	StatusSetSimple(hwndStatus, FALSE);
-	EndWaitCursor();
+	if (!(flag & FileSaveFlag_EndSession)) {
+		StatusSetSimple(hwndStatus, FALSE);
+		EndWaitCursor();
+	}
 
 	return fLoad;
 }
@@ -7374,7 +7378,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 			return false;
 		}
 	} else {
-		fSuccess = FileIO(true, szFileName, 0, status);
+		fSuccess = FileIO(true, szFileName, FileSaveFlag_Default, status);
 		if (fSuccess) {
 			iCurrentEncoding = status.iEncoding;
 			iCurrentEOLMode = status.iEOLMode;
@@ -7568,7 +7572,7 @@ bool FileSave(FileSaveFlag saveFlag) noexcept {
 			}
 		}
 		if (!(saveFlag & FileSaveFlag_SaveAs)) {
-			fSuccess = FileIO(false, szCurFile, saveFlag & FileSaveFlag_EndSession, status);
+			fSuccess = FileIO(false, szCurFile, saveFlag, status);
 			if (!fSuccess) {
 				saveFlag = static_cast<FileSaveFlag>(saveFlag | FileSaveFlag_SaveAs);
 			}
@@ -7586,7 +7590,7 @@ bool FileSave(FileSaveFlag saveFlag) noexcept {
 		}
 
 		if (SaveFileDlg(Untitled, tchFile, COUNTOF(tchFile), tchInitialDir)) {
-			fSuccess = FileIO(false, tchFile, saveFlag & (FileSaveFlag_SaveCopy | FileSaveFlag_EndSession), status);
+			fSuccess = FileIO(false, tchFile, saveFlag, status);
 			if (fSuccess) {
 				if (!(saveFlag & FileSaveFlag_SaveCopy)) {
 					lstrcpy(szCurFile, tchFile);
@@ -7618,7 +7622,7 @@ bool FileSave(FileSaveFlag saveFlag) noexcept {
 			return false;
 		}
 	} else if (!fSuccess) {
-		fSuccess = FileIO(false, szCurFile, saveFlag & FileSaveFlag_EndSession, status);
+		fSuccess = FileIO(false, szCurFile, saveFlag, status);
 	}
 
 	if (fSuccess) {
