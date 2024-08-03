@@ -4680,7 +4680,6 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 	static int bSwitchedFindReplace = 0;
 	static int xFindReplaceDlgSave;
 	static int yFindReplaceDlgSave;
-	static EDITFINDREPLACE efrSave;
 	static HFONT hFontFindReplaceEdit;
 
 	WCHAR tch[NP2_FIND_REPLACE_LIMIT + 32];
@@ -4781,7 +4780,6 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		} else {
 			SetDlgPos(hwnd, xFindReplaceDlgSave, yFindReplaceDlgSave);
 			bSwitchedFindReplace = 0;
-			memcpy(lpefr, &efrSave, sizeof(EDITFINDREPLACE));
 		}
 
 		if (bFindReplaceTransparentMode) {
@@ -5082,10 +5080,9 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			bSwitchedFindReplace |= 2;
 			EDITFINDREPLACE * const lpefr = AsPointer<EDITFINDREPLACE *>(GetWindowLongPtr(hwnd, DWLP_USER));
 			GetDlgPos(hwnd, &xFindReplaceDlgSave, &yFindReplaceDlgSave);
-			memcpy(&efrSave, lpefr, sizeof(EDITFINDREPLACE));
 			GetDlgItemTextA2W(CP_UTF8, hwnd, IDC_FINDTEXT, lpefr->szFindUTF8, COUNTOF(lpefr->szFindUTF8));
-			if (!GetDlgItemTextA2W(CP_UTF8, hwnd, IDC_REPLACETEXT, lpefr->szReplaceUTF8, COUNTOF(lpefr->szReplaceUTF8))) {
-				strcpy(lpefr->szReplaceUTF8, "");
+			if (GetDlgItem(hwnd, IDC_REPLACETEXT) != nullptr) {
+				GetDlgItemTextA2W(CP_UTF8, hwnd, IDC_REPLACETEXT, lpefr->szReplaceUTF8, COUNTOF(lpefr->szReplaceUTF8));
 			}
 		}
 		break;
