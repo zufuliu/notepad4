@@ -191,9 +191,9 @@ void SnapToDefaultPos(HWND hwnd) noexcept;
 void ShowNotifyIcon(HWND hwnd, bool bAdd) noexcept;
 void SetNotifyIconTitle(HWND hwnd) noexcept;
 
-void ShowNotificationA(int notifyPos, LPCSTR lpszText) noexcept;
-void ShowNotificationW(int notifyPos, LPCWSTR lpszText) noexcept;
-void ShowNotificationMessage(int notifyPos, UINT uidMessage, ...) noexcept;
+void ShowNotificationA(WPARAM notifyPos, LPCSTR lpszText) noexcept;
+void ShowNotificationW(WPARAM notifyPos, LPCWSTR lpszText) noexcept;
+void ShowNotificationMessage(WPARAM notifyPos, UINT uidMessage, ...) noexcept;
 
 void InstallFileWatching(bool terminate) noexcept;
 void CALLBACK WatchTimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime) noexcept;

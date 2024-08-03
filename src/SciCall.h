@@ -1150,7 +1150,7 @@ inline void SciCall_CallTipUseStyle(int tabSize) noexcept {
 	SciCall(SCI_CALLTIPUSESTYLE, tabSize, 0);
 }
 
-inline void SciCall_ShowNotification(int notifyPos, const char *definition) noexcept {
+inline void SciCall_ShowNotification(WPARAM notifyPos, const char *definition) noexcept {
 	SciCall(SCI_SHOWNOTIFICATION, notifyPos, AsInteger<LPARAM>(definition));
 }
 

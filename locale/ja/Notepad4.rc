@@ -1726,6 +1726,7 @@ BEGIN
     IDS_READONLY_FILE       "(読み取り専用ファイル)"
     IDS_READONLY_MODE       "(読み取り専用モード)"
     IDS_STATUSITEM_FORMAT   "行 %s / %s \n列 %s / %s \n字 %s / %s \n選 %s / %s \n選行 %s \n見 %s "
+    IDS_ZERO_LENGTH_MATCH   "^ Zero-Length Match"
     IDS_LOADFILE            "読込中 ""%s"" ..."
     IDS_SAVEFILE            "保存中 ""%s"" ..."
     IDS_PRINTFILE           "%s ページを印刷中..."

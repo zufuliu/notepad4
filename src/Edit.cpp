@@ -5310,6 +5310,10 @@ void EditFindNext(const EDITFINDREPLACE *lpefr, bool fExtendSelection) noexcept 
 		} else {
 			EditSelectEx(min(iSelAnchor, iSelPos), ttf.chrgText.cpMax);
 		}
+		if (ttf.chrgText.cpMin == ttf.chrgText.cpMax) {
+			const WPARAM notifyPos = (static_cast<WPARAM>(ttf.chrgText.cpMin) << 2) | SC_NOTIFICATIONPOSITION_NONE;
+			ShowNotificationMessage(notifyPos, IDS_ZERO_LENGTH_MATCH);
+		}
 	}
 
 }
@@ -5352,6 +5356,10 @@ void EditFindPrev(const EDITFINDREPLACE *lpefr, bool fExtendSelection) noexcept 
 			EditSelectEx(ttf.chrgText.cpMin, ttf.chrgText.cpMax);
 		} else {
 			EditSelectEx(max(iSelPos, iSelAnchor), ttf.chrgText.cpMin);
+		}
+		if (ttf.chrgText.cpMin == ttf.chrgText.cpMax) {
+			const WPARAM notifyPos = (static_cast<WPARAM>(ttf.chrgText.cpMin) << 2) | SC_NOTIFICATIONPOSITION_NONE;
+			ShowNotificationMessage(notifyPos, IDS_ZERO_LENGTH_MATCH);
 		}
 	}
 }

@@ -502,6 +502,8 @@ void ScintillaBase::CallTipShow(Point pt, NotificationPosition notifyPos, const 
 	if (ct.UseStyleCallTip()) {
 		ct.SetForeBack(style.fore, style.back);
 	}
+	ct.innerMarginX = 0;
+	ct.innerMarginY = 0;
 	if (notifyPos == NotificationPosition::Default) {
 		ct.innerMarginX = 12;
 		ct.innerMarginY = 10;
@@ -1022,12 +1024,12 @@ sptr_t ScintillaBase::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		return ac.GetTypesep();
 
 	case Message::CallTipShow:
-		CallTipShow(LocationFromPosition(wParam), NotificationPosition::None,
+		CallTipShow(LocationFromPosition(wParam), NotificationPosition::Default,
 			ConstCharPtrFromSPtr(lParam));
 		break;
 
 	case Message::ShowNotification:
-		CallTipShow(LocationFromPosition(0), static_cast<NotificationPosition>(wParam + 1),
+		CallTipShow(LocationFromPosition(wParam >> 2), static_cast<NotificationPosition>(wParam & 3),
 			ConstCharPtrFromSPtr(lParam));
 		break;
 

@@ -1690,8 +1690,8 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) noexcept {
 
 	// CallTip
 	Style_SetDefaultStyle(GlobalStyleIndex_CallTip);
-	//callTipInfo.backColor = SciCall_StyleGetBack(STYLE_CALLTIP);
-	//callTipInfo.foreColor = SciCall_StyleGetFore(STYLE_CALLTIP);
+	callTipInfo.backColor = SciCall_StyleGetBack(STYLE_CALLTIP);
+	callTipInfo.foreColor = SciCall_StyleGetFore(STYLE_CALLTIP);
 	// HotSpot
 	Style_SetDefaultStyle(GlobalStyleIndex_Link);
 	SciCall_StyleSetHotSpot(STYLE_LINK, true);

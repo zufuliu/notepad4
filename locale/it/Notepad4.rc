@@ -1726,6 +1726,7 @@ BEGIN
     IDS_READONLY_FILE       "(File Sola Lettura)"
     IDS_READONLY_MODE       "(Modalità Sola Lettura)"
     IDS_STATUSITEM_FORMAT   "Linea: %s / %s \nColonna: %s / %s \nCarattere: %s / %s \nSelezione: %s / %s \nLinee Selezionate: %s \nTrovati: %s "
+    IDS_ZERO_LENGTH_MATCH   "^ Zero-Length Match"
     IDS_LOADFILE            "Caricamento ""%s""..."
     IDS_SAVEFILE            "Salvataggio ""%s""..."
     IDS_PRINTFILE           "Stampa pagina %s..."

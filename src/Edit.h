@@ -383,8 +383,8 @@ struct CallTipInfo {
 	Sci_Position endPos;
 	Sci_Position hexStart;
 	COLORREF currentColor;
-	//COLORREF backColor;
-	//COLORREF foreColor;
+	COLORREF backColor;
+	COLORREF foreColor;
 };
 void	EditShowCallTip(Sci_Position position) noexcept;
 void	EditClickCallTip(HWND hwnd) noexcept;
