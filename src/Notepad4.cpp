@@ -188,10 +188,7 @@ static bool bAlwaysOnTop;
 static bool bMinimizeToTray;
 static bool bTransparentMode;
 static int	iEndAtLastLine;
-bool	bFindReplaceTransparentMode;
-bool	bFindReplaceUseCxxRegex;
-bool	bFindReplaceUseMonospacedFont;
-bool	bFindReplaceFindAllBookmark;
+int iFindReplaceOption;
 static bool bEditLayoutRTL;
 bool	bWindowLayoutRTL;
 static int iRenderingTechnology;
@@ -950,9 +947,9 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 			WideCharToMultiByte(CP_UTF8, 0, lpMatchArg, -1, efrData.szFindUTF8, COUNTOF(efrData.szFindUTF8), nullptr, nullptr);
 
 			if (flagMatchText & MatchTextFlag_Regex) {
-				efrData.fuFlags |= bFindReplaceUseCxxRegex ? (SCFIND_REGEXP | SCFIND_CXX11REGEX) : (SCFIND_REGEXP | SCFIND_POSIX);
+				efrData.fuFlags |= (iFindReplaceOption & FindReplaceOption_UseCxxRegex) ? (SCFIND_REGEXP | SCFIND_CXX11REGEX) : (SCFIND_REGEXP | SCFIND_POSIX);
 			} else if (flagMatchText & MatchTextFlag_TransformBS) {
-				efrData.bTransformBS = true;
+				efrData.option |= FindReplaceOption_TransformBackslash;
 			}
 
 			if (flagMatchText & MatchTextFlag_FindUp) {
@@ -4737,7 +4734,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			}
 
 			efrData.fuFlags &= SCFIND_REGEXP - 1; // clear all regex flags
-			efrData.bTransformBS = false;
+			efrData.option &= ~FindReplaceOption_TransformBackslash;
 
 			switch (LOWORD(wParam)) {
 			case IDM_EDIT_SAVEFIND:
@@ -5356,30 +5353,13 @@ void LoadSettings() noexcept {
 
 	bSaveRecentFiles = section.GetBool(L"SaveRecentFiles", false);
 	bSaveFindReplace = section.GetBool(L"SaveFindReplace", false);
-	bFindReplaceTransparentMode = section.GetBool(L"FindReplaceTransparentMode", true);
-	bFindReplaceUseCxxRegex = section.GetBool(L"FindReplaceUseCxxRegex", false);
-	bFindReplaceUseMonospacedFont = section.GetBool(L"FindReplaceUseMonospacedFont", false);
-	bFindReplaceFindAllBookmark = section.GetBool(L"FindReplaceFindAllBookmark", false);
-
-	efrData.bFindClose = section.GetBool(L"CloseFind", false);
-	efrData.bReplaceClose = section.GetBool(L"CloseReplace", false);
-	efrData.bNoFindWrap = section.GetBool(L"NoFindWrap", false);
-
+	iValue = section.GetInt(L"FindReplaceOption", FindReplaceOption_None);
+	iFindReplaceOption = iValue & 15;
+	efrData.option = iValue >> 4;
 	if (bSaveFindReplace) {
-		efrData.fuFlags = 0;
-		if (section.GetBool(L"FindReplaceMatchCase", false)) {
-			efrData.fuFlags |= SCFIND_MATCHCASE;
-		}
-		if (section.GetBool(L"FindReplaceMatchWholeWorldOnly", false)) {
-			efrData.fuFlags |= SCFIND_WHOLEWORD;
-		}
-		if (section.GetBool(L"FindReplaceMatchBeginingWordOnly", false)) {
-			efrData.fuFlags |= SCFIND_WORDSTART;
-		}
-		iValue = section.GetInt(L"FindReplaceRegExpSearch", 0);
-		efrData.fuFlags |= iValue << 5;
-		efrData.bTransformBS = section.GetBool(L"FindReplaceTransformBackslash", false);
-		efrData.bWildcardSearch = section.GetBool(L"FindReplaceWildcardSearch", false);
+		iValue = section.GetInt(L"FindReplaceFlag", SCFIND_NONE);
+		efrData.fuFlags = iValue & 1023;
+		efrData.option |= iValue >> 10;
 	}
 
 	fWordWrapG = section.GetBool(L"WordWrap", true);
@@ -5719,20 +5699,11 @@ void SaveSettings(bool bSaveSettingsNow) noexcept {
 
 	section.SetBoolEx(L"SaveRecentFiles", bSaveRecentFiles, false);
 	section.SetBoolEx(L"SaveFindReplace", bSaveFindReplace, false);
-	section.SetBoolEx(L"CloseFind", efrData.bFindClose, false);
-	section.SetBoolEx(L"CloseReplace", efrData.bReplaceClose, false);
-	section.SetBoolEx(L"NoFindWrap", efrData.bNoFindWrap, false);
-	section.SetBoolEx(L"FindReplaceTransparentMode", bFindReplaceTransparentMode, true);
-	section.SetBoolEx(L"FindReplaceUseCxxRegex", bFindReplaceUseCxxRegex, false);
-	section.SetBoolEx(L"FindReplaceUseMonospacedFont", bFindReplaceUseMonospacedFont, false);
-	section.SetBoolEx(L"FindReplaceFindAllBookmark", bFindReplaceFindAllBookmark, false);
+	int iValue = iFindReplaceOption | ((efrData.option & FindReplaceOption_BehaviorMask) << 4);
+	section.SetIntEx(L"FindReplaceOption", iValue, FindReplaceOption_None);
 	if (bSaveFindReplace) {
-		section.SetBoolEx(L"FindReplaceMatchCase", (efrData.fuFlags & SCFIND_MATCHCASE), false);
-		section.SetBoolEx(L"FindReplaceMatchWholeWorldOnly", (efrData.fuFlags & SCFIND_WHOLEWORD), false);
-		section.SetBoolEx(L"FindReplaceMatchBeginingWordOnly", (efrData.fuFlags & SCFIND_WORDSTART), false);
-		section.SetIntEx(L"FindReplaceRegExpSearch", (efrData.fuFlags >> 5), 0);
-		section.SetBoolEx(L"FindReplaceTransformBackslash", efrData.bTransformBS, false);
-		section.SetBoolEx(L"FindReplaceWildcardSearch", efrData.bWildcardSearch, false);
+		iValue = efrData.fuFlags | ((efrData.option & FindReplaceOption_SearchMask) << 10);
+		section.SetIntEx(L"FindReplaceFlag", iValue, SCFIND_NONE);
 	}
 
 	section.SetBoolEx(L"WordWrap", fWordWrapG, true);
@@ -5744,7 +5715,7 @@ void SaveSettings(bool bSaveSettingsNow) noexcept {
 	section.SetBoolEx(L"ShowUnicodeControlCharacter", bShowUnicodeControlCharacter, false);
 	section.SetBoolEx(L"MatchBraces", bMatchBraces, true);
 	section.SetBoolEx(L"HighlightCurrentBlock", bHighlightCurrentBlock, true);
-	int iValue = static_cast<int>(iHighlightCurrentLine) + (static_cast<int>(bHighlightCurrentSubLine)*10);
+	iValue = static_cast<int>(iHighlightCurrentLine) + (static_cast<int>(bHighlightCurrentSubLine)*10);
 	section.SetIntEx(L"HighlightCurrentLine", iValue, 10 + LineHighlightMode_OutlineFrame);
 	section.SetBoolEx(L"ShowIndentGuides", bShowIndentGuides, false);
 

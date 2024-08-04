@@ -3645,9 +3645,9 @@ void EditStripTrailingBlanks(HWND hwnd, bool bIgnoreSelection) noexcept {
 		if (!SciCall_IsRectangleSelection()) {
 			EDITFINDREPLACE efrTrim;
 			memset(&efrTrim, 0, sizeof(efrTrim));
-			memcpy(efrTrim.szFind, "[ \t]+$", CSTRLEN("[ \t]+$"));
 			efrTrim.hwnd = hwnd;
 			efrTrim.fuFlags = SCFIND_REGEXP;
+			memcpy(efrTrim.szFind, "[ \t]+$", CSTRLEN("[ \t]+$"));
 			if (EditReplaceAllInSelection(hwnd, &efrTrim, false)) {
 				return;
 			}
@@ -3686,9 +3686,9 @@ void EditStripLeadingBlanks(HWND hwnd, bool bIgnoreSelection) noexcept {
 		if (!SciCall_IsRectangleSelection()) {
 			EDITFINDREPLACE efrTrim;
 			memset(&efrTrim, 0, sizeof(efrTrim));
-			memcpy(efrTrim.szFind, "^[ \t]+", CSTRLEN("^[ \t]+"));
 			efrTrim.hwnd = hwnd;
 			efrTrim.fuFlags = SCFIND_REGEXP;
+			memcpy(efrTrim.szFind, "^[ \t]+", CSTRLEN("^[ \t]+"));
 			if (EditReplaceAllInSelection(hwnd, &efrTrim, false)) {
 				return;
 			}
@@ -4600,11 +4600,8 @@ void AddBackslashComboBoxSetup(HWND hwndDlg, int nCtlId) noexcept {
 	}
 }
 
-extern bool bFindReplaceTransparentMode;
+extern int iFindReplaceOption;
 extern int iFindReplaceOpacityLevel;
-extern bool bFindReplaceUseCxxRegex;
-extern bool bFindReplaceUseMonospacedFont;
-extern bool bFindReplaceFindAllBookmark;
 extern int iSelectOption;
 
 static void FindReplaceSetFont(HWND hwnd, bool monospaced, HFONT *hFontFindReplaceEdit) noexcept {
@@ -4656,12 +4653,14 @@ static bool CopySelectionAsFindText(HWND hwnd, EDITFINDREPLACE *lpefr, bool bFir
 
 	if (StrNotEmpty(lpszSelection)) {
 		char *lpszEscSel = static_cast<char *>(NP2HeapAlloc((2 * NP2_FIND_REPLACE_LIMIT)));
+		unsigned option = lpefr->option & ~FindReplaceOption_TransformBackslash;
 		if (AddBackslashA(lpszEscSel, lpszSelection)) {
-			lpefr->bTransformBS = !(lpefr->fuFlags & SCFIND_REGEXP);
-		} else {
-			lpefr->bTransformBS = false;
+			if ((lpefr->fuFlags & SCFIND_REGEXP) == 0) {
+				option |= FindReplaceOption_TransformBackslash;
+			}
 		}
 
+		lpefr->option = option;
 		const UINT cpEdit = SciCall_GetCodePage();
 		SetDlgItemTextA2W(cpEdit, hwnd, IDC_FINDTEXT, lpszEscSel);
 		NP2HeapFree(lpszEscSel);
@@ -4721,61 +4720,43 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		// focus on replace box when selected text is not empty.
 		PostMessage(hwnd, WM_NEXTDLGCTL, AsInteger<WPARAM>((hasFindText && hwndRepl)? hwndRepl : hwndFind), TRUE);
 
-		if (lpefr->fuFlags & SCFIND_MATCHCASE) {
+		unsigned mask = lpefr->fuFlags;
+		if (mask & SCFIND_MATCHCASE) {
 			CheckDlgButton(hwnd, IDC_FINDCASE, BST_CHECKED);
 		}
-
-		if (lpefr->fuFlags & SCFIND_WHOLEWORD) {
+		if (mask & SCFIND_WHOLEWORD) {
 			CheckDlgButton(hwnd, IDC_FINDWORD, BST_CHECKED);
 		}
-
-		if (lpefr->fuFlags & SCFIND_WORDSTART) {
+		if (mask & SCFIND_WORDSTART) {
 			CheckDlgButton(hwnd, IDC_FINDSTART, BST_CHECKED);
 		}
-
-		if (lpefr->fuFlags & SCFIND_REGEXP) {
+		if (mask & SCFIND_REGEXP) {
 			CheckDlgButton(hwnd, IDC_FINDREGEXP, BST_CHECKED);
 		}
-		if (lpefr->fuFlags & SCFIND_REGEX_DOT_ALL) {
+		if (mask & SCFIND_REGEX_DOT_ALL) {
 			CheckDlgButton(hwnd, IDC_FIND_DOTALL, BST_CHECKED);
 		}
-		if (bFindReplaceUseCxxRegex) {
-			CheckDlgButton(hwnd, IDC_FIND_CXXREGEX, BST_CHECKED);
-		}
 
-		if (lpefr->bTransformBS) {
+		mask = lpefr->option;
+		if (mask & FindReplaceOption_TransformBackslash) {
 			CheckDlgButton(hwnd, IDC_FINDTRANSFORMBS, BST_CHECKED);
 		}
-
-		if (lpefr->bWildcardSearch) {
+		if (mask & FindReplaceOption_WildcardSearch) {
 			CheckDlgButton(hwnd, IDC_WILDCARDSEARCH, BST_CHECKED);
 			CheckDlgButton(hwnd, IDC_FINDREGEXP, BST_UNCHECKED);
 		}
-
-		if (lpefr->bNoFindWrap) {
+		if (mask & FindReplaceOption_NoFindWrap) {
 			CheckDlgButton(hwnd, IDC_NOWRAP, BST_CHECKED);
 		}
 
+		int bCloseDlg;
 		if (hwndRepl) {
-			if (bSwitchedFindReplace) {
-				if (lpefr->bFindClose) {
-					CheckDlgButton(hwnd, IDC_FINDCLOSE, BST_CHECKED);
-				}
-			} else {
-				if (lpefr->bReplaceClose) {
-					CheckDlgButton(hwnd, IDC_FINDCLOSE, BST_CHECKED);
-				}
-			}
+			bCloseDlg = bSwitchedFindReplace ? FindReplaceOption_CloseFind : FindReplaceOption_CloseReplace;
 		} else {
-			if (bSwitchedFindReplace) {
-				if (lpefr->bReplaceClose) {
-					CheckDlgButton(hwnd, IDC_FINDCLOSE, BST_CHECKED);
-				}
-			} else {
-				if (lpefr->bFindClose) {
-					CheckDlgButton(hwnd, IDC_FINDCLOSE, BST_CHECKED);
-				}
-			}
+			bCloseDlg = bSwitchedFindReplace ? FindReplaceOption_CloseReplace : FindReplaceOption_CloseFind;
+		}
+		if (mask & bCloseDlg) {
+			CheckDlgButton(hwnd, IDC_FINDCLOSE, BST_CHECKED);
 		}
 
 		if (!bSwitchedFindReplace) {
@@ -4785,17 +4766,21 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 				SetDlgPos(hwnd, xFindReplaceDlg, yFindReplaceDlg);
 			}
 		} else {
-			SetDlgPos(hwnd, xFindReplaceDlgSave, yFindReplaceDlgSave);
 			bSwitchedFindReplace = 0;
+			SetDlgPos(hwnd, xFindReplaceDlgSave, yFindReplaceDlgSave);
 		}
 
-		if (bFindReplaceTransparentMode) {
+		mask = iFindReplaceOption;
+		if (mask & FindReplaceOption_UseCxxRegex) {
+			CheckDlgButton(hwnd, IDC_FIND_CXXREGEX, BST_CHECKED);
+		}
+		if (mask & FindReplaceOption_TransparentMode) {
 			CheckDlgButton(hwnd, IDC_TRANSPARENT, BST_CHECKED);
 		}
-		if (bFindReplaceFindAllBookmark) {
+		if (mask & FindReplaceOption_FindAllBookmark) {
 			CheckDlgButton(hwnd, IDC_FINDALLBOOKMARK, BST_CHECKED);
 		}
-		if (bFindReplaceUseMonospacedFont) {
+		if (mask & FindReplaceOption_UseMonospacedFont) {
 			CheckDlgButton(hwnd, IDC_USEMONOSPACEDFONT, BST_CHECKED);
 			FindReplaceSetFont(hwnd, TRUE, &hFontFindReplaceEdit);
 		}
@@ -4811,7 +4796,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		if (!GetWindowTextLength(hwndFind)) {
 			SetDlgItemTextA2W(CP_UTF8, hwnd, IDC_FINDTEXT, lpefr->szFindUTF8);
 		}
-		CheckDlgButton(hwnd, IDC_FINDTRANSFORMBS, lpefr->bTransformBS ? BST_CHECKED : BST_UNCHECKED);
+		CheckDlgButton(hwnd, IDC_FINDTRANSFORMBS, (lpefr->option & FindReplaceOption_TransformBackslash) ? BST_CHECKED : BST_UNCHECKED);
 		// focus on replace box when selected text is not empty.
 		PostMessage(hwnd, WM_NEXTDLGCTL, AsInteger<WPARAM>((hasFindText && hwndRepl)? hwndRepl : hwndFind), TRUE);
 	}
@@ -4896,17 +4881,20 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			//	CheckDlgButton(hwnd, IDC_FINDREGEXP, BST_UNCHECKED);
 			break;
 
-		case IDC_TRANSPARENT:
-			bFindReplaceTransparentMode = IsButtonChecked(hwnd, IDC_TRANSPARENT);
-			break;
-
-		case IDC_FINDALLBOOKMARK:
-			bFindReplaceFindAllBookmark = IsButtonChecked(hwnd, IDC_FINDALLBOOKMARK);
-			break;
-
 		case IDC_FIND_CXXREGEX:
-			bFindReplaceUseCxxRegex = IsButtonChecked(hwnd, IDC_FIND_CXXREGEX);
-			break;
+		case IDC_TRANSPARENT:
+		case IDC_USEMONOSPACEDFONT:
+		case IDC_FINDALLBOOKMARK: {
+			const int mask = 1 << (LOWORD(wParam) - IDC_FIND_CXXREGEX);
+			if (IsButtonChecked(hwnd, LOWORD(wParam))) {
+				iFindReplaceOption |= mask;
+			} else {
+				iFindReplaceOption &= ~mask;
+			}
+			if (LOWORD(wParam) == IDC_USEMONOSPACEDFONT) {
+				FindReplaceSetFont(hwnd, iFindReplaceOption & FindReplaceOption_UseMonospacedFont, &hFontFindReplaceEdit);
+			}
+		} break;
 
 		case IDOK:
 		case IDC_FINDPREV:
@@ -4937,40 +4925,47 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 				GetDlgItemTextA2W(cpEdit, hwnd, IDC_REPLACETEXT, lpefr->szReplace, COUNTOF(lpefr->szReplace));
 			}
 
-			lpefr->bWildcardSearch = IsButtonChecked(hwnd, IDC_WILDCARDSEARCH);
-			lpefr->fuFlags = 0;
-
+			unsigned mask = SCFIND_NONE;
 			if (IsButtonChecked(hwnd, IDC_FINDCASE)) {
-				lpefr->fuFlags |= SCFIND_MATCHCASE;
+				mask |= SCFIND_MATCHCASE;
 			}
-
 			if (IsButtonChecked(hwnd, IDC_FINDWORD)) {
-				lpefr->fuFlags |= SCFIND_WHOLEWORD;
+				mask |= SCFIND_WHOLEWORD;
 			}
-
 			if (IsButtonChecked(hwnd, IDC_FINDSTART)) {
-				lpefr->fuFlags |= SCFIND_WORDSTART;
+				mask |= SCFIND_WORDSTART;
 			}
-
 			if (IsButtonChecked(hwnd, IDC_FINDREGEXP)) {
-				if (bFindReplaceUseCxxRegex) {
-					lpefr->fuFlags |= SCFIND_REGEXP | SCFIND_CXX11REGEX;
+				if (iFindReplaceOption & FindReplaceOption_UseCxxRegex) {
+					mask |= SCFIND_REGEXP | SCFIND_CXX11REGEX;
 					if (IsButtonChecked(hwnd, IDC_FIND_DOTALL)) {
-						lpefr->fuFlags |= SCFIND_REGEX_DOT_ALL;
+						mask |= SCFIND_REGEX_DOT_ALL;
 					}
 				} else {
-					lpefr->fuFlags |= SCFIND_REGEXP | SCFIND_POSIX;
+					mask |= SCFIND_REGEXP | SCFIND_POSIX;
 				}
 			}
+			lpefr->fuFlags = mask;
 
-			lpefr->bTransformBS = IsButtonChecked(hwnd, IDC_FINDTRANSFORMBS);
-			lpefr->bNoFindWrap = IsButtonChecked(hwnd, IDC_NOWRAP);
-
-			if (bIsFindDlg) {
-				lpefr->bFindClose = IsButtonChecked(hwnd, IDC_FINDCLOSE);
-			} else {
-				lpefr->bReplaceClose = IsButtonChecked(hwnd, IDC_FINDCLOSE);
+			mask = FindReplaceOption_None;
+			if (IsButtonChecked(hwnd, IDC_FINDTRANSFORMBS)) {
+				mask |= FindReplaceOption_TransformBackslash;
 			}
+			if (IsButtonChecked(hwnd, IDC_WILDCARDSEARCH)) {
+				mask |= FindReplaceOption_WildcardSearch;
+			}
+			if (IsButtonChecked(hwnd, IDC_NOWRAP)) {
+				mask |= FindReplaceOption_NoFindWrap;
+			}
+
+			bool bCloseDlg = IsButtonChecked(hwnd, IDC_FINDCLOSE);
+			if (bCloseDlg) {
+				mask |= bIsFindDlg ? FindReplaceOption_CloseFind : FindReplaceOption_CloseReplace;
+				if (!bIsFindDlg && LOWORD(wParam) == IDOK) {
+					bCloseDlg = false;
+				}
+			}
+			lpefr->option = mask;
 
 			// Save MRUs
 			if (StrNotEmpty(lpefr->szFind)) {
@@ -4986,17 +4981,6 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 				}
 			} else {
 				strcpy(lpefr->szReplaceUTF8, "");
-			}
-
-			bool bCloseDlg;
-			if (bIsFindDlg) {
-				bCloseDlg = lpefr->bFindClose;
-			} else {
-				if (LOWORD(wParam) == IDOK) {
-					bCloseDlg = false;
-				} else {
-					bCloseDlg = lpefr->bReplaceClose;
-				}
 			}
 
 			// Reload MRUs
@@ -5104,11 +5088,6 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			}
 		}
 		break;
-
-		case IDC_USEMONOSPACEDFONT:
-			bFindReplaceUseMonospacedFont = IsButtonChecked(hwnd, IDC_USEMONOSPACEDFONT);
-			FindReplaceSetFont(hwnd, bFindReplaceUseMonospacedFont, &hFontFindReplaceEdit);
-			break;
 		}
 		return TRUE;
 
@@ -5172,7 +5151,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 	break;
 
 	case WM_ACTIVATE :
-		SetWindowTransparentMode(hwnd, (LOWORD(wParam) == WA_INACTIVE && bFindReplaceTransparentMode), iFindReplaceOpacityLevel);
+		SetWindowTransparentMode(hwnd, (LOWORD(wParam) == WA_INACTIVE && (iFindReplaceOption & FindReplaceOption_TransparentMode) != 0), iFindReplaceOpacityLevel);
 		break;
 	}
 
@@ -5229,7 +5208,7 @@ int EditPrepareFind(char *szFind2, const EDITFINDREPLACE *lpefr) noexcept {
 
 	int searchFlags = lpefr->fuFlags;
 	strncpy(szFind2, lpefr->szFind, NP2_FIND_REPLACE_LIMIT);
-	if (lpefr->bTransformBS) {
+	if (lpefr->option & FindReplaceOption_TransformBackslash) {
 		const UINT cpEdit = SciCall_GetCodePage();
 		TransformBackslashes(szFind2, (searchFlags & SCFIND_REGEXP), cpEdit);
 	}
@@ -5237,7 +5216,7 @@ int EditPrepareFind(char *szFind2, const EDITFINDREPLACE *lpefr) noexcept {
 		InfoBoxWarn(MB_OK, L"MsgNotFound", IDS_NOTFOUND);
 		return NP2_InvalidSearchFlags;
 	}
-	if (lpefr->bWildcardSearch) {
+	if (lpefr->option & FindReplaceOption_WildcardSearch) {
 		EscapeWildcards(szFind2);
 		searchFlags |= SCFIND_REGEXP;
 	} else if (!(searchFlags & (SCFIND_REGEXP | SCFIND_MATCHCASE))) {
@@ -5260,7 +5239,7 @@ int EditPrepareReplace(HWND hwnd, char *szFind2, char **pszReplace2, BOOL *bRepl
 		*pszReplace2 = EditGetClipboardText(hwnd);
 	} else {
 		*pszReplace2 = StrDupA(lpefr->szReplace);
-		if (lpefr->bTransformBS) {
+		if (lpefr->option & FindReplaceOption_TransformBackslash) {
 			const UINT cpEdit = SciCall_GetCodePage();
 			TransformBackslashes(*pszReplace2, *bReplaceRE, cpEdit);
 		}
@@ -5290,7 +5269,7 @@ void EditFindNext(const EDITFINDREPLACE *lpefr, bool fExtendSelection) noexcept 
 	Sci_Position iPos = SciCall_FindTextFull(searchFlags, &ttf);
 	bool bSuppressNotFound = false;
 
-	if (iPos < 0 && ttf.chrg.cpMin > 0 && !lpefr->bNoFindWrap && !fExtendSelection) {
+	if (iPos < 0 && ttf.chrg.cpMin > 0 && (lpefr->option & FindReplaceOption_NoFindWrap) == 0 && !fExtendSelection) {
 		if (IDOK == InfoBoxInfo(MB_OKCANCEL, L"MsgFindWrap1", IDS_FIND_WRAPFW)) {
 			ttf.chrg.cpMin = 0;
 			iPos = SciCall_FindTextFull(searchFlags, &ttf);
@@ -5337,7 +5316,7 @@ void EditFindPrev(const EDITFINDREPLACE *lpefr, bool fExtendSelection) noexcept 
 	const Sci_Position iLength = SciCall_GetLength();
 	bool bSuppressNotFound = false;
 
-	if (iPos < 0 && ttf.chrg.cpMin < iLength && !lpefr->bNoFindWrap && !fExtendSelection) {
+	if (iPos < 0 && ttf.chrg.cpMin < iLength && (lpefr->option & FindReplaceOption_NoFindWrap) == 0 && !fExtendSelection) {
 		if (IDOK == InfoBoxInfo(MB_OKCANCEL, L"MsgFindWrap2", IDS_FIND_WRAPRE)) {
 			ttf.chrg.cpMin = iLength;
 			iPos = SciCall_FindTextFull(searchFlags, &ttf);
@@ -5384,7 +5363,7 @@ bool EditReplace(HWND hwnd, const EDITFINDREPLACE *lpefr) noexcept {
 	Sci_Position iPos = SciCall_FindTextFull(searchFlags, &ttf);
 	bool bSuppressNotFound = false;
 
-	if (iPos < 0 && ttf.chrg.cpMin > 0 && !lpefr->bNoFindWrap) {
+	if (iPos < 0 && ttf.chrg.cpMin > 0 && (lpefr->option & FindReplaceOption_NoFindWrap) == 0) {
 		if (IDOK == InfoBoxInfo(MB_OKCANCEL, L"MsgFindWrap1", IDS_FIND_WRAPFW)) {
 			ttf.chrg.cpMin = 0;
 			iPos = SciCall_FindTextFull(searchFlags, &ttf);
@@ -5417,7 +5396,7 @@ bool EditReplace(HWND hwnd, const EDITFINDREPLACE *lpefr) noexcept {
 	iPos = SciCall_FindTextFull(searchFlags, &ttf);
 	bSuppressNotFound = false;
 
-	if (iPos < 0 && ttf.chrg.cpMin > 0 && !lpefr->bNoFindWrap) {
+	if (iPos < 0 && ttf.chrg.cpMin > 0 && (lpefr->option & FindReplaceOption_NoFindWrap) == 0) {
 		if (IDOK == InfoBoxInfo(MB_OKCANCEL, L"MsgFindWrap1", IDS_FIND_WRAPFW)) {
 			ttf.chrg.cpMin = 0;
 			iPos = SciCall_FindTextFull(searchFlags, &ttf);
@@ -5716,13 +5695,14 @@ void EditFindAll(const EDITFINDREPLACE *lpefr, bool selectAll) noexcept {
 		return;
 	}
 
-	searchFlags |= ((static_cast<int>(bFindReplaceFindAllBookmark)) * NP2_MarkAllBookmark)
+	static_assert(NP2_MarkAllBookmark == FindReplaceOption_FindAllBookmark << 10);
+	searchFlags |= ((iFindReplaceOption & FindReplaceOption_FindAllBookmark) << 10)
 		| ((static_cast<int>(selectAll)) * NP2_MarkAllSelectAll)
 		| NP2_FromFindAll;
 	// rewind start position when transform backslash is checked,
 	// all other searching doesn't across lines.
 	// NOTE: complex fix is needed when multiline regex is supported.
-	if (lpefr->bTransformBS && strpbrk(szFind2, "\r\n") != nullptr) {
+	if ((searchFlags & SCFIND_REGEX_DOT_ALL) != 0 || ((lpefr->option & FindReplaceOption_TransformBackslash) != 0 && strpbrk(szFind2, "\r\n") != nullptr)) {
 		searchFlags |= NP2_MarkAllMultiline;
 	}
 	editMarkAll.Start(FALSE, searchFlags, strlen(szFind2), szFind2);

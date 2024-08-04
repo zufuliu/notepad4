@@ -31,18 +31,31 @@
 #define NP2_MarkAllSelectAll	0x00004000
 #define NP2_FromFindAll			0x00008000
 
+enum {
+	FindReplaceOption_None = 0,
+	FindReplaceOption_UseCxxRegex = 1,
+	FindReplaceOption_TransparentMode = 2,
+	FindReplaceOption_UseMonospacedFont = 4,
+	FindReplaceOption_FindAllBookmark = 8,
+
+	FindReplaceOption_CloseFind = 1,
+	FindReplaceOption_CloseReplace = 2,
+	FindReplaceOption_NoFindWrap = 4,
+	FindReplaceOption_BehaviorMask = 7,
+
+	FindReplaceOption_TransformBackslash = 8,
+	FindReplaceOption_WildcardSearch = 16,
+	FindReplaceOption_SearchMask = 24,
+};
+
 struct EDITFINDREPLACE {
+	HWND	hwnd;
+	UINT	fuFlags;
+	UINT	option;
 	char	szFind[512];
 	char	szReplace[512];
 	char	szFindUTF8[512 * kMaxMultiByteCount];
 	char	szReplaceUTF8[512 * kMaxMultiByteCount];
-	HWND	hwnd;
-	UINT	fuFlags;
-	bool	bTransformBS;
-	bool	bFindClose;
-	bool	bReplaceClose;
-	bool	bNoFindWrap;
-	bool	bWildcardSearch;
 };
 
 enum EditAlignMode {
