@@ -274,6 +274,7 @@ enum {
 	AutoCompleteScope_Default = 0xff,
 };
 enum {
+	AutoCompleteFillUpMask_None = 0,
 	AutoCompleteFillUpMask_Enter = 1,
 	AutoCompleteFillUpMask_Tab = 2,
 	AutoCompleteFillUpMask_Space = 4,
@@ -294,6 +295,7 @@ enum AutoInsertCharacter {
 	AutoInsertCharacter_Comma,
 };
 enum {
+	AutoInsertMask_None = 0,
 	AutoInsertMask_Parenthesis = 1,			// ()
 	AutoInsertMask_Brace = 2,				// {}
 	AutoInsertMask_SquareBracket = 4,		// []
@@ -320,18 +322,24 @@ enum {
 #define MIN_AUTO_COMPLETION_WORD_LENGTH			1
 #define MIN_AUTO_COMPLETION_NUMBER_LENGTH		0
 
+enum {
+	AutoCompletionOption_None = 0,
+	AutoCompletionOption_CloseTags = 1,
+	AutoCompletionOption_CompleteWord = 2,
+	AutoCompletionOption_ScanWordsInDocument = 4,
+	AutoCompletionOption_OnlyWordsInDocument = 8,
+	AutoCompletionOption_EnglishIMEModeOnly = 16,
+	AutoCompletionOption_Default = 7,
+};
+
 struct EditAutoCompletionConfig {
 	bool bIndentText;
-	bool bCloseTags;
-	bool bCompleteWord;
-	bool bScanWordsInDocument;
+	bool bIgnoreCase;
+	bool bLaTeXInputMethod;
+	int iCompleteOption;
 	int fCompleteScope;
 	int fScanWordScope;
 	UINT dwScanWordsTimeout;
-	bool bOnlyWordsInDocument;
-	bool bEnglishIMEModeOnly;
-	bool bIgnoreCase;
-	bool bLaTeXInputMethod;
 	UINT iVisibleItemCount;
 	int iMinWordLength;
 	int iMinNumberLength;

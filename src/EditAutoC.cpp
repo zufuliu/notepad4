@@ -1617,7 +1617,8 @@ static bool EditCompleteWordCore(int iCondition, bool autoInsert) noexcept {
 	watch.Start();
 #endif
 
-	bool bIgnoreLexer = autoCompletionConfig.bOnlyWordsInDocument || (pRoot[0] >= '0' && pRoot[0] <= '9'); // number
+	bool bIgnoreLexer = (autoCompletionConfig.iCompleteOption & AutoCompletionOption_OnlyWordsInDocument) != 0
+		|| (pRoot[0] >= '0' && pRoot[0] <= '9'); // number
 	const bool bIgnoreCase = bIgnoreLexer || autoCompletionConfig.bIgnoreCase;
 	WordList pWList;
 	pWList.Init(pRoot, iRootLen, bIgnoreCase);
@@ -1653,7 +1654,7 @@ static bool EditCompleteWordCore(int iCondition, bool autoInsert) noexcept {
 
 	bool retry = true;
 	uint32_t ignoredStyleMask[8] = {0};
-	const bool bScanWordsInDocument = autoCompletionConfig.bScanWordsInDocument;
+	const bool bScanWordsInDocument = (autoCompletionConfig.iCompleteOption & AutoCompletionOption_ScanWordsInDocument) != 0;
 	if (pLexCurrent->lexerAttr & LexerAttr_PlainTextFile) {
 		if (!bScanWordsInDocument
 			|| !(autoCompletionConfig.fCompleteScope & AutoCompleteScope_PlainText)
@@ -1946,7 +1947,7 @@ void EditAutoCloseXMLTag() noexcept {
 	bool shouldAutoClose = false;
 	bool autoClosed = false;
 
-	if (iSize >= 3 && autoCompletionConfig.bCloseTags) {
+	if (iSize >= 3 && (autoCompletionConfig.iCompleteOption & AutoCompletionOption_CloseTags) != 0) {
 		shouldAutoClose = true;
 		int iCurrentStyle = SciCall_GetStyleIndexAt(iCurPos);
 		const int iLexer = pLexCurrent->iLexer;
@@ -2024,7 +2025,7 @@ void EditAutoCloseXMLTag() noexcept {
 		}
 	}
 
-	if (!autoClosed && autoCompletionConfig.bCompleteWord) {
+	if (!autoClosed && (autoCompletionConfig.iCompleteOption & AutoCompletionOption_CompleteWord) != 0) {
 		const Sci_Position iPos = SciCall_GetCurrentPos();
 		if (SciCall_GetCharAt(iPos - 2) == '-') {
 			EditCompleteWord(AutoCompleteCondition_Normal, false); // obj->field, obj->method

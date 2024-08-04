@@ -2270,24 +2270,23 @@ static INT_PTR CALLBACK AutoCompletionSettingsDlgProc(HWND hwnd, UINT umsg, WPAR
 
 	switch (umsg) {
 	case WM_INITDIALOG: {
+		int mask = autoCompletionConfig.iCompleteOption;
 		if (autoCompletionConfig.bIndentText) {
 			CheckDlgButton(hwnd, IDC_AUTO_INDENT_TEXT, BST_CHECKED);
 		}
-
-		if (autoCompletionConfig.bCloseTags) {
+		if (mask & AutoCompletionOption_CloseTags) {
 			CheckDlgButton(hwnd, IDC_AUTO_CLOSE_TAGS, BST_CHECKED);
 		}
-
-		if (autoCompletionConfig.bCompleteWord) {
+		if (mask & AutoCompletionOption_CompleteWord) {
 			CheckDlgButton(hwnd, IDC_AUTO_COMPLETE_WORD, BST_CHECKED);
 		}
-		if (autoCompletionConfig.bScanWordsInDocument) {
+		if (mask & AutoCompletionOption_ScanWordsInDocument) {
 			CheckDlgButton(hwnd, IDC_AUTOC_SCAN_DOCUMENT_WORDS, BST_CHECKED);
 		}
-		if (autoCompletionConfig.bOnlyWordsInDocument) {
+		if (mask & AutoCompletionOption_OnlyWordsInDocument) {
 			CheckDlgButton(hwnd, IDC_AUTOC_ONLY_DOCUMENT_WORDS, BST_CHECKED);
 		}
-		if (autoCompletionConfig.bEnglishIMEModeOnly) {
+		if (mask & AutoCompletionOption_EnglishIMEModeOnly) {
 			CheckDlgButton(hwnd, IDC_AUTOC_ENGLISH_IME_ONLY, BST_CHECKED);
 		}
 
@@ -2304,7 +2303,7 @@ static INT_PTR CALLBACK AutoCompletionSettingsDlgProc(HWND hwnd, UINT umsg, WPAR
 		wsprintf(wch, L"%u ms", autoCompletionConfig.dwScanWordsTimeout);
 		SetDlgItemText(hwnd, IDC_AUTOC_SCAN_WORDS_TIMEOUT, wch);
 
-		int mask = autoCompletionConfig.fCompleteScope;
+		mask = autoCompletionConfig.fCompleteScope;
 		if (mask & AutoCompleteScope_Commont) {
 			CheckDlgButton(hwnd, IDC_AUTO_COMPLETE_INSIDE_COMMONT, BST_CHECKED);
 		}
@@ -2314,6 +2313,7 @@ static INT_PTR CALLBACK AutoCompletionSettingsDlgProc(HWND hwnd, UINT umsg, WPAR
 		if (mask & AutoCompleteScope_PlainText) {
 			CheckDlgButton(hwnd, IDC_AUTO_COMPLETE_INSIDE_PLAINTEXT, BST_CHECKED);
 		}
+
 		mask = autoCompletionConfig.fScanWordScope;
 		if (mask & AutoCompleteScope_Commont) {
 			CheckDlgButton(hwnd, IDC_SCAN_WORD_INSIDE_COMMONT, BST_CHECKED);
@@ -2382,14 +2382,26 @@ static INT_PTR CALLBACK AutoCompletionSettingsDlgProc(HWND hwnd, UINT umsg, WPAR
 		switch (LOWORD(wParam)) {
 		case IDOK: {
 			autoCompletionConfig.bIndentText = IsButtonChecked(hwnd, IDC_AUTO_INDENT_TEXT);
-			autoCompletionConfig.bCloseTags = IsButtonChecked(hwnd, IDC_AUTO_CLOSE_TAGS);
 
-			autoCompletionConfig.bCompleteWord = IsButtonChecked(hwnd, IDC_AUTO_COMPLETE_WORD);
-			autoCompletionConfig.bScanWordsInDocument = IsButtonChecked(hwnd, IDC_AUTOC_SCAN_DOCUMENT_WORDS);
-			autoCompletionConfig.bOnlyWordsInDocument = IsButtonChecked(hwnd, IDC_AUTOC_ONLY_DOCUMENT_WORDS);
-			autoCompletionConfig.bEnglishIMEModeOnly = IsButtonChecked(hwnd, IDC_AUTOC_ENGLISH_IME_ONLY);
+			int mask = AutoCompletionOption_None;
+			if (IsButtonChecked(hwnd, IDC_AUTO_CLOSE_TAGS)) {
+				mask |= AutoCompletionOption_CloseTags;
+			}
+			if (IsButtonChecked(hwnd, IDC_AUTO_COMPLETE_WORD)) {
+				mask |= AutoCompletionOption_CompleteWord;
+			}
+			if (IsButtonChecked(hwnd, IDC_AUTOC_SCAN_DOCUMENT_WORDS)) {
+				mask |= AutoCompletionOption_ScanWordsInDocument;
+			}
+			if (IsButtonChecked(hwnd, IDC_AUTOC_ONLY_DOCUMENT_WORDS)) {
+				mask |= AutoCompletionOption_OnlyWordsInDocument;
+			}
+			if (IsButtonChecked(hwnd, IDC_AUTOC_ENGLISH_IME_ONLY)) {
+				mask |= AutoCompletionOption_EnglishIMEModeOnly;
+			}
+			autoCompletionConfig.iCompleteOption = mask;
 
-			int mask = GetDlgItemInt(hwnd, IDC_AUTOC_VISIBLE_ITEM_COUNT, nullptr, FALSE);
+			mask = GetDlgItemInt(hwnd, IDC_AUTOC_VISIBLE_ITEM_COUNT, nullptr, FALSE);
 			autoCompletionConfig.iVisibleItemCount = max(mask, MIN_AUTO_COMPLETION_VISIBLE_ITEM_COUNT);
 
 			mask = GetDlgItemInt(hwnd, IDC_AUTOC_MIN_WORD_LENGTH, nullptr, FALSE);
@@ -2428,7 +2440,7 @@ static INT_PTR CALLBACK AutoCompletionSettingsDlgProc(HWND hwnd, UINT umsg, WPAR
 			}
 			autoCompletionConfig.fScanWordScope = mask;
 
-			mask = 0;
+			mask = AutoCompleteFillUpMask_None;
 			if (IsButtonChecked(hwnd, IDC_AUTOC_FILLUP_ENTER)) {
 				mask |= AutoCompleteFillUpMask_Enter;
 			}
@@ -2445,7 +2457,7 @@ static INT_PTR CALLBACK AutoCompletionSettingsDlgProc(HWND hwnd, UINT umsg, WPAR
 			autoCompletionConfig.fAutoCompleteFillUpMask = mask;
 			GetDlgItemText(hwnd, IDC_AUTOC_FILLUP_PUNCTUATION_LIST, autoCompletionConfig.wszAutoCompleteFillUp, COUNTOF(autoCompletionConfig.wszAutoCompleteFillUp));
 
-			mask = 0;
+			mask = AutoInsertMask_None;
 			if (IsButtonChecked(hwnd, IDC_AUTO_INSERT_PARENTHESIS)) {
 				mask |= AutoInsertMask_Parenthesis;
 			}

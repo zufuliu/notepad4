@@ -4052,7 +4052,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_VIEW_AUTOCOMPLETION_SETTINGS:
 		if (AutoCompletionSettingsDlg(hwnd)) {
-			if (!autoCompletionConfig.bCompleteWord) {
+			if ((autoCompletionConfig.iCompleteOption & AutoCompletionOption_CompleteWord) == 0) {
 				SciCall_AutoCCancel();
 			}
 		}
@@ -4973,7 +4973,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				}
 				// Auto close tags
 				if (ch == '>') {
-					if (autoCompletionConfig.bCloseTags || autoCompletionConfig.bCompleteWord) {
+					if (autoCompletionConfig.iCompleteOption & (AutoCompletionOption_CloseTags | AutoCompletionOption_CompleteWord)) {
 						EditAutoCloseXMLTag();
 					}
 					return 0;
@@ -4991,9 +4991,9 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			}
 
 			// auto complete word
-			if (!autoCompletionConfig.bCompleteWord
+			if ((autoCompletionConfig.iCompleteOption & AutoCompletionOption_CompleteWord) == 0
 				// ignore IME input
-				|| (scn->characterSource != SC_CHARACTERSOURCE_DIRECT_INPUT && (ch >= 0x80 || autoCompletionConfig.bEnglishIMEModeOnly))
+				|| (scn->characterSource != SC_CHARACTERSOURCE_DIRECT_INPUT && (ch >= 0x80 || (autoCompletionConfig.iCompleteOption & AutoCompletionOption_EnglishIMEModeOnly) != 0))
 				|| !IsAutoCompletionWordCharacter(ch)
 			) {
 				return 0;
@@ -5416,16 +5416,12 @@ void LoadSettings() noexcept {
 	bShowIndentGuides = section.GetBool(L"ShowIndentGuides", false);
 
 	autoCompletionConfig.bIndentText = section.GetBool(L"AutoIndent", true);
-	autoCompletionConfig.bCloseTags = section.GetBool(L"AutoCloseTags", true);
-	autoCompletionConfig.bCompleteWord = section.GetBool(L"AutoCompleteWords", true);
-	autoCompletionConfig.bScanWordsInDocument = section.GetBool(L"AutoCScanWordsInDocument", true);
+	autoCompletionConfig.iCompleteOption = section.GetInt(L"AutoCompleteOption", AutoCompletionOption_Default);
 	iValue = section.GetInt(L"AutoCompleteScope", AutoCompleteScope_Default);
 	autoCompletionConfig.fCompleteScope = iValue & 15;
 	autoCompletionConfig.fScanWordScope = iValue >> 4;
 	iValue = section.GetInt(L"AutoCScanWordsTimeout", AUTOC_SCAN_WORDS_DEFAULT_TIMEOUT);
 	autoCompletionConfig.dwScanWordsTimeout = max(iValue, AUTOC_SCAN_WORDS_MIN_TIMEOUT);
-	autoCompletionConfig.bOnlyWordsInDocument = section.GetBool(L"AutoCOnlyWordsInDocument", false);
-	autoCompletionConfig.bEnglishIMEModeOnly = section.GetBool(L"AutoCEnglishIMEModeOnly", false);
 	autoCompletionConfig.bIgnoreCase = section.GetBool(L"AutoCIgnoreCase", false);
 	autoCompletionConfig.bLaTeXInputMethod = section.GetBool(L"LaTeXInputMethod", false);
 	iValue = section.GetInt(L"AutoCVisibleItemCount", 16);
@@ -5768,14 +5764,10 @@ void SaveSettings(bool bSaveSettingsNow) noexcept {
 	section.SetBoolEx(L"ShowIndentGuides", bShowIndentGuides, false);
 
 	section.SetBoolEx(L"AutoIndent", autoCompletionConfig.bIndentText, true);
-	section.SetBoolEx(L"AutoCloseTags", autoCompletionConfig.bCloseTags, true);
-	section.SetBoolEx(L"AutoCompleteWords", autoCompletionConfig.bCompleteWord, true);
-	section.SetBoolEx(L"AutoCScanWordsInDocument", autoCompletionConfig.bScanWordsInDocument, true);
+	section.SetIntEx(L"AutoCompleteOption", autoCompletionConfig.iCompleteOption, AutoCompletionOption_Default);
 	iValue = autoCompletionConfig.fCompleteScope | (autoCompletionConfig.fScanWordScope << 4);
 	section.SetIntEx(L"AutoCompleteScope", iValue, AutoCompleteScope_Default);
 	section.SetIntEx(L"AutoCScanWordsTimeout", autoCompletionConfig.dwScanWordsTimeout, AUTOC_SCAN_WORDS_DEFAULT_TIMEOUT);
-	section.SetBoolEx(L"AutoCOnlyWordsInDocument", autoCompletionConfig.bOnlyWordsInDocument, false);
-	section.SetBoolEx(L"AutoCEnglishIMEModeOnly", autoCompletionConfig.bEnglishIMEModeOnly, false);
 	section.SetBoolEx(L"AutoCIgnoreCase", autoCompletionConfig.bIgnoreCase, false);
 	section.SetBoolEx(L"LaTeXInputMethod", autoCompletionConfig.bLaTeXInputMethod, false);
 	section.SetIntEx(L"AutoCVisibleItemCount", autoCompletionConfig.iVisibleItemCount, 16);
