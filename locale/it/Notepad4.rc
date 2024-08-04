@@ -1620,7 +1620,7 @@ BEGIN
     EDITTEXT        IDC_AUTOC_MIN_NUMBER_LENGTH,166,48,50,12,ES_NUMBER | WS_TABSTOP
     AUTOCHECKBOX    "Scansione delle parole nel documento ogni:",IDC_AUTOC_SCAN_DOCUMENT_WORDS,14,68,150,10,WS_TABSTOP
     EDITTEXT        IDC_AUTOC_SCAN_WORDS_TIMEOUT,166,64,50,12,WS_TABSTOP
-    AUTOCHECKBOX    "Only use words in current document.",IDC_AUTOC_ONLY_DOCUMENT_WORDS,14,80,180,10,WS_TABSTOP
+    AUTOCHECKBOX    "Utilizza solo le parole del documento corrente.",IDC_AUTOC_ONLY_DOCUMENT_WORDS,14,80,200,10,WS_TABSTOP
     AUTOCHECKBOX    "Attiva il completamento solo in modalità IME inglese.",IDC_AUTOC_ENGLISH_IME_ONLY,14,92,200,10,WS_TABSTOP
 
     GROUPBOX        "Autocompleta parole in:",IDC_STATIC,7,111,218,26
@@ -1671,7 +1671,7 @@ BEGIN
     AUTOCHECKBOX    "Salva backup in caso di sospensione del sistema.",IDC_AUTOSAVE_SUSPEND,7,31,170,10,WS_GROUP | WS_TABSTOP
     AUTOCHECKBOX    "Salva backup in caso di spegnimento del sistema.",IDC_AUTOSAVE_SHUTDOWN,7,43,170,10,WS_TABSTOP
     AUTOCHECKBOX    "Eliminare manualmente i backup.",IDC_AUTOSAVE_MANUALLYDELETE,7,55,170,10,WS_TABSTOP
-    AUTOCHECKBOX    "Directly overwrite current file.",IDC_AUTOSAVE_OVERWRITECURRENT,7,67,170,10,WS_TABSTOP
+    AUTOCHECKBOX    "Sovrascrivi direttamente il file corrente.",IDC_AUTOSAVE_OVERWRITECURRENT,7,67,170,10,WS_TABSTOP
     PUSHBUTTON      "Apri cartella",IDC_AUTOSAVE_OPENFOLDER,7,84,60,14
     DEFPUSHBUTTON   "OK",IDOK,71,84,50,14
     PUSHBUTTON      "Annulla",IDCANCEL,127,84,50,14
