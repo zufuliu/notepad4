@@ -409,8 +409,8 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 	HereDocCls HereDoc;
 
 	QuoteStackCls QuoteStack;
-	memset(&HereDoc, 0, sizeof(HereDoc));
-	memset(&QuoteStack, 0, sizeof(QuoteStack));
+	memset(static_cast<void *>(&HereDoc), 0, sizeof(HereDoc));
+	memset(static_cast<void *>(&QuoteStack), 0, sizeof(QuoteStack));
 
 	int numBase = 0;
 	const Sci_PositionU endPos = startPos + length;
