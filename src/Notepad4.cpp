@@ -8672,8 +8672,19 @@ void AutoSave_DoWork(FileSaveFlag saveFlag) noexcept {
 		return;
 	}
 
-	WCHAR tchPath[MAX_PATH + 40];
 	const bool Untitled = StrIsEmpty(szCurFile);
+	if (!Untitled && saveFlag == FileSaveFlag_Default && (iAutoSaveOption & AutoSaveOption_OverwriteCurrent)) {
+		// overwrite current file
+		EditFileIOStatus status{};
+		status.iEncoding = iCurrentEncoding;
+		status.iEOLMode = iCurrentEOLMode;
+		if (EditSaveFile(hwndEdit, szCurFile, FileSaveFlag_EndSession, status)) {
+			dwLastSavedDocReversion = dwCurrentDocReversion;
+			return;
+		}
+	}
+
+	WCHAR tchPath[MAX_PATH + 40];
 	LPCWSTR extension = L"bak";
 	if (Untitled) {
 		lstrcpy(tchPath, L"Untitled");

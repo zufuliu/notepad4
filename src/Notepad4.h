@@ -275,6 +275,7 @@ enum {
 	AutoSaveOption_Suspend = 2,
 	AutoSaveOption_Shutdown = 4,
 	AutoSaveOption_ManuallyDelete = 8,
+	AutoSaveOption_OverwriteCurrent = 16,
 	AutoSaveOption_Default = AutoSaveOption_Suspend | AutoSaveOption_Shutdown,
 	AutoSaveDefaultPeriod = 5000,
 };
