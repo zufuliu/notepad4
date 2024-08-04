@@ -1617,7 +1617,7 @@ static bool EditCompleteWordCore(int iCondition, bool autoInsert) noexcept {
 	watch.Start();
 #endif
 
-	bool bIgnoreLexer = (pRoot[0] >= '0' && pRoot[0] <= '9'); // number
+	bool bIgnoreLexer = autoCompletionConfig.bOnlyWordsInDocument || (pRoot[0] >= '0' && pRoot[0] <= '9'); // number
 	const bool bIgnoreCase = bIgnoreLexer || autoCompletionConfig.bIgnoreCase;
 	WordList pWList;
 	pWList.Init(pRoot, iRootLen, bIgnoreCase);

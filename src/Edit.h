@@ -328,7 +328,8 @@ struct EditAutoCompletionConfig {
 	int fCompleteScope;
 	int fScanWordScope;
 	UINT dwScanWordsTimeout;
-	bool bEnglistIMEModeOnly;
+	bool bOnlyWordsInDocument;
+	bool bEnglishIMEModeOnly;
 	bool bIgnoreCase;
 	bool bLaTeXInputMethod;
 	UINT iVisibleItemCount;

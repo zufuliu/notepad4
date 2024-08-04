@@ -4993,7 +4993,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			// auto complete word
 			if (!autoCompletionConfig.bCompleteWord
 				// ignore IME input
-				|| (scn->characterSource != SC_CHARACTERSOURCE_DIRECT_INPUT && (ch >= 0x80 || autoCompletionConfig.bEnglistIMEModeOnly))
+				|| (scn->characterSource != SC_CHARACTERSOURCE_DIRECT_INPUT && (ch >= 0x80 || autoCompletionConfig.bEnglishIMEModeOnly))
 				|| !IsAutoCompletionWordCharacter(ch)
 			) {
 				return 0;
@@ -5424,7 +5424,8 @@ void LoadSettings() noexcept {
 	autoCompletionConfig.fScanWordScope = iValue >> 4;
 	iValue = section.GetInt(L"AutoCScanWordsTimeout", AUTOC_SCAN_WORDS_DEFAULT_TIMEOUT);
 	autoCompletionConfig.dwScanWordsTimeout = max(iValue, AUTOC_SCAN_WORDS_MIN_TIMEOUT);
-	autoCompletionConfig.bEnglistIMEModeOnly = section.GetBool(L"AutoCEnglishIMEModeOnly", false);
+	autoCompletionConfig.bOnlyWordsInDocument = section.GetBool(L"AutoCOnlyWordsInDocument", false);
+	autoCompletionConfig.bEnglishIMEModeOnly = section.GetBool(L"AutoCEnglishIMEModeOnly", false);
 	autoCompletionConfig.bIgnoreCase = section.GetBool(L"AutoCIgnoreCase", false);
 	autoCompletionConfig.bLaTeXInputMethod = section.GetBool(L"LaTeXInputMethod", false);
 	iValue = section.GetInt(L"AutoCVisibleItemCount", 16);
@@ -5773,7 +5774,8 @@ void SaveSettings(bool bSaveSettingsNow) noexcept {
 	iValue = autoCompletionConfig.fCompleteScope | (autoCompletionConfig.fScanWordScope << 4);
 	section.SetIntEx(L"AutoCompleteScope", iValue, AutoCompleteScope_Default);
 	section.SetIntEx(L"AutoCScanWordsTimeout", autoCompletionConfig.dwScanWordsTimeout, AUTOC_SCAN_WORDS_DEFAULT_TIMEOUT);
-	section.SetBoolEx(L"AutoCEnglishIMEModeOnly", autoCompletionConfig.bEnglistIMEModeOnly, false);
+	section.SetBoolEx(L"AutoCOnlyWordsInDocument", autoCompletionConfig.bOnlyWordsInDocument, false);
+	section.SetBoolEx(L"AutoCEnglishIMEModeOnly", autoCompletionConfig.bEnglishIMEModeOnly, false);
 	section.SetBoolEx(L"AutoCIgnoreCase", autoCompletionConfig.bIgnoreCase, false);
 	section.SetBoolEx(L"LaTeXInputMethod", autoCompletionConfig.bLaTeXInputMethod, false);
 	section.SetIntEx(L"AutoCVisibleItemCount", autoCompletionConfig.iVisibleItemCount, 16);
