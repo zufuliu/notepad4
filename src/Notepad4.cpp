@@ -5310,9 +5310,8 @@ void LoadSettings() noexcept {
 
 	LoadIniSection(INI_SECTION_NAME_SETTINGS, pIniSectionBuf, cchIniSection);
 	section.Parse(pIniSectionBuf);
-
-	//const int iSettingsVersion = section.GetInt(L"SettingsVersion", NP2SettingsVersion_Current);
 	bSaveSettings = section.GetBool(L"SaveSettings", true);
+
 	// TODO: sort loading order by item frequency to reduce UnsafeGetValue() calls
 	LPCWSTR strValue = section.GetValue(L"OpenWithDir");
 	if (StrIsEmpty(strValue)) {
@@ -5683,8 +5682,6 @@ void SaveSettings(bool bSaveSettingsNow) noexcept {
 	}
 
 	IniSectionBuilder section = { pIniSectionBuf };
-
-	//section.SetInt(L"SettingsVersion", NP2SettingsVersion_Current);
 	section.SetBoolEx(L"SaveSettings", bSaveSettings, true);
 
 	PathRelativeToApp(tchOpenWithDir, wchTmp, FILE_ATTRIBUTE_DIRECTORY, true, flagPortableMyDocs);
