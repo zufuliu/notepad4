@@ -137,10 +137,7 @@ int		iWrapColumn = 0;
 int		iZoomLevel = 100;
 bool	bShowBookmarkMargin;
 static bool bShowLineNumbers;
-static bool bMarkOccurrences;
-static bool bMarkOccurrencesMatchCase;
-static bool bMarkOccurrencesMatchWords;
-static bool bMarkOccurrencesBookmark;
+static int bMarkOccurrences;
 EditAutoCompletionConfig autoCompletionConfig;
 int iSelectOption;
 static int iLineSelectionMode;
@@ -2618,13 +2615,13 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	i = IDM_LINE_SELECTION_MODE_NONE + iLineSelectionMode;
 	CheckMenuRadioItem(hmenu, IDM_LINE_SELECTION_MODE_NONE, IDM_LINE_SELECTION_MODE_OLDVS, i, MF_BYCOMMAND);
 
-	UncheckCmd(hmenu, IDM_VIEW_MARKOCCURRENCES_OFF, bMarkOccurrences);
-	CheckCmd(hmenu, IDM_VIEW_MARKOCCURRENCES_CASE, bMarkOccurrencesMatchCase);
-	CheckCmd(hmenu, IDM_VIEW_MARKOCCURRENCES_WORD, bMarkOccurrencesMatchWords);
-	CheckCmd(hmenu, IDM_VIEW_MARKOCCURRENCES_BOOKMARK, bMarkOccurrencesBookmark);
-	EnableCmd(hmenu, IDM_VIEW_MARKOCCURRENCES_CASE, bMarkOccurrences);
-	EnableCmd(hmenu, IDM_VIEW_MARKOCCURRENCES_WORD, bMarkOccurrences);
-	EnableCmd(hmenu, IDM_VIEW_MARKOCCURRENCES_BOOKMARK, bMarkOccurrences);
+	UncheckCmd(hmenu, IDM_VIEW_MARKOCCURRENCES_OFF, bMarkOccurrences & MarkOccurrences_Enable);
+	CheckCmd(hmenu, IDM_VIEW_MARKOCCURRENCES_CASE, bMarkOccurrences & MarkOccurrences_MatchCase);
+	CheckCmd(hmenu, IDM_VIEW_MARKOCCURRENCES_WORD, bMarkOccurrences & MarkOccurrences_WholeWord);
+	CheckCmd(hmenu, IDM_VIEW_MARKOCCURRENCES_BOOKMARK, bMarkOccurrences & MarkOccurrences_Bookmark);
+	EnableCmd(hmenu, IDM_VIEW_MARKOCCURRENCES_CASE, bMarkOccurrences & MarkOccurrences_Enable);
+	EnableCmd(hmenu, IDM_VIEW_MARKOCCURRENCES_WORD, bMarkOccurrences & MarkOccurrences_Enable);
+	EnableCmd(hmenu, IDM_VIEW_MARKOCCURRENCES_BOOKMARK, bMarkOccurrences & MarkOccurrences_Enable);
 	i = IDM_VIEW_SHOWCALLTIP_OFF + static_cast<int>(callTipInfo.showCallTip);
 	CheckMenuRadioItem(hmenu, IDM_VIEW_SHOWCALLTIP_OFF, IDM_VIEW_SHOWCALLTIP_ABGR, i, MF_BYCOMMAND);
 
@@ -4094,28 +4091,20 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_VIEW_MARKOCCURRENCES_OFF:
 	case IDM_VIEW_MARKOCCURRENCES_CASE:
 	case IDM_VIEW_MARKOCCURRENCES_WORD:
-	case IDM_VIEW_MARKOCCURRENCES_BOOKMARK:
-		switch (LOWORD(wParam)) {
-		case IDM_VIEW_MARKOCCURRENCES_OFF:
-			bMarkOccurrences = !bMarkOccurrences;
-			break;
-		case IDM_VIEW_MARKOCCURRENCES_CASE:
-			bMarkOccurrencesMatchCase = !bMarkOccurrencesMatchCase;
-			break;
-		case IDM_VIEW_MARKOCCURRENCES_WORD:
-			bMarkOccurrencesMatchWords = !bMarkOccurrencesMatchWords;
-			break;
-		case IDM_VIEW_MARKOCCURRENCES_BOOKMARK:
-			bMarkOccurrencesBookmark = !bMarkOccurrencesBookmark;
-			break;
+	case IDM_VIEW_MARKOCCURRENCES_BOOKMARK: {
+		const int mask = 1 << (LOWORD(wParam) - IDM_VIEW_MARKOCCURRENCES_OFF);
+		if (bMarkOccurrences & mask) {
+			bMarkOccurrences &= ~mask;
+		} else {
+			bMarkOccurrences |= mask;
 		}
-		if (bMarkOccurrences) {
-			editMarkAll.MarkAll(FALSE, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords, bMarkOccurrencesBookmark);
+		if (bMarkOccurrences & MarkOccurrences_Enable) {
+			editMarkAll.MarkAll(FALSE, bMarkOccurrences);
 		} else {
 			editMarkAll.Clear();
 		}
 		UpdateStatusbar();
-		break;
+	} break;
 
 	case IDM_VIEW_SHOW_FOLDING:
 		bShowCodeFolding = !bShowCodeFolding;
@@ -4896,19 +4885,19 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 					// mark occurrences of text currently selected
 					if (editMarkAll.ignoreSelectionUpdate) {
 						editMarkAll.ignoreSelectionUpdate = false;
-					} else if (bMarkOccurrences) {
+					} else if (bMarkOccurrences & MarkOccurrences_Enable) {
 						if (SciCall_IsSelectionEmpty()) {
 							if (editMarkAll.matchCount) {
 								editMarkAll.Clear();
 							}
 						} else {
-							editMarkAll.MarkAll((scn->updated & SC_UPDATE_CONTENT), bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords, bMarkOccurrencesBookmark);
+							editMarkAll.MarkAll((scn->updated & SC_UPDATE_CONTENT), bMarkOccurrences);
 						}
 					}
 				} else if (scn->updated & SC_UPDATE_CONTENT) {
 					// cachedStatusItem.updateMask is already set in SCN_MODIFIED.
 					if (editMarkAll.matchCount) {
-						editMarkAll.MarkAll(TRUE, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords, bMarkOccurrencesBookmark);
+						editMarkAll.MarkAll(TRUE, bMarkOccurrences);
 					}
 				}
 				if (cachedStatusItem.updateMask) {
@@ -5469,11 +5458,7 @@ void LoadSettings() noexcept {
 	bShowBookmarkMargin = section.GetBool(L"ShowBookmarkMargin", false);
 	bShowLineNumbers = section.GetBool(L"ShowLineNumbers", true);
 	bShowCodeFolding = section.GetBool(L"ShowCodeFolding", true);
-
-	bMarkOccurrences = section.GetBool(L"MarkOccurrences", true);
-	bMarkOccurrencesMatchCase = section.GetBool(L"MarkOccurrencesMatchCase", false);
-	bMarkOccurrencesMatchWords = section.GetBool(L"MarkOccurrencesMatchWholeWords", false);
-	bMarkOccurrencesBookmark = section.GetBool(L"MarkOccurrencesBookmark", false);
+	bMarkOccurrences = section.GetInt(L"MarkOccurrences", MarkOccurrences_Enable);
 
 	bViewWhiteSpace = section.GetBool(L"ViewWhiteSpace", false);
 	bViewEOLs = section.GetBool(L"ViewEOLs", false);
@@ -5792,10 +5777,7 @@ void SaveSettings(bool bSaveSettingsNow) noexcept {
 	section.SetBoolEx(L"ShowBookmarkMargin", bShowBookmarkMargin, false);
 	section.SetBoolEx(L"ShowLineNumbers", bShowLineNumbers, true);
 	section.SetBoolEx(L"ShowCodeFolding", bShowCodeFolding, true);
-	section.SetBoolEx(L"MarkOccurrences", bMarkOccurrences, true);
-	section.SetBoolEx(L"MarkOccurrencesMatchCase", bMarkOccurrencesMatchCase, false);
-	section.SetBoolEx(L"MarkOccurrencesMatchWholeWords", bMarkOccurrencesMatchWords, false);
-	section.SetBoolEx(L"MarkOccurrencesBookmark", bMarkOccurrencesBookmark, false);
+	section.SetIntEx(L"MarkOccurrences", bMarkOccurrences, MarkOccurrences_Enable);
 	section.SetBoolEx(L"ViewWhiteSpace", bViewWhiteSpace, false);
 	section.SetBoolEx(L"ViewEOLs", bViewEOLs, false);
 	section.SetIntEx(L"ShowCallTip", static_cast<int>(callTipInfo.showCallTip), ShowCallTip_None);

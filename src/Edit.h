@@ -231,6 +231,14 @@ enum {
 	MarkerBitmask_Bookmark = 1 << MarkerNumber_Bookmark,
 };
 
+enum {
+	MarkOccurrences_None = 0,
+	MarkOccurrences_Enable = 1,
+	MarkOccurrences_MatchCase = 2,
+	MarkOccurrences_WholeWord = 4,
+	MarkOccurrences_Bookmark = 8,
+};
+
 struct EditMarkAll {
 	bool pending;
 	bool ignoreSelectionUpdate;
@@ -253,7 +261,7 @@ struct EditMarkAll {
 	void Start(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPSTR text) noexcept;
 	void Continue(HANDLE timer) noexcept;
 	void Stop() noexcept;
-	void MarkAll(BOOL bChanged, bool matchCase, bool wholeWord, bool bookmark) noexcept;
+	void MarkAll(BOOL bChanged, int option) noexcept;
 };
 
 void EditToggleBookmarkAt(Sci_Position iPos) noexcept;

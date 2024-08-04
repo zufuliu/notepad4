@@ -5660,7 +5660,7 @@ void EditMarkAll::Continue(HANDLE timer) noexcept {
 	}
 }
 
-void EditMarkAll::MarkAll(BOOL bChanged, bool matchCase, bool wholeWord, bool bookmark) noexcept {
+void EditMarkAll::MarkAll(BOOL bChanged, int option) noexcept {
 	// get current selection
 	Sci_Position iSelStart = SciCall_GetSelectionStart();
 	const Sci_Position iSelEnd = SciCall_GetSelectionEnd();
@@ -5676,8 +5676,11 @@ void EditMarkAll::MarkAll(BOOL bChanged, bool matchCase, bool wholeWord, bool bo
 	char *text = static_cast<char *>(NP2HeapAlloc(iSelCount + 1));
 	SciCall_GetSelText(text);
 
+	static_assert(NP2_MarkAllBookmark == MarkOccurrences_Bookmark << 10);
+	int findFlag = (option & MarkOccurrences_Bookmark) << 10;
 	// exit if selection is not a word and Match whole words only is enabled
-	if (wholeWord) {
+	if (option & MarkOccurrences_WholeWord) {
+		findFlag |= SCFIND_WHOLEWORD;
 		const UINT cpEdit = SciCall_GetCodePage();
 		const bool dbcs = !(cpEdit == CP_UTF8 || cpEdit == 0);
 		// CharClassify::SetDefaultCharClasses()
@@ -5692,15 +5695,16 @@ void EditMarkAll::MarkAll(BOOL bChanged, bool matchCase, bool wholeWord, bool bo
 			}
 		}
 	}
-	if (!matchCase) {
+	if (option & MarkOccurrences_MatchCase) {
+		findFlag |= SCFIND_MATCHCASE;
+	} else {
 		const bool sensitive = IsStringCaseSensitiveA(text);
 		//printf("%s sensitive=%d\n", __func__, sensitive);
-		matchCase = !sensitive;
+		if (!sensitive) {
+			findFlag |= SCFIND_MATCHCASE;
+		}
 	}
 
-	const int findFlag = (static_cast<int>(matchCase) * SCFIND_MATCHCASE)
-		| (static_cast<int>(wholeWord) * SCFIND_WHOLEWORD)
-		| (static_cast<int>(bookmark) * NP2_MarkAllBookmark);
 	Start(bChanged, findFlag, iSelCount, text);
 }
 
