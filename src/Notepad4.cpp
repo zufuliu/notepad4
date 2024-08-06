@@ -5349,7 +5349,7 @@ void LoadSettings() noexcept {
 
 	bSaveRecentFiles = section.GetBool(L"SaveRecentFiles", false);
 	bSaveFindReplace = section.GetBool(L"SaveFindReplace", false);
-	iValue = section.GetInt(L"FindReplaceOption", FindReplaceOption_None);
+	iValue = section.GetInt(L"FindReplaceOption", FindReplaceOption_Default);
 	iFindReplaceOption = iValue & 15;
 	efrData.option = iValue >> 4;
 	if (bSaveFindReplace) {
@@ -5694,7 +5694,7 @@ void SaveSettings(bool bSaveSettingsNow) noexcept {
 	section.SetBoolEx(L"SaveRecentFiles", bSaveRecentFiles, false);
 	section.SetBoolEx(L"SaveFindReplace", bSaveFindReplace, false);
 	int iValue = iFindReplaceOption | ((efrData.option & FindReplaceOption_BehaviorMask) << 4);
-	section.SetIntEx(L"FindReplaceOption", iValue, FindReplaceOption_None);
+	section.SetIntEx(L"FindReplaceOption", iValue, FindReplaceOption_Default);
 	if (bSaveFindReplace) {
 		iValue = efrData.fuFlags | ((efrData.option & FindReplaceOption_SearchMask) << 10);
 		section.SetIntEx(L"FindReplaceFlag", iValue, SCFIND_NONE);

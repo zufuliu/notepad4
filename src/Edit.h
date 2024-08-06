@@ -37,6 +37,7 @@ enum {
 	FindReplaceOption_TransparentMode = 2,
 	FindReplaceOption_UseMonospacedFont = 4,
 	FindReplaceOption_FindAllBookmark = 8,
+	FindReplaceOption_Default = 2,
 
 	FindReplaceOption_CloseFind = 1,
 	FindReplaceOption_CloseReplace = 2,
