@@ -57,7 +57,7 @@ struct regex_traits;
 template <class charT, class traits = regex_traits<charT> >
 class basic_regex;
 
-typedef basic_regex<char, regex_traits<char> > regex;
+//typedef basic_regex<char, regex_traits<char> > regex;
 #ifndef BOOST_NO_WREGEX
 typedef basic_regex<wchar_t, regex_traits<wchar_t> > wregex;
 #endif

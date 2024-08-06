@@ -3503,7 +3503,7 @@ Sci::Position BuiltinRegex::FindText(const Document *doc, Sci::Position minPos, 
 const char *BuiltinRegex::SubstituteByPosition(const Document *doc, const char *text, Sci::Position *length) {
 	// boost::regex or std::regex version of this function should be substituted by wrapping format method of
 	// match_results for max compatibility. eg. catch group $0-$9. see detail:
-	// https://www.boost.org/doc/libs/1_84_0/libs/regex/doc/html/boost_regex/format/boost_format_syntax.html
+	// https://www.boost.org/doc/libs/release/libs/regex/doc/html/boost_regex/format/boost_format_syntax.html
 	// https://en.cppreference.com/w/cpp/regex/match_results/format
 	substituted.clear();
 	for (Sci::Position j = 0; j < *length; j++) {

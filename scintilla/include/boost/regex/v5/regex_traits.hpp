@@ -27,7 +27,8 @@
 //#include <boost/regex/v5/cpp_regex_traits.hpp>
 //#include <boost/regex/v5/c_regex_traits.hpp>
 #if defined(_WIN32) && !defined(BOOST_REGEX_NO_W32)
-#     include <boost/regex/v5/w32_regex_traits.hpp>
+//#     include <boost/regex/v5/w32_regex_traits.hpp>
+#     include <boost/regex/v5/win_regex_traits.hpp>
 #endif
 #include <boost/regex_fwd.hpp>
 
