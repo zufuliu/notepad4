@@ -29,21 +29,16 @@ public:
    struct boost_extensions_tag{};
 
    w32_regex_traits():
-      m_ctype1_map{new WORD[characterCount]()},
-      m_lower_map{new wchar_t[characterCount]()},
-      m_upper_map{new wchar_t[characterCount]()}
+      m_ctype_map{new WORD[characterCount]()},
+      m_lower_map{new wchar_t[characterCount]}
    {
-      {
-      const std::unique_ptr<wchar_t[]> str{new wchar_t[characterCount]};
       for (int i = 0; i < characterCount; i++) {
-         str[i] = static_cast<wchar_t>(i);
+         m_lower_map[i] = static_cast<wchar_t>(i);
       }
 
       m_locale = ::GetUserDefaultLCID();
-      ::GetStringTypeExW(m_locale, CT_CTYPE1, str.get(), characterCount, m_ctype1_map.get());
-      ::LCMapStringW(m_locale, LCMAP_LOWERCASE, str.get(), characterCount, m_lower_map.get(), characterCount);
-      ::LCMapStringW(m_locale, LCMAP_UPPERCASE, str.get(), characterCount, m_upper_map.get(), characterCount);
-      }
+      ::GetStringTypeExW(m_locale, CT_CTYPE1, m_lower_map.get(), characterCount, m_ctype_map.get());
+      ::LCMapStringW(m_locale, LCMAP_LOWERCASE, m_lower_map.get(), characterCount, m_lower_map.get(), characterCount);
 
       //
       // get the collation format used by m_pcollate:
@@ -79,8 +74,8 @@ public:
       {
          //if(w32_is_lower(c, m_locale)) return regex_constants::escape_type_class;
          //if(w32_is_upper(c, m_locale)) return regex_constants::escape_type_not_class;
-         if(m_ctype1_map[c] & C1_LOWER) return regex_constants::escape_type_class;
-         if(m_ctype1_map[c] & C1_UPPER) return regex_constants::escape_type_not_class;
+         if(m_ctype_map[c] & C1_LOWER) return regex_constants::escape_type_class;
+         if(m_ctype_map[c] & C1_UPPER) return regex_constants::escape_type_not_class;
          return 0;
       }
       return i->second;
@@ -105,7 +100,7 @@ public:
    charT toupper(charT c) const
    {
       //return w32_toupper(c, m_locale);
-      return m_upper_map[c];
+      return c; // toupper() is unused
    }
    string_type transform(const charT* p1, const charT* p2) const
    {
@@ -184,7 +179,7 @@ public:
    {
       if((f & mask_base)
          //&& (w32_is(m_locale, f & mask_base, c)))
-         && (m_ctype1_map[c] & (f & mask_base)))
+         && (m_ctype_map[c] & (f & mask_base)))
          return true;
       else if((f & mask_unicode) && BOOST_REGEX_DETAIL_NS::is_extended(c))
          return true;
@@ -195,7 +190,7 @@ public:
          return true;
       else if((f & mask_horizontal)
          //&& w32_is(m_locale, C1_SPACE, c) && !(::boost::BOOST_REGEX_DETAIL_NS::is_separator(c) || (c == '\v')))
-         && (m_ctype1_map[c] & C1_SPACE) && !(::boost::BOOST_REGEX_DETAIL_NS::is_separator(c) || (c == '\v')))
+         && (m_ctype_map[c] & C1_SPACE) && !(::boost::BOOST_REGEX_DETAIL_NS::is_separator(c) || (c == '\v')))
          return true;
       return false;
    }
@@ -227,9 +222,8 @@ private:
    locale_type m_locale;
    unsigned                       m_collate_type;    // the form of the collation string
    charT                          m_collate_delim;   // the collation group delimiter
-   std::unique_ptr<WORD[]> m_ctype1_map;
+   std::unique_ptr<WORD[]> m_ctype_map;
    std::unique_ptr<wchar_t[]> m_lower_map;
-   std::unique_ptr<wchar_t[]> m_upper_map;
    // TODO: use a hash table when available!
    std::map<charT, regex_constants::syntax_type> m_char_map;
 

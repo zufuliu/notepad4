@@ -368,6 +368,8 @@ operator + (const sub_match<RandomAccessIterator>& m1,
    result.reserve(m1.length() + m2.length() + 1);
    return result.append(m1.first, m1.second).append(m2.first, m2.second);
 }
+
+#ifdef BOOST_REGEX_DEBUG
 template <class charT, class traits, class RandomAccessIterator>
 std::basic_ostream<charT, traits>&
    operator << (std::basic_ostream<charT, traits>& os,
@@ -375,6 +377,7 @@ std::basic_ostream<charT, traits>&
 {
    return (os << s.str());
 }
+#endif
 
 } // namespace boost
 

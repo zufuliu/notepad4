@@ -680,6 +680,7 @@ void swap(basic_regex<charT, traits>& e1, basic_regex<charT, traits>& e2)
    e1.swap(e2);
 }
 
+#ifdef BOOST_REGEX_DEBUG
 template <class charT, class traits, class traits2>
 std::basic_ostream<charT, traits>& 
    operator << (std::basic_ostream<charT, traits>& os, 
@@ -687,6 +688,7 @@ std::basic_ostream<charT, traits>&
 {
    return (os << e.str());
 }
+#endif
 
 //
 // class reg_expression:

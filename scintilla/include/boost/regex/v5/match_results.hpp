@@ -622,6 +622,7 @@ void swap(match_results<BidiIterator, Allocator>& a, match_results<BidiIterator,
    a.swap(b);
 }
 
+#ifdef BOOST_REGEX_DEBUG
 template <class charT, class traits, class BidiIterator, class Allocator>
 std::basic_ostream<charT, traits>&
    operator << (std::basic_ostream<charT, traits>& os,
@@ -629,6 +630,7 @@ std::basic_ostream<charT, traits>&
 {
    return (os << s.str());
 }
+#endif
 
 #ifdef BOOST_REGEX_MSVC
 #pragma warning(pop)
