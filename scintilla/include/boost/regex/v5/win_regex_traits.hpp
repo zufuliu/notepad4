@@ -32,10 +32,33 @@ public:
       m_ctype_map{new WORD[characterCount]()},
       m_lower_map{new wchar_t[characterCount]}
    {
+#if 0 // prevent compiler vectorize the loop generates big and slow code
       for (int i = 0; i < characterCount; i++) {
          m_lower_map[i] = static_cast<wchar_t>(i);
       }
-
+#elif defined(_WIN64)
+      {
+         uint64_t *ptr = reinterpret_cast<uint64_t *>(m_lower_map.get());
+         uint64_t value = 0x0003'0002'0001'0000ULL;
+         constexpr uint64_t acc = 0x0004'0004'0004'0004ULL;
+         constexpr int count = characterCount / (sizeof(uint64_t) / sizeof(wchar_t));
+         for (int i = 0; i < count; i++) {
+            *ptr++ = value;
+            value += acc;
+         }
+      }
+#else
+      {
+         uint32_t *ptr = reinterpret_cast<uint32_t *>(m_lower_map.get());
+         uint32_t value = 0x0001'0000;
+         constexpr uint32_t acc = 0x0002'0002;
+         constexpr int count = characterCount / (sizeof(uint32_t) / sizeof(wchar_t));
+         for (int i = 0; i < count; i++) {
+            *ptr++ = value;
+            value += acc;
+         }
+      }
+#endif
       m_locale = ::GetUserDefaultLCID();
       ::GetStringTypeExW(m_locale, CT_CTYPE1, m_lower_map.get(), characterCount, m_ctype_map.get());
       ::LCMapStringW(m_locale, LCMAP_LOWERCASE, m_lower_map.get(), characterCount, m_lower_map.get(), characterCount);
@@ -52,8 +75,8 @@ public:
          {
             while(*ptr)
             {
-               this->m_char_map[static_cast<charT>(*ptr)] = i;
-               ++ptr;
+               const unsigned char c = *ptr++;
+               this->m_char_map[c] = i;
             }
          }
       }
