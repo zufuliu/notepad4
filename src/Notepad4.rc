@@ -649,6 +649,7 @@ BEGIN
 		BEGIN
 			MENUITEM "&None",						IDM_VIEW_NOESCFUNC
 			MENUITEM "&Minimize Notepad4",			IDM_VIEW_ESCMINIMIZE
+			MENUITEM "&Dbclick Esc Exit Notepad4",			IDM_VIEW_ESCDBCLICKEXIT
 			MENUITEM "E&xit Notepad4",				IDM_VIEW_ESCEXIT
 		END
 		POPUP "Other Sett&ings"
