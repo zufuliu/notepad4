@@ -173,4 +173,4 @@ void ColouriseMathematicaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int
 
 }
 
-LexerModule lmMathematica(SCLEX_MATHEMATICA, ColouriseMathematicaDoc, "mathematica");
+extern const LexerModule lmMathematica(SCLEX_MATHEMATICA, ColouriseMathematicaDoc, "mathematica");

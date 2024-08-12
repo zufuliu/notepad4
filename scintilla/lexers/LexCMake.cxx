@@ -421,4 +421,4 @@ void FoldCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 
 }
 
-LexerModule lmCMake(SCLEX_CMAKE, ColouriseCMakeDoc, "cmake", FoldCMakeDoc);
+extern const LexerModule lmCMake(SCLEX_CMAKE, ColouriseCMakeDoc, "cmake", FoldCMakeDoc);

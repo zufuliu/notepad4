@@ -397,4 +397,4 @@ void ColouriseTCLDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyl
 
 }
 
-LexerModule lmTCL(SCLEX_TCL, ColouriseTCLDoc, "tcl");
+extern const LexerModule lmTCL(SCLEX_TCL, ColouriseTCLDoc, "tcl");

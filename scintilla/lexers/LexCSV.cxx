@@ -136,4 +136,4 @@ void ColouriseCSVDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 
 }
 
-LexerModule lmCSV(SCLEX_CSV, ColouriseCSVDoc, "csv");
+extern const LexerModule lmCSV(SCLEX_CSV, ColouriseCSVDoc, "csv");

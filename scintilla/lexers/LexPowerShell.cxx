@@ -466,4 +466,4 @@ void FoldPowerShellDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 
 }
 
-LexerModule lmPowerShell(SCLEX_POWERSHELL, ColourisePowerShellDoc, "powershell", FoldPowerShellDoc);
+extern const LexerModule lmPowerShell(SCLEX_POWERSHELL, ColourisePowerShellDoc, "powershell", FoldPowerShellDoc);

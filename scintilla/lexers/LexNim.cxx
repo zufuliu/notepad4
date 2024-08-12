@@ -456,4 +456,4 @@ void ColouriseNimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 
 }
 
-LexerModule lmNim(SCLEX_NIM, ColouriseNimDoc, "nim", FoldPyDoc);
+extern const LexerModule lmNim(SCLEX_NIM, ColouriseNimDoc, "nim", FoldPyDoc);

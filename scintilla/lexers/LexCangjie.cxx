@@ -520,4 +520,4 @@ void FoldCangjieDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 
 }
 
-LexerModule lmCangjie(SCLEX_CANGJIE, ColouriseCangjieDoc, "cj", FoldCangjieDoc);
+extern const LexerModule lmCangjie(SCLEX_CANGJIE, ColouriseCangjieDoc, "cj", FoldCangjieDoc);

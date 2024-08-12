@@ -598,4 +598,4 @@ void FoldSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 
 }
 
-LexerModule lmSwift(SCLEX_SWIFT, ColouriseSwiftDoc, "swift", FoldSwiftDoc);
+extern const LexerModule lmSwift(SCLEX_SWIFT, ColouriseSwiftDoc, "swift", FoldSwiftDoc);

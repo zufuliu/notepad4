@@ -193,4 +193,4 @@ void ColouriseGNDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 static_assert(SCE_GN_OPERATOR == SCE_SIMPLE_OPERATOR);
 }
 
-LexerModule lmGN(SCLEX_GN, ColouriseGNDoc, "gn", FoldSimpleDoc);
+extern const LexerModule lmGN(SCLEX_GN, ColouriseGNDoc, "gn", FoldSimpleDoc);

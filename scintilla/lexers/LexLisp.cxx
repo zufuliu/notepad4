@@ -212,4 +212,4 @@ void FoldListDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lex
 
 }
 
-LexerModule lmLisp(SCLEX_LISP, ColouriseLispDoc, "lisp", FoldListDoc);
+extern const LexerModule lmLisp(SCLEX_LISP, ColouriseLispDoc, "lisp", FoldListDoc);

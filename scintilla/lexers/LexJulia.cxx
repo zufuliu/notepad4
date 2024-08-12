@@ -651,4 +651,4 @@ void FoldJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 
 }
 
-LexerModule lmJulia(SCLEX_JULIA, ColouriseJuliaDoc, "julia", FoldJuliaDoc);
+extern const LexerModule lmJulia(SCLEX_JULIA, ColouriseJuliaDoc, "julia", FoldJuliaDoc);

@@ -401,4 +401,4 @@ void FoldSimpleDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initSty
 
 }
 
-LexerModule lmRLang(SCLEX_RLANG, ColouriseRDoc, "r", FoldSimpleDoc);
+extern const LexerModule lmRLang(SCLEX_RLANG, ColouriseRDoc, "r", FoldSimpleDoc);

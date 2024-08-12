@@ -277,4 +277,4 @@ void ColouriseHaskellDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int ini
 
 }
 
-LexerModule lmHaskell(SCLEX_HASKELL, ColouriseHaskellDoc, "haskell", FoldPyDoc);
+extern const LexerModule lmHaskell(SCLEX_HASKELL, ColouriseHaskellDoc, "haskell", FoldPyDoc);

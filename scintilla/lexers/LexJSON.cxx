@@ -273,4 +273,4 @@ void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 }
 
-LexerModule lmJSON(SCLEX_JSON, ColouriseJSONDoc, "json");
+extern const LexerModule lmJSON(SCLEX_JSON, ColouriseJSONDoc, "json");

@@ -380,4 +380,4 @@ void FoldSmaliDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Le
 
 }
 
-LexerModule lmSmali(SCLEX_SMALI, ColouriseSmaliDoc, "smali", FoldSmaliDoc);
+extern const LexerModule lmSmali(SCLEX_SMALI, ColouriseSmaliDoc, "smali", FoldSmaliDoc);

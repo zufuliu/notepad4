@@ -220,4 +220,4 @@ void FoldCILDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexe
 
 }
 
-LexerModule lmCIL(SCLEX_CIL, ColouriseCILDoc, "cil", FoldCILDoc);
+extern const LexerModule lmCIL(SCLEX_CIL, ColouriseCILDoc, "cil", FoldCILDoc);

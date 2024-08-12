@@ -157,4 +157,4 @@ void ColouriseSASDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 
 }
 
-LexerModule lmSAS(SCLEX_SAS, ColouriseSASDoc, "sas", FoldPyDoc);
+extern const LexerModule lmSAS(SCLEX_SAS, ColouriseSASDoc, "sas", FoldPyDoc);

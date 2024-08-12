@@ -559,4 +559,4 @@ void FoldDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 
 }
 
-LexerModule lmDart(SCLEX_DART, ColouriseDartDoc, "dart", FoldDartDoc);
+extern const LexerModule lmDart(SCLEX_DART, ColouriseDartDoc, "dart", FoldDartDoc);

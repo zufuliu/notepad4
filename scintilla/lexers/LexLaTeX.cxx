@@ -366,4 +366,4 @@ void FoldLatexDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/
 
 }
 
-LexerModule lmLatex(SCLEX_LATEX, ColouriseLatexDoc, "latex", FoldLatexDoc);
+extern const LexerModule lmLatex(SCLEX_LATEX, ColouriseLatexDoc, "latex", FoldLatexDoc);

@@ -406,4 +406,4 @@ void FoldZigDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 
 }
 
-LexerModule lmZig(SCLEX_ZIG, ColouriseZigDoc, "zig", FoldZigDoc);
+extern const LexerModule lmZig(SCLEX_ZIG, ColouriseZigDoc, "zig", FoldZigDoc);

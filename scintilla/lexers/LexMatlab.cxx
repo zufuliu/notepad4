@@ -397,4 +397,4 @@ void FoldMatlabDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, L
 
 }
 
-LexerModule lmMatlab(SCLEX_MATLAB, ColouriseMatlabDoc, "matlab", FoldMatlabDoc);
+extern const LexerModule lmMatlab(SCLEX_MATLAB, ColouriseMatlabDoc, "matlab", FoldMatlabDoc);

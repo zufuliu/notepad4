@@ -387,4 +387,4 @@ void ColouriseOCamlDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 
 }
 
-LexerModule lmOCaml(SCLEX_OCAML, ColouriseOCamlDoc, "ocaml", FoldPyDoc);
+extern const LexerModule lmOCaml(SCLEX_OCAML, ColouriseOCamlDoc, "ocaml", FoldPyDoc);

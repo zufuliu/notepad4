@@ -703,4 +703,4 @@ void FoldJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Le
 
 }
 
-LexerModule lmJavaScript(SCLEX_JAVASCRIPT, ColouriseJsDoc, "js", FoldJsDoc);
+extern const LexerModule lmJavaScript(SCLEX_JAVASCRIPT, ColouriseJsDoc, "js", FoldJsDoc);

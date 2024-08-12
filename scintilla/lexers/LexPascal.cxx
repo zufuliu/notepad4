@@ -434,4 +434,4 @@ void FoldPascalDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, L
 
 }
 
-LexerModule lmPascal(SCLEX_PASCAL, ColourisePascalDoc, "pascal", FoldPascalDoc);
+extern const LexerModule lmPascal(SCLEX_PASCAL, ColourisePascalDoc, "pascal", FoldPascalDoc);

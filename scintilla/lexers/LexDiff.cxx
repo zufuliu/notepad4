@@ -169,4 +169,4 @@ void ColouriseDiffDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 }
 
-LexerModule lmDiff(SCLEX_DIFF, ColouriseDiffDoc, "diff");
+extern const LexerModule lmDiff(SCLEX_DIFF, ColouriseDiffDoc, "diff");

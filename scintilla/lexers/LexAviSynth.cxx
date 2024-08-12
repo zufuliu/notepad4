@@ -348,4 +348,4 @@ void FoldAvsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 
 }
 
-LexerModule lmAviSynth(SCLEX_AVISYNTH, ColouriseAvsDoc, "avs", FoldAvsDoc);
+extern const LexerModule lmAviSynth(SCLEX_AVISYNTH, ColouriseAvsDoc, "avs", FoldAvsDoc);

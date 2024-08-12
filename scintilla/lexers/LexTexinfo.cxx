@@ -357,4 +357,4 @@ void ColouriseTexiDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 }
 
-LexerModule lmTexinfo(SCLEX_TEXINFO, ColouriseTexiDoc, "texi");
+extern const LexerModule lmTexinfo(SCLEX_TEXINFO, ColouriseTexiDoc, "texi");

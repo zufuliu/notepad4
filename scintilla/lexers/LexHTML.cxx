@@ -1386,5 +1386,5 @@ void ColouriseHTMLDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 
 }
 
-LexerModule lmHTML(SCLEX_HTML, ColouriseHTMLDoc, "hypertext");
-LexerModule lmXML(SCLEX_XML, ColouriseXMLDoc, "xml");
+extern const LexerModule lmHTML(SCLEX_HTML, ColouriseHTMLDoc, "hypertext");
+extern const LexerModule lmXML(SCLEX_XML, ColouriseXMLDoc, "xml");

@@ -19,7 +19,7 @@ def FindModules(lexersPath, projectPath):
 
 		with open(path, encoding='utf-8') as fd:
 			doc = fd.read()
-		items = re.findall(r'^\s*LexerModule\s+(\w+)\s*\(\s*(\w+)', doc, re.MULTILINE)
+		items = re.findall(r'^\s*extern\s+const\s+LexerModule\s+(\w+)\s*\(\s*(\w+)', doc, re.MULTILINE)
 		if not items:
 			print('No lexer in file:', path)
 		else:

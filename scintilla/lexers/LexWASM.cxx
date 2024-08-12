@@ -277,4 +277,4 @@ void FoldWASMDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle
 
 }
 
-LexerModule lmWASM(SCLEX_WASM, ColouriseWASMDoc, "wasm", FoldWASMDoc);
+extern const LexerModule lmWASM(SCLEX_WASM, ColouriseWASMDoc, "wasm", FoldWASMDoc);

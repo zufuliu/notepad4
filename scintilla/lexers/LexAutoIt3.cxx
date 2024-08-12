@@ -753,4 +753,4 @@ void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/, 
 
 }
 
-LexerModule lmAutoIt3(SCLEX_AUTOIT3, ColouriseAU3Doc, "au3", FoldAU3Doc);
+extern const LexerModule lmAutoIt3(SCLEX_AUTOIT3, ColouriseAU3Doc, "au3", FoldAU3Doc);

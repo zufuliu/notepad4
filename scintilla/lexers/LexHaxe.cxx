@@ -481,4 +481,4 @@ void FoldHaxeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 
 }
 
-LexerModule lmHaxe(SCLEX_HAXE, ColouriseHaxeDoc, "haxe", FoldHaxeDoc);
+extern const LexerModule lmHaxe(SCLEX_HAXE, ColouriseHaxeDoc, "haxe", FoldHaxeDoc);

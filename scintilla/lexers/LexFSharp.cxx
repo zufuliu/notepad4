@@ -538,4 +538,4 @@ void ColouriseFSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 
 }
 
-LexerModule lmFSharp(SCLEX_FSHARP, ColouriseFSharpDoc, "fsharp", FoldPyDoc);
+extern const LexerModule lmFSharp(SCLEX_FSHARP, ColouriseFSharpDoc, "fsharp", FoldPyDoc);

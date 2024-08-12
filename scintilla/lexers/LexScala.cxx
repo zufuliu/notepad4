@@ -461,4 +461,4 @@ void ColouriseScalaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 // TODO: use brace based folding for Scala 2.
 }
 
-LexerModule lmScala(SCLEX_SCALA, ColouriseScalaDoc, "scala", FoldPyDoc);
+extern const LexerModule lmScala(SCLEX_SCALA, ColouriseScalaDoc, "scala", FoldPyDoc);

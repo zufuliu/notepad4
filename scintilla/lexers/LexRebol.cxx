@@ -469,4 +469,4 @@ void FoldRebolDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyl
 
 }
 
-LexerModule lmRebol(SCLEX_REBOL, ColouriseRebolDoc, "rebol", FoldRebolDoc);
+extern const LexerModule lmRebol(SCLEX_REBOL, ColouriseRebolDoc, "rebol", FoldRebolDoc);

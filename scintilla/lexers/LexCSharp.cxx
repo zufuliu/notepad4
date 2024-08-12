@@ -884,4 +884,4 @@ void FoldCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 
 }
 
-LexerModule lmCSharp(SCLEX_CSHARP, ColouriseCSharpDoc, "csharp", FoldCSharpDoc);
+extern const LexerModule lmCSharp(SCLEX_CSHARP, ColouriseCSharpDoc, "csharp", FoldCSharpDoc);

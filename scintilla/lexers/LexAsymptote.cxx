@@ -320,4 +320,4 @@ void FoldAsyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 
 }
 
-LexerModule lmAsymptote(SCLEX_ASYMPTOTE, ColouriseAsyDoc, "asymptote", FoldAsyDoc);
+extern const LexerModule lmAsymptote(SCLEX_ASYMPTOTE, ColouriseAsyDoc, "asymptote", FoldAsyDoc);

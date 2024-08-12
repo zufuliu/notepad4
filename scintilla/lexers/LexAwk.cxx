@@ -482,4 +482,4 @@ void FoldAwkDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*
 
 }
 
-LexerModule lmAwk(SCLEX_AWK, ColouriseAwkDoc, "awk", FoldAwkDoc);
+extern const LexerModule lmAwk(SCLEX_AWK, ColouriseAwkDoc, "awk", FoldAwkDoc);

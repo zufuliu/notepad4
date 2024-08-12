@@ -632,4 +632,4 @@ void FoldGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Le
 
 }
 
-LexerModule lmGo(SCLEX_GO, ColouriseGoDoc, "go", FoldGoDoc);
+extern const LexerModule lmGo(SCLEX_GO, ColouriseGoDoc, "go", FoldGoDoc);

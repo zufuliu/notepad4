@@ -465,4 +465,4 @@ void FoldAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexe
 
 }
 
-LexerModule lmAsm(SCLEX_ASM, ColouriseAsmDoc, "asm", FoldAsmDoc);
+extern const LexerModule lmAsm(SCLEX_ASM, ColouriseAsmDoc, "asm", FoldAsmDoc);

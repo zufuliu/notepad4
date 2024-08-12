@@ -257,4 +257,4 @@ void ColouriseGraphVizDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 
 }
 
-LexerModule lmGraphViz(SCLEX_GRAPHVIZ, ColouriseGraphVizDoc, "gv");
+extern const LexerModule lmGraphViz(SCLEX_GRAPHVIZ, ColouriseGraphVizDoc, "gv");

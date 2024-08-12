@@ -778,4 +778,4 @@ void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexe
 
 }
 
-LexerModule lmSQL(SCLEX_SQL, ColouriseSqlDoc, "sql", FoldSqlDoc);
+extern const LexerModule lmSQL(SCLEX_SQL, ColouriseSqlDoc, "sql", FoldSqlDoc);

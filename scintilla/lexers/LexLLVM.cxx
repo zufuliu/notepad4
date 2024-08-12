@@ -266,4 +266,4 @@ void ColouriseLLVMDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 static_assert(SCE_LLVM_OPERATOR == SCE_SIMPLE_OPERATOR);
 }
 
-LexerModule lmLLVM(SCLEX_LLVM, ColouriseLLVMDoc, "llvm", FoldSimpleDoc);
+extern const LexerModule lmLLVM(SCLEX_LLVM, ColouriseLLVMDoc, "llvm", FoldSimpleDoc);

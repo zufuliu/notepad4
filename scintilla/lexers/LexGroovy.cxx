@@ -657,4 +657,4 @@ void FoldGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 
 }
 
-LexerModule lmGroovy(SCLEX_GROOVY, ColouriseGroovyDoc, "groovy", FoldGroovyDoc);
+extern const LexerModule lmGroovy(SCLEX_GROOVY, ColouriseGroovyDoc, "groovy", FoldGroovyDoc);

@@ -134,4 +134,4 @@ void ColouriseWinHexDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 
 }
 
-LexerModule lmWinHex(SCLEX_WINHEX, ColouriseWinHexDoc, "winhex");
+extern const LexerModule lmWinHex(SCLEX_WINHEX, ColouriseWinHexDoc, "winhex");

@@ -2443,4 +2443,4 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 
 }
 
-LexerModule lmMarkdown(SCLEX_MARKDOWN, ColouriseMarkdownDoc, "markdown");
+extern const LexerModule lmMarkdown(SCLEX_MARKDOWN, ColouriseMarkdownDoc, "markdown");

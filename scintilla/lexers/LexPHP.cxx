@@ -1586,4 +1586,4 @@ void FoldPHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 
 }
 
-LexerModule lmPHPScript(SCLEX_PHPSCRIPT, ColourisePHPDoc, "php", FoldPHPDoc);
+extern const LexerModule lmPHPScript(SCLEX_PHPSCRIPT, ColourisePHPDoc, "php", FoldPHPDoc);

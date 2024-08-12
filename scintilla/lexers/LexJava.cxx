@@ -671,4 +671,4 @@ void FoldJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 
 }
 
-LexerModule lmJava(SCLEX_JAVA, ColouriseJavaDoc, "java", FoldJavaDoc);
+extern const LexerModule lmJava(SCLEX_JAVA, ColouriseJavaDoc, "java", FoldJavaDoc);

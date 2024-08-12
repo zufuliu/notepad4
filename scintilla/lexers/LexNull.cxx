@@ -119,7 +119,7 @@ void FoldNullDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle
 }
 
 #if !ENABLE_FOLD_NULL_DOCUMENT
-LexerModule lmNull(SCLEX_NULL, ColouriseNullDoc, "null");
+extern const LexerModule lmNull(SCLEX_NULL, ColouriseNullDoc, "null");
 #else
-LexerModule lmNull(SCLEX_NULL, FoldNullDoc, "null");
+extern const LexerModule lmNull(SCLEX_NULL, FoldNullDoc, "null");
 #endif

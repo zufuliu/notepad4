@@ -204,7 +204,7 @@ void FoldPropsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyl
 }
 
 #if ENABLE_FOLD_PROPS_COMMENT
-LexerModule lmProps(SCLEX_PROPERTIES, ColourisePropsDoc, "props", FoldPropsDoc);
+extern const LexerModule lmProps(SCLEX_PROPERTIES, ColourisePropsDoc, "props", FoldPropsDoc);
 #else
-LexerModule lmProps(SCLEX_PROPERTIES, ColourisePropsDoc, "props");
+extern const LexerModule lmProps(SCLEX_PROPERTIES, ColourisePropsDoc, "props");
 #endif
