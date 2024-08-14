@@ -75,7 +75,7 @@ constexpr bool IsTOMLUnquotedKey(int ch) noexcept {
 
 bool IsTOMLKey(StyleContext& sc, int braceCount, const WordList *kwList) {
 	if (braceCount) {
-		const int chNext = sc.GetDocNextChar();
+		const int chNext = sc.GetLineNextChar();
 		if (chNext == '=' || chNext == '.' || chNext == '-') {
 			sc.ChangeState(SCE_TOML_KEY);
 			return true;
@@ -214,7 +214,9 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 						}
 					} else if (sc.state == SCE_TOML_KEY && !IsTOMLUnquotedKey(sc.ch)) {
 						const int chNext = sc.GetLineNextChar();
-						if (!AnyOf(chNext, '\'', '\"', '.', '=')) {
+						if (chNext == '=') {
+							sc.SetState(SCE_TOML_DEFAULT);
+						} else if (!AnyOf(chNext, '\'', '\"', '.')) {
 							sc.ChangeState(SCE_TOML_ERROR);
 							continue;
 						}
@@ -236,7 +238,9 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				}
 			} else if (sc.ch == GetStringQuote(sc.state) && (!IsTripleString(sc.state) || sc.MatchNext())) {
 				if (IsTripleString(sc.state)) {
-					sc.Advance(2);
+					while (sc.ch == sc.chNext) {
+						sc.Forward();
+					}
 				}
 				sc.Forward();
 				if (!IsTripleString(sc.state) && IsTOMLKey(sc, braceCount, nullptr)) {
