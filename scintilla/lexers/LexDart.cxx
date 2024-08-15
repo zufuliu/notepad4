@@ -204,8 +204,8 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					} else if (keywordLists[KeywordIndex_Enumeration].InList(s)) {
 						sc.ChangeState(SCE_DART_ENUM);
 					} else if (sc.ch == ':') {
-						if (chBefore == ',' || chBefore == '{') {
-							sc.ChangeState(SCE_DART_KEY);
+						if (chBefore == ',' || chBefore == '{' || chBefore == '(') {
+							sc.ChangeState(SCE_DART_KEY); // map key or named parameter
 						} else if (IsJumpLabelPrevChar(chBefore)) {
 							sc.ChangeState(SCE_DART_LABEL);
 						}
