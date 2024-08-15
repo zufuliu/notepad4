@@ -210,6 +210,19 @@ Sci_Position CheckPercentFormatSpecifier(const StyleContext &sc, LexAccessor &st
 		return 0;
 	}
 	if (IsDateTimeFormatSpecifier(sc.chNext)) {
+		// https://docs.python.org/3/library/optparse.html
+		if (AnyOf(sc.chNext, 'd', 'p')) {
+			char buf[10];
+			styler.GetRange(sc.currentPos + 1, sc.lineStartNext, buf, sizeof(buf));
+			if (StrStartsWith(buf, "prog")) {
+				keyLen = 5;
+				return 5;
+			}
+			if (StrStartsWith(buf, "default")) {
+				keyLen = 8;
+				return 8;
+			}
+		}
 		return 2;
 	}
 
