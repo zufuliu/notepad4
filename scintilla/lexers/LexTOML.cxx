@@ -110,6 +110,7 @@ enum class TOMLKeyState {
 
 void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	int visibleChars = 0;
+	int chPrevNonWhite = 0;
 	int tableLevel = 0;
 	int braceCount = 0;
 	TOMLLineType lineType = TOMLLineType::None;
@@ -194,14 +195,12 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 						if (sc.state == SCE_TOML_TABLE) {
 							++tableLevel;
 						} else {
+							chPrevNonWhite = '.';
 							sc.SetState(SCE_TOML_OPERATOR);
 							sc.ForwardSetState(SCE_TOML_KEY);
 							// TODO: skip space after dot
 							continue;
 						}
-					} else if (sc.state == SCE_TOML_KEY && sc.ch == '=') {
-						keyState = TOMLKeyState::End;
-						sc.SetState(SCE_TOML_OPERATOR);
 					} else if (sc.state == SCE_TOML_TABLE && sc.ch == ']') {
 						keyState = TOMLKeyState::End;
 						sc.Forward();
@@ -215,8 +214,9 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					} else if (sc.state == SCE_TOML_KEY && !IsTOMLUnquotedKey(sc.ch)) {
 						const int chNext = sc.GetLineNextChar();
 						if (chNext == '=') {
+							keyState = TOMLKeyState::End;
 							sc.SetState(SCE_TOML_DEFAULT);
-						} else if (!AnyOf(chNext, '\'', '\"', '.')) {
+						} else if (chNext != '.' && chPrevNonWhite != '.') {
 							sc.ChangeState(SCE_TOML_ERROR);
 							continue;
 						}
@@ -238,6 +238,7 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				}
 			} else if (sc.ch == GetStringQuote(sc.state) && (!IsTripleString(sc.state) || sc.MatchNext())) {
 				if (IsTripleString(sc.state)) {
+					// TODO: only at most 2+3 quotes at the end
 					while (sc.ch == sc.chNext) {
 						sc.Forward();
 					}
@@ -263,9 +264,6 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				sc.SetState(SCE_TOML_DEFAULT);
 			} else if (sc.ch == '#') {
 				sc.SetState(SCE_TOML_COMMENT);
-			} else if (sc.ch == ',') {
-				sc.SetState(SCE_TOML_OPERATOR);
-				sc.ForwardSetState(SCE_TOML_ERROR);
 			}
 			break;
 
@@ -337,7 +335,8 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			}
 		}
 
-		if (visibleChars == 0 && !isspacechar(sc.ch)) {
+		if (!isspacechar(sc.ch)) {
+			chPrevNonWhite = sc.ch;
 			++visibleChars;
 		}
 		if (sc.atLineEnd) {
@@ -345,6 +344,7 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			styler.SetLineState(sc.currentLine, lineState);
 			lineType = TOMLLineType::None;
 			visibleChars = 0;
+			chPrevNonWhite = 0;
 			tableLevel = 0;
 			keyState = TOMLKeyState::Unquoted;
 		}
