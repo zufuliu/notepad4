@@ -47,7 +47,7 @@ struct EscapeSequence {
 	// highlight any character as escape sequence.
 	void resetEscapeState(int state, int chNext) noexcept {
 		outerState = state;
-		digitsLeft = 0;
+		digitsLeft = 1;
 		hex = true;
 		brace = false;
 		if (chNext == 'x') {
@@ -57,8 +57,6 @@ struct EscapeSequence {
 		} else if (IsADigit(chNext)) {
 			digitsLeft = 7;
 			hex = false;
-		} else {
-			digitsLeft = 1;
 		}
 	}
 	void resetEscapeState(int state) noexcept {
@@ -259,7 +257,10 @@ void ColouriseNimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 					sc.Forward();
 				} else if (sc.state < SCE_NIM_TRIPLE_STRING || sc.MatchNext('\"', '\"')) {
 					if (sc.state >= SCE_NIM_TRIPLE_STRING) {
-						sc.Forward(2);
+						// quotes except last three are string content
+						while (sc.chNext == '\"') {
+							sc.Forward();
+						}
 					}
 					sc.ForwardSetState(SCE_NIM_DEFAULT);
 				}
