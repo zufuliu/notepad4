@@ -55,28 +55,24 @@ struct EscapeSequence {
 	int digitsLeft = 0;
 	bool hex = false;
 
-	// no highlight for name in '\N{name}'.
+	// highlight any character as escape sequence, no highlight for name in '\N{name}'.
 	bool resetEscapeState(int state, int chNext) noexcept {
 		outerState = state;
-		digitsLeft = 0;
+		digitsLeft = 1;
 		hex = true;
 		if (chNext == 'x') {
 			digitsLeft = 3;
 		} else if (IsOctalDigit(chNext)) {
 			digitsLeft = 3;
 			hex = false;
-		} else if (AnyOf(chNext, '\\', '\'', '"', 'a', 'b', 'f', 'n', 'r', 't', 'v')) {
-			digitsLeft = 1;
 		} else if (IsPyString(state)) {
 			if (chNext == 'u') {
 				digitsLeft = 5;
 			} else if (chNext == 'U') {
 				digitsLeft = 9;
-			} else if (chNext == 'N') {
-				digitsLeft = 1;
 			}
 		}
-		return digitsLeft != 0;
+		return true;
 	}
 	bool atEscapeEnd(int ch) noexcept {
 		--digitsLeft;
@@ -212,13 +208,13 @@ Sci_Position CheckPercentFormatSpecifier(const StyleContext &sc, LexAccessor &st
 	if (IsDateTimeFormatSpecifier(sc.chNext)) {
 		// https://docs.python.org/3/library/optparse.html
 		if (AnyOf(sc.chNext, 'd', 'p')) {
-			char buf[10];
+			char buf[8];
 			styler.GetRange(sc.currentPos + 1, sc.lineStartNext, buf, sizeof(buf));
 			if (StrStartsWith(buf, "prog")) {
 				keyLen = 5;
 				return 5;
 			}
-			if (StrStartsWith(buf, "default")) {
+			if (StrEqual(buf, "default")) {
 				keyLen = 8;
 				return 8;
 			}

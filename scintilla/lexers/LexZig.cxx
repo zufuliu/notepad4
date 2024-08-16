@@ -33,14 +33,12 @@ struct EscapeSequence {
 	// highlight any character as escape sequence.
 	void resetEscapeState(int state, int chNext) noexcept {
 		outerState = state;
-		digitsLeft = 0;
+		digitsLeft = 1;
 		brace = false;
 		if (chNext == 'x') {
 			digitsLeft = 3;
 		} else if (chNext == 'u') {
 			digitsLeft = 5;
-		} else {
-			digitsLeft = 1;
 		}
 	}
 	void resetEscapeState(int state) noexcept {

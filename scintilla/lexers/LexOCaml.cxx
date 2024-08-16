@@ -34,7 +34,7 @@ struct EscapeSequence {
 	// highlight any character as escape sequence.
 	void resetEscapeState(int state, int chNext) noexcept {
 		outerState = state;
-		digitsLeft = 0;
+		digitsLeft = 1;
 		numBase = 16;
 		brace = false;
 		if (chNext == 'x') {
@@ -47,8 +47,6 @@ struct EscapeSequence {
 		} else if (IsADigit(chNext)) {
 			digitsLeft = 3;
 			numBase = 10;
-		} else {
-			digitsLeft = 1;
 		}
 	}
 	bool atEscapeEnd(int ch) noexcept {
