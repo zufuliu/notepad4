@@ -299,7 +299,10 @@ void ColouriseScalaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				}
 			} else if (sc.ch == GetStringQuote(sc.state) && (IsSingleLineString(sc.state) || sc.MatchNext('"', '"'))) {
 				if (!IsSingleLineString(sc.state)) {
-					sc.Advance(2);
+					// quotes except last three are string content
+					while (sc.chNext == '\"') {
+						sc.Forward();
+					}
 				}
 				sc.ForwardSetState((sc.state == SCE_SCALA_XML_STRING_SQ || sc.state == SCE_SCALA_XML_STRING_DQ) ? SCE_SCALA_XML_OTHER : SCE_SCALA_DEFAULT);
 				continue;
@@ -369,11 +372,11 @@ void ColouriseScalaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				continue;
 			} else if (sc.ch == '\"') {
 				const bool interpolated = stylePrevNonWhite != SCE_SCALA_NUMBER && IsScalaIdentifierChar(sc.chPrev);
+				sc.SetState(interpolated ? SCE_SCALA_INTERPOLATED_STRING : SCE_SCALA_STRING);
 				if (sc.MatchNext('"', '"')) {
-					sc.SetState(interpolated ? SCE_SCALA_TRIPLE_INTERPOLATED_STRING : SCE_SCALA_TRIPLE_STRING);
+					static_assert(SCE_SCALA_TRIPLE_INTERPOLATED_STRING - SCE_SCALA_INTERPOLATED_STRING == SCE_SCALA_TRIPLE_STRING - SCE_SCALA_STRING);
+					sc.SetState(sc.state + SCE_SCALA_TRIPLE_STRING - SCE_SCALA_STRING);
 					sc.Advance(2);
-				} else {
-					sc.SetState(interpolated ? SCE_SCALA_INTERPOLATED_STRING : SCE_SCALA_STRING);
 				}
 			} else if (sc.ch == '\'') {
 				int state = SCE_SCALA_CHARACTER;
