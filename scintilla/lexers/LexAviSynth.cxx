@@ -195,8 +195,9 @@ void ColouriseAvsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				sc.SetState(SCE_AVS_COMMENTBLOCKN);
 				sc.Forward();
 			} else if (sc.ch == '"') {
+				sc.SetState(SCE_AVS_STRING);
 				if (sc.MatchNext('"', '"')) {
-					sc.SetState(SCE_AVS_TRIPLESTRING);
+					sc.ChangeState(SCE_AVS_TRIPLESTRING);
 					sc.Advance(2);
 					if (scriptEval == ScriptEvalState::Paren) {
 						// first argument
@@ -207,8 +208,6 @@ void ColouriseAvsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 						continue;
 					}
 					insideScript = 0;
-				} else {
-					sc.SetState(SCE_AVS_STRING);
 				}
 			} else if (sc.Match('e', '\"')) {
 				// Avisynth+ 3.6 escaped string

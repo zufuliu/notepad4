@@ -468,29 +468,21 @@ void ColouriseGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 						sc.SetState(SCE_GROOVY_OPERATOR);
 					}
 				}
-			} else if (sc.ch == '\"') {
-				if (sc.MatchNext('"', '"')) {
-					sc.SetState(SCE_GROOVY_TRIPLE_STRING_DQ);
+			} else if (sc.ch == '\'' || sc.ch == '\"') {
+				sc.SetState((sc.ch == '\'') ? SCE_GROOVY_STRING_SQ : SCE_GROOVY_STRING_DQ);
+				if (sc.MatchNext()) {
+					static_assert(SCE_GROOVY_TRIPLE_STRING_SQ - SCE_GROOVY_STRING_SQ == SCE_GROOVY_TRIPLE_STRING_DQ - SCE_GROOVY_STRING_DQ);
+					sc.ChangeState(sc.state + SCE_GROOVY_TRIPLE_STRING_SQ - SCE_GROOVY_STRING_SQ);
 					sc.Advance(2);
-				} else {
-					sc.SetState(SCE_GROOVY_STRING_DQ);
-				}
-			} else if (sc.ch == '\'') {
-				if (sc.MatchNext('\'', '\'')) {
-					sc.SetState(SCE_GROOVY_TRIPLE_STRING_SQ);
-					sc.Advance(2);
-				} else {
-					sc.SetState(SCE_GROOVY_STRING_SQ);
 				}
 			} else if (sc.Match('$', '/')) {
 				sc.SetState(SCE_GROOVY_DOLLAR_SLASHY);
 				sc.Advance(2);
 			} else if (sc.ch == '+' || sc.ch == '-') {
+				sc.SetState(SCE_GROOVY_OPERATOR);
 				if (sc.ch == sc.chNext) {
-					sc.SetState(SCE_GROOVY_OPERATOR_PF);
+					sc.ChangeState(SCE_GROOVY_OPERATOR_PF);
 					sc.Forward();
-				} else {
-					sc.SetState(SCE_GROOVY_OPERATOR);
 				}
 			} else if (IsNumberStartEx(sc.chPrev, sc.ch, sc.chNext)) {
 				sc.SetState(SCE_GROOVY_NUMBER);

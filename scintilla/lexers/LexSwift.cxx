@@ -392,11 +392,10 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				}
 			}
 			else if (sc.ch == '"') {
+				sc.SetState(SCE_SWIFT_STRING);
 				if (sc.MatchNext('"', '"')) {
-					sc.SetState(SCE_SWIFT_TRIPLE_STRING);
+					sc.ChangeState(SCE_SWIFT_TRIPLE_STRING);
 					sc.Advance(2);
-				} else {
-					sc.SetState(SCE_SWIFT_STRING);
 				}
 			} else if (IsNumberStartEx(sc.chPrev, sc.ch, sc.chNext)) {
 				sc.SetState(SCE_SWIFT_NUMBER);
@@ -429,12 +428,11 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				}
 				sc.SetState((sc.ch == '`') ? SCE_SWIFT_IDENTIFIER_BT : SCE_SWIFT_IDENTIFIER);
 			} else if (sc.ch == '+' || sc.ch == '-') {
+				sc.SetState(SCE_SWIFT_OPERATOR);
 				if (sc.ch == sc.chNext) {
 					// highlight ++ and -- as different style to simplify regex detection.
-					sc.SetState(SCE_SWIFT_OPERATOR_PF);
+					sc.ChangeState(SCE_SWIFT_OPERATOR_PF);
 					sc.Forward();
-				} else {
-					sc.SetState(SCE_SWIFT_OPERATOR);
 				}
 			} else if (IsAGraphic(sc.ch)) {
 				sc.SetState(SCE_SWIFT_OPERATOR);

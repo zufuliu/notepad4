@@ -358,31 +358,19 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			}
 			if (sc.ch == 'r' && (sc.chNext == '\'' || sc.chNext == '"')) {
 				sc.SetState((sc.chNext == '\'') ? SCE_DART_RAWSTRING_SQ : SCE_DART_RAWSTRING_DQ);
-				sc.Forward(2);
-				if (sc.chPrev == '\'' && sc.Match('\'', '\'')) {
-					sc.ChangeState(SCE_DART_TRIPLE_RAWSTRING_SQ);
-					sc.Forward(2);
-				} else if (sc.chPrev == '"' && sc.Match('"', '"')) {
-					sc.ChangeState(SCE_DART_TRIPLE_RAWSTRING_DQ);
-					sc.Forward(2);
-				}
-				continue;
-			}
-			if (sc.ch == '"') {
-				if (sc.MatchNext('"', '"')) {
-					sc.SetState(SCE_DART_TRIPLE_STRING_DQ);
+				sc.Forward();
+				if (sc.MatchNext()) {
+					static_assert(SCE_DART_TRIPLE_RAWSTRING_SQ - SCE_DART_RAWSTRING_SQ == SCE_DART_TRIPLE_RAWSTRING_DQ - SCE_DART_RAWSTRING_DQ);
+					sc.ChangeState(sc.state + SCE_DART_TRIPLE_RAWSTRING_SQ - SCE_DART_RAWSTRING_SQ);
 					sc.Advance(2);
-				} else {
-					chBefore = chPrevNonWhite;
-					sc.SetState(SCE_DART_STRING_DQ);
 				}
-			} else if (sc.ch == '\'') {
-				if (sc.MatchNext('\'', '\'')) {
-					sc.SetState(SCE_DART_TRIPLE_STRING_SQ);
+			} else if (sc.ch == '\'' || sc.ch == '"') {
+				sc.SetState((sc.ch == '\'') ? SCE_DART_STRING_SQ : SCE_DART_STRING_DQ);
+				chBefore = chPrevNonWhite;
+				if (sc.MatchNext()) {
+					static_assert(SCE_DART_TRIPLE_STRING_SQ - SCE_DART_STRING_SQ == SCE_DART_TRIPLE_STRING_DQ - SCE_DART_STRING_DQ);
+					sc.ChangeState(sc.state + SCE_DART_TRIPLE_STRING_DQ - SCE_DART_STRING_DQ);
 					sc.Advance(2);
-				} else {
-					chBefore = chPrevNonWhite;
-					sc.SetState(SCE_DART_STRING_SQ);
 				}
 			} else if (IsNumberStart(sc.ch, sc.chNext)) {
 				sc.SetState(SCE_DART_NUMBER);

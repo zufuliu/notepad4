@@ -270,8 +270,8 @@ void ColouriseScalaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 		case SCE_SCALA_XML_STRING_SQ:
 		case SCE_SCALA_XML_STRING_DQ:
 		case SCE_SCALA_STRING:
-		case SCE_SCALA_TRIPLE_STRING:
 		case SCE_SCALA_INTERPOLATED_STRING:
+		case SCE_SCALA_TRIPLE_STRING:
 		case SCE_SCALA_TRIPLE_INTERPOLATED_STRING:
 			if (sc.atLineStart && IsSingleLineString(sc.state)) {
 				sc.SetState(SCE_SCALA_DEFAULT);

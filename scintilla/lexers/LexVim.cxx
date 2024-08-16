@@ -241,11 +241,10 @@ void ColouriseVimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			} else if (sc.ch == '\\' && logicalVisibleChars != 0) {
 				sc.Forward();
 			} else if (IsIdentifierStart(sc.ch)) {
+				sc.SetState(SCE_VIM_IDENTIFIER);
 				if (sc.chNext == ':' && IsLowerCase(sc.ch)) {
-					sc.SetState(SCE_VIM_ENV_VARIABLE); // internal variable namespace
+					sc.ChangeState(SCE_VIM_ENV_VARIABLE); // internal variable namespace
 					sc.ForwardSetState(SCE_VIM_OPERATOR);
-				} else {
-					sc.SetState(SCE_VIM_IDENTIFIER);
 				}
 			} else if (sc.ch == '/' && preferRegex && !IsEOLChar(sc.chNext)) {
 				insideRegexRange = false;

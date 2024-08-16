@@ -359,11 +359,10 @@ void ColouriseAwkDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			} else if (IsIdentifierStart(sc.ch) || (sc.ch == '@' && IsIdentifierStart(sc.chNext))) {
 				sc.SetState(SCE_AWK_IDENTIFIER);
 			} else if (sc.ch == '+' || sc.ch == '-') {
+				sc.SetState(SCE_AWK_OPERATOR);
 				if (sc.ch == sc.chNext) {
-					sc.SetState(SCE_AWK_OPERATOR_PF);
+					sc.ChangeState(SCE_AWK_OPERATOR_PF);
 					sc.Forward();
-				} else {
-					sc.SetState(SCE_AWK_OPERATOR);
 				}
 			} else if (sc.ch == '/') {
 				if (!IsEOLChar(sc.chNext) && IsRegexStart(chPrevNonWhite, stylePrevNonWhite)) {

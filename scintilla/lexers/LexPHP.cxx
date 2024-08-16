@@ -1365,12 +1365,11 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				lexer.chBefore = chPrevNonWhite;
 				sc.SetState(js_style(SCE_JS_IDENTIFIER));
 			} else if (sc.ch == '+' || sc.ch == '-') {
+				sc.SetState(js_style(SCE_JS_OPERATOR));
 				if (sc.ch == sc.chNext) {
 					// highlight ++ and -- as different style to simplify regex detection.
-					sc.SetState(js_style(SCE_JS_OPERATOR_PF));
+					sc.ChangeState(js_style(SCE_JS_OPERATOR_PF));
 					sc.Forward();
-				} else {
-					sc.SetState(js_style(SCE_JS_OPERATOR));
 				}
 			} else if (IsAGraphic(sc.ch) && sc.ch != '\\') {
 				if (lexer.HighlightOperator(HtmlTextBlock::Script, stylePrevNonWhite)) {

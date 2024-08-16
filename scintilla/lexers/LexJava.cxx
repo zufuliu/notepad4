@@ -92,7 +92,7 @@ enum class KeywordType {
 };
 
 static_assert(DefaultNestedStateBaseStyle + 1 == SCE_JAVA_TEMPLATE);
-static_assert(DefaultNestedStateBaseStyle + 2 == SCE_JAVA_TRIPLE_TEMPLATE);
+static_assert(DefaultNestedStateBaseStyle + 3 == SCE_JAVA_TRIPLE_TEMPLATE);
 
 constexpr bool IsSpaceEquiv(int state) noexcept {
 	return state <= SCE_JAVA_TASKMARKER;
@@ -431,8 +431,8 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		case SCE_JAVA_CHARACTER:
 		case SCE_JAVA_STRING:
 		case SCE_JAVA_TEMPLATE:
-		case SCE_JAVA_TRIPLE_TEMPLATE:
 		case SCE_JAVA_TRIPLE_STRING:
+		case SCE_JAVA_TRIPLE_TEMPLATE:
 			if (sc.atLineStart && sc.state <= SCE_JAVA_TEMPLATE) {
 				sc.SetState(SCE_JAVA_DEFAULT);
 			} else if (sc.ch == '\\') {
@@ -514,11 +514,11 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			}
 			if (sc.ch == '\"') {
 				insideUrl = false;
+				sc.SetState((sc.chPrev == '.') ? SCE_JAVA_TEMPLATE : SCE_JAVA_STRING);
 				if (sc.MatchNext('"', '"')) {
-					sc.SetState((sc.chPrev == '.') ? SCE_JAVA_TRIPLE_TEMPLATE : SCE_JAVA_TRIPLE_STRING);
+					static_assert(SCE_JAVA_TRIPLE_TEMPLATE - SCE_JAVA_TEMPLATE == SCE_JAVA_TRIPLE_STRING - SCE_JAVA_STRING);
+					sc.ChangeState(sc.state + SCE_JAVA_TRIPLE_STRING - SCE_JAVA_STRING);
 					sc.Advance(2);
-				} else {
-					sc.SetState((sc.chPrev == '.') ? SCE_JAVA_TEMPLATE : SCE_JAVA_STRING);
 				}
 			} else if (sc.ch == '\'') {
 				sc.SetState(SCE_JAVA_CHARACTER);

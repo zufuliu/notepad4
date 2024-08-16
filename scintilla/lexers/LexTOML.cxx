@@ -300,19 +300,12 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					sc.SetState(SCE_TOML_ERROR);
 				}
 			} else {
-				 if (sc.ch == '\'') {
-					if (sc.MatchNext('\'', '\'')) {
-						sc.SetState(SCE_TOML_TRIPLE_STRING_SQ);
+				 if (sc.ch == '\'' || sc.ch == '"') {
+					sc.SetState((sc.ch == '\'') ? SCE_TOML_STRING_SQ : SCE_TOML_STRING_DQ);
+					if (sc.MatchNext()) {
+						static_assert(SCE_TOML_TRIPLE_STRING_SQ - SCE_TOML_STRING_SQ == SCE_TOML_TRIPLE_STRING_DQ - SCE_TOML_STRING_DQ);
+						sc.ChangeState(sc.state + SCE_TOML_TRIPLE_STRING_SQ - SCE_TOML_STRING_SQ);
 						sc.Advance(2);
-					} else {
-						sc.SetState(SCE_TOML_STRING_SQ);
-					}
-				} else if (sc.ch == '"') {
-					if (sc.MatchNext('"', '"')) {
-						sc.SetState(SCE_TOML_TRIPLE_STRING_DQ);
-						sc.Advance(2);
-					} else {
-						sc.SetState(SCE_TOML_STRING_DQ);
 					}
 				} else if (IsADigit(sc.ch)) {
 					sc.SetState(SCE_TOML_NUMBER);

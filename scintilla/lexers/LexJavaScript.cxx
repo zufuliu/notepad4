@@ -512,12 +512,11 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				sc.SetState(SCE_JS_IDENTIFIER);
 			}
 			else if (sc.ch == '+' || sc.ch == '-') {
+				sc.SetState(SCE_JS_OPERATOR);
 				if (sc.ch == sc.chNext) {
 					// highlight ++ and -- as different style to simplify regex detection.
-					sc.SetState(SCE_JS_OPERATOR_PF);
+					sc.ChangeState(SCE_JS_OPERATOR_PF);
 					sc.Forward();
-				} else {
-					sc.SetState(SCE_JS_OPERATOR);
 				}
 			} else if (sc.ch == '<' && enableJsx) {
 				// <tag></tag>

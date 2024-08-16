@@ -349,6 +349,7 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 						sc.ChangeState(SCE_GO_TYPE);
 					} else if (kwType != KeywordType::None) {
 						if (kwType == KeywordType::Type) {
+							// type name interface{}, type name struct{}
 							const Sci_Position pos = LexSkipWhiteSpace(styler, sc.currentPos + 1, sc.lineStartNext);
 							if (chNext == 'i' && styler.Match(pos, "interface")) {
 								kwType = KeywordType::Interface;

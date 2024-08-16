@@ -333,36 +333,22 @@ void ColouriseCoffeeScriptDoc(Sci_PositionU startPos, Sci_Position lengthDoc, in
 		}
 
 		if (sc.state == SCE_COFFEESCRIPT_DEFAULT) {
-			if (sc.ch == '#') {
-				if (visibleChars == 0) {
+			if (sc.ch == '#' || sc.ch == '`') {
+				if (sc.ch == '#' && visibleChars == 0) {
 					lineState = PyLineStateMaskCommentLine;
 				}
-				if (sc.MatchNext('#', '#')) {
-					sc.SetState(SCE_COFFEESCRIPT_COMMENTBLOCK);
+				sc.SetState((sc.ch == '#') ? SCE_COFFEESCRIPT_COMMENTLINE : SCE_COFFEESCRIPT_BACKTICKS);
+				if (sc.MatchNext()) {
+					static_assert(SCE_COFFEESCRIPT_COMMENTBLOCK - SCE_COFFEESCRIPT_COMMENTLINE == SCE_COFFEESCRIPT_TRIPLE_BACKTICKS - SCE_COFFEESCRIPT_BACKTICKS);
+					sc.ChangeState(sc.state + SCE_COFFEESCRIPT_COMMENTBLOCK - SCE_COFFEESCRIPT_COMMENTLINE);
 					sc.Advance(2);
-				} else {
-					sc.SetState(SCE_COFFEESCRIPT_COMMENTLINE);
 				}
-			} else if (sc.ch == '\'') {
-				if (sc.MatchNext('\'', '\'')) {
-					sc.SetState(SCE_COFFEESCRIPT_TRIPLE_STRING_SQ);
+			} else if (sc.ch == '\'' || sc.ch == '\"') {
+				sc.SetState((sc.ch == '\'') ? SCE_COFFEESCRIPT_STRING_SQ : SCE_COFFEESCRIPT_STRING_DQ);
+				if (sc.MatchNext()) {
+					static_assert(SCE_COFFEESCRIPT_TRIPLE_STRING_SQ - SCE_COFFEESCRIPT_STRING_SQ == SCE_COFFEESCRIPT_TRIPLE_STRING_DQ - SCE_COFFEESCRIPT_STRING_DQ);
+					sc.ChangeState(sc.state + SCE_COFFEESCRIPT_TRIPLE_STRING_SQ - SCE_COFFEESCRIPT_STRING_SQ);
 					sc.Advance(2);
-				} else {
-					sc.SetState(SCE_COFFEESCRIPT_STRING_SQ);
-				}
-			} else if (sc.ch == '\"') {
-				if (sc.MatchNext('\"', '\"')) {
-					sc.SetState(SCE_COFFEESCRIPT_TRIPLE_STRING_DQ);
-					sc.Advance(2);
-				} else {
-					sc.SetState(SCE_COFFEESCRIPT_STRING_DQ);
-				}
-			} else if (sc.ch == '`') {
-				if (sc.MatchNext('`', '`')) {
-					sc.SetState(SCE_COFFEESCRIPT_TRIPLE_BACKTICKS);
-					sc.Advance(2);
-				} else {
-					sc.SetState(SCE_COFFEESCRIPT_BACKTICKS);
 				}
 			} else if (IsNumberStartEx(sc.chPrev, sc.ch, sc.chNext)) {
 				sc.SetState(SCE_COFFEESCRIPT_NUMBER);
@@ -384,12 +370,11 @@ void ColouriseCoffeeScriptDoc(Sci_PositionU startPos, Sci_Position lengthDoc, in
 					sc.ChangeState(SCE_COFFEESCRIPT_REGEX);
 				}
 			} else if (sc.ch == '+' || sc.ch == '-') {
+				sc.SetState(SCE_COFFEESCRIPT_OPERATOR);
 				if (sc.ch == sc.chNext) {
 					// highlight ++ and -- as different style to simplify regex detection.
-					sc.SetState(SCE_COFFEESCRIPT_OPERATOR_PF);
+					sc.ChangeState(SCE_COFFEESCRIPT_OPERATOR_PF);
 					sc.Forward();
-				} else {
-					sc.SetState(SCE_COFFEESCRIPT_OPERATOR);
 				}
 			} else if (sc.ch == '<') {
 				// <tag></tag>
