@@ -283,7 +283,10 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 					}
 				} else if (sc.ch == '\"' && (sc.state == SCE_KOTLIN_STRING || sc.MatchNext('"', '"'))) {
 					if (sc.state == SCE_KOTLIN_RAWSTRING) {
-						sc.Advance(2);
+						// quotes except last three are string content
+						while (sc.chNext == '\"') {
+							sc.Forward();
+						}
 					}
 					sc.ForwardSetState(SCE_KOTLIN_DEFAULT);
 				}
@@ -326,11 +329,10 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 				continue;
 			}
 			if (sc.ch == '\"') {
+				sc.SetState(SCE_KOTLIN_STRING);
 				if (sc.MatchNext('"', '"')) {
-					sc.SetState(SCE_KOTLIN_RAWSTRING);
-					sc.Advance(2);
-				} else {
-					sc.SetState(SCE_KOTLIN_STRING);
+					sc.ChangeState(SCE_KOTLIN_RAWSTRING);
+					sc.Forward(2);
 				}
 			} else if (sc.ch == '\'') {
 				sc.SetState(SCE_KOTLIN_CHARACTER);
