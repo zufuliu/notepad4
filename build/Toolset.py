@@ -130,8 +130,8 @@ def generate_compile_commands(target, avx2=False, cxx=False):
 	target_flag = '--target=' + target
 	msvc = 'msvc' in target
 	if msvc:
-		cflags.extend(['clang-cl.exe', target_flag, '/c', '/std:c17', '/O2'])
-		cxxflags.extend(['clang-cl.exe', target_flag, '/c', '/std:c++20', '/O2', '/EHsc', '/GR-'])
+		cflags.extend(['clang-cl.exe', target_flag, '-c', '/std:c17', '/O2'])
+		cxxflags.extend(['clang-cl.exe', target_flag, '-c', '/std:c++20', '/O2', '/EHsc', '/GR-'])
 		warnings.insert(0, '/W4')
 	else:
 		cflags.extend(['clang.exe', target_flag, '-municode', '-c', '-std=gnu17', '-O2'])
