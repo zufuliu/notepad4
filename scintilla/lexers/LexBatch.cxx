@@ -102,8 +102,7 @@ constexpr char GetStringQuote(int style) noexcept {
 	}
 }
 
-bool IsStringArgumentEnd(const StyleContext &sc, int outerStyle, Command command, int parenCount) noexcept {
-	const int ch = (command == Command::SetValue) ? sc.GetLineNextChar() : sc.ch;
+constexpr bool IsStringArgumentEnd(int ch, int outerStyle, int parenCount) noexcept {
 	return AnyOf(ch, '\0', '\n', '\r', ' ', '\t', '&', '|', '<', '>')
 		|| (parenCount != 0 && ch == ')')
 		|| ch == GetStringQuote(outerStyle);
@@ -419,8 +418,8 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				if (state == SCE_BAT_STRINGDQ) {
 					state = TryTakeAndPop(nestedState);
 					sc.Forward();
-					if ((command == Command::SetValue || command == Command::Argument || command == Command::Escape)
-						&& !IsStringArgumentEnd(sc, state, command, parenCount)) {
+					if ((command == Command::Argument || command == Command::Escape)
+						&& !IsStringArgumentEnd(sc.ch, state, parenCount)) {
 						state = SCE_BAT_STRINGNQ;
 					}
 				} else {
@@ -444,7 +443,7 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				}
 			} else if (sc.state == SCE_BAT_STRINGNQ) {
 				const int state = TryGetBack(nestedState);
-				if (IsStringArgumentEnd(sc, state, command, parenCount)) {
+				if (IsStringArgumentEnd(sc.ch, state, parenCount)) {
 					sc.SetState(state);
 					continue;
 				}
