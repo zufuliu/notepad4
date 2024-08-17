@@ -514,7 +514,7 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			}
 			if (sc.ch == '\"') {
 				insideUrl = false;
-				sc.SetState((sc.chPrev == '.') ? SCE_JAVA_TEMPLATE : SCE_JAVA_STRING);
+				sc.SetState((chPrevNonWhite == '.') ? SCE_JAVA_TEMPLATE : SCE_JAVA_STRING);
 				if (sc.MatchNext('"', '"')) {
 					static_assert(SCE_JAVA_TRIPLE_TEMPLATE - SCE_JAVA_TEMPLATE == SCE_JAVA_TRIPLE_STRING - SCE_JAVA_STRING);
 					sc.ChangeState(sc.state + SCE_JAVA_TRIPLE_STRING - SCE_JAVA_STRING);

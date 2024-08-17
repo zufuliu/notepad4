@@ -1233,18 +1233,12 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				const Sci_PositionU bk = sc.currentPos;
 				Sci_PositionU fw = sc.currentPos + 1;
 				// first check for possible quote-like delimiter
-				if (sc.ch == 's' && !IsIdentifierCharEx(sc.chNext)) {
-					sc.ChangeState(SCE_PL_REGSUBST);
+				if ((sc.ch == 's' || sc.ch == 'y') && !IsIdentifierCharEx(sc.chNext)) {
+					sc.ChangeState((sc.ch == 's') ? SCE_PL_REGSUBST : SCE_PL_XLAT);
 					Quote.New(2);
-				} else if (sc.ch == 'm' && !IsIdentifierCharEx(sc.chNext)) {
-					sc.ChangeState(SCE_PL_REGEX);
+				} else if ((sc.ch == 'm' || sc.ch == 'q') && !IsIdentifierCharEx(sc.chNext)) {
+					sc.ChangeState((sc.ch == 'm') ? SCE_PL_REGEX : SCE_PL_STRING_Q);
 					Quote.New();
-				} else if (sc.ch == 'q' && !IsIdentifierCharEx(sc.chNext)) {
-					sc.ChangeState(SCE_PL_STRING_Q);
-					Quote.New();
-				} else if (sc.ch == 'y' && !IsIdentifierCharEx(sc.chNext)) {
-					sc.ChangeState(SCE_PL_XLAT);
-					Quote.New(2);
 				} else if (sc.Match('t', 'r') && !IsIdentifierCharEx(sc.GetRelative(2))) {
 					sc.ChangeState(SCE_PL_XLAT);
 					Quote.New(2);

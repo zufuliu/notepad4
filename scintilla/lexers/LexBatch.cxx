@@ -94,12 +94,11 @@ constexpr bool IsStringStyle(int style) noexcept {
 }
 
 constexpr char GetStringQuote(int style) noexcept {
-	switch (style) {
-	case SCE_BAT_STRINGDQ: return '\"';
-	case SCE_BAT_STRINGSQ: return '\'';
-	case SCE_BAT_STRINGBT: return '`';
-	default: return '\0';
-	}
+	constexpr unsigned mask = ('\"' << 8*(SCE_BAT_STRINGDQ - SCE_BAT_STRINGDQ))
+		| ('\'' << 8*(SCE_BAT_STRINGSQ - SCE_BAT_STRINGDQ))
+		| ('`' << 8*(SCE_BAT_STRINGBT - SCE_BAT_STRINGDQ));
+	const unsigned offset = 8*(style - SCE_BAT_STRINGDQ);
+	return (offset > 24) ? '\0' : ((mask >> offset) & 0xff);
 }
 
 constexpr bool IsStringArgumentEnd(int ch, int outerStyle, int parenCount) noexcept {
@@ -418,7 +417,7 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				if (state == SCE_BAT_STRINGDQ) {
 					state = TryTakeAndPop(nestedState);
 					sc.Forward();
-					if ((command == Command::Argument || command == Command::Escape)
+					if ((command == Command::SetValue || command == Command::Argument || command == Command::Escape)
 						&& !IsStringArgumentEnd(sc.ch, state, parenCount)) {
 						state = SCE_BAT_STRINGNQ;
 					}

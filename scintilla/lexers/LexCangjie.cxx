@@ -328,7 +328,7 @@ void ColouriseCangjieDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int ini
 				sc.SetState((sc.chNext == '\'') ? SCE_CANGJIE_RUNE_SQ : SCE_CANGJIE_RUNE_DQ);
 				sc.Forward();
 			} else if (sc.ch == '\'' || sc.ch == '"') {
-				sc.SetState((sc.ch == '\'') ? SCE_CANGJIE_STRING_SQ : SCE_CANGJIE_STRING_SQ);
+				sc.SetState((sc.ch == '\'') ? SCE_CANGJIE_STRING_SQ : SCE_CANGJIE_STRING_DQ);
 				if (sc.MatchNext()) {
 					static_assert(SCE_CANGJIE_TRIPLE_STRING_SQ - SCE_CANGJIE_STRING_SQ == SCE_CANGJIE_TRIPLE_STRING_DQ - SCE_CANGJIE_STRING_DQ);
 					sc.ChangeState(sc.state + SCE_CANGJIE_TRIPLE_STRING_SQ - SCE_CANGJIE_STRING_SQ);

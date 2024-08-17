@@ -169,7 +169,11 @@ constexpr int GetStringQuote(int state) noexcept {
 }
 
 constexpr bool IsTripleQuotedString(int state) noexcept {
-	return (state & 1) == 0;
+	if constexpr (SCE_JULIA_TRIPLE_STRING & 1) {
+		return state & true;
+	} else {
+		return (state & 1) == 0;
+	}
 }
 
 void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
