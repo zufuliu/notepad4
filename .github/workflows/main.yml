@@ -290,31 +290,26 @@ jobs:
         CALL "build\install_mingw.bat" llvm
 
     - name: Clang x64 Release
-      continue-on-error: true
       run: |
         CALL "build\mingw\build.bat" llvm x86_64
         CALL "build\make_zip.bat" Clang x64 Release 1
 
     - name: Clang Win32 Release
-      continue-on-error: true
       run: |
         CALL "build\mingw\build.bat" llvm i686
         CALL "build\make_zip.bat" Clang Win32 Release 1
 
     - name: Clang AVX2 Release
-      continue-on-error: true
       run: |
         CALL "build\mingw\build.bat" llvm AVX2
         CALL "build\make_zip.bat" Clang AVX2 Release 1
 
     - name: Clang ARM64 Release
-      continue-on-error: true
       run: |
         CALL "build\mingw\build.bat" llvm aarch64
         CALL "build\make_zip.bat" Clang ARM64 Release 1
 
     - name: Clang ARM Release
-      continue-on-error: true
       run: |
         CALL "build\mingw\build.bat" llvm armv7
         CALL "build\make_zip.bat" Clang ARM Release 1
@@ -467,11 +462,13 @@ jobs:
         CALL "build\install_mingw.bat" i686
 
     - name: GCC Win32 Release
+      continue-on-error: true
       run: |
         CALL "build\mingw\build.bat" i686
         CALL "build\make_zip.bat" GCC Win32 Release 1
 
     - name: Clang Win32 Release
+      continue-on-error: true
       run: |
         CALL "build\mingw\build.bat" i686 Clang
         CALL "build\make_zip.bat" Clang Win32 Release 1
