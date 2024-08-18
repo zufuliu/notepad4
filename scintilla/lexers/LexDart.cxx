@@ -174,17 +174,12 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				} else {
 					char s[128];
 					sc.GetCurrent(s, sizeof(s));
-					const bool keyword = keywordLists[KeywordIndex_Keyword].InList(s);
-					if (sc.state == SCE_DART_IDENTIFIER_NODOLLAR) {
-						if (keyword) { // built-in identifier or this
-							sc.ChangeState(SCE_DART_WORD);
-						}
-						sc.SetState(escSeq.outerState);
-						continue;
-					}
-					if (keyword) {
+					const int state = sc.state;
+					if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 						sc.ChangeState(SCE_DART_WORD);
-						if (StrEqualsAny(s, "import", "part")) {
+						if (state == SCE_DART_IDENTIFIER_NODOLLAR) {
+							kwType = KeywordType::None;
+						} else if (StrEqualsAny(s, "import", "part")) {
 							if (visibleChars == sc.LengthCurrent()) {
 								lineStateLineType = DartLineStateMaskImport;
 							}
@@ -209,13 +204,13 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 						sc.ChangeState(SCE_DART_CLASS);
 					} else if (keywordLists[KeywordIndex_Enumeration].InList(s)) {
 						sc.ChangeState(SCE_DART_ENUM);
-					} else if (sc.ch == ':') {
+					} else if (state == SCE_DART_IDENTIFIER && sc.ch == ':') {
 						if (chBefore == ',' || chBefore == '{' || chBefore == '(') {
 							sc.ChangeState(SCE_DART_KEY); // map key or named parameter
 						} else if (IsJumpLabelPrevChar(chBefore)) {
 							sc.ChangeState(SCE_DART_LABEL);
 						}
-					} else if (sc.ch != '.') {
+					} else if (state == SCE_DART_IDENTIFIER && sc.ch != '.') {
 						if (kwType > KeywordType::None && kwType < KeywordType::Return) {
 							sc.ChangeState(static_cast<int>(kwType));
 						} else {
@@ -244,6 +239,10 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					}
 					if (sc.state != SCE_DART_WORD && sc.ch != '.') {
 						kwType = KeywordType::None;
+					}
+					if (state == SCE_DART_IDENTIFIER_NODOLLAR) {
+						sc.SetState(escSeq.outerState);
+						continue;
 					}
 				}
 
