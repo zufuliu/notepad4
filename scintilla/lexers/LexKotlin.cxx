@@ -128,26 +128,23 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 			}
 			break;
 
-		case SCE_KOTLIN_VARIABLE:
 		case SCE_KOTLIN_LABEL:
 		case SCE_KOTLIN_IDENTIFIER:
 		case SCE_KOTLIN_ANNOTATION:
 		case SCE_KOTLIN_CLASS:
 			if (!IsIdentifierCharEx(sc.ch)) {
-				switch (sc.state) {
-				case SCE_KOTLIN_VARIABLE:
-					sc.SetState(escSeq.outerState);
-					continue;
-
-				case SCE_KOTLIN_ANNOTATION:
+				if (sc.state == SCE_KOTLIN_ANNOTATION) {
 					if (sc.ch == '.' || sc.ch == ':') {
 						sc.SetState(SCE_KOTLIN_OPERATOR);
 						sc.ForwardSetState(SCE_KOTLIN_ANNOTATION);
 						continue;
 					}
-					break;
+				} else if (sc.state == SCE_KOTLIN_IDENTIFIER) {
+					if (escSeq.outerState != SCE_KOTLIN_DEFAULT) {
+						sc.SetState(escSeq.outerState);
+						continue;
+					}
 
-				case SCE_KOTLIN_IDENTIFIER: {
 					char s[128];
 					sc.GetCurrent(s, sizeof(s));
 					if (keywordLists[KeywordIndex_Keyword].InList(s)) {
@@ -219,7 +216,6 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 					if (sc.state != SCE_KOTLIN_WORD && sc.ch != '.') {
 						kwType = KeywordType::None;
 					}
-				} break;
 				}
 				sc.SetState(SCE_KOTLIN_DEFAULT);
 			}
@@ -273,13 +269,15 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 				sc.ForwardSetState(SCE_KOTLIN_DEFAULT);
 			} else if (sc.state != SCE_KOTLIN_CHARACTER) {
 				if (sc.ch == '$') {
-					if (sc.chNext == '{') {
-						nestedState.push_back(sc.state);
+					if (sc.chNext == '{' || IsIdentifierStartEx(sc.chNext)) {
+						escSeq.outerState = sc.state;
 						sc.SetState(SCE_KOTLIN_OPERATOR2);
 						sc.Forward();
-					} else if (IsIdentifierStartEx(sc.chNext)) {
-						escSeq.outerState = sc.state;
-						sc.SetState(SCE_KOTLIN_VARIABLE);
+						if (sc.ch == '{') {
+							nestedState.push_back(escSeq.outerState);
+						} else {
+							sc.SetState(SCE_KOTLIN_IDENTIFIER);
+						}
 					}
 				} else if (sc.ch == '\"' && (sc.state == SCE_KOTLIN_STRING || sc.MatchNext('"', '"'))) {
 					if (sc.state == SCE_KOTLIN_RAWSTRING) {
@@ -353,6 +351,7 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 			} else if (sc.ch == '`') {
 				sc.SetState(SCE_KOTLIN_BACKTICKS);
 			} else if (IsIdentifierStartEx(sc.ch)) {
+				escSeq.outerState = SCE_KOTLIN_DEFAULT;
 				chBefore = chPrevNonWhite;
 				if (chPrevNonWhite != '.') {
 					chBeforeIdentifier = chPrevNonWhite;
