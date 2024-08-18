@@ -53,7 +53,6 @@ static EDITSTYLE Styles_Dart[] = {
 	{ SCE_DART_ESCAPECHAR, NP2StyleX_EscapeSequence, L"fore:#0080C0" },
 	{ SCE_DART_KEY, NP2StyleX_Property, L"fore:#648000" },
 	{ SCE_DART_LABEL, NP2StyleX_Label, L"back:#FFC040" },
-	{ MULTI_STYLE(SCE_DART_VARIABLE, SCE_DART_VARIABLE2, 0, 0), NP2StyleX_Variable, L"fore:#9E4D2A" },
 	{ MULTI_STYLE(SCE_DART_SYMBOL_OPERATOR, SCE_DART_SYMBOL_IDENTIFIER, 0, 0), NP2StyleX_Symbol, L"fore:#7C5AF3" },
 	{ SCE_DART_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
 	{ MULTI_STYLE(SCE_DART_OPERATOR, SCE_DART_OPERATOR2, 0, 0), NP2StyleX_Operator, L"fore:#B000B0" },

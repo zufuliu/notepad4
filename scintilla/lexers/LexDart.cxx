@@ -70,10 +70,29 @@ enum class KeywordType {
 	While = 0x41,
 };
 
+enum class InterpolationType {
+	None,
+	Expression,	// ${expression}
+	Identifier,	// $id, same as ${id}
+	Simple,		// $(id)
+};
+
 static_assert(DefaultNestedStateBaseStyle + 1 == SCE_DART_STRING_SQ);
 static_assert(DefaultNestedStateBaseStyle + 2 == SCE_DART_STRING_DQ);
 static_assert(DefaultNestedStateBaseStyle + 3 == SCE_DART_TRIPLE_STRING_SQ);
 static_assert(DefaultNestedStateBaseStyle + 4 == SCE_DART_TRIPLE_STRING_DQ);
+
+constexpr bool IsDartIdentifierStartNoDollar(int ch) noexcept {
+	return IsIdentifierStartEx(ch);
+}
+
+constexpr bool IsDartIdentifierStart(int ch) noexcept {
+	return IsDartIdentifierStartNoDollar(ch) || ch == '$';
+}
+
+constexpr bool IsDartIdentifierChar(int ch) noexcept {
+	return IsIdentifierCharEx(ch) || ch == '$';
+}
 
 constexpr bool IsDeclarableOperator(int ch) noexcept {
 	// https://github.com/dart-lang/sdk/blob/main/sdk/lib/core/symbol.dart
@@ -104,13 +123,13 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 	KeywordType kwType = KeywordType::None;
 	int chBeforeIdentifier = 0;
 
+	InterpolationType interpolationType = InterpolationType::None;
 	std::vector<int> nestedState; // string interpolation "${}"
 
 	int visibleChars = 0;
 	int chBefore = 0;
 	int visibleCharsBefore = 0;
 	int chPrevNonWhite = 0;
-	bool simpleStringInterpolation = false;
 	EscapeSequence escSeq;
 
 	StyleContext sc(startPos, lengthDoc, initStyle, styler);
@@ -152,28 +171,25 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			}
 			break;
 
+		case SCE_DART_IDENTIFIER_NODOLLAR:
 		case SCE_DART_IDENTIFIER:
-		case SCE_DART_VARIABLE:
-		case SCE_DART_VARIABLE2:
 		case SCE_DART_METADATA:
 		case SCE_DART_SYMBOL_IDENTIFIER:
-			if (!IsIdentifierCharEx(sc.ch)) {
-				switch (sc.state) {
-				case SCE_DART_VARIABLE2:
-					sc.SetState(escSeq.outerState);
-					continue;
-
-				case SCE_DART_METADATA:
-				case SCE_DART_SYMBOL_IDENTIFIER:
+			if (!IsDartIdentifierChar(sc.ch) || (sc.ch == '$' && sc.state == SCE_DART_IDENTIFIER_NODOLLAR)) {
+				if (sc.state == SCE_DART_METADATA || sc.state == SCE_DART_SYMBOL_IDENTIFIER) {
 					if (sc.ch == '.') {
 						const int state = sc.state;
 						sc.SetState(SCE_DART_OPERATOR);
 						sc.ForwardSetState(state);
 						continue;
 					}
-					break;
+				} else {
+					if (interpolationType == InterpolationType::Identifier) {
+						interpolationType = InterpolationType::None;
+						sc.SetState(escSeq.outerState);
+						continue;
+					}
 
-				case SCE_DART_IDENTIFIER: {
 					char s[128];
 					sc.GetCurrent(s, sizeof(s));
 					if (keywordLists[KeywordIndex_Keyword].InList(s)) {
@@ -193,7 +209,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 						}
 						if (kwType > KeywordType::None && kwType < KeywordType::Return) {
 							const int chNext = sc.GetLineNextChar();
-							if (!IsIdentifierStartEx(chNext)) {
+							if (!IsDartIdentifierStart(chNext)) {
 								kwType = KeywordType::None;
 							}
 						}
@@ -213,18 +229,18 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 						if (kwType > KeywordType::None && kwType < KeywordType::Return) {
 							sc.ChangeState(static_cast<int>(kwType));
 						} else {
-							const int chNext = sc.GetDocNextChar(sc.ch == '?');
+							const int chNext = sc.GetLineNextChar(sc.ch == '?');
 							if (chNext == '(') {
 								// type method()
 								// type[] method()
 								// type<type> method()
-								if (kwType != KeywordType::Return && (IsIdentifierCharEx(chBefore) || chBefore == ']')) {
+								if (kwType != KeywordType::Return && (IsDartIdentifierChar(chBefore) || chBefore == ']')) {
 									sc.ChangeState(SCE_DART_FUNCTION_DEFINITION);
 								} else {
 									sc.ChangeState(SCE_DART_FUNCTION);
 								}
 							} else if ((chBeforeIdentifier == '<' && (chNext == '>' || chNext == '<'))
-								|| IsIdentifierStartEx(chNext)) {
+								|| IsDartIdentifierStart(chNext)) {
 								// type<type>
 								// type<type?>
 								// type<type<type>>
@@ -239,7 +255,6 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					if (sc.state != SCE_DART_WORD && sc.ch != '.') {
 						kwType = KeywordType::None;
 					}
-				} break;
 				}
 
 				sc.SetState(SCE_DART_DEFAULT);
@@ -298,22 +313,24 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					}
 				}
 			} else if (sc.ch == '$' && sc.state < SCE_DART_RAWSTRING_SQ) {
-				if (sc.chNext == '{' || sc.chNext == '(') {
-					if (sc.chNext == '(') {
-						simpleStringInterpolation = true;
-						escSeq.outerState = sc.state;
-					} else {
-						nestedState.push_back(sc.state);
-					}
-					sc.SetState(SCE_DART_OPERATOR2);
-					sc.Forward();
-				} else if (IsIdentifierStartEx(sc.chNext)) {
-					escSeq.outerState = sc.state;
-					sc.SetState(SCE_DART_VARIABLE2);
+				escSeq.outerState = sc.state;
+				sc.SetState(SCE_DART_OPERATOR2);
+				sc.Forward();
+				if (sc.ch == '{') {
+					interpolationType = InterpolationType::Expression;
+					nestedState.push_back(escSeq.outerState);
+				} else if (sc.ch == '(') {
+					interpolationType = InterpolationType::Simple;
+				} else if (IsDartIdentifierStartNoDollar(sc.ch)) {
+					interpolationType = InterpolationType::Identifier;
+					sc.SetState(SCE_DART_IDENTIFIER_NODOLLAR);
+				} else { // error
+					sc.SetState(escSeq.outerState);
+					continue;
 				}
 			} else if (sc.ch == GetStringQuote(sc.state) && (!IsTripleString(sc.state) || sc.MatchNext())) {
 				if (IsTripleString(sc.state)) {
-					sc.Advance(2);
+					sc.Forward(2);
 				}
 				sc.Forward();
 				if (sc.state <= SCE_DART_STRING_DQ && (chBefore == ',' || chBefore == '{')) {
@@ -362,7 +379,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				if (sc.MatchNext()) {
 					static_assert(SCE_DART_TRIPLE_RAWSTRING_SQ - SCE_DART_RAWSTRING_SQ == SCE_DART_TRIPLE_RAWSTRING_DQ - SCE_DART_RAWSTRING_DQ);
 					sc.ChangeState(sc.state + SCE_DART_TRIPLE_RAWSTRING_SQ - SCE_DART_RAWSTRING_SQ);
-					sc.Advance(2);
+					sc.Forward(2);
 				}
 			} else if (sc.ch == '\'' || sc.ch == '"') {
 				sc.SetState((sc.ch == '\'') ? SCE_DART_STRING_SQ : SCE_DART_STRING_DQ);
@@ -370,28 +387,24 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				if (sc.MatchNext()) {
 					static_assert(SCE_DART_TRIPLE_STRING_SQ - SCE_DART_STRING_SQ == SCE_DART_TRIPLE_STRING_DQ - SCE_DART_STRING_DQ);
 					sc.ChangeState(sc.state + SCE_DART_TRIPLE_STRING_DQ - SCE_DART_STRING_DQ);
-					sc.Advance(2);
+					sc.Forward(2);
 				}
 			} else if (IsNumberStart(sc.ch, sc.chNext)) {
 				sc.SetState(SCE_DART_NUMBER);
-			} else if ((sc.ch == '@' || sc.ch == '$') && IsIdentifierStartEx(sc.chNext)) {
-				sc.SetState((sc.ch == '@') ? SCE_DART_METADATA : SCE_DART_VARIABLE);
-			} else if (sc.ch == '#') {
-				if (IsIdentifierStartEx(sc.chNext)) {
-					sc.SetState(SCE_DART_SYMBOL_IDENTIFIER);
-				} else if (IsDeclarableOperator(sc.chNext)) {
-					sc.SetState(SCE_DART_SYMBOL_OPERATOR);
-				}
-			} else if (IsIdentifierStartEx(sc.ch)) {
+			} else if ((sc.ch == '@' || sc.ch == '#') && IsDartIdentifierStart(sc.chNext)) {
+				sc.SetState((sc.ch == '@') ? SCE_DART_METADATA : SCE_DART_SYMBOL_IDENTIFIER);
+			} else if (IsDartIdentifierStartNoDollar(sc.ch) || (sc.ch == '$' && interpolationType != InterpolationType::Simple)) {
 				chBefore = chPrevNonWhite;
 				if (chPrevNonWhite != '.') {
 					chBeforeIdentifier = chPrevNonWhite;
 				}
-				sc.SetState(SCE_DART_IDENTIFIER);
+				sc.SetState((interpolationType != InterpolationType::Simple) ? SCE_DART_IDENTIFIER : SCE_DART_IDENTIFIER_NODOLLAR);
+			} else if (sc.ch == '#' && IsDeclarableOperator(sc.chNext)) {
+				sc.SetState(SCE_DART_SYMBOL_OPERATOR);
 			} else if (IsAGraphic(sc.ch)) {
 				sc.SetState(SCE_DART_OPERATOR);
-				if (simpleStringInterpolation && sc.ch == ')') {
-					simpleStringInterpolation = false;
+				if (interpolationType == InterpolationType::Simple && sc.ch == ')') {
+					interpolationType = InterpolationType::None;
 					sc.ChangeState(SCE_DART_OPERATOR2);
 					sc.ForwardSetState(escSeq.outerState);
 					continue;
@@ -425,6 +438,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			visibleChars = 0;
 			visibleCharsBefore = 0;
 			kwType = KeywordType::None;
+			interpolationType = InterpolationType::None;
 		}
 		sc.Forward();
 	}
