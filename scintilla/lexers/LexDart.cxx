@@ -70,24 +70,13 @@ enum class KeywordType {
 	While = 0x41,
 };
 
-enum class InterpolationType {
-	None,
-	Expression,	// ${expression}
-	Identifier,	// $id, same as ${id}
-	Simple,		// $(id)
-};
-
 static_assert(DefaultNestedStateBaseStyle + 1 == SCE_DART_STRING_SQ);
 static_assert(DefaultNestedStateBaseStyle + 2 == SCE_DART_STRING_DQ);
 static_assert(DefaultNestedStateBaseStyle + 3 == SCE_DART_TRIPLE_STRING_SQ);
 static_assert(DefaultNestedStateBaseStyle + 4 == SCE_DART_TRIPLE_STRING_DQ);
 
-constexpr bool IsDartIdentifierStartNoDollar(int ch) noexcept {
-	return IsIdentifierStart(ch);
-}
-
 constexpr bool IsDartIdentifierStart(int ch) noexcept {
-	return IsDartIdentifierStartNoDollar(ch) || ch == '$';
+	return IsIdentifierStart(ch) || ch == '$';
 }
 
 constexpr bool IsDartIdentifierChar(int ch) noexcept {
@@ -123,7 +112,6 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 	KeywordType kwType = KeywordType::None;
 	int chBeforeIdentifier = 0;
 
-	InterpolationType interpolationType = InterpolationType::None;
 	std::vector<int> nestedState; // string interpolation "${}"
 
 	int visibleChars = 0;
@@ -184,14 +172,9 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 						continue;
 					}
 				} else {
-					if (interpolationType == InterpolationType::Identifier) {
-						interpolationType = InterpolationType::None;
-						sc.SetState(escSeq.outerState);
-						continue;
-					}
-
 					char s[128];
 					sc.GetCurrent(s, sizeof(s));
+					const int state = sc.state;
 					if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 						sc.ChangeState(SCE_DART_WORD);
 						if (StrEqualsAny(s, "import", "part")) {
@@ -255,6 +238,10 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					if (sc.state != SCE_DART_WORD && sc.ch != '.') {
 						kwType = KeywordType::None;
 					}
+					if (state == SCE_DART_IDENTIFIER_NODOLLAR) {
+						sc.SetState(escSeq.outerState);
+						continue;
+					}
 				}
 
 				sc.SetState(SCE_DART_DEFAULT);
@@ -317,12 +304,8 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				sc.SetState(SCE_DART_OPERATOR2);
 				sc.Forward();
 				if (sc.ch == '{') {
-					interpolationType = InterpolationType::Expression;
 					nestedState.push_back(escSeq.outerState);
-				} else if (sc.ch == '(') {
-					interpolationType = InterpolationType::Simple;
-				} else if (IsDartIdentifierStartNoDollar(sc.ch)) {
-					interpolationType = InterpolationType::Identifier;
+				} else if (sc.ch != '$' && IsDartIdentifierStart(sc.ch)) {
 					sc.SetState(SCE_DART_IDENTIFIER_NODOLLAR);
 				} else { // error
 					sc.SetState(escSeq.outerState);
@@ -393,22 +376,16 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				sc.SetState(SCE_DART_NUMBER);
 			} else if ((sc.ch == '@' || sc.ch == '#') && IsDartIdentifierStart(sc.chNext)) {
 				sc.SetState((sc.ch == '@') ? SCE_DART_METADATA : SCE_DART_SYMBOL_IDENTIFIER);
-			} else if (IsDartIdentifierStartNoDollar(sc.ch) || (sc.ch == '$' && interpolationType != InterpolationType::Simple)) {
+			} else if (IsDartIdentifierStart(sc.ch)) {
 				chBefore = chPrevNonWhite;
 				if (chPrevNonWhite != '.') {
 					chBeforeIdentifier = chPrevNonWhite;
 				}
-				sc.SetState((interpolationType != InterpolationType::Simple) ? SCE_DART_IDENTIFIER : SCE_DART_IDENTIFIER_NODOLLAR);
+				sc.SetState(SCE_DART_IDENTIFIER);
 			} else if (sc.ch == '#' && IsDeclarableOperator(sc.chNext)) {
 				sc.SetState(SCE_DART_SYMBOL_OPERATOR);
 			} else if (IsAGraphic(sc.ch)) {
 				sc.SetState(SCE_DART_OPERATOR);
-				if (interpolationType == InterpolationType::Simple && sc.ch == ')') {
-					interpolationType = InterpolationType::None;
-					sc.ChangeState(SCE_DART_OPERATOR2);
-					sc.ForwardSetState(escSeq.outerState);
-					continue;
-				}
 				if (!nestedState.empty()) {
 					sc.ChangeState(SCE_DART_OPERATOR2);
 					if (sc.ch == '{') {
@@ -438,7 +415,6 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			visibleChars = 0;
 			visibleCharsBefore = 0;
 			kwType = KeywordType::None;
-			interpolationType = InterpolationType::None;
 		}
 		sc.Forward();
 	}
