@@ -183,6 +183,7 @@ void ColouriseGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 			if (!IsIdentifierCharEx(sc.ch)) {
 				switch (sc.state) {
 				case SCE_GROOVY_VARIABLE:
+					// TODO: handle dotted expression inside interpolation
 					sc.SetState(escSeq.outerState);
 					continue;
 
@@ -391,13 +392,16 @@ void ColouriseGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 					sc.Forward();
 				}
 			} else if (sc.ch == '$' && IsInterpolatedString(sc.state)) {
-				if (sc.chNext == '{') {
-					nestedState.push_back(sc.state);
-					sc.SetState(SCE_GROOVY_OPERATOR2);
-					sc.Forward();
-				} else if (IsIdentifierStartEx(sc.chNext)) {
-					escSeq.outerState = sc.state;
-					sc.SetState(SCE_GROOVY_VARIABLE);
+				escSeq.outerState = sc.state;
+				sc.SetState(SCE_GROOVY_OPERATOR2);
+				sc.Forward();
+				if (sc.ch == '{') {
+					nestedState.push_back(escSeq.outerState);
+				} else if (IsIdentifierStartEx(sc.ch)) {
+					sc.ChangeState(SCE_GROOVY_VARIABLE);
+				} else { // error
+					sc.SetState(escSeq.outerState);
+					continue;
 				}
 			} else if (sc.ch == GetStringQuote(sc.state) && (!IsTripleString(sc.state) || sc.MatchNext())) {
 				if (IsTripleString(sc.state)) {
@@ -410,22 +414,23 @@ void ColouriseGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 		case SCE_GROOVY_SLASHY_STRING:
 		case SCE_GROOVY_DOLLAR_SLASHY:
 			if (sc.Match('\\', '/') && sc.state == SCE_GROOVY_SLASHY_STRING) {
+				escSeq.outerState = sc.state;
+				escSeq.digitsLeft = 1;
 				sc.SetState(SCE_GROOVY_ESCAPECHAR);
 				sc.Forward();
-				sc.ForwardSetState(SCE_GROOVY_SLASHY_STRING);
-			}
-			if (sc.ch == '$') {
-				if (sc.chNext == '{') {
-					nestedState.push_back(sc.state);
-					sc.SetState(SCE_GROOVY_OPERATOR2);
-					sc.Forward();
-				} else if (IsIdentifierStartEx(sc.chNext)) {
-					escSeq.outerState = sc.state;
-					sc.SetState(SCE_GROOVY_VARIABLE);
-				} else if ((sc.chNext == '$' || sc.chNext == '/') && sc.state == SCE_GROOVY_DOLLAR_SLASHY) {
-					sc.SetState(SCE_GROOVY_ESCAPECHAR);
-					sc.Forward();
-					sc.ForwardSetState(SCE_GROOVY_DOLLAR_SLASHY);
+			} else if (sc.ch == '$') {
+				escSeq.outerState = sc.state;
+				sc.SetState(SCE_GROOVY_OPERATOR2);
+				sc.Forward();
+				if ((sc.ch == '$' || sc.ch == '/') && escSeq.outerState == SCE_GROOVY_DOLLAR_SLASHY) {
+					escSeq.digitsLeft = 1;
+					sc.ChangeState(SCE_GROOVY_ESCAPECHAR);
+				} else if (sc.ch == '{') {
+					nestedState.push_back(escSeq.outerState);
+				} else if (IsIdentifierStartEx(sc.ch)) {
+					sc.ChangeState(SCE_GROOVY_VARIABLE);
+				} else { // error
+					sc.SetState(escSeq.outerState);
 					continue;
 				}
 			} else if (sc.ch == '/' && (sc.state != SCE_GROOVY_DOLLAR_SLASHY || sc.chNext == '$')) {
