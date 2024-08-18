@@ -21,13 +21,11 @@ when while
 // Soft Keywords
 by
 catch constructor
-delegate dynamic
-field file finally
+dynamic
+finally
 get
 import init
-param property
-receiver
-set setparam
+set
 value
 where
 
@@ -50,6 +48,18 @@ reified
 sealed suspend
 tailrec
 vararg
+
+//! annotation		===========================================================
+// https://kotlinlang.org/docs/annotations.html#annotation-use-site-targets
+@delegate
+@field
+@file
+@get
+@param
+@property
+@receiver
+@set
+@setparam
 
 //! Library			===========================================================
 // Kotlin Standard Library

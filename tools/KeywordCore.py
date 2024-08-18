@@ -1612,8 +1612,8 @@ def parse_kotlin_api_file(path):
 	sections = read_api_file(path, '//')
 	keywordMap = {}
 	for key, doc in sections:
-		if key == 'kdoc':
-			items = re.findall(r'@(\w+)', doc)
+		if key in ('kdoc', 'annotation'):
+			items = set(re.findall(r'@(\w+)', doc))
 		elif key == 'library':
 			items = re.findall(r'annotation\s+class\s+(\w+)', doc)
 			annotations = set(items)
@@ -1634,7 +1634,7 @@ def parse_kotlin_api_file(path):
 			keywordMap['class'] = classes
 			keywordMap['interface'] = interfaces
 			keywordMap['enumeration'] = enums
-			keywordMap['annotation'] = annotations
+			keywordMap['annotation'].update(annotations)
 
 			items = re.findall(r'fun\s+.*?(\w+\()', doc, re.DOTALL)
 			keywordMap['function'] = items
@@ -1656,7 +1656,6 @@ def parse_kotlin_api_file(path):
 		'class',
 		'interface',
 		'enumeration',
-		'annotation',
 	])
 	return [
 		('keywords', keywordMap['keywords'], KeywordAttr.Default),
