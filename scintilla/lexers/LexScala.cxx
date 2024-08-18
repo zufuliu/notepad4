@@ -68,7 +68,7 @@ constexpr bool IsScalaIdentifierStart(int ch) noexcept {
 }
 
 constexpr bool IsScalaIdentifierChar(int ch) noexcept {
-	return IsIdentifierCharEx(ch) || ch == '$';
+	return IsIdentifierCharEx(ch);
 }
 
 constexpr bool IsSingleLineString(int state) noexcept {
@@ -284,18 +284,19 @@ void ColouriseScalaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					}
 				}
 			} else if (sc.ch == '$' && IsInterpolatedString(sc.state)) {
-				if (sc.chNext == '$') {
-					escSeq.outerState = sc.state;
+				escSeq.outerState = sc.state;
+				sc.SetState(SCE_SCALA_OPERATOR2);
+				sc.Forward();
+				if (sc.ch == '$' || sc.ch == '\"') {
 					escSeq.digitsLeft = 1;
-					sc.SetState(SCE_SCALA_ESCAPECHAR);
-					sc.Forward();
-				} else if (sc.chNext == '{') {
-					nestedState.push_back(sc.state);
-					sc.SetState(SCE_SCALA_OPERATOR2);
-					sc.Forward();
+					sc.ChangeState(SCE_SCALA_ESCAPECHAR);
+				} else if (sc.ch == '{') {
+					nestedState.push_back(escSeq.outerState);
 				} else if (IsScalaIdentifierStart(sc.chNext)) {
-					escSeq.outerState = sc.state;
 					sc.SetState(SCE_SCALA_IDENTIFIER);
+				} else { // error
+					sc.SetState(escSeq.outerState);
+					continue;
 				}
 			} else if (sc.ch == GetStringQuote(sc.state) && (IsSingleLineString(sc.state) || sc.MatchNext('"', '"'))) {
 				if (!IsSingleLineString(sc.state)) {
