@@ -83,7 +83,7 @@ static_assert(DefaultNestedStateBaseStyle + 3 == SCE_DART_TRIPLE_STRING_SQ);
 static_assert(DefaultNestedStateBaseStyle + 4 == SCE_DART_TRIPLE_STRING_DQ);
 
 constexpr bool IsDartIdentifierStartNoDollar(int ch) noexcept {
-	return IsIdentifierStartEx(ch);
+	return IsIdentifierStart(ch);
 }
 
 constexpr bool IsDartIdentifierStart(int ch) noexcept {
@@ -91,7 +91,7 @@ constexpr bool IsDartIdentifierStart(int ch) noexcept {
 }
 
 constexpr bool IsDartIdentifierChar(int ch) noexcept {
-	return IsIdentifierCharEx(ch) || ch == '$';
+	return IsIdentifierChar(ch) || ch == '$';
 }
 
 constexpr bool IsDeclarableOperator(int ch) noexcept {
