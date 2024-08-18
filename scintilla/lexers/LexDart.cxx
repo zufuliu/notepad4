@@ -174,8 +174,15 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				} else {
 					char s[128];
 					sc.GetCurrent(s, sizeof(s));
-					const int state = sc.state;
-					if (keywordLists[KeywordIndex_Keyword].InList(s)) {
+					const bool keyword = keywordLists[KeywordIndex_Keyword].InList(s);
+					if (sc.state == SCE_DART_IDENTIFIER_NODOLLAR) {
+						if (keyword) { // built-in identifier or this
+							sc.ChangeState(SCE_DART_WORD);
+						}
+						sc.SetState(escSeq.outerState);
+						continue;
+					}
+					if (keyword) {
 						sc.ChangeState(SCE_DART_WORD);
 						if (StrEqualsAny(s, "import", "part")) {
 							if (visibleChars == sc.LengthCurrent()) {
@@ -237,10 +244,6 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					}
 					if (sc.state != SCE_DART_WORD && sc.ch != '.') {
 						kwType = KeywordType::None;
-					}
-					if (state == SCE_DART_IDENTIFIER_NODOLLAR) {
-						sc.SetState(escSeq.outerState);
-						continue;
 					}
 				}
 
