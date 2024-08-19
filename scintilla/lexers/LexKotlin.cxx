@@ -140,16 +140,13 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 						continue;
 					}
 				} else if (sc.state == SCE_KOTLIN_IDENTIFIER) {
-					if (escSeq.outerState != SCE_KOTLIN_DEFAULT) {
-						sc.SetState(escSeq.outerState);
-						continue;
-					}
-
 					char s[128];
 					sc.GetCurrent(s, sizeof(s));
 					if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 						sc.ChangeState(SCE_KOTLIN_WORD);
-						if (StrEqual(s, "import")) {
+						if (escSeq.outerState != SCE_KOTLIN_DEFAULT) {
+							kwType = KeywordType::None;
+						} else if (StrEqual(s, "import")) {
 							if (visibleChars == sc.LengthCurrent()) {
 								lineStateLineType = KotlinLineStateMaskImport;
 							}
@@ -176,7 +173,7 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 								kwType = KeywordType::None;
 							}
 						}
-					} else if (sc.ch == '@') {
+					} else if (escSeq.outerState == SCE_KOTLIN_DEFAULT && sc.ch == '@') {
 						sc.ChangeState(SCE_KOTLIN_LABEL);
 						sc.Forward();
 					} else if (keywordLists[KeywordIndex_JavaClass].InList(s) || keywordLists[KeywordIndex_Class].InList(s)) {
@@ -185,7 +182,7 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 						sc.ChangeState(SCE_KOTLIN_INTERFACE);
 					} else if (keywordLists[KeywordIndex_Enumeration].InList(s)) {
 						sc.ChangeState(SCE_KOTLIN_ENUM);
-					} else if (sc.ch != '.') {
+					} else if (escSeq.outerState == SCE_KOTLIN_DEFAULT && sc.ch != '.') {
 						if (kwType > KeywordType::None && kwType < KeywordType::Return) {
 							sc.ChangeState(static_cast<int>(kwType));
 						} else {
@@ -215,6 +212,10 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 					}
 					if (sc.state != SCE_KOTLIN_WORD && sc.ch != '.') {
 						kwType = KeywordType::None;
+					}
+					if (escSeq.outerState != SCE_KOTLIN_DEFAULT) {
+						sc.SetState(escSeq.outerState);
+						continue;
 					}
 				}
 				sc.SetState(SCE_KOTLIN_DEFAULT);
