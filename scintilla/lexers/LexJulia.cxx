@@ -448,7 +448,7 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					sc.Advance(2);
 				}
 			} else if ((symbol || sc.ch == '@' || sc.ch == '$') && IsIdentifierStartEx(sc.chNext)) {
-				isTransposeOperator = sc.ch == '$';
+				isTransposeOperator = sc.ch == '$'; // interpolation in quoted expression
 				sc.SetState(isTransposeOperator ? SCE_JULIA_VARIABLE : (symbol ? SCE_JULIA_SYMBOL : SCE_JULIA_MACRO));
 			} else if (sc.ch == '0') {
 				numBase = 10;

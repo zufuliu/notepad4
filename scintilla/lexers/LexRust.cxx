@@ -467,7 +467,7 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					sc.SetState(SCE_RUST_IDENTIFIER);
 				}
 			} else if (sc.ch == '$' && IsIdentifierStartEx(sc.chNext)) {
-				sc.SetState(SCE_RUST_VARIABLE);
+				sc.SetState(SCE_RUST_VARIABLE); // macro metavariable
 			} else if (IsADigit(sc.ch)) {
 				sc.SetState(SCE_RUST_NUMBER);
 			} else if (IsIdentifierStartEx(sc.ch)) {

@@ -172,12 +172,11 @@ void ColouriseZigDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			break;
 
 		case SCE_ZIG_IDENTIFIER:
+		case SCE_ZIG_BUILTIN_FUNCTION:
 			if (!IsIdentifierCharEx(sc.ch)) {
-				char s[128];
-				sc.GetCurrent(s, sizeof(s));
-				if (s[0] == '@') {
-					sc.ChangeState(SCE_ZIG_BUILTIN_FUNCTION);
-				} else {
+				if (sc.state == SCE_ZIG_IDENTIFIER) {
+					char s[128];
+					sc.GetCurrent(s, sizeof(s));
 					if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 						sc.ChangeState(SCE_ZIG_WORD);
 						kwType = KeywordType::None;
@@ -303,7 +302,7 @@ void ColouriseZigDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			} else if (IsNumberStart(sc.ch, sc.chNext)) {
 				sc.SetState(SCE_ZIG_NUMBER);
 			} else if ((sc.ch == '@' && IsIdentifierStartEx(sc.chNext)) || IsIdentifierStartEx(sc.ch)) {
-				sc.SetState(SCE_ZIG_IDENTIFIER);
+				sc.SetState((sc.ch == '@') ? SCE_ZIG_BUILTIN_FUNCTION : SCE_ZIG_IDENTIFIER);
 			} else if (IsAGraphic(sc.ch)) {
 				sc.SetState(SCE_ZIG_OPERATOR);
 			}

@@ -339,7 +339,7 @@ void ColouriseCangjieDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int ini
 			} else if (sc.ch == '@' && IsIdentifierStart(sc.chNext)) {
 				sc.SetState(SCE_CANGJIE_MACRO);
 			} else if (sc.ch == '$' && IsIdentifierChar(sc.chNext)) {
-				sc.SetState(SCE_CANGJIE_VARIABLE);
+				sc.SetState(SCE_CANGJIE_VARIABLE); // quote() interpolation
 			} else if (IsIdentifierStart(sc.ch) || (sc.ch == '`' && IsIdentifierStart(sc.chNext))) {
 				if (chPrevNonWhite != '.') {
 					chBeforeIdentifier = chPrevNonWhite;

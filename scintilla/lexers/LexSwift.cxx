@@ -399,26 +399,22 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				}
 			} else if (IsNumberStartEx(sc.chPrev, sc.ch, sc.chNext)) {
 				sc.SetState(SCE_SWIFT_NUMBER);
-			} else if (sc.ch == '@' && IsIdentifierStartEx(sc.chNext)) {
-				sc.SetState(SCE_SWIFT_ATTRIBUTE);
+			} else if ((sc.ch == '@' || sc.ch == '#') && IsIdentifierStartEx(sc.chNext)) {
+				sc.SetState((sc.ch == '@') ? SCE_SWIFT_ATTRIBUTE : SCE_SWIFT_DIRECTIVE);
 			} else if (sc.ch == '$' && IsIdentifierCharEx(sc.chNext)) {
-				sc.SetState(SCE_SWIFT_VARIABLE);
+				sc.SetState(SCE_SWIFT_VARIABLE); // closure parameter, synthesized property
 			} else if (sc.ch == '#') {
-				if (IsIdentifierStartEx(sc.chNext)) {
-					sc.SetState(SCE_SWIFT_DIRECTIVE);
-				} else {
-					int delimiter = 0;
-					const DelimiterResult result = CheckSwiftStringDelimiter(styler, sc.currentPos, DelimiterCheck::Start, delimiter);
-					if (result != DelimiterResult::False) {
-						insideRegexRange = false;
-						delimiterCount = delimiter;
-						delimiters.push_back(delimiter);
-						sc.SetState((result == DelimiterResult::Regex) ? SCE_SWIFT_REGEX_ED : SCE_SWIFT_STRING_ED);
-						sc.Advance(delimiter);
-						if (result != DelimiterResult::Regex && sc.Match('"', '"', '"')) {
-							sc.ChangeState(SCE_SWIFT_TRIPLE_STRING_ED);
-							sc.Advance(2);
-						}
+				int delimiter = 0;
+				const DelimiterResult result = CheckSwiftStringDelimiter(styler, sc.currentPos, DelimiterCheck::Start, delimiter);
+				if (result != DelimiterResult::False) {
+					insideRegexRange = false;
+					delimiterCount = delimiter;
+					delimiters.push_back(delimiter);
+					sc.SetState((result == DelimiterResult::Regex) ? SCE_SWIFT_REGEX_ED : SCE_SWIFT_STRING_ED);
+					sc.Advance(delimiter);
+					if (result != DelimiterResult::Regex && sc.Match('"', '"', '"')) {
+						sc.ChangeState(SCE_SWIFT_TRIPLE_STRING_ED);
+						sc.Advance(2);
 					}
 				}
 			} else if (IsIdentifierStartEx(sc.ch) || (sc.ch == '`' && IsIdentifierStartEx(sc.chNext))) {

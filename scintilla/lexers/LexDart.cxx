@@ -159,11 +159,11 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			}
 			break;
 
-		case SCE_DART_IDENTIFIER_NODOLLAR:
+		case SCE_DART_SIMPLE_IDENTIFIER:
 		case SCE_DART_IDENTIFIER:
 		case SCE_DART_METADATA:
 		case SCE_DART_SYMBOL_IDENTIFIER:
-			if (!IsDartIdentifierChar(sc.ch) || (sc.ch == '$' && sc.state == SCE_DART_IDENTIFIER_NODOLLAR)) {
+			if (!IsDartIdentifierChar(sc.ch) || (sc.ch == '$' && sc.state == SCE_DART_SIMPLE_IDENTIFIER)) {
 				if (sc.state == SCE_DART_METADATA || sc.state == SCE_DART_SYMBOL_IDENTIFIER) {
 					if (sc.ch == '.') {
 						const int state = sc.state;
@@ -177,7 +177,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					const int state = sc.state;
 					if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 						sc.ChangeState(SCE_DART_WORD);
-						if (state == SCE_DART_IDENTIFIER_NODOLLAR) {
+						if (state == SCE_DART_SIMPLE_IDENTIFIER) {
 							kwType = KeywordType::None;
 						} else if (StrEqualsAny(s, "import", "part")) {
 							if (visibleChars == sc.LengthCurrent()) {
@@ -240,7 +240,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					if (sc.state != SCE_DART_WORD && sc.ch != '.') {
 						kwType = KeywordType::None;
 					}
-					if (state == SCE_DART_IDENTIFIER_NODOLLAR) {
+					if (state == SCE_DART_SIMPLE_IDENTIFIER) {
 						sc.SetState(escSeq.outerState);
 						continue;
 					}
@@ -308,7 +308,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				if (sc.ch == '{') {
 					nestedState.push_back(escSeq.outerState);
 				} else if (sc.ch != '$' && IsDartIdentifierStart(sc.ch)) {
-					sc.SetState(SCE_DART_IDENTIFIER_NODOLLAR);
+					sc.SetState(SCE_DART_SIMPLE_IDENTIFIER);
 				} else { // error
 					sc.SetState(escSeq.outerState);
 					continue;
