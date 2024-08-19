@@ -135,20 +135,13 @@ void ColouriseHaxeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		case SCE_HAXE_VARIABLE:
 		case SCE_HAXE_VARIABLE2:
 			if (!IsIdentifierCharEx(sc.ch)) {
-				switch (sc.state) {
-				case SCE_HAXE_VARIABLE2:
-					sc.SetState(escSeq.outerState);
-					continue;
-
-				case SCE_HAXE_MATADATA:
+				if (sc.state == SCE_HAXE_MATADATA) {
 					if (sc.ch == '.') {
 						sc.SetState(SCE_HAXE_OPERATOR);
 						sc.ForwardSetState(SCE_HAXE_MATADATA);
 						continue;
 					}
-					break;
-
-				case SCE_HAXE_IDENTIFIER: {
+				} else if (sc.state == SCE_HAXE_IDENTIFIER) {
 					char s[128];
 					sc.GetCurrent(s, sizeof(s));
 					if (s[0] == '#') {
@@ -206,7 +199,9 @@ void ColouriseHaxeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					if (sc.state != SCE_HAXE_WORD && sc.ch != '.') {
 						kwType = KeywordType::None;
 					}
-				} break;
+				} else if (sc.state == SCE_HAXE_VARIABLE2) {
+					sc.SetState(SCE_HAXE_STRINGSQ);
+					continue;
 				}
 				sc.SetState(SCE_HAXE_DEFAULT);
 			}
@@ -225,13 +220,20 @@ void ColouriseHaxeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					}
 				}
 			} else if (sc.ch == '$' && sc.state == SCE_HAXE_STRINGSQ) {
-				if (sc.chNext == '{') {
-					nestedState.push_back(sc.state);
-					sc.SetState(SCE_HAXE_OPERATOR2);
-					sc.Forward();
-				} else if (IsIdentifierStartEx(sc.chNext)) {
-					escSeq.outerState = sc.state;
-					sc.SetState(SCE_HAXE_VARIABLE2);
+				sc.SetState(SCE_HAXE_OPERATOR2);
+				sc.Forward();
+				if (sc.ch == '$') {
+					escSeq.outerState = SCE_HAXE_STRINGSQ;
+					escSeq.digitsLeft = 1;
+					escSeq.brace = false;
+					sc.ChangeState(SCE_HAXE_ESCAPECHAR);
+				} else if (sc.ch == '{') {
+					nestedState.push_back(SCE_HAXE_STRINGSQ);
+				} else if (IsIdentifierStartEx(sc.ch)) {
+					sc.ChangeState(SCE_HAXE_VARIABLE2);
+				} else {
+					sc.SetState(SCE_HAXE_STRINGSQ);
+					continue;
 				}
 			} else if (sc.ch == ((sc.state == SCE_HAXE_STRINGDQ) ? '"' : '\'')) {
 				sc.ForwardSetState(SCE_HAXE_DEFAULT);
@@ -327,7 +329,7 @@ void ColouriseHaxeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					sc.Forward();
 				}
 			} else if (sc.ch == '$' && IsIdentifierStartEx(sc.chNext)) {
-				sc.SetState(SCE_HAXE_VARIABLE);
+				sc.SetState(SCE_HAXE_VARIABLE); // macro reification
 			} else if (IsAGraphic(sc.ch)) {
 				sc.SetState(SCE_HAXE_OPERATOR);
 				if (!nestedState.empty()) {
