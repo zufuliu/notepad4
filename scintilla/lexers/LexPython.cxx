@@ -919,7 +919,7 @@ void FoldPyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	FoldLineState statePrev(styler.GetLineState(lineCurrent - 1));
 	FoldLineState stateCurrent(styler.GetLineState(lineCurrent));
-	while (lineCurrent > 0) {
+	while (lineCurrent != 0) {
 		lineCurrent--;
 		stateCurrent = statePrev;
 		statePrev = FoldLineState(styler.GetLineState(lineCurrent - 1));
@@ -929,17 +929,20 @@ void FoldPyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/
 	}
 
 	while (lineCurrent <= maxLines) {
-		int lev = stateCurrent.indentCount + SC_FOLDLEVELBASE;
 		if (stateCurrent.TripleQuoted()) {
-			statePrev = stateCurrent;
-			styler.SetLevel(lineCurrent, lev | SC_FOLDLEVELHEADERFLAG);
-			int lineState;
-			do {
+			const int skipLevel = stateCurrent.indentCount + SC_FOLDLEVELBASE;
+			styler.SetLevel(lineCurrent, skipLevel | SC_FOLDLEVELHEADERFLAG);
+			while (true) {
 				lineCurrent++;
-				lineState = styler.GetLineState(lineCurrent);
-				styler.SetLevel(lineCurrent, lev + 1);
-			} while (lineState & PyLineStateMaskTripleQuote);
+				styler.SetLevel(lineCurrent, skipLevel + 1);
+				const int lineState = styler.GetLineState(lineCurrent);
+				if ((lineState & PyLineStateMaskTripleQuote) == 0) {
+					break;
+				}
+			}
+
 			lineCurrent++;
+			statePrev = stateCurrent;
 			stateCurrent = FoldLineState(styler.GetLineState(lineCurrent));
 			continue;
 		}
@@ -954,23 +957,24 @@ void FoldPyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/
 			stateNext = FoldLineState(styler.GetLineState(lineNext));
 		}
 
+		int currentLevel = stateCurrent.indentCount;
 		int levelAfterBlank = stateNext.indentCount;
 		if (stateCurrent.Empty()) {
 			if (statePrev.TripleQuoted()) {
 				stateCurrent.indentCount = statePrev.indentCount;
-				lev = levelAfterBlank + SC_FOLDLEVELBASE;
+				currentLevel = levelAfterBlank;
 			}
-		} else{
-			if (stateNext.CloseBrace() && levelAfterBlank < stateCurrent.indentCount) {
-				levelAfterBlank = stateCurrent.indentCount;
+		} else {
+			if (stateNext.CloseBrace() && levelAfterBlank < currentLevel) {
+				levelAfterBlank = currentLevel;
 			}
-			if ((stateCurrent.indentCount < levelAfterBlank)) {
-				lev |= SC_FOLDLEVELHEADERFLAG;
-			} else if (stateCurrent.CloseBrace() && stateCurrent.indentCount < statePrev.indentCount) {
-				lev = statePrev.indentCount + SC_FOLDLEVELBASE;
+			if (stateCurrent.CloseBrace() && currentLevel < statePrev.indentCount) {
+				currentLevel = statePrev.indentCount;
+			} else if (currentLevel < levelAfterBlank) {
+				currentLevel |= SC_FOLDLEVELHEADERFLAG;
 			}
 		}
-		styler.SetLevel(lineCurrent, lev);
+		styler.SetLevel(lineCurrent, currentLevel + SC_FOLDLEVELBASE);
 		lineCurrent++;
 
 		if (lineCurrent < lineNext) {
