@@ -82,6 +82,7 @@ jobs:
         "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./matepath/src/VersionRev.h
 
     - name: Install v141_xp Toolset
+      continue-on-error: true
       run: |
         CALL "build\install_msvc.bat" v141_xp
 
@@ -205,6 +206,7 @@ jobs:
         "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./matepath/src/VersionRev.h
 
     - name: Install v141_xp Toolset
+      continue-on-error: true
       run: |
         CALL "build\install_msvc.bat" v141_xp
 
