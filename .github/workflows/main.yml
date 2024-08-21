@@ -82,19 +82,8 @@ jobs:
         "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./matepath/src/VersionRev.h
 
     - name: Install v141_xp Toolset
-      continue-on-error: true
-      shell: powershell
       run: |
-        Set-Location "C:\Program Files (x86)\Microsoft Visual Studio\Installer\"
-        $InstallPath = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise"
-        $WorkLoads = '--add Microsoft.VisualStudio.Component.WinXP'
-        $Arguments = ('/c', "vs_installer.exe", 'modify', '--installPath', "`"$InstallPath`"", $WorkLoads, '--quiet', '--norestart', '--nocache')
-        $process = Start-Process -FilePath cmd.exe -ArgumentList $Arguments -Wait -PassThru -WindowStyle Hidden
-        if ($process.ExitCode -eq 0) {
-            Write-Host "components have been successfully added"
-        } else {
-            Write-Host "components were not installed"
-        }
+        CALL "build\install_msvc.bat" v141_xp
 
     - name: MSVC x64 Release
       run: |
@@ -216,19 +205,8 @@ jobs:
         "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./matepath/src/VersionRev.h
 
     - name: Install v141_xp Toolset
-      continue-on-error: true
-      shell: powershell
       run: |
-        Set-Location "C:\Program Files (x86)\Microsoft Visual Studio\Installer\"
-        $InstallPath = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise"
-        $WorkLoads = '--add Microsoft.VisualStudio.Component.WinXP'
-        $Arguments = ('/c', "vs_installer.exe", 'modify', '--installPath', "`"$InstallPath`"", $WorkLoads, '--quiet', '--norestart', '--nocache')
-        $process = Start-Process -FilePath cmd.exe -ArgumentList $Arguments -Wait -PassThru -WindowStyle Hidden
-        if ($process.ExitCode -eq 0) {
-            Write-Host "components have been successfully added"
-        } else {
-            Write-Host "components were not installed"
-        }
+        CALL "build\install_msvc.bat" v141_xp
 
     - name: Install LLVM
       run: |
