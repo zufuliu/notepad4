@@ -49,6 +49,7 @@ enum class Command {
 	Set,
 	SetValue,
 	Escape,
+	DoubleQuote,
 	Argument,
 };
 
@@ -90,7 +91,7 @@ constexpr bool IsVariableEscapeChar(int ch, char quote, Command command) noexcep
 }
 
 constexpr bool IsStringStyle(int style) noexcept {
-	return style == SCE_BAT_STRINGDQ || style == SCE_BAT_STRINGNQ || style == SCE_BAT_STRINGSQ || style == SCE_BAT_STRINGBT;
+	return style == SCE_BAT_STRINGDQ || style == SCE_BAT_STRINGSQ || style == SCE_BAT_STRINGBT;
 }
 
 constexpr char GetStringQuote(int style) noexcept {
@@ -127,8 +128,8 @@ bool DetectBatchEscapeChar(StyleContext &sc, int &outerStyle, Command command) {
 		break;
 
 	case '\"':
-		// Inside the search pattern of FIND
-		if (sc.chNext == '"' && state == SCE_BAT_STRINGDQ) {
+		// Inside the search string of FIND
+		if (command == Command::DoubleQuote && sc.chNext == '"' && state == SCE_BAT_STRINGDQ) {
 			length = 1;
 		}
 		break;
@@ -334,7 +335,12 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 						parenBefore = parenCount;
 						sc.ChangeState(SCE_BAT_WORD);
 					} else if (logicalVisibleChars == sc.LengthCurrent()) {
-						command = StrEqualsAny(s, "findstr", "reg") ? Command::Escape : Command::Argument;
+						command = Command::Argument;
+						if (StrEqual(s, "find")) {
+							command = Command::DoubleQuote;
+						} else if (StrEqualsAny(s, "findstr", "reg")) {
+							command = Command::Escape;
+						}
 						parenBefore = parenCount;
 						sc.ChangeState(SCE_BAT_COMMAND);
 						if (sc.ch == ':') {
@@ -405,7 +411,6 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			break;
 
 		case SCE_BAT_STRINGDQ:
-		case SCE_BAT_STRINGNQ:
 		case SCE_BAT_STRINGSQ:
 		case SCE_BAT_STRINGBT:
 			if (DetectBatchEscapeChar(sc, outerStyle, command)) {
@@ -413,23 +418,17 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			} else if (sc.ch == '%' || sc.ch == '!') {
 				DetectBatchVariable(sc, outerStyle, varQuoteChar, command, parenCount);
 			} else if (sc.ch == '\"') {
-				int state = sc.state;
-				if (state == SCE_BAT_STRINGDQ) {
-					state = TryTakeAndPop(nestedState);
-					sc.Forward();
-					if ((command == Command::SetValue || command == Command::Argument || command == Command::Escape)
-						&& !IsStringArgumentEnd(sc.ch, state, parenCount)) {
-						state = SCE_BAT_STRINGNQ;
+				if (sc.state == SCE_BAT_STRINGDQ) {
+					const int state = TryGetBack(nestedState);
+					if (IsStringArgumentEnd(sc.chNext, state, parenCount)) {
+						TryPopBack(nestedState);
+						sc.Forward();
+						sc.SetState(state);
+						continue;
 					}
 				} else {
-					if (state != SCE_BAT_STRINGNQ) {
-						nestedState.push_back(state);
-					}
-					state = SCE_BAT_STRINGDQ;
-				}
-				sc.SetState(state);
-				if (state != SCE_BAT_STRINGDQ) {
-					continue;
+					nestedState.push_back(sc.state);
+					sc.SetState(SCE_BAT_STRINGDQ);
 				}
 			} else if (sc.state == SCE_BAT_STRINGDQ) {
 				if (IsBatchOperator(sc.ch, command)) {
@@ -438,12 +437,6 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					}
 					sc.SetState(SCE_BAT_OPERATOR);
 					sc.ForwardSetState(SCE_BAT_STRINGDQ);
-					continue;
-				}
-			} else if (sc.state == SCE_BAT_STRINGNQ) {
-				const int state = TryGetBack(nestedState);
-				if (IsStringArgumentEnd(sc.ch, state, parenCount)) {
-					sc.SetState(state);
 					continue;
 				}
 			} else if ((sc.state == SCE_BAT_STRINGSQ && sc.ch == '\'') || (sc.state == SCE_BAT_STRINGBT && sc.ch == '`')) {
@@ -603,7 +596,7 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				logicalVisibleChars = 0;
 			}
 			if (IsStringStyle(sc.state)) {
-				if (!lineContinuation && (sc.state == SCE_BAT_STRINGDQ || sc.state == SCE_BAT_STRINGNQ)) {
+				if (!lineContinuation && sc.state == SCE_BAT_STRINGDQ) {
 					const int state = TryTakeAndPop(nestedState);
 					sc.SetState(state);
 				}

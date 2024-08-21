@@ -114,7 +114,7 @@ static EDITSTYLE Styles_Batch[] = {
 	{ SCE_BAT_WORD, NP2StyleX_Keyword, L"bold; fore:#FF8000" },
 	{ SCE_BAT_COMMAND, NP2StyleX_Command, L"bold; fore:#0080FF" },
 	{ SCE_BAT_COMMENT, NP2StyleX_Comment, L"fore:#008000" },
-	{ MULTI_STYLE(SCE_BAT_STRINGDQ, SCE_BAT_STRINGNQ, 0, 0), NP2StyleX_DoubleQuotedString, L"fore:#008080" },
+	{ SCE_BAT_STRINGDQ, NP2StyleX_DoubleQuotedString, L"fore:#008080" },
 	{ SCE_BAT_STRINGSQ, NP2StyleX_SingleQuotedString, L"fore:#C08000" },
 	{ SCE_BAT_STRINGBT, NP2StyleX_Backticks, L"fore:#F08000" },
 	{ MULTI_STYLE(SCE_BAT_ESCAPECHAR, SCE_BAT_LINE_CONTINUATION, 0, 0), NP2StyleX_EscapeSequence, L"fore:#FF0000" },
