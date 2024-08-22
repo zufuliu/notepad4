@@ -1037,7 +1037,7 @@ static inline void ExitApplication(HWND hwnd) noexcept {
 void MsgDropFiles(HWND hwnd, UINT umsg, WPARAM wParam) {
 	UNREFERENCED_PARAMETER(umsg);
 	HDROP hDrop = AsPointer<HDROP>(wParam);
-	// fix drag & drop file from 32-bit app to 64-bit Notepad4 before Win 10
+	// fix drag & drop file from 32-bit app to 64-bit Notepad4 prior Win 10
 #if defined(_WIN64) && (_WIN32_WINNT < _WIN32_WINNT_WIN10)
 	if (umsg == WM_DROPFILES && !bReadOnlyMode) {
 		POINT pt;
@@ -1262,8 +1262,6 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 		// Reset Change Notify
 		//bPendingChangeNotify = false;
-
-		SetDlgItemInt(hwnd, IDC_REUSELOCK, GetTickCount(), FALSE);
 
 		if (pcds->dwData == DATA_NOTEPAD4_PARAMS) {
 			NP2PARAMS *params = static_cast<NP2PARAMS *>(NP2HeapAlloc(pcds->cbData));
@@ -1926,18 +1924,6 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 		nullptr);
 
 	SetDlgItemText(hwnd, IDC_FILENAME, szCurFile);
-
-	(void)CreateWindowEx(0,
-		WC_STATIC,
-		nullptr,
-		WS_CHILD | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
-		10, 10, 10, 10,
-		hwnd,
-		AsPointer<HMENU, ULONG_PTR>(IDC_REUSELOCK),
-		hInstance,
-		nullptr);
-
-	SetDlgItemInt(hwnd, IDC_REUSELOCK, GetTickCount(), FALSE);
 
 	// Drag & Drop
 #if 0//_WIN32_WINNT >= _WIN32_WINNT_WIN7
@@ -7232,7 +7218,6 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 	if (loadFlag & FileLoadFlag_New) {
 		StrCpyEx(szCurFile, L"");
 		SetDlgItemText(hwndMain, IDC_FILENAME, szCurFile);
-		SetDlgItemInt(hwndMain, IDC_REUSELOCK, GetTickCount(), FALSE);
 		if (!keepTitleExcerpt) {
 			StrCpyEx(szTitleExcerpt, L"");
 		}
@@ -7329,7 +7314,6 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 	if (fSuccess) {
 		lstrcpy(szCurFile, szFileName);
 		SetDlgItemText(hwndMain, IDC_FILENAME, szCurFile);
-		SetDlgItemInt(hwndMain, IDC_REUSELOCK, GetTickCount(), FALSE);
 		if (!keepTitleExcerpt) {
 			StrCpyEx(szTitleExcerpt, L"");
 		}
@@ -7536,7 +7520,6 @@ bool FileSave(FileSaveFlag saveFlag) noexcept {
 				if (!(saveFlag & FileSaveFlag_SaveCopy)) {
 					lstrcpy(szCurFile, tchFile);
 					SetDlgItemText(hwndMain, IDC_FILENAME, szCurFile);
-					SetDlgItemInt(hwndMain, IDC_REUSELOCK, GetTickCount(), FALSE);
 					if (!fKeepTitleExcerpt) {
 						StrCpyEx(szTitleExcerpt, L"");
 					}
@@ -7778,12 +7761,9 @@ static BOOL CALLBACK EnumWindProcReuseWindow(HWND hwnd, LPARAM lParam) noexcept 
 
 	if (GetClassName(hwnd, szClassName, COUNTOF(szClassName))) {
 		if (StrCaseEqual(szClassName, wchWndClass)) {
-			const DWORD dwReuseLock = GetDlgItemInt(hwnd, IDC_REUSELOCK, nullptr, FALSE);
-			if (GetTickCount() - dwReuseLock >= REUSEWINDOWLOCKTIMEOUT) {
-				*AsPointer<HWND *>(lParam) = hwnd;
-				if (IsWindowEnabled(hwnd)) {
-					bContinue = FALSE;
-				}
+			*AsPointer<HWND *>(lParam) = hwnd;
+			if (IsWindowEnabled(hwnd)) {
+				bContinue = FALSE;
 			}
 		}
 	}
@@ -7796,18 +7776,11 @@ static BOOL CALLBACK EnumWindProcSingleFileInstance(HWND hwnd, LPARAM lParam) no
 
 	if (GetClassName(hwnd, szClassName, COUNTOF(szClassName))) {
 		if (StrCaseEqual(szClassName, wchWndClass)) {
-			const DWORD dwReuseLock = GetDlgItemInt(hwnd, IDC_REUSELOCK, nullptr, FALSE);
-			if (GetTickCount() - dwReuseLock >= REUSEWINDOWLOCKTIMEOUT) {
+			WCHAR tchFileName[MAX_PATH];
+			if (GetDlgItemText(hwnd, IDC_FILENAME, tchFileName, COUNTOF(tchFileName)) && PathEquivalent(tchFileName, lpFileArg)) {
+				*AsPointer<HWND *>(lParam) = hwnd;
 				if (IsWindowEnabled(hwnd)) {
 					bContinue = FALSE;
-				}
-
-				WCHAR tchFileName[MAX_PATH] = L"";
-				GetDlgItemText(hwnd, IDC_FILENAME, tchFileName, COUNTOF(tchFileName));
-				if (PathEquivalent(tchFileName, lpFileArg)) {
-					*AsPointer<HWND *>(lParam) = hwnd;
-				} else {
-					bContinue = TRUE;
 				}
 			}
 		}

@@ -77,7 +77,6 @@ struct NP2PARAMS {
 #define IDC_EDIT			0xFB03
 #define IDC_EDITFRAME		0xFB04
 #define IDC_FILENAME		0xFB05
-#define IDC_REUSELOCK		0xFB06
 
 // submenu in popup menu, IDR_POPUPMENU
 #define IDP_POPUP_SUBMENU_EDIT	0
@@ -120,8 +119,6 @@ enum {
 #define ID_WATCHTIMER				0xA000	// file watch timer
 #define ID_PASTEBOARDTIMER			0xA001	// paste board timer
 #define ID_AUTOSAVETIMER			0xA002	// AutoSave timer
-
-#define REUSEWINDOWLOCKTIMEOUT		1000	// Reuse Window Lock Timeout
 
 enum EscFunction {
 	EscFunction_None = 0,
