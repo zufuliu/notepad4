@@ -135,10 +135,6 @@ constexpr int GetIndentChild(uint32_t lineState) noexcept {
 	return lineState >> 24;
 }
 
-constexpr bool IsMarkdownSpace(int ch) noexcept {
-	return IsSpaceOrTab(ch) || IsEOLChar(ch);
-}
-
 inline uint8_t GetCharAfterSpace(LexAccessor &styler, Sci_PositionU &startPos, int count) noexcept {
 	Sci_PositionU pos = startPos;
 	uint8_t ch = styler.SafeGetCharAt(pos);
@@ -351,7 +347,7 @@ int CheckATXHeading(LexAccessor &styler, Sci_PositionU pos) noexcept {
 		if (ch == '#') {
 			++level;
 		} else {
-			if (level <= 6 && IsMarkdownSpace(ch)) {
+			if (level <= 6 && IsASpace(ch)) {
 				return level;
 			}
 			break;
@@ -429,7 +425,7 @@ void MarkdownLexer::HighlightDelimiterRow() {
 			equal = true;
 			break;
 		default:
-			if (!IsMarkdownSpace(ch)) {
+			if (!IsASpace(ch)) {
 				if (sc.ch == ':' && (sc.chNext == ':' || IsSpaceOrTab(sc.chNext))) {
 					// Pandoc fenced divs
 					// Pandoc, MultiMarkdown, PHP Markdown Extra definition list
@@ -462,7 +458,7 @@ OrderedListType CheckOrderedList(LexAccessor &styler, Sci_PositionU pos, int cur
 	if (current == '#') { // Pandoc
 		if (chNext == '.') {
 			const uint8_t after = styler[pos + 2];
-			if (IsMarkdownSpace(after)) {
+			if (IsASpace(after)) {
 				return OrderedListType::NumberSign;
 			}
 		}
@@ -521,11 +517,11 @@ OrderedListType CheckOrderedList(LexAccessor &styler, Sci_PositionU pos, int cur
 
 	if ((chNext == '.' && current != '(') || chNext == ')') {
 		const uint8_t after = styler[++pos];
-		if (IsMarkdownSpace(after)) {
+		if (IsASpace(after)) {
 			if (type == OrderedListType::UpperAlpha && chNext == '.' && count == 1) {
 				// single uppercase letter ended with period requires at least two spaces.
 				// see https://pandoc.org/MANUAL.html#fn1
-				if (!(IsSpaceOrTab(after) && IsMarkdownSpace(styler[pos + 1]))) {
+				if (!(IsSpaceOrTab(after) && IsASpace(styler[pos + 1]))) {
 					return OrderedListType::None;
 				}
 			}
@@ -569,7 +565,7 @@ uint32_t MarkdownLexer::HighlightIndentedText(uint32_t lineState, int indentCoun
 	// prefer indented list item
 	if (indentCount == 4 && indentParent != 0) {
 		if (sc.ch == '+' || sc.ch == '-' || sc.ch == '*') {
-			if (IsMarkdownSpace(sc.chNext)) {
+			if (IsASpace(sc.chNext)) {
 				sc.SetState(SCE_MARKDOWN_BULLET_LIST);
 				return lineState;
 			}
@@ -956,7 +952,7 @@ SeekStatus MarkdownLexer::HighlightLinkDestination(uint32_t lineState) {
 			}
 		} else if (sc.state != SCE_MARKDOWN_LINK_TITLE_PAREN && !IsGraphic(sc.ch)) {
 			result = HighlightResult::Invalid;
-			if (IsMarkdownSpace(sc.ch)) {
+			if (IsASpace(sc.ch)) {
 				while (IsSpaceOrTab(sc.ch)) {
 					sc.Forward();
 				}
@@ -1394,7 +1390,7 @@ bool MarkdownLexer::IsParagraphEnd(Sci_PositionU pos, uint32_t lineState) const 
 		if (indentCount == 0 && ch > ' ' && (indentParent != 0 || (lineState & LineStateListItemFirstLine) != 0)) {
 			// check indented list item
 			if (ch == '+' || ch == '-' || ch == '*') {
-				return IsMarkdownSpace(chNext);
+				return IsASpace(chNext);
 			}
 			if (ch == ':' || ch == '~') { // definition list
 				return markdown == Markdown::Pandoc && IsSpaceOrTab(chNext) && CheckDefinitionList(pos, lineState);
@@ -1416,7 +1412,7 @@ bool MarkdownLexer::IsParagraphEnd(Sci_PositionU pos, uint32_t lineState) const 
 		return true;
 
 	case '#':
-		if (IsMarkdownSpace(chNext)) {
+		if (IsASpace(chNext)) {
 			return true;
 		}
 		if (chNext == '#') {
@@ -1449,7 +1445,7 @@ bool MarkdownLexer::IsParagraphEnd(Sci_PositionU pos, uint32_t lineState) const 
 			return true;
 		}
 		if (ch != '_') { // bullet list
-			return IsMarkdownSpace(chNext);
+			return IsASpace(chNext);
 		}
 		[[fallthrough]];
 	case '=':
@@ -1492,14 +1488,14 @@ int MarkdownLexer::HighlightBlockText(uint32_t lineState) {
 			sc.SetState(SCE_MARKDOWN_HRULE);
 			return 0;
 		}
-		if (sc.ch != '_' && IsMarkdownSpace(sc.chNext)) {
+		if (sc.ch != '_' && IsASpace(sc.chNext)) {
 			sc.SetState(SCE_MARKDOWN_BULLET_LIST);
 			return 0;
 		}
 		break;
 
 	case '#':
-		if (IsMarkdownSpace(sc.chNext)) {
+		if (IsASpace(sc.chNext)) {
 			sc.SetState(SCE_MARKDOWN_HEADER1);
 			return SCE_MARKDOWN_HEADER1;
 		}
@@ -1673,7 +1669,7 @@ void MarkdownLexer::HighlightInlineText() {
 		} else if (sc.ch == '[') {
 			if (current == SCE_MARKDOWN_DEFAULT && IsSpaceOrTab(sc.chPrev)
 				&& (sc.chNext == ' ' || sc.chNext == 'x' || sc.chNext == 'X')
-				&& sc.GetRelative(2) == ']' && IsMarkdownSpace(sc.GetRelative(3))) {
+				&& sc.GetRelative(2) == ']' && IsASpace(sc.GetRelative(3))) {
 				// task list after list marker
 				sc.SetState(SCE_MARKDOWN_TASK_LIST);
 				sc.Advance(2);

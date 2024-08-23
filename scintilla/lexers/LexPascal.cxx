@@ -328,7 +328,7 @@ void ClassifyPascalWordFoldPoint(const CharacterSet &setWord, int &levelCurrent,
 		bool ignoreKeyword = true;
 		Sci_Position j = lastStart - 1;
 		char ch = styler.SafeGetCharAt(j);
-		while ((j >= startPos) && (IsASpaceOrTab(ch) || ch == '\r' || ch == '\n' ||
+		while ((j >= startPos) && (IsASpace(ch) ||
 			IsStreamCommentStyle(styler.StyleAt(j)))) {
 			j--;
 			ch = styler.SafeGetCharAt(j);
