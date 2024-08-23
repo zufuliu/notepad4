@@ -69,6 +69,7 @@ enum class KeywordType {
 	Class = SCE_KOTLIN_CLASS,
 	Interface = SCE_KOTLIN_INTERFACE,
 	Enum = SCE_KOTLIN_ENUM,
+	Function = SCE_KOTLIN_FUNCTION_DEFINITION,
 	Return = 0x40,
 };
 
@@ -154,12 +155,14 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 							kwType = KeywordType::Label;
 						} else if (sc.ch == '@' && StrEqualsAny(s, "this", "super")) {
 							kwType = KeywordType::ThisSuper;
-						} else if (StrEqualsAny(s, "class", "typealias")) {
+						} else if (StrEqualsAny(s, "class", "typealias", "throw", "is", "as")) {
 							if (kwType != KeywordType::Annotation && kwType != KeywordType::Enum) {
 								kwType = KeywordType::Class;
 							}
 						} else if (StrEqual(s, "enum")) {
 							kwType = KeywordType::Enum;
+						} else if (StrEqual(s, "fun")) {
+							kwType = KeywordType::Function;
 						} else if (StrEqual(s, "annotation")) {
 							kwType = KeywordType::Annotation;
 						} else if (StrEqual(s, "interface")) {
@@ -169,7 +172,7 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 						}
 						if (kwType > KeywordType::ThisSuper && kwType < KeywordType::Return) {
 							const int chNext = sc.GetDocNextChar();
-							if (!IsIdentifierStartEx(chNext)) {
+							if (chNext != '?' && !IsIdentifierStartEx(chNext)) {
 								kwType = KeywordType::None;
 							}
 						}
@@ -182,8 +185,13 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 						sc.ChangeState(SCE_KOTLIN_INTERFACE);
 					} else if (keywordLists[KeywordIndex_Enumeration].InList(s)) {
 						sc.ChangeState(SCE_KOTLIN_ENUM);
-					} else if (escSeq.outerState == SCE_KOTLIN_DEFAULT && sc.ch != '.') {
-						if (kwType > KeywordType::None && kwType < KeywordType::Return) {
+					} else if (escSeq.outerState == SCE_KOTLIN_DEFAULT) {
+						if (sc.ch == '.') {
+							if (kwType == KeywordType::Function) {
+								// extension function
+								sc.ChangeState(SCE_KOTLIN_CLASS);
+							}
+						} else if (kwType > KeywordType::None && kwType < KeywordType::Return) {
 							sc.ChangeState(static_cast<int>(kwType));
 						} else {
 							const int chNext = sc.GetDocNextChar(sc.ch == '?');
@@ -335,7 +343,7 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 				}
 			} else if (sc.ch == '\'') {
 				sc.SetState(SCE_KOTLIN_CHARACTER);
-			} else if (IsNumberStart(sc.ch, sc.chNext)) {
+			} else if (IsNumberStartEx(sc.chPrev, sc.ch, sc.chNext)) {
 				sc.SetState(SCE_KOTLIN_NUMBER);
 			} else if (sc.ch == '@' && IsIdentifierStartEx(sc.chNext)) {
 				int state;

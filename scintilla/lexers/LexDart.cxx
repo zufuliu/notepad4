@@ -83,7 +83,7 @@ constexpr bool IsDartIdentifierChar(int ch) noexcept {
 	return IsIdentifierChar(ch) || ch == '$';
 }
 
-constexpr bool IsDeclarableOperator(int ch) noexcept {
+constexpr bool IsDefinableOperator(int ch) noexcept {
 	// https://github.com/dart-lang/sdk/blob/main/sdk/lib/core/symbol.dart
 	return AnyOf(ch, '+', '-', '*', '/', '%', '~', '&', '|',
 					 '^', '<', '>', '=', '[', ']');
@@ -206,7 +206,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 						sc.ChangeState(SCE_DART_ENUM);
 					} else if (state == SCE_DART_IDENTIFIER && sc.ch == ':') {
 						if (chBefore == ',' || chBefore == '{' || chBefore == '(') {
-							sc.ChangeState(SCE_DART_KEY); // map key or named parameter
+							sc.ChangeState(SCE_DART_KEY); // map key, record field or named parameter
 						} else if (IsJumpLabelPrevChar(chBefore)) {
 							sc.ChangeState(SCE_DART_LABEL);
 						}
@@ -251,7 +251,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			break;
 
 		case SCE_DART_SYMBOL_OPERATOR:
-			if (!IsDeclarableOperator(sc.ch)) {
+			if (!IsDefinableOperator(sc.ch)) {
 				sc.SetState(SCE_DART_DEFAULT);
 			}
 			break;
@@ -384,7 +384,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					chBeforeIdentifier = chPrevNonWhite;
 				}
 				sc.SetState(SCE_DART_IDENTIFIER);
-			} else if (sc.ch == '#' && IsDeclarableOperator(sc.chNext)) {
+			} else if (sc.ch == '#' && IsDefinableOperator(sc.chNext)) {
 				sc.SetState(SCE_DART_SYMBOL_OPERATOR);
 			} else if (IsAGraphic(sc.ch)) {
 				sc.SetState(SCE_DART_OPERATOR);
