@@ -359,7 +359,7 @@ bool PHPLexer::ClassifyPHPWord(LexerWordList keywordLists, int visibleChars) {
 			return true;
 		}
 	} else {
-		char s[128];
+		char s[64];
 		sc.GetCurrent(s, sizeof(s));
 		// variable, constant and enum name is case-sensitive
 		if (sc.state == SCE_PHP_VARIABLE) {

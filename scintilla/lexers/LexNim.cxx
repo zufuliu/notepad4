@@ -186,7 +186,7 @@ void ColouriseNimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 
 		case SCE_NIM_IDENTIFIER:
 			if (!IsIdentifierCharEx(sc.ch)) {
-				char s[128];
+				char s[64];
 				sc.GetCurrent(s, sizeof(s));
 				if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 					sc.ChangeState(SCE_NIM_WORD);

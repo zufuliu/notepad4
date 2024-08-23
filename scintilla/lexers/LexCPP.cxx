@@ -204,12 +204,12 @@ void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 
 		case SCE_C_IDENTIFIER:
 			if (!iswordstart(sc.ch)) {
-				char s[256];
+				char s[64];
 				sc.GetCurrent(s, sizeof(s));
 
 				//int len = static_cast<int>(strlen(s));
 				//bool pps = (len > 4 && s[0] == '_' && s[1] == '_' && s[len - 1] == '_' && s[len - 2] == '_');
-				//char tu[256]{};
+				//char tu[64]{};
 				//if (pps)
 				//	strncpy(tu, s + 2, len - 4);
 				// __attribute__()

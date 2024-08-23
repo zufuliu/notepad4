@@ -142,7 +142,7 @@ void ColouriseHaxeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 						continue;
 					}
 				} else if (sc.state == SCE_HAXE_IDENTIFIER) {
-					char s[128];
+					char s[64];
 					sc.GetCurrent(s, sizeof(s));
 					if (s[0] == '#') {
 						if (keywordLists[KeywordIndex_Preprocessor].InList(s + 1)) {

@@ -107,7 +107,7 @@ void ColouriseAsyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 
 		case SCE_ASY_IDENTIFIER:
 			if (!IsIdentifierChar(sc.ch)) {
-				char s[128];
+				char s[64];
 				sc.GetCurrent(s, sizeof(s));
 				if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 					sc.ChangeState(SCE_ASY_WORD);

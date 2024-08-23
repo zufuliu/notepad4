@@ -242,7 +242,7 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					continue;
 				}
 				if (sc.state == SCE_JULIA_IDENTIFIER) {
-					char s[128];
+					char s[64];
 					sc.GetCurrent(s, sizeof(s));
 					if (sc.ch == '\"' && StrEqual(s, "raw")) {
 						sc.ChangeState(SCE_JULIA_RAWSTRING);

@@ -290,7 +290,7 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 
 		case SCE_GO_IDENTIFIER:
 			if (!IsIdentifierCharEx(sc.ch)) {
-				char s[128];
+				char s[64];
 				sc.GetCurrent(s, sizeof(s));
 				const KeywordType kwPrev = kwType;
 				if (keywordLists[KeywordIndex_Keyword].InList(s)) {

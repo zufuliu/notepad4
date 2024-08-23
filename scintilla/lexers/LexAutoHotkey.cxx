@@ -79,7 +79,7 @@ constexpr int Digit(unsigned char ch, unsigned char chNext) noexcept {
 	return Digit(ch)*10 + Digit(chNext);
 }
 
-inline bool IsSpecialKey(const char (&buffer)[128], size_t length) noexcept {
+inline bool IsSpecialKey(const char (&buffer)[64], size_t length) noexcept {
 	switch (length) {
 	case 2: // F1 - F9
 		if (buffer[0] == 'f' && Between(buffer[1], '1', '9')) {
@@ -135,7 +135,7 @@ inline bool IsSectionOptionStart(const StyleContext &sc) noexcept {
 	return IsSectionOptionStart(chNext);
 }
 
-constexpr bool IsSectionCommentOption(const char (&buffer)[128], size_t length) noexcept {
+constexpr bool IsSectionCommentOption(const char (&buffer)[64], size_t length) noexcept {
 	constexpr size_t comment = CStrLen("comments");
 	return length <= comment && __builtin_memcmp(buffer, "comments", length) == 0;
 }
@@ -340,7 +340,7 @@ void ColouriseAHKDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 					continue;
 				}
 
-				char s[128];
+				char s[64];
 				sc.GetCurrentLowered(s, sizeof(s));
 				if (sc.state == SCE_AHK_IDENTIFIER) {
 					const int chNext = sc.GetLineNextChar();

@@ -160,7 +160,7 @@ void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 		case SCE_CSS_PSEUDOELEMENT:
 			if (!IsCssIdentifierChar(sc.ch)) {
 				if (sc.state >= SCE_CSS_IDENTIFIER || (sc.state == SCE_CSS_AT_RULE && preprocessor == Preprocessor::Less)) {
-					char s[128];
+					char s[64];
 					sc.GetCurrentLowered(s, sizeof(s));
 					switch (sc.state) {
 					case SCE_CSS_IDENTIFIER: {

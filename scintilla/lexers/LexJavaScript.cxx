@@ -209,7 +209,7 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 			}
 			if (!IsJsIdentifierChar(sc.ch) && !sc.Match('\\', 'u') && !(sc.ch == '-' && (sc.state == SCE_JSX_TAG || sc.state == SCE_JSX_ATTRIBUTE))) {
 				if (sc.state == SCE_JS_IDENTIFIER) {
-					char s[128];
+					char s[64];
 					sc.GetCurrent(s, sizeof(s));
 					if (keywordLists[KeywordIndex_Directive].InList(s)) {
 						sc.ChangeState(SCE_JS_DIRECTIVE);

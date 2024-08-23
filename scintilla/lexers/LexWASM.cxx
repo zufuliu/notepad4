@@ -95,7 +95,7 @@ void ColouriseWASMDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			if (prefixLen == 0 && sc.ch == '.') {
 				prefixLen = sc.LengthCurrent();
 			} else if (IsInvalidIdChar(sc.ch)) {
-				char s[128];
+				char s[64];
 				sc.GetCurrent(s, sizeof(s));
 				if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 					sc.ChangeState(SCE_WASM_KEYWORD);

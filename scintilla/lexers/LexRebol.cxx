@@ -196,7 +196,7 @@ void ColouriseRebolDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				} else if (sc.ch == ':') {
 					sc.ChangeState(SCE_REBOL_PROPERTY);
 				} else {
-					char s[128];
+					char s[64];
 					sc.GetCurrentLowered(s, sizeof(s));
 					const int chNext = sc.GetLineNextChar();
 					if (keywordLists[KeywordIndex_Keyword].InList(s)) {
@@ -226,7 +226,7 @@ void ColouriseRebolDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 		case SCE_REBOL_ISSUE:
 			if (!(sc.ch == '/' || IsRebolIdentifierChar(sc.ch))) {
 				if (sc.state == SCE_REBOL_ISSUE) {
-					char s[128];
+					char s[64];
 					sc.GetCurrentLowered(s, sizeof(s));
 					const char *p = s + 1;
 					if (keywordLists[KeywordIndex_Directive].InList(p)) {

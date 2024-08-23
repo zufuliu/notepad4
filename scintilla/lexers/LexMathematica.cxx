@@ -72,7 +72,7 @@ void ColouriseMathematicaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int
 		case SCE_MATHEMATICA_SLOT:
 			if (!IsIdentifierChar(sc.ch)) {
 				if (sc.state == SCE_MATHEMATICA_IDENTIFIER) {
-					char s[128];
+					char s[64];
 					sc.GetCurrent(s, sizeof(s));
 					if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 						sc.ChangeState(SCE_MATHEMATICA_KEYWORD);

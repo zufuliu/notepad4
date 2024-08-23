@@ -109,7 +109,7 @@ void ColouriseVimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 
 		case SCE_VIM_IDENTIFIER:
 			if (!IsIdentifierChar(sc.ch)) {
-				char s[128];
+				char s[64];
 				const KeywordType kwPrev = kwType;
 				kwType = KeywordType::None;
 				sc.GetCurrent(s, sizeof(s));

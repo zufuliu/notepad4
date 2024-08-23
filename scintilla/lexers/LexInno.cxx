@@ -190,7 +190,7 @@ void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		case SCE_INNO_IDENTIFIER:
 			if (!IsIdentifierChar(sc.ch)) {
 				if (sc.state != SCE_INNO_NUMBER) {
-					char s[128];
+					char s[64];
 					sc.GetCurrentLowered(s, sizeof(s));
 					if (ppKind == PreprocessorKind::Init) {
 						if (sc.state == SCE_INNO_IDENTIFIER) {

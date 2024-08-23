@@ -107,7 +107,7 @@ void ColouriseHaskellDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int ini
 		case SCE_HA_PREPROCESSOR:
 			if (!IsHaskellIdentifierChar(sc.ch)) {
 				if (sc.state == SCE_HA_IDENTIFIER) {
-					char s[128];
+					char s[64];
 					sc.GetCurrent(s, sizeof(s));
 					if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 						sc.ChangeState(SCE_HA_KEYWORD);

@@ -72,7 +72,7 @@ bool GetSendKey(const char *szLine, char *szKey) noexcept {
 	bool nSpecNum = true;
 	unsigned nPos = 0;
 	char cTemp;
-	char szSpecial[128];
+	char szSpecial[64];
 
 	// split the portion of the sendkey in the part before and after the spaces
 	while ((cTemp = szLine[nPos++]) != '\0') {
@@ -158,21 +158,21 @@ void ColouriseAU3Doc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 	char si;	// string indicator "=1 '=2
 	char ni;	// Numeric indicator error=9 normal=0 normal+dec=1 hex=2 Enot=3
 	char ci;	// comment indicator 0=not linecomment(;)
-	char s_save[128] = "";
+	char s_save[64] = "";
 	si = 0;
 	ni = 0;
 	ci = 0;
 	//$$$
 	for (; sc.More(); sc.Forward()) {
-		char s[128];
+		char s[64];
 		sc.GetCurrentLowered(s, sizeof(s));
 		// **********************************************
 		// save the total current word for eof processing
 		if (IsAu3WordChar(sc.ch) || sc.ch == '}') {
-			const size_t tp = strlen(s);
+			const size_t tp = sci::min<size_t>(sizeof(s) - 1, sc.LengthCurrent());
 			memcpy(s_save, s, tp);
 			s_save[tp] = '\0';
-			if (tp < 127) {
+			if (tp < sizeof(s_save) -  1) {
 				s_save[tp] = static_cast<char>(MakeLowerCase(sc.ch));
 				s_save[tp + 1] = '\0';
 			}
@@ -378,7 +378,7 @@ void ColouriseAU3Doc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 			// Send key string ended
 			if (sc.chPrev == '}' && sc.ch != '}') {
 				// set color to SENDKEY when valid sendkey .. else set back to regular string
-				char sk[128] = "";
+				char sk[64] = "";
 				// split {111 222} and return {111} and check if 222 is valid.
 				// if return code = 1 then invalid 222 so must be string
 				if (GetSendKey(s, sk)) {
@@ -516,7 +516,7 @@ void ColouriseAU3Doc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 		// Send key string ended
 		if (sc.chPrev == '}' && sc.ch != '}') {
 			// set color to SENDKEY when valid sendkey .. else set back to regular string
-			char sk[128] = "";
+			char sk[64] = "";
 			// split {111 222} and return {111} and check if 222 is valid.
 			// if return code = 1 then invalid 222 so must be string
 			if (GetSendKey(s_save, sk)) {

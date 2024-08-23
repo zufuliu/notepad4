@@ -152,9 +152,9 @@ void ColouriseTCLDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyl
 		} else if (isComment(sc.state)) {
 		} else if (!IsAWordChar(sc.ch)) {
 			if ((sc.state == SCE_TCL_IDENTIFIER && expected) || sc.state == SCE_TCL_MODIFIER) {
-				char w[100];
+				char w[64];
 				sc.GetCurrent(w, sizeof(w));
-				size_t len = strlen(w);
+				size_t len = sci::min<size_t>(sizeof(w) - 1, sc.LengthCurrent());
 				char *s = w + len - 1;
 				if (*s == '\r') {
 					*s = '\0';

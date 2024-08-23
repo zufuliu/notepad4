@@ -129,7 +129,7 @@ void ColouriseLLVMDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					state = CheckLLVMVarType(sc, kwType);
 					kwType = KeywordType::None;
 				} else if (sc.state == SCE_LLVM_IDENTIFIER) {
-					char s[128];
+					char s[64];
 					sc.GetCurrent(s, sizeof(s));
 					kwType = KeywordType::None;
 					if (keywordLists[KeywordIndex_Keyword].InList(s)) {

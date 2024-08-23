@@ -195,7 +195,7 @@ void ColouriseGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 						continue;
 					}
 				} else if (sc.state == SCE_GROOVY_IDENTIFIER) {
-					char s[128];
+					char s[64];
 					sc.GetCurrent(s, sizeof(s));
 					if (s[0] == '@') {
 						if (StrEqual(s, "@interface")) {

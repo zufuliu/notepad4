@@ -75,7 +75,7 @@ void ColouriseGNDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 
 		case SCE_GN_IDENTIFIER:
 			if (!IsIdentifierChar(sc.ch)) {
-				char s[128];
+				char s[64];
 				sc.GetCurrent(s, sizeof(s));
 				if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 					sc.ChangeState(SCE_GN_KEYWORD);

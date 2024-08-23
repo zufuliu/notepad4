@@ -123,7 +123,7 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 				if (sc.ch == ']') { // bracketed [keyword] identifier
 					sc.Forward();
 				}
-				char s[128];
+				char s[64];
 				sc.GetCurrentLowered(s, sizeof(s));
 				const Sci_Position len = sc.LengthCurrent();
 				if (skipType) {

@@ -68,7 +68,7 @@ enum {
 // Additional beginning whitespace (beyond what preceded the
 // delimiter) will be preserved.
 
-#define HERE_DELIM_MAX 256		// maximum length of HERE doc delimiter
+#define HERE_DELIM_MAX 64		// maximum length of HERE doc delimiter
 
 #define PERLNUM_BINARY		1	// order is significant: 1-3 cannot have a dot
 #define PERLNUM_OCTAL		2
@@ -92,7 +92,7 @@ enum {
 bool isPerlKeyword(LexAccessor &styler, Sci_PositionU start, Sci_PositionU end, const WordList &keywords) noexcept {
 	// old-style keyword matcher; needed because GetCurrent() needs
 	// current segment to be committed, but we may abandon early...
-	char s[128];
+	char s[64];
 	styler.GetRange(start, end, s, sizeof(s));
 	return keywords.InList(s);
 }
@@ -673,7 +673,7 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 			break;
 		case SCE_PL_WORD:		// keyword, plus special cases
 			if (!IsIdentifierCharEx(sc.ch)) {
-				char s[100];
+				char s[12];
 				sc.GetCurrent(s, sizeof(s));
 				if (StrEqualsAny(s, "__DATA__", "__END__")) {
 					sc.ChangeState(SCE_PL_DATASECTION);

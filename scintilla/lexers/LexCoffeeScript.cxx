@@ -164,7 +164,7 @@ void ColouriseCoffeeScriptDoc(Sci_PositionU startPos, Sci_Position lengthDoc, in
 		case SCE_COFFEESCRIPT_PROPERTY_AT:
 			if (!IsJsIdentifierChar(sc.ch)) {
 				if (sc.state == SCE_COFFEESCRIPT_IDENTIFIER) {
-					char s[128];
+					char s[64];
 					sc.GetCurrent(s, sizeof(s));
 					if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 						sc.ChangeState(SCE_COFFEESCRIPT_WORD);

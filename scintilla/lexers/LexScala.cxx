@@ -167,7 +167,7 @@ void ColouriseScalaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			}
 			if (!IsScalaIdentifierChar(sc.ch) && !(sc.ch == '-' && (sc.state == SCE_SCALA_XML_TAG || sc.state == SCE_SCALA_XML_ATTRIBUTE))) {
 				if (sc.state == SCE_SCALA_IDENTIFIER) {
-					char s[128];
+					char s[64];
 					sc.GetCurrent(s, sizeof(s));
 					if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 						sc.ChangeState(SCE_SCALA_WORD);

@@ -289,7 +289,7 @@ void ColouriseVerilogDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int ini
 				const int chNext = sc.GetDocNextChar();
 				const KeywordType prevWord = kwType;
 				kwType = KeywordType::None;
-				char s[128];
+				char s[64];
 				sc.GetCurrent(s, sizeof(s));
 				switch (sc.state) {
 				case SCE_V_SYSTEM_TASK:

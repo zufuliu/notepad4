@@ -219,7 +219,7 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 						sc.ChangeState(SCE_RUST_MACRO);
 						sc.Forward();
 					} else {
-						char s[128];
+						char s[64];
 						sc.GetCurrent(s, sizeof(s));
 						if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 							sc.ChangeState(SCE_RUST_WORD);

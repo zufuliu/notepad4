@@ -79,7 +79,7 @@ void ColouriseAPDLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					}
 				}
 				if (sc.state == SCE_APDL_IDENTIFIER || sc.state == SCE_APDL_STARCOMMAND) {
-					char s[128];
+					char s[64];
 					sc.GetCurrentLowered(s, sizeof(s));
 					if (sc.state == SCE_APDL_STARCOMMAND) {
 						if (keywordLists[KeywordIndex_CodeFolding].InList(s + 1)) {

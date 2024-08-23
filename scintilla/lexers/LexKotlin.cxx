@@ -141,7 +141,7 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 						continue;
 					}
 				} else if (sc.state == SCE_KOTLIN_IDENTIFIER) {
-					char s[128];
+					char s[64];
 					sc.GetCurrent(s, sizeof(s));
 					if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 						sc.ChangeState(SCE_KOTLIN_WORD);

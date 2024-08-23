@@ -182,7 +182,7 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 						sc.Forward();
 					}
 				} else if (sc.state == SCE_SWIFT_IDENTIFIER || sc.state == SCE_SWIFT_DIRECTIVE) {
-					char s[128];
+					char s[64];
 					sc.GetCurrent(s, sizeof(s));
 					if (sc.state == SCE_SWIFT_DIRECTIVE) {
 						if (!keywordLists[KeywordIndex_Directive].InListPrefixed(s + 1, '(')) {

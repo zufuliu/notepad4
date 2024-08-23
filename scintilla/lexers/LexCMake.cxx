@@ -135,7 +135,7 @@ void ColouriseCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				if (chNext == '(') {
 					// command, function and macro are case insensitive
 					// see Command Invocations: space* identifier space* '(' arguments ')'
-					char s[128];
+					char s[64];
 					sc.GetCurrentLowered(s, sizeof(s));
 					kwType = KeywordType::None;
 					if (keywordLists[KeywordIndex_Keyword].InListPrefixed(s, '(')) {
@@ -155,7 +155,7 @@ void ColouriseCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					kwType = KeywordType::None;
 				} else if (IsUpperCase(chIdentifierStart)) {
 					// case sensitive
-					char s[128];
+					char s[64];
 					sc.GetCurrent(s, sizeof(s));
 					if (keywordLists[KeywordIndex_Parameter].InList(s)) {
 						sc.ChangeState(SCE_CMAKE_PARAMETERS);

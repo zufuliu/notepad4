@@ -258,7 +258,7 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 		case SCE_CSHARP_IDENTIFIER:
 		case SCE_CSHARP_PREPROCESSOR:
 			if (!IsCsIdentifierChar(sc.ch, sc.chNext)) {
-				char s[128];
+				char s[64];
 				sc.GetCurrent(s, sizeof(s));
 				switch (ppKind) {
 				case PreprocessorKind::None:

@@ -54,7 +54,7 @@ void ColouriseSASDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 		case SCE_SAS_MACRO:
 		case SCE_SAS_IDENTIFIER:
 			if (!IsIdentifierChar(sc.ch)) {
-				char s[128];
+				char s[64];
 				sc.GetCurrentLowered(s, sizeof(s));
 				if (sc.state == SCE_SAS_MACRO) {
 					if (keywordLists[KeywordIndex_Macro].InListPrefixed(s + 1, '(')) {

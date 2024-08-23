@@ -199,7 +199,7 @@ void ColouriseRDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 		case SCE_R_IDENTIFIER:
 			if (!IsIdentifierCharEx(sc.ch)) {
 				if (sc.ch != '.' && chBeforeIdentifier != '.') {
-					char s[128];
+					char s[64];
 					sc.GetCurrent(s, sizeof(s));
 					if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 						sc.ChangeState(SCE_R_KEYWORD);

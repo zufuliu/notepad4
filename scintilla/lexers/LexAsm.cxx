@@ -106,7 +106,7 @@ void ColouriseAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 			}
 		} else if (sc.state == SCE_ASM_IDENTIFIER) {
 			if (!IsAsmWordChar(sc.ch)) {
-				char s[128];
+				char s[64];
 				sc.GetCurrentLowered(s, sizeof(s));
 				bool IsDirective = false;
 
@@ -265,7 +265,7 @@ void ColouriseAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 				} else if (IsAsmWordStart(sc.chNext)) {
 					sc.SetState(SCE_ASM_IDENTIFIER);
 				} else {
-					char pp[128];
+					char pp[64];
 					const Sci_Position pos = LexSkipSpaceTab(styler, sc.currentPos + 1, endPos);
 					const Sci_PositionU len = LexGetRange(styler, pos, iswordstart, pp, sizeof(pp));
 					if (kwProprocessor.InList(pp)) {

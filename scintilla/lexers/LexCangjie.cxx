@@ -151,7 +151,7 @@ void ColouriseCangjieDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int ini
 						sc.Forward();
 					}
 				} else if (sc.state != SCE_CANGJIE_VARIABLE) {
-					char s[128];
+					char s[64];
 					sc.GetCurrent(s, sizeof(s));
 					if (sc.state == SCE_CANGJIE_MACRO) {
 						// TODO: prefer annotation when next line is class definition

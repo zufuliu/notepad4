@@ -98,7 +98,7 @@ void ColouriseVHDLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		case SCE_VHDL_IDENTIFIER:
 			if (!IsIdentifierCharEx(sc.ch)) {
 				if (sc.state == SCE_VHDL_IDENTIFIER) {
-					char s[128];
+					char s[64];
 					sc.GetCurrentLowered(s, sizeof(s));
 					const KeywordType prevWord = kwType;
 					kwType = KeywordType::None;

@@ -115,7 +115,7 @@ void ColouriseSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 		case SCE_SQL_IDENTIFIER:
 			if (!IsSqlWordChar(sc.ch, sqlAllowDottedWord)) {
 				constexpr int nextState = SCE_SQL_DEFAULT;
-				char s[128];
+				char s[64];
 				const int chNext = sc.GetDocNextChar();
 				sc.GetCurrentLowered(s, sizeof(s));
 				if (keywordLists[KeywordIndex_Keyword].InList(s)) {

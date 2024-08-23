@@ -148,7 +148,7 @@ bool classifyAttribHTML(script_mode inScriptType, Sci_PositionU start, Sci_Posit
 	if (IsNumberChar(styler[start])) {
 		chAttr = SCE_H_NUMBER;
 	} else {
-		char s[128];
+		char s[64];
 		styler.GetRangeLowered(start, end, s, sizeof(s));
 		if (keywords.InList(s) || keywordsEvent.InList(s))
 			chAttr = SCE_H_ATTRIBUTE;
@@ -178,7 +178,9 @@ bool isHTMLCustomElement(const char *tag, size_t length, bool dashColon) noexcep
 
 int classifyTagHTML(Sci_PositionU start, Sci_PositionU end, const WordList &keywords, LexAccessor &styler, bool &tagDontFold,
 	bool isXml, bool allowScripts) {
-	char withSpace[126 + 2] = " ";
+	char withSpace[126 + 2];
+	withSpace[0] = ' ';
+	withSpace[1] = '\0';
 	const char *tag = withSpace + 1;
 	// Copy after the '<' and stop before space
 	Sci_PositionU i = 1;
@@ -249,7 +251,7 @@ int classifyTagHTML(Sci_PositionU start, Sci_PositionU end, const WordList &keyw
 }
 
 void classifyWordHTJS(Sci_PositionU start, Sci_PositionU end, const WordList &keywords, LexAccessor &styler, script_mode inScriptType) {
-	char s[127 + 1];
+	char s[63 + 1];
 	styler.GetRange(start, end, s, sizeof(s));
 	int chAttr = SCE_HJ_WORD;
 	if (keywords.InList(s)) {
@@ -260,7 +262,7 @@ void classifyWordHTJS(Sci_PositionU start, Sci_PositionU end, const WordList &ke
 
 int classifyWordHTVB(Sci_PositionU start, Sci_PositionU end, const WordList &keywords, LexAccessor &styler, script_mode inScriptType) {
 	int chAttr = SCE_HB_IDENTIFIER;
-	char s[128];
+	char s[64];
 	styler.GetRangeLowered(start, end, s, sizeof(s));
 	if (keywords.InList(s)) {
 		chAttr = SCE_HB_WORD;

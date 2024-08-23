@@ -94,7 +94,7 @@ void ColouriseAvsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 
 		case SCE_AVS_IDENTIFIER:
 			if (!IsIdentifierChar(sc.ch)) {
-				char s[128];
+				char s[64];
 				sc.GetCurrentLowered(s, sizeof(s));
 				scriptEval = ScriptEvalState::None;
 				if (keywordLists[KeywordIndex_Keyword].InList(s)) {

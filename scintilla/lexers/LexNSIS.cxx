@@ -80,7 +80,7 @@ void ColouriseNSISDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 		case SCE_NSIS_IDENTIFIER:
 			if (!IsIdentifierChar(sc.ch)) {
-				char s[128];
+				char s[64];
 				sc.GetCurrentLowered(s, sizeof(s));
 				if (s[0] == '!') {
 					sc.ChangeState(SCE_NSIS_PREPROCESSOR);

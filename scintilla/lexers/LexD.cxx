@@ -346,7 +346,7 @@ void ColouriseDDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 		case SCE_D_ATTRIBUTE:
 			if (!IsIdentifierCharEx(sc.ch)) {
 				if (sc.state == SCE_D_IDENTIFIER) {
-					char s[128];
+					char s[64];
 					sc.GetCurrent(s, sizeof(s));
 					if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 						sc.ChangeState(SCE_D_WORD);

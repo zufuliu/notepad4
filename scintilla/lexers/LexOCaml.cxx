@@ -183,7 +183,7 @@ void ColouriseOCamlDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 		case SCE_OCAML_ATTRIBUTE:
 			if (!IsOCamlIdentifierChar(sc.ch)) {
 				if (sc.state == SCE_OCAML_IDENTIFIER) {
-					char s[128];
+					char s[64];
 					sc.GetCurrent(s, sizeof(s));
 					if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 						sc.ChangeState(SCE_OCAML_KEYWORD);

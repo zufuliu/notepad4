@@ -603,9 +603,7 @@ bool sureThisIsNotHeredoc(Sci_Position lt2StartPos, LexAccessor &styler) {
 	// Just look at the start of each line
 	Sci_Line last_line = styler.GetLine(lengthDoc - 1);
 	// But don't go too far
-	if (last_line > lineStart + 50) {
-		last_line = lineStart + 50;
-	}
+	last_line = sci::min(last_line, lineStart + 50);
 	for (Sci_Line line_num = lineStart + 1; line_num <= last_line; line_num++) {
 		j = styler.LineStart(line_num);
 		if (allow_indent) {
@@ -688,7 +686,7 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 		bool Quoted = false;		// true if Quote in ('\'','"','`')
 		bool CanBeIndented = false;
 		unsigned DelimiterLength = 0;	// strlen(Delimiter)
-		char Delimiter[256] {};	// the Delimiter, limit of 256: from Perl
+		char Delimiter[64] {};	// the Delimiter, limit of 256: from Perl
 	};
 	HereDocCls HereDoc;
 

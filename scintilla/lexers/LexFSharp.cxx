@@ -220,7 +220,7 @@ void ColouriseFSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 		case SCE_FSHARP_PREPROCESSOR:
 			if (!IsFSharpIdentifierChar(sc.ch)) {
 				if (sc.state == SCE_FSHARP_IDENTIFIER) {
-					char s[128];
+					char s[64];
 					sc.GetCurrent(s, sizeof(s));
 					if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 						sc.ChangeState(SCE_FSHARP_KEYWORD);

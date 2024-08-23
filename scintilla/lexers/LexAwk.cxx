@@ -240,7 +240,7 @@ void ColouriseAwkDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 		case SCE_AWK_IDENTIFIER:
 			if (!IsIdentifierChar(sc.ch)) {
 				if (sc.state == SCE_AWK_IDENTIFIER) {
-					char s[128];
+					char s[64];
 					sc.GetCurrent(s, sizeof(s));
 					if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 						sc.ChangeState(SCE_AWK_WORD);
