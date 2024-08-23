@@ -75,7 +75,6 @@ struct NP2PARAMS {
 #define IDC_TOOLBAR			0xFB01
 #define IDC_REBAR			0xFB02
 #define IDC_EDIT			0xFB03
-#define IDC_EDITFRAME		0xFB04
 #define IDC_FILENAME		0xFB05
 
 // submenu in popup menu, IDR_POPUPMENU
