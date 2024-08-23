@@ -67,6 +67,7 @@ def BuildKeywordContent(rid, lexer, keywordList, keywordCount=16):
 	output = []
 	attrList = []
 	indexList = LexerKeywordIndexList.setdefault(lexer, {})
+	maxKeywordLen = 0
 	prefix = lexer[3:-4] + 'KeywordIndex_'
 	for index, item in enumerate(keywordList):
 		comment, items, attr = item
@@ -103,6 +104,11 @@ def BuildKeywordContent(rid, lexer, keywordList, keywordCount=16):
 		indexName = build_enum_name(comment)
 		# keyword index for lexer
 		if (attr & KeywordAttr.NoLexer) == 0 and comment != 'unused':
+			if items:
+				length = max(len(item) for item in items)
+				if attr & KeywordAttr.Special:
+					length += 1 # punctuation prefix
+				maxKeywordLen = max(maxKeywordLen, length)
 			if indexName in indexList:
 				assert index == indexList[indexName][0], (rid, lexer, comment)
 			else:
@@ -121,6 +127,10 @@ def BuildKeywordContent(rid, lexer, keywordList, keywordCount=16):
 		if attr != KeywordAttr.Default:
 			attrList.append((index, attr, comment))
 
+	if maxKeywordLen:
+		maxKeywordLen += 2 # extra + '\0'
+		if '@' not in indexList or indexList['@'][0] < maxKeywordLen:
+			indexList['@'] = (maxKeywordLen, 0)
 	count = keywordCount - len(keywordList)
 	if count:
 		output.append(", nullptr" * count)
@@ -2729,10 +2739,22 @@ def UpdateLexerKeywordAttr(indexPath, lexerPath):
 		if indexList:
 			items = [(value[0], key, value[1]) for key, value in indexList.items()]
 			items.sort()
-			prev = (-1, '')
+			prev = (-1, '', '')
 			output.append('enum {')
 			for item in items:
 				value, key, rid = item
+				if key == '@':
+					# round up to 16*n + 4 or 16*n + 8 for easy zero init
+					size, extra = value & ~15, value & 15
+					if extra > 8:
+						size += 16
+					elif extra > 4:
+						size += 8
+					elif extra > 0:
+						size += 4
+					#print(lexer, value, size)
+					output.append(f'\tMaxKeywordSize = {size},')
+					continue
 				if value == prev[0]:
 					print(f'{lexer} same keyword index {value}: ({key} {rid[7:]}), ({prev[1]} {prev[2][7:]})')
 				output.append(f'\tKeywordIndex_{key} = {value},')

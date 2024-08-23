@@ -165,12 +165,12 @@ def generate_compile_commands(target, avx2=False, cxx=False):
 		cflags.extend(cxxwarn)
 
 	config = [
-		('../src', ['../scintilla/include']),
+		# ('../src', ['../scintilla/include']),
 		('../scintilla/lexers', ['../include', '../lexlib']),
-		('../scintilla/lexlib', ['../include']),
-		('../scintilla/src', ['../include', '../lexlib']),
-		('../scintilla/win32', ['../include', '../src']),
-		('../matepath/src', []),
+		# ('../scintilla/lexlib', ['../include']),
+		# ('../scintilla/src', ['../include', '../lexlib']),
+		# ('../scintilla/win32', ['../include', '../src']),
+		# ('../matepath/src', []),
 	]
 
 	def include_path(folder, path):
