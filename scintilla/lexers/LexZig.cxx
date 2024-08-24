@@ -167,7 +167,7 @@ void ColouriseZigDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			break;
 
 		case SCE_ZIG_NUMBER:
-			if (!IsDecimalNumber(sc.chPrev, sc.ch, sc.chNext)) {
+			if (!IsDecimalNumberEx(sc.chPrev, sc.ch, sc.chNext)) {
 				sc.SetState(SCE_ZIG_DEFAULT);
 			}
 			break;
@@ -210,7 +210,7 @@ void ColouriseZigDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				sc.Forward();
 				if (sc.Match('u', '{')) {
 					escSeq.brace = true;
-					escSeq.digitsLeft = 7;
+					escSeq.digitsLeft = 9;
 					sc.Forward();
 				}
 			} else if ((sc.ch == '\'' && sc.state == SCE_ZIG_CHARACTER) || (sc.ch == '\"' && sc.state == SCE_ZIG_STRING)) {
@@ -304,7 +304,7 @@ void ColouriseZigDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				sc.SetState(SCE_ZIG_STRING);
 			} else if (sc.ch == '\'') {
 				sc.SetState(SCE_ZIG_CHARACTER);
-			} else if (IsNumberStart(sc.ch, sc.chNext)) {
+			} else if (IsNumberStartEx(sc.chPrev, sc.ch, sc.chNext)) {
 				sc.SetState(SCE_ZIG_NUMBER);
 			} else if ((sc.ch == '@' && IsIdentifierStartEx(sc.chNext)) || IsIdentifierStartEx(sc.ch)) {
 				sc.SetState((sc.ch == '@') ? SCE_ZIG_BUILTIN_FUNCTION : SCE_ZIG_IDENTIFIER);
