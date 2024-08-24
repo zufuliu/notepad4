@@ -612,7 +612,7 @@ void FoldJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Le
 	lineStartNext = sci::min(lineStartNext, endPos);
 
 	char chNext = styler[startPos];
-	int styleNext = styler.StyleAt(startPos);
+	int styleNext = styler.StyleIndexAt(startPos);
 	int style = initStyle;
 	int visibleChars = 0;
 
@@ -621,7 +621,7 @@ void FoldJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Le
 		const int stylePrev = style;
 		style = styleNext;
 		chNext = styler[++startPos];
-		styleNext = styler.StyleAt(startPos);
+		styleNext = styler.StyleIndexAt(startPos);
 
 		switch (style) {
 		case SCE_JS_COMMENTBLOCK:
@@ -650,7 +650,7 @@ void FoldJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Le
 					levelNext--;
 					startPos++;
 					chNext = styler[startPos];
-					styleNext = styler.StyleAt(startPos);
+					styleNext = styler.StyleIndexAt(startPos);
 				} else {
 					levelNext++;
 				}
@@ -679,7 +679,7 @@ void FoldJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Le
 					startPos = bracePos + 1; // skip the brace
 					style = SCE_JS_OPERATOR;
 					chNext = styler[startPos];
-					styleNext = styler.StyleAt(startPos);
+					styleNext = styler.StyleIndexAt(startPos);
 				}
 			}
 

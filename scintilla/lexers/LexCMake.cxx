@@ -349,7 +349,7 @@ void FoldCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
 	lineStartNext = sci::min(lineStartNext, endPos);
 
-	int styleNext = styler.StyleAt(startPos);
+	int styleNext = styler.StyleIndexAt(startPos);
 	int style = initStyle;
 
 	char buf[16]; // function
@@ -359,7 +359,7 @@ void FoldCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 	while (startPos < endPos) {
 		const int stylePrev = style;
 		style = styleNext;
-		styleNext = styler.StyleAt(startPos + 1);
+		styleNext = styler.StyleIndexAt(startPos + 1);
 
 		switch (style) {
 		case SCE_CMAKE_BLOCK_COMMENT:

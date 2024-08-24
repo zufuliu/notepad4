@@ -431,7 +431,7 @@ void FoldAwkDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*
 	int visibleChars = 0;
 
 	while (startPos < endPos) {
-		const int style = styler.StyleAt(startPos);
+		const int style = styler.StyleIndexAt(startPos);
 
 		if (style == SCE_AWK_OPERATOR) {
 			const char ch = styler[startPos];

@@ -457,13 +457,13 @@ void FoldInnoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 	constexpr int MaxFoldWordLength = sizeof(buf) - 1;
 	int wordLen = 0;
 
-	int styleNext = styler.StyleAt(startPos);
+	int styleNext = styler.StyleIndexAt(startPos);
 	int style = initStyle;
 
 	while (startPos < endPos) {
 		const int stylePrev = style;
 		style = styleNext;
-		styleNext = styler.StyleAt(++startPos);
+		styleNext = styler.StyleIndexAt(++startPos);
 
 		switch (style) {
 		case SCE_INNO_PASCAL_KEYWORD:

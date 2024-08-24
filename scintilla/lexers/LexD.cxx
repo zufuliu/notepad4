@@ -664,7 +664,7 @@ void FoldDDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Lex
 	lineStartNext = sci::min(lineStartNext, endPos);
 
 	char chNext = styler[startPos];
-	int styleNext = styler.StyleAt(startPos);
+	int styleNext = styler.StyleIndexAt(startPos);
 	int style = initStyle;
 	int visibleChars = 0;
 
@@ -673,7 +673,7 @@ void FoldDDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Lex
 		const int stylePrev = style;
 		style = styleNext;
 		chNext = styler[++startPos];
-		styleNext = styler.StyleAt(startPos);
+		styleNext = styler.StyleIndexAt(startPos);
 
 		switch (style) {
 		case SCE_D_COMMENTBLOCKDOC:
@@ -698,7 +698,7 @@ void FoldDDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Lex
 				levelNext += level;
 				startPos++;
 				chNext = styler[startPos];
-				styleNext = styler.StyleAt(startPos);
+				styleNext = styler.StyleIndexAt(startPos);
 			}
 		} break;
 

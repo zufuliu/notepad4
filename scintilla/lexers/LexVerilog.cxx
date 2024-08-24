@@ -519,14 +519,14 @@ void FoldVerilogDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 	constexpr int MaxFoldWordLength = sizeof(buf) - 1;
 	int wordLen = 0;
 
-	int styleNext = styler.StyleAt(startPos);
+	int styleNext = styler.StyleIndexAt(startPos);
 	int style = initStyle;
 
 	while (startPos < endPos) {
 		const int stylePrev = style;
 		style = styleNext;
 		const char ch = styler[startPos++];
-		styleNext = styler.StyleAt(startPos);
+		styleNext = styler.StyleIndexAt(startPos);
 
 		switch (style) {
 		case SCE_V_COMMENTBLOCK:

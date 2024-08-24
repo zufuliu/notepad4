@@ -269,7 +269,7 @@ void FoldAvsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 	lineStartNext = sci::min(lineStartNext, endPos);
 
 	char chNext = styler[startPos];
-	int styleNext = styler.StyleAt(startPos);
+	int styleNext = styler.StyleIndexAt(startPos);
 	int style = initStyle;
 	int visibleChars = 0;
 
@@ -278,7 +278,7 @@ void FoldAvsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 		const int stylePrev = style;
 		style = styleNext;
 		chNext = styler[++startPos];
-		styleNext = styler.StyleAt(startPos);
+		styleNext = styler.StyleIndexAt(startPos);
 
 		switch (style) {
 		case SCE_AVS_COMMENTBLOCKN: {
@@ -287,7 +287,7 @@ void FoldAvsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 				levelNext += level;
 				startPos++;
 				chNext = styler[startPos];
-				styleNext = styler.StyleAt(startPos);
+				styleNext = styler.StyleIndexAt(startPos);
 			}
 		} break;
 
@@ -324,7 +324,7 @@ void FoldAvsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 					startPos = bracePos + 1; // skip the brace
 					style = SCE_AVS_OPERATOR;
 					chNext = styler[startPos];
-					styleNext = styler.StyleAt(startPos);
+					styleNext = styler.StyleIndexAt(startPos);
 				}
 			}
 

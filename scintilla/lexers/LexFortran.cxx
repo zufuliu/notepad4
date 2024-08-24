@@ -359,7 +359,7 @@ void FoldFortranDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initSt
 	int style = SCE_F_DEFAULT;
 	while (startPos < endPos) {
 		const int stylePrev = style;
-		style = styler.StyleAt(startPos);
+		style = styler.StyleIndexAt(startPos);
 
 		if (style == SCE_F_FOLDING_WORD && stylePrev != SCE_F_FOLDING_WORD) {
 			levelNext++;

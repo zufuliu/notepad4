@@ -224,13 +224,13 @@ void FoldWASMDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle
 	lineStartNext = sci::min(lineStartNext, endPos);
 
 	char chNext = styler[startPos];
-	int styleNext = styler.StyleAt(startPos);
+	int styleNext = styler.StyleIndexAt(startPos);
 
 	while (startPos < endPos) {
 		const char ch = chNext;
 		const int style = styleNext;
 		chNext = styler[++startPos];
-		styleNext = styler.StyleAt(startPos);
+		styleNext = styler.StyleIndexAt(startPos);
 
 		switch (style) {
 		case SCE_WASM_COMMENTBLOCK: {
@@ -239,7 +239,7 @@ void FoldWASMDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle
 				levelNext += level;
 				startPos++;
 				chNext = styler[startPos];
-				styleNext = styler.StyleAt(startPos);
+				styleNext = styler.StyleIndexAt(startPos);
 			}
 		} break;
 

@@ -932,7 +932,7 @@ void FoldBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lex
 	lineStartNext = sci::min(lineStartNext, endPos);
 	int levelPrev = styler.LevelAt(lineCurrent) & SC_FOLDLEVELNUMBERMASK;
 	int levelCurrent = levelPrev;
-	int styleNext = styler.StyleAt(startPos);
+	int styleNext = styler.StyleIndexAt(startPos);
 	int style = initStyle;
 
 	char word[8]; // foreach
@@ -943,7 +943,7 @@ void FoldBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lex
 		const char ch = styler[startPos];
 		const int stylePrev = style;
 		style = styleNext;
-		styleNext = styler.StyleAt(++startPos);
+		styleNext = styler.StyleIndexAt(++startPos);
 
 		switch (style) {
 		case SCE_SH_WORD:

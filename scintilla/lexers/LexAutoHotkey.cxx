@@ -774,14 +774,14 @@ void FoldAHKDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
 	lineStartNext = sci::min(lineStartNext, endPos);
 
-	int styleNext = styler.StyleAt(startPos);
+	int styleNext = styler.StyleIndexAt(startPos);
 	int style = initStyle;
 	int visibleChars = 0;
 
 	while (startPos < endPos) {
 		const int stylePrev = style;
 		style = styleNext;
-		styleNext = styler.StyleAt(++startPos);
+		styleNext = styler.StyleIndexAt(++startPos);
 
 		switch (style) {
 		case SCE_AHK_COMMENTBLOCK:
@@ -820,7 +820,7 @@ void FoldAHKDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 					levelNext++;
 					startPos = bracePos + 1; // skip the brace
 					style = SCE_AHK_OPERATOR;
-					styleNext = styler.StyleAt(startPos);
+					styleNext = styler.StyleIndexAt(startPos);
 				}
 			}
 

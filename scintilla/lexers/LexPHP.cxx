@@ -1474,7 +1474,7 @@ void FoldPHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 	lineStartNext = sci::min(lineStartNext, endPos);
 
 	char chNext = styler[startPos];
-	int styleNext = styler.StyleAt(startPos);
+	int styleNext = styler.StyleIndexAt(startPos);
 	int style = initStyle;
 	int visibleChars = 0;
 
@@ -1483,7 +1483,7 @@ void FoldPHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 		const int stylePrev = style;
 		style = styleNext;
 		chNext = styler[++startPos];
-		styleNext = styler.StyleAt(startPos);
+		styleNext = styler.StyleIndexAt(startPos);
 
 		switch (style) {
 		case SCE_PHP_COMMENTBLOCK:
@@ -1562,7 +1562,7 @@ void FoldPHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 					levelNext++;
 					startPos = bracePos + 1; // skip the brace
 					style = (block == HtmlTextBlock::PHP) ? SCE_PHP_OPERATOR : js_style(SCE_JS_OPERATOR);
-					styleNext = styler.StyleAt(startPos);
+					styleNext = styler.StyleIndexAt(startPos);
 				}
 			}
 

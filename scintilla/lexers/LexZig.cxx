@@ -354,7 +354,7 @@ void FoldZigDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 	int visibleChars = 0;
 
 	while (startPos < endPos) {
-		initStyle = styler.StyleAt(startPos);
+		initStyle = styler.StyleIndexAt(startPos);
 
 		if (initStyle == SCE_ZIG_OPERATOR) {
 			const char ch = styler[startPos];

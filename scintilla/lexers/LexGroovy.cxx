@@ -569,14 +569,14 @@ void FoldGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
 	lineStartNext = sci::min(lineStartNext, endPos);
 
-	int styleNext = styler.StyleAt(startPos);
+	int styleNext = styler.StyleIndexAt(startPos);
 	int style = initStyle;
 	int visibleChars = 0;
 
 	while (startPos < endPos) {
 		const int stylePrev = style;
 		style = styleNext;
-		styleNext = styler.StyleAt(++startPos);
+		styleNext = styler.StyleIndexAt(++startPos);
 
 		switch (style) {
 		case SCE_GROOVY_COMMENTBLOCK:
@@ -620,7 +620,7 @@ void FoldGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 					levelNext++;
 					startPos = bracePos + 1; // skip the brace
 					style = SCE_GROOVY_OPERATOR;
-					styleNext = styler.StyleAt(startPos);
+					styleNext = styler.StyleIndexAt(startPos);
 				}
 			}
 

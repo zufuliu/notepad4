@@ -428,7 +428,7 @@ void FoldCangjieDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 	lineStartNext = sci::min(lineStartNext, endPos);
 
 	char chNext = styler[startPos];
-	int styleNext = styler.StyleAt(startPos);
+	int styleNext = styler.StyleIndexAt(startPos);
 	int style = initStyle;
 	int visibleChars = 0;
 
@@ -437,7 +437,7 @@ void FoldCangjieDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 		const int stylePrev = style;
 		style = styleNext;
 		chNext = styler[++startPos];
-		styleNext = styler.StyleAt(startPos);
+		styleNext = styler.StyleIndexAt(startPos);
 
 		switch (style) {
 		case SCE_CANGJIE_COMMENTBLOCKDOC:
@@ -447,7 +447,7 @@ void FoldCangjieDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				levelNext += level;
 				startPos++;
 				chNext = styler[startPos];
-				styleNext = styler.StyleAt(startPos);
+				styleNext = styler.StyleIndexAt(startPos);
 			}
 		} break;
 
@@ -490,7 +490,7 @@ void FoldCangjieDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 					startPos = bracePos + 1; // skip the brace
 					style = SCE_CANGJIE_OPERATOR;
 					chNext = styler[startPos];
-					styleNext = styler.StyleAt(startPos);
+					styleNext = styler.StyleIndexAt(startPos);
 				}
 			}
 

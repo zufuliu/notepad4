@@ -260,7 +260,7 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			--startPos;
 			const unsigned char ch = styler[startPos];
 			if (!isspacechar(ch)) {
-				const int style = styler.StyleAt(startPos);
+				const int style = styler.StyleIndexAt(startPos);
 				if (style != SCE_BAT_LINE_CONTINUATION) {
 					stylePrevNonWhite = style;
 					chPrevNonWhite = ch;

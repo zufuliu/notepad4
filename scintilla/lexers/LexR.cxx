@@ -365,7 +365,7 @@ void FoldSimpleDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initSty
 	lineStartNext = sci::min(lineStartNext, endPos);
 
 	while (startPos < endPos) {
-		const int style = styler.StyleAt(startPos);
+		const int style = styler.StyleIndexAt(startPos);
 
 		if (style == SCE_SIMPLE_OPERATOR) {
 			const char ch = styler[startPos];

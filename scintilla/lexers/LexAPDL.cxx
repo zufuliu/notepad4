@@ -210,10 +210,10 @@ void FoldAPDLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle
 	constexpr int MaxFoldWordLength = sizeof(buf) - 1;
 	int wordLen = 0;
 
-	int styleNext = styler.StyleAt(startPos);
+	int styleNext = styler.StyleIndexAt(startPos);
 	while (startPos < endPos) {
 		const int style = styleNext;
-		styleNext = styler.StyleAt(++startPos);
+		styleNext = styler.StyleIndexAt(++startPos);
 
 		if (style == SCE_APDL_WORD) {
 			if (wordLen < MaxFoldWordLength) {

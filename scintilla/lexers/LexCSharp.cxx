@@ -791,14 +791,14 @@ void FoldCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 	constexpr int MaxFoldWordLength = sizeof(buf) - 1;
 	int wordLen = 0;
 
-	int styleNext = styler.StyleAt(startPos);
+	int styleNext = styler.StyleIndexAt(startPos);
 	int style = initStyle;
 	int visibleChars = 0;
 
 	while (startPos < endPos) {
 		const int stylePrev = style;
 		style = styleNext;
-		styleNext = styler.StyleAt(startPos + 1);
+		styleNext = styler.StyleIndexAt(startPos + 1);
 
 		switch (style) {
 		case SCE_CSHARP_COMMENTBLOCK:
@@ -861,7 +861,7 @@ void FoldCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 					levelNext++;
 					startPos = bracePos + 1; // skip the brace
 					style = SCE_CSHARP_OPERATOR;
-					styleNext = styler.StyleAt(startPos);
+					styleNext = styler.StyleIndexAt(startPos);
 				}
 			}
 

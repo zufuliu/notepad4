@@ -421,7 +421,7 @@ void FoldRebolDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyl
 	lineStartNext = sci::min(lineStartNext, endPos);
 
 	while (startPos < endPos) {
-		const int style = styler.StyleAt(startPos);
+		const int style = styler.StyleIndexAt(startPos);
 		const char ch = styler[startPos];
 
 		switch (style) {

@@ -242,7 +242,7 @@ void BacktrackToStart(const LexAccessor &styler, int stateMask, Sci_PositionU &s
 			const Sci_PositionU endPos = startPos + lengthDoc;
 			startPos = (line == 0)? 0 : styler.LineStart(line);
 			lengthDoc = endPos - startPos;
-			initStyle = (startPos == 0)? 0 : styler.StyleAt(startPos - 1);
+			initStyle = (startPos == 0)? 0 : styler.StyleIndexAt(startPos - 1);
 		}
 	}
 }
@@ -252,7 +252,7 @@ Sci_PositionU LookbackNonWhite(LexAccessor &styler, Sci_PositionU startPos, unsi
 	maxSpaceStyle &= 0xff;
 	do {
 		--startPos;
-		const unsigned style = styler.StyleAt(startPos);
+		const unsigned style = styler.StyleIndexAt(startPos);
 		if (style > maxSpaceStyle) {
 			stylePrevNonWhite = style;
 			chPrevNonWhite = static_cast<unsigned char>(styler[startPos]);
@@ -277,7 +277,7 @@ Sci_PositionU CheckBraceOnNextLine(LexAccessor &styler, Sci_Line line, int opera
 		return 0;
 	}
 
-	int style = styler.StyleAt(bracePos);
+	int style = styler.StyleIndexAt(bracePos);
 	if (style != operatorStyle) {
 		return 0;
 	}
@@ -289,7 +289,7 @@ Sci_PositionU CheckBraceOnNextLine(LexAccessor &styler, Sci_Line line, int opera
 	// ignore current line, e.g. current line is preprocessor.
 	if (ignoreStyle) {
 		while (startPos < endPos) {
-			style = styler.StyleAt(startPos);
+			style = styler.StyleIndexAt(startPos);
 			if (style > maxSpaceStyle) {
 				break;
 			}
@@ -301,7 +301,7 @@ Sci_PositionU CheckBraceOnNextLine(LexAccessor &styler, Sci_Line line, int opera
 	}
 
 	while (endPos >= startPos) {
-		style = styler.StyleAt(endPos);
+		style = styler.StyleIndexAt(endPos);
 		if (style > maxSpaceStyle) {
 			break;
 		}

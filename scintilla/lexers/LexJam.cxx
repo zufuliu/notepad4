@@ -261,12 +261,12 @@ void FoldJamDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 
 	int visibleChars = 0;
 	int style = initStyle;
-	int styleNext = styler.StyleAt(startPos);
+	int styleNext = styler.StyleIndexAt(startPos);
 
 	while (startPos < endPos) {
 		const int stylePrev = style;
 		style = styleNext;
-		styleNext = styler.StyleAt(++startPos);
+		styleNext = styler.StyleIndexAt(++startPos);
 
 		switch (style) {
 		case SCE_JAM_COMMENTBLOCK:
@@ -303,7 +303,7 @@ void FoldJamDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 					levelNext++;
 					startPos = bracePos + 1; // skip the brace
 					style = SCE_JAM_OPERATOR;
-					styleNext = styler.StyleAt(startPos);
+					styleNext = styler.StyleIndexAt(startPos);
 				}
 			}
 

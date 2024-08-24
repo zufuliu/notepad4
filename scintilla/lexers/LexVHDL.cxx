@@ -307,7 +307,7 @@ bool FindCodeFolding(LexAccessor &styler, CodeFolding folding, Sci_PositionU sta
 	int style = SCE_VHDL_DEFAULT;
 	for (; startPos < endPos; startPos++) {
 		const int stylePrev = style;
-		style = styler.StyleAt(startPos);
+		style = styler.StyleIndexAt(startPos);
 		if (IsSpaceEquiv(style)) {
 			continue;
 		}
@@ -328,7 +328,7 @@ bool FindCodeFolding(LexAccessor &styler, CodeFolding folding, Sci_PositionU sta
 			case CodeFolding::Is:
 				if (ch == 'i' && UnsafeLower(styler[startPos + 1]) == 's') {
 					for (Sci_PositionU pos = startPos + 2; pos < endPos; pos++) {
-						const int styleNext = styler.StyleAt(pos);
+						const int styleNext = styler.StyleIndexAt(pos);
 						if (!IsSpaceEquiv(styleNext)) {
 							// find `is`, but not `is new`
 							return styleNext != SCE_VHDL_KEYWORD || !styler.MatchIgnoreCase(pos, "new");
@@ -381,14 +381,14 @@ void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 	constexpr int MaxFoldWordLength = sizeof(buf) - 1;
 	int wordLen = 0;
 
-	int styleNext = styler.StyleAt(startPos);
+	int styleNext = styler.StyleIndexAt(startPos);
 	int style = initStyle;
 
 	while (startPos < endPos) {
 		const int stylePrev = style;
 		style = styleNext;
 		const char ch = styler[startPos++];
-		styleNext = styler.StyleAt(startPos);
+		styleNext = styler.StyleIndexAt(startPos);
 
 		switch (style) {
 		case SCE_VHDL_COMMENTBLOCK:
