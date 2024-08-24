@@ -210,6 +210,7 @@ void ColouriseZigDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				sc.Forward();
 				if (sc.Match('u', '{')) {
 					escSeq.brace = true;
+					escSeq.digitsLeft = 7;
 					sc.Forward();
 				}
 			} else if ((sc.ch == '\'' && sc.state == SCE_ZIG_CHARACTER) || (sc.ch == '\"' && sc.state == SCE_ZIG_STRING)) {
@@ -277,6 +278,7 @@ void ColouriseZigDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 
 		case SCE_ZIG_COMMENTLINE:
 		case SCE_ZIG_COMMENTLINEDOC:
+		case SCE_ZIG_COMMENTLINETOP:
 			if (sc.atLineStart) {
 				sc.SetState(SCE_ZIG_DEFAULT);
 			}
@@ -289,8 +291,10 @@ void ColouriseZigDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 					lineState = ZigLineStateMaskLineComment;
 				}
 				sc.SetState(SCE_ZIG_COMMENTLINE);
-				sc.Forward();
-				if (sc.chNext == '!' || sc.chNext == '/') {
+				sc.Forward(2);
+				if (sc.ch == '!') {
+					sc.ChangeState(SCE_ZIG_COMMENTLINETOP);
+				} else if (sc.ch == '/' && sc.chNext != '/') {
 					sc.ChangeState(SCE_ZIG_COMMENTLINEDOC);
 				}
 			} else if (sc.Match('\\', '\\')) {
