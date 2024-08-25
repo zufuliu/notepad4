@@ -451,16 +451,16 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				hashCount = 0;
 				sc.SetState(SCE_RUST_RAW_STRING);
 				sc.Forward();
-			} else if (sc.Match('b', '\"')) {
-				sc.SetState(SCE_RUST_BYTESTRING);
-				sc.Forward();
-			} else if (sc.Match('b', '\'')) {
-				sc.SetState(SCE_RUST_BYTE_CHARACTER);
-				sc.Forward();
-			} else if (sc.Match('b', 'r')) {
-				if (IsRustRawString(styler, sc.currentPos + 2, true, hashCount)) {
-					sc.SetState(SCE_RUST_RAW_BYTESTRING);
+			} else if (sc.ch == 'b' || sc.ch == 'c') {
+				if (sc.chNext == '\"') {
+					sc.SetState((sc.ch == 'b') ? SCE_RUST_BYTESTRING : SCE_RUST_STRING);
+					sc.Forward();
+				} else if (sc.chNext == 'r' && IsRustRawString(styler, sc.currentPos + 2, true, hashCount)) {
+					sc.SetState((sc.ch == 'b') ? SCE_RUST_RAW_BYTESTRING : SCE_RUST_RAW_STRING);
 					sc.Advance(hashCount + 2);
+				} else if (sc.Match('b', '\'')) {
+					sc.SetState(SCE_RUST_BYTE_CHARACTER);
+					sc.Forward();
 				} else {
 					if (sc.chPrev != '.') {
 						chBeforeIdentifier = sc.chPrev;

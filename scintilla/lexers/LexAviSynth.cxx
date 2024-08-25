@@ -211,7 +211,7 @@ void ColouriseAvsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 					insideScript = 0;
 				}
 			} else if (sc.Match('e', '\"')) {
-				// Avisynth+ 3.6 escaped string
+				// AviSynth+ 3.6 escaped string
 				sc.SetState(SCE_AVS_ESCAPESTRING);
 				sc.Forward();
 			} else if (IsNumberStart(sc.ch, sc.chNext) || (sc.ch == '$' && IsHexDigit(sc.chNext))) {
