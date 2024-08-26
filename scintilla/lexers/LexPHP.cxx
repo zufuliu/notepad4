@@ -1316,7 +1316,7 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				} else {
 					sc.SetState(SCE_PHP_OPERATOR);
 				}
-			} else if (IsADigit(sc.ch)) {
+			} else if (IsNumberStart(sc.ch, sc.chNext)) {
 				escSeq.outerState = SCE_PHP_DEFAULT;
 				sc.SetState(SCE_PHP_NUMBER);
 			} else if (IsIdentifierStartEx(sc.ch)) {

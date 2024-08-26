@@ -480,7 +480,7 @@ void ColouriseGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 					sc.ChangeState(SCE_GROOVY_OPERATOR_PF);
 					sc.Forward();
 				}
-			} else if (IsNumberStartEx(sc.chPrev, sc.ch, sc.chNext)) {
+			} else if (IsADigit(sc.ch)) {
 				sc.SetState(SCE_GROOVY_NUMBER);
 			} else if (IsGroovyIdentifierStart(sc.ch)) {
 				escSeq.outerState = SCE_GROOVY_DEFAULT;

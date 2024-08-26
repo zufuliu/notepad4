@@ -177,7 +177,7 @@ void ColouriseWASMDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				commentLevel = 1;
 			} else if (sc.ch == '\"') {
 				sc.SetState(SCE_WASM_STRING);
-			} else if (IsNumberStart(sc.ch, sc.chNext)) {
+			} else if (IsADigit(sc.ch)) {
 				sc.SetState(SCE_WASM_NUMBER);
 			} else if (IsLowerCase(sc.ch)) {
 				sc.SetState(SCE_WASM_WORD);

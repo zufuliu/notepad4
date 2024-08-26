@@ -399,7 +399,7 @@ void ColouriseNimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				sc.SetState(SCE_NIM_CHARACTER);
 			} else if (sc.ch == '`') {
 				sc.SetState(SCE_NIM_BACKTICKS);
-			} else if (IsNumberStartEx(sc.chPrev, sc.ch, sc.chNext)) {
+			} else if (IsADigit(sc.ch)) {
 				sc.SetState(SCE_NIM_NUMBER);
 			} else if (IsIdentifierStartEx(sc.ch)) {
 				sc.SetState(SCE_NIM_IDENTIFIER);

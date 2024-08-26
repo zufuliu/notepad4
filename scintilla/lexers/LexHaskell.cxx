@@ -223,7 +223,7 @@ void ColouriseHaskellDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int ini
 					}
 				}
 				sc.SetState(state);
-			} else if (IsNumberStartEx(sc.chPrev, sc.ch, sc.chNext)) {
+			} else if (IsADigit(sc.ch)) {
 				sc.SetState(SCE_HA_NUMBER);
 			} else if (IsIdentifierStartEx(sc.ch)) {
 				sc.SetState(SCE_HA_IDENTIFIER);

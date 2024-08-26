@@ -398,7 +398,7 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					sc.ChangeState(SCE_SWIFT_TRIPLE_STRING);
 					sc.Advance(2);
 				}
-			} else if (IsNumberStartEx(sc.chPrev, sc.ch, sc.chNext)) {
+			} else if (IsADigit(sc.ch)) {
 				sc.SetState(SCE_SWIFT_NUMBER);
 			} else if ((sc.ch == '@' || sc.ch == '#') && IsIdentifierStartEx(sc.chNext)) {
 				sc.SetState((sc.ch == '@') ? SCE_SWIFT_ATTRIBUTE : SCE_SWIFT_DIRECTIVE);

@@ -247,7 +247,7 @@ void ColouriseVHDLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				}
 			} else if (sc.ch == '\"') {
 				sc.SetState(SCE_VHDL_STRING);
-			} else if (IsNumberStart(sc.ch, sc.chNext)) {
+			} else if (IsADigit(sc.ch)) {
 				sc.SetState(SCE_VHDL_NUMBER);
 			} else if (sc.ch == '`' && IsIdentifierStart(sc.chNext)) {
 				lineState |= VHDLLineStateMaskDirective;

@@ -330,7 +330,7 @@ void ColouriseOCamlDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				backPos = sc.currentPos;
 				sc.SetState(SCE_OCAML_QUOTED_STRING);
 				sc.ForwardSetState(SCE_OCAML_QUOTED_STRINGID);
-			} else if (IsNumberStartEx(sc.chPrev, sc.ch, sc.chNext) || (sc.ch == '#' && IsADigit(sc.chNext))) {
+			} else if (IsADigit(sc.ch) || (sc.ch == '#' && IsADigit(sc.chNext))) {
 				sc.SetState(SCE_OCAML_NUMBER);
 			} else if (sc.ch == '`' && IsUpperCase(sc.chNext)) {
 				sc.SetState(SCE_OCAML_TAGNAME);

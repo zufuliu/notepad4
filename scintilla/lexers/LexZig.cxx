@@ -304,7 +304,7 @@ void ColouriseZigDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				sc.SetState(SCE_ZIG_STRING);
 			} else if (sc.ch == '\'') {
 				sc.SetState(SCE_ZIG_CHARACTER);
-			} else if (IsNumberStartEx(sc.chPrev, sc.ch, sc.chNext)) {
+			} else if (IsADigit(sc.ch)) {
 				sc.SetState(SCE_ZIG_NUMBER);
 			} else if ((sc.ch == '@' && IsIdentifierStartEx(sc.chNext)) || IsIdentifierStartEx(sc.ch)) {
 				sc.SetState((sc.ch == '@') ? SCE_ZIG_BUILTIN_FUNCTION : SCE_ZIG_IDENTIFIER);

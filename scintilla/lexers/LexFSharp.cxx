@@ -470,7 +470,7 @@ void ColouriseFSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 			} else if (sc.Match('<', '@')) {
 				sc.SetState(SCE_FSHARP_QUOTATION);
 				sc.Forward();
-			} else if (IsNumberStartEx(sc.chPrev, sc.ch, sc.chNext)) {
+			} else if (IsADigit(sc.ch)) {
 				sc.SetState(SCE_FSHARP_NUMBER);
 			} else if (sc.ch == '#' && visibleChars == 0) {
 				sc.SetState(SCE_FSHARP_PREPROCESSOR);
