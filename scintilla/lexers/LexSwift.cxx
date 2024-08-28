@@ -303,7 +303,14 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				if (sc.state == SCE_SWIFT_TRIPLE_STRING) {
 					sc.Advance(2);
 				}
-				sc.ForwardSetState(SCE_SWIFT_DEFAULT);
+				sc.Forward();
+				if (sc.state == SCE_SWIFT_STRING && (chBefore == '[' || chBefore == ',')) {
+					const int chNext = sc.GetLineNextChar();
+					if (chNext == ':') {
+						sc.ChangeState(SCE_SWIFT_KEY);
+					}
+				}
+				sc.SetState(SCE_SWIFT_DEFAULT);
 			}
 			break;
 
@@ -393,6 +400,7 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				}
 			}
 			else if (sc.ch == '"') {
+				chBefore = chPrevNonWhite;
 				sc.SetState(SCE_SWIFT_STRING);
 				if (sc.MatchNext('"', '"')) {
 					sc.ChangeState(SCE_SWIFT_TRIPLE_STRING);
