@@ -410,13 +410,9 @@ void ColouriseVerilogDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int ini
 			break;
 
 		case SCE_V_COMMENTBLOCKVSD:
-			if (sc.Match('$', 'e')) {
-				char s[4]{};
-				styler.GetRange(sc.currentPos + 2, sc.currentPos + 5, s, sizeof(s));
-				if (s[0] == 'n' && s[1] == 'd' && !IsVWordChar(s[2])) {
-					sc.Advance(3); // $end
-					sc.ForwardSetState(SCE_V_DEFAULT);
-				}
+			if (sc.Match('$', 'e', 'n', 'd')) {
+				sc.Advance(3); // $end
+				sc.ForwardSetState(SCE_V_DEFAULT);
 			}
 			break;
 		}
