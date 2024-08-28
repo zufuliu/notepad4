@@ -37,7 +37,7 @@ enum script_mode { eHtml = 0, eNonHtmlScript, eNonHtmlPreProc, eNonHtmlScriptPre
 // Put an upper limit to bound time taken for unexpected text.
 constexpr Sci_PositionU maxLengthCheck = 200;
 
-script_type segIsScriptingIndicator(LexAccessor &styler, Sci_PositionU start, Sci_PositionU end, script_type prevValue) {
+script_type segIsScriptingIndicator(const LexAccessor &styler, Sci_PositionU start, Sci_PositionU end, script_type prevValue) {
 	char s[128];
 	styler.GetRangeLowered(start, end, s, sizeof(s));
 	//Platform::DebugPrintf("Scripting indicator [%s]\n", s);
@@ -276,7 +276,7 @@ int classifyWordHTVB(Sci_PositionU start, Sci_PositionU end, const WordList &key
 		return SCE_HB_DEFAULT;
 }
 
-bool isWordHSGML(Sci_PositionU start, Sci_PositionU end, const WordList &keywords, LexAccessor &styler) noexcept {
+bool isWordHSGML(Sci_PositionU start, Sci_PositionU end, const WordList &keywords, const LexAccessor &styler) noexcept {
 	char s[63 + 1];
 	styler.GetRange(start, end, s, sizeof(s));
 	return keywords.InList(s);

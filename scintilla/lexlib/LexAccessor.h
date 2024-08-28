@@ -141,11 +141,11 @@ public:
 	bool MatchLowerCase(Sci_Position pos, const char *s) noexcept;
 
 	// Get first len - 1 characters in range [startPos_, endPos_).
-	void GetRange(Sci_PositionU startPos_, Sci_PositionU endPos_, char *s, Sci_PositionU len) noexcept;
-	void GetRangeLowered(Sci_PositionU startPos_, Sci_PositionU endPos_, char *s, Sci_PositionU len) noexcept;
+	void GetRange(Sci_PositionU startPos_, Sci_PositionU endPos_, char *s, Sci_PositionU len) const noexcept;
+	void GetRangeLowered(Sci_PositionU startPos_, Sci_PositionU endPos_, char *s, Sci_PositionU len) const noexcept;
 	// Get all characters in range [startPos_, endPos_).
-	std::string GetRange(Sci_PositionU startPos_, Sci_PositionU endPos_);
-	std::string GetRangeLowered(Sci_PositionU startPos_, Sci_PositionU endPos_);
+	std::string GetRange(Sci_PositionU startPos_, Sci_PositionU endPos_) const;
+	std::string GetRangeLowered(Sci_PositionU startPos_, Sci_PositionU endPos_) const;
 
 	// Flush() must be called first when used in Colourise() or Lex() function.
 	unsigned char StyleAt(Sci_Position position) const noexcept {

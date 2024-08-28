@@ -90,7 +90,7 @@ enum {
 #define SUB_HAS_MODULE	3	// sub name can have a ::identifier part
 #define SUB_HAS_SUB		4	// 'sub' keyword
 
-bool isPerlKeyword(LexAccessor &styler, Sci_PositionU start, Sci_PositionU end, const WordList &keywords) noexcept {
+bool isPerlKeyword(const LexAccessor &styler, Sci_PositionU start, Sci_PositionU end, const WordList &keywords) noexcept {
 	// old-style keyword matcher; needed because GetCurrent() needs
 	// current segment to be committed, but we may abandon early...
 	char s[MaxKeywordSize];
