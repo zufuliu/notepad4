@@ -26,6 +26,23 @@ using namespace Lexilla;
 
 namespace {
 
+struct EscapeSequence {
+	int outerState = SCE_SWIFT_DEFAULT;
+	int digitsLeft = 0;
+	bool brace = false;
+
+	// highlight any character as escape sequence.
+	void resetEscapeState(int state) noexcept {
+		outerState = state;
+		digitsLeft = 1;
+		brace = false;
+	}
+	bool atEscapeEnd(int ch) noexcept {
+		--digitsLeft;
+		return digitsLeft <= 0 || !IsHexDigit(ch);
+	}
+};
+
 enum {
 	SwiftLineStateMaskLineComment = 1,		// line comment
 	SwiftLineStateMaskImport = (1 << 1),	// import
@@ -58,10 +75,6 @@ static_assert(DefaultNestedStateBaseStyle + 1 == SCE_SWIFT_STRING);
 static_assert(DefaultNestedStateBaseStyle + 2 == SCE_SWIFT_TRIPLE_STRING);
 static_assert(DefaultNestedStateBaseStyle + 3 == SCE_SWIFT_STRING_ED);
 static_assert(DefaultNestedStateBaseStyle + 4 == SCE_SWIFT_TRIPLE_STRING_ED);
-
-constexpr bool IsEscapeSequence(int ch) noexcept {
-	return AnyOf(ch, '0', '\\', 't', 'n', 'r', '"', '\'', 'u');
-}
 
 constexpr bool FollowExpression(int chPrevNonWhite, int stylePrevNonWhite) noexcept {
 	return chPrevNonWhite == ')' || chPrevNonWhite == ']'
@@ -103,7 +116,7 @@ DelimiterResult CheckSwiftStringDelimiter(LexAccessor &styler, Sci_PositionU pos
 			return (ch == '\"') ? DelimiterResult::True : DelimiterResult::Regex;
 		}
 	} else {
-		if (count == delimiterCount && (ch == '(' || IsEscapeSequence(ch))) {
+		if (count == delimiterCount && (ch == '(' || !IsEOLChar(ch))) {
 			return DelimiterResult::True;
 		}
 	}
@@ -131,6 +144,7 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 	int chPrevNonWhite = 0;
 	int stylePrevNonWhite = SCE_SWIFT_DEFAULT;
 	bool insideRegexRange = false; // inside regex character range []
+	EscapeSequence escSeq;
 
 	StyleContext sc(startPos, lengthDoc, initStyle, styler);
 	if (sc.currentLine > 0) {
@@ -292,12 +306,15 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					nestedState.push_back(sc.state);
 					sc.SetState(SCE_SWIFT_OPERATOR2);
 					sc.Forward();
-				} else if (IsEscapeSequence(sc.chNext)) {
-					const int state = sc.state;
+				} else if (!IsEOLChar(sc.chNext)) {
+					escSeq.resetEscapeState(sc.state);
 					sc.SetState(SCE_SWIFT_ESCAPECHAR);
 					sc.Forward();
-					sc.ForwardSetState(state);
-					continue;
+					if (sc.Match('u', '{')) {
+						escSeq.brace = true;
+						escSeq.digitsLeft = 9;
+						sc.Forward();
+					}
 				}
 			} else if (sc.ch == '"' && (sc.state == SCE_SWIFT_STRING || sc.MatchNext('"', '"'))) {
 				if (sc.state == SCE_SWIFT_TRIPLE_STRING) {
@@ -319,20 +336,21 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			if (sc.atLineStart && sc.state == SCE_SWIFT_STRING_ED) {
 				sc.SetState(SCE_SWIFT_DEFAULT);
 			} else if (sc.Match('\\', '#')) {
-				const int state = sc.state;
+				escSeq.resetEscapeState(sc.state);
 				sc.SetState(SCE_SWIFT_ESCAPECHAR);
 				sc.Forward();
 				const DelimiterResult result = CheckSwiftStringDelimiter(styler, sc.currentPos, DelimiterCheck::Escape, delimiterCount);
 				if (result != DelimiterResult::False) {
 					sc.Advance(delimiterCount);
 					if (sc.ch == '(') {
-						nestedState.push_back(state);
+						nestedState.push_back(escSeq.outerState);
 						sc.SetState(SCE_SWIFT_OPERATOR2);
 					}
 				}
-				if (sc.state == SCE_SWIFT_ESCAPECHAR){
-					sc.ForwardSetState(state);
-					continue;
+				if (sc.state == SCE_SWIFT_ESCAPECHAR && sc.Match('u', '{')) {
+					escSeq.brace = true;
+					escSeq.digitsLeft = 9;
+					sc.Forward();
 				}
 			} else if (sc.ch == '"' && ((sc.state == SCE_SWIFT_STRING_ED && sc.chNext == '#')
 				|| (sc.state == SCE_SWIFT_TRIPLE_STRING_ED && sc.MatchNext('"', '"', '#')))) {
@@ -368,6 +386,16 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 						delimiterCount = TryPopAndPeek(delimiters);
 					}
 				}
+			}
+			break;
+
+		case SCE_SWIFT_ESCAPECHAR:
+			if (escSeq.atEscapeEnd(sc.ch)) {
+				if (escSeq.brace && sc.ch == '}') {
+					sc.Forward();
+				}
+				sc.SetState(escSeq.outerState);
+				continue;
 			}
 			break;
 		}
