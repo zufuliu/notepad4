@@ -305,22 +305,23 @@ void PHPLexer::HandlePHPTag() {
 // ASP tag <% %>, <%= %> and script tag <script language="php"></script> were removed in PHP 7
 // see https://wiki.php.net/rfc/remove_alternative_php_tags
 
+	char s[4]{};
+	sc.styler.GetRange(sc.currentPos + 2, sc.lineStartNext, s, sizeof(s));
 	int offset = 0;
-	const int chNext = sc.GetRelative(2);
-	if (chNext == '=') {
-		offset = 2;
-	} else if (chNext == 'p' || (sc.state == SCE_H_DEFAULT && IsHtmlTagStart(chNext))) {
-		if (chNext == 'p' && sc.GetRelative(3) == 'h' && sc.GetRelative(4) == 'p' && IsASpace(sc.GetRelative(5))) {
-			offset = 5;
-		} else if (sc.state == SCE_H_DEFAULT) {
-			tagType = HtmlTagType::Question;
-			sc.SetState(SCE_H_QUESTION);
-		}
+	if (StrEqual(s, "php")) {
+		offset = 5;
+	} else if (s[0] == '=') {
+		offset = 3;
+	} else if (sc.state == SCE_H_DEFAULT) {
+		tagType = HtmlTagType::Question;
+	} else {
+		return;
 	}
+
+	const int outer = sc.state;
+	sc.SetState(SCE_H_QUESTION);
+	sc.Advance(offset);
 	if (offset != 0) {
-		const int outer = sc.state;
-		sc.SetState(SCE_H_QUESTION);
-		sc.Advance(offset);
 		sc.SetState(SCE_PHP_DEFAULT);
 		if (outer != SCE_H_DEFAULT) {
 			SaveOuterStyle(outer);

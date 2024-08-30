@@ -39,6 +39,7 @@ constexpr Sci_PositionU maxLengthCheck = 200;
 
 script_type segIsScriptingIndicator(const LexAccessor &styler, Sci_PositionU start, Sci_PositionU end, script_type prevValue) {
 	char s[128];
+	memset(s, '\0', 4); // avoid garbage when `end` position is out of range for `<?xml`
 	styler.GetRangeLowered(start, end, s, sizeof(s));
 	//Platform::DebugPrintf("Scripting indicator [%s]\n", s);
 	if (strstr(s, "vbs"))
