@@ -3260,22 +3260,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_EDIT_UNINDENT:
-	case IDM_EDIT_INDENT: {
-		const Sci_Line iLineSelStart = SciCall_LineFromPosition(SciCall_GetSelectionStart());
-		const Sci_Line iLineSelEnd = SciCall_LineFromPosition(SciCall_GetSelectionEnd());
+		SciCall_LineDedent();
+		break;
 
-		SciCall_SetTabIndents(true);
-		if (iLineSelStart == iLineSelEnd) {
-			SciCall_VCHome();
-		}
-		if (LOWORD(wParam) == IDM_EDIT_INDENT) {
-			SciCall_Tab();
-		} else {
-			SciCall_BackTab();
-		}
-		SciCall_SetTabIndents(fvCurFile.bTabIndents);
-	}
-	break;
+	case IDM_EDIT_INDENT:
+		SciCall_LineIndent();
+		break;
 
 	case IDM_EDIT_ENCLOSESELECTION:
 		EditEncloseSelectionDlg(hwnd);

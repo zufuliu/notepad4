@@ -56,7 +56,7 @@ void FontRealised::Realise(Surface &surface, int zoomLevel, Technology technolog
 	measurements.sizeZoomed = GetFontSizeZoomed(fs.size, zoomLevel);
 	const XYPOSITION deviceHeight = static_cast<XYPOSITION>(surface.DeviceHeightFont(measurements.sizeZoomed));
 	const FontParameters fp(fs.fontName, deviceHeight / FontSizeMultiplier, fs.weight,
-		fs.italic, fs.extraFontFlag, technology, fs.characterSet, localeName);
+		fs.stretch, fs.italic, fs.extraFontFlag, technology, fs.characterSet, localeName);
 	font = Font::Allocate(fp);
 
 	// floor here is historical as platform layers have tweaked their values to match.
@@ -227,6 +227,8 @@ ViewStyle::ViewStyle(size_t stylesSize_):
 	marginNumberPadding = 3;
 	ctrlCharPadding = 3; // +3 For a blank on front and rounded edge each side
 	lastSegItalicsOffset = 2;
+
+	autocStyle = StyleDefault;
 
 	localeName = localeNameDefault;
 	maxFontAscent = 1;
@@ -808,13 +810,15 @@ void ViewStyle::FindMaxAscentDescent() noexcept {
 	XYPOSITION descent = 1;
 	int index = 0;
 	for (const Style &style : styles) {
-		if (index != StyleCallTip) {
-			if (ascent < style.ascent) {
-				ascent = style.ascent;
-			}
-			if (descent < style.descent) {
-				descent = style.descent;
-			}
+		if (index == StyleCallTip || (autocStyle != StyleDefault && index == autocStyle)) {
+			index++;
+			continue;
+		}
+		if (ascent < style.ascent) {
+			ascent = style.ascent;
+		}
+		if (descent < style.descent) {
+			descent = style.descent;
 		}
 		index++;
 	}

@@ -80,7 +80,7 @@ class Face:
 			line = sanitiseLine(line)
 			if line:
 				if line[0] == "#":
-					if line[1] == " ":
+					if len(line) > 2 and line[1] == " ":
 						if currentCommentFinished:
 							currentCommentFinished = False
 							currentComment = []

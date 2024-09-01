@@ -101,6 +101,7 @@ struct FontParameters {
 	const char *faceName;
 	XYPOSITION size;
 	Scintilla::FontWeight weight;
+	Scintilla::FontStretch stretch;
 	bool italic;
 	Scintilla::FontQuality extraFontFlag;
 	Scintilla::Technology technology;
@@ -111,6 +112,7 @@ struct FontParameters {
 		const char *faceName_,
 		XYPOSITION size_ = 10,
 		Scintilla::FontWeight weight_ = Scintilla::FontWeight::Normal,
+		Scintilla::FontStretch stretch_ = Scintilla::FontStretch::Normal,
 		bool italic_ = false,
 		Scintilla::FontQuality extraFontFlag_ = Scintilla::FontQuality::QualityDefault,
 		Scintilla::Technology technology_ = Scintilla::Technology::Default,
@@ -120,6 +122,7 @@ struct FontParameters {
 		faceName(faceName_),
 		size(size_),
 		weight(weight_),
+		stretch(stretch_),
 		italic(italic_),
 		extraFontFlag(extraFontFlag_),
 		technology(technology_),

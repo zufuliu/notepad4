@@ -642,6 +642,14 @@ bool ScintillaCall::StyleGetCheckMonospaced(int style) {
 	return Call(Message::StyleGetCheckMonospaced, style);
 }
 
+void ScintillaCall::StyleSetStretch(int style, Scintilla::FontStretch stretch) {
+	Call(Message::StyleSetStretch, style, static_cast<intptr_t>(stretch));
+}
+
+FontStretch ScintillaCall::StyleGetStretch(int style) {
+	return static_cast<Scintilla::FontStretch>(Call(Message::StyleGetStretch, style));
+}
+
 void ScintillaCall::StyleSetInvisibleRepresentation(int style, const char *representation) {
 	CallString(Message::StyleSetInvisibleRepresentation, style, representation);
 }
@@ -772,6 +780,10 @@ void ScintillaCall::BeginUndoAction() {
 
 void ScintillaCall::EndUndoAction() {
 	Call(Message::EndUndoAction);
+}
+
+int ScintillaCall::UndoSequence() {
+	return static_cast<int>(Call(Message::GetUndoSequence));
 }
 
 int ScintillaCall::UndoActions() {
@@ -1044,6 +1056,14 @@ void ScintillaCall::AutoCSetMaxHeight(int rowCount) {
 
 int ScintillaCall::AutoCGetMaxHeight() {
 	return static_cast<int>(Call(Message::AutoCGetMaxHeight));
+}
+
+void ScintillaCall::AutoCSetStyle(int style) {
+	Call(Message::AutoCSetStyle, style);
+}
+
+int ScintillaCall::AutoCGetStyle() {
+	return static_cast<int>(Call(Message::AutoCGetStyle));
 }
 
 void ScintillaCall::SetIndent(int indentSize) {
@@ -1910,8 +1930,16 @@ void ScintillaCall::Tab(int what) {
 	Call(Message::Tab, what);
 }
 
+void ScintillaCall::LineIndent() {
+	Call(Message::LineIndent);
+}
+
 void ScintillaCall::BackTab() {
 	Call(Message::BackTab);
+}
+
+void ScintillaCall::LineDedent() {
+	Call(Message::LineDedent);
 }
 
 void ScintillaCall::NewLine() {
@@ -2620,6 +2648,22 @@ int ScintillaCall::PositionCache() {
 
 void ScintillaCall::CopyAllowLine() {
 	Call(Message::CopyAllowLine);
+}
+
+void ScintillaCall::CutAllowLine() {
+	Call(Message::CutAllowLine);
+}
+
+void ScintillaCall::SetCopySeparator(const char *separator) {
+	CallString(Message::SetCopySeparator, 0, separator);
+}
+
+int ScintillaCall::CopySeparator(char *separator) {
+	return static_cast<int>(CallPointer(Message::GetCopySeparator, 0, separator));
+}
+
+std::string ScintillaCall::CopySeparator() {
+	return CallReturnString(Message::GetCopySeparator, 0);
 }
 
 void *ScintillaCall::CharacterPointer() {

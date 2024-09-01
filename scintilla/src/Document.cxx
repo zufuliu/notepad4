@@ -1585,6 +1585,10 @@ Sci::Position Document::Redo() {
 	return newPos;
 }
 
+int Document::UndoSequenceDepth() const noexcept {
+	return cb.UndoSequenceDepth();
+}
+
 void Document::DelChar(Sci::Position pos) {
 	DeleteChars(pos, LenChar(pos));
 }
@@ -1782,20 +1786,29 @@ void Document::Indent(bool forwards, Sci::Line lineBottom, Sci::Line lineTop) {
 	}
 }
 
+namespace {
+
+constexpr std::string_view EOLForMode(EndOfLine eolMode) noexcept {
+	switch (eolMode) {
+	case EndOfLine::CrLf:
+		return "\r\n";
+	case EndOfLine::Cr:
+		return "\r";
+	default:
+		return "\n";
+	}
+}
+
+}
+
 // Convert line endings for a piece of text to a particular mode.
 // Stop at len or when a NUL is found.
 std::string Document::TransformLineEnds(const char *s, size_t len, EndOfLine eolModeWanted) {
 	std::string dest;
+	const std::string_view eol = EOLForMode(eolModeWanted);
 	for (size_t i = 0; (i < len) && (s[i]); i++) {
 		if (IsEOLCharacter(s[i])) {
-			if (eolModeWanted == EndOfLine::Cr) {
-				dest.push_back('\r');
-			} else if (eolModeWanted == EndOfLine::Lf) {
-				dest.push_back('\n');
-			} else { // eolModeWanted == EndOfLine::CrLf
-				dest.push_back('\r');
-				dest.push_back('\n');
-			}
+			dest.append(eol);
 			if ((s[i] == '\r') && (i + 1 < len) && (s[i + 1] == '\n')) {
 				i++;
 			}
@@ -1845,13 +1858,7 @@ void Document::ConvertLineEnds(EndOfLine eolModeSet) {
 }
 
 std::string_view Document::EOLString() const noexcept {
-	if (eolMode == EndOfLine::CrLf) {
-		return "\r\n";
-	} else if (eolMode == EndOfLine::Cr) {
-		return "\r";
-	} else {
-		return "\n";
-	}
+	return EOLForMode(eolMode);
 }
 
 DocumentOption Document::Options() const noexcept {

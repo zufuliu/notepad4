@@ -1236,8 +1236,12 @@ inline void SciCall_TabCompletion(int what) noexcept {
 	SciCall(SCI_TAB, what, 0);
 }
 
-inline void SciCall_BackTab() noexcept {
-	SciCall(SCI_BACKTAB, 0, 0);
+inline void SciCall_LineIndent() noexcept {
+	SciCall(SCI_LINEINDENT, 0, 0);
+}
+
+inline void SciCall_LineDedent() noexcept {
+	SciCall(SCI_LINEDEDENT, 0, 0);
 }
 
 inline void SciCall_SelectionDuplicate() noexcept {

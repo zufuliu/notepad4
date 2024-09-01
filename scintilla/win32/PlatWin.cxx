@@ -382,7 +382,7 @@ std::shared_ptr<Font> Font::Allocate(const FontParameters &fp) {
 		std::wstring wsFamily;
 		DWRITE_FONT_WEIGHT weight = static_cast<DWRITE_FONT_WEIGHT>(fp.weight);
 		DWRITE_FONT_STYLE style = fp.italic ? DWRITE_FONT_STYLE_ITALIC : DWRITE_FONT_STYLE_NORMAL;
-		DWRITE_FONT_STRETCH stretch = DWRITE_FONT_STRETCH_NORMAL;
+		DWRITE_FONT_STRETCH stretch = static_cast<DWRITE_FONT_STRETCH>(fp.stretch);
 		if (!GetDWriteFontProperties(lf, wsFamily, weight, style, stretch)) {
 			wsFamily = WStringFromUTF8(fp.faceName);
 		}
@@ -1442,6 +1442,28 @@ constexpr D2D1_RECT_F RectangleInset(D2D1_RECT_F rect, FLOAT inset) noexcept {
 	};
 }
 
+using Geometry = std::unique_ptr<ID2D1PathGeometry, UnknownReleaser>;
+
+Geometry GeometryCreate() noexcept {
+	ID2D1PathGeometry *geometry = nullptr;
+	const HRESULT hr = pD2DFactory->CreatePathGeometry(&geometry);
+	if (FAILED(hr) || !geometry) {
+		return {};
+	}
+	return Geometry(geometry);
+}
+
+using GeometrySink = std::unique_ptr<ID2D1GeometrySink, UnknownReleaser>;
+
+GeometrySink GeometrySinkCreate(ID2D1PathGeometry *geometry) noexcept {
+	ID2D1GeometrySink *sink = nullptr;
+	const HRESULT hr = geometry->Open(&sink);
+	if (FAILED(hr) || !sink) {
+		return {};
+	}
+	return GeometrySink(sink);
+}
+
 }
 
 class BlobInline;
@@ -1492,7 +1514,7 @@ public:
 	int PixelDivisions() const noexcept override;
 	int DeviceHeightFont(int points) const noexcept override;
 	void SCICALL LineDraw(Point start, Point end, Stroke stroke) override;
-	static ID2D1PathGeometry *GeometricFigure(const Point *pts, size_t npts, D2D1_FIGURE_BEGIN figureBegin) noexcept;
+	static Geometry GeometricFigure(const Point *pts, size_t npts, D2D1_FIGURE_BEGIN figureBegin) noexcept;
 	void SCICALL PolyLine(const Point *pts, size_t npts, Stroke stroke) override;
 	void SCICALL Polygon(const Point *pts, size_t npts, FillStroke fillStroke) override;
 	void SCICALL RectangleDraw(PRectangle rc, FillStroke fillStroke) override;
@@ -1688,13 +1710,10 @@ void SurfaceD2D::LineDraw(Point start, Point end, Stroke stroke) {
 	ReleaseUnknown(pStrokeStyle);
 }
 
-ID2D1PathGeometry *SurfaceD2D::GeometricFigure(const Point *pts, size_t npts, D2D1_FIGURE_BEGIN figureBegin) noexcept {
-	ID2D1PathGeometry *geometry = nullptr;
-	HRESULT hr = pD2DFactory->CreatePathGeometry(&geometry);
-	if (SUCCEEDED(hr) && geometry) {
-		ID2D1GeometrySink *sink = nullptr;
-		hr = geometry->Open(&sink);
-		if (SUCCEEDED(hr) && sink) {
+Geometry SurfaceD2D::GeometricFigure(const Point *pts, size_t npts, D2D1_FIGURE_BEGIN figureBegin) noexcept {
+	Geometry geometry = GeometryCreate();
+	if (geometry) {
+		if (const GeometrySink sink = GeometrySinkCreate(geometry.get())) {
 			sink->BeginFigure(DPointFromPointEx(pts[0]), figureBegin);
 			for (size_t i = 1; i < npts; i++) {
 				sink->AddLine(DPointFromPointEx(pts[i]));
@@ -1702,7 +1721,6 @@ ID2D1PathGeometry *SurfaceD2D::GeometricFigure(const Point *pts, size_t npts, D2
 			sink->EndFigure((figureBegin == D2D1_FIGURE_BEGIN_FILLED) ?
 				D2D1_FIGURE_END_CLOSED : D2D1_FIGURE_END_OPEN);
 			sink->Close();
-			ReleaseUnknown(sink);
 		}
 	}
 	return geometry;
@@ -1714,7 +1732,7 @@ void SurfaceD2D::PolyLine(const Point *pts, size_t npts, Stroke stroke) {
 		return;
 	}
 
-	ID2D1PathGeometry *geometry = GeometricFigure(pts, npts, D2D1_FIGURE_BEGIN_HOLLOW);
+	const Geometry geometry = GeometricFigure(pts, npts, D2D1_FIGURE_BEGIN_HOLLOW);
 	PLATFORM_ASSERT(geometry);
 	if (!geometry) {
 		return;
@@ -1735,23 +1753,21 @@ void SurfaceD2D::PolyLine(const Point *pts, size_t npts, Stroke stroke) {
 	const HRESULT hr = pD2DFactory->CreateStrokeStyle(
 		strokeProps, nullptr, 0, &pStrokeStyle);
 	if (SUCCEEDED(hr)) {
-		pRenderTarget->DrawGeometry(geometry, pBrush, stroke.WidthF(), pStrokeStyle);
+		pRenderTarget->DrawGeometry(geometry.get(), pBrush, stroke.WidthF(), pStrokeStyle);
 	}
 	ReleaseUnknown(pStrokeStyle);
-	ReleaseUnknown(geometry);
 }
 
 void SurfaceD2D::Polygon(const Point *pts, size_t npts, FillStroke fillStroke) {
 	PLATFORM_ASSERT(pRenderTarget && (npts > 2));
 	if (pRenderTarget) {
-		ID2D1PathGeometry *geometry = GeometricFigure(pts, npts, D2D1_FIGURE_BEGIN_FILLED);
+		const Geometry geometry = GeometricFigure(pts, npts, D2D1_FIGURE_BEGIN_FILLED);
 		PLATFORM_ASSERT(geometry);
 		if (geometry) {
 			D2DPenColourAlpha(fillStroke.fill.colour);
-			pRenderTarget->FillGeometry(geometry, pBrush);
+			pRenderTarget->FillGeometry(geometry.get(), pBrush);
 			D2DPenColourAlpha(fillStroke.stroke.colour);
-			pRenderTarget->DrawGeometry(geometry, pBrush, fillStroke.stroke.WidthF());
-			ReleaseUnknown(geometry);
+			pRenderTarget->DrawGeometry(geometry.get(), pBrush, fillStroke.stroke.WidthF());
 		}
 	}
 }
@@ -1974,13 +1990,10 @@ void SurfaceD2D::Stadium(PRectangle rc, FillStroke fillStroke, Ends ends) {
 		PRectangle rcInner = rc;
 		rcInner.left += radius;
 		rcInner.right -= radius;
-		ID2D1PathGeometry *pathGeometry = nullptr;
-		const HRESULT hrGeometry = pD2DFactory->CreatePathGeometry(&pathGeometry);
-		if (FAILED(hrGeometry) || !pathGeometry)
+		const Geometry pathGeometry = GeometryCreate();
+		if (!pathGeometry)
 			return;
-		ID2D1GeometrySink *pSink = nullptr;
-		const HRESULT hrSink = pathGeometry->Open(&pSink);
-		if (SUCCEEDED(hrSink) && pSink) {
+		if (const GeometrySink pSink = GeometrySinkCreate(pathGeometry.get())) {
 			switch (leftSide) {
 			case Ends::leftFlat:
 				pSink->BeginFigure(DPointFromPoint(Point(rc.left + halfStroke, rc.top + halfStroke)), D2D1_FIGURE_BEGIN_FILLED);
@@ -2033,12 +2046,10 @@ void SurfaceD2D::Stadium(PRectangle rc, FillStroke fillStroke, Ends ends) {
 			pSink->Close();
 		}
 
-		ReleaseUnknown(pSink);
 		D2DPenColourAlpha(fillStroke.fill.colour);
-		pRenderTarget->FillGeometry(pathGeometry, pBrush);
+		pRenderTarget->FillGeometry(pathGeometry.get(), pBrush);
 		D2DPenColourAlpha(fillStroke.stroke.colour);
-		pRenderTarget->DrawGeometry(pathGeometry, pBrush, fillStroke.stroke.WidthF());
-		ReleaseUnknown(pathGeometry);
+		pRenderTarget->DrawGeometry(pathGeometry.get(), pBrush, fillStroke.stroke.WidthF());
 	}
 }
 
@@ -3127,19 +3138,15 @@ public:
 			points[i].y = arrow[i][1] * scale;
 		}
 
-		ID2D1PathGeometry *geometry_ = nullptr;
-		hr = pD2DFactory->CreatePathGeometry(&geometry_);
-		if (FAILED(hr) || !geometry_) {
+		const Geometry geometry = GeometryCreate();
+		if (!geometry) {
 			return false;
 		}
-		const std::unique_ptr<ID2D1PathGeometry, UnknownReleaser> geometry(geometry_);
 
-		ID2D1GeometrySink *sink_ = nullptr;
-		hr = geometry->Open(&sink_);
-		if (FAILED(hr) || !sink_) {
+		const GeometrySink sink = GeometrySinkCreate(geometry.get());
+		if (!sink) {
 			return false;
 		}
-		const std::unique_ptr<ID2D1GeometrySink, UnknownReleaser> sink(sink_);
 
 		sink->BeginFigure(points[0], D2D1_FIGURE_BEGIN_FILLED);
 		for (size_t i = 1; i < nPoints; i++) {

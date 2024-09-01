@@ -200,6 +200,7 @@
 #include "QuartzTextStyle.h"
 #include "QuartzTextStyleAttribute.h"
 #include "QuartzTextLayout.h"
+#include "DictionaryForCF.h"
 #import "InfoBarCommunicator.h"
 #include "InfoBar.h"
 #import "ScintillaView.h"

@@ -35,6 +35,7 @@ public:
 	int bracesMatchStyle;
 	int highlightGuideColumn;
 	Selection sel;
+	std::string copySeparator;
 
 	Scintilla::IMEInteraction imeInteraction;
 	Scintilla::Bidirectional bidirectional;

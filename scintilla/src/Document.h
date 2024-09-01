@@ -433,6 +433,7 @@ public:
 	void EndUndoAction() noexcept {
 		cb.EndUndoAction();
 	}
+	int UndoSequenceDepth() const noexcept;
 	void AddUndoAction(Sci::Position token, bool mayCoalesce) {
 		cb.AddUndoAction(token, mayCoalesce);
 	}
