@@ -79,7 +79,7 @@ public:
    bool match_verb(const char*);
    bool add_emacs_code(bool negate);
    bool unwind_alts(std::ptrdiff_t last_paren_start);
-   digraph<charT> get_next_set_literal(basic_char_set<charT, traits>& char_set);
+   digraph<charT> get_next_set_literal(const basic_char_set<charT, traits>& char_set);
    charT unescape_character();
    regex_constants::syntax_option_type parse_options();
 
@@ -1631,7 +1631,7 @@ void basic_regex_parser<charT, traits>::parse_set_literal(basic_char_set<charT, 
 }
 
 template <class charT, class traits>
-digraph<charT> basic_regex_parser<charT, traits>::get_next_set_literal(basic_char_set<charT, traits>& char_set)
+digraph<charT> basic_regex_parser<charT, traits>::get_next_set_literal(const basic_char_set<charT, traits>& char_set)
 {
    digraph<charT> result;
    switch(this->m_traits.syntax_type(*m_position))

@@ -56,7 +56,7 @@ struct EscapeSequence {
 	bool hex = false;
 
 	// highlight any character as escape sequence, no highlight for name in '\N{name}'.
-	bool resetEscapeState(int state, int chNext) noexcept {
+	void resetEscapeState(int state, int chNext) noexcept {
 		outerState = state;
 		digitsLeft = 1;
 		hex = true;
@@ -72,7 +72,6 @@ struct EscapeSequence {
 				digitsLeft = 9;
 			}
 		}
-		return true;
 	}
 	bool atEscapeEnd(int ch) noexcept {
 		--digitsLeft;
@@ -525,7 +524,8 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 					if (sc.chNext == '\\' || sc.chNext == '\'' || sc.chNext == '\"') {
 						sc.Forward();
 					}
-				} else if (escSeq.resetEscapeState(sc.state, sc.chNext)) {
+				} else {
+					escSeq.resetEscapeState(sc.state, sc.chNext);
 					sc.SetState(SCE_PY_ESCAPECHAR);
 					sc.Forward();
 				}

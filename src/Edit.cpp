@@ -4443,7 +4443,7 @@ void EditGetExcerpt(LPWSTR lpszExcerpt, DWORD cchExcerpt) noexcept {
 
 	DWORD cch = 0;
 	WCHAR chPrev = L' ';
-	WCHAR *p = tch;
+	LPCWSTR p = tch;
 	while (*p != L'\0') {
 		WCHAR ch = *p++;
 		if (ch <= L' ') {

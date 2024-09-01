@@ -184,7 +184,7 @@ class basic_regex_creator
 {
 public:
    basic_regex_creator(regex_data<charT, traits>* data);
-   std::ptrdiff_t getoffset(void* addr)
+   std::ptrdiff_t getoffset(const void* addr)
    {
       return getoffset(addr, m_pdata->m_data.data());
    }
@@ -1078,7 +1078,7 @@ void basic_regex_creator<charT, traits>::create_startmap(re_syntax_base* state, 
 {
    recursion_saver saved_recursions(&m_recursion_checks);
    int not_last_jump = 1;
-   re_syntax_base* recursion_start = 0;
+   const re_syntax_base* recursion_start = 0;
    int recursion_sub = 0;
    re_syntax_base* recursion_restart = 0;
 
@@ -1364,7 +1364,7 @@ void basic_regex_creator<charT, traits>::create_startmap(re_syntax_base* state, 
             {
                if(p->type == syntax_element_recurse)
                {
-                  re_brace* p2 = static_cast<re_brace*>(static_cast<re_jump*>(p)->alt.p);
+                  const re_brace* p2 = static_cast<re_brace*>(static_cast<re_jump*>(p)->alt.p);
                   if((p2->type == syntax_element_startmark) && (p2->index == static_cast<re_brace*>(state)->index))
                   {
                      ok = true;

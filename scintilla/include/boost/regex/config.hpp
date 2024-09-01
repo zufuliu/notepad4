@@ -116,14 +116,14 @@
 #endif
 
 #if !defined(BOOST_REGEX_FALLTHROUGH)
-#  define BOOST_REGEX_FALLTHROUGH
+#  define BOOST_REGEX_FALLTHROUGH [[fallthrough]]
 #endif
 #endif
 
 #ifdef BOOST_NORETURN
 #  define BOOST_REGEX_NORETURN BOOST_NORETURN
 #else
-#  define BOOST_REGEX_NORETURN
+#  define BOOST_REGEX_NORETURN [[noreturn]]
 #endif
 
 
