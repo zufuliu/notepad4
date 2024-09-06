@@ -727,7 +727,6 @@ extern EDITLEXER lexCSS;
 extern EDITLEXER lexHTML;
 extern EDITLEXER lexJavaScript;
 extern EDITLEXER lexPHP;
-extern EDITLEXER lexPython;
 extern EDITLEXER lexVBScript;
 extern HANDLE idleTaskTimer;
 
@@ -737,7 +736,6 @@ enum HtmlTextBlock {
 	HtmlTextBlock_SGML,
 	HtmlTextBlock_JavaScript,
 	HtmlTextBlock_VBScript,
-	HtmlTextBlock_Python,
 	HtmlTextBlock_PHP,
 	HtmlTextBlock_CSS,
 };
@@ -765,7 +763,7 @@ static HtmlTextBlock GetCurrentHtmlTextBlockEx(int iLexer, int iCurrentStyle) no
 		|| (iCurrentStyle >= SCE_HBA_START && iCurrentStyle <= SCE_HBA_OPERATOR)) {
 		return HtmlTextBlock_VBScript;
 	}
-	if ((iCurrentStyle >= SCE_H_SGML_DEFAULT && iCurrentStyle <= SCE_H_SGML_BLOCK_DEFAULT)) {
+	if ((iCurrentStyle >= SCE_H_SGML_DEFAULT && iCurrentStyle < SCE_H_SGML_BLOCK_DEFAULT)) {
 		return HtmlTextBlock_SGML;
 	}
 	return HtmlTextBlock_Tag;
@@ -994,9 +992,6 @@ static void AutoC_AddKeyword(WordList &pWList, int iCurrentStyle) noexcept {
 			break;
 		case HtmlTextBlock_VBScript:
 			pLex = &lexVBScript;
-			break;
-		case HtmlTextBlock_Python:
-			pLex = &lexPython;
 			break;
 		case HtmlTextBlock_PHP:
 			pLex = &lexPHP;
@@ -2419,10 +2414,6 @@ void EditToggleCommentLine(bool alternative) noexcept {
 		switch (block) {
 		case HtmlTextBlock_VBScript:
 			pwszComment = L"'";
-			break;
-
-		case HtmlTextBlock_Python:
-			pwszComment = L"#";
 			break;
 
 		case HtmlTextBlock_CDATA:
