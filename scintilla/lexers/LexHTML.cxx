@@ -252,7 +252,7 @@ int classifyTagHTML(Sci_PositionU start, Sci_PositionU end, const WordList &keyw
 }
 
 void classifyWordHTJS(Sci_PositionU start, Sci_PositionU end, const WordList &keywords, LexAccessor &styler, script_mode inScriptType) {
-	char s[63 + 1];
+	char s[31 + 1];
 	styler.GetRange(start, end, s, sizeof(s));
 	int chAttr = SCE_HJ_WORD;
 	if (keywords.InList(s)) {
@@ -263,7 +263,7 @@ void classifyWordHTJS(Sci_PositionU start, Sci_PositionU end, const WordList &ke
 
 int classifyWordHTVB(Sci_PositionU start, Sci_PositionU end, const WordList &keywords, LexAccessor &styler, script_mode inScriptType) {
 	int chAttr = SCE_HB_IDENTIFIER;
-	char s[64];
+	char s[32];
 	styler.GetRangeLowered(start, end, s, sizeof(s));
 	if (keywords.InList(s)) {
 		chAttr = SCE_HB_WORD;
@@ -278,7 +278,7 @@ int classifyWordHTVB(Sci_PositionU start, Sci_PositionU end, const WordList &key
 }
 
 bool isWordHSGML(Sci_PositionU start, Sci_PositionU end, const WordList &keywords, const LexAccessor &styler) noexcept {
-	char s[63 + 1];
+	char s[15 + 1];
 	styler.GetRange(start, end, s, sizeof(s));
 	return keywords.InList(s);
 }
@@ -400,6 +400,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 	script_type clientScript = static_cast<script_type>((lineState >> 8) & 0x0F); // 4 bits of script name
 	int beforePreProc = (lineState >> 12) & 0xFF; // 8 bits of state
 	bool isLanguageType = (lineState >> 20) & 1; // type or language attribute for script tag
+	int sgmlBlockLevel = (lineState >> 21);
 
 	script_type scriptLanguage = ScriptOfState(state);
 	// If eNonHtmlScript coincides with SCE_H_COMMENT, assume eScriptComment
@@ -526,7 +527,8 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			                    ((aspScript & 0x0F) << 4) |
 			                    ((clientScript & 0x0F) << 8) |
 			                    ((beforePreProc & 0xFF) << 12) |
-			                    ((isLanguageType ? 1 : 0) << 20));
+			                    ((isLanguageType ? 1 : 0) << 20) |
+			                    (sgmlBlockLevel << 21));
 			lineCurrent++;
 		}
 
@@ -644,7 +646,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 
 		/////////////////////////////////////
 		// handle the start of SGML language (DTD)
-		else if (((scriptLanguage == eScriptNone) || (scriptLanguage == eScriptXML)) &&
+		else if ((scriptLanguage == eScriptNone || scriptLanguage == eScriptXML || scriptLanguage == eScriptSGMLblock) &&
 				 (chPrev == '<') &&
 				 (ch == '!') &&
 				 (StateToPrint != SCE_H_CDATA) &&
@@ -674,7 +676,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			} else {
 				styler.ColorTo(i + 1, SCE_H_SGML_DEFAULT); // <! is default
 				scriptLanguage = eScriptSGML;
-				state = SCE_H_SGML_COMMAND; // wait for a pending command
+				state = (chNext == '[') ? SCE_H_SGML_DEFAULT : SCE_H_SGML_COMMAND; // wait for a pending command
 			}
 			// fold whole tag (-- when closing the tag)
 			if constexpr (foldHTMLPreprocessor || state == SCE_H_COMMENT || state == SCE_H_CDATA)
@@ -685,7 +687,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 		// handle the end of a pre-processor = Non-HTML
 		else if ((((inScriptType == eNonHtmlPreProc) || (inScriptType == eNonHtmlScriptPreProc)) &&
 				  ((scriptLanguage != eScriptNone) && (chNext == '>') && stateAllowsTermination(state, ch))) ||
-		         ((scriptLanguage == eScriptSGML) && (ch == '>') && (state != SCE_H_SGML_COMMENT))) {
+		         ((scriptLanguage == eScriptSGML) && (ch == '>') && !AnyOf(state, SCE_H_SGML_COMMENT, SCE_H_SGML_DOUBLESTRING, SCE_H_SGML_SIMPLESTRING))) {
 			if (state == SCE_H_ASPAT) {
 				aspScript = segIsScriptingIndicator(styler, styler.GetStartSegment(), i, aspScript);
 			}
@@ -710,7 +712,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			if (ch == '%')
 				styler.ColorTo(i + 1, SCE_H_ASP);
 			else if (scriptLanguage == eScriptXML)
-				styler.ColorTo(i + 1, SCE_H_XMLEND);
+				styler.ColorTo(i + 1, SCE_H_XMLSTART); // SCE_H_XMLEND
 			else if (scriptLanguage == eScriptSGML)
 				styler.ColorTo(i + 1, SCE_H_SGML_DEFAULT);
 			else
@@ -751,9 +753,6 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			break;
 		case SCE_H_SGML_DEFAULT:
 		case SCE_H_SGML_BLOCK_DEFAULT:
-//			if (scriptLanguage == eScriptSGMLblock)
-//				StateToPrint = SCE_H_SGML_BLOCK_DEFAULT;
-
 			if (ch == '\"') {
 				styler.ColorTo(i, StateToPrint);
 				state = SCE_H_SGML_DOUBLESTRING;
@@ -765,31 +764,35 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 					styler.ColorTo(i - 1, StateToPrint);
 				}
 				state = SCE_H_SGML_COMMENT;
-			} else if (IsAlpha(ch) && (chPrev == '%')) {
-				styler.ColorTo(i - 1, StateToPrint);
+			} else if (ch == '%' && IsAlpha(chNext)) {
+				styler.ColorTo(i, StateToPrint);
 				state = SCE_H_SGML_ENTITY;
 			} else if (ch == '#') {
 				styler.ColorTo(i, StateToPrint);
 				state = SCE_H_SGML_SPECIAL;
 			} else if (ch == '[') {
-				styler.ColorTo(i, StateToPrint);
+				++sgmlBlockLevel;
 				scriptLanguage = eScriptSGMLblock;
 				state = SCE_H_SGML_BLOCK_DEFAULT;
+				styler.ColorTo(i, StateToPrint);
+				styler.ColorTo(i + 1, SCE_H_SGML_DEFAULT);
 			} else if (ch == ']') {
-				if (scriptLanguage == eScriptSGMLblock) {
-					styler.ColorTo(i + 1, StateToPrint);
+				if (sgmlBlockLevel > 0) {
+					--sgmlBlockLevel;
+					if (sgmlBlockLevel == 0) {
+						beforePreProc = SCE_H_DEFAULT;
+					}
 					scriptLanguage = eScriptSGML;
+					state = SCE_H_SGML_DEFAULT;
+					styler.ColorTo(i, StateToPrint);
+					styler.ColorTo(i + 1, SCE_H_SGML_DEFAULT);
 				} else {
+					state = SCE_H_SGML_DEFAULT;
 					styler.ColorTo(i, StateToPrint);
 					styler.ColorTo(i + 1, SCE_H_SGML_ERROR);
 				}
-				state = SCE_H_SGML_DEFAULT;
 			} else if (scriptLanguage == eScriptSGMLblock) {
-				if ((ch == '!') && (chPrev == '<')) {
-					styler.ColorTo(i - 1, StateToPrint);
-					styler.ColorTo(i + 1, SCE_H_SGML_DEFAULT);
-					state = SCE_H_SGML_COMMAND;
-				} else if (ch == '>') {
+				if (ch == '>') {
 					styler.ColorTo(i, StateToPrint);
 					styler.ColorTo(i + 1, SCE_H_SGML_DEFAULT);
 				}
@@ -866,7 +869,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 					i += 1;
 				}
 				styler.ColorTo(i + 1, StateToPrint);
-				state = SCE_H_DEFAULT;
+				state = beforePreProc;
 				levelCurrent--;
 			}
 			break;
@@ -1146,7 +1149,6 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				} else {
 					classifyWordHTJS(styler.GetStartSegment(), i, keywordsJS, styler, inScriptType);
 				}
-				//styler.ColorTo(i, eHTJSKeyword);
 				state = SCE_HJ_DEFAULT;
 				if (ch == '/' && chNext == '*') {
 					if (chNext2 == '*')
