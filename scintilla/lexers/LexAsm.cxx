@@ -262,7 +262,7 @@ void ColouriseAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 						sc.Forward();
 				} else if (IsADigit(sc.chNext) || (sc.chNext == '$' && IsHexDigit(sc.GetRelative(2)))) {
 					sc.SetState(SCE_ASM_NUMBER);
-				} else if (IsAsmWordStart(sc.chNext)) {
+				} else if (IsAsmWordChar(sc.chNext)) {
 					sc.SetState(SCE_ASM_IDENTIFIER);
 				} else {
 					char pp[64];
