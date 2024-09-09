@@ -7693,21 +7693,6 @@ BOOL SaveFileDlg(bool Untitled, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInit
 *
 *
 ******************************************************************************/
-static BOOL CALLBACK EnumWindProcReuseWindow(HWND hwnd, LPARAM lParam) noexcept {
-	BOOL bContinue = TRUE;
-	WCHAR szClassName[64];
-
-	if (GetClassName(hwnd, szClassName, COUNTOF(szClassName))) {
-		if (StrCaseEqual(szClassName, wchWndClass)) {
-			*AsPointer<HWND *>(lParam) = hwnd;
-			if (IsWindowEnabled(hwnd)) {
-				bContinue = FALSE;
-			}
-		}
-	}
-	return bContinue;
-}
-
 static BOOL CALLBACK EnumWindProcSingleFileInstance(HWND hwnd, LPARAM lParam) noexcept {
 	BOOL bContinue = TRUE;
 	WCHAR szClassName[64];
@@ -7715,7 +7700,7 @@ static BOOL CALLBACK EnumWindProcSingleFileInstance(HWND hwnd, LPARAM lParam) no
 	if (GetClassName(hwnd, szClassName, COUNTOF(szClassName))) {
 		if (StrCaseEqual(szClassName, wchWndClass)) {
 			WCHAR tchFileName[MAX_PATH];
-			if (GetDlgItemText(hwnd, IDC_FILENAME, tchFileName, COUNTOF(tchFileName)) && PathEquivalent(tchFileName, lpFileArg)) {
+			if (lpFileArg == nullptr || (GetDlgItemText(hwnd, IDC_FILENAME, tchFileName, COUNTOF(tchFileName)) && PathEquivalent(tchFileName, lpFileArg))) {
 				*AsPointer<HWND *>(lParam) = hwnd;
 				if (IsWindowEnabled(hwnd)) {
 					bContinue = FALSE;
@@ -7782,58 +7767,29 @@ static void ActivatePrevWindow(HWND hwnd, LPCWSTR lpszFile) noexcept {
 }
 
 bool ActivatePrevInst() noexcept {
-	if ((flagNoReuseWindow && !flagSingleFileInstance) || flagStartAsTrayIcon || flagNewFromClipboard || flagPasteBoard) {
-		return false;
-	}
-
-	if (flagSingleFileInstance && lpFileArg) {
-		ExpandEnvironmentStringsEx(lpFileArg, static_cast<DWORD>(NP2HeapSize(lpFileArg) / sizeof(WCHAR)));
-
-		if (PathIsRelative(lpFileArg)) {
-			WCHAR tchTmp[MAX_PATH];
-			PathCombine(tchTmp, g_wchWorkingDirectory, lpFileArg);
-			lstrcpy(lpFileArg, tchTmp);
-		}
-
-		GetLongPathName(lpFileArg, lpFileArg, MAX_PATH);
-
-		HWND hwnd = nullptr;
-		EnumWindows(EnumWindProcSingleFileInstance, AsInteger<LPARAM>(&hwnd));
-
-		if (hwnd != nullptr) {
-			// Enabled
-			if (IsWindowEnabled(hwnd)) {
-				// Make sure the previous window won't pop up a change notification message
-				//SendMessage(hwnd, APPM_CHANGENOTIFYCLEAR, 0, 0);
-
-				if (IsIconic(hwnd)) {
-					ShowWindowAsync(hwnd, SW_RESTORE);
-				}
-
-				if (!IsWindowVisible(hwnd)) {
-					SendMessage(hwnd, APPM_TRAYMESSAGE, 0, WM_LBUTTONDBLCLK);
-					SendMessage(hwnd, APPM_TRAYMESSAGE, 0, WM_LBUTTONUP);
-				}
-
-				SetForegroundWindow(hwnd);
-				ActivatePrevWindow(hwnd, nullptr);
-				return true;
-			}
-
-			// Ask...
-			if (IDYES == MsgBoxAsk(MB_YESNO, IDS_ERR_PREVWINDISABLED)) {
-				return false;
-			}
-			return true;
-		}
-	}
-
-	if (flagNoReuseWindow) {
+	if (flagStartAsTrayIcon || flagNewFromClipboard || flagPasteBoard) {
 		return false;
 	}
 
 	HWND hwnd = nullptr;
-	EnumWindows(EnumWindProcReuseWindow, AsInteger<LPARAM>(&hwnd));
+	LPWSTR lpszFile = lpFileArg;
+	if (flagSingleFileInstance && lpszFile) {
+		ExpandEnvironmentStringsEx(lpszFile, static_cast<DWORD>(NP2HeapSize(lpszFile) / sizeof(WCHAR)));
+
+		if (PathIsRelative(lpszFile)) {
+			WCHAR tchTmp[MAX_PATH];
+			PathCombine(tchTmp, g_wchWorkingDirectory, lpszFile);
+			lstrcpy(lpszFile, tchTmp);
+		}
+
+		GetLongPathName(lpszFile, lpszFile, MAX_PATH);
+		EnumWindows(EnumWindProcSingleFileInstance, AsInteger<LPARAM>(&hwnd));
+		lpszFile = nullptr;
+	} else if (!flagNoReuseWindow) {
+		lpFileArg = nullptr;
+		EnumWindows(EnumWindProcSingleFileInstance, AsInteger<LPARAM>(&hwnd));
+		lpFileArg = lpszFile;
+	}
 
 	// Found a window
 	if (hwnd != nullptr) {
@@ -7853,17 +7809,16 @@ bool ActivatePrevInst() noexcept {
 
 			SetForegroundWindow(hwnd);
 
-			if (lpFileArg) {
-				ExpandEnvironmentStringsEx(lpFileArg, static_cast<DWORD>(NP2HeapSize(lpFileArg) / sizeof(WCHAR)));
+			if (lpszFile) {
+				ExpandEnvironmentStringsEx(lpszFile, static_cast<DWORD>(NP2HeapSize(lpszFile) / sizeof(WCHAR)));
 
-				if (PathIsRelative(lpFileArg)) {
+				if (PathIsRelative(lpszFile)) {
 					WCHAR tchTmp[MAX_PATH];
-					PathCombine(tchTmp, g_wchWorkingDirectory, lpFileArg);
-					lstrcpy(lpFileArg, tchTmp);
+					PathCombine(tchTmp, g_wchWorkingDirectory, lpszFile);
+					lstrcpy(lpszFile, tchTmp);
 				}
-
-				ActivatePrevWindow(hwnd, lpFileArg);
 			}
+			ActivatePrevWindow(hwnd, lpszFile);
 			return true;
 		}
 
