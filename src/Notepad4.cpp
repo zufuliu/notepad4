@@ -859,22 +859,16 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 			}
 		} else {
 			bOpened = FileLoad(FileLoadFlag_Default, lpFileArg);
-			if (bOpened) {
-				bFileLoadCalled = true;
-				if (flagJumpTo) { // Jump to position
-					EditJumpTo(iInitialLine, iInitialColumn);
-				}
-			}
+			bFileLoadCalled = bOpened;
 		}
 		NP2HeapFree(lpFileArg);
 
 		if (bOpened) {
-			if (flagChangeNotify == TripleBoolean_False) {
-				iFileWatchingMode = FileWatchingMode_None;
-				bResetFileWatching = true;
-				InstallFileWatching(false);
-			} else if (flagChangeNotify == TripleBoolean_True) {
-				iFileWatchingMode = FileWatchingMode_AutoReload;
+			if (flagJumpTo) { // Jump to position
+				EditJumpTo(iInitialLine, iInitialColumn);
+			}
+			if (flagChangeNotify != TripleBoolean_NotSet) {
+				iFileWatchingMode = (flagChangeNotify == TripleBoolean_False) ? FileWatchingMode_None : FileWatchingMode_AutoReload;
 				bResetFileWatching = true;
 				InstallFileWatching(false);
 			}
@@ -1261,8 +1255,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		//bPendingChangeNotify = false;
 
 		if (pcds->dwData == DATA_NOTEPAD4_PARAMS) {
-			NP2PARAMS *params = static_cast<NP2PARAMS *>(NP2HeapAlloc(pcds->cbData));
-			memcpy(params, pcds->lpData, pcds->cbData);
+			const NP2PARAMS * const params = static_cast<NP2PARAMS *>(pcds->lpData);
 
 			if (params->flagReadOnlyMode) {
 				flagReadOnlyMode |= ReadOnlyMode_Current;
@@ -1288,12 +1281,8 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 				}
 
 				if (bOpened) {
-					if (params->flagChangeNotify == TripleBoolean_False) {
-						iFileWatchingMode = FileWatchingMode_None;
-						bResetFileWatching = true;
-						InstallFileWatching(false);
-					} else if (params->flagChangeNotify == TripleBoolean_True) {
-						iFileWatchingMode = FileWatchingMode_AutoReload;
+					if (params->flagChangeNotify != TripleBoolean_NotSet) {
+						iFileWatchingMode = (params->flagChangeNotify == TripleBoolean_False) ? FileWatchingMode_None : FileWatchingMode_AutoReload;
 						bResetFileWatching = true;
 						InstallFileWatching(false);
 					}
@@ -1330,17 +1319,13 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			}
 
 			if (params->flagJumpTo) {
-				if (params->iInitialLine == 0) {
-					params->iInitialLine = 1;
-				}
-				EditJumpTo(params->iInitialLine, params->iInitialColumn);
+				const Sci_Line iLine = params->iInitialLine ? params->iInitialLine : 1;
+				EditJumpTo(iLine, params->iInitialColumn);
 			}
 
 			flagLexerSpecified = false;
 			flagQuietCreate = false;
 			flagReadOnlyMode &= ReadOnlyMode_AllFile;
-
-			NP2HeapFree(params);
 		}
 	}
 	return TRUE;
