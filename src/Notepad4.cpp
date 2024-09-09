@@ -612,6 +612,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 	// Try to activate another window
 	if (ActivatePrevInst()) {
+		NP2HeapFree(lpFileArg);
 		return 0;
 	}
 
@@ -1270,14 +1271,15 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			if (params->flagFileSpecified) {
 				bool bOpened = false;
 				iSrcEncoding = params->iSrcEncoding;
+				LPCWSTR lpsz = &params->wchData;
 
-				if (PathIsDirectory(&params->wchData)) {
+				if (PathIsDirectory(lpsz)) {
 					WCHAR tchFile[MAX_PATH];
-					if (OpenFileDlg(tchFile, COUNTOF(tchFile), &params->wchData)) {
+					if (OpenFileDlg(tchFile, COUNTOF(tchFile), lpsz)) {
 						bOpened = FileLoad(FileLoadFlag_Default, tchFile);
 					}
 				} else {
-					bOpened = FileLoad(FileLoadFlag_Default, &params->wchData);
+					bOpened = FileLoad(FileLoadFlag_Default, lpsz);
 				}
 
 				if (bOpened) {
@@ -1302,7 +1304,8 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 					if (params->flagLexerSpecified) {
 						if (params->iInitialLexer <= 0) {
 							WCHAR wchExt[32] = L".";
-							lstrcpyn(wchExt + 1, StrEnd(&params->wchData) + 1, COUNTOF(wchExt) - 1);
+							lpsz = StrEnd(lpsz) + 1;
+							lstrcpyn(wchExt + 1, lpsz, COUNTOF(wchExt) - 1);
 							Style_SetLexerFromName(&params->wchData, wchExt);
 						} else {
 							Style_SetLexerFromID(params->iInitialLexer);
@@ -1310,7 +1313,8 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 					}
 
 					if (params->flagTitleExcerpt) {
-						lstrcpyn(szTitleExcerpt, StrEnd(&params->wchData) + 1, COUNTOF(szTitleExcerpt));
+						lpsz = StrEnd(lpsz) + 1;
+						lstrcpyn(szTitleExcerpt, lpsz, COUNTOF(szTitleExcerpt));
 						UpdateWindowTitle();
 					}
 				}
@@ -7722,6 +7726,61 @@ static BOOL CALLBACK EnumWindProcSingleFileInstance(HWND hwnd, LPARAM lParam) no
 	return bContinue;
 }
 
+static void ActivatePrevWindow(HWND hwnd, LPCWSTR lpszFile) noexcept {
+	DWORD cb = sizeof(NP2PARAMS);
+	int cchTitleExcerpt = 0;
+	if (lpszFile) {
+		cb += (lstrlen(lpszFile) + 1) * sizeof(WCHAR);
+		cb += (lstrlen(lpSchemeArg) + 1) * sizeof(WCHAR);
+		cchTitleExcerpt = lstrlen(szTitleExcerpt);
+		if (cchTitleExcerpt) {
+			cb += (cchTitleExcerpt + 1) * sizeof(WCHAR);
+		}
+	}
+
+	static_assert(__is_standard_layout(NP2PARAMS));
+	NP2PARAMS *params = static_cast<NP2PARAMS *>(GlobalAlloc(GPTR, cb));
+	params->flagFileSpecified = false;
+	params->flagReadOnlyMode = flagReadOnlyMode & ReadOnlyMode_Current;
+	params->flagLexerSpecified = flagLexerSpecified;
+	params->flagQuietCreate = flagQuietCreate;
+	params->flagTitleExcerpt = false;
+	params->flagJumpTo = flagJumpTo;
+	params->flagChangeNotify = flagChangeNotify;
+
+	if (lpszFile) {
+		params->flagFileSpecified = true;
+		LPWSTR lpsz = &params->wchData;
+		lstrcpy(lpsz, lpszFile);
+		params->iInitialLexer = iInitialLexer;
+		if (flagLexerSpecified && lpSchemeArg) {
+			params->iInitialLexer = 0;
+			lpsz = StrEnd(lpsz) + 1;
+			lstrcpy(lpsz, lpSchemeArg);
+		}
+		if (cchTitleExcerpt) {
+			params->flagTitleExcerpt = true;
+			lpsz = StrEnd(lpsz) + 1;
+			lstrcpy(lpsz, szTitleExcerpt);
+		}
+	}
+
+	params->iInitialLine = iInitialLine;
+	params->iInitialColumn = iInitialColumn;
+
+	params->iSrcEncoding = lpEncodingArg ? Encoding_Match(lpEncodingArg) : CPI_NONE;
+	params->flagSetEncoding = flagSetEncoding;
+	params->flagSetEOLMode = flagSetEOLMode;
+
+	COPYDATASTRUCT cds;
+	cds.dwData = DATA_NOTEPAD4_PARAMS;
+	cds.cbData = static_cast<DWORD>(GlobalSize(params));
+	cds.lpData = params;
+
+	SendMessage(hwnd, WM_COPYDATA, 0, AsInteger<LPARAM>(&cds));
+	GlobalFree(params);
+}
+
 bool ActivatePrevInst() noexcept {
 	if ((flagNoReuseWindow && !flagSingleFileInstance) || flagStartAsTrayIcon || flagNewFromClipboard || flagPasteBoard) {
 		return false;
@@ -7757,42 +7816,7 @@ bool ActivatePrevInst() noexcept {
 				}
 
 				SetForegroundWindow(hwnd);
-
-				DWORD cb = sizeof(NP2PARAMS);
-				if (lpSchemeArg) {
-					cb += (lstrlen(lpSchemeArg) + 1) * sizeof(WCHAR);
-				}
-
-				static_assert(__is_standard_layout(NP2PARAMS));
-				NP2PARAMS *params = static_cast<NP2PARAMS *>(GlobalAlloc(GPTR, cb));
-				params->flagFileSpecified = false;
-				params->flagReadOnlyMode = flagReadOnlyMode & ReadOnlyMode_Current;
-				params->flagLexerSpecified = flagLexerSpecified;
-				params->flagQuietCreate = false;
-				params->flagTitleExcerpt = false;
-				params->flagJumpTo = flagJumpTo;
-				params->flagChangeNotify = TripleBoolean_NotSet;
-				if (flagLexerSpecified && lpSchemeArg) {
-					lstrcpy(StrEnd(&params->wchData) + 1, lpSchemeArg);
-					params->iInitialLexer = 0;
-				} else {
-					params->iInitialLexer = iInitialLexer;
-				}
-				params->iInitialLine = iInitialLine;
-				params->iInitialColumn = iInitialColumn;
-
-				params->iSrcEncoding = lpEncodingArg ? Encoding_Match(lpEncodingArg) : CPI_NONE;
-				params->flagSetEncoding = flagSetEncoding;
-				params->flagSetEOLMode = flagSetEOLMode;
-
-				COPYDATASTRUCT cds;
-				cds.dwData = DATA_NOTEPAD4_PARAMS;
-				cds.cbData = static_cast<DWORD>(GlobalSize(params));
-				cds.lpData = params;
-
-				SendMessage(hwnd, WM_COPYDATA, 0, AsInteger<LPARAM>(&cds));
-				GlobalFree(params);
-
+				ActivatePrevWindow(hwnd, nullptr);
 				return true;
 			}
 
@@ -7838,54 +7862,7 @@ bool ActivatePrevInst() noexcept {
 					lstrcpy(lpFileArg, tchTmp);
 				}
 
-				DWORD cb = sizeof(NP2PARAMS);
-				cb += (lstrlen(lpFileArg) + 1) * sizeof(WCHAR);
-
-				if (lpSchemeArg) {
-					cb += (lstrlen(lpSchemeArg) + 1) * sizeof(WCHAR);
-				}
-
-				const int cchTitleExcerpt = lstrlen(szTitleExcerpt);
-				if (cchTitleExcerpt) {
-					cb += (cchTitleExcerpt + 1) * sizeof(WCHAR);
-				}
-
-				NP2PARAMS *params = static_cast<NP2PARAMS *>(GlobalAlloc(GPTR, cb));
-				lstrcpy(&params->wchData, lpFileArg);
-				params->flagFileSpecified = true;
-				params->flagReadOnlyMode = flagReadOnlyMode & ReadOnlyMode_Current;
-				params->flagLexerSpecified = flagLexerSpecified;
-				params->flagQuietCreate = flagQuietCreate;
-				params->flagJumpTo = flagJumpTo;
-				params->flagChangeNotify = flagChangeNotify;
-				if (flagLexerSpecified && lpSchemeArg) {
-					lstrcpy(StrEnd(&params->wchData) + 1, lpSchemeArg);
-					params->iInitialLexer = 0;
-				} else {
-					params->iInitialLexer = iInitialLexer;
-				}
-				params->iInitialLine = iInitialLine;
-				params->iInitialColumn = iInitialColumn;
-
-				params->iSrcEncoding = lpEncodingArg ? Encoding_Match(lpEncodingArg) : CPI_NONE;
-				params->flagSetEncoding = flagSetEncoding;
-				params->flagSetEOLMode = flagSetEOLMode;
-
-				if (cchTitleExcerpt) {
-					lstrcpy(StrEnd(&params->wchData) + 1, szTitleExcerpt);
-					params->flagTitleExcerpt = true;
-				} else {
-					params->flagTitleExcerpt = false;
-				}
-
-				COPYDATASTRUCT cds;
-				cds.dwData = DATA_NOTEPAD4_PARAMS;
-				cds.cbData = static_cast<DWORD>(GlobalSize(params));
-				cds.lpData = params;
-
-				SendMessage(hwnd, WM_COPYDATA, 0, AsInteger<LPARAM>(&cds));
-				GlobalFree(params);
-				NP2HeapFree(lpFileArg);
+				ActivatePrevWindow(hwnd, lpFileArg);
 			}
 			return true;
 		}
