@@ -642,12 +642,8 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		PCOPYDATASTRUCT pcds = AsPointer<PCOPYDATASTRUCT>(lParam);
 
 		if (pcds->dwData == DATA_MATEPATH_PATHARG) {
-			LPWSTR lpsz = static_cast<LPWSTR>(NP2HeapAlloc(pcds->cbData));
-			memcpy(lpsz, pcds->lpData, pcds->cbData);
-
+			LPCWSTR lpsz = static_cast<LPCWSTR>(pcds->lpData);
 			DisplayPath(lpsz, IDS_ERR_CMDLINE);
-
-			NP2HeapFree(lpsz);
 		}
 	}
 	return TRUE;
