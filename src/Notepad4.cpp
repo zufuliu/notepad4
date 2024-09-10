@@ -897,7 +897,6 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	fKeepTitleExcerpt = false;
 
 	// Check for /c [if no file is specified] -- even if a file is specified
-	/*else */
 	if (flagNewFromClipboard) {
 		if (SciCall_CanPaste()) {
 			const bool back = autoCompletionConfig.bIndentText;
@@ -6143,25 +6142,23 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) noexcept {
 			flagSetEncoding = IDM_ENCODING_ANSI - IDM_ENCODING_ANSI + 1;
 			state = CommandParseState_Consumed;
 		} else {
-			bool bFindUp = false;
-			bool bRegex = false;
-			bool bTransBS = false;
+			int flag = MatchTextFlag_None;
 
 			++opt;
 			switch (UnsafeUpper(*opt)) {
 			case L'R':
-				bRegex = true;
+				flag |= MatchTextFlag_Regex;
 				++opt;
 				break;
 
 			case L'B':
-				bTransBS = true;
+				flag |= MatchTextFlag_TransformBS;
 				++opt;
 				break;
 			}
 
 			if (*opt == L'-') {
-				bFindUp = true;
+				flag |= MatchTextFlag_FindUp;
 				++opt;
 			}
 			if (*opt != L'\0') {
@@ -6175,10 +6172,7 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) noexcept {
 				}
 
 				lpMatchArg = StrDup(lp1);
-				flagMatchText = static_cast<MatchTextFlag>(MatchTextFlag_Default
-					| (static_cast<int>(bFindUp) * MatchTextFlag_FindUp)
-					| (static_cast<int>(bRegex) * MatchTextFlag_Regex)
-					| (static_cast<int>(bTransBS) * MatchTextFlag_TransformBS));
+				flagMatchText = static_cast<MatchTextFlag>(flag | MatchTextFlag_Default);
 				state = CommandParseState_Consumed;
 			}
 		}
