@@ -41,6 +41,14 @@ enum FileWatchingMode {
 	FileWatchingMode_AutoReload,
 };
 
+enum MatchTextFlag {
+	MatchTextFlag_None = 0,
+	MatchTextFlag_Default = 1,
+	MatchTextFlag_FindUp = 2,
+	MatchTextFlag_Regex = 4,
+	MatchTextFlag_TransformBS = 8,
+};
+
 //==== Data Type for WM_COPYDATA ==============================================
 #define DATA_NOTEPAD4_PARAMS 0xFB10
 struct NP2PARAMS {
@@ -57,6 +65,7 @@ struct NP2PARAMS {
 	int		iSrcEncoding;
 	int		flagSetEncoding;
 	int		flagSetEOLMode;
+	MatchTextFlag flagMatchText;
 	WCHAR wchData;
 };
 

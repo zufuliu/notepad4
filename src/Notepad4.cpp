@@ -378,14 +378,6 @@ enum NotepadReplacementAction {
 	NotepadReplacementAction_PrintDefault,
 };
 
-enum MatchTextFlag {
-	MatchTextFlag_None = 0,
-	MatchTextFlag_Default = 1,
-	MatchTextFlag_FindUp = 2,
-	MatchTextFlag_Regex = 4,
-	MatchTextFlag_TransformBS = 8,
-};
-
 enum RelaunchElevatedFlag {
 	RelaunchElevatedFlag_None = 0,
 	RelaunchElevatedFlag_Startup,
@@ -709,6 +701,33 @@ BOOL InitApplication(HINSTANCE hInstance) noexcept {
 	return RegisterClassEx(&wc);
 }
 
+static void HandleMatchText(MatchTextFlag flag, LPCWSTR lpszText, bool jumpTo) noexcept {
+	if (StrNotEmpty(lpszText) && SciCall_GetLength()) {
+		const UINT cpEdit = SciCall_GetCodePage();
+		WideCharToMultiByte(cpEdit, 0, lpszText, -1, efrData.szFind, COUNTOF(efrData.szFind), nullptr, nullptr);
+		WideCharToMultiByte(CP_UTF8, 0, lpszText, -1, efrData.szFindUTF8, COUNTOF(efrData.szFindUTF8), nullptr, nullptr);
+
+		if (flag & MatchTextFlag_Regex) {
+			efrData.fuFlags |= (iFindReplaceOption & FindReplaceOption_UseCxxRegex) ? (SCFIND_REGEXP | SCFIND_CXX11REGEX) : (SCFIND_REGEXP | SCFIND_POSIX);
+		} else if (flag & MatchTextFlag_TransformBS) {
+			efrData.option |= FindReplaceOption_TransformBackslash;
+		}
+
+		if (flag & MatchTextFlag_FindUp) {
+			if (!jumpTo) {
+				SciCall_DocumentEnd();
+			}
+			EditFindPrev(&efrData, false);
+		} else {
+			if (!jumpTo) {
+				SciCall_DocumentStart();
+			}
+			EditFindNext(&efrData, false);
+		}
+		EditEnsureSelectionVisible();
+	}
+}
+
 //=============================================================================
 //
 // InitInstance()
@@ -931,31 +950,8 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	}
 
 	// Match Text
-	if (flagMatchText != MatchTextFlag_None && lpMatchArg) {
-		if (StrNotEmpty(lpMatchArg) && SciCall_GetLength()) {
-			const UINT cpEdit = SciCall_GetCodePage();
-			WideCharToMultiByte(cpEdit, 0, lpMatchArg, -1, efrData.szFind, COUNTOF(efrData.szFind), nullptr, nullptr);
-			WideCharToMultiByte(CP_UTF8, 0, lpMatchArg, -1, efrData.szFindUTF8, COUNTOF(efrData.szFindUTF8), nullptr, nullptr);
-
-			if (flagMatchText & MatchTextFlag_Regex) {
-				efrData.fuFlags |= (iFindReplaceOption & FindReplaceOption_UseCxxRegex) ? (SCFIND_REGEXP | SCFIND_CXX11REGEX) : (SCFIND_REGEXP | SCFIND_POSIX);
-			} else if (flagMatchText & MatchTextFlag_TransformBS) {
-				efrData.option |= FindReplaceOption_TransformBackslash;
-			}
-
-			if (flagMatchText & MatchTextFlag_FindUp) {
-				if (!flagJumpTo) {
-					SciCall_DocumentEnd();
-				}
-				EditFindPrev(&efrData, false);
-			} else {
-				if (!flagJumpTo) {
-					SciCall_DocumentStart();
-				}
-				EditFindNext(&efrData, false);
-			}
-			EditEnsureSelectionVisible();
-		}
+	if (lpMatchArg) {
+		HandleMatchText(flagMatchText, lpMatchArg, flagJumpTo);
 		LocalFree(lpMatchArg);
 	}
 
@@ -1267,13 +1263,14 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 				flagQuietCreate = true;
 			}
 
+			bool bOpened = true;
+			LPCWSTR lpsz = &params->wchData;
 			if (params->flagFileSpecified) {
-				bool bOpened = false;
 				iSrcEncoding = params->iSrcEncoding;
-				LPCWSTR lpsz = &params->wchData;
 
 				if (PathIsDirectory(lpsz)) {
 					WCHAR tchFile[MAX_PATH];
+					bOpened = false;
 					if (OpenFileDlg(tchFile, COUNTOF(tchFile), lpsz)) {
 						bOpened = FileLoad(FileLoadFlag_Default, tchFile);
 					}
@@ -1316,6 +1313,9 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 						lstrcpyn(szTitleExcerpt, lpsz, COUNTOF(szTitleExcerpt));
 						UpdateWindowTitle();
 					}
+					if (params->flagMatchText != MatchTextFlag_None) {
+						lpsz = StrEnd(lpsz) + 1;
+					}
 				}
 				// reset
 				iSrcEncoding = CPI_NONE;
@@ -1324,6 +1324,9 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			if (params->flagJumpTo) {
 				const Sci_Line iLine = params->iInitialLine ? params->iInitialLine : 1;
 				EditJumpTo(iLine, params->iInitialColumn);
+			}
+			if (bOpened && params->flagMatchText != MatchTextFlag_None) {
+				HandleMatchText(params->flagMatchText, lpsz, params->flagJumpTo);
 			}
 
 			flagLexerSpecified = false;
@@ -7716,6 +7719,9 @@ static void ActivatePrevWindow(HWND hwnd, LPCWSTR lpszFile) noexcept {
 			cb += (cchTitleExcerpt + 1) * sizeof(WCHAR);
 		}
 	}
+	if (lpMatchArg) {
+		cb += (lstrlen(lpMatchArg) + 1) * sizeof(WCHAR);
+	}
 
 	static_assert(__is_standard_layout(NP2PARAMS));
 	NP2PARAMS *params = static_cast<NP2PARAMS *>(GlobalAlloc(GPTR, cb));
@@ -7727,9 +7733,9 @@ static void ActivatePrevWindow(HWND hwnd, LPCWSTR lpszFile) noexcept {
 	params->flagJumpTo = flagJumpTo;
 	params->flagChangeNotify = flagChangeNotify;
 
+	LPWSTR lpsz = &params->wchData;
 	if (lpszFile) {
 		params->flagFileSpecified = true;
-		LPWSTR lpsz = &params->wchData;
 		lstrcpy(lpsz, lpszFile);
 		params->iInitialLexer = iInitialLexer;
 		if (flagLexerSpecified && lpSchemeArg) {
@@ -7742,6 +7748,13 @@ static void ActivatePrevWindow(HWND hwnd, LPCWSTR lpszFile) noexcept {
 			lpsz = StrEnd(lpsz) + 1;
 			lstrcpy(lpsz, szTitleExcerpt);
 		}
+		if (lpMatchArg) {
+			lpsz = StrEnd(lpsz) + 1;
+		}
+	}
+	if (lpMatchArg) {
+		params->flagMatchText = flagMatchText;
+		lstrcpy(lpsz, lpMatchArg);
 	}
 
 	params->iInitialLine = iInitialLine;
