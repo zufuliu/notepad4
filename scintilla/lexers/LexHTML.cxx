@@ -341,18 +341,21 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 	const WordList &keywordsAttr = keywordLists[6];
 	const WordList &keywordsEvent = keywordLists[7];
 
-	styler.StartAt(startPos);
 	int StateToPrint = initStyle;
 	int state = stateForPrintState(StateToPrint);
 
 	// If inside a tag, it may be a script tag, so reread from the start of line starting tag to ensure any language tags are seen
 	if (InTagState(state)) {
-		while ((startPos > 0) && (InTagState(styler.StyleIndexAt(startPos - 1)))) {
-			const Sci_Position backLineStart = styler.LineStart(styler.GetLine(startPos-1));
+		while (startPos != 0) {
+			state = styler.StyleIndexAt(startPos - 1);
+			if (!InTagState(state)) {
+				break;
+			}
+			const Sci_Position backLineStart = styler.LineStart(styler.GetLine(startPos - 1));
 			length += startPos - backLineStart;
 			startPos = backLineStart;
 		}
-		state = SCE_H_DEFAULT;
+		state = (startPos == 0) ? SCE_H_DEFAULT : state;
 	}
 	styler.StartAt(startPos);
 
@@ -770,20 +773,20 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 		case SCE_H_SGML_1ST_PARAM:
 			// wait for the beginning of the word
 			if ((ch == '-') && (chPrev == '-')) {
-				styler.ColorTo(i - 1, defaultStateForSGML(scriptLanguage));
+				styler.ColorTo(i - 1, SCE_H_SGML_DEFAULT);
 				state = SCE_H_SGML_1ST_PARAM_COMMENT;
 			} else if (IsSGMLWordChar(ch)) {
-				styler.ColorTo(i, defaultStateForSGML(scriptLanguage));
+				styler.ColorTo(i, SCE_H_SGML_DEFAULT);
 				// find the length of the word
 				do {
 					ch = styler.SafeGetUCharAt(++i);
 				} while (IsHTMLWordChar(ch));
 				styler.ColorTo(i, StateToPrint);
 				i -= 1;
-				state = defaultStateForSGML(scriptLanguage);
+				state = SCE_H_SGML_DEFAULT;
 				continue;
 			} else if (ch == '\"' || ch == '\'') {
-				styler.ColorTo(i, defaultStateForSGML(scriptLanguage));
+				styler.ColorTo(i, SCE_H_SGML_DEFAULT);
 				state = (ch == '\"')? SCE_H_SGML_DOUBLESTRING : SCE_H_SGML_SIMPLESTRING;
 			}
 			break;
@@ -792,7 +795,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				styler.ColorTo(i - 1, StateToPrint);
 				state = SCE_H_SGML_COMMENT;
 			} else if (ch == '\"' || ch == '\'') {
-				styler.ColorTo(i, defaultStateForSGML(scriptLanguage));
+				styler.ColorTo(i, SCE_H_SGML_DEFAULT);
 				state = (ch == '\"')? SCE_H_SGML_DOUBLESTRING : SCE_H_SGML_SIMPLESTRING;
 			}
 			break;
