@@ -1,5 +1,5 @@
 // 2023 https://www.w3.org/TR/CSS/ 7 December 2023
-// 2024-07-14 https://drafts.csswg.org/
+// 2024-09-14 https://drafts.csswg.org/
 // https://github.com/w3c/csswg-drafts/
 // https://www.w3.org/Style/CSS/all-properties
 // https://www.w3.org/Style/CSS/all-descriptors
@@ -133,7 +133,7 @@ from to
 	input-security: auto | none;
 }
 
-// CSS Box Model Module Level 4 https://www.w3.org/TR/css-box-4/ 1 April 2024
+// CSS Box Model Module Level 4 https://www.w3.org/TR/css-box-4/ 4 August 2024
 // CSS Box Model Module Level 3 https://www.w3.org/TR/css-box-3/ 11 April 2024
 // Box model https://www.w3.org/TR/CSS22/box.html
 {
@@ -199,7 +199,7 @@ from to
 	min-intrinsic-sizing: legacy | zero-if-scroll | zero-if-extrinsic;
 }
 
-// CSS Cascading and Inheritance Level 6 https://www.w3.org/TR/css-cascade-6/ 21 March 2023
+// CSS Cascading and Inheritance Level 6 https://www.w3.org/TR/css-cascade-6/ 6 September 2024
 // CSS Cascading and Inheritance Level 5 https://www.w3.org/TR/css-cascade-5/ 13 January 2022
 // CSS Cascading and Inheritance Level 4 https://www.w3.org/TR/css-cascade-4/ 13 January 2022
 // CSS Cascading and Inheritance Level 3 https://www.w3.org/TR/css-cascade-3/ 11 February 2021
@@ -245,9 +245,9 @@ initial inherit unset revert revert-layer
 	background-blend-mode:;
 }
 
-// CSS Conditional Rules Module Level 5 https://www.w3.org/TR/css-conditional-5/ 21 December 2021
+// CSS Conditional Rules Module Level 5 https://www.w3.org/TR/css-conditional-5/ 21 23 July 2024
 // CSS Conditional Rules Module Level 4 https://www.w3.org/TR/css-conditional-4/ 17 February 2022
-// CSS Conditional Rules Module Level 3 https://www.w3.org/TR/css-conditional-3/ 13 January 2022
+// CSS Conditional Rules Module Level 3 https://www.w3.org/TR/css-conditional-3/ 15 August 2024
 not and or
 @supports {
 }
@@ -255,6 +255,8 @@ not and or
 }
 @else {
 }
+@container {}
+@media {}
 selector()
 font-tech()
 font-format()
@@ -316,7 +318,9 @@ var()
 	visibility: visible | hidden | collapse;
 }
 
+// CSS Easing Functions Level 2 https://www.w3.org/TR/css-easing-2/ 29 August 2024
 // CSS Easing Functions Level 1 https://www.w3.org/TR/css-easing-1/ 13 February 2023
+linear()
 linear ease ease-in ease-out ease-in-out cubic-bezier()
 step-start step-end steps()
 
@@ -359,7 +363,7 @@ step-start step-end steps()
 	stroke-opacity:;
 }
 
-// Filter Effects Module Level 2 https://drafts.fxtf.org/filter-effects-2/ 11 March 2024
+// Filter Effects Module Level 2 https://drafts.fxtf.org/filter-effects-2/ 1 August 2024
 // Filter Effects Module Level 1 https://www.w3.org/TR/filter-effects-1/ 18 December 2018
 {
 	filter: none | blur() | brightness() | contrast() | drop-shadow() | grayscale() | hue-rotate() | invert() | opacity() | sepia() | saturate();
@@ -538,7 +542,7 @@ stripes()
 	image-resolution: from-image | snap;
 }
 
-// CSS Inline Layout Module Level 3 https://www.w3.org/TR/css-inline-3/ 1 April 2023
+// CSS Inline Layout Module Level 3 https://www.w3.org/TR/css-inline-3/ 12 August 2024
 {
 	dominant-baseline: auto | text-bottom | alphabetic | ideographic | middle | central | mathematical | hanging | text-top;
 	vertical-align: first | last;
@@ -547,8 +551,10 @@ stripes()
 	baseline-shift: sub | super | top | center | bottom;
 
 	line-height: normal;
+	line-fit-edge: leading;
+	text-box: normal;
 	text-box-edge: leading | text | cap | ex | ideographic | ideographic-ink | text | alphabetic | ideographic | ideographic-ink;
-	text-box-trim: normal | start | end | both;
+	text-box-trim: 	none | trim-start | trim-end | trim-both;
 	inline-sizing: normal | stretch;
 
 	initial-letter: normal | drop | raise;
@@ -868,7 +874,7 @@ all continuous paged visual audio speech tactile grid bitmap interactive static
 	page-orientation: upright | rotate-left | rotate-right;
 }
 
-// CSS Positioned Layout Module Level 3 https://www.w3.org/TR/css-position-3/ 3 April 2023
+// CSS Positioned Layout Module Level 3 https://www.w3.org/TR/css-position-3/ 10 August 2024
 {
 	position: static | relative | absolute | sticky | fixed;
 	top: auto;
@@ -974,8 +980,16 @@ all continuous paged visual audio speech tactile grid bitmap interactive static
 	overflow-anchor: auto | none;
 }
 
+// CSS Scroll Snap Module Level 2 https://www.w3.org/TR/css-scroll-snap-2/ 23 July 2024
 // CSS Scroll Snap Module Level 1 https://www.w3.org/TR/css-scroll-snap-1/ 11 March 2021
+:snapped
+:snapped-x
+:snapped-y
+:snapped-inline
+:snapped-block
 {
+	scroll-start-target: none | auto;
+
 	scroll-snap-type: none | block | inline | both | mandatory | proximity;
 	scroll-padding: auto;
 	scroll-margin:;
@@ -1290,6 +1304,7 @@ view()
 }
 @starting-style {}
 
+// CSS Values and Units Module Level 5 https://www.w3.org/TR/css-values-5/ 13 September 2024
 // CSS Values and Units Module Level 4 https://www.w3.org/TR/css-values-4/ 12 March 2024
 // CSS Values and Units Module Level 3 https://www.w3.org/TR/css-values-3/ 22 March 2024
 mix()
@@ -1303,7 +1318,18 @@ attr()
 = sin() cos() tan() asin() acos() atan() atan2()
 = pow() sqrt() hypot() log() exp()
 = abs() sign()
+= progress() media-progress() container-progress()
+= calc-mix() color-mix() cross-fade() transform-mix() mix()
+first-valid() toggle() attr()
+= random()
+random-item()
+sibling-count() sibling-index()
+= calc-size()
 pi infinity NaN
+
+{
+	interpolate-size: numeric-only | allow-keywords;
+}
 
 // CSS Viewport Module Level 1 https://www.w3.org/TR/css-viewport-1/ 25 January 2024
 {
