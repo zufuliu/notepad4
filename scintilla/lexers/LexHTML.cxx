@@ -750,18 +750,10 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 					styler.ColorTo(i, StateToPrint);
 					styler.ColorTo(i + 1, SCE_H_SGML_ERROR);
 				}
-			} else if (scriptLanguage == eScriptSGMLblock) {
-				if (ch == '>') {
-					styler.ColorTo(i, StateToPrint);
-					styler.ColorTo(i + 1, SCE_H_SGML_DEFAULT);
-				}
 			}
 			break;
 		case SCE_H_SGML_COMMAND:
-			if ((ch == '-') && (chPrev == '-')) {
-				styler.ColorTo(i - 1, StateToPrint);
-				state = SCE_H_SGML_COMMENT;
-			} else if (!IsSGMLWordChar(ch)) {
+			if (!IsSGMLWordChar(ch)) {
 				if (isWordHSGML(styler.GetStartSegment(), i, keywordsSGML, styler)) {
 					styler.ColorTo(i, StateToPrint);
 					state = SCE_H_SGML_1ST_PARAM;

@@ -363,6 +363,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	};
 	void MultipleSelectAdd(AddNumber addNumber);
 	bool RangeContainsProtected(Sci::Position start, Sci::Position end) const noexcept;
+	bool RangeContainsProtected(const SelectionRange &range) const noexcept;
 	bool SelectionContainsProtected() const noexcept;
 	Sci::Position MovePositionOutsideChar(Sci::Position pos, Sci::Position moveDir, bool checkLineEnd = true) const noexcept;
 	SelectionPosition MovePositionOutsideChar(SelectionPosition pos, Sci::Position moveDir, bool checkLineEnd = true) const noexcept;
@@ -433,6 +434,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	SelectionPosition RealizeVirtualSpace(SelectionPosition position);
 	void AddChar(char ch);
 	virtual void InsertCharacter(std::string_view sv, Scintilla::CharacterSource charSource);
+	void ClearSelectionRange(SelectionRange &range);
 	void ClearBeforeTentativeStart();
 	void InsertPaste(const char *text, Sci::Position len);
 	enum class PasteShape {
