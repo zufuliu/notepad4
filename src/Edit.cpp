@@ -1717,7 +1717,7 @@ LPWSTR EditURLEncodeSelection(int *pcchEscaped) noexcept {
 	DWORD cchEscapedW = static_cast<DWORD>(NP2HeapSize(pszEscapedW) / sizeof(WCHAR));
 	UrlEscape(pszTextW, pszEscapedW, &cchEscapedW, URL_ESCAPE_AS_UTF8);
 	if (!IsWin7AndAbove()) {
-		// TODO: encode some URL parts as UTF-8 then percent-escape these UTF-8 bytes.
+		// TODO: encode some URL parts as UTF-8 then percent escape these UTF-8 bytes.
 		//ParseURL(pszEscapedW, &ppu);
 	}
 
@@ -7023,12 +7023,19 @@ char *EditGetStringAroundCaret(LPCSTR delimiters) noexcept {
 
 extern bool bOpenFolderWithMatepath;
 
-static DWORD EditOpenSelectionCheckFile(LPCWSTR link, LPWSTR path, int cchFilePath, LPWSTR wchDirectory) noexcept {
+static DWORD EditOpenSelectionCheckFile(LPWSTR link, LPWSTR path, int cchFilePath, LPWSTR wchDirectory) noexcept {
 	if (StrStartsWith(link, L"//")) {
 		// issue #454, treat as link
 		lstrcpy(path, L"http:");
 		lstrcpy(path + CSTRLEN(L"http:"), link);
 		return 0;
+	}
+
+	// handle variables expanded into absolute path, avoid touch percent encoded URL
+	if (link[0] == '%') {
+		if (ExpandEnvironmentStrings(link, wchDirectory, MAX_PATH)) {
+			lstrcpy(link, wchDirectory);
+		}
 	}
 
 	DWORD dwAttributes = GetFileAttributes(link);
