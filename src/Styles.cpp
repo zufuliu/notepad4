@@ -4698,10 +4698,15 @@ static void Lexer_OnCheckStateChanged(HWND hwndTV, HTREEITEM hFavoriteNode, HTRE
 		// append node into Favorite Schemes
 		if (!found) {
 			constexpr DWORD iconFlags = SHGFI_USEFILEATTRIBUTES | SHGFI_SMALLICON | SHGFI_SYSICONINDEX;
-			hTreeNode = TreeView_GetLastVisible(hwndTV);
+			HTREEITEM hChildNode = hTreeNode;
+			hTreeNode = TreeView_GetNextSibling(hwndTV, hTreeNode);
+			if (hTreeNode == nullptr) {
+				hTreeNode = TreeView_GetNextSibling(hwndTV, hParent);
+				hTreeNode = hTreeNode ? hTreeNode : hChildNode;
+			}
 			hParent = Style_AddLexerToTreeView(hwndTV, pLex, iconFlags, hFavoriteNode, hInsertAfter, false);
 			TreeView_SetCheckState(hwndTV, hParent, TRUE);
-			// prevent auto scroll
+			// TODO: prevent auto scroll
 			TreeView_EnsureVisible(hwndTV, hTreeNode);
 		}
 	} else {
