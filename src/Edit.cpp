@@ -7023,7 +7023,7 @@ char *EditGetStringAroundCaret(LPCSTR delimiters) noexcept {
 
 extern bool bOpenFolderWithMatepath;
 
-static DWORD EditOpenSelectionCheckFile(LPWSTR link, LPWSTR path, int cchFilePath, LPWSTR wchDirectory) noexcept {
+static DWORD EditOpenSelectionCheckFile(LPCWSTR link, LPWSTR path, DWORD cchFilePath, LPWSTR wchDirectory) noexcept {
 	if (StrStartsWith(link, L"//")) {
 		// issue #454, treat as link
 		lstrcpy(path, L"http:");
@@ -7031,16 +7031,13 @@ static DWORD EditOpenSelectionCheckFile(LPWSTR link, LPWSTR path, int cchFilePat
 		return 0;
 	}
 
-	// handle variables expanded into absolute path, avoid touch percent encoded URL
-	if (link[0] == '%') {
-		if (ExpandEnvironmentStrings(link, wchDirectory, MAX_PATH)) {
-			lstrcpy(link, wchDirectory);
-		}
-	}
-
 	DWORD dwAttributes = GetFileAttributes(link);
 	if (dwAttributes == INVALID_FILE_ATTRIBUTES) {
-		if (StrNotEmpty(szCurFile)) {
+		// handle variables expanded into absolute path, avoid touch percent encoded URL
+		if (link[0] == '%' && ExpandEnvironmentStrings(link, path, cchFilePath)) {
+			dwAttributes = GetFileAttributes(path);
+		}
+		if (dwAttributes == INVALID_FILE_ATTRIBUTES && StrNotEmpty(szCurFile)) {
 			lstrcpy(wchDirectory, szCurFile);
 			PathRemoveFileSpec(wchDirectory);
 			PathCombine(path, wchDirectory, link);
