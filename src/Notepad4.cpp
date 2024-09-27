@@ -4948,7 +4948,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 					const int chNext = (brace == '(') ? ')' : brace + 2;
 					if (ch == chNext) {
 						if (SciCall_BraceMatchNext(iPos, SciCall_PositionBefore(iCurPos)) < 0) {
-							*(braces + 1) = L'\0'; // delete close brace
+							braces[1] = L'\0'; // delete close brace
 						}
 					} else {
 						closeBrace = brace != '<' && braces[1] == chNext;

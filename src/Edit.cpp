@@ -302,21 +302,18 @@ char* EditGetClipboardText(HWND hwnd) noexcept {
 
 	HANDLE hmem = GetClipboardData(CF_UNICODETEXT);
 	LPCWSTR pwch = static_cast<LPCWSTR>(GlobalLock(hmem));
-	const int wlen = lstrlen(pwch);
 
 	const UINT cpEdit = SciCall_GetCodePage();
-	const int mlen = WideCharToMultiByte(cpEdit, 0, pwch, wlen + 1, nullptr, 0, nullptr, nullptr) - 1;
-	char *pmch = static_cast<char *>(LocalAlloc(LPTR, mlen + 1));
-	char *ptmp = static_cast<char *>(NP2HeapAlloc(mlen * 4 + 1));
+	const int mlen = WideCharToMultiByte(cpEdit, 0, pwch, -1, nullptr, 0, nullptr, nullptr);
+	char *pmch = static_cast<char *>(LocalAlloc(LPTR, mlen*2));
+	char *ptmp = static_cast<char *>(NP2HeapAlloc(mlen));
 
 	if (pmch && ptmp) {
-		const char *s = pmch;
-		char *d = ptmp;
-
-		WideCharToMultiByte(cpEdit, 0, pwch, wlen + 1, pmch, mlen + 1, nullptr, nullptr);
-
+		WideCharToMultiByte(cpEdit, 0, pwch, -1, ptmp, mlen, nullptr, nullptr);
 		const int iEOLMode = SciCall_GetEOLMode();
-		for (int i = 0; (i < mlen) && (*s != '\0'); i++) {
+		const char *s = ptmp;
+		char *d = pmch;
+		while (*s != '\0') {
 			if (*s == '\n' || *s == '\r') {
 				switch (iEOLMode) {
 				default: // SC_EOL_CRLF
@@ -330,8 +327,7 @@ char* EditGetClipboardText(HWND hwnd) noexcept {
 					*d++ = '\r';
 					break;
 				}
-				if ((*s == '\r') && (i + 1 < mlen) && (*(s + 1) == '\n')) {
-					i++;
+				if (*s == '\r' && s[1] == '\n') {
 					s++;
 				}
 				s++;
@@ -341,12 +337,9 @@ char* EditGetClipboardText(HWND hwnd) noexcept {
 		}
 
 		*d++ = '\0';
-		LocalFree(pmch);
-		pmch = static_cast<char *>(LocalAlloc(LPTR, (d - ptmp)));
-		strcpy(pmch, ptmp);
-		NP2HeapFree(ptmp);
 	}
 
+	NP2HeapFree(ptmp);
 	GlobalUnlock(hmem);
 	CloseClipboard();
 
@@ -364,11 +357,10 @@ LPWSTR EditGetClipboardTextW() noexcept {
 	LPWSTR ptmp = static_cast<LPWSTR>(NP2HeapAlloc((2*wlen + 1)*sizeof(WCHAR)));
 
 	if (pwch && ptmp) {
+		const int iEOLMode = SciCall_GetEOLMode();
 		LPCWSTR s = pwch;
 		LPWSTR d = ptmp;
-
-		const int iEOLMode = SciCall_GetEOLMode();
-		for (int i = 0; (i < wlen) && (*s != L'\0'); i++) {
+		while (*s != L'\0') {
 			if (*s == L'\n' || *s == L'\r') {
 				switch (iEOLMode) {
 				default: // SC_EOL_CRLF
@@ -382,8 +374,7 @@ LPWSTR EditGetClipboardTextW() noexcept {
 					*d++ = L'\r';
 					break;
 				}
-				if ((*s == L'\r') && (i + 1 < wlen) && (*(s + 1) == L'\n')) {
-					i++;
+				if (*s == L'\r' && s[1] == L'\n') {
 					s++;
 				}
 				s++;
@@ -6454,7 +6445,7 @@ static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam
 							pwCur++;
 						}
 
-						if (*pwCur == L'>' && *(pwCur - 1) != L'/') {
+						if (*pwCur == L'>' && pwCur[-1] != L'/') {
 							wchIns[cchIns++] = L'>';
 							wchIns[cchIns] = L'\0';
 
@@ -7480,7 +7471,7 @@ static LPCSTR FileVars_Find(LPCSTR pszData, LPCSTR pszName) noexcept {
 
 	LPCSTR pvStart = pszData;
 	while ((pvStart = strstr(pvStart, pszName)) != nullptr) {
-		const unsigned char chPrev = (pvStart > pszData) ? *(pvStart - 1) : 0;
+		const unsigned char chPrev = (pvStart > pszData) ? pvStart[-1] : 0;
 		const size_t len = strlen(pszName);
 		pvStart += len;
 		// match full name or suffix after hyphen
