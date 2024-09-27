@@ -2003,16 +2003,17 @@ void EditAutoCloseXMLTag() noexcept {
 				}
 			}
 
-			tchIns[cchIns++] = '>';
 			tchIns[cchIns] = '\0';
+			tchIns[cchIns + 1] = '\0';
 
-			shouldAutoClose = cchIns > 3;
-			if (shouldAutoClose && pLexCurrent->iLexer == SCLEX_HTML) {
-				tchIns[cchIns - 1] = '\0';
-				shouldAutoClose = !IsHtmlVoidTag(tchIns + 2, cchIns - 3);
+			if (cchIns > 2 && (pLexCurrent->iLexer == SCLEX_HTML || pLexCurrent->iLexer == SCLEX_PHPSCRIPT)) {
+				if (IsHtmlVoidTag(tchIns + 2, cchIns - 2)) {
+					autoClosed = true;
+					cchIns = 0;
+				}
 			}
-			if (shouldAutoClose) {
-				tchIns[cchIns - 1] = '>';
+			if (cchIns > 2) {
+				tchIns[cchIns] = '>';
 				autoClosed = true;
 				SciCall_ReplaceSel(tchIns);
 				SciCall_SetSel(iCurPos, iCurPos);

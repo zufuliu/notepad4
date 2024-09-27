@@ -6446,20 +6446,17 @@ static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam
 						}
 
 						if (*pwCur == L'>' && pwCur[-1] != L'/') {
-							wchIns[cchIns++] = L'>';
 							wchIns[cchIns] = L'\0';
-
-							if (cchIns > 3 && !(
-									StrCaseEqual(wchIns, L"</base>") &&
-									StrCaseEqual(wchIns, L"</bgsound>") &&
-									StrCaseEqual(wchIns, L"</br>") &&
-									StrCaseEqual(wchIns, L"</embed>") &&
-									StrCaseEqual(wchIns, L"</hr>") &&
-									StrCaseEqual(wchIns, L"</img>") &&
-									StrCaseEqual(wchIns, L"</input>") &&
-									StrCaseEqual(wchIns, L"</link>") &&
-									StrCaseEqual(wchIns, L"</meta>"))) {
-
+							wchIns[cchIns + 1] = L'\0';
+							if (cchIns > 3 && (pLexCurrent->iLexer == SCLEX_HTML || pLexCurrent->iLexer == SCLEX_PHPSCRIPT)) {
+								// HTML void tag except <p>
+								pwCur = StrStrI(L" area base basefont br col command embed frame hr img input isindex keygen link meta param source track wbr ", wchIns + 2);
+								if (pwCur != nullptr && pwCur[-1] == L' ' && pwCur[cchIns - 2] == L' ') {
+									cchIns = 0;
+								}
+							}
+							if (cchIns > 2) {
+								wchIns[cchIns] = L'>';
 								SetDlgItemText(hwnd, IDC_MODIFY_LINE_APPEND, wchIns);
 								bClear = false;
 							}
