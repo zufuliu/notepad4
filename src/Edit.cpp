@@ -6433,7 +6433,8 @@ static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam
 					LPCWSTR pwCur = StrChr(wszOpen, L'<');
 					if (pwCur != nullptr) {
 						LPWSTR wchIns = static_cast<LPWSTR>(NP2HeapAlloc((len + 5) * sizeof(WCHAR)));
-						StrCpyEx(wchIns, L"</");
+						wchIns[0] = L'<';
+						wchIns[1] = L' ';
 						int	cchIns = 2;
 
 						++pwCur;
@@ -6446,16 +6447,17 @@ static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam
 						}
 
 						if (*pwCur == L'>' && pwCur[-1] != L'/') {
-							wchIns[cchIns] = L'\0';
+							wchIns[cchIns] = L' ';
 							wchIns[cchIns + 1] = L'\0';
 							if (cchIns > 3 && (pLexCurrent->iLexer == SCLEX_HTML || pLexCurrent->iLexer == SCLEX_PHPSCRIPT)) {
 								// HTML void tag except <p>
-								pwCur = StrStrI(L" area base basefont br col command embed frame hr img input isindex keygen link meta param source track wbr ", wchIns + 2);
-								if (pwCur != nullptr && pwCur[-1] == L' ' && pwCur[cchIns - 2] == L' ') {
+								pwCur = StrStrI(L" area base basefont br col command embed frame hr img input isindex keygen link meta param source track wbr ", wchIns + 1);
+								if (pwCur != nullptr) {
 									cchIns = 0;
 								}
 							}
 							if (cchIns > 2) {
+								wchIns[1] = L'/';
 								wchIns[cchIns] = L'>';
 								SetDlgItemText(hwnd, IDC_MODIFY_LINE_APPEND, wchIns);
 								bClear = false;
