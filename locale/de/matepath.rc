@@ -175,7 +175,7 @@ BEGIN
 	BEGIN
 		MENUITEM "Ö&ffne matepath",				        IDM_TRAY_RESTORE
 		MENUITEM SEPARATOR
-		MENUITEM "&Beende matepath",				I   DM_TRAY_EXIT
+		MENUITEM "&Beende matepath",					IDM_TRAY_EXIT
 	END
 END
 
