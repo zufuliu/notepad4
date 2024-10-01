@@ -12,11 +12,12 @@
 ## File List
 | Localization | Language | Architecture | Minimum System |
 |--|--|--|--|
-| en | English | ARM64 | 🟢Windows 10 on ARM |
-| fr | French | ARM | 🔴legacy Windows RT (Windows 8 on ARM) |
-| it | Italiano | AVX2 | 🟢64-bit Windows 7, Server 2008 R2 |
-| ja | 日本語 | x64 | 🟡legacy 64-bit Windows Vista, Server 2008 |
-| ko | 한국어 | Win32 | 🟠legacy Windows XP, Server 2003 |
+| de | Deutsch | ARM64 | 🟢Windows 10 on ARM |
+| en | English | ARM | 🔴discontinued Windows RT (Windows 8 on ARM) |
+| fr | French | AVX2 | 🟢64-bit Windows 7, Server 2008 R2 |
+| it | Italiano | x64 | 🟡legacy 64-bit Windows Vista, Server 2008 |
+| ja | 日本語 | Win32 | 🟠legacy Windows XP, Server 2003 |
+| ko | 한국어 |
 | zh-Hans | 中文 (简体) |
 | zh-Hant | 中文 (繁體) | Chocolatey | `choco install notepad4`
 | i18n | all above languages | winget | `winget install -e "Notepad4"` |

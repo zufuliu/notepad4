@@ -14,7 +14,7 @@ localeDir = os.path.abspath('../locale')
 notepad4_rc = os.path.abspath('../src/Notepad4.rc')
 matepath_rc = os.path.abspath('../matepath/src/matepath.rc')
 
-activeLocaleList = ['i18n', 'en', 'fr', 'it', 'ja', 'ko', 'zh-Hans', 'zh-Hant']
+activeLocaleList = ['i18n', 'en', 'de', 'fr', 'it', 'ja', 'ko', 'zh-Hans', 'zh-Hant']
 defaultConfig = {
 	'NP2_ENABLE_CUSTOMIZE_TOOLBAR_LABELS': 0,
 	'NP2_ENABLE_HIDPI_IMAGE_RESOURCE': 1,
@@ -82,6 +82,7 @@ def find_7z_path():
 		try:
 			key = winreg.OpenKeyEx(winreg.HKEY_LOCAL_MACHINE, rf"SOFTWARE\{program}", access=winreg.KEY_READ)
 			path, rtype = winreg.QueryValueEx(key, 'Path')
+			winreg.CloseKey(key)
 			if rtype == winreg.REG_SZ and os.path.isdir(path):
 				path = os.path.join(path, '7z.exe')
 				if os.path.isfile(path):
