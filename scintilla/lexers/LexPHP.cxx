@@ -711,7 +711,7 @@ int PHPLexer::ClassifyJSWord(LexerWordList keywordLists) {
 }
 
 void PHPLexer::HighlightJsInnerString() {
-	if (sc.atLineStart) {
+	if (sc.atLineStart && sc.state != js_style(SCE_JS_STRING_BT)) {
 		if (lineContinuation) {
 			lineContinuation = 0;
 		} else {
