@@ -305,7 +305,9 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 			}
 			if (sc.ch == '\\') {
 				if (IsEOLChar(sc.chNext)) {
-					lineContinuation = JsLineStateLineContinuation;
+					if (sc.state != SCE_JS_STRING_BT) {
+						lineContinuation = JsLineStateLineContinuation;
+					}
 				} else {
 					escSeq.resetEscapeState(sc.state, sc.chNext);
 					sc.SetState(SCE_JS_ESCAPECHAR);

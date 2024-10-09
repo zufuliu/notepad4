@@ -721,7 +721,9 @@ void PHPLexer::HighlightJsInnerString() {
 	}
 	if (sc.ch == '\\') {
 		if (IsEOLChar(sc.chNext)) {
-			lineContinuation = JsLineStateLineContinuation;
+			if (sc.state != js_style(SCE_JS_STRING_BT)) {
+				lineContinuation = JsLineStateLineContinuation;
+			}
 		} else {
 			escSeq.resetEscapeState(sc.state, sc.chNext);
 			sc.SetState(js_style(SCE_JS_ESCAPECHAR));
@@ -1339,7 +1341,7 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 					docTagState = DocTagState::None;
 					const int chNext = sc.chNext;
 					sc.SetState((chNext == '*') ? js_style(SCE_JS_COMMENTBLOCK) : js_style(SCE_JS_COMMENTLINE));
-					if (chNext== '*') {
+					if (chNext == '*') {
 						sc.Forward(2);
 						if (sc.ch == '*' && sc.chNext != '*') {
 							sc.ChangeState(js_style(SCE_JS_COMMENTBLOCKDOC));

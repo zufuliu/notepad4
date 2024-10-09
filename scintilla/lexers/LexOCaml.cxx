@@ -163,7 +163,7 @@ void ColouriseOCamlDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 	if (sc.currentLine > 0) {
 		lineState = styler.GetLineState(sc.currentLine - 1);
 		commentLevel = (lineState >> 8) & 0xff;
-		lineContinuation= (lineState & PyLineStateLineContinuation) != 0;
+		lineContinuation = (lineState & PyLineStateLineContinuation) != 0;
 		lineState = 0;
 	}
 

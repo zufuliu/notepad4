@@ -416,7 +416,7 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 		lineState = styler.GetLineState(sc.currentLine - 1);
 		parenCount = (lineState >> 8) & 0xff;
 		prevIndentCount = lineState >> 16;
-		lineContinuation= (lineState & PyLineStateLineContinuation) != 0;
+		lineContinuation = (lineState & PyLineStateLineContinuation) != 0;
 		lineState = 0;
 	}
 	if (startPos != 0 && IsSpaceEquiv(initStyle)) {

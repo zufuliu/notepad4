@@ -139,7 +139,7 @@ void ColouriseCoffeeScriptDoc(Sci_PositionU startPos, Sci_Position lengthDoc, in
 		prevLineContinuation = (styler.GetLineState(sc.currentLine - 2) & PyLineStateLineContinuation) != 0;
 		lineState = styler.GetLineState(sc.currentLine - 1);
 		prevIndentCount = lineState >> 16;
-		lineContinuation= (lineState & PyLineStateLineContinuation) != 0;
+		lineContinuation = (lineState & PyLineStateLineContinuation) != 0;
 		lineState = 0;
 	}
 	if (startPos != 0 && IsSpaceEquiv(initStyle)) {
