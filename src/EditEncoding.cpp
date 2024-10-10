@@ -448,7 +448,7 @@ static inline bool IsValidEncoding(const NP2ENCODING *encoding) noexcept {
 //
 // EditSetNewEncoding()
 //
-bool EditSetNewEncoding(int iEncoding, int iNewEncoding, BOOL bNoUI, bool bSetSavePoint) noexcept {
+bool EditSetNewEncoding(int iEncoding, int iNewEncoding, BOOL bNoUI) noexcept {
 	if (iEncoding != iNewEncoding) {
 		if (iEncoding != CPI_DEFAULT && iNewEncoding != CPI_DEFAULT) {
 			return true;
@@ -458,15 +458,13 @@ bool EditSetNewEncoding(int iEncoding, int iNewEncoding, BOOL bNoUI, bool bSetSa
 		const UINT cpDest = (mEncoding[iNewEncoding].uFlags & NCP_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8;
 
 		if (SciCall_GetLength() == 0) {
-			const bool bIsEmptyUndoHistory = !(SciCall_CanUndo() || SciCall_CanRedo());
-
-			if (bNoUI || bIsEmptyUndoHistory || InfoBoxWarn(MB_YESNO, L"MsgConv2", IDS_ASK_ENCODING2) == IDYES) {
-				EditConvertText(cpSrc, cpDest, bSetSavePoint);
+			if (bNoUI || SciCall_GetUndoActions() == 0 || InfoBoxWarn(MB_YESNO, L"MsgConv2", IDS_ASK_ENCODING2) == IDYES) {
+				EditConvertText(cpSrc, cpDest);
 				return true;
 			}
 		} else if (bNoUI || InfoBoxWarn(MB_YESNO, L"MsgConv1", IDS_ASK_ENCODING) == IDYES) {
 			BeginWaitCursor();
-			EditConvertText(cpSrc, cpDest, false);
+			EditConvertText(cpSrc, cpDest);
 			EndWaitCursor();
 			return true;
 		}

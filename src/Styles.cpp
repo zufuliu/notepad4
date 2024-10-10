@@ -1379,7 +1379,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) noexcept {
 		}
 
 		// change empty file to use scheme default encoding and line ending
-		if (SciCall_GetLength() == 0 && !(SciCall_CanUndo() || SciCall_CanRedo())) {
+		if (SciCall_GetLength() == 0 && SciCall_GetUndoActions() == 0) {
 			EditApplyDefaultEncoding(pLexNew, bLexerChanged & LexerChanged_Override);
 		}
 		SciCall_SetLexer(pLexNew->iLexer);

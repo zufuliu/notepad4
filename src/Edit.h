@@ -122,7 +122,7 @@ static inline void EditSetEmptyText() noexcept{
 	EditSetNewText("", 0, 1);
 }
 
-bool	EditConvertText(UINT cpSource, UINT cpDest, bool bSetSavePoint) noexcept;
+bool	EditConvertText(UINT cpSource, UINT cpDest) noexcept;
 void	EditConvertToLargeMode() noexcept;
 void	EditReplaceDocument(HANDLE pdoc) noexcept;
 
@@ -544,7 +544,7 @@ constexpr bool Encoding_IsUTF8(int iEncoding) noexcept {
 }
 
 void	Encoding_ReleaseResources() noexcept;
-bool	EditSetNewEncoding(int iEncoding, int iNewEncoding, BOOL bNoUI, bool bSetSavePoint) noexcept;
+bool	EditSetNewEncoding(int iEncoding, int iNewEncoding, BOOL bNoUI) noexcept;
 void	EditOnCodePageChanged(UINT oldCodePage, bool showControlCharacter, EDITFINDREPLACE *lpefr) noexcept;
 const char* GetFoldDisplayEllipsis(UINT cpEdit, UINT acp) noexcept;
 void	Encoding_InitDefaults() noexcept;

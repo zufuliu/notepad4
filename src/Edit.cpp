@@ -190,7 +190,7 @@ void EditSetNewText(LPCSTR lpstrText, DWORD cbText, Sci_Line lineCount) noexcept
 //
 // EditConvertText()
 //
-bool EditConvertText(UINT cpSource, UINT cpDest, bool bSetSavePoint) noexcept {
+bool EditConvertText(UINT cpSource, UINT cpDest) noexcept {
 	if (cpSource == cpDest) {
 		return true;
 	}
@@ -236,7 +236,7 @@ bool EditConvertText(UINT cpSource, UINT cpDest, bool bSetSavePoint) noexcept {
 
 	SciCall_EmptyUndoBuffer();
 	SciCall_SetUndoCollection(true);
-	if (length == 0 && bSetSavePoint) {
+	if (length == 0 && StrIsEmpty(szCurFile)) {
 		SciCall_SetSavePoint();
 	}
 	UpdateLineNumberWidth();

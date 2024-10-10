@@ -260,6 +260,10 @@ inline void SciCall_EndUndoAction() noexcept {
 	SciCall(SCI_ENDUNDOACTION, 0, 0);
 }
 
+inline int SciCall_GetUndoActions() noexcept {
+	return static_cast<int>(SciCall(SCI_GETUNDOACTIONS, 0, 0));
+}
+
 // Selection and information
 
 inline Sci_Position SciCall_GetLength() noexcept {
