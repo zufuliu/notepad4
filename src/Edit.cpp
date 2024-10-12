@@ -4595,6 +4595,51 @@ extern int iFindReplaceOption;
 extern int iFindReplaceOpacityLevel;
 extern int iSelectOption;
 
+void EditSaveSelectionAsFindText(EDITFINDREPLACE *lpefr, int menu, bool findSelection) noexcept {
+	if (!findSelection && (iSelectOption & SelectOption_CopySelectionAsFindText) == 0) {
+		return;
+	}
+	Sci_Position cchSelection = SciCall_GetSelTextLength();
+	if (cchSelection == 0 && findSelection) {
+		EditSelectWord();
+		cchSelection = SciCall_GetSelTextLength();
+	}
+
+	if (cchSelection > 0 && cchSelection < NP2_FIND_REPLACE_LIMIT) {
+		char mszSelection[NP2_FIND_REPLACE_LIMIT];
+
+		SciCall_GetSelText(mszSelection);
+		mszSelection[cchSelection] = 0; // zero terminate
+
+		const UINT cpEdit = SciCall_GetCodePage();
+		strcpy(lpefr->szFind, mszSelection);
+
+		if (cpEdit != SC_CP_UTF8) {
+			WCHAR wszBuf[NP2_FIND_REPLACE_LIMIT];
+			MultiByteToWideChar(cpEdit, 0, mszSelection, -1, wszBuf, COUNTOF(wszBuf));
+			WideCharToMultiByte(CP_UTF8, 0, wszBuf, -1, lpefr->szFindUTF8, COUNTOF(lpefr->szFindUTF8), nullptr, nullptr);
+		} else {
+			strcpy(lpefr->szFindUTF8, mszSelection);
+		}
+
+		lpefr->fuFlags &= SCFIND_REGEXP - 1; // clear all regex flags
+		lpefr->option &= ~FindReplaceOption_TransformBackslash;
+
+		switch (menu) {
+		case IDM_EDIT_SAVEFIND:
+			break;
+
+		case CMD_FINDNEXTSEL:
+			EditFindNext(lpefr, false);
+			break;
+
+		case CMD_FINDPREVSEL:
+			EditFindPrev(lpefr, false);
+			break;
+		}
+	}
+}
+
 static void FindReplaceSetFont(HWND hwnd, bool monospaced, HFONT *hFontFindReplaceEdit) noexcept {
 	HWND hwndFind = GetDlgItem(hwnd, IDC_FINDTEXT);
 	HWND hwndRepl = GetDlgItem(hwnd, IDC_REPLACETEXT);

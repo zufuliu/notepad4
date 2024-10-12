@@ -3807,38 +3807,38 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			break;
 		}
 
-		if (StrIsEmpty(efrData.szFind)) {
-			if (LOWORD(wParam) != IDM_EDIT_REPLACENEXT) {
+		if (StrIsEmpty(efrData.szFind) && LOWORD(wParam) != IDM_EDIT_REPLACENEXT) {
+			EditSaveSelectionAsFindText(&efrData, IDM_EDIT_SAVEFIND, false);
+			if (StrIsEmpty(efrData.szFind)) {
 				SendWMCommand(hwnd, IDM_EDIT_FIND);
+				break;
+			}
+		}
+
+		switch (LOWORD(wParam)) {
+		case IDM_EDIT_FINDNEXT:
+			EditFindNext(&efrData, false);
+			break;
+
+		case IDM_EDIT_FINDPREV:
+			EditFindPrev(&efrData, false);
+			break;
+
+		case IDM_EDIT_REPLACENEXT:
+			if (bReplaceInitialized && StrNotEmpty(efrData.szFind)) {
+				EditReplace(hwndEdit, &efrData);
 			} else {
 				SendWMCommand(hwnd, IDM_EDIT_REPLACE);
 			}
-		} else {
-			switch (LOWORD(wParam)) {
-			case IDM_EDIT_FINDNEXT:
-				EditFindNext(&efrData, false);
-				break;
+			break;
 
-			case IDM_EDIT_FINDPREV:
-				EditFindPrev(&efrData, false);
-				break;
+		case IDM_EDIT_SELTONEXT:
+			EditFindNext(&efrData, true);
+			break;
 
-			case IDM_EDIT_REPLACENEXT:
-				if (bReplaceInitialized) {
-					EditReplace(hwndEdit, &efrData);
-				} else {
-					SendWMCommand(hwnd, IDM_EDIT_REPLACE);
-				}
-				break;
-
-			case IDM_EDIT_SELTONEXT:
-				EditFindNext(&efrData, true);
-				break;
-
-			case IDM_EDIT_SELTOPREV:
-				EditFindPrev(&efrData, true);
-				break;
-			}
+		case IDM_EDIT_SELTOPREV:
+			EditFindPrev(&efrData, true);
+			break;
 		}
 		break;
 
@@ -4631,48 +4631,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case CMD_FINDNEXTSEL:
 	case CMD_FINDPREVSEL:
-	case IDM_EDIT_SAVEFIND: {
-		Sci_Position cchSelection = SciCall_GetSelTextLength();
-		if (cchSelection == 0) {
-			SendWMCommand(hwnd, IDM_EDIT_SELECTWORD);
-			cchSelection = SciCall_GetSelTextLength();
-		}
-
-		if (cchSelection > 0 && cchSelection < NP2_FIND_REPLACE_LIMIT) {
-			char mszSelection[NP2_FIND_REPLACE_LIMIT];
-
-			SciCall_GetSelText(mszSelection);
-			mszSelection[cchSelection] = 0; // zero terminate
-
-			const UINT cpEdit = SciCall_GetCodePage();
-			strcpy(efrData.szFind, mszSelection);
-
-			if (cpEdit != SC_CP_UTF8) {
-				WCHAR wszBuf[NP2_FIND_REPLACE_LIMIT];
-				MultiByteToWideChar(cpEdit, 0, mszSelection, -1, wszBuf, COUNTOF(wszBuf));
-				WideCharToMultiByte(CP_UTF8, 0, wszBuf, -1, efrData.szFindUTF8, COUNTOF(efrData.szFindUTF8), nullptr, nullptr);
-			} else {
-				strcpy(efrData.szFindUTF8, mszSelection);
-			}
-
-			efrData.fuFlags &= SCFIND_REGEXP - 1; // clear all regex flags
-			efrData.option &= ~FindReplaceOption_TransformBackslash;
-
-			switch (LOWORD(wParam)) {
-			case IDM_EDIT_SAVEFIND:
-				break;
-
-			case CMD_FINDNEXTSEL:
-				EditFindNext(&efrData, false);
-				break;
-
-			case CMD_FINDPREVSEL:
-				EditFindPrev(&efrData, false);
-				break;
-			}
-		}
-	}
-	break;
+	case IDM_EDIT_SAVEFIND:
+		EditSaveSelectionAsFindText(&efrData, LOWORD(wParam), true);
+		break;
 
 	case CMD_INCLINELIMIT:
 	case CMD_DECLINELIMIT:
