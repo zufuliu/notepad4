@@ -1368,6 +1368,10 @@ inline void SciCall_EnsureVisible(Sci_Line line) noexcept {
 	SciCall(SCI_ENSUREVISIBLE, line, 0);
 }
 
+inline void SciCall_EnsureVisibleEnforcePolicy(Sci_Line line) noexcept {
+	SciCall(SCI_ENSUREVISIBLEENFORCEPOLICY, line, 0);
+}
+
 // Line wrapping
 
 inline void SciCall_SetWrapMode(int wrapMode) noexcept {
