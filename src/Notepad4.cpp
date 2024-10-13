@@ -3725,34 +3725,23 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	break;
 
 	// Main Bookmark Functions
-	case BME_EDIT_BOOKMARKNEXT: {
-		const Sci_Position iPos = SciCall_GetCurrentPos();
-		const Sci_Line iLine = SciCall_LineFromPosition(iPos);
-
-		Sci_Line iNextLine = SciCall_MarkerNext(iLine + 1, MarkerBitmask_Bookmark);
-		if (iNextLine < 0) {
-			iNextLine = SciCall_MarkerNext(0, MarkerBitmask_Bookmark);
-		}
-
-		if (iNextLine >= 0) {
-			editMarkAll.ignoreSelectionUpdate = true;
-			SciCall_EnsureVisible(iNextLine);
-			SciCall_GotoLine(iNextLine);
-			SciCall_SetYCaretPolicy(CARET_SLOP | CARET_STRICT | CARET_EVEN, 10);
-			SciCall_ScrollCaret();
-			SciCall_SetYCaretPolicy(CARET_EVEN, 0);
-		}
-	}
-	break;
-
+	case BME_EDIT_BOOKMARKNEXT:
 	case BME_EDIT_BOOKMARKPREV: {
 		const Sci_Position iPos = SciCall_GetCurrentPos();
 		const Sci_Line iLine = SciCall_LineFromPosition(iPos);
 
-		Sci_Line iNextLine = SciCall_MarkerPrevious(iLine - 1, MarkerBitmask_Bookmark);
-		if (iNextLine < 0) {
-			const Sci_Line nLines = SciCall_GetLineCount();
-			iNextLine = SciCall_MarkerPrevious(nLines, MarkerBitmask_Bookmark);
+		Sci_Line iNextLine;
+		if (LOWORD(wParam) == BME_EDIT_BOOKMARKNEXT) {
+			iNextLine = SciCall_MarkerNext(iLine + 1, MarkerBitmask_Bookmark);
+			if (iNextLine < 0) {
+				iNextLine = SciCall_MarkerNext(0, MarkerBitmask_Bookmark);
+			}
+		} else {
+			iNextLine = SciCall_MarkerPrevious(iLine - 1, MarkerBitmask_Bookmark);
+			if (iNextLine < 0) {
+				const Sci_Line iLines = SciCall_GetLineCount();
+				iNextLine = SciCall_MarkerPrevious(iLines, MarkerBitmask_Bookmark);
+			}
 		}
 
 		if (iNextLine >= 0) {
