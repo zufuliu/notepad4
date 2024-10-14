@@ -1861,7 +1861,7 @@ Datei\tMuss das letzte Argument sein, \n\
 /e enc\tQuelldateicodierung\n\
 /g Z[,S]\tZur Position springen (/g -1 Ende der Datei)\n\
 /m text\tText finden (/m- last, /mr regex, /mb backslash)\n\
-/l[o|p]\tAutomatisches Neuladen von geänderten Dateien\n\
+/l[o]\tAutomatisches Neuladen von geänderten Dateien\n\
 /q\tErzwingt Dateierstellung ohne Nachfrage\n\
 /ro\tÖffne Datei im Nur-Lesen-Modus\n\
 /p\tDrucke Datei mit Standarddrucker und -optionen\n\

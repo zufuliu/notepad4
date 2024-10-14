@@ -1858,7 +1858,7 @@ file\tMust be the last argument, no quoted spaces by default.\n\
 /e encoding\tFile source encoding.\n\
 /g line[,column]\tJump to specified position (/g -1 end of file).\n\
 /m text\tMatch specified text (/m- last, /mr regex, /mb backslash).\n\
-/l[o|p]\tAuto-reload modified files.\n\
+/l[o]\tAuto-reload modified files.\n\
 /q\tForce creation of new files without prompt.\n\
 /ro\tOpen file in read only mode.\n\
 /p\tPrint file with default printer and options.\n\

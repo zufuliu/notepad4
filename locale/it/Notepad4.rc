@@ -1858,7 +1858,7 @@ file\tPer impostazione predefinita deve essere l'ultimo\n\targomento, senza spaz
 /e codifica    Codifica file sorgente.\n\
 /g linea[,colonna]\tSalta alla posizione specificata (/g -1 fine\n\tdel file).\n\
 /m testo\tTrova il testo specificato (/m- last, /mr regex, /mb\n\tbackslash).\n\
-/l[o|p]\tCarica automaticamente i file modificati.\n\
+/l[o]\tCarica automaticamente i file modificati.\n\
 /q\tForza la creazione di nuovi file senza richieste.\n\
 /ro\tAprire un file in modalità di sola lettura.\n\
 /p\tStampa il file con la stampante e le opzioni predefinite.\n\

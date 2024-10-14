@@ -1858,7 +1858,7 @@ fichier\tDoit être le dernier argument, pas de doubles guillemets pour les espa
 /e encodage\tSource d'encodage du fihier.\n\
 /g ligne[,colonne]\tAllez à la position spécifiée (/g -1 fin du fichier).\n\
 /m texte\ttrouver le texte correspondant (/m- dernier, /mr regex, /mb anti-slash).\n\
-/l[o|p]\tRecharge automatiquement les fichiers modifiés.\n\
+/l[o]\tRecharge automatiquement les fichiers modifiés.\n\
 /q\tForce la création de nouveau fichier sans demander.\n\
 /ro\tOuvre un fichier en mode lecture seule.\n\
 /p\tPrint file with default printer and options.\n\
