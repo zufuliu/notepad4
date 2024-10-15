@@ -162,7 +162,6 @@ inline bool KeyboardIsKeyDown(int key) noexcept {
 constexpr sptr_t extendedKeyboard = 1 << 24;
 
 constexpr bool KeyboardIsNumericKeypadFunction(Scintilla::uptr_t wParam, Scintilla::sptr_t lParam) noexcept {
-	// Bit 24 is the extended keyboard flag and the numeric keypad is non-extended
 	if ((lParam & extendedKeyboard) != 0) {
 		// Not from the numeric keypad
 		return false;
@@ -183,6 +182,14 @@ constexpr bool KeyboardIsNumericKeypadFunction(Scintilla::uptr_t wParam, Scintil
 	default:
 		return false;
 	}
+}
+
+inline bool IsMouseEvent() noexcept {
+	// Distinguishing Pen Input from Mouse and Touch
+	// https://learn.microsoft.com/en-us/windows/win32/tablet/system-events-and-mouse-messages
+	constexpr DWORD MI_WP_SIGNATURE = 0xFF515700;
+	constexpr DWORD SIGNATURE_MASK = 0xFFFFFF00;
+	return (::GetMessageExtraInfo() & SIGNATURE_MASK) != MI_WP_SIGNATURE;
 }
 
 inline CLIPFORMAT RegisterClipboardType(LPCWSTR lpszFormat) noexcept {
@@ -1763,17 +1770,25 @@ sptr_t ScintillaWin::MouseMessage(unsigned int iMessage, uptr_t wParam, sptr_t l
 				return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
 			}
 
-			MouseWheelDelta &wheelDelta = (iMessage == WM_MOUSEHWHEEL) ? horizontalWheelDelta : verticalWheelDelta;
-			if (wheelDelta.Accumulate(wParam)) {
-				int charsToScroll = charsPerScroll * wheelDelta.Actions();
+			sptr_t result = 0;
+			MouseWheelDelta *wheelDelta = &verticalWheelDelta;
+			if (iMessage == WM_MOUSEHWHEEL) {
+				wheelDelta = &horizontalWheelDelta;
+				// return 1 for Logitech mouse, https://www.pretentiousname.com/setpoint_hwheel/index.html
+				if (IsMouseEvent()) {
+					result = 1;
+				}
+			}
+			if (wheelDelta->Accumulate(wParam)) {
+				int charsToScroll = charsPerScroll * wheelDelta->Actions();
 				if (iMessage == WM_MOUSEHWHEEL) {
-					// horizontal wheelDelta has opposite sign/direction
+					// horizontal scroll is in reverse direction
 					charsToScroll = -charsToScroll;
 				}
 				const int widthToScroll = static_cast<int>(std::lround(charsToScroll * vs.aveCharWidth));
 				HorizontalScrollToClamped(xOffset + widthToScroll);
 			}
-			return 0;
+			return result;
 		}
 
 		// Either SCROLL or ZOOM. We handle the wheel steppings calculation
