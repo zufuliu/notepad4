@@ -184,14 +184,6 @@ constexpr bool KeyboardIsNumericKeypadFunction(Scintilla::uptr_t wParam, Scintil
 	}
 }
 
-inline bool IsMouseEvent() noexcept {
-	// Distinguishing Pen Input from Mouse and Touch
-	// https://learn.microsoft.com/en-us/windows/win32/tablet/system-events-and-mouse-messages
-	constexpr DWORD MI_WP_SIGNATURE = 0xFF515700;
-	constexpr DWORD SIGNATURE_MASK = 0xFFFFFF00;
-	return (::GetMessageExtraInfo() & SIGNATURE_MASK) != MI_WP_SIGNATURE;
-}
-
 inline CLIPFORMAT RegisterClipboardType(LPCWSTR lpszFormat) noexcept {
 	// Registered clipboard format values are 0xC000 through 0xFFFF.
 	// RegisterClipboardFormat() returns 32-bit unsigned and CLIPFORMAT is 16-bit
@@ -1770,17 +1762,9 @@ sptr_t ScintillaWin::MouseMessage(unsigned int iMessage, uptr_t wParam, sptr_t l
 				return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
 			}
 
-			sptr_t result = 0;
-			MouseWheelDelta *wheelDelta = &verticalWheelDelta;
-			if (iMessage == WM_MOUSEHWHEEL) {
-				wheelDelta = &horizontalWheelDelta;
-				// return 1 for Logitech mouse, https://www.pretentiousname.com/setpoint_hwheel/index.html
-				if (IsMouseEvent()) {
-					result = 1;
-				}
-			}
-			if (wheelDelta->Accumulate(wParam)) {
-				int charsToScroll = charsPerScroll * wheelDelta->Actions();
+			MouseWheelDelta &wheelDelta = (iMessage == WM_MOUSEHWHEEL) ? horizontalWheelDelta : verticalWheelDelta;
+			if (wheelDelta.Accumulate(wParam)) {
+				int charsToScroll = charsPerScroll * wheelDelta.Actions();
 				if (iMessage == WM_MOUSEHWHEEL) {
 					// horizontal scroll is in reverse direction
 					charsToScroll = -charsToScroll;
@@ -1788,7 +1772,8 @@ sptr_t ScintillaWin::MouseMessage(unsigned int iMessage, uptr_t wParam, sptr_t l
 				const int widthToScroll = static_cast<int>(std::lround(charsToScroll * vs.aveCharWidth));
 				HorizontalScrollToClamped(xOffset + widthToScroll);
 			}
-			return result;
+			// return 1 for Logitech mouse, https://www.pretentiousname.com/setpoint_hwheel/index.html
+			return (iMessage == WM_MOUSEHWHEEL) ? 1 : 0;
 		}
 
 		// Either SCROLL or ZOOM. We handle the wheel steppings calculation
