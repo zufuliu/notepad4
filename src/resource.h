@@ -152,6 +152,8 @@
 #define IDC_FILEMRU						100
 #define IDC_SAVEMRU						102
 #define IDC_EMPTY_MRU					103
+#define IDC_MRU_COUNT_LABEL				104
+#define IDC_MRU_COUNT_VALUE				105
 #define IDC_FILEMRU_UPDATE_VIEW			110		// pseudo control
 // File Change Notification
 #define IDD_CHANGENOTIFY				110

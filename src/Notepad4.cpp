@@ -106,6 +106,7 @@ WCHAR	szIniFile[MAX_PATH] = L"";
 static WCHAR szIniFile2[MAX_PATH] = L"";
 static bool bSaveSettings;
 bool	bSaveRecentFiles;
+int iMaxRecentFiles;
 static bool bSaveFindReplace;
 static WCHAR tchLastSaveCopyDir[MAX_PATH] = L"";
 WCHAR	tchOpenWithDir[MAX_PATH];
@@ -1884,9 +1885,9 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 
 	// File MRU
 	const int flags = MRUFlags_FilePath | (static_cast<int>(flagRelativeFileMRU) * MRUFlags_RelativePath) | (static_cast<int>(flagPortableMyDocs) * MRUFlags_PortableMyDocs);
-	mruFile.Init(MRU_KEY_RECENT_FILES, flags);
-	mruFind.Init(MRU_KEY_RECENT_FIND, MRUFlags_QuoteValue);
-	mruReplace.Init(MRU_KEY_RECENT_REPLACE, MRUFlags_QuoteValue);
+	mruFile.Init(MRU_KEY_RECENT_FILES, iMaxRecentFiles, flags);
+	mruFind.Init(MRU_KEY_RECENT_FIND, MRU_MAXITEMS, MRUFlags_QuoteValue);
+	mruReplace.Init(MRU_KEY_RECENT_REPLACE, MRU_MAXITEMS, MRUFlags_QuoteValue);
 	return 0;
 }
 
@@ -5055,7 +5056,8 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				MENUITEMINFO mii;
 				mii.cbSize = sizeof(MENUITEMINFO);
 				mii.fMask = MIIM_ID | MIIM_STRING | MIIM_BITMAP;
-				for (int i = 0; i < mruFile.iSize; i++) {
+				const int count = min(mruFile.iSize, MRU_MAXITEMS);
+				for (int i = 0; i < count; i++) {
 					LPCWSTR path = mruFile.pszItems[i];
 					HBITMAP hbmp = bitmapCache.Get(path);
 					mii.wID = i + IDM_RECENT_HISTORY_START;
@@ -5222,7 +5224,9 @@ void LoadSettings() noexcept {
 	pt.x = section.GetInt(L"WindowPosX", 0);
 	pt.y = section.GetInt(L"WindowPosY", 0);
 
-	bSaveRecentFiles = section.GetBool(L"SaveRecentFiles", false);
+	iValue = section.GetInt(L"SaveRecentFiles", MRU_MAXITEMS << 1);
+	bSaveRecentFiles = iValue & true;
+	iMaxRecentFiles = max(iValue >> 1, MRU_MAXITEMS);
 	bSaveFindReplace = section.GetBool(L"SaveFindReplace", false);
 	iValue = section.GetInt(L"FindReplaceOption", FindReplaceOption_Default);
 	iFindReplaceOption = iValue & 15;
@@ -5566,9 +5570,10 @@ void SaveSettings(bool bSaveSettingsNow) noexcept {
 		section.SetInt(L"WindowPosY", wi.y);
 	}
 
-	section.SetBoolEx(L"SaveRecentFiles", bSaveRecentFiles, false);
+	int iValue = (iMaxRecentFiles << 1) | static_cast<int>(bSaveRecentFiles);
+	section.SetIntEx(L"SaveRecentFiles", iValue, MRU_MAXITEMS << 1);
 	section.SetBoolEx(L"SaveFindReplace", bSaveFindReplace, false);
-	int iValue = iFindReplaceOption | ((efrData.option & FindReplaceOption_BehaviorMask) << 4);
+	iValue = iFindReplaceOption | ((efrData.option & FindReplaceOption_BehaviorMask) << 4);
 	section.SetIntEx(L"FindReplaceOption", iValue, FindReplaceOption_Default);
 	if (bSaveFindReplace) {
 		iValue = efrData.fuFlags | ((efrData.option & FindReplaceOption_SearchMask) << 10);

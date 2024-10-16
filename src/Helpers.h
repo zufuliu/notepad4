@@ -789,21 +789,22 @@ enum {
 	MRUFlags_PortableMyDocs = 8,
 };
 
-// MRU_MAXITEMS * (MAX_PATH + 4)
-#define MAX_INI_SECTION_SIZE_MRU	(8 * 1024)
+// num=path\0
+#define MAX_MRU_ITEM_SIZE	(MAX_PATH + 5)
 
 struct MRUList {
 	int		iSize;
+	int		capacity;
 	int		iFlags;
 	LPCWSTR szRegKey;
-	LPWSTR pszItems[MRU_MAXITEMS];
+	LPWSTR *pszItems;
 
-	void Init(LPCWSTR pszRegKey, int flags) noexcept;
+	void Init(LPCWSTR pszRegKey, int capacity_, int flags) noexcept;
 	void Add(LPCWSTR pszNew) noexcept;
 	void AddMultiline(LPCWSTR pszNew) noexcept;
 	void Delete(int iIndex) noexcept;
 	void DeleteFileFromStore(LPCWSTR pszFile) const noexcept;
-	void Empty(bool save) noexcept;
+	void Empty(bool save, bool destroy = false) noexcept;
 	void Load() noexcept;
 	void Save() const noexcept;
 	void MergeSave(bool keep) noexcept;
