@@ -457,6 +457,7 @@ BEGIN
 		MENUITEM SEPARATOR
 		MENUITEM "Voir les numéros de ligne\tCtrl+Shift+N",		IDM_VIEW_LINENUMBERS
 		MENUITEM "Voir la marge de signets\tCtrl+Shift+M",	IDM_VIEW_MARGIN
+		MENUITEM "Change &History Marker",			IDM_VIEW_CHANGE_HISTORY_MARKER
 		MENUITEM SEPARATOR
 		MENUITEM "Voir les sections de codes\tCtrl+Shift+Alt+F",IDM_VIEW_SHOW_FOLDING
 		POPUP "déplier/replier les séctions"
@@ -2097,6 +2098,7 @@ BEGIN
 	NP2STYLE_CallTip				"Astuce d'appel"
 	NP2STYLE_CodeFolding			"Replier le code"
 	NP2STYLE_Link					"Lien"
+	NP2STYLE_ChangeHistoryMarker	"Change History Marker"
 
 	NP2STYLE_Default				"Défaut"
 END

@@ -397,6 +397,7 @@ enum GlobalStyleIndex {
 	GlobalStyleIndex_FoldDispalyText,	// inherited style.
 	GlobalStyleIndex_MarkOccurrences,	// indicator style. `fore`, `alpha`, `outline`
 	GlobalStyleIndex_Bookmark,			// indicator style. `fore`, `back`, `alpha`
+	GlobalStyleIndex_ChangeHistoryMarker,// marker color. `fore` (SC_MARKNUM_HISTORY_SAVED), `back` (SC_MARKNUM_HISTORY_MODIFIED)
 	GlobalStyleIndex_CallTip,			// inherited style.
 	GlobalStyleIndex_Link,				// inherited style.
 };
@@ -429,6 +430,9 @@ enum ANSIArtStyleIndex {
 #define	BookmarkImageDefaultColor	RGB(0x40, 0x80, 0x40)
 #define	BookmarkLineDefaultColor	RGB(0, 0xff, 0)
 #define BookmarkLineDefaultAlpha	40
+
+#define ChangeHistoryMarkerSaved	RGB(0x00, 0x80, 0x00)
+#define ChangeHistoryMarkerModified	RGB(0x00, 0x80, 0xFF)
 
 #define BookmarkUsingPixmapImage		0
 #if BookmarkUsingPixmapImage
@@ -1711,6 +1715,25 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) noexcept {
 	if (SciCall_MarkerSymbolDefined(MarkerNumber_Bookmark) != SC_MARK_CIRCLE) {
 		Style_SetBookmark();
 	}
+
+	// Change History Marker
+	szValue = lexGlobal.Styles[GlobalStyleIndex_ChangeHistoryMarker].szValue;
+	rgb = ChangeHistoryMarkerSaved;
+	Style_StrGetForeColor(szValue, &rgb);
+	rgb = ColorAlpha(rgb, SC_ALPHA_OPAQUE);
+	SciCall_MarkerSetForeTranslucent(SC_MARKNUM_HISTORY_SAVED, rgb);
+	SciCall_MarkerSetBackTranslucent(SC_MARKNUM_HISTORY_SAVED, rgb);
+	SciCall_MarkerSetForeTranslucent(SC_MARKNUM_HISTORY_REVERTED_TO_ORIGIN, rgb);
+	rgb = ChangeHistoryMarkerModified;
+	Style_StrGetBackColor(szValue, &rgb);
+	rgb = ColorAlpha(rgb, SC_ALPHA_OPAQUE);
+	SciCall_MarkerSetForeTranslucent(SC_MARKNUM_HISTORY_MODIFIED, rgb);
+	SciCall_MarkerSetBackTranslucent(SC_MARKNUM_HISTORY_MODIFIED, rgb);
+	SciCall_MarkerSetForeTranslucent(SC_MARKNUM_HISTORY_REVERTED_TO_MODIFIED, rgb);
+	rgb = SciCall_StyleGetBack(STYLE_LINENUMBER);
+	rgb = ColorAlpha(rgb, SC_ALPHA_OPAQUE);
+	SciCall_MarkerSetBackTranslucent(SC_MARKNUM_HISTORY_REVERTED_TO_ORIGIN, rgb);
+	SciCall_MarkerSetBackTranslucent(SC_MARKNUM_HISTORY_REVERTED_TO_MODIFIED, rgb);
 
 	// other lexer styles
 	Style_SetDefaultStyle(GlobalStyleIndex_ControlCharacter);

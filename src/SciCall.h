@@ -264,6 +264,10 @@ inline int SciCall_GetUndoActions() noexcept {
 	return static_cast<int>(SciCall(SCI_GETUNDOACTIONS, 0, 0));
 }
 
+inline void SciCall_SetChangeHistory(int changeHistory) noexcept {
+	SciCall(SCI_SETCHANGEHISTORY, changeHistory, 0);
+}
+
 // Selection and information
 
 inline Sci_Position SciCall_GetLength() noexcept {

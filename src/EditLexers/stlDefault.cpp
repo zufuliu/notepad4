@@ -25,6 +25,7 @@ static EDITSTYLE Styles_Global[] = {
 	{ STYLE_FOLDDISPLAYTEXT, NP2StyleX_FoldEllipsis, L"font:$(Code); size:-2; bold; fore:#808080" },
 	{ 0, NP2StyleX_MarkOccurrences, L"alpha:25; outline:150" },
 	{ 0, NP2StyleX_Bookmark, L"fore:#408040; back:#00FF00; alpha:40" },
+	{ SC_MARKNUM_HISTORY_SAVED + SC_MARKNUM_HISTORY_MODIFIED, NP2StyleX_ChangeHistoryMarker, L"fore:#008000; back:#0080FF" },
 	{ STYLE_CALLTIP, NP2StyleX_CallTip, L"" },
 	{ STYLE_LINK, NP2StyleX_Link, L"fore:#648000" },
 };

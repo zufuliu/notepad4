@@ -457,6 +457,7 @@ BEGIN
 		MENUITEM SEPARATOR
 		MENUITEM "行番号(&N)\tCtrl+Shift+N",		IDM_VIEW_LINENUMBERS
 		MENUITEM "行番号/しおりの余白(&M)\tCtrl+Shift+M",	IDM_VIEW_MARGIN
+		MENUITEM "Change &History Marker",			IDM_VIEW_CHANGE_HISTORY_MARKER
 		MENUITEM SEPARATOR
 		MENUITEM "コード折りたたみを表示(&F)\tCtrl+Shift+Alt+F",IDM_VIEW_SHOW_FOLDING
 		POPUP "折りたたみの切り替え(&T)"
@@ -2098,6 +2099,7 @@ BEGIN
 	NP2STYLE_CallTip				"コールチップ"
 	NP2STYLE_CodeFolding			"コード折りたたみ"
 	NP2STYLE_Link					"リンク"
+	NP2STYLE_ChangeHistoryMarker	"Change History Marker"
 
 	NP2STYLE_Default				"標準"
 END

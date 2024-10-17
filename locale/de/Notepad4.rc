@@ -457,6 +457,7 @@ BEGIN
 		MENUITEM SEPARATOR
 		MENUITEM "Zei&lennummern\tStrg+Shift+N",			IDM_VIEW_LINENUMBERS
 		MENUITEM "Lesezeichenr&and\tStrg+Shift+M",			IDM_VIEW_MARGIN
+		MENUITEM "Change &History Marker",			IDM_VIEW_CHANGE_HISTORY_MARKER
 		MENUITEM SEPARATOR
 		MENUITEM "Textblock&faltung anzeigen\tStrg+Shift+Alt+F",IDM_VIEW_SHOW_FOLDING
 		POPUP "Textblockfaltun&g umschalten"
@@ -2101,6 +2102,7 @@ BEGIN
 	NP2STYLE_CallTip				"CallTip"
 	NP2STYLE_CodeFolding			"Textblockfaltung"
 	NP2STYLE_Link					"Link"
+	NP2STYLE_ChangeHistoryMarker	"Change History Marker"
 
 	NP2STYLE_Default				"Standard"
 END

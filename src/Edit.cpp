@@ -55,6 +55,7 @@ extern int cxFindReplaceDlg;
 extern int iDefaultEOLMode;
 extern bool bFixLineEndings;
 extern bool bAutoStripBlanks;
+extern int iChangeHistoryMarker;
 
 // Default Codepage and Character Set
 extern int iDefaultCodePage;
@@ -140,6 +141,7 @@ void EditSetNewText(LPCSTR lpstrText, DWORD cbText, Sci_Line lineCount) noexcept
 
 	SciCall_SetReadOnly(false);
 	SciCall_Cancel();
+	SciCall_SetChangeHistory(SC_CHANGE_HISTORY_DISABLED);
 	SciCall_SetUndoCollection(false);
 	SciCall_EmptyUndoBuffer();
 	SciCall_ClearAll();
@@ -182,6 +184,7 @@ void EditSetNewText(LPCSTR lpstrText, DWORD cbText, Sci_Line lineCount) noexcept
 	SciCall_SetUndoCollection(true);
 	SciCall_EmptyUndoBuffer();
 	SciCall_SetSavePoint();
+	SciCall_SetChangeHistory(iChangeHistoryMarker);
 
 	bFreezeAppTitle = false;
 }
@@ -216,6 +219,7 @@ bool EditConvertText(UINT cpSource, UINT cpDest) noexcept {
 	bReadOnlyMode = false;
 	SciCall_SetReadOnly(false);
 	SciCall_Cancel();
+	SciCall_SetChangeHistory(SC_CHANGE_HISTORY_DISABLED);
 	SciCall_SetUndoCollection(false);
 	SciCall_EmptyUndoBuffer();
 	SciCall_ClearAll();
@@ -239,6 +243,7 @@ bool EditConvertText(UINT cpSource, UINT cpDest) noexcept {
 	if (length == 0 && StrIsEmpty(szCurFile)) {
 		SciCall_SetSavePoint();
 	}
+	SciCall_SetChangeHistory(iChangeHistoryMarker);
 	UpdateLineNumberWidth();
 	return true;
 }
@@ -262,6 +267,7 @@ void EditConvertToLargeMode() noexcept {
 	bReadOnlyMode = false;
 	SciCall_SetReadOnly(false);
 	SciCall_Cancel();
+	SciCall_SetChangeHistory(SC_CHANGE_HISTORY_DISABLED);
 	SciCall_SetUndoCollection(false);
 	SciCall_EmptyUndoBuffer();
 	SciCall_ClearAll();
@@ -285,6 +291,7 @@ void EditConvertToLargeMode() noexcept {
 	SciCall_SetUndoCollection(true);
 	SciCall_EmptyUndoBuffer();
 	SciCall_SetSavePoint();
+	SciCall_SetChangeHistory(iChangeHistoryMarker);
 
 	Style_SetLexer(pLexCurrent, true);
 	bLargeFileMode = true;

@@ -457,6 +457,7 @@ BEGIN
 		MENUITEM SEPARATOR
 		MENUITEM "行号(&N)\tCtrl+Shift+N",			IDM_VIEW_LINENUMBERS
 		MENUITEM "书签边界(&M)\tCtrl+Shift+M",		IDM_VIEW_MARGIN
+		MENUITEM "修改历史标记(&H)",			IDM_VIEW_CHANGE_HISTORY_MARKER
 		MENUITEM SEPARATOR
 		MENUITEM "显示代码折叠(&F)\tCtrl+Shift+Alt+F",	IDM_VIEW_SHOW_FOLDING
 		POPUP "切换折叠(&T)"
@@ -2097,6 +2098,7 @@ BEGIN
 	NP2STYLE_CallTip				"调用提示"
 	NP2STYLE_CodeFolding			"代码折叠"
 	NP2STYLE_Link					"链接"
+	NP2STYLE_ChangeHistoryMarker	"修改历史标记"
 
 	NP2STYLE_Default				"默认样式"
 END

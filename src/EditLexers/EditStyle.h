@@ -21,6 +21,7 @@
 #define NP2STYLE_CallTip				63219
 #define NP2STYLE_CodeFolding			63220
 #define NP2STYLE_Link					63221
+#define NP2STYLE_ChangeHistoryMarker	63222
 
 #define NP2STYLE_Default				63226
 #define NP2STYLE_Comment				63227

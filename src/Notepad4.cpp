@@ -138,6 +138,7 @@ int		iZoomLevel = 100;
 bool	bShowBookmarkMargin;
 static bool bShowLineNumbers;
 static int bMarkOccurrences;
+int	iChangeHistoryMarker;
 EditAutoCompletionConfig autoCompletionConfig;
 int iSelectOption;
 static int iLineSelectionMode;
@@ -1651,9 +1652,9 @@ static inline void UpdateDocumentModificationStatus() noexcept {
 
 void UpdateBookmarkMarginWidth() noexcept {
 	// see LineMarker::Draw() for minDim.
-	const int width = bShowBookmarkMargin ? SciCall_TextHeight() - 2 : 0;
+	const int width = (bShowBookmarkMargin || iChangeHistoryMarker != SC_CHANGE_HISTORY_DISABLED) ? SciCall_TextHeight() - 2 : 0;
 	// 16px for XPM bookmark symbol.
-	//const int width = bShowBookmarkMargin ? max(SciCall_TextHeight() - 2, 16) : 0;
+	//const int width = (bShowBookmarkMargin || iChangeHistoryMarker != SC_CHANGE_HISTORY_DISABLED) ? max(SciCall_TextHeight() - 2, 16) : 0;
 	SciCall_SetMarginWidth(MarginNumber_Bookmark, width);
 }
 
@@ -2539,6 +2540,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	CheckCmd(hmenu, IDM_VIEW_SHOWINDENTGUIDES, bShowIndentGuides);
 	CheckCmd(hmenu, IDM_VIEW_LINENUMBERS, bShowLineNumbers);
 	CheckCmd(hmenu, IDM_VIEW_MARGIN, bShowBookmarkMargin);
+	CheckCmd(hmenu, IDM_VIEW_CHANGE_HISTORY_MARKER, iChangeHistoryMarker);
 	CheckCmd(hmenu, IDM_VIEW_AUTOCOMPLETION_IGNORECASE, autoCompletionConfig.bIgnoreCase);
 	CheckCmd(hmenu, IDM_SET_LATEX_INPUT_METHOD, autoCompletionConfig.bLaTeXInputMethod);
 	CheckCmd(hmenu, IDM_SET_MULTIPLE_SELECTION, iSelectOption & SelectOption_EnableMultipleSelection);
@@ -3948,6 +3950,14 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		Style_SetBookmark();
 		break;
 
+	case IDM_VIEW_CHANGE_HISTORY_MARKER:
+		if (iChangeHistoryMarker != SC_CHANGE_HISTORY_DISABLED || !SciCall_CanUndo()) {
+			iChangeHistoryMarker = (iChangeHistoryMarker == SC_CHANGE_HISTORY_DISABLED)? (SC_CHANGE_HISTORY_ENABLED | SC_CHANGE_HISTORY_MARKERS) : SC_CHANGE_HISTORY_DISABLED;
+			UpdateBookmarkMarginWidth();
+			SciCall_SetChangeHistory(iChangeHistoryMarker);
+		}
+		break;
+
 	case IDM_VIEW_AUTOCOMPLETION_SETTINGS:
 		if (AutoCompletionSettingsDlg(hwnd)) {
 			if ((autoCompletionConfig.iCompleteOption & AutoCompletionOption_CompleteWord) == 0) {
@@ -4967,7 +4977,9 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				break;
 #endif
 			case MarginNumber_Bookmark:
-				EditToggleBookmarkAt(scn->position);
+				if (bShowBookmarkMargin) {
+					EditToggleBookmarkAt(scn->position);
+				}
 				break;
 			}
 			break;
@@ -5308,6 +5320,7 @@ void LoadSettings() noexcept {
 	bShowBookmarkMargin = section.GetBool(L"ShowBookmarkMargin", false);
 	bShowLineNumbers = section.GetBool(L"ShowLineNumbers", true);
 	bShowCodeFolding = section.GetBool(L"ShowCodeFolding", true);
+	iChangeHistoryMarker = section.GetInt(L"ChangeHistoryMarker", SC_CHANGE_HISTORY_DISABLED);
 	bMarkOccurrences = section.GetInt(L"MarkOccurrences", MarkOccurrences_Enable);
 
 	bViewWhiteSpace = section.GetBool(L"ViewWhiteSpace", false);
@@ -5617,6 +5630,7 @@ void SaveSettings(bool bSaveSettingsNow) noexcept {
 	section.SetBoolEx(L"ShowBookmarkMargin", bShowBookmarkMargin, false);
 	section.SetBoolEx(L"ShowLineNumbers", bShowLineNumbers, true);
 	section.SetBoolEx(L"ShowCodeFolding", bShowCodeFolding, true);
+	section.SetIntEx(L"ChangeHistoryMarker", iChangeHistoryMarker, SC_CHANGE_HISTORY_DISABLED);
 	section.SetIntEx(L"MarkOccurrences", bMarkOccurrences, MarkOccurrences_Enable);
 	section.SetBoolEx(L"ViewWhiteSpace", bViewWhiteSpace, false);
 	section.SetBoolEx(L"ViewEOLs", bViewEOLs, false);

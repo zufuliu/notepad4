@@ -457,6 +457,7 @@ BEGIN
 		MENUITEM SEPARATOR
 		MENUITEM "줄 번호(&N)\tCtrl+Shift+N",		IDM_VIEW_LINENUMBERS
 		MENUITEM "책갈피 여백(&M)\tCtrl+Shift+M",	IDM_VIEW_MARGIN
+		MENUITEM "Change &History Marker",			IDM_VIEW_CHANGE_HISTORY_MARKER
 		MENUITEM SEPARATOR
 		MENUITEM "코드 접기 표시(&F)\tCtrl+Shift+Alt+F",IDM_VIEW_SHOW_FOLDING
 		POPUP "접기 전환(&T)"
@@ -2097,6 +2098,7 @@ BEGIN
 	NP2STYLE_CallTip				"호출팁"
 	NP2STYLE_CodeFolding			"코드 접기"
 	NP2STYLE_Link					"링크"
+	NP2STYLE_ChangeHistoryMarker	"Change History Marker"
 
 	NP2STYLE_Default				"기본값"
 END
