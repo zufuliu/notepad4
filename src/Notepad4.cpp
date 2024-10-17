@@ -2522,7 +2522,6 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	DisableCmd(hmenu, IDM_EDIT_STREAMCOMMENT, (pLexCurrent->lexerAttr & LexerAttr_NoBlockComment));
 
 	CheckCmd(hmenu, IDM_VIEW_SHOW_FOLDING, bShowCodeFolding);
-	CheckCmd(hmenu, IDM_VIEW_USE2NDGLOBALSTYLE, bUse2ndGlobalStyle);
 	CheckCmd(hmenu, IDM_VIEW_USEDEFAULT_CODESTYLE, pLexCurrent->bUseDefaultCodeStyle);
 	i = IDM_VIEW_STYLE_THEME_DEFAULT + np2StyleTheme;
 	CheckMenuRadioItem(hmenu, IDM_VIEW_STYLE_THEME_DEFAULT, IDM_VIEW_STYLE_THEME_DARK, i, MF_BYCOMMAND);
@@ -3869,10 +3868,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDT_VIEW_SCHEMECONFIG:
 	case IDM_VIEW_SCHEME_CONFIG:
 		Style_ConfigDlg(hwndEdit);
-		break;
-
-	case IDM_VIEW_USE2NDGLOBALSTYLE:
-		Style_ToggleUse2ndGlobalStyle();
 		break;
 
 	case IDM_VIEW_USEDEFAULT_CODESTYLE:

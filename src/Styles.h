@@ -76,7 +76,6 @@ struct StyleDefinition {
 
 extern PEDITLEXER pLexCurrent;
 extern int np2LexLangIndex;
-extern bool bUse2ndGlobalStyle;
 extern int np2StyleTheme;
 
 void	Style_ReleaseResources() noexcept;
@@ -112,7 +111,6 @@ void	Style_SetBookmark() noexcept;
 void	Style_UpdateCaret() noexcept;
 void	Style_SetLongLineColors() noexcept;
 void	Style_HighlightCurrentLine() noexcept;
-void	Style_ToggleUse2ndGlobalStyle() noexcept;
 void	Style_ToggleUseDefaultCodeStyle() noexcept;
 LPWSTR	Style_GetOpenDlgFilterStr(bool open, LPCWSTR lpszFile, int lexers[]) noexcept;
 

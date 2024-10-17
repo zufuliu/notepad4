@@ -29,30 +29,6 @@ static EDITSTYLE Styles_Global[] = {
 	{ STYLE_LINK, NP2StyleX_Link, L"fore:#648000" },
 };
 
-static EDITSTYLE Styles_2ndGlobal[] = {
-	{ STYLE_DEFAULT, NP2StyleX_DefaultCodeStyle, L"font:$(Code); fore:#D4D4D4; back:#1E1E1E" },
-	{ STYLE_DEFAULT, NP2StyleX_DefaultTextStyle, L"font:$(Text); fore:#D4D4D4; back:#1E1E1E" },
-	{ STYLE_LINENUMBER, NP2StyleX_MarginLineNumber, L"size:-2; fore:#A0A0A0; back:#2A2A2E" },
-	{ 0, NP2StyleX_MatchingBrace, L"fore:#02EA0A; alpha:50; outline:150" },
-	{ 0, NP2StyleX_MatchingBraceError, L"fore:#FF0000; alpha:50; outline:200" },
-	{ STYLE_CONTROLCHAR, NP2StyleX_ControlCharacter, L"size:-1; fore:#108010; back:#228B22" },
-	{ STYLE_INDENTGUIDE, NP2StyleX_IndentationGuide, L"fore:#605F63" },
-	{ SC_ELEMENT_SELECTION_BACK, NP2StyleX_SelectedText, L"eolfilled; alpha:95; outline:50" },
-	{ SC_ELEMENT_WHITE_SPACE, NP2StyleX_Whitespace, L"size:2; fore:#FF4000; alpha:65" },
-	{ SC_ELEMENT_CARET_LINE_BACK, NP2StyleX_CurrentLine, L"size:2; fore:#C2C0C3; back:#FFFF00; alpha:25; outline:25" },
-	{ SC_ELEMENT_CARET, NP2StyleX_Caret, L"fore:#FFFFFF; back:#00FF00" },
-	{ 0, NP2StyleX_IMEIndicator, L"fore:#108010" },
-	{ SCI_SETEDGECOLOUR, NP2StyleX_LongLineMarker, L"fore:#605F63" },
-	{ SCI_SETEXTRAASCENT + SCI_SETEXTRADESCENT, NP2StyleX_ExtraLineSpacing, L"size:2" },
-	{ 0, NP2StyleX_CodeFolding, L"fore:#FF8000" },
-	{ 0, NP2StyleX_FoldingMarker, L"fore:#808080; back:#606060" },
-	{ STYLE_FOLDDISPLAYTEXT, NP2StyleX_FoldEllipsis, L"font:$(Code); size:-2; bold; fore:#606060" },
-	{ 0, NP2StyleX_MarkOccurrences, L"alpha:25; outline:150" },
-	{ 0, NP2StyleX_Bookmark, L"fore:#408040; back:#00FF00; alpha:40" },
-	{ STYLE_CALLTIP, NP2StyleX_CallTip, L"" },
-	{ STYLE_LINK, NP2StyleX_Link, L"fore:#648000" },
-};
-
 EDITLEXER lexGlobal = {
 	SCLEX_NULL, NP2LEX_GLOBAL,
 	SCHEME_SETTINGS_DEFAULT,
@@ -60,15 +36,6 @@ EDITLEXER lexGlobal = {
 	nullptr,
 	nullptr,
 	Styles_Global
-};
-
-EDITLEXER lex2ndGlobal = {
-	SCLEX_NULL, NP2LEX_2NDGLOBAL,
-	SCHEME_SETTINGS_DEFAULT,
-	EDITLEXER_HOLE(L"2nd Global Styles", Styles_2ndGlobal),
-	nullptr,
-	nullptr,
-	Styles_2ndGlobal
 };
 
 static EDITSTYLE Styles_Text[] = {

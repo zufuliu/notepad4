@@ -220,6 +220,4 @@ using LPCEDITLEXER = const EDITLEXER *;
 // special lexers
 #define NP2LEX_ANSI			63196	// SCLEX_NULL		ANSI Art
 #define NP2LEX_2NDTEXTFILE	63197	// SCLEX_NULL		2nd Text File
-//#define NP2LEX_DARKUITHEME	63198	// SCLEX_NULL		Dark Mode UI Theme
-#define NP2LEX_2NDGLOBAL	63199	// SCLEX_NULL		2nd Global Styles
 #define NP2LEX_GLOBAL		63200	// SCLEX_NULL		Global Styles

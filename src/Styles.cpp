@@ -41,7 +41,6 @@ struct IUnknown;
 #include "resource.h"
 
 extern EDITLEXER lexGlobal;
-extern EDITLEXER lex2ndGlobal;
 extern EDITLEXER lexTextFile;
 extern EDITLEXER lex2ndTextFile;
 
@@ -154,7 +153,6 @@ extern EDITLEXER lexZig;
 // This array holds all the lexers...
 static PEDITLEXER pLexArray[] = {
 	&lexGlobal,
-	&lex2ndGlobal,
 
 	&lexTextFile,
 	&lex2ndTextFile,
@@ -266,9 +264,9 @@ static PEDITLEXER pLexArray[] = {
 	&lexZig,
 };
 
-// the two global styles at the beginning of the array not visible in
+// global styles at the beginning of the array not visible in
 // "Select Scheme" list, don't participate in file extension match.
-#define LEXER_INDEX_MATCH		2	// global styles
+#define LEXER_INDEX_MATCH		1	// global styles
 #define ALL_LEXER_COUNT			COUNTOF(pLexArray)
 #define MATCH_LEXER_COUNT		(ALL_LEXER_COUNT - LEXER_INDEX_MATCH)
 // the lexer array has three sections:
@@ -291,7 +289,6 @@ static WCHAR darkStyleThemeFilePath[MAX_PATH];
 static WCHAR favoriteSchemesConfig[MAX_FAVORITE_SCHEMES_CONFIG_SIZE];
 
 // Currently used lexer
-static PEDITLEXER pLexGlobal = &lexGlobal;
 PEDITLEXER pLexCurrent = &lexTextFile;
 int np2LexLangIndex = 0;
 static int iCsvOption = ('\"' << 8) | ',';
@@ -336,7 +333,6 @@ static COLORREF customColor[MAX_CUSTOM_COLOR_COUNT];
 CallTipInfo callTipInfo;
 static bool bCustomColorLoaded = false;
 
-bool	bUse2ndGlobalStyle;
 int		np2StyleTheme;
 static UINT fStylesModified = STYLESMODIFIED_NONE;
 static bool fWarnedNoIniFile = false;
@@ -474,14 +470,13 @@ enum {
 };
 
 static constexpr bool IsGlobalBaseStyleIndex(int rid, int index) noexcept {
-	return (rid == NP2LEX_GLOBAL || rid == NP2LEX_2NDGLOBAL)
+	return (rid == NP2LEX_GLOBAL)
 		&& (index == GlobalStyleIndex_DefaultCode || index == GlobalStyleIndex_DefaultText);
 }
 
 static inline UINT GetLexerStyleControlMask(int rid, int index) noexcept {
 	switch (rid) {
 	case NP2LEX_GLOBAL:
-	case NP2LEX_2NDGLOBAL:
 		switch (index) {
 		case GlobalStyleIndex_IndentationGuide:
 		case GlobalStyleIndex_Whitespace:
@@ -763,10 +758,6 @@ void Style_Load() noexcept {
 	LoadIniSection(INI_SECTION_NAME_STYLES, pIniSectionBuf, cchIniSection);
 	section.Parse(pIniSectionBuf);
 
-	// 2nd default
-	bUse2ndGlobalStyle = section.GetBool(L"Use2ndGlobalStyle", false);
-	pLexGlobal = bUse2ndGlobalStyle ? &lex2ndGlobal : &lexGlobal;
-
 	// favorite schemes
 	LPCWSTR strValue = section.GetValue(L"FavoriteSchemes");
 	if (StrNotEmpty(strValue)) {
@@ -802,7 +793,7 @@ void Style_Load() noexcept {
 		FindDarkThemeFile();
 	}
 
-	Style_LoadOneEx(pLexGlobal, section, pIniSectionBuf, cchIniSection);
+	Style_LoadOneEx(&lexGlobal, section, pIniSectionBuf, cchIniSection);
 	Style_LoadOneEx(pLexArray[iDefaultLexerIndex], section, pIniSectionBuf, cchIniSection);
 
 	FindSystemDefaultCodeFont();
@@ -872,8 +863,6 @@ void Style_Save() noexcept {
 	WCHAR *pIniSectionBuf = static_cast<WCHAR *>(NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_STYLES));
 	IniSectionBuilder section = { pIniSectionBuf };
 
-	// 2nd default
-	section.SetBoolEx(L"Use2ndGlobalStyle", bUse2ndGlobalStyle, false);
 	// favorite schemes
 	section.SetString(L"FavoriteSchemes", favoriteSchemesConfig);
 	// default scheme
@@ -1133,7 +1122,7 @@ void Style_OnDPIChanged(LPCEDITLEXER pLex) noexcept {
 	const int scale = g_uCurrentDPI*iZoomLevel;
 
 	// whitespace dot size
-	LPCWSTR szValue = pLexGlobal->Styles[GlobalStyleIndex_Whitespace].szValue;
+	LPCWSTR szValue = lexGlobal.Styles[GlobalStyleIndex_Whitespace].szValue;
 	int iValue = 0;
 	Style_StrGetSize(szValue, &iValue);
 	iValue = ScaleStylePixel(iValue, scale, 1);
@@ -1145,7 +1134,7 @@ void Style_OnDPIChanged(LPCEDITLEXER pLex) noexcept {
 	Style_UpdateCaret();
 
 	// Extra Line Spacing
-	szValue = (pLex->rid != NP2LEX_ANSI)? pLexGlobal->Styles[GlobalStyleIndex_ExtraLineSpacing].szValue
+	szValue = (pLex->rid != NP2LEX_ANSI)? lexGlobal.Styles[GlobalStyleIndex_ExtraLineSpacing].szValue
 		: pLex->Styles[ANSIArtStyleIndex_ExtraLineSpacing].szValue;
 	if (Style_StrGetSize(szValue, &iValue) && iValue != 0) {
 		int iAscent;
@@ -1222,7 +1211,7 @@ void Style_UpdateCaret() noexcept {
 }
 
 static inline void Style_SetDefaultStyle(int index) noexcept {
-	Style_SetStyles(pLexGlobal->Styles[index].iStyle, pLexGlobal->Styles[index].szValue);
+	Style_SetStyles(lexGlobal.Styles[index].iStyle, lexGlobal.Styles[index].szValue);
 }
 
 static void Style_SetAllStyle(PEDITLEXER pLex, UINT offset) noexcept {
@@ -1283,7 +1272,7 @@ static bool Style_StrGetAttributeEx(LPCWSTR lpszStyle, LPCWSTR key, int keyLen) 
 void Style_InitDefaultColor() noexcept {
 	PEDITLEXER pLexNew = pLexArray[iDefaultLexerIndex];
 	const int index = pLexNew->bUseDefaultCodeStyle ? GlobalStyleIndex_DefaultCode : GlobalStyleIndex_DefaultText;
-	LPCWSTR szValue = pLexGlobal->Styles[index].szValue;
+	LPCWSTR szValue = lexGlobal.Styles[index].szValue;
 	COLORREF rgb;
 	if (!Style_StrGetForeColor(szValue, &rgb)) {
 		if (!Style_StrGetForeColor(pLexNew->Styles[0].szValue, &rgb)) {
@@ -1300,14 +1289,14 @@ void Style_InitDefaultColor() noexcept {
 	//SciCall_StyleClearAll();
 
 	const COLORREF backColor = rgb;
-	szValue = pLexGlobal->Styles[GlobalStyleIndex_CodeFolding].szValue;
+	szValue = lexGlobal.Styles[GlobalStyleIndex_CodeFolding].szValue;
 	if (!Style_StrGetBackColor(szValue, &rgb)) {
 		rgb = backColor;
 	}
 	SciCall_SetFoldMarginColor(true, rgb);
 	SciCall_SetFoldMarginHiColor(true, rgb);
 
-	szValue = pLexGlobal->Styles[GlobalStyleIndex_LineNumber].szValue;
+	szValue = lexGlobal.Styles[GlobalStyleIndex_LineNumber].szValue;
 	if (Style_StrGetForeColor(szValue, &rgb)) {
 		SciCall_StyleSetFore(STYLE_LINENUMBER, rgb);
 	}
@@ -1333,7 +1322,7 @@ LPCWSTR Style_FindStyleValue(LPCEDITLEXER pLex, UINT style) noexcept {
 }
 
 void Style_DefineIndicator(int index, int indicator, int indicatorStyle) noexcept {
-	LPCWSTR szValue = pLexGlobal->Styles[index].szValue;
+	LPCWSTR szValue = lexGlobal.Styles[index].szValue;
 	COLORREF rgb;
 	int iValue;
 
@@ -1361,8 +1350,8 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) noexcept {
 		np2LexLangIndex = 0;
 		pLexNew = pLexArray[iDefaultLexerIndex];
 	}
-	if (!IsStyleLoaded(pLexGlobal)) {
-		Style_LoadOne(pLexGlobal);
+	if (!IsStyleLoaded(&lexGlobal)) {
+		Style_LoadOne(&lexGlobal);
 	}
 	if (!IsStyleLoaded(pLexNew)) {
 		Style_LoadOne(pLexNew);
@@ -1486,13 +1475,13 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) noexcept {
 	SciCall_StyleSetCheckMonospaced(STYLE_DEFAULT, true);
 
 	//! begin STYLE_DEFAULT
-	LPCWSTR szValue = pLexGlobal->Styles[GlobalStyleIndex_DefaultCode].szValue;
+	LPCWSTR szValue = lexGlobal.Styles[GlobalStyleIndex_DefaultCode].szValue;
 	Style_StrGetFontEx(szValue, defaultCodeFontName, COUNTOF(defaultCodeFontName), true);
-	szValue = pLexGlobal->Styles[GlobalStyleIndex_DefaultText].szValue;
+	szValue = lexGlobal.Styles[GlobalStyleIndex_DefaultText].szValue;
 	Style_StrGetFontEx(szValue, defaultTextFontName, COUNTOF(defaultTextFontName), true);
 
 	iValue = pLexNew->bUseDefaultCodeStyle ? GlobalStyleIndex_DefaultCode : GlobalStyleIndex_DefaultText;
-	szValue = pLexGlobal->Styles[iValue].szValue;
+	szValue = lexGlobal.Styles[iValue].szValue;
 	// base font size
 	if (!Style_StrGetFontSize(szValue, &iBaseFontSize)) {
 		iBaseFontSize = defaultBaseFontSize;
@@ -1543,7 +1532,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) noexcept {
 	Style_SetDefaultStyle(GlobalStyleIndex_IndentationGuide);
 
 	//! begin Selection
-	szValue = pLexGlobal->Styles[GlobalStyleIndex_Selection].szValue;
+	szValue = lexGlobal.Styles[GlobalStyleIndex_Selection].szValue;
 	// never change text color on selecting.
 	//SciCall_ResetElementColor(SC_ELEMENT_SELECTION_TEXT);
 	//SciCall_ResetElementColor(SC_ELEMENT_SELECTION_ADDITIONAL_TEXT);
@@ -1575,7 +1564,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) noexcept {
 	//! end Selection
 
 	//! begin Whitespace
-	szValue = pLexGlobal->Styles[GlobalStyleIndex_Whitespace].szValue;
+	szValue = lexGlobal.Styles[GlobalStyleIndex_Whitespace].szValue;
 	if (Style_StrGetForeColor(szValue, &rgb)) {
 		if (!Style_StrGetAlpha(szValue, &iValue)) {
 			iValue = SC_ALPHA_OPAQUE;
@@ -1597,7 +1586,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) noexcept {
 	SciCall_SetElementColor(SC_ELEMENT_LIST, foreColor);
 	SciCall_SetElementColor(SC_ELEMENT_LIST_BACK, backColor);
 	// caret fore
-	szValue = pLexGlobal->Styles[GlobalStyleIndex_Caret].szValue;
+	szValue = lexGlobal.Styles[GlobalStyleIndex_Caret].szValue;
 	if (!Style_StrGetForeColor(szValue, &rgb)) {
 		rgb = GetSysColor(COLOR_WINDOWTEXT);
 	}
@@ -1614,7 +1603,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) noexcept {
 	//! end Caret
 
 	// IME indicator
-	szValue = pLexGlobal->Styles[GlobalStyleIndex_IMEIndicator].szValue;
+	szValue = lexGlobal.Styles[GlobalStyleIndex_IMEIndicator].szValue;
 	if (!Style_StrGetForeColor(szValue, &rgb)) {
 		rgb = IMEIndicatorDefaultColor;
 	}
@@ -1633,19 +1622,19 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) noexcept {
 		COLORREF fillColor;
 		COLORREF highlightColor;
 
-		szValue = pLexGlobal->Styles[GlobalStyleIndex_FoldingMarker].szValue;
+		szValue = lexGlobal.Styles[GlobalStyleIndex_FoldingMarker].szValue;
 		if (Style_StrGetForeColor(szValue, &rgb)) {
 			foreColor = rgb;
 		} else {
-			foreColor = (bUse2ndGlobalStyle || np2StyleTheme == StyleTheme_Dark) ? FoldingMarkerLineColorDark : FoldingMarkerLineColorDefault;
+			foreColor = (np2StyleTheme == StyleTheme_Dark) ? FoldingMarkerLineColorDark : FoldingMarkerLineColorDefault;
 		}
 		if (Style_StrGetBackColor(szValue, &rgb)) {
 			fillColor = rgb;
 		} else {
-			fillColor = (bUse2ndGlobalStyle || np2StyleTheme == StyleTheme_Dark) ? FoldingMarkerFillColorDark : FoldingMarkerFillColorDefault;
+			fillColor = (np2StyleTheme == StyleTheme_Dark) ? FoldingMarkerFillColorDark : FoldingMarkerFillColorDefault;
 		}
 
-		szValue = pLexGlobal->Styles[GlobalStyleIndex_CodeFolding].szValue;
+		szValue = lexGlobal.Styles[GlobalStyleIndex_CodeFolding].szValue;
 		if (!Style_StrGetForeColor(szValue, &highlightColor)) {
 			highlightColor = RGB(0xFF, 0x00, 0x00); // Scintilla default red color
 		}
@@ -1701,7 +1690,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) noexcept {
 	}
 
 	// Mark Occurrences
-	szValue = pLexGlobal->Styles[GlobalStyleIndex_MarkOccurrences].szValue;
+	szValue = lexGlobal.Styles[GlobalStyleIndex_MarkOccurrences].szValue;
 	SciCall_IndicSetStyle(IndicatorNumber_MarkOccurrence, INDIC_ROUNDBOX);
 	if (!Style_StrGetForeColor(szValue, &rgb)) {
 		rgb = GetSysColor(COLOR_HIGHLIGHT);
@@ -2880,16 +2869,6 @@ int Style_GetMatchLexerIndex(int rid) noexcept {
 	return LEXER_INDEX_MATCH; // Text File
 }
 
-//=============================================================================
-//
-// Style_ToggleUse2ndDefault()
-//
-void Style_ToggleUse2ndGlobalStyle() noexcept {
-	bUse2ndGlobalStyle = !bUse2ndGlobalStyle;
-	pLexGlobal = bUse2ndGlobalStyle ? &lex2ndGlobal : &lexGlobal;
-	Style_SetLexer(pLexCurrent, false);
-}
-
 void Style_ToggleUseDefaultCodeStyle() noexcept {
 	pLexCurrent->bStyleChanged = true;
 	pLexCurrent->bUseDefaultCodeStyle = !pLexCurrent->bUseDefaultCodeStyle;
@@ -2902,7 +2881,7 @@ void Style_ToggleUseDefaultCodeStyle() noexcept {
 // Style_SetLongLineColors()
 //
 void Style_SetLongLineColors() noexcept {
-	LPCWSTR szValue = pLexGlobal->Styles[GlobalStyleIndex_LongLineMarker].szValue;
+	LPCWSTR szValue = lexGlobal.Styles[GlobalStyleIndex_LongLineMarker].szValue;
 
 	const bool foreColor = SciCall_GetEdgeMode() == EDGE_LINE;
 	COLORREF rgb;
@@ -2919,7 +2898,7 @@ void Style_SetLongLineColors() noexcept {
 //
 void Style_HighlightCurrentLine() noexcept {
 	if (iHighlightCurrentLine != LineHighlightMode_None) {
-		LPCWSTR szValue = pLexGlobal->Styles[GlobalStyleIndex_CurrentLine].szValue;
+		LPCWSTR szValue = lexGlobal.Styles[GlobalStyleIndex_CurrentLine].szValue;
 		const bool outline = iHighlightCurrentLine == LineHighlightMode_OutlineFrame;
 		COLORREF rgb;
 		if (Style_StrGetColor(outline, szValue, &rgb)) {
@@ -2978,7 +2957,7 @@ void Style_SetBookmark() noexcept {
 		}
 	}
 
-	LPCWSTR szValue = pLexGlobal->Styles[GlobalStyleIndex_Bookmark].szValue;
+	LPCWSTR szValue = lexGlobal.Styles[GlobalStyleIndex_Bookmark].szValue;
 	if (bShowBookmarkMargin) {
 		COLORREF iBookmarkImageColor;
 		if (!Style_StrGetForeColor(szValue, &iBookmarkImageColor)) {
@@ -3457,9 +3436,9 @@ bool Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, bool bDefaultSt
 //
 void Style_SetDefaultFont(HWND hwnd, bool bCode) noexcept {
 	const int iIdx = bCode ? GlobalStyleIndex_DefaultCode : GlobalStyleIndex_DefaultText;
-	if (Style_SelectFont(hwnd, pLexGlobal->Styles[iIdx].szValue, MAX_EDITSTYLE_VALUE_SIZE, true)) {
+	if (Style_SelectFont(hwnd, lexGlobal.Styles[iIdx].szValue, MAX_EDITSTYLE_VALUE_SIZE, true)) {
 		fStylesModified |= STYLESMODIFIED_SOME_STYLE;
-		pLexGlobal->bStyleChanged = true;
+		lexGlobal.bStyleChanged = true;
 		Style_SetLexer(pLexCurrent, false);
 	}
 }
@@ -3868,7 +3847,7 @@ static HTREEITEM Style_AddAllLexerToTreeView(HWND hwndTV, bool withStyles, bool 
 	SchemeGroupInfo groupList[26 + 2];
 	int groupCount = 2;
 	groupList[0].group = SchemeGroup_Global;
-	groupList[0].count = withStyles ? LEXER_INDEX_GENERAL : LEXER_INDEX_MATCH;
+	groupList[0].count = withStyles ? LEXER_INDEX_GENERAL : (LEXER_INDEX_GENERAL - LEXER_INDEX_MATCH);
 	groupList[1].group = SchemeGroup_Favorite;
 	groupList[1].count = 0;
 
@@ -4578,7 +4557,7 @@ void Style_ConfigDlg(HWND hwnd) noexcept {
 		LPWSTR szStyleBuf = static_cast<LPWSTR>(NP2HeapAlloc(iStyleBufSize));
 		memcpy(szStyleBuf, pLex->szStyleBuf, iStyleBufSize);
 		param.styleBackup[iLexer] = szStyleBuf;
-		if (pLex == pLexGlobal) {
+		if (pLex == &lexGlobal) {
 			backupGlobal = szStyleBuf;
 		} else if (pLex == pLexCurrent) {
 			backupCurrent = szStyleBuf;
@@ -4621,7 +4600,7 @@ void Style_ConfigDlg(HWND hwnd) noexcept {
 		if (!param.bApply) {
 			// global default or current styles changed
 			// Note: bStyleChanged is retained until styles been saved.
-			param.bApply = memcmp(backupGlobal, pLexGlobal->szStyleBuf, EDITSTYLE_BufferSize(pLexGlobal->iStyleCount)) != 0
+			param.bApply = memcmp(backupGlobal, lexGlobal.szStyleBuf, EDITSTYLE_BufferSize(lexGlobal.iStyleCount)) != 0
 				|| memcmp(backupCurrent, pLexCurrent->szStyleBuf, EDITSTYLE_BufferSize(pLexCurrent->iStyleCount)) != 0;
 		}
 		if ((fStylesModified & STYLESMODIFIED_WARN_MASK) && !fWarnedNoIniFile) {
