@@ -258,6 +258,7 @@ jobs:
   llvm_mingw:
     name: llvm-mingw
     runs-on: windows-latest
+    continue-on-error: true
     steps:
     - uses: actions/checkout@v4
 

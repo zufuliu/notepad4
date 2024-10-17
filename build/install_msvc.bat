@@ -7,5 +7,5 @@ SET "VSPATH=C:\Program Files\Microsoft Visual Studio\2022\Enterprise"
 
 IF /I "%~1" == "v141_xp" (
 	SHIFT
-	"%VSINSTALLER%" modify --installPath "%VSPATH%" --add Microsoft.VisualStudio.Component.WinXP --quiet --norestart --nocache --noUpdateInstaller
+	"%VSINSTALLER%" modify --installPath "%VSPATH%" --add Microsoft.VisualStudio.Component.WinXP --quiet --norestart --nocache
 )
