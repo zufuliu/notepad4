@@ -1,4 +1,4 @@
-# https://www.python.org/
+# 3.13 https://www.python.org/
 # https://ironpython.net/
 # https://www.jython.org/
 # https://cython.org/
@@ -175,39 +175,55 @@ site
 
 #! attributes			===========================================================
 # https://docs.python.org/3/reference/datamodel.html#the-standard-type-hierarchy
+__all__
+__version__
 # Callable types
+# https://docs.python.org/3/reference/datamodel.html#callable-types
+__globals__
+__closure__
+
 __doc__
 __name__
 __qualname__
 __module__
 __defaults__
 __code__
-__globals__
 __dict__
-__closure__
 __annotations__
 __kwdefaults__
 __type_params__
+
 __self__
 __func__
-# Modules
-__name__
 __doc__
-__file__
-__annotations__
-
-__all__
-__version__
-# Custom classes
 __name__
+__module__
+
+# Modules
+# https://docs.python.org/3/reference/datamodel.html#modules
+__name__
+__spec__
+__package__
+__loader__
+__path__
+__file__
+__cached__
+__doc__
+__annotations__
+__dict__
+
+# Custom classes
+# https://docs.python.org/3/reference/datamodel.html#custom-classes
+__name__
+__qualname__
 __module__
 __dict__
 __bases__
 __doc__
 __annotations__
 __type_params__
-# Special Attributes
-# https://docs.python.org/3/library/stdtypes.html#special-attributes
+__static_attributes__
+__firstlineno__
 __dict__
 __class__
 __bases__
@@ -217,16 +233,6 @@ __type_params__
 __mro__
 mro()
 __subclasses__()
-
-# module attributes
-# https://docs.python.org/3/reference/import.html#import-related-module-attributes
-__name__
-__loader__
-__package__
-__spec__
-__path__
-__file__
-__cached__
 
 #! special method	===========================================================
 # https://docs.python.org/3/reference/datamodel.html#special-method-names
@@ -257,6 +263,7 @@ object:
 	__get__(self, instance, owner=None)
 	__set__(self, instance, value)
 	__delete__(self, instance)
+	__objclass__
 	__slots__
 	__weakref__
 	# Customizing class creation
@@ -376,6 +383,7 @@ class:
 	__subclasscheck__(self, subclass)
 
 #! exceptions		===========================================================
+# https://docs.python.org/3/library/exceptions.html
 BaseException
 	BaseExceptionGroup
 	GeneratorExit
@@ -628,12 +636,20 @@ property:
 slice:
 	indices(self, length)
 
+# https://docs.python.org/3/library/exceptions.html
 exception BaseException:
-	__traceback__
+	__context__
+	__context__
+	__suppress_context__
+
 	args
 	with_traceback(tb)
+	__traceback__
 	add_note(note)
 	__notes__
+exception ImportError
+	name
+	path
 exception OSError([arg])
 exception OSError(errno, strerror[, filename[, winerror[, filename2]]]):
 	errno
@@ -641,6 +657,8 @@ exception OSError(errno, strerror[, filename[, winerror[, filename2]]]):
 	strerror
 	filename
 	filename2
+exception StopIteration
+	value
 exception SyntaxError(message, details):
 	filename
 	lineno
@@ -698,7 +716,6 @@ re
 	ASCII
 	DEBUG
 	IGNORECASE
-	LOCALE
 	MULTILINE
 	DOTALL
 	VERBOSE
@@ -713,7 +730,7 @@ re
 	subn(pattern, repl, string, count=0, flags=0)
 	escape(pattern)
 	purge()
-	exception error(msg, pattern=None, pos=None):
+	exception PatternError(msg, pattern=None, pos=None):
 		msg
 		pattern
 		pos
@@ -1107,11 +1124,15 @@ types
 copy
 	__copy__()
 	__deepcopy__()
+	__replace__(self, /, **changes)
 	copy(x)
 	deepcopy(x[, memo])
+	replace(obj, /, **changes)
 	exception Error
 enum
 	class Enum:
+		name
+		value
 		__members__
 	class IntEnum
 	class StrEnum
@@ -1123,6 +1144,8 @@ enum
 	@verify
 	@member
 	@nonmember
+	@global_enum
+	show_flag_values(value)
 
 # Numeric and Mathematical Modules
 # https://docs.python.org/3/library/numeric.html
@@ -1443,6 +1466,8 @@ statistics
 	fmean(data)
 	geometric_mean(data)
 	harmonic_mean(data, weights=None)
+	kde(data, h)
+	kde_random(data, h)
 	median(data)
 	median_low(data)
 	median_high(data)
@@ -1522,6 +1547,7 @@ functools
 pathlib
 	class PurePath(*pathsegments):
 		parts
+		parser
 		drive
 		root
 		anchor
@@ -1532,13 +1558,10 @@ pathlib
 		suffixes
 		stem
 		as_posix()
-		as_uri()
 		is_absolute()
-		is_relative_to(*other)
-		is_reserved()
 		joinpath(*other)
+		full_match(pattern)
 		match(pattern)
-		relative_to(*other)
 		with_name(name)
 		with_stem(stem)
 		with_suffix(suffix)
@@ -1546,47 +1569,55 @@ pathlib
 	class PurePosixPath(*pathsegments)
 	class PureWindowsPath(*pathsegments)
 	class Path(*pathsegments):
-		cwd()
+		from_uri(uri)
+		as_uri()
+
 		home()
-		stat(*, follow_symlinks=True)
-		chmod(mode, *, follow_symlinks=True)
-		exists()
 		expanduser()
-		glob(pattern)
-		group()
-		is_dir()
+		cwd()
+		absolute()
+		resolve(strict=False)
+		readlink()
+
+		stat(*, follow_symlinks=True)
+		lstat()
+		exists()
 		is_file()
+		is_dir()
+		is_symlink()
 		is_junction()
 		is_mount()
-		is_symlink()
 		is_socket()
 		is_fifo()
 		is_block_device()
 		is_char_device()
-		iterdir()
-		walk(top_down=True, on_error=None, follow_symlinks=False)
-		lchmod(mode)
-		lstat()
-		mkdir(mode=0o777, parents=False, exist_ok=False)
-		open(mode='r', buffering=- 1, encoding=None, errors=None, newline=None)
-		owner()
-		read_bytes()
-		read_text(encoding=None, errors=None)
-		readlink()
-		rename(target)
-		replace(target)
-		absolute()
-		resolve(strict=False)
-		rglob(pattern)
-		rmdir()
 		samefile(other_path)
+
+		open(mode='r', buffering=- 1, encoding=None, errors=None, newline=None)
+		read_text(encoding=None, errors=None)
+		read_bytes()
+		write_text(data, encoding=None, errors=None, newline=None)
+		write_bytes(data)
+
+		iterdir()
+		glob(pattern)
+		rglob(pattern)
+		walk(top_down=True, on_error=None, follow_symlinks=False)
+
+		touch(mode=438, exist_ok=True)
+		mkdir(mode=0o777, parents=False, exist_ok=False)
 		symlink_to(target, target_is_directory=False)
 		hardlink_to(target)
-		link_to(target)
-		touch(mode=438, exist_ok=True)
+
+		rename(target)
+		replace(target)
 		unlink(missing_ok=False)
-		write_bytes(data)
-		write_text(data, encoding=None, errors=None, newline=None)
+		rmdir()
+
+		owner()
+		group()
+		chmod(mode, *, follow_symlinks=True)
+		lchmod(mode)
 	class PosixPath(*pathsegments)
 	class WindowsPath(*pathsegments)
 os.path
@@ -1627,6 +1658,7 @@ glob
 	glob(pathname, *, root_dir=None, dir_fd=None, recursive=False, include_hidden=False)
 	iglob(pathname, *, root_dir=None, dir_fd=None, recursive=False, include_hidden=False)
 	escape(pathname)
+	translate(pathname)
 fnmatch
 	fnmatch(filename, pattern)
 	fnmatchcase(filename, pattern)
@@ -1686,8 +1718,6 @@ sqlite3
 	sqlite_version
 	sqlite_version_info
 	threadsafety
-	version
-	version_info
 	connect(database[, timeout, detect_types, isolation_level, check_same_thread, factory, cached_statements, uri])
 	complete_statement(sql)
 	enable_callback_tracebacks(flag)
@@ -1842,6 +1872,7 @@ os
 	fsync(fd)
 	ftruncate(fd, length)
 	get_blocking(fd)
+	grantpt(fd)
 	isatty(fd)
 	lockf(fd, cmd, len)
 	F_LOCK
@@ -1853,6 +1884,8 @@ os
 	SEEK_SET
 	SEEK_CUR
 	SEEK_END
+	SEEK_HOLE
+	SEEK_DATA
 	open(path, flags, mode=511, *, dir_fd=None)
 	O_RDONLY
 	O_WRONLY
@@ -1861,6 +1894,7 @@ os
 	O_CREAT
 	O_EXCL
 	O_TRUNC
+
 	O_DSYNC
 	O_RSYNC
 	O_SYNC
@@ -1868,6 +1902,7 @@ os
 	O_NONBLOCK
 	O_NOCTTY
 	O_CLOEXEC
+
 	O_BINARY
 	O_NOINHERIT
 	O_SHORT_LIVED
@@ -1875,10 +1910,12 @@ os
 	O_RANDOM
 	O_SEQUENTIAL
 	O_TEXT
+
 	O_EVTONLY
 	O_FSYNC
 	O_SYMLINK
 	O_NOFOLLOW_ANY
+
 	O_ASYNC
 	O_DIRECT
 	O_DIRECTORY
@@ -1900,9 +1937,11 @@ os
 	POSIX_FADV_WILLNEED
 	POSIX_FADV_DONTNEED
 	pread(fd, n, offset)
+	posix_openpt(oflag)
 	preadv(fd, buffers, offset, flags=0)
 	RWF_NOWAIT
 	RWF_HIPRI
+	ptsname(fd)
 	pwrite(fd, str, offset)
 	pwritev(fd, buffers, offset, flags=0)
 	RWF_DSYNC
@@ -1915,6 +1954,7 @@ os
 	SF_NODISKIO
 	SF_MNOWAIT
 	SF_SYNC
+	SF_NOCACHE
 	splice(src, dst, count, offset_src=None, offset_dst=None)
 	SPLICE_F_MOVE
 	SPLICE_F_NONBLOCK
@@ -1923,6 +1963,7 @@ os
 	tcgetpgrp(fd)
 	tcsetpgrp(fd, pg)
 	ttyname(fd)
+	unlockpt(fd)
 	write(fd, str)
 	writev(fd, buffers)
 	# Querying the size of a terminal
@@ -1993,6 +2034,7 @@ os
 		st_uid
 		st_gid
 		st_size
+
 		st_atime
 		st_mtime
 		st_ctime
@@ -2001,6 +2043,7 @@ os
 		st_ctime_ns
 		st_birthtime
 		st_birthtime_ns
+
 		st_blocks
 		st_blksize
 		st_rdev
@@ -2048,6 +2091,7 @@ os
 	EFD_CLOEXEC
 	EFD_NONBLOCK
 	EFD_SEMAPHORE
+	# Timer File Descriptors
 	# Linux extended attributes
 	getxattr(path, attribute, *, follow_symlinks=True)
 	listxattr(path=None, *, follow_symlinks=True)
@@ -2174,6 +2218,7 @@ os
 	confstr_names
 	cpu_count()
 	getloadavg()
+	process_cpu_count()
 	sysconf(name)
 	sysconf_names
 	curdir
@@ -2309,12 +2354,14 @@ time
 	CLOCK_HIGHRES
 	CLOCK_MONOTONIC
 	CLOCK_MONOTONIC_RAW
+	CLOCK_MONOTONIC_RAW_APPROX
 	CLOCK_PROCESS_CPUTIME_ID
 	CLOCK_PROF
 	CLOCK_TAI
 	CLOCK_THREAD_CPUTIME_ID
 	CLOCK_UPTIME
 	CLOCK_UPTIME_RAW
+	CLOCK_UPTIME_RAW_APPROX
 	CLOCK_REALTIME
 	altzone
 	daylight
@@ -2788,6 +2835,7 @@ sys
 	getsizeof(object[, default])
 	getswitchinterval()
 	_getframe([depth])
+	_getframemodulename([depth])
 	getprofile()
 	gettrace()
 	getwindowsversion()
@@ -2800,6 +2848,7 @@ sys
 	__interactivehook__
 	intern(string)
 	is_finalizing()
+	last_exc
 	last_type
 	last_value
 	last_traceback
@@ -2827,7 +2876,6 @@ sys
 	activate_stack_trampoline(backend, /)
 	deactivate_stack_trampoline()
 	is_stack_trampoline_active()
-	_enablelegacywindowsfsencoding()
 	stdin
 	stdout
 	stderr
@@ -2853,6 +2901,7 @@ warnings
 	filterwarnings(action, message='', category=Warning, module='', lineno=0, append=False)
 	simplefilter(action, category=Warning, lineno=0, append=False)
 	resetwarnings()
+	@deprecated()
 	class catch_warnings(*, record=False, module=None, action=None, category=Warning, lineno=0, append=False)
 dataclasses
 	@dataclass(*, init=True, repr=True, eq=True, order=False, unsafe_hash=False, frozen=False, match_args=True, kw_only=False, slots=False, weakref_slot=False)
@@ -2930,14 +2979,17 @@ traceback
 	class TracebackException(exc_type, exc_value, exc_traceback, *, limit=None, lookup_lines=True, capture_locals=False, compact=False):
 		__cause__
 		__context__
+		exceptions
 		__suppress_context__
 		__notes__
 		stack
-		exc_type
+		exc_type_str
 		filename
 		lineno
+		end_lineno
 		text
 		offset
+		end_offset
 		msg
 		from_exception(exc, *, limit=None, lookup_lines=True, capture_locals=False)
 		format(*, chain=True)
@@ -2948,16 +3000,6 @@ traceback
 		format()
 		format_frame_summary(frame_summary)
 	class FrameSummary(filename, lineno, name, lookup_line=True, locals=None, line=None)
-__future__
-	nested_scopes
-	generators
-	division
-	absolute_import
-	with_statement
-	print_function
-	unicode_literals
-	generator_stop
-	annotations
 
 #! comment			===========================================================
 # https://devtut.github.io/python/comments-and-documentation.html#syntax-conventions
