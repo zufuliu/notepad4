@@ -143,29 +143,6 @@ CharacterExtracted::CharacterExtracted(const unsigned char *charBytes, size_t wi
 Document::Document(DocumentOption options) :
 	cb(!FlagSet(options, DocumentOption::StylesNone), FlagSet(options, DocumentOption::TextLarge)),
 	durationStyleOneUnit(1e-6) {
-	refCount = 0;
-#ifdef _WIN32
-	eolMode = EndOfLine::CrLf;
-#else
-	eolMode = EndOfLine::Lf;
-#endif
-	dbcsCodePage = CpUtf8;
-	lineEndBitSet = LineEndType::Default;
-	endStyled = 0;
-	styleClock = 0;
-	enteredModification = 0;
-	enteredStyling = 0;
-	enteredReadOnlyCount = 0;
-	matchesValid = false;
-	insertionSet = false;
-	tabInChars = 8;
-	indentInChars = 0;
-	actualIndentInChars = 8;
-	useTabs = true;
-	tabIndents = true;
-	forwardSafeChar = 0x80;
-	backwardSafeChar = 0x80;
-	backspaceUnindents = false;
 
 	perLineData[ldMarkers] = std::make_unique<LineMarkers>();
 	perLineData[ldLevels] = std::make_unique<LineLevels>();

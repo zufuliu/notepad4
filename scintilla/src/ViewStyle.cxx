@@ -111,6 +111,7 @@ ViewStyle::ViewStyle(size_t stylesSize_):
 	constexpr ColourRGBA modified(0xFF, 0x80, 0x0);
 	// Reverted to change
 	constexpr ColourRGBA revertedToChange(0xA0, 0xC0, 0x0);
+	const ColourRGBA chrome = Platform::Chrome();
 
 	// Edition indicators
 	constexpr size_t indexHistory = static_cast<size_t>(IndicatorNumbers::HistoryRevertedToOriginInsertion);
@@ -140,7 +141,7 @@ ViewStyle::ViewStyle(size_t stylesSize_):
 	markers[indexHistorySaved].markType = MarkerSymbol::Bar;
 	// Modified
 	constexpr size_t indexHistoryModified = static_cast<size_t>(MarkerOutline::HistoryModified);
-	markers[indexHistoryModified].back = Platform::Chrome();
+	markers[indexHistoryModified].back = chrome;
 	markers[indexHistoryModified].fore = modified;
 	markers[indexHistoryModified].markType = MarkerSymbol::Bar;
 	// Reverted to change
@@ -184,10 +185,10 @@ ViewStyle::ViewStyle(size_t stylesSize_):
 
 	controlCharSymbol = 0;	/* Draw the control characters */
 	controlCharWidth = 0;
-	selbar = Platform::Chrome();
+	selbar = chrome;
 	selbarlight = Platform::ChromeHighlight();
 	styles[StyleLineNumber].fore = black;
-	styles[StyleLineNumber].back = Platform::Chrome();
+	styles[StyleLineNumber].back = chrome;
 
 	hotspotUnderline = true;
 	marginInside = true;

@@ -302,7 +302,7 @@ if (acp == 874) {{
 	return ANSICharClassifyTable + {result[874]['offset']};
 }}
 *length = 0;
-return NULL;
+return nullptr;
 """.splitlines()
 	output.extend('\t' + line for line in lines)
 	output.append("}")

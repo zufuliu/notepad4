@@ -275,22 +275,21 @@ public:
 	};
 
 private:
-	int refCount;
+	int refCount = 0;
 	CellBuffer cb;
 	CharClassify charClass;
 #if 0
 	CharacterCategoryMap charMap;
 #endif
 	std::unique_ptr<CaseFolder> pcf;
-	Sci::Position endStyled;
-	int styleClock;
-	int enteredModification;
-	int enteredStyling;
-	int enteredReadOnlyCount;
+	Sci::Position endStyled = 0;
+	int styleClock = 0;
+	int enteredModification = 0;
+	int enteredStyling = 0;
+	int enteredReadOnlyCount = 0;
 
 	std::optional<bool> delaySavePoint;
-	bool matchesValid;
-	bool insertionSet;
+	bool insertionSet = false;
 	std::string insertion;
 
 	std::vector<WatcherWithUserData> watchers;
@@ -313,18 +312,18 @@ private:
 
 public:
 
-	Scintilla::EndOfLine eolMode;
+	Scintilla::EndOfLine eolMode = Scintilla::EndOfLine::CrLf;
 	/// Can also be SC_CP_UTF8 to enable UTF-8 mode
-	int dbcsCodePage;
-	Scintilla::LineEndType lineEndBitSet;
-	int tabInChars;
-	int indentInChars;
-	int actualIndentInChars;
-	bool useTabs;
-	bool tabIndents;
-	uint8_t forwardSafeChar;
-	uint8_t backwardSafeChar;
-	uint8_t backspaceUnindents;
+	int dbcsCodePage = Scintilla::CpUtf8;
+	Scintilla::LineEndType lineEndBitSet = Scintilla::LineEndType::Default;
+	int tabInChars = 8;
+	int indentInChars = 0;
+	int actualIndentInChars = 8;
+	bool useTabs = true;
+	bool tabIndents = true;
+	uint8_t forwardSafeChar = 0x80;
+	uint8_t backwardSafeChar = 0x80;
+	uint8_t backspaceUnindents = false;
 	ActionDuration durationStyleOneUnit;
 
 	std::unique_ptr<IDecorationList> decorations;
