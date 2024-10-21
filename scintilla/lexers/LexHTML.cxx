@@ -72,7 +72,7 @@ constexpr int statePrintForState(int state, script_mode inScriptType) noexcept {
 		if ((state >= SCE_HB_START) && (state <= SCE_HB_OPERATOR)) {
 			return state + ((inScriptType == eNonHtmlScript) ? 0 : SCE_HA_VBS);
 		}
-		if ((state >= SCE_HJ_START) && (state <= SCE_HJ_REGEX)) {
+		if ((state >= SCE_HJ_START) && (state <= SCE_HJ_TEMPLATELITERAL)) {
 			return state + ((inScriptType == eNonHtmlScript) ? 0 : SCE_HA_JS);
 		}
 	}
