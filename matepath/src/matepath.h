@@ -117,7 +117,6 @@ enum TargetApplicationMode {
 #define INI_SECTION_NAME_FLAGS				L"Settings2"
 #define INI_SECTION_NAME_WINDOW_POSITION	L"Window Position"
 #define INI_SECTION_NAME_TOOLBAR_LABELS		L"Toolbar Labels"
-#define INI_SECTION_NAME_TOOLBAR_IMAGES		L"Toolbar Images"
 #define INI_SECTION_NAME_FILTERS			L"Filters"
 #define INI_SECTION_NAME_TARGET_APPLICATION	L"Target Application"
 
