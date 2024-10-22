@@ -106,7 +106,7 @@ bool	bMinimizeToTray;
 bool	fUseRecycleBin;
 bool	fNoConfirmDelete;
 static bool bShowToolbar;
-static bool bAutoScaleToolbar;
+static int iAutoScaleToolbar;
 static bool bShowStatusbar;
 static bool bShowDriveBox;
 int		cxRunDlg;
@@ -888,6 +888,12 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 	SendMessage(hwndToolbar, TB_BUTTONSTRUCTSIZE, sizeof(TBBUTTON), 0);
 
 	bool internalBitmap = false;
+	const int scale = iAutoScaleToolbar;
+#if NP2_ENABLE_HIDPI_IMAGE_RESOURCE
+	const UINT dpi = (scale > USER_DEFAULT_SCREEN_DPI) ? (g_uCurrentDPI + scale - USER_DEFAULT_SCREEN_DPI) : g_uCurrentDPI;
+#else
+	const UINT dpi = g_uCurrentDPI;
+#endif
 	// Add normal Toolbar Bitmap
 	HBITMAP hbmp = nullptr;
 	if (tchToolbarBitmap != nullptr) {
@@ -895,11 +901,11 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 	}
 	if (hbmp == nullptr) {
 		internalBitmap = true;
-		const int resource = GetBitmapResourceIdForCurrentDPI(IDB_TOOLBAR16);
+		const int resource = GetBitmapResourceIdForDPI(IDB_TOOLBAR16, dpi);
 		hbmp = static_cast<HBITMAP>(LoadImage(g_exeInstance, MAKEINTRESOURCE(resource), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION));
 	}
-	if (bAutoScaleToolbar) {
-		hbmp = ResizeImageForCurrentDPI(hbmp);
+	if (scale != 0) {
+		hbmp = ResizeImageForDPI(hbmp, dpi);
 	}
 
 	BITMAP bmp;
@@ -1172,7 +1178,10 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	CheckCmd(hmenu, IDM_VIEW_TOOLBAR, bShowToolbar);
 	EnableCmd(hmenu, IDM_VIEW_CUSTOMIZETB, bShowToolbar);
-	CheckCmd(hmenu, IDM_VIEW_AUTO_SCALE_TOOLBAR, bAutoScaleToolbar);
+	CheckCmd(hmenu, IDM_VIEW_AUTO_SCALE_TOOLBAR, iAutoScaleToolbar);
+#if NP2_ENABLE_HIDPI_IMAGE_RESOURCE
+	CheckCmd(hmenu, IDM_VIEW_USE_LARGE_TOOLBAR, iAutoScaleToolbar > USER_DEFAULT_SCREEN_DPI);
+#endif
 	CheckCmd(hmenu, IDM_VIEW_STATUSBAR, bShowStatusbar);
 	CheckCmd(hmenu, IDM_VIEW_DRIVEBOX, bShowDriveBox);
 
@@ -1716,9 +1725,20 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_VIEW_AUTO_SCALE_TOOLBAR:
-		bAutoScaleToolbar = !bAutoScaleToolbar;
+		iAutoScaleToolbar = iAutoScaleToolbar ? 0 : USER_DEFAULT_SCREEN_DPI;
 		MsgThemeChanged(hwnd, 0, 0);
 		break;
+
+#if NP2_ENABLE_HIDPI_IMAGE_RESOURCE
+	case IDM_VIEW_USE_LARGE_TOOLBAR:
+		if (iAutoScaleToolbar >= USER_DEFAULT_SCREEN_DPI && iAutoScaleToolbar < USER_DEFAULT_SCREEN_DPI*2) {
+			iAutoScaleToolbar += USER_DEFAULT_SCREEN_DPI/2;
+		} else {
+			iAutoScaleToolbar = USER_DEFAULT_SCREEN_DPI;
+		}
+		MsgThemeChanged(hwnd, 0, 0);
+		break;
+#endif
 
 	case IDM_VIEW_STATUSBAR:
 		bShowStatusbar = !bShowStatusbar;
@@ -2576,7 +2596,7 @@ void LoadSettings() noexcept {
 	}
 
 	bShowToolbar = section.GetBool(L"ShowToolbar", true);
-	bAutoScaleToolbar = section.GetBool(L"AutoScaleToolbar", true);
+	iAutoScaleToolbar = section.GetInt(L"AutoScaleToolbar", USER_DEFAULT_SCREEN_DPI);
 	bShowStatusbar = section.GetBool(L"ShowStatusbar", true);
 	bShowDriveBox = section.GetBool(L"ShowDriveBox", true);
 
@@ -2739,7 +2759,7 @@ void SaveSettings(bool bSaveSettingsNow) noexcept {
 	Toolbar_GetButtons(hwndToolbar, TOOLBAR_COMMAND_BASE, tchToolbarButtons, COUNTOF(tchToolbarButtons));
 	section.SetStringEx(L"ToolbarButtons", tchToolbarButtons, DefaultToolbarButtons);
 	section.SetBoolEx(L"ShowToolbar", bShowToolbar, true);
-	section.SetBoolEx(L"AutoScaleToolbar", bAutoScaleToolbar, true);
+	section.SetIntEx(L"AutoScaleToolbar", iAutoScaleToolbar, USER_DEFAULT_SCREEN_DPI);
 	section.SetBoolEx(L"ShowStatusbar", bShowStatusbar, true);
 	section.SetBoolEx(L"ShowDriveBox", bShowDriveBox, true);
 

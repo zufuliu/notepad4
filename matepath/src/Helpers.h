@@ -188,15 +188,19 @@ BOOL AdjustWindowRectForDpi(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT 
 #endif
 
 #if defined(NP2_ENABLE_HIDPI_IMAGE_RESOURCE) && NP2_ENABLE_HIDPI_IMAGE_RESOURCE
-inline int GetBitmapResourceIdForCurrentDPI(int resourceId) noexcept {
-	if (g_uCurrentDPI > USER_DEFAULT_SCREEN_DPI + USER_DEFAULT_SCREEN_DPI/4) {
-		int scale = (g_uCurrentDPI + USER_DEFAULT_SCREEN_DPI/4 - 1) / (USER_DEFAULT_SCREEN_DPI/2);
+inline int GetBitmapResourceIdForDPI(int resourceId, UINT dpi) noexcept {
+	if (dpi > USER_DEFAULT_SCREEN_DPI + USER_DEFAULT_SCREEN_DPI/4) {
+		int scale = (dpi + USER_DEFAULT_SCREEN_DPI/4 - 1) / (USER_DEFAULT_SCREEN_DPI/2);
 		scale = min(scale, 6);
 		resourceId += scale - 2;
 	}
 	return resourceId;
 }
+inline int GetBitmapResourceIdForCurrentDPI(int resourceId) noexcept {
+	return GetBitmapResourceIdForDPI(resourceId, g_uCurrentDPI);
+}
 #else
+#define GetBitmapResourceIdForDPI(resourceId, dpi)		(resourceId)
 #define GetBitmapResourceIdForCurrentDPI(resourceId)	(resourceId)
 #endif
 
@@ -386,7 +390,10 @@ bool ExeNameFromWnd(HWND hwnd, LPWSTR szExeName, DWORD cchExeName) noexcept;
 
 bool FindUserResourcePath(LPCWSTR path, LPWSTR outPath) noexcept;
 HBITMAP LoadBitmapFile(LPCWSTR path) noexcept;
-HBITMAP ResizeImageForCurrentDPI(HBITMAP hbmp) noexcept;
+HBITMAP ResizeImageForDPI(HBITMAP hbmp, UINT dpi) noexcept;
+inline HBITMAP ResizeImageForCurrentDPI(HBITMAP hbmp) noexcept {
+	return ResizeImageForDPI(hbmp, g_uCurrentDPI);
+}
 
 bool BitmapMergeAlpha(HBITMAP hbmp, COLORREF crDest) noexcept;
 bool BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha) noexcept;

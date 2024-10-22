@@ -435,11 +435,11 @@ HBITMAP EnlargeImageForDPI(HBITMAP hbmp, UINT dpi) noexcept {
 	return hbmp;
 }
 
-HBITMAP ResizeImageForCurrentDPI(HBITMAP hbmp) noexcept {
+HBITMAP ResizeImageForDPI(HBITMAP hbmp, UINT dpi) noexcept {
 	BITMAP bmp;
 	if (GetObject(hbmp, sizeof(BITMAP), &bmp)) {
 		// assume 16x16 at 100% scaling
-		const int height = (g_uCurrentDPI*16) / USER_DEFAULT_SCREEN_DPI;
+		const int height = (dpi*16) / USER_DEFAULT_SCREEN_DPI;
 		if (height == bmp.bmHeight && bmp.bmBitsPixel == 32) {
 			return hbmp;
 		}
@@ -450,7 +450,7 @@ HBITMAP ResizeImageForCurrentDPI(HBITMAP hbmp) noexcept {
 #if 0
 			BITMAP bmp2;
 			if (GetObject(hCopy, sizeof(BITMAP), &bmp2)) {
-				printf("%s %u: (%d x %d, %d) => (%d x %d, %d)\n", __func__, g_uCurrentDPI,
+				printf("%s %u: (%d x %d, %d) => (%d x %d, %d)\n", __func__, dpi,
 				bmp.bmWidth, bmp.bmHeight, bmp.bmBitsPixel, bmp2.bmWidth, bmp2.bmHeight, bmp2.bmBitsPixel);
 			}
 #endif
