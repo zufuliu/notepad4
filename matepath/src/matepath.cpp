@@ -827,7 +827,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	};
 	ListView_SetExtendedListViewStyle(hwndDirList, LVS_EX_DOUBLEBUFFER | LVS_EX_LABELTIP);
 	ListView_InsertColumn(hwndDirList, 0, &lvc);
-	DirList_Init(hwndDirList, nullptr);
+	DirList_Init(hwndDirList);
 	if (bTrackSelect) {
 		ListView_SetExtendedListViewStyleEx(hwndDirList,
 											LVS_EX_TRACKSELECT | LVS_EX_ONECLICKACTIVATE,
@@ -2106,7 +2106,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			break;
 
 		case LVN_GETDISPINFO:
-			DirList_GetDispInfo(hwndDirList, lParam, flagNoFadeHidden);
+			DirList_GetDispInfo(hwndDirList, lParam);
 			break;
 
 		case LVN_DELETEITEM:

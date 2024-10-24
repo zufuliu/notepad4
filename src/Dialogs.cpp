@@ -589,7 +589,7 @@ static INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 #endif
 		};
 		ListView_InsertColumn(hwndLV, 0, &lvc);
-		DirList_Init(hwndLV, nullptr);
+		DirList_Init(hwndLV);
 		DirList_Fill(hwndLV, tchOpenWithDir, DL_ALLOBJECTS, nullptr, false, flagNoFadeHidden, DS_NAME, false);
 		DirList_StartIconThread(hwndLV);
 		ListView_SetItemState(hwndLV, 0, LVIS_FOCUSED, LVIS_FOCUSED);
@@ -636,7 +636,7 @@ static INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 		if (pnmh->idFrom == IDC_OPENWITHDIR) {
 			switch (pnmh->code) {
 			case LVN_GETDISPINFO:
-				DirList_GetDispInfo(GetDlgItem(hwnd, IDC_OPENWITHDIR), lParam, flagNoFadeHidden);
+				DirList_GetDispInfo(GetDlgItem(hwnd, IDC_OPENWITHDIR), lParam);
 				break;
 
 			case LVN_DELETEITEM:
@@ -765,7 +765,7 @@ static INT_PTR CALLBACK FavoritesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 #endif
 		};
 		ListView_InsertColumn(hwndLV, 0, &lvc);
-		DirList_Init(hwndLV, nullptr);
+		DirList_Init(hwndLV);
 		DirList_Fill(hwndLV, tchFavoritesDir, DL_ALLOBJECTS, nullptr, false, flagNoFadeHidden, DS_NAME, false);
 		DirList_StartIconThread(hwndLV);
 		ListView_SetItemState(hwndLV, 0, LVIS_FOCUSED, LVIS_FOCUSED);
@@ -812,7 +812,7 @@ static INT_PTR CALLBACK FavoritesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 		if (pnmh->idFrom == IDC_FAVORITESDIR) {
 			switch (pnmh->code) {
 			case LVN_GETDISPINFO:
-				DirList_GetDispInfo(GetDlgItem(hwnd, IDC_OPENWITHDIR), lParam, flagNoFadeHidden);
+				DirList_GetDispInfo(GetDlgItem(hwnd, IDC_OPENWITHDIR), lParam);
 				break;
 
 			case LVN_DELETEITEM:

@@ -24,7 +24,7 @@ struct LV_ITEMDATA {
 	LPSHELLFOLDER lpsf; // Parent IShellFolder Interface
 };
 
-void DirList_Init(HWND hwnd, LPCWSTR pszHeader) noexcept;
+void DirList_Init(HWND hwnd) noexcept;
 void DirList_Destroy(HWND hwnd);
 void DirList_StartIconThread(HWND hwnd) noexcept;
 
@@ -36,7 +36,7 @@ int DirList_Fill(HWND hwnd, LPCWSTR lpszDir, DWORD grfFlags, LPCWSTR lpszFileSpe
 				 bool bExcludeFilter, bool bNoFadeHidden,
 				 int iSortFlags, bool fSortRev);
 DWORD WINAPI DirList_IconThread(LPVOID lpParam);
-bool DirList_GetDispInfo(HWND hwnd, LPARAM lParam, bool bNoFadeHidden);
+bool DirList_GetDispInfo(HWND hwnd, LPARAM lParam);
 bool DirList_DeleteItem(HWND hwnd, LPARAM lParam);
 
 #define DS_NAME     0

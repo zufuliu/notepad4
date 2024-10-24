@@ -55,9 +55,7 @@ static inline LPCITEMIDLIST IL_Next(LPCITEMIDLIST pidl) noexcept {
 //
 // Initializes the DLDATA structure and sets up the listview control
 //
-void DirList_Init(HWND hwnd, LPCWSTR pszHeader) noexcept {
-	UNREFERENCED_PARAMETER(pszHeader);
-
+void DirList_Init(HWND hwnd) noexcept {
 	// Allocate DirListData Property
 	DLDATA *lpdl = static_cast<DLDATA *>(GlobalAlloc(GPTR, sizeof(DLDATA)));
 	SetProp(hwnd, pDirListProp, lpdl);
@@ -345,9 +343,8 @@ DWORD WINAPI DirList_IconThread(LPVOID lpParam) {
 // Must be called in response to a WM_NOTIFY/LVN_GETDISPINFO message from
 // the listview control
 //
-bool DirList_GetDispInfo(HWND hwnd, LPARAM lParam, bool bNoFadeHidden) {
+bool DirList_GetDispInfo(HWND hwnd, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(hwnd);
-	UNREFERENCED_PARAMETER(bNoFadeHidden);
 
 	LV_DISPINFO *lpdi = AsPointer<LV_DISPINFO *>(lParam);
 	LV_ITEMDATA *lplvid = AsPointer<LV_ITEMDATA *>(lpdi->item.lParam);
