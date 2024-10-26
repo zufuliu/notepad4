@@ -20,9 +20,9 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English (United States) resources
+// Russian (Russia) resources
 
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_RUS)
 LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
 #pragma code_page(65001)
 
@@ -273,8 +273,8 @@ BEGIN
 			MENUITEM SEPARATOR
 			MENUITEM "&Табулировать выделение\tCtrl+Shift+T",				IDM_EDIT_CONVERTSPACES
 			MENUITEM "Раст&абулировать выделение\tCtrl+Shift+S",			IDM_EDIT_CONVERTTABS
-			MENUITEM "Табулировать &отступ\tCtrl+Alt+T",							IDM_EDIT_CONVERTSPACES2
-			MENUITEM "Растабулировать &отступ\tCtrl+Alt+S",						IDM_EDIT_CONVERTTABS2
+			MENUITEM "Табулировать &отступ\tCtrl+Alt+T",					IDM_EDIT_CONVERTSPACES2
+			MENUITEM "Растабулировать &отступ\tCtrl+Alt+S",					IDM_EDIT_CONVERTTABS2
 			MENUITEM SEPARATOR
 			MENUITEM "В &шестнадцатеричное число\tCtrl+Alt+H",				IDM_EDIT_NUM2HEX
 			MENUITEM "В д&есятеричное число\tCtrl+Alt+D",					IDM_EDIT_NUM2DEC
@@ -335,7 +335,7 @@ BEGIN
 			MENUITEM "Дата и время (под&робная форма)\tCtrl+Shift+F5",				IDM_EDIT_INSERT_LONGDATE
 			MENUITEM SEPARATOR
 			MENUITEM "Обо&значение кодировки\tCtrl+F8",								IDM_EDIT_INSERT_ENCODING
-			MENUITEM "Строка She&bang",										IDM_EDIT_INSERT_SHEBANG
+			MENUITEM "Строка She&bang",												IDM_EDIT_INSERT_SHEBANG
 		END
 		POPUP "&Экспертные возможности"
 		BEGIN
@@ -343,10 +343,10 @@ BEGIN
 			MENUITEM "Шестнадцатеричное число в &символ\tCtrl+Alt+C",				IDM_EDIT_HEX2CHAR
 			MENUITEM "&Показать шестнадцатеричный код",								IDM_EDIT_SHOW_HEX
 			MENUITEM SEPARATOR
-			MENUITEM "Заэкранивать символы C\tCtrl+Alt+E",									IDM_EDIT_ESCAPECCHARS
-			MENUITEM "Расэкранивать си&мволы C\tCtrl+Alt+R",								IDM_EDIT_UNESCAPECCHARS
-			MENUITEM "Заэкранивать символы HT&ML/XML\tAlt+Shift+X",							IDM_EDIT_XHTML_ESCAPE_CHAR
-			MENUITEM "Расэкранивать символы HTML/&XML\tAlt+Shift+H",						IDM_EDIT_XHTML_UNESCAPE_CHAR
+			MENUITEM "Заэкранивать символы C\tCtrl+Alt+E",							IDM_EDIT_ESCAPECCHARS
+			MENUITEM "Расэкранивать си&мволы C\tCtrl+Alt+R",						IDM_EDIT_UNESCAPECCHARS
+			MENUITEM "Заэкранивать символы HT&ML/XML\tAlt+Shift+X",					IDM_EDIT_XHTML_ESCAPE_CHAR
+			MENUITEM "Расэкранивать символы HTML/&XML\tAlt+Shift+H",				IDM_EDIT_XHTML_UNESCAPE_CHAR
 			MENUITEM SEPARATOR
 			MENUITEM "&Обрезать строку слева\tCtrl+Shift+Back",						IDM_EDIT_DELETELINELEFT
 			MENUITEM "О&брезать строку справа\tCtrl+Shift+Del",						IDM_EDIT_DELETELINERIGHT
@@ -400,8 +400,8 @@ BEGIN
 			MENUITEM "Goto P&revious Sibling Block\tCtrl+Alt+Comma (<,)",			IDM_EDIT_GOTO_PREV_SIBLING_BLOCK
 			MENUITEM "Goto N&ext Sibling Block\tCtrl+Alt+Period (>.)",				IDM_EDIT_GOTO_NEXT_SIBLING_BLOCK
 			MENUITEM SEPARATOR
-			MENUITEM "Перейти к &началу выделения\tCtrl+Shift+Comma (<,)",				CMD_JUMP2SELSTART
-			MENUITEM "Перейти к &концу выделения\tCtrl+Shift+Period (>.)",					CMD_JUMP2SELEND
+			MENUITEM "Перейти к &началу выделения\tCtrl+Shift+Comma (<,)",			CMD_JUMP2SELSTART
+			MENUITEM "Перейти к &концу выделения\tCtrl+Shift+Period (>.)",			CMD_JUMP2SELEND
 		END
 	END
 	POPUP "&Вид"
@@ -417,7 +417,7 @@ BEGIN
 			MENUITEM "Ширина строки &2",							IDM_VIEW_CARET_STYLE_WIDTH2
 			MENUITEM "Ширина строки &3",							IDM_VIEW_CARET_STYLE_WIDTH3
 			MENUITEM SEPARATOR
-			MENUITEM "&Без мерцания",									IDM_VIEW_CARET_STYLE_NOBLINK
+			MENUITEM "&Без мерцания",								IDM_VIEW_CARET_STYLE_NOBLINK
 			MENUITEM "Draw Block Caret in &Selection",				IDM_VIEW_CARET_STYLE_SELECTION
 		END
 		MENUITEM SEPARATOR
@@ -699,7 +699,7 @@ BEGIN
 	END
 	POPUP "&Инструменты"
 	BEGIN
-		MENUITEM "Сох&ранять перед открытием инструмента",	IDM_VIEW_SAVEBEFORERUNNINGTOOLS
+		MENUITEM "Сох&ранять перед открытием инструментов",	IDM_VIEW_SAVEBEFORERUNNINGTOOLS
 		MENUITEM "Use &matepath to Open Folder",			IDM_SET_OPEN_FOLDER_MATEPATH
 		MENUITEM SEPARATOR
 		MENUITEM "Запустить с &правами администратора",		IDM_FILE_RELAUNCH_ELEVATED
@@ -1277,7 +1277,7 @@ BEGIN
     AUTORADIOBUTTON "&Отсутствует",IDC_CHANGENOTIFY_NONE,7,7,35,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "&Показывать сообщение",IDC_CHANGENOTIFY_SHOW_MSG,7,19,71,10,WS_TABSTOP
     AUTORADIOBUTTON "&Автоматическая перезагрузка (в неизмененном виде).",IDC_CHANGENOTIFY_AUTO_RELOAD,7,31,114,10,WS_TABSTOP
-    AUTOCHECKBOX    "&Отслеживать постоянный изменяемый файл (например, файл лога).",IDC_CHANGENOTIFY_LOG_FILE,7,48,184,10,WS_TABSTOP
+    AUTOCHECKBOX    "&Отслеживать постоянно изменяемый файл (например, файл лога)",IDC_CHANGENOTIFY_LOG_FILE,7,48,184,10,WS_TABSTOP
     AUTOCHECKBOX    "&Keep at document end after reloading.",IDC_CHANGENOTIFY_KEEP_AT_END,7,60,184,10,WS_TABSTOP
     AUTOCHECKBOX    "&Reset if a new file is opened.",IDC_CHANGENOTIFY_RESET_WATCH,7,72,184,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,139,7,50,14
@@ -2136,7 +2136,7 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
-#endif    // English (United States) resources
+#endif    // Russian (Russia) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

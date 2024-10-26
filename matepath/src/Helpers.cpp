@@ -1055,6 +1055,9 @@ HMODULE LoadLocalizedResourceDLL(LANGID lang, LPCWSTR dllName) noexcept {
 	case LANG_PORTUGUESE:
 		folder = L"pt-BR";
 		break;
+	case LANG_RUSSIAN:
+		folder = L"ru";
+		break;
 	}
 
 	if (folder == nullptr) {

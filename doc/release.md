@@ -18,6 +18,7 @@
 | it | Italiano | x64 | 🟡legacy 64-bit Windows Vista, Server 2008 |
 | ja | 日本語 | Win32 | 🟠legacy Windows XP, Server 2003 |
 | ko | 한국어 |
+| ru | Русский |
 | zh-Hans | 中文 (简体) |
 | zh-Hant | 中文 (繁體) | Chocolatey | `choco install notepad4`
 | i18n | all above languages | winget | `winget install -e "Notepad4"` |

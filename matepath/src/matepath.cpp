@@ -2403,6 +2403,9 @@ void ValidateUILangauge() noexcept {
 	case LANG_PORTUGUESE:
 		languageResID = IDS_LANG_PORTUGUESE_BRAZIL;
 		break;
+	case LANG_RUSSIAN:
+		languageResID = IDS_LANG_RUSSIAN;
+		break;
 	case LANG_NEUTRAL:
 	default:
 		languageResID = IDS_LANG_USER_DEFAULT;
@@ -2443,6 +2446,9 @@ void SetUILanguage(int resID) noexcept {
 		break;
 	case IDS_LANG_PORTUGUESE_BRAZIL:
 		lang = MAKELANGID(LANG_PORTUGUESE, SUBLANG_PORTUGUESE_BRAZILIAN);
+		break;
+	case IDS_LANG_RUSSIAN:
+		lang = MAKELANGID(LANG_RUSSIAN, SUBLANG_DEFAULT);
 		break;
 	}
 

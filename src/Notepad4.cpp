@@ -2196,6 +2196,9 @@ void ValidateUILangauge() noexcept {
 	case LANG_PORTUGUESE:
 		languageMenu = IDM_LANG_PORTUGUESE_BRAZIL;
 		break;
+	case LANG_RUSSIAN:
+		languageMenu = IDM_LANG_RUSSIAN;
+		break;
 	case LANG_NEUTRAL:
 	default:
 		languageMenu = IDM_LANG_USER_DEFAULT;
@@ -2236,6 +2239,9 @@ void SetUILanguage(int menu) noexcept {
 		break;
 	case IDM_LANG_PORTUGUESE_BRAZIL:
 		lang = MAKELANGID(LANG_PORTUGUESE, SUBLANG_PORTUGUESE_BRAZILIAN);
+		break;
+	case IDM_LANG_RUSSIAN:
+		lang = MAKELANGID(LANG_RUSSIAN, SUBLANG_DEFAULT);
 		break;
 	}
 
@@ -4530,6 +4536,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_LANG_KOREAN:
 	case IDM_LANG_PORTUGUESE_BRAZIL:
 	case IDM_LANG_FRENCH_FRANCE:
+	case IDM_LANG_RUSSIAN:
 		SetUILanguage(LOWORD(wParam));
 		break;
 #endif
