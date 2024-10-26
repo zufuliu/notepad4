@@ -103,82 +103,82 @@ IDR_MAINWND MENU
 BEGIN
 	POPUP "+"
 	BEGIN
-		MENUITEM "&Open (Same Window)",			IDM_FILE_OPENSAME
-		MENUITEM "Open (N&ew Window)",			IDM_FILE_OPENNEW
-		MENUITEM "&Run...",						IDM_FILE_RUN
-		MENUITEM "&Launch",						IDM_FILE_LAUNCH
-		MENUITEM "&Quickview",					IDM_FILE_QUICKVIEW
-		MENUITEM "Open &with...",				IDM_FILE_OPENWITH
-		MENUITEM "&Copy File Name",				IDM_POP_COPY_FILENAME
-		MENUITEM "Copy Pa&th Name",				IDM_POP_COPY_PATHNAME
+		MENUITEM "&Открыть в этом окне",		IDM_FILE_OPENSAME
+		MENUITEM "Открыть в новом окне",		IDM_FILE_OPENNEW
+		MENUITEM "&Выполнить...",				IDM_FILE_RUN
+		MENUITEM "&Запустить",					IDM_FILE_LAUNCH
+		MENUITEM "&Быстрый просмотр",			IDM_FILE_QUICKVIEW
+		MENUITEM "Открыть &с помощью...",		IDM_FILE_OPENWITH
+		MENUITEM "&Копировать имя файла",		IDM_POP_COPY_FILENAME
+		MENUITEM "Копировать путь к &файлу",	IDM_POP_COPY_PATHNAME
 		MENUITEM SEPARATOR
-		MENUITEM "Show in E&xplorer",			IDM_FILE_EXPLORER
-		MENUITEM "Create Lin&k...",				IDM_FILE_CREATELINK
-		MENUITEM "&Save As...",					IDM_FILE_SAVEAS
-		MENUITEM "Copy/&Move...",				IDM_FILE_COPYMOVE
-		MENUITEM "&Delete...",					IDM_FILE_DELETE
-		MENUITEM "Re&name...",					IDM_FILE_RENAME
+		MENUITEM "Открыть в &Проводнике",		IDM_FILE_EXPLORER
+		MENUITEM "Создать &ярлык...",			IDM_FILE_CREATELINK
+		MENUITEM "&Сохранить как...",			IDM_FILE_SAVEAS
+		MENUITEM "Копировать/Пере&местить...",	IDM_FILE_COPYMOVE
+		MENUITEM "&Удалить...",					IDM_FILE_DELETE
+		MENUITEM "Пере&именовать...",			IDM_FILE_RENAME
 		MENUITEM SEPARATOR
-		MENUITEM "&Properties",					IDM_FILE_PROPERTIES
+		MENUITEM "&Свойства"					IDM_FILE_PROPERTIES
 	END
 	POPUP "+"
 	BEGIN
-		MENUITEM "&New File...",				IDM_FILE_NEW
-		MENUITEM "Ne&w Directory...",			IDM_FILE_NEWDIR
+		MENUITEM "&Создать файл...",			IDM_FILE_NEW
+		MENUITEM "Создать &директорию...",		IDM_FILE_NEWDIR
 		MENUITEM SEPARATOR
-		MENUITEM "File Fi&lter...",				IDM_VIEW_FILTER
-		MENUITEM "&Reset Filter",				IDM_VIEW_FILTERALL
-		POPUP "&Show"
+		MENUITEM "Отфильтровать...",			IDM_VIEW_FILTER
+		MENUITEM "&Сбросить фильтр",			IDM_VIEW_FILTERALL
+		POPUP "&Показывать"
 		BEGIN
-			MENUITEM "&Directories",			IDM_VIEW_FOLDERS
-			MENUITEM "&Files",					IDM_VIEW_FILES
-			MENUITEM "&System Objects",			IDM_VIEW_HIDDEN
+			MENUITEM "&Директории",				IDM_VIEW_FOLDERS
+			MENUITEM "&Файлы",					IDM_VIEW_FILES
+			MENUITEM "&Системные объекты",		IDM_VIEW_HIDDEN
 		END
-		POPUP "Sor&t"
+		POPUP "&Сортировать"
 		BEGIN
-			MENUITEM "by &Name",				IDM_SORT_NAME
-			MENUITEM "by &Size",				IDM_SORT_SIZE
-			MENUITEM "by &Type",				IDM_SORT_TYPE
-			MENUITEM "by &Date",				IDM_SORT_DATE
+			MENUITEM "По &имени",				IDM_SORT_NAME
+			MENUITEM "по &размеру",				IDM_SORT_SIZE
+			MENUITEM "по &расширению",			IDM_SORT_TYPE
+			MENUITEM "по &дате",				IDM_SORT_DATE
 			MENUITEM SEPARATOR
-			MENUITEM "&Reverse",				IDM_SORT_REVERSE
+			MENUITEM "&В обратном порядке",		IDM_SORT_REVERSE
 		END
 		MENUITEM SEPARATOR
-		MENUITEM "Open in &Explorer",			IDM_FILE_EXPLORER
+		MENUITEM "Открыть в &Проводнике",		IDM_FILE_EXPLORER
 		MENUITEM "Goto &Favorites",				IDM_VIEW_FAVORITES
-		MENUITEM "&Open Favorites",				IDM_VIEW_EDITFAVORITES
-		MENUITEM "&Directory...",				IDM_FILE_CHANGEDIR
-		MENUITEM "&Goto...",					IDM_FILE_GOTO
+		MENUITEM "&Открыть избранные",			IDM_VIEW_EDITFAVORITES
+		MENUITEM "&Директория...",				IDM_FILE_CHANGEDIR
+		MENUITEM "&Перейти...",					IDM_FILE_GOTO
 		MENUITEM SEPARATOR
-		MENUITEM "Show Dri&ves",				IDM_VIEW_DRIVEBOX
+		MENUITEM "Показывать &носители",		IDM_VIEW_DRIVEBOX
 		MENUITEM "&Keep on Top",				IDM_VIEW_ALWAYSONTOP
 		MENUITEM SEPARATOR
-		MENUITEM "Save Sett&ings",				IDM_VIEW_SAVESETTINGS
-		MENUITEM "Set&up Target...",			IDM_VIEW_FINDTARGET
-		MENUITEM "O&ptions...",					IDM_VIEW_OPTIONS
+		MENUITEM "Сохранить &настройки",		IDM_VIEW_SAVESETTINGS
+		MENUITEM "Цель &установки...",			IDM_VIEW_FINDTARGET
+		MENUITEM "П&араметры...",				IDM_VIEW_OPTIONS
 	END
 	POPUP "+"
 	BEGIN
 		MENUITEM "&Directory...",				IDM_FILE_CHANGEDIR
 		MENUITEM "Drive &Properties",			IDM_FILE_DRIVEPROP
 		MENUITEM SEPARATOR
-		MENUITEM "Show Dri&ves",				IDM_VIEW_DRIVEBOX
+		MENUITEM "Показывать &носители",		IDM_VIEW_DRIVEBOX
 	END
 	POPUP "+"
 	BEGIN
-		MENUITEM "Show &Toolbar",				IDM_VIEW_TOOLBAR
-		MENUITEM "&Customize Toolbar...",		IDM_VIEW_CUSTOMIZETB
-		MENUITEM "&Auto Scale Toolbar",			IDM_VIEW_AUTO_SCALE_TOOLBAR
+		MENUITEM "Показывать &панель инструментов",		IDM_VIEW_TOOLBAR
+		MENUITEM "&Customize Toolbar...",				IDM_VIEW_CUSTOMIZETB
+		MENUITEM "&Auto Scale Toolbar",					IDM_VIEW_AUTO_SCALE_TOOLBAR
 #if NP2_ENABLE_HIDPI_IMAGE_RESOURCE
-		MENUITEM "Use &Large Toolbar",			IDM_VIEW_USE_LARGE_TOOLBAR
+		MENUITEM "&Увеличить панель инструментов",		IDM_VIEW_USE_LARGE_TOOLBAR
 #endif
-		MENUITEM "Show &Statusbar",				IDM_VIEW_STATUSBAR
+		MENUITEM "Показывать &строку состояния",		IDM_VIEW_STATUSBAR
 	END
 	POPUP "+"
 	BEGIN
-		MENUITEM "&Open matepath",				IDM_TRAY_RESTORE
+		MENUITEM "&Открыть Matepath",			IDM_TRAY_RESTORE
 		MENUITEM SEPARATOR
-		MENUITEM "E&xit matepath",				IDM_TRAY_EXIT
+		MENUITEM "Выйти& из Matepath",				IDM_TRAY_EXIT
 	END
 END
 
@@ -276,15 +276,15 @@ END
 
 IDD_RUN DIALOGEX 0, 0, 234, 86
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Run"
+CAPTION "Выполнить"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     ICON            IDI_RUN,IDC_STATIC,7,7,20,20
-    LTEXT           "Enter the name of an executable program file, a folder or a document to open.",IDC_RUNDESC,35,7,188,17
+    LTEXT           "Чтобы открыть, введите имя исполняемого файла, папки или документа.",IDC_RUNDESC,35,7,188,17
     EDITTEXT        IDC_COMMANDLINE,7,35,203,14,ES_AUTOHSCROLL
     PUSHBUTTON      "",IDC_SEARCHEXE,215,35,14,14
     DEFPUSHBUTTON   "OK",IDOK,121,65,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,177,65,50,14
+    PUSHBUTTON      "Отмена",IDCANCEL,177,65,50,14
     SCROLLBAR       IDC_RESIZEGRIP3,7,65,10,10
 END
 
@@ -295,87 +295,87 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     CONTROL         "",IDC_OPENWITHDIR,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SHAREIMAGELISTS | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,7,7,151,69
     PUSHBUTTON      "",IDC_GETOPENWITHDIR,7,83,13,13
-    LTEXT           "Click here to specify the directory with links to your favorite applications.",IDC_OPENWITHDESCR,26,83,132,18
+    LTEXT           "Нажмите здесь, чтобы указать директорию с ярлыками на избранные вами приложения.",IDC_OPENWITHDESCR,26,83,132,18
     DEFPUSHBUTTON   "OK",IDOK,52,107,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,108,107,50,14
+    PUSHBUTTON      "Отмена",IDCANCEL,108,107,50,14
     SCROLLBAR       IDC_RESIZEGRIP3,7,112,10,10
 END
 
 IDD_GOTO DIALOGEX 0, 0, 224, 87
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Goto"
+CAPTION "Перейти"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     ICON            IDI_GOTO,IDC_STATIC,7,7,20,20
-    LTEXT           "Enter the name of a file or directory to open, or select a recently visited directory from the list.",IDC_GOTODESC,35,7,182,17
+    LTEXT           "Введите имя файла или директории, чтобы открыть или выбрать недавно посещаемую директорию из списка.",IDC_GOTODESC,35,7,182,17
     COMBOBOX        IDC_GOTO,7,35,210,126,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,111,66,50,14,WS_DISABLED
-    PUSHBUTTON      "Cancel",IDCANCEL,167,66,50,14
+    PUSHBUTTON      "Отмена",IDCANCEL,167,66,50,14
     SCROLLBAR       IDC_RESIZEGRIP,7,70,10,10
 END
 
 IDD_FILTER DIALOGEX 0, 0, 204, 79
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "File Filter"
+CAPTION "Фильтрация файлов"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "Specify a new file &filter. Separate multiple filters by ;",IDC_STATIC,7,7,190,8
+    LTEXT           "Укажите новый &фильтр файла. Разделите несколько фильтров этим символом ;",IDC_STATIC,7,7,190,8
     EDITTEXT        IDC_FILTER,7,22,171,14,ES_AUTOHSCROLL
     PUSHBUTTON      "",IDC_BROWSEFILTER,183,22,14,14
     AUTOCHECKBOX    "&Exclude files matching the filter.",IDC_NEGFILTER,7,40,170,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,91,58,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,147,58,50,14
+    PUSHBUTTON      "Отмена",IDCANCEL,147,58,50,14
     SCROLLBAR       IDC_RESIZEGRIP3,7,58,10,10
 END
 
 IDD_RENAME DIALOGEX 0, 0, 172, 74
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Rename"
+CAPTION "Переименовать"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "Current:",IDC_STATIC,7,9,28,8,SS_RIGHT
+    LTEXT           "Текущее имя:",IDC_STATIC,7,9,28,8,SS_RIGHT
     EDITTEXT        IDC_OLDNAME,39,7,126,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
-    LTEXT           "&New:",IDC_STATIC,7,27,28,8,SS_RIGHT
+    LTEXT           "&Новое имя:",IDC_STATIC,7,27,28,8,SS_RIGHT
     EDITTEXT        IDC_NEWNAME,39,26,126,14,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "OK",IDOK,59,53,50,14,WS_DISABLED
-    PUSHBUTTON      "Cancel",IDCANCEL,115,53,50,14
+    PUSHBUTTON      "Отмена",IDCANCEL,115,53,50,14
     SCROLLBAR       IDC_RESIZEGRIP2,7,53,10,10
 END
 
 IDD_NEWDIR DIALOGEX 0, 0, 172, 66
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "New Directory"
+CAPTION "Создать директорию"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "Enter the name for the new directory:",IDC_STATIC,7,7,158,8
+    LTEXT           "Введите имя новой директории",IDC_STATIC,7,7,158,8
     EDITTEXT        IDC_NEWDIR,7,22,158,14,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "OK",IDOK,59,45,50,14,WS_DISABLED
-    PUSHBUTTON      "Cancel",IDCANCEL,115,45,50,14
+    PUSHBUTTON      "Отмена",IDCANCEL,115,45,50,14
     SCROLLBAR       IDC_RESIZEGRIP,7,45,10,10
 END
 
 IDD_COPYMOVE DIALOGEX 0, 0, 230, 95
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Copy/Move"
+CAPTION "Копировать/Переместить"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "Source:",IDC_STATIC,7,7,26,8
+    LTEXT           "Источник:",IDC_STATIC,7,7,26,8
     EDITTEXT        IDC_SOURCE,7,18,216,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
-    LTEXT           "&Destination:",IDC_STATIC,7,37,40,8
+    LTEXT           "&Место назначения:",IDC_STATIC,7,37,40,8
     COMBOBOX        IDC_DESTINATION,7,48,199,105,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "",IDC_BROWSEDESTINATION,210,48,13,13
-    CONTROL         "<a>Clear Recent History</a>",IDC_EMPTY_MRU,"SysLink",WS_TABSTOP,154,37,70,10
-    LTEXT           "Action:",IDC_STATIC,7,72,24,8
-    AUTORADIOBUTTON "&Copy",IDC_FUNCCOPY,35,71,33,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "&Move",IDC_FUNCMOVE,68,71,33,10,WS_TABSTOP
+    CONTROL         "<a>Очистить историю</a>",IDC_EMPTY_MRU,"SysLink",WS_TABSTOP,154,37,70,10
+    LTEXT           "Действие:",IDC_STATIC,7,72,24,8
+    AUTORADIOBUTTON "&Копировать",IDC_FUNCCOPY,35,71,33,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "&Переместить",IDC_FUNCMOVE,68,71,33,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,117,74,50,14,WS_DISABLED
-    PUSHBUTTON      "Cancel",IDCANCEL,173,74,50,14
+    PUSHBUTTON      "Отмена",IDCANCEL,173,74,50,14
     SCROLLBAR       IDC_RESIZEGRIP5,7,78,10,10
 END
 
 IDPP_GENERAL DIALOGEX 0, 0, 232, 185
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "General"
+CAPTION "Общие"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     ICON            IDI_OPTIONS,IDC_STATIC,10,10,20,20
@@ -397,11 +397,11 @@ END
 
 IDPP_ADVANCED DIALOGEX 0, 0, 232, 185
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Advanced"
+CAPTION "Расширенные"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     ICON            IDI_OPTIONS2,IDC_STATIC,10,10,20,20
-    AUTOCHECKBOX    "Use &RTL Layout.",IDC_RTL_LAYOUT,10,34,190,10,WS_TABSTOP
+    AUTOCHECKBOX    "Использовать &RTL-разметку",IDC_RTL_LAYOUT,10,34,190,10,WS_TABSTOP
     LTEXT           "Specify advanced program settings for matepath.",IDC_STATIC,40,15,200,8
     AUTOCHECKBOX    "&Use startup directory:",IDC_STARTUPDIR,10,46,104,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "Most &recently used.",IDC_GOTOMRU,114,46,90,10,WS_GROUP | WS_TABSTOP
@@ -419,7 +419,7 @@ END
 
 IDPP_ITEMS DIALOGEX 0, 0, 232, 185
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Appearance"
+CAPTION "Оформление"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     ICON            IDI_ITEMS,IDC_STATIC,10,10,21,20
@@ -427,9 +427,9 @@ BEGIN
     GROUPBOX        "Appearance of items in directory list",IDC_STATIC,10,41,205,109
     LTEXT           "Use this text color when NO FILTER is SET:",IDC_STATIC,20,54,170,8
     AUTORADIOBUTTON "Default &windows color.",IDC_COLOR_DEF1,20,68,96,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "Custom &color:",IDC_COLOR_CUST1,20,82,60,10,WS_TABSTOP
+    AUTORADIOBUTTON "Свой цвет:",IDC_COLOR_CUST1,20,82,60,10,WS_TABSTOP
     EDITTEXT        IDC_COLOR_SAMP1,85,80,30,14,ES_AUTOHSCROLL | WS_DISABLED
-    PUSHBUTTON      "Pick Color...",IDC_COLOR_PICK1,120,80,60,14
+    PUSHBUTTON      "Выбрать цвет...",IDC_COLOR_PICK1,120,80,60,14
     LTEXT           "Use this text color when a FILTER is ACTIVE:",IDC_STATIC,20,105,180,8
     AUTORADIOBUTTON "D&efault windows color.",IDC_COLOR_DEF2,20,120,95,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "C&ustom color:",IDC_COLOR_CUST2,20,133,60,10,WS_TABSTOP
@@ -439,7 +439,7 @@ BEGIN
     LTEXT           "Language:",IDC_STATIC,10,157,38,10
     COMBOBOX        IDC_LANGUAGE_LIST,50,154,82,100,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
 #endif
-    AUTOCHECKBOX    "Use &XP Style Open/Save Dialog.",IDC_USE_XP_FILE_DIALOG,10,171,170,10,WS_TABSTOP
+    AUTOCHECKBOX    "Применять окно откр./сохр. файла в &XP-стиле",IDC_USE_XP_FILE_DIALOG,10,171,170,10,WS_TABSTOP
 END
 
 IDPP_PROG DIALOGEX 0, 0, 232, 185
@@ -452,21 +452,21 @@ BEGIN
     LTEXT           "&Default ""Quick View"" program (Ctrl+Q):",IDC_STATIC,10,41,180,8
     EDITTEXT        IDC_QUICKVIEW,10,52,191,14,ES_AUTOHSCROLL
     PUSHBUTTON      "",IDC_BROWSE_Q,204,52,14,14,BS_BITMAP
-    LTEXT           "&Favorites Folder (F11):",IDC_STATIC,10,76,120,8
+    LTEXT           "&Папка ""Избранные"" (F11):",IDC_STATIC,10,76,120,8
     EDITTEXT        IDC_FAVORITES,10,87,191,14,ES_AUTOHSCROLL
     PUSHBUTTON      "",IDC_BROWSE_F,204,87,14,14,BS_BITMAP
-    GROUPBOX        "System Integration (requires Administrator privileges)",IDC_GROUP_SYSTEM_INTEGRATION,7,111,218,72
+    GROUPBOX        "Интеграция системы (требуются права администратора)",IDC_GROUP_SYSTEM_INTEGRATION,7,111,218,72
     AUTOCHECKBOX    "Add matepath to Windows Explorer's context menu.",IDC_ENABLE_CONTEXT_MENU,14,124,204,10,WS_TABSTOP
     LTEXT           "Context menu text:",IDC_STATIC,28,139,70,8
     EDITTEXT        IDC_CONTEXT_MENU_TEXT,100,136,118,14,ES_AUTOHSCROLL | WS_TABSTOP
     AUTOCHECKBOX    "Enable Taskbar Jump List.",IDC_ENABLE_JUMP_LIST,14,152,204,10,WS_TABSTOP
-    LTEXT           "Application name:",IDC_STATIC,28,167,70,8
+    LTEXT           "Имя приложения:",IDC_STATIC,28,167,70,8
     EDITTEXT        IDC_APPLICATION_NAME,100,164,118,14,ES_AUTOHSCROLL | WS_TABSTOP
 END
 
 IDD_FINDTARGET DIALOGEX 0, 0, 272, 210
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Target Application"
+CAPTION "Целевое приложение"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     AUTORADIOBUTTON "Don't use any specific target application, simply launch the selected file.",IDC_LAUNCH,7,7,260,10,WS_GROUP | WS_TABSTOP
@@ -485,22 +485,22 @@ BEGIN
     EDITTEXT        IDC_DDEAPP,65,142,200,14,ES_AUTOHSCROLL
     EDITTEXT        IDC_DDETOPIC,65,162,200,14,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "OK",IDOK,159,189,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,215,189,50,14
+    PUSHBUTTON      "Отмена",IDCANCEL,215,189,50,14
     SCROLLBAR       IDC_RESIZEGRIP4,7,189,10,10
 END
 
 IDD_FINDWIN DIALOGEX 0, 0, 210, 85
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Find Window"
+CAPTION "Найти окно"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     ICON            IDI_CROSS1,IDC_CROSSCURSOR,7,7,21,20,SS_CENTERIMAGE
     LTEXT           "Drag the crosshair over the window you would like to select as the new target, or press Esc to cancel.",IDC_FINDWINDESC,35,7,168,22
     EDITTEXT        IDC_WINTITLE,7,35,196,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
-    LTEXT           "Window Class",IDC_WINCLASS,7,60,45,8,NOT WS_VISIBLE
-    LTEXT           "Window Module",IDC_WINMODULE,7,70,51,8,NOT WS_VISIBLE
+    LTEXT           "Класс окна",IDC_WINCLASS,7,60,45,8,NOT WS_VISIBLE
+    LTEXT           "Модуль окна",IDC_WINMODULE,7,70,51,8,NOT WS_VISIBLE
     DEFPUSHBUTTON   "OK",IDOK,97,64,50,14,WS_DISABLED
-    PUSHBUTTON      "Cancel",IDCANCEL,153,64,50,14
+    PUSHBUTTON      "Отмена",IDCANCEL,153,64,50,14
     SCROLLBAR       IDC_RESIZEGRIP5,7,64,10,10
 END
 
@@ -524,19 +524,19 @@ END
 
 STRINGTABLE
 BEGIN
-	IDT_HISTORY_BACK		"Back"
-	IDT_HISTORY_FORWARD		"Forward"
-	IDT_UP_DIR				"Upper Directory"
-	IDT_ROOT_DIR			"Root Directory"
-	IDT_VIEW_FAVORITES		"Favorites"
-	IDT_FILE_PREV			"Previous File"
-	IDT_FILE_NEXT			"Next File"
-	IDT_FILE_RUN			"Run"
-	IDT_FILE_QUICKVIEW		"Quickview"
-	IDT_FILE_SAVEAS			"Save As"
-	IDT_FILE_COPYMOVE		"Copy/Move"
-	IDT_FILE_DELETE_RECYCLE	"Delete (RecycleBin)"
-	IDT_FILE_DELETE_PERM	"Delete (Permanently)"
+	IDT_HISTORY_BACK		"Назад"
+	IDT_HISTORY_FORWARD		"Вперед"
+	IDT_UP_DIR				"В родительскую директорию"
+	IDT_ROOT_DIR			"Корневая директория"
+	IDT_VIEW_FAVORITES		"Избранные"
+	IDT_FILE_PREV			"Предыдущий файл"
+	IDT_FILE_NEXT			"Следующий файл"
+	IDT_FILE_RUN			"Выполнить"
+	IDT_FILE_QUICKVIEW		"Быстрый просмотр"
+	IDT_FILE_SAVEAS			"Сохранить как"
+	IDT_FILE_COPYMOVE		"Копировать/Переместить"
+	IDT_FILE_DELETE_RECYCLE	"Удалить в корзину"
+	IDT_FILE_DELETE_PERM	"Удалить навсегда"
 	IDT_VIEW_FILTER			"Filter"
 END
 
@@ -551,10 +551,10 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_ERR_CD              "No access to specified directory.\nCheck the disk or the network connection."
-    IDS_ERR_FILE            "No access to ""%s"".\nThe file may be used by another application.\nCheck the disk or the network connection."
-    IDS_ERR_NEW             "File could not be created.\nCheck the disk or the network connection."
-    IDS_ERR_NEWDIR          "Directory could not be created.\nCheck the disk or the network connection."
+    IDS_ERR_CD              "Указанная директория недоступна.\nПроверьте диск или подключение к сети."
+    IDS_ERR_FILE            "Нет доступа к ""%s"".\nЭтот файл может использоваться другим приложением.\nПроверьте диск или подключение к сети."
+    IDS_ERR_NEW             "Файл не был создан.\nПроверьте диск или подключение к сети."
+    IDS_ERR_NEWDIR          "Директория не была создана.\nПроверьте диск или подключение к сети."
     IDS_ERR_SAVEAS1         "Error saving ""%s"".\nProbably an already existing file is write-protected."
     IDS_ERR_SAVEAS2         "Error removing read-only attribute of saved file."
     IDS_ERR_CMDLINE         "Error accessing file or directory specified in command line."

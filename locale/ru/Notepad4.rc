@@ -154,7 +154,7 @@ BEGIN
 			MENUITEM SEPARATOR
 			MENUITEM "&По умолчанию...",									IDM_ENCODING_SETDEFAULT
 		END
-		POPUP "Конец &строки"
+		POPUP "Окончания &строки"
 		BEGIN
 			MENUITEM "&Windows (CR+LF)",									IDM_LINEENDINGS_CRLF
 			MENUITEM "&Unix/macOS (LF)",									IDM_LINEENDINGS_LF
@@ -271,10 +271,10 @@ BEGIN
 			MENUITEM "Начинать с прописных &букв\tCtrl+Alt+I",				IDM_EDIT_TITLECASE
 			MENUITEM "&Как в предложениях\tCtrl+Alt+O",						IDM_EDIT_SENTENCECASE
 			MENUITEM SEPARATOR
-			MENUITEM "&Tabify Selection\tCtrl+Shift+T",						IDM_EDIT_CONVERTSPACES
-			MENUITEM "U&ntabify Selection\tCtrl+Shift+S",					IDM_EDIT_CONVERTTABS
-			MENUITEM "Tabify &Indent\tCtrl+Alt+T",							IDM_EDIT_CONVERTSPACES2
-			MENUITEM "Untabi&fy Indent\tCtrl+Alt+S",						IDM_EDIT_CONVERTTABS2
+			MENUITEM "&Табулировать выделение\tCtrl+Shift+T",				IDM_EDIT_CONVERTSPACES
+			MENUITEM "Раст&абулировать выделение\tCtrl+Shift+S",			IDM_EDIT_CONVERTTABS
+			MENUITEM "Табулировать &отступ\tCtrl+Alt+T",					IDM_EDIT_CONVERTSPACES2
+			MENUITEM "Растабулировать &отступ\tCtrl+Alt+S",					IDM_EDIT_CONVERTTABS2
 			MENUITEM SEPARATOR
 			MENUITEM "В &шестнадцатеричное число\tCtrl+Alt+H",				IDM_EDIT_NUM2HEX
 			MENUITEM "В д&есятеричное число\tCtrl+Alt+D",					IDM_EDIT_NUM2DEC
@@ -335,7 +335,7 @@ BEGIN
 			MENUITEM "Дата и время (под&робная форма)\tCtrl+Shift+F5",				IDM_EDIT_INSERT_LONGDATE
 			MENUITEM SEPARATOR
 			MENUITEM "Обо&значение кодировки\tCtrl+F8",								IDM_EDIT_INSERT_ENCODING
-			MENUITEM "Script She&bang Line",										IDM_EDIT_INSERT_SHEBANG
+			MENUITEM "Строка She&bang",												IDM_EDIT_INSERT_SHEBANG
 		END
 		POPUP "&Экспертные возможности"
 		BEGIN
@@ -343,10 +343,10 @@ BEGIN
 			MENUITEM "Шестнадцатеричное число в &символ\tCtrl+Alt+C",				IDM_EDIT_HEX2CHAR
 			MENUITEM "&Показать шестнадцатеричный код",								IDM_EDIT_SHOW_HEX
 			MENUITEM SEPARATOR
-			MENUITEM "Esca&pe C Chars\tCtrl+Alt+E",									IDM_EDIT_ESCAPECCHARS
-			MENUITEM "&Unescape C Chars\tCtrl+Alt+R",								IDM_EDIT_UNESCAPECCHARS
-			MENUITEM "Escape HT&ML/XML Chars\tAlt+Shift+X",							IDM_EDIT_XHTML_ESCAPE_CHAR
-			MENUITEM "Unescape HTML/&XML Chars\tAlt+Shift+H",						IDM_EDIT_XHTML_UNESCAPE_CHAR
+			MENUITEM "Заэкранивать символы C\tCtrl+Alt+E",							IDM_EDIT_ESCAPECCHARS
+			MENUITEM "Расэкранивать си&мволы C\tCtrl+Alt+R",						IDM_EDIT_UNESCAPECCHARS
+			MENUITEM "Заэкранивать символы HT&ML/XML\tAlt+Shift+X",					IDM_EDIT_XHTML_ESCAPE_CHAR
+			MENUITEM "Расэкранивать символы HTML/&XML\tAlt+Shift+H",				IDM_EDIT_XHTML_UNESCAPE_CHAR
 			MENUITEM SEPARATOR
 			MENUITEM "&Обрезать строку слева\tCtrl+Shift+Back",						IDM_EDIT_DELETELINELEFT
 			MENUITEM "О&брезать строку справа\tCtrl+Shift+Del",						IDM_EDIT_DELETELINERIGHT
@@ -365,14 +365,14 @@ BEGIN
 			MENUITEM "&Заменить...\tCtrl+H",										IDM_EDIT_REPLACE
 			MENUITEM "Заменить &далее\tF4",											IDM_EDIT_REPLACENEXT
 			MENUITEM SEPARATOR
-			MENUITEM "Find Matching &Brace\tCtrl+B",								IDM_EDIT_FINDMATCHINGBRACE
-			MENUITEM "Select to Matching B&race\tCtrl+Shift+B",						IDM_EDIT_SELTOMATCHINGBRACE
+			MENUITEM "Найти соответствующую &скобку\tCtrl+B",						IDM_EDIT_FINDMATCHINGBRACE
+			MENUITEM "Перейти к соответствующей ско&бке\tCtrl+Shift+B",				IDM_EDIT_SELTOMATCHINGBRACE
 			MENUITEM "Выделить &слово\tCtrl+Alt+Space",								IDM_EDIT_SELECTWORD
 			MENUITEM "Выделить ст&роки (расширить выделение)\tCtrl+Shift+Space",	IDM_EDIT_SELECTLINE
 			MENUITEM "Выделить строку в те&кущем блоке\tAlt+Shift+]",				IDM_EDIT_SELECTLINE_BLOCK
 			MENUITEM SEPARATOR
-			MENUITEM "Select to Document Star&t",									IDM_EDIT_SELTODOCSTART
-			MENUITEM "Select to Document En&d",										IDM_EDIT_SELTODOCEND
+			MENUITEM "Перейти к началу &документа",									IDM_EDIT_SELTODOCSTART
+			MENUITEM "Перейти к концу доку&мента",									IDM_EDIT_SELTODOCEND
 			MENUITEM "Select to Ne&xt\tCtrl+Alt+F2",								IDM_EDIT_SELTONEXT
 			MENUITEM "Select to Previou&s\tCtrl+Alt+Shift+F2",						IDM_EDIT_SELTOPREV
 		END
@@ -400,8 +400,8 @@ BEGIN
 			MENUITEM "Goto P&revious Sibling Block\tCtrl+Alt+Comma (<,)",			IDM_EDIT_GOTO_PREV_SIBLING_BLOCK
 			MENUITEM "Goto N&ext Sibling Block\tCtrl+Alt+Period (>.)",				IDM_EDIT_GOTO_NEXT_SIBLING_BLOCK
 			MENUITEM SEPARATOR
-			MENUITEM "Goto &Selection Start\tCtrl+Shift+Comma (<,)",				CMD_JUMP2SELSTART
-			MENUITEM "Goto Selec&tion End\tCtrl+Shift+Period (>.)",					CMD_JUMP2SELEND
+			MENUITEM "Перейти к &началу выделения\tCtrl+Shift+Comma (<,)",			CMD_JUMP2SELSTART
+			MENUITEM "Перейти к &концу выделения\tCtrl+Shift+Period (>.)",			CMD_JUMP2SELEND
 		END
 	END
 	POPUP "&Вид"
@@ -410,42 +410,42 @@ BEGIN
 		MENUITEM "Шрифт &текста по умолчанию...",					IDM_VIEW_DEFAULT_TEXT_FONT
 		POPUP "&Стиль каретки"
 		BEGIN
-			MENUITEM "Block (&OVR Mode)",							IDM_VIEW_CARET_STYLE_BLOCK_OVR
+			MENUITEM "Блочный (режим &замены)",						IDM_VIEW_CARET_STYLE_BLOCK_OVR
 			MENUITEM SEPARATOR
-			MENUITEM "Block (&INS Mode)",							IDM_VIEW_CARET_STYLE_BLOCK
-			MENUITEM "Line Width &1",								IDM_VIEW_CARET_STYLE_WIDTH1
-			MENUITEM "Line Width &2",								IDM_VIEW_CARET_STYLE_WIDTH2
-			MENUITEM "Line Width &3",								IDM_VIEW_CARET_STYLE_WIDTH3
+			MENUITEM "Блочный (режим &вставки)",					IDM_VIEW_CARET_STYLE_BLOCK
+			MENUITEM "Ширина строки &1",							IDM_VIEW_CARET_STYLE_WIDTH1
+			MENUITEM "Ширина строки &2",							IDM_VIEW_CARET_STYLE_WIDTH2
+			MENUITEM "Ширина строки &3",							IDM_VIEW_CARET_STYLE_WIDTH3
 			MENUITEM SEPARATOR
-			MENUITEM "&No Blink",									IDM_VIEW_CARET_STYLE_NOBLINK
+			MENUITEM "&Без мерцания",								IDM_VIEW_CARET_STYLE_NOBLINK
 			MENUITEM "Draw Block Caret in &Selection",				IDM_VIEW_CARET_STYLE_SELECTION
 		END
 		MENUITEM SEPARATOR
 		MENUITEM "&Перенос строки\tCtrl+Shift+W",					IDM_VIEW_WORDWRAP
 		MENUITEM "&Long Line Marker\tCtrl+Shift+L",					IDM_VIEW_LONGLINEMARKER
-		MENUITEM "Indentation &Guides\tCtrl+Shift+G",				IDM_VIEW_SHOWINDENTGUIDES
+		MENUITEM "&Направляющие отступов\tCtrl+Shift+G",			IDM_VIEW_SHOWINDENTGUIDES
 		MENUITEM SEPARATOR
 		MENUITEM "Показывать п&робелы\tCtrl+Shift+8",				IDM_VIEW_SHOWWHITESPACE
-		MENUITEM "Показывать окончания &строк\tCtrl+Shift+9",			IDM_VIEW_SHOWEOLS
+		MENUITEM "Показывать окончания &строк\tCtrl+Shift+9",		IDM_VIEW_SHOWEOLS
 		MENUITEM "Показывать символы п&ереноса\tCtrl+Shift+0",		IDM_VIEW_WORDWRAPSYMBOLS
-		MENUITEM "Un&icode Control Character",						IDM_VIEW_UNICODE_CONTROL_CHAR
+		MENUITEM "Контрольный символ Un&icode",						IDM_VIEW_UNICODE_CONTROL_CHAR
 		MENUITEM SEPARATOR
 		MENUITEM "&Visual Brace Matching\tCtrl+Shift+V",			IDM_VIEW_MATCHBRACES
 		MENUITEM "Highlight Current &Block",						IDM_VIEW_HIGHLIGHTCURRENT_BLOCK
 		POPUP "Подсветка те&кущей строки"
 		BEGIN
 			MENUITEM "&Без подсветки",								IDM_VIEW_HIGHLIGHTCURRENTLINE_NONE
-			MENUITEM "Цвет &форма\tCtrl+Shift+I",					IDM_VIEW_HIGHLIGHTCURRENTLINE_BACK
+			MENUITEM "Цвет &формы\tCtrl+Shift+I",					IDM_VIEW_HIGHLIGHTCURRENTLINE_BACK
 			MENUITEM "&Форма контура\tCtrl+Shift+F",				IDM_VIEW_HIGHLIGHTCURRENTLINE_FRAME
 			MENUITEM SEPARATOR
 			MENUITEM "Highlight &Subline",							IDM_VIEW_HIGHLIGHTCURRENTLINE_SUBLINE
 		END
-		POPUP "Mar&k Occurrences"
+		POPUP "Отметка вхождения"
 		BEGIN
 			MENUITEM "&Выключить",									IDM_VIEW_MARKOCCURRENCES_OFF
-			MENUITEM "Match &Case",									IDM_VIEW_MARKOCCURRENCES_CASE
-			MENUITEM "Match &Whole Word Only",						IDM_VIEW_MARKOCCURRENCES_WORD
-			MENUITEM "Bookmark &Matched Line",						IDM_VIEW_MARKOCCURRENCES_BOOKMARK
+			MENUITEM "По &регистру",								IDM_VIEW_MARKOCCURRENCES_CASE
+			MENUITEM "По всему &слову",								IDM_VIEW_MARKOCCURRENCES_WORD
+			MENUITEM "По строкам, помеченные закладками",			IDM_VIEW_MARKOCCURRENCES_BOOKMARK
 		END
 		POPUP "Show CallTi&p"
 		BEGIN
@@ -457,27 +457,27 @@ BEGIN
 		END
 		MENUITEM SEPARATOR
 		MENUITEM "&Количество строк\tCtrl+Shift+N",					IDM_VIEW_LINENUMBERS
-		MENUITEM "Bookmark &Margin\tCtrl+Shift+M",					IDM_VIEW_MARGIN
+		MENUITEM "Отступ для закла&док\tCtrl+Shift+M",				IDM_VIEW_MARGIN
 		MENUITEM "Change &History Marker",							IDM_VIEW_CHANGE_HISTORY_MARKER
 		MENUITEM SEPARATOR
 		MENUITEM "Show Code &Folding\tCtrl+Shift+Alt+F",			IDM_VIEW_SHOW_FOLDING
 		POPUP "&Toggle Folds"
 		BEGIN
-			MENUITEM "&Default Levels\tShift+Alt+D",				IDM_VIEW_FOLD_DEFAULT
-			MENUITEM "&All Levels\tShift+Alt+A",					IDM_VIEW_FOLD_ALL
-			MENUITEM "&Current Block\tAlt+C",						IDM_VIEW_FOLD_CURRENT_BLOCK
-			MENUITEM "Current &Level",								IDM_VIEW_FOLD_CURRENT_LEVEL
+			MENUITEM "&Уровни по умолчанию\tShift+Alt+D",			IDM_VIEW_FOLD_DEFAULT
+			MENUITEM "&Все уровни\tShift+Alt+A",					IDM_VIEW_FOLD_ALL
+			MENUITEM "&Текущий блок\tAlt+C",						IDM_VIEW_FOLD_CURRENT_BLOCK
+			MENUITEM "Текущий у&ровень",							IDM_VIEW_FOLD_CURRENT_LEVEL
 			MENUITEM SEPARATOR
-			MENUITEM "Level &1\tAlt+1",								IDM_VIEW_FOLD_LEVEL1
-			MENUITEM "Level &2\tAlt+2",								IDM_VIEW_FOLD_LEVEL2
-			MENUITEM "Level &3\tAlt+3",								IDM_VIEW_FOLD_LEVEL3
-			MENUITEM "Level &4\tAlt+4",								IDM_VIEW_FOLD_LEVEL4
-			MENUITEM "Level &5\tAlt+5",								IDM_VIEW_FOLD_LEVEL5
-			MENUITEM "Level &6\tAlt+6",								IDM_VIEW_FOLD_LEVEL6
-			MENUITEM "Level &7\tAlt+7",								IDM_VIEW_FOLD_LEVEL7
-			MENUITEM "Level &8\tAlt+8",								IDM_VIEW_FOLD_LEVEL8
-			MENUITEM "Level &9\tAlt+9",								IDM_VIEW_FOLD_LEVEL9
-			MENUITEM "Level 1&0",									IDM_VIEW_FOLD_LEVEL10
+			MENUITEM "Уровень &1\tAlt+1",							IDM_VIEW_FOLD_LEVEL1
+			MENUITEM "Уровень &2\tAlt+2",							IDM_VIEW_FOLD_LEVEL2
+			MENUITEM "Уровень &3\tAlt+3",							IDM_VIEW_FOLD_LEVEL3
+			MENUITEM "Уровень &4\tAlt+4",							IDM_VIEW_FOLD_LEVEL4
+			MENUITEM "Уровень &5\tAlt+5",							IDM_VIEW_FOLD_LEVEL5
+			MENUITEM "Уровень &6\tAlt+6",							IDM_VIEW_FOLD_LEVEL6
+			MENUITEM "Уровень &7\tAlt+7",							IDM_VIEW_FOLD_LEVEL7
+			MENUITEM "Уровень &8\tAlt+8",							IDM_VIEW_FOLD_LEVEL8
+			MENUITEM "Уровень &9\tAlt+9",							IDM_VIEW_FOLD_LEVEL9
+			MENUITEM "Уровень 1&0",									IDM_VIEW_FOLD_LEVEL10
 		END
 		MENUITEM SEPARATOR
 		POPUP "&Масштаб"
@@ -491,9 +491,9 @@ BEGIN
 	END
 	POPUP "Схе&ма"
 	BEGIN
-		MENUITEM "&Syntax Scheme...\tF12",							IDM_VIEW_SCHEME
-		MENUITEM "&Customize Schemes...\tCtrl+F12",					IDM_VIEW_SCHEME_CONFIG
-		MENUITEM "&Favorite Schemes...",							IDM_VIEW_SCHEME_FAVORITE
+		MENUITEM "&Схема синтаксиса...\tF12",						IDM_VIEW_SCHEME
+		MENUITEM "&Настроить схемы...\tCtrl+F12",					IDM_VIEW_SCHEME_CONFIG
+		MENUITEM "&Избранные схемы...",								IDM_VIEW_SCHEME_FAVORITE
 		MENUITEM SEPARATOR
 		MENUITEM "&Применять стиль кода по умолчанию\tShift+F12",	IDM_VIEW_USEDEFAULT_CODESTYLE
 		POPUP "Стиль &темы"
@@ -565,16 +565,16 @@ BEGIN
 	END
 	POPUP "&Настройки"
 	BEGIN
-		MENUITEM "Insert Tabs as &Spaces",							IDM_VIEW_TABSASSPACES
-		MENUITEM "&Tab Settings...\tCtrl+T",						IDM_VIEW_TABSETTINGS
+		MENUITEM "Вставлять табуляцию как &пробелы",				IDM_VIEW_TABSASSPACES
+		MENUITEM "&Настройки табуляции...\tCtrl+T",					IDM_VIEW_TABSETTINGS
 		MENUITEM "Word &Wrap Settings...",							IDM_VIEW_WORDWRAPSETTINGS
 		MENUITEM "&Long Line Settings...",							IDM_VIEW_LONGLINESETTINGS
 		MENUITEM "Настройки а&втозаполнения...",					IDM_VIEW_AUTOCOMPLETION_SETTINGS
 		MENUITEM "Auto Completion I&gnore Case",					IDM_VIEW_AUTOCOMPLETION_IGNORECASE
 		MENUITEM "Включить метод ввода LaTe&X",						IDM_SET_LATEX_INPUT_METHOD
-		POPUP "Select and &Edit Options"
+		POPUP "Параметры вы&деления и редактирования"
 		BEGIN
-			MENUITEM "Enable &Multiple Selection",					IDM_SET_MULTIPLE_SELECTION
+			MENUITEM "Включить &множественное выделение",			IDM_SET_MULTIPLE_SELECTION
 			MENUITEM "Copy &Selection as Find Text",				IDM_SET_SELECTIONASFINDTEXT
 			MENUITEM "Copy &Paste Buffer as Find Text",				IDM_SET_PASTEBUFFERASFINDTEXT
 			POPUP "Режим вы&деления строки"
@@ -593,7 +593,7 @@ BEGIN
 			MENUITEM "Настроить панель &инструментов...",				IDM_VIEW_CUSTOMIZE_TOOLBAR
 			MENUITEM "&Auto Scale Toolbar",								IDM_VIEW_AUTO_SCALE_TOOLBAR
 #if NP2_ENABLE_HIDPI_IMAGE_RESOURCE
-			MENUITEM "Use Lar&ge Toolbar",								IDM_VIEW_USE_LARGE_TOOLBAR
+			MENUITEM "Использовать увеличенную панель инструментов",	IDM_VIEW_USE_LARGE_TOOLBAR
 #endif
 			MENUITEM "Показывать &строку состояния\tShift+F11",			IDM_VIEW_STATUSBAR
 			MENUITEM SEPARATOR
@@ -603,13 +603,13 @@ BEGIN
 				MENUITEM "При &запуске",								IDM_VIEW_FULLSCREEN_ON_START
 				MENUITEM "Скрыть &заголовок",							IDM_VIEW_FULLSCREEN_HIDE_TITLE
 			END
-			POPUP "Scroll &Past Last Line"
+			POPUP "Прокрутить последнюю строку"
 			BEGIN
-				MENUITEM "&No",						IDM_VIEW_SCROLLPASTLASTLINE_NO
-				MENUITEM "&One Page",				IDM_VIEW_SCROLLPASTLASTLINE_ONE
-				MENUITEM "&Half Page",				IDM_VIEW_SCROLLPASTLASTLINE_HALF
-				MENUITEM "1/&3 Page",				IDM_VIEW_SCROLLPASTLASTLINE_THIRD
-				MENUITEM "1/&4 Page",				IDM_VIEW_SCROLLPASTLASTLINE_QUARTER
+				MENUITEM "&Нет",						IDM_VIEW_SCROLLPASTLASTLINE_NO
+				MENUITEM "&Одну страницу",				IDM_VIEW_SCROLLPASTLASTLINE_ONE
+				MENUITEM "&Половину страницы",			IDM_VIEW_SCROLLPASTLASTLINE_HALF
+				MENUITEM "1/&3 страницы",				IDM_VIEW_SCROLLPASTLASTLINE_THIRD
+				MENUITEM "Четверть страницы",			IDM_VIEW_SCROLLPASTLASTLINE_QUARTER
 			END
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
 			MENUITEM SEPARATOR
@@ -636,7 +636,7 @@ BEGIN
 			MENUITEM "Сворачивать в &лоток",					IDM_VIEW_MINTOTRAY
 			MENUITEM SEPARATOR
 			MENUITEM "&Переиспользовать окно",					IDM_VIEW_REUSEWINDOW
-			MENUITEM "&Sticky Window Position",					IDM_VIEW_STICKY_WINDOW_POSITION
+			MENUITEM "&Закреплять положение окна",				IDM_VIEW_STICKY_WINDOW_POSITION
 			MENUITEM "Не запоминать положение окна",			IDM_VIEW_CLEARWINPOS
 		END
 		POPUP "Отобра&жать в заголовке окна"
@@ -647,14 +647,14 @@ BEGIN
 			MENUITEM "&Text Excerpt",							IDM_VIEW_SHOWEXCERPT
 		END
 		MENUITEM SEPARATOR
-		MENUITEM "Single &File Instance",						IDM_VIEW_SINGLEFILEINSTANCE
+		MENUITEM "Одиночный экземпляр файла",					IDM_VIEW_SINGLEFILEINSTANCE
 		MENUITEM "&Уведомление об изменении файла...\tAlt+F5",	IDM_VIEW_CHANGENOTIFY
 		MENUITEM "Настройки &автосохранения...",				IDM_SET_FILE_AUTOSAVE
-		POPUP "Extra Esc &Key Function"
+		POPUP "Дополнительная функция клавиши Esc"
 		BEGIN
 			MENUITEM "&Отсутствует",							IDM_VIEW_NOESCFUNC
-			MENUITEM "&Minimize Notepad4",						IDM_VIEW_ESCMINIMIZE
-			MENUITEM "E&xit Notepad4",							IDM_VIEW_ESCEXIT
+			MENUITEM "&Свернуть Notepad4",						IDM_VIEW_ESCMINIMIZE
+			MENUITEM "Вы&ход из Notepad4",							IDM_VIEW_ESCEXIT
 		END
 		POPUP "Другие на&стройки"
 		BEGIN
@@ -680,8 +680,8 @@ BEGIN
 			END
 			POPUP "&RTL-разметка (GDI)"
 			BEGIN
-				MENUITEM "&Edit Window",			IDM_SET_RTL_LAYOUT_EDIT
-				MENUITEM "&Other Window",			IDM_SET_RTL_LAYOUT_OTHER
+				MENUITEM "&Изменить окно",			IDM_SET_RTL_LAYOUT_EDIT
+				MENUITEM "&Выбрать другое окно",	IDM_SET_RTL_LAYOUT_OTHER
 			END
 			POPUP "&Двунаправленность (Direct2D)"
 			BEGIN
@@ -699,7 +699,7 @@ BEGIN
 	END
 	POPUP "&Инструменты"
 	BEGIN
-		MENUITEM "Sa&ve Before Running Tools",				IDM_VIEW_SAVEBEFORERUNNINGTOOLS
+		MENUITEM "Сох&ранять перед открытием инструментов",	IDM_VIEW_SAVEBEFORERUNNINGTOOLS
 		MENUITEM "Use &matepath to Open Folder",			IDM_SET_OPEN_FOLDER_MATEPATH
 		MENUITEM SEPARATOR
 		MENUITEM "Запустить с &правами администратора",		IDM_FILE_RELAUNCH_ELEVATED
@@ -713,8 +713,8 @@ BEGIN
 		MENUITEM SEPARATOR
 		POPUP "Действие при &выделении"
 		BEGIN
-			MENUITEM "Code &Compress",								IDM_EDIT_CODE_COMPRESS
-			MENUITEM "Code &Pretty",								IDM_EDIT_CODE_PRETTY
+			MENUITEM "&Сжимать код",								IDM_EDIT_CODE_COMPRESS
+			MENUITEM "Привести код в &порядок",						IDM_EDIT_CODE_PRETTY
 			MENUITEM SEPARATOR
 			MENUITEM "&Открыть файл, папку, ссылку и т. д.",		CMD_OPEN_PATH_OR_LINK
 			MENUITEM "Открыть содержащую &папку",					CMD_OPEN_CONTAINING_FOLDER
@@ -740,7 +740,7 @@ BEGIN
 			MENUITEM "Форма из всей ширины в пол&уторную ширину",			IDM_EDIT_MAP_HALFWIDTH
 			MENUITEM SEPARATOR
 			MENUITEM "Из традиционного китайского в &упрощенный",			IDM_EDIT_MAP_SIMPLIFIED_CHINESE
-			MENUITEM "Из упрощенного китайского to тра&диционный",			IDM_EDIT_MAP_TRADITIONAL_CHINESE
+			MENUITEM "Из упрощенного китайского в тра&диционный",			IDM_EDIT_MAP_TRADITIONAL_CHINESE
 			MENUITEM SEPARATOR
 			MENUITEM "Из японского катакана в &хирагана",					IDM_EDIT_MAP_HIRAGANA
 			MENUITEM "Из японского хирагана в ка&такана",					IDM_EDIT_MAP_KATAKANA
@@ -808,21 +808,21 @@ BEGIN
 	END
 	POPUP "+"
 	BEGIN
-		MENUITEM "&Default Levels",				IDM_VIEW_FOLD_DEFAULT
-		MENUITEM "&All Levels",					IDM_VIEW_FOLD_ALL
-		MENUITEM "&Current Block",				IDM_VIEW_FOLD_CURRENT_BLOCK
-		MENUITEM "Current &Level",				IDM_VIEW_FOLD_CURRENT_LEVEL
+		MENUITEM "Уровни по &умолчанию",		IDM_VIEW_FOLD_DEFAULT
+		MENUITEM "&Все уровни",					IDM_VIEW_FOLD_ALL
+		MENUITEM "&Текущий блок",				IDM_VIEW_FOLD_CURRENT_BLOCK
+		MENUITEM "Текущий &уровень",			IDM_VIEW_FOLD_CURRENT_LEVEL
 		MENUITEM SEPARATOR
-		MENUITEM "Level &1",					IDM_VIEW_FOLD_LEVEL1
-		MENUITEM "Level &2",					IDM_VIEW_FOLD_LEVEL2
-		MENUITEM "Level &3",					IDM_VIEW_FOLD_LEVEL3
-		MENUITEM "Level &4",					IDM_VIEW_FOLD_LEVEL4
-		MENUITEM "Level &5",					IDM_VIEW_FOLD_LEVEL5
-		MENUITEM "Level &6",					IDM_VIEW_FOLD_LEVEL6
-		MENUITEM "Level &7",					IDM_VIEW_FOLD_LEVEL7
-		MENUITEM "Level &8",					IDM_VIEW_FOLD_LEVEL8
-		MENUITEM "Level &9",					IDM_VIEW_FOLD_LEVEL9
-		MENUITEM "Level 1&0",					IDM_VIEW_FOLD_LEVEL10
+		MENUITEM "Уровень &1",					IDM_VIEW_FOLD_LEVEL1
+		MENUITEM "Уровень &2",					IDM_VIEW_FOLD_LEVEL2
+		MENUITEM "Уровень &3",					IDM_VIEW_FOLD_LEVEL3
+		MENUITEM "Уровень &4",					IDM_VIEW_FOLD_LEVEL4
+		MENUITEM "Уровень &5",					IDM_VIEW_FOLD_LEVEL5
+		MENUITEM "Уровень &6",					IDM_VIEW_FOLD_LEVEL6
+		MENUITEM "Уровень &7",					IDM_VIEW_FOLD_LEVEL7
+		MENUITEM "Уровень &8",					IDM_VIEW_FOLD_LEVEL8
+		MENUITEM "Уровень &9",					IDM_VIEW_FOLD_LEVEL9
+		MENUITEM "Уровень 1&0",					IDM_VIEW_FOLD_LEVEL10
 	END
 END
 
@@ -1082,13 +1082,13 @@ BEGIN
     LTEXT           "&Найти:",IDC_STATIC,7,7,67,8
     COMBOBOX        IDC_FINDTEXT,7,17,210,116,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     AUTOCHECKBOX    "С учетом &регистра",IDC_FINDCASE,7,37,73,10,WS_TABSTOP
-    AUTOCHECKBOX    "Match &whole word only",IDC_FINDWORD,7,49,110,10,WS_TABSTOP
+    AUTOCHECKBOX    "Только &целые слова",IDC_FINDWORD,7,49,110,10,WS_TABSTOP
     AUTOCHECKBOX    "Match &beginning of word only",IDC_FINDSTART,7,61,124,10,WS_TABSTOP
     AUTOCHECKBOX    "Поиск регулярных &выражений",IDC_FINDREGEXP,7,73,112,10,WS_TABSTOP
     AUTOCHECKBOX    "Regex dot (.) match newline",IDC_FIND_DOTALL,7,85,124,10,WS_TABSTOP
     AUTOCHECKBOX    "&Transform backslashes",IDC_FINDTRANSFORMBS,7,97,95,10,WS_TABSTOP
     AUTOCHECKBOX    "&Don't wrap around",IDC_NOWRAP,132,37,79,10,WS_TABSTOP
-    AUTOCHECKBOX    "C&lose after find",IDC_FINDCLOSE,132,49,77,10,WS_TABSTOP
+    AUTOCHECKBOX    "За&крывать после поиска",IDC_FINDCLOSE,132,49,77,10,WS_TABSTOP
     AUTOCHECKBOX    "W&ildcard search",IDC_WILDCARDSEARCH,132,61,74,10,WS_TABSTOP
     DEFPUSHBUTTON   "Найти &далее",IDOK,223,7,60,14
     PUSHBUTTON      "Найти &назад",IDC_FINDPREV,223,24,60,14
@@ -1127,11 +1127,11 @@ BEGIN
     AUTOCHECKBOX    "C&lose after replace",IDC_FINDCLOSE,132,78,90,10,WS_TABSTOP
     AUTOCHECKBOX    "W&ildcard search",IDC_WILDCARDSEARCH,132,90,74,10,WS_TABSTOP
     DEFPUSHBUTTON   "Найти &далее",IDOK,223,7,60,14
-    PUSHBUTTON      "Найти &назад",IDC_FINDPREV,223,24,60,14
-    PUSHBUTTON      "&Найти все",IDC_FINDALL,223,41,60,14
+    PUSHBUTTON      "Найти на&зад",IDC_FINDPREV,223,24,60,14
+    PUSHBUTTON      "Найти в&се",IDC_FINDALL,223,41,60,14
     PUSHBUTTON      "За&менить",IDC_REPLACE,223,58,60,14
     PUSHBUTTON      "Заменить &все",IDC_REPLACEALL,223,75,60,14
-    PUSHBUTTON      "При &выделении",IDC_REPLACEINSEL,223,92,60,14
+    PUSHBUTTON      "При вы&делении",IDC_REPLACEINSEL,223,92,60,14
     CONTROL         "<a>(?)</a>",IDC_REGEXPHELP,"SysLink",0x0,118,102,12,10
     CONTROL         "<a>(?)</a>",IDC_BACKSLASHHELP,"SysLink",0x0,118,126,12,10
     CONTROL         "<a>(?)</a>",IDC_WILDCARDHELP,"SysLink",0x0,208,90,12,10
@@ -1140,7 +1140,7 @@ BEGIN
     AUTOCHECKBOX    "Transparent on losing focus",IDC_TRANSPARENT,7,138,124,10,WS_TABSTOP
     AUTOCHECKBOX    "Boo&kmark matched line",IDC_FINDALLBOOKMARK,132,102,90,10,WS_TABSTOP
     AUTOCHECKBOX    "Use Boost Regex",IDC_FIND_CXXREGEX,132,114,90,10,WS_TABSTOP
-    AUTOCHECKBOX    "Use &monospaced font",IDC_USEMONOSPACEDFONT,132,126,90,10,WS_TABSTOP
+    AUTOCHECKBOX    "Использовать моно&ширный шрифт",IDC_USEMONOSPACEDFONT,132,126,90,10,WS_TABSTOP
     CONTROL         "<a>Перейти к поиску (Ctrl+F)</a>",IDC_TOGGLEFINDREPLACE, "SysLink",WS_TABSTOP,140,139,80,10
     CONTROL         "<a>Сохранить позицию</a>",IDC_SAVEPOSITION,"SysLink",WS_TABSTOP,223,126,60,10
     CONTROL         "<a>Сбросить позицию</a>",IDC_RESETPOSITION,"SysLink",WS_TABSTOP,223,138,60,10
@@ -1215,7 +1215,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     LTEXT           "&Режим окончания строки по умолчанию:",IDC_STATIC,7,7,116,8
     COMBOBOX        IDC_EOLMODELIST,7,20,118,81,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    AUTOCHECKBOX    "Show inconsistent line endings warning on loading.",IDC_WARNINCONSISTENTEOLS,7,40,186,10,WS_TABSTOP
+    AUTOCHECKBOX    "Показывать предупреждения о непоследовательных окончаниях строк во время загрузки",IDC_WARNINCONSISTENTEOLS,7,40,186,10,WS_TABSTOP
     AUTOCHECKBOX    "&Ensure consistent line endings when saving.",IDC_CONSISTENTEOLS,7,52,182,10,WS_TABSTOP
     AUTOCHECKBOX    "&Strip trailing blanks when saving.",IDC_AUTOSTRIPBLANKS,7,64,173,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,139,7,50,14
@@ -1260,7 +1260,7 @@ CAPTION "Открытие недавних файлов"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "",IDC_FILEMRU,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SHAREIMAGELISTS | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,7,7,212,158
-    AUTOCHECKBOX    "&Открывать недавние файла при выходе",IDC_SAVEMRU,7,169,155,10,WS_TABSTOP
+    AUTOCHECKBOX    "&Открывать недавние файлы при выходе",IDC_SAVEMRU,7,169,155,10,WS_TABSTOP
     LTEXT           "Максимальное количество файлов:",IDC_MRU_COUNT_LABEL,7,185,64,8
     EDITTEXT        IDC_MRU_COUNT_VALUE,73,183,30,13,ES_NUMBER | ES_AUTOHSCROLL
     CONTROL         "<a>Очистить историю</a>",IDC_EMPTY_MRU,"SysLink",WS_TABSTOP,172,169,48,10
@@ -1277,7 +1277,7 @@ BEGIN
     AUTORADIOBUTTON "&Отсутствует",IDC_CHANGENOTIFY_NONE,7,7,35,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "&Показывать сообщение",IDC_CHANGENOTIFY_SHOW_MSG,7,19,71,10,WS_TABSTOP
     AUTORADIOBUTTON "&Автоматическая перезагрузка (в неизмененном виде).",IDC_CHANGENOTIFY_AUTO_RELOAD,7,31,114,10,WS_TABSTOP
-    AUTOCHECKBOX    "&Monitor continuously updated file (e.g. log file).",IDC_CHANGENOTIFY_LOG_FILE,7,48,184,10,WS_TABSTOP
+    AUTOCHECKBOX    "&Отслеживать постоянно изменяемый файл (например, файл лога)",IDC_CHANGENOTIFY_LOG_FILE,7,48,184,10,WS_TABSTOP
     AUTOCHECKBOX    "&Keep at document end after reloading.",IDC_CHANGENOTIFY_KEEP_AT_END,7,60,184,10,WS_TABSTOP
     AUTOCHECKBOX    "&Reset if a new file is opened.",IDC_CHANGENOTIFY_RESET_WATCH,7,72,184,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,139,7,50,14
@@ -1290,10 +1290,10 @@ CAPTION "Выбор схемы"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "",IDC_STYLELIST,"SysTreeView32",TVS_SHOWSELALWAYS | TVS_HASBUTTONS | TVS_LINESATROOT | WS_BORDER | WS_HSCROLL | WS_TABSTOP,7,7,151,162
-    AUTOCHECKBOX    "Set selected scheme as &default.",IDC_DEFAULTSCHEME,7,171,151,10,WS_TABSTOP
+    AUTOCHECKBOX    "Задать выбранную схему по &умолчанию",IDC_DEFAULTSCHEME,7,171,151,10,WS_TABSTOP
     AUTOCHECKBOX    "&Auto-select by filename extension.",IDC_AUTOSELECT,7,182,151,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,52,196,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,108,196,50,14
+    PUSHBUTTON      "Отмена",IDCANCEL,108,196,50,14
     SCROLLBAR       IDC_RESIZEGRIP3,7,198,10,10
 END
 
@@ -1630,7 +1630,7 @@ BEGIN
     EDITTEXT        IDC_AUTOC_MIN_NUMBER_LENGTH,166,48,50,12,ES_NUMBER | WS_TABSTOP
     AUTOCHECKBOX    "Scanning words in current document for",IDC_AUTOC_SCAN_DOCUMENT_WORDS,14,68,150,10,WS_TABSTOP
     EDITTEXT        IDC_AUTOC_SCAN_WORDS_TIMEOUT,166,64,50,12,WS_TABSTOP
-    AUTOCHECKBOX    "Only use words in current document",IDC_AUTOC_ONLY_DOCUMENT_WORDS,14,80,180,10,WS_TABSTOP
+    AUTOCHECKBOX    "Использовать только слова из текущего документа",IDC_AUTOC_ONLY_DOCUMENT_WORDS,14,80,180,10,WS_TABSTOP
     AUTOCHECKBOX    "Only trigger auto completion in English IME mode",IDC_AUTOC_ENGLISH_IME_ONLY,14,92,180,10,WS_TABSTOP
 
     GROUPBOX        "Автоматически заполнять слова внутри",IDC_STATIC,7,111,218,26
@@ -1689,23 +1689,23 @@ END
 
 IDD_CSV_OPTIONS DIALOGEX 0, 0, 220, 118
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "CSV Options"
+CAPTION "Опции CSV"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    GROUPBOX        "Delimiter",IDC_STATIC,7,7,206,50
-    AUTORADIOBUTTON "Comma (,)",IDC_CSV_DELIMITER_COMMA,14,19,60,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "Tab",IDC_CSV_DELIMITER_TAB,84,19,60,10,WS_TABSTOP
-    AUTORADIOBUTTON "Pipe (|)",IDC_CSV_DELIMITER_PIPE,154,19,55,10,WS_TABSTOP
-    AUTORADIOBUTTON "Semicolon (;)",IDC_CSV_DELIMITER_SEMICOLON,14,31,60,10,WS_TABSTOP
-    AUTORADIOBUTTON "Space",IDC_CSV_DELIMITER_SPACE,84,31,60,10,WS_TABSTOP
-    AUTORADIOBUTTON "Other:",IDC_CSV_DELIMITER_OTHER,154,31,55,10,WS_TABSTOP
+    GROUPBOX        "Разделитель",IDC_STATIC,7,7,206,50
+    AUTORADIOBUTTON "Запятая (,)",IDC_CSV_DELIMITER_COMMA,14,19,60,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "Табуляция",IDC_CSV_DELIMITER_TAB,84,19,60,10,WS_TABSTOP
+    AUTORADIOBUTTON "Прямая черта (|)",IDC_CSV_DELIMITER_PIPE,154,19,55,10,WS_TABSTOP
+    AUTORADIOBUTTON "Точка с запятой (;)",IDC_CSV_DELIMITER_SEMICOLON,14,31,60,10,WS_TABSTOP
+    AUTORADIOBUTTON "Пробел",IDC_CSV_DELIMITER_SPACE,84,31,60,10,WS_TABSTOP
+    AUTORADIOBUTTON "Другие:",IDC_CSV_DELIMITER_OTHER,154,31,55,10,WS_TABSTOP
     EDITTEXT        IDC_CSV_DELIMITER_OTHER_TEXT,166,42,40,11,ES_AUTOHSCROLL|WS_TABSTOP
-    AUTOCHECKBOX    "Treat consecutive delimiters as one.",IDC_CSV_MERGE_DELIMITER,14,43,150,10,WS_TABSTOP
-    GROUPBOX        "Text qualifier",IDC_STATIC,7,63,206,26
-    AUTORADIOBUTTON "Double quote",IDC_CSV_QUALIFIER_DOUBLE,14,75,60,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "Single quote",IDC_CSV_QUALIFIER_SINGLE,84,75,60,10,WS_TABSTOP
-    AUTORADIOBUTTON "None",IDC_CSV_QUALIFIER_NONE,154,75,55,10,WS_TABSTOP
-    AUTOCHECKBOX    "Escape with backslash.",IDC_CSV_BACKSLASH_ESCAPE,14,97,140,10,WS_TABSTOP
+    AUTOCHECKBOX    "Рассматривать последовательные разделители как один",IDC_CSV_MERGE_DELIMITER,14,43,150,10,WS_TABSTOP
+    GROUPBOX        "Текстовый квалификатор",IDC_STATIC,7,63,206,26
+    AUTORADIOBUTTON "Двойная кавычка",IDC_CSV_QUALIFIER_DOUBLE,14,75,60,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "Одинарная кавычка",IDC_CSV_QUALIFIER_SINGLE,84,75,60,10,WS_TABSTOP
+    AUTORADIOBUTTON "Нет",IDC_CSV_QUALIFIER_NONE,154,75,55,10,WS_TABSTOP
+    AUTOCHECKBOX    "Экранировать с помощью обратной косой черты",IDC_CSV_BACKSLASH_ESCAPE,14,97,140,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,163,97,50,14
 END
 
