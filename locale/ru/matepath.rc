@@ -18,10 +18,10 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English (United States) resources
+// Russian (Russia) resources
 
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_RUS)
+LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
 #pragma code_page(65001)
 
 /////////////////////////////////////////////////////////////////////////////
@@ -614,6 +614,7 @@ BEGIN
 	IDS_LANG_ITALIAN				"Italiano"
 	IDS_LANG_PORTUGUESE_BRAZIL		"Português (Brasil)"
 	IDS_LANG_FRENCH_FRANCE		    "Français"
+	IDS_LANG_RUSSIAN		        "Русский"
 END
 #endif
 
@@ -641,7 +642,7 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
-#endif    // English (United States) resources
+#endif    // Russian (Russia) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
