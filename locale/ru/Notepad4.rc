@@ -121,7 +121,7 @@ BEGIN
 		MENUITEM SEPARATOR
 		POPUP "&Режим файла"
 		BEGIN
-			MENUITEM "Read Only &File",										IDM_FILE_READONLY_FILE
+			MENUITEM "&Файл только для чтения",								IDM_FILE_READONLY_FILE
 			MENUITEM "Только для &чтения\tF10",								IDM_FILE_READONLY_MODE
 #if defined(_WIN64)
 			MENUITEM "Режим чтения &больших файлов",						IDM_FILE_LARGE_FILE_MODE
