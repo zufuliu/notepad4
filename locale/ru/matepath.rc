@@ -452,7 +452,7 @@ BEGIN
     LTEXT           "&Default ""Quick View"" program (Ctrl+Q):",IDC_STATIC,10,41,180,8
     EDITTEXT        IDC_QUICKVIEW,10,52,191,14,ES_AUTOHSCROLL
     PUSHBUTTON      "",IDC_BROWSE_Q,204,52,14,14,BS_BITMAP
-    LTEXT           "&Папка \"Избранные\" (F11):",IDC_STATIC,10,76,120,8
+    LTEXT           "&Папка ""Избранные"" (F11):",IDC_STATIC,10,76,120,8
     EDITTEXT        IDC_FAVORITES,10,87,191,14,ES_AUTOHSCROLL
     PUSHBUTTON      "",IDC_BROWSE_F,204,87,14,14,BS_BITMAP
     GROUPBOX        "Интеграция системы (требуются права администратора)",IDC_GROUP_SYSTEM_INTEGRATION,7,111,218,72
