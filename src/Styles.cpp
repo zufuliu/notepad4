@@ -1968,21 +1968,29 @@ void Style_SniffCSV() noexcept {
 	}
 	const uint32_t mask = (maskSet & UINT32_MAX) & (maskSet >> 32);
 #else
-	uint32_t maskSet[2]{};
 	while (ptr < end) {
 		const uint8_t ch = *ptr++;
 		if (ch == ',' || ch == '\t' || ch == ';' || ch == '|') {
-			const int index = (ch & 31);
-			maskSet[offset] |= 1U << index;
+			const unsigned index = offset + (ch & 31);
 			table[index] += 1;
 		} else if (ch == '\r' || ch == '\n') {
-			offset = 1;
+			offset = 32;
 			if (ch == '\r' && *ptr == '\n') {
 				++ptr;
 			}
 		}
 	}
-	const uint32_t mask = maskSet[0] & maskSet[1];
+	uint32_t mask = 0;
+	{
+		uint32_t value = ('\t') | ((',' & 31) << 8) | (('|' & 31) << 16) | ((';' & 31) << 24);
+		while (value) {
+			const int index = value & 0xff;
+			if (table[index] && table[32 + index]) {
+				mask |= 1U << index;
+			}
+			value >>= 8;
+		}
+	}
 #endif // _WIN64
 
 	constexpr uint32_t preferred = ';' | ('|' << 8) | ('\t' << 16) | (',' << 24);
