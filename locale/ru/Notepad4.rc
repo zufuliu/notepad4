@@ -708,7 +708,7 @@ BEGIN
 		MENUITEM "Открыть &пустое окно\tAlt+0",				IDM_FILE_NEWWINDOW2
 		MENUITEM SEPARATOR
 		MENUITEM "Execute &Document\tCtrl+L",				IDM_FILE_LAUNCH
-		MENUITEM "Ооткрыть документ с &помощью...",			IDM_FILE_OPENWITH
+		MENUITEM "Открыть документ с &помощью...",			IDM_FILE_OPENWITH
 		MENUITEM "Выполнить &команду...\tCtrl+R",			IDM_FILE_RUN
 		MENUITEM SEPARATOR
 		POPUP "Действие при &выделении"
