@@ -592,7 +592,7 @@ BEGIN
 			MENUITEM "&Personalizza barra degli strumenti...",		IDM_VIEW_CUSTOMIZE_TOOLBAR
 			MENUITEM "&Auto scala barra degli strumenti",			IDM_VIEW_AUTO_SCALE_TOOLBAR
 #if NP2_ENABLE_HIDPI_IMAGE_RESOURCE
-			MENUITEM "Use Lar&ge Toolbar",			IDM_VIEW_USE_LARGE_TOOLBAR
+			MENUITEM "Usa la barra degli strumenti &grande",			IDM_VIEW_USE_LARGE_TOOLBAR
 #endif
 			MENUITEM "M&ostra barra di stato\tShift+F11",	IDM_VIEW_STATUSBAR
 			MENUITEM SEPARATOR
@@ -795,7 +795,7 @@ BEGIN
 		MENUITEM "&Personalizza barra degli strumenti...",		IDM_VIEW_CUSTOMIZE_TOOLBAR
 		MENUITEM "&Auto Scala barra degli strumenti",			IDM_VIEW_AUTO_SCALE_TOOLBAR
 #if NP2_ENABLE_HIDPI_IMAGE_RESOURCE
-		MENUITEM "Use &Large Toolbar",			IDM_VIEW_USE_LARGE_TOOLBAR
+		MENUITEM "Usa la barra degli strumenti &grande",			IDM_VIEW_USE_LARGE_TOOLBAR
 #endif
 		MENUITEM "Mo&stra barra di stato",				IDM_VIEW_STATUSBAR
 	END
