@@ -249,7 +249,7 @@ BEGIN
 			MENUITEM "&Транспонировать\tAlt+S",								IDM_EDIT_LINETRANSPOSE
 			MENUITEM SEPARATOR
 			MENUITEM "&Cортировать строки...\tAlt+O",						IDM_EDIT_SORTLINES
-			MENUITEM "&Изменять строки...\tAlt+M",							IDM_EDIT_MODIFYLINES
+			MENUITEM "&Изменить строки...\tAlt+M",							IDM_EDIT_MODIFYLINES
 			MENUITEM "Выр&авнивать строки...\tAlt+J",						IDM_EDIT_ALIGN
 			MENUITEM SEPARATOR
 			MENUITEM "&Дублировать строки\tCtrl+D",							IDM_EDIT_DUPLICATELINE
@@ -570,7 +570,7 @@ BEGIN
 		MENUITEM "Word &Wrap Settings...",							IDM_VIEW_WORDWRAPSETTINGS
 		MENUITEM "&Long Line Settings...",							IDM_VIEW_LONGLINESETTINGS
 		MENUITEM "Настройки а&втозаполнения...",					IDM_VIEW_AUTOCOMPLETION_SETTINGS
-		MENUITEM "Auto Completion I&gnore Case",					IDM_VIEW_AUTOCOMPLETION_IGNORECASE
+		MENUITEM "Не учитывать &регистр при автозаполнении",		IDM_VIEW_AUTOCOMPLETION_IGNORECASE
 		MENUITEM "Включить метод ввода LaTe&X",						IDM_SET_LATEX_INPUT_METHOD
 		POPUP "Параметры вы&деления и редактирования"
 		BEGIN
@@ -765,7 +765,7 @@ BEGIN
 		MENUITEM "Пре&дложить функцию",										IDM_HELP_FEATURE_REQUEST
 		MENUITEM SEPARATOR
 		MENUITEM "Онлайн-&вики",											IDM_HELP_ONLINE_WIKI
-		MENUITEM "&Как работать с командной строкой?",						IDM_CMDLINE_HELP
+		MENUITEM "&Справка по командной строке",						IDM_CMDLINE_HELP
 		MENUITEM SEPARATOR
 		MENUITEM "&О программе Notepad4\tF1",								IDM_HELP_ABOUT
 	END
@@ -1057,10 +1057,10 @@ BEGIN
     ICON            IDR_MAINWND,IDC_STATIC,7,7,20,20
     LTEXT           "",IDC_VERSION,45,7,200,8
     LTEXT           "",IDC_BUILD_INFO,45,18,200,16
-    LTEXT           "Copyright © 2011-2024 Zufu Liu и все контрибьюторы.",IDC_STATIC,45,38,200,8
+    LTEXT           "Copyright © Zufu Liu и все контрибьюторы, 2011-2024",IDC_STATIC,45,38,200,8
     LTEXT           "",IDC_NEW_PAGE_TEXT,45,48,200,8,NOT WS_VISIBLE | WS_DISABLED
     CONTROL         "",IDC_NEW_PAGE_LINK,"SysLink",WS_TABSTOP,45,48,200,10
-    LTEXT           "Copyright © 2010-2017 XhmikosR и все контрибьюторы.",IDC_STATIC,45,60,200,8
+    LTEXT           "Copyright © XhmikosR и все контрибьюторы, 2010-2017.",IDC_STATIC,45,60,200,8
     LTEXT           "",IDC_MOD_PAGE_TEXT,45,68,200,8,NOT WS_VISIBLE | WS_DISABLED
     CONTROL         "",IDC_MOD_PAGE_LINK,"SysLink",WS_TABSTOP,45,68,200,10
     LTEXT           "Copyright © 2004-2012 Флориан Балмер.",IDC_STATIC,45,80,200,8
@@ -1074,35 +1074,35 @@ BEGIN
     CONTROL         "",IDC_SCI_PAGE_LINK,"SysLink",WS_TABSTOP,45,128,94,10
 END
 
-IDD_FIND DIALOGEX 0, 0, 290, 124
+IDD_FIND DIALOGEX 0, 0, 314, 124
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_NOFAILCREATE | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Find Text"
+CAPTION "Поиск текста"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     LTEXT           "&Найти:",IDC_STATIC,7,7,67,8
     COMBOBOX        IDC_FINDTEXT,7,17,210,116,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     AUTOCHECKBOX    "С учетом &регистра",IDC_FINDCASE,7,37,73,10,WS_TABSTOP
     AUTOCHECKBOX    "Только &целые слова",IDC_FINDWORD,7,49,110,10,WS_TABSTOP
-    AUTOCHECKBOX    "Match &beginning of word only",IDC_FINDSTART,7,61,124,10,WS_TABSTOP
+    AUTOCHECKBOX    "Только начал&о слова",IDC_FINDSTART,7,61,124,10,WS_TABSTOP
     AUTOCHECKBOX    "Поиск регулярных &выражений",IDC_FINDREGEXP,7,73,112,10,WS_TABSTOP
     AUTOCHECKBOX    "Regex dot (.) match newline",IDC_FIND_DOTALL,7,85,124,10,WS_TABSTOP
     AUTOCHECKBOX    "&Transform backslashes",IDC_FINDTRANSFORMBS,7,97,95,10,WS_TABSTOP
     AUTOCHECKBOX    "&Don't wrap around",IDC_NOWRAP,132,37,79,10,WS_TABSTOP
     AUTOCHECKBOX    "За&крывать после поиска",IDC_FINDCLOSE,132,49,77,10,WS_TABSTOP
     AUTOCHECKBOX    "W&ildcard search",IDC_WILDCARDSEARCH,132,61,74,10,WS_TABSTOP
-    DEFPUSHBUTTON   "Найти &далее",IDOK,223,7,60,14
-    PUSHBUTTON      "Найти &назад",IDC_FINDPREV,223,24,60,14
-    PUSHBUTTON      "&Найти все",IDC_FINDALL,223,41,60,14
-    PUSHBUTTON      "&Выбрать все",IDC_REPLACEALL,223,58,60,14
+    DEFPUSHBUTTON   "Найти &далее",IDOK,247,7,60,14
+    PUSHBUTTON      "Найти &назад",IDC_FINDPREV,247,24,60,14
+    PUSHBUTTON      "&Найти все",IDC_FINDALL,247,41,60,14
+    PUSHBUTTON      "&Выбрать все",IDC_REPLACEALL,247,58,60,14
     CONTROL         "<a>(?)</a>",IDC_REGEXPHELP,"SysLink",0x0,118,73,12,10
     CONTROL         "<a>(?)</a>",IDC_BACKSLASHHELP,"SysLink",0x0,118,97,12,10
     CONTROL         "<a>(?)</a>",IDC_WILDCARDHELP,"SysLink",0x0,208,61,12,10
-    CONTROL         "<a>Очистить историю</a>",IDC_CLEAR_FIND,"SysLink",WS_TABSTOP,173,7,48,10
+    CONTROL         "<a>Очистить историю</a>",IDC_CLEAR_FIND,"SysLink",WS_TABSTOP,160,7,51,10
     AUTOCHECKBOX    "Transparent on losing focus",IDC_TRANSPARENT,7,108,124,10,WS_TABSTOP
     AUTOCHECKBOX    "Boo&kmark matched line",IDC_FINDALLBOOKMARK,132,73,90,10,WS_TABSTOP
     AUTOCHECKBOX    "Use Boost Regex",IDC_FIND_CXXREGEX,132,85,90,10,WS_TABSTOP
-    AUTOCHECKBOX    "Применять &моноширный шрифт",IDC_USEMONOSPACEDFONT,132,97,90,10,WS_TABSTOP
-    CONTROL         "<a>Перейти к замене (Ctrl+H)</a>",IDC_TOGGLEFINDREPLACE, "SysLink",WS_TABSTOP,140,109,80,10
+    AUTOCHECKBOX    "Применять &моноширный шрифт",IDC_USEMONOSPACEDFONT,132,97,104,10,WS_TABSTOP
+    CONTROL         "<a>Перейти к замене (Ctrl+H)</a>",IDC_TOGGLEFINDREPLACE, "SysLink",WS_TABSTOP,140,125,80,10
     CONTROL         "<a>Сохранить позицию</a>",IDC_SAVEPOSITION,"SysLink",WS_TABSTOP,223,97,60,10
     CONTROL         "<a>Сбросить позицию</a>",IDC_RESETPOSITION,"SysLink",WS_TABSTOP,223,108,60,10
     SCROLLBAR       IDC_RESIZEGRIP2,230,108,10,10
@@ -1110,7 +1110,7 @@ END
 
 IDD_REPLACE DIALOGEX 0, 0, 290, 154
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_NOFAILCREATE | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Replace Text"
+CAPTION "Замена текста"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     LTEXT           "&Найти:",IDC_STATIC,7,7,65,8
@@ -1118,8 +1118,8 @@ BEGIN
     LTEXT           "&Заменить на:",IDC_STATIC,7,35,64,8
     COMBOBOX        IDC_REPLACETEXT,7,46,209,116,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     AUTOCHECKBOX    "С учетом &регистра",IDC_FINDCASE,7,66,53,10,WS_TABSTOP
-    AUTOCHECKBOX    "Match &whole word only",IDC_FINDWORD,7,78,105,10,WS_TABSTOP
-    AUTOCHECKBOX    "Match &beginning of word only",IDC_FINDSTART,7,90,124,10,WS_TABSTOP
+    AUTOCHECKBOX    "Только &целые слова",IDC_FINDWORD,7,78,105,10,WS_TABSTOP
+    AUTOCHECKBOX    "Только начал&о слова",IDC_FINDSTART,7,90,124,10,WS_TABSTOP
     AUTOCHECKBOX    "Regular &expression search",IDC_FINDREGEXP,7,102,112,10,WS_TABSTOP
     AUTOCHECKBOX    "Regex dot (.) match newline",IDC_FIND_DOTALL,7,114,124,10,WS_TABSTOP
     AUTOCHECKBOX    "&Transform backslashes",IDC_FINDTRANSFORMBS,7,126,97,10,WS_TABSTOP
@@ -1174,15 +1174,15 @@ BEGIN
     SCROLLBAR       IDC_RESIZEGRIP3,7,189,10,10
 END
 
-IDD_SYSTEM_INTEGRATION DIALOGEX 0, 0, 232, 118
+IDD_SYSTEM_INTEGRATION DIALOGEX 0, 0, 246, 118
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Интеграция системы"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    GROUPBOX        "Интеграция системы (требуются права администратора)",IDC_GROUP_SYSTEM_INTEGRATION,7,7,218,84
-    AUTOCHECKBOX    "Добавить Notepad4 в контекстном меню Проводника Windows",IDC_ENABLE_CONTEXT_MENU,14,20,204,10,WS_TABSTOP
-    LTEXT           "Текст контекстного меню:",IDC_STATIC,28,35,70,8
-    EDITTEXT        IDC_CONTEXT_MENU_TEXT,100,32,118,14,ES_AUTOHSCROLL | WS_TABSTOP
+    GROUPBOX        "Интеграция системы (требуются права администратора)",IDC_GROUP_SYSTEM_INTEGRATION,7,7,232,84
+    AUTOCHECKBOX    "Добавить Notepad4 в контекстном меню Проводника Windows",IDC_ENABLE_CONTEXT_MENU,14,20,212,10,WS_TABSTOP
+    LTEXT           "Текст контекстного меню:",IDC_STATIC,28,35,88,8
+    EDITTEXT        IDC_CONTEXT_MENU_TEXT,112,32,106,14,ES_AUTOHSCROLL | WS_TABSTOP
     AUTOCHECKBOX    "Enable Taskbar Jump List.",IDC_ENABLE_JUMP_LIST,14,48,204,10,WS_TABSTOP
     LTEXT           "Имя приложения:",IDC_STATIC,28,63,70,8
     EDITTEXT        IDC_APPLICATION_NAME,100,60,118,14,ES_AUTOHSCROLL | WS_TABSTOP
@@ -1208,18 +1208,18 @@ BEGIN
     PUSHBUTTON      "Отмена",IDCANCEL,152,108,50,14
 END
 
-IDD_DEFEOLMODE DIALOGEX 0, 0, 196, 80
+IDD_DEFEOLMODE DIALOGEX 0, 0, 222, 80
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Окончания строки"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "&Режим окончания строки по умолчанию:",IDC_STATIC,7,7,116,8
-    COMBOBOX        IDC_EOLMODELIST,7,20,118,81,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    AUTOCHECKBOX    "Показывать предупреждения о непоследовательных окончаниях строк во время загрузки",IDC_WARNINCONSISTENTEOLS,7,40,186,10,WS_TABSTOP
+    LTEXT           "&Режим окончания строки по умолчанию:",IDC_STATIC,7,7,134,8
+    COMBOBOX        IDC_EOLMODELIST,7,20,142,81,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    AUTOCHECKBOX    "Показывать предупреждения о непоследовательных окончаниях строк во время загрузки",IDC_WARNINCONSISTENTEOLS,7,40,200,10,WS_TABSTOP
     AUTOCHECKBOX    "&Ensure consistent line endings when saving.",IDC_CONSISTENTEOLS,7,52,182,10,WS_TABSTOP
     AUTOCHECKBOX    "&Strip trailing blanks when saving.",IDC_AUTOSTRIPBLANKS,7,64,173,10,WS_TABSTOP
-    DEFPUSHBUTTON   "OK",IDOK,139,7,50,14
-    PUSHBUTTON      "Отмена",IDCANCEL,139,24,50,14
+    DEFPUSHBUTTON   "OK",IDOK,163,7,50,14
+    PUSHBUTTON      "Отмена",IDCANCEL,163,24,50,14
 END
 
 IDD_WARNLINEENDS DIALOGEX 0, 0, 196, 100
@@ -1248,7 +1248,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     LTEXT           "&Номер строки (может быть пустым или от 1 до %s):",IDC_LINE_RANGE,7,7,150,8
     EDITTEXT        IDC_LINENUM,7,18,90,14,ES_AUTOHSCROLL
-    LTEXT           "&Столбец (может быть пустым или от 1 до %s):",IDC_COLUMN_RANGE,7,37,150,8
+    LTEXT           "&Символ (может быть пустым или от 1 до %s):",IDC_COLUMN_RANGE,7,37,150,8
     EDITTEXT        IDC_COLNUM,7,48,90,14,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "OK",IDOK,109,18,50,14
     PUSHBUTTON      "Отмена",IDCANCEL,109,48,50,14
@@ -1291,24 +1291,24 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "",IDC_STYLELIST,"SysTreeView32",TVS_SHOWSELALWAYS | TVS_HASBUTTONS | TVS_LINESATROOT | WS_BORDER | WS_HSCROLL | WS_TABSTOP,7,7,151,162
     AUTOCHECKBOX    "Задать выбранную схему по &умолчанию",IDC_DEFAULTSCHEME,7,171,151,10,WS_TABSTOP
-    AUTOCHECKBOX    "&Auto-select by filename extension.",IDC_AUTOSELECT,7,182,151,10,WS_TABSTOP
+    AUTOCHECKBOX    "&Автоматически определять по расширению файла",IDC_AUTOSELECT,7,182,151,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,52,196,50,14
     PUSHBUTTON      "Отмена",IDCANCEL,108,196,50,14
     SCROLLBAR       IDC_RESIZEGRIP3,7,198,10,10
 END
 
-IDD_STYLECONFIG DIALOGEX 0, 0, 468, 238
+IDD_STYLECONFIG DIALOGEX 0, 0, 478, 238
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Customize Schemes"
+CAPTION "Настройка схем"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "",IDC_STYLELIST,"SysTreeView32",TVS_FULLROWSELECT | TVS_SHOWSELALWAYS | TVS_HASBUTTONS | TVS_LINESATROOT | WS_BORDER | WS_HSCROLL | WS_TABSTOP,7,7,164,224
     LTEXT           "",IDC_STYLELABEL,181,132,280,8
     EDITTEXT        IDC_STYLEEDIT,181,142,280,18,ES_MULTILINE | ES_AUTOVSCROLL | WS_VSCROLL
-    PUSHBUTTON      "For&e...",IDC_STYLEFORE,181,195,46,14
-    PUSHBUTTON      "&Фон...",IDC_STYLEBACK,232,195,46,14
-    PUSHBUTTON      "&Шрифт...",IDC_STYLEFONT,283,195,42,14
-    PUSHBUTTON      "&Предпросмотр",IDC_PREVIEW,330,195,42,14
+    PUSHBUTTON      "&Цвет...",IDC_STYLEFORE,171,195,46,14
+    PUSHBUTTON      "&Фон...",IDC_STYLEBACK,222,195,46,14
+    PUSHBUTTON      "&Шрифт...",IDC_STYLEFONT,273,195,42,14
+    PUSHBUTTON      "&Предпросмотр",IDC_PREVIEW,320,195,52,14
     PUSHBUTTON      "&Сброс",IDC_STYLEDEFAULT,377,195,42,14
     PUSHBUTTON      "",IDC_PREVSTYLE,426,195,15,14
     PUSHBUTTON      "",IDC_NEXTSTYLE,446,195,15,14
@@ -1329,33 +1329,33 @@ END
 
 IDD_TABSETTINGS DIALOGEX 0, 0, 232, 209
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Tab Settings"
+CAPTION "Настройки табуляции"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-	GROUPBOX		"Global",IDC_STATIC,7,7,218,38
-    LTEXT           "&Tabulator width:",IDC_STATIC,14,17,67,8
+	GROUPBOX		"Общие",IDC_STATIC,7,7,218,38
+    LTEXT           "&Ширина табулятора:",IDC_STATIC,14,17,67,8
     EDITTEXT        IDC_GLOBAL_TAB_WIDTH,78,15,30,12,ES_NUMBER | ES_AUTOHSCROLL
-    LTEXT           "&Indentation size:",IDC_STATIC,14,32,69,8
+    LTEXT           "&Размер отступа:",IDC_STATIC,14,32,69,8
     EDITTEXT        IDC_GLOBAL_INDENT_WIDTH,78,29,30,12,ES_NUMBER | ES_AUTOHSCROLL
     AUTOCHECKBOX    "Insert tabs as &spaces.",IDC_GLOBAL_TAB_AS_SPACE,118,16,101,10,WS_TABSTOP
 	GROUPBOX		"",IDC_SCHEME_TAB_GROUPBOX,7,49,218,38
     LTEXT           "Tabu&lator width:",IDC_STATIC,14,59,67,8
     EDITTEXT        IDC_SCHEME_TAB_WIDTH,78,57,30,12,ES_NUMBER | ES_AUTOHSCROLL
-    LTEXT           "I&ndentation size:",IDC_STATIC,14,73,69,8
+    LTEXT           "Ра&змер отступа:",IDC_STATIC,14,73,69,8
     EDITTEXT        IDC_SCHEME_INDENT_WIDTH,78,71,30,12,ES_NUMBER | ES_AUTOHSCROLL
     AUTOCHECKBOX    "Insert tabs as s&paces.",IDC_SCHEME_TAB_AS_SPACE,118,58,101,10,WS_TABSTOP
-    AUTOCHECKBOX    "Use &global settings.",IDC_SCHEME_USE_GLOBAL_TAB,118,72,101,10,WS_TABSTOP
+    AUTOCHECKBOX    "Использовать общие на&стройки",IDC_SCHEME_USE_GLOBAL_TAB,118,72,101,10,WS_TABSTOP
 	GROUPBOX		"",IDC_FILE_TAB_GROUPBOX,7,91,218,38
     LTEXT           "Tabulator &width:",IDC_STATIC,14,101,67,8
     EDITTEXT        IDC_FILE_TAB_WIDTH,78,99,30,12,ES_NUMBER | ES_AUTOHSCROLL
-    LTEXT           "In&dentation size:",IDC_STATIC,14,115,69,8
+    LTEXT           "Разме&р отступа:",IDC_STATIC,14,115,69,8
     EDITTEXT        IDC_FILE_INDENT_WIDTH,78,113,30,12,ES_NUMBER | ES_AUTOHSCROLL
     AUTOCHECKBOX    "Insert tabs as sp&aces.",IDC_FILE_TAB_AS_SPACE,118,100,101,10,WS_TABSTOP
-    AUTOCHECKBOX    "Use sche&me settings.",IDC_FILE_USE_SCHEME_TAB,118,114,101,10,WS_TABSTOP
+    AUTOCHECKBOX    "Использовать настройки схемы",IDC_FILE_USE_SCHEME_TAB,118,114,101,10,WS_TABSTOP
     AUTOCHECKBOX    "Tab &key reformats indentation.",IDC_TAB_INDENT,7,135,160,10,WS_TABSTOP
     AUTOCHECKBOX    "&Backspace key reformats indentation.",IDC_BACKSPACE_UNINDENT,7,147,160,10,WS_TABSTOP
     AUTOCHECKBOX    "Backspace key sma&rt delete spaces.",IDC_BACKSPACE_SMARTDEL,7,159,160,10,WS_TABSTOP
-    AUTOCHECKBOX    "Auto dete&ct Tab and indentation settings.",IDC_DETECT_INDENTATION,7,171,160,10,WS_TABSTOP
+    AUTOCHECKBOX    "Автоматически определять настройки отступов и табуляции",IDC_DETECT_INDENTATION,7,171,160,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,119,188,50,14
     PUSHBUTTON      "Отмена",IDCANCEL,175,188,50,14
 END
@@ -1375,7 +1375,7 @@ END
 
 IDD_WORDWRAP DIALOGEX 0, 0, 250, 139
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Word Wrap Settings"
+CAPTION "Настройки переноса слов"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     COMBOBOX        IDC_WRAP_INDENT,7,7,236,196,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
@@ -1392,9 +1392,9 @@ END
 IDD_PAGESETUP DIALOGEX 5, 5, 356, 260
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Параметры страницы"
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
+FONT 8, "MS Shell Dlg", 420, 0, 0x1
 BEGIN
-    GROUPBOX        "Тип бумаги",IDC_PAGESETUP_PAGER_BOX,8,8,224,56,WS_GROUP
+    GROUPBOX        "Тип бумаги",IDC_PAGESETUP_PAGER_BOX,8,8,234,56,WS_GROUP
     LTEXT           "Раз&мер:",IDC_PAGESETUP_SIZE,16,24,36,8
     COMBOBOX        IDC_PAGESETUP_SOURCE_LIST,64,23,160,160,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_GROUP | WS_TABSTOP
     LTEXT           "&Источник:",IDC_PAGESETUP_SOURCE_LABEL,16,45,36,8
@@ -1419,16 +1419,16 @@ BEGIN
     GROUPBOX        "Цвета печати",IDC_PAGESETUP_PRINT_COLOR_BOX,8,191,224,37,WS_GROUP
     LTEXT           "Ре&жим:",IDC_STATIC,16,207,36,8
     COMBOBOX        IDC_PAGESETUP_COLOR_MODE_LIST,64,206,160,160,CBS_DROPDOWNLIST | WS_VSCROLL | WS_GROUP | WS_TABSTOP
-    GROUPBOX        "Масштаб",IDC_STATIC,240,170,108,58,WS_GROUP
-    LTEXT           "Печать в мас&штабе (от 10% до 500%):",IDC_STATIC,248,188,94,8
-    COMBOBOX        IDC_PAGESETUP_ZOOMLEVEL,290,206,50,120,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Масштаб",IDC_STATIC,250,170,118,58,WS_GROUP
+    LTEXT           "Печать в мас&штабе (от 10% до 500%):",IDC_STATIC,248,195,94,8
+    COMBOBOX        IDC_PAGESETUP_ZOOMLEVEL,300,206,50,120,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,187,239,50,14,WS_GROUP
     PUSHBUTTON      "Отмена",IDCANCEL,243,239,50,14
     PUSHBUTTON      "&Принтер...",IDC_PAGESETUP_PRINTER,299,239,50,14
-    GROUPBOX        "Предпросмотр",IDC_STATIC,240,8,108,157
-    CONTROL         "",IDC_PAGESETUP_PREVIEW_WHITE_RECT,"Static",SS_WHITERECT,254,47,80,80
-    CONTROL         "",IDC_PAGESETUP_PREVIEW_VERT_RECT,"Static",SS_GRAYRECT,334,51,4,80
-    CONTROL         "",IDC_PAGESETUP_PREVIEW_HOR_RECT,"Static",SS_GRAYRECT,262,123,80,4
+    GROUPBOX        "Предпросмотр",IDC_STATIC,250,8,118,157
+    CONTROL         "",IDC_PAGESETUP_PREVIEW_WHITE_RECT,"Static",SS_WHITERECT,264,47,80,80
+    CONTROL         "",IDC_PAGESETUP_PREVIEW_VERT_RECT,"Static",SS_GRAYRECT,374,51,4,80
+    CONTROL         "",IDC_PAGESETUP_PREVIEW_HOR_RECT,"Static",SS_GRAYRECT,272,123,80,4
 END
 
 IDD_FAVORITES DIALOGEX 0, 0, 244, 166
@@ -1498,7 +1498,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     LTEXT           "&Открывающий тег (с атрибутами):",IDC_STATIC,7,7,130,8
     EDITTEXT        IDC_MODIFY_LINE_PREFIX,7,18,250,18,ES_MULTILINE | ES_AUTOVSCROLL | WS_VSCROLL | ES_WANTRETURN
-    LTEXT           "&Закрывающий тег (может быть отредактирован):",IDC_MODIFY_LINE_TIP2,7,41,118,8
+    LTEXT           "&Закрывающий тег (может быть отредактирован):",IDC_MODIFY_LINE_TIP2,7,41,156,8
     EDITTEXT        IDC_MODIFY_LINE_APPEND,7,52,250,18,ES_MULTILINE | ES_AUTOVSCROLL | WS_VSCROLL | ES_WANTRETURN
     DEFPUSHBUTTON   "OK",IDOK,151,77,50,14
     PUSHBUTTON      "Отмена",IDCANCEL,207,77,50,14
@@ -1589,55 +1589,55 @@ BEGIN
     SCROLLBAR       IDC_RESIZEGRIP,7,221,10,10
 END
 
-IDD_ALIGN DIALOGEX 0, 0, 184, 74
+IDD_ALIGN DIALOGEX 0, 0, 200, 74
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Выравнивание строки"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     AUTORADIOBUTTON "&Слева",IDC_ALIGN_LEFT,7,7,31,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "&Справа",IDC_ALIGN_RIGHT,7,19,35,10,WS_TABSTOP
-    AUTORADIOBUTTON "&По центру",IDC_ALIGN_CENTER,7,31,41,10,WS_TABSTOP
-    AUTORADIOBUTTON "По всей &ширине",IDC_ALIGN_JUSTIFY,7,43,40,10,WS_TABSTOP
-    AUTORADIOBUTTON "По всей ширине (в режиме парагра&фа).",IDC_ALIGN_JUSTIFY_PAR,7,55,124,10,WS_TABSTOP
-    DEFPUSHBUTTON   "OK",IDOK,127,7,50,14
-    PUSHBUTTON      "Отмена",IDCANCEL,127,24,50,14
+    AUTORADIOBUTTON "&По центру",IDC_ALIGN_CENTER,7,31,52,10,WS_TABSTOP
+    AUTORADIOBUTTON "По всей &ширине",IDC_ALIGN_JUSTIFY,7,43,60,10,WS_TABSTOP
+    AUTORADIOBUTTON "По всей ширине (в режиме парагра&фа).",IDC_ALIGN_JUSTIFY_PAR,7,55,154,10,WS_TABSTOP
+    DEFPUSHBUTTON   "OK",IDOK,143,7,50,14
+    PUSHBUTTON      "Отмена",IDCANCEL,143,24,50,14
 END
 
-IDD_ZOOMLEVEL DIALOGEX 0, 0, 120, 64
+IDD_ZOOMLEVEL DIALOGEX 0, 0, 132, 64
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Уровень масштаба"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     LTEXT           "Уровень масштаба (от 10% до 500%):",IDC_STATIC,7,7,106,8
-    COMBOBOX        IDC_ZOOMLEVEL,7,19,50,120,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "Применить",IDYES,63,18,50,14
-    DEFPUSHBUTTON   "OK",IDOK,7,43,50,14
-    PUSHBUTTON      "Отмена",IDCANCEL,63,43,50,14
+    COMBOBOX        IDC_ZOOMLEVEL,7,19,50,132,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Применить",IDYES,75,18,50,14
+    DEFPUSHBUTTON   "OK",IDOK,19,43,50,14
+    PUSHBUTTON      "Отмена",IDCANCEL,75,43,50,14
 END
 
-IDD_AUTOCOMPLETION DIALOGEX 0, 0, 456, 195
+IDD_AUTOCOMPLETION DIALOGEX 0, 0, 469, 195
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Настройки автозаполнения"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     GROUPBOX        "",IDC_STATIC,7,7,218,98
-    AUTOCHECKBOX    "Автоматически заполнять слово в момент написания",IDC_AUTO_COMPLETE_WORD,14,6,122,10,WS_TABSTOP
+    AUTOCHECKBOX    "Автоматически заполнять слово в момент написания",IDC_AUTO_COMPLETE_WORD,14,6,166,10,WS_TABSTOP
     LTEXT           "Количество видимых элементов в списке автозаполнения:",IDC_STATIC,14,18,148,10,SS_RIGHT
     EDITTEXT        IDC_AUTOC_VISIBLE_ITEM_COUNT,166,16,50,12,ES_NUMBER | WS_TABSTOP
     LTEXT           "Минимальная длина для слов:",IDC_STATIC,14,34,148,10,SS_RIGHT
     EDITTEXT        IDC_AUTOC_MIN_WORD_LENGTH,166,32,50,12,ES_NUMBER | WS_TABSTOP
     LTEXT           "Минимальная длина для цифр (без префикса):",IDC_STATIC,14,50,148,10,SS_RIGHT
     EDITTEXT        IDC_AUTOC_MIN_NUMBER_LENGTH,166,48,50,12,ES_NUMBER | WS_TABSTOP
-    AUTOCHECKBOX    "Scanning words in current document for",IDC_AUTOC_SCAN_DOCUMENT_WORDS,14,68,150,10,WS_TABSTOP
+    AUTOCHECKBOX    "Распозновать слова в текущем документе в течении",IDC_AUTOC_SCAN_DOCUMENT_WORDS,14,68,150,10,WS_TABSTOP
     EDITTEXT        IDC_AUTOC_SCAN_WORDS_TIMEOUT,166,64,50,12,WS_TABSTOP
     AUTOCHECKBOX    "Использовать только слова из текущего документа",IDC_AUTOC_ONLY_DOCUMENT_WORDS,14,80,180,10,WS_TABSTOP
     AUTOCHECKBOX    "Only trigger auto completion in English IME mode",IDC_AUTOC_ENGLISH_IME_ONLY,14,92,180,10,WS_TABSTOP
 
     GROUPBOX        "Автоматически заполнять слова внутри",IDC_STATIC,7,111,218,26
-    AUTOCHECKBOX    "Комментариев",IDC_AUTO_COMPLETE_INSIDE_COMMONT,14,123,65,10,WS_TABSTOP
-    AUTOCHECKBOX    "Строк",IDC_AUTO_COMPLETE_INSIDE_STRING,85,123,65,10,WS_TABSTOP
-    AUTOCHECKBOX    "Обычного текста",IDC_AUTO_COMPLETE_INSIDE_PLAINTEXT,156,123,65,10,WS_TABSTOP
-    GROUPBOX        "Клавиши, используемые для завершения автозаполнения (используйте Esc для отмены)",IDC_STATIC,7,143,218,44
+    AUTOCHECKBOX    "комментариев",IDC_AUTO_COMPLETE_INSIDE_COMMONT,14,123,65,10,WS_TABSTOP
+    AUTOCHECKBOX    "строк",IDC_AUTO_COMPLETE_INSIDE_STRING,85,123,65,10,WS_TABSTOP
+    AUTOCHECKBOX    "обычного текста",IDC_AUTO_COMPLETE_INSIDE_PLAINTEXT,156,123,65,10,WS_TABSTOP
+    GROUPBOX        "Клавиши для завершения автозаполнения (используйте Esc для отмены)",IDC_STATIC,7,143,231,44
     AUTOCHECKBOX    "Enter",IDC_AUTOC_FILLUP_ENTER,14,155,65,10,WS_TABSTOP
     AUTOCHECKBOX    "Tab",IDC_AUTOC_FILLUP_TAB,85,155,65,10,WS_TABSTOP
     AUTOCHECKBOX    "Пробел",IDC_AUTOC_FILLUP_SPACE,156,155,65,10,WS_TABSTOP
@@ -1648,7 +1648,7 @@ BEGIN
     AUTOCHECKBOX    "Автоматически закрывать HTML и XML теги",IDC_AUTO_CLOSE_TAGS,231,19,200,10,WS_TABSTOP
     AUTOCHECKBOX    "Автоматически вставлять пробел после написания запятой в тех случаях, когда это уместно",IDC_AUTO_INSERT_SPACE_COMMA,231,31,218,10,WS_TABSTOP
     AUTOCHECKBOX    "Insert space after comment marker on toggle line comment.",IDC_AUTO_INSERT_SPACE_COMMENT,231,43,218,10,WS_TABSTOP
-    GROUPBOX        "Auto complete braces and quotes",IDC_STATIC,231,56,218,49
+    GROUPBOX        "Автозаполнение скобок и кавычек",IDC_STATIC,231,56,218,49
     AUTOCHECKBOX    "( )",IDC_AUTO_INSERT_PARENTHESIS,238,68,40,10,WS_TABSTOP
     AUTOCHECKBOX    "{ }",IDC_AUTO_INSERT_BRACE,290,68,40,10,WS_TABSTOP
     AUTOCHECKBOX    "[ ]",IDC_AUTO_INSERT_SQUARE_BRACKET,342,68,40,10,WS_TABSTOP
@@ -1657,39 +1657,39 @@ BEGIN
     AUTOCHECKBOX    "Одинарные кавычки ('').",IDC_AUTO_INSERT_SINGLE_QUOTE,342,80,100,10,WS_TABSTOP
     AUTOCHECKBOX    "Обратные кавычки (``).",IDC_AUTO_INSERT_BACKTICK,238,92,100,10,WS_TABSTOP
 
-    GROUPBOX        "Auto completion scanning word inside:",IDC_STATIC,231,111,218,26
-    AUTOCHECKBOX    "Comment",IDC_SCAN_WORD_INSIDE_COMMONT,238,123,65,10,WS_TABSTOP
-    AUTOCHECKBOX    "String",IDC_SCAN_WORD_INSIDE_STRING,309,123,65,10,WS_TABSTOP
-    AUTOCHECKBOX    "Plain Text",IDC_SCAN_WORD_INSIDE_PLAINTEXT,380,123,65,10,WS_TABSTOP
-    GROUPBOX        "Characters used to toggle line comment for Assembler source",IDC_STATIC,231,143,218,26
-    AUTORADIOBUTTON "Semicolon (;)",IDC_ASM_LINE_COMMENT_SEMICOLON,238,155,60,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "#",IDC_ASM_LINE_COMMENT_SHARP,316,155,22,10,WS_TABSTOP
-    AUTORADIOBUTTON "//",IDC_ASM_LINE_COMMENT_SLASH,362,155,22,10,WS_TABSTOP
-    AUTORADIOBUTTON "@",IDC_ASM_LINE_COMMENT_AT,408,155,22,10,WS_TABSTOP
-    DEFPUSHBUTTON   "OK",IDOK,343,174,50,14
-    PUSHBUTTON      "Отмена",IDCANCEL,399,174,50,14
+    GROUPBOX        "Распозновать слова внутри",IDC_STATIC,231,111,218,26
+    AUTOCHECKBOX    "комментариев",IDC_SCAN_WORD_INSIDE_COMMONT,238,123,65,10,WS_TABSTOP
+    AUTOCHECKBOX    "строк",IDC_SCAN_WORD_INSIDE_STRING,309,123,65,10,WS_TABSTOP
+    AUTOCHECKBOX    "обычного текста",IDC_SCAN_WORD_INSIDE_PLAINTEXT,380,123,65,10,WS_TABSTOP
+    GROUPBOX        "Символы для (рас-/за-)комментирования ассемблированного кода",IDC_STATIC,244,143,218,26
+    AUTORADIOBUTTON "Точка с запятой (;)",IDC_ASM_LINE_COMMENT_SEMICOLON,251,155,60,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "#",IDC_ASM_LINE_COMMENT_SHARP,329,155,22,10,WS_TABSTOP
+    AUTORADIOBUTTON "//",IDC_ASM_LINE_COMMENT_SLASH,385,155,22,10,WS_TABSTOP
+    AUTORADIOBUTTON "@",IDC_ASM_LINE_COMMENT_AT,429,155,22,10,WS_TABSTOP
+    DEFPUSHBUTTON   "OK",IDOK,356,174,50,14
+    PUSHBUTTON      "Отмена",IDCANCEL,412,174,50,14
 END
 
-IDD_AUTOSAVE DIALOGEX 0, 0, 184, 105
+IDD_AUTOSAVE DIALOGEX 0, 0, 200, 105
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Настройки автосохранения"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     AUTOCHECKBOX    "Включить автосохранение",IDC_AUTOSAVE_ENABLE,7,7,170,10,WS_GROUP | WS_TABSTOP
-    LTEXT           "Интервал автосохранения (в секундах):",IDC_STATIC,14,19,120,10,SS_RIGHT
-    EDITTEXT        IDC_AUTOSAVE_PERIOD,140,17,30,12,ES_AUTOHSCROLL
+    LTEXT           "Интервал автосохранения (в секундах):",IDC_STATIC,14,19,136,10,SS_RIGHT
+    EDITTEXT        IDC_AUTOSAVE_PERIOD,156,17,30,12,ES_AUTOHSCROLL
     AUTOCHECKBOX    "Сохранять резервную копию при переходе системы в спящий режим",IDC_AUTOSAVE_SUSPEND,7,31,170,10,WS_GROUP | WS_TABSTOP
     AUTOCHECKBOX    "Сохранять резервную копию при завершении работы системы",IDC_AUTOSAVE_SHUTDOWN,7,43,170,10,WS_TABSTOP
     AUTOCHECKBOX    "Вручную удалять резервные копии",IDC_AUTOSAVE_MANUALLYDELETE,7,55,170,10,WS_TABSTOP
     AUTOCHECKBOX    "Удаленно перезаписывать текущий файл",IDC_AUTOSAVE_OVERWRITECURRENT,7,67,170,10,WS_TABSTOP
     PUSHBUTTON      "Открыть папку",IDC_AUTOSAVE_OPENFOLDER,7,84,60,14
-    DEFPUSHBUTTON   "OK",IDOK,71,84,50,14
-    PUSHBUTTON      "Отмена",IDCANCEL,127,84,50,14
+    DEFPUSHBUTTON   "OK",IDOK,87,84,50,14
+    PUSHBUTTON      "Отмена",IDCANCEL,143,84,50,14
 END
 
-IDD_CSV_OPTIONS DIALOGEX 0, 0, 220, 118
+IDD_CSV_OPTIONS DIALOGEX 0, 0, 238, 118
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Опции CSV"
+CAPTION "Параметры CSV"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     GROUPBOX        "Разделитель",IDC_STATIC,7,7,206,50
@@ -1699,14 +1699,14 @@ BEGIN
     AUTORADIOBUTTON "Точка с запятой (;)",IDC_CSV_DELIMITER_SEMICOLON,14,31,60,10,WS_TABSTOP
     AUTORADIOBUTTON "Пробел",IDC_CSV_DELIMITER_SPACE,84,31,60,10,WS_TABSTOP
     AUTORADIOBUTTON "Другие:",IDC_CSV_DELIMITER_OTHER,154,31,55,10,WS_TABSTOP
-    EDITTEXT        IDC_CSV_DELIMITER_OTHER_TEXT,166,42,40,11,ES_AUTOHSCROLL|WS_TABSTOP
-    AUTOCHECKBOX    "Рассматривать последовательные разделители как один",IDC_CSV_MERGE_DELIMITER,14,43,150,10,WS_TABSTOP
+    EDITTEXT        IDC_CSV_DELIMITER_OTHER_TEXT,184,42,40,11,ES_AUTOHSCROLL|WS_TABSTOP
+    AUTOCHECKBOX    "Рассматривать последовательные разделители как один",IDC_CSV_MERGE_DELIMITER,14,43,164,10,WS_TABSTOP
     GROUPBOX        "Текстовый квалификатор",IDC_STATIC,7,63,206,26
     AUTORADIOBUTTON "Двойная кавычка",IDC_CSV_QUALIFIER_DOUBLE,14,75,60,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "Одинарная кавычка",IDC_CSV_QUALIFIER_SINGLE,84,75,60,10,WS_TABSTOP
     AUTORADIOBUTTON "Нет",IDC_CSV_QUALIFIER_NONE,154,75,55,10,WS_TABSTOP
-    AUTOCHECKBOX    "Экранировать с помощью обратной косой черты",IDC_CSV_BACKSLASH_ESCAPE,14,97,140,10,WS_TABSTOP
-    DEFPUSHBUTTON   "OK",IDOK,163,97,50,14
+    AUTOCHECKBOX    "Экранировать с помощью обратной косой черты",IDC_CSV_BACKSLASH_ESCAPE,14,97,154,10,WS_TABSTOP
+    DEFPUSHBUTTON   "OK",IDOK,181,97,50,14
 END
 
 
@@ -1815,7 +1815,7 @@ BEGIN
     IDT_EDIT_PASTE          "Вставить"
     IDT_EDIT_FIND           "Найти"
     IDT_EDIT_REPLACE        "Заменить"
-    IDT_VIEW_WORDWRAP       "Word Wrap"
+    IDT_VIEW_WORDWRAP       "Перенос слов"
     IDT_VIEW_ZOOMIN         "Увеличить"
     IDT_VIEW_ZOOMOUT        "Уменьшить"
     IDT_VIEW_SCHEME         "Select Scheme"
@@ -1839,11 +1839,11 @@ BEGIN
     IDS_ERR_BROWSE          "No file browser plugin was found.\nThe matepath file browser plugin can be downloaded from\nhttps://github.com/zufuliu/notepad4/releases.\n\nOpen download page?"
     IDS_ERR_MRUDLG          "Нет доступа к выбранному файлу!\nВы хотите удалить его из списка?"
     IDS_ERR_CREATELINK      "Ошибка создания ярлыка на рабочий стол"
-    IDS_ERR_PREVWINDISABLED "Existing Notepad4 window is busy or has an active dialog box.\nWould you like to open another Notepad4 window?"
+    IDS_ERR_PREVWINDISABLED "Существующее окно Notepad4 занято или имеет активное диалоговое окно.\nВы хотите открыть другое окно Notepad4?"
     IDS_SELRECT             "This operation can't be perfomed within a rectangular selection."
     IDS_BUFFERTOOSMALL      "Эта операция не может быть выполнена (строки слишком длинные)."
-    IDS_FIND_WRAPFW         "Reached the end of the document, restarting search at the beginning."
-    IDS_FIND_WRAPRE         "Reached the beginning of the document, restarting search at the end."
+    IDS_FIND_WRAPFW         "Достигнут конец документа, повторяется поиск с начала."
+    IDS_FIND_WRAPRE         "Достигнуто начало документа, повторяется поиск с конца."
     IDS_NOTFOUND            "Указанный текст не найден."
     IDS_REPLCOUNT           "%s occurrences of the specified text have been replaced."
     IDS_ASK_ENCODING        "Switching the file encoding from ANSI to non-ANSI (and vice versa) may replace unsupported text with default characters, and the undo history will be cleared. Continue?"
@@ -1858,35 +1858,35 @@ END
 
 STRINGTABLE
 BEGIN
-	IDS_CMDLINEHELP			"Command Line Help\n\n\
-file\tMust be the last argument, no quoted spaces by default.\n\
-+\tAccept multiple file arguments (with quoted spaces).\n\
--\tAccept single file argument (without quoted spaces).\n\
-…\tEncoding (/ansi, /unicode, /unicodele, /unicodebe,\n\
+	IDS_CMDLINEHELP			"Справка по командной строке\n\n\
+файл\tДолжен быть последним аргументом без кавычек\n\
++\tПринимает несколького аргументов файлов (с кавычками).\n\
+-\tПринимает один аргумент файла (без кавычек).\n\
+…\tКодировка (/ansi, /unicode, /unicodele, /unicodebe,\n\
 …\t/utf8, /utf8sig, /utf8bom, /utf16, /utf16le, /utf16be).\n\
-…\tLine ending mode (/crlf, /lf, /cr).\n\
-/e encoding\tFile source encoding.\n\
-/g line[,column]\tJump to specified position (/g -1 end of file).\n\
-/m text\tMatch specified text (/m- last, /mr regex, /mb backslash).\n\
-/l[o]\tAuto-reload modified files.\n\
-/q\tForce creation of new files without prompt.\n\
-/ro\tOpen file in read only mode.\n\
-/p\tPrint file with default printer and options.\n\
-/s name\tSelect specified syntax scheme.\n\
+…\tРежим окончания строки (/crlf, /lf, /cr).\n\
+/e кодировка\tИсходная кодировка файла.\n\
+/g строка[,символ]\tПерейти к заданной позиции (/g -1 конец файла).\n\
+/m текст\tНайти соответствующий текст (/m- последний, /mr regex, /mb обратная косая черта).\n\
+/l[o]\tАвтоматически перезагрузить измененный файл.\n\
+/q\tПринудительно создать файл без приглашения\n\
+/ro\tОткрыть файл в режиме только для чтения.\n\
+/p\tНапечатать файл на принтер по умолчанию.\n\
+/s name\tВыбрать указанную схему синтаксиса\n\
 /d\tSelect Text File scheme.\n\
 /h\tSelect Web Source Code scheme.\n\
 /x\tSelect XML Document scheme.\n\
 /c\tOpen new window and paste clipboard contents.\n\
 /b\tOpen new paste board to collect clipboard entries.\n\
-/n\tAlways open a new window (/ns single file instance).\n\
-/r\tReuse window (/rs single file instance).\n\
-/p<flag>\tSet window position and size (/p0, /ps, /pf,l,t,r,b,m).\n\
-/t title\tSet window title.\n\
-/i\tStart as tray icon.\n\
-/o\tKeep window on top.\n\
-/f path\tSpecify ini-file (/f0 no ini-file).\n\
-/u\tLaunch with elevated privileges (run as Administrator).\n\
-/z\tSkip next (usable for registry-based Notepad replacement)."
+/n\tВсегда открывать в новом окне (/ns одиночный экземпляр окна).\n\
+/r\tПереиспользовать окно (/rs одиночный экземпляр окна).\n\
+/p<flag>\tЗадать положение и размер окна (/p0, /ps, /pf,l,t,r,b,m).\n\
+/t title\tЗадать заголовок окна.\n\
+/i\tОткрыть из лотка.\n\
+/o\tПрикрепит поверх всех окон.\n\
+/f path\tУказать ini-файл (/f0 без ini-файл).\n\
+/u\tЗапустить с повышенными привилегиями (от имени администратора).\n\
+/z\tПропустить следующее (полезно для замены Блокнота через реестр)."
 END
 
 STRINGTABLE
@@ -2064,10 +2064,10 @@ Style properties can be copied using copy and paste or drag and drop.\r\n\
 \r\n\
 The ""Preview"" button will not apply any changes."
 
-	IDS_WRAP_INDENT_OPTIONS			"No wrap indent|Wrap indent by 1 character|Wrap indent by 2 characters|Wrap indent by 1 level|Wrap indent by 2 levels|Wrap indent same as first subline|Wrap indent 1 level more than first subline|Wrap indent 2 levels more than first subline"
+	IDS_WRAP_INDENT_OPTIONS			"Без отступа переноса|Переносить отступ на один символ|Переносить отступ на два символа|Переносить отступ на один уровень|Переносить отступ на два уровня|Wrap indent same as first subline|Wrap indent 1 level more than first subline|Wrap indent 2 levels more than first subline"
 	IDS_WRAP_SYMBOL_BEFORE_OPTIONS	"No visual indicators before wrap|Show visual indicators before wrap (near text)|Show visual indicators before wrap (near borders)"
 	IDS_WRAP_SYMBOL_AFTER_OPTIONS	"No visual indicators after wrap|Show visual indicators after wrap (near text)|Show visual indicators after wrap (near borders)|Show visual indicators after wrap (in line number margin)"
-	IDS_WRAP_MODE_OPTIONS			"No wrap|Wrap text between words|Wrap text between any characters|Wrap text on whitespace|Automatic word wrap"
+	IDS_WRAP_MODE_OPTIONS			"Не переносить|Переносить текст между словами|Переносить между символами|Переносить по пробелам|Переносить текст автоматически"
 END
 
 #if NP2_ENABLE_LOCALIZE_LEXER_NAME
