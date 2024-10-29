@@ -1204,7 +1204,7 @@ BEGIN
     AUTOCHECKBOX    "Открыть ANSI-файлы (с неизвестных кодировок) в режиме UTF-&8",IDC_ANSIASUTF8,7,72,225,10,WS_TABSTOP
     AUTOCHECKBOX    "Oткрыть файлы ANSI-арта (*.&nfo, *.diz) в режиме DOS-437",IDC_NFOASOEM,7,82,195,10,WS_TABSTOP
     AUTOCHECKBOX    "Не определять &теги кодировок",IDC_ENCODINGFROMFILEVARS,7,92,195,10,WS_TABSTOP
-    DEFPUSHBUTTON   "OK",IDOK,96,148,50,14
+    DEFPUSHBUTTON   "OK",IDOK,96,108,50,14
     PUSHBUTTON      "Отмена",IDCANCEL,192,108,50,14
 END
 
