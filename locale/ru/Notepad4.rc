@@ -1319,7 +1319,7 @@ BEGIN
     PUSHBUTTON      "Отмена",IDCANCEL,411,217,50,14
     GROUPBOX        "Информация",IDC_INFO_GROUPBOX,181,7,280,122
     ICON            IDI_STYLES,IDC_STATIC,189,19,20,20
-    LTEXT           "Customize Schemes",IDC_TITLE,220,25,200,12
+    LTEXT           "Настроика схем",IDC_TITLE,220,25,200,12
     EDITTEXT        IDC_STYLEEDIT_HELP,186,40,272,86,ES_READONLY | ES_MULTILINE | NOT WS_BORDER | NOT WS_TABSTOP
     LTEXT           "Ассоциированные &расширения файлов:|Настройки &стилей:",IDC_STYLELABELS,315,230,152,8,NOT WS_VISIBLE
     LTEXT           "Встроенное по умолчанию значение:",IDC_STYLELABEL_DEFAULT,181,162,160,8
@@ -1736,7 +1736,7 @@ BEGIN
     IDS_TITLEEXCERPT        """%s"""
     IDS_READONLY_FILE       "(файл только для чтения)"
     IDS_READONLY_MODE       "(режим только для чтения)"
-    IDS_STATUSITEM_FORMAT   "Стр. %s / %s \nСтб. %s / %s \nСимв. %s / %s \nВыдл. %s / %s \nСтр. выдл. %s \nНайд. %s "
+    IDS_STATUSITEM_FORMAT   "Стр. %s / %s \nСтб. %s / %s \nСимв. %s / %s \nВыдл. %s / %s \nВыдл. %s \nНайд. %s "
     IDS_ZERO_LENGTH_MATCH   "^ Zero-Length Match"
     IDS_LOADFILE            "Загрузка ""%s""..."
     IDS_SAVEFILE            "Сохранение ""%s""..."
@@ -1818,8 +1818,8 @@ BEGIN
     IDT_VIEW_WORDWRAP       "Перенос слов"
     IDT_VIEW_ZOOMIN         "Увеличить"
     IDT_VIEW_ZOOMOUT        "Уменьшить"
-    IDT_VIEW_SCHEME         "Select Scheme"
-    IDT_VIEW_SCHEMECONFIG   "Customize Schemes"
+    IDT_VIEW_SCHEME         "Выбрать схему"
+    IDT_VIEW_SCHEMECONFIG   "Настроить схемы"
     IDT_FILE_EXIT           "Выход"
     IDT_FILE_SAVEAS         "Сохранить как"
     IDT_FILE_SAVECOPY       "Сохранить копию"
@@ -2023,9 +2023,9 @@ BEGIN
 	IDS_ENCODING_ISO2022_CNT		"Традиционно-китайская (ISO 2022);ISO-2022-CN(T)"				// Chinese
 	IDS_ENCODING_CNS				"Традиционно-китайская (CNS);CNS"								// Chinese
 
-	IDS_SELRECT_CURRENT_ENCODING	"Select current file &encoding:"
-	IDS_SELRECT_RELOAD_ENCODING		"Select source &encoding to reload file:"
-	IDS_SELRECT_DEFAULT_ENCODING	"Select default &encoding for new file:"
+	IDS_SELRECT_CURRENT_ENCODING	"Выберите &кодировку текущего файла:"
+	IDS_SELRECT_RELOAD_ENCODING		"Выберите исходную &кодировку, чтобы перезагрузить файл:"
+	IDS_SELRECT_DEFAULT_ENCODING	"Выберите &кодировку по умолчанию для нового файла:"
 
 	IDS_ENCODINGGROUP_UNICODE		"Unicode"
 	IDS_ENCODINGGROUP_WESTERNEURO	"Западная Европа"
@@ -2050,9 +2050,9 @@ BEGIN
 	IDS_EOLMODENAME_LF				"Unix/macOS (LF)"
 	IDS_EOLMODENAME_CR				"Классическая Mac OS (CR)"
 
-	IDS_CONFIG_THEME_TITLE_DEFAULT	"Customize Schemes - Default Theme"
-	IDS_CONFIG_THEME_TITLE_DARK		"Customize Schemes - Dark Theme"
-	IDS_FAVORITE_SCHEMES_TITLE		"Favorite Schemes"
+	IDS_CONFIG_THEME_TITLE_DEFAULT	"Настройка схем - Тема по уолчанию"
+	IDS_CONFIG_THEME_TITLE_DARK		"Настройка схем - Темная тема"
+	IDS_FAVORITE_SCHEMES_TITLE		"Избранные схемы"
 	IDS_CUSTOMIZE_SCHEMES_HELP		"Расширения файлов должны быть разделены точкой с запятой (;)\r\n\
 \r\n\
 Style format:\r\n\
@@ -2064,7 +2064,7 @@ Style properties can be copied using copy and paste or drag and drop.\r\n\
 \r\n\
 The ""Preview"" button will not apply any changes."
 
-	IDS_WRAP_INDENT_OPTIONS			"Без отступа переноса|Переносить отступ на один символ|Переносить отступ на два символа|Переносить отступ на один уровень|Переносить отступ на два уровня|Wrap indent same as first subline|Wrap indent 1 level more than first subline|Wrap indent 2 levels more than first subline"
+	IDS_WRAP_INDENT_OPTIONS			"Не переносить с отступом|Переносить отступ на один символ|Переносить отступ на два символа|Переносить отступ на один уровень|Переносить отступ на два уровня|Wrap indent same as first subline|Wrap indent 1 level more than first subline|Wrap indent 2 levels more than first subline"
 	IDS_WRAP_SYMBOL_BEFORE_OPTIONS	"No visual indicators before wrap|Show visual indicators before wrap (near text)|Show visual indicators before wrap (near borders)"
 	IDS_WRAP_SYMBOL_AFTER_OPTIONS	"No visual indicators after wrap|Show visual indicators after wrap (near text)|Show visual indicators after wrap (near borders)|Show visual indicators after wrap (in line number margin)"
 	IDS_WRAP_MODE_OPTIONS			"Не переносить|Переносить текст между словами|Переносить между символами|Переносить по пробелам|Переносить текст автоматически"
