@@ -1213,9 +1213,9 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "Окончания строки"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "&Режим окончания строки по умолчанию:",IDC_STATIC,7,7,134,8
-    COMBOBOX        IDC_EOLMODELIST,7,20,142,81,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    AUTOCHECKBOX    "Показывать предупреждения о непоследовательных окончаниях строк во время загрузки",IDC_WARNINCONSISTENTEOLS,7,40,200,10,WS_TABSTOP
+    LTEXT           "&Режим окончания строки по умолчанию:",IDC_STATIC,7,7,116,8
+    COMBOBOX        IDC_EOLMODELIST,7,20,118,81,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    AUTOCHECKBOX    "Показывать предупреждения о непоследовательных окончаниях строк во время загрузки",IDC_WARNINCONSISTENTEOLS,7,40,186,10,WS_TABSTOP
     AUTOCHECKBOX    "&Ensure consistent line endings when saving.",IDC_CONSISTENTEOLS,7,52,182,10,WS_TABSTOP
     AUTOCHECKBOX    "&Strip trailing blanks when saving.",IDC_AUTOSTRIPBLANKS,7,64,173,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,163,7,50,14
