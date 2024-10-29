@@ -1125,7 +1125,7 @@ BEGIN
     AUTOCHECKBOX    "&Transform backslashes",IDC_FINDTRANSFORMBS,7,126,97,10,WS_TABSTOP
     AUTOCHECKBOX    "&Don't wrap around",IDC_NOWRAP,132,66,79,10,WS_TABSTOP
     AUTOCHECKBOX    "C&lose after replace",IDC_FINDCLOSE,132,78,90,10,WS_TABSTOP
-    AUTOCHECKBOX    "W&ildcard search",IDC_WILDCARDSEARCH,132,90,74,10,WS_TABSTOP
+    AUTOCHECKBOX    "W&ildcard search",IDC_WILDCARDSEARCH,162,90,74,10,WS_TABSTOP
     DEFPUSHBUTTON   "Найти &далее",IDOK,243,7,60,14
     PUSHBUTTON      "Найти на&зад",IDC_FINDPREV,243,24,60,14
     PUSHBUTTON      "Найти в&се",IDC_FINDALL,243,41,60,14
@@ -1135,15 +1135,15 @@ BEGIN
     CONTROL         "<a>(?)</a>",IDC_REGEXPHELP,"SysLink",0x0,118,102,12,10
     CONTROL         "<a>(?)</a>",IDC_BACKSLASHHELP,"SysLink",0x0,118,126,12,10
     CONTROL         "<a>(?)</a>",IDC_WILDCARDHELP,"SysLink",0x0,208,90,12,10
-    CONTROL         "<a>Очистить историю</a>",IDC_CLEAR_FIND,"SysLink",WS_TABSTOP,193,6,66,10
-    CONTROL         "<a>Очистить историю</a>",IDC_CLEAR_REPLACE,"SysLink",WS_TABSTOP,193,35,66,10
+    CONTROL         "<a>Очистить историю</a>",IDC_CLEAR_FIND,"SysLink",WS_TABSTOP,163,6,66,10
+    CONTROL         "<a>Очистить историю</a>",IDC_CLEAR_REPLACE,"SysLink",WS_TABSTOP,163,35,66,10
     AUTOCHECKBOX    "Transparent on losing focus",IDC_TRANSPARENT,7,138,124,10,WS_TABSTOP
     AUTOCHECKBOX    "Boo&kmark matched line",IDC_FINDALLBOOKMARK,132,102,90,10,WS_TABSTOP
     AUTOCHECKBOX    "Use Boost Regex",IDC_FIND_CXXREGEX,132,114,90,10,WS_TABSTOP
     AUTOCHECKBOX    "Использовать моно&ширный шрифт",IDC_USEMONOSPACEDFONT,132,126,98,10,WS_TABSTOP
     CONTROL         "<a>Перейти к поиску (Ctrl+F)</a>",IDC_TOGGLEFINDREPLACE, "SysLink",WS_TABSTOP,140,169,80,10
-    CONTROL         "<a>Сохранить позицию</a>",IDC_SAVEPOSITION,"SysLink",WS_TABSTOP,243,112,60,10
-    CONTROL         "<a>Сбросить позицию</a>",IDC_RESETPOSITION,"SysLink",WS_TABSTOP,243,112,60,10
+    CONTROL         "<a>Сохранить позицию</a>",IDC_SAVEPOSITION,"SysLink",WS_TABSTOP,243,112,90,10
+    CONTROL         "<a>Сбросить позицию</a>",IDC_RESETPOSITION,"SysLink",WS_TABSTOP,243,142,90,10
     SCROLLBAR       IDC_RESIZEGRIP2,230,138,10,10
 END
 
