@@ -1130,8 +1130,8 @@ BEGIN
     PUSHBUTTON      "Найти на&зад",IDC_FINDPREV,263,24,60,14
     PUSHBUTTON      "Найти в&се",IDC_FINDALL,263,41,60,14
     PUSHBUTTON      "За&менить",IDC_REPLACE,263,58,60,14
-    PUSHBUTTON      "Заменить &все",IDC_REPLACEALL,243,75,60,14
-    PUSHBUTTON      "При вы&делении",IDC_REPLACEINSEL,243,92,60,14
+    PUSHBUTTON      "Заменить &все",IDC_REPLACEALL,263,75,60,14
+    PUSHBUTTON      "При вы&делении",IDC_REPLACEINSEL,263,92,60,14
     CONTROL         "<a>(?)</a>",IDC_REGEXPHELP,"SysLink",0x0,118,102,12,10
     CONTROL         "<a>(?)</a>",IDC_BACKSLASHHELP,"SysLink",0x0,118,126,12,10
     CONTROL         "<a>(?)</a>",IDC_WILDCARDHELP,"SysLink",0x0,248,90,12,10
