@@ -1300,7 +1300,7 @@ END
 IDD_STYLECONFIG DIALOGEX 0, 0, 418, 238
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Настройка схем"
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
+FONT 8, "MS Shell Dlg", 460, 0, 0x1
 BEGIN
     CONTROL         "",IDC_STYLELIST,"SysTreeView32",TVS_FULLROWSELECT | TVS_SHOWSELALWAYS | TVS_HASBUTTONS | TVS_LINESATROOT | WS_BORDER | WS_HSCROLL | WS_TABSTOP,7,7,164,224
     LTEXT           "",IDC_STYLELABEL,181,132,280,8
@@ -1687,12 +1687,12 @@ BEGIN
     PUSHBUTTON      "Отмена",IDCANCEL,167,84,50,14
 END
 
-IDD_CSV_OPTIONS DIALOGEX 0, 0, 238, 118
+IDD_CSV_OPTIONS DIALOGEX 0, 0, 248, 118
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Параметры CSV"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    GROUPBOX        "Разделитель",IDC_STATIC,7,7,206,50
+    GROUPBOX        "Разделитель",IDC_STATIC,7,7,226,50
     AUTORADIOBUTTON "Запятая (,)",IDC_CSV_DELIMITER_COMMA,14,19,60,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "Табуляция",IDC_CSV_DELIMITER_TAB,84,19,60,10,WS_TABSTOP
     AUTORADIOBUTTON "Прямая черта (|)",IDC_CSV_DELIMITER_PIPE,154,19,55,10,WS_TABSTOP
@@ -1705,8 +1705,8 @@ BEGIN
     AUTORADIOBUTTON "Двойная кавычка",IDC_CSV_QUALIFIER_DOUBLE,14,75,60,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "Одинарная кавычка",IDC_CSV_QUALIFIER_SINGLE,84,75,60,10,WS_TABSTOP
     AUTORADIOBUTTON "Нет",IDC_CSV_QUALIFIER_NONE,154,75,55,10,WS_TABSTOP
-    AUTOCHECKBOX    "Экранировать с помощью обратной косой черты",IDC_CSV_BACKSLASH_ESCAPE,14,97,154,10,WS_TABSTOP
-    DEFPUSHBUTTON   "OK",IDOK,181,97,50,14
+    AUTOCHECKBOX    "Экранировать с помощью обратной косой черты",IDC_CSV_BACKSLASH_ESCAPE,14,97,174,10,WS_TABSTOP
+    DEFPUSHBUTTON   "OK",IDOK,191,97,50,14
 END
 
 
@@ -1911,11 +1911,11 @@ END
 STRINGTABLE
 BEGIN
     IDS_READONLY_SAVE       """%s"" является файлом только для чтения. Сохранить другой файл?"
-    IDS_FILECHANGENOTIFY    "The current file has been modified by an external program. Reload?"
-    IDS_FILECHANGENOTIFY2   "The current file has been deleted. Save now?"
-    IDS_SAVEDSETTINGS       "The current program settings have been saved."
-    IDS_CREATEINI_FAIL      "Error creating configuration file."
-    IDS_WRITEINI_FAIL       "Error writing settings to configuration file."
+    IDS_FILECHANGENOTIFY    "Текущий файл изменен внешней программой. Перезагрузить?"
+    IDS_FILECHANGENOTIFY2   "Текущий файл удален. Сохранить сейчас?"
+    IDS_SAVEDSETTINGS       "Текущие настройки программы сохранены."
+    IDS_CREATEINI_FAIL      "Ошибка создания конфигурационного файла."
+    IDS_WRITEINI_FAIL       "Ошибка записи настроек в конфигурационный файл."
     IDS_SETTINGSNOTSAVED    "No existing configuration file was found.\nTo keep your style modifications, save settings now (F7) or go back to scheme configuration (Ctrl+F12) and export your styles."
     IDS_EXPORT_FAIL         "Error exporting style settings to ""%s""."
 END
@@ -2055,14 +2055,14 @@ BEGIN
 	IDS_FAVORITE_SCHEMES_TITLE		"Избранные схемы"
 	IDS_CUSTOMIZE_SCHEMES_HELP		"Расширения файлов должны быть разделены точкой с запятой (;)\r\n\
 \r\n\
-Style format:\r\n\
+Формат стиля:\r\n\
 \tfont:Name; size:[+|-]nn.mm; weight:nnn; bold; italic;\r\n\
 \tunderline; strike; overline; charset:dd; locale:Name;\r\n\
 \tfore:#RRGGBB; back:#RRGGBB; alpha:aa; outline:aa; eolfilled;\r\n\
 \r\n\
-Style properties can be copied using copy and paste or drag and drop.\r\n\
+Свойства стиля могут быть скопированы путем копирования и вставки или перетаксивания.\r\n\
 \r\n\
-The ""Preview"" button will not apply any changes."
+Кнопка ""Предпросмотр"" не будет применять любые изменения."
 
 	IDS_WRAP_INDENT_OPTIONS			"Не переносить с отступом|Переносить отступ на один символ|Переносить отступ на два символа|Переносить отступ на один уровень|Переносить отступ на два уровня|Wrap indent same as first subline|Wrap indent 1 level more than first subline|Wrap indent 2 levels more than first subline"
 	IDS_WRAP_SYMBOL_BEFORE_OPTIONS	"No visual indicators before wrap|Show visual indicators before wrap (near text)|Show visual indicators before wrap (near borders)"
