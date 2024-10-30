@@ -116,22 +116,21 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 				// can end with a special character indicating the type of the value
 				// held or returned.
 				bool skipType = false;
-				if (!vbScriptSyntax && IsTypeCharacter(sc.ch)) {
-					sc.Forward();	// Skip it
-					skipType = true;
-				}
-				if (sc.ch == ']') { // bracketed [keyword] identifier
+				if (sc.ch == ']' || (!vbScriptSyntax && IsTypeCharacter(sc.ch))) {
+					skipType = sc.ch != ']';
+					++visibleChars; // bracketed [keyword] identifier
 					sc.Forward();
 				}
 				char s[64];
 				sc.GetCurrentLowered(s, sizeof(s));
 				const Sci_Position len = sc.LengthCurrent();
-				if (skipType) {
+				if (skipType && len == 4) { // for type character after `rem`
 					s[len - 1] = '\0';
 				}
-					if (StrEqual(s, "rem")) {
-						sc.ChangeState(SCE_B_COMMENT);
-					} else {
+				if (StrEqual(s, "rem")) {
+					sc.ChangeState(SCE_B_COMMENT);
+				} else {
+					if (!skipType) {
 						if ((isIfThenPreprocessor && StrEqual(s, "then")) || (isEndPreprocessor
 							&& StrEqualsAny(s, "if", "region", "externalsource"))) {
 							sc.ChangeState(SCE_B_PREPROCESSOR);
@@ -152,9 +151,9 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 						} else if (keywords6.InList(s)) {
 							sc.ChangeState(SCE_B_CONSTANT);
 						}
-
-						sc.SetState(SCE_B_DEFAULT);
 					}
+					sc.SetState(SCE_B_DEFAULT);
+				}
 			}
 			break;
 
