@@ -132,14 +132,24 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 					sc.ChangeState(SCE_B_COMMENT);
 				} else {
 					if (!skipType) {
-						if ((isIfThenPreprocessor && StrEqual(s, "then")) || (isEndPreprocessor
+						const int chNext = sc.GetLineNextChar();
+						if (s[0] == '[') {
+							if (visibleChars == len && chNext == ':') {
+								sc.ChangeState(SCE_B_LABEL);
+							}
+						} else if ((isIfThenPreprocessor && StrEqual(s, "then")) || (isEndPreprocessor
 							&& StrEqualsAny(s, "if", "region", "externalsource"))) {
 							sc.ChangeState(SCE_B_PREPROCESSOR);
 						} else if (keywords.InList(s)) {
 							sc.ChangeState(SCE_B_KEYWORD);
+							if (StrEqual(s, "if")) {
+								if (language == Language::VBNET && visibleChars > 2 && chNext == '(') {
+									sc.ChangeState(SCE_B_KEYWORD3); // If operator
+								}
+							}
 						} else if (keywords2.InList(s)) {
 							sc.ChangeState(SCE_B_KEYWORD2);
-						} else if (visibleChars == len && sc.GetLineNextChar() == ':') {
+						} else if (visibleChars == len && chNext == ':') {
 							sc.ChangeState(SCE_B_LABEL);
 						} else if (keywords3.InList(s)) {
 							sc.ChangeState(SCE_B_KEYWORD3);
