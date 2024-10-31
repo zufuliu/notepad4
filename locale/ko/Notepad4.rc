@@ -552,6 +552,11 @@ BEGIN
 			MENUITEM "M4 매크로(&M)",									IDM_LEXER_M4
 		END
 		//POPUP "SQL 방언(&Q)"
+		POPUP "&Visual Basic"
+		BEGIN
+			MENUITEM "&Visual Basic",				IDM_LEXER_VBNET
+			MENUITEM "&Office VBA",					IDM_LEXER_VBA
+		END
 		POPUP "XML 문서(&X)"
 		BEGIN
 			MENUITEM "XML 문서(&X)",										IDM_LEXER_XML

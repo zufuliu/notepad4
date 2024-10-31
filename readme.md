@@ -138,7 +138,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [Texinfo](tools/lang/Texinfo.texi), up to Texinfo 7.1.
 	* [TOML File](https://toml.io/)
 	* [TypeScript](tools/lang/TypeScript.ts), up to TypeScript 5.4.
-	* Visual Basic, VB6, VB.NET
+	* Visual Basic, VB6, VBA, VB.NET
 	* VBScript
 	* [VHDL](tools/lang/VHDL.vhdl), up to VHDL 2019.
 	* Verilog HDL, up to [Verilog](tools/lang/Verilog.v) 2005 and [SystemVerilog](tools/lang/SystemVerilog.sv) 2017.

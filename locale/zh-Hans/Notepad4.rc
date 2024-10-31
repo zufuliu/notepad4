@@ -552,6 +552,11 @@ BEGIN
 			MENUITEM "M4 宏(&M)",					IDM_LEXER_M4
 		END
 		//POPUP "S&QL Dialect"
+		POPUP "&Visual Basic"
+		BEGIN
+			MENUITEM "&Visual Basic",				IDM_LEXER_VBNET
+			MENUITEM "&Office VBA",					IDM_LEXER_VBA
+		END
 		POPUP "&XML 文档"
 		BEGIN
 			MENUITEM "XML 文档(&X)",				IDM_LEXER_XML

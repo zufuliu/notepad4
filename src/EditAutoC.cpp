@@ -1778,7 +1778,7 @@ void EditCompleteWord(int iCondition, bool autoInsert) noexcept {
 static bool CanAutoCloseSingleQuote(int chPrev, int iCurrentStyle) noexcept {
 	const int iLexer = pLexCurrent->iLexer;
 	if (iCurrentStyle == 0) {
-		if (iLexer == SCLEX_VISUALBASIC || iLexer == SCLEX_VBSCRIPT) {
+		if (iLexer == SCLEX_VISUALBASIC) {
 			return false; // comment
 		}
 	} else {

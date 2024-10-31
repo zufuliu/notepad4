@@ -4541,52 +4541,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 #endif
 
-	// Text File
-	case IDM_LEXER_TEXTFILE:
-	case IDM_LEXER_2NDTEXTFILE:
-	case IDM_LEXER_CSV:
-	// CSS Style Sheet
-	case IDM_LEXER_CSS:
-	case IDM_LEXER_SCSS:
-	case IDM_LEXER_LESS:
-	case IDM_LEXER_HSS:
-	// JavaScript
-	case IDM_LEXER_JAVASCRIPT:
-	case IDM_LEXER_JAVASCRIPT_JSX:
-	case IDM_LEXER_TYPESCRIPT:
-	case IDM_LEXER_TYPESCRIPT_TSX:
-	// Web Source Code
-	case IDM_LEXER_WEB:
-	case IDM_LEXER_PHP:
-	case IDM_LEXER_JSP:
-	case IDM_LEXER_ASPX_CS:
-	case IDM_LEXER_ASPX_VB:
-	case IDM_LEXER_ASP_VBS:
-	case IDM_LEXER_ASP_JS:
-	case IDM_LEXER_APACHE:
-	// Markdown
-	case IDM_LEXER_MARKDOWN_GITHUB:
-	case IDM_LEXER_MARKDOWN_GITLAB:
-	case IDM_LEXER_MARKDOWN_PANDOC:
-	// Math
-	case IDM_LEXER_MATHEMATICA:
-	case IDM_LEXER_MATLAB:
-	case IDM_LEXER_OCTAVE:
-	case IDM_LEXER_SCILAB:
-	// Shell Script
-	case IDM_LEXER_BASH:
-	case IDM_LEXER_CSHELL:
-	case IDM_LEXER_M4:
-	// XML Document
-	case IDM_LEXER_XML:
-	case IDM_LEXER_XSD:
-	case IDM_LEXER_XSLT:
-	case IDM_LEXER_DTD:
-	case IDM_LEXER_PROPERTY_LIST:
-	//case IDM_LEXER_SVG:
-		Style_SetLexerByLangIndex(LOWORD(wParam));
-		break;
-
 	case CMD_TIMESTAMPS:
 		EditUpdateTimestampMatchTemplate(hwndEdit);
 		break;
@@ -4691,6 +4645,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	default: {
+		if (LOWORD(wParam) >= IDM_LEXER_TEXTFILE && LOWORD(wParam) < IDM_LEXER_LEXER_COUNT) {
+			Style_SetLexerByLangIndex(LOWORD(wParam));
+			break;
+		}
+
 		const UINT index = LOWORD(wParam) - IDM_RECENT_HISTORY_START;
 		if (index < MRU_MAXITEMS) {
 			LPCWSTR path = mruFile.pszItems[index];

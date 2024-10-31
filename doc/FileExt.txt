@@ -588,7 +588,7 @@ Vim Script
 
 Visual Basic
 	vb
-	bas				BASIC Source Code File
+	bas				VBA Source Code File
 	frm				Visual Basic Text Form
 	cls				Program Class File
 	ctl				Visual Basic User Control Object File

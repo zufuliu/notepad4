@@ -552,6 +552,11 @@ BEGIN
 			MENUITEM "Macro M4",					IDM_LEXER_M4
 		END
 		//POPUP "Langage SQL"
+		POPUP "&Visual Basic"
+		BEGIN
+			MENUITEM "&Visual Basic",				IDM_LEXER_VBNET
+			MENUITEM "&Office VBA",					IDM_LEXER_VBA
+		END
 		POPUP "Document XML"
 		BEGIN
 			MENUITEM "Document XML",				IDM_LEXER_XML

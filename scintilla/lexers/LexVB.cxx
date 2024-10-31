@@ -1,10 +1,6 @@
 // Scintilla source code edit control
 /** @file LexVB.cxx
- ** Lexer for Visual Basic (include VB6) and VBScript.
-
- ** Changes by Zufu Liu <zufuliu@gmail.com> 2011/08
- **    - Updated ColouriseVBDoc, updated number format checking, added preprocessor handling
- **    - rewrited FoldVBDoc fucntion, fixed folding bugs, added some properties.
+ ** Lexer for Visual Basic and VBScript.
  **/
 // Copyright 1998-2005 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
@@ -34,10 +30,24 @@ namespace {
 // Internal state, highlighted as number
 #define SCE_B_FILENUMBER	(SCE_B_DEFAULT + 100)
 
+enum class Language {
+	VBNET,
+	VBA,
+	VBScript,
+};
+
 #define LexCharAt(pos)	styler.SafeGetCharAt(pos)
 
+// https://learn.microsoft.com/en-us/dotnet/visual-basic/reference/language-specification/lexical-grammar#type-characters
+// https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/data-type-summary
 constexpr bool IsTypeCharacter(int ch) noexcept {
-	return ch == '%' || ch == '&' || ch == '@' || ch == '!' || ch == '#' || ch == '$';
+	return ch == '%' // Integer
+		|| ch == '&' // Long
+		|| ch == '^' // VBA LongLong
+		|| ch == '@' // Decimal, VBA Currency
+		|| ch == '!' // Single
+		|| ch == '#' // Double
+		|| ch == '$';// String
 }
 
 constexpr bool IsVBNumberPrefix(int ch) noexcept {
@@ -62,22 +72,12 @@ constexpr bool IsVBNumber(int ch, int chPrev) noexcept {
 		|| (ch == '&' && IsHexDigit(chPrev));
 }
 
-/*const char * const vbWordListDesc[] = {
-	"Keyword",
-	"Type keyword"
-	"Unused keyword",
-	"Preprocessor",
-	"Attribute",
-	"Constant"
-	0
-};*/
-
 constexpr bool IsSpaceEquiv(int state) noexcept {
 	// including SCE_B_DEFAULT, SCE_B_COMMENT
 	return (state <= SCE_B_COMMENT);
 }
 
-void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler, bool vbScriptSyntax) {
+void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const WordList &keywords = keywordLists[0];
 	const WordList &keywords2 = keywordLists[1];
 	const WordList &keywords3 = keywordLists[2];
@@ -91,6 +91,7 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 	int stylePrevNonWhite = SCE_B_DEFAULT;
 	bool isIfThenPreprocessor = false;
 	bool isEndPreprocessor = false;
+	const Language language = static_cast<Language>(styler.GetPropertyInt("lexer.lang"));
 
 	StyleContext sc(startPos, length, initStyle, styler);
 	if (startPos != 0 && IsSpaceEquiv(initStyle)) {
@@ -116,7 +117,7 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 				// can end with a special character indicating the type of the value
 				// held or returned.
 				bool skipType = false;
-				if (sc.ch == ']' || (!vbScriptSyntax && IsTypeCharacter(sc.ch))) {
+				if (sc.ch == ']' || (language != Language::VBScript && IsTypeCharacter(sc.ch))) {
 					skipType = sc.ch != ']';
 					++visibleChars; // bracketed [keyword] identifier
 					sc.Forward();
@@ -142,7 +143,7 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 							sc.ChangeState(SCE_B_LABEL);
 						} else if (keywords3.InList(s)) {
 							sc.ChangeState(SCE_B_KEYWORD3);
-						} else if (!vbScriptSyntax && s[0] == '#' && keywords4.InList(s + 1)) {
+						} else if (language != Language::VBScript && s[0] == '#' && keywords4.InList(s + 1)) {
 							sc.ChangeState(SCE_B_PREPROCESSOR);
 							isIfThenPreprocessor = StrEqualsAny(s, "#if", "#elseif");
 							isEndPreprocessor = StrEqual(s, "#end");
@@ -164,9 +165,8 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 			break;
 
 		case SCE_B_STRING:
-			// VB doubles quotes to preserve them, so just end this string
-			// state now as a following quote will start again
-			if (sc.atLineStart) {
+			if (sc.atLineStart && language != Language::VBNET) {
+				// multiline since VB.NET 14
 				sc.SetState(SCE_B_DEFAULT);
 			} else if (sc.ch == '\"') {
 				if (sc.chNext == '\"') {
@@ -505,14 +505,6 @@ void FoldVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexer
 	}
 }
 
-void ColouriseVBNetDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
-	ColouriseVBDoc(startPos, length, initStyle, keywordLists, styler, false);
-}
-void ColouriseVBScriptDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
-	ColouriseVBDoc(startPos, length, initStyle, keywordLists, styler, true);
 }
 
-}
-
-extern const LexerModule lmVisualBasic(SCLEX_VISUALBASIC, ColouriseVBNetDoc, "vb", FoldVBDoc);
-extern const LexerModule lmVBScript(SCLEX_VBSCRIPT, ColouriseVBScriptDoc, "vbscript", FoldVBDoc);
+extern const LexerModule lmVisualBasic(SCLEX_VISUALBASIC, ColouriseVBDoc, "vb", FoldVBDoc);
