@@ -72,12 +72,12 @@ constexpr bool IsFileNameChar(int ch) noexcept {
 constexpr bool IsLabelStart(int ch) noexcept {
 	// ! is not allowed with SetLocal EnableDelayedExpansion
 	//return !AnyOf(ch, '\r', '\n', ' ', '\t', '|', '&', '%', '!', ',', ';', '=', '+', '<', '>');
-	return IsIdentifierChar(ch) || ch == '.' || ch == '-';
+	return IsIdentifierCharEx(ch) || ch == '.' || ch == '-';
 }
 
 constexpr bool IsLabelChar(int ch) noexcept {
 	//return !AnyOf(ch, '\r', '\n', ' ', '\t', '|', '&', '%', '!', ',', ';', '=');
-	return IsIdentifierChar(ch) || ch == '.' || ch == '-';
+	return IsIdentifierCharEx(ch) || ch == '.' || ch == '-';
 }
 
 constexpr bool IsVariableChar(int ch, char quote, Command command, int parenCount) noexcept {
@@ -373,7 +373,7 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			// https://ss64.com/nt/goto.html
 			if (sc.atLineStart) {
 				sc.SetState(SCE_BAT_DEFAULT);
-			} else if (IsGraphic(sc.ch) && !(IsAGraphic(sc.chPrev) && IsLabelChar(sc.ch))) {
+			} else if (IsGraphic(sc.ch) && !(IsGraphic(sc.chPrev) && IsLabelChar(sc.ch))) {
 				if (outerStyle == SCE_BAT_NOT_BATCH) {
 					sc.ChangeState(SCE_BAT_NOT_BATCH);
 					labelLine = false;
