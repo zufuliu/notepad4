@@ -1045,6 +1045,7 @@ LexerConfigMap = {
 		'line_comment_string': "'",
 		'comment_style_marker': 'SCE_VB_COMMENTLINE',
 		'default_fold_level': ['function'],
+		'default_fold_ignore_inner': 'SCE_VB_FUNCTION_DEFINITION',
 		'format_specifier_style': 'SCE_VB_FORMAT_SPECIFIER',
 		'escape_char_start': NoEscapeCharacter,
 		'escape_char_style': 'SCE_VB_ESCAPECHAR',
@@ -1088,7 +1089,8 @@ LexerConfigMap = {
 	'NP2LEX_VISUALBASIC': {
 		'line_comment_string': "'",
 		'comment_style_marker': 'SCE_VB_COMMENTLINE',
-		'default_fold_level': ['class', 'function'],
+		'default_fold_level': ['namespace', 'class', 'function'],
+		'default_fold_ignore_inner': 'SCE_VB_FUNCTION_DEFINITION',
 		'format_specifier_style': 'SCE_VB_FORMAT_SPECIFIER',
 		'escape_char_start': NoEscapeCharacter,
 		'escape_char_style': 'SCE_VB_ESCAPECHAR',

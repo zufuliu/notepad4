@@ -77,6 +77,7 @@ static EDITSTYLE Styles_VB[] = {
 	{ SCE_VB_KEYWORD2, NP2StyleX_TypeKeyword, L"fore:#0000FF" },
 	{ MULTI_STYLE(SCE_VB_PREPROCESSOR, SCE_VB_PREPROCESSOR_WORD, 0, 0), NP2StyleX_Preprocessor, L"fore:#FF8000" },
 	{ SCE_VB_ATTRIBUTE, NP2StyleX_Attribute, L"fore:#FF8000" },
+	{ SCE_VB_FUNCTION_DEFINITION, NP2StyleX_FunctionDefinition, L"bold; fore:#A46000" },
 	{ SCE_VB_CONSTANT, NP2StyleX_Constant, L"fore:#B000B0" },
 	{ SCE_VB_COMMENTLINE, NP2StyleX_Comment, L"fore:#608060" },
 	{ MULTI_STYLE(SCE_VB_STRING, SCE_VB_INTERPOLATED_STRING, 0, 0), NP2StyleX_String, L"fore:#008000" },
@@ -92,8 +93,8 @@ EDITLEXER lexVisualBasic = {
 		LexerAttr_NoBlockComment |
 		LexerAttr_CppPreprocessor,
 		TAB_WIDTH_4, INDENT_WIDTH_4,
-		(1 << 0) | (1 << 1), // class, function
-		0,
+		(1 << 0) | (1 << 1) | (1 << 2), // namespace, class, function
+		SCE_VB_FUNCTION_DEFINITION,
 		'\0', SCE_VB_ESCAPECHAR, SCE_VB_FORMAT_SPECIFIER,
 		0,
 		0, SCE_VB_COMMENTLINE,

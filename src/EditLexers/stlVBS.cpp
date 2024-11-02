@@ -59,6 +59,7 @@ static EDITSTYLE Styles_VBS[] = {
 	EDITSTYLE_DEFAULT,
 	{ MULTI_STYLE(SCE_VB_KEYWORD, SCE_VB_KEYWORD3, 0, 0), NP2StyleX_Keyword, L"fore:#0000FF" },
 	{ SCE_VB_KEYWORD2, NP2StyleX_TypeKeyword, L"fore:#0000FF" },
+	{ SCE_VB_FUNCTION_DEFINITION, NP2StyleX_FunctionDefinition, L"bold; fore:#A46000" },
 	{ SCE_VB_CONSTANT, NP2StyleX_Constant, L"fore:#B000B0" },
 	{ SCE_VB_COMMENTLINE, NP2StyleX_Comment, L"fore:#608060" },
 	{ SCE_VB_STRING, NP2StyleX_String, L"fore:#008000" },
@@ -74,7 +75,7 @@ EDITLEXER lexVBScript = {
 		LexerAttr_NoBlockComment,
 		TAB_WIDTH_4, INDENT_WIDTH_4,
 		(1 << 0), // function
-		0,
+		SCE_VB_FUNCTION_DEFINITION,
 		'\0', SCE_VB_ESCAPECHAR, SCE_VB_FORMAT_SPECIFIER,
 		0,
 		0, SCE_VB_COMMENTLINE,

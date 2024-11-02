@@ -27,9 +27,6 @@ using namespace Lexilla;
 
 namespace {
 
-// Internal state, highlighted as number
-#define SCE_VB_FILENUMBER	(SCE_VB_LABEL + 1)
-
 enum class Language {
 	VBNET,
 	VBA,
@@ -38,7 +35,9 @@ enum class Language {
 
 enum class KeywordType {
 	None,
+	End,
 	AccessModifier,
+	Function,
 };
 
 enum {
@@ -169,6 +168,12 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 									if (visibleChars == len || kwType == KeywordType::AccessModifier) {
 										lineState = VBLineType_VB6TypeLine;
 									}
+								} else if (StrEqual(s, "end")) {
+									kwType = KeywordType::End;
+								} else if (StrEqualsAny(s, "sub", "function")) {
+									if (kwType != KeywordType::End) {
+										kwType = KeywordType::Function;
+									}
 								} else if (StrEqualsAny(s, "public", "protected", "private", "friend")) {
 									kwType = KeywordType::AccessModifier;
 								}
@@ -187,6 +192,8 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 							sc.ChangeState(SCE_VB_ATTRIBUTE);
 						} else if (keywords6.InList(s)) {
 							sc.ChangeState(SCE_VB_CONSTANT);
+						} else if (kwType == KeywordType::Function) {
+							sc.ChangeState(SCE_VB_FUNCTION_DEFINITION);
 						}
 						stylePrevNonWhite = sc.state;
 						if (sc.state != SCE_VB_KEYWORD) {
