@@ -36,8 +36,17 @@ enum class Language {
 	VBScript,
 };
 
+enum class KeywordType {
+	None,
+	AccessModifier,
+};
+
 enum {
-	VBLineStateLineContinuation = 1 << 1,
+	VBLineType_CommentLine = 1,
+	VBLineType_DimLine = 2,
+	VBLineType_ConstLine = 3,
+	VBLineType_VB6TypeLine = 4,
+	VBLineStateLineContinuation = 1 << 3,
 };
 
 #define LexCharAt(pos)	styler.SafeGetCharAt(pos)
@@ -88,9 +97,11 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 	const WordList &keywords5 = keywordLists[4];
 	const WordList &keywords6 = keywordLists[5];
 
+	KeywordType kwType = KeywordType::None;
 	int lineState = 0;
 	int fileNbDigits = 0;
 	int visibleChars = 0;
+	int chBefore = 0;
 	int chPrevNonWhite = 0;
 	int stylePrevNonWhite = SCE_VB_DEFAULT;
 	bool isIfThenPreprocessor = false;
@@ -143,10 +154,23 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 							&& StrEqualsAny(s, "if", "region", "externalsource"))) {
 							sc.ChangeState(SCE_VB_PREPROCESSOR);
 						} else if (keywords.InList(s)) {
-							sc.ChangeState(SCE_VB_KEYWORD);
-							if (StrEqual(s, "if")) {
-								if (language == Language::VBNET && visibleChars > 2 && chNext == '(') {
-									sc.ChangeState(SCE_VB_KEYWORD3); // If operator
+							sc.ChangeState(SCE_VB_KEYWORD3);
+							if (chBefore != '.') {
+								sc.ChangeState(SCE_VB_KEYWORD);
+								if (StrEqual(s, "if")) {
+									if (language == Language::VBNET && visibleChars > 2 && chNext == '(') {
+										sc.ChangeState(SCE_VB_KEYWORD3); // If operator
+									}
+								} else if (StrEqual(s, "dim")) {
+									lineState = VBLineType_DimLine;
+								} else if (StrEqual(s, "const")) {
+									lineState = VBLineType_ConstLine;
+								} else if (StrEqual(s, "type")) {
+									if (visibleChars == len || kwType == KeywordType::AccessModifier) {
+										lineState = VBLineType_VB6TypeLine;
+									}
+								} else if (StrEqualsAny(s, "public", "protected", "private", "friend")) {
+									kwType = KeywordType::AccessModifier;
 								}
 							}
 						} else if (keywords2.InList(s)) {
@@ -165,6 +189,9 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 							sc.ChangeState(SCE_VB_CONSTANT);
 						}
 						stylePrevNonWhite = sc.state;
+						if (sc.state != SCE_VB_KEYWORD) {
+							kwType = KeywordType::None;
+						}
 					}
 					sc.SetState(SCE_VB_DEFAULT);
 				}
@@ -196,7 +223,7 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 		case SCE_VB_COMMENTLINE:
 			if (sc.atLineStart) {
 				if (lineState == VBLineStateLineContinuation) {
-					lineState = 0;
+					lineState = VBLineType_CommentLine;
 				} else {
 					sc.SetState(SCE_VB_DEFAULT);
 				}
@@ -244,6 +271,9 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 		if (sc.state == SCE_VB_DEFAULT) {
 			if (sc.ch == '\'') {
 				sc.SetState(SCE_VB_COMMENTLINE);
+				if (visibleChars == 0) {
+					lineState = VBLineType_CommentLine;
+				}
 			} else if (sc.ch == '\"') {
 				sc.SetState(SCE_VB_STRING);
 			} else if (sc.ch == '#') {
@@ -257,9 +287,10 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 				sc.Forward();
 			} else if (IsNumberStart(sc.ch, sc.chNext)) {
 				sc.SetState(SCE_VB_NUMBER);
-			} else if (sc.ch == '_' && sc.chPrev <= ' ' && sc.chNext <= ' ') {
+			} else if (sc.ch == '_' && sc.chNext <= ' '/* && (sc.chPrev <= ' ' || language == Language::VBScript)*/) {
 				sc.SetState(SCE_VB_LINE_CONTINUATION);
 			} else if (IsIdentifierStartEx(sc.ch) || sc.ch == '[') { // bracketed [keyword] identifier
+				chBefore = chPrevNonWhite;
 				sc.SetState(SCE_VB_IDENTIFIER);
 			} else if (IsAGraphic(sc.ch)) {
 				sc.SetState(SCE_VB_OPERATOR);
@@ -275,9 +306,11 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 		}
 		if (sc.atLineEnd) {
 			styler.SetLineState(sc.currentLine, lineState);
+			lineState &= VBLineStateLineContinuation;
 			isIfThenPreprocessor = false;
 			isEndPreprocessor = false;
 			visibleChars = 0;
+			kwType = KeywordType::None;
 		}
 		sc.Forward();
 	}
@@ -285,10 +318,6 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 	sc.Complete();
 }
 
-bool VBLineStartsWith(LexAccessor &styler, Sci_Line line, const char* word) noexcept {
-	const Sci_Position pos = LexLineSkipSpaceTab(styler, line);
-	return (styler.StyleAt(pos) == SCE_VB_KEYWORD) && (styler.MatchLowerCase(pos, word));
-}
 bool VBMatchNextWord(LexAccessor &styler, Sci_Position startPos, Sci_Position endPos, const char *word) noexcept {
 	const Sci_Position pos = LexSkipSpaceTab(styler, startPos, endPos);
 	return isspacechar(LexCharAt(pos + static_cast<int>(strlen(word))))
@@ -316,55 +345,37 @@ int IsVBProperty(LexAccessor &styler, Sci_Line line, Sci_Position startPos) noex
 	}
 	return false;
 }
-bool IsVBSome(LexAccessor &styler, Sci_Line line, int kind) noexcept {
-	if (line < 0) {
-		return false;
-	}
-	const Sci_Position startPos = styler.LineStart(line);
-	const Sci_Position endPos = styler.LineStart(line + 1) - 1;
-	Sci_Position pos = LexSkipSpaceTab(styler, startPos, endPos);
-	int stl = styler.StyleAt(pos);
-	if (stl == SCE_VB_KEYWORD) {
-		if (styler.MatchLowerCase(pos, "public")) {
-			pos += 6;
-		} else if (styler.MatchLowerCase(pos, "private")) {
-			pos += 7;
-		} else if (styler.MatchLowerCase(pos, "protected")) {
-			pos += 9;
-			pos = LexSkipSpaceTab(styler, endPos, pos);
-		}
-		if (styler.MatchLowerCase(pos, "friend"))
-			pos += 6;
-		pos = LexSkipSpaceTab(styler, pos, endPos);
-		stl = styler.StyleAt(pos);
-		if (stl == SCE_VB_KEYWORD) {
-			return (kind == 1 && isspacechar(LexCharAt(pos + 4)) && styler.MatchLowerCase(pos, "type"))
-				|| (kind == 2 && isspacechar(LexCharAt(pos + 5)) && styler.MatchLowerCase(pos, "const"));
-		}
-	}
-	return false;
-}
+
 #define VBMatch(word)			styler.MatchLowerCase(i, word)
 #define VBMatchNext(pos, word)	VBMatchNextWord(styler, pos, endPos, word)
-#define IsCommentLine(line)		IsLexCommentLine(styler, line, SCE_VB_COMMENTLINE)
-#define IsDimLine(line)			VBLineStartsWith(styler, line, "dim")
-#define IsConstLine(line)		IsVBSome(styler, line, 2)
-#define IsVB6Type(line)			IsVBSome(styler, line, 1)
+
+struct FoldLineState {
+	int lineState;
+	constexpr explicit FoldLineState(int lineState_) noexcept : lineState(lineState_) {}
+	int GetLineType() const noexcept {
+		return lineState & 3;
+	}
+};
 
 void FoldVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList /*keywordLists*/, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + length;
-	int visibleChars = 0;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
+	FoldLineState foldPrev(0);
 	int levelCurrent = SC_FOLDLEVELBASE;
-	if (lineCurrent > 0)
+	if (lineCurrent > 0) {
 		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
-	int levelNext = levelCurrent;
+		foldPrev = FoldLineState(styler.GetLineState(lineCurrent - 1));
+	}
 
-	char ch = '\0';
-	char chNext = styler[startPos];
+	int levelNext = levelCurrent;
+	FoldLineState foldCurrent(styler.GetLineState(lineCurrent));
+	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
+	lineStartNext = sci::min(lineStartNext, endPos);
+
 	int style = initStyle;
 	int styleNext = styler.StyleAt(startPos);
 
+	int visibleChars = 0;
 	int numBegin = 0;		// nested Begin ... End, found in VB6 Form
 	bool isEnd = false;		// End {Function Sub}{If}{Class Module Structure Interface Operator Enum}{Property Event}{Type}
 	bool isInterface = false;// {Property Function Sub Event Interface Class Structure }
@@ -376,31 +387,15 @@ void FoldVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexer
 	static Sci_Line lineIf = 0;
 	static Sci_Line lineThen = 0;
 
-	for (Sci_PositionU i = startPos; i < endPos; i++) {
-		const char chPrev = ch;
-		ch = chNext;
-		chNext = styler.SafeGetCharAt(i + 1);
+	while (startPos < endPos) {
+		const Sci_PositionU i = startPos;
 		const int stylePrev = style;
 		style = styleNext;
-		styleNext = styler.StyleAt(i + 1);
-		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
-		const bool atLineBegin = (visibleChars == 0) && !atEOL;
+		const char ch = styler[startPos];
+		styleNext = styler.StyleAt(++startPos);
 
-		if (atEOL) {
-			if (IsCommentLine(lineCurrent)) {
-				levelNext += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
-			}
-			else if (IsDimLine(lineCurrent)) {
-				levelNext += IsDimLine(lineCurrent + 1) - IsDimLine(lineCurrent - 1);
-			}
-			else if (IsConstLine(lineCurrent)) {
-				levelNext += IsConstLine(lineCurrent + 1) - IsConstLine(lineCurrent - 1);
-			}
-		}
-
-		if (style == SCE_VB_KEYWORD && stylePrev != SCE_VB_KEYWORD
-			&& !(chPrev == '.' || chPrev == '[')) { // not a member, not bracketed [keyword] identifier
-			if (atLineBegin && (VBMatch("for") || (VBMatch("do") && isspacechar(LexCharAt(i + 2))) // not Double
+		if (style == SCE_VB_KEYWORD && stylePrev != SCE_VB_KEYWORD) { // not a member, not bracketed [keyword] identifier
+			if (visibleChars == 0 && (VBMatch("for") || (VBMatch("do") && isspacechar(LexCharAt(i + 2))) // not Double
 				|| VBMatch("while") || (VBMatch("try") && isspacechar(LexCharAt(i + 3))) // not TryCast
 				|| (VBMatch("select") && VBMatchNext(i + 6, "case")) // Select Case
 				|| (VBMatch("with") && isspacechar(LexCharAt(i + 4))) // not WithEvents, not With {...}
@@ -409,7 +404,7 @@ void FoldVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexer
 				|| (isCustom && (VBMatch("raiseevent") || VBMatch("addhandler") || VBMatch("removehandler")))
 				)) {
 				levelNext++;
-			} else if (atLineBegin && (VBMatch("next") || VBMatch("loop") || VBMatch("wend"))) {
+			} else if (visibleChars == 0 && (VBMatch("next") || VBMatch("loop") || VBMatch("wend"))) {
 				levelNext--;
 			} else if (VBMatch("exit") && (VBMatchNext(i + 4, "function") || VBMatchNext(i + 4, "sub")
 				|| VBMatchNext(i + 4, "property")
@@ -498,38 +493,52 @@ void FoldVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexer
 					isEnd = false; isCustom = false;
 				} else 				levelNext++;
 			} else if (VBMatch("type") && isspacechar(LexCharAt(i + 4))) { // not TypeOf, VB6: [...] Type ... End Type
-				if (!isEnd && IsVB6Type(lineCurrent))
+				if (!isEnd && (foldCurrent.lineState & VBLineType_VB6TypeLine) != 0)
 					levelNext++;
 				if (isEnd)	isEnd = false;
 			}
 		}
-
-		if (style == SCE_VB_PREPROCESSOR) {
+		else if (style == SCE_VB_PREPROCESSOR) {
 			if (VBMatch("#if") || VBMatch("#region") || VBMatch("#externalsource"))
 				levelNext++;
 			else if (VBMatch("#end"))
 				levelNext--;
 		}
-
-		if (style == SCE_VB_OPERATOR) {
+		else if (style == SCE_VB_OPERATOR) {
 			// Anonymous With { ... }
 			if (AnyOf<'{', '}'>(ch)) {
 				levelNext += ('{' + '}')/2 - ch;
 			}
 		}
 
-		if (visibleChars == 0 && !isspacechar(ch))
+		if (visibleChars == 0 && !isspacechar(ch)) {
 			visibleChars++;
-
-		if (atEOL || (i == endPos - 1)) {
+		}
+		if (startPos == lineStartNext) {
+			const FoldLineState foldNext(styler.GetLineState(lineCurrent + 1));
 			levelNext = sci::max(levelNext, SC_FOLDLEVELBASE);
+			if (foldCurrent.GetLineType() != 0) {
+				if (foldCurrent.GetLineType() != foldPrev.GetLineType()) {
+					levelNext++;
+				}
+				if (foldCurrent.GetLineType() != foldNext.GetLineType()) {
+					levelNext--;
+				}
+			}
+
 			const int levelUse = levelCurrent;
 			int lev = levelUse | (levelNext << 16);
-			if (levelUse < levelNext)
+			if (levelUse < levelNext) {
 				lev |= SC_FOLDLEVELHEADERFLAG;
+			}
 			styler.SetLevel(lineCurrent, lev);
+
 			lineCurrent++;
+			lineStartNext = styler.LineStart(lineCurrent + 1);
+			lineStartNext = sci::min(lineStartNext, endPos);
 			levelCurrent = levelNext;
+			foldPrev = foldCurrent;
+			foldCurrent = foldNext;
 			visibleChars = 0;
 		}
 	}

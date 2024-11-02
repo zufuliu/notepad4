@@ -57,7 +57,7 @@ nullptr
 
 static EDITSTYLE Styles_VBS[] = {
 	EDITSTYLE_DEFAULT,
-	{ SCE_VB_KEYWORD, NP2StyleX_Keyword, L"fore:#0000FF" },
+	{ MULTI_STYLE(SCE_VB_KEYWORD, SCE_VB_KEYWORD3, 0, 0), NP2StyleX_Keyword, L"fore:#0000FF" },
 	{ SCE_VB_KEYWORD2, NP2StyleX_TypeKeyword, L"fore:#0000FF" },
 	{ SCE_VB_CONSTANT, NP2StyleX_Constant, L"fore:#B000B0" },
 	{ SCE_VB_COMMENTLINE, NP2StyleX_Comment, L"fore:#608060" },
