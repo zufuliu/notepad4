@@ -1043,13 +1043,15 @@ LexerConfigMap = {
 
 	'NP2LEX_VBSCRIPT': {
 		'line_comment_string': "'",
-		'comment_style_marker': 'SCE_B_COMMENT',
+		'comment_style_marker': 'SCE_VB_COMMENTLINE',
 		'default_fold_level': ['function'],
+		'format_specifier_style': 'SCE_VB_FORMAT_SPECIFIER',
 		'escape_char_start': NoEscapeCharacter,
-		'none_quote_style': 'SCE_B_COMMENT',
-		'operator_style': ['SCE_B_OPERATOR'],
-		#'auto_ident_word_style': ['SCE_B_KEYWORD'],
-		'string_style_range': ['SCE_B_STRING', 'SCE_B_STRING'],
+		'escape_char_style': 'SCE_VB_ESCAPECHAR',
+		'none_quote_style': 'SCE_VB_COMMENTLINE',
+		'operator_style': ['SCE_VB_OPERATOR', 'SCE_VB_OPERATOR2'],
+		#'auto_ident_word_style': ['SCE_VB_KEYWORD'],
+		'string_style_range': ['SCE_VB_STRING', 'SCE_VB_PLACEHOLDER'],
 	},
 	'NP2LEX_VERILOG': {
 		'cpp_style_comment': True,
@@ -1085,15 +1087,16 @@ LexerConfigMap = {
 	},
 	'NP2LEX_VISUALBASIC': {
 		'line_comment_string': "'",
-		'comment_style_marker': 'SCE_B_COMMENT',
+		'comment_style_marker': 'SCE_VB_COMMENTLINE',
 		'default_fold_level': ['class', 'function'],
+		'format_specifier_style': 'SCE_VB_FORMAT_SPECIFIER',
 		'escape_char_start': NoEscapeCharacter,
-		'none_quote_style': 'SCE_B_COMMENT',
-		'operator_style': ['SCE_B_OPERATOR'],
+		'escape_char_style': 'SCE_VB_ESCAPECHAR',
+		'none_quote_style': 'SCE_VB_COMMENTLINE',
+		'operator_style': ['SCE_VB_OPERATOR', 'SCE_VB_OPERATOR2'],
 		'cpp_preprocessor': True,
-		#'autoc_extra_keyword': 'kwNETDoc',
-		#'auto_ident_word_style': ['SCE_B_KEYWORD', 'SCE_B_PREPROCESSOR'],
-		'string_style_range': ['SCE_B_STRING', 'SCE_B_STRING'],
+		#'auto_ident_word_style': ['SCE_VB_KEYWORD', 'SCE_VB_PREPROCESSOR'],
+		'string_style_range': ['SCE_VB_STRING', 'SCE_VB_PLACEHOLDER'],
 	},
 
 	'NP2LEX_WASM': {

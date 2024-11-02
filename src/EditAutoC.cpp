@@ -1437,7 +1437,7 @@ static AddWordResult AutoC_AddSpecWord(WordList &pWList, int iCurrentStyle, int 
 		break;
 
 	case NP2LEX_VISUALBASIC:
-		if (ch == '#' && iCurrentStyle == SCE_B_DEFAULT) {
+		if (ch == '#' && iCurrentStyle == SCE_VB_DEFAULT) {
 			pWList.AddList(pLex->pKeyWords->pszKeyWords[VBKeywordIndex_Preprocessor]);
 			return AddWordResult_Finish;
 		}

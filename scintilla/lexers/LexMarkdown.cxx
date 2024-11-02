@@ -1742,7 +1742,6 @@ void MarkdownLexer::HighlightInlineText(int visibleChars) {
 	if (handled || current != sc.state) {
 		SaveOuterStyle(current);
 	} else if (visibleChars != 0
-		&& (current == SCE_MARKDOWN_DEFAULT || (current >= SCE_MARKDOWN_EM_ASTERISK && current <= SCE_MARKDOWN_STRIKEOUT))
 		&& ((sc.ch == '\\' && IsEOLChar(sc.chNext)) || (sc.Match(' ', ' ') && IsEOLChar(sc.GetRelative(2))))) {
 		sc.SetState(SCE_MARKDOWN_HARD_LINE_BREAK);
 		if (sc.ch == ' ') {

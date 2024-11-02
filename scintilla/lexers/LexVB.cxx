@@ -28,7 +28,7 @@ using namespace Lexilla;
 namespace {
 
 // Internal state, highlighted as number
-#define SCE_B_FILENUMBER	(SCE_B_DEFAULT + 100)
+#define SCE_VB_FILENUMBER	(SCE_VB_LABEL + 1)
 
 enum class Language {
 	VBNET,
@@ -58,7 +58,7 @@ constexpr bool IsVBNumberPrefix(int ch) noexcept {
 
 constexpr bool PreferStringConcat(int chPrevNonWhite, int stylePrevNonWhite) noexcept {
 	return chPrevNonWhite == '\"' || chPrevNonWhite == ')' || chPrevNonWhite == ']'
-		|| (stylePrevNonWhite != SCE_B_KEYWORD && IsIdentifierChar(chPrevNonWhite));
+		|| (stylePrevNonWhite != SCE_VB_KEYWORD && IsIdentifierChar(chPrevNonWhite));
 }
 
 constexpr bool IsVBNumber(int ch, int chPrev) noexcept {
@@ -73,8 +73,7 @@ constexpr bool IsVBNumber(int ch, int chPrev) noexcept {
 }
 
 constexpr bool IsSpaceEquiv(int state) noexcept {
-	// including SCE_B_DEFAULT, SCE_B_COMMENT
-	return (state <= SCE_B_COMMENT);
+	return state <= SCE_VB_LINE_CONTINUATION;
 }
 
 void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
@@ -88,31 +87,26 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 	int fileNbDigits = 0;
 	int visibleChars = 0;
 	int chPrevNonWhite = 0;
-	int stylePrevNonWhite = SCE_B_DEFAULT;
+	int stylePrevNonWhite = SCE_VB_DEFAULT;
 	bool isIfThenPreprocessor = false;
 	bool isEndPreprocessor = false;
 	const Language language = static_cast<Language>(styler.GetPropertyInt("lexer.lang"));
 
 	StyleContext sc(startPos, length, initStyle, styler);
 	if (startPos != 0 && IsSpaceEquiv(initStyle)) {
-		LookbackNonWhite(styler, startPos, SCE_B_COMMENT, chPrevNonWhite, stylePrevNonWhite);
+		LookbackNonWhite(styler, startPos, SCE_VB_LINE_CONTINUATION, chPrevNonWhite, stylePrevNonWhite);
 	}
 
-	for (; sc.More(); sc.Forward()) {
-
-		if (sc.atLineStart) {
-			isIfThenPreprocessor = false;
-			isEndPreprocessor = false;
-			visibleChars = 0;
-		}
+	while (sc.More()) {
 
 		switch (sc.state) {
-		case SCE_B_OPERATOR:
-			sc.SetState(SCE_B_DEFAULT);
+		case SCE_VB_OPERATOR:
+		case SCE_VB_LINE_CONTINUATION:
+			sc.SetState(SCE_VB_DEFAULT);
 			break;
 
-		case SCE_B_IDENTIFIER:
-			if (!iswordstart(sc.ch)) {
+		case SCE_VB_IDENTIFIER:
+			if (!IsIdentifierCharEx(sc.ch)) {
 				// In Basic (except VBScript), a variable name or a function name
 				// can end with a special character indicating the type of the value
 				// held or returned.
@@ -129,55 +123,55 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 					s[len - 1] = '\0';
 				}
 				if (StrEqual(s, "rem")) {
-					sc.ChangeState(SCE_B_COMMENT);
+					sc.ChangeState(SCE_VB_COMMENTLINE);
 				} else {
 					if (!skipType) {
 						const int chNext = sc.GetLineNextChar();
 						if (s[0] == '[') {
 							if (visibleChars == len && chNext == ':') {
-								sc.ChangeState(SCE_B_LABEL);
+								sc.ChangeState(SCE_VB_LABEL);
 							}
 						} else if ((isIfThenPreprocessor && StrEqual(s, "then")) || (isEndPreprocessor
 							&& StrEqualsAny(s, "if", "region", "externalsource"))) {
-							sc.ChangeState(SCE_B_PREPROCESSOR);
+							sc.ChangeState(SCE_VB_PREPROCESSOR);
 						} else if (keywords.InList(s)) {
-							sc.ChangeState(SCE_B_KEYWORD);
+							sc.ChangeState(SCE_VB_KEYWORD);
 							if (StrEqual(s, "if")) {
 								if (language == Language::VBNET && visibleChars > 2 && chNext == '(') {
-									sc.ChangeState(SCE_B_KEYWORD3); // If operator
+									sc.ChangeState(SCE_VB_KEYWORD3); // If operator
 								}
 							}
 						} else if (keywords2.InList(s)) {
-							sc.ChangeState(SCE_B_KEYWORD2);
+							sc.ChangeState(SCE_VB_KEYWORD2);
 						} else if (visibleChars == len && chNext == ':') {
-							sc.ChangeState(SCE_B_LABEL);
+							sc.ChangeState(SCE_VB_LABEL);
 						} else if (keywords3.InList(s)) {
-							sc.ChangeState(SCE_B_KEYWORD3);
+							sc.ChangeState(SCE_VB_KEYWORD3);
 						} else if (language != Language::VBScript && s[0] == '#' && keywords4.InList(s + 1)) {
-							sc.ChangeState(SCE_B_PREPROCESSOR);
+							sc.ChangeState(SCE_VB_PREPROCESSOR);
 							isIfThenPreprocessor = StrEqualsAny(s, "#if", "#elseif");
 							isEndPreprocessor = StrEqual(s, "#end");
 						} else if (keywords5.InList(s)) {
-							sc.ChangeState(SCE_B_KEYWORD4);
+							sc.ChangeState(SCE_VB_ATTRIBUTE);
 						} else if (keywords6.InList(s)) {
-							sc.ChangeState(SCE_B_CONSTANT);
+							sc.ChangeState(SCE_VB_CONSTANT);
 						}
 					}
-					sc.SetState(SCE_B_DEFAULT);
+					sc.SetState(SCE_VB_DEFAULT);
 				}
 			}
 			break;
 
-		case SCE_B_NUMBER:
+		case SCE_VB_NUMBER:
 			if (!IsVBNumber(sc.ch, sc.chPrev)) {
-				sc.SetState(SCE_B_DEFAULT);
+				sc.SetState(SCE_VB_DEFAULT);
 			}
 			break;
 
-		case SCE_B_STRING:
+		case SCE_VB_STRING:
 			if (sc.atLineStart && language != Language::VBNET) {
 				// multiline since VB.NET 14
-				sc.SetState(SCE_B_DEFAULT);
+				sc.SetState(SCE_VB_DEFAULT);
 			} else if (sc.ch == '\"') {
 				if (sc.chNext == '\"') {
 					sc.Forward();
@@ -185,71 +179,71 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 					if (sc.chNext == 'c' || sc.chNext == 'C' || sc.chNext == '$') {
 						sc.Forward();
 					}
-					sc.ForwardSetState(SCE_B_DEFAULT);
+					sc.ForwardSetState(SCE_VB_DEFAULT);
 				}
 			}
 			break;
 
-		case SCE_B_COMMENT:
+		case SCE_VB_COMMENTLINE:
 			if (sc.atLineStart) {
-				sc.SetState(SCE_B_DEFAULT);
+				sc.SetState(SCE_VB_DEFAULT);
 			}
 			break;
 
-		case SCE_B_FILENUMBER:
+		case SCE_VB_FILENUMBER:
 			if (IsADigit(sc.ch)) {
 				fileNbDigits++;
 				if (fileNbDigits > 3) {
-					sc.ChangeState(SCE_B_DATE);
+					sc.ChangeState(SCE_VB_DATE);
 				}
 			} else if (sc.ch == '\r' || sc.ch == '\n' || sc.ch == ',') {
 				// Regular uses: Close #1; Put #1, ...; Get #1, ... etc.
 				// Too bad if date is format #27, Oct, 2003# or something like that...
 				// Use regular number state
-				sc.ChangeState(SCE_B_NUMBER);
-				sc.SetState(SCE_B_DEFAULT);
+				sc.ChangeState(SCE_VB_NUMBER);
+				sc.SetState(SCE_VB_DEFAULT);
 			} else if (sc.ch == '#') {
-				sc.ChangeState(SCE_B_DATE);
-				sc.ForwardSetState(SCE_B_DEFAULT);
+				sc.ChangeState(SCE_VB_DATE);
+				sc.ForwardSetState(SCE_VB_DEFAULT);
 			} else {
-				sc.ChangeState(SCE_B_DATE);
+				sc.ChangeState(SCE_VB_DATE);
 			}
-			if (sc.state != SCE_B_FILENUMBER) {
+			if (sc.state != SCE_VB_FILENUMBER) {
 				fileNbDigits = 0;
 			}
 			break;
 
-		case SCE_B_DATE:
+		case SCE_VB_DATE:
 			if (sc.atLineStart) {
-				sc.SetState(SCE_B_DEFAULT);
+				sc.SetState(SCE_VB_DEFAULT);
 			} else if (sc.ch == '#') {
-				sc.ForwardSetState(SCE_B_DEFAULT);
+				sc.ForwardSetState(SCE_VB_DEFAULT);
 			}
 			break;
 		}
 
-		if (sc.state == SCE_B_DEFAULT) {
+		if (sc.state == SCE_VB_DEFAULT) {
 			if (sc.ch == '\'') {
-				sc.SetState(SCE_B_COMMENT);
+				sc.SetState(SCE_VB_COMMENTLINE);
 			} else if (sc.ch == '\"') {
-				sc.SetState(SCE_B_STRING);
+				sc.SetState(SCE_VB_STRING);
 			} else if (sc.ch == '#') {
 				const int chNext = UnsafeLower(sc.chNext);
 				if (chNext == 'e' || chNext == 'i' || chNext == 'r' || chNext == 'c')
-					sc.SetState(SCE_B_IDENTIFIER);
+					sc.SetState(SCE_VB_IDENTIFIER);
 				else
-					sc.SetState(SCE_B_FILENUMBER);
+					sc.SetState(SCE_VB_FILENUMBER);
 			} else if (sc.ch == '&' && IsVBNumberPrefix(sc.chNext) && !PreferStringConcat(chPrevNonWhite, stylePrevNonWhite)) {
-				sc.SetState(SCE_B_NUMBER);
+				sc.SetState(SCE_VB_NUMBER);
 				sc.Forward();
 			} else if (IsNumberStart(sc.ch, sc.chNext)) {
-				sc.SetState(SCE_B_NUMBER);
-			} else if (sc.ch == '_' && isspacechar(sc.chNext)) {
-				sc.SetState(SCE_B_OPERATOR);
-			} else if (iswordstart(sc.ch) || sc.ch == '[') { // bracketed [keyword] identifier
-				sc.SetState(SCE_B_IDENTIFIER);
-			} else if (isoperator(sc.ch) || (sc.ch == '\\')) { // Integer division
-				sc.SetState(SCE_B_OPERATOR);
+				sc.SetState(SCE_VB_NUMBER);
+			} else if (sc.ch == '_' && sc.chPrev <= ' ' && sc.chNext <= ' ') {
+				sc.SetState(SCE_VB_LINE_CONTINUATION);
+			} else if (IsIdentifierStartEx(sc.ch) || sc.ch == '[') { // bracketed [keyword] identifier
+				sc.SetState(SCE_VB_IDENTIFIER);
+			} else if (IsAGraphic(sc.ch)) {
+				sc.SetState(SCE_VB_OPERATOR);
 			}
 		}
 
@@ -260,6 +254,12 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 				stylePrevNonWhite = sc.state;
 			}
 		}
+		if (sc.atLineEnd) {
+			isIfThenPreprocessor = false;
+			isEndPreprocessor = false;
+			visibleChars = 0;
+		}
+		sc.Forward();
 	}
 
 	sc.Complete();
@@ -267,7 +267,7 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 
 bool VBLineStartsWith(LexAccessor &styler, Sci_Line line, const char* word) noexcept {
 	const Sci_Position pos = LexLineSkipSpaceTab(styler, line);
-	return (styler.StyleAt(pos) == SCE_B_KEYWORD) && (styler.MatchLowerCase(pos, word));
+	return (styler.StyleAt(pos) == SCE_VB_KEYWORD) && (styler.MatchLowerCase(pos, word));
 }
 bool VBMatchNextWord(LexAccessor &styler, Sci_Position startPos, Sci_Position endPos, const char *word) noexcept {
 	const Sci_Position pos = LexSkipSpaceTab(styler, startPos, endPos);
@@ -280,10 +280,10 @@ int IsVBProperty(LexAccessor &styler, Sci_Line line, Sci_Position startPos) noex
 	for (Sci_Position i = startPos; i < endPos; i++) {
 		const uint8_t ch = UnsafeLower(styler[i]);
 		const int style = styler.StyleAt(i);
-		if (style == SCE_B_OPERATOR && ch == '(') {
+		if (style == SCE_VB_OPERATOR && ch == '(') {
 			return true;
 		}
-		if (style == SCE_B_KEYWORD && !visibleChars
+		if (style == SCE_VB_KEYWORD && !visibleChars
 			&& (ch == 'g' || ch == 'l' || ch == 's')
 			&& UnsafeLower(styler[i + 1]) == 'e'
 			&& UnsafeLower(styler[i + 2]) == 't'
@@ -304,7 +304,7 @@ bool IsVBSome(LexAccessor &styler, Sci_Line line, int kind) noexcept {
 	const Sci_Position endPos = styler.LineStart(line + 1) - 1;
 	Sci_Position pos = LexSkipSpaceTab(styler, startPos, endPos);
 	int stl = styler.StyleAt(pos);
-	if (stl == SCE_B_KEYWORD) {
+	if (stl == SCE_VB_KEYWORD) {
 		if (styler.MatchLowerCase(pos, "public")) {
 			pos += 6;
 		} else if (styler.MatchLowerCase(pos, "private")) {
@@ -317,7 +317,7 @@ bool IsVBSome(LexAccessor &styler, Sci_Line line, int kind) noexcept {
 			pos += 6;
 		pos = LexSkipSpaceTab(styler, pos, endPos);
 		stl = styler.StyleAt(pos);
-		if (stl == SCE_B_KEYWORD) {
+		if (stl == SCE_VB_KEYWORD) {
 			return (kind == 1 && isspacechar(LexCharAt(pos + 4)) && styler.MatchLowerCase(pos, "type"))
 				|| (kind == 2 && isspacechar(LexCharAt(pos + 5)) && styler.MatchLowerCase(pos, "const"));
 		}
@@ -326,7 +326,7 @@ bool IsVBSome(LexAccessor &styler, Sci_Line line, int kind) noexcept {
 }
 #define VBMatch(word)			styler.MatchLowerCase(i, word)
 #define VBMatchNext(pos, word)	VBMatchNextWord(styler, pos, endPos, word)
-#define IsCommentLine(line)		IsLexCommentLine(styler, line, SCE_B_COMMENT)
+#define IsCommentLine(line)		IsLexCommentLine(styler, line, SCE_VB_COMMENTLINE)
 #define IsDimLine(line)			VBLineStartsWith(styler, line, "dim")
 #define IsConstLine(line)		IsVBSome(styler, line, 2)
 #define IsVB6Type(line)			IsVBSome(styler, line, 1)
@@ -378,7 +378,7 @@ void FoldVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexer
 			}
 		}
 
-		if (style == SCE_B_KEYWORD && stylePrev != SCE_B_KEYWORD
+		if (style == SCE_VB_KEYWORD && stylePrev != SCE_VB_KEYWORD
 			&& !(chPrev == '.' || chPrev == '[')) { // not a member, not bracketed [keyword] identifier
 			if (atLineBegin && (VBMatch("for") || (VBMatch("do") && isspacechar(LexCharAt(i + 2))) // not Double
 				|| VBMatch("while") || (VBMatch("try") && isspacechar(LexCharAt(i + 3))) // not TryCast
@@ -484,14 +484,14 @@ void FoldVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexer
 			}
 		}
 
-		if (style == SCE_B_PREPROCESSOR) {
+		if (style == SCE_VB_PREPROCESSOR) {
 			if (VBMatch("#if") || VBMatch("#region") || VBMatch("#externalsource"))
 				levelNext++;
 			else if (VBMatch("#end"))
 				levelNext--;
 		}
 
-		if (style == SCE_B_OPERATOR) {
+		if (style == SCE_VB_OPERATOR) {
 			// Anonymous With { ... }
 			if (AnyOf<'{', '}'>(ch)) {
 				levelNext += ('{' + '}')/2 - ch;
