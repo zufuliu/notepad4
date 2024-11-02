@@ -217,6 +217,7 @@
 #define NP2StyleX_Parameter				EDITSTYLE_HOLE(Parameter, L"Parameter")
 #define NP2StyleX_InlineExpansion		EDITSTYLE_HOLE(InlineExpansion, L"Inline Expansion")
 #define NP2StyleX_Pragma				EDITSTYLE_HOLE(Pragma, L"Pragma")
+#define NP2StyleX_HardLineBreak			EDITSTYLE_HOLE(HardLineBreak, L"Hard Line Break")
 
 #define NP2StyleX_Section				EDITSTYLE_HOLE(Section, L"Section")
 #define NP2StyleX_Assignment			EDITSTYLE_HOLE(Assignment, L"Assignment")

@@ -43,6 +43,7 @@ static EDITSTYLE Styles_Markdown[] = {
 	{ SCE_MARKDOWN_DELIMITER, NP2StyleX_Delimiter, L"bold; fore:#0080C0" },
 	{ SCE_MARKDOWN_EMOJI, NP2StyleX_Emoji, L"fore:#FF8000" },
 	{ SCE_MARKDOWN_ESCAPECHAR, NP2StyleX_EscapeSequence, L"fore:#0080C0" },
+	{ SCE_MARKDOWN_HARD_LINE_BREAK, NP2StyleX_HardLineBreak, L"fore:#C80000; back:#FFFF80" },
 	{ MULTI_STYLE(SCE_MARKDOWN_DIFF_ADD_CURLY, SCE_MARKDOWN_DIFF_ADD_SQUARE, 0, 0), NP2StyleX_LineAddition, L"back:#80FF80" },
 	{ MULTI_STYLE(SCE_MARKDOWN_DIFF_DEL_CURLY, SCE_MARKDOWN_DIFF_DEL_SQUARE, 0, 0), NP2StyleX_LineRemoval, L"back:#FF8080" },
 };
