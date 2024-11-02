@@ -36,6 +36,10 @@ enum class Language {
 	VBScript,
 };
 
+enum {
+	VBLineStateLineContinuation = 1 << 1,
+};
+
 #define LexCharAt(pos)	styler.SafeGetCharAt(pos)
 
 // https://learn.microsoft.com/en-us/dotnet/visual-basic/reference/language-specification/lexical-grammar#type-characters
@@ -84,6 +88,7 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 	const WordList &keywords5 = keywordLists[4];
 	const WordList &keywords6 = keywordLists[5];
 
+	int lineState = 0;
 	int fileNbDigits = 0;
 	int visibleChars = 0;
 	int chPrevNonWhite = 0;
@@ -93,12 +98,15 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 	const Language language = static_cast<Language>(styler.GetPropertyInt("lexer.lang"));
 
 	StyleContext sc(startPos, length, initStyle, styler);
+	if (sc.currentLine > 0) {
+		lineState = styler.GetLineState(sc.currentLine - 1);
+		lineState &= VBLineStateLineContinuation;
+	}
 	if (startPos != 0 && IsSpaceEquiv(initStyle)) {
 		LookbackNonWhite(styler, startPos, SCE_VB_LINE_CONTINUATION, chPrevNonWhite, stylePrevNonWhite);
 	}
 
 	while (sc.More()) {
-
 		switch (sc.state) {
 		case SCE_VB_OPERATOR:
 		case SCE_VB_LINE_CONTINUATION:
@@ -156,6 +164,7 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 						} else if (keywords6.InList(s)) {
 							sc.ChangeState(SCE_VB_CONSTANT);
 						}
+						stylePrevNonWhite = sc.state;
 					}
 					sc.SetState(SCE_VB_DEFAULT);
 				}
@@ -186,7 +195,17 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 
 		case SCE_VB_COMMENTLINE:
 			if (sc.atLineStart) {
-				sc.SetState(SCE_VB_DEFAULT);
+				if (lineState == VBLineStateLineContinuation) {
+					lineState = 0;
+				} else {
+					sc.SetState(SCE_VB_DEFAULT);
+				}
+			} else if (language == Language::VBA && sc.ch == '_' && sc.chPrev <= ' ') {
+				if (sc.GetLineNextChar(true) == '\0') {
+					lineState |= VBLineStateLineContinuation;
+					sc.SetState(SCE_VB_LINE_CONTINUATION);
+					sc.ForwardSetState(SCE_VB_COMMENTLINE);
+				}
 			}
 			break;
 
@@ -255,6 +274,7 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 			}
 		}
 		if (sc.atLineEnd) {
+			styler.SetLineState(sc.currentLine, lineState);
 			isIfThenPreprocessor = false;
 			isEndPreprocessor = false;
 			visibleChars = 0;
