@@ -200,6 +200,7 @@ void ColouriseZigDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			break;
 
 		case SCE_ZIG_CHARACTER:
+		case SCE_ZIG_IDENTIFIER_STRING:
 		case SCE_ZIG_STRING:
 		case SCE_ZIG_MULTISTRING:
 			if (sc.atLineStart) {
@@ -213,9 +214,10 @@ void ColouriseZigDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 					escSeq.digitsLeft = 9;
 					sc.Forward();
 				}
-			} else if ((sc.ch == '\'' && sc.state == SCE_ZIG_CHARACTER) || (sc.ch == '\"' && sc.state == SCE_ZIG_STRING)) {
+			} else if ((sc.ch == '\'' && sc.state == SCE_ZIG_CHARACTER)
+				|| (sc.ch == '\"' && (sc.state == SCE_ZIG_STRING || sc.state == SCE_ZIG_IDENTIFIER_STRING))) {
 				sc.ForwardSetState(SCE_ZIG_DEFAULT);
-			} else if (sc.state != SCE_ZIG_CHARACTER) {
+			} else if (sc.state >= SCE_ZIG_STRING) {
 				if (sc.ch == '{' || sc.ch == '}') {
 					if (sc.ch == sc.chNext) {
 						escSeq.resetEscapeState(sc.state);
@@ -306,6 +308,9 @@ void ColouriseZigDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				sc.SetState(SCE_ZIG_CHARACTER);
 			} else if (IsADigit(sc.ch)) {
 				sc.SetState(SCE_ZIG_NUMBER);
+			} else if (sc.Match('@', '\"')) {
+				sc.SetState(SCE_ZIG_IDENTIFIER_STRING);
+				sc.Forward();
 			} else if ((sc.ch == '@' && IsIdentifierStartEx(sc.chNext)) || IsIdentifierStartEx(sc.ch)) {
 				sc.SetState((sc.ch == '@') ? SCE_ZIG_BUILTIN_FUNCTION : SCE_ZIG_IDENTIFIER);
 			} else if (IsAGraphic(sc.ch)) {
