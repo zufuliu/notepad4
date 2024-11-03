@@ -81,6 +81,7 @@ static EDITSTYLE Styles_VB[] = {
 	{ SCE_VB_CONSTANT, NP2StyleX_Constant, L"fore:#B000B0" },
 	{ SCE_VB_COMMENTLINE, NP2StyleX_Comment, L"fore:#608060" },
 	{ MULTI_STYLE(SCE_VB_STRING, SCE_VB_INTERPOLATED_STRING, 0, 0), NP2StyleX_String, L"fore:#008000" },
+	{ SCE_VB_FORMAT_SPECIFIER, NP2StyleX_FormatSpecifier, L"fore:#7C5AF3" },
 	{ SCE_VB_DATE, NP2StyleX_DateTime, L"fore:#008080" },
 	{ SCE_VB_LABEL, NP2StyleX_Label, L"back:#FFC040" },
 	{ SCE_VB_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },

@@ -10,6 +10,7 @@
 
 #include <string>
 #include <string_view>
+#include <vector>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -46,6 +47,7 @@ enum {
 	VBLineType_ConstLine = 3,
 	VBLineType_VB6TypeLine = 4,
 	VBLineStateLineContinuation = 1 << 3,
+	VBLineStateStringInterpolation = 1 << 4,
 };
 
 #define LexCharAt(pos)	styler.SafeGetCharAt(pos)
@@ -88,7 +90,18 @@ constexpr bool IsSpaceEquiv(int state) noexcept {
 	return state <= SCE_VB_LINE_CONTINUATION;
 }
 
-void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
+// https://docs.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting
+constexpr bool IsInvalidFormatSpecifier(int ch) noexcept {
+	// Custom format strings allows any characters
+	return (ch >= '\0' && ch < ' ') || ch == '\"' || ch == '{' || ch == '}';
+}
+
+inline bool IsInterpolatedStringEnd(const StyleContext &sc) noexcept {
+	return sc.ch == '}' || sc.ch == ':'
+		|| (sc.ch == ',' && (IsADigit(sc.chNext) || (sc.chNext == '-' && IsADigit(sc.GetRelative(2)))));
+}
+
+void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const WordList &keywords = keywordLists[0];
 	const WordList &keywords2 = keywordLists[1];
 	const WordList &keywords3 = keywordLists[2];
@@ -98,6 +111,7 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 
 	KeywordType kwType = KeywordType::None;
 	int lineState = 0;
+	int parenCount = 0;
 	int fileNbDigits = 0;
 	int visibleChars = 0;
 	int chBefore = 0;
@@ -105,11 +119,18 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 	int stylePrevNonWhite = SCE_VB_DEFAULT;
 	bool isIfThenPreprocessor = false;
 	bool isEndPreprocessor = false;
-	const Language language = static_cast<Language>(styler.GetPropertyInt("lexer.lang"));
+	std::vector<int> nestedState;
 
-	StyleContext sc(startPos, length, initStyle, styler);
+	const Language language = static_cast<Language>(styler.GetPropertyInt("lexer.lang"));
+	if (startPos != 0) {
+		// backtrack to the line starts expression inside interpolated string literal.
+		BacktrackToStart(styler, VBLineStateStringInterpolation, startPos, lengthDoc, initStyle);
+	}
+
+	StyleContext sc(startPos, lengthDoc, initStyle, styler);
 	if (sc.currentLine > 0) {
 		lineState = styler.GetLineState(sc.currentLine - 1);
+		parenCount = lineState >> 16;
 		lineState &= VBLineStateLineContinuation;
 	}
 	if (startPos != 0 && IsSpaceEquiv(initStyle)) {
@@ -119,6 +140,7 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 	while (sc.More()) {
 		switch (sc.state) {
 		case SCE_VB_OPERATOR:
+		case SCE_VB_OPERATOR2:
 		case SCE_VB_LINE_CONTINUATION:
 			sc.SetState(SCE_VB_DEFAULT);
 			break;
@@ -154,7 +176,7 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 							sc.ChangeState(SCE_VB_PREPROCESSOR);
 						} else if (keywords.InList(s)) {
 							sc.ChangeState(SCE_VB_KEYWORD3);
-							if (chBefore != '.') {
+							if (chBefore != '.' && parenCount == 0) {
 								sc.ChangeState(SCE_VB_KEYWORD);
 								if (StrEqual(s, "if")) {
 									if (language == Language::VBNET && visibleChars > 2 && chNext == '(') {
@@ -212,6 +234,7 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 			break;
 
 		case SCE_VB_STRING:
+		case SCE_VB_INTERPOLATED_STRING:
 			if (sc.atLineStart && language != Language::VBNET) {
 				// multiline since VB.NET 14
 				sc.SetState(SCE_VB_DEFAULT);
@@ -223,6 +246,28 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 						sc.Forward();
 					}
 					sc.ForwardSetState(SCE_VB_DEFAULT);
+				}
+			} else if (sc.state == SCE_VB_INTERPOLATED_STRING) {
+				if (sc.ch == '{') {
+					if (sc.chNext == '{') {
+						sc.Forward();
+					} else {
+						++parenCount;
+						nestedState.push_back(0);
+						sc.SetState(SCE_VB_OPERATOR2);
+						sc.ForwardSetState(SCE_VB_DEFAULT);
+					}
+				} else if (sc.ch == '}') {
+					if (!nestedState.empty()) {
+						--parenCount;
+						nestedState.pop_back();
+						sc.SetState(SCE_VB_OPERATOR2);
+						sc.ForwardSetState(SCE_VB_INTERPOLATED_STRING);
+						continue;
+					}
+					if (sc.chNext == '}') {
+						sc.Forward();
+					}
 				}
 			}
 			break;
@@ -273,6 +318,13 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 				sc.ForwardSetState(SCE_VB_DEFAULT);
 			}
 			break;
+
+		case SCE_VB_FORMAT_SPECIFIER:
+			if (IsInvalidFormatSpecifier(sc.ch)) {
+				sc.SetState(SCE_VB_INTERPOLATED_STRING);
+				continue;
+			}
+			break;
 		}
 
 		if (sc.state == SCE_VB_DEFAULT) {
@@ -283,6 +335,9 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 				}
 			} else if (sc.ch == '\"') {
 				sc.SetState(SCE_VB_STRING);
+			} else if (language == Language::VBNET && sc.Match('$', '"')) {
+				sc.SetState(SCE_VB_INTERPOLATED_STRING);
+				sc.Forward();
 			} else if (sc.ch == '#') {
 				const int chNext = UnsafeLower(sc.chNext);
 				if (chNext == 'e' || chNext == 'i' || chNext == 'r' || chNext == 'c')
@@ -301,6 +356,24 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 				sc.SetState(SCE_VB_IDENTIFIER);
 			} else if (IsAGraphic(sc.ch)) {
 				sc.SetState(SCE_VB_OPERATOR);
+				if (nestedState.empty()) {
+					if (sc.ch == '(') {
+						++parenCount;
+					} else if (sc.ch == ')' && parenCount > 0) {
+						--parenCount;
+					}
+				} else {
+					sc.ChangeState(SCE_VB_OPERATOR2);
+					if (sc.ch == '(') {
+						nestedState.back() += 1;
+					} else if (sc.ch == ')') {
+						nestedState.back() -= 1;
+					}
+					if (nestedState.back() <= 0 && IsInterpolatedStringEnd(sc)) {
+						sc.ChangeState((sc.ch == '}') ? SCE_VB_INTERPOLATED_STRING : SCE_VB_FORMAT_SPECIFIER);
+						continue;
+					}
+				}
 			}
 		}
 
@@ -312,7 +385,10 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 			}
 		}
 		if (sc.atLineEnd) {
-			styler.SetLineState(sc.currentLine, lineState);
+			if (!nestedState.empty()) {
+				lineState |= VBLineStateStringInterpolation;
+			}
+			styler.SetLineState(sc.currentLine, lineState | (parenCount << 16));
 			lineState &= VBLineStateLineContinuation;
 			isIfThenPreprocessor = false;
 			isEndPreprocessor = false;
@@ -364,8 +440,8 @@ struct FoldLineState {
 	}
 };
 
-void FoldVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList /*keywordLists*/, Accessor &styler) {
-	const Sci_PositionU endPos = startPos + length;
+void FoldVBDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList /*keywordLists*/, Accessor &styler) {
+	const Sci_PositionU endPos = startPos + lengthDoc;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	FoldLineState foldPrev(0);
 	int levelCurrent = SC_FOLDLEVELBASE;
