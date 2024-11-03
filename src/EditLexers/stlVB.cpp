@@ -33,7 +33,7 @@ static KEYWORDLIST Keywords_VB = {{
 "EndIf GoSub Wend "
 
 , // 3 Preprocessor
-"If Else ElseIf End Const Region ExternalChecksum ExternalSource "
+"If Else ElseIf End Const Region ExternalChecksum ExternalSource Disable Enable "
 
 , // 4 Attribute
 "ComClass HideModuleName WebMethod Serializable MarshalAs AttributeUsage DllImport StructLayout VBFixedString VBFixedArray"

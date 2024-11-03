@@ -39,6 +39,7 @@ enum class KeywordType {
 	End,
 	AccessModifier,
 	Function,
+	Preprocessor,
 };
 
 enum {
@@ -65,25 +66,24 @@ constexpr bool IsTypeCharacter(int ch) noexcept {
 }
 
 constexpr bool IsVBNumberPrefix(int ch) noexcept {
-	return ch == 'h' || ch == 'H'	// Hexadecimal
-		|| ch == 'o' || ch == 'O'	// Octal
-		|| ch == 'b' || ch == 'B';	// Binary
+	ch = UnsafeLower(ch);
+	return ch == 'h' // Hexadecimal
+		|| ch == 'o' // Octal
+		|| ch == 'b';// Binary
+}
+
+constexpr bool IsPreprocessorStart(int ch) noexcept {
+	ch = UnsafeLower(ch);
+	return ch == 'c'// Const
+		|| ch == 'd'// Disable
+		|| ch == 'e'// End
+		|| ch == 'i'// If
+		|| ch == 'r';// Region
 }
 
 constexpr bool PreferStringConcat(int chPrevNonWhite, int stylePrevNonWhite) noexcept {
 	return chPrevNonWhite == '\"' || chPrevNonWhite == ')' || chPrevNonWhite == ']'
 		|| (stylePrevNonWhite != SCE_VB_KEYWORD && IsIdentifierChar(chPrevNonWhite));
-}
-
-constexpr bool IsVBNumber(int ch, int chPrev) noexcept {
-	return IsHexDigit(ch)|| ch == '_'
-		|| (ch == '.' && chPrev != '.')
-		|| ((ch == '+' || ch == '-') && (chPrev == 'E' || chPrev == 'e'))
-		|| ((ch == 'S' || ch == 'I' || ch == 'L' || ch == 's' || ch == 'i' || ch == 'l')
-			&& (IsADigit(chPrev) || chPrev == 'U' || chPrev == 'u'))
-		|| ((ch == 'R' || ch == 'r' || ch == '%' || ch == '@' || ch == '!' || ch == '#')
-			&& IsADigit(chPrev))
-		|| (ch == '&' && IsHexDigit(chPrev));
 }
 
 constexpr bool IsSpaceEquiv(int state) noexcept {
@@ -117,8 +117,6 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 	int chBefore = 0;
 	int chPrevNonWhite = 0;
 	int stylePrevNonWhite = SCE_VB_DEFAULT;
-	bool isIfThenPreprocessor = false;
-	bool isEndPreprocessor = false;
 	std::vector<int> nestedState;
 
 	const Language language = static_cast<Language>(styler.GetPropertyInt("lexer.lang"));
@@ -171,15 +169,25 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 							if (visibleChars == len && chNext == ':') {
 								sc.ChangeState(SCE_VB_LABEL);
 							}
-						} else if ((isIfThenPreprocessor && StrEqual(s, "then")) || (isEndPreprocessor
-							&& StrEqualsAny(s, "if", "region", "externalsource"))) {
-							sc.ChangeState(SCE_VB_PREPROCESSOR);
+						} else if (s[0] == '#') {
+							kwType = KeywordType::None;
+							if (keywords4.InList(s + 1)) {
+								sc.ChangeState(SCE_VB_PREPROCESSOR);
+								if (StrEqualsAny(s + 1, "if", "end", "elseif")) {
+									kwType = KeywordType::Preprocessor;
+								}
+							} else {
+								sc.ChangeState(SCE_VB_FILENUMBER);
+								continue;
+							}
+						} else if (kwType == KeywordType::Preprocessor) {
+							sc.ChangeState(SCE_VB_PREPROCESSOR_WORD);
 						} else if (keywords.InList(s)) {
 							sc.ChangeState(SCE_VB_KEYWORD3);
-							if (chBefore != '.' && parenCount == 0) {
+							if (chBefore != '.') {
 								sc.ChangeState(SCE_VB_KEYWORD);
 								if (StrEqual(s, "if")) {
-									if (language == Language::VBNET && visibleChars > 2 && chNext == '(') {
+									if (language == Language::VBNET && chNext == '(' && (parenCount != 0 || visibleChars > 2)) {
 										sc.ChangeState(SCE_VB_KEYWORD3); // If operator
 									}
 								} else if (StrEqual(s, "dim")) {
@@ -206,10 +214,6 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 							sc.ChangeState(SCE_VB_LABEL);
 						} else if (keywords3.InList(s)) {
 							sc.ChangeState(SCE_VB_KEYWORD3);
-						} else if (language != Language::VBScript && s[0] == '#' && keywords4.InList(s + 1)) {
-							sc.ChangeState(SCE_VB_PREPROCESSOR);
-							isIfThenPreprocessor = StrEqualsAny(s, "#if", "#elseif");
-							isEndPreprocessor = StrEqual(s, "#end");
 						} else if (keywords5.InList(s)) {
 							sc.ChangeState(SCE_VB_ATTRIBUTE);
 						} else if (keywords6.InList(s)) {
@@ -218,7 +222,7 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 							sc.ChangeState(SCE_VB_FUNCTION_DEFINITION);
 						}
 						stylePrevNonWhite = sc.state;
-						if (sc.state != SCE_VB_KEYWORD) {
+						if (sc.state != SCE_VB_KEYWORD && sc.state != SCE_VB_PREPROCESSOR) {
 							kwType = KeywordType::None;
 						}
 					}
@@ -228,7 +232,10 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 			break;
 
 		case SCE_VB_NUMBER:
-			if (!IsVBNumber(sc.ch, sc.chPrev)) {
+			if (!IsDecimalNumber(sc.chPrev, sc.ch, sc.chNext)) {
+				if (language != Language::VBScript && IsTypeCharacter(sc.ch)) {
+					sc.Forward();
+				}
 				sc.SetState(SCE_VB_DEFAULT);
 			}
 			break;
@@ -300,14 +307,9 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				// Use regular number state
 				sc.ChangeState(SCE_VB_NUMBER);
 				sc.SetState(SCE_VB_DEFAULT);
-			} else if (sc.ch == '#') {
-				sc.ChangeState(SCE_VB_DATE);
-				sc.ForwardSetState(SCE_VB_DEFAULT);
 			} else {
 				sc.ChangeState(SCE_VB_DATE);
-			}
-			if (sc.state != SCE_VB_FILENUMBER) {
-				fileNbDigits = 0;
+				continue;
 			}
 			break;
 
@@ -339,11 +341,12 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				sc.SetState(SCE_VB_INTERPOLATED_STRING);
 				sc.Forward();
 			} else if (sc.ch == '#') {
-				const int chNext = UnsafeLower(sc.chNext);
-				if (chNext == 'e' || chNext == 'i' || chNext == 'r' || chNext == 'c')
+				fileNbDigits = 0;
+				if (visibleChars == 0 && language != Language::VBScript && IsPreprocessorStart(sc.chNext)) {
 					sc.SetState(SCE_VB_IDENTIFIER);
-				else
+				} else {
 					sc.SetState(SCE_VB_FILENUMBER);
+				}
 			} else if (sc.ch == '&' && IsVBNumberPrefix(sc.chNext) && !PreferStringConcat(chPrevNonWhite, stylePrevNonWhite)) {
 				sc.SetState(SCE_VB_NUMBER);
 				sc.Forward();
@@ -390,8 +393,6 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 			}
 			styler.SetLineState(sc.currentLine, lineState | (parenCount << 16));
 			lineState &= VBLineStateLineContinuation;
-			isIfThenPreprocessor = false;
-			isEndPreprocessor = false;
 			visibleChars = 0;
 			kwType = KeywordType::None;
 		}
