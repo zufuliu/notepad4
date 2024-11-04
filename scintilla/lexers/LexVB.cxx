@@ -74,10 +74,10 @@ constexpr bool IsVBNumberPrefix(int ch) noexcept {
 
 constexpr bool IsPreprocessorStart(int ch) noexcept {
 	ch = UnsafeLower(ch);
-	return ch == 'c'// Const
-		|| ch == 'd'// Disable
-		|| ch == 'e'// End
-		|| ch == 'i'// If
+	return ch == 'c' // Const
+		|| ch == 'd' // Disable
+		|| ch == 'e' // End
+		|| ch == 'i' // If
 		|| ch == 'r';// Region
 }
 
@@ -162,27 +162,27 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				}
 				if (StrEqual(s, "rem")) {
 					sc.ChangeState(SCE_VB_COMMENTLINE);
+					break;
+				}
+
+				const KeywordType kwPrev = kwType;
+				kwType = KeywordType::None;
+				if (s[0] == '#') {
+					if (keywords4.InList(s + 1)) {
+						sc.ChangeState(SCE_VB_PREPROCESSOR);
+						if (StrEqualsAny(s + 1, "if", "end", "elseif")) {
+							kwType = KeywordType::Preprocessor;
+						}
+					} else {
+						sc.ChangeState(SCE_VB_FILENUMBER);
+						continue;
+					}
+				} else if (kwPrev == KeywordType::Preprocessor) {
+					sc.ChangeState(SCE_VB_PREPROCESSOR_WORD);
 				} else {
-					if (!skipType) {
-						const int chNext = sc.GetLineNextChar();
-						if (s[0] == '[') {
-							if (visibleChars == len && chNext == ':') {
-								sc.ChangeState(SCE_VB_LABEL);
-							}
-						} else if (s[0] == '#') {
-							kwType = KeywordType::None;
-							if (keywords4.InList(s + 1)) {
-								sc.ChangeState(SCE_VB_PREPROCESSOR);
-								if (StrEqualsAny(s + 1, "if", "end", "elseif")) {
-									kwType = KeywordType::Preprocessor;
-								}
-							} else {
-								sc.ChangeState(SCE_VB_FILENUMBER);
-								continue;
-							}
-						} else if (kwType == KeywordType::Preprocessor) {
-							sc.ChangeState(SCE_VB_PREPROCESSOR_WORD);
-						} else if (keywords.InList(s)) {
+					const int chNext = sc.GetLineNextChar();
+					if (!skipType && s[0] != '[') {
+						if (keywords.InList(s)) {
 							sc.ChangeState(SCE_VB_KEYWORD3);
 							if (chBefore != '.') {
 								sc.ChangeState(SCE_VB_KEYWORD);
@@ -195,13 +195,13 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 								} else if (StrEqual(s, "const")) {
 									lineState = VBLineType_ConstLine;
 								} else if (StrEqual(s, "type")) {
-									if (visibleChars == len || kwType == KeywordType::AccessModifier) {
+									if (visibleChars == len || kwPrev == KeywordType::AccessModifier) {
 										lineState = VBLineType_VB6TypeLine;
 									}
 								} else if (StrEqual(s, "end")) {
 									kwType = KeywordType::End;
 								} else if (StrEqualsAny(s, "sub", "function")) {
-									if (kwType != KeywordType::End) {
+									if (kwPrev != KeywordType::End) {
 										kwType = KeywordType::Function;
 									}
 								} else if (StrEqualsAny(s, "public", "protected", "private", "friend")) {
@@ -210,24 +210,24 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 							}
 						} else if (keywords2.InList(s)) {
 							sc.ChangeState(SCE_VB_KEYWORD2);
-						} else if (visibleChars == len && chNext == ':') {
-							sc.ChangeState(SCE_VB_LABEL);
 						} else if (keywords3.InList(s)) {
 							sc.ChangeState(SCE_VB_KEYWORD3);
 						} else if (keywords5.InList(s)) {
 							sc.ChangeState(SCE_VB_ATTRIBUTE);
 						} else if (keywords6.InList(s)) {
 							sc.ChangeState(SCE_VB_CONSTANT);
-						} else if (kwType == KeywordType::Function) {
-							sc.ChangeState(SCE_VB_FUNCTION_DEFINITION);
-						}
-						stylePrevNonWhite = sc.state;
-						if (sc.state != SCE_VB_KEYWORD && sc.state != SCE_VB_PREPROCESSOR) {
-							kwType = KeywordType::None;
 						}
 					}
-					sc.SetState(SCE_VB_DEFAULT);
+					if (sc.state == SCE_VB_IDENTIFIER) {
+						if (visibleChars == len && chNext == ':') {
+							sc.ChangeState(SCE_VB_LABEL);
+						} else if (kwPrev == KeywordType::Function) {
+							sc.ChangeState(SCE_VB_FUNCTION_DEFINITION);
+						}
+					}
 				}
+				stylePrevNonWhite = sc.state;
+				sc.SetState(SCE_VB_DEFAULT);
 			}
 			break;
 
