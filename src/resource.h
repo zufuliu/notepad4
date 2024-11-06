@@ -867,9 +867,10 @@
 // Visual Basic
 #define IDM_LEXER_VBNET					40733
 #define IDM_LEXER_VBA					40734
+#define IDM_LEXER_VBS					40735
 // individual
-#define IDM_LEXER_APACHE				40735
-#define IDM_LEXER_LEXER_COUNT			40736
+#define IDM_LEXER_APACHE				40736
+#define IDM_LEXER_LEXER_COUNT			40737
 
 #define IDS_ERR_LOADFILE				50000
 #define IDS_ERR_SAVEFILE				50001

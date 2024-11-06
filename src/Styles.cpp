@@ -1444,10 +1444,9 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) noexcept {
 		} break;
 
 		case NP2LEX_VBSCRIPT:
-			dialect = 2; // see LexVB.cxx
-			break;
 		case NP2LEX_VISUALBASIC: {
 			static_assert(IDM_LEXER_VBA - IDM_LEXER_VBNET == 1);
+			static_assert(IDM_LEXER_VBS - IDM_LEXER_VBNET == 2);
 			dialect = np2LexLangIndex - IDM_LEXER_VBNET;
 		} break;
 		}
@@ -2902,6 +2901,9 @@ void Style_SetLexerByLangIndex(int lang) noexcept {
 	case IDM_LEXER_VBA:
 		pLex = &lexVisualBasic;
 		break;
+	case IDM_LEXER_VBS:
+		pLex = &lexVBScript;
+		break;
 
 	// XML Document
 	case IDM_LEXER_XML:
@@ -2985,6 +2987,9 @@ void Style_UpdateSchemeMenu(HMENU hmenu) noexcept {
 		// Visual Basic
 		case NP2LEX_VISUALBASIC:
 			lang = IDM_LEXER_VBNET;
+			break;
+		case NP2LEX_VBSCRIPT:
+			lang = IDM_LEXER_VBS;
 			break;
 		// XML Document
 		case NP2LEX_XML:

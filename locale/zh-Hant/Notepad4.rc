@@ -556,6 +556,7 @@ BEGIN
 		BEGIN
 			MENUITEM "&Visual Basic",				IDM_LEXER_VBNET
 			MENUITEM "&Office VBA",					IDM_LEXER_VBA
+			MENUITEM "VB&Script",					IDM_LEXER_VBS
 		END
 		POPUP "&XML 文件"
 		BEGIN
