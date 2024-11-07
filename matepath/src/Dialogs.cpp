@@ -374,11 +374,9 @@ INT_PTR CALLBACK GotoDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			}
 		}
 
-		// from WinUser.h: GetComboBoxInfo() since Windows Vista, but CB_GETCOMBOBOXINFO since Windows XP.
 		COMBOBOXINFO cbi;
-		memset(&cbi, 0, sizeof(COMBOBOXINFO));
 		cbi.cbSize = sizeof(COMBOBOXINFO);
-		if (SendMessage(hwndGoto, CB_GETCOMBOBOXINFO, 0, AsInteger<LPARAM>(&cbi))) {
+		if (GetComboBoxInfo(hwndGoto, &cbi)) {
 			SHAutoComplete(cbi.hwndItem, SHACF_FILESYSTEM);
 		}
 		CenterDlgInParent(hwnd);

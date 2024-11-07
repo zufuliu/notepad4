@@ -4590,12 +4590,13 @@ static LRESULT CALLBACK AddBackslashEditProc(HWND hwnd, UINT umsg, WPARAM wParam
 	return DefSubclassProc(hwnd, umsg, wParam, lParam);
 }
 
-void AddBackslashComboBoxSetup(HWND hwndDlg, int nCtlId) noexcept {
-	HWND hwnd = GetDlgItem(hwndDlg, nCtlId);
+void AddBackslashComboBoxSetup(HWND hwnd) noexcept {
 	COMBOBOXINFO info;
 	info.cbSize = sizeof(COMBOBOXINFO);
 	if (GetComboBoxInfo(hwnd, &info)) {
 		SetWindowSubclass(info.hwndItem, AddBackslashEditProc, 0, 0);
+		// Ctrl+Backspace
+		SHAutoComplete(info.hwndItem, SHACF_FILESYS_ONLY | SHACF_AUTOAPPEND_FORCE_OFF | SHACF_AUTOSUGGEST_FORCE_OFF);
 	}
 }
 
@@ -4734,7 +4735,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		ResizeDlg_InitX(hwnd, cxFindReplaceDlg, IDC_RESIZEGRIP2);
 
 		HWND hwndFind = GetDlgItem(hwnd, IDC_FINDTEXT);
-		AddBackslashComboBoxSetup(hwnd, IDC_FINDTEXT);
+		AddBackslashComboBoxSetup(hwndFind);
 
 		// Load MRUs
 		mruFind.AddToCombobox(hwndFind);
@@ -4754,7 +4755,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 
 		HWND hwndRepl = GetDlgItem(hwnd, IDC_REPLACETEXT);
 		if (hwndRepl) {
-			AddBackslashComboBoxSetup(hwnd, IDC_REPLACETEXT);
+			AddBackslashComboBoxSetup(hwndRepl);
 			mruReplace.AddToCombobox(hwndRepl);
 			ComboBox_LimitText(hwndRepl, NP2_FIND_REPLACE_LIMIT);
 			ComboBox_SetExtendedUI(hwndRepl, TRUE);

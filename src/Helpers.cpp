@@ -1240,7 +1240,10 @@ static LRESULT CALLBACK MultilineEditProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 }
 
 void MultilineEditSetup(HWND hwndDlg, int nCtlId) noexcept {
-	SetWindowSubclass(GetDlgItem(hwndDlg, nCtlId), MultilineEditProc, 0, 0);
+	HWND hwnd = GetDlgItem(hwndDlg, nCtlId);
+	SetWindowSubclass(hwnd, MultilineEditProc, 0, 0);
+	// Ctrl+Backspace
+	SHAutoComplete(hwnd, SHACF_FILESYS_ONLY | SHACF_AUTOAPPEND_FORCE_OFF | SHACF_AUTOSUGGEST_FORCE_OFF);
 }
 
 //=============================================================================
