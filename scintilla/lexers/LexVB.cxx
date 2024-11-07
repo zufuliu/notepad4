@@ -49,6 +49,7 @@ enum {
 	VBLineType_VB6TypeLine = 4,
 	VBLineStateLineContinuation = 1 << 3,
 	VBLineStateStringInterpolation = 1 << 4,
+	MaxKeywordSize = 64,
 };
 
 #define LexCharAt(pos)	styler.SafeGetCharAt(pos)
@@ -154,13 +155,13 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 					++visibleChars; // bracketed [keyword] identifier
 					sc.Forward();
 				}
-				char s[64];
+				char s[MaxKeywordSize];
 				sc.GetCurrentLowered(s, sizeof(s));
 				const Sci_Position len = sc.LengthCurrent();
-				if (skipType && len == 4) { // for type character after `rem`
+				if (skipType && len < MaxKeywordSize) {
 					s[len - 1] = '\0';
 				}
-				if (StrEqual(s, "rem")) {
+				if (StrEqual(s, "rem")) { // ignore type character after `rem`
 					sc.ChangeState(SCE_VB_COMMENTLINE);
 					break;
 				}
@@ -174,17 +175,17 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 							kwType = KeywordType::Preprocessor;
 						}
 					} else {
-						sc.ChangeState(SCE_VB_FILENUMBER);
+						sc.ChangeState(SCE_VB_DATE);
 						continue;
 					}
 				} else if (kwPrev == KeywordType::Preprocessor) {
 					sc.ChangeState(SCE_VB_PREPROCESSOR_WORD);
 				} else {
 					const int chNext = sc.GetLineNextChar();
-					if (!skipType && s[0] != '[') {
+					if (s[0] != '[') {
 						if (keywords.InList(s)) {
 							sc.ChangeState(SCE_VB_KEYWORD3);
-							if (chBefore != '.') {
+							if (!skipType && chBefore != '.') {
 								sc.ChangeState(SCE_VB_KEYWORD);
 								if (StrEqual(s, "if")) {
 									if (language == Language::VBNET && chNext == '(' && (parenCount != 0 || visibleChars > 2)) {
@@ -204,7 +205,7 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 									if (kwPrev != KeywordType::End) {
 										kwType = KeywordType::Function;
 									}
-								} else if (StrEqualsAny(s, "public", "protected", "private", "friend")) {
+								} else if (StrEqualsAny(s, "public", "private")) {
 									kwType = KeywordType::AccessModifier;
 								}
 							}
@@ -252,6 +253,7 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 					if (sc.chNext == 'c' || sc.chNext == 'C' || sc.chNext == '$') {
 						sc.Forward();
 					}
+					chPrevNonWhite = sc.ch;
 					sc.ForwardSetState(SCE_VB_DEFAULT);
 				}
 			} else if (sc.state == SCE_VB_INTERPOLATED_STRING) {
@@ -317,6 +319,7 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 			if (sc.atLineStart) {
 				sc.SetState(SCE_VB_DEFAULT);
 			} else if (sc.ch == '#') {
+				chPrevNonWhite = sc.ch;
 				sc.ForwardSetState(SCE_VB_DEFAULT);
 			}
 			break;
@@ -341,10 +344,10 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				sc.SetState(SCE_VB_INTERPOLATED_STRING);
 				sc.Forward();
 			} else if (sc.ch == '#') {
-				fileNbDigits = 0;
 				if (visibleChars == 0 && language != Language::VBScript && IsPreprocessorStart(sc.chNext)) {
 					sc.SetState(SCE_VB_IDENTIFIER);
 				} else {
+					fileNbDigits = 0;
 					sc.SetState(SCE_VB_FILENUMBER);
 				}
 			} else if (sc.ch == '&' && IsVBNumberPrefix(sc.chNext) && !PreferStringConcat(chPrevNonWhite, stylePrevNonWhite)) {
@@ -467,9 +470,7 @@ void FoldVBDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Le
 	bool isCustom = false;	// Custom Event
 	bool isExit = false;	// Exit {Function Sub Property}
 	bool isDeclare = false;	// Declare, Delegate {Function Sub}
-	bool isIf = false;		// If ... Then \r\n ... \r\n End If
-	static Sci_Line lineIf = 0;
-	static Sci_Line lineThen = 0;
+	int ifThenMask = 0;		// If ... Then \r\n ... \r\n End If
 
 	while (startPos < endPos) {
 		const Sci_PositionU i = startPos;
@@ -519,26 +520,26 @@ void FoldVBDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Le
 					if (numBegin == 0)	levelNext++;// End can be placed anywhere, but not used to terminate statement
 					if (numBegin > 0)	numBegin--;
 				}
-				if (VBMatch("endif")) // same as End If
-					isIf = false;
 				// one line: If ... Then ... End If
-				if (lineCurrent == lineIf && lineCurrent == lineThen)
+				if (ifThenMask == 3) {
 					levelNext++;
+				}
+				ifThenMask = 0;
 			} else if (VBMatch("if")) {
-				isIf = true;
-				lineIf = lineCurrent;
 				if (isEnd) {
-					isEnd = false; isIf = false;
-				} else				levelNext++;
+					isEnd = false;
+				} else {
+					ifThenMask = 1;
+					levelNext++;
+				}
 			} else if (VBMatch("then")) {
-				if (isIf) {
-					isIf = false;
+				if (ifThenMask & 1) {
+					ifThenMask |= 2;
 					const Sci_Position pos = LexSkipSpaceTab(styler, i + 4, endPos);
 					const char chEnd = LexCharAt(pos);
 					if (!(chEnd == '\r' || chEnd == '\n' || chEnd == '\''))
 						levelNext--;
 				}
-				lineThen = lineCurrent;
 			} else if ((!isInterface && (VBMatch("class") || VBMatch("structure")))
 				|| VBMatch("module") || VBMatch("enum") || VBMatch("operator")
 				) {
@@ -582,7 +583,7 @@ void FoldVBDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Le
 				if (isEnd)	isEnd = false;
 			}
 		}
-		else if (style == SCE_VB_PREPROCESSOR) {
+		else if (style == SCE_VB_PREPROCESSOR && ch == '#') {
 			if (VBMatch("#if") || VBMatch("#region") || VBMatch("#externalsource"))
 				levelNext++;
 			else if (VBMatch("#end"))
@@ -624,6 +625,7 @@ void FoldVBDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Le
 			foldPrev = foldCurrent;
 			foldCurrent = foldNext;
 			visibleChars = 0;
+			ifThenMask = 0;
 		}
 	}
 }
