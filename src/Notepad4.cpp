@@ -2466,6 +2466,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 		IDM_EDIT_SPLITLINES,
 		IDM_EDIT_TITLECASE,
 		IDM_EDIT_UNESCAPECCHARS,
+		IDM_EDIT_URLCOMPONENTENCODE,
 		IDM_EDIT_URLDECODE,
 		IDM_EDIT_URLENCODE,
 		IDM_EDIT_XHTML_ESCAPE_CHAR,
@@ -3564,15 +3565,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_EDIT_URLENCODE:
-		BeginWaitCursor();
-		EditURLEncode();
-		EndWaitCursor();
+	case IDM_EDIT_URLCOMPONENTENCODE:
+		EditURLEncode(LOWORD(wParam) == IDM_EDIT_URLCOMPONENTENCODE);
 		break;
 
 	case IDM_EDIT_URLDECODE:
-		BeginWaitCursor();
 		EditURLDecode();
-		EndWaitCursor();
 		break;
 
 	case IDM_EDIT_ESCAPECCHARS:

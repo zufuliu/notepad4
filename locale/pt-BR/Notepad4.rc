@@ -759,6 +759,7 @@ BEGIN
 			MENUITEM "&Malayalam to Latin",					IDM_EDIT_MAP_MALAYALAM_LATIN
 		END
 		MENUITEM "&URL Encode\tCtrl+Shift+E",				IDM_EDIT_URLENCODE
+		MENUITEM "URL Component Encode",					IDM_EDIT_URLCOMPONENTENCODE
 		MENUITEM "UR&L Decode\tCtrl+Shift+R",				IDM_EDIT_URLDECODE
 	END
 	POPUP "&Help"

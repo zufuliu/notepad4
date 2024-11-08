@@ -1683,12 +1683,15 @@ void EditMapTextCase(int menu) noexcept {
 #ifndef URL_UNESCAPE_AS_UTF8	// NTDDI_VERSION >= NTDDI_WIN8
 #define URL_UNESCAPE_AS_UTF8	URL_ESCAPE_AS_UTF8
 #endif
+#ifndef URL_ESCAPE_ASCII_URI_COMPONENT	// NTDDI_VERSION >= NTDDI_WIN8
+#define URL_ESCAPE_ASCII_URI_COMPONENT	0x00080000
+#endif
 
 //=============================================================================
 //
 // EditURLEncode()
 //
-LPWSTR EditURLEncodeSelection(int *pcchEscaped) noexcept {
+LPWSTR EditURLEncodeSelection(int *pcchEscaped, bool component) noexcept {
 	*pcchEscaped = 0;
 	const Sci_Position iSelCount = SciCall_GetSelTextLength();
 	if (iSelCount == 0) {
@@ -1713,18 +1716,15 @@ LPWSTR EditURLEncodeSelection(int *pcchEscaped) noexcept {
 	LPWSTR pszEscapedW = static_cast<LPWSTR>(NP2HeapAlloc(NP2HeapSize(pszTextW) * kMaxMultiByteCount * 3)); // '&', H1, H0
 
 	DWORD cchEscapedW = static_cast<DWORD>(NP2HeapSize(pszEscapedW) / sizeof(WCHAR));
-	UrlEscape(pszTextW, pszEscapedW, &cchEscapedW, URL_ESCAPE_AS_UTF8);
-	if (!IsWin7AndAbove()) {
-		// TODO: encode some URL parts as UTF-8 then percent escape these UTF-8 bytes.
-		//ParseURL(pszEscapedW, &ppu);
-	}
+	const DWORD flags = component ? (URL_ESCAPE_AS_UTF8 | URL_ESCAPE_ASCII_URI_COMPONENT | URL_ESCAPE_SEGMENT_ONLY) : URL_ESCAPE_AS_UTF8;
+	UrlEscape(pszTextW, pszEscapedW, &cchEscapedW, flags);
 
 	NP2HeapFree(pszTextW);
 	*pcchEscaped = cchEscapedW;
 	return pszEscapedW;
 }
 
-void EditURLEncode() noexcept {
+void EditURLEncode(bool component) noexcept {
 	const Sci_Position iSelCount = SciCall_GetSelTextLength();
 	if (iSelCount == 0) {
 		return;
@@ -1735,7 +1735,7 @@ void EditURLEncode() noexcept {
 	}
 
 	int cchEscapedW;
-	LPWSTR pszEscapedW = EditURLEncodeSelection(&cchEscapedW);
+	LPWSTR pszEscapedW = EditURLEncodeSelection(&cchEscapedW, component);
 	if (pszEscapedW == nullptr) {
 		return;
 	}
@@ -6893,7 +6893,7 @@ void EditSelectionAction(int action) noexcept {
 	}
 
 	int cchEscapedW;
-	LPWSTR pszEscapedW = EditURLEncodeSelection(&cchEscapedW);
+	LPWSTR pszEscapedW = EditURLEncodeSelection(&cchEscapedW, false);
 	if (pszEscapedW == nullptr) {
 		return;
 	}

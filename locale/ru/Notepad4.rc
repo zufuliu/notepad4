@@ -760,6 +760,7 @@ BEGIN
 			MENUITEM "Из &малаялам в латинский",							IDM_EDIT_MAP_MALAYALAM_LATIN
 		END
 		MENUITEM "Закодировать в &URL\tCtrl+Shift+E",						IDM_EDIT_URLENCODE
+		MENUITEM "URL Component Encode",					IDM_EDIT_URLCOMPONENTENCODE
 		MENUITEM "Декодировать из UR&L\tCtrl+Shift+R",						IDM_EDIT_URLDECODE
 	END
 	POPUP "&Справка"
