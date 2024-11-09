@@ -633,7 +633,7 @@ BEGIN
 				MENUITEM "中文(简体)",									IDM_LANG_CHINESE_SIMPLIFIED
 			END
 #endif
-			MENUITEM "XP 스타일 열기/저장 대화 상자 사용(&X)",	IDM_SET_USE_XP_FILE_DIALOG
+			MENUITEM "XP 스타일 열기/저장 대화 상자 사용(&X)",				IDM_SET_USE_XP_FILE_DIALOG
 		END
 		POPUP "창 옵션(&P)"
 		BEGIN
@@ -759,7 +759,7 @@ BEGIN
 			MENUITEM "말라얄람 문자를 라틴 문자로(&M)",					IDM_EDIT_MAP_MALAYALAM_LATIN
 		END
 		MENUITEM "URL 인코드(&U)\tCtrl+Shift+E",							IDM_EDIT_URLENCODE
-		MENUITEM "URL Component Encode",					IDM_EDIT_URLCOMPONENTENCODE
+		MENUITEM "URL 구성 요소 인코드",									IDM_EDIT_URLCOMPONENTENCODE
 		MENUITEM "URL 디코드(&L)\tCtrl+Shift+R",							IDM_EDIT_URLDECODE
 	END
 	POPUP "도움말(&H)"
