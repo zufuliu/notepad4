@@ -102,11 +102,11 @@ lexerList = [
 	('NP2LEX_TEXINFO', 'stlTexinfo.cpp', 'LexTexinfo.cxx', 'Texinfo.texi', 0, parse_texinfo_api_file),
 	('NP2LEX_TOML', 'stlTOML.cpp', 'LexTOML.cxx', '', 0, parse_toml_api_file),
 
-	('NP2LEX_VBSCRIPT', 'stlVBS.cpp', 'LexVB.cxx', '', 0, parse_visual_basic_api_file),
+	('NP2LEX_VBSCRIPT', 'stlVBS.cpp', 'LexVB.cxx', ['VBScript.vbs'], 0, parse_visual_basic_api_file),
 	('NP2LEX_VERILOG', 'stlVerilog.cpp', 'LexVerilog.cxx', ['Verilog.v', 'SystemVerilog.sv'], 0, parse_verilog_api_file),
 	('NP2LEX_VHDL', 'stlVHDL.cpp', 'LexVHDL.cxx', 'VHDL.vhdl', 0, parse_vhdl_api_file),
 	('NP2LEX_VIM', 'stlVim.cpp', 'LexVim.cxx', 'Vim.vim', 0, parse_vim_api_file),
-	('NP2LEX_VISUALBASIC', 'stlVB.cpp', 'LexVB.cxx', '', 0, parse_visual_basic_api_file),
+	('NP2LEX_VISUALBASIC', 'stlVB.cpp', 'LexVB.cxx', ['VB.NET.vb', 'VBA.bas'], 0, parse_visual_basic_api_file),
 
 	# https://github.com/WebAssembly/wabt/blob/main/src/lexer-keywords.txt
 	('NP2LEX_WASM', 'stlWASM.cpp', 'LexWASM.cxx', 'wasm-lexer-keywords.txt', 0, parse_wasm_lexer_keywords),

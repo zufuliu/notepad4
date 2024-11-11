@@ -2549,14 +2549,66 @@ def parse_vim_api_file(path):
 		('commands', keywordMap['commands'], KeywordAttr.Default),
 	]
 
-def parse_visual_basic_api_file(path):
+def parse_visual_basic_api_file(pathList):
+	keywordMap = {
+		'types': [],
+		'vba keywords': [],
+		'directives': [],
+		'enumeration': [],
+		'attributes': [],
+		'misc': [],
+	}
+	for path in pathList:
+		name = os.path.basename(path)
+		sections = read_api_file(path, "'")
+		for key, doc in sections:
+			items = []
+			if key in ('keywords', 'vba keywords', 'types', 'enumeration', 'constants'):
+				items = doc.replace('()', '(').split()
+			elif key == 'attributes':
+				items = re.findall(r'(\w+\()', doc)
+			elif key == 'directives':
+				items = re.findall(r'#(\w+)', doc)
+			elif key == 'objects':
+				items = re.findall(r'^\s+(\w+\(?)', doc, re.MULTILINE)
+				keywordMap['misc'] = items
+				items = re.findall(r'^(\w+)\s*\{', doc, re.MULTILINE)
+			elif key == 'functions':
+				items = re.findall(r'^(\w+\(?)', doc, re.MULTILINE)
+			else:
+				print(key, name)
+			if key in keywordMap:
+				keywordMap[key].extend(items)
+			else:
+				keywordMap[key] = items
+
+	items = keywordMap['vba keywords']
+	if items:
+		functions = keywordMap['functions']
+		items = [word for word in items if f'{word}(' not in functions]
+		keywordMap['vba keywords'] = items
+
+	RemoveDuplicateKeyword(keywordMap, [
+		'types',
+		'functions',
+		'keywords',
+		'objects',
+		'enumeration',
+		'vba keywords',
+		'misc',
+	])
 	return [
-		('keywords', [], KeywordAttr.MakeLower),
-		('type keyword', [], KeywordAttr.MakeLower),
-		('demoted keyword', [], KeywordAttr.MakeLower),
-		('preprocessor', [], KeywordAttr.MakeLower | KeywordAttr.NoAutoComp | KeywordAttr.Special),
-		('attribute', [], KeywordAttr.MakeLower),
-		('constant', [], KeywordAttr.MakeLower),
+		('keywords', keywordMap['keywords'], KeywordAttr.MakeLower),
+		('type keyword', keywordMap['types'], KeywordAttr.MakeLower),
+		('vba keyword', keywordMap['vba keywords'], KeywordAttr.MakeLower),
+		('preprocessor', keywordMap['directives'], KeywordAttr.MakeLower | KeywordAttr.NoAutoComp | KeywordAttr.Special),
+		('attribute', keywordMap['attributes'], KeywordAttr.MakeLower),
+		('class', keywordMap['objects'], KeywordAttr.MakeLower),
+		('interface', [], KeywordAttr.MakeLower),
+		('enumeration', keywordMap['enumeration'], KeywordAttr.MakeLower),
+		('constant', keywordMap['constants'], KeywordAttr.MakeLower),
+		('basic function', keywordMap['functions'], KeywordAttr.MakeLower),
+		('misc', keywordMap['misc'], KeywordAttr.NoLexer),
 	]
 
 def parse_verilog_api_file(pathList):

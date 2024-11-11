@@ -26,12 +26,14 @@ static KEYWORDLIST Keywords_HTML = {{
 "this throw true try typeof undefined var void while with yield "
 
 , // 2 VBScript
-"Alias And As Attribute Begin Boolean ByRef Byte ByVal Call Case Class Compare Const Continue "
-"Currency Date Declare Dim Do Double Each Else ElseIf Empty End Enum Eqv Erase Error Event Exit "
-"Explicit False For Friend Function Get Global GoSub Goto If Imp Implement In Integer Is Let Lib "
-"Load Long Loop LSet Me Mid Mod Module New Next Not Nothing Null Object On Option Optional Or "
-"Preserve Private Property Public RaiseEvent ReDim Rem Resume Return RSet Select Set Single "
-"Static Stop String Sub Then To True Type Unload Until Variant WEnd While With WithEvents Xor"
+"Alias And As Attribute Begin Boolean ByRef Byte ByVal Call Case Char Class Compare Const Continue Currency "
+"Decimal Declare Default Dim Do Double "
+"Each Else ElseIf Empty End EndIf Enum Eqv Erase Error Event Execute ExecuteGlobal Exit Explicit "
+"False For Friend Function Get Global GoSub GoTo If Imp Implements In Integer Is "
+"Let Lib Like Load Long LongLong LongPtr Loop LSet Me Mod Module New Next Not Nothing Null Object On Option Optional Or "
+"ParamArray Preserve Private Property Public RaiseEvent Randomize ReDim Rem Resume Return RSet "
+"Select Set Shared Single Static Step Stop String Sub Then To True Type TypeOf Unload Until Variant "
+"Wend While With WithEvents Xor "
 
 , // 3 Python
 nullptr

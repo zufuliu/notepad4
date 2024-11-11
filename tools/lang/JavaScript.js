@@ -679,8 +679,8 @@ Proxy(target, handler) {
 	revocable(target, handler)
 }
 
-// JScript
-// https://docs.microsoft.com/en-us/previous-versions/ms950396(v=msdn.10)
+// Windows Script Host
+// https://learn.microsoft.com/en-us/previous-versions/ms950396(v=msdn.10)
 // https://developer.mozilla.org/en-US/docs/Archive/Web/JavaScript/Microsoft_Extensions
 ActiveXObject(servername.typename[, location])
 Debug {
@@ -700,14 +700,7 @@ VBArray {
 	toArray()
 	ubound(dimension)
 }
-// Windows Script Host
-// https://msdn.microsoft.com/en-us/library/9bbdkx3k(v=msdn.10)
 WScript {
-	//CreateObject(strProgID[,strPrefix])
-	//Echo()
-	//Exec(strCommand)
-	//GetObject(strPathname [,strProgID], [strPrefix])
-	//Quit()
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/API
