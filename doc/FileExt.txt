@@ -588,13 +588,15 @@ Vim Script
 
 Visual Basic
 	vb
-	bas				VBA Source Code File
+
+	https://learn.microsoft.com/en-us/previous-versions/visualstudio/visual-basic-6/aa241721(v=vs.60)
+	bas				Visual Basic Module
 	frm				Visual Basic Text Form
 	cls				Program Class File
 	ctl				Visual Basic User Control Object File
-	pag				Visual Basic Property Page
+	pag				Visual Basic Property Page File
 	dsr				Visual Basic Active Designer File
-	dob				Visual Basic User Document
+	dob				ActiveX Document Form File
 
 
 WebAssembly

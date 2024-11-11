@@ -2437,7 +2437,7 @@ static void Style_UpdateLexerLang(LPCEDITLEXER pLex, LPCWSTR lpszExt, LPCWSTR lp
 		break;
 
 	case NP2LEX_VISUALBASIC:
-		if (StrCaseEqual(L"bas", lpszExt)) {
+		if (lstrlen(lpszExt) == 3) {
 			np2LexLangIndex = IDM_LEXER_VBA;
 		}
 		break;

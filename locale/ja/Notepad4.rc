@@ -554,8 +554,8 @@ BEGIN
 		//POPUP "S&QL Dialect"
 		POPUP "&Visual Basic"
 		BEGIN
-			MENUITEM "&Visual Basic",				IDM_LEXER_VBNET
-			MENUITEM "&Office VBA",					IDM_LEXER_VBA
+			MENUITEM "Visual &Basic",				IDM_LEXER_VBNET
+			MENUITEM "&VBA / VB 6.0",				IDM_LEXER_VBA
 			MENUITEM "VB&Script",					IDM_LEXER_VBS
 		END
 		POPUP "XML文書(&X)"
