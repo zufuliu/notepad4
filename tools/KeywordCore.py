@@ -2571,7 +2571,7 @@ def parse_visual_basic_api_file(pathList):
 				items = re.findall(r'#(\w+)', doc)
 			elif key == 'objects':
 				items = re.findall(r'^\s+(\w+\(?)', doc, re.MULTILINE)
-				keywordMap['misc'] = items
+				keywordMap['misc'].extend(items)
 				items = re.findall(r'^(\w+)\s*\{', doc, re.MULTILINE)
 			elif key == 'functions':
 				items = re.findall(r'^(\w+\(?)', doc, re.MULTILINE)
@@ -2600,7 +2600,7 @@ def parse_visual_basic_api_file(pathList):
 	return [
 		('keywords', keywordMap['keywords'], KeywordAttr.MakeLower),
 		('type keyword', keywordMap['types'], KeywordAttr.MakeLower),
-		('vba keyword', keywordMap['vba keywords'], KeywordAttr.MakeLower),
+		('VBA keyword', keywordMap['vba keywords'], KeywordAttr.MakeLower),
 		('preprocessor', keywordMap['directives'], KeywordAttr.MakeLower | KeywordAttr.NoAutoComp | KeywordAttr.Special),
 		('attribute', keywordMap['attributes'], KeywordAttr.MakeLower),
 		('class', keywordMap['objects'], KeywordAttr.MakeLower),

@@ -131,7 +131,7 @@ False True
 AddressOf And Eqv Imp Is Like Mod Not Or Xor
 
 ' VB6
-Attribute Version
+Class Attribute Version
 Begin
 	BeginProperty
 	EndProperty
@@ -162,6 +162,7 @@ Any
 #EndIf
 
 '! objects				=======================================================
+' https://learn.microsoft.com/en-us/office/vba/language/reference/objects-visual-basic-for-applications
 Collection {
 	Add()
 	Item(index)
@@ -188,7 +189,7 @@ Dictionary {
 	Key(key)
 }
 
-Drive {
+{ ' Drive
 	AvailableSpace
 	DriveLetter
 	DriveType
@@ -213,7 +214,7 @@ Err {
 	Source
 }
 
-File {
+{ ' File
 	Copy()
 	Delete()
 	Move()
@@ -262,7 +263,7 @@ FileSystemObject {
 	Drives
 }
 
-Folder {
+{ ' Folder
 	Add()
 
 	Files
@@ -270,7 +271,7 @@ Folder {
 	SubFolders
 }
 
-TextStream {
+{ ' TextStream
 	Close()
 	Read(characters)
 	ReadAll()
@@ -285,6 +286,17 @@ TextStream {
 	AtEndOfStream
 	Column
 	Line
+}
+
+{ ' UserForm
+	Hide()
+	PrintForm()
+	Show()
+
+	Calendar
+	RightToLeft
+	ShowModal
+	StartUpPosition
 }
 
 '! functions			=======================================================
@@ -483,7 +495,7 @@ vbOKOnly vbOKCancel vbAbortRetryIgnore vbYesNoCancel vbYesNo vbRetryCancel
 vbCritical vbQuestion vbExclamation vbInformation
 vbDefaultButton1 vbDefaultButton2 vbDefaultButton3 vbDefaultButton4
 vbApplicationModal vbSystemModal
-vbMsgBoxHelpButton VbMsgBoxSetForeground vbMsgBoxRight vbMsgBoxRtlReading
+vbMsgBoxHelpButton vbMsgBoxSetForeground vbMsgBoxRight vbMsgBoxRtlReading
 vbOK vbCancel vbAbort vbRetry vbIgnore vbYes vbNo
 ' QueryClose constants
 vbFormControlMenu vbFormCode vbAppWindows vbAppTaskManager

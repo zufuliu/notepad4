@@ -523,7 +523,7 @@ vbOKOnly vbOKCancel vbAbortRetryIgnore vbYesNoCancel vbYesNo vbRetryCancel
 vbCritical vbQuestion vbExclamation vbInformation
 vbDefaultButton1 vbDefaultButton2 vbDefaultButton3
 vbApplicationModal vbSystemModal
-VbMsgBoxSetForeground vbMsgBoxHelp vbMsgBoxRight vbMsgBoxRtlReading
+vbMsgBoxSetForeground vbMsgBoxHelp vbMsgBoxRight vbMsgBoxRtlReading
 ' MsgBoxResult
 vbOK vbCancel vbAbort vbRetry vbIgnore vbYes vbNo
 ' TriState

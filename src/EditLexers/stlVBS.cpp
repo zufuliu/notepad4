@@ -15,7 +15,7 @@ static KEYWORDLIST Keywords_VBS = {{
 , // 1 type keyword
 nullptr
 
-, // 2 vba keyword
+, // 2 VBA keyword
 nullptr
 
 , // 3 preprocessor
@@ -25,7 +25,7 @@ nullptr
 nullptr
 
 , // 5 class
-"ActiveXObject Debug Dictionary Err FileSystemObject RegExp TextStream WScript "
+"ActiveXObject Debug Dictionary Err FileSystemObject RegExp WScript "
 
 , // 6 interface
 nullptr
@@ -97,7 +97,7 @@ EDITLEXER lexVBScript = {
 		SCE_VB_OPERATOR, SCE_VB_OPERATOR2
 		, KeywordAttr32(0, KeywordAttr_MakeLower | KeywordAttr_PreSorted) // keywords
 		| KeywordAttr32(1, KeywordAttr_MakeLower) // type keyword
-		| KeywordAttr32(2, KeywordAttr_MakeLower) // vba keyword
+		| KeywordAttr32(2, KeywordAttr_MakeLower) // VBA keyword
 		| KeywordAttr32(3, KeywordAttr_MakeLower | KeywordAttr_NoAutoComp) // preprocessor
 		| KeywordAttr32(4, KeywordAttr_MakeLower) // attribute
 		| KeywordAttr32(5, KeywordAttr_MakeLower | KeywordAttr_PreSorted) // class

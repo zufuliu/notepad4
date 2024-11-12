@@ -71,24 +71,32 @@ Not And Or Xor Eqv Imp Is Mod
 ' Keywords https://learn.microsoft.com/en-us/previous-versions/f8tbc79x(v=vs.85)
 Empty False Nothing Null True
 
-' types
-Boolean Byte Char Currency Date Decimal Double Integer Long LongLong LongPtr Object Single String Variant
+' reserved types
+Boolean Byte Currency Date Double Integer Long Single String Variant
+' other types
+Char Decimal LongLong LongPtr Object
 
-' others
-Alias As Attribute Begin
-Compare Continue
-Declare
+' reserved words https://flylib.com/books/en/2.442.1/vbscript_basics.html
+' https://isvbscriptdead.com/reserved-keywords/
+As
 EndIf Enum Event
-Friend
-Global GoSub
 Implements
-Lib Like Load LSet
-Me Module
+Like LSet
+Me
 Optional
 ParamArray
-RaiseEvent Return RSet
+RaiseEvent RSet
 Shared Static
 Type TypeOf
+' other words
+Alias Attribute Begin
+Compare Continue
+Declare
+Friend
+Global GoSub
+Lib Load
+Module
+Return
 Unload
 WithEvents
 
@@ -170,7 +178,7 @@ FileSystemObject {
 	OpenTextFile(filename[, iomode[, create[, format]]])
 }
 
-TextStream {
+{ ' TextStream
 	AtEndOfLine
 	AtEndOfStream
 	Column

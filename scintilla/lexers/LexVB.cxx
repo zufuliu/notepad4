@@ -55,7 +55,7 @@ enum {
 enum {
 	KeywordIndex_Keyword = 0,
 	KeywordIndex_TypeKeyword = 1,
-	KeywordIndex_VbaKeyword = 2,
+	KeywordIndex_VBAKeyword = 2,
 	KeywordIndex_Preprocessor = 3,
 	KeywordIndex_Attribute = 4,
 	KeywordIndex_Class = 5,
@@ -88,15 +88,6 @@ constexpr bool IsVBNumberPrefix(int ch) noexcept {
 		|| ch == 'b';// Binary
 }
 
-constexpr bool IsPreprocessorStart(int ch) noexcept {
-	ch = UnsafeLower(ch);
-	return ch == 'c' // Const
-		|| ch == 'd' // Disable
-		|| ch == 'e' // End
-		|| ch == 'i' // If
-		|| ch == 'r';// Region
-}
-
 constexpr bool PreferStringConcat(int chPrevNonWhite, int stylePrevNonWhite) noexcept {
 	return chPrevNonWhite == '\"' || chPrevNonWhite == ')' || chPrevNonWhite == ']'
 		|| (stylePrevNonWhite != SCE_VB_KEYWORD && IsIdentifierChar(chPrevNonWhite));
@@ -119,6 +110,7 @@ inline bool IsInterpolatedStringEnd(const StyleContext &sc) noexcept {
 
 void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	KeywordType kwType = KeywordType::None;
+	bool preprocessor = false;
 	int lineState = 0;
 	int parenCount = 0;
 	int fileNbDigits = 0;
@@ -178,8 +170,9 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				kwType = KeywordType::None;
 				if (s[0] == '#') {
 					if (keywordLists[KeywordIndex_Preprocessor].InList(s + 1)) {
+						preprocessor = true;
 						sc.ChangeState(SCE_VB_PREPROCESSOR);
-						if (StrEqualsAny(s + 1, "if", "end", "elseif")) {
+						if (StrEqual(s + 1, "end")) {
 							kwType = KeywordType::Preprocessor;
 						}
 					} else {
@@ -199,6 +192,10 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 									if (language == Language::VBNET && chNext == '(' && (parenCount != 0 || visibleChars > 2)) {
 										sc.ChangeState(SCE_VB_KEYWORD3); // If operator
 									}
+								} else if (StrEqual(s, "then")) {
+									if (preprocessor) {
+										sc.ChangeState(SCE_VB_PREPROCESSOR_WORD);
+									}
 								} else if (StrEqual(s, "dim")) {
 									lineState = VBLineType_DimLine;
 								} else if (StrEqual(s, "const")) {
@@ -217,7 +214,7 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 									kwType = KeywordType::AccessModifier;
 								}
 							}
-						} else if (keywordLists[KeywordIndex_VbaKeyword].InList(s)) {
+						} else if (keywordLists[KeywordIndex_VBAKeyword].InList(s)) {
 							sc.ChangeState(SCE_VB_KEYWORD3);
 							if (language == Language::VBA && !skipType && chBefore != '.') {
 								sc.ChangeState(SCE_VB_KEYWORD);
@@ -363,7 +360,7 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				sc.SetState(SCE_VB_INTERPOLATED_STRING);
 				sc.Forward();
 			} else if (sc.ch == '#') {
-				if (visibleChars == 0 && language != Language::VBScript && IsPreprocessorStart(sc.chNext)) {
+				if (visibleChars == 0 && language != Language::VBScript && IsUpperOrLowerCase(sc.chNext)) {
 					sc.SetState(SCE_VB_IDENTIFIER);
 				} else {
 					fileNbDigits = 0;
@@ -417,6 +414,7 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 			lineState &= VBLineStateLineContinuation;
 			visibleChars = 0;
 			kwType = KeywordType::None;
+			preprocessor = false;
 		}
 		sc.Forward();
 	}

@@ -303,8 +303,7 @@ constexpr bool IsUpperCase(int ch) noexcept {
 }
 
 constexpr bool IsUpperOrLowerCase(int ch) noexcept {
-	return (ch >= 'A' && ch <= 'Z')
-		|| (ch >= 'a' && ch <= 'z');
+	return IsLowerCase(UnsafeLower(ch));
 }
 
 constexpr bool IsAlpha(int ch) noexcept {
