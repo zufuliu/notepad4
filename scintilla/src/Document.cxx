@@ -252,6 +252,8 @@ bool Document::SetDBCSCodePage(int dbcsCodePage_) {
 		DBCSCharClassify *classify = nullptr;
 		forwardSafeChar = 0xff;
 		backwardSafeChar = 0xff;
+		asciiForwardSafeChar = 0xff;
+		asciiBackwardSafeChar = 0xff;
 		if (dbcsCodePage) {
 			forwardSafeChar = 0x80;
 			backwardSafeChar = 0x80;
@@ -268,6 +270,8 @@ bool Document::SetDBCSCodePage(int dbcsCodePage_) {
 					backwardSafeChar = 0x31 - 1;
 					break;
 				}
+				asciiForwardSafeChar = 0x80;
+				asciiBackwardSafeChar = backwardSafeChar;
 				classify = new DBCSCharClassify(dbcsCodePage);
 			}
 		}
@@ -2939,31 +2943,41 @@ static constexpr char BraceOpposite(char ch) noexcept {
 
 // TODO: should be able to extend styled region to find matching brace
 Sci::Position Document::BraceMatch(Sci::Position position, Sci::Position /*maxReStyle*/, Sci::Position startPos, bool useStartPos) const noexcept {
-	const char chBrace = CharAt(position);
-	const char chSeek = BraceOpposite(chBrace);
+	const unsigned char chBrace = CharAt(position);
+	const unsigned char chSeek = BraceOpposite(chBrace);
 	if (chSeek == '\0')
 		return -1;
 	const int styBrace = StyleIndexAt(position);
 	const int direction = (chBrace < chSeek) ? 1 : -1;
+	const unsigned char safeChar = (direction >= 0) ? asciiForwardSafeChar : asciiBackwardSafeChar;
 	int depth = 1;
 	position = useStartPos ? startPos : NextPosition(position, direction);
+	//startPos = position;
+	//const ElapsedPeriod period;
 	const Sci::Position length = LengthNoExcept();
 	while (IsValidIndex(position, length)) {
-		const char chAtPos = CharAt(position);
-		const int styAtPos = StyleIndexAt(position);
-		if ((position > GetEndStyled()) || (styAtPos == styBrace)) {
-			if (chAtPos == chBrace)
-				depth++;
-			if (chAtPos == chSeek)
-				depth--;
-			if (depth == 0)
-				return position;
+		const unsigned char chAtPos = CharAt(position);
+		if (chAtPos == chBrace || chAtPos == chSeek) {
+			if ((position > GetEndStyled()) || (StyleIndexAt(position) == styBrace)) {
+				depth += (chAtPos == chBrace) ? 1 : -1;
+				if (depth == 0) {
+					return position;
+				}
+			}
+			position += direction;
+		} else if (chAtPos <= safeChar) {
+			position += direction;
+		} else {
+			const Sci::Position positionBeforeMove = position;
+			position = NextPosition(position, direction);
+			if (position == positionBeforeMove) {
+				break;
+			}
 		}
-		const Sci::Position positionBeforeMove = position;
-		position = NextPosition(position, direction);
-		if (position == positionBeforeMove)
-			break;
 	}
+	//const double duration = period.Duration();
+	//printf("%s (%d, %zd, %zd / %zd): %.6f\n", __func__, direction, startPos, GetEndStyled(), length, duration);
+	//return depth ? -1 : position;
 	return -1;
 }
 
