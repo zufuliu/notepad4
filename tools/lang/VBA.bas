@@ -17,13 +17,15 @@ ChDir
 ChDrive
 Close
 Const As
+Date
 Declare PtrSafe Sub Lib Alias
 Declare PtrSafe Function Lib Alias As
 DefBool DefByte DefInt DefLng DefLngLng DefLngPtr
 DefCur DefSng DefDbl DefDec DefDate DefStr DefObj DefVar
 DeleteSetting
-Dim As New WithEvents
+Dim WithEvents As New
 Do
+	End
 	Exit Do
 	Do While
 	Loop
@@ -63,8 +65,8 @@ Kill
 Let
 Line Input
 Load
-Lock
-Unlock
+Lock To
+Unlock To
 LSet
 Mid()
 MkDir
@@ -77,8 +79,8 @@ Open For Access As Len
 Option Base
 Option Compare Binary Text Database
 Option Explicit
-Option Private
-Print
+Option Private Module
+Print Spc() Tab()
 Private WithEvents As New
 Property Get As
 	Exit Property
@@ -101,7 +103,8 @@ SavePicture		' VB6
 SaveSetting
 Seek
 Select Case
-Case Else
+	Case Else
+	Case To
 End Select
 SendKeys
 Set New Nothing

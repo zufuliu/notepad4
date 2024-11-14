@@ -19,8 +19,9 @@ Declare Function Lib Alias As
 	Shared Shadows Static ReadOnly
 Delegate Sub Of As
 Delegate Function Of As
-Dim WithEvents As New With
+Dim WithEvents As New ' With {}
 Do
+	End
 	Continue Do
 	Exit Do
 	Do While
@@ -63,22 +64,26 @@ ElseIf Then
 Else
 End If
 If Then Else
+Implements
 Imports
+Inherits
 Interface Of
-	' Property
-	' Function
-	' Sub
-	' Event
-	' Interface
-	' Class
-	' Structure
+	Inherits
+	Property
+	Function
+	Sub
+	Event
+	Interface
+	Class
+	Structure
 End Interface
 Mid()
 Module
 End Module
 Namespace Global
 End Namespace
-On Error GoTo Resume Next
+On Error GoTo
+On Error Resume Next
 	Public Overloads Shared Shadows Widening Narrowing
 Operator As
 	Return
@@ -87,7 +92,7 @@ Option Compare Binary Text
 Option Explicit On Off
 Option Infer On Off
 Option Strict On Off
-Property
+Property As Implements
 	Get
 	End Get
 	Set()
@@ -98,14 +103,17 @@ RaiseEvent
 ReDim Preserve
 Rem
 RemoveHandler AddressOf
+Resume Next
+Return
 Select Case
 	Case Else
+	Case To
 End Select
 Stop
 Structure Of
 	Implements
 End Structure
-Sub
+Partial Sub
 	Exit Sub
 End Sub
 SyncLock
@@ -134,7 +142,7 @@ From As In
 Group By Into
 Group Join As In On Equals And Equals Into
 Let
-Order By
+Order By Ascending Descending
 Select
 Skip While
 Take While
@@ -151,6 +159,10 @@ NameOf() New Not
 Or OrElse
 TryCast() TypeOf Is IsNot
 Xor
+
+' https://learn.microsoft.com/en-us/dotnet/visual-basic/programming-guide/language-features/procedures/lambda-expressions
+Function() And
+Sub() And
 
 ' https://learn.microsoft.com/en-us/dotnet/visual-basic/language-reference/modifiers/
 Ansi Assembly Async Auto
@@ -199,6 +211,8 @@ Variant
 <MyGroupCollection()>
 <VBFixedArray()>
 <VBFixedString()>
+' https://learn.microsoft.com/en-us/dotnet/visual-basic/programming-guide/language-features/procedures/extension-methods
+<Extension()>
 
 '! directives			=======================================================
 ' https://learn.microsoft.com/en-us/dotnet/visual-basic/reference/language-specification/preprocessing-directives

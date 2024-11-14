@@ -1347,8 +1347,6 @@ void Style_DefineIndicator(int index, int indicator, int indicatorStyle) noexcep
 // Style_SetLexer()
 //
 void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) noexcept {
-	int iValue;
-
 	// Select default if nullptr is specified
 	if (!pLexNew) {
 		np2LexLangIndex = 0;
@@ -1491,7 +1489,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) noexcept {
 	szValue = lexGlobal.Styles[GlobalStyleIndex_DefaultText].szValue;
 	Style_StrGetFontEx(szValue, defaultTextFontName, COUNTOF(defaultTextFontName), true);
 
-	iValue = pLexNew->bUseDefaultCodeStyle ? GlobalStyleIndex_DefaultCode : GlobalStyleIndex_DefaultText;
+	int iValue = pLexNew->bUseDefaultCodeStyle ? GlobalStyleIndex_DefaultCode : GlobalStyleIndex_DefaultText;
 	szValue = lexGlobal.Styles[iValue].szValue;
 	// base font size
 	if (!Style_StrGetFontSize(szValue, &iBaseFontSize)) {
@@ -2436,6 +2434,9 @@ static void Style_UpdateLexerLang(LPCEDITLEXER pLex, LPCWSTR lpszExt, LPCWSTR lp
 		}
 		break;
 
+	case NP2LEX_VBSCRIPT:
+		np2LexLangIndex = IDM_LEXER_VBS;
+		break;
 	case NP2LEX_VISUALBASIC:
 		if (lstrlen(lpszExt) == 3) {
 			np2LexLangIndex = IDM_LEXER_VBA;
