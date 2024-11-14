@@ -8086,10 +8086,15 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		}
 		break;
 
-	case Message::BraceMatch:
+	case Message::BraceMatch: {
 		// wParam is position of char to find brace for,
 		// lParam is maximum amount of text to restyle to find it
-		return pdoc->BraceMatch(PositionFromUPtr(wParam), lParam, 0, false);
+		// const ElapsedPeriod period;
+		const Sci::Position position = pdoc->BraceMatch(PositionFromUPtr(wParam), lParam, 0, false);
+		// const double duration = period.Duration()*1e3;
+		// printf("BraceMatch %zu / %zd, %zd / %zd, %f\n", wParam, position, pdoc->GetEndStyled(), pdoc->LengthNoExcept(), duration);
+		return position;
+	}
 
 	case Message::BraceMatchNext:
 		return pdoc->BraceMatch(PositionFromUPtr(wParam), 0, lParam, true);

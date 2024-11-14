@@ -2950,11 +2950,9 @@ Sci::Position Document::BraceMatch(Sci::Position position, Sci::Position /*maxRe
 	const int styBrace = StyleIndexAt(position);
 	const int direction = (chBrace < chSeek) ? 1 : -1;
 	const unsigned char safeChar = (direction >= 0) ? asciiForwardSafeChar : asciiBackwardSafeChar;
-	int depth = 1;
 	position = useStartPos ? startPos : NextPosition(position, direction);
-	//startPos = position;
-	//const ElapsedPeriod period;
 	const Sci::Position length = LengthNoExcept();
+	int depth = 1;
 	while (IsValidIndex(position, length)) {
 		const unsigned char chAtPos = CharAt(position);
 		if (chAtPos == chBrace || chAtPos == chSeek) {
@@ -2968,16 +2966,11 @@ Sci::Position Document::BraceMatch(Sci::Position position, Sci::Position /*maxRe
 		} else if (chAtPos <= safeChar) {
 			position += direction;
 		} else {
-			const Sci::Position positionBeforeMove = position;
-			position = NextPosition(position, direction);
-			if (position == positionBeforeMove) {
+			if (!NextCharacter(position, direction)) {
 				break;
 			}
 		}
 	}
-	//const double duration = period.Duration();
-	//printf("%s (%d, %zd, %zd / %zd): %.6f\n", __func__, direction, startPos, GetEndStyled(), length, duration);
-	//return depth ? -1 : position;
 	return -1;
 }
 
