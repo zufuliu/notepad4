@@ -1,14 +1,14 @@
-// 2024-06-21 https://developer.huawei.com/consumer/cn/cangjie
+// 2024-10-24 0.53.13 https://cangjie-lang.cn/
+// 2024-10-26 0.22.17 https://developer.huawei.com/consumer/cn/cangjie
 
 //! keywords		===========================================================
-// https://developer.huawei.com/consumer/cn/doc/openharmony-cangjie/keyword
 abstract as
 break
 case catch class const continue
 do
 else enum extend
-false finally for foreign func
-if import in init interface is
+false finally for from foreign func
+if import in init inout interface is
 let
 macro main match mut
 open operator override
@@ -20,6 +20,9 @@ this throw true try type
 unsafe
 var
 where while
+
+// Contextual Keyword
+get sealed set
 
 //! types			===========================================================
 Nothing This VArray
