@@ -1,4 +1,4 @@
-// 5.4 https://www.typescriptlang.org/docs/
+// 5.6 https://www.typescriptlang.org/docs/
 // 1.8 https://github.com/microsoft/TypeScript/blob/main/doc/
 
 //! keywords		===========================================================
@@ -40,7 +40,7 @@ any bigint boolean never number object string symbol unknown void
 
 //! TSDoc			===========================================================
 // https://www.typescriptlang.org/docs/handbook/triple-slash-directives.html
-/// <reference path="" />
+/// <reference path="" preserve="true" />
 /// <reference types="" />
 /// <reference lib="" />
 /// <reference no-default-lib="true" />

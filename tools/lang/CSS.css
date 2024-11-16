@@ -1,5 +1,5 @@
 // 2023 https://www.w3.org/TR/CSS/ 7 December 2023
-// 2024-09-14 https://drafts.csswg.org/
+// 2024-11-16 https://drafts.csswg.org/
 // https://github.com/w3c/csswg-drafts/
 // https://www.w3.org/Style/CSS/all-properties
 // https://www.w3.org/Style/CSS/all-descriptors
@@ -10,15 +10,14 @@
 // https://www.w3.org/TR/css-syntax-3/ 24 December 2021
 !important
 
-// CSS Anchor Positioning https://www.w3.org/TR/css-anchor-position-1/ 26 March 2024
+// CSS Anchor Positioning https://www.w3.org/TR/css-anchor-position-1/ 4 October 2024
 {
 	anchor-name: none;
 	anchor-scope: none | all;
 	position-anchor: auto;
-	inset-area: none;
+	position-area: none;
 	position-visibility: always | anchors-valid | anchors-visible | no-overflow;
 
-	position-try-options: none | inset-area();
 	position-try-fallbacks: none | flip-block | flip-inline | flip-start;
 	position-try-order: normal | most-width | most-height | most-block-size | most-inline-size;
 	position-try:;
@@ -245,7 +244,7 @@ initial inherit unset revert revert-layer
 	background-blend-mode:;
 }
 
-// CSS Conditional Rules Module Level 5 https://www.w3.org/TR/css-conditional-5/ 21 23 July 2024
+// CSS Conditional Rules Module Level 5 https://www.w3.org/TR/css-conditional-5/ 5 November 2024
 // CSS Conditional Rules Module Level 4 https://www.w3.org/TR/css-conditional-4/ 17 February 2022
 // CSS Conditional Rules Module Level 3 https://www.w3.org/TR/css-conditional-3/ 15 August 2024
 not and or
@@ -255,7 +254,22 @@ not and or
 }
 @else {
 }
-@container {}
+{
+	container-type: normal | size | inline-size | scroll-state;
+	container-name: none;
+	container:;
+}
+@container {
+	width:;
+	height:;
+	inline-size:;
+	block-size:;
+	aspect-ratio:;
+	orientation: portrait | landscape;
+	stuck: none | top | right | bottom | left | block-start | inline-start | block-end | inline-end;
+	snapped: none | block | inline;
+	overflowing: none | top | right | bottom | left | block-start | inline-start | block-end | inline-end;
+}
 @media {}
 selector()
 font-tech()
@@ -503,17 +517,18 @@ step-start step-end steps()
 	bookmark-state: open | closed;
 }
 
+// CSS Grid Layout Module Level 3 https://www.w3.org/TR/css-grid-3/ 3 October 2024
 // CSS Grid Layout Module Level 2 https://www.w3.org/TR/css-grid-2/ 18 December 2020
 // CSS Grid Layout Module Level 1 https://www.w3.org/TR/css-grid-1/ 18 December 2020
 {
-	display: grid | inline-grid;
-	grid-template-columns: none, min-content | max-content | auto, minmax(), fit-content(), subgrid;
-	grid-template-rows: none, min-content | max-content | auto, minmax(), fit-content(), subgrid;
+	display: grid | inline-grid | masonry | inline-masonry;
+	grid-template-columns: none, min-content | max-content | auto, minmax(), fit-content(), subgrid, masonry;
+	grid-template-rows: none, min-content | max-content | auto, minmax(), fit-content(), subgrid, masonry;
 	grid-template-areas: none;
 	grid-template: none;
 	grid-auto-columns: auto;
 	grid-auto-rows: auto;
-	grid-auto-flow: row | column | dense;
+	grid-auto-flow: row | column | row-reverse | column-reverse | dense | wrap-reverse;
 	grid: none | auto-flow | dense;
 	grid-row-start: auto | span;
 	grid-column-start: auto | span;
@@ -522,7 +537,20 @@ step-start step-end steps()
 	grid-row: auto;
 	grid-column: auto;
 	grid-area: auto;
+
+	masonry-direction: row | column | row-reverse | column-reverse;
+	masonry-fill: normal | reverse;
+	masonry-flow:;
+	masonry:;
+	masonry-template-tracks: repeat();
+	masonry-template-areas: none;
+	masonry-auto-tracks: auto;
+	masonry-track-start:;
+	masonry-track-end:;
+	masonry-track:;
+	masonry-slack:;
 }
+auto-areas auto-fit
 
 // CSS Images Module Level 4 https://www.w3.org/TR/css-images-4/ 17 February 2023
 // CSS Images Module Level 3 https://www.w3.org/TR/css-images-3/ 18 December 2023
@@ -759,14 +787,14 @@ all continuous paged visual audio speech tactile grid bitmap interactive static
 	text-size-adjust: auto | none;
 }
 
-// Motion Path Module Level 1 https://www.w3.org/TR/motion-1/ 18 December 2018
+// Motion Path Module Level 1 https://www.w3.org/TR/motion-1/ 5 November 2024
 {
-	offset-path: none | ray() | path();
+	offset-path: none | ray();
 	offset-distance:;
-	offset-position: auto;
+	offset-position: normal | auto;
 	offset-anchor: auto;
 	offset-rotate: auto | reverse;
-	offset: auto | reverse;
+	offset:;
 }
 
 // CSS Multi-column Layout Module Level 1 https://www.w3.org/TR/css-multicol-1/ 16 May 2024
@@ -1200,13 +1228,13 @@ view()
 }
 
 // CSS Text Module Level 4 https://www.w3.org/TR/css-text-4/ 29 May 2024
-// CSS Text Module Level 3 https://www.w3.org/TR/css-text-3/ 3 September 2023
+// CSS Text Module Level 3 https://www.w3.org/TR/css-text-3/ 30 September 2024
 // Text https://www.w3.org/TR/CSS22/text.html
 {
 	text-transform: none | capitalize | uppercase | lowercase | full-width | full-size-kana | math-auto;
 	word-space-transform: none | space | ideographic-space | auto-phrase;
 
-	white-space: normal | pre | pre-wrap | pre-line;
+	white-space: normal | pre | nowrap | pre-wrap | break-spaces | pre-line;
 	white-space-collapse: collapse | discard | preserve | preserve-breaks | preserve-spaces | break-spaces;
 	white-space-trim: none | discard-before || discard-after || discard-inner;
 	tab-size:;
@@ -1304,7 +1332,7 @@ view()
 }
 @starting-style {}
 
-// CSS Values and Units Module Level 5 https://www.w3.org/TR/css-values-5/ 13 September 2024
+// CSS Values and Units Module Level 5 https://www.w3.org/TR/css-values-5/ 11 November 2024
 // CSS Values and Units Module Level 4 https://www.w3.org/TR/css-values-4/ 12 March 2024
 // CSS Values and Units Module Level 3 https://www.w3.org/TR/css-values-3/ 22 March 2024
 mix()
@@ -1312,19 +1340,22 @@ initial nherit unset
 url()
 left center right top center bottom
 attr()
-//! math function that requires space on both side of '+' and '-', https://www.w3.org/TR/css-values-4/#calc-syntax
+//! function takes calc-sum arguments requires space on both side of '+' and '-', https://www.w3.org/TR/css-values-4/#calc-syntax
 = calc() min() max() clamp()
 = round() mod() rem()
 = sin() cos() tan() asin() acos() atan() atan2()
 = pow() sqrt() hypot() log() exp()
 = abs() sign()
 = progress() media-progress() container-progress()
-= calc-mix() color-mix() cross-fade() transform-mix() mix()
-first-valid() toggle() attr()
+= calc-mix()
 = random()
+= calc-size()
+// other function
+color-mix() cross-fade() transform-mix()
+first-valid() toggle() var() inherit()
+if() else supports() media() style()
 random-item()
 sibling-count() sibling-index()
-= calc-size()
 pi infinity NaN
 
 {
@@ -1336,11 +1367,12 @@ pi infinity NaN
 	zoom:;
 }
 
-// CSS View Transitions Module Level 2 https://www.w3.org/TR/css-view-transitions-2/ 16 May 2024
+// CSS View Transitions Module Level 2 https://www.w3.org/TR/css-view-transitions-2/ 13 November 2024
 // CSS View Transitions Module Level 1 https://www.w3.org/TR/css-view-transitions-1/ 5 September 2023
 {
 	view-transition-class: none;
 	view-transition-name: none;
+	view-transition-group: normal | contain | nearest;
 }
 @view-transition {
 	navigation: auto | none;
