@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
-	<assemblyIdentity name="Notepad4" processorArchitecture="*" version="24.09.0.5472" type="win32"/>
+	<assemblyIdentity name="Notepad4" processorArchitecture="*" version="24.11.0.5548" type="win32"/>
 	<description>Notepad4 Text Editor</description>
 	<dependency>
 		<dependentAssembly>
