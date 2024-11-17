@@ -841,8 +841,6 @@ INT_PTR CALLBACK ItemsPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPara
 	static HBRUSH m_hbrNoFilter;
 	static HBRUSH m_hbrFilter;
 
-	CHOOSECOLOR cc;
-
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		m_bDefColorNoFilter = bDefColorNoFilter;
@@ -908,40 +906,32 @@ INT_PTR CALLBACK ItemsPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPara
 			break;
 
 		case IDC_COLOR_PICK1:
+		case IDC_COLOR_PICK2: {
+			CHOOSECOLOR cc;
 			memset(&cc, 0, sizeof(CHOOSECOLOR));
 
 			cc.lStructSize = sizeof(CHOOSECOLOR);
 			cc.hwndOwner = hwnd;
-			cc.rgbResult = m_colorNoFilter;
+			cc.rgbResult = (LOWORD(wParam) == IDC_COLOR_PICK1) ? m_colorNoFilter : m_colorFilter;
 			cc.lpCustColors = colorCustom;
 			cc.Flags = CC_RGBINIT | CC_SOLIDCOLOR;
 
 			if (ChooseColor(&cc)) {
-				DeleteObject(m_hbrNoFilter);
-				m_colorNoFilter = cc.rgbResult;
-				m_hbrNoFilter = CreateSolidBrush(m_colorNoFilter);
+				if (LOWORD(wParam) == IDC_COLOR_PICK1) {
+					DeleteObject(m_hbrNoFilter);
+					m_colorNoFilter = cc.rgbResult;
+					m_hbrNoFilter = CreateSolidBrush(m_colorNoFilter);
+				} else {
+					DeleteObject(m_hbrFilter);
+					m_colorFilter = cc.rgbResult;
+					m_hbrFilter = CreateSolidBrush(m_colorFilter);
+				}
 			}
 
-			InvalidateRect(GetDlgItem(hwnd, IDC_COLOR_SAMP1), nullptr, TRUE);
-			break;
+			static_assert(IDC_COLOR_SAMP1 - IDC_COLOR_PICK1 == IDC_COLOR_SAMP2 - IDC_COLOR_PICK2);
+			InvalidateRect(GetDlgItem(hwnd, LOWORD(wParam) + IDC_COLOR_SAMP1 - IDC_COLOR_PICK1), nullptr, TRUE);
+		} break;
 
-		case IDC_COLOR_PICK2:
-			memset(&cc, 0, sizeof(CHOOSECOLOR));
-
-			cc.lStructSize = sizeof(CHOOSECOLOR);
-			cc.hwndOwner = hwnd;
-			cc.rgbResult = m_colorFilter;
-			cc.lpCustColors = colorCustom;
-			cc.Flags = CC_RGBINIT | CC_SOLIDCOLOR;
-
-			if (ChooseColor(&cc)) {
-				DeleteObject(m_hbrFilter);
-				m_colorFilter = cc.rgbResult;
-				m_hbrFilter = CreateSolidBrush(m_colorFilter);
-			}
-
-			InvalidateRect(GetDlgItem(hwnd, IDC_COLOR_SAMP2), nullptr, TRUE);
-			break;
 		}
 		return TRUE;
 
@@ -1290,7 +1280,6 @@ extern int cxFileFilterDlg;
 INT_PTR OptionsPropSheet(HWND hwnd, HINSTANCE hInstance) noexcept {
 	PROPSHEETHEADER psh;
 	PROPSHEETPAGE psp[4];
-	INT_PTR nResult;
 
 	memset(&psh, 0, sizeof(PROPSHEETHEADER));
 	memset(psp, 0, sizeof(psp));
@@ -1328,7 +1317,7 @@ INT_PTR OptionsPropSheet(HWND hwnd, HINSTANCE hInstance) noexcept {
 	psh.nStartPage  = 0;
 	psh.ppsp        = psp;
 
-	nResult = PropertySheet(&psh);
+	const INT_PTR nResult = PropertySheet(&psh);
 
 	if (psp[0].pResource) {
 		NP2HeapFree(const_cast<DLGTEMPLATE *>(psp[0].pResource));
