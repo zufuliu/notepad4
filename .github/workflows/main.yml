@@ -113,6 +113,7 @@ jobs:
 
     - name: MSVC ARM Release
       run: |
+        CALL "build\install_msvc.bat" arm
         CALL "build\VS2017\build.bat" Build ARM Release 1
         CALL "build\make_zip.bat" MSVC ARM Release 1
 
