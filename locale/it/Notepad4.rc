@@ -457,7 +457,7 @@ BEGIN
 		MENUITEM SEPARATOR
 		MENUITEM "&Numeri linee\tCtrl+Shift+N",		IDM_VIEW_LINENUMBERS
 		MENUITEM "Mar&gine segnalibri\tCtrl+Shift+M",	IDM_VIEW_MARGIN
-		MENUITEM "Cambia Marcatore &Cronologia",			IDM_VIEW_CHANGE_HISTORY_MARKER
+		MENUITEM "Marcatore &Cronologia",			IDM_VIEW_CHANGE_HISTORY_MARKER
 		MENUITEM SEPARATOR
 		MENUITEM "Mostra Code &Folding\tCtrl+Shift+Alt+F",IDM_VIEW_SHOW_FOLDING
 		POPUP "Chiudi F&olds"
@@ -2112,7 +2112,7 @@ BEGIN
 	NP2STYLE_CallTip				"Suggerimento"
 	NP2STYLE_CodeFolding			"Code Folding"
 	NP2STYLE_Link					"Collegamento"
-	NP2STYLE_ChangeHistoryMarker	"Cambia Marcatore Cronologia"
+	NP2STYLE_ChangeHistoryMarker	"Marcatore Cronologia"
 
 	NP2STYLE_Default				"Predefinito"
 END
