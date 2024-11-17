@@ -323,8 +323,8 @@ public:
 	bool tabIndents = true;
 	uint8_t backspaceUnindents = false;
 	uint8_t unused1 = 0;
-	uint8_t forwardSafeChar = 0x80;
-	uint8_t backwardSafeChar = 0x80;
+	uint8_t forwardSafeChar = 0x7f;
+	uint8_t backwardSafeChar = 0x7f;
 	uint8_t asciiForwardSafeChar = 0xff;
 	uint8_t asciiBackwardSafeChar = 0xff;
 	ActionDuration durationStyleOneUnit;

@@ -50,6 +50,13 @@ struct SplitView {
 
 	SplitView(const SplitVector<char> &instance) noexcept;
 
+	char operator[](size_t position) const noexcept {
+		if (position < length1) {
+			return segment1[position];
+		}
+		return segment2[position];
+	}
+
 	char CharAt(size_t position) const noexcept {
 		if (position < length1) {
 			return segment1[position];

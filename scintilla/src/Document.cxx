@@ -255,10 +255,13 @@ bool Document::SetDBCSCodePage(int dbcsCodePage_) {
 		asciiForwardSafeChar = 0xff;
 		asciiBackwardSafeChar = 0xff;
 		if (dbcsCodePage) {
-			forwardSafeChar = 0x80;
-			backwardSafeChar = 0x80;
+			forwardSafeChar = 0x7f;
+			backwardSafeChar = 0x7f;
 			if (CpUtf8 != dbcsCodePage) {
-				// minimum trail byte
+				// minimum lead byte - 1
+				forwardSafeChar = 0x80;
+				asciiForwardSafeChar = 0x80;
+				// minimum trail byte - 1
 				switch (dbcsCodePage) {
 				default:
 					backwardSafeChar = 0x40 - 1;
@@ -270,7 +273,6 @@ bool Document::SetDBCSCodePage(int dbcsCodePage_) {
 					backwardSafeChar = 0x31 - 1;
 					break;
 				}
-				asciiForwardSafeChar = 0x80;
 				asciiBackwardSafeChar = backwardSafeChar;
 				classify = new DBCSCharClassify(dbcsCodePage);
 			}
