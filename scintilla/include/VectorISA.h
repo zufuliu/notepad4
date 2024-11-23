@@ -37,7 +37,6 @@
 	#define NP2_USE_SSE2		1
 
 	// Clang and GCC use -march=x86-64-v3, https://clang.llvm.org/docs/UsersManual.html#x86
-	// or -mavx2 -mpopcnt -mbmi -mbmi2 -mlzcnt -mmovbe
 	// MSVC use /arch:AVX2
 	#if defined(_WIN64) && defined(__AVX2__)
 		#define NP2_USE_AVX2	1
@@ -161,6 +160,7 @@
 
 // https://stackoverflow.com/questions/32945410/sse2-intrinsics-comparing-unsigned-integers
 #if NP2_USE_AVX2
+#define mm256_set1_epi8(ch)			_mm256_broadcastb_epi8(_mm_cvtsi32_si128(ch))
 #define mm256_movemask_epi8(a)		static_cast<uint32_t>(_mm256_movemask_epi8(a))
 #define mm256_cmpge_epu8(a, b) \
 	_mm256_cmpeq_epi8(_mm256_max_epu8((a), (b)), (a))
@@ -240,8 +240,8 @@ inline uint32_t loadbe_u32(const void *ptr) noexcept {
 #define andn_u32(a, b)	_andn_u32((a), (b))
 #endif
 
-#define bit_zero_high_u32(x, index)	_bzhi_u32((x), (index))			// BMI2
-//#define bit_zero_high_u32(x, index)	_bextr_u32((x), 0, (index))		// BMI1
+#define bit_zero_high_u32(x, index)	_bzhi_u32((x), (index))
+#define bit_zero_high_u64(x, index)	_bzhi_u64((x), (index))
 #else
 
 inline uint32_t loadbe_u32(const void *ptr) noexcept {
@@ -254,6 +254,9 @@ constexpr uint32_t andn_u32(uint32_t a, uint32_t b) noexcept {
 
 constexpr uint32_t bit_zero_high_u32(uint32_t x, uint32_t index) noexcept {
 	return x & ((1U << index) - 1);
+}
+constexpr uint64_t bit_zero_high_u64(uint64_t x, uint32_t index) noexcept {
+	return x & ((UINT64_C(1) << index) - 1);
 }
 #endif
 

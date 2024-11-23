@@ -38,7 +38,7 @@
 #include "ILexer.h"
 
 #include "Debugging.h"
-//#include "VectorISA.h"
+#include "VectorISA.h"
 
 #include "CharacterSet.h"
 //#include "CharacterCategory.h"
@@ -2930,7 +2930,9 @@ Sci::Position Document::ExtendStyleRange(Sci::Position pos, int delta, bool sing
 	return pos;
 }
 
-static constexpr char BraceOpposite(char ch) noexcept {
+namespace {
+
+constexpr char BraceOpposite(char ch) noexcept {
 	if (AnyOf<'(', ')'>(ch)) {
 		return '(' + ')' - ch;
 	}
@@ -2943,18 +2945,113 @@ static constexpr char BraceOpposite(char ch) noexcept {
 	return '\0';
 }
 
+}
+
 // TODO: should be able to extend styled region to find matching brace
 Sci::Position Document::BraceMatch(Sci::Position position, Sci::Position /*maxReStyle*/, Sci::Position startPos, bool useStartPos) const noexcept {
 	const unsigned char chBrace = CharAt(position);
 	const unsigned char chSeek = BraceOpposite(chBrace);
-	if (chSeek == '\0')
+	if (chSeek == '\0') {
 		return -1;
+	}
 	const int styBrace = StyleIndexAt(position);
 	const int direction = (chBrace < chSeek) ? 1 : -1;
 	const unsigned char safeChar = (direction >= 0) ? asciiForwardSafeChar : asciiBackwardSafeChar;
 	position = useStartPos ? startPos : NextPosition(position, direction);
 	const Sci::Position length = LengthNoExcept();
 	int depth = 1;
+	if (chBrace <= asciiBackwardSafeChar && IsValidIndex(position + 32*direction, length)) {
+#if NP2_USE_AVX2
+		if (direction >= 0) {
+			const SplitView cbView = cb.AllView();
+			const __m256i mmBrace = mm256_set1_epi8(chBrace);
+			const __m256i mmSeek = mm256_set1_epi8(chSeek);
+			do {
+				const bool scanFirst = IsValidIndex(position, cbView.length1);
+				const Sci::Position segmentLength = scanFirst ? cbView.length1 : length;
+				const char * const segment = scanFirst ? cbView.segment1 : cbView.segment2;
+				const __m256i *ptr = reinterpret_cast<const __m256i *>(segment + position);
+				uint32_t mask = 0;
+				do {
+					const __m256i chunk1 = _mm256_loadu_si256(ptr);
+					mask = mm256_movemask_epi8(_mm256_or_si256(_mm256_cmpeq_epi8(chunk1, mmBrace), _mm256_cmpeq_epi8(chunk1, mmSeek)));
+					if (mask != 0) {
+						break;
+					}
+					ptr++;
+					position += sizeof(mmBrace);
+				} while (position < segmentLength);
+				Sci::Position index = position;
+				position += sizeof(mmBrace);
+				if (position >= segmentLength && index <= segmentLength) {
+					position = segmentLength;
+					const uint32_t offset = static_cast<uint32_t>(position - index);
+					mask = bit_zero_high_u32(mask, offset);
+				}
+				while (mask) {
+					const uint32_t trailing = np2::ctz(mask);
+					index += trailing;
+					mask >>= trailing;
+					if (index > GetEndStyled() || StyleIndexAt(index) == styBrace) {
+						const unsigned char chAtPos = segment[index];
+						depth += (chAtPos == chBrace) ? 1 : -1;
+						if (depth == 0) {
+							return index;
+						}
+					}
+					index++;
+					mask >>= 1;
+				}
+			} while (position < length);
+		}
+		// end NP2_USE_AVX2
+#elif NP2_USE_SSE2
+		if (direction >= 0) {
+			const SplitView cbView = cb.AllView();
+			const __m128i mmBrace = _mm_set1_epi8(chBrace);
+			const __m128i mmSeek = _mm_set1_epi8(chSeek);
+			do {
+				const bool scanFirst = IsValidIndex(position, cbView.length1);
+				const Sci::Position segmentLength = scanFirst ? cbView.length1 : length;
+				const char * const segment = scanFirst ? cbView.segment1 : cbView.segment2;
+				const __m128i *ptr = reinterpret_cast<const __m128i *>(segment + position);
+				uint32_t mask = 0;
+				do {
+					const __m128i chunk1 = _mm_loadu_si128(ptr);
+					mask = mm_movemask_epi8(_mm_or_si128(_mm_cmpeq_epi8(chunk1, mmBrace), _mm_cmpeq_epi8(chunk1, mmSeek)));
+					if (mask != 0) {
+						break;
+					}
+					ptr++;
+					position += sizeof(mmBrace);
+				} while (position < segmentLength);
+				Sci::Position index = position;
+				position += sizeof(mmBrace);
+				if (position >= segmentLength && index <= segmentLength) {
+					position = segmentLength;
+					const uint32_t offset = static_cast<uint32_t>(position - index);
+					mask = bit_zero_high_u32(mask, offset);
+				}
+				while (mask) {
+					const uint32_t trailing = np2::ctz(mask);
+					index += trailing;
+					mask >>= trailing;
+					if (index > GetEndStyled() || StyleIndexAt(index) == styBrace) {
+						const unsigned char chAtPos = segment[index];
+						depth += (chAtPos == chBrace) ? 1 : -1;
+						if (depth == 0) {
+							return index;
+						}
+					}
+					index++;
+					mask >>= 1;
+				}
+			} while (position < length);
+		}
+		// end NP2_USE_SSE2
+#endif
+	}
+
 	while (IsValidIndex(position, length)) {
 		const unsigned char chAtPos = CharAt(position);
 		if (chAtPos == chBrace || chAtPos == chSeek) {
