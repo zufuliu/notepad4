@@ -2971,19 +2971,20 @@ Sci::Position Document::BraceMatch(Sci::Position position, Sci::Position /*maxRe
 				const Sci::Position segmentLength = scanFirst ? cbView.length1 : length;
 				const char * const segment = scanFirst ? cbView.segment1 : cbView.segment2;
 				const __m256i *ptr = reinterpret_cast<const __m256i *>(segment + position);
+				Sci::Position index = position;
 				uint32_t mask = 0;
 				do {
 					const __m256i chunk1 = _mm256_loadu_si256(ptr);
 					mask = mm256_movemask_epi8(_mm256_or_si256(_mm256_cmpeq_epi8(chunk1, mmBrace), _mm256_cmpeq_epi8(chunk1, mmSeek)));
 					if (mask != 0) {
+						index = position;
 						break;
 					}
 					ptr++;
 					position += sizeof(mmBrace);
 				} while (position < segmentLength);
-				Sci::Position index = position;
 				position += sizeof(mmBrace);
-				if (position >= segmentLength && index <= segmentLength) {
+				if (position >= segmentLength && index < segmentLength) {
 					position = segmentLength;
 					const uint32_t offset = static_cast<uint32_t>(position - index);
 					mask = bit_zero_high_u32(mask, offset);
@@ -3015,19 +3016,20 @@ Sci::Position Document::BraceMatch(Sci::Position position, Sci::Position /*maxRe
 				const Sci::Position segmentLength = scanFirst ? cbView.length1 : length;
 				const char * const segment = scanFirst ? cbView.segment1 : cbView.segment2;
 				const __m128i *ptr = reinterpret_cast<const __m128i *>(segment + position);
+				Sci::Position index = position;
 				uint32_t mask = 0;
 				do {
 					const __m128i chunk1 = _mm_loadu_si128(ptr);
 					mask = mm_movemask_epi8(_mm_or_si128(_mm_cmpeq_epi8(chunk1, mmBrace), _mm_cmpeq_epi8(chunk1, mmSeek)));
 					if (mask != 0) {
+						index = position;
 						break;
 					}
 					ptr++;
 					position += sizeof(mmBrace);
 				} while (position < segmentLength);
-				Sci::Position index = position;
 				position += sizeof(mmBrace);
-				if (position >= segmentLength && index <= segmentLength) {
+				if (position >= segmentLength && index < segmentLength) {
 					position = segmentLength;
 					const uint32_t offset = static_cast<uint32_t>(position - index);
 					mask = bit_zero_high_u32(mask, offset);
