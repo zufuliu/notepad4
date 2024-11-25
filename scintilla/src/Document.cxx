@@ -2960,37 +2960,42 @@ Sci::Position Document::BraceMatch(Sci::Position position, Sci::Position /*maxRe
 	position = useStartPos ? startPos : NextPosition(position, direction);
 	const Sci::Position length = LengthNoExcept();
 	int depth = 1;
-	if (chBrace <= asciiBackwardSafeChar && IsValidIndex(position + 32*direction, length)) {
+	if (chBrace <= asciiBackwardSafeChar && IsValidIndex(position + 64*direction, length)) {
 #if NP2_USE_AVX2
 		if (direction >= 0) {
 			const SplitView cbView = cb.AllView();
 			const __m256i mmBrace = mm256_set1_epi8(chBrace);
 			const __m256i mmSeek = mm256_set1_epi8(chSeek);
+			const Sci::Position maxPos = length - 2*sizeof(__m256i);
+			const Sci::Position segmentEndPos = std::min<Sci::Position>(maxPos, cbView.length1 - 1);
 			do {
-				const bool scanFirst = IsValidIndex(position, cbView.length1);
-				const Sci::Position segmentLength = scanFirst ? cbView.length1 : length;
+				const Sci::Position segmentLength = cbView.length1;
+				const bool scanFirst = IsValidIndex(position, segmentLength);
+				const Sci::Position endPos = scanFirst ? segmentEndPos : maxPos;
 				const char * const segment = scanFirst ? cbView.segment1 : cbView.segment2;
 				const __m256i *ptr = reinterpret_cast<const __m256i *>(segment + position);
 				Sci::Position index = position;
-				uint32_t mask = 0;
+				uint64_t mask = 0;
 				do {
 					const __m256i chunk1 = _mm256_loadu_si256(ptr);
+					const __m256i chunk2 = _mm256_loadu_si256(ptr + 1);
 					mask = mm256_movemask_epi8(_mm256_or_si256(_mm256_cmpeq_epi8(chunk1, mmBrace), _mm256_cmpeq_epi8(chunk1, mmSeek)));
+					mask |= static_cast<uint64_t>(mm256_movemask_epi8(_mm256_or_si256(_mm256_cmpeq_epi8(chunk2, mmBrace), _mm256_cmpeq_epi8(chunk2, mmSeek)))) << sizeof(__m256i);
 					if (mask != 0) {
 						index = position;
+						position += 2*sizeof(__m256i);
 						break;
 					}
-					ptr++;
-					position += sizeof(mmBrace);
-				} while (position < segmentLength);
-				position += sizeof(mmBrace);
-				if (position >= segmentLength && index < segmentLength) {
+					ptr += 2;
+					position += 2*sizeof(__m256i);
+				} while (position <= endPos);
+				if (position > segmentLength && index < segmentLength) {
 					position = segmentLength;
 					const uint32_t offset = static_cast<uint32_t>(position - index);
-					mask = bit_zero_high_u32(mask, offset);
+					mask = bit_zero_high_u64(mask, offset);
 				}
 				while (mask) {
-					const uint32_t trailing = np2::ctz(mask);
+					const uint64_t trailing = np2::ctz(mask);
 					index += trailing;
 					mask >>= trailing;
 					if (index > GetEndStyled() || StyleIndexAt(index) == styBrace) {
@@ -3003,7 +3008,7 @@ Sci::Position Document::BraceMatch(Sci::Position position, Sci::Position /*maxRe
 					index++;
 					mask >>= 1;
 				}
-			} while (position < length);
+			} while (position <= maxPos);
 		}
 		// end NP2_USE_AVX2
 #elif NP2_USE_SSE2
@@ -3011,25 +3016,30 @@ Sci::Position Document::BraceMatch(Sci::Position position, Sci::Position /*maxRe
 			const SplitView cbView = cb.AllView();
 			const __m128i mmBrace = _mm_set1_epi8(chBrace);
 			const __m128i mmSeek = _mm_set1_epi8(chSeek);
+			const Sci::Position maxPos = length - 2*sizeof(__m128i);
+			const Sci::Position segmentEndPos = std::min<Sci::Position>(maxPos, cbView.length1 - 1);
 			do {
-				const bool scanFirst = IsValidIndex(position, cbView.length1);
-				const Sci::Position segmentLength = scanFirst ? cbView.length1 : length;
+				const Sci::Position segmentLength = cbView.length1;
+				const bool scanFirst = IsValidIndex(position, segmentLength);
+				const Sci::Position endPos = scanFirst ? segmentEndPos : maxPos;
 				const char * const segment = scanFirst ? cbView.segment1 : cbView.segment2;
 				const __m128i *ptr = reinterpret_cast<const __m128i *>(segment + position);
 				Sci::Position index = position;
 				uint32_t mask = 0;
 				do {
 					const __m128i chunk1 = _mm_loadu_si128(ptr);
+					const __m128i chunk2 = _mm_loadu_si128(ptr + 1);
 					mask = mm_movemask_epi8(_mm_or_si128(_mm_cmpeq_epi8(chunk1, mmBrace), _mm_cmpeq_epi8(chunk1, mmSeek)));
+					mask |= mm_movemask_epi8(_mm_or_si128(_mm_cmpeq_epi8(chunk2, mmBrace), _mm_cmpeq_epi8(chunk2, mmSeek))) << sizeof(__m128i);
 					if (mask != 0) {
 						index = position;
+						position += 2*sizeof(__m128i);
 						break;
 					}
-					ptr++;
-					position += sizeof(mmBrace);
-				} while (position < segmentLength);
-				position += sizeof(mmBrace);
-				if (position >= segmentLength && index < segmentLength) {
+					ptr += 2;
+					position += 2*sizeof(__m128i);
+				} while (position <= endPos);
+				if (position > segmentLength && index < segmentLength) {
 					position = segmentLength;
 					const uint32_t offset = static_cast<uint32_t>(position - index);
 					mask = bit_zero_high_u32(mask, offset);
@@ -3048,7 +3058,7 @@ Sci::Position Document::BraceMatch(Sci::Position position, Sci::Position /*maxRe
 					index++;
 					mask >>= 1;
 				}
-			} while (position < length);
+			} while (position <= maxPos);
 		}
 		// end NP2_USE_SSE2
 #endif
