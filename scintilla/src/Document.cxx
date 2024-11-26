@@ -862,15 +862,9 @@ Sci::Position Document::MovePositionOutsideChar(Sci::Position pos, Sci::Position
 				// Else invalid UTF-8 so return position of isolated trail byte
 			}
 		} else {
-			// Anchor DBCS calculations at start of line because start of line can
-			// not be a DBCS trail byte.
-			const Sci::Position posStartLine = LineStartPosition(pos);
-			if (pos == posStartLine)
-				return pos;
-
 			// Step back until a non-lead-byte is found.
 			Sci::Position posCheck = pos;
-			while ((posCheck > posStartLine) && IsDBCSLeadByteNoExcept(cb.CharAt(posCheck - 1))) {
+			while ((posCheck > 0) && IsDBCSLeadByteNoExcept(cb.CharAt(posCheck - 1))) {
 				posCheck--;
 			}
 
@@ -2253,9 +2247,9 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 			}
 
 			const Sci::Position endSearch = (startPos <= endPos) ? endPos - lengthFind + 1 : endPos;
-			const unsigned char charStartSearch = searchData[0];
-			const unsigned char safeChar = (direction >= 0) ? forwardSafeChar : backwardSafeChar;
 			const Sci::Position skip = (direction >= 0) ? lengthFind : -1;
+			const unsigned char safeChar = (skip == 1) ? forwardSafeChar : backwardSafeChar;
+			const unsigned char charStartSearch = searchData[0];
 			if (direction < 0) {
 				pos = MovePositionOutsideChar(pos - lengthFind, -1, false);
 			}
@@ -2956,11 +2950,12 @@ Sci::Position Document::BraceMatch(Sci::Position position, Sci::Position /*maxRe
 	}
 	const int styBrace = StyleIndexAt(position);
 	const int direction = (chBrace < chSeek) ? 1 : -1;
-	const unsigned char safeChar = (direction >= 0) ? asciiForwardSafeChar : asciiBackwardSafeChar;
+	const unsigned char safeChar = asciiBackwardSafeChar;
 	position = useStartPos ? startPos : NextPosition(position, direction);
+	const Sci::Position endStylePos = GetEndStyled();
 	const Sci::Position length = LengthNoExcept();
 	int depth = 1;
-	if (chBrace <= asciiBackwardSafeChar && IsValidIndex(position + 64*direction, length)) {
+	if (IsValidIndex(position + 64*direction, length)) {
 #if NP2_USE_AVX2
 		const SplitView cbView = cb.AllView();
 		const __m256i mmBrace = mm256_set1_epi8(chBrace);
@@ -2998,7 +2993,8 @@ Sci::Position Document::BraceMatch(Sci::Position position, Sci::Position /*maxRe
 					const uint64_t trailing = np2::ctz(mask);
 					index += trailing;
 					mask >>= trailing;
-					if (index > GetEndStyled() || StyleIndexAt(index) == styBrace) {
+					if ((index > endStylePos || StyleIndexAt(index) == styBrace) &&
+						(chBrace <= safeChar || index == MovePositionOutsideChar(index, 1, false))) {
 						const unsigned char chAtPos = segment[index];
 						depth += (chAtPos == chBrace) ? 1 : -1;
 						if (depth == 0) {
@@ -3043,7 +3039,8 @@ Sci::Position Document::BraceMatch(Sci::Position position, Sci::Position /*maxRe
 					const uint64_t leading = np2::clz(mask);
 					index -= leading;
 					mask <<= leading;
-					if (index > GetEndStyled() || StyleIndexAt(index) == styBrace) {
+					if ((index > endStylePos || StyleIndexAt(index) == styBrace) &&
+						(chBrace <= safeChar || index == MovePositionOutsideChar(index, -1, false))) {
 						const unsigned char chAtPos = segment[index];
 						depth += (chAtPos == chBrace) ? 1 : -1;
 						if (depth == 0) {
@@ -3093,7 +3090,8 @@ Sci::Position Document::BraceMatch(Sci::Position position, Sci::Position /*maxRe
 					const uint32_t trailing = np2::ctz(mask);
 					index += trailing;
 					mask >>= trailing;
-					if (index > GetEndStyled() || StyleIndexAt(index) == styBrace) {
+					if ((index > endStylePos || StyleIndexAt(index) == styBrace) &&
+						(chBrace <= safeChar || index == MovePositionOutsideChar(index, 1, false))) {
 						const unsigned char chAtPos = segment[index];
 						depth += (chAtPos == chBrace) ? 1 : -1;
 						if (depth == 0) {
@@ -3138,7 +3136,8 @@ Sci::Position Document::BraceMatch(Sci::Position position, Sci::Position /*maxRe
 					const uint32_t leading = np2::clz(mask);
 					index -= leading;
 					mask <<= leading;
-					if (index > GetEndStyled() || StyleIndexAt(index) == styBrace) {
+					if ((index > endStylePos || StyleIndexAt(index) == styBrace) &&
+						(chBrace <= safeChar || index == MovePositionOutsideChar(index, -1, false))) {
 						const unsigned char chAtPos = segment[index];
 						depth += (chAtPos == chBrace) ? 1 : -1;
 						if (depth == 0) {
@@ -3157,20 +3156,15 @@ Sci::Position Document::BraceMatch(Sci::Position position, Sci::Position /*maxRe
 	while (IsValidIndex(position, length)) {
 		const unsigned char chAtPos = CharAt(position);
 		if (chAtPos == chBrace || chAtPos == chSeek) {
-			if ((position > GetEndStyled()) || (StyleIndexAt(position) == styBrace)) {
+			if ((position > endStylePos || StyleIndexAt(position) == styBrace) &&
+				(chAtPos <= safeChar || position == MovePositionOutsideChar(position, direction, false))) {
 				depth += (chAtPos == chBrace) ? 1 : -1;
 				if (depth == 0) {
 					return position;
 				}
 			}
-			position += direction;
-		} else if (chAtPos <= safeChar) {
-			position += direction;
-		} else {
-			if (!NextCharacter(position, direction)) {
-				break;
-			}
 		}
+		position += direction;
 	}
 	return -1;
 }
