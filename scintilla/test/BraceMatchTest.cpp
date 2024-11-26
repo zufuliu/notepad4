@@ -6,33 +6,11 @@
 #include <cstring>
 #include <cstdio>
 #include "../include/VectorISA.h"
+#include "TestUtils.h"
 
 // cl /EHsc /std:c++20 /DNDEBUG /O2 /FAcs /GS- /GR- /Gv /W4 /arch:AVX2 BraceMatchTest.cpp
-// clang-cl /EHsc /std:c++20 /DNDEBUG /O2 /FA /GS- /GR- /Gv /W4 -march=x86-64-v3 BraceMatchTest.cpp
+// clang-cl /EHsc /std:c++20 /DNDEBUG /O2 /FA /GS- /GR- /Gv /W4 -march=x86-64-v3 -fsanitize=address BraceMatchTest.cpp
 // g++ -S -std=gnu++20 -DNDEBUG -O3 -fno-rtti -Wall -Wextra -march=x86-64-v3 BraceMatchTest.cpp
-template <typename T>
-constexpr T min(T x, T y) noexcept {
-	return (x < y) ? x : y;
-}
-constexpr bool IsValidIndex(size_t index, size_t length) noexcept {
-	return index < length;
-}
-struct SplitView {
-	const char *segment1 = nullptr;
-	size_t length1 = 0;
-	const char *segment2 = nullptr;
-	size_t length = 0;
-
-	char CharAt(size_t position) const noexcept {
-		if (position < length1) {
-			return segment1[position];
-		}
-		if (position < length) {
-			return segment2[position];
-		}
-		return '\0';
-	}
-};
 constexpr char chBrace = '{';
 constexpr char chSeek = '}';
 constexpr uint32_t maxLength = 512;
@@ -133,6 +111,88 @@ void FindAllBraceForward(const SplitView &cbView, ptrdiff_t position, const ptrd
 
 void FindAllBraceBackward(const SplitView &cbView, ptrdiff_t position, uint32_t (&result)[maxLength]) noexcept {
 	unsigned j = 0;
+#if NP2_USE_AVX2
+	const __m256i mmBrace = _mm256_set1_epi8(chBrace);
+	const __m256i mmSeek = _mm256_set1_epi8(chSeek);
+	constexpr ptrdiff_t minPos = 2*sizeof(__m256i) - 1;
+	const ptrdiff_t segmentLength = cbView.length1;
+	const ptrdiff_t segmentEndPos = max(minPos, segmentLength);
+	while (position >= minPos) {
+		const bool scanFirst = IsValidIndex(position, segmentLength);
+		const ptrdiff_t endPos = scanFirst ? minPos : segmentEndPos;
+		const char * const segment = scanFirst ? cbView.segment1 : cbView.segment2;
+		const __m256i *ptr = reinterpret_cast<const __m256i *>(segment + position + 1);
+		ptrdiff_t index = position;
+		uint64_t mask = 0;
+		do {
+			const __m256i chunk1 = _mm256_loadu_si256(ptr - 1);
+			const __m256i chunk2 = _mm256_loadu_si256(ptr - 2);
+			mask = mm256_movemask_epi8(_mm256_or_si256(_mm256_cmpeq_epi8(chunk2, mmBrace), _mm256_cmpeq_epi8(chunk2, mmSeek)));
+			mask |= static_cast<uint64_t>(mm256_movemask_epi8(_mm256_or_si256(_mm256_cmpeq_epi8(chunk1, mmBrace), _mm256_cmpeq_epi8(chunk1, mmSeek)))) << sizeof(__m256i);
+			if (mask != 0) {
+				index = position;
+				position -= 2*sizeof(__m256i);
+				break;
+			}
+			ptr -= 2;
+			position -= 2*sizeof(__m256i);
+		} while (position >= endPos);
+		if (index >= segmentLength && position < segmentLength) {
+			position = segmentLength - 1;
+			const uint32_t offset = 63 ^ static_cast<uint32_t>(index - segmentLength);
+			mask = (mask >> offset) << offset;
+		}
+		while (mask) {
+			const uint64_t leading = np2::clz(mask);
+			index -= leading;
+			mask <<= leading;
+			result[j++] = static_cast<uint32_t>(index + 1);
+			index--;
+			mask <<= 1;
+		}
+	}
+
+#elif NP2_USE_SSE2
+	const __m128i mmBrace = _mm_set1_epi8(chBrace);
+	const __m128i mmSeek = _mm_set1_epi8(chSeek);
+	constexpr ptrdiff_t minPos = 2*sizeof(__m128i) - 1;
+	const ptrdiff_t segmentLength = cbView.length1;
+	const ptrdiff_t segmentEndPos = max(minPos, segmentLength);
+	while (position >= minPos) {
+		const bool scanFirst = IsValidIndex(position, segmentLength);
+		const ptrdiff_t endPos = scanFirst ? minPos : segmentEndPos;
+		const char * const segment = scanFirst ? cbView.segment1 : cbView.segment2;
+		const __m128i *ptr = reinterpret_cast<const __m128i *>(segment + position + 1);
+		ptrdiff_t index = position;
+		uint32_t mask = 0;
+		do {
+			const __m128i chunk1 = _mm_loadu_si128(ptr - 1);
+			const __m128i chunk2 = _mm_loadu_si128(ptr - 2);
+			mask = mm_movemask_epi8(_mm_or_si128(_mm_cmpeq_epi8(chunk2, mmBrace), _mm_cmpeq_epi8(chunk2, mmSeek)));
+			mask |= mm_movemask_epi8(_mm_or_si128(_mm_cmpeq_epi8(chunk1, mmBrace), _mm_cmpeq_epi8(chunk1, mmSeek))) << sizeof(__m128i);
+			if (mask != 0) {
+				index = position;
+				position -= 2*sizeof(__m128i);
+				break;
+			}
+			ptr -= 2;
+			position -= 2*sizeof(__m128i);
+		} while (position >= endPos);
+		if (index >= segmentLength && position < segmentLength) {
+			position = segmentLength - 1;
+			const uint32_t offset = 31 ^ static_cast<uint32_t>(index - segmentLength);
+			mask = (mask >> offset) << offset;
+		}
+		while (mask) {
+			const uint32_t leading = np2::clz(mask);
+			index -= leading;
+			mask <<= leading;
+			result[j++] = static_cast<uint32_t>(index + 1);
+			index--;
+			mask <<= 1;
+		}
+	}
+#endif
 
 	while (position >= 0) {
 		const char chAtPos = cbView.CharAt(position);
@@ -185,7 +245,8 @@ int __cdecl main(int argc, char *argv[]) {
 		argc = atoi(argv[1]);
 	}
 
-	srand(static_cast<unsigned int>(reinterpret_cast<uintptr_t>(argv)));
+	LCGRandom random(static_cast<unsigned int>(reinterpret_cast<uintptr_t>(argv)));
+	//PCG32Random random(reinterpret_cast<uintptr_t>(argv), reinterpret_cast<uintptr_t>(argv[0]));
 	constexpr uint32_t padding = 32;
 	char buffer[padding + maxLength + padding + 1]{};
 	memset(buffer, chBrace, padding);
@@ -214,17 +275,16 @@ int __cdecl main(int argc, char *argv[]) {
 
 	for (int j = 0; j < argc; j++) {
 		for (uint32_t i = 0; i < maxLength; i += 4) {
-			const uint32_t value = rand();
+			const uint32_t value = random.Next();
 			buffer[i + padding + 0] = "0{12[3(45)6]78}9"[value & 15];
 			buffer[i + padding + 1] = "0{12[3(45)6]78}9"[(value >> 4) & 15];
 			buffer[i + padding + 2] = "0{12[3(45)6]78}9"[(value >> 8) & 15];
 			buffer[i + padding + 3] = "0{12[3(45)6]78}9"[(value >> 12) & 15];
 		}
 
-		const uint32_t value = rand();
-		const uint32_t gapPosition = value & (maxLength/2 - 1);
-		const uint32_t gapLength = (value >> 16) & (maxLength/2 - 1);
-		uint32_t position = rand() & (maxLength - 1);
+		const uint32_t gapPosition = random.Next() & (maxLength/2 - 1);
+		const uint32_t gapLength = random.Next() & (maxLength/2 - 1);
+		uint32_t position = random.Next() & (maxLength - 1);
 		const bool hasGap = gapPosition != 0 && gapLength != 0;
 		const uint32_t length = maxLength - (hasGap ? gapLength : 0);
 		if (position >= length) {
