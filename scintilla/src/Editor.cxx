@@ -799,7 +799,7 @@ Sci::Position Editor::MovePositionOutsideChar(Sci::Position pos, Sci::Position m
 }
 
 SelectionPosition Editor::MovePositionOutsideChar(SelectionPosition pos, Sci::Position moveDir, bool checkLineEnd) const noexcept {
-	const Sci::Position posMoved = pdoc->MovePositionOutsideChar(pos.Position(), moveDir, checkLineEnd);
+	const Sci::Position posMoved = pdoc->MovePositionOutsideChar(pos.Position(), static_cast<int>(moveDir), checkLineEnd);
 	if (posMoved != pos.Position())
 		pos.SetPosition(posMoved);
 	if (vs.ProtectionActive()) {

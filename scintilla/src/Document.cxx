@@ -829,7 +829,7 @@ bool Document::InGoodUTF8(Sci::Position pos, Sci::Position &start, Sci::Position
 // When lines are terminated with \r\n pairs which should be treated as one character.
 // When displaying DBCS text such as Japanese.
 // If moving, move the position in the indicated direction.
-Sci::Position Document::MovePositionOutsideChar(Sci::Position pos, Sci::Position moveDir, bool checkLineEnd) const noexcept {
+Sci::Position Document::MovePositionOutsideChar(Sci::Position pos, int moveDir, bool checkLineEnd) const noexcept {
 	//Platform::DebugPrintf("NoCRLF %d %d\n", pos, moveDir);
 	// If out of range, just return minimum/maximum value.
 	if (pos <= 0)
@@ -893,7 +893,7 @@ Sci::Position Document::MovePositionOutsideChar(Sci::Position pos, Sci::Position
 // A \r\n pair is treated as two characters.
 Sci::Position Document::NextPosition(Sci::Position pos, int moveDir) const noexcept {
 	// If out of range, just return minimum/maximum value.
-	const int increment = (moveDir > 0) ? 1 : -1;
+	const int increment = moveDir;
 	if (pos + increment <= 0)
 		return 0;
 	if (pos + increment >= cb.Length())
@@ -941,16 +941,11 @@ Sci::Position Document::NextPosition(Sci::Position pos, int moveDir) const noexc
 				if (pos > cb.Length())
 					pos = cb.Length();
 			} else {
-				// Anchor DBCS calculations at start of line because start of line can
-				// not be a DBCS trail byte.
-				const Sci::Position posStartLine = LineStartPosition(pos);
 				// How to Go Backward in a DBCS String
 				// https://msdn.microsoft.com/en-us/library/cc194792.aspx
 				// DBCS-Enabled Programs vs. Non-DBCS-Enabled Programs
 				// https://msdn.microsoft.com/en-us/library/cc194790.aspx
-				if ((pos - 1) <= posStartLine) {
-					return pos - 1;
-				} else if (IsDBCSLeadByteNoExcept(cb.CharAt(pos - 1))) {
+				if (IsDBCSLeadByteNoExcept(cb.CharAt(pos - 1))) {
 					// Should actually be trail byte
 					if (IsDBCSDualByteAt(pos - 2)) {
 						return pos - 2;
@@ -961,7 +956,7 @@ Sci::Position Document::NextPosition(Sci::Position pos, int moveDir) const noexc
 				} else {
 					// Otherwise, step back until a non-lead-byte is found.
 					Sci::Position posTemp = pos - 1;
-					while (posStartLine <= --posTemp && IsDBCSLeadByteNoExcept(cb.CharAt(posTemp))) {
+					while (--posTemp >= 0 && IsDBCSLeadByteNoExcept(cb.CharAt(posTemp))) {
 					}
 					// Now posTemp+1 must point to the beginning of a character,
 					// so figure out whether we went back an even or an odd
@@ -3186,7 +3181,7 @@ public:
 			return '\0';
 	}
 
-	Sci::Position MovePositionOutsideChar(Sci::Position pos, Sci::Position moveDir) const noexcept override {
+	Sci::Position MovePositionOutsideChar(Sci::Position pos, int moveDir) const noexcept override {
 		return pdoc->MovePositionOutsideChar(pos, moveDir, false);
 	}
 };

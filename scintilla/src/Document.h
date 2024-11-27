@@ -377,7 +377,7 @@ public:
 	bool IsCrLf(Sci::Position pos) const noexcept;
 	int LenChar(Sci::Position pos, bool *invalid = nullptr) const noexcept;
 	bool InGoodUTF8(Sci::Position pos, Sci::Position &start, Sci::Position &end) const noexcept;
-	Sci::Position MovePositionOutsideChar(Sci::Position pos, Sci::Position moveDir, bool checkLineEnd = true) const noexcept;
+	Sci::Position MovePositionOutsideChar(Sci::Position pos, int moveDir, bool checkLineEnd = true) const noexcept;
 	Sci::Position NextPosition(Sci::Position pos, int moveDir) const noexcept;
 	bool NextCharacter(Sci::Position &pos, int moveDir) const noexcept;	// Returns true if pos changed
 	CharacterExtracted CharacterAfter(Sci::Position position) const noexcept;

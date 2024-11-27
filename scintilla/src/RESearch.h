@@ -12,7 +12,7 @@ namespace Scintilla::Internal {
 class CharacterIndexer {
 public:
 	virtual char CharAt(Sci::Position index) const noexcept = 0;
-	virtual Sci::Position MovePositionOutsideChar(Sci::Position pos, Sci::Position moveDir) const noexcept = 0;
+	virtual Sci::Position MovePositionOutsideChar(Sci::Position pos, int moveDir) const noexcept = 0;
 };
 
 class RESearch {

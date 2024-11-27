@@ -1,3 +1,5 @@
+// This file is part of Notepad4.
+// See License.txt for details about distribution and modification.
 #include <cstdint>
 #include <cstdlib>
 
