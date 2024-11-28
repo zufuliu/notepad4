@@ -2250,11 +2250,11 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 			}
 			//while (forward ? (pos < endSearch) : (pos >= endSearch)) {
 			while ((direction ^ (pos - endSearch)) < 0) {
-				const unsigned char leadByte = cbView.CharAt(pos);
+				const unsigned char leadByte = cbView[pos];
 				if (charStartSearch == leadByte) {
 					bool found = (pos + lengthFind) <= limitPos;
 					for (Sci::Position indexSearch = 1; (indexSearch < lengthFind) && found; indexSearch++) {
-						const unsigned char ch = cbView.CharAt(pos + indexSearch);
+						const unsigned char ch = cbView[pos + indexSearch];
 						found = ch == searchData[indexSearch];
 					}
 					if (found && MatchesWordOptions(word, wordStart, pos, lengthFind)) {
@@ -2290,7 +2290,7 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 				size_t indexSearch = 0;
 				bool characterMatches = true;
 				for (;;) {
-					const unsigned char leadByte = cbView.CharAt(posIndexDocument);
+					const unsigned char leadByte = cbView[posIndexDocument];
 					int widthChar = 1;
 					size_t lenFlat = 1;
 					if (UTF8IsAscii(leadByte)) {
@@ -2354,7 +2354,7 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 				size_t indexSearch = 0;
 				bool characterMatches = true;
 				for (;;) {
-					const unsigned char leadByte = cbView.CharAt(pos + indexDocument);
+					const unsigned char leadByte = cbView[pos + indexDocument];
 					const int widthChar = 1 + IsDBCSLeadByteNoExcept(leadByte);
 					if (!widthFirstCharacter) {
 						widthFirstCharacter = widthChar;
@@ -2368,7 +2368,7 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 					} else {
 						const char bytes[maxBytesCharacter + 1] {
 							static_cast<char>(leadByte),
-							cbView.CharAt(pos + indexDocument + 1)
+							cbView[pos + indexDocument + 1]
 						};
 						char folded[maxBytesCharacter * maxFoldingExpansion + 1];
 						lenFlat = pcf->Fold(folded, sizeof(folded), bytes, widthChar);
@@ -2409,7 +2409,7 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 			while ((direction ^ (pos - endSearch)) < 0) {
 				bool found = (pos + lengthFind) <= limitPos;
 				for (Sci::Position indexSearch = 0; (indexSearch < lengthFind) && found; indexSearch++) {
-					const char ch = cbView.CharAt(pos + indexSearch);
+					const char ch = cbView[pos + indexSearch];
 					const char chTest = searchData[indexSearch];
 					if (UTF8IsAscii(ch)) {
 						found = chTest == MakeLowerCase(ch);
@@ -2946,13 +2946,13 @@ Sci::Position Document::BraceMatch(Sci::Position position, Sci::Position /*maxRe
 	const int styBrace = StyleIndexAt(position);
 	const int direction = (chBrace < chSeek) ? 1 : -1;
 	const unsigned char safeChar = asciiBackwardSafeChar;
-	position = useStartPos ? startPos : NextPosition(position, direction);
+	position = useStartPos ? startPos : position + direction;
 	const Sci::Position endStylePos = GetEndStyled();
 	const Sci::Position length = LengthNoExcept();
+	const SplitView cbView = cb.AllView();
 	int depth = 1;
 	if (IsValidIndex(position + 64*direction, length)) {
 #if NP2_USE_AVX2
-		const SplitView cbView = cb.AllView();
 		const __m256i mmBrace = mm256_set1_epi8(chBrace);
 		const __m256i mmSeek = mm256_set1_epi8(chSeek);
 		if (direction >= 0) {
@@ -3049,7 +3049,6 @@ Sci::Position Document::BraceMatch(Sci::Position position, Sci::Position /*maxRe
 		}
 		// end NP2_USE_AVX2
 #elif NP2_USE_SSE2
-		const SplitView cbView = cb.AllView();
 		const __m128i mmBrace = _mm_set1_epi8(chBrace);
 		const __m128i mmSeek = _mm_set1_epi8(chSeek);
 		if (direction >= 0) {
@@ -3149,7 +3148,7 @@ Sci::Position Document::BraceMatch(Sci::Position position, Sci::Position /*maxRe
 	}
 
 	while (IsValidIndex(position, length)) {
-		const unsigned char chAtPos = CharAt(position);
+		const unsigned char chAtPos = cbView[position];
 		if (chAtPos == chBrace || chAtPos == chSeek) {
 			if ((position > endStylePos || StyleIndexAt(position) == styBrace) &&
 				(chAtPos <= safeChar || position == MovePositionOutsideChar(position, direction, false))) {
