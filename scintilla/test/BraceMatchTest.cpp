@@ -139,7 +139,8 @@ void FindAllBraceBackward(const SplitView &cbView, ptrdiff_t position, uint32_t 
 		} while (position >= endPos);
 		if (index >= segmentLength && position < segmentLength) {
 			position = segmentLength - 1;
-			const uint32_t offset = 63 ^ static_cast<uint32_t>(index - segmentLength);
+			//const uint32_t offset = 63 & ~static_cast<uint32_t>(index - segmentLength);
+			const uint32_t offset = 63 & static_cast<uint32_t>(position - index);
 			mask = (mask >> offset) << offset;
 		}
 		while (mask) {
@@ -180,7 +181,8 @@ void FindAllBraceBackward(const SplitView &cbView, ptrdiff_t position, uint32_t 
 		} while (position >= endPos);
 		if (index >= segmentLength && position < segmentLength) {
 			position = segmentLength - 1;
-			const uint32_t offset = 31 ^ static_cast<uint32_t>(index - segmentLength);
+			//const uint32_t offset = 31 & ~static_cast<uint32_t>(index - segmentLength);
+			const uint32_t offset = 31 & static_cast<uint32_t>(position - index);
 			mask = (mask >> offset) << offset;
 		}
 		while (mask) {

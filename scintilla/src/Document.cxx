@@ -3027,7 +3027,7 @@ Sci::Position Document::BraceMatch(Sci::Position position, Sci::Position /*maxRe
 				} while (position >= endPos);
 				if (index >= segmentLength && position < segmentLength) {
 					position = segmentLength - 1;
-					const uint32_t offset = 63 ^ static_cast<uint32_t>(index - segmentLength);
+					const uint32_t offset = 63 & static_cast<uint32_t>(position - index);
 					mask = (mask >> offset) << offset;
 				}
 				while (mask) {
@@ -3123,7 +3123,7 @@ Sci::Position Document::BraceMatch(Sci::Position position, Sci::Position /*maxRe
 				} while (position >= endPos);
 				if (index >= segmentLength && position < segmentLength) {
 					position = segmentLength - 1;
-					const uint32_t offset = 31 ^ static_cast<uint32_t>(index - segmentLength);
+					const uint32_t offset = 31 & static_cast<uint32_t>(position - index);
 					mask = (mask >> offset) << offset;
 				}
 				while (mask) {
@@ -3185,6 +3185,7 @@ public:
 	}
 };
 
+class RESearchRange;
 /**
  * Implementation of RegexSearchBase for the default built-in regular expression engine
  */
@@ -3197,7 +3198,7 @@ public:
 	const char *SubstituteByPosition(const Document *doc, const char *text, Sci::Position *length) override;
 
 #if defined(BOOST_REGEX_STANDALONE) || !defined(NO_CXX11_REGEX)
-	Sci::Position CxxRegexFindText(const Document *doc, Sci::Position minPos, Sci::Position maxPos, const char *pattern, FindOption flags, Sci::Position *length);
+	Sci::Position CxxRegexFindText(const Document *doc, const RESearchRange &resr, const char *pattern, FindOption flags, Sci::Position *length);
 #endif
 
 private:
@@ -3220,14 +3221,13 @@ private:
 */
 class RESearchRange {
 public:
-	const Document *doc;
 	int increment;
 	Sci::Position startPos;
 	Sci::Position endPos;
 	Sci::Line lineRangeStart;
 	Sci::Line lineRangeEnd;
 	Sci::Line lineRangeBreak;
-	RESearchRange(const Document *doc_, Sci::Position minPos, Sci::Position maxPos) noexcept : doc(doc_) {
+	RESearchRange(const Document *doc, Sci::Position minPos, Sci::Position maxPos) noexcept {
 		increment = (minPos <= maxPos) ? 1 : -1;
 
 		// Range endpoints should not be inside DBCS characters or between a CR and LF,
@@ -3416,8 +3416,7 @@ bool MatchOnLines(const Document *doc, const Regex &regexp, const RESearchRange 
 	return matched;
 }
 
-Sci::Position BuiltinRegex::CxxRegexFindText(const Document *doc, Sci::Position minPos, Sci::Position maxPos, const char *pattern, FindOption flags, Sci::Position *length) {
-	const RESearchRange resr(doc, minPos, maxPos);
+Sci::Position BuiltinRegex::CxxRegexFindText(const Document *doc, const RESearchRange &resr, const char *pattern, FindOption flags, Sci::Position *length) {
 	try {
 		boost::wregex::flag_type flagsRe = boost::wregex::ECMAScript;
 		if (!FlagSet(flags, FindOption::MatchCase)) {
@@ -3540,8 +3539,7 @@ labelMatched:
 	return matched;
 }
 
-Sci::Position BuiltinRegex::CxxRegexFindText(const Document *doc, Sci::Position minPos, Sci::Position maxPos, const char *pattern, FindOption flags, Sci::Position *length) {
-	const RESearchRange resr(doc, minPos, maxPos);
+Sci::Position BuiltinRegex::CxxRegexFindText(const Document *doc, const RESearchRange &resr, const char *pattern, FindOption flags, Sci::Position *length) {
 	try {
 		//const ElapsedPeriod ep;
 		std::wregex::flag_type flagsRe = std::wregex::ECMAScript;
@@ -3594,13 +3592,13 @@ Sci::Position BuiltinRegex::CxxRegexFindText(const Document *doc, Sci::Position 
 #endif // BOOST_REGEX_STANDALONE || !NO_CXX11_REGEX
 
 Sci::Position BuiltinRegex::FindText(const Document *doc, Sci::Position minPos, Sci::Position maxPos, const char *pattern, FindOption flags, Sci::Position *length) {
+	const RESearchRange resr(doc, minPos, maxPos);
 #if defined(BOOST_REGEX_STANDALONE) || !defined(NO_CXX11_REGEX)
 	if (FlagSet(flags, FindOption::Cxx11RegEx)) {
-		return CxxRegexFindText(doc, minPos, maxPos, pattern, flags, length);
+		return CxxRegexFindText(doc, resr, pattern, flags, length);
 	}
 #endif
 
-	const RESearchRange resr(doc, minPos, maxPos);
 	const size_t patternLen = *length;
 	const char *errmsg = search.Compile(pattern, patternLen, flags);
 	if (errmsg) {
