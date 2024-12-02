@@ -17,7 +17,7 @@ class AutoComplete {
 	std::string stopChars;
 	std::string fillUpChars;
 	enum {
-		maxItemLen = 1024
+		maxItemLen = 128
 	};
 	std::vector<int> sortMatrix;
 

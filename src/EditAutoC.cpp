@@ -21,8 +21,8 @@ struct IUnknown;
 #define NP2_AUTOC_CACHE_SORT_KEY	1
 #define NP2_AUTOC_USE_WORD_POINTER	0	// used for debug
 // scintilla/src/AutoComplete.h AutoComplete::maxItemLen
-#define NP2_AUTOC_MAX_WORD_LENGTH	(1024 - 3 - 1 - 16)	// SP + '(' + ')' + '\0'
-#define NP2_AUTOC_WORD_BUFFER_SIZE	1024
+#define NP2_AUTOC_MAX_WORD_LENGTH	(128 - 3 - 1)	// SP + '(' + ')' + '\0'
+#define NP2_AUTOC_WORD_BUFFER_SIZE	128
 #define NP2_AUTOC_INIT_BUFFER_SIZE	(4096)
 
 // memory buffer
@@ -875,8 +875,7 @@ static void AutoC_AddDocWord(WordList &pWList, const uint32_t (&ignoredStyleMask
 
 			if (wordEnd - iPosFind >= iRootLen) {
 				char wordBuf[NP2_AUTOC_WORD_BUFFER_SIZE];
-				char *pWord = wordBuf + 16; // avoid overlap in memcpy()
-				bool bChanged = false;
+				char *pWord = wordBuf;
 				const Sci_TextRangeFull tr = { { iPosFind, min(iPosFind + NP2_AUTOC_MAX_WORD_LENGTH, wordEnd) }, pWord };
 				int wordLength = static_cast<int>(SciCall_GetTextRangeFull(&tr));
 
@@ -888,32 +887,24 @@ static void AutoC_AddDocWord(WordList &pWList, const uint32_t (&ignoredStyleMask
 						if (IsEscapeCharOrFormatSpecifier(before, static_cast<uint8_t>(pWord[0]), chPrev, style, false)) {
 							pWord++;
 							--wordLength;
-							bChanged = true;
 						}
 					}
 				}
 				if (prefix && prefix == pWord[0]) {
 					pWord++;
 					--wordLength;
-					bChanged = true;
 				}
 
 				//if (pLexCurrent->iLexer == SCLEX_PHPSCRIPT && wordLength >= 2 && pWord[0] == '$' && pWord[1] == '$') {
 				//	pWord++;
 				//	--wordLength;
-				//	bChanged = true;
 				//}
 				while (wordLength > 0 && (pWord[wordLength - 1] == '-' || pWord[wordLength - 1] == ':' || pWord[wordLength - 1] == '.')) {
 					--wordLength;
 					pWord[wordLength] = '\0';
 				}
-				if (bChanged) {
-					memcpy(wordBuf, pWord, wordLength + 1);
-					pWord = wordBuf;
-				}
 
-				bChanged = wordLength >= iRootLen && pWList.StartsWith(pWord);
-				if (bChanged && !(pWord[0] == ':' && pWord[1] != ':')) {
+				if (wordLength >= iRootLen && (pWord[0] != ':' || pWord[1] == ':') && pWList.StartsWith(pWord)) {
 					bool space = false;
 					if (!(pLexCurrent->iLexer == SCLEX_CPP && style == SCE_C_MACRO)) {
 						while (IsASpaceOrTab(SciCall_GetCharAt(wordEnd))) {
@@ -1733,7 +1724,7 @@ static bool EditCompleteWordCore(int iCondition, bool autoInsert) noexcept {
 		autoCompletionConfig.iPreviousItemCount = pWList.nWordCount;
 		char *pList = pWList.GetList();
 		SciCall_AutoCSetOptions(SC_AUTOCOMPLETE_FIXED_SIZE);
-		SciCall_AutoCSetOrder(SC_ORDER_PRESORTED); // pre-sorted
+		//SciCall_AutoCSetOrder(SC_ORDER_PRESORTED); // pre-sorted is default
 		SciCall_AutoCSetIgnoreCase(bIgnoreCase); // case sensitivity
 		SciCall_AutoCSetCaseInsensitiveBehaviour(bIgnoreCase);
 		//SciCall_AutoCSetSeparator('\n');
