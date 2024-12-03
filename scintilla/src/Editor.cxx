@@ -1003,21 +1003,27 @@ void Editor::MoveSelectedLines(int lineDelta) {
 	// if selection doesn't end at the beginning of a line greater than that of the start,
 	// then set it at the beginning of the next one
 	Sci::Position selectionEnd = SelectionEnd().Position();
-	const Sci::Line endLine = pdoc->SciLineFromPosition(selectionEnd);
+	Sci::Line endLine = pdoc->SciLineFromPosition(selectionEnd);
 	const Sci::Position beginningOfEndLine = pdoc->LineStart(endLine);
+	const Sci::Position docLength = pdoc->LengthNoExcept();
 	bool appendEol = false;
 	if (selectionEnd > beginningOfEndLine
 		|| selectionStart == selectionEnd) {
 		selectionEnd = pdoc->LineStart(endLine + 1);
-		appendEol = (selectionEnd == pdoc->LengthNoExcept() && pdoc->SciLineFromPosition(selectionEnd) == endLine);
+		const Sci::Line line = pdoc->SciLineFromPosition(selectionEnd);
+		appendEol = (line == endLine && selectionEnd == docLength);
+		endLine = line;
 	}
 
 	// if there's nowhere for the selection to move
 	// (i.e. at the beginning going up or at the end going down),
 	// stop it right there!
+	const bool docEndLineEmpty = pdoc->LineStart(endLine) == docLength;
 	if ((selectionStart == 0 && lineDelta < 0)
-		|| (selectionEnd == pdoc->LengthNoExcept() && lineDelta > 0)
-		|| selectionStart == selectionEnd) {
+		|| (selectionEnd == docLength && lineDelta > 0
+			&& !docEndLineEmpty) // allow moving when end line of document is empty
+		|| ((selectionStart == selectionEnd)
+			&& !(lineDelta < 0 && docEndLineEmpty && selectionEnd == docLength))) { // allow moving-up last empty line
 		return;
 	}
 

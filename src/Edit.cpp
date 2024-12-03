@@ -2642,11 +2642,6 @@ void EditMoveUp() noexcept {
 		return;
 	}
 
-	if (SciCall_IsRectangleSelection()) {
-		NotifyRectangleSelection();
-		return;
-	}
-
 	const Sci_Line iLineSrc = min(iCurLine, iAnchorLine) - 1;
 	if (iLineSrc >= 0) {
 		Sci_Line iLineDest = max(iCurLine, iAnchorLine);
@@ -2694,11 +2689,6 @@ void EditMoveDown() noexcept {
 		return;
 	}
 
-	if (SciCall_IsRectangleSelection()) {
-		NotifyRectangleSelection();
-		return;
-	}
-
 	Sci_Line iLineSrc = max(iCurLine, iAnchorLine) + 1;
 	if (max(iCurPos, iAnchorPos) <= SciCall_PositionFromLine(iLineSrc - 1)) {
 		iLineSrc--;
@@ -2706,30 +2696,7 @@ void EditMoveDown() noexcept {
 
 	const Sci_Line iLineEnd = SciCall_GetLineCount() - 1;
 	if (iLineSrc <= iLineEnd) {
-		const bool bLastLine = (iLineSrc == iLineEnd);
-
-		if (bLastLine &&
-				(SciCall_GetLineEndPosition(iLineSrc) == SciCall_PositionFromLine(iLineSrc)) &&
-				(SciCall_GetLineEndPosition(iLineSrc - 1) == SciCall_PositionFromLine(iLineSrc - 1))) {
-			return;
-		}
-
-		if (bLastLine) {
-			SciCall_BeginUndoAction();
-			const unsigned iEOLMode = SciCall_GetEOLMode();
-			LPCSTR lineEnd = "\r\n";
-			lineEnd += (iEOLMode >> 1);
-			SciCall_AppendText((iEOLMode == SC_EOL_CRLF) ? 2 : 1, lineEnd);
-		}
-
 		SciCall_MoveSelectedLinesDown();
-
-		if (bLastLine) {
-			const Sci_Position iLineEndPos = SciCall_GetLineEndPosition(SciCall_GetLineCount() - 2);
-			SciCall_DeleteRange(iLineEndPos, SciCall_GetLength() - iLineEndPos);
-			SciCall_EndUndoAction();
-		}
-
 		if (iCurPos < iAnchorPos) {
 			iCurLine = iCurLine + 1;
 			iAnchorLine = iLineSrc + 1;
