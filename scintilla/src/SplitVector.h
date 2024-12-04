@@ -322,14 +322,34 @@ public:
 	void GetRange(T *buffer, ptrdiff_t position, ptrdiff_t retrieveLength) const noexcept {
 		// Split into up to 2 ranges, before and after the split then use memcpy on each.
 		ptrdiff_t range1Length = 0;
+		const T* data = body.data() + position;
 		if (position < part1Length) {
 			range1Length = std::min(retrieveLength, part1Length - position);
+			memcpy(buffer, data, range1Length*sizeof(T));
 		}
+		if (range1Length < retrieveLength) {
+			data += range1Length + gapLength;
+			const ptrdiff_t range2Length = retrieveLength - range1Length;
+			memcpy(buffer + range1Length, data, range2Length*sizeof(T));
+		}
+	}
+
+	int CheckRange(const T *buffer, ptrdiff_t position, ptrdiff_t rangeLength) const noexcept {
+		// Split into up to 2 ranges, before and after the split then use memcmp on each.
+		ptrdiff_t range1Length = 0;
+		int result = 0;
 		const T* data = body.data() + position;
-		std::copy_n(data, range1Length, buffer);
-		data += range1Length + gapLength;
-		const ptrdiff_t range2Length = retrieveLength - range1Length;
-		std::copy_n(data, range2Length, buffer + range1Length);
+		if (position < part1Length) {
+			range1Length = std::min(rangeLength, part1Length - position);
+			result = memcmp(data, buffer, range1Length*sizeof(T));
+		}
+		if (range1Length < rangeLength) {
+			data += range1Length + gapLength;
+			const ptrdiff_t range2Length = rangeLength - range1Length;
+			// NOLINTNEXTLINE(bugprone-suspicious-string-compare)
+			result |= memcmp(data, buffer + range1Length, range2Length*sizeof(T));
+		}
+		return result;
 	}
 
 	/// Compact the buffer and return a pointer to the first element.

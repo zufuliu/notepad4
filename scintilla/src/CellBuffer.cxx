@@ -412,8 +412,12 @@ const char *CellBuffer::RangePointer(Sci::Position position, Sci::Position range
 	return substance.RangePointer(position, rangeLength);
 }
 
-const char *CellBuffer::StyleRangePointer(Sci::Position position, Sci::Position rangeLength) noexcept {
-	return hasStyles ? style.RangePointer(position, rangeLength) : nullptr;
+int CellBuffer::CheckRange(const char *chars, const char *styles, Sci::Position position, Sci::Position rangeLength) const noexcept {
+	int result = substance.CheckRange(chars, position, rangeLength);
+	if (hasStyles) {
+		result |= style.CheckRange(styles, position, rangeLength);
+	}
+	return result;
 }
 
 Sci::Position CellBuffer::GapPosition() const noexcept {

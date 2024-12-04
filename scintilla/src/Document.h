@@ -494,9 +494,6 @@ public:
 	const char *RangePointer(Sci::Position position, Sci::Position rangeLength) noexcept {
 		return cb.RangePointer(position, rangeLength);
 	}
-	const char *StyleRangePointer(Sci::Position position, Sci::Position rangeLength) noexcept {
-		return cb.StyleRangePointer(position, rangeLength);
-	}
 	Sci::Position GapPosition() const noexcept {
 		return cb.GapPosition();
 	}
@@ -544,6 +541,9 @@ public:
 	}
 	void GetStyleRange(unsigned char *buffer, Sci::Position position, Sci::Position lengthRetrieve) const noexcept {
 		cb.GetStyleRange(buffer, position, lengthRetrieve);
+	}
+	int CheckRange(const char *chars, const char *styles, Sci::Position position, Sci::Position rangeLength) const noexcept {
+		return cb.CheckRange(chars, styles, position, rangeLength);
 	}
 	MarkerMask GetMark(Sci::Line line, bool includeChangeHistory) const noexcept;
 	Sci::Line MarkerNext(Sci::Line lineStart, MarkerMask mask) const noexcept;

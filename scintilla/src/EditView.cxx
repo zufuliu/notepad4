@@ -599,15 +599,7 @@ uint64_t EditView::LayoutLine(const EditModel &model, Surface *surface, const Vi
 			const uint8_t *styles = ll->styles.get();
 
 			if (lineLength != 0) {
-				const char *docStyles = model.pdoc->StyleRangePointer(posLineStart, lineLength);
-				if (docStyles) { // HasStyles
-					allSame = memcmp(docStyles, styles, lineLength);
-				}
-
-				const char *docChars = model.pdoc->RangePointer(posLineStart, lineLength);
-				const char *chars = ll->chars.get();
-				// NOLINTNEXTLINE(bugprone-suspicious-string-compare)
-				allSame |= memcmp(docChars, chars, lineLength);
+				allSame = model.pdoc->CheckRange(ll->chars.get(), reinterpret_cast<const char *>(styles), posLineStart, lineLength);
 			}
 
 			const int styleByteLast = (posLineEnd == posLineStart) ? 0 : model.pdoc->StyleIndexAt(posLineEnd - 1);

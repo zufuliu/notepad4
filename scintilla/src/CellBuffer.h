@@ -116,7 +116,7 @@ public:
 	void GetStyleRange(unsigned char *buffer, Sci::Position position, Sci::Position lengthRetrieve) const noexcept;
 	const char *BufferPointer();
 	const char *RangePointer(Sci::Position position, Sci::Position rangeLength) noexcept;
-	const char *StyleRangePointer(Sci::Position position, Sci::Position rangeLength) noexcept;
+	int CheckRange(const char *chars, const char *styles, Sci::Position position, Sci::Position rangeLength) const noexcept;
 	Sci::Position GapPosition() const noexcept;
 	SplitView AllView() const noexcept;
 
