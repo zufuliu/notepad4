@@ -34,22 +34,7 @@ using namespace Scintilla;
 using namespace Scintilla::Internal;
 
 AutoComplete::AutoComplete() :
-	active(false),
-	separator('\n'),
-	typesep('\t'),
-	ignoreCase(false),
-	chooseSingle(false),
-	options(AutoCompleteOption::Normal),
-	posStart(0),
-	startLen(0),
-	cancelAtStartPos(true),
-	autoHide(true),
-	dropRestOfWord(false),
-	ignoreCaseBehaviour(CaseInsensitiveBehaviour::RespectCase),
-	widthLBDefault(100),
-	heightLBDefault(100),
-	autoSort(Ordering::PreSorted) {
-	lb = ListBox::Allocate();
+	lb{ListBox::Allocate()} {
 }
 
 AutoComplete::~AutoComplete() {
@@ -88,30 +73,14 @@ bool AutoComplete::IsFillUpChar(char ch) const noexcept {
 	return ch && (fillUpChars.find(ch) != std::string::npos);
 }
 
-void AutoComplete::SetSeparator(char separator_) noexcept {
-	separator = separator_;
-}
-
-char AutoComplete::GetSeparator() const noexcept {
-	return separator;
-}
-
-void AutoComplete::SetTypesep(char separator_) noexcept {
-	typesep = separator_;
-}
-
-char AutoComplete::GetTypesep() const noexcept {
-	return typesep;
-}
-
 namespace {
 
 struct Sorter {
-	const AutoComplete *ac;
+	const bool ignoreCase;
 	const char *list;
 	std::vector<int> indices;
 
-	Sorter(const AutoComplete *ac_, const char *list_) : ac(ac_), list(list_) {
+	Sorter(const AutoComplete *ac, const char *list_) : ignoreCase{ac->ignoreCase}, list(list_) {
 		int i = 0;
 		if (!list[i]) {
 			// Empty list has a single empty member
@@ -144,37 +113,48 @@ struct Sorter {
 	}
 
 	bool operator()(int a, int b) const noexcept {
-		const int lenA = indices[a * 2 + 1] - indices[a * 2];
-		const int lenB = indices[b * 2 + 1] - indices[b * 2];
+		const unsigned indexA = a * 2;
+		const unsigned indexB = b * 2;
+		const int lenA = indices[indexA + 1] - indices[indexA];
+		const int lenB = indices[indexB + 1] - indices[indexB];
 		const int len = std::min(lenA, lenB);
 		int cmp;
-		if (ac->ignoreCase)
-			cmp = CompareNCaseInsensitive(list + indices[a * 2], list + indices[b * 2], len);
+		if (ignoreCase)
+			cmp = CompareNCaseInsensitive(list + indices[indexA], list + indices[indexB], len);
 		else
-			cmp = strncmp(list + indices[a * 2], list + indices[b * 2], len);
+			cmp = strncmp(list + indices[indexA], list + indices[indexB], len);
 		if (cmp == 0)
 			cmp = lenA - lenB;
 		return cmp < 0;
 	}
 };
 
+void FillSortMatrix(std::vector<int> &sortMatrix, unsigned itemCount) {
+#if 1
+	sortMatrix.clear();
+	for (unsigned i = 0; i < itemCount; i++) {
+		sortMatrix.push_back(i);
+	}
+#else
+	sortMatrix.resize(itemCount);
+	itemCount = 0;
+	for (auto &it: sortMatrix) {
+		it = itemCount++;
+	}
+#endif
+}
+
 }
 
 void AutoComplete::SetList(const char *list) {
 	if (autoSort == Ordering::PreSorted) {
 		lb->SetList(list, separator, typesep);
-		sortMatrix.resize(lb->Length());
-		for (int i = 0; i < static_cast<int>(sortMatrix.size()); ++i) {
-			sortMatrix[i] = i;
-		}
+		FillSortMatrix(sortMatrix, lb->Length());
 		return;
 	}
 
-	Sorter IndexSort(this, list);
-	sortMatrix.resize(IndexSort.indices.size() / 2);
-	for (int i = 0; i < static_cast<int>(sortMatrix.size()); ++i) {
-		sortMatrix[i] = i;
-	}
+	const Sorter IndexSort(this, list);
+	FillSortMatrix(sortMatrix, static_cast<unsigned>(IndexSort.indices.size() / 2));
 	std::sort(sortMatrix.begin(), sortMatrix.end(), IndexSort);
 	if (autoSort == Ordering::Custom || sortMatrix.size() < 2) {
 		lb->SetList(list, separator, typesep);
@@ -182,31 +162,31 @@ void AutoComplete::SetList(const char *list) {
 		return;
 	}
 
-	std::string sortedList;
-	char item[maxItemLen];
-	for (size_t i = 0; i < sortMatrix.size(); ++i) {
-		int wordLen = IndexSort.indices[sortMatrix[i] * 2 + 2] - IndexSort.indices[sortMatrix[i] * 2];
-		if (wordLen > maxItemLen - 2)
-			wordLen = maxItemLen - 2;
-		memcpy(item, list + IndexSort.indices[sortMatrix[i] * 2], wordLen);
-		if ((i + 1) == sortMatrix.size()) {
+	const size_t itemCount = sortMatrix.size();
+	const std::unique_ptr<char[]> sortedList(new char[itemCount + IndexSort.indices.back() + 1]);
+	char *back = sortedList.get();
+	for (size_t i = 0; i < itemCount; ++i) {
+		const unsigned index = sortMatrix[i] * 2;
+		sortMatrix[i] = static_cast<int>(i);
+		// word length include trailing typesep and separator
+		const unsigned wordLen = IndexSort.indices[index + 2] - IndexSort.indices[index];
+		const char * const item = list + IndexSort.indices[index];
+		memcpy(back, item, wordLen);
+		back += wordLen;
+		if ((i + 1) == itemCount) {
 			// Last item so remove separator if present
-			if ((wordLen > 0) && (item[wordLen - 1] == separator))
-				wordLen--;
+			if (wordLen != 0 && item[wordLen - 1] == separator) {
+				--back;
+			}
 		} else {
 			// Item before last needs a separator
-			if ((wordLen == 0) || (item[wordLen - 1] != separator)) {
-				item[wordLen] = separator;
-				wordLen++;
+			if (wordLen == 0 || item[wordLen - 1] != separator) {
+				*back++ = separator;
 			}
 		}
-		item[wordLen] = '\0';
-		sortedList += item;
 	}
-	for (int i = 0; i < static_cast<int>(sortMatrix.size()); ++i) {
-		sortMatrix[i] = i;
-	}
-	lb->SetList(sortedList.c_str(), separator, typesep);
+	*back = '\0';
+	lb->SetList(sortedList.get(), separator, typesep);
 }
 
 int AutoComplete::GetSelection() const noexcept {

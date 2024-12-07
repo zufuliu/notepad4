@@ -20,10 +20,36 @@ struct IUnknown;
 
 #define NP2_AUTOC_CACHE_SORT_KEY	1
 #define NP2_AUTOC_USE_WORD_POINTER	0	// used for debug
-// scintilla/src/AutoComplete.h AutoComplete::maxItemLen
 #define NP2_AUTOC_MAX_WORD_LENGTH	(128 - 3 - 1)	// SP + '(' + ')' + '\0'
 #define NP2_AUTOC_WORD_BUFFER_SIZE	128
 #define NP2_AUTOC_INIT_BUFFER_SIZE	(4096)
+
+// optimization for small string
+template <size_t StackSize = 32>
+class CharBuffer {
+	char *ptr;
+	char buffer[StackSize];
+public:
+	explicit CharBuffer(size_t size) noexcept {
+		if (size <= StackSize) {
+			ptr = buffer;
+			memset(buffer, '\0', StackSize);
+		} else {
+			ptr = static_cast<char *>(NP2HeapAlloc(size));
+		}
+	}
+	char *data() noexcept {
+		return ptr;
+	}
+	char& operator[](size_t index) noexcept {
+		return ptr[index];
+	}
+	~CharBuffer() {
+		if (ptr != buffer) {
+			NP2HeapFree(ptr);
+		}
+	}
+};
 
 // memory buffer
 struct WordListBuffer {
@@ -798,18 +824,9 @@ static void AutoC_AddDocWord(WordList &pWList, const uint32_t (&ignoredStyleMask
 	LPCSTR const pRoot = pWList.pWordStart;
 	const int iRootLen = pWList.iStartLen;
 
-	// optimization for small string
-	char onStack[64];
-	char *pFind;
-	if (iRootLen + 2 <= static_cast<int>(sizeof(onStack))) {
-		memset(onStack, 0, sizeof(onStack));
-		pFind = onStack;
-	} else {
-		pFind = static_cast<char *>(NP2HeapAlloc(iRootLen + 2));
-	}
-
+	CharBuffer pFind(iRootLen + 2);
 	pFind[0] = prefix;
-	memcpy(pFind + (prefix != '\0'), pRoot, iRootLen);
+	memcpy(pFind.data() + (prefix != '\0'), pRoot, iRootLen);
 	int findFlag = (bIgnoreCase ? SCFIND_NONE : SCFIND_MATCHCASE) | SCFIND_MATCH_TO_WORD_END;
 	if (IsDefaultWordChar(static_cast<uint8_t>(pRoot[0]))) {
 		findFlag |= SCFIND_WORDSTART;
@@ -817,7 +834,7 @@ static void AutoC_AddDocWord(WordList &pWList, const uint32_t (&ignoredStyleMask
 
 	const Sci_Position iCurrentPos = SciCall_GetCurrentPos() - iRootLen - (prefix ? 1 : 0);
 	const Sci_Position iDocLen = SciCall_GetLength();
-	Sci_TextToFindFull ft = { { 0, iDocLen }, pFind, { 0, 0 } };
+	Sci_TextToFindFull ft = { { 0, iDocLen }, pFind.data(), { 0, 0 } };
 
 	Sci_Position iPosFind = SciCall_FindTextFull(findFlag, &ft);
 	HANDLE timer = idleTaskTimer;
@@ -946,10 +963,6 @@ static void AutoC_AddDocWord(WordList &pWList, const uint32_t (&ignoredStyleMask
 
 		ft.chrg.cpMin = wordEnd;
 		iPosFind = SciCall_FindTextFull(findFlag, &ft);
-	}
-
-	if (pFind != onStack) {
-		NP2HeapFree(pFind);
 	}
 }
 
@@ -1584,19 +1597,10 @@ static bool EditCompleteWordCore(int iCondition, bool autoInsert) noexcept {
 		chPrev = chPrev2;
 	}
 
-	// optimization for small string
-	char onStack[64];
-	char *pRoot;
-	if (iCurrentPos - iStartWordPos + 1 < static_cast<Sci_Position>(sizeof(onStack))) {
-		memset(onStack, 0, sizeof(onStack));
-		pRoot = onStack;
-	} else {
-		pRoot = static_cast<char *>(NP2HeapAlloc(iCurrentPos - iStartWordPos + 1));
-	}
-
-	const Sci_TextRangeFull tr = { { iStartWordPos, iCurrentPos }, pRoot };
+	CharBuffer pRoot(iCurrentPos - iStartWordPos + 1);
+	const Sci_TextRangeFull tr = { { iStartWordPos, iCurrentPos }, pRoot.data() };
 	SciCall_GetTextRangeFull(&tr);
-	iRootLen = static_cast<int>(strlen(pRoot));
+	iRootLen = static_cast<int>(strlen(pRoot.data()));
 
 #if 0
 	StopWatch watch;
@@ -1607,7 +1611,7 @@ static bool EditCompleteWordCore(int iCondition, bool autoInsert) noexcept {
 		|| (pRoot[0] >= '0' && pRoot[0] <= '9'); // number
 	const bool bIgnoreCase = bIgnoreLexer || autoCompletionConfig.bIgnoreCase;
 	WordList pWList;
-	pWList.Init(pRoot, iRootLen, bIgnoreCase);
+	pWList.Init(pRoot.data(), iRootLen, bIgnoreCase);
 	bool bIgnoreDoc = false;
 	char prefix = '\0';
 
@@ -1738,9 +1742,6 @@ static bool EditCompleteWordCore(int iCondition, bool autoInsert) noexcept {
 		NP2HeapFree(pList);
 	}
 
-	if (pRoot != onStack) {
-		NP2HeapFree(pRoot);
-	}
 	pWList.Free();
 	return bShow;
 }

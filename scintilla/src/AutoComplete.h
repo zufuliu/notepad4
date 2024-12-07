@@ -11,36 +11,33 @@ namespace Scintilla::Internal {
 /**
  */
 class AutoComplete {
-	bool active;
-	char separator;
-	char typesep; // Type separator
+	bool active = false;
+	char separator = '\n';
+	char typesep = '\t'; // Type separator
 	std::string stopChars;
 	std::string fillUpChars;
-	enum {
-		maxItemLen = 128
-	};
 	std::vector<int> sortMatrix;
 
 public:
 
-	bool ignoreCase;
-	bool chooseSingle;
-	AutoCompleteOption options;
-	std::unique_ptr<ListBox> lb;
-	Sci::Position posStart;
-	Sci::Position startLen;
+	bool ignoreCase = false;
+	bool chooseSingle = false;
+	AutoCompleteOption options = Scintilla::AutoCompleteOption::Normal;
+	const std::unique_ptr<ListBox> lb;
+	Sci::Position posStart = 0;
+	Sci::Position startLen = 0;
 	/// Should autocompletion be cancelled if editor's currentPos <= startPos?
-	bool cancelAtStartPos;
-	bool autoHide;
-	bool dropRestOfWord;
-	Scintilla::CaseInsensitiveBehaviour ignoreCaseBehaviour;
-	int widthLBDefault;
-	int heightLBDefault;
+	bool cancelAtStartPos = true;
+	bool autoHide = true;
+	bool dropRestOfWord = false;
+	Scintilla::CaseInsensitiveBehaviour ignoreCaseBehaviour = Scintilla::CaseInsensitiveBehaviour::RespectCase;
+	int widthLBDefault = 100;
+	int heightLBDefault = 100;
 	/** Ordering::PreSorted:   Assume the list is presorted; selection will fail if it is not alphabetical<br />
 	 *  Ordering::PerformSort: Sort the list alphabetically; start up performance cost for sorting<br />
 	 *  Ordering::Custom:      Handle non-alphabetical entries; start up performance cost for generating a sorted lookup table
 	 */
-	Scintilla::Ordering autoSort;
+	Scintilla::Ordering autoSort = Scintilla::Ordering::PreSorted;
 
 	AutoComplete();
 	// Deleted so AutoComplete objects can not be copied.
@@ -69,12 +66,20 @@ public:
 	bool IsFillUpChar(char ch) const noexcept;
 
 	/// The separator character is used when interpreting the list in SetList
-	void SetSeparator(char separator_) noexcept;
-	char GetSeparator() const noexcept;
+	void SetSeparator(char separator_) noexcept {
+		separator = separator_;
+	}
+	char GetSeparator() const noexcept {
+		return separator;
+	}
 
 	/// The typesep character is used for separating the word from the type
-	void SetTypesep(char separator_) noexcept;
-	char GetTypesep() const noexcept;
+	void SetTypesep(char separator_) noexcept {
+		typesep = separator_;
+	}
+	char GetTypesep() const noexcept {
+		return typesep;
+	}
 
 	/// The list string contains a sequence of words separated by the separator character
 	void SetList(const char *list);
