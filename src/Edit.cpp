@@ -4365,22 +4365,25 @@ void EditEnsureSelectionVisible() noexcept {
 }
 
 void EditEnsureConsistentLineEndings() noexcept {
+	const size_t lineCount = SciCall_GetLineCount();
+	const size_t actions = SciCall_GetUndoActions();
+	if (lineCount + actions >= static_cast<size_t>(INT_MAX)) {
+		// Scintilla undo stack is indexed with int
+		return;
+	}
+
 	const int iEOLMode = SciCall_GetEOLMode();
 	if (iEOLMode == SC_EOL_CRLF) {
 #if defined(_WIN64)
 		const int options = SciCall_GetDocumentOptions();
-		if (!(options & SC_DOCUMENTOPTION_TEXT_LARGE)) {
-			const Sci_Position dwLength = SciCall_GetLength() + SciCall_GetLineCount();
-			if (dwLength >= INT_MAX) {
+		if (!(options & SC_DOCUMENTOPTION_TEXT_LARGE))
+#endif
+		{
+			const size_t dwLength = SciCall_GetLength() + lineCount;
+			if (dwLength >= static_cast<size_t>(INT_MAX)) {
 				return;
 			}
 		}
-#else
-		const DWORD dwLength = static_cast<DWORD>(SciCall_GetLength()) + static_cast<DWORD>(SciCall_GetLineCount());
-		if (dwLength >= INT_MAX) {
-			return;
-		}
-#endif
 	}
 
 	SciCall_ConvertEOLs(iEOLMode);

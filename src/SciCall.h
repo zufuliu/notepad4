@@ -260,8 +260,8 @@ inline void SciCall_EndUndoAction() noexcept {
 	SciCall(SCI_ENDUNDOACTION, 0, 0);
 }
 
-inline int SciCall_GetUndoActions() noexcept {
-	return static_cast<int>(SciCall(SCI_GETUNDOACTIONS, 0, 0));
+inline size_t SciCall_GetUndoActions() noexcept {
+	return SciCall(SCI_GETUNDOACTIONS, 0, 0);
 }
 
 inline void SciCall_SetChangeHistory(int changeHistory) noexcept {

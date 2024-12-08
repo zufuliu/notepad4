@@ -5063,8 +5063,8 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 			case StatusItem_EolMode: {
 				constexpr UINT mask = (SC_EOL_LF << 2*SC_EOL_CRLF) | (SC_EOL_CR << 2*SC_EOL_LF) | (SC_EOL_CRLF << 2*SC_EOL_CR);
-				iCurrentEOLMode = (mask >> (iCurrentEOLMode << 1)) & 3;
-				ConvertLineEndings(iCurrentEOLMode);
+				const int iNewEOLMode = (mask >> (iCurrentEOLMode << 1)) & 3;
+				ConvertLineEndings(iNewEOLMode);
 				return TRUE;
 			}
 
