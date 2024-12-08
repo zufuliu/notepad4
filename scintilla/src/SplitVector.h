@@ -257,9 +257,16 @@ public:
 			}
 			RoomFor(insertLength);
 			GapTo(position);
-			for (ptrdiff_t elem = part1Length; elem < part1Length + insertLength; elem++) {
-				T emptyOne = {};
-				body[elem] = std::move(emptyOne);
+			T *ptr = body.data() + part1Length;
+			//std::uninitialized_value_construct_n(ptr, insertLength);
+			if constexpr (std::is_scalar_v<T>) {
+				memset(ptr, 0, insertLength*sizeof(T));
+			} else {
+				static_assert(std::is_nothrow_default_constructible_v<T>);
+				for (ptrdiff_t elem = 0; elem < insertLength; elem++) {
+					::new (ptr)T();
+					ptr++;
+				}
 			}
 			lengthBody += insertLength;
 			part1Length += insertLength;
@@ -285,7 +292,11 @@ public:
 			}
 			RoomFor(insertLength);
 			GapTo(positionToInsert);
-			std::copy_n(s + positionFrom, insertLength, body.data() + part1Length);
+			if constexpr (__is_standard_layout(T)) {
+				memcpy(body.data() + part1Length, s + positionFrom, insertLength*sizeof(T));
+			} else {
+				std::copy_n(s + positionFrom, insertLength, body.data() + part1Length);
+			}
 			lengthBody += insertLength;
 			part1Length += insertLength;
 			gapLength -= insertLength;
@@ -341,13 +352,13 @@ public:
 		const T* data = body.data() + position;
 		if (position < part1Length) {
 			range1Length = std::min(rangeLength, part1Length - position);
-			result = memcmp(data, buffer, range1Length*sizeof(T));
+			result = memcmp(buffer, data, range1Length*sizeof(T));
 		}
 		if (range1Length < rangeLength) {
 			data += range1Length + gapLength;
 			const ptrdiff_t range2Length = rangeLength - range1Length;
 			// NOLINTNEXTLINE(bugprone-suspicious-string-compare)
-			result |= memcmp(data, buffer + range1Length, range2Length*sizeof(T));
+			result |= memcmp(buffer + range1Length, data, range2Length*sizeof(T));
 		}
 		return result;
 	}

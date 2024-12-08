@@ -4366,6 +4366,9 @@ void EditEnsureSelectionVisible() noexcept {
 
 void EditEnsureConsistentLineEndings() noexcept {
 	const size_t lineCount = SciCall_GetLineCount();
+	if (lineCount < 2) {
+		return;
+	}
 	const size_t actions = SciCall_GetUndoActions();
 	if (lineCount + actions >= static_cast<size_t>(INT_MAX)) {
 		// Scintilla undo stack is indexed with int

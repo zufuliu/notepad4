@@ -26,8 +26,6 @@ private:
 
 public:
 	SparseVector() {
-		starts = Partitioning<Sci::Position>(8);
-		values = SplitVector<T>();
 		values.InsertEmpty(0, 2);
 	}
 
@@ -177,7 +175,7 @@ public:
 	}
 
 	void DeleteAll() {
-		starts = Partitioning<Sci::Position>(8);
+		starts = Partitioning<Sci::Position>();
 		values = SplitVector<T>();
 		values.InsertEmpty(0, 2);
 	}

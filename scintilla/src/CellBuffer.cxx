@@ -97,6 +97,8 @@ public:
 using namespace Scintilla;
 using namespace Scintilla::Internal;
 
+namespace {
+
 template <typename POS>
 class LineStartIndex final {
 	// line_cast(): cast Sci::Line to either 32-bit or 64-bit value
@@ -334,37 +336,28 @@ public:
 	}
 };
 
-SplitView::SplitView(const SplitVector<char> &instance) noexcept {
-	length = instance.Length();
-	length1 = instance.GapPosition();
-	if (length1 == 0) {
-		// Assign segment2 to segment1 / length1 to avoid useless test against 0 length1
-		length1 = length;
-	}
-	segment1 = instance.ElementPointer(0);
-	segment2 = instance.ElementPointer(length1) - length1;
+std::unique_ptr<ILineVector> LineVectorCreate(bool largeDocument) {
+	if (largeDocument)
+		return std::make_unique<LineVector<Sci::Position>>();
+	else
+		return std::make_unique<LineVector<int>>();
+}
+
 }
 
 CellBuffer::CellBuffer(bool hasStyles_, bool largeDocument_) :
-	hasStyles(hasStyles_), largeDocument(largeDocument_) {
+	hasStyles(hasStyles_), largeDocument(largeDocument_),
+	uh{std::make_unique<UndoHistory>()},
+	plv{LineVectorCreate(largeDocument_)} {
 	readOnly = false;
 	utf8Substance = false;
 	utf8LineEnds = LineEndType::Default;
 	collectingUndo = true;
-	uh = std::make_unique<UndoHistory>();
-	if (largeDocument)
-		plv = std::make_unique<LineVector<Sci::Position>>();
-	else
-		plv = std::make_unique<LineVector<int>>();
 }
 
 CellBuffer::~CellBuffer() noexcept = default;
 
 char CellBuffer::CharAt(Sci::Position position) const noexcept {
-	return substance.ValueAt(position);
-}
-
-unsigned char CellBuffer::UCharAt(Sci::Position position) const noexcept {
 	return substance.ValueAt(position);
 }
 
@@ -425,7 +418,18 @@ Sci::Position CellBuffer::GapPosition() const noexcept {
 }
 
 SplitView CellBuffer::AllView() const noexcept {
-	return SplitView(substance);
+	const size_t length = substance.Length();
+	size_t length1 = substance.GapPosition();
+	if (length1 == 0) {
+		// Assign segment2 to segment1 / length1 to avoid useless test against 0 length1
+		length1 = length;
+	}
+	return SplitView {
+		substance.ElementPointer(0),
+		length1,
+		substance.ElementPointer(length1) - length1,
+		length
+	};
 }
 
 // The char* returned is to an allocation owned by the undo history
@@ -705,7 +709,7 @@ void CellBuffer::ResetLineEnds() {
 	unsigned char chBeforePrev = 0;
 	unsigned char chPrev = 0;
 	for (Sci::Position i = 0; i < length; i++) {
-		const unsigned char ch = substance.ValueAt(position + i);
+		const unsigned char ch = substance[position + 1];
 		if (ch == '\r') {
 			InsertLine(lineInsert, (position + i) + 1, atLineStart);
 			lineInsert++;
@@ -1260,11 +1264,13 @@ void CellBuffer::BasicDeleteChars(const Sci::Position position, const Sci::Posit
 				} else {
 					RemoveLine(lineRemove);
 				}
-			} else if (utf8LineEnds != LineEndType::Default && !UTF8IsAscii(ch)) {
-				const unsigned char next3[3] = { ch, chNext,
-					static_cast<unsigned char>(substance.ValueAt(position + i + 2)) };
-				if (UTF8IsSeparator(next3) || UTF8IsNEL(next3)) {
-					RemoveLine(lineRemove);
+			} else if (utf8LineEnds != LineEndType::Default) {
+				if (!UTF8IsAscii(ch)) {
+					const unsigned char next3[3] = { ch, chNext,
+						static_cast<unsigned char>(substance.ValueAt(position + i + 2)) };
+					if (UTF8IsSeparator(next3) || UTF8IsNEL(next3)) {
+						RemoveLine(lineRemove);
+					}
 				}
 			}
 

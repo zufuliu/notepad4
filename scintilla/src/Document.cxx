@@ -142,7 +142,8 @@ CharacterExtracted::CharacterExtracted(const unsigned char *charBytes, size_t wi
 
 Document::Document(DocumentOption options) :
 	cb(!FlagSet(options, DocumentOption::StylesNone), FlagSet(options, DocumentOption::TextLarge)),
-	durationStyleOneUnit(1e-6) {
+	durationStyleOneUnit(1e-6),
+	decorations{DecorationListCreate(IsLarge())} {
 
 	perLineData[ldMarkers] = std::make_unique<LineMarkers>();
 	perLineData[ldLevels] = std::make_unique<LineLevels>();
@@ -150,8 +151,6 @@ Document::Document(DocumentOption options) :
 	perLineData[ldMargin] = std::make_unique<LineAnnotation>();
 	perLineData[ldAnnotation] = std::make_unique<LineAnnotation>();
 	perLineData[ldEOLAnnotation] = std::make_unique<LineAnnotation>();
-
-	decorations = DecorationListCreate(IsLarge());
 
 	cb.SetPerLine(this);
 	cb.SetUTF8Substance(CpUtf8 == dbcsCodePage);

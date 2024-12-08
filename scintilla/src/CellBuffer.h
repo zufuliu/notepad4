@@ -48,8 +48,6 @@ struct SplitView {
 	const char *segment2 = nullptr;
 	size_t length = 0;
 
-	SplitView(const SplitVector<char> &instance) noexcept;
-
 	char operator[](size_t position) const noexcept {
 		if (position < length1) {
 			return segment1[position];
@@ -84,11 +82,11 @@ private:
 	SplitVector<char> style;
 
 	bool collectingUndo;
-	std::unique_ptr<UndoHistory> uh;
+	const std::unique_ptr<UndoHistory> uh;
 
 	std::unique_ptr<ChangeHistory> changeHistory;
 
-	std::unique_ptr<ILineVector> plv;
+	const std::unique_ptr<ILineVector> plv;
 
 	bool UTF8LineEndOverlaps(Sci::Position position) const noexcept;
 	bool UTF8IsCharacterBoundary(Sci::Position position) const;
@@ -110,7 +108,9 @@ public:
 
 	/// Retrieving positions outside the range of the buffer works and returns 0
 	char CharAt(Sci::Position position) const noexcept;
-	unsigned char UCharAt(Sci::Position position) const noexcept;
+	unsigned char UCharAt(Sci::Position position) const noexcept {
+		return CharAt(position);
+	}
 	void GetCharRange(char *buffer, Sci::Position position, Sci::Position lengthRetrieve) const noexcept;
 	char StyleAt(Sci::Position position) const noexcept;
 	void GetStyleRange(unsigned char *buffer, Sci::Position position, Sci::Position lengthRetrieve) const noexcept;

@@ -319,8 +319,7 @@ int UndoHistory::PreviousAction() const noexcept {
 	return currentAction - 1;
 }
 
-UndoHistory::UndoHistory() {
-	scraps = std::make_unique<ScrapStack>();
+UndoHistory::UndoHistory() : scraps{std::make_unique<ScrapStack>()} {
 }
 
 UndoHistory::~UndoHistory() noexcept = default;

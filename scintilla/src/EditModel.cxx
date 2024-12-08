@@ -58,7 +58,10 @@ using namespace Scintilla::Internal;
 Caret::Caret() noexcept :
 	active(false), on(false), period(500) {}
 
-EditModel::EditModel() : durationWrapOneUnit(0.01 / 64), durationWrapOneThread(0.01 / 16) {
+EditModel::EditModel() :
+	reprs{std::make_unique<SpecialRepresentations>()},
+	pcs{ContractionStateCreate(false)},
+	durationWrapOneUnit(0.01 / 64), durationWrapOneThread(0.01 / 16) {
 	inOverstrike = false;
 	trackLineWidth = false;
 	hasFocus = false;
@@ -77,11 +80,9 @@ EditModel::EditModel() : durationWrapOneUnit(0.01 / 64), durationWrapOneThread(0
 	hotspotSingleLine = true;
 	hoverIndicatorPos = Sci::invalidPosition;
 	wrapWidth = LineLayout::wrapWidthInfinite;
-	reprs = std::make_unique<SpecialRepresentations>();
 	// before setting a lexer, style buffer is useless.
 	pdoc = new Document(DocumentOption::StylesNone);
 	pdoc->AddRef();
-	pcs = ContractionStateCreate(pdoc->IsLarge());
 
 	SYSTEM_INFO info;
 	GetNativeSystemInfo(&info);

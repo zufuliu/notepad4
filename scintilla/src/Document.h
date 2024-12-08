@@ -329,7 +329,7 @@ public:
 	uint8_t asciiBackwardSafeChar = 0xff;
 	ActionDuration durationStyleOneUnit;
 
-	std::unique_ptr<IDecorationList> decorations;
+	const std::unique_ptr<IDecorationList> decorations;
 
 	explicit Document(Scintilla::DocumentOption options);
 	// Deleted so Document objects can not be copied.

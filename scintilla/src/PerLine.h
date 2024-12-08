@@ -63,7 +63,7 @@ class LineLevels final : public PerLine {
 	SplitVector<int> levels;
 	Scintilla::FoldLevel GetFoldLevel(Sci::Line line) const noexcept;
 public:
-	LineLevels() = default;
+	LineLevels() noexcept = default;
 	void Init() override;
 	bool IsActive() const noexcept override;
 	void InsertLine(Sci::Line line) override;
@@ -80,7 +80,7 @@ public:
 class LineState final : public PerLine {
 	SplitVector<int> lineStates;
 public:
-	LineState() = default;
+	LineState() noexcept = default;
 	void Init() override;
 	bool IsActive() const noexcept override;
 	void InsertLine(Sci::Line line) override;
@@ -94,7 +94,7 @@ public:
 class LineAnnotation : public PerLine {
 	SplitVector<std::unique_ptr<char[]>> annotations;
 public:
-	LineAnnotation() = default;
+	LineAnnotation() noexcept = default;
 
 	[[nodiscard]] bool Empty() const noexcept;
 	void Init() override;
