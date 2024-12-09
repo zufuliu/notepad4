@@ -200,9 +200,9 @@ HWND	EditFindReplaceDlg(HWND hwnd, EDITFINDREPLACE *lpefr, bool bReplace) noexce
 void	EditFindNext(const EDITFINDREPLACE *lpefr, bool fExtendSelection) noexcept;
 void	EditFindPrev(const EDITFINDREPLACE *lpefr, bool fExtendSelection) noexcept;
 void	EditFindAll(const EDITFINDREPLACE *lpefr, bool selectAll) noexcept;
-bool	EditReplace(HWND hwnd, const EDITFINDREPLACE *lpefr) noexcept;
-bool	EditReplaceAll(HWND hwnd, const EDITFINDREPLACE *lpefr, bool bShowInfo) noexcept;
-bool	EditReplaceAllInSelection(HWND hwnd, const EDITFINDREPLACE *lpefr, bool bShowInfo) noexcept;
+void	EditReplace(HWND hwnd, const EDITFINDREPLACE *lpefr) noexcept;
+void	EditReplaceAll(HWND hwnd, const EDITFINDREPLACE *lpefr) noexcept;
+void	EditReplaceAllInSelection(HWND hwnd, const EDITFINDREPLACE *lpefr, bool bShowInfo = false) noexcept;
 bool	EditLineNumDlg(HWND hwnd) noexcept;
 void	EditModifyLinesDlg(HWND hwnd) noexcept;
 void	EditEncloseSelectionDlg(HWND hwnd) noexcept;

@@ -3613,9 +3613,8 @@ void EditStripTrailingBlanks(HWND hwnd, bool bIgnoreSelection) noexcept {
 			efrTrim.hwnd = hwnd;
 			efrTrim.fuFlags = SCFIND_REGEXP;
 			memcpy(efrTrim.szFind, "[ \t]+$", CSTRLEN("[ \t]+$"));
-			if (EditReplaceAllInSelection(hwnd, &efrTrim, false)) {
-				return;
-			}
+			EditReplaceAllInSelection(hwnd, &efrTrim);
+			return;
 		}
 	}
 
@@ -3654,9 +3653,8 @@ void EditStripLeadingBlanks(HWND hwnd, bool bIgnoreSelection) noexcept {
 			efrTrim.hwnd = hwnd;
 			efrTrim.fuFlags = SCFIND_REGEXP;
 			memcpy(efrTrim.szFind, "^[ \t]+", CSTRLEN("^[ \t]+"));
-			if (EditReplaceAllInSelection(hwnd, &efrTrim, false)) {
-				return;
-			}
+			EditReplaceAllInSelection(hwnd, &efrTrim);
+			return;
 		}
 	}
 
@@ -5048,7 +5046,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 					EditFindAll(lpefr, true);
 				} else {
 					bReplaceInitialized = true;
-					EditReplaceAll(lpefr->hwnd, lpefr, true);
+					EditReplaceAll(lpefr->hwnd, lpefr);
 				}
 				break;
 
@@ -5365,13 +5363,13 @@ void EditFindPrev(const EDITFINDREPLACE *lpefr, bool fExtendSelection) noexcept 
 //
 // EditReplace()
 //
-bool EditReplace(HWND hwnd, const EDITFINDREPLACE *lpefr) noexcept {
+void EditReplace(HWND hwnd, const EDITFINDREPLACE *lpefr) noexcept {
 	BOOL bReplaceRE;
 	char szFind2[NP2_FIND_REPLACE_LIMIT];
 	char *pszReplace2;
 	const int searchFlags = EditPrepareReplace(hwnd, szFind2, &pszReplace2, &bReplaceRE, lpefr);
 	if (searchFlags == NP2_InvalidSearchFlags) {
-		return false;
+		return;
 	}
 
 	const Sci_Position iSelStart = SciCall_GetSelectionStart();
@@ -5396,17 +5394,18 @@ bool EditReplace(HWND hwnd, const EDITFINDREPLACE *lpefr) noexcept {
 		if (!bSuppressNotFound) {
 			InfoBoxWarn(MB_OK, L"MsgNotFound", IDS_NOTFOUND);
 		}
-		return false;
+		return;
 	}
 
 	if (iSelStart != ttf.chrgText.cpMin || iSelEnd != ttf.chrgText.cpMax) {
 		LocalFree(pszReplace2);
 		EditSelectEx(ttf.chrgText.cpMin, ttf.chrgText.cpMax);
-		return false;
+		return;
 	}
 
 	SciCall_SetTargetRange(ttf.chrgText.cpMin, ttf.chrgText.cpMax);
 	SciCall_ReplaceTargetEx(bReplaceRE, -1, pszReplace2);
+	LocalFree(pszReplace2);
 
 	ttf.chrg.cpMin = SciCall_GetTargetEnd();
 	ttf.chrg.cpMax = SciCall_GetLength();
@@ -5432,9 +5431,6 @@ bool EditReplace(HWND hwnd, const EDITFINDREPLACE *lpefr) noexcept {
 			InfoBoxWarn(MB_OK, L"MsgNotFound", IDS_NOTFOUND);
 		}
 	}
-
-	LocalFree(pszReplace2);
-	return true;
 }
 
 //=============================================================================
@@ -5778,13 +5774,13 @@ static void ShwowReplaceCount(Sci_Position iCount) noexcept {
 //
 // EditReplaceAll()
 //
-bool EditReplaceAll(HWND hwnd, const EDITFINDREPLACE *lpefr, bool bShowInfo) noexcept {
+void EditReplaceAll(HWND hwnd, const EDITFINDREPLACE *lpefr) noexcept {
 	BOOL bReplaceRE;
 	char szFind2[NP2_FIND_REPLACE_LIMIT];
 	char *pszReplace2;
 	const int searchFlags = EditPrepareReplace(hwnd, szFind2, &pszReplace2, &bReplaceRE, lpefr);
 	if (searchFlags == NP2_InvalidSearchFlags) {
-		return false;
+		return;
 	}
 
 	// Show wait cursor...
@@ -5845,23 +5841,18 @@ bool EditReplaceAll(HWND hwnd, const EDITFINDREPLACE *lpefr, bool bShowInfo) noe
 
 	// Remove wait cursor
 	EndWaitCursor();
-
-	if (bShowInfo) {
-		ShwowReplaceCount(iCount);
-	}
-
 	LocalFree(pszReplace2);
-	return true;
+	ShwowReplaceCount(iCount);
 }
 
 //=============================================================================
 //
 // EditReplaceAllInSelection()
 //
-bool EditReplaceAllInSelection(HWND hwnd, const EDITFINDREPLACE *lpefr, bool bShowInfo) noexcept {
+void EditReplaceAllInSelection(HWND hwnd, const EDITFINDREPLACE *lpefr, bool bShowInfo) noexcept {
 	if (SciCall_IsRectangleSelection()) {
 		NotifyRectangleSelection();
-		return false;
+		return;
 	}
 
 	BOOL bReplaceRE;
@@ -5869,7 +5860,7 @@ bool EditReplaceAllInSelection(HWND hwnd, const EDITFINDREPLACE *lpefr, bool bSh
 	char *pszReplace2;
 	const int searchFlags = EditPrepareReplace(hwnd, szFind2, &pszReplace2, &bReplaceRE, lpefr);
 	if (searchFlags == NP2_InvalidSearchFlags) {
-		return false;
+		return;
 	}
 
 	// Show wait cursor...
@@ -5939,13 +5930,10 @@ bool EditReplaceAllInSelection(HWND hwnd, const EDITFINDREPLACE *lpefr, bool bSh
 
 	// Remove wait cursor
 	EndWaitCursor();
-
+	LocalFree(pszReplace2);
 	if (bShowInfo) {
 		ShwowReplaceCount(iCount);
 	}
-
-	LocalFree(pszReplace2);
-	return true;
 }
 
 //=============================================================================
@@ -6635,7 +6623,7 @@ void EditUpdateTimestampMatchTemplate(HWND hwnd) noexcept {
 	if (!SciCall_IsSelectionEmpty()) {
 		EditReplaceAllInSelection(hwnd, &efrTS, true);
 	} else {
-		EditReplaceAll(hwnd, &efrTS, true);
+		EditReplaceAll(hwnd, &efrTS);
 	}
 }
 
