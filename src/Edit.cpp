@@ -3613,7 +3613,7 @@ void EditStripTrailingBlanks(HWND hwnd, bool bIgnoreSelection) noexcept {
 			efrTrim->hwnd = hwnd;
 			efrTrim->fuFlags = SCFIND_REGEXP;
 			memcpy(efrTrim->szFind, "[ \t]+$", CSTRLEN("[ \t]+$"));
-			EditReplaceAllInSelection(hwnd, efrTrim);
+			EditReplaceAllInSelection(hwnd, efrTrim, EditReplaceAllFlag_UndoGroup);
 			NP2HeapFree(efrTrim);
 			return;
 		}
@@ -3653,7 +3653,7 @@ void EditStripLeadingBlanks(HWND hwnd, bool bIgnoreSelection) noexcept {
 			efrTrim->hwnd = hwnd;
 			efrTrim->fuFlags = SCFIND_REGEXP;
 			memcpy(efrTrim->szFind, "^[ \t]+", CSTRLEN("^[ \t]+"));
-			EditReplaceAllInSelection(hwnd, efrTrim);
+			EditReplaceAllInSelection(hwnd, efrTrim, EditReplaceAllFlag_UndoGroup);
 			NP2HeapFree(efrTrim);
 			return;
 		}
@@ -4369,7 +4369,7 @@ void EditEnsureConsistentLineEndings() noexcept {
 		return;
 	}
 	const size_t actions = SciCall_GetUndoActions();
-	if (lineCount + actions >= static_cast<size_t>(INT_MAX)) {
+	if (lineCount + actions >= MAX_NON_UTF8_SIZE) {
 		// Scintilla undo stack is indexed with int
 		return;
 	}
@@ -4382,7 +4382,7 @@ void EditEnsureConsistentLineEndings() noexcept {
 #endif
 		{
 			const size_t dwLength = SciCall_GetLength() + lineCount;
-			if (dwLength >= static_cast<size_t>(INT_MAX)) {
+			if (dwLength >= MAX_NON_UTF8_SIZE) {
 				return;
 			}
 		}
@@ -5053,7 +5053,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 
 			case IDC_REPLACEINSEL:
 				bReplaceInitialized = true;
-				EditReplaceAllInSelection(lpefr->hwnd, lpefr, true);
+				EditReplaceAllInSelection(lpefr->hwnd, lpefr, EditReplaceAllFlag_Default);
 				break;
 			}
 		}
@@ -5796,7 +5796,8 @@ void EditReplaceAll(HWND hwnd, const EDITFINDREPLACE *lpefr) noexcept {
 	Sci_TextToFindFull ttf = { { 0, SciCall_GetLength() }, szFind2, { 0, 0 } };
 	Sci_Position iCount = 0;
 	while (SciCall_FindTextFull(searchFlags, &ttf) >= 0) {
-		if (++iCount == 1) {
+		++iCount;
+		if (iCount == 1) {
 			SciCall_BeginUndoAction();
 		}
 
@@ -5850,7 +5851,7 @@ void EditReplaceAll(HWND hwnd, const EDITFINDREPLACE *lpefr) noexcept {
 //
 // EditReplaceAllInSelection()
 //
-void EditReplaceAllInSelection(HWND hwnd, const EDITFINDREPLACE *lpefr, bool bShowInfo) noexcept {
+void EditReplaceAllInSelection(HWND hwnd, const EDITFINDREPLACE *lpefr, EditReplaceAllFlag flag) noexcept {
 	if (SciCall_IsRectangleSelection()) {
 		NotifyRectangleSelection();
 		return;
@@ -5873,7 +5874,8 @@ void EditReplaceAllInSelection(HWND hwnd, const EDITFINDREPLACE *lpefr, bool bSh
 	Sci_Position iCount = 0;
 	while (SciCall_FindTextFull(searchFlags, &ttf) >= 0) {
 		if (ttf.chrgText.cpMax <= SciCall_GetSelectionEnd()) {
-			if (++iCount == 1) {
+			++iCount;
+			if (iCount == 1 && (flag & EditReplaceAllFlag_UndoGroup) != 0) {
 				SciCall_BeginUndoAction();
 			}
 
@@ -5911,6 +5913,9 @@ void EditReplaceAllInSelection(HWND hwnd, const EDITFINDREPLACE *lpefr, bool bSh
 
 	SendMessage(hwnd, WM_SETREDRAW, TRUE, 0);
 	if (iCount) {
+		if ((flag & EditReplaceAllFlag_UndoGroup) != 0) {
+			SciCall_EndUndoAction();
+		}
 		const Sci_Position iPos = SciCall_GetTargetEnd();
 		if (SciCall_GetSelectionEnd() < iPos) {
 			Sci_Position iAnchorPos = SciCall_GetAnchor();
@@ -5925,14 +5930,13 @@ void EditReplaceAllInSelection(HWND hwnd, const EDITFINDREPLACE *lpefr, bool bSh
 			EditSelectEx(iAnchorPos, iCurrentPos);
 		}
 
-		SciCall_EndUndoAction();
 		InvalidateRect(hwnd, nullptr, TRUE);
 	}
 
 	// Remove wait cursor
 	EndWaitCursor();
 	LocalFree(pszReplace2);
-	if (bShowInfo) {
+	if ((flag & EditReplaceAllFlag_ShowInfo) != 0) {
 		ShwowReplaceCount(iCount);
 	}
 }
@@ -6621,7 +6625,7 @@ void EditUpdateTimestampMatchTemplate(HWND hwnd) noexcept {
 	WideCharToMultiByte(cpEdit, 0, wchReplace, -1, efrTS->szReplace, COUNTOF(efrTS->szReplace), nullptr, nullptr);
 
 	if (!SciCall_IsSelectionEmpty()) {
-		EditReplaceAllInSelection(hwnd, efrTS, true);
+		EditReplaceAllInSelection(hwnd, efrTS, EditReplaceAllFlag_Default);
 	} else {
 		EditReplaceAll(hwnd, efrTS);
 	}
