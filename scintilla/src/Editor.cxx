@@ -99,6 +99,17 @@ constexpr bool IsLastStep(const DocModification &mh) noexcept {
 		&& ((mh.modificationType & finalMask) == finalMask);
 }
 
+class BatchUpdateGroup {
+	Editor *editor;
+public:
+	explicit BatchUpdateGroup(Editor *edit) noexcept : editor{edit} {
+		editor->BeginBatchUpdate();
+	}
+	~BatchUpdateGroup() {
+		editor->EndBatchUpdate();
+	}
+};
+
 }
 
 Timer::Timer() noexcept :
@@ -195,6 +206,7 @@ Editor::Editor() {
 	modEventMask = ModificationFlags::EventMaskAll;
 
 	foldAutomatic = AutomaticFold::None;
+	batchUpdateDepth = 0;
 
 	pdoc->AddWatcher(this, nullptr);
 	SetRepresentations();
@@ -6618,11 +6630,21 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		return pdoc->IsCollectingUndo();
 
 	case Message::BeginUndoAction:
-		pdoc->BeginUndoAction();
+		if (wParam == 0) {
+			pdoc->BeginUndoAction();
+		}
+		if (lParam != 0) {
+			BeginBatchUpdate();
+		}
 		return 0;
 
 	case Message::EndUndoAction:
-		pdoc->EndUndoAction();
+		if (wParam == 0) {
+			pdoc->EndUndoAction();
+		}
+		if (lParam != 0) {
+			EndBatchUpdate();
+		}
 		return 0;
 
 	case Message::GetUndoSequence:
@@ -8245,10 +8267,12 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 	case Message::GetCommandEvents:
 		return commandEvents;
 
-	case Message::ConvertEOLs:
+	case Message::ConvertEOLs: {
+		const BatchUpdateGroup group(this);
 		pdoc->ConvertLineEnds(static_cast<EndOfLine>(wParam));
 		SetSelection(sel.MainCaret(), sel.MainAnchor());	// Ensure selection inside document
 		return 0;
+	}
 
 	case Message::SetLengthForEncode:
 		lengthForEncode = PositionFromUPtr(wParam);

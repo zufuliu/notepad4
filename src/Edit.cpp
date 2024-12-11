@@ -1816,7 +1816,7 @@ void EditEscapeCChars(HWND hwnd) noexcept {
 
 	EDITFINDREPLACE * const efr = static_cast<EDITFINDREPLACE *>(NP2HeapAlloc(sizeof(EDITFINDREPLACE)));
 	efr->hwnd = hwnd;
-	SciCall_BeginUndoAction();
+	SciCall_BeginBatchUpdate();
 
 	strcpy(efr->szFind, "\\");
 	strcpy(efr->szReplace, "\\\\");
@@ -1831,7 +1831,7 @@ void EditEscapeCChars(HWND hwnd) noexcept {
 	EditReplaceAllInSelection(hwnd, efr);
 
 	NP2HeapFree(efr);
-	SciCall_EndUndoAction();
+	SciCall_EndBatchUpdate();
 }
 
 //=============================================================================
@@ -1849,7 +1849,7 @@ void EditUnescapeCChars(HWND hwnd) noexcept {
 
 	EDITFINDREPLACE * const efr = static_cast<EDITFINDREPLACE *>(NP2HeapAlloc(sizeof(EDITFINDREPLACE)));
 	efr->hwnd = hwnd;
-	SciCall_BeginUndoAction();
+	SciCall_BeginBatchUpdate();
 
 	strcpy(efr->szFind, "\\\\");
 	strcpy(efr->szReplace, "\\");
@@ -1864,7 +1864,7 @@ void EditUnescapeCChars(HWND hwnd) noexcept {
 	EditReplaceAllInSelection(hwnd, efr);
 
 	NP2HeapFree(efr);
-	SciCall_EndUndoAction();
+	SciCall_EndBatchUpdate();
 }
 
 // XML/HTML predefined entity
@@ -1891,7 +1891,7 @@ void EditEscapeXHTMLChars(HWND hwnd) noexcept {
 
 	EDITFINDREPLACE * const efr = static_cast<EDITFINDREPLACE *>(NP2HeapAlloc(sizeof(EDITFINDREPLACE)));
 	efr->hwnd = hwnd;
-	SciCall_BeginUndoAction();
+	SciCall_BeginBatchUpdate();
 
 	strcpy(efr->szFind, "&");
 	strcpy(efr->szReplace, "&amp;");
@@ -1924,7 +1924,7 @@ void EditEscapeXHTMLChars(HWND hwnd) noexcept {
 	}
 
 	NP2HeapFree(efr);
-	SciCall_EndUndoAction();
+	SciCall_EndBatchUpdate();
 }
 
 //=============================================================================
@@ -1942,7 +1942,7 @@ void EditUnescapeXHTMLChars(HWND hwnd) noexcept {
 
 	EDITFINDREPLACE * const efr = static_cast<EDITFINDREPLACE *>(NP2HeapAlloc(sizeof(EDITFINDREPLACE)));
 	efr->hwnd = hwnd;
-	SciCall_BeginUndoAction();
+	SciCall_BeginBatchUpdate();
 
 	strcpy(efr->szFind, "&quot;");
 	strcpy(efr->szReplace, "\"");
@@ -1973,7 +1973,7 @@ void EditUnescapeXHTMLChars(HWND hwnd) noexcept {
 	EditReplaceAllInSelection(hwnd, efr);
 
 	NP2HeapFree(efr);
-	SciCall_EndUndoAction();
+	SciCall_EndBatchUpdate();
 }
 
 //=============================================================================
@@ -5786,7 +5786,6 @@ void EditReplaceAll(HWND hwnd, const EDITFINDREPLACE *lpefr) noexcept {
 
 	// Show wait cursor...
 	BeginWaitCursor();
-	SendMessage(hwnd, WM_SETREDRAW, FALSE, 0);
 #if 0
 	StopWatch watch;
 	watch.Start();
@@ -5798,7 +5797,7 @@ void EditReplaceAll(HWND hwnd, const EDITFINDREPLACE *lpefr) noexcept {
 	while (SciCall_FindTextFull(searchFlags, &ttf) >= 0) {
 		++iCount;
 		if (iCount == 1) {
-			SciCall_BeginUndoAction();
+			SciCall_BeginBatchUpdate();
 		}
 
 		SciCall_SetTargetRange(ttf.chrgText.cpMin, ttf.chrgText.cpMax);
@@ -5834,11 +5833,9 @@ void EditReplaceAll(HWND hwnd, const EDITFINDREPLACE *lpefr) noexcept {
 	watch.Stop();
 	watch.ShowLog("EditReplaceAll() time");
 #endif
-	SendMessage(hwnd, WM_SETREDRAW, TRUE, 0);
 	if (iCount) {
+		SciCall_EndBatchUpdate();
 		EditEnsureSelectionVisible();
-		SciCall_EndUndoAction();
-		InvalidateRect(hwnd, nullptr, TRUE);
 	}
 
 	// Remove wait cursor
@@ -5867,7 +5864,6 @@ void EditReplaceAllInSelection(HWND hwnd, const EDITFINDREPLACE *lpefr, EditRepl
 
 	// Show wait cursor...
 	BeginWaitCursor();
-	SendMessage(hwnd, WM_SETREDRAW, FALSE, 0);
 
 	const bool bRegexStartOfLine = bReplaceRE && (szFind2[0] == '^');
 	Sci_TextToFindFull ttf = { { SciCall_GetSelectionStart(), SciCall_GetLength() }, szFind2, { 0, 0 } };
@@ -5876,7 +5872,7 @@ void EditReplaceAllInSelection(HWND hwnd, const EDITFINDREPLACE *lpefr, EditRepl
 		if (ttf.chrgText.cpMax <= SciCall_GetSelectionEnd()) {
 			++iCount;
 			if (iCount == 1 && (flag & EditReplaceAllFlag_UndoGroup) != 0) {
-				SciCall_BeginUndoAction();
+				SciCall_BeginBatchUpdate();
 			}
 
 			SciCall_SetTargetRange(ttf.chrgText.cpMin, ttf.chrgText.cpMax);
@@ -5911,10 +5907,9 @@ void EditReplaceAllInSelection(HWND hwnd, const EDITFINDREPLACE *lpefr, EditRepl
 		}
 	}
 
-	SendMessage(hwnd, WM_SETREDRAW, TRUE, 0);
 	if (iCount) {
 		if ((flag & EditReplaceAllFlag_UndoGroup) != 0) {
-			SciCall_EndUndoAction();
+			SciCall_EndBatchUpdate();
 		}
 		const Sci_Position iPos = SciCall_GetTargetEnd();
 		if (SciCall_GetSelectionEnd() < iPos) {
@@ -5929,8 +5924,6 @@ void EditReplaceAllInSelection(HWND hwnd, const EDITFINDREPLACE *lpefr, EditRepl
 
 			EditSelectEx(iAnchorPos, iCurrentPos);
 		}
-
-		InvalidateRect(hwnd, nullptr, TRUE);
 	}
 
 	// Remove wait cursor

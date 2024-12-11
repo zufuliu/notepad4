@@ -293,6 +293,14 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 
 	Scintilla::AutomaticFold foldAutomatic;
 
+	int batchUpdateDepth;
+	struct BatchUpdateSavedState {
+		ModificationFlags modEventMask;
+		int actions;
+		Sci::Line lines;
+	};
+	BatchUpdateSavedState batchUpdateState;
+
 	// Wrapping support
 	WrapPending wrapPending;
 
@@ -702,6 +710,8 @@ public:
 	bool IsUnicodeMode() const noexcept;
 	// Public so scintilla_send_message can use it.
 	virtual Scintilla::sptr_t WndProc(Scintilla::Message iMessage, Scintilla::uptr_t wParam, Scintilla::sptr_t lParam);
+	void BeginBatchUpdate() noexcept;
+	void EndBatchUpdate() noexcept;
 	// Public so scintilla_set_id can use it.
 	int ctrlID;
 	// Public so COM methods for drag and drop can set it.

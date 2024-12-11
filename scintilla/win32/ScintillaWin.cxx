@@ -2780,6 +2780,32 @@ void ScintillaWin::NotifyDoubleClick(Point pt, KeyMod modifiers) {
 		MAKELPARAM(point.x, point.y));
 }
 
+void Editor::BeginBatchUpdate() noexcept {
+	++batchUpdateDepth;
+	if (batchUpdateDepth == 1) {
+		batchUpdateState.modEventMask = modEventMask;
+		modEventMask = ModificationFlags::None;
+		batchUpdateState.actions = pdoc->UndoActions();
+		batchUpdateState.lines = pdoc->LinesTotal();
+		::SendMessage(HwndFromWindow(wMain), WM_SETREDRAW, FALSE, 0);
+	}
+}
+
+void Editor::EndBatchUpdate() noexcept {
+	--batchUpdateDepth;
+	if (batchUpdateDepth == 0) {
+		modEventMask = batchUpdateState.modEventMask;
+		::SendMessage(HwndFromWindow(wMain), WM_SETREDRAW, TRUE, 0);
+		if (batchUpdateState.actions != pdoc->UndoActions()) {
+			NotificationData scn = {};
+			scn.nmhdr.code = Notification::Modified;
+			scn.linesAdded = pdoc->LinesTotal() - batchUpdateState.lines;
+			NotifyParent(scn);
+			::InvalidateRect(HwndFromWindow(wMain), nullptr, TRUE);
+		}
+	}
+}
+
 namespace {
 
 class CaseFolderDBCS final : public CaseFolderTable {

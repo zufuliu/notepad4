@@ -260,6 +260,14 @@ inline void SciCall_EndUndoAction() noexcept {
 	SciCall(SCI_ENDUNDOACTION, 0, 0);
 }
 
+inline void SciCall_BeginBatchUpdate(bool bNoUndoGroup = false) noexcept {
+	SciCall(SCI_BEGINUNDOACTION, bNoUndoGroup, true);
+}
+
+inline void SciCall_EndBatchUpdate(bool bNoUndoGroup = false) noexcept {
+	SciCall(SCI_ENDUNDOACTION, bNoUndoGroup, true);
+}
+
 inline size_t SciCall_GetUndoActions() noexcept {
 	return SciCall(SCI_GETUNDOACTIONS, 0, 0);
 }
