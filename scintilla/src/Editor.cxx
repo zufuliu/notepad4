@@ -5801,8 +5801,10 @@ Sci::Position Editor::GetTag(char *tagValue, int tagNumber) {
 	const char *text = nullptr;
 	Sci::Position length = 0;
 	if ((tagNumber >= 1) && (tagNumber <= 9)) {
-		char name[3] = "\\?";
+		char name[3];
+		name[0] = '\\';
 		name[1] = static_cast<char>(tagNumber + '0');
+		name[2] = '\0';
 		length = 2;
 		text = pdoc->SubstituteByPosition(name, &length);
 	}
@@ -6108,6 +6110,10 @@ namespace {
 
 constexpr Selection::SelTypes SelTypeFromMode(SelectionMode mode) noexcept {
 	return static_cast<Selection::SelTypes>(static_cast<int>(mode) + 1);
+}
+
+constexpr int SelectionModeFromSelType(Selection::SelTypes selType) noexcept {
+	return std::max(0, static_cast<int>(selType) - 1);
 }
 
 }
@@ -6993,15 +6999,17 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 
 	case Message::ClearTabStops:
 		if (view.ClearTabstops(LineFromUPtr(wParam))) {
-			const DocModification mh(ModificationFlags::ChangeTabStops, 0, 0, 0, nullptr, LineFromUPtr(wParam));
-			NotifyModified(pdoc, mh, nullptr);
+			// const DocModification mh(ModificationFlags::ChangeTabStops, 0, 0, 0, nullptr, LineFromUPtr(wParam));
+			// NotifyModified(pdoc, mh, nullptr);
+			Redraw();
 		}
 		break;
 
 	case Message::AddTabStop:
 		if (view.AddTabstop(LineFromUPtr(wParam), static_cast<int>(lParam))) {
-			const DocModification mh(ModificationFlags::ChangeTabStops, 0, 0, 0, nullptr, LineFromUPtr(wParam));
-			NotifyModified(pdoc, mh, nullptr);
+			// const DocModification mh(ModificationFlags::ChangeTabStops, 0, 0, 0, nullptr, LineFromUPtr(wParam));
+			// NotifyModified(pdoc, mh, nullptr);
+			Redraw();
 		}
 		break;
 
@@ -7309,9 +7317,9 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		if (wParam <= MarkerMax) {
 			vs.markers[wParam].markType = static_cast<MarkerSymbol>(lParam);
 			vs.CalcLargestMarkerHeight();
+			InvalidateStyleData();
+			RedrawSelMargin();
 		}
-		InvalidateStyleData();
-		RedrawSelMargin();
 		break;
 
 	case Message::MarkerSymbolDefined:
@@ -7393,9 +7401,9 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		if (wParam <= MarkerMax) {
 			vs.markers[wParam].SetXPM(ConstCharPtrFromSPtr(lParam));
 			vs.CalcLargestMarkerHeight();
+			InvalidateStyleData();
+			RedrawSelMargin();
 		}
-		InvalidateStyleData();
-		RedrawSelMargin();
 		break;
 
 	case Message::RGBAImageSetWidth:
@@ -7414,9 +7422,9 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		if (wParam <= MarkerMax) {
 			vs.markers[wParam].SetRGBAImage(sizeRGBAImage, scaleRGBAImage / 100.0f, ConstUCharPtrFromSPtr(lParam));
 			vs.CalcLargestMarkerHeight();
+			InvalidateStyleData();
+			RedrawSelMargin();
 		}
-		InvalidateStyleData();
-		RedrawSelMargin();
 		break;
 
 	case Message::SetMarginTypeN:
@@ -8256,18 +8264,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		SetSelectionMode(wParam, false);
 		break;
 	case Message::GetSelectionMode:
-		switch (sel.selType) {
-		case Selection::SelTypes::stream:
-			return static_cast<sptr_t>(SelectionMode::Stream);
-		case Selection::SelTypes::rectangle:
-			return static_cast<sptr_t>(SelectionMode::Rectangle);
-		case Selection::SelTypes::lines:
-			return static_cast<sptr_t>(SelectionMode::Lines);
-		case Selection::SelTypes::thin:
-			return static_cast<sptr_t>(SelectionMode::Thin);
-		default:	// ?!
-			return static_cast<sptr_t>(SelectionMode::Stream);
-		}
+		return SelectionModeFromSelType(sel.selType);
 	case Message::SetMoveExtendsSelection:
 		sel.SetMoveExtends(wParam != 0);
 		break;

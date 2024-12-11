@@ -564,7 +564,7 @@ class ScintillaWin final :
 	void NotifyFocus(bool focus) override;
 	void SetCtrlID(int identifier) noexcept override;
 	int GetCtrlID() const noexcept override;
-	void NotifyParent(NotificationData scn) noexcept override;
+	void NotifyParent(NotificationData &scn) const noexcept override;
 	void NotifyDoubleClick(Point pt, KeyMod modifiers) override;
 	std::unique_ptr<CaseFolder> CaseFolderForEncoding() override;
 	std::string CaseMapString(const std::string &s, CaseMapping caseMapping) const override;
@@ -2762,11 +2762,11 @@ int ScintillaWin::GetCtrlID() const noexcept {
 	return ::GetDlgCtrlID(MainHWND());
 }
 
-void ScintillaWin::NotifyParent(NotificationData scn) noexcept {
+void ScintillaWin::NotifyParent(NotificationData &scn) const noexcept {
 	scn.nmhdr.hwndFrom = MainHWND();
 	scn.nmhdr.idFrom = GetCtrlID();
 	::SendMessage(::GetParent(MainHWND()), WM_NOTIFY,
-		GetCtrlID(), AsInteger<LPARAM>(&scn));
+		scn.nmhdr.idFrom, AsInteger<LPARAM>(&scn));
 }
 
 void ScintillaWin::NotifyDoubleClick(Point pt, KeyMod modifiers) {

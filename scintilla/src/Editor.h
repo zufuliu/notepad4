@@ -465,7 +465,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	virtual int GetCtrlID() const noexcept {
 		return ctrlID;
 	}
-	virtual void NotifyParent(Scintilla::NotificationData scn) noexcept = 0;
+	virtual void NotifyParent(Scintilla::NotificationData &scn) const noexcept = 0;
 	virtual void NotifyStyleToNeeded(Sci::Position endStyleNeeded);
 	void NotifyChar(int ch, Scintilla::CharacterSource charSource, bool handled = false) noexcept;
 	void NotifySavePoint(bool isSavePoint) noexcept;
