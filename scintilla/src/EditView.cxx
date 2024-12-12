@@ -1335,7 +1335,7 @@ void EditView::DrawFoldDisplayText(Surface *surface, const EditModel &model, con
 	const XYPOSITION spaceWidth = vsDraw.styles[ll->EndLineStyle()].spaceWidth;
 	const XYPOSITION virtualSpace = model.sel.VirtualSpaceFor(
 		model.pdoc->LineEnd(line)) * spaceWidth;
-	rcSegment.left = xStart + ll->positions[ll->numCharsInLine] - subLineStart + virtualSpace + vsDraw.aveCharWidth;
+	rcSegment.left = xStart + ll->positions[ll->lastSegmentEnd] - subLineStart + virtualSpace + vsDraw.aveCharWidth;
 	rcSegment.right = rcSegment.left + widthFoldDisplayText + margin*2;
 
 	const ColourOptional background = vsDraw.Background(model.GetMark(line), model.caret.active, ll->containsCaret);
@@ -2739,31 +2739,18 @@ void EditView::PaintText(Surface *surfaceWindow, const EditModel &model, const V
 
 		Sci::Line lineDocPrevious = -1;	// Used to avoid laying out one document line multiple times
 		LineLayout *ll = nullptr;
-		int phaseCount;
-		DrawPhase phases[8];
+		DrawPhase phase = DrawPhase::all;
 		if ((phasesDraw == PhasesDraw::Multiple) && !bufferedDraw) {
-			phases[0] = DrawPhase::back;
-			phases[1] = DrawPhase::indicatorsBack;
-			phases[2] = DrawPhase::text;
-			phases[3] = DrawPhase::indentationGuides;
-			phases[4] = DrawPhase::indicatorsFore;
-			phases[5] = DrawPhase::selectionTranslucent;
-			phases[6] = DrawPhase::lineTranslucent;
-			phases[7] = DrawPhase::carets;
-			phaseCount = 8;
-		} else {
-			phases[0] = DrawPhase::all;
-			phaseCount = 1;
+			phase = DrawPhase::back;
 		}
 
-		for (int phaseIndex = 0; phaseIndex < phaseCount; phaseIndex++) {
-			const DrawPhase phase = phases[phaseIndex];
-			int ypos = 0;
-			if (!bufferedDraw)
-				ypos += screenLinePaintFirst * vsDraw.lineHeight;
+		do {
 			int yposScreen = screenLinePaintFirst * vsDraw.lineHeight;
+			int ypos = bufferedDraw ? 0 : yposScreen;
+			const int bottom = static_cast<int>(rcArea.bottom);
 			Sci::Line visibleLine = model.TopLineOfMain() + screenLinePaintFirst;
-			while (visibleLine < model.pcs->LinesDisplayed() && yposScreen < rcArea.bottom) {
+			const Sci::Line linesDisplayed = model.pcs->LinesDisplayed();
+			while (visibleLine < linesDisplayed && yposScreen < bottom) {
 
 				const Sci::Line lineDoc = model.pcs->DocFromDisplay(visibleLine);
 				// Only visible lines should be handled by the code within the loop
@@ -2780,6 +2767,10 @@ void EditView::PaintText(Surface *surfaceWindow, const EditModel &model, const V
 					lineDocPrevious = lineDoc;
 					ll = RetrieveLineLayout(lineDoc, model);
 					LayoutLine(model, surface, vsDraw, ll, model.wrapWidth, LayoutLineOption::KeepPosition);
+					if (model.BidirectionalEnabled()) {
+						// Fill the line bidi data
+						UpdateBidiData(model, vsDraw, ll);
+					}
 				}
 #if defined(TIME_PAINTING)
 				durLayout += ep.Reset();
@@ -2807,11 +2798,6 @@ void EditView::PaintText(Surface *surfaceWindow, const EditModel &model, const V
 						surface->FillRectangleAligned(rcSpacer, Fill(vsDraw.styles[StyleDefault].back));
 					}
 
-					if (model.BidirectionalEnabled()) {
-						// Fill the line bidi data
-						UpdateBidiData(model, vsDraw, ll);
-					}
-
 					DrawLine(surface, model, vsDraw, ll, lineDoc, visibleLine, xStart, rcLine, subLine, phase);
 #if defined(TIME_PAINTING)
 					durPaint += ep.Reset();
@@ -2837,7 +2823,7 @@ void EditView::PaintText(Surface *surfaceWindow, const EditModel &model, const V
 					}
 
 					lineWidthMaxSeen = std::max(
-						lineWidthMaxSeen, static_cast<int>(ll->positions[ll->numCharsInLine]));
+						lineWidthMaxSeen, static_cast<int>(ll->positions[ll->lastSegmentEnd]));
 #if defined(TIME_PAINTING)
 					durCopy += ep.Duration();
 #endif
@@ -2850,7 +2836,9 @@ void EditView::PaintText(Surface *surfaceWindow, const EditModel &model, const V
 				yposScreen += vsDraw.lineHeight;
 				visibleLine++;
 			}
-		}
+
+			phase = static_cast<DrawPhase>(static_cast<int>(phase) << 1);
+		} while (phase < DrawPhase::all);
 #if defined(TIME_PAINTING)
 		if (durPaint < 0.00000001)
 			durPaint = 0.00000001;
