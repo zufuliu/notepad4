@@ -327,7 +327,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	PRectangle GetTextRectangle() const noexcept;
 
 	Sci::Line LinesOnScreen() const noexcept override;
-	void OnLineWrapped(Sci::Line lineDoc, int linesWrapped) override;
+	void OnLineWrapped(Sci::Line lineDoc, int linesWrapped, int option) override;
 	Sci::Line LinesToScroll() const noexcept;
 	Sci::Line MaxScrollPos() const noexcept;
 	SelectionPosition ClampPositionIntoDocument(SelectionPosition sp) const noexcept;

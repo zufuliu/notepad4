@@ -37,7 +37,7 @@ enum class LayoutLineOption {
 	AutoUpdate = 0,
 	ManualUpdate = 1,
 	IdleUpdate = 2,
-	KeepPosition = 3,
+	PaintText = 3,
 	Printing = 4,
 	CallerMultiThreaded = 8,
 	DisablePartialLayout = 16,

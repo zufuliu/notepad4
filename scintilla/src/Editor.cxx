@@ -1498,13 +1498,13 @@ bool Editor::WrapOneLine(Surface *surface, Sci::Position positionInsert) {
 	return pcs->SetHeight(lineToWrap, linesWrapped);
 }
 
-void Editor::OnLineWrapped(Sci::Line lineDoc, int linesWrapped) {
+void Editor::OnLineWrapped(Sci::Line lineDoc, int linesWrapped, int option) {
 	if (Wrapping()) {
 		//printf("%s(%zd, %d)\n", __func__, lineDoc, linesWrapped);
 		if (vs.annotationVisible != AnnotationVisible::Hidden) {
 			linesWrapped += pdoc->AnnotationLines(lineDoc);
 		}
-		if (pcs->SetHeight(lineDoc, linesWrapped)) {
+		if (pcs->SetHeight(lineDoc, linesWrapped) && option == static_cast<int>(LayoutLineOption::AutoUpdate)) {
 			NeedWrapping(lineDoc, lineDoc + 1, false);
 			SetScrollBars();
 			SetVerticalScrollPos();

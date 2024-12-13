@@ -435,7 +435,7 @@ struct LayoutWorker {
 		const int endPos = ll->numCharsInLine;
 		if (endPos - startPos > blockSize*2 && !model.BidirectionalEnabled()) {
 			posInLine = std::max<uint32_t>(posInLine, ll->caretPosition) + blockSize;
-			if (posInLine > static_cast<uint32_t>(endPos)) {
+			if (static_cast<int>(endPos - posInLine) < blockSize) {
 				posInLine = endPos;
 			} else if (option < LayoutLineOption::IdleUpdate) {
 				// layout as much as possible to avoid unexpected scrolling
@@ -651,7 +651,7 @@ uint64_t EditView::LayoutLine(const EditModel &model, Surface *surface, const Vi
 	const bool partialLine = validity == LineLayout::ValidLevel::lines
 		&& ll->PartialPosition() && width == ll->widthLine;
 	if (validity == LineLayout::ValidLevel::invalid
-		|| (option != LayoutLineOption::KeepPosition && ll->PartialPosition())) {
+		|| (option != LayoutLineOption::PaintText && ll->PartialPosition())) {
 		//if (ll->maxLineLength > LayoutWorker::blockSize) {
 		//	printf("start layout line=%zd, posInLine=%d\n", line + 1, posInLine);
 		//}
@@ -753,8 +753,9 @@ uint64_t EditView::LayoutLine(const EditModel &model, Surface *surface, const Vi
 		}
 
 		validity = LineLayout::ValidLevel::lines;
-		if (partialLine && option == LayoutLineOption::AutoUpdate && linesWrapped != ll->lines) {
-			const_cast<EditModel &>(model).OnLineWrapped(line, ll->lines);
+		if (linesWrapped != ll->lines && ((option == LayoutLineOption::AutoUpdate && partialLine)
+			|| (option == LayoutLineOption::PaintText && ll->PartialPosition()))) {
+			const_cast<EditModel &>(model).OnLineWrapped(line, ll->lines, static_cast<int>(option));
 		}
 	}
 	ll->validity = validity;
@@ -2701,6 +2702,7 @@ void EditView::PaintText(Surface *surfaceWindow, const EditModel &model, const V
 			surface->SetMode(model.CurrentSurfaceMode());
 		}
 
+		model.SetIdleTaskTime(EditModel::MaxPaintTextTime);
 		const Point ptOrigin = model.GetVisibleOriginInMain();
 
 		const int screenLinePaintFirst = static_cast<int>(rcArea.top) / vsDraw.lineHeight;
@@ -2744,7 +2746,7 @@ void EditView::PaintText(Surface *surfaceWindow, const EditModel &model, const V
 			phase = DrawPhase::back;
 		}
 
-		do {
+		while (true) {
 			int yposScreen = screenLinePaintFirst * vsDraw.lineHeight;
 			int ypos = bufferedDraw ? 0 : yposScreen;
 			const int bottom = static_cast<int>(rcArea.bottom);
@@ -2766,7 +2768,7 @@ void EditView::PaintText(Surface *surfaceWindow, const EditModel &model, const V
 				if (lineDoc != lineDocPrevious) {
 					lineDocPrevious = lineDoc;
 					ll = RetrieveLineLayout(lineDoc, model);
-					LayoutLine(model, surface, vsDraw, ll, model.wrapWidth, LayoutLineOption::KeepPosition);
+					LayoutLine(model, surface, vsDraw, ll, model.wrapWidth, LayoutLineOption::PaintText);
 					if (model.BidirectionalEnabled()) {
 						// Fill the line bidi data
 						UpdateBidiData(model, vsDraw, ll);
@@ -2775,7 +2777,10 @@ void EditView::PaintText(Surface *surfaceWindow, const EditModel &model, const V
 #if defined(TIME_PAINTING)
 				durLayout += ep.Reset();
 #endif
-				if (ll) {
+				{
+#if defined(__clang__)
+					__builtin_assume(ll != nullptr); // suppress [clang-analyzer-core.CallAndMessage]
+#endif
 					ll->containsCaret = vsDraw.selection.visible && (lineDoc == lineCaret)
 						&& (ll->lines == 1 || !vsDraw.caretLine.subLine || ll->InLine(caretOffset, subLine));
 
@@ -2837,8 +2842,11 @@ void EditView::PaintText(Surface *surfaceWindow, const EditModel &model, const V
 				visibleLine++;
 			}
 
+			if (phase >= DrawPhase::carets) {
+				break;
+			}
 			phase = static_cast<DrawPhase>(static_cast<int>(phase) << 1);
-		} while (phase < DrawPhase::all);
+		}
 #if defined(TIME_PAINTING)
 		if (durPaint < 0.00000001)
 			durPaint = 0.00000001;
