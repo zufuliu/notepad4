@@ -1840,9 +1840,10 @@ void DrawWrapIndentAndMarker(Surface *surface, const ViewStyle &vsDraw, const Li
 // is at the end of a text segment.
 // This function should only be called if iDoc is within the main selection.
 InSelection CharacterInCursesSelection(Sci::Position iDoc, const EditModel &model, const ViewStyle &vsDraw) noexcept {
-	const SelectionPosition &posCaret = model.sel.RangeMain().caret;
-	const bool caretAtStart = posCaret < model.sel.RangeMain().anchor && posCaret.Position() == iDoc;
-	const bool caretAtEnd = posCaret > model.sel.RangeMain().anchor &&
+	const SelectionRange &rangeMain = model.sel.RangeMain();
+	const SelectionPosition &posCaret = rangeMain.caret;
+	const bool caretAtStart = posCaret < rangeMain.anchor && posCaret.Position() == iDoc;
+	const bool caretAtEnd = posCaret > rangeMain.anchor &&
 		vsDraw.DrawCaretInsideSelection(false, false) &&
 		model.pdoc->MovePositionOutsideChar(posCaret.Position() - 1, -1) == iDoc;
 	return (caretAtStart || caretAtEnd) ? InSelection::inNone : InSelection::inMain;
@@ -2745,8 +2746,7 @@ void EditView::PaintText(Surface *surfaceWindow, const EditModel &model, const V
 		if ((phasesDraw == PhasesDraw::Multiple) && !bufferedDraw) {
 			phase = DrawPhase::back;
 		}
-
-		while (true) {
+		for (;;) {
 			int yposScreen = screenLinePaintFirst * vsDraw.lineHeight;
 			int ypos = bufferedDraw ? 0 : yposScreen;
 			const int bottom = static_cast<int>(rcArea.bottom);
@@ -2845,7 +2845,7 @@ void EditView::PaintText(Surface *surfaceWindow, const EditModel &model, const V
 			if (phase >= DrawPhase::carets) {
 				break;
 			}
-			phase = static_cast<DrawPhase>(static_cast<int>(phase) << 1);
+			phase = static_cast<DrawPhase>(static_cast<int>(phase) * 2);
 		}
 #if defined(TIME_PAINTING)
 		if (durPaint < 0.00000001)

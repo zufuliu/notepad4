@@ -374,7 +374,6 @@ void FoldAsmDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 
 	int levelNext = levelCurrent;
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
-	lineStartNext = sci::min(lineStartNext, endPos);
 
 	int style = initStyle;
 	int styleNext = styler.StyleIndexAt(startPos);
@@ -490,7 +489,6 @@ void FoldAsmDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 
 			lineCurrent++;
 			lineStartNext = styler.LineStart(lineCurrent + 1);
-			lineStartNext = sci::min(lineStartNext, endPos);
 			levelCurrent = levelNext;
 			chPrevNonWhite = '\0';
 			chBefore = '\0';

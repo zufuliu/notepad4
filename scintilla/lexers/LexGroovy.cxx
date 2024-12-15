@@ -567,7 +567,6 @@ void FoldGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 	int levelNext = levelCurrent;
 	FoldLineState foldCurrent(styler.GetLineState(lineCurrent));
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
-	lineStartNext = sci::min(lineStartNext, endPos);
 
 	int styleNext = styler.StyleIndexAt(startPos);
 	int style = initStyle;
@@ -633,7 +632,6 @@ void FoldGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 
 			lineCurrent++;
 			lineStartNext = styler.LineStart(lineCurrent + 1);
-			lineStartNext = sci::min(lineStartNext, endPos);
 			levelCurrent = levelNext;
 			foldPrev = foldCurrent;
 			foldCurrent = foldNext;

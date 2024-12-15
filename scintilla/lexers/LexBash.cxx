@@ -929,7 +929,6 @@ void FoldBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lex
 	const Sci_PositionU endPos = startPos + length;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
-	lineStartNext = sci::min(lineStartNext, endPos);
 	int levelPrev = styler.LevelAt(lineCurrent) & SC_FOLDLEVELNUMBERMASK;
 	int levelCurrent = levelPrev;
 	int styleNext = styler.StyleIndexAt(startPos);
@@ -1009,7 +1008,6 @@ void FoldBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lex
 			styler.SetLevel(lineCurrent, lev);
 			lineCurrent++;
 			lineStartNext = styler.LineStart(lineCurrent + 1);
-			lineStartNext = sci::min(lineStartNext, endPos);
 			levelPrev = levelCurrent;
 		}
 	}

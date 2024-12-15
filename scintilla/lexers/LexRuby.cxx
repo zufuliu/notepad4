@@ -1747,7 +1747,6 @@ void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexer
 	int styleNext = styler.StyleAt(startPos);
 	int stylePrev = styler.StyleAt(startPos - 1);
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
-	lineStartNext = sci::min(lineStartNext, endPos);
 	// detect endless method definition to fix up code folding
 	enum class MethodDefinition {
 		None,
@@ -1873,7 +1872,6 @@ void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexer
 			styler.SetLevel(lineCurrent, lev);
 			lineCurrent++;
 			lineStartNext = styler.LineStart(lineCurrent + 1);
-			lineStartNext = sci::min(lineStartNext, endPos);
 			levelPrev = levelCurrent;
 			method_definition = MethodDefinition::None;
 			argument_paren_count = 0;

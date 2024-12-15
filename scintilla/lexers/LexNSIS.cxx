@@ -218,7 +218,6 @@ void FoldNSISDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 	int levelNext = levelCurrent;
 	int lineTypeCurrent = styler.GetLineState(lineCurrent) & NsisLineTypeMask;
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
-	lineStartNext = sci::min(lineStartNext, endPos);
 
 	int styleNext = styler.StyleIndexAt(startPos);
 	int style = initStyle;
@@ -282,7 +281,6 @@ void FoldNSISDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 
 			lineCurrent++;
 			lineStartNext = styler.LineStart(lineCurrent + 1);
-			lineStartNext = sci::min(lineStartNext, endPos);
 			levelCurrent = levelNext;
 			lineTypePrev = lineTypeCurrent;
 			lineTypeCurrent = lineTypeNext;

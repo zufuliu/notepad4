@@ -354,7 +354,6 @@ void FoldFortranDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initSt
 	int levelNext = levelCurrent;
 	int lineCommentCurrent = GetLineCommentState(styler.GetLineState(lineCurrent));
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
-	lineStartNext = sci::min(lineStartNext, endPos);
 
 	int style = SCE_F_DEFAULT;
 	while (startPos < endPos) {
@@ -402,7 +401,6 @@ void FoldFortranDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initSt
 
 			lineCurrent++;
 			lineStartNext = styler.LineStart(lineCurrent + 1);
-			lineStartNext = sci::min(lineStartNext, endPos);
 			levelCurrent = levelNext;
 			lineCommentPrev = lineCommentCurrent;
 			lineCommentCurrent = lineCommentNext;

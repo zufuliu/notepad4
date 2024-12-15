@@ -474,7 +474,6 @@ void FoldVBDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Le
 	int levelNext = levelCurrent;
 	FoldLineState foldCurrent(styler.GetLineState(lineCurrent));
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
-	lineStartNext = sci::min(lineStartNext, endPos);
 
 	int style = initStyle;
 	int styleNext = styler.StyleAt(startPos);
@@ -637,7 +636,6 @@ void FoldVBDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Le
 
 			lineCurrent++;
 			lineStartNext = styler.LineStart(lineCurrent + 1);
-			lineStartNext = sci::min(lineStartNext, endPos);
 			levelCurrent = levelNext;
 			foldPrev = foldCurrent;
 			foldCurrent = foldNext;

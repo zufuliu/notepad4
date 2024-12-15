@@ -418,7 +418,6 @@ void FoldRebolDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyl
 	int levelNext = levelCurrent;
 	int lineTypeCurrent = styler.GetLineState(lineCurrent) & RebolLineTypeMask;
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
-	lineStartNext = sci::min(lineStartNext, endPos);
 
 	while (startPos < endPos) {
 		const int style = styler.StyleIndexAt(startPos);
@@ -460,7 +459,6 @@ void FoldRebolDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyl
 
 			lineCurrent++;
 			lineStartNext = styler.LineStart(lineCurrent + 1);
-			lineStartNext = sci::min(lineStartNext, endPos);
 			levelCurrent = levelNext;
 			lineTypePrev = lineTypeCurrent;
 			lineTypeCurrent = lineTypeNext;

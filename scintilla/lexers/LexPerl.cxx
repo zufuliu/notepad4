@@ -1567,7 +1567,6 @@ void FoldPerlDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/,
 	int stylePrevCh = styler.StyleAt(startPos - 1);
 	// Used at end of line to determine if the line was a package definition
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
-	lineStartNext = sci::min(lineStartNext, endPos);
 	bool isPackageLine = false;
 	bool atLineStart = true;
 	int podHeading = 0;
@@ -1682,7 +1681,6 @@ void FoldPerlDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/,
 			styler.SetLevel(lineCurrent, lev);
 			lineCurrent++;
 			lineStartNext = styler.LineStart(lineCurrent + 1);
-			lineStartNext = sci::min(lineStartNext, endPos);
 			levelPrev = levelCurrent;
 		}
 	}

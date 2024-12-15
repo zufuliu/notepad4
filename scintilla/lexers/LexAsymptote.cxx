@@ -248,7 +248,6 @@ void FoldAsyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 	int levelNext = levelCurrent;
 	FoldLineState foldCurrent(styler.GetLineState(lineCurrent));
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
-	lineStartNext = sci::min(lineStartNext, endPos);
 
 	int styleNext = styler.StyleIndexAt(startPos);
 	int style = initStyle;
@@ -310,7 +309,6 @@ void FoldAsyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 
 			lineCurrent++;
 			lineStartNext = styler.LineStart(lineCurrent + 1);
-			lineStartNext = sci::min(lineStartNext, endPos);
 			levelCurrent = levelNext;
 			foldPrev = foldCurrent;
 			foldCurrent = foldNext;

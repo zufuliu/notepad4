@@ -427,7 +427,6 @@ void FoldAwkDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*
 	int levelNext = levelCurrent;
 	FoldLineState foldCurrent(styler.GetLineState(lineCurrent));
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
-	lineStartNext = sci::min(lineStartNext, endPos);
 	int visibleChars = 0;
 
 	while (startPos < endPos) {
@@ -471,7 +470,6 @@ void FoldAwkDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*
 
 			lineCurrent++;
 			lineStartNext = styler.LineStart(lineCurrent + 1);
-			lineStartNext = sci::min(lineStartNext, endPos);
 			levelCurrent = levelNext;
 			foldPrev = foldCurrent;
 			foldCurrent = foldNext;

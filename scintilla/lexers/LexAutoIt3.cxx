@@ -592,7 +592,6 @@ void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/, 
 		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
 	}
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
-	lineStartNext = sci::min(lineStartNext, endPos);
 	int levelNext = levelCurrent;
 	char chPrev = ' ';
 	while (startPos < endPos) {
@@ -732,7 +731,6 @@ void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/, 
 			// reset values for the next line
 			lineCurrent++;
 			lineStartNext = styler.LineStart(lineCurrent + 1);
-			lineStartNext = sci::min(lineStartNext, endPos);
 			stylePrev = style;
 			style = styleNext;
 			levelCurrent = levelNext;
