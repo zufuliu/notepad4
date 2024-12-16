@@ -117,11 +117,6 @@ void ColourisePascalDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 	}
 
 	for (; sc.More(); sc.Forward()) {
-		if (sc.atLineEnd) {
-			// Update the line state, so it can be seen by next line
-			styler.SetLineState(sc.currentLine, curLineState);
-		}
-
 		// Determine if the current state should terminate.
 		switch (sc.state) {
 		case SCE_PAS_NUMBER:
@@ -227,6 +222,11 @@ void ColourisePascalDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 			} else if (curLineState & stateInAsm) {
 				sc.SetState(SCE_PAS_ASM);
 			}
+		}
+
+		if (sc.atLineEnd) {
+			// Update the line state, so it can be seen by next line
+			styler.SetLineState(sc.currentLine, curLineState);
 		}
 	}
 
