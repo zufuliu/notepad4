@@ -362,8 +362,10 @@ extern int	iDefaultCodePage;
 extern int	iDefaultCharSet;
 extern LineHighlightMode iHighlightCurrentLine;
 extern bool	bShowBookmarkMargin;
+extern bool bShowCodeFolding;
 extern int	iZoomLevel;
 extern bool bUseXPFileDialog;
+extern bool flagSimpleIndentGuides;
 
 // LF_FACESIZE is 32, LOCALE_NAME_MAX_LENGTH is 85
 #define MAX_STYLE_VALUE_LENGTH	LOCALE_NAME_MAX_LENGTH
@@ -392,7 +394,7 @@ enum GlobalStyleIndex {
 	GlobalStyleIndex_IMEIndicator,		// indicator style. `fore`: IME indicator color
 	GlobalStyleIndex_LongLineMarker,	// standalone style. `fore`: edge line color, `back`: background color for text exceeds long line limit
 	GlobalStyleIndex_ExtraLineSpacing,	// standalone style. descent = `size`/2, ascent = `size` - descent
-	GlobalStyleIndex_CodeFolding,		// standalone style. `fore`, `back`
+	GlobalStyleIndex_CodeFolding,		// standalone style. `fore`, `back`, `size`
 	GlobalStyleIndex_FoldingMarker,		// standalone style. `fore`: folding line color, `back`: plus/minus box fill color
 	GlobalStyleIndex_FoldDispalyText,	// inherited style.
 	GlobalStyleIndex_MarkOccurrences,	// indicator style. `fore`, `alpha`, `outline`
@@ -3085,8 +3087,6 @@ void Style_HighlightCurrentLine() noexcept {
 //
 // Style_SetIndentGuides()
 //
-extern bool flagSimpleIndentGuides;
-
 void Style_SetIndentGuides(bool bShow) noexcept {
 	int iIndentView = SC_IV_NONE;
 	if (bShow) {
@@ -3147,6 +3147,22 @@ void Style_SetBookmark() noexcept {
 		SciCall_MarkerDefine(MarkerNumber_Bookmark, SC_MARK_BACKGROUND);
 	}
 	bBookmarkColorUpdated = false;
+}
+
+void UpdateFoldMarginWidth() noexcept {
+	int width = 0;
+	if (bShowCodeFolding) {
+		LPCWSTR szValue = lexGlobal.Styles[GlobalStyleIndex_CodeFolding].szValue;
+		Style_StrGetSize(szValue, &width);
+		if (width != 0) {
+			const int scale = g_uCurrentDPI*iZoomLevel;
+			if (scale != USER_DEFAULT_SCREEN_DPI*100) {
+				width = MulDiv(width, scale, USER_DEFAULT_SCREEN_DPI*100);
+			}
+		}
+		width += SciCall_TextWidth(STYLE_LINENUMBER, "+_");
+	}
+	SciCall_SetMarginWidth(MarginNumber_CodeFolding, width);
 }
 
 //=============================================================================

@@ -140,7 +140,7 @@ int	iChangeHistoryMarker;
 EditAutoCompletionConfig autoCompletionConfig;
 int iSelectOption;
 static int iLineSelectionMode;
-static bool bShowCodeFolding;
+bool bShowCodeFolding;
 extern CallTipInfo callTipInfo;
 static bool bViewWhiteSpace;
 static bool bViewEOLs;
@@ -1648,11 +1648,6 @@ void UpdateBookmarkMarginWidth() noexcept {
 	// 16px for XPM bookmark symbol.
 	//const int width = (bShowBookmarkMargin || iChangeHistoryMarker != SC_CHANGE_HISTORY_DISABLED) ? max(SciCall_TextHeight() - 2, 16) : 0;
 	SciCall_SetMarginWidth(MarginNumber_Bookmark, width);
-}
-
-void UpdateFoldMarginWidth() noexcept {
-	const int width = bShowCodeFolding ? SciCall_TextWidth(STYLE_LINENUMBER, "+_") : 0;
-	SciCall_SetMarginWidth(MarginNumber_CodeFolding, width);
 }
 
 void SetWrapVisualFlags() noexcept {
