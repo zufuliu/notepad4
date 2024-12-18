@@ -1,4 +1,4 @@
-// 5.10 https://www.swift.org/
+// 6.0 https://www.swift.org/
 // https://swift.org/documentation/
 // https://github.com/apple/swift-evolution
 
@@ -7,6 +7,8 @@
 // https://docs.swift.org/swift-book/documentation/the-swift-programming-language/lexicalstructure
 // Keywords used in declarations
 associatedtype
+borrowing
+class consuming
 class
 deinit
 enum extension
@@ -125,6 +127,7 @@ actor nonisolated
 @NSManaged
 @objc
 @objcMembers
+@preconcurrency
 @propertyWrapper
 @resultBuilder
 @requires_stored_property_inits
