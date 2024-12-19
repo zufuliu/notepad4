@@ -1,5 +1,5 @@
 <?php
-// 8.3 https://www.php.net/
+// 8.4 https://www.php.net/
 // https://wiki.php.net/rfc
 // https://php.watch/versions
 
@@ -292,7 +292,6 @@ E_COMPILE_WARNING
 E_USER_ERROR
 E_USER_WARNING
 E_USER_NOTICE
-E_STRICT
 E_RECOVERABLE_ERROR
 E_DEPRECATED
 E_USER_DEPRECATED
@@ -938,10 +937,6 @@ class SQLite3Result {
 
 { // Date and Time Related Extensions
 { // Date and Time
-SUNFUNCS_RET_TIMESTAMP
-SUNFUNCS_RET_STRING
-SUNFUNCS_RET_DOUBLE
-
 class DateTime implements DateTimeInterface {
 	public __construct(string $datetime = "now", ?DateTimeZone $timezone = null)
 	public add(DateInterval $interval): DateTime
@@ -1306,13 +1301,16 @@ mb_http_input(?string $type = null): array|string|false
 mb_http_output(?string $encoding = null): string|bool
 mb_internal_encoding(?string $encoding = null): string|bool
 mb_language(?string $language = null): string|bool
+mb_lcfirst(string $string, ?string $encoding = null): string
 mb_list_encodings(): array
+mb_ltrim(string $string, ?string $characters = null, ?string $encoding = null): string
 mb_ord(string $string, ?string $encoding = null): int|false
 mb_output_handler(string $string, int $status): string
 mb_parse_str(string $string, array &$result): bool
 mb_preferred_mime_name(string $encoding): string|false
 mb_regex_encoding(?string $encoding = null): string|bool
 mb_regex_set_options(?string $options = null): string
+mb_rtrim(string $string, ?string $characters = null, ?string $encoding = null): string
 mb_send_mail(string $to, string $subject, string $message, array|string $additional_headers = [], ?string $additional_params = null): bool
 mb_split(string $pattern, string $string, int $limit = -1): array|false
 mb_str_pad(string $string, int $length, string $pad_string = " ", int $pad_type = STR_PAD_RIGHT, ?string $encoding = null): string
@@ -1334,6 +1332,8 @@ mb_strwidth(string $string, ?string $encoding = null): int
 mb_substitute_character(string|int|null $substitute_character = null): string|int|bool
 mb_substr_count(string $haystack, string $needle, ?string $encoding = null): int
 mb_substr(string $string, int $start, ?int $length = null, ?string $encoding = null): string
+mb_trim(string $string, ?string $characters = null, ?string $encoding = null): string
+mb_ucfirst(string $string, ?string $encoding = null): string
 }
 }
 
@@ -1347,6 +1347,7 @@ mail(string $to, string $subject, string $message, array|string $additional_head
 bcadd(string $num1, string $num2, ?int $scale = null): string
 bccomp(string $num1, string $num2, ?int $scale = null): int
 bcdiv(string $num1, string $num2, ?int $scale = null): string
+bcdivmod(string $num1, string $num2, ?int $scale = null): string
 bcmod(string $num1, string $num2, ?int $scale = null): string
 bcmul(string $num1, string $num2, ?int $scale = null): string
 bcpow(string $num, string $exponent, ?int $scale = null): string
@@ -2485,6 +2486,8 @@ header_remove(?string $name = null): void
 header(string $header, bool $replace = true, int $response_code = 0): void
 headers_list(): array
 headers_sent(string &$filename = null, int &$line = null): bool
+http_clear_last_response_headers(): void
+http_get_last_response_headers(): ?array
 http_response_code(int $response_code = 0): int|bool
 inet_ntop(string $ip): string|false
 inet_pton(string $ip): string|false
@@ -2493,6 +2496,7 @@ long2ip(int $ip): string|false
 net_get_interfaces(): array|false
 openlog(string $prefix, int $flags, int $facility): bool
 pfsockopen(string $hostname, int $port = -1, int &$error_code = null, string &$error_message = null, ?float $timeout = null): resource|false
+request_parse_body(?array $options = null): array
 setcookie(string $name, string $value = "", int $expires_or_options = 0, string $path = "", string $domain = "", bool $secure = false, bool $httponly = false): bool
 setrawcookie(string $name, string $value = ?, int $expires_or_options = 0, string $path = ?, string $domain = ?, bool $secure = false, bool $httponly = false): bool
 socket_get_status()
@@ -2766,6 +2770,8 @@ EXTR_PREFIX_IF_EXISTS
 EXTR_IF_EXISTS
 EXTR_REFS
 
+array_all(array $array, callable $callback): bool
+array_any(array $array, callable $callback): bool
 array_change_key_case(array $array, int $case = CASE_LOWER): array
 array_chunk(array $array, int $length, bool $preserve_keys = false): array
 array_column(array $array, int|string|null $column_key, int|string|null $index_key = null): array
@@ -2779,6 +2785,8 @@ array_diff(array $array, array ...$arrays): array
 array_fill_keys(array $keys, mixed $value): array
 array_fill(int $start_index, int $count, mixed $value): array
 array_filter(array $array, ?callable $callback = null, int $mode = 0): array
+array_find(array $array, callable $callback): mixed
+array_find_key(array $array, callable $callback): mixed
 array_flip(array $array): array
 array_intersect_assoc(array $array, array ...$arrays): array
 array_intersect_key(array $array, array ...$arrays): array
