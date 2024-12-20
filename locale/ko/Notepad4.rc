@@ -1088,13 +1088,13 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     LTEXT           "찾을 문자열(&G):",IDC_STATIC,7,7,95,8
     COMBOBOX        IDC_FINDTEXT,7,17,230,116,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    AUTOCHECKBOX    "대소문자 구별(&C)",IDC_FINDCASE,7,37,125,10,WS_TABSTOP
+    AUTOCHECKBOX    "대소문자 구분(&C)",IDC_FINDCASE,7,37,125,10,WS_TABSTOP
     AUTOCHECKBOX    "단어 단위 일치(&W)",IDC_FINDWORD,7,49,125,10,WS_TABSTOP
     AUTOCHECKBOX    "시작 부분이 일치하는 단어(&B)",IDC_FINDSTART,7,61,125,10,WS_TABSTOP
     AUTOCHECKBOX    "정규식 검색(&E)",IDC_FINDREGEXP,7,73,95,10,WS_TABSTOP
     AUTOCHECKBOX    "정규식 점(.)이 새 줄과 일치",IDC_FIND_DOTALL,7,85,124,10,WS_TABSTOP
     AUTOCHECKBOX    "백슬래시 변환(&T)",IDC_FINDTRANSFORMBS,7,97,95,10,WS_TABSTOP
-    AUTOCHECKBOX    "반복 찾기 안함(&D)",IDC_NOWRAP,140,37,75,10,WS_TABSTOP
+    AUTOCHECKBOX    "반복 찾기 안 함(&D)",IDC_NOWRAP,140,37,75,10,WS_TABSTOP
     AUTOCHECKBOX    "찾은 후 닫기(&L)",IDC_FINDCLOSE,140,49,75,10,WS_TABSTOP
     AUTOCHECKBOX    "와일드카드 검색(&I)",IDC_WILDCARDSEARCH,140,61,75,10,WS_TABSTOP
     DEFPUSHBUTTON   "다음 찾기(&N)",IDOK,250,7,60,14
@@ -1124,7 +1124,7 @@ BEGIN
     COMBOBOX        IDC_FINDTEXT,7,17,230,116,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     LTEXT           "바꿀 문자열(&H):",IDC_STATIC,7,35,95,8
     COMBOBOX        IDC_REPLACETEXT,7,46,230,116,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    AUTOCHECKBOX    "대소문자 구별(&C)",IDC_FINDCASE,7,66,125,10,WS_TABSTOP
+    AUTOCHECKBOX    "대소문자 구분(&C)",IDC_FINDCASE,7,66,125,10,WS_TABSTOP
     AUTOCHECKBOX    "단어 단위 일치(&W)",IDC_FINDWORD,7,78,125,10,WS_TABSTOP
     AUTOCHECKBOX    "시작 부분이 일치하는 단어(&B)",IDC_FINDSTART,7,90,125,10,WS_TABSTOP
     AUTOCHECKBOX    "정규식 검색(&E)",IDC_FINDREGEXP,7,102,95,10,WS_TABSTOP
@@ -1743,8 +1743,8 @@ BEGIN
     IDS_TITLEEXCERPT        """%s"""
     IDS_READONLY_FILE       "(읽기 전용 파일)"
     IDS_READONLY_MODE       "(읽기 전용 모드)"
-                            // Line, Column, Character, Selected, Selected Line, Find
-    IDS_STATUSITEM_FORMAT   "행 %s / %s \n열 %s / %s \n글자 %s / %s \n선택 %s / %s \n선택행 %s \n찾음 %s "
+                            // 줄, 열, 문자, 선택, 선택 줄, 찾기
+    IDS_STATUSITEM_FORMAT   "줄 %s / %s \n열 %s / %s \n문자 %s / %s \n선택 %s / %s \n선택 줄 %s \n찾음 %s "
     IDS_ZERO_LENGTH_MATCH   "^ 0 길이 일치"
     IDS_LOADFILE            """%s"" 불러오는 중..."
     IDS_SAVEFILE            """%s"" 저장 중..."
@@ -1974,7 +1974,7 @@ BEGIN
 	IDS_ENCODING_ISO8859_7			"ISO 8859-7;ISO 8859-7"									// 그리스어
 	IDS_ENCODING_MAC_GREEK			"Mac 그리스어; Mac 그리스어"								// 그리스어
 	IDS_ENCODING_WINDOWS1253		"Windows-1253;Windows-1253"								// 그리스어
-	IDS_ENCODING_DOS869				"OEM 현대 그리스어 (DOS-869);DOS-869"					// 그리스어
+	IDS_ENCODING_DOS869				"OEM 현대 그리스어 (DOS-869);DOS-869"						// 그리스어
 	IDS_ENCODING_DOS862				"OEM 히브리어 (DOS-862);DOS-862"							// 히브리어
 	IDS_ENCODING_ISO8859_8I			"ISO 8859-8-I (논리적 순선);ISO 8859-8-I"				// 히브리어
 	IDS_ENCODING_ISO8859_8			"ISO 8859-8 (시각적 순서);ISO 8859-8"					// 히브리어
@@ -1996,7 +1996,7 @@ BEGIN
 	IDS_ENCODING_MAC_THAI			"Mac 태국어;Mac 태국어"									// 동남아시아
 	IDS_ENCODING_TIS620				"태국어 (TIS-620, Windows-874, ISO 8859-11);TIS-620"		// 동남아시아
 	IDS_ENCODING_DOS857				"OEM 튀르키예어 (DOS-857);DOS-857"						// 튀르키예어
-	IDS_ENCODING_ISO8859_9			"라틴-5 (ISO 8859-9);ISO 8859-9"						// 튀르키예어
+	IDS_ENCODING_ISO8859_9			"라틴-5 (ISO 8859-9);ISO 8859-9"							// 튀르키예어
 	IDS_ENCODING_MAC_TURKISH		"Mac 튀르키예어;Mac 튀르키예어"							// 튀르키예어
 	IDS_ENCODING_WINDOWS1254		"Windows-1254;Windows-1254"								// 튀르키예어
 	IDS_ENCODING_MAC_UKRAINIAN		"Mac 우크라이나어;Mac 우크라이나어"						// 키릴 문자
@@ -2008,20 +2008,20 @@ BEGIN
 	IDS_ENCODING_IBM037				"미국-캐나다 (IBM037);EBCDIC (미국-캐나다)"				// EBCDIC
 	IDS_ENCODING_IBM1140			"미국-캐나다 + 유로 기호 (IBM1140);EBCDIC (미국-캐나다 유로)"// EBCDIC
 	IDS_ENCODING_IBM500				"국제 (IBM500);EBCDIC (Intl.)"							// EBCDIC
-	IDS_ENCODING_IBM870				"라틴어-2 (IBM870);EBCDIC (라틴어-2)"					// EBCDIC
+	IDS_ENCODING_IBM870				"라틴어-2 (IBM870);EBCDIC (라틴어-2)"						// EBCDIC
 	IDS_ENCODING_CP875				"현대 그리스어 (CP875);EBCDIC (그리스)"					// EBCDIC
 	IDS_ENCODING_IBM1026			"튀르키예어 (라틴어-5) (IBM1026);EBCDIC (라틴어-5)"		// EBCDIC
-	IDS_ENCODING_DOS437				"OEM 미국 (DOS-437);DOS-437"							// 서유럽어
+	IDS_ENCODING_DOS437				"OEM 미국 (DOS-437);DOS-437"								// 서유럽어
 	IDS_ENCODING_DOS858				"OEM 라틴어-1 + 유로 기호 (DOS-858);DOS-858"				// 서유럽어
 	IDS_ENCODING_DOS860				"OEM 포르투칼어 (DOS-860);DOS-860"						// 서유럽어
 	IDS_ENCODING_MAC_ARABIC			"Mac 아랍어;Mac 아랍어"									// 아랍어
-	IDS_ENCODING_DOS864				"OEM 아랍어 (DOS-864);OEM 아랍어"						// 아랍어
+	IDS_ENCODING_DOS864				"OEM 아랍어 (DOS-864);OEM 아랍어"							// 아랍어
 	IDS_ENCODING_MAC_ROMANIAN		"Mac 루마니아어;Mac 루마니아어"							// 남유럽어
 	IDS_ENCODING_DOS865				"OEM 북유럽어 (DOS-865);DOS-865"							// 북유럽어
-	IDS_ENCODING_IBM855				"OEM 키릴 문자 (주로 러시아어) (IBM855);OEM 키릴 문자 "	// 키릴 문자
+	IDS_ENCODING_IBM855				"OEM 키릴 문자 (주로 러시아어) (IBM855);OEM 키릴 문자 "		// 키릴 문자
 	IDS_ENCODING_MAC_JAPANESE		"Mac 일본어;Mac 일본어"									// 일본어
 	IDS_ENCODING_CS_ISO2022_JP		"ISO 2022 (1 바이트 가나 허용);CS ISO-2022-JP"			// 일본어
-	IDS_ENCODING_ISO2022_JP_SOSI	"ISO 2022 (1 바이트 가나 허용 - SO/SI);ISO-2022-JP SO/SI"// 일본어
+	IDS_ENCODING_ISO2022_JP_SOSI	"ISO 2022 (1 바이트 가나 허용 - SO/SI);ISO-2022-JP SO/SI"	// 일본어
 	IDS_ENCODING_MAC_KOREAN			"Mac 한국어;Mac 한국어"									// 한국어
 	IDS_ENCODING_ISO2022_KR			"ISO 2022 한국어;ISO-2022-KR"							// 한국어
 	IDS_ENCODING_MAC_GB2312			"중국어 간체 (Mac);Mac GB-2312"							// 중국어
