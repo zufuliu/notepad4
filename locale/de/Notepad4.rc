@@ -1743,6 +1743,7 @@ BEGIN
     IDS_TITLEEXCERPT        """%s"""
     IDS_READONLY_FILE       "(Schreibgeschützt)"
     IDS_READONLY_MODE       "(Nur-Lesen Modus)"
+                            // Line, Column, Character, Selected, Selected Line, Find
     IDS_STATUSITEM_FORMAT   "Zeile %s / %s \nSpalte %s / %s \nZeichen %s / %s \nSel %s / %s \nSelZ %s \nVork %s "
     IDS_ZERO_LENGTH_MATCH   "^ Nulllängenübereinstimmung"
     IDS_LOADFILE            "Lade ""%s""..."

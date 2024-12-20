@@ -1743,6 +1743,7 @@ BEGIN
     IDS_TITLEEXCERPT        """%s"""
     IDS_READONLY_FILE       "(読み取り専用ファイル)"
     IDS_READONLY_MODE       "(読み取り専用モード)"
+                            // Line, Column, Character, Selected, Selected Line, Find
     IDS_STATUSITEM_FORMAT   "行 %s / %s \n列 %s / %s \n字 %s / %s \n選 %s / %s \n選行 %s \n見 %s "
     IDS_ZERO_LENGTH_MATCH   "^ 長さ0に一致"
     IDS_LOADFILE            "読込中 ""%s"" ..."

@@ -1743,6 +1743,7 @@ BEGIN
     IDS_TITLEEXCERPT        "“%s”"
     IDS_READONLY_FILE       "(只读文件)"
     IDS_READONLY_MODE       "(只读模式)"
+                            // Line, Column, Character, Selected, Selected Line, Find
     IDS_STATUSITEM_FORMAT   "行 %s / %s \n列 %s / %s \n字符 %s / %s \n选中 %s / %s \n选中行 %s \n找到 %s "
     IDS_ZERO_LENGTH_MATCH   "^ 零宽度匹配"
     IDS_LOADFILE            "正在载入“%s”..."
