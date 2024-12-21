@@ -354,27 +354,27 @@ BEGIN
 			MENUITEM SEPARATOR
 			MENUITEM "タイムスタンプの更新(&T)\tShift+F5",			CMD_TIMESTAMPS
 		END
+	END
+	POPUP "&Search"
+	BEGIN
+		MENUITEM "検索(&F)...\tCtrl+F",				IDM_EDIT_FIND
+		MENUITEM "検索文字列候補に追加(&V)\tAlt+F3",			IDM_EDIT_SAVEFIND
+		MENUITEM "次を検索(&N)\tF3",					IDM_EDIT_FINDNEXT
+		MENUITEM "前へ検索(&P)\tShift+F3",		IDM_EDIT_FINDPREV
+		MENUITEM "置換(&E)...\tCtrl+H",				IDM_EDIT_REPLACE
+		MENUITEM "置換し次へ(&A)\tF4",				IDM_EDIT_REPLACENEXT
 		MENUITEM SEPARATOR
-		POPUP "検索/置換(&F)"
-		BEGIN
-			MENUITEM "検索(&F)...\tCtrl+F",				IDM_EDIT_FIND
-			MENUITEM "検索文字列候補に追加(&V)\tAlt+F3",			IDM_EDIT_SAVEFIND
-			MENUITEM "次を検索(&N)\tF3",					IDM_EDIT_FINDNEXT
-			MENUITEM "前へ検索(&P)\tShift+F3",		IDM_EDIT_FINDPREV
-			MENUITEM "置換(&E)...\tCtrl+H",				IDM_EDIT_REPLACE
-			MENUITEM "置換し次へ(&A)\tF4",				IDM_EDIT_REPLACENEXT
-			MENUITEM SEPARATOR
-			MENUITEM "対応括弧に移動(&B)\tCtrl+B",				IDM_EDIT_FINDMATCHINGBRACE
-			MENUITEM "対応括弧まで選択(&R)\tCtrl+Shift+B",		IDM_EDIT_SELTOMATCHINGBRACE
-			MENUITEM "単語を選択(&W)\tCtrl+Alt+Space",				IDM_EDIT_SELECTWORD
-			MENUITEM "行を選択(&L)\tCtrl+Shift+Space",	IDM_EDIT_SELECTLINE
-			MENUITEM "現在行のブロックを選択(&C)\tAlt+Shift+]",	IDM_EDIT_SELECTLINE_BLOCK
-			MENUITEM SEPARATOR
-			MENUITEM "先頭まで選択(&T)",					IDM_EDIT_SELTODOCSTART
-			MENUITEM "終端まで選択(&D)",						IDM_EDIT_SELTODOCEND
-			MENUITEM "次の検索一致まで選択(&X)\tCtrl+Alt+F2",				IDM_EDIT_SELTONEXT
-			MENUITEM "前の検索一致まで選択(&S)\tCtrl+Alt+Shift+F2",		IDM_EDIT_SELTOPREV
-		END
+		MENUITEM "対応括弧に移動(&B)\tCtrl+B",				IDM_EDIT_FINDMATCHINGBRACE
+		MENUITEM "対応括弧まで選択(&R)\tCtrl+Shift+B",		IDM_EDIT_SELTOMATCHINGBRACE
+		MENUITEM "単語を選択(&W)\tCtrl+Alt+Space",				IDM_EDIT_SELECTWORD
+		MENUITEM "行を選択(&L)\tCtrl+Shift+Space",	IDM_EDIT_SELECTLINE
+		MENUITEM "現在行のブロックを選択(&C)\tAlt+Shift+]",	IDM_EDIT_SELECTLINE_BLOCK
+		MENUITEM SEPARATOR
+		MENUITEM "先頭まで選択(&T)",					IDM_EDIT_SELTODOCSTART
+		MENUITEM "終端まで選択(&D)",						IDM_EDIT_SELTODOCEND
+		MENUITEM "次の検索一致まで選択(&X)\tCtrl+Alt+F2",				IDM_EDIT_SELTONEXT
+		MENUITEM "前の検索一致まで選択(&S)\tCtrl+Alt+Shift+F2",		IDM_EDIT_SELTOPREV
+		MENUITEM SEPARATOR
 		POPUP "ブックマーク(しおり)(&K)"
 		BEGIN
 			MENUITEM "指定の切替(&T)\tCtrl+F2",			BME_EDIT_BOOKMARKTOGGLE
@@ -568,7 +568,7 @@ BEGIN
 			//MENUITEM "SVG 文書(&G)",				IDM_LEXER_SVG
 		END
 	END
-	POPUP "設定(&S)"
+	POPUP "設定(&I)"
 	BEGIN
 		MENUITEM "タブキーで空白を入力(&S)",			IDM_VIEW_TABSASSPACES
 		MENUITEM "タブキーの設定(&T)...\tCtrl+T",		IDM_VIEW_TABSETTINGS

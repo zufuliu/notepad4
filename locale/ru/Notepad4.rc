@@ -355,27 +355,27 @@ BEGIN
 			MENUITEM SEPARATOR
 			MENUITEM "Обновить отс&четы времени\tShift+F5",							CMD_TIMESTAMPS
 		END
+	END
+	POPUP "&Search"
+	BEGIN
+		MENUITEM "&Найти...\tCtrl+F",											IDM_EDIT_FIND
+		MENUITEM "Со&хранить найденный текст\tAlt+F3",							IDM_EDIT_SAVEFIND
+		MENUITEM "Найти &далее\tF3",											IDM_EDIT_FINDNEXT
+		MENUITEM "Найти в о&братном порядке\tShift+F3",							IDM_EDIT_FINDPREV
+		MENUITEM "&Заменить...\tCtrl+H",										IDM_EDIT_REPLACE
+		MENUITEM "Заменить &далее\tF4",											IDM_EDIT_REPLACENEXT
 		MENUITEM SEPARATOR
-		POPUP "&Поиск и замена"
-		BEGIN
-			MENUITEM "&Найти...\tCtrl+F",											IDM_EDIT_FIND
-			MENUITEM "Со&хранить найденный текст\tAlt+F3",							IDM_EDIT_SAVEFIND
-			MENUITEM "Найти &далее\tF3",											IDM_EDIT_FINDNEXT
-			MENUITEM "Найти в о&братном порядке\tShift+F3",							IDM_EDIT_FINDPREV
-			MENUITEM "&Заменить...\tCtrl+H",										IDM_EDIT_REPLACE
-			MENUITEM "Заменить &далее\tF4",											IDM_EDIT_REPLACENEXT
-			MENUITEM SEPARATOR
-			MENUITEM "Найти соответствующую &скобку\tCtrl+B",						IDM_EDIT_FINDMATCHINGBRACE
-			MENUITEM "Перейти к соответствующей ско&бке\tCtrl+Shift+B",				IDM_EDIT_SELTOMATCHINGBRACE
-			MENUITEM "Выделить &слово\tCtrl+Alt+Space",								IDM_EDIT_SELECTWORD
-			MENUITEM "Выделить ст&роки (расширить выделение)\tCtrl+Shift+Space",	IDM_EDIT_SELECTLINE
-			MENUITEM "Выделить строку в те&кущем блоке\tAlt+Shift+]",				IDM_EDIT_SELECTLINE_BLOCK
-			MENUITEM SEPARATOR
-			MENUITEM "Перейти к началу &документа",									IDM_EDIT_SELTODOCSTART
-			MENUITEM "Перейти к концу доку&мента",									IDM_EDIT_SELTODOCEND
-			MENUITEM "Select to Ne&xt\tCtrl+Alt+F2",								IDM_EDIT_SELTONEXT
-			MENUITEM "Select to Previou&s\tCtrl+Alt+Shift+F2",						IDM_EDIT_SELTOPREV
-		END
+		MENUITEM "Найти соответствующую &скобку\tCtrl+B",						IDM_EDIT_FINDMATCHINGBRACE
+		MENUITEM "Перейти к соответствующей ско&бке\tCtrl+Shift+B",				IDM_EDIT_SELTOMATCHINGBRACE
+		MENUITEM "Выделить &слово\tCtrl+Alt+Space",								IDM_EDIT_SELECTWORD
+		MENUITEM "Выделить ст&роки (расширить выделение)\tCtrl+Shift+Space",	IDM_EDIT_SELECTLINE
+		MENUITEM "Выделить строку в те&кущем блоке\tAlt+Shift+]",				IDM_EDIT_SELECTLINE_BLOCK
+		MENUITEM SEPARATOR
+		MENUITEM "Перейти к началу &документа",									IDM_EDIT_SELTODOCSTART
+		MENUITEM "Перейти к концу доку&мента",									IDM_EDIT_SELTODOCEND
+		MENUITEM "Select to Ne&xt\tCtrl+Alt+F2",								IDM_EDIT_SELTONEXT
+		MENUITEM "Select to Previou&s\tCtrl+Alt+Shift+F2",						IDM_EDIT_SELTOPREV
+		MENUITEM SEPARATOR
 		POPUP "За&кладки"
 		BEGIN
 			MENUITEM "&Создать или удалить\tCtrl+F2",								BME_EDIT_BOOKMARKTOGGLE

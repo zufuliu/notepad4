@@ -354,27 +354,27 @@ BEGIN
 			MENUITEM SEPARATOR
 			MENUITEM "Zeits&tempel aktualisieren\tShift+F5",	CMD_TIMESTAMPS
 		END
+	END
+	POPUP "&Search"
+	BEGIN
+		MENUITEM "&Suchen...\tStrg+F",						IDM_EDIT_FIND
+		MENUITEM "Suchtext s&peichern\tAlt+F3",				IDM_EDIT_SAVEFIND
+		MENUITEM "&Weitersuchen\tF3",						IDM_EDIT_FINDNEXT
+		MENUITEM "&Vorheriges suchen\tShift+F3",			IDM_EDIT_FINDPREV
+		MENUITEM "&Ersetzen...\tStrg+H",					IDM_EDIT_REPLACE
+		MENUITEM "&Nächstes ersetzen\tF4",					IDM_EDIT_REPLACENEXT
 		MENUITEM SEPARATOR
-		POPUP "Suche&n und Ersetzen"
-		BEGIN
-			MENUITEM "&Suchen...\tStrg+F",						IDM_EDIT_FIND
-			MENUITEM "Suchtext s&peichern\tAlt+F3",				IDM_EDIT_SAVEFIND
-			MENUITEM "&Weitersuchen\tF3",						IDM_EDIT_FINDNEXT
-			MENUITEM "&Vorheriges suchen\tShift+F3",			IDM_EDIT_FINDPREV
-			MENUITEM "&Ersetzen...\tStrg+H",					IDM_EDIT_REPLACE
-			MENUITEM "&Nächstes ersetzen\tF4",					IDM_EDIT_REPLACENEXT
-			MENUITEM SEPARATOR
-			MENUITEM "&Klammernpaar anzeigen\tStrg+B",				IDM_EDIT_FINDMATCHINGBRACE
-			MENUITEM "&Auswahl bis Klammerpaar\tStrg+Shift+B",		IDM_EDIT_SELTOMATCHINGBRACE
-			MENUITEM "W&ort auswählen\tStrg+Alt+Space",				IDM_EDIT_SELECTWORD
-			MENUITEM "&Zeile auswählen (eweitert Auswahl)\tStrg+Shift+Space",	IDM_EDIT_SELECTLINE
-			MENUITEM "Zeilen im &Textblock auswählen\tAlt+Shift+´",	IDM_EDIT_SELECTLINE_BLOCK
-			MENUITEM SEPARATOR
-			MENUITEM "Auswahl bis zum Dokumentan&fang",						IDM_EDIT_SELTODOCSTART
-			MENUITEM "Auswahl bis zum &Dokumentende",						IDM_EDIT_SELTODOCEND
-			MENUITEM "Auswahl bis zum näc&hsten\tStrg+Alt+F2",				IDM_EDIT_SELTONEXT
-			MENUITEM "Auswahl bis zum vo&rherigen\tStrg+Alt+Shift+F2",		IDM_EDIT_SELTOPREV
-		END
+		MENUITEM "&Klammernpaar anzeigen\tStrg+B",				IDM_EDIT_FINDMATCHINGBRACE
+		MENUITEM "&Auswahl bis Klammerpaar\tStrg+Shift+B",		IDM_EDIT_SELTOMATCHINGBRACE
+		MENUITEM "W&ort auswählen\tStrg+Alt+Space",				IDM_EDIT_SELECTWORD
+		MENUITEM "&Zeile auswählen (eweitert Auswahl)\tStrg+Shift+Space",	IDM_EDIT_SELECTLINE
+		MENUITEM "Zeilen im &Textblock auswählen\tAlt+Shift+´",	IDM_EDIT_SELECTLINE_BLOCK
+		MENUITEM SEPARATOR
+		MENUITEM "Auswahl bis zum Dokumentan&fang",						IDM_EDIT_SELTODOCSTART
+		MENUITEM "Auswahl bis zum &Dokumentende",						IDM_EDIT_SELTODOCEND
+		MENUITEM "Auswahl bis zum näc&hsten\tStrg+Alt+F2",				IDM_EDIT_SELTONEXT
+		MENUITEM "Auswahl bis zum vo&rherigen\tStrg+Alt+Shift+F2",		IDM_EDIT_SELTOPREV
+		MENUITEM SEPARATOR
 		POPUP "Lesezeic&hen"
 		BEGIN
 			MENUITEM "&Umschalten\tStrg+F2",				BME_EDIT_BOOKMARKTOGGLE

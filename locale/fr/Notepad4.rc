@@ -354,27 +354,27 @@ BEGIN
 			MENUITEM SEPARATOR
 			MENUITEM "Mise à jour des  &Timestamps\tShift+F5",			CMD_TIMESTAMPS
 		END
+	END
+	POPUP "&Search"
+	BEGIN
+		MENUITEM "&Rechercher...\tCtrl+F",				IDM_EDIT_FIND
+		MENUITEM "Sauver la recherche\tAlt+F3",			IDM_EDIT_SAVEFIND
+		MENUITEM "Trouver les occurences précédentes\tF3",					IDM_EDIT_FINDNEXT
+		MENUITEM "Trouver les occurences suivantes\tShift+F3",		IDM_EDIT_FINDPREV
+		MENUITEM "Remplacer...\tCtrl+H",				IDM_EDIT_REPLACE
+		MENUITEM "Remplacer l'occurence suivante\tF4",				IDM_EDIT_REPLACENEXT
 		MENUITEM SEPARATOR
-		POPUP "&Rechercher et remplacer"
-		BEGIN
-			MENUITEM "&Rechercher...\tCtrl+F",				IDM_EDIT_FIND
-			MENUITEM "Sauver la recherche\tAlt+F3",			IDM_EDIT_SAVEFIND
-			MENUITEM "Trouver les occurences précédentes\tF3",					IDM_EDIT_FINDNEXT
-			MENUITEM "Trouver les occurences suivantes\tShift+F3",		IDM_EDIT_FINDPREV
-			MENUITEM "Remplacer...\tCtrl+H",				IDM_EDIT_REPLACE
-			MENUITEM "Remplacer l'occurence suivante\tF4",				IDM_EDIT_REPLACENEXT
-			MENUITEM SEPARATOR
-			MENUITEM "Trouver la parenthèse fermante\tCtrl+B",				IDM_EDIT_FINDMATCHINGBRACE
-			MENUITEM "Selectionner entre les parenthèses\tCtrl+Shift+B",		IDM_EDIT_SELTOMATCHINGBRACE
-			MENUITEM "Sélectionner le mot\tCtrl+Alt+Space",				IDM_EDIT_SELECTWORD
-			MENUITEM "Sélectionner les lignes (étendre la sélection)\tCtrl+Shift+Space",	IDM_EDIT_SELECTLINE
-			MENUITEM "Sélectionner les lignes dans le bloc actuel\tAlt+Shift+]",	IDM_EDIT_SELECTLINE_BLOCK
-			MENUITEM SEPARATOR
-			MENUITEM "Sélectionner jusqu'au début du document",					IDM_EDIT_SELTODOCSTART
-			MENUITEM "Sélectionner jusqu'à la fin du document",						IDM_EDIT_SELTODOCEND
-			MENUITEM "Sélectionner jusqu'au suivant\tCtrl+Alt+F2",				IDM_EDIT_SELTONEXT
-			MENUITEM "Sélectionner jusqu'au précédent\tCtrl+Alt+Shift+F2",		IDM_EDIT_SELTOPREV
-		END
+		MENUITEM "Trouver la parenthèse fermante\tCtrl+B",				IDM_EDIT_FINDMATCHINGBRACE
+		MENUITEM "Selectionner entre les parenthèses\tCtrl+Shift+B",		IDM_EDIT_SELTOMATCHINGBRACE
+		MENUITEM "Sélectionner le mot\tCtrl+Alt+Space",				IDM_EDIT_SELECTWORD
+		MENUITEM "Sélectionner les lignes (étendre la sélection)\tCtrl+Shift+Space",	IDM_EDIT_SELECTLINE
+		MENUITEM "Sélectionner les lignes dans le bloc actuel\tAlt+Shift+]",	IDM_EDIT_SELECTLINE_BLOCK
+		MENUITEM SEPARATOR
+		MENUITEM "Sélectionner jusqu'au début du document",					IDM_EDIT_SELTODOCSTART
+		MENUITEM "Sélectionner jusqu'à la fin du document",						IDM_EDIT_SELTODOCEND
+		MENUITEM "Sélectionner jusqu'au suivant\tCtrl+Alt+F2",				IDM_EDIT_SELTONEXT
+		MENUITEM "Sélectionner jusqu'au précédent\tCtrl+Alt+Shift+F2",		IDM_EDIT_SELTOPREV
+		MENUITEM SEPARATOR
 		POPUP "Marque-page"
 		BEGIN
 			MENUITEM "&Activer\tCtrl+F2",			BME_EDIT_BOOKMARKTOGGLE

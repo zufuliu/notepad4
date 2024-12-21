@@ -354,27 +354,27 @@ BEGIN
 			MENUITEM SEPARATOR
 			MENUITEM "Update &Timestamps\tShift+F5",			CMD_TIMESTAMPS
 		END
+	END
+	POPUP "&Search"
+	BEGIN
+		MENUITEM "&Find...\tCtrl+F",				IDM_EDIT_FIND
+		MENUITEM "Sa&ve Find Text\tAlt+F3",			IDM_EDIT_SAVEFIND
+		MENUITEM "Find &Next\tF3",					IDM_EDIT_FINDNEXT
+		MENUITEM "Find &Previous\tShift+F3",		IDM_EDIT_FINDPREV
+		MENUITEM "R&eplace...\tCtrl+H",				IDM_EDIT_REPLACE
+		MENUITEM "Repl&ace Next\tF4",				IDM_EDIT_REPLACENEXT
 		MENUITEM SEPARATOR
-		POPUP "&Find and Replace"
-		BEGIN
-			MENUITEM "&Find...\tCtrl+F",				IDM_EDIT_FIND
-			MENUITEM "Sa&ve Find Text\tAlt+F3",			IDM_EDIT_SAVEFIND
-			MENUITEM "Find &Next\tF3",					IDM_EDIT_FINDNEXT
-			MENUITEM "Find &Previous\tShift+F3",		IDM_EDIT_FINDPREV
-			MENUITEM "R&eplace...\tCtrl+H",				IDM_EDIT_REPLACE
-			MENUITEM "Repl&ace Next\tF4",				IDM_EDIT_REPLACENEXT
-			MENUITEM SEPARATOR
-			MENUITEM "Find Matching &Brace\tCtrl+B",				IDM_EDIT_FINDMATCHINGBRACE
-			MENUITEM "Select to Matching B&race\tCtrl+Shift+B",		IDM_EDIT_SELTOMATCHINGBRACE
-			MENUITEM "Select &Word\tCtrl+Alt+Space",				IDM_EDIT_SELECTWORD
-			MENUITEM "Select &Lines (Expand Selection)\tCtrl+Shift+Space",	IDM_EDIT_SELECTLINE
-			MENUITEM "Select Lines in &Current Block\tAlt+Shift+]",	IDM_EDIT_SELECTLINE_BLOCK
-			MENUITEM SEPARATOR
-			MENUITEM "Select to Document Star&t",					IDM_EDIT_SELTODOCSTART
-			MENUITEM "Select to Document En&d",						IDM_EDIT_SELTODOCEND
-			MENUITEM "Select to Ne&xt\tCtrl+Alt+F2",				IDM_EDIT_SELTONEXT
-			MENUITEM "Select to Previou&s\tCtrl+Alt+Shift+F2",		IDM_EDIT_SELTOPREV
-		END
+		MENUITEM "Find Matching &Brace\tCtrl+B",				IDM_EDIT_FINDMATCHINGBRACE
+		MENUITEM "Select to Matching B&race\tCtrl+Shift+B",		IDM_EDIT_SELTOMATCHINGBRACE
+		MENUITEM "Select &Word\tCtrl+Alt+Space",				IDM_EDIT_SELECTWORD
+		MENUITEM "Select &Lines (Expand Selection)\tCtrl+Shift+Space",	IDM_EDIT_SELECTLINE
+		MENUITEM "Select Lines in &Current Block\tAlt+Shift+]",	IDM_EDIT_SELECTLINE_BLOCK
+		MENUITEM SEPARATOR
+		MENUITEM "Select to Document Star&t",					IDM_EDIT_SELTODOCSTART
+		MENUITEM "Select to Document En&d",						IDM_EDIT_SELTODOCEND
+		MENUITEM "Select to Ne&xt\tCtrl+Alt+F2",				IDM_EDIT_SELTONEXT
+		MENUITEM "Select to Previou&s\tCtrl+Alt+Shift+F2",		IDM_EDIT_SELTOPREV
+		MENUITEM SEPARATOR
 		POPUP "Boo&kmarks"
 		BEGIN
 			MENUITEM "&Toggle\tCtrl+F2",			BME_EDIT_BOOKMARKTOGGLE
@@ -568,7 +568,7 @@ BEGIN
 			//MENUITEM "SV&G Document",				IDM_LEXER_SVG
 		END
 	END
-	POPUP "&Settings"
+	POPUP "Sett&ings"
 	BEGIN
 		MENUITEM "Insert Tabs as &Spaces",			IDM_VIEW_TABSASSPACES
 		MENUITEM "&Tab Settings...\tCtrl+T",		IDM_VIEW_TABSETTINGS
