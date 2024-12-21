@@ -355,7 +355,7 @@ BEGIN
 			MENUITEM "Zeits&tempel aktualisieren\tShift+F5",	CMD_TIMESTAMPS
 		END
 	END
-	POPUP "&Search"
+	POPUP "&Suchen"
 	BEGIN
 		MENUITEM "&Suchen...\tStrg+F",						IDM_EDIT_FIND
 		MENUITEM "Suchtext s&peichern\tAlt+F3",				IDM_EDIT_SAVEFIND
