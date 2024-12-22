@@ -435,11 +435,19 @@ std::shared_ptr<Font> Font::Allocate(const FontParameters &fp) {
 // when less than safe size otherwise allocate on heap and free automatically.
 template<typename T, size_t lengthStandard>
 class VarBuffer {
-	T * const buffer;
+	T *buffer;
 	T bufferStandard[lengthStandard];
 public:
-	explicit VarBuffer(size_t length) :
-		buffer {(length > lengthStandard) ? new T[length] : bufferStandard} {
+	VarBuffer() noexcept {
+		buffer = bufferStandard;
+	}
+	explicit VarBuffer(size_t length): buffer{bufferStandard} {
+		allocate(length);
+	}
+	void allocate(size_t length) {
+		if (length > lengthStandard) {
+			buffer = new T[length];
+		}
 		static_assert(__is_standard_layout(T));
 		memset(buffer, 0, length*sizeof(T));
 	}
@@ -469,14 +477,16 @@ public:
 	}
 };
 
-constexpr size_t stackBufferLength = 512;
+constexpr size_t stackBufferLength = 480; // max value to keep stack usage under 4096
 class TextWide {
-	wchar_t * const buffer;
+	wchar_t *buffer;
 	UINT len;	// Using UINT instead of size_t as most Win32 APIs take UINT.
 	wchar_t bufferStandard[stackBufferLength];
 public:
-	TextWide(std::string_view text, int codePage) :
-		buffer {(text.length() > stackBufferLength) ? new wchar_t[text.length()] : bufferStandard} {
+	TextWide(std::string_view text, int codePage): buffer {bufferStandard} {
+		if (text.length() > stackBufferLength) {
+			buffer = new wchar_t[text.length()];
+		}
 		if (codePage == CpUtf8) {
 			len = static_cast<UINT>(UTF16FromUTF8(text, buffer, text.length()));
 		} else {
@@ -505,8 +515,59 @@ public:
 	}
 };
 
-using TextPositions = VarBuffer<XYPOSITION, stackBufferLength>;
-using TextPositionsI = VarBuffer<int, stackBufferLength>;
+class TextWideD2D {
+	XYPOSITION *positions = nullptr;
+	wchar_t * buffer;
+	UINT len;	// Using UINT instead of size_t as most Win32 APIs take UINT.
+	// reuse bufferStandard for both text and position, since only one is active
+	XYPOSITION bufferStandard[stackBufferLength];
+public:
+	TextWideD2D(std::string_view text, int codePage): buffer {reinterpret_cast<wchar_t *>(bufferStandard)} {
+		if (text.length() > stackBufferLength*sizeof(XYPOSITION)/sizeof(wchar_t)) {
+			buffer = new wchar_t[text.length()];
+		}
+		if (codePage == CpUtf8) {
+			len = static_cast<UINT>(UTF16FromUTF8(text, buffer, text.length()));
+		} else {
+			// Support Asian string display in 9x English
+			len = ::MultiByteToWideChar(codePage, 0, text.data(), static_cast<int>(text.length()),
+				buffer, static_cast<int>(text.length()));
+		}
+	}
+	const wchar_t *data() const noexcept {
+		return buffer;
+	}
+	UINT length() const noexcept {
+		return len;
+	}
+	XYPOSITION *position() noexcept {
+		return positions;
+	}
+	void allocate() {
+		positions = bufferStandard;
+		if (len > stackBufferLength) {
+			positions = new XYPOSITION[len];
+		}
+		memset(positions, 0, len*sizeof(XYPOSITION));
+	}
+
+	// Deleted so TextWideD2D objects can not be copied.
+	TextWideD2D(const TextWideD2D &) = delete;
+	TextWideD2D(TextWide &&) = delete;
+	TextWideD2D &operator=(const TextWideD2D &) = delete;
+	TextWideD2D &operator=(TextWideD2D &&) = delete;
+
+	~TextWideD2D() noexcept {
+		if (buffer != static_cast<void *>(bufferStandard)) {
+			delete[]buffer;
+		}
+		if (positions != bufferStandard) {
+			delete[]positions;
+		}
+	}
+};
+
+using TextPositionsGDI = VarBuffer<int, stackBufferLength>;
 
 class SurfaceGDI final : public Surface {
 	HDC hdc{};
@@ -1174,9 +1235,10 @@ void SurfaceGDI::MeasureWidths(const Font *font_, std::string_view text, XYPOSIT
 	int fit = 0;
 	int i = 0;
 	const int len = static_cast<int>(text.length());
+	TextPositionsGDI poses;
 	if (mode.codePage == CpUtf8) {
 		const TextWide tbuf(text, CpUtf8);
-		TextPositionsI poses(tbuf.length());
+		poses.allocate(tbuf.length());
 		if (!::GetTextExtentExPointW(hdc, tbuf.data(), tbuf.length(), maxWidthMeasure, &fit, poses.data(), &sz)) {
 			// Failure
 			return;
@@ -1194,7 +1256,7 @@ void SurfaceGDI::MeasureWidths(const Font *font_, std::string_view text, XYPOSIT
 			}
 		}
 	} else {
-		TextPositionsI poses(len);
+		poses.allocate(len);
 		if (!::GetTextExtentExPointA(hdc, text.data(), len, maxWidthMeasure, &fit, poses.data(), &sz)) {
 			// Eeek - a NULL DC or other foolishness could cause this.
 			return;
@@ -1266,7 +1328,7 @@ void SurfaceGDI::MeasureWidthsUTF8(const Font *font_, std::string_view text, XYP
 	int i = 0;
 	const int len = static_cast<int>(text.length());
 	const TextWide tbuf(text, CpUtf8);
-	TextPositionsI poses(tbuf.length());
+	TextPositionsGDI poses(tbuf.length());
 	if (!::GetTextExtentExPointW(hdc, tbuf.data(), tbuf.length(), maxWidthMeasure, &fit, poses.data(), &sz)) {
 		// Failure
 		return;
@@ -2529,7 +2591,7 @@ void SurfaceD2D::DrawTextTransparent(PRectangle rc, const Font *font_, XYPOSITIO
 
 namespace {
 
-HRESULT MeasurePositions(const Font *font_, TextPositions &poses, const TextWide &tbuf) {
+HRESULT MeasurePositions(const Font *font_, TextWideD2D &tbuf) {
 	const FontDirectWrite *pfm = down_cast<const FontDirectWrite *>(font_);
 	if (!pfm->pTextFormat) {
 		// Unexpected failure like no access to DirectWrite so give up.
@@ -2546,6 +2608,7 @@ HRESULT MeasurePositions(const Font *font_, TextPositions &poses, const TextWide
 		return E_FAIL;
 	}
 
+	tbuf.allocate();
 	VarBuffer<DWRITE_CLUSTER_METRICS, stackBufferLength> clusterMetrics(tbuf.length());
 	UINT32 count = 0;
 	const HRESULT hrGetCluster = pTextLayout->GetClusterMetrics(clusterMetrics.data(), tbuf.length(), &count);
@@ -2556,6 +2619,7 @@ HRESULT MeasurePositions(const Font *font_, TextPositions &poses, const TextWide
 	// A cluster may be more than one WCHAR, such as for "ffi" which is a ligature in the Candara font
 	XYPOSITION position = 0.0;
 	UINT ti = 0;
+	XYPOSITION * const poses = tbuf.position();
 	for (UINT32 ci = 0; ci < count; ci++) {
 		const int length = clusterMetrics[ci].length;
 		const XYPOSITION width = clusterMetrics[ci].width;
@@ -2571,11 +2635,11 @@ HRESULT MeasurePositions(const Font *font_, TextPositions &poses, const TextWide
 }
 
 void SurfaceD2D::MeasureWidths(const Font *font_, std::string_view text, XYPOSITION *positions) {
-	const TextWide tbuf(text, mode.codePage);
-	TextPositions poses(tbuf.length());
-	if (FAILED(MeasurePositions(font_, poses, tbuf))) {
+	TextWideD2D tbuf(text, mode.codePage);
+	if (FAILED(MeasurePositions(font_, tbuf))) {
 		return;
 	}
+	const XYPOSITION * const poses = tbuf.position();
 	if (mode.codePage == CpUtf8) {
 		// Map the widths given for UTF-16 characters back onto the UTF-8 input string
 		size_t i = 0;
@@ -2667,13 +2731,13 @@ void SurfaceD2D::DrawTextTransparentUTF8(PRectangle rc, const Font *font_, XYPOS
 }
 
 void SurfaceD2D::MeasureWidthsUTF8(const Font *font_, std::string_view text, XYPOSITION *positions) {
-	const TextWide tbuf(text, CpUtf8);
-	TextPositions poses(tbuf.length());
-	if (FAILED(MeasurePositions(font_, poses, tbuf))) {
+	TextWideD2D tbuf(text, CpUtf8);
+	if (FAILED(MeasurePositions(font_, tbuf))) {
 		return;
 	}
 	// Map the widths given for UTF-16 characters back onto the UTF-8 input string
 	size_t i = 0;
+	const XYPOSITION * const poses = tbuf.position();
 	for (UINT ui = 0; ui < tbuf.length(); ui++) {
 		const unsigned char uch = text[i];
 		const unsigned int byteCount = UTF8BytesOfLead(uch);

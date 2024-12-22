@@ -71,28 +71,6 @@ def update_all_copyright_year():
 	for path in glob.glob('../locale/*/*.rc'):
 		update_copyright_year(path, year)
 
-def dump_static_linked_function(path, dumpAll=True):
-	result = {}
-	with open(path, encoding='utf-8') as fd:
-		for line in fd.readlines():
-			if line.count(':') > 1:
-				items = line.split()
-				func = items[1]
-				obj = items[-1]
-				if dumpAll or (items[3] == 'f' and '<lambda_' not in func and items[4] != 'i'):
-					if obj in result:
-						result[obj].append(func)
-					else:
-						result[obj] = [func]
-
-	path, ext = os.path.splitext(path)
-	path = f'{path}-crt{ext}'
-	print('write:', path)
-	with open(path, 'w', encoding='utf-8') as fd:
-		for obj, items in sorted(result.items()):
-			fd.write(obj + '\n')
-			fd.write(''.join(f'\t{func}\n' for func in sorted(items)))
-
 def quote_path(path):
 	return f'"{path}"' if ' ' in path else path
 
@@ -189,10 +167,6 @@ def generate_compile_commands(target, avx2=False, cxx=False):
 
 #update_all_project_toolset()
 #update_all_copyright_year()
-#dump_static_linked_function('bin/Release/x64/matepath.map')
-#dump_static_linked_function('bin/Release/Win32/matepath.map')
-#dump_static_linked_function('bin/Release/x64/Notepad4.map')
-#dump_static_linked_function('bin/Release/Win32/Notepad4.map')
 generate_compile_commands('x86_64-pc-windows-msvc', avx2=True)
 #generate_compile_commands('x86_64-pc-windows-msvc')
 #generate_compile_commands('i686-pc-windows-msvc')
