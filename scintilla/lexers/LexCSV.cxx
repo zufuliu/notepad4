@@ -26,6 +26,7 @@ namespace {
 // https://commons.apache.org/proper/commons-csv/apidocs/org/apache/commons/csv/CSVFormat.html
 
 enum {
+	// see Styles.cpp
 	CsvOption_BackslashEscape = 1 << 15,
 	CsvOption_MergeDelimiter = 1 << 16,
 	CsvRowGroup = 100,

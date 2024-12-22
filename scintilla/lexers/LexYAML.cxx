@@ -59,7 +59,7 @@ constexpr bool IsYAMLAnchorChar(int ch) noexcept {
 	return IsGraphic(ch) && !IsYAMLFlowIndicator(ch);
 }
 
-bool IsYAMLText(StyleContext& sc, int braceCount, const WordList *kwList) {
+bool IsYAMLText(StyleContext &sc, int braceCount, const WordList *kwList) {
 	const int state = sc.state;
 	const Sci_Position endPos = braceCount? sc.styler.Length() : sc.lineStartNext;
 	const unsigned char chNext = LexGetNextChar(sc.styler, sc.currentPos, endPos);

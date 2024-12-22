@@ -73,7 +73,7 @@ constexpr bool IsTOMLUnquotedKey(int ch) noexcept {
 	return IsIdentifierChar(ch) || ch == '-';
 }
 
-bool IsTOMLKey(StyleContext& sc, int braceCount, const WordList *kwList) {
+bool IsTOMLKey(StyleContext &sc, int braceCount, const WordList *kwList) {
 	if (braceCount) {
 		const int chNext = sc.GetLineNextChar();
 		if (chNext == '=' || chNext == '.' || chNext == '-') {

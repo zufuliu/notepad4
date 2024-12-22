@@ -6,6 +6,7 @@
 #include <boost/regex/v5/primary_transform.hpp>
 #include <memory>
 #include <map>
+#include "VectorISA.h"
 
 namespace boost{
 
@@ -35,6 +36,23 @@ public:
 #if 0 // prevent compiler vectorize the loop generates big and slow code
       for (int i = 0; i < characterCount; i++) {
          m_lower_map[i] = static_cast<wchar_t>(i);
+      }
+#elif NP2_USE_SSE2
+      {
+         __m128i *ptr = reinterpret_cast<__m128i *>(m_lower_map.get());
+         __m128i value = _mm_setr_epi16(0, 1, 2, 3, 4, 5, 6, 7);
+         const __m128i acc = _mm_shuffle_epi32(_mm_cvtsi32_si128(0x0008'0008), 0);
+         constexpr int count = characterCount / (sizeof(__m128i) / sizeof(wchar_t));
+#if defined(__clang__)
+         #pragma clang loop unroll(disable)
+#elif defined(__GNUC__)
+         #pragma GCC unroll 0
+#endif
+         for (int i = 0; i < count; i++) {
+            _mm_storeu_si128(ptr, value);
+            ptr++;
+            value = _mm_add_epi16(value, acc);
+         }
       }
 #elif defined(_WIN64)
       {
