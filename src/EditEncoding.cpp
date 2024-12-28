@@ -1045,12 +1045,13 @@ bool MaybeBinaryFile(const uint8_t *ptr, DWORD length) noexcept {
 	length = min<DWORD>(length, 1024);
 	const uint8_t * const end = ptr + length;
 	UINT count = 0;
+	UINT mask = 0; // find two different C0 control characters
 	while (ptr < end) {
-		uint8_t ch = *ptr++;
+		const uint8_t ch = *ptr++;
 		if (IsC0ControlChar(ch)) {
 			++count;
-			ch = *ptr++;
-			if ((count >= 8) || IsC0ControlChar(ch)) {
+			mask |= 1U << ch;
+			if (((mask & (mask - 1)) != 0) && ((count >= 8) || IsC0ControlChar(*ptr))) {
 				return true;
 			}
 		}
