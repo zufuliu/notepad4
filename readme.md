@@ -74,7 +74,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [Groovy](tools/lang/Groovy.groovy), up to Groovy 5.0.
 	* [Haskell](tools/lang/Haskell.hs), up to GHC 9.6.
 	* [Haxe](tools/lang/Haxe.hx), up to Haxe 4.3.
-	* [HTML](tools/lang/html.html), up to [WHATWG](https://html.spec.whatwg.org/multipage/) September 2024. [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#html)
+	* [HTML](tools/lang/html.html), up to [WHATWG](https://html.spec.whatwg.org/multipage/) December 2024. [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#html)
 		* ASP
 		* ASP.NET
 		* JSP
@@ -138,16 +138,16 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [Texinfo](tools/lang/Texinfo.texi), up to Texinfo 7.1.
 	* [TOML File](https://toml.io/)
 	* [TypeScript](tools/lang/TypeScript.ts), up to TypeScript 5.4.
-	* Visual Basic, VB6, VBA, VB.NET
-	* VBScript
+	* Visual Basic, [VB.NET](tools/lang/VB.NET.vb), [VB 6.0 and VBA](tools/lang/VBA.bas)
+	* [VBScript](tools/lang/VBScript.vbs)
 	* [VHDL](tools/lang/VHDL.vhdl), up to VHDL 2019.
 	* Verilog HDL, up to [Verilog](tools/lang/Verilog.v) 2005 and [SystemVerilog](tools/lang/SystemVerilog.sv) 2017.
 	* [Vim Script](tools/lang/Vim.vim)
 	* [WebAssembly](https://github.com/WebAssembly/wabt/blob/main/src/lexer-keywords.txt), up to wabt 1.0.
 	* [WinHex Script](tools/lang/WinHex.whs) and template, up to WinHex 20.9.
-	* XML Document, [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#xml)
-		* XML Schema
-		* XML Stylesheet
+	* [XML Document](tools/lang/XML.xml), [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#xml)
+		* [XML Schema](https://www.w3.org/XML/Schema)
+		* [XML Stylesheet](https://www.w3.org/Style/XSL/)
 		* SGML and DTD
 		* Apple Property List
 	* [YAML Document](https://yaml.org/)

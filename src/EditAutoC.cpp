@@ -708,9 +708,8 @@ enum {
 	GroovyKeywordIndex_Annotation = 7,
 	GroovyKeywordIndex_GroovyDoc = 9,
 	HTMLKeywordIndex_Tag = 0,
-	HTMLKeywordIndex_Attribute = 6,
-	HTMLKeywordIndex_EventHandler = 7,
-	HTMLKeywordIndex_Value = 8,
+	HTMLKeywordIndex_Attribute = 4,
+	HTMLKeywordIndex_Value = 5,
 	HaxeKeywordIndex_Preprocessor = 1,
 	HaxeKeywordIndex_CommentTag = 8,
 	InnoKeywordIndex_Directive = 4,
@@ -1021,7 +1020,6 @@ static void AutoC_AddKeyword(WordList &pWList, int iCurrentStyle) noexcept {
 	if (iLexer == SCLEX_PHPSCRIPT || iLexer == SCLEX_JAVASCRIPT || iLexer == SCLEX_MARKDOWN) {
 		pWList.AddListEx(lexHTML.pKeyWords->pszKeyWords[HTMLKeywordIndex_Tag]);
 		pWList.AddListEx(lexHTML.pKeyWords->pszKeyWords[HTMLKeywordIndex_Attribute]);
-		pWList.AddListEx(lexHTML.pKeyWords->pszKeyWords[HTMLKeywordIndex_EventHandler]);
 		pWList.AddListEx(lexHTML.pKeyWords->pszKeyWords[HTMLKeywordIndex_Value]);
 	}
 }

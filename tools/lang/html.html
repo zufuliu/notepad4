@@ -1,9 +1,12 @@
 <!--
-https://whatwg.org/ 15 November 2024
+https://whatwg.org/ 17 December 2024
 HTML 4.01 https://www.w3.org/TR/html4/ 27 March 2018
 XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
+XHTML 1.0 https://www.w3.org/TR/xhtml1/ 27 March 2018
+https://developer.mozilla.org/en-US/docs/Web/HTML
 -->
-<!DOCTYPE html>
+<?xml version encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC>
 <!-- Global https://html.spec.whatwg.org/multipage/dom.html#global-attributes -->
 <!-- https://html.spec.whatwg.org/multipage/popover.html -->
 <html
@@ -14,7 +17,7 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 	autofocus
 	contenteditable="true false plaintext-only"
 	dir="ltr rtl auto"
-	draggable
+	draggable="true false"
 	enterkeyhint="enter done go next previous search send"
 	hidden="hidden until-found"
 	inert
@@ -25,8 +28,8 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 	itemref
 	itemscope
 	itemtype
-	lang="en"
-	manifest
+	lang="en" xml:lang xml:base
+	xmlns xmlns:xsi xsi:schemaLocation
 	nonce
 	popover="auto manual" popovertarget="toggle show hide" popovertargetaction
 	spellcheck="true false"
@@ -37,17 +40,21 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 	writingsuggestions="true false"
 >
 	<head>
-		<title>HTML5</title>
+		<title></title>
 		<!-- https://html.spec.whatwg.org/multipage/semantics.html -->
 		<base href target>
 		<!-- Link types https://html.spec.whatwg.org/multipage/links.html#linkTypes -->
+		<!-- Referrer Policy https://www.w3.org/TR/referrer-policy/ -->
+		<!-- https://fetch.spec.whatwg.org/#concept-request-destination -->
 		<link href
 			crossorigin="anonymous use-credentials"
 			rel="alternate canonical author bookmark dns-prefetch expect external help icon manifest modulepreload license next nofollow noopener noreferrer opener pingback preconnect prefetch preload prerender prev privacy-policy search stylesheet tag terms-of-service"
 			media integrity hreflang type="text/plain text/css"
 			referrerpolicy="no-referrer no-referrer-when-downgrade same-origin origin strict-origin origin-when-cross-origin strict-origin-when-cross-origin unsafe-url"
-			sizes imagesrcset imagesizes as blocking color disabled
-			fetchpriority="high low auto">
+			sizes imagesrcset imagesizes
+			as="fetch"
+			blocking="render" color disabled
+			fetchpriority="high low auto" title>
 		<!-- Standard metadata names https://html.spec.whatwg.org/multipage/semantics.html#standard-metadata-names -->
 		<meta name="application-name author description generator keywords referrer theme-color color-scheme "
 			http-equiv="content-language content-type default-style refresh set-cookie x-ua-compatible content-security-policy"
@@ -205,7 +212,7 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 		<search></search>
 		<div></div>
 		<!-- Text-level semantics https://html.spec.whatwg.org/multipage/text-level-semantics.html -->
-		<a href="about:, blob:, data:, http:, https:, mailto:, sms:, urn:, tel:"
+		<a href="about blob data http https mailto sms urn tel"
 		target="_blank _self _parent _top" download ping
 		rel rev hreflang type referrerpolicy></a>
 		<em></em>
@@ -245,14 +252,21 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 		<img alt src srcset sizes crossorigin usemap ismap width height
 		decoding="sync async auto" loading="lazy eager" referrerpolicy fetchpriority>
 		<!-- https://html.spec.whatwg.org/multipage/iframe-embed-object.html -->
-		<iframe src srcdoc name sandbox allow allowfullscreen allowpaymentrequest width height referrerpolicy loading></iframe>
+		<!-- https://www.w3.org/TR/permissions-policy/ -->
+		<!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/Permissions_Policy -->
+		<iframe src srcdoc name
+		sandbox="allow-downloads allow-forms allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts allow-top-navigation allow-top-navigation-by-user-activation allow-top-navigation-to-custom-protocols"
+		allow="self src none"
+		allowfullscreen width height referrerpolicy loading></iframe>
 		<embed src type width height>
-		<object data type typemustmatch name usemap form width height></object>
-		<param name value>
+		<object data type name usemap form width height></object>
 		<!-- https://html.spec.whatwg.org/multipage/media.html -->
-		<video src crossorigin poster preload="none metadata auto" autoplay playsinline loop muted controls width height></video>
+		<video src crossorigin poster
+		preload="none metadata auto"
+		autoplay playsinline loop muted controls width height></video>
 		<audio src crossorigin preload autoplay loop muted controls></audio>
-		<track kind="subtitles captions descriptions chapters metadata" src srclang label default
+		<track kind="subtitles captions descriptions chapters metadata"
+		src srclang label default
 		onchange
 		onaddtrack
 		onremovetrack
@@ -262,7 +276,9 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 		>
 		<!-- https://html.spec.whatwg.org/multipage/image-maps.html -->
 		<map name></map>
-		<area alt coords href download hreflang ping rel shape="circle circ default poly polygon rect rectangle" target type referrerpolicy>
+		<area alt coords href download hreflang ping rel
+		shape="circle circ default poly polygon rect rectangle"
+		target type referrerpolicy>
 		<!-- https://html.spec.whatwg.org/multipage/embedded-content-other.html -->
 		<math></math>
 		<svg></svg>
@@ -282,11 +298,13 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 		</table>
 		<!-- https://html.spec.whatwg.org/multipage/forms.html -->
 		<form accept-charset action autocomplete="on off"
-			enctype="application/x-www-form-urlencoded multipart/form-data text/plain" method name novalidate target rel>
+			enctype="application/x-www-form-urlencoded multipart/form-data text/plain"
+			method="get GET post POST dialog" name novalidate target rel>
 			<label for></label>
 			<!-- https://html.spec.whatwg.org/multipage/input.html#the-input-element -->
-			<input accept="audio/* video/* image/*"
-				alt autocomplete checked dirname disabled form formaction formenctype formmethod formnovalidate formtarget
+			<input accept="audio video image"
+				alpha alt autocomplete checked colorspace="limited-srgb display-p3"
+				dirname disabled form formaction formenctype formmethod formnovalidate formtarget
 				height list max maxlength min minlength multiple name pattern placeholder popovertarget popovertargetaction readonly required size src step
 				type="hidden text search tel url email password date month week time datetime-local number range color checkbox radio file submit image reset button"
 				value width title>
@@ -315,7 +333,7 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 		<script src type="text/javascript text/ecmascript text/jscript text/livescript module text/plain text/xml application/octet-stream application/xml"
 			charset nomodule async defer crossorigin integrity referrerpolicy blocking="render" fetchpriority></script>
 		<noscript></noscript>
-		<template shadowrootmode="open closed" shadowrootdelegatesfocus shadowrootclonable></template>
+		<template shadowrootmode="open closed" shadowrootdelegatesfocus shadowrootclonable shadowrootserializable></template>
 		<slot name></slot>
 		<!-- https://html.spec.whatwg.org/multipage/canvas.html -->
 		<canvas width height></canvas>
@@ -324,28 +342,28 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 
 		<!-- Obsolete features https://html.spec.whatwg.org/multipage/obsolete.html -->
 		<!-- Obsolete Elements https://html.spec.whatwg.org/multipage/obsolete.html#non-conforming-features -->
-		<applet datafld datasrc></applet>
+		<applet archive code codebase datafld datasrc object></applet>
 		<acronym></acronym>
 		<bgsound></bgsound>
-		<basefont>
+		<basefont color face size>
 		<big></big>
 		<blink></blink>
 		<center></center>
-		<dir></dir>
-		<font></font>
+		<dir compact></dir>
+		<font color face size></font>
 		<frame>
-		<frameset></frameset>
-		<isindex>
-		<keygen>
+		<frameset cols rows name scrolling src frameborder longdesc noresize marginheight marginwidth></frameset>
+		<isindex prompt>
+		<keygen autofocus challenge disabled form keytype name>
 		<listing></listing>
-		<marquee bgcolor datafld dataformatas datasrc height hspace vspace width></marquee>
-		<menu compact></menu>
+		<marquee behavior bgcolor datafld dataformatas datasrc direction height hspace loop scrollamount scrolldelay truespeed vspace width></marquee>
 		<menuitem></menuitem>
 		<multicol></multicol>
 		<nextid></nextid>
 		<nobr></nobr>
 		<noembed></noembed>
 		<noframes></noframes>
+		<param name value type valuetype>
 		<plaintext></plaintext>
 		<rb></rb>
 		<rtc></rtc>
@@ -355,9 +373,10 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 		<xmp></xmp>
 
 		<!-- Obsolete Attributes -->
-		<html version>
+		<html contextmenu dropzone manifest version>
 			<head profile>
 				<meta scheme>
+				<style type></style>
 			</head>
 			<body alink background bgcolor bottommargin leftmargin link marginheight marginwidth rightmargin text topmargin vlink>
 				<a charset coords datafld dataformatas datasrc name methods rev shape urn></a>
@@ -382,13 +401,14 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 				<img align border datafld datasrc hspace longdesc lowsrc name vspace>
 				<legend align datafld dataformatas datasrc></legend>
 				<link rev charset methods target urn>
-				<object align archive border classid code codebase codetype datafld dataformatas datasrc declare hspace standby vspace>
+				<menu compact label type></menu>
+				<object align archive border classid code codebase codetype datafld dataformatas datasrc declare hspace standby typemustmatch vspace>
 					<param datafld type valuetype>
 				</object>
 				<ol compact></ol>
 				<p align></p>
 				<pre width></pre>
-				<script event for language></script>
+				<script charset event for language></script>
 				<table align background bgcolor border bordercolor cellpadding cellspacing datapagesize datasrc frame height rules summary width>
 					<caption align></caption>
 					<thead align background valign char charoff>
@@ -412,7 +432,50 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 				</ul>
 			</body>
 		</html>
+
+		<!-- https://www.w3.org/TR/html5-diff/ -->
+		<!-- https://www.w3.org/TR/html5-author/ -->
+		<!-- https://www.w3.org/TR/2014/REC-html5-20141028/ -->
+		<!-- https://www.w3.org/TR/2012/CR-html5-20121217/ -->
+		<!-- https://www.w3.org/html/wiki/Elements.html -->
+		<!-- https://www.w3.org/html/wiki/Attributes/_Global.html -->
+		<!--
+		<html onformchange onforminput onmousewheel onreadystatechange onredo onundo>
+			<audio mediagroup></audio>
+			<command type label icon disabled checked radiogroup command title>
+			<datagrid multiple disabled></datagrid>
+			<datatemplate>
+				<rule condition mode>
+					<nest filter mode></nest>
+				</rule>
+			</datatemplate>
+			<event-source src></event-source>
+			<iframe seamless></iframe>
+			<style scoped></style>
+			<time pubdate></time>
+			<video mediagroup></video>
+		</html>
+		-->
+
+		<!-- https://developer.mozilla.org/en-US/docs/Web/HTML/Element -->
+		<!--
+		<html virtualkeyboardpolicy>
+			<a attributionsrc target="_unfencedTop"></a>
+			<audio disableremoteplayback></audio>
+			<button command commandfor></button>
+			<fencedframe allow height width></fencedframe>
+			<iframe allowpaymentrequest credentialless csp></iframe>
+			<img attributionsrc elementtiming>
+			<portal referrerpolicy src></portal>
+			<script attributionsrc></script>
+			<video disablepictureinpicture disableremoteplayback></video>
+		</html>
+		-->
+
 		<!-- RDFa https://www.w3.org/TR/xhtml-rdfa-primer/ 17 March 2015 -->
 		<meta property vocab resource typeof content datatype>
+		<!-- ARIA in HTML https://www.w3.org/TR/html-aria/ 23 December 2024 -->
+		<a role></a>
+		<!-- https://www.w3.org/TR/xhtml2/elements.html -->
 	</body>
 </html>

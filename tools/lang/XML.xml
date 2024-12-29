@@ -1,0 +1,32 @@
+<!-- 7 February 2013 https://www.w3.org/TR/xml/ -->
+<!-- 29 September 2006 https://www.w3.org/TR/xml11/ -->
+<?xml version encoding="utf-8 UTF-8 ISO-8859-1" standalone="yes no" xml:lang?>
+<!DOCTYPE SYSTEM PUBLIC>
+<!doctype> <!-- https://html.spec.whatwg.org/multipage/syntax.html#the-doctype -->
+<![CDATA[ ]]>
+<!-- Element Type Declarations -->
+<!ELEMENT #PCDATA EMPTY ANY>
+<!-- Attribute-List Declarations -->
+<!ATTLIST CDATA ID IDREF IDREFS ENTITY ENTITIES NMTOKEN NMTOKENS #REQUIRED #IMPLIED #FIXED>
+<!-- Conditional Sections -->
+<![INCLUDE[ ]]>
+<![IGNORE[ ]]>
+<!-- Entity Declarations -->
+<!ENTITY SYSTEM PUBLIC NDATA>
+<!-- Notation Declarations -->
+<!NOTATION PUBLIC>
+<!-- Comparison of SGML and XML, https://www.w3.org/TR/NOTE-sgml-xml-971215/ -->
+<!SGML>
+
+<!-- 8 December 2009 https://www.w3.org/TR/xml-names/ -->
+<!-- https://www.w3.org/XML/Schema -->
+<xml xmlns xmlns:xsi xsi:schemaLocation xsi:noNamespaceSchemaLocation></xml>
+
+<!-- 28 October 2010 https://www.w3.org/TR/xml-stylesheet/ -->
+<?xml-stylesheet href type title media charset alternate="yes no"?>
+
+<!-- https://www.w3.org/Style/XSL/ -->
+<!-- https://www.w3.org/TR/xslt20/ -->
+
+<!-- common attributes -->
+<xml id name type value="true false on off"></xml>

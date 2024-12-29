@@ -41,7 +41,6 @@ lexerList = [
 
 	('NP2LEX_HASKELL', 'stlHaskell.cpp', 'LexHaskell.cxx', 'Haskell.hs', 0, parse_haskell_api_file),
 	('NP2LEX_HAXE', 'stlHaxe.cpp', 'LexHaxe.cxx', 'Haxe.hx', 1, parse_haxe_api_file),
-	('NP2LEX_HTML', 'stlHTML.cpp', 'LexHTML.cxx', 'html.html', 1, parse_html_api_file),
 
 	('NP2LEX_INI', 'stlDefault.cpp', 'LexProps.cxx', '', (0, 'Ini'), None),
 	('NP2LEX_INNOSETUP', 'stlInno.cpp', 'LexInno.cxx', 'InnoSetup.iss', 0, parse_inno_setup_api_file),
@@ -111,7 +110,8 @@ lexerList = [
 	# https://github.com/WebAssembly/wabt/blob/main/src/lexer-keywords.txt
 	('NP2LEX_WASM', 'stlWASM.cpp', 'LexWASM.cxx', 'wasm-lexer-keywords.txt', 0, parse_wasm_lexer_keywords),
 	('NP2LEX_WINHEX', 'stlWinHex.cpp', 'LexWinHex.cxx', 'WinHex.whs', 0, parse_winhex_api_file),
-	('NP2LEX_XML', 'stlXML.cpp', 'LexHTML.cxx', '', 0, parse_xml_api_file),
+	('NP2LEX_XML', 'stlXML.cpp', 'LexHTML.cxx', 'XML.xml', 0, parse_xml_api_file),
+		('NP2LEX_HTML', 'stlHTML.cpp', 'LexHTML.cxx', 'html.html', 0, parse_html_api_file),
 	('NP2LEX_YAML', 'stlYAML.cpp', 'LexYAML.cxx', '', 0, parse_yaml_api_file),
 	('NP2LEX_ZIG', 'stlZig.cpp', 'LexZig.cxx', 'Zig.zig', 0, parse_zig_api_file),
 ]
