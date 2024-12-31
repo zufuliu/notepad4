@@ -25,11 +25,11 @@ static NP2_KEYWORDS kwXmlSchema = {
 "xpath namespace processContents use schemaLocation public system source itemType memberTypes "
 , // value
 "anyType anySimpleType duration dateTime time date gYear gYearMonth gMonth gMonthDay gDay "
-"boolean base64Binary hexBinary float double anyURI QName NOTATION "
+"boolean base64Binary hexBinary float double anyURI QName "
 "decimal integer long int short byte nonPositiveInteger negativeInteger nonNegativeInteger positiveInteger "
 "unsignedLong unsignedInt unsignedShort unsignedByte "
-"string normalizedString token language NMTOKEN NMTOKENS Name NCName ID IDREF IDREFS ENTITY ENTITIES "
-"equal ordered bounded cardinality numeric " " preserve replace collapse "
+"string normalizedString token language Name NCName "
+"equal ordered bounded cardinality numeric preserve replace collapse "
 "unqualified qualified strict skip lax prohibited optional required "
 //"blockSet complexDerivationSet XPathExpr URIref "
 , nullptr
