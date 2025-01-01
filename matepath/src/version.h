@@ -29,7 +29,7 @@
 #define VERSION_FILEVERSION_NUM		VERSION_MINOR,VERSION_BUILD_NUM,0,VERSION_REV
 #define VERSION_FILEVERSION			STRINGIFY(VERSION_MINOR) "." \
 									STRINGIFY(VERSION_BUILD) "." STRINGIFY(VERSION_REV)
-#define VERSION_LEGALCOPYRIGHT		L"\xA9 2011-2024 Zufu Liu and all contributors"
+#define VERSION_LEGALCOPYRIGHT		L"\xA9 2011-2025 Zufu Liu and all contributors"
 #define VERSION_COMPANYNAME			L"Zufu Liu et al."
 #define VERSION_WEBPAGE_DISPLAY		L"flo's freeware - https://www.flos-freeware.ch"
 #define VERSION_EMAIL_DISPLAY		L"florian.balmer@gmail.com"

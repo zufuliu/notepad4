@@ -5,8 +5,8 @@ Notepad4, matepath, Notepad2, metapath and Notepad2-mod are licensed under the B
 https://www.flos-freeware.ch
 https://xhmikosr.github.io/notepad2-mod/
 
-Notepad4 Copyright © 2011-2024 Zufu Liu and All contributors.
-matepath Copyright © 2011-2024 Zufu Liu and All contributors.
+Notepad4 Copyright © 2011-2025 Zufu Liu and All contributors.
+matepath Copyright © 2011-2025 Zufu Liu and All contributors.
 Notepad2-mod Copyright © 2010-2017 XhmikosR and All contributors.
 Notepad2 Copyright © 2004-2012 Florian Balmer.
 metapath Copyright © 1996-2012 Florian Balmer.
@@ -47,7 +47,7 @@ License for Lexilla, Scintilla, and SciTE
 https://www.scintilla.org/
 https://www.scintilla.org/License.txt
 
-Copyright 1998-2024 by Neil Hodgson <neilh@scintilla.org>
+Copyright 1998-2025 by Neil Hodgson <neilh@scintilla.org>
 
 All Rights Reserved
 
@@ -231,7 +231,7 @@ https://github.com/JuliaLang/julia/blob/master/LICENSE.md
 
 The Julia language is licensed under the MIT License. The "language" consists of the compiler (the contents of src/), most of the standard library (base/), and some utilities (most of the rest of the files in this repository). See below for exceptions.
 
-    Copyright (c) 2009-2024: Jeff Bezanson, Stefan Karpinski, Viral B. Shah, and other contributors:
+    Copyright (c) 2009-2025: Jeff Bezanson, Stefan Karpinski, Viral B. Shah, and other contributors:
 
     https://github.com/JuliaLang/julia/contributors
 
@@ -246,7 +246,7 @@ The Julia language is licensed under the MIT License. The "language" consists of
 
 License for Boost regex library
 
-https://www.boost.org/doc/libs/1_84_0/libs/regex/doc/html/index.html
+https://www.boost.org/doc/libs/release/libs/regex/doc/html/index.html
 https://www.boost.org/LICENSE_1_0.txt
 
 Boost Software License - Version 1.0 - August 17th, 2003

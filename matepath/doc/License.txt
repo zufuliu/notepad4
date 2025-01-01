@@ -1,4 +1,4 @@
-matepath Copyright © 2011-2024 Zufu Liu and All contributors.
+matepath Copyright © 2011-2025 Zufu Liu and All contributors.
 metapath Copyright © 1996-2012 Florian Balmer.
 All rights reserved.
 

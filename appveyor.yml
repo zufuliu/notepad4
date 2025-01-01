@@ -1,4 +1,4 @@
-version: '24.x.{build}'
+version: '25.x.{build}'
 
 image:
   - Visual Studio 2017
