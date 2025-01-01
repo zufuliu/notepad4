@@ -125,8 +125,9 @@ constexpr bool IsIdentifierStyle(int style) noexcept {
 		|| style == SCE_RB_BUILTIN_FUNCTION;
 }
 
-int ClassifyWordRb(Sci_PositionU start, Sci_PositionU end, char ch, char chNext, LexerWordList keywordLists, LexAccessor &styler, char *prevWord) {
+int ClassifyWordRb(Sci_PositionU end, char ch, char chNext, LexerWordList keywordLists, LexAccessor &styler, char *prevWord) {
 	char s[MAX_KEYWORD_LENGTH + 1];
+	const Sci_PositionU start = styler.GetStartSegment();
 	styler.GetRange(start, end, s, sizeof(s));
 	int chAttr = SCE_RB_IDENTIFIER;
 	int style = SCE_RB_DEFAULT;
@@ -622,7 +623,7 @@ bool sureThisIsNotHeredoc(Sci_Position lt2StartPos, LexAccessor &styler) {
 // move to the start of the first line that is not in a
 // multi-line construct
 
-void synchronizeDocStart(Sci_PositionU & startPos, Sci_Position &length, int &initStyle, LexAccessor &styler, bool skipWhiteSpace = false) {
+void synchronizeDocStart(Sci_PositionU &startPos, Sci_Position &length, int &initStyle, LexAccessor &styler, bool skipWhiteSpace = false) {
 #if 0
 	styler.Flush();
 	const int style = styler.StyleAt(startPos);
@@ -794,8 +795,7 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 			// Begin of here-doc (the line after the here-doc delimiter):
 			HereDoc.State = 2;
 			if (state == SCE_RB_WORD) {
-				const Sci_Position wordStartPos = styler.GetStartSegment();
-				ClassifyWordRb(wordStartPos, i, ch, chNext, keywordLists, styler, prevWord);
+				ClassifyWordRb(i, ch, chNext, keywordLists, styler, prevWord);
 			} else {
 				styler.ColorTo(i, state);
 			}
@@ -1158,8 +1158,7 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 					// No need to handle this state -- we'll just move to the end
 					preferRE = false;
 				} else {
-					const Sci_Position wordStartPos = styler.GetStartSegment();
-					const int word_style = ClassifyWordRb(wordStartPos, i, ch, chNext, keywordLists, styler, prevWord);
+					const int word_style = ClassifyWordRb(i, ch, chNext, keywordLists, styler, prevWord);
 					preferRE = false;
 					switch (word_style) {
 					case SCE_RB_WORD:
@@ -1494,7 +1493,7 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 	if (state == SCE_RB_WORD) {
 		// We've ended on a word, possibly at EOF, and need to
 		// classify it.
-		ClassifyWordRb(styler.GetStartSegment(), lengthDoc, '\0', '\0', keywordLists, styler, prevWord);
+		ClassifyWordRb(lengthDoc, '\0', '\0', keywordLists, styler, prevWord);
 	} else {
 		styler.ColorTo(lengthDoc, state);
 	}
@@ -1502,24 +1501,6 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 
 // Helper functions for folding, disambiguation keywords
 // Assert that there are no high-bit chars
-
-void getPrevWord(Sci_Position pos, char *prevWord, LexAccessor &styler, int word_state) {
-	Sci_Position i;
-	styler.Flush();
-	for (i = pos - 1; i > 0; i--) {
-		if (styler.StyleAt(i) != word_state) {
-			i++;
-			break;
-		}
-	}
-	if (i < pos - MAX_KEYWORD_LENGTH) // overflow
-		i = pos - MAX_KEYWORD_LENGTH;
-	char *dst = prevWord;
-	for (; i <= pos; i++) {
-		*dst++ = styler[i];
-	}
-	*dst = 0;
-}
 
 bool keywordIsAmbiguous(const char *prevWord) noexcept {
 	// Order from most likely used to least likely
@@ -1608,9 +1589,9 @@ bool keywordIsModifier(const char *word, Sci_Position pos, LexAccessor &styler) 
 		//XXX: Make a list of other keywords where 'if' isn't a modifier
 		//	   and can appear legitimately
 		// Formulate this to avoid warnings from most compilers
-		if (StrEqual(word, "if")) {
+		if (StrEqual(word, "if") && pos - 3 >= lineStartPosn) {
 			char prevWord[MAX_KEYWORD_LENGTH + 1];
-			getPrevWord(pos, prevWord, styler, SCE_RB_WORD);
+			styler.GetRange(pos - 3, pos + 1, prevWord, sizeof(prevWord));
 			return !StrEqual(prevWord, "else");
 		}
 		return true;
@@ -1756,6 +1737,8 @@ void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexer
 	};
 	MethodDefinition method_definition = MethodDefinition::None;
 	int argument_paren_count = 0;
+	char word[MAX_KEYWORD_LENGTH + 1];
+	int wordLen = 0;
 	bool heredocOpen = false;
 
 	while (startPos < endPos) {
@@ -1778,18 +1761,21 @@ void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexer
 			} else if (ch == ')' || ch == '}' || ch == ']') {
 				levelCurrent--;
 			}
-		} else if (style == SCE_RB_WORD && styleNext != SCE_RB_WORD) {
-			// Look at the keyword on the left and decide what to do
-			char prevWord[MAX_KEYWORD_LENGTH + 1]; // 1 byte for zero
-			prevWord[0] = 0;
-			getPrevWord(startPos - 1, prevWord, styler, SCE_RB_WORD);
-			if (StrEqual(prevWord, "end")) {
-				levelCurrent--;
-			} else if (StrEqual(prevWord, "def")) {
-				levelCurrent++;
-				method_definition = MethodDefinition::Define;
-			} else if (keywordLists[KeywordIndex_CodeFolding].InList(prevWord)) {
-				levelCurrent++;
+		} else if (style == SCE_RB_WORD) {
+			if (wordLen < MAX_KEYWORD_LENGTH) {
+				word[wordLen++] = static_cast<char>(ch);
+			}
+			if (styleNext != SCE_RB_WORD) {
+				word[wordLen] = '\0';
+				wordLen = 0;
+				if (StrEqual(word, "end")) {
+					levelCurrent--;
+				} else if (StrEqual(word, "def")) {
+					levelCurrent++;
+					method_definition = MethodDefinition::Define;
+				} else if (keywordLists[KeywordIndex_CodeFolding].InList(word)) {
+					levelCurrent++;
+				}
 			}
 		} else if (style == SCE_RB_HERE_DELIM && !heredocOpen) {
 			if (stylePrev == SCE_RB_OPERATOR && chPrev == '<' && styler.SafeGetCharAt(startPos - 3) == '<') {
