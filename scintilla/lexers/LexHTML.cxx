@@ -151,9 +151,10 @@ constexpr bool isCommentASPState(int state) noexcept {
 		|| state == SCE_HB_COMMENTLINE;
 }
 
-bool classifyAttribHTML(script_mode inScriptType, Sci_PositionU start, Sci_PositionU end, const WordList &keywords, LexAccessor &styler) {
+bool classifyAttribHTML(script_mode inScriptType, Sci_PositionU end, const WordList &keywords, LexAccessor &styler) {
 	int chAttr = SCE_H_ATTRIBUTEUNKNOWN;
 	bool isLanguageType = false;
+	const Sci_PositionU start = styler.GetStartSegment();
 	if (IsNumberChar(styler[start])) {
 		chAttr = SCE_H_NUMBER;
 	} else {
@@ -183,8 +184,7 @@ bool isHTMLCustomElement(const char *tag, size_t length, bool dashColon) noexcep
 	return dashColon;
 }
 
-int classifyTagHTML(Sci_PositionU start, Sci_PositionU end, const WordList &keywords, LexAccessor &styler, bool &tagDontFold,
-	bool isXml, bool allowScripts) {
+int classifyTagHTML(Sci_PositionU end, const WordList &keywords, LexAccessor &styler, bool &tagDontFold, bool isXml, bool allowScripts) {
 	char withSpace[126 + 2];
 	withSpace[0] = ' ';
 	withSpace[1] = '\0';
@@ -192,6 +192,7 @@ int classifyTagHTML(Sci_PositionU start, Sci_PositionU end, const WordList &keyw
 	// Copy after the '<' and stop before space
 	Sci_PositionU i = 1;
 	bool dashColon = false;
+	const Sci_PositionU start = styler.GetStartSegment();
 	for (Sci_PositionU cPos = start; cPos < end && i < sizeof(withSpace) - 2; cPos++) {
 		const char ch = styler[cPos];
 		if (static_cast<unsigned char>(ch) <= ' ') {
@@ -257,9 +258,9 @@ int classifyTagHTML(Sci_PositionU start, Sci_PositionU end, const WordList &keyw
 	return chAttr;
 }
 
-void classifyWordHTJS(Sci_PositionU start, Sci_PositionU end, const WordList &keywords, LexAccessor &styler, script_mode inScriptType) {
+void classifyWordHTJS(Sci_PositionU end, const WordList &keywords, LexAccessor &styler, script_mode inScriptType) {
 	char s[31 + 1];
-	styler.GetRange(start, end, s, sizeof(s));
+	styler.GetRange(styler.GetStartSegment(), end, s, sizeof(s));
 	int chAttr = SCE_HJ_WORD;
 	if (keywords.InList(s)) {
 		chAttr = SCE_HJ_KEYWORD;
@@ -267,10 +268,10 @@ void classifyWordHTJS(Sci_PositionU start, Sci_PositionU end, const WordList &ke
 	styler.ColorTo(end, statePrintForState(chAttr, inScriptType));
 }
 
-int classifyWordHTVB(Sci_PositionU start, Sci_PositionU end, const WordList &keywords, LexAccessor &styler, script_mode inScriptType) {
+int classifyWordHTVB(Sci_PositionU end, const WordList &keywords, LexAccessor &styler, script_mode inScriptType) {
 	int chAttr = SCE_HB_IDENTIFIER;
 	char s[32];
-	styler.GetRangeLowered(start, end, s, sizeof(s));
+	styler.GetRangeLowered(styler.GetStartSegment(), end, s, sizeof(s));
 	if (keywords.InList(s)) {
 		chAttr = SCE_HB_WORD;
 		if (StrEqual(s, "rem"))
@@ -281,16 +282,6 @@ int classifyWordHTVB(Sci_PositionU start, Sci_PositionU end, const WordList &key
 		return SCE_HB_COMMENTLINE;
 	else
 		return SCE_HB_DEFAULT;
-}
-
-bool isWordHSGML(Sci_PositionU start, Sci_PositionU end, const WordList &keywords, const LexAccessor &styler) noexcept {
-	char s[15 + 1];
-	styler.GetRange(start, end, s, sizeof(s));
-	return keywords.InList(s);
-}
-
-inline bool isWordCdata(Sci_PositionU start, LexAccessor &styler) noexcept {
-	return styler.Match(start, "[CDATA[");
 }
 
 // Return the first state to reach when entering a scripting language
@@ -631,7 +622,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 						ch = '-';
 					}
 				}
-			} else if (isWordCdata(i + 1, styler)) {
+			} else if (styler.Match(i + 1, "[CDATA[")) {
 				state = SCE_H_CDATA;
 			} else {
 				styler.ColorTo(i + 1, SCE_H_SGML_DEFAULT); // <! is default
@@ -655,10 +646,10 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			// Bounce out of any ASP mode
 			switch (state) {
 			case SCE_HJ_WORD:
-				classifyWordHTJS(styler.GetStartSegment(), i, keywordLists[KeywordIndex_JavaScript], styler, inScriptType);
+				classifyWordHTJS(i, keywordLists[KeywordIndex_JavaScript], styler, inScriptType);
 				break;
 			case SCE_HB_WORD:
-				classifyWordHTVB(styler.GetStartSegment(), i, keywordLists[KeywordIndex_VBScript], styler, inScriptType);
+				classifyWordHTVB(i, keywordLists[KeywordIndex_VBScript], styler, inScriptType);
 				break;
 			case SCE_H_XCCOMMENT:
 				styler.ColorTo(i, state);
@@ -756,7 +747,9 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			break;
 		case SCE_H_SGML_COMMAND:
 			if (!IsSGMLWordChar(ch)) {
-				if (isWordHSGML(styler.GetStartSegment(), i, keywordLists[KeywordIndex_SGML], styler)) {
+				char s[15 + 1];
+				styler.GetRange(styler.GetStartSegment(), i, s, sizeof(s));
+				if (keywordLists[KeywordIndex_SGML].InList(s)) {
 					styler.ColorTo(i, StateToPrint);
 					state = SCE_H_SGML_1ST_PARAM;
 				} else {
@@ -861,8 +854,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			break;
 		case SCE_H_TAGUNKNOWN:
 			if (!IsTagContinue(ch) && !((ch == '/') && (chPrev == '<'))) {
-				int eClass = classifyTagHTML(styler.GetStartSegment(),
-					i, keywordLists[KeywordIndex_Tag], styler, tagDontFold, isXml, allowScripts);
+				int eClass = classifyTagHTML(i, keywordLists[KeywordIndex_Tag], styler, tagDontFold, isXml, allowScripts);
 				if (eClass == SCE_H_SCRIPT || eClass == SCE_H_COMMENT) {
 					if (!tagClosing) {
 						inScriptType = eNonHtmlScript;
@@ -919,7 +911,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			break;
 		case SCE_H_ATTRIBUTE:
 			if (!IsAttributeContinue(ch)) {
-				isLanguageType = classifyAttribHTML(inScriptType, styler.GetStartSegment(), i, keywordLists[KeywordIndex_Attribute], styler);
+				isLanguageType = classifyAttribHTML(inScriptType, i, keywordLists[KeywordIndex_Attribute], styler);
 				if (ch == '>') {
 					styler.ColorTo(i + 1, SCE_H_TAG);
 					if (inScriptType == eNonHtmlScript) {
@@ -1094,7 +1086,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				if (state == SCE_HJ_NUMBER) {
 					styler.ColorTo(i, statePrintForState(SCE_HJ_NUMBER, inScriptType));
 				} else {
-					classifyWordHTJS(styler.GetStartSegment(), i, keywordLists[KeywordIndex_JavaScript], styler, inScriptType);
+					classifyWordHTJS(i, keywordLists[KeywordIndex_JavaScript], styler, inScriptType);
 				}
 				state = SCE_HJ_DEFAULT;
 			}
@@ -1201,7 +1193,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 					styler.ColorTo(i, statePrintForState(SCE_HB_NUMBER, inScriptType));
 					state = SCE_HB_DEFAULT;
 				} else {
-					state = classifyWordHTVB(styler.GetStartSegment(), i, keywordLists[KeywordIndex_VBScript], styler, inScriptType);
+					state = classifyWordHTVB(i, keywordLists[KeywordIndex_VBScript], styler, inScriptType);
 				}
 			}
 			break;
@@ -1272,15 +1264,16 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 
 	switch (state) {
 	case SCE_HJ_WORD:
-		classifyWordHTJS(styler.GetStartSegment(), lengthDoc, keywordLists[KeywordIndex_JavaScript], styler, inScriptType);
+		classifyWordHTJS(lengthDoc, keywordLists[KeywordIndex_JavaScript], styler, inScriptType);
 		break;
 	case SCE_HB_WORD:
-		classifyWordHTVB(styler.GetStartSegment(), lengthDoc, keywordLists[KeywordIndex_VBScript], styler, inScriptType);
+		classifyWordHTVB(lengthDoc, keywordLists[KeywordIndex_VBScript], styler, inScriptType);
 		break;
 	default:
-		StateToPrint = statePrintForState(state, inScriptType);
-		if (static_cast<Sci_Position>(styler.GetStartSegment()) < lengthDoc)
+		if (static_cast<Sci_Position>(styler.GetStartSegment()) < lengthDoc) {
+			StateToPrint = statePrintForState(state, inScriptType);
 			styler.ColorTo(lengthDoc, StateToPrint);
+		}
 		break;
 	}
 

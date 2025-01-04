@@ -213,7 +213,8 @@ void LineLayout::AddLineStart(Sci::Position start) {
 		const int newMaxLines = lines + 20;
 		std::unique_ptr<int[]> newLineStarts = std::make_unique<int[]>(newMaxLines);
 		if (lenLineStarts) {
-			std::copy(lineStarts.get(), lineStarts.get() + lenLineStarts, newLineStarts.get());
+			//std::copy_n(lineStarts.get(), lenLineStarts, newLineStarts.get());
+			memcpy(newLineStarts.get(), lineStarts.get(), lenLineStarts*sizeof(int));
 		}
 		lineStarts = std::move(newLineStarts);
 		lenLineStarts = newMaxLines;

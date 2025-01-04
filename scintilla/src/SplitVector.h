@@ -263,9 +263,8 @@ public:
 				memset(ptr, 0, insertLength*sizeof(T));
 			} else {
 				static_assert(std::is_nothrow_default_constructible_v<T>);
-				for (ptrdiff_t elem = 0; elem < insertLength; elem++) {
+				for (ptrdiff_t elem = 0; elem < insertLength; elem++, ptr++) {
 					::new (ptr)T();
-					ptr++;
 				}
 			}
 			lengthBody += insertLength;
