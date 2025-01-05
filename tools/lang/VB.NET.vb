@@ -69,7 +69,7 @@ Imports
 Inherits
 Interface Of
 	Inherits
-	Property
+	Property As Implements
 	Function
 	Sub
 	Event
@@ -98,7 +98,6 @@ Property As Implements
 	Set()
 	End Set
 End Property
-Property As Implements
 RaiseEvent
 ReDim Preserve
 Rem
@@ -163,6 +162,8 @@ Xor
 ' https://learn.microsoft.com/en-us/dotnet/visual-basic/programming-guide/language-features/procedures/lambda-expressions
 Function() And
 Sub() And
+Async Sub()
+End Sub
 
 ' https://learn.microsoft.com/en-us/dotnet/visual-basic/language-reference/modifiers/
 Ansi Assembly Async Auto
