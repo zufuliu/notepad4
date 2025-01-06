@@ -188,7 +188,6 @@ int classifyTagHTML(Sci_PositionU end, const WordList &keywords, LexAccessor &st
 	char withSpace[126 + 2];
 	withSpace[0] = ' ';
 	withSpace[1] = '\0';
-	const char *tag = withSpace + 1;
 	// Copy after the '<' and stop before space
 	Sci_PositionU i = 1;
 	bool dashColon = false;
@@ -214,10 +213,11 @@ int classifyTagHTML(Sci_PositionU end, const WordList &keywords, LexAccessor &st
 	// if the current language is XML, I can fold any tag
 	// if the current language is HTML, I don't want to fold certain tags (input, meta, etc.)
 	//...to find it in the list of no-container-tags
-	tagDontFold = (!isXml) && (nullptr != strstr(htmlVoidTagList, withSpace));
+	tagDontFold = (!isXml) && IsHtmlVoidTag(withSpace);
 
 	//now we can remove the trailing space
 	withSpace[i] = '\0';
+	const char * const tag = withSpace + 1;
 
 	// No keywords -> all are known
 	int chAttr = SCE_H_TAGUNKNOWN;

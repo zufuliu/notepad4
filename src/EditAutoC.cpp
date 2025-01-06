@@ -1913,17 +1913,6 @@ void EditAutoCloseBraceQuote(int ch, AutoInsertCharacter what) noexcept {
 	}
 }
 
-static inline bool IsHtmlVoidTag(const char *word) noexcept {
-	// same as htmlVoidTagList in scintilla/lexlib/DocUtils.h
-	const char *p = StrStrIA(
-		// void elements
-		" area base basefont br col command embed frame hr img input isindex keygen link meta param source track wbr "
-		// end tag can be omitted
-		"p "
-		, word);
-	return p != nullptr;
-}
-
 void EditAutoCloseXMLTag() noexcept {
 	char tchBuf[512];
 	const Sci_Position iCurPos = SciCall_GetCurrentPos();

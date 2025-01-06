@@ -6397,11 +6397,10 @@ static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam
 		ResizeDlg_InitY2(hwnd, cxInsertTagDlg, cyInsertTagDlg, IDC_RESIZEGRIP2, IDC_MODIFY_LINE_PREFIX, IDC_MODIFY_LINE_APPEND);
 
 		MultilineEditSetup(hwnd, IDC_MODIFY_LINE_PREFIX);
-		SetDlgItemText(hwnd, IDC_MODIFY_LINE_PREFIX, L"<tag>");
 		MultilineEditSetup(hwnd, IDC_MODIFY_LINE_APPEND);
-		SetDlgItemText(hwnd, IDC_MODIFY_LINE_APPEND, L"</tag>");
 
 		HWND hwndCtl = GetDlgItem(hwnd, IDC_MODIFY_LINE_PREFIX);
+		SetWindowText(hwndCtl, L"<tag>");
 		SetFocus(hwndCtl);
 		PostMessage(hwndCtl, EM_SETSEL, 1, 4);
 		CenterDlgInParent(hwnd);
@@ -6445,7 +6444,7 @@ static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam
 				if (len >= 3) {
 					LPCWSTR pwCur = StrChr(wszOpen, L'<');
 					if (pwCur != nullptr) {
-						LPWSTR wchIns = static_cast<LPWSTR>(NP2HeapAlloc((len + 5) * sizeof(WCHAR)));
+						LPWSTR wchIns = static_cast<LPWSTR>(NP2HeapAlloc((len + 16) * sizeof(WCHAR)));
 						wchIns[0] = L'<';
 						wchIns[1] = L' ';
 						int	cchIns = 2;
@@ -6462,10 +6461,17 @@ static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam
 						if (*pwCur == L'>' && pwCur[-1] != L'/') {
 							wchIns[cchIns] = L' ';
 							wchIns[cchIns + 1] = L'\0';
-							if (cchIns > 3 && (pLexCurrent->iLexer == SCLEX_HTML || pLexCurrent->iLexer == SCLEX_PHPSCRIPT)) {
-								// HTML void tag except <p>
-								pwCur = StrStrI(L" area base basefont br col command embed frame hr img input isindex keygen link meta param source track wbr ", wchIns + 1);
-								if (pwCur != nullptr) {
+							if (cchIns > 3 && cchIns < 16 && (pLexCurrent->iLexer == SCLEX_HTML || pLexCurrent->iLexer == SCLEX_PHPSCRIPT)) {
+								char tag[16]; // HTML void tag except <p>
+#if NP2_USE_SSE2
+								const __m128i *mm = reinterpret_cast<const __m128i *>(wchIns);
+								_mm_storeu_si128(reinterpret_cast<__m128i *>(tag), _mm_packus_epi16(_mm_loadu_si128(mm), _mm_loadu_si128(mm + 1)));
+#else
+								for (int i = 0; i < 16; i++) {
+									tag[i] = static_cast<char>(wchIns[i]);
+								}
+#endif
+								if (IsHtmlVoidTag(tag + 1)) {
 									cchIns = 0;
 								}
 							}

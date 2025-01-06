@@ -239,7 +239,7 @@ void PHPLexer::ClassifyHtmlTag() {
 					--p;
 				}
 				*p = ' ';
-				if (nullptr != strstr(htmlVoidTagList, p)) {
+				if (IsHtmlVoidTag(p)) {
 					tagType = HtmlTagType::Void;
 				}
 			}
