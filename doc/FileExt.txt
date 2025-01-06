@@ -265,6 +265,7 @@ Config File
 
 CSV File
 	csv
+	tsv
 
 
 D Source

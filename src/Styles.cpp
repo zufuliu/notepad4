@@ -291,6 +291,7 @@ static WCHAR favoriteSchemesConfig[MAX_FAVORITE_SCHEMES_CONFIG_SIZE];
 // Currently used lexer
 PEDITLEXER pLexCurrent = &lexTextFile;
 int np2LexLangIndex = 0;
+static bool tabSeparatedValue; // for TSV file
 static int iCsvOption = ('\"' << 8) | ',';
 
 #define CsvOption_BackslashEscape	(1 << 15)
@@ -2402,6 +2403,13 @@ static void Style_UpdateLexerLang(LPCEDITLEXER pLex, LPCWSTR lpszExt, LPCWSTR lp
 		}
 		break;
 
+	case NP2LEX_CSV:
+		if (StrCaseEqual(L"tsv", lpszExt)) {
+			tabSeparatedValue = true;
+			iCsvOption = ('\"' << 8) | '\t';
+		}
+		break;
+
 	case NP2LEX_HTML:
 		if (StrCaseEqual(L"jsp", lpszExt)) {
 			np2LexLangIndex = IDM_LEXER_JSP;
@@ -2619,6 +2627,7 @@ bool Style_SetLexerFromFile(LPCWSTR lpszFile) noexcept {
 	LPCWSTR lpszExt = nullptr;
 	PEDITLEXER pLexNew = nullptr;
 	PEDITLEXER pLexSniffed;
+	tabSeparatedValue = false;
 
 	if (bAutoSelect) {
 		pLexNew = Style_GetLexerFromFile(lpszFile, !fNoCGIGuess, &lpszExt, &bDotFile);
@@ -2722,7 +2731,7 @@ bool Style_SetLexerFromFile(LPCWSTR lpszFile) noexcept {
 		pLexNew = pLexArray[iDefaultLexerIndex];
 	}
 	// Apply the new lexer
-	if (pLexNew->iLexer == SCLEX_CSV) {
+	if (pLexNew->iLexer == SCLEX_CSV && !tabSeparatedValue) {
 		Style_SniffCSV();
 	}
 	Style_SetLexer(pLexNew, true);
