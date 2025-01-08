@@ -1,10 +1,10 @@
-# Ruby 3.3 https://www.ruby-lang.org/en/documentation/
+# Ruby 3.4 https://www.ruby-lang.org/en/documentation/
 # https://docs.ruby-lang.org/en/
 # https://ruby-doc.org/
 # https://rubyreferences.github.io/
 
 #! Keywords			===========================================================
-# keywords_rdoc.html
+# https://docs.ruby-lang.org/en/master/syntax/keywords_rdoc.html
 __ENCODING__
 __LINE__
 __FILE__
@@ -29,7 +29,7 @@ yield
 it
 
 #! Pre-defined constants	===================================================
-# globals_rdoc.html#label-Pre-defined+global+constants
+# https://docs.ruby-lang.org/en/master/globals_rdoc.html#label-Pre-Defined+Global+Constants
 TRUE
 FALSE
 NIL
@@ -52,6 +52,7 @@ RUBY_DESCRIPTION
 SCRIPT_LINES__
 
 #! code folding		===========================================================
+# https://docs.ruby-lang.org/en/master/syntax/control_expressions_rdoc.html
 begin
 end
 case
@@ -62,7 +63,7 @@ def end
 end
 do
 end
-for
+for do
 end
 if
 end
@@ -70,13 +71,13 @@ module end
 end
 unless
 end
-until
+until do
 end
-while
+while do
 end
 
 #! Pre-defined variables	===================================================
-# globals_rdoc.html
+# https://docs.ruby-lang.org/en/master/globals_rdoc.html#label-Pre-Defined+Global+Variables
 $DEBUG
 $LOAD_PATH
 $LOADED_FEATURES

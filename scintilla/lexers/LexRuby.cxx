@@ -85,7 +85,7 @@ constexpr bool isQestionMarkChar(char chNext, char chNext2) noexcept {
 	return !IsASpace(chNext);
 }
 
-#define MAX_KEYWORD_LENGTH (MaxKeywordSize - 1)
+#define MAX_KEYWORD_LENGTH 7 // module
 
 bool followsDot(Sci_PositionU pos, LexAccessor &styler) {
 	while (pos > 1) {
@@ -106,8 +106,6 @@ bool followsDot(Sci_PositionU pos, LexAccessor &styler) {
 	return false;
 }
 
-// Forward declarations
-bool keywordDoStartsLoop(Sci_Position pos, LexAccessor &styler);
 bool keywordIsModifier(const char *word, Sci_Position pos, LexAccessor &styler);
 
 constexpr bool IsIdentifierStyle(int style) noexcept {
@@ -118,8 +116,8 @@ constexpr bool IsIdentifierStyle(int style) noexcept {
 		|| style == SCE_RB_BUILTIN_FUNCTION;
 }
 
-int ClassifyWordRb(Sci_PositionU end, char ch, char chNext, LexerWordList keywordLists, LexAccessor &styler, char *prevWord) {
-	char s[MAX_KEYWORD_LENGTH + 1];
+int ClassifyWordRb(Sci_PositionU end, char ch, char chNext, LexerWordList keywordLists, LexAccessor &styler, bool &modifierDo, char *prevWord) {
+	char s[MaxKeywordSize];
 	const Sci_PositionU start = styler.GetStartSegment();
 	styler.GetRange(start, end, s, sizeof(s));
 	int chAttr = SCE_RB_IDENTIFIER;
@@ -142,7 +140,7 @@ int ClassifyWordRb(Sci_PositionU end, char ch, char chNext, LexerWordList keywor
 	} else if (keywordLists[KeywordIndex_Keyword].InList(s) && ((start < 2) || !followsDot(start, styler))) {
 		// Order from most likely used to least likely
 		// Lots of ways to do a loop in Ruby besides 'while/until'
-		if ((StrEqual(s, "do") && keywordDoStartsLoop(start, styler))
+		if ((modifierDo && StrEqual(s, "do"))
 			|| (StrEqualsAny(s, "if", "while", "unless", "until") && keywordIsModifier(s, start, styler))) {
 
 			// Demoted keywords are colored as keywords,
@@ -156,9 +154,12 @@ int ClassifyWordRb(Sci_PositionU end, char ch, char chNext, LexerWordList keywor
 
 			chAttr = SCE_RB_WORD_DEMOTED;
 		} else {
+			if (StrEqualsAny(s, "while", "until", "for")) {
+				modifierDo = true;
+			}
 			chAttr = SCE_RB_WORD;
 			style = SCE_RB_WORD;
-			strcpy(prevWord, s);
+			memcpy(prevWord, s, MAX_KEYWORD_LENGTH + 1);
 		}
 	} else {
 		if (IsUpperCase(s[0])) {
@@ -342,39 +343,38 @@ void InterpolateVariable(LexAccessor &styler, int state, Sci_Position &i, char &
 //
 // iPrev points to the start of <<
 
-bool sureThisIsHeredoc(Sci_Position iPrev, LexAccessor &styler, char *prevWord) {
+bool sureThisIsHeredoc(Sci_Position iPrev, LexAccessor &styler) {
 	// Not so fast, since Ruby's so dynamic.  Check the context
 	// to make sure we're OK.
 	const Sci_Line lineStart = styler.GetLine(iPrev);
 	const Sci_Position lineStartPosn = styler.LineStart(lineStart);
-	styler.Flush();
 
 	// Find the first word after some whitespace
 	const Sci_Position firstWordPosn = LexSkipSpaceTab(styler, lineStartPosn, iPrev);
-	if (firstWordPosn >= iPrev) {
+	if (firstWordPosn + 3 > iPrev) {
 		// Have something like {^	  <<}
 		//XXX Look at the first previous non-comment non-white line
 		// to establish the context.  Not too likely though.
 		return true;
 	}
+
+	styler.Flush();
 	const int prevStyle = styler.StyleAt(firstWordPosn);
-	switch (prevStyle) {
-	case SCE_RB_WORD:
-	case SCE_RB_WORD_DEMOTED:
-	//case SCE_RB_IDENTIFIER:
-		break;
-	default:
+	if (prevStyle != SCE_RB_WORD) {
 		return true;
 	}
+
+	char prevWord[MAX_KEYWORD_LENGTH + 1];
+	unsigned wordLen = 0;
 	Sci_Position firstWordEndPosn = firstWordPosn;
-	char *dst = prevWord;
 	for (;;) {
-		if (firstWordEndPosn >= iPrev ||
-			styler.StyleAt(firstWordEndPosn) != prevStyle) {
-			*dst = 0;
+		if (wordLen == MAX_KEYWORD_LENGTH || firstWordEndPosn >= iPrev ||
+			styler.StyleAt(firstWordEndPosn) != SCE_RB_WORD) {
+			prevWord[wordLen] = '\0';
 			break;
 		}
-		*dst++ = styler[firstWordEndPosn];
+		prevWord[wordLen] = styler[firstWordEndPosn];
+		wordLen += 1;
 		firstWordEndPosn += 1;
 	}
 	//XXX Write a style-aware thing to regex scintilla buffer objects
@@ -683,12 +683,13 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 
 	bool preferRE = true;
 	bool afterDef = false;
+	bool is_real_number = true;	  // Differentiate between constants and ?-sequences.
+	bool modifierDo = false;
 	int state = initStyle;
-	char prevWord[MAX_KEYWORD_LENGTH + 1] {}; // 1 byte for zero
+	char prevWord[MAX_KEYWORD_LENGTH + 1]{};
 
 	char chPrev = styler.SafeGetCharAt(startPos - 1);
 	char chNext = styler.SafeGetCharAt(startPos);
-	bool is_real_number = true;	  // Differentiate between constants and ?-sequences.
 	styler.StartAt(startPos);
 	styler.StartSegment(startPos);
 
@@ -780,7 +781,7 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 			// Begin of here-doc (the line after the here-doc delimiter):
 			HereDoc.State = 2;
 			if (state == SCE_RB_WORD) {
-				ClassifyWordRb(i, ch, chNext, keywordLists, styler, prevWord);
+				ClassifyWordRb(i, ch, chNext, keywordLists, styler, modifierDo, prevWord);
 			} else {
 				styler.ColorTo(i, state);
 			}
@@ -876,7 +877,7 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 					// heredoc_identifier routine.
 					// Nothing else to do.
 				} else if (preferRE) {
-					if (sureThisIsHeredoc(i - 1, styler, prevWord)) {
+					if (sureThisIsHeredoc(i - 1, styler)) {
 						state = SCE_RB_HERE_DELIM;
 						HereDoc.State = 0;
 					}
@@ -1143,12 +1144,12 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 					// No need to handle this state -- we'll just move to the end
 					preferRE = false;
 				} else {
-					const int word_style = ClassifyWordRb(i, ch, chNext, keywordLists, styler, prevWord);
+					const int word_style = ClassifyWordRb(i, ch, chNext, keywordLists, styler, modifierDo, prevWord);
 					preferRE = false;
 					switch (word_style) {
 					case SCE_RB_WORD:
 						afterDef = StrEqual(prevWord, "def");
-						preferRE = !IsLowerCase(prevWord[0]) || keywordLists[KeywordIndex_Regex].InList(prevWord);
+						preferRE = keywordLists[KeywordIndex_Regex].InList(prevWord);
 						break;
 
 					case SCE_RB_WORD_DEMOTED:
@@ -1474,11 +1475,14 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 			break;
 		}
 		chPrev = ch;
+		if (modifierDo && IsEOLChar(ch)) {
+			modifierDo = false;
+		}
 	}
 	if (state == SCE_RB_WORD) {
 		// We've ended on a word, possibly at EOF, and need to
 		// classify it.
-		ClassifyWordRb(lengthDoc, '\0', '\0', keywordLists, styler, prevWord);
+		ClassifyWordRb(lengthDoc, '\0', '\0', keywordLists, styler, modifierDo, prevWord);
 	} else {
 		styler.ColorTo(lengthDoc, state);
 	}
@@ -1548,17 +1552,14 @@ bool keywordIsModifier(const char *word, Sci_Position pos, LexAccessor &styler) 
 		return false;
 	}
 	// First things where the action is unambiguous
-	switch (style) {
-	case SCE_RB_DEFAULT:
-	case SCE_RB_COMMENTLINE:
-	case SCE_RB_POD:
-	case SCE_RB_CLASS_NAME:
-	case SCE_RB_DEF_NAME:
-	case SCE_RB_MODULE_NAME:
-		return false;
-	case SCE_RB_OPERATOR:
-		break;
-	case SCE_RB_WORD:
+	if (style == SCE_RB_OPERATOR) {
+		// Assume that if the keyword follows an operator,
+		// usually it's a block assignment, like
+		// a << if x then y else z
+		const char ch = styler[pos];
+		return AnyOf(ch, ')', ']', '}');
+	}
+	if (style == SCE_RB_WORD) {
 		// Watch out for uses of 'else if'
 		//XXX: Make a list of other keywords where 'if' isn't a modifier
 		//	   and can appear legitimately
@@ -1569,69 +1570,8 @@ bool keywordIsModifier(const char *word, Sci_Position pos, LexAccessor &styler) 
 			return !StrEqual(prevWord, "else");
 		}
 		return true;
-	default:
-		return true;
 	}
-	// Assume that if the keyword follows an operator,
-	// usually it's a block assignment, like
-	// a << if x then y else z
-
-	const char ch = styler[pos];
-	return AnyOf(ch, ')', ']', '}');
-}
-
-#define WHILE_BACKWARDS "elihw"
-#define UNTIL_BACKWARDS "litnu"
-#define FOR_BACKWARDS "rof"
-
-// Nothing fancy -- look to see if we follow a while/until somewhere
-// on the current line
-
-bool keywordDoStartsLoop(Sci_Position pos, LexAccessor &styler) {
-	const Sci_Line lineStart = styler.GetLine(pos);
-	const Sci_Position lineStartPosn = styler.LineStart(lineStart);
-	styler.Flush();
-	while (--pos >= lineStartPosn) {
-		const int style = styler.StyleAt(pos);
-		if (style == SCE_RB_DEFAULT) {
-			const char ch = styler[pos];
-			if (ch == '\r' || ch == '\n') {
-				// Scintilla's LineStart() and GetLine() routines aren't
-				// platform-independent, so if we have text prepared with
-				// a different system we can't rely on it.
-				return false;
-			}
-		} else if (style == SCE_RB_WORD) {
-			// Check for while or until, but write the word in backwards
-			char prevWord[MAX_KEYWORD_LENGTH + 1]; // 1 byte for zero
-			char *dst = prevWord;
-			int wordLen = 0;
-			Sci_Position start_word;
-			for (start_word = pos;
-				start_word >= lineStartPosn && styler.StyleAt(start_word) == SCE_RB_WORD;
-				start_word--) {
-				if (++wordLen < MAX_KEYWORD_LENGTH) {
-					*dst++ = styler[start_word];
-				}
-			}
-			*dst = 0;
-			// Did we see our keyword?
-			if (StrEqualsAny(prevWord, WHILE_BACKWARDS, UNTIL_BACKWARDS, FOR_BACKWARDS)) {
-				return true;
-			}
-			// We can move pos to the beginning of the keyword, and then
-			// accept another decrement, as we can never have two contiguous
-			// keywords:
-			// word1 word2
-			//			 ^
-			//		  <-  move to start_word
-			//		^
-			//		<- loop decrement
-			//	   ^  # pointing to end of word1 is fine
-			pos = start_word;
-		}
-	}
-	return false;
+	return !AnyOf(style, SCE_RB_DEFAULT, SCE_RB_COMMENTLINE, SCE_RB_POD, SCE_RB_CLASS_NAME, SCE_RB_DEF_NAME, SCE_RB_MODULE_NAME);
 }
 
 /*
