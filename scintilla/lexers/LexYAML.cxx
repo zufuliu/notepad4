@@ -59,7 +59,7 @@ constexpr bool IsYAMLAnchorChar(int ch) noexcept {
 	return IsGraphic(ch) && !IsYAMLFlowIndicator(ch);
 }
 
-bool IsYAMLText(StyleContext &sc, int braceCount, const WordList *kwList) {
+bool IsYAMLText(StyleContext &sc, int braceCount, LexerWordList keywordLists) {
 	const int state = sc.state;
 	const Sci_Position endPos = braceCount? sc.styler.Length() : sc.lineStartNext;
 	const unsigned char chNext = LexGetNextChar(sc.styler, sc.currentPos, endPos);
@@ -74,7 +74,7 @@ bool IsYAMLText(StyleContext &sc, int braceCount, const WordList *kwList) {
 		if (state == SCE_YAML_IDENTIFIER) {
 			char s[8];
 			sc.GetCurrentLowered(s, sizeof(s));
-			if (kwList->InList(s)) {
+			if (keywordLists[0].InList(s)) {
 				sc.ChangeState(SCE_YAML_KEYWORD);
 				sc.SetState(SCE_YAML_DEFAULT);
 			}
@@ -213,7 +213,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			if (!IsDecimalNumber(sc.chPrev, sc.ch, sc.chNext)) {
 				if (IsISODateTime(sc.ch, sc.chNext)) {
 					sc.ChangeState(SCE_YAML_DATETIME);
-				} else if (IsYAMLText(sc, braceCount, nullptr)) {
+				} else if (IsYAMLText(sc, braceCount, keywordLists)) {
 					continue;
 				}
 			}
@@ -221,7 +221,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 		case SCE_YAML_DATETIME:
 			if (!(IsIdentifierChar(sc.ch) || IsISODateTime(sc.ch, sc.chNext))) {
-				 if (IsYAMLText(sc, braceCount, nullptr)) {
+				 if (IsYAMLText(sc, braceCount, keywordLists)) {
 					continue;
 				}
 			}
@@ -229,7 +229,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 		case SCE_YAML_IDENTIFIER:
 			if (!IsAlpha(sc.ch)) {
-				if (IsYAMLText(sc, braceCount, &keywordLists[0])) {
+				if (IsYAMLText(sc, braceCount, keywordLists)) {
 					continue;
 				}
 			}

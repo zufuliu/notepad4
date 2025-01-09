@@ -73,7 +73,7 @@ constexpr bool IsTOMLUnquotedKey(int ch) noexcept {
 	return IsIdentifierChar(ch) || ch == '-';
 }
 
-bool IsTOMLKey(StyleContext &sc, int braceCount, const WordList *kwList) {
+bool IsTOMLKey(StyleContext &sc, int braceCount, LexerWordList keywordLists) {
 	if (braceCount) {
 		const int chNext = sc.GetLineNextChar();
 		if (chNext == '=' || chNext == '.' || chNext == '-') {
@@ -84,10 +84,7 @@ bool IsTOMLKey(StyleContext &sc, int braceCount, const WordList *kwList) {
 	if (sc.state == SCE_TOML_IDENTIFIER) {
 		char s[8];
 		sc.GetCurrentLowered(s, sizeof(s));
-#if defined(__clang__)
-		__builtin_assume(kwList != nullptr); // suppress [clang-analyzer-core.CallAndMessage]
-#endif
-		if (kwList->InList(s)) {
+		if (keywordLists[0].InList(s)) {
 			sc.ChangeState(SCE_TOML_KEYWORD);
 		}
 	}
@@ -138,7 +135,7 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			if (!IsDecimalNumber(sc.chPrev, sc.ch, sc.chNext)) {
 				if (IsISODateTime(sc.ch, sc.chNext)) {
 					sc.ChangeState(SCE_TOML_DATETIME);
-				} else if (IsTOMLKey(sc, braceCount, nullptr)) {
+				} else if (IsTOMLKey(sc, braceCount, keywordLists)) {
 					keyState = TOMLKeyState::Unquoted;
 					continue;
 				}
@@ -147,7 +144,7 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 		case SCE_TOML_DATETIME:
 			if (!(IsIdentifierChar(sc.ch) || IsISODateTime(sc.ch, sc.chNext))) {
-				if (IsTOMLKey(sc, braceCount, nullptr)) {
+				if (IsTOMLKey(sc, braceCount, keywordLists)) {
 					keyState = TOMLKeyState::Unquoted;
 					continue;
 				}
@@ -156,7 +153,7 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 		case SCE_TOML_IDENTIFIER:
 			if (!IsIdentifierChar(sc.ch)) {
-				if (IsTOMLKey(sc, braceCount, &keywordLists[0])) {
+				if (IsTOMLKey(sc, braceCount, keywordLists)) {
 					keyState = TOMLKeyState::Unquoted;
 					continue;
 				}
@@ -244,7 +241,7 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					}
 				}
 				sc.Forward();
-				if (!IsTripleString(sc.state) && IsTOMLKey(sc, braceCount, nullptr)) {
+				if (!IsTripleString(sc.state) && IsTOMLKey(sc, braceCount, keywordLists)) {
 					keyState = TOMLKeyState::Unquoted;
 					continue;
 				}
