@@ -23,6 +23,9 @@ LexerKeywordIndexList = {}
 ColorNameList = set()
 CSharpKeywordMap = {}
 GroovyKeyword = []
+HtmlVoidTagList = """area base basefont br col command embed frame hr
+img input isindex keygen link meta param source track wbr
+p""".split()
 JavaKeywordMap = {}
 JavaScriptKeywordMap = {}
 SGMLKeyword = []
@@ -97,6 +100,9 @@ def BuildKeywordContent(rid, lexer, keywordList, keywordCount=16):
 			length = len(lines) + sum(len(line) for line in lines)
 			if length >= 0xffff:
 				print(rid, comment, 'string exceeds 64 KiB:', length)
+			if attr & KeywordAttr.PrefixSpace:
+				attr &= ~KeywordAttr.PrefixSpace
+				lines[0] = ' ' + lines[0]
 			output.extend('"' + line + ' "' for line in lines)
 		else:
 			output.append('nullptr')
@@ -1299,6 +1305,7 @@ def parse_html_api_file(path):
 	values = set(values) - set(keywords) - set(attributes)
 	return [
 		('tag', keywords, KeywordAttr.Special),
+		('void tag', HtmlVoidTagList, KeywordAttr.NoAutoComp | KeywordAttr.PrefixSpace),
 		('JavaScript', JavaScriptKeywordMap['keywords'], KeywordAttr.NoAutoComp),
 		('VBScript', VBScriptKeyword, KeywordAttr.MakeLower | KeywordAttr.NoAutoComp),
 		('SGML', SGMLKeyword, KeywordAttr.Default),
@@ -1911,6 +1918,7 @@ def parse_php_api_file(path):
 		('constant', keywordMap['constant'], KeywordAttr.NoLexer),
 		('function', keywordMap['function'], KeywordAttr.NoLexer),
 		('misc', keywordMap['misc'], KeywordAttr.NoLexer),
+		('void tag', HtmlVoidTagList, KeywordAttr.NoAutoComp | KeywordAttr.PrefixSpace),
 		('JavaScript', JavaScriptKeywordMap['keywords'], KeywordAttr.NoAutoComp),
 		('phpdoc', keywordMap['phpdoc'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp | KeywordAttr.Special),
 	]
@@ -2762,6 +2770,7 @@ def parse_xml_api_file(path):
 	SGMLKeyword.extend(keywords)
 	return [
 		('tag', [], KeywordAttr.Default),
+		('void tag', [], KeywordAttr.Default),
 		('JavaScript', [], KeywordAttr.Default),
 		('VBScript', [], KeywordAttr.Default),
 		('SGML', keywords, KeywordAttr.Default),

@@ -118,10 +118,9 @@ constexpr bool IsSchemeNameChar(int ch) noexcept {
 
 inline bool IsHtmlVoidTag(const char *tag) noexcept {
 	return nullptr != StrStrIA(
-	// void elements
-	" area base basefont br col command embed frame hr img input isindex keygen link meta param source track wbr "
-	// end tag can be omitted
-	"p ", tag);
+	// void elements, should keep sync with EditLexers/stlHTML.cpp
+	" area base basefont br col command embed frame hr img input isindex keygen link meta p param source track wbr "
+	, tag);
 }
 
 constexpr int ToUpperA(int ch) noexcept {

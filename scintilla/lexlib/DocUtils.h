@@ -4,16 +4,6 @@
 
 namespace Lexilla {
 
-constexpr size_t maxHtmlVoidTagLen = CStrLen("basefont");
-
-inline bool IsHtmlVoidTag(const char *tag) noexcept {
-	return nullptr != strstr(
-	// void elements
-	" area base basefont br col command embed frame hr img input isindex keygen link meta param source track wbr "
-	// end tag can be omitted
-	"p ", tag);
-}
-
 // based on CommonMark Spec 6.6 Raw HTML
 constexpr bool IsHtmlTagStart(int ch) noexcept {
 	return IsAlpha(ch);

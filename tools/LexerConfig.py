@@ -75,6 +75,7 @@ class KeywordAttr(IntFlag):
 	NoLexer = 4		# not used by lexer, listed for auto-completion.
 	NoAutoComp = 8	# don't add to default auto-completion list.
 	Special = 256	# used by context based auto-completion.
+	PrefixSpace = 512	# prefix first item with extra space.
 
 TabSettings_Default = {
 	'tab_width': 4,
