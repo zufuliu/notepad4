@@ -225,14 +225,18 @@ void PHPLexer::ClassifyHtmlTag(LexerWordList keywordLists) {
 		sc.SetState((tagType == HtmlTagType::Question) ? SCE_H_QUESTION : SCE_H_TAG);
 	} else if (tagType == HtmlTagType::None) {
 		char s[16];
+		memset(s, '\0', 4);
 		sc.GetCurrentLowered(s, sizeof(s));
-		const char * const p = s + 1;
+		const char *p = s + 1;
 		if (StrEqual(p, "script")) {
 			tagType = HtmlTagType::Script;
 		} else if (StrEqual(p, "style")) {
 			tagType = HtmlTagType::Style;
 		} else {
 			tagType = HtmlTagType::Normal;
+			if (p[0] == '/') {
+				++p;
+			}
 			if (keywordLists[KeywordIndex_VoidTag].InList(p)) {
 				tagType = HtmlTagType::Void;
 			}

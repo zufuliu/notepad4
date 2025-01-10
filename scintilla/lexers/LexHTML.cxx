@@ -153,14 +153,14 @@ constexpr bool isCommentASPState(int state) noexcept {
 }
 
 bool classifyAttribHTML(Sci_PositionU end, LexerWordList keywordLists, LexAccessor &styler, script_mode inScriptType, bool isXml) {
+	char s[MaxKeywordSize];
 	int chAttr = SCE_H_ATTRIBUTEUNKNOWN;
 	bool isLanguageType = false;
 	const Sci_PositionU start = styler.GetStartSegment();
-	if (IsNumberChar(styler[start])) {
+	styler.GetRangeLowered(start, end, s, sizeof(s));
+	if (IsNumberChar(s[0])) {
 		chAttr = SCE_H_NUMBER;
 	} else {
-		char s[MaxKeywordSize];
-		styler.GetRangeLowered(start, end, s, sizeof(s));
 		if (inScriptType == eNonHtmlScript) {
 			// see https://html.spec.whatwg.org/multipage/scripting.html
 			if (StrEqualsAny(s, "type", "language")) {
@@ -186,25 +186,15 @@ bool isHTMLCustomElement(const char *tag, size_t length, bool dashColon) noexcep
 }
 
 int classifyTagHTML(Sci_PositionU end, LexerWordList keywordLists, LexAccessor &styler, bool &tagDontFold, bool isXml, bool allowScripts) {
-	char tag[127 + 1];
-	// Copy after the '<' and stop before space
-	Sci_PositionU length = 0;
-	bool dashColon = false;
+	char s[63 + 1];
+	memset(s, '\0', 4);
 	const Sci_PositionU start = styler.GetStartSegment();
-	for (Sci_PositionU cPos = start; cPos < end && length < sizeof(tag) - 1; cPos++) {
-		const char ch = styler[cPos];
-		if (static_cast<unsigned char>(ch) <= ' ') {
-			break;
-		}
-		if ((ch != '<') && (ch != '/')) {
-			tag[length++] = isXml ? ch : MakeLowerCase(ch);
-			if (ch == ':' || ch == '-') {
-				dashColon = true;
-			}
-		}
+	styler.GetRange(start, end, s, sizeof(s));
+	char *tag = s;
+	if (tag[0] == '<') {
+		tag += (tag[1] == '/') ? 2 : 1;
 	}
 
-	tag[length] = '\0';
 	int chAttr = SCE_H_TAGUNKNOWN;
 	bool customElement = false;
 	if (tag[0] == '!') {
@@ -212,10 +202,20 @@ int classifyTagHTML(Sci_PositionU end, LexerWordList keywordLists, LexAccessor &
 	} else if (isXml) {
 		chAttr = SCE_H_TAG;
 	} else {
+		bool dashColon = false;
+		char *t = tag;
+		while (*t) {
+			if (*t >= 'A' && *t <= 'Z') {
+				*t |= 'a' - 'A';
+			} else if (*t == ':' || *t == '-') {
+				dashColon = true;
+			}
+			++t;
+		}
 		tagDontFold = keywordLists[KeywordIndex_VoidTag].InList(tag);
 		if (tagDontFold || keywordLists[KeywordIndex_Tag].InList(tag)) {
 			chAttr = SCE_H_TAG;
-		} else if (isHTMLCustomElement(tag, length, dashColon)) {
+		} else if (isHTMLCustomElement(tag, t - tag, dashColon)) {
 			customElement = true;
 			chAttr = SCE_H_TAG;
 		}
@@ -227,7 +227,7 @@ int classifyTagHTML(Sci_PositionU end, LexerWordList keywordLists, LexAccessor &
 		if (allowScripts && StrEqual(tag, "script")) {
 			// check to see if this is a self-closing tag by sniffing ahead
 			bool isSelfClose = false;
-			for (Sci_PositionU cPos = end - 1; cPos < end + maxLengthCheck; cPos++) {
+			for (Sci_PositionU cPos = end; cPos < end + maxLengthCheck; cPos++) {
 				const char ch = styler.SafeGetCharAt(cPos);
 				if (ch == '\0' || ch == '>')
 					break;
