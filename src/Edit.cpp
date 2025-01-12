@@ -6461,7 +6461,7 @@ static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam
 						if (*pwCur == L'>' && pwCur[-1] != L'/') {
 							wchIns[cchIns] = L' ';
 							wchIns[cchIns + 1] = L'\0';
-							if (cchIns > 3 && cchIns < 16 && (pLexCurrent->iLexer == SCLEX_HTML || pLexCurrent->iLexer == SCLEX_PHPSCRIPT)) {
+							if (cchIns > 3 && cchIns < 16 && (pLexCurrent->iLexer != SCLEX_XML)) {
 								char tag[16]; // HTML void tag except <p>
 #if NP2_USE_SSE2
 								const __m128i *mm = reinterpret_cast<const __m128i *>(wchIns);
