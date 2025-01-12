@@ -1987,7 +1987,8 @@ void EditAutoCloseXMLTag() noexcept {
 			tchIns[cchIns] = ' ';
 			tchIns[cchIns + 1] = '\0';
 
-			if (cchIns > 2 && (pLexCurrent->iLexer == SCLEX_HTML || pLexCurrent->iLexer == SCLEX_PHPSCRIPT)) {
+			if (cchIns > 3 && (pLexCurrent->iLexer == SCLEX_HTML || pLexCurrent->iLexer == SCLEX_PHPSCRIPT)) {
+				// HTML void tag except <p>
 				if (IsHtmlVoidTag(tchIns + 1)) {
 					autoClosed = true;
 					cchIns = 0;
