@@ -74,6 +74,7 @@ constexpr bool IsTOMLUnquotedKey(int ch) noexcept {
 }
 
 bool IsTOMLKey(StyleContext &sc, int braceCount, LexerWordList keywordLists) {
+	const int state = sc.state;
 	if (braceCount) {
 		const int chNext = sc.GetLineNextChar();
 		if (chNext == '=' || chNext == '.' || chNext == '-') {
@@ -81,7 +82,7 @@ bool IsTOMLKey(StyleContext &sc, int braceCount, LexerWordList keywordLists) {
 			return true;
 		}
 	}
-	if (sc.state == SCE_TOML_IDENTIFIER) {
+	if (state == SCE_TOML_IDENTIFIER) {
 		char s[8];
 		sc.GetCurrentLowered(s, sizeof(s));
 		if (keywordLists[0].InList(s)) {

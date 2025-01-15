@@ -195,9 +195,12 @@ public:
 	bool Tentative() const noexcept {
 		return tentativeMain;
 	}
+	std::vector<SelectionRange *> SortedRanges();
+#if 0
 	std::vector<SelectionRange> RangesCopy() const {
 		return ranges;
 	}
+#endif
 };
 
 }

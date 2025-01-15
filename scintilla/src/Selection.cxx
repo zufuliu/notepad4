@@ -464,3 +464,16 @@ void Selection::RemoveDuplicates() noexcept {
 void Selection::RotateMain() noexcept {
 	mainRange = (mainRange + 1) % ranges.size();
 }
+
+std::vector<SelectionRange *> Selection::SortedRanges() {
+	std::vector<SelectionRange *> selPtrs;
+	for (SelectionRange &range : ranges) {
+		selPtrs.push_back(&range);
+	}
+	if (selPtrs.size() > 1) {
+		std::sort(selPtrs.begin(), selPtrs.end(), [](const SelectionRange *a, const SelectionRange *b) noexcept {
+			return *a < *b;
+		});
+	}
+	return selPtrs;
+}

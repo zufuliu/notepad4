@@ -2003,14 +2003,7 @@ void Editor::InsertCharacter(std::string_view sv, CharacterSource charSource) {
 		}
 
 		// Vector elements point into selection in order to change selection.
-		std::vector<SelectionRange *> selPtrs;
-		for (size_t r = 0; r < sel.Count(); r++) {
-			selPtrs.push_back(&sel.Range(r));
-		}
-		// Order selections by position in document.
-		std::sort(selPtrs.begin(), selPtrs.end(),
-			[](const SelectionRange *a, const SelectionRange *b) noexcept { return *a < *b; });
-
+		const std::vector<SelectionRange *> selPtrs = sel.SortedRanges();
 		// Loop in reverse to avoid disturbing positions of selections yet to be processed.
 		for (auto rit = selPtrs.rbegin(); rit != selPtrs.rend(); ++rit) {
 			SelectionRange *currentSel = *rit;
@@ -4393,8 +4386,8 @@ void Editor::CopySelectionRange(SelectionText &ss, bool allowLineCopy) const {
 		}
 	} else {
 		std::string text;
-		std::vector<SelectionRange> rangesInOrder = sel.RangesCopy();
 		std::string_view separator;
+		const std::vector<SelectionRange *> rangesInOrder = const_cast<Selection &>(sel).SortedRanges();
 		const bool separate = sel.selType == Selection::SelTypes::rectangle || rangesInOrder.size() > 1;
 		if (separate) {
 			if (sel.selType == Selection::SelTypes::rectangle || copySeparator.empty()) {
@@ -4402,10 +4395,9 @@ void Editor::CopySelectionRange(SelectionText &ss, bool allowLineCopy) const {
 			} else {
 				separator = copySeparator;
 			}
-			std::sort(rangesInOrder.begin(), rangesInOrder.end());
 		}
 		for (size_t part = 0; part < rangesInOrder.size();) {
-			text.append(RangeText(rangesInOrder[part].Start().Position(), rangesInOrder[part].End().Position()));
+			text.append(RangeText(rangesInOrder[part]->Start().Position(), rangesInOrder[part]->End().Position()));
 			++part;
 			if (separate && part < rangesInOrder.size()) {
 				// Append unless simple selection or last part of multiple selection
