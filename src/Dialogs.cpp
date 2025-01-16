@@ -1327,8 +1327,7 @@ bool FileMRUDlg(HWND hwnd, LPWSTR lpstrFile) noexcept {
 //
 //
 extern FileWatchingMode iFileWatchingMode;
-extern bool iFileWatchingMethod;
-extern bool bFileWatchingKeepAtEnd;
+extern int iFileWatchingOption;
 extern bool bResetFileWatching;
 
 static INT_PTR CALLBACK ChangeNotifyDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
@@ -1337,10 +1336,10 @@ static INT_PTR CALLBACK ChangeNotifyDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 	switch (umsg) {
 	case WM_INITDIALOG:
 		CheckRadioButton(hwnd, IDC_CHANGENOTIFY_NONE, IDC_CHANGENOTIFY_AUTO_RELOAD, IDC_CHANGENOTIFY_NONE + static_cast<int>(iFileWatchingMode));
-		if (iFileWatchingMethod) {
+		if (iFileWatchingOption & FileWatchingOption_LogFile) {
 			CheckDlgButton(hwnd, IDC_CHANGENOTIFY_LOG_FILE, BST_CHECKED);
 		}
-		if (bFileWatchingKeepAtEnd) {
+		if (iFileWatchingOption & FileWatchingOption_KeepAtEnd) {
 			CheckDlgButton(hwnd, IDC_CHANGENOTIFY_KEEP_AT_END, BST_CHECKED);
 		}
 		if (bResetFileWatching) {
@@ -1351,13 +1350,20 @@ static INT_PTR CALLBACK ChangeNotifyDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
-		case IDOK:
-			iFileWatchingMode = static_cast<FileWatchingMode>(GetCheckedRadioButton(hwnd, IDC_CHANGENOTIFY_NONE, IDC_CHANGENOTIFY_AUTO_RELOAD) - IDC_CHANGENOTIFY_NONE);
-			iFileWatchingMethod = IsButtonChecked(hwnd, IDC_CHANGENOTIFY_LOG_FILE);
-			bFileWatchingKeepAtEnd = IsButtonChecked(hwnd, IDC_CHANGENOTIFY_KEEP_AT_END);
+		case IDOK: {
+			int value = GetCheckedRadioButton(hwnd, IDC_CHANGENOTIFY_NONE, IDC_CHANGENOTIFY_AUTO_RELOAD);
+			iFileWatchingMode = static_cast<FileWatchingMode>(value - IDC_CHANGENOTIFY_NONE);
+			value = FileWatchingOption_None;
+			if (IsButtonChecked(hwnd, IDC_CHANGENOTIFY_LOG_FILE)) {
+				value |= FileWatchingOption_LogFile;
+			}
+			if (IsButtonChecked(hwnd, IDC_CHANGENOTIFY_KEEP_AT_END)) {
+				value |= FileWatchingOption_KeepAtEnd;
+			}
+			iFileWatchingOption = value;
 			bResetFileWatching = IsButtonChecked(hwnd, IDC_CHANGENOTIFY_RESET_WATCH);
 			EndDialog(hwnd, IDOK);
-			break;
+		} break;
 
 		case IDCANCEL:
 			EndDialog(hwnd, IDCANCEL);

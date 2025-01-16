@@ -41,6 +41,12 @@ enum FileWatchingMode {
 	FileWatchingMode_AutoReload,
 };
 
+enum FileWatchingOption {
+	FileWatchingOption_None = 0,
+	FileWatchingOption_LogFile = 1,
+	FileWatchingOption_KeepAtEnd = 2,
+};
+
 enum MatchTextFlag {
 	MatchTextFlag_None = 0,
 	MatchTextFlag_Default = 1,
