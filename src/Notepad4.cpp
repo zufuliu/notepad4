@@ -8134,9 +8134,9 @@ void InstallFileWatching(bool terminate) noexcept {
 		}
 	}
 
-	bRunningWatch = !terminate;
 	dwChangeNotifyTime = 0;
-	if (!terminate) {
+	bRunningWatch = !terminate;
+	if (bRunningWatch) {
 		// Install
 		SetTimer(nullptr, ID_WATCHTIMER, dwFileCheckInterval, WatchTimerProc);
 
@@ -8152,12 +8152,17 @@ void InstallFileWatching(bool terminate) noexcept {
 			memset(&fdCurFile, 0, sizeof(fdCurFile));
 		}
 
-		hChangeHandle = iFileWatchingMethod ? nullptr : FindFirstChangeNotification(tchDirectory, FALSE,
+		if (iFileWatchingMethod) {
+			hChangeHandle = FindFirstChangeNotification(tchDirectory, FALSE,
 						FILE_NOTIFY_CHANGE_FILE_NAME	| \
 						FILE_NOTIFY_CHANGE_DIR_NAME		| \
 						FILE_NOTIFY_CHANGE_ATTRIBUTES	| \
 						FILE_NOTIFY_CHANGE_SIZE			| \
 						FILE_NOTIFY_CHANGE_LAST_WRITE);
+			if (hChangeHandle == INVALID_HANDLE_VALUE) {
+				hChangeHandle = nullptr;
+			}
+		}
 	}
 }
 
@@ -8190,7 +8195,7 @@ static void CheckCurrentFileChangedOutsideApp() noexcept {
 			dwChangeNotifyTime = 0;
 			SendMessage(hwndMain, APPM_CHANGENOTIFY, 0, 0);
 		}
-	} else if (!iFileWatchingMethod) {
+	} else if (hChangeHandle) {
 		FindNextChangeNotification(hChangeHandle);
 	}
 }
@@ -8217,16 +8222,18 @@ void CALLBACK WatchTimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTim
 			dwChangeNotifyTime = 0;
 			SendMessage(hwndMain, APPM_CHANGENOTIFY, 0, 0);
 		}
-		// polling, not very efficient but useful for watching continuously updated file
-		else if (iFileWatchingMethod) {
-			if (dwChangeNotifyTime == 0) {
+		// Check Change Notification Handle
+		// TODO: notification not fired for continuously updated file
+		else if (hChangeHandle) {
+			if (WAIT_OBJECT_0 == WaitForSingleObject(hChangeHandle, 0)) {
 				CheckCurrentFileChangedOutsideApp();
 			}
 		}
-		// Check Change Notification Handle
-		// TODO: notification not fired for continuously updated file
-		else if (WAIT_OBJECT_0 == WaitForSingleObject(hChangeHandle, 0)) {
-			CheckCurrentFileChangedOutsideApp();
+		// polling, not very efficient but useful for watching continuously updated file
+		else {
+			if (dwChangeNotifyTime == 0) {
+				CheckCurrentFileChangedOutsideApp();
+			}
 		}
 	}
 }
