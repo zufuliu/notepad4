@@ -8,7 +8,8 @@
 // https://en.cppreference.com/w/cpp/links
 
 alignas alignof asm
-break case catch class const const_cast constexpr constinit continue
+break case catch class concept const const_cast consteval constexpr constinit continue
+co_await co_return co_yield
 decltype default delete do dynamic_cast
 else enum explicit export extern
 false for friend goto
@@ -17,16 +18,16 @@ mutable
 namespace new noexcept nullptr
 operator
 private protected public
-register reinterpret_cast return
+register reinterpret_cast requires return
 sizeof static static_assert static_cast struct switch
 template this thread_local throw true try typedef typeid typename
 union using
-volatile
+virtual volatile
 while
 
-override final
+final import module override
 
-auto bool char char16_t char32_t double float int long short signed unsigned wchar_t void
+auto bool char char8_t char16_t char32_t double float int long short signed unsigned wchar_t void
 
 and and_eq bitand bitor compl not not_eq or or_eq xor xor_eq
 
@@ -41,6 +42,18 @@ __STDCPP_DEFAULT_NEW_ALIGNMENT__
 // Feature-test macros
 __STDCPP_STRICT_POINTER_SAFETY__
 __STDCPP_THREADS__
+// attributes https://en.cppreference.com/w/cpp/language/attributes
+[[assume]]
+[[carries_dependency]]
+[[deprecated]]
+[[indeterminate]]
+[[likely]]
+[[maybe_unused]]
+[[no_unique_address]]
+[[nodiscard]]
+[[noreturn]]
+[[optimize_for_synchronized]]
+[[unlikely]]
 
 #include <cstddef>
 namespace std { // Common definitions
@@ -110,6 +123,15 @@ namespace std { // Implementation properties
 	};
 }
 
+#include <stdfloat> // C++23
+namespace std { // Arithmetic types
+	float16_t
+	float32_t
+	float64_t
+	float128_t
+	bfloat16_t
+}
+
 #include <new>
 namespace std { // Dynamic memory management
 	class bad_alloc : public exception {};
@@ -117,7 +139,7 @@ namespace std { // Dynamic memory management
 	struct destroying_delete_t { // C++20
 		explicit destroying_delete_t() = default;
 	};
-	inline constexpr destroying_delete_t destroying_delete {}; //C++20
+	constexpr destroying_delete_t destroying_delete {}; //C++20
 	enum class align_val_t : size_t {};
 	struct nothrow_t {};
 	extern const nothrow_t nothrow;
@@ -213,12 +235,12 @@ namespace std { // Comparisons
 	};
 
 	inline namespace {
-		inline constexpr strong_order(E, F);
-		inline constexpr weak_order(E, F);
-		inline constexpr partial_order(E, F);
-		inline constexpr compare_strong_order_fallback(E, F);
-		inline constexpr compare_weak_order_fallback(E, F);
-		inline constexpr compare_partial_order_fallback(E, F);
+		constexpr strong_order(E, F);
+		constexpr weak_order(E, F);
+		constexpr partial_order(E, F);
+		constexpr compare_strong_order_fallback(E, F);
+		constexpr compare_weak_order_fallback(E, F);
+		constexpr compare_partial_order_fallback(E, F);
 	}
 }
 
@@ -254,7 +276,7 @@ namespace std { // Coroutines
 	using noop_coroutine_handle = coroutine_handle<noop_coroutine_promise>;
 	noop_coroutine_handle noop_coroutine() noexcept;
 	struct suspend_never {
-		constexpr bool await_ready() const noexcept { return true; }
+		constexpr bool await_ready() const noexcept;
 		constexpr void await_suspend(coroutine_handle<>) const noexcept {}
 		constexpr void await_resume() const noexcept {}
 	};
@@ -325,6 +347,8 @@ namespace std { // Concepts
 	concept predicate;
 	template <class R, class T, class U>
 	concept relation;
+	template <class R, class T, class U>
+	concept equivalence_relation;
 	template <class R, class T, class U>
 	concept strict_weak_order;
 }
@@ -508,8 +532,24 @@ namespace std { // System error support
 	template <class T> struct hash;
 	template <> struct hash<error_code>;
 	template <> struct hash<error_condition>;
-	template <class T> inline constexpr bool is_error_code_enum_v = is_error_code_enum<T>::value;
-	template <class T> inline constexpr bool is_error_condition_enum_v = is_error_condition_enum<T>::value;
+	template <class T> constexpr bool is_error_code_enum_v = is_error_code_enum<T>::value;
+	template <class T> constexpr bool is_error_condition_enum_v = is_error_condition_enum<T>::value;
+}
+
+#include <stacktrace> // C++23
+namespace std { // Stacktrace
+	class stacktrace_entry {
+		using native_handle_type;
+		constexpr native_handle_type native_handle() const noexcept;
+		string description() const;
+		string source_file() const;
+		uint_least32_t source_line() const;
+	};
+	template <class Allocator>
+	class basic_stacktrace {
+		static basic_stacktrace current(const allocator_type& alloc = allocator_type()) noexcept;
+	};
+	using stacktrace = basic_stacktrace<allocator<stacktrace_entry>>;
 }
 
 #include <utility>
@@ -522,21 +562,24 @@ namespace std { // Utility components
 	// Forward/move helpers
 	template <class T> constexpr T&& forward(remove_reference_t<T>& t) noexcept;
 	template <class T> constexpr T&& forward(remove_reference_t<T>&& t) noexcept;
+	template <class T, class U> [[nodiscard]] constexpr auto forward_like(U&& x) noexcept;
 	template <class T> constexpr remove_reference_t<T>&& move(T&&) noexcept;
 	template <class T> constexpr conditional_t<!is_nothrow_move_constructible_v<T> && is_copy_constructible_v<T>, const T&, T&&>
 	move_if_noexcept(T& x) noexcept;
 	template <class T> constexpr add_const_t<T>& as_const(T& t) noexcept;
-	template <class T> void as_const(const T&&) = delete;
 	template <class T> add_rvalue_reference_t<T> declval() noexcept;
 
 	// Integer comparison functions
-	template<class T, class U> constexpr bool cmp_equal(T t, U u) noexcept;
-	template<class T, class U> constexpr bool cmp_not_equal(T t, U u) noexcept;
-	template<class T, class U> constexpr bool cmp_less(T t, U u) noexcept;
-	template<class T, class U> constexpr bool cmp_greater(T t, U u) noexcept;
-	template<class T, class U> constexpr bool cmp_less_equal(T t, U u) noexcept;
-	template<class T, class U> constexpr bool cmp_greater_equal(T t, U u) noexcept;
-	template<class R, class T> constexpr bool in_range(T t) noexcept;
+	template <class T, class U> constexpr bool cmp_equal(T t, U u) noexcept;
+	template <class T, class U> constexpr bool cmp_not_equal(T t, U u) noexcept;
+	template <class T, class U> constexpr bool cmp_less(T t, U u) noexcept;
+	template <class T, class U> constexpr bool cmp_greater(T t, U u) noexcept;
+	template <class T, class U> constexpr bool cmp_less_equal(T t, U u) noexcept;
+	template <class T, class U> constexpr bool cmp_greater_equal(T t, U u) noexcept;
+	template <class R, class T> constexpr bool in_range(T t) noexcept;
+
+	template <class T> constexpr underlying_type_t<T> to_underlying(T value) noexcept;
+	[[noreturn]] void unreachable();
 
 	// Compile-time integer sequences
 	template <class T, T...>
@@ -568,28 +611,28 @@ namespace std { // Utility components
 	struct piecewise_construct_t {
 		explicit piecewise_construct_t() = default;
 	};
-	inline constexpr piecewise_construct_t piecewise_construct{};
+	constexpr piecewise_construct_t piecewise_construct{};
 
 	struct in_place_t {
 		explicit in_place_t() = default;
 	};
-	inline constexpr in_place_t in_place{};
+	constexpr in_place_t in_place{};
 	template <class T>
 	struct in_place_type_t {
 		explicit in_place_type_t() = default;
 	};
-	template <class T> inline constexpr in_place_type_t<T> in_place_type{};
+	template <class T> constexpr in_place_type_t<T> in_place_type{};
 	template <size_t I>
 	struct in_place_index_t {
 		explicit in_place_index_t() = default;
 	};
-	template <size_t I> inline constexpr in_place_index_t<I> in_place_index{};
+	template <size_t I> constexpr in_place_index_t<I> in_place_index{};
 }
 
 #include <tuple>
 namespace std { // Tuples
 	template <class... Types> class tuple {};
-	inline constexpr ignore;
+	constexpr ignore;
 	template <class... TTypes> constexpr tuple<VTypes...> make_tuple(TTypes&&...);
 	template <class... TTypes> constexpr tuple<TTypes&&...> forward_as_tuple(TTypes&&...) noexcept;
 	template <class... TTypes> constexpr tuple<TTypes&...> tie(TTypes&...) noexcept;
@@ -599,7 +642,7 @@ namespace std { // Tuples
 
 	template <class... Types, class Alloc>
 	struct uses_allocator<tuple<Types...>, Alloc>;
-	template <class T> inline constexpr size_t tuple_size_v = tuple_size<T>::value;
+	template <class T> constexpr size_t tuple_size_v = tuple_size<T>::value;
 }
 
 #include <optional>
@@ -611,10 +654,13 @@ namespace std { // Optional objects
 		constexpr bool has_value() const noexcept;
 		constexpr const T& value() const&;
 		template <class U> constexpr T value_or(U&&) const&;
+		template <class F> constexpr auto and_then(F&& f) &;
+		template <class F> constexpr auto transform(F&& f) &;
+		template <class F> constexpr optional or_else(F&& f) &&;
 		void reset() noexcept;
 	};
 	struct nullopt_t {};
-	inline constexpr nullopt_t nullopt();
+	constexpr nullopt_t nullopt();
 	class bad_optional_access : public exception {};
 	template <class T> constexpr optional<> make_optional(T&&);
 	template <class T, class... Args> constexpr optional<T> make_optional(Args&&... args);
@@ -631,11 +677,11 @@ namespace std { // Variants
 	};
 	template <class T> struct variant_size;
 	template <class T>
-	inline constexpr size_t variant_size_v = variant_size<T>::value;
+	constexpr size_t variant_size_v = variant_size<T>::value;
 	template <size_t I, class T> struct variant_alternative<I, const T>;
 	template <size_t I, class T>
 	using variant_alternative_t = typename variant_alternative<I, T>::type;
-	inline constexpr size_t variant_npos = -1;
+	constexpr size_t variant_npos = -1;
 	template <class T, class... Types>
 	constexpr bool holds_alternative(const variant<Types...>&) noexcept;
 	template <size_t I, class... Types>
@@ -663,6 +709,38 @@ namespace std { // Storage for any type
 	any make_any(Args&& ...args);
 	template <class T>
 	T any_cast(const any& operand);
+}
+
+#include <expected> // C++23
+namespace std { // Expected objects
+	template <class E> class unexpected {
+		constexpr const E& error() const & noexcept;
+	};
+	template <class E> class bad_expected_access : public bad_expected_access<void> {
+		E& error() & noexcept;
+	};
+	template <> class bad_expected_access<void> : public exception {};
+	struct unexpect_t {
+		explicit unexpect_t() = default;
+	};
+	constexpr unexpect_t unexpect{};
+	template <class T, class E> class expected {
+		using value_type = T;
+		using error_type = E;
+		using unexpected_type = unexpected<E>;
+		template <class U>
+		using rebind = expected<U, error_type>;
+
+		constexpr bool has_value() const noexcept;
+		constexpr const T& value() const &;
+		constexpr const E& error() const & noexcept;
+		template <class U> constexpr T value_or(U&&) const &;
+		template <class G = E> constexpr E error_or(G&&) const &;
+		template <class F> constexpr auto and_then(F&& f) &;
+		template <class F> constexpr auto or_else(F&& f) &;
+		template <class F> constexpr auto transform(F&& f) &;
+		template <class F> constexpr auto transform_error(F&& f) &;
+	};
 }
 
 #include <bitset>
@@ -712,13 +790,17 @@ namespace std { // Memory
 	void* align(size_t alignment, size_t size, void*& ptr, size_t& space);
 	template <size_t N, class T>
 	[[nodiscard]] constexpr T* assume_aligned(T* ptr); // C++20
+	template <class T>
+	T* start_lifetime_as(void* p) noexcept;
+	template <class T>
+	T* start_lifetime_as_array(void* p, size_t n) noexcept;
 	// Allocator argument tag
 	struct allocator_arg_t { explicit allocator_arg_t() = default; };
-	inline constexpr allocator_arg_t allocator_arg{};
+	constexpr allocator_arg_t allocator_arg{};
 	// uses_allocator
 	template <class T, class Alloc> struct uses_allocator;
 	template <class T, class Alloc>
-	inline constexpr bool uses_allocator_v = uses_allocator<T, Alloc>::value;
+	constexpr bool uses_allocator_v = uses_allocator<T, Alloc>::value;
 	template <class T, class Alloc>
 	auto uses_allocator_construction_args(const Alloc& alloc); // C++20
 	template <class T, class Alloc, class... Args>
@@ -751,6 +833,11 @@ namespace std { // Memory
 		static size_type max_size(const Alloc& a) noexcept;
 		static Alloc select_on_container_copy_construction(const Alloc& rhs);
 	};
+	template <class Pointer, class SizeType = size_t>
+	struct allocation_result {
+		Pointer ptr;
+		SizeType count;
+	};
 	// The default allocator
 	template <class T> class allocator;
 	template <class T> constexpr T* addressof(T& r) noexcept;
@@ -775,7 +862,7 @@ namespace std { // Memory
 	void uninitialized_fill(ForwardIterator first, ForwardIterator last, const T& x);
 	template <class ForwardIterator, class Size, class T>
 	ForwardIterator uninitialized_fill_n(ForwardIterator first, Size n, const T& x);
-	template<class T, class... Args>
+	template <class T, class... Args>
 	constexpr T* construct_at(T* location, Args&&... args);
 	template <class T>
 	void destroy_at(T* location);
@@ -821,8 +908,8 @@ namespace std { // Memory
 	shared_ptr<T> make_shared(Args&&... args);
 	template <class T, class A, class... Args>
 	shared_ptr<T> allocate_shared(const A& a, Args&&... args);
-	template<class T> shared_ptr<T> make_shared_for_overwrite(size_t N); // C++20
-	template<class T, class A> shared_ptr<T> allocate_shared_for_overwrite(const A& a, size_t N); // C++20
+	template <class T> shared_ptr<T> make_shared_for_overwrite(size_t N); // C++20
+	template <class T, class A> shared_ptr<T> allocate_shared_for_overwrite(const A& a, size_t N); // C++20
 	template <class T, class U>
 	shared_ptr<T> static_pointer_cast(const shared_ptr<U>& r) noexcept;
 	template <class T, class U>
@@ -844,6 +931,8 @@ namespace std { // Memory
 	template <> struct owner_less<void> {
 		using is_transparent;
 	};
+	struct owner_hash;
+	struct owner_equal;
 	template <class T> class enable_shared_from_this {
 		shared_ptr<T> shared_from_this();
 		shared_ptr<T const> shared_from_this() const;
@@ -852,6 +941,14 @@ namespace std { // Memory
 	};
 	template <class T>
 	bool atomic_is_lock_free(const shared_ptr<T>* p);
+	template <class Smart, class Pointer, class... Args>
+	class out_ptr_t;
+	template <class Pointer = void, class Smart, class... Args>
+	auto out_ptr(Smart& s, Args&&... args);
+	template <class Smart, class Pointer, class... Args>
+	class inout_ptr_t;
+	template <class Pointer = void, class Smart, class... Args>
+	auto inout_ptr(Smart& s, Args&&... args);
 
 	template <class Y> [[deprecated]] struct auto_ptr_ref {}; // C++03
 	template <class X> [[deprecated]] class auto_ptr {}; // C++03
@@ -930,15 +1027,13 @@ namespace std {
 namespace std { // Function objects
 	template <class F, class... Args>
 	invoke_result_t<F, Args...> invoke(F&& f, Args&&... args) noexcept(is_nothrow_invocable_v<F, Args...>);
-
+	template <class R, class F, class... Args> constexpr R invoke_r(F&& f, Args&&... args);
 	template <class T> class reference_wrapper {
 		using type = T;
 		T& get() const noexcept;
 	};
 	template <class T> reference_wrapper<T> ref(T&) noexcept;
 	template <class T> reference_wrapper<const T> cref(const T&) noexcept;
-	template <class T> void ref(const T&&) = delete;
-	template <class T> void cref(const T&&) = delete;
 	// arithmetic operations
 	template <class T = void> struct plus;
 	template <class T = void> struct minus;
@@ -953,6 +1048,7 @@ namespace std { // Function objects
 	template <class T = void> struct less;
 	template <class T = void> struct greater_equal;
 	template <class T = void> struct less_equal;
+	struct compare_three_way;
 	// logical operations
 	template <class T = void> struct logical_and;
 	template <class T = void> struct logical_or;
@@ -985,14 +1081,15 @@ namespace std { // Function objects
 		template <class T> T* target() noexcept;
 		template <class T> const T* target() const noexcept;
 	};
-
+	template <class R, class... ArgTypes>
+	class move_only_function<R(ArgTypes...)>;
 	template <class ForwardIterator, class BinaryPredicate = equal_to<>> class default_searcher;
 	template <class RandomAccessIterator, class Hash = hash<typename iterator_traits<RandomAccessIterator>::value_type>>, class boyer_moore_searcher;
 	template <class RandomAccessIterator, class Hash = hash<typename iterator_traits<RandomAccessIterator>::value_type>, class BinaryPredicate = equal_to<>>
 	class boyer_moore_horspool_searcher;
 
-	template <class T> inline constexpr bool is_bind_expression_v = is_bind_expression<T>::value;
-	template <class T> inline constexpr int is_placeholder_v = is_placeholder<T>::value;
+	template <class T> constexpr bool is_bind_expression_v = is_bind_expression<T>::value;
+	template <class T> constexpr int is_placeholder_v = is_placeholder<T>::value;
 
 	namespace ranges { // C++20
 		// concept-constrained comparisons
@@ -1074,6 +1171,7 @@ namespace std { // Metaprogramming and type traits
 	template <class T> struct is_unsigned;
 	template <class T> struct is_bounded_array; // C++20
 	template <class T> struct is_unbounded_array; // C++20
+	template <class T> struct is_scoped_enum; // C++23
 
 	template <class T, class... Args> struct is_constructible;
 	template <class T> struct is_default_constructible;
@@ -1111,8 +1209,13 @@ namespace std { // Metaprogramming and type traits
 	template <class T> struct is_nothrow_swappable;
 
 	template <class T> struct is_nothrow_destructible;
+	template <class T> struct is_implicit_lifetime; // C++23
 	template <class T> struct has_virtual_destructor;
 	template <class T> struct has_unique_object_representations;
+
+	template <class T, class U> struct reference_constructs_from_temporary; // C++23
+	template <class T, class U> struct reference_converts_from_temporary; // C++23
+
 	// type property queries
 	template <class T> struct alignment_of;
 	template <class T> struct rank;
@@ -1178,6 +1281,8 @@ namespace std { // Metaprogramming and type traits
 	template <class... T> struct common_reference; // C++20
 	template <class T> struct underlying_type;
 	template <class Fn, class... ArgTypes> struct invoke_result;
+	template <class T> struct unwrap_reference;
+	template <class T> struct unwrap_ref_decay;
 
 	template <class T> using type_identity_t = typename type_identity<T>::type;
 	template <size_t Len, size_t Align = default-alignment> using aligned_storage_t = typename aligned_storage<Len, Align>::type;
@@ -1190,6 +1295,8 @@ namespace std { // Metaprogramming and type traits
 	template <class... T> using common_reference_t = typename common_reference<T...>::type; // C++20
 	template <class T> using underlying_type_t = typename underlying_type<T>::type;
 	template <class Fn, class... ArgTypes> using invoke_result_t = typename invoke_result<Fn, ArgTypes...>::type;
+	template <class T> using unwrap_reference_t = typename unwrap_reference<T>::type;
+	template <class T> using unwrap_ref_decay_t = typename unwrap_ref_decay<T>::type;
 	template <class...> using void_t = void;
 	// logical operator traits
 	template <class... B> struct conjunction;
@@ -1201,94 +1308,98 @@ namespace std { // Metaprogramming and type traits
 		native
 	};
 	// primary type categories
-	template <class T> inline constexpr bool is_void_v = is_void<T>::value;
-	template <class T> inline constexpr bool is_null_pointer_v = is_null_pointer<T>::value;
-	template <class T> inline constexpr bool is_integral_v = is_integral<T>::value;
-	template <class T> inline constexpr bool is_floating_point_v = is_floating_point<T>::value;
-	template <class T> inline constexpr bool is_array_v = is_array<T>::value;
-	template <class T> inline constexpr bool is_pointer_v = is_pointer<T>::value;
-	template <class T> inline constexpr bool is_lvalue_reference_v = is_lvalue_reference<T>::value;
-	template <class T> inline constexpr bool is_rvalue_reference_v = is_rvalue_reference<T>::value;
-	template <class T> inline constexpr bool is_member_object_pointer_v = is_member_object_pointer<T>::value;
-	template <class T> inline constexpr bool is_member_function_pointer_v = is_member_function_pointer<T>::value;
-	template <class T> inline constexpr bool is_enum_v = is_enum<T>::value;
-	template <class T> inline constexpr bool is_union_v = is_union<T>::value;
-	template <class T> inline constexpr bool is_class_v = is_class<T>::value;
-	template <class T> inline constexpr bool is_function_v = is_function<T>::value;
+	template <class T> constexpr bool is_void_v = is_void<T>::value;
+	template <class T> constexpr bool is_null_pointer_v = is_null_pointer<T>::value;
+	template <class T> constexpr bool is_integral_v = is_integral<T>::value;
+	template <class T> constexpr bool is_floating_point_v = is_floating_point<T>::value;
+	template <class T> constexpr bool is_array_v = is_array<T>::value;
+	template <class T> constexpr bool is_pointer_v = is_pointer<T>::value;
+	template <class T> constexpr bool is_lvalue_reference_v = is_lvalue_reference<T>::value;
+	template <class T> constexpr bool is_rvalue_reference_v = is_rvalue_reference<T>::value;
+	template <class T> constexpr bool is_member_object_pointer_v = is_member_object_pointer<T>::value;
+	template <class T> constexpr bool is_member_function_pointer_v = is_member_function_pointer<T>::value;
+	template <class T> constexpr bool is_enum_v = is_enum<T>::value;
+	template <class T> constexpr bool is_union_v = is_union<T>::value;
+	template <class T> constexpr bool is_class_v = is_class<T>::value;
+	template <class T> constexpr bool is_function_v = is_function<T>::value;
 	// composite type categories
-	template <class T> inline constexpr bool is_reference_v = is_reference<T>::value;
-	template <class T> inline constexpr bool is_arithmetic_v = is_arithmetic<T>::value;
-	template <class T> inline constexpr bool is_fundamental_v = is_fundamental<T>::value;
-	template <class T> inline constexpr bool is_object_v = is_object<T>::value;
-	template <class T> inline constexpr bool is_scalar_v = is_scalar<T>::value;
-	template <class T> inline constexpr bool is_compound_v = is_compound<T>::value;
-	template <class T> inline constexpr bool is_member_pointer_v = is_member_pointer<T>::value;
+	template <class T> constexpr bool is_reference_v = is_reference<T>::value;
+	template <class T> constexpr bool is_arithmetic_v = is_arithmetic<T>::value;
+	template <class T> constexpr bool is_fundamental_v = is_fundamental<T>::value;
+	template <class T> constexpr bool is_object_v = is_object<T>::value;
+	template <class T> constexpr bool is_scalar_v = is_scalar<T>::value;
+	template <class T> constexpr bool is_compound_v = is_compound<T>::value;
+	template <class T> constexpr bool is_member_pointer_v = is_member_pointer<T>::value;
 	// type properties
-	template <class T> inline constexpr bool is_const_v = is_const<T>::value;
-	template <class T> inline constexpr bool is_volatile_v = is_volatile<T>::value;
-	template <class T> inline constexpr bool is_trivial_v = is_trivial<T>::value;
-	template <class T> inline constexpr bool is_trivially_copyable_v = is_trivially_copyable<T>::value;
-	template <class T> inline constexpr bool is_standard_layout_v = is_standard_layout<T>::value;
-	template <class T> [[deprecated]] inline constexpr bool is_pod_v = is_pod<T>::value; // C++17
-	template <class T> inline constexpr bool is_empty_v = is_empty<T>::value;
-	template <class T> inline constexpr bool is_polymorphic_v = is_polymorphic<T>::value;
-	template <class T> inline constexpr bool is_abstract_v = is_abstract<T>::value;
-	template <class T> inline constexpr bool is_final_v = is_final<T>::value;
-	template <class T> inline constexpr bool is_aggregate_v = is_aggregate<T>::value;
-	template <class T> inline constexpr bool is_signed_v = is_signed<T>::value;
-	template <class T> inline constexpr bool is_unsigned_v = is_unsigned<T>::value;
-	template <class T> inline constexpr bool is_bounded_array_v = is_bounded_array<T>::value; // C++20
-	template <class T> inline constexpr bool is_unbounded_array_v = is_unbounded_array<T>::value; // C++20
-	template <class T, class... Args> inline constexpr bool is_constructible_v = is_constructible<T, Args...>::value;
-	template <class T> inline constexpr bool is_default_constructible_v = is_default_constructible<T>::value;
-	template <class T> inline constexpr bool is_copy_constructible_v = is_copy_constructible<T>::value;
-	template <class T> inline constexpr bool is_move_constructible_v = is_move_constructible<T>::value;
-	template <class T, class U> inline constexpr bool is_assignable_v = is_assignable<T, U>::value;
-	template <class T> inline constexpr bool is_copy_assignable_v = is_copy_assignable<T>::value;
-	template <class T> inline constexpr bool is_move_assignable_v = is_move_assignable<T>::value;
-	template <class T, class U> inline constexpr bool is_swappable_with_v = is_swappable_with<T, U>::value;
-	template <class T> inline constexpr bool is_swappable_v = is_swappable<T>::value;
-	template <class T> inline constexpr bool is_destructible_v = is_destructible<T>::value;
-	template <class T, class... Args> inline constexpr bool is_trivially_constructible_v = is_trivially_constructible<T, Args...>::value;
-	template <class T> inline constexpr bool is_trivially_default_constructible_v = is_trivially_default_constructible<T>::value;
-	template <class T> inline constexpr bool is_trivially_copy_constructible_v = is_trivially_copy_constructible<T>::value;
-	template <class T> inline constexpr bool is_trivially_move_constructible_v = is_trivially_move_constructible<T>::value;
-	template <class T, class U> inline constexpr bool is_trivially_assignable_v = is_trivially_assignable<T, U>::value;
-	template <class T> inline constexpr bool is_trivially_copy_assignable_v = is_trivially_copy_assignable<T>::value;
-	template <class T> inline constexpr bool is_trivially_move_assignable_v = is_trivially_move_assignable<T>::value;
-	template <class T> inline constexpr bool is_trivially_destructible_v = is_trivially_destructible<T>::value;
-	template <class T, class... Args> inline constexpr bool is_nothrow_constructible_v = is_nothrow_constructible<T, Args...>::value;
-	template <class T> inline constexpr bool is_nothrow_default_constructible_v = is_nothrow_default_constructible<T>::value;
-	template <class T> inline constexpr bool is_nothrow_copy_constructible_v = is_nothrow_copy_constructible<T>::value;
-	template <class T> inline constexpr bool is_nothrow_move_constructible_v = is_nothrow_move_constructible<T>::value;
-	template <class T, class U> inline constexpr bool is_nothrow_assignable_v = is_nothrow_assignable<T, U>::value;
-	template <class T> inline constexpr bool is_nothrow_copy_assignable_v = is_nothrow_copy_assignable<T>::value;
-	template <class T> inline constexpr bool is_nothrow_move_assignable_v = is_nothrow_move_assignable<T>::value;
-	template <class T, class U> inline constexpr bool is_nothrow_swappable_with_v = is_nothrow_swappable_with<T, U>::value;
-	template <class T> inline constexpr bool is_nothrow_swappable_v = is_nothrow_swappable<T>::value;
-	template <class T> inline constexpr bool is_nothrow_destructible_v = is_nothrow_destructible<T>::value;
-	template <class T> inline constexpr bool has_virtual_destructor_v = has_virtual_destructor<T>::value;
-	template <class T> inline constexpr bool has_unique_object_representations_v = has_unique_object_representations<T>::value;
-	template <class T> inline constexpr bool has_strong_structural_equality_v = has_strong_structural_equality<T>::value; // C++20
+	template <class T> constexpr bool is_const_v = is_const<T>::value;
+	template <class T> constexpr bool is_volatile_v = is_volatile<T>::value;
+	template <class T> constexpr bool is_trivial_v = is_trivial<T>::value;
+	template <class T> constexpr bool is_trivially_copyable_v = is_trivially_copyable<T>::value;
+	template <class T> constexpr bool is_standard_layout_v = is_standard_layout<T>::value;
+	template <class T> [[deprecated]] constexpr bool is_pod_v = is_pod<T>::value; // C++17
+	template <class T> constexpr bool is_empty_v = is_empty<T>::value;
+	template <class T> constexpr bool is_polymorphic_v = is_polymorphic<T>::value;
+	template <class T> constexpr bool is_abstract_v = is_abstract<T>::value;
+	template <class T> constexpr bool is_final_v = is_final<T>::value;
+	template <class T> constexpr bool is_aggregate_v = is_aggregate<T>::value;
+	template <class T> constexpr bool is_signed_v = is_signed<T>::value;
+	template <class T> constexpr bool is_unsigned_v = is_unsigned<T>::value;
+	template <class T> constexpr bool is_bounded_array_v = is_bounded_array<T>::value; // C++20
+	template <class T> constexpr bool is_unbounded_array_v = is_unbounded_array<T>::value; // C++20
+	template <class T> constexpr bool is_scoped_enum_v = is_scoped_enum<T>::value; // C++23
+	template <class T, class... Args> constexpr bool is_constructible_v = is_constructible<T, Args...>::value;
+	template <class T> constexpr bool is_default_constructible_v = is_default_constructible<T>::value;
+	template <class T> constexpr bool is_copy_constructible_v = is_copy_constructible<T>::value;
+	template <class T> constexpr bool is_move_constructible_v = is_move_constructible<T>::value;
+	template <class T, class U> constexpr bool is_assignable_v = is_assignable<T, U>::value;
+	template <class T> constexpr bool is_copy_assignable_v = is_copy_assignable<T>::value;
+	template <class T> constexpr bool is_move_assignable_v = is_move_assignable<T>::value;
+	template <class T, class U> constexpr bool is_swappable_with_v = is_swappable_with<T, U>::value;
+	template <class T> constexpr bool is_swappable_v = is_swappable<T>::value;
+	template <class T> constexpr bool is_destructible_v = is_destructible<T>::value;
+	template <class T, class... Args> constexpr bool is_trivially_constructible_v = is_trivially_constructible<T, Args...>::value;
+	template <class T> constexpr bool is_trivially_default_constructible_v = is_trivially_default_constructible<T>::value;
+	template <class T> constexpr bool is_trivially_copy_constructible_v = is_trivially_copy_constructible<T>::value;
+	template <class T> constexpr bool is_trivially_move_constructible_v = is_trivially_move_constructible<T>::value;
+	template <class T, class U> constexpr bool is_trivially_assignable_v = is_trivially_assignable<T, U>::value;
+	template <class T> constexpr bool is_trivially_copy_assignable_v = is_trivially_copy_assignable<T>::value;
+	template <class T> constexpr bool is_trivially_move_assignable_v = is_trivially_move_assignable<T>::value;
+	template <class T> constexpr bool is_trivially_destructible_v = is_trivially_destructible<T>::value;
+	template <class T, class... Args> constexpr bool is_nothrow_constructible_v = is_nothrow_constructible<T, Args...>::value;
+	template <class T> constexpr bool is_nothrow_default_constructible_v = is_nothrow_default_constructible<T>::value;
+	template <class T> constexpr bool is_nothrow_copy_constructible_v = is_nothrow_copy_constructible<T>::value;
+	template <class T> constexpr bool is_nothrow_move_constructible_v = is_nothrow_move_constructible<T>::value;
+	template <class T, class U> constexpr bool is_nothrow_assignable_v = is_nothrow_assignable<T, U>::value;
+	template <class T> constexpr bool is_nothrow_copy_assignable_v = is_nothrow_copy_assignable<T>::value;
+	template <class T> constexpr bool is_nothrow_move_assignable_v = is_nothrow_move_assignable<T>::value;
+	template <class T, class U> constexpr bool is_nothrow_swappable_with_v = is_nothrow_swappable_with<T, U>::value;
+	template <class T> constexpr bool is_nothrow_swappable_v = is_nothrow_swappable<T>::value;
+	template <class T> constexpr bool is_nothrow_destructible_v = is_nothrow_destructible<T>::value;
+	template <class T> constexpr bool is_implicit_lifetime_v = is_implicit_lifetime<T>::value; // C++23
+	template <class T> constexpr bool has_virtual_destructor_v = has_virtual_destructor<T>::value;
+	template <class T> constexpr bool has_unique_object_representations_v = has_unique_object_representations<T>::value;
+	template <class T> constexpr bool has_strong_structural_equality_v = has_strong_structural_equality<T>::value; // C++20
+	template <class T, class U> constexpr bool reference_constructs_from_temporary_v = reference_constructs_from_temporary<T, U>::value; // C++23
+	template <class T, class U> constexpr bool reference_converts_from_temporary_v = reference_converts_from_temporary<T, U>::value; // C++23
 	// type property queries
-	template <class T> inline constexpr size_t alignment_of_v = alignment_of<T>::value;
-	template <class T> inline constexpr size_t rank_v = rank<T>::value;
-	template <class T, unsigned I = 0> inline constexpr size_t extent_v = extent<T, I>::value;
+	template <class T> constexpr size_t alignment_of_v = alignment_of<T>::value;
+	template <class T> constexpr size_t rank_v = rank<T>::value;
+	template <class T, unsigned I = 0> constexpr size_t extent_v = extent<T, I>::value;
 	// type relations
-	template <class T, class U> inline constexpr bool is_same_v = is_same<T, U>::value;
-	template <class Base, class Derived> inline constexpr bool is_base_of_v = is_base_of<Base, Derived>::value;
-	template <class From, class To> inline constexpr bool is_convertible_v = is_convertible<From, To>::value;
-	template <class From, class To> inline constexpr bool is_nothrow_convertible_v = is_nothrow_convertible<From, To>::value; // C++20
-	template <class T, class U> inline constexpr bool is_layout_compatible_v = is_layout_compatible<T, U>::value; // C++20
-	template <class Base, class Derived> inline constexpr bool is_pointer_interconvertible_base_of_v = is_pointer_interconvertible_base_of<Base, Derived>::value; // C++20
-	template <class Fn, class... ArgTypes> inline constexpr bool is_invocable_v = is_invocable<Fn, ArgTypes...>::value;
-	template <class R, class Fn, class... ArgTypes> inline constexpr bool is_invocable_r_v = is_invocable_r<R, Fn, ArgTypes...>::value;
-	template <class Fn, class... ArgTypes> inline constexpr bool is_nothrow_invocable_v = is_nothrow_invocable<Fn, ArgTypes...>::value;
-	template <class R, class Fn, class... ArgTypes> inline constexpr bool is_nothrow_invocable_r_v = is_nothrow_invocable_r<R, Fn, ArgTypes...>::value;
+	template <class T, class U> constexpr bool is_same_v = is_same<T, U>::value;
+	template <class Base, class Derived> constexpr bool is_base_of_v = is_base_of<Base, Derived>::value;
+	template <class From, class To> constexpr bool is_convertible_v = is_convertible<From, To>::value;
+	template <class From, class To> constexpr bool is_nothrow_convertible_v = is_nothrow_convertible<From, To>::value; // C++20
+	template <class T, class U> constexpr bool is_layout_compatible_v = is_layout_compatible<T, U>::value; // C++20
+	template <class Base, class Derived> constexpr bool is_pointer_interconvertible_base_of_v = is_pointer_interconvertible_base_of<Base, Derived>::value; // C++20
+	template <class Fn, class... ArgTypes> constexpr bool is_invocable_v = is_invocable<Fn, ArgTypes...>::value;
+	template <class R, class Fn, class... ArgTypes> constexpr bool is_invocable_r_v = is_invocable_r<R, Fn, ArgTypes...>::value;
+	template <class Fn, class... ArgTypes> constexpr bool is_nothrow_invocable_v = is_nothrow_invocable<Fn, ArgTypes...>::value;
+	template <class R, class Fn, class... ArgTypes> constexpr bool is_nothrow_invocable_r_v = is_nothrow_invocable_r<R, Fn, ArgTypes...>::value;
 	// logical operator traits
-	template <class... B> inline constexpr bool conjunction_v = conjunction<B...>::value;
-	template <class... B> inline constexpr bool disjunction_v = disjunction<B...>::value;
-	template <class B> inline constexpr bool negation_v = negation<B>::value;
+	template <class... B> constexpr bool conjunction_v = conjunction<B...>::value;
+	template <class... B> constexpr bool disjunction_v = disjunction<B...>::value;
+	template <class B> constexpr bool negation_v = negation<B>::value;
 	// member relationships
 	template <class S, class M>
 	constexpr bool is_pointer_interconvertible_with_class(M S::*m) noexcept;
@@ -1318,12 +1429,12 @@ namespace std { // Compile-time rational arithmetic
 	template <class R1, class R2> struct ratio_less_equal;
 	template <class R1, class R2> struct ratio_greater;
 	template <class R1, class R2> struct ratio_greater_equal;
-	template <class R1, class R2> inline constexpr bool ratio_equal_v = ratio_equal<R1, R2>::value;
-	template <class R1, class R2> inline constexpr bool ratio_not_equal_v = ratio_not_equal<R1, R2>::value;
-	template <class R1, class R2> inline constexpr bool ratio_less_v = ratio_less<R1, R2>::value;
-	template <class R1, class R2> inline constexpr bool ratio_less_equal_v = ratio_less_equal<R1, R2>::value;
-	template <class R1, class R2> inline constexpr bool ratio_greater_v = ratio_greater<R1, R2>::value;
-	template <class R1, class R2> inline constexpr bool ratio_greater_equal_v = ratio_greater_equal<R1, R2>::value;
+	template <class R1, class R2> constexpr bool ratio_equal_v = ratio_equal<R1, R2>::value;
+	template <class R1, class R2> constexpr bool ratio_not_equal_v = ratio_not_equal<R1, R2>::value;
+	template <class R1, class R2> constexpr bool ratio_less_v = ratio_less<R1, R2>::value;
+	template <class R1, class R2> constexpr bool ratio_less_equal_v = ratio_less_equal<R1, R2>::value;
+	template <class R1, class R2> constexpr bool ratio_greater_v = ratio_greater<R1, R2>::value;
+	template <class R1, class R2> constexpr bool ratio_greater_equal_v = ratio_greater_equal<R1, R2>::value;
 
 	// convenience SI typedefs
 	using yocto;
@@ -1346,6 +1457,8 @@ namespace std { // Compile-time rational arithmetic
 	using exa;
 	using zetta;
 	using yotta;
+	using ronna;
+	using quetta;
 }
 
 #include <utility> // C++17
@@ -1401,9 +1514,9 @@ namespace std::chrono { // Time
 		static constexpr Rep min();
 		static constexpr Rep max();
 	};
-	template <class Rep> inline constexpr bool treat_as_floating_point_v = treat_as_floating_point<Rep>::value;
+	template <class Rep> constexpr bool treat_as_floating_point_v = treat_as_floating_point<Rep>::value;
 	template <class T> struct is_clock; // C++20
-	template <class T> inline constexpr bool is_clock_v = is_clock<T>::value;		// duration_cast
+	template <class T> constexpr bool is_clock_v = is_clock<T>::value;		// duration_cast
 	template <class ToDuration, class Rep, class Period> constexpr ToDuration duration_cast(const duration<Rep, Period>& d);
 	template <class ToDuration, class Rep, class Period> constexpr ToDuration floor(const duration<Rep, Period>& d);
 	template <class ToDuration, class Rep, class Period> constexpr ToDuration ceil(const duration<Rep, Period>& d);
@@ -1591,26 +1704,26 @@ namespace std::chrono { // Time
 	template <class charT, class traits, class Alloc, class Parsable>
 	parse(const basic_string<charT, traits, Alloc>& format, Parsable& tp);
 	// calendrical constants
-	inline constexpr last_spec last{};
-	inline constexpr weekday Sunday{0};
-	inline constexpr weekday Monday{1};
-	inline constexpr weekday Tuesday{2};
-	inline constexpr weekday Wednesday{3};
-	inline constexpr weekday Thursday{4};
-	inline constexpr weekday Friday{5};
-	inline constexpr weekday Saturday{6};
-	inline constexpr month January{1};
-	inline constexpr month February{2};
-	inline constexpr month March{3};
-	inline constexpr month April{4};
-	inline constexpr month May{5};
-	inline constexpr month June{6};
-	inline constexpr month July{7};
-	inline constexpr month August{8};
-	inline constexpr month September{9};
-	inline constexpr month October{10};
-	inline constexpr month November{11};
-	inline constexpr month December{12}
+	constexpr last_spec last{};
+	constexpr weekday Sunday{0};
+	constexpr weekday Monday{1};
+	constexpr weekday Tuesday{2};
+	constexpr weekday Wednesday{3};
+	constexpr weekday Thursday{4};
+	constexpr weekday Friday{5};
+	constexpr weekday Saturday{6};
+	constexpr month January{1};
+	constexpr month February{2};
+	constexpr month March{3};
+	constexpr month April{4};
+	constexpr month May{5};
+	constexpr month June{6};
+	constexpr month July{7};
+	constexpr month August{8};
+	constexpr month September{9};
+	constexpr month October{10};
+	constexpr month November{11};
+	constexpr month December{12}
 }
 
 #include <typeindex>
@@ -1624,17 +1737,17 @@ namespace std { // Class type_index
 #include <execution>
 namespace std { // Execution policies
 	template <class T> struct is_execution_policy;
-	template <class T> inline constexpr bool is_execution_policy_v = is_execution_policy<T>::value;
+	template <class T> constexpr bool is_execution_policy_v = is_execution_policy<T>::value;
 
 	namespace execution {
 		class sequenced_policy;
 		class parallel_policy;
 		class parallel_unsequenced_policy;
 		class unsequenced_policy;
-		inline constexpr sequenced_policy seq;
-		inline constexpr parallel_policy par;
-		inline constexpr parallel_unsequenced_policy par_unseq;
-		inline constexpr unsequenced_policy unseq;
+		constexpr sequenced_policy seq;
+		constexpr parallel_policy par;
+		constexpr parallel_unsequenced_policy par_unseq;
+		constexpr unsequenced_policy unseq;
 	}
 }
 
@@ -1655,6 +1768,7 @@ namespace std { // Formatting
 	format_to_n_result<Out> format_to_n(Out out, iter_difference_t<Out> n, string_view fmt, const Args&... args);
 	template <class... Args>
 	size_t formatted_size(string_view fmt, const Args&... args);
+	template <class T, class charT> concept formattable;
 	template <class T, class charT = char> struct formatter;
 	template <class charT>
 	class basic_format_parse_context {
@@ -1674,6 +1788,18 @@ namespace std { // Formatting
 	};
 	using format_context = basic_format_context<unspecified, char>;
 	using wformat_context = basic_format_context<unspecified, wchar_t>;
+	enum class range_format {};
+	template <class R> constexpr format_kind;
+	template <class T, class charT = char>
+	class range_formatter {
+		constexpr void set_separator(basic_string_view<charT> sep) noexcept;
+		constexpr void set_brackets(basic_string_view<charT> opening, basic_string_view<charT> closing) noexcept;
+		constexpr formatter<T, charT>& underlying() noexcept;
+		parse(ParseContext& ctx);
+		format(R&& r, FormatContext& ctx) const;
+	};
+	template <ranges::input_range R, class charT>
+	struct formatter<R, charT>;
 	template <class Context> class basic_format_arg {
 		class handle;
 	};
@@ -1806,6 +1932,7 @@ namespace std { // Strings
 		size_type max_size() const noexcept;
 		void resize(size_type n, charT c);
 		void resize(size_type n);
+		template <class Operation> constexpr void resize_and_overwrite(size_type n, Operation op); // C++23
 		size_type capacity() const noexcept;
 		void reserve(size_type res_arg = 0);
 		void shrink_to_fit();
@@ -1845,6 +1972,7 @@ namespace std { // Strings
 		int compare(basic_string_view<charT, traits> sv) const noexcept;
 		bool starts_with(basic_string_view<charT, traits> x) const noexcept; // C++20
 		bool ends_with(basic_string_view<charT, traits> x) const noexcept; // C++20
+		bool contains(basic_string_view<charT, traits> x) const noexcept; // C++23
 	};
 }
 
@@ -2174,6 +2302,7 @@ namespace std { // Sequence containers
 		template <class... Args> iterator emplace(const_iterator position, Args&&... args);
 		void push_front(const T& x);
 		void push_back(const T& x);
+		template <container-compatible-range <T> R> void append_range(R&& rg);
 		iterator insert(const_iterator position, const T& x);
 		void pop_front();
 		void pop_back();
@@ -2187,8 +2316,10 @@ namespace std { // Sequence containers
 		iterator before_begin() noexcept;
 		const_iterator cbefore_begin() const noexcept;
 		// modifiers
+		template <class... Args> reference emplace_front(Args&&... args);
 		template <class... Args> iterator emplace_after(const_iterator position, Args&&... args);
 		iterator insert_after(const_iterator position, const T& x);
+		template <container-compatible-range <T> R> iterator insert_range_after(const_iterator position, R&& rg);
 		iterator erase_after(const_iterator position);
 		// forward_list operations
 		void splice_after(const_iterator position, forward_list& x);
@@ -2216,7 +2347,7 @@ namespace std { // Sequence containers
 	};
 
 	namespace pmr {
-		template<class T>
+		template <class T>
 		using deque = std::deque<T, polymorphic_allocator<T>>;
 		template <class T>
 		using forward_list = std::forward_list<T, polymorphic_allocator<T>>;
@@ -2319,6 +2450,8 @@ namespace std { // Unordered associative containers
 
 #include <queue>
 #include <stack>
+#include <flat_map> // C++23
+#include <flat_set> // C++23
 namespace std { // Container adaptors
 	template <class T, class Container = deque<T>> class queue {
 		using container_type = Container;
@@ -2330,11 +2463,27 @@ namespace std { // Container adaptors
 	template <class T, class Container = deque<T>> class stack {
 		reference top();
 	};
+
+	template <class Key, class T, class Compare = less<Key>, class KeyContainer = vector<Key>, class MappedContainer = vector<T>>
+	class flat_map {
+		using key_container_type = KeyContainer;
+		using mapped_container_type = MappedContainer;
+	};
+	struct sorted_unique_t { explicit sorted_unique_t() = default; };
+	constexpr sorted_unique_t sorted_unique{};
+	template <class Key, class T, class Compare = less<Key>, class KeyContainer = vector<Key>, class MappedContainer = vector<T>>
+	class flat_multimap;
+	struct sorted_equivalent_t { explicit sorted_equivalent_t() = default; };
+	constexpr sorted_equivalent_t sorted_equivalent{};
+	template <class Key, class Compare = less<Key>, class KeyContainer = vector<Key>>
+	class flat_set;
+	template <class Key, class Compare = less<Key>, class KeyContainer = vector<Key>>
+	class flat_multiset;
 }
 
 #include <span> // C++20
 namespace std { // Views
-	inline constexpr size_t dynamic_extent = numeric_limits<size_t>::max();
+	constexpr size_t dynamic_extent = numeric_limits<size_t>::max();
 	template <class ElementType, size_t Extent = dynamic_extent>
 	class span {
 		static constexpr index_type extent = Extent;
@@ -2344,6 +2493,62 @@ namespace std { // Views
 	span<const byte> as_bytes(span<ElementType, Extent> s) noexcept;
 	template <class ElementType, size_t Extent>
 	span<byte> as_writable_bytes(span<ElementType, Extent> s) noexcept;
+}
+
+#include <mdspan> // C++23
+namespace std { // Multidimensional access
+	template <class IndexType, size_t... Extents>
+	class extents {
+		using index_type = IndexType;
+		using size_type = make_unsigned_t<index_type>;
+		using rank_type = size_t;
+		static constexpr rank_type rank() noexcep;
+		static constexpr rank_type rank_dynamic() noexcept;
+		static constexpr size_t static_extent(rank_type) noexcept;
+		constexpr index_type extent(rank_type) const noexcept;
+	};
+	template <class IndexType, size_t Rank>
+	using dextents;
+	struct layout_left {
+		template <class Extents>
+		class mapping {
+			using extents_type = Extents;
+			using index_type = typename extents_type::index_type;
+			using size_type = typename extents_type::size_type;
+			using rank_type = typename extents_type::rank_type;
+			using layout_type = layout_left;
+
+			constexpr const extents_type& extents() const noexcept;
+			constexpr index_type required_span_size() const noexcept;
+
+			static constexpr bool is_always_unique() noexcept;
+			static constexpr bool is_always_exhaustive() noexcept;
+			static constexpr bool is_always_strided() noexcept;
+			static constexpr bool is_unique() noexcept;
+			static constexpr bool is_exhaustive() noexcept;
+			static constexpr bool is_strided() noexcept;
+			constexpr index_type stride(rank_type) const noexcept;
+		};
+	};
+	struct layout_right;
+	struct layout_stride;
+	template <class ElementType>
+	class default_accessor {
+		using offset_policy = default_accessor;
+		using element_type = ElementType;
+		using reference = ElementType&;
+		using data_handle_type = ElementType*;
+		constexpr reference access(data_handle_type p, size_t i) const noexcept;
+		constexpr data_handle_type offset(data_handle_type p, size_t i) const noexcept;
+	};
+	template <class ElementType, class Extents, class LayoutPolicy = layout_right, class AccessorPolicy = default_accessor<ElementType>>
+	class mdspan {
+		using accessor_type = AccessorPolicy;
+		using mapping_type = typename layout_type::template mapping<extents_type>;
+		constexpr const data_handle_type& data_handle() const noexcept;
+		constexpr const mapping_type& mapping() const noexcept;
+		constexpr const accessor_type& accessor() const noexcept;
+	};
 }
 
 #include <iterator>
@@ -2363,7 +2568,6 @@ namespace std { // Iterators
 	};
 	template <T> using iter_reference_t = decltype(*declval<T&>()); // C++20
 	using iter_rvalue_reference_t = decltype(ranges::iter_move(declval<T&>()));
-	// C++20 iterator concepts
 	// iterator concepts
 	template <class In> concept indirectly_readable;
 	template <indirectly_readable T>
@@ -2374,7 +2578,7 @@ namespace std { // Iterators
 	template <class I> concept input_or_output_iterator;
 	template <class S, class I> concept sentinel_for;
 	template <class S, class I> concept sized_sentinel_for;
-	template <class S, class I> inline constexpr bool disable_sized_sentinel = false;
+	template <class S, class I> constexpr bool disable_sized_sentinel = false;
 	template <class I> concept input_iterator;
 	template <class I, class T> concept output_iterator;
 	template <class I> concept forward_iterator;
@@ -2389,7 +2593,6 @@ namespace std { // Iterators
 	template <class F, class I1, class I2 = I1> concept indirect_equivalence_relation;
 	template <class F, class I1, class I2 = I1> concept indirect_strict_weak_order;
 	template <class F, class... Is>
-	requires (indirectly_readable<Is> && ...) && invocable<F, iter_reference_t<Is>...>
 	using indirect_result_t = invoke_result_t<F, iter_reference_t<Is>...>;
 	template <indirectly_readable I, indirectly_regular_unary_invocable<I> Proj>
 	struct projected;
@@ -2440,26 +2643,38 @@ namespace std { // Iterators
 	template <class Container> class insert_iterator;
 	template <class Container>
 	insert_iterator<Container> inserter(Container& x, typename Container::iterator i);
+
+	// constant iterators and sentinels
+	template <indirectly_readable I>
+	using iter_const_reference_t;
+	template <input_iterator I>
+	using const_iterator;
+	template <semiregular S>
+	using const_sentinel;
+	template <input_iterator Iterator>
+	class basic_const_iterator;
+	template <input_iterator I>
+	constexpr const_iterator<I> make_const_iterator(I it) { return it; }
 	template <class Iterator> class move_iterator;
 	template <class Iterator>
 	constexpr move_iterator<Iterator> make_move_iterator(Iterator i);
-
 	template <Semiregular S> class move_sentinel; // C++20
+
 	template <Iterator I, Sentinel<I> S>
-	requires (!same_as<I, S>) class common_iterator; // C++20
+	class common_iterator; // C++20
 	template <class I, class S>
 	struct incrementable_traits<common_iterator<I, S>>;
 	template <InputIterator I, class S>
 	struct iterator_traits<common_iterator<I, S>>;
 	struct default_sentinel_t;
-	inline constexpr default_sentinel_t default_sentinel{};
+	constexpr default_sentinel_t default_sentinel{};
 	template <Iterator I> class counted_iterator; // C++20
 	template <class I>
 	struct incrementable_traits<counted_iterator<I>>;
 	template <InputIterator I>
 	struct iterator_traits<counted_iterator<I>>;
 	struct unreachable_sentinel_t; // C++20
-	inline constexpr unreachable_sentinel_t unreachable_sentinel{};
+	constexpr unreachable_sentinel_t unreachable_sentinel{};
 
 	// stream iterators
 	template <class T, class charT = char, class traits = char_traits<charT>, class Distance = ptrdiff_t>
@@ -2487,23 +2702,31 @@ namespace std { // Iterators
 #include <ranges> // C++20
 namespace std::ranges { // Ranges
 	template <class T> concept range;
-	template<class T> inline constexpr bool enable_borrowed_range = false;
-	template<class T> concept borrowed_range;
+	template <class T> constexpr bool enable_borrowed_range = false;
+	template <class T> concept borrowed_range;
 	template <range R>
 	using iterator_t = decltype(ranges::begin(declval<R&>()));
+	template <range R>
+	using const_iterator_t = const_iterator<iterator_t<R>>;
 	template <range R>
 	using sentinel_t = decltype(ranges::end(declval<R&>()));
 	template <range R>
 	using range_difference_t = iter_difference_t<iterator_t<R>>;
+	template <sized_range R>
+	using range_size_t = decltype(ranges::size(declval<R&>()));
 	template <range R>
 	using range_value_t = iter_value_t<iterator_t<R>>;
 	template <range R>
 	using range_reference_t = iter_reference_t<iterator_t<R>>;
 	template <range R>
+	using range_const_reference_t = iter_const_reference_t<iterator_t<R>>;
+	template <range R>
 	using range_rvalue_reference_t = iter_rvalue_reference_t<iterator_t<R>>;
-	template <class> inline constexpr bool disable_sized_range = false;
+	template <range R>
+	using range_common_reference_t = iter_common_reference_t<iterator_t<R>>;
+	template <class> constexpr bool disable_sized_range = false;
 	template <class T> concept sized_range;
-	template <class T> inline constexpr bool enable_view;
+	template <class T> constexpr bool enable_view;
 	struct view_base {};
 	template <class T> concept view;
 	// other range refinements
@@ -2515,89 +2738,95 @@ namespace std::ranges { // Ranges
 	template <class T> concept contiguous_range;
 	template <class T> concept common_range;
 	template <class T> concept viewable_range;
+	template <class T> concept constant_range;
 	template <class D>
-	requires is_class_v<D> && same_as<D, remove_cv_t<D>>
 	class view_interface : public view_base {};
 	enum class subrange_kind : bool { unsized, sized };
 	template <input_or_output_iterator I, sentinel_for<I> S = I, subrange_kind K>
-	requires (K == subrange_kind::sized || !sized_sentinel_for<S, I>)
 	class subrange : public view_interface<subrange<I, S, K>> {};
 	struct dangling;
-	template<range R>
+	template <range R, class Allocator = allocator<byte>>
+	struct elements_of;
+	template <range R>
 	using borrowed_iterator_t = conditional_t<borrowed_range<R>, iterator_t<R>, dangling>;
-	template<range R>
+	template <range R>
 	using borrowed_subrange_t = conditional_t<borrowed_range<R>, subrange<iterator_t<R>>, dangling>;
+	template <template <class...> class C, class... Args>
+	constexpr auto to(Args&&... args);
 	// Range factories
 	template <class T>
-	requires is_object_v<T>
 	class empty_view : public view_interface<empty_view<T>> {};
 	namespace views {
 		template <class T>
-		inline constexpr empty_view<T> empty{};
+		constexpr empty_view<T> empty{};
 	}
 	template <copy_constructible T>
-	requires is_object_v<T>
 	class single_view : public view_interface<single_view<T>> {};
-	namespace views { inline constexpr single_view<T> single(); }
+	namespace views { constexpr single_view<T> single(); }
 	template <weakly_incrementable W, semiregular Bound = unreachable_sentinel_t>
 	class iota_view : public view_interface<iota_view<W, Bound>> {};
 	namespace views {
-		inline constexpr iota_view{E} iota(E);
-		inline constexpr iota_view{E, F} iota(E, F);
+		constexpr iota_view{E} iota(E);
+		constexpr iota_view{E, F} iota(E, F);
 	}
-	template<movable Val, class CharT, class Traits = char_traits<CharT>>
+	template <move_constructible T, semiregular Bound = unreachable_sentinel_t>
+	class repeat_view;
+	template <movable Val, class CharT, class Traits = char_traits<CharT>>
 	class basic_istream_view;
-	template<class Val, class CharT, class Traits>
+	template <class Val>
+	using istream_view = basic_istream_view<Val, char>;
+	template <class Val>
+	using wistream_view = basic_istream_view<Val, wchar_t>;
+	template <class Val, class CharT, class Traits>
 	basic_istream_view<Val, CharT, Traits> istream_view(basic_istream<CharT, Traits>& s);
+	template <class D>
+	class range_adaptor_closure { };
 	template <viewable_range R>
 	using all_view = decltype(views::all(declval<R>()));
 	namespace views {
-		inline constexpr ref_view{E} all(E);
-		inline constexpr subrange{E} all(E);
+		constexpr ref_view{E} all(E);
+		constexpr subrange{E} all(E);
 	}
 	template <range R>
-	requires is_object_v<R>
 	class ref_view : public view_interface<ref_view<R>> {};
+	template <range R>
+	class owning_view;
+	template <view V>
+	class as_rvalue_view;
 	template <input_range V, indirect_unary_predicate<iterator_t<V>> Pred>
-	requires view<V> && is_object_v<Pred>
 	class filter_view : public view_interface<filter_view<V, Pred>> {};
-	namespace views { inline constexpr filter_view{E, P} filter(E, P); }
+	namespace views { constexpr filter_view{E, P} filter(E, P); }
 	template <input_range V, copy_constructible F>
-	requires view<V> && is_object_v<F> && regular_invocable<F&, range_reference_t<V>>
 	class transform_view : public view_interface<transform_view<V, F>> {};
-	namespace views { inline constexpr transform_view{E, F} transform(E, F); }
+	namespace views { constexpr transform_view{E, F} transform(E, F); }
 	template <view> class take_view : public view_interface<take_view<V>> {};
-	namespace views { inline constexpr take_view{E, F} take(E, F); }
+	namespace views { constexpr take_view{E, F} take(E, F); }
 	template <view R, class Pred>
-	requires input_range<R> && is_object_v<Pred> && indirect_unary_predicate<const Pred, iterator_t<R>>
 	class take_while_view : public view_interface<take_while_view<R, Pred>> {};
-	namespace views { inline constexpr take_while_view{E, F} take_while(E, F); }
+	namespace views { constexpr take_while_view{E, F} take_while(E, F); }
 	template <view R>
 	class drop_view : public view_interface<drop_view<R>> {};
-	namespace views { inline constexpr drop_view{E, F} drop(E, F); }
+	namespace views { constexpr drop_view{E, F} drop(E, F); }
 	template <view R, class Pred>
-	requires input_range<R> && is_object_v<Pred> && indirect_unary_predicate<const Pred, iterator_t<R>>
 	class drop_while_view : public view_interface<drop_while_view<R, Pred>> {};
-	namespace views { inline constexpr drop_while_view{E, F} drop_while(E, F); }
+	namespace views { constexpr drop_while_view{E, F} drop_while(E, F); }
 	template <input_range V>
-	requires view<V> && input_range<range_reference_t<V>> && (is_reference_v<range_reference_t<V>> || view<range_value_t<V>>)
 	class join_view : public view_interface<join_view<V>> {};
-	namespace views { inline constexpr join_view{E} join(E); }
+	namespace views { constexpr join_view{E} join(E); }
 	template <input_range V, forward_range Pattern>
-	requires view<V> && view<Pattern> && indirectly_comparable<iterator_t<V>, iterator_t<Pattern>, ranges::equal_to> && (forward_range<V> || tiny-range <Pattern>)
 	class split_view : public view_interface<split_view<V, Pattern>> {};
 	namespace views {
-		inline constexpr split_view{E, F} split(E, F);
-		inline constexpr subrange{counted_iterator{E, F}, default_sentinel} counted(E, F);
+		constexpr split_view{E, F} split(E, F);
+		constexpr subrange{counted_iterator{E, F}, default_sentinel} counted(E, F);
 	}
 	template <view V>
-	requires (!common_range<V>)
 	class common_view : public view_interface<common_view<V>> {};
-	namespace views { inline constexpr common_view{E} common(E); }
+	namespace views { constexpr common_view{E} common(E); }
 	template <view V>
-	requires bidirectional_range<V>
 	class reverse_view : public view_interface<reverse_view<V>> {};
-	namespace views { inline constexpr reverse_view{E} reverse(E); }
+	namespace views { constexpr reverse_view{E} reverse(E); }
+	template <view V>
+	class as_const_view;
 	template <input_range R, size_t N>
 	class elements_view : public view_interface<elements_view<R, N>> {};
 	template <class R>
@@ -2606,30 +2835,63 @@ namespace std::ranges { // Ranges
 	using values_view = elements_view<all_view<R>, 1>;
 	namespace views {
 		template <size_t N>
-		inline constexpr elements_view{R} elements(R);
-		inline constexpr keys_view{R} keys(R);
-		inline constexpr values_view{R} values(R);
+		constexpr elements_view{R} elements(R);
+		constexpr keys_view{R} keys(R);
+		constexpr values_view{R} values(R);
 	}
+	template <input_range View>
+	class enumerate_view;
+	template <input_range... Views>
+	class zip_view;
+	template <move_constructible F, input_range... Views>
+	class zip_transform_view;
+	template <forward_range V, size_t N>
+	class adjacent_view;
+	template <forward_range V, move_constructible F, size_t N>
+	class adjacent_transform_view;
+	template <view V>
+	class chunk_view;
+	template <forward_range V>
+	class slide_view;
+	template <forward_range V, indirect_binary_predicate<iterator_t<V>, iterator_t<V>> Pred>
+	class chunk_by_view;
+	template <input_range V>
+	class stride_view;
+	template <input_range First, forward_range... Vs>
+	class cartesian_product_view;
+}
+
+#include <generator> // C++23
+namespace std { // Range generators
+	template <class Ref, class V = void, class Allocator = void>
+	class generator {
+		using yielded;
+		class promise_type;
+	};
 }
 
 #include <algorithm>
 namespace std { // Algorithms
 	namespace ranges { // C++20
 		// algorithm result types
-		template<class I, class F>
+		template <class I, class F>
 		struct in_fun_result;
-		template<class I1, class I2>
+		template <class I1, class I2>
 		struct in_in_result;
-		template<class I, class O>
+		template <class I, class O>
 		struct in_out_result;
-		template<class I1, class I2, class O>
+		template <class I1, class I2, class O>
 		struct in_in_out_result;
-		template<class I, class O1, class O2>
+		template <class I, class O1, class O2>
 		struct in_out_out_result;
-		template<class T>
+		template <class T>
 		struct min_max_result;
-		template<class I>
+		template <class I>
 		struct in_found_result;
+		template <class I, class T>
+		struct in_value_result;
+		template <class O, class T>
+		struct out_value_result;
 
 		template <class I, class F>
 		using for_each_n_result = in_fun_result<I, F>;
@@ -2669,7 +2931,7 @@ namespace std { // Algorithms
 		using rotate_copy_result = in_out_result<I, O>;
 		template <class I, class O1, class O2>
 		using partition_copy_result = in_out_out_result<I, O1, O2>;
-		template<class I, class O>
+		template <class I, class O>
 		using partial_sort_copy_result = in_out_result<I, O>;
 		template <class I1, class I2, class O>
 		using merge_result = in_in_out_result<I1, I2, O>;
@@ -3133,6 +3395,8 @@ namespace std { // Bit manipulation
 	template <typename To, typename From>
 	constexpr To bit_cast(const From& from) noexcept;
 	template <class T>
+	constexpr T byteswap(T value) noexcept; //C++23
+	template <class T>
 	constexpr bool has_single_bit(T x) noexcept;
 	template <class T>
 	constexpr T bit_ceil(T x) noexcept;
@@ -3190,47 +3454,47 @@ namespace std { // Mathematical functions
 
 #include <numbers> // C++20
 namespace std::numbers { // Numbers
-	template <class T> inline constexpr T e_v;
-	template <class T> inline constexpr T log2e_v;
-	template <class T> inline constexpr T log10e_v;
-	template <class T> inline constexpr T pi_v;
-	template <class T> inline constexpr T inv_pi_v;
-	template <class T> inline constexpr T inv_sqrtpi_v;
-	template <class T> inline constexpr T ln2_v;
-	template <class T> inline constexpr T ln10_v;
-	template <class T> inline constexpr T sqrt2_v;
-	template <class T> inline constexpr T sqrt3_v;
-	template <class T> inline constexpr T inv_sqrt3_v;
-	template <class T> inline constexpr T egamma_v;
-	template <class T> inline constexpr T phi_v;
+	template <class T> constexpr T e_v;
+	template <class T> constexpr T log2e_v;
+	template <class T> constexpr T log10e_v;
+	template <class T> constexpr T pi_v;
+	template <class T> constexpr T inv_pi_v;
+	template <class T> constexpr T inv_sqrtpi_v;
+	template <class T> constexpr T ln2_v;
+	template <class T> constexpr T ln10_v;
+	template <class T> constexpr T sqrt2_v;
+	template <class T> constexpr T sqrt3_v;
+	template <class T> constexpr T inv_sqrt3_v;
+	template <class T> constexpr T egamma_v;
+	template <class T> constexpr T phi_v;
 
-	template <floating_point T> inline constexpr T e_v<T>;
-	template <floating_point T> inline constexpr T log2e_v<T>;
-	template <floating_point T> inline constexpr T log10e_v<T>;
-	template <floating_point T> inline constexpr T pi_v<T>;
-	template <floating_point T> inline constexpr T inv_pi_v<T>;
-	template <floating_point T> inline constexpr T inv_sqrtpi_v<T>;
-	template <floating_point T> inline constexpr T ln2_v<T>;
-	template <floating_point T> inline constexpr T ln10_v<T>;
-	template <floating_point T> inline constexpr T sqrt2_v<T>;
-	template <floating_point T> inline constexpr T sqrt3_v<T>;
-	template <floating_point T> inline constexpr T inv_sqrt3_v<T>;
-	template <floating_point T> inline constexpr T egamma_v<T>;
-	template <floating_point T> inline constexpr T phi_v<T>;
+	template <floating_point T> constexpr T e_v<T>;
+	template <floating_point T> constexpr T log2e_v<T>;
+	template <floating_point T> constexpr T log10e_v<T>;
+	template <floating_point T> constexpr T pi_v<T>;
+	template <floating_point T> constexpr T inv_pi_v<T>;
+	template <floating_point T> constexpr T inv_sqrtpi_v<T>;
+	template <floating_point T> constexpr T ln2_v<T>;
+	template <floating_point T> constexpr T ln10_v<T>;
+	template <floating_point T> constexpr T sqrt2_v<T>;
+	template <floating_point T> constexpr T sqrt3_v<T>;
+	template <floating_point T> constexpr T inv_sqrt3_v<T>;
+	template <floating_point T> constexpr T egamma_v<T>;
+	template <floating_point T> constexpr T phi_v<T>;
 
-	inline constexpr double e = e_v<double>;
-	inline constexpr double log2e = log2e_v<double>;
-	inline constexpr double log10e = log10e_v<double>;
-	inline constexpr double pi = pi_v<double>;
-	inline constexpr double inv_pi = inv_pi_v<double>;
-	inline constexpr double inv_sqrtpi = inv_sqrtpi_v<double>;
-	inline constexpr double ln2 = ln2_v<double>;
-	inline constexpr double ln10 = ln10_v<double>;
-	inline constexpr double sqrt2 = sqrt2_v<double>;
-	inline constexpr double sqrt3 = sqrt3_v<double>;
-	inline constexpr double inv_sqrt3 = inv_sqrt3_v<double>;
-	inline constexpr double egamma = egamma_v<double>;
-	inline constexpr double phi = phi_v<double>;
+	constexpr double e = e_v<double>;
+	constexpr double log2e = log2e_v<double>;
+	constexpr double log10e = log10e_v<double>;
+	constexpr double pi = pi_v<double>;
+	constexpr double inv_pi = inv_pi_v<double>;
+	constexpr double inv_sqrtpi = inv_sqrtpi_v<double>;
+	constexpr double ln2 = ln2_v<double>;
+	constexpr double ln10 = ln10_v<double>;
+	constexpr double sqrt2 = sqrt2_v<double>;
+	constexpr double sqrt3 = sqrt3_v<double>;
+	constexpr double inv_sqrt3 = inv_sqrt3_v<double>;
+	constexpr double egamma = egamma_v<double>;
+	constexpr double phi = phi_v<double>;
 }
 
 #include <iosfwd>
@@ -3632,6 +3896,27 @@ namespace std { // Input/output
 	using osyncstream = basic_osyncstream<char>;
 	using wosyncstream = basic_osyncstream<wchar_t>;
 }
+#include <spanstream> // C++23
+namespace std { // Span-based streams
+	template <class charT, class traits = char_traits<charT>>
+	class basic_spanbuf {
+		std::span<charT> span() const noexcept;
+	};
+	using spanbuf = basic_spanbuf<char>;
+	using wspanbuf = basic_spanbuf<wchar_t>;
+	template <class charT, class traits = char_traits<charT>>
+	class basic_ispanstream;
+	using ispanstream = basic_ispanstream<char>;
+	using wispanstream = basic_ispanstream<wchar_t>;
+	template <class charT, class traits = char_traits<charT>>
+	class basic_ospanstream;
+	using ospanstream = basic_ospanstream<char>;
+	using wospanstream = basic_ospanstream<wchar_t>;
+	template <class charT, class traits = char_traits<charT>>
+	class basic_spanstream;
+	using spanstream = basic_spanstream<char>;
+	using wspanstream = basic_spanstream<wchar_t>;
+}
 #include <strstream> // C++98
 namespace std { // deprecated char* streams
 	class strstreambuf : public basic_streambuf<char> {
@@ -3865,47 +4150,47 @@ namespace std::filesystem { // File systems
 namespace std { // Regular expressions
 	namespace regex_constants {
 		using syntax_option_type;
-		inline constexpr syntax_option_type icase;
-		inline constexpr syntax_option_type nosubs;
-		inline constexpr syntax_option_type optimize;
-		inline constexpr syntax_option_type collate;
-		inline constexpr syntax_option_type ECMAScript;
-		inline constexpr syntax_option_type basic;
-		inline constexpr syntax_option_type extended;
-		inline constexpr syntax_option_type awk;
-		inline constexpr syntax_option_type grep;
-		inline constexpr syntax_option_type egrep;
-		inline constexpr syntax_option_type multiline;
+		constexpr syntax_option_type icase;
+		constexpr syntax_option_type nosubs;
+		constexpr syntax_option_type optimize;
+		constexpr syntax_option_type collate;
+		constexpr syntax_option_type ECMAScript;
+		constexpr syntax_option_type basic;
+		constexpr syntax_option_type extended;
+		constexpr syntax_option_type awk;
+		constexpr syntax_option_type grep;
+		constexpr syntax_option_type egrep;
+		constexpr syntax_option_type multiline;
 
 		using match_flag_type;
-		inline constexpr match_flag_type match_default = {};
-		inline constexpr match_flag_type match_not_bol;
-		inline constexpr match_flag_type match_not_eol;
-		inline constexpr match_flag_type match_not_bow;
-		inline constexpr match_flag_type match_not_eow;
-		inline constexpr match_flag_type match_any;
-		inline constexpr match_flag_type match_not_null;
-		inline constexpr match_flag_type match_continuous;
-		inline constexpr match_flag_type match_prev_avail;
-		inline constexpr match_flag_type format_default = {};
-		inline constexpr match_flag_type format_sed;
-		inline constexpr match_flag_type format_no_copy;
-		inline constexpr match_flag_type format_first_only;
+		constexpr match_flag_type match_default = {};
+		constexpr match_flag_type match_not_bol;
+		constexpr match_flag_type match_not_eol;
+		constexpr match_flag_type match_not_bow;
+		constexpr match_flag_type match_not_eow;
+		constexpr match_flag_type match_any;
+		constexpr match_flag_type match_not_null;
+		constexpr match_flag_type match_continuous;
+		constexpr match_flag_type match_prev_avail;
+		constexpr match_flag_type format_default = {};
+		constexpr match_flag_type format_sed;
+		constexpr match_flag_type format_no_copy;
+		constexpr match_flag_type format_first_only;
 
 		using error_type;
-		inline constexpr error_type error_collate;
-		inline constexpr error_type error_ctype;
-		inline constexpr error_type error_escape;
-		inline constexpr error_type error_backref;
-		inline constexpr error_type error_brack;
-		inline constexpr error_type error_paren;
-		inline constexpr error_type error_brace;
-		inline constexpr error_type error_badbrace;
-		inline constexpr error_type error_range;
-		inline constexpr error_type error_space;
-		inline constexpr error_type error_badrepeat;
-		inline constexpr error_type error_complexity;
-		inline constexpr error_type error_stack;
+		constexpr error_type error_collate;
+		constexpr error_type error_ctype;
+		constexpr error_type error_escape;
+		constexpr error_type error_backref;
+		constexpr error_type error_brack;
+		constexpr error_type error_paren;
+		constexpr error_type error_brace;
+		constexpr error_type error_badbrace;
+		constexpr error_type error_range;
+		constexpr error_type error_space;
+		constexpr error_type error_badrepeat;
+		constexpr error_type error_complexity;
+		constexpr error_type error_stack;
 	}
 	class regex_error : public runtime_error {};
 	template <class charT>
@@ -4043,7 +4328,7 @@ namespace std { // Stop tokens
 	struct nostopstate_t {
 		explicit nostopstate_t() = default;
 	};
-	inline constexpr nostopstate_t nostopstate{};
+	constexpr nostopstate_t nostopstate{};
 	template <class Callback>
 	class stop_callback;
 }
@@ -4118,9 +4403,9 @@ namespace std { // Mutual exclusion
 	struct defer_lock_t { explicit defer_lock_t() = default; };
 	struct try_to_lock_t { explicit try_to_lock_t() = default; };
 	struct adopt_lock_t { explicit adopt_lock_t() = default; };
-	inline constexpr defer_lock_t defer_lock {};
-	inline constexpr try_to_lock_t try_to_lock {};
-	inline constexpr adopt_lock_t adopt_lock {};
+	constexpr defer_lock_t defer_lock {};
+	constexpr try_to_lock_t try_to_lock {};
+	constexpr adopt_lock_t adopt_lock {};
 
 	template <class Mutex> class lock_guard;
 	template <class... MutexTypes> class scoped_lock;

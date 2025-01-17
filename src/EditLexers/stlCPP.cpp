@@ -102,8 +102,8 @@ static KEYWORDLIST Keywords_CPP = {{
 "__aligned__ __alloc_size__ __noreturn__ __returns_twice__ __noinline__ __noclone__ __always_inline__ __flatten__ __pure__ __nothrow__ __sentinel__ __format__ __format_arg__ __no_instrument_function__ __no_split_stack__ __section__ __constructor__ __destructor__ __used__ __unused__ __deprecated__ __weak__ __malloc__ __alias__ __ifunc__ __warn_unused_result__ __nonnull__ __gnu_inline__ __externally_visible__ __hot__ __cold__ __artificial__ __error__ __warning__ __cleanup__ __common__ __nocommon__ __mode__ __packed__ __shared__ __tls_model__ __vector_size__ __const__ "
 "cdecl stdcall __cdecl__ __stdcall__ __deprecated__ __dllexport__ __dllimport__ __naked__ __noinline__ __noreturn__ __nothrow__ __selectany__ "
 "may_alias __may_alias__ visibility __visibility__ "
-// C++11, 14, 17, 20
-"assert carries_dependency fallthrough ensures expects maybe_unused likely unlikely no_unique_address nodiscard optimize_for_synchronized "
+// C/C++
+"assume carries_dependency fallthrough indeterminate maybe_unused likely unlikely no_unique_address nodiscard optimize_for_synchronized reproducible unsequenced "
 
 , // 5 Class
 // locale.h
@@ -136,16 +136,20 @@ static KEYWORDLIST Keywords_CPP = {{
 "runtime_error range_error overflow_error underflow_error "
 // <system_error>
 "error_category error_code error_condition system_error "
+// <stacktrace>
+"stacktrace_entry basic_stacktrace stacktrace "
 // <utility>
 "to_chars_result from_chars_result integer_sequence pair tuple_size tuple_element "
 // <tuple>
 "tuple "
 // <optional>
-"optional nullopt_t bad_optional_access "
+"optional bad_optional_access "
 // <variant>
 "variant variant_size variant_alternative monostate bad_variant_access "
 // <any>
 "any bad_any_cast "
+// <expected>
+"unexpected unexpected bad_expected_access "
 // <bitset>
 "bitset "
 // <memory>
@@ -156,7 +160,7 @@ static KEYWORDLIST Keywords_CPP = {{
 // <scoped_allocator>
 "scoped_allocator_adaptor "
 // <functional>
-"reference_wrapper identity is_bind_expression is_placeholder function bad_function_call "
+"reference_wrapper identity is_bind_expression is_placeholder function move_only_function bad_function_call "
 "default_searcher boyer_moore_searcher boyer_moore_horspool_searcher "
 // <type_traits>
 "integral_constant bool_constant true_type false_type "
@@ -187,8 +191,8 @@ static KEYWORDLIST Keywords_CPP = {{
 "map multimap set multiset "
 // <unordered_map> <unordered_set>
 "hash unordered_map unordered_multimap unordered_set unordered_multiset "
-// <queue> <stack> <span>
-"queue priority_queue stack " "span "
+// <queue> <stack> <flat_map> <flat_set> <span> <mdspan>
+"queue priority_queue stack flat_map flat_multimap flat_set flat_multiset span mdspan "
 // <iterator>
 "incrementable_traits indirectly_readable_traits iterator_traits input_iterator_tag output_iterator_tag forward_iterator_tag bidirectional_iterator_tag random_access_iterator_tag contiguous_iterator_tag "
 "reverse_iterator back_insert_iterator front_insert_iterator insert_iterator move_iterator common_iterator counted_iterator move_sentinel "
@@ -832,6 +836,7 @@ static KEYWORDLIST Keywords_CPP = {{
 "first second " // pair
 "ignore " // <tuple>
 "nullopt " // <optional>
+"unexpect " // <expected>
 "variant_npos " // <variant>
 // <functional>
 "equal_to not_equal_to greater less greater_equal less_equal " // ranges

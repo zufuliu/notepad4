@@ -1,7 +1,7 @@
 // C99 https://open-std.org/jtc1/sc22/wg14/www/docs/n1256.pdf
 // C11 https://open-std.org/jtc1/sc22/wg14/www/docs/n1570.pdf
 // C17 https://files.lhmouse.com/standards/ISO%20C%20N2176.pdf
-// C23 https://open-std.org/JTC1/SC22/WG14/www/docs/n3096.pdf
+// C23 https://open-std.org/JTC1/SC22/WG14/www/docs/n3220.pdf
 // https://en.cppreference.com/w/c
 // https://en.cppreference.com/w/c/header
 // https://en.cppreference.com/w/c/links
@@ -29,7 +29,7 @@ void volatile
 while
 
 _BitInt _Bool bool _Complex complex _Imaginary imaginary
-_Decimal128 _Decimal32 _Decimal64 // C2x
+_Decimal128 _Decimal32 _Decimal64 // C23
 auto char double float int long short signed unsigned
 
 asm
@@ -59,14 +59,26 @@ _Pragma()
 __has_include(header)
 __has_embed(header-name embed-parameter-sequenceopt)
 __has_c_attribute(pp-tokens)
+// attributes https://en.cppreference.com/w/c/language/attributes
+[[deprecated]]
+[[fallthrough]]
+[[maybe_unused]]
+[[nodiscard]]
+[[noreturn]]
+[[reproducible]]
+[[unsequenced]]
 
 // Argument substitution
 __VA_ARGS__
+__VA_OPT__
 // Predefined macro names
 __DATE__
 __FILE__
 __LINE__
 __STDC__
+__STDC_EMBED_NOT_FOUND__ // C23
+__STDC_EMBED_FOUND__ // C23
+__STDC_EMBED_EMPTY__ // C23
 __STDC_HOSTED__
 __STDC_VERSION__
 __TIME__
@@ -77,10 +89,10 @@ __STDC_UTF_16__
 __STDC_UTF_32__
 // Conditional feature macros
 __STDC_ANALYZABLE__
-__STDC_IEC_60559_BFP__
+__STDC_IEC_60559_BFP__ // C23
 __STDC_IEC_559__
-__STDC_IEC_60559_DFP__
-__STDC_IEC_60559_COMPLEX__
+__STDC_IEC_60559_DFP__ // C23
+__STDC_IEC_60559_COMPLEX__ // C23
 __STDC_IEC_559_COMPLEX__
 __STDC_LIB_EXT1__
 __STDC_NO_ATOMICS__
@@ -118,73 +130,95 @@ __STDC_NO_VLA__
 	double complex cacos(double complex z);
 	float complex cacosf(float complex z);
 	long double complex cacosl(long double complex z);
+
 	double complex casin(double complex z);
 	float complex casinf(float complex z);
 	long double complex casinl(long double complex z);
+
 	double complex catan(double complex z);
 	float complex catanf(float complex z);
 	long double complex catanl(long double complex z);
+
 	double complex ccos(double complex z);
 	float complex ccosf(float complex z);
 	long double complex ccosl(long double complex z);
+
 	double complex csin(double complex z);
 	float complex csinf(float complex z);
 	long double complex csinl(long double complex z);
+
 	double complex ctan(double complex z);
 	float complex ctanf(float complex z);
 	long double complex ctanl(long double complex z);
+
 	// Hyperbolic functions
 	double complex cacosh(double complex z);
 	float complex cacoshf(float complex z);
 	long double complex cacoshl(long double complex z);
+
 	double complex casinh(double complex z);
 	float complex casinhf(float complex z);
 	long double complex casinhl(long double complex z);
+
 	double complex catanh(double complex z);
 	float complex catanhf(float complex z);
 	long double complex catanhl(long double complex z);
+
 	double complex ccosh(double complex z);
 	float complex ccoshf(float complex z);
 	long double complex ccoshl(long double complex z);
+
 	double complex csinh(double complex z);
 	float complex csinhf(float complex z);
 	long double complex csinhl(long double complex z);
+
 	double complex ctanh(double complex z);
 	float complex ctanhf(float complex z);
 	long double complex ctanhl(long double complex z);
+
 	// Exponential and logarithmic functions
 	double complex cexp(double complex z);
 	float complex cexpf(float complex z);
 	long double complex cexpl(long double complex z);
+
 	double complex clog(double complex z);
 	float complex clogf(float complex z);
 	long double complex clogl(long double complex z);
+
 	// Power and absolute-value functions
 	double cabs(double complex z);
 	float cabsf(float complex z);
 	long double cabsl(long double complex z);
+
 	double complex cpow(double complex x, double complex y);
 	float complex cpowf(float complex x, float complex y);
 	long double complex cpowl(long double complex x, long double complex y);
+
 	double complex csqrt(double complex z);
 	float complex csqrtf(float complex z);
 	long double complex csqrtl(long double complex z);
+
 	// Manipulation functions
 	double carg(double complex z);
 	float cargf(float complex z);
 	long double cargl(long double complex z);
+
 	double cimag(double complex z);
 	float cimagf(float complex z);
 	long double cimagl(long double complex z);
+
 	double complex CMPLX(double x, double y);
 	float complex CMPLXF(float x, float y);
 	long double complex CMPLXL(long double x, long double y);
+
 	double complex conj(double complex z);
 	float complex conjf(float complex z);
 	long double complex conjl(long double complex z);
+
 	double complex cproj(double complex z);
 	float complex cprojf(float complex z);
 	long double complex cprojl(long double complex z);
+
 	double creal(double complex z);
 	float crealf(float complex z);
 	long double creall(long double complex z);
@@ -221,24 +255,24 @@ __STDC_NO_VLA__
 #include <fenv.h>
 {	// Floating-point environment
 	fenv_t
-	femode_t		// C2x
+	femode_t		// C23
 	fexcept_t
 	FE_DIVBYZERO
 	FE_INEXACT
 	FE_INVALID
 	FE_OVERFLOW
 	FE_UNDERFLOW
-	FE_DFL_MODE		// C2x
+	FE_DFL_MODE		// C23
 	FE_ALL_EXCEPT
 	FE_DOWNWARD
 	FE_TONEAREST
 	FE_TOWARDZERO
 	FE_UPWARD
-	FE_DEC_DOWNWARD		// C2x
-	FE_DEC_TONEAREST	// C2x
-	FE_DEC_TONEARESTFROMZERO	// C2x
-	FE_DEC_TOWARDZERO	// C2x
-	FE_DEC_UPWARD		// C2x
+	FE_DEC_DOWNWARD		// C23
+	FE_DEC_TONEAREST	// C23
+	FE_DEC_TONEARESTFROMZERO	// C23
+	FE_DEC_TOWARDZERO	// C23
+	FE_DEC_UPWARD		// C23
 	FE_DFL_ENV
 	#pragma STDC FENV_ACCESS on-off-switch
 	#pragma STDC FENV_ROUND direction
@@ -249,17 +283,17 @@ __STDC_NO_VLA__
 	int feclearexcept(int excepts);
 	int fegetexceptflag(fexcept_t *flagp, int excepts);
 	int feraiseexcept(int excepts);
-	int fesetexcept(int excepts); // C2x
+	int fesetexcept(int excepts); // C23
 	int fesetexceptflag(const fexcept_t *flagp, int excepts);
-	int fetestexceptflag(const fexcept_t *flagp, int excepts); // C2x
+	int fetestexceptflag(const fexcept_t *flagp, int excepts); // C23
 	int fetestexcept(int excepts);
 	// Rounding
-	int fegetmode(femode_t *modep); // C2x
+	int fegetmode(femode_t *modep); // C23
 	int fegetround(void);
-	int fe_dec_getround(void); // C2x
-	int fesetmode(const femode_t *modep); // C2x
+	int fe_dec_getround(void); // C23
+	int fesetmode(const femode_t *modep); // C23
 	int fesetround(int round);
-	int fe_dec_setround(int round); // C2x
+	int fe_dec_setround(int round); // C23
 	// Environment
 	int fegetenv(fenv_t *envp);
 	int feholdexcept(fenv_t *envp);
@@ -537,44 +571,43 @@ __STDC_NO_VLA__
 
 #include <math.h>
 {	// Mathematics
-	__STDC_VERSION_MATH_H__
 	float_t
 	double_t
-	_Decimal32_t	// C2x
-	_Decimal64_t	// C2x
+	_Decimal32_t	// C23
+	_Decimal64_t	// C23
 	HUGE_VAL
 	HUGE_VALF
 	HUGE_VALL
-	HUGE_VAL_D32	// C2x
-	HUGE_VAL_D64	// C2x
-	HUGE_VAL_D128	// C2x
+	HUGE_VAL_D32	// C23
+	HUGE_VAL_D64	// C23
+	HUGE_VAL_D128	// C23
 	INFINITY
-	DEC_INFINITY	// C2x
+	DEC_INFINITY	// C23
 	NAN
-	DEC_NAN			// C2x
-	SNANF			// C2x
-	SNAN			// C2x
-	SNANL			// C2x
-	SNAND32			// C2x
-	SNAND64			// C2x
-	SNAND128		// C2x
+	DEC_NAN			// C23
+	SNANF			// C23
+	SNAN			// C23
+	SNANL			// C23
+	SNAND32			// C23
+	SNAND64			// C23
+	SNAND128		// C23
 	FP_INFINITE
 	FP_NAN
 	FP_NORMAL
 	FP_SUBNORMAL
 	FP_ZERO
-	FP_INT_UPWARD		// C2x
-	FP_INT_DOWNWARD		// C2x
-	FP_INT_TOWARDZERO	// C2x
-	FP_INT_TONEARESTFROMZERO	// C2x
-	FP_INT_TONEAREST	// C2x
+	FP_INT_UPWARD		// C23
+	FP_INT_DOWNWARD		// C23
+	FP_INT_TOWARDZERO	// C23
+	FP_INT_TONEARESTFROMZERO	// C23
+	FP_INT_TONEAREST	// C23
 	FP_FAST_FMA
 	FP_FAST_FMAF
 	FP_FAST_FMAL
-	FP_FAST_FMAD32	// C2x
-	FP_FAST_FMAD64	// C2x
-	FP_FAST_FMAD128	// C2x
-	// C2x
+	FP_FAST_FMAD32	// C23
+	FP_FAST_FMAD64	// C23
+	FP_FAST_FMAD128	// C23
+	// C23
 	FP_FAST_FADD
 	FP_FAST_FADDL
 	FP_FAST_DADDL
@@ -593,7 +626,7 @@ __STDC_NO_VLA__
 	FP_FAST_FFMA
 	FP_FAST_FFMAL
 	FP_FAST_DFMAL
-	// C2x
+	// C23
 	FP_FAST_D32ADDD64
 	FP_FAST_D32ADDD128
 	FP_FAST_D64ADDD128
@@ -614,8 +647,8 @@ __STDC_NO_VLA__
 	FP_FAST_D64SQRTD128
 	FP_ILOGB0
 	FP_ILOGBNAN
-	FP_LLOGB0		// C2x
-	FP_LLOGBNAN		// C2x
+	FP_LLOGB0		// C23
+	FP_LLOGBNAN		// C23
 	MATH_ERRNO
 	MATH_ERREXCEPT
 	math_errhandling
@@ -623,15 +656,15 @@ __STDC_NO_VLA__
 
 	// Classification macros
 	int fpclassify(real-floating x);
-	int iscanonical(real-floating x); // C2x
+	int iscanonical(real-floating x); // C23
 	int isfinite(real-floating x);
 	int isinf(real-floating x);
 	int isnan(real-floating x);
 	int isnormal(real-floating x);
 	int signbit(real-floating x);
-	int issignaling(real-floating x); // C2x
-	int issubnormal(real-floating x); // C2x
-	int iszero(real-floating x); // C2x
+	int issignaling(real-floating x); // C23
+	int issubnormal(real-floating x); // C23
+	int iszero(real-floating x); // C23
 
 	// Trigonometric functions
 	double acos(double x);
@@ -683,49 +716,49 @@ __STDC_NO_VLA__
 	_Decimal64 tand64(_Decimal64 x);
 	_Decimal128 tand128(_Decimal128 x);
 
-	double acospi(double x); // C2x
+	double acospi(double x); // C23
 	float acospif(float x);
 	long double acospil(long double x);
 	_Decimal32 acospid32(_Decimal32 x);
 	_Decimal64 acospid64(_Decimal64 x);
 	_Decimal128 acospid128(_Decimal128 x);
 
-	double asinpi(double x); // C2x
+	double asinpi(double x); // C23
 	float asinpif(float x);
 	long double asinpil(long double x);
 	_Decimal32 asinpid32(_Decimal32 x);
 	_Decimal64 asinpid64(_Decimal64 x);
 	_Decimal128 asinpid128(_Decimal128 x);
 
-	double atanpi(double x); // C2x
+	double atanpi(double x); // C23
 	float atanpif(float x);
 	long double atanpil(long double x);
 	_Decimal32 atanpid32(_Decimal32 x);
 	_Decimal64 atanpid64(_Decimal64 x);
 	_Decimal128 atanpid128(_Decimal128 x);
 
-	double atan2pi(double y, double x); // C2x
+	double atan2pi(double y, double x); // C23
 	float atan2pif(float y, float x);
 	long double atan2pil(long double y, long double x);
 	_Decimal32 atan2pid32(_Decimal32 y, _Decimal32 x);
 	_Decimal64 atan2pid64(_Decimal64 y, _Decimal64 x);
 	_Decimal128 atan2pid128(_Decimal128 y, _Decimal128 x);
 
-	double cospi(double x); // C2x
+	double cospi(double x); // C23
 	float cospif(float x);
 	long double cospil(long double x);
 	_Decimal32 cospid32(_Decimal32 x);
 	_Decimal64 cospid64(_Decimal64 x);
 	_Decimal128 cospid128(_Decimal128 x);
 
-	double sinpi(double x); // C2x
+	double sinpi(double x); // C23
 	float sinpif(float x);
 	long double sinpil(long double x);
 	_Decimal32 sinpid32(_Decimal32 x);
 	_Decimal64 sinpid64(_Decimal64 x);
 	_Decimal128 sinpid128(_Decimal128 x);
 
-	double tanpi(double x); // C2x
+	double tanpi(double x); // C23
 	float tanpif(float x);
 	long double tanpil(long double x);
 	_Decimal32 tanpid32(_Decimal32 x);
@@ -783,14 +816,14 @@ __STDC_NO_VLA__
 	_Decimal64 expd64(_Decimal64 x);
 	_Decimal128 expd128(_Decimal128 x);
 
-	double exp10(double x); // C2x
+	double exp10(double x); // C23
 	float exp10f(float x);
 	long double exp10l(long double x);
 	_Decimal32 exp10d32(_Decimal32 x);
 	_Decimal64 exp10d64(_Decimal64 x);
 	_Decimal128 exp10d128(_Decimal128 x);
 
-	double exp10m1(double x); // C2x
+	double exp10m1(double x); // C23
 	float exp10m1f(float x);
 	long double exp10m1l(long double x);
 	_Decimal32 exp10m1d32(_Decimal32 x);
@@ -804,7 +837,7 @@ __STDC_NO_VLA__
 	_Decimal64 exp2d64(_Decimal64 x);
 	_Decimal128 exp2d128(_Decimal128 x);
 
-	double exp2m1(double x); // C2x
+	double exp2m1(double x); // C23
 	float exp2m1f(float x);
 	long double exp2m1l(long double x);
 	_Decimal32 exp2m1d32(_Decimal32 x);
@@ -839,7 +872,7 @@ __STDC_NO_VLA__
 	_Decimal64 ldexpd64(_Decimal64 x, int p);
 	_Decimal128 ldexpd128(_Decimal128 x, int p);
 
-	int llogb(double x); // C2x
+	int llogb(double x); // C23
 	int llogbf(float x);
 	int llogbl(long double x);
 	int llogbd32(_Decimal32 x);
@@ -860,22 +893,23 @@ __STDC_NO_VLA__
 	_Decimal64 log10d64(_Decimal64 x);
 	_Decimal128 log10d128(_Decimal128 x);
 
-	double log10p1(double x); // C2x
+	double log10p1(double x); // C23
 	float log10p1f(float x);
 	long double log10p1l(long double x);
 	_Decimal32 log10p1d32(_Decimal32 x);
 	_Decimal64 log10p1d64(_Decimal64 x);
 	_Decimal128 log10p1d128(_Decimal128 x);
 
-	double log1p(double x);
+	double log1p(double x); // C23
 	float log1pf(float x);
 	long double log1pl(long double x);
-	double logp1(double x); // C2x
-	float logp1f(float x);
-	long double logp1l(long double x);
 	_Decimal32 log1pd32(_Decimal32 x);
 	_Decimal64 log1pd64(_Decimal64 x);
 	_Decimal128 log1pd128(_Decimal128 x);
+
+	double logp1(double x); // C23
+	float logp1f(float x);
+	long double logp1l(long double x);
 	_Decimal32 logp1d32(_Decimal32 x);
 	_Decimal64 logp1d64(_Decimal64 x);
 	_Decimal128 logp1d128(_Decimal128 x);
@@ -887,7 +921,7 @@ __STDC_NO_VLA__
 	_Decimal64 log2d64(_Decimal64 x);
 	_Decimal128 log2d128(_Decimal128 x);
 
-	double log2p1(double x); // C2x
+	double log2p1(double x); // C23
 	float log2p1f(float x);
 	long double log2p1l(long double x);
 	_Decimal32 log2p1d32(_Decimal32 x);
@@ -930,7 +964,7 @@ __STDC_NO_VLA__
 	_Decimal64 cbrtd64(_Decimal64 x);
 	_Decimal128 cbrtd128(_Decimal128 x);
 
-	double compoundn(double x, intmax_t n); // C2x
+	double compoundn(double x, intmax_t n); // C23
 	float compoundnf(float x, intmax_t n);
 	long double compoundnl(long double x, intmax_t n);
 	_Decimal32 compoundnd32(_Decimal32 x, intmax_t n);
@@ -958,28 +992,28 @@ __STDC_NO_VLA__
 	_Decimal64 powd64(_Decimal64 x, _Decimal64 y);
 	_Decimal128 powd128(_Decimal128 x, _Decimal128 y);
 
-	double pown(double x, intmax_t n); // C2x
+	double pown(double x, intmax_t n); // C23
 	float pownf(float x, intmax_t n);
 	long double pownl(long double x, intmax_t n);
 	_Decimal32 pownd32(_Decimal32 x, intmax_t n);
 	_Decimal64 pownd64(_Decimal64 x, intmax_t n);
 	_Decimal128 pownd128(_Decimal128 x, intmax_t n);
 
-	double powr(double y, double x); // C2x
+	double powr(double y, double x); // C23
 	float powrf(float y, float x);
 	long double powrl(long double y, long double x);
 	_Decimal32 powrd32(_Decimal32 y, _Decimal32 x);
 	_Decimal64 powrd64(_Decimal64 y, _Decimal64 x);
 	_Decimal128 powrd128(_Decimal128 y, _Decimal128 x);
 
-	double rootn(double x, intmax_t n); // C2x
+	double rootn(double x, intmax_t n); // C23
 	float rootnf(float x, intmax_t n);
 	long double rootnl(long double x, intmax_t n);
 	_Decimal32 rootnd32(_Decimal32 x, intmax_t n);
 	_Decimal64 rootnd64(_Decimal64 x, intmax_t n);
 	_Decimal128 rootnd128(_Decimal128 x, intmax_t n);
 
-	double rsqrt(double x); // C2x
+	double rsqrt(double x); // C23
 	float rsqrtf(float x);
 	long double rsqrtl(long double x);
 	_Decimal32 rsqrtd32(_Decimal32 x);
@@ -1086,7 +1120,7 @@ __STDC_NO_VLA__
 	long long int llroundd64(_Decimal64 x);
 	long long int llroundd128(_Decimal128 x);
 
-	double roundeven(double x); // C2x
+	double roundeven(double x); // C23
 	float roundevenf(float x);
 	long double roundevenl(long double x);
 	_Decimal32 roundevend32(_Decimal32 x);
@@ -1100,28 +1134,28 @@ __STDC_NO_VLA__
 	_Decimal64 truncd64(_Decimal64 x);
 	_Decimal128 truncd128(_Decimal128 x);
 
-	intmax_t fromfp(double x, int round, unsigned int width); // C2x
+	intmax_t fromfp(double x, int round, unsigned int width); // C23
 	intmax_t fromfpf(float x, int round, unsigned int width);
 	intmax_t fromfpl(long double x, int round, unsigned int width);
 	intmax_t fromfpd32(_Decimal32 x, int round, unsigned int width);
 	intmax_t fromfpd64(_Decimal64 x, int round, unsigned int width);
 	intmax_t fromfpd128(_Decimal128 x, int round, unsigned int width);
 
-	uintmax_t ufromfp(double x, int round, unsigned int width); // C2x
+	uintmax_t ufromfp(double x, int round, unsigned int width); // C23
 	uintmax_t ufromfpf(float x, int round, unsigned int width);
 	uintmax_t ufromfpl(long double x, int round, unsigned int width);
 	uintmax_t ufromfpd32(_Decimal32 x, int round, unsigned int width);
 	uintmax_t ufromfpd64( _Decimal64 x, int round, unsigned int width);
 	uintmax_t ufromfpd128(_Decimal128 x, int round, unsigned int width);
 
-	intmax_t fromfpx(double x, int round, unsigned int width); // C2x
+	intmax_t fromfpx(double x, int round, unsigned int width); // C23
 	intmax_t fromfpxf(float x, int round, unsigned int width);
 	intmax_t fromfpxl(long double x, int round, unsigned int width);
 	intmax_t fromfpxd32(_Decimal32 x, int round, unsigned int width);
 	intmax_t fromfpxd64(_Decimal64 x, int round, unsigned int width);
 	intmax_t fromfpxd128(_Decimal128 x, int round, unsigned int width);
 
-	uintmax_t ufromfpx(double x, int round, unsigned int width); // C2x
+	uintmax_t ufromfpx(double x, int round, unsigned int width); // C23
 	uintmax_t ufromfpxf(float x, int round, unsigned int width);
 	uintmax_t ufromfpxl(long double x, int round, unsigned int width);
 	uintmax_t ufromfpxd32(_Decimal32 x, int round, unsigned int width);
@@ -1176,21 +1210,21 @@ __STDC_NO_VLA__
 	_Decimal64 nexttowardd64(_Decimal64 x, _Decimal128 y);
 	_Decimal128 nexttowardd128(_Decimal128 x, _Decimal128 y);
 
-	double nextup(double x); // C2x
+	double nextup(double x); // C23
 	float nextupf(float x);
 	long double nextupl(long double x);
 	_Decimal32 nextupd32(_Decimal32 x);
 	_Decimal64 nextupd64(_Decimal64 x);
 	_Decimal128 nextupd128(_Decimal128 x);
 
-	double nextdown(double x); // C2x
+	double nextdown(double x); // C23
 	float nextdownf(float x);
 	long double nextdownl(long double x);
 	_Decimal32 nextdownd32(_Decimal32 x);
 	_Decimal64 nextdownd64(_Decimal64 x);
 	_Decimal128 nextdownd128(_Decimal128 x);
 
-	int canonicalize(double *cx, const double *x); // C2x
+	int canonicalize(double *cx, const double *x); // C23
 	int canonicalizef(float *cx, const float *x);
 	int canonicalizel(long double *cx, const long double *x);
 	int canonicalized32(_Decimal32 *cx, const _Decimal32 *x);
@@ -1219,19 +1253,61 @@ __STDC_NO_VLA__
 	_Decimal64 fmind64(_Decimal64 x, _Decimal64 y);
 	_Decimal128 fmind128(_Decimal128 x, _Decimal128 y);
 
-	double fmaxmag(double x, double y); // C2x
-	float fmaxmagf(float x, float y);
-	long double fmaxmagl(long double x, long double y);
-	_Decimal32 fmaxmagd32(_Decimal32 x, _Decimal32 y);
-	_Decimal64 fmaxmagd64(_Decimal64 x, _Decimal64 y);
-	_Decimal128 fmaxmagd128(_Decimal128 x, _Decimal128 y);
+	double fmaximum(double x, double y); // C23
+	float fmaximumf(float x, float y);
+	long double fmaximuml(long double x, long double y);
+	_Decimal32 fmaximumd32(_Decimal32 x, _Decimal32 y);
+	_Decimal64 fmaximumd64(_Decimal64 x, _Decimal64 y);
+	_Decimal128 fmaximumd128(_Decimal128 x, _Decimal128 y);
 
-	double fminmag(double x, double y); // C2x
-	float fminmagf(float x, float y);
-	long double fminmagl(long double x, long double y);
-	_Decimal32 fminmagd32(_Decimal32 x, _Decimal32 y);
-	_Decimal64 fminmagd64(_Decimal64 x, _Decimal64 y);
-	_Decimal128 fminmagd128(_Decimal128 x, _Decimal128 y);
+	double fminimum(double x, double y); // C23
+	float fminimumf(float x, float y);
+	long double fminimuml(long double x, long double y);
+	_Decimal32 fminimumd32(_Decimal32 x, _Decimal32 y);
+	_Decimal64 fminimumd64(_Decimal64 x, _Decimal64 y);
+	_Decimal128 fminimumd128(_Decimal128 x, _Decimal128 y);
+
+	double fmaximum_mag(double x, double y); // C23
+	float fmaximum_magf(float x, float y);
+	long double fmaximum_magl(long double x, long double y);
+	_Decimal32 fmaximum_magd32(_Decimal32 x, _Decimal32 y);
+	_Decimal64 fmaximum_magd64(_Decimal64 x, _Decimal64 y);
+	_Decimal128 fmaximum_magd128(_Decimal128 x, _Decimal128 y);
+
+	double fminimum_mag(double x, double y); // C23
+	float fminimum_magf(float x, float y);
+	long double fminimum_magl(long double x, long double y);
+	_Decimal32 fminimum_magd32(_Decimal32 x, _Decimal32 y);
+	_Decimal64 fminimum_magd64(_Decimal64 x, _Decimal64 y);
+	_Decimal128 fminimum_magd128(_Decimal128 x, _Decimal128 y);
+
+	double fmaximum_num(double x, double y); // C23
+	float fmaximum_numf(float x, float y);
+	long double fmaximum_numl(long double x, long double y);
+	_Decimal32 fmaximum_numd32(_Decimal32 x, _Decimal32 y);
+	_Decimal64 fmaximum_numd64(_Decimal64 x, _Decimal64 y);
+	_Decimal128 fmaximum_numd128(_Decimal128 x, _Decimal128 y);
+
+	double fminimum_num(double x, double y); // C23
+	float fminimum_numf(float x, float y);
+	long double fminimum_numl(long double x, long double y);
+	_Decimal32 fminimum_numd32(_Decimal32 x, _Decimal32 y);
+	_Decimal64 fminimum_numd64(_Decimal64 x, _Decimal64 y);
+	_Decimal128 fminimum_numd128(_Decimal128 x, _Decimal128 y);
+
+	double fmaximum_mag_num(double x, double y); // C23
+	float fmaximum_mag_numf(float x, float y);
+	long double fmaximum_mag_numl(long double x, long double y);
+	_Decimal32 fmaximum_mag_numd32(_Decimal32 x, _Decimal32 y);
+	_Decimal64 fmaximum_mag_numd64(_Decimal64 x, _Decimal64 y);
+	_Decimal128 fmaximum_mag_numd128(_Decimal128 x, _Decimal128 y);
+
+	double fminimum_mag_num(double x, double y); // C23
+	float fminimum_mag_numf(float x, float y);
+	long double fminimum_mag_numl(long double x, long double y);
+	_Decimal32 fminimum_mag_numd32(_Decimal32 x, _Decimal32 y);
+	_Decimal64 fminimum_mag_numd64(_Decimal64 x, _Decimal64 y);
+	_Decimal128 fminimum_mag_numd128(_Decimal128 x, _Decimal128 y);
 
 	// Floating multiply-add
 	double fma(double x, double y, double z);
@@ -1242,29 +1318,47 @@ __STDC_NO_VLA__
 	_Decimal128 fmad128(_Decimal128 x, _Decimal128 y, _Decimal128 z);
 
 	// Functions that round result to narrower type
-	double fadd(double x, double y); // C2x
+	double fadd(double x, double y); // C23
 	float faddf(long double x, long double y);
 	double daddl(long double x, long double y);
+	_Decimal32 d32addd64(_Decimal64 x, _Decimal64 y);
+	_Decimal32 d32addd128(_Decimal128 x, _Decimal128 y);
+	_Decimal64 d64addd128(_Decimal128 x, _Decimal128 y);
 
-	double fsub(double x, double y); // C2x
+	double fsub(double x, double y); // C23
 	float fsubl(long double x, long double y);
 	double dsubl(long double x, long double y);
+	_Decimal32 d32subd64(_Decimal64 x, _Decimal64 y);
+	_Decimal32 d32subd128(_Decimal128 x, _Decimal128 y);
+	_Decimal64 d64subd128(_Decimal128 x, _Decimal128 y);
 
-	double fmul(double x, double y); // C2x
+	double fmul(double x, double y); // C23
 	float fmull(long double x, long double y);
 	double dmull(long double x, long double y);
+	_Decimal32 d32muld64(_Decimal64 x, _Decimal64 y);
+	_Decimal32 d32muld128(_Decimal128 x, _Decimal128 y);
+	_Decimal64 d64muld128(_Decimal128 x, _Decimal128 y);
 
-	double fdiv(double x, double y); // C2x
+	double fdiv(double x, double y); // C23
 	float fdivf(long double x, long double y);
 	double fdivl(long double x, long double y);
+	_Decimal32 d32divd64(_Decimal64 x, _Decimal64 y);
+	_Decimal32 d32divd128(_Decimal128 x, _Decimal128 y);
+	_Decimal64 d64divd128(_Decimal128 x, _Decimal128 y);
 
-	double ffma(double x, double y, double z); // C2x
+	double ffma(double x, double y, double z); // C23
 	float ffmal(long double x, long double y, long double z);
 	double dfmal(long double x, long double y, long double z);
+	_Decimal32 d32fmad64(_Decimal64 x, _Decimal64 y, _Decimal64 z);
+	_Decimal32 d32fmad128(_Decimal128 x, _Decimal128 y, _Decimal128 z);
+	_Decimal64 d64fmad128(_Decimal128 x, _Decimal128 y, _Decimal128 z);
 
-	double sqrt(double x); // C2x
+	double sqrt(double x); // C23
 	float fsqrtf(long double x);
 	double dsqrtl(long double x);
+	_Decimal32 d32sqrtd64(_Decimal64 x);
+	_Decimal32 d32sqrtd128(_Decimal128 x);
+	_Decimal64 d64sqrtd128(_Decimal128 x);
 
 	// Quantum and quantum exponent functions
 	_Decimal32 quantized32(_Decimal32 x, _Decimal32 y);
@@ -1307,7 +1401,7 @@ __STDC_NO_VLA__
 	int islessequal(real-floating x, real-floating y);
 	int islessgreater(real-floating x, real-floating y);
 	int isunordered(real-floating x, real-floating y);
-	int iseqsig(real-floating x, real-floating y); // C2x
+	int iseqsig(real-floating x, real-floating y); // C23
 }
 
 #include <setjmp.h>
@@ -1315,7 +1409,7 @@ __STDC_NO_VLA__
 	jmp_buf
 
 	int setjmp(jmp_buf env);
-	_Noreturn void longjmp(jmp_buf env, int val);
+	[[noreturn]] void longjmp(jmp_buf env, int val);
 }
 
 #include <signal.h>
@@ -1451,6 +1545,118 @@ __STDC_NO_VLA__
 	void atomic_flag_clear_explicit(volatile atomic_flag *object, memory_order order);
 }
 
+#include <stdbit.h> // C23
+{	// Bit and byte utilities
+	__STDC_ENDIAN_LITTLE__
+	__STDC_ENDIAN_BIG__
+	__STDC_ENDIAN_NATIVE__
+
+	unsigned int stdc_leading_zeros_uc(unsigned char value) [[unsequenced]];
+	unsigned int stdc_leading_zeros_us(unsigned short value) [[unsequenced]];
+	unsigned int stdc_leading_zeros_ui(unsigned int value) [[unsequenced]];
+	unsigned int stdc_leading_zeros_ul(unsigned long int value) [[unsequenced]];
+	unsigned int stdc_leading_zeros_ull(unsigned long long int value) [[unsequenced]];
+	generic_return_type stdc_leading_zeros(generic_value_type value) [[unsequenced]];
+
+	unsigned int stdc_leading_ones_uc(unsigned char value) [[unsequenced]];
+	unsigned int stdc_leading_ones_us(unsigned short value) [[unsequenced]];
+	unsigned int stdc_leading_ones_ui(unsigned int value) [[unsequenced]];
+	unsigned int stdc_leading_ones_ul(unsigned long int value) [[unsequenced]];
+	unsigned int stdc_leading_ones_ull(unsigned long long int value) [[unsequenced]];
+	generic_return_type stdc_leading_ones(generic_value_type value) [[unsequenced]];
+
+	unsigned int stdc_trailing_zeros_uc(unsigned char value) [[unsequenced]];
+	unsigned int stdc_trailing_zeros_us(unsigned short value) [[unsequenced]];
+	unsigned int stdc_trailing_zeros_ui(unsigned int value) [[unsequenced]];
+	unsigned int stdc_trailing_zeros_ul(unsigned long int value) [[unsequenced]];
+	unsigned int stdc_trailing_zeros_ull(unsigned long long int value) [[unsequenced]];
+	generic_return_type stdc_trailing_zeros(generic_value_type value) [[unsequenced]];
+
+	unsigned int stdc_trailing_ones_uc(unsigned char value) [[unsequenced]];
+	unsigned int stdc_trailing_ones_us(unsigned short value) [[unsequenced]];
+	unsigned int stdc_trailing_ones_ui(unsigned int value) [[unsequenced]];
+	unsigned int stdc_trailing_ones_ul(unsigned long int value) [[unsequenced]];
+	unsigned int stdc_trailing_ones_ull(unsigned long long int value) [[unsequenced]];
+	generic_return_type stdc_trailing_ones(generic_value_type value) [[unsequenced]];
+
+	unsigned int stdc_first_leading_zero_uc(unsigned char value) [[unsequenced]];
+	unsigned int stdc_first_leading_zero_us(unsigned short value) [[unsequenced]];
+	unsigned int stdc_first_leading_zero_ui(unsigned int value) [[unsequenced]];
+	unsigned int stdc_first_leading_zero_ul(unsigned long int value) [[unsequenced]];
+	unsigned int stdc_first_leading_zero_ull(unsigned long long int value) [[unsequenced]];
+	generic_return_type stdc_first_leading_zero(generic_value_type value) [[unsequenced]];
+
+	unsigned int stdc_first_leading_one_uc(unsigned char value) [[unsequenced]];
+	unsigned int stdc_first_leading_one_us(unsigned short value) [[unsequenced]];
+	unsigned int stdc_first_leading_one_ui(unsigned int value) [[unsequenced]];
+	unsigned int stdc_first_leading_one_ul(unsigned long int value) [[unsequenced]];
+	unsigned int stdc_first_leading_one_ull(unsigned long long int value) [[unsequenced]];
+	generic_return_type stdc_first_leading_one(generic_value_type value) [[unsequenced]];
+
+	unsigned int stdc_first_trailing_zero_uc(unsigned char value) [[unsequenced]];
+	unsigned int stdc_first_trailing_zero_us(unsigned short value) [[unsequenced]];
+	unsigned int stdc_first_trailing_zero_ui(unsigned int value) [[unsequenced]];
+	unsigned int stdc_first_trailing_zero_ul(unsigned long int value) [[unsequenced]];
+	unsigned int stdc_first_trailing_zero_ull(unsigned long long int value) [[unsequenced]];
+	generic_return_type stdc_first_trailing_zero(generic_value_type value) [[unsequenced]];
+
+	unsigned int stdc_first_trailing_one_uc(unsigned char value) [[unsequenced]];
+	unsigned int stdc_first_trailing_one_us(unsigned short value) [[unsequenced]];
+	unsigned int stdc_first_trailing_one_ui(unsigned int value) [[unsequenced]];
+	unsigned int stdc_first_trailing_one_ul(unsigned long int value) [[unsequenced]];
+	unsigned int stdc_first_trailing_one_ull(unsigned long long int value) [[unsequenced]];
+	generic_return_type stdc_first_trailing_one(generic_value_type value) [[unsequenced]];
+
+	unsigned int stdc_count_zeros_uc(unsigned char value) [[unsequenced]];
+	unsigned int stdc_count_zeros_us(unsigned short value) [[unsequenced]];
+	unsigned int stdc_count_zeros_ui(unsigned int value) [[unsequenced]];
+	unsigned int stdc_count_zeros_ul(unsigned long int value) [[unsequenced]];
+	unsigned int stdc_count_zeros_ull(unsigned long long int value) [[unsequenced]];
+	generic_return_type stdc_count_zeros(generic_value_type value) [[unsequenced]];
+
+	unsigned int stdc_count_ones_uc(unsigned char value) [[unsequenced]];
+	unsigned int stdc_count_ones_us(unsigned short value) [[unsequenced]];
+	unsigned int stdc_count_ones_ui(unsigned int value) [[unsequenced]];
+	unsigned int stdc_count_ones_ul(unsigned long int value) [[unsequenced]];
+	unsigned int stdc_count_ones_ull(unsigned long long int value) [[unsequenced]];
+	generic_return_type stdc_count_ones(generic_value_type value) [[unsequenced]];
+
+	bool stdc_has_single_bit_uc(unsigned char value) [[unsequenced]];
+	bool stdc_has_single_bit_us(unsigned short value) [[unsequenced]];
+	bool stdc_has_single_bit_ui(unsigned int value) [[unsequenced]];
+	bool stdc_has_single_bit_ul(unsigned long int value) [[unsequenced]];
+	bool stdc_has_single_bit_ull(unsigned long long int value) [[unsequenced]];
+	bool stdc_has_single_bit(generic_value_type value) [[unsequenced]];
+
+	unsigned int stdc_bit_width_uc(unsigned char value) [[unsequenced]];
+	unsigned int stdc_bit_width_us(unsigned short value) [[unsequenced]];
+	unsigned int stdc_bit_width_ui(unsigned int value) [[unsequenced]];
+	unsigned int stdc_bit_width_ul(unsigned long int value) [[unsequenced]];
+	unsigned int stdc_bit_width_ull(unsigned long long int value) [[unsequenced]];
+	generic_return_type stdc_bit_width(generic_value_type value) [[unsequenced]];
+
+	unsigned char stdc_bit_floor_uc(unsigned char value) [[unsequenced]];
+	unsigned short stdc_bit_floor_us(unsigned short value) [[unsequenced]];
+	unsigned int stdc_bit_floor_ui(unsigned int value) [[unsequenced]];
+	unsigned long int stdc_bit_floor_ul(unsigned long int value) [[unsequenced]];
+	unsigned long long int stdc_bit_floor_ull(unsigned long long int value) [[unsequenced]];
+	generic_value_type stdc_bit_floor(generic_value_type value) [[unsequenced]];
+
+	unsigned char stdc_bit_ceil_uc(unsigned char value) [[unsequenced]];
+	unsigned short stdc_bit_ceil_us(unsigned short value) [[unsequenced]];
+	unsigned int stdc_bit_ceil_ui(unsigned int value) [[unsequenced]];
+	unsigned long int stdc_bit_ceil_ul(unsigned long int value) [[unsequenced]];
+	unsigned long long int stdc_bit_ceil_ull(unsigned long long int value) [[unsequenced]];
+	generic_value_type stdc_bit_ceil(generic_value_type value) [[unsequenced]];
+}
+
+#include <stdckdint.h> // C23
+{	// Checked Integer Arithmetic
+	bool ckd_add(type1 *result, type2 a, type3 b);
+	bool ckd_sub(type1 *result, type2 a, type3 b);
+	bool ckd_mul(type1 *result, type2 a, type3 b);
+}
+
 #include <stdbool.h>
 {	// Boolean type and values
 	bool
@@ -1465,7 +1671,9 @@ __STDC_NO_VLA__
 	size_t
 	max_align_t
 	wchar_t
+	nullptr_t
 	NULL
+	unreachable() // C23
 	offsetof(type, member-designator)
 }
 
@@ -1562,6 +1770,7 @@ __STDC_NO_VLA__
 	EOF
 	FOPEN_MAX
 	FILENAME_MAX
+	_PRINTF_NAN_LEN_MAX
 	L_tmpnam
 	SEEK_CUR
 	SEEK_END
@@ -1632,6 +1841,7 @@ __STDC_NO_VLA__
 	EXIT_SUCCESS
 	RAND_MAX
 	MB_CUR_MAX
+	void call_once(once_flag *flag, void (*func)(void)); // C23
 	// Numeric conversion functions
 	double atof(const char *nptr);
 	int atoi(const char *nptr);
@@ -1647,15 +1857,15 @@ __STDC_NO_VLA__
 	unsigned long int strtoul(const char * restrict nptr, char ** restrict endptr, int base);
 	unsigned long long int strtoull(const char * restrict nptr, char ** restrict endptr, int base);
 
-	int strfromd(char* restrict s, size_t n, const char *restrict format, double fp); // C2x
+	int strfromd(char* restrict s, size_t n, const char *restrict format, double fp); // C23
 	int strfromf(char* restrict s, size_t n, const char *restrict format, float fp);
 	int strfroml(char* restrict s, size_t n, const char *restrict format, long double fp);
 
-	int strfromd32(char* restrict s, size_t n, const char *restrict format, _Decimal32 fp); // C2x
+	int strfromd32(char* restrict s, size_t n, const char *restrict format, _Decimal32 fp); // C23
 	int strfromd64(char* restrict s, size_t n, const char *restrict format, _Decimal64 fp);
 	int strfromd128(char* restrict s, size_t n, const char *restrict format, _Decimal128 fp);
 
-	_Decimal32 strtod32(const char * restrict nptr, char ** restrict endptr); // C2x
+	_Decimal32 strtod32(const char * restrict nptr, char ** restrict endptr); // C23
 	_Decimal64 strtod64(const char * restrict nptr,char ** restrict endptr);
 	_Decimal128 strtod128(const char * restrict nptr,char ** restrict endptr);
 	// Pseudo-random sequence generation functions
@@ -1665,16 +1875,18 @@ __STDC_NO_VLA__
 	void *aligned_alloc(size_t alignment, size_t size)
 	void *calloc(size_t nmemb, size_t size);
 	void free(void *ptr);
+	void free_sized(void *ptr, size_t size); // C23
+	void free_aligned_sized(void *ptr, size_t alignment, size_t size); // C23
 	void *malloc(size_t size);
 	void *realloc(void *ptr, size_t size);
 	// Communication with the environment
-	_Noreturn void abort(void);
+	[[noreturn]] void abort(void);
 	int atexit(void (*func)(void));
 	int at_quick_exit(void (*func)(void));
-	_Noreturn void exit(int status);
-	_Noreturn void _Exit(int status);
+	[[noreturn]] void exit(int status);
+	[[noreturn]] void _Exit(int status);
 	char *getenv(const char *name);
-	_Noreturn void quick_exit(int status);
+	[[noreturn]] void quick_exit(int status);
 	int system(const char *string);
 	// Searching and sorting utilities
 	void *bsearch(const void *key, const void *base, size_t nmemb, size_t size, int (*compar)(const void *, const void *));
@@ -1694,6 +1906,8 @@ __STDC_NO_VLA__
 	// Multibyte/wide string conversion functions
 	size_t mbstowcs(wchar_t * restrict pwcs, const char * restrict s, size_t n);
 	size_t wcstombs(char * restrict s, const wchar_t * restrict pwcs, size_t n);
+	// Alignment of memory
+	size_t memalignment(const void *p); // C23
 }
 
 #include <stdnoreturn.h>
@@ -1705,9 +1919,12 @@ __STDC_NO_VLA__
 #include <string.h>
 {	// String handling
 	void *memcpy(void * restrict s1, const void * restrict s2, size_t n);
+	void *memccpy(void * restrict s1, const void * restrict s2, int c, size_t n); // C23
 	void *memmove(void *s1, const void *s2, size_t n);
 	char *strcpy(char * restrict s1, const char * restrict s2);
 	char *strncpy(char * restrict s1, const char * restrict s2, size_t n);
+	char *strdup(const char *s); // C23
+	char *strndup(const char *s, size_t size); // C23
 	// Concatenation functions
 	char *strcat(char * restrict s1, const char * restrict s2);
 	char *strncat(char * restrict s1, const char * restrict s2, size_t n);
@@ -1728,15 +1945,13 @@ __STDC_NO_VLA__
 	char *strtok(char * restrict s1, const char * restrict s2);
 	// Miscellaneous functions
 	void *memset(void *s, int c, size_t n);
+	void *memset_explicit(void *s, int c, size_t n); // C23
 	char *strerror(int errnum);
 	size_t strlen(const char *s);
-	char *strdup(const char *s); // C2x
-	char *strndup(const char *s, size_t size); // C2x
 }
 
 #include <tgmath.h>
 { // Type-generic math
-	__STDC_VERSION_TGMATH_H__
 }
 
 #include <threads.h>
@@ -1784,7 +1999,7 @@ __STDC_NO_VLA__
 	thrd_t thrd_current(void);
 	int thrd_detach(thrd_t thr);
 	int thrd_equal(thrd_t thr0, thrd_t thr1);
-	_Noreturn void thrd_exit(int res);
+	[[noreturn]] void thrd_exit(int res);
 	int thrd_join(thrd_t thr, int *res);
 	int thrd_sleep(const struct timespec *duration, struct timespec *remaining);
 	void thrd_yield(void);
@@ -1799,6 +2014,9 @@ __STDC_NO_VLA__
 {	// Date and time
 	CLOCKS_PER_SEC
 	TIME_UTC
+	TIME_MONOTONIC
+	TIME_ACTIVE
+	TIME_THREAD_ACTIVE
 	clock_t
 	time_t
 	struct timespec;
@@ -1808,21 +2026,28 @@ __STDC_NO_VLA__
 	clock_t clock(void);
 	double difftime(time_t time1, time_t time0);
 	time_t mktime(struct tm *timeptr);
+	time_t timegm(struct tm *timeptr);
 	time_t time(time_t *timer);
 	int timespec_get(struct timespec *ts, int base);
+	int timespec_getres(struct timespec *ts, int base); // C23
 	// Time conversion functions
-	char *asctime(const struct tm *timeptr);
-	char *ctime(const time_t *timer);
+	[[deprecated]] char *asctime(const struct tm *timeptr);
+	[[deprecated]] char *ctime(const time_t *timer);
 	struct tm *gmtime(const time_t *timer);
+	struct tm *gmtime_r(const time_t *timer, struct tm *buf);  // C23
 	struct tm *localtime(const time_t *timer);
+	struct tm *localtime_r(const time_t *timer, struct tm *buf); // C23
 	size_t strftime(char * restrict s, size_t maxsize, const char * restrict format, const struct tm * restrict timeptr);
 }
 
 #include <uchar.h>
 {	// Unicode utilities
+	char8_t
 	char16_t
 	char32_t
 
+	size_t mbrtoc8(char8_t * restrict pc8, const char * restrict s, size_t n, mbstate_t * restrict ps); // C23
+	size_t c8rtomb(char * restrict s, char16_t c8, mbstate_t * restrict ps); // C23
 	size_t mbrtoc16(char16_t * restrict pc16, const char * restrict s, size_t n, mbstate_t * restrict ps);
 	size_t c16rtomb(char * restrict s, char16_t c16, mbstate_t * restrict ps);
 	size_t mbrtoc32(char32_t * restrict pc32, const char * restrict s, size_t n, mbstate_t * restrict ps);

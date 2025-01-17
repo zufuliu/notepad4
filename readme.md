@@ -48,8 +48,8 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* [Vala](https://wiki.gnome.org/Projects/Vala) 0.54
 	* C/C++, [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#cc)
 		* Objective-C/C++, [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#objective-cc)
-		* [C Standard Library](tools/lang/C.c), up to C2x.
-		* [C++ STL](tools/lang/CPP.cpp), up to C++20.
+		* [C Standard Library](tools/lang/C.c), up to C23.
+		* [C++ STL](tools/lang/CPP.cpp), up to C++23.
 	* [Cangjie (仓颉)](tools/lang/Cangjie.cj), up to October 2024.
 	* [CSS Style Sheet](tools/lang/CSS.css), up to November 2024.
 		* [SCSS Style Sheet](tools/lang/SCSS.scss), up to Dart Sass 1.50.
