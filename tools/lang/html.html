@@ -1,5 +1,5 @@
 <!--
-https://whatwg.org/ 17 December 2024
+https://whatwg.org/ 17 January 2025
 HTML 4.01 https://www.w3.org/TR/html4/ 27 March 2018
 XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 XHTML 1.0 https://www.w3.org/TR/xhtml1/ 27 March 2018
@@ -31,7 +31,7 @@ https://developer.mozilla.org/en-US/docs/Web/HTML
 	lang="en" xml:lang xml:base
 	xmlns xmlns:xsi xsi:schemaLocation
 	nonce
-	popover="auto manual" popovertarget="toggle show hide" popovertargetaction
+	popover="auto manual hint" popovertarget="toggle show hide" popovertargetaction
 	spellcheck="true false"
 	style
 	tabindex
@@ -44,7 +44,7 @@ https://developer.mozilla.org/en-US/docs/Web/HTML
 		<!-- https://html.spec.whatwg.org/multipage/semantics.html -->
 		<base href target>
 		<!-- Link types https://html.spec.whatwg.org/multipage/links.html#linkTypes -->
-		<!-- Referrer Policy https://www.w3.org/TR/referrer-policy/ -->
+		<!-- Referrer Policy https://www.w3.org/TR/referrer-policy/ 26 January 2017 -->
 		<!-- https://fetch.spec.whatwg.org/#concept-request-destination -->
 		<link href
 			crossorigin="anonymous use-credentials"
@@ -58,7 +58,19 @@ https://developer.mozilla.org/en-US/docs/Web/HTML
 		<!-- Standard metadata names https://html.spec.whatwg.org/multipage/semantics.html#standard-metadata-names -->
 		<meta name="application-name author description generator keywords referrer theme-color color-scheme "
 			http-equiv="content-language content-type default-style refresh set-cookie x-ua-compatible content-security-policy"
-			content="never default always origin-when-crossorigin" charset="utf-8" media>
+			content charset="utf-8" media>
+		<meta name="referrer" content="never default always origin-when-crossorigin">
+		<!-- https://www.w3.org/TR/css-color-adjust-1/ 14 June 2022 -->
+		<meta name="color-scheme" content="normal dark light only" />
+		<!-- https://www.w3.org/TR/css-viewport-1/ 25 January 2024 -->
+		<!-- https://developer.mozilla.org/en-US/docs/Web/HTML/Viewport_meta_tag -->
+		<meta name="viewport" content="width=device-width, height=device-height, initial-scale=, minimum-scale=, maximum-scale=, user-scalable=yes, interactive-widget=resizes-visual resizes-content overlays-content">
+		<!-- https://developer.mozilla.org/en-US/docs/Web/HTML/Element/meta/name -->
+		<!-- The Open Graph protocol https://ogp.me/ -->
+		<!--
+		<meta name="creator publisher">
+		<meta property="og:title og:type og:image og:url">
+		-->
 		<style media blocking="render" type="text/css" title></style>
 	</head>
 	<!-- event handler content attributes https://html.spec.whatwg.org/multipage/dom.html#global-attributes -->
@@ -252,7 +264,7 @@ https://developer.mozilla.org/en-US/docs/Web/HTML
 		<img alt src srcset sizes crossorigin usemap ismap width height
 		decoding="sync async auto" loading="lazy eager" referrerpolicy fetchpriority>
 		<!-- https://html.spec.whatwg.org/multipage/iframe-embed-object.html -->
-		<!-- https://www.w3.org/TR/permissions-policy/ -->
+		<!-- https://www.w3.org/TR/permissions-policy/ 13 January 2025 -->
 		<!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/Permissions_Policy -->
 		<iframe src srcdoc name
 		sandbox="allow-downloads allow-forms allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts allow-top-navigation allow-top-navigation-by-user-activation allow-top-navigation-to-custom-protocols"
@@ -328,7 +340,7 @@ https://developer.mozilla.org/en-US/docs/Web/HTML
 		<!-- Interactive elements https://html.spec.whatwg.org/multipage/interactive-elements.html -->
 		<details name open></details>
 		<summary></summary>
-		<dialog open></dialog>
+		<dialog closedby="any closerequest none" open></dialog>
 		<!-- Scripting https://html.spec.whatwg.org/multipage/scripting.html -->
 		<script src type="text/javascript text/ecmascript text/jscript text/livescript module text/plain text/xml application/octet-stream application/xml"
 			charset nomodule async defer crossorigin integrity referrerpolicy blocking="render" fetchpriority></script>
@@ -462,7 +474,7 @@ https://developer.mozilla.org/en-US/docs/Web/HTML
 		<html virtualkeyboardpolicy>
 			<a attributionsrc target="_unfencedTop"></a>
 			<audio disableremoteplayback></audio>
-			<button command commandfor></button>
+			<button command="show-modal close show-popover hide-popover toggle-popover" commandfor></button>
 			<fencedframe allow height width></fencedframe>
 			<iframe allowpaymentrequest credentialless csp></iframe>
 			<img attributionsrc elementtiming>
