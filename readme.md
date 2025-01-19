@@ -51,7 +51,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* [C Standard Library](tools/lang/C.c), up to C23.
 		* [C++ STL](tools/lang/CPP.cpp), up to C++23.
 	* [Cangjie (仓颉)](tools/lang/Cangjie.cj), up to October 2024.
-	* [CSS Style Sheet](tools/lang/CSS.css), up to November 2024.
+	* [CSS Style Sheet](tools/lang/CSS.css), up to January 2025.
 		* [SCSS Style Sheet](tools/lang/SCSS.scss), up to Dart Sass 1.50.
 		* [Less Style Sheet](tools/lang/Less.less), up to Less 4.1.
 		* [HSS Style Sheet](tools/lang/HSS.hss)
