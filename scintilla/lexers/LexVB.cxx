@@ -477,6 +477,11 @@ struct FoldLineState {
 	}
 };
 
+inline bool IsCodeFolding(const char *s, unsigned wordLen) noexcept {
+	const char *p = strstr(" interface module namespace operator synclock try using ", s);
+	return p != nullptr && p[-1] == ' ' && p[wordLen] == ' ';
+}
+
 void FoldVBDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList /*keywordLists*/, Accessor &styler) {
 	const Language language = static_cast<Language>(styler.GetPropertyInt("lexer.lang"));
 	const Sci_PositionU endPos = startPos + lengthDoc;
@@ -511,7 +516,6 @@ void FoldVBDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Le
 			}
 			if (style != initStyle) {
 				s[wordLen] = '\0';
-				wordLen = 0;
 				if (style == SCE_VB_KEYWORD) {
 					const KeywordType kwPrev = kwType;
 					kwType = KeywordType::None;
@@ -586,7 +590,7 @@ void FoldVBDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Le
 									kwType = KeywordType::SkipWhile;
 								} else if (StrEqual(s, "custom")) {
 									kwType = KeywordType::CustomEvent;
-								} else if (StrEqualsAny(s, "try", "using", "module", "operator", "synclock", "interface", "namespace")
+								} else if (IsCodeFolding(s, wordLen)
 									|| (kwPrev == KeywordType::CustomEvent && StrEqual(s, "event"))
 									|| (chNext == '(' && StrEqualsAny(s, "addhandler", "removehandler", "raiseevent"))
 									|| (!foldCurrent.IsInterfaceBlock() && StrEqual(s, "structure"))) {
@@ -607,6 +611,7 @@ void FoldVBDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Le
 						levelNext++;
 					}
 				}
+				wordLen = 0;
 			}
 		} else if (style == SCE_VB_OPERATOR) {
 			kwType = KeywordType::None;
