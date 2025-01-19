@@ -49,10 +49,12 @@ Checks: [
     # -modernize-use-auto,
     # -modernize-use-default-member-init,
     # -readability-braces-around-statements,
+    # -readability-container-contains,
     # -readability-else-after-return,
     # -readability-named-parameter,
     # -readability-simplify-boolean-expr,
     # -bugprone-reserved-identifier,
+    # -bugprone-standalone-empty,
     # -misc-const-correctness,
     ]
 
