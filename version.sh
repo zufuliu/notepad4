@@ -89,8 +89,8 @@ fi
 
 # Update manifest file if version information was changed.
 base_ver="[0-9][0-9]"
-new_ver="`date +%m`.0.${ver}"
-newmanifest="$(sed -Ee "0,/(${base_ver}\.)([0-9.]+)/s//\1${new_ver}/g" "$manifestfile")"
+new_ver="`date +%y.%m`.0.${ver}"
+newmanifest="$(sed -Ee "s/(${base_ver}\.[0-9.]+)/${new_ver}/g" "$manifestfile")"
 if [[ "$newmanifest" != "$(<"$manifestfile")" ]]; then
   # Update the revision number in the manifest file
   echo "$newmanifest" > "$manifestfile"
@@ -104,7 +104,7 @@ if [[ $# -ne 0 ]]; then
     echo "$version_info" > "$versionfile"
   fi
 
-  newmanifest="$(sed -Ee "0,/(${base_ver}\.)([0-9.]+)/s//\1${new_ver}/g" "$manifestfile")"
+  newmanifest="$(sed -Ee "s/(${base_ver}\.[0-9.]+)/${new_ver}/g" "$manifestfile")"
   if [[ "$newmanifest" != "$(<"$manifestfile")" ]]; then
     echo "$newmanifest" > "$manifestfile"
   fi
