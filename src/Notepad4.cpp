@@ -702,8 +702,11 @@ static void HandleMatchText(MatchTextFlag flag, LPCWSTR lpszText, bool jumpTo) n
 
 		if (flag & MatchTextFlag_Regex) {
 			efrData.fuFlags |= (iFindReplaceOption & FindReplaceOption_UseCxxRegex) ? (SCFIND_REGEXP | SCFIND_CXX11REGEX) : (SCFIND_REGEXP | SCFIND_POSIX);
-		} else if (flag & MatchTextFlag_TransformBS) {
-			efrData.option |= FindReplaceOption_TransformBackslash;
+		} else {
+			efrData.fuFlags &= SCFIND_REGEXP - 1; // clear all regex flags
+			if (flag & MatchTextFlag_TransformBS) {
+				efrData.option |= FindReplaceOption_TransformBackslash;
+			}
 		}
 
 		if (flag & MatchTextFlag_FindUp) {
