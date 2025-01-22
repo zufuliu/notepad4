@@ -33,7 +33,7 @@ public:
 	explicit CharBuffer(size_t size) noexcept {
 		if (size <= StackSize) {
 			ptr = buffer;
-			memset(buffer, '\0', StackSize);
+			memset(buffer, 0, StackSize);
 		} else {
 			ptr = static_cast<char *>(NP2HeapAlloc(size));
 		}

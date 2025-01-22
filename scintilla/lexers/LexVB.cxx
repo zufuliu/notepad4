@@ -503,7 +503,7 @@ void FoldVBDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Le
 	int ifThenMask = 0; // If ... Then ... End If
 	int wordLen = 0;
 	char s[MaxKeywordSize];
-	memset(s, 4, 4);
+	memset(s, 0, 4);
 
 	while (startPos < endPos) {
 		const int style = initStyle;

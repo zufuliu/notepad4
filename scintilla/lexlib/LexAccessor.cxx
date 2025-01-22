@@ -39,7 +39,7 @@ bool LexAccessor::MatchLowerCase(Sci_Position pos, const char *s) noexcept {
 void LexAccessor::GetRange(Sci_PositionU startPos_, Sci_PositionU endPos_, char *s, Sci_PositionU len) const noexcept {
 	assert(s != nullptr);
 	assert(startPos_ <= endPos_ && len != 0);
-	//memset(s, '\0', len);
+	//memset(s, 0, len);
 	endPos_ = sci::min(endPos_, startPos_ + len - 1);
 	//endPos_ = sci::min(endPos_, static_cast<Sci_PositionU>(lenDoc));
 	len = endPos_ - startPos_;

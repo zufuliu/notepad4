@@ -187,7 +187,7 @@ bool isHTMLCustomElement(const char *tag, size_t length, bool dashColon) noexcep
 
 int classifyTagHTML(Sci_PositionU end, LexerWordList keywordLists, LexAccessor &styler, bool &tagDontFold, bool isXml, bool allowScripts) {
 	char s[63 + 1];
-	memset(s, '\0', 4);
+	memset(s, 0, 4);
 	const Sci_PositionU start = styler.GetStartSegment();
 	styler.GetRange(start, end, s, sizeof(s));
 	char *tag = s;

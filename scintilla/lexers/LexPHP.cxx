@@ -225,7 +225,7 @@ void PHPLexer::ClassifyHtmlTag(LexerWordList keywordLists) {
 		sc.SetState((tagType == HtmlTagType::Question) ? SCE_H_QUESTION : SCE_H_TAG);
 	} else if (tagType == HtmlTagType::None) {
 		char s[16];
-		memset(s, '\0', 4);
+		memset(s, 0, 4);
 		sc.GetCurrentLowered(s, sizeof(s));
 		const char *p = s + 1;
 		if (StrEqual(p, "script")) {
