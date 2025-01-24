@@ -1035,7 +1035,7 @@ static constexpr bool IsC0ControlChar(uint8_t ch) noexcept {
 #endif
 }
 
-bool MaybeBinaryFile(const uint8_t *ptr, DWORD length) noexcept {
+bool MaybeBinaryFile(const uint8_t *ptr, DWORD length, int *encodingFlag) noexcept {
 	/* Test C0 Control Character
 	These characters are not reused in most text encodings, and do not appear in normal text files.
 	Most binary files have reserved fields (mostly zeros) or small values in the header.
@@ -1046,17 +1046,25 @@ bool MaybeBinaryFile(const uint8_t *ptr, DWORD length) noexcept {
 	const uint8_t * const end = ptr + length;
 	UINT count = 0;
 	UINT mask = 0; // find two different C0 control characters
+	int result = 0;
 	while (ptr < end) {
 		const uint8_t ch = *ptr++;
 		if (IsC0ControlChar(ch)) {
 			++count;
 			mask |= 1U << ch;
-			if (((mask & (mask - 1)) != 0) && ((count >= 8) || IsC0ControlChar(*ptr))) {
-				return true;
+			if ((mask & (mask - 1)) != 0) {
+				result |= 2;
+			}
+			if ((count >= 8) || IsC0ControlChar(*ptr)) {
+				result |= 1;
+			}
+			if (result == 3) {
+				*encodingFlag = EncodingFlag_Binary;
+				break;
 			}
 		}
 	}
-	return false;
+	return result & true;
 }
 
 static inline BOOL IsValidMultiByte(UINT codePage, const char *lpData, DWORD cbData) noexcept {
@@ -2439,9 +2447,8 @@ int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, int *enco
 		*encodingFlag = EncodingFlag_Invalid;
 	}
 	// detect binary file
-	if (MaybeBinaryFile(reinterpret_cast<const uint8_t *>(lpData), cbData)) {
+	if (MaybeBinaryFile(reinterpret_cast<const uint8_t *>(lpData), cbData, encodingFlag)) {
 		tryUnicode = true;
-		*encodingFlag = EncodingFlag_Binary;
 	}
 	// check UTF-16 without BOM
 	if (tryUnicode && (cbData & 1) == 0 && fvCurFile.mask == 0) {
