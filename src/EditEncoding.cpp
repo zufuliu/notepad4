@@ -2345,7 +2345,7 @@ int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, int *enco
 		return iEncoding;
 	}
 
-	// file larger than 2 GiB is loaded without encoding conversion, i.e. loaded as UTF-8 or ANSI only.
+	// load large file without encoding conversion, i.e. loaded as UTF-8 or ANSI only.
 	if (cbData >= MAX_NON_UTF8_SIZE) {
 		if (iSrcEncoding != CPI_DEFAULT && (utf8Sig || IsUTF8(lpData, cbData))) {
 			iEncoding = CPI_UTF8 + utf8Sig;

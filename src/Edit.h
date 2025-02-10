@@ -452,8 +452,10 @@ void	EditClickCallTip(HWND hwnd) noexcept;
 #define CPI_GLOBAL_DEFAULT			CPI_UTF8
 
 #define MAX_ENCODING_LABEL_SIZE		32
-// MultiByteToWideChar() and WideCharToMultiByte() uses int as length.
-#define MAX_NON_UTF8_SIZE	((1U << 31) - 16)
+// MultiByteToWideChar() and WideCharToMultiByte() uses int as length, but may fails around 1GB.
+#define MAX_NON_UTF8_SIZE	((1U << 30) - 16)
+// Sci_Position and Sci_Line is int for small file, and ptrdiff_t for large file.
+#define MAX_SMALL_FILE_SIZE	((1U << 31) - 16)
 // added 32 bytes padding as encoding detection may read beyond cbData.
 #define NP2_ENCODING_DETECTION_PADDING	32
 

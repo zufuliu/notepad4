@@ -150,7 +150,7 @@ void EditSetNewText(LPCSTR lpstrText, DWORD cbText, Sci_Line lineCount) noexcept
 
 #if defined(_WIN64)
 	// enable conversion between line endings
-	if (bLargeFileMode || cbText + lineCount >= MAX_NON_UTF8_SIZE) {
+	if (bLargeFileMode || cbText + lineCount >= MAX_SMALL_FILE_SIZE) {
 		constexpr int mask = SC_DOCUMENTOPTION_TEXT_LARGE | SC_DOCUMENTOPTION_STYLES_NONE;
 		const int options = SciCall_GetDocumentOptions();
 		if ((options & mask) != mask) {
@@ -1000,7 +1000,7 @@ bool EditLoadFile(LPWSTR pszFile, EditFileIOStatus &status) noexcept {
 	//     3. Extra memory when moving gaps on editing, it may require more than 2/3 physical memory.
 	// large file TODO: https://github.com/zufuliu/notepad4/issues/125
 	// [ ] [> 4 GiB] use SetFilePointerEx() and ReadFile()/WriteFile() to read/write file.
-	// [-] [> 2 GiB] fix encoding conversion with MultiByteToWideChar() and WideCharToMultiByte().
+	// [-] [> 1 GiB] fix encoding conversion with MultiByteToWideChar() and WideCharToMultiByte().
 	LONGLONG maxFileSize = INT64_C(4) << 30;
 #else
 	// 2 GiB: ptrdiff_t / Sci_Position used in Scintilla
@@ -4369,7 +4369,7 @@ void EditEnsureConsistentLineEndings() noexcept {
 		return;
 	}
 	const size_t actions = SciCall_GetUndoActions();
-	if (lineCount + actions >= MAX_NON_UTF8_SIZE) {
+	if (lineCount + actions >= MAX_SMALL_FILE_SIZE) {
 		// Scintilla undo stack is indexed with int
 		return;
 	}
@@ -4382,7 +4382,7 @@ void EditEnsureConsistentLineEndings() noexcept {
 #endif
 		{
 			const size_t dwLength = SciCall_GetLength() + lineCount;
-			if (dwLength >= MAX_NON_UTF8_SIZE) {
+			if (dwLength >= MAX_SMALL_FILE_SIZE) {
 				return;
 			}
 		}
