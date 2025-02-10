@@ -31,7 +31,7 @@ LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
 // RT_MANIFEST
 //
 
-//IDR_RT_MANIFEST         RT_MANIFEST             "..\\..\\res\\Notepad4.exe.manifest"
+IDR_RT_MANIFEST         RT_MANIFEST             "..\\..\\res\\Notepad4.exe.manifest"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -50,13 +50,13 @@ IDI_RUN                 ICON                    "..\\..\\res\\Run_min.ico"
 IDI_STYLES              ICON                    "..\\..\\res\\Styles_min.ico"
 #endif
 
-//#if !NP2_ENABLE_APP_LOCALIZATION_DLL
+#if !NP2_ENABLE_APP_LOCALIZATION_DLL
 /////////////////////////////////////////////////////////////////////////////
 //
 // Bitmap
 //
 
-///IDB_TOOLBAR16           BITMAP                  "..\\..\\res\\Toolbar16.bmp"
+IDB_TOOLBAR16           BITMAP                  "..\\..\\res\\Toolbar16.bmp"
 IDB_OPEN_FOLDER16       BITMAP                  "..\\..\\res\\OpenFolder16.bmp"
 IDB_NEXT16              BITMAP                  "..\\..\\res\\Next16.bmp"
 IDB_PREV16              BITMAP                  "..\\..\\res\\Prev16.bmp"
@@ -101,7 +101,7 @@ IDC_COPY                CURSOR                  "..\\..\\res\\Copy.cur"
 IDC_COPY                CURSOR                  "..\\..\\res\\Copy_min.cur"
 #endif
 
-//#endif // NP2_ENABLE_APP_LOCALIZATION_DLL
+#endif // NP2_ENABLE_APP_LOCALIZATION_DLL
 
 /////////////////////////////////////////////////////////////////////////////
 //

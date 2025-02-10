@@ -54,6 +54,8 @@ def update_resource_include_path(path, matepath):
 		doc = re.sub(r'^//(#include\s+")(.+)(")', r'\1../../src/\2\3', doc, flags=re.MULTILINE)
 		doc = re.sub(r'^#if\s+0\s*//\s*(NP2_ENABLE_LOCALIZE\w+)', r'#if \1', doc, flags=re.MULTILINE)
 
+	doc = re.sub(r'^//(#if\s+!NP2_ENABLE_APP_LOCALIZATION_DLL)', r'\1', doc, flags=re.MULTILINE)
+	doc = re.sub(r'^//(#endif\s*//\s*NP2_ENABLE_APP_LOCALIZATION_DLL)', r'\1', doc, flags=re.MULTILINE)
 	with open(path, 'w', encoding='utf-8', newline='\n') as fd:
 		fd.write(doc)
 

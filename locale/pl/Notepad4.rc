@@ -50,7 +50,7 @@ IDI_RUN                 ICON                    "..\\..\\res\\Run_min.ico"
 IDI_STYLES              ICON                    "..\\..\\res\\Styles_min.ico"
 #endif
 
-//#if !NP2_ENABLE_APP_LOCALIZATION_DLL
+#if !NP2_ENABLE_APP_LOCALIZATION_DLL
 /////////////////////////////////////////////////////////////////////////////
 //
 // Bitmap
@@ -101,7 +101,7 @@ IDC_COPY                CURSOR                  "..\\..\\res\\Copy.cur"
 IDC_COPY                CURSOR                  "..\\..\\res\\Copy_min.cur"
 #endif
 
-//#endif // NP2_ENABLE_APP_LOCALIZATION_DLL
+#endif // NP2_ENABLE_APP_LOCALIZATION_DLL
 
 /////////////////////////////////////////////////////////////////////////////
 //

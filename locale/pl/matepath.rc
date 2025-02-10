@@ -60,7 +60,7 @@ IDI_CROSS1              ICON                    "..\\..\\matepath\\res\\Cross1_m
 IDI_CROSS2              ICON                    "..\\..\\matepath\\res\\Cross2_min.ico"
 #endif
 
-//#if !NP2_ENABLE_APP_LOCALIZATION_DLL
+#if !NP2_ENABLE_APP_LOCALIZATION_DLL
 /////////////////////////////////////////////////////////////////////////////
 //
 // Bitmap
@@ -92,7 +92,7 @@ IDC_CROSSHAIR           CURSOR                  "..\\..\\matepath\\res\\Crosshai
 IDC_CROSSHAIR           CURSOR                  "..\\..\\matepath\\res\\Crosshair_min.cur"
 #endif
 
-//#endif // NP2_ENABLE_APP_LOCALIZATION_DLL
+#endif // NP2_ENABLE_APP_LOCALIZATION_DLL
 
 /////////////////////////////////////////////////////////////////////////////
 //
