@@ -127,7 +127,7 @@ BEGIN
 		MENUITEM "新增資料夾(&W)...",				IDM_FILE_NEWDIR
 		MENUITEM SEPARATOR
 		MENUITEM "檔案過濾(&L)...",				IDM_VIEW_FILTER
-		MENUITEM "重置過濾(&R)",					IDM_VIEW_FILTERALL
+		MENUITEM "重設過濾(&R)",					IDM_VIEW_FILTERALL
 		POPUP "顯示(&S)"
 		BEGIN
 			MENUITEM "資料夾(&D)",				IDM_VIEW_FOLDERS
@@ -307,7 +307,7 @@ CAPTION "跳到"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     ICON            IDI_GOTO,IDC_STATIC,7,7,20,20
-    LTEXT           "輸入要開啟的檔案或資料夾名稱，或者从列表中选择最近打开的目录。",IDC_GOTODESC,35,7,182,17
+    LTEXT           "輸入要開啟的檔案或資料夾名稱，或者從列表中選擇最近開啟的目錄。",IDC_GOTODESC,35,7,182,17
     COMBOBOX        IDC_GOTO,7,35,210,126,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     DEFPUSHBUTTON   "確定",IDOK,111,66,50,14,WS_DISABLED
     PUSHBUTTON      "取消",IDCANCEL,167,66,50,14
@@ -375,11 +375,11 @@ END
 
 IDPP_GENERAL DIALOGEX 0, 0, 232, 185
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "常规"
+CAPTION "一般"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     ICON            IDI_OPTIONS,IDC_STATIC,10,10,20,20
-    LTEXT           "matepath 常规設定。",IDC_STATIC,40,15,200,8
+    LTEXT           "matepath 一般設定。",IDC_STATIC,40,15,200,8
     AUTOCHECKBOX    "在相同目標應用程式視窗開啟檔案",IDC_OPENFILE_SAME_WINDOW,10,34,190,10,WS_TABSTOP
     AUTOCHECKBOX    "允許滑鼠按下來開啟物件(&A)",IDC_SINGLECLICK,10,46,190,10,WS_TABSTOP
     AUTOCHECKBOX    "開啟自動選擇(&E)",IDC_TRACKSELECT,10,58,100,10,WS_TABSTOP
@@ -401,7 +401,7 @@ CAPTION "進階"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     ICON            IDI_OPTIONS2,IDC_STATIC,10,10,20,20
-    AUTOCHECKBOX    "使用从右至左(&RTL)佈局",IDC_RTL_LAYOUT,10,34,190,10,WS_TABSTOP
+    AUTOCHECKBOX    "使用從右至左(&RTL)配置",IDC_RTL_LAYOUT,10,34,190,10,WS_TABSTOP
     LTEXT           "matepath 進階設定。",IDC_STATIC,40,15,200,8
     AUTOCHECKBOX    "使用啟動資料夾(&U): ",IDC_STARTUPDIR,10,46,104,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "最近使用(&R)",IDC_GOTOMRU,114,46,90,10,WS_GROUP | WS_TABSTOP
@@ -410,7 +410,7 @@ BEGIN
     AUTOCHECKBOX    "儲存檔案時移除唯讀屬性(&C)",IDC_CLEARREADONLY,10,85,172,10,WS_TABSTOP
     AUTOCHECKBOX    "命名衝突時重新命名檔案複本(&N)",IDC_RENAMEONCOLLISION,10,97,164,10,WS_TABSTOP
     AUTOCHECKBOX    "將刪除的檔案移到資源回收桶(&M)",IDC_USERECYCLEBIN,10,109,160,10,WS_TABSTOP
-    AUTOCHECKBOX    "不要確認檔案移除(不推薦)(&D)",IDC_NOCONFIRMDELETE,10,121,184,10,WS_TABSTOP
+    AUTOCHECKBOX    "不要確認檔案刪除(不推薦)(&D)",IDC_NOCONFIRMDELETE,10,121,184,10,WS_TABSTOP
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,139,205,1
     AUTOCHECKBOX    "開啟 &Esc 鍵功能...",IDC_ESCFUNCTION,10,148,104,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "最小化視窗(&W)",IDC_ESCMIN,114,148,74,10,WS_GROUP | WS_TABSTOP
@@ -480,7 +480,7 @@ BEGIN
     PUSHBUTTON      "尋找視窗...",IDC_FINDWIN,204,91,60,14
     LTEXT           "訊息: ",IDC_STATIC,19,124,42,8,SS_RIGHT
     LTEXT           "應用程式: ",IDC_STATIC,19,145,42,8,SS_RIGHT
-    LTEXT           "主题: ",IDC_STATIC,19,165,42,8,SS_RIGHT
+    LTEXT           "主題: ",IDC_STATIC,19,165,42,8,SS_RIGHT
     EDITTEXT        IDC_DDEMSG,65,122,200,14,ES_AUTOHSCROLL
     EDITTEXT        IDC_DDEAPP,65,142,200,14,ES_AUTOHSCROLL
     EDITTEXT        IDC_DDETOPIC,65,162,200,14,ES_AUTOHSCROLL
@@ -497,7 +497,7 @@ BEGIN
     ICON            IDI_CROSS1,IDC_CROSSCURSOR,7,7,21,20,SS_CENTERIMAGE
     LTEXT           "拖曳十字游標到目標視窗來選擇新目標，或按 Esc 取消。",IDC_FINDWINDESC,35,7,168,22
     EDITTEXT        IDC_WINTITLE,7,35,196,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
-    LTEXT           "視窗類",IDC_WINCLASS,7,60,45,8,NOT WS_VISIBLE
+    LTEXT           "視窗類別",IDC_WINCLASS,7,60,45,8,NOT WS_VISIBLE
     LTEXT           "視窗模組",IDC_WINMODULE,7,70,51,8,NOT WS_VISIBLE
     DEFPUSHBUTTON   "確定",IDOK,97,64,50,14,WS_DISABLED
     PUSHBUTTON      "取消",IDCANCEL,153,64,50,14
@@ -535,8 +535,8 @@ BEGIN
 	IDT_FILE_QUICKVIEW		"快速預覽"
 	IDT_FILE_SAVEAS			"另存為"
 	IDT_FILE_COPYMOVE		"複製/移動"
-	IDT_FILE_DELETE_RECYCLE	"刪除(回收站)"
-	IDT_FILE_DELETE_PERM	"永久移除"
+	IDT_FILE_DELETE_RECYCLE	"刪除(回收桶)"
+	IDT_FILE_DELETE_PERM	"永久刪除"
 	IDT_VIEW_FILTER			"過濾"
 END
 
@@ -551,20 +551,20 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_ERR_CD              "無權存取指定目錄。\n請檢查磁碟或網路連線。"
-    IDS_ERR_FILE            "無權存取「%s」。\n此檔案可能正被其他應用程式使用。\n請檢查磁碟或網路連線。"
+    IDS_ERR_CD              "無法存取指定目錄。\n請檢查磁碟或網路連線。"
+    IDS_ERR_FILE            "無法存取「%s」。\n此檔案可能正被其他應用程式使用。\n請檢查磁碟或網路連線。"
     IDS_ERR_NEW             "無法建立檔案。\n請檢查磁碟或網路連線。"
     IDS_ERR_NEWDIR          "無法建立資料夾。\n請檢查磁碟或網路連線。"
-    IDS_ERR_SAVEAS1         "儲存「%s」時發生錯誤。\n可能是現有檔案被寫保護了。"
+    IDS_ERR_SAVEAS1         "儲存「%s」時發生錯誤。\n可能是現有檔案被防止寫入了。"
     IDS_ERR_SAVEAS2         "刪除已儲存檔案的唯讀屬性時發生錯誤。"
-    IDS_ERR_CMDLINE         "存取命令行中指定的檔案或資料夾時發生錯誤。"
-    IDS_ERR_STARTUPDIR      "無權存取啟動資料夾。"
-    IDS_ERR_DROP1           "無權存取拖曳放置的檔案或資料夾。"
+    IDS_ERR_CMDLINE         "存取命令列中指定的檔案或資料夾時發生錯誤。"
+    IDS_ERR_STARTUPDIR      "無法存取啟動資料夾。"
+    IDS_ERR_DROP1           "無法存取拖曳放置的檔案或資料夾。"
     //IDS_ERR_DROP2           "Only a single file or directory can be dropped at a time."
-    IDS_ERR_FAVORITES       "無權存取「我的最愛」資料夾。\n請在「選項」對話框中指定合法的資料夾。"
+    IDS_ERR_FAVORITES       "無法存取「我的最愛」資料夾。\n請在「選項」對話框中指定合法的資料夾。"
     //IDS_ERR_LNK_GETPATH     "沒有可用於連結的物件的合法的檔案系統路徑。\n連結可能未指向一個檔案或資料夾。"
-    IDS_ERR_LNK_NOACCESS    "無權存取連結物件的檔案系統路徑。\n請檢查磁碟或網路連線。"
-    IDS_ERR_CREATELINK      "建立指定的連結時發生錯誤。\n可能目標資料夾被寫保護了。"
+    IDS_ERR_LNK_NOACCESS    "無法存取連結物件的檔案系統路徑。\n請檢查磁碟或網路連線。"
+    IDS_ERR_CREATELINK      "建立指定的連結時發生錯誤。\n可能目標資料夾被防止寫入了。"
     IDS_ERR_FILTER          "沒有指定其他過濾項目。\n請參閱 matepath 自述檔案以取得更多資訊。"
     IDS_ERR_PREVWINDISABLED "現有的 matepath 視窗正忙或有一個活動的對話框。\n要另外開啟一個 matepath 視窗嗎？"
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
