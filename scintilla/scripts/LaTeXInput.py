@@ -1,4 +1,3 @@
-import sys
 import os.path
 import re
 import string
@@ -159,12 +158,10 @@ def update_latex_input_data_hash(input_name, input_map, multiplier, hash_size):
 			items = hash_map[hash_key]
 			items.sort(key=lambda m: (m['magic'], m['hash_key']))
 			collision = len(items)
-			if collision > max_collision:
-				max_collision = collision
+			max_collision = max(max_collision, collision)
 			counter = fast_counter(info['magic'] for info in items)
 			comparison = max(counter.values())
-			if comparison > max_comparison:
-				max_comparison = comparison
+			max_collision = max(max_comparison, comparison)
 
 			if BuildDataForLookupOnly:
 				key_list = [info['sequence'][1:] for info in items]

@@ -79,9 +79,9 @@ CategoryClassifyMap = flattenPropertyMap(CharClassifyMap)
 # https://en.wikipedia.org/wiki/Private_Use_Areas
 # Category: Other, private use (Co)
 def isPrivateChar(c):
-	return (c >= 0xE000 and c <= 0xF8FF) \
-		or (c >= 0xF0000 and c <= 0xFFFFD) \
-		or (c >= 0x100000 and c <= 0x10FFFD)
+	return (0xE000 <= c <= 0xF8FF) \
+		or (0xF0000 <= c <= 0xFFFFD) \
+		or (0x100000 <= c <= 0x10FFFD)
 
 # https://en.wikipedia.org/wiki/Unicode_block
 # https://en.wikipedia.org/wiki/Plane_(Unicode)#Basic_Multilingual_Plane
@@ -157,7 +157,7 @@ def isCJKCharacter(category, ch):
 		return False
 
 	for block in CJKBlockList:
-		if ch >= block[0] and ch <= block[1]:
+		if block[0] <= ch <= block[1]:
 			return True
 
 	return False
@@ -490,18 +490,18 @@ def isReservedOrUDC_GBK(ch, buf):
 	ch1 = buf[0]
 	ch2 = buf[1]
 	# user-defined 1 and 2
-	if ((ch1 >= 0xAA and ch1 <= 0xAF) or (ch1 >= 0xF8 and ch1 <= 0xFE)) \
-		and (ch2 >= 0xA1 and ch2 <= 0xFE):
+	if ((0xAA <= ch1 <= 0xAF) or (0xF8 <= ch1 <= 0xFE)) \
+		and (0xA1 <= ch2 <= 0xFE):
 		return True
 	# user-defined 3
-	if (ch1 >= 0xA1 and ch1 <= 0xA7) and (ch2 >= 0x40 and ch2 <= 0xA0 and ch2 != 0x7F):
+	if (0xA1 <= ch1 <= 0xA7) and ((0x40 <= ch2 <= 0xA0) and ch2 != 0x7F):
 		return True
 	return False
 
 # https://en.wikipedia.org/wiki/Big5
 def isReservedOrUDC_Big5(ch, buf):
 	for block in [(0x8140, 0xA0FE), (0xA3C0, 0xA3FE), (0xC6A1, 0xC8FE), (0xF9D6, 0xFEFE)]:
-		if ch >= block[0] and ch <= block[1]:
+		if block[0] <= ch <= block[1]:
 			return True
 	return False
 

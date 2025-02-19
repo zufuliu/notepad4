@@ -540,8 +540,8 @@ def runBlockEncode(head, table, tableName=''):
 	blockSize = 1 << shift
 	print(f'{head} run block value bit: {totalBit} {valueBit}, length: {len(values)}, size: {minSize} {minSize/1024}, block: {len(blockList)} {blockSize}')
 
+	output = []
 	if tableName and (len(table) & (blockSize - 1)) == 0:
-		output = []
 		mask = (1 << valueBit) - 1
 		for value in values:
 			index = value & mask
@@ -555,7 +555,7 @@ def runBlockEncode(head, table, tableName=''):
 		output = []
 		blockData = list(itertools.chain.from_iterable(blockList))
 		_dumpRunBlock(output, tableName, values, blockData, valueBit, shift)
-		return output
+	return output
 
 def skipBlockEncode(head, table, tableName=''):
 	itemSize = getItemSize(table)
@@ -590,6 +590,7 @@ def skipBlockEncode(head, table, tableName=''):
 	blockSize = 1 << shift
 	print(f'{head} skip block lookup: {length} {length.bit_length()}, size: {minSize} {minSize/1024}, block: {len(blockList)} {blockSize} default: {defaultValue}')
 
+	output = []
 	if tableName and defaultBlock and (len(table) & (blockSize - 1)) == 0:
 		bitCount = (len(blockList) - 1).bit_length()
 		offsetList = []
@@ -606,11 +607,10 @@ def skipBlockEncode(head, table, tableName=''):
 		assert minSize == size, (minSize, size)
 		assert output == table
 
-		output = []
 		if defaultValue:
 			output.append(f'constexpr {_sizeTypeMap[itemSize]} {tableName}DefaultValue = {defaultValue};')
 		_dumpRunBlock(output, tableName, offsetList, blockData, bitCount, shift)
-		return output
+	return output
 
 def _compressTableMergedEx(table, itemSize, level):
 	minSize = sys.maxsize

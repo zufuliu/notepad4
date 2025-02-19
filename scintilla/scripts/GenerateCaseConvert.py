@@ -49,9 +49,9 @@ def conversionSets():
 	complexes = []
 	symmetrics = []
 	for ch in range(UnicodeCharacterCount):
-		if ch >= 0xd800 and ch <= 0xDBFF:
+		if 0xd800 <= ch <= 0xDBFF:
 			continue
-		if ch >= 0xdc00 and ch <= 0xDFFF:
+		if 0xdc00 <= ch <= 0xDFFF:
 			continue
 		uch = chr(ch)
 

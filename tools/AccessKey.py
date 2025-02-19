@@ -43,7 +43,7 @@ def find_free_access_key(menu, path):
 			print('Error:', line)
 			continue
 
-		if end_cut > 0 and end_cut < end:
+		if 0 < end_cut < end:
 			end = end_cut
 
 		used = line.endswith('//#')

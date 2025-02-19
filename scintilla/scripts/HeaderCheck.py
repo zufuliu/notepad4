@@ -25,7 +25,7 @@ def ExcludeName(name, excludes):
     return any(exclude in name for exclude in excludes)
 
 def SortLike(incs, order):
-    return sorted(incs, key = lambda i: order.index(i))
+    return sorted(incs, key = order.index)
 
 basePrefix = "//base:"
 sourcePrefix = "//source:"

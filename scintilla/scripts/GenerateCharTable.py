@@ -23,12 +23,12 @@ def GenerateUTF8Table():
 	def UTF8IsLeadByte(ch):
 		if ch <= 0x7F:
 			return True
-		if ch >= 0xC2 and ch <= 0xF4:
+		if 0xC2 <= ch <= 0xF4:
 			return True
 		return False
 
 	def UTF8IsTrailByte(ch):
-		return ch >= 0x80 and ch <= 0xBF
+		return 0x80 <= ch <= 0xBF
 
 	def UTF8IntervalNumber(ch):
 		# UTF8-1
@@ -45,12 +45,12 @@ def GenerateUTF8Table():
 		if ch == 0xC0 or ch == 0xC1:
 			return 11
 		# UTF8-2
-		if ch >= 0xC2 and ch <= 0xDF:
+		if 0xC2 <= ch <= 0xDF:
 			return 4
 		# UTF8-3
 		if ch == 0xE0:
 			return 5
-		if ch >= 0xE1 and ch <= 0xEC:
+		if 0xE1 <= ch <= 0xEC:
 			return 6
 		if ch == 0xED:
 			return 7
@@ -59,7 +59,7 @@ def GenerateUTF8Table():
 		# UTF8-4
 		if ch == 0xF0:
 			return 8
-		if ch >= 0xF1 and ch <= 0xF3:
+		if 0xF1 <= ch <= 0xF3:
 			return 9
 		if ch == 0xF4:
 			return 10

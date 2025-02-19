@@ -41,7 +41,7 @@ def printLexHFile(f):
 				if name.startswith("SCE_"):
 					if autoValue == STYLE_FIRSTPREDEFINED:
 						autoValue = STYLE_LASTPREDEFINED + 1
-					if val >= STYLE_FIRSTPREDEFINED and val <= STYLE_LASTPREDEFINED:
+					if STYLE_FIRSTPREDEFINED <= val <= STYLE_LASTPREDEFINED:
 						raise ValueError(f"Invalid Style Value: {name} = {val}")
 				out.append(f"#define {name} {value}")
 	return out

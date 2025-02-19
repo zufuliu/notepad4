@@ -184,7 +184,7 @@ def sub_extract(pattern, doc, flags=0):
 	def extract(m):
 		lines.append(m.group(0))
 		return ''
-	doc = re.sub(pattern, lambda m: extract(m), doc, flags=flags)
+	doc = re.sub(pattern, extract, doc, flags=flags)
 	return doc, '\n'.join(lines)
 
 def split_api_section(doc, comment, commentKind=0):

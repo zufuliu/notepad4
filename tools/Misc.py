@@ -1,4 +1,3 @@
-import sys
 import os.path
 import re
 import json
@@ -33,7 +32,7 @@ def generate_lexer_menu_resource_id(path):
 
 def check_encoding_list(path):
 	def is_tag_char(ch):
-		return (ch >= 'a' and ch <= 'z') or (ch >= '0' and ch <= '9')
+		return ('a' <= ch <= 'z') or ('0' <= ch <= '9')
 
 	with open(path, encoding='utf-8', newline='\n') as fd:
 		doc = fd.read()

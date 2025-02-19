@@ -1,7 +1,6 @@
-# https://www.unicode.org/reports/tr41/
+# East Asian Width
 # https://www.unicode.org/reports/tr11/
 
-from FileGenerator import Regenerate
 from MultiStageTable import *
 from UnicodeData import *
 
