@@ -1164,7 +1164,8 @@ bool Document::IsDBCSDualByteAt(Sci::Position pos) const noexcept {
 // In preference order from best to worst:
 //   1) Break before or after spaces or controls
 //   2) Break at word and punctuation boundary for better kerning and ligature support
-//   3) Break after whole character, this may break combining characters
+//   3) Break before letter in UTF-8 to avoid breaking combining characters
+//   4) Break after whole character, this may break combining characters
 
 size_t Document::SafeSegment(const char *text, size_t lengthSegment, EncodingFamily encodingFamily) const noexcept {
 	const char * const end = text + lengthSegment;
@@ -1191,12 +1192,6 @@ size_t Document::SafeSegment(const char *text, size_t lengthSegment, EncodingFam
 
 		it = end;
 		if (encodingFamily != EncodingFamily::eightBit && ccPrev == CharacterClass::word) {
-#if 0
-			// for UTF-8 go back to the start of last character.
-			for (int trail = 0; trail < UTF8MaxBytes - 1 && UTF8IsTrailByte(*it); trail++) {
-				--it;
-			}
-#else
 			// for UTF-8 go back two code points to detect grapheme cluster boundary.
 			it -= 2*UTF8MaxBytes;
 			for (int tryCount = 0; tryCount < 2; tryCount++) {
@@ -1217,7 +1212,6 @@ size_t Document::SafeSegment(const char *text, size_t lengthSegment, EncodingFam
 				// no boundary between last two code points, assume text ends with the longest sequence.
 				it -= longestUnicodeCharacterSequenceBytes + UTF8MaxBytes;
 			}
-#endif
 		}
 		return it - text;
 	}

@@ -44,6 +44,9 @@ bool StyleContext::MatchIgnoreCase(const char *s) const noexcept {
 		return false;
 	}
 	s++;
+	if (!*s) {
+		return true;
+	}
 	if (MakeLowerCase(chNext) != static_cast<unsigned char>(*s)) {
 		return false;
 	}
@@ -61,6 +64,9 @@ bool StyleContext::MatchLowerCase(const char *s) const noexcept {
 		return false;
 	}
 	s++;
+	if (!*s) {
+		return true;
+	}
 	if (UnsafeLower(chNext) != static_cast<unsigned char>(*s)) {
 		return false;
 	}

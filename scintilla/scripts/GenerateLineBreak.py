@@ -1,6 +1,4 @@
 # script to generate line breaking data.
-# https://www.unicode.org/reports/tr41/
-# https://www.unicode.org/Public/UCD/latest/ucd/auxiliary/LineBreakTest.html
 
 import platform
 import unicodedata
@@ -13,6 +11,7 @@ from UnicodeData import *
 
 # Unicode Line Breaking Algorithm
 # https://www.unicode.org/reports/tr14/
+# https://www.unicode.org/Public/UCD/latest/ucd/auxiliary/LineBreakTest.html
 class LineBreak(IntFlag):
 	NonBreak = 0
 	BreakBefore = 1	# B
@@ -86,6 +85,7 @@ LineBreakMap = flattenPropertyMap(LineBreakPropertyMap)
 def updateUnicodeLineBreak(filename):
 	lineBreakTable = ['XX'] * UnicodeCharacterCount	# @missing
 	# https://www.unicode.org/Public/UCD/latest/ucd/LineBreak.txt
+	# https://www.unicode.org/Public/UCD/latest/ucd/extracted/DerivedLineBreak.txt
 	version, propertyList = readUnicodePropertyFile('LineBreak.txt')
 	flattenUnicodePropertyTable(lineBreakTable, propertyList)
 

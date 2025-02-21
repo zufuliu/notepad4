@@ -258,12 +258,15 @@ public:
 			RoomFor(insertLength);
 			GapTo(position);
 			T *ptr = body.data() + part1Length;
-			//std::uninitialized_value_construct_n(ptr, insertLength);
 			if constexpr (std::is_scalar_v<T>) {
 				memset(ptr, 0, insertLength*sizeof(T));
 			} else {
 				static_assert(std::is_nothrow_default_constructible_v<T>);
+				static_assert(std::is_trivially_destructible_v<T> || !(std::is_copy_constructible_v<T> || std::is_copy_assignable_v<T>));
 				for (ptrdiff_t elem = 0; elem < insertLength; elem++, ptr++) {
+					//T emptyOne = {};
+					//*ptr = std::move(emptyOne);
+					//ptr->~T(); // omitted for unique_ptr
 					::new (ptr)T();
 				}
 			}
