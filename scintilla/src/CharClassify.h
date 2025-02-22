@@ -47,7 +47,8 @@ enum class GraphemeBreakProperty {
 	ConjunctLinker = 12,
 	LinkingConsonant = 13,
 	ExtendConjunctLinker = 14,
-	Sentinel = Prepend,
+	ForwardSentinel = Prepend,
+	BackwardSentinel = Extend,
 };
 
 constexpr int maxUnicodeGraphemeBreakCharacter = 0xe1000;

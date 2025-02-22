@@ -61,7 +61,7 @@ def updateIndicConjunctBreak(graphemeBreakTable):
 	for index, conjunct in enumerate(indicConjunctBreak):
 		grapheme = graphemeBreakTable[index]
 		if grapheme == defaultValue:
-			grapheme = GraphemeBreakPropertyMap.get(conjunct, grapheme)
+			grapheme = int(GraphemeBreakPropertyMap.get(conjunct, grapheme))
 		elif grapheme == extend:
 			if conjunct == 'Virama':
 				grapheme = extendLinker
@@ -194,7 +194,8 @@ def updateGraphemeBreakTable(headerFile, sourceFile):
 		output.append(f'\t{prop.name} = {prop.value},')
 		if prop == propNext:
 			break
-	output.append('\tSentinel = Prepend,')
+	output.append('\tForwardSentinel = Prepend,')
+	output.append('\tBackwardSentinel = Extend,')
 	output.append('};')
 
 	output.append('')

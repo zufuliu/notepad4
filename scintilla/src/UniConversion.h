@@ -54,6 +54,10 @@ constexpr bool UTF8IsTrailByte(unsigned char ch) noexcept {
 	return (ch >= 0x80) && (ch < 0xc0);
 }
 
+constexpr bool UTF8IsFirstByte(unsigned char ch) noexcept {
+	return (ch >= 0xc2) && (ch <= 0xf4);
+}
+
 constexpr bool IsASCIICharacter(unsigned int ch) noexcept {
 	return ch < 0x80;
 }
