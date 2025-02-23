@@ -88,8 +88,9 @@ def isPrivateChar(c):
 # https://en.wikipedia.org/wiki/CJK_Unified_Ideographs
 # https://en.wikipedia.org/wiki/Katakana
 # https://en.wikipedia.org/wiki/Hangul
-# Chapter 18 East Asia https://www.unicode.org/versions/Unicode15.0.0/UnicodeStandard-15.0.pdf
+# Chapter 18 East Asia https://www.unicode.org/versions/Unicode16.0.0/UnicodeStandard-16.0.pdf
 # Unicode Han Database (Unihan) https://unicode.org/reports/tr38/#BlockListing
+# https://www.unicode.org/Public/UCD/latest/ucd/Blocks.txt
 CJKBlockList = [
 	# Table 18-1. Blocks Containing Han Ideographs
 	(0x3400, 0x4DBF), # U+3400..U+4DBF CJK Unified Ideographs Extension A
@@ -125,6 +126,7 @@ CJKBlockList = [
 	(0x3190, 0x319F), # U+3190..U+319F Kanbun
 	(0x31F0, 0x31FF), # U+31F0..U+31FF Katakana Phonetic Extensions
 	(0xFF65, 0xFF9F), # U+FF65..U+FF9F Halfwidth Katakana
+	(0x1AFF0, 0x1AFFF), # U+1AFF0..U+1AFFF Kana Extended-B
 	(0x1B000, 0x1B0FF), # U+1B000..U+1B0FF Kana Supplement
 	(0x1B100, 0x1B12F), # U+1B100..U+1B12F Kana Extended-A
 	(0x1B130, 0x1B16F), # U+1B130..U+1B16F Small Kana Extension
@@ -143,6 +145,7 @@ CJKBlockList = [
 	(0x18D00, 0x18D8F), # U+18D00..U+18D8F Tangut Supplement
 	(0x18B00, 0x18CFF), # U+18B00..U+18CFF Khitan Small Script
 	(0x1B170, 0x1B2FF), # U+1B170..U+1B2FF Nüshu
+	# omitted: Lisu, Miao
 ]
 
 def findCategories(filename):
@@ -315,7 +318,8 @@ return nullptr;
 	Regenerate(filename, "//", output)
 
 def updateCharClassifyTable(filename, headfile):
-	indexTable = [0] * UnicodeCharacterCount
+	defaultValue = int(CharacterClass.Space)
+	indexTable = [defaultValue] * UnicodeCharacterCount
 	for ch in range(UnicodeCharacterCount):
 		uch = chr(ch)
 		category = unicodedata.category(uch)
@@ -326,6 +330,10 @@ def updateCharClassifyTable(filename, headfile):
 
 	output = [f"// Created with Python {platform.python_version()}, Unicode {unicodedata.unidata_version}"]
 	head_output = output[:]
+
+	tableSize = getMinTableSize(indexTable, defaultValue)
+	indexTable = indexTable[:tableSize]
+	print(f'Unicode CharClassify table size: {tableSize}, last value: {CharacterClass(indexTable[tableSize - 1]).name}')
 
 	valueBit, totalBit, data = runLengthEncode('CharClassify Unicode BMP', indexTable[:BMPCharacterCharacterCount])
 	assert valueBit == 3
@@ -344,12 +352,11 @@ def updateCharClassifyTable(filename, headfile):
 	if (ch < sizeof(classifyMap)) {
 		return static_cast<CharacterClass>(classifyMap[ch]);
 	}
-	if (ch > maxUnicode) {
-		// Cn
-		return CharacterClass::space;
+	if (ch >= maxUnicode) {
+		return CharacterClass::space; // Cn
 	}
 
-	ch -= sizeof(classifyMap);""",
+	ch -= sizeof(classifyMap);""".replace('maxUnicode', hex(tableSize)),
 		'returnType': 'CharacterClass'
 	}
 
@@ -365,7 +372,14 @@ def updateCharacterCategoryTable(filename):
 	categories = findCategories("../lexlib/CharacterCategory.h")
 	output = [f"// Created with Python {platform.python_version()}, Unicode {unicodedata.unidata_version}"]
 
-	indexTable = [0] * UnicodeCharacterCount
+	# https://www.unicode.org/Public/UCD/latest/ucd/UnicodeData.txt
+	# version, propertyList = readUnicodePropertyFile('UnicodeData.txt', propertyIndex=2)
+	# indexTable = ['Cn'] * UnicodeCharacterCount
+	# flattenUnicodePropertyTable(indexTable, propertyList)
+	# for index, cc in enumerate(indexTable):
+	# 	indexTable[index] = categories.index(cc)
+	defaultValue = categories.index('Cn')
+	indexTable = [defaultValue] * UnicodeCharacterCount
 	for ch in range(UnicodeCharacterCount):
 		uch = chr(ch)
 		category = unicodedata.category(uch)
@@ -373,7 +387,7 @@ def updateCharacterCategoryTable(filename):
 		indexTable[ch] = value
 
 	# the sentinel value is used to simplify CharacterMap::Optimize()
-	sentinel = UnicodeCharacterCount*32 + categories.index('Cn')
+	sentinel = UnicodeCharacterCount*32 + defaultValue
 	valueBit, rangeList = rangeEncode('catRanges', indexTable, sentinel=sentinel)
 	assert valueBit == 5
 	output.append("#if CharacterCategoryUseRangeList")
