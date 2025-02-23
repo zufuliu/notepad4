@@ -218,22 +218,38 @@ constexpr bool IsGraphemeClusterBoundary(GraphemeBreakProperty prev, GraphemeBre
 	valueBit, rangeList = rangeEncode('Unicode Grapheme Break range', graphemeBreakTable, sentinel=sentinel)
 	assert valueBit == 4
 
+	commonCharacterCount = 0x4000 # graphemeMap
+	valueBit, totalBit, data = runLengthEncode('Unicode Grapheme Break BMP', graphemeBreakTable[:commonCharacterCount])
+	assert valueBit == 4
+	assert totalBit == 16
+	cxx_output = ['const uint16_t GraphemeBreakRLE_BMP[] = {']
+	cxx_output.extend(dumpArray(data, 20))
+	cxx_output.append("};")
+	cxx_output.append("")
+	cxx_output.append("}") # namespace
+	cxx_output.append("")
+
 	config = {
 		'tableName': 'GraphemeBreakTable',
 		'tableVarName': 'CharClassify::GraphemeBreakTable',
 		'function': """static GraphemeBreakProperty GetGraphemeBreakProperty(uint32_t ch) noexcept {
+	if (ch < sizeof(graphemeMap)) {
+		return static_cast<GraphemeBreakProperty>(graphemeMap[ch]);
+	}
 	if (ch >= maxUnicodeGraphemeBreakCharacter) {
 		return GraphemeBreakProperty::Other;
 	}
-""",
+
+	ch -= sizeof(graphemeMap);""",
 		'returnType': 'GraphemeBreakProperty'
 	}
 
 	Regenerate(headerFile, "//grapheme type", output)
-	table, function = buildMultiStageTable('Unicode Grapheme Break', graphemeBreakTable, config=config, level=3)
+	table, function = buildMultiStageTable('Unicode Grapheme Break', graphemeBreakTable[commonCharacterCount:], config=config, level=3)
 	output = ['\t' + line for line in function]
+	cxx_output.extend(table)
 	Regenerate(headerFile, "//grapheme function", output)
-	Regenerate(sourceFile, "//grapheme table", table)
+	Regenerate(sourceFile, "//grapheme table", cxx_output)
 
 if __name__ == '__main__':
 	# parseSegmentationChart('Grapheme Break Chart.html')

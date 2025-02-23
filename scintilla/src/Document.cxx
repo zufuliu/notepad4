@@ -1166,7 +1166,7 @@ size_t Document::DiscardLastCombinedCharacter(const char *text, size_t lengthSeg
 			++trail;
 			--it;
 		}
-		// unlike SafeSegment(), text may contains invalid UTF-8
+		// text may contains invalid UTF-8 when called from LineLayout::WrapLine()
 		const int utf8status = UTF8Classify(it, back - it);
 		if (utf8status & UTF8MaskInvalid) {
 			// treat invalid UTF-8 as control character represented with isolated bytes
@@ -1229,28 +1229,7 @@ size_t Document::SafeSegment(const char *text, size_t lengthSegment, EncodingFam
 
 		if (ccPrev >= CharacterClass::punctuation && encodingFamily != EncodingFamily::eightBit) {
 			// for UTF-8 go back two code points to detect grapheme cluster boundary.
-			it = text + lastPunctuationBreak;
-			// only find grapheme cluster boundary within last longest sequence
-			constexpr size_t longest = longestUnicodeCharacterSequenceBytes + UTF8MaxBytes;
-			const char * const end = (lastPunctuationBreak > longest) ? it - longest : text;
-			const char *prev = it;
-			GraphemeBreakProperty next = GraphemeBreakProperty::BackwardSentinel;
-			do {
-				// go back to the start of current character.
-				while (UTF8IsTrailByte(*it)) {
-					--it;
-				}
-				// text is valid UTF-8, invalid UTF-8 are represented with isolated bytes
-				const int character = UnicodeFromUTF8(reinterpret_cast<const unsigned char *>(it));
-				const GraphemeBreakProperty current = CharClassify::GetGraphemeBreakProperty(character);
-				if (IsGraphemeClusterBoundary(current, next)) {
-					lastPunctuationBreak = prev - text;
-					break;
-				}
-				next = current;
-				prev = it;
-				--it;
-			} while (it > end);
+			lastPunctuationBreak = DiscardLastCombinedCharacter(text, lastPunctuationBreak, lastPunctuationBreak + UTF8MaxBytes);
 		}
 		return lastPunctuationBreak;
 	}
