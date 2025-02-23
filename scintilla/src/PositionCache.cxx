@@ -387,6 +387,12 @@ constexpr WrapBreak GetWrapBreakEx(unsigned int ch, bool isUtf8) noexcept {
 }
 
 void LineLayout::WrapLine(const Document *pdoc, Sci::Position posLineStart, Wrap wrapState, XYPOSITION wrapWidth, XYPOSITION wrapIndent_, bool partialLine) {
+	// Document wants document positions but simpler to work in line positions
+	// so take care of adding and subtracting line start in a lambda.
+	auto CharacterBoundary = [=](Sci::Position i, int moveDir) noexcept -> Sci::Position {
+		return pdoc->MovePositionOutsideChar(i + posLineStart, moveDir) - posLineStart;
+	};
+	// Calculate line start positions based upon width.
 	Sci::Position lastLineStart = 0;
 	XYPOSITION startOffset = wrapWidth;
 	Sci::Position p = 0;
@@ -409,8 +415,9 @@ void LineLayout::WrapLine(const Document *pdoc, Sci::Position posLineStart, Wrap
 			// backtrack to find lastGoodBreak
 			Sci::Position lastGoodBreak = p;
 			if (p > 0) {
-				lastGoodBreak = pdoc->MovePositionOutsideChar(p + posLineStart, -1) - posLineStart;
+				lastGoodBreak = CharacterBoundary(p, -1);
 			}
+			bool foundBreak = false;
 			if (wrapState != Wrap::Char) {
 				Sci::Position pos = lastGoodBreak;
 				CharacterClass ccPrev = CharacterClass::space;
@@ -425,13 +432,15 @@ void LineLayout::WrapLine(const Document *pdoc, Sci::Position posLineStart, Wrap
 				while (pos > lastLineStart) {
 					// style boundary and space
 					if (wrapState != Wrap::WhiteSpace && (styles[pos - 1] != styles[pos])) {
+						foundBreak = true;
 						break;
 					}
 					if (IsBreakSpace(chars[pos - 1]) && !IsBreakSpace(chars[pos])) {
+						foundBreak = true;
 						break;
 					}
 
-					const Sci::Position posBefore = pdoc->MovePositionOutsideChar(pos + posLineStart - 1, -1) - posLineStart;
+					const Sci::Position posBefore = CharacterBoundary(pos - 1, -1);
 					if (wrapState == Wrap::Auto) {
 						// word boundary
 						// TODO: Unicode Line Breaking Algorithm https://www.unicode.org/reports/tr14/
@@ -466,14 +475,20 @@ void LineLayout::WrapLine(const Document *pdoc, Sci::Position posLineStart, Wrap
 					lastGoodBreak = pos;
 				}
 			}
-			if (lastGoodBreak == lastLineStart) {
+			if (lastGoodBreak == lastLineStart || (isUtf8 && !foundBreak)) {
 				// Try moving to start of last character
-				if (p > 0) {
-					lastGoodBreak = pdoc->MovePositionOutsideChar(p + posLineStart, -1) - posLineStart;
+				if (lastGoodBreak == lastLineStart && p > 0) {
+					lastGoodBreak = CharacterBoundary(p, -1);
+				}
+				if (isUtf8 && lastGoodBreak != lastLineStart) {
+					const char *text = &chars[lastLineStart];
+					size_t lengthSegment = lastGoodBreak - lastLineStart;
+					lengthSegment = Document::DiscardLastCombinedCharacter(text, lengthSegment, maxLineLength - lastLineStart);
+					lastGoodBreak = lastLineStart + lengthSegment;
 				}
 				if (lastGoodBreak == lastLineStart) {
 					// Ensure at least one character on line.
-					lastGoodBreak = pdoc->MovePositionOutsideChar(lastGoodBreak + posLineStart + 1, 1) - posLineStart;
+					lastGoodBreak = CharacterBoundary(lastGoodBreak + 1, 1);
 				}
 			}
 			lastLineStart = lastGoodBreak;
