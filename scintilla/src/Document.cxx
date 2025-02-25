@@ -1230,6 +1230,14 @@ size_t Document::SafeSegment(const char *text, size_t lengthSegment, EncodingFam
 		if (ccPrev >= CharacterClass::punctuation && encodingFamily != EncodingFamily::eightBit) {
 			// for UTF-8 go back two code points to detect grapheme cluster boundary.
 			lastPunctuationBreak = DiscardLastCombinedCharacter(text, lastPunctuationBreak, lastPunctuationBreak + UTF8MaxBytes);
+			if (lastPunctuationBreak == lengthSegment) {
+				// discard trail bytes in last truncated character around lengthEachSubdivision
+				it = text + lengthSegment;
+				while (UTF8IsTrailByte(*it)) {
+					--it;
+				}
+				lastPunctuationBreak = it - text;
+			}
 		}
 		return lastPunctuationBreak;
 	}
