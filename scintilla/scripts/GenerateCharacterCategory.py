@@ -353,7 +353,7 @@ def updateCharClassifyTable(filename, headfile):
 		return static_cast<CharacterClass>(classifyMap[ch]);
 	}
 	if (ch >= maxUnicode) {
-		return CharacterClass::space; // Cn
+		return CharacterClass::space; // Co, Cn
 	}
 
 	ch -= sizeof(classifyMap);""".replace('maxUnicode', hex(tableSize)),
@@ -368,16 +368,36 @@ def updateCharClassifyTable(filename, headfile):
 	Regenerate(filename, "//", output)
 	Regenerate(headfile, "//", head_output)
 
+def readCharacterCategoryTable(categories):
+	# https://www.unicode.org/Public/UCD/latest/ucd/UnicodeData.txt
+	version, propertyList = readUnicodePropertyFile('UnicodeData.txt', propertyIndex=2, firstLast=1)
+	indexTable = ['Cn'] * UnicodeCharacterCount
+	flattenUnicodePropertyTable(indexTable, propertyList)
+	diff = {}
+	for index, cc in enumerate(indexTable):
+		indexTable[index] = categories.index(cc)
+		category = unicodedata.category(chr(index))
+		if cc != category:
+			key = (cc, category)
+			if key in diff:
+				prev = diff[key]
+				start, end = prev[-1]
+				if index - end == 1:
+					prev[-1] = (start, index)
+				else:
+					prev.append((index, index))
+			else:
+				diff[key] = [(index, index)]
+	for key, rangeList in diff.items():
+		line = ', '.join(f'{start:04X}..{end:04X}' for start, end in rangeList)
+		print(f'{key[0]} => {key[1]}: {line}')
+	return indexTable
+
 def updateCharacterCategoryTable(filename):
 	categories = findCategories("../lexlib/CharacterCategory.h")
 	output = [f"// Created with Python {platform.python_version()}, Unicode {unicodedata.unidata_version}"]
 
-	# https://www.unicode.org/Public/UCD/latest/ucd/UnicodeData.txt
-	# version, propertyList = readUnicodePropertyFile('UnicodeData.txt', propertyIndex=2)
-	# indexTable = ['Cn'] * UnicodeCharacterCount
-	# flattenUnicodePropertyTable(indexTable, propertyList)
-	# for index, cc in enumerate(indexTable):
-	# 	indexTable[index] = categories.index(cc)
+	# indexTable = readCharacterCategoryTable(categories)
 	defaultValue = categories.index('Cn')
 	indexTable = [defaultValue] * UnicodeCharacterCount
 	for ch in range(UnicodeCharacterCount):

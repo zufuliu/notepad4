@@ -119,10 +119,13 @@ def updateCaseConvert():
 	rangeGroups, nonRanges = groupRanges(symmetrics)
 
 	print(len(rangeGroups), "ranges")
-	rangeLines = ["%d,%d,%d,%d," % x for x in rangeGroups]
+	rangeLines = []
+	for lower, upper, length, pitch in rangeGroups:
+		assert length < 256 and pitch < 256
+		rangeLines.append(f"0x{lower:04X}'{length:02X},0x{upper:04X}'{pitch:02X},")
 
 	print(len(nonRanges), "non ranges")
-	nonRangeLines = ["%d,%d," % x for x in nonRanges]
+	nonRangeLines = [f"{lower},{upper}," for lower, upper in nonRanges]
 
 	print(len(symmetrics), "symmetric")
 

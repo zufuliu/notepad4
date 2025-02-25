@@ -12,7 +12,7 @@ class GraphemeBreakProperty(IntEnum):
 	Other = 0
 	Control = 1
 	Extend = 2
-	RegionalIndicator = 3
+	ZeroWidthJoiner = 3
 	Prepend = 4
 	HangulL = 5
 	HangulV = 6
@@ -20,22 +20,20 @@ class GraphemeBreakProperty(IntEnum):
 	HangulLV = 8
 	HangulLVT = 9
 	ExtendedPictographic = 10
-	ZeroWidthJoiner = 11
+	RegionalIndicator = 11
 	# Indic_Conjunct_Break
 	ConjunctLinker = 12
 	LinkingConsonant = 13
-	ExtendConjunctLinker = 14
 	# merged property
-	SpacingMark = 15
-	CR = 16
-	LF = 17
+	SpacingMark = 14
+	CR = 15
+	LF = 16
 
 # https://www.unicode.org/reports/tr35/tr35-general.html#segmentations
 # https://github.com/unicode-org/cldr/blob/main/common/segments/root.xml
 # https://www.unicode.org/reports/tr51/#Emoji_Properties
 GraphemeBreakPropertyMap = GraphemeBreakProperty.__members__ | {
-	'Regional_Indicator': GraphemeBreakProperty.RegionalIndicator,
-	'RI': GraphemeBreakProperty.RegionalIndicator,
+	'ZWJ': GraphemeBreakProperty.ZeroWidthJoiner,
 	'L': GraphemeBreakProperty.HangulL,
 	'V': GraphemeBreakProperty.HangulV,
 	'T': GraphemeBreakProperty.HangulT,
@@ -43,10 +41,10 @@ GraphemeBreakPropertyMap = GraphemeBreakProperty.__members__ | {
 	'LVT': GraphemeBreakProperty.HangulLVT,
 	'Extended_Pictographic': GraphemeBreakProperty.ExtendedPictographic,
 	'ExtPict': GraphemeBreakProperty.ExtendedPictographic,
-	'ZWJ': GraphemeBreakProperty.ZeroWidthJoiner,
+	'Regional_Indicator': GraphemeBreakProperty.RegionalIndicator,
+	'RI': GraphemeBreakProperty.RegionalIndicator,
 	'Consonant': GraphemeBreakProperty.LinkingConsonant,
 	'Virama': GraphemeBreakProperty.ConjunctLinker,
-	'ExtendLinker': GraphemeBreakProperty.ExtendConjunctLinker,
 }
 
 # https://www.unicode.org/reports/tr44/#Indic_Conjunct_Break
@@ -57,14 +55,15 @@ def updateIndicConjunctBreak(graphemeBreakTable):
 	flattenUnicodePropertyTable(indicConjunctBreak, propertyList)
 	defaultValue = int(GraphemeBreakProperty.Other)
 	extend = int(GraphemeBreakProperty.Extend)
-	extendLinker = int(GraphemeBreakProperty.ExtendConjunctLinker)
+	linker = int(GraphemeBreakProperty.ConjunctLinker)
 	for index, conjunct in enumerate(indicConjunctBreak):
 		grapheme = graphemeBreakTable[index]
 		if grapheme == defaultValue:
+			assert conjunct != 'Virama'
 			grapheme = int(GraphemeBreakPropertyMap.get(conjunct, grapheme))
 		elif grapheme == extend:
 			if conjunct == 'Virama':
-				grapheme = extendLinker
+				grapheme = linker
 		graphemeBreakTable[index] = grapheme
 
 graphemeClusterBoundary = [0x3ffff] * (max(GraphemeBreakProperty.__members__.values()) + 1)
@@ -73,22 +72,21 @@ def buildGraphemeClusterBoundary():
 	table = graphemeClusterBoundary
 
 	notBreak = {
-		'Other': ['Extend', 'SpacingMark', 'ZWJ', 'ExtendLinker'],
+		'Other': ['Extend', 'SpacingMark', 'ZWJ', 'ConjunctLinker'],
 		'CR': ['LF'],
-		'Extend': ['Extend', 'SpacingMark', 'ZWJ', 'ExtendLinker'],
-		'RI': ['Extend', 'SpacingMark', 'ZWJ', 'ExtendLinker', 'RI'],
-		'Prepend': ['Other', 'Extend', 'SpacingMark', 'ZWJ', 'ExtendLinker', 'RI', 'Prepend', 'L', 'V', 'T', 'LV', 'LVT', 'ExtPict', 'ConjunctLinker', 'Consonant'],
-		'SpacingMark': ['Extend', 'SpacingMark', 'ZWJ', 'ExtendLinker'],
-		'L': ['Extend', 'SpacingMark', 'ZWJ', 'ExtendLinker', 'L', 'V', 'LV', 'LVT'],
-		'V': ['Extend', 'SpacingMark', 'ZWJ', 'ExtendLinker', 'V', 'T'],
-		'T': ['Extend', 'SpacingMark', 'ZWJ', 'ExtendLinker', 'T'],
-		'LV': ['Extend', 'SpacingMark', 'ZWJ', 'ExtendLinker', 'V', 'T'],
-		'LVT': ['Extend', 'SpacingMark', 'ZWJ', 'ExtendLinker', 'T'],
-		'ExtPict': ['Extend', 'SpacingMark', 'ZWJ', 'ExtendLinker'],
-		'ZWJ': ['Extend', 'SpacingMark', 'ZWJ', 'ExtendLinker', 'ExtPict', 'Consonant'],
-		'ConjunctLinker': ['Extend', 'SpacingMark', 'ZWJ', 'ExtendLinker', 'Consonant'],
-		'Consonant': ['Extend', 'SpacingMark', 'ZWJ', 'ExtendLinker', 'ConjunctLinker'],
-		'ExtendLinker': ['Extend', 'SpacingMark', 'ZWJ', 'ExtendLinker', 'Consonant'],
+		'Extend': ['Extend', 'SpacingMark', 'ZWJ', 'ConjunctLinker'],
+		'ZWJ': ['Extend', 'SpacingMark', 'ZWJ', 'ConjunctLinker', 'ExtPict', 'Consonant'],
+		'Prepend': ['Other', 'Extend', 'SpacingMark', 'ZWJ', 'ConjunctLinker', 'RI', 'Prepend', 'L', 'V', 'T', 'LV', 'LVT', 'ExtPict', 'Consonant'],
+		'SpacingMark': ['Extend', 'SpacingMark', 'ZWJ', 'ConjunctLinker'],
+		'L': ['Extend', 'SpacingMark', 'ZWJ', 'ConjunctLinker', 'L', 'V', 'LV', 'LVT'],
+		'V': ['Extend', 'SpacingMark', 'ZWJ', 'ConjunctLinker', 'V', 'T'],
+		'T': ['Extend', 'SpacingMark', 'ZWJ', 'ConjunctLinker', 'T'],
+		'LV': ['Extend', 'SpacingMark', 'ZWJ', 'ConjunctLinker', 'V', 'T'],
+		'LVT': ['Extend', 'SpacingMark', 'ZWJ', 'ConjunctLinker', 'T'],
+		'ExtPict': ['Extend', 'SpacingMark', 'ZWJ', 'ConjunctLinker'],
+		'RI': ['Extend', 'SpacingMark', 'ZWJ', 'ConjunctLinker', 'RI'],
+		'ConjunctLinker': ['Extend', 'SpacingMark', 'ZWJ', 'ConjunctLinker', 'Consonant'],
+		'Consonant': ['Extend', 'SpacingMark', 'ZWJ', 'ConjunctLinker'],
 	}
 
 	for key, row in notBreak.items():

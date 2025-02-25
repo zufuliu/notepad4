@@ -8,6 +8,7 @@
 
 namespace Lexilla {
 
+// General Category Values https://www.unicode.org/reports/tr44/#GC_Values_Table
 enum CharacterCategory {
 	ccLu, ccLl, ccLt, ccLm, ccLo,
 	ccMn, ccMc, ccMe,

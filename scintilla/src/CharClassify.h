@@ -35,7 +35,7 @@ enum class GraphemeBreakProperty {
 	Other = 0,
 	Control = 1,
 	Extend = 2,
-	RegionalIndicator = 3,
+	ZeroWidthJoiner = 3,
 	Prepend = 4,
 	HangulL = 5,
 	HangulV = 6,
@@ -43,10 +43,9 @@ enum class GraphemeBreakProperty {
 	HangulLV = 8,
 	HangulLVT = 9,
 	ExtendedPictographic = 10,
-	ZeroWidthJoiner = 11,
+	RegionalIndicator = 11,
 	ConjunctLinker = 12,
 	LinkingConsonant = 13,
-	ExtendConjunctLinker = 14,
 	ForwardSentinel = Prepend,
 	BackwardSentinel = Extend,
 };
@@ -56,21 +55,20 @@ constexpr int longestUnicodeCharacterSequenceCount = 10;
 constexpr int longestUnicodeCharacterSequenceBytes = 35;
 
 constexpr uint16_t graphemeClusterBoundary[] = {
-0b00110111'11111011, // Other
+0b10101111'11110011, // Other
 0b11111111'11111111, // Control
-0b00110111'11111011, // Extend
-0b00110111'11110011, // RegionalIndicator
-0b00000000'00000010, // Prepend
-0b00110100'10011011, // HangulL
-0b00110111'00111011, // HangulV
-0b00110111'01111011, // HangulT
-0b00110111'00111011, // HangulLV
-0b00110111'01111011, // HangulLVT
-0b00110111'11111011, // ExtendedPictographic
-0b00010011'11111011, // ZeroWidthJoiner
-0b00010111'11111011, // ConjunctLinker
-0b00100111'11111011, // LinkingConsonant
-0b00010111'11111011, // ExtendConjunctLinker
+0b10101111'11110011, // Extend
+0b10001011'11110011, // ZeroWidthJoiner
+0b10000000'00000010, // Prepend
+0b10101100'10010011, // HangulL
+0b10101111'00110011, // HangulV
+0b10101111'01110011, // HangulT
+0b10101111'00110011, // HangulLV
+0b10101111'01110011, // HangulLVT
+0b10101111'11110011, // ExtendedPictographic
+0b10100111'11110011, // RegionalIndicator
+0b10001111'11110011, // ConjunctLinker
+0b10101111'11110011, // LinkingConsonant
 };
 
 constexpr bool IsGraphemeClusterBoundary(GraphemeBreakProperty prev, GraphemeBreakProperty current) noexcept {
@@ -102,7 +100,7 @@ public:
 			return static_cast<CharacterClass>(classifyMap[ch]);
 		}
 		if (ch >= 0xe01f0) {
-			return CharacterClass::space; // Cn
+			return CharacterClass::space; // Co, Cn
 		}
 
 		ch -= sizeof(classifyMap);
