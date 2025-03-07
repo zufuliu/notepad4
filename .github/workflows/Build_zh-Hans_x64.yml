@@ -1,0 +1,81 @@
+name: Build_zh-Hans_x64
+
+on: [push, pull_request]
+  
+defaults:
+  run:
+    shell: cmd
+
+jobs:
+  msvc2022:
+    name: Visual C++ 2022
+    runs-on: windows-2022
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install v141_xp Toolset
+      continue-on-error: true
+      run: |
+        CALL "build\install_msvc.bat" v141_xp
+
+    - name: Update Version Hash
+      run: |
+        "c:\Program Files\Git\usr\bin\sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" .\src\VersionRev.h .\matepath\src\VersionRev.h
+
+    - name: Locale.py
+      working-directory: locale
+      run: |
+        python Locale.py back zh-Hans
+
+    - name: MSVC Release
+      run: |
+        CALL "build\VS2017\build.bat" Build x64 Release 1
+
+    - name: Copy Notepad4.exe
+      run: |
+        mkdir upload
+        copy /Y "doc\License.txt" "upload\License.txt"
+        copy /Y "doc\my_ini\Notepad4.ini" "upload\Notepad4.ini"
+        copy /Y "doc\my_ini\Notepad4 DarkTheme.ini" "upload\Notepad4 DarkTheme.ini"
+        copy /Y "build\bin\Release\x64\Notepad4.exe" "upload\Notepad4.exe"
+
+    - uses: actions/upload-artifact@v4
+      with:
+          name: Notepad4_msvc2022_zh-Hans_x64
+          path: |
+            upload\*
+
+  msvc2019:
+    name: Visual C++ 2019
+    runs-on: windows-2019
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Update Version Hash
+      run: |
+        "c:\Program Files\Git\usr\bin\sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" .\src\VersionRev.h .\matepath\src\VersionRev.h
+
+    - name: Locale.py
+      working-directory: locale
+      run: |
+        python Locale.py back zh-Hans
+
+    - name: MSVC Release
+      run: |
+        CALL "build\VS2017\build.bat" Build x64 Release 1
+
+    - name: Copy Notepad4.exe
+      run: |
+        mkdir upload
+        copy /Y "doc\License.txt" "upload\License.txt"
+        copy /Y "doc\my_ini\Notepad4.ini" "upload\Notepad4.ini"
+        copy /Y "doc\my_ini\Notepad4 DarkTheme.ini" "upload\Notepad4 DarkTheme.ini"
+        copy /Y "build\bin\Release\x64\Notepad4.exe" "upload\Notepad4.exe"
+
+    - uses: actions/upload-artifact@v4
+      with:
+          name: Notepad4_msvc2019_zh-Hans_x64
+          path: |
+            upload\*

@@ -2732,7 +2732,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDT_FILE_BROWSE:
 	case IDM_FILE_BROWSE:
-		TryBrowseFile(hwnd, szCurFile, true);
+		// TryBrowseFile(hwnd, szCurFile, true);
+		OpenContainingFolder(hwnd, szCurFile, true);
 		break;
 
 	case IDM_FILE_NEWWINDOW:
@@ -6800,14 +6801,17 @@ void UpdateStatusbar() noexcept {
 
 	WCHAR itemText[256];
 	const int len = wsprintf(itemText, cachedStatusItem.tchItemFormat, tchCurLine, tchDocLine,
-		tchCurColumn, tchLineColumn, tchCurChar, tchLineChar,
-		tchSelChar, tchSelByte, tchLinesSelected, tchMatchesCount);
+			tchCurColumn, tchLineColumn, tchCurChar, tchLineChar,
+			tchSelChar, tchSelByte, tchLinesSelected, tchMatchesCount);
 
 	LPCWSTR items[StatusItem_ItemCount];
 	memset(AsVoidPointer(items), 0, StatusItem_Lexer * sizeof(LPCWSTR));
 	LPWSTR start = itemText;
 	UINT index = 0;
 	for (int i = 0; i < len; i++) {
+		if (itemText[i] == L'@') {
+			itemText[i] = L'\0';
+		}
 		if (itemText[i] == L'\n') {
 			itemText[i] = L'\0';
 			items[index] = start;
