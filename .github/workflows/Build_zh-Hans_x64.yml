@@ -1,6 +1,6 @@
 name: Build_zh-Hans_x64
 
-on: [push, pull_request]
+on: [push, pull_request, workflow_dispatch]
   
 defaults:
   run:
