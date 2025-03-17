@@ -1299,7 +1299,7 @@ void CodePretty(std::string &output, LPCEDITLEXER pLex, const char *styledText, 
 
 void EditFormatCode(int menu) noexcept {
 	LPCEDITLEXER pLex = pLexCurrent;
-	if (menu != IDM_EDIT_COPYRTF && pLex->iLexer != SCLEX_JSON && pLex->iLexer != SCLEX_CSS && pLex->iLexer != SCLEX_JAVASCRIPT) {
+	if (menu != IDM_EDIT_COPYRTF && (pLex->lexerAttr & LexerAttr_CodePretty) == 0) {
 		return;
 	}
 	Sci_Position startPos = SciCall_GetSelectionStart();
@@ -1309,6 +1309,9 @@ void EditFormatCode(int menu) noexcept {
 		wholeDoc = true;
 		startPos = 0;
 		endPos = SciCall_GetLength();
+		if (endPos == 0) {
+			return;
+		}
 	}
 
 	try {

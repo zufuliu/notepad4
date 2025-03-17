@@ -720,8 +720,8 @@ BEGIN
 		MENUITEM SEPARATOR
 		POPUP "Действие при &выделении"
 		BEGIN
-			MENUITEM "&Сжимать код",								IDM_EDIT_CODE_COMPRESS
-			MENUITEM "Привести код в &порядок",							IDM_EDIT_CODE_PRETTY
+			MENUITEM "&Сжимать CSS/JS/JSON",								IDM_EDIT_CODE_COMPRESS
+			MENUITEM "Привести CSS/JS/JSON в &порядок",						IDM_EDIT_CODE_PRETTY
 			MENUITEM SEPARATOR
 			MENUITEM "&Открыть файл, папку, ссылку и др.",						CMD_OPEN_PATH_OR_LINK
 			MENUITEM "Открыть &папку с файлом",							CMD_OPEN_CONTAINING_FOLDER

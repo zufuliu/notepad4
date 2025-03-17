@@ -719,8 +719,8 @@ BEGIN
 		MENUITEM SEPARATOR
 		POPUP "Akt&ion an Auswahl"
 		BEGIN
-			MENUITEM "Code &Komprimieren",					IDM_EDIT_CODE_COMPRESS
-			MENUITEM "Code &Verschönern",					IDM_EDIT_CODE_PRETTY
+			MENUITEM "CSS/JS/JSON &Komprimieren",			IDM_EDIT_CODE_COMPRESS
+			MENUITEM "CSS/JS/JSON &Verschönern",			IDM_EDIT_CODE_PRETTY
 			MENUITEM SEPARATOR
 			MENUITEM "Öffne &Datei, Ordner, Link, etc.",	CMD_OPEN_PATH_OR_LINK
 			MENUITEM "Öffne enthaltenden &Ordner",			CMD_OPEN_CONTAINING_FOLDER

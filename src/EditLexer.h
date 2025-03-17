@@ -41,6 +41,7 @@ enum {
 	LexerAttr_CharacterPrefix = 1 << 9,
 	LexerAttr_EscapePunctuation = 1 << 10,
 	LexerAttr_PlainTextFile = 1 << 11,
+	LexerAttr_CodePretty = 1 << 12,
 };
 
 enum {

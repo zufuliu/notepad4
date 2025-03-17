@@ -2379,8 +2379,6 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 		CMD_OPEN_PATH_OR_LINK,
 		CMD_TIMESTAMPS,
 		IDM_EDIT_CLEARDOCUMENT,
-		IDM_EDIT_CODE_COMPRESS,
-		IDM_EDIT_CODE_PRETTY,
 		IDM_EDIT_COMPLETEWORD,
 		IDM_EDIT_COPY,
 		IDM_EDIT_COPYALL,
@@ -2490,8 +2488,11 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	EnableCmd(hmenu, IDM_EDIT_REMOVEDUPLICATELINE, i);
 	EnableCmd(hmenu, IDM_EDIT_MERGEDUPLICATELINE, i);
 
-	DisableCmd(hmenu, IDM_EDIT_LINECOMMENT, (pLexCurrent->lexerAttr & LexerAttr_NoLineComment));
-	DisableCmd(hmenu, IDM_EDIT_STREAMCOMMENT, (pLexCurrent->lexerAttr & LexerAttr_NoBlockComment));
+	i = pLexCurrent->lexerAttr;
+	EnableCmd(hmenu, IDM_EDIT_CODE_COMPRESS, (i & LexerAttr_CodePretty));
+	EnableCmd(hmenu, IDM_EDIT_CODE_PRETTY, (i & LexerAttr_CodePretty));
+	DisableCmd(hmenu, IDM_EDIT_LINECOMMENT, (i & LexerAttr_NoLineComment));
+	DisableCmd(hmenu, IDM_EDIT_STREAMCOMMENT, (i & LexerAttr_NoBlockComment));
 
 	CheckCmd(hmenu, IDM_VIEW_SHOW_FOLDING, bShowCodeFolding);
 	CheckCmd(hmenu, IDM_VIEW_USEDEFAULT_CODESTYLE, pLexCurrent->bUseDefaultCodeStyle);
