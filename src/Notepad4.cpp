@@ -7210,17 +7210,17 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 				SciCall_DocumentEnd();
 			}
 #endif
-			if (bRestoreView) {
-				SciCall_SetSel(iAnchorPos, iCurPos);
-				const Sci_Line iCurLine = iLine - SciCall_LineFromPosition(SciCall_GetCurrentPos());
-				if (abs(iCurLine) > 5) {
-					EditJumpTo(iLine, iCol);
-				} else {
-					SciCall_EnsureVisible(iDocTopLine);
-					const Sci_Line iNewTopLine = SciCall_GetFirstVisibleLine();
-					SciCall_LineScroll(0, iVisTopLine - iNewTopLine);
-					SciCall_SetXOffset(iXOffset);
-				}
+		}
+		if (bRestoreView) {
+			SciCall_SetSel(iAnchorPos, iCurPos);
+			const Sci_Line iCurLine = iLine - SciCall_LineFromPosition(SciCall_GetCurrentPos());
+			if (abs(iCurLine) > 5) {
+				EditJumpTo(iLine, iCol);
+			} else {
+				SciCall_EnsureVisible(iDocTopLine);
+				const Sci_Line iNewTopLine = SciCall_GetFirstVisibleLine();
+				SciCall_LineScroll(0, iVisTopLine - iNewTopLine);
+				SciCall_SetXOffset(iXOffset);
 			}
 		}
 
