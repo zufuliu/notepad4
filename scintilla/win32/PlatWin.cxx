@@ -2228,10 +2228,11 @@ STDMETHODIMP BlobInline::GetBreakConditions(DWRITE_BREAK_CONDITION *breakConditi
 }
 
 class ScreenLineLayout final : public IScreenLineLayout {
-	IDWriteTextLayout *textLayout = nullptr;
 	std::string text;
 	std::wstring buffer;
 	std::vector<BlobInline> blobs;
+	// textLayout depends on blobs so must be declared after blobs so it is destroyed before blobs.
+	IDWriteTextLayout *textLayout = nullptr;
 	static void FillTextLayoutFormats(const IScreenLine *screenLine, IDWriteTextLayout *textLayout, std::vector<BlobInline> &blobs);
 	static std::wstring ReplaceRepresentation(std::string_view text);
 	static size_t GetPositionInLayout(std::string_view text, size_t position) noexcept;
