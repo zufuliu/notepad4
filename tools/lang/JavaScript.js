@@ -5,7 +5,8 @@
 // 2022 https://tc39.es/ecma262/2022/
 // 2023 https://tc39.es/ecma262/2023/
 // 2024 https://tc39.es/ecma262/2024/
-// 2025 https://tc39.es/ecma262/
+// 2025 https://tc39.es/ecma262/2025/
+// 2026 https://tc39.es/ecma262/
 
 //! keywords
 // https://tc39.es/ecma262/#sec-keywords-and-reserved-words
@@ -295,6 +296,7 @@ Math {
 	expm1(x)
 	floor(x)
 	fround(x)
+	f16round(x) // 2025
 	hypot(value1, value2, ...values)
 	imul(x, y)
 	log(x)
@@ -429,6 +431,7 @@ String(value) {
 
 RegExp(pattern, flags) {
 	compile(pattern, flags)
+	escape(S) // 2025
 	lastIndex
 	prototype:
 		exec(string)
@@ -502,6 +505,7 @@ Array(...items) {
 		BigUint64Array // 2020
 		Float32Array
 		Float64Array
+		Float16Array // 2025
 		prototype:
 			BYTES_PER_ELEMENT
 			buffer
@@ -533,10 +537,17 @@ Set([iterable]) {
 		add(value)
 		clear()
 		delete(value)
+		difference(other) // 2025
 		entries()
 		forEach(callbackfn [, thisArg])
 		has(value)
+		intersection(other) // 2025
+		isDisjointFrom(other) // 2025
+		isSubsetOf(other) // 2025
+		isSupersetOf(other) // 2025
 		keys()
+		symmetricDifference(other) // 2025
+		union(other) // 2025
 		values()
 		size
 }
@@ -576,6 +587,7 @@ DataView(buffer [, byteOffset [, byteLength]]) {
 		byteOffset
 		getBigInt64(byteOffset [, littleEndian]) // 2020
 		getBigUint64(byteOffset [, littleEndian]) // 2020
+		getFloat16(byteOffset [, littleEndian]) // 2025
 		getFloat32(byteOffset [, littleEndian])
 		getFloat64(byteOffset [, littleEndian])
 		getInt8(byteOffset)
@@ -587,6 +599,7 @@ DataView(buffer [, byteOffset [, byteLength]]) {
 		getUint32(byteOffset [, littleEndian])
 		setBigInt64(byteOffset, value [, littleEndian])
 		setBigUint64(byteOffset, value [, littleEndian])
+		setFloat16(byteOffset, value [, littleEndian]) // 2026
 		setFloat32(byteOffset, value [, littleEndian])
 		setFloat64(byteOffset, value [, littleEndian])
 		setInt8(byteOffset, value)
@@ -629,6 +642,22 @@ FinalizationRegistry(cleanupCallback) { // 2021
 		unregister(unregisterToken)
 }
 
+Iterator() { // 2025
+	from(O)
+	prototype:
+		drop(limit)
+		every(predicate)
+		filter(predicate)
+		find(predicate)
+		flatMap(mapper)
+		forEach(procedure)
+		map(mapper)
+		reduce(reducer [, initialValue])
+		some(predicate)
+		take(limit)
+		toArray()
+}
+
 GeneratorFunction(p1, p2, … , pn, body) {
 }
 AsyncGeneratorFunction(p1, p2, … , pn, body) {
@@ -649,6 +678,7 @@ Promise(executor) {
 	any(iterable) // 2021
 	reject(r)
 	resolve(x)
+	try(callback, ...args) // 2025
 	withResolvers() // 2024
 	prototype:
 		catch(onRejected)

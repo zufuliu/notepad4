@@ -21,10 +21,11 @@ nullptr
 , // 4 interface
 "ActiveXObject AggregateError Array ArrayBuffer AsyncFunction AsyncGeneratorFunction Atomics "
 "BigInt BigInt64Array BigUint64Array Boolean DataView Date Debug Document Enumerator Error EvalError EventTarget "
-"FinalizationRegistry Float32Array Float64Array FormData Function GeneratorFunction Int16Array Int32Array Int8Array JSON "
-"Map Math Number Object Promise Proxy RangeError ReferenceError Reflect RegExp "
-"Set SharedArrayBuffer String Symbol SyntaxError TypeError URIError Uint16Array Uint32Array Uint8Array Uint8ClampedArray "
-"VBArray WScript WeakMap WeakRef WeakSet Worker XMLHttpRequest "
+"FinalizationRegistry Float16Array Float32Array Float64Array FormData Function GeneratorFunction "
+"Int16Array Int32Array Int8Array Iterator JSON Map Math Number Object Promise Proxy "
+"RangeError ReferenceError Reflect RegExp Set SharedArrayBuffer String Symbol SyntaxError TypeError "
+"URIError Uint16Array Uint32Array Uint8Array Uint8ClampedArray VBArray WScript WeakMap WeakRef WeakSet Worker "
+"XMLHttpRequest "
 
 , // 5 enumeration
 nullptr

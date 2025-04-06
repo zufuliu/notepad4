@@ -84,7 +84,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [Boost Jam](tools/lang/Jamfile.jam), up to Jam 4.4.
 	* [Java](tools/lang/Java.java), up to Java 22. [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#java)
 		* [BeanShell](https://github.com/beanshell/beanshell)
-	* [JavaScript](tools/lang/JavaScript.js), up to ECMAScript 2024 with [JSX](https://facebook.github.io/jsx/) and [Web APIs](https://developer.mozilla.org/en-US/docs/Web/API).
+	* [JavaScript](tools/lang/JavaScript.js), up to ECMAScript 2025 with [JSX](https://facebook.github.io/jsx/) and [Web APIs](https://developer.mozilla.org/en-US/docs/Web/API).
 	* [JSON](https://www.json.org) and [JSON5](https://json5.org/) Document
 	* [Julia Script](tools/lang/Julia.jl), up to Julia 1.9. [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#julia)
 	* [Kotlin](tools/lang/Kotlin.kt), up to Kotlin 2.0.

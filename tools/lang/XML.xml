@@ -1,6 +1,6 @@
 <!-- 7 February 2013 https://www.w3.org/TR/xml/ -->
 <!-- 29 September 2006 https://www.w3.org/TR/xml11/ -->
-<?xml version encoding="utf-8 UTF-8 ISO-8859-1" standalone="yes no" xml:lang?>
+<?xml version encoding="utf-8 UTF-8 ISO-8859-1" standalone="yes no" xml:lang xml:space="default preserve"?>
 <!DOCTYPE SYSTEM PUBLIC>
 <!doctype> <!-- https://html.spec.whatwg.org/multipage/syntax.html#the-doctype -->
 <![CDATA[ ]]>
