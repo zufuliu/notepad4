@@ -22,7 +22,7 @@ def getCharacterName(ch):
 	except ValueError:
 		return ''
 
-def readUnicodePropertyFile(path, propertyIndex=1, firstLast=None):
+def readUnicodePropertyFile(path, propertyIndex=1, firstLast=None, withMissing=False, missingMap=None):
 	filename, ext = os.path.splitext(os.path.basename(path))
 	version = ''
 	propertyList = {}
@@ -51,10 +51,14 @@ def readUnicodePropertyFile(path, propertyIndex=1, firstLast=None):
 			items = line.split(';')
 			code = [int(item, 16) for item in items[0].replace('.', ' ').split() if item]
 			if missing:
-				propertyName = items[1].strip()
-				value = items[2] if len(items) > 2 else None
-				assert propertyName not in missingList
-				missingList[propertyName] = (code, value)
+				if withMissing:
+					propertyName = items[1].strip()
+					if missingMap and propertyName in missingMap:
+						propertyName = missingMap[propertyName]
+					if propertyName in missingList:
+						missingList[propertyName].append(code)
+					else:
+						missingList[propertyName] = [code]
 			else:
 				propertyName = items[propertyIndex].strip()
 				if firstLast:
@@ -73,6 +77,13 @@ def readUnicodePropertyFile(path, propertyIndex=1, firstLast=None):
 						propertyList[propertyName] = [code]
 			prevLine = items
 
+	if withMissing and missingList:
+		for name, codeList in propertyList.items():
+			if name in missingList:
+				missingList[name].extend(codeList)
+			else:
+				missingList[name] = codeList
+		propertyList = missingList
 	print(path, version, 'property:', ', '.join(sorted(propertyList.keys())))
 	return version, propertyList
 

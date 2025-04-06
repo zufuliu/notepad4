@@ -72,25 +72,26 @@ def buildGraphemeClusterBoundary():
 	table = graphemeClusterBoundary
 
 	notBreak = {
-		'Other': ['Extend', 'SpacingMark', 'ZWJ', 'ConjunctLinker'],
-		'CR': ['LF'],
-		'Extend': ['Extend', 'SpacingMark', 'ZWJ', 'ConjunctLinker'],
-		'ZWJ': ['Extend', 'SpacingMark', 'ZWJ', 'ConjunctLinker', 'ExtPict', 'Consonant'],
-		'Prepend': ['Other', 'Extend', 'SpacingMark', 'ZWJ', 'ConjunctLinker', 'RI', 'Prepend', 'L', 'V', 'T', 'LV', 'LVT', 'ExtPict', 'Consonant'],
-		'SpacingMark': ['Extend', 'SpacingMark', 'ZWJ', 'ConjunctLinker'],
-		'L': ['Extend', 'SpacingMark', 'ZWJ', 'ConjunctLinker', 'L', 'V', 'LV', 'LVT'],
-		'V': ['Extend', 'SpacingMark', 'ZWJ', 'ConjunctLinker', 'V', 'T'],
-		'T': ['Extend', 'SpacingMark', 'ZWJ', 'ConjunctLinker', 'T'],
-		'LV': ['Extend', 'SpacingMark', 'ZWJ', 'ConjunctLinker', 'V', 'T'],
-		'LVT': ['Extend', 'SpacingMark', 'ZWJ', 'ConjunctLinker', 'T'],
-		'ExtPict': ['Extend', 'SpacingMark', 'ZWJ', 'ConjunctLinker'],
-		'RI': ['Extend', 'SpacingMark', 'ZWJ', 'ConjunctLinker', 'RI'],
-		'ConjunctLinker': ['Extend', 'SpacingMark', 'ZWJ', 'ConjunctLinker', 'Consonant'],
-		'Consonant': ['Extend', 'SpacingMark', 'ZWJ', 'ConjunctLinker'],
+	'Other': 'Extend SpacingMark ZWJ ConjunctLinker',
+	'CR': 'LF',
+	'Extend': 'Extend SpacingMark ZWJ ConjunctLinker',
+	'ZWJ': 'Extend SpacingMark ZWJ ConjunctLinker ExtPict Consonant',
+	'Prepend': 'Other Extend SpacingMark ZWJ ConjunctLinker RI Prepend L V T LV LVT ExtPict Consonant',
+	'SpacingMark': 'Extend SpacingMark ZWJ ConjunctLinker',
+	'L': 'Extend SpacingMark ZWJ ConjunctLinker L V LV LVT',
+	'V': 'Extend SpacingMark ZWJ ConjunctLinker V T',
+	'T': 'Extend SpacingMark ZWJ ConjunctLinker T',
+	'LV': 'Extend SpacingMark ZWJ ConjunctLinker V T',
+	'LVT': 'Extend SpacingMark ZWJ ConjunctLinker T',
+	'ExtPict': 'Extend SpacingMark ZWJ ConjunctLinker',
+	'RI': 'Extend SpacingMark ZWJ ConjunctLinker RI',
+	'ConjunctLinker': 'Extend SpacingMark ZWJ ConjunctLinker Consonant',
+	'Consonant': 'Extend SpacingMark ZWJ ConjunctLinker',
 	}
 
 	for key, row in notBreak.items():
 		first = GraphemeBreakPropertyMap[key]
+		row = row.split()
 		for item in row:
 			second = GraphemeBreakPropertyMap[item]
 			table[first] &= ~(1 << second)
@@ -154,7 +155,7 @@ def testGraphemeBreak(path, graphemeBreakTable):
 					fail[result ^ 1] += 1
 					print(f'test fail on line {lineno}: {ch} {official} {chNext} => {prop.name} {value} {propNext.name}')
 					print(f'{indent}{line}')
-	print(f'{path} total test: {total}, failed: {opportunity[0]} {fail[0]}, {opportunity[1]} {fail[1]}, ignored: {ignore}')
+	print(f'{path} total test: {total}, failed {sum(fail)}: {opportunity[0]} {fail[0]}, {opportunity[1]} {fail[1]}, ignored: {ignore}')
 
 def updateGraphemeBreakTable(headerFile, sourceFile):
 	defaultValue = int(GraphemeBreakProperty.Other)
@@ -250,5 +251,5 @@ constexpr bool IsGraphemeClusterBoundary(GraphemeBreakProperty prev, GraphemeBre
 	Regenerate(sourceFile, "//grapheme table", cxx_output)
 
 if __name__ == '__main__':
-	# parseSegmentationChart('Grapheme Break Chart.html')
+	# parseSegmentationChart('GraphemeBreakTest.html')
 	updateGraphemeBreakTable('../src/CharClassify.h', '../src/CharClassify.cxx')
