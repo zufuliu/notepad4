@@ -5490,7 +5490,11 @@ void EditClickCallTip(HWND hwnd) noexcept {
 			}
 
 			char text[16];
-			sprintf(text, "%0*X", width, color);
+			if (KeyboardIsKeyDown(VK_SHIFT)) {
+				sprintf(text, "%0*X", width, color);
+			} else {
+				sprintf(text, "%0*x", width, color);
+			}
 			SciCall_SetSel(callTipInfo.hexStart, callTipInfo.endPos);
 			SciCall_ReplaceSel(text);
 		}
