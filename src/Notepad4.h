@@ -259,13 +259,14 @@ enum FileSaveFlag {
 	FileSaveFlag_SaveAs = 4,
 	FileSaveFlag_SaveCopy = 8,
 	FileSaveFlag_EndSession = 16,
+	FileSaveFlag_Untitled = 32,
 };
 
 bool FileIO(bool fLoad, LPWSTR pszFile, FileSaveFlag flag, EditFileIOStatus &status) noexcept;
 bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile);
 bool FileSave(FileSaveFlag saveFlag) noexcept;
 BOOL OpenFileDlg(LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) noexcept;
-BOOL SaveFileDlg(bool Untitled, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) noexcept;
+BOOL SaveFileDlg(FileSaveFlag saveFlag, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) noexcept;
 
 enum {
 	AutoSaveOption_None = 0,

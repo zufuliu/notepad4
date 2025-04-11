@@ -7263,10 +7263,10 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 //
 //
 bool FileSave(FileSaveFlag saveFlag) noexcept {
-	const bool Untitled = StrIsEmpty(szCurFile);
 	bool bIsEmptyNewFile = false;
 
-	if (Untitled) {
+	if (StrIsEmpty(szCurFile)) {
+		saveFlag = static_cast<FileSaveFlag>(saveFlag | FileSaveFlag_Untitled);
 		const Sci_Position cchText = SciCall_GetLength();
 		if (cchText == 0) {
 			bIsEmptyNewFile = true;
@@ -7289,10 +7289,10 @@ bool FileSave(FileSaveFlag saveFlag) noexcept {
 	if (saveFlag & FileSaveFlag_Ask) {
 		// File or "Untitled" ...
 		WCHAR tch[MAX_PATH];
-		if (!Untitled) {
-			lstrcpy(tch, szCurFile);
-		} else {
+		if (saveFlag & FileSaveFlag_Untitled) {
 			GetString(IDS_UNTITLED, tch, COUNTOF(tch));
+		} else {
+			lstrcpy(tch, szCurFile);
 		}
 
 		switch (MsgBoxAsk(MB_YESNOCANCEL, IDS_ASK_SAVE, tch)) {
@@ -7311,7 +7311,7 @@ bool FileSave(FileSaveFlag saveFlag) noexcept {
 	status.iEOLMode = iCurrentEOLMode;
 
 	// Read only...
-	if (!(saveFlag & (FileSaveFlag_SaveAs | FileSaveFlag_SaveCopy)) && !Untitled) {
+	if (!(saveFlag & (FileSaveFlag_SaveAs | FileSaveFlag_SaveCopy | FileSaveFlag_Untitled))) {
 		const DWORD dwFileAttributes = GetFileAttributes(szCurFile);
 		bReadOnlyFile = (dwFileAttributes != INVALID_FILE_ATTRIBUTES) && (dwFileAttributes & FILE_ATTRIBUTE_READONLY);
 		if (bReadOnlyFile) {
@@ -7331,7 +7331,7 @@ bool FileSave(FileSaveFlag saveFlag) noexcept {
 	}
 
 	// Save As...
-	if ((saveFlag & (FileSaveFlag_SaveAs | FileSaveFlag_SaveCopy)) || Untitled) {
+	if ((saveFlag & (FileSaveFlag_SaveAs | FileSaveFlag_SaveCopy | FileSaveFlag_Untitled))) {
 		WCHAR tchInitialDir[MAX_PATH] = L"";
 		if ((saveFlag & FileSaveFlag_SaveCopy) && StrNotEmpty(tchLastSaveCopyDir)) {
 			lstrcpy(tchInitialDir, tchLastSaveCopyDir);
@@ -7340,7 +7340,7 @@ bool FileSave(FileSaveFlag saveFlag) noexcept {
 			lstrcpy(tchFile, szCurFile);
 		}
 
-		if (SaveFileDlg(Untitled, tchFile, COUNTOF(tchFile), tchInitialDir)) {
+		if (SaveFileDlg(saveFlag, tchFile, COUNTOF(tchFile), tchInitialDir)) {
 			fSuccess = FileIO(false, tchFile, saveFlag, status);
 			if (fSuccess) {
 				if (!(saveFlag & FileSaveFlag_SaveCopy)) {
@@ -7536,7 +7536,7 @@ BOOL OpenFileDlg(LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) noexcep
 // SaveFileDlg()
 //
 //
-BOOL SaveFileDlg(bool Untitled, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) noexcept {
+BOOL SaveFileDlg(FileSaveFlag saveFlag, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) noexcept {
 	WCHAR tchInitialDir[MAX_PATH];
 	SetupInitialOpenSaveDir(tchInitialDir, COUNTOF(tchInitialDir), lpstrInitialDir);
 	WCHAR szNewFile[MAX_PATH];
@@ -7566,7 +7566,7 @@ BOOL SaveFileDlg(bool Untitled, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInit
 		lstrcpyn(lpstrFile, szNewFile, cchFile);
 		const int iLexer = lexers[ofn.nFilterIndex];
 		// default scheme, current scheme and selected file type all are Text File => no lexer specified.
-		flagLexerSpecified = iLexer != 0 && !(Untitled && iLexer == NP2LEX_TEXTFILE && iLexer == lexers[0] && iLexer == pLexCurrent->rid);
+		flagLexerSpecified = iLexer != 0 && !((saveFlag & FileSaveFlag_Untitled) && iLexer == NP2LEX_TEXTFILE && iLexer == lexers[0] && iLexer == pLexCurrent->rid);
 		iInitialLexer = iLexer;
 	}
 	NP2HeapFree(szFilter);
