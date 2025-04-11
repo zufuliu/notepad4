@@ -7556,6 +7556,11 @@ BOOL SaveFileDlg(FileSaveFlag saveFlag, LPWSTR lpstrFile, int cchFile, LPCWSTR l
 	ofn.Flags = OFN_HIDEREADONLY /*| OFN_NOCHANGEDIR*/ |
 				/*OFN_NODEREFERENCELINKS |*/ OFN_OVERWRITEPROMPT |
 				OFN_DONTADDTORECENT | OFN_PATHMUSTEXIST;
+	WCHAR szTitle[128];
+	if (saveFlag & FileSaveFlag_SaveCopy) {
+		GetString(IDT_FILE_SAVECOPY, szTitle, COUNTOF(szTitle));
+		ofn.lpstrTitle = szTitle;
+	}
 	if (bUseXPFileDialog) {
 		ofn.Flags |= OFN_EXPLORER | OFN_ENABLESIZING | OFN_ENABLEHOOK;
 		ofn.lpfnHook = OpenSaveFileDlgHookProc;
