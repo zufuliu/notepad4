@@ -95,7 +95,7 @@ struct WordList {
 };
 
 // TODO: replace _stricmp() and _strnicmp() with other functions
-// which correctly case insensitively compares UTF-8 string and ANSI string.
+// which correctly case insensitively compares UTF-8 string and ANSII/DBCS string.
 
 #if NP2_AUTOC_CACHE_SORT_KEY
 #define NP2_AUTOC_SORT_KEY_LENGTH	4
@@ -331,6 +331,7 @@ void WordList::Init(LPCSTR pRoot, UINT iRootLen, bool ignoreCase) noexcept {
 	iStartLen = iRootLen;
 
 	if (ignoreCase) {
+		// use strcmp() instead of _stricmp() to keep all matched string instead of just first one
 		WL_strcmp = strcmp;
 		WL_strncmp = _strnicmp;
 #if NP2_AUTOC_CACHE_SORT_KEY
