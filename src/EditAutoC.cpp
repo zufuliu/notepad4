@@ -95,7 +95,7 @@ struct WordList {
 };
 
 // TODO: replace _stricmp() and _strnicmp() with other functions
-// which correctly case insensitively compares UTF-8 string and ANSII/DBCS string.
+// which correctly case insensitively compares UTF-8 string and ANSI/DBCS string.
 
 #if NP2_AUTOC_CACHE_SORT_KEY
 #define NP2_AUTOC_SORT_KEY_LENGTH	4
