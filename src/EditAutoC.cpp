@@ -3268,10 +3268,12 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) noexcept {
 		CharacterPrefixMask['B' >> 5] |= (1 << ('B' & 31));
 		CharacterPrefixMask['F' >> 5] |= (1 << ('F' & 31));
 		CharacterPrefixMask['R' >> 5] |= (1 << ('R' & 31));
+		CharacterPrefixMask['T' >> 5] |= (1 << ('T' & 31));
 		CharacterPrefixMask['U' >> 5] |= (1 << ('U' & 31));
 		CharacterPrefixMask['b' >> 5] |= (1 << ('b' & 31));
 		CharacterPrefixMask['f' >> 5] |= (1 << ('f' & 31));
 		CharacterPrefixMask['r' >> 5] |= (1 << ('r' & 31));
+		CharacterPrefixMask['t' >> 5] |= (1 << ('t' & 31));
 		CharacterPrefixMask['u' >> 5] |= (1 << ('u' & 31));
 		RawStringStyleMask[SCE_PY_RAWSTRING_SQ >> 5] |= (1U << (SCE_PY_RAWSTRING_SQ & 31));
 		RawStringStyleMask[SCE_PY_RAWSTRING_DQ >> 5] |= (1U << (SCE_PY_RAWSTRING_DQ & 31));

@@ -848,7 +848,7 @@ LexerConfigMap = {
 		'printf_format_specifier': True,
 		'format_specifier_style': 'SCE_PY_FORMAT_SPECIFIER',
 		'escape_char_style': 'SCE_PY_ESCAPECHAR',
-		'character_prefix': ['r', 'b', 'f', 'u', 'R', 'B', 'F', 'U'],
+		'character_prefix': ['r', 'b', 'f', 't', 'u', 'R', 'B', 'F', 'T', 'U'],
 		'raw_string_style': ['SCE_PY_RAWSTRING_SQ', 'SCE_PY_RAWSTRING_DQ',
 			'SCE_PY_TRIPLE_RAWSTRING_SQ', 'SCE_PY_TRIPLE_RAWSTRING_DQ',
 			'SCE_PY_RAWFMTSTRING_SQ', 'SCE_PY_RAWFMTSTRING_DQ',
