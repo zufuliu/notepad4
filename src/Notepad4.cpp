@@ -4910,6 +4910,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 		case SCN_SAVEPOINTREACHED:
 			bDocumentModified = false;
+			iOriginalEncoding = iCurrentEncoding;
 			UpdateDocumentModificationStatus();
 			break;
 
@@ -7377,8 +7378,6 @@ bool FileSave(FileSaveFlag saveFlag) noexcept {
 
 	if (fSuccess) {
 		if (!(saveFlag & FileSaveFlag_SaveCopy)) {
-			bDocumentModified = false;
-			iOriginalEncoding = iCurrentEncoding;
 			mruFile.Add(szCurFile);
 			if (flagUseSystemMRU == TripleBoolean_True) {
 				SHAddToRecentDocs(SHARD_PATHW, szCurFile);
@@ -7387,7 +7386,6 @@ bool FileSave(FileSaveFlag saveFlag) noexcept {
 				&& iPathNameFormat == TitlePathNameFormat_NameOnly) {
 				iPathNameFormat = TitlePathNameFormat_NameFirst;
 			}
-			UpdateDocumentModificationStatus();
 
 			// Install watching of the current file
 			if ((saveFlag & FileSaveFlag_SaveAs) && bResetFileWatching) {
@@ -8368,6 +8366,7 @@ void AutoSave_DoWork(FileSaveFlag saveFlag) noexcept {
 		status.iEOLMode = iCurrentEOLMode;
 		if (EditSaveFile(hwndEdit, szCurFile, FileSaveFlag_EndSession, status)) {
 			dwLastSavedDocReversion = dwCurrentDocReversion;
+			InstallFileWatching(false);
 			return;
 		}
 	}
