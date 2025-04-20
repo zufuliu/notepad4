@@ -439,7 +439,9 @@ HBITMAP ResizeImageForDPI(HBITMAP hbmp, UINT dpi) noexcept {
 	BITMAP bmp;
 	if (GetObject(hbmp, sizeof(BITMAP), &bmp)) {
 		// assume 16x16 at 100% scaling
-		const int height = (dpi*16) / USER_DEFAULT_SCREEN_DPI;
+		int height = (dpi*16) / USER_DEFAULT_SCREEN_DPI;
+		// round up to even to avoid trailing pixels when processed 4 pixels at a time
+		height += height & 1;
 		if (height == bmp.bmHeight && bmp.bmBitsPixel == 32) {
 			return hbmp;
 		}
