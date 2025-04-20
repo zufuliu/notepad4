@@ -4982,6 +4982,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 					bCloseDlg = false;
 				}
 			}
+			mask |= lpefr->option & (bIsFindDlg ? FindReplaceOption_CloseReplace : FindReplaceOption_CloseFind);
 			lpefr->option = mask;
 
 			// Save MRUs
