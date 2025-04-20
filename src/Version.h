@@ -80,6 +80,8 @@
 		#define VERSION_FILEVERSION_ARCH	L" (arm64) "
 	#elif defined(__ia64__) || defined(_IA64_) || defined(_M_IA64)
 		#define VERSION_FILEVERSION_ARCH	L" (ia64) "
+	#elif defined(__AVX512F__) || defined(__AVX512BW__) || defined(__AVX512CD__) || defined(__AVX512DQ__) || defined(__AVX512VL__)
+		#define VERSION_FILEVERSION_ARCH	L" (avx512) "
 	#elif defined(__AVX2__)
 		#define VERSION_FILEVERSION_ARCH	L" (avx2) "
 	#else

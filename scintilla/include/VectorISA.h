@@ -22,6 +22,7 @@
 	#define NP2_TARGET_ARM32	0
 	#define NP2_USE_SSE2		0
 	#define NP2_USE_AVX2		0
+	#define NP2_USE_AVX512		0
 	// TODO: use ARM Neon
 #elif defined(__arm__) || defined(_ARM_) || defined(_M_ARM)
 	#define NP2_TARGET_ARM		1
@@ -29,6 +30,7 @@
 	#define NP2_TARGET_ARM32	1
 	#define NP2_USE_SSE2		0
 	#define NP2_USE_AVX2		0
+	#define NP2_USE_AVX512		0
 #else
 	#define NP2_TARGET_ARM		0
 	#define NP2_TARGET_ARM64	0
@@ -36,12 +38,24 @@
 	// SSE2 enabled by default
 	#define NP2_USE_SSE2		1
 
-	// Clang and GCC use -march=x86-64-v3, https://clang.llvm.org/docs/UsersManual.html#x86
-	// MSVC use /arch:AVX2
-	#if defined(_WIN64) && defined(__AVX2__)
-		#define NP2_USE_AVX2	1
+	// https://learn.microsoft.com/en-us/cpp/build/reference/arch-x64
+	// https://clang.llvm.org/docs/UsersManual.html#x86
+	#if defined(_WIN64)
+		#if defined(__AVX512F__) || defined(__AVX512BW__) || defined(__AVX512CD__) || defined(__AVX512DQ__) || defined(__AVX512VL__)
+			// Clang and GCC: -march=x86-64-v4, MSVC: /arch:AVX512
+			#define NP2_USE_AVX2	1
+			#define NP2_USE_AVX512	1
+		#elif defined(__AVX2__)
+			// Clang and GCC: -march=x86-64-v3, MSVC: /arch:AVX2
+			#define NP2_USE_AVX2	1
+			#define NP2_USE_AVX512	0
+		#else
+			#define NP2_USE_AVX2	0
+			#define NP2_USE_AVX512	0
+		#endif
 	#else
 		#define NP2_USE_AVX2	0
+		#define NP2_USE_AVX512	0
 	#endif
 
 	// TODO: use __isa_enabled/__isa_available in MSVC build to dynamic enable AVX2 code.
