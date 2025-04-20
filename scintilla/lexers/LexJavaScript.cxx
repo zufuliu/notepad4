@@ -37,6 +37,7 @@ struct EscapeSequence {
 	void resetEscapeState(int state, int chNext) noexcept {
 		outerState = state;
 		digitsLeft = (chNext == 'x')? 3 : ((chNext == 'u') ? 5 : 1);
+		brace = false;
 	}
 	bool atEscapeEnd(int ch) noexcept {
 		--digitsLeft;

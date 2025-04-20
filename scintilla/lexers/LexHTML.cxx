@@ -648,7 +648,9 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				styler.ColorTo(i, StateToPrint);
 				break;
 			}
+			state = beforePreProc;
 			if (scriptLanguage != eScriptSGML) {
+				beforePreProc = SCE_H_DEFAULT;
 				i++;
 			}
 			if (ch == '%')
@@ -659,7 +661,6 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				styler.ColorTo(i + 1, SCE_H_SGML_DEFAULT);
 			else
 				styler.ColorTo(i + 1, SCE_H_QUESTION);
-			state = beforePreProc;
 			if (inScriptType == eNonHtmlScriptPreProc)
 				inScriptType = eNonHtmlScript;
 			else
