@@ -1642,7 +1642,7 @@ static bool EditCompleteWordCore(int iCondition, bool autoInsert) noexcept {
 	}
 
 	bool retry = true;
-	uint32_t ignoredStyleMask[8] = {0};
+	uint32_t ignoredStyleMask[8]{};
 	const bool bScanWordsInDocument = (autoCompletionConfig.iCompleteOption & AutoCompletionOption_ScanWordsInDocument) != 0;
 	if (pLexCurrent->lexerAttr & LexerAttr_PlainTextFile) {
 		if (!bScanWordsInDocument

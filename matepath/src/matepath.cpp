@@ -2899,7 +2899,7 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) noexcept {
 		case L'P':
 			state = CommandParseState_Argument;
 			if (ExtractFirstArgument(lp2, lp1, lp2)) {
-				int cord[4] = { 0 };
+				int cord[4]{};
 				const int itok = ParseCommaList(lp1, cord, COUNTOF(cord));
 				if (itok == 4) {
 					flagPosParam = true;

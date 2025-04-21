@@ -717,7 +717,7 @@ void Encoding_AddToTreeView(HWND hwnd, int idSel, bool bRecodeOnly) noexcept {
 
 #if 0	// verify sEncodingGroupList
 	{
-		int encodings[COUNTOF(mEncoding)] = {0};
+		int encodings[COUNTOF(mEncoding)]{};
 		for (UINT i = 0; i < COUNTOF(sEncodingGroupList); i++) {
 			const NP2EncodingGroup *group = &sEncodingGroupList[i];
 			for (UINT j = 0; j < COUNTOF(group->encodings); j++) {
@@ -1866,7 +1866,7 @@ static inline bool z_validate_utf8_sse4(const char *data, uint32_t len) noexcept
 }
 
 static inline int did_cpu_supports_ssse3() noexcept {
-	int info[4] = {0};
+	int info[4]{};
 	__cpuid(info, 0x00000001);
 	return info[2] & 0x0000200;
 }

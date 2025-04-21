@@ -3386,7 +3386,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_EDIT_INSERT_GUID: {
 		GUID guid;
 		if (S_OK == CoCreateGuid(&guid)) {
-			char guidBuf[37] = {0};
+			char guidBuf[37]{};
 			sprintf(guidBuf, "%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",
 					static_cast<unsigned int>(guid.Data1), guid.Data2, guid.Data3,
 					guid.Data4[0], guid.Data4[1],
@@ -5812,10 +5812,10 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) noexcept {
 			state = CommandParseState_Argument;
 			if (ExtractFirstArgument(lp2, lp1, lp2)) {
 #if defined(_WIN64)
-				int64_t cord[2] = { 0 };
+				int64_t cord[2]{};
 				const int itok = ParseCommaList64(lp1, cord, COUNTOF(cord));
 #else
-				int cord[2] = { 0 };
+				int cord[2]{};
 				const int itok = ParseCommaList(lp1, cord, COUNTOF(cord));
 #endif
 				if (itok != 0) {
@@ -6163,7 +6163,7 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) noexcept {
 		default:
 			state = CommandParseState_Argument;
 			if (ExtractFirstArgument(lp2, lp1, lp2)) {
-				int cord[5] = { 0 };
+				int cord[5]{};
 				const int itok = ParseCommaList(lp1, cord, COUNTOF(cord));
 				if (itok >= 4) {
 					flagPosParam = true;
@@ -7498,7 +7498,7 @@ BOOL OpenFileDlg(LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) noexcep
 	SetupInitialOpenSaveDir(tchInitialDir, COUNTOF(tchInitialDir), lpstrInitialDir);
 	WCHAR szFile[MAX_PATH];
 	szFile[0] = L'\0';
-	int lexers[1 + OPENDLG_MAX_LEXER_COUNT] = {0}; // 1-based filter index
+	int lexers[1 + OPENDLG_MAX_LEXER_COUNT]{}; // 1-based filter index
 	LPWSTR szFilter = Style_GetOpenDlgFilterStr(true, szCurFile, lexers);
 
 	OPENFILENAME ofn;
@@ -7539,7 +7539,7 @@ BOOL SaveFileDlg(FileSaveFlag saveFlag, LPWSTR lpstrFile, int cchFile, LPCWSTR l
 	SetupInitialOpenSaveDir(tchInitialDir, COUNTOF(tchInitialDir), lpstrInitialDir);
 	WCHAR szNewFile[MAX_PATH];
 	lstrcpy(szNewFile, lpstrFile);
-	int lexers[1 + OPENDLG_MAX_LEXER_COUNT] = {0}; // 1-based filter index
+	int lexers[1 + OPENDLG_MAX_LEXER_COUNT]{}; // 1-based filter index
 	LPWSTR szFilter = Style_GetOpenDlgFilterStr(false, szCurFile, lexers);
 
 	OPENFILENAME ofn;

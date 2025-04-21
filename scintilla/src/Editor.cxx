@@ -2093,7 +2093,7 @@ void Editor::InsertCharacter(std::string_view sv, CharacterSource charSource) {
 				// Also treats \0 and naked trail bytes 0x80 to 0xBF as valid
 				// characters representing themselves.
 			} else {
-				unsigned int utf32[1] = { 0 };
+				unsigned int utf32[1]{};
 				UTF32FromUTF8(sv, utf32, std::size(utf32));
 				ch = utf32[0];
 			}

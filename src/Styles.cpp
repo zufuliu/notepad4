@@ -2769,7 +2769,7 @@ bool Style_CanOpenFile(LPCWSTR lpszFile) noexcept {
 
 #if 0
 bool Style_MaybeBinaryFile(LPCWSTR lpszFile) noexcept {
-	uint8_t buf[5] = {0}; // file magic
+	uint8_t buf[5]{}; // file magic
 	SciCall_GetText(COUNTOF(buf) - 1, buf);
 	const UINT magic2 = (buf[0] << 8) | buf[1];
 	if (magic2 == 0x4D5AU ||	// PE (exe, dll, etc.): MZ
@@ -4883,7 +4883,7 @@ static void Lexer_OnCheckStateChanged(HWND hwndTV, HTREEITEM hFavoriteNode, HTRE
 		// update check state in general schemes
 		if (hParent == hFavoriteNode) {
 			const int group = Lexer_GetSchemeGroup(pLex);
-			WCHAR szTitle[4] = {0};
+			WCHAR szTitle[4]{};
 			//item.mask = TVIF_TEXT;
 			item.pszText = szTitle;
 			item.cchTextMax = COUNTOF(szTitle);
@@ -5381,7 +5381,7 @@ void EditShowCallTip(Sci_Position position) noexcept {
 
 	const ShowCallTip colorFormat = callTipInfo.showCallTip;
 	if (colorFormat != ShowCallTip_None) {
-		char text[32] = {0};
+		char text[32]{};
 		const Sci_Position startPos = max<Sci_Position>(0, position - 10);
 		const Sci_Position endPos = min(position + 10, SciCall_GetLength());
 		const Sci_TextRangeFull tr = { { startPos, endPos }, text + 8};

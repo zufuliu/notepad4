@@ -1879,7 +1879,7 @@ sptr_t ScintillaWin::KeyMessage(unsigned int iMessage, uptr_t wParam, sptr_t lPa
 		} else if (lastKeyDownConsumed) {
 			return 1;
 		} else {
-			wchar_t wcs[3] = { 0 };
+			wchar_t wcs[3]{};
 			const size_t wclen = UTF16FromUTF32Character(static_cast<unsigned int>(wParam), wcs);
 			AddWString(std::wstring_view(wcs, wclen), CharacterSource::DirectInput);
 			return FALSE;
