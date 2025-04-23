@@ -1217,6 +1217,47 @@ void Style_UpdateCaret() noexcept {
 	SciCall_SetCaretPeriod(iValue);
 }
 
+bool IsCJKLocale(LPCWSTR locale) noexcept {
+	const UINT lang = (*reinterpret_cast<const UINT *>(locale)) | 0x00200020;
+	// zh, ja, ko
+	return lang == 0x0068007A || lang == 0x0061006A || lang == 0x006F006B;
+}
+
+static void Style_SetFontLocaleName(LPCWSTR lpszStyle) noexcept {
+	// current user default locale (empty) to override "en-US" in Scintilla.
+	char localeName[LOCALE_NAME_MAX_LENGTH] = "";
+	WCHAR localeWide[LOCALE_NAME_MAX_LENGTH] = L"";
+#if 0 // improve CJK font display when current UI language isn't CJK
+	if (!Style_StrGetLocale(lpszStyle, localeWide, COUNTOF(localeWide))) {
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+		GetUserDefaultLocaleName(localeWide, COUNTOF(localeWide));
+		if (!IsCJKLocale(localeWide)) {
+			WCHAR systemWide[LOCALE_NAME_MAX_LENGTH] = L"";
+			GetSystemDefaultLocaleName(systemWide, COUNTOF(systemWide));
+			if (IsCJKLocale(systemWide)) {
+				lstrcpy(localeWide, systemWide);
+			}
+		}
+#else
+		GetLocaleInfoW(LOCALE_USER_DEFAULT, LOCALE_SNAME, localeWide, COUNTOF(localeWide));
+		if (!IsCJKLocale(localeWide)) {
+			WCHAR systemWide[LOCALE_NAME_MAX_LENGTH] = L"";
+			GetLocaleInfoW(LOCALE_SYSTEM_DEFAULT, LOCALE_SNAME, localeWide, COUNTOF(localeWide));
+			if (IsCJKLocale(systemWide)) {
+				lstrcpy(localeWide, systemWide);
+			}
+		}
+#endif
+	}
+	WideCharToMultiByte(CP_UTF8, 0, localeWide, -1, localeName, COUNTOF(localeName), nullptr, nullptr);
+#else
+	if (Style_StrGetLocale(lpszStyle, localeWide, COUNTOF(localeWide))) {
+		WideCharToMultiByte(CP_UTF8, 0, localeWide, -1, localeName, COUNTOF(localeName), nullptr, nullptr);
+	}
+#endif
+	SciCall_SetFontLocale(localeName);
+}
+
 static inline void Style_SetDefaultStyle(int index) noexcept {
 	Style_SetStyles(lexGlobal.Styles[index].iStyle, lexGlobal.Styles[index].szValue);
 }
@@ -1503,24 +1544,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) noexcept {
 
 	// used in Direct2D for language dependent glyphs
 	if (IsVistaAndAbove()) {
-		// current user default locale (empty) to override "en-US" in Scintilla.
-		WCHAR localeWide[LOCALE_NAME_MAX_LENGTH] = L"";
-		char localeName[LOCALE_NAME_MAX_LENGTH] = "";
-#if 0
-		if (!Style_StrGetLocale(szValue, localeWide, COUNTOF(localeWide))) {
-#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-			GetUserDefaultLocaleName(localeWide, COUNTOF(localeWide));
-#else
-			GetLocaleInfoW(LOCALE_USER_DEFAULT, LOCALE_SNAME, localeWide, COUNTOF(localeWide));
-#endif
-		}
-		WideCharToMultiByte(CP_UTF8, 0, localeWide, -1, localeName, COUNTOF(localeName), nullptr, nullptr);
-#else
-		if (Style_StrGetLocale(szValue, localeWide, COUNTOF(localeWide))) {
-			WideCharToMultiByte(CP_UTF8, 0, localeWide, -1, localeName, COUNTOF(localeName), nullptr, nullptr);
-		}
-#endif
-		SciCall_SetFontLocale(localeName);
+		Style_SetFontLocaleName(szValue);
 	}
 
 	COLORREF rgb;
