@@ -1217,7 +1217,7 @@ void Style_UpdateCaret() noexcept {
 	SciCall_SetCaretPeriod(iValue);
 }
 
-bool IsCJKLocale(LPCWSTR locale) noexcept {
+static inline bool IsCJKLocale(LPCWSTR locale) noexcept {
 	const UINT lang = (*reinterpret_cast<const UINT *>(locale)) | 0x00200020;
 	// zh, ja, ko
 	return lang == 0x0068007A || lang == 0x0061006A || lang == 0x006F006B;
@@ -1227,9 +1227,10 @@ static void Style_SetFontLocaleName(LPCWSTR lpszStyle) noexcept {
 	// current user default locale (empty) to override "en-US" in Scintilla.
 	char localeName[LOCALE_NAME_MAX_LENGTH] = "";
 	WCHAR localeWide[LOCALE_NAME_MAX_LENGTH] = L"";
-#if 0 // improve CJK font display when current UI language isn't CJK
+	// improve CJK font display when current UI language isn't CJK
 	if (!Style_StrGetLocale(lpszStyle, localeWide, COUNTOF(localeWide))) {
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+#if 1
 		GetUserDefaultLocaleName(localeWide, COUNTOF(localeWide));
 		if (!IsCJKLocale(localeWide)) {
 			WCHAR systemWide[LOCALE_NAME_MAX_LENGTH] = L"";
@@ -1238,6 +1239,25 @@ static void Style_SetFontLocaleName(LPCWSTR lpszStyle) noexcept {
 				lstrcpy(localeWide, systemWide);
 			}
 		}
+#else
+		ULONG numLanguages = 0;
+		ULONG cchLanguagesBuffer = 0;
+		GetUserPreferredUILanguages(MUI_LANGUAGE_NAME, &numLanguages, nullptr, &cchLanguagesBuffer);
+		LPWSTR wszLanguagesBuffer = static_cast<LPWSTR>(NP2HeapAlloc((cchLanguagesBuffer + 2)*sizeof(WCHAR)));
+		GetUserPreferredUILanguages(MUI_LANGUAGE_NAME, &numLanguages, wszLanguagesBuffer, &cchLanguagesBuffer);
+		lstrcpy(localeWide, wszLanguagesBuffer);
+		if (numLanguages > 1 && !IsCJKLocale(localeWide)) {
+			LPCWSTR p = StrEnd(wszLanguagesBuffer) + 1;
+			while (*p) {
+				if (IsCJKLocale(p)) {
+					lstrcpy(localeWide, p);
+					break;
+				}
+				p = StrEnd(p) + 1;
+			}
+		}
+		NP2HeapFree(wszLanguagesBuffer);
+#endif
 #else
 		GetLocaleInfoW(LOCALE_USER_DEFAULT, LOCALE_SNAME, localeWide, COUNTOF(localeWide));
 		if (!IsCJKLocale(localeWide)) {
@@ -1250,11 +1270,6 @@ static void Style_SetFontLocaleName(LPCWSTR lpszStyle) noexcept {
 #endif
 	}
 	WideCharToMultiByte(CP_UTF8, 0, localeWide, -1, localeName, COUNTOF(localeName), nullptr, nullptr);
-#else
-	if (Style_StrGetLocale(lpszStyle, localeWide, COUNTOF(localeWide))) {
-		WideCharToMultiByte(CP_UTF8, 0, localeWide, -1, localeName, COUNTOF(localeName), nullptr, nullptr);
-	}
-#endif
 	SciCall_SetFontLocale(localeName);
 }
 
