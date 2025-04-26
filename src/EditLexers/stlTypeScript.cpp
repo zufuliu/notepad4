@@ -73,7 +73,7 @@ static EDITSTYLE Styles_TS[] = {
 	{ MULTI_STYLE(SCE_JS_COMMENTTAGAT, SCE_JS_COMMENTTAGXML, 0, 0), NP2StyleX_DocCommentTag, L"fore:#408080" },
 	{ SCE_JS_TASKMARKER, NP2StyleX_TaskMarker, L"bold; fore:#408080" },
 	{ MULTI_STYLE(SCE_JS_STRING_SQ, SCE_JS_STRING_DQ, SCE_JSX_STRING_SQ, SCE_JSX_STRING_DQ), NP2StyleX_String, L"fore:#008000" },
-	{ SCE_JS_STRING_BT, NP2StyleX_TemplateLiteral, L"fore:#F08000" },
+	{ SCE_JS_TEMPLATELITERAL, NP2StyleX_TemplateLiteral, L"fore:#F08000" },
 	{ SCE_JS_ESCAPECHAR, NP2StyleX_EscapeSequence, L"fore:#0080C0" },
 	{ SCE_JS_KEY, NP2StyleX_Property, L"fore:#648000" },
 	{ SCE_JS_REGEX, NP2StyleX_Regex, L"fore:#006633; back:#FFF1A8" },

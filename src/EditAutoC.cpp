@@ -3243,7 +3243,7 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) noexcept {
 		AllStringStyleMask[SCE_H_SGML_SIMPLESTRING >> 5] |= (1U << (SCE_H_SGML_SIMPLESTRING & 31));
 		AllStringStyleMask[js_style(SCE_JS_STRING_SQ) >> 5] |= (1U << (js_style(SCE_JS_STRING_SQ) & 31));
 		AllStringStyleMask[js_style(SCE_JS_STRING_DQ) >> 5] |= (1U << (js_style(SCE_JS_STRING_DQ) & 31));
-		AllStringStyleMask[js_style(SCE_JS_STRING_BT) >> 5] |= (1U << (js_style(SCE_JS_STRING_BT) & 31));
+		AllStringStyleMask[js_style(SCE_JS_TEMPLATELITERAL) >> 5] |= (1U << (js_style(SCE_JS_TEMPLATELITERAL) & 31));
 		AllStringStyleMask[js_style(SCE_JS_REGEX) >> 5] |= (1U << (js_style(SCE_JS_REGEX) & 31));
 		AllStringStyleMask[js_style(SCE_JS_ESCAPECHAR) >> 5] |= (1U << (js_style(SCE_JS_ESCAPECHAR) & 31));
 		AllStringStyleMask[css_style(SCE_CSS_ESCAPECHAR) >> 5] |= (1U << (css_style(SCE_CSS_ESCAPECHAR) & 31));

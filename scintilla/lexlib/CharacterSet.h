@@ -117,7 +117,8 @@ constexpr void AnyOf([[maybe_unused]] const T *t, [[maybe_unused]] Args... args)
 
 template <typename T>
 constexpr bool IsPowerOfTwo(T value) noexcept {
-	return (value & (value - 1)) == 0;
+	// return (value ^ (value - 1)) > (value - 1);
+	return /*value != 0 &&*/ (value & (value - 1)) == 0;
 }
 
 template <char ch0, char ch1, typename T>

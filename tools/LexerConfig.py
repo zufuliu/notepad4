@@ -820,7 +820,7 @@ LexerConfigMap = {
 		'string_style_range': ['SCE_PHP_ESCAPECHAR', 'SCE_PHP_NOWDOC_ID'],
 		'string_style_list': ['SCE_H_DOUBLESTRING', 'SCE_H_SINGLESTRING', 'SCE_H_SGML_DOUBLESTRING', 'SCE_H_SGML_SIMPLESTRING',
 			'js_style(SCE_JS_STRING_SQ)', 'js_style(SCE_JS_STRING_DQ)',
-			'js_style(SCE_JS_STRING_BT)', 'js_style(SCE_JS_REGEX)', 'js_style(SCE_JS_ESCAPECHAR)',
+			'js_style(SCE_JS_TEMPLATELITERAL)', 'js_style(SCE_JS_REGEX)', 'js_style(SCE_JS_ESCAPECHAR)',
 			'css_style(SCE_CSS_ESCAPECHAR)', 'css_style(SCE_CSS_STRING_SQ)', 'css_style(SCE_CSS_STRING_DQ)', 'css_style(SCE_CSS_URL)'],
 		'plain_text_style': ['SCE_H_DEFAULT'],
 	},
