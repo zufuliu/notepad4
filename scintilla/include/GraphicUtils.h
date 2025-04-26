@@ -189,20 +189,8 @@ inline uint32_t bgr_from_bgra_epi32_sse2_si32(__m128i i32x4) noexcept {
 }
 #endif // NP2_USE_SSE2
 
-#if NP2_USE_AVX2
-#define pshufb_1to2(n)	((-0x8000) | (n))
-#define pshufb_1to4(n)	(0x80808000 | (n))
-
-#define mm_alignr_ps(a, b, imm8) \
-	_mm_castsi128_ps(_mm_alignr_epi8(_mm_castps_si128(a), _mm_castps_si128(b), (imm8)*4))
-
-inline int mm_hadd_epi32_si32(__m128i i32x4) noexcept {
-	i32x4 = _mm_hadd_epi32(i32x4, i32x4);
-	i32x4 = _mm_hadd_epi32(i32x4, i32x4);
-	return _mm_cvtsi128_si32(i32x4);
-}
-
-
+#if NP2_USE_AVX2 || NP2_USE_AVX512
+// Add SSE4.1 functions that are still used by AVX2 code
 inline __m128i unpack_color_epi16_sse4_si32(uint32_t color) noexcept {
 	return _mm_cvtepu8_epi16(_mm_cvtsi32_si128(color));
 }
@@ -219,7 +207,6 @@ inline __m128i unpack_color_epi32_sse4_si32(uint32_t color) noexcept {
 	return _mm_cvtepu8_epi32(_mm_cvtsi32_si128(color));
 }
 
-
 inline __m128i rgba_to_abgr_epi16_sse4_si32(uint32_t color) noexcept {
 	return unpack_color_epi16_sse4_si32(bswap32(color));
 }
@@ -229,33 +216,109 @@ inline __m128i rgba_to_abgr_epi32_sse4_si32(uint32_t color) noexcept {
 }
 
 inline __m128i rgba_to_bgra_epi16_sse4_si32(uint32_t color) noexcept {
-#if 1
 	const __m128i i16x4 = unpack_color_epi16_sse4_si32(color);
 	return _mm_shufflelo_epi16(i16x4, _MM_SHUFFLE(3, 0, 1, 2));
-#else
-	const __m128i i16x4 = _mm_cvtsi32_si128(color);
-	return _mm_shuffle_epi8(i16x4, _mm_setr_epi16(pshufb_1to2(2), pshufb_1to2(1), pshufb_1to2(0), pshufb_1to2(3), pshufb_1to2(2), pshufb_1to2(1), pshufb_1to2(0), pshufb_1to2(3)));
-#endif
 }
 
 inline __m128i rgba_to_bgra_epi16x8_sse4_si32(uint32_t color) noexcept {
-#if 1
 	const __m128i i16x4 = unpack_color_epi16_sse4_si32(color);
-	//return _mm_shuffle_epi32(_mm_shufflelo_epi16(i16x4, _MM_SHUFFLE(3, 0, 1, 2)), 0x44);
 	return _mm_broadcastq_epi64(_mm_shufflelo_epi16(i16x4, _MM_SHUFFLE(3, 0, 1, 2)));
-#else
-	const __m128i i16x4 = _mm_cvtsi32_si128(color);
-	return _mm_shuffle_epi8(i16x4, _mm_setr_epi16(pshufb_1to2(2), pshufb_1to2(1), pshufb_1to2(0), pshufb_1to2(3), pshufb_1to2(2), pshufb_1to2(1), pshufb_1to2(0), pshufb_1to2(3)));
-#endif
 }
 
-inline __m128i rgba_to_bgra_epi32_sse4_si32(uint32_t color) noexcept {
-#if 1
-	const __m128i i32x4 = unpack_color_epi32_sse4_si32(color);
-	return _mm_shuffle_epi32(i32x4, _MM_SHUFFLE(3, 0, 1, 2));
-#else
-	const __m128i i32x4 = _mm_cvtsi32_si128(color);
-	return _mm_shuffle_epi8(i32x4, _mm_setr_epi32(pshufb_1to4(2), pshufb_1to4(1), pshufb_1to4(0), pshufb_1to4(3)));
-#endif
+#define pshufb_1to2(n)	((-0x8000) | (n))
+#define pshufb_1to4(n)	(0x80808000 | (n))
+
+#define mm_alignr_ps(a, b, imm8) \
+	_mm_castsi128_ps(_mm_alignr_epi8(_mm_castps_si128(a), _mm_castps_si128(b), (imm8)*4))
+
+inline int mm_hadd_epi32_si32(__m128i i32x4) noexcept {
+	i32x4 = _mm_hadd_epi32(i32x4, i32x4);
+	i32x4 = _mm_hadd_epi32(i32x4, i32x4);
+	return _mm_cvtsi128_si32(i32x4);
+}
+
+#if NP2_USE_AVX2
+inline __m128i unpack_color_epi16_avx2_si32(uint32_t color) noexcept {
+	return _mm_cvtepu8_epi16(_mm_cvtsi32_si128(color));
+}
+
+inline __m128i unpack_color_epi16_avx2_ptr32(const uint32_t *color) noexcept {
+	return _mm_cvtepu8_epi16(*(reinterpret_cast<const __m128i *>(color)));
+}
+
+inline __m128i unpack_color_epi16_avx2_ptr64(const uint64_t *color) noexcept {
+	return _mm_cvtepu8_epi16(*(reinterpret_cast<const __m128i *>(color)));
+}
+
+inline __m128i unpack_color_epi32_avx2_si32(uint32_t color) noexcept {
+	return _mm_cvtepu8_epi32(_mm_cvtsi32_si128(color));
+}
+
+inline __m128i rgba_to_bgra_epi16x8_avx2_si32(uint32_t color) noexcept {
+	const __m128i i16x4 = unpack_color_epi16_avx2_si32(color);
+	return _mm_broadcastq_epi64(_mm_shufflelo_epi16(i16x4, _MM_SHUFFLE(3, 0, 1, 2)));
 }
 #endif // NP2_USE_AVX2
+
+#if NP2_USE_AVX512
+inline __m128i unpack_color_epi16_avx512_si32(uint32_t color) noexcept {
+	return _mm_cvtepu8_epi16(_mm_cvtsi32_si128(color));
+}
+
+inline __m128i unpack_color_epi16_avx512_ptr32(const uint32_t *color) noexcept {
+	return _mm_cvtepu8_epi16(*(reinterpret_cast<const __m128i *>(color)));
+}
+
+inline __m128i unpack_color_epi16_avx512_ptr64(const uint64_t *color) noexcept {
+	return _mm_cvtepu8_epi16(*(reinterpret_cast<const __m128i *>(color)));
+}
+
+inline __m128i unpack_color_epi32_avx512_si32(uint32_t color) noexcept {
+	return _mm_cvtepu8_epi32(_mm_cvtsi32_si128(color));
+}
+
+inline __m128i rgba_to_bgra_epi16x8_avx512_si32(uint32_t color) noexcept {
+	const __m128i i16x4 = unpack_color_epi16_avx512_si32(color);
+	return _mm_broadcastq_epi64(_mm_shufflelo_epi16(i16x4, _MM_SHUFFLE(3, 0, 1, 2)));
+}
+#endif // NP2_USE_AVX512
+
+#endif // NP2_USE_AVX2 || NP2_USE_AVX512
+
+#if NP2_USE_AVX512
+inline __m512i mm512_div_epu16_by_255(__m512i i16x32) noexcept {
+	// uint16_t value / 255  => (value * 0x8081) >> (16 + 7)
+	i16x32 = _mm512_mulhi_epu16(i16x32, _mm512_set1_epi16(-0x8000 | 0x81));
+	return _mm512_srli_epi16(i16x32, 7);
+}
+
+inline __m512i unpack_color_epi16_avx512_ptr256(const __m256i *color) noexcept {
+	// Load 256 bits (32 bytes, 8 pixels) and unpack to 16-bit values
+	__m256i input = _mm256_loadu_si256(color);
+	return _mm512_cvtepu8_epi16(input);
+}
+
+inline __m512i pack_color_epi16_avx512_si512(__m512i i16x32) noexcept {
+	// Pack 32 16-bit integers into 32 8-bit integers with unsigned saturation
+	__m512i zero = _mm512_setzero_si512();
+	return _mm512_packus_epi16(i16x32, zero);
+}
+
+// Optional helper functions that might be useful
+inline __m512i mm512_setlo_alpha_epi16(uint32_t alpha) noexcept {
+	return _mm512_set1_epi16(static_cast<short>(alpha));
+}
+
+inline __m512i mm512_xor_alpha_epi16(__m512i alpha) noexcept {
+	// 255 - alpha => 255 ^ alpha
+	return _mm512_xor_si512(_mm512_set1_epi16(255), alpha);
+}
+
+inline __m512i mm512_alpha_blend_epi16(__m512i fore, __m512i back, __m512i alpha) noexcept {
+	// (fore*alpha + back*(255 - alpha)) / 255
+	fore = _mm512_mullo_epi16(fore, alpha);
+	back = _mm512_mullo_epi16(back, mm512_xor_alpha_epi16(alpha));
+	fore = _mm512_add_epi16(fore, back);
+	return mm512_div_epu16_by_255(fore);
+}
+#endif // NP2_USE_AVX512

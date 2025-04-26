@@ -126,6 +126,9 @@
 #elif NP2_TARGET_ARM
 	#define np2_clz(x)		_CountLeadingZeros(x)
 	#define np2_clz64(x)	_CountLeadingZeros64(x)
+#elif NP2_USE_AVX512
+	#define np2_clz(x)		_lzcnt_u32(x)
+	#define np2_clz64(x)	_lzcnt_u64(x)
 #elif NP2_USE_AVX2
 	#define np2_clz(x)		_lzcnt_u32(x)
 	#define np2_clz64(x)	_lzcnt_u64(x)
@@ -135,10 +138,10 @@
 #endif
 
 // count bits set
-#if defined(__clang__) || defined(__GNUC__)
+#if !defined(_MSC_VER) && (defined(__clang__) || defined(__GNUC__))
 	#define np2_popcount(x)		__builtin_popcount(x)
 	#define np2_popcount64(x)	__builtin_popcountll(x)
-#elif NP2_USE_AVX2
+#elif NP2_USE_AVX2 || NP2_USE_AVX512
 	#define np2_popcount(x)		_mm_popcnt_u32(x)
 	#define np2_popcount64(x)	_mm_popcnt_u64(x)
 #else
@@ -192,6 +195,25 @@
 } while (0)
 #endif
 
+#if NP2_USE_AVX512
+#define mm512_set1_epi8(ch)         _mm512_set1_epi8(ch)
+#define mm512_movemask_epi8(a)      static_cast<uint64_t>(_mm512_movepi8_mask(a))
+#define mm512_cmpge_epu8(a, b) \
+    _mm512_cmpeq_epi8(_mm512_max_epu8((a), (b)), (a))
+#define mm512_cmple_epu8(a, b)      mm512_cmpge_epu8((b), (a))
+
+#define ZeroMemory_64x1(buffer) do { \
+    const __m512i zero = _mm512_setzero_si512();                     \
+    _mm512_store_si512(reinterpret_cast<__m512i *>(buffer), zero);   \
+} while (0)
+
+#define ZeroMemory_64x2(buffer) do { \
+    const __m512i zero = _mm512_setzero_si512();                                         \
+    _mm512_store_si512(reinterpret_cast<__m512i *>(buffer), zero);                      \
+    _mm512_store_si512(reinterpret_cast<__m512i *>((buffer) + sizeof(__m512i)), zero);  \
+} while (0)
+#endif
+
 #if NP2_USE_SSE2
 #define mm_movemask_epi8(a)		static_cast<uint32_t>(_mm_movemask_epi8(a))
 #define mm_cmpge_epu8(a, b) \
@@ -239,7 +261,7 @@ inline uint32_t loadle_u32(const void *ptr) noexcept {
 	return *(static_cast<const uint32_t *>(ptr));
 }
 
-#if NP2_USE_AVX2
+#if NP2_USE_AVX2 || NP2_USE_AVX512
 inline uint32_t loadbe_u32(const void *ptr) noexcept {
 #if defined(__GNUC__)
 	return __builtin_bswap32(loadle_u32(ptr));

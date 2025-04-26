@@ -455,7 +455,12 @@ struct LayoutWorker {
 		if (length >= model.minParallelLayoutLength && model.hardwareConcurrency > 1) {
 			segmentCount = static_cast<uint32_t>(segmentList.size());
 			const uint32_t threadCount = std::min(length/blockSize, model.hardwareConcurrency);
-#if USE_STD_ASYNC_FUTURE
+#if defined(_OPENMP)
+#pragma omp parallel num_threads(threadCount)
+			{
+				DoWork();
+			}
+#elif USE_STD_ASYNC_FUTURE
 			std::vector<std::future<void>> features;
 			for (uint32_t i = 0; i < threadCount; i++) {
 				features.push_back(std::async(std::launch::async, [this] {
