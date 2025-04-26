@@ -126,10 +126,7 @@
 #elif NP2_TARGET_ARM
 	#define np2_clz(x)		_CountLeadingZeros(x)
 	#define np2_clz64(x)	_CountLeadingZeros64(x)
-#elif NP2_USE_AVX512
-	#define np2_clz(x)		_lzcnt_u32(x)
-	#define np2_clz64(x)	_lzcnt_u64(x)
-#elif NP2_USE_AVX2
+#elif NP2_USE_AVX2 || NP2_USE_AVX512
 	#define np2_clz(x)		_lzcnt_u32(x)
 	#define np2_clz64(x)	_lzcnt_u64(x)
 #else
