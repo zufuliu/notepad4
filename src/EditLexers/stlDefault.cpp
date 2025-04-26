@@ -14,7 +14,7 @@ static EDITSTYLE Styles_Global[] = {
 	{ STYLE_CONTROLCHAR, NP2StyleX_ControlCharacter, L"size:-1; fore:#108010; back:#228B22" },
 	{ STYLE_INDENTGUIDE, NP2StyleX_IndentationGuide, L"fore:#FF8000" },
 	{ SC_ELEMENT_SELECTION_BACK, NP2StyleX_SelectedText, L"eolfilled; alpha:95; outline:50" },
-	{ SC_ELEMENT_WHITE_SPACE, NP2StyleX_Whitespace, L"size:2; fore:#FF4000; alpha:65" },
+	{ SC_ELEMENT_WHITE_SPACE, NP2StyleX_Whitespace, L"size:2; fore:#FF4000; alpha:128" },
 	{ SC_ELEMENT_CARET_LINE_BACK, NP2StyleX_CurrentLine, L"size:2; fore:#C2C0C3; back:#FFFF00; alpha:90; outline:90" },
 	{ SC_ELEMENT_CARET, NP2StyleX_Caret, L"back:#FF0000" },
 	{ INDICATOR_IME, NP2StyleX_IMEIndicator, L"fore:#108010" },
