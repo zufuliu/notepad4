@@ -5484,7 +5484,7 @@ void EditMarkAll::Reset(int findFlag, Sci_Position iSelCount, LPSTR text) noexce
 }
 
 void EditMarkAll::Start(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPSTR text) noexcept {
-	if (!bChanged && (findFlag == markFlag
+	if (!bChanged && (findFlag == (markFlag & (NP2_SearchForLineEnd - 1))
 		&& iSelCount == length
 		// _stricmp() is not safe for DBCS string.
 		&& memcmp(text, pszText, iSelCount) == 0)) {
@@ -5502,9 +5502,16 @@ void EditMarkAll::Start(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPS
 			UpdateStatusbar();
 			return;
 		}
+	} else if (findFlag & SCFIND_REGEXP) {
+		// see BuiltinRegex::FindText()
+		const char ch = text[iSelCount - 1];
+		if (ch == '$' && text[iSelCount - 2] != '\\') {
+			markFlag |= NP2_SearchForLineEnd;
+		}
 	}
 
 	//EditMarkAll_Runs = 0;
+	bookmarkForFindAll = false;
 	if (findFlag & NP2_MarkAllBookmark) {
 		bookmarkForFindAll = (findFlag & NP2_FromFindAll) != 0;
 		Style_SetBookmark();
@@ -5610,8 +5617,8 @@ void EditMarkAll::Continue(HANDLE timer) noexcept {
 			continue;
 		}
 
-		if (index != 0 && iPos == cpMin && (findFlag & NP2_MarkAllSelectAll) == 0) {
-			// merge adjacent indicator ranges
+		if (index != 0 && iPos == cpMin && (findFlag & (NP2_MarkAllSelectAll | NP2_SearchForLineEnd)) == 0) {
+			// TODO: avoid merge adjacent indicator ranges when they are not on same line.
 			ranges[index - 1] += iSelCount;
 		} else {
 			ranges[index] = iPos;

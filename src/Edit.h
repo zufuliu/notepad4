@@ -30,6 +30,7 @@
 #define NP2_MarkAllBookmark		0x00002000
 #define NP2_MarkAllSelectAll	0x00004000
 #define NP2_FromFindAll			0x00008000
+#define NP2_SearchForLineEnd	0x00010000
 
 enum {
 	FindReplaceOption_None = 0,
