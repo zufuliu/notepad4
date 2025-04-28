@@ -355,7 +355,7 @@ BEGIN
 			MENUITEM "Aggiorna s&tampa orario\tShift+F5",			CMD_TIMESTAMPS
 		END
 	END
-	POPUP "&Search"
+	POPUP "&Ricerca"
 	BEGIN
 		MENUITEM "&Trova...\tCtrl+F",				IDM_EDIT_FIND
 		MENUITEM "Sal&va testo trovato\tAlt+F3",			IDM_EDIT_SAVEFIND
