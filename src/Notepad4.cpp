@@ -7269,14 +7269,18 @@ bool FileSave(FileSaveFlag saveFlag) noexcept {
 	if (StrIsEmpty(szCurFile)) {
 		saveFlag = static_cast<FileSaveFlag>(saveFlag | FileSaveFlag_Untitled);
 		const Sci_Position cchText = SciCall_GetLength();
-		if (cchText == 0) {
+		if (cchText < 2048) {
+			const char *ptr = SciCall_GetRangePointer(0, cchText);
 			bIsEmptyNewFile = true;
-		} else if (cchText < 2048) {
-			char tchText[2048] = "";
-			SciCall_GetText(COUNTOF(tchText) - 1, tchText);
-			StrTrimA(tchText, " \t\n\r"); // failure means not empty.
-			if (StrIsEmpty(tchText)) {
-				bIsEmptyNewFile = true;
+			if (ptr && cchText != 0) {
+				const char * const end = ptr + cchText;
+				do {
+					if (!IsASpace(*ptr)) {
+						bIsEmptyNewFile = false;
+						break;
+					}
+					++ptr;
+				} while (ptr < end);
 			}
 		}
 	}
