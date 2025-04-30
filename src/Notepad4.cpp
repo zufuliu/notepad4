@@ -963,6 +963,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 
 	// check if a lexer was specified from the command line
 	if (flagLexerSpecified) {
+		flagLexerSpecified = false;
 		if (lpSchemeArg) {
 			Style_SetLexerFromName(szCurFile, lpSchemeArg);
 			LocalFree(lpSchemeArg);
@@ -970,7 +971,6 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 		} else {
 			Style_SetLexerFromID(iInitialLexer);
 		}
-		flagLexerSpecified = false;
 	}
 
 	// If start as tray icon, set current filename as tooltip
@@ -7154,6 +7154,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 		bool bUnknownFile = false;
 		if (!keepCurrentLexer) {
 			if (flagLexerSpecified) {
+				flagLexerSpecified = false;
 				if (pLexCurrent->rid == iInitialLexer) {
 					Style_SetLexer(pLexCurrent, true);
 				} else if (lpSchemeArg) {
@@ -7163,7 +7164,6 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 				} else {
 					Style_SetLexerFromID(iInitialLexer);
 				}
-				flagLexerSpecified = false;
 			} else {
 				np2LexLangIndex = 0;
 				bUnknownFile = !Style_SetLexerFromFile(szCurFile);
@@ -7350,17 +7350,12 @@ bool FileSave(FileSaveFlag saveFlag) noexcept {
 					if (!fKeepTitleExcerpt) {
 						StrCpyEx(szTitleExcerpt, L"");
 					}
+					UpdateWindowTitle();
 					if (flagLexerSpecified) {
-						if (pLexCurrent->rid == iInitialLexer) {
-							UpdateLineNumberWidth();
-						} else if (lpSchemeArg) {
-							Style_SetLexerFromName(szCurFile, lpSchemeArg);
-							LocalFree(lpSchemeArg);
-							lpSchemeArg = nullptr;
-						} else {
+						flagLexerSpecified = false;
+						if (pLexCurrent->rid != iInitialLexer) {
 							Style_SetLexerFromID(iInitialLexer);
 						}
-						flagLexerSpecified = false;
 					} else {
 						Style_SetLexerFromFile(szCurFile);
 					}
