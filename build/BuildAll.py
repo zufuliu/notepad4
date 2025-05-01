@@ -9,7 +9,7 @@ buildEnv = {}
 
 notepad4_config_h = os.path.abspath('../src/config.h')
 matepath_config_h = os.path.abspath('../matepath/src/config.h')
-projectDir = os.path.abspath('VS2017')
+projectDir = os.path.abspath('VisualStudio')
 localeDir = os.path.abspath('../locale')
 notepad4_rc = os.path.abspath('../src/Notepad4.rc')
 matepath_rc = os.path.abspath('../matepath/src/matepath.rc')

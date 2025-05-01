@@ -40,7 +40,7 @@ def update_project_toolset(projectPath):
 			fd.write(updated)
 
 def update_all_project_toolset():
-	for path in glob.glob('VS2017/*.vcxproj'):
+	for path in glob.glob('VisualStudio/*.vcxproj'):
 		update_project_toolset(path)
 	for path in glob.glob('../locale/*/*.vcxproj'):
 		update_project_toolset(path)

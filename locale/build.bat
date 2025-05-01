@@ -1,5 +1,5 @@
 @ECHO OFF
-@rem based on build\VS2017\build.bat
+@rem based on build\VisualStudio\build.bat
 
 SETLOCAL ENABLEEXTENSIONS
 CD /D %~dp0
