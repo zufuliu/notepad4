@@ -1,7 +1,7 @@
 version: '25.x.{build}'
 
 image:
-  - Visual Studio 2017
+  - Visual Studio 2019
 
 environment:
   matrix:
