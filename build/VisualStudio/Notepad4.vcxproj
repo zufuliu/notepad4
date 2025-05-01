@@ -86,8 +86,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{B69A8C7E-A22D-45DA-9997-2D1403C7AEE8}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion Condition="'$(VisualStudioVersion)'=='15.0'">10.0.17763.0</WindowsTargetPlatformVersion>
-    <WindowsTargetPlatformVersion Condition="'$(VisualStudioVersion)'!='15.0'">10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <VcpkgConfiguration Condition="$(Configuration.EndsWith('Debug'))">Debug</VcpkgConfiguration>
     <VcpkgConfiguration Condition="$(Configuration.EndsWith('Release'))">Release</VcpkgConfiguration>
   </PropertyGroup>

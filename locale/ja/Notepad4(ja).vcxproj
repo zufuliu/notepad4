@@ -39,8 +39,7 @@
     <ProjectGuid>{9E56DFFA-0B13-423B-81F0-E14E22D0036A}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <TargetName>Notepad4</TargetName>
-    <WindowsTargetPlatformVersion Condition="'$(VisualStudioVersion)'=='15.0'">10.0.17763.0</WindowsTargetPlatformVersion>
-    <WindowsTargetPlatformVersion Condition="'$(VisualStudioVersion)'!='15.0'">10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Label="Configuration">

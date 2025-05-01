@@ -39,8 +39,7 @@
     <ProjectGuid>{4F1A92C8-4CF4-4789-893D-CC4CD30D42BF}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <TargetName>matepath</TargetName>
-    <WindowsTargetPlatformVersion Condition="'$(VisualStudioVersion)'=='15.0'">10.0.17763.0</WindowsTargetPlatformVersion>
-    <WindowsTargetPlatformVersion Condition="'$(VisualStudioVersion)'!='15.0'">10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Label="Configuration">
