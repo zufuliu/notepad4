@@ -27,7 +27,6 @@
 #include <memory>
 //#include <mutex>
 
-struct IUnknown;
 #include <windows.h>
 #include <commctrl.h>
 #include <richedit.h>

@@ -28,7 +28,6 @@
 // WIN32_LEAN_AND_MEAN is defined to avoid including commdlg.h
 // (which defined FindText) to fix GCC LTO ODR violation warning.
 
-struct IUnknown;
 #include <windows.h>
 #include <commctrl.h>
 #include <richedit.h>

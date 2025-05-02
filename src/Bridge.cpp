@@ -20,7 +20,6 @@
 *
 ******************************************************************************/
 
-struct IUnknown;
 #include <windows.h>
 #include <windowsx.h>
 #include <shlwapi.h>

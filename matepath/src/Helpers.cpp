@@ -18,7 +18,6 @@
 *
 ******************************************************************************/
 
-struct IUnknown;
 #include <windows.h>
 #include <windowsx.h>
 #include <dde.h>

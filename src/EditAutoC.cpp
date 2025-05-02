@@ -1,6 +1,5 @@
 // Edit AutoCompletion
 
-struct IUnknown;
 #include <windows.h>
 #include <shlwapi.h>
 #include <shellapi.h>
