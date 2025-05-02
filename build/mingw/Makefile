@@ -110,17 +110,17 @@ else ifeq ($(ARCH), Win32)
 	export CXXFLAGS += -msse2 -mfpmath=sse
 	export RCFLAGS += -DWIN32
 	ifdef WIN7
-		export CPPFLAGS += -DWIN32 -D_WIN32_WINNT=0x0601 -DWINVER=0x0601
-		export LDFLAGS += -msse2 -mfpmath=sse -Wl,--major-os-version,6 -Wl,--minor-os-version,1
+		export CPPFLAGS += -D_WIN64 -D_WIN32_WINNT=0x0601 -DWINVER=0x0601
+		export LDFLAGS += -Wl,--major-os-version,6 -Wl,--minor-os-version,1
 		ifndef LLD
 			export LDFLAGS += -Wl,--subsystem,windows:6.01
 		endif
 	else
-		# Windows XP
-		export CPPFLAGS += -DWIN32 -D_WIN32_WINNT=0x0501 -DWINVER=0x0501
-		export LDFLAGS += -msse2 -mfpmath=sse -Wl,--major-os-version,5 -Wl,--minor-os-version,1
+		# Windows Vista, Windows Server 2008
+		export CPPFLAGS += -D_WIN64 -D_WIN32_WINNT=0x0600 -DWINVER=0x0600
+		export LDFLAGS += -Wl,--major-os-version,6 -Wl,--minor-os-version,0
 		ifndef LLD
-			export LDFLAGS += -Wl,--subsystem,windows:5.01
+			export LDFLAGS += -Wl,--subsystem,windows:6.00
 		endif
 	endif
 else ifeq ($(ARCH), ARM64)

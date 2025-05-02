@@ -126,7 +126,7 @@ def generate_compile_commands(target, avx2=False, cxx=False):
 		else:
 			defines.extend(['_WIN32_WINNT=0x0600', 'WINVER=0x0600'])	# Vista
 	elif arch == 'i686':
-		defines.extend(['WIN32', '_WIN32_WINNT=0x0501', 'WINVER=0x0501'])	# XP
+		defines.extend(['WIN32', '_WIN32_WINNT=0x0600', 'WINVER=0x0600'])	# Vista
 	elif arch in ('aarch64', 'arm64'):
 		defines.extend(['_WIN64', '_WIN32_WINNT=0x0A00', 'WINVER=0x0A00'])	# 10
 	elif arch.startswith('arm'):
