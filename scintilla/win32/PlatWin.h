@@ -27,17 +27,8 @@
 #define USER_DEFAULT_SCREEN_DPI		96
 #endif
 
-#if defined(_MSC_BUILD) && (_WIN32_WINNT < _WIN32_WINNT_VISTA)
-#pragma warning(push)
-#pragma warning(disable: 4458)
-// Win32 XP v141_xp toolset with Windows 7 SDK.
-// d2d1helper.h(677,19): warning C4458:  declaration of 'a' hides class member
-#endif
 #include <d2d1.h>
 #include <dwrite.h>
-#if defined(_MSC_BUILD) && (_WIN32_WINNT < _WIN32_WINNT_VISTA)
-#pragma warning(pop)
-#endif
 
 // official Scintilla use std::call_once(), which increases binary about 12 KiB.
 #define USE_STD_CALL_ONCE		0
