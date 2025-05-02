@@ -4,7 +4,7 @@
 @rem * Notepad4
 @rem *
 @rem * build.bat
-@rem *   Batch file used to build Notepad4 with MSVC 2017, 2019, 2022
+@rem *   Batch file used to build Notepad4 with MSVC 2019, 2022
 @rem *
 @rem * See License.txt for details about distribution and modification.
 @rem *
@@ -122,7 +122,7 @@ IF /I "%ARCH%" == "ARM64" SET NEED_ARM64=1
 IF /I "%ARCH%" == "all" SET /A NEED_ARM=1 - %NO_ARM%
 IF /I "%ARCH%" == "ARM" SET NEED_ARM=1
 CALL :SubVSPath
-IF NOT EXIST "%VS_PATH%" CALL :SUBMSG "ERROR" "Visual Studio 2017, 2019 or 2022 NOT FOUND, please check VS_PATH environment variable!"
+IF NOT EXIST "%VS_PATH%" CALL :SUBMSG "ERROR" "Visual Studio 2019 or 2022 NOT FOUND, please check VS_PATH environment variable!"
 
 IF /I "%processor_architecture%" == "AMD64" (
 	SET "HOST_ARCH=amd64"
@@ -196,13 +196,13 @@ SET VSWHERE=%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe
 SET "VS_COMPONENT=Microsoft.Component.MSBuild Microsoft.VisualStudio.Component.VC.Tools.x86.x64"
 IF "%NEED_ARM64%" == 1 SET "VS_COMPONENT=%VS_COMPONENT% Microsoft.VisualStudio.Component.VC.Tools.ARM64"
 IF "%NEED_ARM%" == 1 SET "VS_COMPONENT=%VS_COMPONENT% Microsoft.VisualStudio.Component.VC.Tools.ARM"
-FOR /f "delims=" %%A IN ('"%VSWHERE%" -property installationPath -prerelease -version [15.0^,18.0^) -requires %VS_COMPONENT%') DO SET "VS_PATH=%%A"
+FOR /f "delims=" %%A IN ('"%VSWHERE%" -property installationPath -prerelease -version [16.0^,18.0^) -requires %VS_COMPONENT%') DO SET "VS_PATH=%%A"
 IF EXIST "%VS_PATH%" (
 	SET "VSINSTALLDIR=%VS_PATH%\"
 	EXIT /B
 )
 @rem Visual Studio Build Tools
-FOR /f "delims=" %%A IN ('"%VSWHERE%" -products Microsoft.VisualStudio.Product.BuildTools -property installationPath -prerelease -version [15.0^,18.0^) -requires %VS_COMPONENT%') DO SET "VS_PATH=%%A"
+FOR /f "delims=" %%A IN ('"%VSWHERE%" -products Microsoft.VisualStudio.Product.BuildTools -property installationPath -prerelease -version [16.0^,18.0^) -requires %VS_COMPONENT%') DO SET "VS_PATH=%%A"
 IF EXIST "%VS_PATH%" SET "VSINSTALLDIR=%VS_PATH%\"
 EXIT /B
 
