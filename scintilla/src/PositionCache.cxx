@@ -1346,7 +1346,7 @@ void PositionCache::MeasureWidths(Surface *surface, const Style &style, uint16_t
 		// constructed here to reduce lock time
 		const size_t length = sv.length();
 		const size_t offset = length*sizeof(XYPOSITION);
-		std::unique_ptr<char[]> positions_ = make_unique_for_overwrite<char[]>(offset + length);
+		std::unique_ptr<char[]> positions_ = std::make_unique_for_overwrite<char[]>(offset + length);
 		memcpy(&positions_[0], positions, offset);
 		memcpy(&positions_[offset], sv.data(), length);
 
