@@ -18,9 +18,9 @@ hg clone http://hg.code.sf.net/p/scintilla/scite
 2024-12-18 6365:e4c786064e6f
 
 Boost regex 7.0.1
-1.86 https://github.com/boostorg/regex
+1.88 https://github.com/boostorg/regex
 git clone -b develop https://github.com/boostorg/regex.git
-2024-09-03 bb9f2b198484820498ed4bb46d0898ee28e84757
+2024-03-04 f851a08050dd6d4bdea552d2cf614c69d8d3cff9
 
 init submodule:
 	git submodule init

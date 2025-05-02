@@ -29,6 +29,22 @@
 #endif
 #endif
 
+#ifndef BOOST_REGEX_MODULE_EXPORT
+#define BOOST_REGEX_MODULE_EXPORT
+#define BOOST_REGEX_STATIC_CONST constexpr
+#else
+#define BOOST_REGEX_STATIC_CONST inline constexpr
+#define BOOST_REGEX_STANDALONE
+#endif
+
+/*
+ * Borland C++ Fix/error check
+ * this has to go *before* we include any std lib headers:
+ */
+#if defined(__BORLANDC__) && !defined(__clang__)
+#  include <boost/regex/config/borland.hpp>
+#endif
+
 #ifndef BOOST_REGEX_STANDALONE
 #include <boost/version.hpp>
 #endif
@@ -40,8 +56,12 @@
 *************************************************************************/
 
 #ifdef BOOST_REGEX_STANDALONE
+#ifndef BOOST_REGEX_AS_MODULE
 #include <cassert>
 #  define BOOST_REGEX_ASSERT(x) assert(x)
+#else
+#  define BOOST_REGEX_ASSERT(x) do{ if(x == 0) { std::printf("%s:%d Assertion Failed", __FILE__, __LINE__); std::abort(); } }while(0)
+#endif
 #else
 #include <boost/assert.hpp>
 #  define BOOST_REGEX_ASSERT(x) BOOST_ASSERT(x)
@@ -284,8 +304,6 @@
  * If there are no exceptions then we must report critical-errors
  * the only way we know how; by terminating.
  */
-#include <cassert>
-
 #  define BOOST_REGEX_NOEH_ASSERT(x) assert(x);
 #else
 /*

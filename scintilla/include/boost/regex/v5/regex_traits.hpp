@@ -34,7 +34,7 @@
 
 namespace boost{
 
-template <class charT, class implementationT >
+BOOST_REGEX_MODULE_EXPORT template <class charT, class implementationT >
 struct regex_traits : public implementationT
 {
    regex_traits() : implementationT() {}
