@@ -17,11 +17,6 @@ jobs:
       run: |
         "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./matepath/src/VersionRev.h
 
-    - name: Install v141_xp Toolset
-      continue-on-error: true
-      run: |
-        CALL "build\install_msvc.bat" v141_xp
-
     - name: MSVC x64 Release
       run: |
         CALL "build\VisualStudio\build.bat" Build x64 Release 1
@@ -29,7 +24,6 @@ jobs:
         CALL "build\make_zip.bat" MSVC x64 Release Locale 1
 
     - name: MSVC Win32 Release
-      continue-on-error: true
       run: |
         CALL "build\VisualStudio\build.bat" Build Win32 Release 1
         CALL "locale\build.bat" Build Win32 Release 1
@@ -88,11 +82,6 @@ jobs:
       run: |
         "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./matepath/src/VersionRev.h
 
-    - name: Install v141_xp Toolset
-      continue-on-error: true
-      run: |
-        CALL "build\install_msvc.bat" v141_xp
-
     - name: Install LLVM
       run: |
         CALL "build\install_llvm.bat" latest 1
@@ -103,7 +92,6 @@ jobs:
         CALL "build\make_zip.bat" LLVM x64 Release 1
 
     - name: Clang Win32 Release
-      continue-on-error: true
       run: |
         CALL "build\VisualStudio\build.bat" Build Win32 LLVMRelease 1
         CALL "build\make_zip.bat" LLVM Win32 Release 1
@@ -314,6 +302,7 @@ jobs:
   gcc_i686:
     name: 32-bit GCC and Clang
     runs-on: windows-latest
+    continue-on-error: true
     steps:
     - uses: actions/checkout@v4
 
@@ -326,13 +315,11 @@ jobs:
         CALL "build\install_mingw.bat" i686
 
     - name: GCC Win32 Release
-      continue-on-error: true
       run: |
         CALL "build\mingw\build.bat" i686
         CALL "build\make_zip.bat" GCC Win32 Release 1
 
     - name: Clang Win32 Release
-      continue-on-error: true
       run: |
         CALL "build\mingw\build.bat" i686 Clang
         CALL "build\make_zip.bat" Clang Win32 Release 1
