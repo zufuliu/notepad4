@@ -305,14 +305,7 @@ extern WCHAR szIniFile[MAX_PATH];
 template<typename T>
 inline T DLLFunction(HMODULE hModule, LPCSTR lpProcName) noexcept {
 	FARPROC function = ::GetProcAddress(hModule, lpProcName);
-#if defined(__clang__) || defined(__GNUC__) || (_MSC_VER >= 1926)
 	return __builtin_bit_cast(T, function);
-#else
-	static_assert(sizeof(T) == sizeof(function));
-	T fp {};
-	memcpy(&fp, &function, sizeof(T));
-	return fp;
-#endif
 }
 
 template<typename T>
