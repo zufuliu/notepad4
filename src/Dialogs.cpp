@@ -2761,6 +2761,12 @@ struct SystemIntegrationInfo {
 };
 
 #define NP2RegSubKey_ReplaceNotepad	L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\notepad.exe"
+#if defined(_WIN64)
+#define samDesired_WOW64_64KEY	0
+#else
+// uses 64-bit registry on 64-bit Windows prior Windows 7
+#define samDesired_WOW64_64KEY	KEY_WOW64_64KEY
+#endif
 
 int GetSystemIntegrationStatus(SystemIntegrationInfo &info) noexcept {
 	int mask = 0;
@@ -2811,7 +2817,7 @@ int GetSystemIntegrationStatus(SystemIntegrationInfo &info) noexcept {
 	}
 
 	// replace Windows Notepad
-	status = RegOpenKeyEx(HKEY_LOCAL_MACHINE, NP2RegSubKey_ReplaceNotepad, 0, KEY_QUERY_VALUE, &hKey);
+	status = RegOpenKeyEx(HKEY_LOCAL_MACHINE, NP2RegSubKey_ReplaceNotepad, 0, KEY_QUERY_VALUE | samDesired_WOW64_64KEY, &hKey);
 	if (status == ERROR_SUCCESS) {
 		LPWSTR command = Registry_GetString(hKey, L"Debugger");
 		if (command != nullptr) {
@@ -2876,7 +2882,7 @@ void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName)
 	// replace Windows Notepad
 	if (mask & SystemIntegration_ReplaceNotepad) {
 		HKEY hKey;
-		const LSTATUS status = Registry_CreateKey(HKEY_LOCAL_MACHINE, NP2RegSubKey_ReplaceNotepad, &hKey);
+		const LSTATUS status = Registry_CreateKey(HKEY_LOCAL_MACHINE, NP2RegSubKey_ReplaceNotepad, &hKey, samDesired_WOW64_64KEY);
 		if (status == ERROR_SUCCESS) {
 			wsprintf(command, L"\"%s\" /z", tchModule);
 			Registry_SetDefaultString(hKey, tchModule);
@@ -2909,7 +2915,7 @@ void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName)
 #else
 		// on Windows 11, all keys were created by the system, we should not delete them.
 		HKEY hKey;
-		const LSTATUS status = RegOpenKeyEx(HKEY_LOCAL_MACHINE, NP2RegSubKey_ReplaceNotepad, 0, KEY_WRITE, &hKey);
+		const LSTATUS status = RegOpenKeyEx(HKEY_LOCAL_MACHINE, NP2RegSubKey_ReplaceNotepad, 0, KEY_WRITE | samDesired_WOW64_64KEY, &hKey);
 		if (status == ERROR_SUCCESS) {
 			RegDeleteValue(hKey, nullptr);
 			RegDeleteValue(hKey, L"Debugger");

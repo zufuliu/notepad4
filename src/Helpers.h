@@ -542,8 +542,8 @@ LSTATUS Registry_SetString(HKEY hKey, LPCWSTR valueName, LPCWSTR lpszText) noexc
 LSTATUS Registry_SetInt(HKEY hKey, LPCWSTR valueName, DWORD value) noexcept;
 #define Registry_GetDefaultString(hKey)				Registry_GetString((hKey), nullptr)
 #define Registry_SetDefaultString(hKey, lpszText)	Registry_SetString((hKey), nullptr, (lpszText))
-inline LSTATUS Registry_CreateKey(HKEY hKey, LPCWSTR lpSubKey, PHKEY phkResult) noexcept {
-	return RegCreateKeyEx(hKey, lpSubKey, 0, nullptr, 0, KEY_WRITE, nullptr, phkResult, nullptr);
+inline LSTATUS Registry_CreateKey(HKEY hKey, LPCWSTR lpSubKey, PHKEY phkResult, REGSAM samDesired = 0) noexcept {
+	return RegCreateKeyEx(hKey, lpSubKey, 0, nullptr, 0, KEY_WRITE | samDesired, nullptr, phkResult, nullptr);
 }
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 #define Registry_DeleteTree(hKey, lpSubKey)			RegDeleteTree((hKey), (lpSubKey))
