@@ -41,12 +41,6 @@ jobs:
         CALL "locale\build.bat" Build ARM64 Release 1
         CALL "build\make_zip.bat" MSVC ARM64 Release Locale 1
 
-    - name: MSVC ARM Release
-      run: |
-        CALL "build\install_msvc.bat" arm
-        CALL "build\VisualStudio\build.bat" Build ARM Release 1
-        CALL "build\make_zip.bat" MSVC ARM Release 1
-
     - uses: actions/upload-artifact@v4
       with:
           name: Notepad4_MSVC2022_i18n_x64
@@ -66,11 +60,6 @@ jobs:
       with:
           name: Notepad4_MSVC2022_i18n_ARM64
           path: 'build\Notepad4_i18n_ARM64_*.zip'
-
-    - uses: actions/upload-artifact@v4
-      with:
-          name: Notepad4_MSVC2022_en_ARM
-          path: 'build\Notepad4_ARM_*.zip'
 
   llvm_msvc2022:
     name: LLVM (Visual C++ 2022)
@@ -161,11 +150,6 @@ jobs:
         CALL "build\mingw\build.bat" llvm aarch64
         CALL "build\make_zip.bat" Clang ARM64 Release 1
 
-    - name: Clang ARM Release
-      run: |
-        CALL "build\mingw\build.bat" llvm armv7
-        CALL "build\make_zip.bat" Clang ARM Release 1
-
     - uses: actions/upload-artifact@v4
       with:
           name: Notepad4_llvm_mingw_en_x64
@@ -185,11 +169,6 @@ jobs:
       with:
           name: Notepad4_llvm_mingw_en_ARM64
           path: 'build\Notepad4_Clang_ARM64_*.zip'
-
-    - uses: actions/upload-artifact@v4
-      with:
-          name: Notepad4_llvm_mingw_en_ARM
-          path: 'build\Notepad4_Clang_ARM_*.zip'
 
   gcc_ucrt:
     name: ucrt GCC and Clang

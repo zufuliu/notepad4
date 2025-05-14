@@ -47,9 +47,6 @@ for:
           CALL "locale\build.bat" Build ARM64 Release 1
           CALL "build\make_zip.bat" MSVC ARM64 Release Locale 1
 
-          CALL "build\VisualStudio\build.bat" Build ARM Release 1
-          CALL "build\make_zip.bat" MSVC ARM Release 1
-
     artifacts:
       - path: 'build\Notepad4*.zip'
         name: Notepad4_MSVC
