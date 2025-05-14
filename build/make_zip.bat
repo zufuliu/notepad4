@@ -27,7 +27,6 @@ IF /I "%~1" == "/?"     GOTO SHOWHELP
 SET "COMPILER=MSVC"
 SET "ARCH=all"
 SET NO_32BIT=0
-SET NO_ARM=0
 SET "CONFIG=Release"
 SET "WITH_LOCALE="
 SET "ZIP_SUFFIX="
@@ -75,22 +74,14 @@ IF /I "%~1" == "ARM64"   SET "ARCH=ARM64" & SHIFT & GOTO CheckThirdArg
 IF /I "%~1" == "/ARM64"  SET "ARCH=ARM64" & SHIFT & GOTO CheckThirdArg
 IF /I "%~1" == "-ARM64"  SET "ARCH=ARM64" & SHIFT & GOTO CheckThirdArg
 IF /I "%~1" == "--ARM64" SET "ARCH=ARM64" & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "ARM"     SET "ARCH=ARM"   & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "/ARM"    SET "ARCH=ARM"   & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "-ARM"    SET "ARCH=ARM"   & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "--ARM"   SET "ARCH=ARM"   & SHIFT & GOTO CheckThirdArg
 IF /I "%~1" == "all"     SET "ARCH=all"   & SHIFT & GOTO CheckThirdArg
 IF /I "%~1" == "/all"    SET "ARCH=all"   & SHIFT & GOTO CheckThirdArg
 IF /I "%~1" == "-all"    SET "ARCH=all"   & SHIFT & GOTO CheckThirdArg
 IF /I "%~1" == "--all"   SET "ARCH=all"   & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "No32bit"   SET "ARCH=all" & SET NO_ARM=1 & SET NO_32BIT=1 & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "/No32bit"  SET "ARCH=all" & SET NO_ARM=1 & SET NO_32BIT=1 & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "-No32bit"  SET "ARCH=all" & SET NO_ARM=1 & SET NO_32BIT=1 & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "--No32bit" SET "ARCH=all" & SET NO_ARM=1 & SET NO_32BIT=1 & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "NoARM"   SET "ARCH=all"   & SET NO_ARM=1 & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "/NoARM"  SET "ARCH=all"   & SET NO_ARM=1 & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "-NoARM"  SET "ARCH=all"   & SET NO_ARM=1 & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "--NoARM" SET "ARCH=all"   & SET NO_ARM=1 & SHIFT & GOTO CheckThirdArg
+IF /I "%~1" == "No32bit"   SET "ARCH=all" & SET NO_32BIT=1 & SHIFT & GOTO CheckThirdArg
+IF /I "%~1" == "/No32bit"  SET "ARCH=all" & SET NO_32BIT=1 & SHIFT & GOTO CheckThirdArg
+IF /I "%~1" == "-No32bit"  SET "ARCH=all" & SET NO_32BIT=1 & SHIFT & GOTO CheckThirdArg
+IF /I "%~1" == "--No32bit" SET "ARCH=all" & SET NO_32BIT=1 & SHIFT & GOTO CheckThirdArg
 
 
 :CheckThirdArg
@@ -134,19 +125,16 @@ IF /I "%COMPILER%" == "GCC" (
   SET INPUTDIR_x64=bin\Clang%CONFIG%_x64
   SET INPUTDIR_Win32=bin\Clang%CONFIG%_Win32
   SET INPUTDIR_ARM64=bin\Clang%CONFIG%_ARM64
-  SET INPUTDIR_ARM=bin\Clang%CONFIG%_ARM
 ) ELSE IF /I "%COMPILER%" == "LLVM" (
   SET INPUTDIR_AVX2=bin\LLVM%CONFIG%\AVX2
   SET INPUTDIR_x64=bin\LLVM%CONFIG%\x64
   SET INPUTDIR_Win32=bin\LLVM%CONFIG%\Win32
   SET INPUTDIR_ARM64=bin\LLVM%CONFIG%\ARM64
-  SET INPUTDIR_ARM=bin\LLVM%CONFIG%\ARM
 ) ELSE (
   SET INPUTDIR_AVX2=bin\%CONFIG%\AVX2
   SET INPUTDIR_x64=bin\%CONFIG%\x64
   SET INPUTDIR_Win32=bin\%CONFIG%\Win32
   SET INPUTDIR_ARM64=bin\%CONFIG%\ARM64
-  SET INPUTDIR_ARM=bin\%CONFIG%\ARM
 )
 
 IF %NO_32BIT% == 1 GOTO ARCH_x64
@@ -154,7 +142,6 @@ IF /I "%ARCH%" == "AVX2" GOTO ARCH_AVX2
 IF /I "%ARCH%" == "x64" GOTO ARCH_x64
 IF /I "%ARCH%" == "Win32" GOTO ARCH_Win32
 IF /I "%ARCH%" == "ARM64" GOTO ARCH_ARM64
-IF /I "%ARCH%" == "ARM" GOTO ARCH_ARM
 
 :ARCH_Win32
 IF EXIST "%INPUTDIR_Win32%" CALL :SubZipFiles %INPUTDIR_Win32% Win32
@@ -171,10 +158,6 @@ IF /I "%ARCH%" == "AVX2" GOTO END_ARCH
 :ARCH_ARM64
 IF EXIST "%INPUTDIR_ARM64%" CALL :SubZipFiles %INPUTDIR_ARM64% ARM64
 IF /I "%ARCH%" == "ARM64" GOTO END_ARCH
-IF %NO_ARM% == 1 GOTO END_ARCH
-
-:ARCH_ARM
-IF EXIST "%INPUTDIR_ARM%" CALL :SubZipFiles %INPUTDIR_ARM% ARM
 
 :END_ARCH
 TITLE Make ZIP For %COMPILER% %ARCH% %CONFIG% Finished!
@@ -255,7 +238,7 @@ EXIT /B
 :SHOWHELP
 TITLE %~nx0 %1
 ECHO. & ECHO.
-ECHO Usage:  %~nx0 [MSVC^|GCC^|Clang^|LLVM] [Win32^|x64^|AVX2^|ARM64^|ARM^|all^|NoARM^|No32bit] [Release^|Debug] [Locale]
+ECHO Usage:  %~nx0 [MSVC^|GCC^|Clang^|LLVM] [Win32^|x64^|AVX2^|ARM64^|all^|No32bit] [Release^|Debug] [Locale]
 ECHO.
 ECHO Notes:  You can also prefix the commands with "-", "--" or "/".
 ECHO         The arguments are not case sensitive.
