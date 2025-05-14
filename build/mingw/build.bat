@@ -28,7 +28,6 @@ IF /I "%~1" == "x86_64"     SET "COMPILER=x86_64"   & SET "TARGET=x86_64"     & 
 IF /I "%~1" == "i686"       SET "COMPILER=i686"     & SET "TARGET=i686"       & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "ucrt"       SET "UCRT=1"            & SET "TARGET=x86_64"     & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "aarch64"    SET "COMPILER=llvm"     & SET "TARGET=aarch64"    & SHIFT & GOTO CheckSecondArg
-IF /I "%~1" == "armv7"      SET "COMPILER=llvm"     & SET "TARGET=armv7"      & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "llvm"       SET "COMPILER=llvm"     & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "Clang"      SET "CLANG=1"           & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "AVX2"       SET "TARGET=AVX2"       & SHIFT & GOTO CheckSecondArg
@@ -40,7 +39,6 @@ IF /I "%~1" == "x86_64"     SET "TARGET=x86_64"     & SHIFT & GOTO CheckSecondAr
 IF /I "%~1" == "AVX2"       SET "TARGET=AVX2"       & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "i686"       SET "TARGET=i686"       & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "aarch64"    SET "TARGET=aarch64"    & SHIFT & GOTO CheckSecondArg
-IF /I "%~1" == "armv7"      SET "TARGET=armv7"      & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "Clang"      SET "CLANG=1"           & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "all"        SET "ACTION=all"        & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "matepath"   SET "ACTION=matepath"   & SHIFT & GOTO CheckSecondArg
