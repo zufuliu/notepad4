@@ -389,8 +389,8 @@ constexpr WrapBreak GetWrapBreakEx(unsigned int ch, bool isUtf8) noexcept {
 void LineLayout::WrapLine(const Document *pdoc, Sci::Position posLineStart, Wrap wrapState, XYPOSITION wrapWidth, XYPOSITION wrapIndent_, bool partialLine) {
 	// Document wants document positions but simpler to work in line positions
 	// so take care of adding and subtracting line start in a lambda.
-	auto CharacterBoundary = [=](Sci::Position i, int moveDir) noexcept -> Sci::Position {
-		return pdoc->MovePositionOutsideChar(i + posLineStart, moveDir) - posLineStart;
+	auto CharacterBoundary = [=](Sci::Position i, int moveDir, bool checkLineEnd = true) noexcept -> Sci::Position {
+		return pdoc->MovePositionOutsideChar(i + posLineStart, moveDir, checkLineEnd) - posLineStart;
 	};
 	// Calculate line start positions based upon width.
 	Sci::Position lastLineStart = 0;
@@ -440,7 +440,7 @@ void LineLayout::WrapLine(const Document *pdoc, Sci::Position posLineStart, Wrap
 						break;
 					}
 
-					const Sci::Position posBefore = CharacterBoundary(pos - 1, -1);
+					const Sci::Position posBefore = CharacterBoundary(pos - 1, -1, false);
 					if (wrapState == Wrap::Auto) {
 						// word boundary
 						// TODO: Unicode Line Breaking Algorithm https://www.unicode.org/reports/tr14/
