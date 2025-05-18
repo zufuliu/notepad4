@@ -177,7 +177,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 
 ## Supported Operating Systems:
 * Windows XP, Vista, 7, 8, 8.1, 10 and 11, both 32-bit and 64-bit
-* Windows Server 2003, 2008, 2012, 2016, 2019 and 2022, both 32-bit and 64-bit
+* Windows Server 2003, 2008, 2012, 2016, 2019, 2022 and 2025, both 32-bit and 64-bit
 * Windows 10 on ARM64, Windows 8/8.1 on ARM32 (Windows RT)
 * Unix-like Operating Systems (Linux, macOS, BSD, etc.) using [Wine](https://www.winehq.org/)
 * [ReactOS](https://www.reactos.org/)
