@@ -1,5 +1,5 @@
-// 2023 https://www.w3.org/TR/CSS/ 7 December 2023
-// 2025-01-19 https://drafts.csswg.org/
+// 2024 https://www.w3.org/TR/CSS/ 25 February 2025
+// 2025-05-18 https://drafts.csswg.org/
 // https://github.com/w3c/csswg-drafts/
 // https://www.w3.org/Style/CSS/all-properties
 // https://www.w3.org/Style/CSS/all-descriptors
@@ -10,7 +10,7 @@
 // https://www.w3.org/TR/css-syntax-3/ 24 December 2021
 !important
 
-// CSS Anchor Positioning https://www.w3.org/TR/css-anchor-position-1/ 4 October 2024
+// CSS Anchor Positioning https://www.w3.org/TR/css-anchor-position-1/ 9 May 2025
 {
 	anchor-name: none;
 	anchor-scope: none | all;
@@ -150,25 +150,23 @@ from to
 	padding: inherit;
 }
 
-// CSS Box Alignment Module Level 3 https://www.w3.org/TR/css-align-3/ 17 February 2023
+// CSS Box Alignment Module Level 3 https://www.w3.org/TR/css-align-3/ 11 March 2025
 {
 	align-content: normal | first | last | baseline | space-between | space-around | space-evenly | stretch | unsafe | safe | center | start | end | flex-start | flex-end;
 	justify-content: normal | space-between | space-around | space-evenly | stretch | unsafe | safe | center | start | end | flex-start | flex-end | left | right;
 	place-content: normal;
+
 	justify-self: auto | normal | stretch | first | last | baseline | unsafe | safe | center | start | end | self-start | self-end | flex-start | flex-end | left | right;
 	align-self: auto | normal | stretch;
 	place-self: auto;
+
 	justify-items: normal | stretch | left | right | legacy | center;
 	align-items: normal | stretch first | last | baseline | unsafe | safe | center | start | end | self-start | self-end | flex-start | flex-end;
+	place-items:;
+
 	align-content: normal;
 	justify-content: normal | left | right;
 	place-content: normal;
-	justify-self: auto | normal | stretch | left | right;
-	align-self: auto | normal | stretch;
-	place-self: auto;
-	justify-items: normal | stretch | left | right | legacy | center;
-	align-items: normal | stretch;
-	place-items:;
 
 	row-gap: normal;
 	grid-row-gap: normal;
@@ -214,12 +212,12 @@ initial inherit unset revert revert-layer
 @scope {}
 :scope
 
-// CSS Color Module Level 5 https://www.w3.org/TR/css-color-5/ 29 February 2024
-// CSS Color Module Level 4 https://www.w3.org/TR/css-color-4/ 13 February 2024
+// CSS Color Module Level 5 https://www.w3.org/TR/css-color-5/ 18 March 2025
+// CSS Color Module Level 4 https://www.w3.org/TR/css-color-4/ 24 April 2025
 // CSS Color Module Level 3 https://www.w3.org/TR/css-color-3/ 18 January 2022
 // Colors and Backgrounds https://www.w3.org/TR/CSS22/colors.html
 {
-	color: color-mix(), color-contrast(), rgb(), rgba(), hsl(), hsla(), hwb(), lab(), oklab(), lch(), oklch(), color(), device-cmyk(), contrast-color(), currentColor;
+	color: color-mix(), color-contrast(), rgb(), rgba(), hsl(), hsla(), hwb(), lab(), oklab(), lch(), oklch(), color(), device-cmyk(), light-dark()，contrast-color(), currentColor;
 	color: Canvas, CanvasText, LinkText, VisitedText, ActiveText, ButtonFace, ButtonText, ButtonBorder, Field, FieldText, Highlight, HighlightText, Mark, MarkText, GrayText;
 	opacity: inherit;
 }
@@ -384,7 +382,7 @@ step-start step-end steps()
 	stroke-opacity:;
 }
 
-// Filter Effects Module Level 2 https://drafts.fxtf.org/filter-effects-2/ 1 August 2024
+// Filter Effects Module Level 2 https://drafts.fxtf.org/filter-effects-2/ 15 March 2025
 // Filter Effects Module Level 1 https://www.w3.org/TR/filter-effects-1/ 18 December 2018
 {
 	filter: none | blur() | brightness() | contrast() | drop-shadow() | grayscale() | hue-rotate() | invert() | opacity() | sepia() | saturate();
@@ -496,6 +494,62 @@ step-start step-end steps()
 	box-decoration-break: slice | clone;
 }
 
+// CSS Form Control Styling Level 1 https://www.w3.org/TR/css-forms-1/ 25 March 2025
+::picker()
+::picker-icon
+::file-selector-button
+::checkmark
+::thumb
+::track
+::fill
+::placeholder
+::field-text
+::clear-icon
+::step-control
+::step-up
+::step-down
+::field-component
+::field-separator
+::color-swatch
+:low-value
+:high-value
+:optimal-value
+control-value()
+{
+	slider-orientation: auto | left-to-right | right-to-left | top-to-bottom | bottom-to-top;
+}
+
+// CSS Functions and Mixins Module https://www.w3.org/TR/css-mixins-1/ 15 May 2025
+@function {
+	result:;
+}
+returns
+type()
+
+// CSS Gap Decorations Module Level 1 https://www.w3.org/TR/css-gaps-1/ 17 April 2025
+{
+	column-rule-break: none | spanning-item | intersection;
+	row-rule-break:;
+	rule-break:;
+	column-rule-outset:;
+	row-rule-outset:;
+	rule-outset:;
+	rule-paint-order: row-over-column | column-over-row;
+
+	column-rule-color: currentColor;
+	row-rule-color:;
+	column-rule-style:;
+	row-rule-style:;
+	column-rule-width: repeat();
+	row-rule-width:;
+	column-rule:;
+	row-rule:;
+	rule-color:;
+	rule-style:;
+	rule-width:;
+	rule:;
+}
+
 // CSS Generated Content Module Level 3 https://www.w3.org/TR/css-content-3/ 2 August 2019
 // https://www.w3.org/TR/CSS22/generate.html
 {
@@ -524,9 +578,9 @@ step-start step-end steps()
 	bookmark-state: open | closed;
 }
 
-// CSS Grid Layout Module Level 3 https://www.w3.org/TR/css-grid-3/ 3 October 2024
-// CSS Grid Layout Module Level 2 https://www.w3.org/TR/css-grid-2/ 18 December 2020
-// CSS Grid Layout Module Level 1 https://www.w3.org/TR/css-grid-1/ 18 December 2020
+// CSS Grid Layout Module Level 3 https://www.w3.org/TR/css-grid-3/ 7 February 2025
+// CSS Grid Layout Module Level 2 https://www.w3.org/TR/css-grid-2/ 26 March 2025
+// CSS Grid Layout Module Level 1 https://www.w3.org/TR/css-grid-1/ 26 March 2025
 {
 	display: grid | inline-grid | masonry | inline-masonry;
 	grid-template-columns: none, min-content | max-content | auto, minmax(), fit-content(), subgrid, masonry;
@@ -537,6 +591,7 @@ step-start step-end steps()
 	grid-auto-rows: auto;
 	grid-auto-flow: row | column | row-reverse | column-reverse | dense | wrap-reverse;
 	grid: none | auto-flow | dense;
+
 	grid-row-start: auto | span;
 	grid-column-start: auto | span;
 	grid-row-end: auto | span;
@@ -545,17 +600,13 @@ step-start step-end steps()
 	grid-column: auto;
 	grid-area: auto;
 
-	masonry-direction: row | column | row-reverse | column-reverse;
-	masonry-fill: normal | reverse;
-	masonry-flow:;
-	masonry:;
-	masonry-template-tracks: repeat();
-	masonry-template-areas: none;
-	masonry-auto-tracks: auto;
-	masonry-track-start:;
-	masonry-track-end:;
-	masonry-track:;
-	masonry-slack:;
+	item-slack: infinite;
+	item-direction: row | column | row-reverse | column-reverse;
+	item-track:;
+	item-wrap: auto | nowrap | wrap | normal | reverse | wrap-reverse;
+	item-cross:;
+	item-pack: normal | dense | balance;
+	item-flow:;
 }
 auto-areas auto-fit
 
@@ -808,7 +859,9 @@ all continuous paged visual audio speech tactile grid bitmap interactive static
 // CSS Multi-column Layout Module Level 1 https://www.w3.org/TR/css-multicol-1/ 16 May 2024
 {
 	column-width: auto;
+	column-height: auto;
 	column-count: auto;
+	column-wrap: auto | nowrap | wrap;
 	columns:;
 
 	column-gap:;
@@ -916,7 +969,7 @@ all continuous paged visual audio speech tactile grid bitmap interactive static
 	page-orientation: upright | rotate-left | rotate-right;
 }
 
-// CSS Positioned Layout Module Level 3 https://www.w3.org/TR/css-position-3/ 10 August 2024
+// CSS Positioned Layout Module Level 3 https://www.w3.org/TR/css-position-3/ 11 March 2025
 {
 	position: static | relative | absolute | sticky | fixed;
 	top: auto;
