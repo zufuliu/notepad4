@@ -8233,7 +8233,7 @@ void CALLBACK WatchTimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTim
 			}
 		}
 		// polling, not very efficient but useful for watching continuously updated file
-		else {
+		else if (iFileWatchingOption & FileWatchingOption_LogFile) {
 			if (dwChangeNotifyTime == 0) {
 				CheckCurrentFileChangedOutsideApp();
 			}
