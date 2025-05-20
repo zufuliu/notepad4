@@ -414,11 +414,12 @@ void LineLayout::WrapLine(const Document *pdoc, Sci::Position posLineStart, Wrap
 		if (p < lastSegmentEnd) {
 			// backtrack to find lastGoodBreak
 			Sci::Position lastGoodBreak = p;
+			// Try moving to start of last character
 			if (p > 0) {
 				lastGoodBreak = CharacterBoundary(p, -1);
 			}
 			bool foundBreak = false;
-			if (wrapState != Wrap::Char) {
+			if (wrapState != Wrap::Char && lastGoodBreak != lastLineStart) {
 				Sci::Position pos = lastGoodBreak;
 				CharacterClass ccPrev = CharacterClass::space;
 				WrapBreak wbPrev = WrapBreak::None;
@@ -429,7 +430,7 @@ void LineLayout::WrapLine(const Document *pdoc, Sci::Position posLineStart, Wrap
 				} else if (wrapState == Wrap::Word) {
 					wbPrev = GetWrapBreak(chars[pos]);
 				}
-				while (pos > lastLineStart) {
+				do {
 					// style boundary and space
 					if (wrapState != Wrap::WhiteSpace && (styles[pos - 1] != styles[pos])) {
 						foundBreak = true;
@@ -470,16 +471,12 @@ void LineLayout::WrapLine(const Document *pdoc, Sci::Position posLineStart, Wrap
 						}
 					}
 					pos = posBefore;
-				}
+				} while (pos > lastLineStart);
 				if (pos > lastLineStart) {
 					lastGoodBreak = pos;
 				}
 			}
 			if (lastGoodBreak == lastLineStart || (isUtf8 && !foundBreak)) {
-				// Try moving to start of last character
-				if (lastGoodBreak == lastLineStart && p > 0) {
-					lastGoodBreak = CharacterBoundary(p, -1);
-				}
 				if (isUtf8 && lastGoodBreak != lastLineStart) {
 					const char *text = &chars[lastLineStart];
 					size_t lengthSegment = lastGoodBreak - lastLineStart;
@@ -488,7 +485,7 @@ void LineLayout::WrapLine(const Document *pdoc, Sci::Position posLineStart, Wrap
 				}
 				if (lastGoodBreak == lastLineStart) {
 					// Ensure at least one character on line.
-					lastGoodBreak = CharacterBoundary(lastGoodBreak + 1, 1);
+					lastGoodBreak = CharacterBoundary(lastGoodBreak + 1, 1, false);
 				}
 			}
 			lastLineStart = lastGoodBreak;
