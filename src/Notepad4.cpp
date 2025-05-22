@@ -1412,11 +1412,12 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		}
 		return DefWindowProc(hwnd, umsg, wParam, lParam);
 
-	case APPM_CHANGENOTIFY:
+	case APPM_CHANGENOTIFY: {
 		if (iFileWatchingMode == FileWatchingMode_ShowMessage || IsDocumentModified()) {
 			SetForegroundWindow(hwnd);
 		}
 
+		bool terminate = false;
 		if (PathIsFile(szCurFile)) {
 			if ((iFileWatchingMode == FileWatchingMode_AutoReload && !IsDocumentModified())
 				|| MsgBoxWarn(MB_YESNO, IDS_FILECHANGENOTIFY) == IDYES) {
@@ -1431,15 +1432,17 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 				}
 			}
 		} else {
-			if (MsgBoxWarn(MB_YESNO, IDS_FILECHANGENOTIFY2) == IDYES) {
+			const int result = MsgBoxWarn(MB_YESNOCANCEL, IDS_FILECHANGENOTIFY2);
+			terminate = result == IDCANCEL;
+			if (result == IDYES) {
 				FileSave(FileSaveFlag_SaveAlways);
 			}
 		}
 
-		if (!bRunningWatch) {
-			InstallFileWatching(false);
+		if (!bRunningWatch || terminate) {
+			InstallFileWatching(terminate);
 		}
-		break;
+	} break;
 
 	//// This message is posted before Notepad4 reactivates itself
 	//case APPM_CHANGENOTIFYCLEAR:
