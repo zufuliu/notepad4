@@ -747,9 +747,11 @@ uint64_t EditView::LayoutLine(const EditModel &model, Surface *surface, const Vi
 			if ((FlagSet(vstyle.wrap.visualFlags, WrapVisualFlag::Start)) && (wrapIndent < aveCharWidth)) {
 				wrapIndent = aveCharWidth; // Indent to show start visual
 			}
+			//const ElapsedPeriod period;
 			ll->WrapLine(model.pdoc, posLineStart, vstyle.wrap.state, width, wrapIndent, partialLine);
 			//const double duration = period.Duration()*1e3;
-			//printf("wrap line=%zd duration=%f\n", line + 1, duration);
+			//printf("wrap line=%zd(%d) duration=%f, lines=%d, %.0f/%d\n", line + 1, ll->lastSegmentEnd,
+			//	duration, ll->lines, ll->positions[ll->lastSegmentEnd], width);
 		}
 
 		validity = LineLayout::ValidLevel::lines;
