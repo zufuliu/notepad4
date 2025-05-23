@@ -88,23 +88,22 @@ LineLayout::LineLayout(Sci::Line lineNumber_, int maxLineLength_) :
 	Resize(maxLineLength_);
 }
 
-LineLayout::~LineLayout() {
-	Free();
-}
+LineLayout::~LineLayout() = default;
 
 void LineLayout::Resize(int maxLineLength_) {
 	if (maxLineLength_ > maxLineLength) {
-		Free();
 		const size_t lineAllocation = maxLineLength_ + 1;
-		chars = std::make_unique<char[]>(lineAllocation);
-		styles = std::make_unique<unsigned char[]>(lineAllocation);
+		auto chars_ = std::make_unique<char[]>(lineAllocation);
+		chars.swap(chars_);
+		auto styles_ = std::make_unique<unsigned char[]>(lineAllocation);
+		styles.swap(styles_);
 		// Extra position allocated as sometimes the Windows
 		// GetTextExtentExPoint API writes an extra element.
-		positions = std::make_unique<XYPOSITION[]>(lineAllocation + 1);
-		if (bidiData) {
-			bidiData->Resize(maxLineLength_);
-		}
-
+		auto positions_ = std::make_unique<XYPOSITION[]>(lineAllocation + 1);
+		positions.swap(positions_);
+		lineStarts.reset();
+		bidiData.reset();
+		lenLineStarts = 0;
 		maxLineLength = maxLineLength_;
 	}
 }
@@ -121,15 +120,6 @@ void LineLayout::EnsureBidiData() {
 		bidiData = std::make_unique<BidiData>();
 		bidiData->Resize(maxLineLength);
 	}
-}
-
-void LineLayout::Free() noexcept {
-	chars.reset();
-	styles.reset();
-	positions.reset();
-	lineStarts.reset();
-	lenLineStarts = 0;
-	bidiData.reset();
 }
 
 void LineLayout::ClearPositions() const noexcept {
@@ -216,7 +206,7 @@ void LineLayout::AddLineStart(Sci::Position start) {
 			//std::copy_n(lineStarts.get(), lenLineStarts, newLineStarts.get());
 			memcpy(newLineStarts.get(), lineStarts.get(), lenLineStarts*sizeof(int));
 		}
-		std::swap(lineStarts, newLineStarts);
+		lineStarts.swap(newLineStarts);
 		lenLineStarts = newMaxLines;
 	}
 	lineStarts[lines] = static_cast<int>(start);
@@ -810,8 +800,8 @@ LineLayout *LineLayoutCache::Retrieve(Sci::Line lineNumber, Sci::Line lineCaret,
 	if (ret) {
 		if (!ret->CanHold(lineNumber, maxChars)) {
 			//printf("USE line=%zd/%zd, caret=%zd/%zd top=%zd, pos=%zu, clock=%d\n",
-			//	lineNumber, ret->lineNumber, lineCaret, lastCaretSlot, topLine, pos, styleClock_);
-			ret->Free();
+			//	lineNumber, ret->LineNumber(), lineCaret, lastCaretSlot, topLine, pos, styleClock_);
+			ret->~LineLayout();
 			::new (ret) LineLayout(lineNumber, maxChars);
 		} else {
 			//printf("HIT line=%zd, caret=%zd/%zd top=%zd, pos=%zu, clock=%d, validity=%d\n",
