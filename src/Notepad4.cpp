@@ -3652,25 +3652,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		EditConvertNumRadix(LOWORD(wParam));
 		break;
 
-	case IDM_EDIT_FINDMATCHINGBRACE: {
-		Sci_Position iBrace2 = INVALID_POSITION;
-		Sci_Position iPos = SciCall_GetCurrentPos();
-		int ch = SciCall_GetCharAt(iPos);
-		if (IsBraceMatchChar(ch)) {
-			iBrace2 = SciCall_BraceMatch(iPos);
-		} else { // Try one before
-			iPos = SciCall_PositionBefore(iPos);
-			ch = SciCall_GetCharAt(iPos);
-			if (IsBraceMatchChar(ch)) {
-				iBrace2 = SciCall_BraceMatch(iPos);
-			}
-		}
-		if (iBrace2 >= 0) {
-			SciCall_GotoPos(iBrace2);
-		}
-	}
-	break;
-
+	case IDM_EDIT_FINDMATCHINGBRACE:
 	case IDM_EDIT_SELTOMATCHINGBRACE: {
 		Sci_Position iBrace2 = INVALID_POSITION;
 		Sci_Position iCurPos = SciCall_GetCurrentPos();
@@ -3686,6 +3668,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			}
 		}
 		if (iBrace2 >= 0) {
+			if (LOWORD(wParam) == IDM_EDIT_FINDMATCHINGBRACE) {
+				SciCall_GotoPos(iBrace2);
+				break;
+			}
 			Sci_Position iAnchorPos = SciCall_GetAnchor();
 			const Sci_Position iMinPos = min(iAnchorPos, iCurPos);
 			const Sci_Position iMaxPos = max(iAnchorPos, iCurPos);
