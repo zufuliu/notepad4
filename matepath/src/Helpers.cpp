@@ -499,7 +499,27 @@ bool BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha) noexcept {
 	BITMAP bmp;
 	if (GetObject(hbmp, sizeof(BITMAP), &bmp)) {
 		if (bmp.bmBitsPixel == 32) {
-#if NP2_USE_AVX2
+#if NP2_USE_AVX512
+			#define BitmapAlphaBlend_Tag	"avx512 8x1"
+			const ULONG count = (bmp.bmHeight * bmp.bmWidth) / 8;
+			__m256i *prgba = static_cast<__m256i *>(bmp.bmBits);
+
+			const __m512i i16x32Alpha = _mm512_broadcastw_epi16(_mm_cvtsi32_si128(alpha));
+			// 使用 SSE4 版本的函数，因为它已经在其他地方定义
+			const __m512i i16x32Back = _mm512_broadcastq_epi64(_mm_mullo_epi16(rgba_to_bgra_epi16_sse2_si32(crDest), mm_xor_alpha_epi16(_mm512_castsi512_si128(i16x32Alpha))));
+			const __m512i i16x32_0x8081 = _mm512_set1_epi16(-0x8000 | 0x81);
+
+			for (ULONG x = 0; x < count; x++, prgba++) {
+				const __m512i origin = _mm512_cvtepu8_epi16(*prgba);
+				__m512i i16x32Fore = _mm512_mullo_epi16(origin, i16x32Alpha);
+				i16x32Fore = _mm512_add_epi16(i16x32Fore, i16x32Back);
+				i16x32Fore = _mm512_srli_epi16(_mm512_mulhi_epu16(i16x32Fore, i16x32_0x8081), 7);
+				i16x32Fore = _mm512_mask_blend_epi16(0x7777, origin, i16x32Fore);
+				i16x32Fore = _mm512_packus_epi16(i16x32Fore, i16x32Fore);
+				i16x32Fore = _mm512_permutexvar_epi64(_mm512_set_epi64(0,0,0,0,0,0,0,8), i16x32Fore);
+				_mm256_storeu_si256(prgba, _mm512_castsi512_si256(i16x32Fore));
+			}
+#elif NP2_USE_AVX2
 #if 1
 			#define BitmapAlphaBlend_Tag	"avx2 4x1"
 			const ULONG count = (bmp.bmHeight * bmp.bmWidth) / 4;

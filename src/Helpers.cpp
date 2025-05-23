@@ -554,20 +554,32 @@ bool BitmapMergeAlpha(HBITMAP hbmp, COLORREF crDest) noexcept {
 		if (bmp.bmBitsPixel == 32) {
 			//StopWatch watch;
 			//watch.Start();
-#if NP2_USE_AVX2
-			#define BitmapMergeAlpha_Tag	"sse4 2x1"
+#if NP2_USE_AVX512
+			#define BitmapMergeAlpha_Tag	"avx512 2x1"
 			const ULONG count = (bmp.bmHeight * bmp.bmWidth) / 2;
 			uint64_t *prgba = static_cast<uint64_t *>(bmp.bmBits);
 
-			const __m128i i16x8Back = rgba_to_bgra_epi16x8_sse4_si32(crDest);
+			const __m128i i16x8Back = rgba_to_bgra_epi16x8_avx512_si32(crDest);
 			for (ULONG x = 0; x < count; x++, prgba++) {
-				__m128i i16x8Fore = unpack_color_epi16_sse4_ptr64(prgba);
+				__m128i i16x8Fore = unpack_color_epi16_avx512_ptr64(prgba);
 				const __m128i i16x8Alpha = _mm_shufflehi_epi16(_mm_shufflelo_epi16(i16x8Fore, 0xff), 0xff);
 				i16x8Fore = mm_alpha_blend_epi16(i16x8Fore, i16x8Back, i16x8Alpha);
 				const uint64_t color = pack_color_epi16_sse2_si64(i16x8Fore);
 				*prgba = color | UINT64_C(0xff000000ff000000);
 			}
+#elif NP2_USE_AVX2
+			#define BitmapMergeAlpha_Tag	"avx2 2x1"
+			const ULONG count = (bmp.bmHeight * bmp.bmWidth) / 2;
+			uint64_t *prgba = static_cast<uint64_t *>(bmp.bmBits);
 
+			const __m128i i16x8Back = rgba_to_bgra_epi16x8_avx2_si32(crDest);
+			for (ULONG x = 0; x < count; x++, prgba++) {
+				__m128i i16x8Fore = unpack_color_epi16_avx2_ptr64(prgba);
+				const __m128i i16x8Alpha = _mm_shufflehi_epi16(_mm_shufflelo_epi16(i16x8Fore, 0xff), 0xff);
+				i16x8Fore = mm_alpha_blend_epi16(i16x8Fore, i16x8Back, i16x8Alpha);
+				const uint64_t color = pack_color_epi16_sse2_si64(i16x8Fore);
+				*prgba = color | UINT64_C(0xff000000ff000000);
+			}
 #elif NP2_USE_SSE2
 			#define BitmapMergeAlpha_Tag	"sse2 1x1"
 			const ULONG count = bmp.bmHeight * bmp.bmWidth;

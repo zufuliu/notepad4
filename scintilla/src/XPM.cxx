@@ -67,7 +67,7 @@ constexpr bool IsPixelIndex(unsigned index, unsigned dimension) noexcept {
 	return index < dimension;
 }
 
-#if !(NP2_USE_AVX2 || NP2_USE_SSE2)
+#if !(NP2_USE_AVX2 || NP2_USE_SSE2 || NP2_USE_AVX512)
 constexpr unsigned char AlphaMultiplied(unsigned char value, unsigned char alpha) noexcept {
 	return (value * alpha) / UCHAR_MAX;
 }
@@ -263,7 +263,24 @@ void RGBAImage::SetPixel(int x, int y, ColourRGBA colour) noexcept {
 // Used for DrawRGBAImage on some platforms.
 void RGBAImage::BGRAFromRGBA(unsigned char *pixelsBGRA, const unsigned char *pixelsRGBA, size_t count) noexcept {
 	static_assert(UCHAR_MAX == 255);
-#if NP2_USE_AVX2
+#if NP2_USE_AVX512
+	count /= (bytesPerPixel * 4);
+	__m256i *pbgra = reinterpret_cast<__m256i *>(pixelsBGRA);
+	const __m256i *prgba = reinterpret_cast<const __m256i *>(pixelsRGBA);
+	for (size_t i = 0; i < count; i++, pbgra++) {
+		__m512i i16x32Color = unpack_color_epi16_avx512_ptr256(prgba++);
+		i16x32Color = _mm512_shufflehi_epi16(_mm512_shufflelo_epi16(i16x32Color, _MM_SHUFFLE(3, 0, 1, 2)), _MM_SHUFFLE(3, 0, 1, 2));
+		const __m512i i16x32Alpha = _mm512_shufflehi_epi16(_mm512_shufflelo_epi16(i16x32Color, 0xff), 0xff);
+
+		i16x32Color = _mm512_mullo_epi16(i16x32Color, i16x32Alpha);
+		i16x32Color = mm512_div_epu16_by_255(i16x32Color);
+		i16x32Color = _mm512_mask_blend_epi16(0x77, i16x32Alpha, i16x32Color);
+
+		i16x32Color = pack_color_epi16_avx512_si512(i16x32Color);
+		_mm256_storeu_si256(pbgra, _mm512_castsi512_si256(i16x32Color));
+	}
+
+#elif NP2_USE_AVX2
 	count /= (bytesPerPixel * 2);
 	uint64_t *pbgra = reinterpret_cast<uint64_t *>(pixelsBGRA);
 	const uint64_t *prgba = reinterpret_cast<const uint64_t *>(pixelsRGBA);
