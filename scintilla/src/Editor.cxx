@@ -1601,18 +1601,19 @@ bool Editor::WrapLines(WrapScope ws) {
 		}
 		wrapPending.Reset();
 	} else if (wrapPending.NeedsWrap()) {
-		wrapPending.start = std::min(wrapPending.start, maxEditorLine);
 		if (!SetIdle(true)) {
 			// Idle processing not supported so full wrap required.
 			ws = WrapScope::wsAll;
 		}
 		// Decide where to start wrapping
+		wrapPending.start = std::min(wrapPending.start, maxEditorLine);
 		Sci::Line lineToWrap = wrapPending.start;
-		Sci::Line lineToWrapEnd = std::min(wrapPending.end, maxEditorLine);
+		const Sci::Line lineEndNeedWrap = std::min(wrapPending.end, maxEditorLine);
+		Sci::Line lineToWrapEnd = lineEndNeedWrap;
 		const Sci::Line lineDocTop = pcs->DocFromDisplay(topLine);
 		const Sci::Line subLineTop = topLine - pcs->DisplayFromDoc(lineDocTop);
 		if (ws == WrapScope::wsVisible) {
-			lineToWrap = std::clamp(lineDocTop - 5, wrapPending.start, maxEditorLine);
+			lineToWrap = std::max(lineDocTop - 5, lineToWrap);
 			// Priority wrap to just after visible area.
 			// Since wrapping could reduce display lines, treat each
 			// as taking only one display line.
@@ -1637,7 +1638,6 @@ bool Editor::WrapLines(WrapScope ws) {
 			lineToWrapEnd = pdoc->LineFromPositionAfter(lineToWrap, actionsInAllowedTime);
 		}
 
-		const Sci::Line lineEndNeedWrap = std::min(wrapPending.end, maxEditorLine);
 		lineToWrapEnd = std::min(lineToWrapEnd, lineEndNeedWrap);
 		Sci::Line partialLine = Sci::invalidPosition;
 		// Ensure all lines being wrapped are styled.
