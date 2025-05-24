@@ -1598,10 +1598,7 @@ bool Editor::WrapLines(WrapScope ws) {
 		}
 		wrapPending.Reset();
 	} else if (wrapPending.NeedsWrap()) {
-		if (!SetIdle(true)) {
-			// Idle processing not supported so full wrap required.
-			ws = WrapScope::wsAll;
-		}
+		SetIdle(true);
 		// Decide where to start wrapping
 		wrapPending.start = std::min(wrapPending.start, maxEditorLine);
 		Sci::Line lineToWrap = wrapPending.start;
@@ -1628,7 +1625,7 @@ bool Editor::WrapLines(WrapScope ws) {
 				// Currently visible text does not need wrapping
 				return false;
 			}
-		} else if (ws == WrapScope::wsIdle) {
+		} else /*if (ws == WrapScope::wsIdle)*/ {
 			// Try to keep time taken by wrapping reasonable so interaction remains smooth.
 			constexpr double secondsAllowed = 0.01;
 			const int actionsInAllowedTime = durationWrapOneUnit.ActionsInAllowedTime(secondsAllowed);
