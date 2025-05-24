@@ -1533,7 +1533,6 @@ bool Editor::WrapBlock(Surface *surface, Sci::Line lineToWrap, Sci::Line lineToW
 	// Wrap all the long lines in the main thread.
 	// LayoutLine may then multi-thread over segments in each line.
 	uint32_t wrappedBytesAllThread = 0;
-	uint32_t wrappedBytesOneThread = 0;
 	for (size_t index = 0; index < linesBeingWrapped; index++) {
 		const Sci::Line lineNumber = lineToWrap + index;
 		const Sci::Position lineStart = pdoc->LineStart(lineNumber);
@@ -1545,9 +1544,8 @@ bool Editor::WrapBlock(Surface *surface, Sci::Line lineToWrap, Sci::Line lineToW
 		} else {
 			ll->caretPosition = 0;
 		}
-		const uint64_t wrappedBytes = view.LayoutLine(*this, surface, vs, ll, wrapWidth, LayoutLineOption::IdleUpdate);
-		wrappedBytesAllThread += wrappedBytes & UINT32_MAX;
-		wrappedBytesOneThread += wrappedBytes >> 32;
+		const uint32_t wrappedBytes = view.LayoutLine(*this, surface, vs, ll, wrapWidth, LayoutLineOption::IdleUpdate);
+		wrappedBytesAllThread += wrappedBytes;
 		linesAfterWrap[index] = ll->lines;
 		if (ll->PartialPosition()) {
 			partialLine = lineNumber;
@@ -1557,7 +1555,6 @@ bool Editor::WrapBlock(Surface *surface, Sci::Line lineToWrap, Sci::Line lineToW
 
 	const double duration = epWrapping.Duration();
 	durationWrapOneUnit.AddSample(wrappedBytesAllThread, duration);
-	durationWrapOneThread.AddSample(wrappedBytesOneThread, duration);
 	UpdateParallelLayoutThreshold();
 
 	bool wrapOccurred = false;
@@ -1664,9 +1661,9 @@ bool Editor::WrapLines(WrapScope ws) {
 		}
 #if 0
 		constexpr double scale = 1e3; // 1 KiB in millisecond
-		printf("%s idle style duration: %f, wrap duration: %f, %f, parallel=%u, %u\n", __func__,
+		printf("%s idle style duration: %f, wrap duration: %f, parallel=%u, %u\n", __func__,
 			pdoc->durationStyleOneUnit.Duration()*scale,
-			durationWrapOneUnit.Duration()*scale, durationWrapOneThread.Duration()*scale,
+			durationWrapOneUnit.Duration()*scale,
 			minParallelLayoutLength/1024, maxParallelLayoutLength/1024);
 #endif
 	}

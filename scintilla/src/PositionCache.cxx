@@ -200,7 +200,7 @@ int LineLayout::SubLineFromPosition(int posInLine, PointEnd pe) const noexcept {
 void LineLayout::AddLineStart(Sci::Position start) {
 	lines++;
 	if (lines >= lenLineStarts) {
-		const int newMaxLines = lines + 20 + lines;
+		const int newMaxLines = lines*2 + 14; // minimum 16
 		std::unique_ptr<int[]> newLineStarts = make_unique_for_overwrite<int[]>(newMaxLines);
 		if (lenLineStarts) {
 			//std::copy_n(lineStarts.get(), lenLineStarts, newLineStarts.get());
