@@ -78,12 +78,6 @@ public:
 	XYPOSITION wrapIndent; // In pixels
 
 	LineLayout(Sci::Line lineNumber_, int maxLineLength_);
-	// Deleted so LineLayout objects can not be copied.
-	LineLayout(const LineLayout &) = delete;
-	LineLayout(LineLayout &&) = delete;
-	void operator=(const LineLayout &) = delete;
-	void operator=(LineLayout &&) = delete;
-	~LineLayout();
 	void Resize(int maxLineLength_);
 	void Reset(Sci::Line lineNumber_, Sci::Position maxLineLength_);
 	void EnsureBidiData();

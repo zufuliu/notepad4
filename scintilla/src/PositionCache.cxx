@@ -88,8 +88,6 @@ LineLayout::LineLayout(Sci::Line lineNumber_, int maxLineLength_) :
 	Resize(maxLineLength_);
 }
 
-LineLayout::~LineLayout() = default;
-
 void LineLayout::Resize(int maxLineLength_) {
 	if (maxLineLength_ > maxLineLength) {
 		const size_t lineAllocation = maxLineLength_ + 1;
@@ -183,15 +181,11 @@ int LineLayout::SubLineFromPosition(int posInLine, PointEnd pe) const noexcept {
 		return lines - 1;
 	}
 
+	// Return subline not start of next for PointEnd::subLineEnd
+	posInLine += FlagSet(pe, PointEnd::subLineEnd) ? 1 : 0;
 	for (int line = 0; line < lines; line++) {
-		if (FlagSet(pe, PointEnd::subLineEnd)) {
-			// Return subline not start of next
-			if (lineStarts[line + 1] <= posInLine + 1)
-				return line;
-		} else {
-			if (lineStarts[line + 1] <= posInLine)
-				return line;
-		}
+		if (lineStarts[line + 1] <= posInLine)
+			return line;
 	}
 
 	return lines - 1;
@@ -201,7 +195,7 @@ void LineLayout::AddLineStart(Sci::Position start) {
 	lines++;
 	if (lines >= lenLineStarts) {
 		const int newMaxLines = lines*2 + 14; // minimum 16
-		std::unique_ptr<int[]> newLineStarts = make_unique_for_overwrite<int[]>(newMaxLines);
+		std::unique_ptr<int[]> newLineStarts = std::make_unique<int[]>(newMaxLines);
 		if (lenLineStarts) {
 			//std::copy_n(lineStarts.get(), lenLineStarts, newLineStarts.get());
 			memcpy(newLineStarts.get(), lineStarts.get(), lenLineStarts*sizeof(int));
@@ -325,11 +319,11 @@ Interval LineLayout::Span(int start, int end) const noexcept {
 }
 
 Interval LineLayout::SpanByte(int index) const noexcept {
-	return Span(index, index+1);
+	return Span(index, index + 1);
 }
 
 int LineLayout::EndLineStyle() const noexcept {
-	return styles[numCharsBeforeEOL > 0 ? numCharsBeforeEOL - 1 : 0];
+	return styles[std::max(numCharsBeforeEOL - 1, 0)];
 }
 
 namespace {
