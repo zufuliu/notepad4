@@ -149,6 +149,6 @@ bool EditModel::IdleTaskTimeExpired() const noexcept {
 
 void EditModel::UpdateParallelLayoutThreshold() noexcept {
 	const uint32_t idleLength = durationWrapOneUnit.ActionsInAllowedTime(0.2);
-	minParallelLayoutLength = idleLength/16; // 12.5ms
+	minParallelLayoutLength = std::max(ParallelLayoutBlockSize, idleLength/64); // (1.5ms ~ 2ms)*2
 	maxParallelLayoutLength = idleLength*hardwareConcurrency;
 }

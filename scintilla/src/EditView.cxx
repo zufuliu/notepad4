@@ -378,7 +378,7 @@ struct LayoutWorker {
 	std::atomic<uint32_t> runningThread = 0;
 #endif
 
-	static constexpr int blockSize = 4096;
+	static constexpr int blockSize = EditModel::ParallelLayoutBlockSize;
 
 	void Layout(const TextSegment &ts, Surface *surface) {
 		const unsigned char styleSegment = ll->styles[ts.start];
@@ -454,7 +454,7 @@ struct LayoutWorker {
 		const uint32_t length = bfLayout.CurrentPos() - startPos;
 		if (length >= model.minParallelLayoutLength && model.hardwareConcurrency > 1) {
 			segmentCount = static_cast<uint32_t>(segmentList.size());
-			const uint32_t threadCount = std::min(length/blockSize, model.hardwareConcurrency);
+			const uint32_t threadCount = std::min(length/(blockSize/2), model.hardwareConcurrency);
 #if USE_STD_ASYNC_FUTURE
 			std::vector<std::future<void>> features;
 			for (uint32_t i = 0; i < threadCount; i++) {
