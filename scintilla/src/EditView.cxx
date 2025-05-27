@@ -750,8 +750,8 @@ uint32_t EditView::LayoutLine(const EditModel &model, Surface *surface, const Vi
 			//const ElapsedPeriod period;
 			ll->WrapLine(model.pdoc, posLineStart, vstyle.wrap.state, width, wrapIndent, partialLine);
 			//const double duration = period.Duration()*1e3;
-			//printf("wrap line=%zd(%d) duration=%f, lines=%d, %.0f/%d\n", line + 1, ll->lastSegmentEnd,
-			//	duration, ll->lines, ll->positions[ll->lastSegmentEnd], width);
+			//printf("wrap line=%zd(%d)%d duration=%f, lines=%d, %.0f/%d\n", line + 1, ll->lastSegmentEnd,
+			//	static_cast<int>(vstyle.wrap.state), duration, ll->lines, ll->positions[ll->lastSegmentEnd], width);
 		}
 
 		validity = LineLayout::ValidLevel::lines;
