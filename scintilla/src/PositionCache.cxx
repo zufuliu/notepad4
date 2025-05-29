@@ -185,8 +185,9 @@ int LineLayout::SubLineFromPosition(int posInLine, PointEnd pe) const noexcept {
 	posInLine += FlagSet(pe, PointEnd::subLineEnd) ? 1 : 0;
 	int line = 1;
 	for (; line < lines; line++) {
-		if (lineStarts[line] <= posInLine)
+		if (lineStarts[line] <= posInLine) {
 			break;
+		}
 	}
 
 	return line - 1;
@@ -375,7 +376,7 @@ void LineLayout::WrapLine(const Document *pdoc, Sci::Position posLineStart, Wrap
 	auto CharacterBoundary = [=](Sci::Position i, int moveDir, bool checkLineEnd = true) noexcept -> Sci::Position {
 		return pdoc->MovePositionOutsideChar(i + posLineStart, moveDir, checkLineEnd) - posLineStart;
 	};
-	auto UpdateWrapBreak = [=, this](Sci::Position i, WrapBreak &wbPrev) noexcept -> void {
+	auto UpdateWrapBreak = [=](Sci::Position i, WrapBreak &wbPrev) noexcept -> void {
 		if (UTF8IsAscii(chars[i])) {
 			wbPrev = static_cast<WrapBreak>(ASCIIWrapBreakTable[static_cast<uint8_t>(chars[i])]);
 		} else if (wrapState == Wrap::Auto) {
