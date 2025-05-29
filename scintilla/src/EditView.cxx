@@ -462,7 +462,7 @@ struct LayoutWorker {
 					DoWork();
 				}));
 			}
-			for (std::future<void> &f : features) {
+			for (auto &f : features) {
 				f.wait();
 			}
 

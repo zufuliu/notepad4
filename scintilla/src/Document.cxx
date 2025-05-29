@@ -245,14 +245,11 @@ LineEndType Document::LineEndTypesSupported() const noexcept {
 bool Document::SetDBCSCodePage(int dbcsCodePage_) {
 	if (dbcsCodePage != dbcsCodePage_) {
 		dbcsCodePage = dbcsCodePage_;
-		pcf.reset();
-		cb.SetLineEndTypes(lineEndBitSet & LineEndTypesSupported());
-		cb.SetUTF8Substance(CpUtf8 == dbcsCodePage);
-		DBCSCharClassify *classify = nullptr;
 		forwardSafeChar = 0xff;
 		backwardSafeChar = 0xff;
 		asciiForwardSafeChar = 0xff;
 		asciiBackwardSafeChar = 0xff;
+		DBCSCharClassify *classify = nullptr;
 		if (dbcsCodePage) {
 			forwardSafeChar = 0x7f;
 			backwardSafeChar = 0x7f;
@@ -262,13 +259,13 @@ bool Document::SetDBCSCodePage(int dbcsCodePage_) {
 				asciiForwardSafeChar = 0x80;
 				// minimum trail byte - 1
 				switch (dbcsCodePage) {
-				default:
+				default: // 932 Shift_jis, 936 GBK, 950 Big5
 					backwardSafeChar = 0x40 - 1;
 					break;
-				case 949:
+				case 949: // Korean Wansung KS C-5601-1987
 					backwardSafeChar = 0x41 - 1;
 					break;
-				case 1361:
+				case 1361: // Korean Johab KS C-5601-1992
 					backwardSafeChar = 0x31 - 1;
 					break;
 				}
@@ -276,8 +273,12 @@ bool Document::SetDBCSCodePage(int dbcsCodePage_) {
 				classify = new DBCSCharClassify(dbcsCodePage);
 			}
 		}
+
 		dbcsCharClass.reset(classify);
+		pcf.reset();
 		regex.reset();
+		cb.SetLineEndTypes(lineEndBitSet & LineEndTypesSupported());
+		cb.SetUTF8Substance(CpUtf8 == dbcsCodePage);
 		ModifiedAt(0);	// Need to restyle whole document
 		return true;
 	} else {
