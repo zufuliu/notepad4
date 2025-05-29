@@ -217,7 +217,7 @@ initial inherit unset revert revert-layer
 // CSS Color Module Level 3 https://www.w3.org/TR/css-color-3/ 18 January 2022
 // Colors and Backgrounds https://www.w3.org/TR/CSS22/colors.html
 {
-	color: color-mix(), color-contrast(), rgb(), rgba(), hsl(), hsla(), hwb(), lab(), oklab(), lch(), oklch(), color(), device-cmyk(), light-dark()，contrast-color(), currentColor;
+	color: color-mix(), color-contrast(), rgb(), rgba(), hsl(), hsla(), hwb(), lab(), oklab(), lch(), oklch(), color(), device-cmyk(), light-dark(), contrast-color(), currentColor;
 	color: Canvas, CanvasText, LinkText, VisitedText, ActiveText, ButtonFace, ButtonText, ButtonBorder, Field, FieldText, Highlight, HighlightText, Mark, MarkText, GrayText;
 	opacity: inherit;
 }

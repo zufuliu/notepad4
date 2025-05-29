@@ -79,6 +79,9 @@ def BuildKeywordContent(rid, lexer, keywordList, keywordCount=16):
 		lines = None
 		if items:
 			items = set(items)
+			for item in items: # check ASCII graphic character
+				if any(c <= ' ' or c > '~' for c in item):
+					print(rid, item)
 			makeLower = False
 			if attr & KeywordAttr.MakeLower:
 				lowercase = to_lower(items)
