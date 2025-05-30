@@ -25,7 +25,7 @@ IF /I "%~1" == "i686" (
 IF /I "%~1" == "llvm" (
   SHIFT
   @rem for CI purpose only, the result binary is dynamic linked against api-ms-win-crt*.dll instead of msvcrt.dll
-  curl -fsSL -o "llvm-mingw-20250514-ucrt-x86_64.zip" "https://github.com/mstorsjo/llvm-mingw/releases/download/20250514/llvm-mingw-20250514-ucrt-x86_64.zip"
-  7z x -y -o"C:\" "llvm-mingw-20250514-ucrt-x86_64.zip" >NUL
-  move /Y "C:\llvm-mingw-20250514-ucrt-x86_64" "C:\llvm-mingw"
+  curl -fsSL -o "llvm-mingw-20250528-ucrt-x86_64.zip" "https://github.com/mstorsjo/llvm-mingw/releases/download/20250528/llvm-mingw-20250528-ucrt-x86_64.zip"
+  7z x -y -o"C:\" "llvm-mingw-20250528-ucrt-x86_64.zip" >NUL
+  move /Y "C:\llvm-mingw-20250528-ucrt-x86_64" "C:\llvm-mingw"
 )
