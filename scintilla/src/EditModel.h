@@ -57,9 +57,9 @@ public:
 	uint32_t minParallelLayoutLength;
 	uint32_t maxParallelLayoutLength;
 	ActionDuration durationWrapOneUnit;
-	ActionDuration durationWrapOneThread;
 	static constexpr uint32_t IdleLineWrapTime = 250;
 	static constexpr uint32_t MaxPaintTextTime = 16; // 60Hz
+	static constexpr uint32_t ParallelLayoutBlockSize = 4096;
 	void *idleTaskTimer;
 
 	EditModel();

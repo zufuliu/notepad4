@@ -61,7 +61,7 @@ Caret::Caret() noexcept :
 EditModel::EditModel() :
 	reprs{std::make_unique<SpecialRepresentations>()},
 	pcs{ContractionStateCreate(false)},
-	durationWrapOneUnit(0.01 / 64), durationWrapOneThread(0.01 / 16) {
+	durationWrapOneUnit(0.01 / 64) {
 	inOverstrike = false;
 	trackLineWidth = false;
 	hasFocus = false;
@@ -148,7 +148,7 @@ bool EditModel::IdleTaskTimeExpired() const noexcept {
 }
 
 void EditModel::UpdateParallelLayoutThreshold() noexcept {
-	minParallelLayoutLength = durationWrapOneThread.ActionsInAllowedTime(0.01);
 	const uint32_t idleLength = durationWrapOneUnit.ActionsInAllowedTime(0.2);
-	maxParallelLayoutLength = std::max(minParallelLayoutLength*hardwareConcurrency, idleLength);
+	minParallelLayoutLength = std::max(ParallelLayoutBlockSize, idleLength/64); // (1.5ms ~ 2ms)*2
+	maxParallelLayoutLength = idleLength*hardwareConcurrency;
 }

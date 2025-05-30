@@ -378,7 +378,7 @@ struct LayoutWorker {
 	std::atomic<uint32_t> runningThread = 0;
 #endif
 
-	static constexpr int blockSize = 4096;
+	static constexpr int blockSize = EditModel::ParallelLayoutBlockSize;
 
 	void Layout(const TextSegment &ts, Surface *surface) {
 		const unsigned char styleSegment = ll->styles[ts.start];
@@ -434,7 +434,7 @@ struct LayoutWorker {
 		const int startPos = ll->lastSegmentEnd;
 		const int endPos = ll->numCharsInLine;
 		if (endPos - startPos > blockSize*2 && !model.BidirectionalEnabled()) {
-			posInLine = std::max<uint32_t>(posInLine, ll->caretPosition) + blockSize;
+			posInLine = std::max<uint32_t>(posInLine, std::max(startPos, ll->caretPosition)) + blockSize;
 			if (static_cast<int>(endPos - posInLine) < blockSize) {
 				posInLine = endPos;
 			} else if (option < LayoutLineOption::IdleUpdate) {
@@ -454,7 +454,7 @@ struct LayoutWorker {
 		const uint32_t length = bfLayout.CurrentPos() - startPos;
 		if (length >= model.minParallelLayoutLength && model.hardwareConcurrency > 1) {
 			segmentCount = static_cast<uint32_t>(segmentList.size());
-			const uint32_t threadCount = std::min(length/blockSize, model.hardwareConcurrency);
+			const uint32_t threadCount = std::min(length/(blockSize/2), model.hardwareConcurrency);
 #if USE_STD_ASYNC_FUTURE
 			std::vector<std::future<void>> features;
 			for (uint32_t i = 0; i < threadCount; i++) {
@@ -462,7 +462,7 @@ struct LayoutWorker {
 					DoWork();
 				}));
 			}
-			for (std::future<void> &f : features) {
+			for (auto &f : features) {
 				f.wait();
 			}
 
@@ -576,8 +576,8 @@ struct LayoutWorker {
 * Copy the given @a line and its styles from the document into local arrays.
 * Also determine the x position at which each character starts.
 */
-uint64_t EditView::LayoutLine(const EditModel &model, Surface *surface, const ViewStyle &vstyle, LineLayout *ll, int width, LayoutLineOption option, int posInLine) {
-	uint64_t wrappedBytes = 0; // only care about time spend on MeasureWidths()
+uint32_t EditView::LayoutLine(const EditModel &model, Surface *surface, const ViewStyle &vstyle, LineLayout *ll, int width, LayoutLineOption option, int posInLine) {
+	uint32_t wrappedBytes = 0; // only care about time spend on MeasureWidths()
 	const Sci::Line line = ll->LineNumber();
 	PLATFORM_ASSERT(line < model.pdoc->LinesTotal());
 	PLATFORM_ASSERT(ll->chars);
@@ -683,13 +683,13 @@ uint64_t EditView::LayoutLine(const EditModel &model, Surface *surface, const Vi
 		const TextSegment &ts = worker.segmentList[finishedCount - 1];
 		const int endPos = ts.end();
 		const uint32_t bytes = endPos - ll->lastSegmentEnd;
-		wrappedBytes = bytes | (static_cast<uint64_t>(bytes / threadCount) << 32);
+		wrappedBytes = bytes / threadCount;
 #if 0
 		if (bytes > LayoutWorker::blockSize) {
 			const double duration = period.Duration()*1e3;
 			printf("layout line=%zd segment=(%u / %zu), posInLine=(%d / %d) (%u / %u, %u), duration=%f, %f\n", line + 1,
 				finishedCount, worker.segmentList.size(), worker.maxPosInLine, ll->maxLineLength,
-				bytes, threadCount, bytes / threadCount, duration, model.durationWrapOneThread.Duration()*1e3);
+				bytes, threadCount, wrappedBytes, duration, model.durationWrapOneUnit.Duration()*1e3);
 		}
 #endif
 		ll->lastSegmentEnd = endPos;
@@ -747,9 +747,11 @@ uint64_t EditView::LayoutLine(const EditModel &model, Surface *surface, const Vi
 			if ((FlagSet(vstyle.wrap.visualFlags, WrapVisualFlag::Start)) && (wrapIndent < aveCharWidth)) {
 				wrapIndent = aveCharWidth; // Indent to show start visual
 			}
+			//const ElapsedPeriod period;
 			ll->WrapLine(model.pdoc, posLineStart, vstyle.wrap.state, width, wrapIndent, partialLine);
 			//const double duration = period.Duration()*1e3;
-			//printf("wrap line=%zd duration=%f\n", line + 1, duration);
+			//printf("wrap line=%zd(%d)%d duration=%f, lines=%d, %.0f/%d\n", line + 1, ll->lastSegmentEnd,
+			//	static_cast<int>(vstyle.wrap.state), duration, ll->lines, ll->positions[ll->lastSegmentEnd], width);
 		}
 
 		validity = LineLayout::ValidLevel::lines;

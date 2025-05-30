@@ -1533,7 +1533,6 @@ bool Editor::WrapBlock(Surface *surface, Sci::Line lineToWrap, Sci::Line lineToW
 	// Wrap all the long lines in the main thread.
 	// LayoutLine may then multi-thread over segments in each line.
 	uint32_t wrappedBytesAllThread = 0;
-	uint32_t wrappedBytesOneThread = 0;
 	for (size_t index = 0; index < linesBeingWrapped; index++) {
 		const Sci::Line lineNumber = lineToWrap + index;
 		const Sci::Position lineStart = pdoc->LineStart(lineNumber);
@@ -1545,9 +1544,8 @@ bool Editor::WrapBlock(Surface *surface, Sci::Line lineToWrap, Sci::Line lineToW
 		} else {
 			ll->caretPosition = 0;
 		}
-		const uint64_t wrappedBytes = view.LayoutLine(*this, surface, vs, ll, wrapWidth, LayoutLineOption::IdleUpdate);
-		wrappedBytesAllThread += wrappedBytes & UINT32_MAX;
-		wrappedBytesOneThread += wrappedBytes >> 32;
+		const uint32_t wrappedBytes = view.LayoutLine(*this, surface, vs, ll, wrapWidth, LayoutLineOption::IdleUpdate);
+		wrappedBytesAllThread += wrappedBytes;
 		linesAfterWrap[index] = ll->lines;
 		if (ll->PartialPosition()) {
 			partialLine = lineNumber;
@@ -1557,7 +1555,6 @@ bool Editor::WrapBlock(Surface *surface, Sci::Line lineToWrap, Sci::Line lineToW
 
 	const double duration = epWrapping.Duration();
 	durationWrapOneUnit.AddSample(wrappedBytesAllThread, duration);
-	durationWrapOneThread.AddSample(wrappedBytesOneThread, duration);
 	UpdateParallelLayoutThreshold();
 
 	bool wrapOccurred = false;
@@ -1601,18 +1598,16 @@ bool Editor::WrapLines(WrapScope ws) {
 		}
 		wrapPending.Reset();
 	} else if (wrapPending.NeedsWrap()) {
-		wrapPending.start = std::min(wrapPending.start, maxEditorLine);
-		if (!SetIdle(true)) {
-			// Idle processing not supported so full wrap required.
-			ws = WrapScope::wsAll;
-		}
+		SetIdle(true);
 		// Decide where to start wrapping
+		wrapPending.start = std::min(wrapPending.start, maxEditorLine);
 		Sci::Line lineToWrap = wrapPending.start;
-		Sci::Line lineToWrapEnd = std::min(wrapPending.end, maxEditorLine);
+		const Sci::Line lineEndNeedWrap = std::min(wrapPending.end, maxEditorLine);
+		Sci::Line lineToWrapEnd = lineEndNeedWrap;
 		const Sci::Line lineDocTop = pcs->DocFromDisplay(topLine);
 		const Sci::Line subLineTop = topLine - pcs->DisplayFromDoc(lineDocTop);
 		if (ws == WrapScope::wsVisible) {
-			lineToWrap = std::clamp(lineDocTop - 5, wrapPending.start, maxEditorLine);
+			lineToWrap = std::max(lineDocTop - 5, lineToWrap);
 			// Priority wrap to just after visible area.
 			// Since wrapping could reduce display lines, treat each
 			// as taking only one display line.
@@ -1630,14 +1625,13 @@ bool Editor::WrapLines(WrapScope ws) {
 				// Currently visible text does not need wrapping
 				return false;
 			}
-		} else if (ws == WrapScope::wsIdle) {
+		} else /*if (ws == WrapScope::wsIdle)*/ {
 			// Try to keep time taken by wrapping reasonable so interaction remains smooth.
 			constexpr double secondsAllowed = 0.01;
 			const int actionsInAllowedTime = durationWrapOneUnit.ActionsInAllowedTime(secondsAllowed);
 			lineToWrapEnd = pdoc->LineFromPositionAfter(lineToWrap, actionsInAllowedTime);
 		}
 
-		const Sci::Line lineEndNeedWrap = std::min(wrapPending.end, maxEditorLine);
 		lineToWrapEnd = std::min(lineToWrapEnd, lineEndNeedWrap);
 		Sci::Line partialLine = Sci::invalidPosition;
 		// Ensure all lines being wrapped are styled.
@@ -1664,9 +1658,9 @@ bool Editor::WrapLines(WrapScope ws) {
 		}
 #if 0
 		constexpr double scale = 1e3; // 1 KiB in millisecond
-		printf("%s idle style duration: %f, wrap duration: %f, %f, parallel=%u, %u\n", __func__,
+		printf("%s idle style duration: %f, wrap duration: %f, parallel=%u, %u\n", __func__,
 			pdoc->durationStyleOneUnit.Duration()*scale,
-			durationWrapOneUnit.Duration()*scale, durationWrapOneThread.Duration()*scale,
+			durationWrapOneUnit.Duration()*scale,
 			minParallelLayoutLength/1024, maxParallelLayoutLength/1024);
 #endif
 	}
@@ -1795,7 +1789,6 @@ void Editor::Paint(Surface *surfaceWindow, PRectangle rcArea) {
 	RefreshStyleData();
 	if (paintState == PaintState::abandoned)
 		return;	// Scroll bars may have changed so need redraw
-	RefreshPixMaps(surfaceWindow);
 
 	paintAbandonedByStyling = false;
 
@@ -1807,7 +1800,6 @@ void Editor::Paint(Surface *surfaceWindow, PRectangle rcArea) {
 
 	if (NotifyUpdateUI()) {
 		RefreshStyleData();
-		RefreshPixMaps(surfaceWindow);
 	}
 
 	// Wrap the visible lines if needed.
@@ -1817,9 +1809,9 @@ void Editor::Paint(Surface *surfaceWindow, PRectangle rcArea) {
 		if (AbandonPaint()) {
 			return;
 		}
-		RefreshPixMaps(surfaceWindow);	// In case pixmaps invalidated by scrollbar change
 	}
 
+	RefreshPixMaps(surfaceWindow);
 	if (!marginView.pixmapSelPattern->Initialised()) {
 		// When Direct2D is used, pixmap creation may fail with D2DERR_RECREATE_TARGET so
 		// abandon this paint to avoid further failures.

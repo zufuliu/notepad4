@@ -1371,5 +1371,6 @@ void EditFormatCode(int menu) noexcept {
 			}
 		}
 	} catch (...) {
+		// ignore
 	}
 }
