@@ -157,7 +157,7 @@ int LineLayout::LineLength(int line) const noexcept {
 int LineLayout::LineLastVisible(int line, Scope scope) const noexcept {
 	if (line < 0) {
 		return 0;
-	} else if ((line >= lines - 1) || !lineStarts) {
+	} else if ((line + 1 >= lines) || !lineStarts) {
 		if (PartialPosition()) {
 			return lastSegmentEnd;
 		}
@@ -376,7 +376,7 @@ void LineLayout::WrapLine(const Document *pdoc, Sci::Position posLineStart, Wrap
 	auto CharacterBoundary = [=](Sci::Position i, int moveDir, bool checkLineEnd = true) noexcept -> Sci::Position {
 		return pdoc->MovePositionOutsideChar(i + posLineStart, moveDir, checkLineEnd) - posLineStart;
 	};
-	auto UpdateWrapBreak = [=](Sci::Position i, WrapBreak &wbPrev) noexcept -> void {
+	auto UpdateWrapBreak = [=, this](Sci::Position i, WrapBreak &wbPrev) noexcept -> void {
 		if (UTF8IsAscii(chars[i])) {
 			wbPrev = static_cast<WrapBreak>(ASCIIWrapBreakTable[static_cast<uint8_t>(chars[i])]);
 		} else if (wrapState == Wrap::Auto) {
