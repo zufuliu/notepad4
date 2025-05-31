@@ -1046,16 +1046,12 @@ BreakFinder::BreakFinder(const LineLayout *ll_, const Selection *psel, Range lin
 	}
 
 	if (FlagSet(breakFor, BreakFor::Selection)) {
-		const SelectionPosition posStart(posLineStart);
-		const SelectionPosition posEnd(posLineStart + endPos);
-		const SelectionSegment segmentLine(posStart, posEnd);
+		const SelectionSegment segmentLine(posLineStart, posLineStart + lineRange.end);
 		for (size_t r = 0; r < psel->Count(); r++) {
 			const SelectionSegment portion = psel->Range(r).Intersect(segmentLine);
-			if (!(portion.start == portion.end)) {
-				if (portion.start.IsValid())
-					Insert(portion.start.Position() - posLineStart);
-				if (portion.end.IsValid())
-					Insert(portion.end.Position() - posLineStart);
+			if (!portion.Empty()) {
+				Insert(portion.start.Position() - posLineStart);
+				Insert(portion.end.Position() - posLineStart);
 			}
 		}
 		// On the curses platform, the terminal is drawing its own caret, so add breaks around the

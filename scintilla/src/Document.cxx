@@ -19,6 +19,7 @@
 #include <string_view>
 #include <vector>
 #include <array>
+//#include <map>
 #include <forward_list>
 #include <optional>
 #include <algorithm>
@@ -1220,7 +1221,7 @@ size_t Document::SafeSegment(const char *text, size_t lengthSegment, EncodingFam
 		const CharacterClass ccPrev = charClass.GetClass(*it);
 		do {
 			--it;
-			uint8_t ch = *it;
+			const uint8_t ch = *it;
 			const CharacterClass cc = charClass.GetClass(ch);
 			if (cc != ccPrev) {
 				lastPunctuationBreak = it - text + 1;
@@ -1315,33 +1316,36 @@ bool Document::DeleteChars(Sci::Position pos, Sci::Position len) {
 	CheckReadOnly();
 	if (enteredModification != 0) {
 		return false;
-	} else {
-		enteredModification++;
-		if (!cb.IsReadOnly()) {
-			NotifyModified(
-				DocModification(
-					ModificationFlags::BeforeDelete | ModificationFlags::User,
-					pos, len,
-					0, nullptr));
-			const Sci::Line prevLinesTotal = LinesTotal();
-			const bool startSavePoint = cb.IsSavePoint();
-			bool startSequence = false;
-			const char *text = cb.DeleteChars(pos, len, startSequence);
-			if (startSavePoint && cb.IsCollectingUndo())
-				NotifySavePoint(false);
-			if ((pos < LengthNoExcept()) || (pos == 0))
-				ModifiedAt(pos);
-			else
-				ModifiedAt(pos - 1);
-			NotifyModified(
-				DocModification(
-					ModificationFlags::DeleteText | ModificationFlags::User |
-					(startSequence ? ModificationFlags::StartAction : ModificationFlags::None),
-					pos, len,
-					LinesTotal() - prevLinesTotal, text));
-		}
-		enteredModification--;
 	}
+	enteredModification++;
+	if (!cb.IsReadOnly()) {
+		if (cb.IsCollectingUndo() && cb.CanRedo()) {
+			// Abandoning some undo actions so truncate any later selections
+			TruncateUndoComments(cb.UndoCurrent());
+		}
+		NotifyModified(
+			DocModification(
+				ModificationFlags::BeforeDelete | ModificationFlags::User,
+				pos, len,
+				0, nullptr));
+		const Sci::Line prevLinesTotal = LinesTotal();
+		const bool startSavePoint = cb.IsSavePoint();
+		bool startSequence = false;
+		const char *text = cb.DeleteChars(pos, len, startSequence);
+		if (startSavePoint && cb.IsCollectingUndo())
+			NotifySavePoint(false);
+		if ((pos < LengthNoExcept()) || (pos == 0))
+			ModifiedAt(pos);
+		else
+			ModifiedAt(pos - 1);
+		NotifyModified(
+			DocModification(
+				ModificationFlags::DeleteText | ModificationFlags::User |
+				(startSequence ? ModificationFlags::StartAction : ModificationFlags::None),
+				pos, len,
+				LinesTotal() - prevLinesTotal, text));
+	}
+	enteredModification--;
 	return !cb.IsReadOnly();
 }
 
@@ -1387,6 +1391,10 @@ Sci::Position Document::InsertString(Sci::Position position, const char *s, Sci:
 	if (insertionSet) {
 		s = insertion.c_str();
 		insertLength = insertion.length();
+	}
+	if (cb.IsCollectingUndo() && cb.CanRedo()) {
+		// Abandoning some undo actions so truncate any later selections
+		TruncateUndoComments(cb.UndoCurrent());
 	}
 	NotifyModified(
 		DocModification(
@@ -1575,6 +1583,16 @@ Sci::Position Document::Redo() {
 		enteredModification--;
 	}
 	return newPos;
+}
+
+void Document::EndUndoAction() noexcept {
+	cb.EndUndoAction();
+	if (UndoSequenceDepth() == 0) {
+		// Broadcast notification to views to allow end of group processing.
+		// NotifyGroupCompleted may throw (for memory exhaustion) but this method
+		// may not as it is called in UndoGroup destructor so ignore exception.
+		NotifyGroupCompleted();
+	}
 }
 
 int Document::UndoSequenceDepth() const noexcept {
@@ -2586,6 +2604,46 @@ void Document::SetLexInterface(std::unique_ptr<LexInterface> pLexInterface) noex
 	pli = std::move(pLexInterface);
 }
 
+#if 0
+void Document::SetViewState(void *view, ViewStateShared pVSS) {
+	if (pVSS) {
+		viewData[view] = std::move(pVSS);
+	} else {
+		viewData.erase(view);
+	}
+}
+
+ViewStateShared Document::GetViewState(void *view) const noexcept {
+	auto it = viewData.find(view);
+
+	if (it != viewData.end()) {
+		return it->second;
+	}
+	return {};
+}
+
+void Document::TruncateUndoComments(int action) {
+	for (auto &[key, value] : viewData) {
+		value->TruncateUndo(action);
+	}
+}
+
+#else
+void Document::SetViewState([[maybe_unused]] void *view, ViewStateShared pVSS) noexcept {
+	viewData = std::move(pVSS);
+}
+
+ViewStateShared Document::GetViewState([[maybe_unused]] void *view) const noexcept {
+	return viewData;
+}
+
+void Document::TruncateUndoComments(int action) {
+	if (viewData) {
+		viewData->TruncateUndo(action);
+	}
+}
+#endif
+
 int SCI_METHOD Document::SetLineState(Sci_Line line, int state) {
 	const int statePrevious = States()->SetLineState(line, state, LinesTotal());
 	if (state != statePrevious) {
@@ -2791,6 +2849,12 @@ void Document::NotifySavePoint(bool atSavePoint) noexcept {
 	}
 	for (const auto &watcher : watchers) {
 		watcher.watcher->NotifySavePoint(this, watcher.userData, atSavePoint);
+	}
+}
+
+void Document::NotifyGroupCompleted() noexcept {
+	for (const WatcherWithUserData &watcher : watchers) {
+		watcher.watcher->NotifyGroupCompleted(this, watcher.userData);
 	}
 }
 

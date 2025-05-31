@@ -10,6 +10,8 @@
 #include <vector>
 
 #include "ILexer.h"
+#include "Scintilla.h"
+
 #include "LexAccessor.h"
 #include "CharacterSet.h"
 #include "LexerUtils.h"

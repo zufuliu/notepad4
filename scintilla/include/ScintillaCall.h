@@ -347,6 +347,8 @@ public:
 	Position FormatRangeFull(bool draw, const RangeToFormatFull *fr);
 	void SetChangeHistory(Scintilla::ChangeHistoryOption changeHistory);
 	Scintilla::ChangeHistoryOption ChangeHistory();
+	void SetUndoSelectionHistory(Scintilla::UndoSelectionHistoryOption undoSelectionHistory);
+	Scintilla::UndoSelectionHistoryOption UndoSelectionHistory();
 	Line FirstVisibleLine();
 	Position GetLine(Line line, char *text);
 	std::string GetLine(Line line);

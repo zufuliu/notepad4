@@ -301,6 +301,11 @@ enum class ChangeHistoryOption {
 	Indicators = 4,
 };
 
+enum class UndoSelectionHistoryOption {
+	Disabled = 0,
+	Enabled = 1,
+};
+
 enum class NotificationPosition {
 	None = 0,
 	Default = 1,

@@ -58,6 +58,42 @@ using namespace Scintilla::Internal;
 Caret::Caret() noexcept :
 	active(false), on(false), period(500) {}
 
+void ModelState::RememberSelectionForUndo(int index, const Selection &sel) {
+	historyForUndo.indexCurrent = index;
+	historyForUndo.ssCurrent = sel.ToString();
+}
+
+void ModelState::ForgetSelectionForUndo() noexcept {
+	historyForUndo.indexCurrent = -1;
+}
+
+void ModelState::RememberSelectionOntoStack(int index, Sci::Line topLine) {
+	if ((historyForUndo.indexCurrent >= 0) && (index == historyForUndo.indexCurrent + 1)) {
+		// Don't overwrite initial selection save if most recent action was coalesced
+		historyForUndo.stack[index] = { historyForUndo.ssCurrent, topLine };
+	}
+}
+
+void ModelState::RememberSelectionForRedoOntoStack(int index, const Selection &sel, Sci::Line topLine) {
+	historyForRedo.stack[index] = { sel.ToString(), topLine };
+}
+
+SelectionWithScroll ModelState::SelectionFromStack(int index, UndoRedo history) const {
+	const SelectionHistory &sh = history == UndoRedo::undo ? historyForUndo : historyForRedo;
+	const SelectionStack::const_iterator it = sh.stack.find(index);
+	if (it != sh.stack.end()) {
+		return it->second;
+	}
+	return {};
+}
+
+void ModelState::TruncateUndo(int index) {
+	const SelectionStack::const_iterator itUndo = historyForUndo.stack.find(index);
+	historyForUndo.stack.erase(itUndo, historyForUndo.stack.end());
+	const SelectionStack::const_iterator itRedo = historyForRedo.stack.find(index);
+	historyForRedo.stack.erase(itRedo, historyForRedo.stack.end());
+}
+
 EditModel::EditModel() :
 	reprs{std::make_unique<SpecialRepresentations>()},
 	pcs{ContractionStateCreate(false)},
@@ -93,6 +129,7 @@ EditModel::EditModel() :
 }
 
 EditModel::~EditModel() {
+	pdoc->SetViewState(this, {});
 	pdoc->Release();
 	pdoc = nullptr;
 	CloseHandle(idleTaskTimer);
@@ -135,6 +172,29 @@ InSelection EditModel::LineEndInSelection(Sci::Line lineDoc) const noexcept {
 
 MarkerMask EditModel::GetMark(Sci::Line line) const noexcept {
 	return pdoc->GetMark(line, FlagSet(changeHistoryOption, ChangeHistoryOption::Markers));
+}
+
+void EditModel::EnsureModelState() {
+	if (!modelState && (undoSelectionHistoryOption == UndoSelectionHistoryOption::Enabled)) {
+		if (auto vss = pdoc->GetViewState(this)) {
+#if USE_RTTI
+			modelState = std::dynamic_pointer_cast<ModelState>(vss);
+#else
+			modelState = std::static_pointer_cast<ModelState>(vss);
+#endif
+		} else {
+			modelState = std::make_shared<ModelState>();
+			pdoc->SetViewState(this, std::static_pointer_cast<ViewState>(modelState));
+		}
+	}
+}
+
+void EditModel::ChangeUndoSelectionHistory(Scintilla::UndoSelectionHistoryOption undoSelectionHistoryOptionNew) noexcept {
+	undoSelectionHistoryOption = undoSelectionHistoryOptionNew;
+	if (undoSelectionHistoryOption == UndoSelectionHistoryOption::Disabled) {
+		modelState.reset();
+		pdoc->SetViewState(this, {});
+	}
 }
 
 void EditModel::SetIdleTaskTime(uint32_t milliseconds) const noexcept {

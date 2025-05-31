@@ -19,6 +19,36 @@ public:
 	Caret() noexcept;
 };
 
+enum class UndoRedo { undo, redo };
+
+// Selection stack is sparse so use a map
+
+struct SelectionWithScroll final {
+	std::string selection;
+	Sci::Line topLine = 0;
+};
+
+using SelectionStack = std::map<int, SelectionWithScroll>;
+
+struct SelectionHistory final {
+	int indexCurrent = 0;
+	std::string ssCurrent;
+	SelectionStack stack;
+};
+
+struct ModelState final : ViewState {
+	SelectionHistory historyForUndo;
+	SelectionHistory historyForRedo;
+	void RememberSelectionForUndo(int index, const Selection &sel);
+	void ForgetSelectionForUndo() noexcept;
+	void RememberSelectionOntoStack(int index, Sci::Line topLine);
+	void RememberSelectionForRedoOntoStack(int index, const Selection &sel, Sci::Line topLine);
+	SelectionWithScroll SelectionFromStack(int index, UndoRedo history) const;
+	void TruncateUndo(int index);
+};
+
+using ModelStateShared = std::shared_ptr<ModelState>;
+
 class EditModel {
 public:
 	Document *pdoc;
@@ -47,9 +77,12 @@ public:
 	// Hotspot support
 	Range hotspot;
 	bool hotspotSingleLine;
+	bool needRedoRemembered = false;
 	Sci::Position hoverIndicatorPos;
 
 	Scintilla::ChangeHistoryOption changeHistoryOption = Scintilla::ChangeHistoryOption::Disabled;
+	Scintilla::UndoSelectionHistoryOption undoSelectionHistoryOption = UndoSelectionHistoryOption::Disabled;
+	ModelStateShared modelState;
 
 	// Wrapping support
 	int wrapWidth;
@@ -83,6 +116,10 @@ public:
 	const char *GetFoldDisplayText(Sci::Line lineDoc, bool partialLine) const noexcept;
 	InSelection LineEndInSelection(Sci::Line lineDoc) const noexcept;
 	[[nodiscard]] MarkerMask GetMark(Sci::Line line) const noexcept;
+
+	void EnsureModelState();
+	void ChangeUndoSelectionHistory(Scintilla::UndoSelectionHistoryOption undoSelectionHistoryOptionNew) noexcept;
+
 	void SetIdleTaskTime(uint32_t milliseconds) const noexcept;
 	bool IdleTaskTimeExpired() const noexcept;
 	void UpdateParallelLayoutThreshold() noexcept;
