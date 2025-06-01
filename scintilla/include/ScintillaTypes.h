@@ -531,6 +531,7 @@ enum class Technology {
 	DirectWrite = 1,
 	DirectWriteRetain = 2,
 	DirectWriteDC = 3,
+	DirectWrite1 = 4,
 };
 
 enum class LineEndType {

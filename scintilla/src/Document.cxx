@@ -129,6 +129,9 @@ int ActionDuration::ActionsInAllowedTime(double secondsAllowed) const noexcept {
 	return actions * unitBytes;
 }
 
+constexpr CharacterExtracted characterEmpty(unicodeReplacementChar, 0);
+constexpr CharacterExtracted characterBadByte(unicodeReplacementChar, 1);
+
 CharacterExtracted::CharacterExtracted(const unsigned char *charBytes, size_t widthCharBytes) noexcept {
 	const int utf8status = UTF8ClassifyMulti(charBytes, widthCharBytes);
 	if (utf8status & UTF8MaskInvalid) {
@@ -991,7 +994,7 @@ bool Document::NextCharacter(Sci::Position &pos, int moveDir) const noexcept {
 
 CharacterExtracted Document::CharacterAfter(Sci::Position position) const noexcept {
 	if (position >= LengthNoExcept()) {
-		return CharacterExtracted(unicodeReplacementChar, 0);
+		return characterEmpty;
 	}
 	const unsigned char leadByte = cb.UCharAt(position);
 	if (UTF8IsAscii(leadByte) || !dbcsCodePage) {
@@ -1018,7 +1021,7 @@ CharacterExtracted Document::CharacterAfter(Sci::Position position) const noexce
 
 CharacterExtracted Document::CharacterBefore(Sci::Position position) const noexcept {
 	if (position <= 0) {
-		return CharacterExtracted(unicodeReplacementChar, 0);
+		return characterEmpty;
 	}
 	const unsigned char previousByte = cb.UCharAt(position - 1);
 	if (0 == dbcsCodePage) {
@@ -1044,7 +1047,7 @@ CharacterExtracted Document::CharacterBefore(Sci::Position position) const noexc
 			}
 			// Else invalid UTF-8 so return position of isolated trail byte
 		}
-		return CharacterExtracted(unicodeReplacementChar, 1);
+		return characterBadByte;
 	} else {
 		// Moving backwards in DBCS is complex so use NextPosition
 		const Sci::Position posStartCharacter = NextPosition(position, -1);
@@ -2613,7 +2616,7 @@ void Document::SetViewState(void *view, ViewStateShared pVSS) {
 	}
 }
 
-ViewStateShared Document::GetViewState(void *view) const noexcept {
+ViewStateShared Document::GetViewState(void *view) const {
 	auto it = viewData.find(view);
 
 	if (it != viewData.end()) {
@@ -3464,8 +3467,8 @@ bool MatchOnLines(const Document *doc, const Regex &regexp, const RESearchRange 
 	if (resr.increment > 0) {
 		const Sci::Position lineStartPos = doc->LineStart(resr.lineRangeStart);
 		const Sci::Position lineEndPos = doc->LineEnd(resr.lineRangeEnd);
-		Iterator itStart(doc, resr.startPos, true);
-		Iterator itEnd(doc, resr.endPos);
+		const Iterator itStart(doc, resr.startPos, true);
+		const Iterator itEnd(doc, resr.endPos);
 		boost::regex_constants::match_flag_type flagsMatch = MatchFlags(doc, resr.startPos, resr.endPos, lineStartPos, lineEndPos);
 		if (FlagSet(flags, FindOption::RegexDotAll)) {
 			flagsMatch = flagsMatch & ~boost::regex_constants::match_not_dot_newline;
@@ -3477,8 +3480,8 @@ bool MatchOnLines(const Document *doc, const Regex &regexp, const RESearchRange 
 			const Sci::Position lineStartPos = doc->LineStart(line);
 			const Sci::Position lineEndPos = doc->LineEnd(line);
 			const Range lineRange = resr.LineRange(line, lineStartPos, lineEndPos);
-			Iterator itStart(doc, lineRange.start, true);
-			Iterator itEnd(doc, lineRange.end);
+			const Iterator itStart(doc, lineRange.start, true);
+			const Iterator itEnd(doc, lineRange.end);
 			const boost::regex_constants::match_flag_type flagsMatch = MatchFlags(doc, lineRange.start, lineRange.end, lineStartPos, lineEndPos);
 			boost::regex_iterator<Iterator> it(itStart, itEnd, regexp, flagsMatch);
 			for (const boost::regex_iterator<Iterator> last; it != last; ++it) {
@@ -3579,8 +3582,8 @@ bool MatchOnLines(const Document *doc, const Regex &regexp, const RESearchRange 
 	if (resr.increment > 0) {
 		const Sci::Position lineStartPos = doc->LineStart(resr.lineRangeStart);
 		const Sci::Position lineEndPos = doc->LineEnd(resr.lineRangeEnd);
-		Iterator itStart(doc, resr.startPos, true);
-		Iterator itEnd(doc, resr.endPos);
+		const Iterator itStart(doc, resr.startPos, true);
+		const Iterator itEnd(doc, resr.endPos);
 		const std::regex_constants::match_flag_type flagsMatch = MatchFlags(doc, resr.startPos, resr.endPos, lineStartPos, lineEndPos);
 		matched = std::regex_search(itStart, itEnd, match, regexp, flagsMatch);
 		goto labelMatched;
@@ -3592,8 +3595,8 @@ bool MatchOnLines(const Document *doc, const Regex &regexp, const RESearchRange 
 			const Sci::Position lineStartPos = doc->LineStart(line);
 			const Sci::Position lineEndPos = doc->LineEnd(line);
 			const Range lineRange = resr.LineRange(line, lineStartPos, lineEndPos);
-			Iterator itStart(doc, lineRange.start, true);
-			Iterator itEnd(doc, lineRange.end);
+			const Iterator itStart(doc, lineRange.start, true);
+			const Iterator itEnd(doc, lineRange.end);
 			const std::regex_constants::match_flag_type flagsMatch = MatchFlags(doc, lineRange.start, lineRange.end, lineStartPos, lineEndPos);
 			std::regex_iterator<Iterator> it(itStart, itEnd, regexp, flagsMatch);
 			for (const std::regex_iterator<Iterator> last; it != last; ++it) {

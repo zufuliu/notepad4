@@ -190,6 +190,17 @@ inline CLIPFORMAT RegisterClipboardType(LPCWSTR lpszFormat) noexcept {
 	return static_cast<CLIPFORMAT>(::RegisterClipboardFormat(lpszFormat));
 }
 
+inline RECT GetClientRect(HWND hwnd) noexcept {
+	RECT rect{};
+	::GetClientRect(hwnd, &rect);
+	return rect;
+}
+
+inline D2D1_SIZE_U GetSizeUFromRect(const RECT &rc) noexcept {
+	const SIZE size = SizeOfRect(rc);
+	return D2D1::SizeU(size.cx, size.cy);
+}
+
 }
 
 namespace Scintilla::Internal {
@@ -399,6 +410,77 @@ struct HorizontalScrollRange {
 
 namespace Scintilla::Internal {
 
+using HwndRenderTarget = ComPtr<ID2D1HwndRenderTarget>;
+
+// There may be either a Hwnd or DC render target
+struct RenderTargets {
+	HwndRenderTarget pHwndRT;
+	DCRenderTarget pDCRT;
+#if _WIN32_WINNT >= _WIN32_WINNT_WIN7
+	ComPtr<ID2D1DeviceContext> pDeviceContext;
+#endif
+	bool valid = true;
+	[[nodiscard]] ID2D1RenderTarget *RenderTarget() const noexcept {
+		if (pHwndRT)
+			return pHwndRT.Get();
+		if (pDCRT)
+			return pDCRT.Get();
+#if _WIN32_WINNT >= _WIN32_WINNT_WIN7
+		if (pDeviceContext)
+			return pDeviceContext.Get();
+#endif
+		return nullptr;
+	}
+	void Release() noexcept {
+		pHwndRT = nullptr;
+		pDCRT = nullptr;
+#if _WIN32_WINNT >= _WIN32_WINNT_WIN7
+		pDeviceContext = nullptr;
+#endif
+	}
+};
+
+// These resources are device-dependent but not window-dependent
+#if _WIN32_WINNT >= _WIN32_WINNT_WIN7
+struct DirectDevice {
+	D3D11Device pDirect3DDevice;
+	ComPtr<ID2D1Device> pDirect2DDevice;
+	ComPtr<IDXGIDevice> pDXGIDevice;
+
+	void Release() noexcept;
+	HRESULT CreateDevice() noexcept;
+};
+
+void DirectDevice::Release() noexcept {
+	pDirect3DDevice = nullptr;
+	pDirect2DDevice = nullptr;
+	pDXGIDevice = nullptr;
+}
+
+HRESULT DirectDevice::CreateDevice() noexcept {
+	if (pDirect2DDevice) {	// Must be released before creation
+		return E_FAIL;
+	}
+
+	HRESULT hr = CreateD3D(pDirect3DDevice);
+	if (FAILED(hr)) {
+		return hr;
+	}
+
+	hr = pDirect3DDevice.As(&pDXGIDevice);
+	if (FAILED(hr)) {
+		return hr;
+	}
+
+	hr = pD2DFactory->CreateDevice(pDXGIDevice.Get(), pDirect2DDevice.ReleaseAndGetAddressOf());
+	if (FAILED(hr)) {
+		return hr;
+	}
+
+	return S_OK;
+}
+#endif // _WIN32_WINNT >= _WIN32_WINNT_WIN7
+
 /**
  */
 class ScintillaWin final :
@@ -459,24 +541,33 @@ class ScintillaWin final :
 	// The current input Language ID.
 	LANGID inputLang = LANG_USER_DEFAULT;
 
-	bool renderTargetValid = true;
-	ID2D1RenderTarget *pRenderTarget = nullptr;
+#if _WIN32_WINNT >= _WIN32_WINNT_WIN7
+	DirectDevice device;
+	ComPtr<IDXGISwapChain1> pDXGISwapChain;
+#endif
+	RenderTargets targets;
 	// rendering parameters for current monitor
 	HMONITOR hCurrentMonitor {};
-	std::unique_ptr<IDWriteRenderingParams, UnknownReleaser> defaultRenderingParams;
-	std::unique_ptr<IDWriteRenderingParams, UnknownReleaser> customRenderingParams;
+	WriteRenderingParams defaultRenderingParams;
+	WriteRenderingParams customRenderingParams;
 
 	explicit ScintillaWin(HWND hwnd) noexcept;
 	// ~ScintillaWin() in public section
 
 	void Finalise() noexcept override;
 	void SetRenderingParams(Surface *surface) const noexcept {
-		surface->SetRenderingParams(defaultRenderingParams.get(), customRenderingParams.get());
+		surface->SetRenderingParams(defaultRenderingParams.Get(), customRenderingParams.Get());
 	}
 	bool UpdateRenderingParams(bool force) noexcept;
+	void CreateRenderTarget() noexcept;
+#if _WIN32_WINNT >= _WIN32_WINNT_WIN7
+	HRESULT Create3D() noexcept;
+	HRESULT SetBackBuffer(HWND hwnd, IDXGISwapChain1 *pSwapChain) const noexcept;
+	HRESULT CreateSwapChain(HWND hwnd) noexcept;
+#endif
 	void EnsureRenderTarget(HDC hdc) noexcept;
 	void DropRenderTarget() noexcept {
-		ReleaseUnknown(pRenderTarget);
+		targets.Release();
 	}
 	HWND MainHWND() const noexcept {
 		return HwndFromWindow(wMain);
@@ -745,6 +836,15 @@ void ScintillaWin::Finalise() noexcept {
 	::RevokeDragDrop(MainHWND());
 }
 
+namespace {
+
+HRESULT CreateHwndRenderTarget(const D2D1_RENDER_TARGET_PROPERTIES *renderTargetProperties,
+	const D2D1_HWND_RENDER_TARGET_PROPERTIES *hwndRenderTargetProperties, HwndRenderTarget &hwndRT) noexcept {
+	return pD2DFactory->CreateHwndRenderTarget(renderTargetProperties, hwndRenderTargetProperties, hwndRT.ReleaseAndGetAddressOf());
+}
+
+}
+
 bool ScintillaWin::UpdateRenderingParams(bool force) noexcept {
 	// see https://sourceforge.net/p/scintilla/bugs/2344/?page=2
 	//HWND topLevel = ::GetAncestor(MainHWND(), GA_ROOT);
@@ -754,89 +854,211 @@ bool ScintillaWin::UpdateRenderingParams(bool force) noexcept {
 		return false;
 	}
 
-	IDWriteRenderingParams *monitorRenderingParams = nullptr;
-	IDWriteRenderingParams *customClearTypeRenderingParams = nullptr;
+	WriteRenderingParams monitorRenderingParams;
+	WriteRenderingParams customClearTypeRenderingParams;
 	if (technology != Technology::Default) {
-		const HRESULT hr = pIDWriteFactory->CreateMonitorRenderingParams(monitor, &monitorRenderingParams);
+#if _WIN32_WINNT >= _WIN32_WINNT_WIN7
+		ComPtr<IDWriteRenderingParams> upMrp;
+		HRESULT hr = pIDWriteFactory->CreateMonitorRenderingParams(monitor, upMrp.GetAddressOf());
+		if (SUCCEEDED(hr)) {
+			// Cast to IDWriteRenderingParams1 so can call GetGrayscaleEnhancedContrast()
+			hr = upMrp.As(&monitorRenderingParams);
+		}
+#else
+		const HRESULT hr = pIDWriteFactory->CreateMonitorRenderingParams(monitor, monitorRenderingParams.GetAddressOf());
+#endif
 		UINT clearTypeContrast = 0;
-		if (SUCCEEDED(hr) && ::SystemParametersInfo(SPI_GETFONTSMOOTHINGCONTRAST, 0, &clearTypeContrast, 0) != 0) {
+		if (SUCCEEDED(hr) && monitorRenderingParams &&
+			::SystemParametersInfo(SPI_GETFONTSMOOTHINGCONTRAST, 0, &clearTypeContrast, 0) != 0) {
 			if (clearTypeContrast >= 1000 && clearTypeContrast <= 2200) {
 				const FLOAT gamma = static_cast<FLOAT>(clearTypeContrast) / 1000.0f;
 				pIDWriteFactory->CreateCustomRenderingParams(gamma,
 					monitorRenderingParams->GetEnhancedContrast(),
+#if _WIN32_WINNT >= _WIN32_WINNT_WIN7
+					monitorRenderingParams->GetGrayscaleEnhancedContrast(),
+#endif
 					monitorRenderingParams->GetClearTypeLevel(),
 					monitorRenderingParams->GetPixelGeometry(),
 					monitorRenderingParams->GetRenderingMode(),
-					&customClearTypeRenderingParams);
+					customClearTypeRenderingParams.GetAddressOf());
 			}
 		}
 	}
 
 	hCurrentMonitor = monitor;
-	defaultRenderingParams.reset(monitorRenderingParams);
-	customRenderingParams.reset(customClearTypeRenderingParams);
+	defaultRenderingParams = std::move(monitorRenderingParams);
+	customRenderingParams = std::move(customClearTypeRenderingParams);
 	return true;
 }
 
-void ScintillaWin::EnsureRenderTarget(HDC hdc) noexcept {
-	if (!renderTargetValid) {
-		DropRenderTarget();
-		renderTargetValid = true;
+#if _WIN32_WINNT >= _WIN32_WINNT_WIN7
+HRESULT ScintillaWin::Create3D() noexcept {
+	if (device.pDirect2DDevice) {
+		return S_OK;
 	}
-	if (!pRenderTarget) {
-		// Create a Direct2D render target.
-		D2D1_RENDER_TARGET_PROPERTIES drtp {};
-		drtp.type = D2D1_RENDER_TARGET_TYPE_DEFAULT;
-		drtp.dpiX = 96.0;
-		drtp.dpiY = 96.0;
-		drtp.usage = D2D1_RENDER_TARGET_USAGE_NONE;
-		drtp.minLevel = D2D1_FEATURE_LEVEL_DEFAULT;
+	targets.Release();
+	pDXGISwapChain = nullptr;
+	device.Release();
+	const HRESULT hr = device.CreateDevice();
+	if (FAILED(hr)) {
+		device.Release();
+	}
+	return hr;
+}
+#endif
 
-		if (technology == Technology::DirectWriteDC) {
-			// Explicit pixel format needed.
-			drtp.pixelFormat = D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_IGNORE);
+void ScintillaWin::CreateRenderTarget() noexcept {
+	HWND hw = MainHWND();
+	const RECT rc = GetClientRect(hw);
 
-			ID2D1DCRenderTarget *pDCRT = nullptr;
-			const HRESULT hr = pD2DFactory->CreateDCRenderTarget(&drtp, &pDCRT);
-			if (SUCCEEDED(hr)) {
-				pRenderTarget = pDCRT;
-				//D2D1::Matrix3x2F invertX = D2D1::Matrix3x2F(-1, 0, 0, 1, 0, 0);
-				//D2D1::Matrix3x2F moveX = D2D1::Matrix3x2F::Translation(rc.right - rc.left, 0);
-				//pRenderTarget->SetTransform(invertX * moveX);
-			} else {
-				//Platform::DebugPrintf("Failed CreateDCRenderTarget 0x%lx\n", hr);
-				pRenderTarget = nullptr;
-			}
+	// Create a Direct2D render target.
+	D2D1_RENDER_TARGET_PROPERTIES drtp{};
+	drtp.type = D2D1_RENDER_TARGET_TYPE_DEFAULT;
+	drtp.dpiX = 96.f;
+	drtp.dpiY = 96.f;
+	drtp.usage = D2D1_RENDER_TARGET_USAGE_NONE;
+	drtp.minLevel = D2D1_FEATURE_LEVEL_DEFAULT;
+
+	if (technology == Technology::DirectWriteDC) {
+		// Explicit pixel format needed.
+		drtp.pixelFormat = D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_IGNORE);
+
+		const HRESULT hr = CreateDCRenderTarget(&drtp, targets.pDCRT);
+		if (FAILED(hr)) {
+			// Platform::DebugPrintf("Failed CreateDCRenderTarget 0x%lx\n", hr);
+			targets.Release();
 		} else {
-			drtp.pixelFormat = D2D1::PixelFormat(DXGI_FORMAT_UNKNOWN, D2D1_ALPHA_MODE_UNKNOWN);
-
-			HWND hw = MainHWND();
-			RECT rc;
-			::GetClientRect(hw, &rc);
-			D2D1_HWND_RENDER_TARGET_PROPERTIES dhrtp {};
-			dhrtp.hwnd = hw;
-			dhrtp.pixelSize = D2D1::SizeU(rc.right - rc.left, rc.bottom - rc.top);
-			dhrtp.presentOptions = (technology == Technology::DirectWriteRetain) ?
-				D2D1_PRESENT_OPTIONS_RETAIN_CONTENTS : D2D1_PRESENT_OPTIONS_NONE;
-
-			ID2D1HwndRenderTarget *pHwndRenderTarget = nullptr;
-			const HRESULT hr = pD2DFactory->CreateHwndRenderTarget(drtp, dhrtp, &pHwndRenderTarget);
-			if (SUCCEEDED(hr)) {
-				pRenderTarget = pHwndRenderTarget;
+			//D2D1::Matrix3x2F invertX = D2D1::Matrix3x2F(-1, 0, 0, 1, 0, 0);
+			//D2D1::Matrix3x2F moveX = D2D1::Matrix3x2F::Translation(rc.right - rc.left, 0);
+			//pRenderTarget->SetTransform(invertX * moveX);
+		}
+	}
+#if _WIN32_WINNT >= _WIN32_WINNT_WIN7
+	else if (technology == Technology::DirectWrite1) {
+		HRESULT hr = Create3D();	// Need pDirect2DDevice
+		if (SUCCEEDED(hr)) {
+			hr = device.pDirect2DDevice->CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_NONE,
+				targets.pDeviceContext.ReleaseAndGetAddressOf());
+			if (FAILED(hr)) {
+				// Platform::DebugPrintf("Failed CreateDeviceContext 0x%lx\n", hr);
 			} else {
-				//Platform::DebugPrintf("Failed CreateHwndRenderTarget 0x%lx\n", hr);
-				pRenderTarget = nullptr;
+				hr = CreateSwapChain(hw);
+				if (FAILED(hr)) {
+					// Platform::DebugPrintf("Failed CreateSwapChain 0x%lx\n", hr);
+					targets.Release();
+				}
 			}
 		}
+	}
+#endif
+	else { // DirectWrite or DirectWriteRetain
+		drtp.pixelFormat = D2D1::PixelFormat(DXGI_FORMAT_UNKNOWN, D2D1_ALPHA_MODE_UNKNOWN);
+
+		D2D1_HWND_RENDER_TARGET_PROPERTIES dhrtp{};
+		dhrtp.hwnd = hw;
+		dhrtp.pixelSize = GetSizeUFromRect(rc);
+		dhrtp.presentOptions = (technology == Technology::DirectWriteRetain) ?
+			D2D1_PRESENT_OPTIONS_RETAIN_CONTENTS : D2D1_PRESENT_OPTIONS_NONE;
+
+		const HRESULT hr = CreateHwndRenderTarget(&drtp, &dhrtp, targets.pHwndRT);
+		if (FAILED(hr)) {
+			// Platform::DebugPrintf("Failed CreateHwndRenderTarget 0x%lx\n", hr);
+			targets.Release();
+		}
+
+	}
+}
+
+#if _WIN32_WINNT >= _WIN32_WINNT_WIN7
+HRESULT ScintillaWin::SetBackBuffer(HWND hwnd, IDXGISwapChain1 *pSwapChain) const noexcept {
+	assert(targets.pDeviceContext);
+	// Back buffer as an IDXGISurface
+	ComPtr<IDXGISurface> dxgiBackBuffer;
+	HRESULT hr = pSwapChain->GetBuffer(0, IID_PPV_ARGS(dxgiBackBuffer.GetAddressOf()));
+	if (FAILED(hr))
+		return hr;
+
+	const FLOAT dpiX = static_cast<FLOAT>(DpiForWindow(hwnd));
+	const FLOAT dpiY = dpiX;
+
+	// Direct2D bitmap linked to Direct3D texture through DXGI back buffer
+	const D2D1_BITMAP_PROPERTIES1 bitmapProperties =
+		D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW,
+			D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_IGNORE), dpiX, dpiY);
+	ComPtr<ID2D1Bitmap1> pDirect2DBackBuffer;
+	hr = targets.pDeviceContext->CreateBitmapFromDxgiSurface(dxgiBackBuffer.Get(), &bitmapProperties, pDirect2DBackBuffer.GetAddressOf());
+	if (FAILED(hr))
+		return hr;
+
+	// Bitmap is render target
+	targets.pDeviceContext->SetTarget(pDirect2DBackBuffer.Get());
+
+	return S_OK;
+}
+
+HRESULT ScintillaWin::CreateSwapChain(HWND hwnd) noexcept {
+	// Sets pDXGISwapChain but only when each call succeeds
+	// Needs pDXGIDevice, pDirect3DDevice
+	pDXGISwapChain = nullptr;
+	assert(device.pDXGIDevice);
+
+	// At each stage, place object in a unique_ptr to ensure release occurs
+
+	ComPtr<IDXGIAdapter> dxgiAdapter;
+	HRESULT hr = device.pDXGIDevice->GetAdapter(dxgiAdapter.GetAddressOf());
+	if (FAILED(hr))
+		return hr;
+
+	ComPtr<IDXGIFactory2> dxgiFactory;
+	hr = dxgiAdapter->GetParent(IID_PPV_ARGS(dxgiFactory.GetAddressOf()));
+	if (FAILED(hr))
+		return hr;
+
+	DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};
+	swapChainDesc.Width = 0;
+	swapChainDesc.Height = 0;
+	swapChainDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+	swapChainDesc.Stereo = false;
+	swapChainDesc.SampleDesc.Count = 1;
+	swapChainDesc.SampleDesc.Quality = 0;
+	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+	swapChainDesc.BufferCount = 2;
+	swapChainDesc.Scaling = DXGI_SCALING_STRETCH;
+	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+	swapChainDesc.Flags = 0;
+
+	// DXGI swap chain for window
+	ComPtr<IDXGISwapChain1> pSwapChain;
+	hr = dxgiFactory->CreateSwapChainForHwnd(device.pDirect3DDevice.Get(), hwnd, &swapChainDesc,
+		nullptr, nullptr, pSwapChain.GetAddressOf());
+	if (FAILED(hr))
+		return hr;
+
+	hr = SetBackBuffer(hwnd, pSwapChain.Get());
+	if (FAILED(hr))
+		return hr;
+
+	// All successful so export swap chain for later presentation
+	pDXGISwapChain = std::move(pSwapChain);
+	return S_OK;
+}
+#endif // _WIN32_WINNT >= _WIN32_WINNT_WIN7
+
+void ScintillaWin::EnsureRenderTarget(HDC hdc) noexcept {
+	if (!targets.valid) {
+		DropRenderTarget();
+		targets.valid = true;
+	}
+	if (!targets.RenderTarget()) {
+		CreateRenderTarget();
 		// Pixmaps were created to be compatible with previous render target so
 		// need to be recreated.
 		DropGraphics();
 	}
 
-	if ((technology == Technology::DirectWriteDC) && pRenderTarget) {
-		RECT rcWindow;
-		::GetClientRect(MainHWND(), &rcWindow);
-		const HRESULT hr = static_cast<ID2D1DCRenderTarget*>(pRenderTarget)->BindDC(hdc, &rcWindow);
+	if ((technology == Technology::DirectWriteDC) && targets.pDCRT) {	// DC RenderTarget needs binding
+		const RECT rcWindow = GetClientRect(MainHWND());
+		const HRESULT hr = targets.pDCRT->BindDC(hdc, &rcWindow);
 		if (FAILED(hr)) {
 			//Platform::DebugPrintf("BindDC failed 0x%lx\n", hr);
 			DropRenderTarget();
@@ -1078,9 +1300,14 @@ bool ScintillaWin::PaintDC(HDC hdc) {
 			surfaceWindow->Release();
 		}
 	} else {
+		// RefreshStyleData may set scroll bars and resize the window.
+		// Avoid issues resizing inside Paint when calling IDXGISwapChain1->ResizeBuffers
+		// with committed resources by refreshing the style data first.
+		RefreshStyleData();
+
 		//SetLayout(hdc, LAYOUT_BITMAPORIENTATIONPRESERVED);
 		EnsureRenderTarget(hdc);
-		if (pRenderTarget) {
+		if (ID2D1RenderTarget *pRenderTarget = targets.RenderTarget()) {
 			const AutoSurface surfaceWindow(pRenderTarget, this);
 			if (surfaceWindow) {
 				SetRenderingParams(surfaceWindow);
@@ -1092,6 +1319,16 @@ bool ScintillaWin::PaintDC(HDC hdc) {
 					DropRenderTarget();
 					return false;
 				}
+#if _WIN32_WINNT >= _WIN32_WINNT_WIN7
+				if ((technology == Technology::DirectWrite1) && pDXGISwapChain) {
+					const DXGI_PRESENT_PARAMETERS parameters{};
+					const HRESULT hrPresent = pDXGISwapChain->Present1(1, 0, &parameters);
+					if (FAILED(hrPresent)) {
+						DropRenderTarget();
+						return false;
+					}
+				}
+#endif
 			}
 		}
 	}
@@ -1670,13 +1907,36 @@ sptr_t ScintillaWin::ShowContextMenu(unsigned int iMessage, uptr_t wParam, sptr_
 #endif
 
 void ScintillaWin::SizeWindow() {
-	if (paintState == PaintState::notPainting) {
-		DropRenderTarget();
-	} else {
-		renderTargetValid = false;
+	rectangleClient = wMain.GetClientPosition();
+	HRESULT hrResize = E_FAIL;
+	if (((technology == Technology::DirectWrite) || (technology == Technology::DirectWriteRetain)) && targets.pHwndRT) {
+		// May be able to just resize the HWND render target
+		const D2D1_SIZE_U pixelSize = GetSizeUFromRect(GetClientRect(MainHWND()));
+		hrResize = targets.pHwndRT->Resize(pixelSize);
+		if (FAILED(hrResize)) {
+			// Platform::DebugPrintf("Failed to Resize ID2D1HwndRenderTarget 0x%lx\n", hrResize);
+		}
+	}
+#if _WIN32_WINNT >= _WIN32_WINNT_WIN7
+	if ((technology == Technology::DirectWrite1) && pDXGISwapChain && targets.pDeviceContext &&
+		(paintState == PaintState::notPainting)) {
+		targets.pDeviceContext->SetTarget(nullptr);	// ResizeBuffers fails if bitmap still owned by swap chain
+		hrResize = pDXGISwapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
+		if (SUCCEEDED(hrResize)) {
+			hrResize = SetBackBuffer(MainHWND(), pDXGISwapChain.Get());
+		} else {
+			// Platform::DebugPrintf("Failed ResizeBuffers 0x%lx\n", hrResize);
+		}
+	}
+#endif
+	if (FAILED(hrResize)) {
+		if (paintState == PaintState::notPainting) {
+			DropRenderTarget();
+		} else {
+			targets.valid = false;
+		}
 	}
 	//Platform::DebugPrintf("Scintilla WM_SIZE %d %d\n", LOWORD(lParam), HIWORD(lParam));
-	rectangleClient = wMain.GetClientPosition();
 	ChangeSize();
 }
 
@@ -2177,7 +2437,8 @@ sptr_t ScintillaWin::SciMessage(Message iMessage, uptr_t wParam, sptr_t lParam) 
 			(technologyNew == Technology::Default) ||
 			(technologyNew == Technology::DirectWriteRetain) ||
 			(technologyNew == Technology::DirectWriteDC) ||
-			(technologyNew == Technology::DirectWrite)) {
+			(technologyNew == Technology::DirectWrite) ||
+			(technologyNew == Technology::DirectWrite1)) {
 			if (technology != technologyNew) {
 				if (technologyNew != Technology::Default) {
 					if (!LoadD2D()) {
@@ -4151,7 +4412,7 @@ LRESULT CALLBACK ScintillaWin::CTWndProc(HWND hWnd, UINT iMessage, WPARAM wParam
 		if (sciThis == nullptr) {
 			if (iMessage == WM_CREATE) {
 				// Associate CallTip object with window
-				CREATESTRUCT *pCreate = AsPointer<CREATESTRUCT *>(lParam);
+				const CREATESTRUCT *pCreate = AsPointer<CREATESTRUCT *>(lParam);
 				SetWindowPointer(hWnd, pCreate->lpCreateParams);
 				return 0;
 			} else {
@@ -4165,12 +4426,11 @@ LRESULT CALLBACK ScintillaWin::CTWndProc(HWND hWnd, UINT iMessage, WPARAM wParam
 				PAINTSTRUCT ps;
 				::BeginPaint(hWnd, &ps);
 				const std::unique_ptr<Surface> surfaceWindow(Surface::Allocate(sciThis->technology));
-				ID2D1HwndRenderTarget *pCTRenderTarget = nullptr;
+				HwndRenderTarget pCTRenderTarget;
 				if (sciThis->technology == Technology::Default) {
 					surfaceWindow->Init(ps.hdc, hWnd);
 				} else {
-					RECT rc;
-					GetClientRect(hWnd, &rc);
+					const RECT rc = GetClientRect(hWnd);
 					// Create a Direct2D render target.
 					D2D1_HWND_RENDER_TARGET_PROPERTIES dhrtp {};
 					dhrtp.hwnd = hWnd;
@@ -4186,7 +4446,8 @@ LRESULT CALLBACK ScintillaWin::CTWndProc(HWND hWnd, UINT iMessage, WPARAM wParam
 					drtp.usage = D2D1_RENDER_TARGET_USAGE_NONE;
 					drtp.minLevel = D2D1_FEATURE_LEVEL_DEFAULT;
 
-					if (!SUCCEEDED(pD2DFactory->CreateHwndRenderTarget(drtp, dhrtp, &pCTRenderTarget))) {
+					const HRESULT hr = CreateHwndRenderTarget(&drtp, &dhrtp, pCTRenderTarget);
+					if (!SUCCEEDED(hr)) {
 						surfaceWindow->Release();
 						::EndPaint(hWnd, &ps);
 						return 0;
@@ -4194,7 +4455,7 @@ LRESULT CALLBACK ScintillaWin::CTWndProc(HWND hWnd, UINT iMessage, WPARAM wParam
 					// If above SUCCEEDED, then pCTRenderTarget not nullptr
 					assert(pCTRenderTarget);
 					if (pCTRenderTarget) {
-						surfaceWindow->Init(pCTRenderTarget, hWnd);
+						surfaceWindow->Init(pCTRenderTarget.Get(), hWnd);
 						sciThis->SetRenderingParams(surfaceWindow.get());
 						pCTRenderTarget->BeginDraw();
 					}
@@ -4205,7 +4466,6 @@ LRESULT CALLBACK ScintillaWin::CTWndProc(HWND hWnd, UINT iMessage, WPARAM wParam
 					pCTRenderTarget->EndDraw();
 				}
 				surfaceWindow->Release();
-				ReleaseUnknown(pCTRenderTarget);
 				::EndPaint(hWnd, &ps);
 				return 0;
 			} else if ((iMessage == WM_NCLBUTTONDOWN) || (iMessage == WM_NCLBUTTONDBLCLK)) {

@@ -188,8 +188,8 @@ public:
 	virtual ~Surface() noexcept = default;
 	static std::unique_ptr<Surface> Allocate(Scintilla::Technology technology);
 
-	virtual void Init(WindowID wid) noexcept = 0;
-	virtual void Init(SurfaceID sid, WindowID wid, bool printing = false) noexcept = 0;
+	virtual void Init(WindowID wid) noexcept = 0;	// For measuring text
+	virtual void Init(SurfaceID sid, WindowID wid, bool printing = false) noexcept = 0;	// For drawing
 	virtual std::unique_ptr<Surface> AllocatePixMap(int width, int height) = 0;
 
 	virtual void SetMode(SurfaceMode mode) noexcept = 0;

@@ -27,8 +27,21 @@
 #define USER_DEFAULT_SCREEN_DPI		96
 #endif
 
+#if (_WIN32_WINNT < _WIN32_WINNT_WIN8) && defined(_MSC_VER) && defined(__clang__)
+// fix error for RoTransformError() used in winrt\wrl\event.h
+WINAPI BOOL RoTransformError(HRESULT oldError, HRESULT newError, /*HSTRING*/ void *message);
+#endif
+#include <wrl.h>
+using Microsoft::WRL::ComPtr;
+
+#if _WIN32_WINNT >= _WIN32_WINNT_WIN7
+#include <d2d1_1.h>
+#include <d3d11_1.h>
+#include <dwrite_1.h>
+#else
 #include <d2d1.h>
 #include <dwrite.h>
+#endif
 
 // official Scintilla use std::call_once(), which increases binary about 12 KiB.
 #define USE_STD_CALL_ONCE		0
@@ -112,6 +125,10 @@ constexpr Point PointFromPOINT(POINT pt) noexcept {
 	return Point::FromInts(pt.x, pt.y);
 }
 
+constexpr SIZE SizeOfRect(RECT rc) noexcept {
+ 	return { rc.right - rc.left, rc.bottom - rc.top };
+}
+
 #if NP2_USE_SSE2
 static_assert(sizeof(Point) == sizeof(__m128d));
 static_assert(sizeof(POINT) == sizeof(__int64));
@@ -189,7 +206,24 @@ constexpr BYTE Win32MapFontQuality(FontQuality extraFontFlag) noexcept {
 }
 
 extern bool LoadD2D() noexcept;
+
+using DCRenderTarget = ComPtr<ID2D1DCRenderTarget>;
+HRESULT CreateDCRenderTarget(const D2D1_RENDER_TARGET_PROPERTIES *renderTargetProperties, DCRenderTarget &dcRT) noexcept;
+
+#if _WIN32_WINNT >= _WIN32_WINNT_WIN7
+extern ID2D1Factory1 *pD2DFactory;
+extern IDWriteFactory1 *pIDWriteFactory;
+
+using D3D11Device = ComPtr<ID3D11Device1>;
+extern HRESULT CreateD3D(D3D11Device &device) noexcept;
+
+using WriteRenderingParams = ComPtr<IDWriteRenderingParams1>;
+
+#else
 extern ID2D1Factory *pD2DFactory;
 extern IDWriteFactory *pIDWriteFactory;
+
+using WriteRenderingParams = ComPtr<IDWriteRenderingParams>;
+#endif
 
 }

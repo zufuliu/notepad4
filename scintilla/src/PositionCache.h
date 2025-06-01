@@ -201,7 +201,7 @@ public:
 	void Clear() noexcept;
 	bool Retrieve(uint16_t styleNumber_, std::string_view sv, XYPOSITION *positions_) const noexcept;
 	static size_t Hash(uint16_t styleNumber_, std::string_view sv) noexcept;
-	bool NewerThan(const PositionCacheEntry &other) const noexcept;
+	[[nodiscard]] bool NewerThan(const PositionCacheEntry &other) const noexcept;
 	void ResetClock() noexcept;
 };
 
@@ -312,15 +312,16 @@ public:
 };
 
 class PositionCache {
-	std::vector<PositionCacheEntry> pces;
+	static constexpr size_t defaultCacheSize = 0x400;
+	std::vector<PositionCacheEntry> pces { defaultCacheSize };
 	NativeMutex cacheLock;
-	uint32_t clock;
-	bool allClear;
+	uint32_t clock = 1;
+	bool allClear = true;
 public:
 	PositionCache();
 	void Clear() noexcept;
 	void SetSize(size_t size_);
-	size_t GetSize() const noexcept;
+	[[nodiscard]] size_t GetSize() const noexcept;
 	void MeasureWidths(Surface *surface, const Style &style, uint16_t styleNumber, std::string_view sv, XYPOSITION *positions);
 };
 

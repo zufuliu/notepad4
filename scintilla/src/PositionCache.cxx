@@ -1212,11 +1212,7 @@ void PositionCacheEntry::ResetClock() noexcept {
 	}
 }
 
-PositionCache::PositionCache() {
-	clock = 1;
-	allClear = true;
-	pces.resize(1024);
-}
+PositionCache::PositionCache() = default;
 
 void PositionCache::Clear() noexcept {
 	if (!allClear) {
