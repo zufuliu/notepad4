@@ -26,10 +26,11 @@
 #ifndef USER_DEFAULT_SCREEN_DPI
 #define USER_DEFAULT_SCREEN_DPI		96
 #endif
+constexpr FLOAT dpiDefault = USER_DEFAULT_SCREEN_DPI;
 
 #if (_WIN32_WINNT < _WIN32_WINNT_WIN8) && defined(_MSC_VER) && defined(__clang__)
 // fix error for RoTransformError() used in winrt\wrl\event.h
-WINAPI BOOL RoTransformError(HRESULT oldError, HRESULT newError, /*HSTRING*/ void *message);
+BOOL WINAPI RoTransformError(HRESULT oldError, HRESULT newError, /*HSTRING*/ void *message);
 #endif
 #include <wrl.h>
 using Microsoft::WRL::ComPtr;
@@ -181,6 +182,18 @@ inline UINT DpiForWindow(WindowID wid) noexcept {
 }
 
 HCURSOR LoadReverseArrowCursor(HCURSOR cursor, UINT dpi) noexcept;
+
+// Encapsulate WM_PAINT handling so that EndPaint is always called even with unexpected returns or exceptions.
+struct Painter {
+	HWND hWnd{};
+	PAINTSTRUCT ps{};
+	explicit Painter(HWND hWnd_) noexcept : hWnd(hWnd_) {
+		::BeginPaint(hWnd, &ps);
+	}
+	~Painter() {
+		::EndPaint(hWnd, &ps);
+	}
+};
 
 class MouseWheelDelta {
 	int wheelDelta = 0;

@@ -1001,22 +1001,124 @@ constexpr DWORD RGBQuadMultiplied(ColourRGBA colour) noexcept {
 }
 #endif
 
+constexpr BITMAPV5HEADER BitMapHeader(int width, int height) noexcept {
+	constexpr int pixelBits = 32;
+
+	// Divide each pixel up in the expected BGRA manner.
+	// Compatible with DXGI_FORMAT_B8G8R8A8_UNORM.
+	constexpr DWORD maskRed = 0x00FF0000U;
+	constexpr DWORD maskGreen = 0x0000FF00U;
+	constexpr DWORD maskBlue = 0x000000FFU;
+	constexpr DWORD maskAlpha = 0xFF000000U;
+
+	BITMAPV5HEADER bi{};
+	bi.bV5Size = sizeof(BITMAPV5HEADER);
+	bi.bV5Width = width;
+	bi.bV5Height = height;
+	bi.bV5Planes = 1;
+	bi.bV5BitCount = pixelBits;
+	bi.bV5Compression = BI_BITFIELDS;
+	// The following mask specification specifies a supported 32 BPP alpha format for Windows XP.
+	bi.bV5RedMask = maskRed;
+	bi.bV5GreenMask = maskGreen;
+	bi.bV5BlueMask = maskBlue;
+	bi.bV5AlphaMask = maskAlpha;
+	return bi;
+}
+
+HBITMAP BitMapSection(HDC hdc, int width, int height, DWORD **pixels) noexcept {
+	const BITMAPV5HEADER bi = BitMapHeader(width, height);
+	void *image = nullptr;
+	HBITMAP hbm = ::CreateDIBSection(hdc, reinterpret_cast<const BITMAPINFO *>(&bi), DIB_RGB_COLORS, &image, {}, 0);
+	if (pixels) {
+		*pixels = static_cast<DWORD *>(image);
+	}
+	return hbm;
+}
+
+// Manage the lifetime of a memory HBITMAP and its HDC so there are no leaks.
+class GDIBitMap {
+	HDC hdc{};
+	HBITMAP hbm{};
+	HBITMAP hbmOriginal{};
+
+public:
+	GDIBitMap() noexcept = default;
+	// Deleted so GDIBitMap objects can not be copied.
+	GDIBitMap(const GDIBitMap &) = delete;
+	GDIBitMap(GDIBitMap &&) = delete;
+	// Move would be OK but not needed yet
+	GDIBitMap &operator=(const GDIBitMap &) = delete;
+	GDIBitMap &operator=(GDIBitMap &&) = delete;
+	~GDIBitMap() noexcept;
+
+	void Create(HDC hdcBase, int width, int height, DWORD **pixels) noexcept;
+	void Release() noexcept;
+	HBITMAP Extract() noexcept;
+
+	[[nodiscard]] HDC DC() const noexcept {
+		return hdc;
+	}
+	[[nodiscard]] explicit operator bool() const noexcept {
+		return hdc && hbm;
+	}
+};
+
+GDIBitMap::~GDIBitMap() noexcept {
+	Release();
+}
+
+void GDIBitMap::Create(HDC hdcBase, int width, int height, DWORD **pixels) noexcept {
+	Release();
+
+	hdc = CreateCompatibleDC(hdcBase);
+	if (!hdc) {
+		return;
+	}
+
+	hbm = BitMapSection(hdc, width, height, pixels);
+	if (!hbm) {
+		return;
+	}
+	hbmOriginal = SelectBitmap(hdc, hbm);
+}
+
+void GDIBitMap::Release() noexcept {
+	if (hbmOriginal) {
+		// Deselect HBITMAP from HDC so it may be deleted.
+		SelectBitmap(hdc, hbmOriginal);
+	}
+	hbmOriginal = {};
+	if (hbm) {
+		::DeleteObject(hbm);
+		hbm = {};
+	}
+	if (hdc) {
+		::DeleteDC(hdc);
+		hdc = {};
+	}
+}
+
+HBITMAP GDIBitMap::Extract() noexcept {
+	// Deselect HBITMAP from HDC but keep so can delete.
+	// The caller will make a copy, not take ownership.
+	HBITMAP ret = hbm;
+	if (hbmOriginal) {
+		SelectBitmap(hdc, hbmOriginal);
+		hbmOriginal = {};
+	}
+	return ret;
+}
+
+// DIBSection is bitmap with some drawing operations used by SurfaceGDI.
 class DIBSection {
-	HDC hMemDC{};
-	HBITMAP hbmMem{};
-	HBITMAP hbmOld{};
+	GDIBitMap bm;
 	DWORD *pixels = nullptr;
 	const SIZE size;
 public:
 	DIBSection(HDC hdc, SIZE size_) noexcept;
-	// Deleted so DIBSection objects can not be copied.
-	DIBSection(const DIBSection&) = delete;
-	DIBSection(DIBSection&&) = delete;
-	DIBSection &operator=(const DIBSection&) = delete;
-	DIBSection &operator=(DIBSection&&) = delete;
-	~DIBSection() noexcept;
-	operator bool() const noexcept {
-		return hbmOld != nullptr;
+	explicit operator bool() const noexcept {
+		return bm && pixels;
 	}
 	[[nodiscard]] DWORD *Pixels() const noexcept {
 		return pixels;
@@ -1025,7 +1127,7 @@ public:
 		return reinterpret_cast<unsigned char *>(pixels);
 	}
 	[[nodiscard]] HDC DC() const noexcept {
-		return hMemDC;
+		return bm.DC();
 	}
 	void SetPixel(LONG x, LONG y, DWORD value) noexcept {
 		PLATFORM_ASSERT(x >= 0);
@@ -1038,29 +1140,8 @@ public:
 };
 
 DIBSection::DIBSection(HDC hdc, SIZE size_) noexcept : size{size_} {
-	hMemDC = ::CreateCompatibleDC(hdc);
-	if (!hMemDC) {
-		return;
-	}
-
 	// -size.y makes bitmap start from top
-	const BITMAPINFO bpih = { {sizeof(BITMAPINFOHEADER), size.cx, -size.cy, 1, 32, BI_RGB, 0, 0, 0, 0, 0}, {{0, 0, 0, 0}} };
-	hbmMem = CreateDIBSection(hMemDC, &bpih, DIB_RGB_COLORS, reinterpret_cast<void **>(&pixels), nullptr, 0);
-	if (hbmMem) {
-		hbmOld = SelectBitmap(hMemDC, hbmMem);
-	}
-}
-
-DIBSection::~DIBSection() noexcept {
-	if (hbmOld) {
-		SelectBitmap(hMemDC, hbmOld);
-	}
-	if (hbmMem) {
-		::DeleteObject(hbmMem);
-	}
-	if (hMemDC) {
-		::DeleteDC(hMemDC);
-	}
+	bm.Create(hdc, size.cx, -size.cy, &pixels);
 }
 
 void DIBSection::SetSymmetric(LONG x, LONG y, DWORD value) noexcept {
@@ -3119,9 +3200,7 @@ std::optional<DWORD> RegGetDWORD(HKEY hKey, LPCWSTR valueName) noexcept {
 }
 
 class CursorHelper {
-	HDC hMemDC {};
-	HBITMAP hBitmap {};
-	HBITMAP hOldBitmap {};
+	GDIBitMap bm;
 	DWORD *pixels = nullptr;
 	const int width;
 	const int height;
@@ -3137,47 +3216,15 @@ class CursorHelper {
 	};
 
 public:
-	~CursorHelper() {
-		if (hOldBitmap) {
-			SelectBitmap(hMemDC, hOldBitmap);
-		}
-		if (hBitmap) {
-			::DeleteObject(hBitmap);
-		}
-		if (hMemDC) {
-			::DeleteDC(hMemDC);
-		}
-	}
+	~CursorHelper() = default;
 
 	CursorHelper(int width_, int height_) noexcept : width{width_}, height{height_} {
-		hMemDC = ::CreateCompatibleDC({});
-		if (!hMemDC) {
-			return;
-		}
-
 		// https://learn.microsoft.com/en-us/windows/win32/menurc/using-cursors#creating-a-cursor
-		BITMAPV5HEADER bi {};
-		bi.bV5Size = sizeof(BITMAPV5HEADER);
-		bi.bV5Width = width;
-		bi.bV5Height = height;
-		bi.bV5Planes = 1;
-		bi.bV5BitCount = 32;
-		bi.bV5Compression = BI_BITFIELDS;
-		// The following mask specification specifies a supported 32 BPP alpha format for Windows XP.
-		bi.bV5RedMask   = 0x00FF0000U;
-		bi.bV5GreenMask = 0x0000FF00U;
-		bi.bV5BlueMask  = 0x000000FFU;
-		bi.bV5AlphaMask = 0xFF000000U;
-
-		// Create the DIB section with an alpha channel.
-		hBitmap = CreateDIBSection(hMemDC, reinterpret_cast<BITMAPINFO *>(&bi), DIB_RGB_COLORS, reinterpret_cast<void **>(&pixels), nullptr, 0);
-		if (hBitmap) {
-			hOldBitmap = SelectBitmap(hMemDC, hBitmap);
-		}
+		bm.Create({}, width, height, &pixels);
 	}
 
-	[[nodiscard]] bool HasBitmap() const noexcept {
-		return hOldBitmap != nullptr;
+	[[nodiscard]] explicit operator bool() const noexcept {
+		return static_cast<bool>(bm);
 	}
 
 	HCURSOR Create() noexcept {
@@ -3187,8 +3234,7 @@ public:
 		if (hMonoBitmap) {
 			// https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-createiconindirect
 			// hBitmap should not already be selected into a device context
-			SelectBitmap(hMemDC, hOldBitmap);
-			hOldBitmap = {};
+			HBITMAP hBitmap = bm.Extract();
 			ICONINFO info = {false, static_cast<DWORD>(width - 1), 0, hMonoBitmap, hBitmap};
 			cursor = ::CreateIconIndirect(&info);
 			::DeleteObject(hMonoBitmap);
@@ -3210,16 +3256,9 @@ public:
 			return false;
 		}
 
-		D2D1_RENDER_TARGET_PROPERTIES drtp {};
-		drtp.type = D2D1_RENDER_TARGET_TYPE_DEFAULT;
-		drtp.usage = D2D1_RENDER_TARGET_USAGE_NONE;
-		drtp.minLevel = D2D1_FEATURE_LEVEL_DEFAULT;
-		drtp.dpiX = 96.f;
-		drtp.dpiY = 96.f;
-		drtp.pixelFormat = D2D1::PixelFormat(
-			DXGI_FORMAT_B8G8R8A8_UNORM,
-			D2D1_ALPHA_MODE_PREMULTIPLIED
-		);
+		const D2D1_RENDER_TARGET_PROPERTIES drtp = D2D1::RenderTargetProperties(
+			D2D1_RENDER_TARGET_TYPE_DEFAULT,
+			{ DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED });
 
 		DCRenderTarget pTarget;
 		HRESULT hr = CreateDCRenderTarget(&drtp, pTarget);
@@ -3228,7 +3267,7 @@ public:
 		}
 
 		const RECT rc = {0, 0, width, height};
-		hr = pTarget->BindDC(hMemDC, &rc);
+		hr = pTarget->BindDC(bm.DC(), &rc);
 		if (FAILED(hr)) {
 			return false;
 		}
@@ -3305,12 +3344,12 @@ public:
 			pen = ::CreatePen(PS_INSIDEFRAME, 1, strokeColour);
 		}
 
-		HPEN penOld = SelectPen(hMemDC, pen);
+		HPEN penOld = SelectPen(bm.DC(), pen);
 		HBRUSH brush = ::CreateSolidBrush(fillColour);
-		HBRUSH brushOld = SelectBrush(hMemDC, brush);
-		::Polygon(hMemDC, points, static_cast<int>(nPoints));
-		SelectPen(hMemDC, penOld);
-		SelectBrush(hMemDC, brushOld);
+		HBRUSH brushOld = SelectBrush(bm.DC(), brush);
+		::Polygon(bm.DC(), points, static_cast<int>(nPoints));
+		SelectPen(bm.DC(), penOld);
+		SelectBrush(bm.DC(), brushOld);
 		::DeleteObject(pen);
 		::DeleteObject(brush);
 
@@ -3353,7 +3392,7 @@ HCURSOR LoadReverseArrowCursor(HCURSOR cursor, UINT dpi) noexcept {
 	}
 
 	CursorHelper cursorHelper(width, height);
-	if (!cursorHelper.HasBitmap()) {
+	if (!cursorHelper) {
 		return {};
 	}
 
@@ -3446,6 +3485,8 @@ PRectangle Window::GetMonitorRect(Point pt) const noexcept {
 	return PRectangle();
 }
 
+namespace {
+
 struct ListItemData {
 	const char *text;
 	unsigned int len;
@@ -3484,29 +3525,61 @@ public:
 	}
 };
 
-static constexpr const WCHAR *ListBoxX_ClassName = L"ListBoxX";
+inline ColourRGBA ColourOfElement(std::optional<ColourRGBA> colour, UINT nIndex) noexcept {
+	COLORREF value;
+	if (colour.has_value()) {
+		value = colour->OpaqueRGB();
+	} else {
+		value = ::GetSysColor(nIndex);
+	}
+	return ColourRGBA::FromRGB(value);
+}
+
+struct LBGraphics {
+	GDIBitMap bm;
+	std::unique_ptr<Surface> pixmapLine;
+	DCRenderTarget pBMDCTarget;
+
+	void Release() noexcept {
+		pixmapLine.reset();
+		pBMDCTarget = nullptr;
+		bm.Release();
+	}
+};
+
 #define LISTBOXX_USE_FAKE_FRAME		0
+#define LISTBOXX_USE_WIDEST_ITEM	1
+
+constexpr const WCHAR *ListBoxX_ClassName = L"ListBoxX";
+#if LISTBOXX_USE_FAKE_FRAME
+constexpr int ListBoxXFakeFrameSize = 4;
+#endif
+
+}
 
 class ListBoxX final : public ListBox {
 	int lineHeight = 10;
 	HFONT fontCopy {};
+	std::shared_ptr<FontWin> fontWin;
 	Technology technology = Technology::Default;
 	RGBAImageSet images;
 	LineToItem lti;
 	HWND lb {};
-	bool unicodeMode = false;
+	int codePage = 0;
 	int desiredVisibleRows = 9;
 	unsigned int maxItemCharacters = 0;
 	unsigned int aveCharWidth = 8;
-	COLORREF colorText = 0;
-	COLORREF colorBackground = 0;
-	COLORREF colorHighlightText = 0;
-	COLORREF colorHighlightBack = 0;
+	ColourRGBA colorText;
+	ColourRGBA colorBackground;
+	ColourRGBA colorHighlightText;
+	ColourRGBA colorHighlightBack;
 	Window *parent = nullptr;
 	int ctrlID = 0;
 	UINT dpi = USER_DEFAULT_SCREEN_DPI;
 	IListBoxDelegate *delegate = nullptr;
+#if LISTBOXX_USE_WIDEST_ITEM
 	const char *widestItem = nullptr;
+#endif
 	unsigned int maxCharWidth = 1;
 	WPARAM resizeHit = 0;
 	PRectangle rcPreSize;
@@ -3514,6 +3587,8 @@ class ListBoxX final : public ListBox {
 	Point location;	// Caret location at which the list is opened
 	MouseWheelDelta wheelDelta;
 	DWORD frameStyle = WS_THICKFRAME;
+
+	LBGraphics graphics;
 
 	HWND GetHWND() const noexcept;
 	void AppendListItem(const char *text, const char *numword, unsigned int len);
@@ -3531,7 +3606,7 @@ class ListBoxX final : public ListBox {
 	void StartResize(WPARAM) noexcept;
 	LRESULT NcHitTest(WPARAM, LPARAM) const noexcept;
 	void CentreItem(int n) noexcept;
-	void Paint(HDC) noexcept;
+	void AllocateBitMap();
 	static LRESULT CALLBACK ControlWndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 
 	static constexpr POINT ItemInset {0, 0};	// Padding around whole item
@@ -3548,9 +3623,10 @@ public:
 		if (fontCopy) {
 			::DeleteObject(fontCopy);
 		}
+		graphics.Release();
 	}
-	void SetFont(const Font *font) noexcept override;
-	void SCICALL Create(Window &parent_, int ctrlID_, Point location_, int lineHeight_, bool unicodeMode_, Technology technology_) noexcept override;
+	void SetFont(std::shared_ptr<Font> font) noexcept override;
+	void SCICALL Create(Window &parent_, int ctrlID_, Point location_, int lineHeight_, int codePage_, Technology technology_) noexcept override;
 	void SetAverageCharWidth(int width) noexcept override;
 	void SetVisibleRows(int rows) noexcept override;
 	int GetVisibleRows() const noexcept override;
@@ -3574,20 +3650,16 @@ public:
 	static LRESULT CALLBACK StaticWndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam);
 };
 
-#if LISTBOXX_USE_FAKE_FRAME
-constexpr int ListBoxXFakeFrameSize = 4;
-#endif
-
 std::unique_ptr<ListBox> ListBox::Allocate() {
 	return std::make_unique<ListBoxX>();
 }
 
-void ListBoxX::Create(Window &parent_, int ctrlID_, Point location_, int lineHeight_, bool unicodeMode_, Technology technology_) noexcept {
+void ListBoxX::Create(Window &parent_, int ctrlID_, Point location_, int lineHeight_, int codePage_, Technology technology_) noexcept {
 	parent = &parent_;
 	ctrlID = ctrlID_;
 	location = location_;
 	lineHeight = lineHeight_;
-	unicodeMode = unicodeMode_;
+	codePage = codePage_;
 	technology = technology_;
 	HWND hwndParent = HwndFromWindow(*parent);
 	HINSTANCE hinstanceParent = GetWindowInstance(hwndParent);
@@ -3606,14 +3678,20 @@ void ListBoxX::Create(Window &parent_, int ctrlID_, Point location_, int lineHei
 	location = PointFromPOINTEx(locationw);
 }
 
-void ListBoxX::SetFont(const Font *font) noexcept {
-	const FontWin *pfm = down_cast<const FontWin *>(font);
+void ListBoxX::SetFont(std::shared_ptr<Font> font) noexcept {
+#if USE_RTTI
+	fontWin = std::dynamic_pointer_cast<FontWin>(font);
+#else
+	fontWin = std::static_pointer_cast<FontWin>(font);
+#endif
+	const FontWin *pfm = fontWin.get();
 	if (pfm) {
 		if (fontCopy) {
 			::DeleteObject(fontCopy);
 		}
 		fontCopy = pfm->HFont();
 		SetWindowFont(lb, fontCopy, FALSE);
+		graphics.Release();
 	}
 }
 
@@ -3642,29 +3720,36 @@ PRectangle ListBoxX::GetDesiredRect() {
 	rcDesired.bottom = rcDesired.top + ItemHeight() * rows;
 
 	int width = MinClientWidth();
-	HDC hdc = ::GetDC(lb);
-	HFONT oldFont = SelectFont(hdc, fontCopy);
-	SIZE textSize {};
-	unsigned int len = 0;
+
+	int textSize = 0;
+	int averageCharWidth = 8;
+
+	// Make a measuring surface
+	const std::unique_ptr<Surface> surfaceItem(Surface::Allocate(technology));
+	surfaceItem->Init(GetID());
+	surfaceItem->SetMode(SurfaceMode(codePage/*, false*/));
+
+	// Find the widest item in pixels
+#if LISTBOXX_USE_WIDEST_ITEM
 	if (widestItem) {
-		len = maxItemCharacters;
-		if (unicodeMode) {
-			const TextWide tbuf(std::string_view(widestItem, len), CpUtf8);
-			::GetTextExtentPoint32W(hdc, tbuf.data(), tbuf.length(), &textSize);
-		} else {
-			::GetTextExtentPoint32A(hdc, widestItem, len, &textSize);
-		}
+		textSize = static_cast<int>(std::ceil(
+			surfaceItem->WidthText(fontWin.get(), std::string_view(widestItem, maxItemCharacters))));
 	}
+#else
+	const int items = lti.Count();
+	for (int i = 0; i < items; i++) {
+		const ListItemData item = lti.Get(i);
+		const int itemTextSize = static_cast<int>(std::ceil(
+			surfaceItem->WidthText(fontWin.get(), item.text)));
+		textSize = std::max(textSize, itemTextSize);
+	}
+#endif
 
-	TEXTMETRIC tm;
-	::GetTextMetrics(hdc, &tm);
-	maxCharWidth = tm.tmMaxCharWidth;
-	SelectFont(hdc, oldFont);
-	::ReleaseDC(lb, hdc);
+	maxCharWidth = static_cast<int>(std::ceil(surfaceItem->WidthText(fontWin.get(), "W")));
+	averageCharWidth = static_cast<int>(surfaceItem->AverageCharWidth(fontWin.get()));
 
-	const int widthDesired = std::max(textSize.cx, static_cast<int>(len + 1) * tm.tmAveCharWidth);
-	if (width < widthDesired)
-		width = widthDesired;
+	width = std::max(width, textSize);
+	width = std::max<int>(width, (maxItemCharacters + 1) * averageCharWidth);
 
 	rcDesired.right = rcDesired.left + TextOffset() + width + (TextInset.x * 2);
 	if (Length() > rows) {
@@ -3689,7 +3774,9 @@ int ListBoxX::CaretFromEdge() const noexcept {
 void ListBoxX::Clear() noexcept {
 	ListBox_ResetContent(lb);
 	maxItemCharacters = 0;
+#if LISTBOXX_USE_WIDEST_ITEM
 	widestItem = nullptr;
+#endif
 	lti.Clear();
 }
 
@@ -3740,101 +3827,74 @@ void ListBoxX::ClearRegisteredImages() noexcept {
 	images.Clear();
 }
 
-namespace {
-
-inline COLORREF ColourOfElement(std::optional<ColourRGBA> colour, UINT nIndex) noexcept {
-	if (colour.has_value()) {
-		return colour.value().OpaqueRGB();
-	}
-	return ::GetSysColor(nIndex);
-}
-
-void FillRectColour(HDC hdc, const RECT *lprc, COLORREF colour) noexcept {
-	HBRUSH brush = ::CreateSolidBrush(colour);
-	::FillRect(hdc, lprc, brush);
-	::DeleteObject(brush);
-}
-
-}
-
 void ListBoxX::Draw(const DRAWITEMSTRUCT *pDrawItem) {
-	if ((pDrawItem->itemAction == ODA_SELECT) || (pDrawItem->itemAction == ODA_DRAWENTIRE)) {
-		RECT rcBox = pDrawItem->rcItem;
-		rcBox.left += TextOffset();
-		if (pDrawItem->itemState & ODS_SELECTED) {
-			RECT rcImage = pDrawItem->rcItem;
-			rcImage.right = rcBox.left;
-			// The image is not highlighted
-			FillRectColour(pDrawItem->hDC, &rcImage, colorBackground);
-			FillRectColour(pDrawItem->hDC, &rcBox, colorHighlightBack);
-			::SetBkColor(pDrawItem->hDC, colorHighlightBack);
-			::SetTextColor(pDrawItem->hDC, colorHighlightText);
-		} else {
-			FillRectColour(pDrawItem->hDC, &pDrawItem->rcItem, colorBackground);
-			::SetBkColor(pDrawItem->hDC, colorBackground);
-			::SetTextColor(pDrawItem->hDC, colorText);
-		}
+	if ((pDrawItem->itemAction != ODA_SELECT) && (pDrawItem->itemAction != ODA_DRAWENTIRE)) {
+		return;
+	}
 
-		const ListItemData item = lti.Get(pDrawItem->itemID);
-		const int pixId = item.pixId;
-		const char *text = item.text;
-		const unsigned int len = item.len;
-
-		RECT rcText = rcBox;
-		::InsetRect(&rcText, TextInset.x, TextInset.y);
-
-		if (unicodeMode) {
-			const TextWide tbuf(std::string_view(text, len), CpUtf8);
-			::DrawTextW(pDrawItem->hDC, tbuf.data(), tbuf.length(), &rcText, DT_NOPREFIX | DT_END_ELLIPSIS | DT_SINGLELINE | DT_NOCLIP);
-		} else {
-			::DrawTextA(pDrawItem->hDC, text, len, &rcText, DT_NOPREFIX | DT_END_ELLIPSIS | DT_SINGLELINE | DT_NOCLIP);
-		}
-
-		// Draw the image, if any
-		const RGBAImage *pimage = images.Get(pixId);
-		if (pimage) {
-			const std::unique_ptr<Surface> surfaceItem(Surface::Allocate(technology));
-			if (technology == Technology::Default) {
-				surfaceItem->Init(pDrawItem->hDC, pDrawItem->hwndItem);
-				const long left = pDrawItem->rcItem.left + ItemInset.x + ImageInset.x;
-				const PRectangle rcImage = PRectangle::FromInts(left, pDrawItem->rcItem.top,
-					left + images.GetWidth(), pDrawItem->rcItem.bottom);
-				surfaceItem->DrawRGBAImage(rcImage,
-					pimage->GetWidth(), pimage->GetHeight(), pimage->Pixels());
-				::SetTextAlign(pDrawItem->hDC, TA_TOP);
-			} else {
-				const D2D1_RENDER_TARGET_PROPERTIES props = D2D1::RenderTargetProperties(
-					D2D1_RENDER_TARGET_TYPE_DEFAULT,
-					D2D1::PixelFormat(
-						DXGI_FORMAT_B8G8R8A8_UNORM,
-						D2D1_ALPHA_MODE_IGNORE),
-					0,
-					0,
-					D2D1_RENDER_TARGET_USAGE_NONE,
-					D2D1_FEATURE_LEVEL_DEFAULT
-				);
-				DCRenderTarget pDCRT;
-				HRESULT hr = CreateDCRenderTarget(&props, pDCRT);
-				if (SUCCEEDED(hr) && pDCRT) {
-					const long left = pDrawItem->rcItem.left + ItemInset.x + ImageInset.x;
-
-					RECT rcItem = pDrawItem->rcItem;
-					rcItem.left = left;
-					rcItem.right = rcItem.left + images.GetWidth();
-
-					hr = pDCRT->BindDC(pDrawItem->hDC, &rcItem);
-					if (SUCCEEDED(hr)) {
-						surfaceItem->Init(pDCRT.Get(), pDrawItem->hwndItem);
-						pDCRT->BeginDraw();
-						const PRectangle rcImage = PRectangle::FromInts(0, 0, images.GetWidth(), rcItem.bottom - rcItem.top);
-						surfaceItem->DrawRGBAImage(rcImage,
-							pimage->GetWidth(), pimage->GetHeight(), pimage->Pixels());
-						pDCRT->EndDraw();
-					}
-				}
-			}
+	if (!graphics.pixmapLine) {
+		AllocateBitMap();
+		if (!graphics.pixmapLine) {
+			// Failed to allocate, so release fully and give up
+			graphics.Release();
+			return;
 		}
 	}
+	if (graphics.pBMDCTarget) {
+		graphics.pBMDCTarget->BeginDraw();
+	}
+
+	const PRectangle rcItemBase = PRectangleFromRectEx(pDrawItem->rcItem);
+	const PRectangle rcItem(0, 0, rcItemBase.Width(), rcItemBase.Height());
+	PRectangle rcBox = rcItem;
+	rcBox.left += TextOffset();
+	ColourRGBA colourFore;
+	ColourRGBA colourBack;
+	if (pDrawItem->itemState & ODS_SELECTED) {
+		PRectangle rcImage = rcItem;
+		rcImage.right = rcBox.left;
+		// The image is not highlighted
+		graphics.pixmapLine->FillRectangle(rcImage, colorBackground);
+		colourBack = colorHighlightBack;
+		graphics.pixmapLine->FillRectangle(rcBox, colourBack);
+		colourFore = colorHighlightText;
+	} else {
+		colourBack = colorBackground;
+		graphics.pixmapLine->FillRectangle(rcItem, colourBack);
+		colourFore = colorText;
+	}
+
+	const ListItemData item = lti.Get(pDrawItem->itemID);
+	const int pixId = item.pixId;
+	const char *text = item.text;
+	const unsigned int len = item.len;
+
+	const PRectangle rcText = rcBox.Inset(Point(TextInset.x, TextInset.y));
+
+	const double ascent = graphics.pixmapLine->Ascent(fontWin.get());
+	graphics.pixmapLine->DrawTextClipped(rcText, fontWin.get(), rcText.top + ascent, std::string_view(text, len), colourFore, colourBack);
+
+	// Draw the image, if any
+	const RGBAImage *pimage = images.Get(pixId);
+	if (pimage) {
+		const XYPOSITION left = rcItem.left + ItemInset.x + ImageInset.x;
+		PRectangle rcImage = rcItem;
+		rcImage.left = left;
+		rcImage.right = rcImage.left + images.GetWidth();
+		graphics.pixmapLine->DrawRGBAImage(rcImage,
+			pimage->GetWidth(), pimage->GetHeight(), pimage->Pixels());
+	}
+
+	if (graphics.pBMDCTarget) {
+		const HRESULT hrEnd = graphics.pBMDCTarget->EndDraw();
+		if (FAILED(hrEnd)) {
+			return;
+		}
+	}
+
+	// Blit from hMemDC to hDC
+	const SIZE extent = SizeOfRect(pDrawItem->rcItem);
+	::BitBlt(pDrawItem->hDC, pDrawItem->rcItem.left, pDrawItem->rcItem.top, extent.cx, extent.cy, graphics.bm.DC(), 0, 0, SRCCOPY);
 }
 
 void ListBoxX::AppendListItem(const char *text, const char *numword, unsigned int len) {
@@ -3850,7 +3910,9 @@ void ListBoxX::AppendListItem(const char *text, const char *numword, unsigned in
 	lti.AllocItem(text, len, pixId);
 	if (maxItemCharacters < len) {
 		maxItemCharacters = len;
+#if LISTBOXX_USE_WIDEST_ITEM
 		widestItem = text;
+#endif
 	}
 }
 
@@ -3951,8 +4013,9 @@ POINT ListBoxX::MaxTrackSize() const noexcept {
 
 void ListBoxX::SetRedraw(bool on) noexcept {
 	::SendMessage(lb, WM_SETREDRAW, on, 0);
-	if (on)
-		::InvalidateRect(lb, nullptr, TRUE);
+	if (on) {
+		::RedrawWindow(lb, {}, {}, RDW_ERASE | RDW_FRAME | RDW_INVALIDATE | RDW_ALLCHILDREN);
+	}
 }
 
 void ListBoxX::ResizeToCursor() {
@@ -4153,25 +4216,42 @@ void ListBoxX::CentreItem(int n) noexcept {
 	}
 }
 
-// Performs a double-buffered paint operation to avoid flicker
-void ListBoxX::Paint(HDC hDC) noexcept {
-	const POINT extent = GetClientExtent();
-	HBITMAP hBitmap = ::CreateCompatibleBitmap(hDC, extent.x, extent.y);
-	HDC bitmapDC = ::CreateCompatibleDC(hDC);
-	HBITMAP hBitmapOld = SelectBitmap(bitmapDC, hBitmap);
-	// The list background is mainly erased during painting, but can be a small
-	// unpainted area when at the end of a non-integrally sized list with a
-	// vertical scroll bar
-	const RECT rc = { 0, 0, extent.x, extent.y };
-	FillRectColour(bitmapDC, &rc, colorBackground);
-	// Paint the entire client area and vertical scrollbar
-	::SendMessage(lb, WM_PRINT, AsInteger<WPARAM>(bitmapDC), PRF_CLIENT | PRF_NONCLIENT);
-	::BitBlt(hDC, 0, 0, extent.x, extent.y, bitmapDC, 0, 0, SRCCOPY);
-	// Select a stock brush to prevent warnings from BoundsChecker
-	SelectBrush(bitmapDC, GetStockBrush(WHITE_BRUSH));
-	SelectBitmap(bitmapDC, hBitmapOld);
-	::DeleteDC(bitmapDC);
-	::DeleteObject(hBitmap);
+void ListBoxX::AllocateBitMap() {
+	const SIZE extent { GetClientExtent().x, ItemHeight() };
+
+	graphics.bm.Create({}, extent.cx, -extent.cy, nullptr);
+	if (!graphics.bm) {
+		return;
+	}
+
+	// Make a surface
+	graphics.pixmapLine = Surface::Allocate(technology);
+	graphics.pixmapLine->SetMode(SurfaceMode(codePage/*, false*/));
+
+	if (technology != Technology::Default) {
+		// if (!LoadD2D()) {
+		// 	return;
+		// }
+
+		const D2D1_RENDER_TARGET_PROPERTIES drtp = D2D1::RenderTargetProperties(
+			D2D1_RENDER_TARGET_TYPE_DEFAULT,
+			{ DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED });
+
+		HRESULT hr = CreateDCRenderTarget(&drtp, graphics.pBMDCTarget);
+		if (FAILED(hr) || !graphics.pBMDCTarget) {
+			return;
+		}
+
+		const RECT rcExtent = { 0, 0, extent.cx, extent.cy };
+		hr = graphics.pBMDCTarget->BindDC(graphics.bm.DC(), &rcExtent);
+		if (SUCCEEDED(hr)) {
+			graphics.pixmapLine->Init(graphics.pBMDCTarget.Get(), GetID());
+		}
+		return;
+	}
+
+	// Either technology == Technology::Default or USE_D2D turned off
+	graphics.pixmapLine->Init(graphics.bm.DC(), GetID());
 }
 
 LRESULT CALLBACK ListBoxX::ControlWndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR /*dwRefData*/) {
@@ -4180,16 +4260,6 @@ LRESULT CALLBACK ListBoxX::ControlWndProc(HWND hWnd, UINT iMessage, WPARAM wPara
 		switch (iMessage) {
 		case WM_ERASEBKGND:
 			return TRUE;
-
-		case WM_PAINT: {
-			PAINTSTRUCT ps;
-			HDC hDC = ::BeginPaint(hWnd, &ps);
-			if (lbx) {
-				lbx->Paint(hDC);
-			}
-			::EndPaint(hWnd, &ps);
-		}
-		return 0;
 
 		case WM_MOUSEACTIVATE:
 			// This prevents the view activating when the scrollbar is clicked
@@ -4251,6 +4321,7 @@ LRESULT ListBoxX::WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam
 
 	case WM_SIZE:
 		if (lb) {
+			graphics.Release();	// Bitmap must be reallocated to new size.
 			SetRedraw(false);
 			::SetWindowPos(lb, {}, 0, 0, LOWORD(lParam), HIWORD(lParam), SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOMOVE);
 			// Ensure the selection remains visible
@@ -4260,9 +4331,7 @@ LRESULT ListBoxX::WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam
 		break;
 
 	case WM_PAINT: {
-		PAINTSTRUCT ps;
-		::BeginPaint(hWnd, &ps);
-		::EndPaint(hWnd, &ps);
+		const Painter painter(hWnd);
 	}
 	break;
 

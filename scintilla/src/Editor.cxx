@@ -99,6 +99,15 @@ constexpr bool IsLastStep(const DocModification &mh) noexcept {
 		&& ((mh.modificationType & finalMask) == finalMask);
 }
 
+constexpr bool IsAllSpacesOrTabs(std::string_view sv) noexcept {
+	for (const char ch : sv) {
+		// This is safe because IsSpaceOrTab() will return false for null terminators
+		if (!IsSpaceOrTab(ch))
+			return false;
+	}
+	return true;
+}
+
 class BatchUpdateGroup {
 	Editor *editor;
 public:
@@ -118,14 +127,6 @@ Timer::Timer() noexcept :
 Idler::Idler() noexcept :
 		state(false), idlerID(nullptr) {}
 
-static constexpr bool IsAllSpacesOrTabs(std::string_view sv) noexcept {
-	for (const char ch : sv) {
-		// This is safe because IsSpaceOrTab() will return false for null terminators
-		if (!IsSpaceOrTab(ch))
-			return false;
-	}
-	return true;
-}
 
 Editor::Editor() {
 	ctrlID = 0;
@@ -3174,7 +3175,7 @@ void Editor::ChangeCaseOfSelection(CaseMapping caseMapping) {
 		SelectionRange currentNoVS = current;
 		currentNoVS.ClearVirtualSpace();
 		const size_t rangeBytes = currentNoVS.Length();
-		if (rangeBytes > 0) {
+		if (rangeBytes > 0 /*&& !RangeContainsProtected(currentNoVS)*/) {
 			const std::string sText = RangeText(currentNoVS.Start().Position(), currentNoVS.End().Position());
 
 			const std::string sMapped = CaseMapString(sText, caseMapping);
@@ -4422,13 +4423,21 @@ void Editor::GoToLine(Sci::Line lineNo) {
 	EnsureCaretVisible();
 }
 
-static bool Close(Point pt1, Point pt2, Point threshold) noexcept {
+namespace {
+
+bool Close(Point pt1, Point pt2, Point threshold) noexcept {
 	const Point ptDifference = pt2 - pt1;
 	if (std::abs(ptDifference.x) > threshold.x)
 		return false;
 	if (std::abs(ptDifference.y) > threshold.y)
 		return false;
 	return true;
+}
+
+constexpr bool AllowVirtualSpace(VirtualSpace virtualSpaceOptions, bool rectangular) noexcept {
+	return FlagSet(virtualSpaceOptions, (rectangular ? VirtualSpace::RectangularSelection : VirtualSpace::UserAccessible));
+}
+
 }
 
 std::string Editor::RangeText(Sci::Position start, Sci::Position end) const {
@@ -4773,10 +4782,6 @@ void Editor::MouseLeave() {
 		ptMouseLast = Point(-1, -1);
 		DwellEnd(true);
 	}
-}
-
-static constexpr bool AllowVirtualSpace(VirtualSpace virtualSpaceOptions, bool rectangular) noexcept {
-	return FlagSet(virtualSpaceOptions, (rectangular ? VirtualSpace::RectangularSelection : VirtualSpace::UserAccessible));
 }
 
 void Editor::ButtonDownWithModifiers(Point pt, unsigned int curTime, KeyMod modifiers) {

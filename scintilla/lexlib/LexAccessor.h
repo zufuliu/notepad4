@@ -242,7 +242,7 @@ public:
 		pAccess->SetLevel(line, level);
 	}
 	// Avoids some overhead when level same as before
-	void SetLevelIfDifferent(Sci_Position line, int level) {
+	void SetLevelIfDifferent(Sci_Line line, int level) {
 		pAccess->SetLevel(line, level);
 	}
 	void IndicatorFill(Sci_Position start, Sci_Position end, int indicator, int value) {

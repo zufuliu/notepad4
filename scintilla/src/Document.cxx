@@ -629,11 +629,15 @@ void Document::ClearLevels() {
 	Levels()->ClearLevels();
 }
 
-static constexpr bool IsSubordinate(FoldLevel levelStart, FoldLevel levelTry) noexcept {
-	if (LevelIsWhitespace(levelTry))
+namespace {
+
+constexpr bool IsSubordinate(FoldLevel levelStart, FoldLevel levelTry) noexcept {
+	if (LevelIsWhitespace(levelTry)) {
 		return true;
-	else
-		return LevelNumber(levelStart) < LevelNumber(levelTry);
+	}
+	return LevelNumber(levelStart) < LevelNumber(levelTry);
+}
+
 }
 
 Sci::Line Document::GetLastChild(Sci::Line lineParent, FoldLevel level, Sci::Line lastLine) {
@@ -1156,6 +1160,14 @@ bool Document::IsDBCSDualByteAt(Sci::Position pos) const noexcept {
 		&& IsDBCSTrailByteNoExcept(cb.UCharAt(pos + 1));
 }
 
+namespace {
+
+constexpr Sci::Position NextTab(Sci::Position pos, Sci::Position tabSize) noexcept {
+	return ((pos / tabSize) + 1) * tabSize;
+}
+
+}
+
 size_t Document::DiscardLastCombinedCharacter(const char *text, size_t lengthSegment, size_t lenBytes) noexcept {
 	const char *it = text + lengthSegment;
 	const char * const back = text + lenBytes;
@@ -1617,10 +1629,6 @@ void Document::DelCharBack(Sci::Position pos) {
 	} else {
 		DeleteChars(pos - 1, 1);
 	}
-}
-
-static constexpr Sci::Position NextTab(Sci::Position pos, Sci::Position tabSize) noexcept {
-	return ((pos / tabSize) + 1) * tabSize;
 }
 
 int SCI_METHOD Document::GetLineIndentation(Sci_Line line) const noexcept {
@@ -3260,14 +3268,14 @@ public:
 	DocumentIndexer(const Document *pdoc_, Sci::Position end_) noexcept :
 		pdoc(pdoc_), end(end_) {}
 
-	char CharAt(Sci::Position index) const noexcept override {
+	[[nodiscard]] char CharAt(Sci::Position index) const noexcept override {
 		if (IsValidIndex(index, end))
 			return pdoc->CharAt(index);
 		else
 			return '\0';
 	}
 
-	Sci::Position MovePositionOutsideChar(Sci::Position pos, int moveDir) const noexcept override {
+	[[nodiscard]] Sci::Position MovePositionOutsideChar(Sci::Position pos, int moveDir) const noexcept override {
 		return pdoc->MovePositionOutsideChar(pos, moveDir, false);
 	}
 };
@@ -3326,7 +3334,7 @@ public:
 		lineRangeEnd = doc->SciLineFromPosition(endPos);
 		lineRangeBreak = lineRangeEnd + increment;
 	}
-	Range LineRange(Sci::Line line, Sci::Position lineStartPos, Sci::Position lineEndPos) const noexcept {
+	[[nodiscard]] Range LineRange(Sci::Line line, Sci::Position lineStartPos, Sci::Position lineEndPos) const noexcept {
 		Range range(lineStartPos, lineEndPos);
 		if (increment > 0) {
 			if (line == lineRangeStart)
@@ -3418,10 +3426,10 @@ public:
 		return position != other.position ||
 			characterIndex != other.characterIndex;
 	}
-	Sci::Position Pos() const noexcept {
+	[[nodiscard]] Sci::Position Pos() const noexcept {
 		return position;
 	}
-	Sci::Position PosRoundUp() const noexcept {
+	[[nodiscard]] Sci::Position PosRoundUp() const noexcept {
 		if (characterIndex)
 			return position + charInfo.lenBytes;	// Force to end of character
 		else
