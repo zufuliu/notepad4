@@ -26,7 +26,16 @@
 #ifndef USER_DEFAULT_SCREEN_DPI
 #define USER_DEFAULT_SCREEN_DPI		96
 #endif
-constexpr FLOAT dpiDefault = USER_DEFAULT_SCREEN_DPI;
+
+#ifndef LOAD_LIBRARY_SEARCH_SYSTEM32
+#define LOAD_LIBRARY_SEARCH_SYSTEM32	0x00000800
+#endif
+
+#if _WIN32_WINNT >= _WIN32_WINNT_WIN8
+#define kSystemLibraryLoadFlags		LOAD_LIBRARY_SEARCH_SYSTEM32
+#else
+extern DWORD kSystemLibraryLoadFlags;
+#endif
 
 #if (_WIN32_WINNT < _WIN32_WINNT_WIN8) && defined(_MSC_VER) && defined(__clang__)
 // fix error for RoTransformError() used in winrt\wrl\event.h
@@ -74,6 +83,12 @@ extern BOOL AdjustWindowRectForDpi(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle
 extern WCHAR defaultTextFontName[LF_FACESIZE];
 
 namespace Scintilla::Internal {
+
+constexpr FLOAT dpiDefault = USER_DEFAULT_SCREEN_DPI;
+
+bool ListBoxX_Register() noexcept;
+void ListBoxX_Unregister() noexcept;
+std::unique_ptr<Surface> SurfaceGDI_Allocate();
 
 extern void Platform_Initialise(void *hInstance) noexcept;
 extern void Platform_Finalise(bool fromDllMain) noexcept;
@@ -160,6 +175,8 @@ constexpr Point PointFromPOINTEx(POINT point) noexcept {
 }
 #endif
 
+extern HINSTANCE hinstPlatformRes;
+
 constexpr HWND HwndFromWindowID(WindowID wid) noexcept {
 	return static_cast<HWND>(wid);
 }
@@ -218,25 +235,152 @@ constexpr BYTE Win32MapFontQuality(FontQuality extraFontFlag) noexcept {
 	return static_cast<BYTE>((mask >> (4*static_cast<int>(extraFontFlag & FontQuality::QualityMask))) & 15);
 }
 
-extern bool LoadD2D() noexcept;
+// Both GDI and DirectWrite can produce a HFONT for use in list boxes
+struct FontWin final : public Font {
+	HFONT hfont{};
+	ComPtr<IDWriteTextFormat> pTextFormat;
+	FontQuality extraFontFlag;
+	FLOAT yAscent = 2.0f;
+	FLOAT yDescent = 1.0f;
+	FLOAT yInternalLeading = 0.0f;
+	LOGFONTW lf {};
+	explicit FontWin(const FontParameters &fp);
+	FontWin(const FontWin &) = delete;
+	FontWin(FontWin &&) = delete;
+	FontWin &operator=(const FontWin &) = delete;
+	FontWin &operator=(FontWin &&) = delete;
 
-using DCRenderTarget = ComPtr<ID2D1DCRenderTarget>;
-HRESULT CreateDCRenderTarget(const D2D1_RENDER_TARGET_PROPERTIES *renderTargetProperties, DCRenderTarget &dcRT) noexcept;
+	~FontWin() noexcept override {
+		if (hfont) {
+			::DeleteObject(hfont);
+		}
+	}
+	[[nodiscard]] HFONT HFont() const noexcept {
+		return ::CreateFontIndirectW(&lf);
+	}
+};
 
-#if _WIN32_WINNT >= _WIN32_WINNT_WIN7
-extern ID2D1Factory1 *pD2DFactory;
-extern IDWriteFactory1 *pIDWriteFactory;
+/* dummy types to minimize differences between official Scintilla.
+FontDirectWrite::HFont() will create wild font when font family name
+is different from typeface name, e.g. Source Code Pro Semibold.
+*/
+using FontGDI = FontWin;
+using FontDirectWrite = FontWin;
 
-using D3D11Device = ComPtr<ID3D11Device1>;
-extern HRESULT CreateD3D(D3D11Device &device) noexcept;
+// Buffer to hold strings and string position arrays without always allocating on heap.
+// May sometimes have string too long to allocate on stack. So use a fixed stack-allocated buffer
+// when less than safe size otherwise allocate on heap and free automatically.
+template<typename T, size_t lengthStandard>
+class VarBuffer {
+	T *buffer;
+	T bufferStandard[lengthStandard];
+public:
+	VarBuffer() noexcept {
+		buffer = bufferStandard;
+	}
+	explicit VarBuffer(size_t length): buffer{bufferStandard} {
+		allocate(length);
+	}
+	void allocate(size_t length) {
+		if (length > lengthStandard) {
+			buffer = new T[length];
+		}
+		static_assert(__is_standard_layout(T));
+		memset(buffer, 0, length*sizeof(T));
+	}
+	const T *data() const noexcept {
+		return buffer;
+	}
+	T *data() noexcept {
+		return buffer;
+	}
+	const T& operator[](size_t index) const noexcept {
+		return buffer[index];
+	}
+	T& operator[](size_t index) noexcept {
+		return buffer[index];
+	}
 
-using WriteRenderingParams = ComPtr<IDWriteRenderingParams1>;
+	// Deleted so VarBuffer objects can not be copied.
+	VarBuffer(const VarBuffer &) = delete;
+	VarBuffer(VarBuffer &&) = delete;
+	VarBuffer &operator=(const VarBuffer &) = delete;
+	VarBuffer &operator=(VarBuffer &&) = delete;
 
-#else
-extern ID2D1Factory *pD2DFactory;
-extern IDWriteFactory *pIDWriteFactory;
+	~VarBuffer() noexcept {
+		if (buffer != bufferStandard) {
+			delete[]buffer;
+		}
+	}
+};
 
-using WriteRenderingParams = ComPtr<IDWriteRenderingParams>;
-#endif
+constexpr size_t stackBufferLength = 480; // max value to keep stack usage under 4096
+class TextWide {
+	wchar_t *buffer;
+	UINT len;	// Using UINT instead of size_t as most Win32 APIs take UINT.
+	wchar_t bufferStandard[stackBufferLength];
+public:
+	TextWide(std::string_view text, int codePage): buffer {bufferStandard} {
+		if (text.length() > stackBufferLength) {
+			buffer = new wchar_t[text.length()];
+		}
+		if (codePage == CpUtf8) {
+			len = static_cast<UINT>(UTF16FromUTF8(text, buffer, text.length()));
+		} else {
+			// Support Asian string display in 9x English
+			len = ::MultiByteToWideChar(codePage, 0, text.data(), static_cast<int>(text.length()),
+				buffer, static_cast<int>(text.length()));
+		}
+	}
+	const wchar_t *data() const noexcept {
+		return buffer;
+	}
+	UINT length() const noexcept {
+		return len;
+	}
+	[[nodiscard]] std::wstring_view AsView() const noexcept {
+		return std::wstring_view{buffer, len};
+	}
+
+	// Deleted so TextWide objects can not be copied.
+	TextWide(const TextWide &) = delete;
+	TextWide(TextWide &&) = delete;
+	TextWide &operator=(const TextWide &) = delete;
+	TextWide &operator=(TextWide &&) = delete;
+
+	~TextWide() noexcept {
+		if (buffer != bufferStandard) {
+			delete[]buffer;
+		}
+	}
+};
+
+// Manage the lifetime of a memory HBITMAP and its HDC so there are no leaks.
+class GDIBitMap {
+	HDC hdc{};
+	HBITMAP hbm{};
+	HBITMAP hbmOriginal{};
+
+public:
+	GDIBitMap() noexcept = default;
+	// Deleted so GDIBitMap objects can not be copied.
+	GDIBitMap(const GDIBitMap &) = delete;
+	GDIBitMap(GDIBitMap &&) = delete;
+	// Move would be OK but not needed yet
+	GDIBitMap &operator=(const GDIBitMap &) = delete;
+	GDIBitMap &operator=(GDIBitMap &&) = delete;
+	~GDIBitMap() noexcept;
+
+	void Create(HDC hdcBase, int width, int height, DWORD **pixels) noexcept;
+	void Release() noexcept;
+	HBITMAP Extract() noexcept;
+
+	[[nodiscard]] HDC DC() const noexcept {
+		return hdc;
+	}
+	[[nodiscard]] explicit operator bool() const noexcept {
+		return hdc && hbm;
+	}
+};
 
 }

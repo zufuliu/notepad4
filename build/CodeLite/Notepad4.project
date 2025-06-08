@@ -193,9 +193,13 @@
       <File Name="../../scintilla/win32/HanjaDic.cxx"/>
       <File Name="../../scintilla/win32/HanjaDic.h"/>
       <File Name="../../scintilla/win32/LaTeXInput.cxx"/>
+      <File Name="../../scintilla/win32/ListBox.cxx"/>
       <File Name="../../scintilla/win32/PlatWin.cxx"/>
       <File Name="../../scintilla/win32/PlatWin.h"/>
       <File Name="../../scintilla/win32/ScintillaWin.cxx"/>
+      <File Name="../../scintilla/win32/SurfaceD2D.cxx"/>
+      <File Name="../../scintilla/win32/SurfaceD2D.h"/>
+      <File Name="../../scintilla/win32/SurfaceGDI.cxx"/>
       <File Name="../../scintilla/win32/WinTypes.h"/>
     </VirtualDirectory>
   </VirtualDirectory>

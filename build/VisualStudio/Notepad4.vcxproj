@@ -496,8 +496,11 @@
     <ClCompile Include="..\..\scintilla\src\XPM.cxx" />
     <ClCompile Include="..\..\scintilla\win32\HanjaDic.cxx" />
     <ClCompile Include="..\..\scintilla\win32\LaTeXInput.cxx" />
+    <ClCompile Include="..\..\scintilla\win32\ListBox.cxx" />
     <ClCompile Include="..\..\scintilla\win32\PlatWin.cxx" />
     <ClCompile Include="..\..\scintilla\win32\ScintillaWin.cxx" />
+    <ClCompile Include="..\..\scintilla\win32\SurfaceD2D.cxx" />
+    <ClCompile Include="..\..\scintilla\win32\SurfaceGDI.cxx" />
     <ClCompile Include="..\..\src\Bridge.cpp" />
     <ClCompile Include="..\..\src\Dialogs.cpp" />
     <ClCompile Include="..\..\src\Dlapi.cpp" />
@@ -654,6 +657,7 @@
     <ClInclude Include="..\..\scintilla\src\XPM.h" />
     <ClInclude Include="..\..\scintilla\win32\HanjaDic.h" />
     <ClInclude Include="..\..\scintilla\win32\PlatWin.h" />
+    <ClInclude Include="..\..\scintilla\win32\SurfaceD2D.h" />
     <ClInclude Include="..\..\scintilla\win32\WinTypes.h" />
     <ClInclude Include="..\..\src\compiler.h" />
     <ClInclude Include="..\..\src\config.h" />

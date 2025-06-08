@@ -51,6 +51,13 @@ inline T DLLFunctionEx(LPCWSTR lpDllName, LPCSTR lpProcName) noexcept {
 	return DLLFunction<T>(::GetModuleHandleW(lpDllName), lpProcName);
 }
 
+inline void ReleaseLibrary(HMODULE &hLib) noexcept {
+	if (hLib) {
+		FreeLibrary(hLib);
+		hLib = {};
+	}
+}
+
 // similar to IID_PPV_ARGS() but without __uuidof() check
 template <class T>
 inline void** AsPPVArgs(T** pp) noexcept {

@@ -97,6 +97,7 @@ Used by VSCode, Atom etc.
 
 #include "WinTypes.h"
 #include "PlatWin.h"
+#include "SurfaceD2D.h"
 #include "HanjaDic.h"
 #include "LaTeXInput.h"
 
