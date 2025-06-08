@@ -9,17 +9,17 @@ SET "PATH=C:\msys64\usr\bin;%PATH%"
 
 IF /I "%~1" == "ucrt" (
   SHIFT
-  pacman -S --needed --noconfirm --noprogressbar mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-make mingw-w64-ucrt-x86_64-tools-git mingw-w64-ucrt-x86_64-clang mingw-w64-ucrt-x86_64-lld mingw-w64-ucrt-x86_64-llvm-tools
+  pacman -S --needed --noconfirm --noprogressbar mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-make mingw-w64-ucrt-x86_64-tools-git mingw-w64-ucrt-x86_64-clang mingw-w64-ucrt-x86_64-lld mingw-w64-ucrt-x86_64-llvm
 )
 
 IF /I "%~1" == "x86_64" (
   SHIFT
-  pacman -S --needed --noconfirm --noprogressbar mingw-w64-x86_64-gcc mingw-w64-x86_64-make mingw-w64-x86_64-tools-git mingw-w64-x86_64-clang mingw-w64-x86_64-lld mingw-w64-x86_64-llvm-tools
+  pacman -S --needed --noconfirm --noprogressbar mingw-w64-x86_64-gcc mingw-w64-x86_64-make mingw-w64-x86_64-tools-git mingw-w64-x86_64-clang mingw-w64-x86_64-lld mingw-w64-x86_64-llvm
 )
 
 IF /I "%~1" == "i686" (
   SHIFT
-  pacman -S --needed --noconfirm --noprogressbar mingw-w64-i686-gcc mingw-w64-i686-make mingw-w64-i686-tools-git mingw-w64-i686-clang mingw-w64-i686-lld mingw-w64-i686-llvm-tools
+  pacman -S --needed --noconfirm --noprogressbar mingw-w64-i686-gcc mingw-w64-i686-make mingw-w64-i686-tools-git mingw-w64-i686-clang mingw-w64-i686-lld mingw-w64-i686-llvm
 )
 
 IF /I "%~1" == "llvm" (
