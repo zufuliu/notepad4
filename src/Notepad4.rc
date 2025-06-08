@@ -258,8 +258,8 @@ BEGIN
 			MENUITEM "D&elete Line\tCtrl+Shift+D",		IDM_EDIT_DELETELINE
 			MENUITEM SEPARATOR
 			MENUITEM "&Join Lines\tCtrl+J",				IDM_EDIT_JOINLINES
-			MENUITEM "Column &Wrap...",					IDM_EDIT_COLUMNWRAP
 			MENUITEM "&Split Lines\tCtrl+I",			IDM_EDIT_SPLITLINES
+			MENUITEM "Column &Wrap...",					IDM_EDIT_COLUMNWRAP
 			MENUITEM "Join &Paragraphs\tCtrl+Shift+J",	IDM_EDIT_JOINLINESEX
 		END
 		POPUP "Con&vert"

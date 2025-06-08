@@ -258,8 +258,8 @@ BEGIN
 			MENUITEM "&Elimina linea\tCtrl+Shift+D",		IDM_EDIT_DELETELINE
 			MENUITEM SEPARATOR
 			MENUITEM "Unisci &linee\tCtrl+J",				IDM_EDIT_JOINLINES
-			MENUITEM "Colonne a c&apo...",				IDM_EDIT_COLUMNWRAP
 			MENUITEM "Di&vidi linee\tCtrl+I",			IDM_EDIT_SPLITLINES
+			MENUITEM "Colonne a c&apo...",				IDM_EDIT_COLUMNWRAP
 			MENUITEM "Unisci &paragrafi\tCtrl+Shift+J",	IDM_EDIT_JOINLINESEX
 		END
 		POPUP "C&onverti"

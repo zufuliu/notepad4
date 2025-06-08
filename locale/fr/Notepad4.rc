@@ -258,8 +258,8 @@ BEGIN
 			MENUITEM "Effacer les lignes\tCtrl+Shift+D",		IDM_EDIT_DELETELINE
 			MENUITEM SEPARATOR
 			MENUITEM "&Joindes les lignes\tCtrl+J",				IDM_EDIT_JOINLINES
-			MENUITEM "toujours afficher les lignes (Wrap)...",					IDM_EDIT_COLUMNWRAP
 			MENUITEM "&Sciender les lignes\tCtrl+I",			IDM_EDIT_SPLITLINES
+			MENUITEM "toujours afficher les lignes (Wrap)...",					IDM_EDIT_COLUMNWRAP
 			MENUITEM "Joindre les paragraphes\tCtrl+Shift+J",	IDM_EDIT_JOINLINESEX
 		END
 		POPUP "Con&vertir"

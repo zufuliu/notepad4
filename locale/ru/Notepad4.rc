@@ -258,8 +258,8 @@ BEGIN
 			MENUITEM "&Удалить строку\tCtrl+Shift+D",						IDM_EDIT_DELETELINE
 			MENUITEM SEPARATOR
 			MENUITEM "&Объединить строки\tCtrl+J",							IDM_EDIT_JOINLINES
-			MENUITEM "Перенос с&толбцов",								IDM_EDIT_COLUMNWRAP
 			MENUITEM "&Разделить строки\tCtrl+I",							IDM_EDIT_SPLITLINES
+			MENUITEM "Перенос с&толбцов",								IDM_EDIT_COLUMNWRAP
 			MENUITEM "Объединить аб&зацы\tCtrl+Shift+J",						IDM_EDIT_JOINLINESEX
 		END
 		POPUP "Прео&бразовать"

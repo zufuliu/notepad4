@@ -258,8 +258,8 @@ BEGIN
 			MENUITEM "削除(&E)\tCtrl+Shift+D",		IDM_EDIT_DELETELINE
 			MENUITEM SEPARATOR
 			MENUITEM "行を結合(空白で)(&J)\tCtrl+J",				IDM_EDIT_JOINLINES
-			MENUITEM "空白で折り返し(&W)...",					IDM_EDIT_COLUMNWRAP
 			MENUITEM "長い行を分割し折り返し(&S)\tCtrl+I",			IDM_EDIT_SPLITLINES
+			MENUITEM "空白で折り返し(&W)...",					IDM_EDIT_COLUMNWRAP
 			MENUITEM "段落を温存して結合(&P)\tCtrl+Shift+J",	IDM_EDIT_JOINLINESEX
 		END
 		POPUP "変換(&V)"
