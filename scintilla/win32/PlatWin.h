@@ -86,6 +86,9 @@ namespace Scintilla::Internal {
 
 constexpr FLOAT dpiDefault = USER_DEFAULT_SCREEN_DPI;
 
+// Used for defining font size with LOGFONT
+constexpr int pointsPerInch = 72;
+
 bool ListBoxX_Register() noexcept;
 void ListBoxX_Unregister() noexcept;
 std::unique_ptr<Surface> SurfaceGDI_Allocate();
@@ -177,6 +180,8 @@ constexpr Point PointFromPOINTEx(POINT point) noexcept {
 
 extern HINSTANCE hinstPlatformRes;
 
+ColourRGBA ColourFromSys(int nIndex) noexcept;
+
 constexpr HWND HwndFromWindowID(WindowID wid) noexcept {
 	return static_cast<HWND>(wid);
 }
@@ -240,7 +245,8 @@ struct FontWin final : public Font {
 	HFONT hfont{};
 	ComPtr<IDWriteTextFormat> pTextFormat;
 	FontQuality extraFontFlag;
-	FLOAT yAscent = 2.0f;
+	static constexpr FLOAT minimalAscent = 2.0f;
+	FLOAT yAscent = minimalAscent;
 	FLOAT yDescent = 1.0f;
 	FLOAT yInternalLeading = 0.0f;
 	LOGFONTW lf {};

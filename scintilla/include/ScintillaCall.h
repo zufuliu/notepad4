@@ -726,7 +726,7 @@ public:
 	int ExtraAscent();
 	void SetExtraDescent(int extraDescent);
 	int ExtraDescent();
-	int MarkerSymbolDefined(int markerNumber);
+	Scintilla::MarkerSymbol MarkerSymbolDefined(int markerNumber);
 	void MarginSetText(Line line, const char *text);
 	int MarginGetText(Line line, char *text);
 	std::string MarginGetText(Line line);

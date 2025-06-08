@@ -10,6 +10,8 @@
 #include <cassert>
 #include <cstring>
 
+#include <array>
+
 #include "ILexer.h"
 
 #include "CharacterSet.h"
@@ -24,28 +26,56 @@ namespace Scintilla::Internal {
 bool DBCSIsLeadByte(int codePage, unsigned char uch) noexcept {
 	// Byte ranges found in Wikipedia articles with relevant search strings in each case
 	switch (codePage) {
-	case 932:
+	case cp932:
 		// Shift_jis
 		return ((uch >= 0x81) && (uch <= 0x9F)) ||
 			((uch >= 0xE0) && (uch <= 0xFC));
 		// Lead bytes F0 to FC may be a Microsoft addition.
-	case 936:
+	case cp936:
 		// GBK
 		return (uch >= 0x81) && (uch <= 0xFE);
-	case 949:
+	case cp949:
 		// Korean Wansung KS C-5601-1987
 		return (uch >= 0x81) && (uch <= 0xFE);
-	case 950:
+	case cp950:
 		// Big5
 		return (uch >= 0x81) && (uch <= 0xFE);
-	case 1361:
+	default:
 		// Korean Johab KS C-5601-1992
 		return
 			((uch >= 0x84) && (uch <= 0xD3)) ||
 			((uch >= 0xD8) && (uch <= 0xDE)) ||
 			((uch >= 0xE0) && (uch <= 0xF9));
 	}
-	return false;
+}
+
+bool DBCSIsTrailByte(int codePage, unsigned char trail) noexcept {
+	switch (codePage) {
+	case cp932:
+		// Shift_jis
+		return (trail != 0x7F) &&
+			((trail >= 0x40) && (trail <= 0xFC));
+	case cp936:
+		// GBK
+		return (trail != 0x7F) &&
+			((trail >= 0x40) && (trail <= 0xFE));
+	case cp949:
+		// Korean Wansung KS C-5601-1987
+		return
+			((trail >= 0x41) && (trail <= 0x5A)) ||
+			((trail >= 0x61) && (trail <= 0x7A)) ||
+			((trail >= 0x81) && (trail <= 0xFE));
+	case cp950:
+		// Big5
+		return
+			((trail >= 0x40) && (trail <= 0x7E)) ||
+			((trail >= 0xA1) && (trail <= 0xFE));
+	default:
+		// Korean Johab KS C-5601-1992
+		return
+			((trail >= 0x31) && (trail <= 0x7E)) ||
+			((trail >= 0x81) && (trail <= 0xFE));
+	}
 }
 
 }
@@ -926,7 +956,7 @@ const uint8_t CharClassify_CP1361Data[] = {
 
 DBCSCharClassify::DBCSCharClassify(int codePage_) noexcept {
 	switch (codePage_) {
-	case 932: {
+	case cp932: {
 		// Shift-JIS
 		constexpr uint8_t BytesRLE_CP932[] = {252, 4, 254, 4, 6, 127, 254, 6, 119, 12,};
 		ExpandRLE2(BytesRLE_CP932, leadByte);
@@ -934,7 +964,7 @@ DBCSCharClassify::DBCSCharClassify(int codePage_) noexcept {
 		ExpandRLE3(CharClassifyRLE_CP932, classifyMap);
 	} break;
 
-	case 936: {
+	case cp936: {
 		// GBK
 		constexpr uint8_t BytesRLE_CP936[] = {252, 4, 254, 4, 6, 255, 255, 4,};
 		ExpandRLE2(BytesRLE_CP936, leadByte);
@@ -942,7 +972,7 @@ DBCSCharClassify::DBCSCharClassify(int codePage_) noexcept {
 		ExpandRLE3(CharClassifyRLE_CP936, classifyMap);
 	} break;
 
-	case 949: {
+	case cp949: {
 		// Korean Unified Hangul Code, Wansung KS C-5601-1987
 		constexpr uint8_t BytesRLE_CP949[] = {252, 8, 106, 24, 106, 24, 255, 255, 4,};
 		ExpandRLE2(BytesRLE_CP949, leadByte);
@@ -950,7 +980,7 @@ DBCSCharClassify::DBCSCharClassify(int codePage_) noexcept {
 		ExpandRLE3(CharClassifyRLE_CP949, classifyMap);
 	} break;
 
-	case 950: {
+	case cp950: {
 		// Big5
 		constexpr uint8_t BytesRLE_CP950[] = {252, 4, 254, 8, 129, 255, 127, 4,};
 		ExpandRLE2(BytesRLE_CP950, leadByte);

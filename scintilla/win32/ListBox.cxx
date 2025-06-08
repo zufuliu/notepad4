@@ -42,7 +42,6 @@
 #include "GraphicUtils.h"
 #include "UniqueString.h"
 #include "XPM.h"
-#include "CharClassify.h"
 #include "UniConversion.h"
 
 #include "WinTypes.h"

@@ -20,6 +20,7 @@
 #include <string>
 #include <string_view>
 #include <vector>
+#include <array>
 #include <map>
 #include <optional>
 #include <algorithm>
@@ -282,7 +283,7 @@ int SurfaceGDI::PixelDivisions() const noexcept {
 }
 
 int SurfaceGDI::DeviceHeightFont(int points) const noexcept {
-	return ::MulDiv(points, logPixelsY, 72);
+	return ::MulDiv(points, logPixelsY, pointsPerInch);
 }
 
 void SurfaceGDI::LineDraw(Point start, Point end, Stroke stroke) noexcept {
@@ -353,10 +354,11 @@ void SurfaceGDI::RoundedRectangle(PRectangle rc, FillStroke fillStroke) noexcept
 	PenColour(fillStroke.stroke.colour, fillStroke.stroke.width);
 	BrushColour(fillStroke.fill.colour);
 	const RECT rcw = RectFromPRectangleEx(rc);
+	constexpr int cornerSize = 8;
 	::RoundRect(hdc,
 		rcw.left + 1, rcw.top,
 		rcw.right - 1, rcw.bottom,
-		8, 8);
+		cornerSize, cornerSize);
 }
 
 #if NP2_USE_AVX2
@@ -430,7 +432,7 @@ public:
 		PLATFORM_ASSERT(y >= 0);
 		PLATFORM_ASSERT(x < size.cx);
 		PLATFORM_ASSERT(y < size.cy);
-		pixels[y * size.cx + x] = value;
+		pixels[(y * size.cx) + x] = value;
 	}
 	void SetSymmetric(LONG x, LONG y, DWORD value) noexcept;
 };
