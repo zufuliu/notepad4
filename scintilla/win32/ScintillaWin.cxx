@@ -2796,12 +2796,12 @@ void Editor::EndBatchUpdate() noexcept {
 	if (batchUpdateDepth == 0) {
 		modEventMask = batchUpdateState.modEventMask;
 		::SendMessage(HwndFromWindow(wMain), WM_SETREDRAW, TRUE, 0);
+		::InvalidateRect(HwndFromWindow(wMain), nullptr, TRUE);
 		if (batchUpdateState.actions != pdoc->UndoActions()) {
 			NotificationData scn = {};
 			scn.nmhdr.code = Notification::Modified;
 			scn.linesAdded = pdoc->LinesTotal() - batchUpdateState.lines;
 			NotifyParent(scn);
-			::InvalidateRect(HwndFromWindow(wMain), nullptr, TRUE);
 		}
 	}
 }
