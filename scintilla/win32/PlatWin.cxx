@@ -467,6 +467,8 @@ class CursorHelper {
 	DWORD *pixels = nullptr;
 	const int width;
 	const int height;
+	const float scale;
+	static constexpr float baseSize = 32.0f;
 
 	static constexpr float arrow[][2] = {
 		{ 32.0f - 12.73606f,32.0f - 19.04075f },
@@ -481,7 +483,7 @@ class CursorHelper {
 public:
 	~CursorHelper() = default;
 
-	CursorHelper(int width_, int height_) noexcept : width{width_}, height{height_} {
+	CursorHelper(int width_, int height_) noexcept : width{width_}, height{height_}, scale{ static_cast<float>(width) / baseSize } {
 		// https://learn.microsoft.com/en-us/windows/win32/menurc/using-cursors#creating-a-cursor
 		bm.Create({}, width, height, &pixels);
 	}
@@ -533,7 +535,6 @@ public:
 		// Draw something on the bitmap section.
 		constexpr size_t nPoints = std::size(arrow);
 		D2D1_POINT_2F points[nPoints];
-		const FLOAT scale = width/32.0f;
 		for (size_t i = 0; i < nPoints; i++) {
 			points[i].x = arrow[i][0] * scale;
 			points[i].y = arrow[i][1] * scale;
@@ -579,7 +580,6 @@ public:
 		// Draw something on the DIB section.
 		constexpr size_t nPoints = std::size(arrow);
 		POINT points[nPoints];
-		const float scale = width/32.0f;
 		for (size_t i = 0; i < nPoints; i++) {
 			points[i].x = std::lround(arrow[i][0] * scale);
 			points[i].y = std::lround(arrow[i][1] * scale);

@@ -116,7 +116,7 @@ void ActionDuration::AddSample(Sci::Position numberActions, double durationOfAct
 	// Most recent value contributes 25% to smoothed value.
 	constexpr double alpha = 0.25;
 
-	const double durationOne = (unitBytes * durationOfActions) / numberActions;
+	const double durationOne = (unitBytes * durationOfActions) / static_cast<double>(numberActions);
 	const double duration_ = alpha * durationOne + (1.0 - alpha) * duration;
 	//duration = Clamp(duration_, minDuration, maxDuration);
 	duration = std::max(duration_, minDuration);
@@ -242,8 +242,7 @@ LineAnnotation *Document::EOLAnnotations() const noexcept {
 LineEndType Document::LineEndTypesSupported() const noexcept {
 	if ((CpUtf8 == dbcsCodePage) && pli)
 		return pli->LineEndTypesSupported();
-	else
-		return LineEndType::Default;
+	return LineEndType::Default;
 }
 
 bool Document::SetDBCSCodePage(int dbcsCodePage_) {
@@ -285,9 +284,8 @@ bool Document::SetDBCSCodePage(int dbcsCodePage_) {
 		cb.SetUTF8Substance(CpUtf8 == dbcsCodePage);
 		ModifiedAt(0);	// Need to restyle whole document
 		return true;
-	} else {
-		return false;
 	}
+	return false;
 }
 
 bool Document::SetLineEndTypesAllowed(LineEndType lineEndBitSet_) {
@@ -298,12 +296,9 @@ bool Document::SetLineEndTypesAllowed(LineEndType lineEndBitSet_) {
 			ModifiedAt(0);
 			cb.SetLineEndTypes(lineEndBitSetActive);
 			return true;
-		} else {
-			return false;
 		}
-	} else {
-		return false;
 	}
+	return false;
 }
 
 void Document::SetSavePoint() {
@@ -467,9 +462,8 @@ int Document::AddMark(Sci::Line line, int markerNum) {
 		const DocModification mh(ModificationFlags::ChangeMarker, LineStart(line), 0, 0, nullptr, line);
 		NotifyModified(mh);
 		return prev;
-	} else {
-		return -1;
 	}
+	return -1;
 }
 
 void Document::AddMarkSet(Sci::Line line, MarkerMask valueSet) {
@@ -787,19 +781,17 @@ int Document::LenChar(Sci::Position pos, bool *invalid) const noexcept {
 				*invalid = true;
 			}
 			return 1;
-		} else {
-			return utf8status & UTF8MaskWidth;
 		}
+		return utf8status & UTF8MaskWidth;
 	} else {
 		const bool lead = IsDBCSLeadByteNoExcept(leadByte);
 		if (lead && IsDBCSTrailByteNoExcept(cb.UCharAt(pos + 1))) {
 			return 2;
-		} else {
-			if (invalid) {
-				*invalid = lead;
-			}
-			return 1;
 		}
+		if (invalid) {
+			*invalid = lead;
+		}
+		return 1;
 	}
 }
 
@@ -814,22 +806,21 @@ bool Document::InGoodUTF8(Sci::Position pos, Sci::Position &start, Sci::Position
 	const int widthCharBytes = UTF8BytesOfLead(leadByte);
 	if (widthCharBytes == 1) {
 		return false;
-	} else {
-		const int trailBytes = widthCharBytes - 1;
-		const Sci::Position len = pos - start;
-		if (len > trailBytes)
-			// pos too far from lead
-			return false;
-		unsigned char charBytes[UTF8MaxBytes] = { leadByte, 0, 0, 0 };
-		for (Sci::Position b = 1; b < widthCharBytes && ((start + b) < cb.Length()); b++) {
-			charBytes[b] = cb.CharAt(start + b);
-		}
-		const int utf8status = UTF8ClassifyMulti(charBytes, widthCharBytes);
-		if (utf8status & UTF8MaskInvalid)
-			return false;
-		end = start + widthCharBytes;
-		return true;
 	}
+	const int trailBytes = widthCharBytes - 1;
+	const Sci::Position len = pos - start;
+	if (len > trailBytes)
+		// pos too far from lead
+		return false;
+	unsigned char charBytes[UTF8MaxBytes] = { leadByte, 0, 0, 0 };
+	for (Sci::Position b = 1; b < widthCharBytes && ((start + b) < cb.Length()); b++) {
+		charBytes[b] = cb.CharAt(start + b);
+	}
+	const int utf8status = UTF8ClassifyMulti(charBytes, widthCharBytes);
+	if (utf8status & UTF8MaskInvalid)
+		return false;
+	end = start + widthCharBytes;
+	return true;
 }
 
 // Normalise a position so that it is not part way through a multi-byte character.
@@ -990,10 +981,9 @@ bool Document::NextCharacter(Sci::Position &pos, int moveDir) const noexcept {
 	const Sci::Position posNext = NextPosition(pos, moveDir);
 	if (posNext == pos) {
 		return false;
-	} else {
-		pos = posNext;
-		return true;
 	}
+	pos = posNext;
+	return true;
 }
 
 CharacterExtracted Document::CharacterAfter(Sci::Position position) const noexcept {
@@ -1288,10 +1278,9 @@ size_t Document::SafeSegment(const char *text, size_t lengthSegment, EncodingFam
 EncodingFamily Document::CodePageFamily() const noexcept {
 	if (CpUtf8 == dbcsCodePage)
 		return EncodingFamily::unicode;
-	else if (dbcsCodePage)
+	if (dbcsCodePage)
 		return EncodingFamily::dbcs;
-	else
-		return EncodingFamily::eightBit;
+	return EncodingFamily::eightBit;
 }
 
 void Document::ModifiedAt(Sci::Position pos) noexcept {
@@ -2482,8 +2471,7 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 const char *Document::SubstituteByPosition(const char *text, Sci::Position *length) {
 	if (regex)
 		return regex->SubstituteByPosition(this, text, length);
-	else
-		return nullptr;
+	return nullptr;
 }
 
 LineCharacterIndexType Document::LineCharacterIndex() const noexcept {
@@ -2535,46 +2523,44 @@ void SCI_METHOD Document::StartStyling(Sci_Position position) noexcept {
 bool SCI_METHOD Document::SetStyleFor(Sci_Position length, unsigned char style) {
 	if (enteredStyling != 0 || !cb.HasStyles()) {
 		return false;
-	} else {
-		enteredStyling++;
-		const Sci::Position prevEndStyled = endStyled;
-		if (cb.SetStyleFor(endStyled, length, style)) {
-			const DocModification mh(ModificationFlags::ChangeStyle | ModificationFlags::User,
-				prevEndStyled, length);
-			NotifyModified(mh);
-		}
-		endStyled += length;
-		enteredStyling--;
-		return true;
 	}
+	enteredStyling++;
+	const Sci::Position prevEndStyled = endStyled;
+	if (cb.SetStyleFor(endStyled, length, style)) {
+		const DocModification mh(ModificationFlags::ChangeStyle | ModificationFlags::User,
+			prevEndStyled, length);
+		NotifyModified(mh);
+	}
+	endStyled += length;
+	enteredStyling--;
+	return true;
 }
 
 bool SCI_METHOD Document::SetStyles(Sci_Position length, const unsigned char *styles) {
 	if (enteredStyling != 0 || !cb.HasStyles()) {
 		return false;
-	} else {
-		enteredStyling++;
-		bool didChange = false;
-		Sci::Position startMod = 0;
-		Sci::Position endMod = 0;
-		for (int iPos = 0; iPos < length; iPos++, endStyled++) {
-			PLATFORM_ASSERT(endStyled < LengthNoExcept());
-			if (cb.SetStyleAt(endStyled, styles[iPos])) {
-				if (!didChange) {
-					startMod = endStyled;
-				}
-				didChange = true;
-				endMod = endStyled;
-			}
-		}
-		if (didChange) {
-			const DocModification mh(ModificationFlags::ChangeStyle | ModificationFlags::User,
-				startMod, endMod - startMod + 1);
-			NotifyModified(mh);
-		}
-		enteredStyling--;
-		return true;
 	}
+	enteredStyling++;
+	bool didChange = false;
+	Sci::Position startMod = 0;
+	Sci::Position endMod = 0;
+	for (int iPos = 0; iPos < length; iPos++, endStyled++) {
+		PLATFORM_ASSERT(endStyled < LengthNoExcept());
+		if (cb.SetStyleAt(endStyled, styles[iPos])) {
+			if (!didChange) {
+				startMod = endStyled;
+			}
+			didChange = true;
+			endMod = endStyled;
+		}
+	}
+	if (didChange) {
+		const DocModification mh(ModificationFlags::ChangeStyle | ModificationFlags::User,
+			startMod, endMod - startMod + 1);
+		NotifyModified(mh);
+	}
+	enteredStyling--;
+	return true;
 }
 
 void Document::EnsureStyledTo(Sci::Position pos) {
@@ -3271,8 +3257,7 @@ public:
 	[[nodiscard]] char CharAt(Sci::Position index) const noexcept override {
 		if (IsValidIndex(index, end))
 			return pdoc->CharAt(index);
-		else
-			return '\0';
+		return '\0';
 	}
 
 	[[nodiscard]] Sci::Position MovePositionOutsideChar(Sci::Position pos, int moveDir) const noexcept override {

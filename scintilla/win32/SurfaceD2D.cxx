@@ -1480,7 +1480,8 @@ HRESULT MeasurePositions(const Font *font_, TextWideD2D &tbuf) {
 		const int length = clusterMetrics[ci].length;
 		const XYPOSITION width = clusterMetrics[ci].width;
 		for (int inCluster = 0; inCluster < length; inCluster++) {
-			poses[ti++] = position + width * (inCluster + 1) / length;
+			const XYPOSITION proportion = static_cast<XYPOSITION>(inCluster + 1) / length;
+			poses[ti++] = position + width * proportion;
 		}
 		position += width;
 	}

@@ -419,7 +419,7 @@ enum ANSIArtStyleIndex {
 #define FoldingMarkerLineColorDark		RGB(0x80, 0x80, 0x80)
 #define FoldingMarkerFillColorDark		RGB(0x60, 0x60, 0x60)
 
-// from ScintillaWin.cxx
+// from ScintillaBase.h
 #define SC_INDICATOR_INPUT		INDICATOR_IME
 #define SC_INDICATOR_TARGET		(INDICATOR_IME + 1)
 #define SC_INDICATOR_CONVERTED	(INDICATOR_IME + 2)

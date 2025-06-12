@@ -149,6 +149,9 @@ void ScintillaBase::Command(int cmdId) {
 	case idcmdSelectAll:
 		WndProc(Message::SelectAll, 0, 0);
 		break;
+
+	default:
+		break;
 	}
 }
 #endif
@@ -230,6 +233,29 @@ void ScintillaBase::ListNotify(ListBoxEvent *plbe) {
 	}
 }
 
+void ScintillaBase::MoveImeCarets(Sci::Position offset) noexcept {
+	// Move carets relatively by bytes.
+	for (size_t r = 0; r < sel.Count(); r++) {
+		const Sci::Position positionInsert = sel.Range(r).Start().Position();
+		sel.Range(r) = SelectionRange(positionInsert + offset);
+	}
+}
+
+void ScintillaBase::DrawImeIndicator(int indicator, Sci::Position len) {
+	// Emulate the visual style of IME characters with indicators.
+	// Draw an indicator on the character before caret by the character bytes of len
+	// so it should be called after InsertCharacter().
+	// It does not affect caret positions.
+	if (indicator < 8 || indicator > IndicatorMax) {
+		return;
+	}
+	pdoc->DecorationSetCurrentIndicator(indicator);
+	for (size_t r = 0; r < sel.Count(); r++) {
+		const Sci::Position positionInsert = sel.Range(r).Start().Position();
+		pdoc->DecorationFillRange(positionInsert - len, 1, len);
+	}
+}
+
 void ScintillaBase::AutoCompleteInsert(Sci::Position startPos, Sci::Position removeLen, std::string_view text) {
 	const UndoGroup ug(pdoc);
 	if (multiAutoCMode == MultiAutoComplete::Once) {
@@ -287,6 +313,7 @@ void ScintillaBase::AutoCompleteStart(Sci::Position lenEntered, const char *list
 		vs.ElementColour(Element::ListSelected),
 		vs.ElementColour(Element::ListSelectedBack),
 		ac.options,
+		ac.imageScale,
 	};
 
 	int lineHeight;
@@ -628,8 +655,8 @@ public:
 	const char *DescribeWordListSets() const noexcept;
 	void SetWordList(int n, int attribute, const char *wl);
 
-	int GetIdentifier() const noexcept;
-	const char *GetName() const noexcept;
+	[[nodiscard]] int GetIdentifier() const noexcept;
+	[[nodiscard]] const char *GetName() const noexcept;
 	void *PrivateCall(int operation, void *pointer);
 	const char *PropertyNames() const noexcept;
 	TypeProperty PropertyType(const char *name) const;
@@ -685,9 +712,8 @@ void LexState::SetLexer(int language) { //! removed in Scintilla 5
 const char *LexState::DescribeWordListSets() const noexcept {
 	if (instance) {
 		return instance->DescribeWordListSets();
-	} else {
-		return nullptr;
 	}
+	return nullptr;
 }
 
 void LexState::SetWordList(int n, int attribute, const char *wl) {
@@ -716,33 +742,29 @@ const char *LexState::GetName() const noexcept {
 void *LexState::PrivateCall(int operation, void *pointer) {
 	if (instance) {
 		return instance->PrivateCall(operation, pointer);
-	} else {
-		return nullptr;
 	}
+	return nullptr;
 }
 
 const char *LexState::PropertyNames() const noexcept {
 	if (instance) {
 		return instance->PropertyNames();
-	} else {
-		return nullptr;
 	}
+	return nullptr;
 }
 
 TypeProperty LexState::PropertyType(const char *name) const {
 	if (instance) {
 		return static_cast<TypeProperty>(instance->PropertyType(name));
-	} else {
-		return TypeProperty::Boolean;
 	}
+	return TypeProperty::Boolean;
 }
 
 const char *LexState::DescribeProperty(const char *name) const {
 	if (instance) {
 		return instance->DescribeProperty(name);
-	} else {
-		return nullptr;
 	}
+	return nullptr;
 }
 
 void LexState::PropSet(const char *key, const char *val) {
@@ -757,9 +779,8 @@ void LexState::PropSet(const char *key, const char *val) {
 const char *LexState::PropGet(const char *key) const {
 	if (instance) {
 		return instance->PropertyGet(key);
-	} else {
-		return nullptr;
 	}
+	return nullptr;
 }
 
 int LexState::PropGetInt(const char *key, int defaultValue) const {
@@ -844,39 +865,35 @@ const char *LexState::GetSubStyleBases() const noexcept {
 int LexState::NamedStyles() const noexcept {
 	if (instance) {
 		return instance->NamedStyles();
-	} else {
-		return -1;
 	}
+	return -1;
 }
 
 const char *LexState::NameOfStyle(int style) const noexcept {
 	if (instance) {
 		return instance->NameOfStyle(style);
-	} else {
-		return nullptr;
 	}
+	return nullptr;
 }
 
 const char *LexState::TagsOfStyle(int style) const noexcept {
 	if (instance) {
 		return instance->TagsOfStyle(style);
-	} else {
-		return nullptr;
 	}
+	return nullptr;
 }
 
 const char *LexState::DescriptionOfStyle(int style) const noexcept {
 	if (instance) {
 		return instance->DescriptionOfStyle(style);
-	} else {
-		return nullptr;
 	}
+	return nullptr;
 }
 
 void ScintillaBase::NotifyStyleToNeeded(Sci::Position endStyleNeeded) {
 	if (!DocumentLexState()->UseContainerLexing()) {
-		const Sci::Line endStyled = pdoc->LineStartPosition(pdoc->GetEndStyled());
-		DocumentLexState()->Colourise(endStyled, endStyleNeeded);
+		const Sci::Line startStyling = pdoc->LineStartPosition(pdoc->GetEndStyled());
+		DocumentLexState()->Colourise(startStyling, endStyleNeeded);
 		return;
 	}
 	Editor::NotifyStyleToNeeded(endStyleNeeded);
@@ -1017,6 +1034,13 @@ sptr_t ScintillaBase::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 
 	case Message::AutoCGetStyle:
 		return vs.autocStyle;
+
+	case Message::AutoCSetImageScale:
+		ac.imageScale = static_cast<float>(wParam) / 100.0f;
+		break;
+
+	case Message::AutoCGetImageScale:
+		return static_cast<int>(ac.imageScale * 100);
 
 	case Message::RegisterImage:
 		ac.lb->RegisterImage(static_cast<int>(wParam), ConstCharPtrFromSPtr(lParam));

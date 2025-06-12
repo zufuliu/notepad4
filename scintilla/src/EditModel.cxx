@@ -176,7 +176,7 @@ MarkerMask EditModel::GetMark(Sci::Line line) const noexcept {
 }
 
 void EditModel::EnsureModelState() {
-	if (!modelState && (undoSelectionHistoryOption == UndoSelectionHistoryOption::Enabled)) {
+	if (!modelState && (undoSelectionHistoryOption != UndoSelectionHistoryOption::Disabled)) {
 		if (auto vss = pdoc->GetViewState(this)) {
 #if USE_RTTI
 			modelState = std::dynamic_pointer_cast<ModelState>(vss);

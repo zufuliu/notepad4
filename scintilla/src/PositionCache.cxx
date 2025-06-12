@@ -1261,7 +1261,7 @@ void PositionCache::MeasureWidths(Surface *surface, const Style &style, uint16_t
 		}
 #else
 		for (size_t i = 0; i < length; i++) {
-			positions[i] = characterWidth * (i + 1);
+			positions[i] = characterWidth * static_cast<XYPOSITION>(i + 1);
 		}
 #endif
 		return;

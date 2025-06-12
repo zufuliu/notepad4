@@ -322,6 +322,7 @@ struct ListOptions final {
 	std::optional<ColourRGBA> foreSelected;
 	std::optional<ColourRGBA> backSelected;
 	AutoCompleteOption options = AutoCompleteOption::Normal;
+	float imageScale = 1.0f;
 };
 
 class ListBox : public Window {

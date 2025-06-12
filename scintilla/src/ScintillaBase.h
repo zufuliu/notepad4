@@ -14,6 +14,11 @@ namespace Scintilla::Internal {
 // blue, with different patterns.
 constexpr ColourRGBA colourIME(0x0, 0x0, 0xffU);
 
+constexpr int IndicatorInput = static_cast<int>(Scintilla::IndicatorNumbers::Ime);
+constexpr int IndicatorTarget = IndicatorInput + 1;
+constexpr int IndicatorConverted = IndicatorInput + 2;
+constexpr int IndicatorUnknown = IndicatorInput + 3;
+
 class LexState;
 
 /**
@@ -61,6 +66,9 @@ protected:
 #endif
 	void CancelModes() noexcept override;
 	int KeyCommand(Scintilla::Message iMessage) override;
+
+	void MoveImeCarets(Sci::Position offset) noexcept;
+	void DrawImeIndicator(int indicator, Sci::Position len);
 
 	void AutoCompleteInsert(Sci::Position startPos, Sci::Position removeLen, std::string_view text);
 	void AutoCompleteStart(Sci::Position lenEntered, const char *list);

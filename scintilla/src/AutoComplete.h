@@ -23,6 +23,7 @@ public:
 	bool ignoreCase = false;
 	bool chooseSingle = false;
 	AutoCompleteOption options = Scintilla::AutoCompleteOption::Normal;
+	float imageScale = 1.0f;
 	const std::unique_ptr<ListBox> lb;
 	Sci::Position posStart = 0;
 	Sci::Position startLen = 0;
