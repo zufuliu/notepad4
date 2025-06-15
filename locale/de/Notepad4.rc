@@ -258,8 +258,8 @@ BEGIN
 			MENUITEM "&Löschen\tStrg+Shift+D",					IDM_EDIT_DELETELINE
 			MENUITEM SEPARATOR
 			MENUITEM "&Zusammenlegen\tStrg+J",					IDM_EDIT_JOINLINES
-			MENUITEM "S&paltenumbruch...",						IDM_EDIT_COLUMNWRAP
 			MENUITEM "Ze&ilenumbruch\tStrg+I",					IDM_EDIT_SPLITLINES
+			MENUITEM "S&paltenumbruch...",						IDM_EDIT_COLUMNWRAP
 			MENUITEM "A&bsätze verbinden\tStrg+Shift+J",		IDM_EDIT_JOINLINESEX
 		END
 		POPUP "Kon&vertieren"

@@ -258,8 +258,8 @@ BEGIN
 			MENUITEM "줄 삭제(&E)\tCtrl+Shift+D",						IDM_EDIT_DELETELINE
 			MENUITEM SEPARATOR
 			MENUITEM "줄 결합(&J)\tCtrl+J",								IDM_EDIT_JOINLINES
-			MENUITEM "열 줄바꿈(&W)...",									IDM_EDIT_COLUMNWRAP
 			MENUITEM "줄 분할(&S)\tCtrl+I",								IDM_EDIT_SPLITLINES
+			MENUITEM "열 줄바꿈(&W)...",									IDM_EDIT_COLUMNWRAP
 			MENUITEM "단락 결합(&P)\tCtrl+Shift+J",						IDM_EDIT_JOINLINESEX
 		END
 		POPUP "변환(&V)"

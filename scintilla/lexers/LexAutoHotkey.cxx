@@ -63,8 +63,7 @@ enum AHKSectionOption {
 };
 
 constexpr bool IsAHKNumber(int base, int chPrev, int ch, int chNext) noexcept {
-	return IsADigit(ch)
-		|| ((base == 16) ? IsHexDigit(ch) : IsNumberContinue(chPrev, ch, chNext));
+	return IsHexDigit(ch) || (base == 10 && IsNumberContinue(chPrev, ch, chNext));
 }
 
 constexpr bool IsHotStringOptionChar(int ch) noexcept {

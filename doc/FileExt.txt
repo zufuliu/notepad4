@@ -80,7 +80,7 @@ JSON Document
 	jsonld			JSON for Linked Data, https://json-ld.org/
 	jsonc			JSON with Comments, https://code.visualstudio.com/docs/languages/json#_json-with-comments
 	json5			JSON5, https://json5.org/
-	jsonl			SON Lines, https://jsonlines.org/
+	jsonl			JSON Lines, https://jsonlines.org/
 	arcconfig		Phabricator Arcanist
 	arclint			Phabricator Arcanist
 	jscop			JSCoP File, https://polly.llvm.org/documentation/passes.html
