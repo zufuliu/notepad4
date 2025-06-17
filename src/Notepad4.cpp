@@ -2573,10 +2573,13 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	EnableCmd(hmenu, IDM_SET_RENDER_TECH_D2D, i);
 	EnableCmd(hmenu, IDM_SET_RENDER_TECH_D2DRETAIN, i);
 	EnableCmd(hmenu, IDM_SET_RENDER_TECH_D2DDC, i);
+#if _WIN32_WINNT < _WIN32_WINNT_WIN7
+	DisableCmd(hmenu, IDM_SET_RENDER_TECH_D3D, true);
+#endif
 	EnableCmd(hmenu, IDM_SET_USE_XP_FILE_DIALOG, i);
 	CheckCmd(hmenu, IDM_SET_USE_XP_FILE_DIALOG, bUseXPFileDialog);
 	i = IDM_SET_RENDER_TECH_GDI + iRenderingTechnology;
-	CheckMenuRadioItem(hmenu, IDM_SET_RENDER_TECH_GDI, IDM_SET_RENDER_TECH_D2DDC, i, MF_BYCOMMAND);
+	CheckMenuRadioItem(hmenu, IDM_SET_RENDER_TECH_GDI, IDM_SET_RENDER_TECH_D3D, i, MF_BYCOMMAND);
 	// RTL Layout
 	CheckCmd(hmenu, IDM_SET_RTL_LAYOUT_EDIT, bEditLayoutRTL);
 	CheckCmd(hmenu, IDM_SET_RTL_LAYOUT_OTHER, bWindowLayoutRTL);
@@ -4213,7 +4216,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_SET_RENDER_TECH_GDI:
 	case IDM_SET_RENDER_TECH_D2D:
 	case IDM_SET_RENDER_TECH_D2DRETAIN:
-	case IDM_SET_RENDER_TECH_D2DDC: {
+	case IDM_SET_RENDER_TECH_D2DDC:
+	case IDM_SET_RENDER_TECH_D3D: {
 		const int back = iRenderingTechnology;
 		iRenderingTechnology = LOWORD(wParam) - IDM_SET_RENDER_TECH_GDI;
 		SciCall_SetTechnology(iRenderingTechnology);
