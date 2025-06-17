@@ -582,6 +582,7 @@ BEGIN
 			MENUITEM "Activer la sélection multiple",		IDM_SET_MULTIPLE_SELECTION
 			MENUITEM "Copier la sélection comme texte trouvé",	IDM_SET_SELECTIONASFINDTEXT
 			MENUITEM "Copier et coller le contenu du presse-papier comme texte trouvé",	IDM_SET_PASTEBUFFERASFINDTEXT
+			MENUITEM "Undo Redo &Remember Selection",	IDM_SET_UNDO_REDO_SELECTION
 			POPUP "Mode de sélection de ligne"
 			BEGIN
 				MENUITEM "Aucun",					IDM_LINE_SELECTION_MODE_NONE

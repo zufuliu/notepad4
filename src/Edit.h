@@ -671,6 +671,7 @@ enum SelectOption {
 	SelectOption_EnableMultipleSelection = 1,
 	SelectOption_CopySelectionAsFindText = 2,
 	SelectOption_CopyPasteBufferAsFindText = 4,
+	SelectOption_UndoRedoRememberSelection = 8,
 	SelectOption_Default = 7,
 };
 

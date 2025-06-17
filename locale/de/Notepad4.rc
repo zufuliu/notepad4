@@ -582,6 +582,7 @@ BEGIN
 			MENUITEM "&Mehrfachauswahl aktivieren",		IDM_SET_MULTIPLE_SELECTION
 			MENUITEM "&Kopiere Auswahl als Suchtext",	IDM_SET_SELECTIONASFINDTEXT
 			MENUITEM "Z&wischenablage als Suchtext",	IDM_SET_PASTEBUFFERASFINDTEXT
+			MENUITEM "Undo Redo &Remember Selection",	IDM_SET_UNDO_REDO_SELECTION
 			POPUP "&Zeilenauswahlmodus"
 			BEGIN
 				MENUITEM "&Keiner",						IDM_LINE_SELECTION_MODE_NONE

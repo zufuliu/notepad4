@@ -582,6 +582,7 @@ BEGIN
 			MENUITEM "Abilita selezione &multipla",		IDM_SET_MULTIPLE_SELECTION
 			MENUITEM "Copia &selezione come testo trovato",	IDM_SET_SELECTIONASFINDTEXT
 			MENUITEM "Co&pia e incolla il buffer come testo trovato",	IDM_SET_PASTEBUFFERASFINDTEXT
+			MENUITEM "Undo Redo &Remember Selection",	IDM_SET_UNDO_REDO_SELECTION
 			POPUP "M&odalità selezione linea"
 			BEGIN
 				MENUITEM "&Nessuna",						IDM_LINE_SELECTION_MODE_NONE

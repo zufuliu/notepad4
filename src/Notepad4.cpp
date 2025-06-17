@@ -1730,6 +1730,7 @@ void EditCreate(HWND hwndParent) noexcept {
 	SciCall_SetXCaretPolicy(CARET_SLOP | CARET_EVEN, 50);
 	SciCall_SetYCaretPolicy(CARET_EVEN, 0);
 	SciCall_SetMultipleSelection(iSelectOption & SelectOption_EnableMultipleSelection);
+	SciCall_SetUndoSelectionHistory((iSelectOption & SelectOption_UndoRedoRememberSelection) ? (SC_UNDO_SELECTION_HISTORY_ENABLED | SC_UNDO_SELECTION_HISTORY_SCROLL): SC_UNDO_SELECTION_HISTORY_DISABLED);
 	SciCall_SetAdditionalSelectionTyping(true);
 	SciCall_SetMultiPaste(SC_MULTIPASTE_EACH);
 	SciCall_SetVirtualSpaceOptions(SCVS_RECTANGULARSELECTION);
@@ -2520,6 +2521,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	CheckCmd(hmenu, IDM_SET_MULTIPLE_SELECTION, iSelectOption & SelectOption_EnableMultipleSelection);
 	CheckCmd(hmenu, IDM_SET_SELECTIONASFINDTEXT, iSelectOption & SelectOption_CopySelectionAsFindText);
 	CheckCmd(hmenu, IDM_SET_PASTEBUFFERASFINDTEXT, iSelectOption & SelectOption_CopyPasteBufferAsFindText);
+	CheckCmd(hmenu, IDM_SET_UNDO_REDO_SELECTION, iSelectOption & SelectOption_UndoRedoRememberSelection);
 	i = IDM_LINE_SELECTION_MODE_NONE + iLineSelectionMode;
 	CheckMenuRadioItem(hmenu, IDM_LINE_SELECTION_MODE_NONE, IDM_LINE_SELECTION_MODE_OLDVS, i, MF_BYCOMMAND);
 
@@ -3940,7 +3942,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_SET_MULTIPLE_SELECTION:
 	case IDM_SET_SELECTIONASFINDTEXT:
-	case IDM_SET_PASTEBUFFERASFINDTEXT: {
+	case IDM_SET_PASTEBUFFERASFINDTEXT:
+	case IDM_SET_UNDO_REDO_SELECTION: {
 		const int option = 1 << (LOWORD(wParam) - IDM_SET_MULTIPLE_SELECTION);
 		if (iSelectOption & option) {
 			iSelectOption &= ~option;
@@ -3949,6 +3952,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 		if (option == SelectOption_EnableMultipleSelection) {
 			SciCall_SetMultipleSelection(iSelectOption & SelectOption_EnableMultipleSelection);
+		} else if (option == SelectOption_UndoRedoRememberSelection) {
+			SciCall_SetUndoSelectionHistory((iSelectOption & SelectOption_UndoRedoRememberSelection) ? (SC_UNDO_SELECTION_HISTORY_ENABLED | SC_UNDO_SELECTION_HISTORY_SCROLL): SC_UNDO_SELECTION_HISTORY_DISABLED);
 		}
 	} break;
 

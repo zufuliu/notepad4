@@ -582,7 +582,8 @@ BEGIN
 			MENUITEM "다중 선택 사용(&M)",								IDM_SET_MULTIPLE_SELECTION
 			MENUITEM "텍스트 찾기로 선택 항목 복사(&S)",					IDM_SET_SELECTIONASFINDTEXT
 			MENUITEM "텍스트 찾기로 붙여넣기 버퍼 복사(&P)",				IDM_SET_PASTEBUFFERASFINDTEXT
-			POPUP "줄 선택 모드(&M)"
+			MENUITEM "Undo Redo &Remember Selection",	IDM_SET_UNDO_REDO_SELECTION
+			POPUP "줄 선택 모드(&L)"
 			BEGIN
 				MENUITEM "없음(&N)",										IDM_LINE_SELECTION_MODE_NONE
 				MENUITEM "Visual Studio(&V)",							IDM_LINE_SELECTION_MODE_VS

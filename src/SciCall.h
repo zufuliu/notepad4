@@ -276,6 +276,10 @@ inline void SciCall_SetChangeHistory(int changeHistory) noexcept {
 	SciCall(SCI_SETCHANGEHISTORY, changeHistory, 0);
 }
 
+inline void SciCall_SetUndoSelectionHistory(int undoSelectionHistory) noexcept {
+	SciCall(SCI_SETUNDOSELECTIONHISTORY, undoSelectionHistory, 0);
+}
+
 // Selection and information
 
 inline Sci_Position SciCall_GetLength() noexcept {
