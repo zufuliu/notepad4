@@ -45,7 +45,7 @@ AutoComplete::~AutoComplete() {
 
 void AutoComplete::Start(Window &parent, int ctrlID,
 	Sci::Position position, Point location, Sci::Position startLen_,
-	int lineHeight, int codePage, Technology technology, ListOptions listOptions) noexcept {
+	int lineHeight, int codePage, Technology technology, const ListOptions &listOptions) noexcept {
 	if (active) {
 		Cancel();
 	}

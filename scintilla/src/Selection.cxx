@@ -16,7 +16,7 @@
 #include <optional>
 #include <algorithm>
 #include <memory>
-#include <charconv>
+//#include <charconv>
 
 #include "Debugging.h"
 
@@ -27,26 +27,42 @@ using namespace Scintilla::Internal;
 
 namespace {
 
+constexpr unsigned max_num_bytes = 1 + sizeof(unsigned)*8/7; // max 4GB
+constexpr unsigned max_range_bytes = 4*max_num_bytes + 4;
+
+// similar to ULEB18 encoding but always set highest bit for last byte
+// to avoid embedded NUL and distinguish from tag characters and separators.
+char *to_string(char *p, size_t value) noexcept {
+	do {
+		*p++ = static_cast<char>(0x80 | (value & 0x7f));
+		value >>= 7;
+	} while (value);
+	return p;
+}
+
 // Generically convert a string to a integer value throwing if the conversion failed.
 // Failures include values that are out of range for the destination variable.
 template <typename T>
-void ValueFromString(std::string_view sv, T &value) {
-	const std::from_chars_result res = std::from_chars(sv.data(), sv.data() + sv.size(), value);
-	if (res.ec != std::errc{}) {
-		if (res.ec == std::errc::result_out_of_range)
-			throw std::runtime_error("from_chars out of range.");
-		throw std::runtime_error("from_chars failed.");
+const char *ValueFromString(const char *p, T &value) noexcept {
+	size_t val = 0;
+	unsigned shift = 0;
+	while (*p & 0x80) {
+		val += static_cast<size_t>(*p & 0x7f) << shift;
+		shift += 7;
+		p++;
 	}
+	value = val;
+	return p;
 }
 
 }
 
-SelectionPosition::SelectionPosition(std::string_view sv) : position(0) {
-	if (const size_t v = sv.find('v'); v != std::string_view::npos) {
-		ValueFromString(sv.substr(v + 1), virtualSpace);
-		sv = sv.substr(0, v);
+SelectionPosition::SelectionPosition(const char *&sv) noexcept {
+	sv = ValueFromString(sv, position);
+	if (*sv == 'v') {
+		sv += 1;
+		sv = ValueFromString(sv, virtualSpace);
 	}
-	ValueFromString(sv, position);
 }
 
 void SelectionPosition::MoveForInsertDelete(bool insertion, Sci::Position startChange, Sci::Position length, bool moveForEqual) noexcept {
@@ -104,23 +120,22 @@ double SelectionPosition::VirtualSpaceWidth(double spaceWidth) const noexcept {
 	return static_cast<double>(virtualSpace) * spaceWidth;
 }
 
-std::string SelectionPosition::ToString() const {
-	std::string result = std::to_string(position);
+char *SelectionPosition::ToString(char *p) const noexcept {
+	p = to_string(p, position);
 	if (virtualSpace) {
-		result += 'v';
-		result += std::to_string(virtualSpace);
+		*p++ = 'v';
+		p = to_string(p, virtualSpace);
 	}
-	return result;
+	return p;
 }
 
-SelectionRange::SelectionRange(std::string_view sv) {
-	const size_t dash = sv.find('-');
-	if (dash == std::string_view::npos) {
-		anchor = SelectionPosition(sv);
+SelectionRange::SelectionRange(const char *&sv) noexcept {
+	anchor = SelectionPosition(sv);
+	if (*sv != '-') {
 		caret = anchor;
 	} else {
-		anchor = SelectionPosition(sv.substr(0, dash));
-		caret = SelectionPosition(sv.substr(dash + 1));
+		sv += 1;
+		caret = SelectionPosition(sv);
 	}
 }
 
@@ -242,13 +257,13 @@ void SelectionRange::MinimizeVirtualSpace() noexcept {
 	}
 }
 
-std::string SelectionRange::ToString() const {
-	std::string result = anchor.ToString();
+char *SelectionRange::ToString(char *p) const noexcept {
+	p = anchor.ToString(p);
 	if (!(caret == anchor)) {
-		result += '-';
-		result += caret.ToString();
+		*p++ = '-';
+		p = caret.ToString(p);
 	}
-	return result;
+	return p;
 }
 
 Selection::Selection() : mainRange(0), moveExtends(false), tentativeMain(false), selType(SelTypes::stream) {
@@ -274,36 +289,44 @@ Selection::Selection(std::string_view sv) : mainRange(0), moveExtends(false), te
 		default:
 			break;
 		}
+		const char *p = sv.data();
 		if (selType != SelTypes::stream) {
-			sv.remove_prefix(1);
+			p++;
 		}
 
-		// Non-zero main index at end after '#'
-		if (const size_t hash = sv.find('#'); hash != std::string_view::npos) {
-			ValueFromString(sv.substr(hash + 1), mainRange);
-			sv = sv.substr(0, hash);
+		// Non-zero main index at start after '#'
+		if (*p == '#') {
+			p += 1;
+			p = ValueFromString(p, mainRange);
+			if (*p == ',') {
+				p += 1;
+			}
 		}
 
 		// Remainder is list of ranges
 		if (selType == SelTypes::rectangle || selType == SelTypes::thin) {
-			rangeRectangular = SelectionRange(sv);
+			::new (&rangeRectangular) SelectionRange(p);
 			// Ensure enough ranges exist for mainRange to be in bounds
 			for (size_t i = 0; i <= mainRange; i++) {
 				ranges.emplace_back(SelectionPosition(0));
 			}
 		} else {
-			size_t comma = sv.find(',');
-			while (comma != std::string_view::npos) {
-				ranges.emplace_back(sv.substr(0, comma));
-				sv.remove_prefix(comma + 1);
-				comma = sv.find(',');
+			const char * const end = sv.data() + sv.size();
+			while (p != end) {
+				if (*p == ',') {
+					p += 1;
+				}
+				if (*p & 0x80) { // requires number
+					ranges.emplace_back(p);
+				} else {
+					break;
+				}
 			}
-			ranges.emplace_back(sv);
 			if (mainRange >= ranges.size()) {
 				mainRange = ranges.size() - 1;
 			}
 		}
-	} catch (std::runtime_error &) {
+	} catch (...) {
 		// On failure, produce an empty selection.
 		Clear();
 	}
@@ -605,36 +628,44 @@ void Selection::Truncate(Sci::Position length) noexcept {
 
 std::string Selection::ToString() const {
 	std::string result;
+	char buf[128];
+	memset(buf, 0, 4);
+	char *p = buf;
 	switch (selType) {
 	case SelTypes::rectangle:
-		result += 'R';
+		*p++ = 'R';
 		break;
 	case SelTypes::lines:
-		result += 'L';
+		*p++ = 'L';
 		break;
 	case SelTypes::thin:
-		result += 'T';
+		*p++ = 'T';
 		break;
 	default:
 		// No handling of none as not a real value of enumeration, just used for empty arguments
 		// No prefix.
 		break;
 	}
+	if (mainRange > 0) {
+		*p++ = '#';
+		p = to_string(p, mainRange);
+		*p++ = ',';
+	}
 	if (selType == SelTypes::rectangle || selType == SelTypes::thin) {
-		result += rangeRectangular.ToString();
+		p = rangeRectangular.ToString(p);
 	} else {
 		for (size_t r = 0; r < ranges.size(); r++) {
-			if (r > 0) {
-				result += ',';
+			if (p >= buf + sizeof(buf) - max_range_bytes) {
+				result += std::string_view(buf, p - buf);
+				p = buf;
 			}
-			result += ranges[r].ToString();
+			if (r > 0) {
+				*p++ = ',';
+			}
+			p = ranges[r].ToString(p);
 		}
 	}
-
-	if (mainRange > 0) {
-		result += '#';
-		result += std::to_string(mainRange);
-	}
+	result += std::string_view(buf, p - buf);
 
 	return result;
 }

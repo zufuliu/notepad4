@@ -56,7 +56,7 @@ public:
 	/// Display the auto completion list positioned to be near a character position
 	void SCICALL Start(Window &parent, int ctrlID, Sci::Position position, Point location,
 		Sci::Position startLen_, int lineHeight, int codePage, Scintilla::Technology technology,
-		ListOptions listOptions) noexcept;
+		const ListOptions &listOptions) noexcept;
 
 	/// The stop chars are characters which, when typed, cause the auto completion list to disappear
 	void SetStopChars(const char *stopChars_);
