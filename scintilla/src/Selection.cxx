@@ -8,6 +8,7 @@
 #include <cstddef>
 #include <cstdlib>
 #include <cassert>
+#include <cstring>
 
 #include <stdexcept>
 #include <string>
@@ -30,7 +31,7 @@ namespace {
 constexpr unsigned max_num_bytes = 1 + sizeof(unsigned)*8/7; // max 4GB
 constexpr unsigned max_range_bytes = 4*max_num_bytes + 4;
 
-// similar to ULEB18 encoding but always set highest bit for last byte
+// similar to ULEB128 encoding but always set highest bit for last byte
 // to avoid embedded NUL and distinguish from tag characters and separators.
 char *to_string(char *p, size_t value) noexcept {
 	do {
