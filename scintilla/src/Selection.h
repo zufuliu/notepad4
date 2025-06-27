@@ -177,7 +177,7 @@ public:
 	SelTypes selType;
 
 	Selection();	// Allocates so may throw.
-	explicit Selection(std::string_view sv);
+	explicit Selection(std::string_view sv) noexcept;
 	bool IsRectangular() const noexcept;
 	Sci::Position MainCaret() const noexcept;
 	Sci::Position MainAnchor() const noexcept;

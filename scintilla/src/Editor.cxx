@@ -731,7 +731,8 @@ void Editor::SetEmptySelection(Sci::Position currentPos_) {
 #if 0
 void Editor::SetSelectionFromSerialized(const char *serialized) {
 	if (serialized) {
-		sel = Selection(serialized);
+		sel.~Selection();
+		::new (&sel) Selection(serialized);
 		sel.Truncate(pdoc->Length());
 		SetRectangularRange();
 		InvalidateStyleRedraw();
@@ -2416,7 +2417,8 @@ void Editor::RestoreSelection(Sci::Position newPos, UndoRedo history) {
 			if (FlagSet(undoSelectionHistoryOption, UndoSelectionHistoryOption::Scroll)) {
 				ScrollTo(selAndLine.topLine);
 			}
-			sel = Selection(selAndLine.selection);
+			sel.~Selection();
+			::new (&sel) Selection(selAndLine.selection);
 			if (sel.IsRectangular()) {
 				const size_t mainForRectangular = sel.Main();
 				// Reconstitute ranges from rectangular range
@@ -5549,7 +5551,7 @@ void Editor::SetDocPointer(Document *document) {
 	vs.ReleaseAllExtendedStyles();
 
 	SetRepresentations();
-	
+
 	scrollToAfterWrap.reset();
 
 	// Reset the contraction state to fully shown.

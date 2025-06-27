@@ -271,7 +271,7 @@ Selection::Selection() : mainRange(0), moveExtends(false), tentativeMain(false),
 	AddSelection(SelectionRange(SelectionPosition(0)));
 }
 
-Selection::Selection(std::string_view sv) : mainRange(0), moveExtends(false), tentativeMain(false), selType(SelTypes::stream) {
+Selection::Selection(std::string_view sv) noexcept : mainRange(0), moveExtends(false), tentativeMain(false), selType(SelTypes::stream) {
 	if (sv.empty()) {
 		return;
 	}
