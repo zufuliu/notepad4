@@ -1730,7 +1730,6 @@ void EditCreate(HWND hwndParent) noexcept {
 	SciCall_SetXCaretPolicy(CARET_SLOP | CARET_EVEN, 50);
 	SciCall_SetYCaretPolicy(CARET_EVEN, 0);
 	SciCall_SetMultipleSelection(iSelectOption & SelectOption_EnableMultipleSelection);
-	SciCall_SetUndoSelectionHistory((iSelectOption & SelectOption_UndoRedoRememberSelection) ? (SC_UNDO_SELECTION_HISTORY_ENABLED | SC_UNDO_SELECTION_HISTORY_SCROLL): SC_UNDO_SELECTION_HISTORY_DISABLED);
 	SciCall_SetAdditionalSelectionTyping(true);
 	SciCall_SetMultiPaste(SC_MULTIPASTE_EACH);
 	SciCall_SetVirtualSpaceOptions(SCVS_RECTANGULARSELECTION);
