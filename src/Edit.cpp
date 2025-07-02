@@ -222,6 +222,7 @@ bool EditConvertText(UINT cpSource, UINT cpDest) noexcept {
 	SciCall_SetReadOnly(false);
 	SciCall_Cancel();
 	SciCall_SetChangeHistory(SC_CHANGE_HISTORY_DISABLED);
+	SciCall_SetUndoSelectionHistory(SC_UNDO_SELECTION_HISTORY_DISABLED);
 	SciCall_SetUndoCollection(false);
 	SciCall_EmptyUndoBuffer();
 	SciCall_ClearAll();
@@ -246,6 +247,7 @@ bool EditConvertText(UINT cpSource, UINT cpDest) noexcept {
 		SciCall_SetSavePoint();
 	}
 	SciCall_SetChangeHistory(iChangeHistoryMarker);
+	SciCall_SetUndoSelectionHistory((iSelectOption & SelectOption_UndoRedoRememberSelection) ? (SC_UNDO_SELECTION_HISTORY_ENABLED | SC_UNDO_SELECTION_HISTORY_SCROLL): SC_UNDO_SELECTION_HISTORY_DISABLED);
 	UpdateLineNumberWidth();
 	return true;
 }
@@ -270,6 +272,7 @@ void EditConvertToLargeMode() noexcept {
 	SciCall_SetReadOnly(false);
 	SciCall_Cancel();
 	SciCall_SetChangeHistory(SC_CHANGE_HISTORY_DISABLED);
+	SciCall_SetUndoSelectionHistory(SC_UNDO_SELECTION_HISTORY_DISABLED);
 	SciCall_SetUndoCollection(false);
 	SciCall_EmptyUndoBuffer();
 	SciCall_ClearAll();
@@ -294,6 +297,7 @@ void EditConvertToLargeMode() noexcept {
 	SciCall_EmptyUndoBuffer();
 	SciCall_SetSavePoint();
 	SciCall_SetChangeHistory(iChangeHistoryMarker);
+	SciCall_SetUndoSelectionHistory((iSelectOption & SelectOption_UndoRedoRememberSelection) ? (SC_UNDO_SELECTION_HISTORY_ENABLED | SC_UNDO_SELECTION_HISTORY_SCROLL): SC_UNDO_SELECTION_HISTORY_DISABLED);
 
 	Style_SetLexer(pLexCurrent, true);
 	bLargeFileMode = true;
