@@ -3069,40 +3069,33 @@ void Editor::EndBatchUpdate() noexcept {
 namespace {
 
 constexpr unsigned int safeFoldingSize = 20;
-constexpr int highByteFirst = 0x80;
-constexpr int highByteLast = 0xFF;
-constexpr int minTrailByte = 0x30;
+constexpr uint8_t highByteFirst = 0x80;
+constexpr uint8_t highByteLast = 0xFF;
+constexpr uint8_t minTrailByte = 0x31;
 
 // CreateFoldMap creates a fold map by calling platform APIs so will differ between platforms.
 void CreateFoldMap(int codePage, FoldMap &foldingMap) {
-	for (unsigned char byte1 = highByteLast; byte1 >= highByteFirst; byte1--) {
-		const char ch1 = byte1;
-		if (DBCSIsLeadByte(codePage, ch1)) {
-			for (unsigned char byte2 = highByteLast; byte2 >= minTrailByte; byte2--) {
-				const char ch2 = byte2;
-				if (DBCSIsTrailByte(codePage, ch2)) {
-					const DBCSPair pair{ ch1, ch2 };
-					const uint16_t index = DBCSIndex(ch1, ch2);
-					foldingMap[index] = pair;
-					const std::string_view svBytes(pair.chars, 2);
-					const int lenUni = WideCharLenFromMultiByte(codePage, svBytes);
-					if (lenUni == 1) {
+	for (unsigned char byte1 = highByteFirst + 1; byte1 < highByteLast; byte1++) {
+		if (DBCSIsLeadByte(codePage, byte1)) {
+			for (unsigned char byte2 = minTrailByte; byte2 < highByteLast; byte2++) {
+				if (DBCSIsTrailByte(codePage, byte2)) {
+					const char sCharacter[2] = { static_cast<char>(byte1), static_cast<char>(byte2) };
+					wchar_t codePoint[4]{};
+					const int lenUni = ::MultiByteToWideChar(codePage, MB_ERR_INVALID_CHARS, sCharacter, 2, codePoint, _countof(codePoint));
+					if (lenUni == 1 && codePoint[0]) {
 						// DBCS pair must produce a single Unicode BMP code point
-						wchar_t codePoint = 0;
-						WideCharFromMultiByte(codePage, svBytes, &codePoint, 1);
-						if (codePoint) {
-							// Could create a DBCS -> Unicode conversion map here
-							const char *foldedUTF8 = CaseConvert(codePoint, CaseConversion::fold);
-							if (foldedUTF8) {
-								wchar_t wFolded[safeFoldingSize]{};
-								const size_t charsConverted = UTF16FromUTF8(foldedUTF8, wFolded, std::size(wFolded));
-								char back[safeFoldingSize]{};
-								const int lengthBack = MultiByteFromWideChar(codePage, std::wstring(wFolded, charsConverted),
-									back, std::size(back));
-								if (lengthBack == 2) {
-									// Only allow cases where input length and folded length are both 2
-									foldingMap[index] = { back[0], back[1] };
-								}
+						// Could create a DBCS -> Unicode conversion map here
+						const char *foldedUTF8 = CaseConvert(codePoint[0], CaseConversion::fold);
+						if (foldedUTF8) {
+							wchar_t wFolded[safeFoldingSize];
+							const size_t charsConverted = UTF16FromUTF8(foldedUTF8, wFolded, std::size(wFolded));
+							char back[safeFoldingSize];
+							const int lengthBack = MultiByteFromWideChar(codePage, std::wstring_view(wFolded, charsConverted),
+								back, std::size(back));
+							if (lengthBack == 2) {
+								// Only allow cases where input length and folded length are both 2
+								const uint16_t index = DBCSIndex(byte1, byte2);
+								foldingMap[index] = { back[0], back[1] };
 							}
 						}
 					}
@@ -3119,7 +3112,10 @@ class CaseFolderDBCS final : public CaseFolderTable {
 	UINT cp;
 public:
 	explicit CaseFolderDBCS(UINT cp_): cp{cp_} {
+		// const ElapsedPeriod period;
 		CreateFoldMap(cp, foldingMap);
+		// const double duration = period.Duration()*1e3;
+		// printf("%s(%u) duration=%.6f\n", __func__, cp, duration);
 	}
 	size_t Fold(char *folded, size_t sizeFolded, const char *mixed, size_t lenMixed) const override;
 };
@@ -3127,16 +3123,21 @@ public:
 size_t CaseFolderDBCS::Fold(char *folded, size_t sizeFolded, const char *mixed, size_t lenMixed) const {
 	// This loop outputs the same length as input as for each char 1-byte -> 1-byte; 2-byte -> 2-byte
 	size_t lenOut = 0;
-	for (size_t i = 0; i < lenMixed; i++) {
+	for (size_t i = 0; i < lenMixed; ) {
 		const ptrdiff_t lenLeft = lenMixed - i;
-		const char ch = mixed[i];
+		const char ch = mixed[i++];
 		if ((lenLeft >= 2) && DBCSIsLeadByte(cp, ch) && ((lenOut + 2) <= sizeFolded)) {
 			i++;
 			const char ch2 = mixed[i];
 			const uint16_t ind = DBCSIndex(ch, ch2);
 			const char *pair = foldingMap.at(ind).chars;
-			folded[lenOut++] = pair[0];
-			folded[lenOut++] = pair[1];
+			if (pair[0]) {
+				folded[lenOut++] = pair[0];
+				folded[lenOut++] = pair[1];
+			} else {
+				folded[lenOut++] = ch;
+				folded[lenOut++] = ch2;
+			}
 		} else if ((lenOut + 1) <= sizeFolded) {
 			const unsigned char uch = ch;
 			folded[lenOut++] = mapping[uch];

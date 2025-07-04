@@ -45,7 +45,7 @@ constexpr uint16_t DBCSIndex(unsigned char ch1, unsigned char uch2) noexcept {
 }
 
 struct DBCSPair {
-	char chars[2];
+	char chars[2]{};
 };
 using FoldMap = std::array<DBCSPair, 0x8000>;
 

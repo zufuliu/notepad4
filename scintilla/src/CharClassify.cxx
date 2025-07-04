@@ -148,36 +148,40 @@ int CharClassify::GetCharsOfClass(CharacterClass characterClass, unsigned char *
 
 namespace {
 
-template <typename DataType, size_t DataSize, typename ValueType, size_t BufferSize>
-void ExpandRLE2(const DataType (&data)[DataSize], ValueType (&buffer)[BufferSize]) noexcept {
+template <typename DataType, typename ValueType, size_t BufferSize>
+void ExpandRLE2(const DataType *begin, const DataType *end, ValueType (&buffer)[BufferSize]) noexcept {
 	constexpr int ValueBit = 2;
 	constexpr DataType mask = (1 << ValueBit) - 1;
 	ValueType *p = buffer;
 
-	for (DataType count : data) {
+	do {
+		DataType count = *begin;
 		const ValueType value = count & mask;
 		count >>= ValueBit;
 		assert(p + count <= buffer + BufferSize);
 		memset(p, value, count);
 		p += count;
-	}
+		++begin;
+	} while (begin != end);
 	// ensure full expanded
 	assert(p == buffer + BufferSize);
 }
 
-template <typename DataType, size_t DataSize, typename ValueType, size_t BufferSize>
-void ExpandRLE3(const DataType (&data)[DataSize], ValueType (&buffer)[BufferSize]) noexcept {
+template <typename DataType, typename ValueType, size_t BufferSize>
+void ExpandRLE3(const DataType *begin, const DataType *end, ValueType (&buffer)[BufferSize]) noexcept {
 	constexpr int ValueBit = 3;
 	constexpr DataType mask = (1 << ValueBit) - 1;
 	ValueType *p = buffer;
 
-	for (DataType count : data) {
+	do {
+		DataType count = *begin;
 		const ValueType value = count & mask;
 		count >>= ValueBit;
 		assert(p + count <= buffer + BufferSize);
 		memset(p, value, count);
 		p += count;
-	}
+		++begin;
+	} while (begin != end);
 	// ensure full expanded
 	assert(p == buffer + BufferSize);
 }
@@ -741,7 +745,7 @@ uint8_t CharClassify::classifyMap[0xffff + 1];
 uint8_t CharClassify::graphemeMap[0x4000];
 
 void CharClassify::InitUnicodeData() noexcept {
-	ExpandRLE3(CharClassifyRLE_BMP, classifyMap);
+	ExpandRLE3(std::begin(CharClassifyRLE_BMP), std::end(CharClassifyRLE_BMP), classifyMap);
 	ExpandRLE4(GraphemeBreakRLE_BMP, graphemeMap);
 }
 
@@ -955,46 +959,64 @@ const uint8_t CharClassify_CP1361Data[] = {
 }
 
 DBCSCharClassify::DBCSCharClassify(int codePage_) noexcept {
+	const uint16_t *classifyBegin = nullptr;
+	uint32_t classifyCount = 0;
+	uint32_t bytesCount = 0;
+	uint8_t bytesRLE[16]{};
 	switch (codePage_) {
 	case cp932: {
 		// Shift-JIS
 		constexpr uint8_t BytesRLE_CP932[] = {252, 4, 254, 4, 6, 127, 254, 6, 119, 12,};
-		ExpandRLE2(BytesRLE_CP932, leadByte);
+		bytesCount = std::size(BytesRLE_CP932);
+		memcpy(bytesRLE, BytesRLE_CP932, sizeof(BytesRLE_CP932));
 
-		ExpandRLE3(CharClassifyRLE_CP932, classifyMap);
+		classifyBegin = std::begin(CharClassifyRLE_CP932);
+		classifyCount = std::size(CharClassifyRLE_CP932);
 	} break;
 
 	case cp936: {
 		// GBK
 		constexpr uint8_t BytesRLE_CP936[] = {252, 4, 254, 4, 6, 255, 255, 4,};
-		ExpandRLE2(BytesRLE_CP936, leadByte);
+		bytesCount = std::size(BytesRLE_CP936);
+		memcpy(bytesRLE, BytesRLE_CP936, sizeof(BytesRLE_CP936));
 
-		ExpandRLE3(CharClassifyRLE_CP936, classifyMap);
+		classifyBegin = std::begin(CharClassifyRLE_CP936);
+		classifyCount = std::size(CharClassifyRLE_CP936);
 	} break;
 
 	case cp949: {
 		// Korean Unified Hangul Code, Wansung KS C-5601-1987
 		constexpr uint8_t BytesRLE_CP949[] = {252, 8, 106, 24, 106, 24, 255, 255, 4,};
-		ExpandRLE2(BytesRLE_CP949, leadByte);
+		bytesCount = std::size(BytesRLE_CP949);
+		memcpy(bytesRLE, BytesRLE_CP949, sizeof(BytesRLE_CP949));
 
-		ExpandRLE3(CharClassifyRLE_CP949, classifyMap);
+		classifyBegin = std::begin(CharClassifyRLE_CP949);
+		classifyCount = std::size(CharClassifyRLE_CP949);
 	} break;
 
 	case cp950: {
 		// Big5
 		constexpr uint8_t BytesRLE_CP950[] = {252, 4, 254, 8, 129, 255, 127, 4,};
-		ExpandRLE2(BytesRLE_CP950, leadByte);
+		bytesCount = std::size(BytesRLE_CP950);
+		memcpy(bytesRLE, BytesRLE_CP950, sizeof(BytesRLE_CP950));
 
-		ExpandRLE3(CharClassifyRLE_CP950, classifyMap);
+		classifyBegin = std::begin(CharClassifyRLE_CP950);
+		classifyCount = std::size(CharClassifyRLE_CP950);
 	} break;
 
 	default: {
 		// Korean Johab, KS C-5601-1992
 		constexpr uint8_t BytesRLE_CP1361[] = {196, 254, 62, 8, 14, 255, 71, 18, 31, 6, 107, 22, 4,};
-		ExpandRLE2(BytesRLE_CP1361, leadByte);
+		bytesCount = std::size(BytesRLE_CP1361);
+		memcpy(bytesRLE, BytesRLE_CP1361, sizeof(BytesRLE_CP1361));
 
 		ExpandRunBlock(CharClassify_CP1361Index, CharClassify_CP1361Data, classifyMap,
 			CharClassify_CP1361IndexBit, CharClassify_CP1361BlockBit);
 	} break;
+	}
+
+	ExpandRLE2(bytesRLE, bytesRLE + bytesCount, leadByte);
+	if (classifyBegin) {
+		ExpandRLE3(classifyBegin, classifyBegin + classifyCount, classifyMap);
 	}
 }
