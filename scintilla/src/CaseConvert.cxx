@@ -612,7 +612,7 @@ class CaseConverter final : public ICaseConverter {
 	std::vector<ConversionString> conversions;
 
 public:
-	bool Initialised() const noexcept {
+	[[nodiscard]] bool Initialised() const noexcept {
 		return !characters.empty();
 	}
 	void Add(int character, const char *conversion) {

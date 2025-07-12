@@ -24,7 +24,7 @@ size_t UTF8Length(std::wstring_view wsv) noexcept {
 			len++;
 		} else if (uch < 0x800) {
 			len += 2;
-		} else if ((uch >= SURROGATE_LEAD_FIRST) && (uch <= SURROGATE_TRAIL_LAST)) {
+		} else if (IsSurrogate(uch)) {
 			len += 4;
 			i++;
 		} else {
@@ -60,7 +60,7 @@ void UTF8FromUTF16(std::wstring_view wsv, char *putf, size_t len) noexcept {
 		} else if (uch < 0x800) {
 			putf[k++] = static_cast<char>(0xC0 | (uch >> 6));
 			putf[k++] = static_cast<char>(0x80 | (uch & 0x3f));
-		} else if ((uch >= SURROGATE_LEAD_FIRST) && (uch <= SURROGATE_TRAIL_LAST)) {
+		} else if (IsSurrogate(uch)) {
 			// Half a surrogate pair
 			i++;
 			const unsigned int xch = UTF16_TO_UTF32(uch, wsv[i]);

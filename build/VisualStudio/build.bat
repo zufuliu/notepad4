@@ -4,7 +4,7 @@
 @rem * Notepad4
 @rem *
 @rem * build.bat
-@rem *   Batch file used to build Notepad4 with MSVC 2017, 2019, 2022
+@rem *   Batch file used to build Notepad4 with MSVC 2019, 2022
 @rem *
 @rem * See License.txt for details about distribution and modification.
 @rem *
@@ -27,7 +27,6 @@ IF /I "%~1" == "/?"     GOTO SHOWHELP
 SET "BUILDTYPE=Build"
 SET "ARCH=all"
 SET NO_32BIT=0
-SET NO_ARM=0
 SET "CONFIG=Release"
 
 @rem Check for the first switch
@@ -69,22 +68,14 @@ IF /I "%~1" == "ARM64"   SET "ARCH=ARM64" & SHIFT & GOTO CheckThirdArg
 IF /I "%~1" == "/ARM64"  SET "ARCH=ARM64" & SHIFT & GOTO CheckThirdArg
 IF /I "%~1" == "-ARM64"  SET "ARCH=ARM64" & SHIFT & GOTO CheckThirdArg
 IF /I "%~1" == "--ARM64" SET "ARCH=ARM64" & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "ARM"     SET "ARCH=ARM"   & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "/ARM"    SET "ARCH=ARM"   & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "-ARM"    SET "ARCH=ARM"   & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "--ARM"   SET "ARCH=ARM"   & SHIFT & GOTO CheckThirdArg
 IF /I "%~1" == "all"     SET "ARCH=all"   & SHIFT & GOTO CheckThirdArg
 IF /I "%~1" == "/all"    SET "ARCH=all"   & SHIFT & GOTO CheckThirdArg
 IF /I "%~1" == "-all"    SET "ARCH=all"   & SHIFT & GOTO CheckThirdArg
 IF /I "%~1" == "--all"   SET "ARCH=all"   & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "No32bit"   SET "ARCH=all" & SET NO_ARM=1 & SET NO_32BIT=1 & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "/No32bit"  SET "ARCH=all" & SET NO_ARM=1 & SET NO_32BIT=1 & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "-No32bit"  SET "ARCH=all" & SET NO_ARM=1 & SET NO_32BIT=1 & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "--No32bit" SET "ARCH=all" & SET NO_ARM=1 & SET NO_32BIT=1 & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "NoARM"   SET "ARCH=all"   & SET NO_ARM=1 & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "/NoARM"  SET "ARCH=all"   & SET NO_ARM=1 & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "-NoARM"  SET "ARCH=all"   & SET NO_ARM=1 & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "--NoARM" SET "ARCH=all"   & SET NO_ARM=1 & SHIFT & GOTO CheckThirdArg
+IF /I "%~1" == "No32bit"   SET "ARCH=all" & SET NO_32BIT=1 & SHIFT & GOTO CheckThirdArg
+IF /I "%~1" == "/No32bit"  SET "ARCH=all" & SET NO_32BIT=1 & SHIFT & GOTO CheckThirdArg
+IF /I "%~1" == "-No32bit"  SET "ARCH=all" & SET NO_32BIT=1 & SHIFT & GOTO CheckThirdArg
+IF /I "%~1" == "--No32bit" SET "ARCH=all" & SET NO_32BIT=1 & SHIFT & GOTO CheckThirdArg
 
 
 :CheckThirdArg
@@ -116,13 +107,10 @@ IF /I "%~1" == "--all"         SET "CONFIG=all"         & SHIFT & GOTO StartWork
 SET "EXIT_ON_ERROR=%~1"
 
 SET NEED_ARM64=0
-SET NEED_ARM=0
 IF /I "%ARCH%" == "all" SET NEED_ARM64=1
 IF /I "%ARCH%" == "ARM64" SET NEED_ARM64=1
-IF /I "%ARCH%" == "all" SET /A NEED_ARM=1 - %NO_ARM%
-IF /I "%ARCH%" == "ARM" SET NEED_ARM=1
 CALL :SubVSPath
-IF NOT EXIST "%VS_PATH%" CALL :SUBMSG "ERROR" "Visual Studio 2017, 2019 or 2022 NOT FOUND, please check VS_PATH environment variable!"
+IF NOT EXIST "%VS_PATH%" CALL :SUBMSG "ERROR" "Visual Studio 2019 or 2022 NOT FOUND, please check VS_PATH environment variable!"
 
 IF /I "%processor_architecture%" == "AMD64" (
 	SET "HOST_ARCH=amd64"
@@ -135,7 +123,6 @@ IF /I "%ARCH%" == "AVX2" GOTO AVX2
 IF /I "%ARCH%" == "x64" GOTO x64
 IF /I "%ARCH%" == "Win32" GOTO Win32
 IF /I "%ARCH%" == "ARM64" GOTO ARM64
-IF /I "%ARCH%" == "ARM" GOTO ARM
 
 
 :Win32
@@ -168,14 +155,6 @@ CALL "%VS_PATH%\Common7\Tools\vsdevcmd" -no_logo -arch=arm64 -host_arch=%HOST_AR
 IF /I "%CONFIG%" == "all" (CALL :SUBMSVC %BUILDTYPE% Debug ARM64 && CALL :SUBMSVC %BUILDTYPE% Release ARM64) ELSE (CALL :SUBMSVC %BUILDTYPE% %CONFIG% ARM64)
 ENDLOCAL
 IF /I "%ARCH%" == "ARM64" GOTO END
-IF %NO_ARM% == 1 GOTO END
-
-
-:ARM
-SETLOCAL
-CALL "%VS_PATH%\Common7\Tools\vsdevcmd" -no_logo -arch=arm -host_arch=%HOST_ARCH%
-IF /I "%CONFIG%" == "all" (CALL :SUBMSVC %BUILDTYPE% Debug ARM && CALL :SUBMSVC %BUILDTYPE% Release ARM) ELSE (CALL :SUBMSVC %BUILDTYPE% %CONFIG% ARM)
-ENDLOCAL
 
 
 :END
@@ -195,14 +174,13 @@ IF EXIST "%VSINSTALLDIR%\Common7\IDE\VC\VCTargets\Platforms\%ARCH%\PlatformTools
 SET VSWHERE=%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe
 SET "VS_COMPONENT=Microsoft.Component.MSBuild Microsoft.VisualStudio.Component.VC.Tools.x86.x64"
 IF "%NEED_ARM64%" == 1 SET "VS_COMPONENT=%VS_COMPONENT% Microsoft.VisualStudio.Component.VC.Tools.ARM64"
-IF "%NEED_ARM%" == 1 SET "VS_COMPONENT=%VS_COMPONENT% Microsoft.VisualStudio.Component.VC.Tools.ARM"
-FOR /f "delims=" %%A IN ('"%VSWHERE%" -property installationPath -prerelease -version [15.0^,18.0^) -requires %VS_COMPONENT%') DO SET "VS_PATH=%%A"
+FOR /f "delims=" %%A IN ('"%VSWHERE%" -property installationPath -prerelease -version [16.0^,18.0^) -requires %VS_COMPONENT%') DO SET "VS_PATH=%%A"
 IF EXIST "%VS_PATH%" (
 	SET "VSINSTALLDIR=%VS_PATH%\"
 	EXIT /B
 )
 @rem Visual Studio Build Tools
-FOR /f "delims=" %%A IN ('"%VSWHERE%" -products Microsoft.VisualStudio.Product.BuildTools -property installationPath -prerelease -version [15.0^,18.0^) -requires %VS_COMPONENT%') DO SET "VS_PATH=%%A"
+FOR /f "delims=" %%A IN ('"%VSWHERE%" -products Microsoft.VisualStudio.Product.BuildTools -property installationPath -prerelease -version [16.0^,18.0^) -requires %VS_COMPONENT%') DO SET "VS_PATH=%%A"
 IF EXIST "%VS_PATH%" SET "VSINSTALLDIR=%VS_PATH%\"
 EXIT /B
 
@@ -219,7 +197,7 @@ EXIT /B
 :SHOWHELP
 TITLE %~nx0 %1
 ECHO. & ECHO.
-ECHO Usage: %~nx0 [Clean^|Build^|Rebuild] [Win32^|x64^|AVX2^|ARM64^|ARM^|all^|NoARM^|No32bit] [Debug^|Release^|LLVMDebug^|LLVMRelease^|all]
+ECHO Usage: %~nx0 [Clean^|Build^|Rebuild] [Win32^|x64^|AVX2^|ARM64^|all^|No32bit] [Debug^|Release^|LLVMDebug^|LLVMRelease^|all]
 ECHO.
 ECHO Notes: You can also prefix the commands with "-", "--" or "/".
 ECHO        The arguments are not case sensitive.

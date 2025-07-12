@@ -42,7 +42,7 @@ public:
 	void Set(Sci_Position position, T value) {
 		Delete(position);
 		if (states.empty() || (value != states[states.size() - 1].value)) {
-			states.push_back(State(position, value));
+			states.emplace_back(position, value);
 		}
 	}
 	T ValueAt(Sci_Position position) const {

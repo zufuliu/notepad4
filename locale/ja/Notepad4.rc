@@ -258,8 +258,8 @@ BEGIN
 			MENUITEM "削除(&E)\tCtrl+Shift+D",		IDM_EDIT_DELETELINE
 			MENUITEM SEPARATOR
 			MENUITEM "行を結合(空白で)(&J)\tCtrl+J",				IDM_EDIT_JOINLINES
-			MENUITEM "空白で折り返し(&W)...",					IDM_EDIT_COLUMNWRAP
 			MENUITEM "長い行を分割し折り返し(&S)\tCtrl+I",			IDM_EDIT_SPLITLINES
+			MENUITEM "空白で折り返し(&W)...",					IDM_EDIT_COLUMNWRAP
 			MENUITEM "段落を温存して結合(&P)\tCtrl+Shift+J",	IDM_EDIT_JOINLINESEX
 		END
 		POPUP "変換(&V)"
@@ -582,7 +582,8 @@ BEGIN
 			MENUITEM "複数選択を使用(&M)",		IDM_SET_MULTIPLE_SELECTION
 			MENUITEM "検索文字列に選択範囲をコピー(&S)",	IDM_SET_SELECTIONASFINDTEXT
 			MENUITEM "検索文字列に貼り付け用バッファをコピー(&P)",	IDM_SET_PASTEBUFFERASFINDTEXT
-			POPUP "行選択の方法(&M)"
+			MENUITEM "Undo Redo &Remember Selection",	IDM_SET_UNDO_REDO_SELECTION
+			POPUP "行選択の方法(&L)"
 			BEGIN
 				MENUITEM "なし(&N)",						IDM_LINE_SELECTION_MODE_NONE
 				MENUITEM "Visual Studio(&V)",				IDM_LINE_SELECTION_MODE_VS
@@ -676,6 +677,7 @@ BEGIN
 				MENUITEM "&Direct2D",				IDM_SET_RENDER_TECH_D2D
 				MENUITEM "Direct2D &Retain",		IDM_SET_RENDER_TECH_D2DRETAIN
 				MENUITEM "Direct2D &GDI DC",		IDM_SET_RENDER_TECH_D2DDC
+				MENUITEM "Direct&3D",				IDM_SET_RENDER_TECH_D3D
 			END
 			POPUP "フォントの品質(&Q)"
 			BEGIN

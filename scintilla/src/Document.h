@@ -169,6 +169,22 @@ public:
 	bool isEnabled;
 };
 
+// Base class for view state that can be held and transferred without understanding the contents.
+// Declared here but real implementation subclass declared in EditModel
+struct ViewState {
+	ViewState() noexcept = default;
+	// Deleted so ViewState objects can not be copied
+	ViewState(const ViewState &) = delete;
+	ViewState(ViewState &&) = delete;
+	ViewState &operator=(const ViewState &) = delete;
+	ViewState &operator=(ViewState &&) = delete;
+	virtual ~ViewState() noexcept = default;
+
+	virtual void TruncateUndo(int index) = 0;
+};
+
+using ViewStateShared = std::shared_ptr<ViewState>;
+
 struct LexerReleaser {
 	// Called by unique_ptr to destroy/free the Resource
 	void operator()(Scintilla::ILexer5 *pLexer) const noexcept {
@@ -310,6 +326,9 @@ private:
 	std::unique_ptr<LexInterface> pli;
 	std::unique_ptr<DBCSCharClassify> dbcsCharClass;
 
+	//std::map<void *, ViewStateShared> viewData;
+	ViewStateShared viewData;
+
 public:
 
 	Scintilla::EndOfLine eolMode = Scintilla::EndOfLine::CrLf;
@@ -433,8 +452,9 @@ public:
 	void BeginUndoAction(bool coalesceWithPrior = false) noexcept {
 		cb.BeginUndoAction(coalesceWithPrior);
 	}
-	void EndUndoAction() noexcept {
-		cb.EndUndoAction();
+	void EndUndoAction() noexcept;
+	bool AfterUndoSequenceStart() const noexcept {
+		return cb.AfterUndoSequenceStart();
 	}
 	int UndoSequenceDepth() const noexcept;
 	void AddUndoAction(Sci::Position token, bool mayCoalesce) {
@@ -635,6 +655,10 @@ public:
 	LexInterface *GetLexInterface() const noexcept;
 	void SetLexInterface(std::unique_ptr<LexInterface> pLexInterface) noexcept;
 
+	void SetViewState(void *view, ViewStateShared pVSS) noexcept;
+	ViewStateShared GetViewState(void *view) const noexcept;
+	void TruncateUndoComments(int action);
+
 	int SCI_METHOD SetLineState(Sci_Line line, int state) override;
 	int SCI_METHOD GetLineState(Sci_Line line) const noexcept override;
 	void SCI_METHOD ChangeLexerState(Sci_Position start, Sci_Position end) override;
@@ -678,6 +702,7 @@ public:
 private:
 	void NotifyModifyAttempt() noexcept;
 	void NotifySavePoint(bool atSavePoint) noexcept;
+	void NotifyGroupCompleted() noexcept;
 	void NotifyModified(DocModification mh);
 };
 
@@ -779,6 +804,7 @@ public:
 	virtual void NotifyDeleted(Document *doc, void *userData) noexcept = 0;
 	virtual void NotifyStyleNeeded(Document *doc, void *userData, Sci::Position endPos) = 0;
 	virtual void NotifyErrorOccurred(Document *doc, void *userData, Scintilla::Status status) noexcept = 0;
+	virtual void NotifyGroupCompleted(Document *doc, void *userData) noexcept = 0;
 };
 
 }

@@ -258,8 +258,8 @@ BEGIN
 			MENUITEM "&Löschen\tStrg+Shift+D",					IDM_EDIT_DELETELINE
 			MENUITEM SEPARATOR
 			MENUITEM "&Zusammenlegen\tStrg+J",					IDM_EDIT_JOINLINES
-			MENUITEM "S&paltenumbruch...",						IDM_EDIT_COLUMNWRAP
 			MENUITEM "Ze&ilenumbruch\tStrg+I",					IDM_EDIT_SPLITLINES
+			MENUITEM "S&paltenumbruch...",						IDM_EDIT_COLUMNWRAP
 			MENUITEM "A&bsätze verbinden\tStrg+Shift+J",		IDM_EDIT_JOINLINESEX
 		END
 		POPUP "Kon&vertieren"
@@ -582,6 +582,7 @@ BEGIN
 			MENUITEM "&Mehrfachauswahl aktivieren",		IDM_SET_MULTIPLE_SELECTION
 			MENUITEM "&Kopiere Auswahl als Suchtext",	IDM_SET_SELECTIONASFINDTEXT
 			MENUITEM "Z&wischenablage als Suchtext",	IDM_SET_PASTEBUFFERASFINDTEXT
+			MENUITEM "Undo Redo &Remember Selection",	IDM_SET_UNDO_REDO_SELECTION
 			POPUP "&Zeilenauswahlmodus"
 			BEGIN
 				MENUITEM "&Keiner",						IDM_LINE_SELECTION_MODE_NONE
@@ -676,6 +677,7 @@ BEGIN
 				MENUITEM "&Direct2D",				IDM_SET_RENDER_TECH_D2D
 				MENUITEM "Direct2D &Retain",		IDM_SET_RENDER_TECH_D2DRETAIN
 				MENUITEM "Direct2D &GDI DC",		IDM_SET_RENDER_TECH_D2DDC
+				MENUITEM "Direct&3D",				IDM_SET_RENDER_TECH_D3D
 			END
 			POPUP "Schrift&qualität"
 			BEGIN

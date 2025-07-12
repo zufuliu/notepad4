@@ -9,7 +9,7 @@ buildEnv = {}
 
 notepad4_config_h = os.path.abspath('../src/config.h')
 matepath_config_h = os.path.abspath('../matepath/src/config.h')
-projectDir = os.path.abspath('VS2017')
+projectDir = os.path.abspath('VisualStudio')
 localeDir = os.path.abspath('../locale')
 notepad4_rc = os.path.abspath('../src/Notepad4.rc')
 matepath_rc = os.path.abspath('../matepath/src/matepath.rc')
@@ -200,14 +200,10 @@ def make_release_artifact(locale, suffix='', hd=False):
 	app_version = buildEnv['app_version']
 	zipDir = buildEnv['temp_zip_dir']
 	outDir = os.path.join(buildFolder, 'bin', 'Release')
-	archList = ['ARM', 'ARM64', 'AVX2', 'Win32', 'x64']
+	archList = ['ARM64', 'AVX2', 'Win32', 'x64']
 	if hd:
-		archList.remove('ARM')
 		archList.remove('Win32')
 	for arch in archList:
-		if arch == 'ARM' and locale not in ('i18n', 'en'):
-			# 32-bit ARM is only built for i18n and en
-			continue
 		folder = os.path.join(outDir, arch)
 		notepad4_exe = os.path.join(folder, 'Notepad4.exe')
 		matepath_exe = os.path.join(folder, 'matepath.exe')
@@ -240,8 +236,7 @@ def build_release_artifact(hd, suffix=''):
 				build_locale_project(arch)
 		else:
 			copy_back_localized_resources(locale)
-			# 32-bit ARM is only built for i18n and en
-			arch = 'No32bit' if hd else 'NoARM'
+			arch = 'No32bit' if hd else 'all'
 			build_main_project(arch)
 		make_release_artifact(locale, suffix, hd)
 	copy_back_localized_resources('en')

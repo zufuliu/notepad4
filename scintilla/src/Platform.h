@@ -188,8 +188,8 @@ public:
 	virtual ~Surface() noexcept = default;
 	static std::unique_ptr<Surface> Allocate(Scintilla::Technology technology);
 
-	virtual void Init(WindowID wid) noexcept = 0;
-	virtual void Init(SurfaceID sid, WindowID wid, bool printing = false) noexcept = 0;
+	virtual void Init(WindowID wid) noexcept = 0;	// For measuring text
+	virtual void Init(SurfaceID sid, WindowID wid, bool printing = false) noexcept = 0;	// For drawing
 	virtual std::unique_ptr<Surface> AllocatePixMap(int width, int height) = 0;
 
 	virtual void SetMode(SurfaceMode mode) noexcept = 0;
@@ -321,7 +321,8 @@ struct ListOptions final {
 	std::optional<ColourRGBA> back;
 	std::optional<ColourRGBA> foreSelected;
 	std::optional<ColourRGBA> backSelected;
-	AutoCompleteOption options=AutoCompleteOption::Normal;
+	AutoCompleteOption options = AutoCompleteOption::Normal;
+	float imageScale = 1.0f;
 };
 
 class ListBox : public Window {
@@ -330,8 +331,8 @@ public:
 	~ListBox() noexcept override = default;
 	static std::unique_ptr<ListBox> Allocate();
 
-	virtual void SetFont(const Font *font) noexcept = 0;
-	virtual void SCICALL Create(Window &parent, int ctrlID, Point location, int lineHeight_, bool unicodeMode_, Scintilla::Technology technology_) noexcept = 0;
+	virtual void SetFont(std::shared_ptr<Font> font) noexcept = 0;
+	virtual void SCICALL Create(Window &parent, int ctrlID, Point location, int lineHeight_, int codePage_, Scintilla::Technology technology_) noexcept = 0;
 	virtual void SetAverageCharWidth(int width) noexcept = 0;
 	virtual void SetVisibleRows(int rows) noexcept = 0;
 	virtual int GetVisibleRows() const noexcept = 0;

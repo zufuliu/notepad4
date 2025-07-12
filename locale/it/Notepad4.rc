@@ -258,8 +258,8 @@ BEGIN
 			MENUITEM "&Elimina linea\tCtrl+Shift+D",		IDM_EDIT_DELETELINE
 			MENUITEM SEPARATOR
 			MENUITEM "Unisci &linee\tCtrl+J",				IDM_EDIT_JOINLINES
-			MENUITEM "Colonne a c&apo...",				IDM_EDIT_COLUMNWRAP
 			MENUITEM "Di&vidi linee\tCtrl+I",			IDM_EDIT_SPLITLINES
+			MENUITEM "Colonne a c&apo...",				IDM_EDIT_COLUMNWRAP
 			MENUITEM "Unisci &paragrafi\tCtrl+Shift+J",	IDM_EDIT_JOINLINESEX
 		END
 		POPUP "C&onverti"
@@ -355,7 +355,7 @@ BEGIN
 			MENUITEM "Aggiorna s&tampa orario\tShift+F5",			CMD_TIMESTAMPS
 		END
 	END
-	POPUP "&Search"
+	POPUP "&Ricerca"
 	BEGIN
 		MENUITEM "&Trova...\tCtrl+F",				IDM_EDIT_FIND
 		MENUITEM "Sal&va testo trovato\tAlt+F3",			IDM_EDIT_SAVEFIND
@@ -582,6 +582,7 @@ BEGIN
 			MENUITEM "Abilita selezione &multipla",		IDM_SET_MULTIPLE_SELECTION
 			MENUITEM "Copia &selezione come testo trovato",	IDM_SET_SELECTIONASFINDTEXT
 			MENUITEM "Co&pia e incolla il buffer come testo trovato",	IDM_SET_PASTEBUFFERASFINDTEXT
+			MENUITEM "Undo Redo &Remember Selection",	IDM_SET_UNDO_REDO_SELECTION
 			POPUP "M&odalità selezione linea"
 			BEGIN
 				MENUITEM "&Nessuna",						IDM_LINE_SELECTION_MODE_NONE
@@ -676,6 +677,7 @@ BEGIN
 				MENUITEM "&Direct2D",				IDM_SET_RENDER_TECH_D2D
 				MENUITEM "Direct2D &Retain",		IDM_SET_RENDER_TECH_D2DRETAIN
 				MENUITEM "Direct2D &GDI DC",		IDM_SET_RENDER_TECH_D2DDC
+				MENUITEM "Direct&3D",				IDM_SET_RENDER_TECH_D3D
 			END
 			POPUP "&Qualità font"
 			BEGIN

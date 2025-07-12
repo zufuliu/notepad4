@@ -1,6 +1,5 @@
 // Edit AutoCompletion
 
-struct IUnknown;
 #include <windows.h>
 #include <shlwapi.h>
 #include <shellapi.h>
@@ -95,7 +94,7 @@ struct WordList {
 };
 
 // TODO: replace _stricmp() and _strnicmp() with other functions
-// which correctly case insensitively compares UTF-8 string and ANSI string.
+// which correctly case insensitively compares UTF-8 string and ANSI/DBCS string.
 
 #if NP2_AUTOC_CACHE_SORT_KEY
 #define NP2_AUTOC_SORT_KEY_LENGTH	4
@@ -331,6 +330,7 @@ void WordList::Init(LPCSTR pRoot, UINT iRootLen, bool ignoreCase) noexcept {
 	iStartLen = iRootLen;
 
 	if (ignoreCase) {
+		// use strcmp() instead of _stricmp() to keep all matched string instead of just first one
 		WL_strcmp = strcmp;
 		WL_strncmp = _strnicmp;
 #if NP2_AUTOC_CACHE_SORT_KEY
@@ -1641,7 +1641,7 @@ static bool EditCompleteWordCore(int iCondition, bool autoInsert) noexcept {
 	}
 
 	bool retry = true;
-	uint32_t ignoredStyleMask[8] = {0};
+	uint32_t ignoredStyleMask[8]{};
 	const bool bScanWordsInDocument = (autoCompletionConfig.iCompleteOption & AutoCompletionOption_ScanWordsInDocument) != 0;
 	if (pLexCurrent->lexerAttr & LexerAttr_PlainTextFile) {
 		if (!bScanWordsInDocument
@@ -3242,7 +3242,7 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) noexcept {
 		AllStringStyleMask[SCE_H_SGML_SIMPLESTRING >> 5] |= (1U << (SCE_H_SGML_SIMPLESTRING & 31));
 		AllStringStyleMask[js_style(SCE_JS_STRING_SQ) >> 5] |= (1U << (js_style(SCE_JS_STRING_SQ) & 31));
 		AllStringStyleMask[js_style(SCE_JS_STRING_DQ) >> 5] |= (1U << (js_style(SCE_JS_STRING_DQ) & 31));
-		AllStringStyleMask[js_style(SCE_JS_STRING_BT) >> 5] |= (1U << (js_style(SCE_JS_STRING_BT) & 31));
+		AllStringStyleMask[js_style(SCE_JS_TEMPLATELITERAL) >> 5] |= (1U << (js_style(SCE_JS_TEMPLATELITERAL) & 31));
 		AllStringStyleMask[js_style(SCE_JS_REGEX) >> 5] |= (1U << (js_style(SCE_JS_REGEX) & 31));
 		AllStringStyleMask[js_style(SCE_JS_ESCAPECHAR) >> 5] |= (1U << (js_style(SCE_JS_ESCAPECHAR) & 31));
 		AllStringStyleMask[css_style(SCE_CSS_ESCAPECHAR) >> 5] |= (1U << (css_style(SCE_CSS_ESCAPECHAR) & 31));
@@ -3267,10 +3267,12 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) noexcept {
 		CharacterPrefixMask['B' >> 5] |= (1 << ('B' & 31));
 		CharacterPrefixMask['F' >> 5] |= (1 << ('F' & 31));
 		CharacterPrefixMask['R' >> 5] |= (1 << ('R' & 31));
+		CharacterPrefixMask['T' >> 5] |= (1 << ('T' & 31));
 		CharacterPrefixMask['U' >> 5] |= (1 << ('U' & 31));
 		CharacterPrefixMask['b' >> 5] |= (1 << ('b' & 31));
 		CharacterPrefixMask['f' >> 5] |= (1 << ('f' & 31));
 		CharacterPrefixMask['r' >> 5] |= (1 << ('r' & 31));
+		CharacterPrefixMask['t' >> 5] |= (1 << ('t' & 31));
 		CharacterPrefixMask['u' >> 5] |= (1 << ('u' & 31));
 		RawStringStyleMask[SCE_PY_RAWSTRING_SQ >> 5] |= (1U << (SCE_PY_RAWSTRING_SQ & 31));
 		RawStringStyleMask[SCE_PY_RAWSTRING_DQ >> 5] |= (1U << (SCE_PY_RAWSTRING_DQ & 31));

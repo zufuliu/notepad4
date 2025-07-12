@@ -77,6 +77,7 @@ public:
 	Sci::Line LinesDisplayed() const noexcept override;
 	Sci::Line DisplayFromDoc(Sci::Line lineDoc) const noexcept override;
 	Sci::Line DisplayLastFromDoc(Sci::Line lineDoc) const noexcept override;
+	Sci::Line DisplayFromDocSub(Sci::Line lineDoc, Sci::Line lineSub) const noexcept override;
 	Sci::Line DocFromDisplay(Sci::Line lineDisplay) const noexcept override;
 
 	void InsertLines(Sci::Line lineDoc, Sci::Line lineCount) override;
@@ -211,6 +212,12 @@ Sci::Line ContractionState<LINE>::DisplayFromDoc(Sci::Line lineDoc) const noexce
 		const LINE lineDocCast = std::min(line_cast(lineDoc), displayLines->Partitions());
 		return displayLines->PositionFromPartition(lineDocCast);
 	}
+}
+
+template <typename LINE>
+Sci::Line ContractionState<LINE>::DisplayFromDocSub(Sci::Line lineDoc, Sci::Line lineSub) const noexcept {
+	return DisplayFromDoc(lineDoc) +
+		std::min(lineSub, static_cast<Sci::Line>(GetHeight(lineDoc) - 1));
 }
 
 template <typename LINE>

@@ -50,7 +50,8 @@ static KEYWORDLIST Keywords_PHP = {{
 "GLOBALS _COOKIE _ENV _FILES _GET _POST _REQUEST _SERVER _SESSION argc argv http_response_header this "
 
 , // 5 magic constant
-"__CLASS__ __COMPILER_HALT_OFFSET__ __DIR__ __FILE__ __FUNCTION__ __LINE__ __METHOD__ __NAMESPACE__ __TRAIT__ "
+"__CLASS__ __COMPILER_HALT_OFFSET__ __DIR__ __FILE__ __FUNCTION__ __LINE__ __METHOD__ __NAMESPACE__ __PROPERTY__ "
+"__TRAIT__ "
 
 , // 6 magic method
 "__call( __callStatic( __clone( __construct( __debugInfo( __destruct( __get( __invoke( __isset( "
@@ -373,14 +374,14 @@ static KEYWORDLIST Keywords_PHP = {{
 "zend_thread_id( zend_version( "
 
 , // 9 misc
-"AUTH_TYPE DOCUMENT_ROOT GATEWAY_INTERFACE "
+"AUTH_TYPE AllowDynamicProperties Attribute DOCUMENT_ROOT Deprecated GATEWAY_INTERFACE "
 "HTTPS HTTP_ACCEPT HTTP_ACCEPT_CHARSET HTTP_ACCEPT_ENCODING HTTP_ACCEPT_LANGUAGE HTTP_CONNECTION HTTP_HOST HTTP_REFERER "
 "HTTP_USER_AGENT "
-"ORIG_PATH_INFO PATH_INFO PATH_TRANSLATED PHP_AUTH_DIGEST PHP_AUTH_PW PHP_AUTH_USER PHP_SELF QUERY_STRING "
+"ORIG_PATH_INFO Override PATH_INFO PATH_TRANSLATED PHP_AUTH_DIGEST PHP_AUTH_PW PHP_AUTH_USER PHP_SELF QUERY_STRING "
 "REDIRECT_REMOTE_USER REMOTE_ADDR REMOTE_HOST REMOTE_PORT REMOTE_USER "
-"REQUEST_METHOD REQUEST_TIME REQUEST_TIME_FLOAT REQUEST_URI "
+"REQUEST_METHOD REQUEST_TIME REQUEST_TIME_FLOAT REQUEST_URI ReturnTypeWillChange "
 "SCRIPT_FILENAME SCRIPT_NAME "
-"SERVER_ADDR SERVER_ADMIN SERVER_NAME SERVER_PORT SERVER_PROTOCOL SERVER_SIGNATURE SERVER_SOFTWARE "
+"SERVER_ADDR SERVER_ADMIN SERVER_NAME SERVER_PORT SERVER_PROTOCOL SERVER_SIGNATURE SERVER_SOFTWARE SensitiveParameter "
 "affected_rows argc argv client_info client_version code connect_errno connect_error context current current_field "
 "data days end errno error errorInfo error_list field_count filtername host_info "
 "id include_start_date info insert_id interval invert lengths message mime name num_rows "
@@ -396,7 +397,7 @@ static KEYWORDLIST Keywords_PHP = {{
 "this throw true try typeof undefined var void while with yield "
 
 , // 12 phpdoc
-"api author category copyright deprecated example filesource global ignore internal license link method "
+"api author category copyright deprecated example filesource final global ignore internal license link method "
 "package param property return see since source subpackage throws todo used uses var version "
 
 , nullptr, nullptr

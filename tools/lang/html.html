@@ -1,5 +1,5 @@
 <!--
-https://whatwg.org/ 17 January 2025
+https://whatwg.org/ 16 May 2025
 HTML 4.01 https://www.w3.org/TR/html4/ 27 March 2018
 XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 XHTML 1.0 https://www.w3.org/TR/xhtml1/ 27 March 2018
@@ -92,6 +92,7 @@ https://developer.mozilla.org/en-US/docs/Web/HTML
 		onchange
 		onclick
 		onclose
+		oncommand
 		oncontextlost
 		oncontextmenu
 		oncontextrestored
@@ -264,7 +265,7 @@ https://developer.mozilla.org/en-US/docs/Web/HTML
 		<img alt src srcset sizes crossorigin usemap ismap width height
 		decoding="sync async auto" loading="lazy eager" referrerpolicy fetchpriority>
 		<!-- https://html.spec.whatwg.org/multipage/iframe-embed-object.html -->
-		<!-- https://www.w3.org/TR/permissions-policy/ 13 January 2025 -->
+		<!-- https://www.w3.org/TR/permissions-policy/ 10 February 2025 -->
 		<!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/Permissions_Policy -->
 		<iframe src srcdoc name
 		sandbox="allow-downloads allow-forms allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts allow-top-navigation allow-top-navigation-by-user-activation allow-top-navigation-to-custom-protocols"
@@ -322,6 +323,7 @@ https://developer.mozilla.org/en-US/docs/Web/HTML
 				value width title>
 			<!-- https://html.spec.whatwg.org/multipage/form-elements.html#the-button-element -->
 			<button disabled form formaction formenctype formmethod formnovalidate formtarget name popovertarget popovertargetaction
+				command="toggle-popover show-popover hide-popover close show-modal" commandfor
 				type="submit reset button" value></button>
 			<select autocomplete disabled form multiple name required size>
 				<optgroup disabled label>
@@ -345,7 +347,7 @@ https://developer.mozilla.org/en-US/docs/Web/HTML
 		<script src type="text/javascript text/ecmascript text/jscript text/livescript module text/plain text/xml application/octet-stream application/xml"
 			charset nomodule async defer crossorigin integrity referrerpolicy blocking="render" fetchpriority></script>
 		<noscript></noscript>
-		<template shadowrootmode="open closed" shadowrootdelegatesfocus shadowrootclonable shadowrootserializable></template>
+		<template shadowrootmode="open closed" shadowrootdelegatesfocus shadowrootclonable shadowrootserializable shadowrootcustomelementregistry></template>
 		<slot name></slot>
 		<!-- https://html.spec.whatwg.org/multipage/canvas.html -->
 		<canvas width height></canvas>
@@ -474,19 +476,19 @@ https://developer.mozilla.org/en-US/docs/Web/HTML
 		<html virtualkeyboardpolicy>
 			<a attributionsrc target="_unfencedTop"></a>
 			<audio disableremoteplayback></audio>
-			<button command="show-modal close show-popover hide-popover toggle-popover" commandfor></button>
 			<fencedframe allow height width></fencedframe>
-			<iframe allowpaymentrequest credentialless csp></iframe>
+			<iframe allowpaymentrequest browsingtopics credentialless csp></iframe>
 			<img attributionsrc elementtiming>
 			<portal referrerpolicy src></portal>
 			<script attributionsrc></script>
+			<selectedcontent></selectedcontent>
 			<video disablepictureinpicture disableremoteplayback></video>
 		</html>
 		-->
 
 		<!-- RDFa https://www.w3.org/TR/xhtml-rdfa-primer/ 17 March 2015 -->
 		<meta property vocab resource typeof content datatype>
-		<!-- ARIA in HTML https://www.w3.org/TR/html-aria/ 23 December 2024 -->
+		<!-- ARIA in HTML https://www.w3.org/TR/html-aria/ 09 April 2025 -->
 		<a role></a>
 		<!-- https://www.w3.org/TR/xhtml2/elements.html -->
 	</body>

@@ -241,6 +241,10 @@ public:
 	void SetLevel(Sci_Line line, int level) {
 		pAccess->SetLevel(line, level);
 	}
+	// Avoids some overhead when level same as before
+	void SetLevelIfDifferent(Sci_Line line, int level) {
+		pAccess->SetLevel(line, level);
+	}
 	void IndicatorFill(Sci_Position start, Sci_Position end, int indicator, int value) {
 		pAccess->DecorationSetCurrentIndicator(indicator);
 		pAccess->DecorationFillRange(start, value, end - start);
@@ -259,6 +263,33 @@ struct LexicalClass {
 };
 
 class CharacterSet;
+
+// Fold level setting
+
+constexpr int FoldLevelShift = 16;
+constexpr int FoldLevelStart(int levelPrevious) noexcept {
+	return levelPrevious >> FoldLevelShift;
+}
+
+constexpr int FoldLevelForCurrentNext(int levelCurrent, int levelNext) noexcept {
+	return levelCurrent | (levelNext << FoldLevelShift);
+}
+
+// Where lexer uses current/next but only has one value, commonly at end of range
+constexpr int FoldLevelForCurrent(int levelCurrent) noexcept {
+	return FoldLevelForCurrentNext(levelCurrent, levelCurrent);
+}
+
+constexpr int FoldLevelFlags(int levelLine, int levelNext, bool white, bool headerPermitted = true) noexcept {
+	int flags = 0;
+	if (white) {
+		flags |= SC_FOLDLEVELWHITEFLAG;
+	}
+	if ((levelLine < levelNext) && (headerPermitted)) {
+		flags |= SC_FOLDLEVELHEADERFLAG;
+	}
+	return flags;
+}
 
 constexpr int MultiStyle(int style1, int style2) noexcept {
 	return style1 | (style2 << 8);

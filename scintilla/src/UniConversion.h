@@ -126,8 +126,12 @@ enum {
 	SUPPLEMENTAL_PLANE_FIRST = 0x10000,
 };
 
+constexpr bool IsSurrogate(unsigned int uch) noexcept {
+	return (uch >= SURROGATE_LEAD_FIRST) && (uch <= SURROGATE_TRAIL_LAST);
+}
+
 constexpr unsigned int UTF16CharLength(wchar_t uch) noexcept {
-	return ((uch >= SURROGATE_LEAD_FIRST) && (uch <= SURROGATE_LEAD_LAST)) ? 2 : 1;
+	return IsSurrogate(uch) ? 2 : 1;
 }
 
 constexpr unsigned int UTF16LengthFromUTF8ByteCount(unsigned int byteCount) noexcept {

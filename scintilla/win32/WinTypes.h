@@ -43,19 +43,19 @@ struct UnknownReleaser {
 template<typename T>
 inline T DLLFunction(HMODULE hModule, LPCSTR lpProcName) noexcept {
 	FARPROC function = ::GetProcAddress(hModule, lpProcName);
-#if defined(__clang__) || defined(__GNUC__) || (_MSC_VER >= 1926)
 	return __builtin_bit_cast(T, function);
-#else
-	static_assert(sizeof(T) == sizeof(function));
-	T fp {};
-	memcpy(&fp, &function, sizeof(T));
-	return fp;
-#endif
 }
 
 template<typename T>
 inline T DLLFunctionEx(LPCWSTR lpDllName, LPCSTR lpProcName) noexcept {
 	return DLLFunction<T>(::GetModuleHandleW(lpDllName), lpProcName);
+}
+
+inline void ReleaseLibrary(HMODULE &hLib) noexcept {
+	if (hLib) {
+		FreeLibrary(hLib);
+		hLib = {};
+	}
 }
 
 // similar to IID_PPV_ARGS() but without __uuidof() check

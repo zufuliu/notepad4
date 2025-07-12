@@ -19,6 +19,15 @@
 #ifndef BOOST_REGEX_V5_BASIC_REGEX_PARSER_HPP
 #define BOOST_REGEX_V5_BASIC_REGEX_PARSER_HPP
 
+#include <boost/regex/v5/basic_regex_creator.hpp>
+
+#ifndef BOOST_REGEX_AS_MODULE
+#include <climits>
+#include <cstdint>
+#include <limits>
+#include <type_traits>
+#endif
+
 namespace boost{
 namespace BOOST_REGEX_DETAIL_NS{
 
@@ -199,7 +208,7 @@ template <class charT, class traits>
 void basic_regex_parser<charT, traits>::fail(regex_constants::error_type error_code, std::ptrdiff_t position)
 {
    // get the error message:
-   std::string message = this->m_pdata->m_ptraits->error_string(error_code);
+   const std::string message = this->m_pdata->m_ptraits->error_string(error_code);
    fail(error_code, position, message);
 }
 
@@ -889,6 +898,11 @@ escape_type_class_jump:
          }
          const charT* pc = m_position;
          std::intmax_t i = this->m_traits.toi(pc, m_end, 10);
+         if(i < 0 && !syn_end)
+         {
+            fail(regex_constants::error_backref, m_position - m_base);
+            return false;
+         }
          if((i < 0) && syn_end)
          {
             // Check for a named capture, get the leftmost one if there is more than one:
@@ -1105,6 +1119,13 @@ bool basic_regex_parser<charT, traits>::parse_repeat(std::size_t low, std::size_
                   else
                      contin = false;
                   break;
+               case regex_constants::syntax_hash:
+                  if (this->flags() & regex_constants::mod_x) {
+                     while((m_position != m_end) && !is_separator(*m_position++)){}
+                     contin = true;
+                     break;
+                  }
+                  BOOST_REGEX_FALLTHROUGH;
                default:
                   contin = false;
                }

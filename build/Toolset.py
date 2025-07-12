@@ -5,13 +5,11 @@ import re
 import datetime
 
 toolset_msvc = """
-    <PlatformToolset Condition="'$(VisualStudioVersion)'=='15.0'">v141</PlatformToolset>
     <PlatformToolset Condition="'$(VisualStudioVersion)'=='16.0'">v142</PlatformToolset>
     <PlatformToolset Condition="'$(VisualStudioVersion)'=='17.0'">v143</PlatformToolset>
 """.strip('\r\n').splitlines()
 
 toolset_llvm = """
-    <PlatformToolset Condition="'$(VisualStudioVersion)'=='15.0'">LLVM_v141</PlatformToolset>
     <PlatformToolset Condition="'$(VisualStudioVersion)'=='16.0'">LLVM_v142</PlatformToolset>
     <PlatformToolset Condition="'$(VisualStudioVersion)'=='17.0'">LLVM_v143</PlatformToolset>
 """.strip('\r\n').splitlines()
@@ -40,7 +38,7 @@ def update_project_toolset(projectPath):
 			fd.write(updated)
 
 def update_all_project_toolset():
-	for path in glob.glob('VS2017/*.vcxproj'):
+	for path in glob.glob('VisualStudio/*.vcxproj'):
 		update_project_toolset(path)
 	for path in glob.glob('../locale/*/*.vcxproj'):
 		update_project_toolset(path)
@@ -128,7 +126,7 @@ def generate_compile_commands(target, avx2=False, cxx=False):
 		else:
 			defines.extend(['_WIN32_WINNT=0x0600', 'WINVER=0x0600'])	# Vista
 	elif arch == 'i686':
-		defines.extend(['WIN32', '_WIN32_WINNT=0x0501', 'WINVER=0x0501'])	# XP
+		defines.extend(['WIN32', '_WIN32_WINNT=0x0600', 'WINVER=0x0600'])	# Vista
 	elif arch in ('aarch64', 'arm64'):
 		defines.extend(['_WIN64', '_WIN32_WINNT=0x0A00', 'WINVER=0x0A00'])	# 10
 	elif arch.startswith('arm'):

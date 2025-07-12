@@ -7,70 +7,6 @@ defaults:
     shell: cmd
 
 jobs:
-  msvc2019:
-    name: Visual C++ 2019
-    runs-on: windows-2019
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Update Version Hash
-      run: |
-        "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./matepath/src/VersionRev.h
-
-    - name: MSVC x64 Release
-      run: |
-        CALL "build\VS2017\build.bat" Build x64 Release 1
-        CALL "locale\build.bat" Build x64 Release 1
-        CALL "build\make_zip.bat" MSVC x64 Release Locale 1
-
-    - name: MSVC Win32 Release
-      run: |
-        CALL "build\VS2017\build.bat" Build Win32 Release 1
-        CALL "locale\build.bat" Build Win32 Release 1
-        CALL "build\make_zip.bat" MSVC Win32 Release Locale 1
-
-    - name: MSVC AVX2 Release
-      run: |
-        CALL "build\VS2017\build.bat" Build AVX2 Release 1
-        CALL "locale\build.bat" Build AVX2 Release 1
-        CALL "build\make_zip.bat" MSVC AVX2 Release Locale 1
-
-    - name: MSVC ARM64 Release
-      run: |
-        CALL "build\VS2017\build.bat" Build ARM64 Release 1
-        CALL "locale\build.bat" Build ARM64 Release 1
-        CALL "build\make_zip.bat" MSVC ARM64 Release Locale 1
-
-    - name: MSVC ARM Release
-      run: |
-        CALL "build\VS2017\build.bat" Build ARM Release 1
-        CALL "build\make_zip.bat" MSVC ARM Release 1
-
-    - uses: actions/upload-artifact@v4
-      with:
-          name: Notepad4_MSVC2019_i18n_x64
-          path: 'build\Notepad4_i18n_x64_*.zip'
-
-    - uses: actions/upload-artifact@v4
-      with:
-          name: Notepad4_MSVC2019_i18n_Win32
-          path: 'build\Notepad4_i18n_Win32_*.zip'
-
-    - uses: actions/upload-artifact@v4
-      with:
-          name: Notepad4_MSVC2019_i18n_AVX2
-          path: 'build\Notepad4_i18n_AVX2_*.zip'
-
-    - uses: actions/upload-artifact@v4
-      with:
-          name: Notepad4_MSVC2019_i18n_ARM64
-          path: 'build\Notepad4_i18n_ARM64_*.zip'
-
-    - uses: actions/upload-artifact@v4
-      with:
-          name: Notepad4_MSVC2019_en_ARM
-          path: 'build\Notepad4_ARM_*.zip'
-
   msvc2022:
     name: Visual C++ 2022
     runs-on: windows-2022
@@ -81,41 +17,29 @@ jobs:
       run: |
         "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./matepath/src/VersionRev.h
 
-    - name: Install v141_xp Toolset
-      continue-on-error: true
-      run: |
-        CALL "build\install_msvc.bat" v141_xp
-
     - name: MSVC x64 Release
       run: |
-        CALL "build\VS2017\build.bat" Build x64 Release 1
+        CALL "build\VisualStudio\build.bat" Build x64 Release 1
         CALL "locale\build.bat" Build x64 Release 1
         CALL "build\make_zip.bat" MSVC x64 Release Locale 1
 
     - name: MSVC Win32 Release
-      continue-on-error: true
       run: |
-        CALL "build\VS2017\build.bat" Build Win32 Release 1
+        CALL "build\VisualStudio\build.bat" Build Win32 Release 1
         CALL "locale\build.bat" Build Win32 Release 1
         CALL "build\make_zip.bat" MSVC Win32 Release Locale 1
 
     - name: MSVC AVX2 Release
       run: |
-        CALL "build\VS2017\build.bat" Build AVX2 Release 1
+        CALL "build\VisualStudio\build.bat" Build AVX2 Release 1
         CALL "locale\build.bat" Build AVX2 Release 1
         CALL "build\make_zip.bat" MSVC AVX2 Release Locale 1
 
     - name: MSVC ARM64 Release
       run: |
-        CALL "build\VS2017\build.bat" Build ARM64 Release 1
+        CALL "build\VisualStudio\build.bat" Build ARM64 Release 1
         CALL "locale\build.bat" Build ARM64 Release 1
         CALL "build\make_zip.bat" MSVC ARM64 Release Locale 1
-
-    - name: MSVC ARM Release
-      run: |
-        CALL "build\install_msvc.bat" arm
-        CALL "build\VS2017\build.bat" Build ARM Release 1
-        CALL "build\make_zip.bat" MSVC ARM Release 1
 
     - uses: actions/upload-artifact@v4
       with:
@@ -137,65 +61,6 @@ jobs:
           name: Notepad4_MSVC2022_i18n_ARM64
           path: 'build\Notepad4_i18n_ARM64_*.zip'
 
-    - uses: actions/upload-artifact@v4
-      with:
-          name: Notepad4_MSVC2022_en_ARM
-          path: 'build\Notepad4_ARM_*.zip'
-
-  llvm_msvc2019:
-    name: LLVM (Visual C++ 2019)
-    runs-on: windows-2019
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Update Version Hash
-      run: |
-        "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./matepath/src/VersionRev.h
-
-    - name: Install LLVM
-      run: |
-        CALL "build\install_llvm.bat" latest 1
-
-    - name: Clang x64 Release
-      run: |
-        CALL "build\VS2017\build.bat" Build x64 LLVMRelease 1
-        CALL "build\make_zip.bat" LLVM x64 Release 1
-
-    - name: Clang Win32 Release
-      run: |
-        CALL "build\VS2017\build.bat" Build Win32 LLVMRelease 1
-        CALL "build\make_zip.bat" LLVM Win32 Release 1
-
-    - name: Clang AVX2 Release
-      run: |
-        CALL "build\VS2017\build.bat" Build AVX2 LLVMRelease 1
-        CALL "build\make_zip.bat" LLVM AVX2 Release 1
-
-    - name: Clang ARM64 Release
-      run: |
-        CALL "build\VS2017\build.bat" Build ARM64 LLVMRelease 1
-        CALL "build\make_zip.bat" LLVM ARM64 Release 1
-
-    - uses: actions/upload-artifact@v4
-      with:
-          name: Notepad4_Clang_MSVC2019_en_x64
-          path: 'build\Notepad4_LLVM_x64_*.zip'
-
-    - uses: actions/upload-artifact@v4
-      with:
-          name: Notepad4_Clang_MSVC2019_en_Win32
-          path: 'build\Notepad4_LLVM_Win32_*.zip'
-
-    - uses: actions/upload-artifact@v4
-      with:
-          name: Notepad4_Clang_MSVC2019_en_AVX2
-          path: 'build\Notepad4_LLVM_AVX2_*.zip'
-
-    - uses: actions/upload-artifact@v4
-      with:
-          name: Notepad4_Clang_MSVC2019_en_ARM64
-          path: 'build\Notepad4_LLVM_ARM64_*.zip'
-
   llvm_msvc2022:
     name: LLVM (Visual C++ 2022)
     runs-on: windows-2022
@@ -206,34 +71,28 @@ jobs:
       run: |
         "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./matepath/src/VersionRev.h
 
-    - name: Install v141_xp Toolset
-      continue-on-error: true
-      run: |
-        CALL "build\install_msvc.bat" v141_xp
-
     - name: Install LLVM
       run: |
         CALL "build\install_llvm.bat" latest 1
 
     - name: Clang x64 Release
       run: |
-        CALL "build\VS2017\build.bat" Build x64 LLVMRelease 1
+        CALL "build\VisualStudio\build.bat" Build x64 LLVMRelease 1
         CALL "build\make_zip.bat" LLVM x64 Release 1
 
     - name: Clang Win32 Release
-      continue-on-error: true
       run: |
-        CALL "build\VS2017\build.bat" Build Win32 LLVMRelease 1
+        CALL "build\VisualStudio\build.bat" Build Win32 LLVMRelease 1
         CALL "build\make_zip.bat" LLVM Win32 Release 1
 
     - name: Clang AVX2 Release
       run: |
-        CALL "build\VS2017\build.bat" Build AVX2 LLVMRelease 1
+        CALL "build\VisualStudio\build.bat" Build AVX2 LLVMRelease 1
         CALL "build\make_zip.bat" LLVM AVX2 Release 1
 
     - name: Clang ARM64 Release
       run: |
-        CALL "build\VS2017\build.bat" Build ARM64 LLVMRelease 1
+        CALL "build\VisualStudio\build.bat" Build ARM64 LLVMRelease 1
         CALL "build\make_zip.bat" LLVM ARM64 Release 1
 
     - uses: actions/upload-artifact@v4
@@ -291,11 +150,6 @@ jobs:
         CALL "build\mingw\build.bat" llvm aarch64
         CALL "build\make_zip.bat" Clang ARM64 Release 1
 
-    - name: Clang ARM Release
-      run: |
-        CALL "build\mingw\build.bat" llvm armv7
-        CALL "build\make_zip.bat" Clang ARM Release 1
-
     - uses: actions/upload-artifact@v4
       with:
           name: Notepad4_llvm_mingw_en_x64
@@ -315,11 +169,6 @@ jobs:
       with:
           name: Notepad4_llvm_mingw_en_ARM64
           path: 'build\Notepad4_Clang_ARM64_*.zip'
-
-    - uses: actions/upload-artifact@v4
-      with:
-          name: Notepad4_llvm_mingw_en_ARM
-          path: 'build\Notepad4_Clang_ARM_*.zip'
 
   gcc_ucrt:
     name: ucrt GCC and Clang
@@ -432,6 +281,7 @@ jobs:
   gcc_i686:
     name: 32-bit GCC and Clang
     runs-on: windows-latest
+    continue-on-error: true
     steps:
     - uses: actions/checkout@v4
 
@@ -444,13 +294,11 @@ jobs:
         CALL "build\install_mingw.bat" i686
 
     - name: GCC Win32 Release
-      continue-on-error: true
       run: |
         CALL "build\mingw\build.bat" i686
         CALL "build\make_zip.bat" GCC Win32 Release 1
 
     - name: Clang Win32 Release
-      continue-on-error: true
       run: |
         CALL "build\mingw\build.bat" i686 Clang
         CALL "build\make_zip.bat" Clang Win32 Release 1

@@ -18,7 +18,6 @@
 *
 ******************************************************************************/
 
-struct IUnknown;
 #include <windows.h>
 #include <windowsx.h>
 #include <shlwapi.h>
@@ -420,7 +419,7 @@ enum ANSIArtStyleIndex {
 #define FoldingMarkerLineColorDark		RGB(0x80, 0x80, 0x80)
 #define FoldingMarkerFillColorDark		RGB(0x60, 0x60, 0x60)
 
-// from ScintillaWin.cxx
+// from ScintillaBase.h
 #define SC_INDICATOR_INPUT		INDICATOR_IME
 #define SC_INDICATOR_TARGET		(INDICATOR_IME + 1)
 #define SC_INDICATOR_CONVERTED	(INDICATOR_IME + 2)
@@ -1217,6 +1216,62 @@ void Style_UpdateCaret() noexcept {
 	SciCall_SetCaretPeriod(iValue);
 }
 
+static inline bool IsCJKLocale(LPCWSTR locale) noexcept {
+	const UINT lang = (*reinterpret_cast<const UINT *>(locale)) | 0x00200020;
+	// zh, ja, ko
+	return lang == 0x0068007A || lang == 0x0061006A || lang == 0x006F006B;
+}
+
+static void Style_SetFontLocaleName(LPCWSTR lpszStyle) noexcept {
+	// current user default locale (empty) to override "en-US" in Scintilla.
+	char localeName[LOCALE_NAME_MAX_LENGTH] = "";
+	WCHAR localeWide[LOCALE_NAME_MAX_LENGTH] = L"";
+	// improve CJK font display when current UI language isn't CJK
+	if (!Style_StrGetLocale(lpszStyle, localeWide, COUNTOF(localeWide))) {
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+#if 1
+		GetUserDefaultLocaleName(localeWide, COUNTOF(localeWide));
+		if (!IsCJKLocale(localeWide)) {
+			WCHAR systemWide[LOCALE_NAME_MAX_LENGTH] = L"";
+			GetSystemDefaultLocaleName(systemWide, COUNTOF(systemWide));
+			if (IsCJKLocale(systemWide)) {
+				lstrcpy(localeWide, systemWide);
+			}
+		}
+#else
+		ULONG numLanguages = 0;
+		ULONG cchLanguagesBuffer = 0;
+		GetUserPreferredUILanguages(MUI_LANGUAGE_NAME, &numLanguages, nullptr, &cchLanguagesBuffer);
+		LPWSTR wszLanguagesBuffer = static_cast<LPWSTR>(NP2HeapAlloc((cchLanguagesBuffer + 2)*sizeof(WCHAR)));
+		GetUserPreferredUILanguages(MUI_LANGUAGE_NAME, &numLanguages, wszLanguagesBuffer, &cchLanguagesBuffer);
+		lstrcpy(localeWide, wszLanguagesBuffer);
+		if (numLanguages > 1 && !IsCJKLocale(localeWide)) {
+			LPCWSTR p = StrEnd(wszLanguagesBuffer) + 1;
+			while (*p) {
+				if (IsCJKLocale(p)) {
+					lstrcpy(localeWide, p);
+					break;
+				}
+				p = StrEnd(p) + 1;
+			}
+		}
+		NP2HeapFree(wszLanguagesBuffer);
+#endif
+#else
+		GetLocaleInfoW(LOCALE_USER_DEFAULT, LOCALE_SNAME, localeWide, COUNTOF(localeWide));
+		if (!IsCJKLocale(localeWide)) {
+			WCHAR systemWide[LOCALE_NAME_MAX_LENGTH] = L"";
+			GetLocaleInfoW(LOCALE_SYSTEM_DEFAULT, LOCALE_SNAME, localeWide, COUNTOF(localeWide));
+			if (IsCJKLocale(systemWide)) {
+				lstrcpy(localeWide, systemWide);
+			}
+		}
+#endif
+	}
+	WideCharToMultiByte(CP_UTF8, 0, localeWide, -1, localeName, COUNTOF(localeName), nullptr, nullptr);
+	SciCall_SetFontLocale(localeName);
+}
+
 static inline void Style_SetDefaultStyle(int index) noexcept {
 	Style_SetStyles(lexGlobal.Styles[index].iStyle, lexGlobal.Styles[index].szValue);
 }
@@ -1503,24 +1558,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) noexcept {
 
 	// used in Direct2D for language dependent glyphs
 	if (IsVistaAndAbove()) {
-		// current user default locale (empty) to override "en-US" in Scintilla.
-		WCHAR localeWide[LOCALE_NAME_MAX_LENGTH] = L"";
-		char localeName[LOCALE_NAME_MAX_LENGTH] = "";
-#if 0
-		if (!Style_StrGetLocale(szValue, localeWide, COUNTOF(localeWide))) {
-#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-			GetUserDefaultLocaleName(localeWide, COUNTOF(localeWide));
-#else
-			GetLocaleInfoW(LOCALE_USER_DEFAULT, LOCALE_SNAME, localeWide, COUNTOF(localeWide));
-#endif
-		}
-		WideCharToMultiByte(CP_UTF8, 0, localeWide, -1, localeName, COUNTOF(localeName), nullptr, nullptr);
-#else
-		if (Style_StrGetLocale(szValue, localeWide, COUNTOF(localeWide))) {
-			WideCharToMultiByte(CP_UTF8, 0, localeWide, -1, localeName, COUNTOF(localeName), nullptr, nullptr);
-		}
-#endif
-		SciCall_SetFontLocale(localeName);
+		Style_SetFontLocaleName(szValue);
 	}
 
 	COLORREF rgb;
@@ -2769,7 +2807,7 @@ bool Style_CanOpenFile(LPCWSTR lpszFile) noexcept {
 
 #if 0
 bool Style_MaybeBinaryFile(LPCWSTR lpszFile) noexcept {
-	uint8_t buf[5] = {0}; // file magic
+	uint8_t buf[5]{}; // file magic
 	SciCall_GetText(COUNTOF(buf) - 1, buf);
 	const UINT magic2 = (buf[0] << 8) | buf[1];
 	if (magic2 == 0x4D5AU ||	// PE (exe, dll, etc.): MZ
@@ -4883,7 +4921,7 @@ static void Lexer_OnCheckStateChanged(HWND hwndTV, HTREEITEM hFavoriteNode, HTRE
 		// update check state in general schemes
 		if (hParent == hFavoriteNode) {
 			const int group = Lexer_GetSchemeGroup(pLex);
-			WCHAR szTitle[4] = {0};
+			WCHAR szTitle[4]{};
 			//item.mask = TVIF_TEXT;
 			item.pszText = szTitle;
 			item.cchTextMax = COUNTOF(szTitle);
@@ -5381,7 +5419,7 @@ void EditShowCallTip(Sci_Position position) noexcept {
 
 	const ShowCallTip colorFormat = callTipInfo.showCallTip;
 	if (colorFormat != ShowCallTip_None) {
-		char text[32] = {0};
+		char text[32]{};
 		const Sci_Position startPos = max<Sci_Position>(0, position - 10);
 		const Sci_Position endPos = min(position + 10, SciCall_GetLength());
 		const Sci_TextRangeFull tr = { { startPos, endPos }, text + 8};

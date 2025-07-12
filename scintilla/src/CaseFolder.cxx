@@ -32,7 +32,7 @@ CaseFolderTable::CaseFolderTable() noexcept {
 	}
 }
 
-size_t CaseFolderTable::Fold(char *folded, size_t sizeFolded, const char *mixed, size_t lenMixed) {
+size_t CaseFolderTable::Fold(char *folded, size_t sizeFolded, const char *mixed, size_t lenMixed) const {
 	if (lenMixed > sizeFolded) {
 		return 0;
 	}
@@ -50,7 +50,7 @@ CaseFolderUnicode::CaseFolderUnicode() {
 	converter = ConverterFor(CaseConversion::fold);
 }
 
-size_t CaseFolderUnicode::Fold(char *folded, size_t sizeFolded, const char *mixed, size_t lenMixed) {
+size_t CaseFolderUnicode::Fold(char *folded, size_t sizeFolded, const char *mixed, size_t lenMixed) const {
 	if ((lenMixed == 1) && (sizeFolded > 0)) {
 		folded[0] = mapping[IndexFromChar(mixed[0])];
 		return 1;

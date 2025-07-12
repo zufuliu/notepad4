@@ -16,7 +16,8 @@ class LineBreak(IntFlag):
 	NonBreak = 0
 	BreakBefore = 1	# B
 	BreakAfter = 2	# A
-	BreakAny = 3	# B/A
+	BreakAny = 7	# B/A
+	Undefined = 3
 
 # https://www.unicode.org/reports/tr14/#Properties
 # https://github.com/unicode-org/cldr/blob/main/common/segments/root.xml
@@ -157,6 +158,36 @@ def buildLineBreakOpportunity():
 				if first == second:
 					current = LineBreakList[j]
 					print('same row and column:', prev, current)
+
+def buildWrapBreakMask(filename, prevIndex=False):
+	wbMax = max(LineBreak.__members__.values())
+	ccMax = max(CharacterClass.__members__.values())
+	maxValue = 8
+	table = [0]*8
+	assert LineBreak.BreakAny == LineBreak.Undefined + CharacterClass.CJKWord
+	for prev in range(maxValue):
+		wbPrev = LineBreak(min(prev, LineBreak.Undefined))
+		ccPrev = CharacterClass(max(prev - LineBreak.Undefined, 0))
+		if ccPrev == CharacterClass.CJKWord:
+			wbPrev = LineBreak.BreakAny
+		for pos in range(maxValue):
+			wbPos = LineBreak(min(pos, LineBreak.Undefined))
+			ccPos = CharacterClass(max(pos - LineBreak.Undefined, 0))
+			if ccPos == CharacterClass.CJKWord:
+				wbPos = LineBreak.BreakAny
+			if wbPrev != LineBreak.BreakBefore and wbPos != LineBreak.BreakAfter:
+				if wbPrev == LineBreak.BreakAny or wbPos == LineBreak.BreakAny \
+				or ccPrev == CharacterClass.CJKWord or ccPos == CharacterClass.CJKWord \
+				or (wbPrev != wbPos and (wbPrev == LineBreak.BreakAfter or wbPos == LineBreak.BreakBefore)) \
+				or (ccPrev != ccPos and (wbPrev == LineBreak.Undefined or wbPos == LineBreak.Undefined)):
+					#print(f'({wbPrev.name}, {ccPrev.name}), ({wbPos.name}, {ccPos.name})')
+					if prevIndex:
+						table[prev] |= (1 << pos)
+					else:
+						table[pos] |= (1 << prev)
+
+	output = [f'{bitValue(value, 8)},' for value in table]
+	Regenerate(filename, "//mask", output)
 
 def testLineBreak(path, lineBreakTable, eastAsianWidth):
 	opportunity = '×÷'
@@ -333,4 +364,5 @@ def updateUnicodeLineBreak(filename):
 
 if __name__ == '__main__':
 	# parseSegmentationChart('LineBreakTest.html')
+	buildWrapBreakMask("../src/PositionCache.cxx")
 	updateUnicodeLineBreak("../src/PositionCache.cxx")

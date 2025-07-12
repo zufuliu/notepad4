@@ -19,7 +19,6 @@
 ******************************************************************************/
 
 #define OEMRESOURCE  // use OBM_ resource constants
-struct IUnknown;
 #include <windows.h>
 #include <windowsx.h>
 #include <shlwapi.h>

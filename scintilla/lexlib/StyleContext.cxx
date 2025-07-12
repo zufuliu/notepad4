@@ -13,6 +13,7 @@
 #include <string_view>
 
 #include "ILexer.h"
+#include "Scintilla.h"
 
 #include "LexAccessor.h"
 #include "Accessor.h"

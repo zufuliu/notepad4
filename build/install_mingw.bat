@@ -9,23 +9,23 @@ SET "PATH=C:\msys64\usr\bin;%PATH%"
 
 IF /I "%~1" == "ucrt" (
   SHIFT
-  pacman -S --needed --noconfirm --noprogressbar mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-make mingw-w64-ucrt-x86_64-tools-git mingw-w64-ucrt-x86_64-clang mingw-w64-ucrt-x86_64-lld
+  pacman -S --needed --noconfirm --noprogressbar mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-make mingw-w64-ucrt-x86_64-tools-git mingw-w64-ucrt-x86_64-clang mingw-w64-ucrt-x86_64-lld mingw-w64-ucrt-x86_64-llvm
 )
 
 IF /I "%~1" == "x86_64" (
   SHIFT
-  pacman -S --needed --noconfirm --noprogressbar mingw-w64-x86_64-gcc mingw-w64-x86_64-make mingw-w64-x86_64-tools-git mingw-w64-x86_64-clang mingw-w64-x86_64-lld
+  pacman -S --needed --noconfirm --noprogressbar mingw-w64-x86_64-gcc mingw-w64-x86_64-make mingw-w64-x86_64-tools-git mingw-w64-x86_64-clang mingw-w64-x86_64-lld mingw-w64-x86_64-llvm
 )
 
 IF /I "%~1" == "i686" (
   SHIFT
-  pacman -S --needed --noconfirm --noprogressbar mingw-w64-i686-gcc mingw-w64-i686-make mingw-w64-i686-tools-git mingw-w64-i686-clang mingw-w64-i686-lld
+  pacman -S --needed --noconfirm --noprogressbar mingw-w64-i686-gcc mingw-w64-i686-make mingw-w64-i686-tools-git mingw-w64-i686-clang mingw-w64-i686-lld mingw-w64-i686-llvm
 )
 
 IF /I "%~1" == "llvm" (
   SHIFT
   @rem for CI purpose only, the result binary is dynamic linked against api-ms-win-crt*.dll instead of msvcrt.dll
-  curl -fsSL -o "llvm-mingw-20250402-ucrt-x86_64.zip" "https://github.com/mstorsjo/llvm-mingw/releases/download/20250402/llvm-mingw-20250402-ucrt-x86_64.zip"
-  7z x -y -o"C:\" "llvm-mingw-20250402-ucrt-x86_64.zip" >NUL
-  move /Y "C:\llvm-mingw-20250402-ucrt-x86_64" "C:\llvm-mingw"
+  curl -fsSL -o "llvm-mingw-20250613-ucrt-x86_64.zip" "https://github.com/mstorsjo/llvm-mingw/releases/download/20250613/llvm-mingw-20250613-ucrt-x86_64.zip"
+  7z x -y -o"C:\" "llvm-mingw-20250613-ucrt-x86_64.zip" >NUL
+  move /Y "C:\llvm-mingw-20250613-ucrt-x86_64" "C:\llvm-mingw"
 )

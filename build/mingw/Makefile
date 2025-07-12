@@ -45,9 +45,6 @@ else ifeq (i686, $(findstring i686, $(ARCH)))
 else ifeq (aarch64, $(findstring aarch64, $(ARCH)))
 	ARCH := ARM64
 	LLD := 1
-else ifeq (armv7, $(findstring armv7, $(ARCH)))
-	ARCH := ARM
-	LLD := 1
 endif
 ifdef TRIPLET
 	# llvm-mingw: TRIPLET-ar
@@ -116,11 +113,11 @@ else ifeq ($(ARCH), Win32)
 			export LDFLAGS += -Wl,--subsystem,windows:6.01
 		endif
 	else
-		# Windows XP
-		export CPPFLAGS += -DWIN32 -D_WIN32_WINNT=0x0501 -DWINVER=0x0501
-		export LDFLAGS += -msse2 -mfpmath=sse -Wl,--major-os-version,5 -Wl,--minor-os-version,1
+		# Windows Vista, Windows Server 2008
+		export CPPFLAGS += -DWIN32 -D_WIN32_WINNT=0x0600 -DWINVER=0x0600
+		export LDFLAGS += -msse2 -mfpmath=sse -Wl,--major-os-version,6 -Wl,--minor-os-version,0
 		ifndef LLD
-			export LDFLAGS += -Wl,--subsystem,windows:5.01
+			export LDFLAGS += -Wl,--subsystem,windows:6.00
 		endif
 	endif
 else ifeq ($(ARCH), ARM64)
@@ -128,11 +125,6 @@ else ifeq ($(ARCH), ARM64)
 	export CPPFLAGS += -D_WIN64 -D_WIN32_WINNT=0x0A00 -DWINVER=0x0A00
 	export RCFLAGS += -D_WIN64
 	export LDFLAGS += -Wl,--major-os-version,10 -Wl,--minor-os-version,0
-else ifeq ($(ARCH), ARM)
-	# Windows 8 RT, requires llvm-mingw. LLVM doesn't full support this target.
-	export CPPFLAGS += -DWIN32 -D_WIN32_WINNT=0x0602 -DWINVER=0x0602
-	export RCFLAGS += -DWIN32
-	export LDFLAGS += -Wl,--major-os-version,6 -Wl,--minor-os-version,2
 else
 	$(error '$(ARCH)' is not supported)
 endif

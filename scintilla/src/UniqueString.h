@@ -15,23 +15,9 @@ constexpr bool IsNullOrEmpty(const char *text) noexcept {
 	return text == nullptr || *text == '\0';
 }
 
-#if (__cplusplus > 201703L || (defined(_MSVC_LANG) && _MSVC_LANG > 201703L)) && ( \
-	(defined(_MSC_VER) && _MSC_VER >= 1928 && (defined(_WIN64) || !defined(__clang__))) || \
-	(defined(_LIBCPP_VERSION) && _LIBCPP_VERSION >= 16000) || \
-	(!defined(_LIBCPP_VERSION) && defined(__GNUC__) && __GNUC__ >= 11) )
-using std::make_unique_for_overwrite; // requires C++20 library support
-#else
-// https://en.cppreference.com/w/cpp/memory/unique_ptr/make_unique
-template<class T>
-std::enable_if_t<std::is_array_v<T>, std::unique_ptr<T>>
-make_unique_for_overwrite(std::size_t n) {
-	return std::unique_ptr<T>(new std::remove_extent_t<T>[n]);
-}
-#endif
-
 template <typename T>
 inline std::unique_ptr<T[]> UniqueCopy(const T *data, size_t length) {
-	std::unique_ptr<T[]> copy = make_unique_for_overwrite<T[]>(length);
+	std::unique_ptr<T[]> copy = std::make_unique_for_overwrite<T[]>(length);
 	memcpy(copy.get(), data, length * sizeof(T));
 	return copy;
 }

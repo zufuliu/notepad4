@@ -20,7 +20,6 @@
 *
 ******************************************************************************/
 
-struct IUnknown;
 #include <windows.h>
 #include <windowsx.h>
 #include <dlgs.h>
@@ -439,7 +438,9 @@ HBITMAP ResizeImageForDPI(HBITMAP hbmp, UINT dpi) noexcept {
 	BITMAP bmp;
 	if (GetObject(hbmp, sizeof(BITMAP), &bmp)) {
 		// assume 16x16 at 100% scaling
-		const int height = (dpi*16) / USER_DEFAULT_SCREEN_DPI;
+		int height = (dpi*16) / USER_DEFAULT_SCREEN_DPI;
+		// round up to even to avoid trailing pixels when processed 4 pixels at a time
+		height += height & 1;
 		if (height == bmp.bmHeight && bmp.bmBitsPixel == 32) {
 			return hbmp;
 		}
@@ -1598,12 +1599,6 @@ bool PathGetRealPath(HANDLE hFile, LPCWSTR lpszSrc, LPWSTR lpszDest) noexcept {
 }
 
 #if _WIN32_WINNT < _WIN32_WINNT_WIN8
-#if defined(_MSC_BUILD) && !defined(FILE_INVALID_FILE_ID)
-struct FILE_ID_128 {
-	BYTE Identifier[16];
-};
-#endif // Win32 XP v141_xp toolset with Windows 7 SDK.
-
 enum { FileIdInfo = 0x12 };
 struct FILE_ID_INFO {
 	ULONGLONG VolumeSerialNumber;

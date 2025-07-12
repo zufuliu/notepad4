@@ -30,6 +30,7 @@
 #define NP2_MarkAllBookmark		0x00002000
 #define NP2_MarkAllSelectAll	0x00004000
 #define NP2_FromFindAll			0x00008000
+#define NP2_SearchForLineEnd	0x00010000
 
 enum {
 	FindReplaceOption_None = 0,
@@ -670,7 +671,8 @@ enum SelectOption {
 	SelectOption_EnableMultipleSelection = 1,
 	SelectOption_CopySelectionAsFindText = 2,
 	SelectOption_CopyPasteBufferAsFindText = 4,
-	SelectOption_Default = 7,
+	SelectOption_UndoRedoRememberSelection = 8,
+	SelectOption_Default = 15,
 };
 
 enum LineSelectionMode {

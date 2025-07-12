@@ -45,12 +45,12 @@ AutoComplete::~AutoComplete() {
 
 void AutoComplete::Start(Window &parent, int ctrlID,
 	Sci::Position position, Point location, Sci::Position startLen_,
-	int lineHeight, bool unicodeMode, Technology technology, ListOptions listOptions) noexcept {
+	int lineHeight, int codePage, Technology technology, const ListOptions &listOptions) noexcept {
 	if (active) {
 		Cancel();
 	}
 	lb->SetOptions(listOptions);
-	lb->Create(parent, ctrlID, location, lineHeight, unicodeMode, technology);
+	lb->Create(parent, ctrlID, location, lineHeight, codePage, technology);
 	lb->Clear();
 	active = true;
 	startLen = startLen_;
@@ -163,7 +163,7 @@ void AutoComplete::SetList(const char *list) {
 	}
 
 	const size_t itemCount = sortMatrix.size();
-	const std::unique_ptr<char[]> sortedList(new char[itemCount + IndexSort.indices.back() + 1]);
+	const std::unique_ptr<char[]> sortedList = std::make_unique_for_overwrite<char[]>(itemCount + IndexSort.indices.back() + 1);
 	char *back = sortedList.get();
 	for (size_t i = 0; i < itemCount; ++i) {
 		const unsigned index = sortMatrix[i] * 2;

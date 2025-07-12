@@ -101,6 +101,7 @@ public:
 	void BeginUndoAction(bool mayCoalesce = false) noexcept;
 	void EndUndoAction() noexcept;
 	int UndoSequenceDepth() const noexcept;
+	bool AfterUndoSequenceStart() const noexcept;
 	void DropUndoSequence() noexcept;
 	void DeleteUndoHistory() noexcept;
 

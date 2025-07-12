@@ -79,6 +79,9 @@ def BuildKeywordContent(rid, lexer, keywordList, keywordCount=16):
 		lines = None
 		if items:
 			items = set(items)
+			for item in items: # check ASCII graphic character
+				if any(c <= ' ' or c > '~' for c in item):
+					print(rid, item)
 			makeLower = False
 			if attr & KeywordAttr.MakeLower:
 				lowercase = to_lower(items)
@@ -1868,17 +1871,20 @@ def parse_ocaml_api_file(path):
 	]
 
 def parse_php_api_file(path):
-	keywordMap = {}
+	keywordMap = {'misc': []}
 	sections = read_api_file(path, '//')
 	for key, doc in sections:
 		if key == 'keywords':
 			keywordMap[key] = [item.replace('()', '(') for item in doc.split()]
 		elif key == 'type':
 			keywordMap[key] = doc.split()
+		elif key == 'attribute':
+			items = re.findall(r'#\[\\?(\w+)', doc)
+			keywordMap['misc'].extend(items)
 		elif key == 'predefined variable':
 			items = doc.split()
 			keywordMap[key] = [item[1:] for item in items if item[0] == '$']
-			keywordMap['misc'] = [item for item in items if item[0].isalpha()]
+			keywordMap['misc'].extend(item for item in items if item[0].isalpha())
 		elif key == 'api':
 			items = re.findall(r'\w+\(', doc)
 			keywordMap['magic method'] = [item for item in items if item.startswith('__')]

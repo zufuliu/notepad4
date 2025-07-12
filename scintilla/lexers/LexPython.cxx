@@ -92,7 +92,7 @@ struct FormattedStringState {
 };
 
 constexpr bool IsPyStringPrefix(int ch) noexcept {
-	return AnyOf(ch, 'r', 'b', 'f', 'u', 'R', 'B', 'F', 'U');
+	return AnyOf(UnsafeLower(ch), 'r', 'b', 'f', 't', 'u');
 }
 
 inline void EnterPyStringState(StyleContext &sc) {
@@ -102,7 +102,7 @@ inline void EnterPyStringState(StyleContext &sc) {
 	int state = SCE_PY_IDENTIFIER;
 	int offset = 1;
 	if (ch == 'r') {
-		if (next == 'b' || next == 'f' || next == 'u') {
+		if (AnyOf(next, 'b', 'f', 't', 'u')) {
 			ch = next;
 			offset = 2;
 			chNext = sc.GetRelative(2);
@@ -117,6 +117,7 @@ inline void EnterPyStringState(StyleContext &sc) {
 			state = SCE_PY_RAWSTRING_SQ;
 			break;
 		case 'f':
+		case 't':
 			state = SCE_PY_FMTSTRING_SQ;
 			break;
 		case 'b':

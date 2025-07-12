@@ -708,7 +708,7 @@ int PHPLexer::ClassifyJSWord(LexerWordList keywordLists) {
 }
 
 void PHPLexer::HighlightJsInnerString() {
-	if (sc.atLineStart && sc.state != js_style(SCE_JS_STRING_BT)) {
+	if (sc.atLineStart && sc.state != js_style(SCE_JS_TEMPLATELITERAL)) {
 		if (lineContinuation) {
 			lineContinuation = 0;
 		} else {
@@ -718,7 +718,7 @@ void PHPLexer::HighlightJsInnerString() {
 	}
 	if (sc.ch == '\\') {
 		if (IsEOLChar(sc.chNext)) {
-			if (sc.state != js_style(SCE_JS_STRING_BT)) {
+			if (sc.state != js_style(SCE_JS_TEMPLATELITERAL)) {
 				lineContinuation = JsLineStateLineContinuation;
 			}
 		} else {
@@ -731,7 +731,7 @@ void PHPLexer::HighlightJsInnerString() {
 				sc.Forward();
 			}
 		}
-	} else if (sc.state == js_style(SCE_JS_STRING_BT)) {
+	} else if (sc.state == js_style(SCE_JS_TEMPLATELITERAL)) {
 		if (sc.Match('$', '{')) {
 			SaveOuterStyle(sc.state);
 			sc.SetState(js_style(SCE_JS_OPERATOR2));
@@ -1143,7 +1143,7 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 
 		case js_style(SCE_JS_STRING_SQ):
 		case js_style(SCE_JS_STRING_DQ):
-		case js_style(SCE_JS_STRING_BT):
+		case js_style(SCE_JS_TEMPLATELITERAL):
 			lexer.HighlightJsInnerString();
 			break;
 
@@ -1358,7 +1358,7 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				lexer.chBefore = chPrevNonWhite;
 				sc.SetState((sc.ch == '\'') ? js_style(SCE_JS_STRING_SQ) : js_style(SCE_JS_STRING_DQ));
 			} else if (sc.ch == '`') {
-				sc.SetState(js_style(SCE_JS_STRING_BT));
+				sc.SetState(js_style(SCE_JS_TEMPLATELITERAL));
 			} else if (IsNumberStartEx(sc.chPrev, sc.ch, sc.chNext)) {
 				escSeq.outerState = js_style(SCE_JS_DEFAULT);
 				sc.SetState(js_style(SCE_JS_NUMBER));
@@ -1497,7 +1497,7 @@ void FoldPHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 		case SCE_PHP_STRING_DQ:
 		case SCE_PHP_HEREDOC:
 		case SCE_PHP_NOWDOC:
-		case js_style(SCE_JS_STRING_BT):
+		case js_style(SCE_JS_TEMPLATELITERAL):
 			if (style != stylePrev) {
 				levelNext++;
 			}

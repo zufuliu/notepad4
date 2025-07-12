@@ -27,16 +27,30 @@
 #define USER_DEFAULT_SCREEN_DPI		96
 #endif
 
-#if defined(_MSC_BUILD) && (_WIN32_WINNT < _WIN32_WINNT_VISTA)
-#pragma warning(push)
-#pragma warning(disable: 4458)
-// Win32 XP v141_xp toolset with Windows 7 SDK.
-// d2d1helper.h(677,19): warning C4458:  declaration of 'a' hides class member
+#ifndef LOAD_LIBRARY_SEARCH_SYSTEM32
+#define LOAD_LIBRARY_SEARCH_SYSTEM32	0x00000800
 #endif
+
+#if _WIN32_WINNT >= _WIN32_WINNT_WIN8
+#define kSystemLibraryLoadFlags		LOAD_LIBRARY_SEARCH_SYSTEM32
+#else
+extern DWORD kSystemLibraryLoadFlags;
+#endif
+
+#if (_WIN32_WINNT < _WIN32_WINNT_WIN8) && defined(_MSC_VER) && defined(__clang__)
+// fix error for RoTransformError() used in winrt\wrl\event.h
+BOOL WINAPI RoTransformError(HRESULT oldError, HRESULT newError, /*HSTRING*/ void *message);
+#endif
+#include <wrl.h>
+using Microsoft::WRL::ComPtr;
+
+#if _WIN32_WINNT >= _WIN32_WINNT_WIN7
+#include <d2d1_1.h>
+#include <d3d11_1.h>
+#include <dwrite_1.h>
+#else
 #include <d2d1.h>
 #include <dwrite.h>
-#if defined(_MSC_BUILD) && (_WIN32_WINNT < _WIN32_WINNT_VISTA)
-#pragma warning(pop)
 #endif
 
 // official Scintilla use std::call_once(), which increases binary about 12 KiB.
@@ -69,6 +83,15 @@ extern BOOL AdjustWindowRectForDpi(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle
 extern WCHAR defaultTextFontName[LF_FACESIZE];
 
 namespace Scintilla::Internal {
+
+constexpr FLOAT dpiDefault = USER_DEFAULT_SCREEN_DPI;
+
+// Used for defining font size with LOGFONT
+constexpr int pointsPerInch = 72;
+
+bool ListBoxX_Register() noexcept;
+void ListBoxX_Unregister() noexcept;
+std::unique_ptr<Surface> SurfaceGDI_Allocate();
 
 extern void Platform_Initialise(void *hInstance) noexcept;
 extern void Platform_Finalise(bool fromDllMain) noexcept;
@@ -121,6 +144,10 @@ constexpr Point PointFromPOINT(POINT pt) noexcept {
 	return Point::FromInts(pt.x, pt.y);
 }
 
+constexpr SIZE SizeOfRect(RECT rc) noexcept {
+ 	return { rc.right - rc.left, rc.bottom - rc.top };
+}
+
 #if NP2_USE_SSE2
 static_assert(sizeof(Point) == sizeof(__m128d));
 static_assert(sizeof(POINT) == sizeof(__int64));
@@ -151,6 +178,10 @@ constexpr Point PointFromPOINTEx(POINT point) noexcept {
 }
 #endif
 
+extern HINSTANCE hinstPlatformRes;
+
+ColourRGBA ColourFromSys(int nIndex) noexcept;
+
 constexpr HWND HwndFromWindowID(WindowID wid) noexcept {
 	return static_cast<HWND>(wid);
 }
@@ -173,6 +204,18 @@ inline UINT DpiForWindow(WindowID wid) noexcept {
 }
 
 HCURSOR LoadReverseArrowCursor(HCURSOR cursor, UINT dpi) noexcept;
+
+// Encapsulate WM_PAINT handling so that EndPaint is always called even with unexpected returns or exceptions.
+struct Painter {
+	HWND hWnd{};
+	PAINTSTRUCT ps{};
+	explicit Painter(HWND hWnd_) noexcept : hWnd(hWnd_) {
+		::BeginPaint(hWnd, &ps);
+	}
+	~Painter() {
+		::EndPaint(hWnd, &ps);
+	}
+};
 
 class MouseWheelDelta {
 	int wheelDelta = 0;
@@ -197,8 +240,153 @@ constexpr BYTE Win32MapFontQuality(FontQuality extraFontFlag) noexcept {
 	return static_cast<BYTE>((mask >> (4*static_cast<int>(extraFontFlag & FontQuality::QualityMask))) & 15);
 }
 
-extern bool LoadD2D() noexcept;
-extern ID2D1Factory *pD2DFactory;
-extern IDWriteFactory *pIDWriteFactory;
+// Both GDI and DirectWrite can produce a HFONT for use in list boxes
+struct FontWin final : public Font {
+	HFONT hfont{};
+	ComPtr<IDWriteTextFormat> pTextFormat;
+	FontQuality extraFontFlag;
+	static constexpr FLOAT minimalAscent = 2.0f;
+	FLOAT yAscent = minimalAscent;
+	FLOAT yDescent = 1.0f;
+	FLOAT yInternalLeading = 0.0f;
+	LOGFONTW lf {};
+	explicit FontWin(const FontParameters &fp);
+	FontWin(const FontWin &) = delete;
+	FontWin(FontWin &&) = delete;
+	FontWin &operator=(const FontWin &) = delete;
+	FontWin &operator=(FontWin &&) = delete;
+
+	~FontWin() noexcept override {
+		if (hfont) {
+			::DeleteObject(hfont);
+		}
+	}
+	[[nodiscard]] HFONT HFont() const noexcept {
+		return ::CreateFontIndirectW(&lf);
+	}
+};
+
+/* dummy types to minimize differences between official Scintilla.
+FontDirectWrite::HFont() will create wild font when font family name
+is different from typeface name, e.g. Source Code Pro Semibold.
+*/
+using FontGDI = FontWin;
+using FontDirectWrite = FontWin;
+
+// Buffer to hold strings and string position arrays without always allocating on heap.
+// May sometimes have string too long to allocate on stack. So use a fixed stack-allocated buffer
+// when less than safe size otherwise allocate on heap and free automatically.
+template<typename T, size_t lengthStandard>
+class VarBuffer {
+	T *buffer;
+	T bufferStandard[lengthStandard];
+public:
+	VarBuffer() noexcept {
+		buffer = bufferStandard;
+	}
+	explicit VarBuffer(size_t length): buffer{bufferStandard} {
+		allocate(length);
+	}
+	void allocate(size_t length) {
+		if (length > lengthStandard) {
+			buffer = new T[length];
+		}
+		static_assert(__is_standard_layout(T));
+		memset(buffer, 0, length*sizeof(T));
+	}
+	const T *data() const noexcept {
+		return buffer;
+	}
+	T *data() noexcept {
+		return buffer;
+	}
+	const T& operator[](size_t index) const noexcept {
+		return buffer[index];
+	}
+	T& operator[](size_t index) noexcept {
+		return buffer[index];
+	}
+
+	// Deleted so VarBuffer objects can not be copied.
+	VarBuffer(const VarBuffer &) = delete;
+	VarBuffer(VarBuffer &&) = delete;
+	VarBuffer &operator=(const VarBuffer &) = delete;
+	VarBuffer &operator=(VarBuffer &&) = delete;
+
+	~VarBuffer() noexcept {
+		if (buffer != bufferStandard) {
+			delete[]buffer;
+		}
+	}
+};
+
+constexpr size_t stackBufferLength = 480; // max value to keep stack usage under 4096
+class TextWide {
+	wchar_t *buffer;
+	UINT len;	// Using UINT instead of size_t as most Win32 APIs take UINT.
+	wchar_t bufferStandard[stackBufferLength];
+public:
+	TextWide(std::string_view text, int codePage): buffer {bufferStandard} {
+		if (text.length() > stackBufferLength) {
+			buffer = new wchar_t[text.length()];
+		}
+		if (codePage == CpUtf8) {
+			len = static_cast<UINT>(UTF16FromUTF8(text, buffer, text.length()));
+		} else {
+			// Support Asian string display in 9x English
+			len = ::MultiByteToWideChar(codePage, 0, text.data(), static_cast<int>(text.length()),
+				buffer, static_cast<int>(text.length()));
+		}
+	}
+	const wchar_t *data() const noexcept {
+		return buffer;
+	}
+	UINT length() const noexcept {
+		return len;
+	}
+	[[nodiscard]] std::wstring_view AsView() const noexcept {
+		return std::wstring_view{buffer, len};
+	}
+
+	// Deleted so TextWide objects can not be copied.
+	TextWide(const TextWide &) = delete;
+	TextWide(TextWide &&) = delete;
+	TextWide &operator=(const TextWide &) = delete;
+	TextWide &operator=(TextWide &&) = delete;
+
+	~TextWide() noexcept {
+		if (buffer != bufferStandard) {
+			delete[]buffer;
+		}
+	}
+};
+
+// Manage the lifetime of a memory HBITMAP and its HDC so there are no leaks.
+class GDIBitMap {
+	HDC hdc{};
+	HBITMAP hbm{};
+	HBITMAP hbmOriginal{};
+
+public:
+	GDIBitMap() noexcept = default;
+	// Deleted so GDIBitMap objects can not be copied.
+	GDIBitMap(const GDIBitMap &) = delete;
+	GDIBitMap(GDIBitMap &&) = delete;
+	// Move would be OK but not needed yet
+	GDIBitMap &operator=(const GDIBitMap &) = delete;
+	GDIBitMap &operator=(GDIBitMap &&) = delete;
+	~GDIBitMap() noexcept;
+
+	void Create(HDC hdcBase, int width, int height, DWORD **pixels) noexcept;
+	void Release() noexcept;
+	HBITMAP Extract() noexcept;
+
+	[[nodiscard]] HDC DC() const noexcept {
+		return hdc;
+	}
+	[[nodiscard]] explicit operator bool() const noexcept {
+		return hdc && hbm;
+	}
+};
 
 }

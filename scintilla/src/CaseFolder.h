@@ -17,7 +17,7 @@ public:
 	CaseFolder &operator=(const CaseFolder &) = delete;
 	CaseFolder &operator=(CaseFolder &&) = delete;
 	virtual ~CaseFolder() = default;
-	virtual size_t Fold(char *folded, size_t sizeFolded, const char *mixed, size_t lenMixed) = 0;
+	virtual size_t Fold(char *folded, size_t sizeFolded, const char *mixed, size_t lenMixed) const = 0;
 };
 
 class CaseFolderTable : public CaseFolder {
@@ -25,7 +25,7 @@ protected:
 	char mapping[256];
 public:
 	CaseFolderTable() noexcept;
-	size_t Fold(char *folded, size_t sizeFolded, const char *mixed, size_t lenMixed) override;
+	size_t Fold(char *folded, size_t sizeFolded, const char *mixed, size_t lenMixed) const override;
 	void SetTranslation(char ch, char chTranslation) noexcept;
 };
 
@@ -35,7 +35,7 @@ class CaseFolderUnicode final : public CaseFolderTable {
 	const ICaseConverter *converter;
 public:
 	CaseFolderUnicode();
-	size_t Fold(char *folded, size_t sizeFolded, const char *mixed, size_t lenMixed) override;
+	size_t Fold(char *folded, size_t sizeFolded, const char *mixed, size_t lenMixed) const override;
 };
 
 }

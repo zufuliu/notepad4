@@ -19,6 +19,16 @@
 #ifndef BOOST_REGEX_V5_MATCH_RESULTS_HPP
 #define BOOST_REGEX_V5_MATCH_RESULTS_HPP
 
+#include <boost/regex/v5/match_flags.hpp>
+#include <boost/regex/v5/sub_match.hpp>
+#include <boost/regex/v5/basic_regex.hpp>
+//#include <boost/regex/v5/regex_format.hpp>
+
+#ifndef BOOST_REGEX_AS_MODULE
+#include <string>
+#include <vector>
+#endif
+
 namespace boost{
 #ifdef BOOST_REGEX_MSVC
 #pragma warning(push)
@@ -43,7 +53,7 @@ class named_subexpressions;
 
 }
 
-template <class BidiIterator, class Allocator>
+BOOST_REGEX_MODULE_EXPORT template <class BidiIterator, class Allocator>
 class match_results
 { 
 private:
@@ -223,6 +233,10 @@ public:
    {
       if(m_is_singular && m_subs.empty())
          raise_logic_error();
+      
+      if (sub >= INT_MAX - 2 )
+         return m_null;
+
       sub += 2;
       if(sub < (int)m_subs.size() && (sub >= 0))
       {
@@ -347,6 +361,64 @@ public:
       return m_subs.end();
    }
    // format:
+#if 0
+   template <class OutputIterator, class Functor>
+   OutputIterator format(OutputIterator out,
+                         Functor fmt,
+                         match_flag_type flags = format_default) const
+   {
+      if(m_is_singular)
+         raise_logic_error();
+      typedef typename BOOST_REGEX_DETAIL_NS::compute_functor_type<Functor, match_results<BidiIterator, Allocator>, OutputIterator>::type F;
+      F func(fmt);
+      return func(*this, out, flags);
+   }
+   template <class Functor>
+   string_type format(Functor fmt, match_flag_type flags = format_default) const
+   {
+      if(m_is_singular)
+         raise_logic_error();
+      std::basic_string<char_type> result;
+      BOOST_REGEX_DETAIL_NS::string_out_iterator<std::basic_string<char_type> > i(result);
+
+      typedef typename BOOST_REGEX_DETAIL_NS::compute_functor_type<Functor, match_results<BidiIterator, Allocator>, BOOST_REGEX_DETAIL_NS::string_out_iterator<std::basic_string<char_type> > >::type F;
+      F func(fmt);
+
+      func(*this, i, flags);
+      return result;
+   }
+   // format with locale:
+   template <class OutputIterator, class Functor, class RegexT>
+   OutputIterator format(OutputIterator out,
+                         Functor fmt,
+                         match_flag_type flags,
+                         const RegexT& re) const
+   {
+      if(m_is_singular)
+         raise_logic_error();
+      typedef ::boost::regex_traits_wrapper<typename RegexT::traits_type> traits_type;
+      typedef typename BOOST_REGEX_DETAIL_NS::compute_functor_type<Functor, match_results<BidiIterator, Allocator>, OutputIterator, traits_type>::type F;
+      F func(fmt);
+      return func(*this, out, flags, re.get_traits());
+   }
+   template <class RegexT, class Functor>
+   string_type format(Functor fmt,
+                      match_flag_type flags,
+                      const RegexT& re) const
+   {
+      if(m_is_singular)
+         raise_logic_error();
+      typedef ::boost::regex_traits_wrapper<typename RegexT::traits_type> traits_type;
+      std::basic_string<char_type> result;
+      BOOST_REGEX_DETAIL_NS::string_out_iterator<std::basic_string<char_type> > i(result);
+
+      typedef typename BOOST_REGEX_DETAIL_NS::compute_functor_type<Functor, match_results<BidiIterator, Allocator>, BOOST_REGEX_DETAIL_NS::string_out_iterator<std::basic_string<char_type> >, traits_type >::type F;
+      F func(fmt);
+
+      func(*this, i, flags, re.get_traits());
+      return result;
+   }
+#endif
 
    const_reference get_last_closed_paren()const
    {
@@ -616,14 +688,14 @@ void  match_results<BidiIterator, Allocator>::maybe_assign(const match_results<B
       *this = m;
 }
 
-template <class BidiIterator, class Allocator>
+BOOST_REGEX_MODULE_EXPORT template <class BidiIterator, class Allocator>
 void swap(match_results<BidiIterator, Allocator>& a, match_results<BidiIterator, Allocator>& b)
 {
    a.swap(b);
 }
 
 #ifdef BOOST_REGEX_DEBUG
-template <class charT, class traits, class BidiIterator, class Allocator>
+BOOST_REGEX_MODULE_EXPORT template <class charT, class traits, class BidiIterator, class Allocator>
 std::basic_ostream<charT, traits>&
    operator << (std::basic_ostream<charT, traits>& os,
                 const match_results<BidiIterator, Allocator>& s)

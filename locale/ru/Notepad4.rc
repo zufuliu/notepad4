@@ -258,8 +258,8 @@ BEGIN
 			MENUITEM "&Удалить строку\tCtrl+Shift+D",						IDM_EDIT_DELETELINE
 			MENUITEM SEPARATOR
 			MENUITEM "&Объединить строки\tCtrl+J",							IDM_EDIT_JOINLINES
-			MENUITEM "Перенос с&толбцов",								IDM_EDIT_COLUMNWRAP
 			MENUITEM "&Разделить строки\tCtrl+I",							IDM_EDIT_SPLITLINES
+			MENUITEM "Перенос с&толбцов",								IDM_EDIT_COLUMNWRAP
 			MENUITEM "Объединить аб&зацы\tCtrl+Shift+J",						IDM_EDIT_JOINLINESEX
 		END
 		POPUP "Прео&бразовать"
@@ -583,6 +583,7 @@ BEGIN
 			MENUITEM "Включить &множественное выделение",						IDM_SET_MULTIPLE_SELECTION
 			MENUITEM "С&копировать выделенный текст как найденный",					IDM_SET_SELECTIONASFINDTEXT
 			MENUITEM "&Вставить текст из буфера как найденный",					IDM_SET_PASTEBUFFERASFINDTEXT
+			MENUITEM "Undo Redo &Remember Selection",	IDM_SET_UNDO_REDO_SELECTION
 			POPUP "Режим вы&деления строк"
 			BEGIN
 				MENUITEM "&Отсутствует",							IDM_LINE_SELECTION_MODE_NONE
@@ -677,6 +678,7 @@ BEGIN
 				MENUITEM "&Direct2D",								IDM_SET_RENDER_TECH_D2D
 				MENUITEM "Direct2D &Retain",							IDM_SET_RENDER_TECH_D2DRETAIN
 				MENUITEM "Direct2D &GDI DC",							IDM_SET_RENDER_TECH_D2DDC
+				MENUITEM "Direct&3D",								IDM_SET_RENDER_TECH_D3D
 			END
 			POPUP "&Сглаживание шрифтов"
 			BEGIN

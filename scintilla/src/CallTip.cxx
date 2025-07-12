@@ -95,9 +95,8 @@ int CallTip::NextTabPos(int x) const noexcept {
 		x -= offsetText;                // position relative to text
 		x = (x + tabSize) / tabSize;  // tab "number"
 		return tabSize * x + offsetText;  // position of next tab
-	} else {
-		return x + 1;                 // arbitrary
 	}
+	return x + 1;                 // arbitrary
 }
 
 namespace {

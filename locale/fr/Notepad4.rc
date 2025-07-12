@@ -258,8 +258,8 @@ BEGIN
 			MENUITEM "Effacer les lignes\tCtrl+Shift+D",		IDM_EDIT_DELETELINE
 			MENUITEM SEPARATOR
 			MENUITEM "&Joindes les lignes\tCtrl+J",				IDM_EDIT_JOINLINES
-			MENUITEM "toujours afficher les lignes (Wrap)...",					IDM_EDIT_COLUMNWRAP
 			MENUITEM "&Sciender les lignes\tCtrl+I",			IDM_EDIT_SPLITLINES
+			MENUITEM "toujours afficher les lignes (Wrap)...",					IDM_EDIT_COLUMNWRAP
 			MENUITEM "Joindre les paragraphes\tCtrl+Shift+J",	IDM_EDIT_JOINLINESEX
 		END
 		POPUP "Con&vertir"
@@ -582,6 +582,7 @@ BEGIN
 			MENUITEM "Activer la sélection multiple",		IDM_SET_MULTIPLE_SELECTION
 			MENUITEM "Copier la sélection comme texte trouvé",	IDM_SET_SELECTIONASFINDTEXT
 			MENUITEM "Copier et coller le contenu du presse-papier comme texte trouvé",	IDM_SET_PASTEBUFFERASFINDTEXT
+			MENUITEM "Undo Redo &Remember Selection",	IDM_SET_UNDO_REDO_SELECTION
 			POPUP "Mode de sélection de ligne"
 			BEGIN
 				MENUITEM "Aucun",					IDM_LINE_SELECTION_MODE_NONE
@@ -676,6 +677,7 @@ BEGIN
 				MENUITEM "Direct2D",				IDM_SET_RENDER_TECH_D2D
 				MENUITEM "Direct2D &Retain",		IDM_SET_RENDER_TECH_D2DRETAIN
 				MENUITEM "Direct2D &GDI DC",		IDM_SET_RENDER_TECH_D2DDC
+				MENUITEM "Direct&3D",				IDM_SET_RENDER_TECH_D3D
 			END
 			POPUP "Rendue des polices"
 			BEGIN

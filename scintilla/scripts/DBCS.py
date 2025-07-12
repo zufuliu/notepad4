@@ -46,8 +46,8 @@ def print_dbcs_byte_ranges():
 				table[start] |= 2
 				start += 1
 		valueBit, totalBit, data = MultiStageTable.runLengthEncode(codePage, table)
-		data = MultiStageTable.dumpArray(data, 20)
-		print(f'{{{data[0]}}}')
+		line = MultiStageTable.dumpArray(data, 20)[0]
+		print(f'{codePage} {len(data)}: {{{line}}}')
 
 def to_byte_ranges(items):
 	ranges = []

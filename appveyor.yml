@@ -1,7 +1,7 @@
 version: '25.x.{build}'
 
 image:
-  - Visual Studio 2017
+  - Visual Studio 2019
 
 environment:
   matrix:
@@ -31,24 +31,21 @@ for:
 
     build_script:
       - cmd: |
-          CALL "build\VS2017\build.bat" Build x64 Release 1
+          CALL "build\VisualStudio\build.bat" Build x64 Release 1
           CALL "locale\build.bat" Build x64 Release 1
           CALL "build\make_zip.bat" MSVC x64 Release Locale 1
 
-          CALL "build\VS2017\build.bat" Build Win32 Release 1
+          CALL "build\VisualStudio\build.bat" Build Win32 Release 1
           CALL "locale\build.bat" Build Win32 Release 1
           CALL "build\make_zip.bat" MSVC Win32 Release Locale 1
 
-          CALL "build\VS2017\build.bat" Build AVX2 Release 1
+          CALL "build\VisualStudio\build.bat" Build AVX2 Release 1
           CALL "locale\build.bat" Build AVX2 Release 1
           CALL "build\make_zip.bat" MSVC AVX2 Release Locale 1
 
-          CALL "build\VS2017\build.bat" Build ARM64 Release 1
+          CALL "build\VisualStudio\build.bat" Build ARM64 Release 1
           CALL "locale\build.bat" Build ARM64 Release 1
           CALL "build\make_zip.bat" MSVC ARM64 Release Locale 1
-
-          CALL "build\VS2017\build.bat" Build ARM Release 1
-          CALL "build\make_zip.bat" MSVC ARM Release 1
 
     artifacts:
       - path: 'build\Notepad4*.zip'
@@ -62,16 +59,16 @@ for:
     build_script:
       - cmd: |
           CALL "build\install_llvm.bat" latest 1
-          CALL "build\VS2017\build.bat" Build x64 LLVMRelease 1
+          CALL "build\VisualStudio\build.bat" Build x64 LLVMRelease 1
           CALL "build\make_zip.bat" LLVM x64 Release 1
 
-          CALL "build\VS2017\build.bat" Build Win32 LLVMRelease 1
+          CALL "build\VisualStudio\build.bat" Build Win32 LLVMRelease 1
           CALL "build\make_zip.bat" LLVM Win32 Release 1
 
-          CALL "build\VS2017\build.bat" Build AVX2 LLVMRelease 1
+          CALL "build\VisualStudio\build.bat" Build AVX2 LLVMRelease 1
           CALL "build\make_zip.bat" LLVM AVX2 Release 1
 
-          CALL "build\VS2017\build.bat" Build ARM64 LLVMRelease 1
+          CALL "build\VisualStudio\build.bat" Build ARM64 LLVMRelease 1
           CALL "build\make_zip.bat" LLVM ARM64 Release 1
 
     artifacts:

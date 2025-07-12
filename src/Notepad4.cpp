@@ -18,7 +18,6 @@
 *
 ******************************************************************************/
 
-struct IUnknown;
 #include <windows.h>
 #include <windowsx.h>
 #include <shlwapi.h>
@@ -963,6 +962,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 
 	// check if a lexer was specified from the command line
 	if (flagLexerSpecified) {
+		flagLexerSpecified = false;
 		if (lpSchemeArg) {
 			Style_SetLexerFromName(szCurFile, lpSchemeArg);
 			LocalFree(lpSchemeArg);
@@ -970,7 +970,6 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 		} else {
 			Style_SetLexerFromID(iInitialLexer);
 		}
-		flagLexerSpecified = false;
 	}
 
 	// If start as tray icon, set current filename as tooltip
@@ -1412,11 +1411,12 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		}
 		return DefWindowProc(hwnd, umsg, wParam, lParam);
 
-	case APPM_CHANGENOTIFY:
+	case APPM_CHANGENOTIFY: {
 		if (iFileWatchingMode == FileWatchingMode_ShowMessage || IsDocumentModified()) {
 			SetForegroundWindow(hwnd);
 		}
 
+		bool terminate = false;
 		if (PathIsFile(szCurFile)) {
 			if ((iFileWatchingMode == FileWatchingMode_AutoReload && !IsDocumentModified())
 				|| MsgBoxWarn(MB_YESNO, IDS_FILECHANGENOTIFY) == IDYES) {
@@ -1431,15 +1431,17 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 				}
 			}
 		} else {
-			if (MsgBoxWarn(MB_YESNO, IDS_FILECHANGENOTIFY2) == IDYES) {
+			const int result = MsgBoxWarn(MB_YESNOCANCEL, IDS_FILECHANGENOTIFY2);
+			terminate = result == IDCANCEL;
+			if (result == IDYES) {
 				FileSave(FileSaveFlag_SaveAlways);
 			}
 		}
 
-		if (!bRunningWatch) {
-			InstallFileWatching(false);
+		if (!bRunningWatch || terminate) {
+			InstallFileWatching(terminate);
 		}
-		break;
+	} break;
 
 	//// This message is posted before Notepad4 reactivates itself
 	//case APPM_CHANGENOTIFYCLEAR:
@@ -2518,6 +2520,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	CheckCmd(hmenu, IDM_SET_MULTIPLE_SELECTION, iSelectOption & SelectOption_EnableMultipleSelection);
 	CheckCmd(hmenu, IDM_SET_SELECTIONASFINDTEXT, iSelectOption & SelectOption_CopySelectionAsFindText);
 	CheckCmd(hmenu, IDM_SET_PASTEBUFFERASFINDTEXT, iSelectOption & SelectOption_CopyPasteBufferAsFindText);
+	CheckCmd(hmenu, IDM_SET_UNDO_REDO_SELECTION, iSelectOption & SelectOption_UndoRedoRememberSelection);
 	i = IDM_LINE_SELECTION_MODE_NONE + iLineSelectionMode;
 	CheckMenuRadioItem(hmenu, IDM_LINE_SELECTION_MODE_NONE, IDM_LINE_SELECTION_MODE_OLDVS, i, MF_BYCOMMAND);
 
@@ -2571,10 +2574,13 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	EnableCmd(hmenu, IDM_SET_RENDER_TECH_D2D, i);
 	EnableCmd(hmenu, IDM_SET_RENDER_TECH_D2DRETAIN, i);
 	EnableCmd(hmenu, IDM_SET_RENDER_TECH_D2DDC, i);
+#if _WIN32_WINNT < _WIN32_WINNT_WIN7
+	DisableCmd(hmenu, IDM_SET_RENDER_TECH_D3D, true);
+#endif
 	EnableCmd(hmenu, IDM_SET_USE_XP_FILE_DIALOG, i);
 	CheckCmd(hmenu, IDM_SET_USE_XP_FILE_DIALOG, bUseXPFileDialog);
 	i = IDM_SET_RENDER_TECH_GDI + iRenderingTechnology;
-	CheckMenuRadioItem(hmenu, IDM_SET_RENDER_TECH_GDI, IDM_SET_RENDER_TECH_D2DDC, i, MF_BYCOMMAND);
+	CheckMenuRadioItem(hmenu, IDM_SET_RENDER_TECH_GDI, IDM_SET_RENDER_TECH_D3D, i, MF_BYCOMMAND);
 	// RTL Layout
 	CheckCmd(hmenu, IDM_SET_RTL_LAYOUT_EDIT, bEditLayoutRTL);
 	CheckCmd(hmenu, IDM_SET_RTL_LAYOUT_OTHER, bWindowLayoutRTL);
@@ -3386,7 +3392,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_EDIT_INSERT_GUID: {
 		GUID guid;
 		if (S_OK == CoCreateGuid(&guid)) {
-			char guidBuf[37] = {0};
+			char guidBuf[37]{};
 			sprintf(guidBuf, "%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",
 					static_cast<unsigned int>(guid.Data1), guid.Data2, guid.Data3,
 					guid.Data4[0], guid.Data4[1],
@@ -3649,25 +3655,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		EditConvertNumRadix(LOWORD(wParam));
 		break;
 
-	case IDM_EDIT_FINDMATCHINGBRACE: {
-		Sci_Position iBrace2 = INVALID_POSITION;
-		Sci_Position iPos = SciCall_GetCurrentPos();
-		int ch = SciCall_GetCharAt(iPos);
-		if (IsBraceMatchChar(ch)) {
-			iBrace2 = SciCall_BraceMatch(iPos);
-		} else { // Try one before
-			iPos = SciCall_PositionBefore(iPos);
-			ch = SciCall_GetCharAt(iPos);
-			if (IsBraceMatchChar(ch)) {
-				iBrace2 = SciCall_BraceMatch(iPos);
-			}
-		}
-		if (iBrace2 >= 0) {
-			SciCall_GotoPos(iBrace2);
-		}
-	}
-	break;
-
+	case IDM_EDIT_FINDMATCHINGBRACE:
 	case IDM_EDIT_SELTOMATCHINGBRACE: {
 		Sci_Position iBrace2 = INVALID_POSITION;
 		Sci_Position iCurPos = SciCall_GetCurrentPos();
@@ -3683,6 +3671,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			}
 		}
 		if (iBrace2 >= 0) {
+			if (LOWORD(wParam) == IDM_EDIT_FINDMATCHINGBRACE) {
+				SciCall_GotoPos(iBrace2);
+				break;
+			}
 			Sci_Position iAnchorPos = SciCall_GetAnchor();
 			const Sci_Position iMinPos = min(iAnchorPos, iCurPos);
 			const Sci_Position iMaxPos = max(iAnchorPos, iCurPos);
@@ -3949,7 +3941,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_SET_MULTIPLE_SELECTION:
 	case IDM_SET_SELECTIONASFINDTEXT:
-	case IDM_SET_PASTEBUFFERASFINDTEXT: {
+	case IDM_SET_PASTEBUFFERASFINDTEXT:
+	case IDM_SET_UNDO_REDO_SELECTION: {
 		const int option = 1 << (LOWORD(wParam) - IDM_SET_MULTIPLE_SELECTION);
 		if (iSelectOption & option) {
 			iSelectOption &= ~option;
@@ -3958,6 +3951,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 		if (option == SelectOption_EnableMultipleSelection) {
 			SciCall_SetMultipleSelection(iSelectOption & SelectOption_EnableMultipleSelection);
+		} else if (option == SelectOption_UndoRedoRememberSelection) {
+			SciCall_SetUndoSelectionHistory((iSelectOption & SelectOption_UndoRedoRememberSelection) ? (SC_UNDO_SELECTION_HISTORY_ENABLED | SC_UNDO_SELECTION_HISTORY_SCROLL): SC_UNDO_SELECTION_HISTORY_DISABLED);
 		}
 	} break;
 
@@ -4225,7 +4220,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_SET_RENDER_TECH_GDI:
 	case IDM_SET_RENDER_TECH_D2D:
 	case IDM_SET_RENDER_TECH_D2DRETAIN:
-	case IDM_SET_RENDER_TECH_D2DDC: {
+	case IDM_SET_RENDER_TECH_D2DDC:
+	case IDM_SET_RENDER_TECH_D3D: {
 		const int back = iRenderingTechnology;
 		iRenderingTechnology = LOWORD(wParam) - IDM_SET_RENDER_TECH_GDI;
 		SciCall_SetTechnology(iRenderingTechnology);
@@ -4910,6 +4906,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 		case SCN_SAVEPOINTREACHED:
 			bDocumentModified = false;
+			iOriginalEncoding = iCurrentEncoding;
 			UpdateDocumentModificationStatus();
 			break;
 
@@ -5811,10 +5808,10 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) noexcept {
 			state = CommandParseState_Argument;
 			if (ExtractFirstArgument(lp2, lp1, lp2)) {
 #if defined(_WIN64)
-				int64_t cord[2] = { 0 };
+				int64_t cord[2]{};
 				const int itok = ParseCommaList64(lp1, cord, COUNTOF(cord));
 #else
-				int cord[2] = { 0 };
+				int cord[2]{};
 				const int itok = ParseCommaList(lp1, cord, COUNTOF(cord));
 #endif
 				if (itok != 0) {
@@ -6162,7 +6159,7 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) noexcept {
 		default:
 			state = CommandParseState_Argument;
 			if (ExtractFirstArgument(lp2, lp1, lp2)) {
-				int cord[5] = { 0 };
+				int cord[5]{};
 				const int itok = ParseCommaList(lp1, cord, COUNTOF(cord));
 				if (itok >= 4) {
 					flagPosParam = true;
@@ -7153,6 +7150,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 		bool bUnknownFile = false;
 		if (!keepCurrentLexer) {
 			if (flagLexerSpecified) {
+				flagLexerSpecified = false;
 				if (pLexCurrent->rid == iInitialLexer) {
 					Style_SetLexer(pLexCurrent, true);
 				} else if (lpSchemeArg) {
@@ -7162,7 +7160,6 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 				} else {
 					Style_SetLexerFromID(iInitialLexer);
 				}
-				flagLexerSpecified = false;
 			} else {
 				np2LexLangIndex = 0;
 				bUnknownFile = !Style_SetLexerFromFile(szCurFile);
@@ -7268,14 +7265,18 @@ bool FileSave(FileSaveFlag saveFlag) noexcept {
 	if (StrIsEmpty(szCurFile)) {
 		saveFlag = static_cast<FileSaveFlag>(saveFlag | FileSaveFlag_Untitled);
 		const Sci_Position cchText = SciCall_GetLength();
-		if (cchText == 0) {
+		if (cchText < 2048) {
+			const char *ptr = SciCall_GetRangePointer(0, cchText);
 			bIsEmptyNewFile = true;
-		} else if (cchText < 2048) {
-			char tchText[2048] = "";
-			SciCall_GetText(COUNTOF(tchText) - 1, tchText);
-			StrTrimA(tchText, " \t\n\r"); // failure means not empty.
-			if (StrIsEmpty(tchText)) {
-				bIsEmptyNewFile = true;
+			if (ptr && cchText != 0) {
+				const char * const end = ptr + cchText;
+				do {
+					if (!IsASpace(*ptr)) {
+						bIsEmptyNewFile = false;
+						break;
+					}
+					++ptr;
+				} while (ptr < end);
 			}
 		}
 	}
@@ -7349,17 +7350,12 @@ bool FileSave(FileSaveFlag saveFlag) noexcept {
 					if (!fKeepTitleExcerpt) {
 						StrCpyEx(szTitleExcerpt, L"");
 					}
+					UpdateWindowTitle();
 					if (flagLexerSpecified) {
-						if (pLexCurrent->rid == iInitialLexer) {
-							UpdateLineNumberWidth();
-						} else if (lpSchemeArg) {
-							Style_SetLexerFromName(szCurFile, lpSchemeArg);
-							LocalFree(lpSchemeArg);
-							lpSchemeArg = nullptr;
-						} else {
+						flagLexerSpecified = false;
+						if (pLexCurrent->rid != iInitialLexer) {
 							Style_SetLexerFromID(iInitialLexer);
 						}
-						flagLexerSpecified = false;
 					} else {
 						Style_SetLexerFromFile(szCurFile);
 					}
@@ -7377,8 +7373,6 @@ bool FileSave(FileSaveFlag saveFlag) noexcept {
 
 	if (fSuccess) {
 		if (!(saveFlag & FileSaveFlag_SaveCopy)) {
-			bDocumentModified = false;
-			iOriginalEncoding = iCurrentEncoding;
 			mruFile.Add(szCurFile);
 			if (flagUseSystemMRU == TripleBoolean_True) {
 				SHAddToRecentDocs(SHARD_PATHW, szCurFile);
@@ -7387,7 +7381,6 @@ bool FileSave(FileSaveFlag saveFlag) noexcept {
 				&& iPathNameFormat == TitlePathNameFormat_NameOnly) {
 				iPathNameFormat = TitlePathNameFormat_NameFirst;
 			}
-			UpdateDocumentModificationStatus();
 
 			// Install watching of the current file
 			if ((saveFlag & FileSaveFlag_SaveAs) && bResetFileWatching) {
@@ -7500,7 +7493,7 @@ BOOL OpenFileDlg(LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) noexcep
 	SetupInitialOpenSaveDir(tchInitialDir, COUNTOF(tchInitialDir), lpstrInitialDir);
 	WCHAR szFile[MAX_PATH];
 	szFile[0] = L'\0';
-	int lexers[1 + OPENDLG_MAX_LEXER_COUNT] = {0}; // 1-based filter index
+	int lexers[1 + OPENDLG_MAX_LEXER_COUNT]{}; // 1-based filter index
 	LPWSTR szFilter = Style_GetOpenDlgFilterStr(true, szCurFile, lexers);
 
 	OPENFILENAME ofn;
@@ -7541,7 +7534,7 @@ BOOL SaveFileDlg(FileSaveFlag saveFlag, LPWSTR lpstrFile, int cchFile, LPCWSTR l
 	SetupInitialOpenSaveDir(tchInitialDir, COUNTOF(tchInitialDir), lpstrInitialDir);
 	WCHAR szNewFile[MAX_PATH];
 	lstrcpy(szNewFile, lpstrFile);
-	int lexers[1 + OPENDLG_MAX_LEXER_COUNT] = {0}; // 1-based filter index
+	int lexers[1 + OPENDLG_MAX_LEXER_COUNT]{}; // 1-based filter index
 	LPWSTR szFilter = Style_GetOpenDlgFilterStr(false, szCurFile, lexers);
 
 	OPENFILENAME ofn;
@@ -8236,7 +8229,7 @@ void CALLBACK WatchTimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTim
 			}
 		}
 		// polling, not very efficient but useful for watching continuously updated file
-		else {
+		else if (iFileWatchingOption & FileWatchingOption_LogFile) {
 			if (dwChangeNotifyTime == 0) {
 				CheckCurrentFileChangedOutsideApp();
 			}
@@ -8368,6 +8361,7 @@ void AutoSave_DoWork(FileSaveFlag saveFlag) noexcept {
 		status.iEOLMode = iCurrentEOLMode;
 		if (EditSaveFile(hwndEdit, szCurFile, FileSaveFlag_EndSession, status)) {
 			dwLastSavedDocReversion = dwCurrentDocReversion;
+			InstallFileWatching(false);
 			return;
 		}
 	}

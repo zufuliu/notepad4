@@ -37,6 +37,7 @@ struct EscapeSequence {
 	void resetEscapeState(int state, int chNext) noexcept {
 		outerState = state;
 		digitsLeft = (chNext == 'x')? 3 : ((chNext == 'u') ? 5 : 1);
+		brace = false;
 	}
 	bool atEscapeEnd(int ch) noexcept {
 		--digitsLeft;
@@ -88,7 +89,7 @@ enum class DocTagState {
 
 static_assert(DefaultNestedStateBaseStyle + 1 == SCE_JSX_OTHER);
 static_assert(DefaultNestedStateBaseStyle + 2 == SCE_JSX_TEXT);
-static_assert(DefaultNestedStateBaseStyle + 3 == SCE_JS_STRING_BT);
+static_assert(DefaultNestedStateBaseStyle + 3 == SCE_JS_TEMPLATELITERAL);
 
 inline bool IsJsIdentifierStartNext(const StyleContext &sc) noexcept {
 	return IsJsIdentifierStart(sc.chNext) || sc.MatchNext('\\', 'u');
@@ -99,7 +100,7 @@ constexpr bool IsSpaceEquiv(int state) noexcept {
 }
 
 constexpr int GetStringQuote(int state) noexcept {
-	if (state == SCE_JS_STRING_BT) {
+	if (state == SCE_JS_TEMPLATELITERAL) {
 		return '`';
 	}
 	if constexpr (SCE_JS_STRING_SQ & 1) {
@@ -294,8 +295,8 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 		case SCE_JS_STRING_DQ:
 		case SCE_JSX_STRING_SQ:
 		case SCE_JSX_STRING_DQ:
-		case SCE_JS_STRING_BT:
-			if (sc.atLineStart && sc.state != SCE_JS_STRING_BT) {
+		case SCE_JS_TEMPLATELITERAL:
+			if (sc.atLineStart && sc.state != SCE_JS_TEMPLATELITERAL) {
 				if (lineContinuation) {
 					lineContinuation = 0;
 				} else {
@@ -305,7 +306,7 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 			}
 			if (sc.ch == '\\') {
 				if (IsEOLChar(sc.chNext)) {
-					if (sc.state != SCE_JS_STRING_BT) {
+					if (sc.state != SCE_JS_TEMPLATELITERAL) {
 						lineContinuation = JsLineStateLineContinuation;
 					}
 				} else {
@@ -329,7 +330,7 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				}
 				sc.SetState((sc.state == SCE_JSX_STRING_SQ || sc.state == SCE_JSX_STRING_DQ) ? SCE_JSX_OTHER : SCE_JS_DEFAULT);
 				continue;
-			} else if (sc.state == SCE_JS_STRING_BT && sc.Match('$', '{')) {
+			} else if (sc.state == SCE_JS_TEMPLATELITERAL && sc.Match('$', '{')) {
 				nestedState.push_back(sc.state);
 				sc.SetState(SCE_JS_OPERATOR2);
 				sc.Forward();
@@ -502,7 +503,7 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				chBefore = chPrevNonWhite;
 				sc.SetState((sc.ch == '\'') ? SCE_JS_STRING_SQ : SCE_JS_STRING_DQ);
 			} else if (sc.ch == '`') {
-				sc.SetState(SCE_JS_STRING_BT);
+				sc.SetState(SCE_JS_TEMPLATELITERAL);
 			} else if (IsNumberStartEx(sc.chPrev, sc.ch, sc.chNext)) {
 				sc.SetState(SCE_JS_NUMBER);
 			} else if (sc.ch == '@' && IsJsIdentifierStartNext(sc)) {
@@ -627,7 +628,7 @@ void FoldJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Le
 		switch (style) {
 		case SCE_JS_COMMENTBLOCK:
 		case SCE_JS_COMMENTBLOCKDOC:
-		case SCE_JS_STRING_BT:
+		case SCE_JS_TEMPLATELITERAL:
 			if (style != stylePrev) {
 				levelNext++;
 			}

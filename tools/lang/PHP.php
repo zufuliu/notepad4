@@ -45,6 +45,15 @@ void never static
 // https://www.php.net/manual/en/language.types.type-juggling.php
 int integer bool boolean float double real string array object unset
 
+//! attribute			=======================================================
+// https://www.php.net/manual/en/reserved.attributes.php
+#[Attribute]
+#[\AllowDynamicProperties]
+#[\Deprecated]
+#[\Override]
+#[\ReturnTypeWillChange]
+#[\SensitiveParameter]
+
 //! Predefined Variable	=======================================================
 // https://www.php.net/manual/en/language.variables.basics.php
 $this
@@ -108,6 +117,7 @@ __FUNCTION__
 __CLASS__
 __TRAIT__
 __METHOD__
+__PROPERTY__
 __NAMESPACE__
 
 // Predefined constant
@@ -3281,7 +3291,7 @@ simplexml_load_string(string $data, ?string $class_name = SimpleXMLElement::clas
 }
 
 //! phpdoc				=======================================================
-// https://docs.phpdoc.org/latest/guide/references/phpdoc/tags/index.html#tag-reference
+// https://docs.phpdoc.org/guide/references/phpdoc/tags/index.html#tag-reference
 /**
  * @api
  * @author [name] [<email address>]
@@ -3291,6 +3301,7 @@ simplexml_load_string(string $data, ?string $class_name = SimpleXMLElement::clas
  * @example [location] [<start-line> [<number-of-lines>] ] [<description>]
  * {@example [location] [<start-line> [<number-of-lines>] ] [<description>]}
  * @filesource
+ * @final [description]
  * @global [Type] [name] @global [Type] [description]
  * @ignore [<description>]
  * @internal [description]

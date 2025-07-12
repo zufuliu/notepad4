@@ -384,10 +384,19 @@
     <ClCompile Include="..\..\scintilla\win32\LaTeXInput.cxx">
       <Filter>Scintilla\win32</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\scintilla\win32\ListBox.cxx">
+      <Filter>Scintilla\win32</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\scintilla\win32\PlatWin.cxx">
       <Filter>Scintilla\win32</Filter>
     </ClCompile>
     <ClCompile Include="..\..\scintilla\win32\ScintillaWin.cxx">
+      <Filter>Scintilla\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\scintilla\win32\SurfaceD2D.cxx">
+      <Filter>Scintilla\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\scintilla\win32\SurfaceGDI.cxx">
       <Filter>Scintilla\win32</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Bridge.cpp">
@@ -852,6 +861,9 @@
       <Filter>Scintilla\win32</Filter>
     </ClInclude>
     <ClInclude Include="..\..\scintilla\win32\PlatWin.h">
+      <Filter>Scintilla\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\scintilla\win32\SurfaceD2D.h">
       <Filter>Scintilla\win32</Filter>
     </ClInclude>
     <ClInclude Include="..\..\scintilla\win32\WinTypes.h">

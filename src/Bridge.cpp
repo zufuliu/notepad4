@@ -20,7 +20,6 @@
 *
 ******************************************************************************/
 
-struct IUnknown;
 #include <windows.h>
 #include <windowsx.h>
 #include <shlwapi.h>
@@ -579,20 +578,6 @@ void EditPrintSetup(HWND hwnd) noexcept {
 
 namespace { // copy as RTF
 
-#if (__cplusplus > 201703L || (defined(_MSVC_LANG) && _MSVC_LANG > 201703L)) && ( \
-	(defined(_MSC_VER) && _MSC_VER >= 1928 && (defined(_WIN64) || !defined(__clang__))) || \
-	(defined(_LIBCPP_VERSION) && _LIBCPP_VERSION >= 16000) || \
-	(!defined(_LIBCPP_VERSION) && defined(__GNUC__) && __GNUC__ >= 11) )
-using std::make_unique_for_overwrite; // requires C++20 library support
-#else
-// https://en.cppreference.com/w/cpp/memory/unique_ptr/make_unique
-template<class T>
-std::enable_if_t<std::is_array_v<T>, std::unique_ptr<T>>
-make_unique_for_overwrite(std::size_t n) {
-	return std::unique_ptr<T>(new std::remove_extent_t<T>[n]);
-}
-#endif
-
 struct DocumentStyledText {
 	std::unique_ptr<StyleDefinition[]> styleList;
 	unsigned styleCount;
@@ -749,9 +734,9 @@ constexpr int GetRTFFontSize(int size) noexcept {
 void SaveToStreamRTF(std::string &os, const char *styledText, size_t textLength, Sci_Position startPos, Sci_Position endPos) {
 	uint8_t styleMap[STYLE_MAX + 1];
 	const auto [styleList, styleCount, cpEdit] = GetDocumentStyledText(styleMap, styledText, textLength);
-	const std::unique_ptr<std::string[]> styles = make_unique_for_overwrite<std::string[]>(styleCount);
-	const std::unique_ptr<LPCSTR[]> fontList = make_unique_for_overwrite<LPCSTR[]>(styleCount);
-	const std::unique_ptr<COLORREF[]> colorList = make_unique_for_overwrite<COLORREF[]>(2*styleCount);
+	const std::unique_ptr<std::string[]> styles = std::make_unique_for_overwrite<std::string[]>(styleCount);
+	const std::unique_ptr<LPCSTR[]> fontList = std::make_unique_for_overwrite<LPCSTR[]>(styleCount);
+	const std::unique_ptr<COLORREF[]> colorList = std::make_unique_for_overwrite<COLORREF[]>(2*styleCount);
 
 	UINT legacyACP = cpEdit;
 	if (legacyACP == SC_CP_UTF8 || legacyACP == 0) {
@@ -1316,7 +1301,7 @@ void EditFormatCode(int menu) noexcept {
 
 	try {
 		SciCall_EnsureStyledTo(endPos);
-		const std::unique_ptr<char[]> styledText = make_unique_for_overwrite<char[]>(2*(endPos - startPos) + 2);
+		const std::unique_ptr<char[]> styledText = std::make_unique_for_overwrite<char[]>(2*(endPos - startPos) + 2);
 		const Sci_TextRangeFull tr { { startPos, endPos }, styledText.get() };
 		const size_t textLength = SciCall_GetStyledTextFull(&tr);
 		std::string output;
@@ -1386,5 +1371,6 @@ void EditFormatCode(int menu) noexcept {
 			}
 		}
 	} catch (...) {
+		// ignore
 	}
 }

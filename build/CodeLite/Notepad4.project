@@ -193,9 +193,13 @@
       <File Name="../../scintilla/win32/HanjaDic.cxx"/>
       <File Name="../../scintilla/win32/HanjaDic.h"/>
       <File Name="../../scintilla/win32/LaTeXInput.cxx"/>
+      <File Name="../../scintilla/win32/ListBox.cxx"/>
       <File Name="../../scintilla/win32/PlatWin.cxx"/>
       <File Name="../../scintilla/win32/PlatWin.h"/>
       <File Name="../../scintilla/win32/ScintillaWin.cxx"/>
+      <File Name="../../scintilla/win32/SurfaceD2D.cxx"/>
+      <File Name="../../scintilla/win32/SurfaceD2D.h"/>
+      <File Name="../../scintilla/win32/SurfaceGDI.cxx"/>
       <File Name="../../scintilla/win32/WinTypes.h"/>
     </VirtualDirectory>
   </VirtualDirectory>
@@ -401,10 +405,10 @@
       <Compiler Options="-g;-O0" C_Options="-g;-O0" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <Preprocessor Value="_DEBUG"/>
         <Preprocessor Value="WIN32"/>
-        <Preprocessor Value="_WIN32_WINNT=0x0501"/>
-        <Preprocessor Value="WINVER=0x0501"/>
+        <Preprocessor Value="_WIN32_WINNT=0x0600"/>
+        <Preprocessor Value="WINVER=0x0600"/>
       </Compiler>
-      <Linker Options="-O0;-Wl,--major-os-version,5;-Wl,--minor-os-version,1;-Wl,--subsystem,windows:5.01" Required="yes"/>
+      <Linker Options="-O0;-Wl,--major-os-version,5;-Wl,--minor-os-version,1;-Wl,--subsystem,windows:6.00" Required="yes"/>
       <ResourceCompiler Options="-D_DEBUG;-DWIN32" Required="no"/>
       <General OutputFile="$(WorkspacePath)/../bin/$(ConfigurationName)/$(ProjectName).exe" IntermediateDirectory="$(WorkspacePath)/../bin/$(ConfigurationName)/obj/$(ProjectName)" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(WorkspacePath)/../bin/$(ConfigurationName)" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>
       <BuildSystem Name="Default"/>
@@ -527,10 +531,10 @@
       <Compiler Options="-msse2;-mfpmath=sse;-O2;-ffast-math;-fno-rtti;-fomit-frame-pointer" C_Options="-msse2;-mfpmath=sse;-O2;-ffast-math;-fomit-frame-pointer" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <Preprocessor Value="NDEBUG"/>
         <Preprocessor Value="WIN32"/>
-        <Preprocessor Value="_WIN32_WINNT=0x0501"/>
-        <Preprocessor Value="WINVER=0x0501"/>
+        <Preprocessor Value="_WIN32_WINNT=0x0600"/>
+        <Preprocessor Value="WINVER=0x0600"/>
       </Compiler>
-      <Linker Options="-s;-O2;-static;-Wl,--gc-sections;-msse2;-mfpmath=sse;-ffast-math;-fno-rtti;-fomit-frame-pointer;-Wl,--major-os-version,5;-Wl,--minor-os-version,1;-Wl,--subsystem,windows:5.01" Required="yes"/>
+      <Linker Options="-s;-O2;-static;-Wl,--gc-sections;-msse2;-mfpmath=sse;-ffast-math;-fno-rtti;-fomit-frame-pointer;-Wl,--major-os-version,5;-Wl,--minor-os-version,1;-Wl,--subsystem,windows:6.00" Required="yes"/>
       <ResourceCompiler Options="-DWIN32" Required="no"/>
       <General OutputFile="$(WorkspacePath)/../bin/$(ConfigurationName)/$(ProjectName).exe" IntermediateDirectory="$(WorkspacePath)/../bin/$(ConfigurationName)/obj/$(ProjectName)" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(WorkspacePath)/../bin/$(ConfigurationName)" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>
       <BuildSystem Name="Default"/>
