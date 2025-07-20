@@ -45,6 +45,9 @@ class LexAccessor {
 		endPos = sci::min(endPos, lenDoc);
 
 		m = endPos - startPos;
+#if defined(__clang__)
+		__builtin_assume(m >= 0 && m <= bufferSize); // suppress [clang-analyzer-security.ArrayBound]
+#endif
 		pAccess->GetCharRange(buf, startPos, m);
 		buf[m] = '\0';
 	}

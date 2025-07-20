@@ -40,6 +40,7 @@ Checks: [
     -readability-math-missing-parentheses,
     -readability-suspicious-call-argument,
     -readability-uppercase-literal-suffix,
+    -readability-use-concise-preprocessor-directives,
     -misc-confusable-identifiers,
     -misc-include-cleaner,
     -misc-non-private-member-variables-in-classes,
