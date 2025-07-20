@@ -176,11 +176,11 @@ Latest development builds (artifacts in Release configuration for each compiler 
 * Other various major or minor changes and tweaks
 
 ## Supported Operating Systems:
-* Windows XP, Vista, 7, 8, 8.1, 10 and 11, both 32-bit and 64-bit
-* Windows Server 2003, 2008, 2012, 2016, 2019, 2022 and 2025, both 32-bit and 64-bit
-* Windows 10 on ARM64, Windows 8/8.1 on ARM32 (Windows RT)
-* Unix-like Operating Systems (Linux, macOS, BSD, etc.) using [Wine](https://www.winehq.org/)
-* [ReactOS](https://www.reactos.org/)
+* Windows Vista, 7, 8, 8.1, 10 and 11, both 32-bit and 64-bit
+* Windows Server 2008, 2012, 2016, 2019, 2022 and 2025, both 32-bit and 64-bit
+* Windows 10 and 11 on ARM64
+* Windows XP, Windows Server 2003 and Windows 8/8.1 on ARM32 (Windows RT) using [v25.06r5696](https://github.com/zufuliu/notepad4/releases/tag/v25.06r5696)
+* Other systems using [Wine](https://www.winehq.org/)
 
 ## Contributors:
 * [XhmikosR](https://xhmikosr.github.io/notepad2-mod/)
