@@ -2,6 +2,18 @@ import os.path
 import re
 import json
 import unicodedata
+import subprocess
+import ctypes
+
+CP_ACP = 'cp' + str(ctypes.windll.kernel32.GetACP())
+
+def decode_stdout(doc):
+	if not doc:
+		return ''
+	try:
+		return doc.decode('utf-8')
+	except UnicodeDecodeError:
+		return doc.decode(CP_ACP)
 
 def increase_style_resource_id_value(path, delta=100):
 	with open(path, encoding='utf-8', newline='\n') as fd:
@@ -205,6 +217,29 @@ def find_new_css_properties(properties, descriptors, lang, draft=True):
 	print('new css properties:', ', '.join(sorted(properties - existing)))
 	print('unknown css properties:', ', '.join(sorted(existing - properties)))
 
+def find_updated_css_drafts(since, path):
+	os.chdir(path)
+	# show commit date and dir stat
+	with subprocess.Popen(['git.exe', 'log', f'--since={since}', '--format=%cs', '--dirstat=files,0,cumulative'], stdout=subprocess.PIPE) as proc:
+		doc = proc.stdout.read()
+		lines = decode_stdout(doc).splitlines()
+		drafts = {}
+		date = ''
+		length = 0
+		for line in lines:
+			if m := re.match(r'(\d{4}-\d{2}-\d{2})', line):
+				date = m.groups()[0]
+			elif m := re.match(r'\s+[\d\.]+%\s+([\w\-]+)/', line):
+				module = m.groups()[0]
+				if module not in drafts or drafts[module] < date:
+					drafts[module] = date
+					length = max(length, len(module))
+		output = []
+		for module, date in sorted(drafts.items()):
+			output.append(f'{' '*4}https://drafts.csswg.org/{module}/{' '*(4 + length - len(module))}{date}')
+		print(f'{len(drafts)} updated CSS drafts since {since}:')
+		print('\n'.join(output))
+
 def group_powershell_commands(path):
 	# group Get-Command output by module
 	commands = {}
@@ -255,6 +290,8 @@ def find_new_texinfo_commands(path, lang):
 #check_encoding_list('../src/EditEncoding.cpp')
 #diff_iso_encoding('iso-8859.log')
 
+# https://github.com/w3c/csswg-drafts/
+#find_updated_css_drafts('2025-07-15', r'H:\Libs\csswg-drafts')
 # https://www.w3.org/Style/CSS/all-properties.en.json
 #dump_all_css_properties('all-properties.en.json', 'property', 'title', 'url')
 # https://www.w3.org/Style/CSS/all-descriptors.en.json
