@@ -2570,14 +2570,9 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	CheckMenuRadioItem(hmenu, IDM_VIEW_SCROLLPASTLASTLINE_ONE, IDM_VIEW_SCROLLPASTLASTLINE_QUARTER, i, MF_BYCOMMAND);
 
 	// Rendering Technology
-	i = IsVistaAndAbove();
-	EnableCmd(hmenu, IDM_SET_RENDER_TECH_D2D, i);
-	EnableCmd(hmenu, IDM_SET_RENDER_TECH_D2DRETAIN, i);
-	EnableCmd(hmenu, IDM_SET_RENDER_TECH_D2DDC, i);
 #if _WIN32_WINNT < _WIN32_WINNT_WIN7
 	DisableCmd(hmenu, IDM_SET_RENDER_TECH_D3D, true);
 #endif
-	EnableCmd(hmenu, IDM_SET_USE_XP_FILE_DIALOG, i);
 	CheckCmd(hmenu, IDM_SET_USE_XP_FILE_DIALOG, bUseXPFileDialog);
 	i = IDM_SET_RENDER_TECH_GDI + iRenderingTechnology;
 	CheckMenuRadioItem(hmenu, IDM_SET_RENDER_TECH_GDI, IDM_SET_RENDER_TECH_D3D, i, MF_BYCOMMAND);
