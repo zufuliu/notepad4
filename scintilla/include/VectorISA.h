@@ -41,7 +41,7 @@
 	// https://learn.microsoft.com/en-us/cpp/build/reference/arch-x64
 	// https://clang.llvm.org/docs/UsersManual.html#x86
 	#if defined(_WIN64)
-		#if defined(__AVX512F__) || defined(__AVX512BW__) || defined(__AVX512CD__) || defined(__AVX512DQ__) || defined(__AVX512VL__)
+		#if defined(__AVX512F__)
 			// Clang and GCC: -march=x86-64-v4, MSVC: /arch:AVX512
 			#define NP2_USE_AVX2	1
 			#define NP2_USE_AVX512	1
