@@ -1198,9 +1198,26 @@ bool PositionCacheEntry::Retrieve(uint16_t styleNumber_, std::string_view sv, XY
 }
 
 size_t PositionCacheEntry::Hash(uint16_t styleNumber_, std::string_view sv) noexcept {
+#if 0
 	const size_t h1 = std::hash<std::string_view>{}(sv);
 	const size_t h2 = std::hash<uint8_t>{}(styleNumber_ & 0xff);
+	// TODO: better hash combine?
 	return h1 ^ (h2 << 1);
+#else
+	// https://peps.python.org/pep-0456/
+	// http://www.isthe.com/chongo/tech/comp/fnv/#FNV-1a
+	// https://github.com/microsoft/STL/blob/main/stl/inc/type_traits
+	constexpr uint32_t FNV_offset_basis = 2166136261U;
+	constexpr uint32_t FNV_prime        = 16777619U;
+	uint32_t h1 = FNV_offset_basis;
+	for (const char ch : sv) {
+		h1 ^= static_cast<uint8_t>(ch);
+		h1 *= FNV_prime;
+	}
+	h1 ^= styleNumber_;
+	h1 *= FNV_prime;
+	return h1;
+#endif
 }
 
 bool PositionCacheEntry::NewerThan(const PositionCacheEntry &other) const noexcept {
