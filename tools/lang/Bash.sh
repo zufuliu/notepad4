@@ -1,5 +1,6 @@
 #!/bin/bash
-# 5.2 https://www.gnu.org/software/bash/manual/
+# 5.3 https://www.gnu.org/software/bash/manual/
+# https://tiswww.case.edu/php/chet/bash/NEWS
 # https://en.wikipedia.org/wiki/Almquist_shell
 # https://en.wikipedia.org/wiki/Bourne_shell
 # https://man.archlinux.org/man/dash.1
@@ -117,19 +118,21 @@ $BASH_ENV
 $BASH_EXECUTION_STRING
 $BASH_LINENO
 $BASH_LOADABLES_PATH
+$BASH_MONOSECONDS
 $BASH_REMATCH
 $BASH_SOURCE
 $BASH_SUBSHELL
+$BASH_TRAPSIG
 $BASH_VERSINFO
 $BASH_VERSION
 $BASH_XTRACEFD
 $CHILD_MAX
 $COLUMNS
 $COMP_CWORD
+$COMP_KEY
 $COMP_LINE
 $COMP_POINT
 $COMP_TYPE
-$COMP_KEY
 $COMP_WORDBREAKS
 $COMP_WORDS
 $COMPREPLY
@@ -146,6 +149,7 @@ $FIGNORE
 $FUNCNAME
 $FUNCNEST
 $GLOBIGNORE
+$GLOBSORT
 $GROUPS
 $HISTCMD
 $HISTCONTROL

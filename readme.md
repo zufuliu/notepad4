@@ -123,7 +123,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [SAS](tools/lang/SAS.sas), up to SAS Viya 2024.06.
 	* [Scala](tools/lang/Scala.scala), up to Scala 3.2.
 	* Shell Script
-		* [Bash](tools/lang/Bash.sh) likes (sh, bash, dash, ash, zsh, ksh), up to Bash 5.2. [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#shell-script)
+		* [Bash](tools/lang/Bash.sh) likes (sh, bash, dash, ash, zsh, ksh), up to Bash 5.3. [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#shell-script)
 		* [C Shell](tools/lang/CShell.csh) (csh, tcsh), up to tcsh 6.24.
 		* [M4 Macro](https://www.gnu.org/software/m4/) and [Autoconf](https://www.gnu.org/software/autoconf/)
 	* SQL Query
