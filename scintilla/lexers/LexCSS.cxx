@@ -222,10 +222,9 @@ void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 					case SCE_CSS_PSEUDOCLASS:
 						if (!keywordLists[KeywordIndex_PseudoClass].InListPrefixed(s + 1, '(')) {
 							sc.ChangeState(SCE_CSS_UNKNOWN_PSEUDOCLASS);
-						} else if (sc.ch == '(') {
-							if (StrEqualsAny(s + 1, "is", "has", "not", "where", "current")) {
-								++selectorLevel;
-							}
+						}
+						if (sc.ch == '(') {
+							++selectorLevel;
 						}
 						break;
 
