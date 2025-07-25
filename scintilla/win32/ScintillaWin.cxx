@@ -662,7 +662,7 @@ class ScintillaWin final :
 	void CreateRenderTarget() noexcept;
 #if _WIN32_WINNT >= _WIN32_WINNT_WIN7
 	HRESULT Create3D() noexcept;
-	HRESULT SetBackBuffer(HWND hwnd, IDXGISwapChain1 *pSwapChain) const noexcept;
+	HRESULT SetBackBuffer(IDXGISwapChain1 *pSwapChain) const noexcept;
 	HRESULT CreateSwapChain(HWND hwnd) noexcept;
 #endif
 	void EnsureRenderTarget(HDC hdc) noexcept;
@@ -1072,7 +1072,7 @@ void ScintillaWin::CreateRenderTarget() noexcept {
 }
 
 #if _WIN32_WINNT >= _WIN32_WINNT_WIN7
-HRESULT ScintillaWin::SetBackBuffer(HWND hwnd, IDXGISwapChain1 *pSwapChain) const noexcept {
+HRESULT ScintillaWin::SetBackBuffer(IDXGISwapChain1 *pSwapChain) const noexcept {
 	assert(targets.pDeviceContext);
 	// Back buffer as an IDXGISurface
 	ComPtr<IDXGISurface> dxgiBackBuffer;
@@ -1080,13 +1080,12 @@ HRESULT ScintillaWin::SetBackBuffer(HWND hwnd, IDXGISwapChain1 *pSwapChain) cons
 	if (FAILED(hr))
 		return hr;
 
-	const FLOAT dpiX = static_cast<FLOAT>(DpiForWindow(hwnd));
-	const FLOAT dpiY = dpiX;
+	const FLOAT dpiX = static_cast<FLOAT>(static_cast<int>(dpi));
 
 	// Direct2D bitmap linked to Direct3D texture through DXGI back buffer
 	const D2D1_BITMAP_PROPERTIES1 bitmapProperties =
 		D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW,
-			D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_IGNORE), dpiX, dpiY);
+			D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_IGNORE), dpiX, dpiX);
 	ComPtr<ID2D1Bitmap1> pDirect2DBackBuffer;
 	hr = targets.pDeviceContext->CreateBitmapFromDxgiSurface(dxgiBackBuffer.Get(), &bitmapProperties, pDirect2DBackBuffer.GetAddressOf());
 	if (FAILED(hr))
@@ -1136,7 +1135,7 @@ HRESULT ScintillaWin::CreateSwapChain(HWND hwnd) noexcept {
 	if (FAILED(hr))
 		return hr;
 
-	hr = SetBackBuffer(hwnd, pSwapChain.Get());
+	hr = SetBackBuffer(pSwapChain.Get());
 	if (FAILED(hr))
 		return hr;
 
@@ -1932,7 +1931,7 @@ void ScintillaWin::SizeWindow() {
 		targets.pDeviceContext->SetTarget(nullptr);	// ResizeBuffers fails if bitmap still owned by swap chain
 		hrResize = pDXGISwapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
 		if (SUCCEEDED(hrResize)) {
-			hrResize = SetBackBuffer(MainHWND(), pDXGISwapChain.Get());
+			hrResize = SetBackBuffer(pDXGISwapChain.Get());
 		} else {
 			// Platform::DebugPrintf("Failed ResizeBuffers 0x%lx\n", hrResize);
 		}
