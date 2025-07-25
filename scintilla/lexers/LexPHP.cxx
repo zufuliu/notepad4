@@ -758,7 +758,7 @@ bool PHPLexer::ClassifyCssWord() {
 	char s[16];
 	sc.GetCurrentLowered(s, sizeof(s));
 	if (sc.state == css_style(SCE_CSS_PSEUDOCLASS)) {
-		if (sc.ch == '(' && StrEqualsAny(s + 1, "is", "has", "not", "where", "current")) {
+		if (sc.ch == '(') {
 			++selectorLevel;
 		}
 		return false;
