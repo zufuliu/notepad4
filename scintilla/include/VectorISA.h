@@ -179,17 +179,6 @@
 #define mm256_cmpge_epu8(a, b) \
 	_mm256_cmpeq_epi8(_mm256_max_epu8((a), (b)), (a))
 #define mm256_cmple_epu8(a, b)	mm256_cmpge_epu8((b), (a))
-
-#define ZeroMemory_32x1(buffer) do { \
-	const __m256i zero = _mm256_setzero_si256();						\
-	_mm256_store_si256(reinterpret_cast<__m256i *>(buffer), zero);		\
-} while (0)
-
-#define ZeroMemory_32x2(buffer) do { \
-	const __m256i zero = _mm256_setzero_si256();										\
-	_mm256_store_si256(reinterpret_cast<__m256i *>(buffer), zero);						\
-	_mm256_store_si256(reinterpret_cast<__m256i *>((buffer) + sizeof(__m256i)), zero);	\
-} while (0)
 #endif
 
 #if NP2_USE_SSE2
@@ -197,20 +186,6 @@
 #define mm_cmpge_epu8(a, b) \
 	_mm_cmpeq_epi8(_mm_max_epu8((a), (b)), (a))
 #define mm_cmple_epu8(a, b)		mm_cmpge_epu8((b), (a))
-
-#define ZeroMemory_16x2(buffer) do { \
-	const __m128 zero = _mm_setzero_ps();										\
-	_mm_store_ps(reinterpret_cast<float *>(buffer), zero);						\
-	_mm_store_ps(reinterpret_cast<float *>((buffer) + sizeof(__m128)), zero);	\
-} while (0)
-
-#define ZeroMemory_16x4(buffer) do { \
-	const __m128 zero = _mm_setzero_ps();										\
-	_mm_store_ps(reinterpret_cast<float *>(buffer), zero);						\
-	_mm_store_ps(reinterpret_cast<float *>((buffer) + sizeof(__m128)), zero);	\
-	_mm_store_ps(reinterpret_cast<float *>((buffer) + 2*sizeof(__m128)), zero);	\
-	_mm_store_ps(reinterpret_cast<float *>((buffer) + 3*sizeof(__m128)), zero);	\
-} while (0)
 #endif
 
 
