@@ -16,25 +16,13 @@
 // https://clang.llvm.org/docs/LanguageExtensions.html
 #include <intrin.h>
 
-#if defined(__aarch64__) || defined(_ARM64_) || defined(_M_ARM64)
+#if defined(__aarch64__) || defined(_M_ARM64)
 	#define NP2_TARGET_ARM		1
-	#define NP2_TARGET_ARM64	1
-	#define NP2_TARGET_ARM32	0
-	#define NP2_USE_SSE2		0
-	#define NP2_USE_AVX2		0
-	#define NP2_USE_AVX512		0
-	// TODO: use ARM Neon
-#elif defined(__arm__) || defined(_ARM_) || defined(_M_ARM)
-	#define NP2_TARGET_ARM		1
-	#define NP2_TARGET_ARM64	0
-	#define NP2_TARGET_ARM32	1
 	#define NP2_USE_SSE2		0
 	#define NP2_USE_AVX2		0
 	#define NP2_USE_AVX512		0
 #else
 	#define NP2_TARGET_ARM		0
-	#define NP2_TARGET_ARM64	0
-	#define NP2_TARGET_ARM32	0
 	// SSE2 enabled by default
 	#define NP2_USE_SSE2		1
 

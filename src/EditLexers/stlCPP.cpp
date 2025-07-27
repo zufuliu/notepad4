@@ -322,10 +322,9 @@ static KEYWORDLIST Keywords_CPP = {{
 "_MSC_VER _MSC_FULL_VER _MSVC_LANG "
 "__GNUC__ __GNUG__ __GNUC_MINOR__ __GNUC_PATCHLEVEL__ __OBJC__ __ASSEMBLER__ __GFORTRAN__ "
 "__clang__ __clang_major__ __clang_minor__ __clang_patchlevel__ __llvm__ "
-"__i386__ __x86_64__ __LP64__ __amd64__ __ia64__ __arm__ __aarch64__ "
-"__MSVCRT__ __MINGW32__ __MINGW64__ __CYGWIN__ "
+"__i386__ __x86_64__ __LP64__ __amd64__ __aarch64__ "
+"__MINGW32__ __CYGWIN__ "
 "__APPLE__ __linux__ __GLIBC__ "
-"_X86_ _AMD64_ _IA64_ _ARM_ _ARM64_ "
 
 // assert.h
 "_DEBUG NDEBUG assert() "
