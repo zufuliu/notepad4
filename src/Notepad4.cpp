@@ -623,7 +623,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 #endif
 
 	// we need DPI-related functions before create Scintilla window.
-#if NP2_HAS_GETDPIFORWINDOW
+#if _WIN32_WINNT >= _WIN32_WINNT_WIN10
 	g_uSystemDPI = GetDpiForSystem();
 #else
 	Scintilla_LoadDpiForWindow();

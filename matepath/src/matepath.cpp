@@ -174,7 +174,7 @@ DWORD		g_uWinVer;
 #endif
 UINT		g_uCurrentDPI = USER_DEFAULT_SCREEN_DPI;
 UINT		g_uSystemDPI = USER_DEFAULT_SCREEN_DPI;
-#if !NP2_HAS_GETDPIFORWINDOW
+#if _WIN32_WINNT < _WIN32_WINNT_WIN10
 namespace {
 // scintilla\win32\PlatWin.cxx
 using GetDpiForWindowSig = UINT (WINAPI *)(HWND hwnd);
@@ -196,7 +196,7 @@ AdjustWindowRectExForDpiSig fnAdjustWindowRectExForDpi = nullptr;
 }
 
 static void LoadDpiForWindow() noexcept;
-#endif // NP2_HAS_GETDPIFORWINDOW
+#endif // _WIN32_WINNT < _WIN32_WINNT_WIN10
 
 WCHAR g_wchAppUserModelID[64] = L"";
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
@@ -243,7 +243,7 @@ static void CleanUpResources(bool initialized) noexcept {
 		FreeLibrary(hResDLL);
 	}
 #endif
-#if !NP2_HAS_GETDPIFORWINDOW
+#if _WIN32_WINNT < _WIN32_WINNT_WIN10
 	if (hShcoreDLL) {
 		FreeLibrary(hShcoreDLL);
 	}
@@ -3851,7 +3851,7 @@ void SnapToDefaultPos(HWND hwnd) noexcept {
 	SetWindowPlacement(hwnd, &wndpl);
 }
 
-#if !NP2_HAS_GETDPIFORWINDOW
+#if _WIN32_WINNT < _WIN32_WINNT_WIN10
 // scintilla\win32\PlatWin.cxx
 static void LoadDpiForWindow() noexcept {
 	HMODULE user32 = GetModuleHandleW(L"user32.dll");
@@ -3908,4 +3908,4 @@ BOOL AdjustWindowRectForDpi(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT 
 	}
 	return AdjustWindowRectEx(lpRect, dwStyle, FALSE, dwExStyle);
 }
-#endif // NP2_HAS_GETDPIFORWINDOW
+#endif // _WIN32_WINNT < _WIN32_WINNT_WIN10
