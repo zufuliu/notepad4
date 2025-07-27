@@ -323,9 +323,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	}
 #endif
 
-// since Windows 10, version 1607
-#if (defined(__aarch64__) || defined(_ARM64_) || defined(_M_ARM64)) && !defined(__MINGW32__)
-// 1709 was the first version for Windows 10 on ARM64.
+#if _WIN32_WINNT >= _WIN32_WINNT_WIN10
 	g_uSystemDPI = GetDpiForSystem();
 #else
 	LoadDpiForWindow();
