@@ -960,8 +960,8 @@ const uint8_t CharClassify_CP1361Data[] = {
 
 DBCSCharClassify::DBCSCharClassify(int codePage_) noexcept {
 	const uint16_t *classifyBegin = nullptr;
-	uint32_t classifyCount = 0;
-	uint32_t bytesCount = 0;
+	size_t classifyCount = 0;
+	size_t bytesCount = 0;
 	uint8_t bytesRLE[16]{};
 	switch (codePage_) {
 	case cp932: {
