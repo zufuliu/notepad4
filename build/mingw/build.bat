@@ -31,12 +31,14 @@ IF /I "%~1" == "aarch64"    SET "COMPILER=llvm"     & SET "TARGET=aarch64"    & 
 IF /I "%~1" == "llvm"       SET "COMPILER=llvm"     & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "Clang"      SET "CLANG=1"           & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "AVX2"       SET "TARGET=AVX2"       & SHIFT & GOTO CheckSecondArg
+IF /I "%~1" == "AVX512"     SET "TARGET=AVX512"     & SHIFT & GOTO CheckSecondArg
 
 
 :CheckSecondArg
 IF /I "%~1" == "" GOTO StartWork
 IF /I "%~1" == "x86_64"     SET "TARGET=x86_64"     & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "AVX2"       SET "TARGET=AVX2"       & SHIFT & GOTO CheckSecondArg
+IF /I "%~1" == "AVX512"     SET "TARGET=AVX512"       & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "i686"       SET "TARGET=i686"       & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "aarch64"    SET "TARGET=aarch64"    & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "Clang"      SET "CLANG=1"           & SHIFT & GOTO CheckSecondArg
@@ -67,6 +69,12 @@ IF /I "%TARGET%" == "AVX2" (
         mingw32-make ARCH=AVX2 CLANG=1 LTO=1 %JOBS% %ACTION%
     ) ELSE (
         mingw32-make TRIPLET=x86_64-w64-mingw32 ARCH=AVX2 LTO=1 %JOBS% %ACTION%
+    )
+) ELSE IF "%TARGET%" == "AVX512" (
+    IF "%CLANG%" == "1" (
+        mingw32-make ARCH=AVX512 CLANG=1 LTO=1 %JOBS% %ACTION%
+    ) ELSE (
+        mingw32-make TRIPLET=x86_64-w64-mingw32 ARCH=AVX512 LTO=1 %JOBS% %ACTION%
     )
 ) ELSE IF "%UCRT%" == "1" (
     IF "%CLANG%" == "1" (
@@ -102,6 +110,8 @@ EXIT /B
 SET "PATH=C:\llvm-mingw\bin;C:\msys64\usr\bin;%PATH%"
 IF /I "%TARGET%" == "AVX2" (
     mingw32-make TRIPLET=x86_64-w64-mingw32 ARCH=AVX2 CLANG=1 LTO=1 %JOBS% %ACTION%
+) ELSE IF "%TARGET%" == "AVX512" (
+    mingw32-make TRIPLET=x86_64-w64-mingw32 ARCH=AVX512 CLANG=1 LTO=1 %JOBS% %ACTION%
 ) ELSE (
     mingw32-make TRIPLET=%TARGET%-w64-mingw32 CLANG=1 LTO=1 WIN7=1 %JOBS% %ACTION%
 )

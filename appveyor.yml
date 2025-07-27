@@ -43,6 +43,10 @@ for:
           CALL "locale\build.bat" Build AVX2 Release 1
           CALL "build\make_zip.bat" MSVC AVX2 Release Locale 1
 
+          CALL "build\VisualStudio\build.bat" Build AVX512 Release 1
+          CALL "locale\build.bat" Build AVX512 Release 1
+          CALL "build\make_zip.bat" MSVC AVX512 Release Locale 1
+
           CALL "build\VisualStudio\build.bat" Build ARM64 Release 1
           CALL "locale\build.bat" Build ARM64 Release 1
           CALL "build\make_zip.bat" MSVC ARM64 Release Locale 1
@@ -67,6 +71,9 @@ for:
 
           CALL "build\VisualStudio\build.bat" Build AVX2 LLVMRelease 1
           CALL "build\make_zip.bat" LLVM AVX2 Release 1
+
+          CALL "build\VisualStudio\build.bat" Build AVX512 LLVMRelease 1
+          CALL "build\make_zip.bat" LLVM AVX512 Release 1
 
           CALL "build\VisualStudio\build.bat" Build ARM64 LLVMRelease 1
           CALL "build\make_zip.bat" LLVM ARM64 Release 1

@@ -17,6 +17,22 @@
       <Configuration>AVX2Release</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="AVX512Debug|x64">
+      <Configuration>AVX512Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="AVX512LLVMDebug|x64">
+      <Configuration>AVX512LLVMDebug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="AVX512LLVMRelease|x64">
+      <Configuration>AVX512LLVMRelease</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="AVX512Release|x64">
+      <Configuration>AVX512Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|ARM64">
       <Configuration>Debug</Configuration>
       <Platform>ARM64</Platform>
@@ -79,7 +95,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)'=='Release' or '$(Configuration)'=='AVX2Release'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)'=='Release' or '$(Configuration)'=='AVX2Release' or '$(Configuration)'=='AVX512Release'" Label="Configuration">
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <PlatformToolset Condition="'$(VisualStudioVersion)'=='16.0'">v142</PlatformToolset>
@@ -90,7 +106,7 @@
     <PlatformToolset Condition="'$(VisualStudioVersion)'=='16.0'">LLVM_v142</PlatformToolset>
     <PlatformToolset Condition="'$(VisualStudioVersion)'=='17.0'">LLVM_v143</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='AVX2Debug'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='AVX2Debug' or '$(Configuration)'=='AVX512Debug'" Label="Configuration">
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset Condition="'$(VisualStudioVersion)'=='16.0'">v142</PlatformToolset>
     <PlatformToolset Condition="'$(VisualStudioVersion)'=='17.0'">v143</PlatformToolset>
@@ -111,16 +127,24 @@
   <PropertyGroup>
     <LinkIncremental Condition="$(Configuration.EndsWith('Debug'))">true</LinkIncremental>
     <LinkIncremental Condition="$(Configuration.EndsWith('Release'))">false</LinkIncremental>
-    <OutDir Condition="!$(Configuration.StartsWith('AVX2'))">$(SolutionDir)..\bin\$(Configuration)\$(Platform)\</OutDir>
-    <IntDir Condition="!$(Configuration.StartsWith('AVX2'))">$(SolutionDir)..\bin\$(Configuration)\$(Platform)\obj\$(ProjectName)\</IntDir>
+    <OutDir Condition="!$(Configuration.StartsWith('AVX'))">$(SolutionDir)..\bin\$(Configuration)\$(Platform)\</OutDir>
+    <IntDir Condition="!$(Configuration.StartsWith('AVX'))">$(SolutionDir)..\bin\$(Configuration)\$(Platform)\obj\$(ProjectName)\</IntDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='AVX2Release|x64'">$(SolutionDir)..\bin\Release\AVX2\</OutDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='AVX2LLVMRelease|x64'">$(SolutionDir)..\bin\LLVMRelease\AVX2\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='AVX2Release|x64'">$(SolutionDir)..\bin\Release\AVX2\obj\$(ProjectName)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='AVX2LLVMRelease|x64'">$(SolutionDir)..\bin\LLVMRelease\AVX2\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='AVX2LLVMRelease|x64'">$(SolutionDir)..\bin\LLVMRelease\AVX2\obj\$(ProjectName)\</IntDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='AVX2Debug|x64'">$(SolutionDir)..\bin\Debug\AVX2\</OutDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='AVX2LLVMDebug|x64'">$(SolutionDir)..\bin\LLVMDebug\AVX2\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='AVX2Debug|x64'">$(SolutionDir)..\bin\Debug\AVX2\obj\$(ProjectName)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='AVX2LLVMDebug|x64'">$(SolutionDir)..\bin\LLVMDebug\AVX2\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='AVX2LLVMDebug|x64'">$(SolutionDir)..\bin\LLVMDebug\AVX2\obj\$(ProjectName)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='AVX512Release|x64'">$(SolutionDir)..\bin\Release\AVX512\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='AVX512Release|x64'">$(SolutionDir)..\bin\Release\AVX512\obj\$(ProjectName)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='AVX512Debug|x64'">$(SolutionDir)..\bin\Debug\AVX512\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='AVX512Debug|x64'">$(SolutionDir)..\bin\Debug\AVX512\obj\$(ProjectName)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='AVX512LLVMRelease|x64'">$(SolutionDir)..\bin\LLVMRelease\AVX512\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='AVX512LLVMRelease|x64'">$(SolutionDir)..\bin\LLVMRelease\AVX512\obj\$(ProjectName)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='AVX512LLVMDebug|x64'">$(SolutionDir)..\bin\LLVMDebug\AVX512\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='AVX512LLVMDebug|x64'">$(SolutionDir)..\bin\LLVMDebug\AVX512\obj\$(ProjectName)\</IntDir>
     <GenerateManifest>false</GenerateManifest>
   </PropertyGroup>
   <PropertyGroup Condition="$(Configuration.EndsWith('Release'))">
@@ -222,6 +246,18 @@
       <PreprocessorDefinitions>_WIN64;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='AVX512Debug|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>_DEBUG;_WIN64;_WIN32_WINNT=0x0A00;WINVER=0x0A00;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions512</EnableEnhancedInstructionSet>
+    </ClCompile>
+    <Link>
+      <MinimumRequiredVersion>10.00</MinimumRequiredVersion>
+    </Link>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_WIN64;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <ClCompile>
       <PreprocessorDefinitions>_DEBUG;_WIN64;_WIN32_WINNT=0x0A00;WINVER=0x0A00;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -253,6 +289,18 @@
     </ClCompile>
     <Link>
       <MinimumRequiredVersion>6.01</MinimumRequiredVersion>
+    </Link>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_WIN64;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='AVX512LLVMDebug|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>_DEBUG;_WIN64;_WIN32_WINNT=0x0A00;WINVER=0x0A00;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions>-march=x86-64-v4 -Wextra -Wshadow -Wimplicit-fallthrough -Wformat=2 -Wundef -Wcomma %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <MinimumRequiredVersion>10.00</MinimumRequiredVersion>
     </Link>
     <ResourceCompile>
       <PreprocessorDefinitions>_WIN64;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -328,6 +376,21 @@
       <PreprocessorDefinitions>_WIN64;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='AVX512Release|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>NDEBUG;_WIN64;_WIN32_WINNT=0x0A00;WINVER=0x0A00;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <AdditionalOptions>/GA /Zc:threadSafeInit- /wd26429 /wd26446 /wd26472 /wd26481 /wd26482 /wd26485 /wd26486 /wd26489 %(AdditionalOptions)</AdditionalOptions>
+      <CallingConvention>VectorCall</CallingConvention>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions512</EnableEnhancedInstructionSet>
+    </ClCompile>
+    <Link>
+      <MinimumRequiredVersion>10.00</MinimumRequiredVersion>
+    </Link>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_WIN64;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <ClCompile>
       <PreprocessorDefinitions>NDEBUG;_WIN64;_WIN32_WINNT=0x0A00;WINVER=0x0A00;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -358,6 +421,18 @@
     <ClCompile>
       <PreprocessorDefinitions>NDEBUG;_WIN64;_WIN32_WINNT=0x0601;WINVER=0x0601;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions>/GA /Zc:threadSafeInit- -march=x86-64-v3 -Wextra -Wshadow -Wimplicit-fallthrough -Wformat=2 -Wundef -Wcomma %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <MinimumRequiredVersion>6.01</MinimumRequiredVersion>
+    </Link>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_WIN64;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='AVX512LLVMRelease|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>NDEBUG;_WIN64;_WIN32_WINNT=0x0A00;WINVER=0x0A00;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions>/GA /Zc:threadSafeInit- -march=x86-64-v4 -Wextra -Wshadow -Wimplicit-fallthrough -Wformat=2 -Wundef -Wcomma %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <MinimumRequiredVersion>6.01</MinimumRequiredVersion>

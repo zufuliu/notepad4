@@ -200,7 +200,7 @@ def make_release_artifact(locale, suffix='', hd=False):
 	app_version = buildEnv['app_version']
 	zipDir = buildEnv['temp_zip_dir']
 	outDir = os.path.join(buildFolder, 'bin', 'Release')
-	archList = ['ARM64', 'AVX2', 'Win32', 'x64']
+	archList = ['ARM64', 'AVX2', 'Win32', 'x64', 'AVX512']
 	if hd:
 		archList.remove('Win32')
 	for arch in archList:

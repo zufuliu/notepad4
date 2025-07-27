@@ -13,10 +13,10 @@
 | Localization | Language | Architecture | Minimum System |
 |--|--|--|--|
 | de | Deutsch | ARM64 | 🟢Windows 10 on ARM |
-| en | English | ARM | 🔴discontinued Windows RT (Windows 8 on ARM) |
+| en | English | AVX512 | 🧪64-bit Windows 10, Server 2019 |
 | fr | French | AVX2 | 🟢64-bit Windows 7, Server 2008 R2 |
 | it | Italiano | x64 | 🟡legacy 64-bit Windows Vista, Server 2008 |
-| ja | 日本語 | Win32 | 🟠legacy Windows XP, Server 2003 |
+| ja | 日本語 | Win32 | 🟠legacy Windows Vista, Server 2008 |
 | ko | 한국어 |
 | ru | Русский |
 | zh-Hans | 中文 (简体) |
