@@ -6,9 +6,6 @@ CD /D %~dp0
 
 @rem Check for the help switches
 IF /I "%~1" == "help"   GOTO SHOWHELP
-IF /I "%~1" == "/help"  GOTO SHOWHELP
-IF /I "%~1" == "-help"  GOTO SHOWHELP
-IF /I "%~1" == "--help" GOTO SHOWHELP
 IF /I "%~1" == "/?"     GOTO SHOWHELP
 
 @rem default arguments
@@ -20,67 +17,28 @@ SET "CONFIG=Release"
 @rem Check for the first switch
 IF "%~1" == "" GOTO StartWork
 IF /I "%~1" == "Build"     SET "BUILDTYPE=Build"   & SHIFT & GOTO CheckSecondArg
-IF /I "%~1" == "/Build"    SET "BUILDTYPE=Build"   & SHIFT & GOTO CheckSecondArg
-IF /I "%~1" == "-Build"    SET "BUILDTYPE=Build"   & SHIFT & GOTO CheckSecondArg
-IF /I "%~1" == "--Build"   SET "BUILDTYPE=Build"   & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "Clean"     SET "BUILDTYPE=Clean"   & SHIFT & GOTO CheckSecondArg
-IF /I "%~1" == "/Clean"    SET "BUILDTYPE=Clean"   & SHIFT & GOTO CheckSecondArg
-IF /I "%~1" == "-Clean"    SET "BUILDTYPE=Clean"   & SHIFT & GOTO CheckSecondArg
-IF /I "%~1" == "--Clean"   SET "BUILDTYPE=Clean"   & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "Rebuild"   SET "BUILDTYPE=Rebuild" & SHIFT & GOTO CheckSecondArg
-IF /I "%~1" == "/Rebuild"  SET "BUILDTYPE=Rebuild" & SHIFT & GOTO CheckSecondArg
-IF /I "%~1" == "-Rebuild"  SET "BUILDTYPE=Rebuild" & SHIFT & GOTO CheckSecondArg
-IF /I "%~1" == "--Rebuild" SET "BUILDTYPE=Rebuild" & SHIFT & GOTO CheckSecondArg
 
 
 :CheckSecondArg
 @rem Check for the second switch
 IF "%~1" == "" GOTO StartWork
 IF /I "%~1" == "x86"     SET "ARCH=Win32" & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "/x86"    SET "ARCH=Win32" & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "-x86"    SET "ARCH=Win32" & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "--x86"   SET "ARCH=Win32" & SHIFT & GOTO CheckThirdArg
 IF /I "%~1" == "Win32"   SET "ARCH=Win32" & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "/Win32"  SET "ARCH=Win32" & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "-Win32"  SET "ARCH=Win32" & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "--Win32" SET "ARCH=Win32" & SHIFT & GOTO CheckThirdArg
 IF /I "%~1" == "x64"     SET "ARCH=x64"   & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "/x64"    SET "ARCH=x64"   & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "-x64"    SET "ARCH=x64"   & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "--x64"   SET "ARCH=x64"   & SHIFT & GOTO CheckThirdArg
 IF /I "%~1" == "AVX2"    SET "ARCH=AVX2"  & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "/AVX2"   SET "ARCH=AVX2"  & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "-AVX2"   SET "ARCH=AVX2"  & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "--AVX2"  SET "ARCH=AVX2"  & SHIFT & GOTO CheckThirdArg
 IF /I "%~1" == "ARM64"   SET "ARCH=ARM64" & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "/ARM64"  SET "ARCH=ARM64" & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "-ARM64"  SET "ARCH=ARM64" & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "--ARM64" SET "ARCH=ARM64" & SHIFT & GOTO CheckThirdArg
 IF /I "%~1" == "all"     SET "ARCH=all"   & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "/all"    SET "ARCH=all"   & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "-all"    SET "ARCH=all"   & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "--all"   SET "ARCH=all"   & SHIFT & GOTO CheckThirdArg
 IF /I "%~1" == "No32bit"   SET "ARCH=all" & SET NO_32BIT=1 & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "/No32bit"  SET "ARCH=all" & SET NO_32BIT=1 & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "-No32bit"  SET "ARCH=all" & SET NO_32BIT=1 & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "--No32bit" SET "ARCH=all" & SET NO_32BIT=1 & SHIFT & GOTO CheckThirdArg
 
 
 :CheckThirdArg
 @rem Check for the third switch
 IF "%~1" == "" GOTO StartWork
 IF /I "%~1" == "Debug"     SET "CONFIG=Debug"   & SHIFT & GOTO StartWork
-IF /I "%~1" == "/Debug"    SET "CONFIG=Debug"   & SHIFT & GOTO StartWork
-IF /I "%~1" == "-Debug"    SET "CONFIG=Debug"   & SHIFT & GOTO StartWork
-IF /I "%~1" == "--Debug"   SET "CONFIG=Debug"   & SHIFT & GOTO StartWork
 IF /I "%~1" == "Release"   SET "CONFIG=Release" & SHIFT & GOTO StartWork
-IF /I "%~1" == "/Release"  SET "CONFIG=Release" & SHIFT & GOTO StartWork
-IF /I "%~1" == "-Release"  SET "CONFIG=Release" & SHIFT & GOTO StartWork
-IF /I "%~1" == "--Release" SET "CONFIG=Release" & SHIFT & GOTO StartWork
 IF /I "%~1" == "all"       SET "CONFIG=all"     & SHIFT & GOTO StartWork
-IF /I "%~1" == "/all"      SET "CONFIG=all"     & SHIFT & GOTO StartWork
-IF /I "%~1" == "-all"      SET "CONFIG=all"     & SHIFT & GOTO StartWork
-IF /I "%~1" == "--all"     SET "CONFIG=all"     & SHIFT & GOTO StartWork
 
 
 :StartWork

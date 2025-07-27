@@ -18,9 +18,6 @@ CD /D %~dp0
 
 @rem Check for the help switches
 IF /I "%~1" == "help"   GOTO SHOWHELP
-IF /I "%~1" == "/help"  GOTO SHOWHELP
-IF /I "%~1" == "-help"  GOTO SHOWHELP
-IF /I "%~1" == "--help" GOTO SHOWHELP
 IF /I "%~1" == "/?"     GOTO SHOWHELP
 
 @rem default arguments
@@ -34,76 +31,34 @@ SET "ZIP_SUFFIX="
 @rem Check for the first switch
 IF "%~1" == "" GOTO StartWork
 IF /I "%~1" == "MSVC"    SET "COMPILER=MSVC"  & SHIFT & GOTO CheckSecondArg
-IF /I "%~1" == "/MSVC"   SET "COMPILER=MSVC"  & SHIFT & GOTO CheckSecondArg
-IF /I "%~1" == "-MSVC"   SET "COMPILER=MSVC"  & SHIFT & GOTO CheckSecondArg
-IF /I "%~1" == "--MSVC"  SET "COMPILER=MSVC"  & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "GCC"     SET "COMPILER=GCC"   & SHIFT & GOTO CheckSecondArg
-IF /I "%~1" == "/GCC"    SET "COMPILER=GCC"   & SHIFT & GOTO CheckSecondArg
-IF /I "%~1" == "-GCC"    SET "COMPILER=GCC"   & SHIFT & GOTO CheckSecondArg
-IF /I "%~1" == "--GCC"   SET "COMPILER=GCC"   & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "Clang"   SET "COMPILER=Clang" & SHIFT & GOTO CheckSecondArg
-IF /I "%~1" == "/Clang"  SET "COMPILER=Clang" & SHIFT & GOTO CheckSecondArg
-IF /I "%~1" == "-Clang"  SET "COMPILER=Clang" & SHIFT & GOTO CheckSecondArg
-IF /I "%~1" == "--Clang" SET "COMPILER=Clang" & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "LLVM"    SET "COMPILER=LLVM"  & SHIFT & GOTO CheckSecondArg
-IF /I "%~1" == "/LLVM"   SET "COMPILER=LLVM"  & SHIFT & GOTO CheckSecondArg
-IF /I "%~1" == "-LLVM"   SET "COMPILER=LLVM"  & SHIFT & GOTO CheckSecondArg
-IF /I "%~1" == "--LLVM"  SET "COMPILER=LLVM"  & SHIFT & GOTO CheckSecondArg
 
 
 :CheckSecondArg
 @rem Check for the second switch
 IF "%~1" == "" GOTO StartWork
 IF /I "%~1" == "x86"     SET "ARCH=Win32" & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "/x86"    SET "ARCH=Win32" & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "-x86"    SET "ARCH=Win32" & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "--x86"   SET "ARCH=Win32" & SHIFT & GOTO CheckThirdArg
 IF /I "%~1" == "Win32"   SET "ARCH=Win32" & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "/Win32"  SET "ARCH=Win32" & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "-Win32"  SET "ARCH=Win32" & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "--Win32" SET "ARCH=Win32" & SHIFT & GOTO CheckThirdArg
 IF /I "%~1" == "x64"     SET "ARCH=x64"   & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "/x64"    SET "ARCH=x64"   & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "-x64"    SET "ARCH=x64"   & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "--x64"   SET "ARCH=x64"   & SHIFT & GOTO CheckThirdArg
 IF /I "%~1" == "AVX2"    SET "ARCH=AVX2"  & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "/AVX2"   SET "ARCH=AVX2"  & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "-AVX2"   SET "ARCH=AVX2"  & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "--AVX2"  SET "ARCH=AVX2"  & SHIFT & GOTO CheckThirdArg
 IF /I "%~1" == "ARM64"   SET "ARCH=ARM64" & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "/ARM64"  SET "ARCH=ARM64" & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "-ARM64"  SET "ARCH=ARM64" & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "--ARM64" SET "ARCH=ARM64" & SHIFT & GOTO CheckThirdArg
 IF /I "%~1" == "all"     SET "ARCH=all"   & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "/all"    SET "ARCH=all"   & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "-all"    SET "ARCH=all"   & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "--all"   SET "ARCH=all"   & SHIFT & GOTO CheckThirdArg
 IF /I "%~1" == "No32bit"   SET "ARCH=all" & SET NO_32BIT=1 & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "/No32bit"  SET "ARCH=all" & SET NO_32BIT=1 & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "-No32bit"  SET "ARCH=all" & SET NO_32BIT=1 & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "--No32bit" SET "ARCH=all" & SET NO_32BIT=1 & SHIFT & GOTO CheckThirdArg
 
 
 :CheckThirdArg
 @rem Check for the third switch
 IF "%~1" == "" GOTO StartWork
 IF /I "%~1" == "Release"   SET "CONFIG=Release" & SHIFT & GOTO CheckFourthArg
-IF /I "%~1" == "/Release"  SET "CONFIG=Release" & SHIFT & GOTO CheckFourthArg
-IF /I "%~1" == "-Release"  SET "CONFIG=Release" & SHIFT & GOTO CheckFourthArg
-IF /I "%~1" == "--Release" SET "CONFIG=Release" & SHIFT & GOTO CheckFourthArg
 IF /I "%~1" == "Debug"     SET "CONFIG=Debug"   & SHIFT & GOTO CheckFourthArg
-IF /I "%~1" == "/Debug"    SET "CONFIG=Debug"   & SHIFT & GOTO CheckFourthArg
-IF /I "%~1" == "-Debug"    SET "CONFIG=Debug"   & SHIFT & GOTO CheckFourthArg
-IF /I "%~1" == "--Debug"   SET "CONFIG=Debug"   & SHIFT & GOTO CheckFourthArg
 
 
 :CheckFourthArg
 @rem Check for the fourth switch
 IF "%~1" == "" GOTO StartWork
 IF /I "%~1" == "Locale"   SET "WITH_LOCALE=1" & SHIFT & GOTO StartWork
-IF /I "%~1" == "/Locale"  SET "WITH_LOCALE=1" & SHIFT & GOTO StartWork
-IF /I "%~1" == "-Locale"  SET "WITH_LOCALE=1" & SHIFT & GOTO StartWork
-IF /I "%~1" == "--Locale" SET "WITH_LOCALE=1" & SHIFT & GOTO StartWork
 
 
 :StartWork
