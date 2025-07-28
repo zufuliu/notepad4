@@ -540,10 +540,10 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus &status) no
 	}
 
 	if (ptr < end) {
-		alignas(16) uint8_t buffer[2*sizeof(__m256i)];
+		uint8_t buffer[2*sizeof(__m256i)];
 		const __m256i zero = _mm256_setzero_si256();
 		_mm256_storeu_si256(reinterpret_cast<__m256i *>(buffer), zero);
-		_mm256_storeu_si256(reinterpret_cast<__m256i *>((buffer) + sizeof(__m256i)), zero);
+		_mm256_storeu_si256(reinterpret_cast<__m256i *>(buffer + sizeof(__m256i)), zero);
 		__movsb(buffer, ptr, end - ptr);
 
 		const __m256i chunk1 = _mm256_loadu_si256(reinterpret_cast<__m256i *>(buffer));
@@ -626,9 +626,9 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus &status) no
 		alignas(16) uint8_t buffer[4*sizeof(__m128i)];
 		const __m128 zero = _mm_setzero_ps();
 		_mm_store_ps(reinterpret_cast<float *>(buffer), zero);
-		_mm_store_ps(reinterpret_cast<float *>((buffer) + sizeof(__m128)), zero);
-		_mm_store_ps(reinterpret_cast<float *>((buffer) + 2*sizeof(__m128)), zero);
-		_mm_store_ps(reinterpret_cast<float *>((buffer) + 3*sizeof(__m128)), zero);
+		_mm_store_ps(reinterpret_cast<float *>(buffer + sizeof(__m128)), zero);
+		_mm_store_ps(reinterpret_cast<float *>(buffer + 2*sizeof(__m128)), zero);
+		_mm_store_ps(reinterpret_cast<float *>(buffer + 3*sizeof(__m128)), zero);
 		__movsb(buffer, ptr, end - ptr);
 
 		const __m128i chunk1 = _mm_load_si128(reinterpret_cast<__m128i *>(buffer));
@@ -710,7 +710,7 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus &status) no
 		uint8_t buffer[2*sizeof(__m128i)];
 		const __m128 zero = _mm_setzero_ps();
 		_mm_storeu_ps(reinterpret_cast<float *>(buffer), zero);
-		_mm_storeu_ps(reinterpret_cast<float *>((buffer) + sizeof(__m128)), zero);
+		_mm_storeu_ps(reinterpret_cast<float *>(buffer + sizeof(__m128)), zero);
 		__movsb(buffer, ptr, end - ptr);
 
 		const __m128i chunk1 = _mm_loadu_si128(reinterpret_cast<__m128i *>(buffer));
