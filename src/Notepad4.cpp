@@ -3011,7 +3011,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_ENCODING_SETDEFAULT:
-		SelectDefEncodingDlg(hwnd, &iDefaultEncoding);
+		SelectDefEncodingDlg(hwnd);
 		break;
 
 	case IDM_LINEENDINGS_CRLF:

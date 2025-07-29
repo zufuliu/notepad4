@@ -46,7 +46,7 @@ bool	ColumnWrapDlg(HWND hwnd) noexcept;
 bool	WordWrapSettingsDlg(HWND hwnd) noexcept;
 bool	LongLineSettingsDlg(HWND hwnd) noexcept;
 bool	TabSettingsDlg(HWND hwnd) noexcept;
-bool	SelectDefEncodingDlg(HWND hwnd, int *pidREncoding) noexcept;
+bool	SelectDefEncodingDlg(HWND hwnd) noexcept;
 bool	SelectEncodingDlg(HWND hwnd, int *pidREncoding, UINT uidLabel) noexcept;
 bool	SelectDefLineEndingDlg(HWND hwnd) noexcept;
 

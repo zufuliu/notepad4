@@ -39,6 +39,7 @@
 
 extern HWND		hwndMain;
 extern DWORD	dwLastIOError;
+extern int		iDefaultEncoding;
 extern int		iCurrentEncoding;
 extern bool		bSkipUnicodeDetection;
 extern bool		bLoadANSIasUTF8;
@@ -1393,7 +1394,6 @@ static INT_PTR CALLBACK ColumnWrapDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
 		const int column = iWrapColumn ? iWrapColumn : fvCurFile.iLongLinesLimit;
 
 		SetDlgItemInt(hwnd, IDC_COLUMNWRAP, column, FALSE);
@@ -1845,9 +1845,7 @@ struct ENCODEDLG {
 static INT_PTR CALLBACK SelectDefEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
-
-		const int iEncoding = *(AsPointer<int *>(lParam));
+		const int iEncoding = iDefaultEncoding;
 		Encoding_GetLabel(iEncoding);
 		SetDlgItemText(hwnd, IDC_ENCODING_LABEL, mEncoding[iEncoding].wchLabel);
 
@@ -1880,10 +1878,10 @@ static INT_PTR CALLBACK SelectDefEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 		case NM_CLICK:
 		case NM_RETURN:
 			if (pnmhdr->idFrom == IDC_ENCODING_LINK) {
-				int *pidREncoding = AsPointer<int *>(GetWindowLongPtr(hwnd, DWLP_USER));
-				if (SelectEncodingDlg(hwndMain, pidREncoding, IDS_SELRECT_DEFAULT_ENCODING)) {
-					Encoding_GetLabel(*pidREncoding);
-					SetDlgItemText(hwnd, IDC_ENCODING_LABEL, mEncoding[*pidREncoding].wchLabel);
+				if (SelectEncodingDlg(hwndMain, &iDefaultEncoding, IDS_SELRECT_DEFAULT_ENCODING)) {
+					const int iEncoding = iDefaultEncoding;
+					Encoding_GetLabel(iEncoding);
+					SetDlgItemText(hwnd, IDC_ENCODING_LABEL, mEncoding[iEncoding].wchLabel);
 				}
 			}
 			break;
@@ -1916,8 +1914,8 @@ static INT_PTR CALLBACK SelectDefEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 //
 // SelectDefEncodingDlg()
 //
-bool SelectDefEncodingDlg(HWND hwnd, int *pidREncoding) noexcept {
-	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_DEFENCODING), hwnd, SelectDefEncodingDlgProc, AsInteger<LPARAM>(pidREncoding));
+bool SelectDefEncodingDlg(HWND hwnd) noexcept {
+	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_DEFENCODING), hwnd, SelectDefEncodingDlgProc, 0);
 	return iResult == IDOK;
 }
 
