@@ -7229,8 +7229,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 			// diff/patch file may contain content from files with different line endings.
 			status.bLineEndingsDefaultNo = bUnknownFile || pLexCurrent->iLexer == SCLEX_DIFF;
 			if (WarnLineEndingDlg(hwndMain, &status)) {
-				const int iNewEOLMode = GetScintillaEOLMode(status.iEOLMode);
-				ConvertLineEndings(iNewEOLMode);
+				ConvertLineEndings(status.iEOLMode);
 			}
 		}
 	} else if (!status.bFileTooBig) {

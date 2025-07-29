@@ -2139,16 +2139,16 @@ static INT_PTR CALLBACK WarnLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
 		const EditFileIOStatus * const status = AsPointer<EditFileIOStatus *>(lParam);
-		const int iEOLMode = GetSettingsEOLMode(status->iEOLMode);
 
 		// Load options
 		HWND hwndCtl = GetDlgItem(hwnd, IDC_EOLMODELIST);
 		WCHAR wch[128];
 		for (int i = 0; i < 3; i++) {
-			GetString(IDS_EOLMODENAME_CRLF + i, wch, COUNTOF(wch));
+			GetString(IDS_EOLMODENAME_CRLF + GetScintillaEOLMode(i), wch, COUNTOF(wch));
 			ComboBox_AddString(hwndCtl, wch);
 		}
 
+		const int iEOLMode = GetSettingsEOLMode(status->iEOLMode);
 		ComboBox_SetCurSel(hwndCtl, iEOLMode);
 		ComboBox_SetExtendedUI(hwndCtl, TRUE);
 
@@ -2176,7 +2176,7 @@ static INT_PTR CALLBACK WarnLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 		case IDOK: {
 			EditFileIOStatus *status = AsPointer<EditFileIOStatus *>(GetWindowLongPtr(hwnd, DWLP_USER));
 			const int iEOLMode = static_cast<int>(SendDlgItemMessage(hwnd, IDC_EOLMODELIST, CB_GETCURSEL, 0, 0));
-			status->iEOLMode = iEOLMode;
+			status->iEOLMode = GetScintillaEOLMode(iEOLMode);
 			bWarnLineEndings = IsButtonChecked(hwnd, IDC_WARNINCONSISTENTEOLS);
 			EndDialog(hwnd, IDOK);
 		}
