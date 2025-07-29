@@ -483,10 +483,6 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus &status) no
 	size_t lineCountCRLF = 0;
 	size_t lineCountCR = 0;
 	size_t lineCountLF = 0;
-#if 0
-	StopWatch watch;
-	watch.Start();
-#endif
 
 	const uint8_t *ptr = reinterpret_cast<const uint8_t *>(lpData);
 	// No NULL-terminated requirement for *ptr == '\n'
@@ -802,10 +798,11 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus &status) no
 #endif
 
 	const size_t linesMax = max(max(lineCountCRLF, lineCountCR), lineCountLF);
-	// values must kept in same order as SC_EOL_CRLF, SC_EOL_CR, SC_EOL_LF
-	const size_t linesCount[3] = { lineCountCRLF, lineCountCR, lineCountLF };
+	status.linesCount[SC_EOL_CRLF] = lineCountCRLF;
+	status.linesCount[SC_EOL_CR] = lineCountCR;
+	status.linesCount[SC_EOL_LF] = lineCountLF;
 	int iEOLMode = status.iEOLMode;
-	if (linesMax != linesCount[iEOLMode]) {
+	if (linesMax != static_cast<size_t>(status.linesCount[iEOLMode])) {
 		if (linesMax == lineCountCRLF) {
 			iEOLMode = SC_EOL_CRLF;
 		} else if (linesMax == lineCountLF) {
@@ -815,18 +812,9 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus &status) no
 		}
 	}
 
-#if 0
-	watch.Stop();
-	watch.ShowLog("EOL time");
-	printf("%s CR+LF:%u, LF: %u, CR: %u\n", __func__, (UINT)lineCountCRLF, (UINT)lineCountLF, (UINT)lineCountCR);
-#endif
-
 	status.iEOLMode = iEOLMode;
 	status.bInconsistent = ((!!lineCountCRLF) + (!!lineCountCR) + (!!lineCountLF)) > 1;
 	status.totalLineCount = lineCountCRLF + lineCountCR + lineCountLF + 1;
-	status.linesCount[0] = lineCountCRLF;
-	status.linesCount[1] = lineCountLF;
-	status.linesCount[2] = lineCountCR;
 }
 
 void EditDetectIndentation(LPCSTR lpData, DWORD cbData, EditFileVars &fv) noexcept {
@@ -1133,7 +1121,12 @@ bool EditLoadFile(LPWSTR pszFile, EditFileIOStatus &status) noexcept {
 	}
 
 	if (cbData) {
+		// StopWatch watch;
+		// watch.Start();
 		EditDetectEOLMode(lpDataUTF8, cbData, status);
+		// watch.Stop();
+		// watch.ShowLog("EOL time");
+		// printf("CR+LF: %zd, LF: %zd, CR: %zd\n", status.linesCount[SC_EOL_CRLF], status.linesCount[SC_EOL_LF], status.linesCount[SC_EOL_CR]);
 		EditDetectIndentation(lpDataUTF8, cbData, fvCurFile);
 	}
 	SciCall_SetCodePage((uFlags & NCP_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8);

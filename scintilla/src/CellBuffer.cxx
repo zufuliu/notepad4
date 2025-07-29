@@ -443,7 +443,10 @@ const char *CellBuffer::InsertString(Sci::Position position, const char *s, Sci:
 			data = uh->AppendAction(ActionType::insert, position, s, insertLength, startSequence);
 		}
 
+		// const ElapsedPeriod period;
 		BasicInsertString(position, s, insertLength);
+		// const double duration = period.Duration()*1e3;
+		// printf("%s duration=%.6f\n", __func__, duration);
 		if (changeHistory) {
 			changeHistory->Insert(position, insertLength, collectingUndo, uh->BeforeReachableSavePoint());
 		}

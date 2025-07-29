@@ -139,8 +139,8 @@
 // Inconsistent Line Endings
 #define IDD_WARNLINEENDS				129
 #define IDC_EOL_SUM_CRLF				102
-#define IDC_EOL_SUM_LF					103
-#define IDC_EOL_SUM_CR					104
+#define IDC_EOL_SUM_CR					103
+#define IDC_EOL_SUM_LF					104
 // Goto
 #define IDD_LINENUM						117
 #define IDC_LINENUM						100
@@ -924,8 +924,8 @@
 #define IDS_WIKI_SEARCH_URL				50046
 
 #define IDS_EOLMODENAME_CRLF			62000
-#define IDS_EOLMODENAME_LF				62001
-#define IDS_EOLMODENAME_CR				62002
+#define IDS_EOLMODENAME_CR				62001
+#define IDS_EOLMODENAME_LF				62002
 // title for IDD_STYLECONFIG
 #define IDS_CONFIG_THEME_TITLE_DEFAULT	62003
 #define IDS_CONFIG_THEME_TITLE_DARK		62004

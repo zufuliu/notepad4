@@ -242,7 +242,7 @@ struct EditFileIOStatus {
 	bool bLineEndingsDefaultNo; // set default button to "No"
 	bool bInconsistent;	// load output
 	Sci_Line totalLineCount; // load output, sum(linesCount) + 1
-	Sci_Line linesCount[3];	// load output: CR+LF, LF, CR
+	Sci_Line linesCount[3];	// load output: CR+LF, CR, LF
 };
 
 enum FileLoadFlag {
