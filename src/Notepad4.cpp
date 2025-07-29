@@ -3023,7 +3023,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	break;
 
 	case IDM_LINEENDINGS_SETDEFAULT:
-		SelectDefLineEndingDlg(hwnd, &iDefaultEOLMode);
+		SelectDefLineEndingDlg(hwnd);
 		break;
 
 	case IDT_EDIT_UNDO:

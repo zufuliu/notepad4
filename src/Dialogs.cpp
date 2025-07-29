@@ -46,6 +46,7 @@ extern bool		bLoadASCIIasUTF8;
 extern bool		bLoadNFOasOEM;
 extern bool		fNoFileVariables;
 extern bool		bNoEncodingTags;
+extern int		iDefaultEOLMode;
 extern bool		bWarnLineEndings;
 extern bool		bFixLineEndings;
 extern bool		bAutoStripBlanks;
@@ -2075,20 +2076,19 @@ bool SelectEncodingDlg(HWND hwnd, int *pidREncoding, UINT uidLabel) noexcept {
 // SelectDefLineEndingDlgProc()
 //
 static INT_PTR CALLBACK SelectDefLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
+	UNREFERENCED_PARAMETER(lParam);
+
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
-		const int iOption = *(AsPointer<int *>(lParam));
-
 		// Load options
 		HWND hwndCtl = GetDlgItem(hwnd, IDC_EOLMODELIST);
 		WCHAR wch[128];
 		for (int i = 0; i < 3; i++) {
-			GetString(IDS_EOLMODENAME_CRLF + i, wch, COUNTOF(wch));
+			GetString(IDS_EOLMODENAME_CRLF + GetScintillaEOLMode(i), wch, COUNTOF(wch));
 			ComboBox_AddString(hwndCtl, wch);
 		}
 
-		ComboBox_SetCurSel(hwndCtl, iOption);
+		ComboBox_SetCurSel(hwndCtl, iDefaultEOLMode);
 		ComboBox_SetExtendedUI(hwndCtl, TRUE);
 
 		if (bWarnLineEndings) {
@@ -2110,8 +2110,7 @@ static INT_PTR CALLBACK SelectDefLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM 
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDOK: {
-			int *piOption = AsPointer<int *>(GetWindowLongPtr(hwnd, DWLP_USER));
-			*piOption = static_cast<int>(SendDlgItemMessage(hwnd, IDC_EOLMODELIST, CB_GETCURSEL, 0, 0));
+			iDefaultEOLMode = static_cast<int>(SendDlgItemMessage(hwnd, IDC_EOLMODELIST, CB_GETCURSEL, 0, 0));
 			bWarnLineEndings = IsButtonChecked(hwnd, IDC_WARNINCONSISTENTEOLS);
 			bFixLineEndings = IsButtonChecked(hwnd, IDC_CONSISTENTEOLS);
 			bAutoStripBlanks = IsButtonChecked(hwnd, IDC_AUTOSTRIPBLANKS);
@@ -2132,8 +2131,8 @@ static INT_PTR CALLBACK SelectDefLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM 
 //
 // SelectDefLineEndingDlg()
 //
-bool SelectDefLineEndingDlg(HWND hwnd, int *iOption) noexcept {
-	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_DEFEOLMODE), hwnd, SelectDefLineEndingDlgProc, AsInteger<LPARAM>(iOption));
+bool SelectDefLineEndingDlg(HWND hwnd) noexcept {
+	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_DEFEOLMODE), hwnd, SelectDefLineEndingDlgProc, 0);
 	return iResult == IDOK;
 }
 
