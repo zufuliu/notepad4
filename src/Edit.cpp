@@ -495,8 +495,8 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus &status) no
 #if NP2_USE_AVX2
 	const __m256i vectCR = _mm256_set1_epi8('\r');
 	const __m256i vectLF = _mm256_set1_epi8('\n');
-	while (ptr + 2*sizeof(__m256i) < end) {
-		// unaligned loading: line starts at random position.
+	uint8_t lastCR = 0;
+	while (ptr + 2*sizeof(__m256i) <= end) {
 		const __m256i chunk1 = _mm256_loadu_si256(reinterpret_cast<const __m256i *>(ptr));
 		const __m256i chunk2 = _mm256_loadu_si256(reinterpret_cast<const __m256i *>(ptr + sizeof(__m256i)));
 		ptr += 2*sizeof(__m256i);
@@ -505,16 +505,8 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus &status) no
 		maskLF |= static_cast<uint64_t>(mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk2, vectLF))) << sizeof(__m256i);
 		maskCR |= static_cast<uint64_t>(mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk2, vectCR))) << sizeof(__m256i);
 
-		if (maskCR) {
-			if (_addcarry_u64(0, maskCR, maskCR, &maskCR)) {
-				if (*ptr == '\n') {
-					// CR+LF across boundary
-					++ptr;
-					++lineCountCRLF;
-				} else {
-					++lineCountCR;
-				}
-			}
+		if (maskCR | lastCR) {
+			lastCR = _addcarry_u64(lastCR, maskCR, maskCR, &maskCR);
 
 			// maskCR and maskLF never have some bit set, after shifting maskCR by 1 bit,
 			// the bits both set in maskCR and maskLF represents CR+LF;
@@ -549,9 +541,11 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus &status) no
 		maskLF |= static_cast<uint64_t>(mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk2, vectLF))) << sizeof(__m256i);
 		maskCR |= static_cast<uint64_t>(mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk2, vectCR))) << sizeof(__m256i);
 
-		if (maskCR) {
-			const uint8_t lastCR = _addcarry_u64(0, maskCR, maskCR, &maskCR);
+		if (maskCR | lastCR) {
+			lastCR = _addcarry_u64(lastCR, maskCR, maskCR, &maskCR);
 			_addcarry_u64(lastCR, lineCountCR, 0, &lineCountCR);
+			lastCR = 0;
+
 			const uint64_t maskCRLF = maskCR & maskLF; // CR+LF
 			const uint64_t maskCR_LF = maskCR ^ maskLF;// CR alone or LF alone
 			maskLF = maskCR_LF & maskLF; // LF alone
@@ -567,13 +561,14 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus &status) no
 			lineCountLF += np2_popcount64(maskLF);
 		}
 	}
+	lineCountCR += lastCR;
 	// end NP2_USE_AVX2
 #elif NP2_USE_SSE2
 #if defined(_WIN64)
 	const __m128i vectCR = _mm_set1_epi8('\r');
 	const __m128i vectLF = _mm_set1_epi8('\n');
-	while (ptr + 4*sizeof(__m128i) < end) {
-		// unaligned loading: line starts at random position.
+	uint8_t lastCR = 0;
+	while (ptr + 4*sizeof(__m128i) <= end) {
 		const __m128i chunk1 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(ptr));
 		const __m128i chunk2 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(ptr + sizeof(__m128i)));
 		const __m128i chunk3 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(ptr + 2*sizeof(__m128i)));
@@ -588,16 +583,8 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus &status) no
 		maskLF |= static_cast<uint64_t>(mm_movemask_epi8(_mm_cmpeq_epi8(chunk4, vectLF))) << 3*sizeof(__m128i);
 		maskCR |= static_cast<uint64_t>(mm_movemask_epi8(_mm_cmpeq_epi8(chunk4, vectCR))) << 3*sizeof(__m128i);
 
-		if (maskCR) {
-			if (_addcarry_u64(0, maskCR, maskCR, &maskCR)) {
-				if (*ptr == '\n') {
-					// CR+LF across boundary
-					++ptr;
-					++lineCountCRLF;
-				} else {
-					++lineCountCR;
-				}
-			}
+		if (maskCR | lastCR) {
+			lastCR = _addcarry_u64(lastCR, maskCR, maskCR, &maskCR);
 
 			// maskCR and maskLF never have some bit set, after shifting maskCR by 1 bit,
 			// the bits both set in maskCR and maskLF represents CR+LF;
@@ -640,9 +627,11 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus &status) no
 		maskLF |= static_cast<uint64_t>(mm_movemask_epi8(_mm_cmpeq_epi8(chunk4, vectLF))) << 3*sizeof(__m128i);
 		maskCR |= static_cast<uint64_t>(mm_movemask_epi8(_mm_cmpeq_epi8(chunk4, vectCR))) << 3*sizeof(__m128i);
 
-		if (maskCR) {
-			const uint8_t lastCR = _addcarry_u64(0, maskCR, maskCR, &maskCR);
+		if (maskCR | lastCR) {
+			lastCR = _addcarry_u64(lastCR, maskCR, maskCR, &maskCR);
 			_addcarry_u64(lastCR, lineCountCR, 0, &lineCountCR);
+			lastCR = 0;
+
 			const uint64_t maskCRLF = maskCR & maskLF; // CR+LF
 			const uint64_t maskCR_LF = maskCR ^ maskLF;// CR alone or LF alone
 			maskLF = maskCR_LF & maskLF; // LF alone
@@ -658,12 +647,13 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus &status) no
 			lineCountLF += np2_popcount64(maskLF);
 		}
 	}
+	lineCountCR += lastCR;
 	// end _WIN64 NP2_USE_SSE2
 #else
 	const __m128i vectCR = _mm_set1_epi8('\r');
 	const __m128i vectLF = _mm_set1_epi8('\n');
+	// not accumulate lastCR due to less register on x86
 	while (ptr + 2*sizeof(__m128i) < end) {
-		// unaligned loading: line starts at random position.
 		const __m128i chunk1 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(ptr));
 		const __m128i chunk2 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(ptr + sizeof(__m128i)));
 		ptr += 2*sizeof(__m128i);
@@ -719,6 +709,7 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus &status) no
 		if (maskCR) {
 			const uint8_t lastCR = _addcarry_u32(0, maskCR, maskCR, &maskCR);
 			_addcarry_u32(lastCR, lineCountCR, 0, &lineCountCR);
+
 			const uint32_t maskCRLF = maskCR & maskLF; // CR+LF
 			const uint32_t maskCR_LF = maskCR ^ maskLF;// CR alone or LF alone
 			maskLF = maskCR_LF & maskLF; // LF alone
