@@ -844,6 +844,12 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 		const __m256i vectCR = _mm256_set1_epi8('\r');
 		const __m256i vectLF = _mm256_set1_epi8('\n');
 		do {
+			if (nPositions >= PositionBlockSize - 2*sizeof(__m256i) - 1) {
+				plv->InsertLines(lineInsert, positions, nPositions, atLineStart);
+				lineInsert += nPositions;
+				nPositions = 0;
+			}
+
 			bool lastCR = false;
 			const __m256i chunk1 = _mm256_loadu_si256(reinterpret_cast<const __m256i *>(ptr));
 			const __m256i chunk2 = _mm256_loadu_si256(reinterpret_cast<const __m256i *>(ptr + sizeof(__m256i)));
@@ -865,12 +871,6 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 				maskLF |= maskCRLF | ((maskCR_LF ^ maskLF) >> 1);
 			}
 			if (maskLF) {
-				if (nPositions >= PositionBlockSize - 2*sizeof(__m256i)) {
-					plv->InsertLines(lineInsert, positions, nPositions, atLineStart);
-					lineInsert += nPositions;
-					nPositions = 0;
-				}
-
 				Sci::Position offset = position + ptr - s;
 				do {
 					const uint64_t trailing = np2::ctz(maskLF);
@@ -888,11 +888,6 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 					// CR+LF across boundary
 					++ptr;
 				}
-				if (nPositions == PositionBlockSize) {
-					plv->InsertLines(lineInsert, positions, nPositions, atLineStart);
-					lineInsert += nPositions;
-					nPositions = 0;
-				}
 				positions[nPositions++] = position + ptr - s;
 			}
 		} while (ptr + 2*sizeof(__m256i) <= end);
@@ -904,8 +899,13 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 		const __m128i vectCR = _mm_set1_epi8('\r');
 		const __m128i vectLF = _mm_set1_epi8('\n');
 		do {
+			if (nPositions >= PositionBlockSize - 4*sizeof(__m128i) - 1) {
+				plv->InsertLines(lineInsert, positions, nPositions, atLineStart);
+				lineInsert += nPositions;
+				nPositions = 0;
+			}
+
 			bool lastCR = false;
-			// unaligned loading: line starts at random position.
 			const __m128i chunk1 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(ptr));
 			const __m128i chunk2 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(ptr + sizeof(__m128i)));
 			const __m128i chunk3 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(ptr + 2*sizeof(__m128i)));
@@ -932,17 +932,11 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 				maskLF |= maskCRLF | ((maskCR_LF ^ maskLF) >> 1);
 			}
 			if (maskLF) {
-				if (nPositions >= PositionBlockSize - 4*sizeof(__m128i)) {
-					plv->InsertLines(lineInsert, positions, nPositions, atLineStart);
-					lineInsert += nPositions;
-					nPositions = 0;
-				}
-
 				Sci::Position offset = position + ptr - s;
 				do {
 					const uint64_t trailing = np2::ctz(maskLF);
 					maskLF >>= trailing;
-					//! shift 32 bit is undefined behavior.
+					//! shift 64 bit is undefined behavior.
 					maskLF >>= 1;
 					offset += trailing + 1;
 					positions[nPositions++] = offset;
@@ -955,11 +949,6 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 					// CR+LF across boundary
 					++ptr;
 				}
-				if (nPositions == PositionBlockSize) {
-					plv->InsertLines(lineInsert, positions, nPositions, atLineStart);
-					lineInsert += nPositions;
-					nPositions = 0;
-				}
 				positions[nPositions++] = position + ptr - s;
 			}
 		} while (ptr + 4*sizeof(__m128i) <= end);
@@ -970,8 +959,13 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 		const __m128i vectCR = _mm_set1_epi8('\r');
 		const __m128i vectLF = _mm_set1_epi8('\n');
 		do {
+			if (nPositions >= PositionBlockSize - 2*sizeof(__m128i) - 1) {
+				plv->InsertLines(lineInsert, positions, nPositions, atLineStart);
+				lineInsert += nPositions;
+				nPositions = 0;
+			}
+
 			bool lastCR = false;
-			// unaligned loading: line starts at random position.
 			const __m128i chunk1 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(ptr));
 			const __m128i chunk2 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(ptr + sizeof(__m128i)));
 			uint32_t maskCR = mm_movemask_epi8(_mm_cmpeq_epi8(chunk1, vectCR));
@@ -992,12 +986,6 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 				maskLF |= maskCRLF | ((maskCR_LF ^ maskLF) >> 1);
 			}
 			if (maskLF) {
-				if (nPositions >= PositionBlockSize - 2*sizeof(__m128i)) {
-					plv->InsertLines(lineInsert, positions, nPositions, atLineStart);
-					lineInsert += nPositions;
-					nPositions = 0;
-				}
-
 				Sci::Position offset = position + ptr - s;
 				do {
 					const uint32_t trailing = np2::ctz(maskLF);
@@ -1014,11 +1002,6 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 				if (*ptr == '\n') {
 					// CR+LF across boundary
 					++ptr;
-				}
-				if (nPositions == PositionBlockSize) {
-					plv->InsertLines(lineInsert, positions, nPositions, atLineStart);
-					lineInsert += nPositions;
-					nPositions = 0;
 				}
 				positions[nPositions++] = position + ptr - s;
 			}
