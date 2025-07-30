@@ -1658,14 +1658,14 @@ bool z_validate_vec_avx2(__m256i bytes, __m256i shifted_bytes, uint32_t *last_co
 	return true;
 }
 
-static inline bool z_validate_utf8_avx2(const char *data, uint32_t len) noexcept {
+bool IsUTF8(const char *data, DWORD length) noexcept {
 	// Keep continuation bits from the previous iteration that carry over to
 	// each input chunk vector
 	uint32_t last_cont = 0;
 
 	uint32_t offset = 0;
 	// Deal with the input up until the last section of bytes
-	if (len >= sizeof(__m256i)) {
+	if (length >= sizeof(__m256i)) {
 		// We need a vector of the input byte stream shifted forward one byte.
 		// Since we don't want to read the memory before the data pointer
 		// (which might not even be mapped), for the first chunk of input just
@@ -1677,7 +1677,7 @@ static inline bool z_validate_utf8_avx2(const char *data, uint32_t len) noexcept
 
 		// Loop over input in sizeof(__m256i)-byte chunks, as long as we can safely read
 		// that far into memory
-		for (; offset + sizeof(__m256i) < len; offset += sizeof(__m256i)) {
+		for (; offset + sizeof(__m256i) < length; offset += sizeof(__m256i)) {
 			const __m256i bytes = _mm256_loadu_si256(reinterpret_cast<const __m256i *>(data + offset));
 			if (!z_validate_vec_avx2(bytes, shifted_bytes, &last_cont)) {
 				return false;
@@ -1687,8 +1687,8 @@ static inline bool z_validate_utf8_avx2(const char *data, uint32_t len) noexcept
 	}
 
 	// Deal with any bytes remaining. Rather than making a separate scalar path,
-	// just fill in a buffer, reading bytes only up to len, and load from that.
-	if (offset < len) {
+	// just fill in a buffer, reading bytes only up to length, and load from that.
+	if (offset < length) {
 		uint8_t buffer[sizeof(__m256i) + 1];
 		_mm256_storeu_si256(reinterpret_cast<__m256i *>(buffer), _mm256_setzero_si256());
 		buffer[sizeof(__m256i)] = 0;
@@ -1696,7 +1696,7 @@ static inline bool z_validate_utf8_avx2(const char *data, uint32_t len) noexcept
 		if (offset != 0) {
 			buffer[0] = data[offset - 1];
 		}
-		__movsb(buffer + 1, reinterpret_cast<const uint8_t *>(data + offset), len - offset);
+		__movsb(buffer + 1, reinterpret_cast<const uint8_t *>(data + offset), length - offset);
 
 		const __m256i shifted_bytes = _mm256_loadu_si256(reinterpret_cast<__m256i *>(buffer));
 		const __m256i bytes = _mm256_loadu_si256(reinterpret_cast<__m256i *>(buffer + 1));
@@ -1814,14 +1814,14 @@ bool z_validate_vec_sse4(__m128i bytes, __m128i shifted_bytes, uint32_t *last_co
 #if defined(__GNUC__) || defined(__clang__)
 __attribute__((__target__("ssse3")))
 #endif
-static inline bool z_validate_utf8_sse4(const char *data, uint32_t len) noexcept {
+static inline bool z_validate_utf8_sse4(const char *data, DWORD length) noexcept {
 	// Keep continuation bits from the previous iteration that carry over to
 	// each input chunk vector
 	uint32_t last_cont = 0;
 
 	uint32_t offset = 0;
 	// Deal with the input up until the last section of bytes
-	if (len >= sizeof(__m128i)) {
+	if (length >= sizeof(__m128i)) {
 		// We need a vector of the input byte stream shifted forward one byte.
 		// Since we don't want to read the memory before the data pointer
 		// (which might not even be mapped), for the first chunk of input just
@@ -1832,7 +1832,7 @@ static inline bool z_validate_utf8_sse4(const char *data, uint32_t len) noexcept
 
 		// Loop over input in sizeof(__m128i)-byte chunks, as long as we can safely read
 		// that far into memory
-		for (; offset + sizeof(__m128i) < len; offset += sizeof(__m128i)) {
+		for (; offset + sizeof(__m128i) < length; offset += sizeof(__m128i)) {
 			const __m128i bytes = _mm_loadu_si128(reinterpret_cast<const __m128i *>(data + offset));
 			if (!z_validate_vec_sse4(bytes, shifted_bytes, &last_cont)) {
 				return false;
@@ -1842,8 +1842,8 @@ static inline bool z_validate_utf8_sse4(const char *data, uint32_t len) noexcept
 	}
 
 	// Deal with any bytes remaining. Rather than making a separate scalar path,
-	// just fill in a buffer, reading bytes only up to len, and load from that.
-	if (offset < len) {
+	// just fill in a buffer, reading bytes only up to length, and load from that.
+	if (offset < length) {
 		uint8_t buffer[sizeof(__m128i) + 1];
 		_mm_storeu_ps(reinterpret_cast<float *>(buffer), _mm_setzero_ps());
 		buffer[sizeof(__m128i)] = 0;
@@ -1851,7 +1851,7 @@ static inline bool z_validate_utf8_sse4(const char *data, uint32_t len) noexcept
 		if (offset != 0) {
 			buffer[0] = data[offset - 1];
 		}
-		__movsb(buffer + 1, reinterpret_cast<const uint8_t *>(data + offset), len - offset);
+		__movsb(buffer + 1, reinterpret_cast<const uint8_t *>(data + offset), length - offset);
 
 		const __m128i shifted_bytes = _mm_loadu_si128(reinterpret_cast<__m128i *>(buffer));
 		const __m128i bytes = _mm_loadu_si128(reinterpret_cast<__m128i *>(buffer + 1));
@@ -1875,30 +1875,11 @@ static inline int did_cpu_supports_ssse3() noexcept {
 // Copyright (c) 2008-2010 Bjoern Hoehrmann <bjoern@hoehrmann.de>
 // See https://bjoern.hoehrmann.de/utf-8/decoder/dfa/ for details.
 
-bool IsUTF8(const char *pTest, DWORD nLength) noexcept {
-#if 0
-	StopWatch watch;
-	watch.Start();
-#endif
-
-#if NP2_USE_AVX2
-	const bool result = z_validate_utf8_avx2(pTest, nLength);
-#if 0
-	watch.Stop();
-	watch.ShowLog("UTF8 time");
-#endif
-	return result;
-	// end NP2_USE_AVX2
-#else
-
+#if !NP2_USE_AVX2
+bool IsUTF8(const char *data, DWORD length) noexcept {
 #if NP2_USE_SSE2
 	if (did_cpu_supports_ssse3()) {
-		const bool result = z_validate_utf8_sse4(pTest, nLength);
-#if 0
-		watch.Stop();
-		watch.ShowLog("UTF8 time");
-#endif
-		return result;
+		return z_validate_utf8_sse4(data, length);
 	}
 #endif // NP2_USE_SSE2
 
@@ -1907,7 +1888,7 @@ bool IsUTF8(const char *pTest, DWORD nLength) noexcept {
 		UTF8_REJECT = 12,
 	};
 
-	static const uint8_t utf8_dfa[] = {
+	static constexpr uint8_t utf8_dfa[] = {
 		// The first part of the table maps bytes to character classes that
 		// to reduce the size of the transition table and create bitmasks.
 		 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -1928,8 +1909,8 @@ bool IsUTF8(const char *pTest, DWORD nLength) noexcept {
 		12,36,12,12,12,12,12,12,12,12,12,12,
 	};
 
-	const uint8_t *pt = reinterpret_cast<const uint8_t *>(pTest);
-	const uint8_t * const end = pt + nLength;
+	const uint8_t *pt = reinterpret_cast<const uint8_t *>(data);
+	const uint8_t * const end = pt + length;
 	UINT state = UTF8_ACCEPT;
 
 #if 0 // NP2_USE_AVX2
@@ -2045,14 +2026,9 @@ bool IsUTF8(const char *pTest, DWORD nLength) noexcept {
 		state = utf8_dfa[256 + state + utf8_dfa[*pt++]];
 	}
 
-#if 0
-	watch.Stop();
-	watch.ShowLog("UTF8 time");
-#endif
-
 	return state == UTF8_ACCEPT;
-#endif // !NP2_USE_AVX2
 }
+#endif // !NP2_USE_AVX2
 
 static const char *CheckUTF7(const char *pTest, DWORD nLength) noexcept {
 	const char *pt = pTest;
@@ -2408,9 +2384,15 @@ int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, int *enco
 	const DWORD multiLen = static_cast<DWORD>(lpData + cbData - multiData);
 	//printf("%s initial ASCII: %u=%u - %u\n", __func__, (unsigned)(cbData - multiLen), (unsigned)cbData, (unsigned)multiLen);
 	// prefer UTF-8 when no encoding specified
+	// StopWatch watch;
+	// watch.Start();
 	if (IsUTF8(multiData, multiLen)) {
+		// watch.Stop();
+		// watch.ShowLog("UTF8 time");
 		return CPI_UTF8;
 	}
+	// watch.Stop();
+	// watch.ShowLog("UTF8 time");
 
 	// brute force test other encoding
 	const int encodings[4] = {
