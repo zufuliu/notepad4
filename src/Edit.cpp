@@ -1035,9 +1035,10 @@ bool EditLoadFile(LPWSTR pszFile, EditFileIOStatus &status) noexcept {
 		return false;
 	}
 
-	char *lpData = static_cast<char *>(NP2HeapAlloc(static_cast<size_t>(fileSize.QuadPart) + NP2_ENCODING_DETECTION_PADDING));
+	char *lpData = static_cast<char *>(NP2HeapAlloc(static_cast<size_t>(fileSize.QuadPart) + NP2_ENCODING_DETECTION_PADDING*2));
+	char *lpDataUTF8 = reinterpret_cast<char *>(NP2_align_up(reinterpret_cast<uintptr_t>(lpData), NP2_ENCODING_DETECTION_PADDING));
 	DWORD cbData = 0;
-	const BOOL bReadSuccess = ReadFile(hFile, lpData, static_cast<DWORD>(fileSize.QuadPart), &cbData, nullptr);
+	const BOOL bReadSuccess = ReadFile(hFile, lpDataUTF8, static_cast<DWORD>(fileSize.QuadPart), &cbData, nullptr);
 	dwLastIOError = GetLastError();
 	CloseHandle(hFile);
 
@@ -1051,7 +1052,7 @@ bool EditLoadFile(LPWSTR pszFile, EditFileIOStatus &status) noexcept {
 	status.totalLineCount = 1;
 
 	int encodingFlag = EncodingFlag_None;
-	int iEncoding = EditDetermineEncoding(pszFile, lpData, cbData, &encodingFlag);
+	int iEncoding = EditDetermineEncoding(pszFile, lpDataUTF8, cbData, &encodingFlag);
 	if (iEncoding == CPI_DEFAULT && encodingFlag == EncodingFlag_UTF7) {
 		iEncoding = Encoding_GetAnsiIndex();
 	}
@@ -1067,20 +1068,20 @@ bool EditLoadFile(LPWSTR pszFile, EditFileIOStatus &status) noexcept {
 		return true;
 	}
 
-	char *lpDataUTF8 = lpData;
 	if (uFlags & NCP_UNICODE) {
-		// cbData/2 => WCHAR, WCHAR*3 => UTF-8
-		lpDataUTF8 = static_cast<char *>(NP2HeapAlloc((cbData + 1)*sizeof(WCHAR)));
-		LPCWSTR pszTextW = (uFlags & NCP_UNICODE_BOM) ? (reinterpret_cast<LPWSTR>(lpData) + 1) : reinterpret_cast<LPWSTR>(lpData);
+		LPCWSTR pszTextW = (uFlags & NCP_UNICODE_BOM) ? (reinterpret_cast<LPWSTR>(lpDataUTF8) + 1) : reinterpret_cast<LPWSTR>(lpDataUTF8);
 		// NOTE: requires two extra trailing NULL bytes.
 		const DWORD cchTextW = (uFlags & NCP_UNICODE_BOM) ? (cbData / sizeof(WCHAR)) : ((cbData / sizeof(WCHAR)) + 1);
 		if ((uFlags & NCP_UNICODE_REVERSE) != 0 && encodingFlag != EncodingFlag_Reversed) {
-			_swab(lpData, lpData, cbData);
+			_swab(lpDataUTF8, lpDataUTF8, cbData);
 		}
-		cbData = WideCharToMultiByte(CP_UTF8, 0, pszTextW, cchTextW, lpDataUTF8, static_cast<int>(NP2HeapSize(lpDataUTF8)), nullptr, nullptr);
+		// cbData/2 => WCHAR, WCHAR*3 => UTF-8
+		lpDataUTF8 = static_cast<char *>(NP2HeapAlloc((cbData + 1)*sizeof(WCHAR)));
+		const int size = static_cast<int>(NP2HeapSize(lpDataUTF8));
+		cbData = WideCharToMultiByte(CP_UTF8, 0, pszTextW, cchTextW, lpDataUTF8, size, nullptr, nullptr);
 		if (cbData == 0) {
 			const UINT legacyACP = mEncoding[CPI_DEFAULT].uCodePage;
-			cbData = WideCharToMultiByte(legacyACP, 0, pszTextW, -1, lpDataUTF8, static_cast<int>(NP2HeapSize(lpDataUTF8)), nullptr, nullptr);
+			cbData = WideCharToMultiByte(legacyACP, 0, pszTextW, -1, lpDataUTF8, size, nullptr, nullptr);
 			status.bUnicodeErr = true;
 		}
 		if (cbData != 0) {
@@ -1099,7 +1100,7 @@ bool EditLoadFile(LPWSTR pszFile, EditFileIOStatus &status) noexcept {
 	} else if (uFlags & (NCP_8BIT | NCP_7BIT)) {
 		if (encodingFlag != EncodingFlag_UTF7 || (uFlags & NCP_7BIT) != 0) {
 			const UINT uCodePage = mEncoding[iEncoding].uCodePage;
-			lpDataUTF8 = RecodeAsUTF8(lpData, &cbData, uCodePage, 0);
+			lpDataUTF8 = RecodeAsUTF8(lpDataUTF8, &cbData, uCodePage, 0);
 			NP2HeapFree(lpData);
 			lpData = lpDataUTF8;
 		}
@@ -1109,7 +1110,7 @@ bool EditLoadFile(LPWSTR pszFile, EditFileIOStatus &status) noexcept {
 		// try to load ANSI / unknown encoding as UTF-8
 		DWORD back = cbData;
 		const UINT legacyACP = mEncoding[CPI_DEFAULT].uCodePage;
-		char * const result = RecodeAsUTF8(lpData, &back, legacyACP, MB_ERR_INVALID_CHARS);
+		char * const result = RecodeAsUTF8(lpDataUTF8, &back, legacyACP, MB_ERR_INVALID_CHARS);
 		if (result) {
 			NP2HeapFree(lpData);
 			lpDataUTF8 = result;
