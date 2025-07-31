@@ -286,7 +286,7 @@ public:
 	}
 
 	/// Insert text into the buffer from an array.
-	void InsertFromArray(ptrdiff_t positionToInsert, const T s[], ptrdiff_t positionFrom, ptrdiff_t insertLength) {
+	void InsertFromArray(ptrdiff_t positionToInsert, const T s[], ptrdiff_t insertLength) {
 		PLATFORM_ASSERT((positionToInsert >= 0) && (positionToInsert <= lengthBody));
 		if (insertLength > 0) {
 			if (!InRangeInclusive(positionToInsert, lengthBody)) {
@@ -295,9 +295,9 @@ public:
 			RoomFor(insertLength);
 			GapTo(positionToInsert);
 			if constexpr (__is_standard_layout(T)) {
-				memcpy(body.data() + part1Length, s + positionFrom, insertLength*sizeof(T));
+				memcpy(body.data() + part1Length, s, insertLength*sizeof(T));
 			} else {
-				std::copy_n(s + positionFrom, insertLength, body.data() + part1Length);
+				std::copy_n(s, insertLength, body.data() + part1Length);
 			}
 			lengthBody += insertLength;
 			part1Length += insertLength;

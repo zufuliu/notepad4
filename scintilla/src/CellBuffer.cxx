@@ -798,7 +798,7 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 			UTF8IsValid(std::string_view(s, insertLength));
 	}
 
-	substance.InsertFromArray(position, s, 0, insertLength);
+	substance.InsertFromArray(position, s, insertLength);
 	if (hasStyles) {
 		style.InsertValue(position, insertLength, 0);
 	}

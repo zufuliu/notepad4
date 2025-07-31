@@ -111,7 +111,7 @@ public:
 		if (stepPartition < partition) {
 			ApplyStep(partition);
 		}
-		body.InsertFromArray(partition, positions, 0, length);
+		body.InsertFromArray(partition, positions, length);
 		stepPartition += static_cast<T>(length);
 	}
 
