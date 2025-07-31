@@ -850,7 +850,6 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 				nPositions = 0;
 			}
 
-			bool lastCR = false;
 			const __m256i chunk1 = _mm256_loadu_si256(reinterpret_cast<const __m256i *>(ptr));
 			const __m256i chunk2 = _mm256_loadu_si256(reinterpret_cast<const __m256i *>(ptr + sizeof(__m256i)));
 			uint64_t maskLF = mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk1, vectLF));
@@ -859,7 +858,7 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 			maskCR |= static_cast<uint64_t>(mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk2, vectCR))) << sizeof(__m256i);
 
 			if (maskCR) {
-				lastCR = _addcarry_u64(0, maskCR, maskCR, &maskCR);
+				const uint8_t lastCR = _addcarry_u64(0, maskCR, maskCR, &maskCR);
 				// maskCR and maskLF never have some bit set, after shifting maskCR by 1 bit,
 				// the bits both set in maskCR and maskLF represents CR+LF;
 				// the bits only set in maskCR or maskLF represents individual CR or LF.
@@ -869,6 +868,7 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 				//maskCR = maskCR_LF ^ maskLF; // CR alone (with one position offset)
 				// each set bit now represent end location of CR or LF in each line endings.
 				maskLF |= maskCRLF | ((maskCR_LF ^ maskLF) >> 1);
+				maskCR = lastCR;
 			}
 			if (maskLF) {
 				Sci::Position offset = position + ptr - s;
@@ -883,7 +883,7 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 			}
 
 			ptr += 2*sizeof(__m256i);
-			if (lastCR) {
+			if (maskCR) {
 				if (*ptr == '\n') {
 					// CR+LF across boundary
 					++ptr;
@@ -905,7 +905,6 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 				nPositions = 0;
 			}
 
-			bool lastCR = false;
 			const __m128i chunk1 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(ptr));
 			const __m128i chunk2 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(ptr + sizeof(__m128i)));
 			const __m128i chunk3 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(ptr + 2*sizeof(__m128i)));
@@ -920,7 +919,7 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 			maskCR |= static_cast<uint64_t>(mm_movemask_epi8(_mm_cmpeq_epi8(chunk4, vectCR))) << 3*sizeof(__m128i);
 
 			if (maskCR) {
-				lastCR = _addcarry_u64(0, maskCR, maskCR, &maskCR);
+				const uint8_t lastCR = _addcarry_u64(0, maskCR, maskCR, &maskCR);
 				// maskCR and maskLF never have some bit set, after shifting maskCR by 1 bit,
 				// the bits both set in maskCR and maskLF represents CR+LF;
 				// the bits only set in maskCR or maskLF represents individual CR or LF.
@@ -930,6 +929,7 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 				//maskCR = maskCR_LF ^ maskLF; // CR alone (with one position offset)
 				// each set bit now represent end location of CR or LF in each line endings.
 				maskLF |= maskCRLF | ((maskCR_LF ^ maskLF) >> 1);
+				maskCR = lastCR;
 			}
 			if (maskLF) {
 				Sci::Position offset = position + ptr - s;
@@ -944,7 +944,7 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 			}
 
 			ptr += 4*sizeof(__m128i);
-			if (lastCR) {
+			if (maskCR) {
 				if (*ptr == '\n') {
 					// CR+LF across boundary
 					++ptr;
@@ -965,7 +965,6 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 				nPositions = 0;
 			}
 
-			bool lastCR = false;
 			const __m128i chunk1 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(ptr));
 			const __m128i chunk2 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(ptr + sizeof(__m128i)));
 			uint32_t maskCR = mm_movemask_epi8(_mm_cmpeq_epi8(chunk1, vectCR));
@@ -974,7 +973,7 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 			maskCR |= mm_movemask_epi8(_mm_cmpeq_epi8(chunk2, vectCR)) << sizeof(__m128i);
 
 			if (maskCR) {
-				lastCR = _addcarry_u32(0, maskCR, maskCR, &maskCR);
+				const uint8_t lastCR = _addcarry_u32(0, maskCR, maskCR, &maskCR);
 				// maskCR and maskLF never have some bit set, after shifting maskCR by 1 bit,
 				// the bits both set in maskCR and maskLF represents CR+LF;
 				// the bits only set in maskCR or maskLF represents individual CR or LF.
@@ -984,6 +983,7 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 				//maskCR = maskCR_LF ^ maskLF; // CR alone (with one position offset)
 				// each set bit now represent end location of CR or LF in each line endings.
 				maskLF |= maskCRLF | ((maskCR_LF ^ maskLF) >> 1);
+				maskCR = lastCR;
 			}
 			if (maskLF) {
 				Sci::Position offset = position + ptr - s;
@@ -998,7 +998,7 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 			}
 
 			ptr += 2*sizeof(__m128i);
-			if (lastCR) {
+			if (maskCR) {
 				if (*ptr == '\n') {
 					// CR+LF across boundary
 					++ptr;
