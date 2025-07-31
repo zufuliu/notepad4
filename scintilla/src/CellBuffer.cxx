@@ -1068,32 +1068,34 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 #endif
 
 	if (ptr < end) {
-		uint8_t eolTable[256]{};
-		eolTable[static_cast<uint8_t>('\n')] = 1;
-		eolTable[static_cast<uint8_t>('\r')] = 2;
+		// Unicode line endings is not enabled, use bit test instead of lookup to reduce stack usage.
+		// https://sourceforge.net/p/scintilla/feature-requests/1347/
+		// https://sourceforge.net/p/scintilla/feature-requests/1370/
+		uint32_t eolTable[8]{};
+		eolTable['\n' >> 5] |= 1 << ('\n' & 31);
+		eolTable['\r' >> 5] |= 1 << ('\r' & 31);
 		if (utf8LineEnds != LineEndType::Default) {
 			// see UniConversion.h for LS, PS and NEL
-			eolTable[0x85] = 4;
-			eolTable[0xa8] = 3;
-			eolTable[0xa9] = 3;
+			eolTable[0x85 >> 5] |= 1 << (0x85 & 31);
+			eolTable[0xa8 >> 5] |= 1 << (0xa9 & 31);
+			eolTable[0xa9 >> 5] |= 1 << (0xa9 & 31);
 		}
 
 		do {
 			// skip to line end
 			uint8_t ch = *ptr++;
-			uint8_t type;
-			while ((type = eolTable[ch]) == 0 && ptr < end) {
+			while (ptr < end && !BitTestEx(eolTable, ch)) {
 				chBeforePrev = chPrev;
 				chPrev = ch;
 				ch = *ptr++;
 			}
-			switch (type) {
-			case 2: // '\r'
+			switch (ch) {
+			case '\r':
 				if (*ptr == '\n') {
 					++ptr;
 				}
 				[[fallthrough]];
-			case 1: // '\n'
+			case '\n':
 				if (nPositions == PositionBlockSize) {
 					plv->InsertLines(lineInsert, positions, nPositions, atLineStart);
 					lineInsert += nPositions;
@@ -1101,10 +1103,9 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 				}
 				positions[nPositions++] = position + ptr - s;
 				break;
-			case 3:
-			case 4:
+			default:
 				// LS, PS and NEL
-				if ((type == 3 && chPrev == 0x80 && chBeforePrev == 0xe2) || (type == 4 && chPrev == 0xc2)) {
+				if ((ch == 0x85 && chPrev == 0xc2) || ((ch == 0xa8 || ch == 0xa9) && chPrev == 0x80 && chBeforePrev == 0xe2)) {
 					if (nPositions == PositionBlockSize) {
 						plv->InsertLines(lineInsert, positions, nPositions, atLineStart);
 						lineInsert += nPositions;
