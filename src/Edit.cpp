@@ -493,9 +493,9 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus &status) no
 #endif
 
 #if NP2_USE_AVX2
+	uint8_t lastCR = 0;
 	const __m256i vectCR = _mm256_set1_epi8('\r');
 	const __m256i vectLF = _mm256_set1_epi8('\n');
-	uint8_t lastCR = 0;
 	while (ptr + 2*sizeof(__m256i) <= end) {
 		const __m256i chunk1 = _mm256_loadu_si256(reinterpret_cast<const __m256i *>(ptr));
 		const __m256i chunk2 = _mm256_loadu_si256(reinterpret_cast<const __m256i *>(ptr + sizeof(__m256i)));
@@ -1002,13 +1002,11 @@ bool EditLoadFile(LPWSTR pszFile, EditFileIOStatus &status) noexcept {
 
 	MEMORYSTATUSEX statex;
 	statex.dwLength = sizeof(statex);
-	if (GlobalMemoryStatusEx(&statex)) {
-		const ULONGLONG maxMem = statex.ullTotalPhys/2U;
-		if (maxMem < static_cast<ULONGLONG>(maxFileSize)) {
-			maxFileSize = static_cast<LONGLONG>(maxMem);
-		}
-	} else {
-		dwLastIOError = GetLastError();
+	statex.ullTotalPhys = 0;
+	GlobalMemoryStatusEx(&statex);
+	const ULONGLONG maxMem = statex.ullTotalPhys/2U;
+	if (maxMem < static_cast<ULONGLONG>(maxFileSize)) {
+		maxFileSize = static_cast<LONGLONG>(maxMem);
 	}
 
 	if (fileSize.QuadPart > maxFileSize) {
@@ -1059,7 +1057,14 @@ bool EditLoadFile(LPWSTR pszFile, EditFileIOStatus &status) noexcept {
 		return true;
 	}
 
-	if (uFlags & NCP_UNICODE) {
+	DWORD offset = 0; // include BOM to make lpDataUTF8 aligned
+	if (uFlags & NCP_UTF8) {
+		if (uFlags & NCP_UTF8_SIGN) {
+			offset = 3;
+			lpDataUTF8 += 3;
+			cbData -= 3;
+		}
+	} else if (uFlags & NCP_UNICODE) {
 		LPCWSTR pszTextW = (uFlags & NCP_UNICODE_BOM) ? (reinterpret_cast<LPWSTR>(lpDataUTF8) + 1) : reinterpret_cast<LPWSTR>(lpDataUTF8);
 		// NOTE: requires two extra trailing NULL bytes.
 		const DWORD cchTextW = (uFlags & NCP_UNICODE_BOM) ? (cbData / sizeof(WCHAR)) : ((cbData / sizeof(WCHAR)) + 1);
@@ -1083,11 +1088,6 @@ bool EditLoadFile(LPWSTR pszFile, EditFileIOStatus &status) noexcept {
 		NP2HeapFree(lpData);
 		lpData = lpDataUTF8;
 		fvCurFile.Init(lpData, cbData);
-	} else if (uFlags & NCP_UTF8) {
-		if (uFlags & NCP_UTF8_SIGN) {
-			lpDataUTF8 += 3;
-			cbData -= 3;
-		}
 	} else if (uFlags & (NCP_8BIT | NCP_7BIT)) {
 		if (encodingFlag != EncodingFlag_UTF7 || (uFlags & NCP_7BIT) != 0) {
 			const UINT uCodePage = mEncoding[iEncoding].uCodePage;
@@ -1115,7 +1115,7 @@ bool EditLoadFile(LPWSTR pszFile, EditFileIOStatus &status) noexcept {
 	if (cbData) {
 		// StopWatch watch;
 		// watch.Start();
-		EditDetectEOLMode(lpDataUTF8, cbData, status);
+		EditDetectEOLMode(lpDataUTF8 - offset, cbData + offset, status);
 		// watch.Stop();
 		// watch.ShowLog("EOL time");
 		// printf("CR+LF: %zd, LF: %zd, CR: %zd\n", status.linesCount[SC_EOL_CRLF], status.linesCount[SC_EOL_LF], status.linesCount[SC_EOL_CR]);
