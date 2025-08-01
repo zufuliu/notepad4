@@ -117,7 +117,7 @@ enum {
 
 void	Edit_ReleaseResources() noexcept;
 void	EditCreate(HWND hwndParent) noexcept;
-void	EditSetNewText(LPCSTR lpstrText, DWORD cbText, Sci_Line lineCount) noexcept;
+void	EditSetNewText(LPCSTR lpstrText, DWORD cbText, size_t lineCount) noexcept;
 
 static inline void EditSetEmptyText() noexcept{
 	EditSetNewText("", 0, 1);
