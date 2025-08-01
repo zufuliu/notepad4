@@ -213,8 +213,10 @@ inline uint32_t loadbe_u32(const void *ptr) noexcept {
 
 #if defined(__GNUC__)
 #define andn_u32(a, b)	__andn_u32((a), (b))
+#define andn_u64(a, b)	__andn_u64((a), (b))
 #else
 #define andn_u32(a, b)	_andn_u32((a), (b))
+#define andn_u64(a, b)	_andn_u64((a), (b))
 #endif
 
 #define bit_zero_high_u32(x, index)	_bzhi_u32((x), (index))
@@ -226,6 +228,10 @@ inline uint32_t loadbe_u32(const void *ptr) noexcept {
 }
 
 constexpr uint32_t andn_u32(uint32_t a, uint32_t b) noexcept {
+	return (~a) & b;
+}
+
+constexpr uint64_t andn_u64(uint64_t a, uint64_t b) noexcept {
 	return (~a) & b;
 }
 
