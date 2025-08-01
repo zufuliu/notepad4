@@ -667,21 +667,22 @@ bool CellBuffer::UTF8LineEndOverlaps(Sci::Position position) const noexcept {
 	return UTF8IsSeparator(bytes) || UTF8IsSeparator(bytes + 1) || UTF8IsNEL(bytes + 1);
 }
 
-bool CellBuffer::UTF8IsCharacterBoundary(Sci::Position position) const {
+bool CellBuffer::UTF8IsCharacterBoundary(Sci::Position position) const noexcept {
 	assert(position >= 0 && position <= Length());
 	if (position > 0) {
-		std::string back;
+		char back[UTF8MaxBytes + 1]{};
 		for (int i = 0; i < UTF8MaxBytes; i++) {
 			const Sci::Position posBack = position - i;
 			if (posBack < 0) {
 				return false;
 			}
-			back.insert(0, 1, substance.ValueAt(posBack));
-			if (!UTF8IsTrailByte(back.front())) {
+			const char chAt = substance.ValueAt(posBack);
+			back[UTF8MaxBytes - 1 - i] = chAt;
+			if (!UTF8IsTrailByte(chAt)) {
 				if (i > 0) {
 					// Have reached a non-trail
-					const int cla = UTF8Classify(back);
-					if ((cla & UTF8MaskInvalid) || (cla != i)) {
+					const int utf8Status = UTF8Classify(back + UTF8MaxBytes - 1 - i, i + 1);
+					if ((utf8Status & UTF8MaskInvalid) || (utf8Status != i)) {
 						return false;
 					}
 				}
@@ -1077,7 +1078,7 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 		if (utf8LineEnds != LineEndType::Default) {
 			// see UniConversion.h for LS, PS and NEL
 			eolTable[0x85 >> 5] |= 1 << (0x85 & 31);
-			eolTable[0xa8 >> 5] |= 1 << (0xa9 & 31);
+			eolTable[0xa8 >> 5] |= 1 << (0xa8 & 31);
 			eolTable[0xa9 >> 5] |= 1 << (0xa9 & 31);
 		}
 

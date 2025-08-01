@@ -89,7 +89,7 @@ private:
 	const std::unique_ptr<ILineVector> plv;
 
 	bool UTF8LineEndOverlaps(Sci::Position position) const noexcept;
-	bool UTF8IsCharacterBoundary(Sci::Position position) const;
+	bool UTF8IsCharacterBoundary(Sci::Position position) const noexcept;
 	void ResetLineEnds();
 	void RecalculateIndexLineStarts(Sci::Line lineFirst, Sci::Line lineLast);
 	bool MaintainingLineCharacterIndex() const noexcept;
