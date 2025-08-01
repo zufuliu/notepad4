@@ -2032,7 +2032,27 @@ bool IsUTF8(const char *data, DWORD length) noexcept {
 
 static const char *CheckUTF7(const char *pTest, DWORD nLength) noexcept {
 	const char *pt = pTest;
-#if NP2_USE_AVX2
+#if NP2_USE_AVX512
+	if (nLength >= sizeof(__m512i)) {
+		const char * const end = pt + nLength - sizeof(__m512i);
+		do {
+			const __m512i chunk = _mm512_loadu_si512(pt);
+			if (_mm512_movepi8_mask(chunk)) {
+				return pt;
+			}
+			pt += sizeof(__m512i);
+		} while (pt <= end);
+	}
+
+	nLength &= sizeof(__m512i) - 1;
+	if (nLength != 0) {
+		const __m512i chunk = _mm512_loadu_si512(pt);
+		uint64_t mask = _mm512_movepi8_mask(chunk);
+		mask = bit_zero_high_u64(mask, nLength);
+		return mask ? pt : nullptr;
+	}
+	return nullptr;
+#elif NP2_USE_AVX2
 	if (nLength >= 2*sizeof(__m256i)) {
 		const char * const end = pt + nLength - 2*sizeof(__m256i);
 		do {
