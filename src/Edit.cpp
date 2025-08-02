@@ -883,7 +883,7 @@ void EditDetectIndentation(LPCSTR lpData, DWORD cbData, EditFileVars &fv) noexce
 	const uint8_t * const end = ptr + cbData;
 	#define MAX_DETECTED_TAB_WIDTH	8
 	// line count for ambiguous lines, line indented by 1 to 8 spaces, line starts with tab.
-	uint32_t indentLineCount[1 + MAX_DETECTED_TAB_WIDTH + 1]{};
+	uint32_t indentLineCount[1 + MAX_DETECTED_TAB_WIDTH + 1 + (6*NP2_USE_AVX2)]{};
 	int prevIndentCount = 0;
 	int prevTabWidth = 0;
 
@@ -968,16 +968,22 @@ labelStart:
 		}
 	}
 
-#if NP2_USE_AVX2
-	const __m128i chunk1 = _mm_loadu_si128(reinterpret_cast<__m128i *>(indentLineCount));
-	const __m128i chunk2 = _mm_loadu_si128(reinterpret_cast<__m128i *>(indentLineCount + 4));
-	const __m128i chunk3 = _mm_loadl_epi64(reinterpret_cast<__m128i *>(indentLineCount + 8));
-	__m128i maxAll = _mm_max_epu32(_mm_max_epu32(chunk1, chunk2), chunk3);
+	// reduce code size for the unrolled loop
+#if NP2_USE_AVX512
+	const __m512i chunk = _mm512_loadu_si512(indentLineCount);
+	const __m512i maxAll = _mm512_set1_epi32(_mm512_reduce_max_epu32(chunk));
+	const uint32_t mask = _mm512_cmpeq_epu32_mask(chunk, maxAll);
+	prevTabWidth = np2_ctz(mask);
+#elif NP2_USE_AVX2
+	const __m256i chunk1 = _mm256_loadu_si256(reinterpret_cast<__m256i *>(indentLineCount));
+	const __m256i chunk2 = _mm256_loadu_si256(reinterpret_cast<__m256i *>(indentLineCount + 8));
+	__m128i maxAll = _mm_max_epu32(_mm256_castsi256_si128(chunk1), _mm256_castsi256_si128(chunk2));
+	maxAll = _mm_max_epu32(maxAll, _mm256_extracti128_si256(chunk1, 1));
 	maxAll = _mm_max_epu32(maxAll, _mm_shuffle_epi32(maxAll, _MM_SHUFFLE(0, 1, 2, 3)));
 	maxAll = _mm_max_epu32(maxAll, _mm_shuffle_epi32(maxAll, _MM_SHUFFLE(1, 0, 3, 2)));
-	uint32_t mask = _mm_movemask_ps(_mm_castsi128_ps(_mm_cmpeq_epi32(maxAll, chunk1)));
-	mask |= static_cast<uint32_t>(_mm_movemask_ps(_mm_castsi128_ps(_mm_cmpeq_epi32(maxAll, chunk2)))) << 4;
-	mask |= static_cast<uint32_t>(_mm_movemask_ps(_mm_castsi128_ps(_mm_cmpeq_epi32(maxAll, chunk3)))) << 8;
+	const __m256i chunk = _mm256_broadcastd_epi32(maxAll);
+	uint32_t mask = _mm256_movemask_ps(_mm256_castsi256_ps(_mm256_cmpeq_epi32(chunk, chunk1)));
+	mask |= static_cast<uint32_t>(_mm256_movemask_ps(_mm256_castsi256_ps(_mm256_cmpeq_epi32(chunk, chunk2)))) << 8;
 	prevTabWidth = np2_ctz(mask);
 
 #else
