@@ -511,9 +511,7 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus &status) no
 			const uint64_t maskCRLF = maskCR & maskLF; // CR+LF
 			const uint64_t maskCR_LF = maskCR ^ maskLF;// CR alone or LF alone
 			maskLF = maskCR_LF & maskLF; // LF alone
-			if (maskCRLF) {
-				lineCountCRLF += np2_popcount64(maskCRLF);
-			}
+			lineCountCRLF += np2_popcount64(maskCRLF);
 			maskCR = maskCR_LF ^ maskLF; // CR alone (with one position offset)
 			if (maskCR) {
 				lineCountCR += np2_popcount64(maskCR);
@@ -542,9 +540,7 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus &status) no
 			const uint64_t maskCRLF = maskCR & maskLF; // CR+LF
 			const uint64_t maskCR_LF = maskCR ^ maskLF;// CR alone or LF alone
 			maskLF = maskCR_LF & maskLF; // LF alone
-			if (maskCRLF) {
-				lineCountCRLF += np2_popcount64(maskCRLF);
-			}
+			lineCountCRLF += np2_popcount64(maskCRLF);
 			maskCR = maskCR_LF ^ maskLF; // CR alone (with one position offset)
 			if (maskCR) {
 				lineCountCR += np2_popcount64(maskCR);
@@ -578,9 +574,7 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus &status) no
 			const uint64_t maskCRLF = maskCR & maskLF; // CR+LF
 			const uint64_t maskCR_LF = maskCR ^ maskLF;// CR alone or LF alone
 			maskLF = maskCR_LF & maskLF; // LF alone
-			if (maskCRLF) {
-				lineCountCRLF += np2_popcount64(maskCRLF);
-			}
+			lineCountCRLF += np2_popcount64(maskCRLF);
 			maskCR = maskCR_LF ^ maskLF; // CR alone (with one position offset)
 			if (maskCR) {
 				lineCountCR += np2_popcount64(maskCR);
@@ -613,9 +607,7 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus &status) no
 			const uint64_t maskCRLF = maskCR & maskLF; // CR+LF
 			const uint64_t maskCR_LF = maskCR ^ maskLF;// CR alone or LF alone
 			maskLF = maskCR_LF & maskLF; // LF alone
-			if (maskCRLF) {
-				lineCountCRLF += np2_popcount64(maskCRLF);
-			}
+			lineCountCRLF += np2_popcount64(maskCRLF);
 			maskCR = maskCR_LF ^ maskLF; // CR alone (with one position offset)
 			if (maskCR) {
 				lineCountCR += np2_popcount64(maskCR);
