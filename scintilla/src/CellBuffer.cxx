@@ -840,7 +840,84 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 		simpleInsertion = false;
 	}
 
-#if NP2_USE_AVX2
+#if 0//NP2_USE_AVX512
+	if (utf8LineEnds == LineEndType::Default && ptr + sizeof(__m512i) <= end) {
+		const __m512i vectCR = _mm512_set1_epi32('\r' * 0x01010101);
+		const __m512i vectLF = _mm512_set1_epi32('\n' * 0x01010101);
+#define ACCUMULATE_LAST_CR	0 // disabled due to register spill and ptr not well aligned
+#if ACCUMULATE_LAST_CR
+		uint8_t lastCR = 0;
+#endif
+		do {
+			if (nPositions >= PositionBlockSize - sizeof(__m512i) - 1) {
+				plv->InsertLines(lineInsert, positions, nPositions, atLineStart);
+				lineInsert += nPositions;
+				nPositions = 0;
+			}
+
+			const __m512i chunk = _mm512_loadu_si512(ptr);
+			uint64_t maskLF = _mm512_cmpeq_epi8_mask(chunk, vectLF);
+			uint64_t maskCR = _mm512_cmpeq_epi8_mask(chunk, vectCR);
+
+#if ACCUMULATE_LAST_CR
+			if (maskCR | lastCR)
+#else
+			if (maskCR)
+#endif
+			{
+#if ACCUMULATE_LAST_CR
+				lastCR = _addcarry_u64(lastCR, maskCR, maskCR, &maskCR);
+#else
+				const uint8_t lastCR = _addcarry_u64(0, maskCR, maskCR, &maskCR);
+#endif
+				// maskCR and maskLF never have some bit set, after shifting maskCR by 1 bit,
+				// the bits both set in maskCR and maskLF represents CR+LF;
+				// the bits only set in maskCR or maskLF represents individual CR or LF.
+				const uint64_t maskCRLF = maskCR & maskLF; // CR+LF
+				const uint64_t maskCR_LF = maskCR ^ maskLF;// CR alone or LF alone
+				maskLF = maskCR_LF & maskLF; // LF alone
+#if ACCUMULATE_LAST_CR
+				maskCR = maskCR_LF ^ maskLF; // CR alone (with one position offset)
+				// each set bit now represent end location of CR or LF in each line endings.
+				maskLF |= maskCRLF | (maskCR >> 1);
+				if (maskCR & 1) { // ptr[-1] == '\r'
+					positions[nPositions++] = position + ptr - s;
+				}
+#else
+				// each set bit now represent end location of CR or LF in each line endings.
+				maskLF |= maskCRLF | ((maskCR_LF ^ maskLF) >> 1);
+				maskCR = lastCR;
+#endif
+			}
+			if (maskLF) {
+				Sci::Position offset = position + ptr - s;
+				do {
+					const uint64_t trailing = np2::ctz(maskLF);
+					maskLF >>= trailing;
+					//! shift 64 bit is undefined behavior.
+					maskLF >>= 1;
+					offset += trailing + 1;
+					positions[nPositions++] = offset;
+				} while (maskLF);
+			}
+
+			ptr += sizeof(__m512i);
+#if !ACCUMULATE_LAST_CR
+			if (maskCR) {
+				if (*ptr == '\n') {
+					// CR+LF across boundary
+					++ptr;
+				}
+				positions[nPositions++] = position + ptr - s;
+			}
+#endif
+		} while (ptr + sizeof(__m512i) <= end);
+#if ACCUMULATE_LAST_CR
+		ptr -= lastCR;
+#endif
+	}
+	// end NP2_USE_AVX512
+#elif NP2_USE_AVX2
 	if (utf8LineEnds == LineEndType::Default && ptr + 2*sizeof(__m256i) <= end) {
 		const __m256i vectCR = _mm256_set1_epi8('\r');
 		const __m256i vectLF = _mm256_set1_epi8('\n');
