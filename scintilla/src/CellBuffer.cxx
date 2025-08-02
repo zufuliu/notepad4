@@ -840,6 +840,7 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 		simpleInsertion = false;
 	}
 
+	// set EditDetectEOLMode()
 #if 0//NP2_USE_AVX512
 	if (utf8LineEnds == LineEndType::Default && ptr + sizeof(__m512i) <= end) {
 		const __m512i vectCR = _mm512_set1_epi32('\r' * 0x01010101);
@@ -873,19 +874,14 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 				// maskCR and maskLF never have some bit set, after shifting maskCR by 1 bit,
 				// the bits both set in maskCR and maskLF represents CR+LF;
 				// the bits only set in maskCR or maskLF represents individual CR or LF.
-				const uint64_t maskCRLF = maskCR & maskLF; // CR+LF
-				const uint64_t maskCR_LF = maskCR ^ maskLF;// CR alone or LF alone
-				maskLF = maskCR_LF & maskLF; // LF alone
-#if ACCUMULATE_LAST_CR
-				maskCR = maskCR_LF ^ maskLF; // CR alone (with one position offset)
+				maskCR = andn_u64(maskLF, maskCR); // CR alone (with one position offset)
 				// each set bit now represent end location of CR or LF in each line endings.
-				maskLF |= maskCRLF | (maskCR >> 1);
+				maskLF |= (maskCR >> 1);
+#if ACCUMULATE_LAST_CR
 				if (maskCR & 1) { // ptr[-1] == '\r'
 					positions[nPositions++] = position + ptr - s;
 				}
 #else
-				// each set bit now represent end location of CR or LF in each line endings.
-				maskLF |= maskCRLF | ((maskCR_LF ^ maskLF) >> 1);
 				maskCR = lastCR;
 #endif
 			}
@@ -930,22 +926,24 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 
 			const __m256i chunk1 = _mm256_loadu_si256(reinterpret_cast<const __m256i *>(ptr));
 			const __m256i chunk2 = _mm256_loadu_si256(reinterpret_cast<const __m256i *>(ptr + sizeof(__m256i)));
+#if 0//NP2_USE_AVX512
+			uint64_t maskLF = _mm512_kunpackd(_mm256_cmpeq_epi8_mask(chunk2, vectLF), _mm256_cmpeq_epi8_mask(chunk1, vectLF));
+			uint64_t maskCR = _mm512_kunpackd(_mm256_cmpeq_epi8_mask(chunk2, vectCR), _mm256_cmpeq_epi8_mask(chunk1, vectCR));
+#else
 			uint64_t maskLF = mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk1, vectLF));
 			uint64_t maskCR = mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk1, vectCR));
 			maskLF |= static_cast<uint64_t>(mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk2, vectLF))) << sizeof(__m256i);
 			maskCR |= static_cast<uint64_t>(mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk2, vectCR))) << sizeof(__m256i);
+#endif
 
 			if (maskCR) {
 				const uint8_t lastCR = _addcarry_u64(0, maskCR, maskCR, &maskCR);
 				// maskCR and maskLF never have some bit set, after shifting maskCR by 1 bit,
 				// the bits both set in maskCR and maskLF represents CR+LF;
 				// the bits only set in maskCR or maskLF represents individual CR or LF.
-				const uint64_t maskCRLF = maskCR & maskLF; // CR+LF
-				const uint64_t maskCR_LF = maskCR ^ maskLF;// CR alone or LF alone
-				maskLF = maskCR_LF & maskLF; // LF alone
-				//maskCR = maskCR_LF ^ maskLF; // CR alone (with one position offset)
+				maskCR = andn_u64(maskLF, maskCR); // CR alone (with one position offset)
 				// each set bit now represent end location of CR or LF in each line endings.
-				maskLF |= maskCRLF | ((maskCR_LF ^ maskLF) >> 1);
+				maskLF |= (maskCR >> 1);
 				maskCR = lastCR;
 			}
 			if (maskLF) {
@@ -1001,12 +999,9 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 				// maskCR and maskLF never have some bit set, after shifting maskCR by 1 bit,
 				// the bits both set in maskCR and maskLF represents CR+LF;
 				// the bits only set in maskCR or maskLF represents individual CR or LF.
-				const uint64_t maskCRLF = maskCR & maskLF; // CR+LF
-				const uint64_t maskCR_LF = maskCR ^ maskLF;// CR alone or LF alone
-				maskLF = maskCR_LF & maskLF; // LF alone
-				//maskCR = maskCR_LF ^ maskLF; // CR alone (with one position offset)
+				maskCR = andn_u64(maskLF, maskCR); // CR alone (with one position offset)
 				// each set bit now represent end location of CR or LF in each line endings.
-				maskLF |= maskCRLF | ((maskCR_LF ^ maskLF) >> 1);
+				maskLF |= (maskCR >> 1);
 				maskCR = lastCR;
 			}
 			if (maskLF) {
@@ -1055,12 +1050,9 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 				// maskCR and maskLF never have some bit set, after shifting maskCR by 1 bit,
 				// the bits both set in maskCR and maskLF represents CR+LF;
 				// the bits only set in maskCR or maskLF represents individual CR or LF.
-				const uint32_t maskCRLF = maskCR & maskLF; // CR+LF
-				const uint32_t maskCR_LF = maskCR ^ maskLF;// CR alone or LF alone
-				maskLF = maskCR_LF & maskLF; // LF alone
-				//maskCR = maskCR_LF ^ maskLF; // CR alone (with one position offset)
+				maskCR = andn_u32(maskLF, maskCR); // CR alone (with one position offset)
 				// each set bit now represent end location of CR or LF in each line endings.
-				maskLF |= maskCRLF | ((maskCR_LF ^ maskLF) >> 1);
+				maskLF |= (maskCR >> 1);
 				maskCR = lastCR;
 			}
 			if (maskLF) {
