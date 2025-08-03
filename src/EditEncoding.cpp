@@ -1630,6 +1630,10 @@ bool IsUTF8(const char *pTest, DWORD nLength) noexcept {
 // bytes, we AND them together. Only when all three have an error bit in common
 // do we fail validation.
 
+// clang -E -Xclang -fkeep-system-includes -DSSE4 z_validate.c > z_validate_sse4.c
+// clang -E -Xclang -fkeep-system-includes -DAVX2 z_validate.c > z_validate_avx2.c
+// clang -E -Xclang -fkeep-system-includes -DAVX512_VBMI z_validate.c > z_validate_avx512.c
+
 #if NP2_USE_AVX2
 #if defined(__GNUC__) || defined(__clang__)
 __attribute__((__always_inline__)) static inline
@@ -1677,7 +1681,8 @@ bool z_validate_vec_avx2(__m256i bytes, __m256i shifted_bytes, uint32_t *last_co
 	// and shift it forward by 1, 2, or 3. This loop should be unrolled by
 	// the compiler, and the (n == 1) branch inside eliminated.
 	uint32_t set = high;
-	set &= _mm256_movemask_epi8(_mm256_slli_epi16(bytes, 1));
+	// set &= _mm256_movemask_epi8(_mm256_slli_epi16(bytes, 1));
+	set &= _mm256_movemask_epi8(_mm256_add_epi16(bytes, bytes));
 	// A bitmask of the actual continuation bytes in the input
 	// Mark continuation bytes: those that have the high bit set but
 	// not the next one
@@ -1823,7 +1828,8 @@ bool z_validate_vec_sse4(__m128i bytes, __m128i shifted_bytes, uint32_t *last_co
 	// and shift it forward by 1, 2, or 3. This loop should be unrolled by
 	// the compiler, and the (n == 1) branch inside eliminated.
 	uint32_t set = high;
-	set &= _mm_movemask_epi8(_mm_slli_epi16(bytes, 1));
+	// set &= _mm_movemask_epi8(_mm_slli_epi16(bytes, 1));
+	set &= _mm_movemask_epi8(_mm_add_epi16(bytes, bytes));
 	// A bitmask of the actual continuation bytes in the input
 	// Mark continuation bytes: those that have the high bit set but
 	// not the next one
