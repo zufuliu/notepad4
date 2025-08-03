@@ -509,10 +509,9 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus &status) no
 			// the bits both set in maskCR and maskLF represents CR+LF;
 			// the bits only set in maskCR or maskLF represents individual CR or LF.
 			const uint64_t maskCRLF = maskCR & maskLF; // CR+LF
-			const uint64_t maskCR_LF = maskCR ^ maskLF;// CR alone or LF alone
-			maskLF = maskCR_LF & maskLF; // LF alone
 			lineCountCRLF += np2_popcount64(maskCRLF);
-			maskCR = maskCR_LF ^ maskLF; // CR alone (with one position offset)
+			maskLF = andn_u64(maskCR, maskLF); // LF alone
+			maskCR = maskCRLF ^ maskCR; // CR alone (with one position offset)
 			if (maskCR) {
 				lineCountCR += np2_popcount64(maskCR);
 			}
@@ -538,10 +537,9 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus &status) no
 			lastCR = 0;
 
 			const uint64_t maskCRLF = maskCR & maskLF; // CR+LF
-			const uint64_t maskCR_LF = maskCR ^ maskLF;// CR alone or LF alone
-			maskLF = maskCR_LF & maskLF; // LF alone
 			lineCountCRLF += np2_popcount64(maskCRLF);
-			maskCR = maskCR_LF ^ maskLF; // CR alone (with one position offset)
+			maskLF = andn_u64(maskCR, maskLF); // LF alone
+			maskCR = maskCRLF ^ maskCR; // CR alone (with one position offset)
 			if (maskCR) {
 				lineCountCR += np2_popcount64(maskCR);
 			}
@@ -572,10 +570,9 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus &status) no
 			// the bits both set in maskCR and maskLF represents CR+LF;
 			// the bits only set in maskCR or maskLF represents individual CR or LF.
 			const uint64_t maskCRLF = maskCR & maskLF; // CR+LF
-			const uint64_t maskCR_LF = maskCR ^ maskLF;// CR alone or LF alone
-			maskLF = maskCR_LF & maskLF; // LF alone
 			lineCountCRLF += np2_popcount64(maskCRLF);
-			maskCR = maskCR_LF ^ maskLF; // CR alone (with one position offset)
+			maskLF = andn_u64(maskCR, maskLF); // LF alone
+			maskCR = maskCRLF ^ maskCR; // CR alone (with one position offset)
 			if (maskCR) {
 				lineCountCR += np2_popcount64(maskCR);
 			}
@@ -605,10 +602,9 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus &status) no
 			lastCR = 0;
 
 			const uint64_t maskCRLF = maskCR & maskLF; // CR+LF
-			const uint64_t maskCR_LF = maskCR ^ maskLF;// CR alone or LF alone
-			maskLF = maskCR_LF & maskLF; // LF alone
 			lineCountCRLF += np2_popcount64(maskCRLF);
-			maskCR = maskCR_LF ^ maskLF; // CR alone (with one position offset)
+			maskLF = andn_u64(maskCR, maskLF); // LF alone
+			maskCR = maskCRLF ^ maskCR; // CR alone (with one position offset)
 			if (maskCR) {
 				lineCountCR += np2_popcount64(maskCR);
 			}
