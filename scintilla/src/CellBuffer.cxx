@@ -850,7 +850,7 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 		uint8_t lastCR = 0;
 #endif
 		do {
-			if (nPositions >= PositionBlockSize - sizeof(__m512i) - 1) {
+			if (nPositions >= PositionBlockSize - sizeof(__m512i)) {
 				plv->InsertLines(lineInsert, positions, nPositions, atLineStart);
 				lineInsert += nPositions;
 				nPositions = 0;
@@ -918,7 +918,7 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 		const __m256i vectCR = _mm256_set1_epi8('\r');
 		const __m256i vectLF = _mm256_set1_epi8('\n');
 		do {
-			if (nPositions >= PositionBlockSize - 2*sizeof(__m256i) - 1) {
+			if (nPositions >= PositionBlockSize - 2*sizeof(__m256i)) {
 				plv->InsertLines(lineInsert, positions, nPositions, atLineStart);
 				lineInsert += nPositions;
 				nPositions = 0;
@@ -975,7 +975,7 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 		const __m128i vectCR = _mm_set1_epi8('\r');
 		const __m128i vectLF = _mm_set1_epi8('\n');
 		do {
-			if (nPositions >= PositionBlockSize - 4*sizeof(__m128i) - 1) {
+			if (nPositions >= PositionBlockSize - 4*sizeof(__m128i)) {
 				plv->InsertLines(lineInsert, positions, nPositions, atLineStart);
 				lineInsert += nPositions;
 				nPositions = 0;
@@ -1032,7 +1032,7 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 		const __m128i vectCR = _mm_set1_epi8('\r');
 		const __m128i vectLF = _mm_set1_epi8('\n');
 		do {
-			if (nPositions >= PositionBlockSize - 2*sizeof(__m128i) - 1) {
+			if (nPositions >= PositionBlockSize - 2*sizeof(__m128i)) {
 				plv->InsertLines(lineInsert, positions, nPositions, atLineStart);
 				lineInsert += nPositions;
 				nPositions = 0;
