@@ -799,10 +799,15 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 			UTF8IsValid(std::string_view(s, insertLength));
 	}
 
+{
+	// const ElapsedPeriod period;
 	substance.InsertFromArray(position, s, insertLength);
 	if (hasStyles) {
 		style.InsertValue(position, insertLength, 0);
 	}
+	// const double duration = period.Duration()*1e3;
+	// printf("InsertFromArray duration=%.6f\n", duration);
+}
 
 	const bool atLineStart = plv->LineStart(lineInsert - 1) == position;
 	// Point all the lines after the insertion point further along in the buffer
