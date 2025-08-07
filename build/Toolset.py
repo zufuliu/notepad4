@@ -92,7 +92,7 @@ def build_compile_commands(commands, folder, cflags, cxxflags, includes, cxx=Fal
 					'file': path,
 				})
 
-def generate_compile_commands(target, avx2=False, cxx=False):
+def generate_compile_commands(target, march='', cxx=False):
 	cflags = []
 	cxxflags = []
 	# flags to run clang-tidy via vscode-clangd plugin, see https://clangd.llvm.org/
@@ -119,10 +119,14 @@ def generate_compile_commands(target, avx2=False, cxx=False):
 	arch = target[:target.index('-')]
 	if arch == 'x86_64':
 		defines.append('_WIN64')
-		if avx2:
+		if march == 'AVX2':
 			cflags.append('-march=x86-64-v3')
 			cxxflags.append('-march=x86-64-v3')
 			defines.extend(['_WIN32_WINNT=0x0601', 'WINVER=0x0601'])	# 7
+		elif march == 'AVX512':
+			cflags.append('-march=x86-64-v4')
+			cxxflags.append('-march=x86-64-v4')
+			defines.extend(['_WIN32_WINNT=0x0A00', 'WINVER=0x0A00'])	# 10
 		else:
 			defines.extend(['_WIN32_WINNT=0x0600', 'WINVER=0x0600'])	# Vista
 	elif arch == 'i686':
@@ -165,12 +169,14 @@ def generate_compile_commands(target, avx2=False, cxx=False):
 
 #update_all_project_toolset()
 #update_all_copyright_year()
-generate_compile_commands('x86_64-pc-windows-msvc', avx2=True)
+generate_compile_commands('x86_64-pc-windows-msvc', march='AVX2')
+#generate_compile_commands('x86_64-pc-windows-msvc', march='AVX512')
 #generate_compile_commands('x86_64-pc-windows-msvc')
 #generate_compile_commands('i686-pc-windows-msvc')
 #generate_compile_commands('aarch64-pc-windows-msvc')
 #generate_compile_commands('arm-pc-windows-msvc')
-#generate_compile_commands('x86_64-w64-windows-gnu', avx2=True)
+#generate_compile_commands('x86_64-w64-windows-gnu', march='AVX2')
+#generate_compile_commands('x86_64-w64-windows-gnu', march='AVX512')
 #generate_compile_commands('x86_64-w64-windows-gnu')
 #generate_compile_commands('i686-w64-windows-gnu')
 #generate_compile_commands('aarch64-w64-windows-gnu')

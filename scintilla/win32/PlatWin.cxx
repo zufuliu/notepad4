@@ -53,7 +53,7 @@ extern UINT g_uSystemDPI;
 
 using namespace Scintilla;
 
-#if !NP2_HAS_GETDPIFORWINDOW
+#if _WIN32_WINNT < _WIN32_WINNT_WIN10
 namespace {
 
 using GetDpiForWindowSig = UINT (WINAPI *)(HWND hwnd);
@@ -135,7 +135,7 @@ BOOL AdjustWindowRectForDpi(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT 
 	}
 	return ::AdjustWindowRectEx(lpRect, dwStyle, FALSE, dwExStyle);
 }
-#endif
+#endif // _WIN32_WINNT < _WIN32_WINNT_WIN10
 
 namespace Scintilla::Internal {
 
@@ -851,7 +851,7 @@ void Platform_Initialise(void *hInstance) noexcept {
 void Platform_Finalise(bool fromDllMain) noexcept {
 	if (!fromDllMain) {
 		ReleaseD2D();
-#if !NP2_HAS_GETDPIFORWINDOW
+#if _WIN32_WINNT < _WIN32_WINNT_WIN10
 		ReleaseLibrary(hShcoreDLL);
 #endif
 	}

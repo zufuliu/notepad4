@@ -18,9 +18,6 @@ CD /D %~dp0
 
 @rem Check for the help switches
 IF /I "%~1" == "help"   GOTO SHOWHELP
-IF /I "%~1" == "/help"  GOTO SHOWHELP
-IF /I "%~1" == "-help"  GOTO SHOWHELP
-IF /I "%~1" == "--help" GOTO SHOWHELP
 IF /I "%~1" == "/?"     GOTO SHOWHELP
 
 @rem default arguments
@@ -32,75 +29,31 @@ SET "CONFIG=Release"
 @rem Check for the first switch
 IF "%~1" == "" GOTO StartWork
 IF /I "%~1" == "Build"     SET "BUILDTYPE=Build"   & SHIFT & GOTO CheckSecondArg
-IF /I "%~1" == "/Build"    SET "BUILDTYPE=Build"   & SHIFT & GOTO CheckSecondArg
-IF /I "%~1" == "-Build"    SET "BUILDTYPE=Build"   & SHIFT & GOTO CheckSecondArg
-IF /I "%~1" == "--Build"   SET "BUILDTYPE=Build"   & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "Clean"     SET "BUILDTYPE=Clean"   & SHIFT & GOTO CheckSecondArg
-IF /I "%~1" == "/Clean"    SET "BUILDTYPE=Clean"   & SHIFT & GOTO CheckSecondArg
-IF /I "%~1" == "-Clean"    SET "BUILDTYPE=Clean"   & SHIFT & GOTO CheckSecondArg
-IF /I "%~1" == "--Clean"   SET "BUILDTYPE=Clean"   & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "Rebuild"   SET "BUILDTYPE=Rebuild" & SHIFT & GOTO CheckSecondArg
-IF /I "%~1" == "/Rebuild"  SET "BUILDTYPE=Rebuild" & SHIFT & GOTO CheckSecondArg
-IF /I "%~1" == "-Rebuild"  SET "BUILDTYPE=Rebuild" & SHIFT & GOTO CheckSecondArg
-IF /I "%~1" == "--Rebuild" SET "BUILDTYPE=Rebuild" & SHIFT & GOTO CheckSecondArg
 
 
 :CheckSecondArg
 @rem Check for the second switch
 IF "%~1" == "" GOTO StartWork
 IF /I "%~1" == "x86"     SET "ARCH=Win32" & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "/x86"    SET "ARCH=Win32" & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "-x86"    SET "ARCH=Win32" & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "--x86"   SET "ARCH=Win32" & SHIFT & GOTO CheckThirdArg
 IF /I "%~1" == "Win32"   SET "ARCH=Win32" & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "/Win32"  SET "ARCH=Win32" & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "-Win32"  SET "ARCH=Win32" & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "--Win32" SET "ARCH=Win32" & SHIFT & GOTO CheckThirdArg
 IF /I "%~1" == "x64"     SET "ARCH=x64"   & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "/x64"    SET "ARCH=x64"   & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "-x64"    SET "ARCH=x64"   & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "--x64"   SET "ARCH=x64"   & SHIFT & GOTO CheckThirdArg
 IF /I "%~1" == "AVX2"    SET "ARCH=AVX2"  & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "/AVX2"   SET "ARCH=AVX2"  & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "-AVX2"   SET "ARCH=AVX2"  & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "--AVX2"  SET "ARCH=AVX2"  & SHIFT & GOTO CheckThirdArg
+IF /I "%~1" == "AVX512"  SET "ARCH=AVX512" & SHIFT & GOTO CheckThirdArg
 IF /I "%~1" == "ARM64"   SET "ARCH=ARM64" & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "/ARM64"  SET "ARCH=ARM64" & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "-ARM64"  SET "ARCH=ARM64" & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "--ARM64" SET "ARCH=ARM64" & SHIFT & GOTO CheckThirdArg
 IF /I "%~1" == "all"     SET "ARCH=all"   & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "/all"    SET "ARCH=all"   & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "-all"    SET "ARCH=all"   & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "--all"   SET "ARCH=all"   & SHIFT & GOTO CheckThirdArg
 IF /I "%~1" == "No32bit"   SET "ARCH=all" & SET NO_32BIT=1 & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "/No32bit"  SET "ARCH=all" & SET NO_32BIT=1 & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "-No32bit"  SET "ARCH=all" & SET NO_32BIT=1 & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "--No32bit" SET "ARCH=all" & SET NO_32BIT=1 & SHIFT & GOTO CheckThirdArg
 
 
 :CheckThirdArg
 @rem Check for the third switch
 IF "%~1" == "" GOTO StartWork
 IF /I "%~1" == "Debug"         SET "CONFIG=Debug"       & SHIFT & GOTO StartWork
-IF /I "%~1" == "/Debug"        SET "CONFIG=Debug"       & SHIFT & GOTO StartWork
-IF /I "%~1" == "-Debug"        SET "CONFIG=Debug"       & SHIFT & GOTO StartWork
-IF /I "%~1" == "--Debug"       SET "CONFIG=Debug"       & SHIFT & GOTO StartWork
 IF /I "%~1" == "Release"       SET "CONFIG=Release"     & SHIFT & GOTO StartWork
-IF /I "%~1" == "/Release"      SET "CONFIG=Release"     & SHIFT & GOTO StartWork
-IF /I "%~1" == "-Release"      SET "CONFIG=Release"     & SHIFT & GOTO StartWork
-IF /I "%~1" == "--Release"     SET "CONFIG=Release"     & SHIFT & GOTO StartWork
 IF /I "%~1" == "LLVMDebug"     SET "CONFIG=LLVMDebug"   & SHIFT & GOTO StartWork
-IF /I "%~1" == "/LLVMDebug"    SET "CONFIG=LLVMDebug"   & SHIFT & GOTO StartWork
-IF /I "%~1" == "-LLVMDebug"    SET "CONFIG=LLVMDebug"   & SHIFT & GOTO StartWork
-IF /I "%~1" == "--LLVMDebug"   SET "CONFIG=LLVMDebug"   & SHIFT & GOTO StartWork
 IF /I "%~1" == "LLVMRelease"   SET "CONFIG=LLVMRelease" & SHIFT & GOTO StartWork
-IF /I "%~1" == "/LLVMRelease"  SET "CONFIG=LLVMRelease" & SHIFT & GOTO StartWork
-IF /I "%~1" == "-LLVMRelease"  SET "CONFIG=LLVMRelease" & SHIFT & GOTO StartWork
-IF /I "%~1" == "--LLVMRelease" SET "CONFIG=LLVMRelease" & SHIFT & GOTO StartWork
 IF /I "%~1" == "all"           SET "CONFIG=all"         & SHIFT & GOTO StartWork
-IF /I "%~1" == "/all"          SET "CONFIG=all"         & SHIFT & GOTO StartWork
-IF /I "%~1" == "-all"          SET "CONFIG=all"         & SHIFT & GOTO StartWork
-IF /I "%~1" == "--all"         SET "CONFIG=all"         & SHIFT & GOTO StartWork
 
 
 :StartWork
@@ -120,6 +73,7 @@ IF /I "%processor_architecture%" == "AMD64" (
 
 IF %NO_32BIT% == 1 GOTO x64
 IF /I "%ARCH%" == "AVX2" GOTO AVX2
+IF /I "%ARCH%" == "AVX512" GOTO AVX512
 IF /I "%ARCH%" == "x64" GOTO x64
 IF /I "%ARCH%" == "Win32" GOTO Win32
 IF /I "%ARCH%" == "ARM64" GOTO ARM64
@@ -147,6 +101,14 @@ CALL "%VS_PATH%\Common7\Tools\vsdevcmd" -no_logo -arch=amd64 -host_arch=%HOST_AR
 IF /I "%CONFIG%" == "all" (CALL :SUBMSVC %BUILDTYPE% AVX2Debug x64 && CALL :SUBMSVC %BUILDTYPE% AVX2Release x64) ELSE (CALL :SUBMSVC %BUILDTYPE% AVX2%CONFIG% x64)
 ENDLOCAL
 IF /I "%ARCH%" == "AVX2" GOTO END
+
+
+:AVX512
+SETLOCAL
+CALL "%VS_PATH%\Common7\Tools\vsdevcmd" -no_logo -arch=amd64 -host_arch=%HOST_ARCH%
+IF /I "%CONFIG%" == "all" (CALL :SUBMSVC %BUILDTYPE% AVX512Debug x64 && CALL :SUBMSVC %BUILDTYPE% AVX512Release x64) ELSE (CALL :SUBMSVC %BUILDTYPE% AVX512%CONFIG% x64)
+ENDLOCAL
+IF /I "%ARCH%" == "AVX512" GOTO END
 
 
 :ARM64
@@ -197,7 +159,7 @@ EXIT /B
 :SHOWHELP
 TITLE %~nx0 %1
 ECHO. & ECHO.
-ECHO Usage: %~nx0 [Clean^|Build^|Rebuild] [Win32^|x64^|AVX2^|ARM64^|all^|No32bit] [Debug^|Release^|LLVMDebug^|LLVMRelease^|all]
+ECHO Usage: %~nx0 [Clean^|Build^|Rebuild] [Win32^|x64^|AVX2^|AVX512^|ARM64^|all^|No32bit] [Debug^|Release^|LLVMDebug^|LLVMRelease^|all]
 ECHO.
 ECHO Notes: You can also prefix the commands with "-", "--" or "/".
 ECHO        The arguments are not case sensitive.

@@ -431,15 +431,6 @@ static inline void InvalidateStyleRedraw() noexcept {
 	SciCall_SetViewEOL(bViewEOLs);
 }
 
-// temporary fix for https://github.com/zufuliu/notepad4/issues/134: Direct2D on arm32
-static inline int GetDefualtRenderingTechnology() noexcept {
-#if defined(__arm__) || defined(_ARM_) || defined(_M_ARM)
-	return SC_TECHNOLOGY_DIRECTWRITERETAIN;
-#else
-	return IsVistaAndAbove()? SC_TECHNOLOGY_DIRECTWRITE : SC_TECHNOLOGY_DEFAULT;
-#endif
-}
-
 //=============================================================================
 //
 // WinMain()
@@ -623,7 +614,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 #endif
 
 	// we need DPI-related functions before create Scintilla window.
-#if NP2_HAS_GETDPIFORWINDOW
+#if _WIN32_WINNT >= _WIN32_WINNT_WIN10
 	g_uSystemDPI = GetDpiForSystem();
 #else
 	Scintilla_LoadDpiForWindow();
@@ -2570,14 +2561,9 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	CheckMenuRadioItem(hmenu, IDM_VIEW_SCROLLPASTLASTLINE_ONE, IDM_VIEW_SCROLLPASTLASTLINE_QUARTER, i, MF_BYCOMMAND);
 
 	// Rendering Technology
-	i = IsVistaAndAbove();
-	EnableCmd(hmenu, IDM_SET_RENDER_TECH_D2D, i);
-	EnableCmd(hmenu, IDM_SET_RENDER_TECH_D2DRETAIN, i);
-	EnableCmd(hmenu, IDM_SET_RENDER_TECH_D2DDC, i);
 #if _WIN32_WINNT < _WIN32_WINNT_WIN7
 	DisableCmd(hmenu, IDM_SET_RENDER_TECH_D3D, true);
 #endif
-	EnableCmd(hmenu, IDM_SET_USE_XP_FILE_DIALOG, i);
 	CheckCmd(hmenu, IDM_SET_USE_XP_FILE_DIALOG, bUseXPFileDialog);
 	i = IDM_SET_RENDER_TECH_GDI + iRenderingTechnology;
 	CheckMenuRadioItem(hmenu, IDM_SET_RENDER_TECH_GDI, IDM_SET_RENDER_TECH_D3D, i, MF_BYCOMMAND);
@@ -3025,7 +3011,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_ENCODING_SETDEFAULT:
-		SelectDefEncodingDlg(hwnd, &iDefaultEncoding);
+		SelectDefEncodingDlg(hwnd);
 		break;
 
 	case IDM_LINEENDINGS_CRLF:
@@ -3037,7 +3023,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	break;
 
 	case IDM_LINEENDINGS_SETDEFAULT:
-		SelectDefLineEndingDlg(hwnd, &iDefaultEOLMode);
+		SelectDefLineEndingDlg(hwnd);
 		break;
 
 	case IDT_EDIT_UNDO:
@@ -5329,8 +5315,8 @@ void LoadSettings() noexcept {
 	bEditLayoutRTL = section.GetBool(L"EditLayoutRTL", false);
 	bWindowLayoutRTL = section.GetBool(L"WindowLayoutRTL", false);
 
-	iValue = section.GetInt(L"RenderingTechnology", GetDefualtRenderingTechnology());
-	iValue = clamp(iValue, SC_TECHNOLOGY_DEFAULT, SC_TECHNOLOGY_DIRECTWRITEDC);
+	iValue = section.GetInt(L"RenderingTechnology", SC_TECHNOLOGY_DIRECTWRITE);
+	iValue = clamp(iValue, SC_TECHNOLOGY_DEFAULT, SC_TECHNOLOGY_DIRECT_WRITE_1);
 	iRenderingTechnology = bEditLayoutRTL ? SC_TECHNOLOGY_DEFAULT : iValue;
 
 	iValue = section.GetInt(L"Bidirectional", SC_BIDIRECTIONAL_DISABLED);
@@ -5597,7 +5583,7 @@ void SaveSettings(bool bSaveSettingsNow) noexcept {
 	section.SetIntEx(L"EndAtLastLine", iEndAtLastLine, 1);
 	section.SetBoolEx(L"EditLayoutRTL", bEditLayoutRTL, false);
 	section.SetBoolEx(L"WindowLayoutRTL", bWindowLayoutRTL, false);
-	section.SetIntEx(L"RenderingTechnology", iRenderingTechnology, GetDefualtRenderingTechnology());
+	section.SetIntEx(L"RenderingTechnology", iRenderingTechnology, SC_TECHNOLOGY_DIRECTWRITE);
 	section.SetIntEx(L"Bidirectional", iBidirectional, SC_BIDIRECTIONAL_DISABLED);
 	section.SetIntEx(L"FontQuality", iFontQuality, SC_EFF_QUALITY_LCD_OPTIMIZED);
 	iValue = static_cast<int>(iCaretStyle) + static_cast<int>(bBlockCaretForOVRMode)*10 + static_cast<int>(bBlockCaretOutSelection)*100;
@@ -7243,8 +7229,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 			// diff/patch file may contain content from files with different line endings.
 			status.bLineEndingsDefaultNo = bUnknownFile || pLexCurrent->iLexer == SCLEX_DIFF;
 			if (WarnLineEndingDlg(hwndMain, &status)) {
-				const int iNewEOLMode = GetScintillaEOLMode(status.iEOLMode);
-				ConvertLineEndings(iNewEOLMode);
+				ConvertLineEndings(status.iEOLMode);
 			}
 		}
 	} else if (!status.bFileTooBig) {

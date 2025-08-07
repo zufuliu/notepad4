@@ -1,5 +1,5 @@
 // 2024 https://www.w3.org/TR/CSS/ 25 February 2025
-// 2025-05-18 https://drafts.csswg.org/
+// 2025-07-20 https://drafts.csswg.org/
 // https://github.com/w3c/csswg-drafts/
 // https://www.w3.org/Style/CSS/all-properties
 // https://www.w3.org/Style/CSS/all-descriptors
@@ -969,7 +969,9 @@ all continuous paged visual audio speech tactile grid bitmap interactive static
 	page-orientation: upright | rotate-left | rotate-right;
 }
 
+// CSS Positioned Layout Module Level 4 https://www.w3.org/TR/css-position-4/ 8 July 2025
 // CSS Positioned Layout Module Level 3 https://www.w3.org/TR/css-position-3/ 11 March 2025
+::backdrop
 {
 	position: static | relative | absolute | sticky | fixed;
 	top: auto;
@@ -983,6 +985,7 @@ all continuous paged visual audio speech tactile grid bitmap interactive static
 	inset-block: auto;
 	inset-inline: auto;
 	inset: auto;
+	overlay: none | auto;
 }
 
 // CSS Presentation Levels Module https://www.w3.org/TR/css3-preslev/ 14 October 2014
@@ -997,7 +1000,7 @@ all continuous paged visual audio speech tactile grid bitmap interactive static
 	initial-value:;
 }
 
-// CSS Pseudo-Elements Module Level 4 https://www.w3.org/TR/css-pseudo-4/ 30 December 2022
+// CSS Pseudo-Elements Module Level 4 https://www.w3.org/TR/css-pseudo-4/ 27 June 2025
 // https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-elements
 // Typographic
 ::first-line
@@ -1006,15 +1009,18 @@ all continuous paged visual audio speech tactile grid bitmap interactive static
 ::postfix
 // Highlight
 ::selection
+::search-text
 ::target-text
 ::spelling-error
 ::grammar-error
+::highlight()
 // Tree-Abiding
 ::before
 ::after
 ::marker
 ::placeholder
 ::file-selector-button
+::details-content
 
 // CSS Regions Module Level 1 https://www.w3.org/TR/css-regions-1/ 9 October 2014
 {
@@ -1231,9 +1237,9 @@ view()
 // CSS Shadow Parts https://www.w3.org/TR/css-shadow-parts-1/ 15 November 2018
 ::part()
 
-// CSS Shapes Module Level 1 https://www.w3.org/TR/css-shapes-1/ 15 November 2022
+// CSS Shapes Module Level 1 https://www.w3.org/TR/css-shapes-1/ 12 June 2025
 {
-	shape-outside: none | inset(), xywh(), rect(), circle(), ellipse(), polygon(), path() | margin-box | border-box | padding-box | content-box;
+	shape-outside: none | inset(), xywh(), rect(), circle(), ellipse(), polygon(), path(), shape() | margin-box | border-box | padding-box | content-box;
 	shape-image-threshold:;
 	shape-margin:;
 	shape-inside:;
@@ -1435,7 +1441,7 @@ pi infinity NaN
 }
 
 // CSS View Transitions Module Level 2 https://www.w3.org/TR/css-view-transitions-2/ 13 November 2024
-// CSS View Transitions Module Level 1 https://www.w3.org/TR/css-view-transitions-1/ 5 September 2023
+// CSS View Transitions Module Level 1 https://www.w3.org/TR/css-view-transitions-1/ 28 March 2024
 {
 	view-transition-class: none;
 	view-transition-name: none;

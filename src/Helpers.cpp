@@ -1512,6 +1512,7 @@ HMODULE LoadLocalizedResourceDLL(LANGID lang, LPCWSTR dllName) noexcept {
 void GetLocaleDefaultUIFont(LANGID lang, LPWSTR lpFaceName, WORD *wSize) noexcept {
 	LPCWSTR font;
 	const LANGID subLang = SUBLANGID(lang);
+	// https://learn.microsoft.com/en-us/typography/fonts/windows_11_font_list
 	switch (PRIMARYLANGID(lang)) {
 	default:
 	case LANG_ENGLISH:
@@ -1524,8 +1525,8 @@ void GetLocaleDefaultUIFont(LANGID lang, LPWSTR lpFaceName, WORD *wSize) noexcep
 		font = IsChineseTraditionalSubLang(subLang) ? L"Microsoft JhengHei UI" : L"Microsoft YaHei UI";
 		break;
 	case LANG_JAPANESE:
-		// https://docs.microsoft.com/en-us/typography/font-list/meiryo
-		font = L"Meiryo UI";
+		// https://learn.microsoft.com/en-us/typography/font-list/yu-gothic
+		font = L"Yu Gothic UI";
 		break;
 	case LANG_KOREAN:
 		// https://docs.microsoft.com/en-us/typography/font-list/malgun-gothic

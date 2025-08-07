@@ -18,9 +18,6 @@ CD /D %~dp0
 
 @rem Check for the help switches
 IF /I "%~1" == "help"   GOTO SHOWHELP
-IF /I "%~1" == "/help"  GOTO SHOWHELP
-IF /I "%~1" == "-help"  GOTO SHOWHELP
-IF /I "%~1" == "--help" GOTO SHOWHELP
 IF /I "%~1" == "/?"     GOTO SHOWHELP
 
 @rem default arguments
@@ -34,76 +31,35 @@ SET "ZIP_SUFFIX="
 @rem Check for the first switch
 IF "%~1" == "" GOTO StartWork
 IF /I "%~1" == "MSVC"    SET "COMPILER=MSVC"  & SHIFT & GOTO CheckSecondArg
-IF /I "%~1" == "/MSVC"   SET "COMPILER=MSVC"  & SHIFT & GOTO CheckSecondArg
-IF /I "%~1" == "-MSVC"   SET "COMPILER=MSVC"  & SHIFT & GOTO CheckSecondArg
-IF /I "%~1" == "--MSVC"  SET "COMPILER=MSVC"  & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "GCC"     SET "COMPILER=GCC"   & SHIFT & GOTO CheckSecondArg
-IF /I "%~1" == "/GCC"    SET "COMPILER=GCC"   & SHIFT & GOTO CheckSecondArg
-IF /I "%~1" == "-GCC"    SET "COMPILER=GCC"   & SHIFT & GOTO CheckSecondArg
-IF /I "%~1" == "--GCC"   SET "COMPILER=GCC"   & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "Clang"   SET "COMPILER=Clang" & SHIFT & GOTO CheckSecondArg
-IF /I "%~1" == "/Clang"  SET "COMPILER=Clang" & SHIFT & GOTO CheckSecondArg
-IF /I "%~1" == "-Clang"  SET "COMPILER=Clang" & SHIFT & GOTO CheckSecondArg
-IF /I "%~1" == "--Clang" SET "COMPILER=Clang" & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "LLVM"    SET "COMPILER=LLVM"  & SHIFT & GOTO CheckSecondArg
-IF /I "%~1" == "/LLVM"   SET "COMPILER=LLVM"  & SHIFT & GOTO CheckSecondArg
-IF /I "%~1" == "-LLVM"   SET "COMPILER=LLVM"  & SHIFT & GOTO CheckSecondArg
-IF /I "%~1" == "--LLVM"  SET "COMPILER=LLVM"  & SHIFT & GOTO CheckSecondArg
 
 
 :CheckSecondArg
 @rem Check for the second switch
 IF "%~1" == "" GOTO StartWork
 IF /I "%~1" == "x86"     SET "ARCH=Win32" & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "/x86"    SET "ARCH=Win32" & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "-x86"    SET "ARCH=Win32" & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "--x86"   SET "ARCH=Win32" & SHIFT & GOTO CheckThirdArg
 IF /I "%~1" == "Win32"   SET "ARCH=Win32" & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "/Win32"  SET "ARCH=Win32" & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "-Win32"  SET "ARCH=Win32" & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "--Win32" SET "ARCH=Win32" & SHIFT & GOTO CheckThirdArg
 IF /I "%~1" == "x64"     SET "ARCH=x64"   & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "/x64"    SET "ARCH=x64"   & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "-x64"    SET "ARCH=x64"   & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "--x64"   SET "ARCH=x64"   & SHIFT & GOTO CheckThirdArg
 IF /I "%~1" == "AVX2"    SET "ARCH=AVX2"  & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "/AVX2"   SET "ARCH=AVX2"  & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "-AVX2"   SET "ARCH=AVX2"  & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "--AVX2"  SET "ARCH=AVX2"  & SHIFT & GOTO CheckThirdArg
+IF /I "%~1" == "AVX512"  SET "ARCH=AVX512" & SHIFT & GOTO CheckThirdArg
 IF /I "%~1" == "ARM64"   SET "ARCH=ARM64" & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "/ARM64"  SET "ARCH=ARM64" & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "-ARM64"  SET "ARCH=ARM64" & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "--ARM64" SET "ARCH=ARM64" & SHIFT & GOTO CheckThirdArg
 IF /I "%~1" == "all"     SET "ARCH=all"   & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "/all"    SET "ARCH=all"   & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "-all"    SET "ARCH=all"   & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "--all"   SET "ARCH=all"   & SHIFT & GOTO CheckThirdArg
 IF /I "%~1" == "No32bit"   SET "ARCH=all" & SET NO_32BIT=1 & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "/No32bit"  SET "ARCH=all" & SET NO_32BIT=1 & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "-No32bit"  SET "ARCH=all" & SET NO_32BIT=1 & SHIFT & GOTO CheckThirdArg
-IF /I "%~1" == "--No32bit" SET "ARCH=all" & SET NO_32BIT=1 & SHIFT & GOTO CheckThirdArg
 
 
 :CheckThirdArg
 @rem Check for the third switch
 IF "%~1" == "" GOTO StartWork
 IF /I "%~1" == "Release"   SET "CONFIG=Release" & SHIFT & GOTO CheckFourthArg
-IF /I "%~1" == "/Release"  SET "CONFIG=Release" & SHIFT & GOTO CheckFourthArg
-IF /I "%~1" == "-Release"  SET "CONFIG=Release" & SHIFT & GOTO CheckFourthArg
-IF /I "%~1" == "--Release" SET "CONFIG=Release" & SHIFT & GOTO CheckFourthArg
 IF /I "%~1" == "Debug"     SET "CONFIG=Debug"   & SHIFT & GOTO CheckFourthArg
-IF /I "%~1" == "/Debug"    SET "CONFIG=Debug"   & SHIFT & GOTO CheckFourthArg
-IF /I "%~1" == "-Debug"    SET "CONFIG=Debug"   & SHIFT & GOTO CheckFourthArg
-IF /I "%~1" == "--Debug"   SET "CONFIG=Debug"   & SHIFT & GOTO CheckFourthArg
 
 
 :CheckFourthArg
 @rem Check for the fourth switch
 IF "%~1" == "" GOTO StartWork
 IF /I "%~1" == "Locale"   SET "WITH_LOCALE=1" & SHIFT & GOTO StartWork
-IF /I "%~1" == "/Locale"  SET "WITH_LOCALE=1" & SHIFT & GOTO StartWork
-IF /I "%~1" == "-Locale"  SET "WITH_LOCALE=1" & SHIFT & GOTO StartWork
-IF /I "%~1" == "--Locale" SET "WITH_LOCALE=1" & SHIFT & GOTO StartWork
 
 
 :StartWork
@@ -114,24 +70,28 @@ SET "EXIT_ON_ERROR=%~1"
 CALL :SubGetVersion
 CALL :SubDetectSevenzipPath
 
-IF NOT EXIST "%SEVENZIP%" CALL :SUBMSG "ERROR" "7za wasn't found!"
+IF NOT EXIST "%SEVENZIP%" CALL :SUBMSG "ERROR" "7z wasn't found!"
 
 IF /I "%COMPILER%" == "GCC" (
   SET INPUTDIR_AVX2=bin\%CONFIG%_AVX2
+  SET INPUTDIR_AVX512=bin\%CONFIG%_AVX512
   SET INPUTDIR_x64=bin\%CONFIG%_x64
   SET INPUTDIR_Win32=bin\%CONFIG%_Win32
 ) ELSE IF /I "%COMPILER%" == "Clang" (
   SET INPUTDIR_AVX2=bin\Clang%CONFIG%_AVX2
+  SET INPUTDIR_AVX512=bin\Clang%CONFIG%_AVX512
   SET INPUTDIR_x64=bin\Clang%CONFIG%_x64
   SET INPUTDIR_Win32=bin\Clang%CONFIG%_Win32
   SET INPUTDIR_ARM64=bin\Clang%CONFIG%_ARM64
 ) ELSE IF /I "%COMPILER%" == "LLVM" (
   SET INPUTDIR_AVX2=bin\LLVM%CONFIG%\AVX2
+  SET INPUTDIR_AVX512=bin\LLVM%CONFIG%\AVX512
   SET INPUTDIR_x64=bin\LLVM%CONFIG%\x64
   SET INPUTDIR_Win32=bin\LLVM%CONFIG%\Win32
   SET INPUTDIR_ARM64=bin\LLVM%CONFIG%\ARM64
 ) ELSE (
   SET INPUTDIR_AVX2=bin\%CONFIG%\AVX2
+  SET INPUTDIR_AVX512=bin\%CONFIG%\AVX512
   SET INPUTDIR_x64=bin\%CONFIG%\x64
   SET INPUTDIR_Win32=bin\%CONFIG%\Win32
   SET INPUTDIR_ARM64=bin\%CONFIG%\ARM64
@@ -139,6 +99,7 @@ IF /I "%COMPILER%" == "GCC" (
 
 IF %NO_32BIT% == 1 GOTO ARCH_x64
 IF /I "%ARCH%" == "AVX2" GOTO ARCH_AVX2
+IF /I "%ARCH%" == "AVX512" GOTO ARCH_AVX512
 IF /I "%ARCH%" == "x64" GOTO ARCH_x64
 IF /I "%ARCH%" == "Win32" GOTO ARCH_Win32
 IF /I "%ARCH%" == "ARM64" GOTO ARCH_ARM64
@@ -154,6 +115,10 @@ IF /I "%ARCH%" == "x64" GOTO END_ARCH
 :ARCH_AVX2
 IF EXIST "%INPUTDIR_AVX2%" CALL :SubZipFiles %INPUTDIR_AVX2% AVX2
 IF /I "%ARCH%" == "AVX2" GOTO END_ARCH
+
+:ARCH_AVX512
+IF EXIST "%INPUTDIR_AVX512%" CALL :SubZipFiles %INPUTDIR_AVX512% AVX512
+IF /I "%ARCH%" == "AVX512" GOTO END_ARCH
 
 :ARCH_ARM64
 IF EXIST "%INPUTDIR_ARM64%" CALL :SubZipFiles %INPUTDIR_ARM64% ARM64
@@ -238,7 +203,7 @@ EXIT /B
 :SHOWHELP
 TITLE %~nx0 %1
 ECHO. & ECHO.
-ECHO Usage:  %~nx0 [MSVC^|GCC^|Clang^|LLVM] [Win32^|x64^|AVX2^|ARM64^|all^|No32bit] [Release^|Debug] [Locale]
+ECHO Usage:  %~nx0 [MSVC^|GCC^|Clang^|LLVM] [Win32^|x64^|AVX2^|AVX512^|ARM64^|all^|No32bit] [Release^|Debug] [Locale]
 ECHO.
 ECHO Notes:  You can also prefix the commands with "-", "--" or "/".
 ECHO         The arguments are not case sensitive.

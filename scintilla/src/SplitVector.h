@@ -30,10 +30,35 @@ constexpr bool IsValidIndex(size_t index, size_t length) noexcept {
 	return index < length;
 }
 
+// https://stackoverflow.com/questions/21028299/is-this-behavior-of-vectorresizesize-type-n-under-c11-and-boost-container
+// Allocator adaptor that interposes construct() calls to
+// convert value initialization into default initialization.
+template <typename T, typename A = std::allocator<T>>
+class default_init_allocator : public A {
+	typedef std::allocator_traits<A> a_t;
+public:
+	template <typename U> struct rebind {
+		using other = default_init_allocator<U, typename a_t::template rebind_alloc<U>>;
+	};
+
+	using A::A;
+
+	template <typename U>
+	void construct(U *ptr) noexcept(std::is_nothrow_default_constructible_v<U>) {
+		::new(static_cast<void*>(ptr)) U;
+	}
+#if 0
+	template <typename U, typename...Args>
+	void construct(U *ptr, Args&&... args) {
+		a_t::construct(static_cast<A&>(*this), ptr, std::forward<Args>(args)...);
+	}
+#endif
+};
+
 template <typename T>
 class SplitVector {
-protected:
-	std::vector<T> body;
+	// std::vector<T> body;
+	std::vector<T, default_init_allocator<T>> body;
 	ptrdiff_t lengthBody = 0;
 	ptrdiff_t part1Length = 0;
 	ptrdiff_t gapLength = 0;	/// invariant: gapLength == body.size() - lengthBody
@@ -93,6 +118,10 @@ protected:
 public:
 	/// Construct a split buffer.
 	SplitVector(size_t growSize_ = 8) noexcept : growSize{growSize_} {}
+
+	size_t capacity() const noexcept {
+		return body.capacity();
+	}
 
 	size_t GetGrowSize() const noexcept {
 		return growSize;
@@ -286,7 +315,7 @@ public:
 	}
 
 	/// Insert text into the buffer from an array.
-	void InsertFromArray(ptrdiff_t positionToInsert, const T s[], ptrdiff_t positionFrom, ptrdiff_t insertLength) {
+	void InsertFromArray(ptrdiff_t positionToInsert, const T s[], ptrdiff_t insertLength) {
 		PLATFORM_ASSERT((positionToInsert >= 0) && (positionToInsert <= lengthBody));
 		if (insertLength > 0) {
 			if (!InRangeInclusive(positionToInsert, lengthBody)) {
@@ -294,10 +323,10 @@ public:
 			}
 			RoomFor(insertLength);
 			GapTo(positionToInsert);
-			if constexpr (__is_standard_layout(T)) {
-				memcpy(body.data() + part1Length, s + positionFrom, insertLength*sizeof(T));
+			if constexpr (std::is_trivially_copyable_v<T>) {
+				memcpy(body.data() + part1Length, s, insertLength*sizeof(T));
 			} else {
-				std::copy_n(s + positionFrom, insertLength, body.data() + part1Length);
+				std::copy_n(s, insertLength, body.data() + part1Length);
 			}
 			lengthBody += insertLength;
 			part1Length += insertLength;

@@ -16,32 +16,20 @@
 // https://clang.llvm.org/docs/LanguageExtensions.html
 #include <intrin.h>
 
-#if defined(__aarch64__) || defined(_ARM64_) || defined(_M_ARM64)
+#if defined(__aarch64__) || defined(_M_ARM64)
 	#define NP2_TARGET_ARM		1
-	#define NP2_TARGET_ARM64	1
-	#define NP2_TARGET_ARM32	0
-	#define NP2_USE_SSE2		0
-	#define NP2_USE_AVX2		0
-	#define NP2_USE_AVX512		0
-	// TODO: use ARM Neon
-#elif defined(__arm__) || defined(_ARM_) || defined(_M_ARM)
-	#define NP2_TARGET_ARM		1
-	#define NP2_TARGET_ARM64	0
-	#define NP2_TARGET_ARM32	1
 	#define NP2_USE_SSE2		0
 	#define NP2_USE_AVX2		0
 	#define NP2_USE_AVX512		0
 #else
 	#define NP2_TARGET_ARM		0
-	#define NP2_TARGET_ARM64	0
-	#define NP2_TARGET_ARM32	0
 	// SSE2 enabled by default
 	#define NP2_USE_SSE2		1
 
 	// https://learn.microsoft.com/en-us/cpp/build/reference/arch-x64
 	// https://clang.llvm.org/docs/UsersManual.html#x86
 	#if defined(_WIN64)
-		#if defined(__AVX512F__) || defined(__AVX512BW__) || defined(__AVX512CD__) || defined(__AVX512DQ__) || defined(__AVX512VL__)
+		#if defined(__AVX512F__)
 			// Clang and GCC: -march=x86-64-v4, MSVC: /arch:AVX512
 			#define NP2_USE_AVX2	1
 			#define NP2_USE_AVX512	1
@@ -179,17 +167,6 @@
 #define mm256_cmpge_epu8(a, b) \
 	_mm256_cmpeq_epi8(_mm256_max_epu8((a), (b)), (a))
 #define mm256_cmple_epu8(a, b)	mm256_cmpge_epu8((b), (a))
-
-#define ZeroMemory_32x1(buffer) do { \
-	const __m256i zero = _mm256_setzero_si256();						\
-	_mm256_store_si256(reinterpret_cast<__m256i *>(buffer), zero);		\
-} while (0)
-
-#define ZeroMemory_32x2(buffer) do { \
-	const __m256i zero = _mm256_setzero_si256();										\
-	_mm256_store_si256(reinterpret_cast<__m256i *>(buffer), zero);						\
-	_mm256_store_si256(reinterpret_cast<__m256i *>((buffer) + sizeof(__m256i)), zero);	\
-} while (0)
 #endif
 
 #if NP2_USE_SSE2
@@ -197,20 +174,6 @@
 #define mm_cmpge_epu8(a, b) \
 	_mm_cmpeq_epi8(_mm_max_epu8((a), (b)), (a))
 #define mm_cmple_epu8(a, b)		mm_cmpge_epu8((b), (a))
-
-#define ZeroMemory_16x2(buffer) do { \
-	const __m128 zero = _mm_setzero_ps();										\
-	_mm_store_ps(reinterpret_cast<float *>(buffer), zero);						\
-	_mm_store_ps(reinterpret_cast<float *>((buffer) + sizeof(__m128)), zero);	\
-} while (0)
-
-#define ZeroMemory_16x4(buffer) do { \
-	const __m128 zero = _mm_setzero_ps();										\
-	_mm_store_ps(reinterpret_cast<float *>(buffer), zero);						\
-	_mm_store_ps(reinterpret_cast<float *>((buffer) + sizeof(__m128)), zero);	\
-	_mm_store_ps(reinterpret_cast<float *>((buffer) + 2*sizeof(__m128)), zero);	\
-	_mm_store_ps(reinterpret_cast<float *>((buffer) + 3*sizeof(__m128)), zero);	\
-} while (0)
 #endif
 
 
@@ -250,8 +213,10 @@ inline uint32_t loadbe_u32(const void *ptr) noexcept {
 
 #if defined(__GNUC__)
 #define andn_u32(a, b)	__andn_u32((a), (b))
+#define andn_u64(a, b)	__andn_u64((a), (b))
 #else
 #define andn_u32(a, b)	_andn_u32((a), (b))
+#define andn_u64(a, b)	_andn_u64((a), (b))
 #endif
 
 #define bit_zero_high_u32(x, index)	_bzhi_u32((x), (index))
@@ -263,6 +228,10 @@ inline uint32_t loadbe_u32(const void *ptr) noexcept {
 }
 
 constexpr uint32_t andn_u32(uint32_t a, uint32_t b) noexcept {
+	return (~a) & b;
+}
+
+constexpr uint64_t andn_u64(uint64_t a, uint64_t b) noexcept {
 	return (~a) & b;
 }
 

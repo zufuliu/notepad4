@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
-	<assemblyIdentity name="matepath" processorArchitecture="*" version="25.05.0.5670" type="win32"/>
+	<assemblyIdentity name="matepath" processorArchitecture="*" version="25.07.0.5738" type="win32"/>
 	<description>matepath File Browser</description>
 	<dependency>
 		<dependentAssembly>

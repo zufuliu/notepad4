@@ -39,6 +39,7 @@
 
 extern HWND		hwndMain;
 extern DWORD	dwLastIOError;
+extern int		iDefaultEncoding;
 extern int		iCurrentEncoding;
 extern bool		bSkipUnicodeDetection;
 extern bool		bLoadANSIasUTF8;
@@ -46,6 +47,7 @@ extern bool		bLoadASCIIasUTF8;
 extern bool		bLoadNFOasOEM;
 extern bool		fNoFileVariables;
 extern bool		bNoEncodingTags;
+extern int		iDefaultEOLMode;
 extern bool		bWarnLineEndings;
 extern bool		bFixLineEndings;
 extern bool		bAutoStripBlanks;
@@ -1392,7 +1394,6 @@ static INT_PTR CALLBACK ColumnWrapDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
 		const int column = iWrapColumn ? iWrapColumn : fvCurFile.iLongLinesLimit;
 
 		SetDlgItemInt(hwnd, IDC_COLUMNWRAP, column, FALSE);
@@ -1844,9 +1845,7 @@ struct ENCODEDLG {
 static INT_PTR CALLBACK SelectDefEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
-
-		const int iEncoding = *(AsPointer<int *>(lParam));
+		const int iEncoding = iDefaultEncoding;
 		Encoding_GetLabel(iEncoding);
 		SetDlgItemText(hwnd, IDC_ENCODING_LABEL, mEncoding[iEncoding].wchLabel);
 
@@ -1879,10 +1878,10 @@ static INT_PTR CALLBACK SelectDefEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 		case NM_CLICK:
 		case NM_RETURN:
 			if (pnmhdr->idFrom == IDC_ENCODING_LINK) {
-				int *pidREncoding = AsPointer<int *>(GetWindowLongPtr(hwnd, DWLP_USER));
-				if (SelectEncodingDlg(hwndMain, pidREncoding, IDS_SELRECT_DEFAULT_ENCODING)) {
-					Encoding_GetLabel(*pidREncoding);
-					SetDlgItemText(hwnd, IDC_ENCODING_LABEL, mEncoding[*pidREncoding].wchLabel);
+				if (SelectEncodingDlg(hwndMain, &iDefaultEncoding, IDS_SELRECT_DEFAULT_ENCODING)) {
+					const int iEncoding = iDefaultEncoding;
+					Encoding_GetLabel(iEncoding);
+					SetDlgItemText(hwnd, IDC_ENCODING_LABEL, mEncoding[iEncoding].wchLabel);
 				}
 			}
 			break;
@@ -1915,8 +1914,8 @@ static INT_PTR CALLBACK SelectDefEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 //
 // SelectDefEncodingDlg()
 //
-bool SelectDefEncodingDlg(HWND hwnd, int *pidREncoding) noexcept {
-	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_DEFENCODING), hwnd, SelectDefEncodingDlgProc, AsInteger<LPARAM>(pidREncoding));
+bool SelectDefEncodingDlg(HWND hwnd) noexcept {
+	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_DEFENCODING), hwnd, SelectDefEncodingDlgProc, 0);
 	return iResult == IDOK;
 }
 
@@ -2075,20 +2074,19 @@ bool SelectEncodingDlg(HWND hwnd, int *pidREncoding, UINT uidLabel) noexcept {
 // SelectDefLineEndingDlgProc()
 //
 static INT_PTR CALLBACK SelectDefLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
+	UNREFERENCED_PARAMETER(lParam);
+
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
-		const int iOption = *(AsPointer<int *>(lParam));
-
 		// Load options
 		HWND hwndCtl = GetDlgItem(hwnd, IDC_EOLMODELIST);
 		WCHAR wch[128];
 		for (int i = 0; i < 3; i++) {
-			GetString(IDS_EOLMODENAME_CRLF + i, wch, COUNTOF(wch));
+			GetString(IDS_EOLMODENAME_CRLF + GetScintillaEOLMode(i), wch, COUNTOF(wch));
 			ComboBox_AddString(hwndCtl, wch);
 		}
 
-		ComboBox_SetCurSel(hwndCtl, iOption);
+		ComboBox_SetCurSel(hwndCtl, iDefaultEOLMode);
 		ComboBox_SetExtendedUI(hwndCtl, TRUE);
 
 		if (bWarnLineEndings) {
@@ -2110,8 +2108,7 @@ static INT_PTR CALLBACK SelectDefLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM 
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDOK: {
-			int *piOption = AsPointer<int *>(GetWindowLongPtr(hwnd, DWLP_USER));
-			*piOption = static_cast<int>(SendDlgItemMessage(hwnd, IDC_EOLMODELIST, CB_GETCURSEL, 0, 0));
+			iDefaultEOLMode = static_cast<int>(SendDlgItemMessage(hwnd, IDC_EOLMODELIST, CB_GETCURSEL, 0, 0));
 			bWarnLineEndings = IsButtonChecked(hwnd, IDC_WARNINCONSISTENTEOLS);
 			bFixLineEndings = IsButtonChecked(hwnd, IDC_CONSISTENTEOLS);
 			bAutoStripBlanks = IsButtonChecked(hwnd, IDC_AUTOSTRIPBLANKS);
@@ -2132,8 +2129,8 @@ static INT_PTR CALLBACK SelectDefLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM 
 //
 // SelectDefLineEndingDlg()
 //
-bool SelectDefLineEndingDlg(HWND hwnd, int *iOption) noexcept {
-	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_DEFEOLMODE), hwnd, SelectDefLineEndingDlgProc, AsInteger<LPARAM>(iOption));
+bool SelectDefLineEndingDlg(HWND hwnd) noexcept {
+	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_DEFEOLMODE), hwnd, SelectDefLineEndingDlgProc, 0);
 	return iResult == IDOK;
 }
 
@@ -2142,16 +2139,16 @@ static INT_PTR CALLBACK WarnLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
 		const EditFileIOStatus * const status = AsPointer<EditFileIOStatus *>(lParam);
-		const int iEOLMode = GetSettingsEOLMode(status->iEOLMode);
 
 		// Load options
 		HWND hwndCtl = GetDlgItem(hwnd, IDC_EOLMODELIST);
 		WCHAR wch[128];
 		for (int i = 0; i < 3; i++) {
-			GetString(IDS_EOLMODENAME_CRLF + i, wch, COUNTOF(wch));
+			GetString(IDS_EOLMODENAME_CRLF + GetScintillaEOLMode(i), wch, COUNTOF(wch));
 			ComboBox_AddString(hwndCtl, wch);
 		}
 
+		const int iEOLMode = GetSettingsEOLMode(status->iEOLMode);
 		ComboBox_SetCurSel(hwndCtl, iEOLMode);
 		ComboBox_SetExtendedUI(hwndCtl, TRUE);
 
@@ -2179,7 +2176,7 @@ static INT_PTR CALLBACK WarnLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 		case IDOK: {
 			EditFileIOStatus *status = AsPointer<EditFileIOStatus *>(GetWindowLongPtr(hwnd, DWLP_USER));
 			const int iEOLMode = static_cast<int>(SendDlgItemMessage(hwnd, IDC_EOLMODELIST, CB_GETCURSEL, 0, 0));
-			status->iEOLMode = iEOLMode;
+			status->iEOLMode = GetScintillaEOLMode(iEOLMode);
 			bWarnLineEndings = IsButtonChecked(hwnd, IDC_WARNINCONSISTENTEOLS);
 			EndDialog(hwnd, IDOK);
 		}

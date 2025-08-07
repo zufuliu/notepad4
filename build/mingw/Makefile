@@ -102,6 +102,16 @@ else ifeq ($(ARCH), AVX2)
 	ifndef LLD
 		export LDFLAGS += -Wl,--subsystem,windows:6.01
 	endif
+else ifeq ($(ARCH), AVX512)
+	# Windows 10, Windows Server 2019, 64-bit only
+	export CFLAGS += -march=x86-64-v4
+	export CXXFLAGS += -march=x86-64-v4
+	export RCFLAGS += -D_WIN64
+	export CPPFLAGS += -D_WIN64 -D_WIN32_WINNT=0x0A00 -DWINVER=0x0A00
+	export LDFLAGS += -march=x86-64-v4 -Wl,--major-os-version,10 -Wl,--minor-os-version,0
+	ifndef LLD
+		export LDFLAGS += -Wl,--subsystem,windows:10.00
+	endif
 else ifeq ($(ARCH), Win32)
 	export CFLAGS += -msse2 -mfpmath=sse
 	export CXXFLAGS += -msse2 -mfpmath=sse

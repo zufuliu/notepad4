@@ -165,16 +165,13 @@ extern UINT g_uCurrentDPI;
 extern UINT g_uSystemDPI;
 
 // since Windows 10, version 1607
-#if (defined(__aarch64__) || defined(_ARM64_) || defined(_M_ARM64)) && !defined(__MINGW32__)
-// 1709 was the first version for Windows 10 on ARM64.
-#define NP2_HAS_GETDPIFORWINDOW				1
+#if _WIN32_WINNT >= _WIN32_WINNT_WIN10
 #define GetWindowDPI(hwnd)					GetDpiForWindow(hwnd)
 #define SystemMetricsForDpi(nIndex, dpi)	GetSystemMetricsForDpi((nIndex), (dpi))
 #define AdjustWindowRectForDpi(lpRect, dwStyle, dwExStyle, dpi) \
 		AdjustWindowRectExForDpi((lpRect), (dwStyle), FALSE, (dwExStyle), (dpi))
 
 #else
-#define NP2_HAS_GETDPIFORWINDOW				0
 UINT GetWindowDPI(HWND hwnd) noexcept;
 int SystemMetricsForDpi(int nIndex, UINT dpi) noexcept;
 BOOL AdjustWindowRectForDpi(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT dpi) noexcept;

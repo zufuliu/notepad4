@@ -117,7 +117,7 @@ enum {
 
 void	Edit_ReleaseResources() noexcept;
 void	EditCreate(HWND hwndParent) noexcept;
-void	EditSetNewText(LPCSTR lpstrText, DWORD cbText, Sci_Line lineCount) noexcept;
+void	EditSetNewText(LPCSTR lpstrText, DWORD cbText, size_t lineCount) noexcept;
 
 static inline void EditSetEmptyText() noexcept{
 	EditSetNewText("", 0, 1);
@@ -457,8 +457,8 @@ void	EditClickCallTip(HWND hwnd) noexcept;
 #define MAX_NON_UTF8_SIZE	((1U << 30) - 16)
 // Scintilla document is indexed with int for normal file, and ptrdiff_t for large file.
 #define MAX_SMALL_FILE_SIZE	((1U << 31) - 16)
-// added 32 bytes padding as encoding detection may read beyond cbData.
-#define NP2_ENCODING_DETECTION_PADDING	32
+// added padding bytes as encoding detection may read beyond cbData.
+#define NP2_ENCODING_DETECTION_PADDING	(32 << NP2_USE_AVX512)
 
 enum {
 	EncodingFlag_None = 0,
@@ -575,7 +575,7 @@ bool	Encoding_GetFromComboboxEx(HWND hwnd, int *pidEncoding) noexcept;
 #endif
 
 UINT	CodePageFromCharSet(UINT uCharSet) noexcept;
-bool	IsUTF8(const char *pTest, DWORD nLength) noexcept;
+bool	IsUTF8(const char *data, DWORD length) noexcept;
 bool	IsUTF7(const char *pTest, DWORD nLength) noexcept;
 
 #define BOM_UTF8		0xBFBBEF

@@ -35,6 +35,12 @@ jobs:
         CALL "locale\build.bat" Build AVX2 Release 1
         CALL "build\make_zip.bat" MSVC AVX2 Release Locale 1
 
+    - name: MSVC AVX512 Release
+      run: |
+        CALL "build\VisualStudio\build.bat" Build AVX512 Release 1
+        CALL "locale\build.bat" Build AVX512 Release 1
+        CALL "build\make_zip.bat" MSVC AVX512 Release Locale 1
+
     - name: MSVC ARM64 Release
       run: |
         CALL "build\VisualStudio\build.bat" Build ARM64 Release 1
@@ -55,6 +61,11 @@ jobs:
       with:
           name: Notepad4_MSVC2022_i18n_AVX2
           path: 'build\Notepad4_i18n_AVX2_*.zip'
+
+    - uses: actions/upload-artifact@v4
+      with:
+          name: Notepad4_MSVC2022_i18n_AVX512
+          path: 'build\Notepad4_i18n_AVX512_*.zip'
 
     - uses: actions/upload-artifact@v4
       with:
@@ -90,6 +101,11 @@ jobs:
         CALL "build\VisualStudio\build.bat" Build AVX2 LLVMRelease 1
         CALL "build\make_zip.bat" LLVM AVX2 Release 1
 
+    - name: Clang AVX512 Release
+      run: |
+        CALL "build\VisualStudio\build.bat" Build AVX512 LLVMRelease 1
+        CALL "build\make_zip.bat" LLVM AVX512 Release 1
+
     - name: Clang ARM64 Release
       run: |
         CALL "build\VisualStudio\build.bat" Build ARM64 LLVMRelease 1
@@ -109,6 +125,11 @@ jobs:
       with:
           name: Notepad4_Clang_MSVC2022_en_AVX2
           path: 'build\Notepad4_LLVM_AVX2_*.zip'
+
+    - uses: actions/upload-artifact@v4
+      with:
+          name: Notepad4_Clang_MSVC2022_en_AVX512
+          path: 'build\Notepad4_LLVM_AVX512_*.zip'
 
     - uses: actions/upload-artifact@v4
       with:
@@ -145,6 +166,11 @@ jobs:
         CALL "build\mingw\build.bat" llvm AVX2
         CALL "build\make_zip.bat" Clang AVX2 Release 1
 
+    - name: Clang AVX512 Release
+      run: |
+        CALL "build\mingw\build.bat" llvm AVX512
+        CALL "build\make_zip.bat" Clang AVX512 Release 1
+
     - name: Clang ARM64 Release
       run: |
         CALL "build\mingw\build.bat" llvm aarch64
@@ -164,6 +190,11 @@ jobs:
       with:
           name: Notepad4_llvm_mingw_en_AVX2
           path: 'build\Notepad4_Clang_AVX2_*.zip'
+
+    - uses: actions/upload-artifact@v4
+      with:
+          name: Notepad4_llvm_mingw_en_AVX512
+          path: 'build\Notepad4_Clang_AVX512_*.zip'
 
     - uses: actions/upload-artifact@v4
       with:
@@ -194,6 +225,11 @@ jobs:
         CALL "build\mingw\build.bat" ucrt AVX2
         CALL "build\make_zip.bat" GCC AVX2 Release 1
 
+    - name: GCC AVX512 Release
+      run: |
+        CALL "build\mingw\build.bat" ucrt AVX512
+        CALL "build\make_zip.bat" GCC AVX512 Release 1
+
     - name: Clang x64 Release
       run: |
         CALL "build\mingw\build.bat" ucrt Clang
@@ -203,6 +239,11 @@ jobs:
       run: |
         CALL "build\mingw\build.bat" ucrt AVX2 Clang
         CALL "build\make_zip.bat" Clang AVX2 Release 1
+
+    - name: Clang AVX512 Release
+      run: |
+        CALL "build\mingw\build.bat" ucrt AVX512 Clang
+        CALL "build\make_zip.bat" Clang AVX512 Release 1
 
     - uses: actions/upload-artifact@v4
       with:
@@ -216,6 +257,11 @@ jobs:
 
     - uses: actions/upload-artifact@v4
       with:
+          name: Notepad4_GCC_en_AVX512_ucrt
+          path: 'build\Notepad4_GCC_AVX512_*.zip'
+
+    - uses: actions/upload-artifact@v4
+      with:
           name: Notepad4_Clang_mingw_en_x64_ucrt
           path: 'build\Notepad4_Clang_x64_*.zip'
 
@@ -223,6 +269,11 @@ jobs:
       with:
           name: Notepad4_Clang_mingw_en_AVX2_ucrt
           path: 'build\Notepad4_Clang_AVX2_*.zip'
+
+    - uses: actions/upload-artifact@v4
+      with:
+          name: Notepad4_Clang_mingw_en_AVX512_ucrt
+          path: 'build\Notepad4_Clang_AVX512_*.zip'
 
   gcc_x86_64:
     name: 64-bit GCC and Clang
@@ -248,6 +299,11 @@ jobs:
         CALL "build\mingw\build.bat" x86_64 AVX2
         CALL "build\make_zip.bat" GCC AVX2 Release 1
 
+    - name: GCC AVX512 Release
+      run: |
+        CALL "build\mingw\build.bat" x86_64 AVX512
+        CALL "build\make_zip.bat" GCC AVX512 Release 1
+
     - name: Clang x64 Release
       run: |
         CALL "build\mingw\build.bat" x86_64 Clang
@@ -257,6 +313,11 @@ jobs:
       run: |
         CALL "build\mingw\build.bat" x86_64 AVX2 Clang
         CALL "build\make_zip.bat" Clang AVX2 Release 1
+
+    - name: Clang AVX512 Release
+      run: |
+        CALL "build\mingw\build.bat" x86_64 AVX512 Clang
+        CALL "build\make_zip.bat" Clang AVX512 Release 1
 
     - uses: actions/upload-artifact@v4
       with:
@@ -270,6 +331,11 @@ jobs:
 
     - uses: actions/upload-artifact@v4
       with:
+          name: Notepad4_GCC_en_AVX512
+          path: 'build\Notepad4_GCC_AVX512_*.zip'
+
+    - uses: actions/upload-artifact@v4
+      with:
           name: Notepad4_Clang_mingw_en_x64
           path: 'build\Notepad4_Clang_x64_*.zip'
 
@@ -277,6 +343,11 @@ jobs:
       with:
           name: Notepad4_Clang_mingw_en_AVX2
           path: 'build\Notepad4_Clang_AVX2_*.zip'
+
+    - uses: actions/upload-artifact@v4
+      with:
+          name: Notepad4_Clang_mingw_en_AVX512
+          path: 'build\Notepad4_Clang_AVX512_*.zip'
 
   gcc_i686:
     name: 32-bit GCC and Clang
