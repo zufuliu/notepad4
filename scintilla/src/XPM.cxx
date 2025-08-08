@@ -263,8 +263,9 @@ void RGBAImage::SetPixel(int x, int y, ColourRGBA colour) noexcept {
 // Used for DrawRGBAImage on some platforms.
 void RGBAImage::BGRAFromRGBA(unsigned char *pixelsBGRA, const unsigned char *pixelsRGBA, size_t count) noexcept {
 	static_assert(UCHAR_MAX == 255);
+	// reduce code size for clang auto vectorization, we no longer use XPM for bookmark symbol.
 #if NP2_USE_AVX2
-	count /= (bytesPerPixel * 2);
+	count /= (sizeof(uint64_t) / bytesPerPixel);
 	uint64_t *pbgra = reinterpret_cast<uint64_t *>(pixelsBGRA);
 	const uint64_t *prgba = reinterpret_cast<const uint64_t *>(pixelsRGBA);
 	for (size_t i = 0; i < count; i++, pbgra++) {
@@ -281,7 +282,7 @@ void RGBAImage::BGRAFromRGBA(unsigned char *pixelsBGRA, const unsigned char *pix
 	}
 
 #elif NP2_USE_SSE2
-	count /= bytesPerPixel;
+	count /= (sizeof(uint32_t) / bytesPerPixel);
 	uint32_t *pbgra = reinterpret_cast<uint32_t *>(pixelsBGRA);
 	const uint32_t *prgba = reinterpret_cast<const uint32_t *>(pixelsRGBA);
 	for (size_t i = 0; i < count; i++, pbgra++) {
