@@ -510,9 +510,8 @@ void TestBitmapAlphaBlend(const char *path, const uint32_t crDest, const BYTE al
 	}
 
 	const size_t pixelCount = data.size();
-	std::vector<uint32_t> scalar;
+	std::vector<uint32_t> scalar(pixelCount);
 	{ // scalar
-		scalar.resize(pixelCount);
 		const RGBQUAD *prgba = reinterpret_cast<RGBQUAD *>(data.data());
 
 		const WORD red = GetRValue(crDest) * (255 ^ alpha);
@@ -528,8 +527,7 @@ void TestBitmapAlphaBlend(const char *path, const uint32_t crDest, const BYTE al
 	}
 
 	{ // sse2 1x1
-		std::vector<uint32_t> xmm;
-		xmm.resize(pixelCount);
+		std::vector<uint32_t> xmm(pixelCount);
 		const uint32_t *prgba = data.data();
 
 		const __m128i i16x4Alpha = mm_setlo_alpha_epi16(alpha);
@@ -552,8 +550,7 @@ void TestBitmapAlphaBlend(const char *path, const uint32_t crDest, const BYTE al
 		}
 	}
 	{ // sse2 1x4
-		std::vector<uint32_t> xmm;
-		xmm.resize(pixelCount);
+		std::vector<uint32_t> xmm(pixelCount);
 		constexpr size_t offset = 0;
 		const __m128i *prgba = reinterpret_cast<__m128i *>(data.data() + offset);
 		__m128i *dest = reinterpret_cast<__m128i *>(xmm.data() + offset);
@@ -594,8 +591,7 @@ void TestBitmapAlphaBlend(const char *path, const uint32_t crDest, const BYTE al
 	}
 #if NP2_USE_AVX2
 	{ // sse4 1x1
-		std::vector<uint32_t> xmm;
-		xmm.resize(pixelCount);
+		std::vector<uint32_t> xmm(pixelCount);
 		const uint32_t *prgba = data.data();
 		uint32_t *dest = xmm.data();
 
@@ -619,8 +615,7 @@ void TestBitmapAlphaBlend(const char *path, const uint32_t crDest, const BYTE al
 		}
 	}
 	{ // sse4 2x1
-		std::vector<uint32_t> xmm;
-		xmm.resize(pixelCount);
+		std::vector<uint32_t> xmm(pixelCount);
 		const uint64_t *prgba = reinterpret_cast<uint64_t *>(data.data());
 		uint64_t *dest = reinterpret_cast<uint64_t *>(xmm.data());
 
@@ -645,8 +640,7 @@ void TestBitmapAlphaBlend(const char *path, const uint32_t crDest, const BYTE al
 		}
 	}
 	{ // avx2 4x1
-		std::vector<uint32_t> xmm;
-		xmm.resize(pixelCount);
+		std::vector<uint32_t> xmm(pixelCount);
 		const __m128i *prgba = reinterpret_cast<__m128i *>(data.data());
 		__m128i *dest = reinterpret_cast<__m128i *>(xmm.data());
 
@@ -657,10 +651,9 @@ void TestBitmapAlphaBlend(const char *path, const uint32_t crDest, const BYTE al
 			const __m256i origin = _mm256_cvtepu8_epi16(*prgba);
 			__m256i i16x16Fore = _mm256_mullo_epi16(origin, i16x16Alpha);
 			i16x16Fore = _mm256_add_epi16(i16x16Fore, i16x16Back);
-			i16x16Fore = _mm256_srli_epi16(_mm256_mulhi_epu16(i16x16Fore, i16x16_0x8081), 7);
+			i16x16Fore = mm256_div_epu16_by_255(i16x16Fore, i16x16_0x8081);
 			i16x16Fore = _mm256_blend_epi16(origin, i16x16Fore, 0x77);
-			i16x16Fore = _mm256_packus_epi16(i16x16Fore, i16x16Fore);
-			i16x16Fore = _mm256_permute4x64_epi64(i16x16Fore, 8);
+			i16x16Fore = pack_color_epi16_avx2_si256(i16x16Fore);
 			_mm_storeu_si128(dest, _mm256_castsi256_si128(i16x16Fore));
 		}
 		for (size_t x = 0; x < pixelCount; x++) {

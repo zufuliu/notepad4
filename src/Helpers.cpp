@@ -633,10 +633,9 @@ bool BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha) noexcept {
 				const __m256i origin = _mm256_cvtepu8_epi16(*prgba);
 				__m256i i16x16Fore = _mm256_mullo_epi16(origin, i16x16Alpha);
 				i16x16Fore = _mm256_add_epi16(i16x16Fore, i16x16Back);
-				i16x16Fore = _mm256_srli_epi16(_mm256_mulhi_epu16(i16x16Fore, i16x16_0x8081), 7);
+				i16x16Fore = mm256_div_epu16_by_255(i16x16Fore, i16x16_0x8081);
 				i16x16Fore = _mm256_blend_epi16(origin, i16x16Fore, 0x77);
-				i16x16Fore = _mm256_packus_epi16(i16x16Fore, i16x16Fore);
-				i16x16Fore = _mm256_permute4x64_epi64(i16x16Fore, 8);
+				i16x16Fore = pack_color_epi16_avx2_si256(i16x16Fore);
 				_mm_storeu_si128(prgba, _mm256_castsi256_si128(i16x16Fore));
 			}
 #else
@@ -742,6 +741,7 @@ bool BitmapGrayScale(HBITMAP hbmp) noexcept {
 // Check if two colors can be distinguished
 //
 bool VerifyContrast(COLORREF cr1, COLORREF cr2) noexcept {
+	// reduce code size
 #if NP2_USE_AVX2
 	__m128i i32x4Fore = unpack_color_epi32_sse4_si32(cr1);
 	__m128i i32x4Back = unpack_color_epi32_sse4_si32(cr2);
