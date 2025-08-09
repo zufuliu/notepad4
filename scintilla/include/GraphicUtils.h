@@ -271,3 +271,20 @@ inline __m128i rgba_to_bgra_epi32_sse4_si32(uint32_t color) noexcept {
 #endif
 }
 #endif // NP2_USE_AVX2
+
+#if NP2_USE_AVX512
+inline __m512i mm512_div_epu16_by_255(__m512i i16x32, __m512i i16x32_0x8081) noexcept {
+	return _mm512_srli_epi16(_mm512_mulhi_epu16(i16x32, i16x32_0x8081), 7);
+}
+
+inline __m512i unpack_color_epi16_avx512_ptr256(const __m256i *color) noexcept {
+	return _mm512_cvtepu8_epi16(*color);
+}
+
+inline __m512i pack_color_epi16_avx512_si512(__m512i i16x32) noexcept {
+	i16x32 = _mm512_packus_epi16(i16x32, i16x32);
+	__m256i i16x16 = _mm256_unpacklo_epi64(_mm512_castsi512_si256(i16x32), _mm512_extracti64x4_epi64(i16x32, 1));
+	i16x16 = _mm256_permute4x64_epi64(i16x16, 0b11011000);
+	return _mm512_castsi256_si512(i16x16);
+}
+#endif // NP2_USE_AVX512

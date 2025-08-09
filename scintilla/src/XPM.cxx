@@ -264,7 +264,25 @@ void RGBAImage::SetPixel(int x, int y, ColourRGBA colour) noexcept {
 void RGBAImage::BGRAFromRGBA(unsigned char *pixelsBGRA, const unsigned char *pixelsRGBA, size_t count) noexcept {
 	static_assert(UCHAR_MAX == 255);
 	// reduce code size for clang auto vectorization, we no longer use XPM for bookmark symbol.
-#if NP2_USE_AVX2
+#if 0//NP2_USE_AVX512
+	count /= (sizeof(__m256i) / bytesPerPixel);
+	__m256i *pbgra = reinterpret_cast<__m256i *>(pixelsBGRA);
+	const __m256i *prgba = reinterpret_cast<const __m256i *>(pixelsRGBA);
+	const __m512i i16x32_0x8081 = _mm512_broadcast_i32x4(_mm_set1_epi16(-0x8000 | 0x81));
+	for (size_t i = 0; i < count; i++, pbgra++) {
+		__m512i i16x32Color = unpack_color_epi16_avx512_ptr256(prgba++);
+		i16x32Color = _mm512_shufflehi_epi16(_mm512_shufflelo_epi16(i16x32Color, _MM_SHUFFLE(3, 0, 1, 2)), _MM_SHUFFLE(3, 0, 1, 2));
+		const __m512i i16x32Alpha = _mm512_shufflehi_epi16(_mm512_shufflelo_epi16(i16x32Color, 0xff), 0xff);
+
+		i16x32Color = _mm512_mullo_epi16(i16x32Color, i16x32Alpha);
+		i16x32Color = mm512_div_epu16_by_255(i16x32Color, i16x32_0x8081);
+		i16x32Color = _mm512_mask_blend_epi16(0x77777777, i16x32Alpha, i16x32Color);
+
+		i16x32Color = pack_color_epi16_avx512_si512(i16x32Color);
+		_mm256_storeu_si256(pbgra, _mm512_castsi512_si256(i16x32Color));
+	}
+
+#elif NP2_USE_AVX2
 #if 1
 	count /= (sizeof(__m128i) / bytesPerPixel);
 	__m128i *pbgra = reinterpret_cast<__m128i *>(pixelsBGRA);
