@@ -620,7 +620,25 @@ bool BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha) noexcept {
 			//FILE *fp = fopen("bitmap.dat", "wb");
 			//fwrite(bmp.bmBits, 1, bmp.bmHeight*bmp.bmWidth*4, fp);
 			//fclose(fp);
-#if NP2_USE_AVX2
+#if 0//NP2_USE_AVX512
+			#define BitmapAlphaBlend_Tag	"avx512 8x1"
+			const ULONG count = (bmp.bmHeight * bmp.bmWidth) / 8;
+			__m256i *prgba = static_cast<__m256i *>(bmp.bmBits);
+
+			const __m512i i16x32Alpha = _mm512_broadcastw_epi16(_mm_cvtsi32_si128(alpha));
+			const __m512i i16x32Back = _mm512_broadcastq_epi64(_mm_mullo_epi16(rgba_to_bgra_epi16_sse2_si32(crDest), mm_xor_alpha_epi16(_mm512_castsi512_si128(i16x32Alpha))));
+			const __m512i i16x32_0x8081 = _mm512_broadcast_i32x4(_mm_set1_epi16(-0x8000 | 0x81));
+			for (ULONG x = 0; x < count; x++, prgba++) {
+				const __m512i origin = unpack_color_epi16_avx512_ptr256(prgba);
+				__m512i i16x32Fore = _mm512_mullo_epi16(origin, i16x32Alpha);
+				i16x32Fore = _mm512_add_epi16(i16x32Fore, i16x32Back);
+				i16x32Fore = mm512_div_epu16_by_255(i16x32Fore, i16x32_0x8081);
+				i16x32Fore = _mm512_mask_blend_epi16(0x77777777, origin, i16x32Fore);
+				i16x32Fore = pack_color_epi16_avx512_si512(i16x32Fore);
+				_mm256_storeu_si256(prgba, _mm512_castsi512_si256(i16x32Fore));
+			}
+
+#elif NP2_USE_AVX2
 #if 1
 			#define BitmapAlphaBlend_Tag	"avx2 4x1"
 			const ULONG count = (bmp.bmHeight * bmp.bmWidth) / 4;
@@ -630,7 +648,7 @@ bool BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha) noexcept {
 			const __m256i i16x16Back = _mm256_broadcastq_epi64(_mm_mullo_epi16(rgba_to_bgra_epi16_sse4_si32(crDest), mm_xor_alpha_epi16(_mm256_castsi256_si128(i16x16Alpha))));
 			const __m256i i16x16_0x8081 = _mm256_broadcastsi128_si256(_mm_set1_epi16(-0x8000 | 0x81));
 			for (ULONG x = 0; x < count; x++, prgba++) {
-				const __m256i origin = _mm256_cvtepu8_epi16(*prgba);
+				const __m256i origin = unpack_color_epi16_avx2_ptr128(prgba);
 				__m256i i16x16Fore = _mm256_mullo_epi16(origin, i16x16Alpha);
 				i16x16Fore = _mm256_add_epi16(i16x16Fore, i16x16Back);
 				i16x16Fore = mm256_div_epu16_by_255(i16x16Fore, i16x16_0x8081);

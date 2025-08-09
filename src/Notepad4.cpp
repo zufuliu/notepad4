@@ -1915,7 +1915,11 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 
 	if (internalBitmap) {
 		HBITMAP hbmpCopy = static_cast<HBITMAP>(CopyImage(hbmp, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION));
+		// StopWatch watch;
+		// watch.Start();
 		const bool fProcessed = BitmapAlphaBlend(hbmpCopy, GetSysColor(COLOR_3DFACE), 0x60);
+		// watch.Stop();
+		// watch.ShowLog("BitmapAlphaBlend");
 		if (fProcessed) {
 			himl = ImageList_Create(bmp.bmHeight, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
 			ImageList_AddMasked(himl, hbmpCopy, CLR_DEFAULT);
