@@ -104,20 +104,20 @@ BEGIN
 	POPUP "+"
 	BEGIN
 		MENUITEM "열기 (동일한 창)(&O)",			IDM_FILE_OPENSAME
-		MENUITEM "열기 (새 창)(&E)",			IDM_FILE_OPENNEW
-		MENUITEM "실행(&R)...",						IDM_FILE_RUN
-		MENUITEM "실행(&L)",						IDM_FILE_LAUNCH
-		MENUITEM "빠른 보기(&Q)",					IDM_FILE_QUICKVIEW
-		MENUITEM "다음으로 열기(&W)...",				IDM_FILE_OPENWITH
-		MENUITEM "파일 이름 복사(&C)",					IDM_POP_COPY_FILENAME
-		MENUITEM "경로 이름 복사(&T)",				IDM_POP_COPY_PATHNAME
+		MENUITEM "열기 (새 창)(&E)",				IDM_FILE_OPENNEW
+		MENUITEM "실행(&R)...",					IDM_FILE_RUN
+		MENUITEM "실행(&L)",					IDM_FILE_LAUNCH
+		MENUITEM "빠른 보기(&Q)",				IDM_FILE_QUICKVIEW
+		MENUITEM "다음으로 열기(&W)...",			IDM_FILE_OPENWITH
+		MENUITEM "파일 이름 복사(&C)",			IDM_POP_COPY_FILENAME
+		MENUITEM "경로 이름 복사(&T)",			IDM_POP_COPY_PATHNAME
 		MENUITEM SEPARATOR
 		MENUITEM "탐색기에서 보기(&E)",			IDM_FILE_EXPLORER
-		MENUITEM "링크 만들기(&K)...",				IDM_FILE_CREATELINK
-		MENUITEM "다른 이름으로 저장(&S)...",					IDM_FILE_SAVEAS
+		MENUITEM "링크 만들기(&K)...",			IDM_FILE_CREATELINK
+		MENUITEM "다른 이름으로 저장(&S)...",	IDM_FILE_SAVEAS
 		MENUITEM "복사/이동(&M)...",				IDM_FILE_COPYMOVE
 		MENUITEM "삭제(D&)...",					IDM_FILE_DELETE
-		MENUITEM "이름 바꾸기(&N)...",					IDM_FILE_RENAME
+		MENUITEM "이름 바꾸기(&N)...",			IDM_FILE_RENAME
 		MENUITEM SEPARATOR
 		MENUITEM "속성(&P)",					IDM_FILE_PROPERTIES
 	END
@@ -130,8 +130,8 @@ BEGIN
 		MENUITEM "필터 초기화(&R)",				IDM_VIEW_FILTERALL
 		POPUP "보기(&S)"
 		BEGIN
-			MENUITEM "디렉터리(&D)",			IDM_VIEW_FOLDERS
-			MENUITEM "파일(&F)",					IDM_VIEW_FILES
+			MENUITEM "디렉터리(&D)",				IDM_VIEW_FOLDERS
+			MENUITEM "파일(&F)",				IDM_VIEW_FILES
 			MENUITEM "시스템 개체(&S)",			IDM_VIEW_HIDDEN
 		END
 		POPUP "정렬(&T)"
@@ -145,16 +145,16 @@ BEGIN
 		END
 		MENUITEM SEPARATOR
 		MENUITEM "탐색기에서 열기(&E)",			IDM_FILE_EXPLORER
-		MENUITEM "즐겨찾기로 이동(&F)",				IDM_VIEW_FAVORITES
-		MENUITEM "즐겨찾기 편집(&O)",				IDM_VIEW_EDITFAVORITES
+		MENUITEM "즐겨찾기로 이동(&F)",			IDM_VIEW_FAVORITES
+		MENUITEM "즐겨찾기 편집(&O)",			IDM_VIEW_EDITFAVORITES
 		MENUITEM "디렉터리(&D)...",				IDM_FILE_CHANGEDIR
 		MENUITEM "이동(&G)...",					IDM_FILE_GOTO
 		MENUITEM SEPARATOR
-		MENUITEM "드라이브 표시(&V)",				IDM_VIEW_DRIVEBOX
+		MENUITEM "드라이브 표시(&V)",			IDM_VIEW_DRIVEBOX
 		MENUITEM "맨 위에 유지(&K)",				IDM_VIEW_ALWAYSONTOP
 		MENUITEM SEPARATOR
 		MENUITEM "설정 저장(&I)",				IDM_VIEW_SAVESETTINGS
-		MENUITEM "대상 지정(&U)...",			IDM_VIEW_FINDTARGET
+		MENUITEM "대상 지정(&U)...",				IDM_VIEW_FINDTARGET
 		MENUITEM "옵션(&P)...",					IDM_VIEW_OPTIONS
 	END
 	POPUP "+"
@@ -162,23 +162,23 @@ BEGIN
 		MENUITEM "디렉터리(&D)...",				IDM_FILE_CHANGEDIR
 		MENUITEM "드라이브 속성(&P)",			IDM_FILE_DRIVEPROP
 		MENUITEM SEPARATOR
-		MENUITEM "드라이브 표시(&V)",				IDM_VIEW_DRIVEBOX
+		MENUITEM "드라이브 표시(&V)",			IDM_VIEW_DRIVEBOX
 	END
 	POPUP "+"
 	BEGIN
-		MENUITEM "도구 모음 표시(&T)",				IDM_VIEW_TOOLBAR
+		MENUITEM "도구 모음 표시(&T)",			IDM_VIEW_TOOLBAR
 		MENUITEM "도구 모음 편집(&E)...",		IDM_VIEW_CUSTOMIZETB
-		MENUITEM "도구 모음 자동 크기 조정(&A)",			IDM_VIEW_AUTO_SCALE_TOOLBAR
+		MENUITEM "도구 모음 자동 크기 조정(&A)",	IDM_VIEW_AUTO_SCALE_TOOLBAR
 #if NP2_ENABLE_HIDPI_IMAGE_RESOURCE
-		MENUITEM "Use &Large Toolbar",			IDM_VIEW_USE_LARGE_TOOLBAR
+		MENUITEM "큰 도구 모음 사용(&L)",		IDM_VIEW_USE_LARGE_TOOLBAR
 #endif
-		MENUITEM "상태 표시줄 표시(&S)",				IDM_VIEW_STATUSBAR
+		MENUITEM "상태 표시줄 표시(&S)",			IDM_VIEW_STATUSBAR
 	END
 	POPUP "+"
 	BEGIN
-		MENUITEM "matepath 열기(&O)",				IDM_TRAY_RESTORE
+		MENUITEM "matepath 열기(&O)",			IDM_TRAY_RESTORE
 		MENUITEM SEPARATOR
-		MENUITEM "matepath 종료(&X)",				IDM_TRAY_EXIT
+		MENUITEM "matepath 종료(&X)",			IDM_TRAY_EXIT
 	END
 END
 
@@ -280,7 +280,7 @@ CAPTION "실행"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     ICON            IDI_RUN,IDC_STATIC,7,7,20,20
-    LTEXT           "실행할 실행 프로그램 파일, 폴더 또는 문서의 이름을 입력합니다.",IDC_RUNDESC,35,7,188,17
+    LTEXT           "실행할 실행 프로그램 파일, 폴더 또는 문서의 이름을 입력하세요.",IDC_RUNDESC,35,7,188,17
     EDITTEXT        IDC_COMMANDLINE,7,35,203,14,ES_AUTOHSCROLL
     PUSHBUTTON      "",IDC_SEARCHEXE,215,35,14,14
     DEFPUSHBUTTON   "확인",IDOK,121,65,50,14
@@ -401,14 +401,14 @@ CAPTION "고급"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     ICON            IDI_OPTIONS2,IDC_STATIC,10,10,20,20
-    AUTOCHECKBOX    "오른쪽에서 왼쪽 레이아웃을 사용(&R).",IDC_RTL_LAYOUT,10,34,190,10,WS_TABSTOP
-    LTEXT           "matepath에 대한 고급 프로그램 설정을 지정.",IDC_STATIC,40,15,200,8
+    AUTOCHECKBOX    "오른쪽에서 왼쪽 레이아웃 사용(&R).",IDC_RTL_LAYOUT,10,34,190,10,WS_TABSTOP
+    LTEXT           "matepath에 대한 고급 프로그램 설정 지정.",IDC_STATIC,40,15,200,8
     AUTOCHECKBOX    "시작 디렉터리 사용(&U):",IDC_STARTUPDIR,10,46,104,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "가장 최근 사용(&R).",IDC_GOTOMRU,114,46,90,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON """즐겨찾기"" 폴더(&F).",IDC_GOTOFAV,114,58,90,10,WS_TABSTOP
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,76,205,1
-    AUTOCHECKBOX    "저장된 파일의 읽기 전용 속성을 지우기&C).",IDC_CLEARREADONLY,10,85,172,10,WS_TABSTOP
-    AUTOCHECKBOX    "이름 충돌 시 복사된 파일의 이름을 바꾸기(&N).",IDC_RENAMEONCOLLISION,10,97,164,10,WS_TABSTOP
+    AUTOCHECKBOX    "저장된 파일의 읽기 전용 속성 지우기&C).",IDC_CLEARREADONLY,10,85,172,10,WS_TABSTOP
+    AUTOCHECKBOX    "이름 충돌 시 복사된 파일의 이름 바꾸기(&N).",IDC_RENAMEONCOLLISION,10,97,164,10,WS_TABSTOP
     AUTOCHECKBOX    "삭제된 파일을 휴지통으로 이동(&M).",IDC_USERECYCLEBIN,10,109,160,10,WS_TABSTOP
     AUTOCHECKBOX    "파일 삭제 확인 안 함 (권장하지 않음)(&D).",IDC_NOCONFIRMDELETE,10,121,184,10,WS_TABSTOP
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,139,205,1
@@ -425,12 +425,12 @@ BEGIN
     ICON            IDI_ITEMS,IDC_STATIC,10,10,21,20
     LTEXT           "matepath 외형",IDC_STATIC,40,15,160,8
     GROUPBOX        "디렉터리 목록에 있는 항목의 외형",IDC_STATIC,10,41,205,109
-    LTEXT           "필터 없음이 설정된 경우 이 텍스트 색상을 사용:",IDC_STATIC,20,54,170,8
+    LTEXT           "필터 없음이 설정된 경우 이 텍스트 색상 사용:",IDC_STATIC,20,54,170,8
     AUTORADIOBUTTON "Windows 기본 색상(&W).",IDC_COLOR_DEF1,20,68,96,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "사용자 지정 색상(&C):",IDC_COLOR_CUST1,20,82,75,10,WS_TABSTOP
     EDITTEXT        IDC_COLOR_SAMP1,97,80,18,14,ES_AUTOHSCROLL | WS_DISABLED
     PUSHBUTTON      "색상 선택...",IDC_COLOR_PICK1,120,80,60,14
-    LTEXT           "FILTER가 활성일 때 이 텍스트 색상을 사용:",IDC_STATIC,20,105,180,8
+    LTEXT           "FILTER가 활성일 때 이 텍스트 색상 사용:",IDC_STATIC,20,105,180,8
     AUTORADIOBUTTON "Windows 기본 색상(&E).",IDC_COLOR_DEF2,20,120,95,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "사용자 지정 색상(&U):",IDC_COLOR_CUST2,20,133,75,10,WS_TABSTOP
     EDITTEXT        IDC_COLOR_SAMP2,97,130,18,14,ES_AUTOHSCROLL | WS_DISABLED
@@ -656,4 +656,5 @@ END
 #include "../../matepath/src/matepath.ver"
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
+
 
