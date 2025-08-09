@@ -648,7 +648,7 @@ void TestBitmapAlphaBlend(const char *path, const uint32_t crDest, const BYTE al
 		const __m256i i16x16Back = _mm256_broadcastq_epi64(_mm_mullo_epi16(rgba_to_bgra_epi16_sse4_si32(crDest), mm_xor_alpha_epi16(_mm256_castsi256_si128(i16x16Alpha))));
 		const __m256i i16x16_0x8081 = _mm256_broadcastsi128_si256(_mm_set1_epi16(-0x8000 | 0x81));
 		for (size_t x = 0; x < pixelCount; x += 4, prgba++, dest++) {
-			const __m256i origin = _mm256_cvtepu8_epi16(*prgba);
+			const __m256i origin = unpack_color_epi16_avx2_ptr128(prgba);
 			__m256i i16x16Fore = _mm256_mullo_epi16(origin, i16x16Alpha);
 			i16x16Fore = _mm256_add_epi16(i16x16Fore, i16x16Back);
 			i16x16Fore = mm256_div_epu16_by_255(i16x16Fore, i16x16_0x8081);
