@@ -9,6 +9,7 @@
 #include <cstdlib>
 #include <cassert>
 #include <cstring>
+//#include <cstdio>
 
 #include <stdexcept>
 #include <string>
@@ -31,6 +32,7 @@ namespace {
 constexpr unsigned max_num_bytes = 1 + sizeof(unsigned)*8/7; // max 4GB
 constexpr unsigned max_range_bytes = 4*max_num_bytes + 4;
 
+#if 1
 // similar to ULEB128 encoding but always set highest bit for last byte
 // to avoid embedded NUL and distinguish from tag characters and separators.
 char *to_string(char *p, size_t value) noexcept {
@@ -55,6 +57,40 @@ const char *ValueFromString(const char *p, T &value) noexcept {
 	value = val;
 	return p;
 }
+
+#else
+// see FormatNumber()
+char *to_string(char *p, size_t value) noexcept {
+	char number[24];
+	char * const end = number + (10*sizeof(size_t) + 2)/4;
+	char *ptr = end;
+	*ptr = '\0';
+	do {
+		*--ptr = static_cast<char>((value % 10) + '0');
+		value /= 10;
+	} while (value != 0);
+	do {
+		*p++ = *ptr++;
+	} while (*ptr);
+	return p;
+}
+
+template <typename T>
+const char *ValueFromString(const char *p, T &value) noexcept {
+	size_t val = 0;
+	while (true) {
+		const unsigned digit = static_cast<uint8_t>(*p) - '0';
+		if (digit <= 9) {
+			val = val*10 + digit;
+			p++;
+		} else {
+			break;
+		}
+	}
+	value = val;
+	return p;
+}
+#endif
 
 }
 
@@ -275,6 +311,7 @@ Selection::Selection(std::string_view sv) noexcept : mainRange(0), moveExtends(f
 	if (sv.empty()) {
 		return;
 	}
+	// printf("%s: %s\n", __func__, sv.data());
 	try {
 		// Decode initial letter prefix if any
 		switch (sv.front()) {
@@ -318,6 +355,7 @@ Selection::Selection(std::string_view sv) noexcept : mainRange(0), moveExtends(f
 					p += 1;
 				}
 				if (*p & 0x80) { // requires number
+				// if (*p >= '0' && *p <= '9') { // requires number
 					ranges.emplace_back(p);
 				} else {
 					break;
@@ -667,6 +705,6 @@ std::string Selection::ToString() const {
 		}
 	}
 	result += std::string_view(buf, p - buf);
-
+	// printf("%s: %s\n", __func__, result.c_str());
 	return result;
 }
