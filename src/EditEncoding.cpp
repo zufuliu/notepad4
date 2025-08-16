@@ -1743,8 +1743,8 @@ bool IsUTF8(const char *data, DWORD length) noexcept {
 		// use vector instructions.
 		__m256i shifted_bytes = _mm256_loadu_si256(reinterpret_cast<const __m256i *>(data));
 		//__m256i shl_16 = _mm256_permute2x128_si256(shifted_bytes, _mm256_setzero_si256(), 0x03);
-		//shifted_bytes = _mm256_alignr_epi8(shifted_bytes, shl_16, 15);
-		shifted_bytes = _mm256_slli_si256(shifted_bytes, 1);
+		__m256i shl_16 = _mm256_permute2x128_si256(shifted_bytes, shifted_bytes, 10);
+		shifted_bytes = _mm256_alignr_epi8(shifted_bytes, shl_16, 15);
 
 		// Loop over input in sizeof(__m256i)-byte chunks, as long as we can safely read
 		// that far into memory
