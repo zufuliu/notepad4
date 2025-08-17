@@ -17,7 +17,10 @@ namespace {
 
 void dump(const char *name, const char *s, size_t len) noexcept {
 	printf("const char %s[%zu] = {", name, len);
-	const char * const end = s + len;
+	const char *end = s + len;
+	while (end > s && end[-1] == '\0') {
+		--end;
+	}
 	while (s < end) {
 		const uint8_t ch = *s++;
 		if (ch == 0) {
@@ -272,11 +275,11 @@ void run_range_test() noexcept {
 	for (const auto &test : TEST_CASES) {
 		// Loop through various frame shifts, to make sure we catch any issues due
 		// to vector alignment
-		for (size_t k = 0; k <= 120; k++) {
+		for (size_t k = 0; k <= 200; k++) {
+			char buffer[256]{};
 			// Loop through first byte
 			const auto first = *test.test.begin();
 			for (int b = first.lower; b <= first.upper; b++) {
-				char buffer[256]{};
 				buffer[k] = static_cast<char>(b);
 				// Find maximum range of values in remaining bytes
 				for (int offset = 0; offset <= 255; offset++) {
