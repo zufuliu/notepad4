@@ -6419,6 +6419,80 @@ void LoadFlags() noexcept {
 
 //=============================================================================
 //
+// CheckIsWinGetPortableApp()
+// 
+// Check if the application is installed as a winget portable app by verifying:
+// 1. The folder name contains "_Microsoft.Winget.Source_"
+// 2. A corresponding <foldername>.db file exists in the same directory
+//
+bool CheckIsWinGetPortableApp(LPCWSTR lpszModulePath) noexcept {
+	if (!IsWin10AndAbove()) {
+		return false;
+	}
+
+	WCHAR tchProgramDir[MAX_PATH];
+	lstrcpy(tchProgramDir, lpszModulePath);
+	PathRemoveFileSpec(tchProgramDir);
+	
+	WCHAR tchFolderName[MAX_PATH];
+	lstrcpy(tchFolderName, PathFindFileName(tchProgramDir));
+	
+	// Check if folder name contains "_Microsoft.Winget.Source_"
+	if (StrStrI(tchFolderName, L"_Microsoft.Winget.Source_") == nullptr) {
+		return false;
+	}
+	
+	// Search for <foldername>.db file
+	WCHAR tchDbFileName[MAX_PATH];
+	swprintf_s(tchDbFileName, COUNTOF(tchDbFileName), L"%s.db", tchFolderName);
+	
+	WCHAR tchDbFilePath[MAX_PATH];
+	PathCombine(tchDbFilePath, tchProgramDir, tchDbFileName);
+	
+	return PathIsFile(tchDbFilePath);
+}
+
+//=============================================================================
+//
+// CopyIniToLocalAppData()
+//
+// Copy ini file from program directory to %LOCALAPPDATA%\Notepad4\
+// Returns the destination path if successful, or empty string if failed
+//
+bool CopyIniToLocalAppData(LPCWSTR lpszSourceIni, LPCWSTR lpszFileName, LPWSTR lpszDestPath, DWORD cchDestPath) noexcept {
+	WCHAR tchLocalAppDataPath[MAX_PATH];
+	
+	LPWSTR pszPath = nullptr;
+	if (S_OK != SHGetKnownFolderPath(FOLDERID_LocalAppData, KF_FLAG_DEFAULT, nullptr, &pszPath)) {
+		if (lpszDestPath && cchDestPath > 0) {
+			lpszDestPath[0] = L'\0';
+		}
+		return false;
+	}
+	PathCombine(tchLocalAppDataPath, pszPath, WC_NOTEPAD4);
+	CoTaskMemFree(pszPath);
+
+	// Create the Notepad4 directory in LocalAppData if it doesn't exist
+	SHCreateDirectoryEx(nullptr, tchLocalAppDataPath, nullptr);
+	
+	WCHAR tchDestIni[MAX_PATH];
+	PathCombine(tchDestIni, tchLocalAppDataPath, lpszFileName);
+	
+	// Copy the file
+	bool success = CopyFile(lpszSourceIni, tchDestIni, FALSE) != FALSE;
+	
+	// Return the destination path if successful
+	if (success && lpszDestPath && cchDestPath > 0) {
+		lstrcpyn(lpszDestPath, tchDestIni, cchDestPath);
+	} else if (lpszDestPath && cchDestPath > 0) {
+		lpszDestPath[0] = L'\0';
+	}
+	
+	return success;
+}
+
+//=============================================================================
+//
 // FindIniFile()
 //
 //
@@ -6428,14 +6502,8 @@ bool CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) noexcept {
 
 	if (PathIsRelative(tchFileExpanded)) {
 		WCHAR tchBuild[MAX_PATH];
-		// program directory
-		lstrcpy(tchBuild, lpszModule);
-		lstrcpy(PathFindFileName(tchBuild), tchFileExpanded);
-		if (PathIsFile(tchBuild)) {
-			lstrcpy(lpszFile, tchBuild);
-			return true;
-		}
 
+		// First check common locations
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 		const KNOWNFOLDERID * const rfidList[] = {
 			&FOLDERID_LocalAppData,
@@ -6479,6 +6547,25 @@ bool CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) noexcept {
 			}
 		}
 #endif
+
+		// Then check program directory
+		lstrcpy(tchBuild, lpszModule);
+		lstrcpy(PathFindFileName(tchBuild), tchFileExpanded);
+		if (PathIsFile(tchBuild)) {
+			// If found in program directory and this is a winget portable app,
+			// copy the ini file to LocalAppData
+			if (CheckIsWinGetPortableApp(lpszModule)) {
+				WCHAR tchDestPath[MAX_PATH];
+				if (CopyIniToLocalAppData(tchBuild, tchFileExpanded, tchDestPath, COUNTOF(tchDestPath))) {
+					// Return the LocalAppData path instead
+					lstrcpy(lpszFile, tchDestPath);
+					return true;
+				}
+			}
+			
+			lstrcpy(lpszFile, tchBuild);
+			return true;
+		}
 	} else if (PathIsFile(tchFileExpanded)) {
 		lstrcpy(lpszFile, tchFileExpanded);
 		return true;
