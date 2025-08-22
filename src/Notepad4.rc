@@ -1840,6 +1840,7 @@ BEGIN
     IDT_VIEW_TOGGLEFOLDS    "Toggle Folds"
     IDT_FILE_LAUNCH         "Execute Document"
     IDT_VIEW_ALWAYSONTOP    "Always On Top"
+    IDT_FILE_EMPTYWINDOW    "Launch Empty Window"
 END
 
 STRINGTABLE
