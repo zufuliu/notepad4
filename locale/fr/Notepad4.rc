@@ -113,6 +113,7 @@ BEGIN
 	POPUP "&Fichier"
 	BEGIN
 		MENUITEM "&Nouveau\tCtrl+N",					IDM_FILE_NEW
+		MENUITEM "New &Window\tAlt+N",				IDM_FILE_NEWWINDOW
 		MENUITEM "&Ouvrir...\tCtrl+O",				IDM_FILE_OPEN
 		MENUITEM "&Enregistrer\tCtrl+S",					IDM_FILE_SAVE
 		MENUITEM "Enregistrer &sous...\tF6",					IDM_FILE_SAVEAS
@@ -712,8 +713,7 @@ BEGIN
 		MENUITEM SEPARATOR
 		MENUITEM "Ouvrir en tant qu'&adminitrateur",		IDM_FILE_RELAUNCH_ELEVATED
 		MENUITEM "&&Redémarrer",					IDM_FILE_RESTART
-		MENUITEM "&Nouvelle fenêtre\tAlt+N",			IDM_FILE_NEWWINDOW
-		MENUITEM "F&enêtre vide\tAlt+0",		IDM_FILE_NEWWINDOW2
+		MENUITEM "Open &in New Window\tAlt+0",		IDM_FILE_NEWWINDOW2
 		MENUITEM SEPARATOR
 		MENUITEM "Exécuter le &document\tCtrl+L",	IDM_FILE_LAUNCH
 		MENUITEM "Ouvrir avec...",				IDM_FILE_OPENWITH
@@ -1840,6 +1840,7 @@ BEGIN
     IDT_VIEW_TOGGLEFOLDS    "plier/déplier les plis"
     IDT_FILE_LAUNCH         "Executer le document"
     IDT_VIEW_ALWAYSONTOP    "Toujours devant"
+    IDT_FILE_NEWWINDOW      "New Window"
 END
 
 STRINGTABLE

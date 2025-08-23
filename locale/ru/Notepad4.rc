@@ -113,6 +113,7 @@ BEGIN
 	POPUP "&Файл"
 	BEGIN
 		MENUITEM "&Создать\tCtrl+N",									IDM_FILE_NEW
+		MENUITEM "New &Window\tAlt+N",				IDM_FILE_NEWWINDOW
 		MENUITEM "&Открыть...\tCtrl+O",									IDM_FILE_OPEN
 		MENUITEM "Со&хранить\tCtrl+S",									IDM_FILE_SAVE
 		MENUITEM "Сохранить &как...\tF6",								IDM_FILE_SAVEAS
@@ -713,8 +714,7 @@ BEGIN
 		MENUITEM SEPARATOR
 		MENUITEM "Запустить с &правами администратора",							IDM_FILE_RELAUNCH_ELEVATED
 		MENUITEM "&Перезапустить Notepad4",								IDM_FILE_RESTART
-		MENUITEM "Открыть &новое окно\tAlt+N",								IDM_FILE_NEWWINDOW
-		MENUITEM "Открыть &пустое окно\tAlt+0",								IDM_FILE_NEWWINDOW2
+		MENUITEM "Open &in New Window\tAlt+0",		IDM_FILE_NEWWINDOW2
 		MENUITEM SEPARATOR
 		MENUITEM "Выполнить &документ\tCtrl+L",								IDM_FILE_LAUNCH
 		MENUITEM "Открыть документ с &помощью...",							IDM_FILE_OPENWITH
@@ -1841,6 +1841,7 @@ BEGIN
     IDT_VIEW_TOGGLEFOLDS    "Вкл./выкл. заворот"
     IDT_FILE_LAUNCH         "Открыть документ"
     IDT_VIEW_ALWAYSONTOP    "Поверх всех окон"
+    IDT_FILE_NEWWINDOW      "New Window"
 END
 
 STRINGTABLE

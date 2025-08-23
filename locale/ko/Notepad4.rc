@@ -113,6 +113,7 @@ BEGIN
 	POPUP "파일(&F)"
 	BEGIN
 		MENUITEM "새로 만들기(&N)\tCtrl+N",								IDM_FILE_NEW
+		MENUITEM "New &Window\tAlt+N",				IDM_FILE_NEWWINDOW
 		MENUITEM "열기(&O)...\tCtrl+O",									IDM_FILE_OPEN
 		MENUITEM "저장(&S)\tCtrl+S",									IDM_FILE_SAVE
 		MENUITEM "다른 이름으로 저장(&A)...\tF6",						IDM_FILE_SAVEAS
@@ -712,8 +713,7 @@ BEGIN
 		MENUITEM SEPARATOR
 		MENUITEM "관리자 권한으로 열기(&A)",								IDM_FILE_RELAUNCH_ELEVATED
 		MENUITEM "다시 시작(&R)",										IDM_FILE_RESTART
-		MENUITEM "새 창 열기(&N)\tAlt+N",								IDM_FILE_NEWWINDOW
-		MENUITEM "빈 창 열기(&E)\tAlt+0",								IDM_FILE_NEWWINDOW2
+		MENUITEM "Open &in New Window\tAlt+0",		IDM_FILE_NEWWINDOW2
 		MENUITEM SEPARATOR
 		MENUITEM "문서 실행(&D)\tCtrl+L",								IDM_FILE_LAUNCH
 		MENUITEM "다음으로 문서 열기(&W)...",								IDM_FILE_OPENWITH
@@ -1840,6 +1840,7 @@ BEGIN
     IDT_VIEW_TOGGLEFOLDS    "접기 전환"
     IDT_FILE_LAUNCH         "문서 실행"
     IDT_VIEW_ALWAYSONTOP    "항상 맨 위에"
+    IDT_FILE_NEWWINDOW      "New Window"
 END
 
 STRINGTABLE

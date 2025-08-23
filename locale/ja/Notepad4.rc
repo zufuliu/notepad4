@@ -113,6 +113,7 @@ BEGIN
 	POPUP "ファイル(&F)"
 	BEGIN
 		MENUITEM "新規(&N)\tCtrl+N",					IDM_FILE_NEW
+		MENUITEM "New &Window\tAlt+N",				IDM_FILE_NEWWINDOW
 		MENUITEM "開く(&O)...\tCtrl+O",				IDM_FILE_OPEN
 		MENUITEM "上書き保存(&S)\tCtrl+S",					IDM_FILE_SAVE
 		MENUITEM "名前を付けて保存(&A)...\tF6",					IDM_FILE_SAVEAS
@@ -712,8 +713,7 @@ BEGIN
 		MENUITEM SEPARATOR
 		MENUITEM "管理者権限で再起動(&A)",		IDM_FILE_RELAUNCH_ELEVATED
 		MENUITEM "再起動(&R)",					IDM_FILE_RESTART
-		MENUITEM "同じファイルを開く(&N)\tAlt+N",			IDM_FILE_NEWWINDOW
-		MENUITEM "新規ウィンドウ(&E)\tAlt+0",		IDM_FILE_NEWWINDOW2
+		MENUITEM "Open &in New Window\tAlt+0",		IDM_FILE_NEWWINDOW2
 		MENUITEM SEPARATOR
 		MENUITEM "開いている文書を実行(&D)\tCtrl+L",	IDM_FILE_LAUNCH
 		MENUITEM "別のプログラムで開く(&W)...",				IDM_FILE_OPENWITH
@@ -1840,6 +1840,7 @@ BEGIN
     IDT_VIEW_TOGGLEFOLDS    "折りたたみの切り替え"
     IDT_FILE_LAUNCH         "開いている文書を実行"
     IDT_VIEW_ALWAYSONTOP    "常に手前に表示"
+    IDT_FILE_NEWWINDOW      "New Window"
 END
 
 STRINGTABLE
