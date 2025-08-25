@@ -119,7 +119,7 @@ EDITLEXER lexGeogebra = {
 		0,
 		0, 0,
 		0, 0
-		, KeywordAttr32(0, KeywordAttr_PreSorted) // keywords
+		, KeywordAttr32(0, KeywordAttr_PreSorted) // operators
 		| KeywordAttr32(1, KeywordAttr_PreSorted) // constants
 		| KeywordAttr32(2, KeywordAttr_PreSorted) // innerfunction
 		| KeywordAttr32(3, KeywordAttr_PreSorted) // function

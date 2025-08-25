@@ -704,7 +704,7 @@ enum {
 	DartKeywordIndex_Metadata = 4,
 	FSharpKeywordIndex_Preprocessor = 2,
 	FSharpKeywordIndex_CommentTag = 4,
-	GeogebraKeywordIndex_Keyword = 0,
+	GeogebraKeywordIndex_Operator = 0,
 	GeogebraKeywordIndex_Constant = 1,
 	GeogebraKeywordIndex_Function = 3,
 	GraphVizKeywordIndex_HtmlLabel = 1,

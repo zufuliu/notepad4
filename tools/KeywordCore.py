@@ -1039,7 +1039,7 @@ def parse_geogebra_api_file(path):
 	sections = read_api_file(path, '//')
 	keywordMap = {}
 	for key, doc in sections:
-		if key == 'keywords':
+		if key == 'operators':
 			keywordMap[key] = doc.split()
 		elif key == 'constants':
 			keywordMap[key] = doc.split()
@@ -1057,13 +1057,13 @@ def parse_geogebra_api_file(path):
 			keywordMap[key] = items
 
 	RemoveDuplicateKeyword(keywordMap, [
-		'keywords',
+		'operators',
 		'constants',
 		'innerfunction',
 		'function',
 	])
 	return [
-		('keywords', keywordMap['keywords'], KeywordAttr.Special),
+		('operators', keywordMap['operators'], KeywordAttr.Special),
 		('constants', keywordMap['constants'], KeywordAttr.Special),
 		('innerfunction', keywordMap['innerfunction'], KeywordAttr.Default),
 		('function', keywordMap['function'], KeywordAttr.Special),

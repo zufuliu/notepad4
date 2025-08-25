@@ -436,13 +436,13 @@ LexerConfigMap = {
 	},
 
 	'NP2LEX_GEOGEBRA': {
-			'default_encoding': 'utf-8',
-			'line_comment_string': '#',
-			'comment_style_marker': 'SCE_GGB_COMMENTLINE',
-			'escape_char_start': NoEscapeCharacter,
-			'extra_word_char': '-',
-			'plain_text_file': True,
-	}, 	
+		'default_encoding': 'utf-8',
+		'line_comment_string': '#',
+		'comment_style_marker': 'SCE_GGB_COMMENTLINE',
+		'escape_char_start': NoEscapeCharacter,
+		'extra_word_char': '-',
+		'plain_text_file': True,
+	},
 	'NP2LEX_GN': {
 		'line_comment_string': '#',
 		'comment_style_marker': 'SCE_GN_COMMENT',
