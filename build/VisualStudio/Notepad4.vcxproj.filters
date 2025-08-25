@@ -36,9 +36,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\scintilla\lexers\LexGeogebra.cxx">
-      <Filter>Scintilla\lexers</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\scintilla\lexers\LexAPDL.cxx">
       <Filter>Scintilla\lexers</Filter>
     </ClCompile>
@@ -106,6 +103,9 @@
       <Filter>Scintilla\lexers</Filter>
     </ClCompile>
     <ClCompile Include="..\..\scintilla\lexers\LexFSharp.cxx">
+      <Filter>Scintilla\lexers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\scintilla\lexers\LexGeogebra.cxx">
       <Filter>Scintilla\lexers</Filter>
     </ClCompile>
     <ClCompile Include="..\..\scintilla\lexers\LexGN.cxx">
@@ -429,9 +429,6 @@
     <ClCompile Include="..\..\src\Styles.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\EditLexers\stlGeogebra.cpp">
-      <Filter>Source Files\EditLexers</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\EditLexers\stlABAQUS.cpp">
       <Filter>Source Files\EditLexers</Filter>
     </ClCompile>
@@ -502,6 +499,9 @@
       <Filter>Source Files\EditLexers</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\EditLexers\stlFSharp.cpp">
+      <Filter>Source Files\EditLexers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\EditLexers\stlGeogebra.cpp">
       <Filter>Source Files\EditLexers</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\EditLexers\stlGo.cpp">

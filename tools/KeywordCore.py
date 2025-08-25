@@ -256,39 +256,6 @@ def remove_duplicate_lower(keywords, duplicate):
 def first_word_on_each_line(doc):
 	return re.findall(r'^\s*(\w+)', doc, re.MULTILINE)
 
-def parse_geogebra_api_file(path):
-	sections = read_api_file(path, '//')
-	keywordMap = {}
-	for key, doc in sections:
-		if key == 'keywords':
-			keywordMap[key] = doc.split()
-		elif key == 'constants':
-			keywordMap[key] = doc.split()
-		elif key == 'innerfunction':
-			items = re.findall(r'(\w+\()', doc)
-			keywordMap[key] = items
-		elif key == 'function':
-			items = []
-			lines = re.split(r'\n', doc)
-			for line in lines:
-				if (re.match(r'^(?!.*.Syntax).*$', line)):
-					parts = re.split(r'=', line)
-					if len(parts) == 2:
-						items.append(parts[1]+'(')				
-			keywordMap[key] = items
-
-	RemoveDuplicateKeyword(keywordMap, [
-		'keywords',
-		'constants',
-		'innerfunction',
-		'function',
-	])
-	return [
-		('keywords', keywordMap['keywords'], KeywordAttr.Special),
-		('constants', keywordMap['constants'], KeywordAttr.Special),
-		('innerfunction', keywordMap['innerfunction'], KeywordAttr.Default),
-		('function', keywordMap['function'], KeywordAttr.Special),
-	]	
 	
 def parse_actionscript_api_file(path):
 	sections = read_api_file(path, '//')
@@ -1066,6 +1033,40 @@ def parse_fsharp_api_file(path):
 		('preprocessor', keywordMap['preprocessor'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp | KeywordAttr.Special),
 		('attributes', [], KeywordAttr.NoLexer),
 		('comment tag', CSharpKeywordMap['comment tag'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp | KeywordAttr.Special),
+	]
+
+def parse_geogebra_api_file(path):
+	sections = read_api_file(path, '//')
+	keywordMap = {}
+	for key, doc in sections:
+		if key == 'keywords':
+			keywordMap[key] = doc.split()
+		elif key == 'constants':
+			keywordMap[key] = doc.split()
+		elif key == 'innerfunction':
+			items = re.findall(r'(\w+\()', doc)
+			keywordMap[key] = items
+		elif key == 'function':
+			items = []
+			lines = re.split(r'\n', doc)
+			for line in lines:
+				if (re.match(r'^(?!.*.Syntax).*$', line)):
+					parts = re.split(r'=', line)
+					if len(parts) == 2:
+						items.append(parts[1]+'(')				
+			keywordMap[key] = items
+
+	RemoveDuplicateKeyword(keywordMap, [
+		'keywords',
+		'constants',
+		'innerfunction',
+		'function',
+	])
+	return [
+		('keywords', keywordMap['keywords'], KeywordAttr.Special),
+		('constants', keywordMap['constants'], KeywordAttr.Special),
+		('innerfunction', keywordMap['innerfunction'], KeywordAttr.Default),
+		('function', keywordMap['function'], KeywordAttr.Special),
 	]
 
 def parse_gn_api_file(path):
