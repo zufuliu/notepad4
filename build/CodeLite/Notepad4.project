@@ -17,6 +17,7 @@
       <File Name="../../scintilla/include/VectorISA.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="lexers">
+      <File Name="../../scintilla/lexers/LexGeogebra.cxx"/>
       <File Name="../../scintilla/lexers/LexAPDL.cxx"/>
       <File Name="../../scintilla/lexers/LexAsm.cxx"/>
       <File Name="../../scintilla/lexers/LexAsymptote.cxx"/>
@@ -205,6 +206,7 @@
   </VirtualDirectory>
   <VirtualDirectory Name="Source Files">
     <VirtualDirectory Name="EditLexers">
+      <File Name="../../src/EditLexers/stlGEOGEBRA.cpp"/>
       <File Name="../../src/EditLexers/stlABAQUS.cpp"/>
       <File Name="../../src/EditLexers/stlActionScript.cpp"/>
       <File Name="../../src/EditLexers/stlAPDL.cpp"/>

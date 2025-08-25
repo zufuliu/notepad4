@@ -1,0 +1,1257 @@
+// 2.70 https://geogebra.github.io/docs/manua
+// https://github.com/geogebra/geogebra
+
+//! keywords		===========================================================
++ - * / ^ ! ( ) [ ] { } = 
+
+//! constants		===========================================================
+xAxis
+yAxis
+zAxis
+Aqua
+Black
+Blue
+Brown
+Crimson
+Cyan
+Dark Blue
+Dark Gray
+Dark Green
+Gold
+Gray
+Green
+Indigo
+Light Blue
+Light Gray
+Light Green
+Light Orange
+Light Purple
+Light Violet
+Light Yellow
+Lime
+Magenta
+Maroon
+Orange
+Pink
+Purple
+Red
+Silver
+Teal
+Turquoise
+Violet
+White
+Yellow
+
+//! innerFunction			===========================================================
+x( )
+y( )
+z( )
+arg( )
+conjugate( )
+real( )
+imaginary( )
+abs( )
+alt( )
+sgn( )
+sign()
+floor( )
+ceil( )
+round(x)
+round(x, y)
+sqrt( )
+cbrt( )
+nroot(x, n)
+random( )
+exp( )
+ℯ^x^
+ln( )
+log2( )
+ld( )
+log10( )
+log( )
+lg( )
+log(b, x )
+cos( )
+sin( )
+tan( )
+sec()
+csc()
+cosec()
+cot()
+cotan()
+acos( )
+arccos( )
+acosd( )
+asin( )
+arcsin( )
+asind( )
+atan( )
+arctan( )
+atand( )
+atan2(y,x)
+atan2d(y, x)
+cosh( )
+sinh( )
+tanh( )
+sech( )
+csch( )
+coth( )
+cotanh()
+acosh( )
+arccosh( )
+asinh( )
+arcsinh( )
+atanh( )
+arctanh( )
+beta(a, b)
+beta(a, b, x)
+betaRegularized(a, b, x)
+gamma( x)
+gamma(a, x)
+gammaRegularized(a, x)
+erf(x)
+psi(x)
+polygamma(m, x)
+sinIntegral(x)
+cosIntegral(x)
+expIntegral(x)
+zeta(x)
+LambertW(x, 0)
+LambertW(x,-1)
+
+//! Function	===========================================================
+# For further details, please see https://www.geogebra.org/license
+ANOVA=ANOVA
+ANOVA.Syntax=[ <List>, <List>, ... ]
+AffineRatio=AffineRatio
+AffineRatio.Syntax=[ <Point>, <Point>, <Point> ]
+Angle=Angle
+Angle.Syntax=[ <Object> ]\n[ <Vector>, <Vector> ]\n[ <Line>, <Line> ]\n[ <Point>, <Apex>, <Point> ]\n[ <Point>, <Apex>, <Angle> ]
+Angle.Syntax3D=[ <Object> ]\n[ <Vector>, <Vector> ]\n[ <Line>, <Line> ]\n[ <Line>, <Plane> ]\n[ <Plane>, <Plane> ]\n[ <Point>, <Apex>, <Point> ]\n[ <Point>, <Apex>, <Angle> ]\n[ <Point>, <Point>, <Point>, <Direction> ]
+AngularBisector=AngleBisector
+AngularBisector.Syntax=[ <Line>, <Line> ]\n[ <Point>, <Point>, <Point> ]
+Append=Append
+Append.Syntax=[ <List>, <Object> ]\n[ <Object>, <List> ]
+ApplyMatrix=ApplyMatrix
+ApplyMatrix.Syntax=[ <Matrix>, <Object> ]
+Arc=Arc
+Arc.Syntax=[ <Circle>, <Point>, <Point> ]\n[ <Ellipse>, <Point>, <Point> ]\n[ <Circle>, <Parameter Value>, <Parameter Value> ]\n[ <Ellipse>, <Parameter Value>, <Parameter Value> ]
+AreCollinear=AreCollinear
+AreCollinear.Syntax=[ <Point>, <Point>, <Point> ]
+AreConcurrent=AreConcurrent
+AreConcurrent.Syntax=[ <Line>, <Line>, <Line> ]
+AreConcyclic=AreConcyclic
+AreConcyclic.Syntax=[ <Point>, <Point>, <Point>, <Point> ]
+AreCongruent=AreCongruent
+AreCongruent.Syntax=[ <Object>, <Object> ]
+AreEqual=AreEqual
+AreEqual.Syntax=[ <Object>, <Object> ]
+AreParallel=AreParallel
+AreParallel.Syntax=[ <Line>, <Line> ]
+ArePerpendicular=ArePerpendicular
+ArePerpendicular.Syntax=[ <Line>, <Line> ]
+Area=Area
+Area.Syntax=[ <Conic> ]\n[ <Polygon> ]\n[ <Point>, ..., <Point> ]
+Assume=Assume
+Assume.SyntaxCAS=[ <Condition>, <Expression> ]
+Asymptote=Asymptote
+Asymptote.Syntax=[ <Object> ]
+AttachCopyToView=AttachCopyToView
+AttachCopyToView.Syntax=[ <Object>, <View 0|1|2> ]\n[ <Object>, <View 0|1|2>, <Point 1>, <Point 2>, <Screen Point 1>, <Screen Point 2> ]
+Axes=Axes
+Axes.Syntax=[ <Conic> ]
+Axes.Syntax3D=[ <Conic> ]\n[ <Quadric> ]
+AxisStepX=AxisStepX
+AxisStepX.Syntax=[ ]
+AxisStepY=AxisStepY
+AxisStepY.Syntax=[ ]
+BarChart=BarChart
+BarChart.Syntax=[ <List of Data>, <List of Frequencies> ]\n[ <List of Raw Data>, <Width of Bars>, <Vertical Scale Factor (optional)> ]\n[ <List of Data>, <List of Frequencies>, <Width of Bars> ]\n[ <Start Value>, <End Value>, <List of Heights> ]\n[ <Start Value>, <End Value>, <Expression>, <Variable>, <From Number>, <To Number> ]\n[ <Start Value>, <End Value>, <Expression>, <Variable>, <From Number>, <To Number>, <Step Width> ]
+Barycenter=Barycenter
+Barycenter.Syntax=[ <List of Points>, <List of Weights> ]
+Bernoulli=Bernoulli
+Bernoulli.Syntax=[ <Probability>, <Boolean Cumulative> ]
+BetaDist=BetaDist
+BetaDist.Syntax=[ <Alpha>, <Beta>, <Variable Value Probability> ]\n[ <Alpha>, <Beta>, <Variable Value Probability>, <Boolean Cumulative>  ]\n[ <Alpha>, <Beta>, x, <Boolean Cumulative> ]
+BezierCurve=BezierCurve
+BezierCurve.Syntax=[ <Point>, <Point>, <Point>, <Point> ]
+Binomial=BinomialCoefficient
+Binomial.Syntax=[ <Number n>, <Number r> ]
+BinomialDist=BinomialDist
+BinomialDist.Syntax=[ <Number of Trials>, <Probability of Success> ]\n[ <Number of Trials>, <Probability of Success>, <Boolean Cumulative> ]\n[ <Number of Trials>, <Probability of Success>, <List of Values> ]\n[ <Number of Trials>, <Probability of Success>, <Variable Value Probability>, <Boolean Cumulative> ]
+BinomialDist.SyntaxCAS=[ <Number of Trials>, <Probability of Success>, <Variable Value Probability>, <Boolean Cumulative> ]\n[ <Number of Trials>, <Probability of Success>, <List of Values> ]
+Bottom=Bottom
+Bottom.Syntax=[ <Quadric> ]
+BoxPlot=BoxPlot
+BoxPlot.Syntax=[ <yOffset>, <yScale>, <List of Raw Data> ]\n[ <yOffset>, <yScale>, <List of Raw Data>, <Boolean Outliers> ]\n[ <yOffset>, <yScale>, <List of Data>, <List of Frequencies>, <Boolean Outliers> ]\n[ <yOffset>, <yScale>, <Start Value>, <Q1>, <Median>, <Q3>, <End Value> ]
+Button=Button
+Button.Syntax=[ ]\n[ <Caption> ]
+CASLoaded=CASLoaded
+CASLoaded.Syntax=[]
+CFactor=CFactor
+CFactor.SyntaxCAS=[ <Expression> ]\n[ <Expression>, <Variable> ]
+CIFactor=CIFactor
+CIFactor.SyntaxCAS=[ <Expression> ]\n[ <Expression>, <Variable> ]
+CSolutions=CSolutions
+CSolutions.SyntaxCAS=[ <Equation> ]\n[ <Equation>, <Variable> ]\n[ <List of Equations>, <List of Variables> ]
+CSolve=CSolve
+CSolve.SyntaxCAS=[ <Equation> ]\n[ <Equation>, <Variable> ]\n[ <List of Equations>, <List of Variables> ]
+Cauchy=Cauchy
+Cauchy.Syntax=[ <Median>, <Scale>, <Variable Value Probability> ]\n[ <Median>, <Scale>, <Variable Value Probability>, <Boolean Cumulative>  ]\n[ <Median>, <Scale>, x, <Boolean Cumulative> ]
+Cauchy.SyntaxCAS=[ <Median>, <Scale>, <Variable Value Probability> ]
+Cell=Cell
+Cell.Syntax=[ <Column>, <Row> ]
+CellRange=CellRange
+CellRange.Syntax=[ <Start Cell>, <End Cell> ]
+Center=Center
+Center.Syntax=[ <Conic> ]
+Center.Syntax3D=[ <Conic> ]\n[ <Quadric> ]
+CenterView=CenterView
+CenterView.Syntax=[ <Center Point> ]
+Centroid=Centroid
+Centroid.Syntax=[ <Polygon> ]
+CharacteristicPolynomial=CharacteristicPolynomial
+CharacteristicPolynomial.Syntax=[ <Matrix> ]
+Checkbox=Checkbox
+Checkbox.Syntax=[ ]\n[ <Caption> ]\n[ <List> ]\n[ <Caption>, <List> ]
+ChiSquared=ChiSquared
+ChiSquared.Syntax=[ <Degrees of Freedom>, <Variable Value Probability> ]\n[ <Degrees of Freedom>, <Variable Value Probability>, <Boolean Cumulative> ]\n[ <Degrees of Freedom>, x, <Boolean Cumulative> ]
+ChiSquared.SyntaxCAS=[ <Degrees of Freedom>, <Variable> ]
+ChiSquaredTest=ChiSquaredTest
+ChiSquaredTest.Syntax=[ <Matrix> ]\n[ <List>, <List> ]\n[ <Matrix>, <Matrix> ]\n[ <List>, <List>, <Degrees of Freedom> ]
+Circle=Circle
+Circle.Syntax=[ <Point>, <Radius Number> ]\n[ <Point>, <Segment> ]\n[ <Point>, <Point> ]\n[ <Point>, <Point>, <Point> ]
+Circle.Syntax3D=[ <Point>, <Radius Number> ]\n[ <Point>, <Segment> ]\n[ <Point>, <Point> ]\n[ <Point>, <Point>, <Point> ]\n[ <Line>, <Point> ]\n[ <Point>, <Radius>, <Direction> ]\n[ <Point>, <Point>, <Direction> ]
+CircleArc=CircularArc
+CircleArc.Syntax=[ <Midpoint>, <Point>, <Point> ]
+CircleSector=CircularSector
+CircleSector.Syntax=[ <Midpoint>, <Point>, <Point> ]
+CircumcircleArc=CircumcircularArc
+CircumcircleArc.Syntax=[ <Point>, <Point>, <Point> ]
+CircumcircleSector=CircumcircularSector
+CircumcircleSector.Syntax=[ <Point>, <Point>, <Point> ]
+Circumference=Circumference
+Circumference.Syntax=[ <Conic> ]
+Classes=Classes
+Classes.Syntax=[ <List of Data>, <Number of Classes> ]\n[ <List of Data>, <Start>, <Width of Classes> ]
+ClosestPoint=ClosestPoint
+ClosestPoint.Syntax=[ <Path>, <Point> ]\n[ <Line>, <Line> ]
+ClosestPointRegion=ClosestPointRegion
+ClosestPointRegion.Syntax=[ <Region>, <Point> ]
+Coefficients=Coefficients
+Coefficients.Syntax=[ <Polynomial> ]\n[ <Conic> ]
+Coefficients.SyntaxCAS=[ <Polynomial> ]\n[ <Polynomial>, <Variable> ]
+Column=Column
+Column.Syntax=[ <Spreadsheet Cell> ]
+ColumnName=ColumnName
+ColumnName.Syntax=[ <Spreadsheet Cell> ]
+Command=Command
+CommonDenominator=CommonDenominator
+CommonDenominator.Syntax=[ <Expression>, <Expression> ]
+CompleteSquare=CompleteSquare
+CompleteSquare.Syntax=[ <Quadratic Function> ]
+ComplexRoot=ComplexRoot
+ComplexRoot.Syntax=[ <Polynomial> ]
+Cone=Cone
+Cone.Syntax=[ <Circle>, <Height> ]\n[ <Point>, <Point>, <Radius> ]\n[ <Point>, <Vector>, <Angle> ]
+ConeInfinite=InfiniteCone
+ConeInfinite.Syntax=[ <Point>, <Vector>, <Angle> ]\n[ <Point>, <Point>, <Angle> ]\n[ <Point>, <Line>, <Angle> ]
+Conic=Conic
+Conic.Syntax=[ <List> ]\n[ <Point>, <Point>, <Point>, <Point>, <Point> ]\n[ <Number>, <Number>, <Number>, <Number>, <Number>, <Number> ]
+ConstructionStep=ConstructionStep
+ConstructionStep.Syntax=[ ]\n[ <Object> ]
+ContingencyTable=ContingencyTable
+ContingencyTable.Syntax=[ <List of Text>, <List of Text> ]\n[ <List of Text>, <List of Text>, <Options> ]\n[ <List of Row Values>, <List of Column Values>, <Frequency Table> ]\n[ <List of Row Values>, <List of Column Values>, <Frequency Table> , <Options> ]
+ContinuedFraction=ContinuedFraction
+ContinuedFraction.Syntax=[ <Number> ]\n[ <Number>, <Level> ]\n[ <Number>, <Level>, <Boolean Shorthand> ]
+ConvexHull=ConvexHull
+ConvexHull.Syntax=[ <List of Points> ]
+CopyFreeObject=CopyFreeObject
+CopyFreeObject.Syntax=[ <Object> ]
+Corner=Corner
+Corner.Syntax=[ <Number of Corner> ]\n[ <Image>, <Number of Corner> ]\n[ <Text>, <Number of Corner> ]\n[ <Graphics View>, <Number of Corner> ]
+CountIf=CountIf
+CountIf.Syntax=[ <Condition>, <List> ]\n[ <Condition>, <Variable>, <List> ]
+Covariance=Covariance
+Covariance.Syntax=[ <List of Points> ]\n[ <List of Numbers>, <List of Numbers> ]
+Cross=Cross
+Cross.Syntax=[ <Vector>, <Vector> ]
+CrossRatio=CrossRatio
+CrossRatio.Syntax=[ <Point>, <Point>, <Point>, <Point> ]
+Cube=Cube
+Cube.Syntax=[ <Square> ]\n[ <Point>, <Point>, <Point> ]\n[ <Point>, <Point>, <Direction> ]
+Cubic=Cubic
+Cubic.Syntax=[ <Point>, <Point>, <Point>, <Number> ]
+Curvature=Curvature
+Curvature.Syntax=[ <Point>, <Object> ]
+CurvatureVector=CurvatureVector
+CurvatureVector.Syntax=[ <Point>, <Object> ]
+CurveCartesian=Curve
+CurveCartesian.Syntax=[ <Expression>, <Expression>, <Parameter Variable>, <Start Value>, <End Value> ]
+CurveCartesian.Syntax3D=[ <Expression>, <Expression>, <Parameter Variable>, <Start Value>, <End Value> ]\n[ <Expression>, <Expression>, <Expression>, <Parameter Variable>, <Start Value>, <End Value> ]
+Cylinder=Cylinder
+Cylinder.Syntax=[ <Circle>, <Height> ]\n[ <Point>, <Point>, <Radius> ]
+CylinderInfinite=InfiniteCylinder
+CylinderInfinite.Syntax=[ <Line>, <Radius> ]\n[ <Point>, <Vector>, <Radius> ]\n[ <Point>, <Point>, <Radius> ]
+DataFunction=DataFunction
+DataFunction.Syntax=[ <List of Numbers>, <List of Numbers> ]
+Defined=IsDefined
+Defined.Syntax=[ <Object> ]
+Degree=Degree
+Degree.Syntax=[ <Polynomial> ]
+Degree.SyntaxCAS=[ <Polynomial> ]\n[ <Polynomial>, <Variable> ]
+DelauneyTriangulation=DelaunayTriangulation
+DelauneyTriangulation.Syntax=[ <List of Points> ]
+Delete=Delete
+Delete.Syntax=[ <Object> ]
+Denominator=Denominator
+Denominator.Syntax=[ <Number> ]\n[ <Function> ]
+Denominator.SyntaxCAS=[ <Expression> ]
+DensityPlot=DensityPlot
+Derivative=Derivative
+Derivative.Syntax=[ <Function> ]\n[ <Curve> ]\n[ <Function>, <Number> ]\n[ <Function>, <Variable> ]\n[ <Curve>, <Number> ]\n[ <Function>, <Variable>, <Number> ]
+Derivative.SyntaxCAS=[ <Expression> ]\n[ <Expression>, <Variable> ]\n[ <Expression>, <Variable>, <Number> ]
+Determinant=Determinant
+Determinant.Syntax=[ <Matrix> ]
+Diameter=ConjugateDiameter
+Diameter.Syntax=[ <Vector>, <Conic> ]\n[ <Line>, <Conic> ]
+Difference=Difference
+Difference.Syntax=[ <Polygon>, <Polygon> ]
+Dilate=Dilate
+Dilate.Syntax=[ <Object>, <Dilation Factor> ]\n[ <Object>, <Dilation Factor>, <Dilation Center Point> ]
+Dimension=Dimension
+Dimension.Syntax=[ <Object> ]
+Direction=Direction
+Direction.Syntax=[ <Line> ]
+Directrix=Directrix
+Directrix.Syntax=[ <Conic> ]
+Distance=Distance
+Distance.Syntax=[ <Point>, <Object> ]\n[ <Line>, <Line> ]\n[ <Plane>, <Plane> ]
+Distance.SyntaxCAS=[ <Point>, <Object> ]
+Div=Div
+Div.Syntax=[ <Dividend Number>, <Divisor Number> ]\n[ <Dividend Polynomial>, <Divisor Polynomial> ]
+Division=Division
+Division.Syntax=[ <Dividend Number>, <Divisor Number> ]\n[ <Dividend Polynomial>, <Divisor Polynomial> ]
+Divisors=Divisors
+Divisors.Syntax=[ <Number> ]
+DivisorsList=DivisorsList
+DivisorsList.Syntax=[ <Number> ]
+DivisorsSum=DivisorsSum
+DivisorsSum.Syntax=[ <Number> ]
+Dodecahedron=Dodecahedron
+Dodecahedron.Syntax=[ <Regular Pentagon> ]\n[ <Point>, <Point>, <Point> ]\n[ <Point>, <Point>, <Direction> ]
+Dot=Dot
+Dot.Syntax=[ <Vector>, <Vector> ]
+DotPlot=DotPlot
+DotPlot.Syntax=[ <List of Raw Data>, <Stack Adjacent Dots (optional)>, <Scale Factor (optional)>]
+DynamicCoordinates=DynamicCoordinates
+DynamicCoordinates.Syntax=[ <Point>, <x-Coordinate>, <y-Coordinate> ]\n[ <Point>, <x-Coordinate>, <y-Coordinate>, <z-Coordinate> ]
+Eccentricity=Eccentricity
+Eccentricity.Syntax=[ <Conic> ]
+Eigenvalues=Eigenvalues
+Eigenvalues.SyntaxCAS=[ <Matrix> ]
+Eigenvectors=Eigenvectors
+Eigenvectors.SyntaxCAS=[ <Matrix> ]
+Element=Element
+Element.Syntax=[ <List>, <Position of Element> ]\n[ <Matrix>, <Row>, <Column> ]\n[ <List>, <Index1>, <Index2>, ... ]
+Element.SyntaxCAS=[ <List>, <Position of Element> ]\n[ <Matrix>, <Row>, <Column> ]
+Eliminate=Eliminate
+Eliminate.Syntax=[ <List of Polynomials>, <List of Variables> ]
+Ellipse=Ellipse
+Ellipse.Syntax=[ <Focus>, <Focus>, <Semimajor Axis Length> ]\n[ <Focus>, <Focus>, <Segment> ]\n[ <Focus>, <Focus>, <Point> ]
+Ends=Ends
+Ends.Syntax=[ <Quadric> ]
+Envelope=Envelope
+Envelope.Syntax=[ <Path>, <Point> ]
+Erlang=Erlang
+Erlang.Syntax=[ <Shape>, <Rate>, <Variable Value Probability> ]\n[ <Shape>, <Rate>, <Variable Value Probability>, <Boolean Cumulative> ]\n[ <Shape>, <Rate>, x, <Boolean Cumulative> ]
+Evaluate=Evaluate
+Excentricity=LinearEccentricity
+Excentricity.Syntax=[ <Conic> ]
+Execute=Execute
+Execute.Syntax=[ <List of Text> ]\n[ <List of Text>, <Parameter>, <Parameter>, ... ]
+Expand=Expand
+Expand.Syntax=[ <Expression> ]
+Exponential=Exponential
+Exponential.Syntax=[ <Lambda>, <Variable Value Probability> ]\n[ <Lambda>, <Variable Value Probability>, <Boolean Cumulative> ]\n[ <Lambda>, x, <Boolean Cumulative> ]
+Exponential.SyntaxCAS=[ <Lambda>, <Variable Value Probability> ]
+ExportImage=ExportImage
+ExportImage.Syntax=[ <Property>, <Value>, <Property>, <Value>, ... ]
+ExtendedGCD=ExtendedGCD
+ExtendedGCD.Syntax=[ <Integer>, <Integer>]\n[ <Polynomial>, <Polynomial>]
+Extremum=Extremum
+Extremum.Syntax=[ <Polynomial> ]\n[ <Function>, <Start x-Value>, <End x-Value> ]
+Extremum.SyntaxCAS=[ <Function> ]\n[ <Function>, <Start x-Value>, <End x-Value> ]
+FDistribution=FDistribution
+FDistribution.Syntax=[ <Numerator Degrees of Freedom>, <Denominator Degrees of Freedom>, <Variable Value Probability> ]\n[ <Numerator Degrees of Freedom>, <Denominator Degrees of Freedom>, <Variable Value Probability>, <Boolean Cumulative> ]\n[ <Numerator Degrees of Freedom>, <Denominator Degrees of Freedom>, x, <Boolean Cumulative> ]
+FDistribution.SyntaxCAS=[ <Numerator Degrees of Freedom>, <Denominator Degrees of Freedom>, <Variable Value Probability> ]
+Factor=Factor
+Factor.Syntax=[ <Polynomial> ]
+Factor.SyntaxCAS=[ <Number> ]\n[ <Polynomial> ]\n[ <Expression>, <Variable> ]
+Factors=Factors
+Factors.Syntax=[ <Polynomial> ]\n[ <Number> ]
+FillCells=FillCells
+FillCells.Syntax=[ <CellRange>, <Object> ]\n[ <Cell>, <List> ]\n[ <Cell>, <Matrix> ]
+FillColumn=FillColumn
+FillColumn.Syntax=[ <Column>, <List> ]
+FillRow=FillRow
+FillRow.Syntax=[ <Row>, <List> ]
+First=First
+First.Syntax=[ <List> ]\n[ <Text> ]\n[ <List>, <Number of Elements> ]\n[ <Text>, <Number of Elements> ]\n[ <Locus>, <Number of Elements> ]
+First.SyntaxCAS=[ <List> ]\n[ <List>, <Number of Elements> ]
+FirstAxis=MajorAxis
+FirstAxis.Syntax=[ <Conic> ]
+FirstAxisLength=SemiMajorAxisLength
+FirstAxisLength.Syntax=[ <Conic> ]
+Fit=Fit
+Fit.Syntax=[ <List of Points>, <List of Functions> ]\n[ <List of Points>, <Function> ]
+FitExp=FitExp
+FitExp.Syntax=[ <List of Points> ]
+FitGrowth=FitGrowth
+FitGrowth.Syntax=[ <List of Points> ]
+FitImplicit=FitImplicit
+FitImplicit.Syntax=[ <List of Points>, <Order> ]
+FitLineX=FitLineX
+FitLineX.Syntax=[ <List of Points> ]
+FitLineY=FitLine
+FitLineY.Syntax=[ <List of Points> ]
+FitLog=FitLog
+FitLog.Syntax=[ <List of Points> ]
+FitLogistic=FitLogistic
+FitLogistic.Syntax=[ <List of Points> ]
+FitPoly=FitPoly
+FitPoly.Syntax=[ <List of Points>, <Degree of Polynomial> ]\n[ <Freehand Function>, <Degree of Polynomial> ]
+FitPow=FitPow
+FitPow.Syntax=[ <List of Points> ]
+FitSin=FitSin
+FitSin.Syntax=[ <List of Points> ]
+Flatten=Flatten
+Flatten.Syntax=[ <List> ]
+Focus=Focus
+Focus.Syntax=[ <Conic> ]
+FractionText=FractionText
+FractionText.Syntax=[ <Number> ]\n[ <Point> ]\n[ <Number>, <Single fraction> ]
+Frequency=Frequency
+Frequency.Syntax=[ <List of Raw Data> ]\n[ <Boolean Cumulative>, <List of Raw Data> ]\n[ <List of Class Boundaries>, <List of Raw Data> ]\n[ <List of Text>, <List of Text> ]\n[ <Boolean Cumulative>, <List of Class Boundaries>, <List of Raw Data> ]\n[ <List of Class Boundaries>, <List of Raw Data>, <Use Density>, <Density Scale Factor (optional)> ]\n[ <Boolean Cumulative>, <List of Class Boundaries>, <List of Raw Data>, <Use Density>, <Density Scale Factor (optional)> ]
+FrequencyPolygon=FrequencyPolygon
+FrequencyPolygon.Syntax=[ <List of Class Boundaries>, <List of Heights> ]\n[ <List of Class Boundaries>, <List of Raw Data>, <Boolean Use Density>, <Density Scale Factor (optional)> ]\n[ <Boolean Cumulative>, <List of Class Boundaries>, <List of Raw Data>, <Boolean Use Density>, <Density Scale Factor (optional)> ]
+FrequencyTable=FrequencyTable
+FrequencyTable.Syntax=[ <List of Raw Data>, <Scale Factor (optional)> ]\n[ <Boolean Cumulative>, <List of Raw Data> ]\n[ <List of Class Boundaries>, <List of Raw Data> ]\n[ <Boolean Cumulative>, <List of Class Boundaries>, <List of Raw Data> ]\n[ <List of Class Boundaries>, <List of Raw Data>, <Use Density>, <Density Scale Factor (optional)> ]\n[ <Boolean Cumulative>, <List of Class Boundaries>, <List of Raw Data>, <Use Density>, <Density Scale Factor (optional)> ]
+FromBase=FromBase
+FromBase.Syntax=[ <Number as Text>, <Base> ]
+Function=Function
+Function.Syntax=[ <Function>, <Start x-Value>, <End x-Value> ]\n[ <List of Numbers> ]
+Function.Syntax3D=[ <List of Numbers> ]\n[ <Function>, <Start x-Value>, <End x-Value> ]\n[ <Expression>, <Parameter Variable 1>, <Start Value>, <End Value>, <Parameter Variable 2>, <Start Value>, <End Value> ]
+Function.SyntaxCAS=[ <Function>, <Start x-Value>, <End x-Value> ]
+FutureValue=FutureValue
+FutureValue.Syntax=[ <Interest Rate>, <Number of Periods>, <Payment>, <Present Value (optional)>, <Type (optional)> ]
+GCD=GCD
+GCD.Syntax=[ <List of Numbers> ]\n[ <Number>, <Number> ]
+GCD.SyntaxCAS=[ <List of Numbers> ]\n[ <List of Polynomials> ]\n[ <Number>, <Number> ]\n[ <Polynomial>, <Polynomial> ]
+Gamma=Gamma
+Gamma.Syntax=[ <Alpha>, <Beta>, <Variable Value Probability> ]\n[ <Alpha>, <Beta>, <Variable Value Probability>, <Boolean Cumulative>  ]\n[ <Alpha>, <Beta>, x, <Boolean Cumulative> ]
+Gamma.SyntaxCAS=[ <Alpha>, <Beta>, <Variable Value Probability> ]
+GeometricMean=GeometricMean
+GeometricMean.Syntax=[ <List of Numbers> ]
+GetTime=GetTime
+GetTime.Syntax=[]\n[ <Format> ]
+GroebnerDegRevLex=GroebnerDegRevLex
+GroebnerDegRevLex.Syntax=[ <List of Polynomials> ]\n[ <List of Polynomials>, <List of Variables> ]
+GroebnerLex=GroebnerLex
+GroebnerLex.Syntax=[ <List of Polynomials> ]\n[ <List of Polynomials>, <List of Variables> ]
+GroebnerLexDeg=GroebnerLexDeg
+GroebnerLexDeg.Syntax=[ <List of Polynomials> ]\n[ <List of Polynomials>, <List of Variables> ]
+HarmonicMean=HarmonicMean
+HarmonicMean.Syntax=[ <List of Numbers> ]
+Height=Height
+Height.Syntax=[ <Solid> ]
+HideLayer=HideLayer
+HideLayer.Syntax=[ <Number> ]
+Histogram=Histogram
+Histogram.Syntax=[ <List of Class Boundaries>, <List of Heights> ]\n[ <List of Class Boundaries>, <List of Raw Data>, <Use Density>, <Density Scale Factor (optional)> ]\n[ <Boolean Cumulative>, <List of Class Boundaries>, <List of Raw Data>, <Use Density>, <Density Scale Factor (optional)> ]
+HistogramRight=HistogramRight
+HistogramRight.Syntax=[ <List of Class Boundaries>, <List of Heights> ]\n[ <List of Class Boundaries>, <List of Raw Data>, <Use Density>, <Density Scale Factor (optional)>  ]\n[ <Boolean Cumulative>, <List of Class Boundaries>, <List of Raw Data>, <Use Density>, <Density Scale Factor (optional)> ]
+HyperGeometric=HyperGeometric
+HyperGeometric.Syntax=[ <Population Size>, <Number of Successes>, <Sample Size> ]\n[ <Population Size>, <Number of Successes>, <Sample Size>, <Boolean Cumulative> ]\n[ <Population Size>, <Number of Successes>, <Sample Size>, <Variable Value Probability>, <Boolean Cumulative> ]
+HyperGeometric.SyntaxCAS=[ <Population Size>, <Number of Successes>, <Sample Size>, <Variable Value Probability>, <Boolean Cumulative> ]
+Hyperbola=Hyperbola
+Hyperbola.Syntax=[ <Focus>, <Focus>, <Semimajor Axis Length> ]\n[ <Focus>, <Focus>, <Segment> ]\n[ <Focus>, <Focus>, <Point> ]
+IFactor=IFactor
+IFactor.Syntax=[ <Polynomial> ]
+IFactor.SyntaxCAS=[ <Expression> ]
+Icosahedron=Icosahedron
+Icosahedron.Syntax=[ <Equilateral Triangle> ]\n[ <Point>, <Point>, <Point> ]\n[ <Point>, <Point>, <Direction> ]
+Identity=Identity
+Identity.Syntax=[ <Number> ]
+If=If
+If.Syntax=[ <Condition>, <Then> ]\n[ <Condition>, <Then>, <Else> ]
+ImplicitCurve=ImplicitCurve
+ImplicitCurve.Syntax=[ <List of Points> ]\n[ <f(x, y)> ]
+ImplicitDerivative=ImplicitDerivative
+ImplicitDerivative.Syntax=[ <f(x, y)> ]
+ImplicitDerivative.SyntaxCAS=[ <f(x, y)> ]\n[ <Expression>, <Dependent Variable>, <Independent Variable> ]
+Incircle=Incircle
+Incircle.Syntax=[ <Point>, <Point>, <Point> ]
+IndexOf=IndexOf
+IndexOf.Syntax=[ <Object>, <List> ]\n[ <Text>, <Text> ]\n[ <Object>, <List>, <Start Index> ]\n[ <Text>, <Text>, <Start Index> ]
+Insert=Insert
+Insert.Syntax=[ <List>, <List>, <Position> ]\n[ <Object>, <List>, <Position> ]
+Integral=Integral
+Integral.Syntax=[ <Function> ]\n[ <Function>, <Variable> ]\n[ <Function>, <Start x-Value>, <End x-Value> ]\n[ <Function>, <Start x-Value>, <End x-Value>, <Boolean Evaluate> ]
+Integral.SyntaxCAS=[ <Function> ]\n[ <Function>, <Variable> ]\n[ <Function>, <Start x-Value>, <End x-Value> ]\n[ <Function>, <Variable>, <Start Value>, <End Value> ]
+IntegralBetween=IntegralBetween
+IntegralBetween.Syntax=[ <Function>, <Function>, <Start x-Value>, <End x-Value> ]\n[ <Function>, <Function>, <Start x-Value>, <End x-Value>, <Boolean Evaluate> ]
+IntegralBetween.SyntaxCAS=[ <Function>, <Function>, <Start x-Value>, <End x-Value> ]\n[ <Function>, <Function>, <Variable>, <Start Value>, <End Value> ]
+IntegralSymbolic=IntegralSymbolic
+IntegralSymbolic.Syntax=[ <Function> ]\n[ <Function>, <Variable> ]
+InteriorAngles=InteriorAngles
+InteriorAngles.Syntax=[ <Polygon> ]
+Intersect=Intersect
+Intersect.Syntax=[ <Object>, <Object> ]\n[ <Object>, <Object>, <Index of Intersection Point> ]\n[ <Object>, <Object>, <Initial Point> ]\n[ <Function>, <Function>, <Start x-Value>, <End x-Value> ]\n[ <Curve 1>, <Curve 2>, <Parameter 1>, <Parameter 2> ]
+Intersect.SyntaxCAS=[ <Function>, <Function> ]
+IntersectConic=IntersectConic
+IntersectConic.Syntax=[ <Plane>, <Quadric> ]\n[ <Quadric>, <Quadric> ]
+IntersectPath=IntersectPath
+IntersectPath.Syntax=[ <Line>, <Polygon> ]\n[ <Polygon>, <Polygon> ]
+IntersectPath.Syntax3D=[ <Line>, <Polygon> ]\n[ <Polygon>, <Polygon> ]\n[ <Plane>, <Polygon> ]\n[ <Plane>, <Quadric> ]
+Intersection=Intersection
+Intersection.Syntax=[ <List>, <List> ]
+InverseBeta=InverseBeta
+InverseBeta.Syntax=[ <Alpha>, <Beta>, <Probability> ]
+InverseBinomial=InverseBinomial
+InverseBinomial.Syntax=[ <Number of Trials>, <Probability of Success>, <Cumulative Probability> ]
+InverseBinomialMinimumTrials=InverseBinomialMinimumTrials
+InverseBinomialMinimumTrials.Syntax=[ <Cumulative Probability>, <Probability of Success>, <Number of Successes> ]
+InverseBinomialMinimumTrials.SyntaxCAS=[ <Cumulative Probability>, <Probability of Success>, <Number of Successes> ]
+InverseCauchy=InverseCauchy
+InverseCauchy.Syntax=[ <Median>, <Scale>, <Probability> ]
+InverseChiSquared=InverseChiSquared
+InverseChiSquared.Syntax=[ <Degrees of Freedom>, <Probability> ]
+InverseExponential=InverseExponential
+InverseExponential.Syntax=[ <Lambda>, <Probability> ]
+InverseFDistribution=InverseFDistribution
+InverseFDistribution.Syntax=[ <Numerator Degrees of Freedom>, <Denominator Degrees of Freedom>, <Probability> ]
+InverseGamma=InverseGamma
+InverseGamma.Syntax=[ <Alpha>, <Beta>, <Probability> ]
+InverseHyperGeometric=InverseHyperGeometric
+InverseHyperGeometric.Syntax=[ <Population Size>, <Number of Successes>, <Sample Size>, <Probability> ]
+InverseLaplace=InverseLaplace
+InverseLaplace.Syntax=[ <Function> ]\n[ <Function>, <Variable> ]\n[ <Function>, <Variable>, <Variable> ]
+InverseLogNormal=InverseLogNormal
+InverseLogNormal.Syntax=[ <Mean>, <Standard Deviation>, <Probability> ]
+InverseLogistic=InverseLogistic
+InverseLogistic.Syntax=[ <Mean>, <Scale>, <Probability> ]
+InverseNormal=InverseNormal
+InverseNormal.Syntax=[ <Mean>, <Standard Deviation>, <Cumulative Probability> ]
+InversePascal=InversePascal
+InversePascal.Syntax=[ <n>, <p>, <Probability> ]
+InversePoisson=InversePoisson
+InversePoisson.Syntax=[ <Mean>, <Probability> ]
+InverseTDistribution=InverseTDistribution
+InverseTDistribution.Syntax=[ <Degrees of Freedom>, <Probability> ]
+InverseWeibull=InverseWeibull
+InverseWeibull.Syntax=[ <Shape>, <Scale>, <Probability> ]
+InverseZipf=InverseZipf
+InverseZipf.Syntax=[ <Number of Elements>, <Exponent>, <Probability> ]
+Invert=Invert
+Invert.Syntax=[ <Matrix> ]\n[ <Function> ]
+IsFactored=IsFactored
+IsFactored.Syntax=[ <Polynomial> ]
+IsInRegion=IsInRegion
+IsInRegion.Syntax=[ <Point>, <Region> ]
+IsInteger=IsInteger
+IsInteger.Syntax=[ <Number> ]
+IsPrime=IsPrime
+IsPrime.Syntax=[ <Number> ]
+IsTangent=IsTangent
+IsTangent.Syntax=[ <Line>, <Conic> ]
+IsVertexForm=IsVertexForm
+IsVertexForm.Syntax=[ <Function> ]
+Iteration=Iteration
+Iteration.Syntax=[ <Function>, <Start Value>, <Number of Iterations> ]\n[ <Expression>, <Variables>, <Start Values>, <Count> ]
+IterationList=IterationList
+IterationList.Syntax=[ <Function>, <Start Value>, <Number of Iterations> ]\n[ <Expression>, <Variables>, <Start Values>, <Count> ]
+IterationList.SyntaxCAS=[ <Function>, <Start Value>, <Number of Iterations> ]
+Join=Join
+Join.Syntax=[ <List of Lists> ]\n[ <List>, <List>, ... ]
+JordanDiagonalization=JordanDiagonalization
+JordanDiagonalization.SyntaxCAS=[ <Matrix> ]
+KeepIf=KeepIf
+KeepIf.Syntax=[ <Condition>, <List> ]\n[ <Condition>, <Variable>, <List> ]
+LCM=LCM
+LCM.Syntax=[ <List of Numbers> ]\n[ <Number>, <Number> ]
+LCM.SyntaxCAS=[ <List of Numbers> ]\n[ <List of Polynomials> ]\n[ <Number>, <Number> ]\n[ <Polynomial>, <Polynomial> ]
+LUDecomposition=LUDecomposition
+LUDecomposition.Syntax=[ <Matrix> ]
+LaTeX=FormulaText
+LaTeX.Syntax=[ <Object> ]\n[ <Object>, <Boolean for Substitution of Variables> ]\n[ <Object>, <Boolean for Substitution of Variables>, <Boolean Show Name> ]
+Laplace=Laplace
+Laplace.Syntax=[ <Function> ]\n[ <Function>, <Variable> ]\n[ <Function>, <Variable>, <Variable> ]
+Last=Last
+Last.Syntax=[ <List> ]\n[ <Text> ]\n[ <List>, <Number of Elements> ]\n[ <Text>, <Number of Elements> ]
+Last.SyntaxCAS=[ <List> ]\n[ <List>, <Number of Elements> ]
+LeftSide=LeftSide
+LeftSide.Syntax=[ <Equation> ]
+LeftSide.SyntaxCAS=[ <Equation> ]\n[ <List of Equations> ]\n[ <List of Equations>, <Index> ]
+LeftSum=LeftSum
+LeftSum.Syntax=[ <Function>, <Start x-Value>, <End x-Value>, <Number of Rectangles> ]
+Length=Length
+Length.Syntax=[ <Object> ]\n[ <Function>, <Start x-Value>, <End x-Value> ]\n[ <Function>, <Start Point>, <End Point> ]\n[ <Curve>, <Start t-Value>, <End t-Value> ]\n[ <Curve>, <Start Point>, <End Point> ]
+Length.SyntaxCAS=[ <List> ]\n[ <Function>, <Start x-Value>, <End x-Value> ]\n[ <Function>, <Variable>, <Start x-Value>, <End x-Value> ]
+LetterToUnicode=LetterToUnicode
+LetterToUnicode.Syntax=[ <Letter> ]
+Limit=Limit
+Limit.Syntax=[ <Function>, <Value> ]
+Limit.SyntaxCAS=[ <Expression>, <Value> ]\n[ <Expression>, <Variable>, <Value> ]
+LimitAbove=LimitAbove
+LimitAbove.Syntax=[ <Function>, <Value> ]
+LimitAbove.SyntaxCAS=[ <Expression>, <Value> ]\n[ <Expression>, <Variable>, <Value> ]
+LimitBelow=LimitBelow
+LimitBelow.Syntax=[ <Function>, <Value> ]
+LimitBelow.SyntaxCAS=[ <Expression>, <Value> ]\n[ <Expression>, <Variable>, <Value> ]
+Line=Line
+Line.Syntax=[ <Point>, <Point> ]\n[ <Point>, <Parallel Line> ]\n[ <Point>, <Direction Vector> ]
+LineBisector=PerpendicularBisector
+LineBisector.Syntax=[ <Segment> ]\n[ <Point>, <Point> ]
+LineBisector.Syntax3D=[ <Segment> ]\n[ <Point>, <Point> ]\n[ <Point>, <Point>, <Direction> ]
+LineGraph=LineGraph
+LineGraph.Syntax=[ <List of x-coordinates>, <List of y-coordinates> ]
+Locus=Locus
+Locus.Syntax=[ <Point Creating Locus Line>, <Point> ]\n[ <Point Creating Locus Line>, <Slider> ]\n[ <Slopefield>, <Point> ]\n[ <f(x, y)>, <Point> ]
+LocusEquation=LocusEquation
+LocusEquation.Syntax=[ <Locus> ]\n[ <Locus Point>, <Moving Point> ]\n[ <Boolean Expression>, <Moving Point> ]
+LogNormal=LogNormal
+LogNormal.Syntax=[ <Mean>, <Standard Deviation>, <Variable Value Probability> ]\n[ <Mean>, <Standard Deviation>, <Variable Value Probability>, <Boolean Cumulative>  ]\n[ <Mean>, <Standard Deviation>, x, <Boolean Cumulative> ]
+Logistic=Logistic
+Logistic.Syntax=[ <Mean>, <Scale>, <Variable Value Probability> ]\n[ <Mean>, <Scale>, <Variable Value Probability>, <Boolean Cumulative>  ]\n[ <Mean>, <Scale>, x, <Boolean Cumulative> ]
+LowerSum=LowerSum
+LowerSum.Syntax=[ <Function>, <Start x-Value>, <End x-Value>, <Number of Rectangles> ]
+MAD=MAD
+MAD.Syntax=[ <List of Raw Data> ]\n[ <List of Numbers>, <List of Frequencies> ]
+MatrixPlot=MatrixPlot
+MatrixRank=MatrixRank
+MatrixRank.Syntax=[ <Matrix> ]
+Max=Max
+Max.Syntax=[ <Interval> ]\n[ <Number>, <Number> ]\n[ <List> ]\n[ <List of Data>, <List of Frequencies> ]\n[ <Function>, <Start x-Value>, <End x-Value> ]
+Max.SyntaxCAS=[ <List> ]\n[ <Interval> ]\n[ <Number>, <Number> ]\n[ <Function>, <Start x-Value>, <End x-Value> ]\n[ <List of Data>, <List of Frequencies> ]
+Maximize=Maximize
+Maximize.Syntax=[ <Dependent Number>, <Free Number> ]\n[ <Dependent Number>, <Point on Path> ]
+Mean=Mean
+Mean.Syntax=[ <List of Raw Data> ]\n[ <List of Numbers>, <List of Frequencies> ]
+MeanX=MeanX
+MeanX.Syntax=[ <List of Points> ]
+MeanY=MeanY
+MeanY.Syntax=[ <List of Points> ]
+Median=Median
+Median.Syntax=[ <List of Raw Data> ]\n[ <List of Numbers>, <List of Frequencies> ]
+Median.SyntaxCAS=[ <List of Numbers> ]
+Midpoint=Midpoint
+Midpoint.Syntax=[ <Segment> ]\n[ <Conic> ]\n[ <Interval> ]\n[ <Point>, <Point> ]
+Min=Min
+Min.Syntax=[ <Interval> ]\n[ <Number>, <Number> ]\n[ <List> ]\n[ <List of Data>, <List of Frequencies> ]\n[ <Function>, <Start x-Value>, <End x-Value> ]
+Min.SyntaxCAS=[ <List> ]\n[ <Interval> ]\n[ <Number>, <Number> ]\n[ <Function>, <Start x-Value>, <End x-Value> ]\n[ <List of Data>, <List of Frequencies> ]
+MinimalPolynomial=MinimalPolynomial
+MinimalPolynomial.Syntax=[ <Matrix> ]
+Minimize=Minimize
+Minimize.Syntax=[ <Dependent Number>, <Free Number> ]\n[ <Dependent Number>, <Point on Path> ]
+MinimumSpanningTree=MinimumSpanningTree
+MinimumSpanningTree.Syntax=[ <List of Points> ]
+Mirror=Reflect
+Mirror.Syntax=[ <Object>, <Point> ]\n[ <Object>, <Line> ]\n[ <Object>, <Circle> ]
+Mirror.Syntax3D=[ <Object>, <Point> ]\n[ <Object>, <Line> ]\n[ <Object>, <Plane> ]\n[ <Object>, <Circle> ]
+MixedNumber=MixedNumber
+MixedNumber.SyntaxCAS=[ <Number> ]
+Mod=Mod
+Mod.Syntax=[ <Dividend Number>, <Divisor Number> ]\n[ <Dividend Polynomial>, <Divisor Polynomial> ]
+Mode=Mode
+Mode.Syntax=[ <List of Numbers> ]
+ModularExponent=ModularExponent
+ModularExponent.Syntax=[ <Number>, <Number>, <Number> ]
+NDerivative=NDerivative
+NDerivative.Syntax=[ <Function> ]\n[ <Function>, <Order> ]
+NIntegral=NIntegral
+NIntegral.Syntax=[ <Function> ]\n[ <Function>, <Start x-Value>, <End x-Value> ]\n[ <Function>, <Start x-Value>, <Start y-Value>, <End x-Value> ]
+NIntegral.SyntaxCAS=[ <Function>, <Start x-Value>, <End x-Value> ]\n[ <Function>, <Variable>, <Start Value>, <End Value> ]
+NInvert=NInvert
+NInvert.Syntax=[ <Function> ]
+NSolutions=NSolutions
+NSolutions.Syntax=[ <Equation> ]
+NSolutions.SyntaxCAS=[ <Equation> ]\n[ <Equation>, <Variable> ]\n[ <Equation>, <Variable = starting value> ]\n[ <List of Equations>, <List of Variables> ]
+NSolve=NSolve
+NSolve.Syntax=[ <Equation> ]
+NSolve.SyntaxCAS=[ <Equation> ]\n[ <Equation>, <Variable> ]\n[ <Equation>, <Variable = starting value> ]\n[ <List of Equations>, <List of Variables> ]
+NSolveODE=NSolveODE
+NSolveODE.Syntax=[ <List of Derivatives>, <Initial x-coordinate>, <List of Initial y-coordinates>, <Final x-coordinate> ]
+Name=Name
+Name.Syntax=[ <Object> ]
+Net=Net
+Net.Syntax=[ <Polyhedron>, <Number> ]\n[ <Polyhedron>, <Number>, <Face>, <Edge>, <Edge>, ... ]
+NextPrime=NextPrime
+NextPrime.Syntax=[ <Number> ]
+Normal=Normal
+Normal.Syntax=[ <Mean>, <Standard Deviation>, <Variable Value Probability> ]\n[ <Mean>, <Standard Deviation>, <Variable Value Probability>, <Boolean Cumulative> ]\n[ <Mean>, <Standard Deviation>, x, <Boolean Cumulative> ]\n[ <Mean>, <Standard Deviation>, <Variable Value u> , <Variable Value v> ]
+NormalQuantilePlot=NormalQuantilePlot
+NormalQuantilePlot.Syntax=[ <List of Raw Data> ]
+Normalize=Normalize
+Normalize.Syntax=[ <List of Numbers> ]\n[ <List of Points> ]
+Numerator=Numerator
+Numerator.Syntax=[ <Number> ]\n[ <Function> ]
+Numerator.SyntaxCAS=[ <Expression> ]
+Numeric=Numeric
+Numeric.SyntaxCAS=[ <Expression> ]\n[ <Expression>, <Significant Figures> ]
+Object=Object
+Object.Syntax=[ <Name of Object as Text> ]
+Octahedron=Octahedron
+Octahedron.Syntax=[ <Equilateral Triangle> ]\n[ <Point>, <Point>, <Point> ]\n[ <Point>, <Point>, <Direction> ]
+Ordinal=Ordinal
+Ordinal.Syntax=[ <Integer> ]
+OrdinalRank=OrdinalRank
+OrdinalRank.Syntax=[ <List> ]
+OrthogonalLine=PerpendicularLine
+OrthogonalLine.Syntax=[ <Point>, <Line> ]\n[ <Point>, <Segment> ]\n[ <Point>, <Vector> ]
+OrthogonalLine.Syntax3D=[ <Point>, <Line> ]\n[ <Point>, <Segment> ]\n[ <Point>, <Vector> ]\n[ <Point>, <Plane> ]\n[ <Line>, <Line> ]\n[ <Point>, <Direction>, <Direction> ]\n[ <Point>, <Line>, <Context> ]
+OrthogonalPlane=PerpendicularPlane
+OrthogonalPlane.Syntax=[ <Point>, <Line> ]\n[ <Point>, <Vector> ]
+OrthogonalVector=PerpendicularVector
+OrthogonalVector.Syntax=[ <Line> ]\n[ <Segment> ]\n[ <Vector> ]
+OrthogonalVector.Syntax3D=[ <Line> ]\n[ <Segment> ]\n[ <Vector> ]\n[ <Plane> ]
+OrthogonalVector.SyntaxCAS=[ <Vector> ]
+OsculatingCircle=OsculatingCircle
+OsculatingCircle.Syntax=[ <Point>, <Object> ]
+PMCC=CorrelationCoefficient
+PMCC.Syntax=[ <List of Points> ]\n[ <List of x-coordinates>, <List of y-coordinates> ]
+Pan=Pan
+Pan.Syntax=[ <x>, <y> ]
+Pan.Syntax3D=[ <x>, <y> ]\n[ <x>, <y>, <z> ]
+Parabola=Parabola
+Parabola.Syntax=[ <Point>, <Line> ]
+Parameter=Parameter
+Parameter.Syntax=[ <Parabola> ]
+ParametricDerivative=ParametricDerivative
+ParametricDerivative.Syntax=[ <Curve> ]
+ParseToFunction=ParseToFunction
+ParseToFunction.Syntax=[ <Text> ]\n[ <Function>, <Text> ]
+ParseToNumber=ParseToNumber
+ParseToNumber.Syntax=[ <Text> ]\n[ <Number>, <Text> ]
+PartialFractions=PartialFractions
+PartialFractions.Syntax=[ <Function> ]
+PartialFractions.SyntaxCAS=[ <Function> ]\n[ <Function>, <Variable> ]
+Pascal=Pascal
+Pascal.Syntax=[ <n>, <p> ]\n[ <n>, <p>, <Boolean Cumulative> ]\n[ <n>, <p>, <Variable Value Probability>, <Boolean Cumulative> ]
+Pascal.SyntaxCAS=[ <n>, <p>, <Variable Value Probability>, <Boolean Cumulative> ]
+PathParameter=PathParameter
+PathParameter.Syntax=[ <Point On Path> ]
+Payment=Payment
+Payment.Syntax=[ <Interest Rate>, <Number of Periods>, <Present Value>, <Future Value (optional)>, <Type (optional)> ]
+PenStroke=PenStroke
+PenStroke.Syntax=[ <Point>, ..., <Point> ]
+Percentile=Percentile
+Percentile.Syntax=[ <List of Numbers>, <Percent> ]
+Perimeter=Perimeter
+Perimeter.Syntax=[ <Polygon> ]\n[ <Conic> ]\n[ <Locus> ]
+Periods=Periods
+Periods.Syntax=[ <Interest Rate>, <Payment>, <Present Value>, <Future Value (optional)>, <Type (optional)> ]
+PieChart=PieChart
+PieChart.Syntax=[ <List of Frequencies> ]\n[ <List of Frequencies>, <Center>, <Radius> ]
+Plane=Plane
+Plane.Syntax=[ <Polygon> ]\n[ <Conic> ]\n[ <Point>, <Plane> ]\n[ <Point>, <Line> ]\n[ <Line>, <Line> ]\n[ <Point>, <Point>, <Point> ]\n[ <Point>, <Vector>, <Vector> ]
+Plane.SyntaxCAS=[ <Point>, <Point>, <Point> ]
+PlaneBisector=PlaneBisector
+PlaneBisector.Syntax=[ <Segment> ]\n[ <Point>, <Point> ]
+PlaySound=PlaySound
+PlaySound.Syntax=[ <URL> ]\n[ <Boolean Play> ]\n[ <Function>, <Min Value>, <Max Value> ]\n[ <Function>, <Min Value>, <Max Value>, <Sample Rate>, <Sample Depth> ]
+PlotSolve=PlotSolve
+PlotSolve.Syntax=[ <Equation in x> ]
+Point=Point
+Point.Syntax=[ <Object> ]\n[ <Object>, <Parameter> ]\n[ <Point>, <Vector> ]\n[ <List> ]
+Point.SyntaxCAS=Point( <List> )\nPoint( <Point>, <Vector> )
+PointIn=PointIn
+PointIn.Syntax=[ <Region> ]
+PointList=PointList
+PointList.Syntax=[ <List> ]
+Poisson=Poisson
+Poisson.Syntax=[ <Mean> ]\n[ <Mean>, <Boolean Cumulative> ]\n[ <Mean>, <Variable Value Probability>, <Boolean Cumulative> ]
+Poisson.SyntaxCAS=[ <Mean>, <Variable Value Probability>, <Boolean Cumulative> ]
+Polar=Polar
+Polar.Syntax=[ <Point>, <Conic> ]\n[ <Line>, <Conic> ]
+PolyLine=Polyline
+PolyLine.Syntax=[ <List of Points> ]\n[ <Point>, ..., <Point> ]
+Polygon=Polygon
+Polygon.Syntax=[ <List of Points> ]\n[ <Point>, ..., <Point> ]\n[ <Point>, <Point>, <Number of Vertices> ]
+Polygon.Syntax3D=[ <List of Points> ]\n[ <Point>, ..., <Point> ]\n[ <Point>, <Point>, <Number of Vertices> ]\n[ <Point>, <Point>, <Number of Vertices>, <Direction> ]
+Polynomial=Polynomial
+Polynomial.Syntax=[ <Function> ]\n[ <List of Points> ]
+Polynomial.SyntaxCAS=[ <Function> ]\n[ <Function>, <Variable> ]
+PresentValue=PresentValue
+PresentValue.Syntax=[ <Interest Rate>, <Number of Periods>, <Payment>, <Future Value (optional)>, <Type (optional)> ]
+PreviousPrime=PreviousPrime
+PreviousPrime.Syntax=[ <Number> ]
+PrimeFactors=PrimeFactors
+PrimeFactors.Syntax=[ <Number> ]
+Prism=Prism
+Prism.Syntax=[ <Polygon>, <Point> ]\n[ <Polygon>, <Height value> ]\n[ <Point>, <Point>, ... ]
+Product=Product
+Product.Syntax=[ <List of Raw Data> ]\n[ <List of Numbers>, <Number of Elements> ]\n[ <List of Numbers>, <List of Frequencies> ]\n[ <Expression>, <Variable>, <Start Value>, <End Value> ]
+Product.SyntaxCAS=[ <List of Expressions> ]\n[ <Expression>, <Variable>, <Start Index>, <End Index> ]
+Prove=Prove
+Prove.Syntax=[ <Boolean Expression> ]
+ProveDetails=ProveDetails
+ProveDetails.Syntax=[ <Boolean Expression> ]
+Pyramid=Pyramid
+Pyramid.Syntax=[ <Polygon>, <Point> ]\n[ <Polygon>, <Height> ]\n[ <Point>, <Point>, <Point>, <Point>, ... ]
+Q1=Quartile1
+Q1.Syntax=[ <List of Raw Data> ]\n[ <List of Numbers>, <List of Frequencies> ]
+Q3=Quartile3
+Q3.Syntax=[ <List of Raw Data> ]\n[ <List of Numbers>, <List of Frequencies> ]
+QRDecomposition=QRDecomposition
+QRDecomposition.Syntax=[ <Matrix> ]
+QuadricSide=Side
+QuadricSide.Syntax=[ <Quadric> ]
+RSquare=RSquare
+RSquare.Syntax=[ <List of Points>, <Function> ]
+Radius=Radius
+Radius.Syntax=[ <Conic> ]
+Random=RandomBetween
+Random.Syntax=[ <Minimum Integer>, <Maximum Integer> ]\n[ <Minimum Integer>, <Maximum Integer>, <Number of Samples> ]\n[ <Minimum Integer>, <Maximum Integer>, <Boolean Fixed> ]
+Random.SyntaxCAS=[ <Minimum Integer>, <Maximum Integer> ]\n[ <Minimum Integer>, <Maximum Integer>, <Number of Samples> ]
+RandomBinomial=RandomBinomial
+RandomBinomial.Syntax=[ <Number of Trials>, <Probability> ]
+RandomDiscrete=RandomDiscrete
+RandomDiscrete.Syntax=[ <List>, <List> ]
+RandomElement=RandomElement
+RandomElement.Syntax=[ <List> ]
+RandomNormal=RandomNormal
+RandomNormal.Syntax=[ <Mean>, <Standard Deviation> ]
+RandomPointIn=RandomPointIn
+RandomPointIn.Syntax=[ <Region> ]\n[ <List of Points> ]\n[ <xMin>, <xMax>, <yMin>, <yMax> ]
+RandomPoisson=RandomPoisson
+RandomPoisson.Syntax=[ <Mean> ]
+RandomPolynomial=RandomPolynomial
+RandomPolynomial.Syntax=[ <Degree>, <Minimum for Coefficients>, <Maximum for Coefficients> ]
+RandomPolynomial.SyntaxCAS=[ <Degree>, <Minimum for Coefficients>, <Maximum for Coefficients> ]\n[ <Variable>, <Degree>, <Minimum for Coefficients>, <Maximum for Coefficients> ]
+RandomUniform=RandomUniform
+RandomUniform.Syntax=[ <Min>, <Max> ]\n[ <Min>, <Max>, <Number of Samples> ]
+Rate=Rate
+Rate.Syntax=[ <Number of Periods>, <Payment>, <Present Value>, <Future Value (optional)>, <Type (optional)>, <Guess (optional)> ]
+Rationalize=Rationalize
+Rationalize.SyntaxCAS=[ <Number> ]
+Ray=Ray
+Ray.Syntax=[ <Start Point>, <Point> ]\n[ <Start Point>, <Direction Vector> ]
+ReadText=ReadText
+ReadText.Syntax=[ <Text> ]
+RectangleSum=RectangleSum
+RectangleSum.Syntax=[ <Function>, <Start x-Value>, <End x-Value>, <Number of Rectangles>, <Position for rectangle start> ]
+ReducedRowEchelonForm=ReducedRowEchelonForm
+ReducedRowEchelonForm.Syntax=[ <Matrix> ]
+Relation=Relation
+Relation.Syntax=[ <List> ]\n[ <Object>, <Object> ]
+RemovableDiscontinuity=RemovableDiscontinuity
+RemovableDiscontinuity.Syntax=[ <Function> ]
+Remove=Remove
+Remove.Syntax=[ <List>, <List> ]
+RemoveUndefined=RemoveUndefined
+RemoveUndefined.Syntax=[ <List> ]
+Rename=Rename
+Rename.Syntax=[ <Object>, <Name> ]
+Repeat=Repeat
+Repeat.Syntax=[ <Number>, <Scripting Command>, <Scripting Command>, ... ]
+ReplaceAll=ReplaceAll
+ReplaceAll.Syntax=[ <Text>, <Text to Match>, <Text to Replace> ]
+ResidualPlot=ResidualPlot
+ResidualPlot.Syntax=[ <List of Points>, <Function> ]
+Reverse=Reverse
+Reverse.Syntax=[ <List> ]
+RightSide=RightSide
+RightSide.Syntax=[ <Equation> ]
+RightSide.SyntaxCAS=[ <Equation> ]\n[ <List of Equations> ]\n[ <List of Equations>, <Index> ]
+RigidPolygon=RigidPolygon
+RigidPolygon.Syntax=[ <Polygon> ]\n[ <Polygon>, <Offset x>, <Offset y> ]\n[ <Free Point>, ..., <Free Point> ]
+Root=Root
+Root.Syntax=[ <Polynomial> ]\n[ <Function>, <Initial x-Value> ]\n[ <Function>, <Start x-Value>, <End x-Value> ]
+Root.SyntaxCAS=[ <Polynomial> ]
+RootList=RootList
+RootList.Syntax=[ <List> ]
+RootMeanSquare=RootMeanSquare
+RootMeanSquare.Syntax=[ <List of Numbers> ]
+Roots=Roots
+Roots.Syntax=[ <Function>, <Start x-Value>, <End x-Value> ]
+Rotate=Rotate
+Rotate.Syntax=[ <Object>, <Angle> ]\n[ <Object>, <Angle>, <Point> ]
+Rotate.Syntax3D=[ <Object>, <Angle> ]\n[ <Object>, <Angle>, <Point> ]\n[ <Object>, <Angle>, <Axis of Rotation> ]\n[ <Object>, <Angle>, <Point on Axis>, <Axis Direction or Plane> ]
+RotateText=RotateText
+RotateText.Syntax=[ <Text>, <Angle> ]
+Row=Row
+Row.Syntax=[ <Spreadsheet Cell> ]
+RunClickScript=RunClickScript
+RunClickScript.Syntax=[ <Object> ]
+RunUpdateScript=RunUpdateScript
+RunUpdateScript.Syntax=[ <Object> ]
+SD=SD
+SD.Syntax=[ <List of Raw Data> ]\n[ <List of Numbers>, <List of Frequencies> ]
+SDX=SDX
+SDX.Syntax=[ <List of Points> ]
+SDY=SDY
+SDY.Syntax=[ <List of Points> ]
+SVD=SVD
+SVD.Syntax=[ <Matrix> ]
+SXX=Sxx
+SXX.Syntax=[ <List of Numbers> ]\n[ <List of Points> ]
+SXY=Sxy
+SXY.Syntax=[ <List of Points> ]\n[ <List of Numbers>, <List of Numbers> ]
+SYY=Syy
+SYY.Syntax=[ <List of Points> ]
+Sample=Sample
+Sample.Syntax=[ <List>, <Size> ]\n[ <List>, <Size>, <With Replacement> ]
+SampleSD=SampleSD
+SampleSD.Syntax=[ <List of Raw Data> ]\n[ <List of Numbers>, <List of Frequencies> ]
+SampleSD.SyntaxCAS=[ <List of Numbers> ]
+SampleSDX=SampleSDX
+SampleSDX.Syntax=[ <List of Points> ]
+SampleSDY=SampleSDY
+SampleSDY.Syntax=[ <List of Points> ]
+SampleVariance=SampleVariance
+SampleVariance.Syntax=[ <List of Raw Data> ]\n[ <List of Numbers>, <List of Frequencies> ]
+SampleVariance.SyntaxCAS=[ <List of Numbers> ]
+ScientificText=ScientificText
+ScientificText.Syntax=[ <Number> ]\n[ <Number>, <Precision> ]
+SecondAxis=MinorAxis
+SecondAxis.Syntax=[ <Conic> ]
+SecondAxisLength=SemiMinorAxisLength
+SecondAxisLength.Syntax=[ <Conic> ]
+Sector=Sector
+Sector.Syntax=[ <Conic>, <Point>, <Point> ]\n[ <Conic>, <Parameter Value>, <Parameter Value> ]
+Segment=Segment
+Segment.Syntax=[ <Point>, <Point> ]\n[ <Point>, <Length> ]
+SelectObjects=SelectObjects
+SelectObjects.Syntax=[ ]\n[ <Object>, <Object>, ... ]
+SelectedElement=SelectedElement
+SelectedElement.Syntax=[ <List> ]
+SelectedIndex=SelectedIndex
+SelectedIndex.Syntax=[ <List> ]
+Semicircle=Semicircle
+Semicircle.Syntax=[ <Point>, <Point> ]
+Sequence=Sequence
+Sequence.Syntax=[ <End Value> ]\n[ <Start Value>, <End Value> ]\n[ <Start Value>, <End Value>, <Increment> ]\n[ <Expression>, <Variable>, <Start Value>, <End Value> ]\n[ <Expression>, <Variable>, <Start Value>, <End Value>, <Increment> ]
+SetActiveView=SetActiveView
+SetActiveView.Syntax=[ <View> ]\n[ <Plane> ]
+SetAxesRatio=SetAxesRatio
+SetAxesRatio.Syntax=[ <Number>, <Number> ]
+SetAxesRatio.Syntax3D=[ <Number>, <Number> ]\n[ <Number>, <Number>, <Number> ]
+SetBackgroundColor=SetBackgroundColor
+SetBackgroundColor.Syntax=[ <Color> ]\n[ <Object>, <Color> ]\n[ <Red>, <Green>, <Blue> ]\n[ <Object>, <Red>, <Green>, <Blue> ]
+SetCaption=SetCaption
+SetCaption.Syntax=[ <Object>, <Text> ]
+SetColor=SetColor
+SetColor.Syntax=[ <Object>, <Color> ]\n[ <Object>, <Red>, <Green>, <Blue> ]
+SetConditionToShowObject=SetConditionToShowObject
+SetConditionToShowObject.Syntax=[ <Object>, <Condition> ]
+SetConstructionStep=SetConstructionStep
+SetConstructionStep.Syntax=[ <Number> ]
+SetCoords=SetCoords
+SetCoords.Syntax=[ <Object>, <x>, <y> ]\n[ <Object>, <x>, <y>, <z> ]
+SetDecoration=SetDecoration
+SetDecoration.Syntax=[ <Object>, <Number> ]\n[ <Segment>, <Number>, <Number>]
+SetDynamicColor=SetDynamicColor
+SetDynamicColor.Syntax=[ <Object>, <Red>, <Green>, <Blue> ]\n[ <Object>, <Red>, <Green>, <Blue>, <Opacity> ]
+SetFilling=SetFilling
+SetFilling.Syntax=[ <Object>, <Number> ]
+SetFixed=SetFixed
+SetFixed.Syntax=[ <Object>, <true | false> ]\n[ <Object>, <true | false>, <true | false> ]
+SetImage=SetImage
+SetImage.Syntax=[ <Object>, <Image> ]\n[ <Object>, <Text> ]
+SetLabelMode=SetLabelMode
+SetLabelMode.Syntax=[ <Object>, <Number> ]
+SetLayer=SetLayer
+SetLayer.Syntax=[ <Object>, <Layer> ]
+SetLevelOfDetail=SetLevelOfDetail
+SetLevelOfDetail.Syntax=[ <Surface>, <Level of Detail> ]
+SetLineStyle=SetLineStyle
+SetLineStyle.Syntax=[ <Object>, <Number> ]
+SetLineThickness=SetLineThickness
+SetLineThickness.Syntax=[ <Object>, <Number> ]
+SetPerspective=SetPerspective
+SetPerspective.Syntax=[ <Text> ]
+SetPointSize=SetPointSize
+SetPointSize.Syntax=[ <Object>, <Number> ]
+SetPointStyle=SetPointStyle
+SetPointStyle.Syntax=[ <Point>, <Number> ]
+SetSeed=SetSeed
+SetSeed.Syntax=[ <Integer> ]
+SetSpinSpeed=SetSpinSpeed
+SetSpinSpeed.Syntax=[ <Number> ]
+SetTooltipMode=SetTooltipMode
+SetTooltipMode.Syntax=[ <Object>, <Number> ]
+SetTrace=SetTrace
+SetTrace.Syntax=[ <Object>, <true | false> ]
+SetValue=SetValue
+SetValue.Syntax=[ <Boolean>, <0|1> ]\n[ <Object>, <Object> ]\n[ <List>, <Number>, <Object> ]
+SetViewDirection=SetViewDirection
+SetViewDirection.Syntax=[ ]\n[ <Direction> ]\n[ <Direction>, <Boolean animate> ]
+SetVisibleInView=SetVisibleInView
+SetVisibleInView.Syntax=[ <Object>, <View Number 1|2>, <Boolean> ]
+Shear=Shear
+Shear.Syntax=[ <Object>, <Line>, <Ratio> ]
+ShortestDistance=ShortestDistance
+ShortestDistance.Syntax=[ <List of Segments>, <Start Point>, <End Point>, <Boolean Weighted> ]
+ShowAxes=ShowAxes
+ShowAxes.Syntax=[]\n[ <Boolean> ]\n[ <View>, <Boolean> ]
+ShowGrid=ShowGrid
+ShowGrid.Syntax=[]\n[ <Boolean> ]\n[ <View>, <Boolean> ]
+ShowLabel=ShowLabel
+ShowLabel.Syntax=[ <Object>, <Boolean> ]
+ShowLayer=ShowLayer
+ShowLayer.Syntax=[ <Number> ]
+Shuffle=Shuffle
+Shuffle.Syntax=[ <List> ]
+SigmaXX=SigmaXX
+SigmaXX.Syntax=[ <List of Points> ]\n[ <List of Raw Data> ]\n[ <List of Numbers>, <List of Frequencies> ]
+SigmaXY=SigmaXY
+SigmaXY.Syntax=[ <List of Points> ]\n[ <List of x-coordinates>, <List of y-coordinates> ]
+SigmaYY=SigmaYY
+SigmaYY.Syntax=[ <List of Points> ]
+Simplify=Simplify
+Simplify.Syntax=[ <Function> ]\n[ <Text> ]
+Simplify.SyntaxCAS=[ <Function> ]
+Slider=Slider
+Slider.Syntax=[ <Min>, <Max>, <Increment>, <Speed>, <Width>, <Is Angle>, <Horizontal>, <Animating>, <Random> ]
+Slope=Slope
+Slope.Syntax=[ <Line> ]
+SlopeField=SlopeField
+SlopeField.Syntax=[ <f(x, y)> ]\n[ <f(x, y)>, <Number n> ]\n[ <f(x, y)>, <Number n>, <Length Multiplier a> ]\n[ <f(x, y)>, <Number n>, <Length Multiplier a>, <Min x>, <Min y>, <Max x>, <Max y> ]
+SlowPlot=SlowPlot
+SlowPlot.Syntax=[ <Function> ]\n[ <Function>, <Boolean Repeat> ]
+Solutions=Solutions
+Solutions.Syntax=[ <Equation> ]
+Solutions.SyntaxCAS=[ <Equation> ]\n[ <Equation>, <Variable> ]\n[ <List of Equations>, <List of Variables> ]
+Solve=Solve
+Solve.Syntax=[ <Equation> ]
+Solve.SyntaxCAS=[ <Equation in x> ]\n[ <Equation>, <Variable> ]\n[ <List of Equations>, <List of Variables> ]\n[ <List of Parametric Equations>, <List of Variables> ]\n[ <Equation>, <Variable>, <List of assumptions> ]
+SolveCubic=SolveCubic
+SolveCubic.SyntaxCAS=[ <Cubic Polynomial> ]
+SolveODE=SolveODE
+SolveODE.Syntax=[ <f'(x, y)> ]\n[ <f'(x, y)>, <Point on f> ]\n[ <f'(x, y)>, <Start x>, <Start y>, <End x>, <Step> ]\n[ <y'>, <x'>, <Start x>, <Start y>, <End t>, <Step> ]\n[ <b(x)>, <c(x)>, <f(x)>, <Start x>, <Start y>, <Start y'>, <End x>, <Step> ]
+SolveODE.SyntaxCAS=[ <Equation> ]\n[ <Equation>, <Point(s) on f> ]\n[ <Equation>, <Point(s) on f>, <Point(s) on f'> ]\n[ <Equation>, <Dependent Variable>, <Independent Variable>, <Point(s) on f> ] \n[ <Equation>, <Dependent Variable>, <Independent Variable>, <Point(s) on f>, <Point(s) on f'> ]
+SolveQuartic=SolveQuartic
+SolveQuartic.SyntaxCAS=[ <Quartic Polynomial> ]
+Sort=Sort
+Sort.Syntax=[ <List> ]\n[ <Values>, <Keys> ]
+Spearman=Spearman
+Spearman.Syntax=[ <List of Points> ]\n[ <List of Numbers>, <List of Numbers> ]
+Sphere=Sphere
+Sphere.Syntax=[ <Point>, <Radius> ]\n[ <Point>, <Point> ]
+Spline=Spline
+Spline.Syntax=[ <List of Points> ]\n[ <List of Points>, <Order ≥ 3> ]\n[ <List of Points>, <Order ≥ 3>, <Weight Function> ]
+Split=Split
+Split.Syntax=[ <Text>, <List of Texts to split on> ]
+StartAnimation=StartAnimation
+StartAnimation.Syntax=[ ]\n[ <Boolean> ]\n[ <Slider or Point>, <Slider or Point>, ... ]\n[ <Slider or Point>, <Slider or Point>, ..., <Boolean> ]
+StartRecord=StartRecord
+StartRecord.Syntax=[ ]\n[ <Boolean> ]
+StemPlot=StemPlot
+StemPlot.Syntax=[ <List> ]\n[ <List>, <Adjustment -1|0|1> ]
+StepGraph=StepGraph
+StepGraph.Syntax=[ <List of Points> ]\n[ <List of Points>, <Boolean Join> ]\n[ <List of x-coordinates>, <List of y-coordinates> ]\n[ <List of Points>, <Boolean Join>, <Point Style> ]\n[ <List of x-coordinates>, <List of y-coordinates>, <Boolean Join> ]\n[ <List of x-coordinates>, <List of y-coordinates>, <Boolean Join>, <Point Style> ]
+StickGraph=StickGraph
+StickGraph.Syntax=[ <List of Points> ]\n[ <List of Points>, <Boolean Horizontal> ]\n[ <List of x-coordinates>, <List of y-coordinates> ]\n[ <List of x-coordinates>, <List of y-coordinates>, <Boolean Horizontal> ]
+Stretch=Stretch
+Stretch.Syntax=[ <Object>, <Vector> ]\n[ <Object>, <Line>, <Ratio> ]
+Substitute=Substitute
+Substitute.SyntaxCAS=[ <Expression>, <Substitution List> ]\n[ <Expression>, <from>, <to> ]
+Sum=Sum
+Sum.Syntax=[ <List> ]\n[ <List>, <Number of Elements> ]\n[ <List>, <List of Frequencies> ]\n[ <Expression>, <Variable>, <Start Value>, <End Value> ]
+Sum.SyntaxCAS=[ <List> ]\n[ <Expression>, <Variable>, <Start Value>, <End Value> ]
+SumSquaredErrors=SumSquaredErrors
+SumSquaredErrors.Syntax=[ <List of Points>, <Function> ]
+SurdText=SurdText
+SurdText.Syntax=[ <Point> ]\n[ <Number> ]\n[ <Number>, <List> ]
+Surface=Surface
+Surface.Syntax=[ <Function>, <Angle> ]\n[ <Curve>, <Angle>, <Line> ]\n[ <Expression>, <Expression>, <Expression>, <Parameter Variable 1>, <Start Value>, <End Value>, <Parameter Variable 2>, <Start Value>, <End Value> ]
+TDistribution=TDistribution
+TDistribution.Syntax=[ <Degrees of Freedom>, <Variable Value Probability> ]\n[ <Degrees of Freedom>, <Variable Value Probability>, <Boolean Cumulative> ]\n[ <Degrees of Freedom>, x, <Boolean Cumulative> ]
+TDistribution.SyntaxCAS=[ <Degrees of Freedom>, <Variable Value Probability> ]
+TMean2Estimate=TMean2Estimate
+TMean2Estimate.Syntax=[ <List of Sample Data 1>, <List of Sample Data 2>, <Confidence Level>, <Boolean Pooled> ]\n[ <Sample Mean 1>, <Sample Standard Deviation 1>, <Sample Size 1>, <Sample Mean 2>, <Sample Standard Deviation 2>, <Sample Size 2>, <Confidence Level>, <Boolean Pooled> ]
+TMeanEstimate=TMeanEstimate
+TMeanEstimate.Syntax=[ <List of Sample Data>, <Confidence Level> ]\n[ <Sample Mean>, <Sample Standard Deviation>, <Sample Size>, <Confidence Level> ]
+TTest=TTest
+TTest.Syntax=[ <List of Sample Data>, <Hypothesized Mean>, <Tail> ]\n[ <Sample Mean>, <Sample Standard Deviation>, <Sample Size>, <Hypothesized Mean>, <Tail> ]
+TTest2=TTest2
+TTest2.Syntax=[ <List of Sample Data 1>, <List of Sample Data 2>, <Tail>, <Boolean Pooled> ]\n[ <Sample Mean 1>, <Sample Standard Deviation 1>, <Sample Size 1>, <Sample Mean 2>, <Sample Standard Deviation 2>, <Sample Size 2>, <Tail>, <Boolean Pooled> ]
+TTestPaired=TTestPaired
+TTestPaired.Syntax=[ <List of Sample Data 1>, <List of Sample Data 2>, <Tail> ]
+TableText=TableText
+TableText.Syntax=[ <List>, <List>, ... ]\n[ <List>, <List>, ..., <Alignment of Text> ]\n[ <List>, <List>, ..., <Alignment of Text>, <Minimum Cell Width> ]\n[ <List>, <List>, ..., <Alignment of Text>, <Minimum Cell Width>, <Minimum Cell Height> ]
+Take=Take
+Take.Syntax=[ <List>, <Start Position>, <End Position> ]\n[ <List>, <Start Position> ]\n[ <Text>, <Start Position>, <End Position> ]\n[ <Text>, <Start Position> ]
+Take.SyntaxCAS=[ <List>, <Start Position> ]\n[ <List>, <Start Position>, <End Position> ]\n[ <Text>, <Start Position>, <End Position> ]\n[ <Text>, <Start Position> ]
+Tangent=Tangent
+Tangent.Syntax=[ <Point>, <Conic> ]\n[ <Point>, <Function> ]\n[ <Point on Curve>, <Curve> ]\n[ <x-Value>, <Function> ]\n[ <Line>, <Conic> ]\n[ <Conic>, <Conic> ]
+Tangent.SyntaxCAS=[ <Number>, <Function> ]\n[ <Point>, <Object> ]
+TaylorSeries=TaylorPolynomial
+TaylorSeries.Syntax=[ <Function>, <x-Value>, <Order Number> ]
+TaylorSeries.SyntaxCAS=[ <Expression>, <x-Value>, <Order Number> ]\n[ <Expression>, <Variable>, <Variable Value>, <Order Number> ]
+Tetrahedron=Tetrahedron
+Tetrahedron.Syntax=[ <Equilateral Triangle> ]\n[ <Point>, <Point>, <Point> ]\n[ <Point>, <Point>, <Direction> ]
+Text=Text
+Text.Syntax=[ <Object> ]\n[ <Object>, <Boolean for Substitution of Variables> ]\n[ <Object>, <Point> ]\n[ <Object>, <Point>, <Boolean for Substitution of Variables> ]\n[ <Object>, <Point>, <Boolean for Substitution of Variables>, <Boolean for LaTeX formula> ]\n[ <Object>, <Point>, <Boolean for Substitution of Variables>, <Boolean for LaTeX formula>, <Horizontal alignment -1|0|1> ]\n[ <Object>, <Point>, <Boolean for Substitution of Variables>, <Boolean for LaTeX formula>, <Horizontal alignment -1|0|1>, <Vertical alignment -1|0|1> ]
+TextToUnicode=TextToUnicode
+TextToUnicode.Syntax=[ <Text> ]
+Textfield=InputBox
+Textfield.Syntax=[ <Linked Object> ]
+TiedRank=TiedRank
+TiedRank.Syntax=[ <List> ]
+ToBase=ToBase
+ToBase.Syntax=[ <Number>, <Base> ]
+ToComplex=ToComplex
+ToComplex.Syntax=[ <Vector> ]
+ToExponential=ToExponential
+ToExponential.SyntaxCAS=[ <Complex Number> ]
+ToPoint=ToPoint
+ToPoint.Syntax=[ <Complex Number> ]
+ToPolar=ToPolar
+ToPolar.Syntax=[ <Complex Number> ]\n[ <Vector> ]
+ToolImage=ToolImage
+ToolImage.Syntax=[ <Number> ]\n[ <Number>, <Point> ]\n[ <Number>, <Point>, <Point> ]
+Top=Top
+Top.Syntax=[ <Quadric> ]
+Translate=Translate
+Translate.Syntax=[ <Object>, <Vector> ]\n[ <Vector>, <Start Point> ]
+Transpose=Transpose
+Transpose.Syntax=[ <Matrix> ]
+TrapezoidalSum=TrapezoidalSum
+TrapezoidalSum.Syntax=[ <Function>, <Start x-Value>, <End x-Value>, <Number of Trapezoids> ]
+TravelingSalesman=TravelingSalesman
+TravelingSalesman.Syntax=[ <List of Points> ]
+TriangleCenter=TriangleCenter
+TriangleCenter.Syntax=[ <Point>, <Point>, <Point>, <Number> ]
+TriangleCurve=TriangleCurve
+TriangleCurve.Syntax=[ <Point>, <Point>, <Point>, <Equation> ]
+Triangular=Triangular
+Triangular.Syntax=[ <Lower Bound>, <Upper Bound>, <Mode>, <Variable Value Probability> ]\n[ <Lower Bound>, <Upper Bound>, <Mode>, <Variable Value Probability>, <Boolean Cumulative> ]\n[ <Lower Bound>, <Upper Bound>, <Mode>, x, <Boolean Cumulative> ]
+TrigCombine=TrigCombine
+TrigCombine.Syntax=[ <Expression> ]\n[ <Expression>, <Target Function> ]
+TrigExpand=TrigExpand
+TrigExpand.Syntax=[ <Expression> ]\n[ <Expression>, <Target Function> ]
+TrigExpand.SyntaxCAS=[ <Expression> ]\n[ <Expression>, <Target Function> ]\n[ <Expression>, <Target Function>, <Target Variable> ]\n[ <Expression>, <Target Function>, <Target Variable>, <Target Variable> ]
+TrigSimplify=TrigSimplify
+TrigSimplify.Syntax=[ <Expression> ]
+Trilinear=Trilinear
+Trilinear.Syntax=[ <Point>, <Point>, <Point>, <Number>, <Number>, <Number> ]
+TurningPoint=InflectionPoint
+TurningPoint.Syntax=[ <Polynomial> ]
+TurningPoint.SyntaxCAS=[ <Function> ]
+Turtle=Turtle
+Turtle.Syntax=[]
+TurtleBack=TurtleBack
+TurtleBack.Syntax=[ <Turtle>, <Distance> ]
+TurtleDown=TurtleDown
+TurtleDown.Syntax=[ <Turtle> ]
+TurtleForward=TurtleForward
+TurtleForward.Syntax=[ <Turtle>, <Distance> ]
+TurtleLeft=TurtleLeft
+TurtleLeft.Syntax=[ <Turtle>, <Angle> ]
+TurtleRight=TurtleRight
+TurtleRight.Syntax=[ <Turtle>, <Angle> ]
+TurtleUp=TurtleUp
+TurtleUp.Syntax=[ <Turtle> ]
+Type=Type
+Type.Syntax=[ <Object> ]
+UnicodeToLetter=UnicodeToLetter
+UnicodeToLetter.Syntax=[ <Integer> ]
+UnicodeToText=UnicodeToText
+UnicodeToText.Syntax=[ <List of Integers> ]
+Uniform=Uniform
+Uniform.Syntax=[ <Lower Bound>, <Upper Bound>, <Variable Value Probability> ]\n[ <Lower Bound>, <Upper Bound>, <Variable Value Probability>, <Boolean Cumulative> ]\n[ <Lower Bound>, <Upper Bound>, x, <Boolean Cumulative> ]
+Union=Union
+Union.Syntax=[ <List>, <List> ]\n[ <Polygon>, <Polygon> ]
+Unique=Unique
+Unique.Syntax=[ <List> ]
+UnitOrthogonalVector=UnitPerpendicularVector
+UnitOrthogonalVector.Syntax=[ <Line> ]\n[ <Segment> ]\n[ <Vector> ]
+UnitOrthogonalVector.Syntax3D=[ <Line> ]\n[ <Segment> ]\n[ <Vector> ]\n[ <Plane> ]
+UnitOrthogonalVector.SyntaxCAS=[ <Vector> ]
+UnitVector=UnitVector
+UnitVector.Syntax=[ <Object> ]
+UnitVector.SyntaxCAS=[ <Vector> ]
+UpdateConstruction=UpdateConstruction
+UpdateConstruction.Syntax=[ ]\n[ <Number of times> ]
+UpperSum=UpperSum
+UpperSum.Syntax=[ <Function>, <Start x-Value>, <End x-Value>, <Number of Rectangles> ]
+Variance=Variance
+Variance.Syntax=[ <List of Raw Data> ]\n[ <List of Numbers>, <List of Frequencies> ]
+Vector=Vector
+Vector.Syntax=[ <Point> ]\n[ <Start Point>, <End Point> ]
+Vertex=Vertex
+Vertex.Syntax=[ <Conic> ]\n[ <Inequality> ]\n[ <Polygon> ]\n[ <Polygon>, <Index> ]\n[ <Segment>, <Index> ]
+VerticalText=VerticalText
+VerticalText.Syntax=[ <Text> ]\n[ <Text>, <Point> ]
+Volume=Volume
+Volume.Syntax=[ <Solid> ]
+Voronoi=Voronoi
+Voronoi.Syntax=[ <List of Points> ]
+Weibull=Weibull
+Weibull.Syntax=[ <Shape>, <Scale>, <Variable Value Probability> ]\n[ <Shape>, <Scale>, <Variable Value Probability>, <Boolean Cumulative> ]\n[ <Shape>, <Scale>, x, <Boolean Cumulative> ]
+Weibull.SyntaxCAS=[ <Shape>, <Scale>, <Variable Value Probability> ]
+ZMean2Estimate=ZMean2Estimate
+ZMean2Estimate.Syntax=[ <List of Sample Data 1>, <List of Sample Data 2>, <σ1>, <σ2>, <Confidence Level> ]\n[ <Sample Mean 1>, <σ1>, <Sample Size 1>, <Sample Mean 2>, <σ2>, <Sample Size 2>, <Confidence Level> ]
+ZMean2Test=ZMean2Test
+ZMean2Test.Syntax=[ <List of Sample Data 1>, <σ1>, <List of Sample Data 2>, <σ2>, <Tail> ]\n[ <Sample Mean 1>, <σ1>, <Sample Size 1>, <Sample Mean 2>, <σ2>, <Sample Size 2>, <Tail> ]
+ZMeanEstimate=ZMeanEstimate
+ZMeanEstimate.Syntax=[ <List of Sample Data>, <σ>, <Confidence Level> ]\n[ <Sample Mean>, <σ>, <Sample Size>, <Confidence Level> ]
+ZMeanTest=ZMeanTest
+ZMeanTest.Syntax=[ <List of Sample Data>, <σ>, <Hypothesized Mean>, <Tail> ]\n[ <Sample Mean>, <σ>, <Sample Size>, <Hypothesized Mean>, <Tail> ]
+ZProportion2Estimate=ZProportion2Estimate
+ZProportion2Estimate.Syntax=[ <Sample Proportion 1>, <Sample Size 1>, <Sample Proportion 2>, <Sample Size 2>, <Confidence Level> ]
+ZProportion2Test=ZProportion2Test
+ZProportion2Test.Syntax=[ <Sample Proportion 1>, <Sample Size 1>, <Sample Proportion 2>, <Sample Size 2>, <Tail> ]
+ZProportionEstimate=ZProportionEstimate
+ZProportionEstimate.Syntax=[ <Sample Proportion>, <Sample Size>, <Confidence Level> ]
+ZProportionTest=ZProportionTest
+ZProportionTest.Syntax=[ <Sample Proportion>, <Sample Size>, <Hypothesized Proportion>, <Tail> ]
+Zip=Zip
+Zip.Syntax=[ <Expression>, <Var1>, <List1>, <Var2>, <List2>, ... ]
+Zipf=Zipf
+Zipf.Syntax=[ <Number of Elements>, <Exponent> ]\n[ <Number of Elements>, <Exponent>, <Boolean Cumulative> ]\n[ <Number of Elements>, <Exponent>, <Variable Value Probability>, <Boolean Cumulative> ]
+Zipf.SyntaxCAS=[ <Number of Elements>, <Exponent>, <Variable Value Probability>, <Boolean Cumulative> ]
+ZoomIn=ZoomIn
+ZoomIn.Syntax=[ ]\n[ <Scale Factor> ]\n[ <Scale Factor>, <Center Point> ]\n[ <Min x>, <Min y>, <Max x>, <Max y> ]\n[ <Min x>, <Min y>, <Min z>, <Max x>, <Max y>, <Max z> ]
+ZoomOut=ZoomOut
+ZoomOut.Syntax=[ <Scale Factor> ]\n[ <Scale Factor>, <Center Point> ]
+mad=mad
+mad.Syntax=[ <List of Raw Data> ]\n[ <List of Numbers>, <List of Frequencies> ]
+mean=mean
+mean.Syntax=[ <List of Raw Data> ]\n[ <List of Numbers>, <List of Frequencies> ]
+stdev=stdev
+stdev.Syntax=[ <List of Raw Data> ]\n[ <List of Numbers>, <List of Frequencies> ]
+stdevp=stdevp
+stdevp.Syntax=[ <List of Raw Data> ]\n[ <List of Numbers>, <List of Frequencies> ]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

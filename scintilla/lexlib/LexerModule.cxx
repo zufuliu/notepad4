@@ -51,6 +51,7 @@ extern const LexerModule lmDiff;
 extern const LexerModule lmDLang;
 extern const LexerModule lmFortran;
 extern const LexerModule lmFSharp;
+extern const LexerModule lmGgb;
 extern const LexerModule lmGN;
 extern const LexerModule lmGo;
 extern const LexerModule lmGraphViz;
@@ -135,6 +136,7 @@ const LexerModule * const lexerCatalogue[] = {
 	&lmDLang,
 	&lmFortran,
 	&lmFSharp,
+	&lmGgb,
 	&lmGN,
 	&lmGo,
 	&lmGraphViz,

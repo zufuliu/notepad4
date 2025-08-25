@@ -1,6 +1,7 @@
 from KeywordCore import *
 
 lexerList = [
+	('NP2LEX_GEOGEBRA', 'stlGeogebra.cpp', 'LexGeogebra.cxx', 'Geogebra.ggb', 1, parse_geogebra_api_file),
 	('NP2LEX_TEXTFILE', 'stlDefault.cpp', 'LexNull.cxx', '', (0, 'Text'), None),
 	('NP2LEX_2NDTEXTFILE', 'stlDefault.cpp', 'LexNull.cxx', '', (0, '2nd Text'), None),
 	('NP2LEX_ANSI', 'stlDefault.cpp', 'LexNull.cxx', '', (0, 'ANSI'), None),

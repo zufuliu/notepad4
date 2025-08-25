@@ -455,6 +455,7 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\scintilla\lexers\LexGeogebra.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexAPDL.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexAsm.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexAsymptote.cxx" />
@@ -585,6 +586,7 @@
     <ClCompile Include="..\..\src\Helpers.cpp" />
     <ClCompile Include="..\..\src\Notepad4.cpp" />
     <ClCompile Include="..\..\src\Styles.cpp" />
+    <ClCompile Include="..\..\src\EditLexers\stlGeogebra.cpp" />
     <ClCompile Include="..\..\src\EditLexers\stlABAQUS.cpp" />
     <ClCompile Include="..\..\src\EditLexers\stlActionScript.cpp" />
     <ClCompile Include="..\..\src\EditLexers\stlAPDL.cpp" />

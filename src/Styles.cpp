@@ -90,6 +90,7 @@ extern EDITLEXER lexGo;
 extern EDITLEXER lexGradle;
 extern EDITLEXER lexGraphViz;
 extern EDITLEXER lexGroovy;
+extern EDITLEXER lexGeogebra;
 
 extern EDITLEXER lexHaskell;
 extern EDITLEXER lexHaxe;
@@ -203,6 +204,7 @@ static PEDITLEXER pLexArray[] = {
 	&lexGradle,
 	&lexGraphViz,
 	&lexGroovy,
+	&lexGeogebra,
 
 	&lexHaskell,
 	&lexHaxe,

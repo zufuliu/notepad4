@@ -256,14 +256,47 @@ def remove_duplicate_lower(keywords, duplicate):
 def first_word_on_each_line(doc):
 	return re.findall(r'^\s*(\w+)', doc, re.MULTILINE)
 
+def parse_geogebra_api_file(path):
+	sections = read_api_file(path, '//')
+	keywordMap = {}
+	for key, doc in sections:
+		if key == 'keywords':
+			keywordMap[key] = doc.split()
+		elif key == 'constants':
+			keywordMap[key] = doc.split()
+		elif key == 'innerfunction':
+			items = re.findall(r'(\w+\()', doc)
+			keywordMap[key] = items
+		elif key == 'function':
+			items = []
+			lines = re.split(r'\n', doc)
+			for line in lines:
+				if (re.match(r'^(?!.*.Syntax).*$', line)):
+					parts = re.split(r'=', line)
+					if len(parts) == 2:
+						items.append(parts[1]+'(')				
+			keywordMap[key] = items
 
+	RemoveDuplicateKeyword(keywordMap, [
+		'keywords',
+		'constants',
+		'innerfunction',
+		'function',
+	])
+	return [
+		('keywords', keywordMap['keywords'], KeywordAttr.Special),
+		('constants', keywordMap['constants'], KeywordAttr.Special),
+		('innerfunction', keywordMap['innerfunction'], KeywordAttr.Default),
+		('function', keywordMap['function'], KeywordAttr.Special),
+	]	
+	
 def parse_actionscript_api_file(path):
 	sections = read_api_file(path, '//')
 	keywordMap = {}
 	for key, doc in sections:
 		if key in ('keywords', 'types', 'directive'):
 			keywordMap[key] = doc.split()
-		if key == 'class':
+		elif key == 'class':
 			items = re.findall(r'class\s+(\w+)', doc)
 			keywordMap[key] = items
 		elif key == 'functions':
