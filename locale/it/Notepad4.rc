@@ -113,7 +113,7 @@ BEGIN
 	POPUP "&File"
 	BEGIN
 		MENUITEM "&Nuovo\tCtrl+N",					IDM_FILE_NEW
-		MENUITEM "Nuova finestra &vuota\tAlt+N",				IDM_FILE_NEWWINDOW
+		MENUITEM "Nuo&va finestra\tAlt+N",				IDM_FILE_NEWWINDOW
 		MENUITEM "&Apri...\tCtrl+O",				IDM_FILE_OPEN
 		MENUITEM "&Salva\tCtrl+S",					IDM_FILE_SAVE
 		MENUITEM "Salva &come...\tF6",					IDM_FILE_SAVEAS
@@ -2160,4 +2160,5 @@ END
 #include "../../src/Notepad4.ver"
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
+
 
