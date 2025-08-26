@@ -113,7 +113,7 @@ BEGIN
 	POPUP "&File"
 	BEGIN
 		MENUITEM "&Nuovo\tCtrl+N",					IDM_FILE_NEW
-		MENUITEM "New &Window\tAlt+N",				IDM_FILE_NEWWINDOW
+		MENUITEM "Nuova finestra &vuota\tAlt+N",				IDM_FILE_NEWWINDOW
 		MENUITEM "&Apri...\tCtrl+O",				IDM_FILE_OPEN
 		MENUITEM "&Salva\tCtrl+S",					IDM_FILE_SAVE
 		MENUITEM "Salva &come...\tF6",					IDM_FILE_SAVEAS
@@ -713,7 +713,7 @@ BEGIN
 		MENUITEM SEPARATOR
 		MENUITEM "Apri come &Amministratore",		IDM_FILE_RELAUNCH_ELEVATED
 		MENUITEM "&Riavvia",					IDM_FILE_RESTART
-		MENUITEM "Open &in New Window\tAlt+0",		IDM_FILE_NEWWINDOW2
+		MENUITEM "Apri &in nuova finestra\tAlt+0",		IDM_FILE_NEWWINDOW2
 		MENUITEM SEPARATOR
 		MENUITEM "Esegui &documento\tCtrl+L",	IDM_FILE_LAUNCH
 		MENUITEM "A&pri con...",				IDM_FILE_OPENWITH
