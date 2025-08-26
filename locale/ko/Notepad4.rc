@@ -113,7 +113,7 @@ BEGIN
 	POPUP "파일(&F)"
 	BEGIN
 		MENUITEM "새로 만들기(&N)\tCtrl+N",								IDM_FILE_NEW
-		MENUITEM "New &Window\tAlt+N",				IDM_FILE_NEWWINDOW
+		MENUITEM "새 창(&W)\tAlt+N",									IDM_FILE_NEWWINDOW
 		MENUITEM "열기(&O)...\tCtrl+O",									IDM_FILE_OPEN
 		MENUITEM "저장(&S)\tCtrl+S",									IDM_FILE_SAVE
 		MENUITEM "다른 이름으로 저장(&A)...\tF6",						IDM_FILE_SAVEAS
@@ -343,10 +343,10 @@ BEGIN
 			MENUITEM "16진수를 문자로(&R)\tCtrl+Alt+C",					IDM_EDIT_HEX2CHAR
 			MENUITEM "16진수 코드 표시(&S)",								IDM_EDIT_SHOW_HEX
 			MENUITEM SEPARATOR
-			MENUITEM "이스케이프 C 문자(&P)\tCtrl+Alt+E",					IDM_EDIT_ESCAPECCHARS
-			MENUITEM "이스케이프 해제 C 문자(&U)\tCtrl+Alt+R",				IDM_EDIT_UNESCAPECCHARS
-			MENUITEM "이스케이프 HTML/XML 문자(&M)\tAlt+Shift+X",			IDM_EDIT_XHTML_ESCAPE_CHAR
-			MENUITEM "이스케이프 해제 HTML/XML 문자(&X)\tAlt+Shift+H",		IDM_EDIT_XHTML_UNESCAPE_CHAR
+			MENUITEM "이스케이프 C 문자(&P)\tCtrl+Alt+E",				IDM_EDIT_ESCAPECCHARS
+			MENUITEM "이스케이프 해제 C 문자(&U)\tCtrl+Alt+R",			IDM_EDIT_UNESCAPECCHARS
+			MENUITEM "이스케이프 HTML/XML 문자(&M)\tAlt+Shift+X",		IDM_EDIT_XHTML_ESCAPE_CHAR
+			MENUITEM "이스케이프 해제 HTML/XML 문자(&X)\tAlt+Shift+H",	IDM_EDIT_XHTML_UNESCAPE_CHAR
 			MENUITEM SEPARATOR
 			MENUITEM "왼쪽 줄 삭제(&L)\tCtrl+Shift+Back",				IDM_EDIT_DELETELINELEFT
 			MENUITEM "오른쪽 줄 삭제(&N)\tCtrl+Shift+Del",				IDM_EDIT_DELETELINERIGHT
@@ -365,11 +365,11 @@ BEGIN
 		MENUITEM "바꾸기(&E)...\tCtrl+H",								IDM_EDIT_REPLACE
 		MENUITEM "다음 바꾸기(&A)\tF4",									IDM_EDIT_REPLACENEXT
 		MENUITEM SEPARATOR
-		MENUITEM "일치하는 중괄호 찾기(&B)\tCtrl+B",							IDM_EDIT_FINDMATCHINGBRACE
-		MENUITEM "일치하는 중괄호 선택(&R)\tCtrl+Shift+B",					IDM_EDIT_SELTOMATCHINGBRACE
-		MENUITEM "단어 선택(&W)\tCtrl+Alt+Space",							IDM_EDIT_SELECTWORD
-		MENUITEM "줄 선택 (선택 확장)(&L)\tCtrl+Shift+Space",				IDM_EDIT_SELECTLINE
-		MENUITEM "현재 블록에서 줄 선택(&C)\tAlt+Shift+]",					IDM_EDIT_SELECTLINE_BLOCK
+		MENUITEM "일치하는 중괄호 찾기(&B)\tCtrl+B",						IDM_EDIT_FINDMATCHINGBRACE
+		MENUITEM "일치하는 중괄호 선택(&R)\tCtrl+Shift+B",				IDM_EDIT_SELTOMATCHINGBRACE
+		MENUITEM "단어 선택(&W)\tCtrl+Alt+Space",						IDM_EDIT_SELECTWORD
+		MENUITEM "줄 선택 (선택 확장)(&L)\tCtrl+Shift+Space",			IDM_EDIT_SELECTLINE
+		MENUITEM "현재 블록에서 줄 선택(&C)\tAlt+Shift+]",				IDM_EDIT_SELECTLINE_BLOCK
 		MENUITEM SEPARATOR
 		MENUITEM "문서 처음까지 선택(&T)",								IDM_EDIT_SELTODOCSTART
 		MENUITEM "문서 끝까지 선택(&D)",									IDM_EDIT_SELTODOCEND
@@ -378,13 +378,13 @@ BEGIN
 		MENUITEM SEPARATOR
 		POPUP "책갈피(&K)"
 		BEGIN
-			MENUITEM "전환(&T)\tCtrl+F2",									BME_EDIT_BOOKMARKTOGGLE
+			MENUITEM "전환(&T)\tCtrl+F2",								BME_EDIT_BOOKMARKTOGGLE
 			MENUITEM SEPARATOR
-			MENUITEM "다음으로 이동(&N)\tF2",								BME_EDIT_BOOKMARKNEXT
-			MENUITEM "이전으로 이동(&P)\tShift+F2",							BME_EDIT_BOOKMARKPREV
+			MENUITEM "다음으로 이동(&N)\tF2",							BME_EDIT_BOOKMARKNEXT
+			MENUITEM "이전으로 이동(&P)\tShift+F2",						BME_EDIT_BOOKMARKPREV
 			MENUITEM SEPARATOR
-			MENUITEM "모두 선택(&S)\tAlt+F6",								BME_EDIT_BOOKMARKSELECT
-			MENUITEM "모든 제거(&C)\tAlt+F2",								BME_EDIT_BOOKMARKCLEAR
+			MENUITEM "모두 선택(&S)\tAlt+F6",							BME_EDIT_BOOKMARKSELECT
+			MENUITEM "모든 제거(&C)\tAlt+F2",							BME_EDIT_BOOKMARKCLEAR
 		END
 		POPUP "이동(&G)"
 		BEGIN
@@ -393,12 +393,12 @@ BEGIN
 			//MENUITEM "뒤로 탐색(&B)\tAlt+Left",						IDM_EDIT_NAVIGATE_BACKWARD
 			//MENUITEM "앞으로 탐색(&F)\tAlt+Right",						IDM_EDIT_NAVIGATE_FORWARD
 			MENUITEM SEPARATOR
-			MENUITEM "블록의 시작으로 이동(&C)\tAlt+[",						IDM_EDIT_GOTO_BLOCK_START
-			MENUITEM "블록의 끝으로 이동(&K)\tAlt+]",						IDM_EDIT_GOTO_BLOCK_END
-			MENUITEM "이전 블록으로 이동(&P)\tAlt+쉼표(<,)",					IDM_EDIT_GOTO_PREVIOUS_BLOCK
-			MENUITEM "다음 블록으로 이동(&N)\tAlt+마침표(>.)",				IDM_EDIT_GOTO_NEXT_BLOCK
-			MENUITEM "이전 형제 블록으로 이동(&R)\tCtrl+Alt+쉼표(<,)",		IDM_EDIT_GOTO_PREV_SIBLING_BLOCK
-			MENUITEM "다음 형제 블록으로 이동(&E)\tCtrl+Alt+마침표(>.)",		IDM_EDIT_GOTO_NEXT_SIBLING_BLOCK
+			MENUITEM "블록의 시작으로 이동(&C)\tAlt+[",					IDM_EDIT_GOTO_BLOCK_START
+			MENUITEM "블록의 끝으로 이동(&K)\tAlt+]",					IDM_EDIT_GOTO_BLOCK_END
+			MENUITEM "이전 블록으로 이동(&P)\tAlt+쉼표(<,)",				IDM_EDIT_GOTO_PREVIOUS_BLOCK
+			MENUITEM "다음 블록으로 이동(&N)\tAlt+마침표(>.)",			IDM_EDIT_GOTO_NEXT_BLOCK
+			MENUITEM "이전 형제 블록으로 이동(&R)\tCtrl+Alt+쉼표(<,)",	IDM_EDIT_GOTO_PREV_SIBLING_BLOCK
+			MENUITEM "다음 형제 블록으로 이동(&E)\tCtrl+Alt+마침표(>.)",	IDM_EDIT_GOTO_NEXT_SIBLING_BLOCK
 			MENUITEM SEPARATOR
 			MENUITEM "선택 영역 시작으로 이동(&S)\tCtrl+Shift+콤마(,)",	CMD_JUMP2SELSTART
 			MENUITEM "선택 영역 끝으로 이동(&T)\tCtrl+Shift+점(.)",		CMD_JUMP2SELEND
@@ -421,9 +421,9 @@ BEGIN
 			MENUITEM "선택에서 블록 탈자기호 그리기(&S)",					IDM_VIEW_CARET_STYLE_SELECTION
 		END
 		MENUITEM SEPARATOR
-		MENUITEM "줄바꿈(&R)\tCtrl+Shift+W",									IDM_VIEW_WORDWRAP
-		MENUITEM "긴 줄 표시(&L)\tCtrl+Shift+L",								IDM_VIEW_LONGLINEMARKER
-		MENUITEM "들여쓰기 안내선(&G)\tCtrl+Shift+G",						IDM_VIEW_SHOWINDENTGUIDES
+		MENUITEM "줄바꿈(&R)\tCtrl+Shift+W",								IDM_VIEW_WORDWRAP
+		MENUITEM "긴 줄 표시(&L)\tCtrl+Shift+L",							IDM_VIEW_LONGLINEMARKER
+		MENUITEM "들여쓰기 안내선(&G)\tCtrl+Shift+G",					IDM_VIEW_SHOWINDENTGUIDES
 		MENUITEM SEPARATOR
 		MENUITEM "공백 표시(&W)\tCtrl+Shift+8",							IDM_VIEW_SHOWWHITESPACE
 		MENUITEM "줄 끝 표시(&E)\tCtrl+Shift+9",							IDM_VIEW_SHOWEOLS
@@ -442,14 +442,14 @@ BEGIN
 		END
 		POPUP "표시 강조(&K)"
 		BEGIN
-			MENUITEM "끄기(&O)",											IDM_VIEW_MARKOCCURRENCES_OFF
-			MENUITEM "대소문자(&C)",											IDM_VIEW_MARKOCCURRENCES_CASE
-			MENUITEM "전체 단어만 일치(&W)",									IDM_VIEW_MARKOCCURRENCES_WORD
-			MENUITEM "일치하는 줄 책갈피(&M)",								IDM_VIEW_MARKOCCURRENCES_BOOKMARK
+			MENUITEM "끄기(&O)",										IDM_VIEW_MARKOCCURRENCES_OFF
+			MENUITEM "대소문자(&C)",										IDM_VIEW_MARKOCCURRENCES_CASE
+			MENUITEM "전체 단어만 일치(&W)",								IDM_VIEW_MARKOCCURRENCES_WORD
+			MENUITEM "일치하는 줄 책갈피(&M)",							IDM_VIEW_MARKOCCURRENCES_BOOKMARK
 		END
 		POPUP "CallTip 표시(&P)"
 		BEGIN
-			MENUITEM "끄기(&O)",											IDM_VIEW_SHOWCALLTIP_OFF
+			MENUITEM "끄기(&O)",										IDM_VIEW_SHOWCALLTIP_OFF
 			MENUITEM "RGBA 색상(&R)",									IDM_VIEW_SHOWCALLTIP_RGBA
 			MENUITEM "ARGB 색상(&G)",									IDM_VIEW_SHOWCALLTIP_ARGB
 			MENUITEM "BGRA 색상(&B)",									IDM_VIEW_SHOWCALLTIP_BGRA
@@ -477,17 +477,17 @@ BEGIN
 			MENUITEM "수준 &7\tAlt+7",									IDM_VIEW_FOLD_LEVEL7
 			MENUITEM "수준 &8\tAlt+8",									IDM_VIEW_FOLD_LEVEL8
 			MENUITEM "수준 &9\tAlt+9",									IDM_VIEW_FOLD_LEVEL9
-			MENUITEM "수준 1&0",											IDM_VIEW_FOLD_LEVEL10
+			MENUITEM "수준 1&0",										IDM_VIEW_FOLD_LEVEL10
 		END
 		MENUITEM SEPARATOR
 		POPUP "확대/축소(&Z)"
 		BEGIN
-			MENUITEM "확대(&I)\tCtrl++",									IDM_VIEW_ZOOMIN
-			MENUITEM "축소(&O)\tCtrl+-",									IDM_VIEW_ZOOMOUT
-			MENUITEM "확대/축소 수준(&L)...",								IDM_VIEW_ZOOM_LEVEL
-			MENUITEM "확대/축소 재설정(&R)\tCtrl+\\",						IDM_VIEW_RESETZOOM
+			MENUITEM "확대(&I)\tCtrl++",								IDM_VIEW_ZOOMIN
+			MENUITEM "축소(&O)\tCtrl+-",								IDM_VIEW_ZOOMOUT
+			MENUITEM "확대/축소 수준(&L)...",							IDM_VIEW_ZOOM_LEVEL
+			MENUITEM "확대/축소 재설정(&R)\tCtrl+\\",					IDM_VIEW_RESETZOOM
 		END
-		MENUITEM "전체 화면 전환(&S)\tF11 [Esc]",							IDM_VIEW_TOGGLE_FULLSCREEN
+		MENUITEM "전체 화면 전환(&S)\tF11 [Esc]",						IDM_VIEW_TOGGLE_FULLSCREEN
 	END
 	POPUP "구성표(&M)"
 	BEGIN
@@ -612,7 +612,7 @@ BEGIN
 			END
 			POPUP "마지막 줄을 지나 스크롤(&P)"
 			BEGIN
-				MENUITEM "없음(&N)",										IDM_VIEW_SCROLLPASTLASTLINE_NO
+				MENUITEM "없음(&N)",									IDM_VIEW_SCROLLPASTLASTLINE_NO
 				MENUITEM "한 페이지(&O)",								IDM_VIEW_SCROLLPASTLASTLINE_ONE
 				MENUITEM "반 페이지(&H)",								IDM_VIEW_SCROLLPASTLASTLINE_HALF
 				MENUITEM "1/3 페이지(&3)",								IDM_VIEW_SCROLLPASTLASTLINE_THIRD
@@ -636,7 +636,7 @@ BEGIN
 				MENUITEM "中文(简体)",									IDM_LANG_CHINESE_SIMPLIFIED
 			END
 #endif
-			MENUITEM "XP 스타일 열기/저장 대화 상자 사용(&X)",				IDM_SET_USE_XP_FILE_DIALOG
+			MENUITEM "XP 스타일 열기/저장 대화 상자 사용(&X)",			IDM_SET_USE_XP_FILE_DIALOG
 		END
 		POPUP "창 옵션(&P)"
 		BEGIN
@@ -656,11 +656,11 @@ BEGIN
 		END
 		MENUITEM SEPARATOR
 		MENUITEM "단일 파일 인스턴스(&F)",								IDM_VIEW_SINGLEFILEINSTANCE
-		MENUITEM "파일 변경 알림(&C)...\tAlt+F5",							IDM_VIEW_CHANGENOTIFY
-		MENUITEM "자동 저장 설정(&U)...",									IDM_SET_FILE_AUTOSAVE
+		MENUITEM "파일 변경 알림(&C)...\tAlt+F5",						IDM_VIEW_CHANGENOTIFY
+		MENUITEM "자동 저장 설정(&U)...",								IDM_SET_FILE_AUTOSAVE
 		POPUP "Esc 키 추가 기능(&K)"
 		BEGIN
-			MENUITEM "없음(&N)",											IDM_VIEW_NOESCFUNC
+			MENUITEM "없음(&N)",										IDM_VIEW_NOESCFUNC
 			MENUITEM "Notepad4 최소화(&M)",								IDM_VIEW_ESCMINIMIZE
 			MENUITEM "Notepad4 종료(&X)",								IDM_VIEW_ESCEXIT
 		END
@@ -683,8 +683,8 @@ BEGIN
 			POPUP "글꼴 품질(&Q)"
 			BEGIN
 				MENUITEM "기본값(&D)",									IDM_VIEW_FONTQUALITY_DEFAULT
-				MENUITEM "없음(&N)",										IDM_VIEW_FONTQUALITY_NONE
-				MENUITEM "표준(&S)",										IDM_VIEW_FONTQUALITY_STANDARD
+				MENUITEM "없음(&N)",									IDM_VIEW_FONTQUALITY_NONE
+				MENUITEM "표준(&S)",									IDM_VIEW_FONTQUALITY_STANDARD
 				MENUITEM "클리어타입(&C)",								IDM_VIEW_FONTQUALITY_CLEARTYPE
 			END
 			POPUP "오른쪽에서 왼쪽 레이아웃 (GDI)(&R)"
@@ -694,7 +694,7 @@ BEGIN
 			END
 			POPUP "양방향 (Direct2D)(&B)"
 			BEGIN
-				MENUITEM "없음(&N)",										IDM_SET_BIDIRECTIONAL_NONE
+				MENUITEM "없음(&N)",									IDM_SET_BIDIRECTIONAL_NONE
 				MENUITEM "왼쪽에서 오른쪽(&L)",							IDM_SET_BIDIRECTIONAL_L2R
 				MENUITEM "오른쪽에서 왼쪽(&R)",							IDM_SET_BIDIRECTIONAL_R2L
 			END
@@ -703,7 +703,7 @@ BEGIN
 			MENUITEM "시스템 통합(&S)...",								IDM_SET_SYSTEM_INTEGRATION
 			MENUITEM "Notepad4.ini 열기(&O)\tCtrl+F7",					CMD_OPENINIFILE
 		END
-		MENUITEM "종료 시 설정 저장(&O)",									IDM_VIEW_SAVESETTINGS
+		MENUITEM "종료 시 설정 저장(&O)",								IDM_VIEW_SAVESETTINGS
 		MENUITEM "지금 설정 저장(&V)\tF7",								IDM_VIEW_SAVESETTINGSNOW
 	END
 	POPUP "도구(&T)"
@@ -713,13 +713,13 @@ BEGIN
 		MENUITEM SEPARATOR
 		MENUITEM "관리자 권한으로 열기(&A)",								IDM_FILE_RELAUNCH_ELEVATED
 		MENUITEM "다시 시작(&R)",										IDM_FILE_RESTART
-		MENUITEM "Open &in New Window\tAlt+0",		IDM_FILE_NEWWINDOW2
+		MENUITEM "새 창에서 열기(&I)\tAlt+0",							IDM_FILE_NEWWINDOW2
 		MENUITEM SEPARATOR
 		MENUITEM "문서 실행(&D)\tCtrl+L",								IDM_FILE_LAUNCH
-		MENUITEM "다음으로 문서 열기(&W)...",								IDM_FILE_OPENWITH
+		MENUITEM "다음으로 문서 열기(&W)...",							IDM_FILE_OPENWITH
 		MENUITEM "명령(&C)...\tCtrl+R",									IDM_FILE_RUN
 		MENUITEM SEPARATOR
-		POPUP "선택시 동작(&O)"
+		POPUP "선택 시 동작(&O)"
 		BEGIN
 			MENUITEM "CSS/JS/JSON 압축(&C)",							IDM_EDIT_CODE_COMPRESS
 			MENUITEM "CSS/JS/JSON 정돈(&P)",							IDM_EDIT_CODE_PRETTY
@@ -731,8 +731,8 @@ BEGIN
 			MENUITEM "Bing에서 검색(&B)",								CMD_ONLINE_SEARCH_BING
 			MENUITEM "위키피디아에서 검색(&W)",							CMD_ONLINE_SEARCH_WIKI
 			MENUITEM SEPARATOR
-			MENUITEM "사용자 지정 동작 &1\tCtrl+Shift+1",					CMD_CUSTOM_ACTION1
-			MENUITEM "사용자 지정 동작 &2\tCtrl+Shift+2",					CMD_CUSTOM_ACTION2
+			MENUITEM "사용자 지정 동작 &1\tCtrl+Shift+1",				CMD_CUSTOM_ACTION1
+			MENUITEM "사용자 지정 동작 &2\tCtrl+Shift+2",				CMD_CUSTOM_ACTION2
 		END
 		POPUP "&Base64"
 		BEGIN
@@ -774,9 +774,9 @@ BEGIN
 		MENUITEM "기능 요청(&F)",										IDM_HELP_FEATURE_REQUEST
 		MENUITEM SEPARATOR
 		MENUITEM "온라인 위키(&W)",										IDM_HELP_ONLINE_WIKI
-		MENUITEM "명령줄 도움말(&C)",										IDM_CMDLINE_HELP
+		MENUITEM "명령줄 도움말(&C)",									IDM_CMDLINE_HELP
 		MENUITEM SEPARATOR
-		MENUITEM "Notepad4 정보(&A)...\tF1",								IDM_HELP_ABOUT
+		MENUITEM "Notepad4 정보(&A)...\tF1",							IDM_HELP_ABOUT
 	END
 END
 
@@ -788,20 +788,20 @@ BEGIN
 		MENUITEM "다시 실행(&R)",										IDM_EDIT_REDO
 		MENUITEM SEPARATOR
 		MENUITEM "잘라내기(&T)",											IDM_EDIT_CUT
-		MENUITEM "복사(&C)",												IDM_EDIT_COPY
+		MENUITEM "복사(&C)",											IDM_EDIT_COPY
 		MENUITEM "붙여넣기(&P)",											IDM_EDIT_PASTE
-		MENUITEM "삭제(&D)",												IDM_EDIT_DELETE
+		MENUITEM "삭제(&D)",											IDM_EDIT_DELETE
 		MENUITEM SEPARATOR
 		MENUITEM "모두 선택(&A)",										IDM_EDIT_SELECTALL
 		MENUITEM SEPARATOR
 		MENUITEM "접기 전환(&F)",										IDM_VIEW_FOLD_CURRENT_BLOCK
 		MENUITEM SEPARATOR
-		MENUITEM "열기(&O)",												CMD_OPEN_PATH_OR_LINK
+		MENUITEM "열기(&O)",											CMD_OPEN_PATH_OR_LINK
 	END
 	POPUP "+"
 	BEGIN
 		MENUITEM "메뉴 표시(&M)",										IDM_VIEW_MENU
-		MENUITEM "도구모음 표시(&T)",										IDM_VIEW_TOOLBAR
+		MENUITEM "도구모음 표시(&T)",									IDM_VIEW_TOOLBAR
 		MENUITEM "도구모음 사용자 지정(&C)...",							IDM_VIEW_CUSTOMIZE_TOOLBAR
 		MENUITEM "도구모음 자동 크기 조정(&A)",							IDM_VIEW_AUTO_SCALE_TOOLBAR
 #if NP2_ENABLE_HIDPI_IMAGE_RESOURCE
@@ -831,7 +831,7 @@ BEGIN
 		MENUITEM "수준 &7",												IDM_VIEW_FOLD_LEVEL7
 		MENUITEM "수준 &8",												IDM_VIEW_FOLD_LEVEL8
 		MENUITEM "수준 &9",												IDM_VIEW_FOLD_LEVEL9
-		MENUITEM "수준 1&0",												IDM_VIEW_FOLD_LEVEL10
+		MENUITEM "수준 1&0",											IDM_VIEW_FOLD_LEVEL10
 	END
 END
 
@@ -1565,7 +1565,7 @@ BEGIN
     AUTOCHECKBOX    "중복된 줄 병합(&M)",IDC_SORT_MERGE_DUP,7,62,100,10,WS_TABSTOP
     AUTOCHECKBOX    "중복된 줄 제거(&R)",IDC_SORT_REMOVE_DUP,7,74,100,10,WS_TABSTOP
     AUTOCHECKBOX    "독특한 줄 제거(&u)",IDC_SORT_REMOVE_UNIQUE,7,86,100,10,WS_TABSTOP
-    AUTOCHECKBOX    "대소문자 구분 안함(&I)",IDC_SORT_IGNORE_CASE,7,104,81,10,WS_TABSTOP
+    AUTOCHECKBOX    "대소문자 구분 안 함(&I)",IDC_SORT_IGNORE_CASE,7,104,81,10,WS_TABSTOP
     AUTOCHECKBOX    "논리 숫자 비교(&N)",IDC_SORT_LOGICAL_NUMBER,7,116,130,10,WS_TABSTOP
     AUTOCHECKBOX    "파일 형식별 그룹(&T)",IDC_SORT_GROUPBY_FILE_TYPE,7,128,130,10,WS_TABSTOP
     AUTOCHECKBOX    "열 정렬 (사각형 선택)(&C)",IDC_SORT_COLUMN,7,147,150,10,WS_TABSTOP
@@ -2113,7 +2113,7 @@ BEGIN
 	NP2STYLE_DefaultTextStyle		"기본 텍스트 스타일"
 	NP2STYLE_FoldEllipsis			"접기 줄임표"
 	NP2STYLE_IMEIndicator			"IME 표시기"
-	NP2STYLE_Bookmark				"책갈피"
+	NP2STYLE_Bookmark				"북마크"
 	NP2STYLE_CallTip				"호출팁"
 	NP2STYLE_CodeFolding			"코드 접기"
 	NP2STYLE_Link					"링크"
@@ -2160,4 +2160,5 @@ END
 #include "../../src/Notepad4.ver"
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
+
 
