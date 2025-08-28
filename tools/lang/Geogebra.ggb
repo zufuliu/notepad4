@@ -3,12 +3,14 @@
 
 
 //! operators		===========================================================
-+ - * / ^ ! ( ) [ ] { } = 
-
++ - * / ^ ! ( ) [ ] { } = : | ! & - < > \  % ? . , '' $ " "
+Undefined NaN pi Pi deg Infinity inf infinity rad true True false False xcoord ycoord zcoord
+ 
 //! constants		===========================================================
 xAxis
 yAxis
 zAxis
+euler_gamma
 Aqua
 Black
 Blue
