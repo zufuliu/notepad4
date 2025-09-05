@@ -104,7 +104,6 @@ bool EditPrint(HWND hwnd, LPCWSTR pszDocTitle, BOOL bDefault) noexcept {
 	memset(&pdlg, 0, sizeof(PRINTDLG));
 	pdlg.lStructSize = sizeof(PRINTDLG);
 	pdlg.hwndOwner = GetParent(hwnd);
-	pdlg.hInstance = g_hInstance;
 	pdlg.Flags = PD_USEDEVMODECOPIES | PD_ALLPAGES | PD_RETURNDC;
 	pdlg.nFromPage = 1;
 	pdlg.nToPage = 1;
@@ -255,7 +254,7 @@ bool EditPrint(HWND hwnd, LPCWSTR pszDocTitle, BOOL bDefault) noexcept {
 	}
 
 	const DOCINFO di = {sizeof(DOCINFO), pszDocTitle, nullptr, nullptr, 0};
-	if (StartDoc(hdc, &di) < 0) {
+	if (StartDoc(hdc, &di) <= 0) {
 		DeleteDC(hdc);
 		if (fontHeader) {
 			DeleteObject(fontHeader);

@@ -2838,6 +2838,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		SHFILEINFO shfi;
 		WCHAR *pszTitle;
 		WCHAR tchUntitled[128];
+		const auto action = (LOWORD(wParam) == IDM_FILE_PRINT)? static_cast<NotepadReplacementAction>(lParam) : NotepadReplacementAction_None;
 
 		if (StrNotEmpty(szCurFile)) {
 			SHGetFileInfo2(szCurFile, 0, &shfi, sizeof(SHFILEINFO), SHGFI_DISPLAYNAME);
@@ -2847,9 +2848,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			pszTitle = tchUntitled;
 		}
 
-		if (!EditPrint(hwndEdit, pszTitle, lParam & TRUE)) {
+		if (!EditPrint(hwndEdit, pszTitle, static_cast<int>(action) & TRUE)) {
 			MsgBoxWarn(MB_OK, IDS_PRINT_ERROR, pszTitle);
-		} else if (lParam) {
+		} else if (action > NotepadReplacementAction_Default) {
 			SendWMCommand(hwnd, IDM_FILE_EXIT);
 		}
 	}
