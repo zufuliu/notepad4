@@ -6422,6 +6422,67 @@ void LoadFlags() noexcept {
 
 //=============================================================================
 //
+// CheckIsWingetPortableApp()
+// 
+// Check if the application is installed as a winget portable app by verifying:
+// 1. The folder name contains "_Microsoft.Winget.Source_"
+// 2. A corresponding <foldername>.db file exists in the same directory
+//
+bool CheckIsWingetPortableApp(LPCWSTR lpszModulePath) noexcept {
+	if (!IsWin10AndAbove()) {
+		return false;
+	}
+
+	WCHAR tchProgramDir[MAX_PATH];
+	lstrcpy(tchProgramDir, lpszModulePath);
+	PathRemoveFileSpec(tchProgramDir);
+	
+	WCHAR tchFolderName[MAX_PATH];
+	lstrcpy(tchFolderName, PathFindFileName(tchProgramDir));
+	
+	// Check if folder name contains "_Microsoft.Winget.Source_"
+	if (StrStrI(tchFolderName, L"_Microsoft.Winget.Source_") == nullptr) {
+		return false;
+	}
+	
+	// Search for <foldername>.db file
+	WCHAR tchDbFileName[MAX_PATH];
+	swprintf_s(tchDbFileName, COUNTOF(tchDbFileName), L"%s.db", tchFolderName);
+	
+	WCHAR tchDbFilePath[MAX_PATH];
+	PathCombine(tchDbFilePath, tchProgramDir, tchDbFileName);
+	
+	return PathIsFile(tchDbFilePath);
+}
+
+//=============================================================================
+//
+// CopyIniToLocalAppData()
+//
+// Copy ini file from program directory to %LOCALAPPDATA%\Notepad4\
+//
+bool CopyIniToLocalAppData(LPCWSTR lpszSourceIni, LPCWSTR lpszFileName) noexcept {
+	WCHAR tchLocalAppDataPath[MAX_PATH];
+	
+	LPWSTR pszPath = nullptr;
+	if (S_OK != SHGetKnownFolderPath(FOLDERID_LocalAppData, KF_FLAG_DEFAULT, nullptr, &pszPath)) {
+		return false;
+	}
+	PathCombine(tchLocalAppDataPath, pszPath, WC_NOTEPAD4);
+	CoTaskMemFree(pszPath);
+
+	// Create the Notepad4 directory in LocalAppData if it doesn't exist
+	SHCreateDirectoryEx(nullptr, tchLocalAppDataPath, nullptr);
+	
+	WCHAR tchDestIni[MAX_PATH];
+	PathCombine(tchDestIni, tchLocalAppDataPath, lpszFileName);
+	
+	// Copy the file
+	return CopyFile(lpszSourceIni, tchDestIni, FALSE) != FALSE;
+}
+
+//=============================================================================
+//
 // FindIniFile()
 //
 //
@@ -6431,57 +6492,41 @@ bool CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) noexcept {
 
 	if (PathIsRelative(tchFileExpanded)) {
 		WCHAR tchBuild[MAX_PATH];
-		// program directory
+		
+		// First check %LOCALAPPDATA%\Notepad4
+		LPWSTR pszPath = nullptr;
+		if (S_OK == SHGetKnownFolderPath(FOLDERID_LocalAppData, KF_FLAG_DEFAULT, nullptr, &pszPath)) {
+			PathCombine(tchBuild, pszPath, WC_NOTEPAD4);
+			CoTaskMemFree(pszPath);
+			PathAppend(tchBuild, tchFileExpanded);
+			if (PathIsFile(tchBuild)) {
+				lstrcpy(lpszFile, tchBuild);
+				return true;
+			}
+		}
+
+		// Then check program directory
 		lstrcpy(tchBuild, lpszModule);
 		lstrcpy(PathFindFileName(tchBuild), tchFileExpanded);
 		if (PathIsFile(tchBuild)) {
+			// If found in program directory and this is a winget portable app,
+			// copy the ini file to LocalAppData
+			if (CheckIsWingetPortableApp(lpszModule)) {
+				if (CopyIniToLocalAppData(tchBuild, tchFileExpanded)) {
+					// Return the LocalAppData path instead
+					LPWSTR pszLocalPath = nullptr;
+					if (S_OK == SHGetKnownFolderPath(FOLDERID_LocalAppData, KF_FLAG_DEFAULT, nullptr, &pszLocalPath)) {
+						PathCombine(lpszFile, pszLocalPath, WC_NOTEPAD4);
+						CoTaskMemFree(pszLocalPath);
+						PathAppend(lpszFile, tchFileExpanded);
+						return true;
+					}
+				}
+			}
+			
 			lstrcpy(lpszFile, tchBuild);
 			return true;
 		}
-
-#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-		const KNOWNFOLDERID * const rfidList[] = {
-			&FOLDERID_LocalAppData,
-			&FOLDERID_RoamingAppData,
-			&FOLDERID_Profile,
-		};
-		for (UINT i = 0; i < COUNTOF(rfidList); i++) {
-			LPWSTR pszPath = nullptr;
-			if (S_OK == SHGetKnownFolderPath(*rfidList[i], KF_FLAG_DEFAULT, nullptr, &pszPath)) {
-				PathCombine(tchBuild, pszPath, WC_NOTEPAD4);
-				CoTaskMemFree(pszPath);
-				PathAppend(tchBuild, tchFileExpanded);
-				if (PathIsFile(tchBuild)) {
-					lstrcpy(lpszFile, tchBuild);
-					return true;
-				}
-			}
-		}
-#else
-		const int csidlList[] = {
-			// %LOCALAPPDATA%
-			// C:\Users\<username>\AppData\Local
-			// C:\Documents and Settings\<username>\Local Settings\Application Data
-			CSIDL_LOCAL_APPDATA,
-			// %APPDATA%
-			// C:\Users\<username>\AppData\Roaming
-			// C:\Documents and Settings\<username>\Application Data
-			CSIDL_APPDATA,
-			// Home
-			// C:\Users\<username>
-			CSIDL_PROFILE,
-		};
-		for (UINT i = 0; i < COUNTOF(csidlList); i++) {
-			if (S_OK == SHGetFolderPath(nullptr, csidlList[i], nullptr, SHGFP_TYPE_CURRENT, tchBuild)) {
-				PathAppend(tchBuild, WC_NOTEPAD4);
-				PathAppend(tchBuild, tchFileExpanded);
-				if (PathIsFile(tchBuild)) {
-					lstrcpy(lpszFile, tchBuild);
-					return true;
-				}
-			}
-		}
-#endif
 	} else if (PathIsFile(tchFileExpanded)) {
 		lstrcpy(lpszFile, tchFileExpanded);
 		return true;
