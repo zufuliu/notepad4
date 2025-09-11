@@ -1339,11 +1339,11 @@ void EditFormatCode(int menu) noexcept {
 						if (spaceOption & SpaceOption_SpaceBefore) {
 							styledText[index++] = ' ';
 						}
-					} else if (ch == '\\') {
+					} else if (ch == '\\' && style != pLex->escapeCharacterStyle) {
 						// line continuation
 						const uint8_t chNext = textBuffer[offset + 1];
 						if (chNext == '\n' || chNext == '\r') {
-							offset += (chNext == '\r' && offset + 2 < textLength && textBuffer[offset + 2] == '\n') ? 2 : 1;
+							offset += (chNext == '\r' && textBuffer[offset + 2] == '\n') ? 2 : 1;
 							continue;
 						}
 					}
