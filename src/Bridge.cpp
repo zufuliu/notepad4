@@ -1333,18 +1333,20 @@ void EditFormatCode(int menu) noexcept {
 				const uint8_t style = styledText[offset];
 				if (style > pLex->commentStyleMarker) {
 					const uint8_t ch = textBuffer[offset];
-					int spaceOption = SpaceOption_None;
-					if (style != stylePrev) {
-						spaceOption = AddStyleSeparator(pLex, ch, chPrev, style);
-						if (spaceOption & SpaceOption_SpaceBefore) {
-							styledText[index++] = ' ';
-						}
-					} else if (ch == '\\' && style != pLex->escapeCharacterStyle) {
+					if (ch == '\\' && style != pLex->escapeCharacterStyle) {
 						// line continuation
 						const uint8_t chNext = textBuffer[offset + 1];
 						if (chNext == '\n' || chNext == '\r') {
 							offset += (chNext == '\r' && textBuffer[offset + 2] == '\n') ? 2 : 1;
 							continue;
+						}
+					}
+
+					int spaceOption = SpaceOption_None;
+					if (style != stylePrev) {
+						spaceOption = AddStyleSeparator(pLex, ch, chPrev, style);
+						if (spaceOption & SpaceOption_SpaceBefore) {
+							styledText[index++] = ' ';
 						}
 					}
 					chPrev = ch;
