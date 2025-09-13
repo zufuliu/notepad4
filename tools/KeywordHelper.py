@@ -121,9 +121,9 @@ def dump_html_elements(path):
 	tbody = table.find('tbody')
 	for row in tbody.find_all('tr'):
 		name = row.find('th').get_text().strip()
-		if ' ' in name or ',' in name:
+		if not name.isalnum():
 			print('ignore elements:', name)
-		elif name != 'script':
+		else:
 			elements.append(name)
 
 	attributes = []
