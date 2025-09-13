@@ -108,6 +108,51 @@ def find_updated_css_drafts(since, path):
 		print(f'{len(drafts)} updated CSS drafts since {since}:')
 		print('\n'.join(output))
 
+def dump_html_elements(path):
+	from bs4 import BeautifulSoup
+
+	with open(path, encoding='utf-8', newline='\n') as fd:
+		doc = fd.read()
+	soup = BeautifulSoup(doc, 'html5lib')
+
+	elements = []
+	table = soup.body.find('table')
+	assert table.find('caption').get_text() == 'List of elements'
+	tbody = table.find('tbody')
+	for row in tbody.find_all('tr'):
+		name = row.find('th').get_text().strip()
+		if ' ' in name or ',' in name:
+			print('ignore elements:', name)
+		elif name != 'script':
+			elements.append(name)
+
+	attributes = []
+	table = soup.body.find('table', {'id': 'attributes-1'})
+	tbody = table.find('tbody')
+	for row in tbody.find_all('tr'):
+		name = row.find('th').get_text().strip()
+		attributes.append(name)
+
+	handlers = []
+	table = soup.body.find('table', {'id': 'ix-event-handlers'})
+	tbody = table.find('tbody')
+	for row in tbody.find_all('tr'):
+		name = row.find('th').get_text().strip()
+		handlers.append(name)
+
+	elements = sorted(set(elements))
+	attributes = sorted(set(attributes))
+	handlers = sorted(set(handlers))
+	print(f'total elements {len(elements)}, attributes: {len(attributes)}, event handlers: {len(handlers)}')
+	with open('html-dump.html', 'w', encoding='utf-8', newline='\n') as fd:
+		fd.write('\n'.join(f'<{name}/>' for name in elements))
+		fd.write('\n<a\n')
+		fd.write('\n'.join(attributes))
+		fd.write('\n/>\n')
+		fd.write('\n<a\n')
+		fd.write('\n'.join(handlers))
+		fd.write('\n/>\n')
+
 def group_powershell_commands(path):
 	# group Get-Command output by module
 	commands = {}
@@ -160,6 +205,9 @@ def find_new_texinfo_commands(path, lang):
 # https://www.w3.org/Style/CSS/all-descriptors.en.json
 #dump_all_css_properties('all-descriptors.en.json', 'descriptor', 'specification', 'URL')
 #find_new_css_properties('all-properties.en.json', 'all-descriptors.en.json', 'lang/CSS.css')
+
+# https://html.spec.whatwg.org/multipage/indices.html
+#dump_html_elements('indices.html')
 
 #group_powershell_commands('command.ps1')
 
