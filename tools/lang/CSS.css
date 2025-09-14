@@ -1,5 +1,5 @@
-// 2024 https://www.w3.org/TR/CSS/ 25 February 2025
-// 2025-07-20 https://drafts.csswg.org/
+// 2025 https://www.w3.org/TR/CSS/ 9 September 2025
+// 2025-07-14 https://drafts.csswg.org/
 // https://github.com/w3c/csswg-drafts/
 // https://www.w3.org/Style/CSS/all-properties
 // https://www.w3.org/Style/CSS/all-descriptors
@@ -132,6 +132,110 @@ from to
 	input-security: auto | none;
 }
 
+// CSS Borders and Box Decorations Module Level 4 https://www.w3.org/TR/css-borders-4/ 22 July 2025
+{
+	border-top-color:;
+	border-right-color:;
+	border-bottom-color:;
+	border-left-color:;
+	border-block-start-color:;
+	border-block-end-color:;
+	border-inline-start-color:;
+	border-inline-end-color:;
+	border-color:;
+	border-block-color:;
+	border-inline-color:;
+
+	border-top-style:;
+	border-right-style:;
+	border-bottom-style:;
+	border-left-style:;
+	border-block-start-style:;
+	border-block-end-style:;
+	border-inline-start-style:;
+	border-inline-end-style:;
+	border-style:;
+	border-block-style:;
+	border-inline-style:;
+
+	border-top-width:;
+	border-right-width:;
+	border-bottom-width:;
+	border-left-width:;
+	border-block-start-width:;
+	border-block-end-width:;
+	border-inline-start-width:;
+	border-inline-end-width:;
+	border-width:;
+	border-block-width:;
+	border-inline-width:;
+
+	border-top:;
+	border-right:;
+	border-bottom:;
+	border-left:;
+	border-block-start:;
+	border-block-end:;
+	border-inline-start:;
+	border-inline-end:;
+	border-block:;
+	border-inline:;
+
+	border-top-left-radius:;
+	border-top-right-radius:;
+	border-bottom-right-radius:;
+	border-bottom-left-radius:;
+	border-start-start-radius:;
+	border-start-end-radius:;
+	border-end-start-radius:;
+	border-end-end-radius:;
+	border-radius:;
+
+	border-top-radius:;
+	border-right-radius:;
+	border-bottom-radius:;
+	border-left-radius:;
+	border-block-start-radius:;
+	border-block-end-radius:;
+	border-inline-start-radius:;
+	border-inline-end-radius:;
+	border-radius:;
+
+	corner-shape: round | scoop | bevel | notch | square | squircle | superellipse();
+	corner-top-left-shape:;
+	corner-top-right-shape:;
+	corner-bottom-right-shape:;
+	corner-bottom-left-shape:;
+	corner-start-start-shape:;
+	corner-start-end-shape:;
+	corner-end-start-shape:;
+	corner-end-end-shape:;
+
+	corner-top-shape:;
+	corner-right-shape:;
+	corner-bottom-shape:;
+	corner-left-shape:;
+	corner-block-start-shape:;
+	corner-block-end-shape:;
+	corner-inline-start-shape:;
+	corner-inline-end-shape:;
+
+	border-limit: all | sides | corners | top | right | bottom | left;
+	border-clip:;
+	border-clip-top:;
+	border-clip-right:;
+	border-clip-bottom:;
+	border-clip-left:;
+
+	box-shadow-color:;
+	box-shadow-offset: none;
+	box-shadow-blur:;
+	box-shadow-spread:;
+	box-shadow-position: outset | inset;
+	box-shadow:;
+	border-shape: none;
+}
+
 // CSS Box Model Module Level 4 https://www.w3.org/TR/css-box-4/ 4 August 2024
 // CSS Box Model Module Level 3 https://www.w3.org/TR/css-box-3/ 11 April 2024
 // Box model https://www.w3.org/TR/CSS22/box.html
@@ -227,7 +331,7 @@ initial inherit unset revert revert-layer
 	components:;
 }
 
-// CSS Color Adjustment Module Level 1 https://www.w3.org/TR/css-color-adjust-1/ 14 June 2022
+// CSS Color Adjustment Module Level 1 https://www.w3.org/TR/css-color-adjust-1/ 12 August 2025
 {
 	color-scheme: normal | light | dark | only;
 	forced-color-adjust: auto | none | preserve-parent-color;
@@ -248,7 +352,7 @@ initial inherit unset revert revert-layer
 }
 
 // CSS Conditional Rules Module Level 5 https://www.w3.org/TR/css-conditional-5/ 5 November 2024
-// CSS Conditional Rules Module Level 4 https://www.w3.org/TR/css-conditional-4/ 17 February 2022
+// CSS Conditional Rules Module Level 4 https://www.w3.org/TR/css-conditional-4/ 4 September 2025
 // CSS Conditional Rules Module Level 3 https://www.w3.org/TR/css-conditional-3/ 15 August 2024
 not and or
 @supports {
@@ -1543,7 +1647,7 @@ aural speech
 	speak-header: once | always;
 }
 
-// Compatibility https://compat.spec.whatwg.org/ 24 January 2024
+// Compatibility https://compat.spec.whatwg.org/ 12 August 2025
 {
 	touch-action: auto | none | pan-x | pan-left | pan-right | pan-y | pan-up | pan-down | pinch-zoom | manipulation;
 }
