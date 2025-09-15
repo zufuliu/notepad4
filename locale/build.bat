@@ -79,11 +79,16 @@ CALL "%VS_PATH%\Common7\Tools\vsdevcmd" -no_logo -arch=amd64 -host_arch=%HOST_AR
 IF /I "%CONFIG%" == "all" (CALL :SUBMSVC %BUILDTYPE% Debug x64 && CALL :SUBMSVC %BUILDTYPE% Release x64) ELSE (CALL :SUBMSVC %BUILDTYPE% %CONFIG% x64)
 ENDLOCAL
 IF /I "%ARCH%" == "x64" GOTO END
-IF /I "%CONFIG%" == "all" (
-	CALL :COPY_x64_AVX2 Debug
-	CALL :COPY_x64_AVX2 Release
-	CALL :COPY_x64_AVX512 Debug
-	CALL :COPY_x64_AVX512 Release
+IF /I "%ARCH%" == "all" (
+	IF /I "%CONFIG%" == "all" (
+		CALL :COPY_x64_AVX2 Debug
+		CALL :COPY_x64_AVX2 Release
+		CALL :COPY_x64_AVX512 Debug
+		CALL :COPY_x64_AVX512 Release
+	) ELSE (
+		CALL :COPY_x64_AVX2 %CONFIG%
+		CALL :COPY_x64_AVX512 %CONFIG%
+	)
 )
 IF /I "%ARCH%" == "AVX2" (CALL :COPY_x64_AVX2 %CONFIG% && GOTO END)
 IF /I "%ARCH%" == "AVX512" (CALL :COPY_x64_AVX512 %CONFIG% && GOTO END)
