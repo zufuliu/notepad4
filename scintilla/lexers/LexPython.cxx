@@ -951,12 +951,12 @@ void FoldPyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/
 
 		Sci_Line lineNext = lineCurrent + 1;
 		FoldLineState stateNext = stateCurrent;
-		if (lineNext <= docLines) {
+		while (lineNext <= docLines) {
 			stateNext = FoldLineState(styler.GetLineState(lineNext));
-		}
-		while ((lineNext < docLines) && stateNext.Empty()) {
+			if (!stateNext.Empty()) {
+				break;
+			}
 			lineNext++;
-			stateNext = FoldLineState(styler.GetLineState(lineNext));
 		}
 
 		int currentLevel = stateCurrent.indentCount;
