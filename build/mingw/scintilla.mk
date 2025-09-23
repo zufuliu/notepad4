@@ -27,7 +27,7 @@ scisrc_obj = $(patsubst $(scisrc_dir)/%.cxx,$(OBJDIR)/%.obj,$(scisrc_src))
 sciwin32_src = $(wildcard $(sciwin32_dir)/*.cxx)
 sciwin32_obj = $(patsubst $(sciwin32_dir)/%.cxx,$(OBJDIR)/%.obj,$(sciwin32_src))
 
-all: $(OBJDIR) $(NAME)
+all: $(NAME)
 
 $(OBJDIR):
 	@mkdir -p $(OBJDIR)

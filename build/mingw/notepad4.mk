@@ -28,7 +28,7 @@ cpp_obj = $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.obj,$(cpp_src))
 rc_src = $(wildcard $(SRCDIR)/*.rc)
 rc_obj = $(patsubst $(SRCDIR)/%.rc,$(OBJDIR)/%.res,$(rc_src))
 
-all: $(OBJDIR) $(NAME)
+all: $(NAME)
 
 $(OBJDIR):
 	@mkdir -p $(OBJDIR)
