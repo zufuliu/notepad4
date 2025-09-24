@@ -970,11 +970,11 @@ int AddStyleSeparator(LPCEDITLEXER pLex, int ch, int chPrev, int style) noexcept
 	}
 	// var name; return .5; CSS property: 1 #1 .5 --name;
 	if (BitTestEx(DefaultWordCharSet, chPrev)) {
-		if (BitTestEx(DefaultWordCharSet, ch) || ch == '$' || ch == '#' || (ch == '-' && pLex->iLexer == SCLEX_CSS)) {
+		if (BitTestEx(DefaultWordCharSet, ch) || (ch == '-' && pLex->iLexer == SCLEX_CSS)) {
 			// TODO: improve CSS An+B when B is negative, https://www.w3.org/TR/css-syntax-3/#anb-microsyntax
 			return SpaceOption_SpaceBefore;
 		}
-		if (ch == '.' && style != pLex->operatorStyle && style != pLex->operatorStyle2) {
+		if ((ch == '.' || ch == '$' || ch == '#') && style != pLex->operatorStyle && style != pLex->operatorStyle2) {
 			return SpaceOption_SpaceBefore;
 		}
 	}
