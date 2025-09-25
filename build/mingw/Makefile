@@ -154,14 +154,11 @@ OBJDIR = $(BINFOLDER)/obj
 
 all: matepath scintilla notepad4
 
-$(OBJDIR):
-	@mkdir -p $(OBJDIR)
-
-matepath: $(OBJDIR)
+matepath:
 	@mkdir -p $(OBJDIR)/matepath
 	$(MAKE) -f matepath.mk
 
-scintilla: $(OBJDIR)
+scintilla:
 	@mkdir -p $(OBJDIR)/scintilla
 	$(MAKE) -f scintilla.mk
 

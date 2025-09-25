@@ -1,7 +1,7 @@
 # Makefile for scintilla
 
 PROJ = scintilla
-NAME = lib$(PROJ).a
+NAME = $(BINFOLDER)/obj/lib$(PROJ).a
 OBJDIR = $(BINFOLDER)/obj/$(PROJ)
 
 scintilla_dir = ../../scintilla
@@ -29,11 +29,8 @@ sciwin32_obj = $(patsubst $(sciwin32_dir)/%.cxx,$(OBJDIR)/%.obj,$(sciwin32_src))
 
 all: $(NAME)
 
-$(OBJDIR):
-	@mkdir -p $(OBJDIR)
-
 $(NAME): $(lexers_obj) $(lexlib_obj) $(scisrc_obj) $(sciwin32_obj)
-	$(AR) cru $(BINFOLDER)/obj/$@ $^
+	$(AR) cru $@ $^
 
 $(lexers_obj): $(OBJDIR)/%.obj: $(lexers_dir)/%.cxx
 	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCDIR) $< -o $(OBJDIR)/$*.obj
@@ -49,4 +46,4 @@ $(sciwin32_obj): $(OBJDIR)/%.obj: $(sciwin32_dir)/%.cxx
 
 clean:
 	@$(RM) -rf $(OBJDIR)
-	@$(RM) -f $(BINFOLDER)/obj/$(NAME)
+	@$(RM) -f $(NAME)
