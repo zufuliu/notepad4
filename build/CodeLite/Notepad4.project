@@ -40,6 +40,7 @@
       <File Name="../../scintilla/lexers/LexDiff.cxx"/>
       <File Name="../../scintilla/lexers/LexFortran.cxx"/>
       <File Name="../../scintilla/lexers/LexFSharp.cxx"/>
+      <File Name="../../scintilla/lexers/LexGeogebra.cxx"/>
       <File Name="../../scintilla/lexers/LexGN.cxx"/>
       <File Name="../../scintilla/lexers/LexGo.cxx"/>
       <File Name="../../scintilla/lexers/LexGraphViz.cxx"/>
@@ -229,6 +230,7 @@
       <File Name="../../src/EditLexers/stlDefault.cpp"/>
       <File Name="../../src/EditLexers/stlFortran.cpp"/>
       <File Name="../../src/EditLexers/stlFSharp.cpp"/>
+      <File Name="../../src/EditLexers/stlGeogebra.cpp"/>
       <File Name="../../src/EditLexers/stlGN.cpp"/>
       <File Name="../../src/EditLexers/stlGo.cpp"/>
       <File Name="../../src/EditLexers/stlGradle.cpp"/>
