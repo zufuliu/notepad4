@@ -5,12 +5,14 @@
 // Copyright 1998-2002 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
 
+#include <cstdint>
 #include <cassert>
 #include <cstring>
 
 #include <algorithm>
 #include <iterator>
 
+#include "VectorISA.h"
 #include "WordList.h"
 
 using namespace Lexilla;
@@ -29,38 +31,56 @@ inline char **ArrayFromWordList(char *wordlist, size_t slen, range_t *len) {
 
 	char * const end = wordlist + slen;
 	char *s = wordlist;
-	while (s < end) {
+	// estimate word count, reduce code size for clang auto vectorization.
+#if NP2_USE_AVX2
+	_mm256_storeu_si256(reinterpret_cast<__m256i *>(end), _mm256_setzero_si256());
+	const __m256i space = _mm256_set1_epi8(-(' ' + 1));
+	do {
+		const __m256i chunk = _mm256_loadu_si256(reinterpret_cast<const __m256i *>(s));
+		uint32_t mask = mm256_movemask_epi8(_mm256_add_epi8(chunk, space));
+		uint32_t mask2;
+		prev = _addcarry_u32(prev, mask, mask, &mask2);
+		words += np2_popcount(andn_u32(mask, mask2));
+		s += sizeof(__m256i);
+	} while (s < end);
+	// the result may be greater than the actual value, see test file.
+#else
+#if defined(__clang__)
+	#pragma clang loop vectorize(disable)
+#endif
+	do {
 		const unsigned char ch = *s++;
-		const bool curr = ch <= ' ';
-		if (!curr && prev) {
+		if (prev <= ' ' && ch > ' ') {
 			words++;
 		}
-		prev = curr;
-	}
+		prev = ch;
+	} while (s < end);
+#endif // NP2_USE_AVX2
 
 	char **keywords = new char *[words + 1];
 	range_t wordsStore = 0;
 	if (words) {
 		prev = '\0';
 		s = wordlist;
-		while (s < end) {
-			unsigned char ch = *s;
-			if (ch > ' ') {
-				if (!prev) {
+		do {
+			const unsigned char ch = *s;
+			if (prev <= ' ') {
+				if (prev) {
+					s[-1] = '\0';
+				}
+				if (ch > ' ') {
 					keywords[wordsStore] = s;
 					wordsStore++;
 				}
-			} else {
-				*s = '\0';
-				ch = '\0';
 			}
 			prev = ch;
 			++s;
-		}
+		} while (s <= end);
 	}
 
 	assert(wordsStore < (words + 1));
 	keywords[wordsStore] = end;
+	// printf("words=%u/%u, [%s] [%s]\n", wordsStore, words, keywords[0], keywords[wordsStore - 1]);
 	*len = wordsStore;
 	return keywords;
 }
@@ -121,21 +141,26 @@ bool WordList::Set(const char *s, KeywordAttr attribute) {
 	// 2. the comparison is expensive than rebuild the list, especially for a long list.
 
 	Clear();
-	const size_t lenS = strlen(s) + 1;
-	list = new char[lenS];
-	memcpy(list, s, lenS);
+	const size_t lenS = strlen(s);
+	list = new char[lenS + 1 + 32*NP2_USE_AVX2];
+	memcpy(list, s, lenS + 1);
 	if (attribute & KeywordAttr_MakeLower) {
 		char *p = list;
-		while (*p) {
-			if (*p >= 'A' && *p <= 'Z') {
+		char * const end = list + lenS;
+#if defined(__clang__)
+		#pragma clang loop vectorize(disable)
+#endif
+		do {
+			const unsigned char ch = *p;
+			if (ch <= 'Z' && ch >= 'A') {
 				*p |= 'a' - 'A';
 			}
 			++p;
-		}
+		} while (p < end);
 	}
 
 	range_t len = 0;
-	words = ArrayFromWordList(list, lenS - 1, &len);
+	words = ArrayFromWordList(list, lenS, &len);
 	if (!(attribute & KeywordAttr_PreSorted)) {
 		std::sort(words, words + len, [](const char *a, const char *b) noexcept {
 			return strcmp(a, b) < 0;
