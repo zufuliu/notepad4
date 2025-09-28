@@ -1809,7 +1809,7 @@ void EditCreate(HWND hwndParent) noexcept {
 	SciCall_SetMouseDwellTime((callTipInfo.showCallTip == ShowCallTip_None)? SC_TIME_FOREVER : CallTipDefaultMouseDwellTime);
 
 	// Nonprinting characters
-	SciCall_SetViewWS((bViewWhiteSpace) ? SCWS_VISIBLEALWAYS : SCWS_INVISIBLE);
+	SciCall_SetViewWS(bViewWhiteSpace ? SCWS_VISIBLEALWAYS : SCWS_INVISIBLE);
 	SciCall_SetViewEOL(bViewEOLs);
 	SciCall_SetAutoInsertMask(autoCompletionConfig.fAutoInsertMask);
 }
@@ -4028,7 +4028,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_VIEW_SHOWWHITESPACE:
 		bViewWhiteSpace = !bViewWhiteSpace;
-		SciCall_SetViewWS((bViewWhiteSpace) ? SCWS_VISIBLEALWAYS : SCWS_INVISIBLE);
+		SciCall_SetViewWS(bViewWhiteSpace ? SCWS_VISIBLEALWAYS : SCWS_INVISIBLE);
 		break;
 
 	case IDM_VIEW_SHOWEOLS:

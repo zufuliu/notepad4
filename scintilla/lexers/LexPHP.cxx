@@ -740,7 +740,7 @@ void PHPLexer::HighlightJsInnerString() {
 			sc.ForwardSetState(js_style(SCE_JS_DEFAULT));
 		}
 	} else {
-		if (sc.ch == ((sc.state == js_style(SCE_JS_STRING_SQ) ? '\'' : '\"'))) {
+		if (sc.ch == (sc.state == js_style(SCE_JS_STRING_SQ) ? '\'' : '\"')) {
 			sc.Forward();
 			if (chBefore == ',' || chBefore == '{') {
 				// json key

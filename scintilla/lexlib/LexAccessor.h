@@ -288,7 +288,7 @@ constexpr int FoldLevelFlags(int levelLine, int levelNext, bool white, bool head
 	if (white) {
 		flags |= SC_FOLDLEVELWHITEFLAG;
 	}
-	if ((levelLine < levelNext) && (headerPermitted)) {
+	if ((levelLine < levelNext) && headerPermitted) {
 		flags |= SC_FOLDLEVELHEADERFLAG;
 	}
 	return flags;

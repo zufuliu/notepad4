@@ -4558,7 +4558,7 @@ void Editor::DropAt(SelectionPosition position, const char *value, size_t length
 	const bool positionOnEdgeOfSelection =
 		(position == SelectionStart()) || (position == SelectionEnd());
 
-	if ((inDragDrop != DragDrop::dragging) || !(positionWasInSelection) ||
+	if ((inDragDrop != DragDrop::dragging) || !positionWasInSelection ||
 		(positionOnEdgeOfSelection && !moving)) {
 
 		const SelectionPosition selStart = SelectionStart();
@@ -6239,7 +6239,7 @@ sptr_t Editor::StringResult(sptr_t lParam, const char *val) noexcept {
 
 sptr_t Editor::BytesResult(sptr_t lParam, const unsigned char *val, size_t len) noexcept {
 	// No NUL termination: len is number of valid/displayed bytes
-	if ((lParam) && (len > 0)) {
+	if (lParam && (len > 0)) {
 		char *ptr = CharPtrFromSPtr(lParam);
 		if (val)
 			memcpy(ptr, val, len);

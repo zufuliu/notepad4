@@ -1123,7 +1123,7 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 			sc.Complete();
 			if (sc.ch == '.') {
 				sc.Forward();
-				if (sc.atLineEnd || ((sc.ch == '\r' && sc.chNext == '\n')))
+				if (sc.atLineEnd || (sc.ch == '\r' && sc.chNext == '\n'))
 					sc.SetState(SCE_PL_DEFAULT);
 			}
 			while (!sc.atLineEnd)

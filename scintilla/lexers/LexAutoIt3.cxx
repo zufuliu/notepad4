@@ -599,7 +599,7 @@ void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/, 
 		// get the style for the current character need to check in comment
 		const int stylech = styler.StyleAt(startPos);
 		// get first word for the line for indent check max 9 characters
-		if (FirstWordStart && (!(FirstWordEnd))) {
+		if (FirstWordStart && (!FirstWordEnd)) {
 			if (!IsAu3WordChar(ch)) {
 				FirstWordEnd = true;
 				szKeyword[szKeywordlen] = '\0';
@@ -610,7 +610,7 @@ void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/, 
 			}
 		}
 		// start the capture of the first word
-		if (!(FirstWordStart)) {
+		if (!FirstWordStart) {
 			if (IsAu3WordChar(ch) || IsAu3WordStart(ch) || ch == ';') {
 				FirstWordStart = true;
 				szKeyword[szKeywordlen++] = UnsafeLower(ch);
@@ -650,7 +650,7 @@ void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/, 
 			// if a keyword is found on the current line and the line doesn't end with _ (continuation)
 			//    and we are not inside a commentblock.
 			if (szKeywordlen > 0 && (!(chPrev == '_')) &&
-				((!(IsStreamCommentStyle(style)) || foldInComment))) {
+				(!(IsStreamCommentStyle(style)) || foldInComment)) {
 				szKeyword[szKeywordlen] = '\0';
 				// only fold "if" last keyword is "then"  (else it's a one line if)
 				if (StrEqual(szKeyword, "if") && ThenFoundLast) {

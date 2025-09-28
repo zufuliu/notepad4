@@ -796,7 +796,7 @@ int RESearch::Execute(const CharacterIndexer &ci, Sci::Position lp, Sci::Positio
 	if (ep == NOTFOUND) {
 		/* similar to EOL, match EOW at line end */
 		if (endp == lineEndPos && *ap == EOW) {
-			if ((ap[1] == END || ((ap[1] == EOL && ap[2] == END))) && iswordc(ci.CharAt(lp - 1))) {
+			if ((ap[1] == END || (ap[1] == EOL && ap[2] == END)) && iswordc(ci.CharAt(lp - 1))) {
 				lp = endp;
 				ep = lp;
 			} else {
