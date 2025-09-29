@@ -4590,7 +4590,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case CMD_JUMP2SELSTART:
 	case CMD_JUMP2SELEND:
-		if (!SciCall_IsRectangleSelection()) {
+		if (!SciCall_IsRectangularSelection()) {
 			const Sci_Position iAnchorPos = SciCall_GetAnchor();
 			const Sci_Position iCursorPos = SciCall_GetCurrentPos();
 			if ((LOWORD(wParam) == CMD_JUMP2SELSTART && iCursorPos > iAnchorPos) || (LOWORD(wParam) != CMD_JUMP2SELSTART && iCursorPos < iAnchorPos)) {
@@ -6751,7 +6751,7 @@ void UpdateStatusbar() noexcept {
 		tchLinesSelected[0] = L'0';
 		tchLinesSelected[1] = L'\0';
 	} else {
-		if (!SciCall_IsRectangleSelection()) {
+		if (!SciCall_IsRectangularSelection()) {
 			const Sci_Position iSelByte = SciCall_GetSelTextLength();
 			const Sci_Position iSelChar = SciCall_CountCharacters(iSelStart, iSelEnd);
 			FormatNumber(tchSelByte, iSelByte);

@@ -117,7 +117,7 @@ void Edit_ReleaseResources() noexcept {
 #endif
 }
 
-static inline void NotifyRectangleSelection() noexcept {
+static inline void NotifyRectangularSelection() noexcept {
 	MsgBoxWarn(MB_OK, IDS_SELRECT);
 	//ShowNotificationMessage(SC_NOTIFICATIONPOSITION_CENTER, IDS_SELRECT);
 }
@@ -417,8 +417,8 @@ bool EditCopyAppend(HWND hwnd) noexcept {
 
 	char *pszText;
 	if (!SciCall_IsSelectionEmpty()) {
-		if (SciCall_IsRectangleSelection()) {
-			NotifyRectangleSelection();
+		if (SciCall_IsRectangularSelection()) {
+			NotifyRectangularSelection();
 			return false;
 		}
 
@@ -1586,8 +1586,8 @@ void EditMapTextCase(int menu) noexcept {
 	if (iSelCount == 0) {
 		return;
 	}
-	if (SciCall_IsRectangleSelection()) {
-		NotifyRectangleSelection();
+	if (SciCall_IsRectangularSelection()) {
+		NotifyRectangularSelection();
 		return;
 	}
 
@@ -1786,8 +1786,8 @@ void EditURLEncode(bool component) noexcept {
 	if (iSelCount == 0) {
 		return;
 	}
-	if (SciCall_IsRectangleSelection()) {
-		NotifyRectangleSelection();
+	if (SciCall_IsRectangularSelection()) {
+		NotifyRectangularSelection();
 		return;
 	}
 
@@ -1815,8 +1815,8 @@ void EditURLDecode() noexcept {
 	if (iSelCount == 0) {
 		return;
 	}
-	if (SciCall_IsRectangleSelection()) {
-		NotifyRectangleSelection();
+	if (SciCall_IsRectangularSelection()) {
+		NotifyRectangularSelection();
 		return;
 	}
 
@@ -1866,8 +1866,8 @@ void EditEscapeCChars(HWND hwnd) noexcept {
 	if (SciCall_IsSelectionEmpty()) {
 		return;
 	}
-	if (SciCall_IsRectangleSelection()) {
-		NotifyRectangleSelection();
+	if (SciCall_IsRectangularSelection()) {
+		NotifyRectangularSelection();
 		return;
 	}
 
@@ -1899,8 +1899,8 @@ void EditUnescapeCChars(HWND hwnd) noexcept {
 	if (SciCall_IsSelectionEmpty()) {
 		return;
 	}
-	if (SciCall_IsRectangleSelection()) {
-		NotifyRectangleSelection();
+	if (SciCall_IsRectangularSelection()) {
+		NotifyRectangularSelection();
 		return;
 	}
 
@@ -1941,8 +1941,8 @@ void EditEscapeXHTMLChars(HWND hwnd) noexcept {
 	if (SciCall_IsSelectionEmpty()) {
 		return;
 	}
-	if (SciCall_IsRectangleSelection()) {
-		NotifyRectangleSelection();
+	if (SciCall_IsRectangularSelection()) {
+		NotifyRectangularSelection();
 		return;
 	}
 
@@ -1992,8 +1992,8 @@ void EditUnescapeXHTMLChars(HWND hwnd) noexcept {
 	if (SciCall_IsSelectionEmpty()) {
 		return;
 	}
-	if (SciCall_IsRectangleSelection()) {
-		NotifyRectangleSelection();
+	if (SciCall_IsRectangularSelection()) {
+		NotifyRectangularSelection();
 		return;
 	}
 
@@ -2054,8 +2054,8 @@ void EditChar2Hex() noexcept {
 	if (count == 0) {
 		return;
 	}
-	if (SciCall_IsRectangleSelection()) {
-		NotifyRectangleSelection();
+	if (SciCall_IsRectangularSelection()) {
+		NotifyRectangularSelection();
 		return;
 	}
 
@@ -2100,8 +2100,8 @@ void EditHex2Char() noexcept {
 	if (count == 0) {
 		return;
 	}
-	if (SciCall_IsRectangleSelection()) {
-		NotifyRectangleSelection();
+	if (SciCall_IsRectangularSelection()) {
+		NotifyRectangularSelection();
 		return;
 	}
 
@@ -2163,8 +2163,8 @@ void EditShowHex() noexcept {
 	if (count == 0) {
 		return;
 	}
-	if (SciCall_IsRectangleSelection()) {
-		NotifyRectangleSelection();
+	if (SciCall_IsRectangularSelection()) {
+		NotifyRectangularSelection();
 		return;
 	}
 
@@ -2195,8 +2195,8 @@ void EditBase64Encode(Base64EncodingFlag encodingFlag) noexcept {
 	if (len == 0) {
 		return;
 	}
-	if (SciCall_IsRectangleSelection()){
-		NotifyRectangleSelection();
+	if (SciCall_IsRectangularSelection()){
+		NotifyRectangularSelection();
 		return;
 	}
 
@@ -2235,8 +2235,8 @@ void EditBase64Decode(bool decodeAsHex) noexcept {
 	if (len == 0) {
 		return;
 	}
-	if (SciCall_IsRectangleSelection()){
-		NotifyRectangleSelection();
+	if (SciCall_IsRectangularSelection()){
+		NotifyRectangularSelection();
 		return;
 	}
 
@@ -2357,8 +2357,8 @@ void EditConvertNumRadix(int radix) noexcept {
 	if (count == 0) {
 		return;
 	}
-	if (SciCall_IsRectangleSelection()) {
-		NotifyRectangleSelection();
+	if (SciCall_IsRectangularSelection()) {
+		NotifyRectangularSelection();
 		return;
 	}
 
@@ -2481,8 +2481,8 @@ void EditModifyNumber(bool bIncrease) {
 	if (iSelCount == 0) {
 		return;
 	}
-	if (SciCall_IsRectangleSelection()) {
-		NotifyRectangleSelection();
+	if (SciCall_IsRectangularSelection()) {
+		NotifyRectangularSelection();
 		return;
 	}
 
@@ -2526,8 +2526,8 @@ void EditTabsToSpaces(int nTabWidth, bool bOnlyIndentingWS) noexcept {
 	if (SciCall_IsSelectionEmpty()) {
 		return;
 	}
-	if (SciCall_IsRectangleSelection()) {
-		NotifyRectangleSelection();
+	if (SciCall_IsRectangularSelection()) {
+		NotifyRectangularSelection();
 		return;
 	}
 
@@ -2595,8 +2595,8 @@ void EditSpacesToTabs(int nTabWidth, bool bOnlyIndentingWS) noexcept {
 	if (SciCall_IsSelectionEmpty()) {
 		return;
 	}
-	if (SciCall_IsRectangleSelection()) {
-		NotifyRectangleSelection();
+	if (SciCall_IsRectangularSelection()) {
+		NotifyRectangularSelection();
 		return;
 	}
 
@@ -2926,8 +2926,8 @@ void EditModifyLinesText::Insert(char *mszInsert, Sci_Line iLine, Sci_Position p
 // EditModifyLines()
 //
 void EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend, bool skipEmptyLine) noexcept {
-	if (SciCall_IsRectangleSelection()) {
-		NotifyRectangleSelection();
+	if (SciCall_IsRectangularSelection()) {
+		NotifyRectangularSelection();
 		return;
 	}
 	if (StrIsEmpty(pwszPrefix) && StrIsEmpty(pwszAppend)) {
@@ -3021,8 +3021,8 @@ void EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend, bool skipEmptyLine)
 // EditAlignText()
 //
 void EditAlignText(EditAlignMode nMode) noexcept {
-	if (SciCall_IsRectangleSelection()) {
-		NotifyRectangleSelection();
+	if (SciCall_IsRectangularSelection()) {
+		NotifyRectangularSelection();
 		return;
 	}
 
@@ -3242,8 +3242,8 @@ void EditAlignText(EditAlignMode nMode) noexcept {
 // EditEncloseSelection()
 //
 void EditEncloseSelection(LPCWSTR pwszOpen, LPCWSTR pwszClose) noexcept {
-	if (SciCall_IsRectangleSelection()) {
-		NotifyRectangleSelection();
+	if (SciCall_IsRectangularSelection()) {
+		NotifyRectangularSelection();
 		return;
 	}
 	if (StrIsEmpty(pwszOpen) && StrIsEmpty(pwszClose)) {
@@ -3322,8 +3322,8 @@ void EditEncloseSelection(LPCWSTR pwszOpen, LPCWSTR pwszClose) noexcept {
 // EditToggleLineComments()
 //
 void EditToggleLineComments(LPCWSTR pwszComment, int commentFlag) noexcept {
-	if (SciCall_IsRectangleSelection()) {
-		NotifyRectangleSelection();
+	if (SciCall_IsRectangularSelection()) {
+		NotifyRectangularSelection();
 		return;
 	}
 
@@ -3478,7 +3478,7 @@ void EditPadWithSpaces(bool bSkipEmpty, bool bNoUndoGroup) noexcept {
 	Sci_Position iRcCurCol = 0;
 	Sci_Position iRcAnchorCol = 0;
 
-	const bool bIsRectangular = SciCall_IsRectangleSelection();
+	const bool bIsRectangular = SciCall_IsRectangularSelection();
 	if (!bIsRectangular ) {
 		iSelStart = SciCall_GetSelectionStart();
 		iSelEnd = SciCall_GetSelectionEnd();
@@ -3588,8 +3588,8 @@ void EditPadWithSpaces(bool bSkipEmpty, bool bNoUndoGroup) noexcept {
 // EditStripFirstCharacter()
 //
 void EditStripFirstCharacter() noexcept {
-	if (SciCall_IsRectangleSelection()) {
-		NotifyRectangleSelection();
+	if (SciCall_IsRectangularSelection()) {
+		NotifyRectangularSelection();
 		return;
 	}
 
@@ -3624,8 +3624,8 @@ void EditStripFirstCharacter() noexcept {
 // EditStripLastCharacter()
 //
 void EditStripLastCharacter() noexcept {
-	if (SciCall_IsRectangleSelection()) {
-		NotifyRectangleSelection();
+	if (SciCall_IsRectangularSelection()) {
+		NotifyRectangularSelection();
 		return;
 	}
 
@@ -3665,7 +3665,7 @@ void EditStripLastCharacter() noexcept {
 void EditStripTrailingBlanks(HWND hwnd, bool bIgnoreSelection) noexcept {
 	// Check if there is any selection... simply use a regular expression replace!
 	if (!bIgnoreSelection && !SciCall_IsSelectionEmpty()) {
-		if (!SciCall_IsRectangleSelection()) {
+		if (!SciCall_IsRectangularSelection()) {
 			EDITFINDREPLACE * const efrTrim = static_cast<EDITFINDREPLACE *>(NP2HeapAlloc(sizeof(EDITFINDREPLACE)));
 			efrTrim->hwnd = hwnd;
 			efrTrim->fuFlags = SCFIND_REGEXP;
@@ -3705,7 +3705,7 @@ void EditStripTrailingBlanks(HWND hwnd, bool bIgnoreSelection) noexcept {
 void EditStripLeadingBlanks(HWND hwnd, bool bIgnoreSelection) noexcept {
 	// Check if there is any selection... simply use a regular expression replace!
 	if (!bIgnoreSelection && !SciCall_IsSelectionEmpty()) {
-		if (!SciCall_IsRectangleSelection()) {
+		if (!SciCall_IsRectangularSelection()) {
 			EDITFINDREPLACE * const efrTrim = static_cast<EDITFINDREPLACE *>(NP2HeapAlloc(sizeof(EDITFINDREPLACE)));
 			efrTrim->hwnd = hwnd;
 			efrTrim->fuFlags = SCFIND_REGEXP;
@@ -3734,8 +3734,8 @@ void EditStripLeadingBlanks(HWND hwnd, bool bIgnoreSelection) noexcept {
 // EditCompressSpaces()
 //
 void EditCompressSpaces() noexcept {
-	if (SciCall_IsRectangleSelection()) {
-		NotifyRectangleSelection();
+	if (SciCall_IsRectangularSelection()) {
+		NotifyRectangularSelection();
 		return;
 	}
 
@@ -3801,8 +3801,8 @@ void EditCompressSpaces() noexcept {
 // EditRemoveBlankLines()
 //
 void EditRemoveBlankLines(bool bMerge) noexcept {
-	if (SciCall_IsRectangleSelection()) {
-		NotifyRectangleSelection();
+	if (SciCall_IsRectangularSelection()) {
+		NotifyRectangularSelection();
 		return;
 	}
 
@@ -3860,8 +3860,8 @@ void EditWrapToColumn(int nColumn/*, int nTabWidth*/) noexcept {
 	if (SciCall_IsSelectionEmpty()) {
 		return;
 	}
-	if (SciCall_IsRectangleSelection()) {
-		NotifyRectangleSelection();
+	if (SciCall_IsRectangularSelection()) {
+		NotifyRectangularSelection();
 		return;
 	}
 
@@ -3989,8 +3989,8 @@ void EditJoinLinesEx() noexcept {
 	if (SciCall_IsSelectionEmpty()) {
 		return;
 	}
-	if (SciCall_IsRectangleSelection()) {
-		NotifyRectangleSelection();
+	if (SciCall_IsRectangularSelection()) {
+		NotifyRectangularSelection();
 		return;
 	}
 
@@ -4117,7 +4117,7 @@ void EditSortLines(EditSortFlag iSortFlags) noexcept {
 	Sci_Line iLineEnd;
 	Sci_Position iSortColumn;
 
-	const bool bIsRectangular = SciCall_IsRectangleSelection();
+	const bool bIsRectangular = SciCall_IsRectangularSelection();
 	if (bIsRectangular) {
 		iRcCurLine = SciCall_LineFromPosition(iCurPos);
 		iRcAnchorLine = SciCall_LineFromPosition(iAnchorPos);
@@ -4454,7 +4454,7 @@ void EditEnsureConsistentLineEndings() noexcept {
 // EditGetExcerpt()
 //
 void EditGetExcerpt(LPWSTR lpszExcerpt, DWORD cchExcerpt) noexcept {
-	if (SciCall_IsSelectionEmpty() || SciCall_IsRectangleSelection()) {
+	if (SciCall_IsSelectionEmpty() || SciCall_IsRectangularSelection()) {
 		StrCpyEx(lpszExcerpt, L"");
 		return;
 	}
@@ -5913,8 +5913,8 @@ void EditReplaceAll(HWND hwnd, const EDITFINDREPLACE *lpefr) noexcept {
 // EditReplaceAllInSelection()
 //
 void EditReplaceAllInSelection(HWND hwnd, const EDITFINDREPLACE *lpefr, EditReplaceAllFlag flag) noexcept {
-	if (SciCall_IsRectangleSelection()) {
-		NotifyRectangleSelection();
+	if (SciCall_IsRectangularSelection()) {
+		NotifyRectangularSelection();
 		return;
 	}
 
@@ -6807,7 +6807,7 @@ static INT_PTR CALLBACK EditSortDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 			CheckDlgButton(hwnd, IDC_SORT_GROUPBY_FILE_TYPE, BST_CHECKED);
 		}
 
-		if (!SciCall_IsRectangleSelection()) {
+		if (!SciCall_IsRectangularSelection()) {
 			*piSortFlags &= ~EditSortFlag_ColumnSort;
 			EnableWindow(GetDlgItem(hwnd, IDC_SORT_COLUMN), FALSE);
 		} else {
