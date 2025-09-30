@@ -3,6 +3,7 @@ import os.path
 import glob
 import re
 
+# add <MapExports>true</MapExports> into <Link> group
 def dump_static_linked_function(path, dumpAll=True):
 	result = {}
 	with open(path, encoding='utf-8') as fd:
@@ -24,6 +25,23 @@ def dump_static_linked_function(path, dumpAll=True):
 		for obj, items in sorted(result.items()):
 			fd.write(obj + '\n')
 			fd.write(''.join(f'\t{func}\n' for func in sorted(items)))
+
+# https://llvm.org/docs/CommandGuide/llvm-mca.html
+def msvc_to_llvm_mca(path):
+	with open(path, encoding='utf-8') as fd:
+		doc = fd.read()
+
+	doc = doc.replace('; ', '# ') # comment
+	doc = doc.replace('$L', '.L') # label
+	doc = re.sub(r'(j\w+\s+)(SHORT\s+)', r'\1', doc) # jump
+	doc = re.sub(r'(npad\s+\d+)', r'# \1', doc)
+
+	name, ext = os.path.splitext(path)
+	path = f'{name}-mca{ext}'
+	print('write:', path)
+	with open(path, 'w', encoding='utf-8', newline='\n') as fd:
+		fd.write('\t.intel_syntax noprefix\n\n')
+		fd.write(doc)
 
 text_segment = re.compile(r'_TEXT\s+SEGMENT')
 proc_comdat = re.compile(r'(\w+\s+)?PROC\s*;(.+?)COMDAT')
@@ -59,20 +77,27 @@ def get_stack_size(path, result_map, threshold):
 				else:
 					result_map[stack_size] = {path: [name]}
 
+# add <AssemblerOutput>All</AssemblerOutput> into <ClCompile> group
 def dump_stack_size():
 	if len(sys.argv) < 3:
 		print(f'Usgae: {sys.argv[0]} threshold <path or folder>')
 		return
 
-	threshold = int(sys.argv[1])
+	mca = sys.argv[1] == 'mca'
+	threshold = 0 if mca else int(sys.argv[1])
 	result_map = {}
 	for arg in sys.argv[2:]:
 		if os.path.isfile(arg):
-			get_stack_size(arg, result_map, threshold)
+			if mca:
+				msvc_to_llvm_mca(arg)
+			else:
+				get_stack_size(arg, result_map, threshold)
 		elif os.path.isdir(arg):
 			for path in glob.glob(os.path.join(arg, '*.cod')):
 				get_stack_size(path, result_map, threshold)
 
+	if mca:
+		return
 	if not result_map:
 		print(f'No result for threshold: {threshold}')
 		return
