@@ -34,12 +34,19 @@ inline char **ArrayFromWordList(char *wordlist, size_t slen, range_t *len) {
 	// estimate word count, reduce code size for clang auto vectorization.
 #if NP2_USE_AVX2
 	_mm256_storeu_si256(reinterpret_cast<__m256i *>(end), _mm256_setzero_si256());
+	// const __m256i space = _mm256_set1_epi8(' ');
 	const __m256i space = _mm256_set1_epi8(-(' ' + 1));
 	do {
 		const __m256i chunk = _mm256_loadu_si256(reinterpret_cast<const __m256i *>(s));
-		uint32_t mask = mm256_movemask_epi8(_mm256_add_epi8(chunk, space));
+		// const uint32_t mask = _mm256_cmple_epu8_mask(chunk, space);
+		const uint32_t mask = mm256_movemask_epi8(_mm256_add_epi8(chunk, space));
+#if 1 // msvc code size
 		uint32_t mask2;
 		prev = _addcarry_u32(prev, mask, mask, &mask2);
+#else
+		const uint32_t mask2 = prev + 2*mask;
+		prev = mask >> 31;
+#endif
 		words += np2_popcount(andn_u32(mask, mask2));
 		s += sizeof(__m256i);
 	} while (s < end);
@@ -149,6 +156,8 @@ bool WordList::Set(const char *s, KeywordAttr attribute) {
 		char * const end = list + lenS;
 #if defined(__clang__)
 		#pragma clang loop vectorize(disable)
+#elif defined(__GNUC__)
+		#pragma GCC novector
 #endif
 		do {
 			const unsigned char ch = *p;
