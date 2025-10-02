@@ -230,7 +230,7 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 							kwType = KeywordType::Enum;
 						} else if (StrEqualsAny(s, "break", "continue")) {
 							kwType = KeywordType::Label;
-						} else if (StrEqualsAny(s, "return", "yield", "else")) {
+						} else if (StrEqualsAny(s, "return", "await", "yield", "else")) {
 							kwType = KeywordType::Return;
 						}
 						if (chBefore == '.' || (kwType > KeywordType::None && kwType < KeywordType::Return)) {
