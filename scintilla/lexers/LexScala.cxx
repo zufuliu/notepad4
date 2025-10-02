@@ -183,7 +183,7 @@ void ColouriseScalaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 							kwType = KeywordType::Function;
 						} else if (StrEqual(s, "enum")) {
 							kwType = KeywordType::Enum;
-						} else if (StrEqualsAny(s, "return", "yield")) {
+						} else if (StrEqualsAny(s, "return", "yield", "else")) {
 							kwType = KeywordType::Return;
 						} else if (visibleChars == 3 && StrEqual(s, "end")) {
 							lineState |= PyLineStateMaskCloseBrace;

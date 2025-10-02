@@ -368,7 +368,7 @@ void ColouriseDDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 								kwType = KeywordType::Enum;
 							} else if (StrEqualsAny(s, "break", "goto")) {
 								kwType = KeywordType::Label;
-							} else if (StrEqual(s, "return")) {
+							} else if (StrEqualsAny(s, "return", "else")) {
 								kwType = KeywordType::Return;
 							} else if (StrEqual(s, "asm")) {
 								asmState = InlineAssembler::Keyword;

@@ -168,7 +168,7 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 							kwType = KeywordType::Annotation;
 						} else if (StrEqual(s, "interface")) {
 							kwType = KeywordType::Interface;
-						} else if (StrEqual(s, "return")) {
+						} else if (StrEqualsAny(s, "return", "else")) {
 							kwType = KeywordType::Return;
 						}
 						if (kwType > KeywordType::ThisSuper && kwType < KeywordType::Return) {

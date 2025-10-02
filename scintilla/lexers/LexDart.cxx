@@ -190,7 +190,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 							kwType = KeywordType::Enum;
 						} else if (StrEqualsAny(s, "break", "continue")) {
 							kwType = KeywordType::Label;
-						} else if (StrEqualsAny(s, "return", "await", "yield")) {
+						} else if (StrEqualsAny(s, "return", "await", "yield", "else")) {
 							kwType = KeywordType::Return;
 						}
 						if (kwType > KeywordType::None && kwType < KeywordType::Return) {

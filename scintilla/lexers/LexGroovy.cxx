@@ -222,7 +222,7 @@ void ColouriseGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 								kwType = KeywordType::Trait;
 							} else if (StrEqual(s, "enum")) {
 								kwType = KeywordType::Enum;
-							} else if (StrEqual(s, "return")) {
+							} else if (StrEqualsAny(s, "return", "else")) {
 								kwType = KeywordType::Return;
 							} else if (StrEqualsAny(s, "if", "while")) {
 								// to avoid treating following code as type cast:
