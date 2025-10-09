@@ -1752,7 +1752,7 @@ BEGIN
     IDS_SAVEFILE            """%s"" 저장 중..."
     IDS_PRINTFILE           "%s 페이지 인쇄 중..."
     IDS_SAVINGSETTINGS      "설정 저장 중..."
-    IDS_LINKDESCRIPTION     "Notepad4로 편집(&2)"
+    IDS_LINKDESCRIPTION     "Notepad4로 편집(&4)"
     IDS_FILTER_ALL          "모든 파일 (*.*)|*.*|"
     IDS_FILTER_EXE          "실행 파일 (*.exe;*.com;*.bat;*.cmd;*.lnk;*.pif)|*.exe;*.com;*.bat;*.cmd;*.lnk;*.pif|모든 파일 (*.*)|*.*|"
 END

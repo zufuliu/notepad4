@@ -1752,7 +1752,7 @@ BEGIN
     IDS_SAVEFILE            "正在保存“%s”..."
     IDS_PRINTFILE           "正在打印页面 %s..."
     IDS_SAVINGSETTINGS      "正在保存设置..."
-    IDS_LINKDESCRIPTION     "使用 Notepad4 编辑(&2)"
+    IDS_LINKDESCRIPTION     "使用 Notepad4 编辑(&4)"
     IDS_FILTER_ALL          "所有文件(*.*)|*.*|"
     IDS_FILTER_EXE          "可执行文件(*.exe;*.com;*.bat;*.cmd;*.lnk;*.pif)|*.exe;*.com;*.bat;*.cmd;*.lnk;*.pif|所有文件(*.*)|*.*|"
 END
