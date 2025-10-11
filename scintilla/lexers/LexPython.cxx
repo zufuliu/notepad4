@@ -145,6 +145,7 @@ inline void EnterPyStringState(StyleContext &sc) {
 	sc.Advance(offset);
 }
 
+// printf-style String Formatting
 // https://docs.python.org/3/library/stdtypes.html#printf-style-string-formatting
 // https://docs.python.org/3/library/stdtypes.html#printf-style-bytes-formatting
 
@@ -236,6 +237,12 @@ Sci_Position CheckPercentFormatSpecifier(const StyleContext &sc, LexAccessor &st
 		} else {
 			return 0;
 		}
+	} else if (ch == ':') {
+		ch = styler[pos + 1];
+		if (ch == 'z') { // Python 3.12, %:z UTC offset
+			return 3;
+		}
+		return 0;
 	}
 	// 3. (optional) Conversion flags
 	while (AnyOf(ch, '#', '0', '-', ' ', '+')) {
@@ -271,6 +278,7 @@ Sci_Position CheckPercentFormatSpecifier(const StyleContext &sc, LexAccessor &st
 	return 0;
 }
 
+// Format Specification Mini-Language
 // https://docs.python.org/3/library/string.html#formatspec
 
 constexpr bool IsConversionChar(int ch) noexcept {
@@ -343,7 +351,7 @@ Sci_Position CheckBraceFormatSpecifier(const StyleContext &sc, LexAccessor &styl
 	while (IsADigit(ch)) {
 		ch = styler[++pos];
 	}
-	// [grouping_option]
+	// [grouping]
 	if (ch == '_' || ch == ',') {
 		ch = styler[++pos];
 	}
@@ -351,6 +359,10 @@ Sci_Position CheckBraceFormatSpecifier(const StyleContext &sc, LexAccessor &styl
 	if (ch == '.') {
 		ch = styler[++pos];
 		while (IsADigit(ch)) {
+			ch = styler[++pos];
+		}
+		// [grouping] Python 3.14
+		if (ch == '_' || ch == ',') {
 			ch = styler[++pos];
 		}
 	}
