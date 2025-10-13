@@ -29,10 +29,13 @@ using namespace Scintilla::Internal;
 
 namespace {
 
+#if 1 // serialized to binary form
 constexpr unsigned max_num_bytes = 1 + sizeof(unsigned)*8/7; // max 4GB
 constexpr unsigned max_range_bytes = 4*max_num_bytes + 4;
+constexpr bool IsSerializedNumber(char ch) noexcept {
+	return ch & 0x80;
+}
 
-#if 1
 // similar to ULEB128 encoding but always set highest bit for last byte
 // to avoid embedded NUL and distinguish from tag characters and separators.
 char *to_string(char *p, size_t value) noexcept {
@@ -58,7 +61,13 @@ const char *ValueFromString(const char *p, T &value) noexcept {
 	return p;
 }
 
-#else
+#else // debug only, serialized to text form
+constexpr unsigned max_num_bytes = (10*sizeof(unsigned) + 2)/4; // max 4GB
+constexpr unsigned max_range_bytes = 4*max_num_bytes + 4;
+constexpr bool IsSerializedNumber(char ch) noexcept {
+	return ch >= '0' && ch <= '9';
+}
+
 // see FormatNumber()
 char *to_string(char *p, size_t value) noexcept {
 	char number[24];
@@ -354,8 +363,7 @@ Selection::Selection(std::string_view sv) noexcept : mainRange(0), moveExtends(f
 				if (*p == ',') {
 					p += 1;
 				}
-				if (*p & 0x80) { // requires number
-				// if (*p >= '0' && *p <= '9') { // requires number
+				if (IsSerializedNumber(*p)) { // requires number
 					ranges.emplace_back(p);
 				} else {
 					break;
