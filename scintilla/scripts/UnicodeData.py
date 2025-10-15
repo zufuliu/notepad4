@@ -16,6 +16,9 @@ UnicodeCharacterCount = sys.maxunicode + 1
 BMPCharacterCharacterCount = 0xffff + 1
 DBCSCharacterCount = 0xffff + 1
 
+def isSurrogate(ch):
+	return 0xD800 <= ch <= 0xDBFF
+
 def getCharacterName(ch):
 	try:
 		return unicodedata.name(ch).title()
