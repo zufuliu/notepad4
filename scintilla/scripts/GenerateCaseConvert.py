@@ -408,7 +408,7 @@ def updateCaseSensitivityBlock(filename, test=False):
 			maskTable[ch >> 5] |= (1 << (ch & 31))
 
 	# divide characters into blocks, filter out blocks with all character not case sensitive.
-	blockSizeBit = 2
+	blockSizeBit = 3
 	blockSize = 1 << blockSizeBit
 	firstCount = first >> 5
 	maskCount = 1 + (maxCh >> 5)
@@ -440,10 +440,11 @@ def updateCaseSensitivityBlock(filename, test=False):
 		blockId = i // blockSize
 		blockSlot = blockId & (blockIndexCount - 1)
 		if blockData[blockSlot][1]:
-			print('multi block', blockId, blockSlot, blockData[blockSlot], index)
+			overlapped = True
+			print('Unicode Case Sensitivity multi block', blockId, blockSlot, blockData[blockSlot], index)
 		if index > maxIndex:
 			overlapped = True
-			print('overlapped block', blockId, blockSlot, index)
+			print('Unicode Case Sensitivity overlapped block', blockId, blockSlot, index)
 
 		blockId = blockId >> blockIndexValueBit
 		blockData[blockSlot] = (blockId, index)
@@ -468,7 +469,7 @@ def updateCaseSensitivityBlock(filename, test=False):
 			indexTable.append(index)
 
 	size = len(blockIndex) + len(indexTable) + len(maskList)*4
-	print('caseBlock', blockSize, len(maskList), len(blockIndex), len(indexTable), size)
+	print('Unicode Case Sensitivity caseBlock', blockSize, len(maskList), len(blockIndex), len(indexTable), size)
 
 	output = [f"// Created with Python {platform.python_version()}, Unicode {unicodedata.unidata_version}"]
 	output.append(f'#define kUnicodeCaseSensitiveFirst\t0x{first:04x}U')

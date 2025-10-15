@@ -88,7 +88,7 @@ def isPrivateChar(c):
 # https://en.wikipedia.org/wiki/CJK_Unified_Ideographs
 # https://en.wikipedia.org/wiki/Katakana
 # https://en.wikipedia.org/wiki/Hangul
-# Chapter 18 East Asia https://www.unicode.org/versions/Unicode16.0.0/UnicodeStandard-16.0.pdf
+# Chapter 18 East Asia https://www.unicode.org/versions/Unicode17.0.0/UnicodeStandard-17.0.pdf
 # Unicode Han Database (Unihan) https://unicode.org/reports/tr38/#BlockListing
 # https://www.unicode.org/Public/UCD/latest/ucd/Blocks.txt
 CJKBlockList = [
@@ -106,6 +106,7 @@ CJKBlockList = [
 	(0x2EBF0, 0x2EE5F), # U+2EBF0..U+2EE5F CJK Unified Ideographs Extension I
 	(0x30000, 0x3134F), # U+30000..U+3134F CJK Unified Ideographs Extension G
 	(0x31350, 0x323AF), # U+31350..U+323AF CJK Unified Ideographs Extension H
+	(0x323B0, 0x3347F), # U+323B0..U+3347F CJK Unified Ideographs Extension J
 
 	(0x2E80, 0x2EFF), # U+2E80..U+2EFF CJK Radicals Supplement
 	(0x2F00, 0x2FDF), # U+2F00..U+2FDF Kangxi Radicals
@@ -142,7 +143,8 @@ CJKBlockList = [
 	(0xA490, 0xA4CF), # U+A490..U+A4CF Yi Radicals
 	(0x17000, 0x187FF), # U+17000..U+187FF Tangut
 	(0x18800, 0x18AFF), # U+18800..U+18AFF Tangut Components
-	(0x18D00, 0x18D8F), # U+18D00..U+18D8F Tangut Supplement
+	(0x18D00, 0x18D7F), # U+18D00..U+18D7F Tangut Supplement
+	(0x18D80, 0x18DFF), # U+18D80..U+18DFF Tangut Components Supplement
 	(0x18B00, 0x18CFF), # U+18B00..U+18CFF Khitan Small Script
 	(0x1B170, 0x1B2FF), # U+1B170..U+1B2FF Nüshu
 	# omitted: Lisu, Miao
