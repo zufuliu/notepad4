@@ -88,7 +88,7 @@ static KEYWORDLIST Keywords_Python = {{
 "URLError UUID UnboundLocalError Underflow "
 "UnicodeDecodeError UnicodeEncodeError UnicodeError UnicodeTranslateError UnicodeWarning UnsupportedOperation "
 "UserDict UserList UserString UserWarning "
-"ValueError ValuesView Warning WindowsPath ZeroDivisionError array catch_warnings date datetime defaultdict deque error "
+"ValueError ValuesView Warning WindowsPath ZeroDivisionError array catch_warnings date datetime defaultdict deque "
 "partialmethod sched_param singledispatchmethod stat_result struct_time terminal_size time timedelta timezone tzinfo "
 
 , // 7 decorator
@@ -136,7 +136,7 @@ static KEYWORDLIST Keywords_Python = {{
 "done( drain( dropwhile( dst( dump( dumps( dup( dup2( "
 "east_asian_width( elements( emit( empty( "
 "enable_callback_tracebacks( enable_load_extension( encode( end( endswith( enter_async_context( enter_context( "
-"erf( erfc( escape( eventfd( eventfd_read( eventfd_write( exc_info( excepthook( exception( "
+"erf( erfc( error( escape( eventfd( eventfd_read( eventfd_write( exc_info( excepthook( exception( "
 "execl( execle( execlp( execlpe( execute( executemany( executescript( execv( execve( execvp( execvpe( exists( "
 "exp( exp2( expand( expandtabs( expanduser( expandvars( expired( expm1( expovariate( "
 "extend( extendleft( extract( extract_stack( extract_tb( "
@@ -315,7 +315,7 @@ static KEYWORDLIST Keywords_Python = {{
 "color column compact compare conflict_handler const context copy_function count counts creationflags ctx cum_weights "
 "cwd "
 "days debug default defaults delete deterministic device dict_factory dir_fd dirs_exist_ok dont_inherit doseq dst_dir_fd "
-"effective_ids enable ensure_ascii enter_result env epilog exclusive exist_ok exit_on_error extra extra_groups "
+"effective_ids enable ensure_ascii enter_result env epilog error exclusive exist_ok exit_on_error extra extra_groups "
 "factory fallback family fdel fget file_actions file_encoding fillvalue firstline fix_imports flush fmt "
 "foldspaces follow_symlinks followlinks formatter_class fromfile_prefix_chars fromlist frozen fset "
 "globals group hash help hint host hours "

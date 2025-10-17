@@ -322,7 +322,7 @@ Sci_Position LexLineSkipSpaceTab(LexAccessor &styler, Sci_Line line) noexcept;
 inline Sci_Position LexSkipSpaceTab(LexAccessor &styler, Sci_Position startPos, Sci_Position endPos) noexcept {
 	for (; startPos < endPos; startPos++) {
 		const char ch = styler.SafeGetCharAt(startPos);
-		if (!(ch == ' ' || ch == '\t')) {
+		if (ch != ' ' && ch != '\t') {
 			break;
 		}
 	}

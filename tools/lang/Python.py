@@ -27,8 +27,9 @@ while with
 yield
 
 # soft keywords
-case match
-type
+match match
+case case
+type type
 # https://docs.python.org/2.7/reference/lexical_analysis.html#identifiers
 exec print
 
@@ -821,7 +822,7 @@ unicodedata
 # Binary Data Services
 # https://docs.python.org/3/library/binary.html
 struct
-	exception error(msg)
+	# exception error(msg)
 	pack(format, v1, v2, ...)
 	pack_into(format, buffer, offset, v1, v2, ...)
 	unpack(format, buffer)
@@ -1834,7 +1835,7 @@ sqlite3
 # Generic Operating System Services
 # https://docs.python.org/3/library/allos.html
 os
-	exception error
+	# exception error
 	name
 	# Process Parameters
 	ctermid()
