@@ -374,7 +374,7 @@ Sci_Position CheckBraceFormatSpecifier(const StyleContext &sc, LexAccessor &styl
 }
 
 constexpr bool IsMatchExpressionStart(int ch, int chNext) noexcept {
-	return IsADigit(ch) || (ch == '.' && IsADigit(chNext))
+	return IsNumberStart(ch, chNext)
 		|| (chNext != '=' && AnyOf(ch, '*', '+', '-',  '~', '(', '[', '{'));
 }
 
@@ -480,6 +480,7 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 			if (!IsIdentifierCharEx(sc.ch)) {
 				char s[MaxKeywordSize];
 				sc.GetCurrent(s, sizeof(s));
+				bool builtin = false;
 				if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 					sc.ChangeState(SCE_PY_WORD);
 					if (StrEqual(s, "def")) {
@@ -488,6 +489,7 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 						kwType = KeywordType::Class;
 					} else if (StrEqualsAny(s, "match", "case", "type")) {
 						if (visibleChars != sc.LengthCurrent() || !IsSoftKeyword(s, sc, styler)) {
+							builtin = s[0] == 't';
 							sc.ChangeState(SCE_PY_IDENTIFIER);
 						}
 					}
@@ -508,7 +510,7 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 					if (kwType != KeywordType::None) {
 						sc.ChangeState(static_cast<int>(kwType));
 					} else if (sc.GetLineNextChar() == '(') {
-						sc.ChangeState(SCE_PY_FUNCTION);
+						sc.ChangeState(builtin ? SCE_PY_BUILTIN_FUNCTION : SCE_PY_FUNCTION);
 					}
 				}
 				if (sc.state != SCE_PY_WORD) {
