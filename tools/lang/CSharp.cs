@@ -1,4 +1,4 @@
-// C# 12.0 https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/
+// C# 14.0 https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/
 // https://github.com/dotnet/roslyn/blob/main/docs/Language%20Feature%20Status.md
 // https://wiki.gnome.org/Projects/Vala
 // https://wiki.gnome.org/Projects/Vala/Manual
@@ -25,10 +25,10 @@ virtual volatile
 while
 
 // Contextual keywords
-add and alias args ascending async await
+add allows and alias args ascending async await
 by descending
-equals
-file from
+equals extension
+field file from
 get global group
 init into
 join

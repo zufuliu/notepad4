@@ -44,7 +44,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [AWK](tools/lang/Awk.awk), up to GNU AWK 5.3.
 	* [Batch Script](tools/lang/Batch.bat), [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#batch)
 	* [blockdiag](tools/lang/blockdiag.diag), seqdiag, actdiag and nwdiag
-	* [C#](tools/lang/CSharp.cs), up to C# 12.0. [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#c)
+	* [C#](tools/lang/CSharp.cs), up to C# 14.0. [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#c)
 		* [Vala](https://wiki.gnome.org/Projects/Vala) 0.54
 	* C/C++, [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#cc)
 		* Objective-C/C++, [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#objective-cc)
