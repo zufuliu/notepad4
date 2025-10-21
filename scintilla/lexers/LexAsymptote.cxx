@@ -116,7 +116,7 @@ void ColouriseAsyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 						lineStateLineType = AsymptoteLineStateMaskImport;
 					} else if (StrEqualsAny(s, "new", "struct")) {
 						kwType = KeywordType::Struct;
-					} else if (StrEqual(s, "return")) {
+					} else if (StrEqualsAny(s, "return", "else")) {
 						kwType = KeywordType::Return;
 					}
 				} else if (keywordLists[KeywordIndex_Type].InList(s)) {

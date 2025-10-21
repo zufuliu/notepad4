@@ -10,7 +10,8 @@ static KEYWORDLIST Keywords_HTML = {{
 "i iframe img input ins isindex kbd keygen label legend li link listing "
 "main map mark marquee math menu menuitem meta meter multicol nav nextid nobr noembed noframes noscript "
 "object ol optgroup option output p param picture plaintext pre progress q rb rp rt rtc ruby "
-"s samp script search section select slot small source spacer span strike strong style sub summary sup svg "
+"s samp script search section select selectedcontent slot small source spacer span strike strong style sub summary sup "
+"svg "
 "table tbody td template textarea tfoot th thead time title tr track tt u ul var video wbr xml xmp "
 
 , // 1 void tag

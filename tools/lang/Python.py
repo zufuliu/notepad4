@@ -1,4 +1,4 @@
-# 3.13 https://www.python.org/
+# 3.14 https://www.python.org/
 # https://ironpython.net/
 # https://www.jython.org/
 # https://cython.org/
@@ -27,8 +27,9 @@ while with
 yield
 
 # soft keywords
-case match
-type
+match match
+case case
+type type
 # https://docs.python.org/2.7/reference/lexical_analysis.html#identifiers
 exec print
 
@@ -42,15 +43,15 @@ self
 # https://docs.python.org/3/library/functions.html
 __builtins__
 builtins
-	abs(x)
+	abs(number)
 	aiter(async_iterable)
 	all(iterable)
 	anext(async_iterator)
 	anext(async_iterator, default)
 	any(iterable)
 	ascii(object)
-	bin(x)
-	class bool(x=False)
+	bin(integer)
+	class bool(object=False)
 	breakpoint(*args, **kws)
 	class bytearray(source=b'')
 	class bytearray(source, encoding)
@@ -59,24 +60,26 @@ builtins
 	class bytes(source, encoding)
 	class bytes(source, encoding, errors):
 	callable(object)
-	chr(i)
+	chr(codepoint)
 	@classmethod
 	classmethod()
 	compile(source, filename, mode, flags=0, dont_inherit=False, optimize=-1)
+	class complex(number=0)
 	class complex(real=0, imag=0)
 	class complex(string)
 	delattr(object, name)
-	class dict(**kwarg)
-	class dict(mapping, **kwarg)
-	class dict(iterable, **kwarg):
+	class dict(**kwargs)
+	class dict(mapping, **kwargs)
+	class dict(iterable, **kwargs):
 	dir()
 	dir(object)
 	divmod(a, b)
 	enumerate(iterable, start=0)
 	eval(expression, globals=None, locals=None)
-	exec(object, globals=None, locals=None, /, *, closure=None)
+	exec(source, globals=None, locals=None, /, *, closure=None)
 	filter(function, iterable)
-	class float(x=0.0)
+	class float(number=0.0)
+	class float(string)
 	format(value, format_spec='')
 	class frozenset(iterable=set())
 	getattr(object, name)
@@ -86,21 +89,20 @@ builtins
 	hash(object)
 	help()
 	help(request)
-	hex(x)
+	hex(integer)
 	id(object)
 	input()
 	input(prompt)
-	class int(x=0)
-	class int(x, base=10)
+	class int(number=0)
+	class int(string, base=10)
 	isinstance(object, classinfo)
 	issubclass(class, classinfo)
 	iter(object)
 	iter(object, sentinel)
-	len(s)
-	class list
+	len(object)
 	class list(iterable)
 	locals()
-	map(function, iterable, *iterables)
+	map(function, iterable, *iterables, strict=False)
 	max(iterable, *, key=None)
 	max(iterable, *, default, key=None)
 	max(arg1, arg2, *args, key=None)
@@ -111,9 +113,9 @@ builtins
 	next(iterator)
 	next(iterator, default)
 	class object
-	oct(x)
+	oct(integer)
 	open(file, mode='r', buffering=- 1, encoding=None, errors=None, newline=None, closefd=True, opener=None)
-	ord(c)
+	ord(character)
 	pow(base, exp, mod=None)
 	print(*objects, sep=' ', end='\n', file=None, flush=False)
 	class property(fget=None, fset=None, fdel=None, doc=None)
@@ -121,9 +123,8 @@ builtins
 	class range(stop)
 	class range(start, stop, step=1)
 	repr(object)
-	reversed(seq)
+	reversed(object)
 	round(number, ndigits=None)
-	class set
 	class set(iterable):
 	setattr(object, name, value)
 	class slice(stop)
@@ -132,11 +133,10 @@ builtins
 	@staticmethod
 	staticmethod(function)
 	class str(object='')
-	class str(object=b'', encoding='utf-8', errors='strict'):
+	class str(object, encoding='utf-8', errors='strict'):
 	sum(iterable, /, start=0)
 	class super
 	class super(type, object_or_type=None)
-	class tuple
 	class tuple(iterable)
 	class type(object)
 	class type(name, bases, dict, **kwds)
@@ -190,6 +190,7 @@ __defaults__
 __code__
 __dict__
 __annotations__
+__annotate__
 __kwdefaults__
 __type_params__
 
@@ -203,13 +204,11 @@ __module__
 # https://docs.python.org/3/reference/datamodel.html#modules
 __name__
 __spec__
-__package__
-__loader__
 __path__
 __file__
-__cached__
 __doc__
 __annotations__
+__annotate__
 __dict__
 
 # Custom classes
@@ -221,6 +220,7 @@ __dict__
 __bases__
 __doc__
 __annotations__
+__annotate__()
 __type_params__
 __static_attributes__
 __firstlineno__
@@ -353,6 +353,9 @@ object:
 	# Emulating buffer types
 	__buffer__(self, flags)
 	__release_buffer__(self, buffer)
+	# Annotations
+	__annotations__
+	__annotate__(format)
 	# Coroutines
 	__await__(self)
 	# Asynchronous Iterators
@@ -464,10 +467,13 @@ int:
 	as_integer_ratio()
 	is_integer()
 float:
+	from_number(x)
 	as_integer_ratio()
 	is_integer()
 	hex()
 	fromhex(s)
+complex:
+	from_number(x)
 list:
 	min(s)
 	max(s)
@@ -711,6 +717,18 @@ string
 		get_identifiers()
 		template
 	capwords(s, sep=None)
+string.templatelib
+	class Template(*args: str | Interpolation):
+		strings
+		interpolations
+		values
+		iter(template)
+	class Interpolation(value, expression, conversion = None, format_spec = ''):
+		value
+		expression
+		conversion
+		format_spec
+	convert(obj, /, conversion)
 re
 	class RegexFlag
 	ASCII
@@ -804,7 +822,7 @@ unicodedata
 # Binary Data Services
 # https://docs.python.org/3/library/binary.html
 struct
-	exception error(msg)
+	# exception error(msg)
 	pack(format, v1, v2, ...)
 	pack_into(format, buffer, offset, v1, v2, ...)
 	unpack(format, buffer)
@@ -832,7 +850,6 @@ codecs
 	getwriter(encoding)
 	register(search_function)
 	unregister(search_function)
-	open(filename, mode='r', encoding=None, errors='strict', buffering=- 1)
 	EncodedFile(file, data_encoding, file_encoding=None, errors='strict')
 	iterencode(iterator, encoding, errors='strict', **kwargs)
 	iterdecode(iterator, encoding, errors='strict', **kwargs)
@@ -906,6 +923,7 @@ datetime
 		isoweekday()
 		isocalendar()
 		isoformat()
+		strptime(date_string, format)
 		ctime()
 		strftime(format)
 		__format__(format)
@@ -959,6 +977,7 @@ datetime
 		tzinfo
 		fold
 		fromisoformat(time_string)
+		strptime(date_string, format)
 		replace(hour=self.hour, minute=self.minute, second=self.second, microsecond=self.microsecond, tzinfo=self.tzinfo, *, fold=0)
 		isoformat(timespec='auto')
 		strftime(format)
@@ -1047,7 +1066,6 @@ collections.abc
 		close()
 	class Sequence
 	class MutableSequence
-	class ByteString
 	class Set
 	class MutableSet
 	class Mapping
@@ -1082,6 +1100,11 @@ heapq
 	heappushpop(heap, item)
 	heapify(x)
 	heapreplace(heap, item)
+	heapify_max(x)
+	heappush_max(heap, item)
+	heappop_max(heap)
+	heappushpop_max(heap, item)
+	heapreplace_max(heap, item)
 	merge(*iterables, key=None, reverse=False)
 	nlargest(n, iterable, key=None)
 	nsmallest(n, iterable, key=None)
@@ -1274,6 +1297,7 @@ decimal
 		copy_sign(other, context=None)
 		exp(context=None)
 		from_float(f)
+		from_number(number, /)
 		fma(other, third, context=None)
 		is_canonical()
 		is_finite()
@@ -1316,6 +1340,7 @@ decimal
 	getcontext()
 	setcontext(c)
 	localcontext(ctx=None)
+	class IEEEContext(bits)
 	class BasicContext
 	class ExtendedContext
 	class DefaultContext
@@ -1427,6 +1452,7 @@ fractions
 		is_integer()
 		from_float(flt)
 		from_decimal(dec)
+		from_number(number)
 		limit_denominator(max_denominator=1000000)
 		__floor__()
 		__ceil__()
@@ -1532,7 +1558,7 @@ functools
 	@total_ordering
 	partial(func, /, *args, **keywords)
 	class partialmethod(func, /, *args, **keywords)
-	reduce(function, iterable[, initializer])
+	reduce(function, iterable, /[, initial])
 	@singledispatch
 	class singledispatchmethod(func)
 	update_wrapper(wrapper, wrapped, assigned=WRAPPER_ASSIGNMENTS, updated=WRAPPER_UPDATES)
@@ -1570,7 +1596,6 @@ pathlib
 	class PureWindowsPath(*pathsegments)
 	class Path(*pathsegments):
 		from_uri(uri)
-		as_uri()
 
 		home()
 		expanduser()
@@ -1592,6 +1617,7 @@ pathlib
 		is_block_device()
 		is_char_device()
 		samefile(other_path)
+		info
 
 		open(mode='r', buffering=- 1, encoding=None, errors=None, newline=None)
 		read_text(encoding=None, errors=None)
@@ -1609,8 +1635,12 @@ pathlib
 		symlink_to(target, target_is_directory=False)
 		hardlink_to(target)
 
+		copy(target, *, follow_symlinks=True, preserve_metadata=False)
+		copy_into(target_dir, *, follow_symlinks=True, preserve_metadata=False)
 		rename(target)
 		replace(target)
+		move(target)
+		move_into(target_dir)
 		unlink(missing_ok=False)
 		rmdir()
 
@@ -1620,6 +1650,12 @@ pathlib
 		lchmod(mode)
 	class PosixPath(*pathsegments)
 	class WindowsPath(*pathsegments)
+pathlib.types
+	class PathInfo:
+		exists(*, follow_symlinks=True)
+		is_dir(*, follow_symlinks=True)
+		is_file(*, follow_symlinks=True)
+		is_symlink()
 os.path
 	abspath(path)
 	basename(path)
@@ -1644,6 +1680,7 @@ os.path
 	join(path, *paths)
 	normcase(path)
 	normpath(path)
+	ALLOW_MISSING
 	realpath(path, *, strict=False)
 	relpath(path, start=os.curdir)
 	samefile(path1, path2)
@@ -1663,6 +1700,7 @@ fnmatch
 	fnmatch(filename, pattern)
 	fnmatchcase(filename, pattern)
 	filter(names, pattern)
+	filterfalse(names, pat)
 	translate(pattern)
 shutil
 	copyfileobj(fsrc, fdst[, length])
@@ -1674,7 +1712,7 @@ shutil
 	copy2(src, dst, *, follow_symlinks=True)
 	ignore_patterns(*patterns)
 	copytree(src, dst, symlinks=False, ignore=None, copy_function=copy2, ignore_dangling_symlinks=False, dirs_exist_ok=False)
-	rmtree(path, ignore_errors=False, onerror=None)
+	rmtree(path, ignore_errors=False, onexc=None)
 	avoids_symlink_attacks
 	move(src, dst, copy_function=copy2)
 	disk_usage(path)
@@ -1797,12 +1835,13 @@ sqlite3
 # Generic Operating System Services
 # https://docs.python.org/3/library/allos.html
 os
-	exception error
+	# exception error
 	name
 	# Process Parameters
 	ctermid()
 	environ
 	environb
+	reload_environ()
 	chdir(path)
 	fchdir(fd)
 	getcwd()
@@ -1948,6 +1987,7 @@ os
 	RWF_SYNC
 	RWF_APPEND
 	read(fd, n)
+	readinto(fd, buffer, /)
 	sendfile(out_fd, in_fd, offset, count)
 	sendfile(out_fd, in_fd, offset, count, headers=(), trailers=(), flags=0)
 	set_blocking(fd, blocking)
@@ -2136,21 +2176,12 @@ os
 	nice(increment)
 	pidfd_open(pid, flags=0)
 	plock(op)
-	popen(cmd, mode='r', buffering=- 1)
 	posix_spawn(path, argv, env, *, file_actions=None, setpgroup=None, resetids=False, setsid=False, setsigmask=(), setsigdef=(), scheduler=None)
 	POSIX_SPAWN_OPEN
 	POSIX_SPAWN_CLOSE
 	POSIX_SPAWN_DUP2
 	posix_spawnp(path, argv, env, *, file_actions=None, setpgroup=None, resetids=False, setsid=False, setsigmask=(), setsigdef=(), scheduler=None)
 	register_at_fork(*, before=None, after_in_parent=None, after_in_child=None)
-	spawnl(mode, path, ...)
-	spawnle(mode, path, ..., env)
-	spawnlp(mode, file, ...)
-	spawnlpe(mode, file, ..., env)
-	spawnv(mode, path, args)
-	spawnve(mode, path, args, env)
-	spawnvp(mode, file, args)
-	spawnvpe(mode, file, args, env)
 	P_NOWAIT
 	P_NOWAITO
 	P_WAIT
@@ -2197,7 +2228,9 @@ os
 	# Interface to the scheduler
 	SCHED_OTHER
 	SCHED_BATCH
+	SCHED_DEADLINE
 	SCHED_IDLE
+	SCHED_NORMAL
 	SCHED_SPORADIC
 	SCHED_FIFO
 	SCHED_RR
@@ -2368,7 +2401,7 @@ time
 	timezone
 	tzname
 argparse:
-	class ArgumentParser(prog=None, usage=None, description=None, epilog=None, parents=[], formatter_class=argparse.HelpFormatter, prefix_chars='-', fromfile_prefix_chars=None, argument_default=None, conflict_handler='error', add_help=True, allow_abbrev=True, exit_on_error=True):
+	class ArgumentParser(prog=None, usage=None, description=None, epilog=None, parents=[], formatter_class=argparse.HelpFormatter, prefix_chars='-', fromfile_prefix_chars=None, argument_default=None, conflict_handler='error', add_help=True, allow_abbrev=True, exit_on_error=True, suggest_on_error=False, color=True):
 		add_argument(name or flags...[, action][, nargs][, const][, default][, type][, choices][, required][, help][, metavar][, dest])
 		parse_args(args=None, namespace=None)
 		add_subparsers([title][, description][, prog][, parser_class][, action][, option_string][, dest][, required][, help][, metavar])
@@ -2387,7 +2420,6 @@ argparse:
 		parse_intermixed_args(args=None, namespace=None)
 		parse_known_intermixed_args(args=None, namespace=None)
 	class Action(option_strings, dest, nargs=None, const=None, default=None, type=None, choices=None, required=False, help=None, metavar=None)
-	class FileType(mode='r', bufsize=- 1, encoding=None, errors=None)
 logging
 	class Logger:
 		propagate
@@ -2783,6 +2815,9 @@ uuid
 	uuid3(namespace, name)
 	uuid4()
 	uuid5(namespace, name)
+	uuid6(node=None, clock_seq=None)
+	uuid7()
+	uuid8(a=None, b=None, c=None)
 	NAMESPACE_DNS
 	NAMESPACE_URL
 	NAMESPACE_OID
@@ -2876,6 +2911,7 @@ sys
 	activate_stack_trampoline(backend, /)
 	deactivate_stack_trampoline()
 	is_stack_trampoline_active()
+	remote_exec(pid, script)
 	stdin
 	stdout
 	stderr
@@ -2905,7 +2941,7 @@ warnings
 	class catch_warnings(*, record=False, module=None, action=None, category=Warning, lineno=0, append=False)
 dataclasses
 	@dataclass(*, init=True, repr=True, eq=True, order=False, unsafe_hash=False, frozen=False, match_args=True, kw_only=False, slots=False, weakref_slot=False)
-	field(*, default=MISSING, default_factory=MISSING, init=True, repr=True, hash=None, compare=True, metadata=None, kw_only=MISSING)
+	field(*, default=MISSING, default_factory=MISSING, init=True, repr=True, hash=None, compare=True, metadata=None, kw_only=MISSING, doc=None)
 	class Field
 	fields(class_or_instance)
 	asdict(instance, *, dict_factory=dict)

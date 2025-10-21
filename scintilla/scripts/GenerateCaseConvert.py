@@ -25,9 +25,6 @@ from FileGenerator import Regenerate
 from MultiStageTable import *
 from UnicodeData import *
 
-def isCaseSensitive(ch):
-	return ch != ch.upper() or ch != ch.lower() or ch != ch.casefold()
-
 def contiguousRanges(ll, diff):
 	# ll is s list of lists
 	# group into lists where first element of each element differs by diff
@@ -49,9 +46,7 @@ def conversionSets():
 	complexes = []
 	symmetrics = []
 	for ch in range(UnicodeCharacterCount):
-		if 0xd800 <= ch <= 0xDBFF:
-			continue
-		if 0xdc00 <= ch <= 0xDFFF:
+		if isSurrogate(ch):
 			continue
 		uch = chr(ch)
 
@@ -133,6 +128,22 @@ def updateCaseConvert():
 	print(len(complexLines), "complex")
 
 	Regenerate("../src/CaseConvert.cxx", "//", rangeLines, nonRangeLines, complexLines)
+
+
+def getCaseSensitiveCharacterSet():
+	sensitive = []
+	for ch in range(UnicodeCharacterCount):
+		if isSurrogate(ch):
+			continue
+		uch = chr(ch)
+		fold = uch.casefold()
+		upper = uch.upper()
+		lower = uch.lower()
+		if uch != fold or uch != upper or uch != lower:
+			sensitive.extend((uch, fold, upper, lower))
+
+	result = sorted(set(''.join(sensitive)))
+	return result
 
 def getUnicodeCaseSensitivityGroup(caseList):
 	ranges = []
@@ -226,11 +237,11 @@ def checkUnicodeCaseSensitivity(filename=None):
 	caseList = []
 	caseTable = ['0']*UnicodeCharacterCount
 
-	for ch in range(UnicodeCharacterCount):
-		uch = chr(ch)
-		if isCaseSensitive(uch):
-			caseList.append((ch, hex(ch), uch, getCharacterName(uch)))
-			caseTable[ch] = '1'
+	sensitive = getCaseSensitiveCharacterSet()
+	for uch in sensitive:
+		ch = ord(uch)
+		caseList.append((ch, hex(ch), uch, getCharacterName(uch)))
+		caseTable[ch] = '1'
 
 	print(len(caseList), caseList[-1])
 	groups = getUnicodeCaseSensitivityGroup(caseList)
@@ -320,13 +331,13 @@ def updateCaseSensitivity(filename, test=False):
 	caseTable = ['0']*UnicodeCharacterCount
 	maskTable = [0] * (UnicodeCharacterCount >> 5)
 	first = 0x600
-	maxCh = 0
 
-	for ch in range(UnicodeCharacterCount):
-		if isCaseSensitive(chr(ch)):
-			maxCh = ch
-			caseTable[ch] = '1'
-			maskTable[ch >> 5] |= (1 << (ch & 31))
+	sensitive = getCaseSensitiveCharacterSet()
+	maxCh = ord(sensitive[-1])
+	for uch in sensitive:
+		ch = ord(uch)
+		caseTable[ch] = '1'
+		maskTable[ch >> 5] |= (1 << (ch & 31))
 
 	maskCount = 1 + (maxCh >> 5)
 	maskList = maskTable[:(first >> 5)]
@@ -399,16 +410,16 @@ def updateCaseSensitivityBlock(filename, test=False):
 	caseTable = ['0']*UnicodeCharacterCount
 	maskTable = [0] * (UnicodeCharacterCount >> 5)
 	first = 0x600
-	maxCh = 0
 
-	for ch in range(UnicodeCharacterCount):
-		if isCaseSensitive(chr(ch)):
-			maxCh = ch
-			caseTable[ch] = '1'
-			maskTable[ch >> 5] |= (1 << (ch & 31))
+	sensitive = getCaseSensitiveCharacterSet()
+	maxCh = ord(sensitive[-1])
+	for uch in sensitive:
+		ch = ord(uch)
+		caseTable[ch] = '1'
+		maskTable[ch >> 5] |= (1 << (ch & 31))
 
 	# divide characters into blocks, filter out blocks with all character not case sensitive.
-	blockSizeBit = 2
+	blockSizeBit = 3
 	blockSize = 1 << blockSizeBit
 	firstCount = first >> 5
 	maskCount = 1 + (maxCh >> 5)
@@ -440,10 +451,11 @@ def updateCaseSensitivityBlock(filename, test=False):
 		blockId = i // blockSize
 		blockSlot = blockId & (blockIndexCount - 1)
 		if blockData[blockSlot][1]:
-			print('multi block', blockId, blockSlot, blockData[blockSlot], index)
+			overlapped = True
+			print('Unicode Case Sensitivity multi block', blockId, blockSlot, blockData[blockSlot], index)
 		if index > maxIndex:
 			overlapped = True
-			print('overlapped block', blockId, blockSlot, index)
+			print('Unicode Case Sensitivity overlapped block', blockId, blockSlot, index)
 
 		blockId = blockId >> blockIndexValueBit
 		blockData[blockSlot] = (blockId, index)
@@ -468,7 +480,7 @@ def updateCaseSensitivityBlock(filename, test=False):
 			indexTable.append(index)
 
 	size = len(blockIndex) + len(indexTable) + len(maskList)*4
-	print('caseBlock', blockSize, len(maskList), len(blockIndex), len(indexTable), size)
+	print('Unicode Case Sensitivity caseBlock', blockSize, len(maskList), len(blockIndex), len(indexTable), size)
 
 	output = [f"// Created with Python {platform.python_version()}, Unicode {unicodedata.unidata_version}"]
 	output.append(f'#define kUnicodeCaseSensitiveFirst\t0x{first:04x}U')

@@ -272,7 +272,7 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 							kwType = KeywordType::Record;
 						} else if (StrEqualsAny(s, "break", "continue")) {
 							kwType = KeywordType::Label;
-						} else if (StrEqualsAny(s, "return", "yield")) {
+						} else if (StrEqualsAny(s, "return", "yield", "else")) {
 							kwType = KeywordType::Return;
 						} else if (StrEqualsAny(s, "if", "while")) {
 							// to avoid treating following code as type cast:

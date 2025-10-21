@@ -51,7 +51,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* [C Standard Library](tools/lang/C.c), up to C23.
 		* [C++ STL](tools/lang/CPP.cpp), up to C++23.
 	* [Cangjie (仓颉)](tools/lang/Cangjie.cj), up to October 2024.
-	* [CSS Style Sheet](tools/lang/CSS.css), up to July 2025.
+	* [CSS Style Sheet](tools/lang/CSS.css), up to September 2025.
 		* [SCSS Style Sheet](tools/lang/SCSS.scss), up to Dart Sass 1.50.
 		* [Less Style Sheet](tools/lang/Less.less), up to Less 4.1.
 		* [HSS Style Sheet](tools/lang/HSS.hss)
@@ -74,7 +74,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [Groovy](tools/lang/Groovy.groovy), up to Groovy 5.0.
 	* [Haskell](tools/lang/Haskell.hs), up to GHC 9.6.
 	* [Haxe](tools/lang/Haxe.hx), up to Haxe 4.3.
-	* [HTML](tools/lang/html.html), up to [WHATWG](https://html.spec.whatwg.org/multipage/) May 2025. [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#html)
+	* [HTML](tools/lang/html.html), up to [WHATWG](https://html.spec.whatwg.org/multipage/) September 2025. [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#html)
 		* ASP
 		* ASP.NET
 		* JSP
@@ -113,7 +113,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* Pascal, Delphi
 	* [Perl](tools/lang/Perl.pl), up to Perl 5.36. [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#perl)
 	* [PowerShell](tools/lang/PowerShell.ps1), up to PowerShell 7.2.
-	* [Python](tools/lang/Python.py), up to Python 3.13. [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#python)
+	* [Python](tools/lang/Python.py), up to Python 3.14. [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#python)
 	* [PHP Script](tools/lang/PHP.php), up to PHP 8.4. [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#php)
 	* Windows Rescouce Script
 	* [R](tools/lang/R.r), up to R 4.2.

@@ -370,7 +370,7 @@ inline Sci_Position SciCall_GetSelBytes(char *buffer) noexcept {
 	return SciCall(SCI_GETSELTEXT, TRUE, AsInteger<LPARAM>(buffer));
 }
 
-inline bool SciCall_IsRectangleSelection() noexcept {
+inline bool SciCall_IsRectangularSelection() noexcept {
 	return static_cast<bool>(SciCall(SCI_SELECTIONISRECTANGLE, 0, 0));
 }
 

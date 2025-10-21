@@ -263,7 +263,7 @@ def parse_actionscript_api_file(path):
 	for key, doc in sections:
 		if key in ('keywords', 'types', 'directive'):
 			keywordMap[key] = doc.split()
-		if key == 'class':
+		elif key == 'class':
 			items = re.findall(r'class\s+(\w+)', doc)
 			keywordMap[key] = items
 		elif key == 'functions':

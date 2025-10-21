@@ -456,17 +456,17 @@ void FoldYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle
 	}
 
 	while (lineCurrent <= maxLines) {
-		Sci_Position lineNext = lineCurrent + 1;
+		Sci_Line lineNext = lineCurrent + 1;
 		FoldLineState stateNext = stateCurrent;
-		if (lineNext <= docLines) {
+		while (lineNext <= docLines) {
 			stateNext = FoldLineState(styler.GetLineState(lineNext));
+			if (!stateNext.Empty()) {
+				break;
+			}
+			lineNext++;
 		}
 		if (stateNext.Empty()) {
 			stateNext.indentCount = stateCurrent.indentCount;
-		}
-		while ((lineNext < docLines) && stateNext.Empty()) {
-			lineNext++;
-			stateNext = FoldLineState(styler.GetLineState(lineNext));
 		}
 
 		int lev = stateCurrent.indentCount + SC_FOLDLEVELBASE;

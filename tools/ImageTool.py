@@ -264,6 +264,7 @@ def make_notepad4_toolbar_bitmap(size):
 		f'{images}/ToggleFolds.png',	# IDT_VIEW_TOGGLEFOLDS
 		f'{images}/Launch.png',			# IDT_FILE_LAUNCH
 		f'{images}/AlwaysOnTop.png',	# IDT_VIEW_ALWAYSONTOP
+		f'{images}/NewWindow.png',		# IDT_FILE_NEWWINDOW
 	], f'Toolbar{size}.bmp')
 
 def make_all_notepad4_toolbar_bitmap():

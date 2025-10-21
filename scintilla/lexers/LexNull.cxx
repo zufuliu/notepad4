@@ -61,7 +61,7 @@ void FoldNullDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle
 	while (lineCurrent > 0) {
 		lineCurrent--;
 		indentCurrent = styler.IndentAmount(lineCurrent);
-		if (!(indentCurrent & SC_FOLDLEVELWHITEFLAG)){
+		if (!(indentCurrent & SC_FOLDLEVELWHITEFLAG)) {
 			break;
 		}
 	}
@@ -73,15 +73,14 @@ void FoldNullDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle
 		// Gather info
 		Sci_Line lineNext = lineCurrent + 1;
 		int indentNext = indentCurrent;
-		if (lineNext <= docLines) {
+		while (lineNext <= docLines) {
 			// Information about next line is only available if not at end of document
 			indentNext = styler.IndentAmount(lineNext);
-		}
-
-		// Skip past any blank lines for next indent level info
-		while ((lineNext < docLines) && (indentNext & SC_FOLDLEVELWHITEFLAG)) {
+			// Skip past any blank lines for next indent level info
+			if (!(indentNext & SC_FOLDLEVELWHITEFLAG)) {
+				break;
+			}
 			lineNext++;
-			indentNext = styler.IndentAmount(lineNext);
 		}
 
 		// Set fold header

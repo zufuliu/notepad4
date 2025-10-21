@@ -125,6 +125,7 @@ def testGraphemeBreak(path, graphemeBreakTable):
 	allow = opportunity[1]
 	total = 0
 	fail = [0, 0]
+	failStat = {}
 	ignore = 0
 	with open(path, encoding='utf-8') as fd:
 		lineno = 0
@@ -153,9 +154,17 @@ def testGraphemeBreak(path, graphemeBreakTable):
 				total += 1
 				if value != official:
 					fail[result ^ 1] += 1
-					print(f'test fail on line {lineno}: {ch} {official} {chNext} => {prop.name} {value} {propNext.name}')
+					key = f'{prop.name} {value} {propNext.name}'
+					print(f'test fail on line {lineno}: {ch} {official} {chNext} => {key}')
 					print(f'{indent}{line}')
-	print(f'{path} total test: {total}, failed {sum(fail)}: {opportunity[0]} {fail[0]}, {opportunity[1]} {fail[1]}, ignored: {ignore}')
+					if key in failStat:
+						failStat[key] += 1
+					else:
+						failStat[key] = 1
+
+	lines = [f'{key}: {value}' for key, value in sorted(failStat.items())]
+	print('\n'.join(lines))
+	print(f'{path} total test: {total}, failed {sum(fail)}: {opportunity[0]} {fail[0]}, {opportunity[1]} {fail[1]}, ignored: {ignore}', file=sys.stderr)
 
 def updateGraphemeBreakTable(headerFile, sourceFile):
 	defaultValue = int(GraphemeBreakProperty.Other)

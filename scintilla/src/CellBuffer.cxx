@@ -1272,7 +1272,7 @@ void CellBuffer::BasicDeleteChars(const Sci::Position position, const Sci::Posit
 		const Sci::Line linePosition = plv->LineFromPosition(position);
 		Sci::Line lineRemove = linePosition + 1;
 
-		plv->InsertText(lineRemove - 1, -(deleteLength));
+		plv->InsertText(lineRemove - 1, -deleteLength);
 		const unsigned char chPrev = substance.ValueAt(position - 1);
 		const unsigned char chBefore = chPrev;
 		unsigned char chNext = substance.ValueAt(position);

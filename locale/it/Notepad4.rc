@@ -113,6 +113,7 @@ BEGIN
 	POPUP "&File"
 	BEGIN
 		MENUITEM "&Nuovo\tCtrl+N",					IDM_FILE_NEW
+		MENUITEM "Nuo&va finestra\tAlt+N",				IDM_FILE_NEWWINDOW
 		MENUITEM "&Apri...\tCtrl+O",				IDM_FILE_OPEN
 		MENUITEM "&Salva\tCtrl+S",					IDM_FILE_SAVE
 		MENUITEM "Salva &come...\tF6",					IDM_FILE_SAVEAS
@@ -582,7 +583,7 @@ BEGIN
 			MENUITEM "Abilita selezione &multipla",		IDM_SET_MULTIPLE_SELECTION
 			MENUITEM "Copia &selezione come testo trovato",	IDM_SET_SELECTIONASFINDTEXT
 			MENUITEM "Co&pia e incolla il buffer come testo trovato",	IDM_SET_PASTEBUFFERASFINDTEXT
-			MENUITEM "Undo Redo &Remember Selection",	IDM_SET_UNDO_REDO_SELECTION
+			MENUITEM "Annulla Ripristina &Ricorda Selezione",	IDM_SET_UNDO_REDO_SELECTION
 			POPUP "M&odalità selezione linea"
 			BEGIN
 				MENUITEM "&Nessuna",						IDM_LINE_SELECTION_MODE_NONE
@@ -712,8 +713,7 @@ BEGIN
 		MENUITEM SEPARATOR
 		MENUITEM "Apri come &Amministratore",		IDM_FILE_RELAUNCH_ELEVATED
 		MENUITEM "&Riavvia",					IDM_FILE_RESTART
-		MENUITEM "&Nuova finestra\tAlt+N",			IDM_FILE_NEWWINDOW
-		MENUITEM "Fin&estra vuota\tAlt+0",		IDM_FILE_NEWWINDOW2
+		MENUITEM "Apri &in nuova finestra\tAlt+0",		IDM_FILE_NEWWINDOW2
 		MENUITEM SEPARATOR
 		MENUITEM "Esegui &documento\tCtrl+L",	IDM_FILE_LAUNCH
 		MENUITEM "A&pri con...",				IDM_FILE_OPENWITH
@@ -1840,6 +1840,7 @@ BEGIN
     IDT_VIEW_TOGGLEFOLDS    "Chiudi Folds"
     IDT_FILE_LAUNCH         "Esegui documento"
     IDT_VIEW_ALWAYSONTOP    "Sempre in cima"
+    IDT_FILE_NEWWINDOW      "Nuova finestra"
 END
 
 STRINGTABLE
@@ -2159,4 +2160,6 @@ END
 #include "../../src/Notepad4.ver"
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
+
+
 

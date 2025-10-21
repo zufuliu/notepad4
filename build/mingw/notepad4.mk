@@ -1,7 +1,7 @@
 # Makefile for notepad4
 
 PROJ = Notepad4
-NAME = $(PROJ).exe
+NAME = $(BINFOLDER)/$(PROJ).exe
 OBJDIR = $(BINFOLDER)/obj/$(PROJ)
 SRCDIR = ../../src
 editlexers_dir = $(SRCDIR)/EditLexers
@@ -19,8 +19,8 @@ LDLIBS += -limm32
 editlexers_src = $(wildcard $(editlexers_dir)/*.cpp)
 editlexers_obj = $(patsubst $(editlexers_dir)/%.cpp,$(OBJDIR)/%.obj,$(editlexers_src))
 
-c_src = $(wildcard $(SRCDIR)/*.c)
-c_obj = $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.obj,$(c_src))
+# c_src = $(wildcard $(SRCDIR)/*.c)
+# c_obj = $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.obj,$(c_src))
 
 cpp_src = $(wildcard $(SRCDIR)/*.cpp)
 cpp_obj = $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.obj,$(cpp_src))
@@ -28,19 +28,16 @@ cpp_obj = $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.obj,$(cpp_src))
 rc_src = $(wildcard $(SRCDIR)/*.rc)
 rc_obj = $(patsubst $(SRCDIR)/%.rc,$(OBJDIR)/%.res,$(rc_src))
 
-all: $(OBJDIR) $(NAME)
+all: $(NAME)
 
-$(OBJDIR):
-	@mkdir -p $(OBJDIR)
-
-$(NAME): $(editlexers_obj) $(c_obj) $(cpp_obj) $(rc_obj)
-	$(CXX) $^ $(LDFLAGS) -lscintilla $(LDLIBS) -o $(BINFOLDER)/$@
+$(NAME): $(editlexers_obj) $(cpp_obj) $(rc_obj)
+	$(CXX) $^ $(LDFLAGS) -lscintilla $(LDLIBS) -o $@
 
 $(editlexers_obj): $(OBJDIR)/%.obj: $(editlexers_dir)/%.cpp
 	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCDIR) $< -o $(OBJDIR)/$*.obj
 
-$(c_obj): $(OBJDIR)/%.obj: $(SRCDIR)/%.c
-	$(CC) -c $(CPPFLAGS) $(CFLAGS) $(INCDIR) $< -o $(OBJDIR)/$*.obj
+# $(c_obj): $(OBJDIR)/%.obj: $(SRCDIR)/%.c
+# 	$(CC) -c $(CPPFLAGS) $(CFLAGS) $(INCDIR) $< -o $(OBJDIR)/$*.obj
 
 $(cpp_obj): $(OBJDIR)/%.obj: $(SRCDIR)/%.cpp
 	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCDIR) $< -o $(OBJDIR)/$*.obj
@@ -50,4 +47,4 @@ $(rc_obj): $(OBJDIR)/%.res: $(SRCDIR)/%.rc
 
 clean:
 	@$(RM) -rf $(OBJDIR)
-	@$(RM) -f $(BINFOLDER)/$(NAME)
+	@$(RM) -f $(NAME)

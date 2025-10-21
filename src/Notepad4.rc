@@ -113,6 +113,7 @@ BEGIN
 	POPUP "&File"
 	BEGIN
 		MENUITEM "&New\tCtrl+N",					IDM_FILE_NEW
+		MENUITEM "New &Window\tAlt+N",				IDM_FILE_NEWWINDOW
 		MENUITEM "&Open...\tCtrl+O",				IDM_FILE_OPEN
 		MENUITEM "&Save\tCtrl+S",					IDM_FILE_SAVE
 		MENUITEM "Save &As...\tF6",					IDM_FILE_SAVEAS
@@ -712,8 +713,7 @@ BEGIN
 		MENUITEM SEPARATOR
 		MENUITEM "Run as &Administrator",			IDM_FILE_RELAUNCH_ELEVATED
 		MENUITEM "&Restart",						IDM_FILE_RESTART
-		MENUITEM "Launch &New Window\tAlt+N",		IDM_FILE_NEWWINDOW
-		MENUITEM "Launch &Empty Window\tAlt+0",		IDM_FILE_NEWWINDOW2
+		MENUITEM "Open &in New Window\tAlt+0",		IDM_FILE_NEWWINDOW2
 		MENUITEM SEPARATOR
 		MENUITEM "Execute &Document\tCtrl+L",		IDM_FILE_LAUNCH
 		MENUITEM "Open Document &With...",			IDM_FILE_OPENWITH
@@ -1840,6 +1840,7 @@ BEGIN
     IDT_VIEW_TOGGLEFOLDS    "Toggle Folds"
     IDT_FILE_LAUNCH         "Execute Document"
     IDT_VIEW_ALWAYSONTOP    "Always On Top"
+    IDT_FILE_NEWWINDOW      "New Window"
 END
 
 STRINGTABLE

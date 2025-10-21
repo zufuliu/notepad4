@@ -332,7 +332,7 @@ void LineMarker::Draw(Surface *surface, PRectangle rcWhole, const Font *fontForC
 		return;
 	}
 
-	if ((markType >= MarkerSymbol::VLine) && markType <= (MarkerSymbol::CircleMinusConnected)) {
+	if (markType >= MarkerSymbol::VLine && markType <= MarkerSymbol::CircleMinusConnected) {
 		DrawFoldingMark(surface, rcWhole, part);
 		return;
 	}

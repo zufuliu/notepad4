@@ -7,11 +7,13 @@ import datetime
 toolset_msvc = """
     <PlatformToolset Condition="'$(VisualStudioVersion)'=='16.0'">v142</PlatformToolset>
     <PlatformToolset Condition="'$(VisualStudioVersion)'=='17.0'">v143</PlatformToolset>
+    <PlatformToolset Condition="'$(VisualStudioVersion)'=='18.0'">v145</PlatformToolset>
 """.strip('\r\n').splitlines()
 
 toolset_llvm = """
     <PlatformToolset Condition="'$(VisualStudioVersion)'=='16.0'">LLVM_v142</PlatformToolset>
     <PlatformToolset Condition="'$(VisualStudioVersion)'=='17.0'">LLVM_v143</PlatformToolset>
+    <PlatformToolset Condition="'$(VisualStudioVersion)'=='18.0'">LLVM_v145</PlatformToolset>
 """.strip('\r\n').splitlines()
 
 def update_project_toolset(projectPath):

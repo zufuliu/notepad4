@@ -1,14 +1,14 @@
 # Makefile for matepath
 
 PROJ = matepath
-NAME = $(PROJ).exe
+NAME = $(BINFOLDER)/$(PROJ).exe
 OBJDIR = $(BINFOLDER)/obj/$(PROJ)
 SRCDIR = ../../$(PROJ)/src
 # for Win32 XP build
 LDLIBS += -lpsapi
 
-c_src = $(wildcard $(SRCDIR)/*.c)
-c_obj = $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.obj,$(c_src))
+# c_src = $(wildcard $(SRCDIR)/*.c)
+# c_obj = $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.obj,$(c_src))
 
 cpp_src = $(wildcard $(SRCDIR)/*.cpp)
 cpp_obj = $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.obj,$(cpp_src))
@@ -16,16 +16,13 @@ cpp_obj = $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.obj,$(cpp_src))
 rc_src = $(wildcard $(SRCDIR)/*.rc)
 rc_obj = $(patsubst $(SRCDIR)/%.rc,$(OBJDIR)/%.res,$(rc_src))
 
-all: $(OBJDIR) $(NAME)
+all: $(NAME)
 
-$(OBJDIR):
-	@mkdir -p $(OBJDIR)
+$(NAME): $(cpp_obj) $(rc_obj)
+	$(CXX) $^ $(LDFLAGS) $(LDLIBS) -o $@
 
-$(NAME): $(c_obj) $(cpp_obj) $(rc_obj)
-	$(CXX) $^ $(LDFLAGS) $(LDLIBS) -o $(BINFOLDER)/$@
-
-$(c_obj): $(OBJDIR)/%.obj: $(SRCDIR)/%.c
-	$(CC) -c $(CPPFLAGS) $(CFLAGS) $< -o $(OBJDIR)/$*.obj
+# $(c_obj): $(OBJDIR)/%.obj: $(SRCDIR)/%.c
+# 	$(CC) -c $(CPPFLAGS) $(CFLAGS) $< -o $(OBJDIR)/$*.obj
 
 $(cpp_obj): $(OBJDIR)/%.obj: $(SRCDIR)/%.cpp
 	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $< -o $(OBJDIR)/$*.obj
@@ -35,4 +32,4 @@ $(rc_obj): $(OBJDIR)/%.res: $(SRCDIR)/%.rc
 
 clean:
 	@$(RM) -rf $(OBJDIR)
-	@$(RM) -f $(BINFOLDER)/$(NAME)
+	@$(RM) -f $(NAME)

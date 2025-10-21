@@ -230,7 +230,7 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 							kwType = KeywordType::Enum;
 						} else if (StrEqualsAny(s, "break", "continue")) {
 							kwType = KeywordType::Label;
-						} else if (StrEqualsAny(s, "return", "yield")) {
+						} else if (StrEqualsAny(s, "return", "await", "yield", "else")) {
 							kwType = KeywordType::Return;
 						}
 						if (chBefore == '.' || (kwType > KeywordType::None && kwType < KeywordType::Return)) {
@@ -264,7 +264,7 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 						} else {
 							const int chNext = sc.GetDocNextChar(sc.ch == '?');
 							if (chNext == '(') {
-								if (kwType != KeywordType::Return && (IsIdentifierCharEx(chBeforeIdentifier) || chBeforeIdentifier == ']')) {
+								if (kwType != KeywordType::Return && (IsIdentifierCharEx(chBefore) || chBefore == ']')) {
 									sc.ChangeState(SCE_JS_FUNCTION_DEFINITION);
 								} else {
 									sc.ChangeState(SCE_JS_FUNCTION);

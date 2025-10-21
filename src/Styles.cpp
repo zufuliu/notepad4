@@ -1517,6 +1517,8 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) noexcept {
 		}
 
 		// Add keyword lists
+		// StopWatch watch;
+		// watch.Start();
 		uint64_t attr = pLexNew->keywordAttr;
 		for (int i = 0; i < KEYWORDSET_MAX; attr >>= 4, i++) {
 			const char *pKeywords = pLexNew->pKeyWords->pszKeyWords[i];
@@ -1525,6 +1527,8 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) noexcept {
 				SciCall_SetKeywords(i | (attribute << 8), pKeywords);
 			}
 		}
+		// watch.Stop();
+		// watch.ShowLog("SetKeywords");
 
 		// clear document style when manually set to a different lexer,
 		// otherwise document was previously empty.

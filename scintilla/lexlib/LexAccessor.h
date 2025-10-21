@@ -288,7 +288,7 @@ constexpr int FoldLevelFlags(int levelLine, int levelNext, bool white, bool head
 	if (white) {
 		flags |= SC_FOLDLEVELWHITEFLAG;
 	}
-	if ((levelLine < levelNext) && (headerPermitted)) {
+	if ((levelLine < levelNext) && headerPermitted) {
 		flags |= SC_FOLDLEVELHEADERFLAG;
 	}
 	return flags;
@@ -322,7 +322,7 @@ Sci_Position LexLineSkipSpaceTab(LexAccessor &styler, Sci_Line line) noexcept;
 inline Sci_Position LexSkipSpaceTab(LexAccessor &styler, Sci_Position startPos, Sci_Position endPos) noexcept {
 	for (; startPos < endPos; startPos++) {
 		const char ch = styler.SafeGetCharAt(startPos);
-		if (!(ch == ' ' || ch == '\t')) {
+		if (ch != ' ' && ch != '\t') {
 			break;
 		}
 	}

@@ -282,7 +282,7 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 								kwType = KeywordType::Record;
 							} else if (StrEqual(s, "goto")) {
 								kwType = KeywordType::Label;
-							} else if (StrEqualsAny(s, "return", "await", "yield")) {
+							} else if (StrEqualsAny(s, "return", "await", "yield", "else")) {
 								kwType = KeywordType::Return;
 							} else if (StrEqualsAny(s, "if", "while")) {
 								// to avoid treating following code as type cast:

@@ -113,6 +113,7 @@ BEGIN
 	POPUP "&Datei"
 	BEGIN
 		MENUITEM "&Neu\tStrg+N",						IDM_FILE_NEW
+		MENUITEM "Neues Fenste&r\tAlt+N",				IDM_FILE_NEWWINDOW
 		MENUITEM "Ö&ffnen...\tStrg+O",					IDM_FILE_OPEN
 		MENUITEM "&Speichern\tStrg+S",					IDM_FILE_SAVE
 		MENUITEM "Speichern &unter...\tF6",				IDM_FILE_SAVEAS
@@ -163,7 +164,7 @@ BEGIN
 			MENUITEM "&Standard...",					IDM_LINEENDINGS_SETDEFAULT
 		END
 		MENUITEM SEPARATOR
-		MENUITEM "Seite ein&richten...",				IDM_FILE_PAGESETUP
+		MENUITEM "Seite einric&hten...",				IDM_FILE_PAGESETUP
 		MENUITEM "&Drucken...\tStrg+P",					IDM_FILE_PRINT
 		MENUITEM SEPARATOR
 		MENUITEM "E&igenschaften...",					IDM_FILE_PROPERTIES
@@ -582,7 +583,7 @@ BEGIN
 			MENUITEM "&Mehrfachauswahl aktivieren",		IDM_SET_MULTIPLE_SELECTION
 			MENUITEM "&Kopiere Auswahl als Suchtext",	IDM_SET_SELECTIONASFINDTEXT
 			MENUITEM "Z&wischenablage als Suchtext",	IDM_SET_PASTEBUFFERASFINDTEXT
-			MENUITEM "Undo Redo &Remember Selection",	IDM_SET_UNDO_REDO_SELECTION
+			MENUITEM "&Auswahl merken bei Undo/Redo",	IDM_SET_UNDO_REDO_SELECTION
 			POPUP "&Zeilenauswahlmodus"
 			BEGIN
 				MENUITEM "&Keiner",						IDM_LINE_SELECTION_MODE_NONE
@@ -712,14 +713,13 @@ BEGIN
 		MENUITEM SEPARATOR
 		MENUITEM "Als &Administrator ausführen",			IDM_FILE_RELAUNCH_ELEVATED
 		MENUITEM "&Neustart",								IDM_FILE_RESTART
-		MENUITEM "Fenster &duplizieren\tAlt+N",				IDM_FILE_NEWWINDOW
-		MENUITEM "&Leeres Fenster öffnen\tAlt+0",			IDM_FILE_NEWWINDOW2
+		MENUITEM "&In neuem Fenster öffnen\tAlt+0",			IDM_FILE_NEWWINDOW2
 		MENUITEM SEPARATOR
 		MENUITEM "Datei aus&führen\tStrg+L",				IDM_FILE_LAUNCH
 		MENUITEM "D&okument öffnen mit...",					IDM_FILE_OPENWITH
 		MENUITEM "&Kommando ausführen...\tStrg+R",			IDM_FILE_RUN
 		MENUITEM SEPARATOR
-		POPUP "Akt&ion an Auswahl"
+		POPUP "Aktion an Auswa&hl"
 		BEGIN
 			MENUITEM "CSS/JS/JSON &Komprimieren",			IDM_EDIT_CODE_COMPRESS
 			MENUITEM "CSS/JS/JSON &Verschönern",			IDM_EDIT_CODE_PRETTY
@@ -1840,6 +1840,7 @@ BEGIN
     IDT_VIEW_TOGGLEFOLDS    "Textblockfaltung umschalten"
     IDT_FILE_LAUNCH         "Dokument ausführen"
     IDT_VIEW_ALWAYSONTOP    "Immer im Vordergrund"
+    IDT_FILE_NEWWINDOW      "Neues Fenster"
 END
 
 STRINGTABLE
@@ -2163,3 +2164,4 @@ END
 #include "../../src/Notepad4.ver"
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
+

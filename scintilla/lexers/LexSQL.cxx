@@ -599,7 +599,7 @@ void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexe
 				levelNext++;
 			} else if (ch == ')') {
 				levelNext--;
-			} else if constexpr ((foldOnlyBegin) && ch == ';') {
+			} else if constexpr (foldOnlyBegin && ch == ';') {
 				sqlStatesCurrentLine = SQLStates::IgnoreWhen(sqlStatesCurrentLine, false);
 			}
 		}

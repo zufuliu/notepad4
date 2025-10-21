@@ -301,7 +301,7 @@ void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 				} else if (lastWordWasGoto && (numCBrace > 0)) {
 					sc.ChangeState(SCE_C_LABEL);
 					lastWordWasGoto = false;
-				} else if (sc.ch == ':' && sc.chNext != ':' && !(isAssignStmt)
+				} else if (sc.ch == ':' && sc.chNext != ':' && !isAssignStmt
 					&& (numCBrace > 0 && numSBrace == 0 && numRBrace == 0)
 					&& visibleChars == sc.LengthCurrent()) {
 					sc.ChangeState(SCE_C_LABEL);

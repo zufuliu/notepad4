@@ -49,7 +49,7 @@ SET NEED_ARM64=0
 IF /I "%ARCH%" == "all" SET NEED_ARM64=1
 IF /I "%ARCH%" == "ARM64" SET NEED_ARM64=1
 CALL :SubVSPath
-IF NOT EXIST "%VS_PATH%" CALL :SUBMSG "ERROR" "Visual Studio 2019 or 2022 NOT FOUND, please check VS_PATH environment variable!"
+IF NOT EXIST "%VS_PATH%" CALL :SUBMSG "ERROR" "Visual Studio 2019, 2022 or 2026 NOT FOUND, please check VS_PATH environment variable!"
 
 IF /I "%processor_architecture%" == "AMD64" (
 	SET "HOST_ARCH=amd64"
@@ -79,11 +79,16 @@ CALL "%VS_PATH%\Common7\Tools\vsdevcmd" -no_logo -arch=amd64 -host_arch=%HOST_AR
 IF /I "%CONFIG%" == "all" (CALL :SUBMSVC %BUILDTYPE% Debug x64 && CALL :SUBMSVC %BUILDTYPE% Release x64) ELSE (CALL :SUBMSVC %BUILDTYPE% %CONFIG% x64)
 ENDLOCAL
 IF /I "%ARCH%" == "x64" GOTO END
-IF /I "%CONFIG%" == "all" (
-	CALL :COPY_x64_AVX2 Debug
-	CALL :COPY_x64_AVX2 Release
-	CALL :COPY_x64_AVX512 Debug
-	CALL :COPY_x64_AVX512 Release
+IF /I "%ARCH%" == "all" (
+	IF /I "%CONFIG%" == "all" (
+		CALL :COPY_x64_AVX2 Debug
+		CALL :COPY_x64_AVX2 Release
+		CALL :COPY_x64_AVX512 Debug
+		CALL :COPY_x64_AVX512 Release
+	) ELSE (
+		CALL :COPY_x64_AVX2 %CONFIG%
+		CALL :COPY_x64_AVX512 %CONFIG%
+	)
 )
 IF /I "%ARCH%" == "AVX2" (CALL :COPY_x64_AVX2 %CONFIG% && GOTO END)
 IF /I "%ARCH%" == "AVX512" (CALL :COPY_x64_AVX512 %CONFIG% && GOTO END)
@@ -114,13 +119,13 @@ IF EXIST "%VSINSTALLDIR%\Common7\IDE\VC\VCTargets\Platforms\%ARCH%\PlatformTools
 SET VSWHERE=%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe
 SET "VS_COMPONENT=Microsoft.Component.MSBuild Microsoft.VisualStudio.Component.VC.Tools.x86.x64"
 IF "%NEED_ARM64%" == 1 SET "VS_COMPONENT=%VS_COMPONENT% Microsoft.VisualStudio.Component.VC.Tools.ARM64"
-FOR /f "delims=" %%A IN ('"%VSWHERE%" -property installationPath -prerelease -version [16.0^,18.0^) -requires %VS_COMPONENT%') DO SET "VS_PATH=%%A"
+FOR /f "delims=" %%A IN ('"%VSWHERE%" -property installationPath -prerelease -version [16.0^,19.0^) -requires %VS_COMPONENT%') DO SET "VS_PATH=%%A"
 IF EXIST "%VS_PATH%" (
 	SET "VSINSTALLDIR=%VS_PATH%\"
 	EXIT /B
 )
 @rem Visual Studio Build Tools
-FOR /f "delims=" %%A IN ('"%VSWHERE%" -products Microsoft.VisualStudio.Product.BuildTools -property installationPath -prerelease -version [16.0^,18.0^) -requires %VS_COMPONENT%') DO SET "VS_PATH=%%A"
+FOR /f "delims=" %%A IN ('"%VSWHERE%" -products Microsoft.VisualStudio.Product.BuildTools -property installationPath -prerelease -version [16.0^,19.0^) -requires %VS_COMPONENT%') DO SET "VS_PATH=%%A"
 IF EXIST "%VS_PATH%" SET "VSINSTALLDIR=%VS_PATH%\"
 EXIT /B
 

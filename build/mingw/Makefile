@@ -150,20 +150,24 @@ endif
 
 # Name root build folder
 export BINFOLDER := ../bin/$(if $(CLANG),Clang,)$(CONFIG)_$(ARCH)
+OBJDIR = $(BINFOLDER)/obj
 
 all: matepath scintilla notepad4
 
 matepath:
+	@mkdir -p $(OBJDIR)/matepath
 	$(MAKE) -f matepath.mk
 
 scintilla:
+	@mkdir -p $(OBJDIR)/scintilla
 	$(MAKE) -f scintilla.mk
 
 notepad4: scintilla
+	@mkdir -p $(OBJDIR)/notepad4
 	$(MAKE) -f notepad4.mk
 
 clean:
 	$(MAKE) -f matepath.mk clean
 	$(MAKE) -f scintilla.mk clean
 	$(MAKE) -f notepad4.mk clean
-	@$(RM) -rf $(BINFOLDER)/obj
+	@$(RM) -rf $(OBJDIR)
