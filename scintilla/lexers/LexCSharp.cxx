@@ -641,20 +641,14 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 					}
 				} else {
 					int interpolatorCount = 0;
-					Sci_PositionU pos = sc.currentPos;
 					chNext = sc.ch;
 					if (chNext == '$') {
-						interpolatorCount = 1;
-						if (sc.chNext == '\"') {
-							chNext = '\"';
-							pos += 1;
-						} else if (sc.chNext == '$') {
-							interpolatorCount += GetMatchedDelimiterCount(styler, pos + 1, '$');
-							pos += interpolatorCount;
-							chNext = static_cast<uint8_t>(styler[pos]);
-						}
+						const auto delimiter = GetMatchedDelimiterCountEx(styler, sc.currentPos, '$');
+						interpolatorCount = delimiter.count;
+						chNext = delimiter.chNext;
 					}
 					if (chNext == '\"') {
+						const Sci_PositionU pos = sc.currentPos + interpolatorCount;
 						int delimiterCount = GetMatchedDelimiterCount(styler, pos, '\"');
 						int state;
 						if (delimiterCount >= 3) {

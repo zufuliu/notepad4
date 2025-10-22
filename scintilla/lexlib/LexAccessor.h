@@ -371,6 +371,25 @@ inline unsigned char LexGetNextChar(LexAccessor &styler, Sci_Position startPos, 
 	return '\0';
 }
 
+struct MatchedDelimiterCount {
+	int count;
+	int chNext;
+};
+
+inline MatchedDelimiterCount GetMatchedDelimiterCountEx(LexAccessor &styler, Sci_PositionU pos, int delimiter) noexcept {
+	int count = 1;
+	int chNext;
+	while (true) {
+		chNext = static_cast<uint8_t>(styler[++pos]);
+		if (chNext == delimiter) {
+			++count;
+		} else {
+			break;
+		}
+	}
+	return {count, chNext};
+}
+
 inline int GetMatchedDelimiterCount(LexAccessor &styler, Sci_PositionU pos, int delimiter) noexcept {
 	int count = 1;
 	while (true) {
