@@ -7,6 +7,7 @@
 // 2024 https://tc39.es/ecma262/2024/
 // 2025 https://tc39.es/ecma262/2025/
 // 2026 https://tc39.es/ecma262/
+// https://github.com/tc39/ecma262
 
 //! keywords
 // https://tc39.es/ecma262/#sec-keywords-and-reserved-words
