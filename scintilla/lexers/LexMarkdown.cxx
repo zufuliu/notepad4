@@ -147,16 +147,6 @@ inline uint8_t GetCharAfterSpace(LexAccessor &styler, Sci_PositionU &startPos, i
 	return ch;
 }
 
-inline uint8_t GetCharAfterDelimiter(LexAccessor &styler, Sci_PositionU &startPos, int delimiter) noexcept {
-	Sci_PositionU pos = startPos;
-	uint8_t ch;
-	do {
-		ch = styler[++pos];
-	} while (ch == delimiter);
-	startPos = pos;
-	return ch;
-}
-
 // 5.2 List items
 // https://html.spec.whatwg.org/multipage/grouping-content.html#the-ol-element
 // https://pandoc.org/MANUAL.html#ordered-lists
@@ -713,10 +703,9 @@ int MarkdownLexer::GetCurrentDelimiterRun(DelimiterRun &delimiterRun, bool ignor
 		chPrev = sc.styler.GetCharacterAt(position);
 	}
 
-	const Sci_PositionU startPos = pos;
-	int chNext = GetCharAfterDelimiter(sc.styler, pos, delimiter);
+	auto [count, chNext] = GetMatchedDelimiterCountEx(sc.styler, pos, delimiter);
 	if (chNext & 0x80) {
-		chNext = sc.styler.GetCharacterAt(pos);
+		chNext = sc.styler.GetCharacterAt(pos + count);
 	}
 
 	// not same as Unicode whitespace or punctuation character defined in "2.1 Characters and lines",
@@ -724,7 +713,7 @@ int MarkdownLexer::GetCurrentDelimiterRun(DelimiterRun &delimiterRun, bool ignor
 	delimiterRun.ccPrev = (chPrev == '_') ? CharacterClass::punctuation : sc.styler.GetCharacterClass(chPrev);
 	delimiterRun.ccNext = (chNext == '_') ? CharacterClass::punctuation : sc.styler.GetCharacterClass(chNext);
 	// returns length of the delimiter run
-	return static_cast<int>(pos - startPos);
+	return count;
 }
 
 constexpr bool IsEmphasisDelimiter(int ch) noexcept {
@@ -1513,15 +1502,14 @@ int MarkdownLexer::HighlightBlockText(uint32_t lineState) {
 	case '`':
 	case '~':
 		if (sc.ch == sc.chNext) {
-			Sci_PositionU pos = sc.currentPos;
-			const int chNext = GetCharAfterDelimiter(sc.styler, pos, sc.ch);
-			const int count = static_cast<int>(pos - sc.currentPos);
+			const auto [count, chNext] = GetMatchedDelimiterCountEx(sc.styler, sc.currentPos, sc.ch);
 			if (count >= 3) {
 				delimiterCount = count;
 				int style = (sc.ch == '`') ? SCE_MARKDOWN_BACKTICK_BLOCK : SCE_MARKDOWN_TILDE_BLOCK;
 				// check info string
 				if (AnyOf<'L', 'l', 'M', 'm'>(chNext)) {
 					char info[8]{};
+					const Sci_PositionU pos = sc.currentPos + count;
 					sc.styler.GetRangeLowered(pos, sc.lineStartNext, info, sizeof(info));
 					if (StrStartsWith(info, "math") || StrStartsWith(info, "latex")) {
 						style += SCE_MARKDOWN_BACKTICK_MATH - SCE_MARKDOWN_BACKTICK_BLOCK;
