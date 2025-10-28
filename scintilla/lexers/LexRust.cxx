@@ -42,25 +42,6 @@ struct EscapeSequence {
 	}
 };
 
-bool IsRustRawString(LexAccessor &styler, Sci_PositionU pos, bool start, int &hashCount) noexcept {
-	int count = 0;
-	char ch;
-	while ((ch = styler[pos]) == '#') {
-		++count;
-		++pos;
-	}
-
-	if (start) {
-		if (ch == '\"') {
-			hashCount = count;
-			return true;
-		}
-	} else {
-		return count == hashCount;
-	}
-	return false;
-}
-
 enum {
 	RustLineStateMaskLineComment = (1 << 0),	// line comment
 	RustLineStateMaskPubUse = (1 << 1),			// [pub] use
@@ -341,7 +322,7 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				sc.ForwardSetState(SCE_RUST_DEFAULT);
 			} else if (!IsCharacterStyle(sc.state)) {
 				if (sc.ch == '\"') {
-					if (hashCount == 0 || (sc.chNext == '#' && IsRustRawString(styler, sc.currentPos + 1, false, hashCount))) {
+					if (hashCount == 0 || (sc.chNext == '#' && GetMatchedDelimiterCount(styler, sc.currentPos + 1, '#') == hashCount)) {
 						sc.Advance(hashCount);
 						hashCount = 0;
 						sc.ForwardSetState(SCE_RUST_DEFAULT);
@@ -432,16 +413,17 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				}
 				sc.SetState(state);
 			} else if (sc.Match('r', '#')) {
-				if (IsRustRawString(styler, sc.currentPos + 2, true, hashCount)) {
-					hashCount += 1;
+				auto [count, chNext] = GetMatchedDelimiterCountEx(styler, sc.currentPos + 1, '#');
+				if (chNext == '\"') {
+					hashCount = count;
 					sc.SetState(SCE_RUST_RAW_STRING);
-					sc.Advance(hashCount + 1);
+					sc.Advance(count);
 				} else {
 					if (sc.chPrev != '.') {
 						chBeforeIdentifier = sc.chPrev;
 					}
 					sc.SetState(SCE_RUST_IDENTIFIER);
-					const int chNext = sc.GetRelative(2);
+					chNext = sc.GetRelative(2);
 					if (IsIdentifierStart(chNext)) {
 						// raw identifier: r# + keyword
 						sc.Forward();
@@ -455,17 +437,26 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				if (sc.chNext == '\"') {
 					sc.SetState((sc.ch == 'b') ? SCE_RUST_BYTESTRING : SCE_RUST_STRING);
 					sc.Forward();
-				} else if (sc.chNext == 'r' && IsRustRawString(styler, sc.currentPos + 2, true, hashCount)) {
-					sc.SetState((sc.ch == 'b') ? SCE_RUST_RAW_BYTESTRING : SCE_RUST_RAW_STRING);
-					sc.Advance(hashCount + 2);
 				} else if (sc.Match('b', '\'')) {
 					sc.SetState(SCE_RUST_BYTE_CHARACTER);
 					sc.Forward();
 				} else {
-					if (sc.chPrev != '.') {
-						chBeforeIdentifier = sc.chPrev;
+					bool handled = false;
+					if (sc.chNext == 'r') {
+						const auto [count, chNext] = GetMatchedDelimiterCountEx(styler, sc.currentPos + 1, '#');
+						if (chNext == '\"') {
+							handled = true;
+							hashCount = count - 1;
+							sc.SetState((sc.ch == 'b') ? SCE_RUST_RAW_BYTESTRING : SCE_RUST_RAW_STRING);
+							sc.Advance(count + 1);
+						}
 					}
-					sc.SetState(SCE_RUST_IDENTIFIER);
+					if (!handled) {
+						if (sc.chPrev != '.') {
+							chBeforeIdentifier = sc.chPrev;
+						}
+						sc.SetState(SCE_RUST_IDENTIFIER);
+					}
 				}
 			} else if (sc.ch == '$' && IsIdentifierStartEx(sc.chNext)) {
 				sc.SetState(SCE_RUST_VARIABLE); // macro metavariable
