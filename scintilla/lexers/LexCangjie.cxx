@@ -283,14 +283,13 @@ void ColouriseCangjieDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int ini
 		case SCE_CANGJIE_RAWSTRING_SQ:
 		case SCE_CANGJIE_RAWSTRING_DQ:
 			if (sc.chNext == '#' && sc.ch == GetStringQuote(sc.state)) {
-				int count = delimiterCount;
-				do {
-					sc.Forward();
-					--count;
-				} while (count != 0 && sc.ch == '#');
-				if (count == 0) {
+				const int count = GetMatchedDelimiterCount(styler, sc.currentPos + 1, '#');
+				if (count >= delimiterCount) {
+					sc.Advance(delimiterCount);
 					delimiterCount = 0;
 					sc.ForwardSetState(SCE_CANGJIE_DEFAULT);
+				} else {
+					sc.Advance(count - 1);
 				}
 			}
 			break;
@@ -348,16 +347,13 @@ void ColouriseCangjieDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int ini
 				sc.SetState((sc.ch == '`') ? SCE_CANGJIE_IDENTIFIER_BT : SCE_CANGJIE_IDENTIFIER);
 			} else if (sc.ch == '#') {
 				sc.SetState(SCE_CANGJIE_OPERATOR);
-				int count = 1;
-				while (sc.chNext == '#') {
-					++count;
-					sc.Forward();
-				}
-				if (sc.chNext == '\'' || sc.chNext == '"') {
+				auto [count, chNext] = GetMatchedDelimiterCountEx(styler, sc.currentPos, '#');
+				if (chNext == '\'' || chNext == '"') {
 					delimiterCount = count;
-					sc.ChangeState((sc.chNext == '\'') ? SCE_CANGJIE_RUNE_SQ : SCE_CANGJIE_RAWSTRING_DQ);
-					sc.Forward();
+					count += 1;
+					sc.ChangeState((chNext == '\'') ? SCE_CANGJIE_RAWSTRING_SQ : SCE_CANGJIE_RAWSTRING_DQ);
 				}
+				sc.Advance(count - 1);
 			} else if (IsAGraphic(sc.ch)) {
 				sc.SetState(SCE_CANGJIE_OPERATOR);
 				if (sc.Match('<', ':')) {

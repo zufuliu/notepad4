@@ -66,28 +66,6 @@ constexpr bool IsCMakeChar(int ch) noexcept {
 	return IsIdentifierChar(ch) || ch == '.' || ch == '-' || ch == '+';
 }
 
-bool IsBracketArgument(LexAccessor &styler, Sci_PositionU pos, bool start, int &bracketNumber) noexcept {
-	int offset = 0;
-	char ch;
-	++pos; // bracket
-	while ((ch = styler[pos]) == '=') {
-		++offset;
-		++pos;
-	}
-
-	if (start) {
-		if (ch == '[') {
-			bracketNumber = offset;
-			return true;
-		}
-	} else {
-		if (ch == ']' && offset == bracketNumber) {
-			return true;
-		}
-	}
-	return false;
-}
-
 void ColouriseCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	int lineStateLineComment = 0;
 
@@ -181,7 +159,8 @@ void ColouriseCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 		case SCE_CMAKE_BLOCK_COMMENT:
 		case SCE_CMAKE_BRACKET_ARGUMENT:
 			if (sc.ch == ']' && (sc.chNext == '=' || sc.chNext == ']')) {
-				if (IsBracketArgument(styler, sc.currentPos, false, bracketNumber)) {
+				const auto [count, chNext] = GetMatchedDelimiterCountEx(styler, sc.currentPos, '=');
+				if (chNext == ']' && count == 1 + bracketNumber) {
 					sc.Advance(1 + bracketNumber);
 					sc.ForwardSetState(SCE_CMAKE_DEFAULT);
 					bracketNumber = 0;
@@ -260,19 +239,24 @@ void ColouriseCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 
 		if (sc.state == SCE_CMAKE_DEFAULT) {
 			if (sc.ch == '#') {
-				if (sc.chNext == '[' && IsBracketArgument(styler, sc.currentPos + 1, true, bracketNumber)) {
-					sc.SetState(SCE_CMAKE_BLOCK_COMMENT);
-					sc.Advance(2 + bracketNumber);
-				} else {
-					sc.SetState(SCE_CMAKE_COMMENT);
-					if (visibleChars == 0) {
-						lineStateLineComment = SimpleLineStateMaskLineComment;
+				sc.SetState(SCE_CMAKE_COMMENT);
+				if (sc.chNext == '[') {
+					const auto [count, chNext] = GetMatchedDelimiterCountEx(styler, sc.currentPos + 1, '=');
+					if (chNext == '[') {
+						bracketNumber = count - 1;
+						sc.SetState(SCE_CMAKE_BLOCK_COMMENT);
+						sc.Advance(1 + count);
 					}
 				}
+				if (visibleChars == 0 && sc.state == SCE_CMAKE_COMMENT) {
+					lineStateLineComment = SimpleLineStateMaskLineComment;
+				}
 			} else if (sc.ch == '[' && (sc.chNext == '=' || sc.chNext == '[')) {
-				if (IsBracketArgument(styler, sc.currentPos, true, bracketNumber)) {
+				const auto [count, chNext] = GetMatchedDelimiterCountEx(styler, sc.currentPos, '=');
+				if (chNext == '[') {
+					bracketNumber = count - 1;
 					sc.SetState(SCE_CMAKE_BRACKET_ARGUMENT);
-					sc.Advance(2 + bracketNumber);
+					sc.Advance(1 + count);
 				}
 			} else if (sc.Match('/', '/')) { // CMakeCache.txt
 				if (visibleChars == 0) {

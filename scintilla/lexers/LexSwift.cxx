@@ -86,43 +86,6 @@ constexpr bool IsRegexStart(int chPrevNonWhite, int stylePrevNonWhite) noexcept 
 	return stylePrevNonWhite == SCE_SWIFT_WORD || !FollowExpression(chPrevNonWhite, stylePrevNonWhite);
 }
 
-enum class DelimiterCheck {
-	Start,
-	End,
-	Escape,
-};
-
-enum class DelimiterResult {
-	False,
-	True,
-	Regex,
-};
-
-DelimiterResult CheckSwiftStringDelimiter(LexAccessor &styler, Sci_PositionU pos, DelimiterCheck what, int &delimiterCount) noexcept {
-	++pos; // first '#'
-	int count = 1;
-	char ch;
-	while ((ch = styler[pos]) == '#') {
-		++count;
-		++pos;
-	}
-	if (what == DelimiterCheck::End) {
-		return (count == delimiterCount) ? DelimiterResult::True : DelimiterResult::False;
-	}
-
-	if (what == DelimiterCheck::Start) {
-		if (ch == '\"' || ch == '/') {
-			delimiterCount = count;
-			return (ch == '\"') ? DelimiterResult::True : DelimiterResult::Regex;
-		}
-	} else {
-		if (count == delimiterCount && (ch == '(' || !IsEOLChar(ch))) {
-			return DelimiterResult::True;
-		}
-	}
-	return DelimiterResult::False;
-}
-
 constexpr bool IsSpaceEquiv(int state) noexcept {
 	return state <= SCE_SWIFT_TASKMARKER;
 }
@@ -339,10 +302,10 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				escSeq.resetEscapeState(sc.state);
 				sc.SetState(SCE_SWIFT_ESCAPECHAR);
 				sc.Forward();
-				const DelimiterResult result = CheckSwiftStringDelimiter(styler, sc.currentPos, DelimiterCheck::Escape, delimiterCount);
-				if (result != DelimiterResult::False) {
+				const auto [count, chNext] = GetMatchedDelimiterCountEx(styler, sc.currentPos, '#');
+				if (count == delimiterCount && !IsEOLChar(chNext)) {
 					sc.Advance(delimiterCount);
-					if (sc.ch == '(') {
+					if (chNext == '(') {
 						nestedState.push_back(escSeq.outerState);
 						sc.SetState(SCE_SWIFT_OPERATOR2);
 					}
@@ -355,8 +318,8 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			} else if (sc.ch == '"' && ((sc.state == SCE_SWIFT_STRING_ED && sc.chNext == '#')
 				|| (sc.state == SCE_SWIFT_TRIPLE_STRING_ED && sc.MatchNext('"', '"', '#')))) {
 				const int offset = (sc.state == SCE_SWIFT_STRING_ED) ? 1 : 3;
-				const DelimiterResult result = CheckSwiftStringDelimiter(styler, sc.currentPos + offset, DelimiterCheck::End, delimiterCount);
-				if (result != DelimiterResult::False) {
+				const int count = GetMatchedDelimiterCount(styler, sc.currentPos + offset, '#');
+				if (count == delimiterCount) {
 					sc.Advance(delimiterCount + offset);
 					sc.SetState(SCE_SWIFT_DEFAULT);
 					delimiterCount = TryPopAndPeek(delimiters);
@@ -379,8 +342,8 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				if (sc.state == SCE_SWIFT_REGEX) {
 					sc.SetState(SCE_SWIFT_DEFAULT);
 				} else {
-					const DelimiterResult result = CheckSwiftStringDelimiter(styler, sc.currentPos, DelimiterCheck::End, delimiterCount);
-					if (result != DelimiterResult::False) {
+					const int count = GetMatchedDelimiterCount(styler, sc.currentPos, '#');
+					if (count == delimiterCount) {
 						sc.Advance(delimiterCount);
 						sc.SetState(SCE_SWIFT_DEFAULT);
 						delimiterCount = TryPopAndPeek(delimiters);
@@ -441,15 +404,14 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			} else if (sc.ch == '$' && IsIdentifierCharEx(sc.chNext)) {
 				sc.SetState(SCE_SWIFT_VARIABLE); // closure parameter, synthesized property
 			} else if (sc.ch == '#') {
-				int delimiter = 0;
-				const DelimiterResult result = CheckSwiftStringDelimiter(styler, sc.currentPos, DelimiterCheck::Start, delimiter);
-				if (result != DelimiterResult::False) {
+				const auto [delimiter, chNext] = GetMatchedDelimiterCountEx(styler, sc.currentPos, '#');
+				if (chNext == '\"' || chNext == '/') {
 					insideRegexRange = false;
 					delimiterCount = delimiter;
 					delimiters.push_back(delimiter);
-					sc.SetState((result == DelimiterResult::Regex) ? SCE_SWIFT_REGEX_ED : SCE_SWIFT_STRING_ED);
+					sc.SetState((chNext == '/') ? SCE_SWIFT_REGEX_ED : SCE_SWIFT_STRING_ED);
 					sc.Advance(delimiter);
-					if (result != DelimiterResult::Regex && sc.Match('"', '"', '"')) {
+					if (chNext != '/' && sc.Match('"', '"', '"')) {
 						sc.ChangeState(SCE_SWIFT_TRIPLE_STRING_ED);
 						sc.Advance(2);
 					}

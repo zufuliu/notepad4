@@ -1,7 +1,7 @@
 // https://www.rust-lang.org/
 // https://doc.rust-lang.org/book/
 // https://doc.rust-lang.org/reference/index.html
-// Rust 1.38 https://doc.rust-lang.org/std/index.html
+// Rust 1.90 https://doc.rust-lang.org/std/index.html
 
 //! Keywords		===========================================================
 // https://doc.rust-lang.org/std/index.html#keywords
@@ -12,6 +12,7 @@ const continue crate
 dyn
 else enum extern
 fn for
+gen
 if impl in
 let loop
 match mod move mut
@@ -23,6 +24,9 @@ union unsafe use
 where while
 
 false self Self super true
+
+// Weak keywords
+//raw safe
 
 //! Reserved Keywords	=======================================================
 // https://doc.rust-lang.org/reference/keywords.html#reserved-keywords
@@ -43,7 +47,7 @@ yield
 array
 bool
 char
-f32 f64
+f16 f32 f64 f128
 i8 i16 i32 i64 i128 isize
 pointer
 reference
@@ -78,6 +82,7 @@ include_bytes!()
 include_str!()
 is_x86_feature_detected!()
 line!()
+matches!()
 module_path!()
 option_env!()
 panic!()
@@ -90,11 +95,18 @@ unreachable!()
 vec!()
 write!()
 writeln!()
+cfg_select!()
+concat_bytes!()
+const_format_args!()
+format_args_nl!()
+log_syntax!()
+trace_macros!()
 
 //! Attribute		===========================================================
 // https://doc.rust-lang.org/reference/attributes.html#built-in-attributes-index
 // Conditional compilation
-#[cfg(target_arch, target_feature, target_os, target_family, unix, windows, target_env, target_endian, target_pointer_width, target_vendor, test, debug_assertions, proc_macro)]
+#[cfg(target_arch, target_feature, target_os, target_family, unix, windows, target_env, target_abi, target_endian, target_pointer_width, target_vendor,
+target_has_atomic, test, debug_assertions, proc_macro, panic)]
 #[cfg(all(), any(), not())]
 #[cfg_attr()]
 // Testing
@@ -113,6 +125,7 @@ writeln!()
 #[proc_macro_attribute]
 // Diagnostics
 #[allow()]
+#[expect()]
 #[warn()]
 #[deny()]
 #[forbid()]
@@ -122,6 +135,7 @@ writeln!()
 // ABI, linking, symbols, and FFI
 #[link(name, kind)]
 #[link_name]
+#[link_ordinal()]
 #[no_link]
 #[repr(C, align(), packed())]
 #![crate_type]
@@ -135,8 +149,13 @@ writeln!()
 #[inline]
 #[inline(always, never)]
 #[cold]
+#[naked]
 #[no_builtins]
 #[target_feature(enable)]
+#[track_caller]
+#[instruction_set()]
+// Documentation
+#[doc]
 // Preludes
 #![no_std]
 #![no_implicit_prelude]
@@ -149,6 +168,13 @@ writeln!()
 #[panic_handler]
 #[global_allocator]
 #![windows_subsystem]
+// Features
+#[feature()]
+// Type System
+#[non_exhaustive]
+// Debugger
+#![debugger_visualizer()]
+#[collapse_debuginfo()]
 
 //! Modules			===========================================================
 // https://doc.rust-lang.org/std/index.html#modules

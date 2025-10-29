@@ -60,28 +60,6 @@ struct EscapeSequence {
 	}
 };
 
-bool IsLongBracket(LexAccessor &styler, Sci_PositionU pos, bool start, int &delimiterCount) noexcept {
-	int offset = 0;
-	char ch;
-	++pos; // bracket
-	while ((ch = styler[pos]) == '=') {
-		++offset;
-		++pos;
-	}
-
-	if (start) {
-		if (ch == '[') {
-			delimiterCount = offset;
-			return true;
-		}
-	} else {
-		if (ch == ']' && offset == delimiterCount) {
-			return true;
-		}
-	}
-	return false;
-}
-
 // https://en.cppreference.com/w/c/io/fprintf
 // 6.4 String Manipulation https://www.lua.org/manual/5.4/manual.html#6.4
 constexpr bool IsFormatSpecifier(char ch) noexcept {
@@ -293,7 +271,8 @@ void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 		case SCE_LUA_COMMENT:
 		case SCE_LUA_LITERALSTRING:
 			if (sc.ch == ']' && (sc.chNext == '=' || sc.chNext == ']')) {
-				if (IsLongBracket(styler, sc.currentPos, false, delimiterCount)) {
+				const auto [count, chNext] = GetMatchedDelimiterCountEx(styler, sc.currentPos, '=');
+				if (chNext == ']' && count == 1 + delimiterCount) {
 					sc.Advance(1 + delimiterCount);
 					sc.ForwardSetState(SCE_LUA_DEFAULT);
 					delimiterCount = 0;
@@ -314,22 +293,25 @@ void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				insideUrl = false;
 				sc.SetState(SCE_LUA_STRING_SQ);
 			} else if (sc.ch == '[' && (sc.chNext == '=' || sc.chNext == '[')) {
-				if (IsLongBracket(styler, sc.currentPos, true, delimiterCount)) {
-					sc.SetState(SCE_LUA_LITERALSTRING);
-					sc.Advance(2 + delimiterCount);
-				} else {
-					sc.SetState(SCE_LUA_OPERATOR);
+				sc.SetState(SCE_LUA_OPERATOR);
+				const auto [count, chNext] = GetMatchedDelimiterCountEx(styler, sc.currentPos, '=');
+				if (chNext == '[') {
+					delimiterCount = count - 1;
+					sc.ChangeState(SCE_LUA_LITERALSTRING);
+					sc.Advance(1 + count);
 				}
 			} else if (sc.Match('-', '-')) {
 				sc.SetState(SCE_LUA_COMMENTLINE);
 				sc.Advance(2);
 				if (sc.ch == '[' && (sc.chNext == '=' || sc.chNext == '[')) {
-					if (IsLongBracket(styler, sc.currentPos, true, delimiterCount)) {
+					const auto [count, chNext] = GetMatchedDelimiterCountEx(styler, sc.currentPos, '=');
+					if (chNext == '[') {
+						delimiterCount = count - 1;
 						sc.ChangeState(SCE_LUA_COMMENT);
-						sc.Advance(2 + delimiterCount);
+						sc.Advance(1 + count);
 					}
 				}
-				if (sc.state == SCE_LUA_COMMENTLINE && visibleChars == 0) {
+				if (visibleChars == 0 && sc.state == SCE_LUA_COMMENTLINE) {
 					lineState = LuaLineStateLineComment;
 				}
 			} else if (IsNumberStart(sc.ch, sc.chNext)) {
