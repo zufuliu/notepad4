@@ -377,29 +377,24 @@ struct MatchedDelimiterCount {
 };
 
 inline MatchedDelimiterCount GetMatchedDelimiterCountEx(LexAccessor &styler, Sci_PositionU pos, int delimiter) noexcept {
-	int count = 1;
+	int count = 0;
 	int chNext;
-	while (true) {
-		chNext = static_cast<uint8_t>(styler[++pos]);
-		if (chNext == delimiter) {
-			++count;
-		} else {
-			break;
-		}
-	}
+	do {
+		++count;
+		++pos;
+		chNext = styler.SafeGetUCharAt(pos);
+	} while (chNext == delimiter);
 	return {count, chNext};
 }
 
 inline int GetMatchedDelimiterCount(LexAccessor &styler, Sci_PositionU pos, int delimiter) noexcept {
-	int count = 1;
-	while (true) {
-		const uint8_t ch = styler.SafeGetCharAt(++pos);
-		if (ch == delimiter) {
-			++count;
-		} else {
-			break;
-		}
-	}
+	int count = 0;
+	int chNext;
+	do {
+		++count;
+		++pos;
+		chNext = styler.SafeGetUCharAt(pos);
+	} while (chNext == delimiter);
 	return count;
 }
 
