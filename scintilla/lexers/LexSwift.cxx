@@ -49,6 +49,18 @@ struct InterpolatedStringState {
 	int delimiterCount;
 };
 
+constexpr bool IsSingleLineString(int state) noexcept {
+	return state < SCE_SWIFT_TRIPLE_STRING;
+}
+
+constexpr bool IsExtendedDelimitedString(int state) noexcept {
+	if constexpr (SCE_SWIFT_STRING_ED & 1) {
+		return state & true;
+	} else {
+		return (state & 1) == 0;
+	}
+}
+
 enum {
 	SwiftLineStateMaskLineComment = 1,		// line comment
 	SwiftLineStateMaskImport = (1 << 1),	// import
@@ -263,27 +275,51 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			break;
 
 		case SCE_SWIFT_STRING:
+		case SCE_SWIFT_STRING_ED:
 		case SCE_SWIFT_TRIPLE_STRING:
-			if (sc.atLineStart && sc.state == SCE_SWIFT_STRING) {
+		case SCE_SWIFT_TRIPLE_STRING_ED:
+			if (sc.atLineStart && IsSingleLineString(sc.state)) {
 				sc.SetState(SCE_SWIFT_DEFAULT);
 			} else if (sc.ch == '\\') {
-				if (sc.chNext == '(') {
-					nestedState.push_back({sc.state, 1, 0});
-					sc.SetState(SCE_SWIFT_OPERATOR2);
-					sc.Forward();
-				} else if (!IsEOLChar(sc.chNext)) {
+				int chNext = sc.chNext;
+				if (IsExtendedDelimitedString(sc.state)) {
+					if (chNext != '#') {
+						break;
+					}
+					const auto delimiter = GetMatchedDelimiterCountEx(styler, sc.currentPos + 1, '#');
+					chNext = delimiter.chNext;
+					if (delimiter.count != delimiterCount) {
+						break;
+					}
+				}
+				if (!IsEOLChar(chNext)) {
 					escSeq.resetEscapeState(sc.state);
 					sc.SetState(SCE_SWIFT_ESCAPECHAR);
+					sc.Advance(delimiterCount);
 					sc.Forward();
-					if (sc.Match('u', '{')) {
+					if (chNext == '(') {
+						sc.ChangeState(SCE_SWIFT_OPERATOR2);
+						nestedState.push_back({escSeq.outerState, 1, delimiterCount});
+					} else if (sc.Match('u', '{')) {
 						escSeq.brace = true;
 						escSeq.digitsLeft = 9;
 						sc.Forward();
 					}
 				}
-			} else if (sc.ch == '"' && (sc.state == SCE_SWIFT_STRING || sc.MatchNext('"', '"'))) {
-				if (sc.state == SCE_SWIFT_TRIPLE_STRING) {
+			} else if (sc.ch == '"' && (IsSingleLineString(sc.state) || sc.MatchNext('"', '"'))) {
+				if (!IsSingleLineString(sc.state)) {
 					sc.Advance(2);
+				}
+				if (IsExtendedDelimitedString(sc.state)) {
+					if (sc.chNext != '#') {
+						break;
+					}
+					const int count = GetMatchedDelimiterCount(styler, sc.currentPos + 1, '#');
+					if (count != delimiterCount) {
+						break;
+					}
+					delimiterCount = 0;
+					sc.Advance(count);
 				}
 				sc.Forward();
 				if (sc.state == SCE_SWIFT_STRING && (chBefore == '[' || chBefore == ',')) {
@@ -296,41 +332,6 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			}
 			break;
 
-		case SCE_SWIFT_STRING_ED:
-		case SCE_SWIFT_TRIPLE_STRING_ED:
-			if (sc.atLineStart && sc.state == SCE_SWIFT_STRING_ED) {
-				sc.SetState(SCE_SWIFT_DEFAULT);
-			} else if (sc.Match('\\', '#')) {
-				escSeq.resetEscapeState(sc.state);
-				sc.SetState(SCE_SWIFT_ESCAPECHAR);
-				sc.Forward();
-				const auto [count, chNext] = GetMatchedDelimiterCountEx(styler, sc.currentPos, '#');
-				if (count == delimiterCount && !IsEOLChar(chNext)) {
-					sc.Advance(delimiterCount);
-					if (chNext == '(') {
-						nestedState.push_back({escSeq.outerState, 1, count});
-						sc.SetState(SCE_SWIFT_OPERATOR2);
-					}
-				}
-				if (sc.state == SCE_SWIFT_ESCAPECHAR && sc.Match('u', '{')) {
-					escSeq.brace = true;
-					escSeq.digitsLeft = 9;
-					sc.Forward();
-				}
-			} else if (sc.ch == '"' && ((sc.state == SCE_SWIFT_STRING_ED && sc.chNext == '#')
-				|| (sc.state == SCE_SWIFT_TRIPLE_STRING_ED && sc.MatchNext('"', '"', '#')))) {
-				const int offset = (sc.state == SCE_SWIFT_STRING_ED) ? 1 : 3;
-				const int count = GetMatchedDelimiterCount(styler, sc.currentPos + offset, '#');
-				if (count == delimiterCount) {
-					delimiterCount = 0;
-					sc.Advance(count + offset);
-					sc.SetState(SCE_SWIFT_DEFAULT);
-				} else {
-					sc.Forward(offset);
-				}
-			}
-			break;
-
 		case SCE_SWIFT_REGEX:
 		case SCE_SWIFT_REGEX_ED:
 			if (sc.atLineStart && sc.state == SCE_SWIFT_REGEX) {
@@ -340,17 +341,15 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			} else if (sc.ch == '[' || sc.ch == ']') {
 				insideRegexRange = sc.ch == '[';
 			} else if (sc.ch == '/' && !insideRegexRange && (sc.state == SCE_SWIFT_REGEX || sc.chNext == '#')) {
-				sc.Forward();
-				if (sc.state == SCE_SWIFT_REGEX) {
-					sc.SetState(SCE_SWIFT_DEFAULT);
-				} else {
-					const int count = GetMatchedDelimiterCount(styler, sc.currentPos, '#');
-					if (count == delimiterCount) {
-						delimiterCount = 0;
-						sc.Advance(count);
-						sc.SetState(SCE_SWIFT_DEFAULT);
+				if (sc.state == SCE_SWIFT_REGEX_ED) {
+					const int count = GetMatchedDelimiterCount(styler, sc.currentPos + 1, '#');
+					if (count != delimiterCount) {
+						break;
 					}
+					delimiterCount = 0;
+					sc.Advance(count);
 				}
+				sc.ForwardSetState(SCE_SWIFT_DEFAULT);
 			}
 			break;
 
@@ -393,6 +392,7 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				}
 			}
 			else if (sc.ch == '"') {
+				delimiterCount = 0;
 				chBefore = chPrevNonWhite;
 				sc.SetState(SCE_SWIFT_STRING);
 				if (sc.MatchNext('"', '"')) {
