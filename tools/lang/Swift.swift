@@ -1,5 +1,6 @@
-// 6.0 https://www.swift.org/
+// 6.2 https://www.swift.org/
 // https://swift.org/documentation/
+// https://www.swift.org/swift-evolution/
 // https://github.com/apple/swift-evolution
 
 //! keywords		===========================================================
@@ -120,6 +121,7 @@ actor nonisolated
 @freestanding()
 @frozen
 @GKInspectable
+@globalActor
 @inlinable
 @main
 @nonobjc

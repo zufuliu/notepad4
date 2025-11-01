@@ -994,6 +994,7 @@ LexerConfigMap = {
 		'default_fold_level': ['class', 'function'],
 		'default_fold_ignore_inner': 'SCE_SWIFT_FUNCTION_DEFINITION',
 		'escape_char_style': 'SCE_SWIFT_ESCAPECHAR',
+		'raw_string_style': ['SCE_SWIFT_STRING_ED', 'SCE_SWIFT_TRIPLE_STRING_ED'],
 		'angle_bracket_generic': True,
 		'generic_type_style': ['SCE_SWIFT_CLASS', 'SCE_SWIFT_STRUCT', 'SCE_SWIFT_PROTOCOL', 'SCE_SWIFT_ENUM'],
 		'operator_style': ['SCE_SWIFT_OPERATOR', 'SCE_SWIFT_OPERATOR2'],
