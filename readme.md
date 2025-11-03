@@ -90,7 +90,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [Kotlin](tools/lang/Kotlin.kt), up to Kotlin 2.2.
 	* LaTeX
 	* Lisp Script (Common Lisp, Clojure, Scheme, etc.)
-	* [LLVM IR](tools/lang/LLVM.ll), up to LLVM 16.
+	* [LLVM IR](tools/lang/LLVM.ll), up to LLVM 21.
 	* [Lua Script](tools/lang/Lua.lua), up to Lua 5.4.
 	* Makefile, [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#makefile)
 		* nmake
@@ -119,7 +119,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [R](tools/lang/R.r), up to R 4.2.
 	* [REBOL](tools/lang/Rebol.r) 3 and [Red](tools/lang/Red.red)
 	* [Ruby](tools/lang/Ruby.rb), up to Ruby 3.4. [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#ruby)
-	* [Rust](tools/lang/Rust.rs), up to Rust 1.90. [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#rust)
+	* [Rust](tools/lang/Rust.rs), up to Rust 1.91. [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#rust)
 	* [SAS](tools/lang/SAS.sas), up to SAS Viya 2024.06.
 	* [Scala](tools/lang/Scala.scala), up to Scala 3.2.
 	* Shell Script
@@ -133,7 +133,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* [PostgreSQL](tools/lang/PostgreSQL.sql), PostgreSQL 14.
 		* [Transact-SQL](tools/lang/Transact-SQL.sql), SQL Server 2019.
 		* [Oracle](tools/lang/Oracle.sql), Oracle 20, incomplete.
-	* [Swift](tools/lang/Swift.swift), up to Swift 6.0.
+	* [Swift](tools/lang/Swift.swift), up to Swift 6.2.
 	* TCL, [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#tcl)
 	* [Texinfo](tools/lang/Texinfo.texi), up to Texinfo 7.1.
 	* [TOML File](https://toml.io/)
