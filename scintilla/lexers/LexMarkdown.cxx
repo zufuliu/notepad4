@@ -1509,7 +1509,7 @@ int MarkdownLexer::HighlightBlockText(uint32_t lineState) {
 				delimiterCount = count;
 				int style = (sc.ch == '`') ? SCE_MARKDOWN_BACKTICK_BLOCK : SCE_MARKDOWN_TILDE_BLOCK;
 				// check info string
-				if (AnyOf<'L', 'l', 'M', 'm'>(chNext)) {
+				if (AnyOf<'L', 'l', 'M', 'm'>(static_cast<uint8_t>(chNext))) {
 					char info[8]{};
 					const Sci_PositionU pos = sc.currentPos + count;
 					sc.styler.GetRangeLowered(pos, sc.lineStartNext, info, sizeof(info));
