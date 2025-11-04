@@ -374,14 +374,16 @@ Sci_Position CheckBraceFormatSpecifier(const StyleContext &sc, LexAccessor &styl
 }
 
 constexpr bool IsMatchExpressionStart(int ch, int chNext) noexcept {
-	return IsNumberStart(ch, chNext)
-		|| (chNext != '=' && AnyOf(ch, '*', '+', '-',  '~', '(', '[', '{'));
+	return IsADigit(ch) || AnyOf(ch, '\'', '\"')
+		|| (ch == '.' && (chNext >= '.' && chNext <= '9'))
+		|| (chNext != '=' && AnyOf(ch, '*', '+', '-', '~', '(', '[', '{'));
 }
 
 bool IsSoftKeyword(const char *s, const StyleContext &sc, LexAccessor &styler) noexcept {
 	// match expression
 	// case pattern
 	// type identifier
+	// lazy [from] import
 	int ch = sc.ch;
 	int chNext = sc.chNext;
 	if (IsWhiteSpace(sc.ch)) {
@@ -398,7 +400,7 @@ bool IsSoftKeyword(const char *s, const StyleContext &sc, LexAccessor &styler) n
 			}
 		}
 	}
-	return s[0] != 't' && IsMatchExpressionStart(ch, chNext);
+	return !AnyOf<'l', 't'>(s[0]) && IsMatchExpressionStart(ch, chNext);
 }
 
 constexpr bool IsDocCommentTag(int state, int chNext) noexcept {
@@ -487,7 +489,7 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 						kwType = KeywordType::Function;
 					} else if (StrEqualsAny(s, "class", "raise", "except")) {
 						kwType = KeywordType::Class;
-					} else if (StrEqualsAny(s, "match", "case", "type")) {
+					} else if (StrEqualsAny(s, "match", "case", "type", "lazy")) {
 						if (visibleChars != sc.LengthCurrent() || !IsSoftKeyword(s, sc, styler)) {
 							builtin = s[0] == 't';
 							sc.ChangeState(SCE_PY_IDENTIFIER);
