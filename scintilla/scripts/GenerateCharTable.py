@@ -170,10 +170,9 @@ def GenerateJsonCharClass():
 				charClass = JsonChar_BraceOpen
 			elif ch in '}]':
 				charClass = JsonChar_BraceClose
-			else:
-				if ch in '+-':
-					# SignedInteger in ExponentPart
-					mask = JsonMask_Number
+			elif ch in '+-':
+				# SignedInteger in ExponentPart
+				mask = JsonMask_Number
 		elif ch == '\"':
 			state = SCE_JSON_STRING_DQ
 		elif ch == '\'':

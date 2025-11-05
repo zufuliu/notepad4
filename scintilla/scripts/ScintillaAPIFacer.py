@@ -164,8 +164,7 @@ def HEnumerations(f):
 							valueNameNoPrefix = valueName[len(prefixMatched):]
 							if not valueNameNoPrefix:	# Removed whole name
 								valueNameNoPrefix = valueName
-							if valueNameNoPrefix.startswith("SC_"):
-								valueNameNoPrefix = valueNameNoPrefix[len("SC_"):]
+							valueNameNoPrefix = valueNameNoPrefix.removeprefix("SC_")
 						pascalName = Face.PascalCase(valueNameNoPrefix)
 						out.append("\t" + pascalName + " = " + vEnum["Value"] + ",")
 				out.append("};")
@@ -204,8 +203,7 @@ def HConstants(f):
 					if name.startswith(prefix):
 						hasPrefix = True
 				if not hasPrefix:
-					if name.startswith("SC_"):
-						name = name[3:]
+					name = name.removeprefix("SC_")
 					typeName = "int"
 					if name == "INVALID_POSITION":
 						typeName = "Position"

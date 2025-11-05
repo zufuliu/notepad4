@@ -4,7 +4,7 @@ import json
 import subprocess
 import ctypes
 
-CP_ACP = 'cp' + str(ctypes.windll.kernel32.GetACP())
+CP_ACP = f'cp{ctypes.windll.kernel32.GetACP()}'
 
 def decode_stdout(doc):
 	if not doc:

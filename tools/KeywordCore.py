@@ -840,7 +840,7 @@ def parse_css_api_file(pathList):
 	# custom property https://www.w3.org/TR/css-variables-1/
 	vendor = '^-moz- ^-ms- ^-o- ^-webkit-'.split()
 	keywordMap = {
-		'properties': vendor + ['^--'],
+		'properties': [*vendor, '^--'],
 		'at rules': vendor[:],
 		'pseudo classes': vendor[:],
 		'pseudo elements': vendor,
@@ -1550,11 +1550,10 @@ def parse_javascript_api_file(path):
 						functions.add(item + '(')
 					else:
 						constant.add(item)
+				elif kind == '(':
+					functions.add(item + '(')
 				else:
-					if kind == '(':
-						functions.add(item + '(')
-					else:
-						properties.add(item)
+					properties.add(item)
 
 			items = ['function', 'require', 'import']
 			for item in items:
@@ -1830,9 +1829,7 @@ def parse_nsis_api_file(path):
 		elif key == 'functions':
 			functions = []
 			for item in items:
-				item = item.strip('.')
-				if item.startswith('un.'):
-					item = item[3:]
+				item = item.strip('.').removeprefix('un.')
 				functions.append(item)
 			items = functions
 		elif key == 'predefined variables':
@@ -2534,12 +2531,12 @@ def parse_vhdl_api_file(path):
 			for item in items:
 				constant.extend(item.replace(',', ' ').split())
 			items = re.findall(r'constant\s+(\w+)', doc)
-			constant.extend(items + ['INPUT', 'OUTPUT'])
+			constant.extend([*items, 'INPUT', 'OUTPUT'])
 			misc.extend(constant)
 			keywordMap['constants'] = to_lower(constant)
 			packages = re.findall(r'package\s+(\w+)', doc)
 			misc.extend(packages)
-			keywordMap['packages'] = to_lower(packages) + ['ieee', 'std', 'work']
+			keywordMap['packages'] = [*to_lower(packages), 'ieee', 'std', 'work']
 			misc.extend(re.findall(r'context\s+(\w+)', doc))
 
 	keywordMap['misc'] = misc

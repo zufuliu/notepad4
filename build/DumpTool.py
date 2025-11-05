@@ -51,7 +51,7 @@ mov_eax = re.compile(r'mov\s+eax\s*,\s*(\d+)')
 call_chkstk = re.compile(r'call\s+_?_?chkstk')
 
 def get_stack_size(path, result_map, threshold):
-	with open(path, 'r', encoding='cp1252') as fd:
+	with open(path, encoding='cp1252') as fd:
 		doc = fd.read()
 	segmentList = text_segment.split(doc)
 	path = os.path.basename(path)

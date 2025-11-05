@@ -1329,7 +1329,7 @@ def BuildLexerConfigContent(rid, keywordAttr):
 	styles = config.get('character_style', ['0'])
 	output.append(f"{indent}{styles[0]}, {config.get('none_quote_style', '0')},")
 	# operator styles
-	styles = config.get('operator_style', []) + ['0', '0']
+	styles = [*config.get('operator_style', []), '0', '0']
 	output.append(f"{indent}{styles[0]}, {styles[1]},")
 
 	# keyword attribute
