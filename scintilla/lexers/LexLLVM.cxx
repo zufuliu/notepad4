@@ -1,6 +1,6 @@
 // This file is part of Notepad4.
 // See License.txt for details about distribution and modification.
-//! Lexer for LLVM.
+//! Lexer for LLVM, MLIR.
 
 #include <cassert>
 #include <cstring>
@@ -208,7 +208,7 @@ void ColouriseLLVMDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		}
 
 		if (sc.state == SCE_LLVM_DEFAULT) {
-			if (sc.ch == ';') {
+			if (sc.ch == ';' || sc.Match('/', '/')) {
 				sc.SetState(SCE_LLVM_COMMENTLINE);
 				if (visibleChars == 0) {
 					lineStateLineComment = SimpleLineStateMaskLineComment;
