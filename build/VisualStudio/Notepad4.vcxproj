@@ -264,7 +264,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <ClCompile>
-      <PreprocessorDefinitions>_DEBUG;_WIN64;_WIN32_WINNT=0x0A00;WINVER=0x0A00;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_WIN64;_WIN32_WINNT=0x0A00;WINVER=0x0A00;PopulationCount64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>gdi32.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -397,7 +397,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <ClCompile>
-      <PreprocessorDefinitions>NDEBUG;_WIN64;_WIN32_WINNT=0x0A00;WINVER=0x0A00;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_WIN64;_WIN32_WINNT=0x0A00;WINVER=0x0A00;PopulationCount64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <AdditionalOptions>/GA /Zc:threadSafeInit- /wd26429 /wd26446 /wd26472 /wd26481 /wd26482 /wd26485 /wd26486 /wd26489 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
