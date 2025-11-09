@@ -605,7 +605,7 @@ BEGIN
 			MENUITEM "M&ostra barra di stato\tShift+F11",	IDM_VIEW_STATUSBAR
 			MENUITEM SEPARATOR
 			MENUITEM "Modalità &trasparente\tCtrl+0",	IDM_VIEW_TRANSPARENT
-			MENUITEM "Transparent on Los&ing Focus",IDM_VIEW_TRANSPARENT_INACTIVE
+			MENUITEM "Trasparente quando perde il &focus",IDM_VIEW_TRANSPARENT_INACTIVE
 			POPUP "Modalità &schermo intero"
 			BEGIN
 				MENUITEM "&All'avvio",					IDM_VIEW_FULLSCREEN_ON_START
@@ -2161,6 +2161,7 @@ END
 #include "../../src/Notepad4.ver"
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
+
 
 
 
