@@ -605,6 +605,7 @@ BEGIN
 			MENUITEM "상태 표시줄 표시(&U)\tShift+F11",					IDM_VIEW_STATUSBAR
 			MENUITEM SEPARATOR
 			MENUITEM "투명 모드(&T)\tCtrl+0",							IDM_VIEW_TRANSPARENT
+			MENUITEM "Transparent on Los&ing Focus",IDM_VIEW_TRANSPARENT_INACTIVE
 			POPUP "전체 화면 모드(&N)"
 			BEGIN
 				MENUITEM "시작 시(&S)",									IDM_VIEW_FULLSCREEN_ON_START

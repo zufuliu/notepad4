@@ -184,7 +184,7 @@ bool bUseXPFileDialog;
 static EscFunction iEscFunction;
 static bool bAlwaysOnTop;
 static bool bMinimizeToTray;
-static bool bTransparentMode;
+static TransparentMode bTransparentMode;
 static int	iEndAtLastLine;
 int iFindReplaceOption;
 static bool bEditLayoutRTL;
@@ -831,7 +831,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	if (IsTopMost()) {
 		SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 	}
-	if (bTransparentMode) {
+	if (bTransparentMode == TransparentMode_Always) {
 		SetWindowTransparentMode(hwnd, true, iOpacityLevel);
 	}
 	if (!bShowMenu) {
@@ -1224,6 +1224,12 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		SetFocus(hwndEdit);
 		//if (bPendingChangeNotify)
 		//	PostMessage(hwnd, APPM_CHANGENOTIFY, 0, 0);
+		break;
+
+	case WM_ACTIVATE:
+		if (bTransparentMode == TransparentMode_Inactive) {
+			SetWindowTransparentMode(hwnd, LOWORD(wParam) == WA_INACTIVE, iOpacityLevel);
+		}
 		break;
 
 	case WM_DROPFILES:
@@ -2561,7 +2567,8 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	CheckCmd(hmenu, IDM_VIEW_SINGLEFILEINSTANCE, bSingleFileInstance);
 	CheckCmd(hmenu, IDM_VIEW_ALWAYSONTOP, IsTopMost());
 	CheckCmd(hmenu, IDM_VIEW_MINTOTRAY, bMinimizeToTray);
-	CheckCmd(hmenu, IDM_VIEW_TRANSPARENT, bTransparentMode);
+	CheckCmd(hmenu, IDM_VIEW_TRANSPARENT, bTransparentMode == TransparentMode_Always);
+	CheckCmd(hmenu, IDM_VIEW_TRANSPARENT_INACTIVE, bTransparentMode == TransparentMode_Inactive);
 	i = IDM_VIEW_SCROLLPASTLASTLINE_ONE + iEndAtLastLine;
 	CheckMenuRadioItem(hmenu, IDM_VIEW_SCROLLPASTLASTLINE_ONE, IDM_VIEW_SCROLLPASTLASTLINE_QUARTER, i, MF_BYCOMMAND);
 
@@ -4197,8 +4204,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_VIEW_TRANSPARENT:
-		bTransparentMode = !bTransparentMode;
-		SetWindowTransparentMode(hwnd, bTransparentMode, iOpacityLevel);
+		bTransparentMode = (bTransparentMode != TransparentMode_Always) ? TransparentMode_Always : TransparentMode_None;
+		SetWindowTransparentMode(hwnd, bTransparentMode != TransparentMode_None, iOpacityLevel);
+		break;
+	case IDM_VIEW_TRANSPARENT_INACTIVE:
+		bTransparentMode = (bTransparentMode != TransparentMode_Inactive) ? TransparentMode_Inactive : TransparentMode_None;
+		SetWindowTransparentMode(hwnd, false, iOpacityLevel);
 		break;
 
 	case IDM_VIEW_SCROLLPASTLASTLINE_NO:
@@ -5316,7 +5327,7 @@ void LoadSettings() noexcept {
 
 	bAlwaysOnTop = section.GetBool(L"AlwaysOnTop", false);
 	bMinimizeToTray = section.GetBool(L"MinimizeToTray", false);
-	bTransparentMode = section.GetBool(L"TransparentMode", false);
+	bTransparentMode = static_cast<TransparentMode>(section.GetInt(L"TransparentMode", TransparentMode_None));
 	iValue = section.GetInt(L"EndAtLastLine", 1);
 	iEndAtLastLine = clamp(iValue, 0, 4);
 	bEditLayoutRTL = section.GetBool(L"EditLayoutRTL", false);
@@ -5586,7 +5597,7 @@ void SaveSettings(bool bSaveSettingsNow) noexcept {
 	section.SetIntEx(L"EscFunction", static_cast<int>(iEscFunction), EscFunction_None);
 	section.SetBoolEx(L"AlwaysOnTop", bAlwaysOnTop, false);
 	section.SetBoolEx(L"MinimizeToTray", bMinimizeToTray, false);
-	section.SetBoolEx(L"TransparentMode", bTransparentMode, false);
+	section.SetIntEx(L"TransparentMode", static_cast<int>(bTransparentMode), TransparentMode_None);
 	section.SetIntEx(L"EndAtLastLine", iEndAtLastLine, 1);
 	section.SetBoolEx(L"EditLayoutRTL", bEditLayoutRTL, false);
 	section.SetBoolEx(L"WindowLayoutRTL", bWindowLayoutRTL, false);

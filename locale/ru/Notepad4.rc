@@ -606,6 +606,7 @@ BEGIN
 			MENUITEM "Показывать &строку состояния\tShift+F11",					IDM_VIEW_STATUSBAR
 			MENUITEM SEPARATOR
 			MENUITEM "&Режим прозрачности\tCtrl+0",							IDM_VIEW_TRANSPARENT
+			MENUITEM "Transparent on Los&ing Focus",IDM_VIEW_TRANSPARENT_INACTIVE
 			POPUP "Полно&экранный режим"
 			BEGIN
 				MENUITEM "&При запуске",							IDM_VIEW_FULLSCREEN_ON_START

@@ -140,6 +140,12 @@ enum EscFunction {
 	EscFunction_Exit,
 };
 
+enum TransparentMode {
+	TransparentMode_None = 0,
+	TransparentMode_Always,
+	TransparentMode_Inactive,
+};
+
 enum TitlePathNameFormat {
 	TitlePathNameFormat_NameOnly = 0,
 	TitlePathNameFormat_NameFirst,

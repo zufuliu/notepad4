@@ -605,6 +605,7 @@ BEGIN
 			MENUITEM "Afficher la barre de statut\tShift+F11",	IDM_VIEW_STATUSBAR
 			MENUITEM SEPARATOR
 			MENUITEM "Mode transparent\tCtrl+0",	IDM_VIEW_TRANSPARENT
+			MENUITEM "Transparent on Los&ing Focus",IDM_VIEW_TRANSPARENT_INACTIVE
 			POPUP "Mode plein écran"
 			BEGIN
 				MENUITEM "Au démarrage",				IDM_VIEW_FULLSCREEN_ON_START

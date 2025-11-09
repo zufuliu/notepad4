@@ -605,6 +605,7 @@ BEGIN
 			MENUITEM "Show Stat&usbar\tShift+F11",	IDM_VIEW_STATUSBAR
 			MENUITEM SEPARATOR
 			MENUITEM "&Transparent Mode\tCtrl+0",	IDM_VIEW_TRANSPARENT
+			MENUITEM "Transparent on Los&ing Focus",IDM_VIEW_TRANSPARENT_INACTIVE
 			POPUP "Full Scree&n Mode"
 			BEGIN
 				MENUITEM "On &Startup",				IDM_VIEW_FULLSCREEN_ON_START
