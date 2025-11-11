@@ -4203,13 +4203,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_VIEW_TRANSPARENT:
-		bTransparentMode = (bTransparentMode != TransparentMode_Always) ? TransparentMode_Always : TransparentMode_None;
-		SetWindowTransparentMode(hwnd, bTransparentMode != TransparentMode_None, iOpacityLevel);
-		break;
-	case IDM_VIEW_TRANSPARENT_INACTIVE:
-		bTransparentMode = (bTransparentMode != TransparentMode_Inactive) ? TransparentMode_Inactive : TransparentMode_None;
-		SetWindowTransparentMode(hwnd, false, iOpacityLevel);
-		break;
+	case IDM_VIEW_TRANSPARENT_INACTIVE: {
+		const TransparentMode mode = static_cast<TransparentMode>(LOWORD(wParam) - IDM_VIEW_TRANSPARENT + 1);
+		bTransparentMode = (bTransparentMode != mode) ? mode : TransparentMode_None;
+		SetWindowTransparentMode(hwnd, bTransparentMode == TransparentMode_Always, iOpacityLevel);
+	} break;
 
 	case IDM_VIEW_SCROLLPASTLASTLINE_NO:
 	case IDM_VIEW_SCROLLPASTLASTLINE_ONE:
