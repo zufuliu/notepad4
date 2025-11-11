@@ -3392,7 +3392,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_EDIT_INSERT_GUID: {
 		GUID guid;
 		if (S_OK == CoCreateGuid(&guid)) {
-			char guidBuf[37]{};
+			char guidBuf[40]{};
 			sprintf(guidBuf, "%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",
 					static_cast<unsigned int>(guid.Data1), guid.Data2, guid.Data3,
 					guid.Data4[0], guid.Data4[1],
@@ -3434,7 +3434,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_EDIT_INSERT_ENCODING: {
-		char msz[32] = {'\0'};
+		char msz[40] = {'\0'};
 		const char *enc = mEncoding[iCurrentEncoding].pszParseNames;
 		const char *sep = strchr(enc, ',');
 		if (sep != nullptr) {
@@ -3469,7 +3469,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_EDIT_INSERT_LOC_DATE:
 	case IDM_EDIT_INSERT_LOC_DATETIME: {
 		SYSTEMTIME lt;
-		char mszBuf[38];
+		char mszBuf[40];
 		// Local
 		GetLocalTime(&lt);
 		if (LOWORD(wParam) == IDM_EDIT_INSERT_LOC_DATE) {
@@ -3483,7 +3483,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_EDIT_INSERT_UTC_DATETIME: {
 		SYSTEMTIME lt;
-		char mszBuf[38];
+		char mszBuf[40];
 		// UTC
 		GetSystemTime(&lt);
 		sprintf(mszBuf, "%04d-%02d-%02dT%02d:%02d:%02dZ", lt.wYear, lt.wMonth, lt.wDay, lt.wHour, lt.wMinute, lt.wSecond);
@@ -3496,7 +3496,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_EDIT_INSERT_TIMESTAMP_MS:	// milli	1000 micro
 	case IDM_EDIT_INSERT_TIMESTAMP_US:	// micro 	1000 nano
 	case IDM_EDIT_INSERT_TIMESTAMP_NS: {// nano
-		char mszBuf[32];
+		char mszBuf[40];
 		FILETIME ft;
 		// Windows timestamp in 100-nanosecond
 #if _WIN32_WINNT >= _WIN32_WINNT_WIN8
@@ -3555,7 +3555,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		if (cmd == CMD_COPYFILENAME || cmd == CMD_COPYFILENAME_NOEXT || cmd == CMD_COPYPATHNAME) {
 			SetClipData(hwnd, pszInsert);
 		} else {
-			//int iSelStart;
 			char mszBuf[MAX_PATH * kMaxMultiByteCount];
 			const UINT cpEdit = SciCall_GetCodePage();
 			WideCharToMultiByte(cpEdit, 0, pszInsert, -1, mszBuf, COUNTOF(mszBuf), nullptr, nullptr);
