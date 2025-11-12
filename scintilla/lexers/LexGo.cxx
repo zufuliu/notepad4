@@ -337,7 +337,8 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 						}
 					}
 				} else {
-					const int chNext = sc.GetLineNextChar();
+					Sci_PositionU pos = 0;
+					const int chNext = sc.GetLineNextCharEx(pos);
 					if (chNext == '(') {
 						if (funcState != GoFunction::None) {
 							funcState = GoFunction::Name;
@@ -351,11 +352,13 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 					} else if (kwType != KeywordType::None) {
 						if (kwType == KeywordType::Type) {
 							// type name interface{}, type name struct{}
-							const Sci_Position pos = LexSkipWhiteSpace(styler, sc.currentPos + 1, sc.lineStartNext);
-							if (chNext == 'i' && styler.Match(pos, "interface")) {
-								kwType = KeywordType::Interface;
-							} else if (chNext == 's' && styler.Match(pos, "struct")) {
-								kwType = KeywordType::Struct;
+							if (chNext == 'i' || chNext == 's') {
+								styler.GetRange(pos, sc.lineStartNext, s, 10);
+								if (StrStartsWith(s, "interface")) {
+									kwType = KeywordType::Interface;
+								} else if (StrStartsWith(s, "struct")) {
+									kwType = KeywordType::Struct;
+								}
 							}
 						} else if (kwType == KeywordType::Identifier && chNext != '.') {
 							// map[KeyType]ElementType
@@ -367,7 +370,7 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 							sc.ChangeState(static_cast<int>(kwType));
 							kwType = KeywordType::None;
 						}
-					} else if (!(chNext == '.' || chNext == '*')) {
+					} else if (!AnyOf(chNext, '.', '*')) {
 						const int state = DetectIdentifierType(styler, funcState, chNext, identifierStartPos, lineStartCurrent);
 						if (state != SCE_GO_DEFAULT) {
 							sc.ChangeState(state);

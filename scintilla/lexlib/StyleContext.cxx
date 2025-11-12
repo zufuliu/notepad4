@@ -117,6 +117,31 @@ int StyleContext::GetLineNextChar(bool ignoreCurrent) const noexcept {
 	return '\0';
 }
 
+int StyleContext::GetLineNextCharEx(Sci_PositionU &pos, bool ignoreCurrent) const noexcept {
+	pos = currentPos;
+	if (!ignoreCurrent && !IsWhiteSpace(ch)) {
+		return ch;
+	}
+	// currentPos + width for Unicode line ending
+	++pos;
+	if (pos == lineStartNext) {
+		return '\0';
+	}
+	if (!IsWhiteSpace(chNext)) {
+		return chNext;
+	}
+	// currentPos + width + widthNext
+	++pos;
+	for (; pos < lineStartNext; pos++) {
+		const unsigned char chPos = styler[pos];
+		if (!IsWhiteSpace(chPos)) {
+			return chPos;
+		}
+	}
+	return '\0';
+}
+
+
 namespace {
 
 constexpr bool IsTaskMarkerPrev(int chPrev) noexcept {
