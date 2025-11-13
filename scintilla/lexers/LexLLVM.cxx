@@ -29,13 +29,14 @@ struct EscapeSequence {
 	int digitsLeft = 0;
 
 	// highlight any character as escape sequence.
-	bool resetEscapeState(int state, int chNext) noexcept {
-		if (IsEOLChar(chNext)) {
-			return false;
-		}
+	bool resetEscapeState(int state, int chNext, bool quoted) noexcept {
 		outerState = state;
-		digitsLeft = IsHexDigit(chNext) ? 2 : 1;
-		return true;
+		if (IsHexDigit(chNext)) {
+			digitsLeft = 2;
+			return true;
+		}
+		digitsLeft = IsEOLChar(chNext)? 0 : 1;
+		return quoted;
 	}
 	bool atEscapeEnd(int ch) noexcept {
 		--digitsLeft;
@@ -59,18 +60,7 @@ enum class KeywordType {
 };
 
 constexpr bool IsLLVMIdentifierChar(int ch) {
-	return IsIdentifierChar(ch) || ch == '-' || ch == '.';
-}
-
-bool IsLLVMTypeVar(LexAccessor &styler, Sci_Position pos) noexcept {
-	while (styler[pos] != '=') {
-		++pos;
-	}
-	++pos;
-	while (isspacechar(styler[pos])) {
-		++pos;
-	}
-	return styler.Match(pos, "type") && isspacechar(styler[pos + 4]);
+	return IsIdentifierChar(ch) || ch == '-' || ch == '.' || ch == '$';
 }
 
 int CheckLLVMVarType(StyleContext &sc, KeywordType kwType) noexcept {
@@ -78,19 +68,44 @@ int CheckLLVMVarType(StyleContext &sc, KeywordType kwType) noexcept {
 	if (kwType == KeywordType::Label || sc.ch == ':') {
 		state = SCE_LLVM_LABEL;
 	} else {
-		const int chNext = sc.GetDocNextChar();
+		Sci_PositionU endPos = sc.currentPos;
+		Sci_PositionU pos = endPos;
+		int chNext = sc.GetLineNextCharEx(pos);
 		if (chNext == '(') {
-			char s[8];
-			sc.GetCurrent(s, sizeof(s));
-			const bool quoted = state == SCE_LLVM_QUOTED_VARIABLE || state == SCE_LLVM_QUOTED_GLOBAL_VARIABLE;
+			pos = sc.styler.GetStartSegment();
+		} else if (chNext == '=') {
+			while (pos < sc.lineStartNext) {
+				++pos;
+				chNext = static_cast<uint8_t>(sc.styler[pos]);
+				if (!isspacechar(chNext)) {
+					break;
+				}
+			}
+			if (chNext != 't') {
+				return state;
+			}
+			endPos = sc.lineStartNext;
+		} else {
+			return state;
+		}
+
+		char s[8];
+		sc.styler.GetRange(pos, endPos, s, sizeof(s));
+		if (chNext == '(') {
+			const bool quoted = sc.chPrev == '\"';
 			if (StrStartsWith(s + (quoted? 2 : 1), "llvm.")) {
 				state = SCE_LLVM_INTRINSIC;
 			} else {
 				state = SCE_LLVM_FUNCTION;
 			}
-		} else if (chNext == '=' && IsLLVMTypeVar(sc.styler, sc.currentPos)) {
-			// var = type {}
-			state = SCE_LLVM_TYPE;
+		} else {
+			if (StrStartsWith(s, "type")) {
+				const uint8_t ch = s[4];
+				if (ch <= ' ' || ch == '{' || ch == '<') {
+					// var = type {}, type <>
+					state = SCE_LLVM_TYPE;
+				}
+			}
 		}
 	}
 	return state;
@@ -100,9 +115,14 @@ void ColouriseLLVMDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 	int lineStateLineComment = 0;
 	KeywordType kwType = KeywordType::None;
 	int visibleChars = 0;
+	bool identifierQuoted = false;
 	EscapeSequence escSeq;
 
 	StyleContext sc(startPos, lengthDoc, initStyle, styler);
+	if (sc.currentLine > 0) {
+		const int lineState = styler.GetLineState(sc.currentLine - 1);
+		identifierQuoted = lineState & 2;
+	}
 
 	while (sc.More()) {
 		switch (sc.state) {
@@ -116,23 +136,32 @@ void ColouriseLLVMDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			}
 			break;
 
+		case SCE_LLVM_STRING:
 		case SCE_LLVM_IDENTIFIER:
-		case SCE_LLVM_VARIABLE:
-		case SCE_LLVM_GLOBAL_VARIABLE:
 		case SCE_LLVM_COMDAT:
 		case SCE_LLVM_METADATA:
 		case SCE_LLVM_ATTRIBUTE_GROUP:
-			if (sc.ch == '\\' && IsHexDigit(sc.chNext)) {
-				sc.Forward();
-			} else if (!IsLLVMIdentifierChar(sc.ch)) {
+		case SCE_LLVM_VARIABLE:
+		case SCE_LLVM_GLOBAL_VARIABLE:
+			if (sc.ch == '\\' && escSeq.resetEscapeState(sc.state, sc.chNext, identifierQuoted)) {
+				if (escSeq.digitsLeft) {
+					sc.SetState(SCE_LLVM_ESCAPECHAR);
+					sc.Forward();
+				}
+			} else if (identifierQuoted ? sc.ch == '\"' : !IsLLVMIdentifierChar(sc.ch)) {
+				if (identifierQuoted) {
+					identifierQuoted = false;
+					sc.Forward();
+				}
+
 				int state = sc.state;
-				if (sc.state == SCE_LLVM_VARIABLE || sc.state == SCE_LLVM_GLOBAL_VARIABLE) {
-					state = CheckLLVMVarType(sc, kwType);
-					kwType = KeywordType::None;
+				const KeywordType kwPrev = kwType;
+				kwType = KeywordType::None;
+				if (sc.state >= SCE_LLVM_VARIABLE) {
+					state = CheckLLVMVarType(sc, kwPrev);
 				} else if (sc.state == SCE_LLVM_IDENTIFIER) {
 					char s[MaxKeywordSize];
 					sc.GetCurrent(s, sizeof(s));
-					kwType = KeywordType::None;
 					if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 						state = SCE_LLVM_WORD;
 					} else if (keywordLists[KeywordIndex_Type].InList(s)) {
@@ -153,43 +182,13 @@ void ColouriseLLVMDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			}
 			break;
 
-		case SCE_LLVM_QUOTED_VARIABLE:
-		case SCE_LLVM_QUOTED_GLOBAL_VARIABLE:
-			if (sc.ch == '\"' || sc.atLineStart) {
-				if (sc.ch == '\"') {
-					sc.Forward();
-				}
-
-				const int state = CheckLLVMVarType(sc, kwType);
-				sc.ChangeState(state);
-				sc.SetState(SCE_LLVM_DEFAULT);
-				kwType = KeywordType::None;
-			} else if (sc.ch == '\\' && !IsEOLChar(sc.chNext)) {
-				sc.Forward();
-			}
-			break;
-
 		case SCE_LLVM_WORD2:
 			if (!IsADigit(sc.ch)) {
-				if (IsIdentifierChar(sc.ch)) {
+				if (IsLLVMIdentifierChar(sc.ch)) {
 					sc.ChangeState(SCE_LLVM_IDENTIFIER);
 				} else {
 					sc.SetState(SCE_LLVM_DEFAULT);
 				}
-			}
-			break;
-
-		case SCE_LLVM_STRING:
-		case SCE_LLVM_META_STRING:
-			if (sc.atLineStart) {
-				sc.SetState(SCE_LLVM_DEFAULT);
-			} else if (sc.ch == '\\') {
-				if (escSeq.resetEscapeState(sc.state, sc.chNext)) {
-					sc.SetState(SCE_LLVM_ESCAPECHAR);
-					sc.Forward();
-				}
-			} else if (sc.ch == '\"') {
-				sc.ForwardSetState(SCE_LLVM_DEFAULT);
 			}
 			break;
 
@@ -205,6 +204,13 @@ void ColouriseLLVMDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				sc.SetState(SCE_LLVM_DEFAULT);
 			}
 			break;
+
+		case SCE_LLVM_COMMENTBLOCK:
+			if (sc.Match('*', '/')) {
+				sc.Forward();
+				sc.ForwardSetState(SCE_LLVM_DEFAULT);
+			}
+			break;
 		}
 
 		if (sc.state == SCE_LLVM_DEFAULT) {
@@ -213,40 +219,46 @@ void ColouriseLLVMDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				if (visibleChars == 0) {
 					lineStateLineComment = SimpleLineStateMaskLineComment;
 				}
+			} else if (sc.Match('/', '*')) {
+				sc.SetState(SCE_LLVM_COMMENTBLOCK);
+				sc.Forward();
 			} else if (sc.ch == '\"' || sc.Match('c', '\"')) {
+				identifierQuoted = true;
 				sc.SetState(SCE_LLVM_STRING);
 				if (sc.ch == 'c') {
 					sc.Forward();
 				}
-			} else if (sc.Match('!', '\"')) {
-				sc.SetState(SCE_LLVM_META_STRING);
-				sc.Forward();
-			} else if (sc.ch == '@' || sc.ch == '%') {
-				if (IsLLVMIdentifierChar(sc.chNext)) {
-					sc.SetState((sc.ch == '@')? SCE_LLVM_GLOBAL_VARIABLE : SCE_LLVM_VARIABLE);
-					sc.Forward();
-				} else if (sc.chNext == '\"') {
-					sc.SetState((sc.ch == '@')? SCE_LLVM_QUOTED_GLOBAL_VARIABLE : SCE_LLVM_QUOTED_VARIABLE);
-					sc.Forward();
-				} else {
-					sc.SetState(SCE_LLVM_OPERATOR);
-				}
-			} else if (sc.ch == '!' && IsLLVMIdentifierChar(sc.chNext)) {
-				sc.SetState(SCE_LLVM_METADATA);
-			} else if (sc.ch == '$' && IsLLVMIdentifierChar(sc.chNext)) {
-				sc.SetState(SCE_LLVM_COMDAT);
-			} else if (sc.ch == '#' && IsLLVMIdentifierChar(sc.chNext)) {
-				sc.SetState(SCE_LLVM_ATTRIBUTE_GROUP);
 			} else if (IsNumberStart(sc.ch, sc.chNext)) {
 				sc.SetState(SCE_LLVM_NUMBER);
-			} else if (sc.ch == 'i' && IsADigit(sc.chNext)) {
-				// iN
-				sc.SetState(SCE_LLVM_WORD2);
 			} else if (IsIdentifierStart(sc.ch)) {
-				sc.SetState((sc.ch == 'x' && isspacechar(sc.chNext)) ? SCE_LLVM_OPERATOR : SCE_LLVM_IDENTIFIER);
+				identifierQuoted = false;
 				sc.SetState(SCE_LLVM_IDENTIFIER);
+				if (sc.ch == 'x' && sc.chNext <= ' ' && sc.chPrev <= ' ') {
+					sc.ChangeState(SCE_LLVM_OPERATOR);
+				} else if (AnyOf<'s', 'u'>(sc.ch) && (sc.chNext == '0' || sc.chNext == 'i')) {
+					++visibleChars;
+					sc.Forward();
+					if (sc.Match('0', 'x')) {
+						sc.ChangeState(SCE_LLVM_NUMBER); // LLVM: [s|u]0x
+					}
+				}
+				if (sc.state == SCE_LLVM_IDENTIFIER && sc.ch == 'i' && IsADigit(sc.chNext)) {
+					sc.ChangeState(SCE_LLVM_WORD2); // i<N>, MLIR: [s|u]i<N>
+				}
 			} else if (IsAGraphic(sc.ch)) {
 				sc.SetState(SCE_LLVM_OPERATOR);
+				if (AnyOf(sc.ch, '@', '%', '!', '$', '#', '^') && (sc.chNext == '\"' || IsLLVMIdentifierChar(sc.chNext))) {
+					identifierQuoted = sc.chNext == '\"';
+					constexpr unsigned mask = (SCE_LLVM_GLOBAL_VARIABLE << (4*('@' & 7)))
+						| (SCE_LLVM_VARIABLE << (4*('%' & 7)))
+						| (SCE_LLVM_METADATA << (4*('!' & 7)))
+						| (SCE_LLVM_COMDAT << (4*('$' & 7)))
+						| (SCE_LLVM_ATTRIBUTE_GROUP << (4*('#' & 7)))
+						| (SCE_LLVM_VARIABLE << (4*('^' & 7))); // LLVM summary id, MLIR caret id, label
+					const int state = (mask >> (4*(sc.ch & 7))) & 15;
+					sc.ChangeState(state);
+					sc.Forward();
+				}
 			}
 		}
 
@@ -254,6 +266,7 @@ void ColouriseLLVMDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			++visibleChars;
 		}
 		if (sc.atLineEnd) {
+			lineStateLineComment += static_cast<int>(identifierQuoted)*2;
 			styler.SetLineState(sc.currentLine, lineStateLineComment);
 			lineStateLineComment = 0;
 			visibleChars = 0;
