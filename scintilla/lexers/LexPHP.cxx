@@ -20,7 +20,6 @@
 #include "CharacterSet.h"
 #include "StringUtils.h"
 #include "LexerModule.h"
-#include "LexerUtils.h"
 #include "DocUtils.h"
 
 using namespace Scintilla;
@@ -112,9 +111,12 @@ enum class VariableType {
 	Normal,
 	Simple,		// $variable
 	Complex,	// ${variable}, {$variable}
+	JavaScript,	// `${}`
+	Html,		// <?php ?>
 };
 
 struct VariableExpansion {
+	int state;
 	VariableType type;
 	int braceCount;
 };
@@ -157,8 +159,7 @@ struct EscapeSequence {
 
 struct PHPLexer {
 	StyleContext sc;
-	std::vector<int> nestedState;
-	std::vector<VariableExpansion> nestedExpansion;
+	std::vector<VariableExpansion> nestedState;
 	std::string hereDocId;
 
 	HtmlTagType tagType = HtmlTagType::None;
@@ -176,23 +177,8 @@ struct PHPLexer {
 	PHPLexer(Sci_PositionU startPos, Sci_PositionU lengthDoc, int initStyle, Accessor &styler) noexcept:
 		sc(startPos, lengthDoc, initStyle, styler) {}
 
-	void SaveOuterStyle(int style) {
-		nestedState.push_back(style);
-	}
-	int TakeOuterStyle() {
-		return TakeAndPop(nestedState);
-	}
-	int TryTakeOuterStyle() {
-		return TryTakeAndPop(nestedState);
-	}
-	void EnterExpansion(VariableType type, int braceCount) {
-		nestedExpansion.push_back({type, braceCount});
-	}
-	void ExitExpansion() {
-		nestedExpansion.pop_back();
-	}
 	VariableType GetVariableType() const noexcept {
-		return nestedExpansion.empty() ? VariableType::Normal : nestedExpansion.back().type;
+		return nestedState.empty() ? VariableType::Normal : nestedState.back().type;
 	}
 
 	int LineState() const noexcept {
@@ -268,10 +254,9 @@ void PHPLexer::ClassifyHtmlTag(LexerWordList keywordLists) {
 bool PHPLexer::HandleBlockEnd(HtmlTextBlock block) {
 	if (block == HtmlTextBlock::PHP) {
 		kwType = KeywordType::None;
-		const int outer = TryTakeOuterStyle();
+		const int outer = nestedState.empty() ? SCE_H_DEFAULT : nestedState.back().state;
 		lineStateLineType = nestedState.empty() ? 0 : LineStateNestedStateLine;
 		nestedState.clear();
-		nestedExpansion.clear();
 		sc.SetState(SCE_H_QUESTION);
 		sc.Forward();
 		sc.ForwardSetState(outer);
@@ -321,7 +306,7 @@ void PHPLexer::HandlePHPTag() {
 	if (offset != 0) {
 		sc.SetState(SCE_PHP_DEFAULT);
 		if (outer != SCE_H_DEFAULT) {
-			SaveOuterStyle(outer);
+			nestedState.push_back({outer, VariableType::Html, 0});
 		}
 	}
 }
@@ -344,17 +329,18 @@ bool PHPLexer::ClassifyPHPWord(LexerWordList keywordLists, int visibleChars) {
 		return false;
 	}
 	const VariableType variableType = GetVariableType();
-	if (variableType == VariableType::Simple && nestedExpansion.back().braceCount == 0) {
+	if (variableType == VariableType::Simple && nestedState.back().braceCount == 0) {
 		// avoid highlighting object property to simplify code folding
 		if (sc.state != SCE_PHP_VARIABLE2) {
 			sc.ChangeState(SCE_PHP_IDENTIFIER2);
 		}
 		if (sc.ch == '[') {
-			nestedExpansion.back().braceCount = 1;
+			nestedState.back().braceCount = 1;
 		} else if (!sc.Match('-', '>')) {
 			kwType = KeywordType::None;
-			ExitExpansion();
-			sc.SetState(TakeOuterStyle());
+			const int outerState = nestedState.back().state;
+			nestedState.pop_back();
+			sc.SetState(outerState);
 			return true;
 		}
 	} else {
@@ -557,15 +543,13 @@ bool PHPLexer::HighlightInnerString() {
 		// see https://wiki.php.net/rfc/deprecate_dollar_brace_string_interpolation
 		if (ExpandVariable(sc.state) && IsIdentifierStartEx(sc.chNext)) {
 			insideUrl = false;
-			SaveOuterStyle(sc.state);
-			EnterExpansion(VariableType::Simple, 0);
+			nestedState.push_back({sc.state, VariableType::Simple, 0});
 			sc.SetState(SCE_PHP_VARIABLE2);
 		}
 	} else if (sc.Match('{', '$')) {
 		insideUrl = false;
 		if (ExpandVariable(sc.state)) {
-			SaveOuterStyle(sc.state);
-			EnterExpansion(VariableType::Complex, 1);
+			nestedState.push_back({sc.state, VariableType::Complex, 1});
 			sc.SetState(SCE_PHP_OPERATOR2);
 		}
 	} else if (sc.Match(':', '/', '/') && IsLowerCase(sc.chPrev)) {
@@ -585,31 +569,36 @@ bool PHPLexer::HighlightOperator(HtmlTextBlock block, int stylePrevNonWhite) {
 			if (lineStateAttribute) {
 				lineStateAttribute = 0;
 			} else if (variableType == VariableType::Simple) {
-				ExitExpansion();
-				sc.ForwardSetState(TakeOuterStyle());
+				const int outerState = nestedState.back().state;
+				nestedState.pop_back();
+				sc.ForwardSetState(outerState);
 				return true;
 			}
 		} else if (variableType == VariableType::Complex) {
 			if (AnyOf<'{', '}'>(sc.ch)) {
-				VariableExpansion &expansion = nestedExpansion.back();
+				VariableExpansion &expansion = nestedState.back();
 				expansion.braceCount += ('{' + '}')/2 - sc.ch;
-				if (expansion.braceCount == 0) {
-					ExitExpansion();
-					sc.ForwardSetState(TakeOuterStyle());
+				if (expansion.braceCount <= 0) {
+					const int outerState = expansion.state;
+					nestedState.pop_back();
+					sc.ForwardSetState(outerState);
 					return true;
 				}
 			}
 		}
 	} else if (block == HtmlTextBlock::Script) {
 		sc.SetState(js_style(SCE_JS_OPERATOR));
-		if (!nestedState.empty() && nestedState.back() > SCE_PHP_LABEL) {
+		if (!nestedState.empty() && nestedState.back().type == VariableType::JavaScript) {
 			sc.ChangeState(js_style(SCE_JS_OPERATOR2));
-			if (sc.ch == '{') {
-				SaveOuterStyle(js_style(SCE_JS_DEFAULT));
-			} else if (sc.ch == '}') {
-				const int outerState = TakeOuterStyle();
-				sc.ForwardSetState(outerState);
-				return true;
+			if (AnyOf<'{', '}'>(sc.ch)) {
+				VariableExpansion &expansion = nestedState.back();
+				expansion.braceCount += ('{' + '}')/2 - sc.ch;
+				if (expansion.braceCount <= 0) {
+					const int outerState = expansion.state;
+					nestedState.pop_back();
+					sc.ForwardSetState(outerState);
+					return true;
+				}
 			}
 		}
 	} else if (block == HtmlTextBlock::Style) {
@@ -733,7 +722,7 @@ void PHPLexer::HighlightJsInnerString() {
 		}
 	} else if (sc.state == js_style(SCE_JS_TEMPLATELITERAL)) {
 		if (sc.Match('$', '{')) {
-			SaveOuterStyle(sc.state);
+			nestedState.push_back({sc.state, VariableType::JavaScript, 1});
 			sc.SetState(js_style(SCE_JS_OPERATOR2));
 			sc.Forward();
 		} else if (sc.ch == '`') {

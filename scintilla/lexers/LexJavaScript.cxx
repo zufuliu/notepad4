@@ -54,7 +54,7 @@ enum {
 	JsLineStateMaskLineComment = 1,		// line comment
 	JsLineStateMaskImport = (1 << 1),	// import
 
-	JsLineStateInsideJsxExpression = 1 << 3,
+	JsLineStateStringInterpolation = 1 << 3,
 	JsLineStateLineContinuation = 1 << 4,
 };
 
@@ -154,7 +154,7 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 
 	if (startPos != 0) {
 		// backtrack to the line starts JSX or interpolation for better coloring on typing.
-		BacktrackToStart(styler, JsLineStateInsideJsxExpression, startPos, lengthDoc, initStyle);
+		BacktrackToStart(styler, JsLineStateStringInterpolation, startPos, lengthDoc, initStyle);
 	}
 
 	StyleContext sc(startPos, lengthDoc, initStyle, styler);
@@ -162,7 +162,7 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 		const int lineState = styler.GetLineState(sc.currentLine - 1);
 		/*
 		2: lineStateLineType
-		1: JsLineStateInsideJsxExpression
+		1: JsLineStateStringInterpolation
 		1: lineContinuation
 		: jsxTagLevel
 		*/
@@ -557,7 +557,7 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 		if (sc.atLineEnd) {
 			int lineState = lineContinuation | lineStateLineType | (jsxTagLevel << 4);
 			if (!nestedState.empty()) {
-				lineState |= JsLineStateInsideJsxExpression;
+				lineState |= JsLineStateStringInterpolation;
 			}
 			styler.SetLineState(sc.currentLine, lineState);
 			lineStateLineType = 0;
