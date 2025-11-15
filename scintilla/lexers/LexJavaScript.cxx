@@ -152,8 +152,8 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 	DocTagState docTagState = DocTagState::None;
 	EscapeSequence escSeq;
 
-	if (enableJsx && startPos != 0) {
-		// backtrack to the line starts JSX for better coloring on typing.
+	if (startPos != 0) {
+		// backtrack to the line starts JSX or interpolation for better coloring on typing.
 		BacktrackToStart(styler, JsLineStateInsideJsxExpression, startPos, lengthDoc, initStyle);
 	}
 

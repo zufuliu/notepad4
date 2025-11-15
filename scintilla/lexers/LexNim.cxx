@@ -410,10 +410,8 @@ void ColouriseNimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 					kwType = KeywordType::Pragma;
 				} else if (interpolating) {
 					FormatStringState &state = nestedState.back();
-					if (sc.ch == '(') {
-						state.parenCount += 1;
-					} else if (sc.ch == ')') {
-						state.parenCount -= 1;
+					if (AnyOf<'(', ')'>(sc.ch)) {
+						state.parenCount += '(' + ')' - 2*sc.ch;
 					} else if (state.parenCount <= 0 && (sc.ch == ':' || sc.ch == '=' || (sc.ch == '}' && sc.chPrev != '\\'))) {
 						fmtPart = (sc.ch == '}') ? FormatStringPart::End : FormatStringPart::FormatSpec;
 						sc.ChangeState(state.state);

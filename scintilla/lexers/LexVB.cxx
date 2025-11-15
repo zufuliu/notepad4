@@ -425,10 +425,8 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 					}
 				} else {
 					sc.ChangeState(SCE_VB_OPERATOR2);
-					if (sc.ch == '(') {
-						nestedState.back() += 1;
-					} else if (sc.ch == ')') {
-						nestedState.back() -= 1;
+					if (AnyOf<'(', ')'>(sc.ch)) {
+						nestedState.back() += '(' + ')' - 2*sc.ch;
 					}
 					if (nestedState.back() <= 0 && IsInterpolatedStringEnd(sc)) {
 						sc.ChangeState((sc.ch == '}') ? SCE_VB_INTERPOLATED_STRING : SCE_VB_FORMAT_SPECIFIER);

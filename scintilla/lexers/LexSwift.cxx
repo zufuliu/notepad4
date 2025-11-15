@@ -20,7 +20,6 @@
 #include "CharacterSet.h"
 #include "StringUtils.h"
 #include "LexerModule.h"
-#include "LexerUtils.h"
 
 using namespace Lexilla;
 
@@ -433,19 +432,15 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			} else if (IsAGraphic(sc.ch)) {
 				const bool interpolating = !nestedState.empty();
 				sc.SetState(interpolating ? SCE_SWIFT_OPERATOR2 : SCE_SWIFT_OPERATOR);
-				if (interpolating && (sc.ch == '(' || sc.ch == ')')) {
+				if (interpolating && AnyOf<'(', ')'>(sc.ch)) {
 					InterpolatedStringState &state = nestedState.back();
-					if (sc.ch == '(') {
-						state.parenCount += 1;
-					} else {
-						state.parenCount -= 1;
-						if (state.parenCount <= 0) {
-							escSeq.outerState = state.state;
-							delimiterCount = state.delimiterCount;
-							nestedState.pop_back();
-							sc.ForwardSetState(escSeq.outerState);
-							continue;
-						}
+					state.parenCount += '(' + ')' - 2*sc.ch;
+					if (state.parenCount <= 0) {
+						escSeq.outerState = state.state;
+						delimiterCount = state.delimiterCount;
+						nestedState.pop_back();
+						sc.ForwardSetState(escSeq.outerState);
+						continue;
 					}
 				}
 			}
