@@ -146,7 +146,7 @@ constexpr bool IsBashWordChar(int ch) noexcept {
 }
 
 constexpr bool IsBashWordChar(int ch, CmdState cmdState) noexcept {
-	return IsIdentifierChar(ch) || (cmdState !=  CmdState::Arithmetic && (ch == '.' || ch == '+' || ch == '-'));
+	return IsIdentifierChar(ch) || (cmdState != CmdState::Arithmetic && (ch == '.' || ch == '+' || ch == '-'));
 }
 
 constexpr bool IsBashMetaCharacter(int ch) noexcept {

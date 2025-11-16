@@ -467,7 +467,7 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 					break;
 				}
 			}
-			if  (sc.ch == '\\') {
+			if (sc.ch == '\\') {
 				if (HasEscapeChar(sc.state)) {
 					if (escSeq.resetEscapeState(sc.state, sc.chNext)) {
 						sc.SetState(SCE_CSHARP_ESCAPECHAR);
