@@ -3107,8 +3107,8 @@ void CreateFoldMap(int codePage, FoldMap &foldingMap) {
 class CaseFolderDBCS final : public CaseFolderTable {
 	// Allocate the expandable storage here so that it does not need to be reallocated
 	// for each call to Fold.
-	FoldMap foldingMap;
 	UINT cp;
+	FoldMap foldingMap;
 public:
 	explicit CaseFolderDBCS(UINT cp_): cp{cp_} {
 		// const ElapsedPeriod period;

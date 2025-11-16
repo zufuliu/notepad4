@@ -46,10 +46,7 @@ def conversionSets():
 	complexes = []
 	symmetrics = []
 	for ch in range(UnicodeCharacterCount):
-		if isSurrogate(ch):
-			continue
 		uch = chr(ch)
-
 		fold = uch.casefold()
 		upper = uch.upper()
 		lower = uch.lower()
@@ -133,8 +130,6 @@ def updateCaseConvert():
 def getCaseSensitiveCharacterSet():
 	sensitive = []
 	for ch in range(UnicodeCharacterCount):
-		if isSurrogate(ch):
-			continue
 		uch = chr(ch)
 		fold = uch.casefold()
 		upper = uch.upper()

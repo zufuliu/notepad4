@@ -17,7 +17,7 @@ BMPCharacterCharacterCount = 0xffff + 1
 DBCSCharacterCount = 0xffff + 1
 
 def isSurrogate(ch):
-	return 0xD800 <= ch <= 0xDBFF
+	return 0xD800 <= ch <= 0xDFFF
 
 def getCharacterName(ch):
 	try:
