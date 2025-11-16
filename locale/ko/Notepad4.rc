@@ -447,7 +447,7 @@ BEGIN
 			MENUITEM "전체 단어만 일치(&W)",								IDM_VIEW_MARKOCCURRENCES_WORD
 			MENUITEM "일치하는 줄 책갈피(&M)",							IDM_VIEW_MARKOCCURRENCES_BOOKMARK
 		END
-		POPUP "CallTip 표시(&P)"
+		POPUP "호출 팁 표시(&P)"
 		BEGIN
 			MENUITEM "끄기(&O)",										IDM_VIEW_SHOWCALLTIP_OFF
 			MENUITEM "RGBA 색상(&R)",									IDM_VIEW_SHOWCALLTIP_RGBA
@@ -458,7 +458,7 @@ BEGIN
 		MENUITEM SEPARATOR
 		MENUITEM "줄 번호(&N)\tCtrl+Shift+N",							IDM_VIEW_LINENUMBERS
 		MENUITEM "책갈피 여백(&M)\tCtrl+Shift+M",						IDM_VIEW_MARGIN
-		MENUITEM "Change &History Marker",								IDM_VIEW_CHANGE_HISTORY_MARKER
+		MENUITEM "기록 마커 변경(&H)",									IDM_VIEW_CHANGE_HISTORY_MARKER
 		MENUITEM SEPARATOR
 		MENUITEM "코드 접기 표시(&F)\tCtrl+Shift+Alt+F",					IDM_VIEW_SHOW_FOLDING
 		POPUP "접기 전환(&T)"
@@ -2161,6 +2161,7 @@ END
 #include "../../src/Notepad4.ver"
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
+
 
 
 
