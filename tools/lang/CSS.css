@@ -1,5 +1,5 @@
-// 2025 https://www.w3.org/TR/CSS/ 9 September 2025
-// 2025-07-14 https://drafts.csswg.org/
+// 2025 https://www.w3.org/TR/CSS/ 18 September 2025
+// 2025-11-16 https://drafts.csswg.org/
 // https://github.com/w3c/csswg-drafts/
 // https://www.w3.org/Style/CSS/all-properties
 // https://www.w3.org/Style/CSS/all-descriptors
@@ -10,7 +10,8 @@
 // https://www.w3.org/TR/css-syntax-3/ 24 December 2021
 !important
 
-// CSS Anchor Positioning https://www.w3.org/TR/css-anchor-position-1/ 9 May 2025
+// CSS Anchor Positioning https://www.w3.org/TR/css-anchor-position-1/ 7 October 2025
+// CSS Anchor Positioning Module Level 2 https://www.w3.org/TR/css-anchor-position-2/ 21 October 2025
 {
 	anchor-name: none;
 	anchor-scope: none | all;
@@ -25,6 +26,10 @@
 anchor()
 anchor-size()
 @position-try {}
+anchored()
+@container {
+	fallback:;
+}
 
 // CSS Animations Level 2 https://www.w3.org/TR/css-animations-2/ 2 June 2023
 // CSS Animations Level 1 https://www.w3.org/TR/css-animations-1/ 2 March 2023
@@ -351,7 +356,7 @@ initial inherit unset revert revert-layer
 	background-blend-mode:;
 }
 
-// CSS Conditional Rules Module Level 5 https://www.w3.org/TR/css-conditional-5/ 5 November 2024
+// CSS Conditional Rules Module Level 5 https://www.w3.org/TR/css-conditional-5/ 30 October 2025
 // CSS Conditional Rules Module Level 4 https://www.w3.org/TR/css-conditional-4/ 4 September 2025
 // CSS Conditional Rules Module Level 3 https://www.w3.org/TR/css-conditional-3/ 15 August 2024
 not and or
@@ -375,14 +380,18 @@ not and or
 	orientation: portrait | landscape;
 	stuck: none | top | right | bottom | left | block-start | inline-start | block-end | inline-end;
 	snapped: none | block | inline;
-	overflowing: none | top | right | bottom | left | block-start | inline-start | block-end | inline-end;
+	scrollable: none | top | right | bottom | left | block-start | inline-start | block-end | inline-end | block | inline;
+	scrolled: none | top | right | bottom | left | block-start | inline-start | block-end | inline-end | block | inline;
 }
 @media {}
 selector()
 font-tech()
 font-format()
+at-rule()
 media()
 supports()
+style()
+scroll-state()
 
 // CSS Containment Module Level 3 https://www.w3.org/TR/css-contain-3/ 18 August 2022
 // CSS Containment Module Level 2 https://www.w3.org/TR/css-contain-2/ 17 September 2022
@@ -431,14 +440,15 @@ var()
 	list-style-type: symbols();
 }
 
-// CSS Display Module Level 4 https://www.w3.org/TR/css-display-4/ 19 December 2024
+// CSS Display Module Level 4 https://www.w3.org/TR/css-display-4/ 6 November 2025
 // CSS Display Module Level 3 https://www.w3.org/TR/css-display-3/ 30 March 2023
 {
 	display: block | inline | run-in | flow | flow-root | table | flex | grid | ruby | flow | flow-root | list-item | table-row-group | table-header-group | table-footer-group | table-row | table-cell | table-column-group | table-column | table-caption | ruby-base | ruby-text | ruby-base-container |
  ruby-text-container | contents | none | inline-block | inline-table | inline-flex | inline-grid;
 	order:;
 	reading-flow: normal | flex-visual | flex-flow | grid-rows | grid-columns | grid-order;
-	visibility: visible | hidden | collapse;
+	reading-order:;
+	visibility: visible | hidden | force-hidden | collapse;
 }
 
 // CSS Easing Functions Level 2 https://www.w3.org/TR/css-easing-2/ 29 August 2024
@@ -446,6 +456,9 @@ var()
 linear()
 linear ease ease-in ease-out ease-in-out cubic-bezier()
 step-start step-end steps()
+
+// CSS Environment Variables Module Level 1 https://www.w3.org/TR/css-env-1/ 23 September 2025
+env()
 
 // CSS Exclusions Module Level 1 https://www.w3.org/TR/css3-exclusions/ 15 January 2015
 {
@@ -497,7 +510,7 @@ step-start step-end steps()
 	backdrop-filter: none;
 }
 
-// CSS Flexible Box Layout Module Level 1 https://www.w3.org/TR/css-flexbox-1/ 19 November 2018
+// CSS Flexible Box Layout Module Level 1 https://www.w3.org/TR/css-flexbox-1/ 14 October 2025
 {
 	flex-direction: row | row-reverse | column | column-reverse;
 	flex-wrap: nowrap | wrap | wrap-reverse;
@@ -682,12 +695,12 @@ type()
 	bookmark-state: open | closed;
 }
 
-// CSS Grid Layout Module Level 3 https://www.w3.org/TR/css-grid-3/ 7 February 2025
+// CSS Grid Layout Module Level 3 https://www.w3.org/TR/css-grid-3/ 17 September 2025
 // CSS Grid Layout Module Level 2 https://www.w3.org/TR/css-grid-2/ 26 March 2025
 // CSS Grid Layout Module Level 1 https://www.w3.org/TR/css-grid-1/ 26 March 2025
 {
 	display: grid | inline-grid | masonry | inline-masonry;
-	grid-template-columns: none, min-content | max-content | auto, minmax(), fit-content(), subgrid, masonry;
+	grid-template-columns: none, min-content | max-content | auto, minmax(), fit-content(), subgrid, masonry, repeat(), auto-fill | auto-fit;
 	grid-template-rows: none, min-content | max-content | auto, minmax(), fit-content(), subgrid, masonry;
 	grid-template-areas: none;
 	grid-template: none;
@@ -704,7 +717,7 @@ type()
 	grid-column: auto;
 	grid-area: auto;
 
-	item-slack: infinite;
+	item-tolerance: normal | infinite;
 	item-direction: row | column | row-reverse | column-reverse;
 	item-track:;
 	item-wrap: auto | nowrap | wrap | normal | reverse | wrap-reverse;
@@ -714,7 +727,7 @@ type()
 }
 auto-areas auto-fit
 
-// CSS Images Module Level 4 https://www.w3.org/TR/css-images-4/ 17 February 2023
+// CSS Images Module Level 4 https://www.w3.org/TR/css-images-4/ 30 September 2025
 // CSS Images Module Level 3 https://www.w3.org/TR/css-images-3/ 18 December 2023
 url() image-set() type()
 image() ltr rtl
@@ -944,7 +957,7 @@ all continuous paged visual audio speech tactile grid bitmap interactive static
 	max-device-aspect-ratio:;
 }
 
-// CSS Mobile Text Size Adjustment Module Level 1 https://drafts.csswg.org/css-size-adjust/ 24 January 2024
+// CSS Mobile Text Size Adjustment Module Level 1 https://drafts.csswg.org/css-size-adjust/ 12 October 2025
 {
 	text-size-adjust: auto | none;
 }
@@ -979,7 +992,7 @@ all continuous paged visual audio speech tactile grid bitmap interactive static
 }
 ::column
 
-// CSS Namespaces Module Level 3 https://www.w3.org/TR/css3-namespace/ 20 March 2014
+// CSS Namespaces Module Level 3 https://www.w3.org/TR/css-namespace/ 20 March 2014
 @namespace ;
 
 // CSS Nesting Module https://www.w3.org/TR/css-nesting-1/ 14 February 2023
@@ -987,11 +1000,11 @@ all continuous paged visual audio speech tactile grid bitmap interactive static
 @nest {}
 
 // CSS Object Model (CSSOM) https://www.w3.org/TR/cssom-1/ 26 August 2021
-// CSSOM View Module https://www.w3.org/TR/cssom-view-1/ 17 March 2016
+// CSSOM View Module https://www.w3.org/TR/cssom-view-1/ 16 September 2025
 
 // CSS Overflow Module Level 5 https://www.w3.org/TR/css-overflow-5/ 17 December 2024
 // CSS Overflow Module Level 4 https://www.w3.org/TR/css-overflow-4/ 21 March 2023
-// CSS Overflow Module Level 3 https://www.w3.org/TR/css-overflow-3/ 29 March 2023
+// CSS Overflow Module Level 3 https://www.w3.org/TR/css-overflow-3/ 7 October 2025
 ::scroll-marker-group
 ::scroll-marker
 :target-current
@@ -1073,8 +1086,8 @@ all continuous paged visual audio speech tactile grid bitmap interactive static
 	page-orientation: upright | rotate-left | rotate-right;
 }
 
-// CSS Positioned Layout Module Level 4 https://www.w3.org/TR/css-position-4/ 8 July 2025
-// CSS Positioned Layout Module Level 3 https://www.w3.org/TR/css-position-3/ 11 March 2025
+// CSS Positioned Layout Module Level 4 https://www.w3.org/TR/css-position-4/ 7 October 2025
+// CSS Positioned Layout Module Level 3 https://www.w3.org/TR/css-position-3/ 7 October 2025
 ::backdrop
 {
 	position: static | relative | absolute | sticky | fixed;
@@ -1136,7 +1149,7 @@ all continuous paged visual audio speech tactile grid bitmap interactive static
 	region-fragment: auto | break;
 }
 
-// Resize Observer https://www.w3.org/TR/resize-observer/ 11 February 2020
+// Resize Observer https://www.w3.org/TR/resize-observer-1/ 11 February 2020
 
 // CSS Rhythmic Sizing https://www.w3.org/TR/css-rhythm-1/ 2 March 2017
 {
@@ -1381,6 +1394,7 @@ view()
 
 // CSS Style Attributes https://www.w3.org/TR/css-style-attr/ 07 November 2013
 
+// CSS Table Module Level 3 https://www.w3.org/TR/css-tables-3/ 27 July 2019
 // Tables https://www.w3.org/TR/CSS22/tables.html
 {
 	caption-side: top | bottom;
@@ -1475,9 +1489,6 @@ view()
 	text-emphasis-position: over | under | right | left;
 	text-emphasis-skip: spaces | punctuation | symbols | narrow;
 	text-shadow: none;
-
-	// https://drafts.csswg.org/css-text-decor-4/
-	text-decoration-trim: auto;
 }
 
 // CSS Transforms Module Level 2 https://www.w3.org/TR/css-transforms-2/ 9 November 2021
@@ -1602,7 +1613,7 @@ pi infinity NaN
 	visibility: visible | hidden | collapse;
 }
 
-// Web Animations Level 2 https://www.w3.org/TR/web-animations-2/ 21 February 2023
+// Web Animations Level 2 https://www.w3.org/TR/web-animations-2/ 15 November 2025
 // Web Animations https://www.w3.org/TR/web-animations-1/ 5 June 2023
 
 // CSS Will Change Module Level 1 https://www.w3.org/TR/css-will-change-1/ 5 May 2022
@@ -1647,7 +1658,7 @@ aural speech
 	speak-header: once | always;
 }
 
-// Compatibility https://compat.spec.whatwg.org/ 12 August 2025
+// Compatibility https://compat.spec.whatwg.org/ 11 November 2025
 {
 	touch-action: auto | none | pan-x | pan-left | pan-right | pan-y | pan-up | pan-down | pinch-zoom | manipulation;
 }

@@ -199,7 +199,7 @@ def find_new_texinfo_commands(path, lang):
 		fd.write(f'@{doc}\n')
 
 # https://github.com/w3c/csswg-drafts/
-#find_updated_css_drafts('2025-09-12', r'H:\Libs\csswg-drafts')
+#find_updated_css_drafts('2025-11-14', r'H:\Libs\csswg-drafts')
 # https://www.w3.org/Style/CSS/all-properties.en.json
 #dump_all_css_properties('all-properties.en.json', 'property', 'title', 'url')
 # https://www.w3.org/Style/CSS/all-descriptors.en.json
