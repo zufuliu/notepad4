@@ -3855,12 +3855,14 @@ const char *BuiltinRegex::SubstituteByPosition(const Document *doc, const char *
 	// match_results for max compatibility. eg. catch group $0-$9. see detail:
 	// https://www.boost.org/doc/libs/release/libs/regex/doc/html/boost_regex/format/boost_format_syntax.html
 	// https://en.cppreference.com/w/cpp/regex/match_results/format
+	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace
 	substituted.clear();
 	for (Sci::Position j = 0; j < *length; j++) {
-		if (text[j] == '\\') {
-			const char chNext = text[++j];
-			if (chNext >= '0' && chNext <= '9') {
-				const unsigned int patNum = chNext - '0';
+		const char ch = text[j];
+		if (ch == '\\') {
+			char chNext = text[++j];
+			const unsigned int patNum = chNext - '0';
+			if (patNum <= '9' - '0') {
 				const Sci::Position startPos = search.bopat[patNum];
 				const Sci::Position len = search.eopat[patNum] - startPos;
 				if (len > 0) {	// Will be null if try for a match that did not occur
@@ -3871,36 +3873,41 @@ const char *BuiltinRegex::SubstituteByPosition(const Document *doc, const char *
 			} else {
 				switch (chNext) {
 				case 'a':
-					substituted.push_back('\a');
+					chNext = '\a';
 					break;
 				case 'b':
-					substituted.push_back('\b');
+					chNext = '\b';
 					break;
 				case 'f':
-					substituted.push_back('\f');
+					chNext = '\f';
 					break;
 				case 'n':
-					substituted.push_back('\n');
+					chNext = '\n';
 					break;
 				case 'r':
-					substituted.push_back('\r');
+					chNext = '\r';
 					break;
 				case 't':
-					substituted.push_back('\t');
+					chNext = '\t';
 					break;
 				case 'v':
-					substituted.push_back('\v');
+					chNext = '\v';
+					break;
+				case 'e':
+					chNext = '\x1B';
 					break;
 				case '\\':
-					substituted.push_back('\\');
+					chNext = '\\';
 					break;
 				default:
-					substituted.push_back('\\');
+					chNext = '\\';
 					j--;
+					break;
 				}
+				substituted.push_back(chNext);
 			}
 		} else {
-			substituted.push_back(text[j]);
+			substituted.push_back(ch);
 		}
 	}
 	*length = substituted.length();
