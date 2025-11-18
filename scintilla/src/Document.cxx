@@ -3856,12 +3856,46 @@ const char *BuiltinRegex::SubstituteByPosition(const Document *doc, const char *
 	// https://www.boost.org/doc/libs/release/libs/regex/doc/html/boost_regex/format/boost_format_syntax.html
 	// https://en.cppreference.com/w/cpp/regex/match_results/format
 	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace
+
+	// keeps same as UnSlash()
+	static constexpr char backslashTable['x' - '\\' + 1] = {
+		'\\',	// '\'
+		0,		// ]
+		0,		// ^
+		0,		// _
+		0,		// `
+		'\a',	// a
+		'\b',	// b
+		0,		// c
+		0,		// d
+		'\x1B',	// e
+		'\f',	// f
+		0,		// g
+		0,		// h
+		0,		// i
+		0,		// j
+		0,		// k
+		0,		// l
+		0,		// m
+		'\n',	// n
+		0,		// o
+		0,		// p
+		0,		// q
+		'\r',	// r
+		0,		// s
+		'\t',	// t
+		'\x84',	// u
+		0,		// v
+		0,		// w
+		'\x82',	// x
+	};
+
 	substituted.clear();
 	for (Sci::Position j = 0; j < *length; j++) {
-		const char ch = text[j];
+		char ch = text[j];
 		if (ch == '\\') {
-			char chNext = text[++j];
-			const unsigned int patNum = chNext - '0';
+			const char chNext = text[++j];
+			unsigned int patNum = chNext - '0';
 			if (patNum <= '9' - '0') {
 				const Sci::Position startPos = search.bopat[patNum];
 				const Sci::Position len = search.eopat[patNum] - startPos;
@@ -3870,45 +3904,17 @@ const char *BuiltinRegex::SubstituteByPosition(const Document *doc, const char *
 					substituted.resize(size + len);
 					doc->GetCharRange(substituted.data() + size, startPos, len);
 				}
+				continue;
 			} else {
-				switch (chNext) {
-				case 'a':
-					chNext = '\a';
-					break;
-				case 'b':
-					chNext = '\b';
-					break;
-				case 'f':
-					chNext = '\f';
-					break;
-				case 'n':
-					chNext = '\n';
-					break;
-				case 'r':
-					chNext = '\r';
-					break;
-				case 't':
-					chNext = '\t';
-					break;
-				case 'v':
-					chNext = '\v';
-					break;
-				case 'e':
-					chNext = '\x1B';
-					break;
-				case '\\':
-					chNext = '\\';
-					break;
-				default:
-					chNext = '\\';
+				patNum = chNext - '\\';
+				if (patNum < sizeof(backslashTable) && static_cast<signed char>(backslashTable[patNum]) > 0) {
+					ch = backslashTable[patNum];
+				} else {
 					j--;
-					break;
 				}
-				substituted.push_back(chNext);
 			}
-		} else {
-			substituted.push_back(ch);
 		}
+		substituted.push_back(ch);
 	}
 	*length = substituted.length();
 	return substituted.c_str();
