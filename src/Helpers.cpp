@@ -2821,6 +2821,39 @@ UINT_PTR CALLBACK OpenSaveFileDlgHookProc(HWND hwnd, UINT umsg, WPARAM wParam, L
  * Convert C style \a, \b, \f, \n, \r, \t, \v, \xhh and \uhhhh into their indicated characters.
  */
 unsigned int UnSlash(char *s, UINT cpEdit) noexcept {
+	// same as BuiltinRegex::SubstituteByPosition()
+	static constexpr char backslashTable['x' - '\\' + 1] = {
+		'\\',	// '\'
+		0,		// ]
+		0,		// ^
+		0,		// _
+		0,		// `
+		'\a',	// a
+		'\b',	// b
+		0,		// c
+		0,		// d
+		'\x1B',	// e
+		'\f',	// f
+		0,		// g
+		0,		// h
+		0,		// i
+		0,		// j
+		0,		// k
+		0,		// l
+		0,		// m
+		'\n',	// n
+		0,		// o
+		0,		// p
+		0,		// q
+		'\r',	// r
+		0,		// s
+		'\t',	// t
+		'\x84',	// u
+		0,		// v
+		0,		// w
+		'\x82',	// x
+	};
+
 	const char * const start = s;
 	char *o = s;
 
@@ -2830,38 +2863,14 @@ unsigned int UnSlash(char *s, UINT cpEdit) noexcept {
 			continue;
 		}
 		s++;
-		switch (*s) {
-		case 'a':
-			*o = '\a';
-			break;
-		case 'b':
-			*o = '\b';
-			break;
-		case 'e':
-			*o = '\x1B';
-			break;
-		case 'f':
-			*o = '\f';
-			break;
-		case 'n':
-			*o = '\n';
-			break;
-		case 'r':
-			*o = '\r';
-			break;
-		case 't':
-			*o = '\t';
-			break;
-		case 'v':
-			*o = '\v';
-			break;
-		case '\\':
-			*o = '\\';
-			break;
-		case 'x':
-		case 'u': {
-			const int digitCount = (*s == 'x') ? 2 : 4;
-			UINT value = 0;
+		const char ch = *s;
+		UINT value = ch - '\\';
+		const char escape = (value < sizeof(backslashTable)) ? backslashTable[value] : '\0';
+		if (static_cast<signed char>(escape) > 0) {
+			*o = escape;
+		} else if (escape != 0) {
+			const int digitCount = escape & 7;
+			value = 0;
 			int count = 0;
 			for (; count < digitCount; count++) {
 				const int hex = GetHexDigit(s[1]);
@@ -2873,25 +2882,23 @@ unsigned int UnSlash(char *s, UINT cpEdit) noexcept {
 			}
 			if (value) {
 				const WCHAR val[2] = { static_cast<WCHAR>(value), 0 };
-				char ch[8];
-				WideCharToMultiByte(cpEdit, 0, val, -1, ch, sizeof(ch), nullptr, nullptr);
-				const char *pch = ch;
+				char buf[8];
+				WideCharToMultiByte(cpEdit, 0, val, -1, buf, sizeof(buf), nullptr, nullptr);
+				const char *pch = buf;
 				*o = *pch++;
 				while (*pch) {
 					*++o = *pch++;
 				}
 			} else if (count == 0) {
 				*o++ = '\\';
-				*o = *s;
+				*o = ch;
 			} else {
-				o--; // to balance o++; at end of switch
+				o--; // to balance o++; at end of block
 			}
-		} break;
-		default:
+		} else {
 			// unknown escape sequence
 			*o++ = '\\';
-			*o = *s;
-			break;
+			*o = ch;
 		}
 		o++;
 		if (*s) {
