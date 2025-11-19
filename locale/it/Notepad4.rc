@@ -1795,7 +1795,7 @@ $\tFine di una linea\n\
 *? o +?\tCorrispondenza inaccurata di quantificatori ""?"" e ""+""\n\
 (\tInizio di un'area\n\
 )\tFine di un'area\n\
-\\n\tRiferimento a un'area quando sostituita (n è 1-9)\n\n\
+\\n o $n\tRiferimento a un'area quando sostituita (n è 1-9)\n\n\
 Boost Perl Regex Syntax:\n\
 a|b\tMatches either a or b\n\
 {n}\tMatches preceding exactly n times\n\

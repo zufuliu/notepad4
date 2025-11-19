@@ -1795,7 +1795,7 @@ $\tZeilenende\n\
 *? or +?\tNicht-gierige Nutzung von * und + Quantifizierern\n\
 (\tBeginn eines Bereichs\n\
 )\tEnde eines Bereichs\n\
-\\n\tBezieht sich auf einen Ersetzungsbereich (n = 1-9)\n\n\
+\\n or $n\tBezieht sich auf einen Ersetzungsbereich (n = 1-9)\n\n\
 Boost Perl Regex Syntax\n\n\
 a|b\tEntspricht entweder a oder b\n\
 {n}\tEntspricht dem vorhergehenden n mal\n\
