@@ -6101,7 +6101,7 @@ void Editor::StyleSetMessage(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		const char *utf8 = ConstCharPtrFromSPtr(lParam);
 		const size_t len = strlen(utf8);
 		memcpy(vs.styles[wParam].invisibleRepresentation, utf8, len + 1);
-		vs.styles[wParam].invisibleRepresentationLength = static_cast<uint8_t>(len);
+		vs.styles[wParam].invisibleRepresentationLength = len;
 		break;
 	}
 	case Message::StyleSetHotSpot:

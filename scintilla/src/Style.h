@@ -35,7 +35,8 @@ struct FontMeasurements {
 	int sizeZoomed = 2;
 };
 
-constexpr size_t maxInvisibleStyleRepresentationLength = 6;
+// ensure sizeof(Style) == 128
+constexpr size_t maxInvisibleStyleRepresentationLength = (8*(8/sizeof(size_t))) - 1;
 
 // used to optimize style copy.
 struct StylePod {
@@ -54,7 +55,7 @@ struct StylePod {
 	bool hotspot = false;
 
 	char invisibleRepresentation[maxInvisibleStyleRepresentationLength + 1]{};
-	uint8_t invisibleRepresentationLength = 0;
+	size_t invisibleRepresentationLength = 0;
 };
 
 /**
