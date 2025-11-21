@@ -80,7 +80,38 @@ void FontRealised::Realise(Surface &surface, int zoomLevel, Technology technolog
 		std::array<XYPOSITION, allASCIIGraphic.length()> positions {};
 		surface.MeasureWidthsUTF8(font.get(), allASCIIGraphic, positions.data());
 		// const ElapsedPeriod period;
-#if 1 // not worth to vectorize the loop
+#if NP2_USE_SSE2
+		static_assert(positions.size() & true);
+		const double *it = positions.data();
+		const double * const end = it + positions.size();
+#if NP2_USE_AVX2
+		__m128d prev = _mm_loaddup_pd(it);
+#else
+		__m128d prev = _mm_set1_pd(*it);
+#endif
+		__m128d mmMaxWidth = prev;
+		__m128d mmMinWidth = prev;
+		++it;
+#if defined(__clang__)
+		#pragma clang loop unroll(disable)
+#elif defined(__GNUC__)
+		#pragma GCC unroll 0
+#endif
+		while (it != end) {
+			const __m128d current = _mm_loadu_pd(it);
+			__m128d value  = _mm_shuffle_pd(prev, current, 0b01);
+			prev = current;
+			value = _mm_sub_pd(current, value);
+			mmMaxWidth = _mm_max_pd(mmMaxWidth, value);
+			mmMinWidth = _mm_min_pd(mmMinWidth, value);
+			it += 2;
+		}
+		mmMaxWidth = _mm_max_sd(mmMaxWidth, _mm_shuffle_pd(mmMaxWidth, mmMaxWidth, 1));
+		mmMinWidth = _mm_min_sd(mmMinWidth, _mm_shuffle_pd(mmMinWidth, mmMinWidth, 1));
+		const XYPOSITION maxWidth = _mm_cvtsd_f64(mmMaxWidth);
+		const XYPOSITION minWidth = _mm_cvtsd_f64(mmMinWidth);
+		// end NP2_USE_SSE2
+#elif 1
 		auto it = positions.begin();
 		XYPOSITION prev = *it;
 		XYPOSITION maxWidth = prev;
