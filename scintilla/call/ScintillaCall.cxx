@@ -634,14 +634,6 @@ void ScintillaCall::StyleSetHotSpot(int style, bool hotspot) {
 	Call(Message::StyleSetHotSpot, style, hotspot);
 }
 
-void ScintillaCall::StyleSetCheckMonospaced(int style, bool checkMonospaced) {
-	Call(Message::StyleSetCheckMonospaced, style, checkMonospaced);
-}
-
-bool ScintillaCall::StyleGetCheckMonospaced(int style) {
-	return Call(Message::StyleGetCheckMonospaced, style);
-}
-
 void ScintillaCall::StyleSetStretch(int style, Scintilla::FontStretch stretch) {
 	Call(Message::StyleSetStretch, style, static_cast<intptr_t>(stretch));
 }

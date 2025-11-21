@@ -1543,7 +1543,6 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) noexcept {
 	// Default Values are always set
 	SciCall_StyleResetDefault();
 	SciCall_StyleSetCharacterSet(STYLE_DEFAULT, DEFAULT_CHARSET);
-	SciCall_StyleSetCheckMonospaced(STYLE_DEFAULT, true);
 
 	//! begin STYLE_DEFAULT
 	LPCWSTR szValue = lexGlobal.Styles[GlobalStyleIndex_DefaultCode].szValue;

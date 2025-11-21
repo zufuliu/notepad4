@@ -133,8 +133,6 @@ enum class Message {
 	StyleGetWeight = 2064,
 	StyleSetCharacterSet = 2066,
 	StyleSetHotSpot = 2409,
-	StyleSetCheckMonospaced = 2254,
-	StyleGetCheckMonospaced = 2255,
 	StyleSetStretch = 2258,
 	StyleGetStretch = 2259,
 	StyleSetInvisibleRepresentation = 2256,

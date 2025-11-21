@@ -15,7 +15,7 @@ struct FontSpecification {
 	Scintilla::FontWeight weight = Scintilla::FontWeight::Normal;
 	Scintilla::FontStretch stretch = Scintilla::FontStretch::Normal;
 	bool italic = false;
-	bool checkMonospaced = false;
+	//bool checkMonospaced = false;
 	Scintilla::CharacterSet characterSet = Scintilla::CharacterSet::Default;
 	Scintilla::FontQuality extraFontFlag = Scintilla::FontQuality::QualityDefault;
 	constexpr FontSpecification(const char *fontName_ = nullptr, int size_ = 10*Scintilla::FontSizeMultiplier) noexcept :
