@@ -246,7 +246,7 @@ public:
 	virtual XYPOSITION Descent(const Font *font_) noexcept = 0;
 	virtual XYPOSITION InternalLeading(const Font *font_) noexcept = 0;
 	virtual XYPOSITION Height(const Font *font_) noexcept = 0;
-	virtual XYPOSITION AverageCharWidth(const Font *font_) = 0;
+	//virtual XYPOSITION AverageCharWidth(const Font *font_) = 0;
 
 	virtual void SCICALL SetClip(PRectangle rc) noexcept = 0;
 	virtual void PopClip() noexcept = 0;

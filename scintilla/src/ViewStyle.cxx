@@ -67,7 +67,7 @@ void FontRealised::Realise(Surface &surface, int zoomLevel, Technology technolog
 	measurements.ascent = surface.Ascent(font.get());
 	measurements.descent = surface.Descent(font.get());
 	measurements.capitalHeight = surface.Ascent(font.get()) - surface.InternalLeading(font.get());
-	measurements.aveCharWidth = surface.AverageCharWidth(font.get());
+	//measurements.aveCharWidth = surface.AverageCharWidth(font.get());
 	//measurements.monospaceCharacterWidth = measurements.aveCharWidth;
 	measurements.spaceWidth = surface.WidthText(font.get(), " ");
 
@@ -78,6 +78,13 @@ void FontRealised::Realise(Surface &surface, int zoomLevel, Technology technolog
 		" !\"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~");
 		std::array<XYPOSITION, allASCIIGraphic.length()> positions {};
 		surface.MeasureWidthsUTF8(font.get(), allASCIIGraphic, positions.data());
+
+		XYPOSITION aveCharWidth = positions.back() * (1.0 / allASCIIGraphic.length());
+		if (technology == Technology::Default/*!surface.SupportsFeature(Supports::FractionalStrokeWidth)*/) {
+			aveCharWidth = std::round(aveCharWidth);
+		}
+		measurements.aveCharWidth = aveCharWidth;
+
 		// const ElapsedPeriod period;
 #if NP2_USE_SSE2
 		static_assert(positions.size() & true);

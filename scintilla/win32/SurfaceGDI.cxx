@@ -139,7 +139,7 @@ public:
 	XYPOSITION Descent(const Font *font_) noexcept override;
 	XYPOSITION InternalLeading(const Font *font_) noexcept override;
 	XYPOSITION Height(const Font *font_) noexcept override;
-	XYPOSITION AverageCharWidth(const Font *font_) noexcept override;
+	//XYPOSITION AverageCharWidth(const Font *font_) noexcept override;
 
 	void SCICALL SetClip(PRectangle rc) noexcept override;
 	void PopClip() noexcept override;
@@ -839,12 +839,14 @@ XYPOSITION SurfaceGDI::Height(const Font *font_) noexcept {
 	return static_cast<XYPOSITION>(tm.tmHeight);
 }
 
+/*
 XYPOSITION SurfaceGDI::AverageCharWidth(const Font *font_) noexcept {
 	SetFont(font_);
 	TEXTMETRIC tm;
 	::GetTextMetrics(hdc, &tm);
 	return static_cast<XYPOSITION>(tm.tmAveCharWidth);
 }
+*/
 
 void SurfaceGDI::SetClip(PRectangle rc) noexcept {
 	::SaveDC(hdc);

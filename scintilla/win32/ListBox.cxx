@@ -316,10 +316,9 @@ PRectangle ListBoxX::GetDesiredRect() {
 #endif
 
 	maxCharWidth = static_cast<int>(std::ceil(surfaceItem->WidthText(fontWin.get(), "W")));
-	const int averageCharWidth = static_cast<int>(surfaceItem->AverageCharWidth(fontWin.get()));
 
 	width = std::max(width, textSize);
-	width = std::max<int>(width, (maxItemCharacters + 1) * averageCharWidth);
+	width = std::max<int>(width, (maxItemCharacters + 1) * aveCharWidth);
 
 	rcDesired.right = rcDesired.left + TextOffset() + width + (TextInset.x * 2);
 	if (Length() > rows) {

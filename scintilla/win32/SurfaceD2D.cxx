@@ -442,7 +442,7 @@ public:
 	XYPOSITION Descent(const Font *font_) noexcept override;
 	XYPOSITION InternalLeading(const Font *font_) noexcept override;
 	XYPOSITION Height(const Font *font_) noexcept override;
-	XYPOSITION AverageCharWidth(const Font *font_) override;
+	//XYPOSITION AverageCharWidth(const Font *font_) override;
 
 	void SCICALL SetClip(PRectangle rc) noexcept override;
 	void PopClip() noexcept override;
@@ -1642,6 +1642,7 @@ XYPOSITION SurfaceD2D::Height(const Font *font_) noexcept {
 	return std::ceil(pfm->yAscent) + std::ceil(pfm->yDescent);
 }
 
+/*
 XYPOSITION SurfaceD2D::AverageCharWidth(const Font *font_) {
 	FLOAT width = 1.0;
 	const FontDirectWrite *pfm = down_cast<const FontDirectWrite *>(font_);
@@ -1656,6 +1657,7 @@ XYPOSITION SurfaceD2D::AverageCharWidth(const Font *font_) {
 	}
 	return width;
 }
+*/
 
 void SurfaceD2D::SetClip(PRectangle rc) noexcept {
 	if (pRenderTarget) {
