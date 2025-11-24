@@ -322,7 +322,7 @@ public:
 	void Clear() noexcept;
 	void SetSize(size_t size_);
 	[[nodiscard]] size_t GetSize() const noexcept;
-	void MeasureWidths(Surface *surface, const Style &style, uint16_t styleNumber, std::string_view sv, XYPOSITION *positions);
+	void MeasureWidths(Surface *surface, const Style &style, unsigned styleNumber_, std::string_view sv, XYPOSITION *positions);
 };
 
 }

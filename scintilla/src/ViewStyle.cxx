@@ -112,8 +112,8 @@ void FontRealised::Realise(Surface &surface, int zoomLevel, Technology technolog
 			mmMinWidth = _mm_min_pd(mmMinWidth, value);
 			it += 2;
 		}
-		mmMaxWidth = _mm_max_sd(mmMaxWidth, _mm_shuffle_pd(mmMaxWidth, mmMaxWidth, 1));
-		mmMinWidth = _mm_min_sd(mmMinWidth, _mm_shuffle_pd(mmMinWidth, mmMinWidth, 1));
+		mmMaxWidth = _mm_max_sd(mmMaxWidth, _mm_unpackhi_pd(mmMaxWidth, mmMaxWidth));
+		mmMinWidth = _mm_min_sd(mmMinWidth, _mm_unpackhi_pd(mmMinWidth, mmMinWidth));
 		const XYPOSITION maxWidth = _mm_cvtsd_f64(mmMaxWidth);
 		const XYPOSITION minWidth = _mm_cvtsd_f64(mmMinWidth);
 		// end NP2_USE_SSE2
