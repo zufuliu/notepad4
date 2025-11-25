@@ -2881,13 +2881,17 @@ unsigned int UnSlash(char *s, UINT cpEdit) noexcept {
 				s++;
 			}
 			if (value) {
-				const WCHAR val[2] = { static_cast<WCHAR>(value), 0 };
-				char buf[8];
-				WideCharToMultiByte(cpEdit, 0, val, -1, buf, sizeof(buf), nullptr, nullptr);
-				const char *pch = buf;
-				*o = *pch++;
-				while (*pch) {
-					*++o = *pch++;
+				if (value < 0x80 || (digitCount == 2)) {
+					*o = static_cast<char>(value);
+				} else {
+					const WCHAR val[2] = { static_cast<WCHAR>(value), 0 };
+					char buf[8];
+					WideCharToMultiByte(cpEdit, 0, val, -1, buf, sizeof(buf), nullptr, nullptr);
+					const char *pch = buf;
+					*o = *pch++;
+					while (*pch) {
+						*++o = *pch++;
+					}
 				}
 			} else if (count == 0) {
 				*o++ = '\\';
