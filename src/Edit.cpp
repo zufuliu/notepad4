@@ -4728,7 +4728,7 @@ static bool CopySelectionAsFindText(HWND hwnd, EDITFINDREPLACE *lpefr, bool bFir
 	}
 
 	if (StrNotEmpty(lpszSelection)) {
-		char *lpszEscSel = static_cast<char *>(NP2HeapAlloc((2 * NP2_FIND_REPLACE_LIMIT)));
+		char *lpszEscSel = static_cast<char *>(NP2HeapAlloc((4 * NP2_FIND_REPLACE_LIMIT)));
 		unsigned option = lpefr->option & ~FindReplaceOption_TransformBackslash;
 		if (AddBackslashA(lpszEscSel, lpszSelection)) {
 			if ((lpefr->fuFlags & SCFIND_REGEXP) == 0) {

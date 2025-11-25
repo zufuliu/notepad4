@@ -2367,7 +2367,7 @@ void MRUList::Add(LPCWSTR pszNew) noexcept {
 
 void MRUList::AddMultiline(LPCWSTR pszNew) noexcept {
 	const int len = lstrlen(pszNew);
-	LPWSTR lpszEsc = static_cast<LPWSTR>(NP2HeapAlloc((2*len + 1)*sizeof(WCHAR)));
+	LPWSTR lpszEsc = static_cast<LPWSTR>(NP2HeapAlloc((4*len + 1)*sizeof(WCHAR)));
 	AddBackslashW(lpszEsc, pszNew);
 	Add(lpszEsc);
 	NP2HeapFree(lpszEsc);
@@ -2953,7 +2953,7 @@ bool AddBackslashA(char *pszOut, const char *pszInput) noexcept {
 	char *lpszEsc = pszOut;
 	const char *lpsz = pszInput;
 	while (*lpsz) {
-		char ch = *lpsz++;
+		unsigned char ch = *lpsz++;
 		const uint8_t index = ch - '\a';
 		if (index <= '\r' - '\a') {
 			ch = "abtnvfr"[index];
@@ -2964,6 +2964,12 @@ bool AddBackslashA(char *pszOut, const char *pszInput) noexcept {
 			hasEscapeChar = true;
 			*lpszEsc++ = '\\';
 			*lpszEsc++ = 'e';
+		} else if (ch < ' ' || ch == 0x7f) {
+			hasEscapeChar = true;
+			*lpszEsc++ = '\\';
+			*lpszEsc++ = 'x';
+			*lpszEsc++ = "0123456789ABCDEF"[ch >> 4];
+			*lpszEsc++ = "0123456789ABCDEF"[ch & 15];
 		} else {
 			*lpszEsc++ = ch;
 			if (ch == '\\') {
@@ -2996,6 +3002,12 @@ bool AddBackslashW(LPWSTR pszOut, LPCWSTR pszInput) noexcept {
 			hasEscapeChar = true;
 			*lpszEsc++ = '\\';
 			*lpszEsc++ = 'e';
+		} else if (ch < ' ' || ch == 0x7f) {
+			hasEscapeChar = true;
+			*lpszEsc++ = '\\';
+			*lpszEsc++ = 'x';
+			*lpszEsc++ = "0123456789ABCDEF"[ch >> 4];
+			*lpszEsc++ = "0123456789ABCDEF"[ch & 15];
 		} else {
 			*lpszEsc++ = ch;
 			if (ch == '\\') {
