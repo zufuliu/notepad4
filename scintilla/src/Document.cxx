@@ -2317,8 +2317,8 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 				}
 			}
 		} else if (CpUtf8 == dbcsCodePage) {
-			constexpr size_t maxFoldingExpansion = 4;
-			searchThing.Allocate((lengthFind + 1) * UTF8MaxBytes * maxFoldingExpansion + 1);
+			constexpr size_t maxFoldingExpansion = 3; // same as maxExpansionCaseConversion
+			searchThing.Allocate((lengthFind + 1) * maxFoldingExpansion + 1);
 			const size_t lenSearch = pcf->Fold(searchThing.data(), searchThing.size(), search, lengthFind);
 			const unsigned char * const searchData = reinterpret_cast<const unsigned char *>(searchThing.data());
 			//while (forward ? (pos < endPos) : (pos >= endPos)) {
@@ -2380,9 +2380,7 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 				}
 			}
 		} else if (dbcsCodePage) {
-			constexpr size_t maxBytesCharacter = 2;
-			constexpr size_t maxFoldingExpansion = 4;
-			searchThing.Allocate((lengthFind + 1) * maxBytesCharacter * maxFoldingExpansion + 1);
+			searchThing.Allocate(lengthFind + 1);
 			const size_t lenSearch = pcf->Fold(searchThing.data(), searchThing.size(), search, lengthFind);
 			const unsigned char * const searchData = reinterpret_cast<const unsigned char *>(searchThing.data());
 			//while (forward ? (pos < endPos) : (pos >= endPos)) {
@@ -2404,11 +2402,11 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 					if (widthChar == 1) {
 						characterMatches = searchData[indexSearch] == MakeLowerCase(leadByte);
 					} else {
-						const char bytes[maxBytesCharacter + 1] {
+						const char bytes[4] {
 							static_cast<char>(leadByte),
 							cbView[pos + indexDocument + 1]
 						};
-						char folded[maxBytesCharacter * maxFoldingExpansion + 1];
+						char folded[4];
 						lenFlat = pcf->Fold(folded, sizeof(folded), bytes, widthChar);
 						// memcmp may examine lenFlat bytes in both arguments so assert it doesn't read past end of searchThing
 						assert((indexSearch + lenFlat) <= searchThing.size());
