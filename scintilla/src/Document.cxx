@@ -2439,7 +2439,8 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 		} else {
 			const Sci::Position endSearch = (startPos <= endPos) ? endPos - lengthFind + 1 : endPos;
 			searchThing.Allocate(lengthFind + 1);
-			pcf->Fold(searchThing.data(), searchThing.size(), search, lengthFind);
+			const CaseFolderTable * const folder = down_cast<CaseFolderTable *>(pcf.get());
+			folder->Fold(searchThing.data(), searchThing.size(), search, lengthFind);
 			const char * const searchData = searchThing.data();
 			//while (forward ? (pos < endSearch) : (pos >= endSearch)) {
 			while ((direction ^ (pos - endSearch)) < 0) {
@@ -2447,13 +2448,8 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 				for (Sci::Position indexSearch = 0; (indexSearch < lengthFind) && found; indexSearch++) {
 					const char ch = cbView[pos + indexSearch];
 					const char chTest = searchData[indexSearch];
-					if (UTF8IsAscii(ch)) {
-						found = chTest == MakeLowerCase(ch);
-					} else {
-						char folded[2];
-						pcf->Fold(folded, sizeof(folded), &ch, 1);
-						found = folded[0] == chTest;
-					}
+					const char folded = folder->FoldChar(ch);
+					found = chTest == folded;
 				}
 				if (found && MatchesWordOptions(word, wordStart, pos, lengthFind)) {
 					return pos;
