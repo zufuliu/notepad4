@@ -3126,11 +3126,11 @@ size_t CaseFolderDBCS::Fold(char *folded, [[maybe_unused]] size_t sizeFolded, co
 	size_t lenOut = 0;
 	for (size_t i = 0; i < lenMixed; ) {
 		const unsigned char ch = mixed[i++];
-		if (byteMask.IsLeadByte(ch)) {
+		const unsigned char ch2 = mixed[i + 1];
+		if (byteMask.IsLeadByte(ch) && byteMask.IsTrailByte(ch2)) {
 			i++;
-			const unsigned char ch2 = mixed[i];
 			const uint16_t ind = DBCSIndex(ch, ch2);
-			const char *pair = foldingMap.at(ind).chars;
+			const char *pair = foldingMap[ind].chars;
 			folded[lenOut++] = pair[0];
 			folded[lenOut++] = pair[1];
 		} else {
