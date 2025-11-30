@@ -127,6 +127,7 @@ def GenerateUnicodeControlCharacters():
 		"\u2068", # U+2068	FSI		First strong isolate
 		"\u2069", # U+2069	PDI		Pop directional isolate
 		"\u061C", # U+061C	ALM		Arabic letter mark
+		"\u00AD", # U+00AD	SHY		Soft hyphen
 	]
 
 	print('UnicodeControlCharacters:')

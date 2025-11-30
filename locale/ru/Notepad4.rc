@@ -316,6 +316,7 @@ BEGIN
 				MENUITEM "LS\tРазделитель строк",						IDM_INSERT_UNICODE_LS
 				MENUITEM "PS\tРазделитель абзацев",						IDM_INSERT_UNICODE_PS
 				MENUITEM "ZWSP\tПробел нулевой ширины",						IDM_INSERT_UNICODE_ZWSP
+				MENUITEM "SHY\tSoft &hyphen",						IDM_INSERT_UNICODE_SHY
 			END
 			MENUITEM SEPARATOR
 			MENUITEM "&Имя файла",									CMD_INSERTFILENAME_NOEXT

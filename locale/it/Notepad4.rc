@@ -315,6 +315,7 @@ BEGIN
 				MENUITEM "LS\tSeparatore d&i linea",						IDM_INSERT_UNICODE_LS
 				MENUITEM "PS\tSeparatore di para&grafo",				IDM_INSERT_UNICODE_PS
 				MENUITEM "&ZWSP\tSpazio a larghezza zero",					IDM_INSERT_UNICODE_ZWSP
+				MENUITEM "SHY\tSoft &hyphen",						IDM_INSERT_UNICODE_SHY
 			END
 			MENUITEM SEPARATOR
 			MENUITEM "Nome &file",								CMD_INSERTFILENAME_NOEXT

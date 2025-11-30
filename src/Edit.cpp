@@ -6735,6 +6735,7 @@ static const UnicodeControlCharacter kUnicodeControlCharacterTable[] = {
 	{ "\xe2\x81\xa8", "FSI" },	// U+2068	FSI		First strong isolate
 	{ "\xe2\x81\xa9", "PDI" },	// U+2069	PDI		Pop directional isolate
 	{ "\xd8\x9c", "ALM" },		// U+061C	ALM		Arabic letter mark
+	{ "\xc2\xad", "SHY" },		// U+00AD	SHY		Soft hyphen
 };
 
 void EditInsertUnicodeControlCharacter(int menu) noexcept {

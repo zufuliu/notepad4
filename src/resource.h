@@ -506,7 +506,7 @@
 #define BME_EDIT_BOOKMARKCLEAR			40256	// Alt+F2
 #define BME_EDIT_BOOKMARKPREV			40257	// Shift+F2
 #define BME_EDIT_BOOKMARKSELECT			40258
-// Insert Unicode Control Character
+// Insert Unicode Control Character, see kUnicodeControlCharacterTable
 #define IDM_INSERT_UNICODE_LRM			40260
 #define IDM_INSERT_UNICODE_RLM			40261
 #define IDM_INSERT_UNICODE_ZWJ			40262
@@ -533,6 +533,7 @@
 #define IDM_INSERT_UNICODE_FSI			40283
 #define IDM_INSERT_UNICODE_PDI			40284
 #define IDM_INSERT_UNICODE_ALM			40285
+#define IDM_INSERT_UNICODE_SHY			40286
 
 #define IDM_EDIT_UNDO					40300	// Alt+Back Ctrl+Z Ctrl+Shift+Y
 #define IDM_EDIT_REDO					40301	// Ctrl+Y Ctrl+Shift+Z
