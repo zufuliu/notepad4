@@ -2153,10 +2153,17 @@ bool Document::IsWordAt(Sci::Position start, Sci::Position end) const noexcept {
 	return (start < end) && IsWordStartAt(start) && IsWordEndAt(end);
 }
 
-bool Document::MatchesWordOptions(bool word, bool wordStart, Sci::Position pos, Sci::Position length) const noexcept {
-	return (!word && !wordStart) ||
-		(word && IsWordAt(pos, pos + length)) ||
-		(wordStart && IsWordStartAt(pos));
+bool Document::MatchesWordOptions(FindOption flags, Sci::Position pos, Sci::Position length) const noexcept {
+	if (!FlagSet(flags, FindOption::WholeWord | FindOption::WordStart)) {
+		return true;
+	}
+	if (!IsWordStartAt(pos)) {
+		return false;
+	}
+	if (FlagSet(flags, FindOption::WholeWord)) {
+		return IsWordEndAt(pos + length);
+	}
+	return true;
 }
 
 bool Document::HasCaseFolder() const noexcept {
@@ -2219,10 +2226,6 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 		}
 		return regex->FindText(this, minPos, maxPos, search, flags, length);
 	} else {
-		const bool caseSensitive = FlagSet(flags, FindOption::MatchCase);
-		const bool word = FlagSet(flags, FindOption::WholeWord);
-		const bool wordStart = FlagSet(flags, FindOption::WordStart);
-
 		const Sci::Position direction = maxPos - minPos;
 		//const bool forward = direction >= 0;
 		const int increment = (direction >= 0) ? 1 : -1;
@@ -2243,13 +2246,13 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 		//Platform::DebugPrintf("Find %d %d %s %d\n", startPos, endPos, search, lengthFind);
 		const Sci::Position limitPos = std::max(startPos, endPos);
 		Sci::Position pos = startPos;
-		if (direction < 0 && !caseSensitive) {
+		if (direction < 0 && !FlagSet(flags, FindOption::MatchCase)) {
 			// Back all of a character
 			pos = NextPosition(pos, -1);
 		}
 		const SplitView cbView = cb.AllView();
 		SearchThing searchThing;
-		if (caseSensitive) {
+		if (FlagSet(flags, FindOption::MatchCase)) {
 			const unsigned char * const searchData = reinterpret_cast<const unsigned char *>(search);
 			// Boyer-Moore-Horspool-Sunday Algorithm / Quick Search Algorithm
 			// https://www-igm.univ-mlv.fr/~lecroq/string/index.html
@@ -2295,7 +2298,7 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 						const unsigned char ch = cbView[pos + indexSearch];
 						found = ch == searchData[indexSearch];
 					}
-					if (found && MatchesWordOptions(word, wordStart, pos, lengthFind)) {
+					if (found && MatchesWordOptions(flags, pos, lengthFind)) {
 						return pos;
 					}
 				}
@@ -2367,7 +2370,7 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 				}
 				if (characterMatches && (indexSearch == lenSearch)) {
 					posIndexDocument -= pos;
-					if (MatchesWordOptions(word, wordStart, pos, posIndexDocument)) {
+					if (MatchesWordOptions(flags, pos, posIndexDocument)) {
 						*length = posIndexDocument;
 						return pos;
 					}
@@ -2434,7 +2437,7 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 				}
 				if (characterMatches && (indexSearch == lenSearch)) {
 					indexDocument -= pos;
-					if (MatchesWordOptions(word, wordStart, pos, indexDocument)) {
+					if (MatchesWordOptions(flags, pos, indexDocument)) {
 						*length = indexDocument;
 						return pos;
 					}
@@ -2462,7 +2465,7 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 					const char folded = folder->FoldChar(ch);
 					found = chTest == folded;
 				}
-				if (found && MatchesWordOptions(word, wordStart, pos, lengthFind)) {
+				if (found && MatchesWordOptions(flags, pos, lengthFind)) {
 					return pos;
 				}
 				pos += increment;
