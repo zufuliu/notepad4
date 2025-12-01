@@ -3072,8 +3072,19 @@ constexpr uint8_t highByteFirst = 0x80;
 constexpr uint8_t highByteLast = 0xFF;
 constexpr uint8_t minTrailByte = 0x31;
 
-// CreateFoldMap creates a fold map by calling platform APIs so will differ between platforms.
-inline void CreateFoldMap(int codePage, FoldMap &foldingMap, const DBCSByteMask &byteMask) {
+class CaseFolderDBCS final : public CaseFolderTable {
+	const DBCSByteMask &byteMask;
+	// Allocate the expandable storage here so that it does not need to be reallocated
+	// for each call to Fold.
+	FoldMap foldingMap;
+public:
+	CaseFolderDBCS(int codePage, const DBCSByteMask &mask);
+	size_t Fold(char *folded, size_t sizeFolded, const char *mixed, size_t lenMixed) const override;
+};
+
+// creates a fold map by calling platform APIs so will differ between platforms.
+CaseFolderDBCS::CaseFolderDBCS(int codePage, const DBCSByteMask &mask): byteMask {mask} {
+	// const ElapsedPeriod period;
 	for (unsigned char byte1 = highByteFirst + 1; byte1 < highByteLast; byte1++) {
 		if (byteMask.IsLeadByte(byte1)) {
 			for (unsigned char byte2 = minTrailByte; byte2 < highByteLast; byte2++) {
@@ -3103,22 +3114,9 @@ inline void CreateFoldMap(int codePage, FoldMap &foldingMap, const DBCSByteMask 
 			}
 		}
 	}
+	// const double duration = period.Duration()*1e3;
+	// printf("%s(%u) duration=%.6f\n", __func__, cp, duration);
 }
-
-class CaseFolderDBCS final : public CaseFolderTable {
-	// Allocate the expandable storage here so that it does not need to be reallocated
-	// for each call to Fold.
-	const DBCSByteMask &byteMask;
-	FoldMap foldingMap;
-public:
-	explicit CaseFolderDBCS(UINT cp, const DBCSByteMask &mask): byteMask {mask} {
-		// const ElapsedPeriod period;
-		CreateFoldMap(cp, foldingMap, mask);
-		// const double duration = period.Duration()*1e3;
-		// printf("%s(%u) duration=%.6f\n", __func__, cp, duration);
-	}
-	size_t Fold(char *folded, size_t sizeFolded, const char *mixed, size_t lenMixed) const override;
-};
 
 size_t CaseFolderDBCS::Fold(char *folded, [[maybe_unused]] size_t sizeFolded, const char *mixed, size_t lenMixed) const {
 	// This loop outputs the same length as input as for each char 1-byte -> 1-byte; 2-byte -> 2-byte
