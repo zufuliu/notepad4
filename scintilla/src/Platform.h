@@ -131,6 +131,13 @@ struct FontParameters {
 
 };
 
+struct FontMetrics {
+	XYPOSITION ascent;
+	XYPOSITION descent;
+	XYPOSITION internalLeading;
+	XYPOSITION height; // ascent + descent
+};
+
 class Font {
 public:
 	Font() noexcept = default;
@@ -242,10 +249,13 @@ public:
 	virtual void SCICALL MeasureWidthsUTF8(const Font *font_, std::string_view text, XYPOSITION *positions) = 0;
 	virtual XYPOSITION WidthTextUTF8(const Font *font_, std::string_view text) = 0;
 
+	/*
 	virtual XYPOSITION Ascent(const Font *font_) noexcept = 0;
 	virtual XYPOSITION Descent(const Font *font_) noexcept = 0;
 	virtual XYPOSITION InternalLeading(const Font *font_) noexcept = 0;
 	virtual XYPOSITION Height(const Font *font_) noexcept = 0;
+	*/
+	virtual FontMetrics Metrics(const Font *font_) noexcept = 0;
 	//virtual XYPOSITION AverageCharWidth(const Font *font_) = 0;
 
 	virtual void SCICALL SetClip(PRectangle rc) noexcept = 0;
@@ -333,7 +343,7 @@ public:
 
 	virtual void SetFont(std::shared_ptr<Font> font) noexcept = 0;
 	virtual void SCICALL Create(Window &parent, int ctrlID, Point location, int lineHeight_, int codePage_, Scintilla::Technology technology_) noexcept = 0;
-	virtual void SetAverageCharWidth(int width) noexcept = 0;
+	virtual void SetAverageCharWidth(int width, double ascent) noexcept = 0;
 	virtual void SetVisibleRows(int rows) noexcept = 0;
 	virtual int GetVisibleRows() const noexcept = 0;
 	virtual PRectangle GetDesiredRect() = 0;

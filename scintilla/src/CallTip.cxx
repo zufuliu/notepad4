@@ -199,13 +199,14 @@ int CallTip::PaintContents(Surface *surfaceWindow, bool draw) {
 		rcClientPos.bottom - rcClientPos.top);
 	PRectangle rcClient = rcClientSize.Deflate(1 + innerMarginX, 1 + innerMarginY);
 
+	const FontMetrics metrics = surfaceWindow->Metrics(font.get());
 	// To make a nice small call tip window, it is only sized to fit most normal characters without accents
-	const int ascent = static_cast<int>(std::lround(surfaceWindow->Ascent(font.get()) - surfaceWindow->InternalLeading(font.get())));
+	const int ascent = static_cast<int>(std::lround(metrics.ascent - metrics.internalLeading));
 
 	// For each line...
 	// Draw the definition in three parts: before highlight, highlighted, after highlight
 	int ytext = static_cast<int>(rcClient.top) + ascent + 1;
-	rcClient.bottom = ytext + surfaceWindow->Descent(font.get()) + 1;
+	rcClient.bottom = ytext + metrics.descent + 1;
 	std::string_view remaining(val);
 	int maxWidth = 0;
 
@@ -289,6 +290,7 @@ PRectangle CallTip::CallTipStart(Sci::Position pos, Point pt, int textHeight, co
 	inCallTipMode = true;
 	posStartCallTip = pos;
 	font = font_;
+	const FontMetrics metrics = surfaceMeasure->Metrics(font.get());
 	// Look for multiple lines in the text
 	// Only support \n here - simply means container must avoid \r!
 	const int numLines = 1 + static_cast<int>(std::count(val.begin(), val.end(), '\n'));
@@ -296,7 +298,7 @@ PRectangle CallTip::CallTipStart(Sci::Position pos, Point pt, int textHeight, co
 	rectDown = PRectangle(0, 0, 0, 0);
 	offsetMain = insetX;            // changed to right edge of any arrows
 	offsetText = insetX + innerMarginX;
-	lineHeight = static_cast<int>(std::lround(surfaceMeasure->Height(font.get())));
+	lineHeight = static_cast<int>(std::lround(metrics.height));
 #if !PLAT_CURSES
 	widthArrow = lineHeight * 9 / 10;
 #endif
@@ -305,7 +307,7 @@ PRectangle CallTip::CallTipStart(Sci::Position pos, Point pt, int textHeight, co
 	// The returned
 	// rectangle is aligned to the right edge of the last arrow encountered in
 	// the tip text, else to the tip text left edge.
-	const int height = lineHeight * numLines - static_cast<int>(surfaceMeasure->InternalLeading(font.get())) + borderHeight * 2 + innerMarginY*2;
+	const int height = lineHeight * numLines - static_cast<int>(metrics.internalLeading) + borderHeight * 2 + innerMarginY*2;
 	if (above) {
 		return PRectangle(pt.x - offsetMain, pt.y - verticalOffset - height, pt.x + width - offsetMain, pt.y - verticalOffset);
 	} else {

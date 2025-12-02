@@ -129,9 +129,9 @@ constexpr int ListBoxXFakeFrameSize = 4;
 
 class ListBoxX final : public ListBox {
 	int lineHeight = commonLineHeight;
+	Technology technology = Technology::Default;
 	HFONT fontCopy {};
 	std::shared_ptr<FontWin> fontWin;
-	Technology technology = Technology::Default;
 	RGBAImageSet images;
 	LineToItem lti;
 	HWND lb {};
@@ -151,12 +151,13 @@ class ListBoxX final : public ListBox {
 	const char *widestItem = nullptr;
 #endif
 	unsigned int maxCharWidth = 1;
+	DWORD frameStyle = WS_THICKFRAME;
 	WPARAM resizeHit = 0;
+	double yAscent = 0;
 	PRectangle rcPreSize;
 	Point dragOffset;
 	Point location;	// Caret location at which the list is opened
 	MouseWheelDelta wheelDelta;
-	DWORD frameStyle = WS_THICKFRAME;
 
 	LBGraphics graphics;
 
@@ -197,7 +198,7 @@ public:
 	}
 	void SetFont(std::shared_ptr<Font> font) noexcept override;
 	void SCICALL Create(Window &parent_, int ctrlID_, Point location_, int lineHeight_, int codePage_, Technology technology_) noexcept override;
-	void SetAverageCharWidth(int width) noexcept override;
+	void SetAverageCharWidth(int width, double ascent) noexcept override;
 	void SetVisibleRows(int rows) noexcept override;
 	int GetVisibleRows() const noexcept override;
 	PRectangle GetDesiredRect() override;
@@ -266,8 +267,9 @@ void ListBoxX::SetFont(std::shared_ptr<Font> font) noexcept {
 	}
 }
 
-void ListBoxX::SetAverageCharWidth(int width) noexcept {
+void ListBoxX::SetAverageCharWidth(int width, double ascent) noexcept {
 	aveCharWidth = width;
+	yAscent = ascent;
 }
 
 void ListBoxX::SetVisibleRows(int rows) noexcept {
@@ -440,8 +442,7 @@ void ListBoxX::Draw(const DRAWITEMSTRUCT *pDrawItem) {
 
 	const PRectangle rcText = rcBox.Inset(Point(TextInset.x, TextInset.y));
 
-	const double ascent = graphics.pixmapLine->Ascent(fontWin.get());
-	graphics.pixmapLine->DrawTextClipped(rcText, fontWin.get(), rcText.top + ascent, std::string_view(text, len), colourFore, colourBack);
+	graphics.pixmapLine->DrawTextClipped(rcText, fontWin.get(), rcText.top + yAscent, std::string_view(text, len), colourFore, colourBack);
 
 	// Draw the image, if any
 	const RGBAImage *pimage = images.Get(pixId);

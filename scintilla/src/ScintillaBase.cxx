@@ -318,8 +318,7 @@ void ScintillaBase::AutoCompleteStart(Sci::Position lenEntered, const char *list
 
 	int lineHeight;
 	if (vs.autocStyle != StyleDefault) {
-		const AutoSurface surfaceMeasure(this);
-		lineHeight = static_cast<int>(std::lround(surfaceMeasure->Height(vs.styles[vs.autocStyle].font.get())));
+		lineHeight = static_cast<int>(std::lround(vs.styles[vs.autocStyle].ascent + vs.styles[vs.autocStyle].descent));
 	} else {
 		lineHeight = vs.lineHeight;
 	}
@@ -360,7 +359,7 @@ void ScintillaBase::AutoCompleteStart(Sci::Position lenEntered, const char *list
 	ac.lb->SetPositionRelative(rcac, &wMain);
 	ac.lb->SetFont(vs.styles[vs.autocStyle].font);
 	const int aveCharWidth = static_cast<int>(vs.styles[vs.autocStyle].aveCharWidth);
-	ac.lb->SetAverageCharWidth(aveCharWidth);
+	ac.lb->SetAverageCharWidth(aveCharWidth, vs.styles[vs.autocStyle].ascent);
 	ac.lb->SetDelegate(this);
 
 	ac.SetList(list ? list : "");

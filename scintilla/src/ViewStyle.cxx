@@ -64,11 +64,11 @@ void FontRealised::Realise(Surface &surface, int zoomLevel, Technology technolog
 	// floor here is historical as platform layers have tweaked their values to match.
 	// ceil would likely be better to ensure (nearly) all of the ink of a character is seen
 	// but that would require platform layer changes.
-	measurements.ascent = surface.Ascent(font.get());
-	measurements.descent = surface.Descent(font.get());
-	measurements.capitalHeight = surface.Ascent(font.get()) - surface.InternalLeading(font.get());
+	const FontMetrics metrics = surface.Metrics(font.get());
+	measurements.ascent = metrics.ascent;
+	measurements.descent = metrics.descent;
+	measurements.capitalHeight = metrics.ascent - metrics.internalLeading;
 	//measurements.aveCharWidth = surface.AverageCharWidth(font.get());
-	//measurements.monospaceCharacterWidth = measurements.aveCharWidth;
 	measurements.spaceWidth = surface.WidthText(font.get(), " ");
 
 	/*if (fs.checkMonospaced)*/ {
