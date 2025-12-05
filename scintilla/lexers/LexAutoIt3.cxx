@@ -153,7 +153,6 @@ void ColouriseAU3Doc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 	}
 	// Set the new length to include it from the start and set the start position
 	length = length + s_startPos - startPos;	// correct the total length to process
-	styler.StartAt(startPos);
 
 	StyleContext sc(startPos, length, initStyle, styler);
 	char si;	// string indicator "=1 '=2
