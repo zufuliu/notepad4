@@ -29,9 +29,9 @@ namespace {
 
 enum class HtmlTagType {
 	None,
-	Question,	// <?xml ?>
 	Normal,
 	Void,		// void tag
+	Question,	// <?xml ?>
 	Script,
 	Style,
 };
@@ -184,7 +184,7 @@ struct PHPLexer {
 	int LineState() const noexcept {
 		int lineState = lineStateLineType | lineStateAttribute | lineContinuation
 			| propertyValue | (parenCount << 8) | (selectorLevel << 16);
-		if (tagType == HtmlTagType::Question || StyleNeedsBacktrack(sc.state) || !nestedState.empty()) {
+		if (tagType >= HtmlTagType::Question || StyleNeedsBacktrack(sc.state) || !nestedState.empty()) {
 			lineState |= LineStateNestedStateLine;
 		}
 		return lineState;
@@ -232,7 +232,7 @@ void PHPLexer::ClassifyHtmlTag(LexerWordList keywordLists) {
 	int state = SCE_H_OTHER;
 	if (tagType == HtmlTagType::Void) {
 		sc.ChangeState(SCE_H_VOID_TAG);
-	} else if (tagType > HtmlTagType::Void && sc.Match('/', '>')) {
+	} else if (tagType > HtmlTagType::Question && sc.Match('/', '>')) {
 		tagType = HtmlTagType::Normal;
 	}
 	if (sc.ch > ' ') {
