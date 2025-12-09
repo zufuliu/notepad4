@@ -256,7 +256,12 @@ bool PHPLexer::HandleBlockEnd(HtmlTextBlock block) {
 		kwType = KeywordType::None;
 		const int outer = nestedState.empty() ? SCE_H_DEFAULT : nestedState.back().state;
 		lineStateLineType = nestedState.empty() ? 0 : LineStateNestedStateLine;
-		nestedState.clear();
+		while (!nestedState.empty()) {
+			if (nestedState.back().type == VariableType::JavaScript) {
+				break;
+			}
+			nestedState.pop_back();
+		}
 		sc.SetState(SCE_H_QUESTION);
 		sc.Forward();
 		sc.ForwardSetState(outer);
