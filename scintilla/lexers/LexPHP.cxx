@@ -246,9 +246,6 @@ void PHPLexer::ClassifyHtmlTag(LexerWordList keywordLists) {
 		sc.Forward((sc.ch == '>') ? 1 : 2);
 	}
 	sc.SetState(state);
-	if (sc.Match('<', '?')) {
-		HandlePHPTag();
-	}
 }
 
 bool PHPLexer::HandleBlockEnd(HtmlTextBlock block) {
@@ -299,7 +296,7 @@ void PHPLexer::HandlePHPTag() {
 		offset = 5;
 	} else if (s[0] == '=') {
 		offset = 3;
-	} else if (sc.state == SCE_H_DEFAULT) {
+	} else if (sc.state == SCE_H_DEFAULT || sc.state == SCE_H_OTHER) {
 		tagType = HtmlTagType::Question;
 	} else {
 		return;
@@ -307,8 +304,8 @@ void PHPLexer::HandlePHPTag() {
 
 	const int outer = sc.state;
 	sc.SetState(SCE_H_QUESTION);
-	sc.Advance(offset);
 	if (offset != 0) {
+		sc.Advance(offset);
 		sc.SetState(SCE_PHP_DEFAULT);
 		if (outer != SCE_H_DEFAULT) {
 			nestedState.push_back({outer, VariableType::Html, 0});
@@ -320,17 +317,8 @@ bool PHPLexer::ClassifyPHPWord(LexerWordList keywordLists, int visibleChars) {
 	if (sc.state == SCE_PHP_HEREDOC_ID || sc.state == SCE_PHP_NOWDOC_ID) {
 		hereDocId = sc.styler.GetRange(sc.styler.GetStartSegment(), sc.currentPos);
 		insideUrl = false;
-		if (sc.state == SCE_PHP_HEREDOC_ID) {
-			if (sc.ch == '\"') {
-				sc.Forward();
-			}
-			sc.SetState(SCE_PHP_HEREDOC);
-		} else {
-			if (sc.ch == '\'') {
-				sc.Forward();
-			}
-			sc.SetState(SCE_PHP_NOWDOC);
-		}
+		static_assert(SCE_PHP_HEREDOC - SCE_PHP_HEREDOC_ID == SCE_PHP_NOWDOC - SCE_PHP_NOWDOC_ID);
+		sc.SetState(sc.state + SCE_PHP_HEREDOC - SCE_PHP_HEREDOC_ID);
 		return false;
 	}
 	const VariableType variableType = GetVariableType();
@@ -849,10 +837,6 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 	}
 
 	while (sc.More()) {
-		if ((sc.state < SCE_PHP_DEFAULT || sc.state > SCE_PHP_LABEL) && sc.Match('<', '?')) {
-			lexer.HandlePHPTag();
-		}
-
 		switch (sc.state) {
 		// PHP
 		case SCE_PHP_OPERATOR:
@@ -913,7 +897,7 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 		case SCE_PHP_HEREDOC:
 		case SCE_PHP_NOWDOC:
 			if (visibleChars == 0 && sc.ch == hereDocStartChar && lexer.IsHereDocEnd()) {
-				sc.Forward(lexer.hereDocId.length());
+				sc.Advance(lexer.hereDocId.length());
 				sc.SetState(SCE_PHP_DEFAULT);
 			} else if (lexer.HighlightInnerString()) {
 				continue;
@@ -1048,7 +1032,11 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			}
 			if (sc.ch == '<') {
 				// html tag on typing
-				sc.SetState(SCE_H_DEFAULT);
+				if (sc.chNext == '?') {
+					lexer.HandlePHPTag();
+				} else {
+					sc.SetState(SCE_H_DEFAULT);
+				}
 				break;
 			}
 			if (sc.ch == '\'') {
@@ -1212,6 +1200,11 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				sc.SetState(css_style(SCE_CSS_DEFAULT));
 			}
 			break;
+		}
+
+		if ((sc.state < SCE_PHP_DEFAULT || sc.state > SCE_PHP_LABEL) && sc.Match('<', '?')) {
+			// sc.state is default or stream style
+			lexer.HandlePHPTag();
 		}
 
 		switch (sc.state) {
