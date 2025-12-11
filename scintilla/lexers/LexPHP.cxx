@@ -531,19 +531,19 @@ bool PHPLexer::HighlightInnerString() {
 				return true;
 			}
 		}
-	} else if (sc.ch == '$') {
+	} else if (sc.Match('{', '$') || sc.Match('$', '{')) {
 		// ${} was deprecated since PHP 8.2 and removed in PHP 9.0
 		// see https://wiki.php.net/rfc/deprecate_dollar_brace_string_interpolation
+		insideUrl = false;
+		if (ExpandVariable(sc.state)) {
+			nestedState.push_back({sc.state, VariableType::Complex, sc.ch == '{'});
+			sc.SetState(SCE_PHP_OPERATOR2);
+		}
+	} else if (sc.ch == '$') {
 		if (ExpandVariable(sc.state) && IsIdentifierStartEx(sc.chNext)) {
 			insideUrl = false;
 			nestedState.push_back({sc.state, VariableType::Simple, 0});
 			sc.SetState(SCE_PHP_VARIABLE2);
-		}
-	} else if (sc.Match('{', '$')) {
-		insideUrl = false;
-		if (ExpandVariable(sc.state)) {
-			nestedState.push_back({sc.state, VariableType::Complex, 1});
-			sc.SetState(SCE_PHP_OPERATOR2);
 		}
 	} else if (sc.Match(':', '/', '/') && IsLowerCase(sc.chPrev)) {
 		insideUrl = true;
@@ -1271,37 +1271,28 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 					sc.ChangeState(SCE_PHP_COMMENTBLOCKDOC);
 				}
 				continue;
-			} else if (sc.ch == '\'') {
+			} else if (sc.ch == '\'' || sc.ch == '\"') {
 				lexer.insideUrl = false;
-				sc.SetState(SCE_PHP_STRING_SQ);
-			} else if (sc.ch == '\"') {
-				lexer.insideUrl = false;
-				sc.SetState(SCE_PHP_STRING_DQ);
+				sc.SetState((sc.ch == '\'') ? SCE_PHP_STRING_SQ : SCE_PHP_STRING_DQ);
 			} else if (sc.ch == '`') {
 				sc.SetState(SCE_PHP_STRING_BT);
 			} else if (sc.Match('<', '<')) {
-				if (sc.GetRelative(2) == '<') {
-					const int ch = sc.GetRelative(3);
-					if (ch == '\'') {
-						sc.SetState(SCE_PHP_NOWDOC);
-						sc.Advance(4);
+				sc.SetState(SCE_PHP_OPERATOR);
+				sc.Forward();
+				if (sc.chNext == '<') {
+					const int chNext = sc.GetRelative(2);
+					if (chNext == '\'' || chNext == '\"' || IsIdentifierStartEx(chNext)) {
+						const int state = (chNext == '\'') ? SCE_PHP_NOWDOC : SCE_PHP_HEREDOC;
+						sc.ChangeState(state);
+						sc.Advance(2 + (chNext <= '\''));
 						hereDocStartChar = sc.ch;
-						sc.SetState(SCE_PHP_NOWDOC_ID);
-					} else if (ch == '\"' || IsIdentifierStartEx(ch)) {
-						sc.SetState(SCE_PHP_HEREDOC);
-						sc.Advance(3 + (ch == '\"'));
-						hereDocStartChar = sc.ch;
-						sc.SetState(SCE_PHP_HEREDOC_ID);
+						sc.SetState(state + SCE_PHP_NOWDOC_ID - SCE_PHP_NOWDOC);
 					}
 				}
-				if (sc.state == SCE_PHP_DEFAULT) {
-					sc.SetState(SCE_PHP_OPERATOR);
-				}
 			} else if (sc.ch == '$') {
-				if (IsIdentifierStartEx(sc.chNext)) {
-					sc.SetState(SCE_PHP_VARIABLE);
-				} else {
-					sc.SetState(SCE_PHP_OPERATOR);
+				sc.SetState(SCE_PHP_VARIABLE);
+				if (!IsIdentifierStartEx(sc.chNext)) {
+					sc.ChangeState(SCE_PHP_OPERATOR);
 				}
 			} else if (IsNumberStart(sc.ch, sc.chNext)) {
 				escSeq.outerState = SCE_PHP_DEFAULT;
