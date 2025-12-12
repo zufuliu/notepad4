@@ -2169,8 +2169,9 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 		// basic html
 		case SCE_H_TAG:
 		case SCE_H_BLOCK_TAG:
+		case SCE_H_OTHER:
 			if (sc.ch == '>' || sc.Match('/', '>')) {
-				if (sc.state == SCE_H_BLOCK_TAG) {
+				if (sc.state != SCE_H_TAG) {
 					sc.SetState(SCE_H_TAG);
 				}
 				lexer.tagState = HtmlTagState::None;
@@ -2178,7 +2179,21 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 				sc.SetState(lexer.TryTakeOuterStyle());
 				continue;
 			}
-			if (!IsHtmlTagChar(sc.ch)) {
+			if (sc.state == SCE_H_OTHER) {
+				if (sc.ch == '<' || (visibleBefore == 0 && (sc.ch == '#' || sc.ch == '*'))) {
+					// html tag on typing, TODO: check other block start characters
+					lexer.tagState = HtmlTagState::None;
+					sc.SetState(SCE_MARKDOWN_DEFAULT);
+				} else if (sc.ch == '\'') {
+					sc.SetState(SCE_H_SINGLESTRING);
+				} else if (sc.ch == '\"') {
+					sc.SetState(SCE_H_DOUBLESTRING);
+				} else if (IsHtmlAttrStart(sc.ch)) {
+					sc.SetState(SCE_H_ATTRIBUTE);
+				} else if (!IsHtmlInvalidAttrChar(sc.ch)) {
+					sc.SetState(SCE_H_VALUE);
+				}
+			} else if (!IsHtmlTagChar(sc.ch)) {
 				if (IsASpace(sc.ch)) {
 					// tag attribute
 					sc.SetState(SCE_H_OTHER);
@@ -2238,31 +2253,6 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 				continue;
 			}
 			lexer.DetectAutoLink();
-			break;
-
-		case SCE_H_OTHER:
-			if (sc.ch == '>' || sc.Match('/', '>')) {
-				lexer.tagState = HtmlTagState::None;
-				sc.SetState(SCE_H_TAG);
-				sc.Forward((sc.ch == '/') ? 2 : 1);
-				sc.SetState(lexer.TryTakeOuterStyle());
-				break;
-			}
-			if (sc.ch == '<' || (visibleBefore == 0 && (sc.ch == '#' || sc.ch == '*'))) {
-				// html tag on typing, TODO: check other block start characters
-				lexer.tagState = HtmlTagState::None;
-				sc.SetState(SCE_MARKDOWN_DEFAULT);
-				break;
-			}
-			if (sc.ch == '\'') {
-				sc.SetState(SCE_H_SINGLESTRING);
-			} else if (sc.ch == '\"') {
-				sc.SetState(SCE_H_DOUBLESTRING);
-			} else if (IsHtmlAttrStart(sc.ch)) {
-				sc.SetState(SCE_H_ATTRIBUTE);
-			} else if (!IsHtmlInvalidAttrChar(sc.ch)) {
-				sc.SetState(SCE_H_VALUE);
-			}
 			break;
 
 		case SCE_H_COMMENT:

@@ -286,6 +286,7 @@ void PHPLexer::HandlePHPTag() {
 // we only support standard tag <?php ?>, and short echo tag <?= ?>
 // short open tag <? ?> was deprecated since PHP 7.4 and removed in PHP 8
 // see https://wiki.php.net/rfc/deprecate_php_short_tags
+// and https://wiki.php.net/rfc/deprecate_php_short_tags_v2
 // ASP tag <% %>, <%= %> and script tag <script language="php"></script> were removed in PHP 7
 // see https://wiki.php.net/rfc/remove_alternative_php_tags
 
@@ -974,9 +975,27 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 		// basic html
 		case SCE_H_TAG:
 		case SCE_H_QUESTION:
-			if (sc.ch == '>' || sc.Match('/', '>') || IsASpace(sc.ch)
-				|| (lexer.tagType == HtmlTagType::Question && sc.Match('?', '>'))) {
+		case SCE_H_OTHER:
+			if (sc.ch == '>' || (sc.chNext == '>' && (sc.ch == '/' || sc.ch == '?'))
+				|| (sc.ch <= ' ' && sc.state != SCE_H_OTHER)) {
 				lexer.ClassifyHtmlTag(keywordLists);
+			} else if (sc.state == SCE_H_OTHER) {
+				if (sc.ch == '<') {
+					// html tag on typing
+					if (sc.chNext == '?') {
+						lexer.HandlePHPTag();
+					} else {
+						sc.SetState(SCE_H_DEFAULT);
+					}
+				} else if (sc.ch == '\'') {
+					sc.SetState(SCE_H_SINGLESTRING);
+				} else if (sc.ch == '\"') {
+					sc.SetState(SCE_H_DOUBLESTRING);
+				} else if (IsHtmlAttrStart(sc.ch)) {
+					sc.SetState(SCE_H_ATTRIBUTE);
+				} else if (!IsHtmlInvalidAttrChar(sc.ch)) {
+					sc.SetState(SCE_H_VALUE);
+				}
 			}
 			break;
 
@@ -1022,31 +1041,6 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				const int outer = (sc.state == SCE_H_DOUBLESTRING) ? SCE_H_OTHER : SCE_H_SGML_DEFAULT;
 				sc.ForwardSetState(outer);
 				continue;
-			}
-			break;
-
-		case SCE_H_OTHER:
-			if (sc.ch == '>' || sc.Match('/', '>') || (lexer.tagType == HtmlTagType::Question && sc.Match('?', '>'))) {
-				lexer.ClassifyHtmlTag(keywordLists);
-				break;
-			}
-			if (sc.ch == '<') {
-				// html tag on typing
-				if (sc.chNext == '?') {
-					lexer.HandlePHPTag();
-				} else {
-					sc.SetState(SCE_H_DEFAULT);
-				}
-				break;
-			}
-			if (sc.ch == '\'') {
-				sc.SetState(SCE_H_SINGLESTRING);
-			} else if (sc.ch == '\"') {
-				sc.SetState(SCE_H_DOUBLESTRING);
-			} else if (IsHtmlAttrStart(sc.ch)) {
-				sc.SetState(SCE_H_ATTRIBUTE);
-			} else if (!IsHtmlInvalidAttrChar(sc.ch)) {
-				sc.SetState(SCE_H_VALUE);
 			}
 			break;
 
