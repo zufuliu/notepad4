@@ -127,7 +127,7 @@ constexpr bool ExpandVariable(int state) noexcept {
 
 // https://www.php.net/manual/en/language.types.string.php
 struct EscapeSequence {
-	int outerState = SCE_PHP_DEFAULT;
+	int outerState = SCE_H_DEFAULT;
 	int digitsLeft = 0;
 	bool hex = false;
 	bool brace = false;
@@ -1337,6 +1337,8 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			} else if (IsJsIdentifierStart(sc.ch) || sc.Match('\\', 'u')) {
 				lexer.chBefore = chPrevNonWhite;
 				sc.SetState(js_style(SCE_JS_IDENTIFIER));
+			} else if (IsHtmlCommentDelimiter(sc)) {
+				sc.SetState(js_style(SCE_JS_COMMENTLINE));
 			} else if (sc.ch == '+' || sc.ch == '-') {
 				sc.SetState(js_style(SCE_JS_OPERATOR));
 				if (sc.ch == sc.chNext) {
@@ -1361,9 +1363,6 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				sc.SetState(css_style(SCE_CSS_STRING_SQ));
 			} else if (sc.ch == '\"') {
 				sc.SetState(css_style(SCE_CSS_STRING_DQ));
-			} else if (IsHtmlCommentDelimiter(sc)) {
-				sc.SetState(css_style(SCE_CSS_CDO_CDC));
-				sc.Advance((sc.ch == '<') ? 3 : 2);
 			} else if (IsNumberStart(sc.ch, sc.chNext)
 				|| (sc.ch == '#' && (lexer.propertyValue || lexer.parenCount > lexer.selectorLevel) && IsHexDigit(sc.chNext))) {
 				escSeq.outerState = css_style(SCE_CSS_DEFAULT);
@@ -1374,6 +1373,9 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				escSeq.digitsLeft = 7;
 				sc.SetState(css_style(SCE_CSS_UNICODE_RANGE));
 				sc.Forward();
+			} else if (IsHtmlCommentDelimiter(sc)) {
+				sc.SetState(css_style(SCE_CSS_CDO_CDC));
+				sc.Advance((sc.ch == '<') ? 3 : 2);
 			} else if (IsCssIdentifierStart(sc.ch, sc.chNext)) {
 				lexer.chBefore = chPrevNonWhite;
 				sc.SetState((sc.ch == '@') ? css_style(SCE_CSS_AT_RULE) : css_style(SCE_CSS_IDENTIFIER));

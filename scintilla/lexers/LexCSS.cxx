@@ -293,9 +293,6 @@ void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				sc.SetState(SCE_CSS_STRING_SQ);
 			} else if (sc.ch == '\"') {
 				sc.SetState(SCE_CSS_STRING_DQ);
-			} else if (IsHtmlCommentDelimiter(sc)) {
-				sc.SetState(SCE_CSS_CDO_CDC);
-				sc.Advance((sc.ch == '<') ? 3 : 2);
 			} else if (IsNumberStart(sc.ch, sc.chNext)
 				|| (sc.ch == '#' && (propertyValue || parenCount > selectorLevel) && IsHexDigit(sc.chNext))) {
 				sc.SetState(SCE_CSS_NUMBER);
@@ -305,6 +302,9 @@ void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				escSeq.digitsLeft = 7;
 				sc.SetState(SCE_CSS_UNICODE_RANGE);
 				sc.Forward();
+			} else if (IsHtmlCommentDelimiter(sc)) {
+				sc.SetState(SCE_CSS_CDO_CDC);
+				sc.Advance((sc.ch == '<') ? 3 : 2);
 			} else if (IsCssIdentifierStartEx(sc.ch, sc.chNext, preprocessor)) {
 				chBefore = chPrevNonWhite;
 				sc.SetState((sc.ch == '@') ? SCE_CSS_AT_RULE : ((sc.ch == '$') ? SCE_CSS_VARIABLE : SCE_CSS_IDENTIFIER));
