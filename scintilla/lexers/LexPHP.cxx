@@ -316,7 +316,7 @@ void PHPLexer::HandlePHPTag() {
 
 bool PHPLexer::ClassifyPHPWord(LexerWordList keywordLists, int visibleChars) {
 	if (sc.state == SCE_PHP_HEREDOC_ID || sc.state == SCE_PHP_NOWDOC_ID) {
-		hereDocId = sc.styler.GetRange(sc.styler.GetStartSegment(), sc.currentPos);
+		sc.styler.GetRange(sc.styler.GetStartSegment(), sc.currentPos, hereDocId);
 		insideUrl = false;
 		static_assert(SCE_PHP_HEREDOC - SCE_PHP_HEREDOC_ID == SCE_PHP_NOWDOC - SCE_PHP_NOWDOC_ID);
 		sc.SetState(sc.state + SCE_PHP_HEREDOC - SCE_PHP_HEREDOC_ID);

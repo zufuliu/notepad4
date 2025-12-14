@@ -59,22 +59,20 @@ void LexAccessor::GetRangeLowered(Sci_PositionU startPos_, Sci_PositionU endPos_
 	ToLowerCase(s);
 }
 
-std::string LexAccessor::GetRange(Sci_PositionU startPos_, Sci_PositionU endPos_) const {
+void LexAccessor::GetRange(Sci_PositionU startPos_, Sci_PositionU endPos_, std::string &s) const {
 	assert(startPos_ < endPos_);
 	//endPos_ = sci::min(endPos_, static_cast<Sci_PositionU>(lenDoc));
 	const Sci_PositionU len = endPos_ - startPos_;
-	std::string s(len, '\0');
+	s.resize(len, '\0');
 	GetRange(startPos_, endPos_, s.data(), len + 1);
-	return s;
 }
 
-std::string LexAccessor::GetRangeLowered(Sci_PositionU startPos_, Sci_PositionU endPos_) const {
+void LexAccessor::GetRangeLowered(Sci_PositionU startPos_, Sci_PositionU endPos_, std::string &s) const {
 	assert(startPos_ < endPos_);
 	//endPos_ = sci::min(endPos_, static_cast<Sci_PositionU>(lenDoc));
 	const Sci_PositionU len = endPos_ - startPos_;
-	std::string s(len, '\0');
+	s.resize(len, '\0');
 	GetRangeLowered(startPos_, endPos_, s.data(), len + 1);
-	return s;
 }
 
 Sci_Position LexLineSkipSpaceTab(LexAccessor &styler, Sci_Line line) noexcept {

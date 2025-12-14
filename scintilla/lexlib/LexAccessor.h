@@ -147,8 +147,8 @@ public:
 	void GetRange(Sci_PositionU startPos_, Sci_PositionU endPos_, char *s, Sci_PositionU len) const noexcept;
 	void GetRangeLowered(Sci_PositionU startPos_, Sci_PositionU endPos_, char *s, Sci_PositionU len) const noexcept;
 	// Get all characters in range [startPos_, endPos_).
-	std::string GetRange(Sci_PositionU startPos_, Sci_PositionU endPos_) const;
-	std::string GetRangeLowered(Sci_PositionU startPos_, Sci_PositionU endPos_) const;
+	void GetRange(Sci_PositionU startPos_, Sci_PositionU endPos_, std::string &s) const;
+	void GetRangeLowered(Sci_PositionU startPos_, Sci_PositionU endPos_, std::string &s) const;
 
 	// Flush() must be called first when used in Colourise() or Lex() function.
 	unsigned char StyleAt(Sci_Position position) const noexcept {
