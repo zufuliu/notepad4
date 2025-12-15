@@ -443,6 +443,12 @@ MATLAB Code
 	sce				Scilab
 	sci				Scilab
 
+MLIR
+	mlir
+	cir				ClangIR
+	fir				Fortran IR
+	sil				Swift SIL
+
 
 Nim Script
 	nim

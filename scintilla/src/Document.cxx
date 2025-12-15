@@ -2153,10 +2153,17 @@ bool Document::IsWordAt(Sci::Position start, Sci::Position end) const noexcept {
 	return (start < end) && IsWordStartAt(start) && IsWordEndAt(end);
 }
 
-bool Document::MatchesWordOptions(bool word, bool wordStart, Sci::Position pos, Sci::Position length) const noexcept {
-	return (!word && !wordStart) ||
-		(word && IsWordAt(pos, pos + length)) ||
-		(wordStart && IsWordStartAt(pos));
+bool Document::MatchesWordOptions(FindOption flags, Sci::Position pos, Sci::Position length) const noexcept {
+	if (!FlagSet(flags, FindOption::WholeWord | FindOption::WordStart)) {
+		return true;
+	}
+	if (!IsWordStartAt(pos)) {
+		return false;
+	}
+	if (FlagSet(flags, FindOption::WholeWord)) {
+		return IsWordEndAt(pos + length);
+	}
+	return true;
 }
 
 bool Document::HasCaseFolder() const noexcept {
@@ -2219,10 +2226,6 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 		}
 		return regex->FindText(this, minPos, maxPos, search, flags, length);
 	} else {
-		const bool caseSensitive = FlagSet(flags, FindOption::MatchCase);
-		const bool word = FlagSet(flags, FindOption::WholeWord);
-		const bool wordStart = FlagSet(flags, FindOption::WordStart);
-
 		const Sci::Position direction = maxPos - minPos;
 		//const bool forward = direction >= 0;
 		const int increment = (direction >= 0) ? 1 : -1;
@@ -2243,13 +2246,13 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 		//Platform::DebugPrintf("Find %d %d %s %d\n", startPos, endPos, search, lengthFind);
 		const Sci::Position limitPos = std::max(startPos, endPos);
 		Sci::Position pos = startPos;
-		if (direction < 0 && !caseSensitive) {
+		if (direction < 0 && !FlagSet(flags, FindOption::MatchCase)) {
 			// Back all of a character
 			pos = NextPosition(pos, -1);
 		}
 		const SplitView cbView = cb.AllView();
 		SearchThing searchThing;
-		if (caseSensitive) {
+		if (FlagSet(flags, FindOption::MatchCase)) {
 			const unsigned char * const searchData = reinterpret_cast<const unsigned char *>(search);
 			// Boyer-Moore-Horspool-Sunday Algorithm / Quick Search Algorithm
 			// https://www-igm.univ-mlv.fr/~lecroq/string/index.html
@@ -2295,7 +2298,7 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 						const unsigned char ch = cbView[pos + indexSearch];
 						found = ch == searchData[indexSearch];
 					}
-					if (found && MatchesWordOptions(word, wordStart, pos, lengthFind)) {
+					if (found && MatchesWordOptions(flags, pos, lengthFind)) {
 						return pos;
 					}
 				}
@@ -2317,8 +2320,8 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 				}
 			}
 		} else if (CpUtf8 == dbcsCodePage) {
-			constexpr size_t maxFoldingExpansion = 4;
-			searchThing.Allocate((lengthFind + 1) * UTF8MaxBytes * maxFoldingExpansion + 1);
+			constexpr size_t maxFoldingExpansion = 3; // same as maxExpansionCaseConversion
+			searchThing.Allocate((lengthFind + UTF8MaxBytes) * maxFoldingExpansion + 1);
 			const size_t lenSearch = pcf->Fold(searchThing.data(), searchThing.size(), search, lengthFind);
 			const unsigned char * const searchData = reinterpret_cast<const unsigned char *>(searchThing.data());
 			//while (forward ? (pos < endPos) : (pos >= endPos)) {
@@ -2366,8 +2369,9 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 					}
 				}
 				if (characterMatches && (indexSearch == lenSearch)) {
-					if (MatchesWordOptions(word, wordStart, pos, posIndexDocument - pos)) {
-						*length = posIndexDocument - pos;
+					posIndexDocument -= pos;
+					if (MatchesWordOptions(flags, pos, posIndexDocument)) {
+						*length = posIndexDocument;
 						return pos;
 					}
 				}
@@ -2380,52 +2384,60 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 				}
 			}
 		} else if (dbcsCodePage) {
-			constexpr size_t maxBytesCharacter = 2;
-			constexpr size_t maxFoldingExpansion = 4;
-			searchThing.Allocate((lengthFind + 1) * maxBytesCharacter * maxFoldingExpansion + 1);
-			const size_t lenSearch = pcf->Fold(searchThing.data(), searchThing.size(), search, lengthFind);
+			searchThing.Allocate(lengthFind + 2 + 1);
+			const CaseFolderTable * const folder = down_cast<CaseFolderTable *>(pcf.get());
+			const size_t lenSearch = folder->Fold(searchThing.data(), searchThing.size(), search, lengthFind);
 			const unsigned char * const searchData = reinterpret_cast<const unsigned char *>(searchThing.data());
 			//while (forward ? (pos < endPos) : (pos >= endPos)) {
 			while ((direction ^ (pos - endPos)) < 0) {
-				int widthFirstCharacter = 0;
-				Sci::Position indexDocument = 0;
+				int widthFirstCharacter = 1;
+				Sci::Position indexDocument = pos;
 				size_t indexSearch = 0;
 				bool characterMatches = true;
 				for (;;) {
-					const unsigned char leadByte = cbView[pos + indexDocument];
-					const int widthChar = 1 + IsDBCSLeadByteNoExcept(leadByte);
-					if (!widthFirstCharacter) {
-						widthFirstCharacter = widthChar;
-					}
-					if ((pos + indexDocument + widthChar) > limitPos) {
+					const char leadByte = cbView[indexDocument];
+					int widthChar = 1;
+					if ((indexDocument + 1) > limitPos) {
 						break;
 					}
-					size_t lenFlat = 1;
-					if (widthChar == 1) {
-						characterMatches = searchData[indexSearch] == MakeLowerCase(leadByte);
+					const char chTest = searchData[indexSearch];
+					if (!IsDBCSLeadByteNoExcept(leadByte)) {
+						characterMatches = chTest == folder->FoldChar(leadByte);
 					} else {
-						const char bytes[maxBytesCharacter + 1] {
-							static_cast<char>(leadByte),
-							cbView[pos + indexDocument + 1]
-						};
-						char folded[maxBytesCharacter * maxFoldingExpansion + 1];
-						lenFlat = pcf->Fold(folded, sizeof(folded), bytes, widthChar);
-						// memcmp may examine lenFlat bytes in both arguments so assert it doesn't read past end of searchThing
-						assert((indexSearch + lenFlat) <= searchThing.size());
-						// Does folded match the buffer
-						characterMatches = 0 == memcmp(folded, searchData + indexSearch, lenFlat);
+						const char trailByte = cbView[indexDocument + 1];
+						if (IsDBCSTrailByteNoExcept(trailByte)) {
+							widthChar = 2;
+							if (!indexSearch) {
+								widthFirstCharacter = widthChar;
+							}
+							if ((indexDocument + widthChar) > limitPos) {
+								break;
+							}
+							char folded[2] = {
+								leadByte,
+								trailByte,
+							};
+							folder->Fold(folded, sizeof(folded), folded, widthChar);
+							// memcmp may examine widthChar bytes in both arguments so assert it doesn't read past end of searchThing
+							assert((indexSearch + widthChar) <= searchThing.size());
+							// Does folded match the buffer
+							characterMatches = 0 == memcmp(folded, searchData + indexSearch, widthChar);
+						} else {
+							characterMatches = chTest == leadByte;
+						}
 					}
 					if (!characterMatches) {
 						break;
 					}
 					indexDocument += widthChar;
-					indexSearch += lenFlat;
+					indexSearch += widthChar;
 					if (indexSearch >= lenSearch) {
 						break;
 					}
 				}
 				if (characterMatches && (indexSearch == lenSearch)) {
-					if (MatchesWordOptions(word, wordStart, pos, indexDocument)) {
+					indexDocument -= pos;
+					if (MatchesWordOptions(flags, pos, indexDocument)) {
 						*length = indexDocument;
 						return pos;
 					}
@@ -2441,7 +2453,8 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 		} else {
 			const Sci::Position endSearch = (startPos <= endPos) ? endPos - lengthFind + 1 : endPos;
 			searchThing.Allocate(lengthFind + 1);
-			pcf->Fold(searchThing.data(), searchThing.size(), search, lengthFind);
+			const CaseFolderTable * const folder = down_cast<CaseFolderTable *>(pcf.get());
+			folder->Fold(searchThing.data(), searchThing.size(), search, lengthFind);
 			const char * const searchData = searchThing.data();
 			//while (forward ? (pos < endSearch) : (pos >= endSearch)) {
 			while ((direction ^ (pos - endSearch)) < 0) {
@@ -2449,15 +2462,10 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 				for (Sci::Position indexSearch = 0; (indexSearch < lengthFind) && found; indexSearch++) {
 					const char ch = cbView[pos + indexSearch];
 					const char chTest = searchData[indexSearch];
-					if (UTF8IsAscii(ch)) {
-						found = chTest == MakeLowerCase(ch);
-					} else {
-						char folded[2];
-						pcf->Fold(folded, sizeof(folded), &ch, 1);
-						found = folded[0] == chTest;
-					}
+					const char folded = folder->FoldChar(ch);
+					found = chTest == folded;
 				}
-				if (found && MatchesWordOptions(word, wordStart, pos, lengthFind)) {
+				if (found && MatchesWordOptions(flags, pos, lengthFind)) {
 					return pos;
 				}
 				pos += increment;
@@ -3855,12 +3863,51 @@ const char *BuiltinRegex::SubstituteByPosition(const Document *doc, const char *
 	// match_results for max compatibility. eg. catch group $0-$9. see detail:
 	// https://www.boost.org/doc/libs/release/libs/regex/doc/html/boost_regex/format/boost_format_syntax.html
 	// https://en.cppreference.com/w/cpp/regex/match_results/format
+	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace
+
+	// keeps same as UnSlash()
+	static constexpr char backslashTable['x' - '\\' + 1] = {
+		'\\',	// '\'
+		0,		// ]
+		0,		// ^
+		0,		// _
+		0,		// `
+		'\a',	// a
+		'\b',	// b
+		0,		// c
+		0,		// d
+		'\x1B',	// e
+		'\f',	// f
+		0,		// g
+		0,		// h
+		0,		// i
+		0,		// j
+		0,		// k
+		0,		// l
+		0,		// m
+		'\n',	// n
+		0,		// o
+		0,		// p
+		0,		// q
+		'\r',	// r
+		0,		// s
+		'\t',	// t
+		'\x84',	// u
+		0,		// v
+		0,		// w
+		'\x82',	// x
+	};
+
 	substituted.clear();
 	for (Sci::Position j = 0; j < *length; j++) {
-		if (text[j] == '\\') {
+		char ch = text[j];
+		if (ch == '\\' || ch == '$') {
 			const char chNext = text[++j];
-			if (chNext >= '0' && chNext <= '9') {
-				const unsigned int patNum = chNext - '0';
+			unsigned int patNum = chNext - '0';
+			if (patNum <= '9' - '0' || (ch == '$' && chNext == '&')) {
+				if (chNext == '&') {
+					patNum = 0;
+				}
 				const Sci::Position startPos = search.bopat[patNum];
 				const Sci::Position len = search.eopat[patNum] - startPos;
 				if (len > 0) {	// Will be null if try for a match that did not occur
@@ -3868,40 +3915,22 @@ const char *BuiltinRegex::SubstituteByPosition(const Document *doc, const char *
 					substituted.resize(size + len);
 					doc->GetCharRange(substituted.data() + size, startPos, len);
 				}
+				continue;
+			}
+			if (ch == '$') {
+				if (chNext != '$') {
+					j--;
+				}
 			} else {
-				switch (chNext) {
-				case 'a':
-					substituted.push_back('\a');
-					break;
-				case 'b':
-					substituted.push_back('\b');
-					break;
-				case 'f':
-					substituted.push_back('\f');
-					break;
-				case 'n':
-					substituted.push_back('\n');
-					break;
-				case 'r':
-					substituted.push_back('\r');
-					break;
-				case 't':
-					substituted.push_back('\t');
-					break;
-				case 'v':
-					substituted.push_back('\v');
-					break;
-				case '\\':
-					substituted.push_back('\\');
-					break;
-				default:
-					substituted.push_back('\\');
+				patNum -= '\\' - '0'; // patNum = chNext - '\\';
+				if (patNum < sizeof(backslashTable) && static_cast<signed char>(backslashTable[patNum]) > 0) {
+					ch = backslashTable[patNum];
+				} else {
 					j--;
 				}
 			}
-		} else {
-			substituted.push_back(text[j]);
 		}
+		substituted.push_back(ch);
 	}
 	*length = substituted.length();
 	return substituted.c_str();

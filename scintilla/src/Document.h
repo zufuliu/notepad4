@@ -413,6 +413,9 @@ public:
 	bool IsDBCSTrailByteNoExcept(unsigned char ch) const noexcept {
 		return dbcsCharClass->IsTrailByte(ch);
 	}
+	const DBCSByteMask& GetDBCSByteMask() const noexcept {
+		return dbcsCharClass->GetByteMask();
+	}
 	bool IsDBCSDualByteAt(Sci::Position pos) const noexcept;
 	int DBCSDrawBytes(const char *text, size_t length) const noexcept;
 	static size_t DiscardLastCombinedCharacter(const char *text, size_t lengthSegment, size_t lenBytes) noexcept;
@@ -616,7 +619,7 @@ public:
 	bool IsWordEndAt(Sci::Position pos) const noexcept;
 	bool IsWordAt(Sci::Position start, Sci::Position end) const noexcept;
 
-	bool MatchesWordOptions(bool word, bool wordStart, Sci::Position pos, Sci::Position length) const noexcept;
+	bool MatchesWordOptions(Scintilla::FindOption flags, Sci::Position pos, Sci::Position length) const noexcept;
 	bool HasCaseFolder() const noexcept;
 	void SetCaseFolder(std::unique_ptr<CaseFolder> pcf_) noexcept;
 	Sci::Position FindText(Sci::Position minPos, Sci::Position maxPos, const char *search, Scintilla::FindOption flags, Sci::Position *length);

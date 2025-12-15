@@ -127,6 +127,8 @@ constexpr bool AnyOf(T ch) noexcept {
 	static_assert(IsPowerOfTwo(ch1 - ch0));
 	if constexpr ((ch1 - ch0) <= 1) {
 		return ch >= ch0 && ch <= ch1;
+	} else if constexpr (sizeof(T) == 1) {
+		return (static_cast<unsigned char>(ch - ch0) & (0xff & ~(ch1 - ch0))) == 0;
 	} else {
 		return ((ch - ch0) & ~(ch1 - ch0)) == 0;
 	}
@@ -136,7 +138,11 @@ template <char ch0, char ch1, char ch2, char ch3, typename T>
 constexpr bool AnyOf(T ch) noexcept {
 	// [chr(ch) for ch in range(256) if ((ch - ord('E')) & ~0x21) == 0] ['E', 'F', 'e', 'f']
 	static_assert(IsPowerOfTwo(ch1 - ch0) && IsPowerOfTwo(ch2 - ch0) && (ch1 - ch0) == (ch3 - ch2));
-	return ((ch - ch0) & ~((ch1 - ch0) | (ch2 - ch0))) == 0;
+	if constexpr (sizeof(T) == 1) {
+		return (static_cast<unsigned char>(ch - ch0) & (0xff & ~((ch1 - ch0) | (ch2 - ch0)))) == 0;
+	} else {
+		return ((ch - ch0) & (~((ch1 - ch0) | (ch2 - ch0)))) == 0;
+	}
 }
 
 template <typename T>

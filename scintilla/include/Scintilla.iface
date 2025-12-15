@@ -715,10 +715,10 @@ set void StyleSetCharacterSet=2066(int style, CharacterSet characterSet)
 set void StyleSetHotSpot=2409(int style, bool hotspot)
 
 # Indicate that a style may be monospaced over ASCII graphics characters which enables optimizations.
-set void StyleSetCheckMonospaced=2254(int style, bool checkMonospaced)
+#set void StyleSetCheckMonospaced=2254(int style, bool checkMonospaced)
 
 # Get whether a style may be monospaced.
-get bool StyleGetCheckMonospaced=2255(int style,)
+#get bool StyleGetCheckMonospaced=2255(int style,)
 
 enu FontStretch=SC_STRETCH_
 val SC_STRETCH_ULTRA_CONDENSED=1

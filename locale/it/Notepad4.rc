@@ -315,6 +315,7 @@ BEGIN
 				MENUITEM "LS\tSeparatore d&i linea",						IDM_INSERT_UNICODE_LS
 				MENUITEM "PS\tSeparatore di para&grafo",				IDM_INSERT_UNICODE_PS
 				MENUITEM "&ZWSP\tSpazio a larghezza zero",					IDM_INSERT_UNICODE_ZWSP
+				MENUITEM "SHY\tSoft &hyphen",						IDM_INSERT_UNICODE_SHY
 			END
 			MENUITEM SEPARATOR
 			MENUITEM "Nome &file",								CMD_INSERTFILENAME_NOEXT
@@ -605,6 +606,7 @@ BEGIN
 			MENUITEM "M&ostra barra di stato\tShift+F11",	IDM_VIEW_STATUSBAR
 			MENUITEM SEPARATOR
 			MENUITEM "Modalità &trasparente\tCtrl+0",	IDM_VIEW_TRANSPARENT
+			MENUITEM "Trasparente quando perde il &focus",IDM_VIEW_TRANSPARENT_INACTIVE
 			POPUP "Modalità &schermo intero"
 			BEGIN
 				MENUITEM "&All'avvio",					IDM_VIEW_FULLSCREEN_ON_START
@@ -1794,7 +1796,7 @@ $\tFine di una linea\n\
 *? o +?\tCorrispondenza inaccurata di quantificatori ""?"" e ""+""\n\
 (\tInizio di un'area\n\
 )\tFine di un'area\n\
-\\n\tRiferimento a un'area quando sostituita (n è 1-9)\n\n\
+\\n o $n\tRiferimento a un'area quando sostituita (n è 1-9)\n\n\
 Boost Perl Regex Syntax:\n\
 a|b\tMatches either a or b\n\
 {n}\tMatches preceding exactly n times\n\
@@ -2160,6 +2162,7 @@ END
 #include "../../src/Notepad4.ver"
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
+
 
 
 

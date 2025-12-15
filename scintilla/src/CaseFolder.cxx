@@ -42,10 +42,6 @@ size_t CaseFolderTable::Fold(char *folded, size_t sizeFolded, const char *mixed,
 	return lenMixed;
 }
 
-void CaseFolderTable::SetTranslation(char ch, char chTranslation) noexcept {
-	mapping[IndexFromChar(ch)] = chTranslation;
-}
-
 CaseFolderUnicode::CaseFolderUnicode() {
 	converter = ConverterFor(CaseConversion::fold);
 }

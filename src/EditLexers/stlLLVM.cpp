@@ -10,45 +10,44 @@ static KEYWORDLIST Keywords_LLVM = {{
 
 , // 1 type
 "bfloat double float fp128 half i1 i128 i16 i32 i64 i8 label metadata opaque ppc_fp128 ptr token type void vscale "
-"x86_fp80 x86_mmx "
+"x86_amx x86_fp80 "
 
 , // 2 attribute
-"acq_rel acquire addrspace( afn "
-"align align( alignstack alignstack( alloc-family allocalign allockind( allocptr allocsize( alwaysinline any anyregcc "
-"arcp atomic "
-"blockaddress( builtin byval byval( ccc cfguard_checkcc cold coldcc contract convergent cxx_fast_tlscc "
-"default denormal-fp-math denormal-fp-math-f32 dereferenceable( dereferenceable_or_null( "
+"acq_rel acquire addrspace( afn align align( alignstack alignstack( "
+"alloc-family alloc-variant-zeroed allocalign allockind( allocptr allocsize( alwaysinline any anyregcc arcp atomic "
+"blockaddress( builtin byval( captures( ccc cfguard_checkcc code_model cold coldcc contract convergent cxx_fast_tlscc "
+"dead_on_return dead_on_unwind default denormal-fp-math denormal-fp-math-f32 dereferenceable( dereferenceable_or_null( "
 "disable_sanitizer_instrumentation dllexport dllimport dontcall-error dontcall-warn "
 "dso_local dso_local_equivalent dso_preemptable "
-"elementtype( exact exactmatch fast fastcc fn_ret_thunk_extern frame-pointer hidden hot "
-"immarg inalloca inbounds indirect-tls-seg-refs initialexec inlinehint inrange inreg inteldialect jumptable "
-"largest local_unnamed_addr localdynamic localexec memory( minsize monotonic mustprogress "
+"elementtype( exact exactmatch fast fastcc fn_ret_thunk_extern frame-pointer ghccc hidden hot "
+"immarg inalloca( inbounds indirect-tls-seg-refs initialexec initializes( inlinehint inrange inreg inteldialect "
+"jumptable largest local_unnamed_addr localdynamic localexec memory( minsize monotonic mustprogress "
 "naked nest ninf nnan no-inline-line-tables no-jump-tables no-stack-arg-probe "
-"no_cfi no_sanitize_address no_sanitize_hwaddress noalias nobuiltin nocallback nocapture nocf_check "
-"noduplicate noduplicates nofpclass( nofree noimplicitfloat noinline nomerge nonlazybind nonnull nooutline noprofile "
-"norecurse noredzone noreturn nosanitize_bounds nosanitize_coverage nosync noundef nounwind nsw nsz "
-"null_pointer_is_valid nuw "
-"optforfuzzing optnone optsize "
-"patchable-function personality preallocated( preserve_allcc preserve_mostcc probe-stack prologue protected "
-"readnone readonly reassoc release returned returns_twice "
-"safestack samesize "
-"sanitize_address sanitize_address_dyninit sanitize_hwaddress sanitize_memory sanitize_memtag sanitize_thread "
-"separate_storage( seq_cst shadowcallstack sideeffect signext skipprofile speculatable speculative_load_hardening sret "
-"ssp sspreq sspstrong stack-probe-size strictfp swiftasync swiftcc swifterror swiftself swifttailcc syncscope( "
-"tailcc thread_local( thunk tls-load-hoist unnamed_addr unordered uwtable "
-"vector-function-abi-variant volatile vscale_range( warn-stack-size webkit_jscc willreturn writeonly "
-"zeroext zeroinitializer "
+"no_cfi no_sanitize_address no_sanitize_hwaddress noalias nobuiltin nocallback nocf_check "
+"nodivergencesource noduplicate noduplicates noext nofpclass( nofree noimplicitfloat noinline nomerge "
+"nonlazybind nonnull nooutline noprofile norecurse noredzone noreturn nosanitize_bounds nosanitize_coverage nosync "
+"noundef nounwind nsw nsz null_pointer_is_valid nuw "
+"optdebug optforfuzzing optnone optsize "
+"patchable-function personality "
+"preallocated( preserve_allcc preserve_mostcc preserve_nonecc probe-stack prologue protected "
+"range( readnone readonly reassoc release returned returns_twice "
+"safestack samesize sanitize_address sanitize_address_dyninit sanitize_alloc_token sanitize_hwaddress "
+"sanitize_memory sanitize_memtag sanitize_realtime sanitize_realtime_blocking sanitize_thread separate_storage( seq_cst "
+"shadowcallstack sideeffect signext skipprofile speculatable speculative_load_hardening sret( ssp sspreq sspstrong "
+"stack-probe-size strictfp swiftasync swiftcc swifterror swiftself swifttailcc syncscope( "
+"tailcc thread_local( thunk unnamed_addr unordered uwtable vector-function-abi-variant volatile vscale_range( "
+"warn-stack-size willreturn writable writeonly zeroext zeroinitializer "
 
 , // 3 instruction
 "add addrspacecast alloca and ashr atomicrmw bitcast br "
 "call callbr caller catch catchpad catchret catchswitch cleanup cleanuppad cleanupret cmpxchg "
 "eq extractelement extractvalue "
-"fadd fcmp fdiv fence filter fmax fmin fmul fneg fpext fptosi fptoui fptrunc freeze frem from fsub getelementptr "
-"icmp indirectbr insertelement insertvalue inttoptr invoke landingpad load lshr max min mul musttail nand ne notail "
-"oeq oge ogt ole olt one or ord phi ptrtoint resume ret "
-"sdiv select sext sge sgt shl shufflevector sitofp sle slt srem store sub switch tail to trunc "
-"udec_wrap udiv ueq uge ugt uinc_wrap uitofp ule ult umax umin une uno unreachable unwind urem va_arg within xchg xor "
-"zext "
+"fadd fcmp fdiv fence filter fmax fmaximum fmin fminimum fmul fneg fpext fptosi fptoui fptrunc freeze frem from fsub "
+"getelementptr icmp indirectbr insertelement insertvalue inttoptr invoke landingpad load lshr max min mul musttail "
+"nand ne notail oeq oge ogt ole olt one or ord phi ptrtoaddr ptrtoint resume ret "
+"samesign sdiv select sext sge sgt shl shufflevector sitofp sle slt srem store sub switch tail to trunc "
+"udec_wrap udiv ueq uge ugt uinc_wrap uitofp ule ult umax umin une uno unreachable unwind urem usub_cond usub_sat va_arg "
+"within xchg xor zext "
 
 , nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr
 //--Autogenerated -- end of section automatically generated
@@ -61,13 +60,13 @@ static EDITSTYLE Styles_LLVM[] = {
 	{ SCE_LLVM_INTRINSIC, NP2StyleX_Intrinsic, L"bold; fore:#A46000" },
 	{ SCE_LLVM_INSTRUCTION, NP2StyleX_Instruction, L"fore:#0080FF" },
 	{ MULTI_STYLE(SCE_LLVM_ATTRIBUTE, SCE_LLVM_ATTRIBUTE_GROUP, 0, 0), NP2StyleX_Attribute, L"fore:#FF8000" },
-	{ MULTI_STYLE(SCE_LLVM_METADATA, SCE_LLVM_META_STRING, 0, 0), NP2StyleX_Metadata, L"fore:#FF8000" },
+	{ SCE_LLVM_METADATA, NP2StyleX_Metadata, L"fore:#FF8000" },
 	{ SCE_LLVM_COMDAT, NP2StyleX_COMDAT, L"fore:#BB60D5" },
-	{ MULTI_STYLE(SCE_LLVM_GLOBAL_VARIABLE, SCE_LLVM_QUOTED_GLOBAL_VARIABLE, 0, 0), NP2StyleX_GlobalVariable, L"fore:#7C5AF3" },
-	{ MULTI_STYLE(SCE_LLVM_VARIABLE, SCE_LLVM_QUOTED_VARIABLE, 0, 0), NP2StyleX_Variable, L"fore:#808000" },
+	{ SCE_LLVM_GLOBAL_VARIABLE, NP2StyleX_GlobalVariable, L"fore:#7C5AF3" },
+	{ SCE_LLVM_VARIABLE, NP2StyleX_Variable, L"fore:#808000" },
 	{ SCE_LLVM_FUNCTION, NP2StyleX_Function, L"fore:#A46000" },
 	{ SCE_LLVM_TYPE, NP2StyleX_Type, L"bold; fore:#007F7F" },
-	{ SCE_LLVM_COMMENTLINE, NP2StyleX_Comment, L"fore:#608060" },
+	{ MULTI_STYLE(SCE_LLVM_COMMENTLINE, SCE_LLVM_COMMENTBLOCK, 0, 0), NP2StyleX_Comment, L"fore:#608060" },
 	{ SCE_LLVM_STRING, NP2StyleX_String, L"fore:#008000" },
 	{ SCE_LLVM_ESCAPECHAR, NP2StyleX_EscapeSequence, L"fore:#0080C0" },
 	{ SCE_LLVM_LABEL, NP2StyleX_Label, L"back:#FFC040" },
@@ -94,7 +93,7 @@ EDITLEXER lexLLVM = {
 		SCE_LLVM_STRING, SCE_LLVM_ESCAPECHAR,
 //Settings--Autogenerated -- end of section automatically generated
 	EDITLEXER_HOLE(L"LLVM IR", Styles_LLVM),
-	L"ll",
+	L"ll; mlir; cir; fir; sil",
 	&Keywords_LLVM,
 	Styles_LLVM
 };

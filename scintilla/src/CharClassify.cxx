@@ -1032,7 +1032,7 @@ DBCSCharClassify::DBCSCharClassify(int codePage_) noexcept {
 	} break;
 	}
 
-	ExpandRLE2(bytesRLE, bytesRLE + bytesCount, leadByte);
+	ExpandRLE2(bytesRLE, bytesRLE + bytesCount, byteMask.byteMask);
 	if (classifyBegin) {
 		ExpandRLE3(classifyBegin, classifyBegin + classifyCount, classifyMap);
 	}

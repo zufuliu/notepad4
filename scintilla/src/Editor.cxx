@@ -4169,6 +4169,12 @@ int Editor::KeyDownWithModifiers(Keys key, KeyMod modifiers, bool *consumed) {
 
 void Editor::Indent(bool forwards, bool lineIndent) {
 	const UndoGroup ug(pdoc);
+	// Avoid problems with recalculating rectangular range multiple times by temporarily
+	// treating rectangular selection as multiple stream selection.
+	const Selection::SelTypes selType = sel.selType;
+	if (sel.IsRectangular()) {
+		sel.selType = Selection::SelTypes::stream;
+	}
 	for (size_t r = 0; r < sel.Count(); r++) {
 		const Sci::Line lineOfAnchor =
 			pdoc->SciLineFromPosition(sel.Range(r).anchor.Position());
@@ -4243,6 +4249,8 @@ void Editor::Indent(bool forwards, bool lineIndent) {
 			}
 		}
 	}
+	sel.selType = selType;	// Restore rectangular mode
+	ThinRectangularRange();
 	ContainerNeedsUpdate(Update::Selection);
 }
 
@@ -6093,15 +6101,15 @@ void Editor::StyleSetMessage(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		const char *utf8 = ConstCharPtrFromSPtr(lParam);
 		const size_t len = strlen(utf8);
 		memcpy(vs.styles[wParam].invisibleRepresentation, utf8, len + 1);
-		vs.styles[wParam].invisibleRepresentationLength = static_cast<uint8_t>(len);
+		vs.styles[wParam].invisibleRepresentationLength = len;
 		break;
 	}
 	case Message::StyleSetHotSpot:
 		vs.styles[wParam].hotspot = lParam != 0;
 		break;
-	case Message::StyleSetCheckMonospaced:
-		vs.styles[wParam].checkMonospaced = lParam != 0;
-		break;
+	// case Message::StyleSetCheckMonospaced:
+	// 	vs.styles[wParam].checkMonospaced = lParam != 0;
+	// 	break;
 	default:
 		break;
 	}
@@ -6147,8 +6155,8 @@ sptr_t Editor::StyleGetMessage(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		return StringResult(lParam, vs.styles[wParam].invisibleRepresentation);
 	case Message::StyleGetHotSpot:
 		return vs.styles[wParam].hotspot ? 1 : 0;
-	case Message::StyleGetCheckMonospaced:
-		return vs.styles[wParam].checkMonospaced ? 1 : 0;
+	// case Message::StyleGetCheckMonospaced:
+	// 	return vs.styles[wParam].checkMonospaced ? 1 : 0;
 	default:
 		break;
 	}
@@ -7649,7 +7657,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 	case Message::StyleSetVisible:
 	case Message::StyleSetChangeable:
 	case Message::StyleSetHotSpot:
-	case Message::StyleSetCheckMonospaced:
+	// case Message::StyleSetCheckMonospaced:
 	case Message::StyleSetInvisibleRepresentation:
 		StyleSetMessage(iMessage, wParam, lParam);
 		break;
@@ -7671,7 +7679,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 	case Message::StyleGetVisible:
 	case Message::StyleGetChangeable:
 	case Message::StyleGetHotSpot:
-	case Message::StyleGetCheckMonospaced:
+	// case Message::StyleGetCheckMonospaced:
 	case Message::StyleGetInvisibleRepresentation:
 		return StyleGetMessage(iMessage, wParam, lParam);
 
@@ -8962,7 +8970,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		return DefWndProc(iMessage, wParam, lParam);
 	}
 
-	// If there was a change that needs its selection saved and it wasn't explicity saved
+	// If there was a change that needs its selection saved and it wasn't explicitly saved
 	// then do that here.
 	RememberCurrentSelectionForRedoOntoStack();
 

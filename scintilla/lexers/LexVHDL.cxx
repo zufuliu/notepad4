@@ -89,7 +89,7 @@ void ColouriseVHDLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			break;
 
 		case SCE_VHDL_NUMBER:
-			if (!(IsDecimalNumber(sc.chPrev, sc.ch, sc.chNext) || sc.ch == '#')) {
+			if (!IsDecimalNumber(sc.chPrev, sc.ch, sc.chNext) && sc.ch != '#') {
 				sc.SetState(SCE_VHDL_DEFAULT);
 			}
 			break;
@@ -319,40 +319,43 @@ bool FindCodeFolding(LexAccessor &styler, CodeFolding folding, Sci_PositionU sta
 			if (ch == ';' && folding != CodeFolding::When) {
 				return false;
 			}
-		} else if (style == SCE_VHDL_FOLDING_KEYWORD) {
-			// for ... loop ... end loop
-			return folding == CodeFolding::For && UnsafeLower(ch) == 'e' && styler.MatchIgnoreCase(startPos, "end");
-		} else if (style == SCE_VHDL_KEYWORD && style != stylePrev) {
+		} else if (style == SCE_VHDL_FOLDING_KEYWORD || (style == SCE_VHDL_KEYWORD && style != stylePrev)) {
 			ch = UnsafeLower(ch);
-			switch (folding) {
-			case CodeFolding::Is:
-				if (ch == 'i' && UnsafeLower(styler[startPos + 1]) == 's') {
-					for (Sci_PositionU pos = startPos + 2; pos < endPos; pos++) {
-						const int styleNext = styler.StyleIndexAt(pos);
-						if (!IsSpaceEquiv(styleNext)) {
-							// find `is`, but not `is new`
-							return styleNext != SCE_VHDL_KEYWORD || !styler.MatchIgnoreCase(pos, "new");
+			if (AnyOf(ch, 'e', 'b', 'i', 'u')) {
+				char s[8];
+				styler.GetRangeLowered(startPos, endPos, s, sizeof(s));
+				if (style == SCE_VHDL_FOLDING_KEYWORD) {
+					// for ... loop ... end loop
+					return folding == CodeFolding::For && StrStartsWith(s, "end");
+				}
+
+				switch (folding) {
+				case CodeFolding::Is:
+					if (StrStartsWith(s, "is")) {
+						for (Sci_PositionU pos = startPos + 2; pos < endPos; pos++) {
+							const int styleNext = styler.StyleIndexAt(pos);
+							if (!IsSpaceEquiv(styleNext)) {
+								// find `is`, but not `is new`
+								if (styleNext != SCE_VHDL_KEYWORD) {
+									return true;
+								}
+								styler.GetRangeLowered(pos, endPos, s, 4);
+								return !StrEqual(s, "new");
+							}
 						}
 					}
-				}
-				break;
+					break;
 
-			case CodeFolding::When:
-				if (ch == 'b' && styler.MatchIgnoreCase(startPos, "begin")) {
-					return true;
-				}
-				break;
+				case CodeFolding::When:
+					return StrStartsWith(s, "begin");
 
-			case CodeFolding::For:
-				if (ch == 'u' && styler.MatchIgnoreCase(startPos, "use")) {
-					return false;
-				}
-				break;
+				case CodeFolding::For:
+					return !StrStartsWith(s, "use");
 
-			default:
-				break;
+				default:
+					break;
+				}
 			}
-
 		}
 	}
 	return folding != CodeFolding::For;

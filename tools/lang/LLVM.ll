@@ -1,4 +1,4 @@
-; LLVM 16 https://llvm.org/docs/LangRef.html
+; LLVM 21 https://llvm.org/docs/LangRef.html
 
 ;! Keywords			===========================================================
 ; Linkage Types
@@ -85,7 +85,7 @@ double
 fp128
 x86_fp80
 ppc_fp128
-x86_mmx
+x86_amx
 ptr				; Pointer Type
 vscale 			; Vector Type
 label			; Label Type
@@ -100,14 +100,15 @@ opaque			; Opaque Structure Types
 ccc
 fastcc
 coldcc
-webkit_jscc
+ghccc
 anyregcc
 preserve_mostcc
 preserve_allcc
+preserve_nonecc
 cxx_fast_tlscc
+tailcc
 swiftcc
 swifttailcc
-tailcc
 cfguard_checkcc
 
 ; Visibility Styles
@@ -137,6 +138,7 @@ dso_local
 ; https://llvm.org/docs/LangRef.html#global-variables
 unnamed_addr
 local_unnamed_addr
+code_model
 no_sanitize_address
 no_sanitize_hwaddress
 sanitize_address_dyninit
@@ -154,17 +156,17 @@ samesize
 ; https://llvm.org/docs/LangRef.html#parameter-attributes
 zeroext
 signext
+noext
 inreg
-byval
 byval(<ty>)
 preallocated(<ty>)
-inalloca
-sret
+inalloca(<ty>)
+sret(<ty>)
 elementtype(<ty>)
 align <n>
 align(<n>)
 noalias
-nocapture
+captures(...)
 nofree
 nest
 returned
@@ -183,6 +185,11 @@ allocptr
 readnone
 readonly
 writeonly
+writable
+initializes((Lo1, Hi1), ...)
+dead_on_unwind
+dead_on_return
+range(<ty> <a>, <b>)
 
 ; Prologue Data
 ; https://llvm.org/docs/LangRef.html#prologue-data
@@ -196,6 +203,7 @@ personality
 alignstack(<n>)
 alloc-family
 allockind("KIND")
+alloc-variant-zeroed
 allocsize(<EltSizeParam>[, <NumEltsParam>])
 alwaysinline
 builtin
@@ -204,8 +212,8 @@ convergent
 disable_sanitizer_instrumentation
 dontcall-error
 dontcall-warn
-frame-pointer
 fn_ret_thunk_extern
+frame-pointer
 hot
 inlinehint
 jumptable
@@ -216,6 +224,7 @@ no-inline-line-tables
 no-jump-tables
 nobuiltin
 nocallback
+nodivergencesource
 noduplicate
 nofree
 noimplicitfloat
@@ -234,6 +243,7 @@ nounwind
 nosanitize_bounds
 nosanitize_coverage
 null_pointer_is_valid
+optdebug
 optforfuzzing
 optnone
 optsize
@@ -248,17 +258,19 @@ sanitize_memory
 sanitize_thread
 sanitize_hwaddress
 sanitize_memtag
+sanitize_realtime
+sanitize_realtime_blocking
+sanitize_alloc_token
 speculative_load_hardening
 speculatable
 ssp
-sspreq
 sspstrong
+sspreq
 strictfp
 denormal-fp-math
 denormal-fp-math-f32
 thunk
-tls-load-hoist
-uwtable
+uwtable[(sync|async)]
 nocf_check
 shadowcallstack
 mustprogress
@@ -293,6 +305,7 @@ seq_cst
 
 ; Fast-Math Flags
 ; https://llvm.org/docs/LangRef.html#fast-math-flags
+fast
 nnan
 ninf
 nsz
@@ -300,7 +313,6 @@ arcp
 contract
 afn
 reassoc
-fast
 
 ; Pointer Type
 addrspace()
@@ -436,8 +448,12 @@ atomicrmw [volatile] <operation> ptr <pointer>, <ty> <value> [syncscope("<target
 	fsub
 	fmax
 	fmin
+	fmaximum
+	fminimum
 	uinc_wrap
 	udec_wrap
+	usub_cond
+	usub_sat
 getelementptr <ty>, ptr <ptrval>{, [inrange] <ty> <idx>}*
 getelementptr inbounds <ty>, ptr <ptrval>{, [inrange] <ty> <idx>}*
 getelementptr <ty>, <N x ptr> <ptrval>, [inrange] <vector index type> <idx>; Conversion Operations
@@ -453,12 +469,14 @@ fptosi <ty> <value> to <ty2>
 uitofp <ty> <value> to <ty2>
 sitofp <ty> <value> to <ty2>
 ptrtoint <ty> <value> to <ty2>
+ptrtoaddr <ty> <value> to <ty2>
 inttoptr <ty> <value> to <ty2>[, !dereferenceable !<deref_bytes_node>][, !dereferenceable_or_null !<deref_bytes_node]
 bitcast <ty> <value> to <ty2>
 addrspacecast <pty> <ptrval> to <pty2>
 ; Other Operations
 ; https://llvm.org/docs/LangRef.html#other-operations
 icmp <cond> <ty> <op1>, <op2>
+	samesign
 	eq
 	ne
 	ugt

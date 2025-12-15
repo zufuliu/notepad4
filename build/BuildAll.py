@@ -253,7 +253,7 @@ def build_all_release_artifact():
 	endTime = time.perf_counter()
 	print('total build time:', format_duration(endTime - startTime))
 
-# https://cli.github.com/
+# https://cli.github.com/manual/
 # gh auth login
 # gh release list -L 2
 # gh release upload <tag> <files>

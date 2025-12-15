@@ -3364,6 +3364,8 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) noexcept {
 		break;
 
 	case NP2LEX_SWIFT:
+		RawStringStyleMask[SCE_SWIFT_STRING_ED >> 5] |= (1U << (SCE_SWIFT_STRING_ED & 31));
+		RawStringStyleMask[SCE_SWIFT_TRIPLE_STRING_ED >> 5] |= (1U << (SCE_SWIFT_TRIPLE_STRING_ED & 31));
 		GenericTypeStyleMask[SCE_SWIFT_CLASS >> 5] |= (1U << (SCE_SWIFT_CLASS & 31));
 		GenericTypeStyleMask[SCE_SWIFT_STRUCT >> 5] |= (1U << (SCE_SWIFT_STRUCT & 31));
 		GenericTypeStyleMask[SCE_SWIFT_PROTOCOL >> 5] |= (1U << (SCE_SWIFT_PROTOCOL & 31));

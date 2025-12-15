@@ -315,6 +315,7 @@ BEGIN
 				MENUITEM "LS\tL&ine Separator",						IDM_INSERT_UNICODE_LS
 				MENUITEM "PS\tPara&graph Separator",				IDM_INSERT_UNICODE_PS
 				MENUITEM "ZWSP\t&Zero width space",					IDM_INSERT_UNICODE_ZWSP
+				MENUITEM "SHY\tSoft &hyphen",						IDM_INSERT_UNICODE_SHY
 			END
 			MENUITEM SEPARATOR
 			MENUITEM "&Dateiname",								CMD_INSERTFILENAME_NOEXT
@@ -605,6 +606,7 @@ BEGIN
 			MENUITEM "Statusleiste &anzeigen\tShift+F11",	IDM_VIEW_STATUSBAR
 			MENUITEM SEPARATOR
 			MENUITEM "&Transparenter Modus\tStrg+0",		IDM_VIEW_TRANSPARENT
+			MENUITEM "Transparent bei &Fokusverlust",		IDM_VIEW_TRANSPARENT_INACTIVE
 			POPUP "&Vollbildmodus"
 			BEGIN
 				MENUITEM "Beim &Starten",					IDM_VIEW_FULLSCREEN_ON_START
@@ -1794,7 +1796,7 @@ $\tZeilenende\n\
 *? or +?\tNicht-gierige Nutzung von * und + Quantifizierern\n\
 (\tBeginn eines Bereichs\n\
 )\tEnde eines Bereichs\n\
-\\n\tBezieht sich auf einen Ersetzungsbereich (n = 1-9)\n\n\
+\\n or $n\tBezieht sich auf einen Ersetzungsbereich (n = 1-9)\n\n\
 Boost Perl Regex Syntax\n\n\
 a|b\tEntspricht entweder a oder b\n\
 {n}\tEntspricht dem vorhergehenden n mal\n\
@@ -2164,4 +2166,5 @@ END
 #include "../../src/Notepad4.ver"
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
+
 

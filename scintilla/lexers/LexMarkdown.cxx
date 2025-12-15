@@ -29,11 +29,13 @@ using namespace Lexilla;
 namespace {
 
 // CommonMark Spec https://spec.commonmark.org/
+// https://github.com/commonmark/commonmark-spec
 // https://spec.commonmark.org/dingus/
 // GitHub Flavored Markdown Spec https://github.github.com/gfm/
 // https://docs.github.com/en/get-started/writing-on-github
-// GitLab Flavored Markdown https://docs.gitlab.com/ee/user/markdown.html
+// GitLab Flavored Markdown https://docs.gitlab.com/user/markdown/
 // https://gitlab.com/gitlab-org/gitlab/blob/master/doc/user/markdown.md
+// https://gitlab-org.gitlab.io/ruby/gems/gitlab-glfm-markdown/
 // Pandoc’s Markdown https://pandoc.org/MANUAL.html#pandocs-markdown
 // MultiMarkdown https://github.com/fletcher/MultiMarkdown-6
 // https://fletcher.github.io/MultiMarkdown-6/
@@ -1507,7 +1509,7 @@ int MarkdownLexer::HighlightBlockText(uint32_t lineState) {
 				delimiterCount = count;
 				int style = (sc.ch == '`') ? SCE_MARKDOWN_BACKTICK_BLOCK : SCE_MARKDOWN_TILDE_BLOCK;
 				// check info string
-				if (AnyOf<'L', 'l', 'M', 'm'>(chNext)) {
+				if (AnyOf<'L', 'l', 'M', 'm'>(static_cast<uint8_t>(chNext))) {
 					char info[8]{};
 					const Sci_PositionU pos = sc.currentPos + count;
 					sc.styler.GetRangeLowered(pos, sc.lineStartNext, info, sizeof(info));
@@ -1521,6 +1523,7 @@ int MarkdownLexer::HighlightBlockText(uint32_t lineState) {
 		}
 		[[fallthrough]];
 	case ':':
+		// TODO: https://docs.gitlab.com/user/markdown/#includes
 		if (markdown == Markdown::Pandoc && sc.ch != '`' && IsSpaceOrTab(sc.chNext) && CheckDefinitionList(sc.currentPos, lineState)) {
 			sc.SetState(SCE_MARKDOWN_DEFINITION_LIST);
 			return 0;
@@ -1534,7 +1537,7 @@ int MarkdownLexer::HighlightBlockText(uint32_t lineState) {
 		break;
 
 	case '$':
-		if (sc.chNext == '$' && markdown != Markdown::GitLab) {
+		if (sc.chNext == '$') {
 			sc.SetState(SCE_MARKDOWN_DISPLAY_MATH);
 			return 0;
 		}
@@ -1647,7 +1650,7 @@ void MarkdownLexer::HighlightInlineText(int visibleChars) {
 	case '{':
 	case '[':
 		if (markdown == Markdown::GitLab && current == SCE_MARKDOWN_DEFAULT && (sc.chNext == '+' || sc.chNext == '-')) {
-			// https://docs.gitlab.com/ee/user/markdown.html#inline-diff
+			// https://docs.gitlab.com/user/markdown/#inline-diff
 			int style = (sc.chNext == '+') ? SCE_MARKDOWN_DIFF_ADD_CURLY : SCE_MARKDOWN_DIFF_DEL_CURLY;
 			if (sc.ch == '[') {
 				style += SCE_MARKDOWN_DIFF_ADD_SQUARE - SCE_MARKDOWN_DIFF_ADD_CURLY;
@@ -1657,7 +1660,8 @@ void MarkdownLexer::HighlightInlineText(int visibleChars) {
 			sc.Forward();
 		} else if (sc.ch == '[') {
 			if (current == SCE_MARKDOWN_DEFAULT && IsSpaceOrTab(sc.chPrev)
-				&& (sc.chNext == ' ' || sc.chNext == 'x' || sc.chNext == 'X')
+				&& (sc.chNext == ' ' || sc.chNext == 'x' || sc.chNext == 'X'
+					|| (sc.chNext == '~' && markdown == Markdown::GitLab)) // Inapplicable task
 				&& sc.GetRelative(2) == ']' && IsASpace(sc.GetRelative(3))) {
 				// task list after list marker
 				sc.SetState(SCE_MARKDOWN_TASK_LIST);
@@ -1696,15 +1700,13 @@ void MarkdownLexer::HighlightInlineText(int visibleChars) {
 		break;
 
 	case '$':
-		if (markdown != Markdown::GitLab) {
-			if (sc.chNext == '$') {
-				sc.SetState(SCE_MARKDOWN_INLINE_DISPLAY_MATH);
-			} else if (IsMathOpenDollar(sc.chNext)) {
-				sc.SetState(SCE_MARKDOWN_INLINE_MATH);
-			}
-		} else if (sc.chNext == '`') {
+		if (sc.chNext == '`' && markdown == Markdown::GitLab) {
 			sc.SetState(SCE_MARKDOWN_MATH_SPAN);
 			sc.Forward();
+		} else if (sc.chNext == '$') {
+			sc.SetState(SCE_MARKDOWN_INLINE_DISPLAY_MATH);
+		} else if (IsMathOpenDollar(sc.chNext)) {
+			sc.SetState(SCE_MARKDOWN_INLINE_MATH);
 		}
 		break;
 
@@ -2167,8 +2169,9 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 		// basic html
 		case SCE_H_TAG:
 		case SCE_H_BLOCK_TAG:
+		case SCE_H_OTHER:
 			if (sc.ch == '>' || sc.Match('/', '>')) {
-				if (sc.state == SCE_H_BLOCK_TAG) {
+				if (sc.state != SCE_H_TAG) {
 					sc.SetState(SCE_H_TAG);
 				}
 				lexer.tagState = HtmlTagState::None;
@@ -2176,7 +2179,21 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 				sc.SetState(lexer.TryTakeOuterStyle());
 				continue;
 			}
-			if (!IsHtmlTagChar(sc.ch)) {
+			if (sc.state == SCE_H_OTHER) {
+				if (sc.ch == '<' || (visibleBefore == 0 && (sc.ch == '#' || sc.ch == '*'))) {
+					// html tag on typing, TODO: check other block start characters
+					lexer.tagState = HtmlTagState::None;
+					sc.SetState(SCE_MARKDOWN_DEFAULT);
+				} else if (sc.ch == '\'') {
+					sc.SetState(SCE_H_SINGLESTRING);
+				} else if (sc.ch == '\"') {
+					sc.SetState(SCE_H_DOUBLESTRING);
+				} else if (IsHtmlAttrStart(sc.ch)) {
+					sc.SetState(SCE_H_ATTRIBUTE);
+				} else if (!IsHtmlInvalidAttrChar(sc.ch)) {
+					sc.SetState(SCE_H_VALUE);
+				}
+			} else if (!IsHtmlTagChar(sc.ch)) {
 				if (IsASpace(sc.ch)) {
 					// tag attribute
 					sc.SetState(SCE_H_OTHER);
@@ -2236,31 +2253,6 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 				continue;
 			}
 			lexer.DetectAutoLink();
-			break;
-
-		case SCE_H_OTHER:
-			if (sc.ch == '>' || sc.Match('/', '>')) {
-				lexer.tagState = HtmlTagState::None;
-				sc.SetState(SCE_H_TAG);
-				sc.Forward((sc.ch == '/') ? 2 : 1);
-				sc.SetState(lexer.TryTakeOuterStyle());
-				break;
-			}
-			if (sc.ch == '<' || (visibleBefore == 0 && (sc.ch == '#' || sc.ch == '*'))) {
-				// html tag on typing, TODO: check other block start characters
-				lexer.tagState = HtmlTagState::None;
-				sc.SetState(SCE_MARKDOWN_DEFAULT);
-				break;
-			}
-			if (sc.ch == '\'') {
-				sc.SetState(SCE_H_SINGLESTRING);
-			} else if (sc.ch == '\"') {
-				sc.SetState(SCE_H_DOUBLESTRING);
-			} else if (IsHtmlAttrStart(sc.ch)) {
-				sc.SetState(SCE_H_ATTRIBUTE);
-			} else if (!IsHtmlInvalidAttrChar(sc.ch)) {
-				sc.SetState(SCE_H_VALUE);
-			}
 			break;
 
 		case SCE_H_COMMENT:

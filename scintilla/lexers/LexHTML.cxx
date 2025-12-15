@@ -340,7 +340,6 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 		}
 		state = (startPos == 0) ? SCE_H_DEFAULT : state;
 	}
-	styler.StartAt(startPos);
 
 	/* Nothing handles getting out of these, so we need not start in any of them.
 	 * As we're at line start and they can't span lines, we'll re-detect them anyway */
@@ -425,6 +424,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 		}
 	}
 
+	styler.StartAt(startPos);
 	styler.StartSegment(startPos);
 	const Sci_Position lengthDoc = startPos + length;
 	for (Sci_Position i = startPos; i < lengthDoc; i++) {

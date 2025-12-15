@@ -378,6 +378,7 @@ struct LayoutWorker {
 	HANDLE finishedEvent = nullptr;
 	std::atomic<uint32_t> runningThread = 0;
 #endif
+	unsigned textUnicode = 0;
 
 	static constexpr int blockSize = EditModel::ParallelLayoutBlockSize;
 
@@ -399,7 +400,7 @@ struct LayoutWorker {
 							// ts.representation->stringRep is UTF-8.
 							XYPOSITION positionsRepr[Representation::maxLength + 1];
 							const std::string_view stringRep = ts.representation->GetStringRep();
-							posCache.MeasureWidths(surface, styleCtrl, StyleControlChar, stringRep, positionsRepr);
+							posCache.MeasureWidths(surface, styleCtrl, StyleControlChar | (1 << 16), stringRep, positionsRepr);
 							representationWidth = positionsRepr[ts.representation->length - 1];
 						}
 						if (FlagSet(ts.representation->appearance, RepresentationAppearance::Blob)) {
@@ -415,15 +416,15 @@ struct LayoutWorker {
 					// Over half the segments are single characters and of these about half are space characters.
 					positions[0] = style.spaceWidth;
 				} else {
-					posCache.MeasureWidths(surface, style, styleSegment,
+					posCache.MeasureWidths(surface, style, styleSegment | textUnicode,
 						std::string_view(&ll->chars[ts.start], ts.length), positions);
 				}
 			}
 		} else if (style.invisibleRepresentationLength) {
 			const std::string_view text = style.GetInvisibleRepresentation();
-			XYPOSITION positionsRepr[maxInvisibleStyleRepresentationLength + 1];
+			XYPOSITION positionsRepr[Representation::maxLength + 1];
 			// invisibleRepresentation is UTF-8.
-			posCache.MeasureWidths(surface, style, styleSegment, text, positionsRepr);
+			posCache.MeasureWidths(surface, style, styleSegment | (1 << 16), text, positionsRepr);
 			const XYPOSITION representationWidth = positionsRepr[text.length() - 1];
 			for (int ii = 0; ii < ts.length; ii++) {
 				positions[ii] = representationWidth;
@@ -432,6 +433,7 @@ struct LayoutWorker {
 	}
 
 	uint32_t Start(Sci::Position posLineStart, uint32_t posInLine, LayoutLineOption option) {
+		textUnicode = (model.pdoc->dbcsCodePage & (1 << 15)) << 1;
 		const int startPos = ll->lastSegmentEnd;
 		const int endPos = ll->numCharsInLine;
 		if (endPos - startPos > blockSize*2 && !model.BidirectionalEnabled()) {

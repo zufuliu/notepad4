@@ -268,7 +268,7 @@ void ColouriseOCamlDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 		case SCE_OCAML_QUOTED_STRINGID:
 			if (!IsQuotedStringId(sc.ch)) {
 				if (sc.ch == '|') {
-					quotedStringId = styler.GetRange(backPos + 1, sc.currentPos);
+					styler.GetRange(backPos + 1, sc.currentPos, quotedStringId);
 					quotedStringId.push_back('}');
 					sc.ChangeState(SCE_OCAML_QUOTED_STRING);
 				} else {

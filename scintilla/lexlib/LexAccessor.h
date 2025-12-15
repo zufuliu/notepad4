@@ -147,8 +147,8 @@ public:
 	void GetRange(Sci_PositionU startPos_, Sci_PositionU endPos_, char *s, Sci_PositionU len) const noexcept;
 	void GetRangeLowered(Sci_PositionU startPos_, Sci_PositionU endPos_, char *s, Sci_PositionU len) const noexcept;
 	// Get all characters in range [startPos_, endPos_).
-	std::string GetRange(Sci_PositionU startPos_, Sci_PositionU endPos_) const;
-	std::string GetRangeLowered(Sci_PositionU startPos_, Sci_PositionU endPos_) const;
+	void GetRange(Sci_PositionU startPos_, Sci_PositionU endPos_, std::string &s) const;
+	void GetRangeLowered(Sci_PositionU startPos_, Sci_PositionU endPos_, std::string &s) const;
 
 	// Flush() must be called first when used in Colourise() or Lex() function.
 	unsigned char StyleAt(Sci_Position position) const noexcept {
@@ -377,29 +377,24 @@ struct MatchedDelimiterCount {
 };
 
 inline MatchedDelimiterCount GetMatchedDelimiterCountEx(LexAccessor &styler, Sci_PositionU pos, int delimiter) noexcept {
-	int count = 1;
+	int count = 0;
 	int chNext;
-	while (true) {
-		chNext = static_cast<uint8_t>(styler[++pos]);
-		if (chNext == delimiter) {
-			++count;
-		} else {
-			break;
-		}
-	}
+	do {
+		++count;
+		++pos;
+		chNext = styler.SafeGetUCharAt(pos);
+	} while (chNext == delimiter);
 	return {count, chNext};
 }
 
 inline int GetMatchedDelimiterCount(LexAccessor &styler, Sci_PositionU pos, int delimiter) noexcept {
-	int count = 1;
-	while (true) {
-		const uint8_t ch = styler.SafeGetCharAt(++pos);
-		if (ch == delimiter) {
-			++count;
-		} else {
-			break;
-		}
-	}
+	int count = 0;
+	int chNext;
+	do {
+		++count;
+		++pos;
+		chNext = styler.SafeGetUCharAt(pos);
+	} while (chNext == delimiter);
 	return count;
 }
 

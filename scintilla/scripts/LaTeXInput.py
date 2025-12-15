@@ -237,7 +237,7 @@ def update_all_latex_input_data_hash(latex_map=None, emoji_map=None):
 		if False:
 			for value in range(1, 8):
 				multiplier_list.append((1 << value) - 1)
-				multiplier_list.append((1 << value))
+				multiplier_list.append(1 << value)
 				multiplier_list.append((1 << value) + 1)
 			multiplier_list = sorted(set(multiplier_list))
 

@@ -158,15 +158,28 @@ private:
 	uint8_t charClass[maxChar];
 };
 
+struct DBCSByteMask {
+	uint8_t byteMask[256];
+	bool IsLeadByte(unsigned char ch) const noexcept {
+		return byteMask[ch] & true;
+	}
+	bool IsTrailByte(unsigned char ch) const noexcept {
+		return byteMask[ch] & 2;
+	}
+};
+
 class DBCSCharClassify {
 public:
 	explicit DBCSCharClassify(int codePage_) noexcept;
 
 	bool IsLeadByte(unsigned char ch) const noexcept {
-		return leadByte[ch] & true;
+		return byteMask.IsLeadByte(ch);
 	}
 	bool IsTrailByte(unsigned char ch) const noexcept {
-		return leadByte[ch] & 2;
+		return byteMask.IsTrailByte(ch);
+	}
+	const DBCSByteMask& GetByteMask() const noexcept {
+		return byteMask;
 	}
 
 	CharacterClass ClassifyCharacter(uint32_t ch) const noexcept {
@@ -178,7 +191,7 @@ public:
 	}
 
 private:
-	uint8_t leadByte[256];
+	DBCSByteMask byteMask;
 	unsigned char classifyMap[0xffff + 1];
 };
 

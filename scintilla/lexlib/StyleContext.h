@@ -294,6 +294,7 @@ public:
 
 	int GetDocNextChar(bool ignoreCurrent = false) const noexcept;
 	int GetLineNextChar(bool ignoreCurrent = false) const noexcept;
+	int GetLineNextCharEx(Sci_PositionU &pos, bool ignoreCurrent = false) const noexcept;
 };
 
 bool HighlightTaskMarker(StyleContext &sc, int &visibleChars, int visibleCharsBefore, int markerStyle);

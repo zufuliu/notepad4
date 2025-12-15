@@ -20,7 +20,6 @@
 #include "CharacterSet.h"
 #include "StringUtils.h"
 #include "LexerModule.h"
-#include "LexerUtils.h"
 
 using namespace Lexilla;
 
@@ -47,7 +46,7 @@ struct EscapeSequence {
 
 struct InterpolatedStringState {
 	int state;
-	int parenCount;
+	int braceCount;
 	int interpolatorCount;
 };
 
@@ -397,19 +396,15 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 			} else if (IsAGraphic(sc.ch)) {
 				const bool interpolating = !nestedState.empty();
 				sc.SetState(interpolating ? SCE_KOTLIN_OPERATOR2 : SCE_KOTLIN_OPERATOR);
-				if (interpolating && (sc.ch == '{' || sc.ch == '}')) {
+				if (interpolating && AnyOf<'{', '}'>(sc.ch)) {
 					InterpolatedStringState &state = nestedState.back();
-					if (sc.ch == '{') {
-						state.parenCount += 1;
-					} else {
-						state.parenCount -= 1;
-						if (state.parenCount <= 0) {
-							escSeq.outerState = state.state;
-							stringInterpolatorCount = state.interpolatorCount;
-							nestedState.pop_back();
-							sc.ForwardSetState(escSeq.outerState);
-							continue;
-						}
+					state.braceCount += ('{' + '}')/2 - sc.ch;
+					if (state.braceCount <= 0) {
+						escSeq.outerState = state.state;
+						stringInterpolatorCount = state.interpolatorCount;
+						nestedState.pop_back();
+						sc.ForwardSetState(escSeq.outerState);
+						continue;
 					}
 				}
 			}

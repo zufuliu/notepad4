@@ -153,7 +153,6 @@ void ColouriseAU3Doc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 	}
 	// Set the new length to include it from the start and set the start position
 	length = length + s_startPos - startPos;	// correct the total length to process
-	styler.StartAt(startPos);
 
 	StyleContext sc(startPos, length, initStyle, styler);
 	char si;	// string indicator "=1 '=2
@@ -173,7 +172,7 @@ void ColouriseAU3Doc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 			const size_t tp = sci::min<size_t>(sizeof(s) - 1, sc.LengthCurrent());
 			memcpy(s_save, s, tp);
 			s_save[tp] = '\0';
-			if (tp < sizeof(s_save) -  1) {
+			if (tp < sizeof(s_save) - 1) {
 				s_save[tp] = static_cast<char>(MakeLowerCase(sc.ch));
 				s_save[tp + 1] = '\0';
 			}

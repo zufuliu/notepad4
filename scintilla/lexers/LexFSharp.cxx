@@ -204,7 +204,7 @@ void ColouriseFSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 		sc.Forward();
 	}
 
-	while  (sc.More()) {
+	while (sc.More()) {
 		switch (sc.state) {
 		case SCE_FSHARP_OPERATOR:
 		case SCE_FSHARP_OPERATOR2:

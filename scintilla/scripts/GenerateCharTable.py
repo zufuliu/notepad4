@@ -127,6 +127,7 @@ def GenerateUnicodeControlCharacters():
 		"\u2068", # U+2068	FSI		First strong isolate
 		"\u2069", # U+2069	PDI		Pop directional isolate
 		"\u061C", # U+061C	ALM		Arabic letter mark
+		"\u00AD", # U+00AD	SHY		Soft hyphen
 	]
 
 	print('UnicodeControlCharacters:')
@@ -170,10 +171,9 @@ def GenerateJsonCharClass():
 				charClass = JsonChar_BraceOpen
 			elif ch in '}]':
 				charClass = JsonChar_BraceClose
-			else:
-				if ch in '+-':
-					# SignedInteger in ExponentPart
-					mask = JsonMask_Number
+			elif ch in '+-':
+				# SignedInteger in ExponentPart
+				mask = JsonMask_Number
 		elif ch == '\"':
 			state = SCE_JSON_STRING_DQ
 		elif ch == '\'':

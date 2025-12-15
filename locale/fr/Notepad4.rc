@@ -315,6 +315,7 @@ BEGIN
 				MENUITEM "LS\tSéparateur de ligne",						IDM_INSERT_UNICODE_LS
 				MENUITEM "PS\tSéparateur de para&graphe",				IDM_INSERT_UNICODE_PS
 				MENUITEM "ZWSP\t&Espace à largeur nulle",					IDM_INSERT_UNICODE_ZWSP
+				MENUITEM "SHY\tSoft &hyphen",						IDM_INSERT_UNICODE_SHY
 			END
 			MENUITEM SEPARATOR
 			MENUITEM "&Nom de fichier (sans extension)",								CMD_INSERTFILENAME_NOEXT
@@ -605,6 +606,7 @@ BEGIN
 			MENUITEM "Afficher la barre de statut\tShift+F11",	IDM_VIEW_STATUSBAR
 			MENUITEM SEPARATOR
 			MENUITEM "Mode transparent\tCtrl+0",	IDM_VIEW_TRANSPARENT
+			MENUITEM "Transparent on Los&ing Focus",IDM_VIEW_TRANSPARENT_INACTIVE
 			POPUP "Mode plein écran"
 			BEGIN
 				MENUITEM "Au démarrage",				IDM_VIEW_FULLSCREEN_ON_START
@@ -1794,7 +1796,7 @@ $\tfind e ligne\n\
 *? or +?\tNon-greedy matching of quantifiers ""?"" and ""+""\n\
 (\tDébut d'une région\n\
 )\tFin  d'une région\n\
-\\n\tSe réfère à une région lors du remplacement (avec n étant compris entre 1 et 9)\n\n\
+\\n or $n\tSe réfère à une région lors du remplacement (avec n étant compris entre 1 et 9)\n\n\
 Boost Perl Regex Syntax:\n\
 a|b\tMatches either a or b\n\
 {n}\tMatches preceding exactly n times\n\

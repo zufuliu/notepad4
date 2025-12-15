@@ -4239,9 +4239,12 @@ void EditSortLines(EditSortFlag iSortFlags) noexcept {
 	}
 
 	if (iSortFlags & EditSortFlag_Shuffle) {
-		srand(GetTickCount());
+		// srand(GetTickCount());
+		uint32_t state = GetTickCount();
 		for (Sci_Line i = iLineCount - 1; i > 0; i--) {
-			const Sci_Line j = rand() % i;
+			// const Sci_Line j = rand() % i;
+			state = state*1103515245 + 12345; // see TestUtils.h
+			const Sci_Line j = ((state >> 16) & RAND_MAX) % i;
 			const SORTLINE sLine = pLines[i];
 			pLines[i] = pLines[j];
 			pLines[j] = sLine;
@@ -4725,7 +4728,7 @@ static bool CopySelectionAsFindText(HWND hwnd, EDITFINDREPLACE *lpefr, bool bFir
 	}
 
 	if (StrNotEmpty(lpszSelection)) {
-		char *lpszEscSel = static_cast<char *>(NP2HeapAlloc((2 * NP2_FIND_REPLACE_LIMIT)));
+		char *lpszEscSel = static_cast<char *>(NP2HeapAlloc((4 * NP2_FIND_REPLACE_LIMIT)));
 		unsigned option = lpefr->option & ~FindReplaceOption_TransformBackslash;
 		if (AddBackslashA(lpszEscSel, lpszSelection)) {
 			if ((lpefr->fuFlags & SCFIND_REGEXP) == 0) {
@@ -5224,7 +5227,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 	}
 	break;
 
-	case WM_ACTIVATE :
+	case WM_ACTIVATE:
 		SetWindowTransparentMode(hwnd, (LOWORD(wParam) == WA_INACTIVE && (iFindReplaceOption & FindReplaceOption_TransparentMode) != 0), iFindReplaceOpacityLevel);
 		break;
 	}
@@ -6732,6 +6735,7 @@ static const UnicodeControlCharacter kUnicodeControlCharacterTable[] = {
 	{ "\xe2\x81\xa8", "FSI" },	// U+2068	FSI		First strong isolate
 	{ "\xe2\x81\xa9", "PDI" },	// U+2069	PDI		Pop directional isolate
 	{ "\xd8\x9c", "ALM" },		// U+061C	ALM		Arabic letter mark
+	{ "\xc2\xad", "SHY" },		// U+00AD	SHY		Soft hyphen
 };
 
 void EditInsertUnicodeControlCharacter(int menu) noexcept {

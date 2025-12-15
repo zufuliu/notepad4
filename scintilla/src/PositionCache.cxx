@@ -1254,13 +1254,13 @@ size_t PositionCache::GetSize() const noexcept {
 	return pces.size();
 }
 
-void PositionCache::MeasureWidths(Surface *surface, const Style &style, uint16_t styleNumber, std::string_view sv, XYPOSITION *positions) {
+void PositionCache::MeasureWidths(Surface *surface, const Style &style, unsigned styleNumber_, std::string_view sv, XYPOSITION *positions) {
 	if (style.monospaceASCII && AllGraphicASCII(sv)) {
-		const XYPOSITION characterWidth = style.aveCharWidth;
+		XYPOSITION characterWidth = style.aveCharWidth;
 		const size_t length = sv.length();
 #if NP2_USE_SSE2
+		XYPOSITION *ptr = positions;
 		if (length >= 2) {
-			XYPOSITION *ptr = positions;
 			const XYPOSITION * const end = ptr + length - 1;
 			const __m128d one = _mm_set1_pd(characterWidth);
 			const __m128d two = _mm_set1_pd(2);
@@ -1270,12 +1270,12 @@ void PositionCache::MeasureWidths(Surface *surface, const Style &style, uint16_t
 				inc = _mm_add_pd(inc, two);
 				ptr += 2;
 			} while (ptr < end);
-			if (ptr == end) {
-				_mm_store_sd(ptr, _mm_mul_sd(one, inc));
+			if (ptr != end) {
+				return;
 			}
-		} else {
-			positions[0] = characterWidth;
+			characterWidth = _mm_cvtsd_f64(_mm_mul_sd(one, inc));
 		}
+		ptr[0] = characterWidth;
 #else
 		for (size_t i = 0; i < length; i++) {
 			positions[i] = characterWidth * static_cast<XYPOSITION>(i + 1);
@@ -1313,6 +1313,7 @@ void PositionCache::MeasureWidths(Surface *surface, const Style &style, uint16_t
 
 	PositionCacheEntry *entry = nullptr;
 	PositionCacheEntry *entry2 = nullptr;
+	const uint16_t styleNumber = styleNumber_ & UINT16_MAX;
 	constexpr size_t maxLength = (512 - 16)/(sizeof(XYPOSITION) + 1);
 	if (sv.length() <= maxLength) {
 		// Only store short strings in the cache so it doesn't churn with
@@ -1336,7 +1337,11 @@ void PositionCache::MeasureWidths(Surface *surface, const Style &style, uint16_t
 		}
 	}
 
-	surface->MeasureWidths(style.font.get(), sv, positions);
+	if (styleNumber_ & (1 << 16)) {
+		surface->MeasureWidthsUTF8(style.font.get(), sv, positions);
+	} else {
+		surface->MeasureWidths(style.font.get(), sv, positions);
+	}
 	if (entry) {
 		// constructed here to reduce lock time
 		const size_t length = sv.length();

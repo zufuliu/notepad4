@@ -26,7 +26,12 @@ protected:
 public:
 	CaseFolderTable() noexcept;
 	size_t Fold(char *folded, size_t sizeFolded, const char *mixed, size_t lenMixed) const override;
-	void SetTranslation(char ch, char chTranslation) noexcept;
+	void SetTranslation(unsigned char ch, char chTranslation) noexcept {
+		mapping[ch] = chTranslation;
+	}
+	char FoldChar(unsigned char ch) const noexcept {
+		return mapping[ch];
+	}
 };
 
 class ICaseConverter;

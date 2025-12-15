@@ -994,6 +994,7 @@ LexerConfigMap = {
 		'default_fold_level': ['class', 'function'],
 		'default_fold_ignore_inner': 'SCE_SWIFT_FUNCTION_DEFINITION',
 		'escape_char_style': 'SCE_SWIFT_ESCAPECHAR',
+		'raw_string_style': ['SCE_SWIFT_STRING_ED', 'SCE_SWIFT_TRIPLE_STRING_ED'],
 		'angle_bracket_generic': True,
 		'generic_type_style': ['SCE_SWIFT_CLASS', 'SCE_SWIFT_STRUCT', 'SCE_SWIFT_PROTOCOL', 'SCE_SWIFT_ENUM'],
 		'operator_style': ['SCE_SWIFT_OPERATOR', 'SCE_SWIFT_OPERATOR2'],
@@ -1328,7 +1329,7 @@ def BuildLexerConfigContent(rid, keywordAttr):
 	styles = config.get('character_style', ['0'])
 	output.append(f"{indent}{styles[0]}, {config.get('none_quote_style', '0')},")
 	# operator styles
-	styles = config.get('operator_style', []) + ['0', '0']
+	styles = [*config.get('operator_style', []), '0', '0']
 	output.append(f"{indent}{styles[0]}, {styles[1]},")
 
 	# keyword attribute

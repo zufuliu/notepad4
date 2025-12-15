@@ -20,7 +20,6 @@
 #include "CharacterSet.h"
 #include "StringUtils.h"
 #include "LexerModule.h"
-#include "LexerUtils.h"
 #include "DocUtils.h"
 
 using namespace Lexilla;
@@ -45,11 +44,17 @@ struct EscapeSequence {
 	}
 };
 
+struct InterpolatedStringState {
+	int state;
+	int braceCount;
+	int jsxTagLevel; // nested JSX tag in expression
+};
+
 enum {
 	JsLineStateMaskLineComment = 1,		// line comment
 	JsLineStateMaskImport = (1 << 1),	// import
 
-	JsLineStateInsideJsxExpression = 1 << 3,
+	JsLineStateStringInterpolation = 1 << 3,
 	JsLineStateLineContinuation = 1 << 4,
 };
 
@@ -87,10 +92,6 @@ enum class DocTagState {
 	XmlClose,		/// </param>, No this (C# like) style
 };
 
-static_assert(DefaultNestedStateBaseStyle + 1 == SCE_JSX_OTHER);
-static_assert(DefaultNestedStateBaseStyle + 2 == SCE_JSX_TEXT);
-static_assert(DefaultNestedStateBaseStyle + 3 == SCE_JS_TEMPLATELITERAL);
-
 inline bool IsJsIdentifierStartNext(const StyleContext &sc) noexcept {
 	return IsJsIdentifierStart(sc.chNext) || sc.MatchNext('\\', 'u');
 }
@@ -122,6 +123,7 @@ constexpr bool IsRegexStart(int chPrevNonWhite, int stylePrevNonWhite) noexcept 
 
 inline bool IsJsxTagStart(const StyleContext &sc, int chPrevNonWhite, int stylePrevNonWhite) noexcept {
 	// https://facebook.github.io/jsx/
+	// https://react.dev/learn/writing-markup-with-jsx
 	// https://reactjs.org/docs/jsx-in-depth.html
 	return (stylePrevNonWhite == SCE_JSX_TAG || IsRegexStart(chPrevNonWhite, stylePrevNonWhite))
 		&& (IsJsIdentifierStartNext(sc) || sc.chNext == '>' || sc.chNext == '{');
@@ -135,9 +137,8 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 	KeywordType kwType = KeywordType::None;
 	int chBeforeIdentifier = 0;
 
-	std::vector<int> nestedState; // string interpolation `${}`
 	int jsxTagLevel = 0;
-	std::vector<int> jsxTagLevels;// nested JSX tag in expression
+	std::vector<InterpolatedStringState> nestedState; // string interpolation `${}`
 
 	// JSX syntax conflicts with TypeScript type assert.
 	// https://www.typescriptlang.org/docs/handbook/jsx.html
@@ -151,26 +152,22 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 	DocTagState docTagState = DocTagState::None;
 	EscapeSequence escSeq;
 
-	if (enableJsx && startPos != 0) {
-		// backtrack to the line starts JSX for better coloring on typing.
-		BacktrackToStart(styler, JsLineStateInsideJsxExpression, startPos, lengthDoc, initStyle);
+	if (startPos != 0) {
+		// backtrack to the line starts JSX or interpolation for better coloring on typing.
+		BacktrackToStart(styler, JsLineStateStringInterpolation, startPos, lengthDoc, initStyle);
 	}
 
 	StyleContext sc(startPos, lengthDoc, initStyle, styler);
 	if (sc.currentLine > 0) {
-		int lineState = styler.GetLineState(sc.currentLine - 1);
+		const int lineState = styler.GetLineState(sc.currentLine - 1);
 		/*
 		2: lineStateLineType
-		1: JsLineStateInsideJsxExpression
+		1: JsLineStateStringInterpolation
 		1: lineContinuation
-		3: nestedState count
-		3*4: nestedState
+		: jsxTagLevel
 		*/
 		lineContinuation = lineState & JsLineStateLineContinuation;
-		lineState >>= 8;
-		if (lineState) {
-			UnpackLineState(lineState, nestedState);
-		}
+		jsxTagLevel = lineState >> 4;
 	}
 	if (startPos == 0) {
 		if (sc.Match('#', '!')) {
@@ -331,7 +328,7 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				sc.SetState((sc.state == SCE_JSX_STRING_SQ || sc.state == SCE_JSX_STRING_DQ) ? SCE_JSX_OTHER : SCE_JS_DEFAULT);
 				continue;
 			} else if (sc.state == SCE_JS_TEMPLATELITERAL && sc.Match('$', '{')) {
-				nestedState.push_back(sc.state);
+				nestedState.push_back({sc.state, 1, jsxTagLevel});
 				sc.SetState(SCE_JS_OPERATOR2);
 				sc.Forward();
 			}
@@ -458,10 +455,9 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 			} else if ((sc.state == SCE_JSX_OTHER) && (IsJsIdentifierStart(sc.ch) || sc.Match('\\', 'u'))) {
 				sc.SetState(SCE_JSX_ATTRIBUTE);
 			} else if (sc.ch == '{') {
-				jsxTagLevels.push_back(jsxTagLevel);
-				nestedState.push_back(sc.state);
-				sc.SetState(SCE_JS_OPERATOR2);
+				nestedState.push_back({sc.state, 1, jsxTagLevel});
 				jsxTagLevel = 0;
+				sc.SetState(SCE_JS_OPERATOR2);
 			} else if (sc.Match('<', '/')) {
 				--jsxTagLevel;
 				sc.SetState(SCE_JSX_TAG);
@@ -535,21 +531,16 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 					sc.SetState(SCE_JS_OPERATOR);
 				}
 			} else if (IsAGraphic(sc.ch) && sc.ch != '\\') {
-				sc.SetState(SCE_JS_OPERATOR);
-				if (!nestedState.empty()) {
-					sc.ChangeState(SCE_JS_OPERATOR2);
-					if (sc.ch == '{') {
-						nestedState.push_back(SCE_JS_DEFAULT);
-						if (enableJsx) {
-							jsxTagLevels.push_back(jsxTagLevel);
-							jsxTagLevel = 0;
-						}
-					} else if (sc.ch == '}') {
-						if (enableJsx) {
-							jsxTagLevel = TryTakeAndPop(jsxTagLevels);
-						}
-						const int outerState = TakeAndPop(nestedState);
-						sc.ForwardSetState(outerState);
+				const bool interpolating = !nestedState.empty();
+				sc.SetState(interpolating ? SCE_JS_OPERATOR2 : SCE_JS_OPERATOR);
+				if (interpolating && AnyOf<'{', '}'>(sc.ch)) {
+					InterpolatedStringState &state = nestedState.back();
+					state.braceCount += ('{' + '}')/2 - sc.ch;
+					if (state.braceCount <= 0) {
+						escSeq.outerState = state.state;
+						jsxTagLevel = state.jsxTagLevel;
+						nestedState.pop_back();
+						sc.ForwardSetState(escSeq.outerState);
 						continue;
 					}
 				}
@@ -564,12 +555,9 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 			}
 		}
 		if (sc.atLineEnd) {
-			int lineState = lineContinuation | lineStateLineType;
-			if (enableJsx && !(jsxTagLevel == 0 && jsxTagLevels.empty())) {
-				lineState |= JsLineStateInsideJsxExpression;
-			}
+			int lineState = lineContinuation | lineStateLineType | (jsxTagLevel << 4);
 			if (!nestedState.empty()) {
-				lineState |= PackLineState(nestedState) << 8;
+				lineState |= JsLineStateStringInterpolation;
 			}
 			styler.SetLineState(sc.currentLine, lineState);
 			lineStateLineType = 0;

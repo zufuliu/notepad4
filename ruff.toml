@@ -1,3 +1,34 @@
 # https://github.com/charliermarsh/ruff#configuration
-line-length = 1024
-lint.ignore = ['F403', 'F405']
+# https://docs.astral.sh/ruff/configuration/
+# https://docs.astral.sh/ruff/settings/
+line-length = 320
+target-version = 'py313'
+extend-exclude = ['bin', 'Python.py']
+
+[lint]
+# https://docs.astral.sh/ruff/rules/
+select = [
+  'B', # flake8-bugbear
+  'E', # pycodestyle
+  'F', # Pyflakes
+  'PL', # Pylint
+  'RUF', # Ruff
+  'UP', # pyupgrade
+]
+
+ignore = [
+  'E501', # line-too-long
+  'F403', # undefined-local-with-import-star
+  'F405', # undefined-local-with-import-star-usage
+  'PLR0912', # too-many-branches
+  'PLR0913', # too-many-arguments
+  'PLR0915', # too-many-statements
+  'PLR2004', # magic-value-comparison
+  'PLW2901', # redefined-loop-name
+]
+
+[lint.per-file-ignores]
+'scintilla/scripts/*.py' = [
+  'RUF001', # ambiguous-unicode-character-string
+  'RUF003', # ambiguous-unicode-character-comment
+]

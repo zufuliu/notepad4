@@ -316,6 +316,7 @@ BEGIN
 				MENUITEM "LS\tРазделитель строк",						IDM_INSERT_UNICODE_LS
 				MENUITEM "PS\tРазделитель абзацев",						IDM_INSERT_UNICODE_PS
 				MENUITEM "ZWSP\tПробел нулевой ширины",						IDM_INSERT_UNICODE_ZWSP
+				MENUITEM "SHY\tSoft &hyphen",						IDM_INSERT_UNICODE_SHY
 			END
 			MENUITEM SEPARATOR
 			MENUITEM "&Имя файла",									CMD_INSERTFILENAME_NOEXT
@@ -606,6 +607,7 @@ BEGIN
 			MENUITEM "Показывать &строку состояния\tShift+F11",					IDM_VIEW_STATUSBAR
 			MENUITEM SEPARATOR
 			MENUITEM "&Режим прозрачности\tCtrl+0",							IDM_VIEW_TRANSPARENT
+			MENUITEM "Transparent on Los&ing Focus",IDM_VIEW_TRANSPARENT_INACTIVE
 			POPUP "Полно&экранный режим"
 			BEGIN
 				MENUITEM "&При запуске",							IDM_VIEW_FULLSCREEN_ON_START
@@ -1795,7 +1797,7 @@ $\tКонец строки\n\
 *? или +?\tНежадное сопоставление кванторов ""?"" и ""+""\n\
 (\tНачало региона\n\
 )\tКонец региона\n\
-\\n\tОтносится к региону при замене (n = 1-9)\n\n\
+\\n или $n\tОтносится к региону при замене (n = 1-9)\n\n\
 Синтаксис регулярных выражений Boost Perl:\n\
 a|b\tСоответствует либо a, либо b\n\
 {n}\tСовпадения, предшествующие точно n раз\n\

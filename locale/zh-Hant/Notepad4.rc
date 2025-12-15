@@ -315,6 +315,7 @@ BEGIN
 				MENUITEM "LS\tL&ine Separator",						IDM_INSERT_UNICODE_LS
 				MENUITEM "PS\tPara&graph Separator",				IDM_INSERT_UNICODE_PS
 				MENUITEM "ZWSP\t&Zero width space",					IDM_INSERT_UNICODE_ZWSP
+				MENUITEM "SHY\tSoft &hyphen",						IDM_INSERT_UNICODE_SHY
 			END
 			MENUITEM SEPARATOR
 			MENUITEM "檔案名稱(&F)",							CMD_INSERTFILENAME_NOEXT
@@ -605,6 +606,7 @@ BEGIN
 			MENUITEM "顯示狀態列(&U)\tShift+F11",		IDM_VIEW_STATUSBAR
 			MENUITEM SEPARATOR
 			MENUITEM "透明模式(&T)\tCtrl+0",			IDM_VIEW_TRANSPARENT
+			MENUITEM "離開後透明(&I)",				IDM_VIEW_TRANSPARENT_INACTIVE
 			POPUP "全螢幕模式(&N)"
 			BEGIN
 				MENUITEM "啟動時全螢幕(&S)",				IDM_VIEW_FULLSCREEN_ON_START
@@ -1107,7 +1109,7 @@ BEGIN
     CONTROL         "<a>(?)</a>",IDC_BACKSLASHHELP,"SysLink",0x0,118,97,12,10
     CONTROL         "<a>(?)</a>",IDC_WILDCARDHELP,"SysLink",0x0,208,61,12,10
     CONTROL         "<a>清除歷史</a>",IDC_CLEAR_FIND,"SysLink",WS_TABSTOP,173,7,48,10
-    AUTOCHECKBOX    "離開時透明",IDC_TRANSPARENT,7,108,124,10,WS_TABSTOP
+    AUTOCHECKBOX    "離開後透明",IDC_TRANSPARENT,7,108,124,10,WS_TABSTOP
     AUTOCHECKBOX    "為符合的行新增書籤(&K)",IDC_FINDALLBOOKMARK,132,73,90,10,WS_TABSTOP
     AUTOCHECKBOX    "使用 Boost 正規表示式",IDC_FIND_CXXREGEX,132,85,90,10,WS_TABSTOP
     AUTOCHECKBOX    "使用等寬字型(&M)",IDC_USEMONOSPACEDFONT,132,97,90,10,WS_TABSTOP
@@ -1794,7 +1796,7 @@ $\t行結束。\n\
 *? 或 +?\t對限量詞 ""?"" 和 ""+"" 做非貪婪比對。\n\
 (\t區域開始。\n\
 )\t區域結束。\n\
-\\n\t取代時參考的區域(n 為 1-9)。\n\n\
+\\n 或 $n\t取代時參考的區域(n 為 1-9)。\n\n\
 Boost Perl 規則運算式語法:\n\
 a|b\t符合 a 或 b。\n\
 {n}\t精確符合 n 次。\n\

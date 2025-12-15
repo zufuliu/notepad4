@@ -19,8 +19,8 @@ cl /utf-8 /W4 /c /EHsc /std:c++20 /O2 /GS- /GR- /Gv /FAcs /DNDEBUG /DUNICODE /DN
 win32
 cl /utf-8 /W4 /c /EHsc /std:c++20 /O2 /GS- /GR- /Gv /FAcs /DNDEBUG /DUNICODE /DNOMINMAX /I../include /I../src
 src
-cl /utf-8 /W4 /wd4996 /c /O2 /GS- /GR- /Gv /FAcs /DNDEBUG /DUNICODE /DNOMINMAX /I../scintilla/include
-cl /utf-8 /W4 /wd4996 /c /EHsc /std:c++20 /O2 /GS- /GR- /Gv /FAcs /DNDEBUG /DUNICODE /DNOMINMAX /I../scintilla/include
+cl /utf-8 /W4 /wd4996 /c /O2 /GS- /GR- /Gv /FAcs /DNDEBUG /DUNICODE /DNOMINMAX /DSTRICT_TYPED_ITEMIDS /I../scintilla/include
+cl /utf-8 /W4 /wd4996 /c /EHsc /std:c++20 /O2 /GS- /GR- /Gv /FAcs /DNDEBUG /DUNICODE /DNOMINMAX /DSTRICT_TYPED_ITEMIDS /I../scintilla/include
 
 https://clang.llvm.org/docs/AddressSanitizer.html
 https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html

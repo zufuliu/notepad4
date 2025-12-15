@@ -30,6 +30,8 @@ yield
 match match
 case case
 type type
+lazy import
+lazy from import
 # https://docs.python.org/2.7/reference/lexical_analysis.html#identifiers
 exec print
 

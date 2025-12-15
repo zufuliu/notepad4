@@ -315,6 +315,7 @@ BEGIN
 				MENUITEM "LS\t줄 구분 기호(&I)",							IDM_INSERT_UNICODE_LS
 				MENUITEM "PS\t단락 구분 기호(&G)",						IDM_INSERT_UNICODE_PS
 				MENUITEM "ZWSP\t0 너비 공간(&Z)",						IDM_INSERT_UNICODE_ZWSP
+				MENUITEM "SHY\tSoft &hyphen",						IDM_INSERT_UNICODE_SHY
 			END
 			MENUITEM SEPARATOR
 			MENUITEM "파일 이름(&F)",									CMD_INSERTFILENAME_NOEXT
@@ -447,7 +448,7 @@ BEGIN
 			MENUITEM "전체 단어만 일치(&W)",								IDM_VIEW_MARKOCCURRENCES_WORD
 			MENUITEM "일치하는 줄 책갈피(&M)",							IDM_VIEW_MARKOCCURRENCES_BOOKMARK
 		END
-		POPUP "CallTip 표시(&P)"
+		POPUP "호출 팁 표시(&P)"
 		BEGIN
 			MENUITEM "끄기(&O)",										IDM_VIEW_SHOWCALLTIP_OFF
 			MENUITEM "RGBA 색상(&R)",									IDM_VIEW_SHOWCALLTIP_RGBA
@@ -458,7 +459,7 @@ BEGIN
 		MENUITEM SEPARATOR
 		MENUITEM "줄 번호(&N)\tCtrl+Shift+N",							IDM_VIEW_LINENUMBERS
 		MENUITEM "책갈피 여백(&M)\tCtrl+Shift+M",						IDM_VIEW_MARGIN
-		MENUITEM "Change &History Marker",								IDM_VIEW_CHANGE_HISTORY_MARKER
+		MENUITEM "기록 마커 변경(&H)",									IDM_VIEW_CHANGE_HISTORY_MARKER
 		MENUITEM SEPARATOR
 		MENUITEM "코드 접기 표시(&F)\tCtrl+Shift+Alt+F",					IDM_VIEW_SHOW_FOLDING
 		POPUP "접기 전환(&T)"
@@ -605,6 +606,7 @@ BEGIN
 			MENUITEM "상태 표시줄 표시(&U)\tShift+F11",					IDM_VIEW_STATUSBAR
 			MENUITEM SEPARATOR
 			MENUITEM "투명 모드(&T)\tCtrl+0",							IDM_VIEW_TRANSPARENT
+			MENUITEM "집중을 잃었을 때 투명성(&I)",						IDM_VIEW_TRANSPARENT_INACTIVE
 			POPUP "전체 화면 모드(&N)"
 			BEGIN
 				MENUITEM "시작 시(&S)",									IDM_VIEW_FULLSCREEN_ON_START
@@ -1794,7 +1796,7 @@ $\t줄의 끝\n\
 *? or +?\t""?"" 및 ""+""의 게으른 수량자\n\
 (\t그룹의 시작\n\
 )\t그룹의 끝\n\
-\\n\t교체 시 영역을 나타냄 (n은 1-9)\n\n\
+\\n or $n\t교체 시 영역을 나타냄 (n은 1-9)\n\n\
 Boost Perl Regex Syntax:\n\
 a|b\tMatches either a or b\n\
 {n}\tMatches preceding exactly n times\n\
@@ -2160,5 +2162,7 @@ END
 #include "../../src/Notepad4.ver"
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
+
+
 
 

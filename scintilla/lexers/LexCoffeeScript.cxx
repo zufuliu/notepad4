@@ -20,7 +20,6 @@
 #include "CharacterSet.h"
 #include "StringUtils.h"
 #include "LexerModule.h"
-#include "LexerUtils.h"
 
 using namespace Lexilla;
 
@@ -46,6 +45,12 @@ struct EscapeSequence {
 		--digitsLeft;
 		return digitsLeft <= 0 || !IsHexDigit(ch);
 	}
+};
+
+struct InterpolatedStringState {
+	int state;
+	int braceCount;
+	int jsxTagLevel; // nested JSX tag in expression
 };
 
 constexpr bool IsJsIdentifierStart(int ch) noexcept {
@@ -88,7 +93,7 @@ inline bool IsRegexStart(const StyleContext &sc, int chPrevNonWhite, int stylePr
 	if (FollowExpression(chPrevNonWhite, stylePrevNonWhite)) {
 		// TODO: improve regex detection
 		const int chNext = sc.GetLineNextChar(true);
-		return !(chNext == '(' || chNext == '-' || chNext == '+' || chNext == '=' || IsJsIdentifierChar(chNext));
+		return !AnyOf(chNext, '(', '-', '+', '=') && !IsJsIdentifierChar(chNext);
 	}
 	return true;
 }
@@ -123,11 +128,10 @@ void ColouriseCoffeeScriptDoc(Sci_PositionU startPos, Sci_Position lengthDoc, in
 
 	int chPrevNonWhite = 0;
 	int stylePrevNonWhite = SCE_COFFEESCRIPT_DEFAULT;
+	int jsxTagLevel = 0;
 
 	EscapeSequence escSeq;
-	std::vector<int> nestedState;
-	int jsxTagLevel = 0;
-	std::vector<int> jsxTagLevels;// nested JSX tag in expression
+	std::vector<InterpolatedStringState> nestedState;
 
 	if (startPos != 0) {
 		// backtrack to the line starts JSX or interpolation for better coloring on typing.
@@ -225,7 +229,7 @@ void ColouriseCoffeeScriptDoc(Sci_PositionU startPos, Sci_Position lengthDoc, in
 				sc.ForwardSetState((sc.state == SCE_COFFEESCRIPT_XML_STRING_SQ || sc.state == SCE_COFFEESCRIPT_XML_STRING_DQ) ? SCE_COFFEESCRIPT_XML_OTHER : SCE_COFFEESCRIPT_DEFAULT);
 				continue;
 			} else if (sc.Match('#', '{') && IsInterpolatedString(sc.state)) {
-				nestedState.push_back(sc.state);
+				nestedState.push_back({sc.state, 1, jsxTagLevel});
 				sc.ForwardSetState(SCE_COFFEESCRIPT_OPERATOR2);
 			}
 			break;
@@ -251,7 +255,7 @@ void ColouriseCoffeeScriptDoc(Sci_PositionU startPos, Sci_Position lengthDoc, in
 			} else if (sc.ch == '#') {
 				if (!insideRegexRange && sc.state == SCE_COFFEESCRIPT_TRIPLE_REGEX) {
 					if (sc.chNext == '{') {
-						nestedState.push_back(sc.state);
+						nestedState.push_back({sc.state, 1, jsxTagLevel});
 						sc.ForwardSetState(SCE_COFFEESCRIPT_OPERATOR2);
 					} else {
 						sc.SetState(SCE_COFFEESCRIPT_REGEX_COMMENT);
@@ -318,10 +322,9 @@ void ColouriseCoffeeScriptDoc(Sci_PositionU startPos, Sci_Position lengthDoc, in
 			} else if ((sc.state == SCE_COFFEESCRIPT_XML_OTHER) && IsJsIdentifierStart(sc.ch)) {
 				sc.SetState(SCE_COFFEESCRIPT_XML_ATTRIBUTE);
 			} else if (sc.ch == '{') {
-				jsxTagLevels.push_back(jsxTagLevel);
-				nestedState.push_back(sc.state);
-				sc.SetState(SCE_COFFEESCRIPT_OPERATOR2);
+				nestedState.push_back({sc.state, 1, jsxTagLevel});
 				jsxTagLevel = 0;
+				sc.SetState(SCE_COFFEESCRIPT_OPERATOR2);
 			} else if (sc.Match('<', '/')) {
 				--jsxTagLevel;
 				sc.SetState(SCE_COFFEESCRIPT_XML_TAG);
@@ -390,17 +393,16 @@ void ColouriseCoffeeScriptDoc(Sci_PositionU startPos, Sci_Position lengthDoc, in
 					sc.SetState(SCE_COFFEESCRIPT_OPERATOR);
 				}
 			} else if (IsAGraphic(sc.ch)) {
-				sc.SetState(SCE_COFFEESCRIPT_OPERATOR);
-				if (!nestedState.empty()) {
-					sc.ChangeState(SCE_COFFEESCRIPT_OPERATOR2);
-					if (sc.ch == '{') {
-						nestedState.push_back(SCE_COFFEESCRIPT_DEFAULT);
-						jsxTagLevels.push_back(jsxTagLevel);
-						jsxTagLevel = 0;
-					} else if (sc.ch == '}') {
-						jsxTagLevel = TryTakeAndPop(jsxTagLevels);
-						const int outerState = TakeAndPop(nestedState);
-						sc.ForwardSetState(outerState);
+				const bool interpolating = !nestedState.empty();
+				sc.SetState(interpolating ? SCE_COFFEESCRIPT_OPERATOR2 : SCE_COFFEESCRIPT_OPERATOR);
+				if (interpolating && AnyOf<'{', '}'>(sc.ch)) {
+					InterpolatedStringState &state = nestedState.back();
+					state.braceCount += ('{' + '}')/2 - sc.ch;
+					if (state.braceCount <= 0) {
+						escSeq.outerState = state.state;
+						jsxTagLevel = state.jsxTagLevel;
+						nestedState.pop_back();
+						sc.ForwardSetState(escSeq.outerState);
 						continue;
 					}
 				} else if (visibleChars == 0 && (sc.ch == '}' || sc.ch == ']' || sc.ch == ')')) {
@@ -435,7 +437,7 @@ void ColouriseCoffeeScriptDoc(Sci_PositionU startPos, Sci_Position lengthDoc, in
 			} else {
 				lineContinuation = false;
 			}
-			if (!nestedState.empty() || !(jsxTagLevel == 0 && jsxTagLevels.empty())) {
+			if (!nestedState.empty() || jsxTagLevel != 0) {
 				lineState |= PyLineStateStringInterpolation | PyLineStateMaskTripleQuote;
 			} else if (IsMultilineStyle(sc.state)) {
 				lineState |= PyLineStateMaskTripleQuote;

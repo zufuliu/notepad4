@@ -1,7 +1,7 @@
 // https://www.rust-lang.org/
 // https://doc.rust-lang.org/book/
 // https://doc.rust-lang.org/reference/index.html
-// Rust 1.90 https://doc.rust-lang.org/std/index.html
+// Rust 1.91 https://doc.rust-lang.org/std/index.html
 
 //! Keywords		===========================================================
 // https://doc.rust-lang.org/std/index.html#keywords
@@ -12,7 +12,7 @@ const continue crate
 dyn
 else enum extern
 fn for
-gen
+gen // 2024
 if impl in
 let loop
 match mod move mut

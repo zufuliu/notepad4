@@ -505,7 +505,7 @@ void ColouriseDDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 
 		case SCE_D_DELIMITED_ID:
 			if (!IsIdentifierCharEx(sc.ch)) {
-				delimiterID = styler.GetRange(styler.GetStartSegment(), sc.currentPos);
+				styler.GetRange(styler.GetStartSegment(), sc.currentPos, delimiterID);
 				sc.ChangeState(SCE_D_DELIMITED_STRING);
 			}
 			break;

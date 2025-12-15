@@ -315,6 +315,7 @@ BEGIN
 				MENUITEM "LS\tL&ine Separator",						IDM_INSERT_UNICODE_LS
 				MENUITEM "PS\tPara&graph Separator",				IDM_INSERT_UNICODE_PS
 				MENUITEM "ZWSP\t&Zero width space",					IDM_INSERT_UNICODE_ZWSP
+				MENUITEM "SHY\tSoft &hyphen",						IDM_INSERT_UNICODE_SHY
 			END
 			MENUITEM SEPARATOR
 			MENUITEM "文件名(&F)",					CMD_INSERTFILENAME_NOEXT
@@ -605,6 +606,7 @@ BEGIN
 			MENUITEM "显示状态栏(&U)\tShift+F11",	IDM_VIEW_STATUSBAR
 			MENUITEM SEPARATOR
 			MENUITEM "透明模式(&T)\tCtrl+0",		IDM_VIEW_TRANSPARENT
+			MENUITEM "离开后透明(&I)",			IDM_VIEW_TRANSPARENT_INACTIVE
 			POPUP "全屏模式(&N)"
 			BEGIN
 				MENUITEM "启动时全屏(&S)",				IDM_VIEW_FULLSCREEN_ON_START
@@ -1794,7 +1796,7 @@ $\t行结束\n\
 *? 或 +?\t对限量词 ""?"" 和 ""+"" 做非贪婪匹配\n\
 (\t区域开始\n\
 )\t区域结束\n\
-\\n\t替换时引用的区域(n 为 1-9)\n\n\
+\\n 或 $n\t替换时引用的区域(n 为 1-9)\n\n\
 Boost Perl 正则表达式语法:\n\
 a|b\t匹配 a 或 b。\n\
 {n}\t精确匹配 n 次。\n\
