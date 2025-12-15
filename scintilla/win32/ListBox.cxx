@@ -178,7 +178,7 @@ class ListBoxX final : public ListBox {
 	LRESULT NcHitTest(WPARAM, LPARAM) const noexcept;
 	void CentreItem(int n) noexcept;
 	void AllocateBitMap();
-	static LRESULT CALLBACK ControlWndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
+	static LRESULT CALLBACK ListProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 
 	static constexpr POINT ItemInset {0, 0};	// Padding around whole item
 	static constexpr POINT TextInset {2, 0};	// Padding around text
@@ -821,9 +821,9 @@ void ListBoxX::AllocateBitMap() {
 	graphics.pixmapLine->Init(graphics.bm.DC(), GetID());
 }
 
-LRESULT CALLBACK ListBoxX::ControlWndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR /*dwRefData*/) {
+LRESULT CALLBACK ListBoxX::ListProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData) {
 	try {
-		ListBoxX * const lbx = PointerFromWindow<ListBoxX *>(::GetParent(hWnd));
+		ListBoxX * const lbx = AsPointer<ListBoxX *>(dwRefData);
 		switch (iMessage) {
 		case WM_ERASEBKGND:
 			return TRUE;
@@ -838,9 +838,7 @@ LRESULT CALLBACK ListBoxX::ControlWndProc(HWND hWnd, UINT iMessage, WPARAM wPara
 			const LRESULT lResult = ::SendMessage(hWnd, LB_ITEMFROMPOINT, 0, lParam);
 			if (HIWORD(lResult) == 0) {
 				ListBox_SetCurSel(hWnd, LOWORD(lResult));
-				if (lbx) {
-					lbx->OnSelChange();
-				}
+				lbx->OnSelChange();
 			}
 		}
 		return 0;
@@ -848,19 +846,16 @@ LRESULT CALLBACK ListBoxX::ControlWndProc(HWND hWnd, UINT iMessage, WPARAM wPara
 		case WM_LBUTTONUP:
 			return 0;
 
-		case WM_LBUTTONDBLCLK: {
-			if (lbx) {
-				lbx->OnDoubleClick();
-			}
-		}
-		return 0;
+		case WM_LBUTTONDBLCLK:
+			lbx->OnDoubleClick();
+			return 0;
 
 		case WM_MBUTTONDOWN:
 			// disable the scroll wheel button click action
 			return 0;
 
 		case WM_NCDESTROY:
-			RemoveWindowSubclass(hWnd, ControlWndProc, uIdSubclass);
+			RemoveWindowSubclass(hWnd, ListProc, uIdSubclass);
 			break;
 		}
 	} catch (...) {
@@ -882,7 +877,7 @@ LRESULT ListBoxX::WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam
 			AsPointer<HMENU>(static_cast<ptrdiff_t>(ctrlID)),
 			hinstanceParent,
 			nullptr);
-		::SetWindowSubclass(lb, ControlWndProc, 0, 0);
+		::SetWindowSubclass(lb, ListProc, 0, AsInteger<DWORD_PTR>(this));
 	}
 	break;
 
