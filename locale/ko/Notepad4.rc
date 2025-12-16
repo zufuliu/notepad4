@@ -315,7 +315,7 @@ BEGIN
 				MENUITEM "LS\t줄 구분 기호(&I)",							IDM_INSERT_UNICODE_LS
 				MENUITEM "PS\t단락 구분 기호(&G)",						IDM_INSERT_UNICODE_PS
 				MENUITEM "ZWSP\t0 너비 공간(&Z)",						IDM_INSERT_UNICODE_ZWSP
-				MENUITEM "SHY\tSoft &hyphen",						IDM_INSERT_UNICODE_SHY
+				MENUITEM "SHY\t소프트 하이픈(&H)",						IDM_INSERT_UNICODE_SHY
 			END
 			MENUITEM SEPARATOR
 			MENUITEM "파일 이름(&F)",									CMD_INSERTFILENAME_NOEXT
@@ -1851,7 +1851,7 @@ BEGIN
     IDS_ERR_SAVEFILE        """%s"" 파일을 저장하는 도중 오류가 발생했습니다."
     IDS_ERR_BROWSE          "파일 탐색 플러그인이 없습니다.\nmatepath 파일 탐색 플러그인은\nttps://github.com/zufuliu/notepad4/releases에서 다운로드할 수 있습니다.\n다운로드 페이지를 여시겠습니까?"
     IDS_ERR_MRUDLG          "선택한 파일에 액세스할 수 없습니다!\n목록에서 제거하시겠습니까?"
-    IDS_ERR_CREATELINK      "바탕화면 링크를 만드는 동안 오류가 발생했습니다."
+    IDS_ERR_CREATELINK      "바탕 화면 링크를 만드는 동안 오류가 발생했습니다."
     IDS_ERR_PREVWINDISABLED "기존 Notepad4 창이 사용 중이거나 활성 대화 상자가 있습니다.\n다른 Notepad4 창을 여시겠습니까?"
     IDS_SELRECT             "이 작업은 직사각형 선택 내에서 수행할 수 없습니다."
     IDS_BUFFERTOOSMALL      "이 작업을 수행할 수 없습니다 (줄이 너무 깁니다)"
@@ -2162,6 +2162,7 @@ END
 #include "../../src/Notepad4.ver"
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
+
 
 
 
