@@ -1381,6 +1381,15 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		MsgInitMenu(hwnd, wParam, lParam);
 		break;
 
+	case WM_ENTERMENULOOP:
+	case WM_EXITMENULOOP:
+		if (wParam == FALSE && !bShowMenu) { // main menu
+			const bool enter = umsg == WM_ENTERMENULOOP;
+			// printf("enter %d: menu: %p\n", enter, GetMenu(hwnd));
+			SetMenu(hwnd, enter ? hmenuMain : nullptr);
+		}
+		return wParam;
+
 	case WM_NOTIFY:
 		return MsgNotify(hwnd, wParam, lParam);
 
