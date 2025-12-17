@@ -2,7 +2,7 @@
 
 import platform
 import unicodedata
-from enum import IntFlag
+from enum import IntEnum
 
 from FileGenerator import Regenerate
 from GenerateCharacterCategory import CharacterClass, CategoryClassifyMap
@@ -12,7 +12,7 @@ from UnicodeData import *
 # Unicode Line Breaking Algorithm
 # https://www.unicode.org/reports/tr14/
 # https://www.unicode.org/Public/UCD/latest/ucd/auxiliary/LineBreakTest.html
-class LineBreak(IntFlag):
+class LineBreak(IntEnum):
 	NonBreak = 0
 	BreakBefore = 1	# B
 	BreakAfter = 2	# A
@@ -159,27 +159,32 @@ def buildLineBreakOpportunity():
 					print('same row and column:', prev, current)
 
 def buildWrapBreakMask(filename, prevIndex=False):
-	wbMax = max(LineBreak.__members__.values())
-	ccMax = max(CharacterClass.__members__.values())
-	maxValue = 8
-	table = [0]*8
+	maxValue = LineBreak.BreakAny + 1
+	table = [0]*maxValue
 	assert LineBreak.BreakAny == LineBreak.Undefined + CharacterClass.CJKWord
+	def get_name(cc):
+		return '<None>' if cc is None else cc.name
+	def unpack_break_class(value):
+		if value < LineBreak.Undefined:
+			return LineBreak(value), None
+		cc = CharacterClass(value - LineBreak.Undefined)
+		if cc in (CharacterClass.Space, CharacterClass.NewLine):
+			return LineBreak.BreakAfter, cc
+		if cc == CharacterClass.Word:
+			return LineBreak.NonBreak, cc
+		if cc == CharacterClass.CJKWord:
+			return LineBreak.BreakAny, cc
+		return LineBreak.Undefined, cc
+
 	for prev in range(maxValue):
-		wbPrev = LineBreak(min(prev, LineBreak.Undefined))
-		ccPrev = CharacterClass(max(prev - LineBreak.Undefined, 0))
-		if ccPrev == CharacterClass.CJKWord:
-			wbPrev = LineBreak.BreakAny
+		wbPrev, ccPrev = unpack_break_class(prev)
 		for pos in range(maxValue):
-			wbPos = LineBreak(min(pos, LineBreak.Undefined))
-			ccPos = CharacterClass(max(pos - LineBreak.Undefined, 0))
-			if ccPos == CharacterClass.CJKWord:
-				wbPos = LineBreak.BreakAny
+			wbPos, ccPos = unpack_break_class(pos)
 			if wbPrev != LineBreak.BreakBefore and wbPos != LineBreak.BreakAfter:
 				if wbPrev == LineBreak.BreakAny or wbPos == LineBreak.BreakAny \
-				or ccPrev == CharacterClass.CJKWord or ccPos == CharacterClass.CJKWord \
 				or (wbPrev != wbPos and (wbPrev == LineBreak.BreakAfter or wbPos == LineBreak.BreakBefore)) \
 				or (ccPrev != ccPos and (wbPrev == LineBreak.Undefined or wbPos == LineBreak.Undefined)):
-					#print(f'({wbPrev.name}, {ccPrev.name}), ({wbPos.name}, {ccPos.name})')
+					print(f'({wbPrev.name}, {get_name(ccPrev)}), ({wbPos.name}, {get_name(ccPos)})')
 					if prevIndex:
 						table[prev] |= (1 << pos)
 					else:

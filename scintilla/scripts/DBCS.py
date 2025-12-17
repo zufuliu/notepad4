@@ -77,8 +77,8 @@ class DBCSTrailKind(IntFlag):
 	Punctuation = 2
 	Word = 4
 	Control = 8
-	All = 15
-	NonWord = 3
+	NonWord = Digit | Punctuation
+	All = NonWord | Word | Control
 
 	@staticmethod
 	def get_kind(flags, ch_trail):
