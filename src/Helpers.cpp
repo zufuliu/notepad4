@@ -991,9 +991,6 @@ void SetDlgPos(HWND hDlg, int xDlg, int yDlg) noexcept {
 //
 #define RESIZEDLG_PROP_KEY	L"ResizeDlg"
 #define MAX_RESIZEDLG_ATTR_COUNT	2
-// temporary fix for moving dialog to monitor with different DPI
-// TODO: all dimensions no longer valid after window DPI changed.
-#define NP2_ENABLE_RESIZEDLG_TEMP_FIX	0
 
 struct RESIZEDLG {
 	int direction;
@@ -1074,19 +1071,6 @@ void ResizeDlg_Size(HWND hwnd, LPARAM lParam, int *cx, int *cy) noexcept {
 	RESIZEDLG * const pm = static_cast<RESIZEDLG *>(GetProp(hwnd, RESIZEDLG_PROP_KEY));
 	const int cxClient = LOWORD(lParam);
 	const int cyClient = HIWORD(lParam);
-#if NP2_ENABLE_RESIZEDLG_TEMP_FIX
-	const UINT dpi = GetWindowDPI(hwnd);
-	const UINT old = pm->dpi;
-	if (cx) {
-		*cx = cxClient - MulDiv(pm->cxClient, dpi, old);
-	}
-	if (cy) {
-		*cy = cyClient - MulDiv(pm->cyClient, dpi, old);
-	}
-	// store in original DPI.
-	pm->cxClient = MulDiv(cxClient, old, dpi);
-	pm->cyClient = MulDiv(cyClient, old, dpi);
-#else
 	if (cx) {
 		*cx = cxClient - pm->cxClient;
 	}
@@ -1095,30 +1079,11 @@ void ResizeDlg_Size(HWND hwnd, LPARAM lParam, int *cx, int *cy) noexcept {
 	}
 	pm->cxClient = cxClient;
 	pm->cyClient = cyClient;
-#endif
 }
 
 void ResizeDlg_GetMinMaxInfo(HWND hwnd, LPARAM lParam) noexcept {
 	const RESIZEDLG * const pm = static_cast<RESIZEDLG *>(GetProp(hwnd, RESIZEDLG_PROP_KEY));
 	LPMINMAXINFO lpmmi = AsPointer<LPMINMAXINFO>(lParam);
-#if NP2_ENABLE_RESIZEDLG_TEMP_FIX
-	const UINT dpi = GetWindowDPI(hwnd);
-	const UINT old = pm->dpi;
-
-	lpmmi->ptMinTrackSize.x = MulDiv(pm->mmiPtMinX, dpi, old);
-	lpmmi->ptMinTrackSize.y = MulDiv(pm->mmiPtMinY, dpi, old);
-
-	// only one direction
-	switch (pm->direction) {
-	case ResizeDlgDirection_OnlyX:
-		lpmmi->ptMaxTrackSize.y = MulDiv(pm->mmiPtMaxY, dpi, old);
-		break;
-
-	case ResizeDlgDirection_OnlyY:
-		lpmmi->ptMaxTrackSize.x = MulDiv(pm->mmiPtMaxX, dpi, old);
-		break;
-	}
-#else
 	lpmmi->ptMinTrackSize.x = pm->mmiPtMinX;
 	lpmmi->ptMinTrackSize.y = pm->mmiPtMinY;
 
@@ -1132,7 +1097,6 @@ void ResizeDlg_GetMinMaxInfo(HWND hwnd, LPARAM lParam) noexcept {
 		lpmmi->ptMaxTrackSize.x = pm->mmiPtMaxX;
 		break;
 	}
-#endif
 }
 
 static inline int GetDlgCtlHeight(HWND hwndDlg, int nCtlId) noexcept {
@@ -1160,14 +1124,8 @@ int ResizeDlg_CalcDeltaY2(HWND hwnd, int dy, int cy, int nCtlId1, int nCtlId2) n
 	}
 
 	const RESIZEDLG * const pm = static_cast<RESIZEDLG *>(GetProp(hwnd, RESIZEDLG_PROP_KEY));
-#if NP2_ENABLE_RESIZEDLG_TEMP_FIX
-	const UINT dpi = GetWindowDPI(hwnd);
-	const int hMin1 = MulDiv(pm->attrs[0], dpi, pm->dpi);
-	const int hMin2 = MulDiv(pm->attrs[1], dpi, pm->dpi);
-#else
 	const int hMin1 = pm->attrs[0];
 	const int hMin2 = pm->attrs[1];
-#endif
 	const int h1 = GetDlgCtlHeight(hwnd, nCtlId1);
 	const int h2 = GetDlgCtlHeight(hwnd, nCtlId2);
 	// cy + h1 >= hMin1			cy >= hMin1 - h1
