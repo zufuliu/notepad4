@@ -227,10 +227,6 @@ INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) 
 	}
 	return TRUE;
 
-	case WM_GETMINMAXINFO:
-		ResizeDlg_GetMinMaxInfo(hwnd, lParam);
-		return TRUE;
-
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDC_SEARCHEXE: {
@@ -402,10 +398,6 @@ INT_PTR CALLBACK GotoDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		InvalidateRect(GetDlgItem(hwnd, IDC_GOTODESC), nullptr, TRUE);
 	}
 	return TRUE;
-
-	case WM_GETMINMAXINFO:
-		ResizeDlg_GetMinMaxInfo(hwnd, lParam);
-		return TRUE;
 
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
@@ -1407,10 +1399,6 @@ INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 	}
 	return TRUE;
 
-	case WM_GETMINMAXINFO:
-		ResizeDlg_GetMinMaxInfo(hwnd, lParam);
-		return TRUE;
-
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDC_BROWSEFILTER: {
@@ -1578,10 +1566,6 @@ INT_PTR CALLBACK RenameFileDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 	}
 	return TRUE;
 
-	case WM_GETMINMAXINFO:
-		ResizeDlg_GetMinMaxInfo(hwnd, lParam);
-		return TRUE;
-
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDC_NEWNAME:
@@ -1724,10 +1708,6 @@ INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 		EndDeferWindowPos(hdwp);
 	}
 	return TRUE;
-
-	case WM_GETMINMAXINFO:
-		ResizeDlg_GetMinMaxInfo(hwnd, lParam);
-		return TRUE;
 
 	case WM_NOTIFY: {
 		LPNMHDR pnmhdr = AsPointer<LPNMHDR>(lParam);
@@ -1923,10 +1903,6 @@ INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 	}
 	return TRUE;
 
-	case WM_GETMINMAXINFO:
-		ResizeDlg_GetMinMaxInfo(hwnd, lParam);
-		return TRUE;
-
 	case WM_NOTIFY: {
 		LPNMHDR pnmh = AsPointer<LPNMHDR>(lParam);
 		if (pnmh->idFrom == IDC_OPENWITHDIR) {
@@ -2092,10 +2068,6 @@ INT_PTR CALLBACK NewDirDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPara
 	}
 	return TRUE;
 
-	case WM_GETMINMAXINFO:
-		ResizeDlg_GetMinMaxInfo(hwnd, lParam);
-		return TRUE;
-
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDC_NEWDIR:
@@ -2175,10 +2147,6 @@ static INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 		InvalidateRect(GetDlgItem(hwnd, IDC_FINDWINDESC), nullptr, TRUE);
 	}
 	return TRUE;
-
-	case WM_GETMINMAXINFO:
-		ResizeDlg_GetMinMaxInfo(hwnd, lParam);
-		return TRUE;
 
 	case WM_CANCELMODE:
 		ReleaseCapture();
@@ -2408,10 +2376,6 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 		EndDeferWindowPos(hdwp);
 	}
 	return TRUE;
-
-	case WM_GETMINMAXINFO:
-		ResizeDlg_GetMinMaxInfo(hwnd, lParam);
-		return TRUE;
 
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {

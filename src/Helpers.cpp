@@ -989,20 +989,48 @@ void SetDlgPos(HWND hDlg, int xDlg, int yDlg) noexcept {
 //
 // Resize Dialog Helpers()
 //
+namespace {
+
 #define RESIZEDLG_PROP_KEY	L"ResizeDlg"
 #define MAX_RESIZEDLG_ATTR_COUNT	2
 
 struct RESIZEDLG {
 	int direction;
 	UINT dpi;
-	int cxClient;
-	int cyClient;
-	int mmiPtMinX;
-	int mmiPtMinY;
-	int mmiPtMaxX;	// only Y direction
-	int mmiPtMaxY;	// only X direction
+	SIZE client;
+	POINT minTrackSize;
 	int attrs[MAX_RESIZEDLG_ATTR_COUNT];
 };
+
+}
+
+static LRESULT CALLBACK ResizeDlg_Proc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData) noexcept {
+	RESIZEDLG * const pm = AsPointer<RESIZEDLG *>(dwRefData);
+
+	switch (umsg) {
+	case WM_GETMINMAXINFO: {
+		LPMINMAXINFO pmmi = AsPointer<LPMINMAXINFO>(lParam);
+		pmmi->ptMinTrackSize = pm->minTrackSize;
+		// only one direction
+		switch (pm->direction) {
+		case ResizeDlgDirection_OnlyX:
+			pmmi->ptMaxTrackSize.y = pm->minTrackSize.y;
+			break;
+
+		case ResizeDlgDirection_OnlyY:
+			pmmi->ptMaxTrackSize.x = pm->minTrackSize.x;
+			break;
+		}
+	}
+	return 0;
+
+	case WM_NCDESTROY:
+		RemoveWindowSubclass(hwnd, ResizeDlg_Proc, uIdSubclass);
+		break;
+	}
+
+	return DefSubclassProc(hwnd, umsg, wParam, lParam);
+}
 
 void ResizeDlg_InitEx(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDirection) noexcept {
 	const UINT dpi = GetWindowDPI(hwnd);
@@ -1012,28 +1040,23 @@ void ResizeDlg_InitEx(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDir
 
 	RECT rc;
 	GetClientRect(hwnd, &rc);
-	pm->cxClient = rc.right - rc.left;
-	pm->cyClient = rc.bottom - rc.top;
+	int cx = rc.right - rc.left;
+	int cy = rc.bottom - rc.top;
+	pm->client.cx = cx;
+	pm->client.cy = cy;
 
 	const DWORD style = GetWindowStyle(hwnd) | WS_THICKFRAME;
 	AdjustWindowRectForDpi(&rc, style, 0, dpi);
-	pm->mmiPtMinX = rc.right - rc.left;
-	pm->mmiPtMinY = rc.bottom - rc.top;
-	// only one direction
-	switch (iDirection) {
-	case ResizeDlgDirection_OnlyX:
-		pm->mmiPtMaxY = pm->mmiPtMinY;
-		break;
+	cx = rc.right - rc.left;
+	cy = rc.bottom - rc.top;
+	pm->minTrackSize.x = cx;
+	pm->minTrackSize.y = cy;
 
-	case ResizeDlgDirection_OnlyY:
-		pm->mmiPtMaxX = pm->mmiPtMinX;
-		break;
-	}
-
-	cxFrame = max(cxFrame, pm->mmiPtMinX);
-	cyFrame = max(cyFrame, pm->mmiPtMinY);
+	cxFrame = max(cxFrame, cx);
+	cyFrame = max(cyFrame, cy);
 
 	SetProp(hwnd, RESIZEDLG_PROP_KEY, pm);
+	SetWindowSubclass(hwnd, ResizeDlg_Proc, 0, AsInteger<DWORD_PTR>(pm));
 
 	SetWindowPos(hwnd, nullptr, rc.left, rc.top, cxFrame, cyFrame, SWP_NOZORDER);
 
@@ -1048,7 +1071,7 @@ void ResizeDlg_InitEx(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDir
 	HWND hwndCtl = GetDlgItem(hwnd, nIdGrip);
 	SetWindowStyle(hwndCtl, GetWindowStyle(hwndCtl) | SBS_SIZEGRIP | WS_CLIPSIBLINGS);
 	const int cGrip = SystemMetricsForDpi(SM_CXHTHUMB, dpi);
-	SetWindowPos(hwndCtl, nullptr, pm->cxClient - cGrip, pm->cyClient - cGrip, cGrip, cGrip, SWP_NOZORDER);
+	SetWindowPos(hwndCtl, nullptr, pm->client.cx - cGrip, pm->client.cy - cGrip, cGrip, cGrip, SWP_NOZORDER);
 }
 
 void ResizeDlg_Destroy(HWND hwnd, int *cxFrame, int *cyFrame) noexcept {
@@ -1067,36 +1090,18 @@ void ResizeDlg_Destroy(HWND hwnd, int *cxFrame, int *cyFrame) noexcept {
 	NP2HeapFree(pm);
 }
 
-void ResizeDlg_Size(HWND hwnd, LPARAM lParam, int *cx, int *cy) noexcept {
+void ResizeDlg_Size(HWND hwnd, LPARAM lParam, int *dx, int *dy) noexcept {
 	RESIZEDLG * const pm = static_cast<RESIZEDLG *>(GetProp(hwnd, RESIZEDLG_PROP_KEY));
 	const int cxClient = LOWORD(lParam);
 	const int cyClient = HIWORD(lParam);
-	if (cx) {
-		*cx = cxClient - pm->cxClient;
+	if (dx) {
+		*dx = cxClient - pm->client.cx;
 	}
-	if (cy) {
-		*cy = cyClient - pm->cyClient;
+	if (dy) {
+		*dy = cyClient - pm->client.cy;
 	}
-	pm->cxClient = cxClient;
-	pm->cyClient = cyClient;
-}
-
-void ResizeDlg_GetMinMaxInfo(HWND hwnd, LPARAM lParam) noexcept {
-	const RESIZEDLG * const pm = static_cast<RESIZEDLG *>(GetProp(hwnd, RESIZEDLG_PROP_KEY));
-	LPMINMAXINFO lpmmi = AsPointer<LPMINMAXINFO>(lParam);
-	lpmmi->ptMinTrackSize.x = pm->mmiPtMinX;
-	lpmmi->ptMinTrackSize.y = pm->mmiPtMinY;
-
-	// only one direction
-	switch (pm->direction) {
-	case ResizeDlgDirection_OnlyX:
-		lpmmi->ptMaxTrackSize.y = pm->mmiPtMaxY;
-		break;
-
-	case ResizeDlgDirection_OnlyY:
-		lpmmi->ptMaxTrackSize.x = pm->mmiPtMaxX;
-		break;
-	}
+	pm->client.cx = cxClient;
+	pm->client.cy = cyClient;
 }
 
 static inline int GetDlgCtlHeight(HWND hwndDlg, int nCtlId) noexcept {

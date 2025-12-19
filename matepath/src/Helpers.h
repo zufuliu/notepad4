@@ -412,8 +412,8 @@ inline void ResizeDlg_InitY(HWND hwnd, int cyFrame, int nIdGrip) noexcept {
 	ResizeDlg_InitEx(hwnd, 0, cyFrame, nIdGrip, ResizeDlgDirection_OnlyY);
 }
 void ResizeDlg_Destroy(HWND hwnd, int *cxFrame, int *cyFrame) noexcept;
-void ResizeDlg_Size(HWND hwnd, LPARAM lParam, int *cx, int *cy) noexcept;
-void ResizeDlg_GetMinMaxInfo(HWND hwnd, LPARAM lParam) noexcept;
+void ResizeDlg_Size(HWND hwnd, LPARAM lParam, int *dx, int *dy) noexcept;
+
 HDWP DeferCtlPos(HDWP hdwp, HWND hwndDlg, int nCtlId, int dx, int dy, UINT uFlags) noexcept;
 void ResizeDlgCtl(HWND hwndDlg, int nCtlId, int dx, int dy) noexcept;
 void MakeBitmapButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, int wBmpId) noexcept;

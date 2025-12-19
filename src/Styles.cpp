@@ -4336,10 +4336,6 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 	}
 	return TRUE;
 
-	case WM_GETMINMAXINFO:
-		ResizeDlg_GetMinMaxInfo(hwnd, lParam);
-		return TRUE;
-
 	case WM_NOTIFY:
 		if (AsPointer<LPNMHDR>(lParam)->idFrom == IDC_STYLELIST) {
 			LPNMTREEVIEW lpnmtv = AsPointer<LPNMTREEVIEW>(lParam);
@@ -5130,10 +5126,6 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 		EndDeferWindowPos(hdwp);
 	}
 	return TRUE;
-
-	case WM_GETMINMAXINFO:
-		ResizeDlg_GetMinMaxInfo(hwnd, lParam);
-		return TRUE;
 
 	case WM_NOTIFY:
 		if (AsPointer<LPNMHDR>(lParam)->idFrom == IDC_STYLELIST) {
