@@ -995,6 +995,7 @@ namespace {
 #define MAX_RESIZEDLG_ATTR_COUNT	2
 
 struct RESIZEDLG {
+	BOOL dpiChanged;
 	int direction;
 	UINT dpi;
 	SIZE client;
@@ -1008,6 +1009,14 @@ static LRESULT CALLBACK ResizeDlg_Proc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 	RESIZEDLG * const pm = AsPointer<RESIZEDLG *>(dwRefData);
 
 	switch (umsg) {
+	case WM_SIZE:
+		if (pm->dpiChanged) {
+			// skip first WM_SIZE message after WM_DPICHANGED, dialog control already has correct layout
+			pm->dpiChanged = FALSE;
+			return TRUE;
+		}
+		break;
+
 	case WM_GETMINMAXINFO: {
 		LPMINMAXINFO pmmi = AsPointer<LPMINMAXINFO>(lParam);
 		pmmi->ptMinTrackSize = pm->minTrackSize;
@@ -1023,6 +1032,24 @@ static LRESULT CALLBACK ResizeDlg_Proc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 		}
 	}
 	return 0;
+
+	case WM_DPICHANGED: {
+		const UINT dpi = HIWORD(wParam);
+		const UINT old = pm->dpi;
+		pm->dpiChanged = TRUE;
+		pm->dpi = dpi;
+		// convert all dimension to current dpi
+		int * const ptr = reinterpret_cast<int *>(pm);
+		constexpr unsigned start = offsetof(RESIZEDLG, client)/sizeof(int);
+		for (unsigned i = start; i < sizeof(RESIZEDLG)/sizeof(int); i++) {
+			ptr[i] = MulDiv(ptr[i], dpi, old);
+		}
+
+		const RECT * const rc = AsPointer<RECT *>(lParam);
+		const int cx = rc->right - rc->left;
+		const int cy = rc->bottom - rc->top;
+		SetWindowPos(hwnd, nullptr, rc->left, rc->top, cx, cy, SWP_NOZORDER | SWP_NOACTIVATE);
+	} break;
 
 	case WM_NCDESTROY:
 		RemoveWindowSubclass(hwnd, ResizeDlg_Proc, uIdSubclass);
