@@ -1091,9 +1091,11 @@ void ResizeDlg_InitEx(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDir
 	SetWindowPos(hwnd, nullptr, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
 
 	WCHAR wch[64];
-	GetMenuString(GetSystemMenu(GetParent(hwnd), FALSE), SC_SIZE, wch, COUNTOF(wch), MF_BYCOMMAND);
-	InsertMenu(GetSystemMenu(hwnd, FALSE), SC_CLOSE, MF_BYCOMMAND | MF_STRING | MF_ENABLED, SC_SIZE, wch);
-	InsertMenu(GetSystemMenu(hwnd, FALSE), SC_CLOSE, MF_BYCOMMAND | MF_SEPARATOR, 0, nullptr);
+	HMENU hmenu = GetSystemMenu(GetParent(hwnd), FALSE);
+	GetMenuString(hmenu, SC_SIZE, wch, COUNTOF(wch), MF_BYCOMMAND);
+	hmenu = GetSystemMenu(hwnd, FALSE);
+	InsertMenu(hmenu, SC_CLOSE, MF_BYCOMMAND | MF_STRING | MF_ENABLED, SC_SIZE, wch);
+	InsertMenu(hmenu, SC_CLOSE, MF_BYCOMMAND | MF_SEPARATOR, 0, nullptr);
 
 	HWND hwndCtl = GetDlgItem(hwnd, nIdGrip);
 	const int cGrip = SystemMetricsForDpi(SM_CXHTHUMB, dpi);
