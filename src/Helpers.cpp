@@ -1364,26 +1364,6 @@ BOOL StatusSetTextID(HWND hwnd, UINT nPart, UINT uID) noexcept {
 
 //=============================================================================
 //
-// StatusCalcPaneWidth()
-//
-int StatusCalcPaneWidth(HWND hwnd, LPCWSTR lpsz) noexcept {
-	HDC hdc = GetDC(hwnd);
-	HFONT hfont = GetWindowFont(hwnd);
-	HFONT hfold = SelectFont(hdc, hfont);
-	const int mmode = SetMapMode(hdc, MM_TEXT);
-
-	SIZE size;
-	GetTextExtentPoint32(hdc, lpsz, lstrlen(lpsz), &size);
-
-	SetMapMode(hdc, mmode);
-	SelectObject(hdc, hfold);
-	ReleaseDC(hwnd, hdc);
-
-	return size.cx + 9;
-}
-
-//=============================================================================
-//
 // Toolbar_Get/SetButtons()
 //
 int Toolbar_GetButtons(HWND hwnd, int cmdBase, LPWSTR lpszButtons, int cchButtons) noexcept {

@@ -6215,7 +6215,7 @@ static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			} else {
 				SetTextColor(hdc, RGB(0, 0, 255));
 			}
-			SelectObject(hdc, /*dwId == id_hover?*/hFontHover/*:hFontNormal*/);
+			SelectFont(hdc, /*dwId == id_hover?*/hFontHover/*:hFontNormal*/);
 			return AsInteger<LONG_PTR>(GetSysColorBrush(COLOR_BTNFACE));
 		}
 	}

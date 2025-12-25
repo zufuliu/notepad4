@@ -6836,11 +6836,9 @@ void UpdateStatusbar() noexcept {
 	static int cachedWidth[StatusItem_ItemCount];
 	int aWidth[StatusItem_ItemCount];
 	HWND hwnd = hwndStatus;
-	// inline StatusCalcPaneWidth() function
 	HDC hdc = GetDC(hwnd);
-	HFONT hfont = GetWindowFont(hwnd);
-	HFONT hfold = SelectFont(hdc, hfont);
-	const int mmode = SetMapMode(hdc, MM_TEXT);
+	HFONT font = GetWindowFont(hwnd);
+	HFONT fontOld = SelectFont(hdc, font);
 	int totalWidth = 0;
 	for (int i = 0; i < StatusItem_ItemCount; i++) {
 		int width;
@@ -6849,7 +6847,7 @@ void UpdateStatusbar() noexcept {
 			LPCWSTR lpsz = items[i];
 			//GetTextExtentPoint32(hdc, lpsz, lstrlen(lpsz), &size);
 			GetTextExtentExPoint(hdc, lpsz, lstrlen(lpsz), 0, nullptr, nullptr, &size);
-			width = NP2_align_up(size.cx + 9, 8);
+			width = NP2_align_up(size.cx + size.cy/2U, 8);
 			cachedWidth[i] = width;
 		} else {
 			width = cachedWidth[i];
@@ -6859,8 +6857,7 @@ void UpdateStatusbar() noexcept {
 		totalWidth += width;
 		aWidth[i] = width;
 	}
-	SetMapMode(hdc, mmode);
-	SelectObject(hdc, hfold);
+	SelectFont(hdc, fontOld);
 	ReleaseDC(hwnd, hdc);
 
 	const int thumb = SystemMetricsForDpi(SM_CXHTHUMB, g_uCurrentDPI);
