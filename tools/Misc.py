@@ -1,32 +1,4 @@
-import re
 import unicodedata
-
-def increase_style_resource_id_value(path, delta=100):
-	with open(path, encoding='utf-8', newline='\n') as fd:
-		doc = fd.read()
-	updated = re.sub(r'\d{5}', lambda m: str(int(m.group(0)) + delta), doc)
-	print('update:', path)
-	with open(path, 'w', encoding='utf-8', newline='\n') as fp:
-		fp.write(updated)
-
-def generate_lexer_menu_resource_id(path):
-	dummy = {'id': 40700}
-	def get_value():
-		result = str(dummy['id'])
-		dummy['id'] += 1
-		return result
-
-	with open(path, encoding='utf-8') as fd:
-		doc = fd.read()
-	start = doc.index('#define IDM_LEXER_TEXTFILE')
-	end = doc.index('\n', doc.index('#define IDM_LEXER_LEXER_COUNT'))
-	menu = doc[start:end]
-	updated = re.sub(r'\d{5}', lambda m: get_value(), menu)
-	if updated != menu:
-		print('update:', path)
-		doc = doc[:start] + updated + doc[end:]
-		with open(path, 'w', encoding='utf-8') as fp:
-			fp.write(doc)
 
 def check_encoding_list(path):
 	def is_tag_char(ch):
@@ -132,7 +104,5 @@ def diff_iso_encoding(path):
 				cat2 = unicodedata.category(ch2) if ch2 else ''
 				fd.write(f'\t{code:02X} {ch1}/{cat1}\t\t\t{ch2}/{cat2}\n')
 
-#increase_style_resource_id_value('../src/EditLexers/EditStyle.h')
-#generate_lexer_menu_resource_id('../src/resource.h')
 #check_encoding_list('../src/EditEncoding.cpp')
 #diff_iso_encoding('iso-8859.log')

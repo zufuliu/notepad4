@@ -1072,8 +1072,7 @@ void ResizeDlg_InitEx(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDir
 	pm->client.cx = cx;
 	pm->client.cy = cy;
 
-	const DWORD style = GetWindowStyle(hwnd) | WS_THICKFRAME;
-	AdjustWindowRectForDpi(&rc, style, 0, dpi);
+	GetWindowRect(hwnd, &rc);
 	cx = rc.right - rc.left;
 	cy = rc.bottom - rc.top;
 	pm->minTrackSize.x = cx;
@@ -1085,17 +1084,14 @@ void ResizeDlg_InitEx(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDir
 	SetProp(hwnd, RESIZEDLG_PROP_KEY, pm);
 	SetWindowSubclass(hwnd, ResizeDlg_Proc, 0, AsInteger<DWORD_PTR>(pm));
 
-	SetWindowPos(hwnd, nullptr, rc.left, rc.top, cxFrame, cyFrame, SWP_NOZORDER);
+	SetWindowPos(hwnd, nullptr, 0, 0, cxFrame, cyFrame, SWP_NOZORDER | SWP_NOMOVE);
 
-	SetWindowStyle(hwnd, style);
-	SetWindowPos(hwnd, nullptr, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
-
-	WCHAR wch[64];
-	HMENU hmenu = GetSystemMenu(GetParent(hwnd), FALSE);
-	GetMenuString(hmenu, SC_SIZE, wch, COUNTOF(wch), MF_BYCOMMAND);
-	hmenu = GetSystemMenu(hwnd, FALSE);
-	InsertMenu(hmenu, SC_CLOSE, MF_BYCOMMAND | MF_STRING | MF_ENABLED, SC_SIZE, wch);
-	InsertMenu(hmenu, SC_CLOSE, MF_BYCOMMAND | MF_SEPARATOR, 0, nullptr);
+#if 0
+	HMENU hmenu = GetSystemMenu(hwnd, FALSE);
+	DeleteMenu(hmenu, SC_RESTORE, MF_BYCOMMAND);
+	DeleteMenu(hmenu, SC_MINIMIZE, MF_BYCOMMAND);
+	DeleteMenu(hmenu, SC_MAXIMIZE, MF_BYCOMMAND);
+#endif
 
 	HWND hwndCtl = GetDlgItem(hwnd, nIdGrip);
 	const int cGrip = SystemMetricsForDpi(SM_CXHTHUMB, dpi);
