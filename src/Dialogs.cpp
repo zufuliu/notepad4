@@ -402,7 +402,7 @@ extern int cxRunDlg;
 static INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		ResizeDlg_InitX(hwnd, cxRunDlg, IDC_RESIZEGRIP3);
+		ResizeDlg_InitX(hwnd, &cxRunDlg, IDC_RESIZEGRIP3);
 		MakeBitmapButton(hwnd, IDC_SEARCHEXE, g_exeInstance, IDB_OPEN_FOLDER16);
 
 		HWND hwndCtl = GetDlgItem(hwnd, IDC_COMMANDLINE);
@@ -573,7 +573,7 @@ static INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
-		ResizeDlg_Init(hwnd, cxOpenWithDlg, cyOpenWithDlg, IDC_RESIZEGRIP3);
+		ResizeDlg_Init(hwnd, &cxOpenWithDlg, &cyOpenWithDlg, IDC_RESIZEGRIP3);
 
 		HWND hwndLV = GetDlgItem(hwnd, IDC_OPENWITHDIR);
 		InitWindowCommon(hwndLV);
@@ -746,7 +746,7 @@ static INT_PTR CALLBACK FavoritesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
-		ResizeDlg_Init(hwnd, cxFavoritesDlg, cyFavoritesDlg, IDC_RESIZEGRIP3);
+		ResizeDlg_Init(hwnd, &cxFavoritesDlg, &cyFavoritesDlg, IDC_RESIZEGRIP3);
 
 		HWND hwndLV = GetDlgItem(hwnd, IDC_FAVORITESDIR);
 		InitWindowCommon(hwndLV);
@@ -888,7 +888,7 @@ static INT_PTR CALLBACK AddToFavDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
-		ResizeDlg_InitX(hwnd, cxAddFavoritesDlg, IDC_RESIZEGRIP);
+		ResizeDlg_InitX(hwnd, &cxAddFavoritesDlg, IDC_RESIZEGRIP);
 
 		HWND hwndCtl = GetDlgItem(hwnd, IDC_FAVORITESFILE);
 		Edit_LimitText(hwndCtl, MAX_PATH - 1);
@@ -1056,7 +1056,7 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 		SetProp(hwnd, L"it", worker);
 		worker->Init(hwndLV);
 
-		ResizeDlg_Init(hwnd, cxFileMRUDlg, cyFileMRUDlg, IDC_RESIZEGRIP);
+		ResizeDlg_Init(hwnd, &cxFileMRUDlg, &cyFileMRUDlg, IDC_RESIZEGRIP);
 
 		SHFILEINFO shfi;
 		ListView_SetImageList(hwndLV,
@@ -1817,10 +1817,10 @@ bool TabSettingsDlg(HWND hwnd) noexcept {
 struct ENCODEDLG {
 	bool bRecodeOnly;
 	int  idEncoding;
-	int  cxDlg;
-	int  cyDlg;
 	UINT uidLabel;
 };
+extern int cxEncodingDlg;
+extern int cyEncodingDlg;
 
 static INT_PTR CALLBACK SelectDefEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	switch (umsg) {
@@ -1909,7 +1909,7 @@ static INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
 		const ENCODEDLG * const pdd = AsPointer<const ENCODEDLG*>(lParam);
-		ResizeDlg_Init(hwnd, pdd->cxDlg, pdd->cyDlg, IDC_RESIZEGRIP);
+		ResizeDlg_Init(hwnd, &cxEncodingDlg, &cyEncodingDlg, IDC_RESIZEGRIP);
 
 		WCHAR wch[256];
 		GetString(pdd->uidLabel, wch, COUNTOF(wch));
@@ -1946,8 +1946,7 @@ static INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 	return TRUE;
 
 	case WM_DESTROY: {
-		ENCODEDLG * pdd = AsPointer<ENCODEDLG *>(GetWindowLongPtr(hwnd, DWLP_USER));
-		ResizeDlg_Destroy(hwnd, &pdd->cxDlg, &pdd->cyDlg);
+		ResizeDlg_Destroy(hwnd, &cxEncodingDlg, &cyEncodingDlg);
 		HIMAGELIST himl = TreeView_GetImageList(GetDlgItem(hwnd, IDC_ENCODINGLIST), TVSIL_NORMAL);
 		ImageList_Destroy(himl);
 	}
@@ -2021,22 +2020,14 @@ static INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 //
 // SelectEncodingDlg()
 //
-extern int cxEncodingDlg;
-extern int cyEncodingDlg;
-
 bool SelectEncodingDlg(HWND hwnd, int *pidREncoding, UINT uidLabel) noexcept {
 	ENCODEDLG dd;
 
 	dd.bRecodeOnly = (uidLabel == IDS_SELRECT_RELOAD_ENCODING);
 	dd.idEncoding = *pidREncoding;
-	dd.cxDlg = cxEncodingDlg;
-	dd.cyDlg = cyEncodingDlg;
 	dd.uidLabel = uidLabel;
 
 	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_SELECT_ENCODING), hwnd, SelectEncodingDlgProc, AsInteger<LPARAM>(&dd));
-
-	cxEncodingDlg = dd.cxDlg;
-	cyEncodingDlg = dd.cyDlg;
 
 	if (iResult == IDOK) {
 		*pidREncoding = dd.idEncoding;

@@ -724,8 +724,9 @@ namespace {
 
 struct RESIZEDLG {
 	BOOL dpiChanged;
-	int direction;
 	UINT dpi;
+	int *cxFrame;
+	int *cyFrame;
 	SIZE client;
 	POINT minTrackSize;
 };
@@ -748,14 +749,11 @@ static LRESULT CALLBACK ResizeDlg_Proc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 		LPMINMAXINFO pmmi = AsPointer<LPMINMAXINFO>(lParam);
 		pmmi->ptMinTrackSize = pm->minTrackSize;
 		// only one direction
-		switch (pm->direction) {
-		case ResizeDlgDirection_OnlyX:
+		if (pm->cyFrame == nullptr) {
 			pmmi->ptMaxTrackSize.y = pm->minTrackSize.y;
-			break;
-
-		case ResizeDlgDirection_OnlyY:
+		}
+		if (pm->cxFrame == nullptr) {
 			pmmi->ptMaxTrackSize.x = pm->minTrackSize.x;
-			break;
 		}
 	}
 	return 0;
@@ -786,10 +784,9 @@ static LRESULT CALLBACK ResizeDlg_Proc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 	return DefSubclassProc(hwnd, umsg, wParam, lParam);
 }
 
-void ResizeDlg_InitEx(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDirection) noexcept {
+void ResizeDlg_InitEx(HWND hwnd, int *cxFrame, int *cyFrame, int nIdGrip) noexcept {
 	const UINT dpi = GetWindowDPI(hwnd);
 	RESIZEDLG * const pm = static_cast<RESIZEDLG *>(NP2HeapAlloc(sizeof(RESIZEDLG)));
-	pm->direction = iDirection;
 	pm->dpi = dpi;
 
 	RECT rc;
@@ -805,13 +802,19 @@ void ResizeDlg_InitEx(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDir
 	pm->minTrackSize.x = cx;
 	pm->minTrackSize.y = cy;
 
-	cxFrame = max(cxFrame, cx);
-	cyFrame = max(cyFrame, cy);
+	if (cxFrame != nullptr) {
+		pm->cxFrame = cxFrame;
+		cx = max(*cxFrame, cx);
+	}
+	if (cyFrame != nullptr) {
+		pm->cyFrame = cyFrame;
+		cy = max(*cyFrame, cy);
+	}
 
 	SetProp(hwnd, RESIZEDLG_PROP_KEY, pm);
 	SetWindowSubclass(hwnd, ResizeDlg_Proc, 0, AsInteger<DWORD_PTR>(pm));
 
-	SetWindowPos(hwnd, nullptr, 0, 0, cxFrame, cyFrame, SWP_NOZORDER | SWP_NOMOVE);
+	SetWindowPos(hwnd, nullptr, 0, 0, cx, cy, SWP_NOZORDER | SWP_NOMOVE);
 
 #if 0
 	HMENU hmenu = GetSystemMenu(hwnd, FALSE);

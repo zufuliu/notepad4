@@ -611,25 +611,22 @@ void SnapToDefaultButton(HWND hwndBox) noexcept;
 void GetDlgPos(HWND hDlg, LPINT xDlg, LPINT yDlg) noexcept;
 void SetDlgPos(HWND hDlg, int xDlg, int yDlg) noexcept;
 
-#define ResizeDlgDirection_Both		0
-#define ResizeDlgDirection_OnlyX	1
-#define ResizeDlgDirection_OnlyY	2
-void ResizeDlg_InitEx(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDirection) noexcept;
-inline void ResizeDlg_Init(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip) noexcept {
-	ResizeDlg_InitEx(hwnd, cxFrame, cyFrame, nIdGrip, ResizeDlgDirection_Both);
+void ResizeDlg_InitEx(HWND hwnd, int *cxFrame, int *cyFrame, int nIdGrip) noexcept;
+inline void ResizeDlg_Init(HWND hwnd, int *cxFrame, int *cyFrame, int nIdGrip) noexcept {
+	ResizeDlg_InitEx(hwnd, cxFrame, cyFrame, nIdGrip);
 }
-inline void ResizeDlg_InitX(HWND hwnd, int cxFrame, int nIdGrip) noexcept {
-	ResizeDlg_InitEx(hwnd, cxFrame, 0, nIdGrip, ResizeDlgDirection_OnlyX);
+inline void ResizeDlg_InitX(HWND hwnd, int *cxFrame, int nIdGrip) noexcept {
+	ResizeDlg_InitEx(hwnd, cxFrame, nullptr, nIdGrip);
 }
-inline void ResizeDlg_InitY(HWND hwnd, int cyFrame, int nIdGrip) noexcept {
-	ResizeDlg_InitEx(hwnd, 0, cyFrame, nIdGrip, ResizeDlgDirection_OnlyY);
+inline void ResizeDlg_InitY(HWND hwnd, int *cyFrame, int nIdGrip) noexcept {
+	ResizeDlg_InitEx(hwnd, nullptr, cyFrame, nIdGrip);
 }
 void ResizeDlg_Destroy(HWND hwnd, int *cxFrame, int *cyFrame) noexcept;
 void ResizeDlg_Size(HWND hwnd, LPARAM lParam, int *dx, int *dy) noexcept;
 
-void ResizeDlg_InitY2Ex(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDirection, int nCtlId1, int nCtlId2) noexcept;
-inline void ResizeDlg_InitY2(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int nCtlId1, int nCtlId2) noexcept {
-	ResizeDlg_InitY2Ex(hwnd, cxFrame, cyFrame, nIdGrip, ResizeDlgDirection_Both, nCtlId1, nCtlId2);
+void ResizeDlg_InitY2Ex(HWND hwnd, int *cxFrame, int *cyFrame, int nIdGrip, int nCtlId1, int nCtlId2) noexcept;
+inline void ResizeDlg_InitY2(HWND hwnd, int *cxFrame, int *cyFrame, int nIdGrip, int nCtlId1, int nCtlId2) noexcept {
+	ResizeDlg_InitY2Ex(hwnd, cxFrame, cyFrame, nIdGrip, nCtlId1, nCtlId2);
 }
 int ResizeDlg_CalcDeltaY2(HWND hwnd, int dy, int cy, int nCtlId1, int nCtlId2) noexcept;
 
