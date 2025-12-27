@@ -992,7 +992,6 @@ void SetDlgPos(HWND hDlg, int xDlg, int yDlg) noexcept {
 namespace {
 
 #define RESIZEDLG_PROP_KEY	L"ResizeDlg"
-#define MAX_RESIZEDLG_ATTR_COUNT	2
 
 struct RESIZEDLG {
 	BOOL dpiChanged;
@@ -1001,7 +1000,7 @@ struct RESIZEDLG {
 	int *cyFrame;
 	SIZE client;
 	POINT minTrackSize;
-	int attrs[MAX_RESIZEDLG_ATTR_COUNT];
+	int itemMinSize[2];
 };
 
 }
@@ -1057,7 +1056,7 @@ static LRESULT CALLBACK ResizeDlg_Proc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 	return DefSubclassProc(hwnd, umsg, wParam, lParam);
 }
 
-void ResizeDlg_InitEx(HWND hwnd, int *cxFrame, int *cyFrame, int nIdGrip) noexcept {
+void ResizeDlg_InitEx(HWND hwnd, int *cxFrame, int *cyFrame, int nIdGrip, DWORD nCtlId) noexcept {
 	const UINT dpi = GetWindowDPI(hwnd);
 	RESIZEDLG * const pm = static_cast<RESIZEDLG *>(NP2HeapAlloc(sizeof(RESIZEDLG)));
 	pm->dpi = dpi;
@@ -1082,6 +1081,13 @@ void ResizeDlg_InitEx(HWND hwnd, int *cxFrame, int *cyFrame, int nIdGrip) noexce
 	if (cyFrame != nullptr) {
 		pm->cyFrame = cyFrame;
 		cy = max(*cyFrame, cy);
+	}
+
+	if (nCtlId != 0) {
+		GetWindowRect(GetDlgItem(hwnd, LOWORD(nCtlId)), &rc);
+		pm->itemMinSize[0] = rc.bottom - rc.top;
+		GetWindowRect(GetDlgItem(hwnd, HIWORD(nCtlId)), &rc);
+		pm->itemMinSize[1] = rc.bottom - rc.top;
 	}
 
 	SetProp(hwnd, RESIZEDLG_PROP_KEY, pm);
@@ -1131,35 +1137,19 @@ void ResizeDlg_Size(HWND hwnd, LPARAM lParam, int *dx, int *dy) noexcept {
 	pm->client.cy = cyClient;
 }
 
-static inline int GetDlgCtlHeight(HWND hwndDlg, int nCtlId) noexcept {
-	RECT rc;
-	GetWindowRect(GetDlgItem(hwndDlg, nCtlId), &rc);
-	const int height = rc.bottom - rc.top;
-	return height;
-}
-
-void ResizeDlg_InitY2Ex(HWND hwnd, int *cxFrame, int *cyFrame, int nIdGrip, int nCtlId1, int nCtlId2) noexcept {
-	const int hMin1 = GetDlgCtlHeight(hwnd, nCtlId1);
-	const int hMin2 = GetDlgCtlHeight(hwnd, nCtlId2);
-	ResizeDlg_InitEx(hwnd, cxFrame, cyFrame, nIdGrip);
-	RESIZEDLG * const pm = static_cast<RESIZEDLG *>(GetProp(hwnd, RESIZEDLG_PROP_KEY));
-	pm->attrs[0] = hMin1;
-	pm->attrs[1] = hMin2;
-}
-
-int ResizeDlg_CalcDeltaY2(HWND hwnd, int dy, int cy, int nCtlId1, int nCtlId2) noexcept {
-	if (dy == 0) {
-		return 0;
-	}
-	if (dy > 0) {
+int ResizeDlg_CalcDeltaEx(HWND hwnd, int dy, int cy, DWORD nCtlId) noexcept {
+	if (dy >= 0) {
 		return MulDiv(dy, cy, 100);
 	}
 
 	const RESIZEDLG * const pm = static_cast<RESIZEDLG *>(GetProp(hwnd, RESIZEDLG_PROP_KEY));
-	const int hMin1 = pm->attrs[0];
-	const int hMin2 = pm->attrs[1];
-	const int h1 = GetDlgCtlHeight(hwnd, nCtlId1);
-	const int h2 = GetDlgCtlHeight(hwnd, nCtlId2);
+	RECT rc;
+	GetWindowRect(GetDlgItem(hwnd, LOWORD(nCtlId)), &rc);
+	const int h1 = rc.bottom - rc.top;
+	GetWindowRect(GetDlgItem(hwnd, HIWORD(nCtlId)), &rc);
+	const int h2 = rc.bottom - rc.top;
+	const int hMin1 = pm->itemMinSize[0];
+	const int hMin2 = pm->itemMinSize[1];
 	// cy + h1 >= hMin1			cy >= hMin1 - h1
 	// dy - cy + h2 >= hMin2	cy <= dy + h2 - hMin2
 	const int cyMin = hMin1 - h1;

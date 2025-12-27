@@ -611,24 +611,26 @@ void SnapToDefaultButton(HWND hwndBox) noexcept;
 void GetDlgPos(HWND hDlg, LPINT xDlg, LPINT yDlg) noexcept;
 void SetDlgPos(HWND hDlg, int xDlg, int yDlg) noexcept;
 
-void ResizeDlg_InitEx(HWND hwnd, int *cxFrame, int *cyFrame, int nIdGrip) noexcept;
+void ResizeDlg_InitEx(HWND hwnd, int *cxFrame, int *cyFrame, int nIdGrip, DWORD nCtlId) noexcept;
 inline void ResizeDlg_Init(HWND hwnd, int *cxFrame, int *cyFrame, int nIdGrip) noexcept {
-	ResizeDlg_InitEx(hwnd, cxFrame, cyFrame, nIdGrip);
+	ResizeDlg_InitEx(hwnd, cxFrame, cyFrame, nIdGrip, 0);
 }
 inline void ResizeDlg_InitX(HWND hwnd, int *cxFrame, int nIdGrip) noexcept {
-	ResizeDlg_InitEx(hwnd, cxFrame, nullptr, nIdGrip);
+	ResizeDlg_InitEx(hwnd, cxFrame, nullptr, nIdGrip, 0);
 }
 inline void ResizeDlg_InitY(HWND hwnd, int *cyFrame, int nIdGrip) noexcept {
-	ResizeDlg_InitEx(hwnd, nullptr, cyFrame, nIdGrip);
+	ResizeDlg_InitEx(hwnd, nullptr, cyFrame, nIdGrip, 0);
 }
 void ResizeDlg_Destroy(HWND hwnd, int *cxFrame, int *cyFrame) noexcept;
 void ResizeDlg_Size(HWND hwnd, LPARAM lParam, int *dx, int *dy) noexcept;
 
-void ResizeDlg_InitY2Ex(HWND hwnd, int *cxFrame, int *cyFrame, int nIdGrip, int nCtlId1, int nCtlId2) noexcept;
 inline void ResizeDlg_InitY2(HWND hwnd, int *cxFrame, int *cyFrame, int nIdGrip, int nCtlId1, int nCtlId2) noexcept {
-	ResizeDlg_InitY2Ex(hwnd, cxFrame, cyFrame, nIdGrip, nCtlId1, nCtlId2);
+	ResizeDlg_InitEx(hwnd, cxFrame, cyFrame, nIdGrip, nCtlId1 | (nCtlId2 << 16));
 }
-int ResizeDlg_CalcDeltaY2(HWND hwnd, int dy, int cy, int nCtlId1, int nCtlId2) noexcept;
+int ResizeDlg_CalcDeltaEx(HWND hwnd, int dy, int cy, DWORD nCtlId) noexcept;
+inline int ResizeDlg_CalcDeltaY2(HWND hwnd, int dy, int cy, int nCtlId1, int nCtlId2) noexcept {
+	return ResizeDlg_CalcDeltaEx(hwnd, dy, cy, nCtlId1 | (nCtlId2 << 16));
+}
 
 HDWP DeferCtlPos(HDWP hdwp, HWND hwndDlg, int nCtlId, int dx, int dy, UINT uFlags) noexcept;
 void ResizeDlgCtl(HWND hwndDlg, int nCtlId, int dx, int dy) noexcept;
