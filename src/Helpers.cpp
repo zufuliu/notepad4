@@ -1048,8 +1048,21 @@ static LRESULT CALLBACK ResizeDlg_Proc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 		SetWindowPos(hwnd, nullptr, rc->left, rc->top, cx, cy, SWP_NOZORDER | SWP_NOACTIVATE);
 	} break;
 
-	case WM_NCDESTROY:
+	case WM_DESTROY: {
+		RECT rc;
+		GetWindowRect(hwnd, &rc);
+		if (pm->cxFrame != nullptr) {
+			*pm->cxFrame = rc.right - rc.left;
+		}
+		if (pm->cyFrame != nullptr) {
+			*pm->cyFrame = rc.bottom - rc.top;
+		}
 		RemoveWindowSubclass(hwnd, ResizeDlg_Proc, uIdSubclass);
+		RemoveProp(hwnd, RESIZEDLG_PROP_KEY);
+		NP2HeapFree(pm);
+	} break;
+
+	default:
 		break;
 	}
 
@@ -1105,22 +1118,6 @@ void ResizeDlg_InitEx(HWND hwnd, int *cxFrame, int *cyFrame, int nIdGrip, DWORD 
 	HWND hwndCtl = GetDlgItem(hwnd, nIdGrip);
 	const int cGrip = SystemMetricsForDpi(SM_CXHTHUMB, dpi);
 	SetWindowPos(hwndCtl, nullptr, pm->client.cx - cGrip, pm->client.cy - cGrip, cGrip, cGrip, SWP_NOZORDER);
-}
-
-void ResizeDlg_Destroy(HWND hwnd, int *cxFrame, int *cyFrame) noexcept {
-	RESIZEDLG * const pm = static_cast<RESIZEDLG *>(GetProp(hwnd, RESIZEDLG_PROP_KEY));
-
-	RECT rc;
-	GetWindowRect(hwnd, &rc);
-	if (cxFrame) {
-		*cxFrame = rc.right - rc.left;
-	}
-	if (cyFrame) {
-		*cyFrame = rc.bottom - rc.top;
-	}
-
-	RemoveProp(hwnd, RESIZEDLG_PROP_KEY);
-	NP2HeapFree(pm);
 }
 
 void ResizeDlg_Size(HWND hwnd, LPARAM lParam, int *dx, int *dy) noexcept {

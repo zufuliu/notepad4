@@ -411,7 +411,6 @@ static INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 	return TRUE;
 
 	case WM_DESTROY:
-		ResizeDlg_Destroy(hwnd, &cxRunDlg, nullptr);
 		DeleteBitmapButton(hwnd, IDC_SEARCHEXE);
 		return FALSE;
 
@@ -596,7 +595,6 @@ static INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 	case WM_DESTROY:
 		DirList_Destroy(GetDlgItem(hwnd, IDC_OPENWITHDIR));
 		DeleteBitmapButton(hwnd, IDC_GETOPENWITHDIR);
-		ResizeDlg_Destroy(hwnd, &cxOpenWithDlg, &cyOpenWithDlg);
 		return FALSE;
 
 	case WM_SIZE: {
@@ -768,7 +766,6 @@ static INT_PTR CALLBACK FavoritesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 	case WM_DESTROY:
 		DirList_Destroy(GetDlgItem(hwnd, IDC_FAVORITESDIR));
 		DeleteBitmapButton(hwnd, IDC_GETFAVORITESDIR);
-		ResizeDlg_Destroy(hwnd, &cxFavoritesDlg, &cyFavoritesDlg);
 		return FALSE;
 
 	case WM_SIZE: {
@@ -893,10 +890,6 @@ static INT_PTR CALLBACK AddToFavDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 		CenterDlgInParent(hwnd);
 	}
 	return TRUE;
-
-	case WM_DESTROY:
-		ResizeDlg_Destroy(hwnd, &cxAddFavoritesDlg, nullptr);
-		return FALSE;
 
 	case WM_SIZE: {
 		int dx;
@@ -1093,8 +1086,6 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 		bSaveRecentFiles = IsButtonChecked(hwnd, IDC_SAVEMRU);
 		iMaxRecentFiles = GetDlgItemInt(hwnd, IDC_MRU_COUNT_VALUE, nullptr, FALSE);
 		iMaxRecentFiles = max(iMaxRecentFiles, MRU_MAXITEMS);
-
-		ResizeDlg_Destroy(hwnd, &cxFileMRUDlg, &cyFileMRUDlg);
 	}
 	return FALSE;
 
@@ -1942,7 +1933,6 @@ static INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 	return TRUE;
 
 	case WM_DESTROY: {
-		ResizeDlg_Destroy(hwnd, &cxEncodingDlg, &cyEncodingDlg);
 		HIMAGELIST himl = TreeView_GetImageList(GetDlgItem(hwnd, IDC_ENCODINGLIST), TVSIL_NORMAL);
 		ImageList_Destroy(himl);
 	}

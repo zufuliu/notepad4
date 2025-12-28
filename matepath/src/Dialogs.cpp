@@ -207,7 +207,6 @@ INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) 
 	return TRUE;
 
 	case WM_DESTROY:
-		ResizeDlg_Destroy(hwnd, &cxRunDlg, nullptr);
 		DeleteBitmapButton(hwnd, IDC_SEARCHEXE);
 		return FALSE;
 
@@ -377,10 +376,6 @@ INT_PTR CALLBACK GotoDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		CenterDlgInParent(hwnd);
 	}
 	return TRUE;
-
-	case WM_DESTROY:
-		ResizeDlg_Destroy(hwnd, &cxGotoDlg, nullptr);
-		return FALSE;
 
 	case WM_SIZE: {
 		int dx;
@@ -1377,7 +1372,6 @@ INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 	return TRUE;
 
 	case WM_DESTROY:
-		ResizeDlg_Destroy(hwnd, &cxFileFilterDlg, nullptr);
 		DeleteBitmapButton(hwnd, IDC_BROWSEFILTER);
 		return FALSE;
 
@@ -1544,10 +1538,6 @@ INT_PTR CALLBACK RenameFileDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 	}
 	return TRUE;
 
-	case WM_DESTROY:
-		ResizeDlg_Destroy(hwnd, &cxRenameFileDlg, nullptr);
-		return FALSE;
-
 	case WM_SIZE: {
 		int dx;
 
@@ -1685,7 +1675,6 @@ INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 	return TRUE;
 
 	case WM_DESTROY:
-		ResizeDlg_Destroy(hwnd, &cxCopyMoveDlg, nullptr);
 		DeleteBitmapButton(hwnd, IDC_BROWSEDESTINATION);
 		return FALSE;
 
@@ -1876,7 +1865,6 @@ INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 	case WM_DESTROY:
 		DirList_Destroy(GetDlgItem(hwnd, IDC_OPENWITHDIR));
 		DeleteBitmapButton(hwnd, IDC_GETOPENWITHDIR);
-		ResizeDlg_Destroy(hwnd, &cxOpenWithDlg, &cyOpenWithDlg);
 		return FALSE;
 
 	case WM_SIZE: {
@@ -2046,10 +2034,6 @@ INT_PTR CALLBACK NewDirDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPara
 		CenterDlgInParent(hwnd);
 	}
 	return TRUE;
-
-	case WM_DESTROY:
-		ResizeDlg_Destroy(hwnd, &cxNewDirectoryDlg, nullptr);
-		return FALSE;
 
 	case WM_SIZE: {
 		int dx;
@@ -2241,7 +2225,6 @@ static INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 		return TRUE;
 
 	case WM_DESTROY:
-		ResizeDlg_Destroy(hwnd, &cxFindWindowDlg, nullptr);
 		if (bHasCapture) {
 			ReleaseCapture();
 			SendMessage(hwnd, WM_LBUTTONUP, 0, 0);
@@ -2351,7 +2334,6 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 	return TRUE;
 
 	case WM_DESTROY:
-		ResizeDlg_Destroy(hwnd, &cxTargetApplicationDlg, nullptr);
 		DeleteBitmapButton(hwnd, IDC_BROWSE);
 		//DeleteBitmapButton(hwnd, IDC_FINDWIN);
 		return FALSE;

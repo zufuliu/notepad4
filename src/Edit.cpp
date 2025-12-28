@@ -4883,7 +4883,6 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			DeleteObject(hFontFindReplaceEdit);
 			hFontFindReplaceEdit = nullptr;
 		}
-		ResizeDlg_Destroy(hwnd, &cxFindReplaceDlg, nullptr);
 		return FALSE;
 
 	case WM_SIZE: {
@@ -6157,7 +6156,6 @@ static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 	return TRUE;
 
 	case WM_DESTROY:
-		ResizeDlg_Destroy(hwnd, &cxModifyLinesDlg, &cyModifyLinesDlg);
 		DeleteObject(hFontHover);
 		return FALSE;
 
@@ -6384,10 +6382,6 @@ static INT_PTR CALLBACK EditEncloseSelectionDlgProc(HWND hwnd, UINT umsg, WPARAM
 	}
 	return TRUE;
 
-	case WM_DESTROY:
-		ResizeDlg_Destroy(hwnd, &cxEncloseSelectionDlg, &cyEncloseSelectionDlg);
-		return FALSE;
-
 	case WM_SIZE: {
 		int dx;
 		int dy;
@@ -6457,10 +6451,6 @@ static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam
 		CenterDlgInParent(hwnd);
 	}
 	return FALSE;
-
-	case WM_DESTROY:
-		ResizeDlg_Destroy(hwnd, &cxInsertTagDlg, &cyInsertTagDlg);
-		return FALSE;
 
 	case WM_SIZE: {
 		int dx;

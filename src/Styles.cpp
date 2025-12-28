@@ -4298,7 +4298,6 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 		DeleteBitmapButton(hwnd, IDC_STYLEBACK);
 		DeleteBitmapButton(hwnd, IDC_PREVSTYLE);
 		DeleteBitmapButton(hwnd, IDC_NEXTSTYLE);
-		ResizeDlg_Destroy(hwnd, &cxStyleCustomizeDlg, &cyStyleCustomizeDlg);
 	}
 	return FALSE;
 
@@ -5103,10 +5102,6 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 		CenterDlgInParent(hwnd);
 	}
 	return TRUE;
-
-	case WM_DESTROY:
-		ResizeDlg_Destroy(hwnd, &cxStyleSelectDlg, &cyStyleSelectDlg);
-		return FALSE;
 
 	case WM_SIZE: {
 		int dx;

@@ -621,7 +621,6 @@ inline void ResizeDlg_InitX(HWND hwnd, int *cxFrame, int nIdGrip) noexcept {
 inline void ResizeDlg_InitY(HWND hwnd, int *cyFrame, int nIdGrip) noexcept {
 	ResizeDlg_InitEx(hwnd, nullptr, cyFrame, nIdGrip, 0);
 }
-void ResizeDlg_Destroy(HWND hwnd, int *cxFrame, int *cyFrame) noexcept;
 void ResizeDlg_Size(HWND hwnd, LPARAM lParam, int *dx, int *dy) noexcept;
 
 inline void ResizeDlg_InitY2(HWND hwnd, int *cxFrame, int *cyFrame, int nIdGrip, int nCtlId1, int nCtlId2) noexcept {
