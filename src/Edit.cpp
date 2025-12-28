@@ -6139,11 +6139,7 @@ static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		id_hover = 0;
 		id_capture = 0;
 
-		HFONT hFontNormal = AsPointer<HFONT>(SendDlgItemMessage(hwnd, IDC_MODIFY_LINE_DLN_NP, WM_GETFONT, 0, 0));
-		if (hFontNormal == nullptr) {
-			hFontNormal = GetStockFont(DEFAULT_GUI_FONT);
-		}
-
+		HFONT hFontNormal = GetWindowFont(hwnd);
 		LOGFONT lf;
 		GetObject(hFontNormal, sizeof(LOGFONT), &lf);
 		lf.lfUnderline = TRUE;

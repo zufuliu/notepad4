@@ -4278,10 +4278,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 		MakeBitmapButton(hwnd, IDC_NEXTSTYLE, g_exeInstance, IDB_NEXT16);
 
 		// Setup title font
-		HFONT hFontTitle = AsPointer<HFONT>(SendDlgItemMessage(hwnd, IDC_TITLE, WM_GETFONT, 0, 0));
-		if (hFontTitle == nullptr) {
-			hFontTitle = GetStockFont(DEFAULT_GUI_FONT);
-		}
+		HFONT hFontTitle = GetWindowFont(hwnd);
 		LOGFONT lf;
 		GetObject(hFontTitle, sizeof(LOGFONT), &lf);
 		lf.lfHeight += lf.lfHeight / 5;

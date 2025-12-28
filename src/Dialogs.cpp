@@ -285,11 +285,7 @@ INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 		SetDlgItemText(hwnd, IDC_VERSION, VERSION_FILEVERSION_LONG);
 		SetDlgItemText(hwnd, IDC_BUILD_INFO, wch);
 
-		HFONT hFontTitle = AsPointer<HFONT>(SendDlgItemMessage(hwnd, IDC_VERSION, WM_GETFONT, 0, 0));
-		if (hFontTitle == nullptr) {
-			hFontTitle = GetStockFont(DEFAULT_GUI_FONT);
-		}
-
+		HFONT hFontTitle = GetWindowFont(hwnd);
 		LOGFONT lf;
 		GetObject(hFontTitle, sizeof(LOGFONT), &lf);
 		lf.lfWeight = FW_BOLD;
