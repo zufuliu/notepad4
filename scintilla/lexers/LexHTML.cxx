@@ -1215,8 +1215,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			break;
 		}
 
-		// Some of the above terminated their lexeme but since the same character starts
-		// the same class again, only reenter if non empty segment.
+		// Some of the above terminated their lexeme
 
 		if (state == SCE_HB_DEFAULT) {    // One of the above succeeded
 			if (ch == '\"') {

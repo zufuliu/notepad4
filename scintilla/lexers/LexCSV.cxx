@@ -48,7 +48,7 @@ void ColouriseCSVDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 	initStyle = SCE_CSV_COLUMN_0;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	if (lineCurrent > 0) {
-		rows = static_cast<int>((lineCurrent - 1) % CsvRowGroup);
+		rows = static_cast<uint32_t>(lineCurrent - 1) % CsvRowGroup;// max 4GB
 		const int lineState = styler.GetLineState(lineCurrent - 1);
 		if (lineState) {
 			quoted = true;

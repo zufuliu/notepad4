@@ -111,12 +111,13 @@ public:
 		state = state_;
 	}
 	void SetState(int state_) {
-#ifndef NDEBUG
-		styler.ColorTo(sci::min<Sci_PositionU>(currentPos, styler.Length()), state);
-#else
-		styler.ColorTo(currentPos, state);
-#endif
+		const int current = state;
 		state = state_;
+#ifndef NDEBUG
+		styler.ColorTo(sci::min<Sci_PositionU>(currentPos, styler.Length()), current);
+#else
+		styler.ColorTo(currentPos, current);
+#endif
 	}
 	void ForwardSetState(int state_) {
 		Forward();

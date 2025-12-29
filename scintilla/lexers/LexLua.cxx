@@ -61,7 +61,7 @@ struct EscapeSequence {
 };
 
 // https://en.cppreference.com/w/c/io/fprintf
-// 6.4 String Manipulation https://www.lua.org/manual/5.4/manual.html#6.4
+// 6.5 String Manipulation https://www.lua.org/manual/5.5/manual.html#6.5
 constexpr bool IsFormatSpecifier(char ch) noexcept {
 	return AnyOf(ch, 'a', 'A',
 					'c',

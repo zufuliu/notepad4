@@ -60,7 +60,7 @@ void LexAccessor::GetRangeLowered(Sci_PositionU startPos_, Sci_PositionU endPos_
 }
 
 void LexAccessor::GetRange(Sci_PositionU startPos_, Sci_PositionU endPos_, std::string &s) const {
-	assert(startPos_ < endPos_);
+	assert(startPos_ <= endPos_);
 	//endPos_ = sci::min(endPos_, static_cast<Sci_PositionU>(lenDoc));
 	const Sci_PositionU len = endPos_ - startPos_;
 	s.resize(len, '\0');
@@ -68,7 +68,7 @@ void LexAccessor::GetRange(Sci_PositionU startPos_, Sci_PositionU endPos_, std::
 }
 
 void LexAccessor::GetRangeLowered(Sci_PositionU startPos_, Sci_PositionU endPos_, std::string &s) const {
-	assert(startPos_ < endPos_);
+	assert(startPos_ <= endPos_);
 	//endPos_ = sci::min(endPos_, static_cast<Sci_PositionU>(lenDoc));
 	const Sci_PositionU len = endPos_ - startPos_;
 	s.resize(len, '\0');
