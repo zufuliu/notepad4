@@ -75,11 +75,13 @@ void FontRealised::Realise(Surface &surface, int zoomLevel, Technology technolog
 		// "Ay" is normally strongly kerned and "fi" may be a ligature
 		constexpr std::string_view allASCIIGraphic("Ayfi"
 		// python: ''.join(chr(ch) for ch in range(32, 127))
-		" !\"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~");
+		" !\"#$%&\'()*+,-./0123456789:;<=>?@[\\]^_`{|}~abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
 		std::array<XYPOSITION, allASCIIGraphic.length()> positions {};
 		surface.MeasureWidthsUTF8(font.get(), allASCIIGraphic, positions.data());
 
-		XYPOSITION aveCharWidth = positions.back() * (1.0 / allASCIIGraphic.length());
+		constexpr size_t tilde = allASCIIGraphic.length() - 53;
+		static_assert(allASCIIGraphic[tilde] == '~');
+		XYPOSITION aveCharWidth = (positions.back() - positions[tilde]) * (1.0 / 52);
 		if (technology == Technology::Default/*!surface.SupportsFeature(Supports::FractionalStrokeWidth)*/) {
 			aveCharWidth = std::round(aveCharWidth);
 		}

@@ -871,9 +871,18 @@ FontMetrics SurfaceGDI::Metrics(const Font *font_) noexcept {
 /*
 XYPOSITION SurfaceGDI::AverageCharWidth(const Font *font_) noexcept {
 	SetFont(font_);
+#if 0 // tmAveCharWidth is unreliable, see https://sourceforge.net/p/scintilla/feature-requests/1571/
 	TEXTMETRIC tm;
 	::GetTextMetrics(hdc, &tm);
 	return static_cast<XYPOSITION>(tm.tmAveCharWidth);
+#else
+	constexpr std::wstring_view wsvAllAlpha = L"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	constexpr UINT len = static_cast<UINT>(wsvAllAlpha.length());
+	SIZE sz {};
+	GetTextExtentPoint32W(hdc, wsvAllAlpha.data(), len, &sz);
+	sz.cx = (sz.cx + len/2)/len;
+	return static_cast<XYPOSITION>(sz.cx);
+#endif
 }
 */
 

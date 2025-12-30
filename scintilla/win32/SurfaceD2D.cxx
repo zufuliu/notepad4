@@ -1669,7 +1669,7 @@ XYPOSITION SurfaceD2D::AverageCharWidth(const Font *font_) {
 		if (const TextLayout pTextLayout = LayoutCreate(wsvAllAlpha, pfm->pTextFormat.Get())) {
 			DWRITE_TEXT_METRICS textMetrics;
 			if (SUCCEEDED(pTextLayout->GetMetrics(&textMetrics)))
-				width = textMetrics.width / wsvAllAlpha.length();
+				width = textMetrics.width*(1.0f / wsvAllAlpha.length());
 		}
 	}
 	return width;
