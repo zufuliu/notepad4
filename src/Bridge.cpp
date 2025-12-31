@@ -861,13 +861,7 @@ void SaveToStreamRTF(std::string &os, const char *styledText, size_t textLength,
 		const char ch = textBuffer[offset];
 		std::string_view sv;
 		column++;
-		if (ch == '{') {
-			sv = "\\{";
-		} else if (ch == '}') {
-			sv = "\\}";
-		} else if (ch == '\\') {
-			sv = "\\\\";
-		} else if (ch == '\t') {
+		if (ch == '\t') {
 			if (!fvCurFile.bTabsAsSpaces) {
 				sv = RTF_TAB;
 			} else {
@@ -926,6 +920,9 @@ void SaveToStreamRTF(std::string &os, const char *styledText, size_t textLength,
 
 		if (sv.empty()) {
 			if (ch != '\t') {
+				if (ch == '{' || ch == '}' || ch == '\\') {
+					os += '\\';
+				}
 				os += ch;
 			}
 		} else {
