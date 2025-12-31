@@ -4680,24 +4680,18 @@ void EditSaveSelectionAsFindText(EDITFINDREPLACE *lpefr, int menu, bool findSele
 	}
 }
 
-static void FindReplaceSetFont(HWND hwnd, bool monospaced, HFONT *hFontFindReplaceEdit) noexcept {
-	HWND hwndFind = GetDlgItem(hwnd, IDC_FINDTEXT);
-	HWND hwndRepl = GetDlgItem(hwnd, IDC_REPLACETEXT);
+static void FindReplaceSetFont(HWND hwnd, BOOL monospaced, HFONT *hFontFindReplaceEdit) noexcept {
 	HFONT font = nullptr;
 	if (monospaced) {
-		font = *hFontFindReplaceEdit;
-		if (font == nullptr) {
-			*hFontFindReplaceEdit = font = Style_CreateCodeFont(g_uCurrentDPI);
-		}
+		const UINT dpi = GetWindowDPI(hwnd);
+		font = Style_CreateCodeFont(dpi);
+		*hFontFindReplaceEdit = font;
 	}
 	if (font == nullptr) {
-		// use font from parent window
 		font = GetWindowFont(hwnd);
 	}
-	SetWindowFont(hwndFind, font, TRUE);
-	if (hwndRepl) {
-		SetWindowFont(hwndRepl, font, TRUE);
-	}
+	SendDlgItemMessage(hwnd, IDC_FINDTEXT, WM_SETFONT, AsInteger<WPARAM>(font), TRUE);
+	SendDlgItemMessage(hwnd, IDC_REPLACETEXT, WM_SETFONT, AsInteger<WPARAM>(font), TRUE);
 }
 
 static bool CopySelectionAsFindText(HWND hwnd, EDITFINDREPLACE *lpefr, bool bFirstTime) noexcept {
@@ -4879,9 +4873,13 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 	break;
 
 	case WM_DESTROY:
+	case WM_DPICHANGED:
 		if (hFontFindReplaceEdit) {
 			DeleteObject(hFontFindReplaceEdit);
 			hFontFindReplaceEdit = nullptr;
+		}
+		if (umsg == WM_DPICHANGED && IsButtonChecked(hwnd, IDC_USEMONOSPACEDFONT)) {
+			FindReplaceSetFont(hwnd, TRUE, &hFontFindReplaceEdit);
 		}
 		return FALSE;
 
@@ -4963,6 +4961,10 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 				iFindReplaceOption &= ~mask;
 			}
 			if (LOWORD(wParam) == IDC_USEMONOSPACEDFONT) {
+				if (hFontFindReplaceEdit) { // dpi may changed between toggle monospaced font
+					DeleteObject(hFontFindReplaceEdit);
+					hFontFindReplaceEdit = nullptr;
+				}
 				FindReplaceSetFont(hwnd, iFindReplaceOption & FindReplaceOption_UseMonospacedFont, &hFontFindReplaceEdit);
 			}
 		} break;

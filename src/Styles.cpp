@@ -583,8 +583,7 @@ void Style_DetectBaseFontSize(HMONITOR hMonitor) noexcept {
 }
 
 HFONT Style_CreateCodeFont(UINT dpi) noexcept {
-	const int size = SciCall_StyleGetSizeFractional(STYLE_DEFAULT);
-	const int height = -MulDiv(size, dpi, 72*SC_FONT_SIZE_MULTIPLIER);
+	const int height = -MulDiv(iBaseFontSize, dpi, 72*SC_FONT_SIZE_MULTIPLIER);
 	HFONT font = CreateFont(height,
 						0, 0, 0,
 						FW_NORMAL,
