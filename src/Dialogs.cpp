@@ -394,11 +394,10 @@ INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 //
 // RunDlgProc()
 //
-extern int cxRunDlg;
 static INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		ResizeDlg_InitX(hwnd, &cxRunDlg, IDC_RESIZEGRIP3);
+		ResizeDlg_InitX(hwnd, &positionRecord.cxRunDlg, IDC_RESIZEGRIP3);
 		MakeBitmapButton(hwnd, IDC_SEARCHEXE, g_exeInstance, IDB_OPEN_FOLDER16);
 
 		HWND hwndCtl = GetDlgItem(hwnd, IDC_COMMANDLINE);
@@ -560,14 +559,11 @@ void RunDlg(HWND hwnd, LPCWSTR lpstrDefault) noexcept {
 extern WCHAR tchOpenWithDir[MAX_PATH];
 extern bool flagNoFadeHidden;
 
-extern int cxOpenWithDlg;
-extern int cyOpenWithDlg;
-
 static INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
-		ResizeDlg_Init(hwnd, &cxOpenWithDlg, &cyOpenWithDlg, IDC_RESIZEGRIP3);
+		ResizeDlg_Init(hwnd, &positionRecord.cxOpenWithDlg, &positionRecord.cyOpenWithDlg, IDC_RESIZEGRIP3);
 
 		HWND hwndLV = GetDlgItem(hwnd, IDC_OPENWITHDIR);
 		InitWindowCommon(hwndLV);
@@ -730,15 +726,11 @@ bool OpenWithDlg(HWND hwnd, LPCWSTR lpstrFile) {
 //
 extern WCHAR tchFavoritesDir[MAX_PATH];
 
-extern int cxFavoritesDlg;
-extern int cyFavoritesDlg;
-extern int cxAddFavoritesDlg;
-
 static INT_PTR CALLBACK FavoritesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
-		ResizeDlg_Init(hwnd, &cxFavoritesDlg, &cyFavoritesDlg, IDC_RESIZEGRIP3);
+		ResizeDlg_Init(hwnd, &positionRecord.cxFavoritesDlg, &positionRecord.cyFavoritesDlg, IDC_RESIZEGRIP3);
 
 		HWND hwndLV = GetDlgItem(hwnd, IDC_FAVORITESDIR);
 		InitWindowCommon(hwndLV);
@@ -878,7 +870,7 @@ static INT_PTR CALLBACK AddToFavDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
-		ResizeDlg_InitX(hwnd, &cxAddFavoritesDlg, IDC_RESIZEGRIP);
+		ResizeDlg_InitX(hwnd, &positionRecord.cxAddFavoritesDlg, IDC_RESIZEGRIP);
 
 		HWND hwndCtl = GetDlgItem(hwnd, IDC_FAVORITESFILE);
 		Edit_LimitText(hwndCtl, MAX_PATH - 1);
@@ -955,8 +947,6 @@ bool AddToFavDlg(HWND hwnd, LPCWSTR lpszName, LPCWSTR lpszTarget) {
 extern MRUList mruFile;
 extern bool bSaveRecentFiles;
 extern int iMaxRecentFiles;
-extern int cxFileMRUDlg;
-extern int cyFileMRUDlg;
 
 static DWORD WINAPI FileMRUIconThread(LPVOID lpParam) noexcept {
 	const BackgroundWorker * const worker = static_cast<const BackgroundWorker *>(lpParam);
@@ -1041,7 +1031,7 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 		SetProp(hwnd, L"it", worker);
 		worker->Init(hwndLV);
 
-		ResizeDlg_Init(hwnd, &cxFileMRUDlg, &cyFileMRUDlg, IDC_RESIZEGRIP);
+		ResizeDlg_Init(hwnd, &positionRecord.cxFileMRUDlg, &positionRecord.cyFileMRUDlg, IDC_RESIZEGRIP);
 
 		SHFILEINFO shfi;
 		ListView_SetImageList(hwndLV,
@@ -1802,8 +1792,6 @@ struct ENCODEDLG {
 	int  idEncoding;
 	UINT uidLabel;
 };
-extern int cxEncodingDlg;
-extern int cyEncodingDlg;
 
 static INT_PTR CALLBACK SelectDefEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	switch (umsg) {
@@ -1892,7 +1880,7 @@ static INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
 		const ENCODEDLG * const pdd = AsPointer<const ENCODEDLG*>(lParam);
-		ResizeDlg_Init(hwnd, &cxEncodingDlg, &cyEncodingDlg, IDC_RESIZEGRIP);
+		ResizeDlg_Init(hwnd, &positionRecord.cxEncodingDlg, &positionRecord.cyEncodingDlg, IDC_RESIZEGRIP);
 
 		WCHAR wch[256];
 		GetString(pdd->uidLabel, wch, COUNTOF(wch));

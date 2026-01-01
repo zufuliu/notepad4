@@ -180,7 +180,6 @@ extern WCHAR szCurDir[MAX_PATH + 40];
 //
 //
 extern HWND hwndDirList;
-extern int cxRunDlg;
 extern bool bUseXPFileDialog;
 
 INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
@@ -188,7 +187,7 @@ INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) 
 
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		ResizeDlg_InitX(hwnd, &cxRunDlg, IDC_RESIZEGRIP3);
+		ResizeDlg_InitX(hwnd, &positionRecord.cxRunDlg, IDC_RESIZEGRIP3);
 		MakeBitmapButton(hwnd, IDC_SEARCHEXE, g_exeInstance, IDB_OPEN_FOLDER16);
 
 		HWND hwndCtl = GetDlgItem(hwnd, IDC_COMMANDLINE);
@@ -346,12 +345,11 @@ void RunDlg(HWND hwnd) noexcept {
 //
 //
 extern HistoryList mHistory;
-extern int cxGotoDlg;
 
 INT_PTR CALLBACK GotoDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		ResizeDlg_InitX(hwnd, &cxGotoDlg, IDC_RESIZEGRIP);
+		ResizeDlg_InitX(hwnd, &positionRecord.cxGotoDlg, IDC_RESIZEGRIP);
 
 		HWND hwndGoto = GetDlgItem(hwnd, IDC_GOTO);
 		ComboBox_LimitText(hwndGoto, MAX_PATH - 1);
@@ -1254,7 +1252,6 @@ extern int nIdFocus;
 
 extern WCHAR tchFilter[128];
 extern bool bNegFilter;
-extern int cxFileFilterDlg;
 
 INT_PTR OptionsPropSheet(HWND hwnd, HINSTANCE hInstance) noexcept {
 	PROPSHEETHEADER psh;
@@ -1355,7 +1352,7 @@ INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		ResizeDlg_InitX(hwnd, &cxFileFilterDlg, IDC_RESIZEGRIP3);
+		ResizeDlg_InitX(hwnd, &positionRecord.cxFileFilterDlg, IDC_RESIZEGRIP3);
 		MakeBitmapButton(hwnd, IDC_BROWSEFILTER, nullptr, OBM_COMBO);
 
 		HWND hwndCtl = GetDlgItem(hwnd, IDC_FILTER);
@@ -1511,7 +1508,6 @@ struct FILEOPDLGDATA {
 	UINT wFunc;
 };
 
-extern int cxRenameFileDlg;
 //=============================================================================
 //
 //  RenameFileDlgProc()
@@ -1521,7 +1517,7 @@ INT_PTR CALLBACK RenameFileDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
-		ResizeDlg_InitX(hwnd, &cxRenameFileDlg, IDC_RESIZEGRIP2);
+		ResizeDlg_InitX(hwnd, &positionRecord.cxRenameFileDlg, IDC_RESIZEGRIP2);
 		const FILEOPDLGDATA * const lpfod = AsPointer<const FILEOPDLGDATA *>(lParam);
 
 		SetDlgItemText(hwnd, IDC_OLDNAME, lpfod->szSource);
@@ -1636,14 +1632,12 @@ bool RenameFileDlg(HWND hwnd) {
 //  CopyMoveDlgProc()
 //
 //
-extern int cxCopyMoveDlg;
-
 INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
 
-		ResizeDlg_InitX(hwnd, &cxCopyMoveDlg, IDC_RESIZEGRIP5);
+		ResizeDlg_InitX(hwnd, &positionRecord.cxCopyMoveDlg, IDC_RESIZEGRIP5);
 		MakeBitmapButton(hwnd, IDC_BROWSEDESTINATION, g_exeInstance, IDB_OPEN_FOLDER16);
 
 		const FILEOPDLGDATA * const lpfod = AsPointer<const FILEOPDLGDATA *>(lParam);
@@ -1828,15 +1822,11 @@ bool CopyMoveDlg(HWND hwnd, UINT *wFunc) {
 extern WCHAR tchOpenWithDir[MAX_PATH];
 extern bool flagNoFadeHidden;
 
-extern int cxOpenWithDlg;
-extern int cyOpenWithDlg;
-extern int cxNewDirectoryDlg;
-
 INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
-		ResizeDlg_Init(hwnd, &cxOpenWithDlg, &cyOpenWithDlg, IDC_RESIZEGRIP3);
+		ResizeDlg_Init(hwnd, &positionRecord.cxOpenWithDlg, &positionRecord.cyOpenWithDlg, IDC_RESIZEGRIP3);
 
 		HWND hwndLV = GetDlgItem(hwnd, IDC_OPENWITHDIR);
 		InitWindowCommon(hwndLV);
@@ -2024,7 +2014,7 @@ INT_PTR CALLBACK NewDirDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPara
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
-		ResizeDlg_InitX(hwnd, &cxNewDirectoryDlg, IDC_RESIZEGRIP);
+		ResizeDlg_InitX(hwnd, &positionRecord.cxNewDirectoryDlg, IDC_RESIZEGRIP);
 
 		SendDlgItemMessage(hwnd, IDC_NEWDIR, EM_LIMITTEXT, MAX_PATH - 1, 0);
 		CenterDlgInParent(hwnd);
@@ -2089,7 +2079,6 @@ bool NewDirDlg(HWND hwnd, LPWSTR pszNewDir) noexcept {
 //  Find target window helper dialog
 //
 extern bool flagPortableMyDocs;
-extern int cxFindWindowDlg;
 
 static INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	static HICON hIconCross1;
@@ -2100,7 +2089,7 @@ static INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 	switch (umsg) {
 	case WM_INITDIALOG:
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
-		ResizeDlg_InitX(hwnd, &cxFindWindowDlg, IDC_RESIZEGRIP5);
+		ResizeDlg_InitX(hwnd, &positionRecord.cxFindWindowDlg, IDC_RESIZEGRIP5);
 
 		hIconCross1 = LoadIcon(g_exeInstance, MAKEINTRESOURCE(IDI_CROSS1));
 		hIconCross2 = LoadIcon(g_exeInstance, MAKEINTRESOURCE(IDI_CROSS2));
@@ -2241,7 +2230,6 @@ static INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 //
 extern UseTargetApplication iUseTargetApplication;
 extern TargetApplicationMode iTargetApplicationMode;
-extern int cxTargetApplicationDlg;
 extern bool bLoadLaunchSetingsLoaded;
 extern WCHAR szTargetApplication[MAX_PATH];
 extern WCHAR szTargetApplicationParams[MAX_PATH];
@@ -2257,7 +2245,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		ResizeDlg_InitX(hwnd, &cxTargetApplicationDlg, IDC_RESIZEGRIP4);
+		ResizeDlg_InitX(hwnd, &positionRecord.cxTargetApplicationDlg, IDC_RESIZEGRIP4);
 		// ToolTip for browse button
 		HWND hwndToolTip = CreateWindowEx(0, TOOLTIPS_CLASS, nullptr, 0, 0, 0, 0, 0, hwnd, nullptr, g_hInstance, nullptr);
 

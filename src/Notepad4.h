@@ -184,6 +184,38 @@ enum PrintFooterOption {
 
 extern WCHAR szCurFile[MAX_PATH + 40];
 
+struct WindowPositionRecord {
+	int cxRunDlg;
+	int cxEncodingDlg;
+	int cyEncodingDlg;
+
+	int cxFileMRUDlg;
+	int cyFileMRUDlg;
+	int cxOpenWithDlg;
+	int cyOpenWithDlg;
+	int cxFavoritesDlg;
+	int cyFavoritesDlg;
+	int cxAddFavoritesDlg;
+
+	int cxModifyLinesDlg;
+	int cyModifyLinesDlg;
+	int cxEncloseSelectionDlg;
+	int cyEncloseSelectionDlg;
+	int cxInsertTagDlg;
+	int cyInsertTagDlg;
+
+	int xFindReplaceDlg;
+	int yFindReplaceDlg;
+	int cxFindReplaceDlg;
+
+	int cxStyleSelectDlg;
+	int cyStyleSelectDlg;
+	int cxStyleCustomizeDlg;
+	int cyStyleCustomizeDlg;
+};
+
+extern WindowPositionRecord positionRecord;
+
 //==== Function Declarations ==================================================
 BOOL InitApplication(HINSTANCE hInstance) noexcept;
 void InitInstance(HINSTANCE hInstance, int nCmdShow);

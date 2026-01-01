@@ -108,16 +108,6 @@ static bool bShowToolbar;
 static int iAutoScaleToolbar;
 static bool bShowStatusbar;
 static bool bShowDriveBox;
-int		cxRunDlg;
-int		cxGotoDlg;
-int		cxFileFilterDlg;
-int		cxRenameFileDlg;
-int		cxNewDirectoryDlg;
-int		cxOpenWithDlg;
-int		cyOpenWithDlg;
-int		cxCopyMoveDlg;
-int		cxTargetApplicationDlg;
-int		cxFindWindowDlg;
 
 WCHAR		tchFilter[DL_FILTER_BUFSIZE];
 bool		bNegFilter;
@@ -139,6 +129,7 @@ static WININFO wi;
 static int cyReBar;
 static int cyReBarFrame;
 static int cyDriveBoxFrame;
+WindowPositionRecord positionRecord;
 
 int		nIdFocus = IDC_DIRLIST;
 
@@ -2625,16 +2616,17 @@ void LoadSettings() noexcept {
 			wi.cy	= section.GetInt(L"WindowSizeY", CW_USEDEFAULT);
 		}
 
-		cxRunDlg = section.GetInt(L"RunDlgSizeX", 0);
-		cxGotoDlg = section.GetInt(L"GotoDlgSizeX", 0);
-		cxFileFilterDlg = section.GetInt(L"FileFilterDlgX", 0);
-		cxRenameFileDlg = section.GetInt(L"RenameFileDlgX", 0);
-		cxNewDirectoryDlg = section.GetInt(L"NewDirectoryDlgX", 0);
-		cxOpenWithDlg = section.GetInt(L"OpenWithDlgSizeX", 0);
-		cyOpenWithDlg = section.GetInt(L"OpenWithDlgSizeY", 0);
-		cxCopyMoveDlg = section.GetInt(L"CopyMoveDlgSizeX", 0);
-		cxTargetApplicationDlg = section.GetInt(L"TargetApplicationDlgSizeX", 0);
-		cxFindWindowDlg = section.GetInt(L"FindWindowDlgSizeX", 0);
+		auto &record = positionRecord;
+		record.cxRunDlg = section.GetInt(L"RunDlgSizeX", 0);
+		record.cxGotoDlg = section.GetInt(L"GotoDlgSizeX", 0);
+		record.cxFileFilterDlg = section.GetInt(L"FileFilterDlgX", 0);
+		record.cxRenameFileDlg = section.GetInt(L"RenameFileDlgX", 0);
+		record.cxNewDirectoryDlg = section.GetInt(L"NewDirectoryDlgX", 0);
+		record.cxOpenWithDlg = section.GetInt(L"OpenWithDlgSizeX", 0);
+		record.cyOpenWithDlg = section.GetInt(L"OpenWithDlgSizeY", 0);
+		record.cxCopyMoveDlg = section.GetInt(L"CopyMoveDlgSizeX", 0);
+		record.cxTargetApplicationDlg = section.GetInt(L"TargetApplicationDlgSizeX", 0);
+		record.cxFindWindowDlg = section.GetInt(L"FindWindowDlgSizeX", 0);
 	}
 
 	section.Free();
@@ -2800,32 +2792,23 @@ void SaveWindowPosition(WCHAR *pIniSectionBuf) noexcept {
 	section.SetInt(L"WindowSizeX", wi.cx);
 	section.SetInt(L"WindowSizeY", wi.cy);
 
-	section.SetIntEx(L"RunDlgSizeX", cxRunDlg, 0);
-	section.SetIntEx(L"GotoDlgSizeX", cxGotoDlg, 0);
-	section.SetIntEx(L"FileFilterDlgX", cxFileFilterDlg, 0);
-	section.SetIntEx(L"RenameFileDlgX", cxRenameFileDlg, 0);
-	section.SetIntEx(L"NewDirectoryDlgX", cxNewDirectoryDlg, 0);
-	section.SetIntEx(L"OpenWithDlgSizeX", cxOpenWithDlg, 0);
-	section.SetIntEx(L"OpenWithDlgSizeY", cyOpenWithDlg, 0);
-	section.SetIntEx(L"CopyMoveDlgSizeX", cxCopyMoveDlg, 0);
-	section.SetIntEx(L"TargetApplicationDlgSizeX", cxTargetApplicationDlg, 0);
-	section.SetIntEx(L"FindWindowDlgSizeX", cxFindWindowDlg, 0);
+	const auto &record = positionRecord;
+	section.SetIntEx(L"RunDlgSizeX", record.cxRunDlg, 0);
+	section.SetIntEx(L"GotoDlgSizeX", record.cxGotoDlg, 0);
+	section.SetIntEx(L"FileFilterDlgX", record.cxFileFilterDlg, 0);
+	section.SetIntEx(L"RenameFileDlgX", record.cxRenameFileDlg, 0);
+	section.SetIntEx(L"NewDirectoryDlgX", record.cxNewDirectoryDlg, 0);
+	section.SetIntEx(L"OpenWithDlgSizeX", record.cxOpenWithDlg, 0);
+	section.SetIntEx(L"OpenWithDlgSizeY", record.cyOpenWithDlg, 0);
+	section.SetIntEx(L"CopyMoveDlgSizeX", record.cxCopyMoveDlg, 0);
+	section.SetIntEx(L"TargetApplicationDlgSizeX", record.cxTargetApplicationDlg, 0);
+	section.SetIntEx(L"FindWindowDlgSizeX", record.cxFindWindowDlg, 0);
 
 	SaveIniSection(sectionName, pIniSectionBuf);
 }
 
 void ClearWindowPositionHistory() noexcept {
-	cxRunDlg = 0;
-	cxGotoDlg = 0;
-	cxFileFilterDlg = 0;
-	cxRenameFileDlg = 0;
-	cxNewDirectoryDlg = 0;
-	cxOpenWithDlg = 0;
-	cyOpenWithDlg = 0;
-	cxCopyMoveDlg = 0;
-	cxTargetApplicationDlg = 0;
-	cxFindWindowDlg = 0;
-
+	memset(&positionRecord, 0, sizeof(positionRecord));
 	IniDeleteAllSection(INI_SECTION_NAME_WINDOW_POSITION);
 }
 

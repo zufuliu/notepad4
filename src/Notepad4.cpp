@@ -211,31 +211,7 @@ static WININFO wi;
 
 static int cyReBar;
 static int cyReBarFrame;
-
-int		cxRunDlg;
-int		cxEncodingDlg;
-int		cyEncodingDlg;
-int		cxFileMRUDlg;
-int		cyFileMRUDlg;
-int		cxOpenWithDlg;
-int		cyOpenWithDlg;
-int		cxFavoritesDlg;
-int		cyFavoritesDlg;
-int		cxAddFavoritesDlg;
-int		cxModifyLinesDlg;
-int		cyModifyLinesDlg;
-int		cxEncloseSelectionDlg;
-int		cyEncloseSelectionDlg;
-int		cxInsertTagDlg;
-int		cyInsertTagDlg;
-int		xFindReplaceDlg;
-int		yFindReplaceDlg;
-int		cxFindReplaceDlg;
-
-extern int cxStyleSelectDlg;
-extern int cyStyleSelectDlg;
-extern int cxStyleCustomizeDlg;
-extern int cyStyleCustomizeDlg;
+WindowPositionRecord positionRecord;
 
 static LPWSTR lpFileList[32];
 static int cFileList = 0;
@@ -5391,33 +5367,34 @@ void LoadSettings() noexcept {
 			wi.max	= section.GetBool(L"WindowMaximized", false);
 		}
 
-		cxRunDlg = section.GetInt(L"RunDlgSizeX", 0);
-		cxEncodingDlg = section.GetInt(L"EncodingDlgSizeX", 0);
-		cyEncodingDlg = section.GetInt(L"EncodingDlgSizeY", 0);
+		auto &record = positionRecord;
+		record.cxRunDlg = section.GetInt(L"RunDlgSizeX", 0);
+		record.cxEncodingDlg = section.GetInt(L"EncodingDlgSizeX", 0);
+		record.cyEncodingDlg = section.GetInt(L"EncodingDlgSizeY", 0);
 
-		cxFileMRUDlg = section.GetInt(L"FileMRUDlgSizeX", 0);
-		cyFileMRUDlg = section.GetInt(L"FileMRUDlgSizeY", 0);
-		cxOpenWithDlg = section.GetInt(L"OpenWithDlgSizeX", 0);
-		cyOpenWithDlg = section.GetInt(L"OpenWithDlgSizeY", 0);
-		cxFavoritesDlg = section.GetInt(L"FavoritesDlgSizeX", 0);
-		cyFavoritesDlg = section.GetInt(L"FavoritesDlgSizeY", 0);
-		cxAddFavoritesDlg = section.GetInt(L"AddFavoritesDlgSizeX", 0);
+		record.cxFileMRUDlg = section.GetInt(L"FileMRUDlgSizeX", 0);
+		record.cyFileMRUDlg = section.GetInt(L"FileMRUDlgSizeY", 0);
+		record.cxOpenWithDlg = section.GetInt(L"OpenWithDlgSizeX", 0);
+		record.cyOpenWithDlg = section.GetInt(L"OpenWithDlgSizeY", 0);
+		record.cxFavoritesDlg = section.GetInt(L"FavoritesDlgSizeX", 0);
+		record.cyFavoritesDlg = section.GetInt(L"FavoritesDlgSizeY", 0);
+		record.cxAddFavoritesDlg = section.GetInt(L"AddFavoritesDlgSizeX", 0);
 
-		cxModifyLinesDlg = section.GetInt(L"ModifyLinesDlgSizeX", 0);
-		cyModifyLinesDlg = section.GetInt(L"ModifyLinesDlgSizeY", 0);
-		cxEncloseSelectionDlg = section.GetInt(L"EncloseSelectionDlgSizeX", 0);
-		cyEncloseSelectionDlg = section.GetInt(L"EncloseSelectionDlgSizeY", 0);
-		cxInsertTagDlg = section.GetInt(L"InsertTagDlgSizeX", 0);
-		cyInsertTagDlg = section.GetInt(L"InsertTagDlgSizeY", 0);
+		record.cxModifyLinesDlg = section.GetInt(L"ModifyLinesDlgSizeX", 0);
+		record.cyModifyLinesDlg = section.GetInt(L"ModifyLinesDlgSizeY", 0);
+		record.cxEncloseSelectionDlg = section.GetInt(L"EncloseSelectionDlgSizeX", 0);
+		record.cyEncloseSelectionDlg = section.GetInt(L"EncloseSelectionDlgSizeY", 0);
+		record.cxInsertTagDlg = section.GetInt(L"InsertTagDlgSizeX", 0);
+		record.cyInsertTagDlg = section.GetInt(L"InsertTagDlgSizeY", 0);
 
-		xFindReplaceDlg = section.GetInt(L"FindReplaceDlgPosX", 0);
-		yFindReplaceDlg = section.GetInt(L"FindReplaceDlgPosY", 0);
-		cxFindReplaceDlg = section.GetInt(L"FindReplaceDlgSizeX", 0);
+		record.xFindReplaceDlg = section.GetInt(L"FindReplaceDlgPosX", 0);
+		record.yFindReplaceDlg = section.GetInt(L"FindReplaceDlgPosY", 0);
+		record.cxFindReplaceDlg = section.GetInt(L"FindReplaceDlgSizeX", 0);
 
-		cxStyleSelectDlg = section.GetInt(L"StyleSelectDlgSizeX", 0);
-		cyStyleSelectDlg = section.GetInt(L"StyleSelectDlgSizeY", 0);
-		cxStyleCustomizeDlg = section.GetInt(L"StyleCustomizeDlgSizeX", 0);
-		cyStyleCustomizeDlg = section.GetInt(L"StyleCustomizeDlgSizeY", 0);
+		record.cxStyleSelectDlg = section.GetInt(L"StyleSelectDlgSizeX", 0);
+		record.cyStyleSelectDlg = section.GetInt(L"StyleSelectDlgSizeY", 0);
+		record.cxStyleCustomizeDlg = section.GetInt(L"StyleCustomizeDlgSizeX", 0);
+		record.cyStyleCustomizeDlg = section.GetInt(L"StyleCustomizeDlgSizeY", 0);
 	}
 
 	section.Free();
@@ -5654,66 +5631,40 @@ void SaveWindowPosition(WCHAR *pIniSectionBuf) noexcept{
 	section.SetInt(L"WindowSizeY", wi.cy);
 	section.SetBoolEx(L"WindowMaximized", wi.max, false);
 
-	section.SetIntEx(L"RunDlgSizeX", cxRunDlg, 0);
-	section.SetIntEx(L"EncodingDlgSizeX", cxEncodingDlg, 0);
-	section.SetIntEx(L"EncodingDlgSizeY", cyEncodingDlg, 0);
+	const auto &record = positionRecord;
+	section.SetIntEx(L"RunDlgSizeX", record.cxRunDlg, 0);
+	section.SetIntEx(L"EncodingDlgSizeX", record.cxEncodingDlg, 0);
+	section.SetIntEx(L"EncodingDlgSizeY", record.cyEncodingDlg, 0);
 
-	section.SetIntEx(L"FileMRUDlgSizeX", cxFileMRUDlg, 0);
-	section.SetIntEx(L"FileMRUDlgSizeY", cyFileMRUDlg, 0);
-	section.SetIntEx(L"OpenWithDlgSizeX", cxOpenWithDlg, 0);
-	section.SetIntEx(L"OpenWithDlgSizeY", cyOpenWithDlg, 0);
-	section.SetIntEx(L"FavoritesDlgSizeX", cxFavoritesDlg, 0);
-	section.SetIntEx(L"FavoritesDlgSizeY", cyFavoritesDlg, 0);
-	section.SetIntEx(L"AddFavoritesDlgSizeX", cxAddFavoritesDlg, 0);
+	section.SetIntEx(L"FileMRUDlgSizeX", record.cxFileMRUDlg, 0);
+	section.SetIntEx(L"FileMRUDlgSizeY", record.cyFileMRUDlg, 0);
+	section.SetIntEx(L"OpenWithDlgSizeX", record.cxOpenWithDlg, 0);
+	section.SetIntEx(L"OpenWithDlgSizeY", record.cyOpenWithDlg, 0);
+	section.SetIntEx(L"FavoritesDlgSizeX", record.cxFavoritesDlg, 0);
+	section.SetIntEx(L"FavoritesDlgSizeY", record.cyFavoritesDlg, 0);
+	section.SetIntEx(L"AddFavoritesDlgSizeX", record.cxAddFavoritesDlg, 0);
 
-	section.SetIntEx(L"ModifyLinesDlgSizeX", cxModifyLinesDlg, 0);
-	section.SetIntEx(L"ModifyLinesDlgSizeY", cyModifyLinesDlg, 0);
-	section.SetIntEx(L"EncloseSelectionDlgSizeX", cxEncloseSelectionDlg, 0);
-	section.SetIntEx(L"EncloseSelectionDlgSizeY", cyEncloseSelectionDlg, 0);
-	section.SetIntEx(L"InsertTagDlgSizeX", cxInsertTagDlg, 0);
-	section.SetIntEx(L"InsertTagDlgSizeY", cyInsertTagDlg, 0);
+	section.SetIntEx(L"ModifyLinesDlgSizeX", record.cxModifyLinesDlg, 0);
+	section.SetIntEx(L"ModifyLinesDlgSizeY", record.cyModifyLinesDlg, 0);
+	section.SetIntEx(L"EncloseSelectionDlgSizeX", record.cxEncloseSelectionDlg, 0);
+	section.SetIntEx(L"EncloseSelectionDlgSizeY", record.cyEncloseSelectionDlg, 0);
+	section.SetIntEx(L"InsertTagDlgSizeX", record.cxInsertTagDlg, 0);
+	section.SetIntEx(L"InsertTagDlgSizeY", record.cyInsertTagDlg, 0);
 
-	section.SetIntEx(L"FindReplaceDlgPosX", xFindReplaceDlg, 0);
-	section.SetIntEx(L"FindReplaceDlgPosY", yFindReplaceDlg, 0);
-	section.SetIntEx(L"FindReplaceDlgSizeX", cxFindReplaceDlg, 0);
+	section.SetIntEx(L"FindReplaceDlgPosX", record.xFindReplaceDlg, 0);
+	section.SetIntEx(L"FindReplaceDlgPosY", record.yFindReplaceDlg, 0);
+	section.SetIntEx(L"FindReplaceDlgSizeX", record.cxFindReplaceDlg, 0);
 
-	section.SetIntEx(L"StyleSelectDlgSizeX", cxStyleSelectDlg, 0);
-	section.SetIntEx(L"StyleSelectDlgSizeY", cyStyleSelectDlg, 0);
-	section.SetIntEx(L"StyleCustomizeDlgSizeX", cxStyleCustomizeDlg, 0);
-	section.SetIntEx(L"StyleCustomizeDlgSizeY", cyStyleCustomizeDlg, 0);
+	section.SetIntEx(L"StyleSelectDlgSizeX", record.cxStyleSelectDlg, 0);
+	section.SetIntEx(L"StyleSelectDlgSizeY", record.cyStyleSelectDlg, 0);
+	section.SetIntEx(L"StyleCustomizeDlgSizeX", record.cxStyleCustomizeDlg, 0);
+	section.SetIntEx(L"StyleCustomizeDlgSizeY", record.cyStyleCustomizeDlg, 0);
 
 	SaveIniSection(sectionName, pIniSectionBuf);
 }
 
 void ClearWindowPositionHistory() noexcept {
-	cxRunDlg = 0;
-	cxEncodingDlg = 0;
-	cyEncodingDlg = 0;
-
-	cxFileMRUDlg = 0;
-	cyFileMRUDlg = 0;
-	cxOpenWithDlg = 0;
-	cyOpenWithDlg = 0;
-	cxFavoritesDlg = 0;
-	cyFavoritesDlg = 0;
-	cxAddFavoritesDlg = 0;
-
-	cxModifyLinesDlg = 0;
-	cyModifyLinesDlg = 0;
-	cxEncloseSelectionDlg = 0;
-	cyEncloseSelectionDlg = 0;
-	cxInsertTagDlg = 0;
-	cyInsertTagDlg = 0;
-
-	xFindReplaceDlg = 0;
-	yFindReplaceDlg = 0;
-	cxFindReplaceDlg = 0;
-
-	cxStyleSelectDlg = 0;
-	cyStyleSelectDlg = 0;
-	cxStyleCustomizeDlg = 0;
-	cyStyleCustomizeDlg = 0;
-
+	memset(&positionRecord, 0, sizeof(positionRecord));
 	IniDeleteAllSection(INI_SECTION_NAME_WINDOW_POSITION);
 }
 

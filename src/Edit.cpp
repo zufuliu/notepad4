@@ -47,10 +47,6 @@ extern DWORD dwLastIOError;
 extern HWND hDlgFindReplace;
 extern bool bReplaceInitialized;
 
-extern int xFindReplaceDlg;
-extern int yFindReplaceDlg;
-extern int cxFindReplaceDlg;
-
 extern int iDefaultEOLMode;
 extern bool bFixLineEndings;
 extern bool bAutoStripBlanks;
@@ -4757,7 +4753,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
-		ResizeDlg_InitX(hwnd, &cxFindReplaceDlg, IDC_RESIZEGRIP2);
+		ResizeDlg_InitX(hwnd, &positionRecord.cxFindReplaceDlg, IDC_RESIZEGRIP2);
 
 		HWND hwndFind = GetDlgItem(hwnd, IDC_FINDTEXT);
 		AddBackslashComboBoxSetup(hwndFind);
@@ -4830,10 +4826,10 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		}
 
 		if (!bSwitchedFindReplace) {
-			if (xFindReplaceDlg == 0 || yFindReplaceDlg == 0) {
+			if (positionRecord.xFindReplaceDlg == 0 || positionRecord.yFindReplaceDlg == 0) {
 				CenterDlgInParent(hwnd);
 			} else {
-				SetDlgPos(hwnd, xFindReplaceDlg, yFindReplaceDlg);
+				SetDlgPos(hwnd, positionRecord.xFindReplaceDlg, positionRecord.yFindReplaceDlg);
 			}
 		} else {
 			bSwitchedFindReplace = 0;
@@ -5211,12 +5207,12 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			break;
 
 			case IDC_SAVEPOSITION:
-				GetDlgPos(hwnd, &xFindReplaceDlg, &yFindReplaceDlg);
+				GetDlgPos(hwnd, &positionRecord.xFindReplaceDlg, &positionRecord.yFindReplaceDlg);
 				break;
 
 			case IDC_RESETPOSITION:
 				CenterDlgInParent(hwnd);
-				xFindReplaceDlg = yFindReplaceDlg = 0;
+				positionRecord.xFindReplaceDlg = positionRecord.yFindReplaceDlg = 0;
 				break;
 			}
 			break;
@@ -6120,13 +6116,6 @@ bool EditLineNumDlg(HWND hwnd) noexcept {
 // EditModifyLinesDlg()
 //
 //
-extern int cxModifyLinesDlg;
-extern int cyModifyLinesDlg;
-extern int cxEncloseSelectionDlg;
-extern int cyEncloseSelectionDlg;
-extern int cxInsertTagDlg;
-extern int cyInsertTagDlg;
-
 static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	static DWORD id_hover;
 	static DWORD id_capture;
@@ -6135,7 +6124,7 @@ static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		ResizeDlg_InitY2(hwnd, &cxModifyLinesDlg, &cyModifyLinesDlg, IDC_RESIZEGRIP2, IDC_MODIFY_LINE_PREFIX, IDC_MODIFY_LINE_APPEND);
+		ResizeDlg_InitY2(hwnd, &positionRecord.cxModifyLinesDlg, &positionRecord.cyModifyLinesDlg, IDC_RESIZEGRIP2, IDC_MODIFY_LINE_PREFIX, IDC_MODIFY_LINE_APPEND);
 
 		id_hover = 0;
 		id_capture = 0;
@@ -6373,7 +6362,7 @@ bool EditAlignDlg(HWND hwnd, EditAlignMode *piAlignMode) noexcept {
 static INT_PTR CALLBACK EditEncloseSelectionDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		ResizeDlg_InitY2(hwnd, &cxEncloseSelectionDlg, &cyEncloseSelectionDlg, IDC_RESIZEGRIP2, IDC_MODIFY_LINE_PREFIX, IDC_MODIFY_LINE_APPEND);
+		ResizeDlg_InitY2(hwnd, &positionRecord.cxEncloseSelectionDlg, &positionRecord.cyEncloseSelectionDlg, IDC_RESIZEGRIP2, IDC_MODIFY_LINE_PREFIX, IDC_MODIFY_LINE_APPEND);
 
 		MultilineEditSetup(hwnd, IDC_MODIFY_LINE_PREFIX);
 		SetDlgItemText(hwnd, IDC_MODIFY_LINE_PREFIX, wchPrefixSelection);
@@ -6439,7 +6428,7 @@ void EditEncloseSelectionDlg(HWND hwnd) noexcept {
 static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		ResizeDlg_InitY2(hwnd, &cxInsertTagDlg, &cyInsertTagDlg, IDC_RESIZEGRIP2, IDC_MODIFY_LINE_PREFIX, IDC_MODIFY_LINE_APPEND);
+		ResizeDlg_InitY2(hwnd, &positionRecord.cxInsertTagDlg, &positionRecord.cyInsertTagDlg, IDC_RESIZEGRIP2, IDC_MODIFY_LINE_PREFIX, IDC_MODIFY_LINE_APPEND);
 
 		MultilineEditSetup(hwnd, IDC_MODIFY_LINE_PREFIX);
 		MultilineEditSetup(hwnd, IDC_MODIFY_LINE_APPEND);
