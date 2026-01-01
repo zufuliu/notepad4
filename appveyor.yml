@@ -1,4 +1,4 @@
-version: '25.x.{build}'
+version: '26.x.{build}'
 
 image:
   - Visual Studio 2019
