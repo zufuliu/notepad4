@@ -218,11 +218,10 @@ INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) 
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP3, dx, 0, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, 0, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDCANCEL, dx, 0, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RUNDESC, dx, 0, SWP_NOMOVE);
+		hdwp = DeferCtlPosEx(hdwp, hwnd, IDC_RUNDESC, 0, 0, dx, 0);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_SEARCHEXE, dx, 0, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_COMMANDLINE, dx, 0, SWP_NOMOVE);
 		EndDeferWindowPos(hdwp);
-		InvalidateRect(GetDlgItem(hwnd, IDC_RUNDESC), nullptr, TRUE);
 	}
 	return TRUE;
 
@@ -387,10 +386,8 @@ INT_PTR CALLBACK GotoDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, 0, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDCANCEL, dx, 0, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_GOTO, dx, 0, SWP_NOMOVE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_GOTODESC, dx, 0, SWP_NOMOVE);
+		hdwp = DeferCtlPosEx(hdwp, hwnd, IDC_GOTODESC, 0, 0, dx, 0);
 		EndDeferWindowPos(hdwp);
-
-		InvalidateRect(GetDlgItem(hwnd, IDC_GOTODESC), nullptr, TRUE);
 	}
 	return TRUE;
 
@@ -1879,10 +1876,9 @@ INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 		hdwp = DeferCtlPos(hdwp, hwnd, IDCANCEL, dx, dy, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_OPENWITHDIR, dx, dy, SWP_NOMOVE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_GETOPENWITHDIR, 0, dy, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_OPENWITHDESCR, 0, dy, SWP_NOSIZE);
+		hdwp = DeferCtlPosEx(hdwp, hwnd, IDC_OPENWITHDESCR, 0, dy, dx, 0);
 		EndDeferWindowPos(hdwp);
 
-		ResizeDlgCtl(hwnd, IDC_OPENWITHDESCR, dx, 0);
 		ListView_SetColumnWidth(GetDlgItem(hwnd, IDC_OPENWITHDIR), 0, LVSCW_AUTOSIZE_USEHEADER);
 	}
 	return TRUE;
@@ -2121,10 +2117,9 @@ static INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP5, dx, 0, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, 0, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDCANCEL, dx, 0, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_FINDWINDESC, dx, 0, SWP_NOMOVE);
+		hdwp = DeferCtlPosEx(hdwp, hwnd, IDC_FINDWINDESC, 0, 0, dx, 0);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_WINTITLE, dx, 0, SWP_NOMOVE);
 		EndDeferWindowPos(hdwp);
-		InvalidateRect(GetDlgItem(hwnd, IDC_FINDWINDESC), nullptr, TRUE);
 	}
 	return TRUE;
 

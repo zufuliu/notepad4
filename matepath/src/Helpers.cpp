@@ -866,6 +866,15 @@ HDWP DeferCtlPos(HDWP hdwp, HWND hwndDlg, int nCtlId, int dx, int dy, UINT uFlag
 	return DeferWindowPos(hdwp, hwndCtl, nullptr, 0, 0, rc.right - rc.left + dx, rc.bottom - rc.top + dy, SWP_NOZORDER | SWP_NOMOVE);
 }
 
+HDWP DeferCtlPosEx(HDWP hdwp, HWND hwndDlg, int nCtlId, int dx, int dy, int cx, int cy) noexcept {
+	HWND hwndCtl = GetDlgItem(hwndDlg, nCtlId);
+	RECT rc;
+	GetWindowRect(hwndCtl, &rc);
+	MapWindowPoints(nullptr, hwndDlg, reinterpret_cast<LPPOINT>(&rc), 2);
+	InvalidateRect(hwndCtl, nullptr, TRUE);
+	return DeferWindowPos(hdwp, hwndCtl, nullptr, rc.left + dx, rc.top + dy, rc.right - rc.left + cx, rc.bottom - rc.top + cy, SWP_NOZORDER);
+}
+
 void ResizeDlgCtl(HWND hwndDlg, int nCtlId, int dx, int dy) noexcept {
 	HWND hwndCtl = GetDlgItem(hwndDlg, nCtlId);
 	RECT rc;
