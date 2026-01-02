@@ -802,7 +802,7 @@ static LRESULT CALLBACK ResizeDlg_Proc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 		rect.top = 0;
 		rect.right = MulDiv(pm->templateSize.cx, baseUnit.cx, DlgBaseUnit.cx);
 		rect.bottom = MulDiv(pm->templateSize.cy, baseUnit.cy, DlgBaseUnit.cy);
-		AdjustWindowRectForDpi(&rect, GetWindowStyle(hwnd), GetWindowExStyle(hwnd), dpi);
+		AdjustWindowRectForDpi(&rect, GetWindowStyle(hwnd), GetWindowExStyle(hwnd), pm->dpi);
 		pm->minTrackSize.x = rect.right - rect.left;
 		pm->minTrackSize.y = rect.bottom - rect.top;
 
@@ -813,13 +813,15 @@ static LRESULT CALLBACK ResizeDlg_Proc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 	} break;
 
 	case WM_DESTROY: {
-		RECT rc;
-		GetWindowRect(hwnd, &rc);
+		RECT rc = {DlgBaseUnit.cx, DlgBaseUnit.cy, 0, 0};
+		MapDialogRect(hwnd, &rc);
 		if (pm->cxFrame != nullptr) {
-			*pm->cxFrame = rc.right - rc.left;
+			const int cx = MulDiv(pm->client.cx, DlgBaseUnit.cx, rc.left);
+			*pm->cxFrame = (cx <= pm->templateSize.cx) ? 0 : cx;
 		}
 		if (pm->cyFrame != nullptr) {
-			*pm->cyFrame = rc.bottom - rc.top;
+			const int cy = MulDiv(pm->client.cy, DlgBaseUnit.cy, rc.top);
+			*pm->cyFrame = (cy <= pm->templateSize.cy) ? 0 : cy;
 		}
 		RemoveWindowSubclass(hwnd, ResizeDlg_Proc, uIdSubclass);
 		RemoveProp(hwnd, RESIZEDLG_PROP_KEY);
@@ -858,11 +860,15 @@ void ResizeDlg_InitEx(HWND hwnd, int *cxFrame, int *cyFrame, int nIdGrip) noexce
 
 	if (cxFrame != nullptr) {
 		pm->cxFrame = cxFrame;
-		cx = max(*cxFrame, cx);
+		if (*cxFrame > pm->templateSize.cx) {
+			cx = cx - pm->client.cx + MulDiv(*cxFrame, baseUnit.cx, DlgBaseUnit.cx);
+		}
 	}
 	if (cyFrame != nullptr) {
 		pm->cyFrame = cyFrame;
-		cy = max(*cyFrame, cy);
+		if (*cyFrame > pm->templateSize.cy) {
+			cy = cy - pm->client.cy + MulDiv(*cyFrame, baseUnit.cy, DlgBaseUnit.cy);
+		}
 	}
 
 	SetProp(hwnd, RESIZEDLG_PROP_KEY, pm);
@@ -878,7 +884,7 @@ void ResizeDlg_InitEx(HWND hwnd, int *cxFrame, int *cyFrame, int nIdGrip) noexce
 #endif
 
 	HWND hwndCtl = GetDlgItem(hwnd, nIdGrip);
-	const int cGrip = SystemMetricsForDpi(SM_CXHTHUMB, dpi);
+	const int cGrip = SystemMetricsForDpi(SM_CXHTHUMB, pm->dpi);
 	SetWindowPos(hwndCtl, nullptr, pm->client.cx - cGrip, pm->client.cy - cGrip, cGrip, cGrip, SWP_NOZORDER);
 }
 
