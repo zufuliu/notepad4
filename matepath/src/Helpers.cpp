@@ -721,6 +721,8 @@ void SetDlgPos(HWND hDlg, int xDlg, int yDlg) noexcept {
 namespace {
 
 #define RESIZEDLG_PROP_KEY	L"ResizeDlg"
+// https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getdialogbaseunits
+constexpr SIZE DlgBaseUnit = {4, 8};
 
 struct RESIZEDLG {
 	BOOL dpiChanged;
@@ -729,8 +731,27 @@ struct RESIZEDLG {
 	int *cyFrame;
 	SIZE client;
 	POINT minTrackSize;
+	SIZE templateSize;
 };
 
+}
+
+void GetDialogBaseUnitForDPI(HWND hwnd, UINT dpi, UINT old, SIZE &baseUnit) noexcept {
+	HFONT font = GetWindowFont(hwnd);
+	LOGFONT lf;
+	GetObject(font, sizeof(lf), &lf);
+	lf.lfHeight = MulDiv(lf.lfHeight, dpi, old);
+	font = CreateFontIndirect(&lf);
+	HDC hdc = GetDC(hwnd);
+	HFONT oldFont = SelectFont(hdc, font);
+	// this implements GdiGetCharDimensions() which system used to calculate dialog base unit, see also MFC CDialogTemplate class
+	// wsvAllAlpha is same as SurfaceD2D::AverageCharWidth()
+	constexpr const wchar_t * const wsvAllAlpha = L"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	GetTextExtentPoint32(hdc, wsvAllAlpha, 52, &baseUnit);
+	baseUnit.cx = (baseUnit.cx + 26)/52U;
+	SelectFont(hdc, oldFont);
+	ReleaseDC(hwnd, hdc);
+	DeleteObject(font);
 }
 
 static LRESULT CALLBACK ResizeDlg_Proc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData) noexcept {
@@ -739,8 +760,11 @@ static LRESULT CALLBACK ResizeDlg_Proc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 	switch (umsg) {
 	case WM_SIZE:
 		if (pm->dpiChanged) {
-			// skip first WM_SIZE message after WM_DPICHANGED, dialog control already has correct layout
+			// skip first WM_SIZE message during WM_DPICHANGED, dialog control already has correct layout
+			// until end of WM_DPICHANGED block, pm->client contains outdated value
 			pm->dpiChanged = FALSE;
+			pm->client.cx = LOWORD(lParam);
+			pm->client.cy = HIWORD(lParam);
 			return TRUE;
 		}
 		break;
@@ -764,11 +788,17 @@ static LRESULT CALLBACK ResizeDlg_Proc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 		pm->dpiChanged = TRUE;
 		pm->dpi = dpi;
 		// convert all dimension to current dpi
-		int * const ptr = reinterpret_cast<int *>(pm);
-		constexpr unsigned start = offsetof(RESIZEDLG, client)/sizeof(int);
-		for (unsigned i = start; i < sizeof(RESIZEDLG)/sizeof(int); i++) {
-			ptr[i] = MulDiv(ptr[i], dpi, old);
-		}
+		SIZE baseUnit {};
+		GetDialogBaseUnitForDPI(hwnd, dpi, old, baseUnit);
+		// can't linear resize pm->client as that may not fit into work area of new monitor
+		RECT rect;
+		rect.left = 0;
+		rect.top = 0;
+		rect.right = MulDiv(pm->templateSize.cx, baseUnit.cx, DlgBaseUnit.cx);
+		rect.bottom = MulDiv(pm->templateSize.cy, baseUnit.cy, DlgBaseUnit.cy);
+		AdjustWindowRectForDpi(&rect, GetWindowStyle(hwnd), GetWindowExStyle(hwnd), dpi);
+		pm->minTrackSize.x = rect.right - rect.left;
+		pm->minTrackSize.y = rect.bottom - rect.top;
 
 		const RECT * const rc = AsPointer<RECT *>(lParam);
 		const int cx = rc->right - rc->left;
@@ -802,12 +832,17 @@ void ResizeDlg_InitEx(HWND hwnd, int *cxFrame, int *cyFrame, int nIdGrip) noexce
 	RESIZEDLG * const pm = static_cast<RESIZEDLG *>(NP2HeapAlloc(sizeof(RESIZEDLG)));
 	pm->dpi = dpi;
 
-	RECT rc;
+	RECT rc = {DlgBaseUnit.cx, DlgBaseUnit.cy, 0, 0};
+	MapDialogRect(hwnd, &rc);
+	const SIZE baseUnit = {rc.left, rc.top};
+
 	GetClientRect(hwnd, &rc);
 	int cx = rc.right - rc.left;
 	int cy = rc.bottom - rc.top;
 	pm->client.cx = cx;
 	pm->client.cy = cy;
+	pm->templateSize.cx = MulDiv(cx, DlgBaseUnit.cx, baseUnit.cx);
+	pm->templateSize.cy = MulDiv(cy, DlgBaseUnit.cy, baseUnit.cy);
 
 	GetWindowRect(hwnd, &rc);
 	cx = rc.right - rc.left;
