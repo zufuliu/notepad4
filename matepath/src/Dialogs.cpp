@@ -210,9 +210,7 @@ INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) 
 		return FALSE;
 
 	case WM_SIZE: {
-		int dx;
-
-		ResizeDlg_Size(hwnd, lParam, &dx, nullptr);
+		const int dx = GET_X_LPARAM(lParam);
 		HDWP hdwp = BeginDeferWindowPos(6);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP3, dx, 0, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, 0, SWP_NOSIZE);
@@ -375,10 +373,7 @@ INT_PTR CALLBACK GotoDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 	return TRUE;
 
 	case WM_SIZE: {
-		int dx;
-
-		ResizeDlg_Size(hwnd, lParam, &dx, nullptr);
-
+		const int dx = GET_X_LPARAM(lParam);
 		HDWP hdwp = BeginDeferWindowPos(5);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP, dx, 0, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, 0, SWP_NOSIZE);
@@ -1370,9 +1365,7 @@ INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 		return FALSE;
 
 	case WM_SIZE: {
-		int dx;
-
-		ResizeDlg_Size(hwnd, lParam, &dx, nullptr);
+		const int dx = GET_X_LPARAM(lParam);
 		HDWP hdwp = BeginDeferWindowPos(5);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP3, dx, 0, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, 0, SWP_NOSIZE);
@@ -1532,9 +1525,7 @@ INT_PTR CALLBACK RenameFileDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 	return TRUE;
 
 	case WM_SIZE: {
-		int dx;
-
-		ResizeDlg_Size(hwnd, lParam, &dx, nullptr);
+		const int dx = GET_X_LPARAM(lParam);
 		HDWP hdwp = BeginDeferWindowPos(5);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP2, dx, 0, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, 0, SWP_NOSIZE);
@@ -1670,9 +1661,7 @@ INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 		return FALSE;
 
 	case WM_SIZE: {
-		int dx;
-
-		ResizeDlg_Size(hwnd, lParam, &dx, nullptr);
+		const int dx = GET_X_LPARAM(lParam);
 		HDWP hdwp = BeginDeferWindowPos(7);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP5, dx, 0, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, 0, SWP_NOSIZE);
@@ -1855,11 +1844,8 @@ INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 		return FALSE;
 
 	case WM_SIZE: {
-		int dx;
-		int dy;
-
-		ResizeDlg_Size(hwnd, lParam, &dx, &dy);
-
+		const int dx = GET_X_LPARAM(lParam);
+		const int dy = GET_Y_LPARAM(lParam);
 		HDWP hdwp = BeginDeferWindowPos(6);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP3, dx, dy, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, dy, SWP_NOSIZE);
@@ -2022,9 +2008,7 @@ INT_PTR CALLBACK NewDirDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPara
 	return TRUE;
 
 	case WM_SIZE: {
-		int dx;
-
-		ResizeDlg_Size(hwnd, lParam, &dx, nullptr);
+		const int dx = GET_X_LPARAM(lParam);
 		HDWP hdwp = BeginDeferWindowPos(4);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP, dx, 0, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, 0, SWP_NOSIZE);
@@ -2099,9 +2083,7 @@ static INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 		return TRUE;
 
 	case WM_SIZE: {
-		int dx;
-
-		ResizeDlg_Size(hwnd, lParam, &dx, nullptr);
+		const int dx = GET_X_LPARAM(lParam);
 		HDWP hdwp = BeginDeferWindowPos(5);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP5, dx, 0, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, 0, SWP_NOSIZE);
@@ -2322,9 +2304,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 		return FALSE;
 
 	case WM_SIZE: {
-		int dx;
-
-		ResizeDlg_Size(hwnd, lParam, &dx, nullptr);
+		const int dx = GET_X_LPARAM(lParam);
 		HDWP hdwp = BeginDeferWindowPos(8);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP4, dx, 0, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, 0, SWP_NOSIZE);

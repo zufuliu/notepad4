@@ -1031,16 +1031,21 @@ static LRESULT CALLBACK ResizeDlg_Proc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 	RESIZEDLG * const pm = AsPointer<RESIZEDLG *>(dwRefData);
 
 	switch (umsg) {
-	case WM_SIZE:
+	case WM_SIZE: {
+		const int cx = LOWORD(lParam);
+		const int cy = HIWORD(lParam);
+		const int dx = cx - pm->client.cx;
+		const int dy = cy - pm->client.cy;
+		lParam = MAKELPARAM(dx, dy); // unpack with GET_X_LPARAM() and GET_Y_LPARAM()
+		pm->client.cx = cx;
+		pm->client.cy = cy;
 		if (pm->dpiChanged) {
 			// skip first WM_SIZE message during WM_DPICHANGED, dialog control already has correct layout
 			// until end of WM_DPICHANGED block, pm->client contains outdated value
 			pm->dpiChanged = FALSE;
-			pm->client.cx = LOWORD(lParam);
-			pm->client.cy = HIWORD(lParam);
 			return TRUE;
 		}
-		break;
+	} break;
 
 	case WM_GETMINMAXINFO: {
 		LPMINMAXINFO pmmi = AsPointer<LPMINMAXINFO>(lParam);
@@ -1062,6 +1067,7 @@ static LRESULT CALLBACK ResizeDlg_Proc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 		pm->dpi = dpi;
 		// convert all dimension to current dpi
 		SIZE baseUnit {};
+		// at this time font on the dialog is still unchanged, otherwise we can use MapDialogRect() to get new base unit
 		GetDialogBaseUnitForDPI(hwnd, dpi, old, baseUnit);
 		pm->itemMinSize[0] = MulDiv(pm->itemTemplateSize[0], baseUnit.cy, DlgBaseUnit.cy);
 		pm->itemMinSize[1] = MulDiv(pm->itemTemplateSize[1], baseUnit.cy, DlgBaseUnit.cy);
@@ -1158,20 +1164,6 @@ void ResizeDlg_InitEx(HWND hwnd, int *cxFrame, int *cyFrame, int nIdGrip, DWORD 
 	HWND hwndCtl = GetDlgItem(hwnd, nIdGrip);
 	const int cGrip = SystemMetricsForDpi(SM_CXHTHUMB, dpi);
 	SetWindowPos(hwndCtl, nullptr, pm->client.cx - cGrip, pm->client.cy - cGrip, cGrip, cGrip, SWP_NOZORDER);
-}
-
-void ResizeDlg_Size(HWND hwnd, LPARAM lParam, int *dx, int *dy) noexcept {
-	RESIZEDLG * const pm = static_cast<RESIZEDLG *>(GetProp(hwnd, RESIZEDLG_PROP_KEY));
-	const int cxClient = LOWORD(lParam);
-	const int cyClient = HIWORD(lParam);
-	if (dx) {
-		*dx = cxClient - pm->client.cx;
-	}
-	if (dy) {
-		*dy = cyClient - pm->client.cy;
-	}
-	pm->client.cx = cxClient;
-	pm->client.cy = cyClient;
 }
 
 int ResizeDlg_CalcDeltaEx(HWND hwnd, int dy, int cy, DWORD nCtlId) noexcept {

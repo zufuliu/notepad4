@@ -4297,10 +4297,8 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 	return FALSE;
 
 	case WM_SIZE: {
-		int dx;
-		int dy;
-
-		ResizeDlg_Size(hwnd, lParam, &dx, &dy);
+		const int dx = GET_X_LPARAM(lParam);
+		const int dy = GET_Y_LPARAM(lParam);
 		const int cy = ResizeDlg_CalcDeltaY2(hwnd, dy, 50, IDC_STYLEEDIT, IDC_STYLEVALUE_DEFAULT);
 		HDWP hdwp = BeginDeferWindowPos(19);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP3, dx, dy, SWP_NOSIZE);
@@ -5098,10 +5096,8 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 	return TRUE;
 
 	case WM_SIZE: {
-		int dx;
-		int dy;
-
-		ResizeDlg_Size(hwnd, lParam, &dx, &dy);
+		const int dx = GET_X_LPARAM(lParam);
+		const int dy = GET_Y_LPARAM(lParam);
 		HDWP hdwp = BeginDeferWindowPos(6);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP3, dx, dy, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, dy, SWP_NOSIZE);

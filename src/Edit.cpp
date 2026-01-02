@@ -4880,10 +4880,8 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		return FALSE;
 
 	case WM_SIZE: {
-		int dx;
-
+		const int dx = GET_X_LPARAM(lParam);
 		const bool isReplace = GetDlgItem(hwnd, IDC_REPLACETEXT) != nullptr;
-		ResizeDlg_Size(hwnd, lParam, &dx, nullptr);
 		HDWP hdwp = BeginDeferWindowPos(isReplace ? 13 : 9);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP2, dx, 0, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, 0, SWP_NOSIZE);
@@ -6151,10 +6149,8 @@ static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		return FALSE;
 
 	case WM_SIZE: {
-		int dx;
-		int dy;
-
-		ResizeDlg_Size(hwnd, lParam, &dx, &dy);
+		const int dx = GET_X_LPARAM(lParam);
+		const int dy = GET_Y_LPARAM(lParam);
 		const int cy = ResizeDlg_CalcDeltaY2(hwnd, dy, 50, IDC_MODIFY_LINE_PREFIX, IDC_MODIFY_LINE_APPEND);
 		HDWP hdwp = BeginDeferWindowPos(15);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP2, dx, dy, SWP_NOSIZE);
@@ -6373,10 +6369,8 @@ static INT_PTR CALLBACK EditEncloseSelectionDlgProc(HWND hwnd, UINT umsg, WPARAM
 	return TRUE;
 
 	case WM_SIZE: {
-		int dx;
-		int dy;
-
-		ResizeDlg_Size(hwnd, lParam, &dx, &dy);
+		const int dx = GET_X_LPARAM(lParam);
+		const int dy = GET_Y_LPARAM(lParam);
 		const int cy = ResizeDlg_CalcDeltaY2(hwnd, dy, 50, IDC_MODIFY_LINE_PREFIX, IDC_MODIFY_LINE_APPEND);
 		HDWP hdwp = BeginDeferWindowPos(6);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP2, dx, dy, SWP_NOSIZE);
@@ -6442,10 +6436,8 @@ static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam
 	return FALSE;
 
 	case WM_SIZE: {
-		int dx;
-		int dy;
-
-		ResizeDlg_Size(hwnd, lParam, &dx, &dy);
+		const int dx = GET_X_LPARAM(lParam);
+		const int dy = GET_Y_LPARAM(lParam);
 		const int cy = ResizeDlg_CalcDeltaY2(hwnd, dy, 75, IDC_MODIFY_LINE_PREFIX, IDC_MODIFY_LINE_APPEND);
 		HDWP hdwp = BeginDeferWindowPos(6);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP2, dx, dy, SWP_NOSIZE);
