@@ -2818,7 +2818,7 @@ bool Document::RemoveWatcher(DocWatcher *watcher, void *userData) noexcept {
 	try {
 		// This can never fail as WatcherWithUserData constructor and == are noexcept
 		// but std::find is not noexcept.
-		auto it = std::find(watchers.begin(), watchers.end(), WatcherWithUserData(watcher, userData));
+		const auto it = std::find(watchers.begin(), watchers.end(), WatcherWithUserData(watcher, userData));
 		if (it != watchers.end()) {
 			watchers.erase(it);
 			return true;

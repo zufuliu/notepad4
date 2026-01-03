@@ -6187,11 +6187,11 @@ void Editor::SetSelectionNMessage(Message iMessage, uptr_t wParam, sptr_t lParam
 		break;
 
 	case Message::SetSelectionNStart:
-		sel.Range(wParam).anchor.SetPosition(lParam);
+		sel.Range(wParam).StartSet(SelectionPosition(lParam));
 		break;
 
 	case Message::SetSelectionNEnd:
-		sel.Range(wParam).caret.SetPosition(lParam);
+		sel.Range(wParam).EndSet(SelectionPosition(lParam));
 		break;
 
 	default:

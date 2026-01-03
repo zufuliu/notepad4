@@ -39,7 +39,7 @@ using ColourOptional = std::optional<ColourRGBA>;
 
 constexpr int GetFontSizeZoomed(int size, int zoomLevel) noexcept {
 	size = (size * zoomLevel + 50) / 100;
-	// May fail if sizeZoomed (in point) < 1
+	// ensure sizeZoomed at least minimum positive size
 	return std::max(size, Scintilla::FontSizeMultiplier);
 }
 

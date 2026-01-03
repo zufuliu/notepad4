@@ -655,13 +655,14 @@ HCURSOR LoadReverseArrowCursor(HCURSOR cursor, UINT dpi) noexcept {
 	COLORREF strokeColour = RGB(0, 0, 1);
 	status = ::RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Accessibility", 0, KEY_QUERY_VALUE, &hKey);
 	if (status == ERROR_SUCCESS) {
+		constexpr DWORD customColour = 6;
 		if (auto cursorType = RegGetDWORD(hKey, L"CursorType")) {
 			switch (*cursorType) {
 			case 1: // black
 			case 4: // black
 				std::swap(fillColour, strokeColour);
 				break;
-			case 6: // custom
+			case customColour: // custom
 				if (auto cursorColor = RegGetDWORD(hKey, L"CursorColor")) {
 					fillColour = *cursorColor;
 				}
@@ -786,20 +787,26 @@ unsigned int Platform::DoubleClickTime() noexcept {
 //#define TRACE
 
 #ifdef TRACE
+namespace {
+
+bool assertionPopUps = true;
+
+constexpr size_t lengthDiagnostic = 2000;
+
+}
+
 void Platform::DebugDisplay(const char *s) noexcept {
 	::OutputDebugStringA(s);
 }
 
 void Platform::DebugPrintf(const char *format, ...) noexcept {
-	char buffer[2000];
+	char buffer[lengthDiagnostic];
 	va_list pArguments;
 	va_start(pArguments, format);
 	vsprintf(buffer, format, pArguments);
 	va_end(pArguments);
 	Platform::DebugDisplay(buffer);
 }
-
-static bool assertionPopUps = true;
 
 bool Platform::ShowAssertionPopUps(bool assertionPopUps_) noexcept {
 	const bool ret = assertionPopUps;
@@ -808,7 +815,7 @@ bool Platform::ShowAssertionPopUps(bool assertionPopUps_) noexcept {
 }
 
 void Platform::Assert(const char *c, const char *file, int line) noexcept {
-	char buffer[2000]{};
+	char buffer[lengthDiagnostic]{};
 	sprintf(buffer, "Assertion [%s] failed at %s %d%s", c, file, line, assertionPopUps ? "" : "\r\n");
 	if (assertionPopUps) {
 		const int idButton = ::MessageBoxA({}, buffer, "Assertion failure",

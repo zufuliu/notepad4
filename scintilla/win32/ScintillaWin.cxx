@@ -151,7 +151,7 @@ constexpr Point PointFromLParam(LPARAM lParam) noexcept {
 }
 
 inline bool KeyboardIsKeyDown(int key) noexcept {
-	return (::GetKeyState(key) & 0x8000) != 0;
+	return ::GetKeyState(key) < 0;
 }
 
 // Bit 24 is the extended keyboard flag and the numeric keypad is non-extended
@@ -971,7 +971,9 @@ bool ScintillaWin::UpdateRenderingParams(bool force) noexcept {
 		UINT clearTypeContrast = 0;
 		if (SUCCEEDED(hr) && monitorRenderingParams &&
 			::SystemParametersInfo(SPI_GETFONTSMOOTHINGCONTRAST, 0, &clearTypeContrast, 0) != 0) {
-			if (clearTypeContrast >= 1000 && clearTypeContrast <= 2200) {
+			constexpr UINT minContrast = 1000;
+			constexpr UINT maxContrast = 2200;
+			if (clearTypeContrast >= minContrast && clearTypeContrast <= maxContrast) {
 				const FLOAT gamma = static_cast<FLOAT>(clearTypeContrast) / 1000.0f;
 				pIDWriteFactory->CreateCustomRenderingParams(gamma,
 					monitorRenderingParams->GetEnhancedContrast(),
