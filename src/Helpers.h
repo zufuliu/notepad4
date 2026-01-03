@@ -542,7 +542,7 @@ LSTATUS Registry_DeleteTree(HKEY hKey, LPCWSTR lpSubKey) noexcept;
 #endif
 
 inline bool KeyboardIsKeyDown(int key) noexcept {
-	return (GetKeyState(key) & 0x8000) != 0;
+	return GetKeyState(key) < 0;
 }
 
 #define WaitableTimer_IdleTaskTimeSlot		100

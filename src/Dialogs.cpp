@@ -2535,7 +2535,8 @@ struct INFOBOX {
 	LPWSTR lpstrMessage;
 	LPCWSTR lpstrSetting;
 	HICON hIcon;
-	bool   bDisableCheckBox;
+	UINT uType;
+	bool bDisableCheckBox;
 };
 
 enum SuppressMmessage {
@@ -2551,11 +2552,25 @@ INT_PTR CALLBACK InfoBoxDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 		const INFOBOX * const lpib = AsPointer<const INFOBOX *>(lParam);
 
 		SendDlgItemMessage(hwnd, IDC_INFOBOXICON, STM_SETICON, AsInteger<WPARAM>(lpib->hIcon), 0);
+		HWND hwndOK = GetDlgItem(hwnd, IDOK);
+		HWND hwndCancel = GetDlgItem(hwnd, IDCANCEL);
+		if (lpib->uType != MB_YESNO) {
+			if (lpib->uType == MB_OK) {
+				RECT rc;
+				GetWindowRect(hwndCancel, &rc);
+				DestroyWindow(hwndCancel);
+				MapWindowPoints(nullptr, hwnd, reinterpret_cast<LPPOINT>(&rc), 2);
+				SetWindowPos(hwndOK, nullptr, rc.left, rc.top, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+			}
+			hwndOK = GetDlgItem(hwnd, IDYES);
+			hwndCancel = GetDlgItem(hwnd, IDNO);
+		}
+		DestroyWindow(hwndOK);
+		DestroyWindow(hwndCancel);
 		SetDlgItemText(hwnd, IDC_INFOBOXTEXT, lpib->lpstrMessage);
 		if (lpib->bDisableCheckBox) {
 			EnableWindow(GetDlgItem(hwnd, IDC_INFOBOXCHECK), FALSE);
 		}
-		NP2HeapFree(lpib->lpstrMessage);
 		CenterDlgInParent(hwnd);
 	}
 	return TRUE;
@@ -2607,37 +2622,71 @@ INT_PTR InfoBox(UINT uType, LPCWSTR lpstrSetting, UINT uidMessage, ...) noexcept
 	WCHAR wchFormat[512];
 	GetString(uidMessage, wchFormat, COUNTOF(wchFormat));
 
-	INFOBOX ib;
-	ib.lpstrMessage = static_cast<LPWSTR>(NP2HeapAlloc(1024 * sizeof(WCHAR)));
-
+	WCHAR lpstrMessage[1024];
 	va_list va;
 	va_start(va, uidMessage);
-	wvsprintf(ib.lpstrMessage, wchFormat, va);
+	// UINT len = wvsprintf(lpstrMessage, wchFormat, va);
+	wvsprintf(lpstrMessage, wchFormat, va);
 	va_end(va);
 
+	INFOBOX ib;
+	ib.lpstrMessage = lpstrMessage;
 	ib.lpstrSetting = lpstrSetting;
+	ib.uType = uType;
 
-#if 0//_WIN32_WINNT >= _WIN32_WINNT_VISTA
-	SHSTOCKICONINFO sii;
-	sii.cbSize = sizeof(SHSTOCKICONINFO);
-	sii.hIcon = nullptr;
-	const SHSTOCKICONID siid = (icon == MB_ICONINFORMATION) ? SIID_INFO : ((icon == MB_ICONQUESTION) ? SIID_HELP : SIID_WARNING);
-	SHGetStockIconInfo(siid, SHGSI_ICON, &sii); //! not implemented in Wine
-	ib.hIcon = sii.hIcon;
-#else
+	HICON hIcon = nullptr;
 	LPCWSTR lpszIcon = (icon == MB_ICONINFORMATION) ? IDI_INFORMATION : ((icon == MB_ICONQUESTION) ? IDI_QUESTION : IDI_EXCLAMATION);
-	ib.hIcon = LoadIcon(nullptr, lpszIcon);
-#endif
+	HWND hwnd = GetMsgBoxParent();
+	const UINT dpi = GetWindowDPI(hwnd);
+	const int size = SystemMetricsForDpi(SM_CXICON, dpi);
+	LoadIconWithScaleDown(nullptr, lpszIcon, size, size, &hIcon);
+	ib.hIcon = hIcon ? hIcon : LoadIcon(nullptr, lpszIcon); // old standard icon
 
 	ib.bDisableCheckBox = StrIsEmpty(szIniFile) || StrIsEmpty(lpstrSetting) || iMode == SuppressMmessage_Never;
-
-	const WORD idDlg = (uType == MB_YESNO) ? IDD_INFOBOX_YESNO : ((uType == MB_OKCANCEL) ? IDD_INFOBOX_OKCANCEL : IDD_INFOBOX_OK);
-	HWND hwnd = GetMsgBoxParent();
 	MessageBeep(MB_ICONEXCLAMATION);
-	const INT_PTR result = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(idDlg), hwnd, InfoBoxDlgProc, AsInteger<LPARAM>(&ib));
-#if 0//_WIN32_WINNT >= _WIN32_WINNT_VISTA
-	DestroyIcon(sii.hIcon);
-#endif
+	const INT_PTR result = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_INFOBOX), hwnd, InfoBoxDlgProc, AsInteger<LPARAM>(&ib));
+	DestroyIcon(hIcon);
+
+#if 0// task dialog
+	// pad message to multiline to make the dialog looks better
+	lpstrMessage[len++] = '\r';
+	lpstrMessage[len++] = '\n';
+	lpstrMessage[len++] = '\0';
+
+	TASKDIALOGCONFIG config {};
+	config.cbSize = sizeof(TASKDIALOGCONFIG);
+	config.hwndParent = GetMsgBoxParent();
+	config.hInstance = g_hInstance;
+	config.dwFlags = TDF_ALLOW_DIALOG_CANCELLATION | TDF_POSITION_RELATIVE_TO_WINDOW;
+	config.cxWidth = 200; // in dialog unit
+	config.pszWindowTitle = MAKEINTRESOURCE(IDS_APPTITLE);
+	config.pszContent = lpstrMessage;
+	// checkbox and verification text seems not center aligned
+	// config.pszVerificationText = MAKEINTRESOURCE(IDS_DONT_SHOW_AGAIN);
+	config.pszVerificationText = L"&Don't show this message again.";
+	config.dwCommonButtons = (uType == MB_YESNO) ? (TDCBF_YES_BUTTON | TDCBF_NO_BUTTON) : ((uType == MB_OKCANCEL) ? (TDCBF_OK_BUTTON | TDCBF_CANCEL_BUTTON) : TDCBF_OK_BUTTON);
+	HICON hMainIcon = nullptr;
+	if (icon != MB_ICONQUESTION) {
+		config.pszMainIcon = (icon == MB_ICONEXCLAMATION) ? TD_WARNING_ICON : TD_INFORMATION_ICON;
+	} else {
+		config.dwFlags |= TDF_USE_HICON_MAIN;
+		const UINT dpi = GetWindowDPI(config.hwndParent);
+		const int size = SystemMetricsForDpi(SM_CXICON, dpi);
+		LoadIconWithScaleDown(nullptr, IDI_QUESTION, size, size, &hMainIcon);
+		config.hMainIcon = hMainIcon ? hMainIcon : LoadIcon(nullptr, IDI_QUESTION); // old standard icon
+	}
+
+	int result = 0;
+	BOOL checked = FALSE;
+	const bool bDisableCheckBox = StrIsEmpty(szIniFile) || StrIsEmpty(lpstrSetting) || iMode == SuppressMmessage_Never;
+	MessageBeep(MB_ICONEXCLAMATION);
+	TaskDialogIndirect(&config, &result, nullptr, (bDisableCheckBox ? nullptr : &checked));
+	DestroyIcon(hMainIcon);
+	if (checked) {
+		IniSetBool(INI_SECTION_NAME_SUPPRESSED_MESSAGES, lpstrSetting, true);
+	}
+#endif // task dialog
+
 	return result;
 }
 
