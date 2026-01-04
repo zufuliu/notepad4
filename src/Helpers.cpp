@@ -1084,7 +1084,10 @@ static LRESULT CALLBACK ResizeDlg_Proc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 		const RECT * const rc = AsPointer<RECT *>(lParam);
 		const int cx = rc->right - rc->left;
 		const int cy = rc->bottom - rc->top;
+		// cx, cy and non-client size from above adjusted rect can be used to calculate pm->client
 		SetWindowPos(hwnd, nullptr, rc->left, rc->top, cx, cy, SWP_NOZORDER | SWP_NOACTIVATE);
+		// pm->client is same or already updated in WM_SIZE message
+		pm->dpiChanged = FALSE; // see MsgDPIChanged(), no WM_SIZE when dpi is same on Windows 8.1
 	} break;
 
 	case WM_DESTROY: {
