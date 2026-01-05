@@ -2490,7 +2490,7 @@ void LoadSettings() noexcept {
 			CoTaskMemFree(pszPath);
 		}
 	} else {
-		PathAbsoluteFromApp(strValue, tchOpenWithDir, true);
+		PathAbsoluteFromApp(strValue, tchOpenWithDir);
 	}
 
 	strValue = section.GetValue(L"Favorites");
@@ -2501,7 +2501,7 @@ void LoadSettings() noexcept {
 			CoTaskMemFree(pszPath);
 		}
 	} else {
-		PathAbsoluteFromApp(strValue, tchFavoritesDir, true);
+		PathAbsoluteFromApp(strValue, tchFavoritesDir);
 	}
 
 	strValue = section.GetValue(L"Quikview.exe");
@@ -2510,7 +2510,7 @@ void LoadSettings() noexcept {
 		PathAddBackslash(szQuickview);
 		lstrcat(szQuickview, L"Viewers\\Quikview.exe");
 	} else {
-		PathAbsoluteFromApp(strValue, szQuickview, true);
+		PathAbsoluteFromApp(strValue, szQuickview);
 	}
 
 	bHasQuickview = PathIsFile(szQuickview);
@@ -2710,12 +2710,12 @@ void SaveSettings(bool bSaveSettingsNow) noexcept {
 	if (iStartupDir == StartupDirectory_MRU) {
 		section.SetString(L"MRUDirectory", szCurDir);
 	}
-	PathRelativeToApp(tchFavoritesDir, wchTmp, FILE_ATTRIBUTE_DIRECTORY, true, flagPortableMyDocs);
+	PathRelativeToApp(tchFavoritesDir, wchTmp, FILE_ATTRIBUTE_DIRECTORY, flagPortableMyDocs);
 	section.SetString(L"Favorites", wchTmp);
-	PathRelativeToApp(szQuickview, wchTmp, FILE_ATTRIBUTE_DIRECTORY, true, flagPortableMyDocs);
+	PathRelativeToApp(szQuickview, wchTmp, FILE_ATTRIBUTE_DIRECTORY, flagPortableMyDocs);
 	section.SetString(L"Quikview.exe", wchTmp);
 	section.SetStringEx(L"QuikviewParams", szQuickviewParams, L"");
-	PathRelativeToApp(tchOpenWithDir, wchTmp, FILE_ATTRIBUTE_DIRECTORY, true, flagPortableMyDocs);
+	PathRelativeToApp(tchOpenWithDir, wchTmp, FILE_ATTRIBUTE_DIRECTORY, flagPortableMyDocs);
 	section.SetString(L"OpenWithDir", wchTmp);
 	section.SetInt(L"WindowPosX", wi.x);
 	section.SetInt(L"WindowPosY", wi.y);
@@ -3631,7 +3631,7 @@ void LaunchTarget(LPCWSTR lpFileName, bool bOpenNew) {
 
 			lstrcpy(szTmp, szTargetApplication);
 			WCHAR szFile[MAX_PATH];
-			PathAbsoluteFromApp(szTmp, szFile, true);
+			PathAbsoluteFromApp(szTmp, szFile);
 
 			SHELLEXECUTEINFO sei;
 			memset(&sei, 0, sizeof(SHELLEXECUTEINFO));
@@ -3681,7 +3681,7 @@ void LaunchTarget(LPCWSTR lpFileName, bool bOpenNew) {
 		ExpandEnvironmentStringsEx(szTmp, COUNTOF(szTmp));
 
 		WCHAR szFile[MAX_PATH];
-		PathAbsoluteFromApp(szTmp, szFile, true);
+		PathAbsoluteFromApp(szTmp, szFile);
 
 		SHELLEXECUTEINFO sei;
 		memset(&sei, 0, sizeof(SHELLEXECUTEINFO));
