@@ -6935,7 +6935,8 @@ bool FileIO(bool fLoad, LPWSTR pszFile, FileSaveFlag flag, EditFileIOStatus &sta
 //
 //
 bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
-	WCHAR tch[MAX_PATH] = L"";
+	WCHAR tchPath[MAX_PATH];
+	SetStrEmpty(tchPath);
 	bool fSuccess = false;
 	bool bRestoreView = false;
 	Sci_Position iCurPos = 0;
@@ -6949,7 +6950,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 	bool keepCurrentLexer = false;
 
 	if (!(loadFlag & FileLoadFlag_New) && StrNotEmpty(lpszFile)) {
-		lstrcpy(tch, lpszFile);
+		lstrcpy(tchPath, lpszFile);
 		if (lpszFile == szCurFile || PathEqual(lpszFile, szCurFile)) {
 			iCurPos = SciCall_GetCurrentPos();
 			iAnchorPos = SciCall_GetAnchor();
@@ -6972,10 +6973,10 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 	}
 
 	if (loadFlag & FileLoadFlag_New) {
-		StrCpyEx(szCurFile, L"");
+		SetStrEmpty(szCurFile);
 		SetDlgItemText(hwndMain, IDC_FILENAME, szCurFile);
 		if (!keepTitleExcerpt) {
-			StrCpyEx(szTitleExcerpt, L"");
+			SetStrEmpty(szTitleExcerpt);
 		}
 		fvCurFile.Init(nullptr, 0);
 		EditSetEmptyText();
@@ -6998,41 +6999,47 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 			iFileWatchingMode = FileWatchingMode_None;
 		}
 		InstallFileWatching(true);
-
 		return true;
 	}
 
 	if (!fSuccess) {
-		if (!OpenFileDlg(tch, COUNTOF(tch), nullptr)) {
+		if (!OpenFileDlg(tchPath, COUNTOF(tchPath), nullptr)) {
 			return false;
 		}
 	}
 	fSuccess = false;
 
-	WCHAR szFileName[MAX_PATH] = L"";
-	ExpandEnvironmentStringsEx(tch, COUNTOF(tch));
-
-	if (PathIsRelative(tch)) {
-		PathCombine(szFileName, g_wchWorkingDirectory, tch);
-	} else {
-		lstrcpy(szFileName, tch);
+	WCHAR szFile[MAX_PATH];
+	SetStrEmpty(szFile);
+	LPWSTR pszFile = tchPath;
+	LPWSTR pszPath = szFile;
+	if (ExpandEnvironmentStringsEx(tchPath, szFile)) {
+		pszFile = szFile;
+		pszPath = tchPath;
 	}
 
-	if (PathCanonicalize(tch, szFileName)) {
-		lstrcpy(szFileName, tch);
+	if (PathIsRelative(pszFile)) {
+		PathCombine(pszPath, g_wchWorkingDirectory, pszFile);
+		LPWSTR const temp = pszFile;
+		pszFile = pszPath;
+		pszPath = temp;
 	}
-	GetLongPathName(szFileName, szFileName, COUNTOF(szFileName));
-	PathGetLnkPath(szFileName, szFileName);
+
+	if (PathCanonicalize(pszPath, pszFile)) {
+		pszFile = pszPath;
+	}
+	GetLongPathName(pszFile, pszFile, COUNTOF(szFile));
+	PathGetLnkPath(pszFile, pszFile);
 
 	EditFileIOStatus status{};
 	status.iEncoding = iCurrentEncoding;
 	status.iEOLMode = iCurrentEOLMode;
 
 	// Ask to create a new file...
-	if (!(loadFlag & FileLoadFlag_Reload) && !PathIsFile(szFileName)) {
-		const int result = flagQuietCreate ? IDYES : MsgBoxWarn(MB_YESNOCANCEL, IDS_ASK_CREATE, szFileName);
+	if (!(loadFlag & FileLoadFlag_Reload) && !PathIsFile(pszFile)) {
+		const int result = flagQuietCreate ? IDYES : MsgBoxWarn(MB_YESNOCANCEL, IDS_ASK_CREATE, pszFile);
 		if (result == IDYES) {
-			HANDLE hFile = CreateFile(szFileName,
+			HANDLE hFile = CreateFile(pszFile,
 									  GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
 									  nullptr, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, nullptr);
 			dwLastIOError = GetLastError();
@@ -7060,7 +7067,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 			return false;
 		}
 	} else {
-		fSuccess = FileIO(true, szFileName, FileSaveFlag_Default, status);
+		fSuccess = FileIO(true, pszFile, FileSaveFlag_Default, status);
 		if (fSuccess) {
 			iCurrentEncoding = status.iEncoding;
 			iCurrentEOLMode = status.iEOLMode;
@@ -7068,10 +7075,10 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 	}
 
 	if (fSuccess) {
-		lstrcpy(szCurFile, szFileName);
+		lstrcpy(szCurFile, pszFile);
 		SetDlgItemText(hwndMain, IDC_FILENAME, szCurFile);
 		if (!keepTitleExcerpt) {
-			StrCpyEx(szTitleExcerpt, L"");
+			SetStrEmpty(szTitleExcerpt);
 		}
 		iOriginalEncoding = iCurrentEncoding;
 		bDocumentModified = false;
@@ -7101,9 +7108,9 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 			UpdateLineNumberWidth();
 		}
 
-		mruFile.Add(szFileName);
+		mruFile.Add(pszFile);
 		if (flagUseSystemMRU == TripleBoolean_True) {
-			SHAddToRecentDocs(SHARD_PATHW, szFileName);
+			SHAddToRecentDocs(SHARD_PATHW, pszFile);
 		}
 
 		AutoSave_Stop(!(loadFlag & FileLoadFlag_Reload));
@@ -7180,7 +7187,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 			}
 		}
 	} else if (!status.bFileTooBig) {
-		MsgBoxLastError(MB_OK, IDS_ERR_LOADFILE, szFileName);
+		MsgBoxLastError(MB_OK, IDS_ERR_LOADFILE, pszFile);
 	}
 
 	return fSuccess;
