@@ -5130,7 +5130,7 @@ void LoadSettings() noexcept {
 			CoTaskMemFree(pszPath);
 		}
 	} else {
-		PathAbsoluteFromApp(strValue, tchOpenWithDir, true);
+		PathAbsoluteFromApp(strValue, tchOpenWithDir);
 	}
 
 	strValue = section.GetValue(L"Favorites");
@@ -5141,7 +5141,7 @@ void LoadSettings() noexcept {
 			CoTaskMemFree(pszPath);
 		}
 	} else {
-		PathAbsoluteFromApp(strValue, tchFavoritesDir, true);
+		PathAbsoluteFromApp(strValue, tchFavoritesDir);
 	}
 
 	int iValue = section.GetInt(L"PathNameFormat", TitlePathNameFormat_NameFirst);
@@ -5469,9 +5469,9 @@ void SaveSettings(bool bSaveSettingsNow) noexcept {
 	IniSectionBuilder section = { pIniSectionBuf };
 	section.SetBoolEx(L"SaveSettings", bSaveSettings, true);
 
-	PathRelativeToApp(tchOpenWithDir, wchTmp, FILE_ATTRIBUTE_DIRECTORY, true, flagPortableMyDocs);
+	PathRelativeToApp(tchOpenWithDir, wchTmp, FILE_ATTRIBUTE_DIRECTORY, flagPortableMyDocs);
 	section.SetString(L"OpenWithDir", wchTmp);
-	PathRelativeToApp(tchFavoritesDir, wchTmp, FILE_ATTRIBUTE_DIRECTORY, true, flagPortableMyDocs);
+	PathRelativeToApp(tchFavoritesDir, wchTmp, FILE_ATTRIBUTE_DIRECTORY, flagPortableMyDocs);
 	section.SetString(L"Favorites", wchTmp);
 	section.SetIntEx(L"PathNameFormat", static_cast<int>(iPathNameFormat), TitlePathNameFormat_NameFirst);
 	if (!bStickyWindowPosition) {

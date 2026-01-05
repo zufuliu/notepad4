@@ -1228,11 +1228,11 @@ bool PathGetRealPath(HANDLE hFile, LPCWSTR lpszSrc, LPWSTR lpszDest) noexcept {
 //
 //  PathRelativeToApp()
 //
-void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, DWORD dwAttrTo, bool bUnexpandEnv, bool bUnexpandMyDocs) noexcept {
+void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, DWORD dwAttrTo, BOOL bUnexpandMyDocs) noexcept {
 	WCHAR wchPath[MAX_PATH];
+	WCHAR wchAppPath[MAX_PATH];
 
 	if (!PathIsRelative(lpszSrc)) {
-		WCHAR wchAppPath[MAX_PATH];
 		WCHAR wchWinDir[MAX_PATH];
 		GetModuleFileName(nullptr, wchAppPath, COUNTOF(wchAppPath));
 		PathRemoveFileSpec(wchAppPath);
@@ -1258,14 +1258,9 @@ void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, DWORD dwAttrTo, bool bU
 		}
 	}
 
-	if (bUnexpandEnv) {
-		if (lpszSrc == lpszDest) {
-			lstrcpyn(wchPath, lpszSrc, COUNTOF(wchPath));
-			lpszSrc = wchPath;
-		}
-		if (PathUnExpandEnvStrings(lpszSrc, lpszDest, MAX_PATH)) {
-			return;
-		}
+	LPWSTR pszPath = (lpszSrc == lpszDest) ? wchAppPath : lpszDest;
+	if (ExpandEnvironmentStrings(lpszSrc, pszPath, MAX_PATH) - 1 < MAX_PATH) {
+		lpszSrc = pszPath;
 	}
 	if (lpszSrc != lpszDest) {
 		lstrcpy(lpszDest, lpszSrc);
@@ -1276,7 +1271,7 @@ void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, DWORD dwAttrTo, bool bU
 //
 //  PathAbsoluteFromApp()
 //
-void PathAbsoluteFromApp(LPCWSTR lpszSrc, LPWSTR lpszDest, bool bExpandEnv) noexcept {
+void PathAbsoluteFromApp(LPCWSTR lpszSrc, LPWSTR lpszDest) noexcept {
 	WCHAR wchPath[MAX_PATH];
 
 	if (StrStartsWith(lpszSrc, L"%CSIDL:MYDOCUMENTS%")) {
@@ -1290,20 +1285,19 @@ void PathAbsoluteFromApp(LPCWSTR lpszSrc, LPWSTR lpszDest, bool bExpandEnv) noex
 		}
 		PathCombine(wchPath, pszPath, lpszSrc);
 		CoTaskMemFree(pszPath);
-	} else {
-		lstrcpyn(wchPath, lpszSrc, COUNTOF(wchPath));
+		lpszSrc = wchPath;
 	}
 
-	if (bExpandEnv) {
-		ExpandEnvironmentStringsEx(wchPath, COUNTOF(wchPath));
+	WCHAR wchAppPath[MAX_PATH];
+	if (ExpandEnvironmentStringsEx(lpszSrc, wchAppPath)) {
+		lpszSrc = wchAppPath;
 	}
 
 	WCHAR wchResult[MAX_PATH];
-	lpszSrc = wchPath;
-	if (PathIsRelative(wchPath)) {
+	if (PathIsRelative(lpszSrc)) {
 		GetModuleFileName(nullptr, wchResult, COUNTOF(wchResult));
 		PathRemoveFileSpec(wchResult);
-		PathAppend(wchResult, wchPath);
+		PathAppend(wchResult, lpszSrc);
 		lpszSrc = wchResult;
 	}
 	if (!PathCanonicalize(lpszDest, lpszSrc)) {

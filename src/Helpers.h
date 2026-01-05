@@ -741,8 +741,8 @@ inline void GetProgramRealPath(LPWSTR tchModule, DWORD nSize) noexcept {
 
 // similar to std::filesystem::equivalent()
 bool PathEquivalent(LPCWSTR pszPath1, LPCWSTR pszPath2) noexcept;
-void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, DWORD dwAttrTo, bool bUnexpandEnv, bool bUnexpandMyDocs) noexcept;
-void PathAbsoluteFromApp(LPCWSTR lpszSrc, LPWSTR lpszDest, bool bExpandEnv) noexcept;
+void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, DWORD dwAttrTo, BOOL bUnexpandMyDocs) noexcept;
+void PathAbsoluteFromApp(LPCWSTR lpszSrc, LPWSTR lpszDest) noexcept;
 bool PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath);
 bool PathCreateDeskLnk(LPCWSTR pszDocument);
 bool PathCreateFavLnk(LPCWSTR pszName, LPCWSTR pszTarget, LPCWSTR pszDir);
@@ -760,6 +760,9 @@ void	StrTab2Space(LPWSTR lpsz) noexcept;
 bool	PathFixBackslashes(LPWSTR lpsz) noexcept;
 
 void	ExpandEnvironmentStringsEx(LPWSTR lpSrc, DWORD dwSrc) noexcept;
+inline bool ExpandEnvironmentStringsEx(LPCWSTR lpszSrc, wchar_t (&lpszDest)[MAX_PATH]) noexcept {
+	return ExpandEnvironmentStrings(lpszSrc, lpszDest, MAX_PATH) - 1 < MAX_PATH;
+}
 DWORD_PTR SHGetFileInfo2(LPCWSTR pszPath, DWORD dwFileAttributes, SHFILEINFO *psfi, UINT cbFileInfo, UINT uFlags) noexcept;
 
 // remove '&' from access key, i.e. SHStripMneumonic().

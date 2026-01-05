@@ -2171,7 +2171,7 @@ static INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 		case IDOK: {
 			WCHAR tch[MAX_PATH] = L"";
 			if (GetDlgItemText(hwnd, IDC_WINMODULE, tch, COUNTOF(tch))) {
-				PathRelativeToApp(tch, tch, 0, true, flagPortableMyDocs);
+				PathRelativeToApp(tch, tch, 0, flagPortableMyDocs);
 				PathQuoteSpaces(tch);
 				SetDlgItemText(GetParent(hwnd), IDC_TARGETPATH, tch);
 			}
@@ -2327,7 +2327,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 
 			GetDlgItemText(hwnd, IDC_TARGETPATH, tchBuf, COUNTOF(tchBuf));
 			ExtractFirstArgument(tchBuf, szFile, szParams);
-			PathAbsoluteFromApp(szFile, szFile, true);
+			PathAbsoluteFromApp(szFile, szFile);
 
 			WCHAR szTitle[32];
 			WCHAR szFilter[256];
@@ -2353,7 +2353,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 			// execute file open dlg
 			if (GetOpenFileName(&ofn)) {
 				lstrcpy(tchBuf, szFile);
-				PathRelativeToApp(tchBuf, tchBuf, 0, true, flagPortableMyDocs);
+				PathRelativeToApp(tchBuf, tchBuf, 0, flagPortableMyDocs);
 				PathQuoteSpaces(tchBuf);
 				if (StrNotEmpty(szParams)) {
 					StrCatBuff(tchBuf, L" ", COUNTOF(tchBuf));

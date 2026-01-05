@@ -505,8 +505,8 @@ inline void GetProgramRealPath(LPWSTR tchModule, DWORD nSize) noexcept {
 	}
 }
 
-void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, DWORD dwAttrTo, bool bUnexpandEnv, bool bUnexpandMyDocs) noexcept;
-void PathAbsoluteFromApp(LPCWSTR lpszSrc, LPWSTR lpszDest, bool bExpandEnv) noexcept;
+void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, DWORD dwAttrTo, BOOL bUnexpandMyDocs) noexcept;
+void PathAbsoluteFromApp(LPCWSTR lpszSrc, LPWSTR lpszDest) noexcept;
 bool PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath);
 bool PathCreateLnk(LPCWSTR pszLnkDir, LPCWSTR pszPath);
 void OpenContainingFolder(HWND hwnd, LPCWSTR pszFile, bool bSelect) noexcept;
@@ -520,6 +520,9 @@ void PrepareFilterStr(LPWSTR lpFilter) noexcept;
 void StrTab2Space(LPWSTR lpsz) noexcept;
 bool PathFixBackslashes(LPWSTR lpsz) noexcept;
 void ExpandEnvironmentStringsEx(LPWSTR lpSrc, DWORD dwSrc) noexcept;
+inline bool ExpandEnvironmentStringsEx(LPCWSTR lpszSrc, wchar_t (&lpszDest)[MAX_PATH]) noexcept {
+	return ExpandEnvironmentStrings(lpszSrc, lpszDest, MAX_PATH) - 1 < MAX_PATH;
+}
 bool SearchPathEx(LPCWSTR lpFileName, DWORD nBufferLength, LPWSTR lpBuffer) noexcept;
 void FormatNumber(LPWSTR lpNumberStr, UINT value) noexcept;
 
