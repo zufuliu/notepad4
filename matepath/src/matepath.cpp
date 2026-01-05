@@ -2484,30 +2484,22 @@ void LoadSettings() noexcept {
 
 	LPCWSTR strValue = section.GetValue(L"OpenWithDir");
 	if (StrIsEmpty(strValue)) {
-#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 		LPWSTR pszPath = nullptr;
 		if (S_OK == SHGetKnownFolderPath(FOLDERID_Desktop, KF_FLAG_DEFAULT, nullptr, &pszPath)) {
 			lstrcpy(tchOpenWithDir, pszPath);
 			CoTaskMemFree(pszPath);
 		}
-#else
-		SHGetFolderPath(nullptr, CSIDL_DESKTOPDIRECTORY, nullptr, SHGFP_TYPE_CURRENT, tchOpenWithDir);
-#endif
 	} else {
 		PathAbsoluteFromApp(strValue, tchOpenWithDir, true);
 	}
 
 	strValue = section.GetValue(L"Favorites");
 	if (StrIsEmpty(strValue)) {
-#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 		LPWSTR pszPath = nullptr;
 		if (S_OK == SHGetKnownFolderPath(FOLDERID_Documents, KF_FLAG_DEFAULT, nullptr, &pszPath)) {
 			lstrcpy(tchFavoritesDir, pszPath);
 			CoTaskMemFree(pszPath);
 		}
-#else
-		SHGetFolderPath(nullptr, CSIDL_PERSONAL, nullptr, SHGFP_TYPE_CURRENT, tchFavoritesDir);
-#endif
 	} else {
 		PathAbsoluteFromApp(strValue, tchFavoritesDir, true);
 	}
@@ -3056,10 +3048,17 @@ bool CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) noexcept {
 			return true;
 		}
 
-#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 		const KNOWNFOLDERID * const rfidList[] = {
+			// %LOCALAPPDATA%
+			// C:\Users\<username>\AppData\Local
+			// C:\Documents and Settings\<username>\Local Settings\Application Data
 			&FOLDERID_LocalAppData,
+			// %APPDATA%
+			// C:\Users\<username>\AppData\Roaming
+			// C:\Documents and Settings\<username>\Application Data
 			&FOLDERID_RoamingAppData,
+			// Home
+			// C:\Users\<username>
 			&FOLDERID_Profile,
 		};
 		for (UINT i = 0; i < COUNTOF(rfidList); i++) {
@@ -3074,31 +3073,6 @@ bool CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) noexcept {
 				}
 			}
 		}
-#else
-		const int csidlList[] = {
-			// %LOCALAPPDATA%
-			// C:\Users\<username>\AppData\Local
-			// C:\Documents and Settings\<username>\Local Settings\Application Data
-			CSIDL_LOCAL_APPDATA,
-			// %APPDATA%
-			// C:\Users\<username>\AppData\Roaming
-			// C:\Documents and Settings\<username>\Application Data
-			CSIDL_APPDATA,
-			// Home
-			// C:\Users\<username>
-			CSIDL_PROFILE,
-		};
-		for (UINT i = 0; i < COUNTOF(csidlList); i++) {
-			if (S_OK == SHGetFolderPath(nullptr, csidlList[i], nullptr, SHGFP_TYPE_CURRENT, tchBuild)) {
-				PathAppend(tchBuild, WC_NOTEPAD4);
-				PathAppend(tchBuild, tchFileExpanded);
-				if (PathIsFile(tchBuild)) {
-					lstrcpy(lpszFile, tchBuild);
-					return true;
-				}
-			}
-		}
-#endif
 	} else if (PathIsFile(tchFileExpanded)) {
 		lstrcpy(lpszFile, tchFileExpanded);
 		return true;
