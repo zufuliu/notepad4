@@ -58,6 +58,12 @@ constexpr bool StrNotEmpty(LPCWSTR s) noexcept {
 	return s != nullptr && *s != L'\0';
 }
 
+template <typename T, size_t N>
+requires(N*sizeof(T) >= sizeof(int))
+inline void SetStrEmpty(T (&s)[N]) noexcept {
+	memset(s, 0, sizeof(int));
+}
+
 // see scintilla/lexlib/CharacterSet.h
 #define UnsafeLower(ch)		((ch) | 0x20)
 #define UnsafeUpper(ch)		((ch) & ~0x20)

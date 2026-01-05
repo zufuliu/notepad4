@@ -50,6 +50,12 @@ constexpr bool StrNotEmpty(LPCWSTR s) noexcept {
 	return s != nullptr && *s != L'\0';
 }
 
+template <typename T, size_t N>
+requires(N*sizeof(T) >= sizeof(int))
+inline void SetStrEmpty(T (&s)[N]) noexcept {
+	memset(s, 0, sizeof(int));
+}
+
 constexpr int ToUpperA(int ch) noexcept {
 	return (ch >= 'a' && ch <= 'z') ? (ch - 'a' + 'A') : ch;
 }

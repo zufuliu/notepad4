@@ -303,16 +303,17 @@ int ParseCommaList(LPCWSTR str, int result[], int count) noexcept {
 }
 
 bool FindUserResourcePath(LPCWSTR path, LPWSTR outPath) noexcept {
-	// similar to CheckIniFile()
 	WCHAR tchFileExpanded[MAX_PATH];
-	ExpandEnvironmentStrings(path, tchFileExpanded, COUNTOF(tchFileExpanded));
+	if (ExpandEnvironmentStringsEx(path, tchFileExpanded)) {
+		path = tchFileExpanded;
+	}
 
-	if (PathIsRelative(tchFileExpanded)) {
+	if (PathIsRelative(path)) {
 		WCHAR tchBuild[MAX_PATH];
 		// relative to program ini file
 		if (StrNotEmpty(szIniFile)) {
 			lstrcpy(tchBuild, szIniFile);
-			lstrcpy(PathFindFileName(tchBuild), tchFileExpanded);
+			lstrcpy(PathFindFileName(tchBuild), path);
 			if (PathIsFile(tchBuild)) {
 				lstrcpy(outPath, tchBuild);
 				return true;
@@ -321,13 +322,13 @@ bool FindUserResourcePath(LPCWSTR path, LPWSTR outPath) noexcept {
 
 		// relative to program exe file
 		GetProgramRealPath(tchBuild, COUNTOF(tchBuild));
-		lstrcpy(PathFindFileName(tchBuild), tchFileExpanded);
+		lstrcpy(PathFindFileName(tchBuild), path);
 		if (PathIsFile(tchBuild)) {
 			lstrcpy(outPath, tchBuild);
 			return true;
 		}
-	} else if (PathIsFile(tchFileExpanded)) {
-		lstrcpy(outPath, tchFileExpanded);
+	} else if (PathIsFile(path)) {
+		lstrcpy(outPath, path);
 		return true;
 	}
 	return false;
@@ -1341,9 +1342,13 @@ bool PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath) {
 	}
 
 	if (hr == S_OK && StrNotEmpty(tchPath)) {
-		ExpandEnvironmentStringsEx(tchPath, COUNTOF(tchPath));
-		if (!PathCanonicalize(pszResPath, tchPath)) {
-			lstrcpy(pszResPath, tchPath);
+		WCHAR wchResult[MAX_PATH];
+		LPCWSTR lpszSrc = tchPath;
+		if (ExpandEnvironmentStringsEx(tchPath, wchResult)) {
+			lpszSrc = wchResult;
+		}
+		if (!PathCanonicalize(pszResPath, lpszSrc)) {
+			lstrcpy(pszResPath, lpszSrc);
 		}
 		return true;
 	}
