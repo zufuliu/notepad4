@@ -3035,14 +3035,11 @@ void LoadFlags() noexcept {
 //
 //
 bool CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) noexcept {
-	WCHAR tchFileExpanded[MAX_PATH];
-	ExpandEnvironmentStrings(lpszFile, tchFileExpanded, COUNTOF(tchFileExpanded));
-
-	if (PathIsRelative(tchFileExpanded)) {
+	if (PathIsRelative(lpszFile)) {
 		WCHAR tchBuild[MAX_PATH];
 		// program directory
 		lstrcpy(tchBuild, lpszModule);
-		lstrcpy(PathFindFileName(tchBuild), tchFileExpanded);
+		lstrcpy(PathFindFileName(tchBuild), lpszFile);
 		if (PathIsFile(tchBuild)) {
 			lstrcpy(lpszFile, tchBuild);
 			return true;
@@ -3066,44 +3063,39 @@ bool CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) noexcept {
 			if (S_OK == SHGetKnownFolderPath(*rfidList[i], KF_FLAG_DEFAULT, nullptr, &pszPath)) {
 				PathCombine(tchBuild, pszPath, WC_NOTEPAD4);
 				CoTaskMemFree(pszPath);
-				PathAppend(tchBuild, tchFileExpanded);
+				PathAppend(tchBuild, lpszFile);
 				if (PathIsFile(tchBuild)) {
 					lstrcpy(lpszFile, tchBuild);
 					return true;
 				}
 			}
 		}
-	} else if (PathIsFile(tchFileExpanded)) {
-		lstrcpy(lpszFile, tchFileExpanded);
+	} else if (PathIsFile(lpszFile)) {
 		return true;
 	}
 
 	return false;
 }
 
-bool CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule) noexcept {
+void CheckIniFileRedirect(wchar_t (&lpszFile)[MAX_PATH], LPCWSTR lpszModule) noexcept {
 	WCHAR tch[MAX_PATH];
 	if (GetPrivateProfileString(INI_SECTION_NAME_MATEPATH, L"matepath.ini", L"", tch, COUNTOF(tch), lpszFile)) {
-		if (CheckIniFile(tch, lpszModule)) {
+		if (!ExpandEnvironmentStringsEx(tch, lpszFile)) {
 			lstrcpy(lpszFile, tch);
-		} else {
-			WCHAR tchFileExpanded[MAX_PATH];
-			ExpandEnvironmentStrings(tch, tchFileExpanded, COUNTOF(tchFileExpanded));
-			if (PathIsRelative(tchFileExpanded)) {
-				lstrcpy(lpszFile, lpszModule);
-				lstrcpy(PathFindFileName(lpszFile), tchFileExpanded);
-			} else {
-				lstrcpy(lpszFile, tchFileExpanded);
+		}
+		if (!CheckIniFile(lpszFile, lpszModule)) {
+			if (PathIsRelative(lpszFile)) {
+				lstrcpy(tch, lpszModule);
+				lstrcpy(PathFindFileName(tch), lpszFile);
+				lstrcpy(lpszFile, tch);
 			}
 		}
-		return true;
 	}
-	return false;
 }
 
-bool FindIniFile() noexcept {
+void FindIniFile() noexcept {
 	if (StrEqualEx(szIniFile, L"*?")) {
-		return false;
+		return;
 	}
 
 	WCHAR tchTest[MAX_PATH];
@@ -3111,39 +3103,35 @@ bool FindIniFile() noexcept {
 	GetProgramRealPath(tchModule, COUNTOF(tchModule));
 
 	if (StrNotEmpty(szIniFile)) {
+		if (ExpandEnvironmentStringsEx(szIniFile, tchTest)) {
+			lstrcpy(szIniFile, tchTest);
+		}
 		if (!CheckIniFile(szIniFile, tchModule)) {
-			ExpandEnvironmentStringsEx(szIniFile, COUNTOF(szIniFile));
 			if (PathIsRelative(szIniFile)) {
 				lstrcpy(tchTest, tchModule);
-				PathRemoveFileSpec(tchTest);
-				PathAppend(tchTest, szIniFile);
+				lstrcpy(PathFindFileName(tchTest), szIniFile);
 				lstrcpy(szIniFile, tchTest);
 			}
 		}
-		return true;
+		return;
 	}
 
 	lstrcpy(tchTest, PathFindFileName(tchModule));
 	PathRenameExtension(tchTest, L".ini");
 	bool bFound = CheckIniFile(tchTest, tchModule);
 
-	if (!bFound) {
+	if (!bFound && !StrCaseEqual(tchTest, L"matepath.ini")) {
 		lstrcpy(tchTest, L"matepath.ini");
 		bFound = CheckIniFile(tchTest, tchModule);
 	}
 
 	if (bFound) {
-		// allow two redirections: administrator -> user -> custom
-		if (CheckIniFileRedirect(tchTest, tchModule)) {
-			CheckIniFileRedirect(tchTest, tchModule);
-		}
+		CheckIniFileRedirect(tchTest, tchModule);
 		lstrcpy(szIniFile, tchTest);
 	} else {
 		lstrcpy(szIniFile, tchModule);
 		PathRenameExtension(szIniFile, L".ini");
 	}
-
-	return true;
 }
 
 bool TestIniFile() noexcept {

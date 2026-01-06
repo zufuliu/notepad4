@@ -161,9 +161,7 @@ void ParseCommandLine() noexcept;
 void LoadFlags() noexcept;
 void LoadLaunchSetings() noexcept;
 
-bool CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) noexcept;
-bool CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule) noexcept;
-bool FindIniFile() noexcept;
+void FindIniFile() noexcept;
 bool TestIniFile() noexcept;
 bool CreateIniFile(LPCWSTR lpszIniFile) noexcept;
 

@@ -2106,20 +2106,6 @@ bool PathFixBackslashes(LPWSTR lpsz) noexcept {
 
 //=============================================================================
 //
-// ExpandEnvironmentStringsEx()
-//
-// Adjusted for Windows 95
-//
-void ExpandEnvironmentStringsEx(LPWSTR lpSrc, DWORD dwSrc) noexcept {
-	WCHAR szBuf[312];
-
-	if (ExpandEnvironmentStrings(lpSrc, szBuf, COUNTOF(szBuf))) {
-		lstrcpyn(lpSrc, szBuf, dwSrc);
-	}
-}
-
-//=============================================================================
-//
 //	SHGetFileInfo2()
 //
 //	Return a default name when the file has been removed, and always append

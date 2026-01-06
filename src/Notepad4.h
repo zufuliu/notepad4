@@ -243,9 +243,7 @@ void ClearWindowPositionHistory() noexcept;
 void ParseCommandLine() noexcept;
 void LoadFlags() noexcept;
 
-bool CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) noexcept;
-bool CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule, LPCWSTR redirectKey) noexcept;
-bool FindIniFile() noexcept;
+void FindIniFile() noexcept;
 bool TestIniFile() noexcept;
 bool CreateIniFile(LPCWSTR lpszIniFile) noexcept;
 void FindExtraIniFile(LPWSTR lpszIniFile, LPCWSTR defaultName, LPCWSTR redirectKey) noexcept;

@@ -1569,20 +1569,6 @@ bool PathFixBackslashes(LPWSTR lpsz) noexcept {
 
 //=============================================================================
 //
-//  ExpandEnvironmentStringsEx()
-//
-//  Adjusted for Windows 95
-//
-void ExpandEnvironmentStringsEx(LPWSTR lpSrc, DWORD dwSrc) noexcept {
-	WCHAR szBuf[312];
-
-	if (ExpandEnvironmentStrings(lpSrc, szBuf, COUNTOF(szBuf))) {
-		lstrcpyn(lpSrc, szBuf, dwSrc);
-	}
-}
-
-//=============================================================================
-//
 //  SearchPathEx()
 //
 //  This Expansion also searches the L"Favorites" folder
