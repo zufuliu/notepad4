@@ -7012,7 +7012,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 
 	if (PathIsRelative(pszFile)) {
 		PathCombine(pszPath, g_wchWorkingDirectory, pszFile);
-		LPWSTR const temp = pszFile;
+		wchar_t * const temp = pszFile;
 		pszFile = pszPath;
 		pszPath = temp;
 	}

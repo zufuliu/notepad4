@@ -527,7 +527,7 @@ void PrepareFilterStr(LPWSTR lpFilter) noexcept;
 void StrTab2Space(LPWSTR lpsz) noexcept;
 bool PathFixBackslashes(LPWSTR lpsz) noexcept;
 template <DWORD cchDest>
-inline [[nodiscard]] bool ExpandEnvironmentStringsEx(LPCWSTR lpszSrc, wchar_t (&lpszDest)[cchDest]) noexcept {
+[[nodiscard]] inline bool ExpandEnvironmentStringsEx(LPCWSTR lpszSrc, wchar_t (&lpszDest)[cchDest]) noexcept {
 	return ExpandEnvironmentStrings(lpszSrc, lpszDest, cchDest) - 1 < cchDest;
 }
 bool SearchPathEx(LPCWSTR lpFileName, DWORD nBufferLength, LPWSTR lpBuffer) noexcept;
