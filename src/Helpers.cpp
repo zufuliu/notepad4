@@ -1770,7 +1770,12 @@ void PathAbsoluteFromApp(LPCWSTR lpszSrc, LPWSTR lpszDest) noexcept {
 		PathAppend(wchResult, lpszSrc);
 		lpszSrc = wchResult;
 	}
-	if (!PathCanonicalize(lpszDest, lpszSrc)) {
+
+	LPWSTR pszPath = (lpszSrc == lpszDest) ? wchResult : lpszDest;
+	if (PathCanonicalize(pszPath, lpszSrc)) {
+		lpszSrc = pszPath;
+	}
+	if (lpszSrc != lpszDest) {
 		lstrcpy(lpszDest, lpszSrc);
 	}
 }
@@ -1796,7 +1801,7 @@ bool PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath) {
 	IShellLink *psl;
 	HRESULT hr = S_FALSE;
 	WCHAR tchPath[MAX_PATH];
-	tchPath[0] = L'\0';
+	SetStrEmpty(tchPath);
 
 	if (SUCCEEDED(CoCreateInstance(CLSID_ShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLink, AsPPVArgs(&psl)))) {
 		IPersistFile *ppf;
