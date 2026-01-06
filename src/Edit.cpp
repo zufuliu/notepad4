@@ -6864,7 +6864,7 @@ void EditSelectionAction(int action) noexcept {
 		L"CustomAction2",
 	};
 
-	WCHAR szCmdTemplate[256];
+	WCHAR szCmdTemplate[MAX_PATH*2];
 	action -= CMD_ONLINE_SEARCH_GOOGLE;
 	LPCWSTR actionKey = kActionKeys[action];
 	BOOL bCmdEnabled = IniGetString(INI_SECTION_NAME_FLAGS, actionKey, L"", szCmdTemplate, COUNTOF(szCmdTemplate));
@@ -6881,15 +6881,18 @@ void EditSelectionAction(int action) noexcept {
 		return;
 	}
 
-	LPWSTR lpszCommand = static_cast<LPWSTR>(NP2HeapAlloc(sizeof(WCHAR) * (cchEscapedW + COUNTOF(szCmdTemplate) + MAX_PATH + 32)));
+	LPWSTR lpszCommand = static_cast<LPWSTR>(NP2HeapAlloc(sizeof(WCHAR) * (cchEscapedW + COUNTOF(szCmdTemplate) + 32)));
 	const size_t cbCommand = NP2HeapSize(lpszCommand);
 	wsprintf(lpszCommand, szCmdTemplate, pszEscapedW);
 
 	LPWSTR lpszArgs = static_cast<LPWSTR>(NP2HeapAlloc(cbCommand));
 	ExtractFirstArgument(lpszCommand, lpszCommand, lpszArgs);
-	ExpandEnvironmentStringsEx(lpszArgs, static_cast<DWORD>(cbCommand / sizeof(WCHAR)));
+	if (ExpandEnvironmentStringsEx(lpszArgs, szCmdTemplate)) {
+		lstrcpy(lpszArgs, szCmdTemplate);
+	}
 
-	WCHAR wchDirectory[MAX_PATH] = L"";
+	auto &wchDirectory = szCmdTemplate;
+	SetStrEmpty(wchDirectory);
 	if (StrNotEmpty(szCurFile)) {
 		lstrcpy(wchDirectory, szCurFile);
 		PathRemoveFileSpec(wchDirectory);
@@ -6914,9 +6917,11 @@ void EditSelectionAction(int action) noexcept {
 }
 
 void TryBrowseFile(HWND hwnd, LPCWSTR pszFile, bool bWarn) noexcept {
-	WCHAR tchParam[MAX_PATH + 4] = L"";
-	WCHAR tchExeFile[MAX_PATH + 4] = L"";
+	WCHAR tchParam[MAX_PATH + 4];
+	WCHAR tchExeFile[MAX_PATH + 4];
 	WCHAR tchTemp[MAX_PATH + 4];
+	SetStrEmpty(tchParam);
+	SetStrEmpty(tchExeFile);
 
 	if (IniGetString(INI_SECTION_NAME_FLAGS, L"filebrowser.exe", L"", tchTemp, COUNTOF(tchTemp))) {
 		ExtractFirstArgument(tchTemp, tchExeFile, tchParam);
@@ -7050,7 +7055,7 @@ char *EditGetStringAroundCaret(LPCSTR delimiters) noexcept {
 
 extern bool bOpenFolderWithMatepath;
 
-static DWORD EditOpenSelectionCheckFile(LPCWSTR link, LPWSTR path, DWORD cchFilePath, LPWSTR wchDirectory) noexcept {
+static DWORD EditOpenSelectionCheckFile(LPCWSTR link, wchar_t (&path)[MAX_PATH*2], LPWSTR wchDirectory) noexcept {
 	if (StrStartsWith(link, L"//")) {
 		// issue #454, treat as link
 		lstrcpy(path, L"http:");
@@ -7059,9 +7064,10 @@ static DWORD EditOpenSelectionCheckFile(LPCWSTR link, LPWSTR path, DWORD cchFile
 	}
 
 	DWORD dwAttributes = GetFileAttributes(link);
+	constexpr DWORD cchFilePath = COUNTOF(path);
 	if (dwAttributes == INVALID_FILE_ATTRIBUTES) {
 		// handle variables expanded into absolute path, avoid touch percent encoded URL
-		if (link[0] == '%' && ExpandEnvironmentStrings(link, path, cchFilePath)) {
+		if (link[0] == '%' && ExpandEnvironmentStringsEx(link, path)) {
 			dwAttributes = GetFileAttributes(path);
 		}
 		if (dwAttributes == INVALID_FILE_ATTRIBUTES && StrNotEmpty(szCurFile)) {
@@ -7173,12 +7179,12 @@ void EditOpenSelection(OpenSelectionType type) {
 
 		WCHAR path[MAX_PATH * 2];
 		WCHAR wchDirectory[MAX_PATH];
-		DWORD dwAttributes = EditOpenSelectionCheckFile(link, path, COUNTOF(path), wchDirectory);
+		DWORD dwAttributes = EditOpenSelectionCheckFile(link, path, wchDirectory);
 		if (dwAttributes == INVALID_FILE_ATTRIBUTES) {
 			if (line != nullptr) {
 				const WCHAR ch = *back;
 				*back = L'\0';
-				dwAttributes = EditOpenSelectionCheckFile(link, path, COUNTOF(path), wchDirectory);
+				dwAttributes = EditOpenSelectionCheckFile(link, path, wchDirectory);
 				if (dwAttributes == INVALID_FILE_ATTRIBUTES) {
 					// line is port number or the file not exists
 					*back = ch;

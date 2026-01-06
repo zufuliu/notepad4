@@ -227,15 +227,19 @@ INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) 
 		case IDC_SEARCHEXE: {
 			WCHAR szArgs[MAX_PATH];
 			WCHAR szArg2[MAX_PATH];
-			WCHAR szFile[MAX_PATH * 2];
+			WCHAR szFile[MAX_PATH];
 
 			GetDlgItemText(hwnd, IDC_COMMANDLINE, szArgs, COUNTOF(szArgs));
 			ExtractFirstArgument(szArgs, szFile, szArg2);
-			ExpandEnvironmentStringsEx(szFile, COUNTOF(szFile));
-			ExpandEnvironmentStringsEx(szArg2, COUNTOF(szArg2));
+			if (ExpandEnvironmentStringsEx(szFile, szArgs)) {
+				lstrcpy(szFile, szArgs);
+			}
+			if (ExpandEnvironmentStringsEx(szArg2, szArgs)) {
+				lstrcpy(szArg2, szArgs);
+			}
 
 			WCHAR szTitle[32];
-			WCHAR szFilter[256];
+			auto &szFilter = szArgs;
 			GetString(IDS_SEARCHEXE, szTitle, COUNTOF(szTitle));
 			GetString(IDS_FILTER_EXE, szFilter, COUNTOF(szFilter));
 			PrepareFilterStr(szFilter);
@@ -294,8 +298,12 @@ INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) 
 					ExtractFirstArgument(arg1 + 1, arg1, arg2);
 					DisplayPath(arg1, IDS_ERR_CMDLINE);
 				} else {
+					WCHAR args[MAX_PATH];
 					ExtractFirstArgument(arg1, arg1, arg2);
-					ExpandEnvironmentStringsEx(arg2, COUNTOF(arg2));
+					LPWSTR lpParameters = arg2;
+					if (ExpandEnvironmentStringsEx(arg2, args)) {
+						lpParameters = args;
+					}
 
 					SHELLEXECUTEINFO sei;
 					memset(&sei, 0, sizeof(SHELLEXECUTEINFO));
@@ -304,7 +312,7 @@ INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) 
 					sei.hwnd = hwnd;
 					sei.lpVerb = nullptr;
 					sei.lpFile = arg1;
-					sei.lpParameters = arg2;
+					sei.lpParameters = lpParameters;
 					sei.lpDirectory = szCurDir;
 					sei.nShow = SW_SHOWNORMAL;
 
@@ -1698,10 +1706,14 @@ INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 
 		case IDC_BROWSEDESTINATION: {
 			WCHAR tch[MAX_PATH];
+			WCHAR tchDestination[MAX_PATH];
 			GetDlgItemText(hwnd, IDC_DESTINATION, tch, COUNTOF(tch));
-			ExpandEnvironmentStringsEx(tch, COUNTOF(tch));
-			if (GetDirectory(hwnd, IDS_COPYMOVE, tch, tch)) {
-				SetDlgItemText(hwnd, IDC_DESTINATION, tch);
+			LPWSTR pszNewDir = tch;
+			if (ExpandEnvironmentStringsEx(tch, tchDestination)) {
+				pszNewDir = tchDestination;
+			}
+			if (GetDirectory(hwnd, IDS_COPYMOVE, pszNewDir, pszNewDir)) {
+				SetDlgItemText(hwnd, IDC_DESTINATION, pszNewDir);
 			}
 			PostMessage(hwnd, WM_NEXTDLGCTL, TRUE, FALSE);
 		}
@@ -1769,13 +1781,16 @@ bool CopyMoveDlg(HWND hwnd, UINT *wFunc) {
 		// Save item
 		mru.Add(fod.szDestination);
 		mru.Save();
-		ExpandEnvironmentStringsEx(fod.szDestination, COUNTOF(fod.szDestination));
 
 		// Double null terminated strings are essential!!!
 		memset(tchSource, 0, sizeof(tchSource));
 		memset(tchDestination, 0, sizeof(tchDestination));
 		lstrcpy(tchSource, dli.szFileName);
-		lstrcpy(tchDestination, fod.szDestination);
+		if (ExpandEnvironmentStringsEx(fod.szDestination, tchDestination)) {
+			lstrcpy(fod.szDestination, tchDestination);
+		} else {
+			lstrcpy(tchDestination, fod.szDestination);
+		}
 
 		// tchDestination is always assumed to be a directory
 		// if it doesn't exist, the file name of tchSource is added
@@ -2169,7 +2184,8 @@ static INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDOK: {
-			WCHAR tch[MAX_PATH] = L"";
+			WCHAR tch[MAX_PATH];
+			SetStrEmpty(tch);
 			if (GetDlgItemText(hwnd, IDC_WINMODULE, tch, COUNTOF(tch))) {
 				PathRelativeToApp(tch, tch, 0, flagPortableMyDocs);
 				PathQuoteSpaces(tch);

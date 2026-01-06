@@ -7403,15 +7403,17 @@ void EditApplyDefaultEncoding(LPCEDITLEXER pLex, BOOL bLexerChanged) noexcept {
 // OpenFileDlg()
 //
 //
-void SetupInitialOpenSaveDir(LPWSTR tchInitialDir, DWORD cchInitialDir, LPCWSTR lpstrInitialDir) noexcept {
-	tchInitialDir[0] = L'\0';
+void SetupInitialOpenSaveDir(wchar_t (&tchInitialDir)[MAX_PATH], LPCWSTR lpstrInitialDir) noexcept {
+	SetStrEmpty(tchInitialDir);
 	if (StrNotEmpty(lpstrInitialDir)) {
 		lstrcpy(tchInitialDir, lpstrInitialDir);
 	} else if (StrNotEmpty(szCurFile)) {
 		lstrcpy(tchInitialDir, szCurFile);
 		PathRemoveFileSpec(tchInitialDir);
 	} else if (StrNotEmpty(tchDefaultDir)) {
-		ExpandEnvironmentStrings(tchDefaultDir, tchInitialDir, cchInitialDir);
+		if (!ExpandEnvironmentStringsEx(tchDefaultDir, tchInitialDir)) {
+			lstrcpy(tchInitialDir, tchDefaultDir);
+		}
 		if (PathIsRelative(tchInitialDir)) {
 			WCHAR tchModule[MAX_PATH];
 			GetModuleFileName(nullptr, tchModule, COUNTOF(tchModule));
@@ -7429,9 +7431,9 @@ void SetupInitialOpenSaveDir(LPWSTR tchInitialDir, DWORD cchInitialDir, LPCWSTR 
 
 BOOL OpenFileDlg(LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) noexcept {
 	WCHAR tchInitialDir[MAX_PATH];
-	SetupInitialOpenSaveDir(tchInitialDir, COUNTOF(tchInitialDir), lpstrInitialDir);
+	SetupInitialOpenSaveDir(tchInitialDir, lpstrInitialDir);
 	WCHAR szFile[MAX_PATH];
-	szFile[0] = L'\0';
+	SetStrEmpty(szFile);
 	int lexers[1 + OPENDLG_MAX_LEXER_COUNT]{}; // 1-based filter index
 	LPWSTR szFilter = Style_GetOpenDlgFilterStr(true, szCurFile, lexers);
 
@@ -7470,7 +7472,7 @@ BOOL OpenFileDlg(LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) noexcep
 //
 BOOL SaveFileDlg(FileSaveFlag saveFlag, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) noexcept {
 	WCHAR tchInitialDir[MAX_PATH];
-	SetupInitialOpenSaveDir(tchInitialDir, COUNTOF(tchInitialDir), lpstrInitialDir);
+	SetupInitialOpenSaveDir(tchInitialDir, lpstrInitialDir);
 	WCHAR szNewFile[MAX_PATH];
 	lstrcpy(szNewFile, lpstrFile);
 	int lexers[1 + OPENDLG_MAX_LEXER_COUNT]{}; // 1-based filter index
@@ -7609,10 +7611,12 @@ bool ActivatePrevInst() noexcept {
 	HWND hwnd = nullptr;
 	LPWSTR lpszFile = lpFileArg;
 	if (flagSingleFileInstance && lpszFile) {
-		ExpandEnvironmentStringsEx(lpszFile, static_cast<DWORD>(NP2HeapSize(lpszFile) / sizeof(WCHAR)));
+		WCHAR tchTmp[MAX_PATH];
+		if (ExpandEnvironmentStringsEx(lpszFile, tchTmp)) {
+			lstrcpy(lpszFile, tchTmp);
+		}
 
 		if (PathIsRelative(lpszFile)) {
-			WCHAR tchTmp[MAX_PATH];
 			PathCombine(tchTmp, g_wchWorkingDirectory, lpszFile);
 			lstrcpy(lpszFile, tchTmp);
 		}
@@ -7645,10 +7649,12 @@ bool ActivatePrevInst() noexcept {
 			SetForegroundWindow(hwnd);
 
 			if (lpszFile) {
-				ExpandEnvironmentStringsEx(lpszFile, static_cast<DWORD>(NP2HeapSize(lpszFile) / sizeof(WCHAR)));
+				WCHAR tchTmp[MAX_PATH];
+				if (ExpandEnvironmentStringsEx(lpszFile, tchTmp)) {
+					lstrcpy(lpszFile, tchTmp);
+				}
 
 				if (PathIsRelative(lpszFile)) {
-					WCHAR tchTmp[MAX_PATH];
 					PathCombine(tchTmp, g_wchWorkingDirectory, lpszFile);
 					lstrcpy(lpszFile, tchTmp);
 				}

@@ -431,14 +431,18 @@ static INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 		case IDC_SEARCHEXE: {
 			WCHAR szArgs[MAX_PATH];
 			WCHAR szArg2[MAX_PATH];
-			WCHAR szFile[MAX_PATH * 2];
+			WCHAR szFile[MAX_PATH];
 
 			GetDlgItemText(hwnd, IDC_COMMANDLINE, szArgs, COUNTOF(szArgs));
 			ExtractFirstArgument(szArgs, szFile, szArg2);
-			ExpandEnvironmentStringsEx(szFile, COUNTOF(szFile));
-			ExpandEnvironmentStringsEx(szArg2, COUNTOF(szArg2));
+			if (ExpandEnvironmentStringsEx(szFile, szArgs)) {
+				lstrcpy(szFile, szArgs);
+			}
+			if (ExpandEnvironmentStringsEx(szArg2, szArgs)) {
+				lstrcpy(szArg2, szArgs);
+			}
 
-			WCHAR szFilter[256];
+			auto &szFilter = szArgs;
 			GetString(IDS_FILTER_EXE, szFilter, COUNTOF(szFilter));
 			PrepareFilterStr(szFilter);
 
@@ -490,16 +494,19 @@ static INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 			if (GetDlgItemText(hwnd, IDC_COMMANDLINE, arg1, MAX_PATH)) {
 				bool bQuickExit = false;
 				WCHAR arg2[MAX_PATH];
+				WCHAR wchDirectory[MAX_PATH];
 
 				ExtractFirstArgument(arg1, arg1, arg2);
-				ExpandEnvironmentStringsEx(arg2, COUNTOF(arg2));
+				if (ExpandEnvironmentStringsEx(arg2, wchDirectory)) {
+					lstrcpy(arg2, wchDirectory);
+				}
 
 				if (StrCaseEqual(arg1, L"Notepad4") || StrCaseEqual(arg1, L"Notepad4.exe")) {
 					GetModuleFileName(nullptr, arg1, COUNTOF(arg1));
 					bQuickExit = true;
 				}
 
-				WCHAR wchDirectory[MAX_PATH] = L"";
+				SetStrEmpty(wchDirectory);
 				if (StrNotEmpty(szCurFile)) {
 					lstrcpy(wchDirectory, szCurFile);
 					PathRemoveFileSpec(wchDirectory);

@@ -3222,12 +3222,13 @@ bool DisplayPath(LPCWSTR lpPath, UINT uIdError) {
 	}
 
 	WCHAR szTmp[MAX_PATH];
-	lstrcpy(szTmp, lpPath);
-	ExpandEnvironmentStringsEx(szTmp, COUNTOF(szTmp));
+	if (ExpandEnvironmentStringsEx(lpPath, szTmp)) {
+		lpPath = szTmp;
+	}
 
 	WCHAR szPath[MAX_PATH];
-	if (!SearchPathEx(szTmp, COUNTOF(szPath), szPath)) {
-		lstrcpy(szPath, szTmp);
+	if (!SearchPathEx(lpPath, COUNTOF(szPath), szPath)) {
+		lstrcpy(szPath, lpPath);
 	}
 	PathGetRealPath(nullptr, szPath, szPath);
 
@@ -3402,10 +3403,12 @@ bool ActivatePrevInst() noexcept {
 			SetForegroundWindow(hwnd);
 
 			if (lpPathArg) {
-				ExpandEnvironmentStringsEx(lpPathArg, static_cast<DWORD>(GlobalSize(lpPathArg) / sizeof(WCHAR)));
+				WCHAR tchTmp[MAX_PATH];
+				if (ExpandEnvironmentStringsEx(lpPathArg, tchTmp)) {
+					lstrcpy(lpPathArg, tchTmp);
+				}
 
 				if (PathIsRelative(lpPathArg)) {
-					WCHAR tchTmp[MAX_PATH];
 					GetCurrentDirectory(COUNTOF(tchTmp), tchTmp);
 					PathAppend(tchTmp, lpPathArg);
 					lstrcpy(lpPathArg, tchTmp);
@@ -3622,7 +3625,8 @@ void LaunchTarget(LPCWSTR lpFileName, bool bOpenNew) {
 			//else
 			GetShortPathName(lpParam, lpParam, MAX_PATH);
 
-			WCHAR szParam[MAX_PATH] = L"";
+			WCHAR szParam[MAX_PATH];
+			SetStrEmpty(szParam);
 			if (StrNotEmpty(szTargetApplicationParams)) {
 				lstrcpyn(szParam, szTargetApplicationParams, COUNTOF(szParam));
 				StrCatBuff(szParam, L" ", COUNTOF(szParam));
@@ -3670,15 +3674,17 @@ void LaunchTarget(LPCWSTR lpFileName, bool bOpenNew) {
 		//else
 		GetShortPathName(lpParam, lpParam, MAX_PATH);
 
-		WCHAR szParam[MAX_PATH] = L"";
+		WCHAR szParam[MAX_PATH];
+		SetStrEmpty(szParam);
 		if (StrNotEmpty(szTargetApplicationParams)) {
 			lstrcpyn(szParam, szTargetApplicationParams, COUNTOF(szParam));
 			StrCatBuff(szParam, L" ", COUNTOF(szParam));
 		}
 		StrCatBuff(szParam, lpParam, COUNTOF(szParam));
 
-		lstrcpy(szTmp, szTargetApplication);
-		ExpandEnvironmentStringsEx(szTmp, COUNTOF(szTmp));
+		if (!ExpandEnvironmentStringsEx(szTargetApplication, szTmp)) {
+			lstrcpy(szTmp, szTargetApplication);
+		}
 
 		WCHAR szFile[MAX_PATH];
 		PathAbsoluteFromApp(szTmp, szFile);

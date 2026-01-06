@@ -766,8 +766,9 @@ void	StrTab2Space(LPWSTR lpsz) noexcept;
 bool	PathFixBackslashes(LPWSTR lpsz) noexcept;
 
 void	ExpandEnvironmentStringsEx(LPWSTR lpSrc, DWORD dwSrc) noexcept;
-inline bool ExpandEnvironmentStringsEx(LPCWSTR lpszSrc, wchar_t (&lpszDest)[MAX_PATH]) noexcept {
-	return ExpandEnvironmentStrings(lpszSrc, lpszDest, MAX_PATH) - 1 < MAX_PATH;
+template <DWORD cchDest>
+inline [[nodiscard]] bool ExpandEnvironmentStringsEx(LPCWSTR lpszSrc, wchar_t (&lpszDest)[cchDest]) noexcept {
+	return ExpandEnvironmentStrings(lpszSrc, lpszDest, cchDest) - 1 < cchDest;
 }
 DWORD_PTR SHGetFileInfo2(LPCWSTR pszPath, DWORD dwFileAttributes, SHFILEINFO *psfi, UINT cbFileInfo, UINT uFlags) noexcept;
 
