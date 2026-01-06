@@ -102,13 +102,14 @@ static TBBUTTON tbbMainWnd[] = {
 	{26, 	IDT_FILE_NEWWINDOW, 	TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
 };
 
-WCHAR	szIniFile[MAX_PATH] = L"";
-static WCHAR szIniFile2[MAX_PATH] = L"";
+WCHAR	szIniFile[MAX_PATH];
+static WCHAR szIniFile2[MAX_PATH];
+WCHAR szExeRealPath[MAX_PATH];
 static bool bSaveSettings;
 bool	bSaveRecentFiles;
 int iMaxRecentFiles;
 static bool bSaveFindReplace;
-static WCHAR tchLastSaveCopyDir[MAX_PATH] = L"";
+static WCHAR tchLastSaveCopyDir[MAX_PATH];
 WCHAR	tchOpenWithDir[MAX_PATH];
 WCHAR	tchFavoritesDir[MAX_PATH];
 static WCHAR tchDefaultDir[MAX_PATH];
@@ -506,6 +507,11 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	WCHAR wchWorkingDirectory[MAX_PATH];
 	GetCurrentDirectory(COUNTOF(g_wchWorkingDirectory), g_wchWorkingDirectory);
 	GetModuleFileName(nullptr, wchWorkingDirectory, COUNTOF(wchWorkingDirectory));
+	// inline GetProgramRealPath()
+	lstrcpy(szExeRealPath, wchWorkingDirectory);
+	if (PathIsSymbolicLink(wchWorkingDirectory)) {
+		PathGetRealPath(nullptr, szExeRealPath, szExeRealPath);
+	}
 	PathRemoveFileSpec(wchWorkingDirectory);
 	SetCurrentDirectory(wchWorkingDirectory);
 
@@ -6451,8 +6457,7 @@ void FindIniFile() noexcept {
 	}
 
 	WCHAR tchTest[MAX_PATH];
-	WCHAR tchModule[MAX_PATH];
-	GetProgramRealPath(tchModule, COUNTOF(tchModule));
+	const auto &tchModule = szExeRealPath;
 
 	if (StrNotEmpty(szIniFile)) {
 		if (ExpandEnvironmentStringsEx(szIniFile, tchTest)) {
@@ -6499,8 +6504,7 @@ bool TestIniFile() noexcept {
 	}
 
 	if ((dwFileAttributes != INVALID_FILE_ATTRIBUTES) || (StrNotEmpty(szIniFile) && szIniFile[lstrlen(szIniFile) - 1] == L'\\')) {
-		WCHAR wchModule[MAX_PATH];
-		GetProgramRealPath(wchModule, COUNTOF(wchModule));
+		const auto &wchModule = szExeRealPath;
 		PathAppend(szIniFile, PathFindFileName(wchModule));
 		PathRenameExtension(szIniFile, L".ini");
 		dwFileAttributes = GetFileAttributes(szIniFile);
@@ -6542,7 +6546,7 @@ void FindExtraIniFile(LPWSTR lpszIniFile, LPCWSTR defaultName, LPCWSTR redirectK
 		lstrcpy(lpszIniFile, szIniFile);
 	} else {
 		// relative to program exe file
-		GetProgramRealPath(lpszIniFile, MAX_PATH);
+		lstrcpy(lpszIniFile, szExeRealPath);
 	}
 	lstrcpy(PathFindFileName(lpszIniFile), defaultName);
 }

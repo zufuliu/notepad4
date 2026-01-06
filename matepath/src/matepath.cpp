@@ -76,8 +76,9 @@ static UINT uTrayIconDPI = 0;
 static HANDLE hChangeHandle = nullptr;
 HistoryList	mHistory;
 
-WCHAR	szIniFile[MAX_PATH] = L"";
-WCHAR	szIniFile2[MAX_PATH] = L"";
+WCHAR	szIniFile[MAX_PATH];
+static WCHAR szIniFile2[MAX_PATH];
+WCHAR szExeRealPath[MAX_PATH];
 bool	bSaveSettings;
 static bool bHasQuickview = false;
 WCHAR	szQuickview[MAX_PATH];
@@ -281,6 +282,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 #endif
 
 	g_hDefaultHeap = GetProcessHeap();
+	GetProgramRealPath(szExeRealPath, COUNTOF(szExeRealPath));
 	SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX);
 	// Command Line, Ini File and Flags
 	ParseCommandLine();
@@ -3099,8 +3101,7 @@ void FindIniFile() noexcept {
 	}
 
 	WCHAR tchTest[MAX_PATH];
-	WCHAR tchModule[MAX_PATH];
-	GetProgramRealPath(tchModule, COUNTOF(tchModule));
+	const auto &tchModule = szExeRealPath;
 
 	if (StrNotEmpty(szIniFile)) {
 		if (ExpandEnvironmentStringsEx(szIniFile, tchTest)) {
@@ -3147,8 +3148,7 @@ bool TestIniFile() noexcept {
 	}
 
 	if ((dwFileAttributes != INVALID_FILE_ATTRIBUTES) || (StrNotEmpty(szIniFile) && szIniFile[lstrlen(szIniFile) - 1] == L'\\')) {
-		WCHAR wchModule[MAX_PATH];
-		GetProgramRealPath(wchModule, COUNTOF(wchModule));
+		const auto &wchModule = szExeRealPath;
 		PathAppend(szIniFile, PathFindFileName(wchModule));
 		PathRenameExtension(szIniFile, L".ini");
 		dwFileAttributes = GetFileAttributes(szIniFile);

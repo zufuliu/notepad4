@@ -271,6 +271,7 @@ extern DWORD kSystemLibraryLoadFlags;
 #define kSystemLibraryLoadFlags		LOAD_LIBRARY_SEARCH_SYSTEM32
 #endif
 extern WCHAR szIniFile[MAX_PATH];
+extern WCHAR szExeRealPath[MAX_PATH];
 
 // Operating System Version
 // https://docs.microsoft.com/en-us/windows/win32/sysinfo/operating-system-version

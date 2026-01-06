@@ -207,6 +207,7 @@ inline int GetBitmapResourceIdForCurrentDPI(int resourceId) noexcept {
 #define NP2HeapSize(hMem)			HeapSize(g_hDefaultHeap, 0, (hMem))
 
 extern WCHAR szIniFile[MAX_PATH];
+extern WCHAR szExeRealPath[MAX_PATH];
 #define IniGetString(lpSection, lpName, lpDefault, lpReturnedStr, nSize) \
 	GetPrivateProfileString(lpSection, lpName, lpDefault, lpReturnedStr, nSize, szIniFile)
 #define IniGetInt(lpSection, lpName, nDefault) \

@@ -6930,7 +6930,7 @@ void TryBrowseFile(HWND hwnd, LPCWSTR pszFile, bool bWarn) noexcept {
 		lstrcpy(tchExeFile, L"matepath.exe");
 	}
 	if (PathIsRelative(tchExeFile)) {
-		GetProgramRealPath(tchTemp, COUNTOF(tchTemp));
+		lstrcpy(tchTemp, szExeRealPath);
 		PathRemoveFileSpec(tchTemp);
 		PathAppend(tchTemp, tchExeFile);
 		if (PathIsFile(tchTemp)) {

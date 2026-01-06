@@ -321,7 +321,7 @@ bool FindUserResourcePath(LPCWSTR path, LPWSTR outPath) noexcept {
 		}
 
 		// relative to program exe file
-		GetProgramRealPath(tchBuild, COUNTOF(tchBuild));
+		lstrcpy(tchBuild, szExeRealPath);
 		lstrcpy(PathFindFileName(tchBuild), path);
 		if (PathIsFile(tchBuild)) {
 			lstrcpy(outPath, tchBuild);
@@ -1123,7 +1123,7 @@ HMODULE LoadLocalizedResourceDLL(LANGID lang, LPCWSTR dllName) noexcept {
 	}
 
 	WCHAR path[MAX_PATH];
-	GetProgramRealPath(path, COUNTOF(path));
+	lstrcpy(path, szExeRealPath);
 	PathRemoveFileSpec(path);
 	PathAppend(path, L"locale");
 	PathAppend(path, folder);
