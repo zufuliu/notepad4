@@ -1729,7 +1729,7 @@ void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, DWORD dwAttrTo, BOOL bU
 	}
 
 	LPWSTR pszPath = (lpszSrc == lpszDest) ? wchAppPath : lpszDest;
-	if (ExpandEnvironmentStrings(lpszSrc, pszPath, MAX_PATH) - 1 < MAX_PATH) {
+	if (PathUnExpandEnvStrings(lpszSrc, pszPath, MAX_PATH)) {
 		lpszSrc = pszPath;
 	}
 	if (lpszSrc != lpszDest) {
