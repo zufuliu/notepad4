@@ -287,7 +287,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	// Command Line, Ini File and Flags
 	ParseCommandLine();
 	FindIniFile();
-	TestIniFile();
 	CreateIniFile(szIniFile);
 	LoadFlags();
 
@@ -2811,11 +2810,17 @@ void ClearWindowPositionHistory() noexcept {
 //  ParseCommandLine()
 //
 //
+namespace {
+
 enum CommandParseState {
 	CommandParseState_None,
 	CommandParseState_Consumed,
 	CommandParseState_Argument,
 };
+
+constexpr UINT noIniTag = L'*' | (L'?' << 16);
+
+}
 
 CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) noexcept {
 	LPWSTR opt = lp1 + 1;
@@ -2900,7 +2905,7 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) noexcept {
 		switch (ch) {
 		case L'F':
 			if (chNext == L'0' || chNext == L'O') {
-				StrCpyEx(szIniFile, L"*?");
+				*reinterpret_cast<UINT *>(szIniFile) = noIniTag;
 				state = CommandParseState_Consumed;
 			}
 			break;
@@ -3036,139 +3041,148 @@ void LoadFlags() noexcept {
 //  FindIniFile()
 //
 //
-bool CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) noexcept {
+namespace {
+
+enum class IniFindStatus {
+	NotFound = 0,
+	Found = 1,
+	Relative = 2,
+	Specified = 4,
+};
+
+constexpr IniFindStatus operator|(IniFindStatus status, IniFindStatus value) noexcept {
+	return static_cast<IniFindStatus>(static_cast<int>(status) | static_cast<int>(value));
+}
+
+struct IniFinder {
+	LPCWSTR tchModule;
+	size_t nameIndex;
+	LPWSTR folder[3]{};
+	const KNOWNFOLDERID* rfidList[3]{};
+
+	IniFinder() noexcept {
+		tchModule = szExeRealPath;
+		nameIndex = PathFindFileName(tchModule) - tchModule;
+	}
+	~IniFinder() {
+		for (UINT i = 0; i < COUNTOF(folder); i++) {
+			if (folder[i]) {
+				CoTaskMemFree(folder[i]);
+			}
+		}
+	}
+	IniFindStatus CheckIniFile(LPWSTR lpszFile) noexcept;
+};
+
+}
+
+IniFindStatus IniFinder::CheckIniFile(LPWSTR lpszFile) noexcept {
 	if (PathIsRelative(lpszFile)) {
 		WCHAR tchBuild[MAX_PATH];
 		// program directory
-		lstrcpy(tchBuild, lpszModule);
-		lstrcpy(PathFindFileName(tchBuild), lpszFile);
+		lstrcpy(tchBuild, tchModule);
+		lstrcpy(&tchBuild[nameIndex], lpszFile);
 		if (PathIsFile(tchBuild)) {
 			lstrcpy(lpszFile, tchBuild);
-			return true;
+			return IniFindStatus::Found;
 		}
 
-		const KNOWNFOLDERID * const rfidList[] = {
+		if (rfidList[0] == nullptr) {
 			// %LOCALAPPDATA%
 			// C:\Users\<username>\AppData\Local
 			// C:\Documents and Settings\<username>\Local Settings\Application Data
-			&FOLDERID_LocalAppData,
+			rfidList[0] = &FOLDERID_LocalAppData;
 			// %APPDATA%
 			// C:\Users\<username>\AppData\Roaming
 			// C:\Documents and Settings\<username>\Application Data
-			&FOLDERID_RoamingAppData,
+			rfidList[1] = &FOLDERID_RoamingAppData;
 			// Home
 			// C:\Users\<username>
-			&FOLDERID_Profile,
-		};
+			rfidList[2] = &FOLDERID_Profile;
+		}
 		for (UINT i = 0; i < COUNTOF(rfidList); i++) {
-			LPWSTR pszPath = nullptr;
-			if (S_OK == SHGetKnownFolderPath(*rfidList[i], KF_FLAG_DEFAULT, nullptr, &pszPath)) {
+			LPWSTR pszPath = folder[i];
+			if (pszPath != nullptr || S_OK == SHGetKnownFolderPath(*rfidList[i], KF_FLAG_DEFAULT, nullptr, &pszPath)) {
+				folder[i] = pszPath;
 				PathCombine(tchBuild, pszPath, WC_NOTEPAD4);
-				CoTaskMemFree(pszPath);
 				PathAppend(tchBuild, lpszFile);
 				if (PathIsFile(tchBuild)) {
 					lstrcpy(lpszFile, tchBuild);
-					return true;
+					return IniFindStatus::Found;
 				}
 			}
 		}
-	} else if (PathIsFile(lpszFile)) {
-		return true;
+		return IniFindStatus::Relative;
+	}
+	if (PathIsFile(lpszFile)) {
+		return IniFindStatus::Found;
 	}
 
-	return false;
-}
-
-void CheckIniFileRedirect(wchar_t (&lpszFile)[MAX_PATH], LPCWSTR lpszModule) noexcept {
-	WCHAR tch[MAX_PATH];
-	if (GetPrivateProfileString(INI_SECTION_NAME_MATEPATH, L"matepath.ini", L"", tch, COUNTOF(tch), lpszFile)) {
-		if (!ExpandEnvironmentStringsEx(tch, lpszFile)) {
-			lstrcpy(lpszFile, tch);
-		}
-		if (!CheckIniFile(lpszFile, lpszModule)) {
-			if (PathIsRelative(lpszFile)) {
-				lstrcpy(tch, lpszModule);
-				lstrcpy(PathFindFileName(tch), lpszFile);
-				lstrcpy(lpszFile, tch);
-			}
-		}
-	}
+	return IniFindStatus::NotFound;
 }
 
 void FindIniFile() noexcept {
-	if (StrEqualEx(szIniFile, L"*?")) {
+	if (*reinterpret_cast<UINT *>(szIniFile) == noIniTag) {
+		SetStrEmpty(szIniFile);
+		SetStrEmpty(szIniFile2);
 		return;
 	}
 
+	IniFinder finder;
+	IniFindStatus status;
 	WCHAR tchTest[MAX_PATH];
-	const auto &tchModule = szExeRealPath;
 
 	if (StrNotEmpty(szIniFile)) {
 		if (ExpandEnvironmentStringsEx(szIniFile, tchTest)) {
 			lstrcpy(szIniFile, tchTest);
 		}
-		if (!CheckIniFile(szIniFile, tchModule)) {
-			if (PathIsRelative(szIniFile)) {
-				lstrcpy(tchTest, tchModule);
-				lstrcpy(PathFindFileName(tchTest), szIniFile);
-				lstrcpy(szIniFile, tchTest);
-			}
-		}
-		return;
-	}
-
-	lstrcpy(tchTest, PathFindFileName(tchModule));
-	PathRenameExtension(tchTest, L".ini");
-	bool bFound = CheckIniFile(tchTest, tchModule);
-
-	if (!bFound && !StrCaseEqual(tchTest, L"matepath.ini")) {
-		lstrcpy(tchTest, L"matepath.ini");
-		bFound = CheckIniFile(tchTest, tchModule);
-	}
-
-	if (bFound) {
-		CheckIniFileRedirect(tchTest, tchModule);
-		lstrcpy(szIniFile, tchTest);
+		status = finder.CheckIniFile(szIniFile);
+		status = status | IniFindStatus::Specified;
 	} else {
-		lstrcpy(szIniFile, tchModule);
-		PathRenameExtension(szIniFile, L".ini");
-	}
-}
+		lstrcpy(tchTest, finder.tchModule + finder.nameIndex);
+		PathRenameExtension(tchTest, L".ini");
+		status = finder.CheckIniFile(tchTest);
 
-bool TestIniFile() noexcept {
-	if (StrEqualEx(szIniFile, L"*?")) {
-		StrCpyEx(szIniFile2, L"");
-		StrCpyEx(szIniFile, L"");
-		return false;
-	}
+		if (!FlagSet(status, IniFindStatus::Found) && !StrCaseEqual(tchTest, L"matepath.ini")) {
+			lstrcpy(tchTest, L"matepath.ini");
+			status = finder.CheckIniFile(tchTest);
+		}
 
-	DWORD dwFileAttributes = GetFileAttributes(szIniFile);
-	if ((dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0) {
-		return true;
-	}
-
-	if ((dwFileAttributes != INVALID_FILE_ATTRIBUTES) || (StrNotEmpty(szIniFile) && szIniFile[lstrlen(szIniFile) - 1] == L'\\')) {
-		const auto &wchModule = szExeRealPath;
-		PathAppend(szIniFile, PathFindFileName(wchModule));
-		PathRenameExtension(szIniFile, L".ini");
-		dwFileAttributes = GetFileAttributes(szIniFile);
-		if ((dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0) {
-			lstrcpy(PathFindFileName(szIniFile), L"matepath.ini");
-			dwFileAttributes = GetFileAttributes(szIniFile);
-			if ((dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0) {
-				lstrcpy(PathFindFileName(szIniFile), PathFindFileName(wchModule));
-				PathRenameExtension(szIniFile, L".ini");
-				dwFileAttributes = GetFileAttributes(szIniFile);
+		if (FlagSet(status, IniFindStatus::Found)) {
+			WCHAR tchTmp[MAX_PATH];
+			// check ini redirection
+			if (GetPrivateProfileString(INI_SECTION_NAME_MATEPATH, L"matepath.ini", L"", tchTmp, COUNTOF(tchTmp), tchTest)) {
+				if (!ExpandEnvironmentStringsEx(tchTmp, tchTest)) {
+					lstrcpy(tchTest, tchTmp);
+				}
+				status = finder.CheckIniFile(tchTest);
+				status = status | IniFindStatus::Specified;
 			}
+			lstrcpy(szIniFile, tchTest);
 		}
 	}
 
-	if ((dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0) {
-		lstrcpy(szIniFile2, szIniFile);
-		StrCpyEx(szIniFile, L"");
-		return false;
+	if (!FlagSet(status, IniFindStatus::Found)) {
+		// ini not found, build default path for it
+		LPCWSTR pszFile = finder.tchModule + finder.nameIndex;
+		bool relative = true;
+		if (FlagSet(status, IniFindStatus::Specified)) {
+			pszFile = szIniFile;
+			relative = FlagSet(status, IniFindStatus::Relative);
+		}
+		if (relative) {
+			lstrcpy(tchTest, finder.tchModule);
+			lstrcpy(&tchTest[finder.nameIndex], pszFile);
+			PathRenameExtension(tchTest, L".ini");
+			pszFile = tchTest;
+			if (PathIsFile(tchTest)) {
+				lstrcpy(szIniFile, tchTest);
+				return;
+			}
+		}
+		lstrcpy(szIniFile2, pszFile);
+		SetStrEmpty(szIniFile);
 	}
-	return true;
 }
 
 bool CreateIniFile(LPCWSTR lpszIniFile) noexcept {

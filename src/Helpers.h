@@ -64,6 +64,11 @@ inline void SetStrEmpty(T (&s)[N]) noexcept {
 	memset(s, 0, sizeof(int));
 }
 
+template <typename T>
+constexpr bool FlagSet(T value, T test) noexcept {
+	return (static_cast<int>(value) & static_cast<int>(test)) != 0;
+}
+
 // see scintilla/lexlib/CharacterSet.h
 #define UnsafeLower(ch)		((ch) | 0x20)
 #define UnsafeUpper(ch)		((ch) & ~0x20)

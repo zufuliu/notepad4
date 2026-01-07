@@ -56,6 +56,11 @@ inline void SetStrEmpty(T (&s)[N]) noexcept {
 	memset(s, 0, sizeof(int));
 }
 
+template <typename T>
+constexpr bool FlagSet(T value, T test) noexcept {
+	return (static_cast<int>(value) & static_cast<int>(test)) != 0;
+}
+
 constexpr int ToUpperA(int ch) noexcept {
 	return (ch >= 'a' && ch <= 'z') ? (ch - 'a' + 'A') : ch;
 }

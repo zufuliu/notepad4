@@ -162,7 +162,6 @@ void LoadFlags() noexcept;
 void LoadLaunchSetings() noexcept;
 
 void FindIniFile() noexcept;
-bool TestIniFile() noexcept;
 bool CreateIniFile(LPCWSTR lpszIniFile) noexcept;
 
 bool DisplayPath(LPCWSTR lpPath, UINT uIdError);
