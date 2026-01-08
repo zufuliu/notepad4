@@ -6415,9 +6415,8 @@ constexpr IniFindStatus operator|(IniFindStatus status, IniFindStatus value) noe
 struct IniFinder {
 	LPCWSTR tchModule;
 	size_t nameIndex;
+	LPWSTR appData = nullptr;
 	bool portable = true;
-	LPWSTR folder[3]{};
-	const KNOWNFOLDERID* rfidList[3]{};
 
 	IniFinder() noexcept {
 		tchModule = szExeRealPath;
@@ -6429,10 +6428,8 @@ struct IniFinder {
 		}
 	}
 	~IniFinder() {
-		for (UINT i = 0; i < COUNTOF(folder); i++) {
-			if (folder[i]) {
-				CoTaskMemFree(folder[i]);
-			}
+		if (appData != nullptr) {
+			CoTaskMemFree(appData);
 		}
 	}
 	IniFindStatus CheckIniFile(LPWSTR lpszFile) noexcept;
@@ -6440,7 +6437,7 @@ struct IniFinder {
 
 }
 
-IniFindStatus IniFinder::CheckIniFile(LPWSTR lpszFile) noexcept {
+NP2_noinline IniFindStatus IniFinder::CheckIniFile(LPWSTR lpszFile) noexcept {
 	if (PathIsRelative(lpszFile)) {
 		WCHAR tchBuild[MAX_PATH];
 		// program directory
@@ -6453,29 +6450,15 @@ IniFindStatus IniFinder::CheckIniFile(LPWSTR lpszFile) noexcept {
 			}
 		}
 
-		if (rfidList[0] == nullptr) {
-			// %LOCALAPPDATA%
-			// C:\Users\<username>\AppData\Local
-			// C:\Documents and Settings\<username>\Local Settings\Application Data
-			rfidList[0] = &FOLDERID_LocalAppData;
-			// %APPDATA%
-			// C:\Users\<username>\AppData\Roaming
-			// C:\Documents and Settings\<username>\Application Data
-			rfidList[1] = &FOLDERID_RoamingAppData;
-			// Home
-			// C:\Users\<username>
-			rfidList[2] = &FOLDERID_Profile;
-		}
-		for (UINT i = 0; i < COUNTOF(rfidList); i++) {
-			LPWSTR pszPath = folder[i];
-			if (pszPath != nullptr || S_OK == SHGetKnownFolderPath(*rfidList[i], KF_FLAG_DEFAULT, nullptr, &pszPath)) {
-				folder[i] = pszPath;
-				PathCombine(tchBuild, pszPath, WC_NOTEPAD4);
-				PathAppend(tchBuild, lpszFile);
-				if (PathIsFile(tchBuild)) {
-					lstrcpy(lpszFile, tchBuild);
-					return IniFindStatus::Found | IniFindStatus::AppData;
-				}
+		// %LOCALAPPDATA%
+		// C:\Users\<username>\AppData\Local
+		// C:\Documents and Settings\<username>\Local Settings\Application Data
+		if (appData != nullptr || S_OK == SHGetKnownFolderPath(FOLDERID_LocalAppData, KF_FLAG_DEFAULT, nullptr, &appData)) {
+			PathCombine(tchBuild, appData, WC_NOTEPAD4);
+			PathAppend(tchBuild, lpszFile);
+			if (PathIsFile(tchBuild)) {
+				lstrcpy(lpszFile, tchBuild);
+				return IniFindStatus::Found | IniFindStatus::AppData;
 			}
 		}
 		if (!portable) {
@@ -6524,9 +6507,9 @@ void FindIniFile() noexcept {
 
 		if (FlagSet(status, IniFindStatus::Found)) {
 			WCHAR tchTmp[MAX_PATH];
-			if (FlagSet(status, IniFindStatus::Program) && !finder.portable && finder.folder[0] != nullptr) {
+			if (FlagSet(status, IniFindStatus::Program) && !finder.portable && finder.appData != nullptr) {
 				// copy ini to %LOCALAPPDATA%\Notepad4
-				PathCombine(tchTmp, finder.folder[0], WC_NOTEPAD4);
+				PathCombine(tchTmp, finder.appData, WC_NOTEPAD4);
 				SHCreateDirectoryEx(nullptr, tchTmp, nullptr);
 				PathAppend(tchTmp, &tchTest[finder.nameIndex]);
 				CopyFile(tchTest, tchTmp, TRUE);
@@ -6554,8 +6537,8 @@ void FindIniFile() noexcept {
 			relative = FlagSet(status, IniFindStatus::Relative);
 		}
 		if (relative) {
-			if (!finder.portable && finder.folder[0] != nullptr) {
-				PathCombine(tchTest, finder.folder[0], WC_NOTEPAD4);
+			if (!finder.portable && finder.appData != nullptr) {
+				PathCombine(tchTest, finder.appData, WC_NOTEPAD4);
 				PathAppend(tchTest, pszFile);
 			} else {
 				lstrcpy(tchTest, finder.tchModule);

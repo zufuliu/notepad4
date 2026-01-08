@@ -21,6 +21,12 @@
 #define NP2_assume(expr)	[[assume(expr)]]
 #endif
 
+#if defined(__GNUC__) || defined(__clang__)
+#define NP2_noinline __attribute__((noinline))
+#else
+#define NP2_noinline __declspec(noinline)
+#endif
+
 template <typename T, typename V>
 inline T AsPointer(V value) noexcept {
 #if defined(__clang__)
