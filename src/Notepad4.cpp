@@ -6404,6 +6404,8 @@ enum class IniFindStatus {
 	Found = 1,
 	Relative = 2,
 	Specified = 4,
+	Program = 8,
+	AppData = 16,
 };
 
 constexpr IniFindStatus operator|(IniFindStatus status, IniFindStatus value) noexcept {
@@ -6413,12 +6415,18 @@ constexpr IniFindStatus operator|(IniFindStatus status, IniFindStatus value) noe
 struct IniFinder {
 	LPCWSTR tchModule;
 	size_t nameIndex;
+	bool portable = true;
 	LPWSTR folder[3]{};
 	const KNOWNFOLDERID* rfidList[3]{};
 
 	IniFinder() noexcept {
 		tchModule = szExeRealPath;
 		nameIndex = PathFindFileName(tchModule) - tchModule;
+		if (StrStrI(tchModule, L"WinGet") != nullptr || StrStrI(tchModule, L"Chocolatey") != nullptr) {
+			// %LOCALAPPDATA%\Microsoft\WinGet\Packages
+			// ChocolateyInstall
+			portable = false;
+		}
 	}
 	~IniFinder() {
 		for (UINT i = 0; i < COUNTOF(folder); i++) {
@@ -6436,11 +6444,13 @@ IniFindStatus IniFinder::CheckIniFile(LPWSTR lpszFile) noexcept {
 	if (PathIsRelative(lpszFile)) {
 		WCHAR tchBuild[MAX_PATH];
 		// program directory
-		lstrcpy(tchBuild, tchModule);
-		lstrcpy(&tchBuild[nameIndex], lpszFile);
-		if (PathIsFile(tchBuild)) {
-			lstrcpy(lpszFile, tchBuild);
-			return IniFindStatus::Found;
+		if (portable) {
+			lstrcpy(tchBuild, tchModule);
+			lstrcpy(&tchBuild[nameIndex], lpszFile);
+			if (PathIsFile(tchBuild)) {
+				lstrcpy(lpszFile, tchBuild);
+				return IniFindStatus::Found | IniFindStatus::Program;
+			}
 		}
 
 		if (rfidList[0] == nullptr) {
@@ -6464,8 +6474,16 @@ IniFindStatus IniFinder::CheckIniFile(LPWSTR lpszFile) noexcept {
 				PathAppend(tchBuild, lpszFile);
 				if (PathIsFile(tchBuild)) {
 					lstrcpy(lpszFile, tchBuild);
-					return IniFindStatus::Found;
+					return IniFindStatus::Found | IniFindStatus::AppData;
 				}
+			}
+		}
+		if (!portable) {
+			lstrcpy(tchBuild, tchModule);
+			lstrcpy(&tchBuild[nameIndex], lpszFile);
+			if (PathIsFile(tchBuild)) {
+				lstrcpy(lpszFile, tchBuild);
+				return IniFindStatus::Found | IniFindStatus::Program;
 			}
 		}
 		return IniFindStatus::Relative;
@@ -6506,6 +6524,15 @@ void FindIniFile() noexcept {
 
 		if (FlagSet(status, IniFindStatus::Found)) {
 			WCHAR tchTmp[MAX_PATH];
+			if (FlagSet(status, IniFindStatus::Program) && !finder.portable && finder.folder[0] != nullptr) {
+				// copy ini to %LOCALAPPDATA%\Notepad4
+				PathCombine(tchTmp, finder.folder[0], WC_NOTEPAD4);
+				SHCreateDirectoryEx(nullptr, tchTmp, nullptr);
+				PathAppend(tchTmp, &tchTest[finder.nameIndex]);
+				CopyFile(tchTest, tchTmp, TRUE);
+				// always use %LOCALAPPDATA% for non-portable installation
+				lstrcpy(tchTest, tchTmp);
+			}
 			// check ini redirection
 			if (GetPrivateProfileString(INI_SECTION_NAME_NOTEPAD4, L"Notepad4.ini", L"", tchTmp, COUNTOF(tchTmp), tchTest)) {
 				if (!ExpandEnvironmentStringsEx(tchTmp, tchTest)) {
@@ -6527,8 +6554,13 @@ void FindIniFile() noexcept {
 			relative = FlagSet(status, IniFindStatus::Relative);
 		}
 		if (relative) {
-			lstrcpy(tchTest, finder.tchModule);
-			lstrcpy(&tchTest[finder.nameIndex], pszFile);
+			if (!finder.portable && finder.folder[0] != nullptr) {
+				PathCombine(tchTest, finder.folder[0], WC_NOTEPAD4);
+				PathAppend(tchTest, pszFile);
+			} else {
+				lstrcpy(tchTest, finder.tchModule);
+				lstrcpy(&tchTest[finder.nameIndex], pszFile);
+			}
 			PathRenameExtension(tchTest, L".ini");
 			pszFile = tchTest;
 			if (PathIsFile(tchTest)) {
