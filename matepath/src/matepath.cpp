@@ -3059,7 +3059,7 @@ struct IniFinder {
 	IniFinder() noexcept {
 		tchModule = szExeRealPath;
 		nameIndex = PathFindFileName(tchModule) - tchModule;
-		if (StrStrI(tchModule, L"WinGet") != nullptr || StrStrI(tchModule, L"Chocolatey") != nullptr) {
+		if (StrStr(tchModule, L"WinGet") != nullptr || StrStr(tchModule, L"Chocolatey") != nullptr) {
 			// %LOCALAPPDATA%\Microsoft\WinGet\Packages
 			// ChocolateyInstall
 			portable = false;
