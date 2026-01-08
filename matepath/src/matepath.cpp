@@ -3046,15 +3046,9 @@ namespace {
 enum class IniFindStatus {
 	NotFound = 0,
 	Found = 1,
-	Relative = 2,
-	Specified = 4,
-	Program = 8,
-	AppData = 16,
+	Program = 2,
+	AppData = 3,
 };
-
-constexpr IniFindStatus operator|(IniFindStatus status, IniFindStatus value) noexcept {
-	return static_cast<IniFindStatus>(static_cast<int>(status) | static_cast<int>(value));
-}
 
 struct IniFinder {
 	LPCWSTR tchModule;
@@ -3086,11 +3080,11 @@ NP2_noinline IniFindStatus IniFinder::CheckIniFile(LPWSTR lpszFile) noexcept {
 		WCHAR tchBuild[MAX_PATH];
 		// program directory
 		if (portable) {
-			lstrcpy(tchBuild, tchModule);
+			memcpy(tchBuild, tchModule, nameIndex*sizeof(WCHAR));
 			lstrcpy(&tchBuild[nameIndex], lpszFile);
 			if (PathIsFile(tchBuild)) {
 				lstrcpy(lpszFile, tchBuild);
-				return IniFindStatus::Found | IniFindStatus::Program;
+				return IniFindStatus::Program;
 			}
 		}
 
@@ -3102,20 +3096,18 @@ NP2_noinline IniFindStatus IniFinder::CheckIniFile(LPWSTR lpszFile) noexcept {
 			PathAppend(tchBuild, lpszFile);
 			if (PathIsFile(tchBuild)) {
 				lstrcpy(lpszFile, tchBuild);
-				return IniFindStatus::Found | IniFindStatus::AppData;
+				return IniFindStatus::AppData;
 			}
 		}
 		if (!portable) {
-			lstrcpy(tchBuild, tchModule);
+			memcpy(tchBuild, tchModule, nameIndex*sizeof(WCHAR));
 			lstrcpy(&tchBuild[nameIndex], lpszFile);
 			if (PathIsFile(tchBuild)) {
 				lstrcpy(lpszFile, tchBuild);
-				return IniFindStatus::Found | IniFindStatus::Program;
+				return IniFindStatus::Program;
 			}
 		}
-		return IniFindStatus::Relative;
-	}
-	if (PathIsFile(lpszFile)) {
+	} else if (PathIsFile(lpszFile)) {
 		return IniFindStatus::Found;
 	}
 
@@ -3138,64 +3130,52 @@ void FindIniFile() noexcept {
 			lstrcpy(szIniFile, tchTest);
 		}
 		status = finder.CheckIniFile(szIniFile);
-		status = status | IniFindStatus::Specified;
 	} else {
 		lstrcpy(tchTest, finder.tchModule + finder.nameIndex);
 		PathRenameExtension(tchTest, L".ini");
 		status = finder.CheckIniFile(tchTest);
 
-		if (!FlagSet(status, IniFindStatus::Found) && !StrCaseEqual(tchTest, L"matepath.ini")) {
+		if (status == IniFindStatus::NotFound && !StrCaseEqual(tchTest, L"matepath.ini")) {
 			lstrcpy(tchTest, L"matepath.ini");
 			status = finder.CheckIniFile(tchTest);
 		}
 
-		if (FlagSet(status, IniFindStatus::Found)) {
+		if (status != IniFindStatus::NotFound) {
 			WCHAR tchTmp[MAX_PATH];
-			if (FlagSet(status, IniFindStatus::Program) && !finder.portable && finder.appData != nullptr) {
+			LPWSTR pszFile = tchTest;
+			if (status == IniFindStatus::Program && !finder.portable && finder.appData != nullptr) {
 				// copy ini to %LOCALAPPDATA%\Notepad4
 				PathCombine(tchTmp, finder.appData, WC_NOTEPAD4);
 				SHCreateDirectoryEx(nullptr, tchTmp, nullptr);
 				PathAppend(tchTmp, &tchTest[finder.nameIndex]);
 				CopyFile(tchTest, tchTmp, TRUE);
 				// always use %LOCALAPPDATA% for non-portable installation
-				lstrcpy(tchTest, tchTmp);
+				pszFile = tchTmp;
 			}
 			// check ini redirection
-			if (GetPrivateProfileString(INI_SECTION_NAME_MATEPATH, L"matepath.ini", L"", tchTmp, COUNTOF(tchTmp), tchTest)) {
-				if (!ExpandEnvironmentStringsEx(tchTmp, tchTest)) {
-					lstrcpy(tchTest, tchTmp);
+			lstrcpy(szIniFile, pszFile);
+			if (GetPrivateProfileString(INI_SECTION_NAME_MATEPATH, L"matepath.ini", L"", tchTmp, COUNTOF(tchTmp), pszFile)) {
+				pszFile = tchTmp;
+				if (ExpandEnvironmentStringsEx(tchTmp, tchTest)) {
+					pszFile = tchTest;
 				}
-				status = finder.CheckIniFile(tchTest);
-				status = status | IniFindStatus::Specified;
+				if (finder.CheckIniFile(pszFile) != IniFindStatus::NotFound) {
+					lstrcpy(szIniFile, pszFile);
+				}
 			}
-			lstrcpy(szIniFile, tchTest);
 		}
 	}
 
-	if (!FlagSet(status, IniFindStatus::Found)) {
+	if (status == IniFindStatus::NotFound) {
 		// ini not found, build default path for it
-		LPCWSTR pszFile = finder.tchModule + finder.nameIndex;
-		bool relative = true;
-		if (FlagSet(status, IniFindStatus::Specified)) {
-			pszFile = szIniFile;
-			relative = FlagSet(status, IniFindStatus::Relative);
+		if (!finder.portable && finder.appData != nullptr) {
+			PathCombine(tchTest, finder.appData, WC_NOTEPAD4);
+			PathAppend(tchTest, finder.tchModule + finder.nameIndex);
+		} else {
+			lstrcpy(tchTest, finder.tchModule);
 		}
-		if (relative) {
-			if (!finder.portable && finder.appData != nullptr) {
-				PathCombine(tchTest, finder.appData, WC_NOTEPAD4);
-				PathAppend(tchTest, pszFile);
-			} else {
-				lstrcpy(tchTest, finder.tchModule);
-				lstrcpy(&tchTest[finder.nameIndex], pszFile);
-			}
-			PathRenameExtension(tchTest, L".ini");
-			pszFile = tchTest;
-			if (PathIsFile(tchTest)) {
-				lstrcpy(szIniFile, tchTest);
-				return;
-			}
-		}
-		lstrcpy(szIniFile2, pszFile);
+		PathRenameExtension(tchTest, L".ini");
+		lstrcpy(szIniFile2, tchTest);
 		SetStrEmpty(szIniFile);
 	}
 }
