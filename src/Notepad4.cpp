@@ -6493,18 +6493,22 @@ void FindIniFile() noexcept {
 
 		if (status != IniFindStatus::NotFound) {
 			WCHAR tchTmp[MAX_PATH];
-			LPWSTR pszFile = tchTest;
+			LPWSTR pszFile = szIniFile;
+			lstrcpy(pszFile, tchTest);
 			if (status == IniFindStatus::Program && !finder.portable && finder.appData != nullptr) {
 				// copy ini to %LOCALAPPDATA%\Notepad4
 				PathCombine(tchTmp, finder.appData, WC_NOTEPAD4);
 				SHCreateDirectoryEx(nullptr, tchTmp, nullptr);
-				PathAppend(tchTmp, &tchTest[finder.nameIndex]);
+				PathAppend(tchTmp, pszFile + finder.nameIndex);
+				CopyFile(pszFile, tchTmp, TRUE);
+				lstrcpy(pszFile, tchTmp);
+
+				lstrcpy(PathFindFileName(tchTmp), L"Notepad4 DarkTheme.ini");
+				lstrcpy(&tchTest[finder.nameIndex], L"Notepad4 DarkTheme.ini");
 				CopyFile(tchTest, tchTmp, TRUE);
 				// always use %LOCALAPPDATA% for non-portable installation
-				pszFile = tchTmp;
 			}
 			// check ini redirection
-			lstrcpy(szIniFile, pszFile);
 			if (GetPrivateProfileString(INI_SECTION_NAME_NOTEPAD4, L"Notepad4.ini", L"", tchTmp, COUNTOF(tchTmp), pszFile)) {
 				pszFile = tchTmp;
 				if (ExpandEnvironmentStringsEx(tchTmp, tchTest)) {
