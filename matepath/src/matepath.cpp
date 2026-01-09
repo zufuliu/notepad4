@@ -3065,11 +3065,6 @@ struct IniFinder {
 			portable = false;
 		}
 	}
-	~IniFinder() {
-		if (appData != nullptr) {
-			CoTaskMemFree(appData);
-		}
-	}
 	IniFindStatus CheckIniFile(LPWSTR lpszFile) noexcept;
 };
 
@@ -3177,6 +3172,9 @@ void FindIniFile() noexcept {
 		PathRenameExtension(tchTest, L".ini");
 		lstrcpy(szIniFile2, tchTest);
 		SetStrEmpty(szIniFile);
+	}
+	if (finder.appData != nullptr) {
+		CoTaskMemFree(finder.appData);
 	}
 }
 
