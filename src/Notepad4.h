@@ -245,7 +245,6 @@ void LoadFlags() noexcept;
 
 void FindIniFile() noexcept;
 bool CreateIniFile(LPCWSTR lpszIniFile) noexcept;
-void FindExtraIniFile(LPWSTR lpszIniFile, LPCWSTR defaultName, LPCWSTR redirectKey) noexcept;
 
 void UpdateWindowTitle() noexcept;
 void UpdateStatusbar() noexcept;

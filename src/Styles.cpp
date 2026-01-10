@@ -611,8 +611,10 @@ static inline LPCWSTR GetStyleThemeFilePath() noexcept {
 	return (np2StyleTheme == StyleTheme_Dark) ? darkStyleThemeFilePath : szIniFile;
 }
 
-static inline void FindDarkThemeFile() noexcept {
-	FindExtraIniFile(darkStyleThemeFilePath, L"Notepad4 DarkTheme.ini", L"DarkTheme.ini");
+static inline void FindDarkThemeFile(LPWSTR lpszIniFile) noexcept {
+	// relative to program ini file
+	lstrcpy(lpszIniFile, szIniFile);
+	lstrcpy(PathFindFileName(lpszIniFile), L"Notepad4 DarkTheme.ini");
 }
 
 void Style_LoadTabSettings(LPCEDITLEXER pLex) noexcept {
@@ -791,7 +793,7 @@ void Style_Load() noexcept {
 	}
 
 	if (np2StyleTheme == StyleTheme_Dark) {
-		FindDarkThemeFile();
+		FindDarkThemeFile(darkStyleThemeFilePath);
 	}
 
 	Style_LoadOneEx(&lexGlobal, section, pIniSectionBuf, cchIniSection);
@@ -1174,8 +1176,8 @@ void Style_OnStyleThemeChanged(int theme) noexcept {
 		return;
 	}
 	if (theme != StyleTheme_Default) {
-		if (!PathIsFile(darkStyleThemeFilePath)) {
-			FindDarkThemeFile();
+		if (StrIsEmpty(darkStyleThemeFilePath)) {
+			FindDarkThemeFile(darkStyleThemeFilePath);
 		}
 	}
 

@@ -6506,29 +6506,6 @@ void FindIniFile() noexcept {
 	}
 }
 
-void FindExtraIniFile(LPWSTR lpszIniFile, LPCWSTR defaultName, LPCWSTR redirectKey) noexcept {
-	if (StrNotEmpty(szIniFile)) {
-		WCHAR tch[MAX_PATH];
-		if (GetPrivateProfileString(INI_SECTION_NAME_NOTEPAD4, redirectKey, L"", tch, COUNTOF(tch), szIniFile)) {
-			if (FindUserResourcePath(tch, lpszIniFile)) {
-				return;
-			}
-		}
-	}
-	if (FindUserResourcePath(defaultName, lpszIniFile)) {
-		return;
-	}
-
-	if (StrNotEmpty(szIniFile)) {
-		// relative to program ini file
-		lstrcpy(lpszIniFile, szIniFile);
-	} else {
-		// relative to program exe file
-		lstrcpy(lpszIniFile, szExeRealPath);
-	}
-	lstrcpy(PathFindFileName(lpszIniFile), defaultName);
-}
-
 bool CreateIniFile(LPCWSTR lpszIniFile) noexcept {
 	if (StrNotEmpty(lpszIniFile)) {
 		WCHAR *pwchTail = StrRChr(lpszIniFile, nullptr, L'\\');
