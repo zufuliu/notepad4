@@ -1,4 +1,3 @@
-💡Tips: To keep your current settings, do **NOT** replace *Notepad4.ini*, *matepath.ini* or any theme (INI) files with the bundled one, but please mind the breaking changes if any.
 
 ## Changes Since
 * Scintilla updated to 5, see https://www.scintilla.org/ScintillaHistory.html for the changes.

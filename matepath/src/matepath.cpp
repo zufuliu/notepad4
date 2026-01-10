@@ -3116,17 +3116,7 @@ void FindIniFile() noexcept {
 				// always use %LOCALAPPDATA% for non-portable installation
 				pszFile = tchTmp;
 			}
-			// check ini redirection
 			lstrcpy(szIniFile, pszFile);
-			if (GetPrivateProfileString(INI_SECTION_NAME_MATEPATH, L"matepath.ini", L"", tchTmp, COUNTOF(tchTmp), pszFile)) {
-				pszFile = tchTmp;
-				if (ExpandEnvironmentStringsEx(tchTmp, tchTest)) {
-					pszFile = tchTest;
-				}
-				if (finder.CheckIniFile(pszFile) != IniFindStatus::NotFound) {
-					lstrcpy(szIniFile, pszFile);
-				}
-			}
 		}
 
 	if (status == IniFindStatus::NotFound) {

@@ -6477,16 +6477,6 @@ void FindIniFile() noexcept {
 				CopyFile(tchTest, tchTmp, TRUE);
 				// always use %LOCALAPPDATA% for non-portable installation
 			}
-			// check ini redirection
-			if (GetPrivateProfileString(INI_SECTION_NAME_NOTEPAD4, L"Notepad4.ini", L"", tchTmp, COUNTOF(tchTmp), pszFile)) {
-				pszFile = tchTmp;
-				if (ExpandEnvironmentStringsEx(tchTmp, tchTest)) {
-					pszFile = tchTest;
-				}
-				if (finder.CheckIniFile(pszFile) != IniFindStatus::NotFound) {
-					lstrcpy(szIniFile, pszFile);
-				}
-			}
 		}
 
 	if (status == IniFindStatus::NotFound) {
