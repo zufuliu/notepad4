@@ -6413,6 +6413,10 @@ void FindIniFile() noexcept {
 		lstrcpy(&source[nameIndex], L"Notepad4.ini-default");
 		CopyFile(source, lpszIniFile, TRUE);
 
+		if (portable) {
+			memcpy(appData, source, nameIndex*sizeof(WCHAR));
+			appData[nameIndex] = L'\0';
+		}
 		lstrcpy(&source[nameIndex], L"Notepad4 DarkTheme.ini-default");
 		PathAppend(appData, L"Notepad4 DarkTheme.ini");
 		CopyFile(source, appData, TRUE);
