@@ -6378,121 +6378,45 @@ void LoadFlags() noexcept {
 // FindIniFile()
 //
 //
-namespace {
-
-enum class IniFindStatus {
-	NotFound = 0,
-	Found = 1,
-	Program = 2,
-	AppData = 3,
-};
-
-struct IniFinder {
-	LPCWSTR tchModule;
-	size_t nameIndex;
-	LPWSTR appData = nullptr;
+void FindIniFile() noexcept {
+	LPCWSTR tchModule = szExeRealPath;
+	const size_t nameIndex = PathFindFileName(tchModule) - tchModule;
+	WCHAR appData[MAX_PATH];
+	LPWSTR lpszIniFile = szIniFile;
 	bool portable = true;
-
-	IniFinder() noexcept {
-		tchModule = szExeRealPath;
-		nameIndex = PathFindFileName(tchModule) - tchModule;
-		if (StrStr(tchModule, L"WinGet") != nullptr || StrStr(tchModule, L"Chocolatey") != nullptr) {
-			// %LOCALAPPDATA%\Microsoft\WinGet\Packages
-			// ChocolateyInstall
-			portable = false;
-		}
-	}
-	IniFindStatus CheckIniFile(LPWSTR lpszFile) noexcept;
-};
-
-}
-
-NP2_noinline IniFindStatus IniFinder::CheckIniFile(LPWSTR lpszFile) noexcept {
-	if (PathIsRelative(lpszFile)) {
-		WCHAR tchBuild[MAX_PATH];
-		// program directory
-		if (portable) {
-			memcpy(tchBuild, tchModule, nameIndex*sizeof(WCHAR));
-			lstrcpy(&tchBuild[nameIndex], lpszFile);
-			if (PathIsFile(tchBuild)) {
-				lstrcpy(lpszFile, tchBuild);
-				return IniFindStatus::Program;
-			}
-		}
-
+	if (StrStr(tchModule, L"WinGet") != nullptr || StrStr(tchModule, L"Chocolatey") != nullptr) {
+		// %LOCALAPPDATA%\Microsoft\WinGet\Packages
+		// ChocolateyInstall
+		LPWSTR pszPath = nullptr;
 		// %LOCALAPPDATA%
 		// C:\Users\<username>\AppData\Local
 		// C:\Documents and Settings\<username>\Local Settings\Application Data
-		if (appData != nullptr || S_OK == SHGetKnownFolderPath(FOLDERID_LocalAppData, KF_FLAG_DEFAULT, nullptr, &appData)) {
-			PathCombine(tchBuild, appData, WC_NOTEPAD4);
-			PathAppend(tchBuild, lpszFile);
-			if (PathIsFile(tchBuild)) {
-				lstrcpy(lpszFile, tchBuild);
-				return IniFindStatus::AppData;
-			}
+		if (S_OK == SHGetKnownFolderPath(FOLDERID_LocalAppData, KF_FLAG_DEFAULT, nullptr, &pszPath)) {
+			// always use %LOCALAPPDATA%\Notepad4 for non-portable installation
+			portable = false;
+			PathCombine(appData, pszPath, WC_NOTEPAD4);
+			lstrcpy(lpszIniFile, appData);
+			PathAppend(lpszIniFile, L"Notepad4.ini");
+			CoTaskMemFree(pszPath);
 		}
+	}
+
+	if (portable) {
+		memcpy(lpszIniFile, tchModule, nameIndex*sizeof(WCHAR));
+		lstrcpy(&lpszIniFile[nameIndex], L"Notepad4.ini");
+	}
+	if (!PathIsFile(lpszIniFile)) {
 		if (!portable) {
-			memcpy(tchBuild, tchModule, nameIndex*sizeof(WCHAR));
-			lstrcpy(&tchBuild[nameIndex], lpszFile);
-			if (PathIsFile(tchBuild)) {
-				lstrcpy(lpszFile, tchBuild);
-				return IniFindStatus::Program;
-			}
+			SHCreateDirectoryEx(nullptr, appData, nullptr);
 		}
-	} else if (PathIsFile(lpszFile)) {
-		return IniFindStatus::Found;
-	}
+		WCHAR source[MAX_PATH];
+		memcpy(source, tchModule, nameIndex*sizeof(WCHAR));
+		lstrcpy(&source[nameIndex], L"Notepad4.ini-default");
+		CopyFile(source, lpszIniFile, TRUE);
 
-	return IniFindStatus::NotFound;
-}
-
-void FindIniFile() noexcept {
-	IniFinder finder;
-	IniFindStatus status;
-	WCHAR tchTest[MAX_PATH];
-
-		lstrcpy(tchTest, finder.tchModule + finder.nameIndex);
-		PathRenameExtension(tchTest, L".ini");
-		status = finder.CheckIniFile(tchTest);
-
-		if (status == IniFindStatus::NotFound && !StrCaseEqual(tchTest, L"Notepad4.ini")) {
-			lstrcpy(tchTest, L"Notepad4.ini");
-			status = finder.CheckIniFile(tchTest);
-		}
-
-		if (status != IniFindStatus::NotFound) {
-			WCHAR tchTmp[MAX_PATH];
-			LPWSTR pszFile = szIniFile;
-			lstrcpy(pszFile, tchTest);
-			if (status == IniFindStatus::Program && !finder.portable && finder.appData != nullptr) {
-				// copy ini to %LOCALAPPDATA%\Notepad4
-				PathCombine(tchTmp, finder.appData, WC_NOTEPAD4);
-				SHCreateDirectoryEx(nullptr, tchTmp, nullptr);
-				PathAppend(tchTmp, pszFile + finder.nameIndex);
-				CopyFile(pszFile, tchTmp, TRUE);
-				lstrcpy(pszFile, tchTmp);
-
-				lstrcpy(PathFindFileName(tchTmp), L"Notepad4 DarkTheme.ini");
-				lstrcpy(&tchTest[finder.nameIndex], L"Notepad4 DarkTheme.ini");
-				CopyFile(tchTest, tchTmp, TRUE);
-				// always use %LOCALAPPDATA% for non-portable installation
-			}
-		}
-
-	if (status == IniFindStatus::NotFound) {
-		// ini not found, build default path for it
-		if (!finder.portable && finder.appData != nullptr) {
-			PathCombine(tchTest, finder.appData, WC_NOTEPAD4);
-			PathAppend(tchTest, finder.tchModule + finder.nameIndex);
-		} else {
-			lstrcpy(tchTest, finder.tchModule);
-		}
-		PathRenameExtension(tchTest, L".ini");
-		lstrcpy(szIniFile2, tchTest);
-		SetStrEmpty(szIniFile);
-	}
-	if (finder.appData != nullptr) {
-		CoTaskMemFree(finder.appData);
+		lstrcpy(&source[nameIndex], L"Notepad4 DarkTheme.ini-default");
+		PathAppend(appData, L"Notepad4 DarkTheme.ini");
+		CopyFile(source, appData, TRUE);
 	}
 }
 

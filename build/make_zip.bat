@@ -156,6 +156,7 @@ IF "%WITH_LOCALE%" == "1" (
 )
 
 PUSHD "%TEMP_ZIP_DIR%"
+RENAME *.ini *.ini-default
 "%SEVENZIP%" a -tzip -mx=9 "../%ZIP_NAME%.zip" "*" >NUL
 POPD
 
