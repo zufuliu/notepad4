@@ -1874,7 +1874,6 @@ fichier\tDoit être le dernier argument, pas de doubles guillemets pour les espa
 /t title\tRégler le titre de la fenêtre.\n\
 /i\tDémarrer en mode réduit dans la barre des tâches.\n\
 /o\tGarder la fenêtre en avant des autres applications.\n\
-/f chemin\tspécifier un fichier ini (/f0 pas de fichier ini).\n\
 /u\tLancer avec des privilèges élevés (exécuter en tant qu'administateur).\n\
 /z\tPassr au suivant (Utilisable pour les remplacements en base de registre)."
 END

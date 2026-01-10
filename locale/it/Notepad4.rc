@@ -1874,7 +1874,6 @@ file\tPer impostazione predefinita deve essere l'ultimo\n\targomento, senza spaz
 /t titolo\tImposta il titolo della finestra..\n\
 /i\tAvvia come icona della barra delle applicazioni.\n\
 /o\tMantiene la finestra sempre in cima.\n\
-/f percorso    Specifica il file ini (/f0 no ini-file).\n\
 /u\tAvvia con privilegi elevati (esegui come\n\tamministratore).\n\
 /z\tSalta successivo (utilizzabile per la sostituzione di\n\tNotepad basata sul registro)."
 END

@@ -5679,8 +5679,6 @@ enum CommandParseState {
 	CommandParseState_Unknown,
 };
 
-constexpr UINT noIniTag = L'*' | (L'?' << 16);
-
 }
 
 CommandParseState ParseCommandLineEncoding(LPCWSTR opt) noexcept {
@@ -5755,16 +5753,6 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) noexcept {
 					LocalFree(lpEncodingArg);
 				}
 				lpEncodingArg = StrDup(lp1);
-				state = CommandParseState_Consumed;
-			}
-			break;
-
-		case L'F':
-			state = CommandParseState_Argument;
-			if (ExtractFirstArgument(lp2, lp1, lp2)) {
-				lstrcpyn(szIniFile, lp1, COUNTOF(szIniFile));
-				TrimString(szIniFile);
-				PathUnquoteSpaces(szIniFile);
 				state = CommandParseState_Consumed;
 			}
 			break;
@@ -5896,13 +5884,6 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) noexcept {
 		case L'C':
 			if (chNext == L'R') {
 				flagSetEOLMode = IDM_LINEENDINGS_CR - IDM_LINEENDINGS_CRLF + 1;
-				state = CommandParseState_Consumed;
-			}
-			break;
-
-		case L'F':
-			if (chNext == L'0' || chNext == L'O') {
-				*reinterpret_cast<UINT *>(szIniFile) = noIniTag;
 				state = CommandParseState_Consumed;
 			}
 			break;
@@ -6466,22 +6447,10 @@ NP2_noinline IniFindStatus IniFinder::CheckIniFile(LPWSTR lpszFile) noexcept {
 }
 
 void FindIniFile() noexcept {
-	if (*reinterpret_cast<UINT *>(szIniFile) == noIniTag) {
-		SetStrEmpty(szIniFile);
-		SetStrEmpty(szIniFile2);
-		return;
-	}
-
 	IniFinder finder;
 	IniFindStatus status;
 	WCHAR tchTest[MAX_PATH];
 
-	if (StrNotEmpty(szIniFile)) {
-		if (ExpandEnvironmentStringsEx(szIniFile, tchTest)) {
-			lstrcpy(szIniFile, tchTest);
-		}
-		status = finder.CheckIniFile(szIniFile);
-	} else {
 		lstrcpy(tchTest, finder.tchModule + finder.nameIndex);
 		PathRenameExtension(tchTest, L".ini");
 		status = finder.CheckIniFile(tchTest);
@@ -6519,7 +6488,6 @@ void FindIniFile() noexcept {
 				}
 			}
 		}
-	}
 
 	if (status == IniFindStatus::NotFound) {
 		// ini not found, build default path for it
@@ -7737,15 +7705,6 @@ void GetRelaunchParameters(LPWSTR szParameters, LPCWSTR lpszFile, bool newWind, 
 
 	wsprintf(tch, L" -sysmru=%i", (flagUseSystemMRU == TripleBoolean_True));
 	lstrcat(szParameters, tch);
-
-	lstrcat(szParameters, L" -f");
-	if (StrNotEmpty(szIniFile)) {
-		lstrcat(szParameters, L" \"");
-		lstrcat(szParameters, szIniFile);
-		lstrcat(szParameters, L"\"");
-	} else {
-		lstrcat(szParameters, L"0");
-	}
 
 	if (newWind) {
 		lstrcat(szParameters, L" -n");

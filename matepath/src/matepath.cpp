@@ -2818,8 +2818,6 @@ enum CommandParseState {
 	CommandParseState_Argument,
 };
 
-constexpr UINT noIniTag = L'*' | (L'?' << 16);
-
 }
 
 CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) noexcept {
@@ -2837,16 +2835,6 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) noexcept {
 
 	if (opt[1] == L'\0') {
 		switch (ch) {
-		case L'F':
-			state = CommandParseState_Argument;
-			if (ExtractFirstArgument(lp2, lp1, lp2)) {
-				lstrcpyn(szIniFile, lp1, COUNTOF(szIniFile));
-				TrimString(szIniFile);
-				PathUnquoteSpaces(szIniFile);
-				state = CommandParseState_Consumed;
-			}
-			break;
-
 		case L'G':
 			flagGotoFavorites = true;
 			state = CommandParseState_Consumed;
@@ -2903,13 +2891,6 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) noexcept {
 	} else if (opt[2] == L'\0') {
 		const int chNext = ToUpperA(opt[1]);
 		switch (ch) {
-		case L'F':
-			if (chNext == L'0' || chNext == L'O') {
-				*reinterpret_cast<UINT *>(szIniFile) = noIniTag;
-				state = CommandParseState_Consumed;
-			}
-			break;
-
 		case L'P':
 			switch (chNext) {
 			case L'D':
@@ -3110,22 +3091,10 @@ NP2_noinline IniFindStatus IniFinder::CheckIniFile(LPWSTR lpszFile) noexcept {
 }
 
 void FindIniFile() noexcept {
-	if (*reinterpret_cast<UINT *>(szIniFile) == noIniTag) {
-		SetStrEmpty(szIniFile);
-		SetStrEmpty(szIniFile2);
-		return;
-	}
-
 	IniFinder finder;
 	IniFindStatus status;
 	WCHAR tchTest[MAX_PATH];
 
-	if (StrNotEmpty(szIniFile)) {
-		if (ExpandEnvironmentStringsEx(szIniFile, tchTest)) {
-			lstrcpy(szIniFile, tchTest);
-		}
-		status = finder.CheckIniFile(szIniFile);
-	} else {
 		lstrcpy(tchTest, finder.tchModule + finder.nameIndex);
 		PathRenameExtension(tchTest, L".ini");
 		status = finder.CheckIniFile(tchTest);
@@ -3159,7 +3128,6 @@ void FindIniFile() noexcept {
 				}
 			}
 		}
-	}
 
 	if (status == IniFindStatus::NotFound) {
 		// ini not found, build default path for it
@@ -3432,16 +3400,7 @@ bool ActivatePrevInst() noexcept {
 }
 
 void GetRelaunchParameters(LPWSTR szParameters) noexcept {
-	StrCpyEx(szParameters, L" -f");
-	if (StrNotEmpty(szIniFile)) {
-		lstrcat(szParameters, L" \"");
-		lstrcat(szParameters, szIniFile);
-		lstrcat(szParameters, L"\"");
-	} else {
-		lstrcat(szParameters, L"0");
-	}
-
-	lstrcat(szParameters, L" -n");
+	StrCpyEx(szParameters, L" -n");
 
 	WINDOWPLACEMENT wndpl;
 	wndpl.length = sizeof(WINDOWPLACEMENT);

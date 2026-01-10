@@ -1877,7 +1877,6 @@ Datei\tMuss das letzte Argument sein, \n\
 /t title\tFenstertitel festlegen\n\
 /i\tStart als Trayicon\n\
 /o\tFenster immer im Vordergrung\n\
-/f path\tINI Datei festlegen (/f0 keine INI Datei verwenden)\n\
 /u\tMit Administratorrechten starten\n\
 /z\tÜberspringt nächstes\n\
 \t(bei Registrybasierter Notepadersetzung)"

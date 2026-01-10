@@ -1874,7 +1874,6 @@ file\tMust be the last argument, no quoted spaces by default.\n\
 /t title\tSet window title.\n\
 /i\tStart as tray icon.\n\
 /o\tKeep window on top.\n\
-/f path\tSpecify ini-file (/f0 no ini-file).\n\
 /u\tLaunch with elevated privileges (run as Administrator).\n\
 /z\tSkip next (usable for registry-based Notepad replacement)."
 END
