@@ -390,7 +390,6 @@ bool ExeNameFromWnd(HWND hwnd, LPWSTR szExeName, DWORD cchExeName) noexcept;
 #define SetExplorerTheme(hwnd)		SetWindowTheme((hwnd), L"Explorer", nullptr)
 #define SetListViewTheme(hwnd)		SetWindowTheme((hwnd), L"Listview", nullptr)
 
-bool FindUserResourcePath(LPCWSTR path, LPWSTR outPath) noexcept;
 HBITMAP LoadBitmapFile(LPCWSTR path) noexcept;
 HBITMAP ResizeImageForDPI(HBITMAP hbmp, UINT dpi) noexcept;
 inline HBITMAP ResizeImageForCurrentDPI(HBITMAP hbmp) noexcept {

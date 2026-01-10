@@ -302,45 +302,23 @@ int ParseCommaList(LPCWSTR str, int result[], int count) noexcept {
 	return index;
 }
 
-bool FindUserResourcePath(LPCWSTR path, LPWSTR outPath) noexcept {
+HBITMAP LoadBitmapFile(LPCWSTR path) noexcept {
 	WCHAR tchFileExpanded[MAX_PATH];
+	WCHAR szTmp[MAX_PATH];
 	if (ExpandEnvironmentStringsEx(path, tchFileExpanded)) {
 		path = tchFileExpanded;
 	}
-
 	if (PathIsRelative(path)) {
-		WCHAR tchBuild[MAX_PATH];
 		// relative to program ini file
-		if (StrNotEmpty(szIniFile)) {
-			lstrcpy(tchBuild, szIniFile);
-			lstrcpy(PathFindFileName(tchBuild), path);
-			if (PathIsFile(tchBuild)) {
-				lstrcpy(outPath, tchBuild);
-				return true;
-			}
-		}
-
-		// relative to program exe file
-		lstrcpy(tchBuild, szExeRealPath);
-		lstrcpy(PathFindFileName(tchBuild), path);
-		if (PathIsFile(tchBuild)) {
-			lstrcpy(outPath, tchBuild);
-			return true;
-		}
-	} else if (PathIsFile(path)) {
-		lstrcpy(outPath, path);
-		return true;
+		lstrcpy(szTmp, szIniFile);
+		lstrcpy(PathFindFileName(szTmp), path);
+		path = szTmp;
 	}
-	return false;
-}
-
-HBITMAP LoadBitmapFile(LPCWSTR path) noexcept {
-	WCHAR szTmp[MAX_PATH];
-	if (!FindUserResourcePath(path, szTmp)) {
+	if (!PathIsFile(path)) {
 		return nullptr;
 	}
 
-	HBITMAP hbmp = static_cast<HBITMAP>(LoadImage(nullptr, szTmp, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE));
+	HBITMAP hbmp = static_cast<HBITMAP>(LoadImage(nullptr, path, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE));
 	return hbmp;
 }
 
