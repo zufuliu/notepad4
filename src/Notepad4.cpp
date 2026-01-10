@@ -526,7 +526,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	// Command Line, Ini File and Flags
 	ParseCommandLine();
 	FindIniFile();
-	CreateIniFile(szIniFile);
 	LoadFlags();
 
 	// set AppUserModelID
@@ -6417,6 +6416,20 @@ void FindIniFile() noexcept {
 		lstrcpy(&source[nameIndex], L"Notepad4 DarkTheme.ini-default");
 		PathAppend(appData, L"Notepad4 DarkTheme.ini");
 		CopyFile(source, appData, TRUE);
+	}
+
+	// inline CreateIniFile() to avoid slow directory creation
+	HANDLE hFile = CreateFile(lpszIniFile,
+					   GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
+					   nullptr, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+	if (hFile != INVALID_HANDLE_VALUE) {
+		LARGE_INTEGER fileSize;
+		fileSize.QuadPart = 0;
+		if (GetFileSizeEx(hFile, &fileSize) && fileSize.QuadPart < 2) {
+			DWORD dw;
+			WriteFile(hFile, L"\xFEFF[Notepad4]\r\n", 26, &dw, nullptr);
+		}
+		CloseHandle(hFile);
 	}
 }
 

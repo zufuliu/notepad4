@@ -287,7 +287,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	// Command Line, Ini File and Flags
 	ParseCommandLine();
 	FindIniFile();
-	CreateIniFile(szIniFile);
 	LoadFlags();
 
 	// Try to activate another window
@@ -3057,6 +3056,20 @@ void FindIniFile() noexcept {
 		memcpy(source, tchModule, nameIndex*sizeof(WCHAR));
 		lstrcpy(&source[nameIndex], L"matepath.ini-default");
 		CopyFile(source, lpszIniFile, TRUE);
+	}
+
+	// inline CreateIniFile() to avoid slow directory creation
+	HANDLE hFile = CreateFile(lpszIniFile,
+					   GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
+					   nullptr, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+	if (hFile != INVALID_HANDLE_VALUE) {
+		LARGE_INTEGER fileSize;
+		fileSize.QuadPart = 0;
+		if (GetFileSizeEx(hFile, &fileSize) && fileSize.QuadPart < 2) {
+			DWORD dw;
+			WriteFile(hFile, L"\xFEFF[matepath]\r\n", 26, &dw, nullptr);
+		}
+		CloseHandle(hFile);
 	}
 }
 
