@@ -103,7 +103,6 @@ static TBBUTTON tbbMainWnd[] = {
 };
 
 WCHAR	szIniFile[MAX_PATH];
-static WCHAR szIniFile2[MAX_PATH];
 WCHAR szExeRealPath[MAX_PATH];
 static bool bSaveSettings;
 bool	bSaveRecentFiles;
@@ -2598,22 +2597,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	i = IDM_VIEW_NOESCFUNC + static_cast<int>(iEscFunction);
 	CheckMenuRadioItem(hmenu, IDM_VIEW_NOESCFUNC, IDM_VIEW_ESCEXIT, i, MF_BYCOMMAND);
 
-	i = StrNotEmpty(szIniFile);
-	const uint16_t menuRequiresIni[] = {
-		CMD_OPENINIFILE,
-		IDM_VIEW_NOSAVEFINDREPL,
-		IDM_VIEW_NOSAVERECENT,
-		IDM_VIEW_REUSEWINDOW,
-		IDM_VIEW_SAVESETTINGS,
-		IDM_VIEW_SINGLEFILEINSTANCE,
-		IDM_VIEW_STICKY_WINDOW_POSITION,
-	};
-	for (unsigned k = 0; k < COUNTOF(menuRequiresIni); k++) {
-		EnableCmd(hmenu, menuRequiresIni[k], i);
-	}
-
-	CheckCmd(hmenu, IDM_VIEW_SAVESETTINGS, i && bSaveSettings);
-	EnableCmd(hmenu, IDM_VIEW_SAVESETTINGSNOW, i || StrNotEmpty(szIniFile2));
+	CheckCmd(hmenu, IDM_VIEW_SAVESETTINGS, bSaveSettings);
 
 	Style_UpdateSchemeMenu(hmenu);
 }
@@ -4624,10 +4608,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case CMD_OPENINIFILE:
-		if (StrNotEmpty(szIniFile)) {
-			CreateIniFile(szIniFile);
-			FileLoad(FileLoadFlag_Default, szIniFile);
-		}
+		CreateIniFile(szIniFile);
+		FileLoad(FileLoadFlag_Default, szIniFile);
 		break;
 
 	case IDM_SET_SYSTEM_INTEGRATION:
@@ -5402,21 +5384,7 @@ void LoadSettings() noexcept {
 
 void SaveSettingsNow(bool bOnlySaveStyle, bool bQuiet) noexcept {
 	bool bCreateFailure = false;
-
-	if (StrIsEmpty(szIniFile)) {
-		if (StrNotEmpty(szIniFile2)) {
-			if (CreateIniFile(szIniFile2)) {
-				lstrcpy(szIniFile, szIniFile2);
-				StrCpyEx(szIniFile2, L"");
-			} else {
-				bCreateFailure = true;
-			}
-		} else {
-			return;
-		}
-	}
-
-	if (!bCreateFailure) {
+	{
 		LPCWSTR section = bOnlySaveStyle ? INI_SECTION_NAME_STYLES : INI_SECTION_NAME_SETTINGS;
 		if (WritePrivateProfileString(section, L"WriteTest", L"ok", szIniFile)) {
 			BeginWaitCursor();

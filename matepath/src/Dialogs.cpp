@@ -612,12 +612,8 @@ static INT_PTR CALLBACK GeneralPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 
 	switch (umsg) {
 	case WM_INITDIALOG:
-		if (StrNotEmpty(szIniFile)) {
-			if (bSaveSettings) {
-				CheckDlgButton(hwnd, IDC_SAVESETTINGS, BST_CHECKED);
-			}
-		} else {
-			EnableWindow(GetDlgItem(hwnd, IDC_SAVESETTINGS), FALSE);
+		if (bSaveSettings) {
+			CheckDlgButton(hwnd, IDC_SAVESETTINGS, BST_CHECKED);
 		}
 
 		if (bOpenFileInSameWindow) {

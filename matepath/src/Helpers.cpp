@@ -41,7 +41,7 @@
 
 void IniClearSectionEx(LPCWSTR lpSection, LPCWSTR lpszIniFile, bool bDelete) noexcept {
 	if (StrIsEmpty(lpszIniFile)) {
-		return;
+		return; // win.ini
 	}
 
 	WritePrivateProfileSection(lpSection, (bDelete ? nullptr : L""), lpszIniFile);
@@ -49,7 +49,7 @@ void IniClearSectionEx(LPCWSTR lpSection, LPCWSTR lpszIniFile, bool bDelete) noe
 
 void IniClearAllSectionEx(LPCWSTR lpszPrefix, LPCWSTR lpszIniFile, bool bDelete) noexcept {
 	if (StrIsEmpty(lpszIniFile)) {
-		return;
+		return; // win.ini
 	}
 
 	WCHAR sections[1024] = L"";
@@ -1907,16 +1907,12 @@ void MRUList::Empty(bool save) noexcept {
 		pszItems[i] = nullptr;
 	}
 	iSize = 0;
-	if (save && StrNotEmpty(szIniFile)) {
+	if (save) {
 		IniClearSection(szRegKey);
 	}
 }
 
 void MRUList::Load() noexcept {
-	if (StrIsEmpty(szIniFile)) {
-		return;
-	}
-
 	IniSectionParser section;
 	WCHAR *pIniSectionBuf = static_cast<WCHAR *>(NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_MRU));
 	const DWORD cchIniSection = static_cast<DWORD>(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
@@ -1939,9 +1935,6 @@ void MRUList::Load() noexcept {
 }
 
 void MRUList::Save() const noexcept {
-	if (StrIsEmpty(szIniFile)) {
-		return;
-	}
 	if (iSize <= 0) {
 		IniClearSection(szRegKey);
 		return;

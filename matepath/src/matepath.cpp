@@ -77,7 +77,6 @@ static HANDLE hChangeHandle = nullptr;
 HistoryList	mHistory;
 
 WCHAR	szIniFile[MAX_PATH];
-static WCHAR szIniFile2[MAX_PATH];
 WCHAR szExeRealPath[MAX_PATH];
 bool	bSaveSettings;
 static bool bHasQuickview = false;
@@ -1177,9 +1176,6 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	CheckCmd(hmenu, IDM_SORT_REVERSE, fSortRev);
 	CheckCmd(hmenu, IDM_VIEW_ALWAYSONTOP, bAlwaysOnTop);
-
-	i = StrNotEmpty(szIniFile) || StrNotEmpty(szIniFile2);
-	EnableCmd(hmenu, IDM_VIEW_SAVESETTINGS, i);
 }
 
 //=============================================================================
@@ -1890,10 +1886,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case ACC_SELECTINIFILE:
-		if (StrNotEmpty(szIniFile)) {
-			CreateIniFile(szIniFile);
-			DisplayPath(szIniFile, IDS_ERR_INIOPEN);
-		}
+		CreateIniFile(szIniFile);
+		DisplayPath(szIniFile, IDS_ERR_INIOPEN);
 		break;
 
 	case IDT_HISTORY_BACK:
@@ -2645,21 +2639,7 @@ void LoadSettings() noexcept {
 
 void SaveSettingsNow() noexcept {
 	bool bCreateFailure = false;
-
-	if (StrIsEmpty(szIniFile)) {
-		if (StrNotEmpty(szIniFile2)) {
-			if (CreateIniFile(szIniFile2)) {
-				lstrcpy(szIniFile, szIniFile2);
-				StrCpyEx(szIniFile2, L"");
-			} else {
-				bCreateFailure = true;
-			}
-		} else {
-			return;
-		}
-	}
-
-	if (!bCreateFailure) {
+	{
 		if (WritePrivateProfileString(INI_SECTION_NAME_SETTINGS, L"WriteTest", L"ok", szIniFile)) {
 			BeginWaitCursor();
 			if (CreateIniFile(szIniFile)) {

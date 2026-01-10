@@ -2649,7 +2649,7 @@ INT_PTR InfoBox(UINT uType, LPCWSTR lpstrSetting, UINT uidMessage, ...) noexcept
 	LoadIconWithScaleDown(nullptr, lpszIcon, size, size, &hIcon);
 	ib.hIcon = hIcon ? hIcon : LoadIcon(nullptr, lpszIcon); // old standard icon
 
-	ib.bDisableCheckBox = StrIsEmpty(szIniFile) || StrIsEmpty(lpstrSetting) || iMode == SuppressMmessage_Never;
+	ib.bDisableCheckBox = StrIsEmpty(lpstrSetting) || iMode == SuppressMmessage_Never;
 	MessageBeep(MB_ICONEXCLAMATION);
 	const INT_PTR result = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_INFOBOX), hwnd, InfoBoxDlgProc, AsInteger<LPARAM>(&ib));
 	DestroyIcon(hIcon);
@@ -2685,7 +2685,7 @@ INT_PTR InfoBox(UINT uType, LPCWSTR lpstrSetting, UINT uidMessage, ...) noexcept
 
 	int result = 0;
 	BOOL checked = FALSE;
-	const bool bDisableCheckBox = StrIsEmpty(szIniFile) || StrIsEmpty(lpstrSetting) || iMode == SuppressMmessage_Never;
+	const bool bDisableCheckBox = StrIsEmpty(lpstrSetting) || iMode == SuppressMmessage_Never;
 	MessageBeep(MB_ICONEXCLAMATION);
 	TaskDialogIndirect(&config, &result, nullptr, (bDisableCheckBox ? nullptr : &checked));
 	DestroyIcon(hMainIcon);
