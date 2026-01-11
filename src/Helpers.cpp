@@ -534,7 +534,7 @@ bool BitmapMergeAlpha(HBITMAP hbmp, COLORREF crDest) noexcept {
 			//watch.Start();
 #if NP2_USE_AVX2
 			#define BitmapMergeAlpha_Tag	"sse4 2x1"
-			const ULONG count = (bmp.bmHeight * bmp.bmWidth) / 2;
+			const ULONG count = (bmp.bmHeight * bmp.bmWidth) / 2U;
 			uint64_t *prgba = static_cast<uint64_t *>(bmp.bmBits);
 
 			const __m128i i16x8Back = rgba_to_bgra_epi16x8_sse4_si32(crDest);
@@ -601,7 +601,7 @@ bool BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha) noexcept {
 			//fclose(fp);
 #if 0//NP2_USE_AVX512
 			#define BitmapAlphaBlend_Tag	"avx512 8x1"
-			const ULONG count = (bmp.bmHeight * bmp.bmWidth) / 8;
+			const ULONG count = (bmp.bmHeight * bmp.bmWidth) / 8U;
 			__m256i *prgba = static_cast<__m256i *>(bmp.bmBits);
 
 			const __m512i i16x32Alpha = _mm512_broadcastw_epi16(_mm_cvtsi32_si128(alpha));
@@ -620,7 +620,7 @@ bool BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha) noexcept {
 #elif NP2_USE_AVX2
 #if 1
 			#define BitmapAlphaBlend_Tag	"avx2 4x1"
-			const ULONG count = (bmp.bmHeight * bmp.bmWidth) / 4;
+			const ULONG count = (bmp.bmHeight * bmp.bmWidth) / 4U;
 			__m128i *prgba = static_cast<__m128i *>(bmp.bmBits);
 
 			const __m256i i16x16Alpha = _mm256_broadcastw_epi16(_mm_cvtsi32_si128(alpha));
@@ -637,7 +637,7 @@ bool BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha) noexcept {
 			}
 #else
 			#define BitmapAlphaBlend_Tag	"sse4 2x1"
-			const ULONG count = (bmp.bmHeight * bmp.bmWidth) / 2;
+			const ULONG count = (bmp.bmHeight * bmp.bmWidth) / 2U;
 			uint64_t *prgba = static_cast<uint64_t *>(bmp.bmBits);
 
 			const __m128i i16x8Alpha = _mm_broadcastw_epi16(_mm_cvtsi32_si128(alpha));
@@ -654,7 +654,7 @@ bool BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha) noexcept {
 #endif // NP2_USE_AVX2
 #elif NP2_USE_SSE2
 			#define BitmapAlphaBlend_Tag	"sse2 1x4"
-			const ULONG count = (bmp.bmHeight * bmp.bmWidth) / 4;
+			const ULONG count = (bmp.bmHeight * bmp.bmWidth) / 4U;
 			__m128i *prgba = static_cast<__m128i *>(bmp.bmBits);
 
 			const __m128i i16x8Alpha = _mm_shuffle_epi32(mm_setlo_alpha_epi16(alpha), 0x44);
@@ -2553,7 +2553,7 @@ DLGTEMPLATE *LoadThemedDialogTemplate(LPCWSTR lpDialogTemplateID, HINSTANCE hIns
 	const DLGTEMPLATE *pRsrcMem = static_cast<DLGTEMPLATE *>(LockResource(hRsrcMem));
 	const DWORD dwTemplateSize = SizeofResource(hInstance, hRsrc);
 
-	DLGTEMPLATE *pTemplate = dwTemplateSize ? static_cast<DLGTEMPLATE *>(NP2HeapAlloc(dwTemplateSize + LF_FACESIZE*sizeof(WCHAR))) : nullptr;
+	DLGTEMPLATE *pTemplate = dwTemplateSize ? static_cast<DLGTEMPLATE *>(NP2HeapAlloc(dwTemplateSize + LF_FACESIZE*sizeof(WCHAR) + sizeof(DWORD))) : nullptr;
 	if (pTemplate == nullptr) {
 		FreeResource(hRsrcMem);
 		return nullptr;
@@ -2629,20 +2629,14 @@ DLGTEMPLATE *LoadThemedDialogTemplate(LPCWSTR lpDialogTemplateID, HINSTANCE hIns
 INT_PTR ThemedDialogBoxParam(HINSTANCE hInstance, LPCWSTR lpTemplate, HWND hWndParent, DLGPROC lpDialogFunc, LPARAM dwInitParam) noexcept {
 	DLGTEMPLATE *pDlgTemplate = LoadThemedDialogTemplate(lpTemplate, hInstance);
 	const INT_PTR ret = DialogBoxIndirectParam(hInstance, pDlgTemplate, hWndParent, lpDialogFunc, dwInitParam);
-	if (pDlgTemplate) {
-		NP2HeapFree(pDlgTemplate);
-	}
-
+	NP2HeapFree(pDlgTemplate);
 	return ret;
 }
 
 HWND CreateThemedDialogParam(HINSTANCE hInstance, LPCWSTR lpTemplate, HWND hWndParent, DLGPROC lpDialogFunc, LPARAM dwInitParam) noexcept {
 	DLGTEMPLATE *pDlgTemplate = LoadThemedDialogTemplate(lpTemplate, hInstance);
 	HWND hwnd = CreateDialogIndirectParam(hInstance, pDlgTemplate, hWndParent, lpDialogFunc, dwInitParam);
-	if (pDlgTemplate) {
-		NP2HeapFree(pDlgTemplate);
-	}
-
+	NP2HeapFree(pDlgTemplate);
 	return hwnd;
 }
 
