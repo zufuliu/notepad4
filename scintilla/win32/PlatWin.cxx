@@ -773,11 +773,11 @@ ColourRGBA Platform::ChromeHighlight() noexcept {
 }
 
 const char *Platform::DefaultFont() noexcept {
-	return "Verdana";
+	return "Segoe UI";
 }
 
 int Platform::DefaultFontSize() noexcept {
-	return 10;
+	return 9;
 }
 
 unsigned int Platform::DoubleClickTime() noexcept {

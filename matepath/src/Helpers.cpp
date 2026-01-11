@@ -2110,12 +2110,6 @@ DLGTEMPLATE *LoadThemedDialogTemplate(LPCWSTR lpDialogTemplateID, HINSTANCE hIns
 	const BOOL bHasFont = DialogTemplate_HasFont(pTemplate, bDialogEx);
 	const DWORD cbFontAttr = DialogTemplate_FontAttrSize(bDialogEx);
 
-	if (bDialogEx) {
-		(reinterpret_cast<DLGTEMPLATEEX *>(pTemplate))->style |= DS_SHELLFONT;
-	} else {
-		pTemplate->style |= DS_SHELLFONT;
-	}
-
 	const DWORD cbNew = cbFontAttr + ((lstrlen(wchFaceName) + 1) * sizeof(WCHAR));
 	const BYTE *pbNew = reinterpret_cast<BYTE *>(wchFaceName);
 

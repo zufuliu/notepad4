@@ -56,6 +56,11 @@ def add_thick_frame_style(doc):
 			parts[index] = item
 	return ' DIALOGEX '.join(parts)
 
+@file_updater
+def use_segoe_ui_font(doc):
+	style = 'FONT 9, "Segoe UI", 400, 0, 0x1'
+	return re.sub(r'FONT.+MS Shell Dlg[^\r\n]+', style, doc)
+
 def update_all_resource_file(func):
 	func('../src/Notepad4.rc')
 	func('../matepath/src/matepath.rc')
@@ -68,3 +73,4 @@ def update_all_resource_file(func):
 # update_all_resource_file(remove_old_style)
 # update_all_resource_file(add_scrollbar_style)
 # update_all_resource_file(add_thick_frame_style)
+# update_all_resource_file(use_segoe_ui_font)
