@@ -533,8 +533,13 @@ static inline void FindSystemDefaultCodeFont() noexcept {
 }
 
 static inline void FindSystemDefaultTextFont() noexcept {
-	WORD wSize;
-	GetThemedDialogFont(systemTextFontName, &wSize);
+	NONCLIENTMETRICS ncm;
+	ncm.cbSize = sizeof(NONCLIENTMETRICS);
+	LPCWSTR fontName = L"Segoe UI";
+	if (SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0)) {
+		fontName = ncm.lfMessageFont.lfFaceName;
+	}
+	lstrcpy(systemTextFontName, fontName);
 }
 
 void Style_DetectBaseFontSize(HMONITOR hMonitor) noexcept {

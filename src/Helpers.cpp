@@ -1511,36 +1511,6 @@ HMODULE LoadLocalizedResourceDLL(LANGID lang, LPCWSTR dllName) noexcept {
 	HMODULE hDLL = LoadLibraryEx(path, nullptr, flags);
 	return hDLL;
 }
-
-#if NP2_ENABLE_TEST_LOCALIZATION_LAYOUT
-void GetLocaleDefaultUIFont(LANGID lang, LPWSTR lpFaceName, WORD *wSize) noexcept {
-	LPCWSTR font;
-	const LANGID subLang = SUBLANGID(lang);
-	// https://learn.microsoft.com/en-us/typography/fonts/windows_11_font_list
-	switch (PRIMARYLANGID(lang)) {
-	default:
-	case LANG_ENGLISH:
-		// https://docs.microsoft.com/en-us/typography/font-list/segoe-ui
-		font = L"Segoe UI";
-		break;
-	case LANG_CHINESE:
-		// https://docs.microsoft.com/en-us/typography/font-list/microsoft-yahei
-		// https://docs.microsoft.com/en-us/typography/font-list/microsoft-jhenghei
-		font = IsChineseTraditionalSubLang(subLang) ? L"Microsoft JhengHei UI" : L"Microsoft YaHei UI";
-		break;
-	case LANG_JAPANESE:
-		// https://learn.microsoft.com/en-us/typography/font-list/yu-gothic
-		font = L"Yu Gothic UI";
-		break;
-	case LANG_KOREAN:
-		// https://docs.microsoft.com/en-us/typography/font-list/malgun-gothic
-		font = L"Malgun Gothic";
-		break;
-	}
-	*wSize = 9;
-	lstrcpy(lpFaceName, font);
-}
-#endif
 #endif // NP2_ENABLE_APP_LOCALIZATION_DLL
 
 bool PathGetRealPath(HANDLE hFile, LPCWSTR lpszSrc, LPWSTR lpszDest) noexcept {
@@ -2515,61 +2485,6 @@ HBITMAP BitmapCache::Get(LPCWSTR path) noexcept {
  Based on code of MFC helper class CDialogTemplate
 
 */
-bool GetThemedDialogFont(LPWSTR lpFaceName, WORD *wSize) noexcept {
-#if NP2_ENABLE_APP_LOCALIZATION_DLL && NP2_ENABLE_TEST_LOCALIZATION_LAYOUT
-	extern LANGID uiLanguage;
-	GetLocaleDefaultUIFont(uiLanguage, lpFaceName, wSize);
-	return true;
-#else
-
-	bool bSucceed = false;
-	int lfHeight = 0;
-
-	if (IsAppThemed()) {
-		HTHEME hTheme = OpenThemeData(nullptr, L"WINDOWSTYLE;WINDOW");
-		if (hTheme) {
-			LOGFONT lf;
-			if (S_OK == GetThemeSysFont(hTheme, TMT_MSGBOXFONT, &lf)) {
-				lfHeight = lf.lfHeight;
-				lstrcpyn(lpFaceName, lf.lfFaceName, LF_FACESIZE);
-				bSucceed = true;
-			}
-			CloseThemeData(hTheme);
-		}
-	}
-
-	if (!bSucceed) {
-		NONCLIENTMETRICS ncm;
-		memset(&ncm, 0, sizeof(ncm));
-		ncm.cbSize = sizeof(NONCLIENTMETRICS);
-#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-		if (!IsVistaAndAbove()) {
-			ncm.cbSize -= sizeof(ncm.iPaddedBorderWidth);
-		}
-#endif
-		if (SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0)) {
-			lfHeight = ncm.lfMessageFont.lfHeight;
-			lstrcpyn(lpFaceName, ncm.lfMessageFont.lfFaceName, LF_FACESIZE);
-			bSucceed = true;
-		}
-	}
-
-	if (bSucceed) {
-		if (lfHeight < 0) {
-			lfHeight = -lfHeight;
-		}
-		lfHeight = MulDiv(lfHeight, 72, g_uSystemDPI);
-		lfHeight = max(lfHeight, 8);
-		*wSize = static_cast<WORD>(lfHeight);
-		if (!IsVistaAndAbove()) {
-			// Windows 2000, XP, 2003
-			lstrcpy(lpFaceName, L"Tahoma");
-		}
-	}
-	return bSucceed;
-#endif
-}
-
 namespace {
 
 // https://learn.microsoft.com/en-us/windows/win32/dlgbox/dlgtemplateex
@@ -2647,18 +2562,52 @@ DLGTEMPLATE *LoadThemedDialogTemplate(LPCWSTR lpDialogTemplateID, HINSTANCE hIns
 	memcpy(reinterpret_cast<BYTE *>(pTemplate), pRsrcMem, dwTemplateSize);
 	FreeResource(hRsrcMem);
 
-	WCHAR wchFaceName[LF_FACESIZE];
-	WORD wFontSize;
-	if (!GetThemedDialogFont(wchFaceName, &wFontSize)) {
+#if NP2_ENABLE_APP_LOCALIZATION_DLL && NP2_ENABLE_TEST_LOCALIZATION_LAYOUT
+	extern LANGID uiLanguage;
+	LPCWSTR lfFaceName;
+	constexpr WORD wFontSize = 9;
+	const LANGID subLang = SUBLANGID(uiLanguage);
+	// https://learn.microsoft.com/en-us/windows/apps/design/signature-experiences/typography#fonts-for-non-latin-languages
+	// https://learn.microsoft.com/en-us/globalization/fonts-layout/font-support
+	switch (PRIMARYLANGID(uiLanguage)) {
+	default:
+	case LANG_ENGLISH:
+		// Segoe UI or Segoe UI Variable
+		return pTemplate;
+	case LANG_CHINESE:
+		lfFaceName = IsChineseTraditionalSubLang(subLang) ? L"Microsoft JhengHei UI" : L"Microsoft YaHei UI";
+		break;
+	case LANG_JAPANESE:
+		lfFaceName = L"Yu Gothic UI";
+		break;
+	case LANG_KOREAN:
+		lfFaceName = L"Malgun Gothic";
+		break;
+	}
+
+#else
+	// https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getstockobject
+	NONCLIENTMETRICS ncm;
+	ncm.cbSize = sizeof(NONCLIENTMETRICS);
+	if (!SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0)) {
 		return pTemplate;
 	}
+	int lfHeight = ncm.lfMessageFont.lfHeight;
+	if (lfHeight < 0) {
+		lfHeight = -lfHeight;
+	}
+	lfHeight = MulDiv(lfHeight, 72, g_uSystemDPI);
+	lfHeight = max(lfHeight, 9);
+	const WORD wFontSize = static_cast<WORD>(lfHeight);
+	LPCWSTR lfFaceName = ncm.lfMessageFont.lfFaceName;
+#endif //  NP2_ENABLE_TEST_LOCALIZATION_LAYOUT
 
 	const bool bDialogEx = DialogTemplate_IsDialogEx(pTemplate);
 	const BOOL bHasFont = DialogTemplate_HasFont(pTemplate, bDialogEx);
 	const DWORD cbFontAttr = DialogTemplate_FontAttrSize(bDialogEx);
 
-	const DWORD cbNew = cbFontAttr + ((lstrlen(wchFaceName) + 1) * sizeof(WCHAR));
-	const BYTE *pbNew = reinterpret_cast<BYTE *>(wchFaceName);
+	const DWORD cbNew = cbFontAttr + ((lstrlen(lfFaceName) + 1) * sizeof(WCHAR));
+	const BYTE *pbNew = reinterpret_cast<const BYTE *>(lfFaceName);
 
 	BYTE *pb = DialogTemplate_GetFontSizeField(pTemplate, bDialogEx);
 	const DWORD cbOld = bHasFont ? cbFontAttr + sizeof(WCHAR) * (lstrlen(reinterpret_cast<WCHAR *>(pb + cbFontAttr)) + 1) : 0;

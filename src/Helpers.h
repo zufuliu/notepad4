@@ -841,7 +841,6 @@ struct BitmapCache {
 };
 
 //==== Themed Dialogs =========================================================
-bool	GetThemedDialogFont(LPWSTR lpFaceName, WORD *wSize) noexcept;
 DLGTEMPLATE *LoadThemedDialogTemplate(LPCWSTR lpDialogTemplateID, HINSTANCE hInstance) noexcept;
 #define ThemedDialogBox(hInstance, lpTemplate, hWndParent, lpDialogFunc) \
 	ThemedDialogBoxParam(hInstance, lpTemplate, hWndParent, lpDialogFunc, 0)
