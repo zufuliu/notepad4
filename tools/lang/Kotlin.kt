@@ -1,5 +1,6 @@
-// Kotlin 2.2 https://kotlinlang.org/docs/home.html
+// Kotlin 2.3 https://kotlinlang.org/docs/home.html
 // https://github.com/Kotlin/KEEP
+// https://kotlinlang.org/docs/kotlin-language-features-and-proposals.html
 
 //! Keywords		===========================================================
 // https://kotlinlang.org/docs/keyword-reference.html

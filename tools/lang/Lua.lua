@@ -1,4 +1,4 @@
--- Lua 5.0 to 5.4 https://www.lua.org/manual/
+-- Lua 5.0 to 5.5 https://www.lua.org/manual/
 -- http://lua-users.org/wiki/
 
 --! keywords			=======================================================
@@ -9,6 +9,7 @@ for do
 end
 function
 end
+global
 goto
 in
 if then
@@ -62,64 +63,55 @@ _VERSION
 assert(v [, message])
 collectgarbage([opt [, arg]])
 -- opt for collectgarbage()
-"collect stop restart count step isrunning incremental generational"
+"collect stop restart count step isrunning incremental generational param"
 dofile([filename])
 error(message [, level])
 getmetatable(object)
-gcinfo()								-- removed in Lua 5.1
 ipairs(t)
-load(chunk [, chunkname [, mode [, env]]])	-- added in Lua 5.1
+load(chunk [, chunkname [, mode [, env]]])
 loadfile([filename [, mode [, env]]])
-loadlib(libname, funcname)				-- removed in Lua 5.1
-loadstring(string [, chunkname])		-- removed in Lua 5.2
 next(table [, index])
 pairs(t)
 pcall(f [, arg1, ···])
 print(···)
 rawequal(v1, v2)
 rawget(table, index)
-rawlen(v)								-- added in Lua 5.2
+rawlen(v)
 rawset(table, index, value)
-require(modname)						-- added in Lua 5.0
-select(index, ···)						-- added in Lua 5.1
-setfenv(f, table)						-- removed in Lua 5.2
+require(modname)
+select(index, ···)
 setmetatable(table, metatable)
 tonumber(e [, base])
 tostring(v)
 type(v)
 -- results for type() function
 "nil number string boolean table function thread userdata"
-unpack(list [, i [, j]])				-- removed in Lua 5.2
-warn(msg1, ···)							-- added in Lua 5.4
+warn(msg1, ···)
 xpcall(f, msgh [, arg1, ···])
-module(name [, ···])					-- Modules, removed in Lua 5.2
 
 --! library				=======================================================
 -- The Standard Libraries
 
 -- Coroutine Manipulation
-coroutine.close(co)						-- added in Lua 5.4
+coroutine.close(co)
 coroutine.create(f)
-coroutine.isyieldable([co])				-- added in Lua 5.3
+coroutine.isyieldable([co])
 coroutine.resume(co [, val1, ···])
-coroutine.running()						-- added in Lua 5.1
+coroutine.running()
 coroutine.status(co)
 coroutine.wrap(f)
 coroutine.yield(···)
 
--- Modules								-- added in Lua 5.1
-module(name [, ···])					-- removed in Lua 5.2
+-- Modules
 require(modname)
-package.config							-- added in Lua 5.2
+package.config
 package.cpath
 package.loaded
-package.loaders							-- removed in Lua 5.2
 package.loadlib(libname, funcname)
 package.path
 package.preload
-package.searchers						-- added in Lua 5.2
-package.searchpath(name, path [, sep [, rep]])	-- added in Lua 5.2
-package.seeall(module)					-- removed in Lua 5.2
+package.searchers
+package.searchpath(name, path [, sep [, rep]])
 
 -- String Manipulation
 string.byte(s [, i [, j]])
@@ -128,20 +120,19 @@ string.dump(Function [, strip])
 string.find(s, pattern [, init [, plain]])
 string.format(formatstring, ···)
 string.gmatch(s, pattern [, init])
-string.gfind(s, pat)					-- removed in Lua 5.1
 string.gsub(s, pattern, repl [, n])
 string.len(s)
 string.lower(s)
 string.match(s, pattern [, init])
-string.pack(fmt, v1, v2, ···)			-- added in Lua 5.2
-string.packsize(fmt)					-- added in Lua 5.3
+string.pack(fmt, v1, v2, ···)
+string.packsize(fmt)
 string.rep(s, n [, sep])
-string.reverse(s)						-- added in Lua 5.1
+string.reverse(s)
 string.sub(s, i [, j])
 string.unpack(fmt, s [, pos])
 string.upper(s)
 
--- UTF-8 Support						-- added in Lua 5.3
+-- UTF-8 Support
 utf8.char(···)
 utf8.charpattern
 utf8.codes(s [, lax])
@@ -151,71 +142,46 @@ utf8.offset(s, n [, i])
 
 -- Table Manipulation
 table.concat(list [, sep [, i [, j]]])
-table.foreach(table, f)					-- removed in Lua 5.1
-table.foreachi(table, f)				-- removed in Lua 5.1
-table.getn(table)						-- removed in Lua 5.1
+table.create(nseq [, nrec])
 table.insert(list, [pos,] value)
-table.move(a1, f, e, t [,a2])			-- added in Lua 5.3
-table.maxn(table)						-- removed in Lua 5.2
-table.pack(···)							-- added in Lua 5.2
+table.move(a1, f, e, t [,a2])
+table.pack(···)
 table.remove(list [, pos])
 table.sort(list [, comp])
-table.setn(table, n)					-- removed in Lua 5.1
-table.unpack(list [, i [, j]])			-- added in Lua 5.2
+table.unpack(list [, i [, j]])
 
 -- Mathematical Functions
 math.abs(x)
 math.acos(x)
 math.asin(x)
 math.atan(y [, x])
-math.atan2(y, x)						-- Lua 5.0 to Lua 5.2
 math.ceil(x)
 math.cos(x)
-math.cosh(x)							-- Lua 5.1 to Lua 5.2
 math.deg(x)
 math.exp(x)
 math.floor(x)
-math.fmod(x, y)							-- added in Lua 5.1
-math.frexp(x)							-- Lua 5.0 to Lua 5.2
-math.huge								-- added in Lua 5.1
-math.ldexp(m, e)						-- Lua 5.0 to Lua 5.2
+math.fmod(x, y)
+math.frexp(x)
+math.huge
+math.ldexp(m, e)
 math.log(x [, base])
-math.log10(x)							-- Lua 5.0 to Lua 5.2
 math.max(x, ···)
-math.maxinteger							-- added in Lua 5.3
+math.maxinteger
 math.min(x, ···)
-math.mininteger							-- added in Lua 5.3
-math.modf(x)							-- added in Lua 5.1
-math.mod(x)								-- Lua 5.0 only
-math.pi									-- added in Lua 5.1
-math.pow(x, y)							-- Lua 5.0 to Lua 5.2
+math.mininteger
+math.modf(x)
+math.pi
 math.rad(x)
 math.random([m [, n]])
 math.randomseed([x [, y]])
 math.sin(x)
-math.sinh(x)							-- Lua 5.0 to Lua 5.2
 math.sqrt(x)
 math.tan(x)
-math.tanh(x)							-- Lua 5.1 to Lua 5.2
-math.tointeger(x)						-- added in Lua 5.3
-math.type(x)							-- added in Lua 5.3
+math.tointeger(x)
+math.type(x)
 -- results for math.type() function
 "integer float"
-math.ult(m, n)							-- added in Lua 5.3
-
--- Bitwise Operations					-- Lua 5.2 only
-bit32.arshift(x, disp)
-bit32.band(···)
-bit32.bnot(x)
-bit32.bor(···)
-bit32.btest(···)
-bit32.bxor(···)
-bit32.extract(n, field [, width])
-bit32.replace(n, v, field [, width])
-bit32.lrotate(x, disp)
-bit32.lshift(x, disp)
-bit32.rrotate(x, disp)
-bit32.rshift(x, disp)
+math.ult(m, n)
 
 -- Input and Output Facilities
 io.close([file])
@@ -224,7 +190,7 @@ io.input([file])
 io.lines([filename, ···])
 io.open(filename [, mode])
 io.output([file])
-io.popen(prog [, mode])					-- added in Lua 5.1
+io.popen(prog [, mode])
 io.stdin
 io.stdout
 io.stderr
@@ -239,7 +205,7 @@ file:flush()
 file:lines(···)
 file:read(···)
 file:seek([whence [, offset]])
-file:setvbuf(mode [, size])				-- added in Lua 5.1
+file:setvbuf(mode [, size])
 file:write(···)
 
 -- Operating System Facilities
@@ -257,24 +223,21 @@ os.tmpname()
 
 -- The Debug Library
 debug.debug()
-debug.getfenv(o)						-- Lua 5.1 only
 debug.gethook([thread])
 debug.getinfo([thread,] f [, what])
 debug.getlocal([thread,] f, local)
-debug.getmetatable(value)				-- added in Lua 5.1
+debug.getmetatable(value)
 debug.getregistry()
 debug.getupvalue(f, up)
-debug.getuservalue(u, n)				-- added in Lua 5.2
-debug.setcstacklimit(limit)				-- added in Lua 5.4
-debug.setfenv(object, table)			-- Lua 5.1 only
+debug.getuservalue(u, n)
 debug.sethook([thread,] hook, mask [, count])
 debug.setlocal([thread,] level, local, value)
-debug.setmetatable(value, table)		-- added in Lua 5.1
+debug.setmetatable(value, table)
 debug.setupvalue(f, up, value)
-debug.setuservalue(udata, value, n)		-- added in Lua 5.2
+debug.setuservalue(udata, value, n)
 debug.traceback([thread,] [message [, level]])
-debug.upvalueid(f, n)					-- added in Lua 5.2
-debug.upvaluejoin(f1, n1, f2, n2)		-- added in Lua 5.2
+debug.upvalueid(f, n)
+debug.upvaluejoin(f1, n1, f2, n2)
 
 -- environment variables
 "LUA_CPATH LUA_INIT LUA_PATH"
