@@ -1,4 +1,4 @@
-# 5.36 https://www.perl.org/
+# 5.42 https://www.perl.org/
 # https://perldoc.perl.org/index-language.html
 
 #! keywords				=======================================================
@@ -37,6 +37,17 @@ isa
 try
 when
 
+# https://perldoc.perl.org/perlclass
+feature
+class method field
+
+# https://perldoc.perl.org/attributes#Built-in-Attributes
+lvalue
+method
+prototype
+const
+shared
+
 # Perl functions
 # https://perldoc.perl.org/functions
 AUTOLOAD
@@ -50,6 +61,8 @@ UNITCHECK
 abs
 accept
 alarm
+all
+any
 atan2
 bind
 binmode
@@ -64,9 +77,11 @@ chop
 chown
 chr
 chroot
+class
 close
 closedir
 connect
+continue
 cos
 crypt
 
@@ -75,6 +90,7 @@ dbmopen
 defined
 delete
 die
+do
 dump
 
 each
@@ -90,6 +106,7 @@ evalbytes
 exec
 exists
 exit
+exp
 
 fc
 fcntl
@@ -147,10 +164,12 @@ link
 listen
 local
 localtime
+lock
 log
 lstat
 
 map
+method
 mkdir
 msgctl
 msgget
@@ -159,6 +178,7 @@ msgsnd
 my
 next
 not
+no
 
 oct
 open
@@ -167,6 +187,7 @@ ord
 our
 
 pack
+# package
 pipe
 pop
 pos
@@ -231,6 +252,7 @@ srand
 stat
 state
 study
+sub
 substr
 symlink
 syscall

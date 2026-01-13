@@ -1,4 +1,4 @@
-# 2.0 https://nim-lang.org/
+# 2.2 https://nim-lang.org/
 # https://github.com/nim-lang/Nim
 # https://nim-lang.org/docs/manual.html
 

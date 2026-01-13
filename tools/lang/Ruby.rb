@@ -1,5 +1,6 @@
-# Ruby 3.4 https://www.ruby-lang.org/en/documentation/
+# Ruby 4.0 https://www.ruby-lang.org/en/documentation/
 # https://docs.ruby-lang.org/en/
+# https://docs.ruby-lang.org/en/master/NEWS_md.html
 # https://ruby-doc.org/
 # https://rubyreferences.github.io/
 
@@ -29,7 +30,7 @@ yield
 it
 
 #! Pre-defined constants	===================================================
-# https://docs.ruby-lang.org/en/master/globals_rdoc.html#label-Pre-Defined+Global+Constants
+# https://docs.ruby-lang.org/en/master/language/globals_md.html#label-Pre-Defined+Global+Constants
 TRUE
 FALSE
 NIL
@@ -77,7 +78,7 @@ while do
 end
 
 #! Pre-defined variables	===================================================
-# https://docs.ruby-lang.org/en/master/globals_rdoc.html#label-Pre-Defined+Global+Variables
+# https://docs.ruby-lang.org/en/master/language/globals_md.html#label-Pre-Defined+Global+Variables
 $DEBUG
 $LOAD_PATH
 $LOADED_FEATURES
