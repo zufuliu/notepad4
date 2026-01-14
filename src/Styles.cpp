@@ -1220,8 +1220,10 @@ void Style_UpdateCaret() noexcept {
 
 static inline bool IsCJKLocale(LPCWSTR locale) noexcept {
 	const UINT lang = (*reinterpret_cast<const UINT *>(locale)) | 0x00200020;
-	// zh, ja, ko
-	return lang == 0x0068007A || lang == 0x0061006A || lang == 0x006F006B;
+	constexpr DWORD zh = MAKELONG('z', 'h');
+	constexpr DWORD ja = MAKELONG('j', 'a');
+	constexpr DWORD ko = MAKELONG('k', 'o');
+	return lang == zh || lang == ja || lang == ko;
 }
 
 static void Style_SetFontLocaleName(LPCWSTR lpszStyle) noexcept {
@@ -2808,67 +2810,6 @@ bool Style_CanOpenFile(LPCWSTR lpszFile) noexcept {
 	np2LexLangIndex = lang;
 	return pLexNew != nullptr || StrIsEmpty(lpszExt) || bDotFile || StrCaseEqual(lpszExt, L"cgi") || StrCaseEqual(lpszExt, L"fcgi");
 }
-
-
-#if 0
-bool Style_MaybeBinaryFile(LPCWSTR lpszFile) noexcept {
-	uint8_t buf[5]{}; // file magic
-	SciCall_GetText(COUNTOF(buf) - 1, buf);
-	const UINT magic2 = (buf[0] << 8) | buf[1];
-	if (magic2 == 0x4D5AU ||	// PE (exe, dll, etc.): MZ
-		magic2 == 0x504BU ||	// ZIP (zip, jar, docx, apk, etc.): PK
-		magic2 == 0x377AU ||	// 7z: 7z
-		magic2 == 0x1F8BU ||	// gzip (gz, gzip, svgz, etc.)
-		magic2 == 0x424DU ||	// BMP: BM
-		magic2 == 0xFFD8U		// JPEG (jpg, jpeg, etc.)
-		) {
-		return true;
-	}
-
-	const UINT magic = (magic2 << 16) | (buf[2] << 8) | buf[3];
-	if (magic == 0x89504E47U ||	// PNG: 0x89+PNG
-		magic == 0x47494638U ||	// GIF: GIF89a
-		magic == 0x25504446U ||	// PDF: %PDF-{version}
-		magic == 0x52617221U ||	// RAR: Rar!
-		magic == 0x7F454C46U ||	// ELF: 0x7F+ELF
-		magic == 0x213C6172U ||	// .lib, .a: !<arch>\n
-		magic == 0xFD377A58U ||	// xz: 0xFD+7zXZ
-		magic == 0xCAFEBABEU	// Java class
-		) {
-		return true;
-	}
-
-	LPCWSTR lpszExt = PathFindExtension(lpszFile);
-	if (StrNotEmpty(lpszExt)) {
-		++lpszExt;
-		const int len = lstrlen(lpszExt);
-		if (len < 3 || len > 5) {
-			return false;
-		}
-		// full match
-		WCHAR wch[8] = L"";
-		wch[0] = L' ';
-		lstrcpy(wch + 1, lpszExt);
-		wch[len + 1] = L' ';
-		LPCWSTR lpszMatch = StrStrI(
-			L" cur"		// Cursor
-			L" ico"		// Icon
-
-			L" obj"
-			L" pdb"
-			L" bin"
-			L" pak"		// Chrome
-
-			L" dmg"		// macOS
-			L" img"
-			L" iso"
-			L" tar"
-			L" ", wch);
-		return lpszMatch != nullptr;
-	}
-	return false;
-}
-#endif
 
 void Style_SetLexerByLangIndex(int lang) noexcept {
 	const int langIndex = np2LexLangIndex;
