@@ -1,7 +1,8 @@
 <?php
-// 8.4 https://www.php.net/
+// 8.5 https://www.php.net/
 // https://wiki.php.net/rfc
 // https://php.watch/versions
+// https://www.php.net/manual/en/appendices.php
 
 //! keywords			=======================================================
 // https://www.php.net/manual/en/reserved.keywords.php
@@ -30,20 +31,18 @@ while
 xor
 yield from
 
-enum
 true false null
 
 //! type				=======================================================
 // https://www.php.net/manual/en/language.types.intro.php
 // https://www.php.net/manual/en/reserved.other-reserved-words.php
-bool int float double string array object callable iterable resource numeric
-// https://www.php.net/manual/en/language.types.declarations.php
-// Single types
-self parent array callable bool float int string iterable object mixed
+bool int float string array object callable resource
+mixed iterable
+enum resource numeric
+// Relative class types
+self parent static
 // Return only types
-void never static
-// https://www.php.net/manual/en/language.types.type-juggling.php
-int integer bool boolean float double real string array object unset
+void never
 
 //! attribute			=======================================================
 // https://www.php.net/manual/en/reserved.attributes.php
@@ -54,15 +53,18 @@ int integer bool boolean float double real string array object unset
 #[\ReturnTypeWillChange]
 #[\SensitiveParameter]
 
+#[\DelayedTargetValidation]
+#[\NoDiscard]
+
 //! Predefined Variable	=======================================================
 // https://www.php.net/manual/en/language.variables.basics.php
 $this
 // https://www.php.net/manual/en/reserved.variables.php
 $GLOBALS $_SERVER $_GET $_POST $_FILES $_REQUEST $_SESSION $_ENV $_COOKIE
-$http_response_header
 $argc
 $argv
 // Indices for $_SERVER
+// https://www.php.net/manual/en/reserved.variables.server.php
 {
 PHP_SELF
 argv
@@ -159,8 +161,6 @@ PHP_CONFIG_FILE_PATH
 PHP_CONFIG_FILE_SCAN_DIR
 PHP_SHLIB_SUFFIX
 PHP_FD_SETSIZE
-PHP_WINDOWS_EVENT_CTRL_C
-PHP_WINDOWS_EVENT_CTRL_BREAK
 
 // Magic Method
 // https://www.php.net/manual/en/language.oop5.magic.php
@@ -206,6 +206,9 @@ interface Throwable extends Stringable {
 	public getTraceAsString(): string
 	public getPrevious(): ?Throwable
 	abstract public __toString(): string
+}
+interface Countable {
+	public count(): int
 }
 interface ArrayAccess {
 	public offsetExists(mixed $offset): bool
@@ -269,6 +272,11 @@ interface BackedEnum extends UnitEnum {
 	public static from(int|string $value): static
 	public static tryFrom(int|string $value): ?static
 }
+final class SensitiveParameterValue {
+	public __construct(mixed $value)
+	public __debugInfo(): array
+	public getValue(): mixed
+}
 
 // Predefined Exceptions
 // https://www.php.net/manual/en/reserved.exceptions.php
@@ -276,6 +284,8 @@ class Exception implements Throwable {}
 	class ErrorException extends Exception {
 		final public getSeverity(): int
 	}
+	class ClosedGeneratorException extends Exception {}
+	class RequestParseBodyException extends Exception {}
 class Error implements Throwable {}
 	class ArithmeticError extends Error {}
 		class DivisionByZeroError extends ArithmeticError {}
@@ -289,7 +299,8 @@ class Error implements Throwable {}
 	final class FiberError extends Error {}
 }
 
-{ // Affecting PHP's Behaviour
+// Affecting PHP's Behaviour
+// https://www.php.net/manual/en/refs.basic.php.php
 { // Error Handling and Logging
 E_ERROR
 E_WARNING
@@ -316,6 +327,8 @@ error_clear_last(): void
 error_get_last(): ?array
 error_log(string $message, int $message_type = 0, ?string $destination = null, ?string $additional_headers = null): bool
 error_reporting(?int $error_level = null): int
+get_error_handler(): ?callable
+get_exception_handler(): ?callable
 restore_error_handler(): bool
 restore_exception_handler(): bool
 set_error_handler(?callable $callback, int $error_levels = E_ALL): ?callable
@@ -380,26 +393,7 @@ INI_USER
 INI_PERDIR
 INI_SYSTEM
 INI_ALL
-// assert()
-ASSERT_ACTIVE
-ASSERT_CALLBACK
-ASSERT_BAIL
-ASSERT_WARNING
-ASSERT_QUIET_EVAL
-// Windows
-PHP_WINDOWS_VERSION_MAJOR
-PHP_WINDOWS_VERSION_MINOR
-PHP_WINDOWS_VERSION_BUILD
-PHP_WINDOWS_VERSION_PLATFORM
-PHP_WINDOWS_VERSION_SP_MAJOR
-PHP_WINDOWS_VERSION_SP_MINOR
-PHP_WINDOWS_VERSION_SUITEMASK
-PHP_WINDOWS_VERSION_PRODUCTTYPE
-PHP_WINDOWS_NT_DOMAIN_CONTROLLER
-PHP_WINDOWS_NT_SERVER
-PHP_WINDOWS_NT_WORKSTATION
 
-assert_options(int $what, mixed $value = ?): mixed
 assert(mixed $assertion, string $description = ?): bool
 assert(mixed $assertion, Throwable $exception = ?): bool
 cli_get_process_title(): ?string
@@ -453,14 +447,9 @@ version_compare(string $version1, string $version2, ?string $operator = null): i
 zend_thread_id(): int
 zend_version(): string
 }
-}
 
-{ // Cryptography Extensions
-{ // CSPRNG
-random_bytes(int $length): string
-random_int(int $min, int $max): int
-}
-
+// Cryptography Extensions
+// https://www.php.net/manual/en/refs.crypto.php
 { // HASH Message Digest Framework
 HASH_HMAC
 
@@ -488,11 +477,6 @@ hash(string $algo, string $data, bool $binary = false, array $options = []): str
 
 { // Password Hashing
 PASSWORD_BCRYPT
-PASSWORD_ARGON2I
-PASSWORD_ARGON2ID
-PASSWORD_ARGON2_DEFAULT_MEMORY_COST
-PASSWORD_ARGON2_DEFAULT_TIME_COST
-PASSWORD_ARGON2_DEFAULT_THREADS
 PASSWORD_DEFAULT
 
 password_algos(): array
@@ -501,9 +485,9 @@ password_hash(string $password, string|int|null $algo, array $options = []): str
 password_needs_rehash(string $hash, string|int|null $algo, array $options = []): bool
 password_verify(string $password, string $hash): bool
 }
-}
 
-{ // Database Extensions
+// Database Extensions
+// https://www.php.net/manual/en/refs.database.php
 { // PHP Data Objects
 class PDO {
 	const int PARAM_BOOL;
@@ -532,7 +516,6 @@ class PDO {
 	const int FETCH_UNIQUE;
 	const int FETCH_KEY_PAIR;
 	const int FETCH_CLASSTYPE;
-	const int FETCH_SERIALIZE;
 	const int FETCH_PROPS_LATE;
 
 	const int ATTR_AUTOCOMMIT;
@@ -583,7 +566,6 @@ class PDO {
 	const int PARAM_EVT_FETCH_PRE;
 	const int PARAM_EVT_FETCH_POST;
 	const int PARAM_EVT_NORMALIZE;
-	const int SQLITE_DETERMINISTIC;
 
 	public __construct(string $dsn, ?string $username = null, ?string $password = null, ?array $options = null)
 	public beginTransaction(): bool
@@ -725,15 +707,6 @@ MYSQLI_DEBUG_TRACE_ENABLED
 MYSQLI_SERVER_QUERY_NO_GOOD_INDEX_USED
 MYSQLI_SERVER_QUERY_NO_INDEX_USED
 MYSQLI_SERVER_PUBLIC_KEY
-MYSQLI_REFRESH_GRANT
-MYSQLI_REFRESH_LOG
-MYSQLI_REFRESH_TABLES
-MYSQLI_REFRESH_HOSTS
-MYSQLI_REFRESH_REPLICA
-MYSQLI_REFRESH_STATUS
-MYSQLI_REFRESH_THREADS
-MYSQLI_REFRESH_SLAVE
-MYSQLI_REFRESH_MASTER
 MYSQLI_TRANS_COR_AND_CHAIN
 MYSQLI_TRANS_COR_AND_NO_CHAIN
 MYSQLI_TRANS_COR_RELEASE
@@ -780,12 +753,10 @@ class mysqli {
 	public get_connection_stats(): array
 	public get_server_info(): string
 	public get_warnings(): mysqli_warning|false
-	public kill(int $process_id): bool
 	public more_results(): bool
 	public multi_query(string $query): bool
 	public next_result(): bool
 	public options(int $option, string|int $value): bool
-	public ping(): bool
 	public static poll(?array &$read, ?array &$error, array &$reject, int $seconds, int $microseconds = 0): int|false
 	public prepare(string $query): mysqli_stmt|false
 	public query(string $query, int $result_mode = MYSQLI_STORE_RESULT): mysqli_result|bool
@@ -793,7 +764,6 @@ class mysqli {
 	public real_escape_string(string $string): string
 	public real_query(string $query): bool
 	public reap_async_query(): mysqli_result|bool
-	public refresh(int $flags): bool
 	public release_savepoint(string $name): bool
 	public rollback(int $flags = 0, ?string $name = null): bool
 	public savepoint(string $name): bool
@@ -866,7 +836,6 @@ class mysqli_result implements IteratorAggregate {
 final class mysqli_driver {
 	public readonly string $client_info;
 	public readonly int $client_version;
-	public readonly int $driver_version;
 	public readonly bool $embedded;
 	public bool $reconnect = false;
 	public int $report_mode;
@@ -907,7 +876,6 @@ class SQLite3 {
 	public createAggregate(string $name, callable $stepCallback, callable $finalCallback, int $argCount = -1): bool
 	public createCollation(string $name, callable $callback): bool
 	public createFunction(string $name, callable $callback, int $argCount = -1, int $flags = 0): bool
-	public enableExceptions(bool $enable = false): bool
 	public static escapeString(string $string): string
 	public exec(string $query): bool
 	public lastErrorCode(): int
@@ -943,9 +911,9 @@ class SQLite3Result {
 	public reset(): bool
 }
 }
-}
 
-{ // Date and Time Related Extensions
+// Date and Time Related Extensions
+// https://www.php.net/manual/en/refs.calendar.php
 { // Date and Time
 class DateTime implements DateTimeInterface {
 	public __construct(string $datetime = "now", ?DateTimeZone $timezone = null)
@@ -1048,7 +1016,6 @@ public DateInterval $interval;
 
 public __construct(DateTimeInterface $start, DateInterval $interval, int $recurrences, int $options = 0)
 public __construct(DateTimeInterface $start, DateInterval $interval, DateTimeInterface $end, int $options = 0)
-public __construct(string $isostr, int $options = 0)
 public getDateInterval(): DateInterval
 public getEndDate(): ?DateTimeInterface
 public getRecurrences(): ?int
@@ -1102,9 +1069,9 @@ timezone_open()
 timezone_transitions_get()
 timezone_version_get(): string
 }
-}
 
-{ // File System Related Extensions
+// File System Related Extensions
+// https://www.php.net/manual/en/refs.fileprocess.file.php
 { // Directories
 DIRECTORY_SEPARATOR
 PATH_SEPARATOR
@@ -1155,8 +1122,6 @@ FILE_NO_DEFAULT_CONTEXT
 FILE_APPEND
 FILE_IGNORE_NEW_LINES
 FILE_SKIP_EMPTY_LINES
-FILE_BINARY
-FILE_TEXT
 INI_SCANNER_NORMAL
 INI_SCANNER_RAW
 INI_SCANNER_TYPED
@@ -1247,9 +1212,9 @@ touch(string $filename, ?int $mtime = null, ?int $atime = null): bool
 umask(?int $mask = null): int
 unlink(string $filename, ?resource $context = null): bool
 }
-}
 
-{ // Human Language and Character Encoding Support
+// Human Language and Character Encoding Support
+// https://www.php.net/manual/en/refs.international.php
 { // iconv
 ICONV_IMPL
 ICONV_VERSION
@@ -1345,23 +1310,26 @@ mb_substr(string $string, int $start, ?int $length = null, ?string $encoding = n
 mb_trim(string $string, ?string $characters = null, ?string $encoding = null): string
 mb_ucfirst(string $string, ?string $encoding = null): string
 }
-}
 
 { // Mail Related Extensions
 // Mail
 mail(string $to, string $subject, string $message, array|string $additional_headers = [], string $additional_params = ""): bool
 }
 
-{ // Mathematical Extensions
+// Mathematical Extensions
+// https://www.php.net/manual/en/refs.math.php
 { // BCMath Arbitrary Precision Mathematics
 bcadd(string $num1, string $num2, ?int $scale = null): string
+bcceil(string $num): string
 bccomp(string $num1, string $num2, ?int $scale = null): int
 bcdiv(string $num1, string $num2, ?int $scale = null): string
 bcdivmod(string $num1, string $num2, ?int $scale = null): string
+bcfloor(string $num): string
 bcmod(string $num1, string $num2, ?int $scale = null): string
 bcmul(string $num1, string $num2, ?int $scale = null): string
 bcpow(string $num, string $exponent, ?int $scale = null): string
 bcpowmod(string $num, string $exponent, string $modulus, ?int $scale = null): string
+bcround(string $num, int $precision = 0, RoundingMode $mode = RoundingMode::HalfAwayFromZero): string
 bcscale(int $scale): int
 bcscale(null $scale = null): int
 bcsqrt(string $num, ?int $scale = null): string
@@ -1484,14 +1452,13 @@ expm1(float $num): float
 fdiv(float $num1, float $num2): float
 floor(int|float $num): float
 fmod(float $num1, float $num2): float
-getrandmax(): int
+fpow(float $num, float $exponent): float
 hexdec(string $hex_string): int|float
 hypot(float $x, float $y): float
 intdiv(int $num1, int $num2): int
 is_finite(float $num): bool
 is_infinite(float $num): bool
 is_nan(float $num): bool
-lcg_value(): float
 log10(float $num): float
 log1p(float $num): float
 log(float $num, float $base = M_E): float
@@ -1499,27 +1466,20 @@ max(mixed $value, mixed ...$values): mixed
 max(array $value_array): mixed
 min(mixed $value, mixed ...$values): mixed
 min(array $value_array): mixed
-mt_getrandmax(): int
-mt_rand(): int
-mt_rand(int $min, int $max): int
-mt_srand(int $seed = 0, int $mode = MT_RAND_MT19937): void
 octdec(string $octal_string): int|float
 pi(): float
 pow(mixed $num, mixed $exponent): int|float|object
 rad2deg(float $num): float
-rand(): int
-rand(int $min, int $max): int
 round(int|float $num, int $precision = 0, int $mode = PHP_ROUND_HALF_UP): float
 sin(float $num): float
 sinh(float $num): float
 sqrt(float $num): float
-srand(int $seed = 0, int $mode = MT_RAND_MT19937): void
 tan(float $num): float
 tanh(float $num): float
 }
-}
 
-{ // Process Control Extensions
+// Process Control Extensions
+// https://www.php.net/manual/en/refs.fileprocess.process.php
 { // System program execution
 escapeshellarg(string $arg): string
 escapeshellcmd(string $command): string
@@ -1533,9 +1493,9 @@ proc_terminate(resource $process, int $signal = 15): bool
 shell_exec(string $command): string|false|null
 system(string $command, int &$result_code = null): string|false
 }
-}
 
-{ // Other Basic Extensions
+// Other Basic Extensions
+// https://www.php.net/manual/en/refs.basic.other.php
 { // JavaScript Object Notation
 JSON_ERROR_NONE
 JSON_ERROR_DEPTH
@@ -1611,6 +1571,19 @@ time_sleep_until(float $timestamp): bool
 uniqid(string $prefix = "", bool $more_entropy = false): string
 unpack(string $format, string $string, int $offset = 0): array|false
 usleep(int $microseconds): void
+}
+
+{ // Random Number Generators and Functions Related to Randomness
+getrandmax(): int
+mt_getrandmax(): int
+mt_rand(): int
+mt_rand(int $min, int $max): int
+mt_srand(int $seed = 0, int $mode = MT_RAND_MT19937): void
+rand(): int
+rand(int $min, int $max): int
+random_bytes(int $length): string
+random_int(int $min, int $max): int
+srand(int $seed = 0, int $mode = MT_RAND_MT19937): void
 }
 
 { // Standard PHP Library (SPL)
@@ -1706,15 +1679,11 @@ class SplFixedArray implements IteratorAggregate, ArrayAccess, Countable, JsonSe
 	public setSize(int $size): bool
 	public toArray(): array
 	public valid(): bool
-	public __wakeup(): void
 }
 class SplObjectStorage implements Countable, Iterator, Serializable, ArrayAccess {
 	public addAll(SplObjectStorage $storage): int
-	public attach(object $object, mixed $info = null): void
-	public contains(object $object): bool
 	public count(int $mode = COUNT_NORMAL): int
 	public current(): object
-	public detach(object $object): void
 	public getHash(object $object): string
 	public getInfo(): mixed
 	public key(): int
@@ -2302,7 +2271,7 @@ stream_context_get_options(resource $stream_or_context): array
 stream_context_get_params(resource $context): array
 stream_context_set_default(array $options): resource
 stream_context_set_option(resource $stream_or_context, string $wrapper, string $option, mixed $value): bool
-stream_context_set_option(resource $stream_or_context, array $options): bool
+stream_context_set_options(resource $context, array $options): true
 stream_context_set_params(resource $context, array $params): bool
 stream_copy_to_stream(resource $from, resource $to, ?int $length = null, int $offset = 0): int|false
 stream_filter_append(resource $stream, string $filtername, int $read_write = ?, mixed $params = ?): resource
@@ -2364,11 +2333,10 @@ rawurlencode(string $string): string
 urldecode(string $string): string
 urlencode(string $string): string
 }
-}
 
-{ // Other Services
+// Other Services
+// https://www.php.net/manual/en/refs.remote.other.php
 { // Client URL Library
-curl_close(CurlHandle $handle): void
 curl_copy_handle(CurlHandle $handle): CurlHandle|false
 curl_errno(CurlHandle $handle): int
 curl_error(CurlHandle $handle): string
@@ -2382,6 +2350,7 @@ curl_multi_close(CurlMultiHandle $multi_handle): void
 curl_multi_errno(CurlMultiHandle $multi_handle): int
 curl_multi_exec(CurlMultiHandle $multi_handle, int &$still_running): int
 curl_multi_getcontent(CurlHandle $handle): ?string
+curl_multi_get_handles(CurlMultiHandle $multi_handle): array
 curl_multi_info_read(CurlMultiHandle $multi_handle, int &$queued_messages = null): array|false
 curl_multi_init(): CurlMultiHandle
 curl_multi_remove_handle(CurlMultiHandle $multi_handle, CurlHandle $handle): int
@@ -2392,18 +2361,20 @@ curl_pause(CurlHandle $handle, int $flags): int
 curl_reset(CurlHandle $handle): void
 curl_setopt_array(CurlHandle $handle, array $options): bool
 curl_setopt(CurlHandle $handle, int $option, mixed $value): bool
-curl_share_close(CurlShareHandle $share_handle): void
 curl_share_errno(CurlShareHandle $share_handle): int
 curl_share_init(): CurlShareHandle
+curl_share_init_persistent(array $share_options): CurlSharePersistentHandle
 curl_share_setopt(CurlShareHandle $share_handle, int $option, mixed $value): bool
 curl_share_strerror(int $error_code): ?string
 curl_strerror(int $error_code): ?string
 curl_unescape(CurlHandle $handle, string $string): string|false
+curl_upkeep(CurlHandle $handle): bool
 curl_version(): array|false
 
 final class CurlHandle {}
 final class CurlMultiHandle {}
 final class CurlShareHandle {}
+final class CurlSharePersistentHandle {}
 class CURLFile {
 	public string $name = "";
 	public string $mime = "";
@@ -2511,20 +2482,19 @@ setcookie(string $name, string $value = "", int $expires_or_options = 0, string 
 setrawcookie(string $name, string $value = ?, int $expires_or_options = 0, string $path = ?, string $domain = ?, bool $secure = false, bool $httponly = false): bool
 socket_get_status()
 socket_set_blocking()
-socket_set_timeout()
 syslog(int $priority, string $message): bool
 }
-}
 
-{ // Server Specific Extensions
+// Server Specific Extensions
+// https://www.php.net/manual/en/refs.utilspec.server.php
 { // FastCGI Process Manager
 fastcgi_finish_request(): bool
 fpm_get_status(): array
 }
-}
 
-{ // Session Extensions
-SID
+// Session Extensions
+// https://www.php.net/manual/en/refs.basic.session.php
+{ // Sessions
 PHP_SESSION_DISABLED
 PHP_SESSION_NONE
 PHP_SESSION_ACTIVE
@@ -2547,7 +2517,7 @@ session_register_shutdown(): void
 session_reset(): bool
 session_save_path(?string $path = null): string|false
 session_set_cookie_params(int $lifetime_or_options, ?string $path = null, ?string $domain = null, ?bool $secure = null, ?bool $httponly = null): bool
-session_set_save_handler(callable $open, callable $close, callable $read, callable $write, callable $destroy, callable $gc, callable $create_sid = ?, callable $validate_sid = ?, callable $update_timestamp = ?): bool
+session_set_save_handler(object $sessionhandler, bool $register_shutdown = true): bool
 session_start(array $options = []): bool
 session_status(): int
 session_unset(): bool
@@ -2579,7 +2549,8 @@ interface SessionUpdateTimestampHandlerInterface {
 }
 }
 
-{ // Text Processing
+// Text Processing
+// https://www.php.net/manual/en/refs.basic.text.php
 { // Regular Expressions (Perl-Compatible)
 PREG_PATTERN_ORDER
 PREG_SET_ORDER
@@ -2748,9 +2719,9 @@ vprintf(string $format, array $values): int
 vsprintf(string $format, array $values): string
 wordwrap(string $string, int $width = 75, string $break = "\n", bool $cut_long_words = false): string
 }
-}
 
-{ // Variable and Type Related Extensions
+// Variable and Type Related Extensions
+// https://www.php.net/manual/en/refs.basic.vartype.php
 { // Arrays
 CASE_LOWER
 CASE_UPPER
@@ -2797,6 +2768,7 @@ array_fill(int $start_index, int $count, mixed $value): array
 array_filter(array $array, ?callable $callback = null, int $mode = 0): array
 array_find(array $array, callable $callback): mixed
 array_find_key(array $array, callable $callback): mixed
+array_first(array $array): mixed
 array_flip(array $array): array
 array_intersect_assoc(array $array, array ...$arrays): array
 array_intersect_key(array $array, array ...$arrays): array
@@ -2809,6 +2781,7 @@ array_key_first(array $array): int|string|null
 array_key_last(array $array): int|string|null
 array_keys(array $array): array
 array_keys(array $array, mixed $search_value, bool $strict = false): array
+array_last(array $array): mixed
 array_map(?callable $callback, array $array, array ...$arrays): array
 array_merge_recursive(array ...$arrays): array
 array_merge(array ...$arrays): array
@@ -2899,7 +2872,7 @@ func_get_arg(int $position): mixed
 func_get_args(): array
 func_num_args(): int
 function_exists(string $function): bool
-get_defined_functions(bool $exclude_disabled = true): array
+get_defined_functions(): array
 register_shutdown_function(callable $callback, mixed ...$args): ?bool
 register_tick_function(callable $callback, mixed ...$args): bool
 unregister_tick_function(callable $callback): void
@@ -3043,7 +3016,6 @@ class ReflectionFunction extends ReflectionFunctionAbstract {
 	const int IS_DEPRECATED;
 
 	public __construct(Closure|string $function)
-	public static export(string $name, string $return = ?): string
 	public getClosure(): Closure
 	public invoke(mixed ...$args): mixed
 	public invokeArgs(array $args): mixed
@@ -3091,8 +3063,6 @@ class ReflectionMethod extends ReflectionFunctionAbstract {
 	public string $class;
 
 	public __construct(object|string $objectOrMethod, string $method)
-	public __construct(string $classMethod)
-	public static export(string $class, string $name, bool $return = false): string
 	public getClosure(?object $object = null): Closure
 	public getDeclaringClass(): ReflectionClass
 	public getModifiers(): int
@@ -3107,7 +3077,6 @@ class ReflectionMethod extends ReflectionFunctionAbstract {
 	public isProtected(): bool
 	public isPublic(): bool
 	public isStatic(): bool
-	public setAccessible(bool $accessible): void
 	public __toString(): string
 }
 class ReflectionNamedType extends ReflectionType {
@@ -3168,9 +3137,7 @@ class ReflectionProperty implements Reflector {
 	public isPublic(): bool
 	public isReadOnly(): bool
 	public isStatic(): bool
-	public setAccessible(bool $accessible): void
 	public setValue(object $object, mixed $value): void
-	public setValue(mixed $value): void
 	public __toString(): string
 }
 abstract class ReflectionType implements Stringable {
@@ -3211,7 +3178,6 @@ class ReflectionAttribute implements Reflector {
 	public newInstance(): object
 }
 interface Reflector extends Stringable {
-	public static export(): string
 	public __toString(): string
 }
 class ReflectionException extends Exception {}
@@ -3255,9 +3221,9 @@ unset(mixed $var, mixed ...$vars): void
 var_dump(mixed $value, mixed ...$values): void
 var_export(mixed $value, bool $return = false): ?string
 }
-}
 
-{ // XML Manipulation
+// XML Manipulation
+// https://www.php.net/manual/en/refs.xml.php
 { // SimpleXML
 class SimpleXMLElement implements Stringable, Countable, RecursiveIterator {
 	public __construct(string $data, int $options = 0, bool $dataIsURL = false, string $namespaceOrPrefix = "", bool $isPrefix = false)
@@ -3287,7 +3253,6 @@ class SimpleXMLIterator extends SimpleXMLElement {
 simplexml_import_dom(SimpleXMLElement|DOMNode $node, ?string $class_name = SimpleXMLElement::class): ?SimpleXMLElement
 simplexml_load_file(string $filename, ?string $class_name = SimpleXMLElement::class, int $options = 0, string $namespace_or_prefix = "", bool $is_prefix = false): SimpleXMLElement|false
 simplexml_load_string(string $data, ?string $class_name = SimpleXMLElement::class, int $options = 0, string $namespace_or_prefix = "", bool $is_prefix = false): SimpleXMLElement|false
-}
 }
 
 //! phpdoc				=======================================================

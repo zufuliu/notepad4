@@ -1,11 +1,12 @@
-// 3.4 https://dart.dev/
-// https://dart.dev/guides/language/language-tour
-// 2.13 https://dart.dev/guides/language/spec
+// 3.10 https://dart.dev/
+// https://dart.dev/language
+// 2.13 https://dart.dev/resources/language/spec
 // https://github.com/dart-lang/language
+// https://github.com/dart-lang/language/tree/main/accepted
 // https://github.com/dart-lang/sdk
 
 //! keywords		===========================================================
-// https://dart.dev/guides/language/language-tour#keywords
+// https://dart.dev/language/keywords
 abstract as assert async await
 base break
 case catch class const continue covariant
@@ -28,13 +29,13 @@ when while with
 yield
 
 //! types			===========================================================
-// https://dart.dev/guides/language/language-tour#built-in-types
+// https://dart.dev/language/built-in-types
 dynamic void Function Never
 int double
 bool num
 
 //! libraries		===========================================================
-// https://dart.dev/guides/libraries
+// https://dart.dev/libraries
 library dart._internal {
 	@Since()
 	class SystemHash
