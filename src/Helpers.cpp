@@ -2741,7 +2741,7 @@ unsigned int UnSlash(char *s, UINT cpEdit) noexcept {
 		0,		// s
 		'\t',	// t
 		'\x84',	// u
-		0,		// v
+		'\v',	// v
 		0,		// w
 		'\x82',	// x
 	};

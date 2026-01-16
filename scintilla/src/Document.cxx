@@ -3893,7 +3893,7 @@ const char *BuiltinRegex::SubstituteByPosition(const Document *doc, const char *
 		0,		// s
 		'\t',	// t
 		'\x84',	// u
-		0,		// v
+		'\v',	// v
 		0,		// w
 		'\x82',	// x
 	};

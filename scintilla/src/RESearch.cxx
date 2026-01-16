@@ -385,7 +385,7 @@ int RESearch::GetBackslashExpression(const char *pattern, int &incr) noexcept {
 		'\x84',	// s
 		'\t',	// t
 		0,		// u
-		0,		// v
+		'\v',	// v
 		'\x86',	// w
 		'\x81',	// x
 	};
