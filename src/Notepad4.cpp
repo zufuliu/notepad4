@@ -164,7 +164,7 @@ extern int g_DOSEncoding;
 bool	bLargeFileMode = false;
 #endif
 int		iDefaultEOLMode;
-static int iCurrentEOLMode;
+int		iCurrentEOLMode;
 bool	bWarnLineEndings;
 bool	bFixLineEndings;
 bool	bAutoStripBlanks;

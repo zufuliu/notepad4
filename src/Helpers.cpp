@@ -1205,6 +1205,15 @@ void ResizeDlgCtl(HWND hwndDlg, int nCtlId, int dx, int dy) noexcept {
 	InvalidateRect(hwndCtl, nullptr, TRUE);
 }
 
+#ifndef EM_SETEXTENDEDSTYLE // (NTDDI_VERSION >= NTDDI_WIN10_RS5)
+#define EM_SETEXTENDEDSTYLE     (ECM_FIRST + 10)
+#define EM_SETENDOFLINE         (ECM_FIRST + 12)
+#define ES_EX_ALLOWEOL_CR             0x0001L
+#define ES_EX_ALLOWEOL_LF             0x0002L
+#define ES_EX_ALLOWEOL_ALL            (ES_EX_ALLOWEOL_CR | ES_EX_ALLOWEOL_LF)
+#define ES_EX_CONVERT_EOL_ON_PASTE    0x0004L
+#endif
+
 // https://docs.microsoft.com/en-us/windows/desktop/Controls/subclassing-overview
 // https://support.microsoft.com/en-us/help/102589/how-to-use-the-enter-key-from-edit-controls-in-a-dialog-box
 // Ctrl+A: https://stackoverflow.com/questions/10127054/select-all-text-in-edit-contol-by-clicking-ctrla
@@ -1266,6 +1275,12 @@ static LRESULT CALLBACK MultilineEditProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 
 void MultilineEditSetup(HWND hwndDlg, int nCtlId) noexcept {
 	HWND hwnd = GetDlgItem(hwndDlg, nCtlId);
+	if (IsWin10AndAbove() && (GetWindowStyle(hwnd) & ES_WANTRETURN) != 0) {
+		extern int iCurrentEOLMode;
+		constexpr DWORD exStyle = ES_EX_ALLOWEOL_ALL | ES_EX_CONVERT_EOL_ON_PASTE;
+		SendMessage(hwnd, EM_SETEXTENDEDSTYLE, exStyle, exStyle);
+		SendMessage(hwnd, EM_SETENDOFLINE, iCurrentEOLMode + 1, 0);
+	}
 	SetWindowSubclass(hwnd, MultilineEditProc, 0, 0);
 	// Ctrl+Backspace
 	SHAutoComplete(hwnd, SHACF_FILESYS_ONLY | SHACF_AUTOAPPEND_FORCE_OFF | SHACF_AUTOSUGGEST_FORCE_OFF);
