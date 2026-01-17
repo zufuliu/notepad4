@@ -48,7 +48,7 @@ static KEYWORDLIST Keywords_HTML = {{
 "dir direction dirname disabled download draggable dropzone "
 "encoding enctype enterkeyhint event "
 "face fetchpriority for form formaction formenctype formmethod formnovalidate formtarget frame frameborder framespacing "
-"headers height hidden high href hreflang hspace http-equiv "
+"headers headingoffset headingreset height hidden high href hreflang hspace http-equiv "
 "id imagesizes imagesrcset inert inputmode integrity is ismap itemid itemprop itemref itemscope itemtype keytype kind "
 "label lang language leftmargin link list loading longdesc loop low lowsrc "
 "manifest marginheight marginwidth max maxlength media method methods min minlength multiple muted "
