@@ -243,6 +243,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	int ticksToDwell;
 	bool dwelling;
 	bool dropWentOutside;
+	bool dragDropEnabled;
 	enum class TextUnit {
 		character, word, subLine, wholeLine
 	} selectionUnit;

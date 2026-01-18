@@ -344,7 +344,7 @@ int RESearch::GetBackslashExpression(const char *pattern, int &incr) noexcept {
 		nonWord = 7,
 		charsetMask = 7,
 	};
-	#define charset(c)	static_cast<char>(0x80 + c)
+	#define charset(c)	static_cast<char>(0x80 + (c))
 	static constexpr char backslashTable['x' - 'D' + 1] = {
 		charset(nonDigit),	// D
 		0,		// E
