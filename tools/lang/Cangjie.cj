@@ -1,5 +1,5 @@
-// 2024-10-24 0.53.13 https://cangjie-lang.cn/
-// 2024-10-26 0.22.17 https://developer.huawei.com/consumer/cn/cangjie
+// 2025-02-07 0.53.18 https://cangjie-lang.cn/
+// 2025-11-05 0.22.17 https://developer.huawei.com/consumer/cn/cangjie
 
 //! keywords		===========================================================
 abstract as

@@ -199,15 +199,15 @@ def find_new_texinfo_commands(path, lang):
 		fd.write(f'@{doc}\n')
 
 # https://github.com/w3c/csswg-drafts/
-#find_updated_css_drafts('2025-11-14', r'H:\Libs\csswg-drafts')
+# find_updated_css_drafts('2026-01-16', r'H:\Libs\csswg-drafts')
 # https://www.w3.org/Style/CSS/all-properties.en.json
-#dump_all_css_properties('all-properties.en.json', 'property', 'title', 'url')
+# dump_all_css_properties('all-properties.en.json', 'property', 'title', 'url')
 # https://www.w3.org/Style/CSS/all-descriptors.en.json
-#dump_all_css_properties('all-descriptors.en.json', 'descriptor', 'specification', 'URL')
-#find_new_css_properties('all-properties.en.json', 'all-descriptors.en.json', 'lang/CSS.css')
+# dump_all_css_properties('all-descriptors.en.json', 'descriptor', 'specification', 'URL')
+# find_new_css_properties('all-properties.en.json', 'all-descriptors.en.json', 'lang/CSS.css')
 
 # https://html.spec.whatwg.org/multipage/indices.html
-#dump_html_elements('indices.html')
+# dump_html_elements('indices.html')
 
 #group_powershell_commands('command.ps1')
 
