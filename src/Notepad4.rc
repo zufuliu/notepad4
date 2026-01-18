@@ -233,6 +233,9 @@ BEGIN
 			MENUITEM "Remo&ve Duplicate Lines",			IDM_EDIT_REMOVEDUPLICATELINE
 			MENUITEM "&Pad With Spaces\tAlt+P",			IDM_EDIT_PADWITHSPACES
 			MENUITEM "Compress &Whitespace\tAlt+W",		IDM_EDIT_COMPRESSWS
+			MENUITEM SEPARATOR
+			MENUITEM "CSS/JS/JSON Compres&s",			IDM_EDIT_CODE_COMPRESS
+			MENUITEM "CSS/JS/JSON Prett&y",				IDM_EDIT_CODE_PRETTY
 		END
 		POPUP "&Enclose Selection"
 		BEGIN
@@ -280,6 +283,46 @@ BEGIN
 			MENUITEM "To &Decimal\tCtrl+Alt+D",				IDM_EDIT_NUM2DEC
 			MENUITEM "To &Binary\tCtrl+Alt+B",				IDM_EDIT_NUM2BIN
 			MENUITEM "To &Octet",							IDM_EDIT_NUM2OCT
+			MENUITEM SEPARATOR
+			MENUITEM "C&har to Hex\tCtrl+Alt+X",				IDM_EDIT_CHAR2HEX
+			MENUITEM "Hex to Cha&r\tCtrl+Alt+C",				IDM_EDIT_HEX2CHAR
+			MENUITEM "&Show Hex Code",							IDM_EDIT_SHOW_HEX
+		END
+		POPUP "Enc&ode / Decode"
+		BEGIN
+			MENUITEM "Esca&pe C Chars\tCtrl+Alt+E",				IDM_EDIT_ESCAPECCHARS
+			MENUITEM "&Unescape C Chars\tCtrl+Alt+R",			IDM_EDIT_UNESCAPECCHARS
+			MENUITEM "Escape HT&ML/XML Chars\tAlt+Shift+X",		IDM_EDIT_XHTML_ESCAPE_CHAR
+			MENUITEM "Unescape HTML/&XML Chars\tAlt+Shift+H",	IDM_EDIT_XHTML_UNESCAPE_CHAR
+			MENUITEM SEPARATOR
+			MENUITEM "Base64 S&tandard Encode",					IDM_EDIT_BASE64_ENCODE
+			MENUITEM "Base64 URL Sa&fe Encode",					IDM_EDIT_BASE64_SAFE_ENCODE
+			MENUITEM "Base64 Encode as HTML Embedded &Image",	IDM_EDIT_BASE64_HTML_EMBEDDED_IMAGE
+			MENUITEM "Base64 &Decode",							IDM_EDIT_BASE64_DECODE
+			MENUITEM "Base64 Decode as H&ex",					IDM_EDIT_BASE64_DECODE_AS_HEX
+			MENUITEM SEPARATOR
+			MENUITEM "UR&L Encode\tCtrl+Shift+E",				IDM_EDIT_URLENCODE
+			MENUITEM "URL C&omponent Encode",					IDM_EDIT_URLCOMPONENTENCODE
+			MENUITEM "URL De&code\tCtrl+Shift+R",				IDM_EDIT_URLDECODE
+		END
+		POPUP "Text &Transliteration"
+		BEGIN
+			MENUITEM "Halfwidth Form to Full&width",				IDM_EDIT_MAP_FULLWIDTH
+			MENUITEM "Fullwidth Form to H&alfwidth",				IDM_EDIT_MAP_HALFWIDTH
+			MENUITEM SEPARATOR
+			MENUITEM "Chinese Traditional to &Simplified",			IDM_EDIT_MAP_SIMPLIFIED_CHINESE
+			MENUITEM "Chinese Simplified to &Traditional",			IDM_EDIT_MAP_TRADITIONAL_CHINESE
+			MENUITEM SEPARATOR
+			MENUITEM "Japanese Katakana to &Hiragana",				IDM_EDIT_MAP_HIRAGANA
+			MENUITEM "Japanese Hiragana to &Katakana",				IDM_EDIT_MAP_KATAKANA
+			MENUITEM SEPARATOR
+			MENUITEM "Korean Han&ja to Hangul",		        		IDM_EDIT_MAP_HANJA_HANGUL
+			MENUITEM "Korean Han&gul Decomposition",				IDM_EDIT_MAP_HANGUL_DECOMPOSITION
+			MENUITEM SEPARATOR
+			MENUITEM "&Bengali to Latin",							IDM_EDIT_MAP_BENGALI_LATIN
+			MENUITEM "C&yrillic to Latin",							IDM_EDIT_MAP_CYRILLIC_LATIN
+			MENUITEM "&Devanagari to Latin",						IDM_EDIT_MAP_DEVANAGARI_LATIN
+			MENUITEM "&Malayalam to Latin",							IDM_EDIT_MAP_MALAYALAM_LATIN
 		END
 		POPUP "I&nsert"
 		BEGIN
@@ -340,15 +383,6 @@ BEGIN
 		END
 		POPUP "Spec&ial"
 		BEGIN
-			MENUITEM "C&har to Hex\tCtrl+Alt+X",				IDM_EDIT_CHAR2HEX
-			MENUITEM "Hex to Cha&r\tCtrl+Alt+C",				IDM_EDIT_HEX2CHAR
-			MENUITEM "&Show Hex Code",							IDM_EDIT_SHOW_HEX
-			MENUITEM SEPARATOR
-			MENUITEM "Esca&pe C Chars\tCtrl+Alt+E",				IDM_EDIT_ESCAPECCHARS
-			MENUITEM "&Unescape C Chars\tCtrl+Alt+R",			IDM_EDIT_UNESCAPECCHARS
-			MENUITEM "Escape HT&ML/XML Chars\tAlt+Shift+X",		IDM_EDIT_XHTML_ESCAPE_CHAR
-			MENUITEM "Unescape HTML/&XML Chars\tAlt+Shift+H",	IDM_EDIT_XHTML_UNESCAPE_CHAR
-			MENUITEM SEPARATOR
 			MENUITEM "Delete &Line Left\tCtrl+Shift+Back",		IDM_EDIT_DELETELINELEFT
 			MENUITEM "Delete Li&ne Right\tCtrl+Shift+Del",		IDM_EDIT_DELETELINERIGHT
 			MENUITEM "Delete Word Le&ft\tCtrl+Back",			CMD_CTRLBACK
@@ -723,9 +757,6 @@ BEGIN
 		MENUITEM SEPARATOR
 		POPUP "Action &on Selection"
 		BEGIN
-			MENUITEM "CSS/JS/JSON &Compress",				IDM_EDIT_CODE_COMPRESS
-			MENUITEM "CSS/JS/JSON &Pretty",					IDM_EDIT_CODE_PRETTY
-			MENUITEM SEPARATOR
 			MENUITEM "&Open File, Folder, Link, etc.",		CMD_OPEN_PATH_OR_LINK
 			MENUITEM "Open Containing &Folder",				CMD_OPEN_CONTAINING_FOLDER
 			MENUITEM SEPARATOR
@@ -736,36 +767,6 @@ BEGIN
 			MENUITEM "Custom Action &1\tCtrl+Shift+1",		CMD_CUSTOM_ACTION1
 			MENUITEM "Custom Action &2\tCtrl+Shift+2",		CMD_CUSTOM_ACTION2
 		END
-		POPUP "&Base64"
-		BEGIN
-			MENUITEM "Standard &Encode",					IDM_EDIT_BASE64_ENCODE
-			MENUITEM "URL &Safe Encode",					IDM_EDIT_BASE64_SAFE_ENCODE
-			MENUITEM "Encode as HTML Embedded &Image",		IDM_EDIT_BASE64_HTML_EMBEDDED_IMAGE
-			MENUITEM "&Decode",								IDM_EDIT_BASE64_DECODE
-			MENUITEM "Decode as &Hex",						IDM_EDIT_BASE64_DECODE_AS_HEX
-		END
-		POPUP "Text &Transliteration"
-		BEGIN
-			MENUITEM "Halfwidth Form to Full&width",		IDM_EDIT_MAP_FULLWIDTH
-			MENUITEM "Fullwidth Form to H&alfwidth",		IDM_EDIT_MAP_HALFWIDTH
-			MENUITEM SEPARATOR
-			MENUITEM "Chinese Traditional to &Simplified",	IDM_EDIT_MAP_SIMPLIFIED_CHINESE
-			MENUITEM "Chinese Simplified to &Traditional",	IDM_EDIT_MAP_TRADITIONAL_CHINESE
-			MENUITEM SEPARATOR
-			MENUITEM "Japanese Katakana to &Hiragana",		IDM_EDIT_MAP_HIRAGANA
-			MENUITEM "Japanese Hiragana to &Katakana",		IDM_EDIT_MAP_KATAKANA
-			MENUITEM SEPARATOR
-			MENUITEM "Korean Han&ja to Hangul",		        IDM_EDIT_MAP_HANJA_HANGUL
-			MENUITEM "Korean Han&gul Decomposition",		IDM_EDIT_MAP_HANGUL_DECOMPOSITION
-			MENUITEM SEPARATOR
-			MENUITEM "&Bengali to Latin",					IDM_EDIT_MAP_BENGALI_LATIN
-			MENUITEM "C&yrillic to Latin",					IDM_EDIT_MAP_CYRILLIC_LATIN
-			MENUITEM "&Devanagari to Latin",				IDM_EDIT_MAP_DEVANAGARI_LATIN
-			MENUITEM "&Malayalam to Latin",					IDM_EDIT_MAP_MALAYALAM_LATIN
-		END
-		MENUITEM "&URL Encode\tCtrl+Shift+E",				IDM_EDIT_URLENCODE
-		MENUITEM "URL Component Encode",					IDM_EDIT_URLCOMPONENTENCODE
-		MENUITEM "UR&L Decode\tCtrl+Shift+R",				IDM_EDIT_URLDECODE
 	END
 	POPUP "&Help"
 	BEGIN
