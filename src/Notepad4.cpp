@@ -491,17 +491,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 #endif
 
 	g_hDefaultHeap = GetProcessHeap();
-	// https://docs.microsoft.com/en-us/windows/desktop/Memory/low-fragmentation-heap
-#if 0 // default enabled since Vista
-	{
-		// Enable the low-fragmenation heap (LFH).
-		ULONG HeapInformation = /*HEAP_LFH*/2;
-		HeapSetInformation(g_hDefaultHeap, HeapCompatibilityInformation, &HeapInformation, sizeof(HeapInformation));
-		// Enable heap terminate-on-corruption.
-		HeapSetInformation(nullptr, HeapEnableTerminationOnCorruption, nullptr, 0);
-	}
-#endif
-
 	// Don't keep working directory locked
 	WCHAR wchWorkingDirectory[MAX_PATH];
 	GetCurrentDirectory(COUNTOF(g_wchWorkingDirectory), g_wchWorkingDirectory);
