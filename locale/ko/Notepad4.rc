@@ -50,7 +50,7 @@ IDI_RUN                 ICON                    "..\\..\\res\\Run_min.ico"
 IDI_STYLES              ICON                    "..\\..\\res\\Styles_min.ico"
 #endif
 
-//#if !NP2_ENABLE_APP_LOCALIZATION_DLL
+#if !NP2_ENABLE_APP_LOCALIZATION_DLL
 /////////////////////////////////////////////////////////////////////////////
 //
 // Bitmap
@@ -101,7 +101,7 @@ IDC_COPY                CURSOR                  "..\\..\\res\\Copy.cur"
 IDC_COPY                CURSOR                  "..\\..\\res\\Copy_min.cur"
 #endif
 
-//#endif // NP2_ENABLE_APP_LOCALIZATION_DLL
+#endif // NP2_ENABLE_APP_LOCALIZATION_DLL
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -2059,7 +2059,7 @@ BEGIN
 	IDS_WRAP_MODE_OPTIONS			"줄바꿈 안함|단어 사이에 텍스트 줄바꿈|문자 사이에 텍스트 줄바꿈|공백에 텍스트 줄바꿈|자동 줄바꿈|"
 END
 
-#if 0//NP2_ENABLE_LOCALIZE_LEXER_NAME
+#if NP2_ENABLE_LOCALIZE_LEXER_NAME
 // string table for lexers, see EditLexer.h
 STRINGTABLE
 BEGIN
@@ -2070,7 +2070,7 @@ BEGIN
 END
 #endif // NP2_ENABLE_LOCALIZE_LEXER_NAME
 
-#if 0//NP2_ENABLE_LOCALIZE_STYLE_NAME
+#if NP2_ENABLE_LOCALIZE_STYLE_NAME
 // string table for styles, see EditLexers/EditStyleX.h
 STRINGTABLE
 BEGIN
@@ -2138,5 +2138,6 @@ END
 #include "../../src/Notepad4.ver"
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
+
 
 
