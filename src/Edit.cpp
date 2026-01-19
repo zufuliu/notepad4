@@ -1518,19 +1518,11 @@ using MappingFreePropertyBagSig = HRESULT (WINAPI *)(PMAPPING_PROPERTY_BAG pBag)
 }
 
 int StringMapCase(LPCWSTR pszTextW, int cchTextW, DWORD flags, LPWSTR &pszMappedW) noexcept {
-#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 	int charsConverted = LCMapStringEx(LOCALE_NAME_USER_DEFAULT, flags, pszTextW, cchTextW, nullptr, 0, nullptr, nullptr, 0);
 	if (charsConverted) {
 		pszMappedW = static_cast<LPWSTR>(NP2HeapAlloc((charsConverted + 1)*sizeof(WCHAR)));
 		charsConverted = LCMapStringEx(LOCALE_NAME_USER_DEFAULT, flags, pszTextW, cchTextW, pszMappedW, charsConverted, nullptr, nullptr, 0);
 	}
-#else
-	int charsConverted = LCMapString(LOCALE_USER_DEFAULT, flags, pszTextW, cchTextW, nullptr, 0);
-	if (charsConverted) {
-		pszMappedW = static_cast<LPWSTR>(NP2HeapAlloc((charsConverted + 1)*sizeof(WCHAR)));
-		charsConverted = LCMapString(LOCALE_USER_DEFAULT, flags, pszTextW, cchTextW, pszMappedW, charsConverted);
-	}
-#endif
 	return charsConverted;
 }
 
@@ -4186,11 +4178,7 @@ void EditSortLines(EditSortFlag iSortFlags) noexcept {
 				// convert to uppercase for case insensitive comparison
 				// https://learn.microsoft.com/en-us/dotnet/api/system.string.toupper?view=net-7.0#system-string-toupper
 				LPWSTR pwszSortLine = pszTextW + cchTotal;
-#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 				const UINT charsConverted = LCMapStringEx(LOCALE_NAME_USER_DEFAULT, LCMAP_UPPERCASE, pwszLine, cchLine, pwszSortLine, static_cast<int>(cbPmszBuf), nullptr, nullptr, 0);
-#else
-				const UINT charsConverted = LCMapString(LOCALE_USER_DEFAULT, LCMAP_UPPERCASE, pwszLine, cchLine, pwszSortLine, static_cast<int>(cbPmszBuf));
-#endif
 				cchTotal += NP2_align_up(charsConverted, alignof(WCHAR *)/sizeof(WCHAR));
 				pwszLine = pwszSortLine;
 			}
