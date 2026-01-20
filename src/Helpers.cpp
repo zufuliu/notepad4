@@ -982,9 +982,76 @@ struct RESIZEDLG {
 	SIZE client;
 	POINT minTrackSize;
 	SIZE templateSize;
+	const DWORD *controlDefinition;
+	UINT controlCount;
 	int itemMinSize[2];
 	int itemTemplateSize[2];
 };
+
+void ResizeDlg_Size(HWND hwnd, const RESIZEDLG *pm, int dx, int dy) noexcept {
+	HDWP hdwp = BeginDeferWindowPos(pm->controlCount);
+	UINT index = 0;
+	HWND hwndLV = nullptr;
+	do {
+		DWORD definition = pm->controlDefinition[index];
+		HWND hwndCtl = GetDlgItem(hwnd, LOWORD(definition));
+		RECT rc;
+		GetWindowRect(hwndCtl, &rc);
+		MapWindowPoints(nullptr, hwnd, reinterpret_cast<LPPOINT>(&rc), 2);
+
+		int x = rc.left;
+		int y = rc.top;
+		int cx = rc.right - x;
+		int cy = rc.bottom - y;
+		DWORD flags = SWP_NOZORDER;
+
+		definition >>= 16;
+		switch (definition & RESIZE_MOVE_MASK) {
+		case RESIZE_MOVE_X:
+			x += dx;
+			break;
+		case RESIZE_MOVE_Y:
+			y += dy;
+			break;
+		case RESIZE_MOVE_XY:
+			x += dx;
+			y += dy;
+			break;
+		default:
+			flags |= SWP_NOMOVE;
+			break;
+		}
+
+		definition >>= 4;
+		switch (definition & RESIZE_SIZE_MASK) {
+		case RESIZE_SIZE_X:
+			cx += dx;
+			break;
+		case RESIZE_SIZE_Y:
+			cy += dy;
+			break;
+		case RESIZE_SIZE_XY:
+			cx += dx;
+			cy += dy;
+			break;
+		default:
+			flags |= SWP_NOSIZE;
+			break;
+		}
+
+		hdwp = DeferWindowPos(hdwp, hwndCtl, nullptr, x, y, cx, cy, flags);
+		if ((definition & (RESIZE_AUTOSIZE_USEHEADER >> 20)) != 0) {
+			hwndLV = hwndCtl;
+		} else if ((definition & (RESIZE_INVALIDATE_RECT >> 20)) != 0) {
+			InvalidateRect(hwndCtl, nullptr, TRUE);
+		}
+		++index;
+	} while (index < pm->controlCount);
+	EndDeferWindowPos(hdwp);
+	if (hwndLV != nullptr) {
+		ListView_SetColumnWidth(hwndLV, 0, LVSCW_AUTOSIZE_USEHEADER);
+	}
+}
 
 }
 
@@ -1022,6 +1089,10 @@ static LRESULT CALLBACK ResizeDlg_Proc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 			// skip first WM_SIZE message during WM_DPICHANGED, dialog control already has correct layout
 			// until end of WM_DPICHANGED block, pm->client contains outdated value
 			pm->dpiChanged = FALSE;
+			return TRUE;
+		}
+		if (pm->controlCount != 0) {
+			ResizeDlg_Size(hwnd, pm, dx, dy);
 			return TRUE;
 		}
 	} break;
@@ -1092,10 +1163,11 @@ static LRESULT CALLBACK ResizeDlg_Proc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 	return DefSubclassProc(hwnd, umsg, wParam, lParam);
 }
 
-void ResizeDlg_InitEx(HWND hwnd, int *cxFrame, int *cyFrame, int nIdGrip, DWORD nCtlId) noexcept {
+void ResizeDlg_InitEx(HWND hwnd, int *cxFrame, int *cyFrame, const DWORD *controlDefinition, DWORD controlCount) noexcept {
 	const UINT dpi = GetWindowDPI(hwnd);
 	RESIZEDLG * const pm = static_cast<RESIZEDLG *>(NP2HeapAlloc(sizeof(RESIZEDLG)));
 	pm->dpi = dpi;
+	pm->controlDefinition = controlDefinition;
 
 	RECT rc = {DlgBaseUnit.cx, DlgBaseUnit.cy, 0, 0};
 	MapDialogRect(hwnd, &rc);
@@ -1128,7 +1200,9 @@ void ResizeDlg_InitEx(HWND hwnd, int *cxFrame, int *cyFrame, int nIdGrip, DWORD 
 		}
 	}
 
-	if (nCtlId != 0) {
+	pm->controlCount = LOWORD(controlCount);
+	if (HIWORD(controlCount) != 0) {
+		const DWORD nCtlId = pm->controlDefinition[pm->controlCount];
 		GetWindowRect(GetDlgItem(hwnd, LOWORD(nCtlId)), &rc);
 		pm->itemMinSize[0] = rc.bottom - rc.top;
 		pm->itemTemplateSize[0] = MulDiv(pm->itemMinSize[0], DlgBaseUnit.cy, baseUnit.cy);
@@ -1149,7 +1223,7 @@ void ResizeDlg_InitEx(HWND hwnd, int *cxFrame, int *cyFrame, int nIdGrip, DWORD 
 	DeleteMenu(hmenu, SC_MAXIMIZE, MF_BYCOMMAND);
 #endif
 
-	HWND hwndCtl = GetDlgItem(hwnd, nIdGrip);
+	HWND hwndCtl = GetDlgItem(hwnd, LOWORD(pm->controlDefinition[0]));
 	const int cGrip = SystemMetricsForDpi(SM_CXHTHUMB, pm->dpi);
 	SetWindowPos(hwndCtl, nullptr, pm->client.cx - cGrip, pm->client.cy - cGrip, cGrip, cGrip, SWP_NOZORDER);
 }

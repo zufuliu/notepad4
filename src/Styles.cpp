@@ -4183,6 +4183,11 @@ static void Style_ResetStyle(LPCEDITLEXER pLex, EDITSTYLE *pStyle) noexcept {
 // Style_ConfigDlgProc()
 //
 static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
+	static const DWORD controlDefinition[] = {
+		DeferCtlMove(IDC_RESIZEGRIP3),
+		MAKELONG(IDC_STYLEEDIT, IDC_STYLEVALUE_DEFAULT),
+	};
+
 	static HWND hwndTV;
 	static bool fDragging;
 	static bool fLexerSelected;
@@ -4194,7 +4199,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		ResizeDlg_InitY2(hwnd, &positionRecord.cxStyleCustomizeDlg, &positionRecord.cyStyleCustomizeDlg, IDC_RESIZEGRIP3, IDC_STYLEEDIT, IDC_STYLEVALUE_DEFAULT);
+		ResizeDlg_InitY2(hwnd, &positionRecord.cxStyleCustomizeDlg, &positionRecord.cyStyleCustomizeDlg, controlDefinition, 0, 50);
 
 		WCHAR szTitle[1024];
 		const UINT idsTitle = (np2StyleTheme == StyleTheme_Dark) ? IDS_CONFIG_THEME_TITLE_DARK : IDS_CONFIG_THEME_TITLE_DEFAULT;
@@ -5000,6 +5005,15 @@ static void Style_GetFavoriteSchemesFromTreeView(HWND hwndTV, HTREEITEM hFavorit
 // Style_SelectLexerDlgProc()
 //
 static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
+	static const DWORD controlDefinition[] = {
+		DeferCtlMove(IDC_RESIZEGRIP3),
+		DeferCtlMove(IDOK),
+		DeferCtlMove(IDCANCEL),
+		DeferCtlSize(IDC_STYLELIST),
+		DeferCtlMoveY(IDC_AUTOSELECT),
+		DeferCtlMoveY(IDC_DEFAULTSCHEME),
+	};
+
 	static HWND hwndTV;
 	static HTREEITEM hFavoriteNode;
 	static HTREEITEM hDraggingNode;
@@ -5009,7 +5023,7 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
-		ResizeDlg_Init(hwnd, &positionRecord.cxStyleSelectDlg, &positionRecord.cyStyleSelectDlg, IDC_RESIZEGRIP3);
+		ResizeDlg_Init(hwnd, &positionRecord.cxStyleSelectDlg, &positionRecord.cyStyleSelectDlg, controlDefinition, COUNTOF(controlDefinition));
 
 		const bool favorite = lParam != 0;
 		if (favorite) {
@@ -5040,20 +5054,6 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 		}
 
 		CenterDlgInParent(hwnd);
-	}
-	return TRUE;
-
-	case WM_SIZE: {
-		const int dx = GET_X_LPARAM(lParam);
-		const int dy = GET_Y_LPARAM(lParam);
-		HDWP hdwp = BeginDeferWindowPos(6);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP3, dx, dy, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, dy, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDCANCEL, dx, dy, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_STYLELIST, dx, dy, SWP_NOMOVE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_AUTOSELECT, 0, dy, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_DEFAULTSCHEME, 0, dy, SWP_NOSIZE);
-		EndDeferWindowPos(hdwp);
 	}
 	return TRUE;
 
