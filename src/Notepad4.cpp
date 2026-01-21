@@ -491,6 +491,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 #endif
 
 	g_hDefaultHeap = GetProcessHeap();
+	SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX);
+
 	// Don't keep working directory locked
 	WCHAR wchWorkingDirectory[MAX_PATH];
 	GetCurrentDirectory(COUNTOF(g_wchWorkingDirectory), g_wchWorkingDirectory);
@@ -502,8 +504,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	}
 	PathRemoveFileSpec(wchWorkingDirectory);
 	SetCurrentDirectory(wchWorkingDirectory);
-
-	SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX);
 
 	// Check if running with elevated privileges
 	fIsElevated = IsElevated();
