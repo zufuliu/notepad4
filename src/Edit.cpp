@@ -4581,7 +4581,7 @@ static LRESULT CALLBACK AddBackslashEditProc(HWND hwnd, UINT umsg, WPARAM wParam
 		LPWSTR lpsz = EditGetClipboardTextW();
 		if (StrNotEmpty(lpsz)) {
 			const int len = lstrlen(lpsz);
-			LPWSTR lpszEsc = static_cast<LPWSTR>(NP2HeapAlloc((2*len + 1)*sizeof(WCHAR)));
+			LPWSTR lpszEsc = static_cast<LPWSTR>(NP2HeapAlloc((kMaxBackslashEscapeCount*len + 1)*sizeof(WCHAR)));
 			if (lpszEsc != nullptr) {
 				AddBackslashW(lpszEsc, lpsz);
 				SendMessage(hwnd, EM_REPLACESEL, TRUE, AsInteger<LPARAM>(lpszEsc));
@@ -4706,7 +4706,7 @@ static bool CopySelectionAsFindText(HWND hwnd, EDITFINDREPLACE *lpefr, bool bFir
 	}
 
 	if (StrNotEmpty(lpszSelection)) {
-		char *lpszEscSel = static_cast<char *>(NP2HeapAlloc((4 * NP2_FIND_REPLACE_LIMIT)));
+		char *lpszEscSel = static_cast<char *>(NP2HeapAlloc((kMaxBackslashEscapeCount * NP2_FIND_REPLACE_LIMIT)));
 		unsigned option = lpefr->option & ~FindReplaceOption_TransformBackslash;
 		if (AddBackslashA(lpszEscSel, lpszSelection)) {
 			if ((lpefr->fuFlags & SCFIND_REGEXP) == 0) {
@@ -7281,7 +7281,7 @@ void EditOpenSelection(OpenSelectionType type) {
 			if (cchTextW > 1 && link[0] == L'#') {
 				// regex find link anchor in current document
 				// html, markdown: (id | name) = [' | "] anchor [' | "]
-				mszSelection = static_cast<char *>(NP2HeapAlloc(2*cchSelection + 32));
+				mszSelection = static_cast<char *>(NP2HeapAlloc(kMaxRegexEscapeCount*cchSelection + 32));
 				strcpy(mszSelection, "name\\s*=\\s*[\'\"]?");
 				char *lpstrText = mszSelection + CSTRLEN("name\\s*=\\s*[\'\"]?");
 				char* const lpszArgs = lpstrText + cchSelection;

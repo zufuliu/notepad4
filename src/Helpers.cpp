@@ -2373,7 +2373,7 @@ void MRUList::Add(LPCWSTR pszNew) noexcept {
 
 void MRUList::AddMultiline(LPCWSTR pszNew) noexcept {
 	const int len = lstrlen(pszNew);
-	LPWSTR lpszEsc = static_cast<LPWSTR>(NP2HeapAlloc((4*len + 1)*sizeof(WCHAR)));
+	LPWSTR lpszEsc = static_cast<LPWSTR>(NP2HeapAlloc((kMaxBackslashEscapeCount*len + 1)*sizeof(WCHAR)));
 	AddBackslashW(lpszEsc, pszNew);
 	Add(lpszEsc);
 	NP2HeapFree(lpszEsc);

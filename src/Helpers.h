@@ -877,6 +877,10 @@ UINT_PTR CALLBACK OpenSaveFileDlgHookProc(HWND hWnd, UINT uMsg, WPARAM wParam, L
 
 //==== UnSlash Functions ======================================================
 void TransformBackslashes(char *pszInput, BOOL bRegEx, UINT cpEdit) noexcept;
+// backslash escape for C0 control character => \xHH
+#define kMaxBackslashEscapeCount	4
+// backslash escape regex meta character
+#define kMaxRegexEscapeCount		2
 bool AddBackslashA(char *pszOut, const char *pszInput) noexcept;
 bool AddBackslashW(LPWSTR pszOut, LPCWSTR pszInput) noexcept;
 void EscapeRegex(LPSTR pszOut, LPCSTR pszIn) noexcept;
