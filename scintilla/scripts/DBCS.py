@@ -1,6 +1,7 @@
 import sys
 from enum import IntFlag
 import MultiStageTable
+from UnicodeData import *
 
 DBCSCodePages = [
 	'cp932', 'shift_jis', 'shift_jis_2004', 'shift_jisx0213',
@@ -110,8 +111,8 @@ def print_dbcs_char_by_trail(codePage, what):
 
 	result = {}
 	count = 0
-	for lead in range(0x81, 0x100):
-		for trail in range(0x21, 0x80):
+	for lead in range(DBCSMinLeadByte, 0xff):
+		for trail in range(DBCSMinTrailByte, 0xff):
 			ch_trail = chr(trail)
 			kind = DBCSTrailKind.get_kind(what, ch_trail)
 			if not kind:
@@ -156,14 +157,14 @@ def print_dbcs_valid_bytes():
 		validLead = set()
 		validTrail = set()
 
-		for lead in range(0x80, 0x100):
+		for lead in range(DBCSMinLeadByte, 0xff):
 			try:
 				bytes([lead]).decode(codePage)
 				validSingle.append(lead)
 			except UnicodeDecodeError:
 				pass
 
-			for trail in range(0x21, 0x100):
+			for trail in range(DBCSMinTrailByte, 0xff):
 				try:
 					ch = bytes([lead, trail]).decode(codePage)
 					if len(ch) == 1:

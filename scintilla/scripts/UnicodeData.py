@@ -15,7 +15,11 @@ import ctypes
 MaxCharacter = sys.maxunicode
 UnicodeCharacterCount = sys.maxunicode + 1
 BMPCharacterCharacterCount = 0xffff + 1
+
 DBCSCharacterCount = 0xffff + 1
+DBCSMinCharacter = 0x8131
+DBCSMinLeadByte = 0x81
+DBCSMinTrailByte = 0x31
 
 MB_ERR_INVALID_CHARS = 0x00000008
 MultiByteToWideChar = ctypes.windll.kernel32.MultiByteToWideChar

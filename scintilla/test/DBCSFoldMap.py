@@ -6,17 +6,16 @@ from UnicodeData import *
 # see https://sourceforge.net/p/scintilla/feature-requests/1564/
 
 def findCaseFoldBlock(encodingList):
-	characterCount = 0xffff + 1
-	foldSet = [0]*characterCount
+	foldSet = [0]*DBCSCharacterCount
 	multiFold = []
 
-	for cp in encodingList:
-		if isinstance(cp, int):
-			decode = PlatformDecoder(cp)
-			cp = f'cp{cp}'
+	for codePage in encodingList:
+		if isinstance(codePage, int):
+			decode = PlatformDecoder(codePage)
+			codePage = f'cp{codePage}'
 		else:
-			decode = codecs.getdecoder(cp)
-		for ch in range(0x80, characterCount):
+			decode = codecs.getdecoder(codePage)
+		for ch in range(DBCSMinCharacter, DBCSCharacterCount):
 			buf = bytes([ch >> 8, ch & 0xff])
 			try:
 				result = decode(buf)
@@ -30,10 +29,10 @@ def findCaseFoldBlock(encodingList):
 				if len(fold) != 1:
 					text = f'{ch:04X}'
 					try:
-						fold.encode(cp)
-						multiFold.append((cp, text, uch, fold, len(fold), True))
+						fold.encode(codePage)
+						multiFold.append((codePage, text, uch, fold, len(fold), True))
 					except UnicodeEncodeError:
-						multiFold.append((cp, text, uch, fold, len(fold), False))
+						multiFold.append((codePage, text, uch, fold, len(fold), False))
 
 	foldCount = 0
 	leadCount = {}
