@@ -1,24 +1,9 @@
+import sys
 import codecs
-import ctypes
+sys.path.append('../scripts')
+from UnicodeData import *
 
 # see https://sourceforge.net/p/scintilla/feature-requests/1564/
-
-MB_ERR_INVALID_CHARS = 0x00000008
-MultiByteToWideChar = ctypes.windll.kernel32.MultiByteToWideChar
-class PlatformDecoder:
-	def __init__(self, cp):
-		self.cp = cp
-	def __call__(self, buf):
-		size = len(buf)*4
-		result = (ctypes.c_wchar*size)()
-		length = MultiByteToWideChar(self.cp, MB_ERR_INVALID_CHARS, ctypes.c_char_p(buf), len(buf), result, size)
-		if length == 0:
-			code = ctypes.GetLastError()
-			msg = ctypes.FormatError(code).strip()
-			raise UnicodeDecodeError(f'{self.cp}', buf, 0, len(buf), f'{code}: {msg}')
-		value = result.value[:length]
-		value += '\0'*(length - len(value))
-		return (value, len(buf))
 
 def findCaseFoldBlock(encodingList):
 	characterCount = 0xffff + 1
