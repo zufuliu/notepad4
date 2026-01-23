@@ -175,10 +175,10 @@ BEGIN
 		POPUP "즐겨찾기(&F)"
 		BEGIN
 			MENUITEM "즐겨찾기 열기(&O)...\tAlt+I",						IDM_FILE_OPENFAV
-			MENUITEM "현재 파일 추가(&A)...\tAlt+K",					IDM_FILE_ADDTOFAV
+			MENUITEM "현재 파일 추가(&A)...\tAlt+K",						IDM_FILE_ADDTOFAV
 			MENUITEM "관리(&M)...\tAlt+F9",								IDM_FILE_MANAGEFAV
 		END
-		MENUITEM "최근 파일 (내역)(&H)...\tAlt+H",					IDM_FILE_RECENT
+		MENUITEM "최근 파일 (내역)(&H)...\tAlt+H",						IDM_FILE_RECENT
 		MENUITEM SEPARATOR
 		MENUITEM "종료(&X)\tAlt+F4",									IDM_FILE_EXIT
 	END
@@ -638,7 +638,7 @@ BEGIN
 				MENUITEM "中文(简体)",									IDM_LANG_CHINESE_SIMPLIFIED
 			END
 #endif
-			MENUITEM "XP 스타일 열기/저장 대화상자 사용(&X)",			IDM_SET_USE_XP_FILE_DIALOG
+			MENUITEM "XP 스타일 열기/저장 대화상자 사용(&X)",				IDM_SET_USE_XP_FILE_DIALOG
 		END
 		POPUP "창 옵션(&P)"
 		BEGIN
@@ -746,14 +746,14 @@ BEGIN
 		END
 		POPUP "텍스트 변환(&T)"
 		BEGIN
-			MENUITEM "전각 문자로(&W)",									IDM_EDIT_MAP_FULLWIDTH
-			MENUITEM "반각 문자로(&A)",									IDM_EDIT_MAP_HALFWIDTH
+			MENUITEM "반각 문자를 전각 문자로(&W)",						IDM_EDIT_MAP_FULLWIDTH
+			MENUITEM "전각 문자를 반각 문자로(&A)",						IDM_EDIT_MAP_HALFWIDTH
 			MENUITEM SEPARATOR
-			MENUITEM "간체 한자로(&S)",									IDM_EDIT_MAP_SIMPLIFIED_CHINESE
-			MENUITEM "번체 한자로(&T)",									IDM_EDIT_MAP_TRADITIONAL_CHINESE
+			MENUITEM "중국어 번체를 간체로(&S)",							IDM_EDIT_MAP_SIMPLIFIED_CHINESE
+			MENUITEM "중국어 간체를 번체로(&T)",							IDM_EDIT_MAP_TRADITIONAL_CHINESE
 			MENUITEM SEPARATOR
-			MENUITEM "가타카나를 히라가나로(&H)",							IDM_EDIT_MAP_HIRAGANA
-			MENUITEM "히라가나를 가타카나로(&K)",							IDM_EDIT_MAP_KATAKANA
+			MENUITEM "일본어 가타카나를 히라가나로(&H)",					IDM_EDIT_MAP_HIRAGANA
+			MENUITEM "일본어 히라가나를 가타카나로(&K)",					IDM_EDIT_MAP_KATAKANA
 			MENUITEM SEPARATOR
 			MENUITEM "한국어 한자를 한글로(&J)",							IDM_EDIT_MAP_HANJA_HANGUL
 			MENUITEM "한국어 한글 풀어쓰기(&G)",							IDM_EDIT_MAP_HANGUL_DECOMPOSITION
@@ -1949,7 +1949,7 @@ BEGIN
 	IDS_ENCODING_KOI8_U				"우크라이나어 (KOI8-U);KOI8-U"							// 키릴 문자
 	IDS_ENCODING_MAC_CYRILLIC		"Mac 키릴 자모;Mac 키릴 자모;"							// 키릴 문자
 	IDS_ENCODING_WINDOWS1251		"Windows-1251;Windows-1251"								// 키릴 문자
-	IDS_ENCODING_ISO8859_13			"에스토니아어 (발트어 Rim, 라틴어-7, ISO 8859-13);ISO 8859-13"// 북유럽어
+	IDS_ENCODING_ISO8859_13			"에스토니아어 (발트어 Rim, 라틴어-7, ISO 8859-13);ISO 8859-13"	// 북유럽어
 	IDS_ENCODING_DOS863				"OEM 프랑스어 캐나다 (DOS-863);DOS-863"					// 서유럽어
 	IDS_ENCODING_DOS737				"OEM 그리스어 (DOS-737);DOS-737"							// 그리스어
 	IDS_ENCODING_ISO8859_7			"ISO 8859-7;ISO 8859-7"									// 그리스어
@@ -1987,7 +1987,7 @@ BEGIN
 	IDS_ENCODING_MAC_ROMAN			"Mac 로마어;Mac 로마어"									// 서유럽어
 	IDS_ENCODING_WINDOWS1252		"라틴어-1 (Windows-1252);Windows-1252"					// 서유럽어
 	IDS_ENCODING_IBM037				"미국-캐나다 (IBM037);EBCDIC (미국-캐나다)"				// EBCDIC
-	IDS_ENCODING_IBM1140			"미국-캐나다 + 유로 기호 (IBM1140);EBCDIC (미국-캐나다 유로)"// EBCDIC
+	IDS_ENCODING_IBM1140			"미국-캐나다 + 유로 기호 (IBM1140);EBCDIC (미국-캐나다 유로)"	// EBCDIC
 	IDS_ENCODING_IBM500				"국제 (IBM500);EBCDIC (Intl.)"							// EBCDIC
 	IDS_ENCODING_IBM870				"라틴어-2 (IBM870);EBCDIC (라틴어-2)"					// EBCDIC
 	IDS_ENCODING_CP875				"현대 그리스어 (CP875);EBCDIC (그리스)"					// EBCDIC
@@ -2138,6 +2138,7 @@ END
 #include "../../src/Notepad4.ver"
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
+
 
 
 
