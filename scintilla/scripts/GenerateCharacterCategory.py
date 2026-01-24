@@ -265,13 +265,17 @@ def getCharClassify(decode, ch):
 		category = 'Cn'
 
 	cc = CategoryClassifyMap[category]
-	return cc
+	return cc, category
 
-def buildCharClassify(codePage):
-	decode = codecs.getdecoder(codePage)
+def buildCharClassify(encoding, codePage):
+	decode_py = codecs.getdecoder(encoding)
+	decode_pd = PlatformDecoder(codePage)
 	result = {}
 	for ch in range(128, 256):
-		cc = getCharClassify(decode, ch)
+		cc, category = getCharClassify(decode_pd, ch)
+		cc_py, category_py = getCharClassify(decode_py, ch)
+		if cc != cc_py:
+			print(f'{codePage} character {ch:02X} diff: ({category}, {cc.name}) ({category_py}, {cc_py.name})')
 		result[ch] = int(cc)
 
 	output = [0] * 32
@@ -285,7 +289,7 @@ def buildANSICharClassifyTable(filename):
 	result = {}
 	offset = 0
 	for encoding, codePage, comment in SBCSCodePageList:
-		data = buildCharClassify(encoding)
+		data = buildCharClassify(encoding, codePage)
 		result[codePage] = { 'data': data, 'offset': offset, 'codePage': [(codePage, comment)]}
 		offset += len(data)
 

@@ -37,8 +37,8 @@ class PlatformDecoder:
 			value = result.value[:length]
 			value += '\0'*(length - len(value))
 			return (value, len(buf))
-		if self.errors == 'ignore':
-			return (result.value[0], 0)
+		if result.value and self.errors == 'ignore':
+			return (result.value, 0)
 
 		code = ctypes.GetLastError()
 		msg = ctypes.FormatError(code).strip()
