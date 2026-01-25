@@ -30,8 +30,7 @@ public:
    struct boost_extensions_tag{};
 
    w32_regex_traits():
-      m_ctype_map{new WORD[characterCount]()},
-      m_lower_map{new wchar_t[characterCount]}
+      m_lower_map{new wchar_t[characterCount*2]}
    {
 #if 0 // prevent compiler vectorize the loop generates big and slow code
       for (int i = 0; i < characterCount; i++) {
@@ -77,9 +76,12 @@ public:
          }
       }
 #endif
-      m_locale = ::GetUserDefaultLCID();
-      ::GetStringTypeExW(m_locale, CT_CTYPE1, m_lower_map.get(), characterCount, m_ctype_map.get());
-      ::LCMapStringW(m_locale, LCMAP_LOWERCASE, m_lower_map.get(), characterCount, m_lower_map.get(), characterCount);
+
+      static_assert(sizeof(wchar_t) == sizeof(WORD));
+      m_ctype_map = reinterpret_cast<WORD *>(m_lower_map.get() + characterCount);
+      memset(m_ctype_map, 0, characterCount*sizeof(WORD));
+      ::GetStringTypeExW(LOCALE_USER_DEFAULT, CT_CTYPE1, m_lower_map.get(), characterCount, m_ctype_map);
+      ::LCMapStringEx(LOCALE_NAME_USER_DEFAULT, LCMAP_LOWERCASE, m_lower_map.get(), characterCount, m_lower_map.get(), characterCount, nullptr, nullptr, 0);
 
       //
       // get the collation format used by m_pcollate:
@@ -113,8 +115,6 @@ public:
       const auto i = m_char_map.find(c);
       if(i == m_char_map.end())
       {
-         //if(w32_is_lower(c, m_locale)) return regex_constants::escape_type_class;
-         //if(w32_is_upper(c, m_locale)) return regex_constants::escape_type_not_class;
          if(m_ctype_map[c] & C1_LOWER) return regex_constants::escape_type_class;
          if(m_ctype_map[c] & C1_UPPER) return regex_constants::escape_type_not_class;
          return 0;
@@ -135,17 +135,15 @@ public:
    }
    charT tolower(charT c) const
    {
-      //return w32_tolower(c, m_locale);
       return m_lower_map[c];
    }
    charT toupper(charT c) const
    {
-      //return w32_toupper(c, m_locale);
       return c; // toupper() is unused
    }
    string_type transform(const charT* p1, const charT* p2) const
    {
-      return w32_transform(m_locale, p1, p2);
+      return w32_transform(p1, p2);
    }
    string_type transform_primary(const charT* p1, const charT* p2) const
    {
@@ -219,7 +217,6 @@ public:
    bool isctype(charT c, char_class_type f) const
    {
       if((f & mask_base)
-         //&& (w32_is(m_locale, f & mask_base, c)))
          && (m_ctype_map[c] & (f & mask_base)))
          return true;
       else if((f & mask_unicode) && BOOST_REGEX_DETAIL_NS::is_extended(c))
@@ -230,7 +227,6 @@ public:
          && (::boost::BOOST_REGEX_DETAIL_NS::is_separator(c) || (c == '\v')))
          return true;
       else if((f & mask_horizontal)
-         //&& w32_is(m_locale, C1_SPACE, c) && !(::boost::BOOST_REGEX_DETAIL_NS::is_separator(c) || (c == '\v')))
          && (m_ctype_map[c] & C1_SPACE) && !(::boost::BOOST_REGEX_DETAIL_NS::is_separator(c) || (c == '\v')))
          return true;
       return false;
@@ -244,15 +240,14 @@ public:
       int result = ::boost::BOOST_REGEX_DETAIL_NS::global_value(c);
       return result < radix ? result : -1;
    }
-   locale_type imbue([[maybe_unused]] locale_type l)
+   locale_type imbue([[maybe_unused]] locale_type l) const
    {
       const locale_type result(getloc());
-      //m_locale = l;
       return result;
    }
    locale_type getloc() const
    {
-      return m_locale;
+      return LOCALE_USER_DEFAULT;
    }
    std::string error_string(regex_constants::error_type n) const
    {
@@ -260,10 +255,9 @@ public:
    }
 
 private:
-   locale_type m_locale;
    unsigned                       m_collate_type;    // the form of the collation string
    charT                          m_collate_delim;   // the collation group delimiter
-   std::unique_ptr<WORD[]> m_ctype_map;
+   WORD *m_ctype_map;
    std::unique_ptr<wchar_t[]> m_lower_map;
    // TODO: use a hash table when available!
    std::map<charT, regex_constants::syntax_type> m_char_map;
@@ -308,26 +302,28 @@ private:
       return masks[0];
    }
 
-   static std::wstring w32_transform(LCID idx, const wchar_t* p1, const wchar_t* p2)
+   static std::wstring w32_transform(const wchar_t* p1, const wchar_t* p2)
    {
-      int bytes = ::LCMapStringW(
-         idx,       // locale identifier
+      int bytes = ::LCMapStringEx(
+         LOCALE_NAME_USER_DEFAULT,       // locale identifier
          LCMAP_SORTKEY,  // mapping transformation type
          p1,  // source string
          static_cast<int>(p2 - p1),        // number of characters in source string
-         0,  // destination buffer
-         0        // size of destination buffer
+         nullptr,  // destination buffer
+         0,        // size of destination buffer
+         nullptr, nullptr, 0
       );
       if (!bytes)
          return std::wstring(p1, p2);
       std::string result(++bytes, '\0');
-      bytes = ::LCMapStringW(
-         idx,       // locale identifier
+      bytes = ::LCMapStringEx(
+         LOCALE_NAME_USER_DEFAULT,       // locale identifier
          LCMAP_SORTKEY,  // mapping transformation type
          p1,  // source string
          static_cast<int>(p2 - p1),        // number of characters in source string
          reinterpret_cast<wchar_t*>(&*result.begin()),  // destination buffer *of bytes*
-         bytes        // size of destination buffer
+         bytes,        // size of destination buffer
+         nullptr, nullptr, 0
       );
       if (bytes > static_cast<int>(result.size()))
          return std::wstring(p1, p2);
@@ -340,62 +336,6 @@ private:
          r2.push_back(static_cast<unsigned char>(c));
       return r2;
    }
-
-#if 0
-   static wchar_t w32_tolower(wchar_t c, LCID idx) noexcept
-   {
-      wchar_t result[2];
-      int b = ::LCMapStringW(
-         idx,       // locale identifier
-         LCMAP_LOWERCASE,  // mapping transformation type
-         &c,  // source string
-         1,        // number of characters in source string
-         result,  // destination buffer
-         1);        // size of destination buffer
-      if (b == 0)
-         return c;
-      return result[0];
-   }
-
-   static wchar_t w32_toupper(wchar_t c, LCID idx) noexcept
-   {
-      wchar_t result[2];
-      int b = ::LCMapStringW(
-         idx,       // locale identifier
-         LCMAP_UPPERCASE,  // mapping transformation type
-         &c,  // source string
-         1,        // number of characters in source string
-         result,  // destination buffer
-         1);        // size of destination buffer
-      if (b == 0)
-         return c;
-      return result[0];
-   }
-
-   static bool w32_is_lower(wchar_t c, LCID idx) noexcept
-   {
-      WORD mask;
-      if (::GetStringTypeExW(idx, CT_CTYPE1, &c, 1, &mask) && (mask & C1_LOWER))
-         return true;
-      return false;
-   }
-
-   static bool w32_is_upper(wchar_t c, LCID idx) noexcept
-   {
-      WORD mask;
-      if (::GetStringTypeExW(idx, CT_CTYPE1, &c, 1, &mask) && (mask & C1_UPPER))
-         return true;
-      return false;
-   }
-
-   static bool w32_is(LCID idx, std::uint32_t m, wchar_t c) noexcept
-   {
-      WORD mask;
-      if (::GetStringTypeExW(idx, CT_CTYPE1, &c, 1, &mask) && (mask & m))
-         return true;
-      return false;
-   }
-#endif
 };
 
 } // boost

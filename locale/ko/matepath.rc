@@ -255,7 +255,7 @@ END
 
 IDD_ABOUT DIALOGEX 0, 0, 255, 96
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "matepath"
+CAPTION "matepath - 한국어 번역: 비너스걸"
 FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "확인",IDOK,142,75,50,14
@@ -263,7 +263,7 @@ BEGIN
     ICON            IDR_MAINWND,IDC_STATIC,7,7,20,20
     LTEXT           "",IDC_VERSION,45,7,200,8
     LTEXT           "",IDC_BUILD_INFO,45,18,200,8
-    LTEXT           "Copyright © 2011-2026 Zufu Liu 및 모든 기여자들.",IDC_STATIC,45,30,200,8
+    LTEXT           "Copyright © 2011-2026 Zufu Liu 및 모든 기여자.",IDC_STATIC,45,30,200,8
     LTEXT           "",IDC_NEW_PAGE_TEXT,45,40,200,8,NOT WS_VISIBLE | WS_DISABLED
     CONTROL         "",IDC_NEW_PAGE_LINK,"SysLink",WS_TABSTOP,45,40,200,10
     LTEXT           "Copyright © 1996-2012 Florian Balmer.",IDC_STATIC,45,52,200,8
@@ -479,7 +479,7 @@ BEGIN
     AUTORADIOBUTTON "다음의 DDE 명령 실행:",IDC_USEDDE,7,106,160,10,WS_TABSTOP
     PUSHBUTTON      "창 찾기...",IDC_FINDWIN,204,91,60,14
     LTEXT           "메시지:",IDC_STATIC,19,124,42,8,SS_RIGHT
-    LTEXT           "응용 프로그램:",IDC_STATIC,19,145,42,8,SS_RIGHT
+    LTEXT           "응용 프로그램:",IDC_STATIC,11,145,42,8,SS_RIGHT
     LTEXT           "주제:",IDC_STATIC,19,165,42,8,SS_RIGHT
     EDITTEXT        IDC_DDEMSG,65,122,200,14,ES_AUTOHSCROLL
     EDITTEXT        IDC_DDEAPP,65,142,200,14,ES_AUTOHSCROLL
@@ -656,5 +656,6 @@ END
 #include "../../matepath/src/matepath.ver"
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
+
 
 

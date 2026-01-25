@@ -10,6 +10,7 @@ from FileGenerator import Regenerate
 from MultiStageTable import *
 from UnicodeData import *
 
+# same as CharacterClass enum in ILexer.h
 class CharacterClass(IntEnum):
 	Space = 0
 	NewLine = 1
@@ -199,19 +200,19 @@ def buildFoldDisplayEllipsis():
 	]
 
 	result = {}
-	for encoding, codepage, comment in encodingList:
+	for encoding, codePage, comment in encodingList:
 		try:
 			value = defaultText.encode(encoding)
 			value = bytesToHex(value)
 		except UnicodeEncodeError:
-			if codepage == 932:
+			if codePage == 932:
 				value = fallbackJIS.encode(encoding)
 				value = bytesToHex(value)
 			else:
 				value = fallbackText
 
 		values = result.setdefault(value, [])
-		values.append((codepage, comment))
+		values.append((codePage, comment))
 
 	utf8Text = defaultText.encode('utf-8')
 	utf8Text = bytesToHex(utf8Text)
@@ -222,17 +223,17 @@ def buildFoldDisplayEllipsis():
 	output.append("\tcase SC_CP_UTF8:")
 	output.append(f'\t\treturn "{utf8Text}";')
 	for key, values in result.items():
-		for codepage, comment in values:
-			output.append(f"\tcase {codepage}: // {comment}")
+		for codePage, comment in values:
+			output.append(f"\tcase {codePage}: // {comment}")
 		output.append(f'\t\treturn "{key}";')
 	output.append("\t}")
 
 	result = {}
-	for encoding, codepage, comment in SBCSCodePageList:
+	for encoding, codePage, comment in SBCSCodePageList:
 		try:
 			value = defaultText.encode(encoding)
 			value = bytesToHex(value)
-			result[codepage] = value
+			result[codePage] = value
 		except UnicodeEncodeError:
 			pass
 
@@ -264,14 +265,18 @@ def getCharClassify(decode, ch):
 		category = 'Cn'
 
 	cc = CategoryClassifyMap[category]
-	return int(cc)
+	return cc, category
 
-def buildCharClassify(cp):
-	decode = codecs.getdecoder(cp)
+def buildCharClassify(encoding, codePage):
+	decode_py = codecs.getdecoder(encoding)
+	decode_pd = PlatformDecoder(codePage)
 	result = {}
 	for ch in range(128, 256):
-		cc = getCharClassify(decode, ch)
-		result[ch] = cc
+		cc, category = getCharClassify(decode_pd, ch)
+		cc_py, category_py = getCharClassify(decode_py, ch)
+		if cc != cc_py:
+			print(f'{codePage} character {ch:02X} diff: ({category}, {cc.name}) ({category_py}, {cc_py.name})')
+		result[ch] = int(cc)
 
 	output = [0] * 32
 	for ch, value in result.items():
@@ -283,16 +288,16 @@ def buildCharClassify(cp):
 def buildANSICharClassifyTable(filename):
 	result = {}
 	offset = 0
-	for encoding, codepage, comment in SBCSCodePageList:
-		data = buildCharClassify(encoding)
-		result[codepage] = { 'data': data, 'offset': offset, 'codepage': [(codepage, comment)]}
+	for encoding, codePage, comment in SBCSCodePageList:
+		data = buildCharClassify(encoding, codePage)
+		result[codePage] = { 'data': data, 'offset': offset, 'codePage': [(codePage, comment)]}
 		offset += len(data)
 
 	output = [f"// Created with Python {platform.python_version()}, Unicode {unicodedata.unidata_version}"]
 	output.append("static const uint8_t ANSICharClassifyTable[] = {")
 	for item in result.values():
-		for page in item['codepage']:
-			output.append('// ' + page[1])
+		for codePage in item['codePage']:
+			output.append('// ' + codePage[1])
 		data = item['data']
 		output.extend(dumpArray(data, 16, '0x%02X'))
 	output.append("};")
@@ -457,23 +462,26 @@ def getDBCSCharClassify(decode, ch, isReservedOrUDC=None):
 		ch = ord(uch[0])
 		# treat PUA in DBCS as word instead of punctuation or space
 		if isCJKCharacter(category, ch) or (category == 'Co' and isPrivateChar(ch)):
-			return int(CharacterClass.CJKWord)
+			return CharacterClass.CJKWord
 	else:
 		# treat reserved or user-defined characters as word
 		if isReservedOrUDC and isReservedOrUDC(ch, buf):
-			return int(CharacterClass.CJKWord)
+			return CharacterClass.CJKWord
 		# undefined, treat as Cn, Not assigned
 		category = 'Cn'
 
 	cc = CategoryClassifyMap[category]
-	return int(cc)
+	return cc
 
 def makeDBCSCharClassifyTable(output, encodingList, isReservedOrUDC=None):
 	result = {}
 
-	for cp in encodingList:
-		decode = codecs.getdecoder(cp)
+	for codePage in encodingList:
+		decode = codecs.getdecoder(codePage)
 		for ch in range(DBCSCharacterCount):
+			if 0xff < ch < DBCSMinCharacter:
+				result[ch] = [CharacterClass.Space] # Cn
+				continue
 			cc = getDBCSCharClassify(decode, ch, isReservedOrUDC)
 			if ch in result:
 				result[ch].append(cc)
@@ -523,14 +531,14 @@ def isReservedOrUDC_GBK(ch, buf):
 	if len(buf) != 2:
 		return False
 
-	ch1 = buf[0]
-	ch2 = buf[1]
+	lead = buf[0]
+	trail = buf[1]
 	# user-defined 1 and 2
-	if ((0xAA <= ch1 <= 0xAF) or (0xF8 <= ch1 <= 0xFE)) \
-		and (0xA1 <= ch2 <= 0xFE):
+	if ((0xAA <= lead <= 0xAF) or (0xF8 <= lead <= 0xFE)) \
+		and (0xA1 <= trail <= 0xFE):
 		return True
 	# user-defined 3
-	if (0xA1 <= ch1 <= 0xA7) and ((0x40 <= ch2 <= 0xA0) and ch2 != 0x7F):
+	if (0xA1 <= lead <= 0xA7) and ((0x40 <= trail <= 0xA0) and trail != 0x7F):
 		return True
 	return False
 

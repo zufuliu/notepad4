@@ -144,7 +144,7 @@ BEGIN
 #endif
 		END
 		MENUITEM SEPARATOR
-        POPUP "인코딩(&E)"
+		POPUP "인코딩(&E)"
 		BEGIN
 			MENUITEM "&ANSI",											IDM_ENCODING_ANSI
 			MENUITEM "UTF-&8",											IDM_ENCODING_UTF8
@@ -175,10 +175,10 @@ BEGIN
 		POPUP "즐겨찾기(&F)"
 		BEGIN
 			MENUITEM "즐겨찾기 열기(&O)...\tAlt+I",						IDM_FILE_OPENFAV
-			MENUITEM "현재 파일에 추가(&A)...\tAlt+K",					IDM_FILE_ADDTOFAV
+			MENUITEM "현재 파일 추가(&A)...\tAlt+K",						IDM_FILE_ADDTOFAV
 			MENUITEM "관리(&M)...\tAlt+F9",								IDM_FILE_MANAGEFAV
 		END
-		MENUITEM "최근 파일 (사용 내역)(&H)...\tAlt+H",					IDM_FILE_RECENT
+		MENUITEM "최근 파일 (내역)(&H)...\tAlt+H",						IDM_FILE_RECENT
 		MENUITEM SEPARATOR
 		MENUITEM "종료(&X)\tAlt+F4",									IDM_FILE_EXIT
 	END
@@ -495,7 +495,7 @@ BEGIN
 		MENUITEM "구성표 즐겨찾기(&F)...",								IDM_VIEW_SCHEME_FAVORITE
 		MENUITEM SEPARATOR
 		MENUITEM "기본 코드 스타일 사용(&U)\tShift+F12",					IDM_VIEW_USEDEFAULT_CODESTYLE
-		POPUP "스타일 테마(&Y)"
+		POPUP "테마 스타일(&Y)"
 		BEGIN
 			MENUITEM "기본값(&D)",										IDM_VIEW_STYLE_THEME_DEFAULT
 			MENUITEM "어두운(&K)",										IDM_VIEW_STYLE_THEME_DARK
@@ -636,7 +636,7 @@ BEGIN
 				MENUITEM "中文(简体)",									IDM_LANG_CHINESE_SIMPLIFIED
 			END
 #endif
-			MENUITEM "XP 스타일 열기/저장 대화 상자 사용(&X)",			IDM_SET_USE_XP_FILE_DIALOG
+			MENUITEM "XP 스타일 열기/저장 대화상자 사용(&X)",				IDM_SET_USE_XP_FILE_DIALOG
 		END
 		POPUP "창 옵션(&P)"
 		BEGIN
@@ -741,14 +741,14 @@ BEGIN
 		END
 		POPUP "텍스트 변환(&T)"
 		BEGIN
-			MENUITEM "전각 문자로(&W)",									IDM_EDIT_MAP_FULLWIDTH
-			MENUITEM "반각 문자로(&A)",									IDM_EDIT_MAP_HALFWIDTH
+			MENUITEM "반각 문자를 전각 문자로(&W)",						IDM_EDIT_MAP_FULLWIDTH
+			MENUITEM "전각 문자를 반각 문자로(&A)",						IDM_EDIT_MAP_HALFWIDTH
 			MENUITEM SEPARATOR
-			MENUITEM "간체 한자로(&S)",									IDM_EDIT_MAP_SIMPLIFIED_CHINESE
-			MENUITEM "번체 한자로(&T)",									IDM_EDIT_MAP_TRADITIONAL_CHINESE
+			MENUITEM "중국어 번체를 간체로(&S)",							IDM_EDIT_MAP_SIMPLIFIED_CHINESE
+			MENUITEM "중국어 간체를 번체로(&T)",							IDM_EDIT_MAP_TRADITIONAL_CHINESE
 			MENUITEM SEPARATOR
-			MENUITEM "가타카나를 히라가나로(&H)",							IDM_EDIT_MAP_HIRAGANA
-			MENUITEM "히라가나를 가타카나로(&K)",							IDM_EDIT_MAP_KATAKANA
+			MENUITEM "일본어 가타카나를 히라가나로(&H)",					IDM_EDIT_MAP_HIRAGANA
+			MENUITEM "일본어 히라가나를 가타카나로(&K)",					IDM_EDIT_MAP_KATAKANA
 			MENUITEM SEPARATOR
 			MENUITEM "한국어 한자를 한글로(&J)",							IDM_EDIT_MAP_HANJA_HANGUL
 			MENUITEM "한국어 한글 풀어쓰기(&G)",							IDM_EDIT_MAP_HANGUL_DECOMPOSITION
@@ -1064,7 +1064,7 @@ END
 
 IDD_ABOUT DIALOGEX 0, 0, 255, 144
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Notepad4"
+CAPTION "Notepad4 - 한국어 번역: 비너스걸"
 FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "확인",IDOK,142,123,50,14
@@ -1072,10 +1072,10 @@ BEGIN
     ICON            IDR_MAINWND,IDC_STATIC,7,7,20,20
     LTEXT           "",IDC_VERSION,45,7,200,8
     LTEXT           "",IDC_BUILD_INFO,45,18,200,16
-    LTEXT           "Copyright © 2011-2026 Zufu Liu 및 모든 기여자들",IDC_STATIC,45,38,200,8
+    LTEXT           "Copyright © 2011-2026 Zufu Liu 및 모든 기여자",IDC_STATIC,45,38,200,8
     LTEXT           "",IDC_NEW_PAGE_TEXT,45,48,200,8,NOT WS_VISIBLE | WS_DISABLED
     CONTROL         "",IDC_NEW_PAGE_LINK,"SysLink",WS_TABSTOP,45,48,200,10
-    LTEXT           "Copyright © 2010-2017 XhmikosR 및 모든 기여자들",IDC_STATIC,45,60,200,8
+    LTEXT           "Copyright © 2010-2017 XhmikosR 및 모든 기여자",IDC_STATIC,45,60,200,8
     LTEXT           "",IDC_MOD_PAGE_TEXT,45,68,200,8,NOT WS_VISIBLE | WS_DISABLED
     CONTROL         "",IDC_MOD_PAGE_LINK,"SysLink",WS_TABSTOP,45,68,200,10
     LTEXT           "Copyright © 2004-2012 Florian Balmer.",IDC_STATIC,45,80,200,8
@@ -1168,7 +1168,7 @@ CAPTION "실행"
 FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
     ICON            IDI_RUN,IDC_STATIC,7,7,21,20
-    LTEXT           "실행할 실행 프로그램 파일, 폴더 또는 문서의 이름을 입력합니다.",IDC_RUNDESC,35,7,188,17
+    LTEXT           "실행할 실행 프로그램 파일, 폴더 또는 문서의 이름을 입력하세요.",IDC_RUNDESC,35,7,188,17
     EDITTEXT        IDC_COMMANDLINE,7,35,203,14,ES_AUTOHSCROLL
     PUSHBUTTON      "",IDC_SEARCHEXE,215,35,14,14
     DEFPUSHBUTTON   "확인",IDOK,121,65,50,14
@@ -1214,11 +1214,11 @@ BEGIN
     LTEXT           "기본 인코딩(&D):",IDC_STATIC,7,7,195,8
     EDITTEXT        IDC_ENCODING_LABEL,7,20,195,14,ES_READONLY | ES_AUTOHSCROLL | WS_TABSTOP
     CONTROL         "<a>기본 인코딩을 선택하려면 여기를 클릭하세요(&S).</a>",IDC_ENCODING_LINK,"SysLink",WS_TABSTOP,7,38,195,10
-    AUTOCHECKBOX    "통계적 유니코드 (UTF-16) 감지 건너뛰기(&U).",IDC_NOUNICODEDETECTION,7,52,195,10,WS_TABSTOP
-    AUTOCHECKBOX    "UTF-8 모드에서 7비트 ASCII 파일 열기(&A).",IDC_ASCIIASUTF8,7,62,195,10,WS_TABSTOP
-    AUTOCHECKBOX    "UTF-8 모드에서 ANSI (알 수 없는 인코딩) 파일 열기(&8).",IDC_ANSIASUTF8,7,72,195,10,WS_TABSTOP
-    AUTOCHECKBOX    "DOS-437 모드에서 ANSI 아트 (*.nfo, *.diz) 파일 열기(&N).",IDC_NFOASOEM,7,82,195,10,WS_TABSTOP
-    AUTOCHECKBOX    "인코딩 태그를 구문 분석하지 않음(&T).",IDC_ENCODINGFROMFILEVARS,7,92,195,10,WS_TABSTOP
+    AUTOCHECKBOX    "통계적 유니코드 (UTF-16) 감지 건너뛰기(&U)",IDC_NOUNICODEDETECTION,7,52,195,10,WS_TABSTOP
+    AUTOCHECKBOX    "UTF-8 모드에서 7비트 ASCII 파일 열기(&A)",IDC_ASCIIASUTF8,7,62,195,10,WS_TABSTOP
+    AUTOCHECKBOX    "UTF-8 모드에서 ANSI (알 수 없는 인코딩) 파일 열기(&8)",IDC_ANSIASUTF8,7,72,195,10,WS_TABSTOP
+    AUTOCHECKBOX    "DOS-437 모드에서 ANSI 아트 (*.nfo, *.diz) 파일 열기(&N)",IDC_NFOASOEM,7,82,195,10,WS_TABSTOP
+    AUTOCHECKBOX    "인코딩 태그를 구문 분석하지 않음(&T)",IDC_ENCODINGFROMFILEVARS,7,92,195,10,WS_TABSTOP
     DEFPUSHBUTTON   "확인",IDOK,96,108,50,14
     PUSHBUTTON      "취소",IDCANCEL,152,108,50,14
 END
@@ -1253,7 +1253,7 @@ BEGIN
     COMBOBOX        IDC_EOLMODELIST,7,64,118,81,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "예(&Y)",IDOK,138,63,50,14
     PUSHBUTTON      "아니요(&N)",IDCANCEL,138,80,50,14
-    AUTOCHECKBOX    "항상 이 대화 상자 표시(&A)",IDC_WARNINCONSISTENTEOLS,7,82,118,10,WS_TABSTOP
+    AUTOCHECKBOX    "항상 이 대화상자 표시(&A)",IDC_WARNINCONSISTENTEOLS,7,82,118,10,WS_TABSTOP
 END
 
 IDD_LINENUM DIALOGEX 0, 0, 166, 70
@@ -1289,10 +1289,10 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "파일 변경 알림"
 FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
-    AUTORADIOBUTTON "알리지 않음(&N)",IDC_CHANGENOTIFY_NONE,7,7,35,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "알리지 않음(&N)",IDC_CHANGENOTIFY_NONE,7,7,56,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "메시지 표시(&S)",IDC_CHANGENOTIFY_SHOW_MSG,7,19,71,10,WS_TABSTOP
     AUTORADIOBUTTON "자동 새로 고침 (수정되지 않음)(&A)",IDC_CHANGENOTIFY_AUTO_RELOAD,7,31,114,10,WS_TABSTOP
-    AUTOCHECKBOX    "지속적으로 업데이트되는 파일 모니터링 (예: 로그 파일)(&M)",IDC_CHANGENOTIFY_LOG_FILE,7,48,184,10,WS_TABSTOP
+    AUTOCHECKBOX    "지속적으로 업데이트되는 파일 모니터링 (예: 로그 파일)(&M)",IDC_CHANGENOTIFY_LOG_FILE,7,48,187,10,WS_TABSTOP
     AUTOCHECKBOX    "다시 불러온 후 문서 끝에 유지(&K)",IDC_CHANGENOTIFY_KEEP_AT_END,7,60,184,10,WS_TABSTOP
     AUTOCHECKBOX    "새 파일이 열리면 재설정(&R)",IDC_CHANGENOTIFY_RESET_WATCH,7,72,184,10,WS_TABSTOP
     DEFPUSHBUTTON   "확인",IDOK,139,7,50,14
@@ -1560,7 +1560,7 @@ BEGIN
     AUTORADIOBUTTON "줄 뒤섞기(&F)",IDC_SORT_SHUFFLE,7,43,70,10,WS_TABSTOP
     AUTOCHECKBOX    "중복된 줄 병합(&M)",IDC_SORT_MERGE_DUP,7,62,100,10,WS_TABSTOP
     AUTOCHECKBOX    "중복된 줄 제거(&R)",IDC_SORT_REMOVE_DUP,7,74,100,10,WS_TABSTOP
-    AUTOCHECKBOX    "독특한 줄 제거(&u)",IDC_SORT_REMOVE_UNIQUE,7,86,100,10,WS_TABSTOP
+    AUTOCHECKBOX    "독특한 줄 제거(&U)",IDC_SORT_REMOVE_UNIQUE,7,86,100,10,WS_TABSTOP
     AUTOCHECKBOX    "대소문자 구분 안 함(&I)",IDC_SORT_IGNORE_CASE,7,104,81,10,WS_TABSTOP
     AUTOCHECKBOX    "논리 숫자 비교(&N)",IDC_SORT_LOGICAL_NUMBER,7,116,130,10,WS_TABSTOP
     AUTOCHECKBOX    "파일 형식별 그룹(&T)",IDC_SORT_GROUPBY_FILE_TYPE,7,128,130,10,WS_TABSTOP
@@ -1587,7 +1587,7 @@ CAPTION "줄 정렬"
 FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
     AUTORADIOBUTTON "왼쪽(&L)",IDC_ALIGN_LEFT,7,7,31,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "오른쪽(&R)",IDC_ALIGN_RIGHT,7,19,35,10,WS_TABSTOP
+    AUTORADIOBUTTON "오른쪽(&R)",IDC_ALIGN_RIGHT,7,19,39,10,WS_TABSTOP
     AUTORADIOBUTTON "가운데(&C)",IDC_ALIGN_CENTER,7,31,41,10,WS_TABSTOP
     AUTORADIOBUTTON "양쪽(&J)",IDC_ALIGN_JUSTIFY,7,43,40,10,WS_TABSTOP
     AUTORADIOBUTTON "양쪽 (단락 모드)(&P)",IDC_ALIGN_JUSTIFY_PAR,7,55,124,10,WS_TABSTOP
@@ -1622,7 +1622,7 @@ BEGIN
     EDITTEXT        IDC_AUTOC_MIN_NUMBER_LENGTH,166,48,50,12,ES_NUMBER | WS_TABSTOP
     AUTOCHECKBOX    "현재 문서의 단어를 검색",IDC_AUTOC_SCAN_DOCUMENT_WORDS,14,68,150,10,WS_TABSTOP
     EDITTEXT        IDC_AUTOC_SCAN_WORDS_TIMEOUT,166,64,50,12,WS_TABSTOP
-    AUTOCHECKBOX    "현재 문서에서 단어만 사용합니다.",IDC_AUTOC_ONLY_DOCUMENT_WORDS,14,80,180,10,WS_TABSTOP
+    AUTOCHECKBOX    "현재 문서에서 단어만 사용",IDC_AUTOC_ONLY_DOCUMENT_WORDS,14,80,180,10,WS_TABSTOP
     AUTOCHECKBOX    "영어 IME 모드에서만 자동 완성 작동",IDC_AUTOC_ENGLISH_IME_ONLY,14,92,180,10,WS_TABSTOP
 
     GROUPBOX        "내부 단어 자동 완성:",IDC_STATIC,7,111,218,26
@@ -1639,7 +1639,7 @@ BEGIN
     AUTOCHECKBOX    "텍스트 자동 들여쓰기",IDC_AUTO_INDENT_TEXT,231,7,200,10,WS_TABSTOP
     AUTOCHECKBOX    "HTML 및 XML 태그 자동 닫기",IDC_AUTO_CLOSE_TAGS,231,19,200,10,WS_TABSTOP
     AUTOCHECKBOX    "해당하는 경우 쉼표(,)를 입력한 후 공백을 자동으로 삽입",IDC_AUTO_INSERT_SPACE_COMMA,231,31,218,10,WS_TABSTOP
-    AUTOCHECKBOX    "줄 주석을 전환할 때 댓글 마커 뒤에 공백을 삽입합니다.",IDC_AUTO_INSERT_SPACE_COMMENT,231,43,218,10,WS_TABSTOP
+    AUTOCHECKBOX    "줄 주석을 전환할 때 댓글 마커 뒤에 공백 삽입",IDC_AUTO_INSERT_SPACE_COMMENT,231,43,218,10,WS_TABSTOP
     GROUPBOX        "괄호 및 따옴표 자동 완성",IDC_STATIC,231,56,218,49
     AUTOCHECKBOX    "( )",IDC_AUTO_INSERT_PARENTHESIS,238,68,40,10,WS_TABSTOP
     AUTOCHECKBOX    "{ }",IDC_AUTO_INSERT_BRACE,290,68,40,10,WS_TABSTOP
@@ -1673,7 +1673,7 @@ BEGIN
     AUTOCHECKBOX    "시스템 일시 중단 시 백업 저장",IDC_AUTOSAVE_SUSPEND,7,31,170,10,WS_GROUP | WS_TABSTOP
     AUTOCHECKBOX    "시스템 종료 시 백업 저장",IDC_AUTOSAVE_SHUTDOWN,7,43,170,10,WS_TABSTOP
     AUTOCHECKBOX    "수동으로 백업 삭제",IDC_AUTOSAVE_MANUALLYDELETE,7,55,170,10,WS_TABSTOP
-    AUTOCHECKBOX    "Directly overwrite current file.",IDC_AUTOSAVE_OVERWRITECURRENT,7,67,170,10,WS_TABSTOP
+    AUTOCHECKBOX    "현재 파일을 직접 덮어쓰기",IDC_AUTOSAVE_OVERWRITECURRENT,7,67,170,10,WS_TABSTOP
     PUSHBUTTON      "폴더 열기",IDC_AUTOSAVE_OPENFOLDER,7,84,60,14
     DEFPUSHBUTTON   "확인",IDOK,71,84,50,14
     PUSHBUTTON      "취소",IDCANCEL,127,84,50,14
@@ -1833,7 +1833,7 @@ BEGIN
     IDS_ERR_BROWSE          "파일 탐색 플러그인이 없습니다.\nmatepath 파일 탐색 플러그인은\nttps://github.com/zufuliu/notepad4/releases에서 다운로드할 수 있습니다.\n다운로드 페이지를 여시겠습니까?"
     IDS_ERR_MRUDLG          "선택한 파일에 액세스할 수 없습니다!\n목록에서 제거하시겠습니까?"
     IDS_ERR_CREATELINK      "바탕 화면 링크를 만드는 동안 오류가 발생했습니다."
-    IDS_ERR_PREVWINDISABLED "기존 Notepad4 창이 사용 중이거나 활성 대화 상자가 있습니다.\n다른 Notepad4 창을 여시겠습니까?"
+    IDS_ERR_PREVWINDISABLED "기존 Notepad4 창이 사용 중이거나 활성 대화상자가 있습니다.\n다른 Notepad4 창을 여시겠습니까?"
     IDS_SELRECT             "이 작업은 직사각형 선택 내에서 수행할 수 없습니다."
     IDS_BUFFERTOOSMALL      "이 작업을 수행할 수 없습니다 (줄이 너무 깁니다)"
     IDS_FIND_WRAPFW         "문서의 끝에 도달하여 처음부터 검색을 다시 시작했습니다."
@@ -1852,7 +1852,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_CMDLINEHELP         "명령행 도움말\n\n\
+	IDS_CMDLINEHELP			"명령줄 도움말\n\n\
 파일\t마지막 인수여야 하며 기본적으로 따옴표로 묶인 공백이 없어야 합니다.\n\
 +\t여러 파일 인수를 허용합니다 (따옴표로 묶인 공백 포함).\n\
 -\t단일 파일 인수를 허용합니다 (따옴표로 묶인 공백 없음).\n\
@@ -1875,7 +1875,7 @@ BEGIN
 /n\t항상 새 창을 엽니다 (/ns 단일 파일 인스턴스).\n\
 /r\t창을 재사용합니다 (/rs 단일 파일 인스턴스).\n\
 /p<flag>\t창 위치 및 크기를 설정합니다 (/p0, /ps, /pf,l,t,r,b,m).\n\
-/t title\t창 제목을 설정합니다.\n\
+/t 제목\t창 제목을 설정합니다.\n\
 /i\t트레이 아이콘으로 시작합니다.\n\
 /o\t창을 맨 위에 둡니다.\n\
 /u\t상승된 권한으로 시작합니다 (관리자 권한으로 실행).\n\
@@ -1953,13 +1953,13 @@ BEGIN
 	IDS_ENCODING_KOI8_U				"우크라이나어 (KOI8-U);KOI8-U"							// 키릴 문자
 	IDS_ENCODING_MAC_CYRILLIC		"Mac 키릴 자모;Mac 키릴 자모;"							// 키릴 문자
 	IDS_ENCODING_WINDOWS1251		"Windows-1251;Windows-1251"								// 키릴 문자
-	IDS_ENCODING_ISO8859_13			"에스토니아어 (발트어 Rim, 라틴어-7, ISO 8859-13);ISO 8859-13"// 북유럽어
+	IDS_ENCODING_ISO8859_13			"에스토니아어 (발트어 Rim, 라틴어-7, ISO 8859-13);ISO 8859-13"	// 북유럽어
 	IDS_ENCODING_DOS863				"OEM 프랑스어 캐나다 (DOS-863);DOS-863"					// 서유럽어
 	IDS_ENCODING_DOS737				"OEM 그리스어 (DOS-737);DOS-737"							// 그리스어
 	IDS_ENCODING_ISO8859_7			"ISO 8859-7;ISO 8859-7"									// 그리스어
 	IDS_ENCODING_MAC_GREEK			"Mac 그리스어; Mac 그리스어"								// 그리스어
 	IDS_ENCODING_WINDOWS1253		"Windows-1253;Windows-1253"								// 그리스어
-	IDS_ENCODING_DOS869				"OEM 현대 그리스어 (DOS-869);DOS-869"						// 그리스어
+	IDS_ENCODING_DOS869				"OEM 현대 그리스어 (DOS-869);DOS-869"					// 그리스어
 	IDS_ENCODING_DOS862				"OEM 히브리어 (DOS-862);DOS-862"							// 히브리어
 	IDS_ENCODING_ISO8859_8I			"ISO 8859-8-I (논리적 순선);ISO 8859-8-I"				// 히브리어
 	IDS_ENCODING_ISO8859_8			"ISO 8859-8 (시각적 순서);ISO 8859-8"					// 히브리어
@@ -1981,7 +1981,7 @@ BEGIN
 	IDS_ENCODING_MAC_THAI			"Mac 태국어;Mac 태국어"									// 동남아시아
 	IDS_ENCODING_TIS620				"태국어 (TIS-620, Windows-874, ISO 8859-11);TIS-620"		// 동남아시아
 	IDS_ENCODING_DOS857				"OEM 튀르키예어 (DOS-857);DOS-857"						// 튀르키예어
-	IDS_ENCODING_ISO8859_9			"라틴-5 (ISO 8859-9);ISO 8859-9"							// 튀르키예어
+	IDS_ENCODING_ISO8859_9			"라틴-5 (ISO 8859-9);ISO 8859-9"						// 튀르키예어
 	IDS_ENCODING_MAC_TURKISH		"Mac 튀르키예어;Mac 튀르키예어"							// 튀르키예어
 	IDS_ENCODING_WINDOWS1254		"Windows-1254;Windows-1254"								// 튀르키예어
 	IDS_ENCODING_MAC_UKRAINIAN		"Mac 우크라이나어;Mac 우크라이나어"						// 키릴 문자
@@ -1991,22 +1991,22 @@ BEGIN
 	IDS_ENCODING_MAC_ROMAN			"Mac 로마어;Mac 로마어"									// 서유럽어
 	IDS_ENCODING_WINDOWS1252		"라틴어-1 (Windows-1252);Windows-1252"					// 서유럽어
 	IDS_ENCODING_IBM037				"미국-캐나다 (IBM037);EBCDIC (미국-캐나다)"				// EBCDIC
-	IDS_ENCODING_IBM1140			"미국-캐나다 + 유로 기호 (IBM1140);EBCDIC (미국-캐나다 유로)"// EBCDIC
+	IDS_ENCODING_IBM1140			"미국-캐나다 + 유로 기호 (IBM1140);EBCDIC (미국-캐나다 유로)"	// EBCDIC
 	IDS_ENCODING_IBM500				"국제 (IBM500);EBCDIC (Intl.)"							// EBCDIC
-	IDS_ENCODING_IBM870				"라틴어-2 (IBM870);EBCDIC (라틴어-2)"						// EBCDIC
+	IDS_ENCODING_IBM870				"라틴어-2 (IBM870);EBCDIC (라틴어-2)"					// EBCDIC
 	IDS_ENCODING_CP875				"현대 그리스어 (CP875);EBCDIC (그리스)"					// EBCDIC
 	IDS_ENCODING_IBM1026			"튀르키예어 (라틴어-5) (IBM1026);EBCDIC (라틴어-5)"		// EBCDIC
-	IDS_ENCODING_DOS437				"OEM 미국 (DOS-437);DOS-437"								// 서유럽어
+	IDS_ENCODING_DOS437				"OEM 미국 (DOS-437);DOS-437"							// 서유럽어
 	IDS_ENCODING_DOS858				"OEM 라틴어-1 + 유로 기호 (DOS-858);DOS-858"				// 서유럽어
 	IDS_ENCODING_DOS860				"OEM 포르투칼어 (DOS-860);DOS-860"						// 서유럽어
 	IDS_ENCODING_MAC_ARABIC			"Mac 아랍어;Mac 아랍어"									// 아랍어
-	IDS_ENCODING_DOS864				"OEM 아랍어 (DOS-864);OEM 아랍어"							// 아랍어
+	IDS_ENCODING_DOS864				"OEM 아랍어 (DOS-864);OEM 아랍어"						// 아랍어
 	IDS_ENCODING_MAC_ROMANIAN		"Mac 루마니아어;Mac 루마니아어"							// 남유럽어
 	IDS_ENCODING_DOS865				"OEM 북유럽어 (DOS-865);DOS-865"							// 북유럽어
-	IDS_ENCODING_IBM855				"OEM 키릴 문자 (주로 러시아어) (IBM855);OEM 키릴 문자 "		// 키릴 문자
+	IDS_ENCODING_IBM855				"OEM 키릴 문자 (주로 러시아어) (IBM855);OEM 키릴 문자 "	// 키릴 문자
 	IDS_ENCODING_MAC_JAPANESE		"Mac 일본어;Mac 일본어"									// 일본어
 	IDS_ENCODING_CS_ISO2022_JP		"ISO 2022 (1 바이트 가나 허용);CS ISO-2022-JP"			// 일본어
-	IDS_ENCODING_ISO2022_JP_SOSI	"ISO 2022 (1 바이트 가나 허용 - SO/SI);ISO-2022-JP SO/SI"	// 일본어
+	IDS_ENCODING_ISO2022_JP_SOSI	"ISO 2022 (1 바이트 가나 허용 - SO/SI);ISO-2022-JP SO/SI"// 일본어
 	IDS_ENCODING_MAC_KOREAN			"Mac 한국어;Mac 한국어"									// 한국어
 	IDS_ENCODING_ISO2022_KR			"ISO 2022 한국어;ISO-2022-KR"							// 한국어
 	IDS_ENCODING_MAC_GB2312			"중국어 간체 (Mac);Mac GB-2312"							// 중국어
@@ -2142,7 +2142,6 @@ END
 #include "../../src/Notepad4.ver"
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
-
 
 
 

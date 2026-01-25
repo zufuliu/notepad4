@@ -1314,7 +1314,6 @@ std::wstring StringDecode(const std::string_view sv, int codePage) {
 }
 
 std::wstring StringMapCase(const std::wstring_view wsv, DWORD mapFlags) {
-#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 	const int charsConverted = ::LCMapStringEx(LOCALE_NAME_USER_DEFAULT, mapFlags,
 		wsv.data(), static_cast<int>(wsv.length()), nullptr, 0, nullptr, nullptr, 0);
 	std::wstring wsConverted(charsConverted, 0);
@@ -1322,15 +1321,6 @@ std::wstring StringMapCase(const std::wstring_view wsv, DWORD mapFlags) {
 		::LCMapStringEx(LOCALE_NAME_USER_DEFAULT, mapFlags,
 			wsv.data(), static_cast<int>(wsv.length()), wsConverted.data(), charsConverted, nullptr, nullptr, 0);
 	}
-#else
-	const int charsConverted = ::LCMapStringW(LOCALE_USER_DEFAULT, mapFlags,
-		wsv.data(), static_cast<int>(wsv.length()), nullptr, 0);
-	std::wstring wsConverted(charsConverted, 0);
-	if (charsConverted) {
-		::LCMapStringW(LOCALE_USER_DEFAULT, mapFlags,
-			wsv.data(), static_cast<int>(wsv.length()), wsConverted.data(), charsConverted);
-	}
-#endif
 	return wsConverted;
 }
 
@@ -1880,7 +1870,7 @@ Window::Cursor ScintillaWin::ContextCursor(Point pt) {
 	// Display regular (drag) cursor over selection
 	if (PointInSelMargin(pt)) {
 		return GetMarginCursor(pt);
-	} else if (!SelectionEmpty() && PointInSelection(pt)) {
+	} else if (dragDropEnabled && !SelectionEmpty() && PointInSelection(pt)) {
 		return Window::Cursor::arrow;
 	} else if (PointIsHotspot(pt)) {
 		return Window::Cursor::hand;
@@ -3117,7 +3107,38 @@ CaseFolderDBCS::CaseFolderDBCS(int codePage, const DBCSByteMask &mask): byteMask
 		}
 	}
 	// const double duration = period.Duration()*1e3;
-	// printf("%s(%u) duration=%.6f\n", __func__, cp, duration);
+	// printf("%s(%d) duration=%.6f\n", __func__, codePage, duration);
+#if 0
+	{
+		static const wchar_t wCharacter[] = { 0x4E2D, 0xFF21, 0xFF41, 0x0391, 0x03B1, 'A', 0 };
+		wchar_t wFolded[std::size(wCharacter)]{};
+		for (size_t i = 0; i < std::size(wCharacter) - 1; i++) {
+			const char *foldedUTF8 = CaseConvert(wCharacter[i], CaseConversion::fold);
+			if (foldedUTF8) {
+				UTF16FromUTF8(foldedUTF8, &wFolded[i], 1);
+			} else {
+				wFolded[i] = wCharacter[i];
+			}
+		}
+		printf("Unicode mixed: %04X %04X %04X %04X %04X %04X\n", wCharacter[0], wCharacter[1], wCharacter[2], wCharacter[3], wCharacter[4], wCharacter[5]);
+		printf("Unicode  fold: %04X %04X %04X %04X %04X %04X\n", wFolded[0], wFolded[1], wFolded[2], wFolded[3], wFolded[4], wFolded[5]);
+
+		uint8_t mixed[sizeof(wCharacter)]{};
+		uint8_t folded[sizeof(mixed)]{};
+		uint8_t expect[sizeof(mixed)]{};
+		unsigned length = WideCharToMultiByte(codePage, 0, wCharacter, _countof(wCharacter) - 1, reinterpret_cast<char *>(mixed), _countof(mixed), nullptr, nullptr);
+		const size_t lenOut = Fold(reinterpret_cast<char *>(folded), sizeof(folded), reinterpret_cast<const char *>(mixed), length);
+		printf("code page %d  mixed %u: %02X%02X %02X%02X %02X%02X %02X%02X %02X%02X %02X%02X\n", codePage, length,
+			mixed[0], mixed[1], mixed[2], mixed[3], mixed[4], mixed[5], mixed[6], mixed[7], mixed[8], mixed[9], mixed[10], mixed[11]);
+		printf("code page %d folded %zu: %02X%02X %02X%02X %02X%02X %02X%02X %02X%02X %02X%02X\n", codePage, lenOut,
+			folded[0], folded[1], folded[2], folded[3], folded[4], folded[5], folded[6], folded[7], folded[8], folded[9], folded[10], folded[11]);
+		length = WideCharToMultiByte(codePage, 0, wFolded, _countof(wFolded) - 1, reinterpret_cast<char *>(expect), _countof(expect), nullptr, nullptr);
+		printf("code page %d expect %u: %02X%02X %02X%02X %02X%02X %02X%02X %02X%02X %02X%02X\n", codePage, length,
+			expect[0], expect[1], expect[2], expect[3], expect[4], expect[5], expect[6], expect[7], expect[8], expect[9], expect[10], expect[11]);
+		const bool pass = memcmp(folded, expect, sizeof(expect)) == 0;
+		printf("code page %d fold %s\n\n", codePage, (pass ? "PASS" : "FAIL"));
+	}
+#endif
 }
 
 size_t CaseFolderDBCS::Fold(char *folded, [[maybe_unused]] size_t sizeFolded, const char *mixed, size_t lenMixed) const {
@@ -3126,7 +3147,7 @@ size_t CaseFolderDBCS::Fold(char *folded, [[maybe_unused]] size_t sizeFolded, co
 	size_t lenOut = 0;
 	for (size_t i = 0; i < lenMixed; ) {
 		const unsigned char ch = mixed[i++];
-		const unsigned char ch2 = mixed[i + 1];
+		const unsigned char ch2 = mixed[i];
 		if (byteMask.IsLeadByte(ch) && byteMask.IsTrailByte(ch2)) {
 			i++;
 			const uint16_t ind = DBCSIndex(ch, ch2);
@@ -4127,6 +4148,10 @@ void ScintillaWin::EnumAllClipboardFormat(const char *tag) {
 
 /// Implement IDropTarget
 STDMETHODIMP ScintillaWin::DragEnter(LPDATAOBJECT pIDataSource, DWORD grfKeyState, POINTL, PDWORD pdwEffect) {
+	if (!dragDropEnabled) {
+		*pdwEffect = DROPEFFECT_NONE;
+		return S_OK;
+	}
 	if (!pIDataSource) {
 		return E_POINTER;
 	}
@@ -4154,7 +4179,7 @@ STDMETHODIMP ScintillaWin::DragEnter(LPDATAOBJECT pIDataSource, DWORD grfKeyStat
 
 STDMETHODIMP ScintillaWin::DragOver(DWORD grfKeyState, POINTL pt, PDWORD pdwEffect) {
 	try {
-		if (!hasOKText || pdoc->IsReadOnly()) {
+		if (!dragDropEnabled || !hasOKText || pdoc->IsReadOnly()) {
 			*pdwEffect = DROPEFFECT_NONE;
 			return S_OK;
 		}
@@ -4186,6 +4211,11 @@ STDMETHODIMP ScintillaWin::DragLeave() {
 STDMETHODIMP ScintillaWin::Drop(LPDATAOBJECT pIDataSource, DWORD grfKeyState, POINTL pt, PDWORD pdwEffect) {
 	try {
 		*pdwEffect = EffectFromState(grfKeyState);
+
+		if (!dragDropEnabled) {
+			*pdwEffect = DROPEFFECT_NONE;
+			return S_OK;
+		}
 
 		if (!pIDataSource) {
 			return E_POINTER;

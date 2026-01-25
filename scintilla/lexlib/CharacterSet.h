@@ -24,7 +24,7 @@ public:
 	};
 
 	//[[deprecated]]
-	CharacterSet(setBase base = setNone, bool valueAfter_ = false) noexcept : valueAfter(valueAfter_) {
+	explicit CharacterSet(setBase base = setNone, bool valueAfter_ = false) noexcept : valueAfter(valueAfter_) {
 		if (base & setLower) {
 			for (int ch = 'a'; ch <= 'z'; ch++) {
 				bset[ch] = true;

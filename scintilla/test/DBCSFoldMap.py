@@ -1,37 +1,21 @@
+import sys
 import codecs
-import ctypes
+sys.path.append('../scripts')
+from UnicodeData import *
 
 # see https://sourceforge.net/p/scintilla/feature-requests/1564/
 
-MB_ERR_INVALID_CHARS = 0x00000008
-MultiByteToWideChar = ctypes.windll.kernel32.MultiByteToWideChar
-class PlatformDecoder:
-	def __init__(self, cp):
-		self.cp = cp
-	def __call__(self, buf):
-		size = len(buf)*4
-		result = (ctypes.c_wchar*size)()
-		length = MultiByteToWideChar(self.cp, MB_ERR_INVALID_CHARS, ctypes.c_char_p(buf), len(buf), result, size)
-		if length == 0:
-			code = ctypes.GetLastError()
-			msg = ctypes.FormatError(code).strip()
-			raise UnicodeDecodeError(f'{self.cp}', buf, 0, len(buf), f'{code}: {msg}')
-		value = result.value[:length]
-		value += '\0'*(length - len(value))
-		return (value, len(buf))
-
 def findCaseFoldBlock(encodingList):
-	characterCount = 0xffff + 1
-	foldSet = [0]*characterCount
+	foldSet = [0]*DBCSCharacterCount
 	multiFold = []
 
-	for cp in encodingList:
-		if isinstance(cp, int):
-			decode = PlatformDecoder(cp)
-			cp = f'cp{cp}'
+	for codePage in encodingList:
+		if isinstance(codePage, int):
+			decode = PlatformDecoder(codePage)
+			codePage = f'cp{codePage}'
 		else:
-			decode = codecs.getdecoder(cp)
-		for ch in range(0x80, characterCount):
+			decode = codecs.getdecoder(codePage)
+		for ch in range(DBCSMinCharacter, DBCSCharacterCount):
 			buf = bytes([ch >> 8, ch & 0xff])
 			try:
 				result = decode(buf)
@@ -45,10 +29,10 @@ def findCaseFoldBlock(encodingList):
 				if len(fold) != 1:
 					text = f'{ch:04X}'
 					try:
-						fold.encode(cp)
-						multiFold.append((cp, text, uch, fold, len(fold), True))
+						fold.encode(codePage)
+						multiFold.append((codePage, text, uch, fold, len(fold), True))
 					except UnicodeEncodeError:
-						multiFold.append((cp, text, uch, fold, len(fold), False))
+						multiFold.append((codePage, text, uch, fold, len(fold), False))
 
 	foldCount = 0
 	leadCount = {}

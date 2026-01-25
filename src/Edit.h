@@ -19,7 +19,7 @@
 ******************************************************************************/
 #pragma once
 
-// WideCharToMultiByte, UTF8 encoding of U+0800 to U+FFFF
+// WideCharToMultiByte(), UTF8 encoding for U+0800 to U+FFFF
 #define kMaxMultiByteCount	3
 
 #define NP2_FIND_REPLACE_LIMIT	2048

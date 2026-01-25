@@ -281,8 +281,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 #endif
 
 	g_hDefaultHeap = GetProcessHeap();
-	GetProgramRealPath(szExeRealPath, COUNTOF(szExeRealPath));
 	SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX);
+
+	GetProgramRealPath(szExeRealPath, COUNTOF(szExeRealPath));
 	// Command Line, Ini File and Flags
 	ParseCommandLine();
 	FindIniFile();
