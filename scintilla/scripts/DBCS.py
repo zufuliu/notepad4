@@ -2,6 +2,7 @@ import sys
 from enum import IntFlag
 import MultiStageTable
 from UnicodeData import *
+from FileGenerator import Regenerate
 
 DBCSCodePages = [
 	'cp932', 'shift_jis', 'shift_jis_2004', 'shift_jisx0213',
@@ -35,7 +36,7 @@ DBCSByteRanges = {
 	},
 }
 
-def print_dbcs_byte_ranges():
+def print_dbcs_byte_ranges(filename):
 	for codePage, ranges in DBCSByteRanges.items():
 		table = [0]*256
 		for start, end in ranges['lead']:
@@ -49,6 +50,14 @@ def print_dbcs_byte_ranges():
 		valueBit, totalBit, data = MultiStageTable.runLengthEncode(codePage, table)
 		line = MultiStageTable.dumpArray(data, 20)[0]
 		print(f'{codePage} {len(data)}: {{{line}}}')
+		suffix = codePage.upper()
+		indent = '\t'*2
+		output = [
+			f'{indent}constexpr uint8_t BytesRLE_{suffix}[] = {{{line}}};',
+			f'{indent}bytesCount = std::size(BytesRLE_{suffix});',
+			f'{indent}memcpy(bytesRLE, BytesRLE_{suffix}, sizeof(BytesRLE_{suffix}));',
+		]
+		Regenerate(filename, f"//{codePage}", output)
 
 def to_byte_ranges(items):
 	ranges = []
@@ -181,6 +190,6 @@ def print_dbcs_valid_bytes():
 		print('    lead:', format_byte_ranges(validLead))
 		print('   trail:', format_byte_ranges(validTrail))
 
-#print_dbcs_byte_ranges()
+#print_dbcs_byte_ranges('../src/CharClassify.cxx')
 #print_dbcs_test_char(DBCSTrailKind.All)
 #print_dbcs_valid_bytes()
