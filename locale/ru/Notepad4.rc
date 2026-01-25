@@ -347,8 +347,6 @@ BEGIN
 			MENUITEM SEPARATOR
 			MENUITEM "Заэкранивать символы Си\tCtrl+Alt+E",						IDM_EDIT_ESCAPECCHARS
 			MENUITEM "Разэкранивать си&мволы Си\tCtrl+Alt+R",					IDM_EDIT_UNESCAPECCHARS
-			MENUITEM "Заэкранивать символы HT&ML/XML\tAlt+Shift+X",					IDM_EDIT_XHTML_ESCAPE_CHAR
-			MENUITEM "Разэкранивать символы HTML/&XML\tAlt+Shift+H",				IDM_EDIT_XHTML_UNESCAPE_CHAR
 			MENUITEM SEPARATOR
 			MENUITEM "&Обрезать строку слева\tCtrl+Shift+Back",					IDM_EDIT_DELETELINELEFT
 			MENUITEM "О&брезать строку справа\tCtrl+Shift+Del",					IDM_EDIT_DELETELINERIGHT
@@ -724,9 +722,6 @@ BEGIN
 		MENUITEM SEPARATOR
 		POPUP "Действие при &выделении"
 		BEGIN
-			MENUITEM "&Сжимать CSS/JS/JSON",								IDM_EDIT_CODE_COMPRESS
-			MENUITEM "Привести CSS/JS/JSON в &порядок",						IDM_EDIT_CODE_PRETTY
-			MENUITEM SEPARATOR
 			MENUITEM "&Открыть файл, папку, ссылку и др.",						CMD_OPEN_PATH_OR_LINK
 			MENUITEM "Открыть &папку с файлом",							CMD_OPEN_CONTAINING_FOLDER
 			MENUITEM SEPARATOR
@@ -764,9 +759,18 @@ BEGIN
 			MENUITEM "Из &деванагари в латиницу",							IDM_EDIT_MAP_DEVANAGARI_LATIN
 			MENUITEM "Из &малаялам в латиницу",							IDM_EDIT_MAP_MALAYALAM_LATIN
 		END
-		MENUITEM "Закодировать в &URL\tCtrl+Shift+E",							IDM_EDIT_URLENCODE
-		MENUITEM "Кодирование компонента URL-адреса",							IDM_EDIT_URLCOMPONENTENCODE
-		MENUITEM "Декодировать из UR&L\tCtrl+Shift+R",							IDM_EDIT_URLDECODE
+		POPUP "&Веб-разработка"
+		BEGIN
+			MENUITEM "&Сжимать CSS/JS/JSON",								IDM_EDIT_CODE_COMPRESS
+			MENUITEM "Привести CSS/JS/JSON в &порядок",						IDM_EDIT_CODE_PRETTY
+			MENUITEM SEPARATOR
+			MENUITEM "Заэкранивать символы HT&ML/XML\tAlt+Shift+X",					IDM_EDIT_XHTML_ESCAPE_CHAR
+			MENUITEM "Разэкранивать символы HTML/&XML\tAlt+Shift+H",				IDM_EDIT_XHTML_UNESCAPE_CHAR
+			MENUITEM SEPARATOR
+			MENUITEM "Закодировать в &URL\tCtrl+Shift+E",							IDM_EDIT_URLENCODE
+			MENUITEM "Кодирование компонента URL-адреса",							IDM_EDIT_URLCOMPONENTENCODE
+			MENUITEM "Декодировать из UR&L\tCtrl+Shift+R",							IDM_EDIT_URLDECODE
+		END
 	END
 	POPUP "&Справка"
 	BEGIN
