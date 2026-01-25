@@ -382,7 +382,7 @@ BEGIN
 			MENUITEM "Przejdź do &następnej\tF2",	BME_EDIT_BOOKMARKNEXT
 			MENUITEM "Przejdź do &poprzedniej\tShift+F2",BME_EDIT_BOOKMARKPREV
 			MENUITEM SEPARATOR
-			MENUITEM "&Zaznacz wszystkie\tAlt+F6",	BME_EDIT_BOOKMARKSELE     CT
+			MENUITEM "&Zaznacz wszystkie\tAlt+F6",	BME_EDIT_BOOKMARKSELECT
 			MENUITEM "&Wyczyść wszystkie\tAlt+F2",	BME_EDIT_BOOKMARKCLEAR
 		END
 		POPUP "P&rzejdź"
@@ -766,9 +766,9 @@ BEGIN
 			MENUITEM "Zamień znaki na encje HTML/&XML\tAlt+Shift+X",IDM_EDIT_XHTML_ESCAPE_CHAR
 			MENUITEM "Zamień encje &HTML/XML na znaki\tAlt+Shift+H",IDM_EDIT_XHTML_UNESCAPE_CHAR
 			MENUITEM SEPARATOR
-      MENUITEM "Zastosuj kodowanie &URL\tCtrl+Shift+E",	IDM_EDIT_URLENCODE
-      MENUITEM "Zastosuj kodowanie &komponentu URL",		IDM_EDIT_URLCOMPONENTENCODE
-      MENUITEM "Dekoduj UR&L\tCtrl+Shift+R",				IDM_EDIT_URLDECODE
+			MENUITEM "Zastosuj kodowanie &URL\tCtrl+Shift+E",	IDM_EDIT_URLENCODE
+			MENUITEM "Zastosuj kodowanie &komponentu URL",		IDM_EDIT_URLCOMPONENTENCODE
+			MENUITEM "Dekoduj UR&L\tCtrl+Shift+R",				IDM_EDIT_URLDECODE
 		END
 	END
 	POPUP "&Pomoc"
