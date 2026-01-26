@@ -53,8 +53,8 @@ def findCaseFoldBlock(encodingList):
 	print(f'{indent}lead {len(leadCount)}:', leadCount)
 	print(f'{indent}fold {len(multiFold)}:', multiFold)
 
-findCaseFoldBlock(['cp932', 'shift_jis', 'shift_jis_2004', 'shift_jisx0213', 932])
-findCaseFoldBlock(['cp936', 'gbk', 936])
-findCaseFoldBlock(['cp949', 'uhc', 949])
-findCaseFoldBlock(['cp950', 'big5', 'big5hkscs', 950])
-findCaseFoldBlock(['cp1361', 'johab', 1361])
+findCaseFoldBlock([932, 'cp932', 'shift_jis', 'shift_jis_2004', 'shift_jisx0213'])
+findCaseFoldBlock([936, 'cp936', 'gbk'])
+findCaseFoldBlock([949, 'cp949', 'uhc'])
+findCaseFoldBlock([950, 'cp950', 'big5', 'big5hkscs'])
+findCaseFoldBlock([1361, 'cp1361', 'johab'])
