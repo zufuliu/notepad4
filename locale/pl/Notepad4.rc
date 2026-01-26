@@ -346,8 +346,6 @@ BEGIN
 			MENUITEM SEPARATOR
 			MENUITEM "&Wstaw znaki ucieczki\tCtrl+Alt+E",		IDM_EDIT_ESCAPECCHARS
 			MENUITEM "&Usuń znaki ucieczki\tCtrl+Alt+R",		IDM_EDIT_UNESCAPECCHARS
-			MENUITEM "Zamień znaki na encje HTML/&XML\tAlt+Shift+X",IDM_EDIT_XHTML_ESCAPE_CHAR
-			MENUITEM "Zamień encje &HTML/XML na znaki\tAlt+Shift+H",IDM_EDIT_XHTML_UNESCAPE_CHAR
 			MENUITEM SEPARATOR
 			MENUITEM "Usuń w&iersz przed kursorem\tCtrl+Shift+Back",IDM_EDIT_DELETELINELEFT
 			MENUITEM "Usuń wi&ersz za kursorem\tCtrl+Shift+Del",IDM_EDIT_DELETELINERIGHT
@@ -723,9 +721,6 @@ BEGIN
 		MENUITEM SEPARATOR
 		POPUP "Operacje na zazna&czeniu"
 		BEGIN
-			MENUITEM "&Skompresuj &kod CSS/JS/JSON",		IDM_EDIT_CODE_COMPRESS
-			MENUITEM "&Popraw formatowanie CSS/JS/JSON",	IDM_EDIT_CODE_PRETTY
-			MENUITEM SEPARATOR
 			MENUITEM "&Otwórz plik, folder, link, itp.",	CMD_OPEN_PATH_OR_LINK
 			MENUITEM "Otwórz &folder zawierający ten dokument",CMD_OPEN_CONTAINING_FOLDER
 			MENUITEM SEPARATOR
@@ -763,9 +758,18 @@ BEGIN
 			MENUITEM "&Dewanagari na łącinkę",				IDM_EDIT_MAP_DEVANAGARI_LATIN
 			MENUITEM "&Malajalam na łacinkę",				IDM_EDIT_MAP_MALAYALAM_LATIN
 		END
-		MENUITEM "Zastosuj kodowanie &URL\tCtrl+Shift+E",	IDM_EDIT_URLENCODE
-		MENUITEM "Zastosuj kodowanie &komponentu URL",		IDM_EDIT_URLCOMPONENTENCODE
-		MENUITEM "Dekoduj UR&L\tCtrl+Shift+R",				IDM_EDIT_URLDECODE
+		POPUP "Narzędzia &Web"
+		BEGIN
+			MENUITEM "&Skompresuj &kod CSS/JS/JSON",		IDM_EDIT_CODE_COMPRESS
+			MENUITEM "&Popraw formatowanie CSS/JS/JSON",	IDM_EDIT_CODE_PRETTY
+			MENUITEM SEPARATOR
+			MENUITEM "Zamień znaki na encje HTML/&XML\tAlt+Shift+X",IDM_EDIT_XHTML_ESCAPE_CHAR
+			MENUITEM "Zamień encje &HTML/XML na znaki\tAlt+Shift+H",IDM_EDIT_XHTML_UNESCAPE_CHAR
+			MENUITEM SEPARATOR
+			MENUITEM "Zastosuj kodowanie &URL\tCtrl+Shift+E",	IDM_EDIT_URLENCODE
+			MENUITEM "Zastosuj kodowanie &komponentu URL",		IDM_EDIT_URLCOMPONENTENCODE
+			MENUITEM "Dekoduj UR&L\tCtrl+Shift+R",				IDM_EDIT_URLDECODE
+		END
 	END
 	POPUP "&Pomoc"
 	BEGIN
