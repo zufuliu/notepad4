@@ -721,8 +721,8 @@ inline void SendWMCommandOrBeep(HWND hwnd, UINT id) noexcept {
 	}
 }
 
-HMODULE LoadLocalizedResourceDLL(LANGID lang, LPCWSTR dllName) noexcept;
-constexpr bool IsChineseTraditionalSubLang(LANGID subLang) noexcept {
+HMODULE LoadLocalizedResourceDLL(UINT lang, LPCWSTR dllName) noexcept;
+constexpr bool IsChineseTraditionalSubLang(UINT subLang) noexcept {
 	return subLang == SUBLANG_CHINESE_TRADITIONAL
 		|| subLang == SUBLANG_CHINESE_HONGKONG
 		|| subLang == SUBLANG_CHINESE_MACAU;

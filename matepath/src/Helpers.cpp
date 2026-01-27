@@ -1130,7 +1130,7 @@ LRESULT SendWMSize(HWND hwnd) noexcept {
 }
 
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
-HMODULE LoadLocalizedResourceDLL(LANGID lang, LPCWSTR dllName) noexcept {
+HMODULE LoadLocalizedResourceDLL(UINT lang, LPCWSTR dllName) noexcept {
 	if (lang == LANG_USER_DEFAULT) {
 		lang = GetUserDefaultUILanguage();
 	}
@@ -1139,7 +1139,8 @@ HMODULE LoadLocalizedResourceDLL(LANGID lang, LPCWSTR dllName) noexcept {
 	const LANGID subLang = SUBLANGID(lang);
 	switch (PRIMARYLANGID(lang)) {
 	case LANG_ENGLISH:
-		break;
+	default:
+		return nullptr;
 	case LANG_CHINESE:
 		folder = IsChineseTraditionalSubLang(subLang) ? L"zh-Hant" : L"zh-Hans";
 		break;
@@ -1169,10 +1170,6 @@ HMODULE LoadLocalizedResourceDLL(LANGID lang, LPCWSTR dllName) noexcept {
 		break;
 	}
 
-	if (folder == nullptr) {
-		return nullptr;
-	}
-
 	WCHAR path[MAX_PATH];
 	lstrcpy(path, szExeRealPath);
 	PathRemoveFileSpec(path);
@@ -1180,7 +1177,7 @@ HMODULE LoadLocalizedResourceDLL(LANGID lang, LPCWSTR dllName) noexcept {
 	PathAppend(path, folder);
 	PathAppend(path, dllName);
 
-	const DWORD flags = IsVistaAndAbove() ? (LOAD_LIBRARY_AS_DATAFILE_EXCLUSIVE | LOAD_LIBRARY_AS_IMAGE_RESOURCE) : LOAD_LIBRARY_AS_DATAFILE;
+	constexpr DWORD flags = LOAD_LIBRARY_AS_DATAFILE_EXCLUSIVE | LOAD_LIBRARY_AS_IMAGE_RESOURCE;
 	HMODULE hDLL = LoadLibraryEx(path, nullptr, flags);
 	return hDLL;
 }
