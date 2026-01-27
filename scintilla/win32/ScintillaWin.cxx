@@ -3062,52 +3062,104 @@ namespace {
 constexpr unsigned int safeFoldingSize = 16; // UTF8MaxBytes*maxExpansionCaseConversion
 constexpr uint8_t highByteFirst = 0x80;
 constexpr uint8_t highByteLast = 0xFF;
+constexpr uint8_t minLeadByte = 0x81;
+constexpr uint8_t maxLeadByte = 0xFE;
 constexpr uint8_t minTrailByte = 0x31;
+constexpr uint8_t maxTrailByte = 0xFE;
 
 class CaseFolderDBCS final : public CaseFolderTable {
 	const DBCSByteMask &byteMask;
 	// Allocate the expandable storage here so that it does not need to be reallocated
 	// for each call to Fold.
-	FoldMap foldingMap;
+	uint16_t foldingMap[0x8000];
 public:
-	CaseFolderDBCS(int codePage, const DBCSByteMask &mask);
+	CaseFolderDBCS(int codePage, const DBCSCharClassify *dbcsCharClass);
 	size_t Fold(char *folded, size_t sizeFolded, const char *mixed, size_t lenMixed) const override;
 };
 
 // creates a fold map by calling platform APIs so will differ between platforms.
-CaseFolderDBCS::CaseFolderDBCS(int codePage, const DBCSByteMask &mask): byteMask {mask} {
+CaseFolderDBCS::CaseFolderDBCS(int codePage, const DBCSCharClassify *dbcsCharClass): byteMask {dbcsCharClass->GetByteMask()} {
 	// const ElapsedPeriod period;
-	for (unsigned char byte1 = highByteFirst + 1; byte1 < highByteLast; byte1++) {
-		if (byteMask.IsLeadByte(byte1)) {
-			for (unsigned char byte2 = minTrailByte; byte2 < highByteLast; byte2++) {
-				if (byteMask.IsTrailByte(byte2)) {
-					const uint16_t index = DBCSIndex(byte1, byte2);
-					const DBCSPair pair{ static_cast<char>(byte1), static_cast<char>(byte2) };
-					foldingMap[index] = pair;
-					wchar_t codePoint[4]{};
-					const int lenUni = ::MultiByteToWideChar(codePage, MB_ERR_INVALID_CHARS, pair.chars, 2, codePoint, _countof(codePoint));
-					if (lenUni == 1 && codePoint[0]) {
-						// DBCS pair must produce a single Unicode BMP code point
-						// Could create a DBCS -> Unicode conversion map here
-						const char *foldedUTF8 = CaseConvert(codePoint[0], CaseConversion::fold);
-						if (foldedUTF8) {
-							wchar_t wFolded[safeFoldingSize];
-							const size_t charsConverted = UTF16FromUTF8(foldedUTF8, wFolded, std::size(wFolded));
-							char back[safeFoldingSize];
-							const int lengthBack = MultiByteFromWideChar(codePage, std::wstring_view(wFolded, charsConverted),
-								back, std::size(back));
-							if (lengthBack == 2) {
-								// Only allow cases where input length and folded length are both 2
-								foldingMap[index] = { back[0], back[1] };
-							}
-						}
+	// int total = 0;
+	// map each character to itself, swap lead and trail byte on little endian
+	{
+#if NP2_USE_SSE2
+		__m128i value = _mm_setr_epi16(0, 1, 2, 3, 4, 5, 6, 7);
+		const __m128i acc = _mm_set1_epi16(0x0008);
+#if NP2_USE_AVX2
+		const __m128i shuffle = _mm_setr_epi8(1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14);
+#endif
+		value = _mm_or_si128(value, _mm_slli_epi16(acc, 12));
+		__m128i *ptr = reinterpret_cast<__m128i *>(foldingMap);
+		constexpr int count = _countof(foldingMap ) / (sizeof(__m128i) / sizeof(uint16_t));
+#if defined(__clang__)
+		#pragma clang loop unroll(disable)
+#elif defined(__GNUC__)
+		#pragma GCC unroll 0
+#endif
+		for (int i = 0; i < count; i++) {
+#if NP2_USE_AVX2
+			_mm_storeu_si128(ptr, _mm_shuffle_epi8(value, shuffle));
+#else
+			_mm_storeu_si128(ptr, _mm_or_si128(_mm_srli_epi16(value, 8), _mm_slli_epi16(value, 8)));
+#endif
+			ptr++;
+			value = _mm_add_epi16(value, acc);
+		}
+		// end NP2_USE_SSE2
+#elif defined(_WIN64)
+		uint64_t *ptr = reinterpret_cast<uint64_t *>(foldingMap);
+		uint64_t value = 0x8000'8001'8002'8003ULL;
+		constexpr uint64_t acc = 0x0004'0004'0004'0004ULL;
+		constexpr int count = _countof(foldingMap ) / (sizeof(uint64_t) / sizeof(uint16_t));
+		for (int i = 0; i < count; i++) {
+			*ptr++ = bswap64(value);
+			value += acc;
+		}
+#else
+		uint32_t *ptr = reinterpret_cast<uint32_t *>(foldingMap);
+		uint32_t value = 0x8000'8001U;
+		constexpr uint32_t acc = 0x0002'0002U;
+		constexpr int count = _countof(foldingMap ) / (sizeof(uint32_t) / sizeof(uint16_t));
+		for (int i = 0; i < count; i++) {
+			*ptr++ = bswap32(value);
+			value += acc;
+		}
+#endif
+	}
+
+	const uint8_t * const charClass = dbcsCharClass->GetClassifyMap();
+	constexpr uint32_t minIndex = DBCSIndex(minLeadByte, minTrailByte);
+	constexpr uint32_t maxIndex = DBCSIndex(maxLeadByte, maxTrailByte) + 1;
+	for (uint32_t index = minIndex; index < maxIndex; index++) {
+		// skip case insensitive control, space, punctuation, CJK and private character
+		if (charClass[index] == static_cast<uint8_t>(CharacterClass::word)) {
+			char * const chars = reinterpret_cast<char *>(&foldingMap[index]);
+			wchar_t codePoint[2]{};
+			const int lenUni = ::MultiByteToWideChar(codePage, MB_ERR_INVALID_CHARS, chars, 2, codePoint, _countof(codePoint));
+			if (lenUni == 1) {
+				// DBCS pair must produce a single Unicode BMP code point
+				// Could create a DBCS -> Unicode conversion map here
+				const char *foldedUTF8 = CaseConvert(codePoint[0], CaseConversion::fold);
+				if (foldedUTF8) {
+					wchar_t wFolded[safeFoldingSize];
+					const size_t charsConverted = UTF16FromUTF8(foldedUTF8, wFolded, std::size(wFolded));
+					char back[safeFoldingSize];
+					const int lengthBack = MultiByteFromWideChar(codePage, std::wstring_view(wFolded, charsConverted),
+						back, std::size(back));
+					if (lengthBack == 2) {
+						// Only allow cases where input length and folded length are both 2
+						memcpy(chars, back, 2);
+						// ++total;
 					}
 				}
 			}
 		}
 	}
+
 	// const double duration = period.Duration()*1e3;
 	// printf("%s(%d) duration=%.6f\n", __func__, codePage, duration);
+	// printf("%s(%d) duration=%.6f, total=%d\n", __func__, codePage, duration, total);
 #if 0
 	{
 		static const wchar_t wCharacter[] = { 0x4E2D, 0xFF21, 0xFF41, 0x0391, 0x03B1, 'A', 0 };
@@ -3151,9 +3203,9 @@ size_t CaseFolderDBCS::Fold(char *folded, [[maybe_unused]] size_t sizeFolded, co
 		if (byteMask.IsLeadByte(ch) && byteMask.IsTrailByte(ch2)) {
 			i++;
 			const uint16_t ind = DBCSIndex(ch, ch2);
-			const char *pair = foldingMap[ind].chars;
-			folded[lenOut++] = pair[0];
-			folded[lenOut++] = pair[1];
+			const uint16_t chars = foldingMap[ind];
+			memcpy(&folded[lenOut], &chars, 2);
+			lenOut += 2;
 		} else {
 			folded[lenOut++] = mapping[ch];
 		}
@@ -3170,7 +3222,7 @@ std::unique_ptr<CaseFolder> ScintillaWin::CaseFolderForEncoding() {
 		return std::make_unique<CaseFolderUnicode>();
 	}
 	if (pdoc->dbcsCodePage) {
-		return std::make_unique<CaseFolderDBCS>(cpDest, pdoc->GetDBCSByteMask());
+		return std::make_unique<CaseFolderDBCS>(cpDest, pdoc->GetDBCSCharClass());
 	}
 	std::unique_ptr<CaseFolderTable> pcf = std::make_unique<CaseFolderTable>();
 	// Only for single byte encodings

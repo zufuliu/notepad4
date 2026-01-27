@@ -7396,6 +7396,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 				InvalidateStyleRedraw();
 				SetRepresentations();
 				NotifyCodePageChanged(oldCodePage);
+				// CaseFolderForEncoding(); // test case fold table creation
 			}
 		}
 		break;

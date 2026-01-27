@@ -40,7 +40,7 @@ public:
       {
          __m128i *ptr = reinterpret_cast<__m128i *>(m_lower_map.get());
          __m128i value = _mm_setr_epi16(0, 1, 2, 3, 4, 5, 6, 7);
-         const __m128i acc = _mm_shuffle_epi32(_mm_cvtsi32_si128(0x0008'0008), 0);
+         const __m128i acc = _mm_set1_epi16(0x0008);
          constexpr int count = characterCount / (sizeof(__m128i) / sizeof(wchar_t));
 #if defined(__clang__)
          #pragma clang loop unroll(disable)

@@ -413,8 +413,8 @@ public:
 	bool IsDBCSTrailByteNoExcept(unsigned char ch) const noexcept {
 		return dbcsCharClass->IsTrailByte(ch);
 	}
-	const DBCSByteMask& GetDBCSByteMask() const noexcept {
-		return dbcsCharClass->GetByteMask();
+	const DBCSCharClassify *GetDBCSCharClass() const noexcept {
+		return dbcsCharClass.get();
 	}
 	bool IsDBCSDualByteAt(Sci::Position pos) const noexcept;
 	int DBCSDrawBytes(const char *text, size_t length) const noexcept;
