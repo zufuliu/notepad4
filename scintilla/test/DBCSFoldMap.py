@@ -12,9 +12,10 @@ def findCaseFoldBlock(encodingList):
 	for codePage in encodingList:
 		if isinstance(codePage, int):
 			decode = PlatformDecoder(codePage)
-			codePage = f'cp{codePage}'
+			encode = PlatformEncoder(codePage)
 		else:
 			decode = codecs.getdecoder(codePage)
+			encode = codecs.getencoder(codePage)
 		for ch in range(DBCSMinCharacter, DBCSCharacterCount):
 			buf = bytes([ch >> 8, ch & 0xff])
 			try:
@@ -24,15 +25,20 @@ def findCaseFoldBlock(encodingList):
 			uch = result[0]
 			if len(uch) == 1 and result[1] == len(buf):
 				fold = uch.casefold()
-				if uch != fold:
-					foldSet[ch] = 1
-				if len(fold) != 1:
+				if uch == fold:
+					continue
+				back = False
+				try:
+					result = encode(fold)
+					buf = result[0]
+					if len(buf) == 2 and result[1] == len(fold) and buf[0] >= DBCSMinLeadByte and buf[1] >= DBCSMinTrailByte:
+						foldSet[ch] = 1
+						back = True
+				except UnicodeEncodeError:
+					pass
+				if len(fold) > 1:
 					text = f'{ch:04X}'
-					try:
-						fold.encode(codePage)
-						multiFold.append((codePage, text, uch, fold, len(fold), True))
-					except UnicodeEncodeError:
-						multiFold.append((codePage, text, uch, fold, len(fold), False))
+					multiFold.append((codePage, text, uch, fold, len(fold), back))
 
 	foldCount = 0
 	leadCount = {}

@@ -500,7 +500,10 @@ def buildDBCSIndexTable(indexTable, result, encodingList, showDiff=False):
 	codePage = encodingList[0]
 	diffCount = 0
 	wordCount = 0
-	for ch in range(DBCSCharacterCount):
+	firstWord = 0
+	lastWord = 0
+
+	for ch in range(128, DBCSCharacterCount):
 		if 0xff < ch < DBCSMinCharacter:
 			continue
 		values = result[ch]
@@ -517,19 +520,25 @@ def buildDBCSIndexTable(indexTable, result, encodingList, showDiff=False):
 		if len(diff) < 2 or (len(diff) == 2 and cjkPrivate in diff and cjkLetter in diff):
 			if cc == CharacterClass.Word:
 				wordCount += 1
+				lastWord = ch
+				if not firstWord:
+					firstWord = ch
 			indexTable[ch] = int(cc)
 			continue
 
 		cc, assigned, detail = getDBCSPreferredClass(diff, showDiff)
 		if cc == CharacterClass.Word:
 			wordCount += 1
+			lastWord = ch
+			if not firstWord:
+				firstWord = ch
 		if len(assigned) > 1:
 			diffCount += 1
 			if showDiff:
 				print(f'{codePage} {ch:04X}: {detail} => {cc.name}')
 		indexTable[ch] = int(cc)
 
-	print(f'{codePage} character diff count: {diffCount}, word count: {wordCount}')
+	print(f'{codePage} character diff count: {diffCount}, word count: {wordCount} [{firstWord:04X}, {lastWord:04X}]/{lastWord - firstWord + 1}')
 
 def makeDBCSCharClassifyTable(output, filename, encodingList, isReservedOrUDC=None):
 	result = {}
@@ -538,7 +547,7 @@ def makeDBCSCharClassifyTable(output, filename, encodingList, isReservedOrUDC=No
 			decode = PlatformDecoder(codePage)
 		else:
 			decode = codecs.getdecoder(codePage)
-		for ch in range(DBCSCharacterCount):
+		for ch in range(128, DBCSCharacterCount):
 			if 0xff < ch < DBCSMinCharacter:
 				continue
 			cc = getDBCSCharClassify(decode, ch, isReservedOrUDC)
