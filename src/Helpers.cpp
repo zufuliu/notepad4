@@ -1006,37 +1006,29 @@ void ResizeDlg_Size(HWND hwnd, const RESIZEDLG *pm, int dx, int dy) noexcept {
 		DWORD flags = SWP_NOZORDER;
 
 		definition >>= 16;
-		switch (definition & RESIZE_MOVE_MASK) {
-		case RESIZE_MOVE_X:
-			x += dx;
-			break;
-		case RESIZE_MOVE_Y:
-			y += dy;
-			break;
-		case RESIZE_MOVE_XY:
-			x += dx;
-			y += dy;
-			break;
-		default:
+		unsigned mask = definition & RESIZE_MOVE_MASK;
+		if (mask == 0) {
 			flags |= SWP_NOMOVE;
-			break;
+		} else {
+			if (mask & RESIZE_MOVE_X) {
+				x += dx;
+			}
+			if (mask & RESIZE_MOVE_Y) {
+				y += dy;
+			}
 		}
 
 		definition >>= 4;
-		switch (definition & RESIZE_SIZE_MASK) {
-		case RESIZE_SIZE_X:
-			cx += dx;
-			break;
-		case RESIZE_SIZE_Y:
-			cy += dy;
-			break;
-		case RESIZE_SIZE_XY:
-			cx += dx;
-			cy += dy;
-			break;
-		default:
+		mask = definition & RESIZE_SIZE_MASK;
+		if (mask == 0) {
 			flags |= SWP_NOSIZE;
-			break;
+		} else {
+			if (mask & RESIZE_SIZE_X) {
+				cx += dx;
+			}
+			if (mask & RESIZE_SIZE_Y) {
+				cy += dy;
+			}
 		}
 
 		hdwp = DeferWindowPos(hdwp, hwndCtl, nullptr, x, y, cx, cy, flags);
@@ -1201,7 +1193,8 @@ void ResizeDlg_InitEx(HWND hwnd, int *cxFrame, int *cyFrame, const DWORD *contro
 	}
 
 	pm->controlCount = LOWORD(controlCount);
-	if (HIWORD(controlCount) != 0) {
+	controlCount >>= 16;
+	if (controlCount != 0) {
 		const DWORD nCtlId = pm->controlDefinition[pm->controlCount];
 		GetWindowRect(GetDlgItem(hwnd, LOWORD(nCtlId)), &rc);
 		pm->itemMinSize[0] = rc.bottom - rc.top;

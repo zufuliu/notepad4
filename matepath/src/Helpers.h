@@ -412,14 +412,14 @@ void SetDlgPos(HWND hDlg, int xDlg, int yDlg) noexcept;
 // bit [16, 19]
 #define RESIZE_MOVE_NONE	0
 #define RESIZE_MOVE_X		1
-#define RESIZE_MOVE_Y		2
-#define RESIZE_MOVE_XY		3
+#define RESIZE_MOVE_Y		(1 << 1)
+#define RESIZE_MOVE_XY		(RESIZE_MOVE_X | RESIZE_MOVE_Y)
 #define RESIZE_MOVE_MASK	7
 // bit [20, 23]
 #define RESIZE_SIZE_NONE	0
 #define RESIZE_SIZE_X		1
-#define RESIZE_SIZE_Y		2
-#define RESIZE_SIZE_XY		3
+#define RESIZE_SIZE_Y		(1 << 1)
+#define RESIZE_SIZE_XY		(RESIZE_SIZE_X | RESIZE_SIZE_Y)
 #define RESIZE_SIZE_MASK	7
 // bit [24, ]
 #define RESIZE_INVALIDATE_RECT		(1 << 24)	// static label
