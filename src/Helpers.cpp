@@ -984,11 +984,40 @@ struct RESIZEDLG {
 	SIZE templateSize;
 	const DWORD *controlDefinition;
 	UINT controlCount;
+
+	DWORD controlY2;
+	int percent;
 	int itemMinSize[2];
 	int itemTemplateSize[2];
 };
 
 void ResizeDlg_Size(HWND hwnd, const RESIZEDLG *pm, int dx, int dy) noexcept {
+	int delta1 = 0;
+	if (dy != 0 && pm->controlY2 != 0) {
+		const DWORD nCtlId = pm->controlY2;
+		RECT rc;
+		GetWindowRect(GetDlgItem(hwnd, LOWORD(nCtlId)), &rc);
+		const int size1 = rc.bottom - rc.top;
+		GetWindowRect(GetDlgItem(hwnd, HIWORD(nCtlId)), &rc);
+		const int size2 = rc.bottom - rc.top;
+		// calculate with total size instead of current size delta to avoid accumulated round off
+		const int total = dy + size1 + size2;
+		delta1 = MulDiv(total, pm->percent, 100);
+		// ensure control with smaller percent not got sized down to it's minimize size
+		if (pm->percent >= 50) {
+			const int minSize2 = pm->itemMinSize[1];
+			delta1 = max(total - delta1, minSize2) - size2;
+			delta1 = dy - delta1;
+		} else {
+			const int minSize1 = pm->itemMinSize[0];
+			delta1 = max(delta1, minSize1) - size1;
+		}
+		// const int delta2 = dy - delta1, minSize1 = pm->itemMinSize[0], minSize2 = pm->itemMinSize[1];
+		// if (delta1 + size1 < minSize1 || delta2 + size2 < minSize2)
+		// printf("delta: (%d, %d) => (%d, %d, %d/%d), (%d, %d, %d/%d)\n", dy, pm->percent,
+		// 	delta1, size1, size1 + delta1, minSize1, delta2, size2, size2 + delta2, minSize2);
+	}
+
 	HDWP hdwp = BeginDeferWindowPos(pm->controlCount);
 	UINT index = 0;
 	HWND hwndLV = nullptr;
@@ -1013,8 +1042,14 @@ void ResizeDlg_Size(HWND hwnd, const RESIZEDLG *pm, int dx, int dy) noexcept {
 			if (mask & RESIZE_MOVE_X) {
 				x += dx;
 			}
-			if (mask & RESIZE_MOVE_Y) {
+			mask >>= 1;
+			switch (mask) {
+			case (RESIZE_MOVE_Y >> 1):
 				y += dy;
+				break;
+			case (RESIZE_MOVE_Y1 >> 1):
+				y += delta1;
+				break;
 			}
 		}
 
@@ -1026,8 +1061,17 @@ void ResizeDlg_Size(HWND hwnd, const RESIZEDLG *pm, int dx, int dy) noexcept {
 			if (mask & RESIZE_SIZE_X) {
 				cx += dx;
 			}
-			if (mask & RESIZE_SIZE_Y) {
+			mask >>= 1;
+			switch (mask) {
+			case (RESIZE_SIZE_Y >> 1):
 				cy += dy;
+				break;
+			case (RESIZE_SIZE_Y1 >> 1):
+				cy += delta1;
+				break;
+			case (RESIZE_SIZE_Y2 >> 1):
+				cy += dy - delta1;
+				break;
 			}
 		}
 
@@ -1074,7 +1118,7 @@ static LRESULT CALLBACK ResizeDlg_Proc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 		const int cy = HIWORD(lParam);
 		const int dx = cx - pm->client.cx;
 		const int dy = cy - pm->client.cy;
-		lParam = MAKELPARAM(dx, dy); // unpack with GET_X_LPARAM() and GET_Y_LPARAM()
+		// lParam = MAKELPARAM(dx, dy); // unpack with GET_X_LPARAM() and GET_Y_LPARAM()
 		pm->client.cx = cx;
 		pm->client.cy = cy;
 		if (pm->dpiChanged) {
@@ -1083,7 +1127,7 @@ static LRESULT CALLBACK ResizeDlg_Proc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 			pm->dpiChanged = FALSE;
 			return TRUE;
 		}
-		if (pm->controlCount != 0) {
+		/*if (pm->controlCount != 0)*/ {
 			ResizeDlg_Size(hwnd, pm, dx, dy);
 			return TRUE;
 		}
@@ -1144,7 +1188,7 @@ static LRESULT CALLBACK ResizeDlg_Proc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 			*pm->cyFrame = (cy <= pm->templateSize.cy) ? 0 : cy;
 		}
 		RemoveWindowSubclass(hwnd, ResizeDlg_Proc, uIdSubclass);
-		RemoveProp(hwnd, RESIZEDLG_PROP_KEY);
+		// RemoveProp(hwnd, RESIZEDLG_PROP_KEY);
 		NP2HeapFree(pm);
 	} break;
 
@@ -1196,6 +1240,8 @@ void ResizeDlg_InitEx(HWND hwnd, int *cxFrame, int *cyFrame, const DWORD *contro
 	controlCount >>= 16;
 	if (controlCount != 0) {
 		const DWORD nCtlId = pm->controlDefinition[pm->controlCount];
+		pm->controlY2 = nCtlId;
+		pm->percent = controlCount;
 		GetWindowRect(GetDlgItem(hwnd, LOWORD(nCtlId)), &rc);
 		pm->itemMinSize[0] = rc.bottom - rc.top;
 		pm->itemTemplateSize[0] = MulDiv(pm->itemMinSize[0], DlgBaseUnit.cy, baseUnit.cy);
@@ -1204,7 +1250,7 @@ void ResizeDlg_InitEx(HWND hwnd, int *cxFrame, int *cyFrame, const DWORD *contro
 		pm->itemTemplateSize[1] = MulDiv(pm->itemMinSize[1], DlgBaseUnit.cy, baseUnit.cy);
 	}
 
-	SetProp(hwnd, RESIZEDLG_PROP_KEY, pm);
+	// SetProp(hwnd, RESIZEDLG_PROP_KEY, pm);
 	SetWindowSubclass(hwnd, ResizeDlg_Proc, 0, AsInteger<DWORD_PTR>(pm));
 
 	SetWindowPos(hwnd, nullptr, 0, 0, cx, cy, SWP_NOZORDER | SWP_NOMOVE);
@@ -1219,28 +1265,6 @@ void ResizeDlg_InitEx(HWND hwnd, int *cxFrame, int *cyFrame, const DWORD *contro
 	HWND hwndCtl = GetDlgItem(hwnd, LOWORD(pm->controlDefinition[0]));
 	const int cGrip = SystemMetricsForDpi(SM_CXHTHUMB, pm->dpi);
 	SetWindowPos(hwndCtl, nullptr, pm->client.cx - cGrip, pm->client.cy - cGrip, cGrip, cGrip, SWP_NOZORDER);
-}
-
-int ResizeDlg_CalcDeltaEx(HWND hwnd, int dy, int cy, DWORD nCtlId) noexcept {
-	if (dy >= 0) {
-		return MulDiv(dy, cy, 100);
-	}
-
-	const RESIZEDLG * const pm = static_cast<RESIZEDLG *>(GetProp(hwnd, RESIZEDLG_PROP_KEY));
-	RECT rc;
-	GetWindowRect(GetDlgItem(hwnd, LOWORD(nCtlId)), &rc);
-	const int h1 = rc.bottom - rc.top;
-	GetWindowRect(GetDlgItem(hwnd, HIWORD(nCtlId)), &rc);
-	const int h2 = rc.bottom - rc.top;
-	const int hMin1 = pm->itemMinSize[0];
-	const int hMin2 = pm->itemMinSize[1];
-	// cy + h1 >= hMin1			cy >= hMin1 - h1
-	// dy - cy + h2 >= hMin2	cy <= dy + h2 - hMin2
-	const int cyMin = hMin1 - h1;
-	const int cyMax = dy + h2 - hMin2;
-	cy = dy - MulDiv(dy, 100 - cy, 100);
-	cy = clamp(cy, cyMin, cyMax);
-	return cy;
 }
 
 HDWP DeferCtlPos(HDWP hdwp, HWND hwndDlg, int nCtlId, int dx, int dy, UINT uFlags) noexcept {

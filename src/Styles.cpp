@@ -4185,6 +4185,24 @@ static void Style_ResetStyle(LPCEDITLEXER pLex, EDITSTYLE *pStyle) noexcept {
 static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	static const DWORD controlDefinition[] = {
 		DeferCtlMove(IDC_RESIZEGRIP3),
+		DeferCtlMove(IDOK),
+		DeferCtlMove(IDCANCEL),
+		DeferCtlSizeY(IDC_STYLELIST),
+		DeferCtlSizeX(IDC_INFO_GROUPBOX),
+		DeferCtlSizeX(IDC_STYLEEDIT_HELP),
+		DeferCtlSizeXY1(IDC_STYLEEDIT),
+		DeferCtlMoveY1(IDC_STYLELABEL_DEFAULT),
+		DeferCtlMoveY1SizeXY2(IDC_STYLEVALUE_DEFAULT),
+		DeferCtlMove(IDC_STYLEFORE),
+		DeferCtlMove(IDC_STYLEBACK),
+		DeferCtlMove(IDC_STYLEFONT),
+		DeferCtlMove(IDC_PREVIEW),
+		DeferCtlMove(IDC_STYLEDEFAULT),
+		DeferCtlMove(IDC_PREVSTYLE),
+		DeferCtlMove(IDC_NEXTSTYLE),
+		DeferCtlMoveY(IDC_IMPORT),
+		DeferCtlMoveY(IDC_EXPORT),
+		DeferCtlMoveY(IDC_RESETALL),
 		MAKELONG(IDC_STYLEEDIT, IDC_STYLEVALUE_DEFAULT),
 	};
 
@@ -4199,7 +4217,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		ResizeDlg_InitY2(hwnd, &positionRecord.cxStyleCustomizeDlg, &positionRecord.cyStyleCustomizeDlg, controlDefinition, 0, 50);
+		ResizeDlg_InitY2(hwnd, &positionRecord.cxStyleCustomizeDlg, &positionRecord.cyStyleCustomizeDlg, controlDefinition, COUNTOF(controlDefinition) - 1, 50);
 
 		WCHAR szTitle[1024];
 		const UINT idsTitle = (np2StyleTheme == StyleTheme_Dark) ? IDS_CONFIG_THEME_TITLE_DARK : IDS_CONFIG_THEME_TITLE_DEFAULT;
@@ -4248,34 +4266,6 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 		DeleteBitmapButton(hwnd, IDC_NEXTSTYLE);
 	}
 	return FALSE;
-
-	case WM_SIZE: {
-		const int dx = GET_X_LPARAM(lParam);
-		const int dy = GET_Y_LPARAM(lParam);
-		const int cy = ResizeDlg_CalcDeltaY2(hwnd, dy, 50, IDC_STYLEEDIT, IDC_STYLEVALUE_DEFAULT);
-		HDWP hdwp = BeginDeferWindowPos(19);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP3, dx, dy, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, dy, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDCANCEL, dx, dy, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_STYLELIST, 0, dy, SWP_NOMOVE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_INFO_GROUPBOX, dx, 0, SWP_NOMOVE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_STYLEEDIT_HELP, dx, 0, SWP_NOMOVE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_STYLEEDIT, dx, cy, SWP_NOMOVE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_STYLELABEL_DEFAULT, 0, cy, SWP_NOSIZE);
-		hdwp = DeferCtlPosEx(hdwp, hwnd, IDC_STYLEVALUE_DEFAULT, 0, cy, dx, dy - cy);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_STYLEFORE, dx, dy, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_STYLEBACK, dx, dy, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_STYLEFONT, dx, dy, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_PREVIEW, dx, dy, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_STYLEDEFAULT, dx, dy, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_PREVSTYLE, dx, dy, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_NEXTSTYLE, dx, dy, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_IMPORT, 0, dy, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_EXPORT, 0, dy, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESETALL, 0, dy, SWP_NOSIZE);
-		EndDeferWindowPos(hdwp);
-	}
-	return TRUE;
 
 	case WM_NOTIFY:
 		if (AsPointer<LPNMHDR>(lParam)->idFrom == IDC_STYLELIST) {

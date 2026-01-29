@@ -6100,6 +6100,21 @@ bool EditLineNumDlg(HWND hwnd) noexcept {
 static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	static const DWORD controlDefinition[] = {
 		DeferCtlMove(IDC_RESIZEGRIP2),
+		DeferCtlMove(IDOK),
+		DeferCtlMove(IDCANCEL),
+		DeferCtlSizeXY1(IDC_MODIFY_LINE_PREFIX),
+		DeferCtlMoveY1(IDC_MODIFY_LINE_TIP2),
+		DeferCtlMoveY1SizeXY2(IDC_MODIFY_LINE_APPEND),
+		DeferCtlMoveY(IDC_MODIFY_LINE_SKIP_EMPTY),
+		DeferCtlMoveY(IDC_MODIFY_LINE_DLN_NP),
+		DeferCtlMoveY(IDC_MODIFY_LINE_DLN_ZP),
+		DeferCtlMoveY(IDC_MODIFY_LINE_TIP_DLN),
+		DeferCtlMoveY(IDC_MODIFY_LINE_CN_NP),
+		DeferCtlMoveY(IDC_MODIFY_LINE_CN_ZP),
+		DeferCtlMoveY(IDC_MODIFY_LINE_TIP_CN),
+		DeferCtlMoveY(IDC_MODIFY_LINE_ZCN_NP),
+		DeferCtlMoveY(IDC_MODIFY_LINE_ZCN_ZP),
+		DeferCtlMoveY(IDC_MODIFY_LINE_TIP_ZCN),
 		MAKELONG(IDC_MODIFY_LINE_PREFIX, IDC_MODIFY_LINE_APPEND),
 	};
 
@@ -6110,7 +6125,7 @@ static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		ResizeDlg_InitY2(hwnd, &positionRecord.cxModifyLinesDlg, &positionRecord.cyModifyLinesDlg, controlDefinition, 0, 50);
+		ResizeDlg_InitY2(hwnd, &positionRecord.cxModifyLinesDlg, &positionRecord.cyModifyLinesDlg, controlDefinition, COUNTOF(controlDefinition) - 1, 50);
 
 		id_hover = 0;
 		id_capture = 0;
@@ -6135,31 +6150,6 @@ static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 	case WM_DESTROY:
 		DeleteObject(hFontHover);
 		return FALSE;
-
-	case WM_SIZE: {
-		const int dx = GET_X_LPARAM(lParam);
-		const int dy = GET_Y_LPARAM(lParam);
-		const int cy = ResizeDlg_CalcDeltaY2(hwnd, dy, 50, IDC_MODIFY_LINE_PREFIX, IDC_MODIFY_LINE_APPEND);
-		HDWP hdwp = BeginDeferWindowPos(15);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP2, dx, dy, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, dy, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDCANCEL, dx, dy, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_PREFIX, dx, cy, SWP_NOMOVE);
-		hdwp = DeferCtlPosEx(hdwp, hwnd, IDC_MODIFY_LINE_APPEND, 0, cy, dx, dy - cy);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_TIP2, 0, cy, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_SKIP_EMPTY, 0, dy, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_DLN_NP, 0, dy, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_DLN_ZP, 0, dy, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_TIP_DLN, 0, dy, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_CN_NP, 0, dy, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_CN_ZP, 0, dy, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_TIP_CN, 0, dy, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_ZCN_NP, 0, dy, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_ZCN_ZP, 0, dy, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_TIP_ZCN, 0, dy, SWP_NOSIZE);
-		EndDeferWindowPos(hdwp);
-	}
-	return TRUE;
 
 	case WM_NCACTIVATE:
 		if (!wParam) {
@@ -6344,35 +6334,26 @@ bool EditAlignDlg(HWND hwnd, EditAlignMode *piAlignMode) noexcept {
 //
 //
 static INT_PTR CALLBACK EditEncloseSelectionDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
+	UNREFERENCED_PARAMETER(lParam);
 	static const DWORD controlDefinition[] = {
 		DeferCtlMove(IDC_RESIZEGRIP2),
+		DeferCtlMove(IDOK),
+		DeferCtlMove(IDCANCEL),
+		DeferCtlSizeXY1(IDC_MODIFY_LINE_PREFIX),
+		DeferCtlMoveY1(IDC_MODIFY_LINE_TIP2),
+		DeferCtlMoveY1SizeXY2(IDC_MODIFY_LINE_APPEND),
 		MAKELONG(IDC_MODIFY_LINE_PREFIX, IDC_MODIFY_LINE_APPEND),
 	};
 
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		ResizeDlg_InitY2(hwnd, &positionRecord.cxEncloseSelectionDlg, &positionRecord.cyEncloseSelectionDlg, controlDefinition, 0, 50);
+		ResizeDlg_InitY2(hwnd, &positionRecord.cxEncloseSelectionDlg, &positionRecord.cyEncloseSelectionDlg, controlDefinition, COUNTOF(controlDefinition) - 1, 50);
 
 		MultilineEditSetup(hwnd, IDC_MODIFY_LINE_PREFIX);
 		SetDlgItemText(hwnd, IDC_MODIFY_LINE_PREFIX, wchPrefixSelection);
 		MultilineEditSetup(hwnd, IDC_MODIFY_LINE_APPEND);
 		SetDlgItemText(hwnd, IDC_MODIFY_LINE_APPEND, wchAppendSelection);
 		CenterDlgInParent(hwnd);
-	}
-	return TRUE;
-
-	case WM_SIZE: {
-		const int dx = GET_X_LPARAM(lParam);
-		const int dy = GET_Y_LPARAM(lParam);
-		const int cy = ResizeDlg_CalcDeltaY2(hwnd, dy, 50, IDC_MODIFY_LINE_PREFIX, IDC_MODIFY_LINE_APPEND);
-		HDWP hdwp = BeginDeferWindowPos(6);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP2, dx, dy, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, dy, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDCANCEL, dx, dy, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_PREFIX, dx, cy, SWP_NOMOVE);
-		hdwp = DeferCtlPosEx(hdwp, hwnd, IDC_MODIFY_LINE_APPEND, 0, cy, dx, dy - cy);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_TIP2, 0, cy, SWP_NOSIZE);
-		EndDeferWindowPos(hdwp);
 	}
 	return TRUE;
 
@@ -6413,14 +6394,20 @@ void EditEncloseSelectionDlg(HWND hwnd) noexcept {
 //
 //
 static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
+	UNREFERENCED_PARAMETER(lParam);
 	static const DWORD controlDefinition[] = {
 		DeferCtlMove(IDC_RESIZEGRIP2),
+		DeferCtlMove(IDOK),
+		DeferCtlMove(IDCANCEL),
+		DeferCtlSizeXY1(IDC_MODIFY_LINE_PREFIX),
+		DeferCtlMoveY1(IDC_MODIFY_LINE_TIP2),
+		DeferCtlMoveY1SizeXY2(IDC_MODIFY_LINE_APPEND),
 		MAKELONG(IDC_MODIFY_LINE_PREFIX, IDC_MODIFY_LINE_APPEND),
 	};
 
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		ResizeDlg_InitY2(hwnd, &positionRecord.cxInsertTagDlg, &positionRecord.cyInsertTagDlg, controlDefinition, 0, 75);
+		ResizeDlg_InitY2(hwnd, &positionRecord.cxInsertTagDlg, &positionRecord.cyInsertTagDlg, controlDefinition, COUNTOF(controlDefinition) - 1, 75);
 
 		MultilineEditSetup(hwnd, IDC_MODIFY_LINE_PREFIX);
 		MultilineEditSetup(hwnd, IDC_MODIFY_LINE_APPEND);
@@ -6432,21 +6419,6 @@ static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam
 		CenterDlgInParent(hwnd);
 	}
 	return FALSE;
-
-	case WM_SIZE: {
-		const int dx = GET_X_LPARAM(lParam);
-		const int dy = GET_Y_LPARAM(lParam);
-		const int cy = ResizeDlg_CalcDeltaY2(hwnd, dy, 75, IDC_MODIFY_LINE_PREFIX, IDC_MODIFY_LINE_APPEND);
-		HDWP hdwp = BeginDeferWindowPos(6);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP2, dx, dy, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, dy, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDCANCEL, dx, dy, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_PREFIX, dx, cy, SWP_NOMOVE);
-		hdwp = DeferCtlPosEx(hdwp, hwnd, IDC_MODIFY_LINE_APPEND, 0, cy, dx, dy - cy);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_TIP2, 0, cy, SWP_NOSIZE);
-		EndDeferWindowPos(hdwp);
-	}
-	return TRUE;
 
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
