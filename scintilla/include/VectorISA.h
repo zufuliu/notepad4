@@ -4,9 +4,11 @@
 
 #if defined(__clang__)
 #define NP2_align_up(value, alignment)		__builtin_align_up(value, alignment)
+#define NP2_align_down(value, alignment)	__builtin_align_down(value, alignment)
 #define NP2_is_aligned(value, alignment)	__builtin_is_aligned(value, alignment)
 #else
 #define NP2_align_up(value, alignment)		(((value) + (alignment) - 1) & ~((alignment) - 1))
+#define NP2_align_down(value, alignment)	((value) & ~((alignment) - 1))
 #define NP2_is_aligned(value, alignment)	(((value) & ((alignment) - 1)) == 0)
 #endif
 

@@ -3128,9 +3128,51 @@ CaseFolderDBCS::CaseFolderDBCS(int codePage, const DBCSCharClassify *dbcsCharCla
 #endif
 	}
 
-	const uint8_t * const charClass = dbcsCharClass->GetClassifyMap();
 	constexpr uint32_t minIndex = DBCSIndex(minLeadByte, minTrailByte);
 	constexpr uint32_t maxIndex = DBCSIndex(maxLeadByte, maxTrailByte) + 1;
+#if NP2_USE_SSE2
+	constexpr uint32_t offset = NP2_align_down(minIndex, sizeof(__m128i));
+	constexpr uint32_t count = NP2_align_up(maxIndex - offset, sizeof(__m128i)) / sizeof(__m128i);
+	const __m128i * const charClass = reinterpret_cast<const __m128i *>(dbcsCharClass->GetClassifyMap() + offset);
+	const __m128i mmWord = _mm_set1_epi8(static_cast<char>(CharacterClass::word));
+
+	for (uint32_t index = 0; index < count; index++) {
+		uint32_t mask = mm_movemask_epi8(_mm_cmpeq_epi8(_mm_loadu_si128(charClass + index), mmWord));
+		if (mask != 0) [[unlikely]] {
+			char *chars = reinterpret_cast<char *>(&foldingMap[offset + index*sizeof(__m128i)]);
+			// const uint32_t trailing = np2::ctz(mask);
+			// chars += trailing * sizeof(uint16_t);
+			// mask >>= trailing;
+			do {
+				if (mask & 1) {
+					wchar_t codePoint[2]{};
+					const int lenUni = ::MultiByteToWideChar(codePage, MB_ERR_INVALID_CHARS, chars, 2, codePoint, _countof(codePoint));
+					if (lenUni == 1) {
+						// DBCS pair must produce a single Unicode BMP code point
+						// Could create a DBCS -> Unicode conversion map here
+						const char *foldedUTF8 = CaseConvert(codePoint[0], CaseConversion::fold);
+						if (foldedUTF8) {
+							wchar_t wFolded[safeFoldingSize];
+							const size_t charsConverted = UTF16FromUTF8(foldedUTF8, wFolded, std::size(wFolded));
+							char back[safeFoldingSize];
+							const int lengthBack = MultiByteFromWideChar(codePage, std::wstring_view(wFolded, charsConverted),
+								back, std::size(back));
+							if (lengthBack == 2) {
+								// Only allow cases where input length and folded length are both 2
+								memcpy(chars, back, 2);
+								// ++total;
+							}
+						}
+					}
+				}
+				chars += sizeof(uint16_t);
+				mask >>= 1;
+			} while (mask != 0);
+		}
+	}
+	// end NP2_USE_SSE2
+#else
+	const uint8_t * const charClass = dbcsCharClass->GetClassifyMap();
 	for (uint32_t index = minIndex; index < maxIndex; index++) {
 		// skip case insensitive control, space, punctuation, CJK and private character
 		if (charClass[index] == static_cast<uint8_t>(CharacterClass::word)) {
@@ -3156,6 +3198,7 @@ CaseFolderDBCS::CaseFolderDBCS(int codePage, const DBCSCharClassify *dbcsCharCla
 			}
 		}
 	}
+#endif
 
 	// const double duration = period.Duration()*1e3;
 	// printf("%s(%d) duration=%.6f\n", __func__, codePage, duration);
