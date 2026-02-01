@@ -27,10 +27,10 @@ jobs:
 
     - name: MSVC ${{ matrix.configuration }} Release
       run: |
-        CALL "build\VisualStudio\build.bat" Build ${{ matrix.configuration }} Release 1
-        CALL "locale\build.bat" Build ${{ matrix.configuration }} Release 1
-        CALL "build\make_zip.bat" MSVC ${{ matrix.configuration }} Release Locale 1
-        $platform = "${{ matrix.configuration }}"
+        CALL "build\VisualStudio\build.bat" Build ${{ matrix.platform }} ${{ matrix.configuration }} 1
+        CALL "locale\build.bat" Build ${{ matrix.platform }} ${{ matrix.configuration }} 1
+        CALL "build\make_zip.bat" MSVC ${{ matrix.platform }} ${{ matrix.configuration }} Locale 1
+        $platform = "${{ matrix.platform }}"
         $version = if ("${{ github.ref }}" -like "refs/tags/*") { "${{ github.ref_name }}" } else { "dev" }
         $outputFile = "Notepad4-${version}-${platform}.exe"
         makensis /DVERSION="$version" /DARCH="$platform" /DOUTPUT_FILE="$outputFile" build\Notepad4.nsi
@@ -84,10 +84,10 @@ jobs:
       run: |
         CALL "build\install_llvm.bat" latest 1
 
-    - name: Clang ${{ matrix.configuration }} Release
+    - name: Clang ${{ matrix.platform }} Release
       run: |
-        CALL "build\VisualStudio\build.bat" Build ${{ matrix.configuration }} LLVMRelease 1
-        CALL "build\make_zip.bat" LLVM ${{ matrix.configuration }} Release 1
+        CALL "build\VisualStudio\build.bat" Build ${{ matrix.platform }} LLVMRelease 1
+        CALL "build\make_zip.bat" LLVM ${{ matrix.platform }} ${{ matrix.configuration }} 1
 
     - uses: actions/upload-artifact@v5
       with:
@@ -117,7 +117,10 @@ jobs:
   llvm_mingw:
     name: llvm-mingw
     runs-on: windows-latest
-    
+    strategy:
+      matrix:
+        platform: [Win32, x64, ARM64, AVX2, AVX512]
+        configuration: [Release]
     continue-on-error: true
     steps:
     - uses: actions/checkout@v6
@@ -130,30 +133,10 @@ jobs:
       run: |
         CALL "build\install_mingw.bat" llvm
 
-    - name: Clang x64 Release
+    - name: Clang ${{ matrix.platform }} Release
       run: |
         CALL "build\mingw\build.bat" llvm x86_64
-        CALL "build\make_zip.bat" Clang x64 Release 1
-
-    - name: Clang Win32 Release
-      run: |
-        CALL "build\mingw\build.bat" llvm i686
-        CALL "build\make_zip.bat" Clang Win32 Release 1
-
-    - name: Clang AVX2 Release
-      run: |
-        CALL "build\mingw\build.bat" llvm AVX2
-        CALL "build\make_zip.bat" Clang AVX2 Release 1
-
-    - name: Clang AVX512 Release
-      run: |
-        CALL "build\mingw\build.bat" llvm AVX512
-        CALL "build\make_zip.bat" Clang AVX512 Release 1
-
-    - name: Clang ARM64 Release
-      run: |
-        CALL "build\mingw\build.bat" llvm aarch64
-        CALL "build\make_zip.bat" Clang ARM64 Release 1
+        CALL "build\make_zip.bat" Clang ${{ matrix.platform }} ${{ matrix.configuration }} 1
 
     - uses: actions/upload-artifact@v5
       with:
@@ -183,6 +166,10 @@ jobs:
   gcc_ucrt:
     name: ucrt GCC and Clang
     runs-on: windows-latest
+    strategy:
+      matrix:
+        platform: [Win32, x64, ARM64, AVX2, AVX512]
+        configuration: [Release]
     steps:
     - uses: actions/checkout@v6
 
@@ -194,35 +181,10 @@ jobs:
       run: |
         CALL "build\install_mingw.bat" ucrt
 
-    - name: GCC x64 Release
+    - name: GCC ${{ matrix.platform }} Release
       run: |
         CALL "build\mingw\build.bat" ucrt
-        CALL "build\make_zip.bat" GCC x64 Release 1
-
-    - name: GCC AVX2 Release
-      run: |
-        CALL "build\mingw\build.bat" ucrt AVX2
-        CALL "build\make_zip.bat" GCC AVX2 Release 1
-
-    - name: GCC AVX512 Release
-      run: |
-        CALL "build\mingw\build.bat" ucrt AVX512
-        CALL "build\make_zip.bat" GCC AVX512 Release 1
-
-    - name: Clang x64 Release
-      run: |
-        CALL "build\mingw\build.bat" ucrt Clang
-        CALL "build\make_zip.bat" Clang x64 Release 1
-
-    - name: Clang AVX2 Release
-      run: |
-        CALL "build\mingw\build.bat" ucrt AVX2 Clang
-        CALL "build\make_zip.bat" Clang AVX2 Release 1
-
-    - name: Clang AVX512 Release
-      run: |
-        CALL "build\mingw\build.bat" ucrt AVX512 Clang
-        CALL "build\make_zip.bat" Clang AVX512 Release 1
+        CALL "build\make_zip.bat" GCC ${{ matrix.platform }} ${{ matrix.configuration }} 1
 
     - uses: actions/upload-artifact@v5
       with:
@@ -257,6 +219,10 @@ jobs:
   gcc_x86_64:
     name: 64-bit GCC and Clang
     runs-on: windows-latest
+    strategy:
+      matrix:
+        platform: [Win32, x64, AVX2, AVX512]
+        configuration: [Release]
     steps:
     - uses: actions/checkout@v6
 
@@ -268,35 +234,10 @@ jobs:
       run: |
         CALL "build\install_mingw.bat" x86_64
 
-    - name: GCC x64 Release
+    - name: GCC ${{ matrix.platform }} Release
       run: |
         CALL "build\mingw\build.bat" x86_64
-        CALL "build\make_zip.bat" GCC x64 Release 1
-
-    - name: GCC AVX2 Release
-      run: |
-        CALL "build\mingw\build.bat" x86_64 AVX2
-        CALL "build\make_zip.bat" GCC AVX2 Release 1
-
-    - name: GCC AVX512 Release
-      run: |
-        CALL "build\mingw\build.bat" x86_64 AVX512
-        CALL "build\make_zip.bat" GCC AVX512 Release 1
-
-    - name: Clang x64 Release
-      run: |
-        CALL "build\mingw\build.bat" x86_64 Clang
-        CALL "build\make_zip.bat" Clang x64 Release 1
-
-    - name: Clang AVX2 Release
-      run: |
-        CALL "build\mingw\build.bat" x86_64 AVX2 Clang
-        CALL "build\make_zip.bat" Clang AVX2 Release 1
-
-    - name: Clang AVX512 Release
-      run: |
-        CALL "build\mingw\build.bat" x86_64 AVX512 Clang
-        CALL "build\make_zip.bat" Clang AVX512 Release 1
+        CALL "build\make_zip.bat" GCC ${{ matrix.platform }} ${{ matrix.configuration }} 1
 
     - uses: actions/upload-artifact@v5
       with:
@@ -331,6 +272,7 @@ jobs:
   gcc_i686:
     name: 32-bit GCC and Clang
     runs-on: windows-latest
+    
     continue-on-error: true
     steps:
     - uses: actions/checkout@v6
