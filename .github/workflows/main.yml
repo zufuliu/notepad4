@@ -42,7 +42,7 @@ jobs:
 
     - uses: actions/upload-artifact@v5
       with:
-          name: Notepad4_MSVC_Installers
+          name: Notepad4_MSVC_Installers_${{ matrix.platform }}
           path: 'build/Notepad4-*.exe'
 
     - uses: actions/upload-artifact@v5
