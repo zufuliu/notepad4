@@ -65,18 +65,24 @@ Section "Notepad4 Main Program" SEC_MAIN
   File /r "bin\Release\${ARCH}\locale\*"
   SetOutPath "$INSTDIR"
   
-  ; Create desktop shortcut
-  CreateShortCut "$DESKTOP\${PRODUCT_NAME}.lnk" "$INSTDIR\Notepad4.exe"
-  
-  ; Create start menu shortcut
+  ; Create start menu folder
   CreateDirectory "$SMPROGRAMS\${PRODUCT_NAME}"
-  CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}\${PRODUCT_NAME}.lnk" "$INSTDIR\Notepad4.exe"
   CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}\Uninstall.lnk" "$INSTDIR\uninstall.exe"
   
   WriteRegStr HKCU "${PRODUCT_DIR_REGKEY}" "" "$INSTDIR\Notepad4.exe"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayName" "${PRODUCT_NAME}"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "UninstallString" "$INSTDIR\uninstall.exe"
   WriteUninstaller "$INSTDIR\uninstall.exe"
+SectionEnd
+
+Section "Create Desktop Shortcut" SEC_DESKTOP_SHORTCUT
+  ; Create desktop shortcut
+  CreateShortCut "$DESKTOP\${PRODUCT_NAME}.lnk" "$INSTDIR\Notepad4.exe"
+SectionEnd
+
+Section "Create Start Menu Shortcut" SEC_START_MENU_SHORTCUT
+  ; Create start menu shortcut
+  CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}\${PRODUCT_NAME}.lnk" "$INSTDIR\Notepad4.exe"
 SectionEnd
 
 
