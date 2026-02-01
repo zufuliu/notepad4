@@ -30,10 +30,15 @@ jobs:
         CALL "build\VisualStudio\build.bat" Build ${{ matrix.platform }} ${{ matrix.configuration }} 1
         CALL "locale\build.bat" Build ${{ matrix.platform }} ${{ matrix.configuration }} 1
         CALL "build\make_zip.bat" MSVC ${{ matrix.platform }} ${{ matrix.configuration }} Locale 1
+    
+    - name: MSVC ${{ matrix.configuration }} Installer build
+      shell: powershell
+      run: |
         $platform = "${{ matrix.platform }}"
         $version = if ("${{ github.ref }}" -like "refs/tags/*") { "${{ github.ref_name }}" } else { "dev" }
         $outputFile = "Notepad4-${version}-${platform}.exe"
         makensis /DVERSION="$version" /DARCH="$platform" /DOUTPUT_FILE="$outputFile" build\Notepad4.nsi
+
 
     - uses: actions/upload-artifact@v5
       with:
