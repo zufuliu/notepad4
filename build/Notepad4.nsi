@@ -72,6 +72,7 @@ Section "Notepad4 Main Program" SEC_MAIN
   WriteRegStr HKCU "${PRODUCT_DIR_REGKEY}" "" "$INSTDIR\Notepad4.exe"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayName" "${PRODUCT_NAME}"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "UninstallString" "$INSTDIR\uninstall.exe"
+  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayVersion" "${PRODUCT_VERSION}"
   WriteUninstaller "$INSTDIR\uninstall.exe"
 SectionEnd
 
