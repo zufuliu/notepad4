@@ -10,42 +10,35 @@ jobs:
   msvc2022:
     name: Visual C++ 2022
     runs-on: windows-2022
+    strategy:
+      matrix:
+        platform: [Win32, x64, ARM64, AVX2, AVX512]
+        configuration: [Release]
+
     steps:
     - uses: actions/checkout@v6
+
+    - name: Install NSIS
+      uses: negrutiu/nsis-install@v2
 
     - name: Update Version Hash
       run: |
         "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./matepath/src/VersionRev.h
 
-    - name: MSVC x64 Release
+    - name: MSVC ${{ matrix.configuration }} Release
       run: |
-        CALL "build\VisualStudio\build.bat" Build x64 Release 1
-        CALL "locale\build.bat" Build x64 Release 1
-        CALL "build\make_zip.bat" MSVC x64 Release Locale 1
+        CALL "build\VisualStudio\build.bat" Build ${{ matrix.configuration }} Release 1
+        CALL "locale\build.bat" Build ${{ matrix.configuration }} Release 1
+        CALL "build\make_zip.bat" MSVC ${{ matrix.configuration }} Release Locale 1
+        $platform = "${{ matrix.configuration }}"
+        $version = if ("${{ github.ref }}" -like "refs/tags/*") { "${{ github.ref_name }}" } else { "dev" }
+        $outputFile = "Notepad4-${version}-${platform}.exe"
+        makensis /DVERSION="$version" /DARCH="$platform" /DOUTPUT_FILE="$outputFile" build\Notepad4.nsi
 
-    - name: MSVC Win32 Release
-      run: |
-        CALL "build\VisualStudio\build.bat" Build Win32 Release 1
-        CALL "locale\build.bat" Build Win32 Release 1
-        CALL "build\make_zip.bat" MSVC Win32 Release Locale 1
-
-    - name: MSVC AVX2 Release
-      run: |
-        CALL "build\VisualStudio\build.bat" Build AVX2 Release 1
-        CALL "locale\build.bat" Build AVX2 Release 1
-        CALL "build\make_zip.bat" MSVC AVX2 Release Locale 1
-
-    - name: MSVC AVX512 Release
-      run: |
-        CALL "build\VisualStudio\build.bat" Build AVX512 Release 1
-        CALL "locale\build.bat" Build AVX512 Release 1
-        CALL "build\make_zip.bat" MSVC AVX512 Release Locale 1
-
-    - name: MSVC ARM64 Release
-      run: |
-        CALL "build\VisualStudio\build.bat" Build ARM64 Release 1
-        CALL "locale\build.bat" Build ARM64 Release 1
-        CALL "build\make_zip.bat" MSVC ARM64 Release Locale 1
+    - uses: actions/upload-artifact@v5
+      with:
+          name: Notepad4_MSVC_Installers
+          path: 'build/Notepad4-*.exe'
 
     - uses: actions/upload-artifact@v5
       with:
@@ -75,9 +68,14 @@ jobs:
   llvm_msvc2022:
     name: LLVM (Visual C++ 2022)
     runs-on: windows-2022
+
+    strategy:
+      matrix:
+        platform: [Win32, x64, ARM64, AVX2, AVX512]
+        configuration: [Release]
     steps:
     - uses: actions/checkout@v6
-
+    
     - name: Update Version Hash
       run: |
         "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./matepath/src/VersionRev.h
@@ -86,30 +84,10 @@ jobs:
       run: |
         CALL "build\install_llvm.bat" latest 1
 
-    - name: Clang x64 Release
+    - name: Clang ${{ matrix.configuration }} Release
       run: |
-        CALL "build\VisualStudio\build.bat" Build x64 LLVMRelease 1
-        CALL "build\make_zip.bat" LLVM x64 Release 1
-
-    - name: Clang Win32 Release
-      run: |
-        CALL "build\VisualStudio\build.bat" Build Win32 LLVMRelease 1
-        CALL "build\make_zip.bat" LLVM Win32 Release 1
-
-    - name: Clang AVX2 Release
-      run: |
-        CALL "build\VisualStudio\build.bat" Build AVX2 LLVMRelease 1
-        CALL "build\make_zip.bat" LLVM AVX2 Release 1
-
-    - name: Clang AVX512 Release
-      run: |
-        CALL "build\VisualStudio\build.bat" Build AVX512 LLVMRelease 1
-        CALL "build\make_zip.bat" LLVM AVX512 Release 1
-
-    - name: Clang ARM64 Release
-      run: |
-        CALL "build\VisualStudio\build.bat" Build ARM64 LLVMRelease 1
-        CALL "build\make_zip.bat" LLVM ARM64 Release 1
+        CALL "build\VisualStudio\build.bat" Build ${{ matrix.configuration }} LLVMRelease 1
+        CALL "build\make_zip.bat" LLVM ${{ matrix.configuration }} Release 1
 
     - uses: actions/upload-artifact@v5
       with:
@@ -139,6 +117,7 @@ jobs:
   llvm_mingw:
     name: llvm-mingw
     runs-on: windows-latest
+    
     continue-on-error: true
     steps:
     - uses: actions/checkout@v6
