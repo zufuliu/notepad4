@@ -37,7 +37,6 @@ jobs:
   llvm_msvc2022:
     name: LLVM (Visual C++ 2022)
     runs-on: windows-2022
-
     strategy:
       matrix:
         platform: [Win32, x64, ARM64, AVX2, AVX512]
