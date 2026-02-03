@@ -4389,23 +4389,6 @@ Sci::Position Editor::SearchText(
 	return pos;
 }
 
-std::string Editor::CaseMapString(const std::string &s, CaseMapping caseMapping) const {
-	std::string ret(s);
-	for (char &ch : ret) {
-		switch (caseMapping) {
-		case CaseMapping::upper:
-			ch = MakeUpperCase(ch);
-			break;
-		case CaseMapping::lower:
-			ch = MakeLowerCase(ch);
-			break;
-		default:	// no action
-			break;
-		}
-	}
-	return ret;
-}
-
 /**
  * Search for text in the target range of the document.
  * @return The position of the found text, -1 if not found.

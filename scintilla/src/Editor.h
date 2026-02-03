@@ -519,7 +519,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	enum class CaseMapping {
 		same, upper, lower
 	};
-	virtual std::string CaseMapString(const std::string &s, CaseMapping caseMapping) const;
+	virtual std::string CaseMapString(const std::string &s, CaseMapping caseMapping) const = 0;
 	void ChangeCaseOfSelection(CaseMapping caseMapping);
 	void LineDelete();
 	void LineTranspose();
