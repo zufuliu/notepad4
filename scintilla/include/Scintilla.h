@@ -784,6 +784,7 @@ typedef sptr_t (*SciFnDirectStatus)(sptr_t ptr, unsigned int iMessage, uptr_t wP
 #define SCI_LINEDUPLICATE 2404
 #define SCI_LOWERCASE 2340
 #define SCI_UPPERCASE 2341
+#define SCI_CUSTOMCASEMAPPING 2139
 #define SCI_LINESCROLLDOWN 2342
 #define SCI_LINESCROLLUP 2343
 #define SCI_DELETEBACKNOTLINE 2344

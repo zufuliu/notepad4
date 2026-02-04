@@ -2152,6 +2152,9 @@ fun void LowerCase=2340(,)
 # Transform the selection to upper case.
 fun void UpperCase=2341(,)
 
+# Transform the selection to custom case.
+fun void CustomCaseMapping=2139(int menu,)
+
 # Scroll the document down, keeping the caret visible.
 fun void LineScrollDown=2342(,)
 

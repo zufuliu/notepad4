@@ -145,7 +145,6 @@ bool	EditLoadFile(LPWSTR pszFile, EditFileIOStatus &status) noexcept;
 bool	EditSaveFile(HWND hwnd, LPCWSTR pszFile, int saveFlag, EditFileIOStatus &status) noexcept;
 
 void	EditReplaceMainSelection(Sci_Position cchText, LPCSTR pszText) noexcept;
-void	EditMapTextCase(int menu) noexcept;
 
 void	EditURLEncode(bool component) noexcept;
 void	EditURLDecode() noexcept;

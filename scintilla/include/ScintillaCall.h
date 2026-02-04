@@ -551,6 +551,7 @@ public:
 	void LineDuplicate();
 	void LowerCase();
 	void UpperCase();
+	void CustomCaseMapping(int menu);
 	void LineScrollDown();
 	void LineScrollUp();
 	void DeleteBackNotLine();

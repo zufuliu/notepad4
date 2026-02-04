@@ -3327,10 +3327,14 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_EDIT_MAP_CYRILLIC_LATIN:
 	case IDM_EDIT_MAP_BENGALI_LATIN:
 	case IDM_EDIT_MAP_HANGUL_DECOMPOSITION:
-	case IDM_EDIT_MAP_HANJA_HANGUL:
 		BeginWaitCursor();
-		EditMapTextCase(LOWORD(wParam));
+		SciCall_CustomCaseMapping(LOWORD(wParam));
 		EndWaitCursor();
+		break;
+
+	case IDM_EDIT_MAP_HANJA_HANGUL:
+		// implemented in ScintillaWin::SelectionToHangul().
+		SendMessage(hwndEdit, WM_IME_KEYDOWN, VK_HANJA, 0);
 		break;
 
 	case IDM_EDIT_CONVERTTABS:

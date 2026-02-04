@@ -2018,6 +2018,10 @@ void ScintillaCall::UpperCase() {
 	Call(Message::UpperCase);
 }
 
+void ScintillaCall::CustomCaseMapping(int menu) {
+	Call(Message::CustomCaseMapping, menu);
+}
+
 void ScintillaCall::LineScrollDown() {
 	Call(Message::LineScrollDown);
 }

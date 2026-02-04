@@ -8194,6 +8194,10 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 	case Message::SelectionDuplicate:
 		return KeyCommand(iMessage);
 
+	case Message::CustomCaseMapping:
+		ChangeCaseOfSelection(static_cast<CaseMapping>(wParam));
+		break;
+
 	case Message::BraceHighlight:
 		SetBraceHighlight(PositionFromUPtr(wParam), lParam, StyleBraceLight);
 		break;

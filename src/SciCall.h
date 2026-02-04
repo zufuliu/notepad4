@@ -1232,6 +1232,10 @@ inline void SciCall_UpperCase() noexcept {
 	SciCall(SCI_UPPERCASE, 0, 0);
 }
 
+inline void SciCall_CustomCaseMapping(int menu) noexcept {
+	SciCall(SCI_CUSTOMCASEMAPPING, menu, 0);
+}
+
 inline void SciCall_Cancel() noexcept {
 	SciCall(SCI_CANCEL, 0, 0);
 }

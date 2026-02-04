@@ -470,6 +470,7 @@ enum class Message {
 	LineDuplicate = 2404,
 	LowerCase = 2340,
 	UpperCase = 2341,
+	CustomCaseMapping = 2139,
 	LineScrollDown = 2342,
 	LineScrollUp = 2343,
 	DeleteBackNotLine = 2344,

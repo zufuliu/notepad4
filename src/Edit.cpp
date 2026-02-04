@@ -1567,18 +1567,9 @@ constexpr bool IsSentenceTerminator(wchar_t ch) noexcept {
 
 //=============================================================================
 //
-// EditMapTextCase()
+// EditMapTextCase(), used by ScintillaWin::CaseMapString()
 //
-void EditMapTextCase(int menu) noexcept {
-	const Sci_Position iSelCount = SciCall_GetSelTextLength();
-	if (iSelCount == 0) {
-		return;
-	}
-	if (SciCall_IsRectangularSelection()) {
-		NotifyRectangularSelection();
-		return;
-	}
-
+char *EditMapTextCase(int menu, const char *pszText, size_t &iSelCount, UINT cpEdit) noexcept {
 	DWORD flags = 0;
 	const GUID *pGuid = nullptr;
 	switch (menu) {
@@ -1621,21 +1612,13 @@ void EditMapTextCase(int menu) noexcept {
 	case IDM_EDIT_MAP_HANGUL_DECOMPOSITION:
 		pGuid = &WIN10_ELS_GUID_TRANSLITERATION_HANGUL_DECOMPOSITION;
 		break;
-	case IDM_EDIT_MAP_HANJA_HANGUL:
-		// implemented in ScintillaWin::SelectionToHangul().
-		SendMessage(hwndEdit, WM_IME_KEYDOWN, VK_HANJA, 0);
-		return;
 	case IDM_EDIT_INVERTCASE:
 	default:
 		break;
 	}
 
-	char *pszText = static_cast<char *>(NP2HeapAlloc(iSelCount*kMaxMultiByteCount + 1));
 	LPWSTR pszTextW = static_cast<LPWSTR>(NP2HeapAlloc((iSelCount + 1) * sizeof(WCHAR)));
-
-	SciCall_GetSelText(pszText);
-	const UINT cpEdit = SciCall_GetCodePage();
-	int cchTextW = MultiByteToWideChar(cpEdit, 0, pszText, static_cast<int>(iSelCount), pszTextW, static_cast<int>(NP2HeapSize(pszTextW) / sizeof(WCHAR)));
+	int cchTextW = MultiByteToWideChar(cpEdit, 0, pszText, static_cast<int>(iSelCount), pszTextW, static_cast<int>(iSelCount + 1));
 
 	bool bChanged = false;
 	if (flags != 0 || pGuid != nullptr) {
@@ -1694,10 +1677,6 @@ void EditMapTextCase(int menu) noexcept {
 			NP2HeapFree(pszTextW);
 			pszTextW = pszMappedW;
 			cchTextW = charsConverted;
-			if (charsConverted > iSelCount) {
-				NP2HeapFree(pszText);
-				pszText = static_cast<char *>(NP2HeapAlloc(charsConverted*kMaxMultiByteCount + 1));
-			}
 		}
 	} else {
 		// invert case
@@ -1713,13 +1692,16 @@ void EditMapTextCase(int menu) noexcept {
 		}
 	}
 
+	char *pszOut = nullptr;
 	if (bChanged) {
-		const int cchText = WideCharToMultiByte(cpEdit, 0, pszTextW, cchTextW, pszText, static_cast<int>(NP2HeapSize(pszText)), nullptr, nullptr);
-		EditReplaceMainSelection(cchText, pszText);
+		int cchText = cchTextW*kMaxMultiByteCount + 1;
+		pszOut = static_cast<char *>(NP2HeapAlloc(cchText));
+		cchText = WideCharToMultiByte(cpEdit, 0, pszTextW, cchTextW, pszOut, cchText, nullptr, nullptr);
+		iSelCount = cchText;
 	}
 
-	NP2HeapFree(pszText);
 	NP2HeapFree(pszTextW);
+	return pszOut;
 }
 
 #ifndef URL_ESCAPE_AS_UTF8		// NTDDI_VERSION >= NTDDI_WIN7

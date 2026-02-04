@@ -517,7 +517,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	void ContainerNeedsUpdate(Scintilla::Update flags) noexcept;
 	void PageMove(int direction, Selection::SelTypes selt = Selection::SelTypes::none, bool stuttered = false);
 	enum class CaseMapping {
-		same, upper, lower
+		same, upper, lower, custom
 	};
 	virtual std::string CaseMapString(const std::string &s, CaseMapping caseMapping) const = 0;
 	void ChangeCaseOfSelection(CaseMapping caseMapping);
