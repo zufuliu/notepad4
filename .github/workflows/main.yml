@@ -47,27 +47,27 @@ jobs:
         CALL "locale\build.bat" Build ARM64 Release 1
         CALL "build\make_zip.bat" MSVC ARM64 Release Locale 1
 
-    - uses: actions/upload-artifact@v5
+    - uses: actions/upload-artifact@v6
       with:
           name: Notepad4_MSVC2022_i18n_x64
           path: 'build\Notepad4_i18n_x64_*.zip'
 
-    - uses: actions/upload-artifact@v5
+    - uses: actions/upload-artifact@v6
       with:
           name: Notepad4_MSVC2022_i18n_Win32
           path: 'build\Notepad4_i18n_Win32_*.zip'
 
-    - uses: actions/upload-artifact@v5
+    - uses: actions/upload-artifact@v6
       with:
           name: Notepad4_MSVC2022_i18n_AVX2
           path: 'build\Notepad4_i18n_AVX2_*.zip'
 
-    - uses: actions/upload-artifact@v5
+    - uses: actions/upload-artifact@v6
       with:
           name: Notepad4_MSVC2022_i18n_AVX512
           path: 'build\Notepad4_i18n_AVX512_*.zip'
 
-    - uses: actions/upload-artifact@v5
+    - uses: actions/upload-artifact@v6
       with:
           name: Notepad4_MSVC2022_i18n_ARM64
           path: 'build\Notepad4_i18n_ARM64_*.zip'
@@ -111,27 +111,27 @@ jobs:
         CALL "build\VisualStudio\build.bat" Build ARM64 LLVMRelease 1
         CALL "build\make_zip.bat" LLVM ARM64 Release 1
 
-    - uses: actions/upload-artifact@v5
+    - uses: actions/upload-artifact@v6
       with:
           name: Notepad4_Clang_MSVC2022_en_x64
           path: 'build\Notepad4_LLVM_x64_*.zip'
 
-    - uses: actions/upload-artifact@v5
+    - uses: actions/upload-artifact@v6
       with:
           name: Notepad4_Clang_MSVC2022_en_Win32
           path: 'build\Notepad4_LLVM_Win32_*.zip'
 
-    - uses: actions/upload-artifact@v5
+    - uses: actions/upload-artifact@v6
       with:
           name: Notepad4_Clang_MSVC2022_en_AVX2
           path: 'build\Notepad4_LLVM_AVX2_*.zip'
 
-    - uses: actions/upload-artifact@v5
+    - uses: actions/upload-artifact@v6
       with:
           name: Notepad4_Clang_MSVC2022_en_AVX512
           path: 'build\Notepad4_LLVM_AVX512_*.zip'
 
-    - uses: actions/upload-artifact@v5
+    - uses: actions/upload-artifact@v6
       with:
           name: Notepad4_Clang_MSVC2022_en_ARM64
           path: 'build\Notepad4_LLVM_ARM64_*.zip'
@@ -176,27 +176,27 @@ jobs:
         CALL "build\mingw\build.bat" llvm aarch64
         CALL "build\make_zip.bat" Clang ARM64 Release 1
 
-    - uses: actions/upload-artifact@v5
+    - uses: actions/upload-artifact@v6
       with:
           name: Notepad4_llvm_mingw_en_x64
           path: 'build\Notepad4_Clang_x64_*.zip'
 
-    - uses: actions/upload-artifact@v5
+    - uses: actions/upload-artifact@v6
       with:
           name: Notepad4_llvm_mingw_en_Win32
           path: 'build\Notepad4_Clang_Win32_*.zip'
 
-    - uses: actions/upload-artifact@v5
+    - uses: actions/upload-artifact@v6
       with:
           name: Notepad4_llvm_mingw_en_AVX2
           path: 'build\Notepad4_Clang_AVX2_*.zip'
 
-    - uses: actions/upload-artifact@v5
+    - uses: actions/upload-artifact@v6
       with:
           name: Notepad4_llvm_mingw_en_AVX512
           path: 'build\Notepad4_Clang_AVX512_*.zip'
 
-    - uses: actions/upload-artifact@v5
+    - uses: actions/upload-artifact@v6
       with:
           name: Notepad4_llvm_mingw_en_ARM64
           path: 'build\Notepad4_Clang_ARM64_*.zip'
@@ -245,32 +245,32 @@ jobs:
         CALL "build\mingw\build.bat" ucrt AVX512 Clang
         CALL "build\make_zip.bat" Clang AVX512 Release 1
 
-    - uses: actions/upload-artifact@v5
+    - uses: actions/upload-artifact@v6
       with:
           name: Notepad4_GCC_en_x64_ucrt
           path: 'build\Notepad4_GCC_x64_*.zip'
 
-    - uses: actions/upload-artifact@v5
+    - uses: actions/upload-artifact@v6
       with:
           name: Notepad4_GCC_en_AVX2_ucrt
           path: 'build\Notepad4_GCC_AVX2_*.zip'
 
-    - uses: actions/upload-artifact@v5
+    - uses: actions/upload-artifact@v6
       with:
           name: Notepad4_GCC_en_AVX512_ucrt
           path: 'build\Notepad4_GCC_AVX512_*.zip'
 
-    - uses: actions/upload-artifact@v5
+    - uses: actions/upload-artifact@v6
       with:
           name: Notepad4_Clang_mingw_en_x64_ucrt
           path: 'build\Notepad4_Clang_x64_*.zip'
 
-    - uses: actions/upload-artifact@v5
+    - uses: actions/upload-artifact@v6
       with:
           name: Notepad4_Clang_mingw_en_AVX2_ucrt
           path: 'build\Notepad4_Clang_AVX2_*.zip'
 
-    - uses: actions/upload-artifact@v5
+    - uses: actions/upload-artifact@v6
       with:
           name: Notepad4_Clang_mingw_en_AVX512_ucrt
           path: 'build\Notepad4_Clang_AVX512_*.zip'
@@ -319,32 +319,32 @@ jobs:
         CALL "build\mingw\build.bat" x86_64 AVX512 Clang
         CALL "build\make_zip.bat" Clang AVX512 Release 1
 
-    - uses: actions/upload-artifact@v5
+    - uses: actions/upload-artifact@v6
       with:
           name: Notepad4_GCC_en_x64
           path: 'build\Notepad4_GCC_x64_*.zip'
 
-    - uses: actions/upload-artifact@v5
+    - uses: actions/upload-artifact@v6
       with:
           name: Notepad4_GCC_en_AVX2
           path: 'build\Notepad4_GCC_AVX2_*.zip'
 
-    - uses: actions/upload-artifact@v5
+    - uses: actions/upload-artifact@v6
       with:
           name: Notepad4_GCC_en_AVX512
           path: 'build\Notepad4_GCC_AVX512_*.zip'
 
-    - uses: actions/upload-artifact@v5
+    - uses: actions/upload-artifact@v6
       with:
           name: Notepad4_Clang_mingw_en_x64
           path: 'build\Notepad4_Clang_x64_*.zip'
 
-    - uses: actions/upload-artifact@v5
+    - uses: actions/upload-artifact@v6
       with:
           name: Notepad4_Clang_mingw_en_AVX2
           path: 'build\Notepad4_Clang_AVX2_*.zip'
 
-    - uses: actions/upload-artifact@v5
+    - uses: actions/upload-artifact@v6
       with:
           name: Notepad4_Clang_mingw_en_AVX512
           path: 'build\Notepad4_Clang_AVX512_*.zip'
@@ -374,12 +374,12 @@ jobs:
         CALL "build\mingw\build.bat" i686 Clang
         CALL "build\make_zip.bat" Clang Win32 Release 1
 
-    - uses: actions/upload-artifact@v5
+    - uses: actions/upload-artifact@v6
       with:
           name: Notepad4_GCC_en_Win32
           path: 'build\Notepad4_GCC_Win32_*.zip'
 
-    - uses: actions/upload-artifact@v5
+    - uses: actions/upload-artifact@v6
       with:
           name: Notepad4_Clang_mingw_en_Win32
           path: 'build\Notepad4_Clang_Win32_*.zip'
