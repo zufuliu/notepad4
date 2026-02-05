@@ -1032,6 +1032,13 @@ static inline bool IsFileStartsWithDotLog() noexcept {
 }
 #endif
 
+static void SaveAllSettings() noexcept {
+	SaveSettings(false);
+	mruFile.MergeSave(bSaveRecentFiles);
+	mruFind.MergeSave(bSaveFindReplace);
+	mruReplace.MergeSave(bSaveFindReplace);
+}
+
 //=============================================================================
 //
 // MainWndProc()
@@ -1092,11 +1099,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			}
 
 			// call SaveSettings() when hwndToolbar is still valid
-			SaveSettings(false);
-
-			mruFile.MergeSave(bSaveRecentFiles);
-			mruFind.MergeSave(bSaveFindReplace);
-			mruReplace.MergeSave(bSaveFindReplace);
+			SaveAllSettings();
 			bitmapCache.Empty();
 
 			// Remove tray icon if necessary
@@ -4601,7 +4604,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case CMD_OPENINIFILE:
-		CreateIniFile(szIniFile);
+		SaveAllSettings();
 		FileLoad(FileLoadFlag_Default, szIniFile);
 		break;
 
