@@ -284,7 +284,7 @@ static WCHAR systemTextFontName[LF_FACESIZE];
 static WCHAR defaultCodeFontName[LF_FACESIZE];
 WCHAR defaultTextFontName[LF_FACESIZE];
 
-static WCHAR darkStyleThemeFilePath[MAX_PATH];
+WCHAR darkStyleThemeFilePath[MAX_PATH];
 static WCHAR favoriteSchemesConfig[MAX_FAVORITE_SCHEMES_CONFIG_SIZE];
 
 // Currently used lexer
@@ -758,7 +758,9 @@ static int __cdecl CmpEditLexerByName(const void *p1, const void *p2) noexcept {
 //
 void Style_Load() noexcept {
 	IniSectionParser section;
-	g_AllFileExtensions = static_cast<LPWSTR>(NP2HeapAlloc(ALL_FILE_EXTENSIONS_BYTE_SIZE));
+	if (g_AllFileExtensions == nullptr) {
+		g_AllFileExtensions = static_cast<LPWSTR>(NP2HeapAlloc(ALL_FILE_EXTENSIONS_BYTE_SIZE));
+	}
 	WCHAR *pIniSectionBuf = static_cast<WCHAR *>(NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_STYLES));
 	const DWORD cchIniSection = static_cast<DWORD>(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
 	section.Init(128);
@@ -797,7 +799,7 @@ void Style_Load() noexcept {
 		}
 	}
 
-	if (np2StyleTheme == StyleTheme_Dark) {
+	if (np2StyleTheme == StyleTheme_Dark && StrIsEmpty(darkStyleThemeFilePath)) {
 		FindDarkThemeFile(darkStyleThemeFilePath);
 	}
 
@@ -821,14 +823,14 @@ static void Style_LoadOne(PEDITLEXER pLex) noexcept {
 	NP2HeapFree(pIniSectionBuf);
 }
 
-static void Style_LoadAll(bool bReload, bool onlyCustom) noexcept {
+void Style_LoadAll(StyleLoadFlag loadFlag) noexcept {
 	IniSectionParser section;
 	WCHAR *pIniSectionBuf = static_cast<WCHAR *>(NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_STYLES));
 	const DWORD cchIniSection = static_cast<DWORD>(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
 	section.Init(128);
 
 	// Custom colors
-	if (bReload || !bCustomColorLoaded) {
+	if (FlagSet(loadFlag, StyleLoadFlag_Reload) || !bCustomColorLoaded) {
 		bCustomColorLoaded = true;
 		LPCWSTR themePath = GetStyleThemeFilePath();
 		memcpy(customColor, defaultCustomColor, MAX_CUSTOM_COLOR_COUNT * sizeof(COLORREF));
@@ -850,10 +852,10 @@ static void Style_LoadAll(bool bReload, bool onlyCustom) noexcept {
 		}
 	}
 
-	if (!onlyCustom) {
+	if (!FlagSet(loadFlag, StyleLoadFlag_CustomColor)) {
 		for (UINT iLexer = 0; iLexer < ALL_LEXER_COUNT; iLexer++) {
 			PEDITLEXER pLex = pLexArray[iLexer];
-			if (bReload || !IsStyleLoaded(pLex)) {
+			if (FlagSet(loadFlag, StyleLoadFlag_Reload) || !IsStyleLoaded(pLex)) {
 				Style_LoadOneEx(pLex, section, pIniSectionBuf, cchIniSection);
 			}
 		}
@@ -861,6 +863,10 @@ static void Style_LoadAll(bool bReload, bool onlyCustom) noexcept {
 
 	section.Free();
 	NP2HeapFree(pIniSectionBuf);
+	if (FlagSet(loadFlag, StyleLoadFlag_Apply)) {
+		Style_LoadTabSettings(pLexCurrent);
+		Style_SetLexer(pLexCurrent, false);
+	}
 }
 
 //=============================================================================
@@ -4556,7 +4562,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 					Style_ResetAll(true);
 				} else {
 					// reload styles from external file
-					Style_LoadAll(true, false);
+					Style_LoadAll(StyleLoadFlag_Reload);
 					// reset file extensions to built-in default
 					Style_ResetAll(false);
 				}
@@ -4693,7 +4699,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 void Style_ConfigDlg(HWND hwnd) noexcept {
 	StyleConfigDlgParam param;
 
-	Style_LoadAll(false, false);
+	Style_LoadAll(StyleLoadFlag_Default);
 	// Backup Styles
 	param.hFontTitle = nullptr;
 	param.bApply = false;
@@ -5411,7 +5417,7 @@ void EditClickCallTip(HWND hwnd) noexcept {
 	callTipInfo.type = CallTipType_None;
 	if (type == CallTipType_ColorHex) {
 		if (!bCustomColorLoaded) {
-			Style_LoadAll(false, true);
+			Style_LoadAll(StyleLoadFlag_CustomColor);
 		}
 
 		const unsigned back = callTipInfo.currentColor;

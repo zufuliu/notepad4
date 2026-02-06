@@ -7168,6 +7168,18 @@ bool FileSave(FileSaveFlag saveFlag) noexcept {
 				iFileWatchingMode = FileWatchingMode_None;
 			}
 			InstallFileWatching(false);
+			if (PathEqual(szCurFile, szIniFile)) {
+				LoadFlags();
+				LoadSettings();
+				mruFile.Reload();
+				mruFind.Reload();
+				mruReplace.Reload();
+				if (np2StyleTheme == StyleTheme_Default) {
+					Style_LoadAll(static_cast<StyleLoadFlag>(StyleLoadFlag_Reload | StyleLoadFlag_Apply));
+				}
+			} else if (np2StyleTheme != StyleTheme_Default && PathEqual(szCurFile, darkStyleThemeFilePath)) {
+				Style_LoadAll(static_cast<StyleLoadFlag>(StyleLoadFlag_Reload | StyleLoadFlag_Apply));
+			}
 		}
 
 		AutoSave_Stop(saveFlag & FileSaveFlag_EndSession);

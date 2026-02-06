@@ -2504,6 +2504,11 @@ void MRUList::Save() const noexcept {
 	NP2HeapFree(pIniSectionBuf);
 }
 
+void MRUList::Reload() noexcept {
+	Empty(false, true);
+	Init(szRegKey, capacity, iFlags);
+}
+
 void MRUList::MergeSave(bool keep, bool destroy) noexcept {
 	if (keep && iSize > 0) {
 		LPWSTR * const current = pszItems;

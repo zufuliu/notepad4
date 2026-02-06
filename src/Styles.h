@@ -74,13 +74,22 @@ struct StyleDefinition {
 	char fontFace[LF_FACESIZE * kMaxMultiByteCount];
 };
 
+enum StyleLoadFlag {
+	StyleLoadFlag_Default = 0,
+	StyleLoadFlag_Reload = 1,
+	StyleLoadFlag_CustomColor = 2,
+	StyleLoadFlag_Apply = 4,
+};
+
 extern PEDITLEXER pLexCurrent;
 extern int np2LexLangIndex;
 extern int np2StyleTheme;
+extern WCHAR darkStyleThemeFilePath[MAX_PATH];
 
 void	Style_ReleaseResources() noexcept;
 void	Style_Load() noexcept;
 void	Style_Save() noexcept;
+void	Style_LoadAll(StyleLoadFlag loadFlag) noexcept;
 bool	Style_Import(HWND hwnd) noexcept;
 bool	Style_Export(HWND hwnd) noexcept;
 void	Style_LoadTabSettings(LPCEDITLEXER pLex) noexcept;
