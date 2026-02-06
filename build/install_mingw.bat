@@ -1,7 +1,7 @@
 @ECHO OFF
 @rem used for GitHub Actions
 
-@rem https://github.com/actions/runner-images/blob/main/images/windows/Windows2019-Readme.md#msys2
+@rem https://github.com/actions/runner-images/blob/main/images/windows/Windows2025-Readme.md#msys2
 @rem https://github.com/actions/runner-images/blob/main/images/windows/Windows2022-Readme.md#msys2
 SET "PATH=C:\msys64\usr\bin;%PATH%"
 

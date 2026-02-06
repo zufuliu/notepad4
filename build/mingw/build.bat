@@ -24,9 +24,13 @@ IF /I "%processor_architecture%" == "AMD64" (
 :CheckFirstArg
 IF /I "%~1" == "" GOTO StartWork
 IF /I "%~1" == "x86_64"     SET "COMPILER=x86_64"   & SET "TARGET=x86_64"     & SHIFT & GOTO CheckSecondArg
+IF /I "%~1" == "x64"        SET "COMPILER=x86_64"   & SET "TARGET=x86_64"     & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "i686"       SET "COMPILER=i686"     & SET "TARGET=i686"       & SHIFT & GOTO CheckSecondArg
+IF /I "%~1" == "x86"        SET "COMPILER=i686"     & SET "TARGET=i686"       & SHIFT & GOTO CheckSecondArg
+IF /I "%~1" == "Win32"      SET "COMPILER=i686"     & SET "TARGET=i686"       & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "ucrt"       SET "UCRT=1"            & SET "TARGET=x86_64"     & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "aarch64"    SET "COMPILER=llvm"     & SET "TARGET=aarch64"    & SHIFT & GOTO CheckSecondArg
+IF /I "%~1" == "ARM64"      SET "COMPILER=llvm"     & SET "TARGET=aarch64"    & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "llvm"       SET "COMPILER=llvm"     & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "Clang"      SET "CLANG=1"           & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "AVX2"       SET "TARGET=AVX2"       & SHIFT & GOTO CheckSecondArg
@@ -36,10 +40,14 @@ IF /I "%~1" == "AVX512"     SET "TARGET=AVX512"     & SHIFT & GOTO CheckSecondAr
 :CheckSecondArg
 IF /I "%~1" == "" GOTO StartWork
 IF /I "%~1" == "x86_64"     SET "TARGET=x86_64"     & SHIFT & GOTO CheckSecondArg
+IF /I "%~1" == "x64"        SET "TARGET=x86_64"     & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "AVX2"       SET "TARGET=AVX2"       & SHIFT & GOTO CheckSecondArg
-IF /I "%~1" == "AVX512"     SET "TARGET=AVX512"       & SHIFT & GOTO CheckSecondArg
+IF /I "%~1" == "AVX512"     SET "TARGET=AVX512"     & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "i686"       SET "TARGET=i686"       & SHIFT & GOTO CheckSecondArg
+IF /I "%~1" == "x86"        SET "TARGET=i686"       & SHIFT & GOTO CheckSecondArg
+IF /I "%~1" == "Win32"      SET "TARGET=i686"       & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "aarch64"    SET "TARGET=aarch64"    & SHIFT & GOTO CheckSecondArg
+IF /I "%~1" == "ARM64"      SET "TARGET=aarch64"    & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "Clang"      SET "CLANG=1"           & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "all"        SET "ACTION=all"        & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "matepath"   SET "ACTION=matepath"   & SHIFT & GOTO CheckSecondArg
