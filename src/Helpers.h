@@ -849,7 +849,7 @@ struct MRUList {
 	void Empty(bool save, bool destroy = false) noexcept;
 	void Load() noexcept;
 	void Save() const noexcept;
-	void MergeSave(bool keep) noexcept;
+	void MergeSave(bool keep, bool destroy) noexcept;
 	void AddToCombobox(HWND hwnd) const noexcept;
 };
 

@@ -2504,7 +2504,7 @@ void MRUList::Save() const noexcept {
 	NP2HeapFree(pIniSectionBuf);
 }
 
-void MRUList::MergeSave(bool keep) noexcept {
+void MRUList::MergeSave(bool keep, bool destroy) noexcept {
 	if (keep && iSize > 0) {
 		LPWSTR * const current = pszItems;
 		const int count = iSize;
@@ -2517,7 +2517,9 @@ void MRUList::MergeSave(bool keep) noexcept {
 		NP2HeapFree(AsVoidPointer(current));
 		Save();
 	}
-	Empty(!keep, true);
+	if (destroy) {
+		Empty(!keep, true);
+	}
 }
 
 void MRUList::AddToCombobox(HWND hwnd) const noexcept {
