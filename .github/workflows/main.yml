@@ -7,12 +7,13 @@ defaults:
     shell: cmd
 
 jobs:
-  msvc2022:
+  msvc:
     strategy:
       matrix:
         platform: [Win32, x64, ARM64, AVX2, AVX512]
-    name: Visual C++ 2022
-    runs-on: windows-2022
+        system: [windows-2022, windows-2025-vs2026]
+    name: MSVC ${{ case(matrix.system == 'windows-2022', '2022', '2026') }} (${{ matrix.platform }})
+    runs-on: ${{ matrix.system }}
     steps:
     - uses: actions/checkout@v6
 
@@ -28,15 +29,16 @@ jobs:
 
     - uses: actions/upload-artifact@v6
       with:
-          name: Notepad4_MSVC2022_i18n_${{ matrix.platform }}
+          name: Notepad4_MSVC${{ case(matrix.system == 'windows-2022', '2022', '2026') }}_i18n_${{ matrix.platform }}
           path: 'build\Notepad4_i18n_${{ matrix.platform }}_*.zip'
 
-  llvm_msvc2022:
+  llvm_msvc:
     strategy:
       matrix:
         platform: [Win32, x64, ARM64, AVX2, AVX512]
-    name: LLVM (Visual C++ 2022)
-    runs-on: windows-2022
+        system: [windows-2022, windows-2025-vs2026]
+    name: LLVM MSVC ${{ case(matrix.system == 'windows-2022', '2022', '2026') }} (${{ matrix.platform }})
+    runs-on: ${{ matrix.system }}
     steps:
     - uses: actions/checkout@v6
 
@@ -55,14 +57,14 @@ jobs:
 
     - uses: actions/upload-artifact@v6
       with:
-          name: Notepad4_Clang_MSVC2022_en_${{ matrix.platform }}
+          name: Notepad4_Clang_MSVC${{ case(matrix.system == 'windows-2022', '2022', '2026') }}_en_${{ matrix.platform }}
           path: 'build\Notepad4_LLVM_${{ matrix.platform }}_*.zip'
 
   llvm_mingw:
     strategy:
       matrix:
         platform: [Win32, x64, ARM64, AVX2, AVX512]
-    name: llvm-mingw
+    name: llvm-mingw (${{ matrix.platform }})
     runs-on: windows-latest
     continue-on-error: true
     steps:
