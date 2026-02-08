@@ -1506,7 +1506,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) noexcept {
 
 		case NP2LEX_TYPESCRIPT: {
 			static_assert(IDM_LEXER_TYPESCRIPT_TSX - IDM_LEXER_TYPESCRIPT == 1);
-			dialect = np2LexLangIndex - IDM_LEXER_TYPESCRIPT;
+			dialect = max(np2LexLangIndex - IDM_LEXER_TYPESCRIPT, 0) + 2;
 		} break;
 
 		case NP2LEX_VBSCRIPT:
