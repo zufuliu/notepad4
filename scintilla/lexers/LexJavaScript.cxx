@@ -253,7 +253,9 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 					} else if (keywordLists[KeywordIndex_Constant].InList(s)) {
 						sc.ChangeState(SCE_JS_CONSTANT);
 					} else if (sc.ch == ':' || sc.Match('?', ':')) {
-						if (chBefore == ',' || chBefore == '{' || (chBefore == ';' && (option & JsOptionTypeScript) != 0)) {
+						if (AnyOf(chBefore, ',', '{', 'c', 'd', 'e') || (chBefore == ';' && (option & JsOptionTypeScript) != 0)) {
+							// JavaScript: { property: value, }
+							// TypeScript: { [public | protected | private] property?: type; }
 							sc.ChangeState(SCE_JS_KEY);
 						} else if (sc.ch == ':' && IsJumpLabelPrevASI(chBefore)) {
 							sc.ChangeState(SCE_JS_LABEL);
