@@ -72,7 +72,6 @@ jobs:
         platform: [Win32, x64, ARM64, AVX2, AVX512]
     name: llvm-mingw (${{ matrix.platform }})
     runs-on: windows-latest
-    continue-on-error: true
     steps:
     - uses: actions/checkout@v6
 
@@ -94,47 +93,17 @@ jobs:
           name: Notepad4_llvm_mingw_en_${{ matrix.platform }}
           path: 'build\Notepad4_Clang_${{ matrix.platform }}_*.zip'
 
-  gcc_x86_64:
+  mingw:
     strategy:
       matrix:
+        arch: [ucrt, x86_64]
         platform: [x64, AVX2, AVX512]
-        compiler: [x86_64, ucrt]
-    name: ${{ matrix.compiler }} GCC and Clang (${{ matrix.platform }})
+        include:
+          - arch: i686
+            platform: Win32
+    name: ${{ matrix.arch }} GCC and Clang (${{ matrix.platform }})
     runs-on: windows-latest
-    steps:
-    - uses: actions/checkout@v6
-
-    - name: Update Version Hash
-      run: |
-        "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./matepath/src/VersionRev.h
-
-    - name: Install GCC and Clang
-      run: |
-        CALL "build\install_mingw.bat" ${{ matrix.compiler }}
-
-    - name: GCC ${{ matrix.platform }} Release
-      run: |
-        CALL "build\mingw\build.bat" ${{ matrix.compiler }} ${{ matrix.platform }}
-        CALL "build\make_zip.bat" GCC ${{ matrix.platform }} Release 1
-
-    - name: Clang ${{ matrix.platform }} Release
-      run: |
-        CALL "build\mingw\build.bat" ${{ matrix.compiler }} ${{ matrix.platform }} Clang
-        CALL "build\make_zip.bat" Clang ${{ matrix.platform }} Release 1
-
-    - uses: actions/upload-artifact@v6
-      with:
-          name: Notepad4_GCC_en_${{ matrix.platform }}${{ case(matrix.compiler == 'ucrt', '_ucrt', '') }}
-          path: 'build\Notepad4_GCC_${{ matrix.platform }}_*.zip'
-
-    - uses: actions/upload-artifact@v6
-      with:
-          name: Notepad4_Clang_mingw_en_${{ matrix.platform }}${{ case(matrix.compiler == 'ucrt', '_ucrt', '') }}
-          path: 'build\Notepad4_Clang_${{ matrix.platform }}_*.zip'
-
-  gcc_i686:
-    name: 32-bit GCC and Clang
-    runs-on: windows-latest
+    # pacman may fail to download packages from mirror site
     continue-on-error: true
     steps:
     - uses: actions/checkout@v6
@@ -145,24 +114,24 @@ jobs:
 
     - name: Install GCC and Clang
       run: |
-        CALL "build\install_mingw.bat" i686
+        CALL "build\install_mingw.bat" ${{ matrix.arch }}
 
-    - name: GCC Win32 Release
+    - name: GCC ${{ matrix.platform }} Release
       run: |
-        CALL "build\mingw\build.bat" i686
-        CALL "build\make_zip.bat" GCC Win32 Release 1
+        CALL "build\mingw\build.bat" ${{ matrix.arch }} ${{ matrix.platform }}
+        CALL "build\make_zip.bat" GCC ${{ matrix.platform }} Release 1
 
-    - name: Clang Win32 Release
+    - name: Clang ${{ matrix.platform }} Release
       run: |
-        CALL "build\mingw\build.bat" i686 Clang
-        CALL "build\make_zip.bat" Clang Win32 Release 1
+        CALL "build\mingw\build.bat" ${{ matrix.arch }} ${{ matrix.platform }} Clang
+        CALL "build\make_zip.bat" Clang ${{ matrix.platform }} Release 1
 
     - uses: actions/upload-artifact@v6
       with:
-          name: Notepad4_GCC_en_Win32
-          path: 'build\Notepad4_GCC_Win32_*.zip'
+          name: Notepad4_GCC_en_${{ matrix.platform }}${{ case(matrix.arch == 'ucrt', '_ucrt', '') }}
+          path: 'build\Notepad4_GCC_${{ matrix.platform }}_*.zip'
 
     - uses: actions/upload-artifact@v6
       with:
-          name: Notepad4_Clang_mingw_en_Win32
-          path: 'build\Notepad4_Clang_Win32_*.zip'
+          name: Notepad4_Clang_mingw_en_${{ matrix.platform }}${{ case(matrix.arch == 'ucrt', '_ucrt', '') }}
+          path: 'build\Notepad4_Clang_${{ matrix.platform }}_*.zip'
