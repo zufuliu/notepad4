@@ -33,6 +33,7 @@ IF /I "%~1" == "aarch64"    SET "COMPILER=llvm"     & SET "TARGET=aarch64"    & 
 IF /I "%~1" == "ARM64"      SET "COMPILER=llvm"     & SET "TARGET=aarch64"    & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "llvm"       SET "COMPILER=llvm"     & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "Clang"      SET "CLANG=1"           & SHIFT & GOTO CheckSecondArg
+IF /I "%~1" == "GCC"        SET "CLANG="            & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "AVX2"       SET "TARGET=AVX2"       & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "AVX512"     SET "TARGET=AVX512"     & SHIFT & GOTO CheckSecondArg
 
@@ -49,6 +50,7 @@ IF /I "%~1" == "Win32"      SET "TARGET=i686"       & SHIFT & GOTO CheckSecondAr
 IF /I "%~1" == "aarch64"    SET "TARGET=aarch64"    & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "ARM64"      SET "TARGET=aarch64"    & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "Clang"      SET "CLANG=1"           & SHIFT & GOTO CheckSecondArg
+IF /I "%~1" == "GCC"        SET "CLANG="            & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "all"        SET "ACTION=all"        & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "matepath"   SET "ACTION=matepath"   & SHIFT & GOTO CheckSecondArg
 IF /I "%~1" == "scintilla"  SET "ACTION=scintilla"  & SHIFT & GOTO CheckSecondArg
