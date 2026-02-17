@@ -20,7 +20,7 @@
 /////////////////////////////////////////////////////////////////////////////
 // Polish (Poland) resources
 
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_POL)
 LANGUAGE LANG_POLISH, SUBLANG_DEFAULT
 #pragma code_page(65001)
 
@@ -656,4 +656,5 @@ END
 #include "../../matepath/src/matepath.ver"
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
+
 
