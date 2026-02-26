@@ -48,6 +48,7 @@ Checks: [
     -misc-override-with-different-visibility,
     -misc-use-anonymous-namespace,
     -misc-use-internal-linkage,
+
     # -modernize-return-braced-init-list,
     # -modernize-use-auto,
     # -modernize-use-default-member-init,
@@ -56,6 +57,7 @@ Checks: [
     # -readability-else-after-return,
     # -readability-named-parameter,
     # -readability-simplify-boolean-expr,
+    # -readability-trailing-comma,
     # -bugprone-reserved-identifier,
     # -bugprone-standalone-empty,
     # -misc-const-correctness,
