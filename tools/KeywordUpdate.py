@@ -33,6 +33,7 @@ lexerList = [
 
 	('NP2LEX_FORTRAN', 'stlFortran.cpp', 'LexFortran.cxx', 'Fortran.f', 0, parse_fortran_api_file),
 
+	('NP2LEX_GEOGEBRA', 'stlGeogebra.cpp', 'LexGeogebra.cxx', 'Geogebra.ggb', 1, parse_geogebra_api_file),
 	('NP2LEX_GN', 'stlGN.cpp', 'LexGN.cxx', 'GN.gn', 0, parse_gn_api_file),
 	('NP2LEX_GRAPHVIZ', 'stlGraphViz.cpp', 'LexGraphViz.cxx', 'GraphViz.dot', 0, parse_graphviz_api_file),
 		('NP2LEX_BLOCKDIAG', 'stlBlockdiag.cpp', 'LexGraphViz.cxx', 'blockdiag.diag', 0, parse_graphviz_api_file),

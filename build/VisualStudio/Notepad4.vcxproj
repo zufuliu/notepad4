@@ -482,6 +482,7 @@
     <ClCompile Include="..\..\scintilla\lexers\LexDiff.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexFortran.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexFSharp.cxx" />
+    <ClCompile Include="..\..\scintilla\lexers\LexGeogebra.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexGN.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexGo.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexGraphViz.cxx" />
@@ -613,6 +614,7 @@
     <ClCompile Include="..\..\src\EditLexers\stlDefault.cpp" />
     <ClCompile Include="..\..\src\EditLexers\stlFortran.cpp" />
     <ClCompile Include="..\..\src\EditLexers\stlFSharp.cpp" />
+    <ClCompile Include="..\..\src\EditLexers\stlGeogebra.cpp" />
     <ClCompile Include="..\..\src\EditLexers\stlGo.cpp" />
     <ClCompile Include="..\..\src\EditLexers\stlGN.cpp" />
     <ClCompile Include="..\..\src\EditLexers\stlGradle.cpp" />
