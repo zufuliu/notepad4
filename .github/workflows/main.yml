@@ -30,7 +30,7 @@ jobs:
         CALL "locale\build.bat" Build ${{ matrix.platform }} Release 1
         CALL "build\make_zip.bat" MSVC ${{ matrix.platform }} Release Locale 1
 
-    - uses: actions/upload-artifact@v6
+    - uses: actions/upload-artifact@v7
       with:
           name: Notepad4_MSVC${{ matrix.system.version }}_i18n_${{ matrix.platform }}
           path: 'build\Notepad4_i18n_${{ matrix.platform }}_*.zip'
@@ -61,7 +61,7 @@ jobs:
         CALL "build\VisualStudio\build.bat" Build ${{ matrix.platform }} LLVMRelease 1
         CALL "build\make_zip.bat" LLVM ${{ matrix.platform }} Release 1
 
-    - uses: actions/upload-artifact@v6
+    - uses: actions/upload-artifact@v7
       with:
           name: Notepad4_Clang_MSVC${{ matrix.system.version }}_en_${{ matrix.platform }}
           path: 'build\Notepad4_LLVM_${{ matrix.platform }}_*.zip'
@@ -88,7 +88,7 @@ jobs:
         CALL "build\mingw\build.bat" llvm ${{ matrix.platform }}
         CALL "build\make_zip.bat" Clang ${{ matrix.platform }} Release 1
 
-    - uses: actions/upload-artifact@v6
+    - uses: actions/upload-artifact@v7
       with:
           name: Notepad4_llvm_mingw_en_${{ matrix.platform }}
           path: 'build\Notepad4_Clang_${{ matrix.platform }}_*.zip'
@@ -126,7 +126,7 @@ jobs:
         CALL "build\mingw\build.bat" ${{ matrix.arch }} ${{ matrix.platform }} ${{ matrix.compiler }}
         CALL "build\make_zip.bat" ${{ matrix.compiler }} ${{ matrix.platform }} Release 1
 
-    - uses: actions/upload-artifact@v6
+    - uses: actions/upload-artifact@v7
       with:
           name: Notepad4_${{ matrix.compiler }}${{ case(matrix.compiler == 'Clang', '_mingw', '') }}_en_${{ matrix.platform }}${{ case(matrix.arch == 'ucrt', '_ucrt', '') }}
           path: 'build\Notepad4_${{ matrix.compiler }}_${{ matrix.platform }}_*.zip'
