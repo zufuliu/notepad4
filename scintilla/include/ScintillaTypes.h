@@ -24,6 +24,7 @@ enum class WhiteSpace {
 enum class TabDrawMode {
 	LongArrow = 0,
 	StrikeOut = 1,
+	ControlChar = 2,
 };
 
 enum class EndOfLine {

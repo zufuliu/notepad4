@@ -329,6 +329,10 @@ int LineLayout::EndLineStyle() const noexcept {
 	return styles[std::max(numCharsBeforeEOL - 1, 0)];
 }
 
+int LineLayout::LastStyle() const noexcept {
+	return styles[numCharsInLine];
+}
+
 namespace {
 
 enum class WrapBreak {

@@ -171,6 +171,10 @@ InSelection EditModel::LineEndInSelection(Sci::Line lineDoc) const noexcept {
 	return sel.InSelectionForEOL(posAfterLineEnd);
 }
 
+Sci::Position EditModel::VirtualSpaceForLine(Sci::Line lineDoc) const noexcept {
+	return sel.VirtualSpaceFor(pdoc->LineEnd(lineDoc));
+}
+
 MarkerMask EditModel::GetMark(Sci::Line line) const noexcept {
 	return pdoc->GetMark(line, FlagSet(changeHistoryOption, ChangeHistoryOption::Markers));
 }

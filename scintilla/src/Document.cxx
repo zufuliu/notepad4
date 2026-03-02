@@ -895,8 +895,9 @@ Sci::Position Document::NextPosition(Sci::Position pos, int moveDir) const noexc
 	const int increment = moveDir;
 	if (pos + increment <= 0)
 		return 0;
-	if (pos + increment >= cb.Length())
-		return cb.Length();
+	const Sci::Position length = cb.Length();
+	if (pos + increment >= length)
+		return length;
 
 	if (dbcsCodePage) {
 		if (CpUtf8 == dbcsCodePage) {
@@ -936,9 +937,7 @@ Sci::Position Document::NextPosition(Sci::Position pos, int moveDir) const noexc
 		} else {
 			if (moveDir > 0) {
 				const int mbsize = IsDBCSDualByteAt(pos) ? 2 : 1;
-				pos += mbsize;
-				if (pos > cb.Length())
-					pos = cb.Length();
+				pos = std::min(pos + mbsize, length);
 			} else {
 				// How to Go Backward in a DBCS String
 				// https://msdn.microsoft.com/en-us/library/cc194792.aspx
@@ -1669,7 +1668,7 @@ Sci::Position Document::SetLineIndentation(Sci::Line line, Sci::Position indent)
 Sci::Position Document::GetLineIndentPosition(Sci::Line line) const noexcept {
 	if (line < 0)
 		return 0;
-	Sci::Position pos = LineStart(line);
+	Sci::Position pos = cb.LineStart(line);
 	const Sci::Position length = LengthNoExcept();
 	while ((pos < length) && IsSpaceOrTab(cb.CharAt(pos))) {
 		pos++;
@@ -1681,7 +1680,8 @@ Sci::Position Document::GetColumn(Sci::Position pos) const noexcept {
 	Sci::Position column = 0;
 	const Sci::Line line = SciLineFromPosition(pos);
 	if (IsValidIndex(line, LinesTotal())) {
-		for (Sci::Position i = LineStart(line); i < pos;) {
+		const Sci::Position length = LengthNoExcept();
+		for (Sci::Position i = cb.LineStart(line); i < pos;) {
 			const char ch = cb.CharAt(i);
 			if (ch == '\t') {
 				column = NextTab(column, tabInChars);
@@ -1693,7 +1693,7 @@ Sci::Position Document::GetColumn(Sci::Position pos) const noexcept {
 			} else if (UTF8IsAscii(ch)) {
 				column++;
 				i++;
-			} else if (i >= LengthNoExcept()) {
+			} else if (i >= length) {
 				return column;
 			} else {
 				column++;
@@ -1761,8 +1761,9 @@ Sci::Position Document::CountUTF16(Sci::Position startPos, Sci::Position endPos)
 Sci::Position Document::FindColumn(Sci::Line line, Sci::Position column) const noexcept {
 	Sci::Position position = LineStart(line);
 	if (IsValidIndex(line, LinesTotal())) {
+		const Sci::Position length = LengthNoExcept();
 		Sci::Position columnCurrent = 0;
-		while ((columnCurrent < column) && (position < LengthNoExcept())) {
+		while ((columnCurrent < column) && (position < length)) {
 			const char ch = cb.CharAt(position);
 			if (ch == '\t') {
 				columnCurrent = NextTab(columnCurrent, tabInChars);
@@ -1835,7 +1836,8 @@ std::string Document::TransformLineEnds(const char *s, size_t len, EndOfLine eol
 void Document::ConvertLineEnds(EndOfLine eolModeSet) {
 	const UndoGroup ug(this);
 
-	for (Sci::Position pos = 0; pos < LengthNoExcept(); pos++) {
+	const Sci::Position length = Length();
+	for (Sci::Position pos = 0; pos < length; pos++) {
 		const char ch = cb.CharAt(pos);
 		if (ch == '\r') {
 			if (cb.CharAt(pos + 1) == '\n') {

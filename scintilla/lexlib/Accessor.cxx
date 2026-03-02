@@ -46,7 +46,8 @@ int Accessor::IndentAmount(Sci_Line line) noexcept {
 		if (ch == ' ') {
 			indent++;
 		} else if (ch == '\t') {
-			indent = (indent + 4) & ~3;
+			constexpr int defaultTabSpaces = 4;
+			indent = (indent + defaultTabSpaces) & ~(defaultTabSpaces - 1);
 		} else {
 			break;
 		}

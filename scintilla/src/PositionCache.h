@@ -110,6 +110,7 @@ public:
 	Interval Span(int start, int end) const noexcept;
 	Interval SpanByte(int index) const noexcept;
 	int EndLineStyle() const noexcept;
+	[[nodiscard]] int LastStyle() const noexcept;
 	void SCICALL WrapLine(const Document *pdoc, Sci::Position posLineStart, Wrap wrapState, XYPOSITION wrapWidth, XYPOSITION wrapIndent_, bool partialLine);
 };
 
@@ -311,14 +312,22 @@ public:
 	}
 };
 
+constexpr size_t positionCacheDefaultSize = 0x400;
+
 class PositionCache {
-	static constexpr size_t defaultCacheSize = 0x400;
-	std::vector<PositionCacheEntry> pces { defaultCacheSize };
+	std::vector<PositionCacheEntry> pces { positionCacheDefaultSize };
 	NativeMutex cacheLock;
 	uint32_t clock = 1;
 	bool allClear = true;
 public:
 	PositionCache();
+	// Deleted so PositionCache objects can not be copied.
+	PositionCache(const PositionCache &) = delete;
+	PositionCache(PositionCache &&) = delete;
+	void operator=(const PositionCache &) = delete;
+	void operator=(PositionCache &&) = delete;
+	~PositionCache() = default;
+
 	void Clear() noexcept;
 	void SetSize(size_t size_);
 	[[nodiscard]] size_t GetSize() const noexcept;

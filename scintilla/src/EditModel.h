@@ -115,6 +115,7 @@ public:
 	const char *GetDefaultFoldDisplayText() const noexcept;
 	const char *GetFoldDisplayText(Sci::Line lineDoc, bool partialLine) const noexcept;
 	InSelection LineEndInSelection(Sci::Line lineDoc) const noexcept;
+	[[nodiscard]] Sci::Position VirtualSpaceForLine(Sci::Line lineDoc) const noexcept;
 	[[nodiscard]] MarkerMask GetMark(Sci::Line line) const noexcept;
 
 	void EnsureModelState();
