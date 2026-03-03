@@ -754,7 +754,7 @@ BEGIN
 			MENUITEM "Dekompozycja koreańskiego han&gula",	IDM_EDIT_MAP_HANGUL_DECOMPOSITION
 			MENUITEM SEPARATOR
 			MENUITEM "&Bengalski na łacinkę",				IDM_EDIT_MAP_BENGALI_LATIN
-			MENUITEM "C&yrilicę na łacinkę",				IDM_EDIT_MAP_CYRILLIC_LATIN
+			MENUITEM "C&yrylicę na łacinkę",				IDM_EDIT_MAP_CYRILLIC_LATIN
 			MENUITEM "&Dewanagari na łacinkę",				IDM_EDIT_MAP_DEVANAGARI_LATIN
 			MENUITEM "&Malajalam na łacinkę",				IDM_EDIT_MAP_MALAYALAM_LATIN
 		END
@@ -2142,6 +2142,7 @@ END
 #include "../../src/Notepad4.ver"
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
+
 
 
 
