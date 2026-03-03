@@ -790,7 +790,7 @@ IDR_POPUPMENU MENU
 BEGIN
 	POPUP "+"
 	BEGIN
-		MENUITEM "&;Cofnij",					IDM_EDIT_UNDO
+		MENUITEM "&Cofnij",					IDM_EDIT_UNDO
 		MENUITEM "&Powtórz",					IDM_EDIT_REDO
 		MENUITEM SEPARATOR
 		MENUITEM "W&ytnij",						IDM_EDIT_CUT
@@ -2142,6 +2142,7 @@ END
 #include "../../src/Notepad4.ver"
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
+
 
 
 
