@@ -573,7 +573,7 @@ BEGIN
 		MENUITEM "Wstawiaj spacje zamiast ta&bulacji",IDM_VIEW_TABSASSPACES
 		MENUITEM "Ustawienia &tabulacji...\tCtrl+T",IDM_VIEW_TABSETTINGS
 		MENUITEM "Ustawienia &zawijania wierszy...",IDM_VIEW_WORDWRAPSETTINGS
-		MENUITEM "Ustawienia &długości wierszy....",IDM_VIEW_LONGLINESETTINGS
+		MENUITEM "Ustawienia &długości wierszy...",IDM_VIEW_LONGLINESETTINGS
 		MENUITEM "Ustawienia &autouzupełniania...",	IDM_VIEW_AUTOCOMPLETION_SETTINGS
 		MENUITEM "I&gnoruj wielkość liter podczas autouzupełniania",IDM_VIEW_AUTOCOMPLETION_IGNORECASE
 		MENUITEM "Włącz metodę wprowadzania LaTe&X",IDM_SET_LATEX_INPUT_METHOD
@@ -754,8 +754,8 @@ BEGIN
 			MENUITEM "Dekompozycja koreańskiego han&gula",	IDM_EDIT_MAP_HANGUL_DECOMPOSITION
 			MENUITEM SEPARATOR
 			MENUITEM "&Bengalski na łacinkę",				IDM_EDIT_MAP_BENGALI_LATIN
-			MENUITEM "C&yrilicę na łacinkę",				IDM_EDIT_MAP_CYRILLIC_LATIN
-			MENUITEM "&Dewanagari na łącinkę",				IDM_EDIT_MAP_DEVANAGARI_LATIN
+			MENUITEM "C&yrylicę na łacinkę",				IDM_EDIT_MAP_CYRILLIC_LATIN
+			MENUITEM "&Dewanagari na łacinkę",				IDM_EDIT_MAP_DEVANAGARI_LATIN
 			MENUITEM "&Malajalam na łacinkę",				IDM_EDIT_MAP_MALAYALAM_LATIN
 		END
 		POPUP "Narzędzia &Web"
@@ -790,7 +790,7 @@ IDR_POPUPMENU MENU
 BEGIN
 	POPUP "+"
 	BEGIN
-		MENUITEM "&;Cofnij",					IDM_EDIT_UNDO
+		MENUITEM "&Cofnij",					IDM_EDIT_UNDO
 		MENUITEM "&Powtórz",					IDM_EDIT_REDO
 		MENUITEM SEPARATOR
 		MENUITEM "W&ytnij",						IDM_EDIT_CUT
@@ -1072,13 +1072,13 @@ BEGIN
     ICON            IDR_MAINWND,IDC_STATIC,7,7,20,20
     LTEXT           "",IDC_VERSION,45,7,200,8
     LTEXT           "",IDC_BUILD_INFO,45,18,200,16
-    LTEXT           "Copyright © 2011-2026 Zufu Liu i wszyscy współautorzy.",IDC_STATIC,45,38,200,8
+    LTEXT           "Prawa autorskie © 2011-2026 Zufu Liu i wszyscy współautorzy.",IDC_STATIC,45,38,200,8
     LTEXT           "",IDC_NEW_PAGE_TEXT,45,48,200,8,NOT WS_VISIBLE | WS_DISABLED
     CONTROL         "",IDC_NEW_PAGE_LINK,"SysLink",WS_TABSTOP,45,48,200,10
-    LTEXT           "Copyright © 2010-2017 XhmikosR i wszyscy współautorzy.",IDC_STATIC,45,60,200,8
+    LTEXT           "Prawa autorskie © 2010-2017 XhmikosR i wszyscy współautorzy.",IDC_STATIC,45,60,200,8
     LTEXT           "",IDC_MOD_PAGE_TEXT,45,68,200,8,NOT WS_VISIBLE | WS_DISABLED
     CONTROL         "",IDC_MOD_PAGE_LINK,"SysLink",WS_TABSTOP,45,68,200,10
-    LTEXT           "Copyright © 2004-2012 Florian Balmer.",IDC_STATIC,45,80,200,8
+    LTEXT           "Prawa autorskie © 2004-2012 Florian Balmer.",IDC_STATIC,45,80,200,8
     LTEXT           "",IDC_WEBPAGE_TEXT,45,80,200,8,NOT WS_VISIBLE | WS_DISABLED
     CONTROL         "",IDC_WEBPAGE_LINK,"SysLink",WS_TABSTOP,45,88,200,10
     LTEXT           "Skontaktuj się z Florianem Balmerem:",IDC_STATIC,45,100,114,8
@@ -1328,7 +1328,7 @@ BEGIN
     PUSHBUTTON      "",IDC_PREVSTYLE,426,195,15,14
     PUSHBUTTON      "",IDC_NEXTSTYLE,446,195,15,14
     PUSHBUTTON      "&Importuj...",IDC_IMPORT,181,217,50,14
-    PUSHBUTTON      "&Eksportuj....",IDC_EXPORT,237,217,50,14
+    PUSHBUTTON      "&Eksportuj...",IDC_EXPORT,237,217,50,14
     PUSHBUTTON      "Resetuj wszystko",IDC_RESETALL,293,217,55,14
     DEFPUSHBUTTON   "OK",IDOK,355,217,50,14
     PUSHBUTTON      "Anuluj",IDCANCEL,411,217,50,14
@@ -1897,7 +1897,7 @@ BEGIN
     IDS_PRINT_PAGENUM       "Strona %s"
     IDS_PRINT_ERROR         "Błąd drukowania ""%s""!"
     IDS_FAV_SUCCESS         "Skrót do bieżącego pliku utworzono w katalogu Ulubione."
-    IDS_FAV_FAILURE         "Nie można utworzyć skrótu do bieżącego pliku.\nnUpewnij się, czy nie ma innego pliku o tej samej nazwie."
+    IDS_FAV_FAILURE         "Nie można utworzyć skrótu do bieżącego pliku.\nUpewnij się, czy nie ma innego pliku o tej samej nazwie."
     IDS_READONLY_MODIFY     "Nie można zmienić atrybutów""%s""."
 END
 
@@ -2142,5 +2142,9 @@ END
 #include "../../src/Notepad4.ver"
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
+
+
+
+
 
 
