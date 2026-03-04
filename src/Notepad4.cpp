@@ -1520,7 +1520,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		const int y = SciCall_PointYFromPosition(lParam);
 		SendMessage(hwndEdit, WM_LBUTTONUP, MAKELPARAM(x, y), MK_CONTROL);
 		EditSelectEx(wParam, lParam);
-		SciCall_SetMultipleSelection(true);
+		SciCall_SetMultipleSelection((iSelectOption & SelectOption_EnableMultipleSelection));
 	} break;
 
 	default:
@@ -4911,7 +4911,8 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			break;
 
 		case SCN_HOTSPOTCLICK:
-			if ((scn->modifiers & SCMOD_CTRL) && (iSelectOption & SelectOption_EnableMultipleSelection)) {
+		case SCN_INDICATORCLICK:
+			if ((scn->modifiers & SCMOD_CTRL)) {
 				// disable multiple selection to avoid two carets after Ctrl + click
 				SciCall_SetMultipleSelection(false);
 				SciCall_SetSel(scn->position, scn->position);
