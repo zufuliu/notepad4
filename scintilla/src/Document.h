@@ -202,7 +202,8 @@ class LexInterface {
 protected:
 	Document *pdoc;
 	LexerInstance instance;
-	bool performingStyle;	///< Prevent reentrance
+	bool performingStyle = false;	///< Prevent reentrance
+	int lexerLanguage = 0;
 public:
 	explicit LexInterface(Document *pdoc_) noexcept;
 	LexInterface(const LexInterface &) = delete;

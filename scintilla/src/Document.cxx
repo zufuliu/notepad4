@@ -61,7 +61,7 @@ using namespace Scintilla;
 using namespace Scintilla::Internal;
 using namespace Lexilla;
 
-LexInterface::LexInterface(Document *pdoc_) noexcept : pdoc(pdoc_), performingStyle(false) {
+LexInterface::LexInterface(Document *pdoc_) noexcept : pdoc{pdoc_} {
 }
 
 LexInterface::~LexInterface() noexcept = default;

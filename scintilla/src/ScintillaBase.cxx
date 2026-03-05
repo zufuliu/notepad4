@@ -687,7 +687,9 @@ LexState::LexState(Document *pdoc_) noexcept : LexInterface(pdoc_) {
 
 void LexState::SetInstance(ILexer5 *instance_) {
 	instance.reset(instance_);
-	pdoc->LexerChanged(GetIdentifier() != SCLEX_NULL);
+	const int language = instance_ ? instance_->GetIdentifier() : SCLEX_CONTAINER;
+	lexerLanguage = language;
+	pdoc->LexerChanged(language != SCLEX_NULL);
 }
 
 LexState *ScintillaBase::DocumentLexState() {
@@ -705,6 +707,7 @@ void LexState::SetLexer(int language) { //! removed in Scintilla 5
 		instance_ = lex->Create();
 	}
 	instance.reset(instance_);
+	lexerLanguage = language;
 	pdoc->LexerChanged(language != SCLEX_NULL);
 }
 
@@ -725,10 +728,7 @@ void LexState::SetWordList(int n, int attribute, const char *wl) {
 }
 
 int LexState::GetIdentifier() const noexcept {
-	if (instance) {
-		return instance->GetIdentifier();
-	}
-	return SCLEX_CONTAINER;
+	return lexerLanguage;
 }
 
 const char *LexState::GetName() const noexcept {
