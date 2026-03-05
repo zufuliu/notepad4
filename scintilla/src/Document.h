@@ -203,6 +203,7 @@ protected:
 	Document *pdoc;
 	LexerInstance instance;
 	bool performingStyle = false;	///< Prevent reentrance
+	bool enableUrlHighlight = false;
 	int lexerLanguage = 0;
 public:
 	explicit LexInterface(Document *pdoc_) noexcept;
@@ -650,6 +651,7 @@ public:
 	void EnsureStyledTo(Sci::Position pos);
 	void StyleToAdjustingLineDuration(Sci::Position pos);
 	void LexerChanged(bool hasStyles_);
+	bool EnableUrlHighlight() const noexcept;
 	int GetStyleClock() const noexcept {
 		return styleClock;
 	}

@@ -13,7 +13,6 @@ def printLexHFile(f):
 	STYLE_LASTPREDEFINED = 39
 
 	out = [
-		'#define STYLE_LINK 33',
 		'#define STYLE_COMMENT_LINK 34',
 		'#define STYLE_STRING_LINK 35',
 	]

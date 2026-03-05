@@ -650,6 +650,7 @@ public:
 	void SetInstance(ILexer5 *instance_);
 	// LexInterface deleted the standard operators and defined the virtual destructor so don't need to here.
 	void SetLexer(int language); //! removed in Scintilla 5
+	bool EnableUrlHighlight() noexcept;
 
 	const char *DescribeWordListSets() const noexcept;
 	void SetWordList(int n, int attribute, const char *wl);
@@ -1234,4 +1235,21 @@ sptr_t ScintillaBase::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		return Editor::WndProc(iMessage, wParam, lParam);
 	}
 	return 0;
+}
+
+bool LexState::EnableUrlHighlight() noexcept {
+	enableUrlHighlight = false;
+	if (lexerLanguage != SCLEX_CONTAINER
+		&& (static_cast<size_t>(pdoc->LengthNoExcept()) >> 28) == 0) {
+		enableUrlHighlight = true;
+		return true;
+	}
+	return false;
+}
+
+bool Document::EnableUrlHighlight() const noexcept {
+	if (LexState *instance = down_cast<LexState *>(GetLexInterface())) {
+		return instance->EnableUrlHighlight();
+	}
+	return false;
 }

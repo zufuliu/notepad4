@@ -116,6 +116,7 @@ enum class MarginType {
 enum class StylesCommon {
 	Default = 0,
 	LineNumber = 32,
+	Link = 33,
 	BraceLight = 34,
 	BraceBad = 35,
 	ControlChar = 36,
@@ -237,6 +238,7 @@ enum class IndicatorStyle {
 };
 
 enum class IndicatorNumbers {
+	Link = 7,
 	Container = 8,
 	Ime = 32,
 	ImeMax = 35,
