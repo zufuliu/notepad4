@@ -448,13 +448,10 @@ void ViewStyle::Refresh(Surface &surface, int tabInChars) {
 
 	bool flagDynamic = false;
 	bool flagSetFore = false;
-	for (const auto &indicator : indicators) {
-		if (indicator.IsDynamic()) {
-			flagDynamic = true;
-		}
-		if (indicator.OverridesTextFore()) {
-			flagSetFore = true;
-		}
+	for (auto &indicator : indicators) {
+		indicator.Refresh();
+		flagDynamic |= indicator.IsDynamic();
+		flagSetFore |= indicator.OverridesTextFore();
 	}
 	indicatorsDynamic = flagDynamic;
 	indicatorsSetFore = flagSetFore;
