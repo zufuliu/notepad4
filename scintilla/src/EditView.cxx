@@ -1392,6 +1392,7 @@ void EditView::DrawFoldDisplayText(Surface *surface, const EditModel &model, con
 
 	// small rectangle to avoid top and bottom edge overlap for adjacent fold block
 	PRectangle rcBox = rcSegment;
+	// align fold ellipsis with {} or <> at line end
 	rcBox.top += 1 + vsDraw.extraAscent/2;
 	rcBox.bottom -= vsDraw.extraDescent/2;
 	rcBox.left = std::round(rcBox.left);
@@ -1489,6 +1490,7 @@ void EditView::DrawEOLAnnotationText(Surface *surface, const EditModel &model, c
 		// it may be double drawing. This is to allow stadiums with
 		// curved or angled ends to have the area outside in the correct
 		// background colour.
+		surface->FillRectangleAligned(rcSegment, Fill(textBack));
 		FillLineRemainder(surface, model, vsDraw, ll, line, rcLine, rcSegment.right, subLine);
 	}
 
@@ -2349,6 +2351,7 @@ void EditView::DrawForeground(Surface *surface, const EditModel &model, const Vi
 			const int styleMain = ll->styles[i];
 			ColourRGBA textFore = vsDraw.styles[styleMain].fore;
 			const Font *textFont = vsDraw.styles[styleMain].font.get();
+			bool hoverUnderline = vsDraw.styles[styleMain].underline;
 			// Hot-spot foreground
 			const bool inHotspot = model.hotspot.Valid() && model.hotspot.ContainsCharacter(iDoc);
 			if (inHotspot) {
@@ -2371,6 +2374,7 @@ void EditView::DrawForeground(Surface *surface, const EditModel &model, const Vi
 						if (hover) {
 							if (indicator.sacHover.style == IndicatorStyle::TextFore) {
 								textFore = indicator.sacHover.fore;
+								hoverUnderline = indicator.hoverUnderline;
 							}
 						} else {
 							if (indicator.sacNormal.style == IndicatorStyle::TextFore) {
@@ -2508,7 +2512,7 @@ void EditView::DrawForeground(Surface *surface, const EditModel &model, const Vi
 					}
 				}
 			}
-			if ((inHotspot && vsDraw.hotspotUnderline) || vsDraw.styles[styleMain].underline) {
+			if (hoverUnderline || (inHotspot && vsDraw.hotspotUnderline)) {
 				PRectangle rcUL = rcSegment;
 				rcUL.top = ybase + 1;
 				rcUL.bottom = ybase + 2;

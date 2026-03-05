@@ -30,6 +30,7 @@ public:
 	bool dynamic = false;
 	bool overrideTextFore = false;
 	bool under = false;
+	bool hoverUnderline = false;
 	int fillAlpha = 30;
 	int outlineAlpha = 50;
 	Scintilla::IndicFlag attributes = Scintilla::IndicFlag::None;
@@ -40,7 +41,7 @@ public:
 	void SCICALL Draw(Surface *surface, PRectangle rc, PRectangle rcLine, PRectangle rcCharacter, State state, int value) const;
 
 	void Refresh() noexcept {
-		dynamic = !(sacNormal == sacHover);
+		dynamic = hoverUnderline || !(sacNormal == sacHover);
 		overrideTextFore = sacNormal.style == Scintilla::IndicatorStyle::TextFore || sacHover.style == Scintilla::IndicatorStyle::TextFore;
 	}
 	bool IsDynamic() const noexcept {
