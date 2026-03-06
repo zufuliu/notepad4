@@ -203,7 +203,7 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 							sc.ChangeState(static_cast<int>(kwType));
 						} else {
 							const int chNext = sc.GetDocNextChar(sc.ch == '?');
-							if (chNext == '(') {
+							if (chNext == '(' && sc.ch != '?') {
 								// type function()
 								// type[] function()
 								// type<type> function()

@@ -216,7 +216,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 							sc.ChangeState(static_cast<int>(kwType));
 						} else {
 							const int chNext = sc.GetLineNextChar(sc.ch == '?');
-							if (chNext == '(') {
+							if (chNext == '(' && sc.ch != '?') {
 								// type method()
 								// type[] method()
 								// type<type> method()

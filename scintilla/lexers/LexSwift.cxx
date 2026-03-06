@@ -224,7 +224,7 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 							sc.ChangeState(static_cast<int>(kwType));
 						} else {
 							const int chNext = sc.GetDocNextChar(sc.ch == '?');
-							if (chNext == '(') {
+							if (chNext == '(' && sc.ch != '?') {
 								sc.ChangeState(SCE_SWIFT_FUNCTION);
 							} else if ((chBeforeIdentifier == '<' && (chNext == '>' || chNext == '<'))
 								|| (chBeforeIdentifier == '[' && (sc.ch == ']' && AnyOf(sc.chNext, '(', ']')))) {

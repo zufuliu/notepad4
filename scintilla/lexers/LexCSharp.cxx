@@ -363,7 +363,7 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 									// (type)expression, (type)++identifier, (type)--identifier
 									sc.ChangeState(SCE_CSHARP_CLASS);
 								}
-							} else if (chNext == '(') {
+							} else if (chNext == '(' && sc.ch != '?') {
 								if (kwType != KeywordType::Return && (IsIdentifierCharEx(chBefore) || chBefore == ']')) {
 									// type method()
 									// type[] method()

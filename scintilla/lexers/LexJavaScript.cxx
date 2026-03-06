@@ -265,7 +265,7 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 							sc.ChangeState(static_cast<int>(kwType));
 						} else {
 							const int chNext = sc.GetDocNextChar(sc.ch == '?');
-							if (chNext == '(') {
+							if (chNext == '(' && sc.ch != '?') {
 								if (kwType != KeywordType::Return && (IsIdentifierCharEx(chBefore) || chBefore == ']')) {
 									sc.ChangeState(SCE_JS_FUNCTION_DEFINITION);
 								} else {
