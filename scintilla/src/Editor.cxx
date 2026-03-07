@@ -6087,15 +6087,17 @@ void Editor::StyleSetMessage(Message iMessage, uptr_t wParam, sptr_t lParam) {
 	}
 	case Message::StyleSetHotSpot:
 		vs.styles[wParam].hotspot = lParam != 0;
-		if (wParam == static_cast<uptr_t>(StylesCommon::Link) && pdoc->EnableUrlHighlight()) {
+		if (wParam == static_cast<uptr_t>(StylesCommon::Link)) {
+			const bool enabled = pdoc->EnableUrlHighlight();
 			constexpr int index = static_cast<int>(IndicatorNumbers::Link);
+			const IndicatorStyle style = enabled ? IndicatorStyle::TextFore : IndicatorStyle::Plain;
 			const ColourRGBA fore = vs.styles[wParam].fore;
 			Indicator &indicator = vs.indicators[index];
-			indicator.sacNormal.style = IndicatorStyle::TextFore;
+			indicator.sacNormal.style = style;
 			indicator.sacNormal.fore = fore;
-			indicator.sacHover.style = IndicatorStyle::TextFore;
+			indicator.sacHover.style = style;
 			indicator.sacHover.fore = fore;
-			indicator.hoverUnderline = true;
+			indicator.hoverUnderline = enabled;
 		}
 		break;
 	// case Message::StyleSetCheckMonospaced:
