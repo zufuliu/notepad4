@@ -1894,21 +1894,27 @@ void DrawBackground(Surface *surface, const EditModel &model, const ViewStyle &v
 					// Blob display
 					inIndentation = false;
 				}
-				surface->FillRectangleAligned(rcSegment, Fill(textBack));
-			} else {
+			}
+			surface->FillRectangleAligned(rcSegment, Fill(textBack));
+			if (!ts.representation) {
 				// Normal text display
-				surface->FillRectangleAligned(rcSegment, Fill(textBack));
 				if (vsDraw.viewWhitespace != WhiteSpace::Invisible) {
-					for (int cpos = 0; cpos <= i - ts.start; cpos++) {
-						if (ll->chars[cpos + ts.start] == ' ') {
+					for (int cpos = 0; cpos <= i - ts.start; ) {
+						int countSpaces = 0;
+						while ((countSpaces <= i - ts.start - cpos) && (ll->chars[cpos + ts.start + countSpaces] == ' ')) {
+							countSpaces++;
+						}
+						if (countSpaces) {
 							if (drawWhitespaceBackground && vsDraw.WhiteSpaceVisible(inIndentation)) {
 								const PRectangle rcSpace = Intersection(rcLine,
-									ll->SpanByte(cpos + ts.start).Offset(horizontalOffset));
+									ll->Span(cpos + ts.start, cpos + ts.start + countSpaces).Offset(horizontalOffset));
 								surface->FillRectangleAligned(rcSpace,
 									vsDraw.ElementColourForced(Element::WhiteSpaceBack).Opaque());
 							}
+							cpos += countSpaces;
 						} else {
 							inIndentation = false;
+							cpos++;
 						}
 					}
 				}

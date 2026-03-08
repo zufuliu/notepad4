@@ -5,7 +5,7 @@ git clone https://github.com/XhmikosR/notepad2-mod.git
 Scintilla (upstream)
 hg clone http://hg.code.sf.net/p/scintilla/code scintilla
 5.6.0
-2026-03-02 9836:3f93255ae114
+2026-03-07 9839:b371d4b36bf9
 
 Lexilla (upstream)
 git clone https://github.com/ScintillaOrg/lexilla.git
@@ -15,7 +15,7 @@ git clone https://github.com/ScintillaOrg/lexilla.git
 SciTE (upstream)
 hg clone http://hg.code.sf.net/p/scintilla/scite
 5.6.0
-2026-02-28 6545:d9931506bb9d
+2026-03-08 6547:86e7dadd01ee
 
 Boost regex 7.0.1
 1.90 https://github.com/boostorg/regex
