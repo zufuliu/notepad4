@@ -205,6 +205,7 @@ protected:
 	bool performingStyle = false;	///< Prevent reentrance
 	bool enableUrlHighlight = false;
 	int lexerLanguage = 0;
+	uint32_t urlIgnoreStyle[8];
 public:
 	explicit LexInterface(Document *pdoc_) noexcept;
 	LexInterface(const LexInterface &) = delete;
@@ -652,6 +653,7 @@ public:
 	void StyleToAdjustingLineDuration(Sci::Position pos);
 	void LexerChanged(bool hasStyles_);
 	bool EnableUrlHighlight() const noexcept;
+	void HighlightUrl(Sci_PositionU startPos, Sci_Position lengthDoc, const uint32_t (&urlIgnoreStyle)[8]);
 	int GetStyleClock() const noexcept {
 		return styleClock;
 	}

@@ -1798,7 +1798,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) noexcept {
 	Style_SetDefaultStyle(GlobalStyleIndex_ControlCharacter);
 	if (rid != NP2LEX_ANSI) {
 		Style_SetAllStyle(pLexNew, 0);
-
+		// keep sync with LexState::EnableUrlHighlight() for link style
 		switch (rid) {
 		case NP2LEX_REBOL:
 			SciCall_CopyStyles(STYLE_LINK, MULTI_STYLE(SCE_REBOL_URL, SCE_REBOL_EMAIL, 0, 0));
@@ -1810,7 +1810,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) noexcept {
 				Style_LoadOne(&lexHTML);
 			}
 			if (rid == NP2LEX_MARKDOWN) {
-				SciCall_CopyStyles(STYLE_LINK, MULTI_STYLE(SCE_MARKDOWN_PLAIN_LINK, SCE_MARKDOWN_PAREN_LINK, SCE_MARKDOWN_ANGLE_LINK, STYLE_COMMENT_LINK));
+				SciCall_CopyStyles(STYLE_LINK, MULTI_STYLE(SCE_MARKDOWN_PLAIN_LINK, SCE_MARKDOWN_PAREN_LINK, SCE_MARKDOWN_ANGLE_LINK, 0));
 			} else {
 				Style_SetAllStyle(&lexJavaScript, SCE_PHP_LABEL + 1);
 				Style_SetAllStyle(&lexCSS, SCE_PHP_LABEL + SCE_JS_LABEL + 2);

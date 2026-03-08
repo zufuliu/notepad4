@@ -59,13 +59,6 @@ enum class HtmlTagType {
 	Both,
 };
 
-enum class AutoLink {
-	None,
-	Angle,
-	Domain,
-	Path,
-};
-
 enum class SeekStatus {
 	None,
 	Continue,
@@ -247,8 +240,6 @@ struct MarkdownLexer {
 	int delimiterCount = 0; // code fence
 	int bracketCount = 0; // link text
 	int parenCount = 0; // link	destination, link title
-	int periodCount = 0; // autoLink domain and path
-	AutoLink autoLink = AutoLink::None;
 	const Markdown markdown;
 	const WordList &blockTagList;
 
@@ -307,9 +298,6 @@ struct MarkdownLexer {
 
 	SeekStatus HighlightLinkText(uint32_t lineState);
 	SeekStatus HighlightLinkDestination(uint32_t lineState);
-
-	bool DetectAutoLink();
-	bool HighlightAutoLink();
 
 	void HighlightDelimiterRow();
 	bool HighlightCriticMarkup();
@@ -1040,188 +1028,6 @@ SeekStatus MarkdownLexer::HighlightLinkDestination(uint32_t lineState) {
 	}
 }
 
-// 6.9 Autolinks (extension)
-bool MarkdownLexer::DetectAutoLink() {
-	int offset = 0;
-	AutoLink result = AutoLink::None;
-	Sci_PositionU pos = sc.currentPos;
-	switch (sc.ch) {
-	case 'w':
-		if (sc.chNext == 'w' && !IsIdentifierChar(sc.chPrev)
-			&& sc.styler[pos + 2] == 'w'
-			&& sc.styler[pos + 3] == '.'
-			&& IsDomainNameChar(sc.styler[pos + 4])) {
-			offset = 3;
-			result = AutoLink::Domain;
-		}
-		break;
-
-	case ':':
-		if (sc.chNext == '/' && pos >= 2 && IsSchemeNameChar(sc.chPrev) && sc.styler[pos + 2] == '/'
-			&& !IsInvalidUrlChar(sc.styler[pos + 3])) {
-			// backtrack to find scheme name before `://`, this is more efficient than forward check every word
-			constexpr int kMinSchemeNameLength = 2;
-			constexpr int kMaxSchemeNameLength = 32;
-			const Sci_PositionU startPos = sc.styler.GetStartSegment();
-			const Sci_PositionU endPos = pos;
-			pos -= 2;
-			uint8_t ch;
-			while (true) {
-				ch = sc.styler.SafeGetCharAt(pos);
-				if (pos == startPos || pos + kMaxSchemeNameLength < endPos || !IsSchemeNameChar(ch)) {
-					break;
-				}
-				--pos;
-			}
-			if (sc.styler.IsLeadByte(ch)) {
-				++pos;
-			}
-
-			uint8_t chPrev = '\0';
-			while (pos < endPos && !IsAlpha(ch)) {
-				chPrev = ch;
-				ch = sc.styler[++pos];
-			}
-
-			offset = static_cast<int>(endPos - pos);
-			if (offset >= kMinSchemeNameLength && !IsIdentifierChar(chPrev)) {
-				offset += 2;
-				result = AutoLink::Path;
-				// go back to scheme start position and change style from here
-				sc.currentPos = pos;
-			}
-		}
-		break;
-	}
-
-	if (result != AutoLink::None) {
-		periodCount = 0;
-		autoLink = result;
-		SaveOuterStyle(sc.state);
-		sc.SetState((sc.state == SCE_H_COMMENT)? STYLE_COMMENT_LINK : STYLE_LINK);
-		sc.Advance(offset);
-		return true;
-	}
-	return false;
-}
-
-bool MarkdownLexer::HighlightAutoLink() {
-	switch (autoLink) {
-	case AutoLink::Angle:
-		// absolute URI or email
-		if (sc.ch == ':' || sc.ch == '@') {
-			++periodCount;
-		}
-		if (IsInvalidUrlChar(sc.ch)) {
-			const int count = periodCount;
-			periodCount = 0;
-			autoLink = AutoLink::None;
-			const int outer = TakeOuterStyle();
-			if (sc.ch == '>' && count != 0) {
-				sc.ForwardSetState(outer);
-			} else {
-				sc.ChangeState(outer);
-				sc.Rewind();
-				sc.Forward();
-			}
-			return true;
-		}
-		break;
-
-	case AutoLink::Domain:
-		if (sc.ch == '.' && IsDomainNameChar(sc.chNext)) {
-			++periodCount;
-			sc.Forward();
-		} else if (!IsDomainNameChar(sc.ch)) {
-			const bool invalid = periodCount == 0;
-			periodCount = 0;
-			if (!invalid && ((sc.ch == ':' && IsADigit(sc.chNext))
-				|| ((sc.ch == '/' || sc.ch == '?' || sc.ch == '#') && !IsInvalidUrlChar(sc.chNext)))) {
-				autoLink = AutoLink::Path;
-			}
-			if (autoLink != AutoLink::Path) {
-				autoLink = AutoLink::None;
-				const int outer = TakeOuterStyle();
-				if (invalid) {
-					sc.ChangeState(outer);
-					sc.Rewind();
-					sc.Forward();
-				} else {
-					if (sc.ch == '/') {
-						sc.Forward();
-					}
-					sc.SetState(outer);
-				}
-				return true;
-			}
-		}
-		break;
-
-	default: {
-		if (sc.ch == '(') {
-			++periodCount;
-		} else if (sc.ch == ')') {
-			--periodCount;
-		}
-		bool invalid = (sc.chNext == ')' && periodCount == 0) || IsInvalidUrlChar(sc.chNext);
-		const bool punctuation = IsPunctuation(sc.ch);
-		if (punctuation && !invalid) {
-			const int outer = nestedState.back();
-			switch (outer) {
-			default:
-				if (outer == SCE_MARKDOWN_DEFAULT || (outer >= SCE_MARKDOWN_HEADER1 && !IsRawTextStyle(outer))) {
-					const bool current = IsEmphasisDelimiter(sc.ch);
-					if (current || IsEmphasisDelimiter(sc.chNext)) {
-						// similar to HighlightEmphasis()
-						DelimiterRun delimiterRun;
-						const int length = GetCurrentDelimiterRun(delimiterRun, !current);
-						const int delimiter = current ? sc.ch : sc.chNext;
-						if ((delimiter != '~' || length >= 2)
-							&& (delimiterRun.CanOpen(delimiter) || delimiterRun.CanClose(delimiter))) {
-							invalid = true;
-						} else {
-							sc.Advance(length - current);
-						}
-					}
-				}
-				break;
-
-			case SCE_H_SINGLESTRING:
-			case SCE_H_SGML_SIMPLESTRING:
-				invalid = sc.ch == '\'';
-				break;
-
-			case SCE_H_COMMENT:
-				if (sc.Match('-', '-')) {
-					const char chNext = sc.styler[sc.currentPos + 2];
-					if (chNext == '>' || chNext == '?') {
-						invalid = true;
-					}
-				}
-				break;
-
-			case SCE_H_CDATA:
-				if (sc.Match(']', ']', '>')) {
-					invalid = true;
-				}
-				break;
-			}
-		}
-		if (invalid) {
-			if (!punctuation || sc.ch == '/' || (sc.ch == ')' && periodCount == 0)) {
-				sc.Forward();
-			}
-			periodCount = 0;
-			autoLink = AutoLink::None;
-			sc.SetState(TakeOuterStyle());
-			return true;
-		}
-	} break;
-	}
-
-	return false;
-}
-
 // 4.6 HTML blocks
 HtmlTagType MarkdownLexer::CheckHtmlBlockTag(Sci_PositionU pos, Sci_PositionU endPos, int chNext, bool paragraph) const noexcept {
 	char tag[MaxKeywordSize]{};
@@ -1336,15 +1142,11 @@ bool MarkdownLexer::HandleHtmlTag(HtmlTagType tagType) {
 		if (tagType == HtmlTagType::Block) {
 			sc.ForwardSetState(SCE_H_BLOCK_TAG);
 		}
-	} else if (tagType == HtmlTagType::Inline && !IsInvalidUrlChar(sc.chNext)) {
-		sc.SetState(STYLE_LINK);
+	// } else if (tagType == HtmlTagType::Inline && !IsInvalidUrlChar(sc.chNext)) {
+		// <autolink>
 	}
 	if (current != sc.state) {
 		if (tagType == HtmlTagType::Inline) {
-			if (sc.state == STYLE_LINK) {
-				autoLink = AutoLink::Angle;
-				periodCount = 0;
-			}
 			SaveOuterStyle(current);
 		}
 		return true;
@@ -1738,8 +1540,6 @@ void MarkdownLexer::HighlightInlineText(int visibleChars) {
 			sc.Forward();
 		}
 		sc.ForwardSetState(current);
-	} else if (bracketCount == 0) {
-		DetectAutoLink();
 	}
 }
 
@@ -1754,8 +1554,6 @@ SeekStatus MarkdownLexer::HighlightCodeSpan(uint32_t lineState) {
 				delimiterCount = 0;
 				result = HighlightResult::Finish;
 			}
-		} else if (bracketCount == 0) {
-			DetectAutoLink();
 		}
 		break;
 
@@ -1973,7 +1771,6 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 					break;
 				}
 			}
-			lexer.DetectAutoLink();
 			break;
 
 		case SCE_MARKDOWN_INDENTED_BLOCK:
@@ -1981,8 +1778,6 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 				if (lexer.IsIndentedBlockEnd()) {
 					lineState |= LineStateBlockEndLine;
 				}
-			} else {
-				lexer.DetectAutoLink();
 			}
 			break;
 
@@ -2027,7 +1822,6 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 					break;
 				}
 			}
-			lexer.DetectAutoLink();
 			break;
 
 		case SCE_MARKDOWN_TITLE_BLOCK:
@@ -2099,13 +1893,6 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 		case SCE_MARKDOWN_TASK_LIST:
 			sc.SetState(lexer.TakeOuterStyle());
 			continue;
-
-		case STYLE_LINK:
-		case STYLE_COMMENT_LINK:
-			if (lexer.HighlightAutoLink()) {
-				continue;
-			}
-			break;
 
 		case SCE_MARKDOWN_EMOJI:
 		case SCE_MARKDOWN_EXAMPLE_LIST:
@@ -2199,22 +1986,21 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 					sc.SetState(SCE_H_OTHER);
 				} else {
 					lexer.tagState = HtmlTagState::None;
-					lexer.periodCount = 0;
-					lexer.autoLink = AutoLink::Angle;
-					sc.ChangeState(STYLE_LINK);
-					continue;
+					// <autolink>
+					sc.ChangeState(SCE_MARKDOWN_DEFAULT);
 				}
 			}
 			break;
 
 		case SCE_H_ENTITY:
 			if (!IsAlphaNumeric(sc.ch)) {
+				const int outer = lexer.TakeOuterStyle();
 				if (sc.ch == ';') {
 					sc.Forward();
 				} else {
-					sc.ChangeState(SCE_H_TAGUNKNOWN);
+					sc.ChangeState(outer);
 				}
-				sc.SetState(lexer.TakeOuterStyle());
+				sc.SetState(outer);
 				continue;
 			}
 			break;
@@ -2242,7 +2028,6 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 				sc.ForwardSetState(outer);
 				continue;
 			}
-			lexer.DetectAutoLink();
 			break;
 
 		case SCE_H_DOUBLESTRING:
@@ -2252,7 +2037,6 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 				sc.ForwardSetState(outer);
 				continue;
 			}
-			lexer.DetectAutoLink();
 			break;
 
 		case SCE_H_COMMENT:
@@ -2269,7 +2053,6 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 					continue;
 				}
 			}
-			lexer.DetectAutoLink();
 			break;
 
 		case SCE_H_CDATA:
@@ -2283,8 +2066,6 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 					sc.SetState(lexer.TryTakeOuterStyle());
 					continue;
 				}
-			} else {
-				lexer.DetectAutoLink();
 			}
 			break;
 
@@ -2303,8 +2084,6 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 				if (IsASpace(sc.ch)) {
 					sc.SetState(SCE_H_PROCESS_TEXT);
 				}
-			} else {
-				lexer.DetectAutoLink();
 			}
 			break;
 

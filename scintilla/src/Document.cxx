@@ -90,6 +90,7 @@ void LexInterface::Colourise(Sci::Position start, Sci::Position end) {
 			instance->Lex(start, len, styleStart, pdoc);
 			instance->Fold(start, len, styleStart, pdoc);
 			if (enableUrlHighlight) {
+				pdoc->HighlightUrl(start, len, urlIgnoreStyle);
 			}
 		}
 

@@ -1,4 +1,5 @@
 import unicodedata
+import string
 
 from FileGenerator import Regenerate
 import MultiStageTable
@@ -204,7 +205,37 @@ def GenerateJsonCharClass():
 	lines = MultiStageTable.dumpArray(table, 16)
 	Regenerate("../lexers/LexJSON.cxx", "//", lines)
 
+def GenerateUrlCharClass():
+	UrlCharMask_Invalid	= 1
+	UrlCharMask_Identifier = 2
+	UrlCharMask_Punctuation = 4
+	UrlCharMask_SchemeName = 8
+	UrlCharMask_DomainName = 16
+
+	table = [0]*256
+	letters = string.ascii_letters + string.digits
+	punctuation = string.punctuation
+	invalid = ('"', '<', '>', '\\', '^', '`', '{', '|', '}', chr(127))
+	for i in range(128):
+		ch = chr(i)
+		mask = 0
+		if i <= 32 or ch in invalid: # IsInvalidUrlChar()
+			mask |= UrlCharMask_Invalid
+		if ch in letters or ch == '_': # IsIdentifierChar()
+			mask |= UrlCharMask_Identifier
+		if ch in punctuation: # IsPunctuation()
+			mask |= UrlCharMask_Punctuation
+		if ch in letters or ch in '+-.': # IsSchemeNameChar()
+			mask |= UrlCharMask_SchemeName
+		if ch in letters or ch in '_-': # IsDomainNameChar()
+			mask |= UrlCharMask_DomainName
+		table[i] = mask
+
+	lines = MultiStageTable.dumpArray(table, 16)
+	Regenerate("../src/ScintillaBase.cxx", "//kUrlCharClass", lines)
+
 if __name__ == '__main__':
 	#GenerateUTF8Table()
 	GenerateUnicodeControlCharacters()
 	GenerateJsonCharClass()
+	GenerateUrlCharClass()
