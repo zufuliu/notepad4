@@ -78,7 +78,7 @@ protected:
 	int AutoCompleteGetCurrentText(char *buffer) const;
 	void AutoCompleteCharacterAdded(char ch);
 	void AutoCompleteCharacterDeleted();
-	void AutoCompleteNotifyCompleted(char ch, CompletionMethods completionMethod, Sci::Position firstPos, const char *text);
+	void AutoCompleteNotifyCompleted(char ch, CompletionMethods completionMethod, Sci::Position firstPos, const char *text) const noexcept;
 	void AutoCompleteCompleted(char ch, Scintilla::CompletionMethods completionMethod);
 	void AutoCompleteMoveToCurrentWord();
 	void AutoCompleteSelection();
@@ -89,7 +89,7 @@ protected:
 	virtual void SCICALL CreateCallTipWindow(PRectangle rc) noexcept = 0;
 
 #if SCI_EnablePopupMenu
-	virtual void AddToPopUp(const char *label, int cmd = 0, bool enabled = true) noexcept = 0;
+	virtual void AddToPopUp(const char *label, int cmd = 0, bool enabled = true) const noexcept = 0;
 	bool ShouldDisplayPopup(Point ptInWindowCoordinates) const noexcept;
 	void ContextMenu(Point pt) noexcept;
 #endif

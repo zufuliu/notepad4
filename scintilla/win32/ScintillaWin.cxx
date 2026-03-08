@@ -443,7 +443,7 @@ public:
 		::ImmSetCompositionWindow(hIMC, &CompForm);
 	}
 
-	void SetCompositionFont(const ViewStyle &vs, int style, UINT dpi) const {
+	void SetCompositionFont(const ViewStyle &vs, int style, UINT dpi) const noexcept {
 		LOGFONTW lf {};
 		const int sizeZoomed = GetFontSizeZoomed(vs.styles[style].size, vs.zoomLevel);
 		// The negative is to allow for leading
@@ -703,7 +703,7 @@ class ScintillaWin final :
 	};
 
 	void DisplayCursor(Window::Cursor c) noexcept override;
-	bool SCICALL DragThreshold(Point ptStart, Point ptNow) noexcept override;
+	bool SCICALL DragThreshold(Point ptStart, Point ptNow) const noexcept override;
 	void StartDrag() override;
 	static KeyMod MouseModifiers(uptr_t wParam) noexcept;
 
@@ -754,29 +754,28 @@ class ScintillaWin final :
 	void UpdateBaseElements() noexcept override;
 	bool SCICALL PaintContains(PRectangle rc) const noexcept override;
 	void ScrollText(Sci::Line linesToMove) override;
-	void NotifyCaretMove() noexcept override;
+	void NotifyCaretMove() const noexcept override;
 	void UpdateSystemCaret() override;
 	void SetVerticalScrollPos() override;
 	void SetHorizontalScrollPos() override;
 	void HorizontalScrollToClamped(int xPos);
 	[[nodiscard]] HorizontalScrollRange GetHorizontalScrollRange() const noexcept;
 	bool ModifyScrollBars(Sci::Line nMax, Sci::Line nPage) override;
-	void NotifyChange() noexcept override;
-	void NotifyFocus(bool focus) override;
+	void NotifyChange() const noexcept override;
+	void NotifyFocus(bool focus) const noexcept override;
 	void SetCtrlID(int identifier) noexcept override;
 	int GetCtrlID() const noexcept override;
 	void NotifyParent(NotificationData &scn) const noexcept override;
 	void NotifyDoubleClick(Point pt, KeyMod modifiers) override;
-	std::unique_ptr<CaseFolder> CaseFolderForEncoding() override;
+	std::unique_ptr<CaseFolder> CaseFolderForEncoding() const override;
 	std::string CaseMapString(const std::string &s, CaseMapping caseMapping) const override;
 	void Copy(bool asBinary) const override;
-	bool CanPaste() noexcept override;
+	bool CanPaste() const noexcept override;
 	void Paste(bool asBinary) override;
 	void SCICALL CreateCallTipWindow(PRectangle rc) noexcept override;
 #if SCI_EnablePopupMenu
-	void AddToPopUp(const char *label, int cmd = 0, bool enabled = true) noexcept override;
+	void AddToPopUp(const char *label, int cmd = 0, bool enabled = true) const noexcept override;
 #endif
-	void ClaimSelection() noexcept override;
 
 	enum class CopyEncoding {
 		Unicode,	// used in Copy & Paste, Drag & Drop
@@ -830,8 +829,8 @@ public:
 
 	/// Implement IUnknown
 	STDMETHODIMP QueryInterface(REFIID riid, PVOID *ppv) noexcept;
-	STDMETHODIMP_(ULONG)AddRef() noexcept;
-	STDMETHODIMP_(ULONG)Release() noexcept;
+	STDMETHODIMP_(ULONG)AddRef() const noexcept;
+	STDMETHODIMP_(ULONG)Release() const noexcept;
 
 	/// Implement IDropTarget
 	STDMETHODIMP DragEnter(LPDATAOBJECT pIDataSource, DWORD grfKeyState,
@@ -842,7 +841,7 @@ public:
 		POINTL pt, PDWORD pdwEffect);
 
 	/// Implement important part of IDataObject
-	STDMETHODIMP GetData(const FORMATETC *pFEIn, STGMEDIUM *pSTM);
+	STDMETHODIMP GetData(const FORMATETC *pFEIn, STGMEDIUM *pSTM) const;
 
 #if USE_WIN32_INIT_ONCE
 	static BOOL CALLBACK PrepareOnce(PINIT_ONCE initOnce, PVOID parameter, PVOID *lpContext) noexcept;
@@ -1190,7 +1189,7 @@ void ScintillaWin::DisplayCursor(Window::Cursor c) noexcept {
 	}
 }
 
-bool ScintillaWin::DragThreshold(Point ptStart, Point ptNow) noexcept {
+bool ScintillaWin::DragThreshold(Point ptStart, Point ptNow) const noexcept {
 	const Point ptDifference = ptStart - ptNow;
 	const XYPOSITION xMove = std::trunc(std::abs(ptDifference.x));
 	const XYPOSITION yMove = std::trunc(std::abs(ptDifference.y));
@@ -2893,7 +2892,7 @@ void ScintillaWin::ScrollText(Sci::Line /* linesToMove */) {
 	UpdateSystemCaret();
 }
 
-void ScintillaWin::NotifyCaretMove() noexcept {
+void ScintillaWin::NotifyCaretMove() const noexcept {
 	NotifyWinEvent(EVENT_OBJECT_LOCATIONCHANGE, MainHWND(), OBJID_CARET, CHILDID_SELF);
 }
 
@@ -3000,13 +2999,13 @@ bool ScintillaWin::ModifyScrollBars(Sci::Line nMax, Sci::Line nPage) {
 	return modified;
 }
 
-void ScintillaWin::NotifyChange() noexcept {
+void ScintillaWin::NotifyChange() const noexcept {
 	::SendMessage(::GetParent(MainHWND()), WM_COMMAND,
 		MAKEWPARAM(GetCtrlID(), FocusChange::Change),
 		AsInteger<LPARAM>(MainHWND()));
 }
 
-void ScintillaWin::NotifyFocus(bool focus) {
+void ScintillaWin::NotifyFocus(bool focus) const noexcept {
 	if (commandEvents) {
 		::SendMessage(::GetParent(MainHWND()), WM_COMMAND,
 			MAKEWPARAM(GetCtrlID(), focus ? FocusChange::Setfocus : FocusChange::Killfocus),
@@ -3084,7 +3083,7 @@ class CaseFolderDBCS final : public CaseFolderTable {
 	uint16_t foldingMap[0x8000];
 public:
 	CaseFolderDBCS(int codePage, const DBCSCharClassify *dbcsCharClass);
-	size_t Fold(char *folded, size_t sizeFolded, const char *mixed, size_t lenMixed) const override;
+	size_t Fold(char *folded, size_t sizeFolded, const char *mixed, size_t lenMixed) const noexcept override;
 };
 
 // creates a fold map by calling platform APIs so will differ between platforms.
@@ -3246,7 +3245,7 @@ CaseFolderDBCS::CaseFolderDBCS(int codePage, const DBCSCharClassify *dbcsCharCla
 #endif
 }
 
-size_t CaseFolderDBCS::Fold(char *folded, [[maybe_unused]] size_t sizeFolded, const char *mixed, size_t lenMixed) const {
+size_t CaseFolderDBCS::Fold(char *folded, [[maybe_unused]] size_t sizeFolded, const char *mixed, size_t lenMixed) const noexcept {
 	// This loop outputs the same length as input as for each char 1-byte -> 1-byte; 2-byte -> 2-byte
 	assert(sizeFolded >= lenMixed);
 	size_t lenOut = 0;
@@ -3269,7 +3268,7 @@ size_t CaseFolderDBCS::Fold(char *folded, [[maybe_unused]] size_t sizeFolded, co
 
 }
 
-std::unique_ptr<CaseFolder> ScintillaWin::CaseFolderForEncoding() {
+std::unique_ptr<CaseFolder> ScintillaWin::CaseFolderForEncoding() const {
 	const UINT cpDest = CodePageOfDocument();
 	if (cpDest == CpUtf8) {
 		return std::make_unique<CaseFolderUnicode>();
@@ -3346,7 +3345,7 @@ void ScintillaWin::Copy(bool asBinary) const {
 	}
 }
 
-bool ScintillaWin::CanPaste() noexcept {
+bool ScintillaWin::CanPaste() const noexcept {
 	if (!Editor::CanPaste())
 		return false;
 #if DebugCopyAsRichTextFormat
@@ -3399,7 +3398,7 @@ public:
 	explicit operator bool() const noexcept {
 		return ptr != nullptr;
 	}
-	[[nodiscard]] SIZE_T Size() noexcept {
+	[[nodiscard]] SIZE_T Size() const noexcept {
 		return ::GlobalSize(hand);
 	}
 };
@@ -3522,7 +3521,7 @@ void ScintillaWin::CreateCallTipWindow(PRectangle) noexcept {
 }
 
 #if SCI_EnablePopupMenu
-void ScintillaWin::AddToPopUp(const char *label, int cmd, bool enabled) noexcept {
+void ScintillaWin::AddToPopUp(const char *label, int cmd, bool enabled) const noexcept {
 	HMENU hmenuPopup = static_cast<HMENU>(popup.GetID());
 	if (!label[0])
 		::AppendMenuA(hmenuPopup, MF_SEPARATOR, 0, "");
@@ -3532,10 +3531,6 @@ void ScintillaWin::AddToPopUp(const char *label, int cmd, bool enabled) noexcept
 		::AppendMenuA(hmenuPopup, MF_STRING | MF_DISABLED | MF_GRAYED, cmd, label);
 }
 #endif
-
-void ScintillaWin::ClaimSelection() noexcept {
-	// Windows does not have a primary selection
-}
 
 /// Implement IUnknown
 STDMETHODIMP FormatEnumerator::QueryInterface(REFIID riid, PVOID *ppv) noexcept {
@@ -4164,11 +4159,11 @@ STDMETHODIMP ScintillaWin::QueryInterface(REFIID riid, PVOID *ppv) noexcept {
 	return S_OK;
 }
 
-STDMETHODIMP_(ULONG) ScintillaWin::AddRef() noexcept {
+STDMETHODIMP_(ULONG) ScintillaWin::AddRef() const noexcept {
 	return 1;
 }
 
-STDMETHODIMP_(ULONG) ScintillaWin::Release() noexcept {
+STDMETHODIMP_(ULONG) ScintillaWin::Release() const noexcept {
 	return 1;
 }
 
@@ -4343,7 +4338,8 @@ STDMETHODIMP ScintillaWin::Drop(LPDATAOBJECT pIDataSource, DWORD grfKeyState, PO
 		for (UINT fmtIndex = 0; fmtIndex < dropFormatCount; fmtIndex++) {
 			const CLIPFORMAT fmt = dropFormat[fmtIndex];
 			FORMATETC fmtu = { fmt, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
-			STGMEDIUM medium {};
+			STGMEDIUM medium;
+			memset(&medium, 0, sizeof(medium));
 			hr = pIDataSource->GetData(&fmtu, &medium);
 
 			if (SUCCEEDED(hr) && medium.hGlobal) {
@@ -4425,7 +4421,7 @@ STDMETHODIMP ScintillaWin::Drop(LPDATAOBJECT pIDataSource, DWORD grfKeyState, PO
 }
 
 /// Implement important part of IDataObject
-STDMETHODIMP ScintillaWin::GetData(const FORMATETC *pFEIn, STGMEDIUM *pSTM) {
+STDMETHODIMP ScintillaWin::GetData(const FORMATETC *pFEIn, STGMEDIUM *pSTM) const {
 	if (!SupportedFormat(pFEIn)) {
 		//Platform::DebugPrintf("DOB GetData No %d %x %x fmt=%x\n", lenDrag, pFEIn, pSTM, pFEIn->cfFormat);
 		return DATA_E_FORMATETC;

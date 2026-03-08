@@ -207,9 +207,9 @@ public:
 	void CalculateMarginWidthAndMask() noexcept;
 	void Refresh(Surface &surface, int tabInChars);
 	void ReleaseAllExtendedStyles() noexcept;
-	int AllocateExtendedStyles(int numberStyles);
-	void CopyStyles(size_t sourceIndex, size_t destStyles);
-	void EnsureStyle(size_t index);
+	int AllocateExtendedStyles(int numberStyles) noexcept;
+	void CopyStyles(size_t sourceIndex, size_t destStyles) noexcept;
+	void EnsureStyle(size_t index) const noexcept;
 	void ResetDefaultStyle();
 	void ClearStyles() noexcept;
 	void SetStyleFontName(int styleIndex, const char *name);

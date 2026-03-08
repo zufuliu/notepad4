@@ -243,7 +243,7 @@ void Editor::InvalidateStyleData() noexcept {
 	view.posCache.Clear();
 }
 
-void Editor::InvalidateStyleRedraw() {
+void Editor::InvalidateStyleRedraw() noexcept {
 	NeedWrapping();
 	InvalidateStyleData();
 	Redraw();
@@ -1952,7 +1952,7 @@ void Editor::SetVerticalScrollPos() {
 }
 
 // Empty method is overridden on GTK to show / hide scrollbars
-void Editor::ReconfigureScrollBars() noexcept {}
+void Editor::ReconfigureScrollBars() const noexcept {}
 
 void Editor::SetScrollBars() {
 	RefreshStyleData();
@@ -2364,7 +2364,7 @@ void Editor::PasteRectangular(SelectionPosition pos, const char *ptr, Sci::Posit
 	SetEmptySelection(pos);
 }
 
-bool Editor::CanPaste() noexcept {
+bool Editor::CanPaste() const noexcept {
 	return !pdoc->IsReadOnly() && !SelectionContainsProtected();
 }
 
@@ -2529,7 +2529,10 @@ void Editor::DelCharBack(bool allowLineStartDeletion) {
 	ShowCaretAtCurrentPosition();
 }
 
-void Editor::NotifyFocus(bool focus) {
+// Windows/macOS does not have a primary selection
+void Editor::ClaimSelection() const noexcept {}
+
+void Editor::NotifyFocus(bool focus) const noexcept {
 	NotificationData scn = {};
 	scn.nmhdr.code = focus ? Notification::FocusIn : Notification::FocusOut;
 	NotifyParent(scn);
@@ -4252,7 +4255,7 @@ void Editor::Indent(bool forwards, bool lineIndent) {
 	ContainerNeedsUpdate(Update::Selection);
 }
 
-std::unique_ptr<CaseFolder> Editor::CaseFolderForEncoding() {
+std::unique_ptr<CaseFolder> Editor::CaseFolderForEncoding() const {
 	// Simple default that only maps ASCII upper case to lower case.
 	return std::make_unique<CaseFolderTable>();
 }
@@ -4531,7 +4534,7 @@ void Editor::DisplayCursor(Window::Cursor c) noexcept {
 		wMain.SetCursor(static_cast<Window::Cursor>(cursorMode));
 }
 
-bool Editor::DragThreshold(Point ptStart, Point ptNow) noexcept {
+bool Editor::DragThreshold(Point ptStart, Point ptNow) const noexcept {
 	const Point ptDiff = ptStart - ptNow;
 	const XYPOSITION distanceSquared = ptDiff.x * ptDiff.x + ptDiff.y * ptDiff.y;
 	return distanceSquared > 16.0f;
@@ -5880,7 +5883,7 @@ Sci::Position Editor::GetTag(char *tagValue, int tagNumber) {
 	const char *text = nullptr;
 	Sci::Position length = 0;
 	if ((tagNumber >= 1) && (tagNumber <= 9)) {
-		char name[3];
+		char name[4];
 		name[0] = '\\';
 		name[1] = static_cast<char>(tagNumber + '0');
 		name[2] = '\0';

@@ -87,7 +87,7 @@ constexpr bool isQestionMarkChar(char chNext, char chNext2) noexcept {
 
 #define MAX_KEYWORD_LENGTH 7 // module
 
-bool followsDot(Sci_PositionU pos, LexAccessor &styler) {
+bool followsDot(Sci_PositionU pos, LexAccessor &styler) noexcept {
 	while (pos > 1) {
 		--pos;
 		const int style = styler.BufferStyleAt(pos);
@@ -608,7 +608,7 @@ bool sureThisIsNotHeredoc(Sci_Position lt2StartPos, LexAccessor &styler) {
 // move to the start of the first line that is not in a
 // multi-line construct
 
-void synchronizeDocStart(Sci_PositionU &startPos, Sci_Position &length, int &initStyle, LexAccessor &styler) {
+void synchronizeDocStart(Sci_PositionU &startPos, Sci_Position &length, int &initStyle, LexAccessor &styler) noexcept {
 #if 0
 	const int style = styler.StyleAt(startPos);
 	switch (style) {

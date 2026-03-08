@@ -170,10 +170,10 @@ class ListBoxX final : public ListBox {
 	POINT GetClientExtent() const noexcept;
 	POINT MinTrackSize() const noexcept;
 	POINT MaxTrackSize() const noexcept;
-	void SetRedraw(bool on) noexcept;
+	void SetRedraw(bool on) const noexcept;
 	void OnDoubleClick();
 	void OnSelChange();
-	void ResizeToCursor();
+	void ResizeToCursor() noexcept;
 	void StartResize(WPARAM) noexcept;
 	LRESULT NcHitTest(WPARAM, LPARAM) const noexcept;
 	void CentreItem(int n) noexcept;
@@ -578,14 +578,14 @@ POINT ListBoxX::MaxTrackSize() const noexcept {
 	return ret;
 }
 
-void ListBoxX::SetRedraw(bool on) noexcept {
+void ListBoxX::SetRedraw(bool on) const noexcept {
 	::SendMessage(lb, WM_SETREDRAW, on, 0);
 	if (on) {
 		::RedrawWindow(lb, {}, {}, RDW_ERASE | RDW_FRAME | RDW_INVALIDATE | RDW_ALLCHILDREN);
 	}
 }
 
-void ListBoxX::ResizeToCursor() {
+void ListBoxX::ResizeToCursor() noexcept {
 	PRectangle rc = GetPosition();
 	POINT ptw;
 	::GetCursorPos(&ptw);

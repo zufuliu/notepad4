@@ -317,7 +317,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	virtual void Finalise() noexcept;
 
 	void InvalidateStyleData() noexcept;
-	void InvalidateStyleRedraw();
+	void InvalidateStyleRedraw() noexcept;
 	void RefreshStyleData();
 	void SetRepresentations();
 	void DropGraphics() noexcept;
@@ -421,7 +421,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	void DropCaret();
 	void CaretSetPeriod(int period);
 	void InvalidateCaret();
-	virtual void NotifyCaretMove() noexcept = 0;
+	virtual void NotifyCaretMove() const noexcept = 0;
 	virtual void UpdateSystemCaret() = 0;
 
 	bool Wrapping() const noexcept;
@@ -444,7 +444,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	virtual void SetVerticalScrollPos();
 	virtual void SetHorizontalScrollPos() = 0;
 	virtual bool ModifyScrollBars(Sci::Line nMax, Sci::Line nPage) = 0;
-	virtual void ReconfigureScrollBars() noexcept;
+	/*virtual*/ void ReconfigureScrollBars() const noexcept;
 	void SetScrollBars();
 	void ChangeSize();
 
@@ -468,7 +468,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	virtual void Copy(bool asBinary) const = 0;
 	void CopyAllowLine() const;
 	void CutAllowLine();
-	virtual bool CanPaste() noexcept;
+	virtual bool CanPaste() const noexcept;
 	virtual void Paste(bool asBinary) = 0;
 	void Clear();
 	virtual void SelectAll();
@@ -477,10 +477,10 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	virtual void Redo();
 	bool BackspaceUnindent(Sci::Position lineCurrentPos, Sci::Position caretPosition, Sci::Position *posSelect);
 	void DelCharBack(bool allowLineStartDeletion);
-	virtual void ClaimSelection() noexcept = 0;
+	/*virtual*/ void ClaimSelection() const noexcept;
 
-	virtual void NotifyChange() noexcept = 0;
-	virtual void NotifyFocus(bool focus);
+	virtual void NotifyChange() const noexcept = 0;
+	virtual void NotifyFocus(bool focus) const noexcept;
 	virtual void SetCtrlID(int identifier) noexcept;
 	virtual int GetCtrlID() const noexcept {
 		return ctrlID;
@@ -546,7 +546,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 
 	void Indent(bool forwards, bool lineIndent);
 
-	virtual std::unique_ptr<CaseFolder> CaseFolderForEncoding();
+	virtual std::unique_ptr<CaseFolder> CaseFolderForEncoding() const;
 	Sci::Position FindTextFull(Scintilla::uptr_t wParam, Scintilla::sptr_t lParam);
 	void SearchAnchor() noexcept;
 	Sci::Position SearchText(Scintilla::Message iMessage, Scintilla::uptr_t wParam, Scintilla::sptr_t lParam);
@@ -561,7 +561,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	void CopyText(size_t length, const char *text) const;
 	void SetDragPosition(SelectionPosition newPos);
 	virtual void DisplayCursor(Window::Cursor c) noexcept;
-	virtual bool SCICALL DragThreshold(Point ptStart, Point ptNow) noexcept;
+	virtual bool SCICALL DragThreshold(Point ptStart, Point ptNow) const noexcept;
 	virtual void StartDrag() = 0;
 	void DropAt(SelectionPosition position, const char *value, size_t lengthValue, bool moving, bool rectangular);
 	void DropAt(SelectionPosition position, const char *value, bool moving, bool rectangular);
@@ -701,7 +701,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	// Set a variable controlling appearance to a value and invalidates the display
 	// if a change was made. Avoids extra text and the possibility of mistyping.
 	template <typename T>
-	bool SetAppearance(T &variable, T value) {
+	bool SetAppearance(T &variable, T value) noexcept {
 		// Using ! and == as more types have == defined than !=.
 		const bool changed = !(variable == value);
 		if (changed) {

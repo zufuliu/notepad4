@@ -25,7 +25,6 @@ struct LineMarkerPod {
 	 * it instead of creating a new method(s) in the Surface class that existing
 	 * platforms must implement as empty. */
 	DrawLineMarkerFn customDraw = nullptr;
-	constexpr LineMarkerPod() noexcept = default;
 };
 
 /**

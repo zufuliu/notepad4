@@ -454,7 +454,7 @@ void ScintillaBase::AutoCompleteCharacterDeleted() {
 	NotifyParent(scn);
 }
 
-void ScintillaBase::AutoCompleteNotifyCompleted(char ch, CompletionMethods completionMethod, Sci::Position firstPos, const char *text) {
+void ScintillaBase::AutoCompleteNotifyCompleted(char ch, CompletionMethods completionMethod, Sci::Position firstPos, const char *text) const noexcept {
 	NotificationData scn = {};
 	scn.nmhdr.code = Notification::AutoCCompleted;
 	scn.ch = static_cast<uint8_t>(ch);
