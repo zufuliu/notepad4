@@ -1150,27 +1150,22 @@ void Style_OnDPIChanged(LPCEDITLEXER pLex) noexcept {
 	// Extra Line Spacing
 	szValue = (pLex->rid != NP2LEX_ANSI)? lexGlobal.Styles[GlobalStyleIndex_ExtraLineSpacing].szValue
 		: pLex->Styles[ANSIArtStyleIndex_ExtraLineSpacing].szValue;
+	int iAscent = 0;
+	int iDescent = 0;
 	if (Style_StrGetSize(szValue, &iValue) && iValue != 0) {
-		int iAscent;
-		int iDescent;
-		if (iValue > 0) {
+		iValue = ScaleStylePixel(abs(iValue), scale, 0);
+		if (iValue >= 0) {
 			// 5 => iAscent = 3, iDescent = 2
-			iValue = ScaleStylePixel(iValue, scale, 0);
-			iDescent = iValue/2 ;
+			iDescent = iValue/2U;
 			iAscent = iValue - iDescent;
 		} else {
 			// -5 => iAscent = -2, iDescent = -3
-			iValue = -ScaleStylePixel(-iValue, scale, 0);
-			iAscent = iValue/2 ;
-			iDescent = iValue - iAscent;
+			iAscent = -static_cast<int>(iValue/2U);
+			iDescent = iAscent - iValue;
 		}
-
-		SciCall_SetExtraAscent(iAscent);
-		SciCall_SetExtraDescent(iDescent);
-	} else {
-		SciCall_SetExtraAscent(0);
-		SciCall_SetExtraDescent(0);
 	}
+	SciCall_SetExtraAscent(iAscent);
+	SciCall_SetExtraDescent(iDescent);
 
 	// code folding
 	iValue = ScaleStylePixel(100, scale, 100);
