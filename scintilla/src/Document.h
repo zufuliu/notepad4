@@ -644,8 +644,13 @@ public:
 	int CharacterCategoryOptimization() const noexcept;
 #endif
 	void SCI_METHOD StartStyling(Sci_Position position) noexcept override;
-	bool SCI_METHOD SetStyleFor(Sci_Position length, unsigned char style) override;
-	bool SCI_METHOD SetStyles(Sci_Position length, const unsigned char *styles) override;
+	bool SCI_METHOD SetStyles(Sci_Position length, const unsigned char *styles, unsigned char style) override;
+	bool SetStyleFor(Sci_Position length, unsigned char style) {
+		return SetStyles(length, nullptr, style);
+	}
+	bool SetStyles(Sci_Position length, const unsigned char *styles) {
+		return SetStyles(length, styles, 0);
+	}
 	Sci::Position GetEndStyled() const noexcept {
 		return endStyled;
 	}

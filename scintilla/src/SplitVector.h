@@ -443,6 +443,13 @@ public:
 	ptrdiff_t GapPosition() const noexcept {
 		return part1Length;
 	}
+	ptrdiff_t GapLength() const noexcept {
+		return gapLength;
+	}
+
+	T *Segment1Pointer(ptrdiff_t position) noexcept {
+		return body.data() + position;
+	}
 };
 
 }

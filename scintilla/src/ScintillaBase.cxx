@@ -1287,7 +1287,6 @@ void Document::HighlightUrl(Sci_PositionU startPos, Sci_Position length, const u
 		UrlCharMask_Punctuation = 4,
 		UrlCharMask_SchemeName = 8,
 		UrlCharMask_DomainName = 16,
-		UrlCharMask_Alpha = 32,
 	};
 
 	// see GenerateUrlCharClass() in scripts/GenerateCharTable.py
@@ -1316,7 +1315,7 @@ void Document::HighlightUrl(Sci_PositionU startPos, Sci_Position length, const u
 	const Sci_PositionU endPos = startPos + length;
 	Sci_PositionU backPos = startPos;
 
-	int linkStyle = 0; // link text should has same style
+	int linkStyle = 0; // link text should have same style
 	AutoLink result = AutoLink::None;
 
 #if NP2_USE_AVX2

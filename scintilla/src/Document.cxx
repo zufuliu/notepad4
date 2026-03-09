@@ -2536,45 +2536,18 @@ void SCI_METHOD Document::StartStyling(Sci_Position position) noexcept {
 	endStyled = position;
 }
 
-bool SCI_METHOD Document::SetStyleFor(Sci_Position length, unsigned char style) {
-	if (enteredStyling != 0 || !cb.HasStyles()) {
+bool SCI_METHOD Document::SetStyles(Sci_Position length, const unsigned char *styles, unsigned char style) {
+	if (length <= 0 || enteredStyling != 0 || !cb.HasStyles()) {
 		return false;
 	}
 	enteredStyling++;
 	const Sci::Position prevEndStyled = endStyled;
-	if (cb.SetStyleFor(endStyled, length, style)) {
+	if (cb.SetStyles(endStyled, length, styles, style)) {
 		const DocModification mh(ModificationFlags::ChangeStyle | ModificationFlags::User,
 			prevEndStyled, length);
 		NotifyModified(mh);
 	}
 	endStyled += length;
-	enteredStyling--;
-	return true;
-}
-
-bool SCI_METHOD Document::SetStyles(Sci_Position length, const unsigned char *styles) {
-	if (enteredStyling != 0 || !cb.HasStyles()) {
-		return false;
-	}
-	enteredStyling++;
-	bool didChange = false;
-	Sci::Position startMod = 0;
-	Sci::Position endMod = 0;
-	for (int iPos = 0; iPos < length; iPos++, endStyled++) {
-		PLATFORM_ASSERT(endStyled < LengthNoExcept());
-		if (cb.SetStyleAt(endStyled, styles[iPos])) {
-			if (!didChange) {
-				startMod = endStyled;
-			}
-			didChange = true;
-			endMod = endStyled;
-		}
-	}
-	if (didChange) {
-		const DocModification mh(ModificationFlags::ChangeStyle | ModificationFlags::User,
-			startMod, endMod - startMod + 1);
-		NotifyModified(mh);
-	}
 	enteredStyling--;
 	return true;
 }

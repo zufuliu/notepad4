@@ -150,9 +150,7 @@ public:
 
 	/// Setting styles for positions outside the range of the buffer is safe and has no effect.
 	/// @return true if the style of a character is changed.
-	bool SetStyleAt(Sci::Position position, char styleValue) noexcept;
-	bool SetStyleFor(Sci::Position position, Sci::Position lengthStyle, char styleValue) noexcept;
-
+	bool SetStyles(Sci::Position position, Sci::Position lengthStyle, const unsigned char *styles, char styleValue) noexcept;
 	const char *DeleteChars(Sci::Position position, Sci::Position deleteLength, bool &startSequence);
 
 	bool IsReadOnly() const noexcept {
