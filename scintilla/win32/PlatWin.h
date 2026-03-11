@@ -55,14 +55,10 @@ using Microsoft::WRL::ComPtr;
 
 // official Scintilla use std::call_once(), which increases binary about 12 KiB.
 #define USE_STD_CALL_ONCE		0
-#if !USE_STD_CALL_ONCE && (_WIN32_WINNT >= _WIN32_WINNT_VISTA)
 // use InitOnceExecuteOnce()
 #define USE_WIN32_INIT_ONCE		0
-#else
 // fallback to InterlockedCompareExchange(). it's not same as std::call_once(),
 // but should safe in Windows message handlers (for WM_CREATE and SCI_SETTECHNOLOGY).
-#define USE_WIN32_INIT_ONCE		0
-#endif
 
 // since Windows 10, version 1607
 #if _WIN32_WINNT >= _WIN32_WINNT_WIN10

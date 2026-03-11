@@ -1839,8 +1839,7 @@ std::string Document::TransformLineEnds(const char *s, size_t len, EndOfLine eol
 void Document::ConvertLineEnds(EndOfLine eolModeSet) {
 	const UndoGroup ug(this);
 
-	const Sci::Position length = Length();
-	for (Sci::Position pos = 0; pos < length; pos++) {
+	for (Sci::Position pos = 0; pos < LengthNoExcept(); pos++) {
 		const char ch = cb.CharAt(pos);
 		if (ch == '\r') {
 			if (cb.CharAt(pos + 1) == '\n') {

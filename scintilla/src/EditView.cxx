@@ -373,10 +373,6 @@ struct LayoutWorker {
 	std::atomic<uint32_t> nextIndex = 0;
 	std::atomic<uint32_t> finishedCount = 0;
 
-#if USE_WIN32_WORK_ITEM
-	HANDLE finishedEvent = nullptr;
-	std::atomic<uint32_t> runningThread = 0;
-#endif
 	unsigned textUnicode = 0;
 
 	static constexpr int blockSize = EditModel::ParallelLayoutBlockSize;
@@ -475,16 +471,7 @@ struct LayoutWorker {
 			}
 			WaitForThreadpoolWorkCallbacks(work, FALSE);
 			CloseThreadpoolWork(work);
-
-#else
-			runningThread.store(threadCount, std::memory_order_relaxed);
-			finishedEvent = CreateEventW(nullptr, TRUE, FALSE, nullptr);
-			for (uint32_t i = 0; i < threadCount; i++) {
-				QueueUserWorkItem(ThreadProc, this, WT_EXECUTEDEFAULT);
-			}
-			WaitForSingleObject(finishedEvent, INFINITE);
-			CloseHandle(finishedEvent);
-#endif // USE_WIN32_WORK_ITEM
+#endif // USE_WIN32_PTP_WORK
 			return threadCount;
 		}
 
@@ -548,25 +535,12 @@ struct LayoutWorker {
 		}
 
 		UpdateMaximum(finishedCount, finished);
-#if USE_WIN32_WORK_ITEM
-		const uint32_t prev = runningThread.fetch_sub(1, std::memory_order_release);
-		if (prev == 1) {
-			SetEvent(finishedEvent);
-		}
-#endif
 	}
 
 #if USE_WIN32_PTP_WORK
 	static VOID CALLBACK WorkCallback([[maybe_unused]] PTP_CALLBACK_INSTANCE instance, PVOID context, [[maybe_unused]] PTP_WORK work) {
 		LayoutWorker *worker = static_cast<LayoutWorker *>(context);
 		worker->DoWork();
-	}
-#elif USE_WIN32_WORK_ITEM
-	static DWORD WINAPI ThreadProc(LPVOID lpParameter) {
-		SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_ABOVE_NORMAL);
-		LayoutWorker *worker = static_cast<LayoutWorker *>(lpParameter);
-		worker->DoWork();
-		return 0;
 	}
 #endif
 };
