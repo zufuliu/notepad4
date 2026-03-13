@@ -62,7 +62,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* Apache Configuration File
 	* [CSV File](https://www.rfc-editor.org/rfc/rfc4180)
 	* [D](tools/lang/D.d), up to D language 2.0.
-	* [Dart](tools/lang/Dart.dart), up to Dart 3.10.
+	* [Dart](tools/lang/Dart.dart), up to Dart 3.11.
 	* Diff/Patch File
 	* [F#](tools/lang/FSharp.fs), up to F# 10.0.
 	* [Fortran](tools/lang/Fortran.f), up to Fortran 2023.
@@ -138,7 +138,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* TCL, [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#tcl)
 	* [Texinfo](tools/lang/Texinfo.texi), up to Texinfo 7.1.
 	* [TOML File](https://toml.io/)
-	* [TypeScript](tools/lang/TypeScript.ts), up to TypeScript 5.4.
+	* [TypeScript](tools/lang/TypeScript.ts), up to TypeScript 7.0.
 	* Visual Basic, [VB.NET](tools/lang/VB.NET.vb), [VB 6.0 and VBA](tools/lang/VBA.bas)
 	* [VBScript](tools/lang/VBScript.vbs)
 	* [VHDL](tools/lang/VHDL.vhdl), up to VHDL 2019.
@@ -201,7 +201,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [Deutsch](https://github.com/zufuliu/notepad4/tree/main/locale/de) by [@xelsios](https://github.com/xelsios)
 	* [French](https://github.com/zufuliu/notepad4/tree/main/locale/fr) by [@VoilierBleu](https://github.com/VoilierBleu)
 	* [Italiano](https://github.com/zufuliu/notepad4/tree/main/locale/it) by [@Matteo-Nigro](https://github.com/Matteo-Nigro)
-	* [Polish](https://github.com/zufuliu/notepad4/tree/main/locale/pl) by [@kbabol](https://github.com/kbabol)
+	* [Polish](https://github.com/zufuliu/notepad4/tree/main/locale/pl) by [@kbabol](https://github.com/kbabol) and [@miroslaw-zylewicz](https://github.com/miroslaw-zylewicz)
 	* [Русский](https://github.com/zufuliu/notepad4/tree/main/locale/ru) by [@tretdm](https://github.com/tretdm)
 	* [日本語](https://github.com/zufuliu/notepad4/tree/main/locale/ja) by [@maboroshin](https://github.com/maboroshin)
 	* [中文 (繁體)](https://github.com/zufuliu/notepad4/tree/main/locale/zh-Hant)

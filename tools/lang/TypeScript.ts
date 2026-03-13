@@ -1,16 +1,17 @@
-// 5.6 https://www.typescriptlang.org/docs/
+// 7.0 https://www.typescriptlang.org/docs/
 // 1.8 https://github.com/microsoft/TypeScript/blob/main/doc/
 
 //! keywords		===========================================================
-// textToKeywordObj https://github.com/microsoft/TypeScript/tree/main/src/compiler/scanner.ts
+// textToKeywordObj https://github.com/microsoft/TypeScript/blob/main/src/compiler/scanner.ts
+// textToKeyword https://github.com/microsoft/typescript-go/blob/main/internal/scanner/scanner.go
 abstract accessor as assert asserts async await
 break
 case catch class const constructor continue
-debugger declare default delete do
+debugger declare default defer delete do
 else enum extends
 false finally for function
 get global
-if implements in infer instanceof interface intrinsic is
+if immediate implements in infer instanceof interface intrinsic is
 keyof
 let
 new null
