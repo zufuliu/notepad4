@@ -704,6 +704,9 @@ enum {
 	DartKeywordIndex_Metadata = 4,
 	FSharpKeywordIndex_Preprocessor = 2,
 	FSharpKeywordIndex_CommentTag = 4,
+	GeogebraKeywordIndex_Operator = 0,
+	GeogebraKeywordIndex_Constant = 1,
+	GeogebraKeywordIndex_Function = 3,
 	GraphVizKeywordIndex_HtmlLabel = 1,
 	GroovyKeywordIndex_Annotation = 7,
 	GroovyKeywordIndex_GroovyDoc = 9,
@@ -2494,6 +2497,7 @@ void EditToggleCommentLine(bool alternative) noexcept {
 	case NP2LEX_CMAKE:
 	case NP2LEX_COFFEESCRIPT:
 	case NP2LEX_CONFIG:
+	case NP2LEX_GEOGEBRA:
 	case NP2LEX_GN:
 	case NP2LEX_JAMFILE:
 	case NP2LEX_JULIA:
@@ -2943,6 +2947,7 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) noexcept {
 	case NP2LEX_BATCH:
 	case NP2LEX_BLOCKDIAG:
 	case NP2LEX_CSV:
+	case NP2LEX_GEOGEBRA:
 	case NP2LEX_GRAPHVIZ:
 	case NP2LEX_LISP:
 	case NP2LEX_SMALI:
