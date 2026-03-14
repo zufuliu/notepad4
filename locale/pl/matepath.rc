@@ -408,7 +408,7 @@ BEGIN
     AUTORADIOBUTTON "folderu &Ulubionych.",IDC_GOTOFAV,114,58,90,10,WS_TABSTOP
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,76,205,1
     AUTOCHECKBOX    "&Wyczyść ""Tylko do odczytu"" w zapisanych plikach.",IDC_CLEARREADONLY,10,85,172,10,WS_TABSTOP
-    AUTOCHECKBOX    "Zmień nazwę kopiowanych plików, jeśli wystąpił konflikt &nazw.",IDC_RENAMEONCOLLISION,10,97,164,10,WS_TABSTOP
+    AUTOCHECKBOX    "Zmień nazwę kopiowanych plików, jeśli wystąpił konflikt &nazw.",IDC_RENAMEONCOLLISION,10,97,198,10,WS_TABSTOP
     AUTOCHECKBOX    "&Przenieś usunięte pliki do kosza.",IDC_USERECYCLEBIN,10,109,160,10,WS_TABSTOP
     AUTOCHECKBOX    "N&ie potwierdzaj usunięcia pliku (niezalecane).",IDC_NOCONFIRMDELETE,10,121,184,10,WS_TABSTOP
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,139,205,1
@@ -427,12 +427,12 @@ BEGIN
     GROUPBOX        "Wygląd elementów listy katalogów",IDC_STATIC,10,41,205,109
     LTEXT           "Użyj tego koloru tekstu, gdy NIE WYBRANO FILTRA:",IDC_STATIC,20,54,170,8
     AUTORADIOBUTTON "Domyślny kolor &okna.",IDC_COLOR_DEF1,20,68,96,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "&Kolor użytkownika:",IDC_COLOR_CUST1,20,82,60,10,WS_TABSTOP
+    AUTORADIOBUTTON "&Kolor użytkownika:",IDC_COLOR_CUST1,20,82,67,10,WS_TABSTOP
     EDITTEXT        IDC_COLOR_SAMP1,100,80,30,14,ES_AUTOHSCROLL | WS_DISABLED
     PUSHBUTTON      "Wybierz kolor...",IDC_COLOR_PICK1,135,80,60,14
     LTEXT           "Użyj tego koloru tekstu, gdy FILTR JEST WŁĄCZONY:",IDC_STATIC,20,105,180,8
     AUTORADIOBUTTON "D&omyślny kolor okna.",IDC_COLOR_DEF2,20,120,95,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "Ko&lor użytkownika:",IDC_COLOR_CUST2,20,133,60,10,WS_TABSTOP
+    AUTORADIOBUTTON "Ko&lor użytkownika:",IDC_COLOR_CUST2,20,133,67,10,WS_TABSTOP
     EDITTEXT        IDC_COLOR_SAMP2,100,130,30,14,ES_AUTOHSCROLL | WS_DISABLED
     PUSHBUTTON      "Wybierz kolor...",IDC_COLOR_PICK2,135,130,60,14
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
