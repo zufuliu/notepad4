@@ -1640,12 +1640,7 @@ void FormatNumber(LPWSTR lpNumberStr, UINT value) noexcept {
 void GetDefaultFavoritesDir(LPWSTR lpFavDir, int cchFavDir) noexcept {
 	PIDLIST_ABSOLUTE pidl;
 
-#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-	if (S_OK == SHGetKnownFolderIDList(FOLDERID_Documents, KF_FLAG_DEFAULT, nullptr, &pidl))
-#else
-	if (S_OK == SHGetFolderLocation(nullptr, CSIDL_PERSONAL, nullptr, SHGFP_TYPE_DEFAULT, &pidl))
-#endif
-	{
+	if (S_OK == SHGetKnownFolderIDList(FOLDERID_Documents, KF_FLAG_DEFAULT, nullptr, &pidl)) {
 		SHGetPathFromIDList(pidl, lpFavDir);
 		CoTaskMemFree(pidl);
 	} else {
@@ -1660,12 +1655,7 @@ void GetDefaultFavoritesDir(LPWSTR lpFavDir, int cchFavDir) noexcept {
 void GetDefaultOpenWithDir(LPWSTR lpOpenWithDir, int cchOpenWithDir) noexcept {
 	PIDLIST_ABSOLUTE pidl;
 
-#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-	if (S_OK == SHGetKnownFolderIDList(FOLDERID_Desktop, KF_FLAG_DEFAULT, nullptr, &pidl))
-#else
-	if (S_OK == SHGetFolderLocation(nullptr, CSIDL_DESKTOPDIRECTORY, nullptr, SHGFP_TYPE_DEFAULT, &pidl))
-#endif
-	{
+	if (S_OK == SHGetKnownFolderIDList(FOLDERID_Desktop, KF_FLAG_DEFAULT, nullptr, &pidl)) {
 		SHGetPathFromIDList(pidl, lpOpenWithDir);
 		CoTaskMemFree(pidl);
 	} else {

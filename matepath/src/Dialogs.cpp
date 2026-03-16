@@ -131,23 +131,13 @@ bool GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase
 //
 // GetDirectory2()
 //
-#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-bool GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, REFKNOWNFOLDERID iBase) noexcept
-#else
-bool GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, int iBase) noexcept
-#endif
-{
+bool GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, REFKNOWNFOLDERID iBase) noexcept {
 	WCHAR szTitle[256];
 	StrCpyEx(szTitle, L"");
 	GetString(iTitle, szTitle, COUNTOF(szTitle));
 
 	PIDLIST_ABSOLUTE pidlRoot;
-#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-	if (S_OK != SHGetKnownFolderIDList(iBase, KF_FLAG_DEFAULT, nullptr, &pidlRoot))
-#else
-	if (S_OK != SHGetFolderLocation(hwndParent, iBase, nullptr, SHGFP_TYPE_DEFAULT, &pidlRoot))
-#endif
-	{
+	if (S_OK != SHGetKnownFolderIDList(iBase, KF_FLAG_DEFAULT, nullptr, &pidlRoot)) {
 		return false;
 	}
 

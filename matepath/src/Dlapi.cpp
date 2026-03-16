@@ -784,17 +784,12 @@ int DriveBox_Fill(HWND hwnd) {
 
 	// Get pidl to [My Computer]
 	PIDLIST_ABSOLUTE pidl;
-#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-	if (S_OK == SHGetKnownFolderIDList(FOLDERID_ComputerFolder, KF_FLAG_DEFAULT, nullptr, &pidl))
-#else
-	if (S_OK == SHGetFolderLocation(hwnd, CSIDL_DRIVES, nullptr, SHGFP_TYPE_DEFAULT, &pidl))
-#endif
-	{
+	if (S_OK == SHGetKnownFolderIDList(FOLDERID_ComputerFolder, KF_FLAG_DEFAULT, nullptr, &pidl)) {
 		// Get Desktop Folder
 		LPSHELLFOLDER lpsfDesktop;
 		if (S_OK == SHGetDesktopFolder(&lpsfDesktop)) {
 			// Bind pidl to IShellFolder
-			LPSHELLFOLDER lpsf; // Workspace == CSIDL_DRIVES
+			LPSHELLFOLDER lpsf; // Workspace == FOLDERID_ComputerFolder
 			if (S_OK == lpsfDesktop->BindToObject(pidl, nullptr, IID_IShellFolder, AsPPVArgs(&lpsf))) {
 				// Create an Enumeration object for lpsf
 				constexpr DWORD grfFlags = SHCONTF_FOLDERS;
