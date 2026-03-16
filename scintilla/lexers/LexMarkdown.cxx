@@ -114,10 +114,12 @@ constexpr bool IsBlockStyle(int state) noexcept {
 		|| IsHtmlBlockStyle(state);
 }
 
+/*
 constexpr bool IsRawTextStyle(int state) noexcept {
 	return (state >= SCE_MARKDOWN_INDENTED_BLOCK && state <= SCE_MARKDOWN_DISPLAY_MATH)
 		|| (state >= SCE_MARKDOWN_CODE_SPAN && state <= SCE_MARKDOWN_INLINE_MATH);
 }
+*/
 
 constexpr bool StyleNeedsBacktrack(int state) noexcept {
 	return state == SCE_MARKDOWN_SETEXT_H1 || state == SCE_MARKDOWN_SETEXT_H2;
@@ -706,9 +708,11 @@ int MarkdownLexer::GetCurrentDelimiterRun(DelimiterRun &delimiterRun, bool ignor
 	return count;
 }
 
+/*
 constexpr bool IsEmphasisDelimiter(int ch) noexcept {
 	return ch == '*' || ch == '_' || ch == '~';
 }
+*/
 
 constexpr uint8_t GetEmphasisDelimiter(int state) noexcept {
 	if constexpr (SCE_MARKDOWN_EM_ASTERISK & 1) {

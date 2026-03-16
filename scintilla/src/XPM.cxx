@@ -348,9 +348,6 @@ void RGBAImage::BGRAFromRGBA(unsigned char *pixelsBGRA, const unsigned char *pix
 #endif
 }
 
-RGBAImageSet::RGBAImageSet() noexcept : height(-1), width(-1) {
-}
-
 /// Remove all images.
 void RGBAImageSet::Clear() noexcept {
 	images.clear();

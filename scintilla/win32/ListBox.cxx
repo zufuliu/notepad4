@@ -98,9 +98,9 @@ public:
 	}
 };
 
-inline ColourRGBA ColourOfElement(std::optional<ColourRGBA> colour, UINT nIndex) noexcept {
+inline ColourRGBA ColourElement(std::optional<ColourRGBA> colour, UINT nIndex) noexcept {
 	if (colour.has_value()) {
-		return colour.value().Opaque();
+		return (*colour).Opaque();
 	}
 	return ColourFromSys(nIndex);
 }
@@ -185,7 +185,7 @@ class ListBoxX final : public ListBox {
 	static constexpr POINT ImageInset {1, 0};	// Padding around image
 
 public:
-	ListBoxX() noexcept = default;
+	ListBoxX() = default;
 	ListBoxX(const ListBoxX &) = delete;
 	ListBoxX(ListBoxX &&) = delete;
 	ListBoxX &operator=(const ListBoxX &) = delete;
@@ -534,10 +534,10 @@ void ListBoxX::SetList(const char *list, const char separator, const char typese
 }
 
 void ListBoxX::SetOptions(const ListOptions &options_) noexcept {
-	colorText = ColourOfElement(options_.fore, COLOR_WINDOWTEXT);
-	colorBackground = ColourOfElement(options_.back, COLOR_WINDOW);
-	colorHighlightText = ColourOfElement(options_.foreSelected, COLOR_HIGHLIGHTTEXT);
-	colorHighlightBack = ColourOfElement(options_.backSelected, COLOR_HIGHLIGHT);
+	colorText = ColourElement(options_.fore, COLOR_WINDOWTEXT);
+	colorBackground = ColourElement(options_.back, COLOR_WINDOW);
+	colorHighlightText = ColourElement(options_.foreSelected, COLOR_HIGHLIGHTTEXT);
+	colorHighlightBack = ColourElement(options_.backSelected, COLOR_HIGHLIGHT);
 	frameStyle = FlagSet(options_.options, AutoCompleteOption::FixedSize) ? WS_BORDER : WS_THICKFRAME;
 }
 

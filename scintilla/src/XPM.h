@@ -77,10 +77,9 @@ public:
 class RGBAImageSet final {
 	using ImageMap = std::map<int, std::unique_ptr<RGBAImage>>;
 	ImageMap images;
-	mutable int height;	///< Memorize largest height of the set.
-	mutable int width;	///< Memorize largest width of the set.
+	mutable int height = -1;	///< Memorize largest height of the set.
+	mutable int width = -1;	///< Memorize largest width of the set.
 public:
-	RGBAImageSet() noexcept;
 	/// Remove all images.
 	void Clear() noexcept;
 	/// Add an image.
