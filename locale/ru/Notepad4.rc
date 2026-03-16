@@ -761,8 +761,8 @@ BEGIN
 		END
 		POPUP "&Веб-разработка"
 		BEGIN
-			MENUITEM "&Сжимать CSS/JS/JSON",								IDM_EDIT_CODE_COMPRESS
-			MENUITEM "Привести CSS/JS/JSON в &порядок",						IDM_EDIT_CODE_PRETTY
+			MENUITEM "&Сжать CSS/JS/JSON",								IDM_EDIT_CODE_COMPRESS
+			MENUITEM "&Форматировать CSS/JS/JSON",						IDM_EDIT_CODE_PRETTY
 			MENUITEM SEPARATOR
 			MENUITEM "Заэкранивать символы HT&ML/XML\tAlt+Shift+X",					IDM_EDIT_XHTML_ESCAPE_CHAR
 			MENUITEM "Разэкранивать символы HTML/&XML\tAlt+Shift+H",				IDM_EDIT_XHTML_UNESCAPE_CHAR
