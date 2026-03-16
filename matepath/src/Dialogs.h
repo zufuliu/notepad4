@@ -34,11 +34,7 @@ int MsgBox(UINT uType, UINT uIdMsg, ...) noexcept;
 #define MsgBoxAsk(uType, uIdMsg, ...)		MsgBox(MB_ICONQUESTION | (uType), (uIdMsg), ##__VA_ARGS__)
 
 bool GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase) noexcept;
-#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 bool GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, REFKNOWNFOLDERID iBase) noexcept;
-#else
-bool GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, int iBase) noexcept;
-#endif
 
 void RunDlg(HWND hwnd) noexcept;
 void GotoDlg(HWND hwnd) noexcept;
