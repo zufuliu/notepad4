@@ -161,7 +161,7 @@ constexpr Point PointFromLParam(LPARAM lParam) noexcept {
 }
 
 inline bool KeyboardIsKeyDown(int key) noexcept {
-	return ::GetKeyState(key) < 0;
+	return ::GetKeyState(key) & 0x8000;
 }
 
 // Bit 24 is the extended keyboard flag and the numeric keypad is non-extended

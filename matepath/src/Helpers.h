@@ -357,7 +357,7 @@ LSTATUS Registry_DeleteTree(HKEY hKey, LPCWSTR lpSubKey) noexcept;
 
 
 inline bool KeyboardIsKeyDown(int key) noexcept {
-	return GetKeyState(key) < 0;
+	return ::GetKeyState(key) & 0x8000;
 }
 
 inline void BeginWaitCursor() noexcept {
