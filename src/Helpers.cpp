@@ -1325,12 +1325,18 @@ static LRESULT CALLBACK MultilineEditProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 		}
 		break;
 
-	case WM_KEYDOWN:
+	case WM_KEYDOWN: {
 		if (wParam == VK_ESCAPE) {
 			SendMessage(hwndParent, WM_CLOSE, 0, 0);
 			return TRUE;
 		}
-		if (wParam == VK_TAB && KeyboardIsKeyDown(VK_SHIFT)) {
+		const bool shift = KeyboardIsKeyDown(VK_SHIFT);
+		if (wParam == VK_RETURN && shift) {
+			constexpr WORD nCtlId = IDOK; // SendMessage(hwndParent, DM_GETDEFID, 0, 0);
+			SendWMCommand(hwndParent, nCtlId);
+			return TRUE;
+		}
+		if (wParam == VK_TAB && shift) {
 			// normally focus on previous control that has the WS_TABSTOP style set.
 			// focus on next control when the ES_WANTRETURN style is set (acts as normal Tab key).
 			const BOOL previous = (uIdSubclass & ES_WANTRETURN) == 0;
@@ -1372,7 +1378,7 @@ static LRESULT CALLBACK MultilineEditProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 			SendInput(COUNTOF(input), input, sizeof(INPUT));
 			return TRUE;
 		}
-		break;
+	} break;
 
 	case WM_SETTEXT: {
 		const LRESULT result = DefSubclassProc(hwnd, umsg, wParam, lParam);
