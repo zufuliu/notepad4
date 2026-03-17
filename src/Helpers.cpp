@@ -1342,6 +1342,35 @@ static LRESULT CALLBACK MultilineEditProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 			if (hwndCtl != hwnd) {
 				PostMessage(hwndParent, WM_NEXTDLGCTL, AsInteger<WPARAM>(hwndCtl), TRUE);
 			}
+		} else if (wParam == VK_BACK /*&& (uIdSubclass & ES_WANTRETURN) != 0*/ && KeyboardIsKeyDown(VK_CONTROL)) {
+			// Ctrl+Backspace => Ctrl+Shift+Left, Backspace https://github.com/dotnet/winforms/issues/259
+			INPUT input[8];
+			memset(input, 0, sizeof(input));
+			// press Ctrl+Shift+Left
+			input[0].type = INPUT_KEYBOARD;
+			input[0].ki.wVk = VK_CONTROL;
+			input[1].type = INPUT_KEYBOARD;
+			input[1].ki.wVk = VK_SHIFT;
+			input[2].type = INPUT_KEYBOARD;
+			input[2].ki.wVk = VK_LEFT;
+			// release Ctrl+Shift+Left
+			input[3].type = INPUT_KEYBOARD;
+			input[3].ki.wVk = VK_LEFT;
+			input[3].ki.dwFlags = KEYEVENTF_KEYUP;
+			input[4].type = INPUT_KEYBOARD;
+			input[4].ki.wVk = VK_SHIFT;
+			input[4].ki.dwFlags = KEYEVENTF_KEYUP;
+			input[5].type = INPUT_KEYBOARD;
+			input[5].ki.wVk = VK_CONTROL;
+			input[5].ki.dwFlags = KEYEVENTF_KEYUP;
+			// press & release Backspace
+			input[6].type = INPUT_KEYBOARD;
+			input[6].ki.wVk = VK_BACK;
+			input[7].type = INPUT_KEYBOARD;
+			input[7].ki.wVk = VK_BACK;
+			input[7].ki.dwFlags = KEYEVENTF_KEYUP;
+			SendInput(COUNTOF(input), input, sizeof(INPUT));
+			return TRUE;
 		}
 		break;
 
@@ -1366,15 +1395,17 @@ static LRESULT CALLBACK MultilineEditProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 void MultilineEditSetup(HWND hwndDlg, int nCtlId) noexcept {
 	HWND hwnd = GetDlgItem(hwndDlg, nCtlId);
 	const DWORD style = GetWindowStyle(hwnd);
-	if ((style & ES_WANTRETURN) != 0 && IsWin10AndAbove()) {
+	if ((style & ES_WANTRETURN) == 0) {
+		// Ctrl+Backspace to delete previous word
+		// for ES_WANTRETURN, Enter key will be changed to select all text instead of line break
+		// SHAutoComplete(hwnd, SHACF_FILESYS_ONLY | SHACF_AUTOAPPEND_FORCE_OFF | SHACF_AUTOSUGGEST_FORCE_OFF);
+	} else if (IsWin10AndAbove()) {
 		extern int iCurrentEOLMode;
 		constexpr DWORD exStyle = ES_EX_ALLOWEOL_ALL | ES_EX_CONVERT_EOL_ON_PASTE;
 		SendMessage(hwnd, EM_SETEXTENDEDSTYLE, exStyle, exStyle);
 		SendMessage(hwnd, EM_SETENDOFLINE, iCurrentEOLMode + 1, 0);
 	}
 	SetWindowSubclass(hwnd, MultilineEditProc, style, AsInteger<DWORD_PTR>(hwndDlg));
-	// Ctrl+Backspace
-	SHAutoComplete(hwnd, SHACF_FILESYS_ONLY | SHACF_AUTOAPPEND_FORCE_OFF | SHACF_AUTOSUGGEST_FORCE_OFF);
 }
 
 //=============================================================================
