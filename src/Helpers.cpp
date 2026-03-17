@@ -1307,18 +1307,18 @@ void ResizeDlgCtl(HWND hwndDlg, int nCtlId, int dx, int dy) noexcept {
 
 // https://docs.microsoft.com/en-us/windows/desktop/Controls/subclassing-overview
 // https://support.microsoft.com/en-us/help/102589/how-to-use-the-enter-key-from-edit-controls-in-a-dialog-box
-// Ctrl+A: https://stackoverflow.com/questions/10127054/select-all-text-in-edit-contol-by-clicking-ctrla
 static LRESULT CALLBACK MultilineEditProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData) noexcept {
-	UNREFERENCED_PARAMETER(dwRefData);
+	HWND hwndParent = AsPointer<HWND>(dwRefData);
 
 	switch (umsg) {
 	case WM_GETDLGCODE:
-		if (GetWindowStyle(hwnd) & ES_WANTRETURN) {
+		if (uIdSubclass & ES_WANTRETURN) {
 			return DLGC_WANTALLKEYS | DLGC_HASSETSEL;
 		}
 		break;
 
 	case WM_CHAR:
+		// Ctrl+A: https://stackoverflow.com/questions/10127054/select-all-text-in-edit-contol-by-clicking-ctrla
 		if (wParam == 1) { // Ctrl+A
 			Edit_SetSel(hwnd, 0, -1);
 			return TRUE;
@@ -1327,14 +1327,13 @@ static LRESULT CALLBACK MultilineEditProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 
 	case WM_KEYDOWN:
 		if (wParam == VK_ESCAPE) {
-			SendMessage(GetParent(hwnd), WM_CLOSE, 0, 0);
+			SendMessage(hwndParent, WM_CLOSE, 0, 0);
 			return TRUE;
 		}
 		if (wParam == VK_TAB && KeyboardIsKeyDown(VK_SHIFT)) {
 			// normally focus on previous control that has the WS_TABSTOP style set.
 			// focus on next control when the ES_WANTRETURN style is set (acts as normal Tab key).
-			const bool previous = (GetWindowStyle(hwnd) & ES_WANTRETURN) == 0;
-			HWND hwndParent = GetParent(hwnd);
+			const BOOL previous = (uIdSubclass & ES_WANTRETURN) == 0;
 			HWND hwndCtl = GetNextDlgTabItem(hwndParent, hwnd, previous);
 			if (hwndCtl == hwnd) {
 				hwndCtl = GetNextDlgTabItem(hwndParent, hwnd, !previous);
@@ -1349,7 +1348,7 @@ static LRESULT CALLBACK MultilineEditProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 	case WM_SETTEXT: {
 		const LRESULT result = DefSubclassProc(hwnd, umsg, wParam, lParam);
 		if (result) {
-			NotifyEditTextChanged(GetParent(hwnd), GetDlgCtrlID(hwnd));
+			NotifyEditTextChanged(hwndParent, GetDlgCtrlID(hwnd));
 		}
 		return result;
 	}
@@ -1366,13 +1365,14 @@ static LRESULT CALLBACK MultilineEditProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 
 void MultilineEditSetup(HWND hwndDlg, int nCtlId) noexcept {
 	HWND hwnd = GetDlgItem(hwndDlg, nCtlId);
-	if (IsWin10AndAbove() && (GetWindowStyle(hwnd) & ES_WANTRETURN) != 0) {
+	const DWORD style = GetWindowStyle(hwnd);
+	if ((style & ES_WANTRETURN) != 0 && IsWin10AndAbove()) {
 		extern int iCurrentEOLMode;
 		constexpr DWORD exStyle = ES_EX_ALLOWEOL_ALL | ES_EX_CONVERT_EOL_ON_PASTE;
 		SendMessage(hwnd, EM_SETEXTENDEDSTYLE, exStyle, exStyle);
 		SendMessage(hwnd, EM_SETENDOFLINE, iCurrentEOLMode + 1, 0);
 	}
-	SetWindowSubclass(hwnd, MultilineEditProc, 0, 0);
+	SetWindowSubclass(hwnd, MultilineEditProc, style, AsInteger<DWORD_PTR>(hwndDlg));
 	// Ctrl+Backspace
 	SHAutoComplete(hwnd, SHACF_FILESYS_ONLY | SHACF_AUTOAPPEND_FORCE_OFF | SHACF_AUTOSUGGEST_FORCE_OFF);
 }
