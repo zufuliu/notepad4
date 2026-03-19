@@ -91,14 +91,15 @@ LineLayout::LineLayout(Sci::Line lineNumber_, int maxLineLength_) :
 
 void LineLayout::Resize(int maxLineLength_) {
 	if (maxLineLength_ > maxLineLength) {
-		const size_t lineAllocation = maxLineLength_ + 1;
+		constexpr size_t sentinel = sizeof(int); // fix out-of-bounds read for KeyFromString()
+		const size_t lineAllocation = maxLineLength_ + sentinel;
 		auto chars_ = std::make_unique<char[]>(lineAllocation);
 		chars.swap(chars_);
 		auto styles_ = std::make_unique<unsigned char[]>(lineAllocation);
 		styles.swap(styles_);
 		// Extra position allocated as sometimes the Windows
 		// GetTextExtentExPoint API writes an extra element.
-		auto positions_ = std::make_unique<XYPOSITION[]>(lineAllocation + 1);
+		auto positions_ = std::make_unique<XYPOSITION[]>(lineAllocation);
 		positions.swap(positions_);
 		lineStarts.reset();
 		bidiData.reset();
@@ -831,7 +832,7 @@ LineLayout *LineLayoutCache::Retrieve(Sci::Line lineNumber, Sci::Line lineCaret,
 namespace {
 
 // Simply pack the (maximum 4) character bytes into an int
-#if USE_ADDRESS_SANITIZER
+#if 0
 constexpr unsigned int KeyFromString(std::string_view charBytes) noexcept {
 	PLATFORM_ASSERT(charBytes.length() <= 4);
 	unsigned int k = 0;

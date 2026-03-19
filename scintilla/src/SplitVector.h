@@ -138,6 +138,9 @@ public:
 	/// copy existing contents to the new buffer.
 	/// Must not be used to decrease the size of the buffer.
 	void ReAllocate(size_t newSize) {
+		// over allocation to simplify SplitView usage
+		constexpr size_t sentinel = (sizeof(T) == sizeof(char)) ? sizeof(int) : 0;
+		newSize += sentinel;
 		const size_t size = body.size();
 		if (newSize > size) {
 #if ENABLE_SHOW_DEBUG_INFO
@@ -146,7 +149,7 @@ public:
 #endif
 			// Move the gap to the end
 			GapTo(lengthBody);
-			gapLength += newSize - size;
+			gapLength += newSize - size - sentinel;
 			// RoomFor implements a growth strategy but so does vector::resize so
 			// ensure vector::resize allocates exactly the amount wanted by
 			// calling reserve first.
@@ -400,12 +403,12 @@ public:
 	/// Compact the buffer and return a pointer to the first element.
 	/// Also ensures there is an empty element beyond logical end in case its
 	/// passed to a function expecting a NUL terminated string.
-	const T *BufferPointer() {
-		RoomFor(1);
+	const T *BufferPointer() noexcept {
+		static_assert(sizeof(T) == sizeof(char));
 		GapTo(lengthBody);
-		T emptyOne = {};
-		body[lengthBody] = std::move(emptyOne);
-		return body.data();
+		T * const data = body.data();
+		memset(data + lengthBody, 0, sizeof(int));
+		return data;
 	}
 
 	/// Return a pointer to a range of elements, first rearranging the buffer if

@@ -515,7 +515,7 @@ public:
 		return cb.EditionNextDelete(pos);
 	}
 
-	const char * SCI_METHOD BufferPointer() override {
+	const char * SCI_METHOD BufferPointer() noexcept override {
 		return cb.BufferPointer();
 	}
 	const char *RangePointer(Sci::Position position, Sci::Position rangeLength) noexcept {

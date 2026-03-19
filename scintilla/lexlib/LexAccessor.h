@@ -24,7 +24,7 @@ class LexAccessor {
 		bufferSize = 4096,
 		slopSize = bufferSize / 8,
 	};
-	char buf[bufferSize + 4];
+	char buf[bufferSize + sizeof(int)];
 	const EncodingType encodingType;
 	Sci_Position startPos = 0;
 	Sci_Position endPos = 0;
@@ -65,9 +65,9 @@ public:
 		lenDoc(pAccess->Length()) {
 		// Prevent warnings by static analyzers about uninitialized buf and styleBuf.
 		// zero unused padding to prevent potential out of bounds bug.
-		memset(buf, 0, 4);
-		memset(buf + bufferSize, 0, 4);
-		memset(styleBuf, 0, 4);
+		memset(buf, 0, sizeof(int));
+		memset(buf + bufferSize, 0, sizeof(int));
+		memset(styleBuf, 0, sizeof(int));
 	}
 	char operator[](Sci_Position position) noexcept {
 		if (position < startPos || position >= endPos) {

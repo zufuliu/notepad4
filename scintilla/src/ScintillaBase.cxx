@@ -1273,7 +1273,7 @@ bool Document::EnableUrlHighlight() const noexcept {
 }
 
 void Document::HighlightUrl(Sci_PositionU startPos, Sci_Position length, const uint32_t (&urlIgnoreStyle)[8]) {
-	// ignore lexer backtrack, which is usually used to reconstruct lexer state and rarely change style
+	// ignore lexer backtracking, which is usually used to reconstruct lexer state and rarely change style
 	DecorationSetCurrentIndicator(INDICATOR_LINK);
 	DecorationFillRange(startPos, 0, length); // clear all
 	// Markdown https://github.github.com/gfm/#autolinks-extension-
