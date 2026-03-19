@@ -119,6 +119,9 @@ public:
 	/// Construct a split buffer.
 	SplitVector(size_t growSize_ = 8) noexcept : growSize{growSize_} {}
 
+	size_t size() const noexcept {
+		return body.size();
+	}
 	size_t capacity() const noexcept {
 		return body.capacity();
 	}
@@ -448,6 +451,9 @@ public:
 	}
 
 	T *Segment1Pointer(ptrdiff_t position) noexcept {
+		return body.data() + position;
+	}
+	const T *Segment1Pointer(ptrdiff_t position) const noexcept {
 		return body.data() + position;
 	}
 };

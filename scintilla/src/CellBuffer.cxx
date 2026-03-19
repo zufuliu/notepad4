@@ -421,14 +421,17 @@ Sci::Position CellBuffer::GapPosition() const noexcept {
 SplitView CellBuffer::AllView() const noexcept {
 	const size_t length = substance.Length();
 	size_t length1 = substance.GapPosition();
+	const char *segment1 = substance.Segment1Pointer(0);
+	const char * const segment2 = segment1 + substance.GapLength();
 	if (length1 == 0) {
 		// Assign segment2 to segment1 / length1 to avoid useless test against 0 length1
 		length1 = length;
+		segment1 = segment2;
 	}
 	return SplitView {
-		substance.ElementPointer(0),
+		segment1,
 		length1,
-		substance.ElementPointer(length1) - length1,
+		segment2,
 		length
 	};
 }
