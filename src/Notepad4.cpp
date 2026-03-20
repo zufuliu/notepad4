@@ -38,12 +38,12 @@
 #include "Dialogs.h"
 #include "resource.h"
 
-#ifndef SM_CXPADDEDBORDER
-#define SM_CXPADDEDBORDER	92
-#endif
-
 //! show code folding level and state on line number margin
 #define NP2_DEBUG_CODE_FOLDING		0
+// style both before and after the visible text in the background
+#define NP2_LEXER_IDLE_STYLING		SC_IDLESTYLING_ALL
+// profile lexer performance inside Style_SetLexer()
+// #define NP2_LEXER_IDLE_STYLING		SC_IDLESTYLING_NONE
 
 /******************************************************************************
 *
@@ -1713,10 +1713,7 @@ void EditCreate(HWND hwndParent) noexcept {
 	SciCall_SetVirtualSpaceOptions(SCVS_RECTANGULARSELECTION);
 	SciCall_SetAdditionalCaretsBlink(true);
 	SciCall_SetAdditionalCaretsVisible(true);
-	// style both before and after the visible text in the background
-	SciCall_SetIdleStyling(SC_IDLESTYLING_ALL);
-	// profile lexer performance
-	//SciCall_SetIdleStyling(SC_IDLESTYLING_NONE);
+	SciCall_SetIdleStyling(NP2_LEXER_IDLE_STYLING);
 
 	SciCall_AssignCmdKey((SCK_NEXT + (SCMOD_CTRL << 16)), SCI_PARADOWN);
 	SciCall_AssignCmdKey((SCK_PRIOR + (SCMOD_CTRL << 16)), SCI_PARAUP);
