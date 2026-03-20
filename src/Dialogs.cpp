@@ -1333,7 +1333,7 @@ static INT_PTR CALLBACK ColumnWrapDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 
 				EndDialog(hwnd, IDOK);
 			} else {
-				PostMessage(hwnd, WM_NEXTDLGCTL, AsInteger<WPARAM>(GetDlgItem(hwnd, IDC_COLUMNWRAP)), 1);
+				PostMessage(hwnd, WM_NEXTDLGCTL, AsInteger<WPARAM>(GetDlgItem(hwnd, IDC_COLUMNWRAP)), TRUE);
 			}
 		}
 		break;

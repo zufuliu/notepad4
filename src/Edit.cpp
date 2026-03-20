@@ -6029,7 +6029,7 @@ static INT_PTR CALLBACK EditLineNumDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 			}
 
 			if (!(fTranslated || fTranslated2)) {
-				PostMessage(hwnd, WM_NEXTDLGCTL, AsInteger<WPARAM>(GetDlgItem(hwnd, IDC_LINENUM)), 1);
+				PostMessage(hwnd, WM_NEXTDLGCTL, AsInteger<WPARAM>(GetDlgItem(hwnd, IDC_LINENUM)), TRUE);
 				return TRUE;
 			}
 

@@ -1313,7 +1313,7 @@ static LRESULT CALLBACK MultilineEditProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 	switch (umsg) {
 	case WM_GETDLGCODE:
 		if (uIdSubclass & ES_WANTRETURN) {
-			return DLGC_WANTALLKEYS | DLGC_HASSETSEL;
+			return DLGC_WANTARROWS | DLGC_WANTALLKEYS | DLGC_HASSETSEL | DLGC_WANTCHARS;
 		}
 		break;
 
@@ -1321,6 +1321,9 @@ static LRESULT CALLBACK MultilineEditProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 		// Ctrl+A: https://stackoverflow.com/questions/10127054/select-all-text-in-edit-contol-by-clicking-ctrla
 		if (wParam == 1) { // Ctrl+A
 			Edit_SetSel(hwnd, 0, -1);
+			return TRUE;
+		}
+		if ((wParam == VK_TAB || wParam == VK_RETURN) && !KeyboardIsKeyDown(VK_SHIFT)) {
 			return TRUE;
 		}
 		break;
@@ -1331,24 +1334,17 @@ static LRESULT CALLBACK MultilineEditProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 			return TRUE;
 		}
 		const bool shift = KeyboardIsKeyDown(VK_SHIFT);
-		if (wParam == VK_RETURN && shift) {
+		if (wParam == VK_RETURN && !shift) {
 			constexpr WORD nCtlId = IDOK; // SendMessage(hwndParent, DM_GETDEFID, 0, 0);
 			SendWMCommand(hwndParent, nCtlId);
 			return TRUE;
 		}
-		if (wParam == VK_TAB && shift) {
-			// normally focus on previous control that has the WS_TABSTOP style set.
-			// focus on next control when the ES_WANTRETURN style is set (acts as normal Tab key).
-			const BOOL previous = (uIdSubclass & ES_WANTRETURN) == 0;
-			HWND hwndCtl = GetNextDlgTabItem(hwndParent, hwnd, previous);
-			if (hwndCtl == hwnd) {
-				hwndCtl = GetNextDlgTabItem(hwndParent, hwnd, !previous);
-			}
-			// TODO: find first control when hwnd is last tab item on this dialog.
-			if (hwndCtl != hwnd) {
-				PostMessage(hwndParent, WM_NEXTDLGCTL, AsInteger<WPARAM>(hwndCtl), TRUE);
-			}
-		} else if (wParam == VK_BACK /*&& (uIdSubclass & ES_WANTRETURN) != 0*/ && KeyboardIsKeyDown(VK_CONTROL)) {
+		if (wParam == VK_TAB && !shift) {
+			// focus on next control for Tab, and previous control for Shift+Tab
+			PostMessage(hwndParent, WM_NEXTDLGCTL, FALSE, FALSE);
+			return TRUE;
+		}
+		if (wParam == VK_BACK /*&& (uIdSubclass & ES_WANTRETURN) != 0*/ && KeyboardIsKeyDown(VK_CONTROL)) {
 			// Ctrl+Backspace => Ctrl+Shift+Left, Backspace https://github.com/dotnet/winforms/issues/259
 			INPUT input[8];
 			memset(input, 0, sizeof(input));
