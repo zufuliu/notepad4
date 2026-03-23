@@ -71,7 +71,7 @@ static EDITSTYLE Styles_Perl[] = {
 	{ SCE_PL_DATASECTION, NP2StyleX_DataSection, L"fore:#A46000; back:#FFFFC0; eolfilled" },
 	{ SCE_PL_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
 	{ SCE_PL_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
-	{ SCE_PL_ERROR, NP2StyleX_ParsingError, L"fore:#C80000; back:#FFFF80" },
+	{ SCE_PL_ERROR, NP2StyleX_ParsingError, L"fore:#C80000; back:#8080FF" },
 	// {SCE_PL_XLAT},
 	//{ SCE_PL_PUNCTUATION, EDITSTYLE_HOLE(L"Symbols / Punctuation (not used)"), L"" },
 	//{ SCE_PL_PREPROCESSOR, EDITSTYLE_HOLE(L"Preprocessor (not used)"), L"" },

@@ -61,7 +61,7 @@ static EDITSTYLE Styles_Bash[] = {
 	{ SCE_SH_HERE_Q, NP2StyleX_HeredocSingleQuoted, L"fore:#A46000; back:#FFFFC0; eolfilled" },
 	{ SCE_SH_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
 	{ SCE_SH_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
-	{ SCE_SH_ERROR, NP2StyleX_ParsingError, L"fore:#C80000; back:#FFFF80" },
+	{ SCE_SH_ERROR, NP2StyleX_ParsingError, L"fore:#C80000; back:#8080FF" },
 };
 
 EDITLEXER lexBash = {
