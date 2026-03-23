@@ -44,6 +44,7 @@ C# Source
 	csx				C# Script
 	vala			GNOME Vala
 	vapi			Vala API File
+	cake			Cake (C# Make), https://cakebuild.net/
 
 CSS Style Sheet
 	css
@@ -280,6 +281,7 @@ Dart Source
 Diff File
 	diff
 	patch
+	rej				Rejected Patch
 
 
 Fortran Source
@@ -431,6 +433,7 @@ Markdown
 
 	litcoffee		Literate CoffeeScript
 	Rmd				R Markdown, https://rmarkdown.rstudio.com/
+	jmd				Julia Markdown, https://docs.julialang.org/en/v1/stdlib/Markdown/
 
 Mathematica
 	m				Module
