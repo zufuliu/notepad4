@@ -18,6 +18,9 @@ then unless until loop of by when
 # COFFEE_ALIAS_MAP
 and or is isnt not yes no on off
 
+# IcedCoffeeScript https://maxtaco.github.io/coffee-script/
+await defer
+
 #! reserved words	===========================================================
 # RESERVED
 case function var void with const let enum
