@@ -1,4 +1,4 @@
-// Go 1.21 https://golang.org/
+// Go 1.26 https://golang.org/
 // https://go.dev/ref/spec
 // https://github.com/golang/go/blob/master/doc/go_spec.html
 
@@ -27,6 +27,7 @@ uint uint8 uint16 uint32 uint64 uintptr
 //! builtin
 func append(slice []Type, elems ...Type) []Type
 func cap(v Type) int
+func clear(t T)
 func close(c chan<- Type)
 func complex(r, i FloatType) ComplexType
 func copy(dst, src []Type) int
@@ -34,6 +35,8 @@ func delete(m map[Type]Type1, key Type)
 func imag(c ComplexType) FloatType
 func len(v Type) int
 func make(t Type, size ...IntegerType) Type
+func max(x T, y ...T) T
+func min(x T, y ...T) T
 func new(Type) *Type
 func panic(v interface{})
 func print(args ...Type)
@@ -75,7 +78,6 @@ package bytes {
 	func SplitAfter(s, sep []byte) [][]byte
 	func SplitAfterN(s, sep []byte, n int) [][]byte
 	func SplitN(s, sep []byte, n int) [][]byte
-	func Title(s []byte) []byte
 	func ToLower(s []byte) []byte
 	func ToLowerSpecial(c unicode.SpecialCase, s []byte) []byte
 	func ToTitle(s []byte) []byte
@@ -293,17 +295,6 @@ package io {
 	type WriterTo interface {
 		WriteTo(w Writer) (n int64, err error)
 	}
-}
-
-package io/ioutil {
-	var Discard io.Writer = devNull(0)
-	func NopCloser(r io.Reader) io.ReadCloser
-	func ReadAll(r io.Reader) ([]byte, error)
-	func ReadDir(dirname string) ([]os.FileInfo, error)
-	func ReadFile(filename string) ([]byte, error)
-	func TempDir(dir, pattern string) (name string, err error)
-	func TempFile(dir, pattern string) (f *os.File, err error)
-	func WriteFile(filename string, data []byte, perm os.FileMode) error
 }
 
 package log {
@@ -576,7 +567,6 @@ package path/filepath {
 	func Ext(path string) string
 	func FromSlash(path string) string
 	func Glob(pattern string) (matches []string, err error)
-	func HasPrefix(p, prefix string) bool
 	func IsAbs(path string) (b bool)
 	func Join(elem ...string) string
 	func Match(pattern, name string) (matched bool, err error)
@@ -670,7 +660,6 @@ package strings {
 	func SplitAfter(s, sep string) []string
 	func SplitAfterN(s, sep string, n int) []string
 	func SplitN(s, sep string, n int) []string
-	func Title(s string) string
 	func ToLower(s string) string
 	func ToLowerSpecial(c unicode.SpecialCase, s string) string
 	func ToTitle(s string) string

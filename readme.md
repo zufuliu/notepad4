@@ -67,7 +67,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [F#](tools/lang/FSharp.fs), up to F# 10.0.
 	* [Fortran](tools/lang/Fortran.f), up to Fortran 2023.
 	* [GN Build](tools/lang/GN.gn), up to GN 2019-03-13.
-	* [Go](tools/lang/Go.go), up to Go 1.21.
+	* [Go](tools/lang/Go.go), up to Go 1.26.
 		* [Go+ (GoPlus)](https://goplus.org/) and the Q language
 	* [Gradle](tools/lang/Gradle.gradle), up to Gradle 8.3, [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#gradle)
 	* [GraphViz Dot](tools/lang/GraphViz.dot), up to GraphViz 2.49, [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#graphviz)
