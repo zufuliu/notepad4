@@ -3008,9 +3008,9 @@ void FindIniFile() noexcept {
 	WCHAR appData[MAX_PATH];
 	LPWSTR lpszIniFile = szIniFile;
 	bool portable = true;
-	if (StrStr(tchModule, L"WinGet") != nullptr || StrStr(tchModule, L"Chocolatey") != nullptr) {
+	if (StrStr(tchModule, L"WinGet") != nullptr || StrStr(tchModule, L"hocolatey") != nullptr) {
 		// %LOCALAPPDATA%\Microsoft\WinGet\Packages
-		// ChocolateyInstall
+		// %ProgramData%\chocolatey\lib
 		LPWSTR pszPath = nullptr;
 		// %LOCALAPPDATA%
 		// C:\Users\<username>\AppData\Local
