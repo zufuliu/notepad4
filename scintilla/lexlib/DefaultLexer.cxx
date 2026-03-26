@@ -5,9 +5,14 @@
 // Copyright 2017 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
 
+#include <string>
+#include <string_view>
+#include <map>
+
 #include "ILexer.h"
 #include "Scintilla.h"
 
+#include "OptionSet.h"
 #include "DefaultLexer.h"
 
 using namespace Lexilla;
@@ -28,14 +33,20 @@ int SCI_METHOD DefaultLexer::Version() const noexcept {
 }
 
 const char * SCI_METHOD DefaultLexer::PropertyNames() const noexcept {
+	if (osi)
+		return osi->PropertyNames();
 	return "";
 }
 
-int SCI_METHOD DefaultLexer::PropertyType(const char *) const {
+int SCI_METHOD DefaultLexer::PropertyType(const char *name) const {
+	if (osi)
+		return osi->PropertyType(name);
 	return SC_TYPE_BOOLEAN;
 }
 
-const char * SCI_METHOD DefaultLexer::DescribeProperty(const char *) const {
+const char * SCI_METHOD DefaultLexer::DescribeProperty(const char *name) const {
+	if (osi)
+		return osi->DescribeProperty(name);
 	return "";
 }
 
@@ -43,11 +54,15 @@ Sci_Position SCI_METHOD DefaultLexer::PropertySet(const char *, const char *) {
 	return -1;
 }
 
-const char *SCI_METHOD DefaultLexer::PropertyGet([[maybe_unused]] const char *key) const {
+const char *SCI_METHOD DefaultLexer::PropertyGet(const char *key) const {
+	if (osi)
+		return osi->PropertyGet(key);
 	return "";
 }
 
 const char * SCI_METHOD DefaultLexer::DescribeWordListSets() const noexcept {
+	if (osi)
+		return osi->DescribeWordListSets();
 	return "";
 }
 

@@ -10,13 +10,20 @@
 
 namespace Lexilla {
 
+struct OptionSetInterface;	// Forward declaration
+
 // A simple lexer with no state
 class DefaultLexer : public Scintilla::ILexer5 {
 	const char *languageName;
 	int language;
+	OptionSetInterface *osi = nullptr;
 public:
 	DefaultLexer(const char *languageName_, int language_) noexcept;
 	virtual ~DefaultLexer();
+	void SetOptionSet(OptionSetInterface *osi_) noexcept {
+		this->osi = osi_;
+	}
+
 	void SCI_METHOD Release() noexcept override;
 	int SCI_METHOD Version() const noexcept override;
 	const char * SCI_METHOD PropertyNames() const noexcept override;

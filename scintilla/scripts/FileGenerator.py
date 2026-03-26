@@ -161,7 +161,7 @@ def UpdateLineInPlistFile(path, key, value):
     lines = []
     keyCurrent = ""
     with open(path, "rb", encoding="utf-8") as f:
-        for line in f.readlines():
+        for line in f:
             ls = line.strip()
             if ls.startswith("<key>"):
                 keyCurrent = ls.replace("<key>", "").replace("</key>", "")
@@ -178,7 +178,7 @@ def UpdateLineInFile(path, linePrefix, lineReplace):
     lines = []
     updated = False
     with open(path, encoding="utf-8") as f:
-        for line in f.readlines():
+        for line in f:
             line = line.rstrip()
             if not updated and line.startswith(linePrefix):
                 lines.append(lineReplace)

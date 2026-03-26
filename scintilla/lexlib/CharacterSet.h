@@ -44,7 +44,7 @@ public:
 
 	//[[deprecated]]
 	template <size_t N>
-	CharacterSet(setBase base, const char (&initialSet)[N], bool valueAfter_ = false) noexcept : valueAfter(valueAfter_) {
+	explicit CharacterSet(setBase base, const char (&initialSet)[N], bool valueAfter_ = false) noexcept : valueAfter(valueAfter_) {
 		AddString(initialSet);
 		if (base & setLower) {
 			for (int ch = 'a'; ch <= 'z'; ch++) {
@@ -90,12 +90,12 @@ public:
 		}
 	}
 
-	bool Contains(int ch) const noexcept {
+	[[nodiscard]] bool Contains(int ch) const noexcept {
 		const unsigned int uch = ch;
 		return (uch < sizeof(bset)) ? bset[uch] : valueAfter;
 	}
 
-	bool Contains(char ch) const noexcept {
+	[[nodiscard]] bool Contains(char ch) const noexcept {
 		const unsigned char uch = ch;
 		return (uch < sizeof(bset)) ? bset[uch] : valueAfter;
 	}

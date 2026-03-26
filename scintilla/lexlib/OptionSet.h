@@ -10,12 +10,33 @@
 
 namespace Lexilla {
 
+inline std::string JoinWordListDescriptions(const char *const wordListDescriptions[]) {
+	std::string wordLists;
+	if (wordListDescriptions) {
+		for (size_t wl = 0; wordListDescriptions[wl]; wl++) {
+			if (wl > 0)
+				wordLists += '\n';
+			wordLists += wordListDescriptions[wl];
+		}
+	}
+	return wordLists;
+}
+
+// Allow OptionSet<T> to be called without knowing T
+struct OptionSetInterface {
+	[[nodiscard]] virtual const char *PropertyNames() const noexcept = 0;
+	[[nodiscard]] virtual int PropertyType(const char *name) const = 0;
+	[[nodiscard]] virtual const char *DescribeProperty(const char *name) const = 0;
+	[[nodiscard]] virtual const char *PropertyGet(const char *name) const = 0;
+	[[nodiscard]] virtual const char *DescribeWordListSets() const noexcept = 0;
+};
+
 template <typename T>
-class OptionSet {
-	typedef T Target;
-	typedef bool T:: *plcob;
-	typedef int T:: *plcoi;
-	typedef std::string T:: *plcos;
+class OptionSet : public OptionSetInterface {
+	using Target = T;
+	using plcob = bool T::*;
+	using plcoi = int T::*;
+	using plcos = std::string T::*;
 	struct Option {
 		int opType;
 		union {
@@ -67,7 +88,7 @@ class OptionSet {
 			}
 			return false;
 		}
-		const char *Get() const noexcept {
+		[[nodiscard]] const char *Get() const noexcept {
 			return value.c_str();
 		}
 	};
@@ -93,6 +114,8 @@ class OptionSet {
 		return nullptr;
 	}
 public:
+	virtual ~OptionSet() = default;
+
 	void DefineProperty(const char *name, plcob pb, const char *description = "") {
 		AddProperty(name, Option(pb, description));
 	}
@@ -112,16 +135,16 @@ public:
 		static_assert(sizeof(pe) == sizeof(pi));
 		AddProperty(name, Option(pi, description));
 	}
-	const char *PropertyNames() const noexcept {
+	[[nodiscard]] const char *PropertyNames() const noexcept final {
 		return names.c_str();
 	}
-	int PropertyType(const char *name) const {
+	[[nodiscard]] int PropertyType(const char *name) const final {
 		if (const Option *option = GetProperty(name)) {
 			return option->opType;
 		}
 		return SC_TYPE_BOOLEAN;
 	}
-	const char *DescribeProperty(const char *name) const {
+	[[nodiscard]] const char *DescribeProperty(const char *name) const final {
 		if (const Option *option = GetProperty(name)) {
 			return option->description;
 		}
@@ -135,7 +158,7 @@ public:
 		return false;
 	}
 
-	const char *PropertyGet(const char *name) const {
+	[[nodiscard]] const char *PropertyGet(const char *name) const final {
 		if (const Option *option = GetProperty(name)) {
 			return option->Get();
 		}
@@ -143,17 +166,10 @@ public:
 	}
 
 	void DefineWordListSets(const char *const wordListDescriptions[]) {
-		if (wordListDescriptions) {
-			for (size_t wl = 0; wordListDescriptions[wl]; wl++) {
-				if (wl != 0) {
-					wordLists += '\n';
-				}
-				wordLists += wordListDescriptions[wl];
-			}
-		}
+		wordLists = JoinWordListDescriptions(wordListDescriptions);
 	}
 
-	const char *DescribeWordListSets() const noexcept {
+	const char *DescribeWordListSets() const noexcept final {
 		return wordLists.c_str();
 	}
 };

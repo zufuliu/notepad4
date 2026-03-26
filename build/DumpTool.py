@@ -7,7 +7,7 @@ import re
 def dump_static_linked_function(path, dumpAll=True):
 	result = {}
 	with open(path, encoding='utf-8') as fd:
-		for line in fd.readlines():
+		for line in fd:
 			if line.count(':') > 1:
 				items = line.split()
 				func = items[1]

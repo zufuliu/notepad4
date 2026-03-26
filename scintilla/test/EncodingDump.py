@@ -68,10 +68,10 @@ def diffCodePage(codePage, dbcs=False):
 def diffAllCodePage():
 	for codePage in SBCSCodePages:
 		diffCodePage(codePage)
-		print('')
+		print()
 	for codePage in DBCSCodePages:
 		diffCodePage(codePage, True)
-		print('')
+		print()
 
 def dumpHighByte(codePage):
 	bestfit = PlatformDecoder(codePage, 0, errors='ignore')

@@ -146,7 +146,7 @@ CJKBlockList = [
 
 def findCategories(filename):
 	with open(filename, encoding="utf-8") as infile:
-		lines = [x.strip() for x in infile.readlines() if "\tcc" in x]
+		lines = [x.strip() for x in infile if "\tcc" in x]
 	values = "".join(lines).replace(" ","").split(",")
 	print(values)
 	return [v[2:] for v in values]

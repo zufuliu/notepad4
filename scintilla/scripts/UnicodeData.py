@@ -90,7 +90,7 @@ def readUnicodePropertyFile(path, propertyIndex=1, firstLast=None, withMissing=F
 	missingList = {}
 	prevLine = []
 	with open(path, encoding='utf-8') as fd:
-		for line in fd.readlines():
+		for line in fd:
 			line = line.strip()
 			missing = False
 			if not line:

@@ -207,7 +207,7 @@ def testLineBreak(path, lineBreakTable, eastAsianWidth):
 	with open(path, encoding='utf-8') as fd:
 		lineno = 0
 		indent = ' '*4
-		for line in fd.readlines():
+		for line in fd:
 			lineno += 1
 			line = line.strip()
 			if not line or line[0] == '#':

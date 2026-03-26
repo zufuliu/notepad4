@@ -57,7 +57,7 @@ def alignUp(value, align):
 	return value
 
 def bitValue(value, bitCount=16, separator='\''):
-	s = bin(value)[2:]
+	s = f'{value:b}'
 	bit = len(s)
 	if bit < bitCount:
 		s = '0'*(bitCount - bit) + s

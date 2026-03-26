@@ -93,7 +93,7 @@ def BuildKeywordContent(rid, lexer, keywordList, keywordCount=16):
 						duplicate = find_duplicate_lower(items)
 						print(rid, comment, 'duplicate words:', duplicate)
 					makeLower = True
-					items = [item[1] for item in sorted(zip(lowercase, items))]
+					items = [item[1] for item in sorted(zip(lowercase, items, strict=True))]
 			if not makeLower:
 				items = sorted(items)
 			lines = MakeKeywordLines(items, makeLower=makeLower)
