@@ -1,4 +1,4 @@
-# https://github.com/charliermarsh/ruff#configuration
+# https://github.com/astral-sh/ruff#configuration
 # https://docs.astral.sh/ruff/configuration/
 # https://docs.astral.sh/ruff/settings/
 line-length = 320
