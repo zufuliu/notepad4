@@ -2647,7 +2647,7 @@ static PEDITLEXER Style_GetLexerFromFile(LPCWSTR lpszFile, bool bCGIGuess, LPCWS
 		else if (StrCaseEqual(lpszName, L"Cakefile")) {
 			pLexNew = &lexCoffeeScript;
 		}
-		else if (StrCaseEqual(lpszName, L"Rakefile") || StrCaseEqual(lpszName, L"Podfile")) {
+		else if (StrCaseEqual(lpszName, L"Rakefile") || StrCaseEqual(lpszName, L"Podfile") || StrCaseEqual(lpszName, L"Steepfile")) {
 			pLexNew = &lexRuby;
 		}
 		else if (StrCaseEqual(lpszName, L"mozconfig") || StrCaseEqual(lpszName, L"APKBUILD") || StrCaseEqual(lpszName, L"PKGBUILD")) {
