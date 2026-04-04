@@ -69,6 +69,7 @@
       <File Name="../../scintilla/lexers/LexPascal.cxx"/>
       <File Name="../../scintilla/lexers/LexPerl.cxx"/>
       <File Name="../../scintilla/lexers/LexPHP.cxx"/>
+      <File Name="../../scintilla/lexers/LexPowerBuilder.cxx"/>
       <File Name="../../scintilla/lexers/LexPowerShell.cxx"/>
       <File Name="../../scintilla/lexers/LexProps.cxx"/>
       <File Name="../../scintilla/lexers/LexPython.cxx"/>
@@ -258,6 +259,7 @@
       <File Name="../../src/EditLexers/stlPascal.cpp"/>
       <File Name="../../src/EditLexers/stlPerl.cpp"/>
       <File Name="../../src/EditLexers/stlPHP.cpp"/>
+      <File Name="../../src/EditLexers/stlPowerBuilder.cpp"/>
       <File Name="../../src/EditLexers/stlPowerShell.cpp"/>
       <File Name="../../src/EditLexers/stlPython.cpp"/>
       <File Name="../../src/EditLexers/stlR.cpp"/>

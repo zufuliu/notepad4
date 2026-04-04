@@ -725,6 +725,7 @@ enum {
 	PHPKeywordIndex_PredefinedVariable = 4,
 	PHPKeywordIndex_Phpdoc = 12,
 	PerlKeywordIndex_Variable = 2,
+	PowerBuilderKeywordIndex_Preprocessor = 2,
 	PowerShellKeywordIndex_PredefinedVariable = 4,
 	PythonKeywordIndex_Decorator = 7,
 	RebolKeywordIndex_Directive = 1,
@@ -1352,6 +1353,13 @@ static AddWordResult AutoC_AddSpecWord(WordList &pWList, int iCurrentStyle, int 
 			}
 		} else if (ch == '$') {
 			pWList.AddList(pLex->pKeyWords->pszKeyWords[PHPKeywordIndex_PredefinedVariable]);
+			return AddWordResult_IgnoreLexer;
+		}
+		break;
+
+	case NP2LEX_POWERBUILDER:
+		if (ch == '#' && iCurrentStyle == SCE_POWERBUILDER_DEFAULT) {
+			pWList.AddList(pLex->pKeyWords->pszKeyWords[PowerBuilderKeywordIndex_Preprocessor]);
 			return AddWordResult_IgnoreLexer;
 		}
 		break;
@@ -2464,6 +2472,7 @@ void EditToggleCommentLine(bool alternative) noexcept {
 	case NP2LEX_JSON:
 	case NP2LEX_KOTLIN:
 	case NP2LEX_PASCAL:
+	case NP2LEX_POWERBUILDER:
 	case NP2LEX_RESOURCESCRIPT:
 	case NP2LEX_RUST:
 	case NP2LEX_SCALA:
@@ -2727,6 +2736,7 @@ void EditToggleCommentBlock(bool alternative) noexcept {
 	case NP2LEX_JSON:
 	case NP2LEX_KOTLIN:
 	case NP2LEX_NSIS:
+	case NP2LEX_POWERBUILDER:
 	case NP2LEX_RESOURCESCRIPT:
 	case NP2LEX_RUST:
 	case NP2LEX_SAS:
@@ -3250,6 +3260,13 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) noexcept {
 		AllStringStyleMask[css_style(SCE_CSS_STRING_DQ) >> 5] |= (1U << (css_style(SCE_CSS_STRING_DQ) & 31));
 		AllStringStyleMask[css_style(SCE_CSS_URL) >> 5] |= (1U << (css_style(SCE_CSS_URL) & 31));
 		PlainTextStyleMask[SCE_H_DEFAULT >> 5] |= (1U << (SCE_H_DEFAULT & 31));
+		break;
+
+	case NP2LEX_POWERBUILDER:
+		CurrentWordCharSet['#' >> 5] |= (1 << ('#' & 31));
+		CurrentWordCharSet['$' >> 5] |= (1 << ('$' & 31));
+		CurrentWordCharSet['%' >> 5] |= (1 << ('%' & 31));
+		CurrentWordCharSet['-' >> 5] |= (1 << ('-' & 31));
 		break;
 
 	case NP2LEX_POWERSHELL:

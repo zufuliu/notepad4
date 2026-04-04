@@ -192,6 +192,9 @@
     <ClCompile Include="..\..\scintilla\lexers\LexPHP.cxx">
       <Filter>Scintilla\lexers</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\scintilla\lexers\LexPowerBuilder.cxx">
+      <Filter>Scintilla\lexers</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\scintilla\lexers\LexPowerShell.cxx">
       <Filter>Scintilla\lexers</Filter>
     </ClCompile>
@@ -583,6 +586,9 @@
       <Filter>Source Files\EditLexers</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\EditLexers\stlPHP.cpp">
+      <Filter>Source Files\EditLexers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\EditLexers\stlPowerBuilder.cpp">
       <Filter>Source Files\EditLexers</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\EditLexers\stlPowerShell.cpp">

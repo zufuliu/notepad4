@@ -80,6 +80,7 @@ extern const LexerModule lmOCaml;
 extern const LexerModule lmPascal;
 extern const LexerModule lmPerl;
 extern const LexerModule lmPHPScript;
+extern const LexerModule lmPowerBuilder;
 extern const LexerModule lmPowerShell;
 extern const LexerModule lmProps;
 extern const LexerModule lmPython;
@@ -164,6 +165,7 @@ const LexerModule * const lexerCatalogue[] = {
 	&lmPascal,
 	&lmPerl,
 	&lmPHPScript,
+	&lmPowerBuilder,
 	&lmPowerShell,
 	&lmProps,
 	&lmPython,

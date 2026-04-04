@@ -141,6 +141,7 @@ using LPCEDITLEXER = const EDITLEXER *;
 #define NP2LEX_GO			63015	// SCLEX_GO			Go Source
 #define NP2LEX_GRADLE		63016	// SCLEX_GROOVY		Gradle Build Script
 
+#define NP2LEX_POWERBUILDER	63020	// SCLEX_POWERBUILDER	PowerBuilder Source
 #define NP2LEX_VISUALBASIC	63021	// SCLEX_VISUALBASIC	Visual Basic
 #define NP2LEX_FSHARP		63022	// SCLEX_FSHARP		F# Source
 #define NP2LEX_ASM			63023	// SCLEX_ASM		Assembler Source

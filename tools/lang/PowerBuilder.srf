@@ -1,0 +1,122 @@
+// 2025 https://docs.appeon.com/pb2025/powerscript_reference/index.html
+
+//! keywords			=======================================================
+// https://docs.appeon.com/pb2025/powerscript_reference/xREF_80481_Reserved_words.html
+_debug
+autoinstantiate
+enumerated event external
+false first forward
+indirect intrinsic
+last
+namespace native
+on
+parent post prior prototypes
+readonly
+static super
+this trigger true type
+variables
+with within
+
+// Declarations https://docs.appeon.com/pb2025/powerscript_reference/Declarations.html
+global shared
+private privateread privatewrite
+protected protectedread protectedwrite
+public
+system systemread systemwrite
+constant
+function ref library rpcfunc alias for
+subroutine ref library rpcfunc alias for
+
+// Operators
+and not or xor
+
+// Statements https://docs.appeon.com/pb2025/powerscript_reference/PowerScript_Statements.html
+call
+choose case
+case is
+case to
+case else
+end choose
+create using
+destroy
+do until
+	if then continue
+loop
+do while
+	if then exit
+loop
+do
+loop until
+do
+loop while
+for to step
+next
+goto
+halt close
+if then else
+if then
+elseif then
+else
+end if
+return
+throw
+throws
+try
+catch
+finally
+end try
+
+// SQL Statements https://docs.appeon.com/pb2025/powerscript_reference/SQL_Statements.html
+close
+commit using
+connect using
+declare cursor for using
+declare procedure for using
+delete from where using
+delete from where current of
+disconnect using
+execute
+fetch into
+insert into values using
+open
+rollback using
+select into from where using
+selectblob into from where using
+update set where using
+updateblob set where using
+update set where current of
+
+// dynamic SQL
+describe into using descriptor from using
+execute immediate
+execute dynamic
+open dynamic
+prepare
+
+//! types				=======================================================
+// https://docs.appeon.com/pb2025/powerscript_reference/Datatypes.html
+any
+blob boolean byte
+char character
+date datetime
+dec decimal double
+int integer
+long longlong longptr
+real
+string
+time
+uint ulong
+UnsignedInt UnsignedInteger UnsignedLong
+
+//! directives			=======================================================
+// Conditional compilation
+// https://docs.appeon.com/pb2025/powerscript_reference/xREF_22106_Conditional.html
+PBNATIVE DEBUG
+#if defined then
+#elseif then
+#else
+#end if
+
+//! functions			=======================================================
+
+//! events				=======================================================

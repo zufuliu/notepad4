@@ -1926,6 +1926,33 @@ def parse_php_api_file(path):
 		('phpdoc', keywordMap['phpdoc'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp | KeywordAttr.Special),
 	]
 
+def parse_powerbuilder_api_file(path):
+	keywordMap = {}
+	sections = read_api_file(path, '//')
+	for key, doc in sections:
+		if key in ('keywords', 'types', 'directives'):
+			items = doc.split()
+			if key == 'directives':
+				directives = []
+				keywords = keywordMap['keywords']
+				for item in items:
+					if item[0] == '#':
+						directives.append(item[1:])
+					else:
+						keywords.append(item)
+				items = directives
+			keywordMap[key] = items
+
+	RemoveDuplicateKeyword(keywordMap, [
+		'types',
+		'keywords',
+	])
+	return [
+		('keywords', keywordMap['keywords'], KeywordAttr.MakeLower),
+		('type keyword', keywordMap['types'], KeywordAttr.MakeLower),
+		('preprocessor', keywordMap['directives'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp | KeywordAttr.Special),
+	]
+
 def parse_powershell_api_file(path):
 	keywordMap = {'misc': []}
 	sections = read_api_file(path, '#')

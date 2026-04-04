@@ -74,6 +74,7 @@ lexerList = [
 	('NP2LEX_PASCAL', 'stlPascal.cpp', 'LexPascal.cxx', '', 0, None),
 	('NP2LEX_PERL', 'stlPerl.cpp', 'LexPerl.cxx', 'Perl.pl', 0, parse_perl_api_file),
 	('NP2LEX_PHP', 'stlPHP.cpp', 'LexPHP.cxx', 'PHP.php', 1, parse_php_api_file),
+	('NP2LEX_POWERBUILDER', 'stlPowerBuilder.cpp', 'LexPowerBuilder.cxx', 'PowerBuilder.srf', 0, parse_powerbuilder_api_file),
 	('NP2LEX_POWERSHELL', 'stlPowerShell.cpp', 'LexPowerShell.cxx', 'PowerShell.ps1', 0, parse_powershell_api_file),
 	('NP2LEX_PYTHON', 'stlPython.cpp', 'LexPython.cxx', 'Python.py', 0, parse_python_api_file),
 

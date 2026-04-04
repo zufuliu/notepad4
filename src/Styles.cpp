@@ -119,6 +119,7 @@ extern EDITLEXER lexOCaml;
 
 extern EDITLEXER lexPascal;
 extern EDITLEXER lexPerl;
+extern EDITLEXER lexPowerBuilder;
 extern EDITLEXER lexPowerShell;
 
 extern EDITLEXER lexRLang;
@@ -232,6 +233,7 @@ static PEDITLEXER pLexArray[] = {
 
 	&lexPascal,
 	&lexPerl,
+	&lexPowerBuilder,
 	&lexPowerShell,
 
 	&lexRLang,

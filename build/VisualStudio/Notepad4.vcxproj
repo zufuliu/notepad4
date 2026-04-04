@@ -511,6 +511,7 @@
     <ClCompile Include="..\..\scintilla\lexers\LexPascal.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexPerl.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexPHP.cxx" />
+    <ClCompile Include="..\..\scintilla\lexers\LexPowerBuilder.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexPowerShell.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexProps.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexPython.cxx" />
@@ -642,6 +643,7 @@
     <ClCompile Include="..\..\src\EditLexers\stlPascal.cpp" />
     <ClCompile Include="..\..\src\EditLexers\stlPerl.cpp" />
     <ClCompile Include="..\..\src\EditLexers\stlPHP.cpp" />
+    <ClCompile Include="..\..\src\EditLexers\stlPowerBuilder.cpp" />
     <ClCompile Include="..\..\src\EditLexers\stlPowerShell.cpp" />
     <ClCompile Include="..\..\src\EditLexers\stlPython.cpp" />
     <ClCompile Include="..\..\src\EditLexers\stlR.cpp" />
