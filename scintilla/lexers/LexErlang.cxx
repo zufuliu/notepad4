@@ -52,8 +52,8 @@ constexpr bool IsMultilineStyle(int style) noexcept {
 	return style > SCE_ERLANG_CHARACTER && style < SCE_ERLANG_ESCAPECHAR;
 }
 
-constexpr bool IsSigilStart(int ch) noexcept {
-	return AnyOf(ch, '(', '[', '{', '<', '/', '|', '\'', '\"', '`', '#');
+constexpr bool IsSigilStart(int ch, bool elixir) noexcept {
+	return AnyOf(ch, '(', '[', '{', '<', '/', '|', '\'', '\"') || (!elixir && AnyOf(ch, '`', '#'));
 }
 
 constexpr int GetSigilDelimiter(int ch) noexcept {
@@ -242,7 +242,7 @@ void ColouriseErlangDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 							}
 						}
 					} else {
-						if (IsSigilStart(sc.ch)) {
+						if (IsSigilStart(sc.ch, elixir)) {
 							stringDelimiter = GetSigilDelimiter(sc.ch);
 							sc.SetState(IsUpperCase(s[1]) ? SCE_ERLANG_VERBATIM_SIGIL : SCE_ERLANG_SIGIL);
 							if ((sc.ch == '\"' || sc.ch == '\'') && sc.ch == sc.chNext) {
@@ -303,7 +303,7 @@ void ColouriseErlangDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 			} else if (((elixir && (sc.ch == '@' || (sc.ch == ':' && sc.chPrev != ':')))
 				|| (!elixir && sc.ch == '-' && visibleChars == 0)) && IsIdentifierStart(sc.chNext)) {
 				sc.SetState((sc.ch == ':') ? SCE_ERLANG_SYMBOL_ID : SCE_ERLANG_PREPROCESSOR);
-			} else if (sc.ch == '~' && (IsAlpha(sc.chNext) || IsSigilStart(sc.chNext))) {
+			} else if (sc.ch == '~' && (IsAlpha(sc.chNext) || IsSigilStart(sc.chNext, elixir))) {
 				sc.SetState(SCE_ERLANG_SIGIL_ID);
 			} else if (IsAGraphic(sc.ch)) {
 				sc.SetState(SCE_ERLANG_OPERATOR);
