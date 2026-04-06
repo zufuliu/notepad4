@@ -59,7 +59,7 @@ static EDITSTYLE Styles_Swift[] = {
 	{ SCE_SWIFT_TASKMARKER, NP2StyleX_TaskMarker, L"bold; fore:#408080" },
 	{ SCE_SWIFT_STRING, NP2StyleX_String, L"fore:#008000" },
 	{ SCE_SWIFT_TRIPLE_STRING, NP2StyleX_TripleQuotedString, L"fore:#F08000" },
-	{ MULTI_STYLE(SCE_SWIFT_STRING_ED, SCE_SWIFT_TRIPLE_STRING_ED, 0, 0), NP2StyleX_DelimitedString, L"fore:#F08000" },
+	{ MULTI_STYLE(SCE_SWIFT_STRING_ED, SCE_SWIFT_TRIPLE_STRING_ED, 0, 0), NP2StyleX_DelimitedString, L"fore:#E24000" },
 	{ MULTI_STYLE(SCE_SWIFT_REGEX, SCE_SWIFT_REGEX_ED, 0, 0), NP2StyleX_Regex, L"fore:#006633; back:#FFF1A8; eolfilled" },
 	{ SCE_SWIFT_ESCAPECHAR, NP2StyleX_EscapeSequence, L"fore:#0080C0" },
 	{ SCE_SWIFT_KEY, NP2StyleX_Key, L"fore:#648000" },

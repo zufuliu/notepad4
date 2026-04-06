@@ -287,6 +287,17 @@ Diff File
 	rej				Rejected Patch
 
 
+Erlang Source
+		erl
+		hrl			Header File, https://www.erlang.org/doc/system/records_macros.html#header-files
+		yrl			YECC parser grammar, https://www.erlang.org/docs/21/man/yecc
+		Emakefile	https://www.erlang.org/doc/apps/tools/make.html
+
+Elixir Source
+		ex
+		exs			Elixir script
+
+
 Fortran Source
 	f
 	for				https://gcc.gnu.org/onlinedocs/gfortran/GNU-Fortran-and-GCC.html

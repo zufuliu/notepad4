@@ -64,6 +64,8 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [D](tools/lang/D.d), up to D language 2.0.
 	* [Dart](tools/lang/Dart.dart), up to Dart 3.11.
 	* Diff/Patch File
+	* [Elixir](tools/lang/Elixir.ex), up to Elixir 1.19.
+	* [Erlang](tools/lang/Erlang.erl), up to Erlang 28.4.
 	* [F#](tools/lang/FSharp.fs), up to F# 10.0.
 	* [Fortran](tools/lang/Fortran.f), up to Fortran 2023.
 	* [GN Build](tools/lang/GN.gn), up to GN 2019-03-13.

@@ -405,6 +405,32 @@ LexerConfigMap = {
 		'plain_text_file': True,
 	},
 
+	'NP2LEX_ELIXIR': {
+		'line_comment_string': '#',
+		'comment_style_marker': 'SCE_ERLANG_COMMENTLINE',
+		'indent_based_folding': True,
+		'indent_guide_style': 'forward',
+		'default_fold_level': ['function'],
+		'escape_char_style': 'SCE_ERLANG_ESCAPECHAR',
+		'raw_string_style': ['SCE_ERLANG_VERBATIM_SIGIL', 'SCE_ERLANG_TRIPLE_SIGIL_SQ', 'SCE_ERLANG_TRIPLE_SIGIL_DQ'],
+		'none_quote_style': 'SCE_ERLANG_CHARACTER',
+		'operator_style': ['SCE_ERLANG_OPERATOR', 'SCE_ERLANG_OPERATOR2'],
+		'string_style_range': ['SCE_ERLANG_CHARACTER', 'SCE_ERLANG_ESCAPECHAR'],
+	},
+	'NP2LEX_ERLANG': {
+		'line_comment_string': '%',
+		'comment_style_marker': 'SCE_ERLANG_COMMENTLINE',
+		'shebang_exe_name': 'escript',
+		'indent_based_folding': True,
+		'indent_guide_style': 'forward',
+		'default_fold_level': ['function'],
+		'escape_char_style': 'SCE_ERLANG_ESCAPECHAR',
+		'raw_string_style': ['SCE_ERLANG_TRIPLE_STRING_SQ', 'SCE_ERLANG_TRIPLE_STRING_DQ', 'SCE_ERLANG_VERBATIM_SIGIL', 'SCE_ERLANG_TRIPLE_SIGIL_SQ', 'SCE_ERLANG_TRIPLE_SIGIL_DQ'],
+		'none_quote_style': 'SCE_ERLANG_CHARACTER',
+		'operator_style': ['SCE_ERLANG_OPERATOR', 'SCE_ERLANG_OPERATOR2'],
+		'string_style_range': ['SCE_ERLANG_CHARACTER', 'SCE_ERLANG_ESCAPECHAR'],
+	},
+
 	'NP2LEX_FORTRAN': {
 		'default_fold_ignore_inner': 'SCE_F_FUNCTION_DEFINITION',
 		'line_comment_string': ['!'], # omited '*'

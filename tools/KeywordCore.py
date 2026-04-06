@@ -974,6 +974,38 @@ def parse_dart_api_file(path):
 		('function', keywordMap['function'], KeywordAttr.NoLexer),
 	]
 
+def parse_elixir_api_file(path):
+	sections = read_api_file(path, '#')
+	keywordMap = {}
+	for key, doc in sections:
+		items = []
+		if key == 'keywords':
+			items = doc.split()
+		elif key == 'directives':
+			items = re.findall(r'@(\w+)', doc)
+		keywordMap[key] = items
+
+	return [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('annotations', keywordMap['annotations'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp | KeywordAttr.Special),
+	]
+
+def parse_erlang_api_file(path):
+	sections = read_api_file(path, '%')
+	keywordMap = {}
+	for key, doc in sections:
+		items = []
+		if key == 'keywords':
+			items = doc.split()
+		elif key == 'directives':
+			items = re.findall(r'-(\w+)', doc)
+		keywordMap[key] = items
+
+	return [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('directives', keywordMap['directives'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp | KeywordAttr.Special),
+	]
+
 def parse_fortran_api_file(path):
 	sections = read_api_file(path, '!', commentKind=1)
 	keywordMap = {}

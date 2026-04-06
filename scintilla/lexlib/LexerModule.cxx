@@ -49,6 +49,7 @@ extern const LexerModule lmCSV;
 extern const LexerModule lmDart;
 extern const LexerModule lmDiff;
 extern const LexerModule lmDLang;
+extern const LexerModule lmErlang;
 extern const LexerModule lmFortran;
 extern const LexerModule lmFSharp;
 extern const LexerModule lmGN;
@@ -134,6 +135,7 @@ const LexerModule * const lexerCatalogue[] = {
 	&lmDart,
 	&lmDiff,
 	&lmDLang,
+	&lmErlang,
 	&lmFortran,
 	&lmFSharp,
 	&lmGN,

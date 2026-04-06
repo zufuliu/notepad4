@@ -82,6 +82,9 @@ extern EDITLEXER lexDLang;
 extern EDITLEXER lexDart;
 extern EDITLEXER lexDiff;
 
+extern EDITLEXER lexElixir;
+extern EDITLEXER lexErlang;
+
 extern EDITLEXER lexFSharp;
 extern EDITLEXER lexFortran;
 
@@ -195,6 +198,9 @@ static PEDITLEXER pLexArray[] = {
 	&lexDLang,
 	&lexDart,
 	&lexDiff,
+
+	&lexElixir,
+	&lexErlang,
 
 	&lexFSharp,
 	&lexFortran,
@@ -1455,11 +1461,10 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) noexcept {
 		//	//SciCall_SetProperty("fold.hypertext.heredoc", "1");
 		//	break;
 
-		case NP2LEX_ACTIONSCRIPT:
-			dialect = 1; // enable ECMAScript For XML
-			break;
-
-		case NP2LEX_APDL:
+		case NP2LEX_ACTIONSCRIPT: // enable ECMAScript For XML
+		case NP2LEX_APDL: // see LexAPDL.cxx
+		case NP2LEX_ELIXIR: // see LexErlang.cxx
+		case NP2LEX_RESOURCESCRIPT: // see LexCPP.cxx
 			dialect = 1;
 			break;
 
@@ -1496,10 +1501,6 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) noexcept {
 			static_assert(IDM_LEXER_SCILAB - IDM_LEXER_MATLAB == 2);
 			dialect = np2LexLangIndex - IDM_LEXER_MATLAB;
 		} break;
-
-		case NP2LEX_RESOURCESCRIPT:
-			dialect = 1; // see LexCPP.cxx
-			break;
 
 		case NP2LEX_TYPESCRIPT: {
 			static_assert(IDM_LEXER_TYPESCRIPT_TSX - IDM_LEXER_TYPESCRIPT == 1);
@@ -1922,6 +1923,9 @@ PEDITLEXER Style_SniffShebang(char *pchText) noexcept {
 				}
 				if (StrStartsWith(name, "Rscript")) {
 					return &lexRLang;
+				}
+				if (StrStartsWith(name, "escript")) {
+					return &lexErlang;
 				}
 			}
 
@@ -2658,6 +2662,9 @@ static PEDITLEXER Style_GetLexerFromFile(LPCWSTR lpszFile, bool bCGIGuess, LPCWS
 		// Boost build
 		else if (StrCaseEqual(lpszName, L"Jamroot") || StrStartsWithCase(lpszName, L"Jamfile")) {
 			pLexNew = &lexJamfile;
+		}
+		else if (StrCaseEqual(lpszName, L"Emakefile")) {
+			pLexNew = &lexErlang;
 		}
 		else if (StrStartsWithCase(lpszName, L"Kconfig") || StrStartsWithCase(lpszName, L"Doxyfile")) {
 			pLexNew = &lexConfig;

@@ -702,6 +702,8 @@ enum {
 	DKeywordIndex_Preprocessor = 2,
 	DKeywordIndex_Attribute = 3,
 	DartKeywordIndex_Metadata = 4,
+	ErlangKeywordIndex_Annotation = 1,
+	ErlangKeywordIndex_Directive = 1,
 	FSharpKeywordIndex_Preprocessor = 2,
 	FSharpKeywordIndex_CommentTag = 4,
 	GraphVizKeywordIndex_HtmlLabel = 1,
@@ -2503,6 +2505,7 @@ void EditToggleCommentLine(bool alternative) noexcept {
 	case NP2LEX_CMAKE:
 	case NP2LEX_COFFEESCRIPT:
 	case NP2LEX_CONFIG:
+	case NP2LEX_ELIXIR:
 	case NP2LEX_GN:
 	case NP2LEX_JAMFILE:
 	case NP2LEX_JULIA:
@@ -2525,14 +2528,15 @@ void EditToggleCommentLine(bool alternative) noexcept {
 		pwszComment = L"@rem ";
 		break;
 
+	case NP2LEX_ERLANG:
+	case NP2LEX_LATEX:
+		pwszComment = L"%";
+		break;
+
 	case NP2LEX_HASKELL:
 	case NP2LEX_LUA:
 	case NP2LEX_VHDL:
 		pwszComment = L"--";
-		break;
-
-	case NP2LEX_LATEX:
-		pwszComment = L"%";
 		break;
 
 	case NP2LEX_SQL:
@@ -2862,6 +2866,10 @@ void EditInsertScriptShebangLine() noexcept {
 		name = "awk";
 		break;
 
+	case NP2LEX_ERLANG:
+		name = "escript";
+		break;
+
 	case NP2LEX_GROOVY:
 		name = "groovy";
 		break;
@@ -3056,6 +3064,20 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) noexcept {
 	case NP2LEX_DLANG:
 		RawStringStyleMask[SCE_D_RAWSTRING >> 5] |= (1U << (SCE_D_RAWSTRING & 31));
 		RawStringStyleMask[SCE_D_STRING_BT >> 5] |= (1U << (SCE_D_STRING_BT & 31));
+		break;
+
+	case NP2LEX_ELIXIR:
+		RawStringStyleMask[SCE_ERLANG_VERBATIM_SIGIL >> 5] |= (1U << (SCE_ERLANG_VERBATIM_SIGIL & 31));
+		RawStringStyleMask[SCE_ERLANG_TRIPLE_SIGIL_SQ >> 5] |= (1U << (SCE_ERLANG_TRIPLE_SIGIL_SQ & 31));
+		RawStringStyleMask[SCE_ERLANG_TRIPLE_SIGIL_DQ >> 5] |= (1U << (SCE_ERLANG_TRIPLE_SIGIL_DQ & 31));
+		break;
+
+	case NP2LEX_ERLANG:
+		RawStringStyleMask[SCE_ERLANG_TRIPLE_STRING_SQ >> 5] |= (1U << (SCE_ERLANG_TRIPLE_STRING_SQ & 31));
+		RawStringStyleMask[SCE_ERLANG_TRIPLE_STRING_DQ >> 5] |= (1U << (SCE_ERLANG_TRIPLE_STRING_DQ & 31));
+		RawStringStyleMask[SCE_ERLANG_VERBATIM_SIGIL >> 5] |= (1U << (SCE_ERLANG_VERBATIM_SIGIL & 31));
+		RawStringStyleMask[SCE_ERLANG_TRIPLE_SIGIL_SQ >> 5] |= (1U << (SCE_ERLANG_TRIPLE_SIGIL_SQ & 31));
+		RawStringStyleMask[SCE_ERLANG_TRIPLE_SIGIL_DQ >> 5] |= (1U << (SCE_ERLANG_TRIPLE_SIGIL_DQ & 31));
 		break;
 
 	case NP2LEX_FORTRAN:

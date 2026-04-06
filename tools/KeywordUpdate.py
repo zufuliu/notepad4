@@ -31,6 +31,9 @@ lexerList = [
 	('NP2LEX_DART', 'stlDart.cpp', 'LexDart.cxx', 'Dart.dart', 0, parse_dart_api_file),
 	('NP2LEX_DIFF', 'stlDefault.cpp', 'LexDiff.cxx', '', (0, 'Diff'), None),
 
+	('NP2LEX_ELIXIR', 'stlElixir.cpp', 'LexErlang.cxx', 'Elixir.ex', 0, parse_elixir_api_file),
+	('NP2LEX_ERLANG', 'stlErlang.cpp', 'LexErlang.cxx', 'Erlang.erl', 0, parse_erlang_api_file),
+
 	('NP2LEX_FORTRAN', 'stlFortran.cpp', 'LexFortran.cxx', 'Fortran.f', 0, parse_fortran_api_file),
 
 	('NP2LEX_GN', 'stlGN.cpp', 'LexGN.cxx', 'GN.gn', 0, parse_gn_api_file),
