@@ -48,10 +48,6 @@ constexpr bool IsVerbatimString(int style, bool elixir) noexcept {
 		|| (!elixir && (style == SCE_ERLANG_TRIPLE_STRING_SQ || style == SCE_ERLANG_TRIPLE_STRING_DQ));
 }
 
-constexpr bool IsMultilineStyle(int style) noexcept {
-	return style > SCE_ERLANG_CHARACTER && style < SCE_ERLANG_ESCAPECHAR;
-}
-
 constexpr bool IsSigilStart(int ch, bool elixir) noexcept {
 	return AnyOf(ch, '(', '[', '{', '<', '/', '|', '\'', '\"') || (!elixir && AnyOf(ch, '`', '#'));
 }
@@ -64,6 +60,11 @@ constexpr int GetSigilDelimiter(int ch) noexcept {
 	case '<': return '>';
 	default: return ch;
 	}
+}
+
+constexpr bool IsOperatorSymbol(int ch) noexcept {
+	// https://hexdocs.pm/elixir/operators.html
+	return AnyOf(ch, '!', '%', '&', '*', '+', '-', '.', '/', '<', '=', '>', '@', '\\', '^', '|', '~');
 }
 
 // https://www.erlang.org/doc/system/data_types.html#escape-sequences
@@ -123,15 +124,9 @@ void ColouriseErlangDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 	StyleContext sc(startPos, lengthDoc, initStyle, styler);
 	if (sc.currentLine > 0) {
 		lineState = styler.GetLineState(sc.currentLine - 1);
-		delimiterCount = (lineState >> 8) & 0xff;
+		stringDelimiter = '\"' + ((lineState >> 6) & 7);
+		delimiterCount = (lineState >> 9) & 0x7f;
 		lineState = 0;
-		if (initStyle > SCE_ERLANG_CHARACTER) {
-			if (initStyle < SCE_ERLANG_STRING_DQ) {
-				stringDelimiter = '\'';
-			} else if (initStyle < SCE_ERLANG_SIGIL) {
-				stringDelimiter = '\"';
-			}
-		}
 	}
 	if (startPos == 0 && sc.Match('#', '!')) {
 		// Shell Shebang at beginning of file
@@ -183,6 +178,8 @@ void ColouriseErlangDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 						break;
 					}
 				}
+				stringDelimiter = 0;
+				delimiterCount = 0;
 				sc.Forward();
 				if (sc.state >= SCE_ERLANG_SIGIL) {
 					while (IsAlpha(sc.ch)) {
@@ -217,7 +214,7 @@ void ColouriseErlangDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 		case SCE_ERLANG_IDENTIFIER:
 		case SCE_ERLANG_PREPROCESSOR:
 		case SCE_ERLANG_SYMBOL_ID:
-			if (!IsIdentifierChar(sc.ch) && (elixir || sc.ch != '@')) {
+			if (!IsIdentifierCharEx(sc.ch) && (elixir || sc.ch != '@')) {
 				if (sc.state == SCE_ERLANG_IDENTIFIER || sc.state == SCE_ERLANG_SIGIL_ID) {
 					char s[MaxKeywordSize];
 					sc.GetCurrent(s, sizeof(s));
@@ -229,7 +226,7 @@ void ColouriseErlangDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 							}
 						} else if (chBefore == (elixir ? '%' : '#')) {
 							sc.ChangeState(SCE_ERLANG_RECORD);
-						} else if (chBefore == '?' && elixir) {
+						} else if (chBefore == '?' && !elixir) {
 							sc.ChangeState(SCE_ERLANG_MACRO);
 						} else {
 							const bool skip = elixir && (sc.ch == '?' || sc.ch == '!');
@@ -268,6 +265,12 @@ void ColouriseErlangDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 			}
 			break;
 
+		case SCE_ERLANG_SYMBOL_OP:
+			if (!IsOperatorSymbol(sc.ch)) {
+				sc.SetState(SCE_ERLANG_DEFAULT);
+			}
+			break;
+
 		case SCE_ERLANG_COMMENTLINE:
 			if (sc.atLineStart) {
 				sc.SetState(SCE_ERLANG_DEFAULT);
@@ -293,18 +296,20 @@ void ColouriseErlangDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 						sc.Advance(count);
 					}
 				}
-			} else if (sc.ch == '$' && IsAGraphic(sc.chNext)) {
+			} else if (sc.ch == (elixir ? '?' : '$') && IsAGraphic(sc.chNext)) {
 				sc.SetState(SCE_ERLANG_CHARACTER);
 			} else if (IsNumberStartEx(sc.chPrev, sc.ch, sc.chNext)) {
 				sc.SetState(SCE_ERLANG_NUMBER);
-			} else if (IsIdentifierStart(sc.ch)) {
+			} else if (IsIdentifierStartEx(sc.ch)) {
 				chBefore = sc.chPrev;
 				sc.SetState(SCE_ERLANG_IDENTIFIER);
 			} else if (((elixir && (sc.ch == '@' || (sc.ch == ':' && sc.chPrev != ':')))
-				|| (!elixir && sc.ch == '-' && visibleChars == 0)) && IsIdentifierStart(sc.chNext)) {
+				|| (!elixir && sc.ch == '-' && visibleChars == 0)) && IsIdentifierStartEx(sc.chNext)) {
 				sc.SetState((sc.ch == ':') ? SCE_ERLANG_SYMBOL_ID : SCE_ERLANG_PREPROCESSOR);
 			} else if (sc.ch == '~' && (IsAlpha(sc.chNext) || IsSigilStart(sc.chNext, elixir))) {
 				sc.SetState(SCE_ERLANG_SIGIL_ID);
+			} else if (sc.ch == ':' && elixir && IsOperatorSymbol(sc.chNext)) {
+				sc.SetState(SCE_ERLANG_SYMBOL_OP);
 			} else if (IsAGraphic(sc.ch)) {
 				sc.SetState(SCE_ERLANG_OPERATOR);
 				if (visibleChars == 0 && (sc.ch == '}' || sc.ch == ']' || sc.ch == ')')) {
@@ -341,14 +346,13 @@ void ColouriseErlangDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 			visibleChars++;
 		}
 		if (sc.atLineEnd) {
-			lineState |= (indentCount << 16) | (delimiterCount << 8);
-			if (!nestedState.empty()) {
+			lineState |= (indentCount << 16) | (delimiterCount << 9);
+			const unsigned delimiter = stringDelimiter - '\"';
+			constexpr unsigned last = '}' - '\"' + 1;
+			if ((delimiter > 7 && delimiter < last) || !nestedState.empty()) {
 				lineState |= PyLineStateStringInterpolation | PyLineStateMaskTripleQuote;
-			} else if (IsMultilineStyle(sc.state)) {
-				lineState |= PyLineStateMaskTripleQuote;
-				if (sc.state == SCE_ERLANG_SIGIL || sc.state == SCE_ERLANG_VERBATIM_SIGIL) {
-					lineState |= PyLineStateStringInterpolation;
-				}
+			} else if (delimiter <= 7) {
+				lineState |= (delimiter << 6) | PyLineStateMaskTripleQuote;
 			} else if (visibleChars == 0) {
 				lineState |= PyLineStateMaskEmptyLine;
 			}
