@@ -124,7 +124,9 @@ void ColouriseErlangDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 	StyleContext sc(startPos, lengthDoc, initStyle, styler);
 	if (sc.currentLine > 0) {
 		lineState = styler.GetLineState(sc.currentLine - 1);
-		stringDelimiter = '\"' + ((lineState >> 6) & 7);
+		if (initStyle > SCE_ERLANG_CHARACTER && initStyle < SCE_ERLANG_ESCAPECHAR) {
+			stringDelimiter = '\"' + ((lineState >> 6) & 7);
+		}
 		delimiterCount = (lineState >> 9) & 0x7f;
 		lineState = 0;
 	}
