@@ -76,6 +76,16 @@ enum class KeywordType {
 	Call = SCE_F_FUNCTION,
 };
 
+constexpr bool IsFortranNumber(int chPrev, int ch, int chNext) noexcept {
+	return IsIdentifierChar(ch)
+		|| ((ch == '+' || ch == '-') && AnyOf<'D', 'E', 'd', 'e'>(chPrev))
+		|| (ch == '.' && chNext != '.');
+}
+
+constexpr bool IsOperatorName(int ch) noexcept {
+	return IsAlpha(ch) || ch == '.';
+}
+
 void ColouriseFortranDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	int lineState = 0;
 	int visibleChars = 0;
@@ -112,13 +122,9 @@ void ColouriseFortranDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int ini
 			break;
 
 		case SCE_F_NUMBER:
-			if (!IsIdentifierChar(sc.ch)) {
-				if (IsFloatExponent(sc.chPrev, sc.ch, sc.chNext)) {
-					sc.Forward();
-				} else if (sc.ch != '.' || sc.chPrev == '.' || (IsAlpha(sc.chNext)
-					&& !(UnsafeLower(sc.chNext) == 'e' && IsADigit(sc.GetRelative(2))))) {
-					sc.SetState(SCE_F_DEFAULT);
-				}
+			if (!IsFortranNumber(sc.chPrev, sc.ch, sc.chNext)
+				|| (sc.ch == '.' && IsAlpha(sc.chNext) && IsOperatorName(sc.GetRelative(2)))) {
+				sc.SetState(SCE_F_DEFAULT);
 			}
 			break;
 
