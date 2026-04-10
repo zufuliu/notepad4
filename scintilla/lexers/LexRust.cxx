@@ -185,7 +185,7 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			break;
 
 		case SCE_RUST_NUMBER:
-			if (!IsDecimalNumber(sc.chPrev, sc.ch, sc.chNext)) {
+			if (!IsDecimalNumber(sc.chPrev, sc.ch, sc.chNext) || (sc.ch == '.' && IsIdentifierStartEx(sc.chNext))) {
 				sc.SetState(SCE_RUST_DEFAULT);
 			}
 			break;
