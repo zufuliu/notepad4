@@ -66,6 +66,17 @@ struct SplitView {
 	}
 };
 
+struct ChangedRange {
+	Sci::Position start = 0;
+	Sci::Position end = 0;
+	[[nodiscard]] bool Empty() const noexcept {
+		return end == 0;
+	}
+	Sci::Position Length() const noexcept {
+		return end - start;
+	}
+};
+
 /**
  * Holder for an expandable array of characters that supports undo and line markers.
  * Based on article "Data Structures in a Bit-Mapped Text Editor"
@@ -150,7 +161,9 @@ public:
 
 	/// Setting styles for positions outside the range of the buffer is safe and has no effect.
 	/// @return true if the style of a character is changed.
-	bool SetStyles(Sci::Position position, Sci::Position lengthStyle, const unsigned char *styles, char styleValue) noexcept;
+	ChangedRange SetStyles(Sci::Position position, Sci::Position lengthStyle, const char *styles) noexcept;
+	ChangedRange SetStyleFor(Sci::Position position, Sci::Position lengthStyle, char styleValue) noexcept;
+
 	const char *DeleteChars(Sci::Position position, Sci::Position deleteLength, bool &startSequence);
 
 	bool IsReadOnly() const noexcept {

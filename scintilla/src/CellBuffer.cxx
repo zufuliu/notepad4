@@ -460,60 +460,89 @@ const char *CellBuffer::InsertString(Sci::Position position, const char *s, Sci:
 	return data;
 }
 
-bool CellBuffer::SetStyles(Sci::Position position, Sci::Position lengthStyle, const unsigned char *styles, char styleValue) noexcept {
-	PLATFORM_ASSERT(position + lengthStyle <= style.Length());
+namespace {
+
+template <bool segment1>
+void CopyBytes(char *data, const char *styles, Sci::Position length, ChangedRange &range, Sci::Position offset) noexcept {
+	Sci::Position index = 0;
+	while (index < length && data[index] == styles[index]) {
+		++index;
+	}
+	--length;
+	while (length > index && data[length] == styles[length]) {
+		--length;
+	}
+	if (index <= length) {
+		++length;
+		memcpy(data + index, styles + index, length - index);
+		if (segment1 || range.Empty()) {
+			range.start = index + offset;
+		}
+		range.end = length + offset;
+	}
+}
+
+template <bool segment1>
+void SetBytes(char *data, char styleValue, Sci::Position length, ChangedRange &range, Sci::Position offset) noexcept {
+	Sci::Position index = 0;
+	while (index < length && data[index] == styleValue) {
+		++index;
+	}
+	--length;
+	while (length > index && data[length] == styleValue) {
+		--length;
+	}
+	if (index <= length) {
+		++length;
+		memset(data + index, static_cast<unsigned char>(styleValue), length - index);
+		if (segment1 || range.Empty()) {
+			range.start = index + offset;
+		}
+		range.end = length + offset;
+	}
+}
+
+}
+
+ChangedRange CellBuffer::SetStyles(Sci::Position position, Sci::Position lengthStyle, const char *styles) noexcept {
+	ChangedRange range;
 	Sci::Position range1Length = 0;
-	bool changed = false;
 	const Sci::Position part1Length = style.GapPosition();
 	char *data = style.Segment1Pointer(position);
 	if (position < part1Length) {
 		range1Length = std::min(lengthStyle, part1Length - position);
-		if (styles) {
-			if (memcmp(data, styles, range1Length) != 0) {
-				changed = true;
-				memcpy(data, styles, range1Length);
-			}
-		} else {
-			Sci::Position length = range1Length;
-			char *ptr = data;
-			do {
-				if (ptr[0] != styleValue) {
-					changed = true;
-					memset(ptr, static_cast<unsigned char>(styleValue), length);
-					break;
-				}
-				++ptr;
-				--length;
-			} while (length != 0);
-		}
+		CopyBytes<true>(data, styles, range1Length, range, position);
 	}
 
 	if (range1Length < lengthStyle) {
-		const Sci::Position lengthBody = style.Length();
+		data += range1Length + style.GapLength();
+		styles += range1Length;
+		position += range1Length;
 		//! required for StyleContext optimizition, where position + lengthStyle <= lengthBody + 1
-		Sci::Position length = std::min(lengthStyle, lengthBody - position) - range1Length;
-		if (length != 0) {
-			data += range1Length + style.GapLength();
-			if (styles) {
-				styles += range1Length;
-				if (memcmp(data, styles, length) != 0) {
-					changed = true;
-					memcpy(data, styles, length);
-				}
-			} else {
-				do {
-					if (data[0] != styleValue) {
-						changed = true;
-						memset(data, static_cast<unsigned char>(styleValue), length);
-						break;
-					}
-					++data;
-					--length;
-				} while (length != 0);
-			}
-		}
+		range1Length = std::min(lengthStyle - range1Length, style.Length() - position);
+		CopyBytes<false>(data, styles, range1Length, range, position);
 	}
-	return changed;
+	return range;
+}
+
+ChangedRange CellBuffer::SetStyleFor(Sci::Position position, Sci::Position lengthStyle, char styleValue) noexcept {
+	ChangedRange range;
+	Sci::Position range1Length = 0;
+	const Sci::Position part1Length = style.GapPosition();
+	char *data = style.Segment1Pointer(position);
+	if (position < part1Length) {
+		range1Length = std::min(lengthStyle, part1Length - position);
+		SetBytes<true>(data, styleValue, range1Length, range, position);
+	}
+
+	if (range1Length < lengthStyle) {
+		data += range1Length + style.GapLength();
+		position += range1Length;
+		//! required for StyleContext optimizition, where position + lengthStyle <= lengthBody + 1
+		range1Length = std::min(lengthStyle - range1Length, style.Length() - position);
+		SetBytes<false>(data, styleValue, range1Length, range, position);
+	}
+	return range;
 }
 
 // The char* returned is to an allocation owned by the undo history

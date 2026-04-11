@@ -192,7 +192,7 @@ public:
 	}
 	void Flush() {
 		if (validLen > 0) {
-			pAccess->SetStyles(validLen, styleBuf, 0);
+			pAccess->SetStyles(validLen, styleBuf);
 			startPosStyling += validLen;
 			validLen = 0;
 		}
@@ -241,7 +241,7 @@ public:
 				} while (len != 0);
 			} else {
 				// Too big for buffer so send directly
-				pAccess->SetStyles(len, nullptr, attr);
+				pAccess->SetStyleFor(len, attr);
 			}
 		}
 	}

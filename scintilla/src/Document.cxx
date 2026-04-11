@@ -2535,18 +2535,34 @@ void SCI_METHOD Document::StartStyling(Sci_Position position) noexcept {
 	endStyled = position;
 }
 
-bool SCI_METHOD Document::SetStyles(Sci_Position length, const unsigned char *styles, unsigned char style) {
+bool SCI_METHOD Document::SetStyleFor(Sci_Position length, unsigned char style) {
 	if (length <= 0 || enteredStyling != 0 || !cb.HasStyles()) {
 		return false;
 	}
 	enteredStyling++;
-	const Sci::Position prevEndStyled = endStyled;
-	if (cb.SetStyles(endStyled, length, styles, style)) {
+	const ChangedRange range = cb.SetStyleFor(endStyled, length, style);
+	endStyled += length;
+	if (!range.Empty()) {
 		const DocModification mh(ModificationFlags::ChangeStyle | ModificationFlags::User,
-			prevEndStyled, length);
+			range.start, range.Length());
 		NotifyModified(mh);
 	}
+	enteredStyling--;
+	return true;
+}
+
+bool SCI_METHOD Document::SetStyles(Sci_Position length, const unsigned char *styles) {
+	if (length <= 0 || enteredStyling != 0 || !cb.HasStyles()) {
+		return false;
+	}
+	enteredStyling++;
+	const ChangedRange range = cb.SetStyles(endStyled, length, reinterpret_cast<const char *>(styles));
 	endStyled += length;
+	if (!range.Empty()) {
+		const DocModification mh(ModificationFlags::ChangeStyle | ModificationFlags::User,
+			range.start, range.Length());
+		NotifyModified(mh);
+	}
 	enteredStyling--;
 	return true;
 }

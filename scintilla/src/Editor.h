@@ -14,9 +14,7 @@ class Timer {
 public:
 	bool ticking;
 	int ticksToWait;
-	enum {
-		tickSize = 100
-	};
+	static constexpr int tickSize = 100;
 	TickerID tickerID;
 
 	Timer() noexcept;
@@ -230,9 +228,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 
 	Timer timer;
 	Timer autoScrollTimer;
-	enum {
-		autoScrollDelay = 200
-	};
+	static constexpr int autoScrollDelay = 200;
 
 	Idler idler;
 
