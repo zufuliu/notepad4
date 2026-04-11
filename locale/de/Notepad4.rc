@@ -119,6 +119,7 @@ BEGIN
 		MENUITEM "Speichern &unter...\tF6",				IDM_FILE_SAVEAS
 		MENUITEM "Sicherheitskopie &anlegen",			IDM_FILE_SAVEBACKUP
 		MENUITEM "&Kopie speichern...\tStrg+F6",		IDM_FILE_SAVECOPY
+		MENUITEM "Save with Original Time",			IDM_FILE_SAVEORIGINALTIMESTAMP
 		MENUITEM SEPARATOR
 		POPUP "Datei&modus"
 		BEGIN

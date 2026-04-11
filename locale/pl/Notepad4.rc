@@ -119,6 +119,7 @@ BEGIN
 		MENUITEM "Zapisz &jako...\tF6",				IDM_FILE_SAVEAS
 		MENUITEM "Zapisz kopię zapa&sową",			IDM_FILE_SAVEBACKUP
 		MENUITEM "Zapisz &kopię...\tCtrl+F6",		IDM_FILE_SAVECOPY
+		MENUITEM "Save with Original Time",			IDM_FILE_SAVEORIGINALTIMESTAMP
 		MENUITEM SEPARATOR
 		POPUP "&Tryb pliku"
 		BEGIN

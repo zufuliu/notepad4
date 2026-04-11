@@ -119,6 +119,7 @@ BEGIN
 		MENUITEM "名前を付けて保存(&A)...\tF6",					IDM_FILE_SAVEAS
 		MENUITEM "バックアップを保存(&U)",					    IDM_FILE_SAVEBACKUP
 		MENUITEM "コピーして保存(&Y)...\tCtrl+F6",			IDM_FILE_SAVECOPY
+		MENUITEM "Save with Original Time",			IDM_FILE_SAVEORIGINALTIMESTAMP
 		MENUITEM SEPARATOR
 		POPUP "編集モード(&M)"
 		BEGIN

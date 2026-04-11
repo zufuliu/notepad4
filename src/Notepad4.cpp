@@ -2315,7 +2315,9 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 		EnableCmd(hmenu, menuRequiresPath[k], hasPath);
 	}
 
-	EnableCmd(hmenu, IDM_FILE_SAVE, IsDocumentModified());
+	const bool changed = IsDocumentModified();
+	EnableCmd(hmenu, IDM_FILE_SAVE, changed);
+	EnableCmd(hmenu, IDM_FILE_SAVEORIGINALTIMESTAMP, changed);
 #if defined(_WIN64)
 	DisableCmd(hmenu, IDM_FILE_LARGE_FILE_MODE, bLargeFileMode);
 	DisableCmd(hmenu, IDM_FILE_LARGE_FILE_MODE_RELOAD, bLargeFileMode);
@@ -2663,6 +2665,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDT_FILE_SAVECOPY:
 	case IDM_FILE_SAVECOPY:
 		FileSave(static_cast<FileSaveFlag>(FileSaveFlag_SaveAlways | FileSaveFlag_SaveAs | FileSaveFlag_SaveCopy));
+		break;
+
+	case IDM_FILE_SAVEORIGINALTIMESTAMP:
+		FileSave(static_cast<FileSaveFlag>(FileSaveFlag_SaveAlways | FileSaveFlag_OriginalTimestamp));
 		break;
 
 	case IDM_FILE_READONLY_FILE:

@@ -294,6 +294,7 @@ enum FileSaveFlag {
 	FileSaveFlag_SaveCopy = 8,
 	FileSaveFlag_EndSession = 16,
 	FileSaveFlag_Untitled = 32,
+	FileSaveFlag_OriginalTimestamp = 64,
 };
 
 bool FileIO(bool fLoad, LPWSTR pszFile, FileSaveFlag flag, EditFileIOStatus &status) noexcept;

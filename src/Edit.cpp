@@ -1215,6 +1215,13 @@ bool EditSaveFile(HWND hwnd, LPCWSTR pszFile, int saveFlag, EditFileIOStatus &st
 		return false;
 	}
 
+	FILE_BASIC_INFO timestamp;
+	if (saveFlag & FileSaveFlag_OriginalTimestamp) {
+		if (!GetFileInformationByHandleEx(hFile, FileBasicInfo, &timestamp, sizeof(timestamp))) {
+			saveFlag &= ~FileSaveFlag_OriginalTimestamp;
+		}
+	}
+
 	if (!(saveFlag & FileSaveFlag_EndSession) && !bReadOnlyMode) {
 		// ensure consistent line endings
 		if (bFixLineEndings) {
@@ -1351,6 +1358,9 @@ bool EditSaveFile(HWND hwnd, LPCWSTR pszFile, int saveFlag, EditFileIOStatus &st
 		NP2HeapFree(lpData);
 	}
 
+	if (saveFlag & FileSaveFlag_OriginalTimestamp) {
+		SetFileInformationByHandle(hFile, FileBasicInfo, &timestamp, sizeof(timestamp));
+	}
 	CloseHandle(hFile);
 	if (bWriteSuccess) {
 		if (!(saveFlag & FileSaveFlag_SaveCopy)) {
