@@ -1659,16 +1659,7 @@ bool PathGetRealPath(HANDLE hFile, LPCWSTR lpszSrc, LPWSTR lpszDest) noexcept {
 				nullptr, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, nullptr);
 		}
 		if (hFile != INVALID_HANDLE_VALUE) {
-#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 			DWORD cch = GetFinalPathNameByHandleW(hFile, path, COUNTOF(path), FILE_NAME_OPENED);
-#else
-			using GetFinalPathNameByHandleSig = DWORD (WINAPI *)(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, DWORD dwFlags);
-			static GetFinalPathNameByHandleSig pfnGetFinalPathNameByHandle = nullptr;
-			if (pfnGetFinalPathNameByHandle == nullptr) {
-				pfnGetFinalPathNameByHandle = DLLFunctionEx<GetFinalPathNameByHandleSig>(L"kernel32.dll", "GetFinalPathNameByHandleW");
-			}
-			DWORD cch = pfnGetFinalPathNameByHandle(hFile, path, COUNTOF(path), FILE_NAME_OPENED);
-#endif
 			// TODO: support long path
 			if (closing) {
 				CloseHandle(hFile);
@@ -1720,16 +1711,7 @@ struct FILE_ID_INFO {
 static inline BOOL PathGetFileId(HANDLE hFile, FILE_ID_INFO *fileId) noexcept {
 	BOOL success = FALSE;
 	if (IsWin8AndAbove()) {
-#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 		success = GetFileInformationByHandleEx(hFile, static_cast<FILE_INFO_BY_HANDLE_CLASS>(FileIdInfo), fileId, sizeof(FILE_ID_INFO));
-#else
-		using GetFileInformationByHandleExSig = BOOL (WINAPI *)(HANDLE hFile, int FileInformationClass, LPVOID lpFileInformation, DWORD dwBufferSize);
-		static GetFileInformationByHandleExSig pfnGetFileInformationByHandleEx = nullptr;
-		if (pfnGetFileInformationByHandleEx == nullptr) {
-			pfnGetFileInformationByHandleEx = DLLFunctionEx<GetFileInformationByHandleExSig>(L"kernel32.dll", "GetFileInformationByHandleEx");
-		}
-		success = pfnGetFileInformationByHandleEx(hFile, FileIdInfo, fileId, sizeof(FILE_ID_INFO));
-#endif
 		// failed on samba: GetLastError() => ERROR_INVALID_PARAMETER
 	}
 	if (!success) {

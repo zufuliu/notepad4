@@ -3431,15 +3431,7 @@ static void Style_StrCopyAttributeEx(LPWSTR szNewStyle, LPCWSTR lpszStyle, LPCWS
 
 BOOL Style_StrGetLocale(LPCWSTR lpszStyle, LPWSTR lpszLocale, int cchLocale) noexcept {
 	if (Style_StrGetValueEx(lpszStyle, L"locale:", CSTRLEN(L"locale:"), lpszLocale, cchLocale)) {
-#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 		return IsValidLocaleName(lpszLocale);
-#else
-		using IsValidLocaleNameSig = BOOL (WINAPI *)(LPCWSTR lpLocaleName);
-		IsValidLocaleNameSig pfnIsValidLocaleName = DLLFunctionEx<IsValidLocaleNameSig>(L"kernel32.dll", "IsValidLocaleName");
-		if (pfnIsValidLocaleName != nullptr) {
-			return pfnIsValidLocaleName(lpszLocale);
-		}
-#endif
 	}
 	return FALSE;
 }
