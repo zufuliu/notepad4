@@ -360,6 +360,7 @@ static LPWSTR g_AllFileExtensions = nullptr;
 
 // Notepad4.cpp
 extern HWND hwndMain;
+extern DWORD dwLastIOError;
 extern int	iCurrentEncoding;
 extern int	g_DOSEncoding;
 extern int	iDefaultCodePage;
@@ -1099,6 +1100,7 @@ bool Style_Export(HWND hwnd) noexcept {
 		NP2HeapFree(pIniSectionBuf);
 
 		if (dwError != ERROR_SUCCESS) {
+			dwLastIOError = dwError;
 			MsgBoxLastError(MB_OK, IDS_EXPORT_FAIL, szFile);
 		}
 		return true;
