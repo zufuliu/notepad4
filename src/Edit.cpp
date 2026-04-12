@@ -1234,37 +1234,20 @@ bool EditSaveFile(HWND hwnd, LPCWSTR pszFile, int saveFlag, EditFileIOStatus &st
 		}
 	}
 
-	BOOL bWriteSuccess;
 	// get text
 	DWORD cbData = static_cast<DWORD>(SciCall_GetLength());
 	char *lpData = nullptr;
-	int iEncoding = status.iEncoding;
+	const int iEncoding = status.iEncoding;
 	UINT uFlags = mEncoding[iEncoding].uFlags;
 
-	if (cbData == 0) {
-		bWriteSuccess = SetEndOfFile(hFile);
-		// write encoding BOM
-		DWORD dwBytesWritten;
-		if (uFlags & NCP_UNICODE_BOM) {
-			if (uFlags & NCP_UNICODE_REVERSE) {
-				bWriteSuccess = WriteFile(hFile, "\xFE\xFF", 2, &dwBytesWritten, nullptr);
-			} else {
-				bWriteSuccess = WriteFile(hFile, "\xFF\xFE", 2, &dwBytesWritten, nullptr);
-			}
-		} else if (uFlags & NCP_UTF8_SIGN) {
-			bWriteSuccess = WriteFile(hFile, "\xEF\xBB\xBF", 3, &dwBytesWritten, nullptr);
-		}
-		dwLastIOError = GetLastError();
-	} else {
+	// get content and convert encoding
+	if (cbData != 0) {
 		if (cbData >= MAX_NON_UTF8_SIZE) {
 			// save as UTF-8 or ANSI
 			if (!(uFlags & (NCP_DEFAULT | NCP_UTF8))) {
-				if (uFlags & NCP_UNICODE_BOM) {
-					iEncoding = CPI_UTF8SIGN;
-				} else {
-					iEncoding = CPI_UTF8;
-				}
-				uFlags = mEncoding[iEncoding].uFlags;
+				// iEncoding = (uFlags & NCP_UNICODE_BOM) ? CPI_UTF8SIGN : CPI_UTF8;
+				// uFlags = mEncoding[iEncoding].uFlags;
+				uFlags = (uFlags & NCP_UNICODE_BOM) ? NCP_UTF8_SIGN : NCP_UTF8;
 			}
 		}
 
@@ -1287,39 +1270,19 @@ bool EditSaveFile(HWND hwnd, LPCWSTR pszFile, int saveFlag, EditFileIOStatus &st
 		}
 #endif
 
-		DWORD dwBytesWritten;
-		if (uFlags & NCP_UNICODE) {
-			SetEndOfFile(hFile);
-
+		if (uFlags & (NCP_UTF8 | NCP_DEFAULT)) {
+			// no encoding conversion for UTF-8 or ANSI
+		} else if (uFlags & NCP_UNICODE) {
 			LPWSTR lpDataWide = static_cast<LPWSTR>(NP2HeapAlloc(cbData * sizeof(WCHAR) + 16));
 			const int cbDataWide = MultiByteToWideChar(CP_UTF8, 0, lpData, cbData, lpDataWide, static_cast<int>(NP2HeapSize(lpDataWide) / sizeof(WCHAR)));
-
-			if (uFlags & NCP_UNICODE_BOM) {
-				if (uFlags & NCP_UNICODE_REVERSE) {
-					WriteFile(hFile, "\xFE\xFF", 2, &dwBytesWritten, nullptr);
-				} else {
-					WriteFile(hFile, "\xFF\xFE", 2, &dwBytesWritten, nullptr);
-				}
-			}
+			NP2HeapFree(lpData);
+			lpData = reinterpret_cast<char *>(lpDataWide);
+			cbData = cbDataWide * sizeof(WCHAR);
 
 			if (uFlags & NCP_UNICODE_REVERSE) {
-				_swab(reinterpret_cast<char *>(lpDataWide), reinterpret_cast<char *>(lpDataWide), static_cast<int>(cbDataWide * sizeof(WCHAR)));
+				_swab(lpData, lpData, cbData);
 			}
-
-			bWriteSuccess = WriteFile(hFile, lpDataWide, cbDataWide * sizeof(WCHAR), &dwBytesWritten, nullptr);
-			dwLastIOError = GetLastError();
-
-			NP2HeapFree(lpDataWide);
-		} else if (uFlags & NCP_UTF8) {
-			SetEndOfFile(hFile);
-
-			if (uFlags & NCP_UTF8_SIGN) {
-				WriteFile(hFile, "\xEF\xBB\xBF", 3, &dwBytesWritten, nullptr);
-			}
-
-			bWriteSuccess = WriteFile(hFile, lpData, cbData, &dwBytesWritten, nullptr);
-			dwLastIOError = GetLastError();
-		} else if (uFlags & (NCP_8BIT | NCP_7BIT)) {
+		} else { // NCP_8BIT, NCP_7BIT
 			BOOL bCancelDataLoss = FALSE;
 			const UINT uCodePage = mEncoding[iEncoding].uCodePage;
 
@@ -1339,34 +1302,48 @@ bool EditSaveFile(HWND hwnd, LPCWSTR pszFile, int saveFlag, EditFileIOStatus &st
 			}
 			NP2HeapFree(lpDataWide);
 
-			if (!bCancelDataLoss || InfoBoxWarn(MB_OKCANCEL, L"MsgConv3", IDS_ERR_UNICODE2) == IDOK) {
-				SetEndOfFile(hFile);
-				bWriteSuccess = WriteFile(hFile, lpData, cbData, &dwBytesWritten, nullptr);
-				dwLastIOError = GetLastError();
-			} else {
-				bWriteSuccess = FALSE;
+			if (bCancelDataLoss && InfoBoxWarn(MB_OKCANCEL, L"MsgConv3", IDS_ERR_UNICODE2) != IDOK) {
 				status.bCancelDataLoss = true;
+				CloseHandle(hFile);
+				NP2HeapFree(lpData);
+				return false;
 			}
-		} else {
-			SetEndOfFile(hFile);
+		}
+	}
+
+	// write content
+	{
+		BOOL bWriteSuccess = SetEndOfFile(hFile);
+		DWORD dwBytesWritten;
+		// write encoding BOM
+		DWORD bom;
+		DWORD length = 0;
+		if (uFlags & NCP_UNICODE_BOM) {
+			bom = (uFlags & NCP_UNICODE_REVERSE) ? BOM_UTF16BE : BOM_UTF16LE;
+			length = 2;
+		} else if (uFlags & NCP_UTF8_SIGN) {
+			bom = BOM_UTF8;
+			length = 3;
+		}
+		if (length != 0) {
+			bWriteSuccess = WriteFile(hFile, &bom, length, &dwBytesWritten, nullptr);
+		}
+		dwLastIOError = GetLastError();
+		if (lpData != nullptr) {
 			bWriteSuccess = WriteFile(hFile, lpData, cbData, &dwBytesWritten, nullptr);
 			dwLastIOError = GetLastError();
+			NP2HeapFree(lpData);
 		}
-	}
-
-	if (lpData != nullptr) {
-		NP2HeapFree(lpData);
-	}
-
-	if (saveFlag & FileSaveFlag_OriginalTimestamp) {
-		SetFileInformationByHandle(hFile, FileBasicInfo, &timestamp, sizeof(timestamp));
-	}
-	CloseHandle(hFile);
-	if (bWriteSuccess) {
-		if (!(saveFlag & FileSaveFlag_SaveCopy)) {
-			SciCall_SetSavePoint();
+		if (saveFlag & FileSaveFlag_OriginalTimestamp) {
+			SetFileInformationByHandle(hFile, FileBasicInfo, &timestamp, sizeof(timestamp));
 		}
-		return true;
+		CloseHandle(hFile);
+		if (bWriteSuccess) {
+			if (!(saveFlag & FileSaveFlag_SaveCopy)) {
+				SciCall_SetSavePoint();
+			}
+			return true;
+		}
 	}
 
 	return false;
