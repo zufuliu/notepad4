@@ -119,7 +119,7 @@ BEGIN
 		MENUITEM "Salva &come...\tF6",					IDM_FILE_SAVEAS
 		MENUITEM "Salva back&up",					    IDM_FILE_SAVEBACKUP
 		MENUITEM "Salva copia.&..\tCtrl+F6",			IDM_FILE_SAVECOPY
-		MENUITEM "Save with Original Time",			IDM_FILE_SAVEORIGINALTIMESTAMP
+		MENUITEM "Salva con l'ora &originale",			IDM_FILE_SAVEORIGINALTIMESTAMP
 		MENUITEM SEPARATOR
 		POPUP "&Modalità file"
 		BEGIN
