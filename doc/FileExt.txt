@@ -657,6 +657,7 @@ YAML Document
 	ifs				LLVM IFS (Interface Stubs)
 	gyp				GYP
 	gypi			GYP
+	cff				Citation File Format, https://citation-file-format.github.io/
 
 Zig Source
 	zig
