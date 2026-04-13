@@ -119,7 +119,7 @@ BEGIN
 		MENUITEM "다른 이름으로 저장(&A)...\tF6",						IDM_FILE_SAVEAS
 		MENUITEM "백업 저장(&U)",										IDM_FILE_SAVEBACKUP
 		MENUITEM "사본 저장(&Y)...\tCtrl+F6",							IDM_FILE_SAVECOPY
-		MENUITEM "Save with Original Time",			IDM_FILE_SAVEORIGINALTIMESTAMP
+		MENUITEM "원본 시간으로 저장",									IDM_FILE_SAVEORIGINALTIMESTAMP
 		MENUITEM SEPARATOR
 		POPUP "파일 모드(&M)"
 		BEGIN
