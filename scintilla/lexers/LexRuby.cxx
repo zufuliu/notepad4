@@ -76,6 +76,11 @@ constexpr bool isEscapeSequence(char ch) noexcept {
 	return AnyOf(ch, '\\', 'a', 'b', 'e', 'f', 'n', 'r', 's', 't', 'v');
 }
 
+constexpr bool isOperatorChar(char ch) noexcept {
+	// see operator list at https://docs.ruby-lang.org/en/master/syntax/methods_rdoc.html#method-names
+	return AnyOf(ch, '[', '*', '!', '~', '+', '-', '*', '/', '%', '=', '<', '>', '&', '^', '|');
+}
+
 constexpr bool isQestionMarkChar(char chNext, char chNext2) noexcept {
 	// followed by a single character or escape sequence that corresponds to a single codepoint
 	if (isSafeAlnum(chNext)) {
@@ -276,7 +281,7 @@ public:
 	}
 };
 
-constexpr bool IsPercentLiteral(int state) noexcept {
+constexpr bool isPercentLiteral(int state) noexcept {
 	return state == SCE_RB_STRING_Q
 		|| state == SCE_RB_STRING_QQ
 		// excluded SCE_RB_STRING_QR
@@ -288,7 +293,7 @@ constexpr bool IsPercentLiteral(int state) noexcept {
 		|| state == SCE_RB_STRING_QX;
 }
 
-constexpr bool IsInterpolableLiteral(int state) noexcept {
+constexpr bool isInterpolableLiteral(int state) noexcept {
 	return state != SCE_RB_STRING_Q
 		&& state != SCE_RB_STRING_W
 		&& state != SCE_RB_STRING_I
@@ -296,7 +301,7 @@ constexpr bool IsInterpolableLiteral(int state) noexcept {
 		&& state != SCE_RB_STRING_SQ;
 }
 
-constexpr bool IsSingleSpecialVariable(char ch) noexcept {
+constexpr bool isSingleSpecialVariable(char ch) noexcept {
 	// https://docs.ruby-lang.org/en/master/globals_rdoc.html
 	return AnyOf(ch, '~', '*', '$', '?', '!', '@', '/', '\\', ';', ',', '.', '=', ':', '<', '>', '"', '&', '`', '\'', '+');
 }
@@ -312,7 +317,7 @@ void InterpolateVariable(LexAccessor &styler, int state, Sci_Position &i, char &
 		if (chNext2 == '-') {
 			++pos;
 			len = 2;
-		} else if (IsSingleSpecialVariable(chNext2)) {
+		} else if (isSingleSpecialVariable(chNext2)) {
 			++pos;
 			len = 1;
 		}
@@ -703,6 +708,7 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 							 | (static_cast<uint64_t>(SCE_RB_STRING_QI) << 42)
 							 | (static_cast<uint64_t>(SCE_RB_STRING_QS) << 48);
 	constexpr const char* q_chars = "qQrwWxiIs";
+	constexpr size_t q_charsLen = 9;
 
 	// In most cases a value of 2 should be ample for the code in the
 	// Ruby library, and the code the user is likely to enter.
@@ -923,14 +929,14 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 					i += 3;
 					ch = styler.SafeGetCharAt(i);
 					chNext = styler.SafeGetCharAt(i + 1);
-				} else if (chNext == '$' && IsSingleSpecialVariable(chNext2)) {
+				} else if (chNext == '$' && isSingleSpecialVariable(chNext2)) {
 					// single-character special global variables
 					i += 2;
 					ch = chNext2;
 					chNext = styler.SafeGetCharAt(i+1);
 					styler.ColorTo(i + 1, SCE_RB_SYMBOL);
 					state = SCE_RB_DEFAULT;
-				} else if (AnyOf(chNext, '[', '*', '!', '~', '+', '-', '*', '/', '%', '=', '<', '>', '&', '^', '|')) {
+				} else if (isOperatorChar(chNext)) {
 					// Do the operator analysis in-line, looking ahead
 					// Based on the table in pickaxe 2nd ed., page 339
 					bool doColoring = true;
@@ -1015,7 +1021,7 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 			} else if (ch == '%' && !afterDef) {
 				styler.ColorTo(i, state);
 				bool have_string = false;
-				const char *hit = strchr(q_chars, chNext);
+				const char *hit = static_cast<const char *>(memchr(q_chars, static_cast<uint8_t>(chNext), q_charsLen));
 				if (hit && !isSafeWordcharOrHigh(chNext2)) {
 					state = (q_states >> ((hit - q_chars)*6)) & 0x3f;
 					Quote.New();
@@ -1437,7 +1443,7 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 				}
 			}
 			// Quotes of all kinds...
-		} else if (IsPercentLiteral(state) ||
+		} else if (isPercentLiteral(state) ||
 				state == SCE_RB_STRING_DQ || state == SCE_RB_STRING_SQ ||
 				state == SCE_RB_BACKTICKS) {
 			if (!Quote.Down && !isspacechar(ch)) {
@@ -1454,7 +1460,7 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 				}
 			} else if (ch == Quote.Up) {
 				Quote.Count++;
-			} else if (ch == '#' && IsInterpolableLiteral(state)) {
+			} else if (ch == '#' && isInterpolableLiteral(state)) {
 				if (chNext == '{') {
 					if (innerExpr.canEnter()) {
 						// process #{ ... }
