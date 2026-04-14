@@ -221,6 +221,9 @@ void ColouriseErlangDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 					char s[MaxKeywordSize];
 					sc.GetCurrent(s, sizeof(s));
 					if (sc.state == SCE_ERLANG_IDENTIFIER) {
+						if (elixir && (sc.ch == '?' || sc.ch == '!')) {
+							sc.Forward();
+						}
 						if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 							sc.ChangeState(SCE_ERLANG_KEYWORD);
 							if (visibleChars == 3 && StrEqual(s, "end")) {
@@ -231,12 +234,8 @@ void ColouriseErlangDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 						} else if (chBefore == '?' && !elixir) {
 							sc.ChangeState(SCE_ERLANG_MACRO);
 						} else {
-							const bool skip = elixir && (sc.ch == '?' || sc.ch == '!');
-							const int chNext = sc.GetLineNextChar(skip);
+							const int chNext = sc.GetLineNextChar();
 							if (chNext == '(') {
-								if (skip) {
-									sc.Forward();
-								}
 								sc.ChangeState(SCE_ERLANG_FUNCTION);
 							}
 						}
