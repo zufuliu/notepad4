@@ -2089,7 +2089,7 @@ void EditHex2Char() noexcept {
 				value = (value << 4) | hex;
 				p++;
 			}
-			if (value != 0 && value <= MAX_UNICODE) {
+			if (ucc > 1 && value <= MAX_UNICODE) {
 				changed = true;
 				// see UTF16FromUTF32Character() in UniConversion.h
 				if (value < SUPPLEMENTAL_PLANE_FIRST) {
