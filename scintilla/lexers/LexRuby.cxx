@@ -1181,7 +1181,7 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 			}
 		} else if (state == SCE_RB_NUMBER) {
 			if (!is_real_number) {
-				if (ch != '\\' || chPrev == '\\') {
+				if (ch != '\\' || chPrev == '\\' || IsEOLChar(chNext)) {
 					styler.ColorTo(i + 1, state);
 					state = SCE_RB_DEFAULT;
 					preferRE = false;
@@ -1204,11 +1204,17 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 					// Stay here, \c is a combining sequence
 					advance_char(i, ch, chNext, chNext2); // pass by ref
 				} else {
+					Sci_Position width = 1;
+					if (isHighBitChar(chNext2)) {
+						styler.GetCharacterAndWidth(i + 1, &width);
+					}
 					// ?\x, including ?\\ is final.
-					styler.ColorTo(i + 2, state);
+					i += width;
+					styler.ColorTo(std::min(i + 1, lengthDoc), state);
 					state = SCE_RB_DEFAULT;
 					preferRE = false;
-					advance_char(i, ch, chNext, chNext2);
+					ch = chNext;
+					chNext = styler.SafeGetCharAt(i + 1);
 				}
 			} else if (isSafeAlnumOrHigh(ch) || (ch == '.' && isSafeDigit(chNext))) {
 				// Keep going
