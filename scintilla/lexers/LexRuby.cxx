@@ -72,11 +72,7 @@ constexpr bool isSafeWordcharOrHigh(char ch) noexcept {
 	return isHighBitChar(ch) || isSafeAlnum(ch);
 }
 
-constexpr bool isEscapeSequence(char ch) noexcept {
-	return AnyOf(ch, '\\', 'a', 'b', 'e', 'f', 'n', 'r', 's', 't', 'v');
-}
-
-constexpr bool isOperatorChar(char ch) noexcept {
+constexpr bool isOperatorName(char ch) noexcept {
 	// see operator list at https://docs.ruby-lang.org/en/master/syntax/methods_rdoc.html#method-names
 	return AnyOf(ch, '[', '*', '!', '~', '+', '-', '*', '/', '%', '=', '<', '>', '&', '^', '|');
 }
@@ -88,6 +84,43 @@ constexpr bool isQestionMarkChar(char chNext, char chNext2) noexcept {
 	}
 	// multibyte character, escape sequence, punctuation
 	return !IsASpace(chNext);
+}
+
+Sci_Position GetEscapeSequenceLength(LexAccessor &styler, Sci_Position pos, char &chNext, char chNext2) noexcept {
+	// https://docs.ruby-lang.org/en/master/syntax/literals_rdoc.html#escape-sequences
+	Sci_Position width = 1;
+	if (isHighBitChar(chNext)) {
+		styler.GetCharacterAndWidth(pos, &width);
+	} else {
+		Sci_Position digits = 3; // \xHH, \nnn
+		bool hex = true;
+		if (chNext == 'u') {
+			if (chNext2 == '{') {
+				digits = 9; // \u{HHHHHH}
+				width += 1;
+				pos += 1;
+			} else {
+				digits = 5; // \uHHHH
+			}
+		} else if (IsOctalDigit(chNext)) {
+			hex = false;
+		} else if (chNext != 'x') {
+			return width;
+		}
+		do {
+			++pos;
+			chNext2 = styler.SafeGetCharAt(pos);
+			if (!IsOctalOrHex(chNext2, hex)) {
+				if (chNext2 == '}' && digits == 9) {
+					++width;
+				}
+				break;
+			}
+			++width;
+		} while (width < digits);
+		chNext = chNext2;
+	}
+	return width;
 }
 
 #define MAX_KEYWORD_LENGTH 7 // module
@@ -936,7 +969,7 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 					chNext = styler.SafeGetCharAt(i+1);
 					styler.ColorTo(i + 1, SCE_RB_SYMBOL);
 					state = SCE_RB_DEFAULT;
-				} else if (isOperatorChar(chNext)) {
+				} else if (isOperatorName(chNext)) {
 					// Do the operator analysis in-line, looking ahead
 					// Based on the table in pickaxe 2nd ed., page 339
 					bool doColoring = true;
@@ -1181,34 +1214,24 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 			}
 		} else if (state == SCE_RB_NUMBER) {
 			if (!is_real_number) {
-				if (ch != '\\' || chPrev == '\\' || IsEOLChar(chNext)) {
+				if (ch != '\\' || IsEOLChar(chNext)) {
 					styler.ColorTo(i + 1, state);
 					state = SCE_RB_DEFAULT;
 					preferRE = false;
-				} else if (isEscapeSequence(chNext)) {
-					// Terminal escape sequence -- handle it next time
-					// Nothing more to do this time through the loop
-				} else if (chNext == 'C' || chNext == 'M') {
-					if (chNext2 != '-') {
-						// \C or \M ends the sequence -- handle it next time
-					} else {
-						// Move from abc?\C-x
-						//				 ^
-						// to
-						//				   ^
-						i += 2;
-						ch = chNext2;
-						chNext = styler.SafeGetCharAt(i + 1);
-					}
+				} else if ((chNext == 'C' || chNext == 'M') && chNext2 == '-') {
+					// Move from abc?\C-x
+					//				 ^
+					// to
+					//				   ^
+					i += 2;
+					ch = chNext2;
+					chNext = styler.SafeGetCharAt(i + 1);
 				} else if (chNext == 'c') {
 					// Stay here, \c is a combining sequence
 					advance_char(i, ch, chNext, chNext2); // pass by ref
 				} else {
-					Sci_Position width = 1;
-					if (isHighBitChar(chNext2)) {
-						styler.GetCharacterAndWidth(i + 1, &width);
-					}
 					// ?\x, including ?\\ is final.
+					const Sci_Position width = GetEscapeSequenceLength(styler, i + 1, chNext, chNext2);
 					i += width;
 					styler.ColorTo(std::min(i + 1, lengthDoc), state);
 					state = SCE_RB_DEFAULT;
