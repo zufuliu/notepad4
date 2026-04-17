@@ -658,6 +658,7 @@ YAML Document
 	gyp				GYP
 	gypi			GYP
 	cff				Citation File Format, https://citation-file-format.github.io/
+	winget			WinGet Configuration file, https://learn.microsoft.com/en-us/windows/package-manager/configuration/create
 
 Zig Source
 	zig
