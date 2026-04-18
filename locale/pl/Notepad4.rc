@@ -119,7 +119,7 @@ BEGIN
 		MENUITEM "Zapisz &jako...\tF6",				IDM_FILE_SAVEAS
 		MENUITEM "Zapisz kopię zapa&sową",			IDM_FILE_SAVEBACKUP
 		MENUITEM "Zapisz &kopię...\tCtrl+F6",		IDM_FILE_SAVECOPY
-		MENUITEM "Save with Original Time",			IDM_FILE_SAVEORIGINALTIMESTAMP
+		MENUITEM "Zapisz z or&yginalnym czasem",	IDM_FILE_SAVEORIGINALTIMESTAMP
 		MENUITEM SEPARATOR
 		POPUP "&Tryb pliku"
 		BEGIN
@@ -173,7 +173,7 @@ BEGIN
 		MENUITEM "Utwórz skrót na pu&lpicie",		IDM_FILE_CREATELINK
 		MENUITEM SEPARATOR
 		MENUITEM "Prze&glądaj...\tCtrl+M",			IDM_FILE_BROWSE
-		POPUP "U&lubione"
+		POPUP "Ulu&bione"
 		BEGIN
 			MENUITEM "&Otwórz ulubione...\tAlt+I",	IDM_FILE_OPENFAV
 			MENUITEM "&Dodaj do ulubionych...\tAlt+K",IDM_FILE_ADDTOFAV
