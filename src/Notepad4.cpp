@@ -57,7 +57,6 @@ static HMONITOR hCurrentMonitor = nullptr;
 HWND	hwndEdit;
 HWND	hwndMain;
 static HMENU hmenuMain;
-static HWND hwndNextCBChain = nullptr;
 HWND	hDlgFindReplace = nullptr;
 static bool bInitDone = false;
 static HACCEL hAccMain;
@@ -250,6 +249,7 @@ static int iInitialLexer;
 
 static bool bLastCopyFromMe = false;
 static DWORD dwLastCopyTime;
+static DWORD dwClipboardSequenceNumber;
 
 bool bFreezeAppTitle = false;
 static WCHAR szTitleExcerpt[128] = L"";
@@ -913,10 +913,11 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	// Check for Paste Board option -- after loading files
 	if (flagPasteBoard) {
 		bLastCopyFromMe = true;
-		hwndNextCBChain = SetClipboardViewer(hwnd);
+		AddClipboardFormatListener(hwnd);
 		UpdateWindowTitle();
 		bLastCopyFromMe = false;
 		dwLastCopyTime = 0;
+		dwClipboardSequenceNumber = GetClipboardSequenceNumber();
 		SetTimer(hwnd, ID_PASTEBOARDTIMER, 100, PasteBoardTimer);
 	}
 
@@ -1090,7 +1091,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			// Terminate clipboard watching
 			if (flagPasteBoard) {
 				KillTimer(hwnd, ID_PASTEBOARDTIMER);
-				ChangeClipboardChain(hwnd, hwndNextCBChain);
+				RemoveClipboardFormatListener(hwnd);
 			}
 
 			// Destroy find / replace dialog
@@ -1426,23 +1427,11 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 	//	bPendingChangeNotify = false;
 	//	break;
 
-	case WM_DRAWCLIPBOARD:
+	case WM_CLIPBOARDUPDATE:
 		if (!bLastCopyFromMe) {
 			dwLastCopyTime = GetTickCount();
 		} else {
 			bLastCopyFromMe = false;
-		}
-		if (hwndNextCBChain) {
-			SendMessage(hwndNextCBChain, WM_DRAWCLIPBOARD, wParam, lParam);
-		}
-		break;
-
-	case WM_CHANGECBCHAIN:
-		if (AsPointer<HWND>(wParam) == hwndNextCBChain) {
-			hwndNextCBChain = AsPointer<HWND>(lParam);
-		}
-		if (hwndNextCBChain) {
-			SendMessage(hwndNextCBChain, WM_CHANGECBCHAIN, lParam, wParam);
 		}
 		break;
 
@@ -8025,6 +8014,12 @@ void CALLBACK PasteBoardTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTi
 	UNREFERENCED_PARAMETER(dwTime);
 
 	if (dwLastCopyTime > 0 && GetTickCount() - dwLastCopyTime > 200) {
+		const DWORD sequence = GetClipboardSequenceNumber();
+		if (sequence == dwClipboardSequenceNumber) {
+			dwLastCopyTime = 0;
+			return;
+		}
+		dwClipboardSequenceNumber = sequence;
 		if (SciCall_CanPaste()) {
 			const bool back = autoCompletionConfig.bIndentText;
 			autoCompletionConfig.bIndentText = false;
