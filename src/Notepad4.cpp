@@ -3020,9 +3020,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDT_EDIT_CUT:
 	case IDM_EDIT_CUT:
-		if (flagPasteBoard) {
-			bLastCopyFromMe = true;
-		}
+		bLastCopyFromMe = true;
 		if (SciCall_IsSelectionEmpty() && iLineSelectionMode != LineSelectionMode_None) {
 			const int mode = iLineSelectionMode;
 			Sci_Position iCurrentPos = SciCall_GetCurrentPos();
@@ -3037,17 +3035,13 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	//case IDM_EDIT_CUT_BINARY:
-	//	if (flagPasteBoard) {
-	//		bLastCopyFromMe = true;
-	//	}
+	//	bLastCopyFromMe = true;
 	//	SciCall_Cut(true);
 	//	break;
 
 	case IDT_EDIT_COPY:
 	case IDM_EDIT_COPY:
-		if (flagPasteBoard) {
-			bLastCopyFromMe = true;
-		}
+		bLastCopyFromMe = true;
 		if (SciCall_IsSelectionEmpty() && iLineSelectionMode != LineSelectionMode_None) {
 			SciCall_LineCopy(iLineSelectionMode & LineSelectionMode_VisualStudio);
 		} else {
@@ -3057,25 +3051,19 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	//case IDM_EDIT_COPY_BINARY:
-	//	if (flagPasteBoard) {
-	//		bLastCopyFromMe = true;
-	//	}
+	//	bLastCopyFromMe = true;
 	//	SciCall_Copy(true);
 	//	UpdateToolbar();
 	//	break;
 
 	case IDM_EDIT_COPYALL:
-		if (flagPasteBoard) {
-			bLastCopyFromMe = true;
-		}
+		bLastCopyFromMe = true;
 		SciCall_CopyRange(0, SciCall_GetLength());
 		UpdateToolbar();
 		break;
 
 	case IDM_EDIT_COPYADD:
-		if (flagPasteBoard) {
-			bLastCopyFromMe = true;
-		}
+		bLastCopyFromMe = true;
 		EditCopyAppend(hwndEdit);
 		UpdateToolbar();
 		break;
@@ -3098,9 +3086,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			if (pClip == nullptr) {
 				break;
 			}
-			if (flagPasteBoard) {
-				bLastCopyFromMe = true;
-			}
+			bLastCopyFromMe = true;
 			Sci_Position iPos = SciCall_GetCurrentPos();
 			Sci_Position iAnchor = SciCall_GetAnchor();
 			SciCall_BeginUndoAction();
@@ -3174,16 +3160,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_EDIT_CUTLINE:
-		if (flagPasteBoard) {
-			bLastCopyFromMe = true;
-		}
+		bLastCopyFromMe = true;
 		SciCall_LineCut(iLineSelectionMode & LineSelectionMode_VisualStudio);
 		break;
 
 	case IDM_EDIT_COPYLINE:
-		if (flagPasteBoard) {
-			bLastCopyFromMe = true;
-		}
+		bLastCopyFromMe = true;
 		SciCall_LineCopy(iLineSelectionMode & LineSelectionMode_VisualStudio);
 		UpdateToolbar();
 		break;
