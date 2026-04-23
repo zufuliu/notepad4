@@ -234,12 +234,19 @@ void BacktrackToStart(const LexAccessor &styler, int stateMask, Sci_PositionU &s
 	const Sci_Line currentLine = styler.GetLine(startPos);
 	if (currentLine != 0) {
 		Sci_Line line = currentLine - 1;
+		const bool always = stateMask < 0;
+		if (always) { // always backtrack one line
+			stateMask = -stateMask;
+			if (line != 0) {
+				--line;
+			}
+		}
 		int lineState = styler.GetLineState(line);
 		while ((lineState & stateMask) != 0 && line != 0) {
 			--line;
 			lineState = styler.GetLineState(line);
 		}
-		if ((lineState & stateMask) == 0) {
+		if ((lineState & stateMask) == 0 && (!always || line + 1 < currentLine - 1)) {
 			++line;
 		}
 		if (line != currentLine) {
