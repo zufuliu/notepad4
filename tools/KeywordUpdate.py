@@ -104,6 +104,7 @@ lexerList = [
 	('NP2LEX_TCL', 'stlTcl.cpp', 'LexTCL.cxx', '', 0, None),
 	('NP2LEX_TEXINFO', 'stlTexinfo.cpp', 'LexTexinfo.cxx', 'Texinfo.texi', 0, parse_texinfo_api_file),
 	('NP2LEX_TOML', 'stlTOML.cpp', 'LexTOML.cxx', '', 0, parse_toml_api_file),
+	('NP2LEX_TYPST', 'stlTypst.cpp', 'LexTypst.cxx', 'Typst.typ', 0, parse_typst_api_file),
 
 	('NP2LEX_VBSCRIPT', 'stlVBS.cpp', 'LexVB.cxx', ['VBScript.vbs'], 0, parse_visual_basic_api_file),
 	('NP2LEX_VERILOG', 'stlVerilog.cpp', 'LexVerilog.cxx', ['Verilog.v', 'SystemVerilog.sv'], 0, parse_verilog_api_file),

@@ -65,7 +65,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [Dart](tools/lang/Dart.dart), up to Dart 3.11.
 	* Diff/Patch File
 	* [Elixir](tools/lang/Elixir.ex), up to Elixir 1.19.
-	* [Erlang](tools/lang/Erlang.erl), up to Erlang 28.4.
+	* [Erlang](tools/lang/Erlang.erl), up to Erlang/OTP 28.4.
 	* [F#](tools/lang/FSharp.fs), up to F# 10.0.
 	* [Fortran](tools/lang/Fortran.f), up to Fortran 2023.
 	* [GN Build](tools/lang/GN.gn), up to GN 2019-03-13.
@@ -122,7 +122,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* Windows Rescouce Script
 	* [R](tools/lang/R.r), up to R 4.2.
 	* [REBOL](tools/lang/Rebol.r) 3 and [Red](tools/lang/Red.red)
-	* [Ruby](tools/lang/Ruby.rb), up to Ruby 4.0 [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#ruby)
+	* [Ruby](tools/lang/Ruby.rb), up to Ruby 4.1 [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#ruby)
 	* [Rust](tools/lang/Rust.rs), up to Rust 1.91. [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#rust)
 	* [SAS](tools/lang/SAS.sas), up to SAS Viya 2024.06.
 	* [Scala](tools/lang/Scala.scala), up to Scala 3.2.
@@ -142,6 +142,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [Texinfo](tools/lang/Texinfo.texi), up to Texinfo 7.1.
 	* [TOML File](https://toml.io/)
 	* [TypeScript](tools/lang/TypeScript.ts), up to TypeScript 7.0.
+	* [Typst](tools/lang/Typst.typ), up to Typst 0.14.
 	* Visual Basic, [VB.NET](tools/lang/VB.NET.vb), [VB 6.0 and VBA](tools/lang/VBA.bas)
 	* [VBScript](tools/lang/VBScript.vbs)
 	* [VHDL](tools/lang/VHDL.vhdl), up to VHDL 2019.
@@ -205,7 +206,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [French](https://github.com/zufuliu/notepad4/tree/main/locale/fr) by [@VoilierBleu](https://github.com/VoilierBleu)
 	* [Italiano](https://github.com/zufuliu/notepad4/tree/main/locale/it) by [@Matteo-Nigro](https://github.com/Matteo-Nigro)
 	* [Polish](https://github.com/zufuliu/notepad4/tree/main/locale/pl) by [@kbabol](https://github.com/kbabol) and [@miroslaw-zylewicz](https://github.com/miroslaw-zylewicz)
-	* [Русский](https://github.com/zufuliu/notepad4/tree/main/locale/ru) by [@tretdm](https://github.com/tretdm)
+	* [Русский](https://github.com/zufuliu/notepad4/tree/main/locale/ru) by [@tretdm](https://github.com/tretdm) and [@Dimmitrius](https://github.com/Dimmitrius)
 	* [日本語](https://github.com/zufuliu/notepad4/tree/main/locale/ja) by [@maboroshin](https://github.com/maboroshin)
 	* [中文 (繁體)](https://github.com/zufuliu/notepad4/tree/main/locale/zh-Hant)
 	* [中文 (简体)](https://github.com/zufuliu/notepad4/tree/main/locale/zh-Hans)

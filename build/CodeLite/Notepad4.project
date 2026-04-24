@@ -86,6 +86,7 @@
       <File Name="../../scintilla/lexers/LexTCL.cxx"/>
       <File Name="../../scintilla/lexers/LexTexinfo.cxx"/>
       <File Name="../../scintilla/lexers/LexTOML.cxx"/>
+      <File Name="../../scintilla/lexers/LexTypst.cxx"/>
       <File Name="../../scintilla/lexers/LexVB.cxx"/>
       <File Name="../../scintilla/lexers/LexVerilog.cxx"/>
       <File Name="../../scintilla/lexers/LexVHDL.cxx"/>
@@ -279,6 +280,7 @@
       <File Name="../../src/EditLexers/stlTexinfo.cpp"/>
       <File Name="../../src/EditLexers/stlTOML.cpp"/>
       <File Name="../../src/EditLexers/stlTypeScript.cpp"/>
+      <File Name="../../src/EditLexers/stlTypst.cpp"/>
       <File Name="../../src/EditLexers/stlVB.cpp"/>
       <File Name="../../src/EditLexers/stlVBS.cpp"/>
       <File Name="../../src/EditLexers/stlVerilog.cpp"/>

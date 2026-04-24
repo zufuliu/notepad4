@@ -1087,6 +1087,18 @@ LexerConfigMap = {
 		#'ignore_word_style': ['SCE_JS_WORD', 'SCE_JS_WORD2', 'SCE_JS_DIRECTIVE'],
 		'string_style_range': ['SCE_JSX_TEXT', 'SCE_JS_ESCAPECHAR'],
 	},
+	'NP2LEX_TYPST': {
+		'cpp_style_comment': True,
+		'comment_style_marker': 'SCE_TYPST_COMMENT_BLOCK',
+		'default_fold_level': ['header1', 'header2', 'header3'],
+		'escape_char_style': 'SCE_TYPST_ESCAPECHAR',
+		'escape_punctuation': True,
+		'none_quote_style': 'SCE_TYPST_OPERATOR',
+		'operator_style': ['SCE_TYPST_OPERATOR'],
+		'extra_word_char': '-',
+		'string_style_range': ['SCE_TYPST_STRING', 'SCE_TYPST_ESCAPECHAR'],
+		'plain_text_style': ['SCE_TYPST_DEFAULT'],
+	},
 
 	'NP2LEX_VBSCRIPT': {
 		'line_comment_string': "'",

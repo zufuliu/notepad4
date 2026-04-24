@@ -139,6 +139,7 @@ extern EDITLEXER lexTcl;
 extern EDITLEXER lexTexinfo;
 extern EDITLEXER lexTOML;
 extern EDITLEXER lexTypeScript;
+extern EDITLEXER lexTypst;
 
 extern EDITLEXER lexVBScript;
 extern EDITLEXER lexVerilog;
@@ -256,6 +257,7 @@ static PEDITLEXER pLexArray[] = {
 	&lexTexinfo,
 	&lexTOML,
 	&lexTypeScript,
+	&lexTypst,
 
 	&lexVBScript,
 	&lexVerilog,

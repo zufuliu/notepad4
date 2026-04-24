@@ -97,6 +97,7 @@ extern const LexerModule lmSwift;
 extern const LexerModule lmTCL;
 extern const LexerModule lmTexinfo;
 extern const LexerModule lmTOML;
+extern const LexerModule lmTypst;
 extern const LexerModule lmVerilog;
 extern const LexerModule lmVHDL;
 extern const LexerModule lmVim;
@@ -183,6 +184,7 @@ const LexerModule * const lexerCatalogue[] = {
 	&lmTCL,
 	&lmTexinfo,
 	&lmTOML,
+	&lmTypst,
 	&lmVerilog,
 	&lmVHDL,
 	&lmVim,

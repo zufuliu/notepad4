@@ -607,6 +607,9 @@ TypeScript
 	ets		HarmonyOS ArkTS, https://developer.huawei.com/consumer/cn/arkts/
 	osts	Office Scripts, https://learn.microsoft.com/en-us/office/dev/scripts/
 
+Typst File
+	typ
+
 
 VBScript
 	vbs

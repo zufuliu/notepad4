@@ -2480,6 +2480,7 @@ void EditToggleCommentLine(bool alternative) noexcept {
 	case NP2LEX_SCALA:
 	case NP2LEX_SWIFT:
 	case NP2LEX_TYPESCRIPT:
+	case NP2LEX_TYPST:
 	case NP2LEX_VERILOG:
 	case NP2LEX_WINHEX:
 	case NP2LEX_ZIG:
@@ -2748,6 +2749,7 @@ void EditToggleCommentBlock(bool alternative) noexcept {
 	case NP2LEX_SQL:
 	case NP2LEX_SWIFT:
 	case NP2LEX_TYPESCRIPT:
+	case NP2LEX_TYPST:
 	case NP2LEX_VERILOG:
 	case NP2LEX_VHDL:
 		pwszOpen = L"/*"; pwszClose = L"*/";
@@ -3425,6 +3427,11 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) noexcept {
 		PlainTextStyleMask[SCE_TEXINFO_SECTION >> 5] |= (1U << (SCE_TEXINFO_SECTION & 31));
 		PlainTextStyleMask[SCE_TEXINFO_SECTION1 >> 5] |= (1U << (SCE_TEXINFO_SECTION1 & 31));
 		PlainTextStyleMask[SCE_TEXINFO_SECTION2 >> 5] |= (1U << (SCE_TEXINFO_SECTION2 & 31));
+		break;
+
+	case NP2LEX_TYPST:
+		CurrentWordCharSet['-' >> 5] |= (1 << ('-' & 31));
+		PlainTextStyleMask[SCE_TYPST_DEFAULT >> 5] |= (1U << (SCE_TYPST_DEFAULT & 31));
 		break;
 
 	case NP2LEX_VERILOG:

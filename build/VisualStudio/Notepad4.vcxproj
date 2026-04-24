@@ -528,6 +528,7 @@
     <ClCompile Include="..\..\scintilla\lexers\LexTCL.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexTexinfo.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexTOML.cxx" />
+    <ClCompile Include="..\..\scintilla\lexers\LexTypst.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexVB.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexVerilog.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexVHDL.cxx" />
@@ -663,6 +664,7 @@
     <ClCompile Include="..\..\src\EditLexers\stlTexinfo.cpp" />
     <ClCompile Include="..\..\src\EditLexers\stlTOML.cpp" />
     <ClCompile Include="..\..\src\EditLexers\stlTypeScript.cpp" />
+    <ClCompile Include="..\..\src\EditLexers\stlTypst.cpp" />
     <ClCompile Include="..\..\src\EditLexers\stlVB.cpp" />
     <ClCompile Include="..\..\src\EditLexers\stlVBS.cpp" />
     <ClCompile Include="..\..\src\EditLexers\stlVerilog.cpp" />

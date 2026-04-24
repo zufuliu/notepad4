@@ -1,4 +1,4 @@
-# Ruby 4.0 https://www.ruby-lang.org/en/documentation/
+# Ruby 4.1 https://www.ruby-lang.org/en/documentation/
 # https://docs.ruby-lang.org/en/
 # https://docs.ruby-lang.org/en/master/NEWS_md.html
 # https://ruby-doc.org/

@@ -2524,6 +2524,19 @@ def parse_toml_api_file(path):
 		('keywords', keywords, KeywordAttr.Default),
 	]
 
+def parse_typst_api_file(path):
+	sections = read_api_file(path, '//')
+	keywordMap = {}
+	for key, doc in sections:
+		items = []
+		if key == 'keywords':
+			items = re.findall(r'\w+', doc)
+		keywordMap[key] = items
+
+	return [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+	]
+
 def parse_typescript_api_file(path):
 	sections = read_api_file(path, '//')
 	keywordMap = {}
