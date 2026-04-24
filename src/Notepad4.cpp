@@ -179,6 +179,7 @@ int iFileWatchingOption;
 bool	bResetFileWatching;
 static DWORD dwFileCheckInterval;
 static DWORD dwAutoReloadTimeout;
+unsigned int dwUrlThreshold;
 bool bUseXPFileDialog;
 static EscFunction iEscFunction;
 static bool bAlwaysOnTop;
@@ -6266,6 +6267,7 @@ void LoadFlags() noexcept {
 
 	dwFileCheckInterval = section.GetInt(L"FileCheckInterval", 1000);
 	dwAutoReloadTimeout = section.GetInt(L"AutoReloadTimeout", 1000);
+	dwUrlThreshold = section.GetInt(L"UrlThreshold", 256);
 
 	if (IsVistaAndAbove()) {
 		bUseXPFileDialog = section.GetBool(L"UseXPFileDialog", false);

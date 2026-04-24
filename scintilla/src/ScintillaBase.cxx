@@ -1241,9 +1241,10 @@ sptr_t ScintillaBase::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 }
 
 bool LexState::EnableUrlHighlight() noexcept {
+	extern unsigned int dwUrlThreshold;
 	enableUrlHighlight = false;
-	if (lexerLanguage != SCLEX_CONTAINER
-		&& (static_cast<size_t>(pdoc->LengthNoExcept()) >> 28) == 0) {
+	if (lexerLanguage != SCLEX_CONTAINER && dwUrlThreshold != 0
+		&& (static_cast<unsigned int>(pdoc->LengthNoExcept()) >> 20) <= dwUrlThreshold) {
 		enableUrlHighlight = true;
 		memset(urlIgnoreStyle, 0, sizeof(urlIgnoreStyle));
 		constexpr unsigned mask = (1U << (STYLE_LASTPREDEFINED - STYLE_FIRSTPREDEFINED + 1)) - 1;
