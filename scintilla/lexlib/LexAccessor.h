@@ -220,6 +220,7 @@ public:
 		ColorTo(pos + 1, chAttr);
 	}
 #endif
+	SCI_noinline
 	void ColorTo(Sci_PositionU endPos_, int chAttr) {
 		// Only perform styling for non empty range [startSeg, endPos_)
 		assert(endPos_ >= startSeg && endPos_ <= static_cast<Sci_PositionU>(Length()));

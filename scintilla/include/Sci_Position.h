@@ -22,6 +22,12 @@ typedef size_t Sci_PositionU;
 	#define SCI_METHOD
 #endif
 
+#if defined(__GNUC__) || defined(__clang__)
+#define SCI_noinline __attribute__((noinline))
+#else
+#define SCI_noinline __declspec(noinline)
+#endif
+
 namespace sci {
 
 template <typename T>

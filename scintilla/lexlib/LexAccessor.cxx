@@ -230,23 +230,26 @@ void UnpackLineState(int lineState, std::vector<int>& states) {
 	UnpackLineState<DefaultNestedStateValueBit, DefaultMaxNestedStateCount, DefaultNestedStateCountBit, DefaultNestedStateBaseStyle>(lineState, states);
 }
 
+SCI_noinline
 void BacktrackToStart(const LexAccessor &styler, int stateMask, Sci_PositionU &startPos, Sci_Position &lengthDoc, int &initStyle) noexcept {
 	const Sci_Line currentLine = styler.GetLine(startPos);
 	if (currentLine != 0) {
 		Sci_Line line = currentLine - 1;
-		const bool always = stateMask < 0;
-		if (always) { // always backtrack one line
+		Sci_Line backtrack = line;
+		if (stateMask < 0) { // always backtrack one line
 			stateMask = -stateMask;
 			if (line != 0) {
 				--line;
 			}
+		} else {
+			backtrack += 2;
 		}
 		int lineState = styler.GetLineState(line);
 		while ((lineState & stateMask) != 0 && line != 0) {
 			--line;
 			lineState = styler.GetLineState(line);
 		}
-		if ((lineState & stateMask) == 0 && (!always || line + 1 < currentLine - 1)) {
+		if ((lineState & stateMask) == 0 && (line + 1 < backtrack)) {
 			++line;
 		}
 		if (line != currentLine) {
@@ -276,6 +279,7 @@ Sci_PositionU LookbackNonWhite(LexAccessor &styler, Sci_PositionU startPos, unsi
 	return startPos;
 }
 
+SCI_noinline
 Sci_PositionU CheckBraceOnNextLine(LexAccessor &styler, Sci_Line line, int operatorStyle, int maxSpaceStyle, int ignoreStyle) noexcept {
 	// check brace on next line
 	Sci_Position startPos = styler.LineStart(line + 1);
