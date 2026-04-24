@@ -335,13 +335,13 @@ LSTATUS Registry_DeleteTree(HKEY hKey, LPCWSTR lpSubKey) noexcept {
 }
 #endif
 
-int ParseCommaList(LPCWSTR str, int result[], int count) noexcept {
+UINT ParseCommaList(LPCWSTR str, int result[], UINT count) noexcept {
 	if (StrIsEmpty(str)) {
 		return 0;
 	}
 
-	int index = 0;
-	while (index < count) {
+	UINT index = 0;
+	while (index != count) {
 		LPWSTR end;
 		result[index] = static_cast<int>(wcstol(str, &end, 10));
 		if (str == end) {
@@ -357,13 +357,13 @@ int ParseCommaList(LPCWSTR str, int result[], int count) noexcept {
 	return index;
 }
 
-int ParseCommaList64(LPCWSTR str, int64_t result[], int count) noexcept {
+UINT ParseCommaList64(LPCWSTR str, int64_t result[], UINT count) noexcept {
 	if (StrIsEmpty(str)) {
 		return 0;
 	}
 
-	int index = 0;
-	while (index < count) {
+	UINT index = 0;
+	while (index != count) {
 		LPWSTR end;
 		result[index] = _wcstoi64(str, &end, 10);
 		if (str == end) {

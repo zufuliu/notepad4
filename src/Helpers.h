@@ -223,8 +223,8 @@ inline bool HexStrToInt(LPCWSTR str, int *value) noexcept {
 	return str != end;
 }
 
-int ParseCommaList(LPCWSTR str, int result[], int count) noexcept;
-int ParseCommaList64(LPCWSTR str, int64_t result[], int count) noexcept;
+UINT ParseCommaList(LPCWSTR str, int result[], UINT count) noexcept;
+UINT ParseCommaList64(LPCWSTR str, int64_t result[], UINT count) noexcept;
 LPCSTR GetCurrentLogTime() noexcept;
 
 struct StopWatch {

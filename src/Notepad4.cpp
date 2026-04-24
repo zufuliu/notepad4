@@ -5700,10 +5700,10 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) noexcept {
 			if (ExtractFirstArgument(lp2, lp1, lp2)) {
 #if defined(_WIN64)
 				int64_t cord[2]{};
-				const int itok = ParseCommaList64(lp1, cord, COUNTOF(cord));
+				const UINT itok = ParseCommaList64(lp1, cord, COUNTOF(cord));
 #else
 				int cord[2]{};
-				const int itok = ParseCommaList(lp1, cord, COUNTOF(cord));
+				const UINT itok = ParseCommaList(lp1, cord, COUNTOF(cord));
 #endif
 				if (itok != 0) {
 					flagJumpTo = true;
@@ -6044,7 +6044,7 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) noexcept {
 			state = CommandParseState_Argument;
 			if (ExtractFirstArgument(lp2, lp1, lp2)) {
 				int cord[5]{};
-				const int itok = ParseCommaList(lp1, cord, COUNTOF(cord));
+				const UINT itok = ParseCommaList(lp1, cord, COUNTOF(cord));
 				if (itok >= 4) {
 					flagPosParam = true;
 					flagDefaultPos = DefaultPositionFlag_None;

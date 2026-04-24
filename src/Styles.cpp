@@ -691,10 +691,10 @@ static void Style_LoadOneEx(PEDITLEXER pLex, IniSectionParser &section, WCHAR *p
 
 void Style_SetFavoriteSchemes() noexcept {
 	int favorite[MAX_FAVORITE_SCHEMES_COUNT];
-	const int count = ParseCommaList(favoriteSchemesConfig, favorite, MAX_FAVORITE_SCHEMES_COUNT);
+	const UINT count = ParseCommaList(favoriteSchemesConfig, favorite, MAX_FAVORITE_SCHEMES_COUNT);
 	UINT index = LEXER_INDEX_GENERAL;
 
-	for (int i = 0; i < count; i++) {
+	for (UINT i = 0; i < count; i++) {
 		const int rid = favorite[i] + NP2LEX_TEXTFILE;
 		for (UINT iLexer = index; iLexer < ALL_LEXER_COUNT; iLexer++) {
 			PEDITLEXER pLex = pLexArray[iLexer];

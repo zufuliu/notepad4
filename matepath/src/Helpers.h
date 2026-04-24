@@ -98,7 +98,7 @@ inline bool CRTStrToInt(LPCWSTR str, int *value) noexcept {
 	return str != end;
 }
 
-int ParseCommaList(LPCWSTR str, int result[], int count) noexcept;
+UINT ParseCommaList(LPCWSTR str, int result[], UINT count) noexcept;
 
 extern HINSTANCE g_hInstance;
 #if defined(NP2_ENABLE_APP_LOCALIZATION_DLL) && NP2_ENABLE_APP_LOCALIZATION_DLL
