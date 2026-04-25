@@ -2,6 +2,7 @@ import sys
 import os.path
 import re
 
+# count color on exported scheme file
 kReColorHex = re.compile(r'#[0-9A-Fa-f]{6}')
 
 def parse_key_value(line):
@@ -23,7 +24,11 @@ def parse_key_value(line):
 def find_color_in_file(path, color_map):
 	with open(path, encoding='utf-8') as fd:
 		lines = fd.readlines()
+	scheme = ''
 	for line in lines:
+		if line.startswith('['):
+			scheme = line[1:-2]
+			continue
 		items = parse_key_value(line)
 		if not items:
 			continue
@@ -39,14 +44,14 @@ def find_color_in_file(path, color_map):
 				color_stat = color_map[color]
 				color_stat['total_count'] += 1
 				if key not in color_stat['usage']:
-					color_stat['usage'][key] = 1
+					color_stat['usage'][key] = [scheme]
 				else:
-					color_stat['usage'][key] += 1
+					color_stat['usage'][key].append(scheme)
 			else:
 				color_stat = {
 					'total_count': 1,
 					'usage': {
-						key: 1,
+						key: [scheme],
 					},
 				}
 				color_map[color] = color_stat
@@ -55,11 +60,13 @@ def print_color_count(color_map):
 	for color, color_stat in color_map.items():
 		print(f"{color}\t{color_stat['total_count']}")
 		usage = color_stat['usage']
-		for key, count in usage.items():
-			print(f'\t{count}\t{key}')
+		for key, items in usage.items():
+			count = len(items)
+			scheme = ', '.join(sorted(set(items)))
+			print(f'\t{count}\t{key}\t[{scheme}]')
 
 def count_color(path):
-	# { color : { total_count: total_count, usage: { key: count}}}
+	# { color : { total_count: total_count, usage: { key: [scheme]}}}
 	color_map = {}
 	find_color_in_file(path, color_map)
 
@@ -69,7 +76,7 @@ def count_color(path):
 	for color_stat in color_map.values():
 		usage = color_stat['usage']
 		usage = sorted(usage.items(), key=lambda m: m[0])
-		usage = sorted(usage, key=lambda m: m[1], reverse=True)
+		usage = sorted(usage, key=lambda m: len(m[1]), reverse=True)
 		color_stat['usage'] = dict(usage)
 
 	print_color_count(color_map)

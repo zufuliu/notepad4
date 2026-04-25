@@ -281,7 +281,7 @@ static EDITSTYLE Styles_AU3[] = {
 	{ SCE_AU3_STRING, NP2StyleX_String, L"fore:#008080" },
 	{ SCE_AU3_SENT, NP2StyleX_SendKey, L"fore:#8080FF" },
 	{ SCE_AU3_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
-	{ SCE_AU3_OPERATOR, NP2StyleX_Operator, L"fore:#C000C0" },
+	{ SCE_AU3_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
 };
 
 EDITLEXER lexAutoIt3 = {

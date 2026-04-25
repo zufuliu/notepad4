@@ -88,7 +88,7 @@ static KEYWORDLIST Keywords_Verilog = {{
 
 static EDITSTYLE Styles_Verilog[] = {
 	EDITSTYLE_DEFAULT,
-	{ MULTI_STYLE(SCE_V_KEYWORD, SCE_V_FOLDING_KEYWORD, 0, 0), NP2StyleX_Keyword, L"bold; fore:#FF8040" },
+	{ MULTI_STYLE(SCE_V_KEYWORD, SCE_V_FOLDING_KEYWORD, 0, 0), NP2StyleX_Keyword, L"bold; fore:#FF8000" },
 	{ SCE_V_DATATYPE, NP2StyleX_TypeKeyword, L"bold; fore:#1E90FF" },
 	{ SCE_V_DIRECTIVE, NP2StyleX_Directive, L"fore:#FF8000" },
 	{ SCE_V_ATTRIBUTE, NP2StyleX_Attribute, L"fore:#FF8000" },

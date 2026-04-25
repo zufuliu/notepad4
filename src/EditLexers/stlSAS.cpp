@@ -85,7 +85,7 @@ static KEYWORDLIST Keywords_SAS = {{
 static EDITSTYLE Styles_SAS[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_SAS_WORD, NP2StyleX_Keyword, L"bold; fore:#FF8000" },
-	{ SCE_SAS_MACRO_KEYWORD, NP2StyleX_MacroKeyword, L"bold; fore:#FF8040" },
+	{ SCE_SAS_MACRO_KEYWORD, NP2StyleX_MacroKeyword, L"bold; fore:#1E90FF" },
 	{ SCE_SAS_MACRO_FUNCTION, NP2StyleX_MacroFunction, L"fore:#C65D09" },
 	{ SCE_SAS_MACRO, NP2StyleX_Macro, L"fore:#008080" },
 	{ SCE_SAS_BASIC_FUNCTION, NP2StyleX_BasicFunction, L"fore:#A46000" },
