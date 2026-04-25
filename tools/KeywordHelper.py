@@ -211,4 +211,5 @@ def find_new_texinfo_commands(path, lang):
 
 #group_powershell_commands('command.ps1')
 
-#find_new_texinfo_commands(r'texinfo.texi', 'lang/Texinfo.texi')
+# https://www.gnu.org/software/texinfo/manual/texinfo/texinfo.texi.tar.gz
+# find_new_texinfo_commands(r'texinfo.texi', 'lang/Texinfo.texi')

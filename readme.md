@@ -139,7 +139,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* [Oracle](tools/lang/Oracle.sql), Oracle 20, incomplete.
 	* [Swift](tools/lang/Swift.swift), up to Swift 6.2.
 	* TCL, [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#tcl)
-	* [Texinfo](tools/lang/Texinfo.texi), up to Texinfo 7.1.
+	* [Texinfo](tools/lang/Texinfo.texi), up to Texinfo 7.3.
 	* [TOML File](https://toml.io/)
 	* [TypeScript](tools/lang/TypeScript.ts), up to TypeScript 7.0.
 	* [Typst](tools/lang/Typst.typ), up to Typst 0.14.
