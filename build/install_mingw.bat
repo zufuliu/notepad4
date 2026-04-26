@@ -27,7 +27,7 @@ IF /I "%~1" == "ucrt" (
   )
 ) ELSE IF /I "%~1" == "llvm" (
   @rem for CI purpose only, the result binary is dynamic linked against api-ms-win-crt*.dll instead of msvcrt.dll
-  curl -fsSL -o "llvm-mingw-20260407-ucrt-x86_64.zip" "https://github.com/mstorsjo/llvm-mingw/releases/download/20260407/llvm-mingw-20260407-ucrt-x86_64.zip"
-  7z x -y -o"C:\" "llvm-mingw-20260407-ucrt-x86_64.zip" >NUL
-  move /Y "C:\llvm-mingw-20260407-ucrt-x86_64" "C:\llvm-mingw"
+  curl -fsSL -o "llvm-mingw-20260421-ucrt-x86_64.zip" "https://github.com/mstorsjo/llvm-mingw/releases/download/20260421/llvm-mingw-20260421-ucrt-x86_64.zip"
+  7z x -y -o"C:\" "llvm-mingw-20260421-ucrt-x86_64.zip" >NUL
+  move /Y "C:\llvm-mingw-20260421-ucrt-x86_64" "C:\llvm-mingw"
 )

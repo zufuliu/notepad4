@@ -19,6 +19,7 @@ Checks: [
     -bugprone-implicit-widening-of-multiplication-result,
     -bugprone-invalid-enum-default-initialization,
     -bugprone-narrowing-conversions,
+    -bugprone-signed-bitwise,
     -bugprone-switch-missing-default-case,
     -bugprone-unchecked-optional-access,
     -modernize-avoid-c-arrays,
