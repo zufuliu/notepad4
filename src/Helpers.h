@@ -168,10 +168,74 @@ inline bool StrCaseEqual(LPCWSTR s1, LPCWSTR s2) noexcept {
 	return _wcsicmp(s1, s2) == 0;
 }
 
+#if defined(__clang__) || defined(__GNUC__) || !defined(_MSC_BUILD)
 template <typename T, size_t N>
 inline void StrCpyEx(T *s, const T (&t)[N]) noexcept {
-	memcpy(s, t, N*sizeof(T));
+	__builtin_memcpy(s, t, N*sizeof(T));
 }
+
+#else
+template <size_t N>
+inline void StrCpyEx(char *s, const char (&t)[N]) noexcept {
+	switch (N) {
+	case 1:
+		s[0] = t[0];
+		break;
+	case 2:
+		*((uint16_t *)s) = *((const uint16_t *)t);
+		break;
+	case 3:
+		*((uint16_t *)s) = *((const uint16_t *)t);
+		s[2] = t[2];
+		break;
+	case 4:
+		*((uint32_t *)s) = *((const uint32_t *)t);
+		break;
+	case 5:
+		*((uint32_t *)s) = *((const uint32_t *)t);
+		s[4] = t[4];
+		break;
+	case 6:
+		*((uint32_t *)s) = *((const uint32_t *)t);
+		*((uint16_t *)(s + 4)) = *((const uint16_t *)(t + 4));
+		break;
+	case 7:
+		*((uint32_t *)s) = *((const uint32_t *)t);
+		*((uint16_t *)(s + 4)) = *((const uint16_t *)(t + 4));
+		s[6] = t[6];
+		break;
+	case 8:
+		*((uint32_t *)s) = *((const uint32_t *)t);
+		*((uint32_t *)(s + 4)) = *((const uint32_t *)(t + 4));
+		break;
+	default:
+		memcpy(s, t, N*sizeof(char));
+		break;
+	}
+}
+
+template <size_t N>
+inline void StrCpyEx(wchar_t *s, const wchar_t (&t)[N]) noexcept {
+	switch (N) {
+	case 1:
+		s[0] = t[0];
+		break;
+	case 2:
+		*((uint32_t *)s) = *((const uint32_t *)t);
+		break;
+	case 3:
+		*((uint32_t *)s) = *((const uint32_t *)t);
+		s[2] = t[2];
+		break;
+	case 4:
+		*((uint64_t *)s) = *((const uint64_t *)t);
+		break;
+	default:
+		memcpy(s, t, N*sizeof(wchar_t));
+		break;
+	}
+}
+#endif
 
 template <typename T, size_t N>
 constexpr bool StrEqualEx(const T *s, const T (&t)[N]) noexcept {

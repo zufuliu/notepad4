@@ -1832,16 +1832,16 @@ void EditEscapeCChars(HWND hwnd) noexcept {
 	efr->hwnd = hwnd;
 	SciCall_BeginBatchUpdate();
 
-	strcpy(efr->szFind, "\\");
-	strcpy(efr->szReplace, "\\\\");
+	StrCpyEx(efr->szFind, "\\");
+	StrCpyEx(efr->szReplace, "\\\\");
 	EditReplaceAllInSelection(hwnd, efr);
 
-	strcpy(efr->szFind, "\"");
-	strcpy(efr->szReplace, "\\\"");
+	StrCpyEx(efr->szFind, "\"");
+	StrCpyEx(efr->szReplace, "\\\"");
 	EditReplaceAllInSelection(hwnd, efr);
 
-	strcpy(efr->szFind, "\'");
-	strcpy(efr->szReplace, "\\\'");
+	StrCpyEx(efr->szFind, "\'");
+	StrCpyEx(efr->szReplace, "\\\'");
 	EditReplaceAllInSelection(hwnd, efr);
 
 	NP2HeapFree(efr);
@@ -1865,16 +1865,16 @@ void EditUnescapeCChars(HWND hwnd) noexcept {
 	efr->hwnd = hwnd;
 	SciCall_BeginBatchUpdate();
 
-	strcpy(efr->szFind, "\\\\");
-	strcpy(efr->szReplace, "\\");
+	StrCpyEx(efr->szFind, "\\\\");
+	StrCpyEx(efr->szReplace, "\\");
 	EditReplaceAllInSelection(hwnd, efr);
 
-	strcpy(efr->szFind, "\\\"");
-	strcpy(efr->szReplace, "\"");
+	StrCpyEx(efr->szFind, "\\\"");
+	StrCpyEx(efr->szReplace, "\"");
 	EditReplaceAllInSelection(hwnd, efr);
 
-	strcpy(efr->szFind, "\\\'");
-	strcpy(efr->szReplace, "\'");
+	StrCpyEx(efr->szFind, "\\\'");
+	StrCpyEx(efr->szReplace, "\'");
 	EditReplaceAllInSelection(hwnd, efr);
 
 	NP2HeapFree(efr);
@@ -1907,33 +1907,33 @@ void EditEscapeXHTMLChars(HWND hwnd) noexcept {
 	efr->hwnd = hwnd;
 	SciCall_BeginBatchUpdate();
 
-	strcpy(efr->szFind, "&");
-	strcpy(efr->szReplace, "&amp;");
+	StrCpyEx(efr->szFind, "&");
+	StrCpyEx(efr->szReplace, "&amp;");
 	EditReplaceAllInSelection(hwnd, efr);
 
-	strcpy(efr->szFind, "\"");
-	strcpy(efr->szReplace, "&quot;");
+	StrCpyEx(efr->szFind, "\"");
+	StrCpyEx(efr->szReplace, "&quot;");
 	EditReplaceAllInSelection(hwnd, efr);
 
-	strcpy(efr->szFind, "\'");
-	strcpy(efr->szReplace, "&apos;");
+	StrCpyEx(efr->szFind, "\'");
+	StrCpyEx(efr->szReplace, "&apos;");
 	EditReplaceAllInSelection(hwnd, efr);
 
-	strcpy(efr->szFind, "<");
-	strcpy(efr->szReplace, "&lt;");
+	StrCpyEx(efr->szFind, "<");
+	StrCpyEx(efr->szReplace, "&lt;");
 	EditReplaceAllInSelection(hwnd, efr);
 
-	strcpy(efr->szFind, ">");
-	strcpy(efr->szReplace, "&gt;");
+	StrCpyEx(efr->szFind, ">");
+	StrCpyEx(efr->szReplace, "&gt;");
 	EditReplaceAllInSelection(hwnd, efr);
 
 	if (pLexCurrent->iLexer != SCLEX_XML) {
-		strcpy(efr->szFind, " ");
-		strcpy(efr->szReplace, "&nbsp;");
+		StrCpyEx(efr->szFind, " ");
+		StrCpyEx(efr->szReplace, "&nbsp;");
 		EditReplaceAllInSelection(hwnd, efr);
 
-		strcpy(efr->szFind, "\t");
-		strcpy(efr->szReplace, "&emsp;");
+		StrCpyEx(efr->szFind, "\t");
+		StrCpyEx(efr->szReplace, "&emsp;");
 		EditReplaceAllInSelection(hwnd, efr);
 	}
 
@@ -1958,32 +1958,32 @@ void EditUnescapeXHTMLChars(HWND hwnd) noexcept {
 	efr->hwnd = hwnd;
 	SciCall_BeginBatchUpdate();
 
-	strcpy(efr->szFind, "&quot;");
-	strcpy(efr->szReplace, "\"");
+	StrCpyEx(efr->szFind, "&quot;");
+	StrCpyEx(efr->szReplace, "\"");
 	EditReplaceAllInSelection(hwnd, efr);
 
-	strcpy(efr->szFind, "&apos;");
-	strcpy(efr->szReplace, "\'");
+	StrCpyEx(efr->szFind, "&apos;");
+	StrCpyEx(efr->szReplace, "\'");
 	EditReplaceAllInSelection(hwnd, efr);
 
-	strcpy(efr->szFind, "&lt;");
-	strcpy(efr->szReplace, "<");
+	StrCpyEx(efr->szFind, "&lt;");
+	StrCpyEx(efr->szReplace, "<");
 	EditReplaceAllInSelection(hwnd, efr);
 
-	strcpy(efr->szFind, "&gt;");
-	strcpy(efr->szReplace, ">");
+	StrCpyEx(efr->szFind, "&gt;");
+	StrCpyEx(efr->szReplace, ">");
 	EditReplaceAllInSelection(hwnd, efr);
 
-	strcpy(efr->szFind, "&nbsp;");
-	strcpy(efr->szReplace, " ");
+	StrCpyEx(efr->szFind, "&nbsp;");
+	StrCpyEx(efr->szReplace, " ");
 	EditReplaceAllInSelection(hwnd, efr);
 
-	strcpy(efr->szFind, "&amp;");
-	strcpy(efr->szReplace, "&");
+	StrCpyEx(efr->szFind, "&amp;");
+	StrCpyEx(efr->szReplace, "&");
 	EditReplaceAllInSelection(hwnd, efr);
 
-	strcpy(efr->szFind, "&emsp;");
-	strcpy(efr->szReplace, "\t");
+	StrCpyEx(efr->szFind, "&emsp;");
+	StrCpyEx(efr->szReplace, "\t");
 	EditReplaceAllInSelection(hwnd, efr);
 
 	NP2HeapFree(efr);
@@ -2025,7 +2025,7 @@ void EditChar2Hex() noexcept {
 	int outLen = 0;
 	if (ch[0] == '\0') {
 		outLen = 4;
-		strcpy(ch, "\\x00");
+		StrCpyEx(ch, "\\x00");
 	} else {
 		const UINT cpEdit = SciCall_GetCodePage();
 		count = MultiByteToWideChar(cpEdit, 0, ch, -1, wch, static_cast<int>(count)) - 1; // '\0'
@@ -2039,7 +2039,7 @@ void EditChar2Hex() noexcept {
 		}
 		if (count == 2 && IS_SURROGATE_PAIR(wch[0], wch[1])) {
 			const UINT value = UTF16_TO_UTF32(wch[0], wch[1]);
-			outLen += sprintf(ch + outLen, " U+%X", value);
+			outLen += sprintf(ch + outLen, " U+%06X", value);
 		}
 	}
 
