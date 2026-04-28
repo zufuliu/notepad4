@@ -140,7 +140,7 @@ static EDITSTYLE Styles_AHK[] = {
 	{ SCE_AHK_CLASS, NP2StyleX_Class, L"bold; fore:#1E90FF" },
 	{ SCE_AHK_BUILTIN_FUNCTION, NP2StyleX_BuiltInFunction, L"fore:#0080C0" },
 	{ SCE_AHK_FUNCTION, NP2StyleX_Function, L"fore:#A46000" },
-	{ SCE_AHK_BUILTIN_VARIABLE, NP2StyleX_PredefinedVariable, L"fore:#B000B0" },
+	{ SCE_AHK_BUILTIN_VARIABLE, NP2StyleX_PredefinedVariable, L"fore:#7C5AF3" },
 	{ SCE_AHK_DYNAMIC_VARIABLE, NP2StyleX_Variable, L"fore:#808000" },
 	{ SCE_AHK_KEY, NP2StyleX_Key, L"fore:#007F7F" },
 	{ MULTI_STYLE(SCE_AHK_COMMENTLINE, SCE_AHK_COMMENTBLOCK, SCE_AHK_SECTION_COMMENT, 0), NP2StyleX_Comment, L"fore:#608060" },

@@ -146,7 +146,7 @@ nullptr
 static EDITSTYLE Styles_JS[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_JS_WORD, NP2StyleX_Keyword, L"fore:#0000FF" },
-	{ SCE_JS_WORD2, NP2StyleX_ReservedWord, L"fore:#B000B0" },
+	{ SCE_JS_WORD2, NP2StyleX_ReservedWord, L"fore:#FF4F0F" },
 	{ SCE_JS_DIRECTIVE, NP2StyleX_Directive, L"fore:#FF8000" },
 	{ SCE_JS_CLASS, NP2StyleX_Class, L"bold; fore:#0080C0" },
 	{ SCE_JS_DECORATOR, NP2StyleX_Decorator, L"fore:#FF8000" },

@@ -98,7 +98,7 @@ static EDITSTYLE Styles_Ruby[] = {
 	{ SCE_RB_POD, NP2StyleX_POD, L"fore:#004000; back:#C0FFC0; eolfilled" },
 	{ MULTI_STYLE(SCE_RB_BACKTICKS, SCE_RB_STRING_QX, 0, 0), NP2StyleX_Backticks, L"fore:#E24000; back:#FFF1A8" },
 	{ MULTI_STYLE(SCE_RB_REGEX, SCE_RB_STRING_QR, 0, 0), NP2StyleX_Regex, L"fore:#006633; back:#FFF1A8" },
-	{ MULTI_STYLE(SCE_RB_SYMBOL, SCE_RB_STRING_QS, 0, 0), NP2StyleX_Symbol, L"bold; fore:#FF4F0F" },
+	{ MULTI_STYLE(SCE_RB_SYMBOL, SCE_RB_STRING_QS, 0, 0), NP2StyleX_Symbol, L"fore:#FF4F0F" },
 	{ MULTI_STYLE(SCE_RB_CLASS_VAR, SCE_RB_INSTANCE_VAR, SCE_RB_GLOBAL, 0), NP2StyleX_Variable, L"fore:#003CE6" },
 	{ SCE_RB_HERE_DELIM, NP2StyleX_HeredocDelimiter, L"fore:#648000" },
 	{ SCE_RB_HERE_Q, NP2StyleX_HeredocSingleQuoted, L"fore:#648000" },

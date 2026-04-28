@@ -34,6 +34,7 @@ def parse_key_value(line):
 
 def find_color_in_file(path, color_map):
 	lines = read_file(path).splitlines()
+	suffix = [' Code', ' Source', ' Script', ' File', ' Document']
 	scheme = ''
 	for line in lines:
 		line = line.strip()
@@ -41,6 +42,8 @@ def find_color_in_file(path, color_map):
 			continue
 		if line[0] == '[':
 			scheme = line[1:-1]
+			for item in suffix:
+				scheme = scheme.removesuffix(item)
 			continue
 		items = parse_key_value(line)
 		if not items:

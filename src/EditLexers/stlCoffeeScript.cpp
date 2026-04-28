@@ -30,7 +30,7 @@ static KEYWORDLIST Keywords_CoffeeScript = {{
 static EDITSTYLE Styles_CoffeeScript[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_COFFEESCRIPT_WORD, NP2StyleX_Keyword, L"fore:#0000FF" },
-	{ SCE_COFFEESCRIPT_WORD2, NP2StyleX_ReservedWord, L"fore:#B000B0" },
+	{ SCE_COFFEESCRIPT_WORD2, NP2StyleX_ReservedWord, L"fore:#FF4F0F" },
 	{ SCE_COFFEESCRIPT_DIRECTIVE, NP2StyleX_Directive, L"fore:#FF8000" },
 	{ SCE_COFFEESCRIPT_CLASS, NP2StyleX_Class, L"bold; fore:#0080C0" },
 	{ MULTI_STYLE(SCE_COFFEESCRIPT_PROPERTY, SCE_COFFEESCRIPT_PROPERTY_AT, 0, 0), NP2StyleX_Property, L"fore:#A46000" },

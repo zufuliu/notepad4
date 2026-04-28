@@ -14,7 +14,7 @@ static EDITSTYLE Styles_TEX[] = {
 	{ SCE_L_TITLE, NP2StyleX_Title, L"fore:#008000" },
 	{ SCE_L_CHAPTER, NP2StyleX_Chapter, L"fore:#008000" },
 	{ MULTI_STYLE(SCE_L_SECTION, SCE_L_SECTION1, SCE_L_SECTION2, 0), NP2StyleX_Section, L"fore:#008000" },
-	{ MULTI_STYLE(SCE_L_MATH, SCE_L_MATH2, 0, 0), NP2StyleX_Math, L"fore:#FF0000" },
+	{ MULTI_STYLE(SCE_L_MATH, SCE_L_MATH2, 0, 0), NP2StyleX_Math, L"fore:#FF4F0F" },
 	{ SCE_L_SPECIAL, NP2StyleX_SpecialCharacter, L"fore:#3A6EA5" },
 	{ MULTI_STYLE(SCE_L_TAG, SCE_L_TAG2, 0, 0), NP2StyleX_Tag, L"fore:#FF8000" },
 	{ SCE_L_CMDOPT, NP2StyleX_Option, L"fore:#1E90FF" },
