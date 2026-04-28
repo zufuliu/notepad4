@@ -1831,18 +1831,25 @@ void EditEscapeCChars(HWND hwnd) noexcept {
 	EDITFINDREPLACE * const efr = static_cast<EDITFINDREPLACE *>(NP2HeapAlloc(sizeof(EDITFINDREPLACE)));
 	efr->hwnd = hwnd;
 	SciCall_BeginBatchUpdate();
+	const int rid = pLexCurrent->rid;
 
 	StrCpyEx(efr->szFind, "\\");
 	StrCpyEx(efr->szReplace, "\\\\");
 	EditReplaceAllInSelection(hwnd, efr);
 
 	StrCpyEx(efr->szFind, "\"");
-	StrCpyEx(efr->szReplace, "\\\"");
+	if (rid == NP2LEX_RESOURCESCRIPT) {
+		StrCpyEx(efr->szReplace, "\"\"");
+	} else {
+		StrCpyEx(efr->szReplace, "\\\"");
+	}
 	EditReplaceAllInSelection(hwnd, efr);
 
-	StrCpyEx(efr->szFind, "\'");
-	StrCpyEx(efr->szReplace, "\\\'");
-	EditReplaceAllInSelection(hwnd, efr);
+	if (rid != NP2LEX_RESOURCESCRIPT) {
+		StrCpyEx(efr->szFind, "\'");
+		StrCpyEx(efr->szReplace, "\\\'");
+		EditReplaceAllInSelection(hwnd, efr);
+	}
 
 	NP2HeapFree(efr);
 	SciCall_EndBatchUpdate();
@@ -1864,18 +1871,25 @@ void EditUnescapeCChars(HWND hwnd) noexcept {
 	EDITFINDREPLACE * const efr = static_cast<EDITFINDREPLACE *>(NP2HeapAlloc(sizeof(EDITFINDREPLACE)));
 	efr->hwnd = hwnd;
 	SciCall_BeginBatchUpdate();
+	const int rid = pLexCurrent->rid;
 
 	StrCpyEx(efr->szFind, "\\\\");
 	StrCpyEx(efr->szReplace, "\\");
 	EditReplaceAllInSelection(hwnd, efr);
 
-	StrCpyEx(efr->szFind, "\\\"");
+	if (rid == NP2LEX_RESOURCESCRIPT) {
+		StrCpyEx(efr->szFind, "\"\"");
+	} else {
+		StrCpyEx(efr->szFind, "\\\"");
+	}
 	StrCpyEx(efr->szReplace, "\"");
 	EditReplaceAllInSelection(hwnd, efr);
 
-	StrCpyEx(efr->szFind, "\\\'");
-	StrCpyEx(efr->szReplace, "\'");
-	EditReplaceAllInSelection(hwnd, efr);
+	if (rid != NP2LEX_RESOURCESCRIPT) {
+		StrCpyEx(efr->szFind, "\\\'");
+		StrCpyEx(efr->szReplace, "\'");
+		EditReplaceAllInSelection(hwnd, efr);
+	}
 
 	NP2HeapFree(efr);
 	SciCall_EndBatchUpdate();
