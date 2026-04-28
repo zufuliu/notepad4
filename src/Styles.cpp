@@ -49,9 +49,7 @@ extern EDITLEXER lexCSS;
 extern EDITLEXER lexJava;
 extern EDITLEXER lexJavaScript;
 extern EDITLEXER lexJSON;
-extern EDITLEXER lexPHP;
 extern EDITLEXER lexPython;
-extern EDITLEXER lexRuby;
 extern EDITLEXER lexSQL;
 extern EDITLEXER lexHTML;
 extern EDITLEXER lexXML;
@@ -122,12 +120,14 @@ extern EDITLEXER lexOCaml;
 
 extern EDITLEXER lexPascal;
 extern EDITLEXER lexPerl;
+extern EDITLEXER lexPHP;
 extern EDITLEXER lexPowerBuilder;
 extern EDITLEXER lexPowerShell;
 
 extern EDITLEXER lexRLang;
 extern EDITLEXER lexRebol;
 extern EDITLEXER lexResourceScript;
+extern EDITLEXER lexRuby;
 extern EDITLEXER lexRust;
 
 extern EDITLEXER lexSAS;
@@ -167,9 +167,7 @@ static PEDITLEXER pLexArray[] = {
 	&lexJava,
 	&lexJavaScript,
 	&lexJSON,
-	&lexPHP,
 	&lexPython,
-	&lexRuby,
 	&lexSQL,
 	&lexHTML,
 	&lexXML,
@@ -240,12 +238,14 @@ static PEDITLEXER pLexArray[] = {
 
 	&lexPascal,
 	&lexPerl,
+	&lexPHP,
 	&lexPowerBuilder,
 	&lexPowerShell,
 
 	&lexRLang,
 	&lexRebol,
 	&lexResourceScript,
+	&lexRuby,
 	&lexRust,
 
 	&lexSAS,
