@@ -403,6 +403,7 @@ void	EditInsertScriptShebangLine() noexcept;
 enum CallTipType {
 	CallTipType_None,
 	CallTipType_Notification,
+	// mouse hover CallTip, auto hide on mouse move
 	CallTipType_ColorHex,
 };
 
@@ -413,6 +414,10 @@ enum ShowCallTip {
 	ShowCallTip_ColorBGRA,
 	ShowCallTip_ColorABGR,
 };
+
+// tab width for notification text
+#define CallTipTabWidthNotification		8
+#define CallTipDefaultMouseDwellTime	250
 
 struct CallTipInfo {
 	ShowCallTip showCallTip;

@@ -64,10 +64,6 @@ static HACCEL hAccFindReplace;
 static HICON hTrayIcon = nullptr;
 static UINT uTrayIconDPI = 0;
 
-// tab width for notification text
-#define CallTipTabWidthNotification		8
-#define CallTipDefaultMouseDwellTime	250
-
 #define TOOLBAR_COMMAND_BASE	IDT_FILE_NEW
 #define DefaultToolbarButtons	L"22 3 0 1 27 2 0 4 18 19 0 5 6 0 7 8 9 20 0 10 11 0 12 0 24 0 13 14 0 15 16 0 17"
 static TBBUTTON tbbMainWnd[] = {
@@ -7870,8 +7866,10 @@ void ShowNotificationW(WPARAM notifyPos, LPCWSTR lpszText) noexcept {
 }
 
 void ShowNotificationMessage(WPARAM notifyPos, UINT uidMessage, ...) noexcept {
-	WCHAR wchFormat[1024] = L"";
-	WCHAR wchMessage[2048] = L"";
+	WCHAR wchFormat[1024];
+	WCHAR wchMessage[1024];
+	wchFormat[0] = L'\0';
+	wchMessage[0] = L'\0';
 	GetString(uidMessage, wchFormat, COUNTOF(wchFormat));
 
 	va_list va;
@@ -7879,7 +7877,16 @@ void ShowNotificationMessage(WPARAM notifyPos, UINT uidMessage, ...) noexcept {
 	wvsprintf(wchMessage, wchFormat, va);
 	va_end(va);
 
-	ShowNotificationW(notifyPos, wchMessage);
+	const int cpEdit = SciCall_GetCodePage();
+	wchFormat[0] = L'\0';
+	char * const lpszText = reinterpret_cast<char *>(wchFormat);
+	WideCharToMultiByte(cpEdit, 0, wchMessage, -1, lpszText, COUNTOF(wchFormat)*sizeof(WCHAR), nullptr, nullptr);
+
+	callTipInfo.type = CallTipType_Notification;
+	SciCall_CallTipSetBack(callTipInfo.backColor);
+	SciCall_CallTipSetFore(callTipInfo.foreColor);
+	SciCall_CallTipUseStyle(CallTipTabWidthNotification);
+	SciCall_ShowNotification(notifyPos, lpszText);
 }
 
 //=============================================================================
