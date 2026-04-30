@@ -62,6 +62,7 @@ extern int iCurrentEncoding;
 
 extern MRUList mruFind;
 extern MRUList mruReplace;
+extern CallTipInfo callTipInfo;
 
 static LPWSTR wchPrefixSelection;
 static LPWSTR wchAppendSelection;
@@ -79,7 +80,8 @@ static HMODULE hELSCoreDLL = nullptr;
 #else
 #pragma comment(lib, "elscore.lib")
 #endif
-
+// see EditShowCharInfo()
+static HMODULE hICUDLL = nullptr;
 #define NP2_DYNAMIC_LOAD_wcsftime	1
 #if NP2_DYNAMIC_LOAD_wcsftime
 static HMODULE hCrtDLL = nullptr;
@@ -106,6 +108,9 @@ void Edit_ReleaseResources() noexcept {
 		FreeLibrary(hELSCoreDLL);
 	}
 #endif
+	if (hICUDLL != nullptr) {
+		FreeLibrary(hICUDLL);
+	}
 #if NP2_DYNAMIC_LOAD_wcsftime
 	if (hCrtDLL) {
 		FreeLibrary(hCrtDLL);
@@ -2159,6 +2164,115 @@ void EditShowHex() noexcept {
 	SciCall_SetSel(iSelEnd, iSelEnd + (t - cch));
 	NP2HeapFree(ch);
 	NP2HeapFree(cch);
+}
+
+void EditShowCharInfo() noexcept {
+	const Sci_Position position = SciCall_GetSelectionStart();
+	unsigned character = SciCall_GetCharacterAt(position);
+	char bytes[4]{};
+	WCHAR wchBuf[256];
+	memset(wchBuf, 0, sizeof(int));
+	unsigned count = 1;
+	if (character <= 0x7f) {
+		bytes[0] = static_cast<char>(character);
+		wchBuf[0] = static_cast<wchar_t>(character);
+	} else {
+		const UINT cpEdit = SciCall_GetCodePage();
+		if (cpEdit == SC_CP_UTF8) {
+			if (character < SUPPLEMENTAL_PLANE_FIRST) {
+				wchBuf[0] = static_cast<wchar_t>(character);
+			} else {
+				count = 2;
+				wchBuf[0] = static_cast<WCHAR>(((character - SUPPLEMENTAL_PLANE_FIRST) >> 10) + SURROGATE_LEAD_FIRST);
+				wchBuf[1] = (character & 0x3ff) + SURROGATE_TRAIL_FIRST;
+			}
+		} else {
+			if (character <= 0xff) {
+				bytes[0] = static_cast<char>(character);
+			} else {
+				count = 2;
+				const uint16_t dbcs = bswap16(static_cast<uint16_t>(character));
+				memcpy(bytes, &dbcs, 2);
+			}
+			count = MultiByteToWideChar(cpEdit, 0, bytes, count, wchBuf, COUNTOF(wchBuf));
+			if (IS_SURROGATE_PAIR(wchBuf[0], wchBuf[1])) {
+				character = UTF16_TO_UTF32(wchBuf[0], wchBuf[1]);
+			} else {
+				character = wchBuf[0];
+			}
+		}
+		count = WideCharToMultiByte(CP_UTF8, 0, wchBuf, count, bytes, COUNTOF(bytes), nullptr, nullptr);
+	}
+
+	char buffer[256];
+	unsigned length = 0;
+	memset(buffer, 0, sizeof(int));
+	length = sprintf(buffer, "Unicode: U+%0*X\n", ((character < SUPPLEMENTAL_PLANE_FIRST) ? 4 : 6), character);
+	StrCpyEx(buffer + length, "UTF-16:");
+	length += CSTRLEN("UTF-16:");
+	length += sprintf(buffer + length, " %04X", wchBuf[0]);
+	if (character >= SUPPLEMENTAL_PLANE_FIRST) {
+		length += sprintf(buffer + length, " %04X", wchBuf[1]);
+	}
+	StrCpyEx(buffer + length, "\nUTF-8:");
+	length += CSTRLEN("\nUTF-8:");
+	for (unsigned i = 0; i < count; i++) {
+		const uint8_t ch = bytes[i];
+		buffer[length] = ' ';
+		buffer[length + 1] = "0123456789ABCDEF"[ch >> 4];
+		buffer[length + 2] = "0123456789ABCDEF"[ch & 15];
+		length += 3;
+	}
+	length += sprintf(buffer + length, "\nHTML: &#%u;", character);
+
+// see icu.h / uchar.h
+using u_charNameSig = int32_t (__cdecl *)(uint32_t code, int nameChoice, char *buffer, int32_t bufferLength, int *pErrorCode);
+using u_getIntPropertyValueSig = int32_t (__cdecl *)(uint32_t code, int which);
+using u_getPropertyValueNameSig = const char * (__cdecl *)(int property, int32_t value, int nameChoice);
+	constexpr int U_EXTENDED_CHAR_NAME = 2;
+	constexpr int U_SHORT_PROPERTY_NAME = 0;
+	constexpr int U_LONG_PROPERTY_NAME = 1;
+	constexpr int UCHAR_GENERAL_CATEGORY = 0x1005;
+
+	static int triedLoadingICU = 0;
+	static u_charNameSig pfn_charName;
+	static u_getIntPropertyValueSig pfn_getIntPropertyValue;
+	static u_getPropertyValueNameSig pfn_getPropertyValueName;
+	if (triedLoadingICU == 0) {
+		triedLoadingICU = 1;
+		hICUDLL = LoadLibraryExW(L"icu.dll", nullptr, kSystemLibraryLoadFlags);
+		if (hICUDLL != nullptr) {
+			pfn_charName = DLLFunction<u_charNameSig>(hICUDLL, "u_charName");
+			pfn_getIntPropertyValue = DLLFunction<u_getIntPropertyValueSig>(hICUDLL, "u_getIntPropertyValue");
+			pfn_getPropertyValueName = DLLFunction<u_getPropertyValueNameSig>(hICUDLL, "u_getPropertyValueName");
+			if (pfn_charName == nullptr || pfn_getIntPropertyValue == nullptr || pfn_getPropertyValueName == nullptr) {
+				FreeLibrary(hICUDLL);
+				hICUDLL = nullptr;
+			} else {
+				triedLoadingICU = 2;
+			}
+		}
+	}
+	if (triedLoadingICU == 2) {
+		StrCpyEx(buffer + length, "\nName: ");
+		length += CSTRLEN("\nName: ");
+		int value = 0;
+		length += pfn_charName(character, U_EXTENDED_CHAR_NAME, buffer + length, COUNTOF(buffer) - length, &value);
+		value = pfn_getIntPropertyValue(character, UCHAR_GENERAL_CATEGORY);
+		const char *shortName = pfn_getPropertyValueName(UCHAR_GENERAL_CATEGORY, value, U_SHORT_PROPERTY_NAME);
+		const char *longName = pfn_getPropertyValueName(UCHAR_GENERAL_CATEGORY, value, U_LONG_PROPERTY_NAME);
+		sprintf(buffer + length, "\nCategory: %s %s", shortName, longName);
+	}
+
+	const WPARAM notifyPos = (static_cast<WPARAM>(position) << 2) | SC_NOTIFICATIONPOSITION_NONE;
+	callTipInfo.type = CallTipType_CharacterInfo;
+	SciCall_CallTipSetBack(callTipInfo.backColor);
+	SciCall_CallTipSetFore(callTipInfo.foreColor);
+	SciCall_CallTipUseStyle(CallTipTabWidthNotification);
+	SciCall_ShowNotification(notifyPos, buffer);
+
+	MultiByteToWideChar(CP_UTF8, 0, buffer, -1, wchBuf, COUNTOF(wchBuf));
+	SetClipData(hwndMain, wchBuf);
 }
 
 void EditBase64Encode(Base64EncodingFlag encodingFlag) noexcept {

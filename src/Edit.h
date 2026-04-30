@@ -155,6 +155,7 @@ void	EditUnescapeXHTMLChars(HWND hwnd) noexcept;
 void	EditChar2Hex() noexcept;
 void	EditHex2Char() noexcept;
 void	EditShowHex() noexcept;
+void	EditShowCharInfo() noexcept;
 
 enum Base64EncodingFlag {
 	Base64EncodingFlag_Default,
@@ -402,6 +403,7 @@ void	EditInsertScriptShebangLine() noexcept;
 
 enum CallTipType {
 	CallTipType_None,
+	CallTipType_CharacterInfo,
 	CallTipType_Notification,
 	// mouse hover CallTip, auto hide on mouse move
 	CallTipType_ColorHex,

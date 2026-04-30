@@ -344,6 +344,7 @@ BEGIN
 			MENUITEM "문자를 16진수로(&H)\tCtrl+Alt+X",					IDM_EDIT_CHAR2HEX
 			MENUITEM "16진수를 문자로(&R)\tCtrl+Alt+C",					IDM_EDIT_HEX2CHAR
 			MENUITEM "16진수 코드 표시(&S)",								IDM_EDIT_SHOW_HEX
+			MENUITEM "Show Char &Info",							IDM_EDIT_SHOW_CHAR_INFO
 			MENUITEM SEPARATOR
 			MENUITEM "이스케이프 C 문자(&P)\tCtrl+Alt+E",				IDM_EDIT_ESCAPECCHARS
 			MENUITEM "이스케이프 해제 C 문자(&U)\tCtrl+Alt+R",			IDM_EDIT_UNESCAPECCHARS

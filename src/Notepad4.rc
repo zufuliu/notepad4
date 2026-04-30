@@ -344,6 +344,7 @@ BEGIN
 			MENUITEM "C&har to Hex\tCtrl+Alt+X",				IDM_EDIT_CHAR2HEX
 			MENUITEM "Hex to Cha&r\tCtrl+Alt+C",				IDM_EDIT_HEX2CHAR
 			MENUITEM "&Show Hex Code",							IDM_EDIT_SHOW_HEX
+			MENUITEM "Show Char &Info",							IDM_EDIT_SHOW_CHAR_INFO
 			MENUITEM SEPARATOR
 			MENUITEM "Esca&pe C Chars\tCtrl+Alt+E",				IDM_EDIT_ESCAPECCHARS
 			MENUITEM "&Unescape C Chars\tCtrl+Alt+R",			IDM_EDIT_UNESCAPECCHARS

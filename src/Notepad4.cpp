@@ -3565,6 +3565,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		EndWaitCursor();
 		break;
 
+	case IDM_EDIT_SHOW_CHAR_INFO:
+		EditShowCharInfo();
+		break;
+
 	case IDM_EDIT_COPYRTF:
 	case IDM_EDIT_CODE_COMPRESS:
 	case IDM_EDIT_CODE_PRETTY:

@@ -344,6 +344,7 @@ BEGIN
 			MENUITEM "Zamień znak na kod &szesnastkowy\tCtrl+Alt+X",IDM_EDIT_CHAR2HEX
 			MENUITEM "Zamień kod szesnastkowy na &znak\tCtrl+Alt+C",IDM_EDIT_HEX2CHAR
 			MENUITEM "&Pokaż kod szesnastkowy",					IDM_EDIT_SHOW_HEX
+			MENUITEM "Show Char &Info",							IDM_EDIT_SHOW_CHAR_INFO
 			MENUITEM SEPARATOR
 			MENUITEM "&Wstaw znaki ucieczki\tCtrl+Alt+E",		IDM_EDIT_ESCAPECCHARS
 			MENUITEM "&Usuń znaki ucieczki\tCtrl+Alt+R",		IDM_EDIT_UNESCAPECCHARS
