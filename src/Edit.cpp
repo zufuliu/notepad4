@@ -73,19 +73,24 @@ static LPWSTR wchAppendLines;
 static HMODULE hELSCoreDLL = nullptr;
 // see EditShowCharInfo()
 static HMODULE hICUDLL = nullptr;
+// reduce global CRT initializer and binary size,
+// static linked wcsftime() may behaviors different from system one.
 #define NP2_DYNAMIC_LOAD_wcsftime	1
 #if NP2_DYNAMIC_LOAD_wcsftime
 static HMODULE hCrtDLL = nullptr;
 
 using wcsftimeSig = size_t (__cdecl *)(wchar_t *str, size_t count, const wchar_t *format, const struct tm *time);
+NP2_noinline
 wcsftimeSig GetFunctionPointer_wcsftime() noexcept {
-	if (hCrtDLL == nullptr) {
-		hCrtDLL = LoadLibraryExW(L"ucrtbase.dll", nullptr, kSystemLibraryLoadFlags);
-		if (hCrtDLL == nullptr) {
-			hCrtDLL = LoadLibraryExW(L"msvcrt.dll", nullptr, kSystemLibraryLoadFlags);
+	HMODULE hDLL = hCrtDLL;
+	if (hDLL == nullptr) {
+		hDLL = LoadLibraryExW(L"ucrtbase.dll", nullptr, kSystemLibraryLoadFlags);
+		if (hDLL == nullptr) {
+			hDLL = LoadLibraryExW(L"msvcrt.dll", nullptr, kSystemLibraryLoadFlags);
 		}
+		hCrtDLL = hDLL;
 	}
-	return DLLFunction<wcsftimeSig>(hCrtDLL, "wcsftime");
+	return DLLFunction<wcsftimeSig>(hDLL, "wcsftime");
 }
 #endif
 
@@ -1422,7 +1427,7 @@ using MappingFreeServicesSig = HRESULT (WINAPI *)(PMAPPING_SERVICE_INFO pService
 using MappingRecognizeTextSig = HRESULT (WINAPI *)(PMAPPING_SERVICE_INFO pServiceInfo, LPCWSTR pszText, DWORD dwLength, DWORD dwIndex, PMAPPING_OPTIONS pOptions, PMAPPING_PROPERTY_BAG pbag);
 using MappingFreePropertyBagSig = HRESULT (WINAPI *)(PMAPPING_PROPERTY_BAG pBag);
 
-	static int triedLoadingELSCore = 0;
+	static uint8_t triedLoadingELSCore = 0;
 	static MappingGetServicesSig pfnMappingGetServices;
 	static MappingFreeServicesSig pfnMappingFreeServices;
 	static MappingRecognizeTextSig pfnMappingRecognizeText;
@@ -1430,17 +1435,17 @@ using MappingFreePropertyBagSig = HRESULT (WINAPI *)(PMAPPING_PROPERTY_BAG pBag)
 
 	if (triedLoadingELSCore == 0) {
 		triedLoadingELSCore = 1;
-		hELSCoreDLL = LoadLibraryExW(L"elscore.dll", nullptr, kSystemLibraryLoadFlags);
-		if (hELSCoreDLL != nullptr) {
-			pfnMappingGetServices = DLLFunction<MappingGetServicesSig>(hELSCoreDLL, "MappingGetServices");
-			pfnMappingFreeServices = DLLFunction<MappingFreeServicesSig>(hELSCoreDLL, "MappingFreeServices");
-			pfnMappingRecognizeText = DLLFunction<MappingRecognizeTextSig>(hELSCoreDLL, "MappingRecognizeText");
-			pfnMappingFreePropertyBag = DLLFunction<MappingFreePropertyBagSig>(hELSCoreDLL, "MappingFreePropertyBag");
+		HMODULE hDLL = LoadLibraryExW(L"elscore.dll", nullptr, kSystemLibraryLoadFlags);
+		if (hDLL != nullptr) {
+			pfnMappingGetServices = DLLFunction<MappingGetServicesSig>(hDLL, "MappingGetServices");
+			pfnMappingFreeServices = DLLFunction<MappingFreeServicesSig>(hDLL, "MappingFreeServices");
+			pfnMappingRecognizeText = DLLFunction<MappingRecognizeTextSig>(hDLL, "MappingRecognizeText");
+			pfnMappingFreePropertyBag = DLLFunction<MappingFreePropertyBagSig>(hDLL, "MappingFreePropertyBag");
 			if (pfnMappingGetServices == nullptr || pfnMappingFreeServices == nullptr || pfnMappingRecognizeText == nullptr || pfnMappingFreePropertyBag == nullptr) {
-				FreeLibrary(hELSCoreDLL);
-				hELSCoreDLL = nullptr;
+				FreeLibrary(hDLL);
 				return 0;
 			}
+			hELSCoreDLL = hDLL;
 			triedLoadingELSCore = 2;
 		}
 	}
@@ -2196,7 +2201,7 @@ void EditShowCharInfo() noexcept {
 	}
 	length += sprintf(buffer + length, "\nHTML: &#%u;", character);
 
-// see icu.h / uchar.h
+// see icu.h / uchar.h, https://learn.microsoft.com/en-us/windows/win32/intl/international-components-for-unicode--icu-
 using u_charNameSig = int32_t (__cdecl *)(uint32_t code, int nameChoice, char *buffer, int32_t bufferLength, int *pErrorCode);
 using u_getIntPropertyValueSig = int32_t (__cdecl *)(uint32_t code, int which);
 using u_getPropertyValueNameSig = const char * (__cdecl *)(int property, int32_t value, int nameChoice);
@@ -2205,21 +2210,24 @@ using u_getPropertyValueNameSig = const char * (__cdecl *)(int property, int32_t
 	constexpr int U_LONG_PROPERTY_NAME = 1;
 	constexpr int UCHAR_GENERAL_CATEGORY = 0x1005;
 
-	static int triedLoadingICU = 0;
+	static uint8_t triedLoadingICU = 0;
 	static u_charNameSig pfn_charName;
 	static u_getIntPropertyValueSig pfn_getIntPropertyValue;
 	static u_getPropertyValueNameSig pfn_getPropertyValueName;
 	if (triedLoadingICU == 0) {
 		triedLoadingICU = 1;
-		hICUDLL = LoadLibraryExW(L"icu.dll", nullptr, kSystemLibraryLoadFlags);
-		if (hICUDLL != nullptr) {
-			pfn_charName = DLLFunction<u_charNameSig>(hICUDLL, "u_charName");
-			pfn_getIntPropertyValue = DLLFunction<u_getIntPropertyValueSig>(hICUDLL, "u_getIntPropertyValue");
-			pfn_getPropertyValueName = DLLFunction<u_getPropertyValueNameSig>(hICUDLL, "u_getPropertyValueName");
+		HMODULE hDLL = LoadLibraryExW(L"icu.dll", nullptr, kSystemLibraryLoadFlags); // Windows 10 1903
+		// if (hDLL == nullptr) { // Windows 10 1703, legacy outdated
+		// 	hDLL = LoadLibraryExW(L"icuuc.dll", nullptr, kSystemLibraryLoadFlags);
+		// }
+		if (hDLL != nullptr) {
+			pfn_charName = DLLFunction<u_charNameSig>(hDLL, "u_charName");
+			pfn_getIntPropertyValue = DLLFunction<u_getIntPropertyValueSig>(hDLL, "u_getIntPropertyValue");
+			pfn_getPropertyValueName = DLLFunction<u_getPropertyValueNameSig>(hDLL, "u_getPropertyValueName");
 			if (pfn_charName == nullptr || pfn_getIntPropertyValue == nullptr || pfn_getPropertyValueName == nullptr) {
-				FreeLibrary(hICUDLL);
-				hICUDLL = nullptr;
+				FreeLibrary(hDLL);
 			} else {
+				hICUDLL = hDLL;
 				triedLoadingICU = 2;
 			}
 		}
