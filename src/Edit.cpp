@@ -70,16 +70,7 @@ static LPWSTR wchPrefixLines;
 static LPWSTR wchAppendLines;
 
 // see TransliterateText()
-#if defined(_MSC_VER) && (_WIN32_WINNT >= _WIN32_WINNT_WIN7)
-#define NP2_DYNAMIC_LOAD_ELSCORE_DLL	1
-#else
-#define NP2_DYNAMIC_LOAD_ELSCORE_DLL	1
-#endif
-#if NP2_DYNAMIC_LOAD_ELSCORE_DLL
 static HMODULE hELSCoreDLL = nullptr;
-#else
-#pragma comment(lib, "elscore.lib")
-#endif
 // see EditShowCharInfo()
 static HMODULE hICUDLL = nullptr;
 #define NP2_DYNAMIC_LOAD_wcsftime	1
@@ -103,11 +94,9 @@ void Edit_ReleaseResources() noexcept {
 	NP2HeapFree(wchAppendSelection);
 	NP2HeapFree(wchPrefixLines);
 	NP2HeapFree(wchAppendLines);
-#if NP2_DYNAMIC_LOAD_ELSCORE_DLL
 	if (hELSCoreDLL != nullptr) {
 		FreeLibrary(hELSCoreDLL);
 	}
-#endif
 	if (hICUDLL != nullptr) {
 		FreeLibrary(hICUDLL);
 	}
@@ -1428,7 +1417,6 @@ const GUID WIN10_ELS_GUID_TRANSLITERATION_HANGUL_DECOMPOSITION =
 	{ 0x4BA2A721, 0xE43D, 0x41b7, { 0xB3, 0x30, 0x53, 0x6A, 0xE1, 0xE4, 0x88, 0x63 } };
 
 int TransliterateText(const GUID *pGuid, LPCWSTR pszTextW, int cchTextW, LPWSTR &pszMappedW) noexcept {
-#if NP2_DYNAMIC_LOAD_ELSCORE_DLL
 using MappingGetServicesSig = HRESULT (WINAPI *)(PMAPPING_ENUM_OPTIONS pOptions, PMAPPING_SERVICE_INFO *prgServices, DWORD *pdwServicesCount);
 using MappingFreeServicesSig = HRESULT (WINAPI *)(PMAPPING_SERVICE_INFO pServiceInfo);
 using MappingRecognizeTextSig = HRESULT (WINAPI *)(PMAPPING_SERVICE_INFO pServiceInfo, LPCWSTR pszText, DWORD dwLength, DWORD dwIndex, PMAPPING_OPTIONS pOptions, PMAPPING_PROPERTY_BAG pbag);
@@ -1459,7 +1447,6 @@ using MappingFreePropertyBagSig = HRESULT (WINAPI *)(PMAPPING_PROPERTY_BAG pBag)
 	if (triedLoadingELSCore != 2) {
 		return 0;
 	}
-#endif
 
 	MAPPING_ENUM_OPTIONS enumOptions;
 	PMAPPING_SERVICE_INFO prgServices = nullptr;
@@ -1469,21 +1456,13 @@ using MappingFreePropertyBagSig = HRESULT (WINAPI *)(PMAPPING_PROPERTY_BAG pBag)
 	enumOptions.Size = sizeof(MAPPING_ENUM_OPTIONS);
 	enumOptions.pGuid = const_cast<GUID *>(pGuid);
 
-#if NP2_DYNAMIC_LOAD_ELSCORE_DLL
 	HRESULT hr = pfnMappingGetServices(&enumOptions, &prgServices, &dwServicesCount);
-#else
-	HRESULT hr = MappingGetServices(&enumOptions, &prgServices, &dwServicesCount);
-#endif
 	dwServicesCount = 0;
 	if (SUCCEEDED(hr)) {
 		MAPPING_PROPERTY_BAG bag;
 		memset(&bag, 0, sizeof(MAPPING_PROPERTY_BAG));
 		bag.Size = sizeof (MAPPING_PROPERTY_BAG);
-#if NP2_DYNAMIC_LOAD_ELSCORE_DLL
 		hr = pfnMappingRecognizeText(prgServices, pszTextW, cchTextW, 0, nullptr, &bag);
-#else
-		hr = MappingRecognizeText(prgServices, pszTextW, cchTextW, 0, nullptr, &bag);
-#endif
 		if (SUCCEEDED(hr)) {
 			const DWORD dwDataSize = bag.prgResultRanges[0].dwDataSize;
 			dwServicesCount = dwDataSize/sizeof(WCHAR);
@@ -1493,17 +1472,9 @@ using MappingFreePropertyBagSig = HRESULT (WINAPI *)(PMAPPING_PROPERTY_BAG pBag)
 				memcpy(pszConvW, pszTextW, dwDataSize);
 				pszMappedW = pszConvW;
 			}
-#if NP2_DYNAMIC_LOAD_ELSCORE_DLL
 			pfnMappingFreePropertyBag(&bag);
-#else
-			MappingFreePropertyBag(&bag);
-#endif
 		}
-#if NP2_DYNAMIC_LOAD_ELSCORE_DLL
 		pfnMappingFreeServices(prgServices);
-#else
-		MappingFreeServices(prgServices);
-#endif
 	}
 
 	return dwServicesCount;
