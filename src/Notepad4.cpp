@@ -6812,6 +6812,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 		UpdateStatusBarCache(StatusItem_EolMode);
 		UpdateStatusBarCacheLineColumn();
 		UpdateDocumentModificationStatus();
+		UpdateStatusbar();
 
 		AutoSave_Stop(TRUE);
 		// Terminate file watching
