@@ -2585,6 +2585,7 @@ static void ConvertLineEndings(int iNewEOLMode) noexcept {
 	EditEnsureConsistentLineEndings();
 	UpdateStatusBarCache(StatusItem_EolMode);
 	UpdateWindowTitle();
+	UpdateStatusbar();
 }
 
 static inline bool IsBraceMatchChar(uint32_t ch) noexcept {
