@@ -152,10 +152,10 @@ void	EditEscapeCChars(HWND hwnd) noexcept;
 void	EditUnescapeCChars(HWND hwnd) noexcept;
 void	EditEscapeXHTMLChars(HWND hwnd) noexcept;
 void	EditUnescapeXHTMLChars(HWND hwnd) noexcept;
-void	EditChar2Hex() noexcept;
-void	EditHex2Char() noexcept;
+void	EditCharacterToHex() noexcept;
+void	EditHexToCharacter() noexcept;
 void	EditShowHex() noexcept;
-void	EditShowCharInfo() noexcept;
+void	EditShowCharacterInfo() noexcept;
 
 enum Base64EncodingFlag {
 	Base64EncodingFlag_Default,

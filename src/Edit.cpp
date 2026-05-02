@@ -2001,7 +2001,7 @@ void EditUnescapeXHTMLChars(HWND hwnd) noexcept {
 #define BMP_UNICODE_HEX_DIGIT	4
 #define MAX_UNICODE_HEX_DIGIT	8
 
-void EditChar2Hex() noexcept {
+void EditCharacterToHex() noexcept {
 	Sci_Position count = SciCall_GetSelTextLength();
 	if (count == 0) {
 		return;
@@ -2047,7 +2047,7 @@ void EditChar2Hex() noexcept {
 //
 // EditHex2Char()
 //
-void EditHex2Char() noexcept {
+void EditHexToCharacter() noexcept {
 	Sci_Position count = SciCall_GetSelTextLength();
 	if (count == 0) {
 		return;
@@ -2142,7 +2142,7 @@ void EditShowHex() noexcept {
 	NP2HeapFree(cch);
 }
 
-void EditShowCharInfo() noexcept {
+void EditShowCharacterInfo() noexcept {
 	const Sci_Position position = SciCall_GetSelectionStart();
 	unsigned character = SciCall_GetCharacterAt(position);
 	char bytes[4]{};

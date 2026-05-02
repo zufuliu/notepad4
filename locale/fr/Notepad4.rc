@@ -344,7 +344,7 @@ BEGIN
 			MENUITEM "Ca&ractères en hexa\tCtrl+Alt+X",				IDM_EDIT_CHAR2HEX
 			MENUITEM "Hex en Ca&ractères\tCtrl+Alt+C",				IDM_EDIT_HEX2CHAR
 			MENUITEM "&Montrer les codes exadécimaux",							IDM_EDIT_SHOW_HEX
-			MENUITEM "Show Char &Info",							IDM_EDIT_SHOW_CHAR_INFO
+			MENUITEM "Show Character &Info",							IDM_EDIT_SHOW_CHAR_INFO
 			MENUITEM SEPARATOR
 			MENUITEM "Neutraliser les caractères C\tCtrl+Alt+E",				IDM_EDIT_ESCAPECCHARS
 			MENUITEM "&Rétablir les caractères C\tCtrl+Alt+R",			IDM_EDIT_UNESCAPECCHARS

@@ -3550,13 +3550,13 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_EDIT_CHAR2HEX:
 		BeginWaitCursor();
-		EditChar2Hex();
+		EditCharacterToHex();
 		EndWaitCursor();
 		break;
 
 	case IDM_EDIT_HEX2CHAR:
 		BeginWaitCursor();
-		EditHex2Char();
+		EditHexToCharacter();
 		EndWaitCursor();
 		break;
 
@@ -3567,7 +3567,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_EDIT_SHOW_CHAR_INFO:
-		EditShowCharInfo();
+		EditShowCharacterInfo();
 		break;
 
 	case IDM_EDIT_COPYRTF:

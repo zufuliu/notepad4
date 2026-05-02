@@ -344,7 +344,7 @@ BEGIN
 			MENUITEM "Zeic&hen zu Hex\tStrg+Alt+X",				IDM_EDIT_CHAR2HEX
 			MENUITEM "Hex zu Zei&chen \tStrg+Alt+C",			IDM_EDIT_HEX2CHAR
 			MENUITEM "&Zeige Hex Code",							IDM_EDIT_SHOW_HEX
-			MENUITEM "Zeige Char &Info",						IDM_EDIT_SHOW_CHAR_INFO
+			MENUITEM "Zeige Zeichen &Info",						IDM_EDIT_SHOW_CHAR_INFO
 			MENUITEM SEPARATOR
 			MENUITEM "C Zeichen m&askieren\tStrg+Alt+E",			IDM_EDIT_ESCAPECCHARS
 			MENUITEM "C Zeichen &entmaskieren\tStrg+Alt+R",			IDM_EDIT_UNESCAPECCHARS

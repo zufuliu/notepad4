@@ -345,7 +345,7 @@ BEGIN
 			MENUITEM "Сим&вол - в шестнадцатеричное число\tCtrl+Alt+X",				IDM_EDIT_CHAR2HEX
 			MENUITEM "Шестнадцатеричное число - в &символ\tCtrl+Alt+C",				IDM_EDIT_HEX2CHAR
 			MENUITEM "&Показать шестнадцатеричный код",						IDM_EDIT_SHOW_HEX
-			MENUITEM "Show Char &Info",							IDM_EDIT_SHOW_CHAR_INFO
+			MENUITEM "Show Character &Info",							IDM_EDIT_SHOW_CHAR_INFO
 			MENUITEM SEPARATOR
 			MENUITEM "Заэкранивать символы Си\tCtrl+Alt+E",						IDM_EDIT_ESCAPECCHARS
 			MENUITEM "Разэкранивать си&мволы Си\tCtrl+Alt+R",					IDM_EDIT_UNESCAPECCHARS
