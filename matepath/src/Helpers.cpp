@@ -1160,6 +1160,9 @@ HMODULE LoadLocalizedResourceDLL(UINT lang, LPCWSTR dllName) noexcept {
 	case LANG_RUSSIAN:
 		folder = L"ru";
 		break;
+	case LANG_SLOVENIAN:
+		folder = L"sl";
+		break;
 	}
 
 	WCHAR path[MAX_PATH];

@@ -1,7 +1,7 @@
 // Microsoft Visual C++ generated resource script.
 //
-#include "resource.h"
-#include "config.h"
+#include "../../matepath/src/resource.h"
+#include "../../matepath/src/config.h"
 
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
@@ -18,10 +18,10 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English (United States) resources
+// Slovenian (Slovenia) resources
 
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_SLV)
+LANGUAGE LANG_SLOVENIAN, SUBLANG_DEFAULT
 #pragma code_page(65001)
 
 /////////////////////////////////////////////////////////////////////////////
@@ -29,7 +29,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 // RT_MANIFEST
 //
 
-IDR_RT_MANIFEST         RT_MANIFEST             "..\\res\\matepath.exe.manifest"
+IDR_RT_MANIFEST         RT_MANIFEST             "..\\..\\matepath\\res\\matepath.exe.manifest"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -39,46 +39,46 @@ IDR_RT_MANIFEST         RT_MANIFEST             "..\\res\\matepath.exe.manifest"
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 #if NP2_ENABLE_HIDPI_IMAGE_RESOURCE
-IDR_MAINWND             ICON                    "..\\res\\matepath.ico"
-IDI_RUN                 ICON                    "..\\res\\Run.ico"
-IDI_GOTO                ICON                    "..\\res\\Goto.ico"
-IDI_OPTIONS             ICON                    "..\\res\\Options.ico"
-IDI_OPTIONS2            ICON                    "..\\res\\Options2.ico"
-IDI_ITEMS               ICON                    "..\\res\\Items.ico"
-IDI_PROGS               ICON                    "..\\res\\Progs.ico"
-IDI_CROSS1              ICON                    "..\\res\\Cross1.ico"
-IDI_CROSS2              ICON                    "..\\res\\Cross2.ico"
+IDR_MAINWND             ICON                    "..\\..\\matepath\\res\\matepath.ico"
+IDI_RUN                 ICON                    "..\\..\\matepath\\res\\Run.ico"
+IDI_GOTO                ICON                    "..\\..\\matepath\\res\\Goto.ico"
+IDI_OPTIONS             ICON                    "..\\..\\matepath\\res\\Options.ico"
+IDI_OPTIONS2            ICON                    "..\\..\\matepath\\res\\Options2.ico"
+IDI_ITEMS               ICON                    "..\\..\\matepath\\res\\Items.ico"
+IDI_PROGS               ICON                    "..\\..\\matepath\\res\\Progs.ico"
+IDI_CROSS1              ICON                    "..\\..\\matepath\\res\\Cross1.ico"
+IDI_CROSS2              ICON                    "..\\..\\matepath\\res\\Cross2.ico"
 #else
-IDR_MAINWND             ICON                    "..\\res\\matepath_min.ico"
-IDI_RUN                 ICON                    "..\\res\\Run_min.ico"
-IDI_GOTO                ICON                    "..\\res\\Goto_min.ico"
-IDI_OPTIONS             ICON                    "..\\res\\Options_min.ico"
-IDI_OPTIONS2            ICON                    "..\\res\\Options2_min.ico"
-IDI_ITEMS               ICON                    "..\\res\\Items_min.ico"
-IDI_PROGS               ICON                    "..\\res\\Progs_min.ico"
-IDI_CROSS1              ICON                    "..\\res\\Cross1_min.ico"
-IDI_CROSS2              ICON                    "..\\res\\Cross2_min.ico"
+IDR_MAINWND             ICON                    "..\\..\\matepath\\res\\matepath_min.ico"
+IDI_RUN                 ICON                    "..\\..\\matepath\\res\\Run_min.ico"
+IDI_GOTO                ICON                    "..\\..\\matepath\\res\\Goto_min.ico"
+IDI_OPTIONS             ICON                    "..\\..\\matepath\\res\\Options_min.ico"
+IDI_OPTIONS2            ICON                    "..\\..\\matepath\\res\\Options2_min.ico"
+IDI_ITEMS               ICON                    "..\\..\\matepath\\res\\Items_min.ico"
+IDI_PROGS               ICON                    "..\\..\\matepath\\res\\Progs_min.ico"
+IDI_CROSS1              ICON                    "..\\..\\matepath\\res\\Cross1_min.ico"
+IDI_CROSS2              ICON                    "..\\..\\matepath\\res\\Cross2_min.ico"
 #endif
 
-//#if !NP2_ENABLE_APP_LOCALIZATION_DLL
+#if !NP2_ENABLE_APP_LOCALIZATION_DLL
 /////////////////////////////////////////////////////////////////////////////
 //
 // Bitmap
 //
 
-IDB_TOOLBAR16           BITMAP                  "..\\res\\Toolbar16.bmp"
-IDB_OPEN_FOLDER16       BITMAP                  "..\\res\\OpenFolder16.bmp"
+IDB_TOOLBAR16           BITMAP                  "..\\..\\matepath\\res\\Toolbar16.bmp"
+IDB_OPEN_FOLDER16       BITMAP                  "..\\..\\matepath\\res\\OpenFolder16.bmp"
 
 #if NP2_ENABLE_HIDPI_IMAGE_RESOURCE
-IDB_TOOLBAR24           BITMAP                  "..\\res\\Toolbar24.bmp"
-IDB_TOOLBAR32           BITMAP                  "..\\res\\Toolbar32.bmp"
-IDB_TOOLBAR40           BITMAP                  "..\\res\\Toolbar40.bmp"
-IDB_TOOLBAR48           BITMAP                  "..\\res\\Toolbar48.bmp"
+IDB_TOOLBAR24           BITMAP                  "..\\..\\matepath\\res\\Toolbar24.bmp"
+IDB_TOOLBAR32           BITMAP                  "..\\..\\matepath\\res\\Toolbar32.bmp"
+IDB_TOOLBAR40           BITMAP                  "..\\..\\matepath\\res\\Toolbar40.bmp"
+IDB_TOOLBAR48           BITMAP                  "..\\..\\matepath\\res\\Toolbar48.bmp"
 
-IDB_OPEN_FOLDER24       BITMAP                  "..\\res\\OpenFolder24.bmp"
-IDB_OPEN_FOLDER32       BITMAP                  "..\\res\\OpenFolder32.bmp"
-IDB_OPEN_FOLDER40       BITMAP                  "..\\res\\OpenFolder40.bmp"
-IDB_OPEN_FOLDER48       BITMAP                  "..\\res\\OpenFolder48.bmp"
+IDB_OPEN_FOLDER24       BITMAP                  "..\\..\\matepath\\res\\OpenFolder24.bmp"
+IDB_OPEN_FOLDER32       BITMAP                  "..\\..\\matepath\\res\\OpenFolder32.bmp"
+IDB_OPEN_FOLDER40       BITMAP                  "..\\..\\matepath\\res\\OpenFolder40.bmp"
+IDB_OPEN_FOLDER48       BITMAP                  "..\\..\\matepath\\res\\OpenFolder48.bmp"
 #endif // NP2_ENABLE_HIDPI_IMAGE_RESOURCE
 
 /////////////////////////////////////////////////////////////////////////////
@@ -87,12 +87,12 @@ IDB_OPEN_FOLDER48       BITMAP                  "..\\res\\OpenFolder48.bmp"
 //
 
 #if NP2_ENABLE_HIDPI_IMAGE_RESOURCE
-IDC_CROSSHAIR           CURSOR                  "..\\res\\Crosshair.cur"
+IDC_CROSSHAIR           CURSOR                  "..\\..\\matepath\\res\\Crosshair.cur"
 #else
-IDC_CROSSHAIR           CURSOR                  "..\\res\\Crosshair_min.cur"
+IDC_CROSSHAIR           CURSOR                  "..\\..\\matepath\\res\\Crosshair_min.cur"
 #endif
 
-//#endif // NP2_ENABLE_APP_LOCALIZATION_DLL
+#endif // NP2_ENABLE_APP_LOCALIZATION_DLL
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -644,7 +644,7 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
-#endif    // English (United States) resources
+#endif    // Slovenian (Slovenia) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -654,7 +654,7 @@ END
 //
 // Generated from the TEXTINCLUDE 3 resource.
 //
-#include "matepath.ver"
+#include "../../matepath/src/matepath.ver"
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
 

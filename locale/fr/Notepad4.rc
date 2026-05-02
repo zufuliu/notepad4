@@ -632,6 +632,7 @@ BEGIN
 				MENUITEM "Polski",					IDM_LANG_POLISH
 				MENUITEM "Portuguais (Brésil)",		IDM_LANG_PORTUGUESE_BRAZIL
 				MENUITEM "Русский",					IDM_LANG_RUSSIAN
+				MENUITEM "Slovenščina",				IDM_LANG_SLOVENIAN
 				MENUITEM "Japonais",					IDM_LANG_JAPANESE
 				MENUITEM "Coréen",					IDM_LANG_KOREAN
 				MENUITEM "Chinois traditionnel",				IDM_LANG_CHINESE_TRADITIONAL

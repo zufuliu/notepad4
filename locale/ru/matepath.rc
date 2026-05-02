@@ -616,6 +616,7 @@ BEGIN
 	IDS_LANG_FRENCH_FRANCE			"Français"
 	IDS_LANG_RUSSIAN				"Русский"
 	IDS_LANG_POLISH					"Polski"
+	IDS_LANG_SLOVENIAN				"Slovenščina"
 END
 #endif
 
