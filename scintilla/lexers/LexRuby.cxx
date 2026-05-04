@@ -1233,7 +1233,7 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 					// ?\x, including ?\\ is final.
 					const Sci_Position width = GetEscapeSequenceLength(styler, i + 1, chNext, chNext2);
 					i += width;
-					styler.ColorTo(std::min(i + 1, lengthDoc), state);
+					styler.ColorTo(sci::min(i + 1, lengthDoc), state);
 					state = SCE_RB_DEFAULT;
 					preferRE = false;
 					ch = chNext;
