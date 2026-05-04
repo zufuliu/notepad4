@@ -2466,8 +2466,8 @@ void MRUList::Empty(bool save, bool destroy) noexcept {
 
 void MRUList::Load() noexcept {
 	IniSectionParser section;
-	WCHAR *pIniSectionBuf = static_cast<WCHAR *>(NP2HeapAlloc(sizeof(WCHAR) * MAX_MRU_ITEM_SIZE * capacity));
-	const DWORD cchIniSection = static_cast<DWORD>(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
+	const DWORD cchIniSection = MAX_MRU_ITEM_SIZE * capacity;
+	WCHAR *pIniSectionBuf = static_cast<WCHAR *>(NP2HeapAlloc(sizeof(WCHAR) * cchIniSection));
 
 	section.Init(capacity);
 	LoadIniSection(szRegKey, pIniSectionBuf, cchIniSection);

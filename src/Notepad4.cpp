@@ -1903,7 +1903,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 	// Load toolbar labels
 	IniSectionParser section;
 	WCHAR *pIniSectionBuf = static_cast<WCHAR *>(NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_TOOLBAR_LABELS));
-	const DWORD cchIniSection = static_cast<DWORD>(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
+	constexpr DWORD cchIniSection = MAX_INI_SECTION_SIZE_TOOLBAR_LABELS;
 
 	section.Init(COUNTOF(tbbMainWnd));
 	LoadIniSection(INI_SECTION_NAME_TOOLBAR_LABELS, pIniSectionBuf, cchIniSection);
@@ -5080,7 +5080,7 @@ static void GetWindowPositionSectionName(HMONITOR hMonitor, WCHAR (&sectionName)
 void LoadSettings() noexcept {
 	IniSectionParser section;
 	WCHAR *pIniSectionBuf = static_cast<WCHAR *>(NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_SETTINGS));
-	const DWORD cchIniSection = static_cast<DWORD>(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
+	constexpr DWORD cchIniSection = MAX_INI_SECTION_SIZE_SETTINGS;
 	section.Init(128);
 
 	LoadIniSection(INI_SECTION_NAME_SETTINGS, pIniSectionBuf, cchIniSection);
@@ -6136,7 +6136,7 @@ void ParseCommandLine() noexcept {
 #if 0
 	FILE *fp = fopen("args-dump.txt", "wb");
 	fwrite("\xFF\xFE", 1, 2, fp);
-	fwrite(lpCmdLine, 1, cmdSize - 2, fp);
+	fwrite(lpCmdLine, 1, cmdSize - sizeof(WCHAR), fp);
 	fclose(fp);
 #endif
 
@@ -6240,7 +6240,7 @@ void ParseCommandLine() noexcept {
 void LoadFlags() noexcept {
 	IniSectionParser section;
 	WCHAR *pIniSectionBuf = static_cast<WCHAR *>(NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_FLAGS));
-	const DWORD cchIniSection = static_cast<DWORD>(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
+	constexpr DWORD cchIniSection = MAX_INI_SECTION_SIZE_FLAGS;
 	section.Init(64);
 
 	LoadIniSection(INI_SECTION_NAME_FLAGS, pIniSectionBuf, cchIniSection);

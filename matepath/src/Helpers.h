@@ -273,7 +273,7 @@ inline int GetBitmapResourceIdForCurrentDPI(int resourceId) noexcept {
 // https://blogs.msdn.microsoft.com/oldnewthing/20120316-00/?p=8083/
 #define NP2HeapAlloc(size)			HeapAlloc(g_hDefaultHeap, HEAP_ZERO_MEMORY, (size))
 #define NP2HeapFree(hMem)			HeapFree(g_hDefaultHeap, 0, (hMem))
-#define NP2HeapSize(hMem)			HeapSize(g_hDefaultHeap, 0, (hMem))
+// #define NP2HeapSize(hMem)			HeapSize(g_hDefaultHeap, 0, (hMem))
 
 extern WCHAR szIniFile[MAX_PATH];
 extern WCHAR szExeRealPath[MAX_PATH];
