@@ -71,7 +71,7 @@ static LPWSTR wchAppendLines;
 
 // see TransliterateText()
 static HMODULE hELSCoreDLL = nullptr;
-// see EditShowCharInfo()
+// see EditShowCharacterInfo()
 static HMODULE hICUDLL = nullptr;
 // reduce global CRT initializer and binary size,
 // static linked wcsftime() may behaviors different from system one.
@@ -2244,11 +2244,7 @@ using u_getPropertyValueNameSig = const char * (__cdecl *)(int property, int32_t
 	}
 
 	const WPARAM notifyPos = (static_cast<WPARAM>(position) << 2) | SC_NOTIFICATIONPOSITION_NONE;
-	callTipInfo.type = CallTipType_CharacterInfo;
-	SciCall_CallTipSetBack(callTipInfo.backColor);
-	SciCall_CallTipSetFore(callTipInfo.foreColor);
-	SciCall_CallTipUseStyle(CallTipTabWidthNotification);
-	SciCall_ShowNotification(notifyPos, buffer);
+	ShowNotificationA(notifyPos, buffer);
 
 	MultiByteToWideChar(CP_UTF8, 0, buffer, -1, wchBuf, COUNTOF(wchBuf));
 	SetClipData(hwndMain, wchBuf);

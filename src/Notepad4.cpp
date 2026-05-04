@@ -7860,6 +7860,7 @@ void SetNotifyIconTitle(HWND hwnd) noexcept {
 	Shell_NotifyIcon(NIM_MODIFY, &nid);
 }
 
+NP2_noinline
 void ShowNotificationA(WPARAM notifyPos, LPCSTR lpszText) noexcept {
 	callTipInfo.type = CallTipType_Notification;
 	SciCall_CallTipSetBack(callTipInfo.backColor);
@@ -7868,6 +7869,7 @@ void ShowNotificationA(WPARAM notifyPos, LPCSTR lpszText) noexcept {
 	SciCall_ShowNotification(notifyPos, lpszText);
 }
 
+NP2_noinline
 void ShowNotificationW(WPARAM notifyPos, LPCWSTR lpszText) noexcept {
 	const int cpEdit = SciCall_GetCodePage();
 	const int wchLen = lstrlen(lpszText);
@@ -7878,6 +7880,7 @@ void ShowNotificationW(WPARAM notifyPos, LPCWSTR lpszText) noexcept {
 	NP2HeapFree(cchText);
 }
 
+NP2_noinline
 void ShowNotificationMessage(WPARAM notifyPos, UINT uidMessage, ...) noexcept {
 	WCHAR wchFormat[1024];
 	WCHAR wchMessage[1024];
@@ -7894,12 +7897,7 @@ void ShowNotificationMessage(WPARAM notifyPos, UINT uidMessage, ...) noexcept {
 	wchFormat[0] = L'\0';
 	char * const lpszText = reinterpret_cast<char *>(wchFormat);
 	WideCharToMultiByte(cpEdit, 0, wchMessage, -1, lpszText, COUNTOF(wchFormat)*sizeof(WCHAR), nullptr, nullptr);
-
-	callTipInfo.type = CallTipType_Notification;
-	SciCall_CallTipSetBack(callTipInfo.backColor);
-	SciCall_CallTipSetFore(callTipInfo.foreColor);
-	SciCall_CallTipUseStyle(CallTipTabWidthNotification);
-	SciCall_ShowNotification(notifyPos, lpszText);
+	ShowNotificationA(notifyPos, lpszText);
 }
 
 //=============================================================================
