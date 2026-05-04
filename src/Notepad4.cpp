@@ -2351,6 +2351,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 		CMD_CTRLBACK,
 		CMD_CTRLDEL,
 		CMD_OPEN_CONTAINING_FOLDER,
+		CMD_CALCULATE,
 		CMD_OPEN_PATH_OR_LINK,
 		CMD_TIMESTAMPS,
 		IDM_EDIT_CLEARDOCUMENT,
@@ -3551,6 +3552,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_EDIT_XHTML_UNESCAPE_CHAR:
 		BeginWaitCursor();
 		EditUnescapeXHTMLChars(hwndEdit);
+		EndWaitCursor();
+		break;
+
+	case CMD_CALCULATE:
+		BeginWaitCursor();
+		EditCalculate();
 		EndWaitCursor();
 		break;
 

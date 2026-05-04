@@ -40,6 +40,9 @@
 #include "Styles.h"
 #include "Dialogs.h"
 #include "resource.h"
+#include <activscp.h>
+
+
 
 extern HWND hwndMain;
 extern HWND hwndEdit;
@@ -68,6 +71,8 @@ static LPWSTR wchPrefixSelection;
 static LPWSTR wchAppendSelection;
 static LPWSTR wchPrefixLines;
 static LPWSTR wchAppendLines;
+// {F414C260-6AC0-11CF-B6D1-00AA00BBBB58}
+static const CLSID CLSID_JScript = { 0xf414c260, 0x6ac0, 0x11cf, { 0xb6, 0xd1, 0x00, 0xaa, 0x00, 0xbb, 0xbb, 0x58 } };
 
 // see TransliterateText()
 static HMODULE hELSCoreDLL = nullptr;
@@ -1983,6 +1988,89 @@ void EditUnescapeXHTMLChars(HWND hwnd) noexcept {
 
 	NP2HeapFree(efr);
 	SciCall_EndBatchUpdate();
+}
+
+
+//=============================================================================
+//
+// EditCalculate()
+//
+
+// 2. Classe minima "Sito" per evitare il crash di JScript
+class MyActiveScriptSite : public IActiveScriptSite {
+public:
+	STDMETHOD_(ULONG, AddRef)() { return 1; }
+	STDMETHOD_(ULONG, Release)() { return 1; }
+	STDMETHOD(QueryInterface)(REFIID riid, void** ppv) {
+		if (riid == IID_IUnknown || riid == IID_IActiveScriptSite) {
+			*ppv = this; return S_OK;
+		}
+		*ppv = NULL; return E_NOINTERFACE;
+	}
+	STDMETHOD(GetLCID)(LCID* plcid) { return E_NOTIMPL; }
+	STDMETHOD(GetItemInfo)(LPCOLESTR, DWORD, IUnknown**, ITypeInfo**) { return TYPE_E_ELEMENTNOTFOUND; }
+	STDMETHOD(GetDocVersionString)(BSTR*) { return E_NOTIMPL; }
+	STDMETHOD(OnScriptTerminate)(const VARIANT*, const EXCEPINFO*) { return S_OK; }
+	STDMETHOD(OnStateChange)(SCRIPTSTATE) { return S_OK; }
+	STDMETHOD(OnScriptError)(IActiveScriptError*) { return S_OK; }
+	STDMETHOD(OnEnterScript)() { return S_OK; }
+	STDMETHOD(OnLeaveScript)() { return S_OK; }
+};
+
+void EditCalculate() noexcept {
+	Sci_Position count = SciCall_GetSelTextLength();
+	if (count == 0) {
+		return;
+	}
+	if (SciCall_IsRectangularSelection()) {
+		NotifyRectangularSelection();
+		return;
+	}
+	char* ch = static_cast<char*>(NP2HeapAlloc(count + 1));
+	if (!ch) return;
+	SciCall_GetSelText(ch);
+	// Convert in WideChar
+	int wlen = MultiByteToWideChar(CP_UTF8, 0, ch, -1, NULL, 0);
+	WCHAR* wExpression = static_cast<WCHAR*>(NP2HeapAlloc(wlen * sizeof(WCHAR)));
+	MultiByteToWideChar(CP_UTF8, 0, ch, -1, wExpression, wlen);
+	HRESULT hr = CoInitialize(NULL);
+	if (SUCCEEDED(hr)) {
+		IActiveScript* pJScript = nullptr;
+		if (SUCCEEDED(CoCreateInstance(CLSID_JScript, NULL, CLSCTX_INPROC_SERVER, IID_IActiveScript, (void**)&pJScript))) {
+			MyActiveScriptSite site; // Il nostro sito minimo
+			IActiveScriptParse* pParse = nullptr;
+			if (SUCCEEDED(pJScript->SetScriptSite(&site)) && 
+				SUCCEEDED(pJScript->QueryInterface(IID_IActiveScriptParse, (void**)&pParse))) {
+				pParse->InitNew();
+				VARIANT varRes;
+				VariantInit(&varRes);
+				EXCEPINFO ei = { 0 };
+				// Eexcute calc
+				hr = pParse->ParseScriptText(wExpression, NULL, NULL, NULL, 0, 0, SCRIPTTEXT_ISEXPRESSION, &varRes, &ei);
+				if (SUCCEEDED(hr)) {
+						VARIANT varDouble;
+						VariantInit(&varDouble);
+						// Force Double
+						if (SUCCEEDED(VariantChangeType(&varDouble, &varRes, 0, VT_R8))) {
+							char resBuffer[64];
+							// Convert number to string
+							_gcvt_s(resBuffer, sizeof(resBuffer), varDouble.dblVal, 10);
+							size_t outLen = strlen(resBuffer);
+							// Final decimal point cleaning
+							if (outLen > 0 && resBuffer[outLen - 1] == '.') resBuffer[--outLen] = '\0';
+							EditReplaceMainSelection((int)outLen, resBuffer);
+						}
+						VariantClear(&varRes);
+				}
+				pParse->Release();
+			}
+			pJScript->Close();
+			pJScript->Release();
+		}
+		CoUninitialize();
+	}
+	NP2HeapFree(wExpression);
+	NP2HeapFree(ch);
 }
 
 //=============================================================================
