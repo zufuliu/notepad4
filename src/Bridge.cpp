@@ -1382,6 +1382,13 @@ void EditFormatCode(int menu) noexcept {
 	}
 }
 
+#if defined(__MINGW32__)
+extern "C" const GUID __declspec(selectany) IID_IActiveScriptParse32 = // {BB1A2AE2-A4F9-11cf-8F20-00805F2CD064}
+{ 0xbb1a2ae2, 0xa4f9, 0x11cf, { 0x8f, 0x20, 0x00, 0x80, 0x5f, 0x2c, 0xd0, 0x64 }};
+extern "C" const GUID __declspec(selectany) IID_IActiveScriptParse64 = // {C7EF7658-E1EE-480E-97EA-D52CB4D76D17}
+{ 0xc7ef7658, 0xe1ee, 0x480e, { 0x97, 0xea, 0xd5, 0x2c, 0xb4, 0xd7, 0x6d, 0x17 }};
+#endif
+
 namespace {
 
 struct CalcContext final : IActiveScriptSite {
