@@ -1520,7 +1520,7 @@ void EditCalculateExpr() {
 						WCHAR szFinalCommand[2048]; 
 						// Use with(Math) to avoid writing it everywhere.
 						wsprintfW(szFinalCommand, L"with(Math){ eval(\"%s\") }", pszTextW);
-						// .replace() per supportare ^ come potenza
+						// .replace() to support ^
 						/*wsprintfW(szFinalCommand, 
 							L"(function(s){ "
 							L"  var str = s.replace(/([\\d.]+)\\s*\\^\\s*([\\d.]+)/g, 'pow($1,$2)'); "
