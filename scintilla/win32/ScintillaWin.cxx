@@ -2654,9 +2654,11 @@ sptr_t ScintillaWin::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		case WM_WINDOWPOSCHANGED:
 			return ::DefWindowProc(MainHWND(), msg, wParam, lParam);
 
-#if 0 // we don't use Scintilla as top level window
+#if 0 // we don't use Scintilla as top level window, monitor detection is already handled in MainWndProc()
+		case WM_NCPAINT:
 		case WM_WINDOWPOSCHANGED:
 			if (UpdateRenderingParams(false)) {
+				reverseArrowCursor.Invalidate();
 				DropGraphics();
 				Redraw();
 			}
@@ -2725,6 +2727,8 @@ sptr_t ScintillaWin::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		}
 	} catch (std::bad_alloc &) {
 		errorStatus = Status::BadAlloc;
+	} catch (Failure &failure) {
+		errorStatus = failure.status;
 	} catch (...) {
 		errorStatus = Status::Failure;
 	}

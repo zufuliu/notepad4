@@ -38,9 +38,10 @@ using FontMap = std::map<FontSpecification, std::unique_ptr<FontRealised>>;
 using ColourOptional = std::optional<ColourRGBA>;
 
 constexpr int GetFontSizeZoomed(int size, int zoomLevel) noexcept {
-	size = (size * zoomLevel + 50) / 100;
+	size = (size * zoomLevel + 50) / 100U;
 	// ensure sizeZoomed at least minimum positive size
-	return std::max(size, Scintilla::FontSizeMultiplier);
+	// Hangs if font height <= 1, so force minimum value
+	return std::max(size, 2*Scintilla::FontSizeMultiplier);
 }
 
 constexpr ColourOptional OptionalColour(uptr_t wParam, sptr_t lParam) {

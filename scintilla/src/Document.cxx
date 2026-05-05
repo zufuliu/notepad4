@@ -545,6 +545,13 @@ void SCI_METHOD Document::SetErrorStatus(int status) noexcept {
 	}
 }
 
+void Document::CheckPosition(Sci::Position pos) const {
+	PLATFORM_ASSERT(InRangeInclusive(pos, LengthNoExcept()));
+	if (!InRangeInclusive(pos, LengthNoExcept())) {
+		throw Failure(Status::OutsideDocument);
+	}
+}
+
 Sci_Line SCI_METHOD Document::LineFromPosition(Sci_Position pos) const noexcept {
 	return cb.LineFromPosition(pos);
 }
@@ -1379,6 +1386,7 @@ Sci::Position Document::InsertString(Sci::Position position, const char *s, Sci:
 	if (insertLength <= 0) {
 		return 0;
 	}
+	CheckPosition(position);
 	CheckReadOnly();	// Application may change read only state here
 	if (cb.IsReadOnly()) {
 		return 0;
@@ -3326,7 +3334,7 @@ Sci::Position Document::BraceMatch(Sci::Position position, Sci::Position /*maxRe
 
 	while (IsValidIndex(position, length)) {
 		const unsigned char chAtPos = cbView[position];
-		if (chAtPos == chBrace || chAtPos == chSeek) {
+		if (AnyOf(chAtPos, chBrace, chSeek)) {
 			if ((position > endStylePos || StyleIndexAt(position) == styBrace) &&
 				(chAtPos <= safeChar || position == MovePositionOutsideChar(position, direction, false))) {
 				depth += (chAtPos == chBrace) ? 1 : -1;
