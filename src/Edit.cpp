@@ -2008,8 +2008,8 @@ void EditUnescapeXHTMLChars(HWND hwnd) noexcept {
 #define MAX_UNICODE_HEX_DIGIT	8
 
 void EditCharacterToHex() noexcept {
-	Sci_Position count = SciCall_GetSelTextLength();
-	if (count == 0) {
+	Sci_Position iSelCount = SciCall_GetSelTextLength();
+	if (iSelCount == 0) {
 		return;
 	}
 	if (SciCall_IsRectangularSelection()) {
@@ -2017,36 +2017,35 @@ void EditCharacterToHex() noexcept {
 		return;
 	}
 
-	count *= 2 + BMP_UNICODE_HEX_DIGIT;
-	count += 1;
-	char *ch = static_cast<char *>(NP2HeapAlloc(count + 10));
-	WCHAR *wch = static_cast<WCHAR *>(NP2HeapAlloc(count * sizeof(WCHAR)));
-	SciCall_GetSelText(ch);
+	iSelCount *= MAX_UNICODE_HEX_DIGIT;
+	iSelCount = NP2_align_up(iSelCount + 1, MEMORY_ALLOCATION_ALIGNMENT);
+	char * const pszText = static_cast<char *>(NP2HeapAlloc(iSelCount * (sizeof(char) + sizeof(WCHAR))));
+	SciCall_GetSelText(pszText);
 
 	int outLen = 0;
-	if (ch[0] == '\0') {
+	if (pszText[0] == '\0') {
 		outLen = 4;
-		StrCpyEx(ch, "\\x00");
+		StrCpyEx(pszText, "\\x00");
 	} else {
+		WCHAR * const pszTextW = reinterpret_cast<WCHAR *>(pszText + iSelCount);
 		const UINT cpEdit = SciCall_GetCodePage();
-		count = MultiByteToWideChar(cpEdit, 0, ch, -1, wch, static_cast<int>(count)) - 1; // '\0'
+		const int count = MultiByteToWideChar(cpEdit, 0, pszText, -1, pszTextW, static_cast<int>(iSelCount)) - 1; // '\0'
 		for (Sci_Position i = 0; i < count; i++) {
-			const WCHAR c = wch[i];
+			const WCHAR c = pszTextW[i];
 			if (c <= 0xFF) {
-				outLen += sprintf(ch + outLen, "\\x%02X", c); // \xHH
+				outLen += sprintf(pszText + outLen, "\\x%02X", c); // \xHH
 			} else {
-				outLen += sprintf(ch + outLen, "\\u%04X", c); // \uHHHH
+				outLen += sprintf(pszText + outLen, "\\u%04X", c); // \uHHHH
 			}
 		}
-		if (count == 2 && IS_SURROGATE_PAIR(wch[0], wch[1])) {
-			const UINT value = UTF16_TO_UTF32(wch[0], wch[1]);
-			outLen += sprintf(ch + outLen, " U+%06X", value);
+		if (count == 2 && IS_SURROGATE_PAIR(pszTextW[0], pszTextW[1])) {
+			const UINT value = UTF16_TO_UTF32(pszTextW[0], pszTextW[1]);
+			outLen += sprintf(pszText + outLen, " U+%06X", value);
 		}
 	}
 
-	EditReplaceMainSelection(outLen, ch);
-	NP2HeapFree(ch);
-	NP2HeapFree(wch);
+	EditReplaceMainSelection(outLen, pszText);
+	NP2HeapFree(pszText);
 }
 
 //=============================================================================
@@ -2054,8 +2053,8 @@ void EditCharacterToHex() noexcept {
 // EditHex2Char()
 //
 void EditHexToCharacter() noexcept {
-	Sci_Position count = SciCall_GetSelTextLength();
-	if (count == 0) {
+	Sci_Position iSelCount = SciCall_GetSelTextLength();
+	if (iSelCount == 0) {
 		return;
 	}
 	if (SciCall_IsRectangularSelection()) {
@@ -2063,17 +2062,17 @@ void EditHexToCharacter() noexcept {
 		return;
 	}
 
-	count *= 2 + BMP_UNICODE_HEX_DIGIT;
-	count += 1;
-	char *ch = static_cast<char *>(NP2HeapAlloc(count));
-	WCHAR *wch = static_cast<WCHAR *>(NP2HeapAlloc(count * sizeof(WCHAR)));
+	iSelCount *= MAX_UNICODE_HEX_DIGIT;
+	iSelCount = NP2_align_up(iSelCount + 1, MEMORY_ALLOCATION_ALIGNMENT);
+	char * const pszText = static_cast<char *>(NP2HeapAlloc(iSelCount * (sizeof(char) + sizeof(WCHAR))));
+	WCHAR * const pszTextW = reinterpret_cast<WCHAR *>(pszText + iSelCount);
+
+	SciCall_GetSelText(pszText);
 	const UINT cpEdit = SciCall_GetCodePage();
+	MultiByteToWideChar(cpEdit, 0, pszText, -1, pszTextW, static_cast<int>(iSelCount));
 
-	SciCall_GetSelText(ch);
-	MultiByteToWideChar(cpEdit, 0, ch, -1, wch, static_cast<int>(count));
-
-	const WCHAR *p = wch;
-	WCHAR *t = wch;
+	const WCHAR *p = pszTextW;
+	WCHAR *t = pszTextW;
 	bool changed = false;
 	while (*p) {
 		UINT wc = *p++;
@@ -2108,17 +2107,16 @@ void EditHexToCharacter() noexcept {
 
 	if (changed) {
 		*t = L'\0';
-		count = WideCharToMultiByte(cpEdit, 0, wch, static_cast<int>(t - wch), ch, static_cast<int>(count), nullptr, nullptr);
-		EditReplaceMainSelection(count, ch);
+		iSelCount = WideCharToMultiByte(cpEdit, 0, pszTextW, static_cast<int>(t - pszTextW), pszText, static_cast<int>(iSelCount), nullptr, nullptr);
+		EditReplaceMainSelection(iSelCount, pszText);
 	}
 
-	NP2HeapFree(ch);
-	NP2HeapFree(wch);
+	NP2HeapFree(pszText);
 }
 
 void EditShowHex() noexcept {
-	const Sci_Position count = SciCall_GetSelTextLength();
-	if (count == 0) {
+	const Sci_Position iSelCount = SciCall_GetSelTextLength();
+	if (iSelCount == 0) {
 		return;
 	}
 	if (SciCall_IsRectangularSelection()) {
@@ -2126,12 +2124,13 @@ void EditShowHex() noexcept {
 		return;
 	}
 
-	char *ch = static_cast<char *>(NP2HeapAlloc(count + 1));
-	char *cch = static_cast<char *>(NP2HeapAlloc(count * 3 + 3));
-	SciCall_GetSelBytes(ch);
-	const uint8_t *p = reinterpret_cast<const uint8_t *>(ch);
-	const uint8_t * const end = p + count;
-	char *t = cch;
+	const size_t allocSize = NP2_align_up(iSelCount + 1, MEMORY_ALLOCATION_ALIGNMENT);
+	char *pszText = static_cast<char *>(NP2HeapAlloc(allocSize * 4));
+	char *pszOut = pszText + allocSize;
+	SciCall_GetSelBytes(pszText);
+	const uint8_t *p = reinterpret_cast<const uint8_t *>(pszText);
+	const uint8_t * const end = p + iSelCount;
+	char *t = pszOut;
 	*t++ = '[';
 	do {
 		const uint8_t c = *p++;
@@ -2142,10 +2141,9 @@ void EditShowHex() noexcept {
 	t[-1] = ']';
 
 	const Sci_Position iSelEnd = SciCall_GetSelectionEnd();
-	SciCall_InsertText(iSelEnd, cch);
-	SciCall_SetSel(iSelEnd, iSelEnd + (t - cch));
-	NP2HeapFree(ch);
-	NP2HeapFree(cch);
+	SciCall_InsertText(iSelEnd, pszOut);
+	SciCall_SetSel(iSelEnd, iSelEnd + (t - pszOut));
+	NP2HeapFree(pszText);
 }
 
 void EditShowCharacterInfo() noexcept {
@@ -2257,8 +2255,8 @@ using u_getPropertyValueNameSig = const char * (__cdecl *)(int property, int32_t
 }
 
 void EditBase64Encode(Base64EncodingFlag encodingFlag) noexcept {
-	const size_t len = SciCall_GetSelTextLength();
-	if (len == 0) {
+	const size_t iSelByte = SciCall_GetSelTextLength();
+	if (iSelByte == 0) {
 		return;
 	}
 	if (SciCall_IsRectangularSelection()){
@@ -2266,10 +2264,11 @@ void EditBase64Encode(Base64EncodingFlag encodingFlag) noexcept {
 		return;
 	}
 
-	char *input = static_cast<char *>(NP2HeapAlloc(len + 1));
+	const size_t allocSize = NP2_align_up(iSelByte + 1, MEMORY_ALLOCATION_ALIGNMENT);
+	size_t outLen = (allocSize*4)/3 + 4 + MAX_PATH*2;
+	char * const input = static_cast<char *>(NP2HeapAlloc(allocSize + outLen));
 	SciCall_GetSelBytes(input);
-	size_t outLen = (len*4)/3 + 4 + MAX_PATH*2;
-	char *output = static_cast<char *>(NP2HeapAlloc(outLen));
+	char * const output = input + allocSize;
 	outLen = 0;
 	if (encodingFlag == Base64EncodingFlag_HtmlEmbeddedImage) {
 		memcpy(output, "<img src=\"data:image/", CSTRLEN("<img src=\"data:image/"));
@@ -2285,7 +2284,7 @@ void EditBase64Encode(Base64EncodingFlag encodingFlag) noexcept {
 		memcpy(output + outLen, ";base64,", CSTRLEN(";base64,"));
 		outLen += CSTRLEN(";base64,");
 	}
-	outLen += Base64Encode(output + outLen, reinterpret_cast<const uint8_t *>(input), len, encodingFlag == Base64EncodingFlag_UrlSafe);
+	outLen += Base64Encode(output + outLen, reinterpret_cast<const uint8_t *>(input), iSelByte, encodingFlag == Base64EncodingFlag_UrlSafe);
 	if (encodingFlag == Base64EncodingFlag_HtmlEmbeddedImage) {
 		memcpy(output + outLen, "\" />", CSTRLEN("\" />"));
 		outLen += CSTRLEN("\" />");
@@ -2293,12 +2292,11 @@ void EditBase64Encode(Base64EncodingFlag encodingFlag) noexcept {
 
 	EditReplaceMainSelection(outLen, output);
 	NP2HeapFree(input);
-	NP2HeapFree(output);
 }
 
 void EditBase64Decode(bool decodeAsHex) noexcept {
-	size_t len = SciCall_GetSelTextLength();
-	if (len == 0) {
+	size_t iSelByte = SciCall_GetSelTextLength();
+	if (iSelByte == 0) {
 		return;
 	}
 	if (SciCall_IsRectangularSelection()){
@@ -2306,18 +2304,18 @@ void EditBase64Decode(bool decodeAsHex) noexcept {
 		return;
 	}
 
-	char *input = static_cast<char *>(NP2HeapAlloc(len + 1));
+	const size_t allocSize = NP2_align_up(iSelByte + 1, MEMORY_ALLOCATION_ALIGNMENT);
+	size_t outLen = (allocSize*3)/4 + 4;
+	char *input = static_cast<char *>(NP2HeapAlloc(allocSize + outLen));
 	SciCall_GetSelText(input);
-	size_t outLen = (len*3)/4 + 4;
-	uint8_t *output = static_cast<uint8_t *>(NP2HeapAlloc(outLen));
-	outLen = Base64Decode(output, reinterpret_cast<const uint8_t *>(input), len);
-	NP2HeapFree(input);
+	uint8_t *output = reinterpret_cast<uint8_t *>(input + allocSize);
+	outLen = Base64Decode(output, reinterpret_cast<const uint8_t *>(input), iSelByte);
 	if (outLen != 0) {
 		if(decodeAsHex) {
 			const int iEOLMode = SciCall_GetEOLMode();
-			len = outLen*3 + outLen/8;
-			input = static_cast<char *>(NP2HeapAlloc(len + 1));
-			char *t = input;
+			iSelByte = outLen*3 + outLen/8 + 1;
+			char *pszOut = static_cast<char *>(NP2HeapAlloc(iSelByte));
+			char *t = pszOut;
 			size_t i = 0;
 			do {
 				const uint8_t c = output[i++];
@@ -2343,13 +2341,14 @@ void EditBase64Decode(bool decodeAsHex) noexcept {
 			if ((i & 15) != 0) {
 				--t;
 			}
-			outLen = t - input;
-			NP2HeapFree(output);
-			output = reinterpret_cast<uint8_t *>(input);
+			outLen = t - pszOut;
+			NP2HeapFree(input);
+			input = pszOut;
+			output = reinterpret_cast<uint8_t *>(pszOut);
 		}
 		EditReplaceMainSelection(outLen, reinterpret_cast<char *>(output));
 	}
-	NP2HeapFree(output);
+	NP2HeapFree(input);
 }
 
 //=============================================================================
@@ -2419,8 +2418,8 @@ static int ConvertNumRadix(char *tch, uint64_t num, int radix) noexcept {
 }
 
 void EditConvertNumRadix(int radix) noexcept {
-	const Sci_Position count = SciCall_GetSelTextLength();
-	if (count == 0) {
+	Sci_Position iSelCount = SciCall_GetSelTextLength();
+	if (iSelCount == 0) {
 		return;
 	}
 	if (SciCall_IsRectangularSelection()) {
@@ -2434,13 +2433,15 @@ void EditConvertNumRadix(int radix) noexcept {
 	radix -= IDM_EDIT_NUM2BIN;
 	radix = (radix == 1) ? 10 : (2 << radix);
 
-	char *ch = static_cast<char *>(NP2HeapAlloc(count + 1));
-	char *tch = static_cast<char *>(NP2HeapAlloc(2 + count * 4 + 8 + 1));
+	iSelCount = NP2_align_up(iSelCount + 1, MEMORY_ALLOCATION_ALIGNMENT);
+	const size_t outLen = (iSelCount*5) + 16; // 0xFF => 0b1111_1111
+	char * const pszText = static_cast<char *>(NP2HeapAlloc(iSelCount + outLen));
+	char * const pszOut = pszText + iSelCount;
 	Sci_Position cch = 0;
-	char *p = ch;
+	const char *p = pszText;
 	uint64_t value = 0;
 
-	SciCall_GetSelText(ch);
+	SciCall_GetSelText(pszText);
 
 	while (*p) {
 		if (*p == '0') {
@@ -2461,7 +2462,7 @@ void EditConvertNumRadix(int radix) noexcept {
 						p++;
 					}
 				}
-				cch += ConvertNumRadix(tch + cch, value, radix);
+				cch += ConvertNumRadix(pszOut + cch, value, radix);
 			} else if (prefix == 'o' && radix != 8) {
 				p++;
 				while (*p) {
@@ -2474,7 +2475,7 @@ void EditConvertNumRadix(int radix) noexcept {
 						break;
 					}
 				}
-				cch += ConvertNumRadix(tch + cch, value, radix);
+				cch += ConvertNumRadix(pszOut + cch, value, radix);
 			} else if (prefix == 'b' && radix != 2) {
 				p++;
 				while (*p) {
@@ -2491,7 +2492,7 @@ void EditConvertNumRadix(int radix) noexcept {
 						break;
 					}
 				}
-				cch += ConvertNumRadix(tch + cch, value, radix);
+				cch += ConvertNumRadix(pszOut + cch, value, radix);
 			} else if ((*p >= '0' && *p <= '9') && radix != 10) {
 				value = *p++ - '0';
 				while (*p) {
@@ -2504,9 +2505,9 @@ void EditConvertNumRadix(int radix) noexcept {
 						break;
 					}
 				}
-				cch += ConvertNumRadix(tch + cch, value, radix);
+				cch += ConvertNumRadix(pszOut + cch, value, radix);
 			} else {
-				tch[cch++] = '0';
+				pszOut[cch++] = '0';
 			}
 		} else if ((*p >= '1' && *p <= '9') && radix != 10) {
 			value = *p++ - '0';
@@ -2520,22 +2521,21 @@ void EditConvertNumRadix(int radix) noexcept {
 					break;
 				}
 			}
-			cch += ConvertNumRadix(tch + cch, value, radix);
+			cch += ConvertNumRadix(pszOut + cch, value, radix);
 		} else if (IsAlphaNumeric(*p) || *p == '_') {
 			// radix and number prefix matches, no conversion
-			tch[cch++] = *p++;
+			pszOut[cch++] = *p++;
 			while (IsAlphaNumeric(*p) || *p == '_') {
-				tch[cch++] = *p++;
+				pszOut[cch++] = *p++;
 			}
 		} else {
-			tch[cch++] = *p++;
+			pszOut[cch++] = *p++;
 		}
 	}
-	tch[cch] = '\0';
+	pszOut[cch] = '\0';
 
-	EditReplaceMainSelection(cch, tch);
-	NP2HeapFree(ch);
-	NP2HeapFree(tch);
+	EditReplaceMainSelection(cch, pszOut);
+	NP2HeapFree(pszText);
 }
 
 //=============================================================================
@@ -3835,7 +3835,7 @@ void EditCompressSpaces() noexcept {
 	const char * const end = pszIn + iSelCount;
 	char *co = pszIn;
 	bool bModified = false;
-	for (char *ci = pszIn; ci < end;) {
+	for (const char *ci = pszIn; ci < end;) {
 		const char ch = *ci++;
 		if (ch != ' ' && ch != '\t') {
 			chPrev = ch;
