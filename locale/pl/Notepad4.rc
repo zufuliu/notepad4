@@ -727,7 +727,7 @@ BEGIN
 			MENUITEM "&Otwórz plik, folder, link, itp.",	CMD_OPEN_PATH_OR_LINK
 			MENUITEM "Otwórz &folder zawierający ten dokument",CMD_OPEN_CONTAINING_FOLDER
 			MENUITEM SEPARATOR
-			MENUITEM "&Calculate Expression",				CMD_CALCULATE_EXPR
+			MENUITEM "O&blicz wyrażenie",				CMD_CALCULATE_EXPR
 			MENUITEM SEPARATOR
 			MENUITEM "Wyszukaj przy użyciu &Google",		CMD_ONLINE_SEARCH_GOOGLE
 			MENUITEM "Wyszukaj przy użyciu &Bing",			CMD_ONLINE_SEARCH_BING
@@ -768,7 +768,7 @@ BEGIN
 			MENUITEM "&Skompresuj &kod CSS/JS/JSON",		IDM_EDIT_CODE_COMPRESS
 			MENUITEM "&Popraw formatowanie CSS/JS/JSON",	IDM_EDIT_CODE_PRETTY
 			MENUITEM SEPARATOR
-			MENUITEM "&Evaluate JS Expression",				CMD_EVALUATE_JS_EXPR
+			MENUITEM "&Wyznacz wartość wyrażenia JS",			CMD_EVALUATE_JS_EXPR
 			MENUITEM "Zamień znaki na encje HTML/&XML\tAlt+Shift+X",IDM_EDIT_XHTML_ESCAPE_CHAR
 			MENUITEM "Zamień encje &HTML/XML na znaki\tAlt+Shift+H",IDM_EDIT_XHTML_UNESCAPE_CHAR
 			MENUITEM SEPARATOR
