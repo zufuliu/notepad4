@@ -1395,6 +1395,7 @@ struct CalcContext final : IActiveScriptSite {
 	LPSTR pszText;
 	size_t textLength;
 	UINT cpEdit;
+	ULONG lineOffset;
 
 	// IUnknown
 	STDMETHODIMP QueryInterface(REFIID riid, PVOID *ppv) noexcept override {
@@ -1446,12 +1447,12 @@ struct CalcContext final : IActiveScriptSite {
 			LONG column = 0;
 			scriptError->GetSourcePosition(nullptr, &line, &column);
 			Sci_Position iSelStart = SciCall_GetSelectionStart();
-			if (line != 0) {
-				iSelStart = SciCall_LineFromPosition(iSelStart) + line;
+			if (line > lineOffset) {
+				iSelStart = SciCall_LineFromPosition(iSelStart) + line - lineOffset;
 				iSelStart = SciCall_PositionFromLine(iSelStart);
 			}
 			iSelStart += column;
-			const WPARAM notifyPos =(static_cast<WPARAM>(iSelStart) << 2) | SC_NOTIFICATIONPOSITION_NONE;
+			const WPARAM notifyPos = (static_cast<WPARAM>(iSelStart) << 2) | SC_NOTIFICATIONPOSITION_NONE;
 			ShowNotificationA(notifyPos, pszText);
 		}
 		return S_OK;
@@ -1460,7 +1461,7 @@ struct CalcContext final : IActiveScriptSite {
 
 }
 
-void EditCalculateExpr() {
+void EditCalculateExpr(int menu) {
 	Sci_Position iSelCount = SciCall_GetSelTextLength();
 	if (iSelCount == 0) {
 		return;
@@ -1489,10 +1490,12 @@ void EditCalculateExpr() {
 		return;
 	}
 
+	constexpr size_t padding = 1024 * sizeof(WCHAR); // for CMD_CALCULATE_EXPR
 	iSelCount = NP2_align_up(iSelCount + 1, MEMORY_ALLOCATION_ALIGNMENT);
 	iSelCount = max<Sci_Position>(iSelCount, 1024); // increased to store result and error message
 	CalcContext context;
-	context.textLength = iSelCount * (sizeof(char) + sizeof(WCHAR));
+	context.textLength = (iSelCount * (sizeof(char) + sizeof(WCHAR)*2)) + padding;
+	context.lineOffset = 0;
 	context.pszText = static_cast<char *>(NP2HeapAlloc(context.textLength));
 	context.cpEdit = SciCall_GetCodePage();
 
@@ -1517,7 +1520,20 @@ void EditCalculateExpr() {
 						WCHAR * const pszTextW = reinterpret_cast<LPWSTR>(pszText + iSelCount);
 						SciCall_GetSelText(pszText);
 						MultiByteToWideChar(context.cpEdit, 0, pszText, -1, pszTextW, static_cast<int>(iSelCount));
-						hr = scriptParse->ParseScriptText(pszTextW, nullptr, nullptr, nullptr, 0, 0, SCRIPTTEXT_ISEXPRESSION, &result, nullptr);
+						LPWSTR pszBuf = pszTextW;
+						if (menu == CMD_CALCULATE_EXPR) {
+							context.lineOffset = 1;
+							pszBuf += iSelCount;
+							// Use with(Math) to avoid writing it everywhere.
+							wsprintf(pszBuf, L"with(Math){eval(\n%s)}", pszTextW);
+							// regex replace() to support pow operator ^
+							/*wsprintf(pszBuf,
+								L"(function(s){"
+								L"var str = s.replace(/([\\d.]+)\\s*\\^\\s*([\\d.]+)/g, 'pow($1,$2)');"
+								L"with(Math){return eval(str);}"
+								L"})('%s')", pszTextW);*/
+						}
+						hr = scriptParse->ParseScriptText(pszBuf, nullptr, nullptr, nullptr, 0, 0, SCRIPTTEXT_ISEXPRESSION, &result, nullptr);
 						if (SUCCEEDED(hr)) {
 							pszTextW[0] = L'\0';
 							hr = pfnVariantToString(result, pszTextW, static_cast<UINT>(iSelCount));

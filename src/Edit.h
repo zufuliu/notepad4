@@ -152,7 +152,7 @@ void	EditEscapeCChars(HWND hwnd) noexcept;
 void	EditUnescapeCChars(HWND hwnd) noexcept;
 void	EditEscapeXHTMLChars(HWND hwnd) noexcept;
 void	EditUnescapeXHTMLChars(HWND hwnd) noexcept;
-void	EditCalculateExpr();
+void	EditCalculateExpr(int menu);
 void	EditCharacterToHex() noexcept;
 void	EditHexToCharacter() noexcept;
 void	EditShowHex() noexcept;
