@@ -1517,7 +1517,16 @@ void EditCalculateExpr() {
 						WCHAR * const pszTextW = reinterpret_cast<LPWSTR>(pszText + iSelCount);
 						SciCall_GetSelText(pszText);
 						MultiByteToWideChar(context.cpEdit, 0, pszText, -1, pszTextW, static_cast<int>(iSelCount));
-						hr = scriptParse->ParseScriptText(pszTextW, nullptr, nullptr, nullptr, 0, 0, SCRIPTTEXT_ISEXPRESSION, &result, nullptr);
+						WCHAR szFinalCommand[2048]; 
+						// Use with(Math) to avoid writing it everywhere.
+						wsprintfW(szFinalCommand, L"with(Math){ eval(\"%s\") }", pszTextW);
+						// .replace() per supportare ^ come potenza
+						/*wsprintfW(szFinalCommand, 
+							L"(function(s){ "
+							L"  var str = s.replace(/([\\d.]+)\\s*\\^\\s*([\\d.]+)/g, 'pow($1,$2)'); "
+							L"  with(Math){ return eval(str); } "
+							L"})('%s')", pszTextW);*/
+						hr = scriptParse->ParseScriptText(szFinalCommand, nullptr, nullptr, nullptr, 0, 0, SCRIPTTEXT_ISEXPRESSION, &result, nullptr);
 						if (SUCCEEDED(hr)) {
 							pszTextW[0] = L'\0';
 							hr = pfnVariantToString(result, pszTextW, static_cast<UINT>(iSelCount));
