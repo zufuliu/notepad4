@@ -727,6 +727,8 @@ BEGIN
 			MENUITEM "&Apri File, Cartella, Link, ecc...",		CMD_OPEN_PATH_OR_LINK
 			MENUITEM "Apri &cartella contenente",				CMD_OPEN_CONTAINING_FOLDER
 			MENUITEM SEPARATOR
+			MENUITEM "&Calculate Expression",				CMD_CALCULATE_EXPR
+			MENUITEM SEPARATOR
 			MENUITEM "Cerca con &Google",					CMD_ONLINE_SEARCH_GOOGLE
 			MENUITEM "Cerca con &Bing",					CMD_ONLINE_SEARCH_BING
 			MENUITEM "Cerca con &Wikipedia",				CMD_ONLINE_SEARCH_WIKI

@@ -73,6 +73,8 @@ static LPWSTR wchAppendLines;
 static HMODULE hELSCoreDLL = nullptr;
 // see EditShowCharacterInfo()
 static HMODULE hICUDLL = nullptr;
+// see EditCalculateExpr()
+HMODULE hPropSysDLL = nullptr;
 // reduce global CRT initializer and binary size,
 // static linked wcsftime() may behaviors different from system one.
 #define NP2_DYNAMIC_LOAD_wcsftime	1
@@ -104,6 +106,9 @@ void Edit_ReleaseResources() noexcept {
 	}
 	if (hICUDLL != nullptr) {
 		FreeLibrary(hICUDLL);
+	}
+	if (hPropSysDLL != nullptr) {
+		FreeLibrary(hPropSysDLL);
 	}
 #if NP2_DYNAMIC_LOAD_wcsftime
 	if (hCrtDLL) {

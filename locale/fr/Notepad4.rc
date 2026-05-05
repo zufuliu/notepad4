@@ -727,6 +727,8 @@ BEGIN
 			MENUITEM "&Ouvrir un fichier, dossier, lien, etc.",		CMD_OPEN_PATH_OR_LINK
 			MENUITEM "Ouvrir le répertoire contenant",				CMD_OPEN_CONTAINING_FOLDER
 			MENUITEM SEPARATOR
+			MENUITEM "&Calculate Expression",				CMD_CALCULATE_EXPR
+			MENUITEM SEPARATOR
 			MENUITEM "Rechercher avec &Google",					CMD_ONLINE_SEARCH_GOOGLE
 			MENUITEM "Rechercher avec &Bing",					CMD_ONLINE_SEARCH_BING
 			MENUITEM "Rechercher avec &Wikipedia",				CMD_ONLINE_SEARCH_WIKI

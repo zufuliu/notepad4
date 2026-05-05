@@ -2401,6 +2401,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 		CMD_ONLINE_SEARCH_BING,
 		CMD_ONLINE_SEARCH_GOOGLE,
 		CMD_ONLINE_SEARCH_WIKI,
+		CMD_CALCULATE_EXPR,
 		IDM_EDIT_BASE64_DECODE,
 		IDM_EDIT_BASE64_DECODE_AS_HEX,
 		IDM_EDIT_BASE64_ENCODE,
@@ -4503,6 +4504,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 	case CMD_OPEN_CONTAINING_FOLDER:
 		EditOpenSelection(OpenSelectionType_ContainingFolder);
+		break;
+	case CMD_CALCULATE_EXPR:
+		EditCalculateExpr();
 		break;
 
 	case CMD_ONLINE_SEARCH_GOOGLE:

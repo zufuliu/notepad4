@@ -728,6 +728,8 @@ BEGIN
 			MENUITEM "&Открыть файл, папку, ссылку и др.",						CMD_OPEN_PATH_OR_LINK
 			MENUITEM "Открыть &папку с файлом",							CMD_OPEN_CONTAINING_FOLDER
 			MENUITEM SEPARATOR
+			MENUITEM "&Calculate Expression",				CMD_CALCULATE_EXPR
+			MENUITEM SEPARATOR
 			MENUITEM "Найти в &Google",								CMD_ONLINE_SEARCH_GOOGLE
 			MENUITEM "Найти в &Bing",								CMD_ONLINE_SEARCH_BING
 			MENUITEM "Найти в &Википедии",								CMD_ONLINE_SEARCH_WIKI

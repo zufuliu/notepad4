@@ -26,6 +26,7 @@
 #include <shellapi.h>
 #include <commctrl.h>
 #include <commdlg.h>
+#include <activscp.h>
 #include <string>
 #include <string_view>
 #include <memory>
@@ -48,6 +49,7 @@ extern int iPrintZoom;
 extern RECT pageSetupMargin;
 extern HWND hwndStatus;
 extern WCHAR defaultTextFontName[LF_FACESIZE];
+extern HMODULE hPropSysDLL;
 
 namespace {
 
@@ -1378,4 +1380,157 @@ void EditFormatCode(int menu) noexcept {
 	} catch (...) {
 		// ignore
 	}
+}
+
+namespace {
+
+struct CalcContext final : IActiveScriptSite {
+	LPSTR pszText;
+	size_t textLength;
+	UINT cpEdit;
+
+	// IUnknown
+	STDMETHODIMP QueryInterface(REFIID riid, PVOID *ppv) noexcept override {
+		if (riid == IID_IUnknown || riid == IID_IActiveScriptSite) {
+			*ppv = this;
+			AddRef();
+			return S_OK;
+		}
+		*ppv = nullptr;
+		return E_NOINTERFACE;
+	}
+	STDMETHODIMP_(ULONG) AddRef() noexcept override {
+		return 1;
+	}
+	STDMETHODIMP_(ULONG) Release() noexcept override {
+		return 1;
+	}
+
+	// IActiveScriptSite
+	STDMETHODIMP GetLCID(LCID *lcid) noexcept override {
+		*lcid = LOCALE_USER_DEFAULT;
+		return S_OK;
+	}
+	STDMETHODIMP GetDocVersionString(BSTR *ver) noexcept override {
+		*ver = nullptr;
+		return S_OK;
+	}
+	STDMETHODIMP OnScriptTerminate(const VARIANT * /*result*/, const EXCEPINFO * /*excepInfo*/) noexcept override {
+		return S_OK;
+	}
+	STDMETHODIMP OnStateChange(SCRIPTSTATE /*scriptState*/) noexcept override {
+		return S_OK;
+	}
+	STDMETHODIMP OnEnterScript() noexcept override {
+		return S_OK;
+	}
+	STDMETHODIMP OnLeaveScript() noexcept override {
+		return S_OK;
+	}
+	STDMETHODIMP GetItemInfo(const WCHAR * /*strName*/, DWORD /*dwReturnMask*/, IUnknown ** /*ppItem*/, ITypeInfo ** /*ppti*/) noexcept override {
+		return S_OK;
+	}
+	STDMETHODIMP OnScriptError(IActiveScriptError *scriptError) override {
+		EXCEPINFO excepInfo{};
+		const HRESULT hr = scriptError->GetExceptionInfo(&excepInfo);
+		if (SUCCEEDED(hr) && excepInfo.bstrDescription) {
+			WideCharToMultiByte(cpEdit, 0, excepInfo.bstrDescription, -1, pszText, static_cast<int>(textLength), nullptr, nullptr);
+			ULONG line = 0;
+			LONG column = 0;
+			scriptError->GetSourcePosition(nullptr, &line, &column);
+			Sci_Position iSelStart = SciCall_GetSelectionStart();
+			if (line != 0) {
+				iSelStart = SciCall_LineFromPosition(iSelStart) + line;
+				iSelStart = SciCall_PositionFromLine(iSelStart);
+			}
+			iSelStart += column;
+			const WPARAM notifyPos =(static_cast<WPARAM>(iSelStart) << 2) | SC_NOTIFICATIONPOSITION_NONE;
+			ShowNotificationA(notifyPos, pszText);
+		}
+		return S_OK;
+	}
+};
+
+}
+
+void EditCalculateExpr() {
+	Sci_Position iSelCount = SciCall_GetSelTextLength();
+	if (iSelCount == 0) {
+		return;
+	}
+	if (SciCall_IsRectangularSelection()) {
+		// NotifyRectangularSelection();
+		MsgBoxWarn(MB_OK, IDS_SELRECT);
+		return;
+	}
+
+	using VariantToStringSig = HRESULT (WINAPI *)(REFVARIANT varIn, PWSTR pszBuf, UINT cchBuf);
+	static VariantToStringSig pfnVariantToString = nullptr;
+	static uint8_t triedLoadingPropSys = 0;
+	if (triedLoadingPropSys == 0) {
+		triedLoadingPropSys = 1;
+		HMODULE hDLL = LoadLibraryExW(L"propsys.dll", nullptr, kSystemLibraryLoadFlags);
+		pfnVariantToString = DLLFunction<VariantToStringSig>(hDLL, "VariantToString");
+		if (pfnVariantToString == nullptr) {
+			FreeLibrary(hDLL);
+			return;
+		}
+		triedLoadingPropSys = 2;
+		hPropSysDLL = hDLL;
+	}
+	if (triedLoadingPropSys != 2) {
+		return;
+	}
+
+	iSelCount = NP2_align_up(iSelCount + 1, MEMORY_ALLOCATION_ALIGNMENT);
+	iSelCount = max<Sci_Position>(iSelCount, 1024); // increased to store result and error message
+	CalcContext context;
+	context.textLength = iSelCount * (sizeof(char) + sizeof(WCHAR));
+	context.pszText = static_cast<char *>(NP2HeapAlloc(context.textLength));
+	context.cpEdit = SciCall_GetCodePage();
+
+	CLSID clsidScript;
+	HRESULT hr = CLSIDFromProgID(L"JavaScript", &clsidScript);
+	if (SUCCEEDED(hr)) {
+		IActiveScript* activeScript = nullptr;
+		hr = CoCreateInstance(clsidScript, nullptr,
+			CLSCTX_INPROC_SERVER, IID_IActiveScript,
+			AsPPVArgs(&activeScript));
+		if (SUCCEEDED(hr)) {
+			hr = activeScript->SetScriptSite(&context);
+			if (SUCCEEDED(hr)) {
+				IActiveScriptParse* scriptParse = nullptr;
+				hr = activeScript->QueryInterface(IID_IActiveScriptParse, AsPPVArgs(&scriptParse));
+				if (SUCCEEDED(hr)) {
+					hr = scriptParse->InitNew();
+					if (SUCCEEDED(hr)) {
+						VARIANT result;
+						VariantInit(&result);
+						char * const pszText = context.pszText;
+						WCHAR * const pszTextW = reinterpret_cast<LPWSTR>(pszText + iSelCount);
+						SciCall_GetSelText(pszText);
+						MultiByteToWideChar(context.cpEdit, 0, pszText, -1, pszTextW, static_cast<int>(iSelCount));
+						hr = scriptParse->ParseScriptText(pszTextW, nullptr, nullptr, nullptr, 0, 0, SCRIPTTEXT_ISEXPRESSION, &result, nullptr);
+						if (SUCCEEDED(hr)) {
+							pszTextW[0] = L'\0';
+							hr = pfnVariantToString(result, pszTextW, static_cast<UINT>(iSelCount));
+							if (SUCCEEDED(hr) && pszTextW[0]) {
+								pszText[0] = ' ';
+								iSelCount = context.textLength - 1;
+								iSelCount = WideCharToMultiByte(context.cpEdit, 0, pszTextW, -1, pszText + 1, static_cast<int>(iSelCount), nullptr, nullptr);
+								const Sci_Position iSelEnd = SciCall_GetSelectionEnd();
+								SciCall_InsertText(iSelEnd, pszText);
+								SciCall_SetSel(iSelEnd, iSelEnd + iSelCount);
+							}
+						}
+						VariantClear(&result);
+					}
+					scriptParse->Release();
+				}
+			}
+			activeScript->Close();
+			activeScript->Release();
+		}
+	}
+	NP2HeapFree(context.pszText);
 }
