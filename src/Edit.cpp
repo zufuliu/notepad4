@@ -200,8 +200,8 @@ bool EditConvertText(UINT cpSource, UINT cpDest) noexcept {
 		return true;
 	}
 
-	const Sci_Position length = SciCall_GetLength();
-	if (static_cast<size_t>(length) >= MAX_NON_UTF8_SIZE) {
+	const size_t length = SciCall_GetLength();
+	if (length >= MAX_NON_UTF8_SIZE) {
 		return true;
 	}
 
@@ -281,7 +281,7 @@ void EditConvertToLargeMode() noexcept {
 	EditReplaceDocument(pdoc);
 	fvCurFile.Apply();
 
-	if (length > 0) {
+	if (length != 0) {
 		SendMessage(hwndEdit, WM_SETREDRAW, FALSE, 0);
 		SciCall_SetModEventMask(SC_MOD_NONE);
 		SciCall_AppendText(length, pchText);
@@ -1691,36 +1691,36 @@ char *EditMapTextCase(int menu, const char *pszText, size_t &iSelCount, UINT cpE
 //
 // EditURLEncode()
 //
-LPWSTR EditURLEncodeSelection(int *pcchEscaped, bool component) noexcept {
-	*pcchEscaped = 0;
+LPWSTR EditURLEncodeSelection(DWORD *cchEscapedW, bool component) noexcept {
+	*cchEscapedW = 0;
 	const Sci_Position iSelCount = SciCall_GetSelTextLength();
 	if (iSelCount == 0) {
 		return nullptr;
 	}
 
-	char *pszText = static_cast<char *>(NP2HeapAlloc(iSelCount + 1));
+	const size_t allocSize = NP2_align_up(iSelCount + 1, MEMORY_ALLOCATION_ALIGNMENT);
+	char * const pszText = static_cast<char *>(NP2HeapAlloc(allocSize * (sizeof(char) + sizeof(WCHAR))));
 	SciCall_GetSelText(pszText);
 
-	LPWSTR pszTextW = static_cast<LPWSTR>(NP2HeapAlloc((iSelCount + 1) * sizeof(WCHAR)));
+	WCHAR * const pszTextW = reinterpret_cast<LPWSTR>(pszText + allocSize);
 	const UINT cpEdit = SciCall_GetCodePage();
-	MultiByteToWideChar(cpEdit, 0, pszText, static_cast<int>(iSelCount), pszTextW, static_cast<int>(NP2HeapSize(pszTextW) / sizeof(WCHAR)));
-	NP2HeapFree(pszText);
+	MultiByteToWideChar(cpEdit, 0, pszText, static_cast<int>(iSelCount), pszTextW, static_cast<int>(allocSize));
 	// TODO: trim all C0 and C1 control characters.
 	StrTrim(pszTextW, L" \a\b\f\n\r\t\v");
 	if (StrIsEmpty(pszTextW)) {
-		NP2HeapFree(pszTextW);
+		NP2HeapFree(pszText);
 		return nullptr;
 	}
 
 	// https://docs.microsoft.com/en-us/windows/desktop/api/shlwapi/nf-shlwapi-urlescapew
-	LPWSTR pszEscapedW = static_cast<LPWSTR>(NP2HeapAlloc(NP2HeapSize(pszTextW) * kMaxMultiByteCount * 3)); // '&', H1, H0
+	DWORD cchEscaped = static_cast<DWORD>(allocSize * kMaxMultiByteCount * 3); // '&', H1, H0
+	LPWSTR pszEscapedW = static_cast<LPWSTR>(NP2HeapAlloc(cchEscaped * sizeof(WCHAR))); // '&', H1, H0
 
-	DWORD cchEscapedW = static_cast<DWORD>(NP2HeapSize(pszEscapedW) / sizeof(WCHAR));
 	const DWORD flags = component ? (URL_ESCAPE_AS_UTF8 | URL_ESCAPE_ASCII_URI_COMPONENT | URL_ESCAPE_SEGMENT_ONLY) : URL_ESCAPE_AS_UTF8;
-	UrlEscape(pszTextW, pszEscapedW, &cchEscapedW, flags);
+	UrlEscape(pszTextW, pszEscapedW, &cchEscaped, flags);
 
-	NP2HeapFree(pszTextW);
-	*pcchEscaped = cchEscapedW;
+	NP2HeapFree(pszText);
+	*cchEscapedW = cchEscaped;
 	return pszEscapedW;
 }
 
@@ -1734,15 +1734,16 @@ void EditURLEncode(bool component) noexcept {
 		return;
 	}
 
-	int cchEscapedW;
+	DWORD cchEscapedW;
 	LPWSTR pszEscapedW = EditURLEncodeSelection(&cchEscapedW, component);
 	if (pszEscapedW == nullptr) {
 		return;
 	}
 
 	const UINT cpEdit = SciCall_GetCodePage();
-	char *pszEscaped = static_cast<char *>(NP2HeapAlloc(cchEscapedW * kMaxMultiByteCount));
-	const int cchEscaped = WideCharToMultiByte(cpEdit, 0, pszEscapedW, cchEscapedW, pszEscaped, static_cast<int>(NP2HeapSize(pszEscaped)), nullptr, nullptr);
+	DWORD cchEscaped = cchEscapedW * kMaxMultiByteCount;
+	char *pszEscaped = static_cast<char *>(NP2HeapAlloc(cchEscaped));
+	cchEscaped = WideCharToMultiByte(cpEdit, 0, pszEscapedW, cchEscapedW, pszEscaped, cchEscaped, nullptr, nullptr);
 	EditReplaceMainSelection(cchEscaped, pszEscaped);
 
 	NP2HeapFree(pszEscaped);
@@ -1763,17 +1764,19 @@ void EditURLDecode() noexcept {
 		return;
 	}
 
-	char *pszText = static_cast<char *>(NP2HeapAlloc(iSelCount + 1));
-	LPWSTR pszTextW = static_cast<LPWSTR>(NP2HeapAlloc((iSelCount + 1) * sizeof(WCHAR)));
+	size_t allocSize = NP2_align_up(iSelCount + 1, MEMORY_ALLOCATION_ALIGNMENT);
+	char * const pszText = static_cast<char *>(NP2HeapAlloc(allocSize * (sizeof(char) + sizeof(WCHAR))));
+	WCHAR * const pszTextW = reinterpret_cast<LPWSTR>(pszText + allocSize);
 
 	SciCall_GetSelText(pszText);
 	const UINT cpEdit = SciCall_GetCodePage();
-	MultiByteToWideChar(cpEdit, 0, pszText, static_cast<int>(iSelCount), pszTextW, static_cast<int>(NP2HeapSize(pszTextW) / sizeof(WCHAR)));
+	MultiByteToWideChar(cpEdit, 0, pszText, static_cast<int>(iSelCount), pszTextW, static_cast<int>(allocSize));
 
-	char *pszUnescaped = static_cast<char *>(NP2HeapAlloc(NP2HeapSize(pszText) * 3));
-	LPWSTR pszUnescapedW = static_cast<LPWSTR>(NP2HeapAlloc(NP2HeapSize(pszTextW) * 3));
+	allocSize *= kMaxMultiByteCount;
+	char * const pszUnescaped = static_cast<char *>(NP2HeapAlloc(allocSize * (sizeof(char) + sizeof(WCHAR))));
+	WCHAR * const pszUnescapedW = reinterpret_cast<LPWSTR>(pszUnescaped + allocSize);
 
-	DWORD cchUnescapedW = static_cast<DWORD>(NP2HeapSize(pszUnescapedW) / sizeof(WCHAR));
+	DWORD cchUnescapedW = static_cast<DWORD>(allocSize);
 	int cchUnescaped = cchUnescapedW;
 	UrlUnescape(pszTextW, pszUnescapedW, &cchUnescapedW, URL_UNESCAPE_AS_UTF8);
 	if (!IsWin8AndAbove()) {
@@ -1792,13 +1795,11 @@ void EditURLDecode() noexcept {
 		}
 	}
 
-	cchUnescaped = WideCharToMultiByte(cpEdit, 0, pszUnescapedW, cchUnescapedW, pszUnescaped, static_cast<int>(NP2HeapSize(pszUnescaped)), nullptr, nullptr);
+	cchUnescaped = WideCharToMultiByte(cpEdit, 0, pszUnescapedW, cchUnescapedW, pszUnescaped, static_cast<int>(allocSize), nullptr, nullptr);
 	EditReplaceMainSelection(cchUnescaped, pszUnescaped);
 
 	NP2HeapFree(pszText);
-	NP2HeapFree(pszTextW);
 	NP2HeapFree(pszUnescaped);
-	NP2HeapFree(pszUnescapedW);
 }
 
 //=============================================================================
@@ -6922,17 +6923,17 @@ void EditSelectionAction(int action) noexcept {
 		return;
 	}
 
-	int cchEscapedW;
+	DWORD cchEscapedW;
 	LPWSTR pszEscapedW = EditURLEncodeSelection(&cchEscapedW, false);
 	if (pszEscapedW == nullptr) {
 		return;
 	}
 
-	LPWSTR lpszCommand = static_cast<LPWSTR>(NP2HeapAlloc(sizeof(WCHAR) * (cchEscapedW + COUNTOF(szCmdTemplate) + 32)));
-	const size_t cbCommand = NP2HeapSize(lpszCommand);
+	cchEscapedW = NP2_align_up(cchEscapedW + COUNTOF(szCmdTemplate) + 32, MEMORY_ALLOCATION_ALIGNMENT);
+	LPWSTR lpszCommand = static_cast<LPWSTR>(NP2HeapAlloc(sizeof(WCHAR) * cchEscapedW * 2));
 	wsprintf(lpszCommand, szCmdTemplate, pszEscapedW);
 
-	LPWSTR lpszArgs = static_cast<LPWSTR>(NP2HeapAlloc(cbCommand));
+	LPWSTR lpszArgs = lpszCommand + cchEscapedW;
 	ExtractFirstArgument(lpszCommand, lpszCommand, lpszArgs);
 	if (ExpandEnvironmentStringsEx(lpszArgs, szCmdTemplate)) {
 		lstrcpy(lpszArgs, szCmdTemplate);
@@ -6960,7 +6961,6 @@ void EditSelectionAction(int action) noexcept {
 
 	NP2HeapFree(pszEscapedW);
 	NP2HeapFree(lpszCommand);
-	NP2HeapFree(lpszArgs);
 }
 
 void TryBrowseFile(HWND hwnd, LPCWSTR pszFile, bool bWarn) noexcept {

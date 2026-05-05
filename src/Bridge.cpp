@@ -1490,11 +1490,11 @@ void EditCalculateExpr(int menu) {
 		return;
 	}
 
-	constexpr size_t padding = 1024 * sizeof(WCHAR); // for CMD_CALCULATE_EXPR
+	constexpr size_t padding = 1024; // for CMD_CALCULATE_EXPR
 	iSelCount = NP2_align_up(iSelCount + 1, MEMORY_ALLOCATION_ALIGNMENT);
 	iSelCount = max<Sci_Position>(iSelCount, 1024); // increased to store result and error message
 	CalcContext context;
-	context.textLength = (iSelCount * (sizeof(char) + sizeof(WCHAR)*2)) + padding;
+	context.textLength = (iSelCount * (sizeof(char) + sizeof(WCHAR)*2)) + (padding * sizeof(WCHAR));
 	context.lineOffset = 0;
 	context.pszText = static_cast<char *>(NP2HeapAlloc(context.textLength));
 	context.cpEdit = SciCall_GetCodePage();
@@ -1536,6 +1536,7 @@ void EditCalculateExpr(int menu) {
 						hr = scriptParse->ParseScriptText(pszBuf, nullptr, nullptr, nullptr, 0, 0, SCRIPTTEXT_ISEXPRESSION, &result, nullptr);
 						if (SUCCEEDED(hr)) {
 							pszTextW[0] = L'\0';
+							iSelCount = iSelCount*2 + padding;
 							hr = pfnVariantToString(result, pszTextW, static_cast<UINT>(iSelCount));
 							if (SUCCEEDED(hr) && pszTextW[0]) {
 								pszText[0] = ' ';

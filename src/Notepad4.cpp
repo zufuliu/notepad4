@@ -874,7 +874,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 			autoCompletionConfig.bIndentText = false;
 			SciCall_DocumentEnd();
 			SciCall_BeginUndoAction();
-			if (SciCall_GetLength() > 0) {
+			if (SciCall_GetLength() != 0) {
 				SciCall_NewLine();
 			}
 			SciCall_Paste(false);
@@ -8051,7 +8051,7 @@ void CALLBACK PasteBoardTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTi
 			autoCompletionConfig.bIndentText = false;
 			SciCall_DocumentEnd();
 			SciCall_BeginUndoAction();
-			if (SciCall_GetLength() > 0) {
+			if (SciCall_GetLength() != 0) {
 				SciCall_NewLine();
 			}
 			SciCall_Paste(false);
