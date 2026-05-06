@@ -128,7 +128,7 @@ void	EditConvertToLargeMode() noexcept;
 void	EditReplaceDocument(HANDLE pdoc) noexcept;
 
 char*	EditGetClipboardText(HWND hwnd) noexcept; // LocalFree()
-bool	EditCopyAppend(HWND hwnd) noexcept;
+void	EditCopyAppend(HWND hwnd) noexcept;
 
 constexpr int GetScintillaEOLMode(int mode) noexcept {
 	constexpr UINT mask = (SC_EOL_CRLF << 2*0) | (SC_EOL_LF << 2*1) | (SC_EOL_CR << 2*2);
