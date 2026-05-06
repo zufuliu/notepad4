@@ -1382,6 +1382,14 @@ void EditFormatCode(int menu) noexcept {
 	}
 }
 
+// calculate / evaluate expression
+// https://github.com/chakra-core/ChakraCore/blob/master/lib/Common/Core/AtomLockGuids.h
+static const GUID CLSID_Chakra = // {1b7cd997-e5ff-4932-a7a6-2a9e636da385}
+{ 0x1b7cd997, 0xe5ff, 0x4932, { 0xa7, 0xa6, 0x2a, 0x9e, 0x63, 0x6d, 0xa3, 0x85 } };
+// static const GUID CLSID_JScript9 = // {16d51579-a30b-4c8b-a276-0ff4dc41e755}
+// { 0x16d51579, 0xa30b, 0x4c8b, { 0xa2, 0x76, 0x0f, 0xf4, 0xdc, 0x41, 0xe7, 0x55 } };
+// static const GUID CLSID_JScript = // {f414c260-6ac0-11cf-b6d1-00aa00bbbb58}
+// { 0xf414c260, 0x6ac0, 0x11cf, { 0xb6, 0xd1, 0x00, 0xaa, 0x00, 0xbb, 0xbb, 0x58 } };
 #if defined(__MINGW32__)
 extern "C" const GUID __declspec(selectany) IID_IActiveScriptParse32 = // {BB1A2AE2-A4F9-11cf-8F20-00805F2CD064}
 { 0xbb1a2ae2, 0xa4f9, 0x11cf, { 0x8f, 0x20, 0x00, 0x80, 0x5f, 0x2c, 0xd0, 0x64 }};
@@ -1395,7 +1403,7 @@ struct CalcContext final : IActiveScriptSite {
 	LPSTR pszText;
 	size_t textLength;
 	UINT cpEdit;
-	ULONG lineOffset;
+	ULONG lineStart;
 
 	// IUnknown
 	STDMETHODIMP QueryInterface(REFIID riid, PVOID *ppv) noexcept override {
@@ -1447,8 +1455,8 @@ struct CalcContext final : IActiveScriptSite {
 			LONG column = 0;
 			scriptError->GetSourcePosition(nullptr, &line, &column);
 			Sci_Position iSelStart = SciCall_GetSelectionStart();
-			if (line > lineOffset) {
-				iSelStart = SciCall_LineFromPosition(iSelStart) + line - lineOffset;
+			if (line > lineStart) {
+				iSelStart = SciCall_LineFromPosition(iSelStart) + line - lineStart;
 				iSelStart = SciCall_PositionFromLine(iSelStart);
 			}
 			iSelStart += column;
@@ -1490,71 +1498,80 @@ void EditCalculateExpr(int menu) {
 		return;
 	}
 
+	IActiveScript *activeScript = nullptr;
+	HRESULT hr = CoCreateInstance(CLSID_Chakra, nullptr, CLSCTX_INPROC_SERVER, IID_IActiveScript, AsPPVArgs(&activeScript));
+	if (!SUCCEEDED(hr)) {
+#if 0
+		// JScript9 or JScript9Legacy is just secure version of JScript, no ES6 support
+		hr = CoCreateInstance(CLSID_JScript, nullptr, CLSCTX_INPROC_SERVER, IID_IActiveScript, AsPPVArgs(&activeScript));
+#else
+		CLSID clsidScript;
+		hr = CLSIDFromProgID(L"JavaScript", &clsidScript);
+		if (SUCCEEDED(hr)) {
+			hr = CoCreateInstance(clsidScript, nullptr, CLSCTX_INPROC_SERVER, IID_IActiveScript, AsPPVArgs(&activeScript));
+		}
+#endif
+		if (!SUCCEEDED(hr)) {
+			return;
+		}
+	}
+
 	constexpr size_t padding = 1024; // for CMD_CALCULATE_EXPR
 	iSelCount = NP2_align_up(iSelCount + 1, MEMORY_ALLOCATION_ALIGNMENT);
 	iSelCount = max<Sci_Position>(iSelCount, 1024); // increased to store result and error message
 	CalcContext context;
 	context.textLength = (iSelCount * (sizeof(char) + sizeof(WCHAR)*2)) + (padding * sizeof(WCHAR));
-	context.lineOffset = 0;
+	context.lineStart = 0;
 	context.pszText = static_cast<char *>(NP2HeapAlloc(context.textLength));
 	context.cpEdit = SciCall_GetCodePage();
 
-	CLSID clsidScript;
-	HRESULT hr = CLSIDFromProgID(L"JavaScript", &clsidScript);
+	hr = activeScript->SetScriptSite(&context);
 	if (SUCCEEDED(hr)) {
-		IActiveScript* activeScript = nullptr;
-		hr = CoCreateInstance(clsidScript, nullptr,
-			CLSCTX_INPROC_SERVER, IID_IActiveScript,
-			AsPPVArgs(&activeScript));
+		IActiveScriptParse* scriptParse = nullptr;
+		hr = activeScript->QueryInterface(IID_IActiveScriptParse, AsPPVArgs(&scriptParse));
 		if (SUCCEEDED(hr)) {
-			hr = activeScript->SetScriptSite(&context);
+			hr = scriptParse->InitNew();
 			if (SUCCEEDED(hr)) {
-				IActiveScriptParse* scriptParse = nullptr;
-				hr = activeScript->QueryInterface(IID_IActiveScriptParse, AsPPVArgs(&scriptParse));
-				if (SUCCEEDED(hr)) {
-					hr = scriptParse->InitNew();
-					if (SUCCEEDED(hr)) {
-						VARIANT result;
-						VariantInit(&result);
-						char * const pszText = context.pszText;
-						WCHAR * const pszTextW = reinterpret_cast<LPWSTR>(pszText + iSelCount);
-						SciCall_GetSelText(pszText);
-						MultiByteToWideChar(context.cpEdit, 0, pszText, -1, pszTextW, static_cast<int>(iSelCount));
-						LPWSTR pszBuf = pszTextW;
-						if (menu == CMD_CALCULATE_EXPR) {
-							context.lineOffset = 1;
-							pszBuf += iSelCount;
-							// Use with(Math) to avoid writing it everywhere.
-							wsprintf(pszBuf, L"with(Math){eval(\n%s)}", pszTextW);
-							// regex replace() to support pow operator ^
-							/*wsprintf(pszBuf,
-								L"(function(s){"
-								L"var str = s.replace(/([\\d.]+)\\s*\\^\\s*([\\d.]+)/g, 'pow($1,$2)');"
-								L"with(Math){return eval(str);}"
-								L"})('%s')", pszTextW);*/
-						}
-						hr = scriptParse->ParseScriptText(pszBuf, nullptr, nullptr, nullptr, 0, 0, SCRIPTTEXT_ISEXPRESSION, &result, nullptr);
-						if (SUCCEEDED(hr)) {
-							pszTextW[0] = L'\0';
-							iSelCount = iSelCount*2 + padding;
-							hr = pfnVariantToString(result, pszTextW, static_cast<UINT>(iSelCount));
-							if (SUCCEEDED(hr) && pszTextW[0]) {
-								pszText[0] = ' ';
-								iSelCount = context.textLength - 1;
-								iSelCount = WideCharToMultiByte(context.cpEdit, 0, pszTextW, -1, pszText + 1, static_cast<int>(iSelCount), nullptr, nullptr);
-								const Sci_Position iSelEnd = SciCall_GetSelectionEnd();
-								SciCall_InsertText(iSelEnd, pszText);
-								SciCall_SetSel(iSelEnd, iSelEnd + iSelCount);
-							}
-						}
-						VariantClear(&result);
-					}
-					scriptParse->Release();
+				VARIANT result;
+				VariantInit(&result);
+				char * const pszText = context.pszText;
+				WCHAR * const pszTextW = reinterpret_cast<LPWSTR>(pszText + iSelCount);
+				SciCall_GetSelText(pszText);
+				MultiByteToWideChar(context.cpEdit, 0, pszText, -1, pszTextW, static_cast<int>(iSelCount));
+				LPWSTR pszBuf = pszTextW;
+				if (menu == CMD_CALCULATE_EXPR) {
+					context.lineStart = 1;
+					pszBuf += iSelCount;
+					// Use with(Math) to avoid writing it everywhere.
+					wsprintf(pszBuf, L"with(Math){eval(\n%s)}", pszTextW);
+					// regex replace() to support pow operator ^
+					/*wsprintf(pszBuf,
+						L"(function(s){"
+						L"var str = s.replace(/([\\d.]+)\\s*\\^\\s*([\\d.]+)/g, 'pow($1,$2)');"
+						L"with(Math){return eval(str);}"
+						L"})('%s')", pszTextW);*/
 				}
+				hr = scriptParse->ParseScriptText(pszBuf, nullptr, nullptr, nullptr, 0, 0, SCRIPTTEXT_ISEXPRESSION, &result, nullptr);
+				if (SUCCEEDED(hr)) {
+					pszTextW[0] = L'\0';
+					iSelCount = iSelCount*2 + padding;
+					hr = pfnVariantToString(result, pszTextW, static_cast<UINT>(iSelCount));
+					if (SUCCEEDED(hr) && pszTextW[0]) {
+						pszText[0] = ' ';
+						iSelCount = context.textLength - 1;
+						iSelCount = WideCharToMultiByte(context.cpEdit, 0, pszTextW, -1, pszText + 1, static_cast<int>(iSelCount), nullptr, nullptr);
+						const Sci_Position iSelEnd = SciCall_GetSelectionEnd();
+						SciCall_InsertText(iSelEnd, pszText);
+						SciCall_SetSel(iSelEnd, iSelEnd + iSelCount);
+					}
+				}
+				VariantClear(&result);
 			}
-			activeScript->Close();
-			activeScript->Release();
+			scriptParse->Release();
 		}
 	}
+
+	activeScript->Close();
+	activeScript->Release();
 	NP2HeapFree(context.pszText);
 }
