@@ -157,8 +157,8 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\scintilla\include;..\..\scintilla\lexlib;..\..\scintilla\src;..\..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_WINDOWS;NOMINMAX;WIN32_LEAN_AND_MEAN;STRICT_TYPED_ITEMIDS;BOOST_REGEX_STANDALONE;NO_CXX11_REGEX;UNICODE;_UNICODE;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\scintilla\include;..\..\scintilla\lexlib;..\..\scintilla\src;..\..\src;..\..\darkmodelib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_WINDOWS;NOMINMAX;WIN32_LEAN_AND_MEAN;STRICT_TYPED_ITEMIDS;BOOST_REGEX_STANDALONE;NO_CXX11_REGEX;UNICODE;_UNICODE;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;_DARKMODELIB_NO_INI_CONFIG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level4</WarningLevel>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -592,6 +592,16 @@
     <ClCompile Include="..\..\src\Helpers.cpp" />
     <ClCompile Include="..\..\src\Notepad4.cpp" />
     <ClCompile Include="..\..\src\Styles.cpp" />
+    <ClCompile Include="..\..\src\DarkMode.cpp" />
+    <ClCompile Include="..\..\darkmodelib\DarkModeSubclass.cpp" />
+    <ClCompile Include="..\..\darkmodelib\DmlibColor.cpp" />
+    <ClCompile Include="..\..\darkmodelib\DmlibDpi.cpp" />
+    <ClCompile Include="..\..\darkmodelib\DmlibHook.cpp" />
+    <ClCompile Include="..\..\darkmodelib\DmlibPaintHelper.cpp" />
+    <ClCompile Include="..\..\darkmodelib\DmlibSubclass.cpp" />
+    <ClCompile Include="..\..\darkmodelib\DmlibSubclassControl.cpp" />
+    <ClCompile Include="..\..\darkmodelib\DmlibSubclassWindow.cpp" />
+    <ClCompile Include="..\..\darkmodelib\DmlibWinApi.cpp" />
     <ClCompile Include="..\..\src\EditLexers\stlABAQUS.cpp" />
     <ClCompile Include="..\..\src\EditLexers\stlActionScript.cpp" />
     <ClCompile Include="..\..\src\EditLexers\stlAPDL.cpp" />
@@ -758,6 +768,8 @@
     <ClInclude Include="..\..\src\Resource.h" />
     <ClInclude Include="..\..\src\SciCall.h" />
     <ClInclude Include="..\..\src\Styles.h" />
+    <ClInclude Include="..\..\src\DarkMode.h" />
+    <ClInclude Include="..\..\darkmodelib\DarkModeSubclass.h" />
     <ClInclude Include="..\..\src\Version.h" />
     <ClInclude Include="..\..\src\VersionRev.h" />
   </ItemGroup>

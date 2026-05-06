@@ -36,6 +36,8 @@
 #include "Edit.h"
 #include "Styles.h"
 #include "Dialogs.h"
+#include "DarkMode.h"
+#include "DarkModeSubclass.h"
 #include "resource.h"
 
 //! show code folding level and state on line number margin
@@ -590,6 +592,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	// Load Settings
 	LoadSettings();
 
+	// Initialize dark mode support
+	DarkMode_Init();
+
 	if (!InitApplication(hInstance)) {
 		CleanUpResources(false);
 		return FALSE;
@@ -1103,6 +1108,9 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			// Remove tray icon if necessary
 			ShowNotifyIcon(hwnd, false);
 
+			// Clean up dark mode resources
+			DarkMode_Cleanup();
+
 			bShutdownOK = true;
 		}
 		if (umsg == WM_DESTROY) {
@@ -1148,7 +1156,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 	case WM_SETTINGCHANGE:
 		bitmapCache.Invalidate();
-		// TODO: detect system theme and high contrast mode changes
+		DarkMode_HandleSettingChange(hwnd, lParam);
 		SendMessage(hwndEdit, WM_SETTINGCHANGE, wParam, lParam);
 		Style_SetLexer(pLexCurrent, false); // override base elements
 		break;
@@ -1836,6 +1844,9 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 #endif
 	DragAcceptFiles(hwnd, TRUE);
 
+	// Apply dark mode to main window
+	DarkMode_ApplyToWindow(hwnd);
+
 	// File MRU
 	const int flags = MRUFlags_FilePath | (static_cast<int>(flagRelativeFileMRU) * MRUFlags_RelativePath) | (static_cast<int>(flagPortableMyDocs) * MRUFlags_PortableMyDocs);
 	mruFile.Init(MRU_KEY_RECENT_FILES, iMaxRecentFiles, flags);
@@ -1977,6 +1988,19 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 	GetWindowRect(hwndReBar, &rc);
 	cyReBar = rc.bottom - rc.top;
 	cyReBarFrame = bIsAppThemed ? 0 : 2;
+
+	// Apply dark mode subclassing to toolbar, status bar, and rebar
+	DarkMode::setDarkLineAbovePanelToolbar(hwndToolbar);
+	DarkMode::setDarkExplorerTheme(hwndToolbar);
+	DarkMode::setStatusBarCtrlSubclass(hwndStatus);
+	DarkMode::setWindowEraseBgSubclass(hwndReBar);
+	DarkMode::enableDarkScrollBarForWindowAndChildren(hwnd);
+
+	// Theme toolbar tooltips
+	HWND hwndTT = reinterpret_cast<HWND>(SendMessage(hwndToolbar, TB_GETTOOLTIPS, 0, 0));
+	if (hwndTT) {
+		DarkMode::setDarkTooltips(hwndTT, static_cast<int>(DarkMode::ToolTipsType::toolbar));
+	}
 }
 
 void RecreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
@@ -2041,6 +2065,9 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	}
 	SetWindowExStyle(hwndEdit, dwExStyle);
 	SetWindowPos(hwndEdit, nullptr, 0, 0, 0, 0, SWP_NOZORDER | SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE);
+
+	// refresh dark mode on theme change
+	DarkMode_ApplyToWindow(hwnd);
 
 	// recreate toolbar and statusbar
 	HINSTANCE hInstance = GetWindowInstance(hwnd);
@@ -4082,7 +4109,20 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_VIEW_CUSTOMIZE_TOOLBAR:
-		SendMessage(hwndToolbar, TB_CUSTOMIZE, 0, 0);
+		if (DarkMode_IsEnabled()) {
+			// Temporarily override system colors so comctl32's owner-drawn
+			// list boxes in the Customize Toolbar dialog use dark colors
+			const int indices[] = { COLOR_WINDOW, COLOR_WINDOWTEXT, COLOR_BTNFACE, COLOR_BTNTEXT };
+			const COLORREF oldColors[] = { GetSysColor(COLOR_WINDOW), GetSysColor(COLOR_WINDOWTEXT),
+				GetSysColor(COLOR_BTNFACE), GetSysColor(COLOR_BTNTEXT) };
+			const COLORREF darkColors[] = { RGB(0x1E, 0x1E, 0x1E), RGB(0xD4, 0xD4, 0xD4),
+				RGB(0x25, 0x25, 0x26), RGB(0xD4, 0xD4, 0xD4) };
+			SetSysColors(COUNTOF(indices), indices, darkColors);
+			SendMessage(hwndToolbar, TB_CUSTOMIZE, 0, 0);
+			SetSysColors(COUNTOF(indices), indices, oldColors);
+		} else {
+			SendMessage(hwndToolbar, TB_CUSTOMIZE, 0, 0);
+		}
 		break;
 
 	case IDM_VIEW_AUTO_SCALE_TOOLBAR:
