@@ -284,7 +284,7 @@ namespace dmlib_paint
 	 * @return `true`  If animation effects are enabled.
 	 * @return `false` Otherwise.
 	 */
-	[[nodiscard]] inline bool isAnimationEnabled()
+	[[nodiscard]] inline bool isAnimationEnabled() noexcept
 	{
 		if (BOOL isEnabled = FALSE;
 			::SystemParametersInfoW(SPI_GETCLIENTAREAANIMATION, 0, &isEnabled, FALSE) != FALSE)

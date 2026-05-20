@@ -41,13 +41,22 @@
 	#define DMLIB_API
 #endif
 
+#if defined(__clang__)
+	#pragma clang diagnostic push
+	// identifier '_TASKDIALOGCONFIG' is reserved because it starts with '_' followed by a capital letter
+	#pragma clang diagnostic ignored "-Wreserved-identifier"
+#endif
+
 typedef struct _TASKDIALOGCONFIG TASKDIALOGCONFIG; // forward declaration, from <CommCtrl.h>
 
+#if defined(__clang__)
+	#pragma clang diagnostic pop
+#endif
 /**
- * @namespace DarkMode
+ * @namespace dmlib
  * @brief Provides dark mode theming, subclassing, and rendering utilities for most Win32 controls.
  */
-namespace DarkMode
+namespace dmlib
 {
 	struct Colors
 	{
@@ -117,9 +126,9 @@ namespace DarkMode
 	 * - `light`: Light mode appearance.
 	 * - `dark`: Dark mode appearance.
 	 *
-	 * Set via configuration and used by style evaluators (e.g. @ref DarkMode::calculateTreeViewStyle).
+	 * Set via configuration and used by style evaluators (e.g. @ref dmlib::calculateTreeViewStyle).
 	 *
-	 * @see DarkMode::calculateTreeViewStyle()
+	 * @see dmlib::calculateTreeViewStyle()
 	 */
 	enum class TreeViewStyle : unsigned char
 	{
@@ -131,10 +140,10 @@ namespace DarkMode
 	/**
 	 * @brief Describes metadata fields and compile-time features of the dark mode library.
 	 *
-	 * Values of this enum are used with @ref DarkMode::getLibInfo to retrieve version numbers and
+	 * Values of this enum are used with @ref dmlib::getLibInfo to retrieve version numbers and
 	 * determine whether specific features were enabled during compilation.
 	 *
-	 * @see DarkMode::getLibInfo()
+	 * @see dmlib::getLibInfo()
 	 */
 	enum class LibInfo : unsigned char
 	{
@@ -153,13 +162,13 @@ namespace DarkMode
 	/**
 	 * @brief Defines the available dark mode types for manual configurations.
 	 *
-	 * Can be used in `DarkMode::initDarkModeConfig` and in `DarkMode::setDarkModeConfigEx`
+	 * Can be used in `dmlib::initDarkModeConfig` and in `dmlib::setDarkModeConfigEx`
 	 * with static_cast<UINT>(DarkModeType::'value').
 	 *
 	 * @note Also used internally to distinguish between light, dark, and classic modes.
 	 *
-	 * @see DarkMode::initDarkModeConfig()
-	 * @see DarkMode::setDarkModeConfigEx()
+	 * @see dmlib::initDarkModeConfig()
+	 * @see dmlib::setDarkModeConfigEx()
 	 */
 	enum class DarkModeType : unsigned char
 	{
@@ -471,7 +480,7 @@ namespace DarkMode
 
 	/// Applies theming and/or subclassing to all child controls of a parent window.
 	DMLIB_API void setChildCtrlsSubclassAndThemeEx(HWND hParent, bool subclass, bool theme);
-	/// Wrapper for `DarkMode::setChildCtrlsSubclassAndThemeEx`.
+	/// Wrapper for `dmlib::setChildCtrlsSubclassAndThemeEx`.
 	DMLIB_API void setChildCtrlsSubclassAndTheme(HWND hParent);
 	/// Applies theming to all child controls of a parent window.
 	DMLIB_API void setChildCtrlsTheme(HWND hParent);
@@ -528,7 +537,7 @@ namespace DarkMode
 	/// Applies "DarkMode_Explorer" visual style to scroll bars.
 	DMLIB_API void setDarkScrollBar(HWND hWnd);
 	/// Applies "DarkMode_Explorer" visual style to tooltip controls based on context.
-	DMLIB_API void setDarkTooltips(HWND hWnd, int tooltipType);
+	DMLIB_API void setDarkTooltips(HWND hWnd, UINT tooltipType);
 	/// Applies "DarkMode_DarkTheme" visual style if supported and experimental mode is active.
 	DMLIB_API void setDarkThemeTheme(HWND hWnd);
 
@@ -708,7 +717,7 @@ namespace DarkMode
 	 *
 	 * CHOOSEFONT cf{};
 	 * cf.Flags |= CF_ENABLEHOOK | CF_ENABLETEMPLATE;
-	 * cf.lpfnHook = static_cast<LPCFHOOKPROC>(DarkMode::HookDlgProc);
+	 * cf.lpfnHook = static_cast<LPCFHOOKPROC>(dmlib::HookDlgProc);
 	 * cf.hInstance = GetModuleHandle(nullptr);
 	 * cf.lpTemplateName = MAKEINTRESOURCE(IDD_DARK_FONT_DIALOG);
 	 * ```
@@ -731,7 +740,7 @@ namespace DarkMode
 	 * @brief Wrapper for `TaskDialogIndirect` with dark mode support.
 	 *
 	 * Parameters are same as for `TaskDialogIndirect`.
-	 * Should be used with `DarkMode::setDarkTaskDlg`
+	 * Should be used with `dmlib::setDarkTaskDlg`
 	 * used in task dialog callback procedure.
 	 *
 	 * ## Example of Callback Procedure
@@ -746,27 +755,25 @@ namespace DarkMode
 	 * {
 	 *     if (uMsg == TDN_DIALOG_CONSTRUCTED)
 	 *     {
-	 *          DarkMode::setDarkTaskDlg(hWnd);
+	 *          dmlib::setDarkTaskDlg(hWnd);
 	 *     }
 	 *     return S_OK;
 	 * }
 	 * ```
 	 *
-	 * @see DarkMode::DarkTaskDlgCallback()
-	 * @see DarkMode::setDarkTaskDlg()
+	 * @see dmlib::DarkTaskDlgCallback()
+	 * @see dmlib::setDarkTaskDlg()
 	 */
 	DMLIB_API HRESULT darkTaskDialogIndirect(const TASKDIALOGCONFIG* pTaskConfig, int* pnButton, int* pnRadioButton, BOOL* pfVerificationFlagChecked);
 
-	/**
-	 * @brief Displays a message box as task dialog with themed styling.
-	 */
+	/// Displays a message box as task dialog with themed styling.
 	DMLIB_API HRESULT darkMessageBoxW(HWND hWnd, LPCWSTR lpText, LPCWSTR lpCaption, UINT uType);
 
 #ifdef __cplusplus
 	} // extern "C"
 #endif
 
-} // namespace DarkMode
+} // namespace dmlib
 
 #else
 #define _DARKMODELIB_NOT_USED

@@ -17,7 +17,7 @@ namespace dmlib_win32api
 {
 	[[nodiscard]] bool IsWindows10() noexcept;
 	[[nodiscard]] bool IsDarkModeSupported() noexcept;
-}
+} // namespace dmlib_win32api
 #endif
 
 /**

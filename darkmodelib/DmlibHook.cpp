@@ -34,7 +34,7 @@ namespace dmlib_win32api
 {
 	[[nodiscard]] bool IsWindows11() noexcept;
 	[[nodiscard]] bool IsDarkModeActive() noexcept;
-}
+} // namespace dmlib_win32api
 
 using fnFindThunkInModule = auto (*)(void* moduleBase, const char* dllName, const char* funcName) -> PIMAGE_THUNK_DATA;
 

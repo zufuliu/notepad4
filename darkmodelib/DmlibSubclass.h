@@ -377,7 +377,7 @@ namespace dmlib_subclass
 	[[nodiscard]] inline std::wstring getWndClassName(HWND hWnd)
 	{
 		static constexpr int strLen = 32;
-		std::wstring className(strLen, L'\0');
+		auto className = std::wstring(strLen, L'\0');
 		className.resize(static_cast<size_t>(::GetClassNameW(hWnd, className.data(), strLen)));
 		return className;
 	}
@@ -397,7 +397,7 @@ namespace dmlib_subclass
 	 */
 	[[nodiscard]] inline bool cmpWndClassName(HWND hWnd, const wchar_t* classNameToCmp)
 	{
-		if (!hWnd)
+		if (hWnd == nullptr)
 		{
 			return false;
 		}

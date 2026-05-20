@@ -23,11 +23,11 @@
 #include "DmlibSubclass.h"
 #include "DmlibWinApi.h"
 
-namespace DarkMode
+namespace dmlib
 {
 	/// Checks if current mode is dark type.
 	[[nodiscard]] bool isDarkDmTypeUsed() noexcept;
-}
+} // namespace dmlib
 
 namespace dmlib_subclass
 {
@@ -132,8 +132,12 @@ namespace dmlib_subclass
 		RECT m_rcPrev{};
 		RECT m_rcNext{};
 		int m_cornerRoundness = 0;
+		int m_iStateIDPrev = UPS_NORMAL;
+		int m_iStateIDNext = UPS_NORMAL;
 		bool m_isHorizontal = false;
 		bool m_wasHotNext = false;
+
+		static constexpr LONG kOffset = 2;
 
 		UpDownData() = delete;
 
@@ -167,15 +171,13 @@ namespace dmlib_subclass
 			}
 			else
 			{
-				static constexpr LONG offset = 2;
-
 				const RECT rcArrowTop{
-					m_rcClient.left + offset, m_rcClient.top,
+					m_rcClient.left + kOffset, m_rcClient.top,
 					m_rcClient.right, m_rcClient.bottom - ((m_rcClient.bottom - m_rcClient.top) / 2)
 				};
 
 				const RECT rcArrowBottom{
-					m_rcClient.left + offset, rcArrowTop.bottom,
+					m_rcClient.left + kOffset, rcArrowTop.bottom,
 					m_rcClient.right, m_rcClient.bottom
 				};
 
@@ -242,7 +244,7 @@ namespace dmlib_subclass
 		LONG m_xScroll = ::GetSystemMetrics(SM_CXVSCROLL);
 		LONG m_yScroll = ::GetSystemMetrics(SM_CYVSCROLL);
 		bool m_isHot = false;
-		const bool m_isEdit = false;
+		bool m_isEdit = false;
 
 		BorderMetricsData() = delete;
 
@@ -340,7 +342,7 @@ namespace dmlib_subclass
 
 		HeaderData() = delete;
 
-		explicit HeaderData(HWND hWnd) noexcept
+		explicit HeaderData(HWND hWnd)
 			: m_hasBtnStyle((::GetWindowLongPtr(hWnd, GWL_STYLE) & HDS_BUTTONS) == HDS_BUTTONS)
 			, m_isLVChild(dmlib_subclass::cmpWndClassName(::GetParent(hWnd), WC_LISTVIEW))
 		{}
@@ -435,18 +437,18 @@ namespace dmlib_subclass
 
 	LRESULT CALLBACK ButtonSubclass(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 	LRESULT CALLBACK GroupboxSubclass(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
-	LRESULT CALLBACK UpDownSubclass(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
+	LRESULT CALLBACK UpDownSubclass(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData) noexcept;
 	LRESULT CALLBACK TabPaintSubclass(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 	LRESULT CALLBACK TabUpDownSubclass(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
-	LRESULT CALLBACK CustomBorderSubclass(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
+	LRESULT CALLBACK CustomBorderSubclass(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData) noexcept;
 	LRESULT CALLBACK ComboBoxSubclass(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
-	LRESULT CALLBACK ComboBoxExSubclass(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
-	LRESULT CALLBACK ListViewSubclass(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
+	LRESULT CALLBACK ComboBoxExSubclass(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData) noexcept;
+	LRESULT CALLBACK ListViewSubclass(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData) noexcept;
 	LRESULT CALLBACK HeaderSubclass(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 	LRESULT CALLBACK StatusBarSubclass(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
-	LRESULT CALLBACK ProgressBarSubclass(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
-	LRESULT CALLBACK StaticTextSubclass(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
-	LRESULT CALLBACK IPAddressSubclass(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
-	LRESULT CALLBACK HotKeySubclass(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
-	LRESULT CALLBACK DTPSubclass(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
+	LRESULT CALLBACK ProgressBarSubclass(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData) noexcept;
+	LRESULT CALLBACK StaticTextSubclass(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData) noexcept;
+	LRESULT CALLBACK IPAddressSubclass(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData) noexcept;
+	LRESULT CALLBACK HotKeySubclass(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData) noexcept;
+	LRESULT CALLBACK DTPSubclass(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData) noexcept;
 } // namespace dmlib_subclass

@@ -37,7 +37,7 @@
 #include "Styles.h"
 #include "Dialogs.h"
 #include "DarkMode.h"
-#include "DarkModeSubclass.h"
+#include "Darkmodelib.h"
 #include "resource.h"
 
 //! show code folding level and state on line number margin
@@ -2004,16 +2004,16 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 	cyReBarFrame = bIsAppThemed ? 0 : 2;
 
 	// Apply dark mode subclassing to toolbar, status bar, and rebar
-	DarkMode::setDarkLineAbovePanelToolbar(hwndToolbar);
-	DarkMode::setDarkExplorerTheme(hwndToolbar);
-	DarkMode::setStatusBarCtrlSubclass(hwndStatus);
-	DarkMode::setWindowEraseBgSubclass(hwndReBar);
-	DarkMode::enableDarkScrollBarForWindowAndChildren(hwnd);
+	dmlib::setDarkLineAbovePanelToolbar(hwndToolbar);
+	dmlib::setDarkExplorerTheme(hwndToolbar);
+	dmlib::setStatusBarCtrlSubclass(hwndStatus);
+	dmlib::setWindowEraseBgSubclass(hwndReBar);
+	dmlib::enableDarkScrollBarForWindowAndChildren(hwnd);
 
 	// Theme toolbar tooltips
 	HWND hwndTT = reinterpret_cast<HWND>(SendMessage(hwndToolbar, TB_GETTOOLTIPS, 0, 0));
 	if (hwndTT) {
-		DarkMode::setDarkTooltips(hwndTT, static_cast<int>(DarkMode::ToolTipsType::toolbar));
+		dmlib::setDarkTooltips(hwndTT, static_cast<int>(dmlib::ToolTipsType::toolbar));
 	}
 }
 

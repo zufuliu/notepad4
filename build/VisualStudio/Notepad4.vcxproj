@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="AVX2Debug|x64">
@@ -592,7 +592,7 @@
     <ClCompile Include="..\..\src\Notepad4.cpp" />
     <ClCompile Include="..\..\src\Styles.cpp" />
     <ClCompile Include="..\..\src\DarkMode.cpp" />
-    <ClCompile Include="..\..\darkmodelib\DarkModeSubclass.cpp" />
+    <ClCompile Include="..\..\darkmodelib\Darkmodelib.cpp" />
     <ClCompile Include="..\..\darkmodelib\DmlibColor.cpp" />
     <ClCompile Include="..\..\darkmodelib\DmlibDpi.cpp" />
     <ClCompile Include="..\..\darkmodelib\DmlibHook.cpp" />
@@ -767,7 +767,7 @@
     <ClInclude Include="..\..\src\SciCall.h" />
     <ClInclude Include="..\..\src\Styles.h" />
     <ClInclude Include="..\..\src\DarkMode.h" />
-    <ClInclude Include="..\..\darkmodelib\DarkModeSubclass.h" />
+    <ClInclude Include="..\..\darkmodelib\Darkmodelib.h" />
     <ClInclude Include="..\..\src\Version.h" />
     <ClInclude Include="..\..\src\VersionRev.h" />
   </ItemGroup>
