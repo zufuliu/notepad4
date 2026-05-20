@@ -168,7 +168,7 @@ static fnOpenNcThemeData pfOpenNcThemeData = nullptr;
 
 bool dmlib_hook::loadOpenNcThemeData(const HMODULE& hUxtheme) noexcept
 {
-	return LoadFn(hUxtheme, pfOpenNcThemeData, 49);
+	return dmlib_module::LoadFn(hUxtheme, pfOpenNcThemeData, 49);
 }
 
 #if defined(_DARKMODELIB_USE_SCROLLBAR_FIX) && (_DARKMODELIB_USE_SCROLLBAR_FIX > 1)
@@ -229,7 +229,7 @@ static HTHEME WINAPI MyOpenNcThemeData(HWND hWnd, LPCWSTR pszClassList)
 
 void dmlib_hook::fixDarkScrollBar()
 {
-	const ModuleHandle moduleComctl(L"comctl32.dll");
+	const dmlib_module::ModuleHandle moduleComctl(L"comctl32.dll");
 	if (moduleComctl.isLoaded())
 	{
 		auto* addr = iat_hook::FindDelayLoadThunkInModule(moduleComctl.get(), "uxtheme.dll", 49); // OpenNcThemeData

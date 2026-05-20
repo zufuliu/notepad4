@@ -14,7 +14,7 @@ INCDIR = \
 	-I"$(scintilla_dir)/include" \
 	-I"$(darkmodelib_dir)"
 
-CPPFLAGS += -D_DARKMODELIB_NO_INI_CONFIG
+CPPFLAGS += -D_DARKMODELIB_NO_INI_CONFIG -D_DARKMODELIB_USE_SCROLLBAR_FIX=2
 
 LDFLAGS += -L"$(BINFOLDER)/obj"
 

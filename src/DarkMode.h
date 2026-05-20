@@ -28,3 +28,7 @@ bool DarkMode_HandleSettingChange(HWND hwnd, LPARAM lParam) noexcept;
 
 // Check if dark mode UI is currently active.
 bool DarkMode_IsEnabled() noexcept;
+
+// Show a message box that respects dark mode (uses Task Dialog when dark mode is active).
+// Returns the same kind of value as MessageBoxEx (IDOK, IDYES, IDNO, IDCANCEL, ...).
+int DarkMode_MessageBox(HWND hwnd, LPCWSTR text, LPCWSTR caption, UINT uType, WORD wLanguageId) noexcept;
