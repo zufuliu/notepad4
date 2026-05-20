@@ -6,7 +6,7 @@
 # https://hexdocs.pm/elixir/syntax-reference.html#reserved-words
 # https://hexdocs.pm/elixir/Kernel.html
 true false nil
-import use with
+alias import require use with
 
 case do
 end

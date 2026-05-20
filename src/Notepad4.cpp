@@ -59,17 +59,12 @@ static HMONITOR hCurrentMonitor = nullptr;
 HWND	hwndEdit;
 HWND	hwndMain;
 static HMENU hmenuMain;
-static HWND hwndNextCBChain = nullptr;
 HWND	hDlgFindReplace = nullptr;
 static bool bInitDone = false;
 static HACCEL hAccMain;
 static HACCEL hAccFindReplace;
 static HICON hTrayIcon = nullptr;
 static UINT uTrayIconDPI = 0;
-
-// tab width for notification text
-#define CallTipTabWidthNotification		8
-#define CallTipDefaultMouseDwellTime	250
 
 #define TOOLBAR_COMMAND_BASE	IDT_FILE_NEW
 #define DefaultToolbarButtons	L"22 3 0 1 27 2 0 4 18 19 0 5 6 0 7 8 9 20 0 10 11 0 12 0 24 0 13 14 0 15 16 0 17"
@@ -182,6 +177,7 @@ int iFileWatchingOption;
 bool	bResetFileWatching;
 static DWORD dwFileCheckInterval;
 static DWORD dwAutoReloadTimeout;
+unsigned int dwUrlThreshold;
 bool bUseXPFileDialog;
 static EscFunction iEscFunction;
 static bool bAlwaysOnTop;
@@ -252,6 +248,7 @@ static int iInitialLexer;
 
 static bool bLastCopyFromMe = false;
 static DWORD dwLastCopyTime;
+static DWORD dwClipboardSequenceNumber;
 
 bool bFreezeAppTitle = false;
 static WCHAR szTitleExcerpt[128] = L"";
@@ -882,7 +879,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 			autoCompletionConfig.bIndentText = false;
 			SciCall_DocumentEnd();
 			SciCall_BeginUndoAction();
-			if (SciCall_GetLength() > 0) {
+			if (SciCall_GetLength() != 0) {
 				SciCall_NewLine();
 			}
 			SciCall_Paste(false);
@@ -918,10 +915,11 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	// Check for Paste Board option -- after loading files
 	if (flagPasteBoard) {
 		bLastCopyFromMe = true;
-		hwndNextCBChain = SetClipboardViewer(hwnd);
+		AddClipboardFormatListener(hwnd);
 		UpdateWindowTitle();
 		bLastCopyFromMe = false;
 		dwLastCopyTime = 0;
+		dwClipboardSequenceNumber = GetClipboardSequenceNumber();
 		SetTimer(hwnd, ID_PASTEBOARDTIMER, 100, PasteBoardTimer);
 	}
 
@@ -1095,7 +1093,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			// Terminate clipboard watching
 			if (flagPasteBoard) {
 				KillTimer(hwnd, ID_PASTEBOARDTIMER);
-				ChangeClipboardChain(hwnd, hwndNextCBChain);
+				RemoveClipboardFormatListener(hwnd);
 			}
 
 			// Destroy find / replace dialog
@@ -1434,23 +1432,11 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 	//	bPendingChangeNotify = false;
 	//	break;
 
-	case WM_DRAWCLIPBOARD:
+	case WM_CLIPBOARDUPDATE:
 		if (!bLastCopyFromMe) {
 			dwLastCopyTime = GetTickCount();
 		} else {
 			bLastCopyFromMe = false;
-		}
-		if (hwndNextCBChain) {
-			SendMessage(hwndNextCBChain, WM_DRAWCLIPBOARD, wParam, lParam);
-		}
-		break;
-
-	case WM_CHANGECBCHAIN:
-		if (AsPointer<HWND>(wParam) == hwndNextCBChain) {
-			hwndNextCBChain = AsPointer<HWND>(lParam);
-		}
-		if (hwndNextCBChain) {
-			SendMessage(hwndNextCBChain, WM_CHANGECBCHAIN, lParam, wParam);
 		}
 		break;
 
@@ -1927,10 +1913,9 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 #if NP2_ENABLE_CUSTOMIZE_TOOLBAR_LABELS
 	// Load toolbar labels
 	IniSectionParser section;
-	WCHAR *pIniSectionBuf = static_cast<WCHAR *>(NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_TOOLBAR_LABELS));
-	const DWORD cchIniSection = static_cast<DWORD>(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
+	constexpr DWORD cchIniSection = MAX_INI_SECTION_SIZE_TOOLBAR_LABELS;
 
-	section.Init(COUNTOF(tbbMainWnd));
+	WCHAR * const pIniSectionBuf = section.Init(COUNTOF(tbbMainWnd), cchIniSection);
 	LoadIniSection(INI_SECTION_NAME_TOOLBAR_LABELS, pIniSectionBuf, cchIniSection);
 	section.ParseArray(pIniSectionBuf, FALSE);
 
@@ -1951,7 +1936,6 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 	}
 
 	section.Free();
-	NP2HeapFree(pIniSectionBuf);
 #endif // NP2_ENABLE_CUSTOMIZE_TOOLBAR_LABELS
 
 	SendMessage(hwndToolbar, TB_SETEXTENDEDSTYLE, 0,
@@ -2207,6 +2191,9 @@ void ValidateUILangauge() noexcept {
 	case LANG_RUSSIAN:
 		languageMenu = IDM_LANG_RUSSIAN;
 		break;
+	case LANG_SLOVENIAN:
+		languageMenu = IDM_LANG_SLOVENIAN;
+		break;
 	case LANG_NEUTRAL:
 	default:
 		languageMenu = IDM_LANG_USER_DEFAULT;
@@ -2253,6 +2240,9 @@ void SetUILanguage(int menu) noexcept {
 		break;
 	case IDM_LANG_RUSSIAN:
 		lang = MAKELANGID(LANG_RUSSIAN, SUBLANG_DEFAULT);
+		break;
+	case IDM_LANG_SLOVENIAN:
+		lang = MAKELANGID(LANG_SLOVENIAN, SUBLANG_DEFAULT);
 		break;
 	}
 
@@ -2342,7 +2332,9 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 		EnableCmd(hmenu, menuRequiresPath[k], hasPath);
 	}
 
-	EnableCmd(hmenu, IDM_FILE_SAVE, IsDocumentModified());
+	const bool changed = IsDocumentModified();
+	EnableCmd(hmenu, IDM_FILE_SAVE, changed);
+	EnableCmd(hmenu, IDM_FILE_SAVEORIGINALTIMESTAMP, changed);
 #if defined(_WIN64)
 	DisableCmd(hmenu, IDM_FILE_LARGE_FILE_MODE, bLargeFileMode);
 	DisableCmd(hmenu, IDM_FILE_LARGE_FILE_MODE_RELOAD, bLargeFileMode);
@@ -2434,6 +2426,8 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 		CMD_ONLINE_SEARCH_BING,
 		CMD_ONLINE_SEARCH_GOOGLE,
 		CMD_ONLINE_SEARCH_WIKI,
+		CMD_CALCULATE_EXPR,
+		CMD_EVALUATE_JS_EXPR,
 		IDM_EDIT_BASE64_DECODE,
 		IDM_EDIT_BASE64_DECODE_AS_HEX,
 		IDM_EDIT_BASE64_ENCODE,
@@ -2624,6 +2618,7 @@ static void ConvertLineEndings(int iNewEOLMode) noexcept {
 	EditEnsureConsistentLineEndings();
 	UpdateStatusBarCache(StatusItem_EolMode);
 	UpdateWindowTitle();
+	UpdateStatusbar();
 }
 
 static inline bool IsBraceMatchChar(uint32_t ch) noexcept {
@@ -2690,6 +2685,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDT_FILE_SAVECOPY:
 	case IDM_FILE_SAVECOPY:
 		FileSave(static_cast<FileSaveFlag>(FileSaveFlag_SaveAlways | FileSaveFlag_SaveAs | FileSaveFlag_SaveCopy));
+		break;
+
+	case IDM_FILE_SAVEORIGINALTIMESTAMP:
+		FileSave(static_cast<FileSaveFlag>(FileSaveFlag_SaveAlways | FileSaveFlag_OriginalTimestamp));
 		break;
 
 	case IDM_FILE_READONLY_FILE:
@@ -3041,9 +3040,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDT_EDIT_CUT:
 	case IDM_EDIT_CUT:
-		if (flagPasteBoard) {
-			bLastCopyFromMe = true;
-		}
+		bLastCopyFromMe = true;
 		if (SciCall_IsSelectionEmpty() && iLineSelectionMode != LineSelectionMode_None) {
 			const int mode = iLineSelectionMode;
 			Sci_Position iCurrentPos = SciCall_GetCurrentPos();
@@ -3058,17 +3055,13 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	//case IDM_EDIT_CUT_BINARY:
-	//	if (flagPasteBoard) {
-	//		bLastCopyFromMe = true;
-	//	}
+	//	bLastCopyFromMe = true;
 	//	SciCall_Cut(true);
 	//	break;
 
 	case IDT_EDIT_COPY:
 	case IDM_EDIT_COPY:
-		if (flagPasteBoard) {
-			bLastCopyFromMe = true;
-		}
+		bLastCopyFromMe = true;
 		if (SciCall_IsSelectionEmpty() && iLineSelectionMode != LineSelectionMode_None) {
 			SciCall_LineCopy(iLineSelectionMode & LineSelectionMode_VisualStudio);
 		} else {
@@ -3078,25 +3071,19 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	//case IDM_EDIT_COPY_BINARY:
-	//	if (flagPasteBoard) {
-	//		bLastCopyFromMe = true;
-	//	}
+	//	bLastCopyFromMe = true;
 	//	SciCall_Copy(true);
 	//	UpdateToolbar();
 	//	break;
 
 	case IDM_EDIT_COPYALL:
-		if (flagPasteBoard) {
-			bLastCopyFromMe = true;
-		}
+		bLastCopyFromMe = true;
 		SciCall_CopyRange(0, SciCall_GetLength());
 		UpdateToolbar();
 		break;
 
 	case IDM_EDIT_COPYADD:
-		if (flagPasteBoard) {
-			bLastCopyFromMe = true;
-		}
+		bLastCopyFromMe = true;
 		EditCopyAppend(hwndEdit);
 		UpdateToolbar();
 		break;
@@ -3119,9 +3106,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			if (pClip == nullptr) {
 				break;
 			}
-			if (flagPasteBoard) {
-				bLastCopyFromMe = true;
-			}
+			bLastCopyFromMe = true;
 			Sci_Position iPos = SciCall_GetCurrentPos();
 			Sci_Position iAnchor = SciCall_GetAnchor();
 			SciCall_BeginUndoAction();
@@ -3195,16 +3180,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_EDIT_CUTLINE:
-		if (flagPasteBoard) {
-			bLastCopyFromMe = true;
-		}
+		bLastCopyFromMe = true;
 		SciCall_LineCut(iLineSelectionMode & LineSelectionMode_VisualStudio);
 		break;
 
 	case IDM_EDIT_COPYLINE:
-		if (flagPasteBoard) {
-			bLastCopyFromMe = true;
-		}
+		bLastCopyFromMe = true;
 		SciCall_LineCopy(iLineSelectionMode & LineSelectionMode_VisualStudio);
 		UpdateToolbar();
 		break;
@@ -3602,13 +3583,13 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_EDIT_CHAR2HEX:
 		BeginWaitCursor();
-		EditChar2Hex();
+		EditCharacterToHex();
 		EndWaitCursor();
 		break;
 
 	case IDM_EDIT_HEX2CHAR:
 		BeginWaitCursor();
-		EditHex2Char();
+		EditHexToCharacter();
 		EndWaitCursor();
 		break;
 
@@ -3616,6 +3597,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		BeginWaitCursor();
 		EditShowHex();
 		EndWaitCursor();
+		break;
+
+	case IDM_EDIT_SHOW_CHAR_INFO:
+		EditShowCharacterInfo();
 		break;
 
 	case IDM_EDIT_COPYRTF:
@@ -4544,6 +4529,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_LANG_FRENCH_FRANCE:
 	case IDM_LANG_RUSSIAN:
 	case IDM_LANG_POLISH:
+	case IDM_LANG_SLOVENIAN:
 		SetUILanguage(LOWORD(wParam));
 		break;
 #endif
@@ -4557,6 +4543,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 	case CMD_OPEN_CONTAINING_FOLDER:
 		EditOpenSelection(OpenSelectionType_ContainingFolder);
+		break;
+	case CMD_CALCULATE_EXPR:
+	case CMD_EVALUATE_JS_EXPR:
+		EditCalculateExpr(LOWORD(wParam));
 		break;
 
 	case CMD_ONLINE_SEARCH_GOOGLE:
@@ -5133,9 +5123,8 @@ static void GetWindowPositionSectionName(HMONITOR hMonitor, WCHAR (&sectionName)
 //
 void LoadSettings() noexcept {
 	IniSectionParser section;
-	WCHAR *pIniSectionBuf = static_cast<WCHAR *>(NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_SETTINGS));
-	const DWORD cchIniSection = static_cast<DWORD>(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
-	section.Init(128);
+	constexpr DWORD cchIniSection = MAX_INI_SECTION_SIZE_SETTINGS;
+	WCHAR * const pIniSectionBuf= section.Init(128, cchIniSection);
 
 	LoadIniSection(INI_SECTION_NAME_SETTINGS, pIniSectionBuf, cchIniSection);
 	section.Parse(pIniSectionBuf);
@@ -5410,7 +5399,6 @@ void LoadSettings() noexcept {
 	}
 
 	section.Free();
-	NP2HeapFree(pIniSectionBuf);
 
 	// Scintilla Styles
 	Style_Load();
@@ -5763,10 +5751,10 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) noexcept {
 			if (ExtractFirstArgument(lp2, lp1, lp2)) {
 #if defined(_WIN64)
 				int64_t cord[2]{};
-				const int itok = ParseCommaList64(lp1, cord, COUNTOF(cord));
+				const UINT itok = ParseCommaList64(lp1, cord, COUNTOF(cord));
 #else
 				int cord[2]{};
-				const int itok = ParseCommaList(lp1, cord, COUNTOF(cord));
+				const UINT itok = ParseCommaList(lp1, cord, COUNTOF(cord));
 #endif
 				if (itok != 0) {
 					flagJumpTo = true;
@@ -6107,7 +6095,7 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) noexcept {
 			state = CommandParseState_Argument;
 			if (ExtractFirstArgument(lp2, lp1, lp2)) {
 				int cord[5]{};
-				const int itok = ParseCommaList(lp1, cord, COUNTOF(cord));
+				const UINT itok = ParseCommaList(lp1, cord, COUNTOF(cord));
 				if (itok >= 4) {
 					flagPosParam = true;
 					flagDefaultPos = DefaultPositionFlag_None;
@@ -6181,34 +6169,33 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) noexcept {
 
 void ParseCommandLine() noexcept {
 	LPWSTR lpCmdLine = GetCommandLine();
-	const size_t cmdSize = sizeof(WCHAR) * (lstrlen(lpCmdLine) + 1);
-
-	if (cmdSize == sizeof(WCHAR)) {
+	size_t cmdSize = lstrlen(lpCmdLine);
+	if (cmdSize == 0) {
 		return;
 	}
 
 #if 0
 	FILE *fp = fopen("args-dump.txt", "wb");
 	fwrite("\xFF\xFE", 1, 2, fp);
-	fwrite(lpCmdLine, 1, cmdSize - 2, fp);
+	fwrite(lpCmdLine, 1, cmdSize * sizeof(WCHAR), fp);
 	fclose(fp);
 #endif
 
 	// Good old console can also send args separated by Tabs
 	StrTab2Space(lpCmdLine);
 
-	LPWSTR lp1 = static_cast<LPWSTR>(NP2HeapAlloc(cmdSize));
-	LPWSTR lp3 = static_cast<LPWSTR>(NP2HeapAlloc(cmdSize));
+	cmdSize = NP2_align_up(cmdSize + 1, MEMORY_ALLOCATION_ALIGNMENT);
+	WCHAR * const lp1 = static_cast<LPWSTR>(NP2HeapAlloc(cmdSize * sizeof(WCHAR) * 4));
+	WCHAR * const lp2 = lp1 + cmdSize;
+	WCHAR * const lp3 = lp2 + cmdSize;
 
 	// Start with 2nd argument
 	if (!(ExtractFirstArgument(lpCmdLine, lp1, lp3) && *lp3)) {
 		NP2HeapFree(lp1);
-		NP2HeapFree(lp3);
 		return;
 	}
 
 	bool bIsFileArg = false;
-	LPWSTR lp2 = static_cast<LPWSTR>(NP2HeapAlloc(cmdSize));
 	while (ExtractFirstArgument(lp3, lp1, lp2)) {
 		// options
 		if (!bIsFileArg) {
@@ -6242,8 +6229,6 @@ void ParseCommandLine() noexcept {
 
 		// pathname
 		{
-			LPWSTR lpFileBuf = static_cast<LPWSTR>(NP2HeapAlloc(cmdSize));
-
 			if (lpFileArg) {
 				NP2HeapFree(lpFileArg);
 			}
@@ -6269,6 +6254,7 @@ void ParseCommandLine() noexcept {
 
 			if (flagMultiFileArg == TripleBoolean_True) {
 				cchiFileList = lstrlen(lpCmdLine) - lstrlen(lp3);
+				LPWSTR lpFileBuf = lp3 + cmdSize;
 
 				while (cFileList < 32 && ExtractFirstArgument(lp3, lpFileBuf, lp3)) {
 					PathQuoteSpaces(lpFileBuf);
@@ -6276,14 +6262,11 @@ void ParseCommandLine() noexcept {
 				}
 			}
 
-			NP2HeapFree(lpFileBuf);
 			break;
 		}
 	}
 
-	NP2HeapFree(lp2);
 	NP2HeapFree(lp1);
-	NP2HeapFree(lp3);
 }
 
 //=============================================================================
@@ -6293,9 +6276,8 @@ void ParseCommandLine() noexcept {
 //
 void LoadFlags() noexcept {
 	IniSectionParser section;
-	WCHAR *pIniSectionBuf = static_cast<WCHAR *>(NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_FLAGS));
-	const DWORD cchIniSection = static_cast<DWORD>(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
-	section.Init(64);
+	constexpr DWORD cchIniSection = MAX_INI_SECTION_SIZE_FLAGS;
+	WCHAR * const pIniSectionBuf = section.Init(64, cchIniSection);
 
 	LoadIniSection(INI_SECTION_NAME_FLAGS, pIniSectionBuf, cchIniSection);
 	section.Parse(pIniSectionBuf);
@@ -6329,6 +6311,7 @@ void LoadFlags() noexcept {
 
 	dwFileCheckInterval = section.GetInt(L"FileCheckInterval", 1000);
 	dwAutoReloadTimeout = section.GetInt(L"AutoReloadTimeout", 1000);
+	dwUrlThreshold = section.GetInt(L"UrlThreshold", 256);
 
 	if (IsVistaAndAbove()) {
 		bUseXPFileDialog = section.GetBool(L"UseXPFileDialog", false);
@@ -6371,7 +6354,6 @@ void LoadFlags() noexcept {
 	}
 
 	section.Free();
-	NP2HeapFree(pIniSectionBuf);
 }
 
 //=============================================================================
@@ -6872,6 +6854,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 		UpdateStatusBarCache(StatusItem_EolMode);
 		UpdateStatusBarCacheLineColumn();
 		UpdateDocumentModificationStatus();
+		UpdateStatusbar();
 
 		AutoSave_Stop(TRUE);
 		// Terminate file watching
@@ -7338,7 +7321,7 @@ BOOL OpenFileDlg(LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) noexcep
 	ofn.lpstrInitialDir = tchInitialDir;
 	ofn.lpstrDefExt = L""; // auto add first extension from current filter
 	ofn.nMaxFile = COUNTOF(szFile);
-	ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | /* OFN_NOCHANGEDIR |*/
+	ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | /* OFN_NOCHANGEDIR |*/ OFN_NOTESTFILECREATE |
 				OFN_DONTADDTORECENT | OFN_PATHMUSTEXIST |
 				OFN_SHAREAWARE /*| OFN_NODEREFERENCELINKS*/;
 	if (bUseXPFileDialog) {
@@ -7379,7 +7362,7 @@ BOOL SaveFileDlg(FileSaveFlag saveFlag, LPWSTR lpstrFile, int cchFile, LPCWSTR l
 	ofn.lpstrInitialDir = tchInitialDir;
 	ofn.lpstrDefExt = L""; // auto add first extension from current filter
 	ofn.nMaxFile = MAX_PATH;
-	ofn.Flags = OFN_HIDEREADONLY /*| OFN_NOCHANGEDIR*/ |
+	ofn.Flags = OFN_HIDEREADONLY /*| OFN_NOCHANGEDIR*/ | OFN_NOTESTFILECREATE |
 				/*OFN_NODEREFERENCELINKS |*/ OFN_OVERWRITEPROMPT |
 				OFN_DONTADDTORECENT | OFN_PATHMUSTEXIST;
 	WCHAR szTitle[128];
@@ -7571,10 +7554,8 @@ bool ActivatePrevInst() noexcept {
 //
 bool RelaunchMultiInst() noexcept {
 	if (flagMultiFileArg == TripleBoolean_True && cFileList > 1) {
-		LPWSTR lpCmdLineNew = StrDup(GetCommandLine());
-		const size_t cmdSize = sizeof(WCHAR) * (lstrlen(lpCmdLineNew) + 1);
-		LPWSTR lp1 = static_cast<LPWSTR>(NP2HeapAlloc(cmdSize));
-		LPWSTR lp2 = static_cast<LPWSTR>(NP2HeapAlloc(cmdSize));
+		const LPCWSTR lpCmdLine = GetCommandLine();
+		LPWSTR lpCmdLineNew = StrDup(lpCmdLine);
 
 		StrTab2Space(lpCmdLineNew);
 		StrCpyEx(lpCmdLineNew + cchiFileList, L"");
@@ -7607,8 +7588,6 @@ bool RelaunchMultiInst() noexcept {
 		}
 
 		LocalFree(lpCmdLineNew);
-		NP2HeapFree(lp1);
-		NP2HeapFree(lp2);
 		NP2HeapFree(lpFileArg);
 
 		return true;
@@ -7766,16 +7745,18 @@ bool RelaunchElevated() noexcept {
 			}
 
 			exit = PathEqual(tchFile, szCurFile);
-			lpArg1 = static_cast<LPWSTR>(NP2HeapAlloc(sizeof(WCHAR) * MAX_PATH));
+			constexpr size_t cmdSize = NP2_align_up(MAX_PATH, MEMORY_ALLOCATION_ALIGNMENT);
+			lpArg1 = static_cast<LPWSTR>(NP2HeapAlloc(sizeof(WCHAR) * (cmdSize + 1024)));
+			lpArg2 = lpArg1 + cmdSize;
 			GetModuleFileName(nullptr, lpArg1, MAX_PATH);
-			lpArg2 = static_cast<LPWSTR>(NP2HeapAlloc(sizeof(WCHAR) * 1024));
 			GetRelaunchParameters(lpArg2, tchFile, !exit, false);
 			exit = !IsDocumentModified();
 		} else {
 			const LPCWSTR lpCmdLine = GetCommandLine();
-			const size_t cmdSize = sizeof(WCHAR) * (lstrlen(lpCmdLine) + 1);
-			lpArg1 = static_cast<LPWSTR>(NP2HeapAlloc(cmdSize));
-			lpArg2 = static_cast<LPWSTR>(NP2HeapAlloc(cmdSize));
+			size_t cmdSize = lstrlen(lpCmdLine);
+			cmdSize = NP2_align_up(cmdSize + 1, MEMORY_ALLOCATION_ALIGNMENT);
+			lpArg1 = static_cast<LPWSTR>(NP2HeapAlloc(cmdSize * sizeof(WCHAR) * 2));
+			lpArg2 = lpArg1 + cmdSize;
 			ExtractFirstArgument(lpCmdLine, lpArg1, lpArg2);
 		}
 
@@ -7799,7 +7780,6 @@ bool RelaunchElevated() noexcept {
 		}
 
 		NP2HeapFree(lpArg1);
-		NP2HeapFree(lpArg2);
 		return exit;
 	}
 }
@@ -7912,6 +7892,7 @@ void SetNotifyIconTitle(HWND hwnd) noexcept {
 	Shell_NotifyIcon(NIM_MODIFY, &nid);
 }
 
+NP2_noinline
 void ShowNotificationA(WPARAM notifyPos, LPCSTR lpszText) noexcept {
 	callTipInfo.type = CallTipType_Notification;
 	SciCall_CallTipSetBack(callTipInfo.backColor);
@@ -7920,6 +7901,7 @@ void ShowNotificationA(WPARAM notifyPos, LPCSTR lpszText) noexcept {
 	SciCall_ShowNotification(notifyPos, lpszText);
 }
 
+NP2_noinline
 void ShowNotificationW(WPARAM notifyPos, LPCWSTR lpszText) noexcept {
 	const int cpEdit = SciCall_GetCodePage();
 	const int wchLen = lstrlen(lpszText);
@@ -7930,9 +7912,12 @@ void ShowNotificationW(WPARAM notifyPos, LPCWSTR lpszText) noexcept {
 	NP2HeapFree(cchText);
 }
 
+NP2_noinline
 void ShowNotificationMessage(WPARAM notifyPos, UINT uidMessage, ...) noexcept {
-	WCHAR wchFormat[1024] = L"";
-	WCHAR wchMessage[2048] = L"";
+	WCHAR wchFormat[1024];
+	WCHAR wchMessage[1024];
+	wchFormat[0] = L'\0';
+	wchMessage[0] = L'\0';
 	GetString(uidMessage, wchFormat, COUNTOF(wchFormat));
 
 	va_list va;
@@ -7940,7 +7925,11 @@ void ShowNotificationMessage(WPARAM notifyPos, UINT uidMessage, ...) noexcept {
 	wvsprintf(wchMessage, wchFormat, va);
 	va_end(va);
 
-	ShowNotificationW(notifyPos, wchMessage);
+	const int cpEdit = SciCall_GetCodePage();
+	wchFormat[0] = L'\0';
+	char * const lpszText = reinterpret_cast<char *>(wchFormat);
+	WideCharToMultiByte(cpEdit, 0, wchMessage, -1, lpszText, COUNTOF(wchFormat)*sizeof(WCHAR), nullptr, nullptr);
+	ShowNotificationA(notifyPos, lpszText);
 }
 
 //=============================================================================
@@ -8077,12 +8066,18 @@ void CALLBACK PasteBoardTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTi
 	UNREFERENCED_PARAMETER(dwTime);
 
 	if (dwLastCopyTime > 0 && GetTickCount() - dwLastCopyTime > 200) {
+		const DWORD sequence = GetClipboardSequenceNumber();
+		if (sequence == dwClipboardSequenceNumber) {
+			dwLastCopyTime = 0;
+			return;
+		}
+		dwClipboardSequenceNumber = sequence;
 		if (SciCall_CanPaste()) {
 			const bool back = autoCompletionConfig.bIndentText;
 			autoCompletionConfig.bIndentText = false;
 			SciCall_DocumentEnd();
 			SciCall_BeginUndoAction();
-			if (SciCall_GetLength() > 0) {
+			if (SciCall_GetLength() != 0) {
 				SciCall_NewLine();
 			}
 			SciCall_Paste(false);

@@ -87,7 +87,7 @@ class ChangeHistory final {
 	int historicEpoch = -1;
 
 public:
-	ChangeHistory(Sci::Position length=0);
+	explicit ChangeHistory(Sci::Position length=0);
 
 	void Insert(Sci::Position position, Sci::Position insertLength, bool collectingUndo, bool beforeSave);
 	void DeleteRange(Sci::Position position, Sci::Position deleteLength, bool reverting);

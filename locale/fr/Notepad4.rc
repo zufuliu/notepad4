@@ -119,6 +119,7 @@ BEGIN
 		MENUITEM "Enregistrer &sous...\tF6",					IDM_FILE_SAVEAS
 		MENUITEM "Enregistrer une sa&uvegarde",					IDM_FILE_SAVEBACKUP
 		MENUITEM "Enregistrer une cop&y...\tCtrl+F6",			IDM_FILE_SAVECOPY
+		MENUITEM "Save with Original Time",			IDM_FILE_SAVEORIGINALTIMESTAMP
 		MENUITEM SEPARATOR
 		POPUP "&Mode fichier"
 		BEGIN
@@ -343,6 +344,7 @@ BEGIN
 			MENUITEM "Ca&ractères en hexa\tCtrl+Alt+X",				IDM_EDIT_CHAR2HEX
 			MENUITEM "Hex en Ca&ractères\tCtrl+Alt+C",				IDM_EDIT_HEX2CHAR
 			MENUITEM "&Montrer les codes exadécimaux",							IDM_EDIT_SHOW_HEX
+			MENUITEM "Show Character &Info",							IDM_EDIT_SHOW_CHAR_INFO
 			MENUITEM SEPARATOR
 			MENUITEM "Neutraliser les caractères C\tCtrl+Alt+E",				IDM_EDIT_ESCAPECCHARS
 			MENUITEM "&Rétablir les caractères C\tCtrl+Alt+R",			IDM_EDIT_UNESCAPECCHARS
@@ -630,6 +632,7 @@ BEGIN
 				MENUITEM "Polski",					IDM_LANG_POLISH
 				MENUITEM "Portuguais (Brésil)",		IDM_LANG_PORTUGUESE_BRAZIL
 				MENUITEM "Русский",					IDM_LANG_RUSSIAN
+				MENUITEM "Slovenščina",				IDM_LANG_SLOVENIAN
 				MENUITEM "Japonais",					IDM_LANG_JAPANESE
 				MENUITEM "Coréen",					IDM_LANG_KOREAN
 				MENUITEM "Chinois traditionnel",				IDM_LANG_CHINESE_TRADITIONAL
@@ -724,6 +727,8 @@ BEGIN
 			MENUITEM "&Ouvrir un fichier, dossier, lien, etc.",		CMD_OPEN_PATH_OR_LINK
 			MENUITEM "Ouvrir le répertoire contenant",				CMD_OPEN_CONTAINING_FOLDER
 			MENUITEM SEPARATOR
+			MENUITEM "&Calculate Expression",				CMD_CALCULATE_EXPR
+			MENUITEM SEPARATOR
 			MENUITEM "Rechercher avec &Google",					CMD_ONLINE_SEARCH_GOOGLE
 			MENUITEM "Rechercher avec &Bing",					CMD_ONLINE_SEARCH_BING
 			MENUITEM "Rechercher avec &Wikipedia",				CMD_ONLINE_SEARCH_WIKI
@@ -763,6 +768,7 @@ BEGIN
 			MENUITEM "CSS/JS/JSON &Compress",				IDM_EDIT_CODE_COMPRESS
 			MENUITEM "CSS/JS/JSON &Pretty",					IDM_EDIT_CODE_PRETTY
 			MENUITEM SEPARATOR
+			MENUITEM "&Evaluate JS Expression",				CMD_EVALUATE_JS_EXPR
 			MENUITEM "Neutraliser les caractères HT&ML/XML \tAlt+Shift+X",		IDM_EDIT_XHTML_ESCAPE_CHAR
 			MENUITEM "Rétablir les caractères HTML/&XML\tAlt+Shift+H",	IDM_EDIT_XHTML_UNESCAPE_CHAR
 			MENUITEM SEPARATOR

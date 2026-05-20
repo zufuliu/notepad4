@@ -168,10 +168,74 @@ inline bool StrCaseEqual(LPCWSTR s1, LPCWSTR s2) noexcept {
 	return _wcsicmp(s1, s2) == 0;
 }
 
+#if defined(__clang__) || defined(__GNUC__) || !defined(_MSC_BUILD)
 template <typename T, size_t N>
 inline void StrCpyEx(T *s, const T (&t)[N]) noexcept {
-	memcpy(s, t, N*sizeof(T));
+	__builtin_memcpy(s, t, N*sizeof(T));
 }
+
+#else
+template <size_t N>
+inline void StrCpyEx(char *s, const char (&t)[N]) noexcept {
+	switch (N) {
+	case 1:
+		s[0] = t[0];
+		break;
+	case 2:
+		*((uint16_t *)s) = *((const uint16_t *)t);
+		break;
+	case 3:
+		*((uint16_t *)s) = *((const uint16_t *)t);
+		s[2] = t[2];
+		break;
+	case 4:
+		*((uint32_t *)s) = *((const uint32_t *)t);
+		break;
+	case 5:
+		*((uint32_t *)s) = *((const uint32_t *)t);
+		s[4] = t[4];
+		break;
+	case 6:
+		*((uint32_t *)s) = *((const uint32_t *)t);
+		*((uint16_t *)(s + 4)) = *((const uint16_t *)(t + 4));
+		break;
+	case 7:
+		*((uint32_t *)s) = *((const uint32_t *)t);
+		*((uint16_t *)(s + 4)) = *((const uint16_t *)(t + 4));
+		s[6] = t[6];
+		break;
+	case 8:
+		*((uint32_t *)s) = *((const uint32_t *)t);
+		*((uint32_t *)(s + 4)) = *((const uint32_t *)(t + 4));
+		break;
+	default:
+		memcpy(s, t, N*sizeof(char));
+		break;
+	}
+}
+
+template <size_t N>
+inline void StrCpyEx(wchar_t *s, const wchar_t (&t)[N]) noexcept {
+	switch (N) {
+	case 1:
+		s[0] = t[0];
+		break;
+	case 2:
+		*((uint32_t *)s) = *((const uint32_t *)t);
+		break;
+	case 3:
+		*((uint32_t *)s) = *((const uint32_t *)t);
+		s[2] = t[2];
+		break;
+	case 4:
+		*((uint64_t *)s) = *((const uint64_t *)t);
+		break;
+	default:
+		memcpy(s, t, N*sizeof(wchar_t));
+		break;
+	}
+}
+#endif
 
 template <typename T, size_t N>
 constexpr bool StrEqualEx(const T *s, const T (&t)[N]) noexcept {
@@ -223,8 +287,8 @@ inline bool HexStrToInt(LPCWSTR str, int *value) noexcept {
 	return str != end;
 }
 
-int ParseCommaList(LPCWSTR str, int result[], int count) noexcept;
-int ParseCommaList64(LPCWSTR str, int64_t result[], int count) noexcept;
+UINT ParseCommaList(LPCWSTR str, int result[], UINT count) noexcept;
+UINT ParseCommaList64(LPCWSTR str, int64_t result[], UINT count) noexcept;
 LPCSTR GetCurrentLogTime() noexcept;
 
 struct StopWatch {
@@ -407,7 +471,7 @@ inline int GetBitmapResourceIdForCurrentDPI(int resourceId) noexcept {
 #define NP2HeapAlloc(size)			HeapAlloc(g_hDefaultHeap, HEAP_ZERO_MEMORY, (size))
 #define NP2HeapReAlloc(hMem, size)	HeapReAlloc(g_hDefaultHeap, HEAP_ZERO_MEMORY, (hMem), (size))
 #define NP2HeapFree(hMem)			HeapFree(g_hDefaultHeap, 0, (hMem))
-#define NP2HeapSize(hMem)			HeapSize(g_hDefaultHeap, 0, (hMem))
+// #define NP2HeapSize(hMem)			HeapSize(g_hDefaultHeap, 0, (hMem))
 
 #define IniGetString(lpSection, lpName, lpDefault, lpReturnedStr, nSize) \
 	GetPrivateProfileString(lpSection, lpName, lpDefault, lpReturnedStr, nSize, szIniFile)
@@ -471,7 +535,7 @@ struct IniSectionParser {
 #endif
 	IniKeyValueNode *nodeList;
 
-	void Init(UINT capacity_) noexcept;
+	LPWSTR Init(UINT capacity_, DWORD cchIniSection) noexcept;
 	void Free() const noexcept {
 		NP2HeapFree(nodeList);
 	}
@@ -511,19 +575,11 @@ struct IniSectionBuilder {
 	LPWSTR next;
 	void SetString(LPCWSTR key, LPCWSTR value) noexcept;
 	void SetQuotedString(LPCWSTR key, LPCWSTR value) noexcept;
-	void SetInt(LPCWSTR key, int i) noexcept {
-		WCHAR tch[16];
-		_ltow(i, tch, 10);
-		SetString(key, tch);
-	}
+	void SetInt(LPCWSTR key, int i) noexcept;
 	void SetBool(LPCWSTR key, bool b) noexcept {
 		SetString(key, (b ? L"1" : L"0"));
 	}
-	void SetStringEx(LPCWSTR key, LPCWSTR value, LPCWSTR lpDefault) noexcept {
-		if (!StrCaseEqual(value, lpDefault)) {
-			SetString(key, value);
-		}
-	}
+	void SetStringEx(LPCWSTR key, LPCWSTR value, LPCWSTR lpDefault) noexcept;
 	void SetIntEx(LPCWSTR key, int i, int iDefault) noexcept {
 		if (i != iDefault) {
 			SetInt(key, i);

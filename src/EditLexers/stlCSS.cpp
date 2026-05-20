@@ -69,7 +69,7 @@ static KEYWORDLIST Keywords_CSS = {{
 "grid-template grid-template-areas grid-template-columns grid-template-rows "
 "hanging-punctuation height horizontal-viewport-segments hover "
 "hyphenate-character hyphenate-limit-chars hyphenate-limit-last hyphenate-limit-lines hyphenate-limit-zone hyphens "
-"image-orientation image-rendering image-resolution inherits "
+"image-animation image-orientation image-rendering image-resolution inherits "
 "initial-letter initial-letter-align initial-letter-wrap initial-value inline-size inline-sizing input-security "
 "inset inset-block inset-block-end inset-block-start inset-inline inset-inline-end inset-inline-start "
 "interactivity interest-delay interest-delay-end interest-delay-start interpolate-size inverted-colors isolation "
@@ -166,7 +166,8 @@ static KEYWORDLIST Keywords_CSS = {{
 "use view-transition viewport warn when while "
 
 , // 2 pseudo classes
-"^-moz- ^-ms- ^-o- ^-webkit- active active-view-transition active-view-transition-type( after any-link autofill "
+"^-moz- ^-ms- ^-o- ^-webkit- "
+"active active-view-transition active-view-transition-type( after animated-image any-link autofill "
 "before blank buffering checked closed current current( default defined dir( disabled empty enabled extend( "
 "first first-child first-letter first-line first-of-type focus focus-visible focus-within fullscreen future "
 "has( heading heading( high-value host host( host-context( hover "
@@ -303,7 +304,7 @@ static KEYWORDLIST Keywords_CSS = {{
 "small small-caps small-caption smaller smooth snap snap-block snap-inline soft soft-light softlight( solid "
 "space space-adjacent space-all space-around space-between space-end space-evenly space-first space-start spaces "
 "span spanning-item speech spell-out spin( spread square square-button squircle srgb "
-"stable stacked-fractions standalone standard start state static status-bar step-end step-start steps( sticky "
+"stable stacked-fractions standalone standard start state static status-bar step-end step-start steps( sticky stopped "
 "stretch strict string string( stripes( stroke-box strong stupid style style( styleset( stylistic( "
 "sub subgrid subtract subtractive super superellipse( supports( svg svg-gradient( sw-resize swap swash( "
 "symbolic symbols( system-ui "

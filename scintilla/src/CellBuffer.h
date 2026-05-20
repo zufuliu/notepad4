@@ -10,6 +10,11 @@
 
 namespace Scintilla::Internal {
 
+struct Failure : public std::runtime_error {
+	Status status;
+	explicit Failure(Status status_) : std::runtime_error("failure with status"), status(status_) {}
+};
+
 // Interface to per-line data that wants to see each line insertion and deletion
 class PerLine {
 public:
@@ -63,6 +68,17 @@ struct SplitView {
 			return segment2[position];
 		}
 		return '\0';
+	}
+};
+
+struct ChangedRange {
+	Sci::Position start = 0;
+	Sci::Position end = 0;
+	[[nodiscard]] bool Empty() const noexcept {
+		return end == 0;
+	}
+	Sci::Position Length() const noexcept {
+		return end - start;
 	}
 };
 
@@ -150,7 +166,9 @@ public:
 
 	/// Setting styles for positions outside the range of the buffer is safe and has no effect.
 	/// @return true if the style of a character is changed.
-	bool SetStyles(Sci::Position position, Sci::Position lengthStyle, const unsigned char *styles, char styleValue) noexcept;
+	ChangedRange SetStyles(Sci::Position position, Sci::Position lengthStyle, const char *styles) noexcept;
+	ChangedRange SetStyleFor(Sci::Position position, Sci::Position lengthStyle, char styleValue) noexcept;
+
 	const char *DeleteChars(Sci::Position position, Sci::Position deleteLength, bool &startSequence);
 
 	bool IsReadOnly() const noexcept {

@@ -392,17 +392,27 @@ Kotlin
 LaTeX File
 	tex
 	latex
-	sty
+	sty				LaTeX Macro package
 	cls				LaTeX Document Class File
-	tpx
-	bbl
-	bib
+	tpx				drawing tool for TeX，https://github.com/krystophny/tpx
+	bbl				Bibliography
+	bib				Bibliography
+	bst				Bibliography Style
 	ltx
-	dtx
-	ins
-	toc
+	dtx				Documented TeX
+	ins				Installer file for dtx
 	info
-	rd				R documentation
+	isty				makeindex
+	fd				Font description file
+	rd				R documentation, https://cran.r-project.org/doc/manuals/R-exts.html#Writing-R-documentation-files
+
+	Output files:
+	aux				Auxiliary information
+	toc				Table of Contents
+	lof				list of figures
+	lot				list of tables
+	idx				makeindex
+	ind				processed .idx file
 
 Lisp Script
 	lisp
@@ -607,6 +617,9 @@ TypeScript
 	ets		HarmonyOS ArkTS, https://developer.huawei.com/consumer/cn/arkts/
 	osts	Office Scripts, https://learn.microsoft.com/en-us/office/dev/scripts/
 
+Typst File
+	typ
+
 
 VBScript
 	vbs
@@ -657,6 +670,8 @@ YAML Document
 	ifs				LLVM IFS (Interface Stubs)
 	gyp				GYP
 	gypi			GYP
+	cff				Citation File Format, https://citation-file-format.github.io/
+	winget			WinGet Configuration file, https://learn.microsoft.com/en-us/windows/package-manager/configuration/create
 
 Zig Source
 	zig

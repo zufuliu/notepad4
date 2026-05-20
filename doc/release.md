@@ -32,5 +32,5 @@ Latest development builds (artifacts in Release configuration for each compiler 
 | File | System Requirement |
 | - | - |
 | FindInFiles-net4.8 | [.NET Framework 4.8](https://dotnet.microsoft.com/en-us/download/dotnet-framework) prior Windows 10 |
-| FindInFiles-net9.0 | [.NET Desktop Runtime 9.0](https://dotnet.microsoft.com/en-us/download/dotnet/9.0) |
+| FindInFiles-net10.0 | [.NET Desktop Runtime 10.0](https://dotnet.microsoft.com/en-us/download/dotnet/10.0) |
 | FindInFiles-net8.0 | [.NET Desktop Runtime 8.0](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) |

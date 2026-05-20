@@ -51,7 +51,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* [C Standard Library](tools/lang/C.c), up to C23.
 		* [C++ STL](tools/lang/CPP.cpp), up to C++23.
 	* [Cangjie (仓颉)](tools/lang/Cangjie.cj), up to Cangjie 2025.
-	* [CSS Style Sheet](tools/lang/CSS.css), up to March 2026.
+	* [CSS Style Sheet](tools/lang/CSS.css), up to May 2026.
 		* [SCSS Style Sheet](tools/lang/SCSS.scss), up to Dart Sass 1.50.
 		* [Less Style Sheet](tools/lang/Less.less), up to Less 4.1.
 		* [HSS Style Sheet](tools/lang/HSS.hss)
@@ -65,7 +65,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [Dart](tools/lang/Dart.dart), up to Dart 3.11.
 	* Diff/Patch File
 	* [Elixir](tools/lang/Elixir.ex), up to Elixir 1.19.
-	* [Erlang](tools/lang/Erlang.erl), up to Erlang 28.4.
+	* [Erlang](tools/lang/Erlang.erl), up to Erlang/OTP 28.4.
 	* [F#](tools/lang/FSharp.fs), up to F# 10.0.
 	* [Fortran](tools/lang/Fortran.f), up to Fortran 2023.
 	* [GN Build](tools/lang/GN.gn), up to GN 2019-03-13.
@@ -76,7 +76,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [Groovy](tools/lang/Groovy.groovy), up to Groovy 5.0.
 	* [Haskell](tools/lang/Haskell.hs), up to GHC 9.6.
 	* [Haxe](tools/lang/Haxe.hx), up to Haxe 4.3.
-	* [HTML](tools/lang/html.html), up to [WHATWG](https://html.spec.whatwg.org/multipage/) March 2026. [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#html)
+	* [HTML](tools/lang/html.html), up to [WHATWG](https://html.spec.whatwg.org/multipage/) May 2026. [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#html)
 		* ASP
 		* ASP.NET
 		* JSP
@@ -86,11 +86,11 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [Boost Jam](tools/lang/Jamfile.jam), up to Jam 4.4.
 	* [Java](tools/lang/Java.java), up to Java 25. [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#java)
 		* [BeanShell](https://github.com/beanshell/beanshell)
-	* [JavaScript](tools/lang/JavaScript.js), up to ECMAScript 2025 with [JSX](https://facebook.github.io/jsx/) and [Web APIs](https://developer.mozilla.org/en-US/docs/Web/API).
+	* [JavaScript](tools/lang/JavaScript.js), up to ECMAScript 2026 with [JSX](https://facebook.github.io/jsx/) and [Web APIs](https://developer.mozilla.org/en-US/docs/Web/API).
 	* [JSON](https://www.json.org) and [JSON5](https://json5.org/) Document
 	* [Julia Script](tools/lang/Julia.jl), up to Julia 1.9. [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#julia)
 	* [Kotlin](tools/lang/Kotlin.kt), up to Kotlin 2.3.
-	* LaTeX
+	* [LaTeX](tools/lang/LaTeX.tex)
 	* Lisp Script (Common Lisp, Clojure, Scheme, etc.)
 	* [LLVM IR](tools/lang/LLVM.ll), up to LLVM 21.
 		* [MLIR](tools/lang/MLIR.mlir)
@@ -122,7 +122,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* Windows Rescouce Script
 	* [R](tools/lang/R.r), up to R 4.2.
 	* [REBOL](tools/lang/Rebol.r) 3 and [Red](tools/lang/Red.red)
-	* [Ruby](tools/lang/Ruby.rb), up to Ruby 4.0 [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#ruby)
+	* [Ruby](tools/lang/Ruby.rb), up to Ruby 4.1 [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#ruby)
 	* [Rust](tools/lang/Rust.rs), up to Rust 1.91. [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#rust)
 	* [SAS](tools/lang/SAS.sas), up to SAS Viya 2024.06.
 	* [Scala](tools/lang/Scala.scala), up to Scala 3.2.
@@ -139,9 +139,10 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* [Oracle](tools/lang/Oracle.sql), Oracle 20, incomplete.
 	* [Swift](tools/lang/Swift.swift), up to Swift 6.2.
 	* TCL, [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#tcl)
-	* [Texinfo](tools/lang/Texinfo.texi), up to Texinfo 7.1.
+	* [Texinfo](tools/lang/Texinfo.texi), up to Texinfo 7.3.
 	* [TOML File](https://toml.io/)
 	* [TypeScript](tools/lang/TypeScript.ts), up to TypeScript 7.0.
+	* [Typst](tools/lang/Typst.typ), up to Typst 0.14.
 	* Visual Basic, [VB.NET](tools/lang/VB.NET.vb), [VB 6.0 and VBA](tools/lang/VBA.bas)
 	* [VBScript](tools/lang/VBScript.vbs)
 	* [VHDL](tools/lang/VHDL.vhdl), up to VHDL 2019.
@@ -175,7 +176,9 @@ Latest development builds (artifacts in Release configuration for each compiler 
 * Support full screen mode
 * Support compress & pretty for CSS, JavaScript, JSON and JSON5
 * Support copy as RTF
+* Support evaluate expression
 * Support text transliteration
+* Support URL highlighting
 * Support drag and drop file from Visual Studio, Android Studio, IntelliJ IDEA, etc.
 * Other various major or minor changes and tweaks
 
@@ -205,7 +208,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [French](https://github.com/zufuliu/notepad4/tree/main/locale/fr) by [@VoilierBleu](https://github.com/VoilierBleu)
 	* [Italiano](https://github.com/zufuliu/notepad4/tree/main/locale/it) by [@Matteo-Nigro](https://github.com/Matteo-Nigro)
 	* [Polish](https://github.com/zufuliu/notepad4/tree/main/locale/pl) by [@kbabol](https://github.com/kbabol) and [@miroslaw-zylewicz](https://github.com/miroslaw-zylewicz)
-	* [Русский](https://github.com/zufuliu/notepad4/tree/main/locale/ru) by [@tretdm](https://github.com/tretdm)
+	* [Русский](https://github.com/zufuliu/notepad4/tree/main/locale/ru) by [@tretdm](https://github.com/tretdm) and [@Dimmitrius](https://github.com/Dimmitrius)
 	* [日本語](https://github.com/zufuliu/notepad4/tree/main/locale/ja) by [@maboroshin](https://github.com/maboroshin)
 	* [中文 (繁體)](https://github.com/zufuliu/notepad4/tree/main/locale/zh-Hant)
 	* [中文 (简体)](https://github.com/zufuliu/notepad4/tree/main/locale/zh-Hans)

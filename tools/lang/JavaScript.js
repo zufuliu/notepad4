@@ -6,7 +6,8 @@
 // 2023 https://tc39.es/ecma262/2023/
 // 2024 https://tc39.es/ecma262/2024/
 // 2025 https://tc39.es/ecma262/2025/
-// 2026 https://tc39.es/ecma262/
+// 2026 https://tc39.es/ecma262/2026/
+// 2027 https://tc39.es/ecma262/
 // https://github.com/tc39/ecma262
 
 //! keywords
@@ -225,12 +226,15 @@ Symbol([description]) {
 	prototype
 	for(key)
 	keyFor(sym)
+	prototype:
+		description
 }
 
-Error(message) {
+Error(message [, options]) {
 	cause // 2022
 	message
 	name
+	isError(arg) // 2026
 
 	AggregateError // 2021
 	// Native Error Types
@@ -270,7 +274,7 @@ BigInt(value) {
 }
 
 Math {
-	E
+	// E
 	LN10
 	LN2
 	LOG10E
@@ -312,6 +316,7 @@ Math {
 	sin(x)
 	sinh(x)
 	sqrt(x)
+	sumPrecise(items) // 2026
 	tan(x)
 	tanh(x)
 	trunc(x)
@@ -427,7 +432,6 @@ String(value) {
 		sup()
 		trimLeft()
 		trimRight()
-
 }
 
 RegExp(pattern, flags) {
@@ -440,23 +444,26 @@ RegExp(pattern, flags) {
 		dotAll // 2018
 		flags
 		global
+		hasIndices // 2022
 		ignoreCase
 		multiline
 		sticky
 		source
 		unicode
+		unicodeSets // 2023
 }
 
 Array(...items) {
 	Array(len)
 	Array()
 	from(items [, mapfn [, thisArg]])
+	fromAsync(items [, mapper [, thisArg]]) // 2026
 	isArray(arg)
 	of(...items)
 	length
 	prototype:
 		at(index) // 2022
-		concat(...arguments)
+		concat(...items)
 		copyWithin(target, start [, end])
 		entries()
 		every(callbackfn [, thisArg])
@@ -497,6 +504,11 @@ Array(...items) {
 	// TypedArray
 		Int8Array
 		Uint8Array
+			fromBase64(string [, options]) // 2026
+			fromHex(string) // 2026
+			setFromHex(string) // 2026
+			toBase64([options]) // 2026
+			toHex() // 2026
 		Uint8ClampedArray
 		Int16Array
 		Uint16Array
@@ -524,6 +536,8 @@ Map([iterable]) {
 		entries()
 		forEach(callbackfn [, thisArg])
 		get(key)
+		getOrInsert(key, value) // 2026
+		getOrInsertComputed(key, callback) // 2026
 		has(key)
 		keys()
 		set(key, value)
@@ -557,6 +571,8 @@ WeakMap([iterable]) {
 	prototype:
 		delete(key)
 		get(key)
+		getOrInsert(key, value) // 2026
+		getOrInsertComputed(key, callback) // 2026
 		has(key)
 		set(key, value)
 }
@@ -568,16 +584,25 @@ WeakSet([iterable]) {
 		has(value)
 }
 
-ArrayBuffer(length) {
+ArrayBuffer(length [, options]) {
 	isView(arg)
 	prototype:
 		byteLength
+		detached // 2024
+		maxByteLength // 2024
+		resizable // 2024
+		resize(newLength) // 2024
 		slice(start, end)
+		transfer([newLength]) // 2024
+		transferToFixedLength([newLength]) // 2024
 }
 
-SharedArrayBuffer(length) {
+SharedArrayBuffer(length [, options]) {
 	prototype:
 		byteLength
+		grow(newLength) // 2024
+		growable // 2024
+		maxByteLength // 2024
 		slice(start, end)
 }
 
@@ -600,7 +625,7 @@ DataView(buffer [, byteOffset [, byteLength]]) {
 		getUint32(byteOffset [, littleEndian])
 		setBigInt64(byteOffset, value [, littleEndian])
 		setBigUint64(byteOffset, value [, littleEndian])
-		setFloat16(byteOffset, value [, littleEndian]) // 2026
+		setFloat16(byteOffset, value [, littleEndian]) // 2025
 		setFloat32(byteOffset, value [, littleEndian])
 		setFloat64(byteOffset, value [, littleEndian])
 		setInt8(byteOffset, value)
@@ -628,7 +653,9 @@ Atomics {
 }
 
 JSON {
+	isRawJSON(obj) // 2026
 	parse(text [, reviver])
+	rawJSON(text) // 2026
 	stringify(value [, replacer [, space]])
 }
 
@@ -644,6 +671,7 @@ FinalizationRegistry(cleanupCallback) { // 2021
 }
 
 Iterator() { // 2025
+	concat(...items) // 2026
 	from(O)
 	prototype:
 		drop(limit)

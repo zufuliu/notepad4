@@ -71,15 +71,19 @@ void IniClearAllSectionEx(LPCWSTR lpszPrefix, LPCWSTR lpszIniFile, bool bDelete)
 //
 //  Manipulation of (cached) ini file sections
 //
-void IniSectionParser::Init(UINT capacity_) noexcept {
+LPWSTR IniSectionParser::Init(UINT capacity_, DWORD cchIniSection) noexcept {
 	count = 0;
 	capacity = capacity_;
 	head = nullptr;
 #if IniSectionParserUseSentinelNode
-	nodeList = static_cast<IniKeyValueNode *>(NP2HeapAlloc((capacity_ + 1) * sizeof(IniKeyValueNode)));
+	const size_t allocSize = (capacity_ + 1)*sizeof(IniKeyValueNode) + cchIniSection*sizeof(WCHAR);
+	nodeList = static_cast<IniKeyValueNode *>(NP2HeapAlloc(allocSize));
 	sentinel = &nodeList[capacity_];
+	return reinterpret_cast<LPWSTR>(sentinel + 1);
 #else
-	nodeList = static_cast<IniKeyValueNode *>(NP2HeapAlloc(capacity_ * sizeof(IniKeyValueNode)));
+	const size_t allocSize = capacity_*sizeof(IniKeyValueNode) + cchIniSection*sizeof(WCHAR);
+	nodeList = static_cast<IniKeyValueNode *>(NP2HeapAlloc(allocSize));
+	return reinterpret_cast<LPWSTR>(nodeList + capacity_);
 #endif
 }
 
@@ -201,13 +205,13 @@ LPCWSTR IniSectionParser::UnsafeGetValue(LPCWSTR key, int keyLen) noexcept {
 }
 
 void IniSectionParser::GetStringImpl(LPCWSTR key, int keyLen, LPCWSTR lpDefault, LPWSTR lpReturnedString, int cchReturnedString) noexcept {
-	LPCWSTR value = GetValueImpl(key, keyLen);
+	LPCWSTR value = count ? UnsafeGetValue(key, keyLen) : nullptr;
 	// allow empty string value
 	lstrcpyn(lpReturnedString, ((value == nullptr) ? lpDefault : value), cchReturnedString);
 }
 
 int IniSectionParser::GetIntImpl(LPCWSTR key, int keyLen, int iDefault) noexcept {
-	LPCWSTR value = GetValueImpl(key, keyLen);
+	LPCWSTR value = count ? UnsafeGetValue(key, keyLen) : nullptr;
 	if (value && CRTStrToInt(value, &keyLen)) {
 		return keyLen;
 	}
@@ -215,7 +219,7 @@ int IniSectionParser::GetIntImpl(LPCWSTR key, int keyLen, int iDefault) noexcept
 }
 
 bool IniSectionParser::GetBoolImpl(LPCWSTR key, int keyLen, bool bDefault) noexcept {
-	LPCWSTR value = GetValueImpl(key, keyLen);
+	LPCWSTR value = count ? UnsafeGetValue(key, keyLen) : nullptr;
 	if (value) {
 		const UINT t = *value - L'0';
 		if (t <= TRUE) {
@@ -233,6 +237,18 @@ void IniSectionBuilder::SetString(LPCWSTR key, LPCWSTR value) noexcept {
 	p = StrEnd(p) + 1;
 	*p = L'\0';
 	next = p;
+}
+
+void IniSectionBuilder::SetInt(LPCWSTR key, int i) noexcept {
+	WCHAR tch[16];
+	_ltow(i, tch, 10);
+	SetString(key, tch);
+}
+
+void IniSectionBuilder::SetStringEx(LPCWSTR key, LPCWSTR value, LPCWSTR lpDefault) noexcept {
+	if (!StrCaseEqual(value, lpDefault)) {
+		SetString(key, value);
+	}
 }
 
 LPWSTR Registry_GetString(HKEY hKey, LPCWSTR valueName) noexcept {
@@ -280,13 +296,13 @@ LSTATUS Registry_DeleteTree(HKEY hKey, LPCWSTR lpSubKey) noexcept {
 }
 #endif
 
-int ParseCommaList(LPCWSTR str, int result[], int count) noexcept {
+UINT ParseCommaList(LPCWSTR str, int result[], UINT count) noexcept {
 	if (StrIsEmpty(str)) {
 		return 0;
 	}
 
-	int index = 0;
-	while (index < count) {
+	UINT index = 0;
+	while (index != count) {
 		LPWSTR end;
 		result[index] = static_cast<int>(wcstol(str, &end, 10));
 		if (str == end) {
@@ -1004,12 +1020,14 @@ void DeleteBitmapButton(HWND hwnd, int nCtlId) noexcept {
 //
 // SetClipData()
 //
+NP2_noinline
 void SetClipData(HWND hwnd, LPCWSTR pszData) noexcept {
 	if (OpenClipboard(hwnd)) {
-		EmptyClipboard();
-		HANDLE hData = GlobalAlloc(GHND, sizeof(WCHAR) * (lstrlen(pszData) + 1));
+		const size_t size = sizeof(WCHAR) * (lstrlen(pszData) + 1U);
+		HANDLE hData = GlobalAlloc(GHND, size);
 		WCHAR *pData = static_cast<WCHAR *>(GlobalLock(hData));
-		lstrcpyn(pData, pszData, static_cast<int>(GlobalSize(hData) / sizeof(WCHAR)));
+		memcpy(pData, pszData, size);
+		EmptyClipboard();
 		GlobalUnlock(hData);
 		SetClipboardData(CF_UNICODETEXT, hData);
 		CloseClipboard();
@@ -1160,6 +1178,9 @@ HMODULE LoadLocalizedResourceDLL(UINT lang, LPCWSTR dllName) noexcept {
 	case LANG_RUSSIAN:
 		folder = L"ru";
 		break;
+	case LANG_SLOVENIAN:
+		folder = L"sl";
+		break;
 	}
 
 	WCHAR path[MAX_PATH];
@@ -1185,16 +1206,7 @@ bool PathGetRealPath(HANDLE hFile, LPCWSTR lpszSrc, LPWSTR lpszDest) noexcept {
 				nullptr, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, nullptr);
 		}
 		if (hFile != INVALID_HANDLE_VALUE) {
-#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 			DWORD cch = GetFinalPathNameByHandleW(hFile, path, COUNTOF(path), FILE_NAME_OPENED);
-#else
-			using GetFinalPathNameByHandleSig = DWORD (WINAPI *)(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, DWORD dwFlags);
-			static GetFinalPathNameByHandleSig pfnGetFinalPathNameByHandle = nullptr;
-			if (pfnGetFinalPathNameByHandle == nullptr) {
-				pfnGetFinalPathNameByHandle = DLLFunctionEx<GetFinalPathNameByHandleSig>(L"kernel32.dll", "GetFinalPathNameByHandleW");
-			}
-			DWORD cch = pfnGetFinalPathNameByHandle(hFile, path, COUNTOF(path), FILE_NAME_OPENED);
-#endif
 			// TODO: support long path
 			if (closing) {
 				CloseHandle(hFile);
@@ -1936,10 +1948,9 @@ void MRUList::Empty(bool save) noexcept {
 
 void MRUList::Load() noexcept {
 	IniSectionParser section;
-	WCHAR *pIniSectionBuf = static_cast<WCHAR *>(NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_MRU));
-	const DWORD cchIniSection = static_cast<DWORD>(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
+	constexpr DWORD cchIniSection = MAX_INI_SECTION_SIZE_MRU;
 
-	section.Init(MRU_MAXITEMS);
+	WCHAR * const pIniSectionBuf = section.Init(MRU_MAXITEMS, cchIniSection);
 	LoadIniSection(szRegKey, pIniSectionBuf, cchIniSection);
 	section.ParseArray(pIniSectionBuf);
 	UINT n = 0;
@@ -1953,7 +1964,6 @@ void MRUList::Load() noexcept {
 
 	iSize = n;
 	section.Free();
-	NP2HeapFree(pIniSectionBuf);
 }
 
 void MRUList::Save() const noexcept {

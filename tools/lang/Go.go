@@ -337,7 +337,7 @@ package log {
 
 package math {
 	const (
-		E
+		// E
 		Pi
 		Phi
 

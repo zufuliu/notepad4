@@ -33,6 +33,7 @@ enum {
 };
 
 inline uint32_t asU4(const char *s) noexcept {
+	// return atoi(s);
 	return *reinterpret_cast<const uint32_t *>(s);
 }
 
@@ -44,7 +45,7 @@ void ColouriseCSVDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 	const uint8_t quoteChar = (csvOption >> 8) & 0x7f;
 
 	bool quoted = false;
-	int rows = 0;
+	int rows = CsvRowGroup - 1;
 	initStyle = SCE_CSV_COLUMN_0;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	if (lineCurrent > 0) {
@@ -111,7 +112,7 @@ void ColouriseCSVDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			if (fold) {
 				++rows;
 				int lev = SC_FOLDLEVELBASE + 1;
-				if (rows == CsvRowGroup || lineCurrent == 0) {
+				if (rows == CsvRowGroup) {
 					rows = 0;
 					lev = SC_FOLDLEVELBASE | SC_FOLDLEVELHEADERFLAG;
 				}

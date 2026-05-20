@@ -29,6 +29,7 @@
 #include <cstdio>
 #include "config.h"
 #include "Helpers.h"
+#include "../../scintilla/include/VectorISA.h"
 #include "Dlapi.h"
 #include "Dialogs.h"
 #include "matepath.h"
@@ -917,10 +918,9 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 #if NP2_ENABLE_CUSTOMIZE_TOOLBAR_LABELS
 	// Load toolbar labels
 	IniSectionParser section;
-	WCHAR *pIniSectionBuf = static_cast<WCHAR *>(NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_TOOLBAR_LABELS));
-	const DWORD cchIniSection = static_cast<DWORD>NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
+	constexpr DWORD cchIniSection = MAX_INI_SECTION_SIZE_TOOLBAR_LABELS;
 
-	section.Init(COUNTOF(tbbMainWnd));
+	WCHAR * const pIniSectionBuf = section.Init(COUNTOF(tbbMainWnd), cchIniSection);
 	LoadIniSection(INI_SECTION_NAME_TOOLBAR_LABELS, pIniSectionBuf, cchIniSection);
 	section.ParseArray(pIniSectionBuf);
 
@@ -941,7 +941,6 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 	}
 
 	section.Free();
-	NP2HeapFree(pIniSectionBuf);
 #endif // NP2_ENABLE_CUSTOMIZE_TOOLBAR_LABELS
 
 	SendMessage(hwndToolbar, TB_SETEXTENDEDSTYLE, 0,
@@ -1353,7 +1352,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		ofn.nMaxFile = MAX_PATH;
 		ofn.lpstrTitle = szTitle;
 		ofn.lpstrInitialDir = szCurDir;
-		ofn.Flags = OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT |
+		ofn.Flags = OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT | OFN_NOTESTFILECREATE |
 					OFN_NODEREFERENCELINKS | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST;
 		if (bUseXPFileDialog) {
 			ofn.Flags |= OFN_EXPLORER | OFN_ENABLESIZING | OFN_ENABLEHOOK;
@@ -1448,7 +1447,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		ofn.lpstrFilter = szFilter;
 		ofn.lpstrFile = szNewFile;
 		ofn.nMaxFile = MAX_PATH;
-		ofn.Flags = OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT |
+		ofn.Flags = OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT | OFN_NOTESTFILECREATE |
 					OFN_NODEREFERENCELINKS | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST;
 		if (bUseXPFileDialog) {
 			ofn.Flags |= OFN_EXPLORER | OFN_ENABLESIZING | OFN_ENABLEHOOK;
@@ -2392,6 +2391,9 @@ void ValidateUILangauge() noexcept {
 	case LANG_RUSSIAN:
 		languageResID = IDS_LANG_RUSSIAN;
 		break;
+	case LANG_SLOVENIAN:
+		languageResID = IDS_LANG_SLOVENIAN;
+		break;
 	case LANG_NEUTRAL:
 	default:
 		languageResID = IDS_LANG_USER_DEFAULT;
@@ -2439,6 +2441,9 @@ void SetUILanguage(int resID) noexcept {
 	case IDS_LANG_RUSSIAN:
 		lang = MAKELANGID(LANG_RUSSIAN, SUBLANG_DEFAULT);
 		break;
+	case IDS_LANG_SLOVENIAN:
+		lang = MAKELANGID(LANG_SLOVENIAN, SUBLANG_DEFAULT);
+		break;
 	}
 
 	if (uiLanguage == lang) {
@@ -2464,10 +2469,9 @@ void SetUILanguage(int resID) noexcept {
 //
 void LoadSettings() noexcept {
 	IniSectionParser section;
-	WCHAR *pIniSectionBuf = static_cast<WCHAR *>(NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_SETTINGS));
-	const DWORD cchIniSection = static_cast<DWORD>(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
+	constexpr DWORD cchIniSection = MAX_INI_SECTION_SIZE_SETTINGS;
 
-	section.Init(128);
+	WCHAR * const pIniSectionBuf = section.Init(128, cchIniSection);
 	LoadIniSection(INI_SECTION_NAME_SETTINGS, pIniSectionBuf, cchIniSection);
 	section.Parse(pIniSectionBuf);
 
@@ -2560,13 +2564,10 @@ void LoadSettings() noexcept {
 		}
 		bNegFilter = section.GetBool(L"NegativeFilter", false);
 	} else { // ignore filter if /m was specified
-		if (*lpFilterArg == L'-') {
-			bNegFilter = true;
-			lstrcpyn(tchFilter, lpFilterArg + 1, COUNTOF(tchFilter));
-		} else {
-			bNegFilter = false;
-			lstrcpyn(tchFilter, lpFilterArg, COUNTOF(tchFilter));
-		}
+		bNegFilter = *lpFilterArg == L'-';
+		lstrcpyn(tchFilter, lpFilterArg + static_cast<uint8_t>(bNegFilter), COUNTOF(tchFilter));
+		NP2HeapFree(lpFilterArg);
+		lpFilterArg = nullptr;
 	}
 
 	bDefColorNoFilter = section.GetBool(L"DefColorNoFilter", true);
@@ -2617,7 +2618,6 @@ void LoadSettings() noexcept {
 	}
 
 	section.Free();
-	NP2HeapFree(pIniSectionBuf);
 
 	// Initialize custom colors for ChooseColor()
 	colorCustom[0] = RGB(0, 0, 128);
@@ -2847,7 +2847,7 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) noexcept {
 			state = CommandParseState_Argument;
 			if (ExtractFirstArgument(lp2, lp1, lp2)) {
 				int cord[4]{};
-				const int itok = ParseCommaList(lp1, cord, COUNTOF(cord));
+				const UINT itok = ParseCommaList(lp1, cord, COUNTOF(cord));
 				if (itok == 4) {
 					flagPosParam = true;
 					state = CommandParseState_Consumed;
@@ -2892,33 +2892,32 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) noexcept {
 
 void ParseCommandLine() noexcept {
 	LPWSTR lpCmdLine = GetCommandLine();
-	const size_t cmdSize = sizeof(WCHAR) * (lstrlen(lpCmdLine) + 1);
-
-	if (cmdSize == sizeof(WCHAR)) {
+	size_t cmdSize = lstrlen(lpCmdLine);
+	if (cmdSize == 0) {
 		return;
 	}
 
 #if 0
 	FILE *fp = fopen("args-dump.txt", "wb");
 	fwrite("\xFF\xFE", 1, 2, fp);
-	fwrite(lpCmdLine, 1, cmdSize - 2, fp);
+	fwrite(lpCmdLine, 1, cmdSize * sizeof(WCHAR), fp);
 	fclose(fp);
 #endif
 
 	// Good old console can also send args separated by Tabs
 	StrTab2Space(lpCmdLine);
 
-	LPWSTR lp1 = static_cast<LPWSTR>(NP2HeapAlloc(cmdSize));
-	LPWSTR lp3 = static_cast<LPWSTR>(NP2HeapAlloc(cmdSize));
+	cmdSize = NP2_align_up(cmdSize + 1, MEMORY_ALLOCATION_ALIGNMENT);
+	WCHAR * const lp1 = static_cast<LPWSTR>(NP2HeapAlloc(cmdSize * sizeof(WCHAR) * 3));
+	WCHAR * const lp2 = lp1 + cmdSize;
+	WCHAR * const lp3 = lp2 + cmdSize;
 
 	// Start with 2nd argument
 	if (!(ExtractFirstArgument(lpCmdLine, lp1, lp3) && *lp3)) {
 		NP2HeapFree(lp1);
-		NP2HeapFree(lp3);
 		return;
 	}
 
-	LPWSTR lp2 = static_cast<LPWSTR>(NP2HeapAlloc(cmdSize));
 	while (ExtractFirstArgument(lp3, lp1, lp2)) {
 		// options
 		if (*lp1 == L'/' || *lp1 == L'-') {
@@ -2943,9 +2942,7 @@ void ParseCommandLine() noexcept {
 		}
 	}
 
-	NP2HeapFree(lp2);
 	NP2HeapFree(lp1);
-	NP2HeapFree(lp3);
 }
 
 //=============================================================================
@@ -2955,10 +2952,9 @@ void ParseCommandLine() noexcept {
 //
 void LoadFlags() noexcept {
 	IniSectionParser section;
-	WCHAR *pIniSectionBuf = static_cast<WCHAR *>(NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_FLAGS));
-	const DWORD cchIniSection = static_cast<DWORD>(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
+	constexpr DWORD cchIniSection = MAX_INI_SECTION_SIZE_FLAGS;
 
-	section.Init(16);
+	WCHAR * const pIniSectionBuf = section.Init(16, cchIniSection);
 	LoadIniSection(INI_SECTION_NAME_FLAGS, pIniSectionBuf, cchIniSection);
 	section.Parse(pIniSectionBuf);
 
@@ -2994,7 +2990,6 @@ void LoadFlags() noexcept {
 	}
 
 	section.Free();
-	NP2HeapFree(pIniSectionBuf);
 }
 
 //=============================================================================
@@ -3403,10 +3398,9 @@ static BOOL CALLBACK EnumWindProcTargetApplication(HWND hwnd, LPARAM lParam) noe
 
 void LoadLaunchSetings() noexcept {
 	IniSectionParser section;
-	WCHAR *pIniSectionBuf = static_cast<WCHAR *>(NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_TARGET_APPLICATION));
-	const DWORD cchIniSection = static_cast<DWORD>(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
+	constexpr DWORD cchIniSection = MAX_INI_SECTION_SIZE_TARGET_APPLICATION;
 
-	section.Init(16);
+	WCHAR * const pIniSectionBuf = section.Init(16, cchIniSection);
 	LoadIniSection(INI_SECTION_NAME_TARGET_APPLICATION, pIniSectionBuf, cchIniSection);
 	section.Parse(pIniSectionBuf);
 
@@ -3434,7 +3428,6 @@ void LoadLaunchSetings() noexcept {
 
 	lstrcpy(szGlobalWndClass, szTargetApplicationWndClass);
 	section.Free();
-	NP2HeapFree(pIniSectionBuf);
 	bLoadLaunchSetingsLoaded = true;
 }
 

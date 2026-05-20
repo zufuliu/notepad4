@@ -451,6 +451,7 @@ void ListBoxX::Draw(const DRAWITEMSTRUCT *pDrawItem) {
 		PRectangle rcImage = rcItem;
 		rcImage.left = left;
 		rcImage.right = rcImage.left + images.GetWidth();
+		rcImage.bottom = rcImage.top + rcItemBase.Height();
 		graphics.pixmapLine->DrawRGBAImage(rcImage,
 			pimage->GetWidth(), pimage->GetHeight(), pimage->Pixels());
 	}

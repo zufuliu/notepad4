@@ -49,13 +49,13 @@ class OptionSet : public OptionSetInterface {
 		Option() noexcept :
 			opType(SC_TYPE_BOOLEAN), pb(nullptr), description("") {
 		}
-		Option(plcob pb_, const char *description_ = "") noexcept :
+		explicit Option(plcob pb_, const char *description_ = "") noexcept :
 			opType(SC_TYPE_BOOLEAN), pb(pb_), description(description_) {
 		}
-		Option(plcoi pi_, const char *description_) noexcept :
+		explicit Option(plcoi pi_, const char *description_) noexcept :
 			opType(SC_TYPE_INTEGER), pi(pi_), description(description_) {
 		}
-		Option(plcos ps_, const char *description_) noexcept :
+		explicit Option(plcos ps_, const char *description_) noexcept :
 			opType(SC_TYPE_STRING), ps(ps_), description(description_) {
 		}
 		bool Set(T *base, const char *val) {

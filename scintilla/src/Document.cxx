@@ -15,6 +15,8 @@
 #include <climits>
 
 #include <stdexcept>
+#include <new>
+#include <utility>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -23,6 +25,7 @@
 #include <forward_list>
 #include <optional>
 #include <algorithm>
+#include <iterator>
 #include <memory>
 
 #include <windows.h>
@@ -542,6 +545,13 @@ void SCI_METHOD Document::SetErrorStatus(int status) noexcept {
 	// Tell the watchers an error has occurred.
 	for (const auto &watcher : watchers) {
 		watcher.watcher->NotifyErrorOccurred(this, watcher.userData, static_cast<Status>(status));
+	}
+}
+
+void Document::CheckPosition(Sci::Position pos) const {
+	PLATFORM_ASSERT(InRangeInclusive(pos, LengthNoExcept()));
+	if (!InRangeInclusive(pos, LengthNoExcept())) {
+		throw Failure(Status::OutsideDocument);
 	}
 }
 
@@ -1379,6 +1389,7 @@ Sci::Position Document::InsertString(Sci::Position position, const char *s, Sci:
 	if (insertLength <= 0) {
 		return 0;
 	}
+	CheckPosition(position);
 	CheckReadOnly();	// Application may change read only state here
 	if (cb.IsReadOnly()) {
 		return 0;
@@ -1450,7 +1461,7 @@ int SCI_METHOD Document::AddData(const char *data, Sci_Position length) {
 	try {
 		const Sci::Position position = LengthNoExcept();
 		InsertString(position, data, length);
-	} catch (std::bad_alloc &) {
+	} catch (const std::bad_alloc &) {
 		return static_cast<int>(Status::BadAlloc);
 	} catch (...) {
 		return static_cast<int>(Status::Failure);
@@ -1522,7 +1533,7 @@ Sci::Position Document::Undo() {
 						modFlags |= ModificationFlags::MultilineUndoRedo;
 				}
 				NotifyModified(DocModification(modFlags, action.position, action.lenData,
-					linesAdded, action.data));
+					linesAdded, action.data, 0, newPos));
 			}
 
 			const bool endSavePoint = cb.IsSavePoint();
@@ -1582,7 +1593,7 @@ Sci::Position Document::Redo() {
 				}
 				NotifyModified(
 					DocModification(modFlags, action.position, action.lenData,
-						linesAdded, action.data));
+						linesAdded, action.data, 0, newPos));
 			}
 
 			const bool endSavePoint = cb.IsSavePoint();
@@ -1820,13 +1831,13 @@ constexpr std::string_view EOLForMode(EndOfLine eolMode) noexcept {
 
 // Convert line endings for a piece of text to a particular mode.
 // Stop at len or when a NUL is found.
-std::string Document::TransformLineEnds(const char *s, size_t len, EndOfLine eolModeWanted) {
+std::string Document::TransformLineEnds(std::string_view s, EndOfLine eolModeWanted) {
 	std::string dest;
 	const std::string_view eol = EOLForMode(eolModeWanted);
-	for (size_t i = 0; (i < len) && (s[i]); i++) {
+	for (size_t i = 0; (i < s.length()) && (s[i]); i++) {
 		if (IsEOLCharacter(s[i])) {
 			dest.append(eol);
-			if ((s[i] == '\r') && (i + 1 < len) && (s[i + 1] == '\n')) {
+			if ((s[i] == '\r') && (i + 1 < s.length()) && (s[i + 1] == '\n')) {
 				i++;
 			}
 		} else {
@@ -2535,18 +2546,34 @@ void SCI_METHOD Document::StartStyling(Sci_Position position) noexcept {
 	endStyled = position;
 }
 
-bool SCI_METHOD Document::SetStyles(Sci_Position length, const unsigned char *styles, unsigned char style) {
+bool SCI_METHOD Document::SetStyleFor(Sci_Position length, unsigned char style) {
 	if (length <= 0 || enteredStyling != 0 || !cb.HasStyles()) {
 		return false;
 	}
 	enteredStyling++;
-	const Sci::Position prevEndStyled = endStyled;
-	if (cb.SetStyles(endStyled, length, styles, style)) {
+	const ChangedRange range = cb.SetStyleFor(endStyled, length, style);
+	endStyled += length;
+	if (!range.Empty()) {
 		const DocModification mh(ModificationFlags::ChangeStyle | ModificationFlags::User,
-			prevEndStyled, length);
+			range.start, range.Length());
 		NotifyModified(mh);
 	}
+	enteredStyling--;
+	return true;
+}
+
+bool SCI_METHOD Document::SetStyles(Sci_Position length, const unsigned char *styles) {
+	if (length <= 0 || enteredStyling != 0 || !cb.HasStyles()) {
+		return false;
+	}
+	enteredStyling++;
+	const ChangedRange range = cb.SetStyles(endStyled, length, reinterpret_cast<const char *>(styles));
 	endStyled += length;
+	if (!range.Empty()) {
+		const DocModification mh(ModificationFlags::ChangeStyle | ModificationFlags::User,
+			range.start, range.Length());
+		NotifyModified(mh);
+	}
 	enteredStyling--;
 	return true;
 }
@@ -3310,7 +3337,7 @@ Sci::Position Document::BraceMatch(Sci::Position position, Sci::Position /*maxRe
 
 	while (IsValidIndex(position, length)) {
 		const unsigned char chAtPos = cbView[position];
-		if (chAtPos == chBrace || chAtPos == chSeek) {
+		if (AnyOf(chAtPos, chBrace, chSeek)) {
 			if ((position > endStylePos || StyleIndexAt(position) == styBrace) &&
 				(chAtPos <= safeChar || position == MovePositionOutsideChar(position, direction, false))) {
 				depth += (chAtPos == chBrace) ? 1 : -1;

@@ -12,7 +12,7 @@ struct StyleAndColour {
 	Scintilla::IndicatorStyle style = Scintilla::IndicatorStyle::Plain;
 	ColourRGBA fore = black;
 	constexpr StyleAndColour() noexcept = default;
-	constexpr StyleAndColour(Scintilla::IndicatorStyle style_, ColourRGBA fore_ = black) noexcept : style(style_), fore(fore_) {}
+	explicit constexpr StyleAndColour(Scintilla::IndicatorStyle style_, ColourRGBA fore_ = black) noexcept : style(style_), fore(fore_) {}
 	bool operator==(const StyleAndColour &other) const noexcept {
 		return __builtin_memcmp(this, &other, sizeof(other)) == 0;
 	}
@@ -36,7 +36,7 @@ public:
 	Scintilla::IndicFlag attributes = Scintilla::IndicFlag::None;
 	XYPOSITION strokeWidth = 1.0f;
 	constexpr Indicator() noexcept = default;
-	constexpr Indicator(Scintilla::IndicatorStyle style_, ColourRGBA fore_ = black, bool under_ = false, int fillAlpha_ = 30, int outlineAlpha_ = 50) noexcept :
+	explicit constexpr Indicator(Scintilla::IndicatorStyle style_, ColourRGBA fore_ = black, bool under_ = false, int fillAlpha_ = 30, int outlineAlpha_ = 50) noexcept :
 		sacNormal(style_, fore_), sacHover(style_, fore_), under(under_), fillAlpha(fillAlpha_), outlineAlpha(outlineAlpha_) {}
 	void SCICALL Draw(Surface *surface, PRectangle rc, PRectangle rcLine, PRectangle rcCharacter, State state, int value) const;
 

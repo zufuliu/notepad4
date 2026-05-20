@@ -10,10 +10,9 @@ jobs:
   msvc:
     strategy:
       matrix:
-        system: [
-          { runner: windows-2025-vs2026, version: '2026' },
-          { runner: windows-2022, version: '2022' },
-        ]
+        system:
+        - { runner: windows-2025-vs2026, version: '2026' }
+        - { runner: windows-2022, version: '2022' }
         platform: [Win32, x64, ARM64, AVX2, AVX512]
     name: MSVC ${{ matrix.system.version }} (${{ matrix.platform }})
     runs-on: ${{ matrix.system.runner }}
@@ -38,10 +37,9 @@ jobs:
   llvm_msvc:
     strategy:
       matrix:
-        system: [
-          { runner: windows-2025-vs2026, version: '2026' },
-          { runner: windows-2022, version: '2022' },
-        ]
+        system:
+        - { runner: windows-2025-vs2026, version: '2026' }
+        - { runner: windows-2022, version: '2022' }
         platform: [Win32, x64, ARM64, AVX2, AVX512]
     name: LLVM MSVC ${{ matrix.system.version }} (${{ matrix.platform }})
     runs-on: ${{ matrix.system.runner }}
@@ -100,12 +98,8 @@ jobs:
         compiler: [GCC, Clang]
         platform: [x64, AVX2, AVX512]
         include:
-          - arch: i686
-            platform: Win32
-            compiler: GCC
-          - arch: i686
-            platform: Win32
-            compiler: Clang
+        - { arch: i686, platform: Win32, compiler: GCC }
+        # - { arch: i686, platform: Win32, compiler: Clang }
     name: ${{ matrix.arch }} ${{ matrix.compiler }} (${{ matrix.platform }})
     runs-on: windows-latest
     # pacman may fail to download packages from mirror site

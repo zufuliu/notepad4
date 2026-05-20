@@ -512,7 +512,7 @@ static KEYWORDLIST Keywords_SQL = {{
 
 static EDITSTYLE Styles_SQL[] = {
 	EDITSTYLE_DEFAULT,
-	{ SCE_SQL_WORD, NP2StyleX_Keyword, L"bold; fore:#FF8040" },
+	{ SCE_SQL_WORD, NP2StyleX_Keyword, L"bold; fore:#FF8000" },
 	{ SCE_SQL_WORD2, NP2StyleX_TypeKeyword, L"bold; fore:#1E90FF" },
 	{ SCE_SQL_USER1, NP2StyleX_BasicFunction, L"fore:#FF0080" },
 	{ MULTI_STYLE(SCE_SQL_COMMENT, SCE_SQL_COMMENTLINE, SCE_SQL_COMMENTLINEDOC, SCE_SQL_COMMENTDOC), NP2StyleX_Comment, L"fore:#608060" },

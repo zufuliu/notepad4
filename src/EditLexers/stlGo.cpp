@@ -26,7 +26,7 @@ static KEYWORDLIST Keywords_Go = {{
 "Seeker StringWriter WriteCloser WriteSeeker Writer WriterAt WriterTo "
 
 , // 6 constant
-"DevNull E Friday Hour Ln10 Ln2 Log10E Log2E "
+"DevNull Friday Hour Ln10 Ln2 Log10E Log2E "
 "Microsecond Millisecond Minute ModeAppend ModeCharDevice ModeDevice ModeDir ModeExclusive ModeIrregular ModeNamedPipe "
 "ModePerm ModeSetgid ModeSetuid ModeSocket ModeSticky ModeSymlink ModeTemporary ModeType Monday "
 "Nanosecond O_APPEND O_CREATE O_EXCL O_RDONLY O_RDWR O_SYNC O_TRUNC O_WRONLY PathListSeparator PathSeparator Phi Pi "

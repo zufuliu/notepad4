@@ -1,5 +1,5 @@
-// 2026 https://www.w3.org/TR/CSS/ 26 February 2026
-// 2026-03-15 https://drafts.csswg.org/
+// 2026 https://www.w3.org/TR/CSS/ 26 March 2026
+// 2026-03-16 https://drafts.csswg.org/
 // https://github.com/w3c/csswg-drafts/
 // https://www.w3.org/Style/CSS/current-work
 // https://www.w3.org/Style/CSS/all-properties
@@ -12,7 +12,7 @@
 !important
 
 // CSS Anchor Positioning Module Level 2 https://www.w3.org/TR/css-anchor-position-2/ 21 October 2025
-// CSS Anchor Positioning Module Level 1 https://www.w3.org/TR/css-anchor-position-1/ 30 January 2026
+// CSS Anchor Positioning Module Level 1 https://www.w3.org/TR/css-anchor-position-1/ 27 March 2026
 {
 	anchor-name: none;
 	anchor-scope: none | all;
@@ -113,7 +113,7 @@ from to
 }
 
 // CSS Basic User Interface Module Level 4 https://www.w3.org/TR/css-ui-4/ 20 January 2026
-// CSS Basic User Interface Module Level 3 https://www.w3.org/TR/css-ui-3/ 21 June 2018
+// CSS Basic User Interface Module Level 3 https://www.w3.org/TR/css-ui-3/ 7 April 2026
 // User interface https://www.w3.org/TR/CSS22/ui.html
 {
 	box-sizing: content-box | border-box;
@@ -369,8 +369,8 @@ initial inherit unset revert revert-layer
 @scope {}
 :scope
 
-// CSS Color Module Level 5 https://www.w3.org/TR/css-color-5/ 27 February 2026
-// CSS Color Module Level 4 https://www.w3.org/TR/css-color-4/ 27 February 2026
+// CSS Color Module Level 5 https://www.w3.org/TR/css-color-5/ 7 May 2026
+// CSS Color Module Level 4 https://www.w3.org/TR/css-color-4/ 2 May 2026
 // CSS Color Module Level 3 https://www.w3.org/TR/css-color-3/ 18 January 2022
 // Colors and Backgrounds https://www.w3.org/TR/CSS22/colors.html
 {
@@ -576,7 +576,7 @@ env()
 }
 
 // CSS Fonts Module Level 5 https://www.w3.org/TR/css-fonts-5/ 3 March 2026
-// CSS Fonts Module Level 4 https://www.w3.org/TR/css-fonts-4/ 3 March 2026
+// CSS Fonts Module Level 4 https://www.w3.org/TR/css-fonts-4/ 22 April 2026
 // CSS Fonts Module Level 3 https://www.w3.org/TR/css-fonts-3/ 20 September 2018
 // Fonts https://www.w3.org/TR/CSS22/fonts.html
 {
@@ -809,6 +809,12 @@ type()
 	item-flow:;
 }
 auto-areas auto-fit
+
+// CSS Image Animation Module Level 1 https://www.w3.org/TR/css-image-animation-1/ 9 April 2026
+:animated-image
+{
+	image-animation: normal | paused | stopped | running;
+}
 
 // CSS Images Module Level 4 https://www.w3.org/TR/css-images-4/ 30 September 2025
 // CSS Images Module Level 3 https://www.w3.org/TR/css-images-3/ 18 December 2023
@@ -1351,7 +1357,7 @@ block inline vertical horizontal
 root nearest
 view()
 
-// Selectors Level 5 https://drafts.csswg.org/selectors-5/ 16 February 2026
+// Selectors Level 5 https://www.w3.org/TR/selectors-5/ 17 February 2026
 // Selectors Level 4 https://www.w3.org/TR/selectors-4/ 22 January 2026
 // Selectors Level 3 https://www.w3.org/TR/selectors-3/ 6 November 2018
 // pseudo-class https://www.w3.org/TR/css/#selectors
@@ -1755,7 +1761,7 @@ aural speech
 	speak-header: once | always;
 }
 
-// Compatibility https://compat.spec.whatwg.org/ 15 December 2025
+// Compatibility https://compat.spec.whatwg.org/ 15 March 2026
 {
 	touch-action: auto | none | pan-x | pan-left | pan-right | pan-y | pan-up | pan-down | pinch-zoom | manipulation;
 }

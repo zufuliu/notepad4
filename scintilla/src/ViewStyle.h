@@ -18,7 +18,7 @@ public:
 	MarkerMask mask;
 	bool sensitive = false;
 	Scintilla::CursorShape cursor = Scintilla::CursorShape::ReverseArrow;
-	constexpr MarginStyle(Scintilla::MarginType style_ = Scintilla::MarginType::Symbol, int width_ = 0, MarkerMask mask_ = 0) noexcept:
+	explicit constexpr MarginStyle(Scintilla::MarginType style_ = Scintilla::MarginType::Symbol, int width_ = 0, MarkerMask mask_ = 0) noexcept:
 		style(style_), width(width_), mask(mask_) {}
 	constexpr bool ShowsFolding() const noexcept {
 		return (mask & Scintilla::MaskFolders) != 0;
@@ -38,9 +38,10 @@ using FontMap = std::map<FontSpecification, std::unique_ptr<FontRealised>>;
 using ColourOptional = std::optional<ColourRGBA>;
 
 constexpr int GetFontSizeZoomed(int size, int zoomLevel) noexcept {
-	size = (size * zoomLevel + 50) / 100;
+	size = (size * zoomLevel + 50) / 100U;
 	// ensure sizeZoomed at least minimum positive size
-	return std::max(size, Scintilla::FontSizeMultiplier);
+	// Hangs if font height <= 1, so force minimum value
+	return std::max(size, 2*Scintilla::FontSizeMultiplier);
 }
 
 constexpr ColourOptional OptionalColour(uptr_t wParam, sptr_t lParam) {
@@ -197,7 +198,7 @@ public:
 
 	std::string localeName;
 
-	ViewStyle(size_t stylesSize_ = 256);
+	explicit ViewStyle(size_t stylesSize_ = 256);
 	ViewStyle(const ViewStyle &source);
 	ViewStyle(ViewStyle &&) = delete;
 	// Can only be copied through copy constructor which ensures font names initialised correctly

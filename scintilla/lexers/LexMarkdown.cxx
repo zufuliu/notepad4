@@ -1633,18 +1633,7 @@ bool MarkdownLexer::HighlightCriticMarkup() {
 void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	if (startPos != 0) {
 		// backtrack to previous line for better coloring on typing.
-		const Sci_PositionU endPos = startPos + lengthDoc;
-		Sci_Line currentLine = styler.GetLine(startPos) - 1;
-		if (currentLine > 0 && (styler.GetLineState(currentLine) & LineStateEmptyLine) != 0) {
-			--currentLine; // fix typing after indented code block
-		}
-		startPos = styler.LineStart(currentLine);
-		lengthDoc = endPos - startPos;
-		initStyle = 0;
-		if (startPos != 0) {
-			initStyle = styler.StyleIndexAt(startPos - 1);
-			BacktrackToStart(styler, LineStateNestedStateLine, startPos, lengthDoc, initStyle);
-		}
+		BacktrackToStart(styler, -LineStateNestedStateLine, startPos, lengthDoc, initStyle);
 	}
 
 	MarkdownLexer lexer(startPos, lengthDoc, initStyle, keywordLists, styler);

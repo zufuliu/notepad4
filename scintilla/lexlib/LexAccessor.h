@@ -192,7 +192,7 @@ public:
 	}
 	void Flush() {
 		if (validLen > 0) {
-			pAccess->SetStyles(validLen, styleBuf, 0);
+			pAccess->SetStyles(validLen, styleBuf);
 			startPosStyling += validLen;
 			validLen = 0;
 		}
@@ -220,9 +220,9 @@ public:
 		ColorTo(pos + 1, chAttr);
 	}
 #endif
-	// styling in range [startSeg, endPos_)
+	SCI_noinline
 	void ColorTo(Sci_PositionU endPos_, int chAttr) {
-		// Only perform styling if non empty range
+		// Only perform styling for non empty range [startSeg, endPos_)
 		assert(endPos_ >= startSeg && endPos_ <= static_cast<Sci_PositionU>(Length()));
 		if (endPos_ > startSeg) {
 			Sci_PositionU len = endPos_ - startSeg;
@@ -241,7 +241,7 @@ public:
 				} while (len != 0);
 			} else {
 				// Too big for buffer so send directly
-				pAccess->SetStyles(len, nullptr, attr);
+				pAccess->SetStyleFor(len, attr);
 			}
 		}
 	}

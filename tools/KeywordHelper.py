@@ -82,8 +82,8 @@ def find_new_css_properties(properties, descriptors, lang, draft=True):
 	max-aspect-ratio max-device-aspect-ratio max-device-height max-device-width max-resolution
 	min-aspect-ratio min-device-aspect-ratio min-device-height min-device-width min-resolution
 	'''.split())
-	print('new css properties:', ', '.join(sorted(properties - existing)))
-	print('unknown css properties:', ', '.join(sorted(existing - properties)))
+	print('new css properties:', ':;\n'.join(sorted(properties - existing)) + ':;')
+	print('unknown css properties:', ':;\n'.join(sorted(existing - properties)) + ':;')
 
 def find_updated_css_drafts(since, path):
 	os.chdir(path)
@@ -199,7 +199,7 @@ def find_new_texinfo_commands(path, lang):
 		fd.write(f'@{doc}\n')
 
 # https://github.com/w3c/csswg-drafts/
-# find_updated_css_drafts('2026-03-15', r'H:\Libs\csswg-drafts')
+# find_updated_css_drafts('2026-05-16', r'H:\Libs\csswg-drafts')
 # https://www.w3.org/Style/CSS/all-properties.en.json
 # dump_all_css_properties('all-properties.en.json', 'property', 'title', 'url')
 # https://www.w3.org/Style/CSS/all-descriptors.en.json
@@ -211,4 +211,5 @@ def find_new_texinfo_commands(path, lang):
 
 #group_powershell_commands('command.ps1')
 
-#find_new_texinfo_commands(r'texinfo.texi', 'lang/Texinfo.texi')
+# https://www.gnu.org/software/texinfo/manual/texinfo/texinfo.texi.tar.gz
+# find_new_texinfo_commands(r'texinfo.texi', 'lang/Texinfo.texi')

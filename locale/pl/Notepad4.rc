@@ -119,6 +119,7 @@ BEGIN
 		MENUITEM "Zapisz &jako...\tF6",				IDM_FILE_SAVEAS
 		MENUITEM "Zapisz kopię zapa&sową",			IDM_FILE_SAVEBACKUP
 		MENUITEM "Zapisz &kopię...\tCtrl+F6",		IDM_FILE_SAVECOPY
+		MENUITEM "Zapisz z or&yginalnym czasem",	IDM_FILE_SAVEORIGINALTIMESTAMP
 		MENUITEM SEPARATOR
 		POPUP "&Tryb pliku"
 		BEGIN
@@ -172,7 +173,7 @@ BEGIN
 		MENUITEM "Utwórz skrót na pu&lpicie",		IDM_FILE_CREATELINK
 		MENUITEM SEPARATOR
 		MENUITEM "Prze&glądaj...\tCtrl+M",			IDM_FILE_BROWSE
-		POPUP "U&lubione"
+		POPUP "Ulu&bione"
 		BEGIN
 			MENUITEM "&Otwórz ulubione...\tAlt+I",	IDM_FILE_OPENFAV
 			MENUITEM "&Dodaj do ulubionych...\tAlt+K",IDM_FILE_ADDTOFAV
@@ -343,6 +344,7 @@ BEGIN
 			MENUITEM "Zamień znak na kod &szesnastkowy\tCtrl+Alt+X",IDM_EDIT_CHAR2HEX
 			MENUITEM "Zamień kod szesnastkowy na &znak\tCtrl+Alt+C",IDM_EDIT_HEX2CHAR
 			MENUITEM "&Pokaż kod szesnastkowy",					IDM_EDIT_SHOW_HEX
+			MENUITEM "P&okaż informację o znaku",				IDM_EDIT_SHOW_CHAR_INFO
 			MENUITEM SEPARATOR
 			MENUITEM "&Wstaw znaki ucieczki\tCtrl+Alt+E",		IDM_EDIT_ESCAPECCHARS
 			MENUITEM "&Usuń znaki ucieczki\tCtrl+Alt+R",		IDM_EDIT_UNESCAPECCHARS
@@ -630,6 +632,7 @@ BEGIN
 				MENUITEM "Polski",					IDM_LANG_POLISH
 				MENUITEM "Português (Brasil)",		IDM_LANG_PORTUGUESE_BRAZIL
 				MENUITEM "Русский",					IDM_LANG_RUSSIAN
+				MENUITEM "Slovenščina",				IDM_LANG_SLOVENIAN
 				MENUITEM "日本語",					IDM_LANG_JAPANESE
 				MENUITEM "한국어",					IDM_LANG_KOREAN
 				MENUITEM "中文(繁體)",				IDM_LANG_CHINESE_TRADITIONAL
@@ -724,6 +727,8 @@ BEGIN
 			MENUITEM "&Otwórz plik, folder, link, itp.",	CMD_OPEN_PATH_OR_LINK
 			MENUITEM "Otwórz &folder zawierający ten dokument",CMD_OPEN_CONTAINING_FOLDER
 			MENUITEM SEPARATOR
+			MENUITEM "O&blicz wyrażenie",				CMD_CALCULATE_EXPR
+			MENUITEM SEPARATOR
 			MENUITEM "Wyszukaj przy użyciu &Google",		CMD_ONLINE_SEARCH_GOOGLE
 			MENUITEM "Wyszukaj przy użyciu &Bing",			CMD_ONLINE_SEARCH_BING
 			MENUITEM "Wyszukaj na &Wikipedii",				CMD_ONLINE_SEARCH_WIKI
@@ -763,6 +768,7 @@ BEGIN
 			MENUITEM "&Skompresuj &kod CSS/JS/JSON",		IDM_EDIT_CODE_COMPRESS
 			MENUITEM "&Popraw formatowanie CSS/JS/JSON",	IDM_EDIT_CODE_PRETTY
 			MENUITEM SEPARATOR
+			MENUITEM "&Wyznacz wartość wyrażenia JS",			CMD_EVALUATE_JS_EXPR
 			MENUITEM "Zamień znaki na encje HTML/&XML\tAlt+Shift+X",IDM_EDIT_XHTML_ESCAPE_CHAR
 			MENUITEM "Zamień encje &HTML/XML na znaki\tAlt+Shift+H",IDM_EDIT_XHTML_UNESCAPE_CHAR
 			MENUITEM SEPARATOR

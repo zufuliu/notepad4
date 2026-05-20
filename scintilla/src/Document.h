@@ -127,6 +127,9 @@ struct StyledText {
 	size_t StyleAt(size_t i) const noexcept {
 		return multipleStyles ? styles[i] : style;
 	}
+	std::string_view AsView() const noexcept {
+		return { text, length };
+	}
 };
 
 class HighlightDelimiter {
@@ -240,7 +243,7 @@ class ActionDuration {
 	static constexpr int unitBytes = 1024;
 public:
 	static constexpr int InitialBytes = 1024*1024;
-	ActionDuration(double initial) noexcept : duration{initial} {}
+	explicit ActionDuration(double initial) noexcept : duration{initial} {}
 	void AddSample(Sci::Position numberActions, double durationOfActions) noexcept;
 	double Duration() const noexcept {
 		return duration;
@@ -286,7 +289,7 @@ public:
 	struct WatcherWithUserData {
 		DocWatcher *watcher;
 		void *userData;
-		WatcherWithUserData(DocWatcher *watcher_ = nullptr, void *userData_ = nullptr)noexcept :
+		explicit WatcherWithUserData(DocWatcher *watcher_ = nullptr, void *userData_ = nullptr)noexcept :
 			watcher(watcher_), userData(userData_) {}
 		bool operator==(const WatcherWithUserData &other) const noexcept {
 			return (watcher == other.watcher) && (userData == other.userData);
@@ -389,6 +392,7 @@ public:
 	}
 
 	void SCI_METHOD SetErrorStatus(int status) noexcept override;
+	void CheckPosition(Sci::Position pos) const;
 
 	Sci_Line SCI_METHOD LineFromPosition(Sci_Position pos) const noexcept override;
 	Sci::Line SciLineFromPosition(Sci::Position pos) const noexcept;	// Avoids casting LineFromPosition
@@ -534,7 +538,7 @@ public:
 	Sci::Position CountUTF16(Sci::Position startPos, Sci::Position endPos) const noexcept;
 	Sci::Position FindColumn(Sci::Line line, Sci::Position column) const noexcept;
 	void Indent(bool forwards, Sci::Line lineBottom, Sci::Line lineTop);
-	static std::string TransformLineEnds(const char *s, size_t len, Scintilla::EndOfLine eolModeWanted);
+	static std::string TransformLineEnds(std::string_view s, Scintilla::EndOfLine eolModeWanted);
 	void ConvertLineEnds(Scintilla::EndOfLine eolModeSet);
 	std::string_view EOLString() const noexcept;
 	void SetReadOnly(bool set) noexcept {
@@ -644,13 +648,8 @@ public:
 	int CharacterCategoryOptimization() const noexcept;
 #endif
 	void SCI_METHOD StartStyling(Sci_Position position) noexcept override;
-	bool SCI_METHOD SetStyles(Sci_Position length, const unsigned char *styles, unsigned char style) override;
-	bool SetStyleFor(Sci_Position length, unsigned char style) {
-		return SetStyles(length, nullptr, style);
-	}
-	bool SetStyles(Sci_Position length, const unsigned char *styles) {
-		return SetStyles(length, styles, 0);
-	}
+	bool SCI_METHOD SetStyleFor(Sci_Position length, unsigned char style) override;
+	bool SCI_METHOD SetStyles(Sci_Position length, const unsigned char *styles) override;
 	Sci::Position GetEndStyled() const noexcept {
 		return endStyled;
 	}
@@ -734,7 +733,7 @@ class UndoGroup {
 	Document *pdoc;
 	bool groupNeeded;
 public:
-	UndoGroup(Document *pdoc_, bool groupNeeded_ = true) noexcept :
+	explicit UndoGroup(Document *pdoc_, bool groupNeeded_ = true) noexcept :
 		pdoc(pdoc_), groupNeeded(groupNeeded_) {
 		if (groupNeeded) {
 			pdoc->BeginUndoAction();
@@ -771,36 +770,29 @@ public:
 	Sci::Position length;
 	Sci::Line linesAdded;	/**< Negative if lines deleted. */
 	const char *text;	/**< Only valid for changes to text, not for changes to style. */
-	Sci::Line line;
-	Scintilla::FoldLevel foldLevelNow;
-	Scintilla::FoldLevel foldLevelPrev;
-	Sci::Line annotationLinesAdded;
-	Sci::Position token;
+	Sci::Line line = 0;
+	Scintilla::FoldLevel foldLevelNow = Scintilla::FoldLevel::None;
+	Scintilla::FoldLevel foldLevelPrev = Scintilla::FoldLevel::None;
+	Sci::Line annotationLinesAdded = 0;
+	Sci::Position token = 0;
+	Sci::Position newPos = -1;	/**< Reasonable new caret position after undo or redo. */
 
-	DocModification(Scintilla::ModificationFlags modificationType_, Sci::Position position_ = 0, Sci::Position length_ = 0,
-		Sci::Line linesAdded_ = 0, const char *text_ = nullptr, Sci::Line line_ = 0) noexcept :
+	explicit DocModification(Scintilla::ModificationFlags modificationType_, Sci::Position position_ = 0, Sci::Position length_ = 0,
+		Sci::Line linesAdded_ = 0, const char *text_ = nullptr, Sci::Line line_ = 0, Sci::Position newPos_ = -1) noexcept :
 		modificationType(modificationType_),
 		position(position_),
 		length(length_),
 		linesAdded(linesAdded_),
 		text(text_),
 		line(line_),
-		foldLevelNow(Scintilla::FoldLevel::None),
-		foldLevelPrev(Scintilla::FoldLevel::None),
-		annotationLinesAdded(0),
-		token(0) {}
+		newPos(newPos_) {}
 
 	DocModification(Scintilla::ModificationFlags modificationType_, const Action &act, Sci::Line linesAdded_ = 0) noexcept :
 		modificationType(modificationType_),
 		position(act.position),
 		length(act.lenData),
 		linesAdded(linesAdded_),
-		text(act.data),
-		line(0),
-		foldLevelNow(Scintilla::FoldLevel::None),
-		foldLevelPrev(Scintilla::FoldLevel::None),
-		annotationLinesAdded(0),
-		token(0) {}
+		text(act.data) {}
 };
 
 /**

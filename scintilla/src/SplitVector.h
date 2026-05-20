@@ -117,7 +117,7 @@ class SplitVector {
 
 public:
 	/// Construct a split buffer.
-	SplitVector(size_t growSize_ = 8) noexcept : growSize{growSize_} {}
+	explicit SplitVector(size_t growSize_ = 8) noexcept : growSize{growSize_} {}
 
 	size_t size() const noexcept {
 		return body.size();

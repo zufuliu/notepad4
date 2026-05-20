@@ -50,9 +50,7 @@ extern EDITLEXER lexCSS;
 extern EDITLEXER lexJava;
 extern EDITLEXER lexJavaScript;
 extern EDITLEXER lexJSON;
-extern EDITLEXER lexPHP;
 extern EDITLEXER lexPython;
-extern EDITLEXER lexRuby;
 extern EDITLEXER lexSQL;
 extern EDITLEXER lexHTML;
 extern EDITLEXER lexXML;
@@ -123,12 +121,14 @@ extern EDITLEXER lexOCaml;
 
 extern EDITLEXER lexPascal;
 extern EDITLEXER lexPerl;
+extern EDITLEXER lexPHP;
 extern EDITLEXER lexPowerBuilder;
 extern EDITLEXER lexPowerShell;
 
 extern EDITLEXER lexRLang;
 extern EDITLEXER lexRebol;
 extern EDITLEXER lexResourceScript;
+extern EDITLEXER lexRuby;
 extern EDITLEXER lexRust;
 
 extern EDITLEXER lexSAS;
@@ -140,6 +140,7 @@ extern EDITLEXER lexTcl;
 extern EDITLEXER lexTexinfo;
 extern EDITLEXER lexTOML;
 extern EDITLEXER lexTypeScript;
+extern EDITLEXER lexTypst;
 
 extern EDITLEXER lexVBScript;
 extern EDITLEXER lexVerilog;
@@ -167,9 +168,7 @@ static PEDITLEXER pLexArray[] = {
 	&lexJava,
 	&lexJavaScript,
 	&lexJSON,
-	&lexPHP,
 	&lexPython,
-	&lexRuby,
 	&lexSQL,
 	&lexHTML,
 	&lexXML,
@@ -240,12 +239,14 @@ static PEDITLEXER pLexArray[] = {
 
 	&lexPascal,
 	&lexPerl,
+	&lexPHP,
 	&lexPowerBuilder,
 	&lexPowerShell,
 
 	&lexRLang,
 	&lexRebol,
 	&lexResourceScript,
+	&lexRuby,
 	&lexRust,
 
 	&lexSAS,
@@ -257,6 +258,7 @@ static PEDITLEXER pLexArray[] = {
 	&lexTexinfo,
 	&lexTOML,
 	&lexTypeScript,
+	&lexTypst,
 
 	&lexVBScript,
 	&lexVerilog,
@@ -361,6 +363,7 @@ static LPWSTR g_AllFileExtensions = nullptr;
 
 // Notepad4.cpp
 extern HWND hwndMain;
+extern DWORD dwLastIOError;
 extern int	iCurrentEncoding;
 extern int	g_DOSEncoding;
 extern int	iDefaultCodePage;
@@ -691,10 +694,10 @@ static void Style_LoadOneEx(PEDITLEXER pLex, IniSectionParser &section, WCHAR *p
 
 void Style_SetFavoriteSchemes() noexcept {
 	int favorite[MAX_FAVORITE_SCHEMES_COUNT];
-	const int count = ParseCommaList(favoriteSchemesConfig, favorite, MAX_FAVORITE_SCHEMES_COUNT);
+	const UINT count = ParseCommaList(favoriteSchemesConfig, favorite, MAX_FAVORITE_SCHEMES_COUNT);
 	UINT index = LEXER_INDEX_GENERAL;
 
-	for (int i = 0; i < count; i++) {
+	for (UINT i = 0; i < count; i++) {
 		const int rid = favorite[i] + NP2LEX_TEXTFILE;
 		for (UINT iLexer = index; iLexer < ALL_LEXER_COUNT; iLexer++) {
 			PEDITLEXER pLex = pLexArray[iLexer];
@@ -770,9 +773,8 @@ void Style_Load() noexcept {
 	if (g_AllFileExtensions == nullptr) {
 		g_AllFileExtensions = static_cast<LPWSTR>(NP2HeapAlloc(ALL_FILE_EXTENSIONS_BYTE_SIZE));
 	}
-	WCHAR *pIniSectionBuf = static_cast<WCHAR *>(NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_STYLES));
-	const DWORD cchIniSection = static_cast<DWORD>(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
-	section.Init(128);
+	constexpr DWORD cchIniSection = MAX_INI_SECTION_SIZE_STYLES;
+	WCHAR * const pIniSectionBuf = section.Init(128, cchIniSection);
 
 	LoadIniSection(INI_SECTION_NAME_STYLES, pIniSectionBuf, cchIniSection);
 	section.Parse(pIniSectionBuf);
@@ -819,24 +821,20 @@ void Style_Load() noexcept {
 	FindSystemDefaultTextFont();
 
 	section.Free();
-	NP2HeapFree(pIniSectionBuf);
 }
 
 static void Style_LoadOne(PEDITLEXER pLex) noexcept {
 	IniSectionParser section;
-	WCHAR *pIniSectionBuf = static_cast<WCHAR *>(NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_STYLES));
-	const DWORD cchIniSection = static_cast<DWORD>(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
-	section.Init(128);
+	constexpr DWORD cchIniSection = MAX_INI_SECTION_SIZE_STYLES;
+	WCHAR * const pIniSectionBuf = section.Init(128, cchIniSection);
 	Style_LoadOneEx(pLex, section, pIniSectionBuf, cchIniSection);
 	section.Free();
-	NP2HeapFree(pIniSectionBuf);
 }
 
 void Style_LoadAll(StyleLoadFlag loadFlag) noexcept {
 	IniSectionParser section;
-	WCHAR *pIniSectionBuf = static_cast<WCHAR *>(NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_STYLES));
-	const DWORD cchIniSection = static_cast<DWORD>(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
-	section.Init(128);
+	constexpr DWORD cchIniSection = MAX_INI_SECTION_SIZE_STYLES;
+	WCHAR * const pIniSectionBuf = section.Init(128, cchIniSection);
 
 	// Custom colors
 	if (FlagSet(loadFlag, StyleLoadFlag_Reload) || !bCustomColorLoaded) {
@@ -871,7 +869,6 @@ void Style_LoadAll(StyleLoadFlag loadFlag) noexcept {
 	}
 
 	section.Free();
-	NP2HeapFree(pIniSectionBuf);
 	if (FlagSet(loadFlag, StyleLoadFlag_Apply)) {
 		Style_LoadTabSettings(pLexCurrent);
 		Style_SetLexer(pLexCurrent, false);
@@ -988,7 +985,7 @@ bool Style_Import(HWND hwnd) noexcept {
 	ofn.lpstrFile	= szFile;
 	ofn.lpstrDefExt	= L"ini";
 	ofn.nMaxFile	= COUNTOF(szFile);
-	ofn.Flags		= OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT
+	ofn.Flags		= OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT | OFN_NOTESTFILECREATE
 					  | OFN_PATHMUSTEXIST | OFN_SHAREAWARE /*| OFN_NODEREFERENCELINKS*/;
 	if (bUseXPFileDialog) {
 		ofn.Flags |= OFN_EXPLORER | OFN_ENABLESIZING | OFN_ENABLEHOOK;
@@ -997,10 +994,8 @@ bool Style_Import(HWND hwnd) noexcept {
 
 	if (GetOpenFileName(&ofn)) {
 		IniSectionParser section;
-		WCHAR *pIniSectionBuf = static_cast<WCHAR *>(NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_STYLES));
-		const DWORD cchIniSection = static_cast<DWORD>(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
-
-		section.Init(128);
+		constexpr DWORD cchIniSection = MAX_INI_SECTION_SIZE_STYLES;
+		WCHAR * const pIniSectionBuf = section.Init(128, cchIniSection);
 		// file extensions
 		if (GetPrivateProfileSection(INI_SECTION_NAME_FILE_EXTENSIONS, pIniSectionBuf, cchIniSection, szFile)) {
 			if (section.Parse(pIniSectionBuf)) {
@@ -1038,7 +1033,6 @@ bool Style_Import(HWND hwnd) noexcept {
 		}
 
 		section.Free();
-		NP2HeapFree(pIniSectionBuf);
 		return true;
 	}
 	return false;
@@ -1063,7 +1057,7 @@ bool Style_Export(HWND hwnd) noexcept {
 	ofn.lpstrFile	= szFile;
 	ofn.lpstrDefExt = L"ini";
 	ofn.nMaxFile	= COUNTOF(szFile);
-	ofn.Flags		= /*OFN_FILEMUSTEXIST |*/ OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT
+	ofn.Flags		= /*OFN_FILEMUSTEXIST |*/ OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT | OFN_NOTESTFILECREATE
 					  | OFN_PATHMUSTEXIST | OFN_SHAREAWARE /*| OFN_NODEREFERENCELINKS*/ | OFN_OVERWRITEPROMPT;
 	if (bUseXPFileDialog) {
 		ofn.Flags |= OFN_EXPLORER | OFN_ENABLESIZING | OFN_ENABLEHOOK;
@@ -1100,6 +1094,7 @@ bool Style_Export(HWND hwnd) noexcept {
 		NP2HeapFree(pIniSectionBuf);
 
 		if (dwError != ERROR_SUCCESS) {
+			dwLastIOError = dwError;
 			MsgBoxLastError(MB_OK, IDS_EXPORT_FAIL, szFile);
 		}
 		return true;
@@ -3440,15 +3435,7 @@ static void Style_StrCopyAttributeEx(LPWSTR szNewStyle, LPCWSTR lpszStyle, LPCWS
 
 BOOL Style_StrGetLocale(LPCWSTR lpszStyle, LPWSTR lpszLocale, int cchLocale) noexcept {
 	if (Style_StrGetValueEx(lpszStyle, L"locale:", CSTRLEN(L"locale:"), lpszLocale, cchLocale)) {
-#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 		return IsValidLocaleName(lpszLocale);
-#else
-		using IsValidLocaleNameSig = BOOL (WINAPI *)(LPCWSTR lpLocaleName);
-		IsValidLocaleNameSig pfnIsValidLocaleName = DLLFunctionEx<IsValidLocaleNameSig>(L"kernel32.dll", "IsValidLocaleName");
-		if (pfnIsValidLocaleName != nullptr) {
-			return pfnIsValidLocaleName(lpszLocale);
-		}
-#endif
 	}
 	return FALSE;
 }

@@ -4,6 +4,10 @@
 
 #include <windows.h>
 
+#ifndef _WIN32_WINNT_WIN7
+#define _WIN32_WINNT_WIN7				0x0601
+#endif
+
 #define USE_STD_ASYNC_FUTURE	0
 #define USE_WIN32_PTP_WORK		1
 

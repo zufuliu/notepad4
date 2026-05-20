@@ -14,9 +14,7 @@ class Timer {
 public:
 	bool ticking;
 	int ticksToWait;
-	enum {
-		tickSize = 100
-	};
+	static constexpr int tickSize = 100;
 	TickerID tickerID;
 
 	Timer() noexcept;
@@ -93,8 +91,14 @@ public:
 	size_t Length() const noexcept {
 		return s.length();
 	}
+	std::string_view AsView() const noexcept {
+		return s;
+	}
 	size_t LengthWithTerminator() const noexcept {
 		return s.length() + 1;
+	}
+	std::string_view AsViewWithTerminator() const noexcept {
+		return {s.c_str(), s.length() + 1};
 	}
 	bool Empty() const noexcept {
 		return s.empty();
@@ -154,7 +158,7 @@ struct CaretPolicySlop {
 	int slop;	// Pixels for X, lines for Y
 	CaretPolicySlop(Scintilla::CaretPolicy policy_, intptr_t slop_) noexcept :
 		policy(policy_), slop(static_cast<int>(slop_)) {}
-	CaretPolicySlop(uintptr_t policy_=0, intptr_t slop_=0) noexcept:
+	explicit CaretPolicySlop(uintptr_t policy_=0, intptr_t slop_=0) noexcept:
 		policy(static_cast<Scintilla::CaretPolicy>(policy_)), slop(static_cast<int>(slop_)) {}
 };
 
@@ -230,9 +234,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 
 	Timer timer;
 	Timer autoScrollTimer;
-	enum {
-		autoScrollDelay = 200
-	};
+	static constexpr int autoScrollDelay = 200;
 
 	Idler idler;
 
@@ -455,16 +457,16 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	virtual void InsertCharacter(std::string_view sv, Scintilla::CharacterSource charSource);
 	void ClearSelectionRange(SelectionRange &range);
 	void ClearBeforeTentativeStart();
-	void InsertPaste(const char *text, Sci::Position len);
+	void InsertPaste(std::string_view text);
 	enum class PasteShape {
 		stream = 0, rectangular = 1, line = 2
 	};
-	void InsertPasteShape(const char *text, Sci::Position len, PasteShape shape);
+	void InsertPasteShape(std::string_view text, PasteShape shape);
 	void ClearSelection(bool retainMultipleSelections = false);
 	void ClearAll();
 	void ClearDocumentStyle();
 	virtual void Cut(bool asBinary, bool lineCopy = false);
-	void PasteRectangular(SelectionPosition pos, const char *ptr, Sci::Position len);
+	void PasteRectangular(SelectionPosition pos, std::string_view text);
 	virtual void Copy(bool asBinary) const = 0;
 	void CopyAllowLine() const;
 	void CutAllowLine();
@@ -563,8 +565,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	virtual void DisplayCursor(Window::Cursor c) noexcept;
 	virtual bool SCICALL DragThreshold(Point ptStart, Point ptNow) const noexcept;
 	virtual void StartDrag() = 0;
-	void DropAt(SelectionPosition position, const char *value, size_t lengthValue, bool moving, bool rectangular);
-	void DropAt(SelectionPosition position, const char *value, bool moving, bool rectangular);
+	void DropAt(SelectionPosition position, std::string_view value, bool moving, bool rectangular);
 	/** PositionInSelection returns true if position in selection. */
 	bool PositionInSelection(Sci::Position pos) const noexcept;
 	bool SCICALL PointInSelection(Point pt);

@@ -2332,11 +2332,14 @@ INT UTF8_mbslen(LPCSTR source, INT byte_length) noexcept {
 
 
 LPSTR RecodeAsUTF8(LPSTR lpData, DWORD *cbData, UINT codePage, DWORD flags) noexcept {
-	LPWSTR lpDataWide = static_cast<LPWSTR>(NP2HeapAlloc(*cbData * sizeof(WCHAR) + 16));
-	const int cbDataWide = MultiByteToWideChar(codePage, flags, lpData, *cbData, lpDataWide, static_cast<int>(NP2HeapSize(lpDataWide) / sizeof(WCHAR)));
+	DWORD size = *cbData;
+	DWORD cbDataWide = (size + 16) * sizeof(WCHAR);
+	LPWSTR lpDataWide = static_cast<LPWSTR>(NP2HeapAlloc(cbDataWide));
+	cbDataWide = MultiByteToWideChar(codePage, flags, lpData, size, lpDataWide, size + 16);
 	if (cbDataWide) {
-		lpData = static_cast<char *>(NP2HeapAlloc(cbDataWide * kMaxMultiByteCount + 16));
-		*cbData = WideCharToMultiByte(CP_UTF8, 0, lpDataWide, cbDataWide, lpData, static_cast<int>(NP2HeapSize(lpData)), nullptr, nullptr);
+		size = cbDataWide * kMaxMultiByteCount + 16;
+		lpData = static_cast<char *>(NP2HeapAlloc(size));
+		*cbData = WideCharToMultiByte(CP_UTF8, 0, lpDataWide, cbDataWide, lpData, size, nullptr, nullptr);
 	} else {
 		lpData = nullptr;
 		*cbData = 0;

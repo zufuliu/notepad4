@@ -285,7 +285,7 @@
 #define NP2StyleX_Tag					EDITSTYLE_HOLE(Tag, L"Tag")
 #define NP2StyleX_Option				EDITSTYLE_HOLE(Option, L"Option")
 #define NP2StyleX_Title					EDITSTYLE_HOLE(Title, L"Title")
-#define NP2StyleX_Quote					EDITSTYLE_HOLE(Quote, L"Quote")
+// #define NP2StyleX_					EDITSTYLE_HOLE(, L"")
 #define NP2StyleX_VerbatimSegment		EDITSTYLE_HOLE(VerbatimSegment, L"Verbatim Segment")
 #define NP2StyleX_ListCode				EDITSTYLE_HOLE(ListCode, L"List Code")
 #define NP2StyleX_Chapter				EDITSTYLE_HOLE(Chapter, L"Chapter")

@@ -128,7 +128,7 @@ void	EditConvertToLargeMode() noexcept;
 void	EditReplaceDocument(HANDLE pdoc) noexcept;
 
 char*	EditGetClipboardText(HWND hwnd) noexcept; // LocalFree()
-bool	EditCopyAppend(HWND hwnd) noexcept;
+void	EditCopyAppend(HWND hwnd) noexcept;
 
 constexpr int GetScintillaEOLMode(int mode) noexcept {
 	constexpr UINT mask = (SC_EOL_CRLF << 2*0) | (SC_EOL_LF << 2*1) | (SC_EOL_CR << 2*2);
@@ -152,9 +152,11 @@ void	EditEscapeCChars(HWND hwnd) noexcept;
 void	EditUnescapeCChars(HWND hwnd) noexcept;
 void	EditEscapeXHTMLChars(HWND hwnd) noexcept;
 void	EditUnescapeXHTMLChars(HWND hwnd) noexcept;
-void	EditChar2Hex() noexcept;
-void	EditHex2Char() noexcept;
+void	EditCalculateExpr(int menu);
+void	EditCharacterToHex() noexcept;
+void	EditHexToCharacter() noexcept;
 void	EditShowHex() noexcept;
+void	EditShowCharacterInfo() noexcept;
 
 enum Base64EncodingFlag {
 	Base64EncodingFlag_Default,
@@ -402,7 +404,9 @@ void	EditInsertScriptShebangLine() noexcept;
 
 enum CallTipType {
 	CallTipType_None,
+	CallTipType_CharacterInfo,
 	CallTipType_Notification,
+	// mouse hover CallTip, auto hide on mouse move
 	CallTipType_ColorHex,
 };
 
@@ -413,6 +417,10 @@ enum ShowCallTip {
 	ShowCallTip_ColorBGRA,
 	ShowCallTip_ColorABGR,
 };
+
+// tab width for notification text
+#define CallTipTabWidthNotification		8
+#define CallTipDefaultMouseDwellTime	250
 
 struct CallTipInfo {
 	ShowCallTip showCallTip;

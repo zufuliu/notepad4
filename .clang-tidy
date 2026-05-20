@@ -19,6 +19,7 @@ Checks: [
     -bugprone-implicit-widening-of-multiplication-result,
     -bugprone-invalid-enum-default-initialization,
     -bugprone-narrowing-conversions,
+    -bugprone-signed-bitwise,
     -bugprone-switch-missing-default-case,
     -bugprone-unchecked-optional-access,
     -modernize-avoid-c-arrays,
@@ -39,6 +40,7 @@ Checks: [
     -readability-implicit-bool-conversion,
     -readability-magic-numbers,
     -readability-math-missing-parentheses,
+    -readability-redundant-parentheses,
     -readability-suspicious-call-argument,
     -readability-trailing-comma,
     -readability-uppercase-literal-suffix,
@@ -58,12 +60,13 @@ Checks: [
     # -readability-container-contains,
     # -readability-else-after-return,
     # -readability-named-parameter,
-    # -readability-redundant-parentheses,
     # -readability-simplify-boolean-expr,
     # -bugprone-forward-declaration-namespace,
     # -bugprone-reserved-identifier,
     # -bugprone-standalone-empty,
+    # -bugprone-unhandled-code-paths,
     # -misc-const-correctness,
+    # -misc-explicit-constructor,
     ]
 
 WarningsAsErrors: ''

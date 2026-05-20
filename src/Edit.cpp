@@ -62,6 +62,7 @@ extern int iCurrentEncoding;
 
 extern MRUList mruFind;
 extern MRUList mruReplace;
+extern CallTipInfo callTipInfo;
 
 static LPWSTR wchPrefixSelection;
 static LPWSTR wchAppendSelection;
@@ -69,30 +70,29 @@ static LPWSTR wchPrefixLines;
 static LPWSTR wchAppendLines;
 
 // see TransliterateText()
-#if defined(_MSC_VER) && (_WIN32_WINNT >= _WIN32_WINNT_WIN7)
-#define NP2_DYNAMIC_LOAD_ELSCORE_DLL	1
-#else
-#define NP2_DYNAMIC_LOAD_ELSCORE_DLL	1
-#endif
-#if NP2_DYNAMIC_LOAD_ELSCORE_DLL
 static HMODULE hELSCoreDLL = nullptr;
-#else
-#pragma comment(lib, "elscore.lib")
-#endif
-
+// see EditShowCharacterInfo()
+static HMODULE hICUDLL = nullptr;
+// see EditCalculateExpr()
+HMODULE hPropSysDLL = nullptr;
+// reduce global CRT initializer and binary size,
+// static linked wcsftime() may behaviors different from system one.
 #define NP2_DYNAMIC_LOAD_wcsftime	1
 #if NP2_DYNAMIC_LOAD_wcsftime
 static HMODULE hCrtDLL = nullptr;
 
 using wcsftimeSig = size_t (__cdecl *)(wchar_t *str, size_t count, const wchar_t *format, const struct tm *time);
+NP2_noinline
 wcsftimeSig GetFunctionPointer_wcsftime() noexcept {
-	if (hCrtDLL == nullptr) {
-		hCrtDLL = LoadLibraryExW(L"ucrtbase.dll", nullptr, kSystemLibraryLoadFlags);
-		if (hCrtDLL == nullptr) {
-			hCrtDLL = LoadLibraryExW(L"msvcrt.dll", nullptr, kSystemLibraryLoadFlags);
+	HMODULE hDLL = hCrtDLL;
+	if (hDLL == nullptr) {
+		hDLL = LoadLibraryExW(L"ucrtbase.dll", nullptr, kSystemLibraryLoadFlags);
+		if (hDLL == nullptr) {
+			hDLL = LoadLibraryExW(L"msvcrt.dll", nullptr, kSystemLibraryLoadFlags);
 		}
+		hCrtDLL = hDLL;
 	}
-	return DLLFunction<wcsftimeSig>(hCrtDLL, "wcsftime");
+	return DLLFunction<wcsftimeSig>(hDLL, "wcsftime");
 }
 #endif
 
@@ -101,11 +101,15 @@ void Edit_ReleaseResources() noexcept {
 	NP2HeapFree(wchAppendSelection);
 	NP2HeapFree(wchPrefixLines);
 	NP2HeapFree(wchAppendLines);
-#if NP2_DYNAMIC_LOAD_ELSCORE_DLL
 	if (hELSCoreDLL != nullptr) {
 		FreeLibrary(hELSCoreDLL);
 	}
-#endif
+	if (hICUDLL != nullptr) {
+		FreeLibrary(hICUDLL);
+	}
+	if (hPropSysDLL != nullptr) {
+		FreeLibrary(hPropSysDLL);
+	}
 #if NP2_DYNAMIC_LOAD_wcsftime
 	if (hCrtDLL) {
 		FreeLibrary(hCrtDLL);
@@ -196,21 +200,22 @@ bool EditConvertText(UINT cpSource, UINT cpDest) noexcept {
 		return true;
 	}
 
-	const Sci_Position length = SciCall_GetLength();
-	if (static_cast<size_t>(length) >= MAX_NON_UTF8_SIZE) {
+	const size_t length = SciCall_GetLength();
+	if (length >= MAX_NON_UTF8_SIZE) {
 		return true;
 	}
 
 	char *pchText = nullptr;
-	int cbText = 0;
-	if (length > 0) {
+	UINT cbText = 0;
+	if (length != 0) {
 		// DBCS: length -> WCHAR: sizeof(WCHAR) * (length / 2) -> UTF-8: kMaxMultiByteCount * (length / 2)
-		pchText = static_cast<char *>(NP2HeapAlloc((length + 1) * sizeof(WCHAR)));
+		const size_t allocSize = NP2_align_up(length + 1, MEMORY_ALLOCATION_ALIGNMENT);
+		pchText = static_cast<char *>(NP2HeapAlloc(allocSize * sizeof(WCHAR)));
 		SciCall_GetText(length, pchText);
 
-		WCHAR *pwchText = static_cast<WCHAR *>(NP2HeapAlloc((length + 1) * sizeof(WCHAR)));
-		const int cbwText = MultiByteToWideChar(cpSource, 0, pchText, static_cast<int>(length), pwchText, static_cast<int>(NP2HeapSize(pwchText) / sizeof(WCHAR)));
-		cbText = WideCharToMultiByte(cpDest, 0, pwchText, cbwText, pchText, static_cast<int>(NP2HeapSize(pchText)), nullptr, nullptr);
+		WCHAR *pwchText = static_cast<WCHAR *>(NP2HeapAlloc(allocSize * sizeof(WCHAR)));
+		const int cbwText = MultiByteToWideChar(cpSource, 0, pchText, static_cast<int>(length), pwchText, static_cast<int>(allocSize));
+		cbText = WideCharToMultiByte(cpDest, 0, pwchText, cbwText, pchText, static_cast<int>(allocSize * sizeof(WCHAR)), nullptr, nullptr);
 		NP2HeapFree(pwchText);
 	}
 
@@ -225,7 +230,7 @@ bool EditConvertText(UINT cpSource, UINT cpDest) noexcept {
 	SciCall_ClearMarker();
 	SciCall_SetCodePage(cpDest);
 
-	if (cbText > 0) {
+	if (cbText != 0) {
 		SendMessage(hwndEdit, WM_SETREDRAW, FALSE, 0);
 		SciCall_SetModEventMask(SC_MOD_NONE);
 		SciCall_AppendText(cbText, pchText);
@@ -277,7 +282,7 @@ void EditConvertToLargeMode() noexcept {
 	EditReplaceDocument(pdoc);
 	fvCurFile.Apply();
 
-	if (length > 0) {
+	if (length != 0) {
 		SendMessage(hwndEdit, WM_SETREDRAW, FALSE, 0);
 		SciCall_SetModEventMask(SC_MOD_NONE);
 		SciCall_AppendText(length, pchText);
@@ -313,7 +318,7 @@ char* EditGetClipboardText(HWND hwnd) noexcept {
 	LPCWSTR pwch = static_cast<LPCWSTR>(GlobalLock(hmem));
 
 	const UINT cpEdit = SciCall_GetCodePage();
-	const int mlen = WideCharToMultiByte(cpEdit, 0, pwch, -1, nullptr, 0, nullptr, nullptr);
+	const UINT mlen = WideCharToMultiByte(cpEdit, 0, pwch, -1, nullptr, 0, nullptr, nullptr);
 	char *pmch = static_cast<char *>(LocalAlloc(LPTR, mlen*2));
 	char *ptmp = static_cast<char *>(NP2HeapAlloc(mlen));
 
@@ -362,7 +367,7 @@ LPWSTR EditGetClipboardTextW() noexcept {
 
 	HANDLE hmem = GetClipboardData(CF_UNICODETEXT);
 	LPCWSTR pwch = static_cast<LPCWSTR>(GlobalLock(hmem));
-	const int wlen = lstrlen(pwch);
+	const UINT wlen = lstrlen(pwch);
 	LPWSTR ptmp = static_cast<LPWSTR>(NP2HeapAlloc((2*wlen + 1)*sizeof(WCHAR)));
 
 	if (pwch && ptmp) {
@@ -405,52 +410,53 @@ LPWSTR EditGetClipboardTextW() noexcept {
 //
 // EditCopyAppend()
 //
-bool EditCopyAppend(HWND hwnd) noexcept {
+void EditCopyAppend(HWND hwnd) noexcept {
 	if (!IsClipboardFormatAvailable(CF_UNICODETEXT)) {
 		SciCall_Copy(false);
-		return true;
+		return;
 	}
 
 	char *pszText;
+	size_t cchText;
 	if (!SciCall_IsSelectionEmpty()) {
 		if (SciCall_IsRectangularSelection()) {
 			NotifyRectangularSelection();
-			return false;
+			return;
 		}
 
-		const Sci_Position iSelCount = SciCall_GetSelTextLength();
-		pszText = static_cast<char *>(NP2HeapAlloc(iSelCount + 1));
+		cchText = SciCall_GetSelTextLength();
+		cchText = NP2_align_up(cchText + 1, MEMORY_ALLOCATION_ALIGNMENT);
+		pszText = static_cast<char *>(NP2HeapAlloc(cchText * (sizeof(char) + sizeof(WCHAR))));
 		SciCall_GetSelText(pszText);
 	} else {
-		const Sci_Position cchText = SciCall_GetLength();
-		pszText = static_cast<char *>(NP2HeapAlloc(cchText + 1));
+		cchText = SciCall_GetLength();
+		const size_t allocSize = NP2_align_up(cchText + 1, MEMORY_ALLOCATION_ALIGNMENT);
+		pszText = static_cast<char *>(NP2HeapAlloc(allocSize * (sizeof(char) + sizeof(WCHAR))));
 		SciCall_GetText(cchText, pszText);
+		cchText = allocSize;
 	}
 
 	const UINT cpEdit = SciCall_GetCodePage();
-	const int cchTextW = MultiByteToWideChar(cpEdit, 0, pszText, -1, nullptr, 0);
+	WCHAR * const pszTextW = reinterpret_cast<WCHAR *>(pszText + cchText);
+	UINT cchTextW = MultiByteToWideChar(cpEdit, 0, pszText, -1, pszTextW, static_cast<int>(cchText));
 
-	WCHAR *pszTextW = nullptr;
-	if (cchTextW > 0) {
-		const WCHAR *pszSep = L"\r\n\r\n";
-		pszTextW = static_cast<WCHAR *>(NP2HeapAlloc(sizeof(WCHAR) * (CSTRLEN(L"\r\n\r\n") + cchTextW + 1)));
-		lstrcpy(pszTextW, pszSep);
-		MultiByteToWideChar(cpEdit, 0, pszText, -1, StrEnd(pszTextW), static_cast<int>(NP2HeapSize(pszTextW) / sizeof(WCHAR)));
-	}
-
-	NP2HeapFree(pszText);
-
-	bool succ = false;
-	if (OpenClipboard(GetParent(hwnd))) {
+	if (cchTextW > 1 && OpenClipboard(GetParent(hwnd))) {
 		HANDLE hOld = GetClipboardData(CF_UNICODETEXT);
 		LPCWSTR pszOld = static_cast<LPCWSTR>(GlobalLock(hOld));
 
-		HANDLE hNew = GlobalAlloc(GMEM_MOVEABLE | GMEM_ZEROINIT,
-						   sizeof(WCHAR) * (lstrlen(pszOld) + lstrlen(pszTextW) + 1));
+		cchText = sizeof(WCHAR)*cchTextW;
+		cchTextW = lstrlen(pszOld);
+		const size_t size = sizeof(WCHAR)*cchTextW;
+		HANDLE hNew = GlobalAlloc(GMEM_MOVEABLE | GMEM_ZEROINIT, size + 4*sizeof(WCHAR) + cchText);
 		WCHAR *pszNew = static_cast<WCHAR *>(GlobalLock(hNew));
 
-		lstrcpy(pszNew, pszOld);
-		lstrcat(pszNew, pszTextW);
+		memcpy(pszNew, pszOld, size);
+		pszNew += cchTextW;
+		pszNew[0] = L'\r';
+		pszNew[1] = L'\n';
+		pszNew[2] = L'\r';
+		pszNew[3] = L'\n';
+		memcpy(pszNew + 4, pszTextW, cchText);
 
 		GlobalUnlock(hOld);
 		GlobalUnlock(hNew);
@@ -458,14 +464,9 @@ bool EditCopyAppend(HWND hwnd) noexcept {
 		EmptyClipboard();
 		SetClipboardData(CF_UNICODETEXT, hNew);
 		CloseClipboard();
-
-		succ = true;
 	}
 
-	if (pszTextW != nullptr) {
-		NP2HeapFree(pszTextW);
-	}
-	return succ;
+	NP2HeapFree(pszText);
 }
 
 //=============================================================================
@@ -1126,8 +1127,8 @@ bool EditLoadFile(LPWSTR pszFile, EditFileIOStatus &status) noexcept {
 			_swab(lpDataUTF8, lpDataUTF8, cbData);
 		}
 		// cbData/2 => WCHAR, WCHAR*3 => UTF-8
-		lpDataUTF8 = static_cast<char *>(NP2HeapAlloc((cbData + 1)*sizeof(WCHAR)));
-		const int size = static_cast<int>(NP2HeapSize(lpDataUTF8));
+		const DWORD size = (cbData + 1)*sizeof(WCHAR);
+		lpDataUTF8 = static_cast<char *>(NP2HeapAlloc(size));
 		cbData = WideCharToMultiByte(CP_UTF8, 0, pszTextW, cchTextW, lpDataUTF8, size, nullptr, nullptr);
 		if (cbData == 0) {
 			const UINT legacyACP = mEncoding[CPI_DEFAULT].uCodePage;
@@ -1215,6 +1216,13 @@ bool EditSaveFile(HWND hwnd, LPCWSTR pszFile, int saveFlag, EditFileIOStatus &st
 		return false;
 	}
 
+	FILE_BASIC_INFO timestamp;
+	if (saveFlag & FileSaveFlag_OriginalTimestamp) {
+		if (!GetFileInformationByHandleEx(hFile, FileBasicInfo, &timestamp, sizeof(timestamp))) {
+			saveFlag &= ~FileSaveFlag_OriginalTimestamp;
+		}
+	}
+
 	if (!(saveFlag & FileSaveFlag_EndSession) && !bReadOnlyMode) {
 		// ensure consistent line endings
 		if (bFixLineEndings) {
@@ -1227,37 +1235,20 @@ bool EditSaveFile(HWND hwnd, LPCWSTR pszFile, int saveFlag, EditFileIOStatus &st
 		}
 	}
 
-	BOOL bWriteSuccess;
 	// get text
 	DWORD cbData = static_cast<DWORD>(SciCall_GetLength());
 	char *lpData = nullptr;
-	int iEncoding = status.iEncoding;
+	const int iEncoding = status.iEncoding;
 	UINT uFlags = mEncoding[iEncoding].uFlags;
 
-	if (cbData == 0) {
-		bWriteSuccess = SetEndOfFile(hFile);
-		// write encoding BOM
-		DWORD dwBytesWritten;
-		if (uFlags & NCP_UNICODE_BOM) {
-			if (uFlags & NCP_UNICODE_REVERSE) {
-				bWriteSuccess = WriteFile(hFile, "\xFE\xFF", 2, &dwBytesWritten, nullptr);
-			} else {
-				bWriteSuccess = WriteFile(hFile, "\xFF\xFE", 2, &dwBytesWritten, nullptr);
-			}
-		} else if (uFlags & NCP_UTF8_SIGN) {
-			bWriteSuccess = WriteFile(hFile, "\xEF\xBB\xBF", 3, &dwBytesWritten, nullptr);
-		}
-		dwLastIOError = GetLastError();
-	} else {
+	// get content and convert encoding
+	if (cbData != 0) {
 		if (cbData >= MAX_NON_UTF8_SIZE) {
 			// save as UTF-8 or ANSI
 			if (!(uFlags & (NCP_DEFAULT | NCP_UTF8))) {
-				if (uFlags & NCP_UNICODE_BOM) {
-					iEncoding = CPI_UTF8SIGN;
-				} else {
-					iEncoding = CPI_UTF8;
-				}
-				uFlags = mEncoding[iEncoding].uFlags;
+				// iEncoding = (uFlags & NCP_UNICODE_BOM) ? CPI_UTF8SIGN : CPI_UTF8;
+				// uFlags = mEncoding[iEncoding].uFlags;
+				uFlags = (uFlags & NCP_UNICODE_BOM) ? NCP_UTF8_SIGN : NCP_UTF8;
 			}
 		}
 
@@ -1280,83 +1271,82 @@ bool EditSaveFile(HWND hwnd, LPCWSTR pszFile, int saveFlag, EditFileIOStatus &st
 		}
 #endif
 
-		DWORD dwBytesWritten;
-		if (uFlags & NCP_UNICODE) {
-			SetEndOfFile(hFile);
-
-			LPWSTR lpDataWide = static_cast<LPWSTR>(NP2HeapAlloc(cbData * sizeof(WCHAR) + 16));
-			const int cbDataWide = MultiByteToWideChar(CP_UTF8, 0, lpData, cbData, lpDataWide, static_cast<int>(NP2HeapSize(lpDataWide) / sizeof(WCHAR)));
-
-			if (uFlags & NCP_UNICODE_BOM) {
-				if (uFlags & NCP_UNICODE_REVERSE) {
-					WriteFile(hFile, "\xFE\xFF", 2, &dwBytesWritten, nullptr);
-				} else {
-					WriteFile(hFile, "\xFF\xFE", 2, &dwBytesWritten, nullptr);
-				}
-			}
+		if (uFlags & (NCP_UTF8 | NCP_DEFAULT)) {
+			// no encoding conversion for UTF-8 or ANSI
+		} else if (uFlags & NCP_UNICODE) {
+			DWORD cbDataWide = (cbData + 1)*sizeof(WCHAR);
+			LPWSTR lpDataWide = static_cast<LPWSTR>(NP2HeapAlloc(cbDataWide));
+			cbDataWide = MultiByteToWideChar(CP_UTF8, 0, lpData, cbData, lpDataWide, cbData);
+			NP2HeapFree(lpData);
+			lpData = reinterpret_cast<char *>(lpDataWide);
+			cbData = cbDataWide * sizeof(WCHAR);
 
 			if (uFlags & NCP_UNICODE_REVERSE) {
-				_swab(reinterpret_cast<char *>(lpDataWide), reinterpret_cast<char *>(lpDataWide), static_cast<int>(cbDataWide * sizeof(WCHAR)));
+				_swab(lpData, lpData, cbData);
 			}
-
-			bWriteSuccess = WriteFile(hFile, lpDataWide, cbDataWide * sizeof(WCHAR), &dwBytesWritten, nullptr);
-			dwLastIOError = GetLastError();
-
-			NP2HeapFree(lpDataWide);
-		} else if (uFlags & NCP_UTF8) {
-			SetEndOfFile(hFile);
-
-			if (uFlags & NCP_UTF8_SIGN) {
-				WriteFile(hFile, "\xEF\xBB\xBF", 3, &dwBytesWritten, nullptr);
-			}
-
-			bWriteSuccess = WriteFile(hFile, lpData, cbData, &dwBytesWritten, nullptr);
-			dwLastIOError = GetLastError();
-		} else if (uFlags & (NCP_8BIT | NCP_7BIT)) {
+		} else { // NCP_8BIT, NCP_7BIT
 			BOOL bCancelDataLoss = FALSE;
 			const UINT uCodePage = mEncoding[iEncoding].uCodePage;
-
-			LPWSTR lpDataWide = static_cast<LPWSTR>(NP2HeapAlloc(cbData * sizeof(WCHAR) + 16));
-			const int cbDataWide = MultiByteToWideChar(CP_UTF8, 0, lpData, cbData, lpDataWide, static_cast<int>(NP2HeapSize(lpDataWide) / sizeof(WCHAR)));
+			DWORD cbDataWide = (cbData + 1)*sizeof(WCHAR);
+			LPWSTR lpDataWide = static_cast<LPWSTR>(NP2HeapAlloc(cbDataWide));
+			cbDataWide = MultiByteToWideChar(CP_UTF8, 0, lpData, cbData, lpDataWide, cbData);
 
 			if (IsZeroFlagsCodePage(uCodePage)) {
 				NP2HeapFree(lpData);
-				lpData = static_cast<char *>(NP2HeapAlloc(NP2HeapSize(lpDataWide) * 2));
+				cbData = ((cbData + 16)*sizeof(WCHAR))*2; // why?
+				lpData = static_cast<char *>(NP2HeapAlloc(cbData + 1));
 			} else {
-				memset(lpData, 0, NP2HeapSize(lpData));
-				cbData = WideCharToMultiByte(uCodePage, WC_NO_BEST_FIT_CHARS, lpDataWide, cbDataWide, lpData, static_cast<int>(NP2HeapSize(lpData)), nullptr, &bCancelDataLoss);
+				memset(lpData, 0, cbData);
+				cbData = WideCharToMultiByte(uCodePage, WC_NO_BEST_FIT_CHARS, lpDataWide, cbDataWide, lpData, cbData, nullptr, &bCancelDataLoss);
 			}
 
 			if (!bCancelDataLoss) {
-				cbData = WideCharToMultiByte(uCodePage, 0, lpDataWide, cbDataWide, lpData, static_cast<int>(NP2HeapSize(lpData)), nullptr, nullptr);
+				cbData = WideCharToMultiByte(uCodePage, 0, lpDataWide, cbDataWide, lpData, cbData, nullptr, nullptr);
 			}
 			NP2HeapFree(lpDataWide);
 
-			if (!bCancelDataLoss || InfoBoxWarn(MB_OKCANCEL, L"MsgConv3", IDS_ERR_UNICODE2) == IDOK) {
-				SetEndOfFile(hFile);
-				bWriteSuccess = WriteFile(hFile, lpData, cbData, &dwBytesWritten, nullptr);
-				dwLastIOError = GetLastError();
-			} else {
-				bWriteSuccess = FALSE;
+			if (bCancelDataLoss && InfoBoxWarn(MB_OKCANCEL, L"MsgConv3", IDS_ERR_UNICODE2) != IDOK) {
 				status.bCancelDataLoss = true;
+				CloseHandle(hFile);
+				NP2HeapFree(lpData);
+				return false;
 			}
-		} else {
-			SetEndOfFile(hFile);
+		}
+	}
+
+	// write content
+	{
+		BOOL bWriteSuccess = SetEndOfFile(hFile);
+		DWORD dwBytesWritten;
+		// write encoding BOM
+		DWORD bom;
+		DWORD length = 0;
+		if (uFlags & NCP_UNICODE_BOM) {
+			bom = (uFlags & NCP_UNICODE_REVERSE) ? BOM_UTF16BE : BOM_UTF16LE;
+			length = 2;
+		} else if (uFlags & NCP_UTF8_SIGN) {
+			bom = BOM_UTF8;
+			length = 3;
+		}
+		if (length != 0) {
+			bWriteSuccess = WriteFile(hFile, &bom, length, &dwBytesWritten, nullptr);
+		}
+		dwLastIOError = GetLastError();
+		if (lpData != nullptr) {
 			bWriteSuccess = WriteFile(hFile, lpData, cbData, &dwBytesWritten, nullptr);
 			dwLastIOError = GetLastError();
+			NP2HeapFree(lpData);
 		}
-	}
-
-	if (lpData != nullptr) {
-		NP2HeapFree(lpData);
-	}
-
-	CloseHandle(hFile);
-	if (bWriteSuccess) {
-		if (!(saveFlag & FileSaveFlag_SaveCopy)) {
-			SciCall_SetSavePoint();
+		if (saveFlag & FileSaveFlag_OriginalTimestamp) {
+			SetFileInformationByHandle(hFile, FileBasicInfo, &timestamp, sizeof(timestamp));
 		}
-		return true;
+		CloseHandle(hFile);
+		if (bWriteSuccess) {
+			if (!(saveFlag & FileSaveFlag_SaveCopy)) {
+				SciCall_SetSavePoint();
+			}
+			return true;
+		}
 	}
 
 	return false;
@@ -1436,13 +1426,12 @@ const GUID WIN10_ELS_GUID_TRANSLITERATION_HANGUL_DECOMPOSITION =
 	{ 0x4BA2A721, 0xE43D, 0x41b7, { 0xB3, 0x30, 0x53, 0x6A, 0xE1, 0xE4, 0x88, 0x63 } };
 
 int TransliterateText(const GUID *pGuid, LPCWSTR pszTextW, int cchTextW, LPWSTR &pszMappedW) noexcept {
-#if NP2_DYNAMIC_LOAD_ELSCORE_DLL
 using MappingGetServicesSig = HRESULT (WINAPI *)(PMAPPING_ENUM_OPTIONS pOptions, PMAPPING_SERVICE_INFO *prgServices, DWORD *pdwServicesCount);
 using MappingFreeServicesSig = HRESULT (WINAPI *)(PMAPPING_SERVICE_INFO pServiceInfo);
 using MappingRecognizeTextSig = HRESULT (WINAPI *)(PMAPPING_SERVICE_INFO pServiceInfo, LPCWSTR pszText, DWORD dwLength, DWORD dwIndex, PMAPPING_OPTIONS pOptions, PMAPPING_PROPERTY_BAG pbag);
 using MappingFreePropertyBagSig = HRESULT (WINAPI *)(PMAPPING_PROPERTY_BAG pBag);
 
-	static int triedLoadingELSCore = 0;
+	static uint8_t triedLoadingELSCore = 0;
 	static MappingGetServicesSig pfnMappingGetServices;
 	static MappingFreeServicesSig pfnMappingFreeServices;
 	static MappingRecognizeTextSig pfnMappingRecognizeText;
@@ -1450,24 +1439,23 @@ using MappingFreePropertyBagSig = HRESULT (WINAPI *)(PMAPPING_PROPERTY_BAG pBag)
 
 	if (triedLoadingELSCore == 0) {
 		triedLoadingELSCore = 1;
-		hELSCoreDLL = LoadLibraryExW(L"elscore.dll", nullptr, kSystemLibraryLoadFlags);
-		if (hELSCoreDLL != nullptr) {
-			pfnMappingGetServices = DLLFunction<MappingGetServicesSig>(hELSCoreDLL, "MappingGetServices");
-			pfnMappingFreeServices = DLLFunction<MappingFreeServicesSig>(hELSCoreDLL, "MappingFreeServices");
-			pfnMappingRecognizeText = DLLFunction<MappingRecognizeTextSig>(hELSCoreDLL, "MappingRecognizeText");
-			pfnMappingFreePropertyBag = DLLFunction<MappingFreePropertyBagSig>(hELSCoreDLL, "MappingFreePropertyBag");
+		HMODULE hDLL = LoadLibraryExW(L"elscore.dll", nullptr, kSystemLibraryLoadFlags);
+		if (hDLL != nullptr) {
+			pfnMappingGetServices = DLLFunction<MappingGetServicesSig>(hDLL, "MappingGetServices");
+			pfnMappingFreeServices = DLLFunction<MappingFreeServicesSig>(hDLL, "MappingFreeServices");
+			pfnMappingRecognizeText = DLLFunction<MappingRecognizeTextSig>(hDLL, "MappingRecognizeText");
+			pfnMappingFreePropertyBag = DLLFunction<MappingFreePropertyBagSig>(hDLL, "MappingFreePropertyBag");
 			if (pfnMappingGetServices == nullptr || pfnMappingFreeServices == nullptr || pfnMappingRecognizeText == nullptr || pfnMappingFreePropertyBag == nullptr) {
-				FreeLibrary(hELSCoreDLL);
-				hELSCoreDLL = nullptr;
+				FreeLibrary(hDLL);
 				return 0;
 			}
+			hELSCoreDLL = hDLL;
 			triedLoadingELSCore = 2;
 		}
 	}
 	if (triedLoadingELSCore != 2) {
 		return 0;
 	}
-#endif
 
 	MAPPING_ENUM_OPTIONS enumOptions;
 	PMAPPING_SERVICE_INFO prgServices = nullptr;
@@ -1477,21 +1465,13 @@ using MappingFreePropertyBagSig = HRESULT (WINAPI *)(PMAPPING_PROPERTY_BAG pBag)
 	enumOptions.Size = sizeof(MAPPING_ENUM_OPTIONS);
 	enumOptions.pGuid = const_cast<GUID *>(pGuid);
 
-#if NP2_DYNAMIC_LOAD_ELSCORE_DLL
 	HRESULT hr = pfnMappingGetServices(&enumOptions, &prgServices, &dwServicesCount);
-#else
-	HRESULT hr = MappingGetServices(&enumOptions, &prgServices, &dwServicesCount);
-#endif
 	dwServicesCount = 0;
 	if (SUCCEEDED(hr)) {
 		MAPPING_PROPERTY_BAG bag;
 		memset(&bag, 0, sizeof(MAPPING_PROPERTY_BAG));
 		bag.Size = sizeof (MAPPING_PROPERTY_BAG);
-#if NP2_DYNAMIC_LOAD_ELSCORE_DLL
 		hr = pfnMappingRecognizeText(prgServices, pszTextW, cchTextW, 0, nullptr, &bag);
-#else
-		hr = MappingRecognizeText(prgServices, pszTextW, cchTextW, 0, nullptr, &bag);
-#endif
 		if (SUCCEEDED(hr)) {
 			const DWORD dwDataSize = bag.prgResultRanges[0].dwDataSize;
 			dwServicesCount = dwDataSize/sizeof(WCHAR);
@@ -1501,17 +1481,9 @@ using MappingFreePropertyBagSig = HRESULT (WINAPI *)(PMAPPING_PROPERTY_BAG pBag)
 				memcpy(pszConvW, pszTextW, dwDataSize);
 				pszMappedW = pszConvW;
 			}
-#if NP2_DYNAMIC_LOAD_ELSCORE_DLL
 			pfnMappingFreePropertyBag(&bag);
-#else
-			MappingFreePropertyBag(&bag);
-#endif
 		}
-#if NP2_DYNAMIC_LOAD_ELSCORE_DLL
 		pfnMappingFreeServices(prgServices);
-#else
-		MappingFreeServices(prgServices);
-#endif
 	}
 
 	return dwServicesCount;
@@ -1618,11 +1590,11 @@ char *EditMapTextCase(int menu, const char *pszText, size_t &iSelCount, UINT cpE
 	}
 
 	LPWSTR pszTextW = static_cast<LPWSTR>(NP2HeapAlloc((iSelCount + 1) * sizeof(WCHAR)));
-	int cchTextW = MultiByteToWideChar(cpEdit, 0, pszText, static_cast<int>(iSelCount), pszTextW, static_cast<int>(iSelCount + 1));
+	UINT cchTextW = MultiByteToWideChar(cpEdit, 0, pszText, static_cast<int>(iSelCount), pszTextW, static_cast<int>(iSelCount + 1));
 
 	bool bChanged = false;
 	if (flags != 0 || pGuid != nullptr) {
-		int charsConverted = 0;
+		UINT charsConverted = 0;
 		LPWSTR pszMappedW = nullptr;
 		if (pGuid != nullptr && IsWin7AndAbove()) {
 			charsConverted = TransliterateText(pGuid, pszTextW, cchTextW, pszMappedW);
@@ -1640,7 +1612,7 @@ char *EditMapTextCase(int menu, const char *pszText, size_t &iSelCount, UINT cpE
 						// BOOKMARK_EDITION
 						bool bNewWord = true;
 						bool bPrevWasSpace = true;
-						for (int i = 0; i < charsConverted; i++) {
+						for (UINT i = 0; i < charsConverted; i++) {
 							const WCHAR ch = pszMappedW[i];
 							if (!IsCharAlphaNumeric(ch) && (!IsWordSingleQuote(ch) || bPrevWasSpace)) {
 								bNewWord = true;
@@ -1655,7 +1627,7 @@ char *EditMapTextCase(int menu, const char *pszText, size_t &iSelCount, UINT cpE
 					}
 				} else if (menu == IDM_EDIT_SENTENCECASE) {
 					bool bNewSentence = true;
-					for (int i = 0; i < charsConverted; i++) {
+					for (UINT i = 0; i < charsConverted; i++) {
 						const WCHAR ch = pszMappedW[i];
 						if (IsSentenceTerminator(ch)) {
 							bNewSentence = true;
@@ -1680,7 +1652,7 @@ char *EditMapTextCase(int menu, const char *pszText, size_t &iSelCount, UINT cpE
 		}
 	} else {
 		// invert case
-		for (int i = 0; i < cchTextW; i++) {
+		for (UINT i = 0; i < cchTextW; i++) {
 			const WCHAR ch = pszTextW[i];
 			if (IsCharUpper(ch)) {
 				pszTextW[i] = LOWORD(CharLower(AsPointer<LPWSTR, LONG_PTR>(ch)));
@@ -1694,7 +1666,7 @@ char *EditMapTextCase(int menu, const char *pszText, size_t &iSelCount, UINT cpE
 
 	char *pszOut = nullptr;
 	if (bChanged) {
-		int cchText = cchTextW*kMaxMultiByteCount + 1;
+		UINT cchText = cchTextW*kMaxMultiByteCount + 1;
 		pszOut = static_cast<char *>(NP2HeapAlloc(cchText));
 		cchText = WideCharToMultiByte(cpEdit, 0, pszTextW, cchTextW, pszOut, cchText, nullptr, nullptr);
 		iSelCount = cchText;
@@ -1718,36 +1690,36 @@ char *EditMapTextCase(int menu, const char *pszText, size_t &iSelCount, UINT cpE
 //
 // EditURLEncode()
 //
-LPWSTR EditURLEncodeSelection(int *pcchEscaped, bool component) noexcept {
-	*pcchEscaped = 0;
+LPWSTR EditURLEncodeSelection(DWORD *cchEscapedW, bool component) noexcept {
+	*cchEscapedW = 0;
 	const Sci_Position iSelCount = SciCall_GetSelTextLength();
 	if (iSelCount == 0) {
 		return nullptr;
 	}
 
-	char *pszText = static_cast<char *>(NP2HeapAlloc(iSelCount + 1));
+	const size_t allocSize = NP2_align_up(iSelCount + 1, MEMORY_ALLOCATION_ALIGNMENT);
+	char * const pszText = static_cast<char *>(NP2HeapAlloc(allocSize * (sizeof(char) + sizeof(WCHAR))));
 	SciCall_GetSelText(pszText);
 
-	LPWSTR pszTextW = static_cast<LPWSTR>(NP2HeapAlloc((iSelCount + 1) * sizeof(WCHAR)));
+	WCHAR * const pszTextW = reinterpret_cast<LPWSTR>(pszText + allocSize);
 	const UINT cpEdit = SciCall_GetCodePage();
-	MultiByteToWideChar(cpEdit, 0, pszText, static_cast<int>(iSelCount), pszTextW, static_cast<int>(NP2HeapSize(pszTextW) / sizeof(WCHAR)));
-	NP2HeapFree(pszText);
+	MultiByteToWideChar(cpEdit, 0, pszText, static_cast<int>(iSelCount), pszTextW, static_cast<int>(allocSize));
 	// TODO: trim all C0 and C1 control characters.
 	StrTrim(pszTextW, L" \a\b\f\n\r\t\v");
 	if (StrIsEmpty(pszTextW)) {
-		NP2HeapFree(pszTextW);
+		NP2HeapFree(pszText);
 		return nullptr;
 	}
 
 	// https://docs.microsoft.com/en-us/windows/desktop/api/shlwapi/nf-shlwapi-urlescapew
-	LPWSTR pszEscapedW = static_cast<LPWSTR>(NP2HeapAlloc(NP2HeapSize(pszTextW) * kMaxMultiByteCount * 3)); // '&', H1, H0
+	DWORD cchEscaped = static_cast<DWORD>(allocSize * kMaxMultiByteCount * 3); // '&', H1, H0
+	LPWSTR pszEscapedW = static_cast<LPWSTR>(NP2HeapAlloc(cchEscaped * sizeof(WCHAR))); // '&', H1, H0
 
-	DWORD cchEscapedW = static_cast<DWORD>(NP2HeapSize(pszEscapedW) / sizeof(WCHAR));
 	const DWORD flags = component ? (URL_ESCAPE_AS_UTF8 | URL_ESCAPE_ASCII_URI_COMPONENT | URL_ESCAPE_SEGMENT_ONLY) : URL_ESCAPE_AS_UTF8;
-	UrlEscape(pszTextW, pszEscapedW, &cchEscapedW, flags);
+	UrlEscape(pszTextW, pszEscapedW, &cchEscaped, flags);
 
-	NP2HeapFree(pszTextW);
-	*pcchEscaped = cchEscapedW;
+	NP2HeapFree(pszText);
+	*cchEscapedW = cchEscaped;
 	return pszEscapedW;
 }
 
@@ -1761,15 +1733,16 @@ void EditURLEncode(bool component) noexcept {
 		return;
 	}
 
-	int cchEscapedW;
+	DWORD cchEscapedW;
 	LPWSTR pszEscapedW = EditURLEncodeSelection(&cchEscapedW, component);
 	if (pszEscapedW == nullptr) {
 		return;
 	}
 
 	const UINT cpEdit = SciCall_GetCodePage();
-	char *pszEscaped = static_cast<char *>(NP2HeapAlloc(cchEscapedW * kMaxMultiByteCount));
-	const int cchEscaped = WideCharToMultiByte(cpEdit, 0, pszEscapedW, cchEscapedW, pszEscaped, static_cast<int>(NP2HeapSize(pszEscaped)), nullptr, nullptr);
+	DWORD cchEscaped = cchEscapedW * kMaxMultiByteCount;
+	char *pszEscaped = static_cast<char *>(NP2HeapAlloc(cchEscaped));
+	cchEscaped = WideCharToMultiByte(cpEdit, 0, pszEscapedW, cchEscapedW, pszEscaped, cchEscaped, nullptr, nullptr);
 	EditReplaceMainSelection(cchEscaped, pszEscaped);
 
 	NP2HeapFree(pszEscaped);
@@ -1790,17 +1763,19 @@ void EditURLDecode() noexcept {
 		return;
 	}
 
-	char *pszText = static_cast<char *>(NP2HeapAlloc(iSelCount + 1));
-	LPWSTR pszTextW = static_cast<LPWSTR>(NP2HeapAlloc((iSelCount + 1) * sizeof(WCHAR)));
+	size_t allocSize = NP2_align_up(iSelCount + 1, MEMORY_ALLOCATION_ALIGNMENT);
+	char * const pszText = static_cast<char *>(NP2HeapAlloc(allocSize * (sizeof(char) + sizeof(WCHAR))));
+	WCHAR * const pszTextW = reinterpret_cast<LPWSTR>(pszText + allocSize);
 
 	SciCall_GetSelText(pszText);
 	const UINT cpEdit = SciCall_GetCodePage();
-	MultiByteToWideChar(cpEdit, 0, pszText, static_cast<int>(iSelCount), pszTextW, static_cast<int>(NP2HeapSize(pszTextW) / sizeof(WCHAR)));
+	MultiByteToWideChar(cpEdit, 0, pszText, static_cast<int>(iSelCount), pszTextW, static_cast<int>(allocSize));
 
-	char *pszUnescaped = static_cast<char *>(NP2HeapAlloc(NP2HeapSize(pszText) * 3));
-	LPWSTR pszUnescapedW = static_cast<LPWSTR>(NP2HeapAlloc(NP2HeapSize(pszTextW) * 3));
+	allocSize *= kMaxMultiByteCount;
+	char * const pszUnescaped = static_cast<char *>(NP2HeapAlloc(allocSize * (sizeof(char) + sizeof(WCHAR))));
+	WCHAR * const pszUnescapedW = reinterpret_cast<LPWSTR>(pszUnescaped + allocSize);
 
-	DWORD cchUnescapedW = static_cast<DWORD>(NP2HeapSize(pszUnescapedW) / sizeof(WCHAR));
+	DWORD cchUnescapedW = static_cast<DWORD>(allocSize);
 	int cchUnescaped = cchUnescapedW;
 	UrlUnescape(pszTextW, pszUnescapedW, &cchUnescapedW, URL_UNESCAPE_AS_UTF8);
 	if (!IsWin8AndAbove()) {
@@ -1819,13 +1794,11 @@ void EditURLDecode() noexcept {
 		}
 	}
 
-	cchUnescaped = WideCharToMultiByte(cpEdit, 0, pszUnescapedW, cchUnescapedW, pszUnescaped, static_cast<int>(NP2HeapSize(pszUnescaped)), nullptr, nullptr);
+	cchUnescaped = WideCharToMultiByte(cpEdit, 0, pszUnescapedW, cchUnescapedW, pszUnescaped, static_cast<int>(allocSize), nullptr, nullptr);
 	EditReplaceMainSelection(cchUnescaped, pszUnescaped);
 
 	NP2HeapFree(pszText);
-	NP2HeapFree(pszTextW);
 	NP2HeapFree(pszUnescaped);
-	NP2HeapFree(pszUnescapedW);
 }
 
 //=============================================================================
@@ -1844,18 +1817,25 @@ void EditEscapeCChars(HWND hwnd) noexcept {
 	EDITFINDREPLACE * const efr = static_cast<EDITFINDREPLACE *>(NP2HeapAlloc(sizeof(EDITFINDREPLACE)));
 	efr->hwnd = hwnd;
 	SciCall_BeginBatchUpdate();
+	const int rid = pLexCurrent->rid;
 
-	strcpy(efr->szFind, "\\");
-	strcpy(efr->szReplace, "\\\\");
+	StrCpyEx(efr->szFind, "\\");
+	StrCpyEx(efr->szReplace, "\\\\");
 	EditReplaceAllInSelection(hwnd, efr);
 
-	strcpy(efr->szFind, "\"");
-	strcpy(efr->szReplace, "\\\"");
+	StrCpyEx(efr->szFind, "\"");
+	if (rid == NP2LEX_RESOURCESCRIPT) {
+		StrCpyEx(efr->szReplace, "\"\"");
+	} else {
+		StrCpyEx(efr->szReplace, "\\\"");
+	}
 	EditReplaceAllInSelection(hwnd, efr);
 
-	strcpy(efr->szFind, "\'");
-	strcpy(efr->szReplace, "\\\'");
-	EditReplaceAllInSelection(hwnd, efr);
+	if (rid != NP2LEX_RESOURCESCRIPT) {
+		StrCpyEx(efr->szFind, "\'");
+		StrCpyEx(efr->szReplace, "\\\'");
+		EditReplaceAllInSelection(hwnd, efr);
+	}
 
 	NP2HeapFree(efr);
 	SciCall_EndBatchUpdate();
@@ -1877,18 +1857,25 @@ void EditUnescapeCChars(HWND hwnd) noexcept {
 	EDITFINDREPLACE * const efr = static_cast<EDITFINDREPLACE *>(NP2HeapAlloc(sizeof(EDITFINDREPLACE)));
 	efr->hwnd = hwnd;
 	SciCall_BeginBatchUpdate();
+	const int rid = pLexCurrent->rid;
 
-	strcpy(efr->szFind, "\\\\");
-	strcpy(efr->szReplace, "\\");
+	StrCpyEx(efr->szFind, "\\\\");
+	StrCpyEx(efr->szReplace, "\\");
 	EditReplaceAllInSelection(hwnd, efr);
 
-	strcpy(efr->szFind, "\\\"");
-	strcpy(efr->szReplace, "\"");
+	if (rid == NP2LEX_RESOURCESCRIPT) {
+		StrCpyEx(efr->szFind, "\"\"");
+	} else {
+		StrCpyEx(efr->szFind, "\\\"");
+	}
+	StrCpyEx(efr->szReplace, "\"");
 	EditReplaceAllInSelection(hwnd, efr);
 
-	strcpy(efr->szFind, "\\\'");
-	strcpy(efr->szReplace, "\'");
-	EditReplaceAllInSelection(hwnd, efr);
+	if (rid != NP2LEX_RESOURCESCRIPT) {
+		StrCpyEx(efr->szFind, "\\\'");
+		StrCpyEx(efr->szReplace, "\'");
+		EditReplaceAllInSelection(hwnd, efr);
+	}
 
 	NP2HeapFree(efr);
 	SciCall_EndBatchUpdate();
@@ -1920,33 +1907,33 @@ void EditEscapeXHTMLChars(HWND hwnd) noexcept {
 	efr->hwnd = hwnd;
 	SciCall_BeginBatchUpdate();
 
-	strcpy(efr->szFind, "&");
-	strcpy(efr->szReplace, "&amp;");
+	StrCpyEx(efr->szFind, "&");
+	StrCpyEx(efr->szReplace, "&amp;");
 	EditReplaceAllInSelection(hwnd, efr);
 
-	strcpy(efr->szFind, "\"");
-	strcpy(efr->szReplace, "&quot;");
+	StrCpyEx(efr->szFind, "\"");
+	StrCpyEx(efr->szReplace, "&quot;");
 	EditReplaceAllInSelection(hwnd, efr);
 
-	strcpy(efr->szFind, "\'");
-	strcpy(efr->szReplace, "&apos;");
+	StrCpyEx(efr->szFind, "\'");
+	StrCpyEx(efr->szReplace, "&apos;");
 	EditReplaceAllInSelection(hwnd, efr);
 
-	strcpy(efr->szFind, "<");
-	strcpy(efr->szReplace, "&lt;");
+	StrCpyEx(efr->szFind, "<");
+	StrCpyEx(efr->szReplace, "&lt;");
 	EditReplaceAllInSelection(hwnd, efr);
 
-	strcpy(efr->szFind, ">");
-	strcpy(efr->szReplace, "&gt;");
+	StrCpyEx(efr->szFind, ">");
+	StrCpyEx(efr->szReplace, "&gt;");
 	EditReplaceAllInSelection(hwnd, efr);
 
 	if (pLexCurrent->iLexer != SCLEX_XML) {
-		strcpy(efr->szFind, " ");
-		strcpy(efr->szReplace, "&nbsp;");
+		StrCpyEx(efr->szFind, " ");
+		StrCpyEx(efr->szReplace, "&nbsp;");
 		EditReplaceAllInSelection(hwnd, efr);
 
-		strcpy(efr->szFind, "\t");
-		strcpy(efr->szReplace, "&emsp;");
+		StrCpyEx(efr->szFind, "\t");
+		StrCpyEx(efr->szReplace, "&emsp;");
 		EditReplaceAllInSelection(hwnd, efr);
 	}
 
@@ -1971,32 +1958,32 @@ void EditUnescapeXHTMLChars(HWND hwnd) noexcept {
 	efr->hwnd = hwnd;
 	SciCall_BeginBatchUpdate();
 
-	strcpy(efr->szFind, "&quot;");
-	strcpy(efr->szReplace, "\"");
+	StrCpyEx(efr->szFind, "&quot;");
+	StrCpyEx(efr->szReplace, "\"");
 	EditReplaceAllInSelection(hwnd, efr);
 
-	strcpy(efr->szFind, "&apos;");
-	strcpy(efr->szReplace, "\'");
+	StrCpyEx(efr->szFind, "&apos;");
+	StrCpyEx(efr->szReplace, "\'");
 	EditReplaceAllInSelection(hwnd, efr);
 
-	strcpy(efr->szFind, "&lt;");
-	strcpy(efr->szReplace, "<");
+	StrCpyEx(efr->szFind, "&lt;");
+	StrCpyEx(efr->szReplace, "<");
 	EditReplaceAllInSelection(hwnd, efr);
 
-	strcpy(efr->szFind, "&gt;");
-	strcpy(efr->szReplace, ">");
+	StrCpyEx(efr->szFind, "&gt;");
+	StrCpyEx(efr->szReplace, ">");
 	EditReplaceAllInSelection(hwnd, efr);
 
-	strcpy(efr->szFind, "&nbsp;");
-	strcpy(efr->szReplace, " ");
+	StrCpyEx(efr->szFind, "&nbsp;");
+	StrCpyEx(efr->szReplace, " ");
 	EditReplaceAllInSelection(hwnd, efr);
 
-	strcpy(efr->szFind, "&amp;");
-	strcpy(efr->szReplace, "&");
+	StrCpyEx(efr->szFind, "&amp;");
+	StrCpyEx(efr->szReplace, "&");
 	EditReplaceAllInSelection(hwnd, efr);
 
-	strcpy(efr->szFind, "&emsp;");
-	strcpy(efr->szReplace, "\t");
+	StrCpyEx(efr->szFind, "&emsp;");
+	StrCpyEx(efr->szReplace, "\t");
 	EditReplaceAllInSelection(hwnd, efr);
 
 	NP2HeapFree(efr);
@@ -2019,9 +2006,9 @@ void EditUnescapeXHTMLChars(HWND hwnd) noexcept {
 #define BMP_UNICODE_HEX_DIGIT	4
 #define MAX_UNICODE_HEX_DIGIT	8
 
-void EditChar2Hex() noexcept {
-	Sci_Position count = SciCall_GetSelTextLength();
-	if (count == 0) {
+void EditCharacterToHex() noexcept {
+	Sci_Position iSelCount = SciCall_GetSelTextLength();
+	if (iSelCount == 0) {
 		return;
 	}
 	if (SciCall_IsRectangularSelection()) {
@@ -2029,45 +2016,44 @@ void EditChar2Hex() noexcept {
 		return;
 	}
 
-	count *= 2 + BMP_UNICODE_HEX_DIGIT;
-	count += 1;
-	char *ch = static_cast<char *>(NP2HeapAlloc(count + 10));
-	WCHAR *wch = static_cast<WCHAR *>(NP2HeapAlloc(count * sizeof(WCHAR)));
-	SciCall_GetSelText(ch);
+	iSelCount *= MAX_UNICODE_HEX_DIGIT;
+	iSelCount = NP2_align_up(iSelCount + 1, MEMORY_ALLOCATION_ALIGNMENT);
+	char * const pszText = static_cast<char *>(NP2HeapAlloc(iSelCount * (sizeof(char) + sizeof(WCHAR))));
+	SciCall_GetSelText(pszText);
 
 	int outLen = 0;
-	if (ch[0] == '\0') {
+	if (pszText[0] == '\0') {
 		outLen = 4;
-		strcpy(ch, "\\x00");
+		StrCpyEx(pszText, "\\x00");
 	} else {
+		WCHAR * const pszTextW = reinterpret_cast<WCHAR *>(pszText + iSelCount);
 		const UINT cpEdit = SciCall_GetCodePage();
-		count = MultiByteToWideChar(cpEdit, 0, ch, -1, wch, static_cast<int>(count)) - 1; // '\0'
+		const int count = MultiByteToWideChar(cpEdit, 0, pszText, -1, pszTextW, static_cast<int>(iSelCount)) - 1; // '\0'
 		for (Sci_Position i = 0; i < count; i++) {
-			const WCHAR c = wch[i];
+			const WCHAR c = pszTextW[i];
 			if (c <= 0xFF) {
-				outLen += sprintf(ch + outLen, "\\x%02X", c); // \xHH
+				outLen += sprintf(pszText + outLen, "\\x%02X", c); // \xHH
 			} else {
-				outLen += sprintf(ch + outLen, "\\u%04X", c); // \uHHHH
+				outLen += sprintf(pszText + outLen, "\\u%04X", c); // \uHHHH
 			}
 		}
-		if (count == 2 && IS_SURROGATE_PAIR(wch[0], wch[1])) {
-			const UINT value = UTF16_TO_UTF32(wch[0], wch[1]);
-			outLen += sprintf(ch + outLen, " U+%X", value);
+		if (count == 2 && IS_SURROGATE_PAIR(pszTextW[0], pszTextW[1])) {
+			const UINT value = UTF16_TO_UTF32(pszTextW[0], pszTextW[1]);
+			outLen += sprintf(pszText + outLen, " U+%06X", value);
 		}
 	}
 
-	EditReplaceMainSelection(outLen, ch);
-	NP2HeapFree(ch);
-	NP2HeapFree(wch);
+	EditReplaceMainSelection(outLen, pszText);
+	NP2HeapFree(pszText);
 }
 
 //=============================================================================
 //
 // EditHex2Char()
 //
-void EditHex2Char() noexcept {
-	Sci_Position count = SciCall_GetSelTextLength();
-	if (count == 0) {
+void EditHexToCharacter() noexcept {
+	Sci_Position iSelCount = SciCall_GetSelTextLength();
+	if (iSelCount == 0) {
 		return;
 	}
 	if (SciCall_IsRectangularSelection()) {
@@ -2075,17 +2061,17 @@ void EditHex2Char() noexcept {
 		return;
 	}
 
-	count *= 2 + BMP_UNICODE_HEX_DIGIT;
-	count += 1;
-	char *ch = static_cast<char *>(NP2HeapAlloc(count));
-	WCHAR *wch = static_cast<WCHAR *>(NP2HeapAlloc(count * sizeof(WCHAR)));
+	iSelCount *= MAX_UNICODE_HEX_DIGIT;
+	iSelCount = NP2_align_up(iSelCount + 1, MEMORY_ALLOCATION_ALIGNMENT);
+	char * const pszText = static_cast<char *>(NP2HeapAlloc(iSelCount * (sizeof(char) + sizeof(WCHAR))));
+	WCHAR * const pszTextW = reinterpret_cast<WCHAR *>(pszText + iSelCount);
+
+	SciCall_GetSelText(pszText);
 	const UINT cpEdit = SciCall_GetCodePage();
+	MultiByteToWideChar(cpEdit, 0, pszText, -1, pszTextW, static_cast<int>(iSelCount));
 
-	SciCall_GetSelText(ch);
-	MultiByteToWideChar(cpEdit, 0, ch, -1, wch, static_cast<int>(count));
-
-	const WCHAR *p = wch;
-	WCHAR *t = wch;
+	const WCHAR *p = pszTextW;
+	WCHAR *t = pszTextW;
 	bool changed = false;
 	while (*p) {
 		UINT wc = *p++;
@@ -2102,7 +2088,7 @@ void EditHex2Char() noexcept {
 				value = (value << 4) | hex;
 				p++;
 			}
-			if (value != 0 && value <= MAX_UNICODE) {
+			if (ucc > 1 && value <= MAX_UNICODE) {
 				changed = true;
 				// see UTF16FromUTF32Character() in UniConversion.h
 				if (value < SUPPLEMENTAL_PLANE_FIRST) {
@@ -2120,17 +2106,16 @@ void EditHex2Char() noexcept {
 
 	if (changed) {
 		*t = L'\0';
-		count = WideCharToMultiByte(cpEdit, 0, wch, static_cast<int>(t - wch), ch, static_cast<int>(count), nullptr, nullptr);
-		EditReplaceMainSelection(count, ch);
+		iSelCount = WideCharToMultiByte(cpEdit, 0, pszTextW, static_cast<int>(t - pszTextW), pszText, static_cast<int>(iSelCount), nullptr, nullptr);
+		EditReplaceMainSelection(iSelCount, pszText);
 	}
 
-	NP2HeapFree(ch);
-	NP2HeapFree(wch);
+	NP2HeapFree(pszText);
 }
 
 void EditShowHex() noexcept {
-	const Sci_Position count = SciCall_GetSelTextLength();
-	if (count == 0) {
+	const Sci_Position iSelCount = SciCall_GetSelTextLength();
+	if (iSelCount == 0) {
 		return;
 	}
 	if (SciCall_IsRectangularSelection()) {
@@ -2138,12 +2123,13 @@ void EditShowHex() noexcept {
 		return;
 	}
 
-	char *ch = static_cast<char *>(NP2HeapAlloc(count + 1));
-	char *cch = static_cast<char *>(NP2HeapAlloc(count * 3 + 3));
-	SciCall_GetSelBytes(ch);
-	const uint8_t *p = reinterpret_cast<const uint8_t *>(ch);
-	const uint8_t * const end = p + count;
-	char *t = cch;
+	const size_t allocSize = NP2_align_up(iSelCount + 1, MEMORY_ALLOCATION_ALIGNMENT);
+	char *pszText = static_cast<char *>(NP2HeapAlloc(allocSize * 4));
+	char *pszOut = pszText + allocSize;
+	SciCall_GetSelBytes(pszText);
+	const uint8_t *p = reinterpret_cast<const uint8_t *>(pszText);
+	const uint8_t * const end = p + iSelCount;
+	char *t = pszOut;
 	*t++ = '[';
 	do {
 		const uint8_t c = *p++;
@@ -2154,15 +2140,122 @@ void EditShowHex() noexcept {
 	t[-1] = ']';
 
 	const Sci_Position iSelEnd = SciCall_GetSelectionEnd();
-	SciCall_InsertText(iSelEnd, cch);
-	SciCall_SetSel(iSelEnd, iSelEnd + (t - cch));
-	NP2HeapFree(ch);
-	NP2HeapFree(cch);
+	SciCall_InsertText(iSelEnd, pszOut);
+	SciCall_SetSel(iSelEnd, iSelEnd + (t - pszOut));
+	NP2HeapFree(pszText);
+}
+
+void EditShowCharacterInfo() noexcept {
+	const Sci_Position position = SciCall_GetSelectionStart();
+	unsigned character = SciCall_GetCharacterAt(position);
+	char bytes[4]{};
+	WCHAR wchBuf[256];
+	memset(wchBuf, 0, sizeof(int));
+	unsigned count = 1;
+	if (character <= 0x7f) {
+		bytes[0] = static_cast<char>(character);
+		wchBuf[0] = static_cast<wchar_t>(character);
+	} else {
+		const UINT cpEdit = SciCall_GetCodePage();
+		if (cpEdit == SC_CP_UTF8) {
+			if (character < SUPPLEMENTAL_PLANE_FIRST) {
+				wchBuf[0] = static_cast<wchar_t>(character);
+			} else {
+				count = 2;
+				wchBuf[0] = static_cast<WCHAR>(((character - SUPPLEMENTAL_PLANE_FIRST) >> 10) + SURROGATE_LEAD_FIRST);
+				wchBuf[1] = (character & 0x3ff) + SURROGATE_TRAIL_FIRST;
+			}
+		} else {
+			if (character <= 0xff) {
+				bytes[0] = static_cast<char>(character);
+			} else {
+				count = 2;
+				const uint16_t dbcs = bswap16(static_cast<uint16_t>(character));
+				memcpy(bytes, &dbcs, 2);
+			}
+			count = MultiByteToWideChar(cpEdit, 0, bytes, count, wchBuf, COUNTOF(wchBuf));
+			if (IS_SURROGATE_PAIR(wchBuf[0], wchBuf[1])) {
+				character = UTF16_TO_UTF32(wchBuf[0], wchBuf[1]);
+			} else {
+				character = wchBuf[0];
+			}
+		}
+		count = WideCharToMultiByte(CP_UTF8, 0, wchBuf, count, bytes, COUNTOF(bytes), nullptr, nullptr);
+	}
+
+	char buffer[256];
+	unsigned length = 0;
+	memset(buffer, 0, sizeof(int));
+	length = sprintf(buffer, "Unicode: U+%0*X\n", ((character < SUPPLEMENTAL_PLANE_FIRST) ? 4 : 6), character);
+	StrCpyEx(buffer + length, "UTF-16:");
+	length += CSTRLEN("UTF-16:");
+	length += sprintf(buffer + length, " %04X", wchBuf[0]);
+	if (character >= SUPPLEMENTAL_PLANE_FIRST) {
+		length += sprintf(buffer + length, " %04X", wchBuf[1]);
+	}
+	StrCpyEx(buffer + length, "\nUTF-8:");
+	length += CSTRLEN("\nUTF-8:");
+	for (unsigned i = 0; i < count; i++) {
+		const uint8_t ch = bytes[i];
+		buffer[length] = ' ';
+		buffer[length + 1] = "0123456789ABCDEF"[ch >> 4];
+		buffer[length + 2] = "0123456789ABCDEF"[ch & 15];
+		length += 3;
+	}
+	length += sprintf(buffer + length, "\nHTML: &#%u;", character);
+
+// see icu.h / uchar.h, https://learn.microsoft.com/en-us/windows/win32/intl/international-components-for-unicode--icu-
+using u_charNameSig = int32_t (__cdecl *)(uint32_t code, int nameChoice, char *buffer, int32_t bufferLength, int *pErrorCode);
+using u_getIntPropertyValueSig = int32_t (__cdecl *)(uint32_t code, int which);
+using u_getPropertyValueNameSig = const char * (__cdecl *)(int property, int32_t value, int nameChoice);
+	constexpr int U_EXTENDED_CHAR_NAME = 2;
+	constexpr int U_SHORT_PROPERTY_NAME = 0;
+	constexpr int U_LONG_PROPERTY_NAME = 1;
+	constexpr int UCHAR_GENERAL_CATEGORY = 0x1005;
+
+	static uint8_t triedLoadingICU = 0;
+	static u_charNameSig pfn_charName;
+	static u_getIntPropertyValueSig pfn_getIntPropertyValue;
+	static u_getPropertyValueNameSig pfn_getPropertyValueName;
+	if (triedLoadingICU == 0) {
+		triedLoadingICU = 1;
+		HMODULE hDLL = LoadLibraryExW(L"icu.dll", nullptr, kSystemLibraryLoadFlags); // Windows 10 1903
+		// if (hDLL == nullptr) { // Windows 10 1703, legacy outdated
+		// 	hDLL = LoadLibraryExW(L"icuuc.dll", nullptr, kSystemLibraryLoadFlags);
+		// }
+		if (hDLL != nullptr) {
+			pfn_charName = DLLFunction<u_charNameSig>(hDLL, "u_charName");
+			pfn_getIntPropertyValue = DLLFunction<u_getIntPropertyValueSig>(hDLL, "u_getIntPropertyValue");
+			pfn_getPropertyValueName = DLLFunction<u_getPropertyValueNameSig>(hDLL, "u_getPropertyValueName");
+			if (pfn_charName == nullptr || pfn_getIntPropertyValue == nullptr || pfn_getPropertyValueName == nullptr) {
+				FreeLibrary(hDLL);
+			} else {
+				hICUDLL = hDLL;
+				triedLoadingICU = 2;
+			}
+		}
+	}
+	if (triedLoadingICU == 2) {
+		StrCpyEx(buffer + length, "\nName: ");
+		length += CSTRLEN("\nName: ");
+		int value = 0;
+		length += pfn_charName(character, U_EXTENDED_CHAR_NAME, buffer + length, COUNTOF(buffer) - length, &value);
+		value = pfn_getIntPropertyValue(character, UCHAR_GENERAL_CATEGORY);
+		const char *shortName = pfn_getPropertyValueName(UCHAR_GENERAL_CATEGORY, value, U_SHORT_PROPERTY_NAME);
+		const char *longName = pfn_getPropertyValueName(UCHAR_GENERAL_CATEGORY, value, U_LONG_PROPERTY_NAME);
+		sprintf(buffer + length, "\nCategory: %s %s", shortName, longName);
+	}
+
+	const WPARAM notifyPos = (static_cast<WPARAM>(position) << 2) | SC_NOTIFICATIONPOSITION_NONE;
+	ShowNotificationA(notifyPos, buffer);
+
+	MultiByteToWideChar(CP_UTF8, 0, buffer, -1, wchBuf, COUNTOF(wchBuf));
+	SetClipData(hwndMain, wchBuf);
 }
 
 void EditBase64Encode(Base64EncodingFlag encodingFlag) noexcept {
-	const size_t len = SciCall_GetSelTextLength();
-	if (len == 0) {
+	const size_t iSelByte = SciCall_GetSelTextLength();
+	if (iSelByte == 0) {
 		return;
 	}
 	if (SciCall_IsRectangularSelection()){
@@ -2170,10 +2263,11 @@ void EditBase64Encode(Base64EncodingFlag encodingFlag) noexcept {
 		return;
 	}
 
-	char *input = static_cast<char *>(NP2HeapAlloc(len + 1));
+	const size_t allocSize = NP2_align_up(iSelByte + 1, MEMORY_ALLOCATION_ALIGNMENT);
+	size_t outLen = (allocSize*4)/3 + 4 + MAX_PATH*2;
+	char * const input = static_cast<char *>(NP2HeapAlloc(allocSize + outLen));
 	SciCall_GetSelBytes(input);
-	size_t outLen = (len*4)/3 + 4 + MAX_PATH*2;
-	char *output = static_cast<char *>(NP2HeapAlloc(outLen));
+	char * const output = input + allocSize;
 	outLen = 0;
 	if (encodingFlag == Base64EncodingFlag_HtmlEmbeddedImage) {
 		memcpy(output, "<img src=\"data:image/", CSTRLEN("<img src=\"data:image/"));
@@ -2189,7 +2283,7 @@ void EditBase64Encode(Base64EncodingFlag encodingFlag) noexcept {
 		memcpy(output + outLen, ";base64,", CSTRLEN(";base64,"));
 		outLen += CSTRLEN(";base64,");
 	}
-	outLen += Base64Encode(output + outLen, reinterpret_cast<const uint8_t *>(input), len, encodingFlag == Base64EncodingFlag_UrlSafe);
+	outLen += Base64Encode(output + outLen, reinterpret_cast<const uint8_t *>(input), iSelByte, encodingFlag == Base64EncodingFlag_UrlSafe);
 	if (encodingFlag == Base64EncodingFlag_HtmlEmbeddedImage) {
 		memcpy(output + outLen, "\" />", CSTRLEN("\" />"));
 		outLen += CSTRLEN("\" />");
@@ -2197,12 +2291,11 @@ void EditBase64Encode(Base64EncodingFlag encodingFlag) noexcept {
 
 	EditReplaceMainSelection(outLen, output);
 	NP2HeapFree(input);
-	NP2HeapFree(output);
 }
 
 void EditBase64Decode(bool decodeAsHex) noexcept {
-	size_t len = SciCall_GetSelTextLength();
-	if (len == 0) {
+	size_t iSelByte = SciCall_GetSelTextLength();
+	if (iSelByte == 0) {
 		return;
 	}
 	if (SciCall_IsRectangularSelection()){
@@ -2210,18 +2303,18 @@ void EditBase64Decode(bool decodeAsHex) noexcept {
 		return;
 	}
 
-	char *input = static_cast<char *>(NP2HeapAlloc(len + 1));
+	const size_t allocSize = NP2_align_up(iSelByte + 1, MEMORY_ALLOCATION_ALIGNMENT);
+	size_t outLen = (allocSize*3)/4 + 4;
+	char *input = static_cast<char *>(NP2HeapAlloc(allocSize + outLen));
 	SciCall_GetSelText(input);
-	size_t outLen = (len*3)/4 + 4;
-	uint8_t *output = static_cast<uint8_t *>(NP2HeapAlloc(outLen));
-	outLen = Base64Decode(output, reinterpret_cast<const uint8_t *>(input), len);
-	NP2HeapFree(input);
+	uint8_t *output = reinterpret_cast<uint8_t *>(input + allocSize);
+	outLen = Base64Decode(output, reinterpret_cast<const uint8_t *>(input), iSelByte);
 	if (outLen != 0) {
 		if(decodeAsHex) {
 			const int iEOLMode = SciCall_GetEOLMode();
-			len = outLen*3 + outLen/8;
-			input = static_cast<char *>(NP2HeapAlloc(len + 1));
-			char *t = input;
+			iSelByte = outLen*3 + outLen/8 + 1;
+			char *pszOut = static_cast<char *>(NP2HeapAlloc(iSelByte));
+			char *t = pszOut;
 			size_t i = 0;
 			do {
 				const uint8_t c = output[i++];
@@ -2247,13 +2340,14 @@ void EditBase64Decode(bool decodeAsHex) noexcept {
 			if ((i & 15) != 0) {
 				--t;
 			}
-			outLen = t - input;
-			NP2HeapFree(output);
-			output = reinterpret_cast<uint8_t *>(input);
+			outLen = t - pszOut;
+			NP2HeapFree(input);
+			input = pszOut;
+			output = reinterpret_cast<uint8_t *>(pszOut);
 		}
 		EditReplaceMainSelection(outLen, reinterpret_cast<char *>(output));
 	}
-	NP2HeapFree(output);
+	NP2HeapFree(input);
 }
 
 //=============================================================================
@@ -2323,8 +2417,8 @@ static int ConvertNumRadix(char *tch, uint64_t num, int radix) noexcept {
 }
 
 void EditConvertNumRadix(int radix) noexcept {
-	const Sci_Position count = SciCall_GetSelTextLength();
-	if (count == 0) {
+	Sci_Position iSelCount = SciCall_GetSelTextLength();
+	if (iSelCount == 0) {
 		return;
 	}
 	if (SciCall_IsRectangularSelection()) {
@@ -2338,13 +2432,15 @@ void EditConvertNumRadix(int radix) noexcept {
 	radix -= IDM_EDIT_NUM2BIN;
 	radix = (radix == 1) ? 10 : (2 << radix);
 
-	char *ch = static_cast<char *>(NP2HeapAlloc(count + 1));
-	char *tch = static_cast<char *>(NP2HeapAlloc(2 + count * 4 + 8 + 1));
+	iSelCount = NP2_align_up(iSelCount + 1, MEMORY_ALLOCATION_ALIGNMENT);
+	const size_t outLen = (iSelCount*5) + 16; // 0xFF => 0b1111_1111
+	char * const pszText = static_cast<char *>(NP2HeapAlloc(iSelCount + outLen));
+	char * const pszOut = pszText + iSelCount;
 	Sci_Position cch = 0;
-	char *p = ch;
+	const char *p = pszText;
 	uint64_t value = 0;
 
-	SciCall_GetSelText(ch);
+	SciCall_GetSelText(pszText);
 
 	while (*p) {
 		if (*p == '0') {
@@ -2365,7 +2461,7 @@ void EditConvertNumRadix(int radix) noexcept {
 						p++;
 					}
 				}
-				cch += ConvertNumRadix(tch + cch, value, radix);
+				cch += ConvertNumRadix(pszOut + cch, value, radix);
 			} else if (prefix == 'o' && radix != 8) {
 				p++;
 				while (*p) {
@@ -2378,7 +2474,7 @@ void EditConvertNumRadix(int radix) noexcept {
 						break;
 					}
 				}
-				cch += ConvertNumRadix(tch + cch, value, radix);
+				cch += ConvertNumRadix(pszOut + cch, value, radix);
 			} else if (prefix == 'b' && radix != 2) {
 				p++;
 				while (*p) {
@@ -2395,7 +2491,7 @@ void EditConvertNumRadix(int radix) noexcept {
 						break;
 					}
 				}
-				cch += ConvertNumRadix(tch + cch, value, radix);
+				cch += ConvertNumRadix(pszOut + cch, value, radix);
 			} else if ((*p >= '0' && *p <= '9') && radix != 10) {
 				value = *p++ - '0';
 				while (*p) {
@@ -2408,9 +2504,9 @@ void EditConvertNumRadix(int radix) noexcept {
 						break;
 					}
 				}
-				cch += ConvertNumRadix(tch + cch, value, radix);
+				cch += ConvertNumRadix(pszOut + cch, value, radix);
 			} else {
-				tch[cch++] = '0';
+				pszOut[cch++] = '0';
 			}
 		} else if ((*p >= '1' && *p <= '9') && radix != 10) {
 			value = *p++ - '0';
@@ -2424,22 +2520,21 @@ void EditConvertNumRadix(int radix) noexcept {
 					break;
 				}
 			}
-			cch += ConvertNumRadix(tch + cch, value, radix);
+			cch += ConvertNumRadix(pszOut + cch, value, radix);
 		} else if (IsAlphaNumeric(*p) || *p == '_') {
 			// radix and number prefix matches, no conversion
-			tch[cch++] = *p++;
+			pszOut[cch++] = *p++;
 			while (IsAlphaNumeric(*p) || *p == '_') {
-				tch[cch++] = *p++;
+				pszOut[cch++] = *p++;
 			}
 		} else {
-			tch[cch++] = *p++;
+			pszOut[cch++] = *p++;
 		}
 	}
-	tch[cch] = '\0';
+	pszOut[cch] = '\0';
 
-	EditReplaceMainSelection(cch, tch);
-	NP2HeapFree(ch);
-	NP2HeapFree(tch);
+	EditReplaceMainSelection(cch, pszOut);
+	NP2HeapFree(pszText);
 }
 
 //=============================================================================
@@ -2508,24 +2603,24 @@ void EditTabsToSpaces(int nTabWidth, bool bOnlyIndentingWS) noexcept {
 	iSelStart = SciCall_PositionFromLine(iLine);
 
 	const Sci_Position iSelCount = iSelEnd - iSelStart;
-	char *pszText = static_cast<char *>(NP2HeapAlloc(iSelCount + 1));
-	LPWSTR pszTextW = static_cast<LPWSTR>(NP2HeapAlloc((iSelCount + 1) * sizeof(WCHAR)));
+	const size_t allocSize = NP2_align_up(iSelCount + 1, MEMORY_ALLOCATION_ALIGNMENT);
+	char *pszText = static_cast<char *>(NP2HeapAlloc(allocSize * (sizeof(char) + sizeof(WCHAR))));
+	WCHAR * const pszTextW = reinterpret_cast<LPWSTR>(pszText + allocSize);
 
 	const Sci_TextRangeFull tr = { { iSelStart, iSelEnd }, pszText};
 	SciCall_GetTextRangeFull(&tr);
 
 	const UINT cpEdit = SciCall_GetCodePage();
-	const int cchTextW = MultiByteToWideChar(cpEdit, 0, pszText, static_cast<int>(iSelCount), pszTextW, static_cast<int>(NP2HeapSize(pszTextW) / sizeof(WCHAR)));
-	NP2HeapFree(pszText);
+	const UINT cchTextW = MultiByteToWideChar(cpEdit, 0, pszText, static_cast<int>(iSelCount), pszTextW, static_cast<int>(allocSize));
 
 	LPWSTR pszConvW = static_cast<LPWSTR>(NP2HeapAlloc(cchTextW * sizeof(WCHAR) * nTabWidth + 2));
-	int cchConvW = 0;
+	UINT cchConvW = 0;
 
 	bool bIsLineStart = true;
 	bool bModified = false;
 	// Contributed by Homam, Thank you very much!
 	int i = 0;
-	for (int iTextW = 0; iTextW < cchTextW; iTextW++) {
+	for (UINT iTextW = 0; iTextW < cchTextW; iTextW++) {
 		const WCHAR w = pszTextW[iTextW];
 		if (w == L'\t' && (!bOnlyIndentingWS || bIsLineStart)) {
 			for (int j = 0; j < nTabWidth - (i % nTabWidth); j++) {
@@ -2545,15 +2640,14 @@ void EditTabsToSpaces(int nTabWidth, bool bOnlyIndentingWS) noexcept {
 		}
 	}
 
-	NP2HeapFree(pszTextW);
-
+	NP2HeapFree(pszText);
 	if (bModified) {
-		pszText = static_cast<char *>(NP2HeapAlloc(cchConvW * kMaxMultiByteCount));
-		const int cchText = WideCharToMultiByte(cpEdit, 0, pszConvW, cchConvW, pszText, static_cast<int>(NP2HeapSize(pszText)), nullptr, nullptr);
+		const UINT outLen = cchConvW * kMaxMultiByteCount + 1;
+		pszText = static_cast<char *>(NP2HeapAlloc(outLen));
+		const UINT cchText = WideCharToMultiByte(cpEdit, 0, pszConvW, cchConvW, pszText, outLen, nullptr, nullptr);
 		EditReplaceRange(iSelStart, iSelEnd, cchText, pszText);
 		NP2HeapFree(pszText);
 	}
-
 	NP2HeapFree(pszConvW);
 }
 
@@ -2577,19 +2671,19 @@ void EditSpacesToTabs(int nTabWidth, bool bOnlyIndentingWS) noexcept {
 	iSelStart = SciCall_PositionFromLine(iLine);
 
 	const Sci_Position iSelCount = iSelEnd - iSelStart;
-	char *pszText = static_cast<char *>(NP2HeapAlloc(iSelCount + 1));
-	LPWSTR pszTextW = static_cast<LPWSTR>(NP2HeapAlloc((iSelCount + 1) * sizeof(WCHAR)));
+	const size_t allocSize = NP2_align_up(iSelCount + 1, MEMORY_ALLOCATION_ALIGNMENT);
+	char *pszText = static_cast<char *>(NP2HeapAlloc(allocSize * (sizeof(char) + sizeof(WCHAR))));
+	WCHAR * const pszTextW = reinterpret_cast<LPWSTR>(pszText + allocSize);
 
 	const Sci_TextRangeFull tr = { { iSelStart, iSelEnd }, pszText };
 	SciCall_GetTextRangeFull(&tr);
 
 	const UINT cpEdit = SciCall_GetCodePage();
 
-	const int cchTextW = MultiByteToWideChar(cpEdit, 0, pszText, static_cast<int>(iSelCount), pszTextW, static_cast<int>(NP2HeapSize(pszTextW) / sizeof(WCHAR)));
-	NP2HeapFree(pszText);
+	const UINT cchTextW = MultiByteToWideChar(cpEdit, 0, pszText, static_cast<int>(iSelCount), pszTextW, static_cast<int>(allocSize));
 
 	LPWSTR pszConvW = static_cast<LPWSTR>(NP2HeapAlloc(cchTextW * sizeof(WCHAR) + 2));
-	int cchConvW = 0;
+	UINT cchConvW = 0;
 
 	bool bIsLineStart = true;
 	bool bModified = false;
@@ -2597,7 +2691,7 @@ void EditSpacesToTabs(int nTabWidth, bool bOnlyIndentingWS) noexcept {
 	int i = 0;
 	int j = 0;
 	WCHAR space[256];
-	for (int iTextW = 0; iTextW < cchTextW; iTextW++) {
+	for (UINT iTextW = 0; iTextW < cchTextW; iTextW++) {
 		const WCHAR w = pszTextW[iTextW];
 		if ((w == L' ' || w == L'\t') && (!bOnlyIndentingWS || bIsLineStart)) {
 			space[j++] = w;
@@ -2635,15 +2729,14 @@ void EditSpacesToTabs(int nTabWidth, bool bOnlyIndentingWS) noexcept {
 		}
 	}
 
-	NP2HeapFree(pszTextW);
-
+	NP2HeapFree(pszText);
 	if (bModified || cchConvW != cchTextW) {
-		pszText = static_cast<char *>(NP2HeapAlloc(cchConvW * kMaxMultiByteCount + 1));
-		const int cchText = WideCharToMultiByte(cpEdit, 0, pszConvW, cchConvW, pszText, static_cast<int>(NP2HeapSize(pszText)), nullptr, nullptr);
+		const UINT outLen = cchConvW * kMaxMultiByteCount + 1;
+		pszText = static_cast<char *>(NP2HeapAlloc(outLen));
+		const UINT cchText = WideCharToMultiByte(cpEdit, 0, pszConvW, cchConvW, pszText, outLen, nullptr, nullptr);
 		EditReplaceRange(iSelStart, iSelEnd, cchText, pszText);
 		NP2HeapFree(pszText);
 	}
-
 	NP2HeapFree(pszConvW);
 }
 
@@ -3739,7 +3832,7 @@ void EditCompressSpaces() noexcept {
 	const char * const end = pszIn + iSelCount;
 	char *co = pszIn;
 	bool bModified = false;
-	for (char *ci = pszIn; ci < end;) {
+	for (const char *ci = pszIn; ci < end;) {
 		const char ch = *ci++;
 		if (ch != ' ' && ch != '\t') {
 			chPrev = ch;
@@ -3842,15 +3935,15 @@ void EditWrapToColumn(int nColumn/*, int nTabWidth*/) noexcept {
 	iSelStart = SciCall_PositionFromLine(iLine);
 
 	const Sci_Position iSelCount = iSelEnd - iSelStart;
-	char *pszText = static_cast<char *>(NP2HeapAlloc(iSelCount + 1 + 2));
-	LPWSTR pszTextW = static_cast<LPWSTR>(NP2HeapAlloc((iSelCount + 1 + 2) * sizeof(WCHAR)));
+	const size_t allocSize = NP2_align_up(iSelCount + 1 + 2, MEMORY_ALLOCATION_ALIGNMENT);
+	char *pszText = static_cast<char *>(NP2HeapAlloc(allocSize * (sizeof(char) + sizeof(WCHAR))));
+	WCHAR * const pszTextW = reinterpret_cast<LPWSTR>(pszText + allocSize);
 
 	const Sci_TextRangeFull tr = { { iSelStart, iSelEnd }, pszText };
 	SciCall_GetTextRangeFull(&tr);
 
 	const UINT cpEdit = SciCall_GetCodePage();
-	const int cchTextW = MultiByteToWideChar(cpEdit, 0, pszText, static_cast<int>(iSelCount), pszTextW, static_cast<int>(NP2HeapSize(pszTextW) / sizeof(WCHAR)));
-	NP2HeapFree(pszText);
+	const UINT cchTextW = MultiByteToWideChar(cpEdit, 0, pszText, static_cast<int>(iSelCount), pszTextW, static_cast<int>(allocSize));
 
 	LPWSTR pszConvW = static_cast<LPWSTR>(NP2HeapAlloc(cchTextW * sizeof(WCHAR) * 3 + 2));
 
@@ -3862,10 +3955,10 @@ void EditWrapToColumn(int nColumn/*, int nTabWidth*/) noexcept {
 #define ISWHITE(wc)		IsASpaceOrTab(wc)
 #define ISWORDEND(wc)	(/*ISDELIMITER(wc) ||*/ IsASpace(wc))
 
-	int cchConvW = 0;
+	UINT cchConvW = 0;
 	int iLineLength = 0;
 	bool bModified = false;
-	for (int iTextW = 0; iTextW < cchTextW; iTextW++) {
+	for (UINT iTextW = 0; iTextW < cchTextW; iTextW++) {
 		const WCHAR w = pszTextW[iTextW];
 
 		//if (ISDELIMITER(w)) {
@@ -3939,15 +4032,14 @@ void EditWrapToColumn(int nColumn/*, int nTabWidth*/) noexcept {
 		}
 	}
 
-	NP2HeapFree(pszTextW);
-
+	NP2HeapFree(pszText);
 	if (bModified) {
-		pszText = static_cast<char *>(NP2HeapAlloc(cchConvW * kMaxMultiByteCount));
-		const int cchText = WideCharToMultiByte(cpEdit, 0, pszConvW, cchConvW, pszText, static_cast<int>(NP2HeapSize(pszText)), nullptr, nullptr);
+		const UINT outLen = cchConvW * kMaxMultiByteCount + 1;
+		pszText = static_cast<char *>(NP2HeapAlloc(outLen));
+		const UINT cchText = WideCharToMultiByte(cpEdit, 0, pszConvW, cchConvW, pszText, outLen, nullptr, nullptr);
 		EditReplaceRange(iSelStart, iSelEnd, cchText, pszText);
 		NP2HeapFree(pszText);
 	}
-
 	NP2HeapFree(pszConvW);
 }
 
@@ -3970,8 +4062,9 @@ void EditJoinLinesEx() noexcept {
 	iSelStart = SciCall_PositionFromLine(iLine);
 
 	const Sci_Position iSelCount = iSelEnd - iSelStart;
-	char *pszText = static_cast<char *>(NP2HeapAlloc(iSelCount + 1 + 2));
-	char *pszJoin = static_cast<char *>(NP2HeapAlloc(NP2HeapSize(pszText)));
+	const size_t allocSize = NP2_align_up(iSelCount + 1 + 2, MEMORY_ALLOCATION_ALIGNMENT);
+	char * const pszText = static_cast<char *>(NP2HeapAlloc(allocSize * 2));
+	char * const pszJoin = pszText + allocSize;
 
 	const Sci_TextRangeFull tr = { { iSelStart, iSelEnd }, pszText };
 	SciCall_GetTextRangeFull(&tr);
@@ -4009,13 +4102,10 @@ void EditJoinLinesEx() noexcept {
 		}
 	}
 
-	NP2HeapFree(pszText);
-
 	if (bModified) {
 		EditReplaceRange(iSelStart, iSelEnd, cchJoin, pszJoin);
 	}
-
-	NP2HeapFree(pszJoin);
+	NP2HeapFree(pszText);
 }
 
 //=============================================================================
@@ -4128,14 +4218,14 @@ void EditSortLines(EditSortFlag iSortFlags) noexcept {
 	const UINT cpEdit = SciCall_GetCodePage();
 	Sci_Position iTargetStart = SciCall_PositionFromLine(iLineStart);
 	Sci_Position iTargetEnd = SciCall_PositionFromLine(iLineEnd + 1);
-	const size_t cbPmszBuf = iTargetEnd - iTargetStart + 2*iLineCount + 1; // 2 for CR LF
-	size_t cchTextW = cbPmszBuf*sizeof(WCHAR) + iLineCount*alignof(WCHAR *);
+	const size_t cbPmszBuf = NP2_align_up(iTargetEnd - iTargetStart + 2*iLineCount + 1, MEMORY_ALLOCATION_ALIGNMENT); // 2 for CR LF
+	size_t cchTextW = NP2_align_up(cbPmszBuf*sizeof(WCHAR) + iLineCount*alignof(WCHAR *), MEMORY_ALLOCATION_ALIGNMENT);
 	if (iSortFlags & EditSortFlag_IgnoreCase) {
 		cchTextW += cchTextW;
 	}
-	char * const pmszBuf = static_cast<char *>(NP2HeapAlloc(cbPmszBuf));
-	SORTLINE * const pLines = static_cast<SORTLINE *>(NP2HeapAlloc(sizeof(SORTLINE) * iLineCount));
-	WCHAR * const pszTextW = static_cast<WCHAR *>(NP2HeapAlloc(cchTextW));
+	char * const pmszBuf = static_cast<char *>(NP2HeapAlloc(cbPmszBuf + cchTextW + sizeof(SORTLINE) * iLineCount));
+	WCHAR * const pszTextW = reinterpret_cast<WCHAR *>(pmszBuf + cbPmszBuf);
+	SORTLINE * const pLines = reinterpret_cast<SORTLINE *>(pmszBuf + cbPmszBuf + cchTextW);
 	size_t cchTotal = alignof(WCHAR *)/sizeof(WCHAR); // first pointer reserved for empty line
 
 	for (Sci_Line i = 0, iLine = iLineStart; iLine <= iLineEnd; i++, iLine++) {
@@ -4263,8 +4353,6 @@ void EditSortLines(EditSortFlag iSortFlags) noexcept {
 		}
 	}
 
-	NP2HeapFree(pLines);
-	NP2HeapFree(pszTextW);
 	SciCall_SetTargetRange(iTargetStart, iTargetEnd);
 	SciCall_ReplaceTarget(cchTotal, pmszBuf);
 	SciCall_EndUndoAction();
@@ -6827,17 +6915,17 @@ void EditSelectionAction(int action) noexcept {
 		return;
 	}
 
-	int cchEscapedW;
+	DWORD cchEscapedW;
 	LPWSTR pszEscapedW = EditURLEncodeSelection(&cchEscapedW, false);
 	if (pszEscapedW == nullptr) {
 		return;
 	}
 
-	LPWSTR lpszCommand = static_cast<LPWSTR>(NP2HeapAlloc(sizeof(WCHAR) * (cchEscapedW + COUNTOF(szCmdTemplate) + 32)));
-	const size_t cbCommand = NP2HeapSize(lpszCommand);
+	cchEscapedW = NP2_align_up(cchEscapedW + COUNTOF(szCmdTemplate) + 32, MEMORY_ALLOCATION_ALIGNMENT);
+	LPWSTR lpszCommand = static_cast<LPWSTR>(NP2HeapAlloc(sizeof(WCHAR) * cchEscapedW * 2));
 	wsprintf(lpszCommand, szCmdTemplate, pszEscapedW);
 
-	LPWSTR lpszArgs = static_cast<LPWSTR>(NP2HeapAlloc(cbCommand));
+	LPWSTR lpszArgs = lpszCommand + cchEscapedW;
 	ExtractFirstArgument(lpszCommand, lpszCommand, lpszArgs);
 	if (ExpandEnvironmentStringsEx(lpszArgs, szCmdTemplate)) {
 		lstrcpy(lpszArgs, szCmdTemplate);
@@ -6865,7 +6953,6 @@ void EditSelectionAction(int action) noexcept {
 
 	NP2HeapFree(pszEscapedW);
 	NP2HeapFree(lpszCommand);
-	NP2HeapFree(lpszArgs);
 }
 
 void TryBrowseFile(HWND hwnd, LPCWSTR pszFile, bool bWarn) noexcept {

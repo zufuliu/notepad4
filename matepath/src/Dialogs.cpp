@@ -237,7 +237,7 @@ INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) 
 			ofn.lpstrFile = szFile;
 			ofn.nMaxFile = COUNTOF(szFile);
 			ofn.lpstrTitle = szTitle;
-			ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT
+			ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT | OFN_NOTESTFILECREATE
 						| OFN_PATHMUSTEXIST | OFN_SHAREAWARE | OFN_NODEREFERENCELINKS;
 			if (bUseXPFileDialog) {
 				ofn.Flags |= OFN_EXPLORER | OFN_ENABLESIZING | OFN_ENABLEHOOK;
@@ -1135,7 +1135,7 @@ INT_PTR CALLBACK ProgPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 			ofn.lpstrFile = szFile;
 			ofn.nMaxFile = COUNTOF(szFile);
 			ofn.lpstrTitle = szTitle;
-			ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT
+			ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT | OFN_NOTESTFILECREATE
 						| OFN_PATHMUSTEXIST | OFN_SHAREAWARE | OFN_NODEREFERENCELINKS;
 			if (bUseXPFileDialog) {
 				ofn.Flags |= OFN_EXPLORER | OFN_ENABLESIZING | OFN_ENABLEHOOK;
@@ -1367,9 +1367,8 @@ INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 			HMENU hMenu = CreatePopupMenu();
 
 			IniSectionParser section;
-			WCHAR *pIniSectionBuf = static_cast<WCHAR *>(NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_FILTERS));
-			const DWORD cchIniSection = static_cast<DWORD>(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
-			section.Init(128);
+			constexpr DWORD cchIniSection = MAX_INI_SECTION_SIZE_FILTERS;
+			WCHAR * const pIniSectionBuf = section.Init(128, cchIniSection);
 
 			LoadIniSection(INI_SECTION_NAME_FILTERS, pIniSectionBuf, cchIniSection);
 			section.ParseArray(pIniSectionBuf);
@@ -1379,7 +1378,7 @@ INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 			for (UINT i = 0; i < section.count; i++, dwIndex++) {
 				const IniKeyValueNode &node = section.nodeList[i];
 				LPCWSTR pszFilterValue = node.value;
-				if (*pszFilterValue) {
+				if (StrNotEmpty(pszFilterValue)) {
 					AppendMenu(hMenu, MF_ENABLED | MF_STRING, 1234 + dwIndex, node.key);
 					// Find description for current filter
 					const bool negFilter = IsButtonChecked(hwnd, IDC_NEGFILTER);
@@ -1389,7 +1388,6 @@ INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 				}
 			}
 			section.Free();
-			NP2HeapFree(pIniSectionBuf);
 
 			if (dwCheck != 0xFFFF) { // check description for current filter
 				CheckMenuRadioItem(hMenu, 0, dwIndex, dwCheck, MF_BYPOSITION);
@@ -2305,7 +2303,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 			ofn.lpstrFile   = szFile;
 			ofn.nMaxFile    = COUNTOF(szFile);
 			ofn.lpstrTitle  = szTitle;
-			ofn.Flags       = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_NOCHANGEDIR |
+			ofn.Flags       = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_NOTESTFILECREATE |
 							  OFN_PATHMUSTEXIST | OFN_SHAREAWARE | OFN_NODEREFERENCELINKS;
 			if (bUseXPFileDialog) {
 				ofn.Flags |= OFN_EXPLORER | OFN_ENABLESIZING | OFN_ENABLEHOOK;

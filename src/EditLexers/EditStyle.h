@@ -262,7 +262,7 @@
 #define NP2STYLE_Tag					63673
 #define NP2STYLE_Option					63674
 #define NP2STYLE_Title					63675
-#define NP2STYLE_Quote					63676
+// #define NP2STYLE_					63676
 #define NP2STYLE_VerbatimSegment		63677
 #define NP2STYLE_ListCode				63678
 #define NP2STYLE_Chapter				63679
