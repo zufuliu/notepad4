@@ -775,6 +775,10 @@ SeekStatus MarkdownLexer::HighlightEmphasis(uint32_t lineState, int visibleChars
 		sc.ChangeState(outer);
 		// no rewind inside link text to avoid extra stack for bracketCount.
 		if (bracketCount == 0) {
+			while (!backPos.empty() && nestedState.back() == outer) {
+				nestedState.pop_back();
+				backPos.pop_back();
+			}
 			const bool multiline = sc.BackTo(startPos);
 			sc.Forward();
 			if ((current == SCE_MARKDOWN_STRIKEOUT)
