@@ -1356,12 +1356,13 @@ static LRESULT CALLBACK MultilineEditProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 			SendWMCommand(hwndParent, nCtlId);
 			return TRUE;
 		}
-		if (wParam == VK_TAB && !shift) {
+		const bool control = KeyboardIsKeyDown(VK_CONTROL);
+		if (wParam == VK_TAB && (control || !shift)) {
 			// focus on next control for Tab, and previous control for Shift+Tab
-			PostMessage(hwndParent, WM_NEXTDLGCTL, FALSE, FALSE);
+			PostMessage(hwndParent, WM_NEXTDLGCTL, shift, FALSE);
 			return TRUE;
 		}
-		if (wParam == VK_BACK /*&& (uIdSubclass & ES_WANTRETURN) != 0*/ && KeyboardIsKeyDown(VK_CONTROL)) {
+		if (wParam == VK_BACK /*&& (uIdSubclass & ES_WANTRETURN) != 0*/ && control) {
 			// Ctrl+Backspace => Ctrl+Shift+Left, Backspace https://github.com/dotnet/winforms/issues/259
 			INPUT input[8];
 			memset(input, 0, sizeof(input));
