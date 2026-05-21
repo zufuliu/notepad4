@@ -242,6 +242,7 @@ struct MarkdownLexer {
 	int delimiterCount = 0; // code fence
 	int bracketCount = 0; // link text
 	int parenCount = 0; // link	destination, link title
+	Sci_PositionU cycleMaxPos = 0;
 	const Markdown markdown;
 	const WordList &blockTagList;
 
@@ -708,12 +709,6 @@ int MarkdownLexer::GetCurrentDelimiterRun(DelimiterRun &delimiterRun, bool ignor
 	return count;
 }
 
-/*
-constexpr bool IsEmphasisDelimiter(int ch) noexcept {
-	return ch == '*' || ch == '_' || ch == '~';
-}
-*/
-
 constexpr uint8_t GetEmphasisDelimiter(int state) noexcept {
 	if constexpr (SCE_MARKDOWN_EM_ASTERISK & 1) {
 		return (state == SCE_MARKDOWN_STRIKEOUT) ? '~' : ((state & 1) ? '*' : '_');
@@ -734,12 +729,11 @@ SeekStatus MarkdownLexer::HighlightEmphasis(uint32_t lineState, int visibleChars
 		result = closed ? HighlightResult::Finish : HighlightResult::Continue;
 		if (current != SCE_MARKDOWN_STRIKEOUT) {
 			// TODO: fix longest match failure for `***strong** in emph* t`
-			if (length == 1 && current >= SCE_MARKDOWN_STRONG_ASTERISK) {
-				// inner emphasis with `*`
-				result = HighlightResult::None;
-			} else if (!closed || (current < SCE_MARKDOWN_STRONG_ASTERISK && length == 2)) {
-				if (delimiterRun.CanOpen(delimiter)) {
-					// inner strong emphasis with `**`
+			// inner emphasis with `*`, inner strong emphasis with `**`
+			const int inner = (current < SCE_MARKDOWN_STRONG_ASTERISK) ? 2 : 1;
+			if ((!closed || length == inner) && delimiterRun.CanOpen(delimiter)) {
+				// prevent cycle/infinite loop when reparse nested emphasis text
+				if (sc.currentPos > cycleMaxPos) {
 					result = HighlightResult::None;
 				}
 			}
@@ -775,10 +769,7 @@ SeekStatus MarkdownLexer::HighlightEmphasis(uint32_t lineState, int visibleChars
 		sc.ChangeState(outer);
 		// no rewind inside link text to avoid extra stack for bracketCount.
 		if (bracketCount == 0) {
-			while (!backPos.empty() && nestedState.back() == outer) {
-				nestedState.pop_back();
-				backPos.pop_back();
-			}
+			cycleMaxPos = sci::max(cycleMaxPos, startPos);
 			const bool multiline = sc.BackTo(startPos);
 			sc.Forward();
 			if ((current == SCE_MARKDOWN_STRIKEOUT)
