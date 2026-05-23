@@ -236,6 +236,7 @@ void EditOpenSelection(OpenSelectionType type);
 // in Bridge.cpp
 bool	EditPrint(HWND hwnd, LPCWSTR pszDocTitle, BOOL bDefault) noexcept;
 void	EditPrintSetup(HWND hwnd) noexcept;
+void	EditDumpDocumentStyledText(LPCWSTR lpszFile);
 void	EditFormatCode(int menu) noexcept;
 
 enum {

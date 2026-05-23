@@ -4305,6 +4305,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_HELP_ABOUT:
+		// EditDumpDocumentStyledText(szCurFile);
 		ThemedDialogBox(g_hInstance, MAKEINTRESOURCE(IDD_ABOUT), hwnd, AboutDlgProc);
 		break;
 

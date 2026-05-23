@@ -577,6 +577,47 @@ void EditPrintSetup(HWND hwnd) noexcept {
 	NP2HeapFree(pDlgTemplate);
 }
 
+#if 0 // lexer debug
+void EditDumpDocumentStyledText(LPCWSTR lpszFile) {
+	size_t textLength = SciCall_GetLength();
+	const std::unique_ptr<char[]> styledText = std::make_unique_for_overwrite<char[]>(2*textLength + 2);
+	const Sci_TextRangeFull tr { { 0, static_cast<Sci_Position>(textLength) }, styledText.get() };
+	textLength = SciCall_GetStyledTextFull(&tr);
+	const char * const textBuffer = styledText.get() + textLength + 1;
+	std::string output; // similar to Lexilla test output format
+	char fmtbuf[8]{};
+	int stylePrev = -1;
+	size_t startPos = 0;
+	for (size_t offset = 0; offset < textLength; offset++) {
+		const int style = static_cast<uint8_t>(styledText[offset]);
+		if (style != stylePrev) {
+			if (startPos != offset) {
+				output.append(textBuffer + startPos, offset - startPos);
+			}
+			stylePrev = style;
+			startPos = offset;
+			const unsigned fmtlen = sprintf(fmtbuf, "{%d}", style);
+			output.append(fmtbuf, fmtlen);
+		}
+	}
+	if (startPos != textLength) {
+		output.append(textBuffer + startPos, textLength - startPos);
+	}
+
+	WCHAR tchPath[MAX_PATH];
+	lstrcpy(tchPath, lpszFile);
+	lstrcat(tchPath, L".styled.log");
+	HANDLE hFile = CreateFile(tchPath,
+						GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
+						nullptr, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+	if (hFile != INVALID_HANDLE_VALUE) {
+		DWORD dwBytesWritten = static_cast<DWORD>(output.length());
+		WriteFile(hFile, output.c_str(), dwBytesWritten, &dwBytesWritten, nullptr);
+		CloseHandle(hFile);
+	}
+}
+#endif
+
 namespace { // copy as RTF
 
 struct DocumentStyledText {
