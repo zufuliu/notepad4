@@ -716,7 +716,7 @@ BEGIN
 		MENUITEM SEPARATOR
 		MENUITEM "Apri come &Amministratore",		IDM_FILE_RELAUNCH_ELEVATED
 		MENUITEM "&Riavvia",					IDM_FILE_RESTART
-		MENUITEM "Apri &in nuova finestra\tAlt+0",		IDM_FILE_NEWWINDOW2
+		MENUITEM "Apri in nuova &finestra\tAlt+0",		IDM_FILE_NEWWINDOW2
 		MENUITEM SEPARATOR
 		MENUITEM "Esegui &documento\tCtrl+L",	IDM_FILE_LAUNCH
 		MENUITEM "A&pri con...",				IDM_FILE_OPENWITH
@@ -727,7 +727,7 @@ BEGIN
 			MENUITEM "&Apri File, Cartella, Link, ecc...",		CMD_OPEN_PATH_OR_LINK
 			MENUITEM "Apri &cartella contenente",				CMD_OPEN_CONTAINING_FOLDER
 			MENUITEM SEPARATOR
-			MENUITEM "&Calcola Espressione",				CMD_CALCULATE_EXPR
+			MENUITEM "Calcola &Espressione",				CMD_CALCULATE_EXPR
 			MENUITEM SEPARATOR
 			MENUITEM "Cerca con &Google",					CMD_ONLINE_SEARCH_GOOGLE
 			MENUITEM "Cerca con &Bing",					CMD_ONLINE_SEARCH_BING
@@ -763,7 +763,7 @@ BEGIN
 			MENUITEM "&Devanagari a Latino",				IDM_EDIT_MAP_DEVANAGARI_LATIN
 			MENUITEM "&Malayalam a Latino",					IDM_EDIT_MAP_MALAYALAM_LATIN
 		END
-		POPUP "S&trumenti Web"
+		POPUP "Strumenti &Web"
 		BEGIN
 			MENUITEM "Comp&rimere il CSS/JS/JSON",				IDM_EDIT_CODE_COMPRESS
 			MENUITEM "Abbe&llire il CSS/JS/JSON",				IDM_EDIT_CODE_PRETTY
