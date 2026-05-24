@@ -67,6 +67,7 @@ Checks: [
     # -bugprone-unhandled-code-paths,
     # -misc-const-correctness,
     # -misc-explicit-constructor,
+    # -misc-static-initialization-cycle,
     ]
 
 WarningsAsErrors: ''
