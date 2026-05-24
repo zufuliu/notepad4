@@ -69,11 +69,30 @@ constexpr int ToLowerA(int ch) noexcept {
 	return (ch >= 'A' && ch <= 'Z') ? (ch - 'A' + 'a') : ch;
 }
 
+#if defined(_MSC_VER)
+// Case-insensitive ASCII comparisons, see corecrt_internal.h
+extern "C" int __cdecl __ascii_memicmp(void const * lhs, void const * rhs, size_t count) noexcept;
+extern "C" int __cdecl __ascii_stricmp(char const * lhs, char const * rhs) noexcept;
+extern "C" int __cdecl __ascii_strnicmp(char const * lhs, char const * rhs, size_t count) noexcept;
+extern "C" int __cdecl __ascii_wcsicmp(const wchar_t * lhs, const wchar_t * rhs) noexcept;
+extern "C" int __cdecl __ascii_wcsnicmp(const wchar_t * lhs, const wchar_t * rhs, size_t count) noexcept;
+#else
+#define __ascii_memicmp		_memicmp
+#define __ascii_stricmp		_stricmp
+#define __ascii_strnicmp	_strnicmp
+#define __ascii_wcsicmp		_wcsicmp
+#define __ascii_wcsnicmp	_wcsnicmp
+#endif
+
 inline bool StrEqual(LPCWSTR s1, LPCWSTR s2) noexcept {
 	return wcscmp(s1, s2) == 0;
 }
 
 inline bool StrCaseEqual(LPCWSTR s1, LPCWSTR s2) noexcept {
+	return __ascii_wcsicmp(s1, s2) == 0;
+}
+
+inline bool WcsCaseEqual(LPCWSTR s1, LPCWSTR s2) noexcept {
 	return _wcsicmp(s1, s2) == 0;
 }
 

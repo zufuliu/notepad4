@@ -1382,7 +1382,7 @@ INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 					AppendMenu(hMenu, MF_ENABLED | MF_STRING, 1234 + dwIndex, node.key);
 					// Find description for current filter
 					const bool negFilter = IsButtonChecked(hwnd, IDC_NEGFILTER);
-					if ((!negFilter || *pszFilterValue == L'-') && StrCaseEqual(pszFilterValue + negFilter, szTypedFilter)) {
+					if ((!negFilter || *pszFilterValue == L'-') && WcsCaseEqual(pszFilterValue + negFilter, szTypedFilter)) {
 						dwCheck = dwIndex;
 					}
 				}
@@ -1463,7 +1463,7 @@ bool GetFilterDlg(HWND hwnd) noexcept {
 	const bool bOldNegFilter = bNegFilter;
 
 	if (IDOK == ThemedDialogBox(g_hInstance, MAKEINTRESOURCE(IDD_FILTER), hwnd, GetFilterDlgProc)) {
-		if (StrCaseEqual(tchFilter, tchOldFilter) && (bOldNegFilter == bNegFilter)) {
+		if (WcsCaseEqual(tchFilter, tchOldFilter) && (bOldNegFilter == bNegFilter)) {
 			return false;    // Old and new filters are identical
 		}
 		return true;

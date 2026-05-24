@@ -246,7 +246,7 @@ void IniSectionBuilder::SetInt(LPCWSTR key, int i) noexcept {
 }
 
 void IniSectionBuilder::SetStringEx(LPCWSTR key, LPCWSTR value, LPCWSTR lpDefault) noexcept {
-	if (!StrCaseEqual(value, lpDefault)) {
+	if (!WcsCaseEqual(value, lpDefault)) {
 		SetString(key, value);
 	}
 }
