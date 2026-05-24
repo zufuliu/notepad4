@@ -175,6 +175,21 @@ constexpr bool StrStartsWith(const T *s, const T (&t)[N]) noexcept {
 	return __builtin_memcmp(s, t, (N - 1)*sizeof(T)) == 0;
 }
 
+template <size_t N>
+inline bool WcsStartsWith(const wchar_t *s, const wchar_t (&t)[N]) noexcept {
+	return wcsncmp(s, t, N - 1) == 0;
+}
+
+template <size_t N>
+inline bool StrStartsWithCase(const wchar_t *s, const wchar_t (&t)[N]) noexcept {
+	return __ascii_wcsnicmp(s, t, N - 1) == 0;
+}
+
+template <size_t N>
+inline bool StrStartsWithCase(const char *s, const char (&t)[N]) noexcept {
+	return __ascii_strnicmp(s, t, N - 1) == 0;
+}
+
 inline bool CRTStrToInt(LPCWSTR str, int *value) noexcept {
 	LPWSTR end;
 	*value = static_cast<int>(wcstol(str, &end, 10));
