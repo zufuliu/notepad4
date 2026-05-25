@@ -160,7 +160,7 @@ constexpr int GetHexDigit(int ch) noexcept {
 	return -1;
 }
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && !defined(_DLL)
 // Case-insensitive ASCII comparisons, see corecrt_internal.h
 extern "C" int __cdecl __ascii_memicmp(void const * lhs, void const * rhs, size_t count) noexcept;
 extern "C" int __cdecl __ascii_stricmp(char const * lhs, char const * rhs) noexcept;
