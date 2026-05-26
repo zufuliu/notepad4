@@ -1680,7 +1680,7 @@ bool Editor::WrapLines(WrapScope ws) {
 			}
 		} else /*if (ws == WrapScope::wsIdle)*/ {
 			// Try to keep time taken by wrapping reasonable so interaction remains smooth.
-			constexpr double secondsAllowed = 0.01;
+			constexpr double secondsAllowed = 0.05;
 			const int actionsInAllowedTime = durationWrapOneUnit.ActionsInAllowedTime(secondsAllowed);
 			lineToWrapEnd = pdoc->LineFromPositionAfter(lineToWrap, actionsInAllowedTime);
 		}
@@ -5396,7 +5396,7 @@ Sci::Position Editor::PositionAfterMaxStyling(Sci::Position posMax, bool scrolli
 
 	// Try to keep time taken by styling reasonable so interaction remains smooth.
 	// When scrolling, allow less time to ensure responsive
-	const double secondsAllowed = scrolling ? 0.005 : 0.02;
+	const double secondsAllowed = scrolling ? 0.01 : 0.05;
 
 	Sci::Line lineLast = pdoc->SciLineFromPosition(pdoc->GetEndStyled());
 	const int actionsInAllowedTime = pdoc->durationStyleOneUnit.ActionsInAllowedTime(secondsAllowed);
