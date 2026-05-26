@@ -47,39 +47,39 @@ private:
 	std::unique_ptr<int[]> lineStarts;
 	/// Drawing is only performed for @a maxLineLength characters on each line.
 	Sci::Line lineNumber;
-	int lenLineStarts;
+	int lenLineStarts = 0;
 public:
 	enum {
 		wrapWidthInfinite = 0x7ffffff
 	};
 
-	int maxLineLength;
-	int lastSegmentEnd;
-	int numCharsInLine;
-	int numCharsBeforeEOL;
+	int maxLineLength = -1;
+	int lastSegmentEnd = 0;
+	int numCharsInLine = 0;
+	int numCharsBeforeEOL = 0;
 	enum class ValidLevel {
 		invalid, checkTextAndStyle, positions, lines
-	} validity;
-	int xHighlightGuide;
-	bool highlightColumn;
-	bool containsCaret;
-	unsigned char bracePreviousStyles[2];
-	int edgeColumn;
-	int caretPosition;
+	};
+	ValidLevel validity = ValidLevel::invalid;
+	int xHighlightGuide = 0;
+	bool highlightColumn = false;
+	bool containsCaret = false;
+	unsigned char bracePreviousStyles[2]{};
+	int edgeColumn = 0;
+	int caretPosition = 0;
 	std::unique_ptr<char[]> chars;
-	std::unique_ptr<unsigned char[]> styles;
-	std::unique_ptr<XYPOSITION[]> positions;
-
+	unsigned char *styles = nullptr;
+	XYPOSITION *positions = nullptr;
 	std::unique_ptr<BidiData> bidiData;
 
 	// Wrapped line support
-	int widthLine;
-	int lines;
-	XYPOSITION wrapIndent; // In pixels
+	int widthLine = wrapWidthInfinite;
+	int lines = 1;
+	XYPOSITION wrapIndent = 0; // In pixels
 
 	LineLayout(Sci::Line lineNumber_, int maxLineLength_);
 	void Resize(int maxLineLength_);
-	void Reset(Sci::Line lineNumber_, Sci::Position maxLineLength_);
+	void Reset(Sci::Line lineNumber_, int maxLineLength_);
 	void EnsureBidiData();
 	void ClearPositions() const noexcept;
 	void Invalidate(ValidLevel validity_) noexcept;

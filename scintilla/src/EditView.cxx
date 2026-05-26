@@ -574,8 +574,7 @@ uint32_t EditView::LayoutLine(const EditModel &model, Surface *surface, const Vi
 			// See if chars, styles, indicators, are all the same
 			int allSame = 0;
 			// Check base line layout
-			const uint8_t *styles = ll->styles.get();
-
+			const uint8_t * const styles = ll->styles;
 			if (lineLength != 0) {
 				allSame = model.pdoc->CheckRange(ll->chars.get(), reinterpret_cast<const char *>(styles), posLineStart, lineLength);
 			}
@@ -593,7 +592,7 @@ uint32_t EditView::LayoutLine(const EditModel &model, Surface *surface, const Vi
 		// Fill base line layout
 		const int lineLength = static_cast<int>(posLineEnd - posLineStart);
 		model.pdoc->GetCharRange(ll->chars.get(), posLineStart, lineLength);
-		model.pdoc->GetStyleRange(ll->styles.get(), posLineStart, lineLength);
+		model.pdoc->GetStyleRange(ll->styles, posLineStart, lineLength);
 		const int numCharsBeforeEOL = static_cast<int>(model.pdoc->LineEnd(line) - posLineStart);
 		const int numCharsInLine = vstyle.viewEOL ? lineLength : numCharsBeforeEOL;
 		const unsigned char styleByteLast = (lineLength == 0) ? 0 : ll->styles[lineLength - 1];

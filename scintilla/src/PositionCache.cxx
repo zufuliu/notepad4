@@ -71,49 +71,34 @@ void BidiData::Resize(size_t maxLineLength_) {
 }
 
 LineLayout::LineLayout(Sci::Line lineNumber_, int maxLineLength_) :
-	lineNumber(lineNumber_),
-	lenLineStarts(0),
-	maxLineLength(-1),
-	lastSegmentEnd(0),
-	numCharsInLine(0),
-	numCharsBeforeEOL(0),
-	validity(ValidLevel::invalid),
-	xHighlightGuide(0),
-	highlightColumn(false),
-	containsCaret(false),
-	bracePreviousStyles{},
-	edgeColumn(0),
-	caretPosition(0),
-	widthLine(wrapWidthInfinite),
-	lines(1),
-	wrapIndent(0) {
+	lineNumber{lineNumber_} {
 	Resize(maxLineLength_);
 }
 
 void LineLayout::Resize(int maxLineLength_) {
 	if (maxLineLength_ > maxLineLength) {
-		constexpr size_t sentinel = sizeof(int); // fix out-of-bounds read for KeyFromString()
-		const size_t lineAllocation = maxLineLength_ + sentinel;
-		auto chars_ = std::make_unique<char[]>(lineAllocation);
-		chars.swap(chars_);
-		auto styles_ = std::make_unique<unsigned char[]>(lineAllocation);
-		styles.swap(styles_);
-		// Extra position allocated as sometimes the Windows
-		// GetTextExtentExPoint API writes an extra element.
-		auto positions_ = std::make_unique<XYPOSITION[]>(lineAllocation);
-		positions.swap(positions_);
-		lineStarts.reset();
-		bidiData.reset();
 		lenLineStarts = 0;
 		maxLineLength = maxLineLength_;
+		constexpr size_t sentinel = sizeof(int); // fix out-of-bounds read for KeyFromString()
+		constexpr size_t alignment = sizeof(XYPOSITION)*2;
+		const unsigned length = maxLineLength_ + sentinel;
+		const size_t lineAllocation = NP2_align_up(length, alignment);
+		auto chars_ = std::make_unique<char[]>(lineAllocation*2 + length*sizeof(XYPOSITION));
+		chars.swap(chars_);
+		styles = reinterpret_cast<unsigned char *>(chars.get() + lineAllocation);
+		// Extra position allocated as sometimes the Windows
+		// GetTextExtentExPoint API writes an extra element.
+		positions = reinterpret_cast<XYPOSITION *>(styles + lineAllocation);
+		lineStarts.reset();
+		bidiData.reset();
 	}
 }
 
-void LineLayout::Reset(Sci::Line lineNumber_, Sci::Position maxLineLength_) {
+void LineLayout::Reset(Sci::Line lineNumber_, int maxLineLength_) {
 	lineNumber = lineNumber_;
-	Resize(static_cast<int>(maxLineLength_));
 	lines = 0;
-	Invalidate(ValidLevel::invalid);
+	validity = ValidLevel::invalid;
+	Resize(maxLineLength_);
 }
 
 void LineLayout::EnsureBidiData() {
@@ -124,8 +109,9 @@ void LineLayout::EnsureBidiData() {
 }
 
 void LineLayout::ClearPositions() const noexcept {
-	//std::fill_n(positions.get(), maxLineLength + sizeof(int), 0.0f);
-	memset(positions.get(), 0, (maxLineLength + sizeof(int)) * sizeof(XYPOSITION));
+	const unsigned length = maxLineLength + sizeof(int);
+	//std::fill_n(positions, length, 0.0f);
+	memset(positions, 0, length * sizeof(XYPOSITION));
 }
 
 void LineLayout::Invalidate(ValidLevel validity_) noexcept {
