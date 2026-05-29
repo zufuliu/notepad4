@@ -723,7 +723,7 @@ SeekStatus MarkdownLexer::HighlightEmphasis(uint32_t lineState, int visibleChars
 		DelimiterRun delimiterRun;
 		const int length = GetCurrentDelimiterRun(delimiterRun);
 
-		const bool closed = delimiterRun.CanClose(delimiter);
+		const bool closed = (!IsDoubleDelimiter(current) || length != 1) && delimiterRun.CanClose(delimiter);
 		result = closed ? HighlightResult::Finish : HighlightResult::Continue;
 		if (current != SCE_MARKDOWN_STRIKEOUT) {
 			// TODO: fix longest match failure for `***strong** in emph* t`
