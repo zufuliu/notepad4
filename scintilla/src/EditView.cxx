@@ -432,7 +432,7 @@ struct LayoutWorker {
 		textUnicode = (model.pdoc->dbcsCodePage & (1 << 15)) << 1;
 		const int startPos = ll->lastSegmentEnd;
 		const int endPos = ll->numCharsInLine;
-		if (endPos - startPos > blockSize*2 && !model.BidirectionalEnabled()) {
+		if (option < LayoutLineOption::CallerMultiThreaded && endPos - startPos > blockSize*2 && !model.BidirectionalEnabled()) {
 			posInLine = std::max<uint32_t>(posInLine, std::max(startPos, ll->caretPosition)) + blockSize;
 			if (static_cast<int>(endPos - posInLine) < blockSize) {
 				posInLine = endPos;
@@ -451,7 +451,7 @@ struct LayoutWorker {
 
 		maxPosInLine = static_cast<int>(posInLine);
 		const uint32_t length = bfLayout.CurrentPos() - startPos;
-		if (length >= model.minParallelLayoutLength && model.hardwareConcurrency > 1) {
+		if (!FlagSet(option, LayoutLineOption::CallerMultiThreaded) && length >= model.minParallelLayoutLength && model.hardwareConcurrency > 1) {
 			segmentCount = static_cast<uint32_t>(segmentList.size());
 			const uint32_t threadCount = std::min(length/(blockSize/2), model.hardwareConcurrency);
 #if USE_STD_ASYNC_FUTURE
@@ -500,7 +500,7 @@ struct LayoutWorker {
 	}
 
 	std::unique_ptr<Surface> CreateMeasurementSurface() const {
-		// if (!surface->SupportsFeature(Supports::ThreadSafeMeasureWidths))
+		// if (!sharedSurface->SupportsFeature(Supports::ThreadSafeMeasureWidths))
 		if (vstyle.technology == Technology::Default) {
 			std::unique_ptr<Surface> surf = Surface::Allocate(Technology::Default);
 			surf->Init(nullptr);

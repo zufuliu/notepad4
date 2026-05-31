@@ -541,7 +541,10 @@ XYPOSITION ScreenLine::TabPositionAfter(XYPOSITION xPosition) const noexcept {
 	return (std::floor((xPosition + TabWidthMinimumPixels()) / TabWidth()) + 1) * TabWidth();
 }
 
-bool SignificantLines::LineMayCache(Sci::Line line) const noexcept {
+bool SignificantLines::LineMayCache(Sci::Line line, unsigned maxChars) const noexcept {
+	if (LineLayoutCache::UseLongCache(maxChars)) {
+		return true;
+	}
 	switch (level) {
 	case LineCache::None:
 		return false;

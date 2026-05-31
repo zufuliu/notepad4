@@ -25,6 +25,8 @@
 #include <algorithm>
 #include <iterator>
 #include <memory>
+#include <atomic>
+//#include <future>
 
 #include "ParallelSupport.h"
 #include "ScintillaTypes.h"
@@ -36,6 +38,7 @@
 #include "Debugging.h"
 #include "Geometry.h"
 #include "Platform.h"
+#include "VectorISA.h"
 
 #include "CharacterSet.h"
 //#include "CharacterCategory.h"
@@ -128,7 +131,6 @@ Timer::Timer() noexcept :
 
 Idler::Idler() noexcept :
 		state(false), idlerID(nullptr) {}
-
 
 Editor::Editor() {
 	ctrlID = 0;
@@ -1558,66 +1560,199 @@ void Editor::OnLineWrapped(Sci::Line lineDoc, int linesWrapped, int option) {
 	}
 }
 
-bool Editor::WrapBlock(Surface *surface, Sci::Line lineToWrap, Sci::Line lineToWrapEnd, Sci::Line &partialLine) {
-	const size_t linesBeingWrapped = static_cast<size_t>(lineToWrapEnd - lineToWrap);
-	const std::unique_ptr<int[]> linesAfterWrap = std::make_unique<int[]>(linesBeingWrapped);
+namespace {
 
+// double durationWrapAllLines = 0;
+constexpr int WrapPartialLine = 2;
+
+struct WrapBlockWorker {
+	const size_t linesBeingWrapped;
+	const std::unique_ptr<int[]> linesAfterWrap;
+	const Sci::Line lineToWrap;
+	const Sci::Position caretPosition;
+
+	const Editor &model;
+	EditView &view;
+	const ViewStyle &vstyle;
+	Surface * const sharedSurface;
+	const SignificantLines significantLines;
+
+	// Protect the line layout cache from being accessed from multiple threads simultaneously
+	NativeMutex mutexRetrieve;
+	std::atomic<size_t> nextIndex = 0;
+	std::atomic<uint32_t> wrappedBytesAllThread = 0;
+
+	WrapBlockWorker(Surface *surface, Sci::Line startLine, Sci::Line endLine,
+		const Editor &editor, EditView &view_, const ViewStyle &vs,
+		Sci::Line topLine, Sci::Line linesOnScreen, Sci::Position currentPos):
+		linesBeingWrapped {static_cast<size_t>(endLine - startLine)},
+		linesAfterWrap {std::make_unique<int[]>(linesBeingWrapped)},
+		lineToWrap {startLine},
+		caretPosition {currentPos},
+		model {editor},
+		view {view_},
+		vstyle {vs},
+		sharedSurface {surface},
+		significantLines {
+			model.pdoc->SciLineFromPosition(caretPosition),
+			model.pcs->DocFromDisplay(topLine),
+			// 1/4 of short cache size, see LineLayoutCache::AllocateForLevel() and LineLayoutCache::Retrieve()
+			NP2_align_up(linesOnScreen + 1, 16),
+			model.pdoc->LinesTotal(),
+			model.pdoc->GetStyleClock(),
+			view.llc.GetLevel(),
+		} {}
+
+	uint32_t Start(Sci::Line lineToWrapEnd) {
+		if (linesBeingWrapped < 2 || model.hardwareConcurrency < 2) {
+			return 0;
+		}
+		size_t length = model.pdoc->LineStart(lineToWrapEnd) - model.pdoc->LineStart(lineToWrap);
+		constexpr uint32_t blockSize = EditModel::ParallelLayoutBlockSize;
+		if (length < blockSize) {
+			return 0;
+		}
+		length = std::min(length/(blockSize/2), linesBeingWrapped);
+		const uint32_t threadCount = std::min(static_cast<uint32_t>(length), model.hardwareConcurrency);
+
+#if USE_STD_ASYNC_FUTURE
+		std::vector<std::future<void>> features;
+		for (uint32_t i = 0; i < threadCount; i++) {
+			features.push_back(std::async(std::launch::async, [this] {
+				DoWork();
+			}));
+		}
+		for (auto &f : features) {
+			f.wait();
+		}
+#else
+		PTP_WORK work = CreateThreadpoolWork(WorkCallback, this, nullptr);
+		for (uint32_t i = 0; i < threadCount; i++) {
+			SubmitThreadpoolWork(work);
+		}
+		WaitForThreadpoolWorkCallbacks(work, FALSE);
+		CloseThreadpoolWork(work);
+#endif
+
+		const uint32_t wrappedBytes = wrappedBytesAllThread.load(std::memory_order_relaxed);
+		return wrappedBytes / threadCount;
+	}
+
+	std::unique_ptr<Surface> CreateMeasurementSurface() const {
+		// if (!sharedSurface->SupportsFeature(Supports::ThreadSafeMeasureWidths))
+		if (vstyle.technology == Technology::Default) {
+			std::unique_ptr<Surface> surf = Surface::Allocate(Technology::Default);
+			surf->Init(nullptr);
+			surf->SetMode(model.CurrentSurfaceMode());
+			return surf;
+		}
+		return {};
+	}
+
+	void DoWork() {
+		uint32_t wrappedBytesOneThread = 0;
+		const int lengthToMultiThread = 2*model.minParallelLayoutLength;
+		// llTemporary is reused for non-significant lines, avoiding allocation costs.
+		const std::unique_ptr<LineLayout> llTemporary = std::make_unique<LineLayout>(-1, -1);
+		const std::unique_ptr<Surface> surf{CreateMeasurementSurface()};
+		Surface * const surface = surf ? surf.get() : sharedSurface;
+		while (true) {
+			const size_t index = nextIndex.fetch_add(1, std::memory_order_relaxed);
+			if (index >= linesBeingWrapped) {
+				break;
+			}
+			const Sci::Line lineNumber = lineToWrap + index;
+			const Sci::Position lineStart = model.pdoc->LineStart(lineNumber);
+			const Sci::Position lineEnd = model.pdoc->LineStart(lineNumber + 1);
+			const int lengthLine = static_cast<int>(lineEnd - lineStart);
+			if (lengthLine < lengthToMultiThread) {
+				LineLayout *ll;
+				if (significantLines.LineMayCache(lineNumber, lengthLine)) {
+					const LockGuard<NativeMutex> guard(mutexRetrieve);
+					ll = view.llc.Retrieve(lineNumber, significantLines, lengthLine);
+					if (lineNumber == significantLines.lineCaret) {
+						ll->caretPosition = static_cast<int>(caretPosition - lineStart);
+					} else {
+						ll->caretPosition = 0;
+					}
+				} else {
+					ll = llTemporary.get();
+					ll->Reset(lineNumber, lengthLine);
+				}
+				const uint32_t wrappedBytes = view.LayoutLine(model, surface, vstyle, ll, model.wrapWidth, LayoutLineOption::CallerMultiThreaded);
+				wrappedBytesOneThread += wrappedBytes;
+				linesAfterWrap[index] = ll->lines;
+			}
+		}
+		wrappedBytesAllThread.fetch_add(wrappedBytesOneThread, std::memory_order_relaxed);
+	}
+
+#if USE_WIN32_PTP_WORK
+	static VOID CALLBACK WorkCallback([[maybe_unused]] PTP_CALLBACK_INSTANCE instance, PVOID context, [[maybe_unused]] PTP_WORK work) {
+		WrapBlockWorker *worker = static_cast<WrapBlockWorker *>(context);
+		worker->DoWork();
+	}
+#endif
+};
+
+}
+
+int Editor::WrapBlock(Surface *surface, Sci::Line lineToWrap, Sci::Line lineToWrapEnd) {
+	// Wrap all the short lines in multiple threads
 	// Lines that are less likely to be re-examined should not be read from or written to the cache.
-	const Sci::Position caretPosition = sel.MainCaret();
-	const SignificantLines significantLines {
-		pdoc->SciLineFromPosition(caretPosition),
-		pcs->DocFromDisplay(topLine),
-		LinesOnScreen() + 1,
-		pdoc->LinesTotal(),
-		pdoc->GetStyleClock(),
-		view.llc.GetLevel(),
-	};
+	WrapBlockWorker worker(surface, lineToWrap, lineToWrapEnd, *this, view, vs, topLine, LinesOnScreen(), sel.MainCaret());
 
 	const ElapsedPeriod epWrapping;
 	SetIdleTaskTime(IdleLineWrapTime);
 
 	// Wrap all the long lines in the main thread.
 	// LayoutLine may then multi-thread over segments in each line.
-	uint32_t wrappedBytesAllThread = 0;
-	for (size_t index = 0; index < linesBeingWrapped; index++) {
+	uint32_t wrappedBytesAllThread = worker.Start(lineToWrapEnd);
+	int wrapOccurred = false;
+	for (size_t index = 0; index < worker.linesBeingWrapped; index++) {
+		if (worker.linesAfterWrap[index] != 0) {
+			continue;
+		}
 		const Sci::Line lineNumber = lineToWrap + index;
 		const Sci::Position lineStart = pdoc->LineStart(lineNumber);
 		const Sci::Position lineEnd = pdoc->LineStart(lineNumber + 1);
 		const int lengthLine = static_cast<int>(lineEnd - lineStart);
-		LineLayout * const ll = view.llc.Retrieve(lineNumber, significantLines, lengthLine);
-		if (lineNumber == significantLines.lineCaret) {
-			ll->caretPosition = static_cast<int>(caretPosition - lineStart);
+		LineLayout * const ll = view.llc.Retrieve(lineNumber, worker.significantLines, lengthLine);
+		if (lineNumber == worker.significantLines.lineCaret) {
+			ll->caretPosition = static_cast<int>(worker.caretPosition - lineStart);
 		} else {
 			ll->caretPosition = 0;
 		}
 		const uint32_t wrappedBytes = view.LayoutLine(*this, surface, vs, ll, wrapWidth, LayoutLineOption::IdleUpdate);
 		wrappedBytesAllThread += wrappedBytes;
-		linesAfterWrap[index] = ll->lines;
+		worker.linesAfterWrap[index] = ll->lines;
 		if (ll->PartialPosition()) {
-			partialLine = lineNumber;
+			lineToWrapEnd = lineNumber;
+			wrapOccurred = WrapPartialLine;
 			break;
 		}
 	}
 
 	const double duration = epWrapping.Duration();
+	// durationWrapAllLines += duration;
 	durationWrapOneUnit.AddSample(wrappedBytesAllThread, duration);
 	UpdateParallelLayoutThreshold();
 
-	bool wrapOccurred = false;
-	for (size_t index = 0; index < linesBeingWrapped; index++) {
+	for (size_t index = 0; index < worker.linesBeingWrapped; index++) {
 		const Sci::Line lineNumber = lineToWrap + index;
-		int linesWrapped = linesAfterWrap[index];
+		int linesWrapped = worker.linesAfterWrap[index];
+		if (linesWrapped == 0) {
+			continue;
+		}
 		if (vs.annotationVisible != AnnotationVisible::Hidden) {
 			linesWrapped += pdoc->AnnotationLines(lineNumber);
 		}
 		if (pcs->SetHeight(lineNumber, linesWrapped)) {
-			wrapOccurred = true;
+			wrapOccurred |= true;
 		}
-		if (lineNumber == partialLine) {
-			break;
-		}
-		wrapPending.Wrapped(lineNumber);
 	}
+
+	wrapPending.start = std::max(wrapPending.start, lineToWrapEnd);
 	return wrapOccurred;
 }
 
@@ -1627,8 +1762,9 @@ bool Editor::WrapBlock(Surface *surface, Sci::Line lineToWrap, Sci::Line lineToW
 // wsIdle: wrap one page + 100 lines
 // Return true if wrapping occurred.
 bool Editor::WrapLines(WrapScope ws) {
+	// const ElapsedPeriod period;
 	Sci::Line goodTopLine = topLine;
-	bool wrapOccurred = false;
+	int wrapOccurred = false;
 	const Sci::Line maxEditorLine = pdoc->LinesTotal();
 	if (!Wrapping()) {
 		if (wrapWidth != LineLayout::wrapWidthInfinite) {
@@ -1680,13 +1816,13 @@ bool Editor::WrapLines(WrapScope ws) {
 			}
 		} else /*if (ws == WrapScope::wsIdle)*/ {
 			// Try to keep time taken by wrapping reasonable so interaction remains smooth.
-			constexpr double secondsAllowed = 0.05;
-			const int actionsInAllowedTime = durationWrapOneUnit.ActionsInAllowedTime(secondsAllowed);
+			// constexpr double secondsAllowed = 0.05;
+			// const int actionsInAllowedTime = durationWrapOneUnit.ActionsInAllowedTime(secondsAllowed);
+			const uint32_t actionsInAllowedTime = maxParallelLayoutLength >> static_cast<int>(ws);
 			lineToWrapEnd = pdoc->LineFromPositionAfter(lineToWrap, actionsInAllowedTime);
 		}
 
 		lineToWrapEnd = std::min(lineToWrapEnd, lineEndNeedWrap);
-		Sci::Line partialLine = Sci::invalidPosition;
 		// Ensure all lines being wrapped are styled.
 		pdoc->EnsureStyledTo(pdoc->LineStart(lineToWrapEnd));
 
@@ -1699,13 +1835,20 @@ bool Editor::WrapLines(WrapScope ws) {
 			const AutoSurface surface(this);
 			if (surface) {
 				//Platform::DebugPrintf("Wraplines: scope=%0d need=%0d..%0d perform=%0d..%0d\n", ws, wrapPending.start, wrapPending.end, lineToWrap, lineToWrapEnd);
-				wrapOccurred = WrapBlock(surface, lineToWrap, lineToWrapEnd, partialLine);
+				wrapOccurred = WrapBlock(surface, lineToWrap, lineToWrapEnd);
 				goodTopLine = pcs->DisplayFromDocSub(lineScrollTo.lineDoc, lineScrollTo.subLine);
 			}
 		}
 
 		// If wrapping is done, bring it to resting position
-		if (partialLine < 0 && wrapPending.start >= lineEndNeedWrap) {
+		if ((wrapOccurred & WrapPartialLine) == 0 && wrapPending.start >= lineEndNeedWrap) {
+#if 0
+			const double duration = durationWrapAllLines*1e3;
+			durationWrapAllLines = 0;
+			printf("%s(%d, %d) wrap all duration=%.6f, parallel=%u, %u\n", __func__,
+				static_cast<int>(ws), static_cast<int>(vs.technology), duration,
+				minParallelLayoutLength/1024, maxParallelLayoutLength/1024);
+#endif
 			wrapPending.Reset();
 			scrollToAfterWrap.reset();
 		}
@@ -1718,6 +1861,7 @@ bool Editor::WrapLines(WrapScope ws) {
 #endif
 	}
 
+	wrapOccurred &= true;
 	if (wrapOccurred) {
 		insideWrapScroll = true;
 		SetScrollBars();
@@ -1725,7 +1869,13 @@ bool Editor::WrapLines(WrapScope ws) {
 		SetVerticalScrollPos();
 		insideWrapScroll = false;
 	}
-
+#if 0
+	const double duration = period.Duration()*1e3;
+	if (duration >= 1) {
+		printf("%s(%d) call duration=%.6f, parallel=%u, %u\n", __func__, static_cast<int>(ws), duration,
+			minParallelLayoutLength/1024, maxParallelLayoutLength/1024);
+	}
+#endif
 	return wrapOccurred;
 }
 

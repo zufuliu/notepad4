@@ -151,7 +151,7 @@ struct SignificantLines {
 	Sci::Line linesTotal;
 	int styleClock;
 	Scintilla::LineCache level;
-	bool LineMayCache(Sci::Line line) const noexcept;
+	bool LineMayCache(Sci::Line line, unsigned maxChars) const noexcept;
 };
 
 /**
