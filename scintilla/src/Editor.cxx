@@ -1574,7 +1574,7 @@ struct WrapBlockWorker {
 	const Editor &model;
 	EditView &view;
 	const ViewStyle &vstyle;
-	Surface * const sharedSurface;
+	Surface * const surface;
 	const SignificantLines significantLines;
 
 	// Protect the line layout cache from being accessed from multiple threads simultaneously
@@ -1582,7 +1582,7 @@ struct WrapBlockWorker {
 	std::atomic<size_t> nextIndex = 0;
 	std::atomic<uint32_t> wrappedBytesAllThread = 0;
 
-	WrapBlockWorker(Surface *surface, Sci::Line startLine, Sci::Line endLine,
+	WrapBlockWorker(Surface *surfaceMeasure, Sci::Line startLine, Sci::Line endLine,
 		const Editor &editor, EditView &view_, const ViewStyle &vs,
 		Sci::Line topLine, Sci::Line linesOnScreen, Sci::Position currentPos):
 		linesBeingWrapped {static_cast<size_t>(endLine - startLine)},
@@ -1592,7 +1592,7 @@ struct WrapBlockWorker {
 		model {editor},
 		view {view_},
 		vstyle {vs},
-		sharedSurface {surface},
+		surface {surfaceMeasure},
 		significantLines {
 			model.pdoc->SciLineFromPosition(caretPosition),
 			model.pcs->DocFromDisplay(topLine),
@@ -1638,24 +1638,11 @@ struct WrapBlockWorker {
 		return wrappedBytes / threadCount;
 	}
 
-	std::unique_ptr<Surface> CreateMeasurementSurface() const {
-		// if (!sharedSurface->SupportsFeature(Supports::ThreadSafeMeasureWidths))
-		if (vstyle.technology == Technology::Default) {
-			std::unique_ptr<Surface> surf = Surface::Allocate(Technology::Default);
-			surf->Init(nullptr);
-			surf->SetMode(model.CurrentSurfaceMode());
-			return surf;
-		}
-		return {};
-	}
-
 	void DoWork() {
 		uint32_t wrappedBytesOneThread = 0;
 		const int lengthToMultiThread = 2*model.minParallelLayoutLength;
 		// llTemporary is reused for non-significant lines, avoiding allocation costs.
 		const std::unique_ptr<LineLayout> llTemporary = std::make_unique<LineLayout>(-1, -1);
-		const std::unique_ptr<Surface> surf{CreateMeasurementSurface()};
-		Surface * const surface = surf ? surf.get() : sharedSurface;
 		while (true) {
 			const size_t index = nextIndex.fetch_add(1, std::memory_order_relaxed);
 			if (index >= linesBeingWrapped) {
@@ -1845,8 +1832,8 @@ bool Editor::WrapLines(WrapScope ws) {
 #if 0
 			const double duration = durationWrapAllLines*1e3;
 			durationWrapAllLines = 0;
-			printf("%s(%d, %d) wrap all duration=%.6f, parallel=%u, %u\n", __func__,
-				static_cast<int>(ws), static_cast<int>(vs.technology), duration,
+			printf("%s(%d, %d, %u) wrap all duration=%.6f, parallel=%u, %u\n", __func__,
+				static_cast<int>(ws), static_cast<int>(vs.technology), hardwareConcurrency, duration,
 				minParallelLayoutLength/1024, maxParallelLayoutLength/1024);
 #endif
 			wrapPending.Reset();
@@ -1872,7 +1859,8 @@ bool Editor::WrapLines(WrapScope ws) {
 #if 0
 	const double duration = period.Duration()*1e3;
 	if (duration >= 1) {
-		printf("%s(%d) call duration=%.6f, parallel=%u, %u\n", __func__, static_cast<int>(ws), duration,
+		printf("%s(%d, %d, %u) call duration=%.6f, parallel=%u, %u\n", __func__,
+			static_cast<int>(ws), static_cast<int>(vs.technology), hardwareConcurrency, duration,
 			minParallelLayoutLength/1024, maxParallelLayoutLength/1024);
 	}
 #endif

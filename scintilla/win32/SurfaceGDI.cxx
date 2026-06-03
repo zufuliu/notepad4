@@ -32,6 +32,7 @@
 #include <windowsx.h>
 #include <shlwapi.h>
 
+#include "ParallelSupport.h"
 #include "ScintillaTypes.h"
 #include "ILexer.h"
 
@@ -66,6 +67,7 @@ class SurfaceGDI final : public Surface {
 	HBITMAP bitmap{};
 	HBITMAP bitmapOld{};
 
+	NativeMutex measureLock;
 	SurfaceMode mode;
 	bool hdcOwned = false;
 	int logPixelsY = USER_DEFAULT_SCREEN_DPI;
@@ -687,7 +689,6 @@ void SurfaceGDI::DrawTextTransparent(PRectangle rc, const Font *font_, XYPOSITIO
 }
 
 void SurfaceGDI::MeasureWidths(const Font *font_, std::string_view text, XYPOSITION *positions) {
-	SetFont(font_);
 	SIZE sz {};
 	int fit = 0;
 	int i = 0;
@@ -696,9 +697,13 @@ void SurfaceGDI::MeasureWidths(const Font *font_, std::string_view text, XYPOSIT
 	if (mode.codePage == CpUtf8) {
 		const TextWide tbuf(text, CpUtf8);
 		poses.allocate(tbuf.length());
-		if (!::GetTextExtentExPointW(hdc, tbuf.data(), tbuf.length(), maxWidthMeasure, &fit, poses.data(), &sz)) {
-			// Failure
-			return;
+		{
+			const LockGuard<NativeMutex> guard(measureLock);
+			SetFont(font_);
+			if (!::GetTextExtentExPointW(hdc, tbuf.data(), tbuf.length(), maxWidthMeasure, &fit, poses.data(), &sz)) {
+				// Failure
+				return;
+			}
 		}
 		// Map the widths given for UTF-16 characters back onto the UTF-8 input string
 		for (int ui = 0; ui < fit; ui++) {
@@ -714,9 +719,13 @@ void SurfaceGDI::MeasureWidths(const Font *font_, std::string_view text, XYPOSIT
 		}
 	} else {
 		poses.allocate(len);
-		if (!::GetTextExtentExPointA(hdc, text.data(), len, maxWidthMeasure, &fit, poses.data(), &sz)) {
-			// Eeek - a NULL DC or other foolishness could cause this.
-			return;
+		{
+			const LockGuard<NativeMutex> guard(measureLock);
+			SetFont(font_);
+			if (!::GetTextExtentExPointA(hdc, text.data(), len, maxWidthMeasure, &fit, poses.data(), &sz)) {
+				// Eeek - a NULL DC or other foolishness could cause this.
+				return;
+			}
 		}
 		while (i < fit) {
 			positions[i] = static_cast<XYPOSITION>(poses[i]);
@@ -781,16 +790,19 @@ void SurfaceGDI::DrawTextTransparentUTF8(PRectangle rc, const Font *font_, XYPOS
 }
 
 void SurfaceGDI::MeasureWidthsUTF8(const Font *font_, std::string_view text, XYPOSITION *positions) {
-	SetFont(font_);
 	SIZE sz = { 0,0 };
 	int fit = 0;
 	int i = 0;
 	const int len = static_cast<int>(text.length());
 	const TextWide tbuf(text, CpUtf8);
 	TextPositionsGDI poses(tbuf.length());
-	if (!::GetTextExtentExPointW(hdc, tbuf.data(), tbuf.length(), maxWidthMeasure, &fit, poses.data(), &sz)) {
-		// Failure
-		return;
+	{
+		const LockGuard<NativeMutex> guard(measureLock);
+		SetFont(font_);
+		if (!::GetTextExtentExPointW(hdc, tbuf.data(), tbuf.length(), maxWidthMeasure, &fit, poses.data(), &sz)) {
+			// Failure
+			return;
+		}
 	}
 	// Map the widths given for UTF-16 characters back onto the UTF-8 input string
 	for (int ui = 0; ui < fit; ui++) {

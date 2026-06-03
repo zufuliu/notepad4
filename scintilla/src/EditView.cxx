@@ -364,7 +364,7 @@ inline void UpdateMaximum(std::atomic<T> &maximum, const T &value) noexcept {
 struct LayoutWorker {
 	LineLayout * const ll;
 	const ViewStyle &vstyle;
-	Surface * const sharedSurface;
+	Surface * const surface;
 	PositionCache &posCache;
 	const EditModel &model;
 
@@ -378,7 +378,7 @@ struct LayoutWorker {
 
 	static constexpr int blockSize = EditModel::ParallelLayoutBlockSize;
 
-	void Layout(const TextSegment &ts, Surface *surface) {
+	void Layout(const TextSegment &ts) {
 		const unsigned char styleSegment = ll->styles[ts.start];
 		const Style &style = vstyle.styles[styleSegment];
 		XYPOSITION * const positions = &ll->positions[ts.start + 1];
@@ -477,12 +477,11 @@ struct LayoutWorker {
 		}
 
 		void * const idleTaskTimer = model.idleTaskTimer;
-		Surface * const surface = sharedSurface;
 		int processed = 0;
 		auto it = segmentList.begin();
 		while (true) {
 			const TextSegment &ts = *it++;
-			Layout(ts, surface);
+			Layout(ts);
 			if (it == segmentList.end()) {
 				break;
 			}
@@ -499,22 +498,9 @@ struct LayoutWorker {
 		return 1;
 	}
 
-	std::unique_ptr<Surface> CreateMeasurementSurface() const {
-		// if (!sharedSurface->SupportsFeature(Supports::ThreadSafeMeasureWidths))
-		if (vstyle.technology == Technology::Default) {
-			std::unique_ptr<Surface> surf = Surface::Allocate(Technology::Default);
-			surf->Init(nullptr);
-			surf->SetMode(model.CurrentSurfaceMode());
-			return surf;
-		}
-		return {};
-	}
-
 	void DoWork() {
 		uint32_t finished = 0;
 		void * const idleTaskTimer = model.idleTaskTimer;
-		const std::unique_ptr<Surface> surf{CreateMeasurementSurface()};
-		Surface * const surface = surf ? surf.get() : sharedSurface;
 
 		int processed = 0;
 		while (true) {
@@ -524,7 +510,7 @@ struct LayoutWorker {
 			}
 
 			const TextSegment &ts = segmentList[index];
-			Layout(ts, surface);
+			Layout(ts);
 			finished = index + 1;
 			processed += ts.length;
 			if (processed >= blockSize) {
