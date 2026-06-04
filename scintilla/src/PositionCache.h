@@ -313,6 +313,7 @@ public:
 };
 
 constexpr size_t positionCacheDefaultSize = 0x400;
+constexpr unsigned positionCacheUnicode = 1 << 16;
 
 class PositionCache {
 	std::vector<PositionCacheEntry> pces { positionCacheDefaultSize };

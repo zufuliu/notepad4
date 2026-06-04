@@ -396,7 +396,7 @@ struct LayoutWorker {
 							// ts.representation->stringRep is UTF-8.
 							std::array<XYPOSITION, Representation::maxLength + 1> positionsRepr;
 							const std::string_view stringRep = ts.representation->GetStringRep();
-							posCache.MeasureWidths(surface, styleCtrl, StyleControlChar | (1 << 16), stringRep, positionsRepr.data());
+							posCache.MeasureWidths(surface, styleCtrl, StyleControlChar | positionCacheUnicode, stringRep, positionsRepr.data());
 							representationWidth = positionsRepr[ts.representation->length - 1];
 						}
 						if (FlagSet(ts.representation->appearance, RepresentationAppearance::Blob)) {
@@ -420,7 +420,7 @@ struct LayoutWorker {
 			const std::string_view text = style.GetInvisibleRepresentation();
 			std::array<XYPOSITION, Representation::maxLength + 1> positionsRepr;
 			// invisibleRepresentation is UTF-8.
-			posCache.MeasureWidths(surface, style, styleSegment | (1 << 16), text, positionsRepr.data());
+			posCache.MeasureWidths(surface, style, styleSegment | positionCacheUnicode, text, positionsRepr.data());
 			const XYPOSITION representationWidth = positionsRepr[text.length() - 1];
 			for (int ii = 0; ii < ts.length; ii++) {
 				positions[ii] = representationWidth;
@@ -429,7 +429,7 @@ struct LayoutWorker {
 	}
 
 	uint32_t Start(Sci::Position posLineStart, uint32_t posInLine, LayoutLineOption option) {
-		textUnicode = (model.pdoc->dbcsCodePage & (1 << 15)) << 1;
+		textUnicode = (model.pdoc->dbcsCodePage & (positionCacheUnicode >> 1)) << 1;
 		const int startPos = ll->lastSegmentEnd;
 		const int endPos = ll->numCharsInLine;
 		if (option < LayoutLineOption::CallerMultiThreaded && endPos - startPos > blockSize*2 && !model.BidirectionalEnabled()) {

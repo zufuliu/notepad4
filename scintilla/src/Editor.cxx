@@ -1639,10 +1639,10 @@ struct WrapBlockWorker {
 	}
 
 	void DoWork() {
+		// llTemporary is reused for non-significant lines, avoiding allocation costs.
+		LineLayout llTemporary(-1, -1);
 		uint32_t wrappedBytesOneThread = 0;
 		const int lengthToMultiThread = 2*model.minParallelLayoutLength;
-		// llTemporary is reused for non-significant lines, avoiding allocation costs.
-		const std::unique_ptr<LineLayout> llTemporary = std::make_unique<LineLayout>(-1, -1);
 		while (true) {
 			const size_t index = nextIndex.fetch_add(1, std::memory_order_relaxed);
 			if (index >= linesBeingWrapped) {
@@ -1657,13 +1657,8 @@ struct WrapBlockWorker {
 				if (significantLines.LineMayCache(lineNumber, lengthLine)) {
 					const LockGuard<NativeMutex> guard(mutexRetrieve);
 					ll = view.llc.Retrieve(lineNumber, significantLines, lengthLine);
-					if (lineNumber == significantLines.lineCaret) {
-						ll->caretPosition = static_cast<int>(caretPosition - lineStart);
-					} else {
-						ll->caretPosition = 0;
-					}
 				} else {
-					ll = llTemporary.get();
+					ll = &llTemporary;
 					ll->Reset(lineNumber, lengthLine);
 				}
 				const uint32_t wrappedBytes = view.LayoutLine(model, surface, vstyle, ll, model.wrapWidth, LayoutLineOption::CallerMultiThreaded);

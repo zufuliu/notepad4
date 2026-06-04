@@ -1311,7 +1311,7 @@ void PositionCache::MeasureWidths(Surface *surface, const Style &style, unsigned
 	PositionCacheEntry *entry = nullptr;
 	PositionCacheEntry *entry2 = nullptr;
 	const uint16_t styleNumber = styleNumber_ & UINT16_MAX;
-	constexpr size_t maxLength = (512 - 16)/(sizeof(XYPOSITION) + 1);
+	constexpr size_t maxLength = 512/(sizeof(XYPOSITION) + sizeof(char));
 	if (sv.length() <= maxLength) {
 		// Only store short strings in the cache so it doesn't churn with
 		// long comments with only a single comment.
@@ -1334,7 +1334,7 @@ void PositionCache::MeasureWidths(Surface *surface, const Style &style, unsigned
 		}
 	}
 
-	if (styleNumber_ & (1 << 16)) {
+	if (styleNumber_ & positionCacheUnicode) {
 		surface->MeasureWidthsUTF8(style.font.get(), sv, positions);
 	} else {
 		surface->MeasureWidths(style.font.get(), sv, positions);
