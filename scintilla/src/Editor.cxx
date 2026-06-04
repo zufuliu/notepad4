@@ -1643,6 +1643,11 @@ struct WrapBlockWorker {
 		LineLayout llTemporary(-1, -1);
 		uint32_t wrappedBytesOneThread = 0;
 		const int lengthToMultiThread = 2*model.minParallelLayoutLength;
+		const int wrapWidth = std::max(model.wrapWidth, LineLayout::wrapWidthMinimum);
+		const int maxByteLength = std::max(Representation::maxByteLength, model.pdoc->tabInChars);
+		const int maxLineLength = static_cast<int>(wrapWidth / vstyle.aveCharWidth);
+		const int minLineLength = maxLineLength / maxByteLength;
+		// printf("minLineLength=%d, %d / %d\n", minLineLength, maxLineLength, maxByteLength);
 		while (true) {
 			const size_t index = nextIndex.fetch_add(1, std::memory_order_relaxed);
 			if (index >= linesBeingWrapped) {
@@ -1657,11 +1662,15 @@ struct WrapBlockWorker {
 				if (significantLines.LineMayCache(lineNumber, lengthLine)) {
 					const LockGuard<NativeMutex> guard(mutexRetrieve);
 					ll = view.llc.Retrieve(lineNumber, significantLines, lengthLine);
+				} else if (lengthLine < minLineLength) {
+					wrappedBytesOneThread += lengthLine;
+					linesAfterWrap[index] = 1;
+					continue;
 				} else {
 					ll = &llTemporary;
 					ll->Reset(lineNumber, lengthLine);
 				}
-				const uint32_t wrappedBytes = view.LayoutLine(model, surface, vstyle, ll, model.wrapWidth, LayoutLineOption::CallerMultiThreaded);
+				const uint32_t wrappedBytes = view.LayoutLine(model, surface, vstyle, ll, wrapWidth, LayoutLineOption::CallerMultiThreaded);
 				wrappedBytesOneThread += wrappedBytes;
 				linesAfterWrap[index] = ll->lines;
 			}

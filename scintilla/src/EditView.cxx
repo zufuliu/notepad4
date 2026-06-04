@@ -548,8 +548,7 @@ uint32_t EditView::LayoutLine(const EditModel &model, Surface *surface, const Vi
 	// If the line is very long, limit the treatment to a length that should fit in the viewport
 	const Sci::Position posLineEnd = std::min(model.pdoc->LineStart(line + 1), posLineStart + ll->maxLineLength);
 	// Hard to cope when too narrow, so just assume there is space
-	constexpr int minimumWidth = 20;
-	width = std::max(width, minimumWidth);
+	width = std::max(width, LineLayout::wrapWidthMinimum);
 
 	auto validity = ll->validity;
 	if (validity == LineLayout::ValidLevel::checkTextAndStyle) {
