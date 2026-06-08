@@ -78,12 +78,15 @@ LineLayout::LineLayout(Sci::Line lineNumber_, int maxLineLength_) :
 void LineLayout::Resize(int maxLineLength_) {
 	if (maxLineLength_ > maxLineLength) {
 		lenLineStarts = 0;
-		maxLineLength = maxLineLength_;
 		constexpr size_t sentinel = sizeof(int); // fix out-of-bounds read for KeyFromString()
 		constexpr size_t alignment = sizeof(XYPOSITION)*2;
-		const unsigned length = maxLineLength_ + sentinel;
-		const size_t lineAllocation = NP2_align_up(length, alignment);
-		auto chars_ = std::make_unique<char[]>(lineAllocation*2 + length*sizeof(XYPOSITION));
+		unsigned length = maxLineLength_ + sentinel;
+		length = NP2_align_up(length, alignment);
+		const size_t lineAllocation = length;
+		length -= sentinel;
+		maxLineLength = length;
+		auto chars_ = std::make_unique_for_overwrite<char[]>(lineAllocation*(2 + sizeof(XYPOSITION)));
+		memset(&chars_[length], 0, sentinel); // ensure styles[-1] is valid
 		chars.swap(chars_);
 		styles = reinterpret_cast<unsigned char *>(chars.get() + lineAllocation);
 		// Extra position allocated as sometimes the Windows
@@ -96,7 +99,6 @@ void LineLayout::Resize(int maxLineLength_) {
 
 void LineLayout::Reset(Sci::Line lineNumber_, int maxLineLength_) {
 	lineNumber = lineNumber_;
-	lines = 0;
 	validity = ValidLevel::invalid;
 	Resize(maxLineLength_);
 }
@@ -109,7 +111,7 @@ void LineLayout::EnsureBidiData() {
 }
 
 void LineLayout::ClearPositions() const noexcept {
-	const unsigned length = maxLineLength + sizeof(int);
+	const unsigned length = numCharsInLine + sizeof(int);
 	//std::fill_n(positions, length, 0.0f);
 	memset(positions, 0, length * sizeof(XYPOSITION));
 }
@@ -270,8 +272,8 @@ int LineLayout::FindPositionFromX(XYPOSITION x, Range range, bool charPosition) 
 Point LineLayout::PointFromPosition(int posInLine, int lineHeight, PointEnd pe) const noexcept {
 	Point pt;
 	// In case of very long line put x at arbitrary large position
-	if (posInLine > maxLineLength) {
-		pt.x = positions[maxLineLength] - positions[LineStart(lines)];
+	if (posInLine > numCharsInLine) {
+		pt.x = positions[numCharsInLine] - positions[LineStart(lines)];
 	}
 
 	for (int subLine = 0; subLine < lines; subLine++) {
@@ -797,8 +799,7 @@ LineLayout *LineLayoutCache::Retrieve(Sci::Line lineNumber, Sci::Line lineCaret,
 		if (!ret->CanHold(lineNumber, maxChars)) {
 			//printf("USE line=%zd/%zd, caret=%zd/%zd top=%zd, pos=%zu, clock=%d\n",
 			//	lineNumber, ret->LineNumber(), lineCaret, lastCaretSlot, topLine, pos, styleClock_);
-			ret->~LineLayout();
-			::new (ret) LineLayout(lineNumber, maxChars);
+			ret->Reset(lineNumber, maxChars);
 		} else {
 			//printf("HIT line=%zd, caret=%zd/%zd top=%zd, pos=%zu, clock=%d, validity=%d\n",
 			//	lineNumber, lineCaret, lastCaretSlot, topLine, pos, styleClock_, ret->validity);
