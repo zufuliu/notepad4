@@ -432,7 +432,7 @@ struct LayoutWorker {
 		textUnicode = (model.pdoc->dbcsCodePage & (positionCacheUnicode >> 1)) << 1;
 		const int startPos = ll->lastSegmentEnd;
 		const int endPos = ll->numCharsInLine;
-		if (option < LayoutLineOption::CallerMultiThreaded && endPos - startPos > blockSize*2 && !model.BidirectionalEnabled()) {
+		if (option < LayoutLineOption::Printing && endPos - startPos > blockSize*2 && !model.BidirectionalEnabled()) {
 			posInLine = std::max<uint32_t>(posInLine, std::max(startPos, ll->caretPosition)) + blockSize;
 			if (static_cast<int>(endPos - posInLine) < blockSize) {
 				posInLine = endPos;
@@ -2961,6 +2961,7 @@ Sci::Position EditView::FormatRange(bool draw, CharacterRangeFull chrg, Scintill
 	int lineVisible = 0;
 	const int widthPrint = (printParameters.wrapState == Wrap::None) ? LineLayout::wrapWidthInfinite : rc.right - rc.left - vsPrint.fixedColumnWidth;
 
+	LineLayout ll(-1, -1);
 	while (lineDoc <= linePrintLast && ypos < rc.bottom) {
 
 		// When printing, the hdc and hdcTarget may be the same, so
@@ -2971,8 +2972,11 @@ Sci::Position EditView::FormatRange(bool draw, CharacterRangeFull chrg, Scintill
 
 		// Copy this line and its styles from the document into local arrays
 		// and determine the x position at which each character starts.
-		LineLayout ll(lineDoc, static_cast<int>(model.pdoc->LineStart(lineDoc + 1) - model.pdoc->LineStart(lineDoc) + 1));
-		LayoutLine(model, surfaceMeasure, vsPrint, &ll, widthPrint, LayoutLineOption::Printing, ll.maxLineLength);
+		const Sci::Position posLineStart = model.pdoc->LineStart(lineDoc);
+		const Sci::Position posLineEnd = model.pdoc->LineStart(lineDoc + 1);
+		const int lineLength = static_cast<int>(posLineEnd - posLineStart);
+		ll.Reset(lineDoc, lineLength);
+		LayoutLine(model, surfaceMeasure, vsPrint, &ll, widthPrint, LayoutLineOption::Printing);
 
 		ll.containsCaret = false;
 
@@ -2986,8 +2990,7 @@ Sci::Position EditView::FormatRange(bool draw, CharacterRangeFull chrg, Scintill
 		// to start printing from to ensure a particular position is on the first
 		// line of the page.
 		if (lineVisible == 0) {
-			const Sci::Position startWithinLine = nPrintPos -
-				model.pdoc->LineStart(lineDoc);
+			const Sci::Position startWithinLine = nPrintPos - posLineStart;
 			for (int iwl = 0; iwl < ll.lines - 1; iwl++) {
 				if (ll.LineStart(iwl) <= startWithinLine && ll.LineStart(iwl + 1) >= startWithinLine) {
 					lineVisible = -iwl;
@@ -3034,7 +3037,7 @@ Sci::Position EditView::FormatRange(bool draw, CharacterRangeFull chrg, Scintill
 				}
 				lineVisible++;
 				if (iwl == ll.lines - 1)
-					nPrintPos = model.pdoc->LineStart(lineDoc + 1);
+					nPrintPos = posLineEnd;
 				else
 					nPrintPos += ll.LineStart(iwl + 1) - ll.LineStart(iwl);
 			}
