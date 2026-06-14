@@ -271,11 +271,6 @@ int LineLayout::FindPositionFromX(XYPOSITION x, Range range, bool charPosition) 
 
 Point LineLayout::PointFromPosition(int posInLine, int lineHeight, PointEnd pe) const noexcept {
 	Point pt;
-	// In case of very long line put x at arbitrary large position
-	if (posInLine > numCharsInLine) {
-		pt.x = positions[numCharsInLine] - positions[LineStart(lines)];
-	}
-
 	for (int subLine = 0; subLine < lines; subLine++) {
 		const Range rangeSubLine = SubLineRange(subLine, Scope::visibleOnly);
 		if (posInLine >= rangeSubLine.start) {

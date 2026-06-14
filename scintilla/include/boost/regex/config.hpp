@@ -37,14 +37,6 @@
 #define BOOST_REGEX_STANDALONE
 #endif
 
-/*
- * Borland C++ Fix/error check
- * this has to go *before* we include any std lib headers:
- */
-#if defined(__BORLANDC__) && !defined(__clang__)
-#  include <boost/regex/config/borland.hpp>
-#endif
-
 #ifndef BOOST_REGEX_STANDALONE
 #include <boost/version.hpp>
 #endif
