@@ -443,6 +443,8 @@ void ColouriseTypstDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				sc.ForwardSetState(SCE_TYPST_DEFAULT);
 			} else if (sc.atLineEnd) {
 				sc.ChangeState(SCE_TYPST_DEFAULT);
+				sc.Rewind();
+				sc.Forward();
 			}
 			break;
 
