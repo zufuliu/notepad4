@@ -458,6 +458,14 @@ BOOL WINAPI ConsoleHandlerRoutine(DWORD dwCtrlType) noexcept {
 	return FALSE;
 }
 
+LONG WINAPI TopLevelHandler(EXCEPTION_POINTERS *ep) noexcept {
+	if (ep->ExceptionRecord->ExceptionCode == EXCEPTION_ACCESS_VIOLATION) {
+		AutoSave_DoWork(FileSaveFlag_SaveCopy);
+		return EXCEPTION_EXECUTE_HANDLER;
+	}
+	return EXCEPTION_CONTINUE_SEARCH;
+}
+
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nShowCmd) {
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
@@ -598,6 +606,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	// create the timer first, to make flagMatchText working.
 	HANDLE timer = idleTaskTimer = WaitableTimer_Create();
 	QueryPerformanceFrequency(&editMarkAll.watch.freq);
+	SetUnhandledExceptionFilter(TopLevelHandler);
 	InitInstance(hInstance, nShowCmd);
 	hAccMain = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_MAINWND));
 	hAccFindReplace = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_ACCFINDREPLACE));

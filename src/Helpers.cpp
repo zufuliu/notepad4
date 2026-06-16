@@ -817,6 +817,7 @@ BOOL IsFontAvailable(LPCWSTR lpszFontName) noexcept {
 //
 // SetClipData()
 //
+NP2_noinline
 void SetClipData(HWND hwnd, LPCWSTR pszData) noexcept {
 	if (OpenClipboard(hwnd)) {
 		const size_t size = sizeof(WCHAR) * (lstrlen(pszData) + 1U);
