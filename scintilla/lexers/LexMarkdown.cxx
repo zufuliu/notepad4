@@ -260,13 +260,16 @@ struct MarkdownLexer {
 		nestedState.pop_back();
 		return outer;
 	}
-	int TryTakeOuterStyle() {
+	SCI_noinline
+	void OnHtmlTagEnd() {
+		tagState = HtmlTagState::None;
 		int outer = SCE_MARKDOWN_DEFAULT;
 		if (!nestedState.empty()) {
 			outer = nestedState.back().outerState;
 			nestedState.pop_back();
 		}
-		return outer;
+		sc.Forward((sc.ch == '>') ? 1 : 2);
+		sc.SetState(outer);
 	}
 	MarkupState TakeOuterState() {
 		const auto state = nestedState.back();
@@ -1945,9 +1948,7 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 				if (sc.state != SCE_H_TAG) {
 					sc.SetState(SCE_H_TAG);
 				}
-				lexer.tagState = HtmlTagState::None;
-				sc.Forward((sc.ch == '/') ? 2 : 1);
-				sc.SetState(lexer.TryTakeOuterStyle());
+				lexer.OnHtmlTagEnd();
 				continue;
 			}
 			if (sc.state == SCE_H_OTHER) {
@@ -2031,25 +2032,16 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 				// close HTML comment with --!>
 				// https://html.spec.whatwg.org/multipage/parsing.html#parse-error-incorrectly-closed-comment
 				if (sc.ch == '>' || sc.Match('!', '>')) {
-					lexer.tagState = HtmlTagState::None;
-					sc.Forward((sc.ch == '>') ? 1 : 2);
-					sc.SetState(lexer.TryTakeOuterStyle());
+					lexer.OnHtmlTagEnd();
 					continue;
 				}
 			}
 			break;
 
 		case SCE_H_CDATA:
-			if (sc.Match(']', ']', '>')) {
-				const HtmlTagState tag = lexer.tagState;
-				lexer.tagState = HtmlTagState::None;
-				sc.Forward(3);
-				if (tag == HtmlTagState::None && sc.GetLineNextChar() == '\0') {
-					lineState |= LineStateBlockEndLine;
-				} else {
-					sc.SetState(lexer.TryTakeOuterStyle());
-					continue;
-				}
+			if (sc.Match(']', '>') && sc.chPrev == ']') {
+				lexer.OnHtmlTagEnd();
+				continue;
 			}
 			break;
 
@@ -2059,9 +2051,7 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 				if (sc.state == SCE_H_PROCESS_TEXT) {
 					sc.SetState(SCE_H_QUESTION);
 				}
-				lexer.tagState = HtmlTagState::None;
-				sc.Forward(2);
-				sc.SetState(lexer.TryTakeOuterStyle());
+				lexer.OnHtmlTagEnd();
 				continue;
 			}
 			if (sc.state == SCE_H_QUESTION) {
@@ -2085,8 +2075,7 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 				if (sc.state == SCE_H_SGML_DEFAULT) {
 					sc.SetState(SCE_H_SGML_COMMAND);
 				}
-				lexer.tagState = HtmlTagState::None;
-				sc.ForwardSetState(lexer.TryTakeOuterStyle());
+				lexer.OnHtmlTagEnd();
 				continue;
 			}
 			if (sc.state == SCE_H_SGML_COMMAND) {
