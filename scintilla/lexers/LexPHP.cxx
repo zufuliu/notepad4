@@ -1059,9 +1059,9 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			break;
 
 		case SCE_H_CDATA:
-			if (sc.Match(']', ']', '>')) {
-				sc.Advance(3);
-				sc.SetState(SCE_H_DEFAULT);
+			if (sc.Match(']', '>') && sc.chPrev == ']') {
+				sc.Forward();
+				sc.ForwardSetState(SCE_H_DEFAULT);
 			}
 			break;
 

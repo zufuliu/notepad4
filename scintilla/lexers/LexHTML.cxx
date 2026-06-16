@@ -612,7 +612,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 						ch = '-';
 					}
 				}
-			} else if (styler.Match(i + 1, "[CDATA[")) {
+			} else if (chNext == '[' && styler.Match(i + 2, "CDATA[")) {
 				state = SCE_H_CDATA;
 			} else {
 				styler.ColorTo(i + 1, SCE_H_SGML_DEFAULT); // <! is default
