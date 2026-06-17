@@ -7,6 +7,8 @@ SRCDIR = ../../src
 editlexers_dir = $(SRCDIR)/EditLexers
 scintilla_dir = ../../scintilla
 
+CPPFLAGS += -D_DARKMODELIB_CUSTOM_MEM=0x002
+
 INCDIR = \
 	-I"../../src" \
 	-I"../../src/EditLexers" \
