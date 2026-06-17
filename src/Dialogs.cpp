@@ -34,6 +34,7 @@
 #include "Styles.h"
 #include "Dlapi.h"
 #include "Dialogs.h"
+#include "DarkMode.h"
 #include "resource.h"
 #include "Version.h"
 
@@ -114,7 +115,7 @@ int MsgBox(UINT uType, UINT uIdMsg, ...) noexcept {
 
 	HWND hwnd = GetMsgBoxParent();
 	PostMessage(hwndMain, APPM_CENTER_MESSAGE_BOX, AsInteger<WPARAM>(hwnd), 0);
-	return MessageBoxEx(hwnd, szText, szTitle, uType, lang);
+	return DarkMode_MessageBox(hwnd, szText, szTitle, uType, lang);
 }
 
 //=============================================================================

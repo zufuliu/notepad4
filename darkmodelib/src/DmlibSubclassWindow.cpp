@@ -77,7 +77,7 @@ LRESULT CALLBACK dmlib_subclass::WindowEraseBgSubclass(
 
 			RECT rcClient{};
 			::GetClientRect(hWnd, &rcClient);
-			::FillRect(reinterpret_cast<HDC>(wParam), &rcClient, dmlib::getDlgBackgroundBrush());
+			::FillRect(reinterpret_cast<HDC>(wParam), &rcClient, dmlib::getBackgroundBrush());
 			return TRUE;
 		}
 
@@ -411,7 +411,7 @@ LRESULT CALLBACK dmlib_subclass::WindowCtlColorSubclass(
 	{
 		case CDDS_PREPAINT:
 		{
-			::FillRect(lptbcd->nmcd.hdc, &lptbcd->nmcd.rc, dmlib::getDlgBackgroundBrush());
+			::FillRect(lptbcd->nmcd.hdc, &lptbcd->nmcd.rc, dmlib::getBackgroundBrush());
 			return CDRF_NOTIFYITEMDRAW | CDRF_NOTIFYPOSTPAINT;
 		}
 
@@ -769,7 +769,7 @@ static void postpaintTreeViewItem(const LPNMTVCUSTOMDRAW& lptvcd) noexcept
 		{
 			if (::IsWindowEnabled(lpnmcd->hdr.hwndFrom) == FALSE)
 			{
-				::FillRect(lpnmcd->hdc, &lpnmcd->rc, dmlib::getDlgBackgroundBrush());
+				::FillRect(lpnmcd->hdc, &lpnmcd->rc, dmlib::getBackgroundBrush());
 				dmlib_paint::paintRoundFrameRect(lpnmcd->hdc, lpnmcd->rc, dmlib::getEdgePen(), 0, 0);
 			}
 			else
@@ -1103,7 +1103,7 @@ static void paintMenuBar(HWND hWnd, HDC hdc) noexcept
 
 	rcBar.top -= 1;
 
-	::FillRect(hdc, &rcBar, dmlib::getDlgBackgroundBrush());
+	::FillRect(hdc, &rcBar, dmlib::getBackgroundBrush());
 }
 
 /**
@@ -1172,7 +1172,7 @@ static void paintMenuBarItems(UAHDRAWMENUITEM& UDMI, const HTHEME& hTheme)
 		case MBI_NORMAL:
 		case MBI_DISABLED:
 		{
-			::FillRect(UDMI.um.hdc, &UDMI.dis.rcItem, dmlib::getDlgBackgroundBrush());
+			::FillRect(UDMI.um.hdc, &UDMI.dis.rcItem, dmlib::getBackgroundBrush());
 			break;
 		}
 
@@ -1262,7 +1262,7 @@ static void drawUAHMenuNCBottomLine(HWND hWnd) noexcept
 
 
 	HDC hdc = ::GetWindowDC(hWnd);
-	::FillRect(hdc, &rcAnnoyingLine, dmlib::getDlgBackgroundBrush());
+	::FillRect(hdc, &rcAnnoyingLine, dmlib::getBackgroundBrush());
 	::ReleaseDC(hWnd, hdc);
 }
 

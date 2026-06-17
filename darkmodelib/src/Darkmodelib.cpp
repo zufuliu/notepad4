@@ -2961,8 +2961,8 @@ void dmlib::setDarkLineAbovePanelToolbar(HWND hWnd)
 
 	if (dmlib::isEnabled())
 	{
-		scheme.clrBtnHighlight = dmlib::getDlgBackgroundColor();
-		scheme.clrBtnShadow = dmlib::getDlgBackgroundColor();
+		scheme.clrBtnHighlight = dmlib::getBackgroundColor();
+		scheme.clrBtnShadow = dmlib::getBackgroundColor();
 	}
 	else
 	{

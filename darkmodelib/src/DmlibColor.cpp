@@ -31,7 +31,7 @@ namespace dmlib_win32api
 dmlib::Colors dmlib_color::getLightColors() noexcept
 {
 	return dmlib::Colors{
-		::GetSysColor(COLOR_3DFACE),        // background
+		::GetSysColor(COLOR_WINDOW),        // background
 		::GetSysColor(COLOR_WINDOW),        // ctrlBackground
 		dmlib_color::HEXRGB(0xC0DCF3),      // hotBackground
 		::GetSysColor(COLOR_3DFACE),        // dlgBackground
