@@ -303,6 +303,18 @@
     <File Name="../../src/Notepad4.cpp"/>
     <File Name="../../src/Styles.cpp"/>
   </VirtualDirectory>
+  <VirtualDirectory Name="DarkModeLib">
+    <File Name="../../darkmodelib/include/Darkmodelib.h"/>
+    <File Name="../../darkmodelib/src/Darkmodelib.cpp"/>
+    <File Name="../../darkmodelib/src/DmlibColor.cpp"/>
+    <File Name="../../darkmodelib/src/DmlibDpi.cpp"/>
+    <File Name="../../darkmodelib/src/DmlibHook.cpp"/>
+    <File Name="../../darkmodelib/src/DmlibPaintHelper.cpp"/>
+    <File Name="../../darkmodelib/src/DmlibSubclass.cpp"/>
+    <File Name="../../darkmodelib/src/DmlibSubclassControl.cpp"/>
+    <File Name="../../darkmodelib/src/DmlibSubclassWindow.cpp"/>
+    <File Name="../../darkmodelib/src/DmlibWinApi.cpp"/>
+  </VirtualDirectory>
   <VirtualDirectory Name="Header Files">
     <File Name="../../src/compiler.h"/>
     <File Name="../../src/config.h"/>
@@ -342,6 +354,8 @@
         <IncludePath Value="../../scintilla/include"/>
         <IncludePath Value="../../scintilla/lexlib"/>
         <IncludePath Value="../../scintilla/src"/>
+        <IncludePath Value="../../darkmodelib/include"/>
+        <IncludePath Value="../../darkmodelib/src"/>
         <Preprocessor Value="_WINDOWS"/>
         <Preprocessor Value="NOMINMAX"/>
         <Preprocessor Value="WIN32_LEAN_AND_MEAN"/>
@@ -350,6 +364,7 @@
         <Preprocessor Value="_UNICODE"/>
         <Preprocessor Value="BOOST_REGEX_STANDALONE"/>
         <Preprocessor Value="NO_CXX11_REGEX"/>
+        <Preprocessor Value="_DARKMODELIB_NO_INI_CONFIG"/>
         <Preprocessor Value="_DARKMODELIB_CUSTOM_MEM=0x002"/>
       </Compiler>
       <Linker Options="-mwindows;-municode">
@@ -366,6 +381,7 @@
         <Library Value="uuid.a"/>
         <Library Value="uxtheme.a"/>
         <Library Value="imm32.a"/>
+        <Library Value="dwmapi.a"/>
       </Linker>
       <ResourceCompiler Options="-DRC_INVOKED;-DUNICODE;-D_UNICODE;"/>
     </GlobalSettings>

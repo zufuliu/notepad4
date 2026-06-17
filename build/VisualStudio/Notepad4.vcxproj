@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="AVX2Debug|x64">
@@ -157,8 +157,8 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\scintilla\include;..\..\scintilla\lexlib;..\..\scintilla\src;..\..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_WINDOWS;NOMINMAX;WIN32_LEAN_AND_MEAN;STRICT_TYPED_ITEMIDS;BOOST_REGEX_STANDALONE;NO_CXX11_REGEX;UNICODE;_UNICODE;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;_DARKMODELIB_CUSTOM_MEM=0x002;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\scintilla\include;..\..\scintilla\lexlib;..\..\scintilla\src;..\..\src;..\..\darkmodelib\include;..\..\darkmodelib\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_WINDOWS;NOMINMAX;WIN32_LEAN_AND_MEAN;STRICT_TYPED_ITEMIDS;BOOST_REGEX_STANDALONE;NO_CXX11_REGEX;UNICODE;_UNICODE;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;_DARKMODELIB_NO_INI_CONFIG;_DARKMODELIB_CUSTOM_MEM=0x002;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level4</WarningLevel>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -593,6 +593,15 @@
     <ClCompile Include="..\..\src\Helpers.cpp" />
     <ClCompile Include="..\..\src\Notepad4.cpp" />
     <ClCompile Include="..\..\src\Styles.cpp" />
+    <ClCompile Include="..\..\darkmodelib\src\Darkmodelib.cpp" />
+    <ClCompile Include="..\..\darkmodelib\src\DmlibColor.cpp" />
+    <ClCompile Include="..\..\darkmodelib\src\DmlibDpi.cpp" />
+    <ClCompile Include="..\..\darkmodelib\src\DmlibHook.cpp" />
+    <ClCompile Include="..\..\darkmodelib\src\DmlibPaintHelper.cpp" />
+    <ClCompile Include="..\..\darkmodelib\src\DmlibSubclass.cpp" />
+    <ClCompile Include="..\..\darkmodelib\src\DmlibSubclassControl.cpp" />
+    <ClCompile Include="..\..\darkmodelib\src\DmlibSubclassWindow.cpp" />
+    <ClCompile Include="..\..\darkmodelib\src\DmlibWinApi.cpp" />
     <ClCompile Include="..\..\src\EditLexers\stlABAQUS.cpp" />
     <ClCompile Include="..\..\src\EditLexers\stlActionScript.cpp" />
     <ClCompile Include="..\..\src\EditLexers\stlAPDL.cpp" />
@@ -760,6 +769,7 @@
     <ClInclude Include="..\..\src\Resource.h" />
     <ClInclude Include="..\..\src\SciCall.h" />
     <ClInclude Include="..\..\src\Styles.h" />
+    <ClInclude Include="..\..\darkmodelib\include\Darkmodelib.h" />
     <ClInclude Include="..\..\src\Version.h" />
     <ClInclude Include="..\..\src\VersionRev.h" />
   </ItemGroup>
