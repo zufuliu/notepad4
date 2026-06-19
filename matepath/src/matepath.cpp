@@ -26,6 +26,7 @@
 #include <shellapi.h>
 #include <commdlg.h>
 #include <uxtheme.h>
+// #include <dbghelp.h>
 #include <cstdio>
 #include "config.h"
 #include "Helpers.h"
@@ -252,6 +253,37 @@ BOOL WINAPI ConsoleHandlerRoutine(DWORD dwCtrlType) noexcept {
 	return FALSE;
 }
 
+#if 0
+static LPTOP_LEVEL_EXCEPTION_FILTER lpTopLevelExceptionFilter = nullptr;
+static SRWLOCK srwTopLevelHandlerLock = SRWLOCK_INIT;
+static LONG WINAPI TopLevelHandler(EXCEPTION_POINTERS *ep) noexcept {
+	// printf("unhandled exception: 0x%08X\n", static_cast<unsigned>(ep->ExceptionRecord->ExceptionCode));
+	AcquireSRWLockExclusive(&srwTopLevelHandlerLock);
+	using MiniDumpWriteDumpSig = BOOL (WINAPI *)(HANDLE hProcess, DWORD ProcessId, HANDLE hFile, MINIDUMP_TYPE DumpType,
+	LPVOID ExceptionParam, LPVOID UserStreamParam, LPVOID CallbackParam) noexcept;
+	if (HMODULE hDLL = LoadLibraryExW(L"dbghelp.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32)) {
+		if (auto fnMiniDumpWriteDump = DLLFunction<MiniDumpWriteDumpSig>(hDLL, "MiniDumpWriteDump")) {
+			WCHAR tchPath[64];
+			const UINT pid = GetCurrentProcessId();
+			const UINT tid = GetCurrentThreadId();
+			wsprintf(tchPath, L"%s %u %u.dmp", WC_MATEPATH, pid, tid);
+			HANDLE hFile = CreateFile(tchPath, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
+				nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+			if (hFile != INVALID_HANDLE_VALUE) {
+				MINIDUMP_EXCEPTION_INFORMATION dumpInfo;
+				dumpInfo.ThreadId = tid;
+				dumpInfo.ExceptionPointers = ep;
+				dumpInfo.ClientPointers = FALSE;
+				fnMiniDumpWriteDump(GetCurrentProcess(), pid, hFile, MiniDumpNormal, &dumpInfo, nullptr, nullptr);
+				CloseHandle(hFile);
+			}
+		}
+	}
+	ReleaseSRWLockExclusive(&srwTopLevelHandlerLock);
+	return lpTopLevelExceptionFilter(ep);// C++ runtime unhandled exception filter
+}
+#endif
+
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nShowCmd) {
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
@@ -283,6 +315,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 	g_hDefaultHeap = GetProcessHeap();
 	SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX);
+	// lpTopLevelExceptionFilter = SetUnhandledExceptionFilter(TopLevelHandler);
 
 	GetProgramRealPath(szExeRealPath, COUNTOF(szExeRealPath));
 	// Command Line, Ini File and Flags

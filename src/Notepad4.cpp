@@ -26,6 +26,7 @@
 #include <commctrl.h>
 #include <commdlg.h>
 #include <uxtheme.h>
+// #include <dbghelp.h>
 #include <cstdio>
 #include <cinttypes>
 #include "SciCall.h"
@@ -458,12 +459,36 @@ BOOL WINAPI ConsoleHandlerRoutine(DWORD dwCtrlType) noexcept {
 	return FALSE;
 }
 
-LONG WINAPI TopLevelHandler(EXCEPTION_POINTERS *ep) noexcept {
-	if (ep->ExceptionRecord->ExceptionCode == EXCEPTION_ACCESS_VIOLATION) {
-		AutoSave_DoWork(FileSaveFlag_SaveCopy);
-		return EXCEPTION_EXECUTE_HANDLER;
+static LPTOP_LEVEL_EXCEPTION_FILTER lpTopLevelExceptionFilter = nullptr;
+static SRWLOCK srwTopLevelHandlerLock = SRWLOCK_INIT;
+static LONG WINAPI TopLevelHandler(EXCEPTION_POINTERS *ep) noexcept {
+	// printf("unhandled exception: 0x%08X\n", static_cast<unsigned>(ep->ExceptionRecord->ExceptionCode));
+	AcquireSRWLockExclusive(&srwTopLevelHandlerLock);
+	AutoSave_DoWork(FileSaveFlag_SaveAs);
+#if 0
+	using MiniDumpWriteDumpSig = BOOL (WINAPI *)(HANDLE hProcess, DWORD ProcessId, HANDLE hFile, MINIDUMP_TYPE DumpType,
+	LPVOID ExceptionParam, LPVOID UserStreamParam, LPVOID CallbackParam) noexcept;
+	if (HMODULE hDLL = LoadLibraryExW(L"dbghelp.dll", nullptr, kSystemLibraryLoadFlags)) {
+		if (auto fnMiniDumpWriteDump = DLLFunction<MiniDumpWriteDumpSig>(hDLL, "MiniDumpWriteDump")) {
+			WCHAR tchPath[64];
+			const UINT pid = GetCurrentProcessId();
+			const UINT tid = GetCurrentThreadId();
+			wsprintf(tchPath, L"%s %u %u.dmp", WC_NOTEPAD4, pid, tid);
+			HANDLE hFile = CreateFile(tchPath, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
+				nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+			if (hFile != INVALID_HANDLE_VALUE) {
+				MINIDUMP_EXCEPTION_INFORMATION dumpInfo;
+				dumpInfo.ThreadId = tid;
+				dumpInfo.ExceptionPointers = ep;
+				dumpInfo.ClientPointers = FALSE;
+				fnMiniDumpWriteDump(GetCurrentProcess(), pid, hFile, MiniDumpNormal, &dumpInfo, nullptr, nullptr);
+				CloseHandle(hFile);
+			}
+		}
 	}
-	return EXCEPTION_CONTINUE_SEARCH;
+#endif
+	ReleaseSRWLockExclusive(&srwTopLevelHandlerLock);
+	return lpTopLevelExceptionFilter(ep);// C++ runtime unhandled exception filter
 }
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nShowCmd) {
@@ -497,6 +522,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 	g_hDefaultHeap = GetProcessHeap();
 	SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX);
+	lpTopLevelExceptionFilter = SetUnhandledExceptionFilter(TopLevelHandler);
 
 	// Don't keep working directory locked
 	WCHAR wchWorkingDirectory[MAX_PATH];
@@ -606,7 +632,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	// create the timer first, to make flagMatchText working.
 	HANDLE timer = idleTaskTimer = WaitableTimer_Create();
 	QueryPerformanceFrequency(&editMarkAll.watch.freq);
-	SetUnhandledExceptionFilter(TopLevelHandler);
 	InitInstance(hInstance, nShowCmd);
 	hAccMain = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_MAINWND));
 	hAccFindReplace = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_ACCFINDREPLACE));
@@ -8240,7 +8265,7 @@ void AutoSave_DoWork(FileSaveFlag saveFlag) noexcept {
 	NP2HeapFree(lpData);
 
 	if (bWriteSuccess) {
-		if (saveFlag & FileSaveFlag_SaveAlways) {
+		if (saveFlag & (FileSaveFlag_SaveAlways | FileSaveFlag_SaveAs)) {
 			dwLastSavedDocReversion = dwCurrentDocReversion;
 			return; // treat "Save Backup" as "Save As" with generated file name
 		}
