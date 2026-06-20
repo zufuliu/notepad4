@@ -17,7 +17,7 @@ jobs:
     name: MSVC ${{ matrix.system.version }} (${{ matrix.platform }})
     runs-on: ${{ matrix.system.runner }}
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
 
     - name: Update Version Hash
       run: |
@@ -44,7 +44,7 @@ jobs:
     name: LLVM MSVC ${{ matrix.system.version }} (${{ matrix.platform }})
     runs-on: ${{ matrix.system.runner }}
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
 
     - name: Update Version Hash
       run: |
@@ -71,7 +71,7 @@ jobs:
     name: llvm-mingw (${{ matrix.platform }})
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
 
     - name: Update Version Hash
       run: |
@@ -105,7 +105,7 @@ jobs:
     # pacman may fail to download packages from mirror site
     continue-on-error: true
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
 
     - name: Update Version Hash
       run: |
