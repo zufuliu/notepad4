@@ -234,24 +234,30 @@ SCI_noinline
 void BacktrackToStart(const LexAccessor &styler, int stateMask, Sci_PositionU &startPos, Sci_Position &lengthDoc, int &initStyle) noexcept {
 	const Sci_Line currentLine = styler.GetLine(startPos);
 	if (currentLine != 0) {
-		Sci_Line line = currentLine - 1;
-		Sci_Line backtrack = line;
+		Sci_Line line = currentLine;
 		if (stateMask < 0) { // always backtrack one line
-			stateMask = -stateMask;
+			const uint8_t empty = (static_cast<uint32_t>(stateMask) >> 8) & 0xff;
+			stateMask &= 0xff;
+			line -= 1;
+			// fix backtrack for LineStateBlockEndLine, skip previous empty line
 			if (line != 0) {
-				--line;
+				const int lineState = styler.GetLineState(line);
+				// printf("  lineState[%zd]: %d / %d, mask: %d / %d\n", line, lineState, styler.GetLineState(line - 1), stateMask, empty);
+				if ((lineState & empty) != 0) {
+					line -= 1;
+				}
 			}
-		} else {
-			backtrack += 2;
 		}
-		int lineState = styler.GetLineState(line);
-		while ((lineState & stateMask) != 0 && line != 0) {
-			--line;
-			lineState = styler.GetLineState(line);
+		while (line != 0) {
+			const Sci_Line prev = line - 1;
+			const int lineState = styler.GetLineState(prev);
+			if ((lineState & stateMask) != 0) {
+				line = prev;
+			} else {
+				break;
+			}
 		}
-		if ((lineState & stateMask) == 0 && (line + 1 < backtrack)) {
-			++line;
-		}
+		// printf("  backtrack: %zd => %zd, lineState: %d / %d, %d\n", currentLine, line, styler.GetLineState(line), styler.GetLineState(line - 1), stateMask);
 		if (line != currentLine) {
 			const Sci_PositionU endPos = startPos + lengthDoc;
 			startPos = (line == 0)? 0 : styler.LineStart(line);

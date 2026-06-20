@@ -365,7 +365,8 @@ void TypstLexer::ClassifyWord(LexerWordList keywordLists) {
 void ColouriseTypstDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	if (startPos != 0) {
 		// backtrack to previous line for better coloring on typing.
-		BacktrackToStart(styler, -LineStateNestedStateLine, startPos, lengthDoc, initStyle);
+		constexpr int mask = INT_MIN | LineStateNestedStateLine | (LineStateEmptyLine << 8);
+		BacktrackToStart(styler, mask, startPos, lengthDoc, initStyle);
 	}
 
 	TypstLexer lexer(startPos, lengthDoc, initStyle, styler);
