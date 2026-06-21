@@ -174,7 +174,7 @@ public:
       return start;
    }
 
-   size_type  index(void* ptr)
+   size_type  index(void* ptr) const
    {
       return size_type(static_cast<pointer>(ptr) - static_cast<pointer>(data()));
    }
@@ -199,7 +199,7 @@ public:
 
 inline raw_storage::raw_storage()
 {
-   last = start = end = 0;
+   last = start = end = nullptr;
 }
 
 inline raw_storage::raw_storage(size_type n)

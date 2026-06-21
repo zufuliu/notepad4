@@ -614,6 +614,9 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				}
 			} else if (chNext == '[' && styler.Match(i + 2, "CDATA[")) {
 				state = SCE_H_CDATA;
+				// styler.ColorTo(i + 2, SCE_H_SGML_DEFAULT);
+				// styler.ColorTo(i + 2 + 5, SCE_H_SGML_COMMAND);
+				// styler.ColorTo(i + 2 + 5 + 1, SCE_H_SGML_DEFAULT);
 			} else {
 				styler.ColorTo(i + 1, SCE_H_SGML_DEFAULT); // <! is default
 				beforeLanguage = scriptLanguage;
@@ -793,6 +796,8 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 		case SCE_H_CDATA:
 			if ((chPrev2 == ']') && (chPrev == ']') && (ch == '>')) {
 				styler.ColorTo(i + 1, StateToPrint);
+				// styler.ColorTo(i + 1 - 3, StateToPrint);
+				// styler.ColorTo(i + 1, SCE_H_SGML_COMMAND);
 				state = beforePreProc;
 				levelCurrent--;
 			}

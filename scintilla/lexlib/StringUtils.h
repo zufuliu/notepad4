@@ -45,11 +45,13 @@ inline bool StrHasSuffix(const char *s, size_t length, const char (&suffix)[N]) 
 #if defined(__clang__) || defined(__GNUC__) || !defined(_MSC_BUILD)// || (_MSC_VER >= 1920)
 template <size_t N>
 constexpr bool StrEqual(const char *s, const char (&t)[N]) noexcept {
+	// NOLINTNEXTLINE(clang-analyzer-unix.cstring.UninitializedRead)
 	return __builtin_memcmp(s, t, N) == 0;
 }
 
 template <size_t N>
 constexpr bool StrStartsWith(const char *s, const char (&prefix)[N]) noexcept {
+	// NOLINTNEXTLINE(clang-analyzer-unix.cstring.UninitializedRead)
 	return __builtin_memcmp(s, prefix, N - 1) == 0;
 }
 
@@ -192,16 +194,19 @@ constexpr bool StrEndsWith(const char *s, size_t length, const char (&suffix)[N]
 
 template <size_t N>
 constexpr bool StrEqualEx(const char *s, const char (&t)[N]) noexcept {
+	// NOLINTNEXTLINE(clang-analyzer-unix.cstring.UninitializedRead)
 	return __builtin_memcmp(s, t, N) == 0;
 }
 
 template <size_t N>
 constexpr bool StrStartsWithEx(const char *s, const char (&prefix)[N]) noexcept {
+	// NOLINTNEXTLINE(clang-analyzer-unix.cstring.UninitializedRead)
 	return __builtin_memcmp(s, prefix, N - 1) == 0;
 }
 
 template <size_t N>
 constexpr bool StrEndsWithEx(const char *s, size_t length, const char (&suffix)[N]) noexcept {
+	// NOLINTNEXTLINE(clang-analyzer-unix.cstring.UninitializedRead)
 	return length >= N - 1 && __builtin_memcmp(s + (length + 1 - N), suffix, N) == 0;
 }
 

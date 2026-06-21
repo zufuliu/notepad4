@@ -60,6 +60,7 @@ Checks: [
     # -readability-container-contains,
     # -readability-else-after-return,
     # -readability-named-parameter,
+    # -readability-redundant-nested-if,
     # -readability-simplify-boolean-expr,
     # -bugprone-forward-declaration-namespace,
     # -bugprone-reserved-identifier,

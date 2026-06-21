@@ -1,3 +1,4 @@
+// NOLINTBEGIN(bugprone-reserved-identifier)
 /******************************************************************************
 *
 *
@@ -69,6 +70,7 @@ constexpr int ToLowerA(int ch) noexcept {
 	return (ch >= 'A' && ch <= 'Z') ? (ch - 'A' + 'a') : ch;
 }
 
+// NOLINTBEGIN(bugprone-reserved-identifier)
 #if defined(_MSC_VER) && !defined(_DLL)
 // Case-insensitive ASCII comparisons, see corecrt_internal.h
 extern "C" int __cdecl __ascii_memicmp(void const * lhs, void const * rhs, size_t count) noexcept;
@@ -83,6 +85,7 @@ extern "C" int __cdecl __ascii_wcsnicmp(const wchar_t * lhs, const wchar_t * rhs
 #define __ascii_wcsicmp		_wcsicmp
 #define __ascii_wcsnicmp	_wcsnicmp
 #endif
+// NOLINTEND(bugprone-reserved-identifier)
 
 inline bool StrEqual(LPCWSTR s1, LPCWSTR s2) noexcept {
 	return wcscmp(s1, s2) == 0;
@@ -167,11 +170,13 @@ inline void StrCpyEx(wchar_t *s, const wchar_t (&t)[N]) noexcept {
 
 template <typename T, size_t N>
 constexpr bool StrEqualEx(const T *s, const T (&t)[N]) noexcept {
+	// NOLINTNEXTLINE(clang-analyzer-unix.cstring.UninitializedRead)
 	return __builtin_memcmp(s, t, N*sizeof(T)) == 0;
 }
 
 template <typename T, size_t N>
 constexpr bool StrStartsWith(const T *s, const T (&t)[N]) noexcept {
+	// NOLINTNEXTLINE(clang-analyzer-unix.cstring.UninitializedRead)
 	return __builtin_memcmp(s, t, (N - 1)*sizeof(T)) == 0;
 }
 
