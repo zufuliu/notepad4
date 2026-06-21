@@ -505,8 +505,8 @@ HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(LPCWSTR AppID) noexcept {
 #if _WIN32_WINNT >= _WIN32_WINNT_WIN7
 	return SetCurrentProcessExplicitAppUserModelID(AppID);
 #else
-	using SetCurrentProcessExplicitAppUserModelIDSig = HRESULT (WINAPI *)(LPCWSTR AppID);
-	SetCurrentProcessExplicitAppUserModelIDSig pfnSetCurrentProcessExplicitAppUserModelID =
+	using SetCurrentProcessExplicitAppUserModelIDSig = HRESULT (WINAPI *)(LPCWSTR AppID) noexcept;
+	auto pfnSetCurrentProcessExplicitAppUserModelID =
 		DLLFunctionEx<SetCurrentProcessExplicitAppUserModelIDSig>(L"shell32.dll", "SetCurrentProcessExplicitAppUserModelID");
 	if (pfnSetCurrentProcessExplicitAppUserModelID) {
 		return pfnSetCurrentProcessExplicitAppUserModelID(AppID);

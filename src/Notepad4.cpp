@@ -461,7 +461,7 @@ BOOL WINAPI ConsoleHandlerRoutine(DWORD dwCtrlType) noexcept {
 
 static LPTOP_LEVEL_EXCEPTION_FILTER lpTopLevelExceptionFilter = nullptr;
 static SRWLOCK srwTopLevelHandlerLock = SRWLOCK_INIT;
-static LONG WINAPI TopLevelHandler(EXCEPTION_POINTERS *ep) noexcept {
+static LONG WINAPI TopLevelHandler(EXCEPTION_POINTERS *ep) {
 	// printf("unhandled exception: 0x%08X\n", static_cast<unsigned>(ep->ExceptionRecord->ExceptionCode));
 	AcquireSRWLockExclusive(&srwTopLevelHandlerLock);
 	AutoSave_DoWork(FileSaveFlag_SaveAs);

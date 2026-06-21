@@ -170,21 +170,21 @@ UINT		g_uSystemDPI = USER_DEFAULT_SCREEN_DPI;
 #if _WIN32_WINNT < _WIN32_WINNT_WIN10
 namespace {
 // scintilla\win32\PlatWin.cxx
-using GetDpiForWindowSig = UINT (WINAPI *)(HWND hwnd);
+using GetDpiForWindowSig = UINT (WINAPI *)(HWND hwnd) noexcept;
 GetDpiForWindowSig fnGetDpiForWindow = nullptr;
 
 #ifndef DPI_ENUMS_DECLARED
 #define MDT_EFFECTIVE_DPI	0
 #endif
 
-using GetDpiForMonitorSig = HRESULT (WINAPI *)(HMONITOR hmonitor, /*MONITOR_DPI_TYPE*/int dpiType, UINT *dpiX, UINT *dpiY);
+using GetDpiForMonitorSig = HRESULT (WINAPI *)(HMONITOR hmonitor, /*MONITOR_DPI_TYPE*/int dpiType, UINT *dpiX, UINT *dpiY) noexcept;
 HMODULE hShcoreDLL {};
 GetDpiForMonitorSig fnGetDpiForMonitor = nullptr;
 
-using GetSystemMetricsForDpiSig = int (WINAPI *)(int nIndex, UINT dpi);
+using GetSystemMetricsForDpiSig = int (WINAPI *)(int nIndex, UINT dpi) noexcept;
 GetSystemMetricsForDpiSig fnGetSystemMetricsForDpi = nullptr;
 
-using AdjustWindowRectExForDpiSig = BOOL (WINAPI *)(LPRECT lpRect, DWORD dwStyle, BOOL bMenu, DWORD dwExStyle, UINT dpi);
+using AdjustWindowRectExForDpiSig = BOOL (WINAPI *)(LPRECT lpRect, DWORD dwStyle, BOOL bMenu, DWORD dwExStyle, UINT dpi) noexcept;
 AdjustWindowRectExForDpiSig fnAdjustWindowRectExForDpi = nullptr;
 }
 
@@ -256,7 +256,7 @@ BOOL WINAPI ConsoleHandlerRoutine(DWORD dwCtrlType) noexcept {
 #if 0
 static LPTOP_LEVEL_EXCEPTION_FILTER lpTopLevelExceptionFilter = nullptr;
 static SRWLOCK srwTopLevelHandlerLock = SRWLOCK_INIT;
-static LONG WINAPI TopLevelHandler(EXCEPTION_POINTERS *ep) noexcept {
+static LONG WINAPI TopLevelHandler(EXCEPTION_POINTERS *ep) {
 	// printf("unhandled exception: 0x%08X\n", static_cast<unsigned>(ep->ExceptionRecord->ExceptionCode));
 	AcquireSRWLockExclusive(&srwTopLevelHandlerLock);
 	using MiniDumpWriteDumpSig = BOOL (WINAPI *)(HANDLE hProcess, DWORD ProcessId, HANDLE hFile, MINIDUMP_TYPE DumpType,
@@ -3708,7 +3708,7 @@ static void LoadDpiForWindow() noexcept {
 	fnGetSystemMetricsForDpi = DLLFunction<GetSystemMetricsForDpiSig>(user32, "GetSystemMetricsForDpi");
 	fnAdjustWindowRectExForDpi = DLLFunction<AdjustWindowRectExForDpiSig>(user32, "AdjustWindowRectExForDpi");
 
-	using GetDpiForSystemSig = UINT (WINAPI *)(void);
+	using GetDpiForSystemSig = UINT (WINAPI *)(void) noexcept;
 	GetDpiForSystemSig fnGetDpiForSystem = DLLFunction<GetDpiForSystemSig>(user32, "GetDpiForSystem");
 	if (fnGetDpiForSystem) {
 		g_uSystemDPI = fnGetDpiForSystem();

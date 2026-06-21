@@ -1518,7 +1518,7 @@ void EditCalculateExpr(int menu) {
 		return;
 	}
 
-	using VariantToStringSig = HRESULT (WINAPI *)(REFVARIANT varIn, PWSTR pszBuf, UINT cchBuf);
+	using VariantToStringSig = HRESULT (WINAPI *)(REFVARIANT varIn, PWSTR pszBuf, UINT cchBuf) noexcept;
 	static VariantToStringSig pfnVariantToString = nullptr;
 	static uint8_t triedLoadingPropSys = 0;
 	if (triedLoadingPropSys == 0) {

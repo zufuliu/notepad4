@@ -144,7 +144,7 @@ constexpr UINT SC_WORK_IDLE = 5002;
 
 #if _WIN32_WINNT < _WIN32_WINNT_WIN8
 using SetCoalescableTimerSig = UINT_PTR (WINAPI *)(HWND hwnd, UINT_PTR nIDEvent,
-	UINT uElapse, TIMERPROC lpTimerFunc, ULONG uToleranceDelay);
+	UINT uElapse, TIMERPROC lpTimerFunc, ULONG uToleranceDelay) noexcept;
 #endif
 
 constexpr const WCHAR *callClassName = L"CallTip";

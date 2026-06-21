@@ -81,7 +81,7 @@ HMODULE hPropSysDLL = nullptr;
 #if NP2_DYNAMIC_LOAD_wcsftime
 static HMODULE hCrtDLL = nullptr;
 
-using wcsftimeSig = size_t (__cdecl *)(wchar_t *str, size_t count, const wchar_t *format, const struct tm *time);
+using wcsftimeSig = size_t (__cdecl *)(wchar_t *str, size_t count, const wchar_t *format, const struct tm *time) noexcept;
 NP2_noinline
 wcsftimeSig GetFunctionPointer_wcsftime() noexcept {
 	HMODULE hDLL = hCrtDLL;
@@ -1426,10 +1426,10 @@ const GUID WIN10_ELS_GUID_TRANSLITERATION_HANGUL_DECOMPOSITION =
 	{ 0x4BA2A721, 0xE43D, 0x41b7, { 0xB3, 0x30, 0x53, 0x6A, 0xE1, 0xE4, 0x88, 0x63 } };
 
 int TransliterateText(const GUID *pGuid, LPCWSTR pszTextW, int cchTextW, LPWSTR &pszMappedW) noexcept {
-using MappingGetServicesSig = HRESULT (WINAPI *)(PMAPPING_ENUM_OPTIONS pOptions, PMAPPING_SERVICE_INFO *prgServices, DWORD *pdwServicesCount);
-using MappingFreeServicesSig = HRESULT (WINAPI *)(PMAPPING_SERVICE_INFO pServiceInfo);
-using MappingRecognizeTextSig = HRESULT (WINAPI *)(PMAPPING_SERVICE_INFO pServiceInfo, LPCWSTR pszText, DWORD dwLength, DWORD dwIndex, PMAPPING_OPTIONS pOptions, PMAPPING_PROPERTY_BAG pbag);
-using MappingFreePropertyBagSig = HRESULT (WINAPI *)(PMAPPING_PROPERTY_BAG pBag);
+using MappingGetServicesSig = HRESULT (WINAPI *)(PMAPPING_ENUM_OPTIONS pOptions, PMAPPING_SERVICE_INFO *prgServices, DWORD *pdwServicesCount) noexcept;
+using MappingFreeServicesSig = HRESULT (WINAPI *)(PMAPPING_SERVICE_INFO pServiceInfo) noexcept;
+using MappingRecognizeTextSig = HRESULT (WINAPI *)(PMAPPING_SERVICE_INFO pServiceInfo, LPCWSTR pszText, DWORD dwLength, DWORD dwIndex, PMAPPING_OPTIONS pOptions, PMAPPING_PROPERTY_BAG pbag) noexcept;
+using MappingFreePropertyBagSig = HRESULT (WINAPI *)(PMAPPING_PROPERTY_BAG pBag) noexcept;
 
 	static uint8_t triedLoadingELSCore = 0;
 	static MappingGetServicesSig pfnMappingGetServices;
@@ -2205,9 +2205,9 @@ void EditShowCharacterInfo() noexcept {
 	length += sprintf(buffer + length, "\nHTML: &#%u;", character);
 
 // see icu.h / uchar.h, https://learn.microsoft.com/en-us/windows/win32/intl/international-components-for-unicode--icu-
-using u_charNameSig = int32_t (__cdecl *)(uint32_t code, int nameChoice, char *buffer, int32_t bufferLength, int *pErrorCode);
-using u_getIntPropertyValueSig = int32_t (__cdecl *)(uint32_t code, int which);
-using u_getPropertyValueNameSig = const char * (__cdecl *)(int property, int32_t value, int nameChoice);
+using u_charNameSig = int32_t (__cdecl *)(uint32_t code, int nameChoice, char *buffer, int32_t bufferLength, int *pErrorCode) noexcept;
+using u_getIntPropertyValueSig = int32_t (__cdecl *)(uint32_t code, int which) noexcept;
+using u_getPropertyValueNameSig = const char * (__cdecl *)(int property, int32_t value, int nameChoice) noexcept;
 	constexpr int U_EXTENDED_CHAR_NAME = 2;
 	constexpr int U_SHORT_PROPERTY_NAME = 0;
 	constexpr int U_LONG_PROPERTY_NAME = 1;
