@@ -260,9 +260,14 @@ void BacktrackToStart(const LexAccessor &styler, int stateMask, Sci_PositionU &s
 		// printf("  backtrack: %zd => %zd, lineState: %d / %d, %d\n", currentLine, line, styler.GetLineState(line), styler.GetLineState(line - 1), stateMask);
 		if (line != currentLine) {
 			const Sci_PositionU endPos = startPos + lengthDoc;
-			startPos = (line == 0)? 0 : styler.LineStart(line);
+			if (line == 0) {
+				startPos = 0;
+				initStyle = 0;
+			} else {
+				startPos = styler.LineStart(line);
+				initStyle = styler.StyleIndexAt(startPos - 1);
+			}
 			lengthDoc = endPos - startPos;
-			initStyle = (startPos == 0)? 0 : styler.StyleIndexAt(startPos - 1);
 		}
 	}
 }
