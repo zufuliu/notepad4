@@ -23,6 +23,13 @@
 
 #include "ModuleHelper.h"
 
+// When _DARKMODELIB_EXTERNAL_DPI is defined, the host application provides the
+// dmlib_dpi implementations (e.g. reusing DPI functions it has already loaded),
+// so this translation unit's own dynamic loader is compiled out to avoid
+// duplicating that work. Standalone builds leave the macro undefined and use
+// the implementation below unchanged.
+#ifndef _DARKMODELIB_EXTERNAL_DPI
+
 extern "C"
 {
 	static UINT WINAPI DummyGetDpiForSystem() noexcept
@@ -228,3 +235,5 @@ DWORD dmlib_dpi::getTextScaleFactor() noexcept
 	}
 	return defaultVal;
 }
+
+#endif // !defined(_DARKMODELIB_EXTERNAL_DPI)

@@ -15,7 +15,7 @@ INCDIR = \
 	-I"$(darkmodelib_dir)/include" \
 	-I"$(darkmodelib_dir)/src"
 
-CPPFLAGS += -D_DARKMODELIB_NO_INI_CONFIG
+CPPFLAGS += -D_DARKMODELIB_NO_INI_CONFIG -D_DARKMODELIB_EXTERNAL_DPI
 
 LDFLAGS += -L"$(BINFOLDER)/obj"
 
