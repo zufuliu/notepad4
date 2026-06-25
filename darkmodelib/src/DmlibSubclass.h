@@ -18,7 +18,9 @@
 
 #include <algorithm>
 #include <array>
+#include <cwchar>
 #include <memory>
+#include <new>
 #include <string>
 #include <string_view>
 #include <type_traits>
@@ -74,12 +76,16 @@ namespace dmlib_subclass
 		if (const auto subclassID = static_cast<UINT_PTR>(subID);
 			::GetWindowSubclass(hWnd, subclassProc, subclassID, nullptr) == FALSE)
 		{
-			if (auto pData = std::make_unique<T>(param);
-				::SetWindowSubclass(hWnd, subclassProc, subclassID, reinterpret_cast<DWORD_PTR>(pData.get())) == TRUE)
+			T* pData = new (std::nothrow) T(param);
+			if (pData == nullptr)
 			{
-				pData.release();
+				return FALSE;
+			}
+			if (::SetWindowSubclass(hWnd, subclassProc, subclassID, reinterpret_cast<DWORD_PTR>(pData)) == TRUE)
+			{
 				return TRUE;
 			}
+			delete pData;
 			return FALSE;
 		}
 		return -1;
@@ -102,12 +108,16 @@ namespace dmlib_subclass
 		if (const auto subclassID = static_cast<UINT_PTR>(subID);
 			::GetWindowSubclass(hWnd, subclassProc, subclassID, nullptr) == FALSE)
 		{
-			if (auto pData = std::make_unique<T>();
-				::SetWindowSubclass(hWnd, subclassProc, subclassID, reinterpret_cast<DWORD_PTR>(pData.get())) == TRUE)
+			T* pData = new (std::nothrow) T();
+			if (pData == nullptr)
 			{
-				pData.release();
+				return FALSE;
+			}
+			if (::SetWindowSubclass(hWnd, subclassProc, subclassID, reinterpret_cast<DWORD_PTR>(pData)) == TRUE)
+			{
 				return TRUE;
 			}
+			delete pData;
 			return FALSE;
 		}
 		return -1;
@@ -368,22 +378,46 @@ namespace dmlib_subclass
 	};
 
 	/**
+	 * @brief Holds a window class name in a fixed-size buffer.
+	 *
+	 * Window class names are limited in length and the standard control classes
+	 * are short, so a small fixed buffer avoids the heap allocation (and the
+	 * possible `std::bad_alloc`) of `std::wstring` when querying a class name
+	 * inside a Win32 callback.
+	 */
+	struct WndClassName
+	{
+		static constexpr int kMaxLength = 32;
+		wchar_t data[kMaxLength];
+	};
+
+	[[nodiscard]] inline bool operator==(const WndClassName& lhs, const wchar_t* rhs) noexcept
+	{
+		return ::wcscmp(lhs.data, rhs) == 0;
+	}
+
+	[[nodiscard]] inline bool operator!=(const WndClassName& lhs, const wchar_t* rhs) noexcept
+	{
+		return ::wcscmp(lhs.data, rhs) != 0;
+	}
+
+	/**
 	 * @brief Retrieves the class name of a given window.
 	 *
-	 * This function wraps the Win32 API `GetClassNameW` to return the class name
-	 * of a window as a wide string (`std::wstring`).
+	 * Wraps the Win32 API `GetClassNameW`, returning the result in a fixed-size
+	 * buffer so that the call does not allocate and cannot throw when used
+	 * inside a Win32 callback.
 	 *
 	 * @param[in] hWnd Handle to the target window.
-	 * @return The class name of the window as a `std::wstring`.
+	 * @return The class name of the window.
 	 *
 	 * @note The maximum length is capped at 32 characters (including the null terminator),
 	 *       which suffices for standard Windows window classes.
 	 */
-	[[nodiscard]] inline std::wstring getWndClassName(HWND hWnd)
+	[[nodiscard]] inline WndClassName getWndClassName(HWND hWnd) noexcept
 	{
-		static constexpr int strLen = 32;
-		auto className = std::wstring(strLen, L'\0');
-		className.resize(static_cast<size_t>(::GetClassNameW(hWnd, className.data(), strLen)));
+		WndClassName className{};
+		::GetClassNameW(hWnd, className.data, WndClassName::kMaxLength);
 		return className;
 	}
 
@@ -408,6 +442,55 @@ namespace dmlib_subclass
 		}
 		return (dmlib_subclass::getWndClassName(hWnd) == classNameToCmp);
 	}
+
+	/**
+	 * @brief Fixed-capacity text buffer with a non-throwing heap fallback.
+	 *
+	 * Provides an inline stack buffer for the common (short) case and falls back
+	 * to a `new (std::nothrow)` allocation for longer strings. Retrieving control
+	 * text inside a Win32 callback therefore never throws `std::bad_alloc` the
+	 * way a `std::wstring` scratch buffer would. On allocation failure the buffer
+	 * keeps its inline capacity, so callers always get a valid (possibly
+	 * truncated) null-terminated buffer.
+	 */
+	class TextBuffer
+	{
+	public:
+		explicit TextBuffer(size_t length) noexcept
+		{
+			if (length > kStackCapacity)
+			{
+				m_heap = new (std::nothrow) wchar_t[length];
+				if (m_heap != nullptr)
+				{
+					m_ptr = m_heap;
+					m_capacity = length;
+				}
+			}
+			m_ptr[0] = L'\0';
+		}
+
+		~TextBuffer()
+		{
+			delete[] m_heap;
+		}
+
+		TextBuffer(const TextBuffer&) = delete;
+		TextBuffer& operator=(const TextBuffer&) = delete;
+		TextBuffer(TextBuffer&&) = delete;
+		TextBuffer& operator=(TextBuffer&&) = delete;
+
+		[[nodiscard]] wchar_t* data() noexcept { return m_ptr; }
+		[[nodiscard]] const wchar_t* data() const noexcept { return m_ptr; }
+		[[nodiscard]] int capacity() const noexcept { return static_cast<int>(m_capacity); }
+
+	private:
+		static constexpr size_t kStackCapacity = 256;
+		wchar_t m_stack[kStackCapacity];
+		wchar_t* m_heap = nullptr;
+		wchar_t* m_ptr = m_stack;
+		size_t m_capacity = kStackCapacity;
+	};
 
 	/// Determines if themed styling should be preferred over subclassing.
 	[[nodiscard]] bool isThemePrefered() noexcept;

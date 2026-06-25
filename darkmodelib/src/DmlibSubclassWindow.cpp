@@ -102,7 +102,7 @@ static LRESULT onCtlColorStaticHelper(LPARAM lParam, WPARAM wParam)
 	auto hChild = reinterpret_cast<HWND>(lParam);
 
 	const bool isChildEnabled = ::IsWindowEnabled(hChild) == TRUE;
-	const std::wstring className = dmlib_subclass::getWndClassName(hChild);
+	const auto className = dmlib_subclass::getWndClassName(hChild);
 
 	if (className == WC_EDIT)
 	{
@@ -966,7 +966,7 @@ static LRESULT onNotifyCustomDrawOrDTPDropDown(
 	auto* lpnmhdr = reinterpret_cast<LPNMHDR>(lParam);
 	if (lpnmhdr->code == NM_CUSTOMDRAW)
 	{
-		const std::wstring className = dmlib_subclass::getWndClassName(lpnmhdr->hwndFrom);
+		const auto className = dmlib_subclass::getWndClassName(lpnmhdr->hwndFrom);
 
 		if (className == TOOLBARCLASSNAME)
 		{
@@ -1120,11 +1120,11 @@ static void paintMenuBar(HWND hWnd, HDC hdc) noexcept
 static void paintMenuBarItems(UAHDRAWMENUITEM& UDMI, const HTHEME& hTheme)
 {
 	// get the menu item string
-	auto buffer = std::wstring(MAX_PATH, L'\0');
+	wchar_t buffer[MAX_PATH]{};
 	MENUITEMINFO mii{};
 	mii.cbSize = sizeof(MENUITEMINFO);
 	mii.fMask = MIIM_STRING;
-	mii.dwTypeData = buffer.data();
+	mii.dwTypeData = buffer;
 	mii.cch = MAX_PATH - 1;
 
 	::GetMenuItemInfoW(UDMI.um.hmenu, static_cast<UINT>(UDMI.umi.iPosition), TRUE, &mii);
@@ -1224,7 +1224,7 @@ static void paintMenuBarItems(UAHDRAWMENUITEM& UDMI, const HTHEME& hTheme)
 		}
 	}
 
-	::DrawThemeTextEx(hTheme, UDMI.um.hdc, MENU_BARITEM, iTextStateID, buffer.c_str(), static_cast<int>(mii.cch), dwFlags, &UDMI.dis.rcItem, &dttopts);
+	::DrawThemeTextEx(hTheme, UDMI.um.hdc, MENU_BARITEM, iTextStateID, buffer, static_cast<int>(mii.cch), dwFlags, &UDMI.dis.rcItem, &dttopts);
 }
 
 /**
@@ -1521,7 +1521,7 @@ static LRESULT CALLBACK DarkTaskDlgSubclass(
 
 		case WM_ERASEBKGND:
 		{
-			const std::wstring className = dmlib_subclass::getWndClassName(hWnd);
+			const auto className = dmlib_subclass::getWndClassName(hWnd);
 
 			if (className == L"CtrlNotifySink")
 			{
@@ -1581,7 +1581,7 @@ static void setDarkTaskDlgSubclass(HWND hWnd)
  */
 static BOOL CALLBACK DarkTaskEnumChildProc(HWND hWnd, [[maybe_unused]] LPARAM lParam)
 {
-	const std::wstring className = dmlib_subclass::getWndClassName(hWnd);
+	const auto className = dmlib_subclass::getWndClassName(hWnd);
 
 	if (className == L"CtrlNotifySink")
 	{

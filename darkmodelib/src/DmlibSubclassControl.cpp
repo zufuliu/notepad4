@@ -138,8 +138,8 @@ static void renderButton(
 	::GetClientRect(hWnd, &rcClient);
 
 	const auto bufferLen = static_cast<size_t>(::GetWindowTextLengthW(hWnd));
-	auto buffer = std::wstring(bufferLen + 1, L'\0');
-	::GetWindowTextW(hWnd, buffer.data(), static_cast<int>(buffer.length()));
+	dmlib_subclass::TextBuffer buffer(bufferLen + 1);
+	::GetWindowTextW(hWnd, buffer.data(), buffer.capacity());
 
 	SIZE szBox{};
 	::GetThemePartSize(hTheme, hdc, iPartID, iStateID, nullptr, TS_DRAW, &szBox);
@@ -164,7 +164,7 @@ static void renderButton(
 	dtto.dwFlags = DTT_TEXTCOLOR;
 	dtto.crText = (::IsWindowEnabled(hWnd) == FALSE) ? dmlib::getDisabledTextColor() : dmlib::getTextColor();
 
-	::DrawThemeTextEx(hTheme, hdc, iPartID, iStateID, buffer.c_str(), -1, dtFlags, &rcText, &dtto);
+	::DrawThemeTextEx(hTheme, hdc, iPartID, iStateID, buffer.data(), -1, dtFlags, &rcText, &dtto);
 
 	// Focus rect
 
@@ -172,7 +172,7 @@ static void renderButton(
 	if (((nState & BST_FOCUS) == BST_FOCUS) && ((uiState & UISF_HIDEFOCUS) != UISF_HIDEFOCUS))
 	{
 		dtto.dwFlags |= DTT_CALCRECT;
-		::DrawThemeTextEx(hTheme, hdc, iPartID, iStateID, buffer.c_str(), -1, dtFlags | DT_CALCRECT, &rcText, &dtto);
+		::DrawThemeTextEx(hTheme, hdc, iPartID, iStateID, buffer.data(), -1, dtFlags | DT_CALCRECT, &rcText, &dtto);
 		const RECT rcFocus{ rcText.left - 1, rcText.top, rcText.right + 1, rcText.bottom + 1 };
 		::DrawFocusRect(hdc, &rcFocus);
 	}
@@ -527,12 +527,11 @@ static void paintGroupbox(HWND hWnd, HDC hdc, const dmlib_subclass::ButtonData& 
 
 	// Text rectangle part
 
-	std::wstring buffer;
 	const auto bufferLen = static_cast<size_t>(::GetWindowTextLengthW(hWnd));
+	dmlib_subclass::TextBuffer buffer(bufferLen + 1);
 	if (bufferLen > 0)
 	{
-		buffer.resize(bufferLen + 1, L'\0');
-		::GetWindowTextW(hWnd, buffer.data(), static_cast<int>(buffer.length()));
+		::GetWindowTextW(hWnd, buffer.data(), buffer.capacity());
 	}
 
 	const auto nStyle = ::GetWindowLongPtr(hWnd, GWL_STYLE);
@@ -545,10 +544,10 @@ static void paintGroupbox(HWND hWnd, HDC hdc, const dmlib_subclass::ButtonData& 
 
 	RECT rcText{ rcClient };
 	RECT rcBackground{ rcClient };
-	if (!buffer.empty())
+	if (bufferLen != 0)
 	{
 		SIZE szText{};
-		::GetTextExtentPoint32W(hdc, buffer.c_str(), static_cast<int>(bufferLen), &szText);
+		::GetTextExtentPoint32W(hdc, buffer.data(), static_cast<int>(bufferLen), &szText);
 
 		const int centerPosX = isCenter ? ((rcClient.right - rcClient.left - szText.cx) / 2) : 7;
 
@@ -576,7 +575,7 @@ static void paintGroupbox(HWND hWnd, HDC hdc, const dmlib_subclass::ButtonData& 
 
 	// Text part
 
-	if (!buffer.empty())
+	if (bufferLen != 0)
 	{
 		::InflateRect(&rcText, -2, 0);
 
@@ -592,7 +591,7 @@ static void paintGroupbox(HWND hWnd, HDC hdc, const dmlib_subclass::ButtonData& 
 			dtFlags |= DT_HIDEPREFIX;
 		}
 
-		::DrawThemeTextEx(hTheme, hdc, BP_GROUPBOX, iStateID, buffer.c_str(), -1, dtFlags | DT_SINGLELINE, &rcText, &dtto);
+		::DrawThemeTextEx(hTheme, hdc, BP_GROUPBOX, iStateID, buffer.data(), -1, dtFlags | DT_SINGLELINE, &rcText, &dtto);
 	}
 }
 
@@ -925,8 +924,8 @@ static void paintArrow(
 	std::array<POINT, 3> ptsArrow{};
 	for (size_t i = 0; i < 3; ++i)
 	{
-		ptsArrow.at(i).x = static_cast<LONG>((ptsArrowSelected.at(i).x * sizeArrow.x) + xPos);
-		ptsArrow.at(i).y = static_cast<LONG>((ptsArrowSelected.at(i).y * sizeArrow.y) + yPos);
+		ptsArrow[i].x = static_cast<LONG>((ptsArrowSelected[i].x * sizeArrow.x) + xPos);
+		ptsArrow[i].y = static_cast<LONG>((ptsArrowSelected[i].y * sizeArrow.y) + yPos);
 	}
 
 	const auto hBrush = dmlib_paint::GdiObject{ hdc, ::CreateSolidBrush(clr) };
@@ -1325,11 +1324,11 @@ static void paintTabItem(
 	::InflateRect(&rcItem, -1, -1);
 	rcItem.right += 1;
 
-	auto buffer = std::wstring(MAX_PATH, L'\0'); // label
+	wchar_t buffer[MAX_PATH]{}; // label
 	TCITEMW tci{};
 	tci.mask = TCIF_TEXT | TCIF_IMAGE | TCIF_STATE;
 	tci.dwStateMask = TCIS_HIGHLIGHTED;
-	tci.pszText = buffer.data();
+	tci.pszText = buffer;
 	tci.cchTextMax = MAX_PATH - 1;
 
 	TabCtrl_GetItem(hWnd, i, &tci);
@@ -1404,7 +1403,7 @@ static void paintTabItem(
 		dmlib_paint::paintRect(hdc, rcHighlightLine, dmlib::getHighlightPen(), dmlib::getHighlightBrush());
 	}
 
-	::DrawText(hdc, buffer.c_str(), -1, &rcText, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	::DrawText(hdc, buffer, -1, &rcText, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 
 	// Draw focus keyboard cue
 	if (!isSelectedTab || ::GetFocus() != hWnd)
@@ -2123,7 +2122,7 @@ static void renderComboBoxList(
 		else
 		{
 			const auto bufferLen = static_cast<size_t>(::SendMessage(hWnd, CB_GETLBTEXTLEN, static_cast<WPARAM>(index), 0));
-			auto buffer = std::wstring(bufferLen + 1, L'\0');
+			dmlib_subclass::TextBuffer buffer(bufferLen + 1);
 			::SendMessage(hWnd, CB_GETLBTEXT, static_cast<WPARAM>(index), reinterpret_cast<LPARAM>(buffer.data()));
 
 			RECT rcText{ cbi.rcItem };
@@ -2137,13 +2136,13 @@ static void renderComboBoxList(
 				dtto.dwFlags = DTT_TEXTCOLOR;
 				dtto.crText = clrText;
 
-				::DrawThemeTextEx(hTheme, hdc, CP_DROPDOWNITEM, iStateID, buffer.c_str(), -1, dtFlags, &rcText, &dtto);
+				::DrawThemeTextEx(hTheme, hdc, CP_DROPDOWNITEM, iStateID, buffer.data(), -1, dtFlags, &rcText, &dtto);
 			}
 			else
 			{
 				::SetTextColor(hdc, clrText);
 				::SetBkMode(hdc, TRANSPARENT);
-				::DrawText(hdc, buffer.c_str(), -1, &rcText, dtFlags);
+				::DrawText(hdc, buffer.data(), -1, &rcText, dtFlags);
 			}
 		}
 	}
@@ -2713,10 +2712,10 @@ static void paintHeaderItem(
 		::FillRect(hdc, &rcTmp, dmlib::getHeaderHotBackgroundBrush());
 	}
 
-	auto buffer = std::wstring(MAX_PATH, L'\0');
+	wchar_t buffer[MAX_PATH]{};
 	HDITEM hdi{};
 	hdi.mask = HDI_TEXT | HDI_FORMAT;
-	hdi.pszText = buffer.data();
+	hdi.pszText = buffer;
 	hdi.cchTextMax = MAX_PATH - 1;
 
 	Header_GetItem(hWnd, i, &hdi);
@@ -3080,7 +3079,6 @@ static void paintStatusBar(HWND hWnd, HDC hdc, dmlib_subclass::StatusBarData& st
 	::FillRect(hdc, &rcClient, dmlib::getBackgroundBrush());
 
 	const auto nParts = static_cast<int>(::SendMessage(hWnd, SB_GETPARTS, 0, 0));
-	std::wstring str;
 	RECT rcPart{};
 	RECT rcIntersect{};
 	// no edge before size grip
@@ -3110,7 +3108,7 @@ static void paintStatusBar(HWND hWnd, HDC hdc, dmlib_subclass::StatusBarData& st
 		const LRESULT retValLen = ::SendMessage(hWnd, SB_GETTEXTLENGTH, static_cast<WPARAM>(i), 0);
 		const DWORD cchText = LOWORD(retValLen);
 
-		str.resize(static_cast<size_t>(cchText) + 1);
+		dmlib_subclass::TextBuffer str(static_cast<size_t>(cchText) + 1);
 		const LRESULT retValText = ::SendMessage(hWnd, SB_GETTEXT, static_cast<WPARAM>(i), reinterpret_cast<LPARAM>(str.data()));
 
 		// With `SBT_OWNERDRAW` flag parent will draw status bar.
@@ -3133,7 +3131,7 @@ static void paintStatusBar(HWND hWnd, HDC hdc, dmlib_subclass::StatusBarData& st
 		}
 		else
 		{
-			::DrawText(hdc, str.c_str(), -1, &rcPart, DT_SINGLELINE | DT_VCENTER | DT_LEFT);
+			::DrawText(hdc, str.data(), -1, &rcPart, DT_SINGLELINE | DT_VCENTER | DT_LEFT);
 		}
 	}
 

@@ -2273,7 +2273,7 @@ static void setMonthCalendarCtrlTheme(HWND hWnd, DarkModeParams p) noexcept
 static BOOL CALLBACK DarkEnumChildProc(HWND hWnd, LPARAM lParam)
 {
 	const auto& p = *reinterpret_cast<DarkModeParams*>(lParam);
-	const std::wstring className = dmlib_subclass::getWndClassName(hWnd);
+	const auto className = dmlib_subclass::getWndClassName(hWnd);
 
 	if (className == WC_BUTTON)
 	{
