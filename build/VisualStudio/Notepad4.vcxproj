@@ -595,7 +595,6 @@
     <ClCompile Include="..\..\src\Styles.cpp" />
     <ClCompile Include="..\..\darkmodelib\src\Darkmodelib.cpp" />
     <ClCompile Include="..\..\darkmodelib\src\DmlibColor.cpp" />
-    <ClCompile Include="..\..\darkmodelib\src\DmlibDpi.cpp" />
     <ClCompile Include="..\..\darkmodelib\src\DmlibHook.cpp" />
     <ClCompile Include="..\..\darkmodelib\src\DmlibPaintHelper.cpp" />
     <ClCompile Include="..\..\darkmodelib\src\DmlibSubclass.cpp" />

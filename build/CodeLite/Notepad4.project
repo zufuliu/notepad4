@@ -307,7 +307,6 @@
     <File Name="../../darkmodelib/include/Darkmodelib.h"/>
     <File Name="../../darkmodelib/src/Darkmodelib.cpp"/>
     <File Name="../../darkmodelib/src/DmlibColor.cpp"/>
-    <File Name="../../darkmodelib/src/DmlibDpi.cpp"/>
     <File Name="../../darkmodelib/src/DmlibHook.cpp"/>
     <File Name="../../darkmodelib/src/DmlibPaintHelper.cpp"/>
     <File Name="../../darkmodelib/src/DmlibSubclass.cpp"/>

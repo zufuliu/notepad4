@@ -447,9 +447,6 @@
     <ClCompile Include="..\..\darkmodelib\src\DmlibColor.cpp">
       <Filter>DarkModeLib</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\darkmodelib\src\DmlibDpi.cpp">
-      <Filter>DarkModeLib</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\darkmodelib\src\DmlibHook.cpp">
       <Filter>DarkModeLib</Filter>
     </ClCompile>
