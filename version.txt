@@ -22,6 +22,11 @@ Boost regex 7.0.1
 git clone -b develop https://github.com/boostorg/regex.git
 2026-05-05 7760ef2a61d643c1770026f0392b440bdfb5687d
 
+win32-darkmodelib (upstream)
+git clone https://github.com/ozone10/win32-darkmodelib.git
+0.67.0
+2026-06-20 cf3f80eb723ca05239ee3056c491bf4deac3453a
+
 init submodule:
 	git submodule init
 update submodule:
