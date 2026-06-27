@@ -66,6 +66,16 @@ static HACCEL hAccFindReplace;
 static HICON hTrayIcon = nullptr;
 static UINT uTrayIconDPI = 0;
 
+static void RefreshDarkModeUI(HWND hwnd) noexcept {
+	DarkMode_OnThemeChanged(np2StyleTheme);
+	DarkMode_ApplyToWindow(hwnd);
+	if (bInitDone) {
+		DarkMode_BroadcastThemeChanged(hwnd);
+		RedrawWindow(hwnd, nullptr, nullptr,
+			RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN | RDW_UPDATENOW | RDW_FRAME);
+	}
+}
+
 #define TOOLBAR_COMMAND_BASE	IDT_FILE_NEW
 #define DefaultToolbarButtons	L"22 3 0 1 27 2 0 4 18 19 0 5 6 0 7 8 9 20 0 10 11 0 12 0 24 0 13 14 0 15 16 0 17"
 static TBBUTTON tbbMainWnd[] = {
@@ -1181,13 +1191,14 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 	case WM_SETTINGCHANGE:
 		bitmapCache.Invalidate();
-		// TODO: detect system theme and high contrast mode changes
+		RefreshDarkModeUI(hwnd);
 		SendMessage(hwndEdit, WM_SETTINGCHANGE, wParam, lParam);
 		Style_SetLexer(pLexCurrent, false); // override base elements
 		break;
 
 	case WM_SYSCOLORCHANGE:
 		bitmapCache.Invalidate();
+		RefreshDarkModeUI(hwnd);
 		SendMessage(hwndToolbar, WM_SYSCOLORCHANGE, wParam, lParam);
 		SendMessage(hwndEdit, WM_SYSCOLORCHANGE, wParam, lParam);
 		Style_SetLexer(pLexCurrent, false); // override base elements
@@ -1857,6 +1868,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	ChangeWindowMessageFilterEx(hwnd, 0x0049 /*WM_COPYGLOBALDATA*/, MSGFLT_ADD, nullptr);
 #endif
 	DragAcceptFiles(hwnd, TRUE);
+	DarkMode_ApplyToWindow(hwnd);
 
 	// File MRU
 	const int flags = MRUFlags_FilePath | (static_cast<int>(flagRelativeFileMRU) * MRUFlags_RelativePath) | (static_cast<int>(flagPortableMyDocs) * MRUFlags_PortableMyDocs);
@@ -1962,7 +1974,8 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 
 	cachedStatusItem.updateMask = ((1 << StatusItem_ItemCount) - 1) ^ (1 << StatusItem_Empty);
 	GetString(IDS_STATUSITEM_FORMAT, cachedStatusItem.tchItemFormat, COUNTOF(cachedStatusItem.tchItemFormat));
-	const DWORD dwStatusbarStyle = bShowStatusbar ? (WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE) : (WS_CHILD | WS_CLIPSIBLINGS);
+	// Main-window size grip is part of the status bar, so darkmodelib can paint it there.
+	const DWORD dwStatusbarStyle = WS_CHILD | WS_CLIPSIBLINGS | SBARS_SIZEGRIP | (bShowStatusbar ? WS_VISIBLE : 0);
 	hwndStatus = CreateStatusWindow(dwStatusbarStyle, nullptr, hwnd, IDC_STATUSBAR);
 
 	// Create ReBar and add Toolbar
@@ -1997,6 +2010,8 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 	GetWindowRect(hwndReBar, &rc);
 	cyReBar = rc.bottom - rc.top;
 	cyReBarFrame = bIsAppThemed ? 0 : 2;
+
+	DarkMode_ApplyToBars(hwnd, hwndToolbar, hwndReBar, hwndStatus);
 }
 
 void RecreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
@@ -2061,6 +2076,7 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	}
 	SetWindowExStyle(hwndEdit, dwExStyle);
 	SetWindowPos(hwndEdit, nullptr, 0, 0, 0, 0, SWP_NOZORDER | SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE);
+	DarkMode_ApplyToWindow(hwnd);
 
 	// recreate toolbar and statusbar
 	HINSTANCE hInstance = GetWindowInstance(hwnd);
@@ -3815,6 +3831,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_VIEW_STYLE_THEME_DEFAULT:
 	case IDM_VIEW_STYLE_THEME_DARK:
 		Style_OnStyleThemeChanged(LOWORD(wParam) - IDM_VIEW_STYLE_THEME_DEFAULT);
+		RefreshDarkModeUI(hwnd);
 		break;
 
 	case IDM_VIEW_DEFAULT_CODE_FONT:
@@ -4101,7 +4118,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_VIEW_CUSTOMIZE_TOOLBAR:
-		SendMessage(hwndToolbar, TB_CUSTOMIZE, 0, 0);
+		DarkMode_CustomizeToolbar(hwndToolbar);
 		break;
 
 	case IDM_VIEW_AUTO_SCALE_TOOLBAR:
@@ -7162,7 +7179,11 @@ bool FileSave(FileSaveFlag saveFlag) {
 			InstallFileWatching(false);
 			if (PathEqual(szCurFile, szIniFile)) {
 				LoadFlags();
+				const int oldStyleTheme = np2StyleTheme;
 				LoadSettings();
+				if (np2StyleTheme != oldStyleTheme) {
+					RefreshDarkModeUI(hwndMain);
+				}
 				mruFile.Reload();
 				mruFind.Reload();
 				mruReplace.Reload();
