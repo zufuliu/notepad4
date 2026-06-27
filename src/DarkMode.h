@@ -22,6 +22,12 @@ void DarkMode_ApplyToBars(HWND hwnd, HWND hwndToolbar, HWND hwndReBar, HWND hwnd
 // Apply dark mode to a dialog (WM_INITDIALOG handler).
 void DarkMode_ApplyToDialog(HWND hDlg) noexcept;
 
+// Apply dark-mode colors to a TreeView before it is populated.
+void DarkMode_ApplyToTreeView(HWND hwndTreeView) noexcept;
+
+// Show the comctl32 Customize Toolbar dialog with dark-mode theming applied.
+void DarkMode_CustomizeToolbar(HWND hwndToolbar) noexcept;
+
 // Update dark mode after style theme change. Call from Style_OnStyleThemeChanged().
 void DarkMode_OnThemeChanged(int newTheme) noexcept;
 
@@ -31,6 +37,12 @@ bool DarkMode_HandleSettingChange(HWND hwnd, LPARAM lParam) noexcept;
 
 // Check if dark mode UI is currently active.
 bool DarkMode_IsEnabled() noexcept;
+
+// Fill a dialog whose main content area should differ from its footer/button area.
+void DarkMode_FillDialogWithFooter(HWND hwnd, HDC hdc, HWND hwndMainArea) noexcept;
+
+// Handle custom WM_CTLCOLORSTATIC code paths that cannot use the generic dialog subclass.
+LRESULT DarkMode_OnCtlColorDlgStaticText(HDC hdc, bool isTextEnabled) noexcept;
 
 // Show a message box that respects dark mode (uses Task Dialog when dark mode is active).
 // Returns the same kind of value as MessageBoxEx (IDOK, IDYES, IDNO, IDCANCEL, ...).

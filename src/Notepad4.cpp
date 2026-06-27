@@ -1951,7 +1951,8 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 
 	cachedStatusItem.updateMask = ((1 << StatusItem_ItemCount) - 1) ^ (1 << StatusItem_Empty);
 	GetString(IDS_STATUSITEM_FORMAT, cachedStatusItem.tchItemFormat, COUNTOF(cachedStatusItem.tchItemFormat));
-	const DWORD dwStatusbarStyle = bShowStatusbar ? (WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE) : (WS_CHILD | WS_CLIPSIBLINGS);
+	// Main-window size grip is part of the status bar, so darkmodelib can paint it there.
+	const DWORD dwStatusbarStyle = WS_CHILD | WS_CLIPSIBLINGS | SBARS_SIZEGRIP | (bShowStatusbar ? WS_VISIBLE : 0);
 	hwndStatus = CreateStatusWindow(dwStatusbarStyle, nullptr, hwnd, IDC_STATUSBAR);
 
 	// Create ReBar and add Toolbar
@@ -4101,20 +4102,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_VIEW_CUSTOMIZE_TOOLBAR:
-		if (DarkMode_IsEnabled()) {
-			// Temporarily override system colors so comctl32's owner-drawn
-			// list boxes in the Customize Toolbar dialog use dark colors
-			const int indices[] = { COLOR_WINDOW, COLOR_WINDOWTEXT, COLOR_BTNFACE, COLOR_BTNTEXT };
-			const COLORREF oldColors[] = { GetSysColor(COLOR_WINDOW), GetSysColor(COLOR_WINDOWTEXT),
-				GetSysColor(COLOR_BTNFACE), GetSysColor(COLOR_BTNTEXT) };
-			const COLORREF darkColors[] = { RGB(0x1E, 0x1E, 0x1E), RGB(0xD4, 0xD4, 0xD4),
-				RGB(0x25, 0x25, 0x26), RGB(0xD4, 0xD4, 0xD4) };
-			SetSysColors(COUNTOF(indices), indices, darkColors);
-			SendMessage(hwndToolbar, TB_CUSTOMIZE, 0, 0);
-			SetSysColors(COUNTOF(indices), indices, oldColors);
-		} else {
-			SendMessage(hwndToolbar, TB_CUSTOMIZE, 0, 0);
-		}
+		DarkMode_CustomizeToolbar(hwndToolbar);
 		break;
 
 	case IDM_VIEW_AUTO_SCALE_TOOLBAR:

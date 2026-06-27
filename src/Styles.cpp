@@ -4239,6 +4239,8 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 		pCurrentStyle = nullptr;
 
 		hwndTV = GetDlgItem(hwnd, IDC_STYLELIST);
+		// Theme the large tree before populating it to avoid a slow post-init pass.
+		DarkMode_ApplyToTreeView(hwndTV);
 		Style_AddAllLexerToTreeView(hwndTV, true, false);
 
 		MultilineEditSetup(hwnd, IDC_STYLEEDIT);

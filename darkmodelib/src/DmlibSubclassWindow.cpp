@@ -106,7 +106,8 @@ static LRESULT onCtlColorStaticHelper(LPARAM lParam, WPARAM wParam)
 
 	if (className == WC_EDIT)
 	{
-		return isChildEnabled ? dmlib::onCtlColor(hdc) : dmlib::onCtlColorDlg(hdc);
+		// Read-only edits arrive as WM_CTLCOLORSTATIC and should blend into dialogs.
+		return dmlib::onCtlColorDlg(hdc);
 	}
 
 	if (className == WC_LINK)

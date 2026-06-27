@@ -12,12 +12,15 @@
 #include <commctrl.h>
 #include <commdlg.h>
 #include <uxtheme.h>
+#include <vssym32.h>
 #include "config.h"
 #include "Helpers.h"
 #include "Darkmodelib.h"
 #include "DarkMode.h"
 #include "EditLexer.h"
 #include "DmlibDpi.h"
+#include "DmlibHook.h"
+#include "resource.h"
 
 // Declared in Styles.cpp
 extern int np2StyleTheme;
@@ -28,6 +31,11 @@ extern HWND hwndEdit;
 
 // Thread-level hook to intercept WM_INITDIALOG and apply dark mode to dialogs
 static HHOOK s_hCallWndProcRetHook = nullptr;
+static constexpr LPCWSTR DarkMode_DialogAppliedProp = L"Notepad4.DarkModeApplied";
+static constexpr UINT_PTR DarkMode_DialogSubclassId = 1;
+static constexpr UINT_PTR DarkMode_ResizeGripSubclassId = 1;
+// Temporarily allows known external dialogs, such as TB_CUSTOMIZE, through our dialog hook.
+static bool s_applyExternalDialog = false;
 
 static constexpr UINT DarkMode_TypeForStyleTheme(int theme) noexcept {
 	return static_cast<UINT>((theme == StyleTheme_Dark) ? dmlib::DarkModeType::dark : dmlib::DarkModeType::light);
@@ -41,11 +49,101 @@ static LRESULT CALLBACK DarkMode_CallWndRetProc(int nCode, WPARAM wParam, LPARAM
 		// dialog) that are hosted in our process but owned by comdlg32/shell.
 		if (cwpret->message == WM_INITDIALOG
 			&& dmlib::isExperimentalActive()
-			&& reinterpret_cast<HINSTANCE>(GetWindowLongPtr(cwpret->hwnd, GWLP_HINSTANCE)) == g_hInstance) {
+			&& (s_applyExternalDialog || reinterpret_cast<HINSTANCE>(GetWindowLongPtr(cwpret->hwnd, GWLP_HINSTANCE)) == g_hInstance)) {
 			DarkMode_ApplyToDialog(cwpret->hwnd);
 		}
 	}
 	return CallNextHookEx(s_hCallWndProcRetHook, nCode, wParam, lParam);
+}
+
+static void DarkMode_PaintResizeGrip(HWND hwnd, HDC hdc) noexcept {
+	RECT rc{};
+	GetClientRect(hwnd, &rc);
+	FillRect(hdc, &rc, dmlib::getDlgBackgroundBrush());
+
+	// Dialog grips are scrollbar controls; use the same themed gripper as the status bar.
+	HTHEME hTheme = OpenThemeData(hwnd, VSCLASS_STATUS);
+	if (hTheme != nullptr) {
+		SIZE szGrip{};
+		GetThemePartSize(hTheme, hdc, SP_GRIPPER, 0, &rc, TS_DRAW, &szGrip);
+		RECT rcGrip{ rc };
+		rcGrip.left = rcGrip.right - szGrip.cx;
+		rcGrip.top = rcGrip.bottom - szGrip.cy;
+		DrawThemeBackground(hTheme, hdc, SP_GRIPPER, 0, &rcGrip, nullptr);
+		CloseThemeData(hTheme);
+	}
+}
+
+static LRESULT CALLBACK DarkMode_ResizeGripSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, UINT_PTR idSubclass, DWORD_PTR /*refData*/) noexcept {
+	switch (msg) {
+	case WM_NCDESTROY:
+		RemoveWindowSubclass(hwnd, DarkMode_ResizeGripSubclass, idSubclass);
+		break;
+
+	case WM_ERASEBKGND:
+		if (dmlib::isExperimentalActive()) {
+			return TRUE;
+		}
+		break;
+
+	case WM_PAINT:
+		if (dmlib::isExperimentalActive()) {
+			PAINTSTRUCT ps{};
+			HDC hdc = BeginPaint(hwnd, &ps);
+			DarkMode_PaintResizeGrip(hwnd, hdc);
+			EndPaint(hwnd, &ps);
+			return 0;
+		}
+		break;
+
+	case WM_PRINT:
+	case WM_PRINTCLIENT:
+		if (dmlib::isExperimentalActive()) {
+			DarkMode_PaintResizeGrip(hwnd, AsPointer<HDC>(wParam));
+			return 0;
+		}
+		break;
+
+	case WM_THEMECHANGED:
+	case WM_WINDOWPOSCHANGED:
+		if (dmlib::isExperimentalActive()) {
+			InvalidateRect(hwnd, nullptr, TRUE);
+		}
+		break;
+	}
+	return DefSubclassProc(hwnd, msg, wParam, lParam);
+}
+
+static void DarkMode_ApplyToResizeGrip(HWND hwndDlg, int id) noexcept {
+	HWND hwndGrip = GetDlgItem(hwndDlg, id);
+	if (hwndGrip != nullptr && (GetWindowLongPtr(hwndGrip, GWL_STYLE) & SBS_SIZEGRIP) == SBS_SIZEGRIP) {
+		SetWindowSubclass(hwndGrip, DarkMode_ResizeGripSubclass, DarkMode_ResizeGripSubclassId, 0);
+	}
+}
+
+static LRESULT CALLBACK DarkMode_DialogSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, UINT_PTR idSubclass, DWORD_PTR /*refData*/) noexcept {
+	switch (msg) {
+	case WM_NCDESTROY:
+		RemoveWindowSubclass(hwnd, DarkMode_DialogSubclass, idSubclass);
+		break;
+
+	case WM_CTLCOLORSTATIC: {
+		HWND hwndCtl = AsPointer<HWND>(lParam);
+		const DWORD id = GetWindowLong(hwndCtl, GWL_ID);
+		// These pseudo-links are plain static controls, not SysLink controls.
+		if (id >= IDC_MODIFY_LINE_DLN_NP && id <= IDC_MODIFY_LINE_ZCN_ZP) {
+			return dmlib::onCtlColorDlgLinkText(AsPointer<HDC>(wParam), true);
+		}
+	} break;
+
+	case WM_CTLCOLOREDIT:
+		return dmlib::onCtlColorCtrl(AsPointer<HDC>(wParam));
+
+	case WM_CTLCOLORLISTBOX:
+		return dmlib::onCtlColorListbox(wParam, lParam);
+
+	}
+	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
 // Custom dark colors for Notepad4
@@ -131,7 +229,42 @@ void DarkMode_ApplyToBars(HWND hwnd, HWND hwndToolbar, HWND hwndReBar, HWND hwnd
 }
 
 void DarkMode_ApplyToDialog(HWND hDlg) noexcept {
+	if (hDlg == nullptr || !dmlib::isExperimentalActive() || GetProp(hDlg, DarkMode_DialogAppliedProp) != nullptr) {
+		return;
+	}
 	dmlib::setDarkWndNotifySafeEx(hDlg, false, true);
+	DarkMode_ApplyToResizeGrip(hDlg, IDC_RESIZEGRIP);
+	DarkMode_ApplyToResizeGrip(hDlg, IDC_RESIZEGRIP2);
+	DarkMode_ApplyToResizeGrip(hDlg, IDC_RESIZEGRIP3);
+	SetWindowSubclass(hDlg, DarkMode_DialogSubclass, DarkMode_DialogSubclassId, 0);
+	SetProp(hDlg, DarkMode_DialogAppliedProp, reinterpret_cast<HANDLE>(1));
+}
+
+void DarkMode_ApplyToTreeView(HWND hwndTreeView) noexcept {
+	if (hwndTreeView == nullptr || !dmlib::isExperimentalActive()) {
+		return;
+	}
+
+	TreeView_SetTextColor(hwndTreeView, dmlib::getViewTextColor());
+	TreeView_SetBkColor(hwndTreeView, dmlib::getViewBackgroundColor());
+	dmlib::setTreeViewWindowThemeEx(hwndTreeView, true);
+	dmlib::setDarkTooltips(hwndTreeView, static_cast<int>(dmlib::ToolTipsType::treeview));
+}
+
+void DarkMode_CustomizeToolbar(HWND hwndToolbar) noexcept {
+	if (!dmlib::isExperimentalActive()) {
+		SendMessage(hwndToolbar, TB_CUSTOMIZE, 0, 0);
+		return;
+	}
+
+	// TB_CUSTOMIZE is a comctl32 dialog; hook GetSysColor only inside this process.
+	s_applyExternalDialog = true;
+	const bool hookSysColor = dmlib_hook::hookSysColor();
+	SendMessage(hwndToolbar, TB_CUSTOMIZE, 0, 0);
+	if (hookSysColor) {
+		dmlib_hook::unhookSysColor();
+	}
+	s_applyExternalDialog = false;
 }
 
 void DarkMode_OnThemeChanged(int newTheme) noexcept {
@@ -173,6 +306,28 @@ bool DarkMode_HandleSettingChange([[maybe_unused]] HWND hwnd, LPARAM lParam) noe
 
 bool DarkMode_IsEnabled() noexcept {
 	return dmlib::isExperimentalActive();
+}
+
+void DarkMode_FillDialogWithFooter(HWND hwnd, HDC hdc, HWND hwndMainArea) noexcept {
+	if (!dmlib::isExperimentalActive()) {
+		return;
+	}
+
+	// InfoBox has a deliberate content/footer split; do not apply this globally.
+	RECT rcClient{};
+	GetClientRect(hwnd, &rcClient);
+	FillRect(hdc, &rcClient, dmlib::getBackgroundBrush());
+
+	if (hwndMainArea != nullptr) {
+		RECT rcMain{};
+		GetWindowRect(hwndMainArea, &rcMain);
+		MapWindowPoints(HWND_DESKTOP, hwnd, reinterpret_cast<LPPOINT>(&rcMain), 2);
+		FillRect(hdc, &rcMain, dmlib::getDlgBackgroundBrush());
+	}
+}
+
+LRESULT DarkMode_OnCtlColorDlgStaticText(HDC hdc, bool isTextEnabled) noexcept {
+	return dmlib::onCtlColorDlgStaticText(hdc, isTextEnabled);
 }
 
 int DarkMode_MessageBox(HWND hwnd, LPCWSTR text, LPCWSTR caption, UINT uType, WORD wLanguageId) noexcept {

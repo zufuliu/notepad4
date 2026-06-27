@@ -1731,8 +1731,14 @@ static void ncPaintCustomBorder(HWND hWnd, const dmlib_subclass::BorderMetricsDa
 
 	const bool isHot = ::PtInRect(&rcClient, ptCursor) == TRUE;
 	const bool hasFocus = ::GetFocus() == hWnd;
+	// Read-only edits are display fields; keep their border passive.
+	const bool isReadOnlyEdit = borderMetricsData.m_isEdit
+		&& (::GetWindowLongPtrW(hWnd, GWL_STYLE) & ES_READONLY) == ES_READONLY;
 
-	const HPEN hEnabledPen = ((borderMetricsData.m_isHot && isHot) || hasFocus ? dmlib::getHotEdgePen() : dmlib::getEdgePen());
+	const bool drawHotBorder = !isReadOnlyEdit
+		&& (borderMetricsData.m_isHot && isHot);
+	const bool drawFocusBorder = !isReadOnlyEdit && hasFocus;
+	const HPEN hEnabledPen = (drawHotBorder || drawFocusBorder) ? dmlib::getHotEdgePen() : dmlib::getEdgePen();
 
 	static const int roundness = dmlib::isAtLeastWindows11() ? dmlib_paint::kWin11CornerRoundness : 0;
 	dmlib_paint::paintRoundRect(
@@ -1743,15 +1749,6 @@ static void ncPaintCustomBorder(HWND hWnd, const dmlib_subclass::BorderMetricsDa
 		roundness,
 		roundness
 	);
-
-	if (dmlib::getHighlightColor() != dmlib::getCtrlBackgroundColor()
-		&& dmlib::isAtLeastWindows11()
-		&& hasFocus
-		&& borderMetricsData.m_isEdit)
-	{
-		const RECT rcHighlightBottomLine{ rcClient.left, rcClient.bottom - dmlib_dpi::scale(2, hWnd), rcClient.right, rcClient.bottom};
-		dmlib_paint::paintRoundRect(hdc, rcHighlightBottomLine, dmlib::getHighlightPen(), dmlib::getHighlightBrush(), roundness, roundness);
-	}
 
 	::ReleaseDC(hWnd, hdc);
 }
