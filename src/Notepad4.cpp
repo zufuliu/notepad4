@@ -439,7 +439,7 @@ static void CleanUpResources(bool initialized) noexcept {
 }
 
 static void DispatchMessageMain(MSG *msg) noexcept {
-	if (IsWindow(hDlgFindReplace) && (msg->hwnd == hDlgFindReplace || IsChild(hDlgFindReplace, msg->hwnd))) {
+	if (hDlgFindReplace != nullptr && (msg->hwnd == hDlgFindReplace || IsChild(hDlgFindReplace, msg->hwnd))) {
 		if (TranslateAccelerator(hDlgFindReplace, hAccFindReplace, msg) || IsDialogMessage(hDlgFindReplace, msg)) {
 			return;
 		}
@@ -1126,7 +1126,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			}
 
 			// Destroy find / replace dialog
-			if (IsWindow(hDlgFindReplace)) {
+			if (hDlgFindReplace != nullptr) {
 				DestroyWindow(hDlgFindReplace);
 			}
 
@@ -3723,7 +3723,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_EDIT_FIND:
 	case IDM_EDIT_REPLACE: {
 		const bool bReplace = (LOWORD(wParam) == IDM_EDIT_REPLACE) || (LOWORD(wParam) == IDT_EDIT_REPLACE);
-		if (!IsWindow(hDlgFindReplace)) {
+		if (hDlgFindReplace == nullptr) {
 			hDlgFindReplace = EditFindReplaceDlg(hwndEdit, &efrData, bReplace);
 		} else {
 			if (bReplace != (GetDlgItem(hDlgFindReplace, IDC_REPLACETEXT) != nullptr)) {

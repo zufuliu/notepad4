@@ -4950,7 +4950,9 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			DeleteObject(hFontFindReplaceEdit);
 			hFontFindReplaceEdit = nullptr;
 		}
-		if (umsg == WM_DPICHANGED && IsButtonChecked(hwnd, IDC_USEMONOSPACEDFONT)) {
+		if (umsg == WM_DESTROY) {
+			hDlgFindReplace = nullptr;
+		} else if (IsButtonChecked(hwnd, IDC_USEMONOSPACEDFONT)) {
 			FindReplaceSetFont(hwnd, TRUE, &hFontFindReplaceEdit);
 		}
 		return FALSE;
@@ -5117,7 +5119,6 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 
 			if (bCloseDlg) {
 				DestroyWindow(hwnd);
-				hDlgFindReplace = nullptr;
 			}
 
 			switch (LOWORD(wParam)) {
