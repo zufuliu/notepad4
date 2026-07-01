@@ -330,17 +330,6 @@ LRESULT DarkMode_OnCtlColorDlgStaticText(HDC hdc, bool isTextEnabled) noexcept {
 	return dmlib::onCtlColorDlgStaticText(hdc, isTextEnabled);
 }
 
-int DarkMode_MessageBox(HWND hwnd, LPCWSTR text, LPCWSTR caption, UINT uType, WORD wLanguageId) noexcept {
-	if (dmlib::isExperimentalActive()) {
-		const HRESULT hr = dmlib::darkMessageBoxW(hwnd, text, caption, uType);
-		if (hr > 0) {
-			return static_cast<int>(hr);
-		}
-		// Fall through to MessageBoxEx on failure.
-	}
-	return MessageBoxEx(hwnd, text, caption, uType, wLanguageId);
-}
-
 // ---------------------------------------------------------------------------
 // External DPI provider for darkmodelib (_DARKMODELIB_EXTERNAL_DPI)
 //

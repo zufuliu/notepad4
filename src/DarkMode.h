@@ -44,10 +44,6 @@ void DarkMode_FillDialogWithFooter(HWND hwnd, HDC hdc, HWND hwndMainArea) noexce
 // Handle custom WM_CTLCOLORSTATIC code paths that cannot use the generic dialog subclass.
 LRESULT DarkMode_OnCtlColorDlgStaticText(HDC hdc, bool isTextEnabled) noexcept;
 
-// Show a message box that respects dark mode (uses Task Dialog when dark mode is active).
-// Returns the same kind of value as MessageBoxEx (IDOK, IDYES, IDNO, IDCANCEL, ...).
-int DarkMode_MessageBox(HWND hwnd, LPCWSTR text, LPCWSTR caption, UINT uType, WORD wLanguageId) noexcept;
-
 // Broadcast WM_THEMECHANGED to the window and all its descendants so that
 // themed controls (including scroll bars) re-open their theme handles.
 void DarkMode_BroadcastThemeChanged(HWND hwnd) noexcept;
