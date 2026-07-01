@@ -169,7 +169,7 @@ INT_PTR CALLBACK MsgBoxDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPara
 		// before wrapping (the way the system MessageBox does).
 		HFONT hFont = AsPointer<HFONT>(SendMessage(hwndText, WM_GETFONT, 0, 0));
 		HDC hdc = GetDC(hwndText);
-		HFONT hOldFont = AsPointer<HFONT>(SelectObject(hdc, hFont));
+		HFONT hOldFont = static_cast<HFONT>(SelectObject(hdc, hFont));
 
 		HMONITOR hMonitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
 		MONITORINFO mi{};
