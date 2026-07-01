@@ -2364,7 +2364,7 @@ static int ConvertNumRadix(char *tch, uint64_t num, int radix) noexcept {
 
 	case 8: {
 		char buf[2 + 22 + 1] = "";
-		int index = 2 + 22;
+		int index = 2 + 22 - 1;
 		int length = 0;
 		while (num) {
 			const int bit = static_cast<int>(num & 7);
@@ -2386,7 +2386,7 @@ static int ConvertNumRadix(char *tch, uint64_t num, int radix) noexcept {
 
 	case 2: {
 		char buf[2 + 64 + 8 + 1] = "";
-		int index = 2 + 64 + 8;
+		int index = 2 + 64 + 8 - 1;
 		int length = 0;
 		int bit_count = 0;
 		while (num) {
