@@ -6206,6 +6206,10 @@ static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		GetObject(hFontNormal, sizeof(LOGFONT), &lf);
 		lf.lfUnderline = TRUE;
 		hFontHover = CreateFontIndirect(&lf);
+		// These are pseudo-links; dark mode colors them from the dialog subclass.
+		for (UINT id = IDC_MODIFY_LINE_DLN_NP; id <= IDC_MODIFY_LINE_ZCN_ZP; ++id) {
+			SendDlgItemMessage(hwnd, id, WM_SETFONT, AsInteger<WPARAM>(hFontHover), TRUE);
+		}
 
 		MultilineEditSetup(hwnd, IDC_MODIFY_LINE_PREFIX);
 		SetDlgItemText(hwnd, IDC_MODIFY_LINE_PREFIX, wchPrefixLines);

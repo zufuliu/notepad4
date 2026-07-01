@@ -37,6 +37,8 @@
 #include "Edit.h"
 #include "Styles.h"
 #include "Dialogs.h"
+#include "DarkMode.h"
+#include "Darkmodelib.h"
 #include "resource.h"
 
 //! show code folding level and state on line number margin
@@ -624,6 +626,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	// Load Settings
 	LoadSettings();
 
+	// Initialize dark mode support
+	DarkMode_Init();
+
 	if (!InitApplication(hInstance)) {
 		CleanUpResources(false);
 		return FALSE;
@@ -1137,6 +1142,9 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			// Remove tray icon if necessary
 			ShowNotifyIcon(hwnd, false);
 
+			// Clean up dark mode resources
+			DarkMode_Cleanup();
+
 			bShutdownOK = true;
 		}
 		if (umsg == WM_DESTROY) {
@@ -1182,7 +1190,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 	case WM_SETTINGCHANGE:
 		bitmapCache.Invalidate();
-		// TODO: detect system theme and high contrast mode changes
+		DarkMode_HandleSettingChange(hwnd, lParam);
 		SendMessage(hwndEdit, WM_SETTINGCHANGE, wParam, lParam);
 		Style_SetLexer(pLexCurrent, false); // override base elements
 		break;
@@ -1870,6 +1878,9 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 #endif
 	DragAcceptFiles(hwnd, TRUE);
 
+	// Apply dark mode to main window
+	DarkMode_ApplyToWindow(hwnd);
+
 	// File MRU
 	const int flags = MRUFlags_FilePath | (static_cast<int>(flagRelativeFileMRU) * MRUFlags_RelativePath) | (static_cast<int>(flagPortableMyDocs) * MRUFlags_PortableMyDocs);
 	mruFile.Init(MRU_KEY_RECENT_FILES, iMaxRecentFiles, flags);
@@ -1974,7 +1985,8 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 
 	cachedStatusItem.updateMask = ((1 << StatusItem_ItemCount) - 1) ^ (1 << StatusItem_Empty);
 	GetString(IDS_STATUSITEM_FORMAT, cachedStatusItem.tchItemFormat, COUNTOF(cachedStatusItem.tchItemFormat));
-	const DWORD dwStatusbarStyle = bShowStatusbar ? (WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE) : (WS_CHILD | WS_CLIPSIBLINGS);
+	// Main-window size grip is part of the status bar, so darkmodelib can paint it there.
+	const DWORD dwStatusbarStyle = WS_CHILD | WS_CLIPSIBLINGS | SBARS_SIZEGRIP | (bShowStatusbar ? WS_VISIBLE : 0);
 	hwndStatus = CreateStatusWindow(dwStatusbarStyle, nullptr, hwnd, IDC_STATUSBAR);
 
 	// Create ReBar and add Toolbar
@@ -2009,6 +2021,8 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 	GetWindowRect(hwndReBar, &rc);
 	cyReBar = rc.bottom - rc.top;
 	cyReBarFrame = bIsAppThemed ? 0 : 2;
+
+	DarkMode_ApplyToBars(hwnd, hwndToolbar, hwndReBar, hwndStatus);
 }
 
 void RecreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
@@ -2073,6 +2087,9 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	}
 	SetWindowExStyle(hwndEdit, dwExStyle);
 	SetWindowPos(hwndEdit, nullptr, 0, 0, 0, 0, SWP_NOZORDER | SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE);
+
+	// refresh dark mode on theme change
+	DarkMode_ApplyToWindow(hwnd);
 
 	// recreate toolbar and statusbar
 	HINSTANCE hInstance = GetWindowInstance(hwnd);
@@ -3828,6 +3845,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_VIEW_STYLE_THEME_DEFAULT:
 	case IDM_VIEW_STYLE_THEME_DARK:
 		Style_OnStyleThemeChanged(LOWORD(wParam) - IDM_VIEW_STYLE_THEME_DEFAULT);
+		DarkMode_ApplyToBars(hwnd, hwndToolbar, hwndReBar, hwndStatus);
+		// Make controls (including scroll bars) re-open theme handles after
+		// updating the dark/light scroll bar theme.
+		DarkMode_BroadcastThemeChanged(hwnd);
+		RedrawWindow(hwnd, nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN | RDW_UPDATENOW | RDW_FRAME);
 		break;
 
 	case IDM_VIEW_DEFAULT_CODE_FONT:
@@ -4114,7 +4136,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_VIEW_CUSTOMIZE_TOOLBAR:
-		SendMessage(hwndToolbar, TB_CUSTOMIZE, 0, 0);
+		DarkMode_CustomizeToolbar(hwndToolbar);
 		break;
 
 	case IDM_VIEW_AUTO_SCALE_TOOLBAR:

@@ -34,6 +34,7 @@
 #include "Styles.h"
 #include "Dlapi.h"
 #include "Dialogs.h"
+#include "DarkMode.h"
 #include "resource.h"
 #include "Version.h"
 
@@ -61,6 +62,298 @@ static inline HWND GetMsgBoxParent() noexcept {
 	HWND hwnd = GetActiveWindow();
 	return (hwnd == nullptr) ? hwndMain : hwnd;
 }
+
+//=============================================================================
+//
+// MsgBoxDlgProc() / MsgBoxDlg()
+//
+// A drop-in MessageBox replacement built on top of the IDD_INFOBOX dialog
+// template. It gives Notepad4 the same appearance in every mode (and proper
+// dark mode support through the app wide dialog theming) instead of relying on
+// the system TaskDialog/MessageBox, which cannot be themed to match. The dialog
+// hides the "don't show again" checkbox, keeps only the buttons requested by
+// the MB_* type and resizes the message pane (IDC_INFOBOXRECT / IDC_INFOBOXTEXT)
+// to fit the text.
+//
+namespace {
+
+struct MSGBOX {
+	LPCWSTR lpstrMessage;
+	LPCWSTR lpstrCaption;
+	HICON hIcon;
+	UINT uType;
+};
+
+RECT MsgBox_GetChildRect(HWND hwnd, int id) noexcept {
+	RECT rc{};
+	GetWindowRect(GetDlgItem(hwnd, id), &rc);
+	MapWindowPoints(nullptr, hwnd, reinterpret_cast<LPPOINT>(&rc), 2);
+	return rc;
+}
+
+INT_PTR CALLBACK MsgBoxDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
+	switch (umsg) {
+	case WM_INITDIALOG: {
+		const MSGBOX * const lpmb = AsPointer<const MSGBOX *>(lParam);
+		const UINT btnType = lpmb->uType & MB_TYPEMASK;
+		SetWindowLongPtr(hwnd, DWLP_USER, static_cast<LONG_PTR>(btnType));
+
+		if (StrNotEmpty(lpmb->lpstrCaption)) {
+			SetWindowText(hwnd, lpmb->lpstrCaption);
+		}
+		SendDlgItemMessage(hwnd, IDC_INFOBOXICON, STM_SETICON, AsInteger<WPARAM>(lpmb->hIcon), 0);
+
+		// this is a plain message box: the suppress-message checkbox has no meaning here.
+		ShowWindow(GetDlgItem(hwnd, IDC_INFOBOXCHECK), SW_HIDE);
+		EnableWindow(GetDlgItem(hwnd, IDC_INFOBOXCHECK), FALSE);
+
+		// show message text literally, like the system MessageBox (no '&' mnemonics).
+		HWND hwndText = GetDlgItem(hwnd, IDC_INFOBOXTEXT);
+		SetWindowLongPtr(hwndText, GWL_STYLE, GetWindowLongPtr(hwndText, GWL_STYLE) | SS_NOPREFIX);
+		SetWindowText(hwndText, lpmb->lpstrMessage);
+
+		// choose the buttons required by the MB_* type (left to right order).
+		int buttons[3];
+		int count = 0;
+		switch (btnType) {
+		case MB_OKCANCEL:
+			buttons[count++] = IDOK;
+			buttons[count++] = IDCANCEL;
+			break;
+		case MB_YESNOCANCEL:
+			buttons[count++] = IDYES;
+			buttons[count++] = IDNO;
+			buttons[count++] = IDCANCEL;
+			break;
+		case MB_YESNO:
+			buttons[count++] = IDYES;
+			buttons[count++] = IDNO;
+			break;
+		default: // MB_OK
+			buttons[count++] = IDOK;
+			break;
+		}
+
+		// capture the template geometry before removing the unused buttons.
+		RECT rcClient{};
+		GetClientRect(hwnd, &rcClient);
+		const int clientW0 = rcClient.right;
+		const int clientH0 = rcClient.bottom;
+
+		const RECT rcText0 = MsgBox_GetChildRect(hwnd, IDC_INFOBOXTEXT);
+		const RECT rcIcon0 = MsgBox_GetChildRect(hwnd, IDC_INFOBOXICON);
+		const RECT rcPane0 = MsgBox_GetChildRect(hwnd, IDC_INFOBOXRECT);
+		const RECT rcYes0 = MsgBox_GetChildRect(hwnd, IDYES);
+		const RECT rcNo0 = MsgBox_GetChildRect(hwnd, IDNO);
+		const RECT rcBtn0 = MsgBox_GetChildRect(hwnd, IDCANCEL);
+
+		const int textLeft = rcText0.left;
+		const int textTop = rcText0.top;
+		const int origTextW = rcText0.right - rcText0.left;
+		const int rightMargin = clientW0 - rcText0.right;
+		const int iconLeft = rcIcon0.left;
+		const int iconW = rcIcon0.right - rcIcon0.left;
+		const int iconH = rcIcon0.bottom - rcIcon0.top;
+		// The template packs the content tightly; use a larger symmetric top/bottom
+		// margin so the spacing matches the system MessageBox.
+		const int vMargin = textTop * 2;
+
+		const int btnW = rcBtn0.right - rcBtn0.left;
+		const int btnH = rcBtn0.bottom - rcBtn0.top;
+		const int btnRightMargin = clientW0 - rcBtn0.right;
+		const int gapAboveBtn = rcBtn0.top - rcPane0.bottom;
+		const int gapBelowBtn = clientH0 - (rcBtn0.top + btnH);
+		const int btnGap = rcNo0.left - rcYes0.right;
+
+		// measure the message text, growing up to a fraction of the work area
+		// before wrapping (the way the system MessageBox does).
+		HFONT hFont = AsPointer<HFONT>(SendMessage(hwndText, WM_GETFONT, 0, 0));
+		HDC hdc = GetDC(hwndText);
+		HFONT hOldFont = static_cast<HFONT>(SelectObject(hdc, hFont));
+
+		HMONITOR hMonitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
+		MONITORINFO mi{};
+		mi.cbSize = sizeof(mi);
+		GetMonitorInfo(hMonitor, &mi);
+		const int workW = mi.rcWork.right - mi.rcWork.left;
+		int maxTextW = origTextW * 3;
+		if (maxTextW > workW * 5 / 8) {
+			maxTextW = workW * 5 / 8;
+		}
+		if (maxTextW < origTextW) {
+			maxTextW = origTextW;
+		}
+
+		RECT rcCalc{ 0, 0, 0, 0 };
+		DrawText(hdc, lpmb->lpstrMessage, -1, &rcCalc, DT_CALCRECT | DT_NOPREFIX);
+		int textW = rcCalc.right - rcCalc.left;
+		int textH = rcCalc.bottom - rcCalc.top;
+		if (textW > maxTextW) {
+			rcCalc = { 0, 0, maxTextW, 0 };
+			DrawText(hdc, lpmb->lpstrMessage, -1, &rcCalc, DT_CALCRECT | DT_NOPREFIX | DT_WORDBREAK);
+			textW = rcCalc.right - rcCalc.left;
+			textH = rcCalc.bottom - rcCalc.top;
+		}
+		if (textW < origTextW) {
+			textW = origTextW;
+		}
+
+		SelectObject(hdc, hOldFont);
+		ReleaseDC(hwndText, hdc);
+
+		// remove the buttons that are not part of this message box.
+		static constexpr int allButtons[] = { IDOK, IDCANCEL, IDYES, IDNO };
+		for (const int id : allButtons) {
+			bool used = false;
+			for (int i = 0; i < count; i++) {
+				if (buttons[i] == id) {
+					used = true;
+					break;
+				}
+			}
+			if (!used) {
+				DestroyWindow(GetDlgItem(hwnd, id));
+			}
+		}
+
+		// compute the new client size from the measured text and button row.
+		// The icon stays at the top; short text is centered against the icon.
+		const int contentH = textH > iconH ? textH : iconH;
+		const int iconTop = vMargin;
+		const int newTextTop = textH < iconH ? vMargin + (iconH - textH) / 2 : vMargin;
+		const int paneBottom = vMargin + contentH + vMargin;
+
+		int newClientW = textLeft + textW + rightMargin;
+		const int minBtnClientW = count * btnW + (count - 1) * btnGap + 2 * btnRightMargin;
+		if (newClientW < minBtnClientW) {
+			newClientW = minBtnClientW;
+		}
+		const int btnTop = paneBottom + gapAboveBtn;
+		const int newClientH = btnTop + btnH + gapBelowBtn;
+
+		// apply the new layout.
+		SetWindowPos(GetDlgItem(hwnd, IDC_INFOBOXRECT), nullptr, 0, 0, newClientW, paneBottom, SWP_NOZORDER | SWP_NOACTIVATE);
+		SetWindowPos(GetDlgItem(hwnd, IDC_INFOBOXICON), nullptr, iconLeft, iconTop, iconW, iconH, SWP_NOZORDER | SWP_NOACTIVATE);
+		SetWindowPos(hwndText, nullptr, textLeft, newTextTop, textW, textH, SWP_NOZORDER | SWP_NOACTIVATE);
+
+		int right = newClientW - btnRightMargin;
+		for (int i = count - 1; i >= 0; i--) {
+			const int x = right - btnW;
+			SetWindowPos(GetDlgItem(hwnd, buttons[i]), nullptr, x, btnTop, btnW, btnH, SWP_NOZORDER | SWP_NOACTIVATE);
+			right = x - btnGap;
+		}
+
+		RECT rcWin{};
+		GetWindowRect(hwnd, &rcWin);
+		const int ncW = (rcWin.right - rcWin.left) - clientW0;
+		const int ncH = (rcWin.bottom - rcWin.top) - clientH0;
+		SetWindowPos(hwnd, nullptr, 0, 0, newClientW + ncW, newClientH + ncH, SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
+
+		// pick the default button.
+		int defIndex = 0;
+		switch (lpmb->uType & MB_DEFMASK) {
+		case MB_DEFBUTTON2: defIndex = 1; break;
+		case MB_DEFBUTTON3: defIndex = 2; break;
+		}
+		if (defIndex >= count) {
+			defIndex = 0;
+		}
+		for (int i = 0; i < count; i++) {
+			SendDlgItemMessage(hwnd, buttons[i], BM_SETSTYLE, (i == defIndex) ? BS_DEFPUSHBUTTON : BS_PUSHBUTTON, TRUE);
+		}
+		SendMessage(hwnd, DM_SETDEFID, buttons[defIndex], 0);
+
+		CenterDlgInParent(hwnd);
+		if (bWindowLayoutRTL) {
+			SetWindowLayoutRTL(hwnd, true);
+		}
+		if (lpmb->uType & MB_SETFOREGROUND) {
+			SetForegroundWindow(hwnd);
+		}
+		SetFocus(GetDlgItem(hwnd, buttons[defIndex]));
+	}
+	return FALSE;
+
+	case WM_ERASEBKGND:
+		if (DarkMode_IsEnabled()) {
+			// Keep the message pane distinct from the button/footer area, like InfoBox.
+			DarkMode_FillDialogWithFooter(hwnd, AsPointer<HDC>(wParam), GetDlgItem(hwnd, IDC_INFOBOXRECT));
+			return TRUE;
+		}
+		break;
+
+	case WM_CTLCOLORSTATIC: {
+		const DWORD dwId = GetWindowLong(AsPointer<HWND>(lParam), GWL_ID);
+		if (dwId >= IDC_INFOBOXRECT && dwId <= IDC_INFOBOXTEXT) {
+			HDC hdc = AsPointer<HDC>(wParam);
+			if (DarkMode_IsEnabled()) {
+				return DarkMode_OnCtlColorDlgStaticText(hdc, true);
+			}
+			SetBkMode(hdc, TRANSPARENT);
+			return AsInteger<LONG_PTR>(GetSysColorBrush(COLOR_WINDOW));
+		}
+	}
+	break;
+
+	case WM_COMMAND:
+		switch (LOWORD(wParam)) {
+		case IDOK:
+		case IDYES:
+		case IDNO:
+			EndDialog(hwnd, LOWORD(wParam));
+			break;
+
+		case IDCANCEL: {
+			// IDCANCEL also arrives via Esc or the caption close button.
+			const UINT btnType = static_cast<UINT>(GetWindowLongPtr(hwnd, DWLP_USER));
+			if (btnType == MB_OK) {
+				EndDialog(hwnd, IDOK);
+			} else if (btnType == MB_OKCANCEL || btnType == MB_YESNOCANCEL) {
+				EndDialog(hwnd, IDCANCEL);
+			}
+			// MB_YESNO has no cancel action: ignore.
+		} break;
+		}
+		return TRUE;
+	}
+	return FALSE;
+}
+
+int MsgBoxDlg(HWND hwnd, LPCWSTR text, LPCWSTR caption, UINT uType) noexcept {
+	const UINT icon = uType & MB_ICONMASK;
+	LPCWSTR lpszIcon = nullptr;
+	switch (icon) {
+	case MB_ICONHAND:         lpszIcon = IDI_ERROR; break;       // MB_ICONERROR / MB_ICONSTOP
+	case MB_ICONQUESTION:     lpszIcon = IDI_QUESTION; break;
+	case MB_ICONEXCLAMATION:  lpszIcon = IDI_EXCLAMATION; break; // MB_ICONWARNING
+	case MB_ICONASTERISK:     lpszIcon = IDI_INFORMATION; break; // MB_ICONINFORMATION
+	}
+
+	HICON hIcon = nullptr;
+	if (lpszIcon != nullptr) {
+		const UINT dpi = GetWindowDPI(hwnd);
+		const int size = SystemMetricsForDpi(SM_CXICON, dpi);
+		LoadIconWithScaleDown(nullptr, lpszIcon, size, size, &hIcon);
+		if (hIcon == nullptr) {
+			hIcon = LoadIcon(nullptr, lpszIcon); // old standard icon
+		}
+	}
+
+	MSGBOX mb;
+	mb.lpstrMessage = text;
+	mb.lpstrCaption = caption;
+	mb.hIcon = hIcon;
+	mb.uType = uType;
+
+	MessageBeep(icon != 0 ? icon : MB_OK);
+	const INT_PTR result = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_INFOBOX), hwnd, MsgBoxDlgProc, AsInteger<LPARAM>(&mb));
+	if (hIcon != nullptr) {
+		DestroyIcon(hIcon);
+	}
+	return static_cast<int>(result);
+}
+
+} // namespace
 
 //=============================================================================
 //
@@ -113,6 +406,11 @@ int MsgBox(UINT uType, UINT uIdMsg, ...) noexcept {
 	}
 
 	HWND hwnd = GetMsgBoxParent();
+	if (DarkMode_IsEnabled()) {
+		// Use our own InfoBox based dialog so the message box matches the app
+		// (and dark mode) instead of the un-themable system MessageBox.
+		return MsgBoxDlg(hwnd, szText, szTitle, uType);
+	}
 	PostMessage(hwndMain, APPM_CENTER_MESSAGE_BOX, AsInteger<WPARAM>(hwnd), 0);
 	return MessageBoxEx(hwnd, szText, szTitle, uType, lang);
 }
@@ -2549,11 +2847,22 @@ INT_PTR CALLBACK InfoBoxDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 	}
 	return TRUE;
 
+	case WM_ERASEBKGND:
+		if (DarkMode_IsEnabled()) {
+			// Keep InfoBox's main message pane distinct from the button/footer area.
+			DarkMode_FillDialogWithFooter(hwnd, AsPointer<HDC>(wParam), GetDlgItem(hwnd, IDC_INFOBOXRECT));
+			return TRUE;
+		}
+		break;
+
 	case WM_CTLCOLORSTATIC: {
 		const DWORD dwId = GetWindowLong(AsPointer<HWND>(lParam), GWL_ID);
 
 		if (dwId >= IDC_INFOBOXRECT && dwId <= IDC_INFOBOXTEXT) {
 			HDC hdc = AsPointer<HDC>(wParam);
+			if (DarkMode_IsEnabled()) {
+				return DarkMode_OnCtlColorDlgStaticText(hdc, true);
+			}
 			SetBkMode(hdc, TRANSPARENT);
 			return AsInteger<LONG_PTR>(GetSysColorBrush(COLOR_WINDOW));
 		}

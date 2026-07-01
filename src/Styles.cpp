@@ -37,6 +37,7 @@
 #include "Edit.h"
 #include "Styles.h"
 #include "Dialogs.h"
+#include "DarkMode.h"
 #include "resource.h"
 
 extern EDITLEXER lexGlobal;
@@ -1195,6 +1196,13 @@ void Style_OnStyleThemeChanged(int theme) noexcept {
 	}
 	np2StyleTheme = theme;
 	bCustomColorLoaded = false;
+
+	// Toggle dark mode UI to match the new style theme
+	DarkMode_OnThemeChanged(theme);
+	if (hwndMain) {
+		DarkMode_ApplyToWindow(hwndMain);
+	}
+
 	Style_SetLexer(pLexCurrent, false);
 }
 
@@ -4231,6 +4239,8 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 		pCurrentStyle = nullptr;
 
 		hwndTV = GetDlgItem(hwnd, IDC_STYLELIST);
+		// Theme the large tree before populating it to avoid a slow post-init pass.
+		DarkMode_ApplyToTreeView(hwndTV);
 		Style_AddAllLexerToTreeView(hwndTV, true, false);
 
 		MultilineEditSetup(hwnd, IDC_STYLEEDIT);
