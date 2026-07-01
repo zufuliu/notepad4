@@ -2363,9 +2363,9 @@ static int ConvertNumRadix(char *tch, uint64_t num, int radix) noexcept {
 		return sprintf(tch, "%" PRIu64, num);
 
 	case 8: {
-		char buf[2 + 22 + 1] = "";
-		int index = 2 + 22;
-		int length = 0;
+		char buf[32]{};
+		unsigned index = COUNTOF(buf) - 2;
+		unsigned length = 0;
 		while (num) {
 			const int bit = static_cast<int>(num & 7);
 			num >>= 3;
@@ -2385,10 +2385,10 @@ static int ConvertNumRadix(char *tch, uint64_t num, int radix) noexcept {
 	break;
 
 	case 2: {
-		char buf[2 + 64 + 8 + 1] = "";
-		int index = 2 + 64 + 8;
-		int length = 0;
-		int bit_count = 0;
+		char buf[80]{};
+		unsigned index = COUNTOF(buf) - 2;
+		unsigned length = 0;
+		unsigned bit_count = 0;
 		while (num) {
 			const int bit = static_cast<int>(num & 1);
 			num >>= 1;
