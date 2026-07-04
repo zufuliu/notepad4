@@ -36,16 +36,11 @@
 // About
 #define IDD_ABOUT						100
 #define IDC_VERSION						100
-#define IDC_COPYRIGHT					101
-#define IDC_WEBPAGE_LINK				102
-#define IDC_WEBPAGE_TEXT				103
-#define IDC_AUTHORNAME					104
-#define IDC_EMAIL_LINK					105
-#define IDC_EMAIL_TEXT					106
-#define IDC_NEW_PAGE_TEXT				109
-#define IDC_NEW_PAGE_LINK				110
-#define IDC_BUILD_INFO					111
-#define IDC_COPY_BUILD_INFO				112
+#define IDC_WEBPAGE_LINK				101
+#define IDC_EMAIL_LINK					102
+#define IDC_NEW_PAGE_LINK				103
+#define IDC_BUILD_INFO					110
+#define IDC_COPY_BUILD_INFO				111
 // Run
 #define IDD_RUN							101
 #define IDC_COMMANDLINE					100

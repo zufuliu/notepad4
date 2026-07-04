@@ -48,18 +48,13 @@
 // About
 #define IDD_ABOUT						100
 #define IDC_VERSION						100
-#define IDC_WEBPAGE_TEXT				103
-#define IDC_WEBPAGE_LINK				104
-#define IDC_EMAIL_TEXT					105
-#define IDC_EMAIL_LINK					106
-#define IDC_MOD_PAGE_TEXT				107
-#define IDC_MOD_PAGE_LINK				108
-#define IDC_NEW_PAGE_TEXT				109
-#define IDC_NEW_PAGE_LINK				110
-#define IDC_SCI_PAGE_TEXT				111
-#define IDC_SCI_PAGE_LINK				112
-#define IDC_BUILD_INFO					113
-#define IDC_COPY_BUILD_INFO				114
+#define IDC_WEBPAGE_LINK				101
+#define IDC_EMAIL_LINK					102
+#define IDC_MOD_PAGE_LINK				103
+#define IDC_NEW_PAGE_LINK				104
+#define IDC_SCI_PAGE_LINK				105
+#define IDC_BUILD_INFO					110
+#define IDC_COPY_BUILD_INFO				111
 // Find/Replace Text
 #define IDD_FIND						118
 #define IDD_REPLACE						119

@@ -293,45 +293,16 @@ INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 		SendDlgItemMessage(hwnd, IDC_VERSION, WM_SETFONT, AsInteger<WPARAM>(hFontTitle), TRUE);
 		SetWindowLongPtr(hwnd, DWLP_USER, AsInteger<LONG_PTR>(hFontTitle));
 
-		if (GetDlgItem(hwnd, IDC_WEBPAGE_LINK) == nullptr) {
-			SetDlgItemText(hwnd, IDC_WEBPAGE_TEXT, VERSION_WEBPAGE_DISPLAY);
-			ShowWindow(GetDlgItem(hwnd, IDC_WEBPAGE_TEXT), SW_SHOWNORMAL);
-		} else {
-			wsprintf(wch, L"<A>%s</A>", VERSION_WEBPAGE_DISPLAY);
-			SetDlgItemText(hwnd, IDC_WEBPAGE_LINK, wch);
-		}
-
-		if (GetDlgItem(hwnd, IDC_EMAIL_LINK) == nullptr) {
-			SetDlgItemText(hwnd, IDC_EMAIL_TEXT, VERSION_EMAIL_DISPLAY);
-			ShowWindow(GetDlgItem(hwnd, IDC_EMAIL_TEXT), SW_SHOWNORMAL);
-		} else {
-			wsprintf(wch, L"<A>%s</A>", VERSION_EMAIL_DISPLAY);
-			SetDlgItemText(hwnd, IDC_EMAIL_LINK, wch);
-		}
-
-		if (GetDlgItem(hwnd, IDC_MOD_PAGE_LINK) == nullptr) {
-			SetDlgItemText(hwnd, IDC_MOD_PAGE_LINK, VERSION_MODPAGE_DISPLAY);
-			ShowWindow(GetDlgItem(hwnd, IDC_MOD_PAGE_TEXT), SW_SHOWNORMAL);
-		} else {
-			wsprintf(wch, L"<A>%s</A>", VERSION_MODPAGE_DISPLAY);
-			SetDlgItemText(hwnd, IDC_MOD_PAGE_LINK, wch);
-		}
-
-		if (GetDlgItem(hwnd, IDC_NEW_PAGE_LINK) == nullptr) {
-			SetDlgItemText(hwnd, IDC_NEW_PAGE_TEXT, VERSION_NEWPAGE_DISPLAY);
-			ShowWindow(GetDlgItem(hwnd, IDC_NEW_PAGE_TEXT), SW_SHOWNORMAL);
-		} else {
-			wsprintf(wch, L"<A>%s</A>", VERSION_NEWPAGE_DISPLAY);
-			SetDlgItemText(hwnd, IDC_NEW_PAGE_LINK, wch);
-		}
-
-		if (GetDlgItem(hwnd, IDC_SCI_PAGE_LINK) == nullptr) {
-			SetDlgItemText(hwnd, IDC_SCI_PAGE_TEXT, VERSION_SCIPAGE_DISPLAY);
-			ShowWindow(GetDlgItem(hwnd, IDC_SCI_PAGE_TEXT), SW_SHOWNORMAL);
-		} else {
-			wsprintf(wch, L"<A>%s</A>", VERSION_SCIPAGE_DISPLAY);
-			SetDlgItemText(hwnd, IDC_SCI_PAGE_LINK, wch);
-		}
+		wsprintf(wch, L"<A>%s</A>", VERSION_WEBPAGE_DISPLAY);
+		SetDlgItemText(hwnd, IDC_WEBPAGE_LINK, wch);
+		wsprintf(wch, L"<A>%s</A>", VERSION_EMAIL_DISPLAY);
+		SetDlgItemText(hwnd, IDC_EMAIL_LINK, wch);
+		wsprintf(wch, L"<A>%s</A>", VERSION_MODPAGE_DISPLAY);
+		SetDlgItemText(hwnd, IDC_MOD_PAGE_LINK, wch);
+		wsprintf(wch, L"<A>%s</A>", VERSION_NEWPAGE_DISPLAY);
+		SetDlgItemText(hwnd, IDC_NEW_PAGE_LINK, wch);
+		wsprintf(wch, L"<A>%s</A>", VERSION_SCIPAGE_DISPLAY);
+		SetDlgItemText(hwnd, IDC_SCI_PAGE_LINK, wch);
 
 		CenterDlgInParent(hwnd);
 	}
