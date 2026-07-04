@@ -4891,25 +4891,16 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			CheckDlgButton(hwnd, IDC_NOWRAP, BST_CHECKED);
 		}
 
+		const int bSwitched = bSwitchedFindReplace;
+		bSwitchedFindReplace = 0;
 		int bCloseDlg;
 		if (hwndRepl) {
-			bCloseDlg = bSwitchedFindReplace ? FindReplaceOption_CloseFind : FindReplaceOption_CloseReplace;
+			bCloseDlg = bSwitched ? FindReplaceOption_CloseFind : FindReplaceOption_CloseReplace;
 		} else {
-			bCloseDlg = bSwitchedFindReplace ? FindReplaceOption_CloseReplace : FindReplaceOption_CloseFind;
+			bCloseDlg = bSwitched ? FindReplaceOption_CloseReplace : FindReplaceOption_CloseFind;
 		}
 		if (mask & bCloseDlg) {
 			CheckDlgButton(hwnd, IDC_FINDCLOSE, BST_CHECKED);
-		}
-
-		if (!bSwitchedFindReplace) {
-			if (positionRecord.xFindReplaceDlg == 0 || positionRecord.yFindReplaceDlg == 0) {
-				CenterDlgInParent(hwnd);
-			} else {
-				SetDlgPos(hwnd, positionRecord.xFindReplaceDlg, positionRecord.yFindReplaceDlg);
-			}
-		} else {
-			bSwitchedFindReplace = 0;
-			SetDlgPos(hwnd, xFindReplaceDlgSave, yFindReplaceDlgSave);
 		}
 
 		mask = iFindReplaceOption;
@@ -4925,6 +4916,16 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		if (mask & FindReplaceOption_UseMonospacedFont) {
 			CheckDlgButton(hwnd, IDC_USEMONOSPACEDFONT, BST_CHECKED);
 			FindReplaceSetFont(hwnd, TRUE, &hFontFindReplaceEdit);
+		}
+
+		if (!bSwitched) {
+			if (positionRecord.xFindReplaceDlg == 0 || positionRecord.yFindReplaceDlg == 0) {
+				CenterDlgInParent(hwnd);
+			} else {
+				SetDlgPos(hwnd, positionRecord.xFindReplaceDlg, positionRecord.yFindReplaceDlg);
+			}
+		} else {
+			SetDlgPos(hwnd, xFindReplaceDlgSave, yFindReplaceDlgSave);
 		}
 	}
 	return TRUE;
