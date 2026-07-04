@@ -639,11 +639,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 	while (true) {
 		if (editMarkAll.pending) {
-			WaitableTimer_Set(timer, WaitableTimer_IdleTaskDelayTime);
-			while (editMarkAll.pending && WaitableTimer_Continue(timer)) {
-				if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
-					DispatchMessageMain(&msg);
-				}
+			while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
+				DispatchMessageMain(&msg);
 			}
 			if (editMarkAll.pending) {
 				editMarkAll.Continue(timer);
