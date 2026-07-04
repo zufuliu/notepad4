@@ -6190,23 +6190,12 @@ static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		MAKELONG(IDC_MODIFY_LINE_PREFIX, IDC_MODIFY_LINE_APPEND),
 	};
 
-	static DWORD id_hover;
-	static DWORD id_capture;
+	static int idEditBox;
 	static bool skipEmptyLine;
-	static HFONT hFontHover;
 
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		ResizeDlg_InitY2(hwnd, &positionRecord.cxModifyLinesDlg, &positionRecord.cyModifyLinesDlg, controlDefinition, COUNTOF(controlDefinition) - 1, 50);
-
-		id_hover = 0;
-		id_capture = 0;
-
-		HFONT hFontNormal = GetWindowFont(hwnd);
-		LOGFONT lf;
-		GetObject(hFontNormal, sizeof(LOGFONT), &lf);
-		lf.lfUnderline = TRUE;
-		hFontHover = CreateFontIndirect(&lf);
 
 		MultilineEditSetup(hwnd, IDC_MODIFY_LINE_PREFIX);
 		SetDlgItemText(hwnd, IDC_MODIFY_LINE_PREFIX, wchPrefixLines);
@@ -6219,114 +6208,30 @@ static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 	}
 	return TRUE;
 
-	case WM_DESTROY:
-		DeleteObject(hFontHover);
-		return FALSE;
-
-	case WM_NCACTIVATE:
-		if (!wParam) {
-			if (id_hover != 0) {
-				//int _id_hover = id_hover;
-				id_hover = 0;
-				id_capture = 0;
-				//InvalidateRect(GetDlgItem(hwnd, id_hover), nullptr, FALSE);
-			}
-		}
-		return FALSE;
-
-	case WM_CTLCOLORSTATIC: {
-		const DWORD dwId = GetWindowLong(AsPointer<HWND>(lParam), GWL_ID);
-
-		if (dwId >= IDC_MODIFY_LINE_DLN_NP && dwId <= IDC_MODIFY_LINE_ZCN_ZP) {
-			HDC hdc = AsPointer<HDC>(wParam);
-			SetBkMode(hdc, TRANSPARENT);
-			if (GetSysColorBrush(COLOR_HOTLIGHT)) {
-				SetTextColor(hdc, GetSysColor(COLOR_HOTLIGHT));
-			} else {
-				SetTextColor(hdc, RGB(0, 0, 255));
-			}
-			SelectFont(hdc, /*dwId == id_hover?*/hFontHover/*:hFontNormal*/);
-			return AsInteger<LONG_PTR>(GetSysColorBrush(COLOR_BTNFACE));
+	case WM_NOTIFY: {
+		LPNMHDR pnmhdr = AsPointer<LPNMHDR>(lParam);
+		if (pnmhdr->code == NM_CLICK && pnmhdr->idFrom >= IDC_MODIFY_LINE_DLN_NP && pnmhdr->idFrom <= IDC_MODIFY_LINE_ZCN_ZP && idEditBox != 0) {
+			WCHAR wch[16]{};
+			HWND hwndCtl = GetDlgItem(hwnd, idEditBox);
+			GetDlgItemText(hwnd, static_cast<int>(pnmhdr->idFrom), wch, COUNTOF(wch));
+			const unsigned end = (wch[7] == L'<') ? 7 : 8;
+			wch[end] = L'\0';
+			SendMessage(hwndCtl, EM_SETSEL, 0, -1);
+			SendMessage(hwndCtl, EM_REPLACESEL, TRUE, AsInteger<LPARAM>(&wch[3]));
+			PostMessage(hwnd, WM_NEXTDLGCTL, AsInteger<WPARAM>(hwndCtl), TRUE);
 		}
 	}
-	break;
-
-	case WM_MOUSEMOVE: {
-		const POINT pt = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
-		HWND hwndHover = ChildWindowFromPoint(hwnd, pt);
-		const DWORD dwId = GetWindowLong(hwndHover, GWL_ID);
-
-		if (GetActiveWindow() == hwnd) {
-			if (dwId >= IDC_MODIFY_LINE_DLN_NP && dwId <= IDC_MODIFY_LINE_ZCN_ZP) {
-				if (id_capture == dwId || id_capture == 0) {
-					if (id_hover != id_capture || id_hover == 0) {
-						id_hover = dwId;
-						//InvalidateRect(GetDlgItem(hwnd, dwId), nullptr, FALSE);
-					}
-				} else if (id_hover != 0) {
-					//int _id_hover = id_hover;
-					id_hover = 0;
-					//InvalidateRect(GetDlgItem(hwnd, _id_hover), nullptr, FALSE);
-				}
-			} else if (id_hover != 0) {
-				//int _id_hover = id_hover;
-				id_hover = 0;
-				//InvalidateRect(GetDlgItem(hwnd, _id_hover), nullptr, FALSE);
-			}
-			SetCursor(LoadCursor(nullptr, (id_hover ? IDC_HAND : IDC_ARROW)));
-		}
-	}
-	break;
-
-	case WM_LBUTTONDOWN: {
-		const POINT pt = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
-		HWND hwndHover = ChildWindowFromPoint(hwnd, pt);
-		const DWORD dwId = GetWindowLong(hwndHover, GWL_ID);
-
-		if (dwId >= IDC_MODIFY_LINE_DLN_NP && dwId <= IDC_MODIFY_LINE_ZCN_ZP) {
-			GetCapture();
-			id_hover = dwId;
-			id_capture = dwId;
-			//InvalidateRect(GetDlgItem(hwnd, dwId), nullptr, FALSE);
-		}
-		SetCursor(LoadCursor(nullptr, (id_hover ? IDC_HAND : IDC_ARROW)));
-	}
-	break;
-
-	case WM_LBUTTONUP: {
-		//const POINT pt = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
-		//HWND hwndHover = ChildWindowFromPoint(hwnd, pt);
-		//const DWORD dwId = GetWindowLong(hwndHover, GWL_ID);
-
-		if (id_capture != 0) {
-			ReleaseCapture();
-			if (id_hover == id_capture) {
-				const DWORD id_focus = GetWindowLong(GetFocus(), GWL_ID);
-				if (id_focus == IDC_MODIFY_LINE_PREFIX || id_focus == IDC_MODIFY_LINE_APPEND) {
-					WCHAR wch[8];
-					GetDlgItemText(hwnd, id_capture, wch, COUNTOF(wch));
-					SendDlgItemMessage(hwnd, id_focus, EM_SETSEL, 0, -1);
-					SendDlgItemMessage(hwnd, id_focus, EM_REPLACESEL, TRUE, AsInteger<LPARAM>(wch));
-					PostMessage(hwnd, WM_NEXTDLGCTL, AsInteger<WPARAM>(GetFocus()), TRUE);
-				}
-			}
-			id_capture = 0;
-		}
-		SetCursor(LoadCursor(nullptr, (id_hover ? IDC_HAND : IDC_ARROW)));
-	}
-	break;
-
-	case WM_CANCELMODE:
-		if (id_capture != 0) {
-			ReleaseCapture();
-			id_hover = 0;
-			id_capture = 0;
-			SetCursor(LoadCursor(nullptr, IDC_ARROW));
-		}
-		break;
+	return TRUE;
 
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
+		case IDC_MODIFY_LINE_PREFIX:
+		case IDC_MODIFY_LINE_APPEND:
+			if (HIWORD(wParam) == EN_SETFOCUS) {
+				idEditBox = LOWORD(wParam);
+			}
+			break;
+
 		case IDOK: {
 			NP2HeapFree(wchPrefixLines);
 			NP2HeapFree(wchAppendLines);

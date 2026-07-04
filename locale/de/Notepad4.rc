@@ -1495,15 +1495,15 @@ BEGIN
     AUTOCHECKBOX    "&Leerzeilen überspringen",IDC_MODIFY_LINE_SKIP_EMPTY,7,108,96,14,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,147,108,50,14
     PUSHBUTTON      "Abbrechen",IDCANCEL,203,108,50,14
-    LTEXT           "$(L)",IDC_MODIFY_LINE_DLN_NP,7,76,21,8
-    LTEXT           "$(0L)",IDC_MODIFY_LINE_DLN_ZP,27,76,27,8
-    LTEXT           "Dokumentenzeilennummer",IDC_MODIFY_LINE_TIP_DLN,51,76,118,8
-    LTEXT           "$(N)",IDC_MODIFY_LINE_CN_NP,7,86,22,8
-    LTEXT           "$(0N)",IDC_MODIFY_LINE_CN_ZP,27,86,25,8
-    LTEXT           "Fortlaufende Zahl (1-basiert)",IDC_MODIFY_LINE_TIP_CN,51,86,107,8
-    LTEXT           "$(I)",IDC_MODIFY_LINE_ZCN_NP,7,96,21,8
-    LTEXT           "$(0I)",IDC_MODIFY_LINE_ZCN_ZP,27,96,25,8
-    LTEXT           "Fortlaufende Zahl (0-basiert)",IDC_MODIFY_LINE_TIP_ZCN,51,96,125,8
+    CONTROL         "<a>$(L)</a>",IDC_MODIFY_LINE_DLN_NP,"SysLink",LWS_IGNORERETURN,7,76,21,8
+    CONTROL         "<a>$(0L)</a>",IDC_MODIFY_LINE_DLN_ZP,"SysLink",LWS_IGNORERETURN,29,76,21,8
+    LTEXT           "Dokumentenzeilennummer",IDC_MODIFY_LINE_TIP_DLN,52,76,150,8
+    CONTROL         "<a>$(N)</a>",IDC_MODIFY_LINE_CN_NP,"SysLink",LWS_IGNORERETURN,7,86,21,8
+    CONTROL         "<a>$(0N)</a>",IDC_MODIFY_LINE_CN_ZP,"SysLink",LWS_IGNORERETURN,29,86,21,8
+    LTEXT           "Fortlaufende Zahl (1-basiert)",IDC_MODIFY_LINE_TIP_CN,52,86,150,8
+    CONTROL         "<a>$(I)</a>",IDC_MODIFY_LINE_ZCN_NP,"SysLink",LWS_IGNORERETURN,7,96,21,8
+    CONTROL         "<a>$(0I)</a>",IDC_MODIFY_LINE_ZCN_ZP,"SysLink",LWS_IGNORERETURN,29,96,21,8
+    LTEXT           "Fortlaufende Zahl (0-basiert)",IDC_MODIFY_LINE_TIP_ZCN,52,96,150,8
     SCROLLBAR       IDC_RESIZEGRIP2,7,108,10,10,SBS_SIZEGRIP | WS_CLIPSIBLINGS
 END
 
