@@ -3608,31 +3608,34 @@ void Style_SetDefaultFont(HWND hwnd, bool bCode) noexcept {
 	}
 }
 
+static COLORREF Style_ChooseColor(HWND hwnd, COLORREF color) noexcept {
+	CHOOSECOLOR cc;
+	memset(&cc, 0, sizeof(CHOOSECOLOR));
+	cc.lStructSize = sizeof(CHOOSECOLOR);
+	cc.hwndOwner = hwnd;
+	cc.rgbResult = color;
+	cc.lpCustColors = customColor;
+	cc.Flags = CC_FULLOPEN | CC_RGBINIT | CC_SOLIDCOLOR;
+	const BOOL result = ChooseColor(&cc);
+	return result ? cc.rgbResult : color;
+}
+
 //=============================================================================
 //
 // Style_SelectColor()
 //
 bool Style_SelectColor(HWND hwnd, LPWSTR lpszStyle, int cchStyle, bool bFore) noexcept {
-	CHOOSECOLOR cc;
-	memset(&cc, 0, sizeof(CHOOSECOLOR));
-
 	COLORREF iRGBResult;
 	if (!Style_StrGetColor(bFore, lpszStyle, &iRGBResult)) {
 		iRGBResult = bFore ? GetSysColor(COLOR_WINDOWTEXT) : GetSysColor(COLOR_WINDOW);
 	}
 
-	cc.lStructSize = sizeof(CHOOSECOLOR);
-	cc.hwndOwner = hwnd;
-	cc.rgbResult = iRGBResult;
-	cc.lpCustColors = customColor;
-	cc.Flags = CC_FULLOPEN | CC_RGBINIT | CC_SOLIDCOLOR;
-
-	if (!ChooseColor(&cc) || cc.rgbResult == iRGBResult) {
+	const COLORREF rgbResult = Style_ChooseColor(hwnd, iRGBResult);
+	if (rgbResult == iRGBResult) {
 		return false;
 	}
 
-	iRGBResult = cc.rgbResult;
-	iRGBResult = ColorToRGBHex(iRGBResult);
+	iRGBResult = ColorToRGBHex(rgbResult);
 
 	// Rebuild style string
 	WCHAR szNewStyle[MAX_LEXER_STYLE_EDIT_SIZE];
@@ -5413,17 +5416,11 @@ void EditClickCallTip(HWND hwnd) noexcept {
 
 		const unsigned back = callTipInfo.currentColor;
 		unsigned color = back & 0xffffffU;
-		CHOOSECOLOR cc;
-		memset(&cc, 0, sizeof(CHOOSECOLOR));
-		cc.lStructSize = sizeof(CHOOSECOLOR);
-		cc.hwndOwner = hwnd;
-		cc.rgbResult = color;
-		cc.lpCustColors = customColor;
-		cc.Flags = CC_FULLOPEN | CC_RGBINIT | CC_SOLIDCOLOR;
+		const COLORREF rgbResult = Style_ChooseColor(hwnd, color);
 
-		if (ChooseColor(&cc) && cc.rgbResult != color) {
+		if (rgbResult != color) {
 			const ShowCallTip colorFormat = callTipInfo.showCallTip;
-			color = cc.rgbResult | (back & 0xff000000U);
+			color = rgbResult | (back & 0xff000000U);
 			const int width = (color > 0xffffffU) ? 8 : 6;
 			if (width == 6) {
 				if (colorFormat == ShowCallTip_ColorRGBA || colorFormat == ShowCallTip_ColorARGB) {
