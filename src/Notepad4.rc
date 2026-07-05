@@ -1075,7 +1075,7 @@ FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,142,123,50,14
     PUSHBUTTON      "Copy",IDC_COPY_BUILD_INFO,198,123,50,14
-    ICON            IDR_MAINWND,IDC_STATIC,7,7,20,20
+    ICON            IDR_MAINWND,IDC_STATIC,14,7,20,20
     LTEXT           "",IDC_VERSION,45,7,200,8
     LTEXT           "",IDC_BUILD_INFO,45,18,200,16
     LTEXT           "Copyright © 2011-2026 Zufu Liu and all contributors.",IDC_STATIC,45,38,200,8
