@@ -663,7 +663,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 	return TRUE;
 
 	case WM_CONTEXTMENU: {
-		const int nID = GetDlgCtrlID(AsPointer<HWND>(wParam));
+		const int nID = GetWinCtrlID(AsPointer<HWND>(wParam));
 
 		if (!(nID == IDC_DIRLIST || nID == IDC_DRIVEBOX || nID == IDC_TOOLBAR || nID == IDC_STATUSBAR || nID == IDC_REBAR)) {
 			return DefWindowProc(hwnd, umsg, wParam, lParam);
@@ -1767,7 +1767,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		bShowDriveBox = !bShowDriveBox;
 		ShowWindow(hwndDriveBox, bShowDriveBox ? SW_SHOW : SW_HIDE);
 		if (!bShowDriveBox) {
-			if (GetDlgCtrlID(GetFocus()) == IDC_DRIVEBOX) {
+			if (GetWinCtrlID(GetFocus()) == IDC_DRIVEBOX) {
 				SetFocus(hwndDirList);
 			}
 		}
@@ -1842,7 +1842,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case ACC_NEXTCTL:
 	case ACC_PREVCTL: {
-		int nId = GetDlgCtrlID(GetFocus());
+		int nId = GetWinCtrlID(GetFocus());
 
 		if (LOWORD(wParam) == ACC_NEXTCTL) {
 			if (++nId > IDC_DIRLIST) {

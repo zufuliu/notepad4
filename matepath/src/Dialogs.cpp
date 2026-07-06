@@ -895,10 +895,10 @@ INT_PTR CALLBACK ItemsPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPara
 		return FALSE;
 
 	case WM_CTLCOLORSTATIC:
-		if (!m_bDefColorNoFilter && GetDlgCtrlID(AsPointer<HWND>(lParam)) == IDC_COLOR_SAMP1) {
+		if (!m_bDefColorNoFilter && GetWinCtrlID(AsPointer<HWND>(lParam)) == IDC_COLOR_SAMP1) {
 			return AsInteger<LRESULT>(m_hbrNoFilter);
 		}
-		if (!m_bDefColorFilter && GetDlgCtrlID(AsPointer<HWND>(lParam)) == IDC_COLOR_SAMP2) {
+		if (!m_bDefColorFilter && GetWinCtrlID(AsPointer<HWND>(lParam)) == IDC_COLOR_SAMP2) {
 			return AsInteger<LRESULT>(m_hbrFilter);
 		}
 		return FALSE;
@@ -2047,7 +2047,7 @@ static INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 
 	case WM_LBUTTONDOWN: {
 		const POINT pt = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
-		if (GetDlgCtrlID((ChildWindowFromPoint(hwnd, pt))) == IDC_CROSSCURSOR) {
+		if (GetWinCtrlID(ChildWindowFromPoint(hwnd, pt)) == IDC_CROSSCURSOR) {
 			SetCapture(hwnd);
 			bHasCapture = true;
 			SetCursor(hCursorCross);

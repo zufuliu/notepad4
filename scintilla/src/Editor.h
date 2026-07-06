@@ -484,7 +484,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	virtual void NotifyChange() const noexcept = 0;
 	virtual void NotifyFocus(bool focus) const noexcept;
 	virtual void SetCtrlID(int identifier) noexcept;
-	virtual int GetCtrlID() const noexcept {
+	int GetCtrlID() const noexcept {
 		return ctrlID;
 	}
 	virtual void NotifyParent(Scintilla::NotificationData &scn) const noexcept = 0;

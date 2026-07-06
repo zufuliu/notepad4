@@ -260,6 +260,11 @@ inline T DLLFunctionEx(LPCWSTR lpDllName, LPCSTR lpProcName) noexcept {
 	return DLLFunction<T>(::GetModuleHandleW(lpDllName), lpProcName);
 }
 
+inline int GetWinCtrlID(HWND hwnd) noexcept {
+	// same as GetWindowID(), GetDlgCtrlID()
+	return static_cast<int>(::GetWindowLongPtr(hwnd, GWLP_ID));
+}
+
 // High DPI Reference
 // https://docs.microsoft.com/en-us/windows/desktop/hidpi/high-dpi-reference
 #ifndef WM_DPICHANGED

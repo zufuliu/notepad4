@@ -2521,7 +2521,7 @@ INT_PTR CALLBACK InfoBoxDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 	return TRUE;
 
 	case WM_CTLCOLORSTATIC: {
-		const DWORD dwId = GetWindowLong(AsPointer<HWND>(lParam), GWL_ID);
+		const DWORD dwId = GetWinCtrlID(AsPointer<HWND>(lParam));
 
 		if (dwId >= IDC_INFOBOXRECT && dwId <= IDC_INFOBOXTEXT) {
 			HDC hdc = AsPointer<HDC>(wParam);

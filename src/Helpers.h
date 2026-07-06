@@ -417,6 +417,11 @@ inline T DLLFunctionEx(LPCWSTR lpDllName, LPCSTR lpProcName) noexcept {
 	return DLLFunction<T>(::GetModuleHandleW(lpDllName), lpProcName);
 }
 
+inline int GetWinCtrlID(HWND hwnd) noexcept {
+	// same as GetWindowID(), GetDlgCtrlID()
+	return static_cast<int>(::GetWindowLongPtr(hwnd, GWLP_ID));
+}
+
 #ifndef SEE_MASK_NOZONECHECKS
 #define SEE_MASK_NOZONECHECKS		0x00800000		// NTDDI_VERSION >= NTDDI_WINXPSP1
 #endif

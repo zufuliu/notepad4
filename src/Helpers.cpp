@@ -1398,7 +1398,7 @@ static LRESULT CALLBACK MultilineEditProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 	case WM_SETTEXT: {
 		const LRESULT result = DefSubclassProc(hwnd, umsg, wParam, lParam);
 		if (result) {
-			NotifyEditTextChanged(hwndParent, GetDlgCtrlID(hwnd));
+			NotifyEditTextChanged(hwndParent, GetWinCtrlID(hwnd));
 		}
 		return result;
 	}

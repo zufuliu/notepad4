@@ -149,10 +149,6 @@ using SetCoalescableTimerSig = UINT_PTR (WINAPI *)(HWND hwnd, UINT_PTR nIDEvent,
 
 constexpr const WCHAR *callClassName = L"CallTip";
 
-inline void SetWindowID(HWND hWnd, int identifier) noexcept {
-	::SetWindowLongPtr(hWnd, GWLP_ID, identifier);
-}
-
 constexpr POINT POINTFromLParam(sptr_t lParam) noexcept {
 	return { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
 };
@@ -765,7 +761,6 @@ class ScintillaWin final :
 	void NotifyChange() const noexcept override;
 	void NotifyFocus(bool focus) const noexcept override;
 	void SetCtrlID(int identifier) noexcept override;
-	int GetCtrlID() const noexcept override;
 	void NotifyParent(NotificationData &scn) const noexcept override;
 	void NotifyDoubleClick(Point pt, KeyMod modifiers) override;
 	std::unique_ptr<CaseFolder> CaseFolderForEncoding() const override;
@@ -2492,7 +2487,7 @@ sptr_t ScintillaWin::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		switch (msg) {
 
 		case WM_CREATE:
-			ctrlID = ::GetDlgCtrlID(MainHWND());
+			ctrlID = static_cast<int>(::GetWindowLongPtr(MainHWND(), GWLP_ID));
 			UpdateBaseElements();
 			GetMouseParameters();
 			::RegisterDragDrop(MainHWND(), &dt);
@@ -3020,11 +3015,9 @@ void ScintillaWin::NotifyFocus(bool focus) const noexcept {
 }
 
 void ScintillaWin::SetCtrlID(int identifier) noexcept {
-	::SetWindowID(MainHWND(), identifier);
-}
-
-int ScintillaWin::GetCtrlID() const noexcept {
-	return ::GetDlgCtrlID(MainHWND());
+	ctrlID = identifier;
+	::SetWindowLongPtr(MainHWND(), GWLP_ID, identifier);
+	// ctrlID = static_cast<int>(::GetWindowLongPtr(MainHWND(), GWLP_ID));
 }
 
 void ScintillaWin::NotifyParent(NotificationData &scn) const noexcept {

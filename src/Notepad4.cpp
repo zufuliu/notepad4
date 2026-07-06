@@ -1330,7 +1330,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 	return TRUE;
 
 	case WM_CONTEXTMENU: {
-		const int nID = GetDlgCtrlID(AsPointer<HWND>(wParam));
+		const int nID = GetWinCtrlID(AsPointer<HWND>(wParam));
 
 		if (!(nID == IDC_EDIT || nID == IDC_STATUSBAR || nID == IDC_REBAR || nID == IDC_TOOLBAR)) {
 			return DefWindowProc(hwnd, umsg, wParam, lParam);
