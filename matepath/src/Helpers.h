@@ -716,6 +716,24 @@ DLGTEMPLATE *LoadThemedDialogTemplate(LPCWSTR lpDialogTemplateID, HINSTANCE hIns
 	ThemedDialogBoxParam(hInstance, lpTemplate, hWndParent, lpDialogFunc, 0)
 INT_PTR ThemedDialogBoxParam(HINSTANCE hInstance, LPCWSTR lpTemplate, HWND hWndParent, DLGPROC lpDialogFunc, LPARAM dwInitParam) noexcept;
 
+enum FileDialogType {
+	FileDialogType_FileOpen = 1,
+	FileDialogType_FileSave = 2,
+};
+
+#define FileDialog_BrowseFolder		(FOS_NOCHANGEDIR | FOS_FORCEFILESYSTEM | FOS_PATHMUSTEXIST | FOS_DONTADDTORECENT | FOS_PICKFOLDERS)
+
+struct FileDialog {
+	COMDLG_FILTERSPEC *filterSpec;
+	UINT filterCount;
+	UINT filterIndex;
+	FileDialogType dialogType;
+	DWORD dialogOptions; // FILEOPENDIALOGOPTIONS
+	LPCWSTR pszDefaultExtension;
+
+	LPWSTR Show(HWND hwndOwner, LPCWSTR lpstrInitialDir, LPCWSTR lpstrFile, UINT idsTitle = 0);
+};
+
 //==== File Dialog Hook =========================================================
 UINT_PTR CALLBACK OpenSaveFileDlgHookProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) noexcept;
 

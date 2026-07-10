@@ -78,49 +78,19 @@ int MsgBox(UINT uType, UINT uIdMsg, ...) noexcept {
 
 //=============================================================================
 //
-// BFFCallBack()
-//
-static int CALLBACK BFFCallBack(HWND hwnd, UINT umsg, LPARAM lParam, LPARAM lpData) noexcept {
-	UNREFERENCED_PARAMETER(lParam);
-	UNREFERENCED_PARAMETER(lpData);
-
-	if (umsg == BFFM_INITIALIZED) {
-		SendMessage(hwnd, BFFM_SETSELECTION, TRUE, lpData);
-	}
-
-	return 0;
-}
-
-//=============================================================================
-//
 // GetDirectory()
 //
-bool GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase) noexcept {
-	WCHAR szTitle[256];
-	StrCpyEx(szTitle, L"");
-	GetString(iTitle, szTitle, COUNTOF(szTitle));
-
+bool GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase) {
 	WCHAR szBase[MAX_PATH];
 	if (StrIsEmpty(pszBase)) {
+		pszBase = szBase;
 		GetCurrentDirectory(MAX_PATH, szBase);
-	} else {
-		lstrcpy(szBase, pszBase);
 	}
 
-	BROWSEINFO bi;
-	bi.hwndOwner = hwndParent;
-	bi.pidlRoot = nullptr;
-	bi.pszDisplayName = pszFolder;
-	bi.lpszTitle = szTitle;
-	bi.ulFlags = BIF_RETURNONLYFSDIRS | BIF_NEWDIALOGSTYLE;
-	bi.lpfn = BFFCallBack;
-	bi.lParam = AsInteger<LPARAM>(szBase);
-	bi.iImage = 0;
-
-	PIDLIST_ABSOLUTE pidl = SHBrowseForFolder(&bi);
-	if (pidl) {
-		SHGetPathFromIDList(pidl, pszFolder);
-		CoTaskMemFree(pidl);
+	FileDialog dialog {nullptr, 0, 0, FileDialogType_FileOpen, FileDialog_BrowseFolder, nullptr, };
+	if (LPWSTR pszPath = dialog.Show(hwndParent, pszBase, nullptr, iTitle)) {
+		lstrcpy(pszFolder, pszPath);
+		CoTaskMemFree(pszPath);
 		return true;
 	}
 
@@ -1017,7 +987,7 @@ void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName)
 //  ProgPageProc
 //
 //
-INT_PTR CALLBACK ProgPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
+INT_PTR CALLBACK ProgPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		MakeBitmapButton(hwnd, IDC_BROWSE_Q, g_exeInstance, IDB_OPEN_FOLDER16);
@@ -1566,7 +1536,7 @@ bool RenameFileDlg(HWND hwnd) {
 //  CopyMoveDlgProc()
 //
 //
-INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
+INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	static const DWORD controlDefinition[] = {
 		DeferCtlMoveX(IDC_RESIZEGRIP5),
 		DeferCtlMoveX(IDOK),

@@ -2148,6 +2148,60 @@ INT_PTR ThemedDialogBoxParam(HINSTANCE hInstance, LPCWSTR lpTemplate, HWND hWndP
 	return ret;
 }
 
+LPWSTR FileDialog::Show(HWND hwndOwner, LPCWSTR lpstrInitialDir, LPCWSTR lpstrFile, UINT idsTitle) {
+	IFileDialog *dialog = nullptr;
+	LPWSTR pszPath = nullptr;
+
+	const bool save = (dialogType & FileDialogType_FileSave) != 0;
+	if (SUCCEEDED(CoCreateInstance((save ? CLSID_FileSaveDialog : CLSID_FileOpenDialog), nullptr, CLSCTX_INPROC_SERVER, (save ? IID_IFileSaveDialog : IID_IFileOpenDialog), AsPPVArgs(&dialog)))) {
+		FILEOPENDIALOGOPTIONS options = 0;
+		dialog->GetOptions(&options);
+		dialog->SetOptions(options | dialogOptions);
+		WCHAR tchTemp[MAX_PATH];
+		if ((dialogOptions & FOS_PICKFOLDERS) == 0) {
+			dialog->SetFileTypes(filterCount, filterSpec);
+		}
+		if (idsTitle != 0) {
+			GetString(idsTitle, tchTemp, COUNTOF(tchTemp));
+			dialog->SetTitle(tchTemp);
+		}
+		if (StrNotEmpty(lpstrFile)) {
+			LPCWSTR pszName = PathFindFileName(lpstrFile);
+			if (pszName != lpstrFile) {
+				const size_t len = pszName - lpstrFile;
+				memcpy(tchTemp, lpstrFile, len*sizeof(WCHAR));
+				tchTemp[len] = '\0';
+				lpstrInitialDir = tchTemp;
+			}
+			dialog->SetFileName(pszName);
+		}
+		if (StrNotEmpty(lpstrInitialDir)) {
+			IShellItem *folder = nullptr;
+			if (SUCCEEDED(SHCreateItemFromParsingName(lpstrInitialDir, nullptr, IID_IShellItem, AsPPVArgs(&folder)))) {
+				dialog->SetFolder(folder);
+				folder->Release();
+			}
+		}
+		const HRESULT hr = dialog->Show(hwndOwner);
+		if (SUCCEEDED(hr)) {
+			IShellItem *folder = nullptr;
+			if (SUCCEEDED(dialog->GetResult(&folder))) {
+				if (SUCCEEDED(folder->GetDisplayName(SIGDN_FILESYSPATH, &pszPath))) {
+					if ((dialogOptions & FOS_PICKFOLDERS) == 0) {
+						dialog->GetFileTypeIndex(&filterIndex);
+					}
+				}
+				folder->Release();
+			}
+		}
+		dialog->Release();
+	}
+	if (filterSpec != nullptr) {
+		NP2HeapFree(filterSpec);
+	}
+	return pszPath;
+}
+
 //=============================================================================
 //
 // File Dialog Hook for GetOpenFileName/GetSaveFileName
