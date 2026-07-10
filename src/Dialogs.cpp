@@ -531,7 +531,18 @@ void RunDlg(HWND hwnd, LPCWSTR lpstrDefault) noexcept {
 extern WCHAR tchOpenWithDir[MAX_PATH];
 extern bool flagNoFadeHidden;
 
-static INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+namespace {
+
+struct OpenWithDlgParam {
+	LPWSTR lpDirectory;
+	int *cxFrame;
+	int *cyFrame;
+	UINT idsTitle;
+	DirListItem dli;
+};
+
+INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+	static_assert(IDC_OPENWITHDIR == IDC_FAVORITESDIR && IDC_GETOPENWITHDIR == IDC_GETFAVORITESDIR && IDC_OPENWITHDESCR == IDC_FAVORITESDESCR);
 	static const DWORD controlDefinition[] = {
 		DeferCtlMove(IDC_RESIZEGRIP3),
 		DeferCtlMove(IDOK),
@@ -544,7 +555,8 @@ static INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
-		ResizeDlg_Init(hwnd, &positionRecord.cxOpenWithDlg, &positionRecord.cyOpenWithDlg, controlDefinition, COUNTOF(controlDefinition));
+		const auto *param = AsPointer<OpenWithDlgParam *>(lParam);
+		ResizeDlg_Init(hwnd, param->cxFrame, param->cyFrame, controlDefinition, COUNTOF(controlDefinition));
 
 		HWND hwndLV = GetDlgItem(hwnd, IDC_OPENWITHDIR);
 		InitWindowCommon(hwndLV);
@@ -558,7 +570,7 @@ static INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 		};
 		ListView_InsertColumn(hwndLV, 0, &lvc);
 		DirList_Init(hwndLV);
-		DirList_Fill(hwndLV, tchOpenWithDir, DL_ALLOBJECTS, nullptr, false, flagNoFadeHidden, DS_NAME, false);
+		DirList_Fill(hwndLV, param->lpDirectory, DL_ALLOBJECTS, nullptr, false, flagNoFadeHidden, DS_NAME, false);
 		DirList_StartIconThread(hwndLV);
 		ListView_SetItemState(hwndLV, 0, LVIS_FOCUSED, LVIS_FOCUSED);
 
@@ -606,8 +618,9 @@ static INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 		switch (LOWORD(wParam)) {
 		case IDC_GETOPENWITHDIR: {
 			HWND hwndLV = GetDlgItem(hwnd, IDC_OPENWITHDIR);
-			if (GetDirectory(hwnd, IDS_OPENWITH, tchOpenWithDir, tchOpenWithDir)) {
-				DirList_Fill(hwndLV, tchOpenWithDir, DL_ALLOBJECTS, nullptr, false, flagNoFadeHidden, DS_NAME, false);
+			const auto *param = AsPointer<OpenWithDlgParam *>(GetWindowLongPtr(hwnd, DWLP_USER));
+			if (GetDirectory(hwnd, param->idsTitle, param->lpDirectory, param->lpDirectory)) {
+				DirList_Fill(hwndLV, param->lpDirectory, DL_ALLOBJECTS, nullptr, false, flagNoFadeHidden, DS_NAME, false);
 				DirList_StartIconThread(hwndLV);
 				ListView_EnsureVisible(hwndLV, 0, FALSE);
 				ListView_SetItemState(hwndLV, 0, LVIS_FOCUSED, LVIS_FOCUSED);
@@ -617,12 +630,12 @@ static INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 		break;
 
 		case IDOK: {
-			DirListItem *lpdli = AsPointer<DirListItem *>(GetWindowLongPtr(hwnd, DWLP_USER));
-			lpdli->mask = DLI_FILENAME | DLI_TYPE;
-			lpdli->ntype = DLE_NONE;
-			DirList_GetItem(GetDlgItem(hwnd, IDC_OPENWITHDIR), (-1), lpdli);
+			auto *param = AsPointer<OpenWithDlgParam *>(GetWindowLongPtr(hwnd, DWLP_USER));
+			param->dli.mask = DLI_FILENAME | DLI_TYPE;
+			param->dli.ntype = DLE_NONE;
+			DirList_GetItem(GetDlgItem(hwnd, IDC_OPENWITHDIR), (-1), &param->dli);
 
-			if (lpdli->ntype != DLE_NONE) {
+			if (param->dli.ntype != DLE_NONE) {
 				EndDialog(hwnd, IDOK);
 			} else {
 				MessageBeep(MB_OK);
@@ -641,15 +654,21 @@ static INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 	return FALSE;
 }
 
+}
+
 //=============================================================================
 //
 // OpenWithDlg()
 //
 bool OpenWithDlg(HWND hwnd, LPCWSTR lpstrFile) {
-	DirListItem dliOpenWith;
-	dliOpenWith.mask = DLI_FILENAME;
+	OpenWithDlgParam param;
+	param.lpDirectory = tchOpenWithDir;
+	param.cxFrame = &positionRecord.cxOpenWithDlg;
+	param.cyFrame = &positionRecord.cyOpenWithDlg;
+	param.idsTitle = IDS_OPENWITH;
+	param.dli.mask = DLI_FILENAME;
 
-	if (IDOK == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_OPENWITH), hwnd, OpenWithDlgProc, AsInteger<LPARAM>(&dliOpenWith))) {
+	if (IDOK == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_OPENWITH), hwnd, OpenWithDlgProc, AsInteger<LPARAM>(&param))) {
 		WCHAR szParam[MAX_PATH];
 		WCHAR wchDirectory[MAX_PATH] = L"";
 
@@ -664,7 +683,7 @@ bool OpenWithDlg(HWND hwnd, LPCWSTR lpstrFile) {
 		sei.fMask = 0;
 		sei.hwnd = hwnd;
 		sei.lpVerb = nullptr;
-		sei.lpFile = dliOpenWith.szFileName;
+		sei.lpFile = param.dli.szFileName;
 		sei.lpParameters = szParam;
 		sei.lpDirectory = wchDirectory;
 		sei.nShow = SW_SHOWNORMAL;
@@ -682,131 +701,21 @@ bool OpenWithDlg(HWND hwnd, LPCWSTR lpstrFile) {
 	return false;
 }
 
-//=============================================================================
-//
-// FavoritesDlgProc()
-//
 extern WCHAR tchFavoritesDir[MAX_PATH];
-
-static INT_PTR CALLBACK FavoritesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
-	static const DWORD controlDefinition[] = {
-		DeferCtlMove(IDC_RESIZEGRIP3),
-		DeferCtlMove(IDOK),
-		DeferCtlMove(IDCANCEL),
-		DeferCtlSize(IDC_FAVORITESDIR) | RESIZE_AUTOSIZE_USEHEADER,
-		DeferCtlMoveY(IDC_GETFAVORITESDIR),
-		DeferCtlMoveYSizeX(IDC_FAVORITESDESCR) | RESIZE_INVALIDATE_RECT,
-	};
-
-	switch (umsg) {
-	case WM_INITDIALOG: {
-		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
-		ResizeDlg_Init(hwnd, &positionRecord.cxFavoritesDlg, &positionRecord.cyFavoritesDlg, controlDefinition, COUNTOF(controlDefinition));
-
-		HWND hwndLV = GetDlgItem(hwnd, IDC_FAVORITESDIR);
-		InitWindowCommon(hwndLV);
-		//SetExplorerTheme(hwndLV);
-		ListView_SetExtendedListViewStyle(hwndLV, /*LVS_EX_FULLROWSELECT|*/LVS_EX_DOUBLEBUFFER | LVS_EX_LABELTIP);
-		const LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT, LVCFMT_LEFT, 0, nullptr, -1, 0, 0, 0
-#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-			, 0, 0, 0
-#endif
-		};
-		ListView_InsertColumn(hwndLV, 0, &lvc);
-		DirList_Init(hwndLV);
-		DirList_Fill(hwndLV, tchFavoritesDir, DL_ALLOBJECTS, nullptr, false, flagNoFadeHidden, DS_NAME, false);
-		DirList_StartIconThread(hwndLV);
-		ListView_SetItemState(hwndLV, 0, LVIS_FOCUSED, LVIS_FOCUSED);
-
-		MakeBitmapButton(hwnd, IDC_GETFAVORITESDIR, g_exeInstance, IDB_OPEN_FOLDER16);
-
-		CenterDlgInParent(hwnd);
-	}
-	return TRUE;
-
-	case WM_DESTROY:
-		DirList_Destroy(GetDlgItem(hwnd, IDC_FAVORITESDIR));
-		DeleteBitmapButton(hwnd, IDC_GETFAVORITESDIR);
-		return FALSE;
-
-	case WM_NOTIFY: {
-		LPNMHDR pnmh = AsPointer<LPNMHDR>(lParam);
-
-		if (pnmh->idFrom == IDC_FAVORITESDIR) {
-			switch (pnmh->code) {
-			case LVN_GETDISPINFO:
-				DirList_GetDispInfo(GetDlgItem(hwnd, IDC_OPENWITHDIR), lParam);
-				break;
-
-			case LVN_DELETEITEM:
-				DirList_DeleteItem(GetDlgItem(hwnd, IDC_FAVORITESDIR), lParam);
-				break;
-
-			case LVN_ITEMCHANGED: {
-				const NM_LISTVIEW *pnmlv = AsPointer<NM_LISTVIEW *>(lParam);
-				EnableWindow(GetDlgItem(hwnd, IDOK), (pnmlv->uNewState & LVIS_SELECTED));
-			}
-			break;
-
-			case NM_DBLCLK:
-				if (ListView_GetSelectedCount(GetDlgItem(hwnd, IDC_FAVORITESDIR))) {
-					SendWMCommand(hwnd, IDOK);
-				}
-				break;
-			}
-		}
-	}
-	return TRUE;
-
-	case WM_COMMAND:
-		switch (LOWORD(wParam)) {
-		case IDC_GETFAVORITESDIR: {
-			HWND hwndLV = GetDlgItem(hwnd, IDC_FAVORITESDIR);
-			if (GetDirectory(hwnd, IDS_FAVORITES, tchFavoritesDir, tchFavoritesDir)) {
-				DirList_Fill(hwndLV, tchFavoritesDir, DL_ALLOBJECTS, nullptr, false, flagNoFadeHidden, DS_NAME, false);
-				DirList_StartIconThread(hwndLV);
-				ListView_EnsureVisible(hwndLV, 0, FALSE);
-				ListView_SetItemState(hwndLV, 0, LVIS_FOCUSED, LVIS_FOCUSED);
-			}
-			PostMessage(hwnd, WM_NEXTDLGCTL, AsInteger<WPARAM>(hwndLV), TRUE);
-		}
-		break;
-
-		case IDOK: {
-			DirListItem *lpdli = AsPointer<DirListItem *>(GetWindowLongPtr(hwnd, DWLP_USER));
-			lpdli->mask = DLI_FILENAME | DLI_TYPE;
-			lpdli->ntype = DLE_NONE;
-			DirList_GetItem(GetDlgItem(hwnd, IDC_FAVORITESDIR), (-1), lpdli);
-
-			if (lpdli->ntype != DLE_NONE) {
-				EndDialog(hwnd, IDOK);
-			} else {
-				MessageBeep(MB_OK);
-			}
-		}
-		break;
-
-		case IDCANCEL:
-			EndDialog(hwnd, IDCANCEL);
-			break;
-		}
-
-		return TRUE;
-	}
-
-	return FALSE;
-}
-
 //=============================================================================
 //
 // FavoritesDlg()
 //
 bool FavoritesDlg(HWND hwnd, LPWSTR lpstrFile) noexcept {
-	DirListItem dliFavorite;
-	dliFavorite.mask = DLI_FILENAME;
+	OpenWithDlgParam param;
+	param.lpDirectory = tchFavoritesDir;
+	param.cxFrame = &positionRecord.cxFavoritesDlg;
+	param.cyFrame = &positionRecord.cyFavoritesDlg;
+	param.idsTitle = IDS_FAVORITES;
+	param.dli.mask = DLI_FILENAME;
 
-	if (IDOK == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_FAVORITES), hwnd, FavoritesDlgProc, AsInteger<LPARAM>(&dliFavorite))) {
-		lstrcpyn(lpstrFile, dliFavorite.szFileName, MAX_PATH);
+	if (IDOK == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_FAVORITES), hwnd, OpenWithDlgProc, AsInteger<LPARAM>(&param))) {
+		lstrcpyn(lpstrFile, param.dli.szFileName, MAX_PATH);
 		return true;
 	}
 
