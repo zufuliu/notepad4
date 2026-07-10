@@ -4800,6 +4800,15 @@ static bool CopySelectionAsFindText(HWND hwnd, EDITFINDREPLACE *lpefr, bool bFir
 //
 // EditFindReplaceDlgProc()
 //
+static void UpdateFindReplaceDlgItem(HWND hwnd, BOOL bEnable) noexcept {
+	EnableWindow(GetDlgItem(hwnd, IDOK), bEnable);
+	EnableWindow(GetDlgItem(hwnd, IDC_FINDPREV), bEnable);
+	EnableWindow(GetDlgItem(hwnd, IDC_FINDALL), bEnable);
+	EnableWindow(GetDlgItem(hwnd, IDC_REPLACE), bEnable);
+	EnableWindow(GetDlgItem(hwnd, IDC_REPLACEALL), bEnable);
+	EnableWindow(GetDlgItem(hwnd, IDC_REPLACEINSEL), bEnable);
+}
+
 static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	static const DWORD controlDefinition[] = {
 		DeferCtlMoveX(IDC_RESIZEGRIP2),
@@ -4964,14 +4973,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		case IDC_REPLACETEXT: {
 			HWND hwndFind = GetDlgItem(hwnd, IDC_FINDTEXT);
 			const BOOL bEnable = ComboBox_HasText(hwndFind);
-
-			EnableWindow(GetDlgItem(hwnd, IDOK), bEnable);
-			EnableWindow(GetDlgItem(hwnd, IDC_FINDPREV), bEnable);
-			EnableWindow(GetDlgItem(hwnd, IDC_FINDALL), bEnable);
-			EnableWindow(GetDlgItem(hwnd, IDC_REPLACE), bEnable);
-			EnableWindow(GetDlgItem(hwnd, IDC_REPLACEALL), bEnable);
-			EnableWindow(GetDlgItem(hwnd, IDC_REPLACEINSEL), bEnable);
-
+			UpdateFindReplaceDlgItem(hwnd, bEnable);
 			if (HIWORD(wParam) == CBN_CLOSEUP) {
 				HWND hwndCtl = GetDlgItem(hwnd, LOWORD(wParam));
 				const DWORD lSelEnd = ComboBox_GetEditSelEnd(hwndCtl);
@@ -5035,12 +5037,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			const UINT cpEdit = SciCall_GetCodePage();
 
 			if (!GetDlgItemTextA2W(cpEdit, hwnd, IDC_FINDTEXT, lpefr->szFind, COUNTOF(lpefr->szFind))) {
-				EnableWindow(GetDlgItem(hwnd, IDOK), FALSE);
-				EnableWindow(GetDlgItem(hwnd, IDC_FINDPREV), FALSE);
-				EnableWindow(GetDlgItem(hwnd, IDC_FINDALL), FALSE);
-				EnableWindow(GetDlgItem(hwnd, IDC_REPLACE), FALSE);
-				EnableWindow(GetDlgItem(hwnd, IDC_REPLACEALL), FALSE);
-				EnableWindow(GetDlgItem(hwnd, IDC_REPLACEINSEL), FALSE);
+				UpdateFindReplaceDlgItem(hwnd, FALSE);
 				return TRUE;
 			}
 
@@ -6664,6 +6661,15 @@ void EditShowUnicodeControlCharacter(bool bShow) noexcept {
 // EditSortDlgProc()
 //
 //
+static void UpdateSortDlgItem(HWND hwnd, BOOL bEnable) noexcept {
+	EnableWindow(GetDlgItem(hwnd, IDC_SORT_MERGE_DUP), bEnable && !IsButtonChecked(hwnd, IDC_SORT_REMOVE_UNIQUE));
+	EnableWindow(GetDlgItem(hwnd, IDC_SORT_REMOVE_DUP), bEnable);
+	EnableWindow(GetDlgItem(hwnd, IDC_SORT_REMOVE_UNIQUE), bEnable);
+	EnableWindow(GetDlgItem(hwnd, IDC_SORT_IGNORE_CASE), bEnable);
+	EnableWindow(GetDlgItem(hwnd, IDC_SORT_LOGICAL_NUMBER), bEnable);
+	EnableWindow(GetDlgItem(hwnd, IDC_SORT_GROUPBY_FILE_TYPE), bEnable);
+}
+
 static INT_PTR CALLBACK EditSortDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	switch (umsg) {
 	case WM_INITDIALOG: {
@@ -6673,12 +6679,7 @@ static INT_PTR CALLBACK EditSortDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 
 		if (iSortFlags & EditSortFlag_Shuffle) {
 			CheckRadioButton(hwnd, IDC_SORT_NONE, IDC_SORT_SHUFFLE, IDC_SORT_SHUFFLE);
-			EnableWindow(GetDlgItem(hwnd, IDC_SORT_MERGE_DUP), FALSE);
-			EnableWindow(GetDlgItem(hwnd, IDC_SORT_REMOVE_DUP), FALSE);
-			EnableWindow(GetDlgItem(hwnd, IDC_SORT_REMOVE_UNIQUE), FALSE);
-			EnableWindow(GetDlgItem(hwnd, IDC_SORT_IGNORE_CASE), FALSE);
-			EnableWindow(GetDlgItem(hwnd, IDC_SORT_LOGICAL_NUMBER), FALSE);
-			EnableWindow(GetDlgItem(hwnd, IDC_SORT_GROUPBY_FILE_TYPE), FALSE);
+			UpdateSortDlgItem(hwnd, FALSE);
 		} else {
 			const int button = (iSortFlags & EditSortFlag_DontSort) ? IDC_SORT_NONE : (IDC_SORT_ASC + (iSortFlags & EditSortFlag_Descending));
 			CheckRadioButton(hwnd, IDC_SORT_NONE, IDC_SORT_SHUFFLE, button);
@@ -6766,21 +6767,8 @@ static INT_PTR CALLBACK EditSortDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 		case IDC_SORT_NONE:
 		case IDC_SORT_ASC:
 		case IDC_SORT_DESC:
-			EnableWindow(GetDlgItem(hwnd, IDC_SORT_MERGE_DUP), !IsButtonChecked(hwnd, IDC_SORT_REMOVE_UNIQUE));
-			EnableWindow(GetDlgItem(hwnd, IDC_SORT_REMOVE_DUP), TRUE);
-			EnableWindow(GetDlgItem(hwnd, IDC_SORT_REMOVE_UNIQUE), TRUE);
-			EnableWindow(GetDlgItem(hwnd, IDC_SORT_IGNORE_CASE), TRUE);
-			EnableWindow(GetDlgItem(hwnd, IDC_SORT_LOGICAL_NUMBER), TRUE);
-			EnableWindow(GetDlgItem(hwnd, IDC_SORT_GROUPBY_FILE_TYPE), TRUE);
-			break;
-
 		case IDC_SORT_SHUFFLE:
-			EnableWindow(GetDlgItem(hwnd, IDC_SORT_MERGE_DUP), FALSE);
-			EnableWindow(GetDlgItem(hwnd, IDC_SORT_REMOVE_DUP), FALSE);
-			EnableWindow(GetDlgItem(hwnd, IDC_SORT_REMOVE_UNIQUE), FALSE);
-			EnableWindow(GetDlgItem(hwnd, IDC_SORT_IGNORE_CASE), FALSE);
-			EnableWindow(GetDlgItem(hwnd, IDC_SORT_LOGICAL_NUMBER), FALSE);
-			EnableWindow(GetDlgItem(hwnd, IDC_SORT_GROUPBY_FILE_TYPE), FALSE);
+			UpdateSortDlgItem(hwnd, LOWORD(wParam) != IDC_SORT_SHUFFLE);
 			break;
 
 		case IDC_SORT_REMOVE_DUP:
