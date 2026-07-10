@@ -589,13 +589,14 @@ INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 		LPNMHDR pnmh = AsPointer<LPNMHDR>(lParam);
 
 		if (pnmh->idFrom == IDC_OPENWITHDIR) {
+			HWND hwndLV = pnmh->hwndFrom;
 			switch (pnmh->code) {
 			case LVN_GETDISPINFO:
-				DirList_GetDispInfo(GetDlgItem(hwnd, IDC_OPENWITHDIR), lParam);
+				DirList_GetDispInfo(hwndLV, lParam);
 				break;
 
 			case LVN_DELETEITEM:
-				DirList_DeleteItem(GetDlgItem(hwnd, IDC_OPENWITHDIR), lParam);
+				DirList_DeleteItem(hwndLV, lParam);
 				break;
 
 			case LVN_ITEMCHANGED: {
@@ -605,7 +606,7 @@ INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 			break;
 
 			case NM_DBLCLK:
-				if (ListView_GetSelectedCount(GetDlgItem(hwnd, IDC_OPENWITHDIR))) {
+				if (ListView_GetSelectedCount(hwndLV)) {
 					SendWMCommand(hwnd, IDOK);
 				}
 				break;

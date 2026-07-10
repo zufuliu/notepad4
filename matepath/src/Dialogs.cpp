@@ -1816,7 +1816,7 @@ INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 	case WM_NOTIFY: {
 		LPNMHDR pnmh = AsPointer<LPNMHDR>(lParam);
 		if (pnmh->idFrom == IDC_OPENWITHDIR) {
-			HWND hwndLV = GetDlgItem(hwnd, IDC_OPENWITHDIR);
+			HWND hwndLV = pnmh->hwndFrom;
 			switch (pnmh->code) {
 			case LVN_GETDISPINFO:
 				DirList_GetDispInfo(hwndLV, lParam);
