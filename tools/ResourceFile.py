@@ -69,6 +69,10 @@ def remove_version_link_text(doc):
 def adjust_about_main_icon(doc):
 	return doc.replace('IDR_MAINWND,IDC_STATIC,7,7,20,20', 'IDR_MAINWND,IDC_STATIC,14,7,20,20')
 
+@file_updater
+def remove_use_xp_file_dialog(doc):
+	return re.sub(r'.+_USE_XP_FILE_DIALOG.*[\n]', '', doc)
+
 def update_all_resource_file(func):
 	func('../src/Notepad4.rc')
 	func('../matepath/src/matepath.rc')
@@ -84,3 +88,4 @@ def update_all_resource_file(func):
 # update_all_resource_file(use_segoe_ui_font)
 # update_all_resource_file(remove_version_link_text)
 # update_all_resource_file(adjust_about_main_icon)
+# update_all_resource_file(remove_use_xp_file_dialog)

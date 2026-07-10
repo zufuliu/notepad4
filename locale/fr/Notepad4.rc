@@ -639,7 +639,6 @@ BEGIN
 				MENUITEM "Chinois simplifié",				IDM_LANG_CHINESE_SIMPLIFIED
 			END
 #endif
-			MENUITEM "Utiliser l'ancien style Windows &XP de dialogue d'ouverture/fermeture",	IDM_SET_USE_XP_FILE_DIALOG
 		END
 		POPUP "Options de la fenêtre Notepad4"
 		BEGIN

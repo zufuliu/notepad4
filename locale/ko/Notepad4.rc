@@ -639,7 +639,6 @@ BEGIN
 				MENUITEM "中文(简体)",									IDM_LANG_CHINESE_SIMPLIFIED
 			END
 #endif
-			MENUITEM "XP 스타일 열기/저장 대화상자 사용(&X)",				IDM_SET_USE_XP_FILE_DIALOG
 		END
 		POPUP "창 옵션(&P)"
 		BEGIN

@@ -177,7 +177,6 @@ bool	bResetFileWatching;
 static DWORD dwFileCheckInterval;
 static DWORD dwAutoReloadTimeout;
 unsigned int dwUrlThreshold;
-bool bUseXPFileDialog;
 static EscFunction iEscFunction;
 static bool bAlwaysOnTop;
 static bool bMinimizeToTray;
@@ -2578,7 +2577,6 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 #if _WIN32_WINNT < _WIN32_WINNT_WIN7
 	DisableCmd(hmenu, IDM_SET_RENDER_TECH_D3D, true);
 #endif
-	CheckCmd(hmenu, IDM_SET_USE_XP_FILE_DIALOG, bUseXPFileDialog);
 	i = IDM_SET_RENDER_TECH_GDI + iRenderingTechnology;
 	CheckMenuRadioItem(hmenu, IDM_SET_RENDER_TECH_GDI, IDM_SET_RENDER_TECH_D3D, i, MF_BYCOMMAND);
 	// RTL Layout
@@ -4160,11 +4158,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_VIEW_SINGLEFILEINSTANCE:
 		bSingleFileInstance = !bSingleFileInstance;
 		IniSetBoolEx(INI_SECTION_NAME_FLAGS, L"SingleFileInstance", bSingleFileInstance, true);
-		break;
-
-	case IDM_SET_USE_XP_FILE_DIALOG:
-		bUseXPFileDialog = !bUseXPFileDialog;
-		IniSetBoolEx(INI_SECTION_NAME_FLAGS, L"UseXPFileDialog", bUseXPFileDialog, false);
 		break;
 
 	case IDT_VIEW_ALWAYSONTOP:
@@ -6305,12 +6298,6 @@ void LoadFlags() noexcept {
 	dwAutoReloadTimeout = section.GetInt(L"AutoReloadTimeout", 1000);
 	dwUrlThreshold = section.GetInt(L"UrlThreshold", 256);
 
-	if (IsVistaAndAbove()) {
-		bUseXPFileDialog = section.GetBool(L"UseXPFileDialog", false);
-	} else {
-		bUseXPFileDialog = true;
-	}
-
 	flagNoFadeHidden = section.GetBool(L"NoFadeHidden", false);
 
 	int iValue = section.GetInt(L"OpacityLevel", 75);
@@ -7316,10 +7303,6 @@ BOOL OpenFileDlg(LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) noexcep
 	ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | /* OFN_NOCHANGEDIR |*/ OFN_NOTESTFILECREATE |
 				OFN_DONTADDTORECENT | OFN_PATHMUSTEXIST |
 				OFN_SHAREAWARE /*| OFN_NODEREFERENCELINKS*/;
-	if (bUseXPFileDialog) {
-		ofn.Flags |= OFN_EXPLORER | OFN_ENABLESIZING | OFN_ENABLEHOOK;
-		ofn.lpfnHook = OpenSaveFileDlgHookProc;
-	}
 
 	const BOOL success = GetOpenFileName(&ofn);
 	if (success) {
@@ -7361,10 +7344,6 @@ BOOL SaveFileDlg(FileSaveFlag saveFlag, LPWSTR lpstrFile, int cchFile, LPCWSTR l
 	if (saveFlag & FileSaveFlag_SaveCopy) {
 		GetString(IDT_FILE_SAVECOPY, szTitle, COUNTOF(szTitle));
 		ofn.lpstrTitle = szTitle;
-	}
-	if (bUseXPFileDialog) {
-		ofn.Flags |= OFN_EXPLORER | OFN_ENABLESIZING | OFN_ENABLEHOOK;
-		ofn.lpfnHook = OpenSaveFileDlgHookProc;
 	}
 
 	const BOOL success = GetSaveFileName(&ofn);

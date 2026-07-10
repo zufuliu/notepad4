@@ -639,7 +639,6 @@ BEGIN
 				MENUITEM "中文(简体)",				IDM_LANG_CHINESE_SIMPLIFIED
 			END
 #endif
-			MENUITEM "Okna dialogowe otwierania/zapisywania w stylu &XP",IDM_SET_USE_XP_FILE_DIALOG
 		END
 		POPUP "O&pcje okna"
 		BEGIN

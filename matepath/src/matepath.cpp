@@ -101,7 +101,6 @@ EscFunction iEscFunction;
 bool	bFocusEdit;
 bool	bAlwaysOnTop;
 static bool bTransparentMode;
-bool bUseXPFileDialog;
 bool	bWindowLayoutRTL;
 bool	bMinimizeToTray;
 bool	fUseRecycleBin;
@@ -1387,10 +1386,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		ofn.lpstrInitialDir = szCurDir;
 		ofn.Flags = OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT | OFN_NOTESTFILECREATE |
 					OFN_NODEREFERENCELINKS | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST;
-		if (bUseXPFileDialog) {
-			ofn.Flags |= OFN_EXPLORER | OFN_ENABLESIZING | OFN_ENABLEHOOK;
-			ofn.lpfnHook = OpenSaveFileDlgHookProc;
-		}
 
 		if (!GetSaveFileName(&ofn)) {
 			break;
@@ -1482,10 +1477,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		ofn.nMaxFile = MAX_PATH;
 		ofn.Flags = OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT | OFN_NOTESTFILECREATE |
 					OFN_NODEREFERENCELINKS | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST;
-		if (bUseXPFileDialog) {
-			ofn.Flags |= OFN_EXPLORER | OFN_ENABLESIZING | OFN_ENABLEHOOK;
-			ofn.lpfnHook = OpenSaveFileDlgHookProc;
-		}
 
 		if (!GetSaveFileName(&ofn)) {
 			break;
@@ -2572,12 +2563,6 @@ void LoadSettings() noexcept {
 	iValue = section.GetInt(L"EscFunction", EscFunction_None);
 	iEscFunction = clamp(static_cast<EscFunction>(iValue), EscFunction_None, EscFunction_Exit);
 
-	if (IsVistaAndAbove()) {
-		bUseXPFileDialog = section.GetBool(L"UseXPFileDialog", false);
-	} else {
-		bUseXPFileDialog = true;
-	}
-
 	dwFillMask = section.GetInt(L"FillMask", DL_ALLOBJECTS);
 	if (dwFillMask & ~DL_ALLOBJECTS) {
 		dwFillMask = DL_ALLOBJECTS;
@@ -2748,10 +2733,6 @@ void SaveSettings(bool bSaveSettingsNow) noexcept {
 	section.SetBoolEx(L"TransparentMode", bTransparentMode, false);
 	section.SetBoolEx(L"WindowLayoutRTL", bWindowLayoutRTL, false);
 	section.SetIntEx(L"EscFunction", static_cast<int>(iEscFunction), EscFunction_None);
-
-	if (IsVistaAndAbove()) {
-		section.SetBoolEx(L"UseXPFileDialog", bUseXPFileDialog, false);
-	}
 
 	section.SetIntEx(L"FillMask", dwFillMask, DL_ALLOBJECTS);
 	section.SetIntEx(L"SortOptions", nSortFlags, DS_NAME);

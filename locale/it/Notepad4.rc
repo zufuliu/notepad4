@@ -639,7 +639,6 @@ BEGIN
 				MENUITEM "中文(简体)",				IDM_LANG_CHINESE_SIMPLIFIED
 			END
 #endif
-			MENUITEM "Usa la finestra di dialogo Apri/Salva stile &XP",	IDM_SET_USE_XP_FILE_DIALOG
 		END
 		POPUP "Opzioni &finestra"
 		BEGIN

@@ -55,7 +55,6 @@ extern bool		bAutoStripBlanks;
 extern LANGID uiLanguage;
 #endif
 extern int iWrapColumn;
-extern bool bUseXPFileDialog;
 
 static inline HWND GetMsgBoxParent() noexcept {
 	HWND hwnd = GetActiveWindow();
@@ -422,10 +421,6 @@ static INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 			ofn.nMaxFile = COUNTOF(szFile);
 			ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT | OFN_NOTESTFILECREATE
 						| OFN_PATHMUSTEXIST | OFN_SHAREAWARE | OFN_NODEREFERENCELINKS;
-			if (bUseXPFileDialog) {
-				ofn.Flags |= OFN_EXPLORER | OFN_ENABLESIZING | OFN_ENABLEHOOK;
-				ofn.lpfnHook = OpenSaveFileDlgHookProc;
-			}
 
 			if (GetOpenFileName(&ofn)) {
 				PathQuoteSpaces(szFile);

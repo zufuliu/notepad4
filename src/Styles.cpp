@@ -371,7 +371,6 @@ extern LineHighlightMode iHighlightCurrentLine;
 extern bool	bShowBookmarkMargin;
 extern bool bShowCodeFolding;
 extern int	iZoomLevel;
-extern bool bUseXPFileDialog;
 extern bool flagSimpleIndentGuides;
 
 // LF_FACESIZE is 32, LOCALE_NAME_MAX_LENGTH is 85
@@ -986,10 +985,6 @@ bool Style_Import(HWND hwnd) noexcept {
 	ofn.nMaxFile	= COUNTOF(szFile);
 	ofn.Flags		= OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT | OFN_NOTESTFILECREATE
 					  | OFN_PATHMUSTEXIST | OFN_SHAREAWARE /*| OFN_NODEREFERENCELINKS*/;
-	if (bUseXPFileDialog) {
-		ofn.Flags |= OFN_EXPLORER | OFN_ENABLESIZING | OFN_ENABLEHOOK;
-		ofn.lpfnHook = OpenSaveFileDlgHookProc;
-	}
 
 	if (GetOpenFileName(&ofn)) {
 		IniSectionParser section;
@@ -1058,10 +1053,6 @@ bool Style_Export(HWND hwnd) noexcept {
 	ofn.nMaxFile	= COUNTOF(szFile);
 	ofn.Flags		= /*OFN_FILEMUSTEXIST |*/ OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT | OFN_NOTESTFILECREATE
 					  | OFN_PATHMUSTEXIST | OFN_SHAREAWARE /*| OFN_NODEREFERENCELINKS*/ | OFN_OVERWRITEPROMPT;
-	if (bUseXPFileDialog) {
-		ofn.Flags |= OFN_EXPLORER | OFN_ENABLESIZING | OFN_ENABLEHOOK;
-		ofn.lpfnHook = OpenSaveFileDlgHookProc;
-	}
 
 	if (GetSaveFileName(&ofn)) {
 		DWORD dwError = ERROR_SUCCESS;
