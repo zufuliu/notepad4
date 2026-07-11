@@ -335,7 +335,7 @@ INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 //
 // RunDlgProc()
 //
-static INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
+static INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	static const DWORD controlDefinition[] = {
 		DeferCtlMoveX(IDC_RESIZEGRIP3),
 		DeferCtlMoveX(IDOK),
@@ -379,21 +379,10 @@ static INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 				lstrcpy(szArg2, szArgs);
 			}
 
-			auto &szFilter = szArgs;
-			GetString(IDS_FILTER_EXE, szFilter, COUNTOF(szFilter));
-			PrepareFilterStr(szFilter);
-
-			OPENFILENAME ofn;
-			memset(&ofn, 0, sizeof(OPENFILENAME));
-			ofn.lStructSize = sizeof(OPENFILENAME);
-			ofn.hwndOwner = hwnd;
-			ofn.lpstrFilter = szFilter;
-			ofn.lpstrFile = szFile;
-			ofn.nMaxFile = COUNTOF(szFile);
-			ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT | OFN_NOTESTFILECREATE
-						| OFN_PATHMUSTEXIST | OFN_SHAREAWARE | OFN_NODEREFERENCELINKS;
-
-			if (GetOpenFileName(&ofn)) {
+			FileDialog dialog {nullptr, IDS_FILTER_EXE, 0, FileDialogType_OpenParseFilter, FileDialog_FindFile, nullptr};
+			if (LPWSTR pszPath = dialog.Show(hwnd, nullptr, szFile)) {
+				lstrcpy(szFile, pszPath);
+				CoTaskMemFree(pszPath);
 				PathQuoteSpaces(szFile);
 				if (StrNotEmpty(szArg2)) {
 					lstrcat(szFile, L" ");

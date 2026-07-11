@@ -2148,6 +2148,32 @@ INT_PTR ThemedDialogBoxParam(HINSTANCE hInstance, LPCWSTR lpTemplate, HWND hWndP
 	return ret;
 }
 
+NP2_noinline
+void FileDialog::ParseFilter(LPWSTR szFilter) noexcept {
+	constexpr UINT maxFilterCount = 2;
+	if (filterSpec == nullptr) {
+		filterSpec = static_cast<COMDLG_FILTERSPEC *>(NP2HeapAlloc(sizeof(COMDLG_FILTERSPEC)*maxFilterCount));
+	}
+
+	LPWSTR *filterList = reinterpret_cast<LPWSTR *>(filterSpec + filterCount);
+	UINT index = 0;
+	LPWSTR psz = szFilter;
+	while (*psz) {
+		const WCHAR ch = *psz++;
+		if (ch == L'|') {
+			psz[-1] = L'\0';
+			filterList[index] = szFilter;
+			szFilter = psz;
+			index++;
+			if (index == maxFilterCount*2) {
+				break;
+			}
+		}
+	}
+	filterCount += index / 2;
+}
+
+NP2_noinline
 LPWSTR FileDialog::Show(HWND hwndOwner, LPCWSTR lpstrInitialDir, LPCWSTR lpstrFile, UINT idsTitle) {
 	IFileDialog *dialog = nullptr;
 	LPWSTR pszPath = nullptr;
@@ -2159,7 +2185,13 @@ LPWSTR FileDialog::Show(HWND hwndOwner, LPCWSTR lpstrInitialDir, LPCWSTR lpstrFi
 		dialog->SetOptions(options | dialogOptions);
 		WCHAR tchTemp[MAX_PATH];
 		if ((dialogOptions & FOS_PICKFOLDERS) == 0) {
+			if (dialogType & FileDialogType_ParseFilter) {
+				GetString(filterCount, tchTemp, COUNTOF(tchTemp));
+				filterCount = 0;
+				ParseFilter(tchTemp);
+			}
 			dialog->SetFileTypes(filterCount, filterSpec);
+			dialog->SetDefaultExtension(pszDefaultExtension);
 		}
 		if (idsTitle != 0) {
 			GetString(idsTitle, tchTemp, COUNTOF(tchTemp));

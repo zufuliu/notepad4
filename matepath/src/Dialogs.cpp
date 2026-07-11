@@ -192,24 +192,10 @@ INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) 
 				lstrcpy(szArg2, szArgs);
 			}
 
-			WCHAR szTitle[32];
-			auto &szFilter = szArgs;
-			GetString(IDS_SEARCHEXE, szTitle, COUNTOF(szTitle));
-			GetString(IDS_FILTER_EXE, szFilter, COUNTOF(szFilter));
-			PrepareFilterStr(szFilter);
-
-			OPENFILENAME ofn;
-			memset(&ofn, 0, sizeof(OPENFILENAME));
-			ofn.lStructSize = sizeof(OPENFILENAME);
-			ofn.hwndOwner = hwnd;
-			ofn.lpstrFilter = szFilter;
-			ofn.lpstrFile = szFile;
-			ofn.nMaxFile = COUNTOF(szFile);
-			ofn.lpstrTitle = szTitle;
-			ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT | OFN_NOTESTFILECREATE
-						| OFN_PATHMUSTEXIST | OFN_SHAREAWARE | OFN_NODEREFERENCELINKS;
-
-			if (GetOpenFileName(&ofn)) {
+			FileDialog dialog {nullptr, IDS_FILTER_EXE, 0, FileDialogType_OpenParseFilter, FileDialog_FindFile, nullptr};
+			if (LPWSTR pszPath = dialog.Show(hwnd, nullptr, szFile, IDS_SEARCHEXE)) {
+				lstrcpy(szFile, pszPath);
+				CoTaskMemFree(pszPath);
 				PathQuoteSpaces(szFile);
 
 				if (StrNotEmpty(szArg2)) {
@@ -1063,25 +1049,10 @@ INT_PTR CALLBACK ProgPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 			GetDlgItemText(hwnd, IDC_QUICKVIEW, tchBuf, COUNTOF(tchBuf));
 			ExtractFirstArgument(tchBuf, szFile, szParams);
 
-			WCHAR szTitle[32];
-			WCHAR szFilter[256];
-			GetString(IDS_GETQUICKVIEWER, szTitle, COUNTOF(szTitle));
-			GetString(IDS_FILTER_EXE, szFilter, COUNTOF(szFilter));
-			PrepareFilterStr(szFilter);
-
-			OPENFILENAME ofn;
-			memset(&ofn, 0, sizeof(OPENFILENAME));
-			ofn.lStructSize = sizeof(OPENFILENAME);
-			ofn.hwndOwner = hwnd;
-			ofn.lpstrFilter = szFilter;
-			ofn.lpstrFile = szFile;
-			ofn.nMaxFile = COUNTOF(szFile);
-			ofn.lpstrTitle = szTitle;
-			ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT | OFN_NOTESTFILECREATE
-						| OFN_PATHMUSTEXIST | OFN_SHAREAWARE | OFN_NODEREFERENCELINKS;
-
-			if (GetOpenFileName(&ofn)) {
-				lstrcpyn(tchBuf, szFile, COUNTOF(tchBuf));
+			FileDialog dialog {nullptr, IDS_FILTER_EXE, 0, FileDialogType_OpenParseFilter, FileDialog_FindFile, nullptr};
+			if (LPWSTR pszPath = dialog.Show(hwnd, nullptr, szFile, IDS_GETQUICKVIEWER)) {
+				lstrcpy(tchBuf, pszPath);
+				CoTaskMemFree(pszPath);
 				PathQuoteSpaces(tchBuf);
 				if (StrNotEmpty(szParams)) {
 					StrCatBuff(tchBuf, L" ", COUNTOF(tchBuf));
@@ -2122,7 +2093,7 @@ extern WCHAR szDDEMsg[256];
 extern WCHAR szDDEApp[256];
 extern WCHAR szDDETopic[256];
 
-INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
+INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(lParam);
 	static const DWORD controlDefinition[] = {
 		DeferCtlMoveX(IDC_RESIZEGRIP4),
@@ -2227,26 +2198,10 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 			ExtractFirstArgument(tchBuf, szFile, szParams);
 			PathAbsoluteFromApp(szFile, szFile);
 
-			WCHAR szTitle[32];
-			WCHAR szFilter[256];
-			GetString(IDS_SEARCHEXE, szTitle, COUNTOF(szTitle));
-			GetString(IDS_FILTER_EXE, szFilter, COUNTOF(szFilter));
-			PrepareFilterStr(szFilter);
-
-			OPENFILENAME ofn;
-			memset(&ofn, 0, sizeof(OPENFILENAME));
-			ofn.lStructSize = sizeof(OPENFILENAME);
-			ofn.hwndOwner   = hwnd;
-			ofn.lpstrFilter = szFilter;
-			ofn.lpstrFile   = szFile;
-			ofn.nMaxFile    = COUNTOF(szFile);
-			ofn.lpstrTitle  = szTitle;
-			ofn.Flags       = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_NOTESTFILECREATE |
-							  OFN_PATHMUSTEXIST | OFN_SHAREAWARE | OFN_NODEREFERENCELINKS;
-
-			// execute file open dlg
-			if (GetOpenFileName(&ofn)) {
-				lstrcpy(tchBuf, szFile);
+			FileDialog dialog {nullptr, IDS_FILTER_EXE, 0, FileDialogType_OpenParseFilter, FileDialog_FindFile, nullptr};
+			if (LPWSTR pszPath = dialog.Show(hwnd, nullptr, szFile, IDS_SEARCHEXE)) {
+				lstrcpy(tchBuf, pszPath);
+				CoTaskMemFree(pszPath);
 				PathRelativeToApp(tchBuf, tchBuf, 0, flagPortableMyDocs);
 				PathQuoteSpaces(tchBuf);
 				if (StrNotEmpty(szParams)) {

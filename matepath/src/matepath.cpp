@@ -1366,28 +1366,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_FILE_NEW: {
-		WCHAR szNewFile[MAX_PATH];
-		WCHAR szFilter[128];
-		WCHAR szTitle[32];
-
-		StrCpyEx(szNewFile, L"");
-		GetString(IDS_FILTER_ALL, szFilter, COUNTOF(szFilter));
-		PrepareFilterStr(szFilter);
-		GetString(IDS_NEWFILE, szTitle, COUNTOF(szTitle));
-
-		OPENFILENAME ofn;
-		memset(&ofn, 0, sizeof(OPENFILENAME));
-		ofn.lStructSize = sizeof(OPENFILENAME);
-		ofn.hwndOwner = hwnd;
-		ofn.lpstrFilter = szFilter;
-		ofn.lpstrFile = szNewFile;
-		ofn.nMaxFile = MAX_PATH;
-		ofn.lpstrTitle = szTitle;
-		ofn.lpstrInitialDir = szCurDir;
-		ofn.Flags = OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT | OFN_NOTESTFILECREATE |
-					OFN_NODEREFERENCELINKS | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST;
-
-		if (!GetSaveFileName(&ofn)) {
+		FileDialog dialog {nullptr, IDS_FILTER_ALL, 0, FileDialogType_SaveParseFilter, FileDialog_SaveFile | FOS_NODEREFERENCELINKS, nullptr};
+		LPWSTR szNewFile = dialog.Show(hwnd, szCurDir, nullptr, IDS_NEWFILE);
+		if (szNewFile == nullptr) {
 			break;
 		}
 
@@ -1418,6 +1399,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		} else {
 			MsgBoxWarn(MB_OK, IDS_ERR_NEW);
 		}
+		CoTaskMemFree(szNewFile);
 	}
 	break;
 
@@ -1461,24 +1443,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			break;
 		}
 
-		WCHAR szNewFile[MAX_PATH];
-		lstrcpy(szNewFile, dli.szFileName);
-
-		WCHAR szFilter[128];
-		GetString(IDS_FILTER_ALL, szFilter, COUNTOF(szFilter));
-		PrepareFilterStr(szFilter);
-
-		OPENFILENAME ofn;
-		memset(&ofn, 0, sizeof(OPENFILENAME));
-		ofn.lStructSize = sizeof(OPENFILENAME);
-		ofn.hwndOwner = hwnd;
-		ofn.lpstrFilter = szFilter;
-		ofn.lpstrFile = szNewFile;
-		ofn.nMaxFile = MAX_PATH;
-		ofn.Flags = OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT | OFN_NOTESTFILECREATE |
-					OFN_NODEREFERENCELINKS | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST;
-
-		if (!GetSaveFileName(&ofn)) {
+		FileDialog dialog {nullptr, IDS_FILTER_ALL, 0, FileDialogType_SaveParseFilter, FileDialog_SaveFile | FOS_NODEREFERENCELINKS, nullptr};
+		LPWSTR szNewFile = dialog.Show(hwnd, nullptr, dli.szFileName);
+		if (szNewFile == nullptr) {
 			break;
 		}
 
@@ -1507,6 +1474,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				}
 			}
 		}
+		CoTaskMemFree(szNewFile);
 		StatusSetSimple(hwndStatus, FALSE);
 
 		EndWaitCursor();

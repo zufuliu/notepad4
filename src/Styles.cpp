@@ -968,25 +968,9 @@ void Style_Save() noexcept {
 //
 // Style_Import()
 //
-bool Style_Import(HWND hwnd) noexcept {
-	WCHAR szFile[MAX_PATH * 2] = L"";
-	WCHAR szFilter[256];
-
-	GetString(IDS_FILTER_INI, szFilter, COUNTOF(szFilter));
-	PrepareFilterStr(szFilter);
-
-	OPENFILENAME ofn;
-	memset(&ofn, 0, sizeof(OPENFILENAME));
-	ofn.lStructSize	= sizeof(OPENFILENAME);
-	ofn.hwndOwner	= hwnd;
-	ofn.lpstrFilter	= szFilter;
-	ofn.lpstrFile	= szFile;
-	ofn.lpstrDefExt	= L"ini";
-	ofn.nMaxFile	= COUNTOF(szFile);
-	ofn.Flags		= OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT | OFN_NOTESTFILECREATE
-					  | OFN_PATHMUSTEXIST | OFN_SHAREAWARE /*| OFN_NODEREFERENCELINKS*/;
-
-	if (GetOpenFileName(&ofn)) {
+bool Style_Import(HWND hwnd) {
+	FileDialog dialog {nullptr, IDS_FILTER_INI, 0, FileDialogType_OpenParseFilter, FileDialog_OpenFile, L"ini"};
+	if (LPWSTR szFile = dialog.Show(hwnd, nullptr, nullptr)) {
 		IniSectionParser section;
 		constexpr DWORD cchIniSection = MAX_INI_SECTION_SIZE_STYLES;
 		WCHAR * const pIniSectionBuf = section.Init(128, cchIniSection);
@@ -1027,6 +1011,7 @@ bool Style_Import(HWND hwnd) noexcept {
 		}
 
 		section.Free();
+		CoTaskMemFree(szFile);
 		return true;
 	}
 	return false;
@@ -1036,25 +1021,9 @@ bool Style_Import(HWND hwnd) noexcept {
 //
 // Style_Export()
 //
-bool Style_Export(HWND hwnd) noexcept {
-	WCHAR szFile[MAX_PATH * 2] = L"";
-	WCHAR szFilter[256];
-
-	GetString(IDS_FILTER_INI, szFilter, COUNTOF(szFilter));
-	PrepareFilterStr(szFilter);
-
-	OPENFILENAME ofn;
-	memset(&ofn, 0, sizeof(OPENFILENAME));
-	ofn.lStructSize = sizeof(OPENFILENAME);
-	ofn.hwndOwner	= hwnd;
-	ofn.lpstrFilter = szFilter;
-	ofn.lpstrFile	= szFile;
-	ofn.lpstrDefExt = L"ini";
-	ofn.nMaxFile	= COUNTOF(szFile);
-	ofn.Flags		= /*OFN_FILEMUSTEXIST |*/ OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT | OFN_NOTESTFILECREATE
-					  | OFN_PATHMUSTEXIST | OFN_SHAREAWARE /*| OFN_NODEREFERENCELINKS*/ | OFN_OVERWRITEPROMPT;
-
-	if (GetSaveFileName(&ofn)) {
+bool Style_Export(HWND hwnd) {
+	FileDialog dialog {nullptr, IDS_FILTER_INI, 0, FileDialogType_SaveParseFilter, FileDialog_SaveFile, L"ini"};
+	if (LPWSTR szFile = dialog.Show(hwnd, nullptr, nullptr)) {
 		DWORD dwError = ERROR_SUCCESS;
 		WCHAR *pIniSectionBuf = static_cast<WCHAR *>(NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_STYLES));
 		IniSectionBuilder section = { pIniSectionBuf };
@@ -1087,6 +1056,7 @@ bool Style_Export(HWND hwnd) noexcept {
 			dwLastIOError = dwError;
 			MsgBoxLastError(MB_OK, IDS_EXPORT_FAIL, szFile);
 		}
+		CoTaskMemFree(szFile);
 		return true;
 	}
 	return false;
@@ -4173,7 +4143,7 @@ static void Style_ResetStyle(LPCEDITLEXER pLex, EDITSTYLE *pStyle) noexcept {
 //
 // Style_ConfigDlgProc()
 //
-static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
+static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	static const DWORD controlDefinition[] = {
 		DeferCtlMove(IDC_RESIZEGRIP3),
 		DeferCtlMove(IDOK),

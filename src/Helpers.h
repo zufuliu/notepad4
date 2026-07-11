@@ -969,9 +969,16 @@ HWND	CreateThemedDialogParam(HINSTANCE hInstance, LPCWSTR lpTemplate, HWND hWndP
 enum FileDialogType {
 	FileDialogType_FileOpen = 1,
 	FileDialogType_FileSave = 2,
+	FileDialogType_ParseFilter = 4,
+	FileDialogType_OpenParseFilter = FileDialogType_FileOpen | FileDialogType_ParseFilter,
+	FileDialogType_SaveParseFilter = FileDialogType_FileSave | FileDialogType_ParseFilter,
 };
 
 #define FileDialog_BrowseFolder		(FOS_NOCHANGEDIR | FOS_FORCEFILESYSTEM | FOS_PATHMUSTEXIST | FOS_DONTADDTORECENT | FOS_PICKFOLDERS)
+#define FileDialog_FileCommon		(FOS_NOCHANGEDIR | FOS_FORCEFILESYSTEM | FOS_PATHMUSTEXIST | FOS_DONTADDTORECENT | FOS_SHAREAWARE | FOS_NOTESTFILECREATE)
+#define FileDialog_OpenFile			(FileDialog_FileCommon | FOS_NOREADONLYRETURN | FOS_FILEMUSTEXIST)
+#define FileDialog_SaveFile			(FileDialog_FileCommon | FOS_NOREADONLYRETURN | FOS_OVERWRITEPROMPT)
+#define FileDialog_FindFile			(FileDialog_FileCommon | FOS_FILEMUSTEXIST | FOS_NODEREFERENCELINKS)
 
 struct FileDialog {
 	COMDLG_FILTERSPEC *filterSpec;
@@ -982,6 +989,7 @@ struct FileDialog {
 	LPCWSTR pszDefaultExtension;
 
 	LPWSTR Show(HWND hwndOwner, LPCWSTR lpstrInitialDir, LPCWSTR lpstrFile, UINT idsTitle = 0);
+	void ParseFilter(LPWSTR szFilter) noexcept;
 };
 
 //==== File Dialog Hook =========================================================
