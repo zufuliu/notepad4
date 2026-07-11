@@ -121,7 +121,7 @@ void	Style_UpdateCaret() noexcept;
 void	Style_SetLongLineColors() noexcept;
 void	Style_HighlightCurrentLine() noexcept;
 void	Style_ToggleUseDefaultCodeStyle() noexcept;
-LPWSTR	Style_GetOpenDlgFilterStr(bool open, LPCWSTR lpszFile, int lexers[]) noexcept;
+void	Style_GetFileDialogFilter(FileDialog &dialog, LPCWSTR lpszFile, int lexers[]) noexcept;
 
 bool	Style_StrGetFontEx(LPCWSTR lpszStyle, LPWSTR lpszFont, int cchFont, bool bDefaultStyle) noexcept;
 bool	Style_StrGetCharSet(LPCWSTR lpszStyle, int *charset) noexcept;

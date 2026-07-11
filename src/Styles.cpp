@@ -3128,7 +3128,7 @@ void UpdateFoldMarginWidth() noexcept {
 //
 // Style_GetOpenDlgFilterStr()
 //
-static void AddLexFilterStr(LPWSTR szFilter, LPCEDITLEXER pLex, LPCWSTR lpszExt, int *length, int lexers[], int *index) noexcept {
+static LPWSTR AddLexFilterStr(FileDialog &dialog, LPWSTR szFilter, LPCEDITLEXER pLex, LPCWSTR lpszExt, int lexers[]) noexcept {
 	LPCWSTR p = pLex->szExtensions;
 	if (StrIsEmpty(p)) {
 		p = pLex->pszDefExt;
@@ -3166,16 +3166,16 @@ static void AddLexFilterStr(LPWSTR szFilter, LPCEDITLEXER pLex, LPCWSTR lpszExt,
 		*ptr = L'\0';
 
 		WCHAR wch[MAX_PATH];
-		wsprintf(wch, L"*%s;", lpszExt);
+		const UINT len = wsprintf(wch, L"*%s;", lpszExt);
 		if (StrStrI(extensions, wch) == nullptr) {
 			++count;
 			lstrcpy(ptr, wch);
-			ptr += lstrlen(wch);
+			ptr += len;
 		}
 	}
 
 	if (count == 0) {
-		return;
+		return szFilter;
 	}
 	if (state == 1) {
 		--ptr; // trailing semicolon
@@ -3194,28 +3194,41 @@ static void AddLexFilterStr(LPWSTR szFilter, LPCEDITLEXER pLex, LPCWSTR lpszExt,
 	LPCWSTR pszName = pLex->pszName;
 #endif
 
-	*length += wsprintf(szFilter + *length, L"%s (%s)|%s|", pszName, extensions, extensions);
-	lexers[*index] = pLex->rid;
-	*index += 1;
+	UINT len = wsprintf(szFilter, L"%s (%s)", pszName, extensions);
+	LPCWSTR lpszName = szFilter;
+	szFilter += len + 1;
+	len = static_cast<UINT>(ptr - extensions) + 1;
+	memcpy(szFilter, extensions, len * sizeof(WCHAR));
+	lpszExt = szFilter;
+	szFilter += len;
+	len = dialog.filterCount;
+	dialog.filterSpec[len].pszName = lpszName;
+	dialog.filterSpec[len].pszSpec = lpszExt;
+	dialog.filterCount += 1;
+	dialog.filterIndex += 1; // 1-based filter index
+	lexers[dialog.filterIndex] = pLex->rid;
+	return szFilter;
 }
 
-LPWSTR Style_GetOpenDlgFilterStr(bool open, LPCWSTR lpszFile, int lexers[]) noexcept {
-	int length = (MAX_FAVORITE_SCHEMES_COUNT + 2 + LEXER_INDEX_GENERAL - LEXER_INDEX_MATCH)
-				*(MAX_EDITLEXER_NAME_SIZE + MAX_EDITLEXER_EXT_SIZE*3*2);
-	LPWSTR szFilter = static_cast<LPWSTR>(NP2HeapAlloc(length * sizeof(WCHAR)));
+NP2_noinline
+void Style_GetFileDialogFilter(FileDialog &dialog, LPCWSTR lpszFile, int lexers[]) noexcept {
+	constexpr UINT maxFilterCount = MAX_FAVORITE_SCHEMES_COUNT + 2 + LEXER_INDEX_GENERAL - LEXER_INDEX_MATCH;
+	static_assert(maxFilterCount == OPENDLG_MAX_LEXER_COUNT);
+	UINT length = maxFilterCount*(MAX_EDITLEXER_NAME_SIZE + MAX_EDITLEXER_EXT_SIZE*3*2);
+	dialog.filterSpec = static_cast<COMDLG_FILTERSPEC *>(NP2HeapAlloc(maxFilterCount*sizeof(COMDLG_FILTERSPEC) + length*sizeof(WCHAR)));
+	LPWSTR szFilter = reinterpret_cast<LPWSTR>(dialog.filterSpec + maxFilterCount);
 
-	length = 0;
-	int index = 1; // 1-based filter index
-	if (open) {
+	if (dialog.dialogType & FileDialogType_FileOpen) {
+		dialog.filterIndex = 1;
 		// All Files comes first for open file dialog.
-		GetString(IDS_FILTER_ALL, szFilter, MAX_EDITLEXER_EXT_SIZE);
-		length = lstrlen(szFilter);
-		++index;
+		length = GetString(IDS_FILTER_ALL, szFilter, MAX_EDITLEXER_EXT_SIZE);
+		dialog.ParseFilter(szFilter);
+		szFilter += length + 1;
 	}
 
 	// current scheme
 	LPCWSTR lpszExt = PathFindExtension(lpszFile);
-	AddLexFilterStr(szFilter, pLexCurrent, lpszExt, &length, lexers, &index);
+	szFilter = AddLexFilterStr(dialog, szFilter, pLexCurrent, lpszExt, lexers);
 	// text file and favorite schemes
 	for (UINT iLexer = LEXER_INDEX_MATCH; iLexer < ALL_LEXER_COUNT; iLexer++) {
 		LPCEDITLEXER pLex = pLexArray[iLexer];
@@ -3223,18 +3236,17 @@ LPWSTR Style_GetOpenDlgFilterStr(bool open, LPCWSTR lpszFile, int lexers[]) noex
 			break;
 		}
 		if (pLex != pLexCurrent) {
-			AddLexFilterStr(szFilter, pLex, nullptr, &length, lexers, &index);
+			szFilter = AddLexFilterStr(dialog, szFilter, pLex, nullptr, lexers);
 		}
 	}
 
-	if (!open) {
+	dialog.filterIndex = 0;
+	if (dialog.dialogType & FileDialogType_FileSave) {
 		lexers[0] = pLexArray[iDefaultLexerIndex]->rid;
 		// All Files comes last for save file dialog.
-		GetString(IDS_FILTER_ALL, szFilter + length, MAX_EDITLEXER_EXT_SIZE);
+		GetString(IDS_FILTER_ALL, szFilter, MAX_EDITLEXER_EXT_SIZE);
+		dialog.ParseFilter(szFilter);
 	}
-
-	PrepareFilterStr(szFilter);
-	return szFilter;
 }
 
 //=============================================================================

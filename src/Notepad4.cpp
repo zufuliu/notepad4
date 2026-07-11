@@ -998,7 +998,7 @@ static inline void NP2RestoreWind(HWND hwnd) noexcept {
 	ShowOwnedPopups(hwnd, TRUE);
 }
 
-static inline void ExitApplication(HWND hwnd) noexcept {
+static inline void ExitApplication(HWND hwnd) {
 	if (FileSave(FileSaveFlag_Ask)) {
 		DestroyWindow(hwnd);
 	}
@@ -7040,7 +7040,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 // FileSave()
 //
 //
-bool FileSave(FileSaveFlag saveFlag) noexcept {
+bool FileSave(FileSaveFlag saveFlag) {
 	bool bIsEmptyNewFile = false;
 
 	if (StrIsEmpty(szCurFile)) {
@@ -7257,6 +7257,7 @@ void EditApplyDefaultEncoding(LPCEDITLEXER pLex, BOOL bLexerChanged) noexcept {
 // OpenFileDlg()
 //
 //
+NP2_noinline
 void SetupInitialOpenSaveDir(wchar_t (&tchInitialDir)[MAX_PATH], LPCWSTR lpstrInitialDir) noexcept {
 	SetStrEmpty(tchInitialDir);
 	if (StrNotEmpty(lpstrInitialDir)) {
@@ -7283,36 +7284,23 @@ void SetupInitialOpenSaveDir(wchar_t (&tchInitialDir)[MAX_PATH], LPCWSTR lpstrIn
 	}
 }
 
-BOOL OpenFileDlg(LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) noexcept {
+bool OpenFileDlg(LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) {
 	WCHAR tchInitialDir[MAX_PATH];
 	SetupInitialOpenSaveDir(tchInitialDir, lpstrInitialDir);
-	WCHAR szFile[MAX_PATH];
-	SetStrEmpty(szFile);
 	int lexers[1 + OPENDLG_MAX_LEXER_COUNT]{}; // 1-based filter index
-	LPWSTR szFilter = Style_GetOpenDlgFilterStr(true, szCurFile, lexers);
+	FileDialog dialog{nullptr, 0, 0, FileDialogType_FileOpen, FileDialog_OpenFile, L"", };
+	// empty pszDefaultExtension: auto add first extension from current filter
+	Style_GetFileDialogFilter(dialog, szCurFile, lexers);
 
-	OPENFILENAME ofn;
-	memset(&ofn, 0, sizeof(OPENFILENAME));
-	ofn.lStructSize = sizeof(OPENFILENAME);
-	ofn.hwndOwner = hwndMain;
-	ofn.lpstrFilter = szFilter;
-	ofn.lpstrFile = szFile;
-	ofn.lpstrInitialDir = tchInitialDir;
-	ofn.lpstrDefExt = L""; // auto add first extension from current filter
-	ofn.nMaxFile = COUNTOF(szFile);
-	ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | /* OFN_NOCHANGEDIR |*/ OFN_NOTESTFILECREATE |
-				OFN_DONTADDTORECENT | OFN_PATHMUSTEXIST |
-				OFN_SHAREAWARE /*| OFN_NODEREFERENCELINKS*/;
-
-	const BOOL success = GetOpenFileName(&ofn);
-	if (success) {
+	if (LPWSTR szFile = dialog.Show(hwndMain, tchInitialDir, nullptr)) {
 		lstrcpyn(lpstrFile, szFile, cchFile);
-		const int iLexer = lexers[ofn.nFilterIndex];
-		flagLexerSpecified = iLexer != 0;
+		CoTaskMemFree(szFile);
+		const int iLexer = lexers[dialog.filterIndex];
 		iInitialLexer = iLexer;
+		flagLexerSpecified = iLexer != 0;
+		return true;
 	}
-	NP2HeapFree(szFilter);
-	return success;
+	return false;
 }
 
 //=============================================================================
@@ -7320,42 +7308,25 @@ BOOL OpenFileDlg(LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) noexcep
 // SaveFileDlg()
 //
 //
-BOOL SaveFileDlg(FileSaveFlag saveFlag, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) noexcept {
+bool SaveFileDlg(FileSaveFlag saveFlag, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) {
 	WCHAR tchInitialDir[MAX_PATH];
 	SetupInitialOpenSaveDir(tchInitialDir, lpstrInitialDir);
-	WCHAR szNewFile[MAX_PATH];
-	lstrcpy(szNewFile, lpstrFile);
 	int lexers[1 + OPENDLG_MAX_LEXER_COUNT]{}; // 1-based filter index
-	LPWSTR szFilter = Style_GetOpenDlgFilterStr(false, szCurFile, lexers);
+	FileDialog dialog{nullptr, 0, 0, FileDialogType_FileSave, FileDialog_SaveFile, L"", };
+	// empty pszDefaultExtension: auto add first extension from current filter
+	Style_GetFileDialogFilter(dialog, szCurFile, lexers);
 
-	OPENFILENAME ofn;
-	memset(&ofn, 0, sizeof(OPENFILENAME));
-	ofn.lStructSize = sizeof(OPENFILENAME);
-	ofn.hwndOwner = hwndMain;
-	ofn.lpstrFilter = szFilter;
-	ofn.lpstrFile = szNewFile;
-	ofn.lpstrInitialDir = tchInitialDir;
-	ofn.lpstrDefExt = L""; // auto add first extension from current filter
-	ofn.nMaxFile = MAX_PATH;
-	ofn.Flags = OFN_HIDEREADONLY /*| OFN_NOCHANGEDIR*/ | OFN_NOTESTFILECREATE |
-				/*OFN_NODEREFERENCELINKS |*/ OFN_OVERWRITEPROMPT |
-				OFN_DONTADDTORECENT | OFN_PATHMUSTEXIST;
-	WCHAR szTitle[128];
-	if (saveFlag & FileSaveFlag_SaveCopy) {
-		GetString(IDT_FILE_SAVECOPY, szTitle, COUNTOF(szTitle));
-		ofn.lpstrTitle = szTitle;
-	}
-
-	const BOOL success = GetSaveFileName(&ofn);
-	if (success) {
+	const UINT idsTitle = (saveFlag & FileSaveFlag_SaveCopy) ? IDT_FILE_SAVECOPY : 0;
+	if (LPWSTR szNewFile = dialog.Show(hwndMain, tchInitialDir, lpstrFile, idsTitle)) {
 		lstrcpyn(lpstrFile, szNewFile, cchFile);
-		const int iLexer = lexers[ofn.nFilterIndex];
+		CoTaskMemFree(szNewFile);
+		const int iLexer = lexers[dialog.filterIndex];
+		iInitialLexer = iLexer;
 		// default scheme, current scheme and selected file type all are Text File => no lexer specified.
 		flagLexerSpecified = iLexer != 0 && !((saveFlag & FileSaveFlag_Untitled) && iLexer == NP2LEX_TEXTFILE && iLexer == lexers[0] && iLexer == pLexCurrent->rid);
-		iInitialLexer = iLexer;
+		return true;
 	}
-	NP2HeapFree(szFilter);
-	return success;
+	return false;
 }
 
 /******************************************************************************
@@ -7699,7 +7670,7 @@ void GetRelaunchParameters(LPWSTR szParameters, LPCWSTR lpszFile, bool newWind, 
 // RelaunchElevated()
 //
 //
-bool RelaunchElevated() noexcept {
+bool RelaunchElevated() {
 	if (!IsVistaAndAbove() || fIsElevated || flagRelaunchElevated == RelaunchElevatedFlag_None || flagDisplayHelp) {
 		return false;
 	}

@@ -222,7 +222,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow);
 bool ActivatePrevInst() noexcept;
 void GetRelaunchParameters(LPWSTR szParameters, LPCWSTR lpszFile, bool newWind, bool emptyWind) noexcept;
 bool RelaunchMultiInst() noexcept;
-bool RelaunchElevated() noexcept;
+bool RelaunchElevated();
 void SnapToDefaultPos(HWND hwnd) noexcept;
 void ShowNotifyIcon(HWND hwnd, bool bAdd) noexcept;
 void SetNotifyIconTitle(HWND hwnd) noexcept;
@@ -299,9 +299,9 @@ enum FileSaveFlag {
 
 bool FileIO(bool fLoad, LPWSTR pszFile, FileSaveFlag flag, EditFileIOStatus &status) noexcept;
 bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile);
-bool FileSave(FileSaveFlag saveFlag) noexcept;
-BOOL OpenFileDlg(LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) noexcept;
-BOOL SaveFileDlg(FileSaveFlag saveFlag, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) noexcept;
+bool FileSave(FileSaveFlag saveFlag);
+bool OpenFileDlg(LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir);
+bool SaveFileDlg(FileSaveFlag saveFlag, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir);
 
 enum {
 	AutoSaveOption_None = 0,
