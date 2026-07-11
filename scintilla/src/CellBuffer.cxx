@@ -424,7 +424,9 @@ SplitView CellBuffer::AllView() const noexcept {
 	const char *segment1 = substance.Segment1Pointer(0);
 	const char * const segment2 = segment1 + substance.GapLength();
 	// zero sentinel
-	memset(const_cast<char *>(segment2 + length), 0, sizeof(int));
+	if (segment2 != nullptr) {
+		memset(const_cast<char *>(segment2 + length), 0, sizeof(int));
+	}
 	if (length1 == 0) {
 		// Assign segment2 to segment1 / length1 to avoid useless test against 0 length1
 		length1 = length;
