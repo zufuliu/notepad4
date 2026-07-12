@@ -34,6 +34,7 @@
 #include "SciCall.h"
 #include "VectorISA.h"
 #include "Helpers.h"
+#include "DarkMode.h"
 #include "Dialogs.h"
 #include "Notepad4.h"
 #include "Edit.h"
@@ -515,6 +516,7 @@ static UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam, LPA
 		// Make combox handier
 		SendDlgItemMessage(hwnd, IDC_PAGESETUP_SOURCE_LIST, CB_SETEXTENDEDUI, TRUE, 0);
 		SendDlgItemMessage(hwnd, IDC_PAGESETUP_ORIENTATION_LIST, CB_SETEXTENDEDUI, TRUE, 0);
+		DarkMode_InitDialog(hwnd, DialogRefData_NotCenter);
 	}
 	break;
 

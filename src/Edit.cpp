@@ -35,6 +35,7 @@
 #include "SciCall.h"
 #include "VectorISA.h"
 #include "Helpers.h"
+#include "DarkMode.h"
 #include "Notepad4.h"
 #include "Edit.h"
 #include "Styles.h"
@@ -4927,6 +4928,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			FindReplaceSetFont(hwnd, TRUE, &hFontFindReplaceEdit);
 		}
 
+		DarkMode_InitDialog(hwnd, DialogRefData_NotCenter);
 		if (!bSwitched) {
 			if (positionRecord.xFindReplaceDlg == 0 || positionRecord.yFindReplaceDlg == 0) {
 				CenterDlgInParent(hwnd);
@@ -6077,7 +6079,7 @@ static INT_PTR CALLBACK EditLineNumDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 		wsprintf(tchLines, tchFmt, tchLn);
 		SetDlgItemText(hwnd, IDC_COLUMN_RANGE, tchLines);
 
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 	}
 	return TRUE;
 
@@ -6201,7 +6203,7 @@ static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		if (skipEmptyLine) {
 			CheckDlgButton(hwnd, IDC_MODIFY_LINE_SKIP_EMPTY, BST_CHECKED);
 		}
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 	}
 	return TRUE;
 
@@ -6269,7 +6271,7 @@ static INT_PTR CALLBACK EditAlignDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
 		const int iAlignMode = *(AsPointer<int *>(lParam));
 		CheckRadioButton(hwnd, IDC_ALIGN_LEFT, IDC_ALIGN_JUSTIFY_PAR, iAlignMode + IDC_ALIGN_LEFT);
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 	}
 	return TRUE;
 
@@ -6327,7 +6329,7 @@ static INT_PTR CALLBACK EditEncloseSelectionDlgProc(HWND hwnd, UINT umsg, WPARAM
 		SetDlgItemText(hwnd, IDC_MODIFY_LINE_PREFIX, wchPrefixSelection);
 		MultilineEditSetup(hwnd, IDC_MODIFY_LINE_APPEND);
 		SetDlgItemText(hwnd, IDC_MODIFY_LINE_APPEND, wchAppendSelection);
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 	}
 	return TRUE;
 
@@ -6390,7 +6392,7 @@ static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam
 		SetWindowText(hwndCtl, L"<tag>");
 		SetFocus(hwndCtl);
 		PostMessage(hwndCtl, EM_SETSEL, 1, 4);
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 	}
 	return FALSE;
 
@@ -6716,7 +6718,7 @@ static INT_PTR CALLBACK EditSortDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 			*piSortFlags |= EditSortFlag_ColumnSort;
 			CheckDlgButton(hwnd, IDC_SORT_COLUMN, BST_CHECKED);
 		}
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 	}
 	return TRUE;
 

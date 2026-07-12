@@ -173,7 +173,7 @@ INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) 
 
 		Edit_LimitText(hwndCtl, MAX_PATH - 1);
 		SHAutoComplete(hwndCtl, SHACF_FILESYSTEM);
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 	}
 	return TRUE;
 
@@ -326,7 +326,7 @@ INT_PTR CALLBACK GotoDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		if (GetComboBoxInfo(hwndGoto, &cbi)) {
 			SHAutoComplete(cbi.hwndItem, SHACF_FILESYSTEM);
 		}
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 	}
 	return TRUE;
 
@@ -450,7 +450,7 @@ INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 		wsprintf(wch, L"<A>%s</A>", VERSION_NEWPAGE_DISPLAY);
 		SetDlgItemText(hwnd, IDC_NEW_PAGE_LINK, wch);
 
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 	}
 	return TRUE;
 
@@ -1264,7 +1264,7 @@ INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 
 		CheckDlgButton(hwnd, IDC_NEGFILTER, bNegFilter);
 
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 	}
 	return TRUE;
 
@@ -1422,7 +1422,7 @@ INT_PTR CALLBACK RenameFileDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 		Edit_LimitText(hwndCtl, MAX_PATH - 1);
 		Edit_SetModify(hwndCtl, FALSE);
 
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 	}
 	return TRUE;
 
@@ -1552,7 +1552,7 @@ INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 			SHAutoComplete(cbi.hwndItem, SHACF_FILESYSTEM);
 		}
 
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 	}
 	return TRUE;
 
@@ -1736,7 +1736,7 @@ INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 
 		MakeBitmapButton(hwnd, IDC_GETOPENWITHDIR, g_exeInstance, IDB_OPEN_FOLDER16);
 
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 	}
 	return TRUE;
 
@@ -1896,7 +1896,7 @@ INT_PTR CALLBACK NewDirDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPara
 		ResizeDlg_InitX(hwnd, &positionRecord.cxNewDirectoryDlg, controlDefinition, COUNTOF(controlDefinition));
 
 		SendDlgItemMessage(hwnd, IDC_NEWDIR, EM_LIMITTEXT, MAX_PATH - 1, 0);
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 	}
 	return TRUE;
 
@@ -1968,7 +1968,7 @@ static INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 		hIconCross1 = LoadIcon(g_exeInstance, MAKEINTRESOURCE(IDI_CROSS1));
 		hIconCross2 = LoadIcon(g_exeInstance, MAKEINTRESOURCE(IDI_CROSS2));
 		hCursorCross = LoadCursor(g_exeInstance, MAKEINTRESOURCE(IDC_CROSSHAIR));
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 		bHasCapture = false;
 		return TRUE;
 
@@ -2184,7 +2184,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 		SetDlgItemText(hwnd, IDC_DDEAPP, szDDEApp);
 		SetDlgItemText(hwnd, IDC_DDETOPIC, szDDETopic);
 
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 	}
 	return TRUE;
 

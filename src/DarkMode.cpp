@@ -77,5 +77,7 @@ void DarkMode_InitDialog(HWND hwnd, DWORD_PTR dwRefData) noexcept {
 		if (dwRefData == DialogRefData_MsgBox) {
 			SnapToDefaultButton(hwnd);
 		}
+	} else if (dwRefData == DialogRefData_RightBottom) {
+		SetToRightBottom(hwnd);
 	}
 }

@@ -278,7 +278,7 @@ INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 		wsprintf(wch, L"<A>%s</A>", VERSION_SCIPAGE_DISPLAY);
 		SetDlgItemText(hwnd, IDC_SCI_PAGE_LINK, wch);
 
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 	}
 	return TRUE;
 
@@ -359,7 +359,7 @@ static INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 		Edit_SetText(hwndCtl, AsPointer<LPCWSTR>(lParam));
 		SHAutoComplete(hwndCtl, SHACF_FILESYSTEM);
 
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 	}
 	return TRUE;
 
@@ -535,7 +535,7 @@ INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 
 		MakeBitmapButton(hwnd, IDC_GETOPENWITHDIR, g_exeInstance, IDB_OPEN_FOLDER16);
 
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 	}
 	return TRUE;
 
@@ -705,7 +705,7 @@ static INT_PTR CALLBACK AddToFavDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 		Edit_LimitText(hwndCtl, MAX_PATH - 1);
 		Edit_SetText(hwndCtl, AsPointer<LPCWSTR>(lParam));
 
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 	}
 	return TRUE;
 
@@ -885,7 +885,7 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 			CheckDlgButton(hwnd, IDC_SAVEMRU, BST_CHECKED);
 		}
 
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 	}
 	return TRUE;
 
@@ -1105,7 +1105,7 @@ static INT_PTR CALLBACK ChangeNotifyDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 		if (bResetFileWatching) {
 			CheckDlgButton(hwnd, IDC_CHANGENOTIFY_RESET_WATCH, BST_CHECKED);
 		}
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 		return TRUE;
 
 	case WM_COMMAND:
@@ -1158,7 +1158,7 @@ static INT_PTR CALLBACK ColumnWrapDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 		SetDlgItemInt(hwnd, IDC_COLUMNWRAP, column, FALSE);
 		SendDlgItemMessage(hwnd, IDC_COLUMNWRAP, EM_LIMITTEXT, 15, 0);
 
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 	}
 	return TRUE;
 
@@ -1246,7 +1246,7 @@ static INT_PTR CALLBACK WordWrapSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 			CheckDlgButton(hwnd, IDC_WRAP_HIGHLIGHT_SUBLINE, BST_CHECKED);
 		}
 
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 	}
 	return TRUE;
 
@@ -1316,7 +1316,7 @@ static INT_PTR CALLBACK LongLineSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 			CheckRadioButton(hwnd, IDC_LONGLINE_EDGE_LINE, IDC_LONGLINE_BACK_COLOR, IDC_LONGLINE_BACK_COLOR);
 		}
 
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 	}
 	return TRUE;
 
@@ -1465,7 +1465,7 @@ static INT_PTR CALLBACK TabSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 			CheckDlgButton(hwnd, IDC_DETECT_INDENTATION, BST_CHECKED);
 		}
 
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 		if (hasFileTabSettings || !tabSettings.schemeUseGlobalTabSettings) {
 			HWND hwndCtl = GetDlgItem(hwnd, hasFileTabSettings ? IDC_FILE_TAB_WIDTH : IDC_SCHEME_TAB_WIDTH);
 			SetFocus(hwndCtl);
@@ -1625,7 +1625,7 @@ static INT_PTR CALLBACK SelectDefEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 			CheckDlgButton(hwnd, IDC_ENCODINGFROMFILEVARS, BST_CHECKED);
 		}
 
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 	}
 	return TRUE;
 
@@ -1725,7 +1725,7 @@ static INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 		TreeView_SetImageList(hwndTV, himl, TVSIL_NORMAL);
 		Encoding_AddToTreeView(hwndTV, pdd->idEncoding, pdd->bRecodeOnly);
 
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 	}
 	return TRUE;
 
@@ -1836,7 +1836,7 @@ static INT_PTR CALLBACK SelectDefLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM 
 			CheckDlgButton(hwnd, IDC_AUTOSTRIPBLANKS, BST_CHECKED);
 		}
 
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 	}
 	return TRUE;
 
@@ -1902,7 +1902,7 @@ static INT_PTR CALLBACK WarnLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 		if (status->bLineEndingsDefaultNo) {
 			SendMessage(hwnd, DM_SETDEFID, IDCANCEL, 0);
 		}
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 	}
 	return TRUE;
 
@@ -1971,11 +1971,7 @@ static INT_PTR CALLBACK ZoomLevelDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 	case WM_INITDIALOG: {
 		const int zoomLevel = SciCall_GetZoom();
 		InitZoomLevelComboBox(hwnd, IDC_ZOOMLEVEL, zoomLevel);
-		if (lParam) {
-			SetToRightBottom(hwnd);
-		} else {
-			CenterDlgInParent(hwnd);
-		}
+		DarkMode_InitDialog(hwnd, lParam ? DialogRefData_RightBottom : DialogRefData_None);
 	}
 	return TRUE;
 
@@ -2117,7 +2113,7 @@ static INT_PTR CALLBACK AutoCompletionSettingsDlgProc(HWND hwnd, UINT umsg, WPAR
 		mask = autoCompletionConfig.iAsmLineCommentChar;
 		CheckRadioButton(hwnd, IDC_ASM_LINE_COMMENT_SEMICOLON, IDC_ASM_LINE_COMMENT_AT, IDC_ASM_LINE_COMMENT_SEMICOLON + mask);
 
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 	}
 	return TRUE;
 
@@ -2285,7 +2281,7 @@ static INT_PTR CALLBACK AutoSaveSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 		}
 		SetDlgItemText(hwnd, IDC_AUTOSAVE_PERIOD, tch);
 
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 	};
 	return TRUE;
 
@@ -2385,7 +2381,7 @@ INT_PTR CALLBACK InfoBoxDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 		if (lpib->bDisableCheckBox) {
 			EnableWindow(GetDlgItem(hwnd, IDC_INFOBOXCHECK), FALSE);
 		}
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd, DialogRefData_MsgBox);
 	}
 	return TRUE;
 
@@ -2773,7 +2769,7 @@ INT_PTR CALLBACK SystemIntegrationDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 			EnableWindow(GetDlgItem(hwnd, IDC_REPLACE_WINDOWS_NOTEPAD), FALSE);
 		}
 
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 	}
 	return TRUE;
 

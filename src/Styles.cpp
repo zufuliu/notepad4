@@ -31,6 +31,7 @@
 #include "SciCall.h"
 #include "config.h"
 #include "Helpers.h"
+#include "DarkMode.h"
 #include "VectorISA.h"
 #include "GraphicUtils.h"
 #include "Notepad4.h"
@@ -4229,7 +4230,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 		StyleConfigDlgParam *param = AsPointer<StyleConfigDlgParam *>(lParam);
 		param->hFontTitle = hFontTitle;
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 	}
 	return TRUE;
 
@@ -5017,7 +5018,7 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 			CheckDlgButton(hwnd, IDC_AUTOSELECT, BST_CHECKED);
 		}
 
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 	}
 	return TRUE;
 
@@ -5233,7 +5234,7 @@ static INT_PTR CALLBACK SelectCSVOptionsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 		if (option & CsvOption_MergeDelimiter) {
 			CheckDlgButton(hwnd, IDC_CSV_MERGE_DELIMITER, BST_CHECKED);
 		}
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 	}
 	return TRUE;
 
