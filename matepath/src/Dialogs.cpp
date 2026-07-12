@@ -1720,15 +1720,7 @@ INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 		ResizeDlg_Init(hwnd, &positionRecord.cxOpenWithDlg, &positionRecord.cyOpenWithDlg, controlDefinition, COUNTOF(controlDefinition));
 
 		HWND hwndLV = GetDlgItem(hwnd, IDC_OPENWITHDIR);
-		InitWindowCommon(hwndLV);
-		//SetExplorerTheme(hwndLV);
-		ListView_SetExtendedListViewStyle(hwndLV, /*LVS_EX_FULLROWSELECT | */LVS_EX_DOUBLEBUFFER | LVS_EX_LABELTIP);
-		const LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT, LVCFMT_LEFT, 0, nullptr, -1, 0, 0, 0
-#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-			, 0, 0, 0
-#endif
-		};
-		ListView_InsertColumn(hwndLV, 0, &lvc);
+		DarkMode_InitFileListView(hwndLV);
 		DirList_Init(hwndLV);
 		DirList_Fill(hwndLV, tchOpenWithDir, DL_ALLOBJECTS, nullptr, false, flagNoFadeHidden, DS_NAME, false);
 		DirList_StartIconThread(hwndLV);

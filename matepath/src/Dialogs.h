@@ -46,6 +46,7 @@ INT_PTR OptionsPropSheet(HWND hwnd, HINSTANCE hInstance) noexcept;
 bool GetFilterDlg(HWND hwnd) noexcept;
 bool RenameFileDlg(HWND hwnd);
 bool CopyMoveDlg(HWND hwnd, UINT *wFunc);
+struct DirListItem;
 bool OpenWithDlg(HWND hwnd, const DirListItem *lpdliParam);
 bool NewDirDlg(HWND hwnd, LPWSTR pszNewDir) noexcept;
 

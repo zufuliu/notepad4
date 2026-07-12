@@ -811,7 +811,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 					  hInstance,
 					  nullptr);
 
-	InitWindowCommon(hwndDirList);
+	DarkMode_InitFileListView(hwndDirList);
 
 	const DWORD dwDriveBoxStyle = bShowDriveBox ? (WS_DRIVEBOX | WS_VISIBLE) : WS_DRIVEBOX;
 	hwndDriveBox = CreateWindowEx(
@@ -833,13 +833,6 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	DriveBox_Init(hwndDriveBox);
 	ComboBox_SetExtendedUI(hwndDriveBox, TRUE);
 	// DirList
-	const LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT, LVCFMT_LEFT, 0, nullptr, -1, 0, 0, 0
-#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-			, 0, 0, 0
-#endif
-	};
-	ListView_SetExtendedListViewStyle(hwndDirList, LVS_EX_DOUBLEBUFFER | LVS_EX_LABELTIP);
-	ListView_InsertColumn(hwndDirList, 0, &lvc);
 	DirList_Init(hwndDirList);
 	if (bTrackSelect) {
 		ListView_SetExtendedListViewStyleEx(hwndDirList,

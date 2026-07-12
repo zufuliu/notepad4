@@ -89,3 +89,15 @@ void DarkMode_InitTreeView(HWND hwndTV) noexcept {
 	TreeView_SetExtendedStyle(hwndTV, TVS_EX_DOUBLEBUFFER, TVS_EX_DOUBLEBUFFER);
 	SetWindowTheme(hwndTV, L"Explorer", nullptr);
 }
+
+NP2_noinline
+void DarkMode_InitFileListView(HWND hwndLV) noexcept {
+	InitWindowCommon(hwndLV);
+	ListView_SetExtendedListViewStyle(hwndLV, /*LVS_EX_FULLROWSELECT|*/LVS_EX_DOUBLEBUFFER | LVS_EX_LABELTIP);
+	// SetWindowTheme(hwndLV, L"Explorer", nullptr);
+
+	LVCOLUMN lvc{};
+	lvc.mask = LVCF_FMT | LVCF_TEXT;
+	lvc.fmt = LVCFMT_LEFT;
+	ListView_InsertColumn(hwndLV, 0, &lvc);
+}

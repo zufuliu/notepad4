@@ -13,6 +13,7 @@
 #include "config.h"
 #include "Helpers.h"
 #include "DarkMode.h"
+#include "Dialogs.h"
 
 namespace { // DialogHook
 
@@ -78,4 +79,16 @@ void DarkMode_InitDialog(HWND hwnd, DWORD_PTR dwRefData) noexcept {
 			SnapToDefaultButton(hwnd);
 		}
 	}
+}
+
+NP2_noinline
+void DarkMode_InitFileListView(HWND hwndLV) noexcept {
+	InitWindowCommon(hwndLV);
+	ListView_SetExtendedListViewStyle(hwndLV, /*LVS_EX_FULLROWSELECT|*/LVS_EX_DOUBLEBUFFER | LVS_EX_LABELTIP);
+	// SetWindowTheme(hwndLV, L"Explorer", nullptr);
+
+	LVCOLUMN lvc{};
+	lvc.mask = LVCF_FMT | LVCF_TEXT;
+	lvc.fmt = LVCFMT_LEFT;
+	ListView_InsertColumn(hwndLV, 0, &lvc);
 }
