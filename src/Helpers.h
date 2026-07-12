@@ -990,10 +990,9 @@ struct FileDialog {
 
 	LPWSTR Show(HWND hwndOwner, LPCWSTR lpstrInitialDir, LPCWSTR lpstrFile, UINT idsTitle = 0);
 	void ParseFilter(LPWSTR szFilter) noexcept;
+	// File Dialog Hook
+	static LRESULT CALLBACK SubProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 };
-
-//==== File Dialog Hook =========================================================
-UINT_PTR CALLBACK OpenSaveFileDlgHookProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) noexcept;
 
 //==== UnSlash Functions ======================================================
 void TransformBackslashes(char *pszInput, BOOL bRegEx, UINT cpEdit) noexcept;

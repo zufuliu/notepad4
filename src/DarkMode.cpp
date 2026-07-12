@@ -42,6 +42,7 @@ LRESULT CALLBACK DialogHook::HookProc(int nCode, WPARAM wParam, LPARAM lParam) n
 			memset(&dialogHook, 0, sizeof(dialogHook));
 			UnhookWindowsHookEx(current.hook);
 			if (current.dwRefData > DialogRefData_MaxValue) {
+				SetWindowSubclass(cwpret->hwnd, FileDialog::SubProc, 0, current.dwRefData);
 			} else {
 			}
 		}

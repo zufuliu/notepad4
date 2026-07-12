@@ -22,7 +22,7 @@
 #include <windowsx.h>
 #include <dde.h>
 #include <ddeml.h>
-#include <dlgs.h>
+// #include <dlgs.h>
 #include <shlwapi.h>
 #include <shlobj.h>
 #include <shellapi.h>
@@ -34,6 +34,7 @@
 #include <cstdio>
 #include "config.h"
 #include "Helpers.h"
+#include "DarkMode.h"
 #include "../../scintilla/include/VectorISA.h"
 #include "../../scintilla/include/GraphicUtils.h"
 #include "Dlapi.h"
@@ -1575,6 +1576,7 @@ void StrTab2Space(LPWSTR lpsz) noexcept {
 //
 // PathFixBackslashes() - in place conversion
 //
+NP2_noinline
 bool PathFixBackslashes(LPWSTR lpsz) noexcept {
 	WCHAR *c = lpsz;
 	bool bFixed = false;
@@ -2214,7 +2216,9 @@ LPWSTR FileDialog::Show(HWND hwndOwner, LPCWSTR lpstrInitialDir, LPCWSTR lpstrFi
 				folder->Release();
 			}
 		}
+		DialogHook_Start(AsInteger<DWORD_PTR>(dialog));
 		const HRESULT hr = dialog->Show(hwndOwner);
+		DialogHook_Stop();
 		if (SUCCEEDED(hr)) {
 			IShellItem *folder = nullptr;
 			if (SUCCEEDED(dialog->GetResult(&folder))) {
@@ -2234,51 +2238,28 @@ LPWSTR FileDialog::Show(HWND hwndOwner, LPCWSTR lpstrInitialDir, LPCWSTR lpstrFi
 	return pszPath;
 }
 
-//=============================================================================
-//
-// File Dialog Hook for GetOpenFileName/GetSaveFileName
-// https://docs.microsoft.com/en-us/windows/win32/dlgbox/open-and-save-as-dialog-boxes
-//
-static LRESULT CALLBACK OpenSaveFileDlgSubProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData) noexcept {
-	UNREFERENCED_PARAMETER(dwRefData);
-
+LRESULT CALLBACK FileDialog::SubProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData) {
 	switch (umsg) {
 	case WM_COMMAND:
-		switch (wParam) {
-		case IDOK: {
-			WCHAR szPath[MAX_PATH];
-			HWND hCmbPath = GetDlgItem(hwnd, cmb13); // cmb13: dlgs.h
-			GetWindowText(hCmbPath, szPath, MAX_PATH);
-			if (PathFixBackslashes(szPath)) {
-				SetWindowText(hCmbPath, szPath);
+		if (LOWORD(wParam) == IDOK) {
+			LPWSTR pszName = nullptr;
+			auto dialog = AsPointer<IFileDialog *>(dwRefData);
+			if (SUCCEEDED(dialog->GetFileName(&pszName))) {
+				if (PathFixBackslashes(pszName)) {
+					dialog->SetFileName(pszName);
+					// SetDlgItemText(hwnd, cmb13, pszName); // cmb13: dlgs.h
+				}
+				CoTaskMemFree(pszName);
 			}
-		} break;
-	} break;
+		}
+		break;
 
 	case WM_NCDESTROY:
-		RemoveWindowSubclass(hwnd, OpenSaveFileDlgSubProc, uIdSubclass);
+		RemoveWindowSubclass(hwnd, FileDialog::SubProc, uIdSubclass);
 		break;
 	}
 
 	return DefSubclassProc(hwnd, umsg, wParam, lParam);
-}
-
-UINT_PTR CALLBACK OpenSaveFileDlgHookProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
-	UNREFERENCED_PARAMETER(wParam);
-
-	switch (umsg) {
-	case WM_NOTIFY: {
-		LPOFNOTIFY pOFNOTIFY = AsPointer<LPOFNOTIFY>(lParam);
-		switch (pOFNOTIFY->hdr.code) {
-		case CDN_INITDONE:
-			// OFN_OVERWRITEPROMPT is tested before OFNHookProc making "D:\d" like folder path trigger a prompt.
-			// Hook the default (parent) dialog box procedure.
-			SetWindowSubclass(GetParent(hwnd), OpenSaveFileDlgSubProc, 0, 0);
-			break;
-		}
-	} break;
-	}
-	return FALSE;
 }
 
 /*
