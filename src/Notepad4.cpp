@@ -1522,17 +1522,6 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 
-	case APPM_CENTER_MESSAGE_BOX: {
-		HWND box = FindWindow(L"#32770", nullptr);
-		HWND parent = GetParent(box);
-		// MessageBox belongs to us.
-		if (parent == AsPointer<HWND>(wParam) || parent == hwnd) {
-			CenterDlgInParentEx(box, parent);
-			SnapToDefaultButton(box);
-		}
-	}
-	break;
-
 	case APPM_POST_HOTSPOTCLICK: {
 		// release mouse capture and restore selection
 		const int x = SciCall_PointXFromPosition(lParam);

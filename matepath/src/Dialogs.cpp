@@ -28,6 +28,7 @@
 #include <uxtheme.h>
 #include "config.h"
 #include "Helpers.h"
+#include "DarkMode.h"
 #include "matepath.h"
 #include "Dlapi.h"
 #include "Dialogs.h"
@@ -67,13 +68,17 @@ int MsgBox(UINT uType, UINT uIdMsg, ...) noexcept {
 		uType |= MB_RTLREADING;
 	}
 
-	HWND hwnd = GetMsgBoxParent();
-	PostMessage(hwndMain, APPM_CENTER_MESSAGE_BOX, AsInteger<WPARAM>(hwnd), 0);
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
-	return MessageBoxEx(hwnd, szText, szTitle, uType, uiLanguage);
+	const LANGID lang = uiLanguage;
 #else
-	return MessageBoxEx(hwnd, szText, szTitle, uType, LANG_USER_DEFAULT);
+	constexpr LANGID lang = LANG_USER_DEFAULT;
 #endif
+
+	HWND hwnd = GetMsgBoxParent();
+	DialogHook_Start(DialogRefData_MsgBox);
+	const int result = MessageBoxEx(hwnd, szText, szTitle, uType, lang);
+	DialogHook_Stop();
+	return result;
 }
 
 //=============================================================================
@@ -803,7 +808,8 @@ INT_PTR CALLBACK ItemsPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPara
 			cc.lpCustColors = colorCustom;
 			cc.Flags = CC_RGBINIT | CC_SOLIDCOLOR;
 
-			if (ChooseColor(&cc)) {
+			const BOOL result = ChooseColor(&cc);
+			if (result) {
 				if (LOWORD(wParam) == IDC_COLOR_PICK1) {
 					DeleteObject(m_hbrNoFilter);
 					m_colorNoFilter = cc.rgbResult;

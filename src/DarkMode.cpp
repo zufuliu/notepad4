@@ -44,6 +44,7 @@ LRESULT CALLBACK DialogHook::HookProc(int nCode, WPARAM wParam, LPARAM lParam) n
 			if (current.dwRefData > DialogRefData_MaxValue) {
 				SetWindowSubclass(cwpret->hwnd, FileDialog::SubProc, 0, current.dwRefData);
 			} else {
+				DarkMode_InitDialog(cwpret->hwnd, current.dwRefData);
 			}
 		}
 	}
@@ -67,4 +68,14 @@ void DarkMode_Init() noexcept {
 }
 
 void DarkMode_Cleanup() noexcept {
+}
+
+NP2_noinline
+void DarkMode_InitDialog(HWND hwnd, DWORD_PTR dwRefData) noexcept {
+	if (dwRefData < DialogRefData_NotCenter) {
+		CenterDlgInParent(hwnd);
+		if (dwRefData == DialogRefData_MsgBox) {
+			SnapToDefaultButton(hwnd);
+		}
+	}
 }

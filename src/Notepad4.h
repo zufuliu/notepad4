@@ -117,10 +117,6 @@ enum {
 };
 #define STATUS_HELP			(255 | SBT_NOBORDERS)
 
-/**
- * App message used to center MessageBox to the window of the program.
- */
-#define APPM_CENTER_MESSAGE_BOX		(WM_APP + 1)
 #define APPM_CHANGENOTIFY			(WM_APP + 2)	// file change notifications
 //#define APPM_CHANGENOTIFYCLEAR	(WM_APP + 3)
 #define APPM_TRAYMESSAGE			(WM_APP + 4)	// callback message from system tray

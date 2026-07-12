@@ -3508,7 +3508,8 @@ bool Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, bool bDefaultSt
 		cf.Flags |= CF_FIXEDPITCHONLY;
 	}
 
-	if (!ChooseFont(&cf) || StrIsEmpty(lf.lfFaceName)) {
+	const BOOL result = ChooseFont(&cf);
+	if (!result || StrIsEmpty(lf.lfFaceName)) {
 		return false;
 	}
 

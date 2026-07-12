@@ -13,3 +13,4 @@ void DialogHook_Start(DWORD_PTR dwRefData) noexcept;
 void DialogHook_Stop() noexcept;
 void DarkMode_Init() noexcept;
 void DarkMode_Cleanup() noexcept;
+void DarkMode_InitDialog(HWND hwnd, DWORD_PTR dwRefData = DialogRefData_None) noexcept;

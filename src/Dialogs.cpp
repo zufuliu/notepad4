@@ -29,6 +29,7 @@
 #include "config.h"
 #include "SciCall.h"
 #include "Helpers.h"
+#include "DarkMode.h"
 #include "Notepad4.h"
 #include "Edit.h"
 #include "Styles.h"
@@ -112,8 +113,10 @@ int MsgBox(UINT uType, UINT uIdMsg, ...) noexcept {
 	}
 
 	HWND hwnd = GetMsgBoxParent();
-	PostMessage(hwndMain, APPM_CENTER_MESSAGE_BOX, AsInteger<WPARAM>(hwnd), 0);
-	return MessageBoxEx(hwnd, szText, szTitle, uType, lang);
+	DialogHook_Start(DialogRefData_MsgBox);
+	const int result = MessageBoxEx(hwnd, szText, szTitle, uType, lang);
+	DialogHook_Stop();
+	return result;
 }
 
 //=============================================================================
@@ -147,9 +150,10 @@ void DisplayCmdLineHelp(HWND hwnd) noexcept {
 	}
 
 	if (hwnd != nullptr) {
-		PostMessage(hwndMain, APPM_CENTER_MESSAGE_BOX, AsInteger<WPARAM>(hwnd), 0);
+		DialogHook_Start(DialogRefData_MsgBox);
 	}
 	MessageBoxIndirect(&mbp);
+	DialogHook_Stop();
 }
 
 void OpenHelpLink(HWND hwnd, int cmd) noexcept {
