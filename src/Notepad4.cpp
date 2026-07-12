@@ -33,6 +33,7 @@
 #include "VectorISA.h"
 #include "config.h"
 #include "Helpers.h"
+#include "DarkMode.h"
 #include "Notepad4.h"
 #include "Edit.h"
 #include "Styles.h"
@@ -422,6 +423,7 @@ static void CleanUpResources(bool initialized) noexcept {
 	Style_ReleaseResources();
 	Edit_ReleaseResources();
 	Scintilla_ReleaseResources();
+	DarkMode_Cleanup();
 
 	if (hTrayIcon) {
 		DestroyIcon(hTrayIcon);
@@ -622,6 +624,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 	// Load Settings
 	LoadSettings();
+	DarkMode_Init();
 
 	if (!InitApplication(hInstance)) {
 		CleanUpResources(false);

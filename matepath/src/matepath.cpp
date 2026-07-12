@@ -30,6 +30,7 @@
 #include <cstdio>
 #include "config.h"
 #include "Helpers.h"
+#include "DarkMode.h"
 #include "../../scintilla/include/VectorISA.h"
 #include "Dlapi.h"
 #include "Dialogs.h"
@@ -221,6 +222,7 @@ static inline bool HasFilter() noexcept {
 //
 //
 static void CleanUpResources(bool initialized) noexcept {
+	DarkMode_Cleanup();
 	if (tchToolbarBitmap != nullptr) {
 		LocalFree(tchToolbarBitmap);
 	}
@@ -355,6 +357,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 	// Load Settings
 	LoadSettings();
+	DarkMode_Init();
 
 	if (!InitApplication(hInstance)) {
 		CleanUpResources(false);

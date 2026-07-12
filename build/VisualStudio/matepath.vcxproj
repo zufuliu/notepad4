@@ -462,6 +462,7 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\matepath\src\DarkMode.cpp" />
     <ClCompile Include="..\..\matepath\src\Dialogs.cpp" />
     <ClCompile Include="..\..\matepath\src\Dlapi.cpp" />
     <ClCompile Include="..\..\matepath\src\DropSource.cpp" />
@@ -471,6 +472,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\matepath\src\compiler.h" />
     <ClInclude Include="..\..\matepath\src\config.h" />
+    <ClInclude Include="..\..\matepath\src\DarkMode.h" />
     <ClInclude Include="..\..\matepath\src\Dialogs.h" />
     <ClInclude Include="..\..\matepath\src\Dlapi.h" />
     <ClInclude Include="..\..\matepath\src\DropSource.h" />

@@ -584,6 +584,7 @@
     <ClCompile Include="..\..\scintilla\win32\SurfaceD2D.cxx" />
     <ClCompile Include="..\..\scintilla\win32\SurfaceGDI.cxx" />
     <ClCompile Include="..\..\src\Bridge.cpp" />
+    <ClCompile Include="..\..\src\DarkMode.cpp" />
     <ClCompile Include="..\..\src\Dialogs.cpp" />
     <ClCompile Include="..\..\src\Dlapi.cpp" />
     <ClCompile Include="..\..\src\Edit.cpp" />
@@ -747,6 +748,7 @@
     <ClInclude Include="..\..\scintilla\win32\WinTypes.h" />
     <ClInclude Include="..\..\src\compiler.h" />
     <ClInclude Include="..\..\src\config.h" />
+    <ClInclude Include="..\..\src\DarkMode.h" />
     <ClInclude Include="..\..\src\Dialogs.h" />
     <ClInclude Include="..\..\src\Dlapi.h" />
     <ClInclude Include="..\..\src\Edit.h" />
