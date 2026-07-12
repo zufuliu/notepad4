@@ -82,10 +82,13 @@ void DarkMode_InitDialog(HWND hwnd, DWORD_PTR dwRefData) noexcept {
 }
 
 NP2_noinline
-void DarkMode_InitFileListView(HWND hwndLV) noexcept {
+void DarkMode_InitFileListView(HWND hwndLV, DWORD exStyle) noexcept {
 	InitWindowCommon(hwndLV);
-	ListView_SetExtendedListViewStyle(hwndLV, /*LVS_EX_FULLROWSELECT|*/LVS_EX_DOUBLEBUFFER | LVS_EX_LABELTIP);
-	// SetWindowTheme(hwndLV, L"Explorer", nullptr);
+	exStyle |= LVS_EX_DOUBLEBUFFER | LVS_EX_LABELTIP;
+	ListView_SetExtendedListViewStyle(hwndLV, exStyle);
+	if (exStyle & LVS_EX_FULLROWSELECT) {
+		SetWindowTheme(hwndLV, L"Explorer", nullptr);
+	}
 
 	LVCOLUMN lvc{};
 	lvc.mask = LVCF_FMT | LVCF_TEXT;

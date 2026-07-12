@@ -1206,33 +1206,27 @@ INT_PTR OptionsPropSheet(HWND hwnd, HINSTANCE hInstance) noexcept {
 
 	// Apply the results
 	if (nResult) {
-		if (bAlwaysOnTop) {
-			SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-		} else {
-			SetWindowPos(hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-		}
+		SetWindowPos(hwnd, (bAlwaysOnTop ? HWND_TOPMOST : HWND_NOTOPMOST), 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 
+		constexpr DWORD mask = LVS_EX_TRACKSELECT | LVS_EX_ONECLICKACTIVATE | LVS_EX_FULLROWSELECT;
+		DWORD exStyle = 0;
 		if (bTrackSelect) {
-			ListView_SetExtendedListViewStyleEx(hwndDirList, LVS_EX_TRACKSELECT | LVS_EX_ONECLICKACTIVATE, LVS_EX_TRACKSELECT | LVS_EX_ONECLICKACTIVATE);
-		} else {
-			ListView_SetExtendedListViewStyleEx(hwndDirList, LVS_EX_TRACKSELECT | LVS_EX_ONECLICKACTIVATE, 0);
+			exStyle = LVS_EX_TRACKSELECT | LVS_EX_ONECLICKACTIVATE;
 		}
-
 		if (bFullRowSelect) {
-			ListView_SetExtendedListViewStyleEx(hwndDirList, LVS_EX_FULLROWSELECT, LVS_EX_FULLROWSELECT);
-			SetExplorerTheme(hwndDirList);
-		} else {
-			ListView_SetExtendedListViewStyleEx(hwndDirList, LVS_EX_FULLROWSELECT, 0);
-			SetListViewTheme(hwndDirList);
+			exStyle |= LVS_EX_FULLROWSELECT;
 		}
+		ListView_SetExtendedListViewStyleEx(hwndDirList, mask, exStyle);
+		SetWindowTheme(hwndDirList, (bFullRowSelect ? L"Explorer" : L"Listview"), nullptr);
 
+		COLORREF color;
 		if (!StrEqualEx(tchFilter, L"*.*") || bNegFilter) {
-			ListView_SetTextColor(hwndDirList, bDefColorFilter ? GetSysColor(COLOR_WINDOWTEXT) : colorFilter);
-			ListView_RedrawItems(hwndDirList, 0, ListView_GetItemCount(hwndDirList) - 1);
+			color = bDefColorFilter ? GetSysColor(COLOR_WINDOWTEXT) : colorFilter;
 		} else {
-			ListView_SetTextColor(hwndDirList, bDefColorNoFilter ? GetSysColor(COLOR_WINDOWTEXT) : colorNoFilter);
-			ListView_RedrawItems(hwndDirList, 0, ListView_GetItemCount(hwndDirList) - 1);
+			color = bDefColorNoFilter ? GetSysColor(COLOR_WINDOWTEXT) : colorNoFilter;
 		}
+		ListView_SetTextColor(hwndDirList, color);
+		ListView_RedrawItems(hwndDirList, 0, ListView_GetItemCount(hwndDirList) - 1);
 	}
 
 	return nResult;

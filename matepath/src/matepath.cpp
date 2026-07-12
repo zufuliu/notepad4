@@ -811,7 +811,14 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 					  hInstance,
 					  nullptr);
 
-	DarkMode_InitFileListView(hwndDirList);
+	DWORD exStyle = 0;
+	if (bTrackSelect) {
+		exStyle = LVS_EX_TRACKSELECT | LVS_EX_ONECLICKACTIVATE;
+	}
+	if (bFullRowSelect) {
+		exStyle |= LVS_EX_FULLROWSELECT;
+	}
+	DarkMode_InitFileListView(hwndDirList, exStyle);
 
 	const DWORD dwDriveBoxStyle = bShowDriveBox ? (WS_DRIVEBOX | WS_VISIBLE) : WS_DRIVEBOX;
 	hwndDriveBox = CreateWindowEx(
@@ -834,18 +841,6 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	ComboBox_SetExtendedUI(hwndDriveBox, TRUE);
 	// DirList
 	DirList_Init(hwndDirList);
-	if (bTrackSelect) {
-		ListView_SetExtendedListViewStyleEx(hwndDirList,
-											LVS_EX_TRACKSELECT | LVS_EX_ONECLICKACTIVATE,
-											LVS_EX_TRACKSELECT | LVS_EX_ONECLICKACTIVATE);
-	}
-	if (bFullRowSelect) {
-		ListView_SetExtendedListViewStyleEx(hwndDirList,
-											LVS_EX_FULLROWSELECT,
-											LVS_EX_FULLROWSELECT);
-		SetExplorerTheme(hwndDirList);
-	}
-
 	ListView_SetHoverTime(hwndDirList, 50);
 	// Drag & Drop
 	DragAcceptFiles(hwnd, TRUE);
@@ -1060,11 +1055,7 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	DWORD dwExStyle = GetWindowExStyle(hwndDirList);
 	if (IsAppThemed()) {
 		dwExStyle &= ~WS_EX_CLIENTEDGE;
-		if (bFullRowSelect) {
-			SetExplorerTheme(hwndDirList);
-		} else {
-			SetListViewTheme(hwndDirList);
-		}
+		SetWindowTheme(hwndDirList, (bFullRowSelect ? L"Explorer" : L"Listview"), nullptr);
 	} else {
 		dwExStyle |= WS_EX_CLIENTEDGE;
 	}
