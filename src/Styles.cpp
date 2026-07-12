@@ -4021,9 +4021,7 @@ static HTREEITEM Style_AddAllLexerToTreeView(HWND hwndTV, bool withStyles, bool 
 		++groupCount;
 	}
 
-	InitWindowCommon(hwndTV);
-	TreeView_SetExtendedStyle(hwndTV, TVS_EX_DOUBLEBUFFER, TVS_EX_DOUBLEBUFFER);
-	SetExplorerTheme(hwndTV);
+	DarkMode_InitTreeView(hwndTV);
 
 	constexpr DWORD iconFlags = SHGFI_USEFILEATTRIBUTES | SHGFI_SMALLICON | SHGFI_SYSICONINDEX;
 	SHFILEINFO shfi;

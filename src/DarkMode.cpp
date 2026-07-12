@@ -13,6 +13,7 @@
 #include "config.h"
 #include "Helpers.h"
 #include "DarkMode.h"
+#include "Dialogs.h"
 
 namespace { // DialogHook
 
@@ -80,4 +81,11 @@ void DarkMode_InitDialog(HWND hwnd, DWORD_PTR dwRefData) noexcept {
 	} else if (dwRefData == DialogRefData_RightBottom) {
 		SetToRightBottom(hwnd);
 	}
+}
+
+NP2_noinline
+void DarkMode_InitTreeView(HWND hwndTV) noexcept {
+	InitWindowCommon(hwndTV);
+	TreeView_SetExtendedStyle(hwndTV, TVS_EX_DOUBLEBUFFER, TVS_EX_DOUBLEBUFFER);
+	SetWindowTheme(hwndTV, L"Explorer", nullptr);
 }

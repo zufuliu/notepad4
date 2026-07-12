@@ -1718,9 +1718,7 @@ static INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 		ImageList_AddIcon(himl, shfi.hIcon);
 
 		HWND hwndTV = GetDlgItem(hwnd, IDC_ENCODINGLIST);
-		InitWindowCommon(hwndTV);
-		TreeView_SetExtendedStyle(hwndTV, TVS_EX_DOUBLEBUFFER, TVS_EX_DOUBLEBUFFER);
-		SetExplorerTheme(hwndTV);
+		DarkMode_InitTreeView(hwndTV);
 
 		TreeView_SetImageList(hwndTV, himl, TVSIL_NORMAL);
 		Encoding_AddToTreeView(hwndTV, pdd->idEncoding, pdd->bRecodeOnly);
