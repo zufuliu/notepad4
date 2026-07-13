@@ -570,13 +570,14 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		SendMessage(hwndToolbar, WM_SYSCOLORCHANGE, wParam, lParam);
 		const LRESULT lret = DefWindowProc(hwnd, umsg, wParam, lParam);
 
+		COLORREF color = GetSysColor(COLOR_WINDOWTEXT);
 		if (HasFilter()) {
-			ListView_SetTextColor(hwndDirList, (bDefColorFilter) ? GetSysColor(COLOR_WINDOWTEXT) : colorFilter);
-			ListView_RedrawItems(hwndDirList, 0, ListView_GetItemCount(hwndDirList) - 1);
+			color = bDefColorFilter ? color : colorFilter;
 		} else {
-			ListView_SetTextColor(hwndDirList, (bDefColorNoFilter) ? GetSysColor(COLOR_WINDOWTEXT) : colorNoFilter);
-			ListView_RedrawItems(hwndDirList, 0, ListView_GetItemCount(hwndDirList) - 1);
+			color = bDefColorNoFilter ? color : colorNoFilter;
 		}
+		ListView_SetTextColor(hwndDirList, color);
+		ListView_RedrawItems(hwndDirList, 0, ListView_GetItemCount(hwndDirList) - 1);
 		return lret;
 	}
 
@@ -2256,13 +2257,15 @@ bool ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, bool bUpdateHistory) {
 		GetCurrentDirectory(COUNTOF(szCurDir), szCurDir);
 		SetWindowPathTitle(hwnd, szCurDir);
 
-		if (HasFilter()) {
-			ListView_SetTextColor(hwndDirList, (bDefColorFilter) ? GetSysColor(COLOR_WINDOWTEXT) : colorFilter);
-			Toolbar_SetButtonImage(hwndToolbar, IDT_VIEW_FILTER, TB_DEL_FILTER_BMP);
+		COLORREF color = GetSysColor(COLOR_WINDOWTEXT);
+		const bool has = HasFilter();
+		if (has) {
+			color = bDefColorFilter ? color : colorFilter;
 		} else {
-			ListView_SetTextColor(hwndDirList, (bDefColorNoFilter) ? GetSysColor(COLOR_WINDOWTEXT) : colorNoFilter);
-			Toolbar_SetButtonImage(hwndToolbar, IDT_VIEW_FILTER, TB_ADD_FILTER_BMP);
+			color = bDefColorNoFilter ? color : colorNoFilter;
 		}
+		Toolbar_SetButtonImage(hwndToolbar, IDT_VIEW_FILTER, (has ? TB_DEL_FILTER_BMP : TB_ADD_FILTER_BMP));
+		ListView_SetTextColor(hwndDirList, color);
 
 		const int cItems = DirList_Fill(hwndDirList, szCurDir, dwFillMask, tchFilter, bNegFilter, flagNoFadeHidden, nSortFlags, fSortRev);
 		DirList_StartIconThread(hwndDirList);

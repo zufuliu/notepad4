@@ -1191,17 +1191,8 @@ INT_PTR OptionsPropSheet(HWND hwnd, HINSTANCE hInstance) noexcept {
 
 	const INT_PTR nResult = PropertySheet(&psh);
 
-	if (psp[0].pResource) {
-		NP2HeapFree(const_cast<DLGTEMPLATE *>(psp[0].pResource));
-	}
-	if (psp[1].pResource) {
-		NP2HeapFree(const_cast<DLGTEMPLATE *>(psp[1].pResource));
-	}
-	if (psp[2].pResource) {
-		NP2HeapFree(const_cast<DLGTEMPLATE *>(psp[2].pResource));
-	}
-	if (psp[3].pResource) {
-		NP2HeapFree(const_cast<DLGTEMPLATE *>(psp[3].pResource));
+	for (UINT index = 0; index < COUNTOF(psp); index++) {
+		NP2HeapFree(const_cast<DLGTEMPLATE *>(psp[index].pResource));
 	}
 
 	// Apply the results
@@ -1217,13 +1208,13 @@ INT_PTR OptionsPropSheet(HWND hwnd, HINSTANCE hInstance) noexcept {
 			exStyle |= LVS_EX_FULLROWSELECT;
 		}
 		ListView_SetExtendedListViewStyleEx(hwndDirList, mask, exStyle);
-		SetWindowTheme(hwndDirList, (bFullRowSelect ? L"Explorer" : L"Listview"), nullptr);
+		SetWindowTheme(hwndDirList, ((exStyle & LVS_EX_FULLROWSELECT) ? L"Explorer" : L"Listview"), nullptr);
 
-		COLORREF color;
+		COLORREF color = GetSysColor(COLOR_WINDOWTEXT);
 		if (!StrEqualEx(tchFilter, L"*.*") || bNegFilter) {
-			color = bDefColorFilter ? GetSysColor(COLOR_WINDOWTEXT) : colorFilter;
+			color = bDefColorFilter ? color : colorFilter;
 		} else {
-			color = bDefColorNoFilter ? GetSysColor(COLOR_WINDOWTEXT) : colorNoFilter;
+			color = bDefColorNoFilter ? color : colorNoFilter;
 		}
 		ListView_SetTextColor(hwndDirList, color);
 		ListView_RedrawItems(hwndDirList, 0, ListView_GetItemCount(hwndDirList) - 1);

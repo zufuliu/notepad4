@@ -486,9 +486,6 @@ bool IsElevated() noexcept;
 bool ExeNameFromWnd(HWND hwnd, LPWSTR szExeName, DWORD cchExeName) noexcept;
 //bool Is32bitExe(LPCWSTR lpszExeName) noexcept;
 
-#define SetExplorerTheme(hwnd)		SetWindowTheme((hwnd), L"Explorer", nullptr)
-#define SetListViewTheme(hwnd)		SetWindowTheme((hwnd), L"Listview", nullptr)
-
 HBITMAP LoadBitmapFile(LPCWSTR path) noexcept;
 HBITMAP ResizeImageForDPI(HBITMAP hbmp, UINT dpi) noexcept;
 inline HBITMAP ResizeImageForCurrentDPI(HBITMAP hbmp) noexcept {
