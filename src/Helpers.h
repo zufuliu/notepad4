@@ -680,8 +680,6 @@ struct BackgroundWorker {
 HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(LPCWSTR AppID) noexcept;
 bool IsElevated() noexcept;
 
-#define SetExplorerTheme(hwnd)		SetWindowTheme((hwnd), L"Explorer", nullptr)
-
 HBITMAP LoadBitmapFile(LPCWSTR path) noexcept;
 HBITMAP ResizeImageForDPI(HBITMAP hbmp, UINT dpi) noexcept;
 inline HBITMAP ResizeImageForCurrentDPI(HBITMAP hbmp) noexcept {

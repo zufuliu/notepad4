@@ -4928,7 +4928,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			FindReplaceSetFont(hwnd, TRUE, &hFontFindReplaceEdit);
 		}
 
-		DarkMode_InitDialog(hwnd, DialogRefData_NotCenter);
+		DarkMode_InitDialog(hwnd, DialogRefData_EndPosition);
 		if (!bSwitched) {
 			if (positionRecord.xFindReplaceDlg == 0 || positionRecord.yFindReplaceDlg == 0) {
 				CenterDlgInParent(hwnd);

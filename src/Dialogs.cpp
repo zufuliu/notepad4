@@ -1916,7 +1916,7 @@ bool WarnLineEndingDlg(HWND hwnd, EditFileIOStatus *status) noexcept {
 void InitZoomLevelComboBox(HWND hwnd, int nCtlId, int zoomLevel) noexcept {
 	WCHAR tch[16];
 	int selIndex = -1;
-	static const short levelList[] = {
+	static const uint16_t levelList[] = {
 		500, 450, 400, 350, 300, 250,
 		200, 175, 150, 125, 100, 75, 50, 25,
 	};

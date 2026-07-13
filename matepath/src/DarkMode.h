@@ -5,7 +5,9 @@
 enum DialogRefData {
 	DialogRefData_None,
 	DialogRefData_MsgBox,
-	DialogRefData_NotCenter,
+	DialogRefData_EndPosition,
+	DialogRefData_PropSheetPage,
+	DialogRefData_PropSheetMain,
 	DialogRefData_MaxValue,
 };
 

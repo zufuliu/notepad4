@@ -56,9 +56,7 @@ LRESULT CALLBACK DialogHook::HookProc(int nCode, WPARAM wParam, LPARAM lParam) n
 
 void DialogHook_Start(DWORD_PTR dwRefData) noexcept {
 	dialogHook.dwRefData = dwRefData;
-	if (!dialogHook.hook) {
-		dialogHook.Start();
-	}
+	dialogHook.Start();
 }
 
 void DialogHook_Stop() noexcept {
@@ -73,7 +71,7 @@ void DarkMode_Cleanup() noexcept {
 
 NP2_noinline
 void DarkMode_InitDialog(HWND hwnd, DWORD_PTR dwRefData) noexcept {
-	if (dwRefData < DialogRefData_NotCenter) {
+	if (dwRefData < DialogRefData_EndPosition) {
 		CenterDlgInParent(hwnd);
 		if (dwRefData == DialogRefData_MsgBox) {
 			SnapToDefaultButton(hwnd);
