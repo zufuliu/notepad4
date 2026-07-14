@@ -113,7 +113,7 @@ int MsgBox(UINT uType, UINT uIdMsg, ...) noexcept {
 	}
 
 	HWND hwnd = GetMsgBoxParent();
-	DialogHook_Start(DialogRefData_MsgBox);
+	DialogHook_Start(DialogRefData_MessageBox);
 	const int result = MessageBoxEx(hwnd, szText, szTitle, uType, lang);
 	DialogHook_Stop();
 	return result;
@@ -150,7 +150,7 @@ void DisplayCmdLineHelp(HWND hwnd) noexcept {
 	}
 
 	if (hwnd != nullptr) {
-		DialogHook_Start(DialogRefData_MsgBox);
+		DialogHook_Start(DialogRefData_MessageBox);
 	}
 	MessageBoxIndirect(&mbp);
 	DialogHook_Stop();
@@ -1951,7 +1951,7 @@ static INT_PTR CALLBACK ZoomLevelDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 	case WM_INITDIALOG: {
 		const int zoomLevel = SciCall_GetZoom();
 		InitZoomLevelComboBox(hwnd, IDC_ZOOMLEVEL, zoomLevel);
-		DarkMode_InitDialog(hwnd, lParam ? DialogRefData_RightBottom : DialogRefData_None);
+		DarkMode_InitDialog(hwnd, lParam ? DialogRefData_RightBottom : DialogRefData_CenterParent);
 	}
 	return TRUE;
 
@@ -2361,7 +2361,7 @@ INT_PTR CALLBACK InfoBoxDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 		if (lpib->bDisableCheckBox) {
 			EnableWindow(GetDlgItem(hwnd, IDC_INFOBOXCHECK), FALSE);
 		}
-		DarkMode_InitDialog(hwnd, DialogRefData_MsgBox);
+		DarkMode_InitDialog(hwnd, DialogRefData_MessageBox);
 	}
 	return TRUE;
 

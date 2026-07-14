@@ -34,7 +34,7 @@ struct DialogHook {
 	static LRESULT CALLBACK HookProc(int nCode, WPARAM wParam, LPARAM lParam) noexcept;
 };
 
-DialogHook dialogHook {nullptr, DialogRefData_None};
+DialogHook dialogHook {nullptr, DialogRefData_CenterParent};
 LRESULT CALLBACK DialogHook::HookProc(int nCode, WPARAM wParam, LPARAM lParam) noexcept {
 	if (nCode == HC_ACTION) {
 		const auto *cwpret = AsPointer<const CWPRETSTRUCT *>(lParam);
@@ -71,9 +71,9 @@ void DarkMode_Cleanup() noexcept {
 
 NP2_noinline
 void DarkMode_InitDialog(HWND hwnd, DWORD_PTR dwRefData) noexcept {
-	if (dwRefData < DialogRefData_EndPosition) {
+	if (dwRefData < DialogRefData_DefaultPosition) {
 		CenterDlgInParent(hwnd);
-		if (dwRefData == DialogRefData_MsgBox) {
+		if (dwRefData == DialogRefData_MessageBox) {
 			SnapToDefaultButton(hwnd);
 		}
 	}

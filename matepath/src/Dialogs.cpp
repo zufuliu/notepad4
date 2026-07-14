@@ -75,7 +75,7 @@ int MsgBox(UINT uType, UINT uIdMsg, ...) noexcept {
 #endif
 
 	HWND hwnd = GetMsgBoxParent();
-	DialogHook_Start(DialogRefData_MsgBox);
+	DialogHook_Start(DialogRefData_MessageBox);
 	const int result = MessageBoxEx(hwnd, szText, szTitle, uType, lang);
 	DialogHook_Stop();
 	return result;
