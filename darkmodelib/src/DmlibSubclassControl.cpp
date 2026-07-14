@@ -3076,8 +3076,7 @@ static void paintStatusBar(HWND hWnd, HDC hdc, dmlib_subclass::StatusBarData& st
 
 	::SendMessage(hWnd, SB_GETBORDERS, 0, reinterpret_cast<LPARAM>(&borders));
 
-	const auto nStyle = ::GetWindowLongPtr(hWnd, GWL_STYLE);
-	const bool hasSizeGrip = (nStyle & SBARS_SIZEGRIP) == SBARS_SIZEGRIP;
+	const bool hasSizeGrip = ::IsZoomed(::GetParent(hWnd)) == FALSE;
 
 	const auto holdPen = dmlib_paint::GdiObject{ hdc, dmlib::getEdgePen(), true };
 	const auto holdFont = dmlib_paint::GdiObject{ hdc, statusBarData.m_fontData.getFont(), true };

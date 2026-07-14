@@ -1974,8 +1974,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 
 	cachedStatusItem.updateMask = ((1 << StatusItem_ItemCount) - 1) ^ (1 << StatusItem_Empty);
 	GetString(IDS_STATUSITEM_FORMAT, cachedStatusItem.tchItemFormat, COUNTOF(cachedStatusItem.tchItemFormat));
-	// Main-window size grip is part of the status bar, so darkmodelib can paint it there.
-	const DWORD dwStatusbarStyle = WS_CHILD | WS_CLIPSIBLINGS | SBARS_SIZEGRIP | (bShowStatusbar ? WS_VISIBLE : 0);
+	const DWORD dwStatusbarStyle = bShowStatusbar ? (WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE) : (WS_CHILD | WS_CLIPSIBLINGS);
 	hwndStatus = CreateStatusWindow(dwStatusbarStyle, nullptr, hwnd, IDC_STATUSBAR);
 
 	// Create ReBar and add Toolbar
