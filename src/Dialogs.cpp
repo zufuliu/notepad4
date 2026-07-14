@@ -905,7 +905,7 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 					lvi.cchTextMax = COUNTOF(tch);
 					lvi.iItem = lpdi->item.iItem;
 
-					ListView_GetItem(GetDlgItem(hwnd, IDC_FILEMRU), &lvi);
+					ListView_GetItem(pnmhdr->hwndFrom, &lvi);
 
 					DWORD dwFlags = SHGFI_SMALLICON | SHGFI_SYSICONINDEX | SHGFI_ATTRIBUTES | SHGFI_ATTR_SPECIFIED;
 					DWORD dwAttr = 0;
@@ -953,7 +953,7 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 
 			case LVN_ITEMCHANGED:
 			case LVN_DELETEITEM:
-				EnableWindow(GetDlgItem(hwnd, IDOK), ListView_GetSelectedCount(GetDlgItem(hwnd, IDC_FILEMRU)));
+				EnableWindow(GetDlgItem(hwnd, IDOK), ListView_GetSelectedCount(pnmhdr->hwndFrom));
 				break;
 			}
 		} else if (pnmhdr->idFrom == IDC_EMPTY_MRU) {
@@ -1721,7 +1721,7 @@ static INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 			switch (lpnmh->code) {
 			case NM_DBLCLK: {
 				int temp = -1;
-				if (Encoding_GetFromTreeView(GetDlgItem(hwnd, IDC_ENCODINGLIST), &temp, true)) {
+				if (Encoding_GetFromTreeView(lpnmh->hwndFrom, &temp, true)) {
 					SendWMCommand(hwnd, IDOK);
 				}
 			}
@@ -1731,7 +1731,7 @@ static INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 				LPNMTREEVIEW lpnmtv = AsPointer<LPNMTREEVIEW>(lParam);
 				EnableWindow(GetDlgItem(hwnd, IDOK), lpnmtv->itemNew.lParam != 0);
 				if (lpnmtv->itemNew.lParam == 0) {
-					TreeView_Expand(GetDlgItem(hwnd, IDC_ENCODINGLIST), lpnmtv->itemNew.hItem, TVE_EXPAND);
+					TreeView_Expand(lpnmh->hwndFrom, lpnmtv->itemNew.hItem, TVE_EXPAND);
 				}
 			}
 			break;

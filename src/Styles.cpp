@@ -4248,8 +4248,9 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 				if (pCurrentStyle) {
 					GetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentStyle->szValue, MAX_EDITSTYLE_VALUE_SIZE);
 				} else if (fLexerSelected && pCurrentLexer && pCurrentLexer->szExtensions) {
-					if (!GetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentLexer->szExtensions, MAX_EDITLEXER_EXT_SIZE)) {
-						lstrcpy(pCurrentLexer->szExtensions, pCurrentLexer->pszDefExt);
+					LPWSTR szValue = pCurrentLexer->szExtensions;
+					if (!GetDlgItemText(hwnd, IDC_STYLEEDIT, szValue, MAX_EDITLEXER_EXT_SIZE)) {
+						lstrcpy(szValue, pCurrentLexer->pszDefExt);
 					}
 				}
 
@@ -4257,7 +4258,8 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 				iCurrentStyleIndex = -1;
 				pCurrentStyle = nullptr;
 
-				HTREEITEM hParent = TreeView_GetParent(hwndTV, lpnmtv->itemNew.hItem);
+				HWND hwndTree = lpnmtv->hdr.hwndFrom;
+				HTREEITEM hParent = TreeView_GetParent(hwndTree, lpnmtv->itemNew.hItem);
 				if (hParent == nullptr) {
 					if (lpnmtv->itemNew.lParam == 0) {
 						pCurrentLexer = nullptr;
@@ -4270,7 +4272,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 					memset(&item, 0, sizeof(item));
 					item.mask = TVIF_PARAM;
 					item.hItem = hParent;
-					TreeView_GetItem(hwndTV, &item);
+					TreeView_GetItem(hwndTree, &item);
 
 					if (item.lParam == 0) {
 						fLexerSelected = true;
@@ -4281,46 +4283,43 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 					}
 				}
 				if (hParent == nullptr || fLexerSelected) {
-					TreeView_Expand(hwndTV, lpnmtv->itemNew.hItem, TVE_EXPAND);
+					TreeView_Expand(hwndTree, lpnmtv->itemNew.hItem, TVE_EXPAND);
 				}
 
 				UINT enableMask = StyleControl_None;
+				WCHAR wch[MAX_EDITLEXER_EXT_SIZE];
+				memset(wch, 0, sizeof(int));
+				LPCWSTR szTitle = wch;
+				LPCWSTR szValue = wch;
+				LPCWSTR pszDefault = wch;
 				// a lexer has been selected
-				if (fLexerSelected) {
-					if (pCurrentLexer != nullptr) {
-						WCHAR wch[MAX_EDITLEXER_EXT_SIZE];
-
+				if (fLexerSelected && pCurrentLexer != nullptr) {
 						GetDlgItemText(hwnd, IDC_STYLELABELS, wch, COUNTOF(wch));
 						LPWSTR p = StrChr(wch, L'|');
 						if (p != nullptr) {
 							*p = L'\0';
 						}
 
-						SetDlgItemText(hwnd, IDC_STYLELABEL, wch);
+						szValue = pCurrentLexer->szExtensions;
+						pszDefault = pCurrentLexer->pszDefExt;
 						EnableWindow(GetDlgItem(hwnd, IDC_STYLEEDIT), (pCurrentLexer->szExtensions != nullptr));
 						EnableWindow(GetDlgItem(hwnd, IDC_STYLEDEFAULT), TRUE);
-						SetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentLexer->szExtensions);
-						SetDlgItemText(hwnd, IDC_STYLEVALUE_DEFAULT, pCurrentLexer->pszDefExt);
-					}
 				}
 
 				// a style or group has been selected
-				else {
-					if (pCurrentStyle != nullptr) {
-						WCHAR wch[MAX_EDITSTYLE_VALUE_SIZE];
-
+				else if (pCurrentStyle != nullptr) {
 						GetDlgItemText(hwnd, IDC_STYLELABELS, wch, COUNTOF(wch));
 						LPWSTR p = StrChr(wch, L'|');
 						if (p != nullptr) {
-							*p = L'\0';
+							*p++ = L'\0';
 						}
 
-						SetDlgItemText(hwnd, IDC_STYLELABEL, StrEnd(wch) + 1);
+						szTitle = p;
+						szValue = pCurrentStyle->szValue;
+						pszDefault = pCurrentStyle->pszDefault;
 						EnableWindow(GetDlgItem(hwnd, IDC_STYLEEDIT), TRUE);
 						EnableWindow(GetDlgItem(hwnd, IDC_STYLEBACK), TRUE);
 						EnableWindow(GetDlgItem(hwnd, IDC_STYLEDEFAULT), TRUE);
-						SetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentStyle->szValue);
-						SetDlgItemText(hwnd, IDC_STYLEVALUE_DEFAULT, pCurrentStyle->pszDefault);
 
 						for (UINT i = 0; i < pCurrentLexer->iStyleCount; i++) {
 							if (pCurrentStyle == &pCurrentLexer->Styles[i]) {
@@ -4329,16 +4328,16 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 							}
 						}
 						enableMask = GetLexerStyleControlMask(pCurrentLexer->rid, iCurrentStyleIndex);
-					}
 				}
 
-				if ((fLexerSelected && pCurrentLexer == nullptr) || (!fLexerSelected && pCurrentStyle == nullptr)) {
-					SetDlgItemText(hwnd, IDC_STYLELABEL, L"");
+				else {
 					EnableWindow(GetDlgItem(hwnd, IDC_STYLEEDIT), FALSE);
 					EnableWindow(GetDlgItem(hwnd, IDC_STYLEDEFAULT), FALSE);
-					SetDlgItemText(hwnd, IDC_STYLEEDIT, L"");
-					SetDlgItemText(hwnd, IDC_STYLEVALUE_DEFAULT, L"");
 				}
+
+				SetDlgItemText(hwnd, IDC_STYLELABEL, szTitle);
+				SetDlgItemText(hwnd, IDC_STYLEEDIT, szValue);
+				SetDlgItemText(hwnd, IDC_STYLEVALUE_DEFAULT, pszDefault);
 
 				const bool changed = pCurrentStyle != nullptr && (
 					((enableMask & StyleControl_Fore) && !IsWindowEnabled(GetDlgItem(hwnd, IDC_STYLEFORE)))
@@ -4382,17 +4381,19 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 				//if (pCurrentStyle) {
 				//	GetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentStyle->szValue, MAX_EDITSTYLE_VALUE_SIZE);
 				//}
-				TreeView_Select(hwndTV, lpnmtv->itemNew.hItem, TVGN_CARET);
+				HWND hwndTree = lpnmtv->hdr.hwndFrom;
+				TreeView_Select(hwndTree, lpnmtv->itemNew.hItem, TVGN_CARET);
 
-				//HIMAGELIST himl = TreeView_CreateDragImage(hwndTV, lpnmtv->itemNew.hItem);
+				//HIMAGELIST himl = TreeView_CreateDragImage(hwndTree, lpnmtv->itemNew.hItem);
 				//ImageList_BeginDrag(himl, 0, 0, 0);
-				//ImageList_DragEnter(hwndTV, lpnmtv->ptDrag.x, lpnmtv->ptDrag.y);
+				//ImageList_DragEnter(hwndTree, lpnmtv->ptDrag.x, lpnmtv->ptDrag.y);
+				HCURSOR cursor;
 				if (pCurrentStyle) {
-					DestroyCursor(SetCursor(LoadCursor(g_exeInstance, MAKEINTRESOURCE(IDC_COPY))));
+					cursor = LoadCursor(g_exeInstance, MAKEINTRESOURCE(IDC_COPY));
 				} else {
-					DestroyCursor(SetCursor(LoadCursor(nullptr, IDC_NO)));
+					cursor = LoadCursor(nullptr, IDC_NO);
 				}
-
+				DestroyCursor(SetCursor(cursor));
 				SetCapture(hwnd);
 				fDragging = true;
 			}
@@ -4474,15 +4475,10 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDC_PREVSTYLE:
-			if (TreeView_GetSelection(hwndTV)) {
-				TreeView_Select(hwndTV, TreeView_GetPrevVisible(hwndTV, TreeView_GetSelection(hwndTV)), TVGN_CARET);
-			}
-			PostMessage(hwnd, WM_NEXTDLGCTL, AsInteger<WPARAM>(GetDlgItem(hwnd, IDC_STYLEEDIT)), TRUE);
-			break;
-
 		case IDC_NEXTSTYLE:
-			if (TreeView_GetSelection(hwndTV)) {
-				TreeView_Select(hwndTV, TreeView_GetNextVisible(hwndTV, TreeView_GetSelection(hwndTV)), TVGN_CARET);
+			if (HTREEITEM hSelNode = TreeView_GetSelection(hwndTV)) {
+				hSelNode = (LOWORD(wParam) == IDC_PREVSTYLE) ? TreeView_GetPrevVisible(hwndTV, hSelNode) : TreeView_GetNextVisible(hwndTV, hSelNode);
+				TreeView_Select(hwndTV, hSelNode, TVGN_CARET);
 			}
 			PostMessage(hwnd, WM_NEXTDLGCTL, AsInteger<WPARAM>(GetDlgItem(hwnd, IDC_STYLEEDIT)), TRUE);
 			break;
@@ -5023,6 +5019,7 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 	case WM_NOTIFY:
 		if (AsPointer<LPNMHDR>(lParam)->idFrom == IDC_STYLELIST) {
 			LPNMTREEVIEW lpnmtv = AsPointer<LPNMTREEVIEW>(lParam);
+			HWND hwndTree = lpnmtv->hdr.hwndFrom;
 			switch (lpnmtv->hdr.code) {
 			case NM_CLICK: {
 				// https://support.microsoft.com/en-us/help/261289/how-to-know-when-the-user-clicks-a-check-box-in-a-treeview-control
@@ -5030,18 +5027,18 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 				const DWORD dwpos = GetMessagePos();
 				tvht.pt.x = GET_X_LPARAM(dwpos);
 				tvht.pt.y = GET_Y_LPARAM(dwpos);
-				MapWindowPoints(HWND_DESKTOP, hwndTV, &tvht.pt, 1);
-				TreeView_HitTest(hwndTV, &tvht);
+				MapWindowPoints(HWND_DESKTOP, hwndTree, &tvht.pt, 1);
+				TreeView_HitTest(hwndTree, &tvht);
 
 				if (tvht.hItem != nullptr && (TVHT_ONITEMSTATEICON & tvht.flags)) {
-					Lexer_OnCheckStateChanged(hwndTV, hFavoriteNode, tvht.hItem);
+					Lexer_OnCheckStateChanged(hwndTree, hFavoriteNode, tvht.hItem);
 				}
 			}
 			break;
 
 			case NM_DBLCLK:
 				// disable double click when managing favorite schemes.
-				if (Lexer_GetFromTreeView(hwndTV) != nullptr && GetWindowLongPtr(hwnd, DWLP_USER) == 0) {
+				if (Lexer_GetFromTreeView(hwndTree) != nullptr && GetWindowLongPtr(hwnd, DWLP_USER) == 0) {
 					SendWMCommand(hwnd, IDOK);
 				}
 				break;
@@ -5052,22 +5049,24 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 				if (selected) {
 					CheckDlgButton(hwnd, IDC_DEFAULTSCHEME, (iInternalDefault == pLex->rid)? BST_CHECKED : BST_UNCHECKED);
 				} else {
-					TreeView_Expand(hwndTV, lpnmtv->itemNew.hItem, TVE_EXPAND);
+					TreeView_Expand(hwndTree, lpnmtv->itemNew.hItem, TVE_EXPAND);
 				}
 				EnableWindow(GetDlgItem(hwnd, IDC_DEFAULTSCHEME), selected);
 			}
 			break;
 
 			case TVN_BEGINDRAG: {
-				TreeView_Select(hwndTV, lpnmtv->itemNew.hItem, TVGN_CARET);
+				TreeView_Select(hwndTree, lpnmtv->itemNew.hItem, TVGN_CARET);
 				// prevent dragging group folder or Text File
-				if (lpnmtv->itemNew.lParam != 0 && TreeView_GetParent(hwndTV, lpnmtv->itemNew.hItem) != nullptr) {
+				HCURSOR cursor;
+				if (lpnmtv->itemNew.lParam != 0 && TreeView_GetParent(hwndTree, lpnmtv->itemNew.hItem) != nullptr) {
 					hDraggingNode = lpnmtv->itemNew.hItem;
-					DestroyCursor(SetCursor(LoadCursor(g_exeInstance, MAKEINTRESOURCE(IDC_COPY))));
+					cursor = LoadCursor(g_exeInstance, MAKEINTRESOURCE(IDC_COPY));
 				} else {
 					hDraggingNode = nullptr;
-					DestroyCursor(SetCursor(LoadCursor(nullptr, IDC_NO)));
+					cursor = LoadCursor(nullptr, IDC_NO);
 				}
+				DestroyCursor(SetCursor(cursor));
 				SetCapture(hwnd);
 				fDragging = true;
 			}
