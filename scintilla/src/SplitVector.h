@@ -141,15 +141,15 @@ public:
 		// over allocation to simplify SplitView usage
 		constexpr size_t sentinel = (sizeof(T) == sizeof(char)) ? sizeof(int) : 0;
 		newSize += sentinel;
-		const size_t size = body.size();
-		if (newSize > size) {
+		const size_t currentSize = body.size();
+		if (newSize > currentSize) {
 #if ENABLE_SHOW_DEBUG_INFO
 			printf("before %s(%td, %zu) part1Length=%td, gapLength=%td, lengthBody=%td, growSize=%zu\n",
-				__func__, newSize, size, part1Length, gapLength, lengthBody, growSize);
+				__func__, newSize, currentSize, part1Length, gapLength, lengthBody, growSize);
 #endif
 			// Move the gap to the end
 			GapTo(lengthBody);
-			gapLength += newSize - size - sentinel;
+			gapLength += newSize - currentSize - sentinel;
 			// RoomFor implements a growth strategy but so does vector::resize so
 			// ensure vector::resize allocates exactly the amount wanted by
 			// calling reserve first.
@@ -157,7 +157,7 @@ public:
 			body.resize(newSize);
 #if ENABLE_SHOW_DEBUG_INFO
 			printf("after %s(%td, %zu) part1Length=%td, gapLength=%td, lengthBody=%td, growSize=%zu\n",
-				__func__, newSize, size, part1Length, gapLength, lengthBody, growSize);
+				__func__, newSize, currentSize, part1Length, gapLength, lengthBody, growSize);
 #endif
 		}
 	}

@@ -42,7 +42,7 @@ constexpr bool IsLigature(int ch, int chNext) noexcept {
 		|| (ch == chNext && AnyOf(ch, '`', '\'', '-'));
 }
 
-int CheckBlockType(LexAccessor &styler, Sci_PositionU startPos, Sci_PositionU endPos, int state) noexcept {
+int CheckBlockType(const LexAccessor &styler, Sci_PositionU startPos, Sci_PositionU endPos, int state) noexcept {
 	char s[16]{};
 	++startPos;
 	styler.GetRange(startPos, endPos, s, sizeof(s));

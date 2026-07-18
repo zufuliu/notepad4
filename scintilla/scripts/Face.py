@@ -65,7 +65,7 @@ class Face:
 		self.events = {}
 		self.aliases = {}
 
-	def ReadFromFile(self, name):
+	def ReadFromFile(self, name, pickUpPixels=False):
 		currentCategory = ""
 		currentComment = []
 		currentCommentFinished = False
@@ -77,6 +77,11 @@ class Face:
 			lines = fd.readlines()
 		for line in lines:
 			lineno += 1
+			if pickUpPixels:
+				stripped = line.strip()
+				if stripped.startswith("## "):
+					self.ApplyPixelComment(stripped[3:])
+					continue
 			line = sanitiseLine(line)
 			if line:
 				if line[0] == "#":
@@ -170,3 +175,24 @@ class Face:
 						name, value = featureVal.split("=", 1)
 						self.aliases[name] = value
 						currentComment = []
+
+	def ApplyPixelComment(self, featureVal):
+		# A '## <fun|get|set ... pixels ...>' comment below a message re-types
+		# the named feature's pixels slots, so a caller passing pickUpPixels=True
+		# sees them. Other consumers ignore it, since sanitiseLine strips '##'.
+		featureType, _, rest = featureVal.partition(" ")
+		if featureType not in ("fun", "get", "set") or not rest:
+			return
+		try:
+			retType, name, value, param1, param2 = decodeFunction(rest)
+		except ValueError:
+			return
+		feature = self.features.get(name)
+		if feature is None:
+			return
+		if retType == "pixels":
+			feature["ReturnType"] = "pixels"
+		if decodeParam(param1)[0] == "pixels":
+			feature["Param1Type"] = "pixels"
+		if decodeParam(param2)[0] == "pixels":
+			feature["Param2Type"] = "pixels"
