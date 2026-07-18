@@ -381,7 +381,6 @@ HCURSOR LoadReverseArrowCursor(HCURSOR cursor, UINT dpi) noexcept {
 			WCHAR cursorPath[MAX_PATH]{};
 			DWORD size = sizeof(cursorPath);
 			DWORD type = REG_NONE;
-#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 			status = ::RegGetValueW(hKey, nullptr, L"Arrow", RRF_RT_REG_SZ, &type, cursorPath, &size);
 			if (status == ERROR_SUCCESS && type == REG_SZ) {
 				HCURSOR load = static_cast<HCURSOR>(::LoadImage({}, cursorPath, IMAGE_CURSOR, width, height, LR_LOADFROMFILE));
@@ -390,24 +389,6 @@ HCURSOR LoadReverseArrowCursor(HCURSOR cursor, UINT dpi) noexcept {
 					cursor = load;
 				}
 			}
-#else
-			status = ::RegQueryValueExW(hKey, L"Arrow", nullptr, &type, reinterpret_cast<LPBYTE>(cursorPath), &size);
-			if (status == ERROR_SUCCESS && (type == REG_SZ || type == REG_EXPAND_SZ)) {
-				LPCWSTR path = cursorPath;
-				WCHAR expansion[MAX_PATH];
-				if (type == REG_EXPAND_SZ) {
-					size = ::ExpandEnvironmentStringsW(cursorPath, expansion, MAX_PATH);
-					if (size > 0 && size <= MAX_PATH) {
-						path = expansion;
-					}
-				}
-				HCURSOR load = static_cast<HCURSOR>(::LoadImage({}, path, IMAGE_CURSOR, width, height, LR_LOADFROMFILE));
-				if (load) {
-					created = true;
-					cursor = load;
-				}
-			}
-#endif // _WIN32_WINNT_VISTA
 		}
 		HCURSOR copy = static_cast<HCURSOR>(::CopyImage(cursor, IMAGE_CURSOR, width, height, LR_COPYFROMRESOURCE | LR_COPYRETURNORG));
 		if (copy && copy != cursor) {

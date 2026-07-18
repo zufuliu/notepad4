@@ -2596,7 +2596,7 @@ void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName)
 
 	// context menu
 	// delete the old one: HKEY_CLASSES_ROOT\*\shell\Notepad4.exe
-	//Registry_DeleteTree(HKEY_CLASSES_ROOT, NP2RegSubKey_ContextMenu L".exe");
+	//RegDeleteTree(HKEY_CLASSES_ROOT, NP2RegSubKey_ContextMenu L".exe");
 	if (mask & SystemIntegration_ContextMenu) {
 		HKEY hSubKey;
 		const LSTATUS status = Registry_CreateKey(HKEY_CLASSES_ROOT, NP2RegSubKey_ContextMenu L"\\command", &hSubKey);
@@ -2610,7 +2610,7 @@ void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName)
 			RegCloseKey(hSubKey);
 		}
 	} else {
-		Registry_DeleteTree(HKEY_CLASSES_ROOT, NP2RegSubKey_ContextMenu);
+		RegDeleteTree(HKEY_CLASSES_ROOT, NP2RegSubKey_ContextMenu);
 	}
 
 	// jump list
@@ -2632,7 +2632,7 @@ void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName)
 			}
 		}
 	} else {
-		Registry_DeleteTree(HKEY_CLASSES_ROOT, NP2RegSubKey_JumpList);
+		RegDeleteTree(HKEY_CLASSES_ROOT, NP2RegSubKey_JumpList);
 	}
 
 	// replace Windows Notepad
@@ -2650,7 +2650,7 @@ void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName)
 			WCHAR num[2] = { L'0', L'\0' };
 			for (int index = 0; index < 3; index++, num[0]++) {
 #if 1
-				Registry_DeleteTree(hKey, num);
+				RegDeleteTree(hKey, num);
 #else
 				HKEY hSubKey;
 				status = Registry_CreateKey(hKey, num, &hSubKey);
@@ -2667,7 +2667,7 @@ void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName)
 		}
 	} else if (mask & SystemIntegration_RestoreNotepad) {
 #if 0
-		Registry_DeleteTree(HKEY_LOCAL_MACHINE, NP2RegSubKey_ReplaceNotepad);
+		RegDeleteTree(HKEY_LOCAL_MACHINE, NP2RegSubKey_ReplaceNotepad);
 #else
 		// on Windows 11, all keys were created by the system, we should not delete them.
 		HKEY hKey;

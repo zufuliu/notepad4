@@ -277,26 +277,6 @@ LSTATUS Registry_SetString(HKEY hKey, LPCWSTR valueName, LPCWSTR lpszText) noexc
 	return status;
 }
 
-#if _WIN32_WINNT < _WIN32_WINNT_VISTA
-LSTATUS Registry_DeleteTree(HKEY hKey, LPCWSTR lpSubKey) noexcept {
-	using RegDeleteTreeSig = LSTATUS (WINAPI *)(HKEY hKey, LPCWSTR lpSubKey);
-	RegDeleteTreeSig pfnRegDeleteTree = DLLFunctionEx<RegDeleteTreeSig>(L"advapi32.dll", "RegDeleteTreeW");
-
-	LSTATUS status;
-	if (pfnRegDeleteTree != nullptr) {
-		status = pfnRegDeleteTree(hKey, lpSubKey);
-	} else {
-		status = RegDeleteKey(hKey, lpSubKey);
-		if (status != ERROR_SUCCESS && status != ERROR_FILE_NOT_FOUND) {
-			// TODO: Deleting a Key with Subkeys on Windows XP.
-			// https://docs.microsoft.com/en-us/windows/win32/sysinfo/deleting-a-key-with-subkeys
-		}
-	}
-
-	return status;
-}
-#endif
-
 UINT ParseCommaList(LPCWSTR str, int result[], UINT count) noexcept {
 	if (StrIsEmpty(str)) {
 		return 0;

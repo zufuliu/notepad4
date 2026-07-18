@@ -953,7 +953,7 @@ void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName)
 			RegCloseKey(hSubKey);
 		}
 	} else {
-		Registry_DeleteTree(HKEY_CLASSES_ROOT, NP2RegSubKey_ContextMenu);
+		RegDeleteTree(HKEY_CLASSES_ROOT, NP2RegSubKey_ContextMenu);
 	}
 
 	// jump list
@@ -970,7 +970,7 @@ void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName)
 			RegCloseKey(hSubKey);
 		}
 	} else {
-		Registry_DeleteTree(HKEY_CLASSES_ROOT, NP2RegSubKey_JumpList);
+		RegDeleteTree(HKEY_CLASSES_ROOT, NP2RegSubKey_JumpList);
 	}
 }
 
