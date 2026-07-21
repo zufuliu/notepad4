@@ -4117,7 +4117,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_VIEW_CUSTOMIZE_TOOLBAR:
-		DarkMode_CustomizeToolbar(hwndToolbar);
+		SendMessage(hwndToolbar, TB_CUSTOMIZE, 0, 0);
 		break;
 
 	case IDM_VIEW_AUTO_SCALE_TOOLBAR:
@@ -4956,7 +4956,12 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDC_TOOLBAR:
 		switch (pnmh->code) {
+		case TBN_BEGINADJUST:
+			DarkMode_OnToolbarBeginAdjust();
+			break;
+
 		case TBN_ENDADJUST:
+			DarkMode_OnToolbarEndAdjust();
 			UpdateToolbar();
 			break;
 

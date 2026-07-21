@@ -359,13 +359,15 @@ void DarkMode_ApplyToBars(HWND hwnd, HWND hwndToolbar, HWND hwndReBar, HWND hwnd
 	dmlib::setDarkTooltips(hwndToolbar, static_cast<int>(dmlib::ToolTipsType::toolbar));
 }
 
-void DarkMode_CustomizeToolbar(HWND hwndToolbar) noexcept {
+void DarkMode_OnToolbarBeginAdjust() noexcept {
 	DialogHook_Start(DialogRefData_CustomizeToolbar);
-	const bool hookSysColor = dmlib::isExperimentalActive() && dmlib_hook::hookSysColor();
-	SendMessage(hwndToolbar, TB_CUSTOMIZE, 0, 0);
-	if (hookSysColor) {
-		dmlib_hook::unhookSysColor();
+	if (dmlib::isExperimentalActive()) {
+		dmlib_hook::hookSysColor();
 	}
+}
+
+void DarkMode_OnToolbarEndAdjust() noexcept {
+	dmlib_hook::unhookSysColor();
 	DialogHook_Stop();
 }
 
