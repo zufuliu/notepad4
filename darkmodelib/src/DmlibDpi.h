@@ -110,6 +110,7 @@ namespace dmlib_dpi
 	BOOL AdjustWindowRectExForDpi(LPRECT lpRect, DWORD dwStyle, BOOL bMenu, DWORD dwExStyle, UINT dpi) noexcept;
 
 	void loadIcon(HINSTANCE hinst, const wchar_t* pszName, int cx, int cy, HICON& hicon) noexcept;
+	void loadIconMetric(HINSTANCE hinst, const wchar_t* pszName, int lims, HICON& hicon) noexcept;
 
 	[[nodiscard]] HTHEME OpenThemeDataForDpi(HWND hwnd, LPCWSTR pszClassList, UINT dpi) noexcept;
 

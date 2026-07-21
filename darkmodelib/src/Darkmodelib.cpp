@@ -4172,7 +4172,12 @@ static HRESULT CALLBACK DarkTaskDlgMsgBoxCallback(
  * @see DarkTaskDlgMsgBoxCallback()
  * @see dmlib::darkMessageBoxW()
  */
-static TASKDIALOGCONFIG msgBoxParamToTaskDlgConfig(HWND hWnd, LPCWSTR lpText, LPCWSTR lpCaption, UINT uType) noexcept
+static TASKDIALOGCONFIG msgBoxParamToTaskDlgConfig(
+	HWND hWnd,
+	LPCWSTR lpText,
+	LPCWSTR lpCaption,
+	UINT uType
+) noexcept
 {
 	// base config
 
@@ -4188,7 +4193,9 @@ static TASKDIALOGCONFIG msgBoxParamToTaskDlgConfig(HWND hWnd, LPCWSTR lpText, LP
 	tdc.hwndParent = hWnd;
 	tdc.hInstance = nullptr;
 	tdc.dwFlags = TDF_ALLOW_DIALOG_CANCELLATION | TDF_SIZE_TO_CONTENT;
-	tdc.pszWindowTitle = lpCaption;
+	// Unlike message box localized "Error" string, task dialog uses filename if title is nullptr.
+	// Maintainer will need to provide localization themself.
+	tdc.pszWindowTitle = lpCaption != nullptr ? lpCaption : L"Error";
 	tdc.pszContent = lpText;
 	tdc.pfCallback = DarkTaskDlgMsgBoxCallback;
 	tdc.lpCallbackData = static_cast<LONG_PTR>(uType);
@@ -4311,8 +4318,7 @@ static TASKDIALOGCONFIG msgBoxParamToTaskDlgConfig(HWND hWnd, LPCWSTR lpText, LP
 
 		case MB_ICONQUESTION:
 		{
-			tdc.dwFlags |= TDF_USE_HICON_MAIN;
-			tdc.hMainIcon = static_cast<HICON>(::LoadImageW(nullptr, IDI_QUESTION, IMAGE_ICON, 0, 0, LR_SHARED));
+			tdc.pszMainIcon = IDI_QUESTION;
 			break;
 		}
 

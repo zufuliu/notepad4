@@ -358,8 +358,8 @@ void dmlib_hook::unhookSysColor() noexcept
 static HookData<decltype(&::GetThemeColor)> g_hookDataGetThemeColor{};
 static HookData<decltype(&::DrawThemeBackgroundEx)> g_hookDataDrawThemeBackgroundEx{};
 
-static constexpr COLORREF kMainInstructionTextClr = RGB(96, 205, 255);
-static constexpr COLORREF kOtherTextClr = RGB(255, 255, 255);
+static COLORREF g_mainInstructionTextClr = RGB(153, 235, 255);
+static COLORREF g_otherTextClr = RGB(255, 255, 255);
 
 static HTHEME g_hDarkTheme = nullptr;
 
@@ -383,7 +383,7 @@ static HRESULT WINAPI MyGetThemeColor(
 		{
 			case TDLG_MAININSTRUCTIONPANE:
 			{
-				*pColor = kMainInstructionTextClr;
+				*pColor = g_mainInstructionTextClr;
 				break;
 			}
 
@@ -399,7 +399,7 @@ static HRESULT WINAPI MyGetThemeColor(
 				}
 				else
 				{
-					*pColor = kOtherTextClr;
+					*pColor = g_otherTextClr;
 				}
 				break;
 			}
@@ -478,9 +478,19 @@ bool dmlib_hook::hookThemeColor() noexcept
 				clrMain = kMainPaneBgClr;
 			}
 
-			if (FAILED(::GetThemeColor(g_hDarkTheme, TDLG_SECONDARYPANEL, 0, TMT_FILLCOLOR, &clrFooter)))
+			if (FAILED(::GetThemeColor(g_hDarkTheme, TDLG_FOOTNOTEPANE, 0, TMT_FILLCOLOR, &clrFooter)))
 			{
 				clrFooter = kFooterBgClr;
+			}
+
+			if (FAILED(::GetThemeColor(g_hDarkTheme, TDLG_PRIMARYPANEL, 0, TMT_TEXTCOLOR, &g_otherTextClr)))
+			{
+				g_otherTextClr = RGB(255, 255, 255);
+			}
+
+			if (FAILED(::GetThemeColor(g_hDarkTheme, TDLG_MAININSTRUCTIONPANE, 0, TMT_TEXTCOLOR, &g_mainInstructionTextClr)))
+			{
+				g_mainInstructionTextClr = RGB(153, 235, 255);
 			}
 		}
 	}
