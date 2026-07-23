@@ -22,7 +22,7 @@ struct DialogHook {
 	DWORD_PTR dwRefData;
 
 	void Start() noexcept {
-		hook = SetWindowsHookEx(WH_CALLWNDPROCRET, DialogHook::HookProc, nullptr, GetCurrentThreadId());
+		hook = SetWindowsHookEx(WH_CBT, DialogHook::HookProc, nullptr, GetCurrentThreadId());
 	}
 	void Stop() noexcept {
 		HHOOK current = hook;
@@ -35,18 +35,30 @@ struct DialogHook {
 };
 
 DialogHook dialogHook {nullptr, DialogRefData_CenterParent};
+LRESULT CALLBACK InitDialogSubProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData) noexcept {
+	if (umsg == WM_INITDIALOG || umsg == WM_DESTROY) {
+		RemoveWindowSubclass(hwnd, InitDialogSubProc, uIdSubclass);
+	}
+	const LRESULT result = DefSubclassProc(hwnd, umsg, wParam, lParam);
+	if (umsg == WM_INITDIALOG) {
+		if (dwRefData > DialogRefData_MaxValue) {
+			SetWindowSubclass(hwnd, FileDialog::SubProc, 0, dwRefData);
+		} else {
+			DarkMode_InitDialog(hwnd, dwRefData);
+		}
+	}
+	return result;
+}
+
 LRESULT CALLBACK DialogHook::HookProc(int nCode, WPARAM wParam, LPARAM lParam) noexcept {
-	if (nCode == HC_ACTION) {
-		const auto *cwpret = AsPointer<const CWPRETSTRUCT *>(lParam);
-		if (cwpret->message == WM_INITDIALOG) {
+	if (nCode == HCBT_CREATEWND) {
+		const auto *lpcs = AsPointer<const CBT_CREATEWND *>(lParam)->lpcs;
+		if (lpcs->lpszClass == WC_DIALOG) {
 			const auto current = dialogHook;
 			memset(&dialogHook, 0, sizeof(dialogHook));
 			UnhookWindowsHookEx(current.hook);
-			if (current.dwRefData > DialogRefData_MaxValue) {
-				SetWindowSubclass(cwpret->hwnd, FileDialog::SubProc, 0, current.dwRefData);
-			} else {
-				DarkMode_InitDialog(cwpret->hwnd, current.dwRefData);
-			}
+			HWND hwnd = AsPointer<HWND>(wParam);
+			SetWindowSubclass(hwnd, InitDialogSubProc, 0, current.dwRefData);
 		}
 	}
 	return CallNextHookEx(nullptr, nCode, wParam, lParam);
