@@ -380,9 +380,8 @@ HCURSOR LoadReverseArrowCursor(HCURSOR cursor, UINT dpi) noexcept {
 			// https://learn.microsoft.com/en-us/answers/questions/1315176/how-to-copy-system-cursors-properly
 			WCHAR cursorPath[MAX_PATH]{};
 			DWORD size = sizeof(cursorPath);
-			DWORD type = REG_NONE;
-			status = ::RegGetValueW(hKey, nullptr, L"Arrow", RRF_RT_REG_SZ, &type, cursorPath, &size);
-			if (status == ERROR_SUCCESS && type == REG_SZ) {
+			status = ::RegGetValueW(hKey, nullptr, L"Arrow", RRF_RT_REG_SZ, nullptr, cursorPath, &size);
+			if (status == ERROR_SUCCESS) {
 				HCURSOR load = static_cast<HCURSOR>(::LoadImage({}, cursorPath, IMAGE_CURSOR, width, height, LR_LOADFROMFILE));
 				if (load) {
 					created = true;
