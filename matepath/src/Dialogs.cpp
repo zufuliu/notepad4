@@ -878,31 +878,27 @@ enum {
 };
 
 struct SystemIntegrationInfo {
-	LPWSTR lpszText;
-	LPWSTR lpszName;
+	WCHAR lpszText[MAX_PATH/2];
+	WCHAR lpszName[MAX_PATH/2];
 };
 
-int GetSystemIntegrationStatus(SystemIntegrationInfo &info) noexcept {
-	int mask = 0;
+DWORD GetSystemIntegrationStatus(SystemIntegrationInfo &info) noexcept {
+	DWORD mask = 0;
 	WCHAR tchModule[MAX_PATH];
+	WCHAR command[MAX_PATH];
 	GetModuleFileName(nullptr, tchModule, COUNTOF(tchModule));
 
 	// context menu
 	HKEY hKey;
 	LSTATUS status = RegOpenKeyEx(HKEY_CLASSES_ROOT, NP2RegSubKey_ContextMenu, 0, KEY_READ, &hKey);
 	if (status == ERROR_SUCCESS) {
-		info.lpszText = Registry_GetDefaultString(hKey);
-		HKEY hSubKey;
-		status = RegOpenKeyEx(hKey, L"command", 0, KEY_READ, &hSubKey);
-		if (status == ERROR_SUCCESS) {
-			LPWSTR command = Registry_GetDefaultString(hSubKey);
-			if (command != nullptr) {
-				if (StrStrI(command, tchModule) != nullptr) {
-					mask |= SystemIntegration_ContextMenu;
-				}
-				NP2HeapFree(command);
+		if (!Registry_GetDefaultString(hKey, info.lpszText)) {
+			info.lpszText[0] = L'\0';
+		}
+		if (Registry_GetSubKeyDefaultString(hKey, L"command", command)) {
+			if (StrStrI(command, tchModule) != nullptr) {
+				mask |= SystemIntegration_ContextMenu;
 			}
-			RegCloseKey(hSubKey);
 		}
 		RegCloseKey(hKey);
 	}
@@ -910,22 +906,17 @@ int GetSystemIntegrationStatus(SystemIntegrationInfo &info) noexcept {
 	// jump list
 	status = RegOpenKeyEx(HKEY_CLASSES_ROOT, NP2RegSubKey_JumpList, 0, KEY_READ, &hKey);
 	if (status == ERROR_SUCCESS) {
-		info.lpszName = Registry_GetString(hKey, L"FriendlyAppName");
-		HKEY hSubKey;
-		status = RegOpenKeyEx(hKey, L"shell\\open\\command", 0, KEY_READ, &hSubKey);
-		if (status == ERROR_SUCCESS) {
-			LPWSTR command = Registry_GetDefaultString(hSubKey);
-			if (command != nullptr) {
-				LPWSTR userId = Registry_GetString(hKey, L"AppUserModelID");
-				if (userId != nullptr && StrEqual(userId, g_wchAppUserModelID) && StrStrI(command, tchModule) != nullptr) {
-					mask |= SystemIntegration_JumpList;
+		if (!Registry_GetString(hKey, L"FriendlyAppName", info.lpszName)) {
+			info.lpszName[0] = L'\0';
+		}
+		if (Registry_GetString(hKey, L"AppUserModelID", command)) {
+			if (StrEqual(command, g_wchAppUserModelID)) {
+				if (Registry_GetSubKeyDefaultString(hKey, L"shell\\open\\command", command)) {
+					if (StrStrI(command, tchModule) != nullptr) {
+						mask |= SystemIntegration_JumpList;
+					}
 				}
-				if (userId != nullptr) {
-					NP2HeapFree(userId);
-				}
-				NP2HeapFree(command);
 			}
-			RegCloseKey(hSubKey);
 		}
 		RegCloseKey(hKey);
 	}
@@ -933,7 +924,7 @@ int GetSystemIntegrationStatus(SystemIntegrationInfo &info) noexcept {
 	return mask;
 }
 
-void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName) noexcept {
+void UpdateSystemIntegrationStatus(DWORD mask, LPCWSTR lpszText, LPCWSTR lpszName) noexcept {
 	WCHAR tchModule[MAX_PATH];
 	GetModuleFileName(nullptr, tchModule, COUNTOF(tchModule));
 	WCHAR command[300];
@@ -1003,26 +994,19 @@ INT_PTR CALLBACK ProgPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 		Edit_SetText(hwndCtl, tchFavoritesDir);
 		SHAutoComplete(hwndCtl, SHACF_FILESYSTEM);
 
-		SystemIntegrationInfo info{};
-		const int mask = GetSystemIntegrationStatus(info);
+		SystemIntegrationInfo info;
+		info.lpszText[0] = L'\0';
+		info.lpszName[0] = L'\0';
+		const DWORD mask = GetSystemIntegrationStatus(info);
 
 		hwndCtl = GetDlgItem(hwnd, IDC_CONTEXT_MENU_TEXT);
 		if (StrIsEmpty(info.lpszText)) {
-			WCHAR wch[128];
-			GetString(IDS_LINKDESCRIPTION, wch, COUNTOF(wch));
-			Edit_SetText(hwndCtl, wch);
-		} else {
-			Edit_SetText(hwndCtl, info.lpszText);
+			GetString(IDS_LINKDESCRIPTION, info.lpszText, COUNTOF(info.lpszText));
 		}
+		Edit_SetText(hwndCtl, info.lpszText);
 
 		HWND hwndName = GetDlgItem(hwnd, IDC_APPLICATION_NAME);
 		Edit_SetText(hwndName, StrIsEmpty(info.lpszName)? g_wchAppUserModelID : info.lpszName);
-		if (info.lpszText) {
-			NP2HeapFree(info.lpszText);
-		}
-		if (info.lpszName) {
-			NP2HeapFree(info.lpszName);
-		}
 
 		if (mask & SystemIntegration_ContextMenu) {
 			CheckDlgButton(hwnd, IDC_ENABLE_CONTEXT_MENU, BST_CHECKED);
@@ -1109,7 +1093,7 @@ INT_PTR CALLBACK ProgPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 			}
 
 			if (IsWindowEnabled(GetDlgItem(hwnd, IDC_ENABLE_CONTEXT_MENU))) {
-				int mask = 0;
+				DWORD mask = 0;
 				if (IsButtonChecked(hwnd, IDC_ENABLE_CONTEXT_MENU)) {
 					mask |= SystemIntegration_ContextMenu;
 				}
@@ -1120,7 +1104,7 @@ INT_PTR CALLBACK ProgPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 				GetDlgItemText(hwnd, IDC_CONTEXT_MENU_TEXT, tch, COUNTOF(tch));
 				TrimString(tch);
 
-				WCHAR wchName[128];
+				WCHAR wchName[MAX_PATH];
 				GetDlgItemText(hwnd, IDC_APPLICATION_NAME, wchName, COUNTOF(wchName));
 				TrimString(wchName);
 

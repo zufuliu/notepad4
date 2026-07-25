@@ -441,9 +441,16 @@ struct IniSectionBuilder {
 #define NP2RegSubKey_ContextMenu	L"Folder\\shell\\matepath"
 #define NP2RegSubKey_JumpList		L"Applications\\matepath.exe"
 
-LPWSTR Registry_GetString(HKEY hKey, LPCWSTR valueName) noexcept;
+template <DWORD cchDest>
+[[nodiscard]] inline bool Registry_GetStringEx(HKEY hKey, LPCWSTR lpSubKey, LPCWSTR valueName, WCHAR (&value)[cchDest], DWORD samDesired = RRF_RT_REG_SZ) noexcept {
+	DWORD size = cchDest * sizeof(WCHAR);
+	const LSTATUS status = RegGetValueW(hKey, lpSubKey, valueName, samDesired, nullptr, value, &size);
+	return status == ERROR_SUCCESS;
+}
 LSTATUS Registry_SetString(HKEY hKey, LPCWSTR valueName, LPCWSTR lpszText) noexcept;
-#define Registry_GetDefaultString(hKey)				Registry_GetString((hKey), nullptr)
+#define Registry_GetString(hKey, valueName, value)	Registry_GetStringEx((hKey), nullptr, (valueName), (value))
+#define Registry_GetDefaultString(hKey, value)		Registry_GetStringEx((hKey), nullptr, nullptr, (value))
+#define Registry_GetSubKeyDefaultString(hKey, lpSubKey, value)	Registry_GetStringEx((hKey), (lpSubKey), nullptr, (value))
 #define Registry_SetDefaultString(hKey, lpszText)	Registry_SetString((hKey), nullptr, (lpszText))
 inline LSTATUS Registry_CreateKey(HKEY hKey, LPCWSTR lpSubKey, PHKEY phkResult) noexcept {
 	return RegCreateKeyEx(hKey, lpSubKey, 0, nullptr, 0, KEY_WRITE, nullptr, phkResult, nullptr);
