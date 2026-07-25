@@ -554,7 +554,7 @@ uint32_t EditView::LayoutLine(const EditModel &model, Surface *surface, const Vi
 	if (validity == LineLayout::ValidLevel::checkTextAndStyle) {
 		const Sci::Position lineLength = (vstyle.viewEOL ? posLineEnd : model.pdoc->LineEnd(line)) - posLineStart;
 		validity = LineLayout::ValidLevel::invalid;
-		if (lineLength == ll->numCharsInLine) {
+		if (static_cast<int>(lineLength) == ll->numCharsInLine) {
 			//const ElapsedPeriod period;
 			// See if chars, styles, indicators, are all the same
 			int allSame = 0;
@@ -575,11 +575,11 @@ uint32_t EditView::LayoutLine(const EditModel &model, Surface *surface, const Vi
 	}
 	if (validity == LineLayout::ValidLevel::invalid) {
 		// Fill base line layout
-		const int lineLength = static_cast<int>(posLineEnd - posLineStart);
+		const Sci::Position lineLength = posLineEnd - posLineStart;
 		model.pdoc->GetCharRange(ll->chars.get(), posLineStart, lineLength);
 		model.pdoc->GetStyleRange(ll->styles, posLineStart, lineLength);
-		const int numCharsBeforeEOL = static_cast<int>(model.pdoc->LineEnd(line) - posLineStart);
-		const unsigned numCharsInLine = vstyle.viewEOL ? lineLength : numCharsBeforeEOL;
+		const Sci::Position numCharsBeforeEOL = model.pdoc->LineEnd(line) - posLineStart;
+		const size_t numCharsInLine = vstyle.viewEOL ? lineLength : numCharsBeforeEOL;
 		const uint8_t styleByteLast = ll->styles[lineLength - 1]; // styles[-1] is zero sentinel
 		// Extra element at the end of the line to hold end x position and act as
 		// Also triggers processing in the loops as this is a control character
@@ -590,8 +590,8 @@ uint32_t EditView::LayoutLine(const EditModel &model, Surface *surface, const Vi
 		// Layout the line, determining the position of each character,
 		// with an extra element at the end for the end of the line.
 		ll->lastSegmentEnd = 0;
-		ll->numCharsInLine = numCharsInLine;
-		ll->numCharsBeforeEOL = numCharsBeforeEOL;
+		ll->numCharsInLine = static_cast<int>(numCharsInLine);
+		ll->numCharsBeforeEOL = static_cast<int>(numCharsBeforeEOL);
 
 		ll->xHighlightGuide = 0;
 		ll->edgeColumn = -1;

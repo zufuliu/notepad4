@@ -1688,7 +1688,7 @@ struct WrapBlockWorker {
 
 }
 
-int Editor::WrapBlock(Surface *surface, Sci::Line lineToWrap, Sci::Line lineToWrapEnd) {
+int Editor::WrapBlock(Surface *surface, const Sci::Line lineToWrap, Sci::Line lineToWrapEnd) {
 	// Wrap all the short lines in multiple threads
 	// Lines that are less likely to be re-examined should not be read from or written to the cache.
 	WrapBlockWorker worker(surface, lineToWrap, lineToWrapEnd, *this, view, vs, topLine, LinesOnScreen(), sel.MainCaret());
@@ -1742,8 +1742,9 @@ int Editor::WrapBlock(Surface *surface, Sci::Line lineToWrap, Sci::Line lineToWr
 			wrapOccurred |= true;
 		}
 	}
-
-	wrapPending.start = std::max(wrapPending.start, lineToWrapEnd);
+	if (lineToWrap <= wrapPending.start) {
+		wrapPending.start = std::max(wrapPending.start, lineToWrapEnd);
+	}
 	return wrapOccurred;
 }
 
