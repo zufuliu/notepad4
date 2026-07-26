@@ -363,10 +363,10 @@ constexpr uint8_t WrapBreakMask[8] = {
 void LineLayout::WrapLine(const Document *pdoc, Sci::Position posLineStart, Wrap wrapState, XYPOSITION wrapWidth, XYPOSITION wrapIndent_, bool partialLine) {
 	// Document wants document positions but simpler to work in line positions
 	// so take care of adding and subtracting line start in a lambda.
-	auto CharacterBoundary = [=](Sci::Position i, int moveDir, bool checkLineEnd = true) noexcept -> Sci::Position {
+	const auto CharacterBoundary = [=](Sci::Position i, int moveDir, bool checkLineEnd = true) noexcept -> Sci::Position {
 		return pdoc->MovePositionOutsideChar(i + posLineStart, moveDir, checkLineEnd) - posLineStart;
 	};
-	auto UpdateWrapBreak = [=, this](Sci::Position i, WrapBreak &wbPrev) noexcept -> void {
+	const auto UpdateWrapBreak = [=, this](Sci::Position i, WrapBreak &wbPrev) noexcept -> void {
 		const uint8_t ch = chars[i];
 		if (UTF8IsAscii(ch)) {
 			wbPrev = static_cast<WrapBreak>(ASCIIWrapBreakTable[ch]);

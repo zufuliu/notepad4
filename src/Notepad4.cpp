@@ -4656,11 +4656,15 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	switch (pnmh->idFrom) {
 	case IDC_EDIT:
 		switch (pnmh->code) {
-		case SCN_UPDATEUI:
-			if (scn->updated & ~(SC_UPDATE_V_SCROLL | SC_UPDATE_H_SCROLL)) {
+		case SCN_UPDATEUI: {
+			const unsigned updated = scn->updated;
+			if (updated & ~(SC_UPDATE_V_SCROLL | SC_UPDATE_H_SCROLL)) {
 				UpdateToolbar();
+				if (updated & SC_UPDATE_LINE_COUNT) {
+					UpdateLineNumberWidth();
+				}
 
-				if (scn->updated & SC_UPDATE_SELECTION) {
+				if (updated & SC_UPDATE_SELECTION) {
 					const int overType = scn->listType;
 					cachedStatusItem.updateMask |= (1 << StatusItem_Character) | (1 << StatusItem_Column)
 						| (1 << StatusItem_Selection) | (1 << StatusItem_SelectedLine);
@@ -4679,10 +4683,10 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 								editMarkAll.Clear();
 							}
 						} else {
-							editMarkAll.MarkAll((scn->updated & SC_UPDATE_CONTENT), bMarkOccurrences);
+							editMarkAll.MarkAll((updated & SC_UPDATE_TEXT), bMarkOccurrences);
 						}
 					}
-				} else if (scn->updated & SC_UPDATE_CONTENT) {
+				} else if (updated & SC_UPDATE_TEXT) {
 					// cachedStatusItem.updateMask is already set in SCN_MODIFIED.
 					if (editMarkAll.matchCount) {
 						editMarkAll.MarkAll(TRUE, bMarkOccurrences);
@@ -4728,7 +4732,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 					}
 				}
 			}
-			break;
+		} break;
 
 		case SCN_CHARADDED: {
 			// fix cursor flash on typing when "Hide pointer while typing" is enabled
@@ -4867,9 +4871,6 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			// we only watch SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT
 			++dwCurrentDocReversion;
 			UpdateStatusBarCacheLineColumn();
-			if (scn->linesAdded) {
-				UpdateLineNumberWidth();
-			}
 			AutoSave_Start(false);
 			break;
 

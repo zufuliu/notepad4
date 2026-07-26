@@ -2302,8 +2302,8 @@ void Editor::InsertCharacter(std::string_view sv, CharacterSource charSource) {
 
 void Editor::ClearSelectionRange(SelectionRange &range) {
 	if (!range.Empty()) {
-		if (range.Length()) {
-			pdoc->DeleteChars(range.Start().Position(), range.Length());
+		if (const Sci::Position length = range.Length()) {
+			pdoc->DeleteChars(range.Start().Position(), length);
 			range.ClearVirtualSpace();
 		} else {
 			// Range is all virtual so collapse to start of virtual space
@@ -2797,9 +2797,11 @@ bool Editor::NotifyUpdateUI() noexcept {
 		NotificationData scn = {};
 		scn.nmhdr.code = Notification::UpdateUI;
 		scn.updated = needUpdateUI;
+		scn.position = updateTextStart;
 		scn.listType = inOverstrike;
 		NotifyParent(scn);
 		needUpdateUI = Update::None;
+		updateTextStart = InvalidPosition;
 		return true;
 	}
 	return false;
@@ -2965,8 +2967,13 @@ constexpr Sci::Position MovePositionForDeletion(Sci::Position position, Sci::Pos
 }
 
 void Editor::NotifyModified(Document *, DocModification mh, void *) {
+	// omitted ContainerNeedsUpdate(Update::Content);
 	if (FlagSet(mh.modificationType, ModificationFlags::InsertText | ModificationFlags::DeleteText)) {
-		ContainerNeedsUpdate(Update::Content);
+		ContainerNeedsUpdate(Update::Text);
+		updateTextStart = (updateTextStart < 0) ? mh.position : std::min(updateTextStart, mh.position);
+		if (mh.linesAdded != 0) {
+			ContainerNeedsUpdate(Update::LineCount);
+		}
 	}
 	if (paintState == PaintState::painting) {
 		CheckForChangeOutsidePaint(Range(mh.position, mh.position + mh.length));
@@ -3113,7 +3120,7 @@ void Editor::NotifyModified(Document *, DocModification mh, void *) {
 		if ((!willRedrawAll) && ((paintState == PaintState::notPainting) || !PaintContainsMargin())) {
 			if (FlagSet(mh.modificationType, ModificationFlags::ChangeFold)) {
 				// Fold changes can affect the drawing of following lines so redraw whole margin
-				RedrawSelMargin(marginView.highlightDelimiter.isEnabled ? -1 : mh.line - 1, true);
+				RedrawSelMargin(marginView.highlightDelimiter.IsEnabled() ? -1 : mh.line - 1, true);
 			} else {
 				RedrawSelMargin(mh.line);
 			}
@@ -5367,8 +5374,7 @@ void Editor::ButtonUpWithModifiers(Point pt, unsigned int curTime, KeyMod modifi
 			const SelectionPosition selStart = SelectionStart();
 			const SelectionPosition selEnd = SelectionEnd();
 			if (selStart < selEnd) {
-				if (drag.Length()) {
-					const Sci::Position length = drag.Length();
+				if (const Sci::Position length = drag.Length()) {
 					if (FlagSet(modifiers, KeyMod::Ctrl)) {
 						const Sci::Position lengthInserted = pdoc->InsertString(
 							newPos.Position(), drag.Data(), length);
@@ -7642,7 +7648,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		RedrawSelMargin();
 		break;
 	case Message::MarkerEnableHighlight:
-		marginView.highlightDelimiter.isEnabled = wParam == 1;
+		marginView.highlightDelimiter.SetEnabled(wParam == 1);
 		RedrawSelMargin();
 		break;
 	case Message::MarkerSetLayer:

@@ -750,10 +750,7 @@ void Document::GetHighlightDelimiters(HighlightDelimiter &highlightDelimiter, Sc
 	if (firstChangeableLineAfter < 0)
 		firstChangeableLineAfter = endFoldBlock + 1;
 
-	highlightDelimiter.beginFoldBlock = beginFoldBlock;
-	highlightDelimiter.endFoldBlock = endFoldBlock;
-	highlightDelimiter.firstChangeableLineBefore = firstChangeableLineBefore;
-	highlightDelimiter.firstChangeableLineAfter = firstChangeableLineAfter;
+	highlightDelimiter.Set(beginFoldBlock, endFoldBlock, firstChangeableLineBefore, firstChangeableLineAfter);
 }
 
 Sci::Position Document::ClampPositionIntoDocument(Sci::Position pos) const noexcept {

@@ -13,10 +13,12 @@ struct InputSequence {
 	uint32_t character;
 };
 
+#if 0
 template <typename T, size_t N>
 constexpr uint32_t array_size([[maybe_unused]] const T (&a)[N]) noexcept {
 	return static_cast<uint32_t>(N);
 }
+#endif
 
 }
 
