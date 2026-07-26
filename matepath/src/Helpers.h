@@ -674,7 +674,7 @@ struct HistoryList {
 	LPWSTR pszItems[HISTORY_ITEMS];
 	void Init() noexcept;
 	void Empty() noexcept;
-	bool Add(LPCWSTR pszNew) noexcept;
+	void Add(LPCWSTR pszNew) noexcept;
 	bool Forward(LPWSTR pszItem, int cItem) noexcept;
 	bool Back(LPWSTR pszItem, int cItem) noexcept;
 	bool CanForward() const noexcept;
