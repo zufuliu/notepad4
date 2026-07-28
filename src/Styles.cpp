@@ -3665,7 +3665,7 @@ void Style_SetStyles(int iStyle, LPCWSTR lpszStyle) noexcept {
 
 	// Font
 	if (Style_StrGetFont(lpszStyle, tch, COUNTOF(tch))) {
-		char mch[LF_FACESIZE * kMaxMultiByteCount];
+		char mch[LF_FACESIZE];
 		WideCharToMultiByte(CP_UTF8, 0, tch, -1, mch, COUNTOF(mch), nullptr, nullptr);
 		SciCall_StyleSetFont(iStyle, mch);
 	}

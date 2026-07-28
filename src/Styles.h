@@ -71,7 +71,7 @@ struct StyleDefinition {
 	uint16_t backIndex;
 	int charset;
 	WCHAR fontWide[LF_FACESIZE];
-	char fontFace[LF_FACESIZE * kMaxMultiByteCount];
+	char fontFace[LF_FACESIZE];
 };
 
 enum StyleLoadFlag {
