@@ -239,9 +239,7 @@ bool EditConvertText(UINT cpSource, UINT cpDest) noexcept {
 		SendMessage(hwndEdit, WM_SETREDRAW, TRUE, 0);
 		InvalidateRect(hwndEdit, nullptr, TRUE);
 	}
-	if (pchText != nullptr) {
-		NP2HeapFree(pchText);
-	}
+	NP2HeapFree(pchText);
 
 	SciCall_EmptyUndoBuffer();
 	SciCall_SetUndoCollection(true);
@@ -291,9 +289,7 @@ void EditConvertToLargeMode() noexcept {
 		SendMessage(hwndEdit, WM_SETREDRAW, TRUE, 0);
 		InvalidateRect(hwndEdit, nullptr, TRUE);
 	}
-	if (pchText != nullptr) {
-		NP2HeapFree(pchText);
-	}
+	NP2HeapFree(pchText);
 
 	SciCall_SetUndoCollection(true);
 	SciCall_EmptyUndoBuffer();
@@ -3373,12 +3369,8 @@ void EditEncloseSelection(LPCWSTR pwszOpen, LPCWSTR pwszClose) noexcept {
 	}
 
 	EndWaitCursor();
-	if (mszOpen != nullptr) {
-		NP2HeapFree(mszOpen);
-	}
-	if (mszClose != nullptr) {
-		NP2HeapFree(mszClose);
-	}
+	NP2HeapFree(mszOpen);
+	NP2HeapFree(mszClose);
 }
 
 //=============================================================================
@@ -4650,7 +4642,7 @@ static LRESULT CALLBACK AddBackslashEditProc(HWND hwnd, UINT umsg, WPARAM wParam
 	case WM_PASTE: {
 		bool done = false;
 		LPWSTR lpsz = EditGetClipboardTextW();
-		if (StrNotEmpty(lpsz)) {
+		if (lpsz) {
 			const int len = lstrlen(lpsz);
 			LPWSTR lpszEsc = static_cast<LPWSTR>(NP2HeapAlloc((kMaxBackslashEscapeCount*len + 1)*sizeof(WCHAR)));
 			if (lpszEsc != nullptr) {
@@ -4659,8 +4651,6 @@ static LRESULT CALLBACK AddBackslashEditProc(HWND hwnd, UINT umsg, WPARAM wParam
 				NP2HeapFree(lpszEsc);
 				done = true;
 			}
-		}
-		if (lpsz != nullptr) {
 			NP2HeapFree(lpsz);
 		}
 		if (done) {
@@ -4787,9 +4777,7 @@ static bool CopySelectionAsFindText(HWND hwnd, EDITFINDREPLACE *lpefr, bool bFir
 		NP2HeapFree(lpszEscSel);
 	}
 
-	if (lpszSelection != nullptr) {
-		NP2HeapFree(lpszSelection);
-	}
+	NP2HeapFree(lpszSelection);
 	return hasFindText;
 }
 
@@ -5561,9 +5549,7 @@ void EditMarkAll::Reset(int findFlag, Sci_Position iSelCount, LPSTR text) noexce
 			}
 		}
 	}
-	if (pszText) {
-		NP2HeapFree(pszText);
-	}
+	NP2HeapFree(pszText);
 
 	pending = false;
 	ignoreSelectionUpdate = false;

@@ -26,7 +26,7 @@
 #include <commctrl.h>
 #include <commdlg.h>
 #include <uxtheme.h>
-#include <dbghelp.h>
+// #include <dbghelp.h>
 #include <cstdio>
 #include <cinttypes>
 #include "SciCall.h"
@@ -412,12 +412,9 @@ static inline void InvalidateStyleRedraw() noexcept {
 //
 //
 static void CleanUpResources(bool initialized) noexcept {
-	if (tchToolbarBitmap != nullptr) {
-		LocalFree(tchToolbarBitmap);
-	}
-	if (lpSchemeArg) {
-		LocalFree(lpSchemeArg);
-	}
+	LocalFree(tchToolbarBitmap);
+	LocalFree(lpSchemeArg);
+	LocalFree(lpEncodingArg);
 
 	Encoding_ReleaseResources();
 	Style_ReleaseResources();
@@ -466,7 +463,7 @@ static LONG WINAPI TopLevelHandler(EXCEPTION_POINTERS *ep) {
 	// printf("unhandled exception: 0x%08X\n", static_cast<unsigned>(ep->ExceptionRecord->ExceptionCode));
 	AcquireSRWLockExclusive(&srwTopLevelHandlerLock);
 	AutoSave_DoWork(FileSaveFlag_SaveAs);
-#if 1
+#if 0
 	using MiniDumpWriteDumpSig = BOOL (WINAPI *)(HANDLE hProcess, DWORD ProcessId, HANDLE hFile, MINIDUMP_TYPE DumpType,
 	LPVOID ExceptionParam, LPVOID UserStreamParam, LPVOID CallbackParam) noexcept;
 	if (HMODULE hDLL = LoadLibraryExW(L"dbghelp.dll", nullptr, kSystemLibraryLoadFlags)) {
@@ -588,7 +585,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 	// Try to activate another window
 	if (ActivatePrevInst()) {
-		NP2HeapFree(lpFileArg);
 		return 0;
 	}
 
@@ -7470,13 +7466,17 @@ bool ActivatePrevInst() noexcept {
 				}
 			}
 			ActivatePrevWindow(hwnd, lpszFile);
-			return true;
 		}
 
 		// Ask...
-		if (IDYES == MsgBoxAsk(MB_YESNO, IDS_ERR_PREVWINDISABLED)) {
+		else if (IDYES == MsgBoxAsk(MB_YESNO, IDS_ERR_PREVWINDISABLED)) {
 			return false;
 		}
+
+		NP2HeapFree(lpFileArg);
+		LocalFree(lpSchemeArg);
+		LocalFree(lpMatchArg);
+		LocalFree(lpEncodingArg);
 		return true;
 	}
 	return false;
