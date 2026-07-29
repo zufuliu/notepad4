@@ -25,6 +25,16 @@
 #define NP2_FIND_REPLACE_LIMIT	2048
 #define NP2_LONG_LINE_LIMIT		4096
 
+#if 1
+// sizeof(EDITFINDREPLACE) = 4096
+#define NP2_FIND_REPLACE_WCHAR	512
+#define NP2_FIND_REPLACE_BYTES	((2048 - 16)/2)
+#else
+// sizeof(EDITFINDREPLACE) = 4096*2
+#define NP2_FIND_REPLACE_WCHAR	1024
+#define NP2_FIND_REPLACE_BYTES	((4096 - 16)/2)
+#endif
+
 #define NP2_InvalidSearchFlags	(-1)
 #define NP2_MarkAllMultiline	0x00001000
 #define NP2_MarkAllBookmark		0x00002000
@@ -54,10 +64,10 @@ struct EDITFINDREPLACE {
 	HWND	hwnd;
 	UINT	fuFlags;
 	UINT	option;
-	char	szFind[512];
-	char	szReplace[512];
-	char	szFindUTF8[512 * kMaxMultiByteCount];
-	char	szReplaceUTF8[512 * kMaxMultiByteCount];
+	char	szFind[NP2_FIND_REPLACE_BYTES + 8 - sizeof(HWND)];
+	char	szReplace[NP2_FIND_REPLACE_BYTES];
+	WCHAR	szFindUTF16[NP2_FIND_REPLACE_WCHAR];
+	WCHAR	szReplaceUTF16[NP2_FIND_REPLACE_WCHAR];
 };
 
 enum EditAlignMode {

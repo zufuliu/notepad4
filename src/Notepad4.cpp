@@ -26,7 +26,7 @@
 #include <commctrl.h>
 #include <commdlg.h>
 #include <uxtheme.h>
-// #include <dbghelp.h>
+#include <dbghelp.h>
 #include <cstdio>
 #include <cinttypes>
 #include "SciCall.h"
@@ -466,7 +466,7 @@ static LONG WINAPI TopLevelHandler(EXCEPTION_POINTERS *ep) {
 	// printf("unhandled exception: 0x%08X\n", static_cast<unsigned>(ep->ExceptionRecord->ExceptionCode));
 	AcquireSRWLockExclusive(&srwTopLevelHandlerLock);
 	AutoSave_DoWork(FileSaveFlag_SaveAs);
-#if 0
+#if 1
 	using MiniDumpWriteDumpSig = BOOL (WINAPI *)(HANDLE hProcess, DWORD ProcessId, HANDLE hFile, MINIDUMP_TYPE DumpType,
 	LPVOID ExceptionParam, LPVOID UserStreamParam, LPVOID CallbackParam) noexcept;
 	if (HMODULE hDLL = LoadLibraryExW(L"dbghelp.dll", nullptr, kSystemLibraryLoadFlags)) {
@@ -687,7 +687,7 @@ static void HandleMatchText(MatchTextFlag flag, LPCWSTR lpszText, bool jumpTo) n
 	if (StrNotEmpty(lpszText) && SciCall_GetLength()) {
 		const UINT cpEdit = SciCall_GetCodePage();
 		WideCharToMultiByte(cpEdit, 0, lpszText, -1, efrData.szFind, COUNTOF(efrData.szFind), nullptr, nullptr);
-		WideCharToMultiByte(CP_UTF8, 0, lpszText, -1, efrData.szFindUTF8, COUNTOF(efrData.szFindUTF8), nullptr, nullptr);
+		lstrcpyn(efrData.szFindUTF16, lpszText, COUNTOF(efrData.szFindUTF16));
 
 		if (flag & MatchTextFlag_Regex) {
 			efrData.fuFlags |= (iFindReplaceOption & FindReplaceOption_UseCxxRegex) ? (SCFIND_REGEXP | SCFIND_CXX11REGEX) : (SCFIND_REGEXP | SCFIND_POSIX);

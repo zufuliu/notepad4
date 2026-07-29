@@ -4707,15 +4707,8 @@ void EditSaveSelectionAsFindText(EDITFINDREPLACE *lpefr, int menu, bool findSele
 		mszSelection[cchSelection] = 0; // zero terminate
 
 		const UINT cpEdit = SciCall_GetCodePage();
-		strcpy(lpefr->szFind, mszSelection);
-
-		if (cpEdit != SC_CP_UTF8) {
-			WCHAR wszBuf[NP2_FIND_REPLACE_LIMIT];
-			MultiByteToWideChar(cpEdit, 0, mszSelection, -1, wszBuf, COUNTOF(wszBuf));
-			WideCharToMultiByte(CP_UTF8, 0, wszBuf, -1, lpefr->szFindUTF8, COUNTOF(lpefr->szFindUTF8), nullptr, nullptr);
-		} else {
-			strcpy(lpefr->szFindUTF8, mszSelection);
-		}
+		strncpy(lpefr->szFind, mszSelection, COUNTOF(lpefr->szFind));
+		MultiByteToWideChar(cpEdit, 0, mszSelection, -1, lpefr->szFindUTF16, COUNTOF(lpefr->szFindUTF16));
 
 		lpefr->fuFlags &= SCFIND_REGEXP - 1; // clear all regex flags
 		lpefr->option &= ~FindReplaceOption_TransformBackslash;
@@ -4777,7 +4770,8 @@ static bool CopySelectionAsFindText(HWND hwnd, EDITFINDREPLACE *lpefr, bool bFir
 	}
 
 	if (StrNotEmpty(lpszSelection)) {
-		char *lpszEscSel = static_cast<char *>(NP2HeapAlloc((kMaxBackslashEscapeCount * NP2_FIND_REPLACE_LIMIT)));
+		constexpr unsigned len = kMaxBackslashEscapeCount * NP2_FIND_REPLACE_LIMIT;
+		char *lpszEscSel = static_cast<char *>(NP2HeapAlloc((len * (sizeof(char) + sizeof(WCHAR)))));
 		unsigned option = lpefr->option & ~FindReplaceOption_TransformBackslash;
 		if (AddBackslashA(lpszEscSel, lpszSelection)) {
 			if ((lpefr->fuFlags & SCFIND_REGEXP) == 0) {
@@ -4787,7 +4781,9 @@ static bool CopySelectionAsFindText(HWND hwnd, EDITFINDREPLACE *lpefr, bool bFir
 
 		lpefr->option = option;
 		const UINT cpEdit = SciCall_GetCodePage();
-		SetDlgItemTextA2W(cpEdit, hwnd, IDC_FINDTEXT, lpszEscSel);
+		LPWSTR wszSelection = reinterpret_cast<LPWSTR>(lpszEscSel + len);
+		MultiByteToWideChar(cpEdit, 0, lpszEscSel, -1, wszSelection, len);
+		SetDlgItemText(hwnd, IDC_FINDTEXT, wszSelection);
 		NP2HeapFree(lpszEscSel);
 	}
 
@@ -4833,7 +4829,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 	static int yFindReplaceDlgSave;
 	static HFONT hFontFindReplaceEdit;
 
-	WCHAR tch[NP2_FIND_REPLACE_LIMIT + 32];
+	WCHAR tch[NP2_FIND_REPLACE_LIMIT];
 
 	switch (umsg) {
 	case WM_INITDIALOG: {
@@ -4855,7 +4851,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			hasFindText = CopySelectionAsFindText(hwnd, lpefr, true);
 		}
 		if (!GetWindowTextLength(hwndFind)) {
-			SetDlgItemTextA2W(CP_UTF8, hwnd, IDC_FINDTEXT, lpefr->szFindUTF8);
+			SetWindowText(hwndFind, lpefr->szFindUTF16);
 		}
 
 		ComboBox_LimitText(hwndFind, NP2_FIND_REPLACE_LIMIT);
@@ -4866,7 +4862,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			mruReplace.AddToCombobox(hwndRepl);
 			ComboBox_LimitText(hwndRepl, NP2_FIND_REPLACE_LIMIT);
 			ComboBox_SetExtendedUI(hwndRepl, TRUE);
-			SetDlgItemTextA2W(CP_UTF8, hwnd, IDC_REPLACETEXT, lpefr->szReplaceUTF8);
+			SetWindowText(hwndRepl, lpefr->szReplaceUTF16);
 		}
 
 		// focus on replace box when selected text is not empty.
@@ -4948,7 +4944,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 
 		const bool hasFindText = CopySelectionAsFindText(hwnd, lpefr, false);
 		if (!GetWindowTextLength(hwndFind)) {
-			SetDlgItemTextA2W(CP_UTF8, hwnd, IDC_FINDTEXT, lpefr->szFindUTF8);
+			SetWindowText(hwndFind, lpefr->szFindUTF16);
 		}
 		CheckDlgButton(hwnd, IDC_FINDTRANSFORMBS, (lpefr->option & FindReplaceOption_TransformBackslash) ? BST_CHECKED : BST_UNCHECKED);
 		// focus on replace box when selected text is not empty.
@@ -5038,13 +5034,32 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			// Get current code page for Unicode conversion
 			const UINT cpEdit = SciCall_GetCodePage();
 
-			if (!GetDlgItemTextA2W(cpEdit, hwnd, IDC_FINDTEXT, lpefr->szFind, COUNTOF(lpefr->szFind))) {
+			if (!GetWindowText(hwndFind, tch, COUNTOF(tch))) {
 				UpdateFindReplaceDlgItem(hwnd, FALSE);
 				return TRUE;
 			}
 
+			// Save MRUs
+			mruFind.AddMultiline(tch);
+			WideCharToMultiByte(cpEdit, 0, tch, -1, lpefr->szFind, COUNTOF(lpefr->szFind), nullptr, nullptr);
+			lstrcpyn(lpefr->szFindUTF16, tch, COUNTOF(lpefr->szFindUTF16));
+			// Reload MRUs
+			ComboBox_ResetContent(hwndFind);
+			mruFind.AddToCombobox(hwndFind);
+			SetWindowText(hwndFind, tch);
+
 			if (!bIsFindDlg) {
-				GetDlgItemTextA2W(cpEdit, hwnd, IDC_REPLACETEXT, lpefr->szReplace, COUNTOF(lpefr->szReplace));
+				if (GetWindowText(hwndRepl, tch, COUNTOF(tch))) {
+					mruReplace.AddMultiline(tch);
+					WideCharToMultiByte(cpEdit, 0, tch, -1, lpefr->szReplace, COUNTOF(lpefr->szReplace), nullptr, nullptr);
+					lstrcpyn(lpefr->szReplaceUTF16, tch, COUNTOF(lpefr->szReplaceUTF16));
+				} else {
+					StrCpyEx(lpefr->szReplace, "");
+					StrCpyEx(lpefr->szReplaceUTF16, L"");
+				}
+				ComboBox_ResetContent(hwndRepl);
+				mruReplace.AddToCombobox(hwndRepl);
+				SetWindowText(hwndRepl, tch);
 			}
 
 			unsigned mask = SCFIND_NONE;
@@ -5089,31 +5104,6 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			}
 			mask |= lpefr->option & (bIsFindDlg ? FindReplaceOption_CloseReplace : FindReplaceOption_CloseFind);
 			lpefr->option = mask;
-
-			// Save MRUs
-			if (StrNotEmpty(lpefr->szFind)) {
-				if (GetDlgItemTextA2W(CP_UTF8, hwnd, IDC_FINDTEXT, lpefr->szFindUTF8, COUNTOF(lpefr->szFindUTF8))) {
-					ComboBox_GetText(hwndFind, tch, COUNTOF(tch));
-					mruFind.AddMultiline(tch);
-				}
-			}
-			if (StrNotEmpty(lpefr->szReplace)) {
-				if (GetDlgItemTextA2W(CP_UTF8, hwnd, IDC_REPLACETEXT, lpefr->szReplaceUTF8, COUNTOF(lpefr->szReplaceUTF8))) {
-					ComboBox_GetText(hwndRepl, tch, COUNTOF(tch));
-					mruReplace.AddMultiline(tch);
-				}
-			} else {
-				strcpy(lpefr->szReplaceUTF8, "");
-			}
-
-			// Reload MRUs
-			ComboBox_ResetContent(hwndFind);
-			ComboBox_ResetContent(hwndRepl);
-			mruFind.AddToCombobox(hwndFind);
-			mruReplace.AddToCombobox(hwndRepl);
-
-			SetDlgItemTextA2W(CP_UTF8, hwnd, IDC_FINDTEXT, lpefr->szFindUTF8);
-			SetDlgItemTextA2W(CP_UTF8, hwnd, IDC_REPLACETEXT, lpefr->szReplaceUTF8);
 
 			SendMessage(hwnd, WM_NEXTDLGCTL, AsInteger<WPARAM>(GetFocus()), TRUE);
 
@@ -5193,7 +5183,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		case IDACC_SAVEFIND: {
 			SendWMCommand(hwndMain, IDM_EDIT_SAVEFIND);
 			const EDITFINDREPLACE * const lpefr = AsPointer<const EDITFINDREPLACE *>(GetWindowLongPtr(hwnd, DWLP_USER));
-			SetDlgItemTextA2W(CP_UTF8, hwnd, IDC_FINDTEXT, lpefr->szFindUTF8);
+			SetDlgItemText(hwnd, IDC_FINDTEXT, lpefr->szFindUTF16);
 			CheckDlgButton(hwnd, IDC_FINDREGEXP, BST_UNCHECKED);
 			CheckDlgButton(hwnd, IDC_FINDTRANSFORMBS, BST_UNCHECKED);
 			PostMessage(hwnd, WM_NEXTDLGCTL, AsInteger<WPARAM>(GetDlgItem(hwnd, IDC_FINDTEXT)), TRUE);
@@ -5204,9 +5194,9 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			bSwitchedFindReplace |= 2;
 			EDITFINDREPLACE * const lpefr = AsPointer<EDITFINDREPLACE *>(GetWindowLongPtr(hwnd, DWLP_USER));
 			GetDlgPos(hwnd, &xFindReplaceDlgSave, &yFindReplaceDlgSave);
-			GetDlgItemTextA2W(CP_UTF8, hwnd, IDC_FINDTEXT, lpefr->szFindUTF8, COUNTOF(lpefr->szFindUTF8));
-			if (GetDlgItem(hwnd, IDC_REPLACETEXT) != nullptr) {
-				GetDlgItemTextA2W(CP_UTF8, hwnd, IDC_REPLACETEXT, lpefr->szReplaceUTF8, COUNTOF(lpefr->szReplaceUTF8));
+			GetDlgItemText(hwnd, IDC_FINDTEXT, lpefr->szFindUTF16, COUNTOF(lpefr->szFindUTF16));
+			if (HWND hwndRepl = GetDlgItem(hwnd, IDC_REPLACETEXT)) {
+				GetWindowText(hwndRepl, lpefr->szReplaceUTF16, COUNTOF(lpefr->szReplaceUTF16));
 			}
 		}
 		break;
@@ -5246,10 +5236,12 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 
 			case IDC_CLEAR_FIND:
 			case IDC_CLEAR_REPLACE: {
-				HWND hwndFind = GetDlgItem(hwnd, (pnmhdr->idFrom == IDC_CLEAR_FIND) ? IDC_FINDTEXT : IDC_REPLACETEXT);
+				static_assert(IDC_FINDTEXT - IDC_CLEAR_FIND == IDC_REPLACETEXT - IDC_CLEAR_REPLACE);
+				const int control = static_cast<int>(pnmhdr->idFrom + IDC_FINDTEXT - IDC_CLEAR_FIND);
+				HWND hwndFind = GetDlgItem(hwnd, control);
 				ComboBox_GetText(hwndFind, tch, COUNTOF(tch));
 				ComboBox_ResetContent(hwndFind);
-				if (pnmhdr->idFrom == IDC_CLEAR_FIND) {
+				if (control == IDC_FINDTEXT) {
 					mruFind.Empty(true);
 				} else {
 					mruReplace.Empty(true);
