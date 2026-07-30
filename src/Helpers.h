@@ -195,69 +195,249 @@ inline void StrCpyEx(T *s, const T (&t)[N]) noexcept {
 	__builtin_memcpy(s, t, N*sizeof(T));
 }
 
+template <typename T, size_t N>
+inline void StrCpyExNull(T *s, const T (&t)[N]) noexcept {
+	__builtin_memcpy(s, t, (N - 1)*sizeof(T));
+}
 #else
-template <size_t N>
+// see scintilla\lexlib\StringUtils.h
+namespace StrCopyEqualExPrivate {
+constexpr uint16_t *toU2(void *s) noexcept {
+	return (uint16_t *)(s);
+}
+constexpr uint32_t *toU4(void *s) noexcept {
+	return (uint32_t *)(s);
+}
+constexpr uint64_t *toU8(void *s) noexcept {
+	return (uint64_t *)(s);
+}
+constexpr uint16_t asU2(const char *s) noexcept {
+	return *(const uint16_t *)s;
+}
+constexpr uint32_t asU4(const void *s) noexcept {
+	return *(const uint32_t *)s;
+}
+constexpr uint64_t asU8(const void *s) noexcept {
+	return *(const uint64_t *)s;
+}
+constexpr uint32_t asU3_4M1(const char *s) noexcept {
+	return asU4(s - 1);
+}
+constexpr uint32_t asU3_2P1(const char *s) noexcept {
+	return asU4(s - 1);
+}
+}
+
+template <size_t N, size_t M = N>
 inline void StrCpyEx(char *s, const char (&t)[N]) noexcept {
-	switch (N) {
+	using namespace StrCopyEqualExPrivate;
+	switch (M) {
 	case 1:
 		s[0] = t[0];
 		break;
 	case 2:
-		*((uint16_t *)s) = *((const uint16_t *)t);
+		*toU2(s) = asU2(t);
 		break;
 	case 3:
-		*((uint16_t *)s) = *((const uint16_t *)t);
+		*toU2(s) = asU2(t);
 		s[2] = t[2];
 		break;
 	case 4:
-		*((uint32_t *)s) = *((const uint32_t *)t);
+		*toU4(s) = asU4(t);
 		break;
 	case 5:
-		*((uint32_t *)s) = *((const uint32_t *)t);
+		*toU4(s) = asU4(t);
 		s[4] = t[4];
 		break;
 	case 6:
-		*((uint32_t *)s) = *((const uint32_t *)t);
-		*((uint16_t *)(s + 4)) = *((const uint16_t *)(t + 4));
+		*toU4(s) = asU4(t);
+		*toU2(s + 4) = asU2(t + 4);
 		break;
 	case 7:
-		*((uint32_t *)s) = *((const uint32_t *)t);
-		*((uint16_t *)(s + 4)) = *((const uint16_t *)(t + 4));
+		*toU4(s) = asU4(t);
+		*toU2(s + 4) = asU2(t + 4);
+		s[6] = t[6];
+		break;
+#if defined(_WIN64)
+	case 8:
+		*toU8(s) = asU8(t);
+		break;
+	case 9:
+		*toU8(s) = asU8(t);
+		s[8] = t[8];
+		break;
+	case 10:
+		*toU8(s) = asU8(t);
+		*toU2(s + 8) = asU2(t + 8);
+		break;
+	case 11:
+		*toU8(s) = asU8(t);
+		*toU2(s + 8) = asU2(t + 8);
+		s[10] = s[11];
+		break;
+	case 12:
+		*toU8(s) = asU8(t);
+		*toU4(s + 8) = asU4(t + 8);
+		break;
+	case 13:
+		*toU8(s) = asU8(t);
+		*toU4(s + 8) = asU4(t + 8);
+		s[12] = t[12];
+		break;
+	case 14:
+		*toU8(s) = asU8(t);
+		*toU4(s + 8) = asU4(t + 8);
+		*toU2(s + 12) = asU2(t + 12);
+		break;
+	case 15:
+		*toU8(s) = asU8(t);
+		*toU4(s + 8) = asU4(t + 8);
+		*toU2(s + 12) = asU2(t + 12);
+		s[14] = t[14];
+		break;
+	case 16:
+		*toU8(s) = asU8(t);
+		*toU8(s + 8) = asU8(t + 8);
+		break;
+#else
+	case 8:
+		*toU4(s) = asU4(t);
+		*toU4(s + 4) = asU4(t + 4);
+		break;
+	case 9:
+		*toU4(s) = asU4(t);
+		*toU4(s + 4) = asU4(t + 4);
+		s[8] = t[8];
+		break;
+	case 10:
+		*toU4(s) = asU4(t);
+		*toU4(s + 4) = asU4(t + 4);
+		*toU2(s + 8) = asU2(t + 8);
+		break;
+	case 11:
+		*toU4(s) = asU4(t);
+		*toU4(s + 4) = asU4(t + 4);
+		*toU2(s + 8) = asU2(t + 8);
+		s[10] = s[11];
+		break;
+	case 12:
+		*toU4(s) = asU4(t);
+		*toU4(s + 4) = asU4(t + 4);
+		*toU4(s + 8) = asU4(t + 8);
+		break;
+	case 13:
+		*toU4(s) = asU4(t);
+		*toU4(s + 4) = asU4(t + 4);
+		*toU4(s + 8) = asU4(t + 8);
+		s[12] = t[12];
+		break;
+	case 14:
+		*toU4(s) = asU4(t);
+		*toU4(s + 4) = asU4(t + 4);
+		*toU4(s + 8) = asU4(t + 8);
+		*toU2(s + 12) = asU2(t + 12);
+		break;
+	case 15:
+		*toU4(s) = asU4(t);
+		*toU4(s + 4) = asU4(t + 4);
+		*toU4(s + 8) = asU4(t + 8);
+		*toU2(s + 12) = asU2(t + 12);
+		s[14] = t[14];
+		break;
+	case 16:
+		*toU4(s) = asU4(t);
+		*toU4(s + 4) = asU4(t + 4);
+		*toU4(s + 8) = asU4(t + 8);
+		*toU4(s + 12) = asU4(t + 12);
+		break;
+#endif
+	default:
+		memcpy(s, t, M*sizeof(char));
+		break;
+	}
+}
+
+template <size_t N, size_t M = N>
+inline void StrCpyEx(wchar_t *s, const wchar_t (&t)[N]) noexcept {
+	using namespace StrCopyEqualExPrivate;
+	switch (M) {
+	case 1:
+		s[0] = t[0];
+		break;
+	case 2:
+		*toU4(s) = asU4(t);
+		break;
+	case 3:
+		*toU4(s) = asU4(t);
+		s[2] = t[2];
+		break;
+#if defined(_WIN64)
+	case 4:
+		*toU8(s) = asU8(t);
+		break;
+	case 5:
+		*toU8(s) = asU8(t);
+		s[4] = t[4];
+		break;
+	case 6:
+		*toU8(s) = asU8(t);
+		*toU4(s + 4) = asU4(t + 4);
+		break;
+	case 7:
+		*toU8(s) = asU8(t);
+		*toU4(s + 4) = asU4(t + 4);
 		s[6] = t[6];
 		break;
 	case 8:
-		*((uint32_t *)s) = *((const uint32_t *)t);
-		*((uint32_t *)(s + 4)) = *((const uint32_t *)(t + 4));
+		*toU8(s) = asU8(t);
+		*toU8(s + 4) = asU8(t + 4);
 		break;
+#else
+	case 4:
+		*toU4(s) = asU4(t);
+		*toU4(s + 2) = asU4(t + 2);
+		break;
+	case 5:
+		*toU4(s) = asU4(t);
+		*toU4(s + 2) = asU4(t + 2);
+		s[4] = t[4];
+		break;
+	case 6:
+		*toU4(s) = asU4(t);
+		*toU4(s + 2) = asU4(t + 2);
+		*toU4(s + 4) = asU4(t + 4);
+		break;
+	case 7:
+		*toU4(s) = asU4(t);
+		*toU4(s + 2) = asU4(t + 2);
+		*toU4(s + 4) = asU4(t + 4);
+		s[6] = t[6];
+		break;
+	case 8:
+		*toU4(s) = asU4(t);
+		*toU4(s + 2) = asU4(t + 2);
+		*toU4(s + 4) = asU4(t + 4);
+		*toU4(s + 6) = asU4(t + 6);
+		break;
+#endif
 	default:
-		memcpy(s, t, N*sizeof(char));
+		memcpy(s, t, M*sizeof(wchar_t));
 		break;
 	}
 }
 
 template <size_t N>
-inline void StrCpyEx(wchar_t *s, const wchar_t (&t)[N]) noexcept {
-	switch (N) {
-	case 1:
-		s[0] = t[0];
-		break;
-	case 2:
-		*((uint32_t *)s) = *((const uint32_t *)t);
-		break;
-	case 3:
-		*((uint32_t *)s) = *((const uint32_t *)t);
-		s[2] = t[2];
-		break;
-	case 4:
-		*((uint64_t *)s) = *((const uint64_t *)t);
-		break;
-	default:
-		memcpy(s, t, N*sizeof(wchar_t));
-		break;
-	}
+inline void StrCpyExNull(char *s, const char (&t)[N]) noexcept {
+	StrCpyEx<N, N - 1>(s, t);
+}
+
+template <size_t N>
+inline void StrCpyExNull(wchar_t *s, const wchar_t (&t)[N]) noexcept {
+	StrCpyEx<N, N - 1>(s, t);
 }
 #endif
 
+#if defined(__clang__) || defined(__GNUC__) || !defined(_MSC_BUILD)
 template <typename T, size_t N>
 constexpr bool StrEqualEx(const T *s, const T (&t)[N]) noexcept {
 	// NOLINTNEXTLINE(clang-analyzer-unix.cstring.UninitializedRead)
@@ -269,6 +449,118 @@ constexpr bool StrStartsWith(const T *s, const T (&t)[N]) noexcept {
 	// NOLINTNEXTLINE(clang-analyzer-unix.cstring.UninitializedRead)
 	return __builtin_memcmp(s, t, (N - 1)*sizeof(T)) == 0;
 }
+
+#else
+template <size_t N, size_t M = N>
+constexpr bool StrEqualEx(const char *s, const char (&t)[N]) noexcept {
+	using namespace StrCopyEqualExPrivate;
+	switch (M) {
+	case 1:
+		return s[0] == t[0];
+	case 2:
+		return asU2(s) == asU2(t);
+	case 3:
+		return asU2(s) == asU2(t) && s[2] == t[2];
+	case 4:
+		return asU4(s) == asU4(t);
+	case 5:
+		return asU4(s) == asU4(t) && s[4] == t[4];
+	case 6:
+		return asU4(s) == asU4(t) && asU2(s + 4) == asU2(t + 4);
+	case 7:
+		return asU4(s) == asU4(t) && asU3_4M1(s + 4) == asU3_2P1(t + 4);
+#if defined(_WIN64)
+	case 8:
+		return asU8(s) == asU8(t);
+	case 9:
+		return asU8(s) == asU8(t) && s[8] == t[8];
+	case 10:
+		return asU8(s) == asU8(t) && asU2(s + 8) == asU2(t + 8);
+	case 11:
+		return asU8(s) == asU8(t) && asU3_4M1(s + 8) == asU3_2P1(t + 8);
+	case 12:
+		return asU8(s) == asU8(t) && asU4(s + 8) == asU4(t + 8);
+	case 13:
+		return asU8(s) == asU8(t) && asU4(s + 8) == asU4(t + 8) && s[12] == t[12];
+	case 14:
+		return asU8(s) == asU8(t) && asU4(s + 8) == asU4(t + 8) && asU2(s + 12) == asU2(t + 12);
+	case 15:
+		return asU8(s) == asU8(t) && asU4(s + 8) == asU4(t + 8) && asU3_4M1(s + 12) == asU3_2P1(t + 12);
+	case 16:
+		return asU8(s) == asU8(t) && asU8(s + 8) == asU8(t + 8);
+#else
+	case 8:
+		return asU4(s) == asU4(t) && asU4(s + 4) == asU4(t + 4);
+	case 9:
+		return asU4(s) == asU4(t) && asU4(s + 4) == asU4(t + 4) && s[8] == t[8];
+	case 10:
+		return asU4(s) == asU4(t) && asU4(s + 4) == asU4(t + 4) && asU2(s + 8) == asU2(t + 8);
+	case 11:
+		return asU4(s) == asU4(t) && asU4(s + 4) == asU4(t + 4) && asU3_4M1(s + 8) == asU3_2P1(t + 8);
+	case 12:
+		return asU4(s) == asU4(t) && asU4(s + 4) == asU4(t + 4) && asU4(s + 8) == asU4(t + 8);
+	case 13:
+		return asU4(s) == asU4(t) && asU4(s + 4) == asU4(t + 4) && asU4(s + 8) == asU4(t + 8) && s[12] == t[12];
+	case 14:
+		return asU4(s) == asU4(t) && asU4(s + 4) == asU4(t + 4) && asU4(s + 8) == asU4(t + 8) && asU2(s + 12) == asU2(t + 12);
+	case 15:
+		return asU4(s) == asU4(t) && asU4(s + 4) == asU4(t + 4) && asU4(s + 8) == asU4(t + 8) && asU3_4M1(s + 12) == asU3_2P1(t + 12);
+	case 16:
+		return asU4(s) == asU4(t) && asU4(s + 4) == asU4(t + 4) && asU4(s + 8) == asU4(t + 8) && asU4(s + 12) == asU4(t + 12);
+#endif
+	default:
+		return __builtin_memcmp(s, t, M) == 0;
+	}
+}
+
+template <size_t N, size_t M = N>
+constexpr bool StrEqualEx(const wchar_t *s, const wchar_t (&t)[N]) noexcept {
+	using namespace StrCopyEqualExPrivate;
+	switch (M) {
+	case 1:
+		return s[0] == t[0];
+	case 2:
+		return asU4(s) == asU4(t);
+	case 3:
+		return asU4(s) == asU4(t) && s[2] == t[2];
+#if defined(_WIN64)
+	case 4:
+		return asU8(s) == asU8(t);
+	case 5:
+		return asU8(s) == asU8(t) && s[4] == t[4];
+	case 6:
+		return asU8(s) == asU8(t) && asU4(s + 4) == asU4(t + 4);
+	case 7:
+		return asU8(s) == asU8(t) && asU4(s + 4) == asU4(t + 4) && s[6] == t[6];
+	case 8:
+		return asU8(s) == asU8(t) && asU8(s + 4) == asU8(t + 4);
+#else
+	case 4:
+		return asU4(s) == asU4(t) && asU4(s + 2) == asU4(t + 2);
+	case 5:
+		return asU4(s) == asU4(t) && asU4(s + 2) == asU4(t + 2) && s[4] == t[4];
+	case 6:
+		return asU4(s) == asU4(t) && asU4(s + 2) == asU4(t + 2) && asU4(s + 4) == asU4(t + 4);
+	case 7:
+		return asU4(s) == asU4(t) && asU4(s + 2) == asU4(t + 2) && asU4(s + 4) == asU4(t + 4) && s[6] == t[6];
+	case 8:
+		return asU4(s) == asU4(t) && asU4(s + 2) == asU4(t + 2) && asU4(s + 4) == asU4(t + 4) && asU4(s + 6) == asU4(t + 6);
+#endif
+	default:
+		return __builtin_memcmp(s, t, M*sizeof(wchar_t)) == 0;
+	}
+}
+
+template <size_t N>
+constexpr bool StrStartsWith(const char *s, const char (&t)[N]) noexcept {
+	return StrEqualEx<N, N - 1>(s, t);
+}
+
+template <size_t N>
+constexpr bool StrStartsWith(const wchar_t *s, const wchar_t (&t)[N]) noexcept {
+	return StrEqualEx<N, N - 1>(s, t);
+}
+#endif
 
 template <size_t N>
 inline bool WcsStartsWith(const wchar_t *s, const wchar_t (&t)[N]) noexcept {

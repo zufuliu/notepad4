@@ -96,81 +96,63 @@ constexpr uint32_t asU3_2P1(const char *s) noexcept {
 
 template <size_t M, size_t N>
 constexpr bool StringEqual(const char *s, const char (&t)[N]) noexcept {
-	if constexpr (M == 2) {
+	switch (M) {
+	case 1:
+		return s[0] == t[0];
+	case 2:
 		return asU2(s) == asU2(t);
-	}
-	if constexpr (M == 3) {
+	case 3:
 		return asU2(s) == asU2(t) && s[2] == t[2];
-	}
-	if constexpr (M == 4) {
+	case 4:
 		return asU4(s) == asU4(t);
-	}
-	if constexpr (M == 5) {
+	case 5:
 		return asU4(s) == asU4(t) && s[4] == t[4];
-	}
-	if constexpr (M == 6) {
+	case 6:
 		return asU4(s) == asU4(t) && asU2(s + 4) == asU2(t + 4);
-	}
-	if constexpr (M == 7) {
+	case 7:
 		return asU4(s) == asU4(t) && asU3_4M1(s + 4) == asU3_2P1(t + 4);
-	}
 #if defined(_WIN64)
-	if constexpr (M == 8) {
+	case 8:
 		return asU8(s) == asU8(t);
-	}
-	if constexpr (M == 9) {
+	case 9:
 		return asU8(s) == asU8(t) && s[8] == t[8];
-	}
-	if constexpr (M == 10) {
+	case 10:
 		return asU8(s) == asU8(t) && asU2(s + 8) == asU2(t + 8);
-	}
-	if constexpr (M == 11) {
+	case 11:
 		return asU8(s) == asU8(t) && asU3_4M1(s + 8) == asU3_2P1(t + 8);
-	}
-	if constexpr (M == 12) {
+	case 12:
 		return asU8(s) == asU8(t) && asU4(s + 8) == asU4(t + 8);
-	}
-	if constexpr (M == 13) {
+	case 13:
 		return asU8(s) == asU8(t) && asU4(s + 8) == asU4(t + 8) && s[12] == t[12];
-	}
-	if constexpr (M == 14) {
+	case 14:
 		return asU8(s) == asU8(t) && asU4(s + 8) == asU4(t + 8) && asU2(s + 12) == asU2(t + 12);
-	}
-	if constexpr (M == 15) {
+	case 15:
 		return asU8(s) == asU8(t) && asU4(s + 8) == asU4(t + 8) && asU3_4M1(s + 12) == asU3_2P1(t + 12);
-	}
-	if constexpr (M == 16) {
+	case 16:
 		return asU8(s) == asU8(t) && asU8(s + 8) == asU8(t + 8);
-	}
 #else
-	if constexpr (M == 8) {
+	case 8:
 		return asU4(s) == asU4(t) && asU4(s + 4) == asU4(t + 4);
-	}
-	if constexpr (M == 9) {
+	case 9:
 		return asU4(s) == asU4(t) && asU4(s + 4) == asU4(t + 4) && s[8] == t[8];
-	}
-	if constexpr (M == 10) {
+	case 10:
 		return asU4(s) == asU4(t) && asU4(s + 4) == asU4(t + 4) && asU2(s + 8) == asU2(t + 8);
-	}
-	if constexpr (M == 11) {
+	case 11:
 		return asU4(s) == asU4(t) && asU4(s + 4) == asU4(t + 4) && asU3_4M1(s + 8) == asU3_2P1(t + 8);
-	}
-	if constexpr (M == 12) {
+	case 12:
 		return asU4(s) == asU4(t) && asU4(s + 4) == asU4(t + 4) && asU4(s + 8) == asU4(t + 8);
-	}
-	if constexpr (M == 13) {
+	case 13:
 		return asU4(s) == asU4(t) && asU4(s + 4) == asU4(t + 4) && asU4(s + 8) == asU4(t + 8) && s[12] == t[12];
-	}
-	if constexpr (M == 14) {
+	case 14:
 		return asU4(s) == asU4(t) && asU4(s + 4) == asU4(t + 4) && asU4(s + 8) == asU4(t + 8) && asU2(s + 12) == asU2(t + 12);
-	}
-	if constexpr (M == 15) {
+	case 15:
 		return asU4(s) == asU4(t) && asU4(s + 4) == asU4(t + 4) && asU4(s + 8) == asU4(t + 8) && asU3_4M1(s + 12) == asU3_2P1(t + 12);
-	}
-	if constexpr (M == 16) {
+	case 16:
 		return asU4(s) == asU4(t) && asU4(s + 4) == asU4(t + 4) && asU4(s + 8) == asU4(t + 8) && asU4(s + 12) == asU4(t + 12);
-	}
 #endif
+	default:
+		return __builtin_memcmp(s, t, M) == 0;
+	}
 }
 
 }
