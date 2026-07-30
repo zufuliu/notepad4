@@ -587,10 +587,7 @@ inline void BeginWaitCursor() noexcept {
 }
 
 inline void EndWaitCursor() noexcept {
-	POINT pt;
 	SciCall_SetCursor(SC_CURSORNORMAL);
-	GetCursorPos(&pt);
-	SetCursorPos(pt.x, pt.y);
 }
 
 // Line endings

@@ -4393,7 +4393,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 				} else {
 					cursor = LoadCursor(nullptr, IDC_NO);
 				}
-				DestroyCursor(SetCursor(cursor));
+				SetCursor(cursor);
 				SetCapture(hwnd);
 				fDragging = true;
 			}
@@ -4457,7 +4457,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 			}
 
 			ReleaseCapture();
-			DestroyCursor(SetCursor(LoadCursor(nullptr, IDC_ARROW)));
+			SetCursor(LoadCursor(nullptr, IDC_ARROW));
 			fDragging = false;
 		}
 		break;
@@ -4467,7 +4467,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 			//ImageList_EndDrag();
 			TreeView_SelectDropTarget(hwndTV, nullptr);
 			ReleaseCapture();
-			DestroyCursor(SetCursor(LoadCursor(nullptr, IDC_ARROW)));
+			SetCursor(LoadCursor(nullptr, IDC_ARROW));
 			fDragging = false;
 		}
 		break;
@@ -5066,7 +5066,7 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 					hDraggingNode = nullptr;
 					cursor = LoadCursor(nullptr, IDC_NO);
 				}
-				DestroyCursor(SetCursor(cursor));
+				SetCursor(cursor);
 				SetCapture(hwnd);
 				fDragging = true;
 			}
@@ -5112,7 +5112,7 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 			}
 
 			ReleaseCapture();
-			DestroyCursor(SetCursor(LoadCursor(nullptr, IDC_ARROW)));
+			SetCursor(LoadCursor(nullptr, IDC_ARROW));
 			fDragging = false;
 		}
 		break;
@@ -5122,7 +5122,7 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 			TreeView_SelectDropTarget(hwndTV, nullptr);
 			TreeView_SetInsertMark(hwndTV, nullptr, TRUE);
 			ReleaseCapture();
-			DestroyCursor(SetCursor(LoadCursor(nullptr, IDC_ARROW)));
+			SetCursor(LoadCursor(nullptr, IDC_ARROW));
 			fDragging = false;
 		}
 		break;

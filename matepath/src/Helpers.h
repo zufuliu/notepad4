@@ -461,11 +461,11 @@ inline bool KeyboardIsKeyDown(int key) noexcept {
 }
 
 inline void BeginWaitCursor() noexcept {
-	DestroyCursor(SetCursor(LoadCursor(nullptr, IDC_WAIT)));
+	SetCursor(LoadCursor(nullptr, IDC_WAIT));
 }
 
 inline void EndWaitCursor() noexcept {
-	DestroyCursor(SetCursor(LoadCursor(nullptr, IDC_ARROW)));
+	SetCursor(LoadCursor(nullptr, IDC_ARROW));
 }
 
 struct BackgroundWorker {
