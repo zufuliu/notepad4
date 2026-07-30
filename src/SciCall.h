@@ -31,10 +31,24 @@ LRESULT SCI_METHOD Scintilla_DirectFunction(HANDLE handle, UINT msg, WPARAM wPar
 
 namespace Scintilla {
 enum class CharacterClass { space, newLine, punctuation, word, cjkWord }; // ILexer.h
+
+namespace Internal {
+struct DBCSByteMask { // CharClassify.h
+	uint8_t byteMask[256];
+	bool IsLeadByte(unsigned char ch) const noexcept {
+		return byteMask[ch] & true;
+	}
+	bool IsTrailByte(unsigned char ch) const noexcept {
+		return byteMask[ch] & 2;
+	}
+};
+
+}
 }
 
 using Sci_MarkerMask = unsigned int;
 using CharacterClass = Scintilla::CharacterClass;
+using DBCSByteMask = Scintilla::Internal::DBCSByteMask;
 
 constexpr COLORREF ColorAlpha(COLORREF rgb, UINT alpha) noexcept {
 	return rgb | (alpha << 24);
@@ -856,6 +870,10 @@ inline void SciCall_SetCodePage(UINT codePage) noexcept {
 
 inline UINT SciCall_GetCodePage() noexcept {
 	return static_cast<UINT>(SciCall(SCI_GETCODEPAGE, 0, 0));
+}
+
+inline const DBCSByteMask *SciCall_GetDBCSByteMask() noexcept {
+	return AsPointer<const DBCSByteMask *>(SciCall(SCI_GETCODEPAGE, TRUE, 0));
 }
 
 inline void SciCall_SetTechnology(int technology) noexcept {

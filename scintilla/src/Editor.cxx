@@ -7574,6 +7574,9 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case Message::GetCodePage:
+		if (wParam) {
+			return AsInteger<sptr_t>(pdoc->GetDBCSByteMask());
+		}
 		return pdoc->dbcsCodePage;
 
 	case Message::SetIMEInteraction:

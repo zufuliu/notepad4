@@ -5765,12 +5765,11 @@ void EditMarkAll::MarkAll(BOOL bChanged, int option) noexcept {
 	// exit if selection is not a word and Match whole words only is enabled
 	if (option & MarkOccurrences_WholeWord) {
 		findFlag |= SCFIND_WHOLEWORD;
-		const UINT cpEdit = SciCall_GetCodePage();
-		const bool dbcs = !(cpEdit == CP_UTF8 || cpEdit == 0);
+		const auto *byteMask = SciCall_GetDBCSByteMask();
 		// CharClassify::SetDefaultCharClasses()
 		for (iSelStart = 0; iSelStart < iSelCount; ++iSelStart) {
 			const unsigned char ch = text[iSelStart];
-			if (dbcs && IsDBCSLeadByteEx(cpEdit, ch)) {
+			if (byteMask && byteMask->IsLeadByte(ch) && byteMask->IsTrailByte(text[iSelStart + 1]))	{
 				++iSelStart;
 			} else if (!IsDocWordChar(ch)) {
 				NP2HeapFree(text);
