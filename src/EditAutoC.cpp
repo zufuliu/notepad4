@@ -595,7 +595,7 @@ bool IsAutoCompletionWordCharacter(uint32_t ch) noexcept {
 		return IsDocWordChar(ch);
 	}
 	const CharacterClass cc = SciCall_GetCharacterClass(ch);
-	return cc == CharacterClass_Word;
+	return cc == CharacterClass::word;
 }
 
 static constexpr bool IsEscapeCharacter(int ch) noexcept {

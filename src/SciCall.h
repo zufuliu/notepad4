@@ -29,7 +29,12 @@ extern "C"
 LRESULT SCI_METHOD Scintilla_DirectFunction(HANDLE handle, UINT msg, WPARAM wParam, LPARAM lParam);
 #define SciCall(m, w, l)	Scintilla_DirectFunction(g_hScintilla, (m), (w), (l))
 
+namespace Scintilla {
+enum class CharacterClass { space, newLine, punctuation, word, cjkWord }; // ILexer.h
+}
+
 using Sci_MarkerMask = unsigned int;
+using CharacterClass = Scintilla::CharacterClass;
 
 constexpr COLORREF ColorAlpha(COLORREF rgb, UINT alpha) noexcept {
 	return rgb | (alpha << 24);
@@ -126,15 +131,6 @@ inline int SciCall_GetCharacterAndWidth(Sci_Position position, Sci_Position *wid
 inline int SciCall_GetCharacterAt(Sci_Position position) noexcept {
 	return static_cast<int>(SciCall(SCI_GETCHARACTERANDWIDTH, position, 0));
 }
-
-// same as CharacterClass in ILexer.h
-enum CharacterClass {
-	CharacterClass_Space,
-	CharacterClass_NewLine,
-	CharacterClass_Punctuation,
-	CharacterClass_Word,
-	CharacterClass_CJKWord
-};
 
 inline CharacterClass SciCall_GetCharacterClass(UINT character) noexcept {
 	return static_cast<CharacterClass>(SciCall(SCI_GETCHARACTERCLASS, character, 0));
