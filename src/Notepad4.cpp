@@ -3300,14 +3300,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_EDIT_CONVERTUPPERCASE:
-		BeginWaitCursor();
-		SciCall_UpperCase();
-		EndWaitCursor();
-		break;
-
 	case IDM_EDIT_CONVERTLOWERCASE:
 		BeginWaitCursor();
-		SciCall_LowerCase();
+		// see CaseMapping in Editor.h
+		SciCall_CustomCaseMapping(LOWORD(wParam) - IDM_EDIT_CONVERTUPPERCASE + 1);
 		EndWaitCursor();
 		break;
 

@@ -2277,12 +2277,12 @@ void EditBase64Encode(Base64EncodingFlag encodingFlag) noexcept {
 				output[outLen++] = static_cast<char>(ToLowerA(*suffix++));
 			}
 		}
-		memcpy(output + outLen, ";base64,", CSTRLEN(";base64,"));
+		StrCpyExNull(output + outLen, ";base64,");
 		outLen += CSTRLEN(";base64,");
 	}
 	outLen += Base64Encode(output + outLen, reinterpret_cast<const uint8_t *>(input), iSelByte, encodingFlag == Base64EncodingFlag_UrlSafe);
 	if (encodingFlag == Base64EncodingFlag_HtmlEmbeddedImage) {
-		memcpy(output + outLen, "\" />", CSTRLEN("\" />"));
+		StrCpyExNull(output + outLen, "\" />");
 		outLen += CSTRLEN("\" />");
 	}
 
@@ -3725,7 +3725,7 @@ void EditStripTrailingBlanks(HWND hwnd, bool bIgnoreSelection) noexcept {
 			EDITFINDREPLACE * const efrTrim = static_cast<EDITFINDREPLACE *>(NP2HeapAlloc(sizeof(EDITFINDREPLACE)));
 			efrTrim->hwnd = hwnd;
 			efrTrim->fuFlags = SCFIND_REGEXP;
-			memcpy(efrTrim->szFind, "[ \t]+$", CSTRLEN("[ \t]+$"));
+			StrCpyExNull(efrTrim->szFind, "[ \t]+$");
 			EditReplaceAllInSelection(hwnd, efrTrim, EditReplaceAllFlag_UndoGroup);
 			NP2HeapFree(efrTrim);
 			return;
@@ -3765,7 +3765,7 @@ void EditStripLeadingBlanks(HWND hwnd, bool bIgnoreSelection) noexcept {
 			EDITFINDREPLACE * const efrTrim = static_cast<EDITFINDREPLACE *>(NP2HeapAlloc(sizeof(EDITFINDREPLACE)));
 			efrTrim->hwnd = hwnd;
 			efrTrim->fuFlags = SCFIND_REGEXP;
-			memcpy(efrTrim->szFind, "^[ \t]+", CSTRLEN("^[ \t]+"));
+			StrCpyExNull(efrTrim->szFind, "^[ \t]+");
 			EditReplaceAllInSelection(hwnd, efrTrim, EditReplaceAllFlag_UndoGroup);
 			NP2HeapFree(efrTrim);
 			return;
