@@ -1542,6 +1542,9 @@ char *EditMapTextCase(int menu, const char *pszText, size_t &iSelCount, UINT cpE
 	DWORD flags = 0;
 	const GUID *pGuid = nullptr;
 	switch (menu) {
+	case IDM_EDIT_ESCAPECCHARS:
+	case IDM_EDIT_UNESCAPECCHARS:
+		return EditEscapeChars(static_cast<EscapeMenu>(menu - IDM_EDIT_ESCAPECCHARS), pszText, iSelCount);
 	case IDM_EDIT_SENTENCECASE:
 	case IDM_EDIT_TITLECASE:
 		flags = LCMAP_LINGUISTIC_CASING | LCMAP_LOWERCASE;
@@ -1798,86 +1801,6 @@ void EditURLDecode() noexcept {
 	NP2HeapFree(pszUnescaped);
 }
 
-//=============================================================================
-//
-// EditEscapeCChars()
-//
-void EditEscapeCChars(HWND hwnd) noexcept {
-	if (SciCall_IsSelectionEmpty()) {
-		return;
-	}
-	if (SciCall_IsRectangularSelection()) {
-		NotifyRectangularSelection();
-		return;
-	}
-
-	EDITFINDREPLACE * const efr = static_cast<EDITFINDREPLACE *>(NP2HeapAlloc(sizeof(EDITFINDREPLACE)));
-	efr->hwnd = hwnd;
-	SciCall_BeginBatchUpdate();
-	const int rid = pLexCurrent->rid;
-
-	StrCpyEx(efr->szFind, "\\");
-	StrCpyEx(efr->szReplace, "\\\\");
-	EditReplaceAllInSelection(hwnd, efr);
-
-	StrCpyEx(efr->szFind, "\"");
-	if (rid == NP2LEX_RESOURCESCRIPT) {
-		StrCpyEx(efr->szReplace, "\"\"");
-	} else {
-		StrCpyEx(efr->szReplace, "\\\"");
-	}
-	EditReplaceAllInSelection(hwnd, efr);
-
-	if (rid != NP2LEX_RESOURCESCRIPT) {
-		StrCpyEx(efr->szFind, "\'");
-		StrCpyEx(efr->szReplace, "\\\'");
-		EditReplaceAllInSelection(hwnd, efr);
-	}
-
-	NP2HeapFree(efr);
-	SciCall_EndBatchUpdate();
-}
-
-//=============================================================================
-//
-// EditUnescapeCChars()
-//
-void EditUnescapeCChars(HWND hwnd) noexcept {
-	if (SciCall_IsSelectionEmpty()) {
-		return;
-	}
-	if (SciCall_IsRectangularSelection()) {
-		NotifyRectangularSelection();
-		return;
-	}
-
-	EDITFINDREPLACE * const efr = static_cast<EDITFINDREPLACE *>(NP2HeapAlloc(sizeof(EDITFINDREPLACE)));
-	efr->hwnd = hwnd;
-	SciCall_BeginBatchUpdate();
-	const int rid = pLexCurrent->rid;
-
-	StrCpyEx(efr->szFind, "\\\\");
-	StrCpyEx(efr->szReplace, "\\");
-	EditReplaceAllInSelection(hwnd, efr);
-
-	if (rid == NP2LEX_RESOURCESCRIPT) {
-		StrCpyEx(efr->szFind, "\"\"");
-	} else {
-		StrCpyEx(efr->szFind, "\\\"");
-	}
-	StrCpyEx(efr->szReplace, "\"");
-	EditReplaceAllInSelection(hwnd, efr);
-
-	if (rid != NP2LEX_RESOURCESCRIPT) {
-		StrCpyEx(efr->szFind, "\\\'");
-		StrCpyEx(efr->szReplace, "\'");
-		EditReplaceAllInSelection(hwnd, efr);
-	}
-
-	NP2HeapFree(efr);
-	SciCall_EndBatchUpdate();
-}
-
 // XML/HTML predefined entity
 // https://en.wikipedia.org/wiki/List_of_XML_and_HTML_character_entity_references
 // &quot;	["]
@@ -1985,6 +1908,103 @@ void EditUnescapeXHTMLChars(HWND hwnd) noexcept {
 
 	NP2HeapFree(efr);
 	SciCall_EndBatchUpdate();
+}
+
+char *EditEscapeChars(EscapeMenu menu, const char *pszText, size_t &iSelCount) noexcept {
+	// same as UnSlash() and BuiltinRegex::SubstituteByPosition()
+	static constexpr char backslashTable['x' - '\\' + 1] = {
+		'\\',	// '\'
+		0,		// ]
+		0,		// ^
+		0,		// _
+		0,		// `
+		'\a',	// a
+		'\b',	// b
+		0,		// c
+		0,		// d
+		'\x1B',	// e
+		'\f',	// f
+		0,		// g
+		0,		// h
+		0,		// i
+		0,		// j
+		0,		// k
+		0,		// l
+		0,		// m
+		'\n',	// n
+		0,		// o
+		0,		// p
+		0,		// q
+		'\r',	// r
+		0,		// s
+		'\t',	// t
+		'\x84',	// u
+		'\v',	// v
+		0,		// w
+		'\x82',	// x
+	};
+
+	const auto *byteMask = SciCall_GetDBCSByteMask();
+	char * const pszOut = static_cast<char *>(NP2HeapAlloc((iSelCount + 1) * 6));
+	const int rid = pLexCurrent->rid;
+	size_t outLen = 0;
+	for (size_t index = 0; index < iSelCount; index++) {
+		uint8_t ch = pszText[index];
+		const uint8_t chNext = pszText[index + 1];
+		switch (ch) {
+		case '\\':
+			if (menu == EscapeMenu::CxxEscape) {
+				pszOut[outLen++] = '\\';
+			} else if (menu == EscapeMenu::CxxUnescape) {
+				if (chNext == '\\') {
+					index++;
+				} else if (rid != NP2LEX_RESOURCESCRIPT && (chNext == '\"' || chNext == '\'')) {
+					ch = chNext;
+					index++;
+				} else if (chNext != 'e') {
+					const unsigned offset = chNext - '\\';
+					const uint8_t escape = (offset < sizeof(backslashTable)) ? backslashTable[offset] : '\0';
+					if (static_cast<signed char>(escape) > 0) {
+						ch = escape;
+						index++;
+					}
+				}
+			}
+			break;
+
+		case '\"':
+			if (menu == EscapeMenu::CxxEscape) {
+				pszOut[outLen++] = (rid == NP2LEX_RESOURCESCRIPT)? '\"' : '\\';
+			} else if (menu == EscapeMenu::CxxUnescape && chNext == '\"' && rid == NP2LEX_RESOURCESCRIPT) {
+				index++;
+			}
+			break;
+
+		case '\'':
+			if (menu == EscapeMenu::CxxEscape && rid != NP2LEX_RESOURCESCRIPT) {
+				pszOut[outLen++] = '\\';
+			}
+			break;
+
+		default:
+			if (menu == EscapeMenu::CxxEscape) {
+				const unsigned offset = ch - '\a';
+				if (offset <= '\r' - '\a') {
+					ch = "abtnvfr"[offset];
+					pszOut[outLen++] = '\\';
+				}
+			}
+			break;
+		}
+
+		pszOut[outLen++] = ch;
+		if (byteMask && byteMask->IsLeadByte(ch) && byteMask->IsTrailByte(chNext)) {
+			pszOut[outLen++] = chNext;
+			index++;
+		}
+	}
+	iSelCount = outLen;
+	return pszOut;
 }
 
 //=============================================================================

@@ -47,8 +47,8 @@ struct DBCSByteMask { // CharClassify.h
 }
 
 using Sci_MarkerMask = unsigned int;
-using CharacterClass = Scintilla::CharacterClass;
-using DBCSByteMask = Scintilla::Internal::DBCSByteMask;
+using Scintilla::CharacterClass;
+using Scintilla::Internal::DBCSByteMask;
 
 constexpr COLORREF ColorAlpha(COLORREF rgb, UINT alpha) noexcept {
 	return rgb | (alpha << 24);
