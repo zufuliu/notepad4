@@ -1544,6 +1544,8 @@ char *EditMapTextCase(int menu, const char *pszText, size_t &iSelCount, UINT cpE
 	switch (menu) {
 	case IDM_EDIT_ESCAPECCHARS:
 	case IDM_EDIT_UNESCAPECCHARS:
+	case IDM_EDIT_XHTML_ESCAPE_CHAR:
+	case IDM_EDIT_XHTML_UNESCAPE_CHAR:
 		return EditEscapeChars(static_cast<EscapeMenu>(menu - IDM_EDIT_ESCAPECCHARS), pszText, iSelCount);
 	case IDM_EDIT_SENTENCECASE:
 	case IDM_EDIT_TITLECASE:
@@ -1803,113 +1805,12 @@ void EditURLDecode() noexcept {
 
 // XML/HTML predefined entity
 // https://en.wikipedia.org/wiki/List_of_XML_and_HTML_character_entity_references
+// https://html.spec.whatwg.org/multipage/named-characters.html#named-character-references
 // &quot;	["]
 // &amp;	[&]
 // &apos;	[']
 // &lt;		[<]
 // &gt;		[>]
-// &nbsp;	[ ]
-// &emsp;	[\t]
-//=============================================================================
-//
-// EditEscapeXHTMLChars()
-//
-void EditEscapeXHTMLChars(HWND hwnd) noexcept {
-	if (SciCall_IsSelectionEmpty()) {
-		return;
-	}
-	if (SciCall_IsRectangularSelection()) {
-		NotifyRectangularSelection();
-		return;
-	}
-
-	EDITFINDREPLACE * const efr = static_cast<EDITFINDREPLACE *>(NP2HeapAlloc(sizeof(EDITFINDREPLACE)));
-	efr->hwnd = hwnd;
-	SciCall_BeginBatchUpdate();
-
-	StrCpyEx(efr->szFind, "&");
-	StrCpyEx(efr->szReplace, "&amp;");
-	EditReplaceAllInSelection(hwnd, efr);
-
-	StrCpyEx(efr->szFind, "\"");
-	StrCpyEx(efr->szReplace, "&quot;");
-	EditReplaceAllInSelection(hwnd, efr);
-
-	StrCpyEx(efr->szFind, "\'");
-	StrCpyEx(efr->szReplace, "&apos;");
-	EditReplaceAllInSelection(hwnd, efr);
-
-	StrCpyEx(efr->szFind, "<");
-	StrCpyEx(efr->szReplace, "&lt;");
-	EditReplaceAllInSelection(hwnd, efr);
-
-	StrCpyEx(efr->szFind, ">");
-	StrCpyEx(efr->szReplace, "&gt;");
-	EditReplaceAllInSelection(hwnd, efr);
-
-	if (pLexCurrent->iLexer != SCLEX_XML) {
-		StrCpyEx(efr->szFind, " ");
-		StrCpyEx(efr->szReplace, "&nbsp;");
-		EditReplaceAllInSelection(hwnd, efr);
-
-		StrCpyEx(efr->szFind, "\t");
-		StrCpyEx(efr->szReplace, "&emsp;");
-		EditReplaceAllInSelection(hwnd, efr);
-	}
-
-	NP2HeapFree(efr);
-	SciCall_EndBatchUpdate();
-}
-
-//=============================================================================
-//
-// EditUnescapeXHTMLChars()
-//
-void EditUnescapeXHTMLChars(HWND hwnd) noexcept {
-	if (SciCall_IsSelectionEmpty()) {
-		return;
-	}
-	if (SciCall_IsRectangularSelection()) {
-		NotifyRectangularSelection();
-		return;
-	}
-
-	EDITFINDREPLACE * const efr = static_cast<EDITFINDREPLACE *>(NP2HeapAlloc(sizeof(EDITFINDREPLACE)));
-	efr->hwnd = hwnd;
-	SciCall_BeginBatchUpdate();
-
-	StrCpyEx(efr->szFind, "&quot;");
-	StrCpyEx(efr->szReplace, "\"");
-	EditReplaceAllInSelection(hwnd, efr);
-
-	StrCpyEx(efr->szFind, "&apos;");
-	StrCpyEx(efr->szReplace, "\'");
-	EditReplaceAllInSelection(hwnd, efr);
-
-	StrCpyEx(efr->szFind, "&lt;");
-	StrCpyEx(efr->szReplace, "<");
-	EditReplaceAllInSelection(hwnd, efr);
-
-	StrCpyEx(efr->szFind, "&gt;");
-	StrCpyEx(efr->szReplace, ">");
-	EditReplaceAllInSelection(hwnd, efr);
-
-	StrCpyEx(efr->szFind, "&nbsp;");
-	StrCpyEx(efr->szReplace, " ");
-	EditReplaceAllInSelection(hwnd, efr);
-
-	StrCpyEx(efr->szFind, "&amp;");
-	StrCpyEx(efr->szReplace, "&");
-	EditReplaceAllInSelection(hwnd, efr);
-
-	StrCpyEx(efr->szFind, "&emsp;");
-	StrCpyEx(efr->szReplace, "\t");
-	EditReplaceAllInSelection(hwnd, efr);
-
-	NP2HeapFree(efr);
-	SciCall_EndBatchUpdate();
-}
-
 char *EditEscapeChars(EscapeMenu menu, const char *pszText, size_t &iSelCount) noexcept {
 	// same as UnSlash() and BuiltinRegex::SubstituteByPosition()
 	static constexpr char backslashTable['x' - '\\' + 1] = {
@@ -1977,12 +1878,60 @@ char *EditEscapeChars(EscapeMenu menu, const char *pszText, size_t &iSelCount) n
 				pszOut[outLen++] = (rid == NP2LEX_RESOURCESCRIPT)? '\"' : '\\';
 			} else if (menu == EscapeMenu::CxxUnescape && chNext == '\"' && rid == NP2LEX_RESOURCESCRIPT) {
 				index++;
+			} else if (menu == EscapeMenu::HtmlEscape) {
+				ch = ';';
+				StrCpyExNull(pszOut + outLen, "&quot");
+				outLen += CSTRLEN("&quot");
 			}
 			break;
 
 		case '\'':
 			if (menu == EscapeMenu::CxxEscape && rid != NP2LEX_RESOURCESCRIPT) {
 				pszOut[outLen++] = '\\';
+			} else if (menu == EscapeMenu::HtmlEscape) {
+				ch = ';';
+				StrCpyExNull(pszOut + outLen, "&apos");
+				outLen += CSTRLEN("&apos");
+			}
+			break;
+
+		case '&':
+			if (menu == EscapeMenu::HtmlEscape) {
+				ch = ';';
+				StrCpyExNull(pszOut + outLen, "&amp");
+				outLen += CSTRLEN("&amp");
+			} else if (menu == EscapeMenu::HtmlUnescape && chNext >= 'a' && chNext <= 'z') {
+				// named character reference is case sensitive
+				char entity[6]{};
+				entity[0] = chNext;
+				unsigned len = 1;
+				size_t offset = index + 2;
+				uint8_t next;
+				do {
+					next = pszText[offset++];
+					if (next >= 'a' && next <= 'z') {
+						entity[len++] = next;
+					} else {
+						break;
+					}
+				} while (len < sizeof(entity) - 1 && offset < iSelCount);
+				if (next == ';') {
+					if (StrEqualEx(entity, "amp")) {
+						next = '&';
+					} else if (StrEqualEx(entity, "quot")) {
+						next = '\"';
+					} else if (StrEqualEx(entity, "apos")) {
+						next = '\'';
+					} else if (StrEqualEx(entity, "lt")) {
+						next = '<';
+					} else if (StrEqualEx(entity, "gt")) {
+						next = '>';
+					}
+					if (next != ';') {
+						ch = next;
+						index += len + 1;
+					}
+				}
 			}
 			break;
 
@@ -1992,6 +1941,16 @@ char *EditEscapeChars(EscapeMenu menu, const char *pszText, size_t &iSelCount) n
 				if (offset <= '\r' - '\a') {
 					ch = "abtnvfr"[offset];
 					pszOut[outLen++] = '\\';
+				}
+			} else if (menu == EscapeMenu::HtmlEscape) {
+				if (ch == '<') {
+					ch = ';';
+					StrCpyEx(pszOut + outLen, "&lt");
+					outLen += CSTRLEN("&lt");
+				} else if (ch == '>') {
+					ch = ';';
+					StrCpyEx(pszOut + outLen, "&gt");
+					outLen += CSTRLEN("&gt");
 				}
 			}
 			break;

@@ -480,6 +480,8 @@
 
 #define IDM_EDIT_ESCAPECCHARS			40204	// Ctrl+Alt+E
 #define IDM_EDIT_UNESCAPECCHARS			40205	// Ctrl+Alt+R
+#define IDM_EDIT_XHTML_ESCAPE_CHAR		40206	// Alt+Shift+X
+#define IDM_EDIT_XHTML_UNESCAPE_CHAR	40207	// Alt+Shift+H
 #define IDM_EDIT_INVERTCASE					40208	// Ctrl+Alt+U
 #define IDM_EDIT_SENTENCECASE				40209	// Ctrl+Alt+O
 #define IDM_EDIT_TITLECASE					40210	// Ctrl+Alt+I
@@ -606,8 +608,7 @@
 #define IDM_EDIT_SELTOPREV				40372	// Ctrl+Shift+Alt+F2
 #define IDM_EDIT_COMPLETEWORD			40373	// Alt+/
 #define IDM_EDIT_TRIMLEAD				40374	// trim leading whitespace
-#define IDM_EDIT_XHTML_ESCAPE_CHAR		40375	// Alt+Shift+X
-#define IDM_EDIT_XHTML_UNESCAPE_CHAR	40376	// Alt+Shift+H
+
 #define IDM_EDIT_COPYRTF				40377	// copy as RTF
 #define IDM_EDIT_CODE_COMPRESS			40378
 #define IDM_EDIT_CODE_PRETTY			40379

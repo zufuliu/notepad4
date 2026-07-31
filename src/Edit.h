@@ -159,13 +159,13 @@ void	EditReplaceMainSelection(Sci_Position cchText, LPCSTR pszText) noexcept;
 enum class EscapeMenu {
 	CxxEscape,
 	CxxUnescape,
+	HtmlEscape,
+	HtmlUnescape,
 };
 
 void	EditURLEncode(bool component) noexcept;
 void	EditURLDecode() noexcept;
 char*	EditEscapeChars(EscapeMenu menu, const char *pszText, size_t &iSelCount) noexcept;
-void	EditEscapeXHTMLChars(HWND hwnd) noexcept;
-void	EditUnescapeXHTMLChars(HWND hwnd) noexcept;
 void	EditCalculateExpr(int menu);
 void	EditCharacterToHex() noexcept;
 void	EditHexToCharacter() noexcept;

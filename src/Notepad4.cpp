@@ -3309,6 +3309,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_EDIT_ESCAPECCHARS:
 	case IDM_EDIT_UNESCAPECCHARS:
+	case IDM_EDIT_XHTML_ESCAPE_CHAR:
+	case IDM_EDIT_XHTML_UNESCAPE_CHAR:
 	case IDM_EDIT_INVERTCASE:
 	case IDM_EDIT_TITLECASE:
 	case IDM_EDIT_SENTENCECASE:
@@ -3543,18 +3545,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_EDIT_URLDECODE:
 		EditURLDecode();
-		break;
-
-	case IDM_EDIT_XHTML_ESCAPE_CHAR:
-		BeginWaitCursor();
-		EditEscapeXHTMLChars(hwndEdit);
-		EndWaitCursor();
-		break;
-
-	case IDM_EDIT_XHTML_UNESCAPE_CHAR:
-		BeginWaitCursor();
-		EditUnescapeXHTMLChars(hwndEdit);
-		EndWaitCursor();
 		break;
 
 	case IDM_EDIT_CHAR2HEX:
