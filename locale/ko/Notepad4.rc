@@ -1751,7 +1751,6 @@ BEGIN
 \\r\t개행 문자 (CR, ASCII 13 / 0D)\n\
 \\t\t가로 탭 (HT, ASCII 9)\n\
 \\v\t세로 탭 (VT, ASCII 11 / 0B)\n\
-\\ooo\t8진수 값\n\
 \\uHHHH\t16진수 값\n\
 \\xHH\t16진수 값\n\
 \\\\\t백슬래시"

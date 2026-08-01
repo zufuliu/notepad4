@@ -1751,7 +1751,6 @@ BEGIN
 \\r\t回车 (CR, ASCII 13 / 0D)\n\
 \\t\t水平制表符 (HT, ASCII 9)\n\
 \\v\t垂直制表符 (VT, ASCII 11 / 0B)\n\
-\\ooo\t八进制值\n\
 \\uHHHH\t十六进制值\n\
 \\xHH\t十六进制值\n\
 \\\\\t反斜线"
