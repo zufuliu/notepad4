@@ -3309,7 +3309,7 @@ std::string ScintillaWin::CaseMapString(const std::string &s, CaseMapping caseMa
 	if (caseMapping >= CaseMapping::custom) {
 		size_t length = s.length();
 		const std::unique_ptr<char, HeapPointerFreer> pszText{EditMapTextCase(static_cast<int>(caseMapping), s.c_str(), length, cpDoc)};
-		if (pszText) {
+		if (pszText && static_cast<ptrdiff_t>(length) > 0) {
 			return {pszText.get(), length};
 		}
 		return s;
