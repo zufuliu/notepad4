@@ -1196,7 +1196,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(lParam);
 
 	switch (LOWORD(wParam)) {
-	case IDC_DRIVEBOX:
+	default:
+	if (LOWORD(wParam) == IDC_DRIVEBOX) {
 		switch (HIWORD(wParam)) {
 		case CBN_SETFOCUS:
 			nIdFocus = IDC_DRIVEBOX;
@@ -1215,7 +1216,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 		break;
 		}
-		break;
+	}
+	break;
 
 	case IDM_FILE_OPENSAME:
 	case IDM_FILE_OPENNEW: {
@@ -1251,6 +1253,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	break;
 
 	case IDM_FILE_RUN:
+	case IDT_FILE_RUN:
 		RunDlg(hwnd);
 		break;
 
@@ -1281,6 +1284,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	}
 	break;
 
+	case IDT_FILE_QUICKVIEW:
 	case IDM_FILE_QUICKVIEW: {
 		if (!DirList_IsFileSelected(hwndDirList)) {
 			MessageBeep(MB_OK);
@@ -1408,6 +1412,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	}
 	break;
 
+	case IDT_FILE_SAVEAS:
 	case IDM_FILE_SAVEAS: {
 		if (!DirList_IsFileSelected(hwndDirList)) {
 			MessageBeep(MB_OK);
@@ -1459,6 +1464,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	break;
 
 	case IDM_FILE_COPYMOVE:
+	case IDT_FILE_COPYMOVE:
 		if (ListView_GetSelectedCount(hwndDirList)) {
 			CopyMoveDlg(hwnd, &wFuncCopyMove);
 		} else {
@@ -1466,6 +1472,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 		break;
 
+	case IDT_FILE_DELETE_PERM:
 	case IDM_FILE_DELETE:
 	case IDM_FILE_DELETE2:
 	case IDM_FILE_DELETE3: {
@@ -1487,7 +1494,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		shfos.wFunc = FO_DELETE;
 		shfos.pFrom = tch;
 		shfos.pTo = nullptr;
-		if (fUseRecycleBin && (LOWORD(wParam) != IDM_FILE_DELETE2)) {
+		if (fUseRecycleBin && (LOWORD(wParam) != IDM_FILE_DELETE2 || LOWORD(wParam) != IDT_FILE_DELETE_PERM)) {
 			shfos.fFlags = FOF_ALLOWUNDO;
 		}
 		if (fNoConfirmDelete || LOWORD(wParam) == IDM_FILE_DELETE3) {
@@ -1600,6 +1607,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_VIEW_FILTER:
+	case IDT_VIEW_FILTER:
 		if (GetFilterDlg(hwnd)) {
 			// Store information about currently selected item
 			DirListItem dli;
@@ -1645,6 +1653,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_VIEW_FAVORITES:
+	case IDT_VIEW_FAVORITES:
 		// Goto Favorites Directory
 		DisplayPath(tchFavoritesDir, IDS_ERR_FAVORITES);
 		break;
@@ -1907,10 +1916,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	}
 	break;
 
-	case IDT_VIEW_FAVORITES:
-		SendWMCommand(hwnd, IDM_VIEW_FAVORITES);
-		break;
-
 	case IDT_FILE_NEXT: {
 		const int iItem = ListView_GetNextItem(hwndDirList, -1, LVNI_ALL | LVNI_FOCUSED);
 		const int d = ListView_GetSelectedCount(hwndDirList) ? 1 : 0;
@@ -1984,34 +1989,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	}
 	break;
 
-	case IDT_FILE_RUN:
-		SendWMCommand(hwnd, IDM_FILE_RUN);
-		break;
-
-	case IDT_FILE_QUICKVIEW:
-		if (DirList_IsFileSelected(hwndDirList)) {
-			SendWMCommand(hwnd, IDM_FILE_QUICKVIEW);
-		} else {
-			MessageBeep(MB_OK);
-		}
-		break;
-
-	case IDT_FILE_SAVEAS:
-		if (DirList_IsFileSelected(hwndDirList)) {
-			SendWMCommand(hwnd, IDM_FILE_SAVEAS);
-		} else {
-			MessageBeep(MB_OK);
-		}
-		break;
-
-	case IDT_FILE_COPYMOVE:
-		if (ListView_GetSelectedCount(hwndDirList)) {
-			SendWMCommand(hwnd, IDM_FILE_COPYMOVE);
-		} else {
-			MessageBeep(MB_OK);
-		}
-		break;
-
 	case IDT_FILE_DELETE_RECYCLE:
 		if (ListView_GetSelectedCount(hwndDirList)) {
 			const bool fUseRecycleBin2 = fUseRecycleBin;
@@ -2021,18 +1998,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		} else {
 			MessageBeep(MB_OK);
 		}
-		break;
-
-	case IDT_FILE_DELETE_PERM:
-		if (ListView_GetSelectedCount(hwndDirList)) {
-			SendWMCommand(hwnd, IDM_FILE_DELETE2);
-		} else {
-			MessageBeep(MB_OK);
-		}
-		break;
-
-	case IDT_VIEW_FILTER:
-		SendWMCommand(hwnd, IDM_VIEW_FILTER);
 		break;
 	}
 
