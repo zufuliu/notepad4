@@ -1812,7 +1812,7 @@ void EditURLDecode() noexcept {
 // &lt;		[<]
 // &gt;		[>]
 char *EditEscapeChars(EscapeMenu menu, const char *pszText, size_t &iSelCount) noexcept {
-	// same as UnSlash() and BuiltinRegex::SubstituteByPosition()
+	// same as TransformBackslashes() and BuiltinRegex::SubstituteByPosition()
 	static constexpr char backslashTable['x' - '\\' + 1] = {
 		'\\',	// '\'
 		0,		// ]
@@ -5291,7 +5291,7 @@ int EditPrepareFind(char *szFind2, const EDITFINDREPLACE *lpefr) noexcept {
 	strncpy(szFind2, lpefr->szFind, NP2_FIND_REPLACE_LIMIT);
 	if (lpefr->option & FindReplaceOption_TransformBackslash) {
 		const UINT cpEdit = SciCall_GetCodePage();
-		TransformBackslashes(szFind2, (searchFlags & SCFIND_REGEXP), cpEdit);
+		TransformBackslashes(szFind2, cpEdit);
 	}
 	if (StrIsEmpty(szFind2)) {
 		InfoBoxWarn(MB_OK, L"MsgNotFound", IDS_NOTFOUND);
@@ -5322,7 +5322,7 @@ int EditPrepareReplace(HWND hwnd, char *szFind2, char **pszReplace2, BOOL *bRepl
 		*pszReplace2 = StrDupA(lpefr->szReplace);
 		if (lpefr->option & FindReplaceOption_TransformBackslash) {
 			const UINT cpEdit = SciCall_GetCodePage();
-			TransformBackslashes(*pszReplace2, *bReplaceRE, cpEdit);
+			TransformBackslashes(*pszReplace2, cpEdit);
 		}
 	}
 
