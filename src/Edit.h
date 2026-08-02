@@ -137,6 +137,11 @@ bool	EditConvertText(UINT cpSource, UINT cpDest) noexcept;
 void	EditConvertToLargeMode() noexcept;
 void	EditReplaceDocument(HANDLE pdoc) noexcept;
 
+enum class ClipboardTextType {
+	Unicode,
+	UnicodeBackslash,
+};
+LPWSTR EditGetClipboardTextW(ClipboardTextType type) noexcept; // LocalFree()
 char*	EditGetClipboardText(HWND hwnd) noexcept; // LocalFree()
 void	EditCopyAppend(HWND hwnd) noexcept;
 

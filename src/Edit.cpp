@@ -357,7 +357,7 @@ char* EditGetClipboardText(HWND hwnd) noexcept {
 	return pmch;
 }
 
-LPWSTR EditGetClipboardTextW() noexcept {
+LPWSTR EditGetClipboardTextW(ClipboardTextType type) noexcept {
 	if (!IsClipboardFormatAvailable(CF_UNICODETEXT) || !OpenClipboard(hwndMain)) {
 		return nullptr;
 	}
@@ -365,12 +365,15 @@ LPWSTR EditGetClipboardTextW() noexcept {
 	HANDLE hmem = GetClipboardData(CF_UNICODETEXT);
 	LPCWSTR pwch = static_cast<LPCWSTR>(GlobalLock(hmem));
 	const UINT wlen = lstrlen(pwch);
-	LPWSTR ptmp = static_cast<LPWSTR>(NP2HeapAlloc((2*wlen + 1)*sizeof(WCHAR)));
+	const UINT len = NP2_align_up(2*wlen + 1, MEMORY_ALLOCATION_ALIGNMENT); // EOL conversion
+	const UINT offset = (type == ClipboardTextType::Unicode) ? 0 : len*kMaxBackslashEscapeCount;
+	WCHAR * const ptmp = static_cast<LPWSTR>(LocalAlloc(LPTR, (len + offset)*sizeof(WCHAR)));
 
 	if (pwch && ptmp) {
 		const int iEOLMode = SciCall_GetEOLMode();
+		WCHAR * const wszEOL = ptmp + offset;
 		LPCWSTR s = pwch;
-		LPWSTR d = ptmp;
+		LPWSTR d = wszEOL;
 		while (*s != L'\0') {
 			if (*s == L'\n' || *s == L'\r') {
 				switch (iEOLMode) {
@@ -393,8 +396,9 @@ LPWSTR EditGetClipboardTextW() noexcept {
 				*d++ = *s++;
 			}
 		}
-
-		*d++ = L'\0';
+		if (type == ClipboardTextType::UnicodeBackslash) {
+			AddBackslashW(ptmp, wszEOL);
+		}
 	}
 
 	GlobalUnlock(hmem);
@@ -4619,20 +4623,10 @@ static LRESULT CALLBACK AddBackslashEditProc(HWND hwnd, UINT umsg, WPARAM wParam
 
 	switch (umsg) {
 	case WM_PASTE: {
-		bool done = false;
-		LPWSTR lpsz = EditGetClipboardTextW();
+		LPWSTR lpsz = EditGetClipboardTextW(ClipboardTextType::UnicodeBackslash);
 		if (lpsz) {
-			const int len = lstrlen(lpsz);
-			LPWSTR lpszEsc = static_cast<LPWSTR>(NP2HeapAlloc((kMaxBackslashEscapeCount*len + 1)*sizeof(WCHAR)));
-			if (lpszEsc != nullptr) {
-				AddBackslashW(lpszEsc, lpsz);
-				SendMessage(hwnd, EM_REPLACESEL, TRUE, AsInteger<LPARAM>(lpszEsc));
-				NP2HeapFree(lpszEsc);
-				done = true;
-			}
-			NP2HeapFree(lpsz);
-		}
-		if (done) {
+			SendMessage(hwnd, EM_REPLACESEL, TRUE, AsInteger<LPARAM>(lpsz));
+			LocalFree(lpsz);
 			return TRUE;
 		}
 	}
