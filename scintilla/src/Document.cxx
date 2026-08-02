@@ -656,14 +656,21 @@ Sci::Line Document::GetLastChild(Sci::Line lineParent, FoldLevel level, Sci::Lin
 	if (lastLine < 0 || lastLine > maxLine) {
 		lastLine = maxLine;
 	}
-	Sci::Line lineEndStyled = SciLineFromPosition(GetEndStyled()) - 1;
 	Sci::Line lineMaxSubord = lineParent;
+
+	// A fold start is commonly closely followed by its last child, but it could be a long distance,
+	// perhaps the end of the file. This may be caused by an unbalanced fold start.
+	// To reduce lexer/folder overhead use progressively larger blocks of lines.
+	// First few grow by 1 then geometric 1.25x growth.
+	Sci::Line linesToStyle = 2;
+	constexpr size_t growthFraction = 4;
+
 	while (lineMaxSubord < maxLine) {
-		if (lineMaxSubord >= lineEndStyled) {
+		const Sci::Position posNeedStyle = LineStart(lineMaxSubord + 2);
+		if (posNeedStyle > GetEndStyled()) {
 			// two or more lines are required to make stable fold for most lexer
-			EnsureStyledTo(LineStart(lineMaxSubord + 2 + 1));
-			// LexerBase::Fold() already moved one line back
-			lineEndStyled = SciLineFromPosition(GetEndStyled()) - 1;
+			EnsureStyledTo(LineStart(lineMaxSubord + linesToStyle + 1));
+			linesToStyle += std::max<Sci::Line>(1, linesToStyle / growthFraction);
 		}
 		if (!IsSubordinate(levelStart, GetFoldLevel(lineMaxSubord + 1)))
 			break;
@@ -3873,7 +3880,7 @@ const char *BuiltinRegex::SubstituteByPosition(const Document *doc, const char *
 	// https://en.cppreference.com/w/cpp/regex/match_results/format
 	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace
 
-	// keeps same as UnSlash()
+	// keeps same as TransformBackslashes()
 	static constexpr char backslashTable['x' - '\\' + 1] = {
 		'\\',	// '\'
 		0,		// ]

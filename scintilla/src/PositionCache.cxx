@@ -201,16 +201,16 @@ void LineLayout::AddLineStart(Sci::Position start) {
 
 void LineLayout::SetBracesHighlight(Range rangeLine, const Sci::Position braces[],
 	unsigned char bracesMatchStyle, int xHighlight, bool ignoreStyle) noexcept {
-	if (!ignoreStyle && rangeLine.ContainsCharacter(braces[0])) {
+	if (!ignoreStyle) {
 		const Sci::Position braceOffset = braces[0] - rangeLine.start;
-		if (braceOffset < numCharsInLine) {
+		if (InLineRange(braceOffset, numCharsInLine)) {
 			bracePreviousStyles[0] = styles[braceOffset];
 			styles[braceOffset] = bracesMatchStyle;
 		}
 	}
-	if (!ignoreStyle && rangeLine.ContainsCharacter(braces[1])) {
+	if (!ignoreStyle) {
 		const Sci::Position braceOffset = braces[1] - rangeLine.start;
-		if (braceOffset < numCharsInLine) {
+		if (InLineRange(braceOffset, numCharsInLine)) {
 			bracePreviousStyles[1] = styles[braceOffset];
 			styles[braceOffset] = bracesMatchStyle;
 		}
@@ -222,15 +222,15 @@ void LineLayout::SetBracesHighlight(Range rangeLine, const Sci::Position braces[
 }
 
 void LineLayout::RestoreBracesHighlight(Range rangeLine, const Sci::Position braces[], bool ignoreStyle) noexcept {
-	if (!ignoreStyle && rangeLine.ContainsCharacter(braces[0])) {
+	if (!ignoreStyle) {
 		const Sci::Position braceOffset = braces[0] - rangeLine.start;
-		if (braceOffset < numCharsInLine) {
+		if (InLineRange(braceOffset, numCharsInLine)) {
 			styles[braceOffset] = bracePreviousStyles[0];
 		}
 	}
-	if (!ignoreStyle && rangeLine.ContainsCharacter(braces[1])) {
+	if (!ignoreStyle) {
 		const Sci::Position braceOffset = braces[1] - rangeLine.start;
-		if (braceOffset < numCharsInLine) {
+		if (InLineRange(braceOffset, numCharsInLine)) {
 			styles[braceOffset] = bracePreviousStyles[1];
 		}
 	}

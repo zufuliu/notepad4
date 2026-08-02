@@ -8,6 +8,10 @@
 
 namespace Scintilla::Internal {
 
+constexpr bool InLineRange(size_t index, unsigned length) noexcept {
+	return index < length;
+}
+
 /**
 * A point in document space.
 * Uses double for sufficient resolution in large (>20,000,000 line) documents.

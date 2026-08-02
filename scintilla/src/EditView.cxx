@@ -2167,11 +2167,10 @@ void DrawIndicators(Surface *surface, const EditModel &model, const ViewStyle &v
 		(vsDraw.braceBadLightIndicatorSet && (model.bracesMatchStyle == StyleBraceBad))) {
 		const int braceIndicator = (model.bracesMatchStyle == StyleBraceLight) ? vsDraw.braceHighlightIndicator : vsDraw.braceBadLightIndicator;
 		if (under == vsDraw.indicators[braceIndicator].under) {
-			const Range rangeLine(posLineStart + lineStart, posLineEnd);
 			for (size_t brace = 0; brace <= 1; brace++) {
-				if (rangeLine.ContainsCharacter(model.braces[brace])) {
-					const Sci::Position braceOffset = model.braces[brace] - posLineStart;
-					if (braceOffset < ll->numCharsInLine) {
+				const Sci::Position braceOffset = model.braces[brace] - posLineStart;
+				if (braceOffset >= lineStart && braceOffset < lineEnd) {
+					if (InLineRange(braceOffset, ll->numCharsInLine)) {
 						const Sci::Position secondOffset = model.pdoc->MovePositionOutsideChar(model.braces[brace] + 1, 1) - posLineStart;
 						DrawIndicator(braceIndicator, braceOffset, braceOffset + 1, surface, vsDraw, ll, xStart, rcLine, secondOffset,
 							subLine, Indicator::State::normal, 1, model.BidirectionalEnabled(), tabWidthMinimumPixels);
