@@ -216,15 +216,15 @@ HWND	EditFindReplaceDlg(HWND hwnd, EDITFINDREPLACE *lpefr, bool bReplace) noexce
 void	EditFindNext(const EDITFINDREPLACE *lpefr, bool fExtendSelection) noexcept;
 void	EditFindPrev(const EDITFINDREPLACE *lpefr, bool fExtendSelection) noexcept;
 void	EditFindAll(const EDITFINDREPLACE *lpefr, bool selectAll) noexcept;
-void	EditReplace(HWND hwnd, const EDITFINDREPLACE *lpefr) noexcept;
+void	EditReplace(const EDITFINDREPLACE *lpefr) noexcept;
 enum EditReplaceAllFlag {
 	EditReplaceAllFlag_None,
 	EditReplaceAllFlag_UndoGroup,
 	EditReplaceAllFlag_ShowInfo,
 	EditReplaceAllFlag_Default,
 };
-void	EditReplaceAll(HWND hwnd, const EDITFINDREPLACE *lpefr) noexcept;
-void	EditReplaceAllInSelection(HWND hwnd, const EDITFINDREPLACE *lpefr, EditReplaceAllFlag flag = EditReplaceAllFlag_None) noexcept;
+void	EditReplaceAll(const EDITFINDREPLACE *lpefr) noexcept;
+void	EditReplaceAllInSelection(const EDITFINDREPLACE *lpefr, EditReplaceAllFlag flag = EditReplaceAllFlag_None) noexcept;
 bool	EditLineNumDlg(HWND hwnd) noexcept;
 void	EditModifyLinesDlg(HWND hwnd) noexcept;
 void	EditEncloseSelectionDlg(HWND hwnd) noexcept;

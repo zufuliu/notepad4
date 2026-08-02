@@ -3725,7 +3725,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 		case IDM_EDIT_REPLACENEXT:
 			if (bReplaceInitialized && StrNotEmpty(efrData.szFind)) {
-				EditReplace(hwndEdit, &efrData);
+				EditReplace(&efrData);
 			} else {
 				SendWMCommand(hwnd, IDM_EDIT_REPLACE);
 			}

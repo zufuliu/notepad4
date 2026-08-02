@@ -3705,7 +3705,7 @@ void EditStripTrailingBlanks(HWND hwnd, bool bIgnoreSelection) noexcept {
 			efrTrim->hwnd = hwnd;
 			efrTrim->fuFlags = SCFIND_REGEXP;
 			StrCpyExNull(efrTrim->szFind, "[ \t]+$");
-			EditReplaceAllInSelection(hwnd, efrTrim, EditReplaceAllFlag_UndoGroup);
+			EditReplaceAllInSelection(efrTrim, EditReplaceAllFlag_UndoGroup);
 			NP2HeapFree(efrTrim);
 			return;
 		}
@@ -3745,7 +3745,7 @@ void EditStripLeadingBlanks(HWND hwnd, bool bIgnoreSelection) noexcept {
 			efrTrim->hwnd = hwnd;
 			efrTrim->fuFlags = SCFIND_REGEXP;
 			StrCpyExNull(efrTrim->szFind, "^[ \t]+");
-			EditReplaceAllInSelection(hwnd, efrTrim, EditReplaceAllFlag_UndoGroup);
+			EditReplaceAllInSelection(efrTrim, EditReplaceAllFlag_UndoGroup);
 			NP2HeapFree(efrTrim);
 			return;
 		}
@@ -5097,7 +5097,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 
 			case IDC_REPLACE:
 				bReplaceInitialized = true;
-				EditReplace(lpefr->hwnd, lpefr);
+				EditReplace(lpefr);
 				break;
 
 			case IDC_FINDALL:
@@ -5109,13 +5109,13 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 					EditFindAll(lpefr, true);
 				} else {
 					bReplaceInitialized = true;
-					EditReplaceAll(lpefr->hwnd, lpefr);
+					EditReplaceAll(lpefr);
 				}
 				break;
 
 			case IDC_REPLACEINSEL:
 				bReplaceInitialized = true;
-				EditReplaceAllInSelection(lpefr->hwnd, lpefr, EditReplaceAllFlag_Default);
+				EditReplaceAllInSelection(lpefr, EditReplaceAllFlag_Default);
 				break;
 			}
 		}
@@ -5308,7 +5308,7 @@ int EditPrepareFind(char *szFind2, const EDITFINDREPLACE *lpefr) noexcept {
 	return searchFlags;
 }
 
-int EditPrepareReplace(HWND hwnd, char *szFind2, char **pszReplace2, BOOL *bReplaceRE, const EDITFINDREPLACE *lpefr) noexcept {
+int EditPrepareReplace(char *szFind2, char **pszReplace2, BOOL *bReplaceRE, const EDITFINDREPLACE *lpefr) noexcept {
 	const int searchFlags = EditPrepareFind(szFind2, lpefr);
 	if (searchFlags == NP2_InvalidSearchFlags) {
 		return searchFlags;
@@ -5317,7 +5317,7 @@ int EditPrepareReplace(HWND hwnd, char *szFind2, char **pszReplace2, BOOL *bRepl
 	*bReplaceRE = (searchFlags & SCFIND_REGEXP);
 	if (StrEqualEx(lpefr->szReplace, "^c")) {
 		*bReplaceRE = FALSE;
-		*pszReplace2 = EditGetClipboardText(hwnd);
+		*pszReplace2 = EditGetClipboardText(lpefr->hwnd);
 	} else {
 		*pszReplace2 = StrDupA(lpefr->szReplace);
 		if (lpefr->option & FindReplaceOption_TransformBackslash) {
@@ -5428,11 +5428,11 @@ void EditFindPrev(const EDITFINDREPLACE *lpefr, bool fExtendSelection) noexcept 
 //
 // EditReplace()
 //
-void EditReplace(HWND hwnd, const EDITFINDREPLACE *lpefr) noexcept {
+void EditReplace(const EDITFINDREPLACE *lpefr) noexcept {
 	BOOL bReplaceRE;
 	char szFind2[NP2_FIND_REPLACE_LIMIT];
 	char *pszReplace2;
-	const int searchFlags = EditPrepareReplace(hwnd, szFind2, &pszReplace2, &bReplaceRE, lpefr);
+	const int searchFlags = EditPrepareReplace(szFind2, &pszReplace2, &bReplaceRE, lpefr);
 	if (searchFlags == NP2_InvalidSearchFlags) {
 		return;
 	}
@@ -5843,11 +5843,11 @@ static void ShwowReplaceCount(Sci_Position iCount) noexcept {
 //
 // EditReplaceAll()
 //
-void EditReplaceAll(HWND hwnd, const EDITFINDREPLACE *lpefr) noexcept {
+void EditReplaceAll(const EDITFINDREPLACE *lpefr) noexcept {
 	BOOL bReplaceRE;
 	char szFind2[NP2_FIND_REPLACE_LIMIT];
 	char *pszReplace2;
-	const int searchFlags = EditPrepareReplace(hwnd, szFind2, &pszReplace2, &bReplaceRE, lpefr);
+	const int searchFlags = EditPrepareReplace(szFind2, &pszReplace2, &bReplaceRE, lpefr);
 	if (searchFlags == NP2_InvalidSearchFlags) {
 		return;
 	}
@@ -5916,7 +5916,7 @@ void EditReplaceAll(HWND hwnd, const EDITFINDREPLACE *lpefr) noexcept {
 //
 // EditReplaceAllInSelection()
 //
-void EditReplaceAllInSelection(HWND hwnd, const EDITFINDREPLACE *lpefr, EditReplaceAllFlag flag) noexcept {
+void EditReplaceAllInSelection(const EDITFINDREPLACE *lpefr, EditReplaceAllFlag flag) noexcept {
 	if (SciCall_IsRectangularSelection()) {
 		NotifyRectangularSelection();
 		return;
@@ -5925,7 +5925,7 @@ void EditReplaceAllInSelection(HWND hwnd, const EDITFINDREPLACE *lpefr, EditRepl
 	BOOL bReplaceRE;
 	char szFind2[NP2_FIND_REPLACE_LIMIT];
 	char *pszReplace2;
-	const int searchFlags = EditPrepareReplace(hwnd, szFind2, &pszReplace2, &bReplaceRE, lpefr);
+	const int searchFlags = EditPrepareReplace(szFind2, &pszReplace2, &bReplaceRE, lpefr);
 	if (searchFlags == NP2_InvalidSearchFlags) {
 		return;
 	}
@@ -6543,9 +6543,9 @@ void EditUpdateTimestampMatchTemplate(HWND hwnd) noexcept {
 	WideCharToMultiByte(cpEdit, 0, wchReplace, -1, efrTS->szReplace, COUNTOF(efrTS->szReplace), nullptr, nullptr);
 
 	if (!SciCall_IsSelectionEmpty()) {
-		EditReplaceAllInSelection(hwnd, efrTS, EditReplaceAllFlag_Default);
+		EditReplaceAllInSelection(efrTS, EditReplaceAllFlag_Default);
 	} else {
-		EditReplaceAll(hwnd, efrTS);
+		EditReplaceAll(efrTS);
 	}
 	NP2HeapFree(efrTS);
 }
