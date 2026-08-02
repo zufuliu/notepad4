@@ -4658,7 +4658,7 @@ static void FindReplaceSetFont(HWND hwnd, BOOL monospaced, HFONT *hFontFindRepla
 }
 
 static bool CopySelectionAsFindText(HWND hwnd, EDITFINDREPLACE *lpefr, bool bFirstTime) noexcept {
-	const Sci_Position cchSelection = SciCall_GetSelTextLength();
+	const size_t cchSelection = SciCall_GetSelTextLength();
 	char *lpszSelection = nullptr;
 
 	if (cchSelection != 0 && cchSelection <= NP2_FIND_REPLACE_LIMIT && (iSelectOption & SelectOption_CopySelectionAsFindText)) {
@@ -4668,40 +4668,40 @@ static bool CopySelectionAsFindText(HWND hwnd, EDITFINDREPLACE *lpefr, bool bFir
 
 	// only for manually selected text
 	const bool hasFindText = StrNotEmpty(lpszSelection);
+	LPWSTR pClip = nullptr;
+	UINT cchUnescapedW = 0;
 
 	// First time you bring up find/replace dialog,
 	// copy content from clipboard to find box when nothing is selected in the editor.
 	if (!hasFindText && bFirstTime && (iSelectOption & SelectOption_CopyPasteBufferAsFindText)) {
-		char *pClip = EditGetClipboardText();
+		pClip = EditGetClipboardTextW(ClipboardTextType::Unicode);
 		if (pClip != nullptr) {
-			const size_t len = strlen(pClip);
-			if (len > 0 && len <= NP2_FIND_REPLACE_LIMIT) {
-				NP2HeapFree(lpszSelection);
-				lpszSelection = static_cast<char *>(NP2HeapAlloc(len + 2));
-				strcpy(lpszSelection, pClip);
-			}
-			LocalFree(pClip);
+			cchUnescapedW = lstrlen(pClip);
 		}
 	}
 
-	if (StrNotEmpty(lpszSelection)) {
-		constexpr unsigned len = kMaxBackslashEscapeCount * NP2_FIND_REPLACE_LIMIT;
-		char *lpszEscSel = static_cast<char *>(NP2HeapAlloc((len * (sizeof(char) + sizeof(WCHAR)))));
+	if (hasFindText || cchUnescapedW != 0) {
+		const size_t len = (max<size_t>(cchSelection, cchUnescapedW) + 1) * kMaxBackslashEscapeCount;
+		WCHAR * const lpszEscSel = static_cast<WCHAR *>(NP2HeapAlloc(len * 2 * sizeof(WCHAR)));
+		LPCWSTR pszUnescapedW = pClip;
+		if (hasFindText) {
+			const UINT cpEdit = SciCall_GetCodePage();
+			MultiByteToWideChar(cpEdit, 0, lpszSelection, -1, lpszEscSel, static_cast<int>(len));
+			pszUnescapedW = lpszEscSel;
+		}
 		unsigned option = lpefr->option & ~FindReplaceOption_TransformBackslash;
-		if (AddBackslashA(lpszEscSel, lpszSelection)) {
+		LPWSTR wszSelection = lpszEscSel + len;
+		if (AddBackslashW(wszSelection, pszUnescapedW)) {
 			if ((lpefr->fuFlags & SCFIND_REGEXP) == 0) {
 				option |= FindReplaceOption_TransformBackslash;
 			}
 		}
-
 		lpefr->option = option;
-		const UINT cpEdit = SciCall_GetCodePage();
-		LPWSTR wszSelection = reinterpret_cast<LPWSTR>(lpszEscSel + len);
-		MultiByteToWideChar(cpEdit, 0, lpszEscSel, -1, wszSelection, len);
 		SetDlgItemText(hwnd, IDC_FINDTEXT, wszSelection);
 		NP2HeapFree(lpszEscSel);
 	}
 
+	LocalFree(pClip);
 	NP2HeapFree(lpszSelection);
 	return hasFindText;
 }

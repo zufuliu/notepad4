@@ -2966,44 +2966,6 @@ void TransformBackslashes(char *pszInput, UINT cpEdit) noexcept {
 	*o = '\0';
 }
 
-bool AddBackslashA(char *pszOut, const char *pszInput) noexcept {
-	bool hasEscapeChar = false;
-	bool hasSlash = false;
-	char *lpszEsc = pszOut;
-	const char *lpsz = pszInput;
-	while (*lpsz) {
-		unsigned char ch = *lpsz++;
-		const uint8_t index = ch - '\a';
-		if (index <= '\r' - '\a') {
-			ch = "abtnvfr"[index];
-			hasEscapeChar = true;
-			*lpszEsc++ = '\\';
-			*lpszEsc++ = ch;
-		} else if (ch == '\x1B') {
-			hasEscapeChar = true;
-			*lpszEsc++ = '\\';
-			*lpszEsc++ = 'e';
-		} else if (ch < ' ' || ch == 0x7f) {
-			hasEscapeChar = true;
-			*lpszEsc++ = '\\';
-			*lpszEsc++ = 'x';
-			*lpszEsc++ = "0123456789ABCDEF"[ch >> 4];
-			*lpszEsc++ = "0123456789ABCDEF"[ch & 15];
-		} else {
-			*lpszEsc++ = ch;
-			if (ch == '\\') {
-				hasSlash = true;
-				*lpszEsc++ = ch;
-			}
-		}
-	}
-
-	if (hasSlash && !hasEscapeChar) {
-		strcpy(pszOut, pszInput);
-	}
-	return hasEscapeChar;
-}
-
 bool AddBackslashW(LPWSTR pszOut, LPCWSTR pszInput) noexcept {
 	bool hasEscapeChar = false;
 	bool hasSlash = false;

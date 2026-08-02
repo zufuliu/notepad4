@@ -1291,7 +1291,6 @@ void TransformBackslashes(char *pszInput, UINT cpEdit) noexcept;
 #define kMaxBackslashEscapeCount	4
 // backslash escape regex meta character
 #define kMaxRegexEscapeCount		2
-bool AddBackslashA(char *pszOut, const char *pszInput) noexcept;
 bool AddBackslashW(LPWSTR pszOut, LPCWSTR pszInput) noexcept;
 void EscapeRegex(LPSTR pszOut, LPCSTR pszIn) noexcept;
 size_t Base64Encode(char *output, const uint8_t *src, size_t length, bool urlSafe) noexcept;
