@@ -3092,7 +3092,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			SciCall_SetSel(iPos, iNewPos);
 			SendWMCommand(hwnd, IDM_EDIT_CLEARCLIPBOARD);
 		} else {
-			char *pClip = EditGetClipboardText(hwndEdit);
+			char *pClip = EditGetClipboardText();
 			if (pClip == nullptr) {
 				break;
 			}

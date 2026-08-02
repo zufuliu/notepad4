@@ -306,57 +306,6 @@ void EditConvertToLargeMode() noexcept {
 //
 // EditGetClipboardText()
 //
-char* EditGetClipboardText(HWND hwnd) noexcept {
-	if (!IsClipboardFormatAvailable(CF_UNICODETEXT) || !OpenClipboard(GetParent(hwnd))) {
-		return nullptr;
-	}
-
-	HANDLE hmem = GetClipboardData(CF_UNICODETEXT);
-	LPCWSTR pwch = static_cast<LPCWSTR>(GlobalLock(hmem));
-
-	const UINT cpEdit = SciCall_GetCodePage();
-	const UINT mlen = WideCharToMultiByte(cpEdit, 0, pwch, -1, nullptr, 0, nullptr, nullptr);
-	char *pmch = static_cast<char *>(LocalAlloc(LPTR, mlen*2));
-	char *ptmp = static_cast<char *>(NP2HeapAlloc(mlen));
-
-	if (pmch && ptmp) {
-		WideCharToMultiByte(cpEdit, 0, pwch, -1, ptmp, mlen, nullptr, nullptr);
-		const int iEOLMode = SciCall_GetEOLMode();
-		const char *s = ptmp;
-		char *d = pmch;
-		while (*s != '\0') {
-			if (*s == '\n' || *s == '\r') {
-				switch (iEOLMode) {
-				default: // SC_EOL_CRLF
-					*d++ = '\r';
-					*d++ = '\n';
-					break;
-				case SC_EOL_LF:
-					*d++ = '\n';
-					break;
-				case SC_EOL_CR:
-					*d++ = '\r';
-					break;
-				}
-				if (*s == '\r' && s[1] == '\n') {
-					s++;
-				}
-				s++;
-			} else {
-				*d++ = *s++;
-			}
-		}
-
-		*d++ = '\0';
-	}
-
-	NP2HeapFree(ptmp);
-	GlobalUnlock(hmem);
-	CloseClipboard();
-
-	return pmch;
-}
-
 LPWSTR EditGetClipboardTextW(ClipboardTextType type) noexcept {
 	if (!IsClipboardFormatAvailable(CF_UNICODETEXT) || !OpenClipboard(hwndMain)) {
 		return nullptr;
@@ -398,6 +347,9 @@ LPWSTR EditGetClipboardTextW(ClipboardTextType type) noexcept {
 		}
 		if (type == ClipboardTextType::UnicodeBackslash) {
 			AddBackslashW(ptmp, wszEOL);
+		} else if (type == ClipboardTextType::DocumentBytes) {
+			const UINT cpEdit = SciCall_GetCodePage();
+			WideCharToMultiByte(cpEdit, 0, wszEOL, static_cast<int>(d - wszEOL), reinterpret_cast<char *>(ptmp), offset*sizeof(WCHAR), nullptr, nullptr);
 		}
 	}
 
@@ -4720,7 +4672,7 @@ static bool CopySelectionAsFindText(HWND hwnd, EDITFINDREPLACE *lpefr, bool bFir
 	// First time you bring up find/replace dialog,
 	// copy content from clipboard to find box when nothing is selected in the editor.
 	if (!hasFindText && bFirstTime && (iSelectOption & SelectOption_CopyPasteBufferAsFindText)) {
-		char *pClip = EditGetClipboardText(hwnd);
+		char *pClip = EditGetClipboardText();
 		if (pClip != nullptr) {
 			const size_t len = strlen(pClip);
 			if (len > 0 && len <= NP2_FIND_REPLACE_LIMIT) {
@@ -5311,7 +5263,7 @@ int EditPrepareReplace(char *szFind2, char **pszReplace2, BOOL *bReplaceRE, cons
 	*bReplaceRE = (searchFlags & SCFIND_REGEXP);
 	if (StrEqualEx(lpefr->szReplace, "^c")) {
 		*bReplaceRE = FALSE;
-		*pszReplace2 = EditGetClipboardText(lpefr->hwnd);
+		*pszReplace2 = EditGetClipboardText();
 	} else {
 		*pszReplace2 = StrDupA(lpefr->szReplace);
 		if (lpefr->option & FindReplaceOption_TransformBackslash) {

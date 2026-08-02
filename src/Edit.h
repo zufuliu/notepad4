@@ -140,9 +140,12 @@ void	EditReplaceDocument(HANDLE pdoc) noexcept;
 enum class ClipboardTextType {
 	Unicode,
 	UnicodeBackslash,
+	DocumentBytes,
 };
 LPWSTR EditGetClipboardTextW(ClipboardTextType type) noexcept; // LocalFree()
-char*	EditGetClipboardText(HWND hwnd) noexcept; // LocalFree()
+inline char *EditGetClipboardText() noexcept {
+	return reinterpret_cast<char *>(EditGetClipboardTextW(ClipboardTextType::DocumentBytes));
+}
 void	EditCopyAppend(HWND hwnd) noexcept;
 
 constexpr int GetScintillaEOLMode(int mode) noexcept {
