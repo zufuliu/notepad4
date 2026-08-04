@@ -3914,15 +3914,17 @@ const char *BuiltinRegex::SubstituteByPosition(const Document *doc, const char *
 	};
 
 	substituted.clear();
+	const auto *byteMask = doc->GetDBCSByteMask();
 	for (Sci::Position j = 0; j < *length; j++) {
 		char ch = text[j];
+		char chNext = text[j + 1];
 		if (ch == '\\' || ch == '$') {
-			const char chNext = text[++j];
 			unsigned int patNum = chNext - '0';
 			if (patNum <= '9' - '0' || (ch == '$' && chNext == '&')) {
 				if (chNext == '&') {
 					patNum = 0;
 				}
+				j++;
 				const Sci::Position startPos = search.bopat[patNum];
 				const Sci::Position len = search.eopat[patNum] - startPos;
 				if (len > 0) {	// Will be null if try for a match that did not occur
@@ -3933,17 +3935,20 @@ const char *BuiltinRegex::SubstituteByPosition(const Document *doc, const char *
 				continue;
 			}
 			if (ch == '$') {
-				if (chNext != '$') {
-					j--;
+				if (chNext == '$') {
+					j++;
 				}
 			} else {
 				patNum -= '\\' - '0'; // patNum = chNext - '\\';
 				if (patNum < sizeof(backslashTable) && static_cast<signed char>(backslashTable[patNum]) > 0) {
 					ch = backslashTable[patNum];
-				} else {
-					j--;
+					j++;
 				}
 			}
+		} else if (byteMask && byteMask->IsLeadByte(ch) && byteMask->IsTrailByte(chNext)) {
+			j++;
+			std::swap(ch, chNext);
+			substituted.push_back(chNext);
 		}
 		substituted.push_back(ch);
 	}

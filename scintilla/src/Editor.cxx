@@ -6024,11 +6024,10 @@ void Editor::NeedShown(Sci::Position pos, Sci::Position len) {
 Sci::Position Editor::GetTag(char *tagValue, int tagNumber) {
 	const char *text = nullptr;
 	Sci::Position length = 0;
-	if ((tagNumber >= 1) && (tagNumber <= 9)) {
-		char name[4];
+	if ((tagNumber >= 0) && (tagNumber <= 9)) {
+		char name[4]{};
 		name[0] = '\\';
 		name[1] = static_cast<char>(tagNumber + '0');
-		name[2] = '\0';
 		length = 2;
 		text = pdoc->SubstituteByPosition(name, &length);
 	}
