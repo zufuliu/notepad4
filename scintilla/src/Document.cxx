@@ -1966,7 +1966,7 @@ Sci::Position Document::ExtendWordSelect(Sci::Position pos, int delta, bool only
 		if (pos > 0) {
 			const CharacterExtracted ce = CharacterBefore(pos);
 			const CharacterClass ceStart = WordCharacterClass(ce.character);
-			if (!onlyWordCharacters || ceStart == ccStart || ceStart == CharacterClass::cjkWord) {
+			if (!onlyWordCharacters || ceStart >= ccStart) {
 				ccStart = ceStart;
 				pos -= ce.widthBytes;
 			} else {
@@ -1984,7 +1984,7 @@ Sci::Position Document::ExtendWordSelect(Sci::Position pos, int delta, bool only
 		if (pos < LengthNoExcept()) {
 			const CharacterExtracted ce = CharacterAfter(pos);
 			const CharacterClass ceStart = WordCharacterClass(ce.character);
-			if (!onlyWordCharacters || ceStart == ccStart || ceStart == CharacterClass::cjkWord) {
+			if (!onlyWordCharacters || ceStart >= ccStart) {
 				ccStart = ceStart;
 				pos += ce.widthBytes;
 			} else {

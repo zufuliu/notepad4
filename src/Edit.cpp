@@ -5671,38 +5671,31 @@ void EditMarkAll::Continue(HANDLE timer) noexcept {
 
 void EditMarkAll::MarkAll(BOOL bChanged, int option) noexcept {
 	// get current selection
-	Sci_Position iSelStart = SciCall_GetSelectionStart();
+	const Sci_Position iSelStart = SciCall_GetSelectionStart();
 	const Sci_Position iSelEnd = SciCall_GetSelectionEnd();
-	Sci_Position iSelCount = iSelEnd - iSelStart;
 
 	// if nothing selected or multiple lines are selected exit
-	if (iSelCount == 0 || SciCall_LineFromPosition(iSelStart) != SciCall_LineFromPosition(iSelEnd)) {
+	if (iSelStart == iSelEnd || SciCall_LineFromPosition(iSelStart) != SciCall_LineFromPosition(iSelEnd)) {
 		Clear();
 		return;
 	}
-
-	iSelCount = SciCall_GetSelTextLength();
-	char *text = static_cast<char *>(NP2HeapAlloc(iSelCount + 1));
-	SciCall_GetSelText(text);
 
 	static_assert(NP2_MarkAllBookmark == MarkOccurrences_Bookmark << 10);
 	int findFlag = (option & MarkOccurrences_Bookmark) << 10;
 	// exit if selection is not a word and Match whole words only is enabled
 	if (option & MarkOccurrences_WholeWord) {
 		findFlag |= SCFIND_WHOLEWORD;
-		const auto *byteMask = SciCall_GetDBCSByteMask();
-		// CharClassify::SetDefaultCharClasses()
-		for (iSelStart = 0; iSelStart < iSelCount; ++iSelStart) {
-			const unsigned char ch = text[iSelStart];
-			if (byteMask && byteMask->IsLeadByte(ch) && byteMask->IsTrailByte(text[iSelStart + 1]))	{
-				++iSelStart;
-			} else if (!IsDocWordChar(ch)) {
-				NP2HeapFree(text);
-				Clear();
-				return;
-			}
+		const Sci_Position iEndPos = SciCall_WordEndPosition(iSelStart, true);
+		if (iEndPos != iSelEnd || !SciCall_IsRangeWord(iSelStart, iEndPos)) {
+			Clear();
+			return;
 		}
 	}
+
+	const size_t iSelCount = SciCall_GetSelTextLength();
+	char *text = static_cast<char *>(NP2HeapAlloc(iSelCount + 1));
+	SciCall_GetSelText(text);
+
 	if (option & MarkOccurrences_MatchCase) {
 		findFlag |= SCFIND_MATCHCASE;
 	} else {

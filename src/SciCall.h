@@ -628,6 +628,10 @@ inline Sci_Position SciCall_WordEndPosition(Sci_Position position, bool onlyWord
 	return SciCall(SCI_WORDENDPOSITION, position, onlyWordCharacters);
 }
 
+inline Sci_Position SciCall_IsRangeWord(Sci_Position start, Sci_Position end) noexcept {
+	return SciCall(SCI_ISRANGEWORD, start, end);
+}
+
 inline void SciCall_SetCharClassesEx(int length, const unsigned char *characters) noexcept {
 	SciCall(SCI_SETCHARCLASSESEX, length, AsInteger<LPARAM>(characters));
 }
