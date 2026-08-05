@@ -61,7 +61,6 @@ enum {
 };
 
 struct EDITFINDREPLACE {
-	HWND	hwnd;
 	UINT	fuFlags;
 	UINT	option;
 	char	szFind[NP2_FIND_REPLACE_BYTES + 8 - sizeof(HWND)];
@@ -160,7 +159,7 @@ constexpr int GetSettingsEOLMode(int mode) noexcept {
 struct EditFileIOStatus;
 void 	EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus &status) noexcept;
 bool	EditLoadFile(LPWSTR pszFile, EditFileIOStatus &status) noexcept;
-bool	EditSaveFile(HWND hwnd, LPCWSTR pszFile, int saveFlag, EditFileIOStatus &status) noexcept;
+bool	EditSaveFile(LPCWSTR pszFile, int saveFlag, EditFileIOStatus &status) noexcept;
 
 void	EditReplaceMainSelection(Sci_Position cchText, LPCSTR pszText) noexcept;
 
@@ -202,8 +201,8 @@ void	EditToggleLineComments(LPCWSTR pwszComment, int commentFlag) noexcept;
 void	EditPadWithSpaces(bool bSkipEmpty, bool bNoUndoGroup) noexcept;
 void	EditStripFirstCharacter() noexcept;
 void	EditStripLastCharacter() noexcept;
-void	EditStripTrailingBlanks(HWND hwnd, bool bIgnoreSelection) noexcept;
-void	EditStripLeadingBlanks(HWND hwnd, bool bIgnoreSelection) noexcept;
+void	EditStripTrailingBlanks(bool bIgnoreSelection) noexcept;
+void	EditStripLeadingBlanks(bool bIgnoreSelection) noexcept;
 void	EditCompressSpaces() noexcept;
 void	EditRemoveBlankLines(bool bMerge) noexcept;
 void	EditWrapToColumn(int nColumn/*, int nTabWidth*/) noexcept;
@@ -238,7 +237,7 @@ void	EditModifyLinesDlg(HWND hwnd) noexcept;
 void	EditEncloseSelectionDlg(HWND hwnd) noexcept;
 void	EditInsertTagDlg(HWND hwnd) noexcept;
 void	EditInsertDateTime(bool bShort) noexcept;
-void	EditUpdateTimestampMatchTemplate(HWND hwnd) noexcept;
+void	EditUpdateTimestampMatchTemplate() noexcept;
 void	EditInsertUnicodeControlCharacter(int menu) noexcept;
 void	EditShowUnicodeControlCharacter(bool bShow) noexcept;
 bool	EditSortDlg(HWND hwnd, EditSortFlag *piSortFlags) noexcept;

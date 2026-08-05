@@ -1140,7 +1140,7 @@ bool EditLoadFile(LPWSTR pszFile, EditFileIOStatus &status) noexcept {
 //
 // EditSaveFile()
 //
-bool EditSaveFile(HWND hwnd, LPCWSTR pszFile, int saveFlag, EditFileIOStatus &status) noexcept {
+bool EditSaveFile(LPCWSTR pszFile, int saveFlag, EditFileIOStatus &status) noexcept {
 	HANDLE hFile = CreateFile(pszFile,
 					   GENERIC_READ | GENERIC_WRITE,
 					   FILE_SHARE_READ | FILE_SHARE_WRITE,
@@ -1184,7 +1184,7 @@ bool EditSaveFile(HWND hwnd, LPCWSTR pszFile, int saveFlag, EditFileIOStatus &st
 
 		// strip trailing blanks
 		if (bAutoStripBlanks) {
-			EditStripTrailingBlanks(hwnd, true);
+			EditStripTrailingBlanks(true);
 		}
 	}
 
@@ -3653,12 +3653,11 @@ void EditStripLastCharacter() noexcept {
 //
 // EditStripTrailingBlanks()
 //
-void EditStripTrailingBlanks(HWND hwnd, bool bIgnoreSelection) noexcept {
+void EditStripTrailingBlanks(bool bIgnoreSelection) noexcept {
 	// Check if there is any selection... simply use a regular expression replace!
 	if (!bIgnoreSelection && !SciCall_IsSelectionEmpty()) {
 		if (!SciCall_IsRectangularSelection()) {
 			EDITFINDREPLACE * const efrTrim = static_cast<EDITFINDREPLACE *>(NP2HeapAlloc(sizeof(EDITFINDREPLACE)));
-			efrTrim->hwnd = hwnd;
 			efrTrim->fuFlags = SCFIND_REGEXP;
 			StrCpyExNull(efrTrim->szFind, "[ \t]+$");
 			EditReplaceAllInSelection(efrTrim, EditReplaceAllFlag_UndoGroup);
@@ -3693,12 +3692,11 @@ void EditStripTrailingBlanks(HWND hwnd, bool bIgnoreSelection) noexcept {
 //
 // EditStripLeadingBlanks()
 //
-void EditStripLeadingBlanks(HWND hwnd, bool bIgnoreSelection) noexcept {
+void EditStripLeadingBlanks(bool bIgnoreSelection) noexcept {
 	// Check if there is any selection... simply use a regular expression replace!
 	if (!bIgnoreSelection && !SciCall_IsSelectionEmpty()) {
 		if (!SciCall_IsRectangularSelection()) {
 			EDITFINDREPLACE * const efrTrim = static_cast<EDITFINDREPLACE *>(NP2HeapAlloc(sizeof(EDITFINDREPLACE)));
-			efrTrim->hwnd = hwnd;
 			efrTrim->fuFlags = SCFIND_REGEXP;
 			StrCpyExNull(efrTrim->szFind, "^[ \t]+");
 			EditReplaceAllInSelection(efrTrim, EditReplaceAllFlag_UndoGroup);
@@ -5190,7 +5188,6 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 // EditFindReplaceDlg()
 //
 HWND EditFindReplaceDlg(HWND hwnd, EDITFINDREPLACE *lpefr, bool bReplace) noexcept {
-	lpefr->hwnd = hwnd;
 	HWND hDlg = CreateThemedDialogParam(g_hInstance,
 								   bReplace ? MAKEINTRESOURCE(IDD_REPLACE) : MAKEINTRESOURCE(IDD_FIND),
 								   GetParent(hwnd),
@@ -6435,7 +6432,7 @@ void EditInsertDateTime(bool bShort) noexcept {
 	SciCall_ReplaceSel(mszBuf);
 }
 
-void EditUpdateTimestampMatchTemplate(HWND hwnd) noexcept {
+void EditUpdateTimestampMatchTemplate() noexcept {
 	WCHAR wchFind[256]{};
 	IniGetString(INI_SECTION_NAME_FLAGS, L"TimeStamp", L"\\$Date:[^\\$]+\\$ | $Date: %Y/%m/%d %H:%M:%S $", wchFind, COUNTOF(wchFind));
 
@@ -6475,7 +6472,6 @@ void EditUpdateTimestampMatchTemplate(HWND hwnd) noexcept {
 
 	const UINT cpEdit = SciCall_GetCodePage();
 	EDITFINDREPLACE * const efrTS = static_cast<EDITFINDREPLACE *>(NP2HeapAlloc(sizeof(EDITFINDREPLACE)));
-	efrTS->hwnd = hwnd;
 	efrTS->fuFlags = SCFIND_REGEXP;
 
 	WideCharToMultiByte(cpEdit, 0, wchFind, -1, efrTS->szFind, COUNTOF(efrTS->szFind), nullptr, nullptr);

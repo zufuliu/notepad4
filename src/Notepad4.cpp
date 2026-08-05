@@ -1691,7 +1691,6 @@ void EditCreate(HWND hwndParent) noexcept {
 						  g_hInstance,
 						  nullptr);
 	hwndEdit = hwnd;
-	efrData.hwnd = hwnd;
 	InitScintillaHandle(hwnd);
 	//SciInitThemes(hwnd);
 	if (bEditLayoutRTL) {
@@ -3228,13 +3227,13 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_EDIT_TRIMLINES:
 		BeginWaitCursor();
-		EditStripTrailingBlanks(hwndEdit, false);
+		EditStripTrailingBlanks(false);
 		EndWaitCursor();
 		break;
 
 	case IDM_EDIT_TRIMLEAD:
 		BeginWaitCursor();
-		EditStripLeadingBlanks(hwndEdit, false);
+		EditStripLeadingBlanks(false);
 		EndWaitCursor();
 		break;
 
@@ -4484,7 +4483,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 #endif
 
 	case CMD_TIMESTAMPS:
-		EditUpdateTimestampMatchTemplate(hwndEdit);
+		EditUpdateTimestampMatchTemplate();
 		break;
 
 	case CMD_OPEN_PATH_OR_LINK:
@@ -6721,7 +6720,7 @@ bool FileIO(bool fLoad, LPWSTR pszFile, FileSaveFlag flag, EditFileIOStatus &sta
 		iSrcEncoding = CPI_NONE;
 		iWeakSrcEncoding = CPI_NONE;
 	} else {
-		fLoad = EditSaveFile(hwndEdit, pszFile, flag, status);
+		fLoad = EditSaveFile(pszFile, flag, status);
 	}
 
 	const DWORD dwFileAttributes = GetFileAttributes(pszFile);
@@ -8082,7 +8081,7 @@ void AutoSave_DoWork(FileSaveFlag saveFlag) noexcept {
 		EditFileIOStatus status{};
 		status.iEncoding = iCurrentEncoding;
 		status.iEOLMode = iCurrentEOLMode;
-		if (EditSaveFile(hwndEdit, szCurFile, FileSaveFlag_EndSession, status)) {
+		if (EditSaveFile(szCurFile, FileSaveFlag_EndSession, status)) {
 			dwLastSavedDocReversion = dwCurrentDocReversion;
 			InstallFileWatching(false);
 			return;
