@@ -24,8 +24,8 @@ git clone -b develop https://github.com/boostorg/regex.git
 
 win32-darkmodelib (upstream)
 git clone https://github.com/ozone10/win32-darkmodelib.git
-0.71.0
-2026-07-16 11803a06be00581280c53d27b14e541f3cb19201
+0.75.0
+2026-07-26 fa99647299c4edb3cf662bc14f19b5451090723e
 
 init submodule:
 	git submodule init

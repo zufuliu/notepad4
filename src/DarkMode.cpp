@@ -374,12 +374,12 @@ void DarkMode_ApplyToBars(HWND hwnd, HWND hwndToolbar, HWND hwndReBar, HWND hwnd
 void DarkMode_OnToolbarBeginAdjust() noexcept {
 	DialogHook_Start(DialogRefData_CustomizeToolbar);
 	if (dmlib::isExperimentalActive()) {
-		dmlib_hook::hookSysColor();
+		dmlib_hook::GetSysColor::hook();
 	}
 }
 
 void DarkMode_OnToolbarEndAdjust() noexcept {
-	dmlib_hook::unhookSysColor();
+	dmlib_hook::GetSysColor::unhook();
 	DialogHook_Stop();
 }
 

@@ -23,6 +23,8 @@
 
 #include <windows.h>
 
+#include <colordlg.h>
+#include <dlgs.h>
 #include <dwmapi.h>
 #include <richedit.h>
 #include <uxtheme.h>
@@ -814,7 +816,9 @@ void dmlib::initDarkModeEx([[maybe_unused]] const wchar_t* iniName)
 
 		dmlib::setSysColor(COLOR_WINDOW, dmlib::getCtrlBackgroundColor());
 		dmlib::setSysColor(COLOR_WINDOWTEXT, dmlib::getTextColor());
-		dmlib::setSysColor(COLOR_BTNFACE, dmlib::getViewGridlinesColor());
+		dmlib::setSysColor(COLOR_3DFACE, dmlib::getViewGridlinesColor());
+
+		dmlib::updateCommonDlgsBrushes();
 
 		g_dmCfg.m_isInit = true;
 	}
@@ -1019,6 +1023,14 @@ bool dmlib::isDarkModeReg()
 void dmlib::setSysColor(int nIndex, COLORREF color)
 {
 	dmlib_hook::setMySysColor(nIndex, color);
+}
+/**
+ * @brief Updates custom color brushes for ChooseFont and ChooseColor dialogs.
+ */
+void dmlib::updateCommonDlgsBrushes()
+{
+	dmlib_hook::updateFontBrush();
+	dmlib_hook::updateLumSliderBrush();
 }
 
 /**
@@ -1602,7 +1614,7 @@ void dmlib::setComboBoxExCtrlSubclass(HWND hWnd)
 void dmlib::removeComboBoxExCtrlSubclass(HWND hWnd)
 {
 	dmlib_subclass::RemoveSubclass(hWnd, dmlib_subclass::ComboBoxExSubclass, dmlib_subclass::SubclassID::comboBoxEx);
-	dmlib_hook::unhookSysColor();
+	dmlib_hook::GetSysColor::unhook();
 }
 
 /**
@@ -3247,8 +3259,7 @@ void dmlib::setDarkMonthCalendar(HWND hWnd)
 	{
 		MonthCal_SetColor(hWnd, MCSC_MONTHBK, dmlib::getCtrlBackgroundColor());
 		MonthCal_SetColor(hWnd, MCSC_TEXT, dmlib::getTextColor());
-		static constexpr COLORREF accentBlue = dmlib_color::HEXRGB(0x0078D7);
-		MonthCal_SetColor(hWnd, MCSC_TITLEBK, accentBlue);
+		MonthCal_SetColor(hWnd, MCSC_TITLEBK, dmlib_color::kAccentBlue);
 		MonthCal_SetColor(hWnd, MCSC_TITLETEXT, dmlib::getTextColor());
 		MonthCal_SetColor(hWnd, MCSC_TRAILINGTEXT, dmlib::getDisabledTextColor());
 	}
@@ -4015,13 +4026,137 @@ LRESULT dmlib::onCtlColorListbox(WPARAM wParam, LPARAM lParam)
 }
 
 /**
- * @brief Hook procedure for customizing common dialogs with custom colors.
+ * @brief Window subclass procedure for customizing ChooseFont and ChooseColor dialogs.
+ *
+ * @param[in]   hWnd        Window handle being subclassed.
+ * @param[in]   uMsg        Message identifier.
+ * @param[in]   wParam      Message-specific data.
+ * @param[in]   lParam      Message-specific data.
+ * @param[in]   uIdSubclass Subclass identifier.
+ * @param[in]   dwRefData   Reference data (unused).
+ * @return LRESULT Result of message processing.
+ *
+ * @see dmlib::HookDlgProc()
+ */
+static LRESULT CALLBACK ComDlgSubclass(
+	HWND hWnd,
+	UINT uMsg,
+	WPARAM wParam,
+	LPARAM lParam,
+	UINT_PTR uIdSubclass,
+	[[maybe_unused]] DWORD_PTR dwRefData
+) noexcept
+{
+	if (!dmlib::isEnabled() && uMsg != WM_NCDESTROY)
+	{
+		return ::DefSubclassProc(hWnd, uMsg, wParam, lParam);
+	}
+
+	switch (uMsg)
+	{
+		case WM_NCDESTROY:
+		{
+			::RemoveWindowSubclass(hWnd, ComDlgSubclass, uIdSubclass);
+			break;
+		}
+
+		case WM_MOUSEMOVE: // for ChooseColor dialog luminosity slide control
+		{
+			if (const auto autoHook = dmlib_hook::AutoHook<dmlib_hook::ClrGetSysColorBrush>();
+				autoHook)
+			{
+				return ::DefSubclassProc(hWnd, uMsg, wParam, lParam);
+			}
+			break;
+		}
+
+		case WM_PAINT: // for font preview background, control has id stc5 (0x444) and for ChooseColor dialog luminosity slide control
+		{
+			const auto ahFontSysColor = dmlib_hook::AutoHook<dmlib_hook::FontGetSysColor>();
+			const auto ahClrGetSysColorBrush = dmlib_hook::AutoHook<dmlib_hook::ClrGetSysColorBrush>();
+			return ::DefSubclassProc(hWnd, uMsg, wParam, lParam);
+		}
+
+		case WM_DRAWITEM: // for combo boxes and their list boxes
+		{
+			if (wParam == cmb1 || wParam == cmb2 || wParam == cmb3 || wParam == cmb4 || wParam == cmb5)
+			{
+				const auto ahFontSysColor = dmlib_hook::AutoHook<dmlib_hook::FontGetSysColor>();
+				const auto ahFontFillRect = dmlib_hook::AutoHook<dmlib_hook::FontFillRect>();
+				return ::DefSubclassProc(hWnd, uMsg, wParam, lParam);
+			}
+
+			break;
+		}
+
+		case WM_COMMAND: // for ChooseColor dialog luminosity slide control
+		{
+			const int id = LOWORD(wParam);
+			const int nCode = HIWORD(wParam);
+
+			if (nCode == EN_CHANGE
+				&& (id == COLOR_RED
+					|| id == COLOR_GREEN
+					|| id == COLOR_BLUE))
+			{
+				if (const auto autoHook = dmlib_hook::AutoHook<dmlib_hook::ClrGetSysColorBrush>();
+					autoHook)
+				{
+					return ::DefSubclassProc(hWnd, uMsg, wParam, lParam);
+				}
+				break;
+			}
+
+			if (nCode == EN_CHANGE && id == COLOR_LUM)
+			{
+				const auto retVal = ::DefSubclassProc(hWnd, uMsg, wParam, lParam);
+
+				RECT rcClient{};
+				::GetClientRect(hWnd, &rcClient);
+
+				RECT rcLum{};
+				::GetWindowRect(::GetDlgItem(hWnd, COLOR_LUMSCROLL), &rcLum);
+				::MapWindowPoints(nullptr, hWnd, reinterpret_cast<POINT*>(&rcLum), 2);
+
+				const LONG gap = rcLum.top - rcClient.top;
+				::InflateRect(&rcLum, 0, gap);
+				rcLum.left = rcLum.right;
+				rcLum.right = rcClient.right;
+
+				::RedrawWindow(hWnd, &rcLum, nullptr, RDW_INVALIDATE);
+				return retVal;
+			}
+
+			if (id == IDOK && nCode == BN_CLICKED) // for ChooseFont dialog message boxes
+			{
+				if (const auto autoHook = dmlib_hook::AutoHook<dmlib_hook::FontMB>();
+					autoHook)
+				{
+					return ::DefSubclassProc(hWnd, uMsg, wParam, lParam);
+				}
+				break;
+			}
+
+			break;
+		}
+
+		default:
+		{
+			break;
+		}
+	}
+	return ::DefSubclassProc(hWnd, uMsg, wParam, lParam);
+}
+
+/**
+ * @brief Hook procedure for customizing ChooseFont and ChooseColor dialogs with custom colors.
  */
 UINT_PTR CALLBACK dmlib::HookDlgProc(HWND hWnd, UINT uMsg, [[maybe_unused]] WPARAM wParam, [[maybe_unused]] LPARAM lParam)
 {
 	if (uMsg == WM_INITDIALOG)
 	{
 		dmlib::setDarkWndSafe(hWnd);
+		dmlib_subclass::SetSubclass(hWnd, ComDlgSubclass, dmlib_subclass::SubclassID::comDlg);
 		return TRUE;
 	}
 	return FALSE;
@@ -4084,10 +4219,8 @@ HRESULT dmlib::darkTaskDialogIndirect(
 	BOOL* pfVerificationFlagChecked
 )
 {
-	dmlib_hook::hookThemeColor();
-	const HRESULT retVal = ::TaskDialogIndirect(pTaskConfig, pnButton, pnRadioButton, pfVerificationFlagChecked);
-	dmlib_hook::unhookThemeColor();
-	return retVal;
+	const auto autoHook = dmlib_hook::AutoHook<dmlib_hook::TaskDlgTheme>();
+	return ::TaskDialogIndirect(pTaskConfig, pnButton, pnRadioButton, pfVerificationFlagChecked);
 }
 
 /**

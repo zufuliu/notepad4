@@ -458,7 +458,7 @@ LRESULT CALLBACK dmlib_subclass::ButtonSubclass(
 			}
 
 			// Skip the button's normal wndproc so it won't redraw out of wm_paint
-			const LRESULT retVal = ::DefWindowProcW(hWnd, uMsg, wParam, lParam);
+			const auto retVal = ::DefWindowProcW(hWnd, uMsg, wParam, lParam);
 			::InvalidateRect(hWnd, nullptr, FALSE);
 			return retVal;
 		}
@@ -2410,7 +2410,7 @@ LRESULT CALLBACK dmlib_subclass::ComboBoxSubclass(
 				break;
 			}
 
-			const LRESULT retVal = ::DefSubclassProc(hWnd, uMsg, wParam, lParam);
+			const auto retVal = ::DefSubclassProc(hWnd, uMsg, wParam, lParam);
 			::RedrawWindow(hWnd, nullptr, nullptr, RDW_INVALIDATE);
 			return retVal;
 		}
@@ -2451,7 +2451,7 @@ LRESULT CALLBACK dmlib_subclass::ComboBoxExSubclass(
 		case WM_NCDESTROY:
 		{
 			::RemoveWindowSubclass(hWnd, ComboBoxExSubclass, uIdSubclass);
-			dmlib_hook::unhookSysColor();
+			dmlib_hook::GetSysColor::unhook();
 			break;
 		}
 
@@ -2500,13 +2500,13 @@ LRESULT CALLBACK dmlib_subclass::ComboBoxExSubclass(
 			{
 				case CBN_DROPDOWN:
 				{
-					dmlib_hook::hookSysColor();
+					dmlib_hook::GetSysColor::hook();
 					break;
 				}
 
 				case CBN_CLOSEUP:
 				{
-					dmlib_hook::unhookSysColor();
+					dmlib_hook::GetSysColor::unhook();
 					break;
 				}
 
@@ -2590,7 +2590,6 @@ LRESULT CALLBACK dmlib_subclass::ListViewSubclass(
 		case WM_NCDESTROY:
 		{
 			::RemoveWindowSubclass(hWnd, ListViewSubclass, uIdSubclass);
-			dmlib_hook::unhookSysColor();
 			break;
 		}
 
@@ -2613,10 +2612,8 @@ LRESULT CALLBACK dmlib_subclass::ListViewSubclass(
 
 			if (hasGridlines)
 			{
-				dmlib_hook::hookSysColor();
-				const LRESULT retVal = ::DefSubclassProc(hWnd, uMsg, wParam, lParam);
-				dmlib_hook::unhookSysColor();
-				return retVal;
+				auto const autoHook = dmlib_hook::AutoHook<dmlib_hook::GetSysColor>();
+				return ::DefSubclassProc(hWnd, uMsg, wParam, lParam);
 			}
 			break;
 		}
@@ -3033,7 +3030,7 @@ LRESULT CALLBACK dmlib_subclass::HeaderSubclass(
 				break;
 			}
 
-			const LRESULT retVal = ::DefSubclassProc(hWnd, uMsg, wParam, lParam);
+			const auto retVal = ::DefSubclassProc(hWnd, uMsg, wParam, lParam);
 
 			pHeaderData->m_isHot = false;
 			pHeaderData->m_pt.x = LONG_MIN;
@@ -3117,7 +3114,7 @@ static void paintStatusBar(HWND hWnd, HDC hdc, dmlib_subclass::StatusBarData& st
 		rcPart.left += borders.between;
 		rcPart.right -= borders.vertical;
 
-		const LRESULT retValLen = ::SendMessage(hWnd, SB_GETTEXTLENGTH, static_cast<WPARAM>(i), 0);
+		const auto retValLen = ::SendMessage(hWnd, SB_GETTEXTLENGTH, static_cast<WPARAM>(i), 0);
 		const DWORD cchText = LOWORD(retValLen);
 
 #if defined(_DARKMODELIB_CUSTOM_MEM) && (_DARKMODELIB_CUSTOM_MEM == 0x002)
@@ -3128,7 +3125,7 @@ static void paintStatusBar(HWND hWnd, HDC hdc, dmlib_subclass::StatusBarData& st
 #else
 		str.resize(static_cast<size_t>(cchText) + 1);
 #endif
-		const LRESULT retValText = ::SendMessage(hWnd, SB_GETTEXT, static_cast<WPARAM>(i), reinterpret_cast<LPARAM>(str.data()));
+		const auto retValText = ::SendMessage(hWnd, SB_GETTEXT, static_cast<WPARAM>(i), reinterpret_cast<LPARAM>(str.data()));
 
 		// With `SBT_OWNERDRAW` flag parent will draw status bar.
 		if (cchText == 0 && (HIWORD(retValLen) & SBT_OWNERDRAW) != 0)
@@ -3705,7 +3702,6 @@ LRESULT CALLBACK dmlib_subclass::HotKeySubclass(
 		case WM_NCDESTROY:
 		{
 			::RemoveWindowSubclass(hWnd, HotKeySubclass, uIdSubclass);
-			dmlib_hook::unhookSysColor();
 			break;
 		}
 
@@ -3729,10 +3725,12 @@ LRESULT CALLBACK dmlib_subclass::HotKeySubclass(
 				break;
 			}
 
-			dmlib_hook::hookSysColor();
-			const LRESULT resVal = ::DefSubclassProc(hWnd, uMsg, wParam, lParam);
-			dmlib_hook::unhookSysColor();
-			return resVal;
+			if (const auto autoHook = dmlib_hook::AutoHook<dmlib_hook::GetSysColor>();
+				autoHook)
+			{
+				return ::DefSubclassProc(hWnd, uMsg, wParam, lParam);
+			}
+			break;
 		}
 
 		default:
@@ -3771,7 +3769,6 @@ LRESULT CALLBACK dmlib_subclass::DTPSubclass(
 		case WM_NCDESTROY:
 		{
 			::RemoveWindowSubclass(hWnd, DTPSubclass, uIdSubclass);
-			dmlib_hook::unhookSysColor();
 			break;
 		}
 
@@ -3782,10 +3779,12 @@ LRESULT CALLBACK dmlib_subclass::DTPSubclass(
 				break;
 			}
 
-			dmlib_hook::hookSysColor();
-			const LRESULT resVal = ::DefSubclassProc(hWnd, uMsg, wParam, lParam);
-			dmlib_hook::unhookSysColor();
-			return resVal;
+			if (const auto autoHook = dmlib_hook::AutoHook<dmlib_hook::GetSysColor>();
+				autoHook)
+			{
+				return ::DefSubclassProc(hWnd, uMsg, wParam, lParam);
+			}
+			break;
 		}
 
 		// for DTS_APPCANPARSE style

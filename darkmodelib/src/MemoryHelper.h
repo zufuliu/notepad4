@@ -76,7 +76,7 @@ namespace dmlib_mem
 	{
 	public:
 		BufferWString() noexcept = default;
-		BufferWString(size_t count, wchar_t ch = L'\0') noexcept
+		explicit BufferWString(size_t count, wchar_t ch = L'\0') noexcept
 		{
 			if (count <= kStackCapacity)
 			{

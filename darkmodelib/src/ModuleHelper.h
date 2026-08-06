@@ -62,8 +62,14 @@ namespace dmlib_module
 		ModuleHandle() = delete;
 
 		explicit ModuleHandle(const wchar_t* moduleName) noexcept
-			: m_hModule(::LoadLibraryExW(moduleName, nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32))
-		{}
+			: m_hModule(::GetModuleHandleW(moduleName))
+			, m_shared(m_hModule != nullptr)
+		{
+			if (!m_shared)
+			{
+				m_hModule = ::LoadLibraryExW(moduleName, nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
+			}
+		}
 
 		ModuleHandle(const ModuleHandle&) = delete;
 		ModuleHandle& operator=(const ModuleHandle&) = delete;
@@ -73,7 +79,7 @@ namespace dmlib_module
 
 		~ModuleHandle()
 		{
-			if (m_hModule != nullptr)
+			if (m_hModule != nullptr && !m_shared)
 			{
 				::FreeLibrary(m_hModule);
 				m_hModule = nullptr;
@@ -92,5 +98,6 @@ namespace dmlib_module
 
 	private:
 		HMODULE m_hModule = nullptr;
+		bool m_shared = false;
 	};
 } // namespace dmlib_module

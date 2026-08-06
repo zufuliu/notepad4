@@ -93,42 +93,41 @@ struct WINDOWCOMPOSITIONATTRIBDATA
 };
 #endif
 
-using fnRtlGetNtVersionNumbers = void (WINAPI*)(LPDWORD major, LPDWORD minor, LPDWORD build);
+using RtlGetNtVersionNumbers_t = void (WINAPI*)(LPDWORD major, LPDWORD minor, LPDWORD build);
 #if defined(_DARKMODELIB_ALLOW_OLD_OS) && (_DARKMODELIB_ALLOW_OLD_OS > 0)
-using fnSetWindowCompositionAttribute = auto (WINAPI*)(HWND hWnd, WINDOWCOMPOSITIONATTRIBDATA*) -> BOOL;
+using SetWindowCompositionAttribute_t = auto (WINAPI*)(HWND hWnd, WINDOWCOMPOSITIONATTRIBDATA*) -> BOOL;
 #endif
 
 // 1809 17763
-using fnAllowDarkModeForWindow = auto (WINAPI*)(HWND hWnd, bool allow) -> bool; // ordinal 133
+using AllowDarkModeForWindow_t = auto (WINAPI*)(HWND hWnd, bool allow) -> bool; // ordinal 133
 #if defined(_DARKMODELIB_ALLOW_OLD_OS) && (_DARKMODELIB_ALLOW_OLD_OS > 0)
-using fnAllowDarkModeForApp = auto (WINAPI*)(bool allow) -> bool; // ordinal 135, in 1809
+using AllowDarkModeForApp_t = auto (WINAPI*)(bool allow) -> bool; // ordinal 135, in 1809
 #endif
-using fnFlushMenuThemes = void (WINAPI*)(); // ordinal 136
+using FlushMenuThemes_t = void (WINAPI*)(); // ordinal 136
 #if defined(_DARKMODELIB_ALLOW_OLD_OS) && (_DARKMODELIB_ALLOW_OLD_OS > 0)
-using fnIsDarkModeAllowedForWindow = auto (WINAPI*)(HWND hWnd) -> bool; // ordinal 137
+using IsDarkModeAllowedForWindow_t = auto (WINAPI*)(HWND hWnd) -> bool; // ordinal 137
 #endif
-using fnRefreshImmersiveColorPolicyState = void (WINAPI*)(); // ordinal 104
-using fnGetIsImmersiveColorUsingHighContrast = auto (WINAPI*)(IMMERSIVE_HC_CACHE_MODE mode) -> bool; // ordinal 106
+using RefreshImmersiveColorPolicyState_t = void (WINAPI*)(); // ordinal 104
+using GetIsImmersiveColorUsingHighContrast_t = auto (WINAPI*)(IMMERSIVE_HC_CACHE_MODE mode) -> bool; // ordinal 106
 
 // 1903 18362
-using fnSetPreferredAppMode = auto (WINAPI*)(PreferredAppMode appMode) -> PreferredAppMode; // ordinal 135, in 1903
+using SetPreferredAppMode_t = auto (WINAPI*)(PreferredAppMode appMode) -> PreferredAppMode; // ordinal 135, in 1903
 
 #if defined(_DARKMODELIB_ALLOW_OLD_OS) && (_DARKMODELIB_ALLOW_OLD_OS > 0)
-static fnSetWindowCompositionAttribute pfSetWindowCompositionAttribute = nullptr;
+static SetWindowCompositionAttribute_t pfSetWindowCompositionAttribute = nullptr;
 #endif
-static fnAllowDarkModeForWindow pfAllowDarkModeForWindow = nullptr;
+static AllowDarkModeForWindow_t pfAllowDarkModeForWindow = nullptr;
 #if defined(_DARKMODELIB_ALLOW_OLD_OS) && (_DARKMODELIB_ALLOW_OLD_OS > 0)
-static fnAllowDarkModeForApp pfAllowDarkModeForApp = nullptr;
+static AllowDarkModeForApp_t pfAllowDarkModeForApp = nullptr;
 #endif
-static fnFlushMenuThemes pfFlushMenuThemes = nullptr;
+static FlushMenuThemes_t pfFlushMenuThemes = nullptr;
 #if defined(_DARKMODELIB_ALLOW_OLD_OS) && (_DARKMODELIB_ALLOW_OLD_OS > 0)
-static fnIsDarkModeAllowedForWindow pfIsDarkModeAllowedForWindow = nullptr;
+static IsDarkModeAllowedForWindow_t pfIsDarkModeAllowedForWindow = nullptr;
 #endif
-static fnRefreshImmersiveColorPolicyState pfRefreshImmersiveColorPolicyState = nullptr;
-static fnGetIsImmersiveColorUsingHighContrast pfGetIsImmersiveColorUsingHighContrast = nullptr;
+static RefreshImmersiveColorPolicyState_t pfRefreshImmersiveColorPolicyState = nullptr;
+static GetIsImmersiveColorUsingHighContrast_t pfGetIsImmersiveColorUsingHighContrast = nullptr;
 
-// 1903 18362
-static fnSetPreferredAppMode pfSetPreferredAppMode = nullptr;
+static SetPreferredAppMode_t pfSetPreferredAppMode = nullptr;
 
 static bool g_darkModeSupported = false;
 static bool g_darkModeActive = false;
@@ -376,7 +375,7 @@ void dmlib_win32api::InitDarkMode() noexcept
 #pragma warning(push)
 #pragma warning(disable: 26429) // Symbol is never tested for nullness, it can be marked as not_null. // Already checked in dmlib_module::LoadFn.
 #endif
-	fnRtlGetNtVersionNumbers RtlGetNtVersionNumbers = nullptr;
+	RtlGetNtVersionNumbers_t RtlGetNtVersionNumbers = nullptr;
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif

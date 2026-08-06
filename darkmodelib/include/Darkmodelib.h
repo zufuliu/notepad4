@@ -297,6 +297,9 @@ namespace dmlib
 	 */
 	DMLIB_API void setSysColor(int nIndex, COLORREF color);
 
+	/// Updates custom color brushes for ChooseFont and ChooseColor dialogs.
+	DMLIB_API void updateCommonDlgsBrushes();
+
 	// ========================================================================
 	// Enhancements to DarkMode.h
 	// ========================================================================
