@@ -737,13 +737,13 @@ class ScintillaWin final :
 
 	std::string EncodeWString(std::wstring_view wsv) const;
 	sptr_t DefWndProc(Message iMessage, uptr_t wParam, sptr_t lParam) noexcept override;
-	void IdleWork() override;
-	void QueueIdleWork(WorkItems items, Sci::Position upTo) noexcept override;
-	bool SetIdle(bool on) noexcept override;
 	UINT_PTR timers[static_cast<int>(TickReason::dwell) + 1]{};
 	bool FineTickerRunning(TickReason reason) const noexcept override;
 	void FineTickerStart(TickReason reason, int millis, int tolerance) noexcept override;
 	void FineTickerCancel(TickReason reason) noexcept override;
+	void IdleWork() override;
+	void QueueIdleWork(WorkItems items, Sci::Position upTo) noexcept override;
+	bool SetIdle(bool on) noexcept override;
 	void SetMouseCapture(bool on) noexcept override;
 	bool HaveMouseCapture() const noexcept override;
 	void SetTrackMouseLeaveEvent(bool on) noexcept;
@@ -3309,7 +3309,7 @@ std::string ScintillaWin::CaseMapString(const std::string &s, CaseMapping caseMa
 	if (caseMapping >= CaseMapping::custom) {
 		size_t length = s.length();
 		const std::unique_ptr<char, HeapPointerFreer> pszText{EditMapTextCase(static_cast<int>(caseMapping), s.c_str(), length, cpDoc)};
-		if (pszText) {
+		if (pszText && static_cast<ptrdiff_t>(length) > 0) {
 			return {pszText.get(), length};
 		}
 		return s;

@@ -656,14 +656,21 @@ Sci::Line Document::GetLastChild(Sci::Line lineParent, FoldLevel level, Sci::Lin
 	if (lastLine < 0 || lastLine > maxLine) {
 		lastLine = maxLine;
 	}
-	Sci::Line lineEndStyled = SciLineFromPosition(GetEndStyled()) - 1;
 	Sci::Line lineMaxSubord = lineParent;
+
+	// A fold start is commonly closely followed by its last child, but it could be a long distance,
+	// perhaps the end of the file. This may be caused by an unbalanced fold start.
+	// To reduce lexer/folder overhead use progressively larger blocks of lines.
+	// First few grow by 1 then geometric 1.25x growth.
+	Sci::Line linesToStyle = 2;
+	constexpr size_t growthFraction = 4;
+
 	while (lineMaxSubord < maxLine) {
-		if (lineMaxSubord >= lineEndStyled) {
+		const Sci::Position posNeedStyle = LineStart(lineMaxSubord + 2);
+		if (posNeedStyle > GetEndStyled()) {
 			// two or more lines are required to make stable fold for most lexer
-			EnsureStyledTo(LineStart(lineMaxSubord + 2 + 1));
-			// LexerBase::Fold() already moved one line back
-			lineEndStyled = SciLineFromPosition(GetEndStyled()) - 1;
+			EnsureStyledTo(LineStart(lineMaxSubord + linesToStyle + 1));
+			linesToStyle += std::max<Sci::Line>(1, linesToStyle / growthFraction);
 		}
 		if (!IsSubordinate(levelStart, GetFoldLevel(lineMaxSubord + 1)))
 			break;
@@ -750,10 +757,7 @@ void Document::GetHighlightDelimiters(HighlightDelimiter &highlightDelimiter, Sc
 	if (firstChangeableLineAfter < 0)
 		firstChangeableLineAfter = endFoldBlock + 1;
 
-	highlightDelimiter.beginFoldBlock = beginFoldBlock;
-	highlightDelimiter.endFoldBlock = endFoldBlock;
-	highlightDelimiter.firstChangeableLineBefore = firstChangeableLineBefore;
-	highlightDelimiter.firstChangeableLineAfter = firstChangeableLineAfter;
+	highlightDelimiter.Set(beginFoldBlock, endFoldBlock, firstChangeableLineBefore, firstChangeableLineAfter);
 }
 
 Sci::Position Document::ClampPositionIntoDocument(Sci::Position pos) const noexcept {
@@ -1962,7 +1966,7 @@ Sci::Position Document::ExtendWordSelect(Sci::Position pos, int delta, bool only
 		if (pos > 0) {
 			const CharacterExtracted ce = CharacterBefore(pos);
 			const CharacterClass ceStart = WordCharacterClass(ce.character);
-			if (!onlyWordCharacters || ceStart == ccStart || ceStart == CharacterClass::cjkWord) {
+			if (!onlyWordCharacters || ceStart >= ccStart) {
 				ccStart = ceStart;
 				pos -= ce.widthBytes;
 			} else {
@@ -1980,7 +1984,7 @@ Sci::Position Document::ExtendWordSelect(Sci::Position pos, int delta, bool only
 		if (pos < LengthNoExcept()) {
 			const CharacterExtracted ce = CharacterAfter(pos);
 			const CharacterClass ceStart = WordCharacterClass(ce.character);
-			if (!onlyWordCharacters || ceStart == ccStart || ceStart == CharacterClass::cjkWord) {
+			if (!onlyWordCharacters || ceStart >= ccStart) {
 				ccStart = ceStart;
 				pos += ce.widthBytes;
 			} else {
@@ -3876,7 +3880,7 @@ const char *BuiltinRegex::SubstituteByPosition(const Document *doc, const char *
 	// https://en.cppreference.com/w/cpp/regex/match_results/format
 	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace
 
-	// keeps same as UnSlash()
+	// keeps same as TransformBackslashes()
 	static constexpr char backslashTable['x' - '\\' + 1] = {
 		'\\',	// '\'
 		0,		// ]
@@ -3910,15 +3914,17 @@ const char *BuiltinRegex::SubstituteByPosition(const Document *doc, const char *
 	};
 
 	substituted.clear();
+	const auto *byteMask = doc->GetDBCSByteMask();
 	for (Sci::Position j = 0; j < *length; j++) {
 		char ch = text[j];
+		char chNext = text[j + 1];
 		if (ch == '\\' || ch == '$') {
-			const char chNext = text[++j];
 			unsigned int patNum = chNext - '0';
 			if (patNum <= '9' - '0' || (ch == '$' && chNext == '&')) {
 				if (chNext == '&') {
 					patNum = 0;
 				}
+				j++;
 				const Sci::Position startPos = search.bopat[patNum];
 				const Sci::Position len = search.eopat[patNum] - startPos;
 				if (len > 0) {	// Will be null if try for a match that did not occur
@@ -3929,17 +3935,20 @@ const char *BuiltinRegex::SubstituteByPosition(const Document *doc, const char *
 				continue;
 			}
 			if (ch == '$') {
-				if (chNext != '$') {
-					j--;
+				if (chNext == '$') {
+					j++;
 				}
 			} else {
 				patNum -= '\\' - '0'; // patNum = chNext - '\\';
 				if (patNum < sizeof(backslashTable) && static_cast<signed char>(backslashTable[patNum]) > 0) {
 					ch = backslashTable[patNum];
-				} else {
-					j--;
+					j++;
 				}
 			}
+		} else if (byteMask && byteMask->IsLeadByte(ch) && byteMask->IsTrailByte(chNext)) {
+			j++;
+			std::swap(ch, chNext);
+			substituted.push_back(chNext);
 		}
 		substituted.push_back(ch);
 	}

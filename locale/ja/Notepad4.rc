@@ -1751,7 +1751,6 @@ BEGIN
 \\r\t復帰文字 (CR, ASCII 13 / 0D, キャリッジリターン)\n\
 \\t\tタブ Tab (HT, ASCII 9)\n\
 \\v\t垂直タブ (VT, ASCII 11 / 0B)\n\
-\\ooo\t8進数表記\n\
 \\uHHHH\t16進数表記\n\
 \\xHH\t16進数表記\n\
 \\\\\tバックスラッシュ自体"

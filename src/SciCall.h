@@ -29,7 +29,26 @@ extern "C"
 LRESULT SCI_METHOD Scintilla_DirectFunction(HANDLE handle, UINT msg, WPARAM wParam, LPARAM lParam);
 #define SciCall(m, w, l)	Scintilla_DirectFunction(g_hScintilla, (m), (w), (l))
 
+namespace Scintilla {
+enum class CharacterClass { space, newLine, punctuation, word, cjkWord }; // ILexer.h
+
+namespace Internal {
+struct DBCSByteMask { // CharClassify.h
+	uint8_t byteMask[256];
+	bool IsLeadByte(unsigned char ch) const noexcept {
+		return byteMask[ch] & true;
+	}
+	bool IsTrailByte(unsigned char ch) const noexcept {
+		return byteMask[ch] & 2;
+	}
+};
+
+}
+}
+
 using Sci_MarkerMask = unsigned int;
+using Scintilla::CharacterClass;
+using Scintilla::Internal::DBCSByteMask;
 
 constexpr COLORREF ColorAlpha(COLORREF rgb, UINT alpha) noexcept {
 	return rgb | (alpha << 24);
@@ -126,15 +145,6 @@ inline int SciCall_GetCharacterAndWidth(Sci_Position position, Sci_Position *wid
 inline int SciCall_GetCharacterAt(Sci_Position position) noexcept {
 	return static_cast<int>(SciCall(SCI_GETCHARACTERANDWIDTH, position, 0));
 }
-
-// same as CharacterClass in ILexer.h
-enum CharacterClass {
-	CharacterClass_Space,
-	CharacterClass_NewLine,
-	CharacterClass_Punctuation,
-	CharacterClass_Word,
-	CharacterClass_CJKWord
-};
 
 inline CharacterClass SciCall_GetCharacterClass(UINT character) noexcept {
 	return static_cast<CharacterClass>(SciCall(SCI_GETCHARACTERCLASS, character, 0));
@@ -587,10 +597,7 @@ inline void BeginWaitCursor() noexcept {
 }
 
 inline void EndWaitCursor() noexcept {
-	POINT pt;
 	SciCall_SetCursor(SC_CURSORNORMAL);
-	GetCursorPos(&pt);
-	SetCursorPos(pt.x, pt.y);
 }
 
 // Line endings
@@ -619,6 +626,10 @@ inline Sci_Position SciCall_WordStartPosition(Sci_Position position, bool onlyWo
 
 inline Sci_Position SciCall_WordEndPosition(Sci_Position position, bool onlyWordCharacters) noexcept {
 	return SciCall(SCI_WORDENDPOSITION, position, onlyWordCharacters);
+}
+
+inline Sci_Position SciCall_IsRangeWord(Sci_Position start, Sci_Position end) noexcept {
+	return SciCall(SCI_ISRANGEWORD, start, end);
 }
 
 inline void SciCall_SetCharClassesEx(int length, const unsigned char *characters) noexcept {
@@ -863,6 +874,10 @@ inline void SciCall_SetCodePage(UINT codePage) noexcept {
 
 inline UINT SciCall_GetCodePage() noexcept {
 	return static_cast<UINT>(SciCall(SCI_GETCODEPAGE, 0, 0));
+}
+
+inline const DBCSByteMask *SciCall_GetDBCSByteMask() noexcept {
+	return AsPointer<const DBCSByteMask *>(SciCall(SCI_GETCODEPAGE, TRUE, 0));
 }
 
 inline void SciCall_SetTechnology(int technology) noexcept {

@@ -268,6 +268,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	Sci::Position posTopLine;
 	Sci::Position lengthForEncode;
 
+	Sci::Position updateTextStart = InvalidPosition;
 	Scintilla::Update needUpdateUI;
 
 	enum class PaintState {

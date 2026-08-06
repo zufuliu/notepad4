@@ -422,12 +422,9 @@ static inline void InvalidateStyleRedraw() noexcept {
 //
 //
 static void CleanUpResources(bool initialized) noexcept {
-	if (tchToolbarBitmap != nullptr) {
-		LocalFree(tchToolbarBitmap);
-	}
-	if (lpSchemeArg) {
-		LocalFree(lpSchemeArg);
-	}
+	LocalFree(tchToolbarBitmap);
+	LocalFree(lpSchemeArg);
+	LocalFree(lpEncodingArg);
 
 	Encoding_ReleaseResources();
 	Style_ReleaseResources();
@@ -598,7 +595,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 	// Try to activate another window
 	if (ActivatePrevInst()) {
-		NP2HeapFree(lpFileArg);
 		return 0;
 	}
 
@@ -697,7 +693,7 @@ static void HandleMatchText(MatchTextFlag flag, LPCWSTR lpszText, bool jumpTo) n
 	if (StrNotEmpty(lpszText) && SciCall_GetLength()) {
 		const UINT cpEdit = SciCall_GetCodePage();
 		WideCharToMultiByte(cpEdit, 0, lpszText, -1, efrData.szFind, COUNTOF(efrData.szFind), nullptr, nullptr);
-		WideCharToMultiByte(CP_UTF8, 0, lpszText, -1, efrData.szFindUTF8, COUNTOF(efrData.szFindUTF8), nullptr, nullptr);
+		lstrcpyn(efrData.szFindUTF16, lpszText, COUNTOF(efrData.szFindUTF16));
 
 		if (flag & MatchTextFlag_Regex) {
 			efrData.fuFlags |= (iFindReplaceOption & FindReplaceOption_UseCxxRegex) ? (SCFIND_REGEXP | SCFIND_CXX11REGEX) : (SCFIND_REGEXP | SCFIND_POSIX);
@@ -1706,7 +1702,6 @@ void EditCreate(HWND hwndParent) noexcept {
 						  g_hInstance,
 						  nullptr);
 	hwndEdit = hwnd;
-	efrData.hwnd = hwnd;
 	InitScintillaHandle(hwnd);
 	//SciInitThemes(hwnd);
 	if (bEditLayoutRTL) {
@@ -3111,7 +3106,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			SciCall_SetSel(iPos, iNewPos);
 			SendWMCommand(hwnd, IDM_EDIT_CLEARCLIPBOARD);
 		} else {
-			char *pClip = EditGetClipboardText(hwndEdit);
+			char *pClip = EditGetClipboardText();
 			if (pClip == nullptr) {
 				break;
 			}
@@ -3247,13 +3242,13 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_EDIT_TRIMLINES:
 		BeginWaitCursor();
-		EditStripTrailingBlanks(hwndEdit, false);
+		EditStripTrailingBlanks(false);
 		EndWaitCursor();
 		break;
 
 	case IDM_EDIT_TRIMLEAD:
 		BeginWaitCursor();
-		EditStripLeadingBlanks(hwndEdit, false);
+		EditStripLeadingBlanks(false);
 		EndWaitCursor();
 		break;
 
@@ -3319,17 +3314,17 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_EDIT_CONVERTUPPERCASE:
-		BeginWaitCursor();
-		SciCall_UpperCase();
-		EndWaitCursor();
-		break;
-
 	case IDM_EDIT_CONVERTLOWERCASE:
 		BeginWaitCursor();
-		SciCall_LowerCase();
+		// see CaseMapping in Editor.h
+		SciCall_CustomCaseMapping(LOWORD(wParam) - IDM_EDIT_CONVERTUPPERCASE + 1);
 		EndWaitCursor();
 		break;
 
+	case IDM_EDIT_ESCAPECCHARS:
+	case IDM_EDIT_UNESCAPECCHARS:
+	case IDM_EDIT_XHTML_ESCAPE_CHAR:
+	case IDM_EDIT_XHTML_UNESCAPE_CHAR:
 	case IDM_EDIT_INVERTCASE:
 	case IDM_EDIT_TITLECASE:
 	case IDM_EDIT_SENTENCECASE:
@@ -3566,30 +3561,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		EditURLDecode();
 		break;
 
-	case IDM_EDIT_ESCAPECCHARS:
-		BeginWaitCursor();
-		EditEscapeCChars(hwndEdit);
-		EndWaitCursor();
-		break;
-
-	case IDM_EDIT_UNESCAPECCHARS:
-		BeginWaitCursor();
-		EditUnescapeCChars(hwndEdit);
-		EndWaitCursor();
-		break;
-
-	case IDM_EDIT_XHTML_ESCAPE_CHAR:
-		BeginWaitCursor();
-		EditEscapeXHTMLChars(hwndEdit);
-		EndWaitCursor();
-		break;
-
-	case IDM_EDIT_XHTML_UNESCAPE_CHAR:
-		BeginWaitCursor();
-		EditUnescapeXHTMLChars(hwndEdit);
-		EndWaitCursor();
-		break;
-
 	case IDM_EDIT_CHAR2HEX:
 		BeginWaitCursor();
 		EditCharacterToHex();
@@ -3768,7 +3739,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 		case IDM_EDIT_REPLACENEXT:
 			if (bReplaceInitialized && StrNotEmpty(efrData.szFind)) {
-				EditReplace(hwndEdit, &efrData);
+				EditReplace(&efrData);
 			} else {
 				SendWMCommand(hwnd, IDM_EDIT_REPLACE);
 			}
@@ -4528,7 +4499,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 #endif
 
 	case CMD_TIMESTAMPS:
-		EditUpdateTimestampMatchTemplate(hwndEdit);
+		EditUpdateTimestampMatchTemplate();
 		break;
 
 	case CMD_OPEN_PATH_OR_LINK:
@@ -4672,11 +4643,15 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	switch (pnmh->idFrom) {
 	case IDC_EDIT:
 		switch (pnmh->code) {
-		case SCN_UPDATEUI:
-			if (scn->updated & ~(SC_UPDATE_V_SCROLL | SC_UPDATE_H_SCROLL)) {
+		case SCN_UPDATEUI: {
+			const unsigned updated = scn->updated;
+			if (updated & ~(SC_UPDATE_V_SCROLL | SC_UPDATE_H_SCROLL)) {
 				UpdateToolbar();
+				if (updated & SC_UPDATE_LINE_COUNT) {
+					UpdateLineNumberWidth();
+				}
 
-				if (scn->updated & SC_UPDATE_SELECTION) {
+				if (updated & SC_UPDATE_SELECTION) {
 					const int overType = scn->listType;
 					cachedStatusItem.updateMask |= (1 << StatusItem_Character) | (1 << StatusItem_Column)
 						| (1 << StatusItem_Selection) | (1 << StatusItem_SelectedLine);
@@ -4695,10 +4670,10 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 								editMarkAll.Clear();
 							}
 						} else {
-							editMarkAll.MarkAll((scn->updated & SC_UPDATE_CONTENT), bMarkOccurrences);
+							editMarkAll.MarkAll((updated & SC_UPDATE_TEXT), bMarkOccurrences);
 						}
 					}
-				} else if (scn->updated & SC_UPDATE_CONTENT) {
+				} else if (updated & SC_UPDATE_TEXT) {
 					// cachedStatusItem.updateMask is already set in SCN_MODIFIED.
 					if (editMarkAll.matchCount) {
 						editMarkAll.MarkAll(TRUE, bMarkOccurrences);
@@ -4744,7 +4719,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 					}
 				}
 			}
-			break;
+		} break;
 
 		case SCN_CHARADDED: {
 			// fix cursor flash on typing when "Hide pointer while typing" is enabled
@@ -4883,9 +4858,6 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			// we only watch SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT
 			++dwCurrentDocReversion;
 			UpdateStatusBarCacheLineColumn();
-			if (scn->linesAdded) {
-				UpdateLineNumberWidth();
-			}
 			AutoSave_Start(false);
 			break;
 
@@ -6769,7 +6741,7 @@ bool FileIO(bool fLoad, LPWSTR pszFile, FileSaveFlag flag, EditFileIOStatus &sta
 		iSrcEncoding = CPI_NONE;
 		iWeakSrcEncoding = CPI_NONE;
 	} else {
-		fLoad = EditSaveFile(hwndEdit, pszFile, flag, status);
+		fLoad = EditSaveFile(pszFile, flag, status);
 	}
 
 	const DWORD dwFileAttributes = GetFileAttributes(pszFile);
@@ -7494,13 +7466,17 @@ bool ActivatePrevInst() noexcept {
 				}
 			}
 			ActivatePrevWindow(hwnd, lpszFile);
-			return true;
 		}
 
 		// Ask...
-		if (IDYES == MsgBoxAsk(MB_YESNO, IDS_ERR_PREVWINDISABLED)) {
+		else if (IDYES == MsgBoxAsk(MB_YESNO, IDS_ERR_PREVWINDISABLED)) {
 			return false;
 		}
+
+		NP2HeapFree(lpFileArg);
+		LocalFree(lpSchemeArg);
+		LocalFree(lpMatchArg);
+		LocalFree(lpEncodingArg);
 		return true;
 	}
 	return false;
@@ -8130,7 +8106,7 @@ void AutoSave_DoWork(FileSaveFlag saveFlag) noexcept {
 		EditFileIOStatus status{};
 		status.iEncoding = iCurrentEncoding;
 		status.iEOLMode = iCurrentEOLMode;
-		if (EditSaveFile(hwndEdit, szCurFile, FileSaveFlag_EndSession, status)) {
+		if (EditSaveFile(szCurFile, FileSaveFlag_EndSession, status)) {
 			dwLastSavedDocReversion = dwCurrentDocReversion;
 			InstallFileWatching(false);
 			return;

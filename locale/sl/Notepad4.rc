@@ -1751,7 +1751,6 @@ BEGIN
 \\r\tCarriage return (CR, ASCII 13 / 0D)\n\
 \\t\tHorizontal Tab (HT, ASCII 9)\n\
 \\v\tVertical Tab (VT, ASCII 11 / 0B)\n\
-\\ooo\tOctal Value\n\
 \\uHHHH\tHexadecimal Value\n\
 \\xHH\tHexadecimal Value\n\
 \\\\\tBackslash"

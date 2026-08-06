@@ -1751,7 +1751,6 @@ BEGIN
 \\r\t回車 (CR, ASCII 13 / 0D)。\n\
 \\t\t水平 Tab (HT, ASCII 9)。\n\
 \\v\t垂直 Tab (VT, ASCII 11 / 0B)。\n\
-\\ooo\t八進位值。\n\
 \\uHHHH\t十六進位值。\n\
 \\xHH\t十六進位值。\n\
 \\\\\t反斜線。"

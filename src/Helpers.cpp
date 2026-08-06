@@ -2873,7 +2873,7 @@ LRESULT CALLBACK FileDialog::SubProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 /**
  * Convert C style \a, \b, \f, \n, \r, \t, \v, \xhh and \uhhhh into their indicated characters.
  */
-unsigned int UnSlash(char *s, UINT cpEdit) noexcept {
+void TransformBackslashes(char *pszInput, UINT cpEdit) noexcept {
 	// same as BuiltinRegex::SubstituteByPosition()
 	static constexpr char backslashTable['x' - '\\' + 1] = {
 		'\\',	// '\'
@@ -2907,8 +2907,8 @@ unsigned int UnSlash(char *s, UINT cpEdit) noexcept {
 		'\x82',	// x
 	};
 
-	const char * const start = s;
-	char *o = s;
+	char *o = pszInput;
+	const char *s = pszInput;
 
 	while (*s) {
 		if (*s != '\\') {
@@ -2964,78 +2964,6 @@ unsigned int UnSlash(char *s, UINT cpEdit) noexcept {
 	}
 
 	*o = '\0';
-	return static_cast<unsigned int>(o - start);
-}
-
-/**
- * Convert C style \0oo into their indicated characters.
- * This is used to get control characters into the regular expression engine.
- */
-unsigned int UnSlashLowOctal(char *s) noexcept {
-	const char * const start = s;
-	char *o = s;
-
-	while (*s) {
-		if ((s[0] == '\\') && (s[1] == '0') && IsOctalDigit(s[2]) && IsOctalDigit(s[3])) {
-			*o = static_cast<char>(8 * (s[2] - '0') + (s[3] - '0'));
-			s += 3;
-		} else {
-			*o = *s;
-		}
-		o++;
-		if (*s) {
-			s++;
-		}
-	}
-
-	*o = '\0';
-	return static_cast<unsigned int>(o - start);
-}
-
-void TransformBackslashes(char *pszInput, BOOL bRegEx, UINT cpEdit) noexcept {
-	if (bRegEx) {
-		UnSlashLowOctal(pszInput);
-	} else {
-		UnSlash(pszInput, cpEdit);
-	}
-}
-
-bool AddBackslashA(char *pszOut, const char *pszInput) noexcept {
-	bool hasEscapeChar = false;
-	bool hasSlash = false;
-	char *lpszEsc = pszOut;
-	const char *lpsz = pszInput;
-	while (*lpsz) {
-		unsigned char ch = *lpsz++;
-		const uint8_t index = ch - '\a';
-		if (index <= '\r' - '\a') {
-			ch = "abtnvfr"[index];
-			hasEscapeChar = true;
-			*lpszEsc++ = '\\';
-			*lpszEsc++ = ch;
-		} else if (ch == '\x1B') {
-			hasEscapeChar = true;
-			*lpszEsc++ = '\\';
-			*lpszEsc++ = 'e';
-		} else if (ch < ' ' || ch == 0x7f) {
-			hasEscapeChar = true;
-			*lpszEsc++ = '\\';
-			*lpszEsc++ = 'x';
-			*lpszEsc++ = "0123456789ABCDEF"[ch >> 4];
-			*lpszEsc++ = "0123456789ABCDEF"[ch & 15];
-		} else {
-			*lpszEsc++ = ch;
-			if (ch == '\\') {
-				hasSlash = true;
-				*lpszEsc++ = ch;
-			}
-		}
-	}
-
-	if (hasSlash && !hasEscapeChar) {
-		strcpy(pszOut, pszInput);
-	}
-	return hasEscapeChar;
 }
 
 bool AddBackslashW(LPWSTR pszOut, LPCWSTR pszInput) noexcept {

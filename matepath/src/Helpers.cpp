@@ -1751,11 +1751,11 @@ void HistoryList::Empty() noexcept {
 	}
 }
 
-bool HistoryList::Add(LPCWSTR pszNew) noexcept {
+void HistoryList::Add(LPCWSTR pszNew) noexcept {
 	// Item to be added is equal to current item
 	if (iCurItem >= 0 && iCurItem < HISTORY_ITEMS) {
 		if (pszItems[iCurItem] != nullptr && PathEqual(pszNew, pszItems[iCurItem])) {
-			return false;
+			return;
 		}
 	}
 
@@ -1769,6 +1769,7 @@ bool HistoryList::Add(LPCWSTR pszNew) noexcept {
 		}
 	} else {
 		// Shift
+		iCurItem = 0;
 		if (pszItems[0]) {
 			LocalFree(pszItems[0]);
 		}
@@ -1777,8 +1778,6 @@ bool HistoryList::Add(LPCWSTR pszNew) noexcept {
 	}
 
 	pszItems[iCurItem] = StrDup(pszNew);
-
-	return true;
 }
 
 bool HistoryList::Forward(LPWSTR pszItem, int cItem) noexcept {
