@@ -174,8 +174,7 @@ void	EditURLEncode(bool component) noexcept;
 void	EditURLDecode() noexcept;
 char*	EditEscapeChars(EscapeMenu menu, const char *pszText, size_t &iSelCount) noexcept;
 void	EditCalculateExpr(int menu);
-void	EditCharacterToHex() noexcept;
-void	EditHexToCharacter() noexcept;
+char*	EditCharacterToHex(int menu, LPCSTR lpszSelection, size_t &iSelCount, UINT cpEdit) noexcept;
 void	EditShowHex() noexcept;
 void	EditShowCharacterInfo() noexcept;
 

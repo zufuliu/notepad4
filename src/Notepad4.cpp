@@ -3306,6 +3306,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		EndWaitCursor();
 		break;
 
+	case IDM_EDIT_CHAR2HEX:
+	case IDM_EDIT_HEX2CHAR:
 	case IDM_EDIT_ESCAPECCHARS:
 	case IDM_EDIT_UNESCAPECCHARS:
 	case IDM_EDIT_XHTML_ESCAPE_CHAR:
@@ -3544,18 +3546,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_EDIT_URLDECODE:
 		EditURLDecode();
-		break;
-
-	case IDM_EDIT_CHAR2HEX:
-		BeginWaitCursor();
-		EditCharacterToHex();
-		EndWaitCursor();
-		break;
-
-	case IDM_EDIT_HEX2CHAR:
-		BeginWaitCursor();
-		EditHexToCharacter();
-		EndWaitCursor();
 		break;
 
 	case IDM_EDIT_SHOW_HEX:

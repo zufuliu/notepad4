@@ -1498,6 +1498,9 @@ char *EditMapTextCase(int menu, const char *pszText, size_t &iSelCount, UINT cpE
 	DWORD flags = 0;
 	const GUID *pGuid = nullptr;
 	switch (menu) {
+	case IDM_EDIT_CHAR2HEX:
+	case IDM_EDIT_HEX2CHAR:
+		return EditCharacterToHex(menu, pszText, iSelCount, cpEdit);
 	case IDM_EDIT_ESCAPECCHARS:
 	case IDM_EDIT_UNESCAPECCHARS:
 	case IDM_EDIT_XHTML_ESCAPE_CHAR:
@@ -1922,11 +1925,6 @@ char *EditEscapeChars(EscapeMenu menu, const char *pszText, size_t &iSelCount) n
 	return pszOut;
 }
 
-//=============================================================================
-//
-// EditChar2Hex()
-//
-
 /*				C/C++	C#	Java	JS	JSON	Python	PHP	Lua		Go
 \ooo		3	1			1					1		1	1/ddd	1
 \xHH		2	1		1			1			1		1			1
@@ -1937,82 +1935,56 @@ char *EditEscapeChars(EscapeMenu menu, const char *pszText, size_t &iSelCount) n
 */
 #define BMP_UNICODE_HEX_DIGIT	4
 #define MAX_UNICODE_HEX_DIGIT	8
+char *EditCharacterToHex(int menu, LPCSTR lpszSelection, size_t &iSelCount, UINT cpEdit) noexcept {
+	const size_t wcharLen = NP2_align_up(iSelCount + 1, MEMORY_ALLOCATION_ALIGNMENT);
+	const size_t offset = wcharLen * (2 + BMP_UNICODE_HEX_DIGIT);
+	const size_t allocSize = offset + wcharLen*sizeof(WCHAR);
+	char * const pszText = static_cast<char *>(NP2HeapAlloc(allocSize));
+	WCHAR * const pszTextW = reinterpret_cast<WCHAR *>(pszText + offset);
 
-void EditCharacterToHex() noexcept {
-	Sci_Position iSelCount = SciCall_GetSelTextLength();
-	if (iSelCount == 0) {
-		return;
-	}
-	if (SciCall_IsRectangularSelection()) {
-		NotifyRectangularSelection();
-		return;
-	}
-
-	iSelCount *= MAX_UNICODE_HEX_DIGIT;
-	iSelCount = NP2_align_up(iSelCount + 1, MEMORY_ALLOCATION_ALIGNMENT);
-	char * const pszText = static_cast<char *>(NP2HeapAlloc(iSelCount * (sizeof(char) + sizeof(WCHAR))));
-	SciCall_GetSelText(pszText);
-
-	int outLen = 0;
-	if (pszText[0] == '\0') {
-		outLen = 4;
-		StrCpyEx(pszText, "\\x00");
-	} else {
-		WCHAR * const pszTextW = reinterpret_cast<WCHAR *>(pszText + iSelCount);
-		const UINT cpEdit = SciCall_GetCodePage();
-		const int count = MultiByteToWideChar(cpEdit, 0, pszText, -1, pszTextW, static_cast<int>(iSelCount)) - 1; // '\0'
-		for (Sci_Position i = 0; i < count; i++) {
-			const WCHAR c = pszTextW[i];
+	const UINT count = MultiByteToWideChar(cpEdit, 0, lpszSelection, static_cast<int>(iSelCount), pszTextW, static_cast<int>(wcharLen));
+	const WCHAR * const end = pszTextW + count;
+	const WCHAR *p = pszTextW;
+	iSelCount = 0;
+	if (menu == IDM_EDIT_CHAR2HEX) {
+		size_t outLen = 0;
+		do {
+			const WCHAR c = *p++;
 			if (c <= 0xFF) {
 				outLen += sprintf(pszText + outLen, "\\x%02X", c); // \xHH
 			} else {
 				outLen += sprintf(pszText + outLen, "\\u%04X", c); // \uHHHH
 			}
-		}
+		} while (p < end);
 		if (count == 2 && IS_SURROGATE_PAIR(pszTextW[0], pszTextW[1])) {
 			const UINT value = UTF16_TO_UTF32(pszTextW[0], pszTextW[1]);
 			outLen += sprintf(pszText + outLen, " U+%06X", value);
 		}
+
+		iSelCount = outLen;
+		return pszText;
 	}
 
-	EditReplaceMainSelection(outLen, pszText);
-	NP2HeapFree(pszText);
-}
-
-//=============================================================================
-//
-// EditHex2Char()
-//
-void EditHexToCharacter() noexcept {
-	Sci_Position iSelCount = SciCall_GetSelTextLength();
-	if (iSelCount == 0) {
-		return;
-	}
-	if (SciCall_IsRectangularSelection()) {
-		NotifyRectangularSelection();
-		return;
-	}
-
-	iSelCount *= MAX_UNICODE_HEX_DIGIT;
-	iSelCount = NP2_align_up(iSelCount + 1, MEMORY_ALLOCATION_ALIGNMENT);
-	char * const pszText = static_cast<char *>(NP2HeapAlloc(iSelCount * (sizeof(char) + sizeof(WCHAR))));
-	WCHAR * const pszTextW = reinterpret_cast<WCHAR *>(pszText + iSelCount);
-
-	SciCall_GetSelText(pszText);
-	const UINT cpEdit = SciCall_GetCodePage();
-	MultiByteToWideChar(cpEdit, 0, pszText, -1, pszTextW, static_cast<int>(iSelCount));
-
-	const WCHAR *p = pszTextW;
 	WCHAR *t = pszTextW;
 	bool changed = false;
-	while (*p) {
+	do {
 		UINT wc = *p++;
-		if ((wc == L'\\' && (*p == L'x' || UnsafeLower(*p) == 'u')) || (wc == L'U' && *p == L'+')) {
-			const int digitCount = (wc == L'U' || *p == L'U') ? MAX_UNICODE_HEX_DIGIT : BMP_UNICODE_HEX_DIGIT;
+		const wchar_t chNext = p[0];
+		if ((wc == L'\\' && (chNext == L'x' || UnsafeUpper(chNext) == 'U')) || (wc == L'U' && chNext == L'+')) {
+			// \x[2, 4], \u[4], \U[8], U+[4, 6]
+			#define mask_offset(c)	((((c) + ((c) >> 4)) & 3) * 8)
+			constexpr unsigned mask = ((2 | (4 << 4)) << mask_offset('x'))
+				| ((4 | (4 << 4)) << mask_offset('u'))
+				| ((8 | (8 << 4)) << mask_offset('U'))
+				| ((4 | (6 << 4)) << mask_offset('+'));
+			unsigned minCount = (mask >> mask_offset(chNext)) & 0xff;
+			const unsigned digitCount = minCount >> 4;
+			minCount &= 15;
+			#undef mask_offset
 			UINT value = 0;
-			int ucc = 1;
+			unsigned ucc = 1;
 			p++;
-			for (; ucc <= digitCount && *p; ucc++) {
+			for (; ucc <= digitCount; ucc++) {
 				const int hex = GetHexDigit(*p);
 				if (hex < 0) {
 					break;
@@ -2020,7 +1992,12 @@ void EditHexToCharacter() noexcept {
 				value = (value << 4) | hex;
 				p++;
 			}
-			if (ucc > 1 && value <= MAX_UNICODE) {
+			if ((ucc & 1) == 0) { // strip odd hex
+				p--;
+				value >>= 4;
+				ucc--;
+			}
+			if (ucc > minCount && value <= MAX_UNICODE) {
 				changed = true;
 				// see UTF16FromUTF32Character() in UniConversion.h
 				if (value < SUPPLEMENTAL_PLANE_FIRST) {
@@ -2034,15 +2011,14 @@ void EditHexToCharacter() noexcept {
 			}
 		}
 		*t++ = static_cast<WCHAR>(wc);
-	}
+	} while (p < end);
 
 	if (changed) {
 		*t = L'\0';
-		iSelCount = WideCharToMultiByte(cpEdit, 0, pszTextW, static_cast<int>(t - pszTextW), pszText, static_cast<int>(iSelCount), nullptr, nullptr);
-		EditReplaceMainSelection(iSelCount, pszText);
+		iSelCount = WideCharToMultiByte(cpEdit, 0, pszTextW, static_cast<int>(t - pszTextW), pszText, static_cast<int>(allocSize), nullptr, nullptr);
 	}
 
-	NP2HeapFree(pszText);
+	return pszText;
 }
 
 void EditShowHex() noexcept {
