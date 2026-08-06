@@ -72,6 +72,9 @@ static void DarkMode_SetCustomColors() noexcept {
 	dmlib::setSysColor(COLOR_WINDOW, HEXRGB(0x1E1E1E));
 	dmlib::setSysColor(COLOR_WINDOWTEXT, HEXRGB(0xD4D4D4));
 	dmlib::setSysColor(COLOR_BTNFACE, HEXRGB(0x3C3C3C));
+
+	// Luminosity slider brush follows the darker text color set above.
+	dmlib::updateCommonDlgsBrushes();
 }
 
 static void DarkMode_PaintResizeGrip(HWND hwnd, HDC hdc) noexcept {
@@ -301,6 +304,13 @@ static void DarkMode_ApplyDialogStyling(HWND hwnd, DWORD_PTR dwRefData) noexcept
 	if (dwRefData == DialogRefData_MessageBox) {
 		SetWindowSubclass(hwnd, DarkMode_MessageBoxSubclass, DarkMode_MessageBoxSubclassId, 0);
 		InvalidateRect(hwnd, nullptr, TRUE);
+	} else if (dwRefData == DialogRefData_CommonDialog) {
+		// Installs darkmodelib's common dialog subclass, which colorizes the parts
+		// ChooseFont() and ChooseColor() draw themselves: the font preview, the
+		// owner-drawn font combo boxes, the luminosity slider and their message boxes.
+		// Driving it from Notepad4's CBT hook instead of CF_ENABLEHOOK/CC_ENABLEHOOK
+		// keeps the system's modern, localized dialog template.
+		dmlib::HookDlgProc(hwnd, WM_INITDIALOG, 0, 0);
 	}
 }
 
@@ -392,6 +402,7 @@ void DarkMode_OnThemeChanged(int newTheme) noexcept {
 		dmlib::setSysColor(COLOR_WINDOW, GetSysColor(COLOR_WINDOW));
 		dmlib::setSysColor(COLOR_WINDOWTEXT, GetSysColor(COLOR_WINDOWTEXT));
 		dmlib::setSysColor(COLOR_BTNFACE, GetSysColor(COLOR_BTNFACE));
+		dmlib::updateCommonDlgsBrushes();
 	}
 }
 

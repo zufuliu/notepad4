@@ -8,6 +8,7 @@ enum DialogRefData {
 	DialogRefData_RightBottom,
 	DialogRefData_DefaultPosition,
 	DialogRefData_CustomizeToolbar,
+	DialogRefData_CommonDialog,
 	DialogRefData_MaxValue,
 };
 
