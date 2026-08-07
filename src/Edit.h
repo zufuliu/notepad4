@@ -624,6 +624,7 @@ LPSTR RecodeAsUTF8(LPSTR lpData, DWORD *cbData, UINT codePage, DWORD flags) noex
 int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, int *encodingFlag) noexcept;
 bool IsStringCaseSensitiveW(LPCWSTR pszTextW) noexcept;
 bool IsStringCaseSensitiveA(LPCSTR pszText) noexcept;
+void TransformBackslashes(char *pszInput, UINT cpEdit, const DBCSByteMask *byteMask) noexcept;
 
 //void SciInitThemes(HWND hwnd) noexcept;
 

@@ -1286,7 +1286,6 @@ struct FileDialog {
 	static LRESULT CALLBACK SubProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 };
 
-void TransformBackslashes(char *pszInput, UINT cpEdit) noexcept;
 // backslash escape for C0 control character => \xHH
 #define kMaxBackslashEscapeCount	4
 // backslash escape regex meta character

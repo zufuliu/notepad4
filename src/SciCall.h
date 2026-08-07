@@ -876,8 +876,8 @@ inline UINT SciCall_GetCodePage() noexcept {
 	return static_cast<UINT>(SciCall(SCI_GETCODEPAGE, 0, 0));
 }
 
-inline const DBCSByteMask *SciCall_GetDBCSByteMask() noexcept {
-	return AsPointer<const DBCSByteMask *>(SciCall(SCI_GETCODEPAGE, TRUE, 0));
+inline UINT SciCall_GetDBCSByteMask(const DBCSByteMask* &byteMask) noexcept {
+	return static_cast<UINT>(SciCall(SCI_GETCODEPAGE, AsInteger<WPARAM>(&byteMask), 0));
 }
 
 inline void SciCall_SetTechnology(int technology) noexcept {

@@ -1798,13 +1798,14 @@ char *EditEscapeChars(EscapeMenu menu, const char *pszText, size_t &iSelCount) n
 		'\r',	// r
 		0,		// s
 		'\t',	// t
-		'\x84',	// u
+		'\x86',	// u
 		'\v',	// v
 		0,		// w
-		'\x82',	// x
+		'\x84',	// x
 	};
 
-	const auto *byteMask = SciCall_GetDBCSByteMask();
+	const DBCSByteMask *byteMask = nullptr;
+	SciCall_GetDBCSByteMask(byteMask);
 	char * const pszOut = static_cast<char *>(NP2HeapAlloc((iSelCount + 1) * 6));
 	const int rid = pLexCurrent->rid;
 	size_t outLen = 0;
@@ -5176,29 +5177,25 @@ HWND EditFindReplaceDlg(HWND hwnd, EDITFINDREPLACE *lpefr, bool bReplace) noexce
 
 // Wildcard search uses the regexp engine to perform a simple search with * ?
 // as wildcards instead of more advanced and user-unfriendly regexp syntax.
-static void EscapeWildcards(char *szFind2) noexcept {
-	char szWildcardEscaped[NP2_FIND_REPLACE_LIMIT];
-	int iSource = 0;
-	int iDest = 0;
-
-	while (szFind2[iSource]) {
-		const char c = szFind2[iSource];
+static void EscapeWildcards(char *pszOut, const char *pszIn, const DBCSByteMask *byteMask) noexcept {
+	while (*pszIn) {
+		uint8_t c = *pszIn++;
 		if (c == '*') {
-			szWildcardEscaped[iDest++] = '.';
-			szWildcardEscaped[iDest] = '*';
+			*pszOut++ = '.';
+			c = '*';
 		} else if (c == '?') {
-			szWildcardEscaped[iDest] = '.';
+			c = '.';
 		} else {
 			if (c == '.' || c == '^' || c == '$' || c == '\\' || c == '[' || c == ']' || c == '+') {
-				szWildcardEscaped[iDest++] = '\\';
+				*pszOut++ = '\\';
+			} else if (byteMask && byteMask->IsLeadByte(c) && byteMask->IsTrailByte(*pszIn)) {
+				*pszOut++ = c;
+				c = *pszIn++;
 			}
-			szWildcardEscaped[iDest] = c;
 		}
-		iSource++;
-		iDest++;
+		*pszOut++ = c;
 	}
-	szWildcardEscaped[iDest] = 0;
-	strncpy(szFind2, szWildcardEscaped, COUNTOF(szWildcardEscaped));
+	*pszOut = '\0';
 }
 
 int EditPrepareFind(char *szFind2, const EDITFINDREPLACE *lpefr) noexcept {
@@ -5206,19 +5203,22 @@ int EditPrepareFind(char *szFind2, const EDITFINDREPLACE *lpefr) noexcept {
 		return NP2_InvalidSearchFlags;
 	}
 
+	const DBCSByteMask *byteMask = nullptr;
+	const UINT cpEdit = SciCall_GetDBCSByteMask(byteMask);
 	int searchFlags = lpefr->fuFlags;
 	strncpy(szFind2, lpefr->szFind, NP2_FIND_REPLACE_LIMIT);
 	if (lpefr->option & FindReplaceOption_TransformBackslash) {
-		const UINT cpEdit = SciCall_GetCodePage();
-		TransformBackslashes(szFind2, cpEdit);
+		TransformBackslashes(szFind2, cpEdit, byteMask);
 	}
 	if (StrIsEmpty(szFind2)) {
 		InfoBoxWarn(MB_OK, L"MsgNotFound", IDS_NOTFOUND);
 		return NP2_InvalidSearchFlags;
 	}
 	if (lpefr->option & FindReplaceOption_WildcardSearch) {
-		EscapeWildcards(szFind2);
 		searchFlags |= SCFIND_REGEXP;
+		char szWildcardEscaped[NP2_FIND_REPLACE_LIMIT];
+		EscapeWildcards(szWildcardEscaped, szFind2, byteMask);
+		strncpy(szFind2, szWildcardEscaped, COUNTOF(szWildcardEscaped));
 	} else if (!(searchFlags & (SCFIND_REGEXP | SCFIND_MATCHCASE))) {
 		const BOOL sensitive = IsStringCaseSensitiveA(szFind2);
 		//printf("%s sensitive=%d\n", __func__, sensitive);
@@ -5240,8 +5240,9 @@ int EditPrepareReplace(char *szFind2, char **pszReplace2, BOOL *bReplaceRE, cons
 	} else {
 		*pszReplace2 = StrDupA(lpefr->szReplace);
 		if (lpefr->option & FindReplaceOption_TransformBackslash) {
-			const UINT cpEdit = SciCall_GetCodePage();
-			TransformBackslashes(*pszReplace2, cpEdit);
+			const DBCSByteMask *byteMask = nullptr;
+			const UINT cpEdit = SciCall_GetDBCSByteMask(byteMask);
+			TransformBackslashes(*pszReplace2, cpEdit, byteMask);
 		}
 	}
 

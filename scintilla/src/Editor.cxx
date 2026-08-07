@@ -7541,7 +7541,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 
 	case Message::GetCodePage:
 		if (wParam) {
-			return AsInteger<sptr_t>(pdoc->GetDBCSByteMask());
+			*AsPointer<const DBCSByteMask **>(wParam) = pdoc->GetDBCSByteMask();
 		}
 		return pdoc->dbcsCodePage;
 

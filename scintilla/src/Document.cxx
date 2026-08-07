@@ -3907,10 +3907,10 @@ const char *BuiltinRegex::SubstituteByPosition(const Document *doc, const char *
 		'\r',	// r
 		0,		// s
 		'\t',	// t
-		'\x84',	// u
+		'\x86',	// u
 		'\v',	// v
 		0,		// w
-		'\x82',	// x
+		'\x84',	// x
 	};
 
 	substituted.clear();

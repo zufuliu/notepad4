@@ -2641,3 +2641,104 @@ bool IsStringCaseSensitiveA(LPCSTR pszText) noexcept {
 	}
 	return false;
 }
+
+/**
+ * Convert C style \a, \b, \f, \n, \r, \t, \v, \xHH and \uHHHH into their indicated characters.
+ */
+void TransformBackslashes(char *pszInput, UINT cpEdit, const DBCSByteMask *byteMask) noexcept {
+	// same as BuiltinRegex::SubstituteByPosition()
+	static constexpr char backslashTable['x' - '\\' + 1] = {
+		'\\',	// '\'
+		0,		// ]
+		0,		// ^
+		0,		// _
+		0,		// `
+		'\a',	// a
+		'\b',	// b
+		0,		// c
+		0,		// d
+		'\x1B',	// e
+		'\f',	// f
+		0,		// g
+		0,		// h
+		0,		// i
+		0,		// j
+		0,		// k
+		0,		// l
+		0,		// m
+		'\n',	// n
+		0,		// o
+		0,		// p
+		0,		// q
+		'\r',	// r
+		0,		// s
+		'\t',	// t
+		'\x86',	// u
+		'\v',	// v
+		0,		// w
+		'\x84',	// x
+	};
+
+	char *output = pszInput;
+	const char *input = pszInput;
+
+	while (*input) {
+		uint8_t ch = *input++;
+		const uint8_t chNext = input[0];
+		if (ch == '\\') {
+			const unsigned value = chNext - '\\';
+			const char escape = (value < sizeof(backslashTable)) ? backslashTable[value] : '\0';
+			if (static_cast<signed char>(escape) > 0) {
+				ch = escape;
+				input++;
+			} else if (escape != 0) {
+				const unsigned digitCount = (escape & 7);
+				WCHAR wchBuf[2]{}; // read adjacent hex to corect handle UTF-16 surrogate pair
+				unsigned index = 0;
+				const char *ptr = input - 1;
+				while (true) {
+					unsigned wch = 0;
+					unsigned count = 2;
+					ptr += 2;
+					for (; count < digitCount; count++, ptr++) {
+						const int hex = GetHexDigit(ptr[0]);
+						if (hex < 0) {
+							break;
+						}
+						wch = (wch << 4) | hex;
+					}
+					if (count != digitCount) {
+						break;
+					}
+					wchBuf[index++] = static_cast<WCHAR>(wch);
+					if (index == COUNTOF(wchBuf)) {
+						if (IS_HIGH_SURROGATE(wch)) {
+							index--;
+						}
+						break;
+					}
+					if (!IS_HIGH_SURROGATE(wch) || ptr[0] != '\\' || ptr[1] != 'u') {
+						break;
+					}
+				}
+				if (index != 0) {
+					input += digitCount*index;
+					if (digitCount == 4 || (index == 1 && wchBuf[0] < 0x80)) {
+						ch = static_cast<uint8_t>(wchBuf[0]); // \xHH or ASCII
+					} else {
+						index = WideCharToMultiByte(cpEdit, 0, wchBuf, index, output, static_cast<int>(input - output), nullptr, nullptr);
+						output += index;
+						continue;
+					}
+				}
+			}
+		} else if (byteMask && byteMask->IsLeadByte(ch) && byteMask->IsTrailByte(chNext)) {
+			*output++ = ch;
+			ch = chNext;
+			input++;
+		}
+		*output++ = ch;
+	}
+
+	*output = '\0';
+}
