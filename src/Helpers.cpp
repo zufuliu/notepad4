@@ -789,8 +789,8 @@ void SetClipData(HWND hwnd, LPCWSTR pszData) noexcept {
 		HANDLE hData = GlobalAlloc(GHND, size);
 		WCHAR *pData = static_cast<WCHAR *>(GlobalLock(hData));
 		memcpy(pData, pszData, size);
-		EmptyClipboard();
 		GlobalUnlock(hData);
+		EmptyClipboard();
 		SetClipboardData(CF_UNICODETEXT, hData);
 		CloseClipboard();
 	}

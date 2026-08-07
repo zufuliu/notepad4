@@ -3102,6 +3102,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			SciCall_Cut(false);
 			SciCall_ReplaceSel(pClip);
 			const size_t len = strlen(pClip);
+			NP2HeapFree(pClip);
 			if (iPos > iAnchor) {
 				iPos = iAnchor + len;
 			} else {
@@ -3109,7 +3110,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			}
 			SciCall_SetSel(iAnchor, iPos);
 			SciCall_EndUndoAction();
-			LocalFree(pClip);
 		}
 		break;
 

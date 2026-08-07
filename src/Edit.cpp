@@ -313,12 +313,13 @@ LPWSTR EditGetClipboardTextW(ClipboardTextType type) noexcept {
 
 	HANDLE hmem = GetClipboardData(CF_UNICODETEXT);
 	LPCWSTR pwch = static_cast<LPCWSTR>(GlobalLock(hmem));
-	const UINT wlen = lstrlen(pwch);
-	const UINT len = NP2_align_up(2*wlen + 1, MEMORY_ALLOCATION_ALIGNMENT); // EOL conversion
-	const UINT offset = (type == ClipboardTextType::Unicode) ? 0 : len*kMaxBackslashEscapeCount;
-	WCHAR * const ptmp = static_cast<LPWSTR>(LocalAlloc(LPTR, (len + offset)*sizeof(WCHAR)));
+	const UINT wcharLen = lstrlen(pwch);
+	LPWSTR ptmp = nullptr;
 
-	if (pwch && ptmp) {
+	if (wcharLen != 0) {
+		const UINT len = NP2_align_up(2*wcharLen + 1, MEMORY_ALLOCATION_ALIGNMENT); // EOL conversion
+		const UINT offset = (type == ClipboardTextType::Unicode) ? 0 : len*kMaxBackslashEscapeCount;
+		ptmp = static_cast<LPWSTR>(NP2HeapAlloc((len + offset)*sizeof(WCHAR)));
 		const int iEOLMode = SciCall_GetEOLMode();
 		WCHAR * const wszEOL = ptmp + offset;
 		LPCWSTR s = pwch;
@@ -355,7 +356,6 @@ LPWSTR EditGetClipboardTextW(ClipboardTextType type) noexcept {
 
 	GlobalUnlock(hmem);
 	CloseClipboard();
-
 	return ptmp;
 }
 
@@ -4553,7 +4553,7 @@ static LRESULT CALLBACK AddBackslashEditProc(HWND hwnd, UINT umsg, WPARAM wParam
 		LPWSTR lpsz = EditGetClipboardTextW(ClipboardTextType::UnicodeBackslash);
 		if (lpsz) {
 			SendMessage(hwnd, EM_REPLACESEL, TRUE, AsInteger<LPARAM>(lpsz));
-			LocalFree(lpsz);
+			NP2HeapFree(lpsz);
 			return TRUE;
 		}
 	}
@@ -4676,7 +4676,7 @@ static bool CopySelectionAsFindText(HWND hwnd, EDITFINDREPLACE *lpefr, bool bFir
 		NP2HeapFree(lpszEscSel);
 	}
 
-	LocalFree(pClip);
+	NP2HeapFree(pClip);
 	NP2HeapFree(lpszSelection);
 	return hasFindText;
 }
@@ -5236,7 +5236,11 @@ int EditPrepareReplace(char *szFind2, char **pszReplace2, BOOL *bReplaceRE, cons
 	*bReplaceRE = (searchFlags & SCFIND_REGEXP);
 	if (StrEqualEx(lpefr->szReplace, "^c")) {
 		*bReplaceRE = FALSE;
-		*pszReplace2 = EditGetClipboardText();
+		LPSTR pClip = EditGetClipboardText();
+		if (pClip) {
+			*pszReplace2 = StrDupA(pClip);
+			NP2HeapFree(pClip);
+		}
 	} else {
 		*pszReplace2 = StrDupA(lpefr->szReplace);
 		if (lpefr->option & FindReplaceOption_TransformBackslash) {

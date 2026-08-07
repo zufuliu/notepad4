@@ -141,7 +141,7 @@ enum class ClipboardTextType {
 	UnicodeBackslash,
 	DocumentBytes,
 };
-LPWSTR EditGetClipboardTextW(ClipboardTextType type) noexcept; // LocalFree()
+LPWSTR EditGetClipboardTextW(ClipboardTextType type) noexcept;
 inline char *EditGetClipboardText() noexcept {
 	return reinterpret_cast<char *>(EditGetClipboardTextW(ClipboardTextType::DocumentBytes));
 }
