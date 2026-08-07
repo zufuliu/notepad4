@@ -48,7 +48,7 @@ public:
  */
 class LineLayout final {
 private:
-	std::unique_ptr<int[]> lineStarts;
+	std::unique_ptr<int[], HeapPointerFreer> lineStarts;
 	/// Drawing is only performed for @a maxLineLength characters on each line.
 	Sci::Line lineNumber;
 	int lenLineStarts = 0;
@@ -70,7 +70,7 @@ public:
 	unsigned char bracePreviousStyles[2]{};
 	int edgeColumn = 0;
 	int caretPosition = 0;
-	std::unique_ptr<char[]> chars;
+	std::unique_ptr<char[], HeapPointerFreer> chars;
 	unsigned char *styles = nullptr;
 	XYPOSITION *positions = nullptr;
 	std::unique_ptr<BidiData> bidiData;
@@ -102,7 +102,7 @@ public:
 	Range SubLineRange(int subLine, Scope scope) const noexcept;
 	bool InLine(int offset, int line) const noexcept;
 	int SubLineFromPosition(int posInLine, PointEnd pe) const noexcept;
-	void AddLineStart(Sci::Position start);
+	void AddLineStart(Sci::Position start) noexcept;
 	void SetBracesHighlight(Range rangeLine, const Sci::Position braces[],
 		unsigned char bracesMatchStyle, int xHighlight, bool ignoreStyle) noexcept;
 	void RestoreBracesHighlight(Range rangeLine, const Sci::Position braces[], bool ignoreStyle) noexcept;
@@ -114,7 +114,7 @@ public:
 	Interval SpanByte(int index) const noexcept;
 	int EndLineStyle() const noexcept;
 	[[nodiscard]] int LastStyle() const noexcept;
-	void SCICALL WrapLine(const Document *pdoc, Sci::Position posLineStart, Wrap wrapState, XYPOSITION wrapWidth, XYPOSITION wrapIndent_, bool partialLine);
+	void SCICALL WrapLine(const Document *pdoc, Sci::Position posLineStart, Wrap wrapState, XYPOSITION wrapWidth, XYPOSITION wrapIndent_, bool partialLine) noexcept;
 };
 
 struct ScreenLine final : public IScreenLine {

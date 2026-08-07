@@ -75,6 +75,7 @@ LineLayout::LineLayout(Sci::Line lineNumber_, int maxLineLength_) :
 	Resize(maxLineLength_);
 }
 
+SCI_noinline
 void LineLayout::Resize(int maxLineLength_) {
 	if (maxLineLength_ > maxLineLength) {
 		lenLineStarts = 0;
@@ -85,8 +86,7 @@ void LineLayout::Resize(int maxLineLength_) {
 		const size_t lineAllocation = length;
 		length -= sentinel;
 		maxLineLength = length;
-		auto chars_ = std::make_unique_for_overwrite<char[]>(lineAllocation*(2 + sizeof(XYPOSITION)));
-		memset(&chars_[length], 0, sentinel); // ensure styles[-1] is valid
+		auto chars_ = HeapPointerFreer::make_unique<char[]>(lineAllocation*(2 + sizeof(XYPOSITION)));
 		chars.swap(chars_);
 		styles = reinterpret_cast<unsigned char *>(chars.get() + lineAllocation);
 		// Extra position allocated as sometimes the Windows
@@ -184,19 +184,19 @@ int LineLayout::SubLineFromPosition(int posInLine, PointEnd pe) const noexcept {
 	return line - 1;
 }
 
-void LineLayout::AddLineStart(Sci::Position start) {
+void LineLayout::AddLineStart(Sci::Position start) noexcept {
 	lines++;
 	if (lines >= lenLineStarts) {
-		const int newMaxLines = lines*2 + 14; // minimum 16
-		std::unique_ptr<int[]> newLineStarts = std::make_unique<int[]>(newMaxLines);
+		const unsigned newMaxLines = static_cast<unsigned>(lines)*2 + 14; // minimum 16
+		auto newLineStarts = HeapPointerFreer::make_unique<int[]>(newMaxLines);
 		if (lenLineStarts) {
 			//std::copy_n(lineStarts.get(), lenLineStarts, newLineStarts.get());
-			memcpy(newLineStarts.get(), lineStarts.get(), lenLineStarts*sizeof(int));
+			memcpy(newLineStarts.get(), lineStarts.get(), static_cast<unsigned>(lenLineStarts)*sizeof(int));
 		}
 		lenLineStarts = newMaxLines;
 		lineStarts.swap(newLineStarts);
 	}
-	lineStarts[lines] = static_cast<int>(start);
+	lineStarts[static_cast<unsigned>(lines)] = static_cast<int>(start);
 }
 
 void LineLayout::SetBracesHighlight(Range rangeLine, const Sci::Position braces[],
@@ -360,7 +360,7 @@ constexpr uint8_t WrapBreakMask[8] = {
 
 }
 
-void LineLayout::WrapLine(const Document *pdoc, Sci::Position posLineStart, Wrap wrapState, XYPOSITION wrapWidth, XYPOSITION wrapIndent_, bool partialLine) {
+void LineLayout::WrapLine(const Document *pdoc, Sci::Position posLineStart, Wrap wrapState, XYPOSITION wrapWidth, XYPOSITION wrapIndent_, bool partialLine) noexcept {
 	// Document wants document positions but simpler to work in line positions
 	// so take care of adding and subtracting line start in a lambda.
 	const auto CharacterBoundary = [=](Sci::Position i, int moveDir, bool checkLineEnd = true) noexcept -> Sci::Position {

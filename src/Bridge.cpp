@@ -54,6 +54,22 @@ extern HMODULE hPropSysDLL;
 
 namespace {
 
+struct HeapPointerFreer {
+	template <typename T>
+	void operator()(T *ptr) const noexcept {
+		::HeapFree(g_hDefaultHeap, 0, ptr);
+	}
+
+	template <typename T>
+	requires std::is_unbounded_array_v<T>
+	static std::unique_ptr<T, HeapPointerFreer> make_unique(size_t size) noexcept {
+		using U = std::remove_extent_t<T>;
+		static_assert(__is_standard_layout(U));
+		auto ptr = static_cast<U *>(::HeapAlloc(g_hDefaultHeap, HEAP_ZERO_MEMORY, size*sizeof(U)));
+		return std::unique_ptr<T, HeapPointerFreer>{ptr};
+	}
+};
+
 // Stored objects...
 HGLOBAL hDevMode {};
 HGLOBAL hDevNames {};
@@ -582,7 +598,7 @@ void EditPrintSetup(HWND hwnd) noexcept {
 #if 0 // lexer debug
 void EditDumpDocumentStyledText(LPCWSTR lpszFile) {
 	size_t textLength = SciCall_GetLength();
-	const std::unique_ptr<char[]> styledText = std::make_unique_for_overwrite<char[]>(2*textLength + 2);
+	auto styledText = HeapPointerFreer::make_unique<char[]>(2*textLength + 2);
 	const Sci_TextRangeFull tr { { 0, static_cast<Sci_Position>(textLength) }, styledText.get() };
 	textLength = SciCall_GetStyledTextFull(&tr);
 	const char * const textBuffer = styledText.get() + textLength + 1;
@@ -623,7 +639,7 @@ void EditDumpDocumentStyledText(LPCWSTR lpszFile) {
 namespace { // copy as RTF
 
 struct DocumentStyledText {
-	std::unique_ptr<StyleDefinition[]> styleList;
+	std::unique_ptr<StyleDefinition[], HeapPointerFreer> styleList;
 	unsigned styleCount;
 	UINT cpEdit;
 };
@@ -658,7 +674,7 @@ DocumentStyledText GetDocumentStyledText(uint8_t (&styleMap)[STYLE_MAX + 1], con
 	memset(styleMap, 0, STYLE_MAX + 1);
 
 	unsigned styleCount = 0;
-	std::unique_ptr<StyleDefinition[]> styleList = std::make_unique<StyleDefinition[]>(maxStyle);
+	auto styleList = HeapPointerFreer::make_unique<StyleDefinition[]>(maxStyle);
 	if constexpr (STYLE_DEFAULT != 0) {
 		styleCount = 1;
 		styleUsed[STYLE_DEFAULT >> 5] &= ~(1U << (STYLE_DEFAULT & 31));
@@ -1342,7 +1358,7 @@ void EditFormatCode(int menu) noexcept {
 
 	try {
 		SciCall_EnsureStyledTo(endPos);
-		const std::unique_ptr<char[]> styledText = std::make_unique_for_overwrite<char[]>(2*(endPos - startPos) + 2);
+		const auto styledText = HeapPointerFreer::make_unique<char[]>(2*(endPos - startPos) + 2);
 		const Sci_TextRangeFull tr { { startPos, endPos }, styledText.get() };
 		const size_t textLength = SciCall_GetStyledTextFull(&tr);
 		std::string output;
