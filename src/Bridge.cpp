@@ -598,7 +598,7 @@ void EditPrintSetup(HWND hwnd) noexcept {
 #if 0 // lexer debug
 void EditDumpDocumentStyledText(LPCWSTR lpszFile) {
 	size_t textLength = SciCall_GetLength();
-	auto styledText = HeapPointerFreer::make_unique<char[]>(2*textLength + 2);
+	const auto styledText = HeapPointerFreer::make_unique<char[]>(2*textLength + 2);
 	const Sci_TextRangeFull tr { { 0, static_cast<Sci_Position>(textLength) }, styledText.get() };
 	textLength = SciCall_GetStyledTextFull(&tr);
 	const char * const textBuffer = styledText.get() + textLength + 1;

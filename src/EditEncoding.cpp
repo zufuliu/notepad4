@@ -470,12 +470,12 @@ bool EditSetNewEncoding(int iEncoding, int iNewEncoding, BOOL bNoUI) noexcept {
 	return false;
 }
 
-void EditOnCodePageChanged(UINT oldCodePage, bool showControlCharacter, EDITFINDREPLACE *lpefr) noexcept {
+void EditOnCodePageChanged(UINT oldCodePage, bool showControlCharacter, EditFindReplace &efr) noexcept {
 	const UINT cpEdit = SciCall_GetCodePage();
 	const UINT acp = GetACP();
-	if (StrNotEmpty(lpefr->szFind)) { // need to convert last find & replace string.
-		WideCharToMultiByte(cpEdit, 0, lpefr->szFindUTF16, -1, lpefr->szFind, COUNTOF(lpefr->szFind), nullptr, nullptr);
-		WideCharToMultiByte(cpEdit, 0, lpefr->szReplaceUTF16, -1, lpefr->szReplace, COUNTOF(lpefr->szReplace), nullptr, nullptr);
+	if (efr.HasFindText()) { // need to convert last find & replace string.
+		efr.status &= FindReplaceStatus_ReplaceInitialized;
+		efr.status |= FindReplaceStatus_HasFindText | FindReplaceStatus_FindUpdated | FindReplaceStatus_ReplaceUpdated;
 	}
 
 	if (oldCodePage == SC_CP_UTF8) {

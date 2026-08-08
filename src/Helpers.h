@@ -1224,7 +1224,6 @@ struct MRUList {
 
 	void Init(LPCWSTR pszRegKey, int capacity_, int flags) noexcept;
 	void Add(LPCWSTR pszNew) noexcept;
-	void AddMultiline(LPCWSTR pszNew) noexcept;
 	void Delete(int iIndex) noexcept;
 	void DeleteFileFromStore(LPCWSTR pszFile) const noexcept;
 	void Empty(bool save, bool destroy = false) noexcept;
@@ -1292,6 +1291,7 @@ struct FileDialog {
 #define kMaxRegexEscapeCount		2
 bool AddBackslashW(LPWSTR pszOut, LPCWSTR pszInput) noexcept;
 void EscapeRegex(LPSTR pszOut, LPCSTR pszIn) noexcept;
+LPWSTR HeapStrDupW(LPCWSTR pszIn) noexcept;
 size_t Base64Encode(char *output, const uint8_t *src, size_t length, bool urlSafe) noexcept;
 size_t Base64Decode(uint8_t *output, const uint8_t *src, size_t length) noexcept;
 

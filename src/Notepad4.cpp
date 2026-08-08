@@ -265,8 +265,7 @@ static struct WatchFileInformation {
 	DWORD		nFileSizeLow;
 } fdCurFile;
 
-static EDITFINDREPLACE efrData;
-bool	bReplaceInitialized = false;
+static EditFindReplace efrData;
 EditMarkAll editMarkAll;
 HANDLE idleTaskTimer;
 
@@ -415,6 +414,10 @@ static void CleanUpResources(bool initialized) noexcept {
 	LocalFree(tchToolbarBitmap);
 	LocalFree(lpSchemeArg);
 	LocalFree(lpEncodingArg);
+	NP2HeapFree(efrData.wszFind);
+	NP2HeapFree(efrData.wszReplace);
+	NP2HeapFree(efrData.szFind);
+	NP2HeapFree(efrData.szReplace);
 
 	Encoding_ReleaseResources();
 	Style_ReleaseResources();
@@ -679,11 +682,11 @@ BOOL InitApplication(HINSTANCE hInstance) noexcept {
 	return RegisterClassEx(&wc);
 }
 
+NP2_noinline
 static void HandleMatchText(MatchTextFlag flag, LPCWSTR lpszText, bool jumpTo) noexcept {
 	if (StrNotEmpty(lpszText) && SciCall_GetLength()) {
-		const UINT cpEdit = SciCall_GetCodePage();
-		WideCharToMultiByte(cpEdit, 0, lpszText, -1, efrData.szFind, COUNTOF(efrData.szFind), nullptr, nullptr);
-		lstrcpyn(efrData.szFindUTF16, lpszText, COUNTOF(efrData.szFindUTF16));
+		efrData.wszFind = HeapStrDupW(lpszText);
+		efrData.status = FindReplaceStatus_HasFindText | FindReplaceStatus_FindUpdated;
 
 		if (flag & MatchTextFlag_Regex) {
 			efrData.fuFlags |= (iFindReplaceOption & FindReplaceOption_UseCxxRegex) ? (SCFIND_REGEXP | SCFIND_CXX11REGEX) : (SCFIND_REGEXP | SCFIND_POSIX);
@@ -698,12 +701,12 @@ static void HandleMatchText(MatchTextFlag flag, LPCWSTR lpszText, bool jumpTo) n
 			if (!jumpTo) {
 				SciCall_DocumentEnd();
 			}
-			EditFindPrev(&efrData, false);
+			EditFindPrev(efrData, false);
 		} else {
 			if (!jumpTo) {
 				SciCall_DocumentStart();
 			}
-			EditFindNext(&efrData, false);
+			EditFindNext(efrData, false);
 		}
 		EditEnsureSelectionVisible();
 	}
@@ -3672,12 +3675,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_EDIT_REPLACE: {
 		const bool bReplace = (LOWORD(wParam) == IDM_EDIT_REPLACE) || (LOWORD(wParam) == IDT_EDIT_REPLACE);
 		if (hDlgFindReplace == nullptr) {
-			hDlgFindReplace = EditFindReplaceDlg(hwndEdit, &efrData, bReplace);
+			hDlgFindReplace = EditFindReplaceDlg(hwndEdit, efrData, bReplace);
 		} else {
 			if (bReplace != (GetDlgItem(hDlgFindReplace, IDC_REPLACETEXT) != nullptr)) {
 				SendWMCommand(hDlgFindReplace, IDC_TOGGLEFINDREPLACE);
 				DestroyWindow(hDlgFindReplace);
-				hDlgFindReplace = EditFindReplaceDlg(hwndEdit, &efrData, bReplace);
+				hDlgFindReplace = EditFindReplaceDlg(hwndEdit, efrData, bReplace);
 			} else {
 				SetForegroundWindow(hDlgFindReplace);
 				SendMessage(hDlgFindReplace, APPM_COPYDATA, 0, 0);
@@ -3695,9 +3698,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			break;
 		}
 
-		if (StrIsEmpty(efrData.szFind) && LOWORD(wParam) != IDM_EDIT_REPLACENEXT) {
-			EditSaveSelectionAsFindText(&efrData, IDM_EDIT_SAVEFIND, false);
-			if (StrIsEmpty(efrData.szFind)) {
+		if (!efrData.HasFindText() && LOWORD(wParam) != IDM_EDIT_REPLACENEXT) {
+			EditSaveSelectionAsFindText(efrData, IDM_EDIT_SAVEFIND, false);
+			if (!efrData.HasFindText()) {
 				SendWMCommand(hwnd, IDM_EDIT_FIND);
 				break;
 			}
@@ -3705,27 +3708,27 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 		switch (LOWORD(wParam)) {
 		case IDM_EDIT_FINDNEXT:
-			EditFindNext(&efrData, false);
+			EditFindNext(efrData, false);
 			break;
 
 		case IDM_EDIT_FINDPREV:
-			EditFindPrev(&efrData, false);
+			EditFindPrev(efrData, false);
 			break;
 
 		case IDM_EDIT_REPLACENEXT:
-			if (bReplaceInitialized && StrNotEmpty(efrData.szFind)) {
-				EditReplace(&efrData);
+			if (efrData.ReplaceInitialized()) {
+				EditReplace(efrData);
 			} else {
 				SendWMCommand(hwnd, IDM_EDIT_REPLACE);
 			}
 			break;
 
 		case IDM_EDIT_SELTONEXT:
-			EditFindNext(&efrData, true);
+			EditFindNext(efrData, true);
 			break;
 
 		case IDM_EDIT_SELTOPREV:
-			EditFindPrev(&efrData, true);
+			EditFindPrev(efrData, true);
 			break;
 		}
 		break;
@@ -4498,7 +4501,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case CMD_FINDNEXTSEL:
 	case CMD_FINDPREVSEL:
 	case IDM_EDIT_SAVEFIND:
-		EditSaveSelectionAsFindText(&efrData, LOWORD(wParam), true);
+		EditSaveSelectionAsFindText(efrData, LOWORD(wParam), true);
 		break;
 
 	case CMD_INCLINELIMIT:
@@ -4873,7 +4876,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			break;
 
 		case SCN_CODEPAGECHANGED:
-			EditOnCodePageChanged(scn->oldCodePage, bShowUnicodeControlCharacter, &efrData);
+			EditOnCodePageChanged(scn->oldCodePage, bShowUnicodeControlCharacter, efrData);
 			break;
 
 		case SCN_HOTSPOTCLICK:
@@ -5418,7 +5421,7 @@ void SaveSettings(bool bSaveSettingsNow) noexcept {
 	iValue = iFindReplaceOption | ((efrData.option & FindReplaceOption_BehaviorMask) << 4);
 	section.SetIntEx(L"FindReplaceOption", iValue, FindReplaceOption_Default);
 	if (bSaveFindReplace) {
-		iValue = efrData.fuFlags | ((efrData.option & FindReplaceOption_SearchMask) << 10);
+		iValue = PackFindFlagOption(efrData.fuFlags, efrData.option, FindReplaceOption_MRUSaveMask);
 		section.SetIntEx(L"FindReplaceFlag", iValue, SCFIND_NONE);
 	}
 

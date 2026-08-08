@@ -2388,14 +2388,6 @@ void MRUList::Add(LPCWSTR pszNew) noexcept {
 	pszItems[0] = tchItem;
 }
 
-void MRUList::AddMultiline(LPCWSTR pszNew) noexcept {
-	const int len = lstrlen(pszNew);
-	LPWSTR lpszEsc = static_cast<LPWSTR>(NP2HeapAlloc((kMaxBackslashEscapeCount*len + 1)*sizeof(WCHAR)));
-	AddBackslashW(lpszEsc, pszNew);
-	Add(lpszEsc);
-	NP2HeapFree(lpszEsc);
-}
-
 void MRUList::Delete(int iIndex) noexcept {
 	if (iIndex < 0 || iIndex >= iSize) {
 		return;
@@ -2863,6 +2855,7 @@ LRESULT CALLBACK FileDialog::SubProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 	return DefSubclassProc(hwnd, umsg, wParam, lParam);
 }
 
+NP2_noinline
 bool AddBackslashW(LPWSTR pszOut, LPCWSTR pszInput) noexcept {
 	bool hasEscapeChar = false;
 	bool hasSlash = false;
@@ -2896,9 +2889,18 @@ bool AddBackslashW(LPWSTR pszOut, LPCWSTR pszInput) noexcept {
 	}
 
 	if (hasSlash && !hasEscapeChar) {
-		lstrcpy(pszOut, pszInput);
+		const size_t len = lpsz - pszInput + 1;
+		memcpy(pszOut, pszInput, len*sizeof(WCHAR));
 	}
 	return hasEscapeChar;
+}
+
+LPWSTR HeapStrDupW(LPCWSTR pszIn) noexcept {
+	const UINT len = lstrlen(pszIn);
+	const size_t size = len*sizeof(WCHAR);
+	const size_t allocSize = NP2_align_up(size + sizeof(WCHAR), MEMORY_ALLOCATION_ALIGNMENT);
+	LPWSTR pszOut = static_cast<LPWSTR>(NP2HeapAlloc(allocSize));
+	return static_cast<LPWSTR>(memcpy(pszOut, pszIn, size));
 }
 
 size_t Base64Encode(char *output, const uint8_t *src, size_t length, bool urlSafe) noexcept {

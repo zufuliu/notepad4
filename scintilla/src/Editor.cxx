@@ -6670,7 +6670,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 	case Message::ReplaceTarget:
 	case Message::ReplaceTargetRE:
 	case Message::ReplaceTargetMinimal:
-		PLATFORM_ASSERT(lParam);
+		PLATFORM_ASSERT(lParam != 0 || (wParam | lParam) == 0);
 		return ReplaceTarget(iMessage, wParam, lParam);
 
 	case Message::SearchInTarget:

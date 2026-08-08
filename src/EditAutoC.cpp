@@ -830,7 +830,7 @@ static void AutoC_AddDocWord(WordList &pWList, const uint32_t (&ignoredStyleMask
 	CharBuffer pFind(iRootLen + 2);
 	pFind[0] = prefix;
 	memcpy(pFind.data() + (prefix != '\0'), pRoot, iRootLen);
-	int findFlag = (bIgnoreCase ? SCFIND_NONE : SCFIND_MATCHCASE) | SCFIND_MATCH_TO_WORD_END;
+	UINT findFlag = (bIgnoreCase ? SCFIND_NONE : SCFIND_MATCHCASE) | SCFIND_MATCH_TO_WORD_END;
 	if (IsDefaultWordChar(static_cast<uint8_t>(pRoot[0]))) {
 		findFlag |= SCFIND_WORDSTART;
 	}
