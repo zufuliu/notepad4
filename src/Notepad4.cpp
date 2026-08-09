@@ -5668,11 +5668,13 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) noexcept {
 			break;
 
 		case L'D':
+		case L'H':
+		case L'X':
 			if (lpSchemeArg) {
 				LocalFree(lpSchemeArg);
 				lpSchemeArg = nullptr;
 			}
-			iInitialLexer = NP2LEX_TEXTFILE;
+			iInitialLexer = (ch == 'D') ? NP2LEX_TEXTFILE : ((ch == 'H') ? NP2LEX_HTML : NP2LEX_XML);
 			flagLexerSpecified = true;
 			state = CommandParseState_Consumed;
 			break;
@@ -5705,16 +5707,6 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) noexcept {
 					iInitialColumn = cord[1];
 				}
 			}
-			break;
-
-		case L'H':
-			if (lpSchemeArg) {
-				LocalFree(lpSchemeArg);
-				lpSchemeArg = nullptr;
-			}
-			iInitialLexer = NP2LEX_HTML;
-			flagLexerSpecified = true;
-			state = CommandParseState_Consumed;
 			break;
 
 		case L'I':
@@ -5779,16 +5771,6 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) noexcept {
 
 		case L'W':
 			flagSetEncoding = IDM_ENCODING_UNICODE - IDM_ENCODING_ANSI + 1;
-			state = CommandParseState_Consumed;
-			break;
-
-		case L'X':
-			if (lpSchemeArg) {
-				LocalFree(lpSchemeArg);
-				lpSchemeArg = nullptr;
-			}
-			iInitialLexer = NP2LEX_XML;
-			flagLexerSpecified = true;
 			state = CommandParseState_Consumed;
 			break;
 
