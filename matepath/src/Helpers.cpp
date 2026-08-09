@@ -992,8 +992,8 @@ void SetClipData(HWND hwnd, LPCWSTR pszData) noexcept {
 		HANDLE hData = GlobalAlloc(GHND, size);
 		WCHAR *pData = static_cast<WCHAR *>(GlobalLock(hData));
 		memcpy(pData, pszData, size);
-		EmptyClipboard();
 		GlobalUnlock(hData);
+		EmptyClipboard();
 		SetClipboardData(CF_UNICODETEXT, hData);
 		CloseClipboard();
 	}
@@ -2206,7 +2206,7 @@ LRESULT CALLBACK FileDialog::SubProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 	case WM_COMMAND:
 		if (LOWORD(wParam) == IDOK) {
 			LPWSTR pszName = nullptr;
-			auto dialog = AsPointer<IFileDialog *>(dwRefData);
+			auto *dialog = AsPointer<IFileDialog *>(dwRefData);
 			if (SUCCEEDED(dialog->GetFileName(&pszName))) {
 				if (PathFixBackslashes(pszName)) {
 					dialog->SetFileName(pszName);

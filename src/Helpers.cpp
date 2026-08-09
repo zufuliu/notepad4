@@ -2292,7 +2292,7 @@ void FormatNumber(LPWSTR lpNumberStr, size_t value) noexcept {
 NP2_noinline
 LPWSTR GetDlgItemFullText(HWND hwndDlg, int nCtlId) noexcept {
 	hwndDlg = GetDlgItem(hwndDlg, nCtlId);
-	UINT len = GetWindowTextLength(hwndDlg);
+	const UINT len = GetWindowTextLength(hwndDlg);
 	if (len == 0) {
 		return nullptr;
 	}
@@ -2455,6 +2455,7 @@ void MRUList::Load() noexcept {
 		LPCWSTR tchItem = section.nodeList[i].value;
 		if (StrNotEmpty(tchItem)) {
 			WCHAR tchPath[MAX_PATH];
+			tchPath[0] = L'\0';
 			if ((iFlags & MRUFlags_FilePath) != 0 && PathIsRelative(tchItem)) {
 				PathAbsoluteFromApp(tchItem, tchPath);
 				tchItem = tchPath;
@@ -2837,7 +2838,7 @@ LRESULT CALLBACK FileDialog::SubProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 	case WM_COMMAND:
 		if (LOWORD(wParam) == IDOK) {
 			LPWSTR pszName = nullptr;
-			auto dialog = AsPointer<IFileDialog *>(dwRefData);
+			auto *dialog = AsPointer<IFileDialog *>(dwRefData);
 			if (SUCCEEDED(dialog->GetFileName(&pszName))) {
 				if (PathFixBackslashes(pszName)) {
 					dialog->SetFileName(pszName);

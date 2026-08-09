@@ -491,7 +491,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	// Pathname parameter
 	if (lpPathArg) {
 		DisplayPath(lpPathArg, IDS_ERR_CMDLINE);
-		GlobalFree(lpPathArg);
+		NP2HeapFree(lpPathArg);
 	} else if (iStartupDir != StartupDirectory_None) {
 		// Use a startup directory
 		if (iStartupDir == StartupDirectory_MRU) {
@@ -2850,10 +2850,10 @@ void ParseCommandLine() noexcept {
 		// pathname
 		{
 			if (lpPathArg) {
-				GlobalFree(lpPathArg);
+				NP2HeapFree(lpPathArg);
 			}
 
-			lpPathArg = static_cast<LPWSTR>(GlobalAlloc(GPTR, sizeof(WCHAR) * (MAX_PATH + 2)));
+			lpPathArg = static_cast<LPWSTR>(NP2HeapAlloc(sizeof(WCHAR) * (MAX_PATH + 2)));
 			lstrcpyn(lpPathArg, lp3, MAX_PATH);
 			PathFixBackslashes(lpPathArg);
 			StrTrim(lpPathArg, L" \"");
@@ -3199,15 +3199,18 @@ bool ActivatePrevInst() noexcept {
 					lstrcpy(lpPathArg, tchTmp);
 				}
 
+				LPWSTR params = static_cast<LPWSTR>(GlobalAlloc(GPTR, sizeof(WCHAR) * (MAX_PATH + 2)));
+				lstrcpy(params, lpPathArg);
 				COPYDATASTRUCT cds;
 				cds.dwData = DATA_MATEPATH_PATHARG;
-				cds.cbData = static_cast<DWORD>(GlobalSize(lpPathArg));
-				cds.lpData = lpPathArg;
+				cds.cbData = static_cast<DWORD>(GlobalSize(params));
+				cds.lpData = params;
 
 				// Send lpPathArg to previous instance
 				SendMessage(hwnd, WM_COPYDATA, 0, AsInteger<LPARAM>(&cds));
 
-				GlobalFree(lpPathArg);
+				GlobalFree(params);
+				NP2HeapFree(lpPathArg);
 			}
 			return true;
 		}

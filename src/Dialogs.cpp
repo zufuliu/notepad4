@@ -844,7 +844,7 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 		HWND hwndLV = GetDlgItem(hwnd, IDC_FILEMRU);
 		DarkMode_InitFileListView(hwndLV);
 
-		BackgroundWorker *worker = static_cast<BackgroundWorker *>(GlobalAlloc(GPTR, sizeof(BackgroundWorker)));
+		BackgroundWorker *worker = static_cast<BackgroundWorker *>(NP2HeapAlloc(sizeof(BackgroundWorker)));
 		SetProp(hwnd, L"it", worker);
 		worker->Init(hwndLV);
 
@@ -875,7 +875,7 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 		BackgroundWorker *worker = static_cast<BackgroundWorker *>(GetProp(hwnd, L"it"));
 		worker->Destroy();
 		RemoveProp(hwnd, L"it");
-		GlobalFree(worker);
+		NP2HeapFree(worker);
 
 		bSaveRecentFiles = IsButtonChecked(hwnd, IDC_SAVEMRU);
 		iMaxRecentFiles = GetDlgItemInt(hwnd, IDC_MRU_COUNT_VALUE, nullptr, FALSE);
