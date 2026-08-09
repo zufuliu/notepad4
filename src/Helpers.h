@@ -1292,6 +1292,7 @@ struct FileDialog {
 bool AddBackslashW(LPWSTR pszOut, LPCWSTR pszInput) noexcept;
 void EscapeRegex(LPSTR pszOut, LPCSTR pszIn) noexcept;
 LPWSTR HeapStrDupW(LPCWSTR pszIn) noexcept;
+void HeapStrDupExW(LPWSTR &pszOut, LPCWSTR pszIn) noexcept;
 size_t Base64Encode(char *output, const uint8_t *src, size_t length, bool urlSafe) noexcept;
 size_t Base64Decode(uint8_t *output, const uint8_t *src, size_t length) noexcept;
 

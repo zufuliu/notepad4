@@ -411,9 +411,9 @@ static inline void InvalidateStyleRedraw() noexcept {
 //
 //
 static void CleanUpResources(bool initialized) noexcept {
-	LocalFree(tchToolbarBitmap);
-	LocalFree(lpSchemeArg);
-	LocalFree(lpEncodingArg);
+	NP2HeapFree(tchToolbarBitmap);
+	NP2HeapFree(lpSchemeArg);
+	NP2HeapFree(lpEncodingArg);
 	NP2HeapFree(efrData.wszFind);
 	NP2HeapFree(efrData.wszReplace);
 	NP2HeapFree(efrData.szFind);
@@ -936,7 +936,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	// Match Text
 	if (lpMatchArg) {
 		HandleMatchText(flagMatchText, lpMatchArg, flagJumpTo);
-		LocalFree(lpMatchArg);
+		NP2HeapFree(lpMatchArg);
 	}
 
 	// Check for Paste Board option -- after loading files
@@ -955,7 +955,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 		flagLexerSpecified = false;
 		if (lpSchemeArg) {
 			Style_SetLexerFromName(szCurFile, lpSchemeArg);
-			LocalFree(lpSchemeArg);
+			NP2HeapFree(lpSchemeArg);
 			lpSchemeArg = nullptr;
 		} else {
 			Style_SetLexerFromID(iInitialLexer);
@@ -5670,10 +5670,8 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) noexcept {
 		case L'D':
 		case L'H':
 		case L'X':
-			if (lpSchemeArg) {
-				LocalFree(lpSchemeArg);
-				lpSchemeArg = nullptr;
-			}
+			NP2HeapFree(lpSchemeArg);
+			lpSchemeArg = nullptr;
 			iInitialLexer = (ch == 'D') ? NP2LEX_TEXTFILE : ((ch == 'H') ? NP2LEX_HTML : NP2LEX_XML);
 			flagLexerSpecified = true;
 			state = CommandParseState_Consumed;
@@ -5682,10 +5680,7 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) noexcept {
 		case L'E':
 			state = CommandParseState_Argument;
 			if (ExtractFirstArgument(lp2, lp1, lp2)) {
-				if (lpEncodingArg) {
-					LocalFree(lpEncodingArg);
-				}
-				lpEncodingArg = StrDup(lp1);
+				HeapStrDupExW(lpEncodingArg, lp1);
 				state = CommandParseState_Consumed;
 			}
 			break;
@@ -5746,10 +5741,7 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) noexcept {
 		case L'S':
 			state = CommandParseState_Argument;
 			if (ExtractFirstArgument(lp2, lp1, lp2)) {
-				if (lpSchemeArg) {
-					LocalFree(lpSchemeArg);
-				}
-				lpSchemeArg = StrDup(lp1);
+				HeapStrDupExW(lpSchemeArg, lp1);
 				flagLexerSpecified = true;
 				state = CommandParseState_Consumed;
 			}
@@ -5912,11 +5904,7 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) noexcept {
 
 			state = CommandParseState_Argument;
 			if (ExtractFirstArgument(lp2, lp1, lp2)) {
-				if (lpMatchArg) {
-					LocalFree(lpMatchArg);
-				}
-
-				lpMatchArg = StrDup(lp1);
+				HeapStrDupExW(lpMatchArg, lp1);
 				flagMatchText = static_cast<MatchTextFlag>(flag | MatchTextFlag_Default);
 				state = CommandParseState_Consumed;
 			}
@@ -6182,7 +6170,7 @@ void ParseCommandLine() noexcept {
 
 				while (cFileList < 32 && ExtractFirstArgument(lp3, lpFileBuf, lp3)) {
 					PathQuoteSpaces(lpFileBuf);
-					lpFileList[cFileList++] = StrDup(lpFileBuf);
+					lpFileList[cFileList++] = HeapStrDupW(lpFileBuf);
 				}
 			}
 
@@ -6253,7 +6241,7 @@ void LoadFlags() noexcept {
 
 	LPCWSTR strValue = section.GetValue(L"ToolbarImage");
 	if (StrNotEmpty(strValue)) {
-		tchToolbarBitmap = StrDup(strValue);
+		HeapStrDupExW(tchToolbarBitmap, strValue);
 	}
 
 	if (StrIsEmpty(g_wchAppUserModelID)) {
@@ -6876,7 +6864,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 					Style_SetLexer(pLexCurrent, true);
 				} else if (lpSchemeArg) {
 					Style_SetLexerFromName(szCurFile, lpSchemeArg);
-					LocalFree(lpSchemeArg);
+					NP2HeapFree(lpSchemeArg);
 					lpSchemeArg = nullptr;
 				} else {
 					Style_SetLexerFromID(iInitialLexer);
@@ -7424,9 +7412,9 @@ bool ActivatePrevInst() noexcept {
 		}
 
 		NP2HeapFree(lpFileArg);
-		LocalFree(lpSchemeArg);
-		LocalFree(lpMatchArg);
-		LocalFree(lpEncodingArg);
+		NP2HeapFree(lpSchemeArg);
+		NP2HeapFree(lpMatchArg);
+		NP2HeapFree(lpEncodingArg);
 		return true;
 	}
 	return false;
@@ -7440,7 +7428,7 @@ bool ActivatePrevInst() noexcept {
 bool RelaunchMultiInst() noexcept {
 	if (flagMultiFileArg == TripleBoolean_True && cFileList > 1) {
 		const LPCWSTR lpCmdLine = GetCommandLine();
-		LPWSTR lpCmdLineNew = StrDup(lpCmdLine);
+		LPWSTR lpCmdLineNew = HeapStrDupW(lpCmdLine);
 
 		StrTab2Space(lpCmdLineNew);
 		StrCpyEx(lpCmdLineNew + cchiFileList, L"");
@@ -7458,7 +7446,7 @@ bool RelaunchMultiInst() noexcept {
 		for (i = 0; i < cFileList; i++) {
 			lstrcpy(lpCmdLineNew + cchiFileList, L" /n - ");
 			lstrcat(lpCmdLineNew, lpFileList[i]);
-			LocalFree(lpFileList[i]);
+			NP2HeapFree(lpFileList[i]);
 
 			STARTUPINFO si;
 			memset(&si, 0, sizeof(STARTUPINFO));
@@ -7472,14 +7460,14 @@ bool RelaunchMultiInst() noexcept {
 			}
 		}
 
-		LocalFree(lpCmdLineNew);
+		NP2HeapFree(lpCmdLineNew);
 		NP2HeapFree(lpFileArg);
 
 		return true;
 	}
 
 	for (int i = 0; i < cFileList; i++) {
-		LocalFree(lpFileList[i]);
+		NP2HeapFree(lpFileList[i]);
 	}
 	return false;
 }
@@ -8009,7 +7997,7 @@ void AutoSave_Stop(BOOL keepBackup) noexcept {
 				if (!keepBackup) {
 					DeleteFile(path);
 				}
-				LocalFree(path);
+				NP2HeapFree(path);
 			}
 		}
 
@@ -8166,14 +8154,14 @@ void AutoSave_DoWork(FileSaveFlag saveFlag) noexcept {
 				if (!(iAutoSaveOption & AutoSaveOption_ManuallyDelete)) {
 					DeleteFile(old);
 				}
-				LocalFree(old);
+				NP2HeapFree(old);
 			}
 			memmove(AsVoidPointer(autoSavePathList), AsVoidPointer(autoSavePathList + 1), (AllAutoSaveCount - 1) * sizeof(LPWSTR));
 			autoSavePathList[AllAutoSaveCount - 1] = nullptr;
 			--autoSaveCount;
 		}
 
-		autoSavePathList[autoSaveCount++] = StrDup(tchPath);
+		autoSavePathList[autoSaveCount++] = HeapStrDupW(tchPath);
 		dwLastSavedDocReversion = dwCurrentDocReversion;
 	} else {
 		DeleteFile(tchPath);

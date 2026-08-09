@@ -223,9 +223,7 @@ static inline bool HasFilter() noexcept {
 //
 static void CleanUpResources(bool initialized) noexcept {
 	DarkMode_Cleanup();
-	if (tchToolbarBitmap != nullptr) {
-		LocalFree(tchToolbarBitmap);
-	}
+	NP2HeapFree(tchToolbarBitmap);
 	if (hTrayIcon) {
 		DestroyIcon(hTrayIcon);
 	}
@@ -2754,12 +2752,7 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) noexcept {
 		case L'M':
 			state = CommandParseState_Argument;
 			if (ExtractFirstArgument(lp2, lp1, lp2)) {
-				if (lpFilterArg) {
-					NP2HeapFree(lpFilterArg);
-				}
-
-				lpFilterArg = static_cast<LPWSTR>(NP2HeapAlloc(sizeof(WCHAR) * (lstrlen(lp1) + 1)));
-				lstrcpy(lpFilterArg, lp1);
+				HeapStrDupExW(lpFilterArg, lp1);
 				state = CommandParseState_Consumed;
 			}
 			break;
@@ -2903,7 +2896,7 @@ void LoadFlags() noexcept {
 
 	LPCWSTR strValue = section.GetValue(L"ToolbarImage");
 	if (StrNotEmpty(strValue)) {
-		tchToolbarBitmap = StrDup(strValue);
+		 HeapStrDupExW(tchToolbarBitmap, strValue);
 	}
 
 	if (StrIsEmpty(g_wchAppUserModelID)) {

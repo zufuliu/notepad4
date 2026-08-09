@@ -2289,15 +2289,16 @@ void FormatNumber(LPWSTR lpNumberStr, size_t value) noexcept {
 	}
 }
 
+NP2_noinline
 LPWSTR GetDlgItemFullText(HWND hwndDlg, int nCtlId) noexcept {
 	hwndDlg = GetDlgItem(hwndDlg, nCtlId);
-	int len = GetWindowTextLength(hwndDlg);
+	UINT len = GetWindowTextLength(hwndDlg);
 	if (len == 0) {
 		return nullptr;
 	}
-	len += 1;
-	LPWSTR buffer = static_cast<LPWSTR>(NP2HeapAlloc(len*sizeof(WCHAR)));
-	GetWindowText(hwndDlg, buffer, len);
+	const UINT wcharLen = NP2_align_up(len + 1, MEMORY_ALLOCATION_ALIGNMENT);
+	LPWSTR buffer = static_cast<LPWSTR>(NP2HeapAlloc(wcharLen*sizeof(WCHAR)));
+	GetWindowText(hwndDlg, buffer, wcharLen);
 	return buffer;
 }
 
@@ -2375,7 +2376,7 @@ void MRUList::Add(LPCWSTR pszNew) noexcept {
 	}
 	if (i == capacity) {
 		--i;
-		LocalFree(pszItems[i]);
+		NP2HeapFree(pszItems[i]);
 	} else if (i == iSize) {
 		iSize += 1;
 	}
@@ -2383,7 +2384,7 @@ void MRUList::Add(LPCWSTR pszNew) noexcept {
 		pszItems[i] = pszItems[i - 1];
 	}
 	if (tchItem == nullptr) {
-		tchItem = StrDup(pszNew);
+		tchItem = HeapStrDupW(pszNew);
 	}
 	pszItems[0] = tchItem;
 }
@@ -2392,7 +2393,7 @@ void MRUList::Delete(int iIndex) noexcept {
 	if (iIndex < 0 || iIndex >= iSize) {
 		return;
 	}
-	LocalFree(pszItems[iIndex]);
+	NP2HeapFree(pszItems[iIndex]);
 	pszItems[iIndex] = nullptr;
 	iSize -= 1;
 	for (int i = iIndex; i < iSize; i++) {
@@ -2410,7 +2411,7 @@ void MRUList::DeleteFileFromStore(LPCWSTR pszFile) const noexcept {
 		LPCWSTR path = mruStore.pszItems[index];
 		if (PathEqual(path, pszFile)) {
 			deleted += 1;
-			LocalFree(mruStore.pszItems[index]);
+			NP2HeapFree(mruStore.pszItems[index]);
 			mruStore.pszItems[index] = nullptr;
 			for (int i = index; i < mruStore.iSize - 1; i++) {
 				mruStore.pszItems[i] = mruStore.pszItems[i + 1];
@@ -2428,7 +2429,7 @@ void MRUList::DeleteFileFromStore(LPCWSTR pszFile) const noexcept {
 
 void MRUList::Empty(bool save, bool destroy) noexcept {
 	for (int i = 0; i < iSize; i++) {
-		LocalFree(pszItems[i]);
+		NP2HeapFree(pszItems[i]);
 		pszItems[i] = nullptr;
 	}
 	iSize = 0;
@@ -2458,7 +2459,7 @@ void MRUList::Load() noexcept {
 				PathAbsoluteFromApp(tchItem, tchPath);
 				tchItem = tchPath;
 			}
-			pszItems[n++] = StrDup(tchItem);
+			pszItems[n++] = HeapStrDupW(tchItem);
 		}
 	}
 
@@ -2510,7 +2511,7 @@ void MRUList::MergeSave(bool keep, bool destroy) noexcept {
 		for (int i = count - 1; i >= 0; i--) {
 			LPWSTR path = current[i];
 			Add(path);
-			LocalFree(path);
+			NP2HeapFree(path);
 		}
 		NP2HeapFree(AsVoidPointer(current));
 		Save();
@@ -2901,6 +2902,18 @@ LPWSTR HeapStrDupW(LPCWSTR pszIn) noexcept {
 	const size_t allocSize = NP2_align_up(size + sizeof(WCHAR), MEMORY_ALLOCATION_ALIGNMENT);
 	LPWSTR pszOut = static_cast<LPWSTR>(NP2HeapAlloc(allocSize));
 	return static_cast<LPWSTR>(memcpy(pszOut, pszIn, size));
+}
+
+NP2_noinline
+void HeapStrDupExW(LPWSTR &pszOut, LPCWSTR pszIn) noexcept {
+	if (pszOut) {
+		NP2HeapFree(pszOut);
+	}
+	const UINT len = lstrlen(pszIn);
+	const size_t size = len*sizeof(WCHAR);
+	const size_t allocSize = NP2_align_up(size + sizeof(WCHAR), MEMORY_ALLOCATION_ALIGNMENT);
+	pszOut = static_cast<LPWSTR>(NP2HeapAlloc(allocSize));
+	memcpy(pszOut, pszIn, size);
 }
 
 size_t Base64Encode(char *output, const uint8_t *src, size_t length, bool urlSafe) noexcept {
