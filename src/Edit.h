@@ -164,9 +164,9 @@ enum class ClipboardTextType {
 	UnicodeBackslash,
 	DocumentBytes,
 };
-LPWSTR EditGetClipboardTextW(ClipboardTextType type) noexcept;
-inline char *EditGetClipboardText() noexcept {
-	return reinterpret_cast<char *>(EditGetClipboardTextW(ClipboardTextType::DocumentBytes));
+LPWSTR EditGetClipboardTextW(ClipboardTextType type, UINT &length) noexcept;
+inline char *EditGetClipboardText(UINT &length) noexcept {
+	return reinterpret_cast<char *>(EditGetClipboardTextW(ClipboardTextType::DocumentBytes, length));
 }
 void	EditCopyAppend(HWND hwnd) noexcept;
 
@@ -647,7 +647,7 @@ LPSTR RecodeAsUTF8(LPSTR lpData, DWORD *cbData, UINT codePage, DWORD flags) noex
 int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, int *encodingFlag) noexcept;
 bool IsStringCaseSensitiveW(LPCWSTR pszTextW) noexcept;
 bool IsStringCaseSensitiveA(LPCSTR pszText) noexcept;
-void TransformBackslashes(char *pszInput, UINT cpEdit, const DBCSByteMask *byteMask) noexcept;
+UINT TransformBackslashes(char *pszInput, UINT cpEdit, const DBCSByteMask *byteMask) noexcept;
 
 //void SciInitThemes(HWND hwnd) noexcept;
 

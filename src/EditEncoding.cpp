@@ -2645,7 +2645,7 @@ bool IsStringCaseSensitiveA(LPCSTR pszText) noexcept {
 /**
  * Convert C style \a, \b, \f, \n, \r, \t, \v, \xHH and \uHHHH into their indicated characters.
  */
-void TransformBackslashes(char *pszInput, UINT cpEdit, const DBCSByteMask *byteMask) noexcept {
+UINT TransformBackslashes(char *pszInput, UINT cpEdit, const DBCSByteMask *byteMask) noexcept {
 	// same as BuiltinRegex::SubstituteByPosition()
 	static constexpr char backslashTable['x' - '\\' + 1] = {
 		'\\',	// '\'
@@ -2741,4 +2741,5 @@ void TransformBackslashes(char *pszInput, UINT cpEdit, const DBCSByteMask *byteM
 	}
 
 	*output = '\0';
+	return static_cast<UINT>(output - pszInput);
 }

@@ -305,7 +305,7 @@ void EditConvertToLargeMode() noexcept {
 //
 // EditGetClipboardText()
 //
-LPWSTR EditGetClipboardTextW(ClipboardTextType type) noexcept {
+LPWSTR EditGetClipboardTextW(ClipboardTextType type, UINT &length) noexcept {
 	if (!IsClipboardFormatAvailable(CF_UNICODETEXT) || !OpenClipboard(hwndMain)) {
 		return nullptr;
 	}
@@ -345,11 +345,12 @@ LPWSTR EditGetClipboardTextW(ClipboardTextType type) noexcept {
 				*d++ = *s++;
 			}
 		}
+		length = static_cast<UINT>(d - wszEOL);
 		if (type == ClipboardTextType::UnicodeBackslash) {
 			AddBackslashW(ptmp, wszEOL);
 		} else if (type == ClipboardTextType::DocumentBytes) {
 			const UINT cpEdit = SciCall_GetCodePage();
-			WideCharToMultiByte(cpEdit, 0, wszEOL, static_cast<int>(d - wszEOL), reinterpret_cast<char *>(ptmp), offset*sizeof(WCHAR), nullptr, nullptr);
+			length = WideCharToMultiByte(cpEdit, 0, wszEOL, static_cast<int>(d - wszEOL), reinterpret_cast<char *>(ptmp), offset*sizeof(WCHAR), nullptr, nullptr);
 		}
 	}
 
@@ -4555,7 +4556,8 @@ static LRESULT CALLBACK AddBackslashEditProc(HWND hwnd, UINT umsg, WPARAM wParam
 
 	switch (umsg) {
 	case WM_PASTE: {
-		LPWSTR lpsz = EditGetClipboardTextW(ClipboardTextType::UnicodeBackslash);
+		UINT len = 0;
+		LPWSTR lpsz = EditGetClipboardTextW(ClipboardTextType::UnicodeBackslash, len);
 		if (lpsz) {
 			SendMessage(hwnd, EM_REPLACESEL, TRUE, AsInteger<LPARAM>(lpsz));
 			NP2HeapFree(lpsz);
@@ -4660,10 +4662,7 @@ bool CopySelectionAsFindText(HWND hwndFind, EditFindReplace &efr, bool bFirstTim
 	// First time you bring up find/replace dialog,
 	// copy content from clipboard to find box when nothing is selected in the editor.
 	if (!hasFindText && bFirstTime && (iSelectOption & SelectOption_CopyPasteBufferAsFindText)) {
-		pClip = EditGetClipboardTextW(ClipboardTextType::Unicode);
-		if (pClip != nullptr) {
-			cchUnescapedW = lstrlen(pClip);
-		}
+		pClip = EditGetClipboardTextW(ClipboardTextType::Unicode, cchUnescapedW);
 	}
 
 	if (hasFindText || cchUnescapedW != 0) {
@@ -5280,7 +5279,7 @@ bool EditFindReplace::Prepare(UINT mask) noexcept {
 		if (StrNotEmpty(wszReplace)) {
 			if (StrEqualEx(wszReplace, L"^c")) {
 				status |= FindReplaceStatus_ReplaceClipboard;
-				szReplace = EditGetClipboardText();
+				szReplace = EditGetClipboardText(replaceLength);
 			} else {
 				if (searchFlags & SCFIND_REGEXP) {
 					replaceMessage = SCI_REPLACETARGETRE;
@@ -5288,13 +5287,10 @@ bool EditFindReplace::Prepare(UINT mask) noexcept {
 				const UINT len = lstrlen(wszReplace);
 				const UINT size = (len + 1)*kMaxMultiByteCount;
 				szReplace = static_cast<LPSTR>(NP2HeapAlloc(size));
-				WideCharToMultiByte(cpEdit, 0, wszReplace, len, szReplace, static_cast<int>(size), nullptr, nullptr);
+				replaceLength = WideCharToMultiByte(cpEdit, 0, wszReplace, len, szReplace, static_cast<int>(size), nullptr, nullptr);
 				if (option & FindReplaceOption_TransformBackslash) {
-					TransformBackslashes(szReplace, cpEdit, byteMask);
+					replaceLength = TransformBackslashes(szReplace, cpEdit, byteMask);
 				}
-			}
-			if (szReplace) {
-				replaceLength = static_cast<UINT>(strlen(szReplace));
 			}
 		}
 	}

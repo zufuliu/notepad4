@@ -3094,7 +3094,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			SciCall_SetSel(iPos, iNewPos);
 			SendWMCommand(hwnd, IDM_EDIT_CLEARCLIPBOARD);
 		} else {
-			char *pClip = EditGetClipboardText();
+			UINT len = 0;
+			char *pClip = EditGetClipboardText(len);
 			if (pClip == nullptr) {
 				break;
 			}
@@ -3104,7 +3105,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			SciCall_BeginUndoAction();
 			SciCall_Cut(false);
 			SciCall_ReplaceSel(pClip);
-			const size_t len = strlen(pClip);
 			NP2HeapFree(pClip);
 			if (iPos > iAnchor) {
 				iPos = iAnchor + len;
