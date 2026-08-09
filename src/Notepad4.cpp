@@ -6436,7 +6436,7 @@ void UpdateStatusbar() noexcept {
 	StopWatch watch;
 	watch.Start();
 #endif
-	Sci_TextToFindFull ft = { { SciCall_PositionFromLine(iLine), iPos }, nullptr, { 0, 0 } };
+	Sci_TextToFindFull ft = { { SciCall_PositionFromLine(iLine), iPos }, nullptr, 0, { 0, 0 } };
 	SciCall_CountCharactersAndColumns(&ft);
 	const Sci_Position iChar = ft.chrgText.cpMin + 1;
 	const Sci_Position iCol = ft.chrgText.cpMax + 1;

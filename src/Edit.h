@@ -79,6 +79,7 @@ struct EditFindReplace {
 	UINT	searchFlags;
 	LPSTR	szFind;
 	LPSTR	szReplace;
+	UINT	findTextLength;
 	UINT	replaceMessage;
 	UINT	replaceLength;
 
@@ -312,7 +313,7 @@ struct EditMarkAll {
 	bool bookmarkForFindAll;
 	UINT markFlag;
 	int incrementSize;			// increment search size
-	Sci_Position length;		// length for pszText
+	Sci_Position textLength;	// length for pszText
 	LPSTR pszText;				// pattern or text to find
 	double duration;			// search duration in milliseconds
 	Sci_Position matchCount;	// total match count

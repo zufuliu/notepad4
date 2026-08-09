@@ -3640,6 +3640,7 @@ void EditStripTrailingBlanks(bool bIgnoreSelection) noexcept {
 			StrCpyExNull(szFind, "[ \t]+$");
 			efr.searchFlags = SCFIND_REGEXP;
 			efr.szFind = szFind;
+			efr.findTextLength = CSTRLEN("[ \t]+$");
 			efr.replaceMessage = SCI_REPLACETARGET;
 			EditReplaceAllInSelection(efr, EditReplaceAllFlag_UndoGroup);
 			return;
@@ -3682,6 +3683,7 @@ void EditStripLeadingBlanks(bool bIgnoreSelection) noexcept {
 			StrCpyExNull(szFind, "^[ \t]+");
 			efr.searchFlags = SCFIND_REGEXP;
 			efr.szFind = szFind;
+			efr.findTextLength = CSTRLEN("^[ \t]+");
 			efr.replaceMessage = SCI_REPLACETARGET;
 			EditReplaceAllInSelection(efr, EditReplaceAllFlag_UndoGroup);
 			return;
@@ -5203,7 +5205,8 @@ HWND EditFindReplaceDlg(HWND hwnd, EditFindReplace &efr, bool bReplace) noexcept
 
 // Wildcard search uses the regexp engine to perform a simple search with * ?
 // as wildcards instead of more advanced and user-unfriendly regexp syntax.
-static void EscapeWildcards(char *pszOut, const char *pszIn, const DBCSByteMask *byteMask) noexcept {
+UINT EscapeWildcards(char *output, const char *pszIn, const DBCSByteMask *byteMask) noexcept {
+	char *pszOut = output;
 	while (*pszIn) {
 		uint8_t c = *pszIn++;
 		if (c == '*') {
@@ -5222,6 +5225,7 @@ static void EscapeWildcards(char *pszOut, const char *pszIn, const DBCSByteMask 
 		*pszOut++ = c;
 	}
 	*pszOut = '\0';
+	return static_cast<UINT>(pszOut - output);
 }
 
 NP2_noinline
@@ -5233,6 +5237,7 @@ bool EditFindReplace::Prepare(UINT mask) noexcept {
 		const UINT len = lstrlen(wszFind);
 		if (len == 0) {
 			status &= ~FindReplaceStatus_HasFindText;
+			findTextLength = 0;
 			InfoBoxWarn(MB_OK, L"MsgNotFound", IDS_NOTFOUND);
 			return false;
 		}
@@ -5244,23 +5249,23 @@ bool EditFindReplace::Prepare(UINT mask) noexcept {
 		NP2HeapFree(szFind);
 		szFind = static_cast<LPSTR>(NP2HeapAlloc(offset + findLen));
 		char * const pszText = szFind + offset;
-		WideCharToMultiByte(cpEdit, 0, wszFind, len, pszText, static_cast<int>(findLen), nullptr, nullptr);
+		findTextLength = WideCharToMultiByte(cpEdit, 0, wszFind, len, pszText, static_cast<int>(findLen), nullptr, nullptr);
 		if (option & FindReplaceOption_TransformBackslash) {
-			TransformBackslashes(pszText, cpEdit, byteMask);
+			findTextLength = TransformBackslashes(pszText, cpEdit, byteMask);
 		}
 		searchFlags = fuFlags;
 		status &= ~FindReplaceStatus_FindUpdated;
 		status = (status & 0xff) | (PackFindFlagOption(fuFlags, option) << 8);
 		if (option & FindReplaceOption_WildcardSearch) {
 			searchFlags |= SCFIND_REGEXP;
-			EscapeWildcards(szFind, pszText, byteMask);
+			findTextLength = EscapeWildcards(szFind, pszText, byteMask);
 		} else if (!(searchFlags & (SCFIND_REGEXP | SCFIND_MATCHCASE))) {
 			const BOOL sensitive = IsStringCaseSensitiveA(szFind);
 			//printf("%s sensitive=%d\n", __func__, sensitive);
 			searchFlags |= ((sensitive - TRUE) & SCFIND_MATCHCASE);
 		}
 	}
-	if (StrIsEmpty(szFind)) {
+	if (findTextLength == 0) {
 		InfoBoxWarn(MB_OK, L"MsgNotFound", IDS_NOTFOUND);
 		return false;
 	}
@@ -5309,7 +5314,7 @@ void EditFindNext(EditFindReplace &efr, bool fExtendSelection) noexcept {
 	const Sci_Position iSelPos = SciCall_GetCurrentPos();
 	const Sci_Position iSelAnchor = SciCall_GetAnchor();
 
-	Sci_TextToFindFull ttf = { { SciCall_GetSelectionEnd(), SciCall_GetLength() }, efr.szFind, { 0, 0 } };
+	Sci_TextToFindFull ttf = { { SciCall_GetSelectionEnd(), SciCall_GetLength() }, efr.szFind, efr.findTextLength, { 0, 0 } };
 	Sci_Position iPos = SciCall_FindTextFull(efr.searchFlags, &ttf);
 	bool bSuppressNotFound = false;
 
@@ -5352,7 +5357,7 @@ void EditFindPrev(EditFindReplace &efr, bool fExtendSelection) noexcept {
 	const Sci_Position iSelPos = SciCall_GetCurrentPos();
 	const Sci_Position iSelAnchor = SciCall_GetAnchor();
 
-	Sci_TextToFindFull ttf = { { SciCall_GetSelectionStart(), 0 }, efr.szFind, { 0, 0 } };
+	Sci_TextToFindFull ttf = { { SciCall_GetSelectionStart(), 0 }, efr.szFind, efr.findTextLength, { 0, 0 } };
 	Sci_Position iPos = SciCall_FindTextFull(efr.searchFlags, &ttf);
 	const Sci_Position iLength = SciCall_GetLength();
 	bool bSuppressNotFound = false;
@@ -5396,7 +5401,7 @@ void EditReplace(EditFindReplace &efr) noexcept {
 	const Sci_Position iSelStart = SciCall_GetSelectionStart();
 	const Sci_Position iSelEnd = SciCall_GetSelectionEnd();
 
-	Sci_TextToFindFull ttf = { { iSelStart, SciCall_GetLength() }, efr.szFind, { 0, 0 } };
+	Sci_TextToFindFull ttf = { { iSelStart, SciCall_GetLength() }, efr.szFind, efr.findTextLength, { 0, 0 } };
 	Sci_Position iPos = SciCall_FindTextFull(efr.searchFlags, &ttf);
 	bool bSuppressNotFound = false;
 
@@ -5487,7 +5492,7 @@ void EditMarkAll::Reset(UINT findFlag, Sci_Position iSelCount, LPSTR text) noexc
 	ignoreSelectionUpdate = false;
 	markFlag = findFlag;
 	incrementSize = 1;
-	length = iSelCount;
+	textLength = iSelCount;
 	pszText = text;
 	// timing for increment search is only useful for current search.
 	duration = EditMarkAll_DefaultDuration;
@@ -5499,7 +5504,7 @@ void EditMarkAll::Reset(UINT findFlag, Sci_Position iSelCount, LPSTR text) noexc
 
 void EditMarkAll::Start(BOOL bChanged, UINT findFlag, Sci_Position iSelCount, LPSTR text) noexcept {
 	if (!bChanged && (findFlag == (markFlag & (NP2_SearchForLineEnd - 1))
-		&& iSelCount == length
+		&& iSelCount == textLength
 		// _stricmp() is not safe for DBCS string.
 		&& memcmp(text, pszText, iSelCount) == 0)) {
 		NP2HeapFree(text);
@@ -5589,7 +5594,7 @@ void EditMarkAll::Continue(HANDLE timer) noexcept {
 	const Sci_Position iLength = SciCall_GetLength();
 	Sci_Position iStartPos = prevStopPos;
 	Sci_Position iMaxLength = incrementSize * EditMarkAll_MeasuredSize;
-	iMaxLength += iStartPos + length;
+	iMaxLength += iStartPos + textLength;
 	iMaxLength = min(iMaxLength, iLength);
 	if (iMaxLength < iLength) {
 		// match on whole line to avoid rewinding.
@@ -5602,11 +5607,11 @@ void EditMarkAll::Continue(HANDLE timer) noexcept {
 	// rewind start position
 	const UINT findFlag = markFlag;
 	if (findFlag & NP2_MarkAllMultiline) {
-		iStartPos = max(iStartPos - length + 1, lastMatchPos);
+		iStartPos = max(iStartPos - textLength + 1, lastMatchPos);
 	}
 
 	Sci_Position cpMin = iStartPos;
-	Sci_TextToFindFull ttf = { { cpMin, iMaxLength }, pszText, { 0, 0 } };
+	Sci_TextToFindFull ttf = { { cpMin, iMaxLength }, pszText, static_cast<Sci_PositionU>(textLength), { 0, 0 } };
 
 	Sci_Position matchCount_ = matchCount;
 	UINT index = 0;
@@ -5721,7 +5726,7 @@ void EditFindAll(EditFindReplace &efr, bool selectAll) noexcept {
 		return;
 	}
 
-	const size_t findLen = strlen(efr.szFind);
+	const size_t findLen = efr.findTextLength;
 	LPSTR szFind = static_cast<LPSTR>(NP2HeapAlloc(findLen + 1));
 	memcpy(szFind, efr.szFind, findLen);
 
@@ -5803,7 +5808,7 @@ void EditReplaceAll(EditFindReplace &efr) noexcept {
 	watch.Start();
 #endif
 
-	Sci_TextToFindFull ttf = { { 0, SciCall_GetLength() }, efr.szFind, { 0, 0 } };
+	Sci_TextToFindFull ttf = { { 0, SciCall_GetLength() }, efr.szFind, efr.findTextLength, { 0, 0 } };
 	Sci_Position iCount = 0;
 	while (SciCall_FindTextFull(efr.searchFlags, &ttf) >= 0) {
 		++iCount;
@@ -5871,7 +5876,7 @@ void EditReplaceAllInSelection(EditFindReplace &efr, EditReplaceAllFlag flag) no
 	// Show wait cursor...
 	BeginWaitCursor();
 
-	Sci_TextToFindFull ttf = { { SciCall_GetSelectionStart(), SciCall_GetLength() }, efr.szFind, { 0, 0 } };
+	Sci_TextToFindFull ttf = { { SciCall_GetSelectionStart(), SciCall_GetLength() }, efr.szFind, efr.findTextLength, { 0, 0 } };
 	Sci_Position iCount = 0;
 	while (SciCall_FindTextFull(efr.searchFlags, &ttf) >= 0) {
 		if (ttf.chrgText.cpMax <= SciCall_GetSelectionEnd()) {
@@ -6801,7 +6806,7 @@ void TryBrowseFile(HWND hwnd, LPCWSTR pszFile, bool bWarn) noexcept {
 	}
 }
 
-char *EditGetStringAroundCaret(LPCSTR delimiters) noexcept {
+char *EditGetStringAroundCaret(LPCSTR delimiters, UINT textLength) noexcept {
 	const Sci_Position iCurrentPos = SciCall_GetCurrentPos();
 	const Sci_Line iLine = SciCall_LineFromPosition(iCurrentPos);
 	Sci_Position iLineStart = SciCall_PositionFromLine(iLine);
@@ -6826,7 +6831,7 @@ char *EditGetStringAroundCaret(LPCSTR delimiters) noexcept {
 		return EditGetTextRange(iLineStart, iLineEnd);
 	}
 
-	Sci_TextToFindFull ft = { { iCurrentPos, 0 }, delimiters, { 0, 0 } };
+	Sci_TextToFindFull ft = { { iCurrentPos, 0 }, delimiters, textLength, { 0, 0 } };
 	constexpr int findFlag = SCFIND_REGEXP | SCFIND_POSIX;
 
 	// forward
@@ -6927,7 +6932,7 @@ void EditOpenSelection(OpenSelectionType type) {
 		}
 	} else {
 		// string terminated by space or quotes
-		mszSelection = EditGetStringAroundCaret("[\\s'`\"<>|*,;]");
+		mszSelection = EditGetStringAroundCaret("[\\s'`\"<>|*,;]", CSTRLEN("[\\s'`\"<>|*,;]"));
 	}
 
 	if (mszSelection == nullptr) {
@@ -7119,7 +7124,7 @@ void EditOpenSelection(OpenSelectionType type) {
 				EscapeRegex(lpstrText, lpszArgs);
 				strcat(lpstrText, "[\'\"]?");
 
-				Sci_TextToFindFull ft = { { 0, SciCall_GetLength() }, mszSelection, { 0, 0 } };
+				Sci_TextToFindFull ft = { { 0, SciCall_GetLength() }, mszSelection, 0, { 0, 0 } };
 				Sci_Position iPos = SciCall_FindTextFull(SCFIND_REGEXP | SCFIND_POSIX, &ft);
 				if (iPos < 0) {
 					lpstrText = mszSelection + 2;

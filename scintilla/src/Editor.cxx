@@ -4446,7 +4446,10 @@ Sci::Position Editor::FindTextFull(
 
 	TextToFindFull *ft = AsPointer<TextToFindFull *>(lParam);
 #if 1
-	Sci::Position lengthFound = strlen(ft->lpstrText);
+	Sci::Position lengthFound = ft->textLength;
+	if (lengthFound <= 0) {
+		lengthFound = strlen(ft->lpstrText);
+	}
 	if (!pdoc->HasCaseFolder())
 		pdoc->SetCaseFolder(CaseFolderForEncoding());
 	try {
@@ -4473,7 +4476,10 @@ Sci::Position Editor::FindTextFull(
 	const ElapsedPeriod period;
 	uint32_t count = 0;
 	while (true) {
-		Sci::Position lengthFound = strlen(ft->lpstrText);
+		Sci::Position lengthFound = ft->textLength;
+		if (lengthFound <= 0) {
+			lengthFound = strlen(ft->lpstrText);
+		}
 		if (!pdoc->HasCaseFolder())
 			pdoc->SetCaseFolder(CaseFolderForEncoding());
 		try {

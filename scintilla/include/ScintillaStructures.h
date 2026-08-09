@@ -23,6 +23,7 @@ struct TextRangeFull final {
 struct TextToFindFull final {
 	CharacterRangeFull chrg;
 	const char *lpstrText;
+	Position textLength;
 	CharacterRangeFull chrgText;
 };
 
