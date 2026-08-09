@@ -2296,15 +2296,16 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 				}
 				if (direction >= 0) {
 					const unsigned char *ptr = searchData;
-					while (*ptr != 0) {
+					const unsigned char * const end = searchData + shift;
+					do {
 						shiftTable[*ptr++] = shift--;
-					}
+					} while (ptr < end);
 				} else {
 					const unsigned char *ptr = searchData + shift - 1;
 					shift = -shift;
-					while (ptr >= searchData) {
+					do {
 						shiftTable[*ptr--] = shift++;
-					}
+					} while (ptr >= searchData);
 				}
 			}
 

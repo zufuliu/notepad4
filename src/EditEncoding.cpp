@@ -2722,7 +2722,7 @@ UINT TransformBackslashes(char *pszInput, UINT cpEdit, const DBCSByteMask *byteM
 					}
 				}
 				if (index != 0) {
-					input += digitCount*index;
+					input += digitCount*index - 1;
 					if (digitCount == 4 || (index == 1 && wchBuf[0] < 0x80)) {
 						ch = static_cast<uint8_t>(wchBuf[0]); // \xHH or ASCII
 					} else {
