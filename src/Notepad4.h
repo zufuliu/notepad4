@@ -216,7 +216,12 @@ extern WindowPositionRecord positionRecord;
 BOOL InitApplication(HINSTANCE hInstance) noexcept;
 void InitInstance(HINSTANCE hInstance, int nCmdShow);
 bool ActivatePrevInst() noexcept;
-void GetRelaunchParameters(LPWSTR szParameters, LPCWSTR lpszFile, bool newWind, bool emptyWind) noexcept;
+enum RelaunchOption {
+	RelaunchOption_None = 0,
+	RelaunchOption_NewWindow = 1,
+	RelaunchOption_EmptyWindow = 2,
+};
+void GetRelaunchParameters(LPWSTR szParameters, LPCWSTR lpszFile, RelaunchOption option) noexcept;
 bool RelaunchMultiInst() noexcept;
 bool RelaunchElevated();
 void SnapToDefaultPos(HWND hwnd) noexcept;

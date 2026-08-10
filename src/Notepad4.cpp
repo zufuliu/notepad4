@@ -2732,7 +2732,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		WCHAR szModuleName[MAX_PATH];
 		GetModuleFileName(nullptr, szModuleName, COUNTOF(szModuleName));
 		LPWSTR szParameters = static_cast<LPWSTR>(NP2HeapAlloc(sizeof(WCHAR) * 1024));
-		GetRelaunchParameters(szParameters, szCurFile, true, emptyWind);
+		const RelaunchOption option = emptyWind ? static_cast<RelaunchOption>(RelaunchOption_NewWindow | RelaunchOption_EmptyWindow) : RelaunchOption_NewWindow;
+		GetRelaunchParameters(szParameters, szCurFile, option);
 
 		SHELLEXECUTEINFO sei;
 		memset(&sei, 0, sizeof(SHELLEXECUTEINFO));
@@ -7472,7 +7473,7 @@ bool RelaunchMultiInst() noexcept {
 	return false;
 }
 
-void GetRelaunchParameters(LPWSTR szParameters, LPCWSTR lpszFile, bool newWind, bool emptyWind) noexcept {
+void GetRelaunchParameters(LPWSTR szParameters, LPCWSTR lpszFile, RelaunchOption option) noexcept {
 	WCHAR tch[64];
 	wsprintf(tch, L"-appid=\"%s\"", g_wchAppUserModelID);
 	lstrcpy(szParameters, tch);
@@ -7480,7 +7481,7 @@ void GetRelaunchParameters(LPWSTR szParameters, LPCWSTR lpszFile, bool newWind, 
 	wsprintf(tch, L" -sysmru=%i", (flagUseSystemMRU == TripleBoolean_True));
 	lstrcat(szParameters, tch);
 
-	if (newWind) {
+	if (option & RelaunchOption_NewWindow) {
 		lstrcat(szParameters, L" -n");
 	}
 
@@ -7494,8 +7495,8 @@ void GetRelaunchParameters(LPWSTR szParameters, LPCWSTR lpszFile, bool newWind, 
 	GetMonitorInfo(hMonitor, &mi);
 
 	// offset new window position +10/+10
-	int x = wndpl.rcNormalPosition.left + (newWind? 10 : 0);
-	int y = wndpl.rcNormalPosition.top	+ (newWind? 10 : 0);
+	int x = wndpl.rcNormalPosition.left + ((option & RelaunchOption_NewWindow)? 10 : 0);
+	int y = wndpl.rcNormalPosition.top	+ ((option & RelaunchOption_NewWindow)? 10 : 0);
 	const int cx = wndpl.rcNormalPosition.right - wndpl.rcNormalPosition.left;
 	const int cy = wndpl.rcNormalPosition.bottom - wndpl.rcNormalPosition.top;
 
@@ -7509,7 +7510,7 @@ void GetRelaunchParameters(LPWSTR szParameters, LPCWSTR lpszFile, bool newWind, 
 	wsprintf(tch, L" -pos %i,%i,%i,%i,%i", x, y, cx, cy, imax);
 	lstrcat(szParameters, tch);
 
-	if (!emptyWind && StrNotEmpty(lpszFile)) {
+	if (!(option & RelaunchOption_EmptyWindow) && StrNotEmpty(lpszFile)) {
 		// read only mode
 		if (bReadOnlyMode) {
 			lstrcat(szParameters, L" -ro");
@@ -7542,6 +7543,9 @@ void GetRelaunchParameters(LPWSTR szParameters, LPCWSTR lpszFile, bool newWind, 
 		default: {
 			const char *enc = mEncoding[iCurrentEncoding].pszParseNames;
 			const char *sep = strchr(enc, ',');
+			if (sep == nullptr) {
+				break;
+			}
 			memset(tch, 0, sizeof(tch));
 			MultiByteToWideChar(CP_UTF8, 0, enc, static_cast<int>(sep - enc), tch, COUNTOF(tch));
 			lstrcat(szParameters, L" -e \"");
@@ -7622,7 +7626,7 @@ bool RelaunchElevated() {
 			lpArg1 = static_cast<LPWSTR>(NP2HeapAlloc(sizeof(WCHAR) * (cmdSize + 1024)));
 			lpArg2 = lpArg1 + cmdSize;
 			GetModuleFileName(nullptr, lpArg1, MAX_PATH);
-			GetRelaunchParameters(lpArg2, tchFile, !exit, false);
+			GetRelaunchParameters(lpArg2, tchFile, (exit ? RelaunchOption_None : RelaunchOption_NewWindow));
 			exit = !IsDocumentModified();
 		} else {
 			const LPCWSTR lpCmdLine = GetCommandLine();
