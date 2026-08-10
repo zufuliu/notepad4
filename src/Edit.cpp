@@ -3681,6 +3681,7 @@ void EditStripLeadingBlanks(bool bIgnoreSelection) noexcept {
 			EditFindReplace efr;
 			memset(&efr, 0, sizeof(efr));
 			StrCpyExNull(szFind, "^[ \t]+");
+			efr.status = FindReplaceStatus_RegexStartOfLine;
 			efr.searchFlags = SCFIND_REGEXP;
 			efr.szFind = szFind;
 			efr.findTextLength = CSTRLEN("^[ \t]+");
@@ -4463,7 +4464,7 @@ void EditGetExcerpt(LPWSTR lpszExcerpt, DWORD cchExcerpt) noexcept {
 	}
 	lpszExcerpt[cch] = L'\0';
 	if (cch == 0) {
-		lstrcpy(lpszExcerpt, L" ... ");
+		StrCpyEx(lpszExcerpt, L" ... ");
 	}
 }
 
@@ -5469,7 +5470,7 @@ extern HANDLE idleTaskTimer;
 // increment search size will return to normal after several runs
 // when selection no longer changed, this make continuous selecting smooth.
 #define EditMarkAll_DefaultDuration		64
-#define EditMarkAll_RangeCacheCount		256
+#define EditMarkAll_RangeCacheCount		240
 //static UINT EditMarkAll_Runs;
 
 void EditMarkAll::Reset(UINT findFlag, Sci_Position iSelCount, LPSTR text) noexcept {
