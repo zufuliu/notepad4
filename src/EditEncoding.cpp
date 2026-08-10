@@ -474,7 +474,6 @@ void EditOnCodePageChanged(UINT oldCodePage, bool showControlCharacter, EditFind
 	const UINT cpEdit = SciCall_GetCodePage();
 	const UINT acp = GetACP();
 	if (efr.HasFindText()) { // need to convert last find & replace string.
-		efr.status &= FindReplaceStatus_ReplaceInitialized;
 		efr.status |= FindReplaceStatus_HasFindText | FindReplaceStatus_FindUpdated | FindReplaceStatus_ReplaceUpdated;
 	}
 

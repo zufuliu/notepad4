@@ -686,7 +686,7 @@ NP2_noinline
 static void HandleMatchText(MatchTextFlag flag, LPCWSTR lpszText, bool jumpTo) noexcept {
 	if (StrNotEmpty(lpszText) && SciCall_GetLength()) {
 		efrData.wszFind = HeapStrDupW(lpszText);
-		efrData.status = FindReplaceStatus_HasFindText | FindReplaceStatus_FindUpdated;
+		efrData.status |= FindReplaceStatus_HasFindText | FindReplaceStatus_FindUpdated | FindReplaceStatus_ReplaceUpdated;
 
 		if (flag & MatchTextFlag_Regex) {
 			efrData.fuFlags |= (iFindReplaceOption & FindReplaceOption_UseCxxRegex) ? (SCFIND_REGEXP | SCFIND_CXX11REGEX) : (SCFIND_REGEXP | SCFIND_POSIX);

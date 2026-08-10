@@ -4613,7 +4613,6 @@ void EditSaveSelectionAsFindText(EditFindReplace &efr, int menu, bool findSelect
 
 		efr.fuFlags &= SCFIND_REGEXP - 1; // clear all regex flags
 		efr.option &= ~FindReplaceOption_TransformBackslash;
-		efr.status &= FindReplaceStatus_ReplaceInitialized;
 		efr.status |= FindReplaceStatus_HasFindText | FindReplaceStatus_FindUpdated | FindReplaceStatus_ReplaceUpdated;
 
 		switch (menu) {
