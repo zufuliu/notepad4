@@ -820,7 +820,7 @@ BEGIN
 #endif
 		MENUITEM "Exibir Barra de E&status",				IDM_VIEW_STATUSBAR
 	END
-	POPUP "+"
+POPUP "+"
 	BEGIN
 		MENUITEM "&Abrir Notepad4",				IDM_TRAY_RESTORE
 		MENUITEM SEPARATOR
@@ -1190,7 +1190,7 @@ BEGIN
 END
 
 IDD_SYSTEM_INTEGRATION DIALOGEX 0, 0, 232, 118
-IDD_SYSTEM DIALOGEX 0, 0, 232, 118
+IDD_SYSTEM_INTEGRATION DIALOGEX 0, 0, 232, 118
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Integração com o Sistema"
 FONT 9, "Segoe UI", 400, 0, 0x1
@@ -1919,6 +1919,7 @@ BEGIN
     IDS_WIKI_SEARCH_URL     "https://pt.wikipedia.org/wiki/Especial:Pesquisar?search=%s"
 END
 
+
 // formato do nome da codificação: 'nome descritivo longo no diálogo Selecionar Codificação' + ';' + 'nome curto na barra de status'
 STRINGTABLE
 BEGIN
@@ -2063,7 +2064,7 @@ O botão ""Visualizar"" não aplicará nenhuma alteração."
 END
 
 #if NP2_ENABLE_LOCALIZE_LEXER_NAME
-// tabela de strings para analisadores sintáticos (lexers), veja EditLexer.h
+// string table for lexers, see EditLexer.h
 STRINGTABLE
 BEGIN
 	NP2LEX_TEXTFILE					"Arquivo de Texto"
@@ -2074,7 +2075,7 @@ END
 #endif // NP2_ENABLE_LOCALIZE_LEXER_NAME
 
 #if NP2_ENABLE_LOCALIZE_STYLE_NAME
-// tabela de strings para estilos, veja EditLexers/EditStyleX.h
+// string table for st yles, see EditLexers/ EditStyleX.h
 STRINGTABLE
 BEGIN
 	NP2STYLE_MarginLineNumber		"Margem e Número da Linha"
@@ -2128,7 +2129,7 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
-#endif    // Recursos em Português (Brasil)
+#endif    // Resources in Portuguese (Brasil)
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -2136,7 +2137,7 @@ END
 #ifndef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
 //
-// Gerado a partir do recurso TEXTINCLUDE 3.
+// Generated from the resource TEXTINCLUDE 3.
 //
 #include "../../src/Notepad4.ver"
 /////////////////////////////////////////////////////////////////////////////
