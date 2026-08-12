@@ -132,7 +132,7 @@ public:
 	void DropGraphics() noexcept;
 	void RefreshPixMaps(Surface *surfaceWindow, const ViewStyle &vsDraw);
 
-	LineLayout *RetrieveLineLayout(Sci::Line lineNumber, const EditModel &model);
+	std::shared_ptr<LineLayout> RetrieveLineLayout(Sci::Line lineNumber, const EditModel &model);
 	uint32_t LayoutLine(const EditModel &model, Surface *surface, const ViewStyle &vstyle,
 		LineLayout *ll, int width, LayoutLineOption option, int posInLine = 0);
 

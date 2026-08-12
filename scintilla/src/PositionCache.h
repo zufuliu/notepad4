@@ -161,8 +161,8 @@ struct SignificantLines {
  */
 class LineLayoutCache final {
 private:
-	std::vector<std::unique_ptr<LineLayout>> shortCache;
-	std::vector<std::unique_ptr<LineLayout>> longCache;
+	std::vector<std::shared_ptr<LineLayout>> shortCache;
+	std::vector<std::shared_ptr<LineLayout>> longCache;
 	size_t lastCaretSlot;
 	Scintilla::LineCache level;
 	LineLayout::ValidLevel maxValidity;
@@ -182,9 +182,9 @@ public:
 	Scintilla::LineCache GetLevel() const noexcept {
 		return level;
 	}
-	LineLayout* SCICALL Retrieve(Sci::Line lineNumber, Sci::Line lineCaret, int maxChars, int styleClock_,
+	std::shared_ptr<LineLayout> SCICALL Retrieve(Sci::Line lineNumber, Sci::Line lineCaret, int maxChars, int styleClock_,
 		Sci::Line linesOnScreen, Sci::Line linesInDoc, Sci::Line topLine);
-	LineLayout* Retrieve(Sci::Line lineNumber, const SignificantLines &significantLines, int maxChars) {
+	std::shared_ptr<LineLayout> Retrieve(Sci::Line lineNumber, const SignificantLines &significantLines, int maxChars) {
 		return Retrieve(lineNumber, significantLines.lineCaret,
 			maxChars, significantLines.styleClock,
 			significantLines.linesOnScreen, significantLines.linesTotal, significantLines.lineTop);

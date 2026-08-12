@@ -1537,8 +1537,8 @@ void Editor::NeedWrapping(Sci::Line docLineStart, Sci::Line docLineEnd, bool inv
 bool Editor::WrapOneLine(Surface *surface, Sci::Position positionInsert) {
 	const Sci::Line lineToWrap = pdoc->SciLineFromPosition(positionInsert);
 	const int posInLine = static_cast<int>(positionInsert - pdoc->LineStart(lineToWrap));
-	LineLayout * const ll = view.RetrieveLineLayout(lineToWrap, *this);
-	view.LayoutLine(*this, surface, vs, ll, wrapWidth, LayoutLineOption::ManualUpdate, posInLine);
+	auto const ll = view.RetrieveLineLayout(lineToWrap, *this);
+	view.LayoutLine(*this, surface, vs, ll.get(), wrapWidth, LayoutLineOption::ManualUpdate, posInLine);
 	int linesWrapped = ll->lines;
 	if (vs.annotationVisible != AnnotationVisible::Hidden) {
 		linesWrapped += pdoc->AnnotationLines(lineToWrap);
@@ -1658,10 +1658,12 @@ struct WrapBlockWorker {
 			const Sci::Position lineEnd = model.pdoc->LineStart(lineNumber + 1);
 			const int lengthLine = static_cast<int>(lineEnd - lineStart);
 			if (lengthLine < lengthToMultiThread) {
+				std::shared_ptr<LineLayout> shared;
 				LineLayout *ll;
 				if (significantLines.LineMayCache(lineNumber, lengthLine)) {
 					const LockGuard<NativeMutex> guard(mutexRetrieve);
-					ll = view.llc.Retrieve(lineNumber, significantLines, lengthLine);
+					shared = view.llc.Retrieve(lineNumber, significantLines, lengthLine);
+					ll = shared.get();
 				} else if (lengthLine < minLineLength) {
 					wrappedBytesOneThread += lengthLine;
 					linesAfterWrap[index] = 1;
@@ -1708,13 +1710,13 @@ int Editor::WrapBlock(Surface *surface, const Sci::Line lineToWrap, Sci::Line li
 		const Sci::Position lineStart = pdoc->LineStart(lineNumber);
 		const Sci::Position lineEnd = pdoc->LineStart(lineNumber + 1);
 		const int lengthLine = static_cast<int>(lineEnd - lineStart);
-		LineLayout * const ll = view.llc.Retrieve(lineNumber, worker.significantLines, lengthLine);
+		auto const ll = view.llc.Retrieve(lineNumber, worker.significantLines, lengthLine);
 		if (lineNumber == worker.significantLines.lineCaret) {
 			ll->caretPosition = static_cast<int>(worker.caretPosition - lineStart);
 		} else {
 			ll->caretPosition = 0;
 		}
-		const uint32_t wrappedBytes = view.LayoutLine(*this, surface, vs, ll, wrapWidth, LayoutLineOption::IdleUpdate);
+		const uint32_t wrappedBytes = view.LayoutLine(*this, surface, vs, ll.get(), wrapWidth, LayoutLineOption::IdleUpdate);
 		wrappedBytesAllThread += wrappedBytes;
 		worker.linesAfterWrap[index] = ll->lines;
 		if (ll->PartialPosition()) {
@@ -1904,8 +1906,8 @@ void Editor::LinesSplit(int pixelWidth) {
 			const AutoSurface surface(this);
 			if (surface) {
 				const Sci::Position posLineStart = pdoc->LineStart(line);
-				LineLayout * const ll = view.RetrieveLineLayout(line, *this);
-				view.LayoutLine(*this, surface, vs, ll, pixelWidth, LayoutLineOption::AutoUpdate, ll->maxLineLength);
+				auto const ll = view.RetrieveLineLayout(line, *this);
+				view.LayoutLine(*this, surface, vs, ll.get(), pixelWidth, LayoutLineOption::AutoUpdate, ll->maxLineLength);
 				Sci::Position lengthInsertedTotal = 0;
 				for (int subLine = 1; subLine < ll->lines; subLine++) {
 					const Sci::Position lengthInserted = pdoc->InsertString(
@@ -5653,8 +5655,8 @@ void Editor::SetAnnotationHeights(Sci::Line start, Sci::Line end) {
 			if (Wrapping()) {
 				const AutoSurface surface(this);
 				if (surface) {
-					LineLayout * const ll = view.RetrieveLineLayout(line, *this);
-					view.LayoutLine(*this, surface, vs, ll, wrapWidth, LayoutLineOption::ManualUpdate);
+					auto const ll = view.RetrieveLineLayout(line, *this);
+					view.LayoutLine(*this, surface, vs, ll.get(), wrapWidth, LayoutLineOption::ManualUpdate);
 					linesWrapped = ll->lines;
 				}
 			}
@@ -6131,8 +6133,8 @@ Sci::Line Editor::WrapCount(Sci::Line line) {
 	const AutoSurface surface(this);
 
 	if (surface) {
-		LineLayout * const ll = view.RetrieveLineLayout(line, *this);
-		view.LayoutLine(*this, surface, vs, ll, wrapWidth, LayoutLineOption::AutoUpdate);
+		auto const ll = view.RetrieveLineLayout(line, *this);
+		view.LayoutLine(*this, surface, vs, ll.get(), wrapWidth, LayoutLineOption::AutoUpdate);
 		return ll->lines;
 	}
 	return 1;

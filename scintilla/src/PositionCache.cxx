@@ -742,7 +742,7 @@ void LineLayoutCache::SetLevel(LineCache level_) noexcept {
 	}
 }
 
-LineLayout *LineLayoutCache::Retrieve(Sci::Line lineNumber, Sci::Line lineCaret, int maxChars, int styleClock_,
+std::shared_ptr<LineLayout> LineLayoutCache::Retrieve(Sci::Line lineNumber, Sci::Line lineCaret, int maxChars, int styleClock_,
 	Sci::Line linesOnScreen, Sci::Line linesInDoc, Sci::Line topLine) {
 	AllocateForLevel(linesOnScreen, linesInDoc);
 	if (styleClock != styleClock_) {
@@ -752,12 +752,12 @@ LineLayout *LineLayoutCache::Retrieve(Sci::Line lineNumber, Sci::Line lineCaret,
 	maxValidity = LineLayout::ValidLevel::lines;
 
 	size_t pos = 0;
-	LineLayout *ret = nullptr;
+	std::shared_ptr<LineLayout> ret;
 	const int useLongCache = UseLongCache(maxChars);
 	if (useLongCache) {
 		for (const auto &ll : longCache) {
 			if (ll->LineNumber() == lineNumber) {
-				ret = ll.get();
+				ret = ll;
 				break;
 			}
 		}
@@ -788,7 +788,7 @@ LineLayout *LineLayoutCache::Retrieve(Sci::Line lineNumber, Sci::Line lineCaret,
 	}
 
 	if (!useLongCache) {
-		ret = shortCache[pos].get();
+		ret = shortCache[pos];
 	}
 	if (ret) {
 		if (!ret->CanHold(lineNumber, maxChars)) {
@@ -799,11 +799,12 @@ LineLayout *LineLayoutCache::Retrieve(Sci::Line lineNumber, Sci::Line lineCaret,
 			//printf("HIT line=%zd, caret=%zd/%zd top=%zd, pos=%zu, clock=%d, validity=%d\n",
 			//	lineNumber, lineCaret, lastCaretSlot, topLine, pos, styleClock_, ret->validity);
 		}
-	} else {
+	}
+	if (!ret) {
 		//printf("NEW line=%zd, caret=%zd/%zd top=%zd, pos=%zu, clock=%d\n",
 		//	lineNumber, lineCaret, lastCaretSlot, topLine, pos, styleClock_);
-		auto ll = std::make_unique<LineLayout>(lineNumber, maxChars);
-		ret = ll.get();
+		auto ll = std::make_shared<LineLayout>(lineNumber, maxChars);
+		ret = ll;
 		if (useLongCache) {
 			longCache.push_back(std::move(ll));
 		} else {
