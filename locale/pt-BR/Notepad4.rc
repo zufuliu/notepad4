@@ -2075,7 +2075,7 @@ END
 #endif // NP2_ENABLE_LOCALIZE_LEXER_NAME
 
 #if NP2_ENABLE_LOCALIZE_STYLE_NAME
-// string table for st yles, see EditLexers/ EditStyleX.h
+// string table for styles, see EditLexers/ EditStyleX.h
 STRINGTABLE
 BEGIN
 	NP2STYLE_MarginLineNumber		"Margem e Número da Linha"
