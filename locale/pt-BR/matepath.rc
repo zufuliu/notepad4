@@ -126,7 +126,7 @@ BEGIN
 		MENUITEM "&Novo arquivo...",				IDM_FILE_NEW
 		MENUITEM "No&vo Diretório...",			IDM_FILE_NEWDIR
 		MENUITEM SEPARATOR
-		MENUITEM "File Fi&lter...",				IDM_VIEW_FILTER
+		MENUITEM "Filtro de Arquivos...",				IDM_VIEW_FILTER
 		MENUITEM "&Limpar Filtro",				IDM_VIEW_FILTERALL
 		POPUP "&Mostrar"
 		BEGIN
@@ -159,26 +159,26 @@ BEGIN
 	END
 	POPUP "+"
 	BEGIN
-		MENUITEM "&Directory...",				IDM_FILE_CHANGEDIR
-		MENUITEM "Drive &Properties",			IDM_FILE_DRIVEPROP
+		MENUITEM "&Diretório...",				IDM_FILE_CHANGEDIR
+		MENUITEM "Drive & Propriedades",			IDM_FILE_DRIVEPROP
 		MENUITEM SEPARATOR
-		MENUITEM "Show Dri&ves",				IDM_VIEW_DRIVEBOX
+		MENUITEM "Mostrar Dri&ves",				IDM_VIEW_DRIVEBOX
 	END
 	POPUP "+"
 	BEGIN
-		MENUITEM "Show &Toolbar",				IDM_VIEW_TOOLBAR
-		MENUITEM "&Customize Toolbar...",		IDM_VIEW_CUSTOMIZETB
-		MENUITEM "&Auto Scale Toolbar",			IDM_VIEW_AUTO_SCALE_TOOLBAR
+		MENUITEM "Mostrar &Toolbar",				IDM_VIEW_TOOLBAR
+		MENUITEM "&Customizar Toolbar...",		IDM_VIEW_CUSTOMIZETB
+		MENUITEM "&Escala Automática da Toolbar",			IDM_VIEW_AUTO_SCALE_TOOLBAR
 #if NP2_ENABLE_HIDPI_IMAGE_RESOURCE
-		MENUITEM "Use &Large Toolbar",			IDM_VIEW_USE_LARGE_TOOLBAR
+		MENUITEM "Usar Too&lbar Grande",			IDM_VIEW_USE_LARGE_TOOLBAR
 #endif
-		MENUITEM "Show &Statusbar",				IDM_VIEW_STATUSBAR
+		MENUITEM "Mostrar &Barra de Status",				IDM_VIEW_STATUSBAR
 	END
 	POPUP "+"
 	BEGIN
-		MENUITEM "&Open matepath",				IDM_TRAY_RESTORE
+		MENUITEM "&Abrir matepath",				IDM_TRAY_RESTORE
 		MENUITEM SEPARATOR
-		MENUITEM "E&xit matepath",				IDM_TRAY_EXIT
+		MENUITEM "&Sair do matepath",				IDM_TRAY_EXIT
 	END
 END
 
