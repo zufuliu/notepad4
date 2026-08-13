@@ -411,7 +411,7 @@ BEGIN
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,139,205,1
     AUTOCHECKBOX    "Enable ""&Esc"" key to...",IDC_ESCFUNCTION,10,148,104,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "Minimizar janela.",IDC_ESCMIN,114,148,74,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "E&saída matepath.",IDC_ESCEXIT,114,160,66,10,WS_TABSTOP
+    AUTORADIOBUTTON "sair do matepath.",IDC_ESCEXIT,114,160,66,10,WS_TABSTOP
 END
 
 IDPP_ITEMS DIALOGEX 0, 0, 232, 185
@@ -420,7 +420,7 @@ CAPTION "Aparência"
 FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
     ICON            IDI_ITEMS,IDC_STATIC,10,10,21,20
-    LTEXT           "Aparência de matepath.",IDC_STATIC,40,15,160,8
+    LTEXT           "Aparência do matepath.",IDC_STATIC,40,15,160,8
     GROUPBOX        "Aparência dos itens na lista de diretórios",IDC_STATIC,10,41,205,109
     LTEXT           "Use esta cor de texto quando NENHUM FILTRO estiver ATIVADO:",IDC_STATIC,20,54,170,8
     AUTORADIOBUTTON "Cor padrão do Windows.",IDC_COLOR_DEF1,20,68,96,10,WS_GROUP | WS_TABSTOP
@@ -547,60 +547,60 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_ERR_CD              "No access to specified directory.\nCheck the disk or the network connection."
-    IDS_ERR_FILE            "No access to ""%s"".\nThe file may be used by another application.\nCheck the disk or the network connection."
-    IDS_ERR_NEW             "File could not be created.\nCheck the disk or the network connection."
-    IDS_ERR_NEWDIR          "Directory could not be created.\nCheck the disk or the network connection."
-    IDS_ERR_SAVEAS1         "Error saving ""%s"".\nProbably an already existing file is write-protected."
-    IDS_ERR_SAVEAS2         "Error removing read-only attribute of saved file."
-    IDS_ERR_CMDLINE         "Error accessing file or directory specified in command line."
-    IDS_ERR_STARTUPDIR      "No access to startup directory."
-    IDS_ERR_DROP1           "No access to dropped file or directory."
-    //IDS_ERR_DROP2           "Only a single file or directory can be dropped at a time."
-    IDS_ERR_FAVORITES       "No access to ""Favorites"" folder.\nSpecify a valid directory in the ""Options"" dialog box."
-    //IDS_ERR_LNK_GETPATH     "No valid filesystem-path available for linked object.\nProbably the link doesn't refer to a file or directory."
-    IDS_ERR_LNK_NOACCESS    "No access to filesystem-path of linked object.\nCheck the disk or the network connection."
-    IDS_ERR_CREATELINK      "Error creating the specified link.\nProbably the destination directory is write-protected."
-    IDS_ERR_FILTER          "No additional filters specified.\nPlease refer to the matepath readme file for more information."
-    IDS_ERR_PREVWINDISABLED "Existing matepath window is busy or has an active dialog box.\nDo you want to open another matepath window?"
+    IDS_ERR_CD              "Sem acesso ao diretório especificado.\nVerifique o disco ou a conexão de rede."
+    IDS_ERR_FILE            "Sem acesso a "%s".\nO arquivo pode estar sendo usado por outro aplicativo.\nVerifique o disco ou a conexão de rede."
+    IDS_ERR_NEW             "Não foi possível criar o arquivo.\nVerifique o disco ou a conexão de rede."
+    IDS_ERR_NEWDIR          "Não foi possível criar o diretório.\nVerifique o disco ou a conexão de rede."
+    IDS_ERR_SAVEAS1         "Erro ao salvar "%s".\nProvavelmente um arquivo já existente está protegido contra gravação."
+    IDS_ERR_SAVEAS2         "Erro ao remover o atributo somente leitura do arquivo salvo."
+    IDS_ERR_CMDLINE         "Erro ao acessar o arquivo ou diretório especificado na linha de comando."
+    IDS_ERR_STARTUPDIR      "Sem acesso ao diretório de inicialização."
+    IDS_ERR_DROP1           "Sem acesso ao arquivo ou diretório excluído."
+    //IDS_ERR_DROP2           "Apenas um arquivo ou diretório pode ser adicionado por vez."
+    IDS_ERR_FAVORITES       "Não é possível acessar a pasta "Favoritos".\nEspecifique um diretório válido na caixa de diálogo "Opções"."
+    //IDS_ERR_LNK_GETPATH     "Não há caminho de sistema de arquivos válido disponível para o objeto vinculado.\nProvavelmente o link não se refere a um arquivo ou diretório."
+    IDS_ERR_LNK_NOACCESS    "Sem acesso ao caminho do sistema de arquivos do objeto vinculado.\nVerifique o disco ou a conexão de rede."
+    IDS_ERR_CREATELINK      "Erro ao criar o link especificado.\nProvavelmente o diretório de destino está protegido contra gravação."
+    IDS_ERR_FILTER          "Nenhum filtro adicional foi especificado.\nConsulte o arquivo readme do matepath para obter mais informações."
+    IDS_ERR_PREVWINDISABLED "A janela atual do matepath está ocupada ou possui uma caixa de diálogo ativa.\nDeseja abrir outra janela do matepath?"
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
-	IDS_CHANGE_LANG_RESTART	"Changing the UI language requires a restart of matepath, restart now?"
+	IDS_CHANGE_LANG_RESTART	"Alterar o idioma da interface do usuário requer a reinicialização do matepath. Deseja reiniciar agora?"
 #endif
 END
 
 STRINGTABLE
 BEGIN
-    IDS_ERR_TARGETDISABLED  "Existing target window is busy or has an active dialog box.\nWould you like to open a new window?"
-    IDS_ERR_INVALIDTARGET   "Please make sure all the required fields are completed.\nYou will also have to find a target window if the appropriate option is enabled."
-    IDS_ERR_INIOPEN         "No access to matepath configuration file."
-    IDS_ERR_INICREATE       "Error creating configuration file."
-    IDS_ERR_INIWRITE        "Settings not saved!\nNo write access to configuration file."
+    IDS_ERR_TARGETDISABLED  "A janela de destino atual está ocupada ou contém uma caixa de diálogo ativa.\nDeseja abrir uma nova janela?"
+    IDS_ERR_INVALIDTARGET   "Certifique-se de que todos os campos obrigatórios estejam preenchidos.\nVocê também precisará encontrar uma janela de destino, caso a opção correspondente esteja habilitada."
+    IDS_ERR_INIOPEN         "Sem acesso ao arquivo de configuração do matepath."
+    IDS_ERR_INICREATE       "Erro ao criar o arquivo de configuração."
+    IDS_ERR_INIWRITE        "Configurações não salvas!\nSem permissão de escrita no arquivo de configuração." 
 END
 
 STRINGTABLE
 BEGIN
-    IDS_SEARCHEXE           "Find Executable"
-    IDS_GETQUICKVIEWER      "Find Quickview"
-    IDS_GETTARGET           "Find Editor"
-    IDS_NEWFILE             "New File"
-    IDS_FILTER_ALL          "All Files (*.*)|*.*|"
-    IDS_FILTER_EXE          "Executable Files (*.exe;*.com;*.bat;*.lnk;*.pif)|*.exe;*.com;*.bat;*.lnk;*.pif|All Files (*.*)|*.*|"
-    IDS_GETDIRECTORY        "Select a new directory."
-    IDS_FAVORITES           "Specify the ""Favorites"" directory."
+    IDS_SEARCHEXE           "Encontrar executável"
+    IDS_GETQUICKVIEWER      "Encontrar Visão Geral"
+    IDS_GETTARGET           "Encontrar Editor"
+    IDS_NEWFILE             "Novo arquivo"
+    IDS_FILTER_ALL          "Todos os arquivos (*.*)|*.*|"
+    IDS_FILTER_EXE          "Arquivos executáveis (*.exe;*.com;*.bat;*.lnk;*.pif)|*.exe;*.com;*.bat;*.lnk;*.pif|All Files (*.*)|*.*|"
+    IDS_GETDIRECTORY        "Selecione um novo diretório."
+    IDS_FAVORITES           "Especifique os "Favoritos""" diretório."
 END
 
 STRINGTABLE
 BEGIN
-    IDS_OPENWITH            "Select the directory with links to your favorite applications."
-    IDS_COPYMOVE            "Select a destination directory."
-    IDS_CREATELINK          "Select a destination directory for the new link."
-    IDS_SAVESETTINGS        "The current program settings have been saved."
+    IDS_OPENWITH            "Selecione o diretório com links para seus aplicativos favoritos."
+    IDS_COPYMOVE            "Selecione um diretório de destino."
+    IDS_CREATELINK          "Selecione um diretório de destino para o novo link."
+    IDS_SAVESETTINGS        "As configurações atuais do programa foram salvas."
 END
 
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
 STRINGTABLE
 BEGIN
-	IDS_LANG_USER_DEFAULT			"System Language"
+	IDS_LANG_USER_DEFAULT			"Linguagem do sistema"
 	IDS_LANG_ENGLISH_US				"English"
 	IDS_LANG_CHINESE_SIMPLIFIED		"简体中文"
 	IDS_LANG_CHINESE_TRADITIONAL	"繁體中文"
