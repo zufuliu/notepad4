@@ -105,10 +105,10 @@ BEGIN
 	BEGIN
 		MENUITEM "&Abrir (Same Window)",			IDM_FILE_OPENSAME
 		MENUITEM "Abrir (N&ew Window)",			IDM_FILE_OPENNEW
-		MENUITEM "&Correr...",						IDM_FILE_RUN
+		MENUITEM "&Executar...",						IDM_FILE_RUN
 		MENUITEM "&Lançar",						IDM_FILE_LAUNCH
 		MENUITEM "&Visão geral",					IDM_FILE_QUICKVIEW
-		MENUITEM "Abrir &com...",				IDM_FILE_OPENWITH
+		MENUITEM "Abra &com...",				IDM_FILE_OPENWITH
 		MENUITEM "&Copiar nome do arquivo",				IDM_POP_COPY_FILENAME
 		MENUITEM "Copiar nome do pa&th",				IDM_POP_COPY_PATHNAME
 		MENUITEM SEPARATOR
@@ -259,7 +259,7 @@ CAPTION "matepath"
 FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,142,75,50,14
-    PUSHBUTTON      "Copy",IDC_COPY_BUILD_INFO,198,75,50,14
+    PUSHBUTTON      "Copiar",IDC_COPY_BUILD_INFO,198,75,50,14
     ICON            IDR_MAINWND,IDC_STATIC,14,7,20,20
     LTEXT           "",IDC_VERSION,45,7,200,8
     LTEXT           "",IDC_BUILD_INFO,45,18,200,8
@@ -273,230 +273,230 @@ END
 
 IDD_RUN DIALOGEX 0, 0, 234, 86
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
-CAPTION "Run"
+CAPTION "Executar"
 FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
     ICON            IDI_RUN,IDC_STATIC,7,7,20,20
-    LTEXT           "Enter the name of an executable program file, a folder or a document to open.",IDC_RUNDESC,35,7,188,17
+    LTEXT           "Digite o nome de um arquivo executável, uma pasta ou um documento que deseja abrir.",IDC_RUNDESC,35,7,188,17
     EDITTEXT        IDC_COMMANDLINE,7,35,203,14,ES_AUTOHSCROLL
     PUSHBUTTON      "",IDC_SEARCHEXE,215,35,14,14
     DEFPUSHBUTTON   "OK",IDOK,121,65,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,177,65,50,14
+    PUSHBUTTON      "Cancelar",IDCANCEL,177,65,50,14
     SCROLLBAR       IDC_RESIZEGRIP3,7,65,10,10,SBS_SIZEGRIP | WS_CLIPSIBLINGS
 END
 
 IDD_OPENWITH DIALOGEX 0, 0, 165, 128
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
-CAPTION "Open with..."
+CAPTION "Abra com..."
 FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
     CONTROL         "",IDC_OPENWITHDIR,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SHAREIMAGELISTS | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,7,7,151,69
     PUSHBUTTON      "",IDC_GETOPENWITHDIR,7,83,13,13
-    LTEXT           "Click here to specify the directory with links to your favorite applications.",IDC_OPENWITHDESCR,26,83,132,18
+    LTEXT           "Clique aqui para especificar o diretório com links para seus aplicativos favoritos.",IDC_OPENWITHDESCR,26,83,132,18
     DEFPUSHBUTTON   "OK",IDOK,52,107,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,108,107,50,14
+    PUSHBUTTON      "Cancelar",IDCANCEL,108,107,50,14
     SCROLLBAR       IDC_RESIZEGRIP3,7,112,10,10,SBS_SIZEGRIP | WS_CLIPSIBLINGS
 END
 
 IDD_GOTO DIALOGEX 0, 0, 224, 87
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
-CAPTION "Goto"
+CAPTION "Vá para"
 FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
     ICON            IDI_GOTO,IDC_STATIC,7,7,20,20
-    LTEXT           "Enter the name of a file or directory to open, or select a recently visited directory from the list.",IDC_GOTODESC,35,7,182,17
+    LTEXT           "Digite o nome de um arquivo ou diretório para abrir, ou selecione um diretório visitado recentemente na lista.",IDC_GOTODESC,35,7,182,17
     COMBOBOX        IDC_GOTO,7,35,210,126,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,111,66,50,14,WS_DISABLED
-    PUSHBUTTON      "Cancel",IDCANCEL,167,66,50,14
+    PUSHBUTTON      "Cancelar",IDCANCEL,167,66,50,14
     SCROLLBAR       IDC_RESIZEGRIP,7,70,10,10,SBS_SIZEGRIP | WS_CLIPSIBLINGS
 END
 
 IDD_FILTER DIALOGEX 0, 0, 204, 79
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
-CAPTION "File Filter"
+CAPTION "Filtro de Arquivos"
 FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
-    LTEXT           "Specify a new file &filter. Separate multiple filters by ;",IDC_STATIC,7,7,190,8
+    LTEXT           "Especifique um novo arquivo e filtro. Separe vários filtros por ;",IDC_STATIC,7,7,190,8
     EDITTEXT        IDC_FILTER,7,22,171,14,ES_AUTOHSCROLL
     PUSHBUTTON      "",IDC_BROWSEFILTER,183,22,14,14
-    AUTOCHECKBOX    "&Exclude files matching the filter.",IDC_NEGFILTER,7,40,170,10,WS_TABSTOP
+    AUTOCHECKBOX    "Excluir arquivos que correspondam ao filtro.",IDC_NEGFILTER,7,40,170,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,91,58,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,147,58,50,14
+    PUSHBUTTON      "Cancelar",IDCANCEL,147,58,50,14
     SCROLLBAR       IDC_RESIZEGRIP3,7,58,10,10,SBS_SIZEGRIP | WS_CLIPSIBLINGS
 END
 
 IDD_RENAME DIALOGEX 0, 0, 172, 74
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
-CAPTION "Rename"
+CAPTION "Renomear"
 FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
-    LTEXT           "Current:",IDC_STATIC,7,9,28,8,SS_RIGHT
+    LTEXT           "Atual:",IDC_STATIC,7,9,28,8,SS_RIGHT
     EDITTEXT        IDC_OLDNAME,39,7,126,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
-    LTEXT           "&New:",IDC_STATIC,7,27,28,8,SS_RIGHT
+    LTEXT           "&Novo:",IDC_STATIC,7,27,28,8,SS_RIGHT
     EDITTEXT        IDC_NEWNAME,39,26,126,14,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "OK",IDOK,59,53,50,14,WS_DISABLED
-    PUSHBUTTON      "Cancel",IDCANCEL,115,53,50,14
+    PUSHBUTTON      "Cancelar",IDCANCEL,115,53,50,14
     SCROLLBAR       IDC_RESIZEGRIP2,7,53,10,10,SBS_SIZEGRIP | WS_CLIPSIBLINGS
 END
 
 IDD_NEWDIR DIALOGEX 0, 0, 172, 66
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
-CAPTION "New Directory"
+CAPTION "Novo Diretório"
 FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
-    LTEXT           "Enter the name for the new directory:",IDC_STATIC,7,7,158,8
+    LTEXT           "Digite o nome do novo diretório:",IDC_STATIC,7,7,158,8
     EDITTEXT        IDC_NEWDIR,7,22,158,14,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "OK",IDOK,59,45,50,14,WS_DISABLED
-    PUSHBUTTON      "Cancel",IDCANCEL,115,45,50,14
+    PUSHBUTTON      "Cancelar",IDCANCEL,115,45,50,14
     SCROLLBAR       IDC_RESIZEGRIP,7,45,10,10,SBS_SIZEGRIP | WS_CLIPSIBLINGS
 END
 
 IDD_COPYMOVE DIALOGEX 0, 0, 230, 95
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
-CAPTION "Copy/Move"
+CAPTION "Copiar/Mover" 
 FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
-    LTEXT           "Source:",IDC_STATIC,7,7,26,8
+    LTEXT           "Fonte:",IDC_STATIC,7,7,26,8
     EDITTEXT        IDC_SOURCE,7,18,216,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
-    LTEXT           "&Destination:",IDC_STATIC,7,37,40,8
+    LTEXT           "&Destino:",IDC_STATIC,7,37,40,8
     COMBOBOX        IDC_DESTINATION,7,48,199,105,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "",IDC_BROWSEDESTINATION,210,48,13,13
     CONTROL         "<a>Clear Recent History</a>",IDC_EMPTY_MRU,"SysLink",WS_TABSTOP,154,37,70,10
-    LTEXT           "Action:",IDC_STATIC,7,72,24,8
-    AUTORADIOBUTTON "&Copy",IDC_FUNCCOPY,35,71,33,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "&Move",IDC_FUNCMOVE,68,71,33,10,WS_TABSTOP
+    LTEXT           "Ação:",IDC_STATIC,7,72,24,8
+    AUTORADIOBUTTON "&Copiar",IDC_FUNCCOPY,35,71,33,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "&Mover",IDC_FUNCMOVE,68,71,33,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,117,74,50,14,WS_DISABLED
-    PUSHBUTTON      "Cancel",IDCANCEL,173,74,50,14
+    PUSHBUTTON      "Cancelar",IDCANCEL,173,74,50,14
     SCROLLBAR       IDC_RESIZEGRIP5,7,78,10,10,SBS_SIZEGRIP | WS_CLIPSIBLINGS
 END
 
 IDPP_GENERAL DIALOGEX 0, 0, 232, 185
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "General"
+CAPTION "Em geral"
 FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
     ICON            IDI_OPTIONS,IDC_STATIC,10,10,20,20
-    LTEXT           "Specify general program settings for matepath.",IDC_STATIC,40,15,200,8
-    AUTOCHECKBOX    "Open file in same target application window.",IDC_OPENFILE_SAME_WINDOW,10,34,190,10,WS_TABSTOP
-    AUTOCHECKBOX    "&Allow single mouse-click to open objects.",IDC_SINGLECLICK,10,46,190,10,WS_TABSTOP
-    AUTOCHECKBOX    "&Enable track selection.",IDC_TRACKSELECT,10,58,100,10,WS_TABSTOP
-    AUTOCHECKBOX    "Enable &full row selection.",IDC_FULLROWSELECT,10,70,120,10,WS_TABSTOP
-    AUTOCHECKBOX    "Always a&ctivate target window when a file is opened.",IDC_FOCUSEDIT,10,82,220,10,WS_TABSTOP
+    LTEXT           "Especifique as configurações gerais do programa para o matepath.",IDC_STATIC,40,15,200,8
+    AUTOCHECKBOX    "Abra o arquivo na mesma janela do aplicativo de destino.",IDC_OPENFILE_SAME_WINDOW,10,34,190,10,WS_TABSTOP
+    AUTOCHECKBOX    "&Permitir que um único clique do mouse abra objetos.",IDC_SINGLECLICK,10,46,190,10,WS_TABSTOP
+    AUTOCHECKBOX    "&Ativar seleção de faixa.",IDC_TRACKSELECT,10,58,100,10,WS_TABSTOP
+    AUTOCHECKBOX    "Habilitar seleção de linha completa.",IDC_FULLROWSELECT,10,70,120,10,WS_TABSTOP
+    AUTOCHECKBOX    "Sempre ative a janela de destino quando um arquivo for aberto.",IDC_FOCUSEDIT,10,82,220,10,WS_TABSTOP
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,100,205,1
-    AUTOCHECKBOX    "&Keep matepath window always on top.",IDC_ALWAYSONTOP,10,109,150,10,WS_TABSTOP
-    AUTOCHECKBOX    "&Minimize to system tray (click to reactivate).",IDC_MINIMIZETOTRAY,10,121,200,10,WS_TABSTOP
-    AUTOCHECKBOX    "&Try to reuse existing window when matepath is started.",IDC_REUSEWINDOW,10,133,220,10,WS_TABSTOP
+    AUTOCHECKBOX    "Mantenha a janela do Matepath sempre visível.",IDC_ALWAYSONTOP,10,109,150,10,WS_TABSTOP
+    AUTOCHECKBOX    "Minimizar para a bandeja do sistema (clique para reativar).",IDC_MINIMIZETOTRAY,10,121,200,10,WS_TABSTOP
+    AUTOCHECKBOX    "Tente reutilizar a janela existente quando o matepath for iniciado.",IDC_REUSEWINDOW,10,133,220,10,WS_TABSTOP
     CONTROL         "<a>Clear window position history</a>",IDC_CLEARWINPOS,"SysLink",WS_TABSTOP,20,145,103,12
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,161,205,1
-    AUTOCHECKBOX    "&Save settings on exit.",IDC_SAVESETTINGS,10,170,100,10,WS_TABSTOP
+    AUTOCHECKBOX    "Salvar configurações ao sair.",IDC_SAVESETTINGS,10,170,100,10,WS_TABSTOP
     CONTROL         "<a>About matepath</a>",IDC_ABOUT,"SysLink",WS_TABSTOP,130,170,80,12
 END
 
 IDPP_ADVANCED DIALOGEX 0, 0, 232, 185
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Advanced"
+CAPTION "Avançado"
 FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
     ICON            IDI_OPTIONS2,IDC_STATIC,10,10,20,20
-    AUTOCHECKBOX    "Use &RTL Layout.",IDC_RTL_LAYOUT,10,34,190,10,WS_TABSTOP
-    LTEXT           "Specify advanced program settings for matepath.",IDC_STATIC,40,15,200,8
-    AUTOCHECKBOX    "&Use startup directory:",IDC_STARTUPDIR,10,46,104,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "Most &recently used.",IDC_GOTOMRU,114,46,90,10,WS_GROUP | WS_TABSTOP
+    AUTOCHECKBOX    "Use o layout &RTL.",IDC_RTL_LAYOUT,10,34,190,10,WS_TABSTOP
+    LTEXT           "Especifique as configurações avançadas do programa para o matepath.",IDC_STATIC,40,15,200,8
+    AUTOCHECKBOX    "&Usar diretório de inicialização:",IDC_STARTUPDIR,10,46,104,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "Mais usados e usados recentemente.",IDC_GOTOMRU,114,46,90,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON """&Favorites"" folder.",IDC_GOTOFAV,114,58,90,10,WS_TABSTOP
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,76,205,1
-    AUTOCHECKBOX    "&Clear read-only attribute of saved files.",IDC_CLEARREADONLY,10,85,172,10,WS_TABSTOP
-    AUTOCHECKBOX    "Rename copied files on &name collisions.",IDC_RENAMEONCOLLISION,10,97,164,10,WS_TABSTOP
-    AUTOCHECKBOX    "&Move deleted files to the recycle bin.",IDC_USERECYCLEBIN,10,109,160,10,WS_TABSTOP
-    AUTOCHECKBOX    "&Don't confirm file delete (not recommended).",IDC_NOCONFIRMDELETE,10,121,184,10,WS_TABSTOP
+    AUTOCHECKBOX    "Limpar o atributo somente leitura dos arquivos salvos.",IDC_CLEARREADONLY,10,85,172,10,WS_TABSTOP
+    AUTOCHECKBOX    "Renomear arquivos copiados em caso de conflito de nomes.",IDC_RENAMEONCOLLISION,10,97,164,10,WS_TABSTOP
+    AUTOCHECKBOX    "Mova os arquivos excluídos para a lixeira.",IDC_USERECYCLEBIN,10,109,160,10,WS_TABSTOP
+    AUTOCHECKBOX    "Não confirme a exclusão do arquivo (não recomendado).",IDC_NOCONFIRMDELETE,10,121,184,10,WS_TABSTOP
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,139,205,1
     AUTOCHECKBOX    "Enable ""&Esc"" key to...",IDC_ESCFUNCTION,10,148,104,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "Minimize &window.",IDC_ESCMIN,114,148,74,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "E&xit matepath.",IDC_ESCEXIT,114,160,66,10,WS_TABSTOP
+    AUTORADIOBUTTON "Minimizar janela.",IDC_ESCMIN,114,148,74,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "E&saída matepath.",IDC_ESCEXIT,114,160,66,10,WS_TABSTOP
 END
 
 IDPP_ITEMS DIALOGEX 0, 0, 232, 185
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Appearance"
+CAPTION "Aparência"
 FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
     ICON            IDI_ITEMS,IDC_STATIC,10,10,21,20
-    LTEXT           "Appearance of matepath.",IDC_STATIC,40,15,160,8
-    GROUPBOX        "Appearance of items in directory list",IDC_STATIC,10,41,205,109
-    LTEXT           "Use this text color when NO FILTER is SET:",IDC_STATIC,20,54,170,8
-    AUTORADIOBUTTON "Default &windows color.",IDC_COLOR_DEF1,20,68,96,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "Custom &color:",IDC_COLOR_CUST1,20,82,60,10,WS_TABSTOP
+    LTEXT           "Aparência de matepath.",IDC_STATIC,40,15,160,8
+    GROUPBOX        "Aparência dos itens na lista de diretórios",IDC_STATIC,10,41,205,109
+    LTEXT           "Use esta cor de texto quando NENHUM FILTRO estiver ATIVADO:",IDC_STATIC,20,54,170,8
+    AUTORADIOBUTTON "Cor padrão do Windows.",IDC_COLOR_DEF1,20,68,96,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "Personalizado e cor:",IDC_COLOR_CUST1,20,82,60,10,WS_TABSTOP
     EDITTEXT        IDC_COLOR_SAMP1,85,80,30,14,ES_AUTOHSCROLL | WS_DISABLED
-    PUSHBUTTON      "Pick Color...",IDC_COLOR_PICK1,120,80,60,14
-    LTEXT           "Use this text color when a FILTER is ACTIVE:",IDC_STATIC,20,105,180,8
-    AUTORADIOBUTTON "D&efault windows color.",IDC_COLOR_DEF2,20,120,95,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "C&ustom color:",IDC_COLOR_CUST2,20,133,60,10,WS_TABSTOP
+    PUSHBUTTON      "Escolha a cor...",IDC_COLOR_PICK1,120,80,60,14
+    LTEXT           "Use esta cor de texto quando um FILTRO estiver ATIVO:",IDC_STATIC,20,105,180,8
+    AUTORADIOBUTTON "Cor padrão do Windows.",IDC_COLOR_DEF2,20,120,95,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "Cor personalizada:",IDC_COLOR_CUST2,20,133,60,10,WS_TABSTOP
     EDITTEXT        IDC_COLOR_SAMP2,86,130,30,14,ES_AUTOHSCROLL | WS_DISABLED
-    PUSHBUTTON      "Pick Color...",IDC_COLOR_PICK2,120,130,60,14
+    PUSHBUTTON      "Escolha a cor...",IDC_COLOR_PICK2,120,130,60,14
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
-    LTEXT           "Language:",IDC_STATIC,10,157,38,10
+    LTEXT           "Linguagem:",IDC_STATIC,10,157,38,10
     COMBOBOX        IDC_LANGUAGE_LIST,50,154,82,100,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
 #endif
 END
 
 IDPP_PROG DIALOGEX 0, 0, 232, 185
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Locations"
+CAPTION "Locais"
 FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
     ICON            IDI_PROGS,IDC_STATIC,10,10,20,20
-    LTEXT           "Specify external programs and paths.",IDC_STATIC,40,15,180,8
+    LTEXT           "Especifique os programas e caminhos externos.",IDC_STATIC,40,15,180,8
     LTEXT           "&Default ""Quick View"" program (Ctrl+Q):",IDC_STATIC,10,41,180,8
     EDITTEXT        IDC_QUICKVIEW,10,52,191,14,ES_AUTOHSCROLL
     PUSHBUTTON      "",IDC_BROWSE_Q,204,52,14,14,BS_BITMAP
     LTEXT           "&Favorites Folder (F11):",IDC_STATIC,10,76,120,8
     EDITTEXT        IDC_FAVORITES,10,87,191,14,ES_AUTOHSCROLL
     PUSHBUTTON      "",IDC_BROWSE_F,204,87,14,14,BS_BITMAP
-    GROUPBOX        "System Integration (requires Administrator privileges)",IDC_GROUP_SYSTEM_INTEGRATION,7,111,218,72
-    AUTOCHECKBOX    "Add matepath to Windows Explorer's context menu.",IDC_ENABLE_CONTEXT_MENU,14,124,204,10,WS_TABSTOP
-    LTEXT           "Context menu text:",IDC_STATIC,28,139,70,8
+    GROUPBOX        "Integração de sistemas (requer privilégios de administrador)",IDC_GROUP_SYSTEM_INTEGRATION,7,111,218,72
+    AUTOCHECKBOX    "Adicione o matepath ao menu de contexto do Windows Explorer.",IDC_ENABLE_CONTEXT_MENU,14,124,204,10,WS_TABSTOP
+    LTEXT           "Texto do menu de contexto:",IDC_STATIC,28,139,70,8
     EDITTEXT        IDC_CONTEXT_MENU_TEXT,100,136,118,14,ES_AUTOHSCROLL | WS_TABSTOP
-    AUTOCHECKBOX    "Enable Taskbar Jump List.",IDC_ENABLE_JUMP_LIST,14,152,204,10,WS_TABSTOP
-    LTEXT           "Application name:",IDC_STATIC,28,167,70,8
+    AUTOCHECKBOX    "Ativar a lista de atalhos da barra de tarefas.",IDC_ENABLE_JUMP_LIST,14,152,204,10,WS_TABSTOP
+    LTEXT           "Nome do aplicativo:",IDC_STATIC,28,167,70,8
     EDITTEXT        IDC_APPLICATION_NAME,100,164,118,14,ES_AUTOHSCROLL | WS_TABSTOP
 END
 
 IDD_FINDTARGET DIALOGEX 0, 0, 272, 210
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
-CAPTION "Target Application"
+CAPTION "Aplicação alvo"
 FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
-    AUTORADIOBUTTON "Don't use any specific target application, simply launch the selected file.",IDC_LAUNCH,7,7,260,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "Use the following target application:",IDC_TARGET,7,21,160,10,WS_TABSTOP
-    LTEXT           "Specify the action if the target applicatoin is already running:",IDC_STATIC,7,64,260,8
+    AUTORADIOBUTTON "Não utilize nenhum aplicativo específico, simplesmente execute o arquivo selecionado.",IDC_LAUNCH,7,7,260,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "Utilize a seguinte aplicação de destino:",IDC_TARGET,7,21,160,10,WS_TABSTOP
+    LTEXT           "Especifique a ação se o aplicativo de destino já estiver em execução:",IDC_STATIC,7,64,260,8
     EDITTEXT        IDC_TARGETPATH,20,35,226,14,ES_AUTOHSCROLL
     PUSHBUTTON      "",IDC_BROWSE,251,35,14,14,BS_BITMAP
-    AUTORADIOBUTTON "None, run target application each time a file is opened.",IDC_ALWAYSRUN,7,78,240,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "Send a file open message to target application window:",IDC_SENDDROPMSG,7,92,194,10,WS_TABSTOP
-    AUTORADIOBUTTON "Execute the following DDE command:",IDC_USEDDE,7,106,160,10,WS_TABSTOP
-    PUSHBUTTON      "Find Window...",IDC_FINDWIN,204,91,60,14
-    LTEXT           "Message:",IDC_STATIC,19,124,42,8,SS_RIGHT
-    LTEXT           "Application:",IDC_STATIC,19,145,42,8,SS_RIGHT
-    LTEXT           "Topic:",IDC_STATIC,19,165,42,8,SS_RIGHT
+    AUTORADIOBUTTON "Nenhuma opção; execute o aplicativo de destino sempre que um arquivo for aberto.",IDC_ALWAYSRUN,7,78,240,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "Enviar uma mensagem de arquivo aberto para a janela do aplicativo de destino:",IDC_SENDDROPMSG,7,92,194,10,WS_TABSTOP
+    AUTORADIOBUTTON "Execute o seguinte comando DDE:",IDC_USEDDE,7,106,160,10,WS_TABSTOP
+    PUSHBUTTON      "Encontrar janela...",IDC_FINDWIN,204,91,60,14
+    LTEXT           "Mensagem:",IDC_STATIC,19,124,42,8,SS_RIGHT
+    LTEXT           "Aplicação:",IDC_STATIC,19,145,42,8,SS_RIGHT
+    LTEXT           "Tópico:",IDC_STATIC,19,165,42,8,SS_RIGHT
     EDITTEXT        IDC_DDEMSG,65,122,200,14,ES_AUTOHSCROLL
     EDITTEXT        IDC_DDEAPP,65,142,200,14,ES_AUTOHSCROLL
     EDITTEXT        IDC_DDETOPIC,65,162,200,14,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "OK",IDOK,159,189,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,215,189,50,14
+    PUSHBUTTON      "Cancelar",IDCANCEL,215,189,50,14
     SCROLLBAR       IDC_RESIZEGRIP4,7,189,10,10,SBS_SIZEGRIP | WS_CLIPSIBLINGS
 END
 
 IDD_FINDWIN DIALOGEX 0, 0, 210, 85
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
-CAPTION "Find Window"
+CAPTION "Encontrar janela..."
 FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
     ICON            IDI_CROSS1,IDC_CROSSCURSOR,7,7,21,20,SS_CENTERIMAGE
-    LTEXT           "Drag the crosshair over the window you would like to select as the new target, or press Esc to cancel.",IDC_FINDWINDESC,35,7,168,22
+    LTEXT           "Arraste a mira sobre a janela que deseja selecionar como novo alvo ou pressione Esc para cancelar.",IDC_FINDWINDESC,35,7,168,22
     EDITTEXT        IDC_WINTITLE,7,35,196,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
     LTEXT           "Window Class",IDC_WINCLASS,7,60,45,8,NOT WS_VISIBLE
     LTEXT           "Window Module",IDC_WINMODULE,7,70,51,8,NOT WS_VISIBLE
     DEFPUSHBUTTON   "OK",IDOK,97,64,50,14,WS_DISABLED
-    PUSHBUTTON      "Cancel",IDCANCEL,153,64,50,14
+    PUSHBUTTON      "Cancelar",IDCANCEL,153,64,50,14
     SCROLLBAR       IDC_RESIZEGRIP5,7,64,10,10,SBS_SIZEGRIP | WS_CLIPSIBLINGS
 END
 
@@ -520,20 +520,20 @@ END
 
 STRINGTABLE
 BEGIN
-	IDT_HISTORY_BACK		"Back"
-	IDT_HISTORY_FORWARD		"Forward"
-	IDT_UP_DIR				"Upper Directory"
-	IDT_ROOT_DIR			"Root Directory"
-	IDT_VIEW_FAVORITES		"Favorites"
-	IDT_FILE_PREV			"Previous File"
-	IDT_FILE_NEXT			"Next File"
-	IDT_FILE_RUN			"Run"
-	IDT_FILE_QUICKVIEW		"Quickview"
-	IDT_FILE_SAVEAS			"Save As"
-	IDT_FILE_COPYMOVE		"Copy/Move"
-	IDT_FILE_DELETE_RECYCLE	"Delete (RecycleBin)"
-	IDT_FILE_DELETE_PERM	"Delete (Permanently)"
-	IDT_VIEW_FILTER			"Filter"
+	IDT_HISTORY_BACK		"Voltar"
+	IDT_HISTORY_FORWARD		"Avançar"
+	IDT_UP_DIR				"Diretório Superior"
+	IDT_ROOT_DIR			"Diretório raiz"
+	IDT_VIEW_FAVORITES		"Favoritos""
+	IDT_FILE_PREV			"Arquivo anterior"
+	IDT_FILE_NEXT			"Próximo arquivo"
+	IDT_FILE_RUN			"Executar"
+	IDT_FILE_QUICKVIEW		"Visão geral"
+	IDT_FILE_SAVEAS			"Salvar como"
+	IDT_FILE_COPYMOVE		"Copiar/Mover"
+	IDT_FILE_DELETE_RECYCLE	"Excluir (Lixeira)"
+	IDT_FILE_DELETE_PERM	"Excluir (permanentemente)"
+	IDT_VIEW_FILTER			"Filtro"
 END
 
 STRINGTABLE
@@ -541,8 +541,8 @@ BEGIN
 	IDS_APPTITLE			"matepath"
 	IDS_NUMFILES			"%s Object(s)"
 	IDS_NUMFILES_FILTER		"%s Object(s) | Filter"
-	IDS_SAVEFILE			"Saving ""%s""..."
-    IDS_LINKDESCRIPTION     "Open in matepath"
+	IDS_SAVEFILE			"Salvando ""%s""..."
+    IDS_LINKDESCRIPTION     "Abrir no matePath"
 END
 
 STRINGTABLE
