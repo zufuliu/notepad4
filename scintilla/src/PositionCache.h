@@ -80,9 +80,9 @@ public:
 	int lines = 1;
 	XYPOSITION wrapIndent = 0; // In pixels
 
-	LineLayout(Sci::Line lineNumber_, int maxLineLength_);
-	void Resize(int maxLineLength_);
-	void Reset(Sci::Line lineNumber_, int maxLineLength_);
+	LineLayout(Sci::Line lineNumber_, int maxLineLength_) noexcept;
+	void Resize(int maxLineLength_) noexcept;
+	void Reset(Sci::Line lineNumber_, int maxLineLength_) noexcept;
 	void EnsureBidiData();
 	void ClearPositions() const noexcept;
 	void Invalidate(ValidLevel validity_) noexcept;
@@ -154,15 +154,14 @@ struct SignificantLines {
 	Sci::Line linesTotal;
 	int styleClock;
 	Scintilla::LineCache level;
-	bool LineMayCache(Sci::Line line, unsigned maxChars) const noexcept;
+	bool LineMayCache(Sci::Line line) const noexcept;
 };
 
 /**
  */
 class LineLayoutCache final {
 private:
-	std::vector<std::shared_ptr<LineLayout>> shortCache;
-	std::vector<std::shared_ptr<LineLayout>> longCache;
+	std::vector<std::shared_ptr<LineLayout>> cache;
 	size_t lastCaretSlot;
 	Scintilla::LineCache level;
 	LineLayout::ValidLevel maxValidity;
@@ -188,10 +187,6 @@ public:
 		return Retrieve(lineNumber, significantLines.lineCaret,
 			maxChars, significantLines.styleClock,
 			significantLines.linesOnScreen, significantLines.linesTotal, significantLines.lineTop);
-	}
-
-	static constexpr int UseLongCache(unsigned maxChars) noexcept {
-		return maxChars >> (20 + 1); // 2MiB
 	}
 };
 

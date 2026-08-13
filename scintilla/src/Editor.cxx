@@ -1660,7 +1660,7 @@ struct WrapBlockWorker {
 			if (lengthLine < lengthToMultiThread) {
 				std::shared_ptr<LineLayout> shared;
 				LineLayout *ll;
-				if (significantLines.LineMayCache(lineNumber, lengthLine)) {
+				if (significantLines.LineMayCache(lineNumber)) {
 					const LockGuard<NativeMutex> guard(mutexRetrieve);
 					shared = view.llc.Retrieve(lineNumber, significantLines, lengthLine);
 					ll = shared.get();
