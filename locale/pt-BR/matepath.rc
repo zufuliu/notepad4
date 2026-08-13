@@ -112,7 +112,7 @@ BEGIN
 		MENUITEM "&Copiar nome do arquivo",				IDM_POP_COPY_FILENAME
 		MENUITEM "Copiar nome do pa&th",				IDM_POP_COPY_PATHNAME
 		MENUITEM SEPARATOR
-		MENUITEM "Mostrar no explorador",			IDM_FILE_EXPLORER
+		MENUITEM "Mostrar no explorer",			IDM_FILE_EXPLORER
 		MENUITEM "Criar Lin&k...",				IDM_FILE_CREATELINK
 		MENUITEM "&Salvar Como...",					IDM_FILE_SAVEAS
 		MENUITEM "Copiar/&Mover...",				IDM_FILE_COPYMOVE
@@ -123,39 +123,39 @@ BEGIN
 	END
 	POPUP "+"
 	BEGIN
-		MENUITEM "&New File...",				IDM_FILE_NEW
-		MENUITEM "Ne&w Directory...",			IDM_FILE_NEWDIR
+		MENUITEM "&Novo arquivo...",				IDM_FILE_NEW
+		MENUITEM "No&vo Diretório...",			IDM_FILE_NEWDIR
 		MENUITEM SEPARATOR
 		MENUITEM "File Fi&lter...",				IDM_VIEW_FILTER
-		MENUITEM "&Reset Filter",				IDM_VIEW_FILTERALL
-		POPUP "&Show"
+		MENUITEM "&Limpar Filtro",				IDM_VIEW_FILTERALL
+		POPUP "&Mostrar"
 		BEGIN
-			MENUITEM "&Directories",			IDM_VIEW_FOLDERS
-			MENUITEM "&Files",					IDM_VIEW_FILES
-			MENUITEM "&System Objects",			IDM_VIEW_HIDDEN
+			MENUITEM "&Diretórios",			IDM_VIEW_FOLDERS
+			MENUITEM "&arquivos",					IDM_VIEW_FILES
+			MENUITEM "&Objetos do sistema",			IDM_VIEW_HIDDEN
 		END
-		POPUP "Sor&t"
+		POPUP "Organizar"
 		BEGIN
-			MENUITEM "by &Name",				IDM_SORT_NAME
-			MENUITEM "by &Size",				IDM_SORT_SIZE
-			MENUITEM "by &Type",				IDM_SORT_TYPE
-			MENUITEM "by &Date",				IDM_SORT_DATE
+			MENUITEM "by &Nome",				IDM_SORT_NAME
+			MENUITEM "by &tamanho",				IDM_SORT_SIZE
+			MENUITEM "by &Tipo",				IDM_SORT_TYPE
+			MENUITEM "by &Data",				IDM_SORT_DATE
 			MENUITEM SEPARATOR
-			MENUITEM "&Reverse",				IDM_SORT_REVERSE
+			MENUITEM "&Reverso",				IDM_SORT_REVERSE
 		END
 		MENUITEM SEPARATOR
-		MENUITEM "Open in &Explorer",			IDM_FILE_EXPLORER
-		MENUITEM "Goto &Favorites",				IDM_VIEW_FAVORITES
-		MENUITEM "&Open Favorites",				IDM_VIEW_EDITFAVORITES
-		MENUITEM "&Directory...",				IDM_FILE_CHANGEDIR
-		MENUITEM "&Goto...",					IDM_FILE_GOTO
+		MENUITEM "Abrir no &Explorer",			IDM_FILE_EXPLORER
+		MENUITEM "Vá para &Favoritos",				IDM_VIEW_FAVORITES
+		MENUITEM "&Abrir Favoritos",				IDM_VIEW_EDITFAVORITES
+		MENUITEM "&Diretório...",				IDM_FILE_CHANGEDIR
+		MENUITEM "&Vá para...",					IDM_FILE_GOTO
 		MENUITEM SEPARATOR
-		MENUITEM "Show Dri&ves",				IDM_VIEW_DRIVEBOX
-		MENUITEM "&Keep on Top",				IDM_VIEW_ALWAYSONTOP
+		MENUITEM "Mostrar Drivers",				IDM_VIEW_DRIVEBOX
+		MENUITEM "&Mantenha-se atualizado",				IDM_VIEW_ALWAYSONTOP
 		MENUITEM SEPARATOR
-		MENUITEM "Save Sett&ings",				IDM_VIEW_SAVESETTINGS
-		MENUITEM "Set&up Target...",			IDM_VIEW_FINDTARGET
-		MENUITEM "O&ptions...",					IDM_VIEW_OPTIONS
+		MENUITEM "Salvar Configurações",				IDM_VIEW_SAVESETTINGS
+		MENUITEM "Setup alvo...",			IDM_VIEW_FINDTARGET
+		MENUITEM "Opções...",					IDM_VIEW_OPTIONS
 	END
 	POPUP "+"
 	BEGIN
