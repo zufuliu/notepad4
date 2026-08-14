@@ -353,7 +353,7 @@ END
 
 IDD_COPYMOVE DIALOGEX 0, 0, 230, 95
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
-CAPTION "Copiar/Mover" 
+CAPTION "Copiar/Mover"
 FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
     LTEXT           "Fonte:",IDC_STATIC,7,7,26,8
@@ -524,7 +524,7 @@ BEGIN
 	IDT_HISTORY_FORWARD		"Avançar"
 	IDT_UP_DIR				"Diretório Superior"
 	IDT_ROOT_DIR			"Diretório raiz"
-	IDT_VIEW_FAVORITES		"Favoritos""
+	IDT_VIEW_FAVORITES		"Favoritos"
 	IDT_FILE_PREV			"Arquivo anterior"
 	IDT_FILE_NEXT			"Próximo arquivo"
 	IDT_FILE_RUN			"Executar"
@@ -548,16 +548,16 @@ END
 STRINGTABLE
 BEGIN
     IDS_ERR_CD              "Sem acesso ao diretório especificado.\nVerifique o disco ou a conexão de rede."
-    IDS_ERR_FILE            "Sem acesso a "%s".\nO arquivo pode estar sendo usado por outro aplicativo.\nVerifique o disco ou a conexão de rede."
+    IDS_ERR_FILE            "Sem acesso a ""%s"".\nO arquivo pode estar sendo usado por outro aplicativo.\nVerifique o disco ou a conexão de rede."
     IDS_ERR_NEW             "Não foi possível criar o arquivo.\nVerifique o disco ou a conexão de rede."
     IDS_ERR_NEWDIR          "Não foi possível criar o diretório.\nVerifique o disco ou a conexão de rede."
-    IDS_ERR_SAVEAS1         "Erro ao salvar "%s".\nProvavelmente um arquivo já existente está protegido contra gravação."
+    IDS_ERR_SAVEAS1         "Erro ao salvar ""%s"".\nProvavelmente um arquivo já existente está protegido contra gravação."
     IDS_ERR_SAVEAS2         "Erro ao remover o atributo somente leitura do arquivo salvo."
     IDS_ERR_CMDLINE         "Erro ao acessar o arquivo ou diretório especificado na linha de comando."
     IDS_ERR_STARTUPDIR      "Sem acesso ao diretório de inicialização."
     IDS_ERR_DROP1           "Sem acesso ao arquivo ou diretório excluído."
     //IDS_ERR_DROP2           "Apenas um arquivo ou diretório pode ser adicionado por vez."
-    IDS_ERR_FAVORITES       "Não é possível acessar a pasta "Favoritos".\nEspecifique um diretório válido na caixa de diálogo "Opções"."
+    IDS_ERR_FAVORITES       "Não é possível acessar a pasta ""Favoritos"".\nEspecifique um diretório válido na caixa de diálogo ""Opções""."
     //IDS_ERR_LNK_GETPATH     "Não há caminho de sistema de arquivos válido disponível para o objeto vinculado.\nProvavelmente o link não se refere a um arquivo ou diretório."
     IDS_ERR_LNK_NOACCESS    "Sem acesso ao caminho do sistema de arquivos do objeto vinculado.\nVerifique o disco ou a conexão de rede."
     IDS_ERR_CREATELINK      "Erro ao criar o link especificado.\nProvavelmente o diretório de destino está protegido contra gravação."
@@ -574,7 +574,7 @@ BEGIN
     IDS_ERR_INVALIDTARGET   "Certifique-se de que todos os campos obrigatórios estejam preenchidos.\nVocê também precisará encontrar uma janela de destino, caso a opção correspondente esteja habilitada."
     IDS_ERR_INIOPEN         "Sem acesso ao arquivo de configuração do matepath."
     IDS_ERR_INICREATE       "Erro ao criar o arquivo de configuração."
-    IDS_ERR_INIWRITE        "Configurações não salvas!\nSem permissão de escrita no arquivo de configuração." 
+    IDS_ERR_INIWRITE        "Configurações não salvas!\nSem permissão de escrita no arquivo de configuração."
 END
 
 STRINGTABLE
@@ -586,7 +586,7 @@ BEGIN
     IDS_FILTER_ALL          "Todos os arquivos (*.*)|*.*|"
     IDS_FILTER_EXE          "Arquivos executáveis (*.exe;*.com;*.bat;*.lnk;*.pif)|*.exe;*.com;*.bat;*.lnk;*.pif|All Files (*.*)|*.*|"
     IDS_GETDIRECTORY        "Selecione um novo diretório."
-    IDS_FAVORITES           "Especifique os "Favoritos""" diretório."
+    IDS_FAVORITES           "Especifique os ""Favoritos"" diretório."
 END
 
 STRINGTABLE
