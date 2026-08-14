@@ -20,6 +20,7 @@
 | ja | 日本語 | Win32 | 🟠legacy Windows Vista, Server 2008 |
 | ko | 한국어 |
 | pl | Polski | HD | HiDPI, High Definition |
+| pt-BR | Português (Brasil) |
 | ru | Русский |
 | zh-Hans | 中文 (简体) | winget | `winget install zufuliu.notepad4.AVX2` |
 | zh-Hant | 中文 (繁體) | winget | `winget install zufuliu.notepad4` |
