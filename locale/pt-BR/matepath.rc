@@ -445,10 +445,10 @@ FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
     ICON            IDI_PROGS,IDC_STATIC,10,10,20,20
     LTEXT           "Especifique os programas e caminhos externos.",IDC_STATIC,40,15,180,8
-    LTEXT           "&Default ""Quick View"" program (Ctrl+Q):",IDC_STATIC,10,41,180,8
+    LTEXT           "&Padrão ""Visualização Rápida"" program (Ctrl+Q):",IDC_STATIC,10,41,180,8
     EDITTEXT        IDC_QUICKVIEW,10,52,191,14,ES_AUTOHSCROLL
     PUSHBUTTON      "",IDC_BROWSE_Q,204,52,14,14,BS_BITMAP
-    LTEXT           "&Favorites Folder (F11):",IDC_STATIC,10,76,120,8
+    LTEXT           "&Pasta de Favoritos (F11):",IDC_STATIC,10,76,120,8
     EDITTEXT        IDC_FAVORITES,10,87,191,14,ES_AUTOHSCROLL
     PUSHBUTTON      "",IDC_BROWSE_F,204,87,14,14,BS_BITMAP
     GROUPBOX        "Integração de sistemas (requer privilégios de administrador)",IDC_GROUP_SYSTEM_INTEGRATION,7,111,218,72
@@ -493,8 +493,8 @@ BEGIN
     ICON            IDI_CROSS1,IDC_CROSSCURSOR,7,7,21,20,SS_CENTERIMAGE
     LTEXT           "Arraste a mira sobre a janela que deseja selecionar como novo alvo ou pressione Esc para cancelar.",IDC_FINDWINDESC,35,7,168,22
     EDITTEXT        IDC_WINTITLE,7,35,196,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
-    LTEXT           "Window Class",IDC_WINCLASS,7,60,45,8,NOT WS_VISIBLE
-    LTEXT           "Window Module",IDC_WINMODULE,7,70,51,8,NOT WS_VISIBLE
+    LTEXT           "Classe de janela",IDC_WINCLASS,7,60,45,8,NOT WS_VISIBLE
+    LTEXT           "Módulo de janela",IDC_WINMODULE,7,70,51,8,NOT WS_VISIBLE
     DEFPUSHBUTTON   "OK",IDOK,97,64,50,14,WS_DISABLED
     PUSHBUTTON      "Cancelar",IDCANCEL,153,64,50,14
     SCROLLBAR       IDC_RESIZEGRIP5,7,64,10,10,SBS_SIZEGRIP | WS_CLIPSIBLINGS
