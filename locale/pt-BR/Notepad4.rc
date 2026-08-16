@@ -1747,7 +1747,7 @@ BEGIN
 \\b\tBackspace (BS, ASCII 8)\n\
 \\e\tEscape (ESC, ASCII 27 / 1B)\n\
 \\f\tAlimentação de formulário (FF, ASCII 12 / 0C)\n\
-\\n\tNova linha (LF, ASCII 10 / 0A)\n\"
+\\n\tNova linha (LF, ASCII 10 / 0A)\n\
 \\r\tRetorno de transporte (CR, ASCII 13 / 0D)\n\
 \\t\tTabulação Horizontal (HT, ASCII 9)\n\
 \\v\tTabulação Vertical (VT, ASCII 11 / 0B)\n\
