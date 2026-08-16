@@ -2804,7 +2804,7 @@ void Document::EOLAnnotationClearAll() {
 }
 
 void Document::IncrementStyleClock() noexcept {
-	styleClock = (styleClock + 1) % 0x100000;
+	styleClock = (styleClock + 1) & (0x100000 - 1);
 }
 
 void SCI_METHOD Document::DecorationSetCurrentIndicator(int indicator) noexcept {

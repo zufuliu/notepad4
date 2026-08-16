@@ -51,6 +51,7 @@ static HWND hwndReBar;
 
 #define TOOLBAR_COMMAND_BASE	IDT_HISTORY_BACK
 #define DefaultToolbarButtons	L"1 2 3 4 5 0 8"
+// NOLINTBEGIN(readability-redundant-zero-initializer)
 static TBBUTTON tbbMainWnd[] = {
 	{0, 0, 0, TBSTYLE_SEP, {0}, 0, 0},
 	{0, IDT_HISTORY_BACK, TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
@@ -69,6 +70,7 @@ static TBBUTTON tbbMainWnd[] = {
 	{13, IDT_VIEW_FILTER, TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
 	// TB_ADD_FILTER_BMP and TB_DEL_FILTER_BMP both used for IDT_VIEW_FILTER
 };
+// NOLINTEND(readability-redundant-zero-initializer)
 
 static HWND hwndDriveBox;
 HWND	hwndDirList;

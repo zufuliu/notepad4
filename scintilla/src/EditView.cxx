@@ -12,6 +12,7 @@
 #include <cstring>
 #include <cstdio>
 #include <cmath>
+#include <climits>
 
 #include <stdexcept>
 #include <utility>
@@ -1137,7 +1138,9 @@ HorizontalPadding StadiumPadding(Scintilla::EOLAnnotationVisible eolAnnotationVi
 }
 
 void EditView::UpdateMaxWidth(XYPOSITION width) noexcept {
-	lineWidthMaxSeen = std::max(lineWidthMaxSeen, static_cast<int>(width));
+	constexpr XYPOSITION maxInt = INT_MAX;
+	const XYPOSITION cappedWidth = std::min(width, maxInt);
+	lineWidthMaxSeen = std::max(lineWidthMaxSeen, static_cast<int>(cappedWidth));
 }
 
 void EditView::DrawEOL(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll,

@@ -301,7 +301,7 @@ public:
 	enum class Cursor {
 		invalid, text, arrow, up, wait, horizontal, vertical, reverseArrow, hand
 	};
-	void SetCursor(Cursor curs) noexcept;
+	void SetCursor(Cursor curs) const noexcept;
 	PRectangle SCICALL GetMonitorRect(Point pt) const noexcept;
 
 private:
@@ -349,11 +349,10 @@ public:
 	virtual PRectangle GetDesiredRect() = 0;
 	virtual int CaretFromEdge() const noexcept = 0;
 	virtual void Clear() noexcept = 0;
-	virtual void Append(const char *s, int type = -1) const noexcept = 0;
 	virtual int Length() const noexcept = 0;
 	virtual void Select(int n) = 0;
 	virtual int GetSelection() const noexcept = 0;
-	virtual int Find(const char *prefix) const noexcept = 0;
+	// virtual int Find(const char *prefix) const noexcept = 0;
 	virtual std::string GetValue(int n) const = 0;
 	virtual void RegisterImage(int type, const char *xpm_data) = 0;
 	virtual void RegisterRGBAImage(int type, int width, int height, const unsigned char *pixelsImage) = 0;

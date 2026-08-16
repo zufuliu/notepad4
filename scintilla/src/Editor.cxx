@@ -817,8 +817,7 @@ bool Editor::RangeContainsProtected(const SelectionRange &range) const noexcept 
 
 bool Editor::SelectionContainsProtected() const noexcept {
 	for (size_t r = 0; r < sel.Count(); r++) {
-		if (RangeContainsProtected(sel.Range(r).Start().Position(),
-			sel.Range(r).End().Position())) {
+		if (RangeContainsProtected(sel.Range(r))) {
 			return true;
 		}
 	}
@@ -1211,8 +1210,8 @@ Editor::XYScrollPosition Editor::XYScrollToMakeVisible(SelectionRange range, con
 	}
 
 	// Vertical positioning
-	if (FlagSet(options, XYScrollOptions::vertical)
-		&& (pt.y < rcClient.top || ptBottomCaret.y >= rcClient.bottom || FlagSet(policies.y.policy, CaretPolicy::Strict))) {
+	if (FlagSet(options, XYScrollOptions::vertical) &&
+		(pt.y < rcClient.top || ptBottomCaret.y >= rcClient.bottom || FlagSet(policies.y.policy, CaretPolicy::Strict))) {
 		const Sci::Line lineCaret = DisplayFromPosition(range.caret.Position());
 		const Sci::Line linesOnScreen = LinesOnScreen();
 		const Sci::Line halfScreen = std::max<Sci::Line>(linesOnScreen - 1, 2) / 2;
@@ -1482,7 +1481,7 @@ void Editor::ShowCaretAtCurrentPosition() {
 		caret.on = true;
 		FineTickerCancel(TickReason::caret);
 		if (caret.period > 0)
-			FineTickerStart(TickReason::caret, caret.period, caret.period / 10);
+			FineTickerStart(TickReason::caret, caret.period, caret.period / tickerToleranceFraction);
 	} else {
 		caret.active = false;
 		caret.on = false;
@@ -1503,7 +1502,7 @@ void Editor::CaretSetPeriod(int period) {
 		caret.on = true;
 		FineTickerCancel(TickReason::caret);
 		if ((caret.active) && (caret.period > 0))
-			FineTickerStart(TickReason::caret, caret.period, caret.period / 10);
+			FineTickerStart(TickReason::caret, caret.period, caret.period / tickerToleranceFraction);
 		InvalidateCaret();
 	}
 }
@@ -2057,7 +2056,7 @@ void Editor::Paint(Surface *surfaceWindow, PRectangle rcArea) {
 	if (horizontalScrollBarVisible && trackLineWidth && (view.lineWidthMaxSeen > scrollWidth)) {
 		scrollWidth = view.lineWidthMaxSeen;
 		if (!FineTickerRunning(TickReason::widen)) {
-			FineTickerStart(TickReason::widen, 50, 5);
+			FineTickerStart(TickReason::widen, tickerIntervalWiden, tickerIntervalWiden / tickerToleranceFraction);
 		}
 	}
 
@@ -2366,7 +2365,7 @@ void Editor::InsertPasteShape(std::string_view text, PasteShape shape) {
 			const Sci::Position insertPos = pdoc->LineStartPosition(sel.MainCaret());
 			Sci::Position lengthInserted = pdoc->InsertString(insertPos, text);
 			// add the newline if necessary
-			if ((text.empty()) && !IsEOLCharacter(text.back())) {
+			if ((!text.empty()) && !IsEOLCharacter(text.back())) {
 				const std::string_view endline = pdoc->EOLString();
 				lengthInserted += pdoc->InsertString(insertPos + lengthInserted, endline);
 			}
@@ -2385,6 +2384,7 @@ void Editor::ClearSelection(bool retainMultipleSelections) {
 	const UndoGroup ug(pdoc);
 	for (size_t r = 0; r < sel.Count(); r++) {
 		if (!sel.Range(r).Empty()) {
+			// https://github.com/zufuliu/notepad4/issues/186
 			SelectionRange rangeNew = sel.Range(r);
 			if (sel.selType == Selection::SelTypes::lines && sel.Count() == 1) {
 				// remove EOLs
@@ -2922,6 +2922,24 @@ void Editor::NotifySavePoint(Document *, void *, bool atSavePoint) noexcept {
 	NotifySavePoint(atSavePoint);
 }
 
+void Editor::CheckModificationForWrap(const DocModification &mh) {
+	view.llc.Invalidate(LineLayout::ValidLevel::checkTextAndStyle);
+	const Sci::Line lineDoc = pdoc->SciLineFromPosition(mh.position);
+	const Sci::Line lines = std::max<Sci::Line>(0, mh.linesAdded);
+	if (Wrapping()) {
+		// Check if this modification crosses any of the wrap points
+		if (wrapPending.NeedsWrap()) {
+			if (lineDoc < wrapPending.end) { // Inserted/deleted before or inside wrap range
+				wrapPending.end += mh.linesAdded;
+			}
+		}
+		NeedWrapping(lineDoc, lineDoc + lines + 1);
+	}
+	RefreshStyleData();
+	// Fix up annotation heights
+	SetAnnotationHeights(lineDoc, lineDoc + lines + 2);
+}
+
 void Editor::CheckModificationForShow(const DocModification &mh) {
 	const Sci::Line lineOfPos = pdoc->SciLineFromPosition(mh.position);
 	Sci::Position endNeedShown = mh.position;
@@ -3067,23 +3085,8 @@ void Editor::NotifyModified(Document *, DocModification mh, void *) {
 				Redraw();
 			}
 		}
-		//CheckModificationForWrap(mh);
 		if (FlagSet(mh.modificationType, ModificationFlags::InsertText | ModificationFlags::DeleteText)) {
-			view.llc.Invalidate(LineLayout::ValidLevel::checkTextAndStyle);
-			const Sci::Line lineDoc = pdoc->SciLineFromPosition(mh.position);
-			const Sci::Line lines = std::max<Sci::Line>(0, mh.linesAdded);
-			if (Wrapping()) {
-				// Check if this modification crosses any of the wrap points
-				if (wrapPending.NeedsWrap()) {
-					if (lineDoc < wrapPending.end) { // Inserted/deleted before or inside wrap range
-						wrapPending.end += mh.linesAdded;
-					}
-				}
-				NeedWrapping(lineDoc, lineDoc + lines + 1);
-			}
-			RefreshStyleData();
-			// Fix up annotation heights
-			SetAnnotationHeights(lineDoc, lineDoc + lines + 2);
+			CheckModificationForWrap(mh);
 		}
 		if (mh.linesAdded != 0) {
 			// Avoid scrolling of display if change before current display
@@ -4703,7 +4706,7 @@ void Editor::SetDragPosition(SelectionPosition newPos) {
 		caret.on = true;
 		FineTickerCancel(TickReason::caret);
 		if ((caret.active) && (caret.period > 0) && (newPos.Position() < 0))
-			FineTickerStart(TickReason::caret, caret.period, caret.period / 10);
+			FineTickerStart(TickReason::caret, caret.period, caret.period / tickerToleranceFraction);
 		InvalidateCaret();
 		posDrag = newPos;
 		InvalidateCaret();
@@ -5242,7 +5245,7 @@ void Editor::ButtonMoveWithModifiers(Point pt, unsigned int, KeyMod modifiers) {
 	const Point ptOrigin = GetVisibleOriginInMain();
 	rcClient.Move(0, -ptOrigin.y);
 	if ((dwellDelay < TimeForever) && rcClient.Contains(pt)) {
-		FineTickerStart(TickReason::dwell, dwellDelay, dwellDelay / 10);
+		FineTickerStart(TickReason::dwell, dwellDelay, dwellDelay / tickerToleranceFraction);
 	}
 	//Platform::DebugPrintf("Move %.0f %.0f\n", pt.x, pt.y);
 	if (HaveMouseCapture()) {
@@ -5465,7 +5468,7 @@ void Editor::ChangeMouseCapture(bool on) noexcept {
 	SetMouseCapture(on);
 	// While mouse captured want timer to scroll automatically
 	if (on) {
-		FineTickerStart(TickReason::scroll, 100, 10);
+		FineTickerStart(TickReason::scroll, tickerInterval, tickerInterval / tickerToleranceFraction);
 	} else {
 		FineTickerCancel(TickReason::scroll);
 	}
@@ -6356,6 +6359,11 @@ constexpr Selection::SelTypes SelTypeFromMode(SelectionMode mode) noexcept {
 
 constexpr int SelectionModeFromSelType(Selection::SelTypes selType) noexcept {
 	return std::max(0, static_cast<int>(selType) - 1);
+}
+
+constexpr bool ValidAlpha(sptr_t alpha) noexcept {
+	constexpr sptr_t alphaMax = 0xff;
+	return (alpha >= 0) && (alpha <= alphaMax);
 }
 
 }
@@ -8123,9 +8131,9 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 
 	case Message::IndicSetStyle:
 		if (wParam <= IndicatorMax) {
-			vs.indicators[wParam].sacNormal.style = static_cast<IndicatorStyle>(lParam);
-			vs.indicators[wParam].sacHover.style = static_cast<IndicatorStyle>(lParam);
-			InvalidateStyleRedraw();
+			if (vs.indicators[wParam].SetStyle(static_cast<IndicatorStyle>(lParam))) {
+				InvalidateStyleRedraw();
+			}
 		}
 		break;
 
@@ -8134,9 +8142,9 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 
 	case Message::IndicSetFore:
 		if (wParam <= IndicatorMax) {
-			vs.indicators[wParam].sacNormal.fore = ColourRGBA::FromIpRGB(lParam);
-			vs.indicators[wParam].sacHover.fore = ColourRGBA::FromIpRGB(lParam);
-			InvalidateStyleRedraw();
+			if (vs.indicators[wParam].SetFore(ColourRGBA::FromIpRGB(lParam))) {
+				InvalidateStyleRedraw();
+			}
 		}
 		break;
 
@@ -8145,8 +8153,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 
 	case Message::IndicSetHoverStyle:
 		if (wParam <= IndicatorMax) {
-			vs.indicators[wParam].sacHover.style = static_cast<IndicatorStyle>(lParam);
-			InvalidateStyleRedraw();
+			SetAppearance(vs.indicators[wParam].sacHover.style, static_cast<IndicatorStyle>(lParam));
 		}
 		break;
 
@@ -8155,8 +8162,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 
 	case Message::IndicSetHoverFore:
 		if (wParam <= IndicatorMax) {
-			vs.indicators[wParam].sacHover.fore = ColourRGBA::FromIpRGB(lParam);
-			InvalidateStyleRedraw();
+			SetAppearance(vs.indicators[wParam].sacHover.fore, ColourRGBA::FromIpRGB(lParam));
 		}
 		break;
 
@@ -8165,8 +8171,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 
 	case Message::IndicSetFlags:
 		if (wParam <= IndicatorMax) {
-			vs.indicators[wParam].SetFlags(static_cast<IndicFlag>(lParam));
-			InvalidateStyleRedraw();
+			SetAppearance(vs.indicators[wParam].attributes, static_cast<IndicFlag>(lParam));
 		}
 		break;
 
@@ -8175,8 +8180,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 
 	case Message::IndicSetUnder:
 		if (wParam <= IndicatorMax) {
-			vs.indicators[wParam].under = lParam != 0;
-			InvalidateStyleRedraw();
+			SetAppearance(vs.indicators[wParam].under, lParam != 0);
 		}
 		break;
 
@@ -8184,9 +8188,8 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		return (wParam <= IndicatorMax) ? vs.indicators[wParam].under : 0;
 
 	case Message::IndicSetAlpha:
-		if (wParam <= IndicatorMax && lParam >=0 && lParam <= 255) {
-			vs.indicators[wParam].fillAlpha = static_cast<int>(lParam);
-			InvalidateStyleRedraw();
+		if (wParam <= IndicatorMax && ValidAlpha(lParam)) {
+			SetAppearance(vs.indicators[wParam].fillAlpha, static_cast<int>(lParam));
 		}
 		break;
 
@@ -8194,9 +8197,8 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		return (wParam <= IndicatorMax) ? vs.indicators[wParam].fillAlpha : 0;
 
 	case Message::IndicSetOutlineAlpha:
-		if (wParam <= IndicatorMax && lParam >=0 && lParam <= 255) {
-			vs.indicators[wParam].outlineAlpha = static_cast<int>(lParam);
-			InvalidateStyleRedraw();
+		if (wParam <= IndicatorMax && ValidAlpha(lParam)) {
+			SetAppearance(vs.indicators[wParam].outlineAlpha, static_cast<int>(lParam));
 		}
 		break;
 
@@ -8204,15 +8206,14 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		return (wParam <= IndicatorMax) ? vs.indicators[wParam].outlineAlpha : 0;
 
 	case Message::IndicSetStrokeWidth:
-		if (wParam <= IndicatorMax && lParam >= 0 && lParam <= 1000) {
-			vs.indicators[wParam].strokeWidth = static_cast<XYPOSITION>(lParam) / 100.0;
-			InvalidateStyleRedraw();
+		if (wParam <= IndicatorMax && lParam >= 0 && lParam <= strokeWidthMax) {
+			SetAppearance(vs.indicators[wParam].strokeWidth, static_cast<XYPOSITION>(lParam) / strokeWidthScale);
 		}
 		break;
 
 	case Message::IndicGetStrokeWidth:
 		if (wParam <= IndicatorMax) {
-			return std::lround(vs.indicators[wParam].strokeWidth * 100);
+			return std::lround(vs.indicators[wParam].strokeWidth * strokeWidthScale);
 		}
 		break;
 

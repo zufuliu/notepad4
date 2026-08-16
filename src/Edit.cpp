@@ -4800,7 +4800,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		}
 		SetFindReplaceText(hwndFind, efr.wszFind, mruFind, toggle);
 		if (hwndRepl) {
-			SetFindReplaceText(hwndRepl, efr.wszReplace, mruReplace, (efr.option & FindReplaceOption_LastReplaceEmpty) | FindReplaceStatus_ReplaceUpdated);
+			SetFindReplaceText(hwndRepl, efr.wszReplace, mruReplace, (efr.option & FindReplaceOption_LastReplaceEmpty) | TRUE);
 		}
 
 		// focus on replace box when selected text is not empty.

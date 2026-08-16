@@ -2230,7 +2230,7 @@ void FormatNumber64(LPWSTR lpNumberStr, uint64_t value) noexcept {
 #endif
 
 	WCHAR *c = lpNumberStr + lstrlen(lpNumberStr);
-	WCHAR *end = c;
+	const WCHAR *end = c;
 	lpNumberStr += 3;
 	do {
 		c -= 3;

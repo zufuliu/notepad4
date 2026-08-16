@@ -5,6 +5,10 @@
 // Copyright 2017 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
 
+#include <cstdlib>
+#include <cassert>
+#include <cstring>
+
 #include <string>
 #include <string_view>
 #include <map>

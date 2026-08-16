@@ -277,7 +277,7 @@ def RegenerateAll(root):
 	HFacer.RegenerateAll(root, False)
 	f = Face.Face()
 	include = root / "include"
-	f.ReadFromFile(include / "Scintilla.iface")
+	f.ReadFromFile(include / "Scintilla.iface", negativeParen=False)
 	FileGenerator.Regenerate(include / "ScintillaMessages.h", "//", HMessages(f))
 	FileGenerator.Regenerate(include / "ScintillaTypes.h", "//", HEnumerations(f), HConstants(f))
 	FileGenerator.Regenerate(include / "ScintillaCall.h", "//", HMethods(f))

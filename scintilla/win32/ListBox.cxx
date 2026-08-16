@@ -174,8 +174,8 @@ class ListBoxX final : public ListBox {
 	void OnDoubleClick();
 	void OnSelChange();
 	void ResizeToCursor() noexcept;
-	void StartResize(WPARAM) noexcept;
-	LRESULT NcHitTest(WPARAM, LPARAM) const noexcept;
+	void StartResize(WPARAM hitCode) noexcept;
+	LRESULT NcHitTest(WPARAM wParam, LPARAM lParam) const noexcept;
 	void CentreItem(int n) noexcept;
 	void AllocateBitMap();
 	static LRESULT CALLBACK ListProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
@@ -204,11 +204,10 @@ public:
 	PRectangle GetDesiredRect() override;
 	int CaretFromEdge() const noexcept override;
 	void Clear() noexcept override;
-	void Append(const char *s, int type = -1) const noexcept override;
 	int Length() const noexcept override;
 	void Select(int n) override;
 	int GetSelection() const noexcept override;
-	int Find(const char *prefix) const noexcept override;
+	// int Find(const char *prefix) const noexcept override;
 	std::string GetValue(int n) const override;
 	void RegisterImage(int type, const char *xpm_data) override;
 	void RegisterRGBAImage(int type, int width, int height, const unsigned char *pixelsImage) override;
@@ -293,7 +292,6 @@ PRectangle ListBoxX::GetDesiredRect() {
 	rcDesired.bottom = rcDesired.top + ItemHeight() * rows;
 
 	int width = MinClientWidth();
-
 	int textSize = 0;
 
 	// Make a measuring surface
@@ -351,11 +349,6 @@ void ListBoxX::Clear() noexcept {
 	lti.Clear();
 }
 
-void ListBoxX::Append(const char *, int) const noexcept {
-	// This method is no longer called in Scintilla
-	PLATFORM_ASSERT(false);
-}
-
 int ListBoxX::Length() const noexcept {
 	return lti.Count();
 }
@@ -376,9 +369,11 @@ int ListBoxX::GetSelection() const noexcept {
 }
 
 // This is not actually called at present
+/*
 int ListBoxX::Find(const char *) const noexcept {
 	return LB_ERR;
 }
+*/
 
 std::string ListBoxX::GetValue(int n) const {
 	const ListItemData item = lti.Get(n);
@@ -402,7 +397,6 @@ void ListBoxX::Draw(const DRAWITEMSTRUCT *pDrawItem) {
 	if ((pDrawItem->itemAction != ODA_SELECT) && (pDrawItem->itemAction != ODA_DRAWENTIRE)) {
 		return;
 	}
-
 	if (!graphics.pixmapLine) {
 		AllocateBitMap();
 		if (!graphics.pixmapLine) {
@@ -500,7 +494,7 @@ void ListBoxX::SetList(const char *list, const char separator, const char typese
 	char *words = lti.SetWords(list, size);
 	const char *startword = words;
 	char *numword = nullptr;
-	char * const end = words + size;
+	const char * const end = words + size;
 	for (; words < end; words++) {
 		if (words[0] == separator) {
 			words[0] = '\0';

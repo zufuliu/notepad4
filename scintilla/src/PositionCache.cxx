@@ -541,7 +541,6 @@ XYPOSITION ScreenLine::TabPositionAfter(XYPOSITION xPosition) const noexcept {
 bool SignificantLines::LineMayCache(Sci::Line line) const noexcept {
 	switch (level) {
 	case LineCache::None:
-		return false;
 	case LineCache::Caret:
 		return line == lineCaret;
 	case LineCache::Page:
