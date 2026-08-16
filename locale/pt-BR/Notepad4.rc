@@ -1190,7 +1190,6 @@ BEGIN
 END
 
 IDD_SYSTEM_INTEGRATION DIALOGEX 0, 0, 232, 118
-IDD_SYSTEM_INTEGRATION DIALOGEX 0, 0, 232, 118
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Integração com o Sistema"
 FONT 9, "Segoe UI", 400, 0, 0x1
@@ -1299,6 +1298,7 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,139,7,50,14
     PUSHBUTTON      "Cancelar",IDCANCEL,139,24,50,14
 END
+
 IDD_STYLESELECT DIALOGEX 0, 0, 165, 217
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
 CAPTION "Selecionar Esquema"
@@ -1748,7 +1748,7 @@ BEGIN
 \\e\tEscape (ESC, ASCII 27 / 1B)\n\
 \\f\tAlimentação de formulário (FF, ASCII 12 / 0C)\n\
 \\n\tNova linha (LF, ASCII 10 / 0A)\n\"
-    \r\tRetorno de transporte (CR, ASCII 13 / 0D)\n\
+\\r\tRetorno de transporte (CR, ASCII 13 / 0D)\n\
 \\t\tTabulação Horizontal (HT, ASCII 9)\n\
 \\v\tTabulação Vertical (VT, ASCII 11 / 0B)\n\
 \\uHHHH\tValor Hexadecimal\n\
@@ -1919,7 +1919,7 @@ BEGIN
     IDS_WIKI_SEARCH_URL     "https://pt.wikipedia.org/wiki/Especial:Pesquisar?search=%s"
 END
 
-// formato do nome da codificação: 'nome descritivo longo no diálogo Selecionar Codificação' + ';' + 'nome curto na barra de status'
+// ecoding name string format: 'long descriptive name on Select Encoding dialog '+';'+'short name on statusbar'
 STRINGTABLE
 BEGIN
 	IDS_ENCODING_ANSI				"ANSI;ANSI"
@@ -2074,7 +2074,7 @@ END
 #endif // NP2_ENABLE_LOCALIZE_LEXER_NAME
 
 #if NP2_ENABLE_LOCALIZE_STYLE_NAME
-// string table for st yles, see EditLexers/ EditStyleX.h
+// string table for styles, see EditLexers/ EditStyleX.h
 STRINGTABLE
 BEGIN
 	NP2STYLE_MarginLineNumber		"Margem e Número da Linha"
@@ -2128,7 +2128,7 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
-#endif    // Resources in Portuguese (Brasil)
+#endif    //Portuguese (Brasil) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -2136,7 +2136,7 @@ END
 #ifndef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
 //
-// Generated from the resource TEXTINCLUDE 3.
+// Generated from the TEXTINCLUDE 3 resource.
 //
 #include "../../src/Notepad4.ver"
 /////////////////////////////////////////////////////////////////////////////
