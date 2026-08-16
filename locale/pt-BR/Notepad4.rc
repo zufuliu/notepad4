@@ -391,18 +391,18 @@ BEGIN
 		BEGIN
 			MENUITEM "&Ir para Linha...\tCtrl+G",		IDM_EDIT_GOTOLINE
 			//MENUITEM SEPARATOR
-			//MENUITEM "Navegar para &Trás\tAlt+Left",	IDM_EDIT_NAVIGATE_BACKWARD
-			//MENUITEM "Navegar para &Frente\tAlt+Right",	IDM_EDIT_NAVIGATE_FORWARD
+			//MENUITEM "Navegar para &Trás\tAlt+Esquerda",	IDM_EDIT_NAVIGATE_BACKWARD
+			//MENUITEM "Navegar para &Frente\tAlt+Direita",	IDM_EDIT_NAVIGATE_FORWARD
 			MENUITEM SEPARATOR
-			MENUITEM "Ir para Início do Blo&ck\tAlt+[",					IDM_EDIT_GOTO_BLOCK_START
+			MENUITEM "Ir para Início do Blo&co\tAlt+[",					IDM_EDIT_GOTO_BLOCK_START
 			MENUITEM "Ir para Fim do Bl&oco\tAlt+]",						IDM_EDIT_GOTO_BLOCK_END
-			MENUITEM "Ir para Bloco &Anterior\tAlt+Comma (<,)",		IDM_EDIT_GOTO_PREVIOUS_BLOCK
-			MENUITEM "Ir para Próximo &Bloco\tAlt+Period (>.)",			IDM_EDIT_GOTO_NEXT_BLOCK
-			MENUITEM "Ir para Bloco Irmão P&révio\tCtrl+Alt+Comma (<,)",IDM_EDIT_GOTO_PREV_SIBLING_BLOCK
-			MENUITEM "Ir para Bloco Irmão N&ext\tCtrl+Alt+Period (>.)",	IDM_EDIT_GOTO_NEXT_SIBLING_BLOCK
+			MENUITEM "Ir para Bloco &Anterior\tAlt+Vírgula (<,)",		IDM_EDIT_GOTO_PREVIOUS_BLOCK
+			MENUITEM "Ir para Próximo &Bloco\tAlt+Ponto (>.)",			IDM_EDIT_GOTO_NEXT_BLOCK
+			MENUITEM "Ir para Bloco Irmão Ante&rior\tCtrl+Alt+Vírgula (<,)",IDM_EDIT_GOTO_PREV_SIBLING_BLOCK
+			MENUITEM "Ir para Próximo Bloco Irmão\tCtrl+Alt+Ponto (>.)",	IDM_EDIT_GOTO_NEXT_SIBLING_BLOCK
 			MENUITEM SEPARATOR
-			MENUITEM "Ir para Início da &Seleção\tCtrl+Shift+Comma (<,)",CMD_JUMP2SELSTART
-			MENUITEM "Ir para Fim da Sele&ção\tCtrl+Shift+Period (>.)",	CMD_JUMP2SELEND
+			MENUITEM "Ir para Início da &Seleção\tCtrl+Shift+Vírgula (<,)",CMD_JUMP2SELSTART
+			MENUITEM "Ir para Fim da Sele&ção\tCtrl+Shift+Ponto (>.)",	CMD_JUMP2SELEND
 		END
 	END
 	POPUP "E&xibir"
@@ -1190,6 +1190,7 @@ BEGIN
 END
 
 IDD_SYSTEM_INTEGRATION DIALOGEX 0, 0, 232, 118
+IDD_SYSTEM_INTEGRATION DIALOGEX 0, 0, 232, 118
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Integração com o Sistema"
 FONT 9, "Segoe UI", 400, 0, 0x1
@@ -1298,7 +1299,6 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,139,7,50,14
     PUSHBUTTON      "Cancelar",IDCANCEL,139,24,50,14
 END
-
 IDD_STYLESELECT DIALOGEX 0, 0, 165, 217
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
 CAPTION "Selecionar Esquema"
@@ -1747,8 +1747,8 @@ BEGIN
 \\b\tBackspace (BS, ASCII 8)\n\
 \\e\tEscape (ESC, ASCII 27 / 1B)\n\
 \\f\tAlimentação de formulário (FF, ASCII 12 / 0C)\n\
-\\n\tNova linha (LF, ASCII 10 / 0A)\n\
-\\r\tRetorno de transporte (CR, ASCII 13 / 0D)\n\
+\\n\tNova linha (LF, ASCII 10 / 0A)\n\"
+    \r\tRetorno de transporte (CR, ASCII 13 / 0D)\n\
 \\t\tTabulação Horizontal (HT, ASCII 9)\n\
 \\v\tTabulação Vertical (VT, ASCII 11 / 0B)\n\
 \\uHHHH\tValor Hexadecimal\n\
@@ -1919,7 +1919,7 @@ BEGIN
     IDS_WIKI_SEARCH_URL     "https://pt.wikipedia.org/wiki/Especial:Pesquisar?search=%s"
 END
 
-// encoding name string format: 'long descriptive name on Select Encoding dialog' + ';' + 'short name on statusbar'
+// formato do nome da codificação: 'nome descritivo longo no diálogo Selecionar Codificação' + ';' + 'nome curto na barra de status'
 STRINGTABLE
 BEGIN
 	IDS_ENCODING_ANSI				"ANSI;ANSI"
@@ -2074,7 +2074,7 @@ END
 #endif // NP2_ENABLE_LOCALIZE_LEXER_NAME
 
 #if NP2_ENABLE_LOCALIZE_STYLE_NAME
-// string table for styles, see EditLexers/EditStyleX.h
+// string table for st yles, see EditLexers/ EditStyleX.h
 STRINGTABLE
 BEGIN
 	NP2STYLE_MarginLineNumber		"Margem e Número da Linha"
@@ -2128,7 +2128,7 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
-#endif    // Portuguese (Brazil) resources
+#endif    // Resources in Portuguese (Brasil)
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -2136,9 +2136,8 @@ END
 #ifndef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
 //
-// Generated from the TEXTINCLUDE 3 resource.
+// Generated from the resource TEXTINCLUDE 3.
 //
 #include "../../src/Notepad4.ver"
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
-
