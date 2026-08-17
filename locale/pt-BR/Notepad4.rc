@@ -1919,7 +1919,7 @@ BEGIN
     IDS_WIKI_SEARCH_URL     "https://pt.wikipedia.org/wiki/Especial:Pesquisar?search=%s"
 END
 
-// ecoding name string format: 'long descriptive name on Select Encoding dialog '+';'+'short name on statusbar'
+// encoding name string format: 'long descriptive name on Select Encoding dialog' + ';' + 'short name on statusbar'
 STRINGTABLE
 BEGIN
 	IDS_ENCODING_ANSI				"ANSI;ANSI"
@@ -2074,7 +2074,7 @@ END
 #endif // NP2_ENABLE_LOCALIZE_LEXER_NAME
 
 #if NP2_ENABLE_LOCALIZE_STYLE_NAME
-// string table for styles, see EditLexers/ EditStyleX.h
+// string table for styles, see EditLexers/EditStyleX.h
 STRINGTABLE
 BEGIN
 	NP2STYLE_MarginLineNumber		"Margem e Número da Linha"
@@ -2128,7 +2128,7 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
-#endif    //Portuguese (Brasil) resources
+#endif    // Portuguese (Brazil) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -2141,3 +2141,4 @@ END
 #include "../../src/Notepad4.ver"
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
+
