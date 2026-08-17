@@ -391,18 +391,18 @@ BEGIN
 		BEGIN
 			MENUITEM "&Ir para Linha...\tCtrl+G",		IDM_EDIT_GOTOLINE
 			//MENUITEM SEPARATOR
-			//MENUITEM "Navegar para &Trás\tAlt+Left",	IDM_EDIT_NAVIGATE_BACKWARD
-			//MENUITEM "Navegar para &Frente\tAlt+Right",	IDM_EDIT_NAVIGATE_FORWARD
+			//MENUITEM "Navegar para &Trás\tAlt+Esquerda",	IDM_EDIT_NAVIGATE_BACKWARD
+			//MENUITEM "Navegar para &Frente\tAlt+Direita",	IDM_EDIT_NAVIGATE_FORWARD
 			MENUITEM SEPARATOR
-			MENUITEM "Ir para Início do Blo&ck\tAlt+[",					IDM_EDIT_GOTO_BLOCK_START
+			MENUITEM "Ir para Início do Blo&co\tAlt+[",					IDM_EDIT_GOTO_BLOCK_START
 			MENUITEM "Ir para Fim do Bl&oco\tAlt+]",						IDM_EDIT_GOTO_BLOCK_END
-			MENUITEM "Ir para Bloco &Anterior\tAlt+Comma (<,)",		IDM_EDIT_GOTO_PREVIOUS_BLOCK
-			MENUITEM "Ir para Próximo &Bloco\tAlt+Period (>.)",			IDM_EDIT_GOTO_NEXT_BLOCK
-			MENUITEM "Ir para Bloco Irmão P&révio\tCtrl+Alt+Comma (<,)",IDM_EDIT_GOTO_PREV_SIBLING_BLOCK
-			MENUITEM "Ir para Bloco Irmão N&ext\tCtrl+Alt+Period (>.)",	IDM_EDIT_GOTO_NEXT_SIBLING_BLOCK
+			MENUITEM "Ir para Bloco &Anterior\tAlt+Vírgula (<,)",		IDM_EDIT_GOTO_PREVIOUS_BLOCK
+			MENUITEM "Ir para Próximo &Bloco\tAlt+Ponto (>.)",			IDM_EDIT_GOTO_NEXT_BLOCK
+			MENUITEM "Ir para Bloco Irmão Ante&rior\tCtrl+Alt+Vírgula (<,)",IDM_EDIT_GOTO_PREV_SIBLING_BLOCK
+			MENUITEM "Ir para Próximo Bloco Irmão\tCtrl+Alt+Ponto (>.)",	IDM_EDIT_GOTO_NEXT_SIBLING_BLOCK
 			MENUITEM SEPARATOR
-			MENUITEM "Ir para Início da &Seleção\tCtrl+Shift+Comma (<,)",CMD_JUMP2SELSTART
-			MENUITEM "Ir para Fim da Sele&ção\tCtrl+Shift+Period (>.)",	CMD_JUMP2SELEND
+			MENUITEM "Ir para Início da &Seleção\tCtrl+Shift+Vírgula (<,)",CMD_JUMP2SELSTART
+			MENUITEM "Ir para Fim da Sele&ção\tCtrl+Shift+Ponto (>.)",	CMD_JUMP2SELEND
 		END
 	END
 	POPUP "E&xibir"
