@@ -3509,7 +3509,9 @@ bool Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, bool bDefaultSt
 		cf.Flags |= CF_FIXEDPITCHONLY;
 	}
 
+	DialogHook_Start(DialogRefData_CommonDialog);
 	const BOOL result = ChooseFont(&cf);
+	DialogHook_Stop();
 	if (!result || StrIsEmpty(lf.lfFaceName)) {
 		return false;
 	}
@@ -3591,7 +3593,9 @@ static COLORREF Style_ChooseColor(HWND hwnd, COLORREF color) noexcept {
 	cc.rgbResult = color;
 	cc.lpCustColors = customColor;
 	cc.Flags = CC_FULLOPEN | CC_RGBINIT | CC_SOLIDCOLOR;
+	DialogHook_Start(DialogRefData_CommonDialog);
 	const BOOL result = ChooseColor(&cc);
+	DialogHook_Stop();
 	return result ? cc.rgbResult : color;
 }
 
