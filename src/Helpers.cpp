@@ -2343,13 +2343,15 @@ void ComboBox_AddStringA2W(UINT uCP, HWND hwnd, LPCSTR lpString) noexcept {
 //
 // MRU functions
 //
-void MRUList::Init(LPCWSTR pszRegKey, int capacity_, int flags) noexcept {
+void MRUList::Init(LPCWSTR pszRegKey, int capacity_, int flags, bool save) noexcept {
 	iSize = 0;
 	capacity = capacity_;
 	iFlags = flags;
 	szRegKey = pszRegKey;
 	pszItems = static_cast<LPWSTR *>(NP2HeapAlloc(sizeof(LPWSTR) * capacity_));
-	Load();
+	if (save) {
+		Load();
+	}
 }
 
 static inline bool MRU_Equal(int flags, LPCWSTR psz1, LPCWSTR psz2) noexcept {
@@ -2404,7 +2406,7 @@ void MRUList::Delete(int iIndex) noexcept {
 
 void MRUList::DeleteFileFromStore(LPCWSTR pszFile, int fileIndex) noexcept {
 	MRUList mruStore;
-	mruStore.Init(szRegKey, capacity, iFlags);
+	mruStore.Init(szRegKey, capacity, iFlags, true);
 	int deleted = 0;
 
 	for (int index = 0; index < mruStore.iSize; ) {
@@ -2502,14 +2504,14 @@ void MRUList::Save() const noexcept {
 
 void MRUList::Reload() noexcept {
 	Empty(false, true);
-	Init(szRegKey, capacity, iFlags);
+	Init(szRegKey, capacity, iFlags, true);
 }
 
 void MRUList::MergeSave(bool keep, bool destroy) noexcept {
 	if (keep && iSize > 0) {
 		LPWSTR * const current = pszItems;
 		const int count = iSize;
-		Init(szRegKey, capacity, iFlags);
+		Init(szRegKey, capacity, iFlags, true);
 		for (int i = count - 1; i >= 0; i--) {
 			LPWSTR path = current[i];
 			Add(path);
@@ -2519,7 +2521,7 @@ void MRUList::MergeSave(bool keep, bool destroy) noexcept {
 		Save();
 	}
 	if (destroy) {
-		Empty(!keep, true);
+		Empty(false, true);
 	}
 }
 

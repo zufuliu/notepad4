@@ -4589,6 +4589,7 @@ void AddBackslashComboBoxSetup(HWND hwnd) noexcept {
 
 extern int iFindReplaceOption;
 extern int iFindReplaceOpacityLevel;
+extern bool bSaveFindReplace;
 
 void EditSaveSelectionAsFindText(EditFindReplace &efr, int menu, bool findSelection) noexcept {
 	if (!findSelection && (iSelectOption & SelectOption_CopySelectionAsFindText) == 0) {
@@ -5157,9 +5158,9 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 				LPWSTR lpszText = GetDlgItemFullText(hwnd, control);
 				ComboBox_ResetContent(hwndFind);
 				if (control == IDC_FINDTEXT) {
-					mruFind.Empty(true);
+					mruFind.Empty(bSaveFindReplace);
 				} else {
-					mruReplace.Empty(true);
+					mruReplace.Empty(bSaveFindReplace);
 				}
 				ComboBox_SetText(hwndFind, lpszText);
 				NP2HeapFree(lpszText);

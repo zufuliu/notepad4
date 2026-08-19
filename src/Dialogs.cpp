@@ -958,11 +958,10 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 			}
 		} else if (pnmhdr->idFrom == IDC_EMPTY_MRU) {
 			if ((pnmhdr->code == NM_CLICK || pnmhdr->code == NM_RETURN)) {
-				mruFile.Empty(false);
+				mruFile.Empty(bSaveRecentFiles);
 				if (StrNotEmpty(szCurFile)) {
 					mruFile.Add(szCurFile);
 				}
-				mruFile.Save();
 				SendWMCommand(hwnd, IDC_FILEMRU_UPDATE_VIEW);
 			}
 		}

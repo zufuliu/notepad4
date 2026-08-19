@@ -1222,7 +1222,7 @@ struct MRUList {
 	LPCWSTR szRegKey;
 	LPWSTR *pszItems;
 
-	void Init(LPCWSTR pszRegKey, int capacity_, int flags) noexcept;
+	void Init(LPCWSTR pszRegKey, int capacity_, int flags, bool save) noexcept;
 	void Add(LPCWSTR pszNew) noexcept;
 	void Delete(int iIndex) noexcept;
 	void DeleteFileFromStore(LPCWSTR pszFile, int fileIndex) noexcept;

@@ -106,7 +106,7 @@ WCHAR szExeRealPath[MAX_PATH];
 static bool bSaveSettings;
 bool	bSaveRecentFiles;
 int iMaxRecentFiles;
-static bool bSaveFindReplace;
+bool bSaveFindReplace;
 static WCHAR tchLastSaveCopyDir[MAX_PATH];
 WCHAR	tchOpenWithDir[MAX_PATH];
 WCHAR	tchFavoritesDir[MAX_PATH];
@@ -1860,9 +1860,9 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 
 	// File MRU
 	const int flags = MRUFlags_FilePath | (static_cast<int>(flagRelativeFileMRU) * MRUFlags_RelativePath) | (static_cast<int>(flagPortableMyDocs) * MRUFlags_PortableMyDocs);
-	mruFile.Init(MRU_KEY_RECENT_FILES, iMaxRecentFiles, flags);
-	mruFind.Init(MRU_KEY_RECENT_FIND, MRU_MAXITEMS, MRUFlags_QuoteValue);
-	mruReplace.Init(MRU_KEY_RECENT_REPLACE, MRU_MAXITEMS, MRUFlags_QuoteValue);
+	mruFile.Init(MRU_KEY_RECENT_FILES, iMaxRecentFiles, flags, bSaveRecentFiles);
+	mruFind.Init(MRU_KEY_RECENT_FIND, MRU_MAXITEMS, MRUFlags_QuoteValue, bSaveFindReplace);
+	mruReplace.Init(MRU_KEY_RECENT_REPLACE, MRU_MAXITEMS, MRUFlags_QuoteValue, bSaveFindReplace);
 	return 0;
 }
 
@@ -7100,9 +7100,13 @@ bool FileSave(FileSaveFlag saveFlag) {
 			if (PathEqual(szCurFile, szIniFile)) {
 				LoadFlags();
 				LoadSettings();
-				mruFile.Reload();
-				mruFind.Reload();
-				mruReplace.Reload();
+				if (bSaveRecentFiles) {
+					mruFile.Reload();
+				}
+				if (bSaveFindReplace) {
+					mruFind.Reload();
+					mruReplace.Reload();
+				}
 				if (np2StyleTheme == StyleTheme_Default) {
 					Style_LoadAll(static_cast<StyleLoadFlag>(StyleLoadFlag_Reload | StyleLoadFlag_Apply));
 				}
