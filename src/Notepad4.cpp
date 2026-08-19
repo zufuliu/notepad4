@@ -4595,8 +4595,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			if (path) {
 				if (!PathIsFile(path)) {
 					if (IDYES == MsgBoxWarn(MB_YESNO, IDS_ERR_MRUDLG)) {
-						mruFile.DeleteFileFromStore(path);
-						mruFile.Delete(index);
+						mruFile.DeleteFileFromStore(path, index);
 					}
 				} else if (FileSave(FileSaveFlag_Ask)) {
 					FileLoad(FileLoadFlag_DontSave, path);

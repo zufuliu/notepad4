@@ -1024,8 +1024,7 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 				if (!PathIsFile(tch)) {
 					// Ask...
 					if (IDYES == MsgBoxWarn(MB_YESNO, IDS_ERR_MRUDLG)) {
-						mruFile.DeleteFileFromStore(tch);
-						mruFile.Delete(lvi.iItem);
+						mruFile.DeleteFileFromStore(tch, lvi.iItem);
 
 						// must use recreate the list, index might change...
 						//ListView_DeleteItem(hwndLV, lvi.iItem);

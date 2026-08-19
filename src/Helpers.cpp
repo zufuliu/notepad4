@@ -2402,7 +2402,7 @@ void MRUList::Delete(int iIndex) noexcept {
 	}
 }
 
-void MRUList::DeleteFileFromStore(LPCWSTR pszFile) const noexcept {
+void MRUList::DeleteFileFromStore(LPCWSTR pszFile, int fileIndex) noexcept {
 	MRUList mruStore;
 	mruStore.Init(szRegKey, capacity, iFlags);
 	int deleted = 0;
@@ -2425,6 +2425,7 @@ void MRUList::DeleteFileFromStore(LPCWSTR pszFile) const noexcept {
 	mruStore.iSize -= deleted;
 	mruStore.Save();
 	mruStore.Empty(false, true);
+	Delete(fileIndex);
 }
 
 void MRUList::Empty(bool save, bool destroy) noexcept {
