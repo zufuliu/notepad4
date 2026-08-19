@@ -7843,7 +7843,7 @@ void InstallFileWatching(bool terminate) noexcept {
 		PathRemoveFileSpec(tchDirectory);
 
 		// Save data of current file
-		WIN32_FIND_DATA data;
+		WIN32_FILE_ATTRIBUTE_DATA data;
 		if (GetFileAttributesEx(szCurFile, GetFileExInfoStandard, &data)) {
 			memcpy(&fdCurFile, &data.ftLastWriteTime, sizeof(fdCurFile));
 		} else {
@@ -7866,7 +7866,7 @@ void InstallFileWatching(bool terminate) noexcept {
 
 static inline bool IsCurrentFileChangedOutsideApp() noexcept {
 	// Check if the file has been changed
-	WIN32_FIND_DATA fdUpdated;
+	WIN32_FILE_ATTRIBUTE_DATA fdUpdated;
 	if (!GetFileAttributesEx(szCurFile, GetFileExInfoStandard, &fdUpdated)) {
 		// The current file has been removed
 		return true;

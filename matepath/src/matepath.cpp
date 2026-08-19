@@ -1484,7 +1484,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			break;
 		}
 
-		WCHAR tch[512];
+		WCHAR tch[MAX_PATH + 4];
 		memset(tch, 0, sizeof(tch));
 		lstrcpy(tch, dli.szFileName);
 
@@ -2042,16 +2042,13 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 				WCHAR tch[64];
 				if ((pnmlv->uNewState & LVIS_SELECTED)) {
-					WIN32_FIND_DATA fd;
+					WIN32_FILE_ATTRIBUTE_DATA fd;
 					DirListItem dli;
 					dli.mask  = DLI_FILENAME;
 					dli.ntype = DLE_NONE;
+					memset(&fd, 0, sizeof(fd));
 					DirList_GetItem(hwndDirList, -1, &dli);
-					DirList_GetItemEx(hwndDirList, -1, &fd);
-
-					if (fd.nFileSizeLow >= MAXDWORD) {
-						GetFileAttributesEx(dli.szFileName, GetFileExInfoStandard, &fd);
-					}
+					GetFileAttributesEx(dli.szFileName, GetFileExInfoStandard, &fd);
 
 					const LONGLONG isize = (static_cast<LONGLONG>(fd.nFileSizeHigh) << 32) | fd.nFileSizeLow;
 					WCHAR tchsize[64];
