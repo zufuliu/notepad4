@@ -523,7 +523,7 @@ void Encoding_InitDefaults() noexcept {
 	}
 
 	CHARSETINFO ci;
-	if (TranslateCharsetInfo(AsPointer<DWORD *, UINT_PTR>(iDefaultCodePage), &ci, TCI_SRCCODEPAGE)) {
+	if (TranslateCharsetInfo(AsPointer<DWORD *, UINT_PTR>(acp), &ci, TCI_SRCCODEPAGE)) {
 		iDefaultCharSet = ci.ciCharset;
 	} else {
 		iDefaultCharSet = ANSI_CHARSET;
