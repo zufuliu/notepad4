@@ -521,12 +521,11 @@ enum {
 };
 
 struct NP2ENCODING {
-	const UINT uFlags;
 	/*const*/UINT uCodePage;
+	const uint16_t uFlags;
+	const uint16_t idsName;
 	// string format: [normal name + ','] + [lower case parse name + ',']+
 	const char * const pszParseNames;
-	const UINT idsName;
-	LPWSTR wchLabel;
 };
 
 // see UniConversion.h and https://www.unicode.org/faq/utf_bom.html
@@ -611,10 +610,10 @@ void	EditOnCodePageChanged(UINT oldCodePage, bool showControlCharacter, EditFind
 const char* GetFoldDisplayEllipsis(UINT cpEdit, UINT acp) noexcept;
 void	Encoding_InitDefaults() noexcept;
 int 	Encoding_MapIniSetting(bool bLoad, UINT iSetting) noexcept;
-void	Encoding_GetLabel(int iEncoding) noexcept;
+LPCWSTR Encoding_GetLabel(UINT iEncoding) noexcept;
 int 	Encoding_Match(LPCWSTR pwszTest) noexcept;
 int 	Encoding_MatchA(LPCSTR pchTest) noexcept;
-bool	Encoding_IsValid(int iEncoding) noexcept;
+bool	Encoding_IsValid(UINT iEncoding) noexcept;
 int		Encoding_GetIndex(UINT codePage) noexcept;
 int		Encoding_GetAnsiIndex() noexcept;
 void	Encoding_AddToTreeView(HWND hwnd, int idSel, bool bRecodeOnly) noexcept;

@@ -2132,8 +2132,7 @@ void UpdateStatusBarCache(int item) noexcept {
 		break;
 
 	case StatusItem_Encoding:
-		Encoding_GetLabel(iCurrentEncoding);
-		cachedStatusItem.pszEncoding = mEncoding[iCurrentEncoding].wchLabel;
+		cachedStatusItem.pszEncoding = Encoding_GetLabel(iCurrentEncoding);
 		break;
 
 	case StatusItem_EolMode:
@@ -3412,7 +3411,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		if (sep != nullptr) {
 			strncpy(msz, enc, min<size_t>(sep - enc, COUNTOF(msz) - 1));
 		} else {
-			WideCharToMultiByte(CP_UTF8, 0, mEncoding[iCurrentEncoding].wchLabel, -1, msz, COUNTOF(msz), nullptr, nullptr);
+			WideCharToMultiByte(CP_UTF8, 0, cachedStatusItem.pszEncoding, -1, msz, COUNTOF(msz), nullptr, nullptr);
 		}
 		if (pLexCurrent->iLexer == SCLEX_PYTHON || pLexCurrent->iLexer == SCLEX_RUBY) {
 			const Sci_Position iCurrentPos = SciCall_GetCurrentPos();

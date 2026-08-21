@@ -1215,11 +1215,9 @@ bool EditSaveFile(LPCWSTR pszFile, int saveFlag, EditFileIOStatus &status) noexc
 			const int iAltEncoding = fv.GetEncoding();
 			if (iAltEncoding >= CPI_FIRST && iAltEncoding != iEncoding
 				&& !((uFlags & NCP_UTF8) && (mEncoding[iAltEncoding].uFlags & NCP_UTF8))) {
-				Encoding_GetLabel(iAltEncoding);
-				Encoding_GetLabel(iEncoding);
-				InfoBoxWarn(MB_OK, L"MsgEncodingMismatch", IDS_ENCODINGMISMATCH,
-					mEncoding[iAltEncoding].wchLabel,
-					mEncoding[iEncoding].wchLabel);
+				LPCWSTR altLabel = Encoding_GetLabel(iAltEncoding);
+				LPCWSTR wchLabel = Encoding_GetLabel(iEncoding);
+				InfoBoxWarn(MB_OK, L"MsgEncodingMismatch", IDS_ENCODINGMISMATCH, altLabel, wchLabel);
 			}
 		}
 #endif
