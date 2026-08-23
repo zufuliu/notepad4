@@ -509,6 +509,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 
 	void NotifyModifyAttempt(Document *document, void *userData) noexcept override;
 	void NotifySavePoint(Document *document, void *userData, bool atSavePoint) noexcept override;
+	void CheckModificationForWrap(const DocModification &mh);
 	void CheckModificationForShow(const DocModification &mh);
 	void NotifyModified(Document *document, DocModification mh, void *userData) override;
 	void NotifyDeleted(Document *document, void *userData) noexcept override;
@@ -588,6 +589,9 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	enum class TickReason {
 		caret, scroll, widen, dwell, platform
 	};
+	static constexpr int tickerInterval = 100;	// Default background ticker period for caret blinking, auto-scroll, ...
+	static constexpr int tickerIntervalWiden = 50;	// Ticker period for reflecting measured width to widen scroll bar
+	static constexpr int tickerToleranceFraction = 10;	// Default tolerance is 1/10 of tick interval
 	virtual void TickFor(TickReason reason);
 	virtual bool FineTickerRunning(TickReason reason) const noexcept = 0;
 	virtual void FineTickerStart(TickReason reason, int millis, int tolerance) noexcept = 0;
@@ -758,7 +762,7 @@ public:
 	operator Surface *() const noexcept {
 		return surf.get();
 	}
-	operator bool() const noexcept {
+	explicit operator bool() const noexcept {
 		return surf.operator bool();
 	}
 };

@@ -1343,6 +1343,7 @@ struct Sci_TextRangeFull {
 struct Sci_TextToFindFull {
 	struct Sci_CharacterRangeFull chrg;
 	const char *lpstrText;
+	Sci_PositionU textLength;
 	struct Sci_CharacterRangeFull chrgText;
 };
 

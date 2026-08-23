@@ -1222,11 +1222,10 @@ struct MRUList {
 	LPCWSTR szRegKey;
 	LPWSTR *pszItems;
 
-	void Init(LPCWSTR pszRegKey, int capacity_, int flags) noexcept;
+	void Init(LPCWSTR pszRegKey, int capacity_, int flags, bool save) noexcept;
 	void Add(LPCWSTR pszNew) noexcept;
-	void AddMultiline(LPCWSTR pszNew) noexcept;
 	void Delete(int iIndex) noexcept;
-	void DeleteFileFromStore(LPCWSTR pszFile) const noexcept;
+	void DeleteFileFromStore(LPCWSTR pszFile, int fileIndex) noexcept;
 	void Empty(bool save, bool destroy = false) noexcept;
 	void Load() noexcept;
 	void Save() const noexcept;
@@ -1286,13 +1285,14 @@ struct FileDialog {
 	static LRESULT CALLBACK SubProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 };
 
-void TransformBackslashes(char *pszInput, UINT cpEdit) noexcept;
 // backslash escape for C0 control character => \xHH
 #define kMaxBackslashEscapeCount	4
 // backslash escape regex meta character
 #define kMaxRegexEscapeCount		2
 bool AddBackslashW(LPWSTR pszOut, LPCWSTR pszInput) noexcept;
 void EscapeRegex(LPSTR pszOut, LPCSTR pszIn) noexcept;
+LPWSTR HeapStrDupW(LPCWSTR pszIn) noexcept;
+void HeapStrDupExW(LPWSTR &pszOut, LPCWSTR pszIn) noexcept;
 size_t Base64Encode(char *output, const uint8_t *src, size_t length, bool urlSafe) noexcept;
 size_t Base64Decode(uint8_t *output, const uint8_t *src, size_t length) noexcept;
 

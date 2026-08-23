@@ -117,20 +117,12 @@ Used by VSCode, Atom etc.
 #define SPI_GETWHEELSCROLLCHARS		0x006C
 #endif
 
-extern HANDLE g_hDefaultHeap;
 extern char *EditMapTextCase(int menu, const char *pszText, size_t &iSelCount, UINT cpEdit) noexcept;
 
 using namespace Scintilla;
 using namespace Scintilla::Internal;
 
 namespace {
-
-struct HeapPointerFreer {
-	template <typename T>
-	void operator()(T *ptr) const noexcept {
-		::HeapFree(g_hDefaultHeap, 0, ptr);
-	}
-};
 
 // Two idle messages SC_WIN_IDLE and SC_WORK_IDLE.
 
@@ -2246,7 +2238,7 @@ sptr_t ScintillaWin::EditMessage(unsigned int iMessage, uptr_t wParam, sptr_t lP
 			return -1;
 		} else {
 			const FINDTEXTA *pFT = AsPointer<const FINDTEXTA *>(lParam);
-			TextToFindFull tt = { { pFT->chrg.cpMin, pFT->chrg.cpMax }, pFT->lpstrText, {} };
+			TextToFindFull tt = { { pFT->chrg.cpMin, pFT->chrg.cpMax }, pFT->lpstrText, 0, {} };
 			return ScintillaBase::WndProc(Message::FindTextFull, wParam, AsInteger<sptr_t>(&tt));
 		}
 
@@ -2255,7 +2247,7 @@ sptr_t ScintillaWin::EditMessage(unsigned int iMessage, uptr_t wParam, sptr_t lP
 			return -1;
 		} else {
 			FINDTEXTEXA *pFT = AsPointer<FINDTEXTEXA *>(lParam);
-			TextToFindFull tt = { { pFT->chrg.cpMin, pFT->chrg.cpMax }, pFT->lpstrText, {} };
+			TextToFindFull tt = { { pFT->chrg.cpMin, pFT->chrg.cpMax }, pFT->lpstrText, 0, {} };
 			const Sci::Position pos =ScintillaBase::WndProc(Message::FindTextFull, wParam, AsInteger<sptr_t>(&tt));
 			pFT->chrgText.cpMin = (pos < 0)? -1 : static_cast<LONG>(tt.chrgText.cpMin);
 			pFT->chrgText.cpMax = (pos < 0)? -1 : static_cast<LONG>(tt.chrgText.cpMax);

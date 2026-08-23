@@ -311,11 +311,12 @@ INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 				WCHAR tch[512];
 				LPCWSTR arch = GetProcessorArchitecture();
 				const int iEncoding = Encoding_GetIndex(mEncoding[CPI_DEFAULT].uCodePage);
-				Encoding_GetLabel(iEncoding);
+				LPCWSTR defaultEncoding = Encoding_GetLabel(iEncoding);
+				LPCWSTR currentEncoding = Encoding_GetLabel(iCurrentEncoding);
 				GetDlgItemText(hwnd, IDC_BUILD_INFO, wch, COUNTOF(wch));
 				wsprintf(tch, L"%s\n%s\nEncoding: %s, %s\nScheme: %s, %s\nSystem: %u.%u.%u %s %s\n",
 					VERSION_FILEVERSION_LONG, wch,
-					mEncoding[iCurrentEncoding].wchLabel, mEncoding[iEncoding].wchLabel,
+					currentEncoding, defaultEncoding,
 					PathFindExtension(szCurFile), pLexCurrent->pszName,
 					version.dwMajorVersion, version.dwMinorVersion, version.dwBuildNumber,
 					version.szCSDVersion, arch);
@@ -844,7 +845,7 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 		HWND hwndLV = GetDlgItem(hwnd, IDC_FILEMRU);
 		DarkMode_InitFileListView(hwndLV);
 
-		BackgroundWorker *worker = static_cast<BackgroundWorker *>(GlobalAlloc(GPTR, sizeof(BackgroundWorker)));
+		BackgroundWorker *worker = static_cast<BackgroundWorker *>(NP2HeapAlloc(sizeof(BackgroundWorker)));
 		SetProp(hwnd, L"it", worker);
 		worker->Init(hwndLV);
 
@@ -875,7 +876,7 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 		BackgroundWorker *worker = static_cast<BackgroundWorker *>(GetProp(hwnd, L"it"));
 		worker->Destroy();
 		RemoveProp(hwnd, L"it");
-		GlobalFree(worker);
+		NP2HeapFree(worker);
 
 		bSaveRecentFiles = IsButtonChecked(hwnd, IDC_SAVEMRU);
 		iMaxRecentFiles = GetDlgItemInt(hwnd, IDC_MRU_COUNT_VALUE, nullptr, FALSE);
@@ -958,11 +959,10 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 			}
 		} else if (pnmhdr->idFrom == IDC_EMPTY_MRU) {
 			if ((pnmhdr->code == NM_CLICK || pnmhdr->code == NM_RETURN)) {
-				mruFile.Empty(false);
+				mruFile.Empty(bSaveRecentFiles);
 				if (StrNotEmpty(szCurFile)) {
 					mruFile.Add(szCurFile);
 				}
-				mruFile.Save();
 				SendWMCommand(hwnd, IDC_FILEMRU_UPDATE_VIEW);
 			}
 		}
@@ -1024,8 +1024,7 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 				if (!PathIsFile(tch)) {
 					// Ask...
 					if (IDYES == MsgBoxWarn(MB_YESNO, IDS_ERR_MRUDLG)) {
-						mruFile.DeleteFileFromStore(tch);
-						mruFile.Delete(lvi.iItem);
+						mruFile.DeleteFileFromStore(tch, lvi.iItem);
 
 						// must use recreate the list, index might change...
 						//ListView_DeleteItem(hwndLV, lvi.iItem);
@@ -1584,9 +1583,8 @@ struct ENCODEDLG {
 static INT_PTR CALLBACK SelectDefEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		const int iEncoding = iDefaultEncoding;
-		Encoding_GetLabel(iEncoding);
-		SetDlgItemText(hwnd, IDC_ENCODING_LABEL, mEncoding[iEncoding].wchLabel);
+		LPCWSTR wchLabel = Encoding_GetLabel(iDefaultEncoding);
+		SetDlgItemText(hwnd, IDC_ENCODING_LABEL, wchLabel);
 
 		if (bSkipUnicodeDetection) {
 			CheckDlgButton(hwnd, IDC_NOUNICODEDETECTION, BST_CHECKED);
@@ -1618,9 +1616,8 @@ static INT_PTR CALLBACK SelectDefEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 		case NM_RETURN:
 			if (pnmhdr->idFrom == IDC_ENCODING_LINK) {
 				if (SelectEncodingDlg(hwndMain, &iDefaultEncoding, IDS_SELRECT_DEFAULT_ENCODING)) {
-					const int iEncoding = iDefaultEncoding;
-					Encoding_GetLabel(iEncoding);
-					SetDlgItemText(hwnd, IDC_ENCODING_LABEL, mEncoding[iEncoding].wchLabel);
+					LPCWSTR wchLabel = Encoding_GetLabel(iDefaultEncoding);
+					SetDlgItemText(hwnd, IDC_ENCODING_LABEL, wchLabel);
 				}
 			}
 			break;

@@ -2056,7 +2056,7 @@ void Style_SniffCSV() noexcept {
 // Style_GetDocTypeLanguage()
 //
 int Style_GetDocTypeLanguage() noexcept {
-	char tchText[4096] = ""; // maybe contains header comments
+	char tchText[4000] = ""; // maybe contains header comments
 	SciCall_GetText(COUNTOF(tchText) - 1, tchText);
 
 	// check DOCTYPE
@@ -2183,7 +2183,7 @@ bool MatchCPPKeyword(const char *p, int index) noexcept {
 }
 
 PEDITLEXER Style_DetectObjCAndMatlab() noexcept {
-	char tchText[4096] = ""; // maybe contains header comments
+	char tchText[4000] = ""; // maybe contains header comments
 	SciCall_GetText(COUNTOF(tchText) - 1, tchText);
 
 	const char *p = tchText;
@@ -2248,7 +2248,7 @@ PEDITLEXER Style_DetectObjCAndMatlab() noexcept {
 
 // auto detect file type from content.
 PEDITLEXER Style_AutoDetect(BOOL bDotFile) noexcept {
-	char tchText[4096] = ""; // maybe contains header comments
+	char tchText[4000] = ""; // maybe contains header comments
 	SciCall_GetText(COUNTOF(tchText) - 1, tchText);
 
 	const char *p = tchText;

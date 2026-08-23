@@ -11,7 +11,25 @@
 #define USE_STD_ASYNC_FUTURE	0
 #define USE_WIN32_PTP_WORK		1
 
+extern HANDLE g_hDefaultHeap;
+
 namespace Scintilla::Internal {
+
+struct HeapPointerFreer {
+	template <typename T>
+	void operator()(T *ptr) const noexcept {
+		::HeapFree(g_hDefaultHeap, 0, ptr);
+	}
+
+	template <typename T>
+	requires std::is_unbounded_array_v<T>
+	static std::unique_ptr<T, HeapPointerFreer> make_unique(size_t size) noexcept {
+		using U = std::remove_extent_t<T>;
+		static_assert(__is_standard_layout(U));
+		auto ptr = static_cast<U *>(::HeapAlloc(g_hDefaultHeap, HEAP_ZERO_MEMORY, size*sizeof(U)));
+		return std::unique_ptr<T, HeapPointerFreer>{ptr};
+	}
+};
 
 inline bool WaitableTimerExpired(HANDLE timer) noexcept {
 	return WaitForSingleObject(timer, 0) == WAIT_OBJECT_0;

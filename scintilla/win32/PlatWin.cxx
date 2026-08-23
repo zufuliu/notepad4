@@ -698,7 +698,7 @@ void ChooseCursor(Window::Cursor curs) noexcept {
 
 }
 
-void Window::SetCursor(Cursor curs) noexcept {
+void Window::SetCursor(Cursor curs) const noexcept {
 	ChooseCursor(curs);
 }
 
@@ -784,7 +784,7 @@ void Platform::DebugPrintf(const char *format, ...) noexcept {
 	char buffer[lengthDiagnostic];
 	va_list pArguments;
 	va_start(pArguments, format);
-	vsprintf(buffer, format, pArguments);
+	vsnprintf(buffer, std::size(buffer), format, pArguments);
 	va_end(pArguments);
 	Platform::DebugDisplay(buffer);
 }
@@ -797,7 +797,7 @@ bool Platform::ShowAssertionPopUps(bool assertionPopUps_) noexcept {
 
 void Platform::Assert(const char *c, const char *file, int line) noexcept {
 	char buffer[lengthDiagnostic]{};
-	sprintf(buffer, "Assertion [%s] failed at %s %d%s", c, file, line, assertionPopUps ? "" : "\r\n");
+	snprintf(buffer, std::size(buffer), "Assertion [%s] failed at %s %d%s", c, file, line, assertionPopUps ? "" : "\r\n");
 	if (assertionPopUps) {
 		const int idButton = ::MessageBoxA({}, buffer, "Assertion failure",
 			MB_ABORTRETRYIGNORE | MB_ICONHAND | MB_SETFOREGROUND | MB_TASKMODAL);

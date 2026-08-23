@@ -70,12 +70,13 @@ void BidiData::Resize(size_t maxLineLength_) {
 	widthReprs.resize(maxLineLength_ + 1);
 }
 
-LineLayout::LineLayout(Sci::Line lineNumber_, int maxLineLength_) :
+LineLayout::LineLayout(Sci::Line lineNumber_, int maxLineLength_) noexcept:
 	lineNumber{lineNumber_} {
 	Resize(maxLineLength_);
 }
 
-void LineLayout::Resize(int maxLineLength_) {
+SCI_noinline
+void LineLayout::Resize(int maxLineLength_) noexcept {
 	if (maxLineLength_ > maxLineLength) {
 		lenLineStarts = 0;
 		constexpr size_t sentinel = sizeof(int); // fix out-of-bounds read for KeyFromString()
@@ -85,8 +86,7 @@ void LineLayout::Resize(int maxLineLength_) {
 		const size_t lineAllocation = length;
 		length -= sentinel;
 		maxLineLength = length;
-		auto chars_ = std::make_unique_for_overwrite<char[]>(lineAllocation*(2 + sizeof(XYPOSITION)));
-		memset(&chars_[length], 0, sentinel); // ensure styles[-1] is valid
+		auto chars_ = HeapPointerFreer::make_unique<char[]>(lineAllocation*(2 + sizeof(XYPOSITION)));
 		chars.swap(chars_);
 		styles = reinterpret_cast<unsigned char *>(chars.get() + lineAllocation);
 		// Extra position allocated as sometimes the Windows
@@ -97,7 +97,7 @@ void LineLayout::Resize(int maxLineLength_) {
 	}
 }
 
-void LineLayout::Reset(Sci::Line lineNumber_, int maxLineLength_) {
+void LineLayout::Reset(Sci::Line lineNumber_, int maxLineLength_) noexcept {
 	lineNumber = lineNumber_;
 	validity = ValidLevel::invalid;
 	Resize(maxLineLength_);
@@ -184,19 +184,19 @@ int LineLayout::SubLineFromPosition(int posInLine, PointEnd pe) const noexcept {
 	return line - 1;
 }
 
-void LineLayout::AddLineStart(Sci::Position start) {
+void LineLayout::AddLineStart(Sci::Position start) noexcept {
 	lines++;
 	if (lines >= lenLineStarts) {
-		const int newMaxLines = lines*2 + 14; // minimum 16
-		std::unique_ptr<int[]> newLineStarts = std::make_unique<int[]>(newMaxLines);
+		const unsigned newMaxLines = static_cast<unsigned>(lines)*2 + 14; // minimum 16
+		auto newLineStarts = HeapPointerFreer::make_unique<int[]>(newMaxLines);
 		if (lenLineStarts) {
 			//std::copy_n(lineStarts.get(), lenLineStarts, newLineStarts.get());
-			memcpy(newLineStarts.get(), lineStarts.get(), lenLineStarts*sizeof(int));
+			memcpy(newLineStarts.get(), lineStarts.get(), static_cast<unsigned>(lenLineStarts)*sizeof(int));
 		}
 		lenLineStarts = newMaxLines;
 		lineStarts.swap(newLineStarts);
 	}
-	lineStarts[lines] = static_cast<int>(start);
+	lineStarts[static_cast<unsigned>(lines)] = static_cast<int>(start);
 }
 
 void LineLayout::SetBracesHighlight(Range rangeLine, const Sci::Position braces[],
@@ -360,7 +360,7 @@ constexpr uint8_t WrapBreakMask[8] = {
 
 }
 
-void LineLayout::WrapLine(const Document *pdoc, Sci::Position posLineStart, Wrap wrapState, XYPOSITION wrapWidth, XYPOSITION wrapIndent_, bool partialLine) {
+void LineLayout::WrapLine(const Document *pdoc, Sci::Position posLineStart, Wrap wrapState, XYPOSITION wrapWidth, XYPOSITION wrapIndent_, bool partialLine) noexcept {
 	// Document wants document positions but simpler to work in line positions
 	// so take care of adding and subtracting line start in a lambda.
 	const auto CharacterBoundary = [=](Sci::Position i, int moveDir, bool checkLineEnd = true) noexcept -> Sci::Position {
@@ -538,13 +538,9 @@ XYPOSITION ScreenLine::TabPositionAfter(XYPOSITION xPosition) const noexcept {
 	return (std::floor((xPosition + TabWidthMinimumPixels()) / TabWidth()) + 1) * TabWidth();
 }
 
-bool SignificantLines::LineMayCache(Sci::Line line, unsigned maxChars) const noexcept {
-	if (LineLayoutCache::UseLongCache(maxChars)) {
-		return true;
-	}
+bool SignificantLines::LineMayCache(Sci::Line line) const noexcept {
 	switch (level) {
 	case LineCache::None:
-		return false;
 	case LineCache::Caret:
 		return line == lineCaret;
 	case LineCache::Page:
@@ -690,41 +686,33 @@ constexpr bool AllGraphicASCII(std::string_view text) noexcept {
 
 void LineLayoutCache::AllocateForLevel(Sci::Line linesOnScreen, Sci::Line linesInDoc) {
 	// round up cache size to avoid rapidly resizing when linesOnScreen or linesInDoc changed.
-	size_t lengthForLevel = 0;
+	size_t lengthForLevel = 2; // LineCache::Caret, LineCache::None
 	if (level == LineCache::Page) {
 		// see comment in Retrieve() method.
 		lengthForLevel = 1 + NP2_align_up(4*linesOnScreen, 64);
-	} else if (level == LineCache::Caret) {
-		lengthForLevel = 2;
 	} else if (level == LineCache::Document) {
 		lengthForLevel = NP2_align_up(linesInDoc, 64);
 	}
-	if (lengthForLevel != shortCache.size()) {
+	if (lengthForLevel != cache.size()) {
 		maxValidity = LineLayout::ValidLevel::lines;
-		shortCache.resize(lengthForLevel);
+		cache.resize(lengthForLevel);
 		//printf("%s level=%d, size=%zu/%zu, LineLayout=%zu/%zu, BidiData=%zu, XYPOSITION=%zu\n",
-		//	__func__, level, shortCache.size(), shortCache.capacity(), sizeof(LineLayout),
+		//	__func__, level, cache.size(), cache.capacity(), sizeof(LineLayout),
 		//	sizeof(std::unique_ptr<LineLayout>), sizeof(BidiData), sizeof(XYPOSITION));
 	}
-	PLATFORM_ASSERT(shortCache.size() >= lengthForLevel);
+	PLATFORM_ASSERT(cache.size() >= lengthForLevel);
 }
 
 void LineLayoutCache::Deallocate() noexcept {
 	maxValidity = LineLayout::ValidLevel::invalid;
 	lastCaretSlot = SIZE_MAX;
-	shortCache.clear();
-	longCache.clear();
+	cache.clear();
 }
 
 void LineLayoutCache::Invalidate(LineLayout::ValidLevel validity_) noexcept {
 	if (maxValidity > validity_) {
 		maxValidity = validity_;
-		for (const auto &ll : shortCache) {
-			if (ll) {
-				ll->Invalidate(validity_);
-			}
-		}
-		for (const auto &ll : longCache) {
+		for (const auto &ll : cache) {
 			if (ll) {
 				ll->Invalidate(validity_);
 			}
@@ -737,12 +725,11 @@ void LineLayoutCache::SetLevel(LineCache level_) noexcept {
 		level = level_;
 		maxValidity = LineLayout::ValidLevel::invalid;
 		lastCaretSlot = SIZE_MAX;
-		shortCache.clear();
-		longCache.clear();
+		cache.clear();
 	}
 }
 
-LineLayout *LineLayoutCache::Retrieve(Sci::Line lineNumber, Sci::Line lineCaret, int maxChars, int styleClock_,
+std::shared_ptr<LineLayout> LineLayoutCache::Retrieve(Sci::Line lineNumber, Sci::Line lineCaret, int maxChars, int styleClock_,
 	Sci::Line linesOnScreen, Sci::Line linesInDoc, Sci::Line topLine) {
 	AllocateForLevel(linesOnScreen, linesInDoc);
 	if (styleClock != styleClock_) {
@@ -752,26 +739,17 @@ LineLayout *LineLayoutCache::Retrieve(Sci::Line lineNumber, Sci::Line lineCaret,
 	maxValidity = LineLayout::ValidLevel::lines;
 
 	size_t pos = 0;
-	LineLayout *ret = nullptr;
-	const int useLongCache = UseLongCache(maxChars);
-	if (useLongCache) {
-		for (const auto &ll : longCache) {
-			if (ll->LineNumber() == lineNumber) {
-				ret = ll.get();
-				break;
-			}
-		}
-	} else if (level == LineCache::Page) {
+	if (level == LineCache::Page) {
 		// two arenas, each with two pages to ensure cache efficiency on scrolling.
 		// first arena for lines near top visible line.
 		// second arena for other lines, e.g. folded lines near top visible line.
 		// TODO: use/cleanup second arena after some periods, e.g. after Editor::WrapLines() finished.
 		const size_t diff = std::abs(lineNumber - topLine);
-		const size_t gap = shortCache.size() / 2;
+		const size_t gap = cache.size() / 2;
 		pos = 1 + (lineNumber % gap) + ((diff < gap) ? 0 : gap);
 		// first slot reserved for caret line, which is rapidly retrieved when caret blinking.
 		if (lineNumber == lineCaret) {
-			if (lastCaretSlot == 0 && shortCache[0]->LineNumber() == lineCaret) {
+			if (lastCaretSlot == 0 && cache[0]->LineNumber() == lineCaret) {
 				pos = 0;
 			} else {
 				lastCaretSlot = pos;
@@ -779,39 +757,18 @@ LineLayout *LineLayoutCache::Retrieve(Sci::Line lineNumber, Sci::Line lineCaret,
 		} else if (pos == lastCaretSlot) {
 			// save cache for caret line.
 			lastCaretSlot = 0;
-			std::swap(shortCache[0], shortCache[pos]);
+			std::swap(cache[0], cache[pos]);
 		}
-	} else if (level == LineCache::Caret) {
-		pos = lineNumber != lineCaret;
 	} else if (level == LineCache::Document) {
 		pos = lineNumber;
+	} else { // LineCache::Caret, LineCache::None
+		pos = lineNumber != lineCaret;
 	}
 
-	if (!useLongCache) {
-		ret = shortCache[pos].get();
+	auto& ret = cache[pos];
+	if (!ret || !ret->CanHold(lineNumber, maxChars)) {
+		ret = std::make_shared<LineLayout>(lineNumber, maxChars);
 	}
-	if (ret) {
-		if (!ret->CanHold(lineNumber, maxChars)) {
-			//printf("USE line=%zd/%zd, caret=%zd/%zd top=%zd, pos=%zu, clock=%d\n",
-			//	lineNumber, ret->LineNumber(), lineCaret, lastCaretSlot, topLine, pos, styleClock_);
-			ret->Reset(lineNumber, maxChars);
-		} else {
-			//printf("HIT line=%zd, caret=%zd/%zd top=%zd, pos=%zu, clock=%d, validity=%d\n",
-			//	lineNumber, lineCaret, lastCaretSlot, topLine, pos, styleClock_, ret->validity);
-		}
-	} else {
-		//printf("NEW line=%zd, caret=%zd/%zd top=%zd, pos=%zu, clock=%d\n",
-		//	lineNumber, lineCaret, lastCaretSlot, topLine, pos, styleClock_);
-		auto ll = std::make_unique<LineLayout>(lineNumber, maxChars);
-		ret = ll.get();
-		if (useLongCache) {
-			longCache.push_back(std::move(ll));
-		} else {
-			shortCache[pos].swap(ll);
-		}
-	}
-
-	// LineLineCache::None is not supported, we only use LineCache::Page.
 	return ret;
 }
 

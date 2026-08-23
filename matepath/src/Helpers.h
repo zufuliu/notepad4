@@ -1034,6 +1034,9 @@ struct FileDialog {
 	static LRESULT CALLBACK SubProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 };
 
+LPWSTR HeapStrDupW(LPCWSTR pszIn) noexcept;
+void HeapStrDupExW(LPWSTR &pszOut, LPCWSTR pszIn) noexcept;
+
 //==== MinimizeToTray Functions - see comments in Helpers.cpp ===================
 bool GetDoAnimateMinimize() noexcept;
 void MinimizeWndToTray(HWND hwnd) noexcept;

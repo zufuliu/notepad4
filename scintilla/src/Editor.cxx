@@ -817,8 +817,7 @@ bool Editor::RangeContainsProtected(const SelectionRange &range) const noexcept 
 
 bool Editor::SelectionContainsProtected() const noexcept {
 	for (size_t r = 0; r < sel.Count(); r++) {
-		if (RangeContainsProtected(sel.Range(r).Start().Position(),
-			sel.Range(r).End().Position())) {
+		if (RangeContainsProtected(sel.Range(r))) {
 			return true;
 		}
 	}
@@ -1211,8 +1210,8 @@ Editor::XYScrollPosition Editor::XYScrollToMakeVisible(SelectionRange range, con
 	}
 
 	// Vertical positioning
-	if (FlagSet(options, XYScrollOptions::vertical)
-		&& (pt.y < rcClient.top || ptBottomCaret.y >= rcClient.bottom || FlagSet(policies.y.policy, CaretPolicy::Strict))) {
+	if (FlagSet(options, XYScrollOptions::vertical) &&
+		(pt.y < rcClient.top || ptBottomCaret.y >= rcClient.bottom || FlagSet(policies.y.policy, CaretPolicy::Strict))) {
 		const Sci::Line lineCaret = DisplayFromPosition(range.caret.Position());
 		const Sci::Line linesOnScreen = LinesOnScreen();
 		const Sci::Line halfScreen = std::max<Sci::Line>(linesOnScreen - 1, 2) / 2;
@@ -1482,7 +1481,7 @@ void Editor::ShowCaretAtCurrentPosition() {
 		caret.on = true;
 		FineTickerCancel(TickReason::caret);
 		if (caret.period > 0)
-			FineTickerStart(TickReason::caret, caret.period, caret.period / 10);
+			FineTickerStart(TickReason::caret, caret.period, caret.period / tickerToleranceFraction);
 	} else {
 		caret.active = false;
 		caret.on = false;
@@ -1503,7 +1502,7 @@ void Editor::CaretSetPeriod(int period) {
 		caret.on = true;
 		FineTickerCancel(TickReason::caret);
 		if ((caret.active) && (caret.period > 0))
-			FineTickerStart(TickReason::caret, caret.period, caret.period / 10);
+			FineTickerStart(TickReason::caret, caret.period, caret.period / tickerToleranceFraction);
 		InvalidateCaret();
 	}
 }
@@ -1537,8 +1536,8 @@ void Editor::NeedWrapping(Sci::Line docLineStart, Sci::Line docLineEnd, bool inv
 bool Editor::WrapOneLine(Surface *surface, Sci::Position positionInsert) {
 	const Sci::Line lineToWrap = pdoc->SciLineFromPosition(positionInsert);
 	const int posInLine = static_cast<int>(positionInsert - pdoc->LineStart(lineToWrap));
-	LineLayout * const ll = view.RetrieveLineLayout(lineToWrap, *this);
-	view.LayoutLine(*this, surface, vs, ll, wrapWidth, LayoutLineOption::ManualUpdate, posInLine);
+	auto const ll = view.RetrieveLineLayout(lineToWrap, *this);
+	view.LayoutLine(*this, surface, vs, ll.get(), wrapWidth, LayoutLineOption::ManualUpdate, posInLine);
 	int linesWrapped = ll->lines;
 	if (vs.annotationVisible != AnnotationVisible::Hidden) {
 		linesWrapped += pdoc->AnnotationLines(lineToWrap);
@@ -1658,10 +1657,12 @@ struct WrapBlockWorker {
 			const Sci::Position lineEnd = model.pdoc->LineStart(lineNumber + 1);
 			const int lengthLine = static_cast<int>(lineEnd - lineStart);
 			if (lengthLine < lengthToMultiThread) {
+				std::shared_ptr<LineLayout> shared;
 				LineLayout *ll;
-				if (significantLines.LineMayCache(lineNumber, lengthLine)) {
+				if (significantLines.LineMayCache(lineNumber)) {
 					const LockGuard<NativeMutex> guard(mutexRetrieve);
-					ll = view.llc.Retrieve(lineNumber, significantLines, lengthLine);
+					shared = view.llc.Retrieve(lineNumber, significantLines, lengthLine);
+					ll = shared.get();
 				} else if (lengthLine < minLineLength) {
 					wrappedBytesOneThread += lengthLine;
 					linesAfterWrap[index] = 1;
@@ -1708,13 +1709,13 @@ int Editor::WrapBlock(Surface *surface, const Sci::Line lineToWrap, Sci::Line li
 		const Sci::Position lineStart = pdoc->LineStart(lineNumber);
 		const Sci::Position lineEnd = pdoc->LineStart(lineNumber + 1);
 		const int lengthLine = static_cast<int>(lineEnd - lineStart);
-		LineLayout * const ll = view.llc.Retrieve(lineNumber, worker.significantLines, lengthLine);
+		auto const ll = view.llc.Retrieve(lineNumber, worker.significantLines, lengthLine);
 		if (lineNumber == worker.significantLines.lineCaret) {
 			ll->caretPosition = static_cast<int>(worker.caretPosition - lineStart);
 		} else {
 			ll->caretPosition = 0;
 		}
-		const uint32_t wrappedBytes = view.LayoutLine(*this, surface, vs, ll, wrapWidth, LayoutLineOption::IdleUpdate);
+		const uint32_t wrappedBytes = view.LayoutLine(*this, surface, vs, ll.get(), wrapWidth, LayoutLineOption::IdleUpdate);
 		wrappedBytesAllThread += wrappedBytes;
 		worker.linesAfterWrap[index] = ll->lines;
 		if (ll->PartialPosition()) {
@@ -1904,8 +1905,8 @@ void Editor::LinesSplit(int pixelWidth) {
 			const AutoSurface surface(this);
 			if (surface) {
 				const Sci::Position posLineStart = pdoc->LineStart(line);
-				LineLayout * const ll = view.RetrieveLineLayout(line, *this);
-				view.LayoutLine(*this, surface, vs, ll, pixelWidth, LayoutLineOption::AutoUpdate, ll->maxLineLength);
+				auto const ll = view.RetrieveLineLayout(line, *this);
+				view.LayoutLine(*this, surface, vs, ll.get(), pixelWidth, LayoutLineOption::AutoUpdate, ll->maxLineLength);
 				Sci::Position lengthInsertedTotal = 0;
 				for (int subLine = 1; subLine < ll->lines; subLine++) {
 					const Sci::Position lengthInserted = pdoc->InsertString(
@@ -2055,7 +2056,7 @@ void Editor::Paint(Surface *surfaceWindow, PRectangle rcArea) {
 	if (horizontalScrollBarVisible && trackLineWidth && (view.lineWidthMaxSeen > scrollWidth)) {
 		scrollWidth = view.lineWidthMaxSeen;
 		if (!FineTickerRunning(TickReason::widen)) {
-			FineTickerStart(TickReason::widen, 50, 5);
+			FineTickerStart(TickReason::widen, tickerIntervalWiden, tickerIntervalWiden / tickerToleranceFraction);
 		}
 	}
 
@@ -2364,7 +2365,7 @@ void Editor::InsertPasteShape(std::string_view text, PasteShape shape) {
 			const Sci::Position insertPos = pdoc->LineStartPosition(sel.MainCaret());
 			Sci::Position lengthInserted = pdoc->InsertString(insertPos, text);
 			// add the newline if necessary
-			if ((text.empty()) && !IsEOLCharacter(text.back())) {
+			if ((!text.empty()) && !IsEOLCharacter(text.back())) {
 				const std::string_view endline = pdoc->EOLString();
 				lengthInserted += pdoc->InsertString(insertPos + lengthInserted, endline);
 			}
@@ -2383,6 +2384,7 @@ void Editor::ClearSelection(bool retainMultipleSelections) {
 	const UndoGroup ug(pdoc);
 	for (size_t r = 0; r < sel.Count(); r++) {
 		if (!sel.Range(r).Empty()) {
+			// https://github.com/zufuliu/notepad4/issues/186
 			SelectionRange rangeNew = sel.Range(r);
 			if (sel.selType == Selection::SelTypes::lines && sel.Count() == 1) {
 				// remove EOLs
@@ -2920,6 +2922,24 @@ void Editor::NotifySavePoint(Document *, void *, bool atSavePoint) noexcept {
 	NotifySavePoint(atSavePoint);
 }
 
+void Editor::CheckModificationForWrap(const DocModification &mh) {
+	view.llc.Invalidate(LineLayout::ValidLevel::checkTextAndStyle);
+	const Sci::Line lineDoc = pdoc->SciLineFromPosition(mh.position);
+	const Sci::Line lines = std::max<Sci::Line>(0, mh.linesAdded);
+	if (Wrapping()) {
+		// Check if this modification crosses any of the wrap points
+		if (wrapPending.NeedsWrap()) {
+			if (lineDoc < wrapPending.end) { // Inserted/deleted before or inside wrap range
+				wrapPending.end += mh.linesAdded;
+			}
+		}
+		NeedWrapping(lineDoc, lineDoc + lines + 1);
+	}
+	RefreshStyleData();
+	// Fix up annotation heights
+	SetAnnotationHeights(lineDoc, lineDoc + lines + 2);
+}
+
 void Editor::CheckModificationForShow(const DocModification &mh) {
 	const Sci::Line lineOfPos = pdoc->SciLineFromPosition(mh.position);
 	Sci::Position endNeedShown = mh.position;
@@ -3065,23 +3085,8 @@ void Editor::NotifyModified(Document *, DocModification mh, void *) {
 				Redraw();
 			}
 		}
-		//CheckModificationForWrap(mh);
 		if (FlagSet(mh.modificationType, ModificationFlags::InsertText | ModificationFlags::DeleteText)) {
-			view.llc.Invalidate(LineLayout::ValidLevel::checkTextAndStyle);
-			const Sci::Line lineDoc = pdoc->SciLineFromPosition(mh.position);
-			const Sci::Line lines = std::max<Sci::Line>(0, mh.linesAdded);
-			if (Wrapping()) {
-				// Check if this modification crosses any of the wrap points
-				if (wrapPending.NeedsWrap()) {
-					if (lineDoc < wrapPending.end) { // Inserted/deleted before or inside wrap range
-						wrapPending.end += mh.linesAdded;
-					}
-				}
-				NeedWrapping(lineDoc, lineDoc + lines + 1);
-			}
-			RefreshStyleData();
-			// Fix up annotation heights
-			SetAnnotationHeights(lineDoc, lineDoc + lines + 2);
+			CheckModificationForWrap(mh);
 		}
 		if (mh.linesAdded != 0) {
 			// Avoid scrolling of display if change before current display
@@ -4446,7 +4451,10 @@ Sci::Position Editor::FindTextFull(
 
 	TextToFindFull *ft = AsPointer<TextToFindFull *>(lParam);
 #if 1
-	Sci::Position lengthFound = strlen(ft->lpstrText);
+	Sci::Position lengthFound = ft->textLength;
+	if (lengthFound <= 0) {
+		lengthFound = strlen(ft->lpstrText);
+	}
 	if (!pdoc->HasCaseFolder())
 		pdoc->SetCaseFolder(CaseFolderForEncoding());
 	try {
@@ -4473,7 +4481,10 @@ Sci::Position Editor::FindTextFull(
 	const ElapsedPeriod period;
 	uint32_t count = 0;
 	while (true) {
-		Sci::Position lengthFound = strlen(ft->lpstrText);
+		Sci::Position lengthFound = ft->textLength;
+		if (lengthFound <= 0) {
+			lengthFound = strlen(ft->lpstrText);
+		}
 		if (!pdoc->HasCaseFolder())
 			pdoc->SetCaseFolder(CaseFolderForEncoding());
 		try {
@@ -4695,7 +4706,7 @@ void Editor::SetDragPosition(SelectionPosition newPos) {
 		caret.on = true;
 		FineTickerCancel(TickReason::caret);
 		if ((caret.active) && (caret.period > 0) && (newPos.Position() < 0))
-			FineTickerStart(TickReason::caret, caret.period, caret.period / 10);
+			FineTickerStart(TickReason::caret, caret.period, caret.period / tickerToleranceFraction);
 		InvalidateCaret();
 		posDrag = newPos;
 		InvalidateCaret();
@@ -5234,7 +5245,7 @@ void Editor::ButtonMoveWithModifiers(Point pt, unsigned int, KeyMod modifiers) {
 	const Point ptOrigin = GetVisibleOriginInMain();
 	rcClient.Move(0, -ptOrigin.y);
 	if ((dwellDelay < TimeForever) && rcClient.Contains(pt)) {
-		FineTickerStart(TickReason::dwell, dwellDelay, dwellDelay / 10);
+		FineTickerStart(TickReason::dwell, dwellDelay, dwellDelay / tickerToleranceFraction);
 	}
 	//Platform::DebugPrintf("Move %.0f %.0f\n", pt.x, pt.y);
 	if (HaveMouseCapture()) {
@@ -5457,7 +5468,7 @@ void Editor::ChangeMouseCapture(bool on) noexcept {
 	SetMouseCapture(on);
 	// While mouse captured want timer to scroll automatically
 	if (on) {
-		FineTickerStart(TickReason::scroll, 100, 10);
+		FineTickerStart(TickReason::scroll, tickerInterval, tickerInterval / tickerToleranceFraction);
 	} else {
 		FineTickerCancel(TickReason::scroll);
 	}
@@ -5647,8 +5658,8 @@ void Editor::SetAnnotationHeights(Sci::Line start, Sci::Line end) {
 			if (Wrapping()) {
 				const AutoSurface surface(this);
 				if (surface) {
-					LineLayout * const ll = view.RetrieveLineLayout(line, *this);
-					view.LayoutLine(*this, surface, vs, ll, wrapWidth, LayoutLineOption::ManualUpdate);
+					auto const ll = view.RetrieveLineLayout(line, *this);
+					view.LayoutLine(*this, surface, vs, ll.get(), wrapWidth, LayoutLineOption::ManualUpdate);
 					linesWrapped = ll->lines;
 				}
 			}
@@ -6125,8 +6136,8 @@ Sci::Line Editor::WrapCount(Sci::Line line) {
 	const AutoSurface surface(this);
 
 	if (surface) {
-		LineLayout * const ll = view.RetrieveLineLayout(line, *this);
-		view.LayoutLine(*this, surface, vs, ll, wrapWidth, LayoutLineOption::AutoUpdate);
+		auto const ll = view.RetrieveLineLayout(line, *this);
+		view.LayoutLine(*this, surface, vs, ll.get(), wrapWidth, LayoutLineOption::AutoUpdate);
 		return ll->lines;
 	}
 	return 1;
@@ -6348,6 +6359,11 @@ constexpr Selection::SelTypes SelTypeFromMode(SelectionMode mode) noexcept {
 
 constexpr int SelectionModeFromSelType(Selection::SelTypes selType) noexcept {
 	return std::max(0, static_cast<int>(selType) - 1);
+}
+
+constexpr bool ValidAlpha(sptr_t alpha) noexcept {
+	constexpr sptr_t alphaMax = 0xff;
+	return (alpha >= 0) && (alpha <= alphaMax);
 }
 
 }
@@ -6670,7 +6686,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 	case Message::ReplaceTarget:
 	case Message::ReplaceTargetRE:
 	case Message::ReplaceTargetMinimal:
-		PLATFORM_ASSERT(lParam);
+		PLATFORM_ASSERT(lParam != 0 || (wParam | lParam) == 0);
 		return ReplaceTarget(iMessage, wParam, lParam);
 
 	case Message::SearchInTarget:
@@ -7541,7 +7557,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 
 	case Message::GetCodePage:
 		if (wParam) {
-			return AsInteger<sptr_t>(pdoc->GetDBCSByteMask());
+			*AsPointer<const DBCSByteMask **>(wParam) = pdoc->GetDBCSByteMask();
 		}
 		return pdoc->dbcsCodePage;
 
@@ -8115,9 +8131,9 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 
 	case Message::IndicSetStyle:
 		if (wParam <= IndicatorMax) {
-			vs.indicators[wParam].sacNormal.style = static_cast<IndicatorStyle>(lParam);
-			vs.indicators[wParam].sacHover.style = static_cast<IndicatorStyle>(lParam);
-			InvalidateStyleRedraw();
+			if (vs.indicators[wParam].SetStyle(static_cast<IndicatorStyle>(lParam))) {
+				InvalidateStyleRedraw();
+			}
 		}
 		break;
 
@@ -8126,9 +8142,9 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 
 	case Message::IndicSetFore:
 		if (wParam <= IndicatorMax) {
-			vs.indicators[wParam].sacNormal.fore = ColourRGBA::FromIpRGB(lParam);
-			vs.indicators[wParam].sacHover.fore = ColourRGBA::FromIpRGB(lParam);
-			InvalidateStyleRedraw();
+			if (vs.indicators[wParam].SetFore(ColourRGBA::FromIpRGB(lParam))) {
+				InvalidateStyleRedraw();
+			}
 		}
 		break;
 
@@ -8137,8 +8153,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 
 	case Message::IndicSetHoverStyle:
 		if (wParam <= IndicatorMax) {
-			vs.indicators[wParam].sacHover.style = static_cast<IndicatorStyle>(lParam);
-			InvalidateStyleRedraw();
+			SetAppearance(vs.indicators[wParam].sacHover.style, static_cast<IndicatorStyle>(lParam));
 		}
 		break;
 
@@ -8147,8 +8162,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 
 	case Message::IndicSetHoverFore:
 		if (wParam <= IndicatorMax) {
-			vs.indicators[wParam].sacHover.fore = ColourRGBA::FromIpRGB(lParam);
-			InvalidateStyleRedraw();
+			SetAppearance(vs.indicators[wParam].sacHover.fore, ColourRGBA::FromIpRGB(lParam));
 		}
 		break;
 
@@ -8157,8 +8171,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 
 	case Message::IndicSetFlags:
 		if (wParam <= IndicatorMax) {
-			vs.indicators[wParam].SetFlags(static_cast<IndicFlag>(lParam));
-			InvalidateStyleRedraw();
+			SetAppearance(vs.indicators[wParam].attributes, static_cast<IndicFlag>(lParam));
 		}
 		break;
 
@@ -8167,8 +8180,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 
 	case Message::IndicSetUnder:
 		if (wParam <= IndicatorMax) {
-			vs.indicators[wParam].under = lParam != 0;
-			InvalidateStyleRedraw();
+			SetAppearance(vs.indicators[wParam].under, lParam != 0);
 		}
 		break;
 
@@ -8176,9 +8188,8 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		return (wParam <= IndicatorMax) ? vs.indicators[wParam].under : 0;
 
 	case Message::IndicSetAlpha:
-		if (wParam <= IndicatorMax && lParam >=0 && lParam <= 255) {
-			vs.indicators[wParam].fillAlpha = static_cast<int>(lParam);
-			InvalidateStyleRedraw();
+		if (wParam <= IndicatorMax && ValidAlpha(lParam)) {
+			SetAppearance(vs.indicators[wParam].fillAlpha, static_cast<int>(lParam));
 		}
 		break;
 
@@ -8186,9 +8197,8 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		return (wParam <= IndicatorMax) ? vs.indicators[wParam].fillAlpha : 0;
 
 	case Message::IndicSetOutlineAlpha:
-		if (wParam <= IndicatorMax && lParam >=0 && lParam <= 255) {
-			vs.indicators[wParam].outlineAlpha = static_cast<int>(lParam);
-			InvalidateStyleRedraw();
+		if (wParam <= IndicatorMax && ValidAlpha(lParam)) {
+			SetAppearance(vs.indicators[wParam].outlineAlpha, static_cast<int>(lParam));
 		}
 		break;
 
@@ -8196,15 +8206,14 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		return (wParam <= IndicatorMax) ? vs.indicators[wParam].outlineAlpha : 0;
 
 	case Message::IndicSetStrokeWidth:
-		if (wParam <= IndicatorMax && lParam >= 0 && lParam <= 1000) {
-			vs.indicators[wParam].strokeWidth = static_cast<XYPOSITION>(lParam) / 100.0;
-			InvalidateStyleRedraw();
+		if (wParam <= IndicatorMax && lParam >= 0 && lParam <= strokeWidthMax) {
+			SetAppearance(vs.indicators[wParam].strokeWidth, static_cast<XYPOSITION>(lParam) / strokeWidthScale);
 		}
 		break;
 
 	case Message::IndicGetStrokeWidth:
 		if (wParam <= IndicatorMax) {
-			return std::lround(vs.indicators[wParam].strokeWidth * 100);
+			return std::lround(vs.indicators[wParam].strokeWidth * strokeWidthScale);
 		}
 		break;
 

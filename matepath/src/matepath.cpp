@@ -51,6 +51,7 @@ static HWND hwndReBar;
 
 #define TOOLBAR_COMMAND_BASE	IDT_HISTORY_BACK
 #define DefaultToolbarButtons	L"1 2 3 4 5 0 8"
+// NOLINTBEGIN(readability-redundant-zero-initializer)
 static TBBUTTON tbbMainWnd[] = {
 	{0, 0, 0, TBSTYLE_SEP, {0}, 0, 0},
 	{0, IDT_HISTORY_BACK, TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
@@ -69,6 +70,7 @@ static TBBUTTON tbbMainWnd[] = {
 	{13, IDT_VIEW_FILTER, TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
 	// TB_ADD_FILTER_BMP and TB_DEL_FILTER_BMP both used for IDT_VIEW_FILTER
 };
+// NOLINTEND(readability-redundant-zero-initializer)
 
 static HWND hwndDriveBox;
 HWND	hwndDirList;
@@ -223,9 +225,7 @@ static inline bool HasFilter() noexcept {
 //
 static void CleanUpResources(bool initialized) noexcept {
 	DarkMode_Cleanup();
-	if (tchToolbarBitmap != nullptr) {
-		LocalFree(tchToolbarBitmap);
-	}
+	NP2HeapFree(tchToolbarBitmap);
 	if (hTrayIcon) {
 		DestroyIcon(hTrayIcon);
 	}
@@ -493,7 +493,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	// Pathname parameter
 	if (lpPathArg) {
 		DisplayPath(lpPathArg, IDS_ERR_CMDLINE);
-		GlobalFree(lpPathArg);
+		NP2HeapFree(lpPathArg);
 	} else if (iStartupDir != StartupDirectory_None) {
 		// Use a startup directory
 		if (iStartupDir == StartupDirectory_MRU) {
@@ -1484,7 +1484,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			break;
 		}
 
-		WCHAR tch[512];
+		WCHAR tch[MAX_PATH + 4];
 		memset(tch, 0, sizeof(tch));
 		lstrcpy(tch, dli.szFileName);
 
@@ -2042,16 +2042,13 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 				WCHAR tch[64];
 				if ((pnmlv->uNewState & LVIS_SELECTED)) {
-					WIN32_FIND_DATA fd;
+					WIN32_FILE_ATTRIBUTE_DATA fd;
 					DirListItem dli;
 					dli.mask  = DLI_FILENAME;
 					dli.ntype = DLE_NONE;
+					memset(&fd, 0, sizeof(fd));
 					DirList_GetItem(hwndDirList, -1, &dli);
-					DirList_GetItemEx(hwndDirList, -1, &fd);
-
-					if (fd.nFileSizeLow >= MAXDWORD) {
-						GetFileAttributesEx(dli.szFileName, GetFileExInfoStandard, &fd);
-					}
+					GetFileAttributesEx(dli.szFileName, GetFileExInfoStandard, &fd);
 
 					const LONGLONG isize = (static_cast<LONGLONG>(fd.nFileSizeHigh) << 32) | fd.nFileSizeLow;
 					WCHAR tchsize[64];
@@ -2754,12 +2751,7 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) noexcept {
 		case L'M':
 			state = CommandParseState_Argument;
 			if (ExtractFirstArgument(lp2, lp1, lp2)) {
-				if (lpFilterArg) {
-					NP2HeapFree(lpFilterArg);
-				}
-
-				lpFilterArg = static_cast<LPWSTR>(NP2HeapAlloc(sizeof(WCHAR) * (lstrlen(lp1) + 1)));
-				lstrcpy(lpFilterArg, lp1);
+				HeapStrDupExW(lpFilterArg, lp1);
 				state = CommandParseState_Consumed;
 			}
 			break;
@@ -2857,10 +2849,10 @@ void ParseCommandLine() noexcept {
 		// pathname
 		{
 			if (lpPathArg) {
-				GlobalFree(lpPathArg);
+				NP2HeapFree(lpPathArg);
 			}
 
-			lpPathArg = static_cast<LPWSTR>(GlobalAlloc(GPTR, sizeof(WCHAR) * (MAX_PATH + 2)));
+			lpPathArg = static_cast<LPWSTR>(NP2HeapAlloc(sizeof(WCHAR) * (MAX_PATH + 2)));
 			lstrcpyn(lpPathArg, lp3, MAX_PATH);
 			PathFixBackslashes(lpPathArg);
 			StrTrim(lpPathArg, L" \"");
@@ -2903,7 +2895,7 @@ void LoadFlags() noexcept {
 
 	LPCWSTR strValue = section.GetValue(L"ToolbarImage");
 	if (StrNotEmpty(strValue)) {
-		tchToolbarBitmap = StrDup(strValue);
+		 HeapStrDupExW(tchToolbarBitmap, strValue);
 	}
 
 	if (StrIsEmpty(g_wchAppUserModelID)) {
@@ -2950,7 +2942,9 @@ void FindIniFile() noexcept {
 		memcpy(lpszIniFile, tchModule, nameIndex*sizeof(WCHAR));
 		lstrcpy(&lpszIniFile[nameIndex], L"matepath.ini");
 	}
-	if (!PathIsFile(lpszIniFile)) {
+	WIN32_FILE_ATTRIBUTE_DATA data;
+	BOOL success = GetFileAttributesEx(lpszIniFile, GetFileExInfoStandard, &data);
+	if (!success) {
 		if (!portable) {
 			SHCreateDirectoryEx(nullptr, appData, nullptr);
 		}
@@ -2958,6 +2952,10 @@ void FindIniFile() noexcept {
 		memcpy(source, tchModule, nameIndex*sizeof(WCHAR));
 		lstrcpy(&source[nameIndex], L"matepath.ini-default");
 		CopyFile(source, lpszIniFile, TRUE);
+		success = GetFileAttributesEx(lpszIniFile, GetFileExInfoStandard, &data);
+	}
+	if (success && (data.nFileSizeLow >= 2 || data.nFileSizeHigh != 0 || (data.dwFileAttributes & (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_READONLY)) != 0)) {
+		return;
 	}
 
 	// inline CreateIniFile() to avoid slow directory creation
@@ -2976,7 +2974,20 @@ void FindIniFile() noexcept {
 }
 
 bool CreateIniFile(LPCWSTR lpszIniFile) noexcept {
-	if (StrNotEmpty(lpszIniFile)) {
+	if (StrIsEmpty(lpszIniFile)) {
+		return false;
+	}
+	WIN32_FILE_ATTRIBUTE_DATA data;
+	const BOOL success = GetFileAttributesEx(lpszIniFile, GetFileExInfoStandard, &data);
+	if (success) {
+		if ((data.dwFileAttributes & (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_READONLY)) != 0) {
+			return false;
+		}
+		if (data.nFileSizeLow >= 2 || data.nFileSizeHigh != 0) {
+			return true;
+		}
+	}
+	{
 		WCHAR *pwchTail = StrRChr(lpszIniFile, nullptr, L'\\');
 
 		if (pwchTail != nullptr) {
@@ -3206,15 +3217,18 @@ bool ActivatePrevInst() noexcept {
 					lstrcpy(lpPathArg, tchTmp);
 				}
 
+				LPWSTR params = static_cast<LPWSTR>(GlobalAlloc(GPTR, sizeof(WCHAR) * (MAX_PATH + 2)));
+				lstrcpy(params, lpPathArg);
 				COPYDATASTRUCT cds;
 				cds.dwData = DATA_MATEPATH_PATHARG;
-				cds.cbData = static_cast<DWORD>(GlobalSize(lpPathArg));
-				cds.lpData = lpPathArg;
+				cds.cbData = static_cast<DWORD>(GlobalSize(params));
+				cds.lpData = params;
 
 				// Send lpPathArg to previous instance
 				SendMessage(hwnd, WM_COPYDATA, 0, AsInteger<LPARAM>(&cds));
 
-				GlobalFree(lpPathArg);
+				GlobalFree(params);
+				NP2HeapFree(lpPathArg);
 			}
 			return true;
 		}

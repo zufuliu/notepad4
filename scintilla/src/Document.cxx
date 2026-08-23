@@ -2296,15 +2296,16 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 				}
 				if (direction >= 0) {
 					const unsigned char *ptr = searchData;
-					while (*ptr != 0) {
+					const unsigned char * const end = searchData + shift;
+					do {
 						shiftTable[*ptr++] = shift--;
-					}
+					} while (ptr < end);
 				} else {
 					const unsigned char *ptr = searchData + shift - 1;
 					shift = -shift;
-					while (ptr >= searchData) {
+					do {
 						shiftTable[*ptr--] = shift++;
-					}
+					} while (ptr >= searchData);
 				}
 			}
 
@@ -2803,7 +2804,7 @@ void Document::EOLAnnotationClearAll() {
 }
 
 void Document::IncrementStyleClock() noexcept {
-	styleClock = (styleClock + 1) % 0x100000;
+	styleClock = (styleClock + 1) & (0x100000 - 1);
 }
 
 void SCI_METHOD Document::DecorationSetCurrentIndicator(int indicator) noexcept {
@@ -3907,10 +3908,10 @@ const char *BuiltinRegex::SubstituteByPosition(const Document *doc, const char *
 		'\r',	// r
 		0,		// s
 		'\t',	// t
-		'\x84',	// u
+		'\x86',	// u
 		'\v',	// v
 		0,		// w
-		'\x82',	// x
+		'\x84',	// x
 	};
 
 	substituted.clear();

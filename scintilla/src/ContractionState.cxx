@@ -77,8 +77,8 @@ public:
 	Sci::Line LinesInDoc() const noexcept override;
 	Sci::Line LinesDisplayed() const noexcept override;
 	Sci::Line DisplayFromDoc(Sci::Line lineDoc) const noexcept override;
-	Sci::Line DisplayLastFromDoc(Sci::Line lineDoc) const noexcept override;
 	Sci::Line DisplayFromDocSub(Sci::Line lineDoc, Sci::Line lineSub) const noexcept override;
+	Sci::Line DisplayLastFromDoc(Sci::Line lineDoc) const noexcept override;
 	Sci::Line DocFromDisplay(Sci::Line lineDisplay) const noexcept override;
 
 	void InsertLines(Sci::Line lineDoc, Sci::Line lineCount) override;

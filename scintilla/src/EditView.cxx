@@ -12,6 +12,7 @@
 #include <cstring>
 #include <cstdio>
 #include <cmath>
+#include <climits>
 
 #include <stdexcept>
 #include <utility>
@@ -332,14 +333,14 @@ void EditView::RefreshPixMaps(Surface *surfaceWindow, const ViewStyle &vsDraw) {
 	}
 }
 
-LineLayout *EditView::RetrieveLineLayout(Sci::Line lineNumber, const EditModel &model) {
+std::shared_ptr<LineLayout> EditView::RetrieveLineLayout(Sci::Line lineNumber, const EditModel &model) {
 	const Sci::Position posLineStart = model.pdoc->LineStart(lineNumber);
 	const Sci::Position posLineEnd = model.pdoc->LineStart(lineNumber + 1);
 	PLATFORM_ASSERT(posLineEnd >= posLineStart);
 	const Sci::Position caretPosition = model.sel.MainCaret();
 	const Sci::Line lineCaret = model.pdoc->SciLineFromPosition(caretPosition);
 	const Sci::Line topLine = model.pcs->DocFromDisplay(model.TopLineOfMain());
-	LineLayout *ll = llc.Retrieve(lineNumber, lineCaret,
+	auto const ll = llc.Retrieve(lineNumber, lineCaret,
 		static_cast<int>(posLineEnd - posLineStart), model.pdoc->GetStyleClock(),
 		model.LinesOnScreen() + 1, model.pdoc->LinesTotal(), topLine);
 	if (lineNumber == lineCaret) {
@@ -773,15 +774,15 @@ Point EditView::LocationFromPosition(Surface *surface, const EditModel &model, S
 		posLineStart = model.pdoc->LineStart(lineDoc);
 	}
 	if (surface) {
-		LineLayout * const ll = RetrieveLineLayout(lineDoc, model);
+		auto const ll = RetrieveLineLayout(lineDoc, model);
 		const int posInLine = static_cast<int>(pos.Position() - posLineStart);
-		LayoutLine(model, surface, vs, ll, model.wrapWidth, LayoutLineOption::AutoUpdate, posInLine);
+		LayoutLine(model, surface, vs, ll.get(), model.wrapWidth, LayoutLineOption::AutoUpdate, posInLine);
 		pt = ll->PointFromPosition(posInLine, vs.lineHeight, pe);
 		pt.x += vs.textStart - model.xOffset;
 
 		if (model.BidirectionalEnabled()) {
 			// Fill the line bidi data
-			UpdateBidiData(model, vs, ll);
+			UpdateBidiData(model, vs, ll.get());
 
 			// Find subLine
 			const int subLine = ll->SubLineFromPosition(posInLine, pe);
@@ -789,7 +790,7 @@ Point EditView::LocationFromPosition(Surface *surface, const EditModel &model, S
 			const int caretPosition = posInLine - lineStart;
 
 			// Get the point from current position
-			const ScreenLine screenLine(ll, subLine, vs, rcClient.right, tabWidthMinimumPixels);
+			const ScreenLine screenLine(ll.get(), subLine, vs, rcClient.right, tabWidthMinimumPixels);
 			const std::unique_ptr<IScreenLineLayout> slLayout = surface->Layout(&screenLine);
 			pt.x = slLayout->XFromPosition(caretPosition);
 
@@ -816,8 +817,8 @@ Range EditView::RangeDisplayLine(Surface *surface, const EditModel &model, Sci::
 	const Sci::Line lineDoc = model.pcs->DocFromDisplay(lineVisible);
 	const Sci::Position positionLineStart = model.pdoc->LineStart(lineDoc);
 	if (surface) {
-		LineLayout * const ll = RetrieveLineLayout(lineDoc, model);
-		LayoutLine(model, surface, vs, ll, model.wrapWidth, LayoutLineOption::AutoUpdate);
+		auto const ll = RetrieveLineLayout(lineDoc, model);
+		LayoutLine(model, surface, vs, ll.get(), model.wrapWidth, LayoutLineOption::AutoUpdate);
 		const Sci::Line lineStartSet = model.pcs->DisplayFromDoc(lineDoc);
 		const int subLine = static_cast<int>(lineVisible - lineStartSet);
 		if (subLine < ll->lines) {
@@ -847,8 +848,8 @@ SelectionPosition EditView::SPositionFromLocation(Surface *surface, const EditMo
 			model.pdoc->LengthNoExcept());
 	const Sci::Position posLineStart = model.pdoc->LineStart(lineDoc);
 	if (surface) {
-		LineLayout * const ll = RetrieveLineLayout(lineDoc, model);
-		LayoutLine(model, surface, vs, ll, model.wrapWidth, LayoutLineOption::AutoUpdate);
+		auto const ll = RetrieveLineLayout(lineDoc, model);
+		LayoutLine(model, surface, vs, ll.get(), model.wrapWidth, LayoutLineOption::AutoUpdate);
 		const Sci::Line lineStartSet = model.pcs->DisplayFromDoc(lineDoc);
 		const int subLine = static_cast<int>(lineVisible - lineStartSet);
 		if (subLine < ll->lines) {
@@ -859,9 +860,9 @@ SelectionPosition EditView::SPositionFromLocation(Surface *surface, const EditMo
 			Sci::Position positionInLine = 0;
 			if (model.BidirectionalEnabled()) {
 				// Fill the line bidi data
-				UpdateBidiData(model, vs, ll);
+				UpdateBidiData(model, vs, ll.get());
 
-				const ScreenLine screenLine(ll, subLine, vs, rcClient.right, tabWidthMinimumPixels);
+				const ScreenLine screenLine(ll.get(), subLine, vs, rcClient.right, tabWidthMinimumPixels);
 				const std::unique_ptr<IScreenLineLayout> slLayout = surface->Layout(&screenLine);
 				positionInLine = slLayout->PositionFromX(pt.x, charPosition) +
 					rangeSubLine.start;
@@ -899,8 +900,8 @@ SelectionPosition EditView::SPositionFromLocation(Surface *surface, const EditMo
 */
 SelectionPosition EditView::SPositionFromLineX(Surface *surface, const EditModel &model, Sci::Line lineDoc, int x, const ViewStyle &vs) {
 	if (surface) {
-		LineLayout * const ll = RetrieveLineLayout(lineDoc, model);
-		LayoutLine(model, surface, vs, ll, model.wrapWidth, LayoutLineOption::AutoUpdate);
+		auto const ll = RetrieveLineLayout(lineDoc, model);
+		LayoutLine(model, surface, vs, ll.get(), model.wrapWidth, LayoutLineOption::AutoUpdate);
 		const Sci::Position posLineStart = model.pdoc->LineStart(lineDoc);
 		const Range rangeSubLine = ll->SubLineRange(0, LineLayout::Scope::visibleOnly);
 		const XYPOSITION subLineStart = ll->positions[rangeSubLine.start];
@@ -922,8 +923,8 @@ Sci::Line EditView::DisplayFromPosition(Surface *surface, const EditModel &model
 	if (surface) {
 		const Sci::Position posLineStart = model.pdoc->LineStart(lineDoc);
 		const int posInLine = static_cast<int>(pos - posLineStart);
-		LineLayout * const ll = RetrieveLineLayout(lineDoc, model);
-		LayoutLine(model, surface, vs, ll, model.wrapWidth, LayoutLineOption::AutoUpdate, posInLine);
+		auto const ll = RetrieveLineLayout(lineDoc, model);
+		LayoutLine(model, surface, vs, ll.get(), model.wrapWidth, LayoutLineOption::AutoUpdate, posInLine);
 		lineDisplay--; // To make up for first increment ahead.
 		for (int subLine = 0; subLine < ll->lines; subLine++) {
 			if (posInLine >= ll->LineStart(subLine)) {
@@ -940,8 +941,8 @@ Sci::Position EditView::StartEndDisplayLine(Surface *surface, const EditModel &m
 	if (surface) {
 		const Sci::Position posLineStart = model.pdoc->LineStart(line);
 		const int posInLine = static_cast<int>(pos - posLineStart);
-		LineLayout * const ll = RetrieveLineLayout(line, model);
-		LayoutLine(model, surface, vs, ll, model.wrapWidth, LayoutLineOption::AutoUpdate, posInLine);
+		auto const ll = RetrieveLineLayout(line, model);
+		LayoutLine(model, surface, vs, ll.get(), model.wrapWidth, LayoutLineOption::AutoUpdate, posInLine);
 		if (posInLine <= ll->numCharsInLine) {
 			for (int subLine = 0; subLine < ll->lines; subLine++) {
 				if ((posInLine >= ll->LineStart(subLine)) &&
@@ -1137,7 +1138,9 @@ HorizontalPadding StadiumPadding(Scintilla::EOLAnnotationVisible eolAnnotationVi
 }
 
 void EditView::UpdateMaxWidth(XYPOSITION width) noexcept {
-	lineWidthMaxSeen = std::max(lineWidthMaxSeen, static_cast<int>(width));
+	constexpr XYPOSITION maxInt = INT_MAX;
+	const XYPOSITION cappedWidth = std::min(width, maxInt);
+	lineWidthMaxSeen = std::max(lineWidthMaxSeen, static_cast<int>(cappedWidth));
 }
 
 void EditView::DrawEOL(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll,
@@ -2712,7 +2715,7 @@ void EditView::PaintText(Surface *surfaceWindow, const EditModel &model, const V
 			(vsDraw.braceBadLightIndicatorSet && (model.bracesMatchStyle == StyleBraceBad)));
 
 		Sci::Line lineDocPrevious = -1;	// Used to avoid laying out one document line multiple times
-		LineLayout *ll = nullptr;
+		std::shared_ptr<LineLayout> ll;
 		DrawPhase phase = DrawPhase::all;
 		if ((phasesDraw == PhasesDraw::Multiple) && !bufferedDraw) {
 			phase = DrawPhase::back;
@@ -2739,19 +2742,16 @@ void EditView::PaintText(Surface *surfaceWindow, const EditModel &model, const V
 				if (lineDoc != lineDocPrevious) {
 					lineDocPrevious = lineDoc;
 					ll = RetrieveLineLayout(lineDoc, model);
-					LayoutLine(model, surface, vsDraw, ll, model.wrapWidth, LayoutLineOption::PaintText);
+					LayoutLine(model, surface, vsDraw, ll.get(), model.wrapWidth, LayoutLineOption::PaintText);
 					if (model.BidirectionalEnabled()) {
 						// Fill the line bidi data
-						UpdateBidiData(model, vsDraw, ll);
+						UpdateBidiData(model, vsDraw, ll.get());
 					}
 				}
 #if defined(TIME_PAINTING)
 				durLayout += ep.Reset();
 #endif
 				{
-#if defined(__clang__)
-					__builtin_assume(ll != nullptr); // suppress [clang-analyzer-core.CallAndMessage]
-#endif
 					ll->containsCaret = vsDraw.selection.visible && (lineDoc == lineCaret)
 						&& (ll->lines == 1 || !vsDraw.caretLine.subLine || ll->InLine(caretOffset, subLine));
 
@@ -2774,7 +2774,7 @@ void EditView::PaintText(Surface *surfaceWindow, const EditModel &model, const V
 						surface->FillRectangleAligned(rcSpacer, Fill(vsDraw.styles[StyleDefault].back));
 					}
 
-					DrawLine(surface, model, vsDraw, ll, lineDoc, lineVisible, xOrigin, rcLine, subLine, phase);
+					DrawLine(surface, model, vsDraw, ll.get(), lineDoc, lineVisible, xOrigin, rcLine, subLine, phase);
 #if defined(TIME_PAINTING)
 					durPaint += ep.Reset();
 #endif
@@ -2782,11 +2782,11 @@ void EditView::PaintText(Surface *surfaceWindow, const EditModel &model, const V
 					ll->RestoreBracesHighlight(rangeLine, model.braces, bracesIgnoreStyle);
 #if 0
 					if (FlagSet(phase, DrawPhase::foldLines)) {
-						DrawFoldLines(surface, model, vsDraw, ll, lineDoc, rcLine, subLine);
+						DrawFoldLines(surface, model, vsDraw, ll.get(), lineDoc, rcLine, subLine);
 					}
 #endif
 					if (FlagSet(phase, DrawPhase::carets)) {
-						DrawCarets(surface, model, vsDraw, ll, lineDoc, xOrigin, rcLine, subLine);
+						DrawCarets(surface, model, vsDraw, ll.get(), lineDoc, xOrigin, rcLine, subLine);
 					}
 
 					if (bufferedDraw) {

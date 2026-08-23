@@ -48,7 +48,7 @@ public:
  */
 class LineLayout final {
 private:
-	std::unique_ptr<int[]> lineStarts;
+	std::unique_ptr<int[], HeapPointerFreer> lineStarts;
 	/// Drawing is only performed for @a maxLineLength characters on each line.
 	Sci::Line lineNumber;
 	int lenLineStarts = 0;
@@ -70,7 +70,7 @@ public:
 	unsigned char bracePreviousStyles[2]{};
 	int edgeColumn = 0;
 	int caretPosition = 0;
-	std::unique_ptr<char[]> chars;
+	std::unique_ptr<char[], HeapPointerFreer> chars;
 	unsigned char *styles = nullptr;
 	XYPOSITION *positions = nullptr;
 	std::unique_ptr<BidiData> bidiData;
@@ -80,9 +80,9 @@ public:
 	int lines = 1;
 	XYPOSITION wrapIndent = 0; // In pixels
 
-	LineLayout(Sci::Line lineNumber_, int maxLineLength_);
-	void Resize(int maxLineLength_);
-	void Reset(Sci::Line lineNumber_, int maxLineLength_);
+	LineLayout(Sci::Line lineNumber_, int maxLineLength_) noexcept;
+	void Resize(int maxLineLength_) noexcept;
+	void Reset(Sci::Line lineNumber_, int maxLineLength_) noexcept;
 	void EnsureBidiData();
 	void ClearPositions() const noexcept;
 	void Invalidate(ValidLevel validity_) noexcept;
@@ -102,7 +102,7 @@ public:
 	Range SubLineRange(int subLine, Scope scope) const noexcept;
 	bool InLine(int offset, int line) const noexcept;
 	int SubLineFromPosition(int posInLine, PointEnd pe) const noexcept;
-	void AddLineStart(Sci::Position start);
+	void AddLineStart(Sci::Position start) noexcept;
 	void SetBracesHighlight(Range rangeLine, const Sci::Position braces[],
 		unsigned char bracesMatchStyle, int xHighlight, bool ignoreStyle) noexcept;
 	void RestoreBracesHighlight(Range rangeLine, const Sci::Position braces[], bool ignoreStyle) noexcept;
@@ -114,7 +114,7 @@ public:
 	Interval SpanByte(int index) const noexcept;
 	int EndLineStyle() const noexcept;
 	[[nodiscard]] int LastStyle() const noexcept;
-	void SCICALL WrapLine(const Document *pdoc, Sci::Position posLineStart, Wrap wrapState, XYPOSITION wrapWidth, XYPOSITION wrapIndent_, bool partialLine);
+	void SCICALL WrapLine(const Document *pdoc, Sci::Position posLineStart, Wrap wrapState, XYPOSITION wrapWidth, XYPOSITION wrapIndent_, bool partialLine) noexcept;
 };
 
 struct ScreenLine final : public IScreenLine {
@@ -154,15 +154,14 @@ struct SignificantLines {
 	Sci::Line linesTotal;
 	int styleClock;
 	Scintilla::LineCache level;
-	bool LineMayCache(Sci::Line line, unsigned maxChars) const noexcept;
+	bool LineMayCache(Sci::Line line) const noexcept;
 };
 
 /**
  */
 class LineLayoutCache final {
 private:
-	std::vector<std::unique_ptr<LineLayout>> shortCache;
-	std::vector<std::unique_ptr<LineLayout>> longCache;
+	std::vector<std::shared_ptr<LineLayout>> cache;
 	size_t lastCaretSlot;
 	Scintilla::LineCache level;
 	LineLayout::ValidLevel maxValidity;
@@ -182,16 +181,12 @@ public:
 	Scintilla::LineCache GetLevel() const noexcept {
 		return level;
 	}
-	LineLayout* SCICALL Retrieve(Sci::Line lineNumber, Sci::Line lineCaret, int maxChars, int styleClock_,
+	std::shared_ptr<LineLayout> SCICALL Retrieve(Sci::Line lineNumber, Sci::Line lineCaret, int maxChars, int styleClock_,
 		Sci::Line linesOnScreen, Sci::Line linesInDoc, Sci::Line topLine);
-	LineLayout* Retrieve(Sci::Line lineNumber, const SignificantLines &significantLines, int maxChars) {
+	std::shared_ptr<LineLayout> Retrieve(Sci::Line lineNumber, const SignificantLines &significantLines, int maxChars) {
 		return Retrieve(lineNumber, significantLines.lineCaret,
 			maxChars, significantLines.styleClock,
 			significantLines.linesOnScreen, significantLines.linesTotal, significantLines.lineTop);
-	}
-
-	static constexpr int UseLongCache(unsigned maxChars) noexcept {
-		return maxChars >> (20 + 1); // 2MiB
 	}
 };
 

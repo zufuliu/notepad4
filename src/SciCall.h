@@ -172,10 +172,6 @@ inline void SciCall_TargetWholeDocument() noexcept {
 	SciCall(SCI_TARGETWHOLEDOCUMENT, 0, 0);
 }
 
-inline void SciCall_SetSearchFlags(int searchFlags) noexcept {
-	SciCall(SCI_SETSEARCHFLAGS, searchFlags, 0);
-}
-
 inline Sci_Position SciCall_SearchInTarget(Sci_Position length, const char *text) noexcept {
 	return SciCall(SCI_SEARCHINTARGET, length, AsInteger<LPARAM>(text));
 }
@@ -188,12 +184,12 @@ inline Sci_Position SciCall_ReplaceTargetRE(Sci_Position length, const char *tex
 	return SciCall(SCI_REPLACETARGETRE, length, AsInteger<LPARAM>(text));
 }
 
-inline Sci_Position SciCall_FindTextFull(int searchFlags, Sci_TextToFindFull *ft) noexcept {
+inline Sci_Position SciCall_FindTextFull(UINT searchFlags, Sci_TextToFindFull *ft) noexcept {
 	return SciCall(SCI_FINDTEXTFULL, searchFlags, AsInteger<LPARAM>(ft));
 }
 
-inline Sci_Position SciCall_ReplaceTargetEx(BOOL regex, Sci_Position length, const char *text) noexcept {
-	return SciCall(regex ? SCI_REPLACETARGETRE : SCI_REPLACETARGET, length, AsInteger<LPARAM>(text));
+inline Sci_Position SciCall_ReplaceTargetEx(UINT msg, Sci_Position length, const char *text) noexcept {
+	return SciCall(msg, length, AsInteger<LPARAM>(text));
 }
 
 // Overtype
@@ -876,8 +872,8 @@ inline UINT SciCall_GetCodePage() noexcept {
 	return static_cast<UINT>(SciCall(SCI_GETCODEPAGE, 0, 0));
 }
 
-inline const DBCSByteMask *SciCall_GetDBCSByteMask() noexcept {
-	return AsPointer<const DBCSByteMask *>(SciCall(SCI_GETCODEPAGE, TRUE, 0));
+inline UINT SciCall_GetDBCSByteMask(const DBCSByteMask* &byteMask) noexcept {
+	return static_cast<UINT>(SciCall(SCI_GETCODEPAGE, AsInteger<WPARAM>(&byteMask), 0));
 }
 
 inline void SciCall_SetTechnology(int technology) noexcept {

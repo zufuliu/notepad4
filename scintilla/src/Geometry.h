@@ -299,10 +299,10 @@ public:
 		return ComponentAsFloat(GetAlpha());
 	}
 
-	constexpr bool operator==(const ColourRGBA &other) const noexcept {
+	[[nodiscard]] constexpr bool operator==(const ColourRGBA &other) const noexcept {
 		return co == other.co;
 	}
-	constexpr bool operator!=(const ColourRGBA &other) const noexcept {
+	[[nodiscard]] constexpr bool operator!=(const ColourRGBA &other) const noexcept {
 		return co != other.co;
 	}
 

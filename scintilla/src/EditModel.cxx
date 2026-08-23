@@ -56,9 +56,6 @@
 using namespace Scintilla;
 using namespace Scintilla::Internal;
 
-Caret::Caret() noexcept :
-	active(false), on(false), period(500) {}
-
 void ModelState::RememberSelectionForUndo(int index, const Selection &sel) {
 	historyForUndo.indexCurrent = index;
 	historyForUndo.ssCurrent = sel.ToString();
@@ -187,7 +184,7 @@ MarkerMask EditModel::GetMark(Sci::Line line) const noexcept {
 
 void EditModel::EnsureModelState() {
 	if (!modelState && (undoSelectionHistoryOption != UndoSelectionHistoryOption::Disabled)) {
-		if (auto vss = pdoc->GetViewState(this)) {
+		if (const auto vss = pdoc->GetViewState(this)) {
 #if USE_RTTI
 			modelState = std::dynamic_pointer_cast<ModelState>(vss);
 #else

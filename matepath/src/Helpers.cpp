@@ -992,8 +992,8 @@ void SetClipData(HWND hwnd, LPCWSTR pszData) noexcept {
 		HANDLE hData = GlobalAlloc(GHND, size);
 		WCHAR *pData = static_cast<WCHAR *>(GlobalLock(hData));
 		memcpy(pData, pszData, size);
-		EmptyClipboard();
 		GlobalUnlock(hData);
+		EmptyClipboard();
 		SetClipboardData(CF_UNICODETEXT, hData);
 		CloseClipboard();
 	}
@@ -1601,7 +1601,7 @@ void FormatNumber(LPWSTR lpNumberStr, UINT value) noexcept {
 #endif
 
 	WCHAR *c = lpNumberStr + lstrlen(lpNumberStr);
-	WCHAR *end = c;
+	const WCHAR *end = c;
 	lpNumberStr += 3;
 	do {
 		c -= 3;
@@ -1745,7 +1745,7 @@ void HistoryList::Init() noexcept {
 void HistoryList::Empty() noexcept {
 	for (int i = 0; i < HISTORY_ITEMS; i++) {
 		if (pszItems[i]) {
-			LocalFree(pszItems[i]);
+			NP2HeapFree(pszItems[i]);
 			pszItems[i] = nullptr;
 		}
 	}
@@ -1763,7 +1763,7 @@ void HistoryList::Add(LPCWSTR pszNew) noexcept {
 		iCurItem++;
 		for (int i = iCurItem; i < HISTORY_ITEMS; i++) {
 			if (pszItems[i]) {
-				LocalFree(pszItems[i]);
+				NP2HeapFree(pszItems[i]);
 				pszItems[i] = nullptr;
 			}
 		}
@@ -1771,13 +1771,13 @@ void HistoryList::Add(LPCWSTR pszNew) noexcept {
 		// Shift
 		iCurItem = 0;
 		if (pszItems[0]) {
-			LocalFree(pszItems[0]);
+			NP2HeapFree(pszItems[0]);
 		}
 
 		memmove(AsVoidPointer(pszItems), AsVoidPointer(pszItems + 1), (HISTORY_ITEMS - 1) * sizeof(LPWSTR));
 	}
 
-	pszItems[iCurItem] = StrDup(pszNew);
+	pszItems[iCurItem] = HeapStrDupW(pszNew);
 }
 
 bool HistoryList::Forward(LPWSTR pszItem, int cItem) noexcept {
@@ -1874,7 +1874,7 @@ void MRUList::Add(LPCWSTR pszNew) noexcept {
 	}
 	if (i == MRU_MAXITEMS) {
 		--i;
-		LocalFree(pszItems[i]);
+		NP2HeapFree(pszItems[i]);
 	} else if (i == iSize) {
 		iSize += 1;
 	}
@@ -1882,7 +1882,7 @@ void MRUList::Add(LPCWSTR pszNew) noexcept {
 		pszItems[i] = pszItems[i - 1];
 	}
 	if (tchItem == nullptr) {
-		tchItem = StrDup(pszNew);
+		tchItem = HeapStrDupW(pszNew);
 	}
 	pszItems[0] = tchItem;
 }
@@ -1891,7 +1891,7 @@ void MRUList::Delete(int iIndex) noexcept {
 	if (iIndex < 0 || iIndex >= iSize) {
 		return;
 	}
-	LocalFree(pszItems[iIndex]);
+	NP2HeapFree(pszItems[iIndex]);
 	pszItems[iIndex] = nullptr;
 	iSize -= 1;
 	for (int i = iIndex; i < iSize; i++) {
@@ -1902,7 +1902,7 @@ void MRUList::Delete(int iIndex) noexcept {
 
 void MRUList::Empty(bool save) noexcept {
 	for (int i = 0; i < iSize; i++) {
-		LocalFree(pszItems[i]);
+		NP2HeapFree(pszItems[i]);
 		pszItems[i] = nullptr;
 	}
 	iSize = 0;
@@ -1923,7 +1923,7 @@ void MRUList::Load() noexcept {
 	for (UINT i = 0; i < section.count; i++) {
 		LPCWSTR tchItem = section.nodeList[i].value;
 		if (StrNotEmpty(tchItem)) {
-			pszItems[n++] = StrDup(tchItem);
+			pszItems[n++] = HeapStrDupW(tchItem);
 		}
 	}
 
@@ -2206,7 +2206,7 @@ LRESULT CALLBACK FileDialog::SubProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 	case WM_COMMAND:
 		if (LOWORD(wParam) == IDOK) {
 			LPWSTR pszName = nullptr;
-			auto dialog = AsPointer<IFileDialog *>(dwRefData);
+			auto *dialog = AsPointer<IFileDialog *>(dwRefData);
 			if (SUCCEEDED(dialog->GetFileName(&pszName))) {
 				if (PathFixBackslashes(pszName)) {
 					dialog->SetFileName(pszName);
@@ -2223,6 +2223,26 @@ LRESULT CALLBACK FileDialog::SubProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 	}
 
 	return DefSubclassProc(hwnd, umsg, wParam, lParam);
+}
+
+LPWSTR HeapStrDupW(LPCWSTR pszIn) noexcept {
+	const UINT len = lstrlen(pszIn);
+	const size_t size = len*sizeof(WCHAR);
+	const size_t allocSize = NP2_align_up(size + sizeof(WCHAR), MEMORY_ALLOCATION_ALIGNMENT);
+	LPWSTR pszOut = static_cast<LPWSTR>(NP2HeapAlloc(allocSize));
+	return static_cast<LPWSTR>(memcpy(pszOut, pszIn, size));
+}
+
+NP2_noinline
+void HeapStrDupExW(LPWSTR &pszOut, LPCWSTR pszIn) noexcept {
+	if (pszOut) {
+		NP2HeapFree(pszOut);
+	}
+	const UINT len = lstrlen(pszIn);
+	const size_t size = len*sizeof(WCHAR);
+	const size_t allocSize = NP2_align_up(size + sizeof(WCHAR), MEMORY_ALLOCATION_ALIGNMENT);
+	pszOut = static_cast<LPWSTR>(NP2HeapAlloc(allocSize));
+	memcpy(pszOut, pszIn, size);
 }
 
 /*

@@ -830,14 +830,15 @@ static void AutoC_AddDocWord(WordList &pWList, const uint32_t (&ignoredStyleMask
 	CharBuffer pFind(iRootLen + 2);
 	pFind[0] = prefix;
 	memcpy(pFind.data() + (prefix != '\0'), pRoot, iRootLen);
-	int findFlag = (bIgnoreCase ? SCFIND_NONE : SCFIND_MATCHCASE) | SCFIND_MATCH_TO_WORD_END;
+	UINT findFlag = (bIgnoreCase ? SCFIND_NONE : SCFIND_MATCHCASE) | SCFIND_MATCH_TO_WORD_END;
 	if (IsDefaultWordChar(static_cast<uint8_t>(pRoot[0]))) {
 		findFlag |= SCFIND_WORDSTART;
 	}
 
-	const Sci_Position iCurrentPos = SciCall_GetCurrentPos() - iRootLen - (prefix ? 1 : 0);
+	const Sci_Position textLength = iRootLen + (prefix ? 1 : 0);
+	const Sci_Position iCurrentPos = SciCall_GetCurrentPos() - textLength;
 	const Sci_Position iDocLen = SciCall_GetLength();
-	Sci_TextToFindFull ft = { { 0, iDocLen }, pFind.data(), { 0, 0 } };
+	Sci_TextToFindFull ft = { { 0, iDocLen }, pFind.data(), static_cast<Sci_PositionU>(textLength), { 0, 0 } };
 
 	Sci_Position iPosFind = SciCall_FindTextFull(findFlag, &ft);
 	HANDLE timer = idleTaskTimer;
@@ -2619,17 +2620,17 @@ static bool EditUncommentBlock(LPCWSTR pwszOpen, LPCWSTR pwszClose, bool newLine
 		const UINT cpEdit = SciCall_GetCodePage();
 		char mszOpen[64] = "";
 		char mszClose[64] = "";
-		WideCharToMultiByte(cpEdit, 0, pwszOpen, -1, mszOpen, COUNTOF(mszOpen), nullptr, nullptr);
-		WideCharToMultiByte(cpEdit, 0, pwszClose, -1, mszClose, COUNTOF(mszClose), nullptr, nullptr);
+		const UINT lenOpen = WideCharToMultiByte(cpEdit, 0, pwszOpen, -1, mszOpen, COUNTOF(mszOpen), nullptr, nullptr);
+		const UINT lenClose = WideCharToMultiByte(cpEdit, 0, pwszClose, -1, mszClose, COUNTOF(mszClose), nullptr, nullptr);
 
 		// find inner most comment block for current selection
-		Sci_TextToFindFull ttfClose = { { iSelStart, iEndPos }, mszClose, { 0, 0 } };
+		Sci_TextToFindFull ttfClose = { { iSelStart, iEndPos }, mszClose, lenClose - 1, { 0, 0 } };
 		iEndPos = SciCall_FindTextFull(SCFIND_NONE, &ttfClose);
 		if (iEndPos < 0) {
 			return false;
 		}
 
-		Sci_TextToFindFull ttfOpen = { { iSelEnd, iStartPos + 1 }, mszOpen, { 0, 0 } };
+		Sci_TextToFindFull ttfOpen = { { iSelEnd, iStartPos + 1 }, mszOpen, lenOpen - 1, { 0, 0 } };
 		iStartPos = SciCall_FindTextFull(SCFIND_NONE, &ttfOpen);
 		if (iStartPos < 0 || ttfOpen.chrgText.cpMax > iEndPos) {
 			return false;
