@@ -838,7 +838,6 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	}
 	if (!flagStartAsTrayIcon) {
 		ShowWindow(hwnd, wi.max ? SW_SHOWMAXIMIZED : nCmdShow);
-		UpdateWindow(hwnd);
 	} else {
 		ShowWindow(hwnd, SW_HIDE); // trick ShowWindow()
 		ShowNotifyIcon(hwnd, true);
@@ -855,6 +854,8 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	bool bFileLoadCalled = false;
 	// Pathname parameter
 	if (lpFileArg /*&& !flagNewFromClipboard*/) {
+		// paint main window to avoid blank window while loading large file
+		UpdateWindow(hwnd);
 
 		// Open from Directory
 		if (PathIsDirectory(lpFileArg)) {
