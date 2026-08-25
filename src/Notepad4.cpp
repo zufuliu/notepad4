@@ -815,7 +815,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	}
 
 	HWND hwnd = CreateWindowEx(
-				   0,
+				   WS_EX_ACCEPTFILES,
 				   wchWndClass,
 				   WC_NOTEPAD4,
 				   WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
@@ -1117,7 +1117,6 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			AutoSave_Stop(TRUE);
 			// Terminate file watching
 			InstallFileWatching(true);
-			DragAcceptFiles(hwnd, FALSE);
 
 			// Terminate clipboard watching
 			if (flagPasteBoard) {
@@ -1856,7 +1855,6 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	ChangeWindowMessageFilterEx(hwnd, WM_COPYDATA, MSGFLT_ADD, nullptr);
 	ChangeWindowMessageFilterEx(hwnd, 0x0049 /*WM_COPYGLOBALDATA*/, MSGFLT_ADD, nullptr);
 #endif
-	DragAcceptFiles(hwnd, TRUE);
 
 	// File MRU
 	const int flags = MRUFlags_FilePath | (static_cast<int>(flagRelativeFileMRU) * MRUFlags_RelativePath) | (static_cast<int>(flagPortableMyDocs) * MRUFlags_PortableMyDocs);

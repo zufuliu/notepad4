@@ -464,7 +464,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	}
 
 	HWND hwnd = CreateWindowEx(
-				   0,
+				   WS_EX_ACCEPTFILES,
 				   WC_MATEPATH,
 				   WC_MATEPATH,
 				   WS_MATEPATH,
@@ -543,7 +543,6 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			FindCloseChangeNotification(hChangeHandle);
 
 			DirList_Destroy(hwndDirList);
-			DragAcceptFiles(hwnd, FALSE);
 
 			mHistory.Empty();
 
@@ -844,7 +843,6 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	DirList_Init(hwndDirList);
 	ListView_SetHoverTime(hwndDirList, 50);
 	// Drag & Drop
-	DragAcceptFiles(hwnd, TRUE);
 	// History
 	mHistory.Init();
 	mHistory.UpdateToolbar(hwndToolbar, IDT_HISTORY_BACK, IDT_HISTORY_FORWARD);
