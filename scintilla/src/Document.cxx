@@ -2100,21 +2100,21 @@ constexpr bool IsWordEdge(CharacterClass cc, CharacterClass ccNext) noexcept {
 	return (cc != ccNext) && (cc >= CharacterClass::punctuation);
 }
 
-class SearchThing {
+class SearchBuffer {
 	char *buffer = nullptr;
 	size_t length = 0;
 public:
 	Sci::Position shiftTable[256];
-	void Allocate(size_t size) {
-		length = size;
-		if (size <= sizeof(shiftTable)) {
+	void Allocate(size_t newSize) {
+		length = newSize;
+		if (newSize <= sizeof(shiftTable)) {
 			buffer = reinterpret_cast<char *>(shiftTable);
 		} else {
-			buffer = new char[size];
+			buffer = new char[newSize];
 		}
-		memset(buffer, 0, size);
+		memset(buffer, 0, newSize);
 	}
-	~SearchThing() noexcept {
+	~SearchBuffer() noexcept {
 		if (length > sizeof(shiftTable)) {
 			delete[] buffer;
 		}
@@ -2277,14 +2277,14 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 			pos = NextPosition(pos, -1);
 		}
 		const SplitView cbView = cb.AllView();
-		SearchThing searchThing;
+		SearchBuffer searchBuffer;
 		if (FlagSet(flags, FindOption::MatchCase)) {
 			const unsigned char * const searchData = reinterpret_cast<const unsigned char *>(search);
 			// Boyer-Moore-Horspool-Sunday Algorithm / Quick Search Algorithm
 			// https://www-igm.univ-mlv.fr/~lecroq/string/index.html
 			// https://www-igm.univ-mlv.fr/~lecroq/string/node19.html
 			// https://www.inf.hs-flensburg.de/lang/algorithmen/pattern/sundayen.htm
-			auto& shiftTable = searchThing.shiftTable;
+			auto& shiftTable = searchBuffer.shiftTable;
 			if (lengthFind != 1) {
 				Sci::Position shift = lengthFind;
 				const Sci::Position value = (shift + 1) * increment;
@@ -2348,9 +2348,9 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 			}
 		} else if (CpUtf8 == dbcsCodePage) {
 			constexpr size_t maxFoldingExpansion = 3; // same as maxExpansionCaseConversion
-			searchThing.Allocate((lengthFind + UTF8MaxBytes) * maxFoldingExpansion + 1);
-			const size_t lenSearch = pcf->Fold(searchThing.data(), searchThing.size(), search, lengthFind);
-			const unsigned char * const searchData = reinterpret_cast<const unsigned char *>(searchThing.data());
+			searchBuffer.Allocate((lengthFind + UTF8MaxBytes) * maxFoldingExpansion + 1);
+			const size_t lenSearch = pcf->Fold(searchBuffer.data(), searchBuffer.size(), search, lengthFind);
+			const unsigned char * const searchData = reinterpret_cast<const unsigned char *>(searchBuffer.data());
 			//while (forward ? (pos < endPos) : (pos >= endPos)) {
 			while ((direction ^ (pos - endPos)) < 0) {
 				int widthFirstCharacter = 1;
@@ -2381,8 +2381,8 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 						}
 						char folded[UTF8MaxBytes * maxFoldingExpansion + 1];
 						lenFlat = pcf->Fold(folded, sizeof(folded), bytes, widthChar);
-						// memcmp may examine lenFlat bytes in both arguments so assert it doesn't read past end of searchThing
-						assert((indexSearch + lenFlat) <= searchThing.size());
+						// memcmp may examine lenFlat bytes in both arguments so assert it doesn't read past end of searchBuffer
+						assert((indexSearch + lenFlat) <= searchBuffer.size());
 						// Does folded match the buffer
 						characterMatches = 0 == memcmp(folded, searchData + indexSearch, lenFlat);
 					}
@@ -2411,10 +2411,10 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 				}
 			}
 		} else if (dbcsCodePage) {
-			searchThing.Allocate(lengthFind + 2 + 1);
+			searchBuffer.Allocate(lengthFind + 2 + 1);
 			const CaseFolderTable * const folder = down_cast<CaseFolderTable *>(pcf.get());
-			const size_t lenSearch = folder->Fold(searchThing.data(), searchThing.size(), search, lengthFind);
-			const unsigned char * const searchData = reinterpret_cast<const unsigned char *>(searchThing.data());
+			const size_t lenSearch = folder->Fold(searchBuffer.data(), searchBuffer.size(), search, lengthFind);
+			const unsigned char * const searchData = reinterpret_cast<const unsigned char *>(searchBuffer.data());
 			//while (forward ? (pos < endPos) : (pos >= endPos)) {
 			while ((direction ^ (pos - endPos)) < 0) {
 				int widthFirstCharacter = 1;
@@ -2445,8 +2445,8 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 								trailByte,
 							};
 							folder->Fold(folded, sizeof(folded), folded, widthChar);
-							// memcmp may examine widthChar bytes in both arguments so assert it doesn't read past end of searchThing
-							assert((indexSearch + widthChar) <= searchThing.size());
+							// memcmp may examine widthChar bytes in both arguments so assert it doesn't read past end of searchBuffer
+							assert((indexSearch + widthChar) <= searchBuffer.size());
 							// Does folded match the buffer
 							characterMatches = 0 == memcmp(folded, searchData + indexSearch, widthChar);
 						} else {
@@ -2479,10 +2479,10 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 			}
 		} else {
 			const Sci::Position endSearch = (startPos <= endPos) ? endPos - lengthFind + 1 : endPos;
-			searchThing.Allocate(lengthFind + 1);
+			searchBuffer.Allocate(lengthFind + 1);
 			const CaseFolderTable * const folder = down_cast<CaseFolderTable *>(pcf.get());
-			folder->Fold(searchThing.data(), searchThing.size(), search, lengthFind);
-			const char * const searchData = searchThing.data();
+			folder->Fold(searchBuffer.data(), searchBuffer.size(), search, lengthFind);
+			const char * const searchData = searchBuffer.data();
 			//while (forward ? (pos < endSearch) : (pos >= endSearch)) {
 			while ((direction ^ (pos - endSearch)) < 0) {
 				bool found = (pos + lengthFind) <= limitPos;

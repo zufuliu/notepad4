@@ -97,12 +97,12 @@ class SplitVector {
 	/// reallocating if more space needed.
 	void RoomFor(ptrdiff_t insertionLength) {
 		if (gapLength < insertionLength) {
-			const size_t size = body.size();
-			const size_t upper = size / 6;
+			const size_t currentSize = body.size();
+			const size_t upper = currentSize / 6;
 			while (growSize < upper) {
 				growSize *= 2;
 			}
-			ReAllocate(size + insertionLength + growSize);
+			ReAllocate(currentSize + insertionLength + growSize);
 		}
 	}
 
