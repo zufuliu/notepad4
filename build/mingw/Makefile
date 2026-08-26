@@ -145,7 +145,7 @@ ifndef LLD
 	export RCFLAGS += -O coff
 else
 	export RCFLAGS += -O res
-	export LDFLAGS += -Wl,--subsystem,windows
+	export LDFLAGS += -Wl,--subsystem,windows -Wl,--dependent-load-flag,0x800
 endif
 
 # Name root build folder
