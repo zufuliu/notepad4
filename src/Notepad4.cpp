@@ -497,6 +497,19 @@ static LONG WINAPI TopLevelHandler(EXCEPTION_POINTERS *ep) {
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nShowCmd) {
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
+	// RestrictDLLPath() from SciTEWin.cxx, only load system or full path DLL
+#if _WIN32_WINNT >= _WIN32_WINNT_WIN8
+	SetDefaultDllDirectories(LOAD_LIBRARY_SEARCH_SYSTEM32);
+#else
+	using SetDefaultDllDirectoriesSig = BOOL (WINAPI *)(DWORD DirectoryFlags) noexcept;
+	if (auto fnSetDefaultDllDirectories = DLLFunctionEx<SetDefaultDllDirectoriesSig>(L"kernel32.dll", "SetDefaultDllDirectories")) {
+		kSystemLibraryLoadFlags = LOAD_LIBRARY_SEARCH_SYSTEM32;
+		fnSetDefaultDllDirectories(LOAD_LIBRARY_SEARCH_SYSTEM32);
+	} else {
+		SetDllDirectory(L""); // remove current directory from the DLL search path
+	}
+#endif
+
 #if 0 // used for Clang UBSan or printing debug message on console.
 	if (AttachConsole(ATTACH_PARENT_PROCESS)) {
 		SetConsoleCtrlHandler(ConsoleHandlerRoutine, TRUE);
@@ -602,11 +615,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	InitCommonControlsEx(&icex);
 
 	msgTaskbarCreated = RegisterWindowMessage(L"TaskbarCreated");
-
-#if _WIN32_WINNT < _WIN32_WINNT_WIN8
-	// see LoadD2D() in PlatWin.cxx
-	kSystemLibraryLoadFlags = (DLLFunctionEx<FARPROC>(L"kernel32.dll", "SetDefaultDllDirectories") != nullptr) ? LOAD_LIBRARY_SEARCH_SYSTEM32 : 0;
-#endif
 
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
 	hResDLL = LoadLocalizedResourceDLL(uiLanguage, WC_NOTEPAD4 L".dll");
