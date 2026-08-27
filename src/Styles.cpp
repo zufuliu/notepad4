@@ -4293,6 +4293,8 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 				LPCWSTR szTitle = wch;
 				LPCWSTR szValue = wch;
 				LPCWSTR pszDefault = wch;
+				BOOL editEnable = FALSE;
+				BOOL resetEnable = FALSE;
 				// a lexer has been selected
 				if (fLexerSelected && pCurrentLexer != nullptr) {
 						GetDlgItemText(hwnd, IDC_STYLELABELS, wch, COUNTOF(wch));
@@ -4303,8 +4305,8 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 
 						szValue = pCurrentLexer->szExtensions;
 						pszDefault = pCurrentLexer->pszDefExt;
-						EnableWindow(GetDlgItem(hwnd, IDC_STYLEEDIT), (pCurrentLexer->szExtensions != nullptr));
-						EnableWindow(GetDlgItem(hwnd, IDC_STYLEDEFAULT), TRUE);
+						editEnable = (pCurrentLexer->szExtensions != nullptr);
+						resetEnable = TRUE;
 				}
 
 				// a style or group has been selected
@@ -4318,25 +4320,23 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 						szTitle = p;
 						szValue = pCurrentStyle->szValue;
 						pszDefault = pCurrentStyle->pszDefault;
-						EnableWindow(GetDlgItem(hwnd, IDC_STYLEEDIT), TRUE);
-						EnableWindow(GetDlgItem(hwnd, IDC_STYLEBACK), TRUE);
-						EnableWindow(GetDlgItem(hwnd, IDC_STYLEDEFAULT), TRUE);
-
+						editEnable = TRUE;
+						resetEnable = TRUE;
 						enableMask = GetLexerStyleControlMask(pCurrentLexer->rid, iCurrentStyleIndex);
+						EnableWindow(GetDlgItem(hwnd, IDC_STYLEBACK), TRUE);
 				}
 
-				else {
-					EnableWindow(GetDlgItem(hwnd, IDC_STYLEEDIT), FALSE);
-					EnableWindow(GetDlgItem(hwnd, IDC_STYLEDEFAULT), FALSE);
-				}
-
+				EnableWindow(GetDlgItem(hwnd, IDC_STYLEEDIT), editEnable);
+				EnableWindow(GetDlgItem(hwnd, IDC_STYLEDEFAULT), resetEnable);
 				SetDlgItemText(hwnd, IDC_STYLELABEL, szTitle);
 				SetDlgItemText(hwnd, IDC_STYLEEDIT, szValue);
 				SetDlgItemText(hwnd, IDC_STYLEVALUE_DEFAULT, pszDefault);
 
+				HWND hwndFore = GetDlgItem(hwnd, IDC_STYLEFORE);
+				HWND hwndBack = GetDlgItem(hwnd, IDC_STYLEBACK);
 				const bool changed = pCurrentStyle != nullptr && (
-					((enableMask & StyleControl_Fore) && !IsWindowEnabled(GetDlgItem(hwnd, IDC_STYLEFORE)))
-					|| ((enableMask & StyleControl_Back) && !IsWindowEnabled(GetDlgItem(hwnd, IDC_STYLEBACK)))
+					((enableMask & StyleControl_Fore) && !IsWindowEnabled(hwndFore))
+					|| ((enableMask & StyleControl_Back) && !IsWindowEnabled(hwndBack))
 				);
 
 				EnableWindow(GetDlgItem(hwnd, IDC_STYLEFONT), (enableMask & StyleControl_Font) != 0);
@@ -4357,8 +4357,8 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 				//	CheckDlgButton(hwnd, IDC_STYLEITALIC, BST_UNCHECKED);
 				//	CheckDlgButton(hwnd, IDC_STYLEUNDERLINE, BST_UNCHECKED);
 				//}
-				EnableWindow(GetDlgItem(hwnd, IDC_STYLEFORE), (enableMask & StyleControl_Fore) != 0);
-				EnableWindow(GetDlgItem(hwnd, IDC_STYLEBACK), (enableMask & StyleControl_Back) != 0);
+				EnableWindow(hwndFore, (enableMask & StyleControl_Fore) != 0);
+				EnableWindow(hwndBack, (enableMask & StyleControl_Back) != 0);
 				//if (enableMask & StyleControl_EOLFilled) {
 				//	EnableWindow(GetDlgItem(hwnd, IDC_STYLEEOLFILLED), TRUE);
 				//	CheckDlgButton(hwnd, IDC_STYLEEOLFILLED, Style_StrGetEOLFilled(pCurrentStyle->szValue) ? BST_CHECKED : BST_UNCHECKED);
