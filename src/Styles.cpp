@@ -3925,7 +3925,7 @@ HTREEITEM Style_AddLexerToTreeView(HWND hwnd, LPCEDITLEXER pLex, DWORD iconFlags
 #else
 		tvis.item.pszText = const_cast<WCHAR *>(pLex->Styles[i].pszName);
 #endif
-		tvis.item.lParam = AsInteger<LPARAM>(&pLex->Styles[i]);
+		tvis.item.lParam = i + 1;
 		hInsertAfter = TreeView_InsertItem(hwnd, &tvis);
 	}
 
@@ -4182,7 +4182,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 	static HWND hwndTV;
 	static bool fDragging;
 	static bool fLexerSelected;
-	static int iCurrentStyleIndex;
+	static unsigned iCurrentStyleIndex;
 	static PEDITLEXER pCurrentLexer;
 	static EDITSTYLE *pCurrentStyle;
 	//static HBRUSH hbrFore;
@@ -4202,7 +4202,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 
 		fDragging = false;
 		fLexerSelected = false;
-		iCurrentStyleIndex = -1;
+		iCurrentStyleIndex = 0;
 		pCurrentLexer = nullptr;
 		pCurrentStyle = nullptr;
 
@@ -4255,7 +4255,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 				}
 
 				fLexerSelected = false;
-				iCurrentStyleIndex = -1;
+				iCurrentStyleIndex = 0;
 				pCurrentStyle = nullptr;
 
 				HWND hwndTree = lpnmtv->hdr.hwndFrom;
@@ -4279,7 +4279,8 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 						pCurrentLexer = AsPointer<PEDITLEXER>(lpnmtv->itemNew.lParam);
 					} else {
 						pCurrentLexer = AsPointer<PEDITLEXER>(item.lParam);
-						pCurrentStyle = AsPointer<EDITSTYLE *>(lpnmtv->itemNew.lParam);
+						iCurrentStyleIndex = static_cast<unsigned>(lpnmtv->itemNew.lParam - 1);
+						pCurrentStyle = &pCurrentLexer->Styles[iCurrentStyleIndex];
 					}
 				}
 				if (hParent == nullptr || fLexerSelected) {
@@ -4321,12 +4322,6 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 						EnableWindow(GetDlgItem(hwnd, IDC_STYLEBACK), TRUE);
 						EnableWindow(GetDlgItem(hwnd, IDC_STYLEDEFAULT), TRUE);
 
-						for (UINT i = 0; i < pCurrentLexer->iStyleCount; i++) {
-							if (pCurrentStyle == &pCurrentLexer->Styles[i]) {
-								iCurrentStyleIndex = i;
-								break;
-							}
-						}
 						enableMask = GetLexerStyleControlMask(pCurrentLexer->rid, iCurrentStyleIndex);
 				}
 
