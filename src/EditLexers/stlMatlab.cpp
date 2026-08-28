@@ -37,7 +37,7 @@ static KEYWORDLIST Keywords_Matlab = {{
 , nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr
 }};
 
-static EDITSTYLE Styles_Matlab[] = {
+static const EDITSTYLE Styles_Matlab[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_MAT_KEYWORD, NP2StyleX_Keyword, L"fore:#0000FF" },
 	{ SCE_MAT_ATTRIBUTE, NP2StyleX_Attribute, L"fore:#FF8000" },

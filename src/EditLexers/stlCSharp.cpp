@@ -101,7 +101,7 @@ nullptr
 "assembly field method module param property type "
 }};
 
-static EDITSTYLE Styles_CSharp[] = {
+static const EDITSTYLE Styles_CSharp[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_CSHARP_WORD, NP2StyleX_Keyword, L"fore:#0000FF" },
 	{ SCE_CSHARP_WORD2, NP2StyleX_TypeKeyword, L"fore:#0000FF" },

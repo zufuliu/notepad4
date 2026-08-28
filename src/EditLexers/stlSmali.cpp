@@ -118,7 +118,7 @@ nullptr
 , nullptr, nullptr, nullptr, nullptr
 }};
 
-static EDITSTYLE Styles_Smail[] = {
+static const EDITSTYLE Styles_Smail[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_SMALI_WORD, NP2StyleX_Keyword, L"fore:#0000FF" },
 	{ SCE_SMALI_DIRECTIVE, NP2StyleX_Directive, L"fore:#FF8000" },

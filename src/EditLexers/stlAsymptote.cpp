@@ -51,7 +51,7 @@ static KEYWORDLIST Keywords_ASY = {{
 "for^() if^() while^() else^if^() else^{} "
 }};
 
-static EDITSTYLE Styles_ASY[] = {
+static const EDITSTYLE Styles_ASY[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_ASY_WORD, NP2StyleX_Keyword, L"fore:#0000FF" },
 	{ SCE_ASY_TYPE, NP2StyleX_Type, L"fore:#1E90FF" },

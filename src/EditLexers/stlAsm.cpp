@@ -152,7 +152,7 @@ static KEYWORDLIST Keywords_ASM = {{
 , nullptr, nullptr, nullptr, nullptr, nullptr, nullptr
 }};
 
-static EDITSTYLE Styles_ASM[] = {
+static const EDITSTYLE Styles_ASM[] = {
 	EDITSTYLE_DEFAULT,
 	{ MULTI_STYLE(SCE_ASM_COMMENT, SCE_ASM_COMMENTLINE, SCE_ASM_COMMENT2, SCE_ASM_COMMENTDIRECTIVE), NP2StyleX_Comment, L"fore:#608060" },
 	{ MULTI_STYLE(SCE_ASM_STRING, SCE_ASM_CHARACTER, SCE_ASM_STRINGEOL, 0), NP2StyleX_String, L"fore:#008000" },

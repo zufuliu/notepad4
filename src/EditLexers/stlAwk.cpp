@@ -37,7 +37,7 @@ static KEYWORDLIST Keywords_Awk = {{
 "for^() if^() switch^() while^() else^if^() else^{} "
 }};
 
-static EDITSTYLE Styles_Awk[] = {
+static const EDITSTYLE Styles_Awk[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_AWK_WORD, NP2StyleX_Keyword, L"fore:#0000FF" },
 	{ SCE_AWK_FUNCTION_DEFINITION, NP2StyleX_FunctionDefinition, L"bold; fore:#A46000" },

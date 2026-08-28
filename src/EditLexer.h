@@ -64,7 +64,6 @@ struct EDITSTYLE {
 		const uint16_t rid;
 		const uint16_t iNameLen;
 		const wchar_t * const pszName;
-		wchar_t *szValue;
 	const wchar_t * const pszDefault;
 };
 
@@ -114,7 +113,11 @@ struct EDITLEXER {
 		wchar_t *szStyleBuf;
 	const wchar_t * const pszDefExt;
 	const KEYWORDLIST * const pKeyWords;
-	EDITSTYLE * const Styles;
+	const EDITSTYLE * const Styles;
+
+	wchar_t *GetStyleValue(unsigned index) const noexcept {
+		return szStyleBuf + (index*MAX_EDITSTYLE_VALUE_SIZE);
+	}
 };
 
 using PEDITLEXER = EDITLEXER *;

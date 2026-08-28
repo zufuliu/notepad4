@@ -86,7 +86,7 @@ nullptr
 "for^() if^() switch^() while^() catch^() else^if^() else^{} synchronized^() try^() "
 }};
 
-static EDITSTYLE Styles_Java[] = {
+static const EDITSTYLE Styles_Java[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_JAVA_WORD, NP2StyleX_Keyword, L"fore:#0000FF" },
 	{ SCE_JAVA_WORD2, NP2StyleX_TypeKeyword, L"fore:#0000FF" },

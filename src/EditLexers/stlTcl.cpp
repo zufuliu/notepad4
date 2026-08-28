@@ -33,7 +33,7 @@ static KEYWORDLIST Keywords_Tcl = {{
 , nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr
 }};
 
-static EDITSTYLE Styles_Tcl[] = {
+static const EDITSTYLE Styles_Tcl[] = {
 	EDITSTYLE_DEFAULT,
 	{ MULTI_STYLE(SCE_TCL_WORD, SCE_TCL_WORD2, SCE_TCL_WORD3, SCE_TCL_WORD_IN_QUOTE), NP2StyleX_Keyword, L"bold; fore:#FF8000" },
 	{ MULTI_STYLE(SCE_TCL_COMMENT, SCE_TCL_COMMENTLINE, SCE_TCL_COMMENT_BOX, SCE_TCL_BLOCK_COMMENT), NP2StyleX_Comment, L"fore:#608060" },

@@ -5,7 +5,7 @@ static KEYWORDLIST Keywords_NULL = {{
 nullptr
 }};
 
-static EDITSTYLE Styles_Global[] = {
+static const EDITSTYLE Styles_Global[] = {
 	{ STYLE_DEFAULT, NP2StyleX_DefaultCodeStyle, L"font:$(Code)" },
 	{ STYLE_DEFAULT, NP2StyleX_DefaultTextStyle, L"font:$(Text)" },
 	{ STYLE_LINENUMBER, NP2StyleX_MarginLineNumber, L"size:-2; fore:#2B91AF" },
@@ -39,11 +39,11 @@ EDITLEXER lexGlobal = {
 	Styles_Global
 };
 
-static EDITSTYLE Styles_Text[] = {
+static const EDITSTYLE Styles_Text[] = {
 	EDITSTYLE_DEFAULT,
 };
 
-static EDITSTYLE Styles_2ndText[] = {
+static const EDITSTYLE Styles_2ndText[] = {
 	EDITSTYLE_DEFAULT,
 };
 
@@ -97,7 +97,7 @@ EDITLEXER lex2ndTextFile = {
 	Styles_2ndText
 };
 
-static EDITSTYLE Styles_ANSI[] = {
+static const EDITSTYLE Styles_ANSI[] = {
 	// override font used in global styles to ensure line height is same as measured from STYLE_DEFAULT.
 	// negative extra line spacing is required when using Direct2D, not required when using GDI.
 	{ STYLE_DEFAULT, NP2StyleX_Default, L"font:Lucida Console" },
@@ -131,7 +131,7 @@ EDITLEXER lexANSI = {
 	Styles_ANSI
 };
 
-static EDITSTYLE Styles_Config[] = {
+static const EDITSTYLE Styles_Config[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_CONF_SECTION, NP2StyleX_Section, L"bold; back:#FFC040; eolfilled" },
 	{ SCE_CONF_DIRECTIVE, NP2StyleX_Directive, L"fore:#003CE6" },
@@ -166,7 +166,7 @@ EDITLEXER lexConfig = {
 	Styles_Config
 };
 
-static EDITSTYLE Styles_CSV[] = {
+static const EDITSTYLE Styles_CSV[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_CSV_COLUMN_0, NP2StyleX_Column1, L"fore:#E24000" },
 	{ SCE_CSV_COLUMN_1, NP2StyleX_Column2, L"fore:#FF8000" },
@@ -204,7 +204,7 @@ EDITLEXER lexCSV = {
 	Styles_CSV
 };
 
-static EDITSTYLE Styles_Diff[] = {
+static const EDITSTYLE Styles_Diff[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_DIFF_COMMENT, NP2StyleX_Comment, L"fore:#008000" },
 	{ SCE_DIFF_COMMAND, NP2StyleX_Command, L"bold; fore:#0A246A" },
@@ -238,7 +238,7 @@ EDITLEXER lexDiff = {
 	Styles_Diff
 };
 
-static EDITSTYLE Styles_INI[] = {
+static const EDITSTYLE Styles_INI[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_PROPS_SECTION, NP2StyleX_Section, L"bold; back:#FFC040; eolfilled" },
 	{ SCE_PROPS_KEY, NP2StyleX_Property, L"fore:#A46000" },

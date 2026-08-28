@@ -400,7 +400,7 @@ static KEYWORDLIST Keywords_PHP = {{
 "for^() if^() switch^() while^() elseif^() else^{} foreach^() catch^() "
 }};
 
-static EDITSTYLE Styles_PHP[] = {
+static const EDITSTYLE Styles_PHP[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_PHP_WORD, NP2StyleX_Keyword, L"bold; fore:#FF8000" },
 	{ SCE_PHP_WORD2, NP2StyleX_TypeKeyword, L"bold; fore:#FF8000" },

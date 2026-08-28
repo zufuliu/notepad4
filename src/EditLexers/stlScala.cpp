@@ -39,7 +39,7 @@ static KEYWORDLIST Keywords_Scala = {{
 "for^() if^() switch^() while^() catch^() else^if^() else^{} "
 }};
 
-static EDITSTYLE Styles_Scala[] = {
+static const EDITSTYLE Styles_Scala[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_SCALA_WORD, NP2StyleX_Keyword, L"fore:#0000FF" },
 	{ SCE_SCALA_ANNOTATION, NP2StyleX_Annotation, L"fore:#FF8000" },

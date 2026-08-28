@@ -56,7 +56,7 @@ nullptr
 "for^() if^() switch^() while^() else^if^() else^{} "
 }};
 
-static EDITSTYLE Styles_TS[] = {
+static const EDITSTYLE Styles_TS[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_JS_WORD, NP2StyleX_Keyword, L"fore:#0000FF" },
 	{ SCE_JS_WORD2, NP2StyleX_TypeKeyword, L"fore:#0000FF" },

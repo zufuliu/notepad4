@@ -42,7 +42,7 @@ nullptr
 "defined() code_page() __has_include() "
 }};
 
-static EDITSTYLE Styles_RC[] = {
+static const EDITSTYLE Styles_RC[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_C_WORD, NP2StyleX_Keyword, L"fore:#0000FF" },
 	{ SCE_C_PREPROCESSOR, NP2StyleX_Preprocessor, L"fore:#FF8000" },

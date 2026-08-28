@@ -48,7 +48,7 @@ static KEYWORDLIST Keywords_MAK = {{
 , nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr
 }};
 
-static EDITSTYLE Styles_MAK[] = {
+static const EDITSTYLE Styles_MAK[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_MAKE_COMMENT, NP2StyleX_Comment, L"fore:#008000" },
 	{ SCE_MAKE_PREPROCESSOR, NP2StyleX_Preprocessor, L"fore:#FF8000" },

@@ -63,7 +63,7 @@ static KEYWORDLIST Keywords_Rebol = {{
 "REBOL^[] Red^[] Red/System^[]"
 }};
 
-static EDITSTYLE Styles_Rebol[] = {
+static const EDITSTYLE Styles_Rebol[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_REBOL_WORD, NP2StyleX_Keyword, L"bold; fore:#FF8000" },
 	{ SCE_REBOL_TYPE, NP2StyleX_Type, L"fore:#0080FF" },

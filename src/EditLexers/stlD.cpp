@@ -67,7 +67,7 @@ nullptr
 "synchronized^() catch^() scope^() version^() mixin^() "
 }};
 
-static EDITSTYLE Styles_D[] = {
+static const EDITSTYLE Styles_D[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_D_WORD, NP2StyleX_Keyword, L"fore:#0000FF" },
 	{ SCE_D_WORD2, NP2StyleX_TypeKeyword, L"fore:#0000FF" },

@@ -146,7 +146,7 @@ nullptr
 "object boolean number string symbol bigint "
 }};
 
-static EDITSTYLE Styles_JS[] = {
+static const EDITSTYLE Styles_JS[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_JS_WORD, NP2StyleX_Keyword, L"fore:#0000FF" },
 	{ SCE_JS_WORD2, NP2StyleX_ReservedWord, L"fore:#FF4F0F" },

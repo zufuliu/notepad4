@@ -87,7 +87,7 @@ nullptr
 "for^() if^() switch^() while^() catch^() else^if^() else^{} "
 }};
 
-static EDITSTYLE Styles_Groovy[] = {
+static const EDITSTYLE Styles_Groovy[] = {
 	EDITSTYLE_DEFAULT,
 	{ MULTI_STYLE(SCE_GROOVY_WORD, SCE_GROOVY_WORD_DEMOTED, 0, 0), NP2StyleX_Keyword, L"fore:#0000FF" },
 	{ SCE_GROOVY_WORD2, NP2StyleX_TypeKeyword, L"fore:#0000FF" },

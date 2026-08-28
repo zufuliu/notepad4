@@ -42,7 +42,7 @@ nullptr
 "for^() if^() switch^() while^() else^if^() else^{} "
 }};
 
-static EDITSTYLE Styles_Haxe[] = {
+static const EDITSTYLE Styles_Haxe[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_HAXE_WORD, NP2StyleX_Keyword, L"fore:#0000FF" },
 	{ SCE_HAXE_PREPROCESSOR, NP2StyleX_Preprocessor, L"fore:#FF8000" },

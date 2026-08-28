@@ -865,7 +865,7 @@ static KEYWORDLIST Keywords_CPP = {{
 "launch async deferred ready timeout "
 }};
 
-static EDITSTYLE Styles_CPP[] = {
+static const EDITSTYLE Styles_CPP[] = {
 	EDITSTYLE_DEFAULT,
 	{ MULTI_STYLE(SCE_C_WORD, SCE_C_2NDWORD, 0, 0), NP2StyleX_Keyword, L"fore:#0000FF" },
 	{ SCE_C_WORD2, NP2StyleX_TypeKeyword, L"fore:#0000FF" },

@@ -79,7 +79,7 @@ nullptr
 "ctor() "
 }};
 
-static EDITSTYLE Styles_CIL[] = {
+static const EDITSTYLE Styles_CIL[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_CIL_WORD, NP2StyleX_Keyword, L"fore:#0000FF" },
 	{ SCE_CIL_WORD2, NP2StyleX_TypeKeyword, L"fore:#0000FF" },

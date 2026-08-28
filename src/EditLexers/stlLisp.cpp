@@ -13,7 +13,7 @@ nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
 nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr
 }};
 
-static EDITSTYLE Styles_LISP[] = {
+static const EDITSTYLE Styles_LISP[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_LISP_KEYWORD, NP2StyleX_Keyword, L"fore:#FF8000" },
 	{ MULTI_STYLE(SCE_LISP_COMMENTLINE, SCE_LISP_COMMENTBLOCK, 0, 0), NP2StyleX_Comment, L"fore:#008000" },

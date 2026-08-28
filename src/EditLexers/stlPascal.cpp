@@ -25,7 +25,7 @@ static KEYWORDLIST Keywords_Pascal = {{
 , nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr
 }};
 
-static EDITSTYLE Styles_Pascal[] = {
+static const EDITSTYLE Styles_Pascal[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_PAS_WORD, NP2StyleX_Keyword, L"bold; fore:#FF8000" },
 	{ SCE_PAS_TYPE, NP2StyleX_TypeKeyword, L"bold; fore:#1E90FF" },
