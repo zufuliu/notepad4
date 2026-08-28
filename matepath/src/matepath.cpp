@@ -52,7 +52,12 @@ static HWND hwndReBar;
 #define TOOLBAR_COMMAND_BASE	IDT_HISTORY_BACK
 #define DefaultToolbarButtons	L"1 2 3 4 5 0 8"
 // NOLINTBEGIN(readability-redundant-zero-initializer)
-static TBBUTTON tbbMainWnd[] = {
+#if NP2_ENABLE_CUSTOMIZE_TOOLBAR_LABELS
+static TBBUTTON tbbMainWnd[] =
+#else
+static const TBBUTTON tbbMainWnd[] =
+#endif
+{
 	{0, 0, 0, TBSTYLE_SEP, {0}, 0, 0},
 	{0, IDT_HISTORY_BACK, TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
 	{1, IDT_HISTORY_FORWARD, TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
