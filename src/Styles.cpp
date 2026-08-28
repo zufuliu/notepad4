@@ -1257,7 +1257,8 @@ static void Style_SetAllStyle(PEDITLEXER pLex, UINT offset) noexcept {
 	const UINT iStyleCount = pLex->iStyleCount;
 	LPCWSTR szValue = pLex->szStyleBuf;
 	// first style is the default style.
-	for (UINT i = 1; i < iStyleCount; i++, szValue += MAX_EDITSTYLE_VALUE_SIZE) {
+	for (UINT i = 1; i < iStyleCount; i++) {
+		szValue += MAX_EDITSTYLE_VALUE_SIZE;
 		const UINT iStyle = pLex->Styles[i].iStyle;
 		const int first = (iStyle & 0xff) + offset;
 		Style_SetStyles(first, szValue);
@@ -1343,7 +1344,8 @@ LPCWSTR Style_FindStyleValue(LPCEDITLEXER pLex, UINT style) noexcept {
 	const UINT iStyleCount = pLex->iStyleCount;
 	LPCWSTR szValue = pLex->szStyleBuf;
 	// first style is the default style.
-	for (UINT i = 1; i < iStyleCount; i++, szValue += MAX_EDITSTYLE_VALUE_SIZE) {
+	for (UINT i = 1; i < iStyleCount; i++) {
+		szValue += MAX_EDITSTYLE_VALUE_SIZE;
 		UINT iStyle = pLex->Styles[i].iStyle;
 		do {
 			if ((iStyle & 0xFF) == style) {
@@ -1773,7 +1775,8 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) noexcept {
 				Style_SetAllStyle(&lexCSS, SCE_PHP_LABEL + SCE_JS_LABEL + 2);
 			}
 			szValue = lexHTML.szStyleBuf;
-			for (UINT i = 1; i < lexHTML.iStyleCount; i++, szValue += MAX_EDITSTYLE_VALUE_SIZE) {
+			for (UINT i = 1; i < lexHTML.iStyleCount; i++) {
+				szValue += MAX_EDITSTYLE_VALUE_SIZE;
 				const UINT iStyle = lexHTML.Styles[i].iStyle;
 				const int first = iStyle & 0xff;
 				Style_SetStyles(first, szValue);
