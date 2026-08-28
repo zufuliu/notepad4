@@ -29,8 +29,7 @@ extern int iCurrentEncoding;
 int g_DOSEncoding;
 
 // Supported Encodings
-static WCHAR wchANSI[16];
-static WCHAR wchOEM [16];
+static WCHAR wchANSI[16][2];
 static LPWSTR g_AllEncodingLabel = nullptr;
 
 struct NP2EncodingGroup {
@@ -510,9 +509,9 @@ void Encoding_InitDefaults() noexcept {
 	UINT acp = GetACP();
 	if (acp == CP_UTF8) {
 		GetLegacyACP(&acp);
-		wsprintf(wchANSI, L" (UTF-8, %u)", acp);
+		wsprintf(wchANSI[CPI_DEFAULT], L" (UTF-8, %u)", acp);
 	} else {
-		wsprintf(wchANSI, L" (%u)", acp);
+		wsprintf(wchANSI[CPI_DEFAULT], L" (%u)", acp);
 	}
 
 	mEncoding[CPI_DEFAULT].uCodePage = acp;
@@ -532,9 +531,9 @@ void Encoding_InitDefaults() noexcept {
 	UINT oemcp = GetOEMCP();
 	if (oemcp == CP_UTF8) {
 		GetLegacyOEMCP(&oemcp);
-		wsprintf(wchOEM, L" (UTF-8, %u)", oemcp);
+		wsprintf(wchANSI[CPI_OEM], L" (UTF-8, %u)", oemcp);
 	} else {
-		wsprintf(wchOEM, L" (%u)", oemcp);
+		wsprintf(wchANSI[CPI_OEM], L" (%u)", oemcp);
 	}
 
 	mEncoding[CPI_OEM].uCodePage = oemcp;
@@ -747,11 +746,7 @@ void Encoding_AddToTreeView(HWND hwnd, int idSel, bool bRecodeOnly) noexcept {
 		if (pwsz != nullptr) {
 			*pwsz = L'\0';
 		}
-		if (id == CPI_DEFAULT) {
-			StrCatBuff(wchBuf, wchANSI, COUNTOF(wchBuf));
-		} else if (id == CPI_OEM) {
-			StrCatBuff(wchBuf, wchOEM, COUNTOF(wchBuf));
-		}
+		StrCatBuff(wchBuf, wchANSI[id], COUNTOF(wchBuf));
 
 		tvis.hInsertAfter = hParent;
 		tvis.item.pszText = wchBuf;
@@ -881,10 +876,8 @@ void Encoding_AddToListView(HWND hwnd, int idSel, bool bRecodeOnly) noexcept {
 				lstrcpyn(wchBuf, pEE[i].wch, COUNTOF(wchBuf));
 			}
 
-			if (id == CPI_DEFAULT) {
-				StrCatBuff(wchBuf, wchANSI, COUNTOF(wchBuf));
-			} else if (id == CPI_OEM) {
-				StrCatBuff(wchBuf, wchOEM, COUNTOF(wchBuf));
+			if (id <= CPI_OEM) {
+				StrCatBuff(wchBuf, wchANSI[id], COUNTOF(wchBuf));
 			}
 
 			lvi.iImage = GetEncodingImageIndex(encoding);
@@ -961,10 +954,8 @@ void Encoding_AddToComboboxEx(HWND hwnd, int idSel, bool bRecodeOnly) noexcept {
 				lstrcpyn(wchBuf, pEE[i].wch, COUNTOF(wchBuf));
 			}
 
-			if (id == CPI_DEFAULT) {
-				StrCatBuff(wchBuf, wchANSI, COUNTOF(wchBuf));
-			} else if (id == CPI_OEM) {
-				StrCatBuff(wchBuf, wchOEM, COUNTOF(wchBuf));
+			if (id <= CPI_OEM) {
+				StrCatBuff(wchBuf, wchANSI[id], COUNTOF(wchBuf));
 			}
 
 			cbei.iImage = GetEncodingImageIndex(encoding);
