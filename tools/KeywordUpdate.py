@@ -153,7 +153,7 @@ def update_all_keyword():
 		print('missing lexer config:', ', '.join(sorted(missing)))
 	if missing := handled - config:
 		print('default lexer config:', ', '.join(sorted(missing)))
-	UpdateLexerKeywordAttr('../src/EditAutoC.cpp', '../scintilla/lexers/')
+	UpdateLexerKeywordAttr('../src/EditAutoC.cpp', '../src/Styles.cpp', '../scintilla/lexers/')
 
 update_all_keyword()
 UpdateLexerEnumFile('../src/EditLexer.h', '../scintilla/lexlib/WordList.h')

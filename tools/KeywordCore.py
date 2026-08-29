@@ -2895,16 +2895,23 @@ def parse_zig_api_file(path):
 		('function', keywordMap['functions'], KeywordAttr.NoLexer),
 	]
 
-def UpdateLexerKeywordAttr(indexPath, lexerPath):
+def UpdateLexerKeywordAttr(indexPath, matchPath, lexerPath):
 	#print(SinglyWordMap)
 	output = []
+	matchIndex = []
 	if AllKeywordAttrList:
 		output.append('enum {')
+		matchIndex.append('enum {')
 		for prefix, group in sorted(SpecialKeywordIndexList.items()):
 			items = sorted(group.items(), key=lambda m: m[1])
-			output.extend(f'\t{prefix}{key} = {value},' for key, value in items)
+			lines = [f'\t{prefix}{key} = {value},' for key, value in items]
+			output.extend(lines)
+			if prefix in ('CPPKeywordIndex_'):
+				matchIndex.extend(lines)
+		matchIndex.append('};')
 		output.append('};')
 	Regenerate(indexPath, '//KeywordIndex', output)
+	Regenerate(matchPath, '//KeywordIndex', matchIndex)
 
 	for lexer, indexList in LexerKeywordIndexList.items():
 		output = []
