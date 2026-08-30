@@ -145,10 +145,6 @@ def BuildKeywordContent(rid, lexer, keywordList, reservedCount=0):
 		maxKeywordLen += 2 # extra + '\0'
 		if '@' not in indexList or indexList['@'][0] < maxKeywordLen:
 			indexList['@'] = (maxKeywordLen, 0)
-	keywordCount = LexerKeywordCount + 1 - reservedCount
-	count = keywordCount - len(keywordList)
-	if count:
-		output.append(", nullptr" * count)
 	index = len(keywordList)
 	while reservedCount != 0:
 		attrList.append((index, KeywordAttr.NoLexer, 'Code Snippet'))

@@ -1496,7 +1496,8 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) noexcept {
 		// StopWatch watch;
 		// watch.Start();
 		uint64_t attr = pLexNew->keywordAttr;
-		for (int i = 0; i < KEYWORDSET_MAX; attr >>= 4, i++) {
+		const int keywordCount = min<int>(pLexNew->keywordCount, KEYWORDSET_MAX);
+		for (int i = 0; i < keywordCount; attr >>= 4, i++) {
 			const char *pKeywords = pLexNew->pszKeyWords[i];
 			if (!(attr & KeywordAttr_NoLexer) && StrNotEmpty(pKeywords)) {
 				const int attribute = attr & (KeywordAttr_NoLexer - 1);

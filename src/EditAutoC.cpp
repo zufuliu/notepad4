@@ -974,7 +974,8 @@ static void AutoC_AddKeyword(WordList &pWList, int iCurrentStyle) noexcept {
 	const int iLexer = pLexCurrent->iLexer;
 	if (iLexer != SCLEX_PHPSCRIPT) {
 		uint64_t attr = pLexCurrent->keywordAttr;
-		for (UINT i = 0; i < KEYWORDSET_MAX + 1; attr >>= 4, i++) {
+		const UINT keywordCount = pLexCurrent->keywordCount;
+		for (UINT i = 0; i < keywordCount; attr >>= 4, i++) {
 			const char *pKeywords = pLexCurrent->pszKeyWords[i];
 			if (!(attr & KeywordAttr_NoAutoComp) && StrNotEmpty(pKeywords)) {
 				pWList.AddListEx(pKeywords);
@@ -1015,7 +1016,8 @@ static void AutoC_AddKeyword(WordList &pWList, int iCurrentStyle) noexcept {
 	}
 	if (pLex != nullptr) {
 		uint64_t attr = pLex->keywordAttr;
-		for (UINT i = 0; i < KEYWORDSET_MAX + 1; attr >>= 4, i++) {
+		const UINT keywordCount = pLex->keywordCount;
+		for (UINT i = 0; i < keywordCount; attr >>= 4, i++) {
 			const char *pKeywords = pLex->pszKeyWords[i];
 			if (!(attr & KeywordAttr_NoAutoComp) && StrNotEmpty(pKeywords)) {
 				pWList.AddListEx(pKeywords);

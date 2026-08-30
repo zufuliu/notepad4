@@ -42,7 +42,7 @@ static const EDITSTYLE Styles_IDL[] = {
 
 EDITLEXER lexIDL = {
 	SCLEX_CPP, NP2LEX_IDL,
-	EDITLEXER_HOLE(L"Interface Definition File", Styles_IDL),
+	EDITLEXER_HOLE(L"Interface Definition File", Keywords_IDL, Styles_IDL),
 	L"idl; odl; midl",
 	Keywords_IDL,
 	Styles_IDL

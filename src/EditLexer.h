@@ -97,6 +97,7 @@ struct EDITLEXER {
 		const uint8_t stringStyleFirst;
 		const uint8_t stringStyleLast;
 	// set with EDITLEXER_HOLE() or EDITLEXER_TEXT()
+		const uint8_t keywordCount;
 		uint8_t iStyleTheme;
 		bool bStyleChanged;
 		bool bUseDefaultCodeStyle;
@@ -108,7 +109,7 @@ struct EDITLEXER {
 		wchar_t *szExtensions;
 		wchar_t *szStyleBuf;
 	const wchar_t * const pszDefExt;
-	const char * const (&pszKeyWords)[KEYWORDSET_MAX + 1];
+	const char * const (&pszKeyWords)[/*KEYWORDSET_MAX + 1*/];
 	const EDITSTYLE (&Styles)[];
 
 	constexpr wchar_t *GetStyleValue(unsigned index) const noexcept {
