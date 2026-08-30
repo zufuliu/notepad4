@@ -113,9 +113,9 @@ struct EDITLEXER {
 		wchar_t *szStyleBuf;
 	const wchar_t * const pszDefExt;
 	const KEYWORDLIST * const pKeyWords;
-	const EDITSTYLE * const Styles;
+	const EDITSTYLE (&Styles)[];
 
-	wchar_t *GetStyleValue(unsigned index) const noexcept {
+	constexpr wchar_t *GetStyleValue(unsigned index) const noexcept {
 		return szStyleBuf + (index*MAX_EDITSTYLE_VALUE_SIZE);
 	}
 };
