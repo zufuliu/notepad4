@@ -14,7 +14,7 @@ SinglyWordMap = {
 	'properties': 'property',
 	'alias': 'alias',
 }
-
+LexerKeywordCount = 15
 AllKeywordAttrList = {}
 # for keyword list used in AutoC_AddSpecWord()
 SpecialKeywordIndexList = {}
@@ -68,7 +68,7 @@ def build_enum_name(comment):
 	items = [item if item[0].isupper() else item.title() for item in items]
 	return ''.join(items)
 
-def BuildKeywordContent(rid, lexer, keywordList, keywordCount=16):
+def BuildKeywordContent(rid, lexer, keywordList, reservedCount=0):
 	output = []
 	attrList = []
 	indexList = LexerKeywordIndexList.setdefault(lexer, {})
@@ -111,10 +111,11 @@ def BuildKeywordContent(rid, lexer, keywordList, keywordCount=16):
 			output.extend('"' + line + ' "' for line in lines)
 		else:
 			output.append('nullptr')
-		if index + 1 < keywordCount:
-			output.append("")
+		output.append("")
 
 		indexName = build_enum_name(comment)
+		if index > LexerKeywordCount:
+			attr |= KeywordAttr.NoLexer
 		# keyword index for lexer
 		if (attr & KeywordAttr.NoLexer) == 0 and comment != 'unused':
 			if items:
@@ -144,19 +145,25 @@ def BuildKeywordContent(rid, lexer, keywordList, keywordCount=16):
 		maxKeywordLen += 2 # extra + '\0'
 		if '@' not in indexList or indexList['@'][0] < maxKeywordLen:
 			indexList['@'] = (maxKeywordLen, 0)
+	keywordCount = LexerKeywordCount + 1 - reservedCount
 	count = keywordCount - len(keywordList)
 	if count:
 		output.append(", nullptr" * count)
+	index = len(keywordList)
+	while reservedCount != 0:
+		attrList.append((index, KeywordAttr.NoLexer, 'Code Snippet'))
+		index += 1
+		reservedCount -= 1
 	if attrList:
 		AllKeywordAttrList[rid] = attrList
 	return output, attrList
 
-def UpdateKeywordFile(rid, path, lexer, keywordList, keywordCount=16, suffix=''):
+def UpdateKeywordFile(rid, path, lexer, keywordList, reservedCount=0, suffix=''):
 	if keywordList is None:
 		return
 	attrList = []
 	if keywordList:
-		output, attrList = BuildKeywordContent(rid, lexer, keywordList, keywordCount=keywordCount)
+		output, attrList = BuildKeywordContent(rid, lexer, keywordList, reservedCount=reservedCount)
 		if len(output) > 1:
 			Regenerate(path, '//' + suffix, output)
 

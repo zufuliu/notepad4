@@ -122,7 +122,6 @@ lexerList = [
 ]
 
 def update_all_keyword():
-	numKeyword = 16
 	handled = set()
 	for rid, output, lexer, path, count, parse in lexerList:
 		assert rid.startswith('NP2LEX_'), rid
@@ -141,13 +140,13 @@ def update_all_keyword():
 
 		output = '../src/EditLexers/' + output
 		if isinstance(count, tuple):
-			num, suffix = count
+			reservedCount, suffix = count
 		else:
-			num = count
+			reservedCount = count
 			suffix = ''
-		UpdateKeywordFile(rid, output, lexer, keywordList, numKeyword - num, suffix)
+		UpdateKeywordFile(rid, output, lexer, keywordList, reservedCount, suffix)
 
-	UpdateKeywordFile('', '../src/EditLexers/EditStyleX.h', '', [], numKeyword, 'Scheme Default')
+	UpdateKeywordFile('', '../src/EditLexers/EditStyleX.h', '', [], 0, 'Scheme Default')
 	config = set(LexerConfigMap.keys())
 	if missing := config - handled:
 		print('missing lexer config:', ', '.join(sorted(missing)))
