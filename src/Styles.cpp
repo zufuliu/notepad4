@@ -1497,7 +1497,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) noexcept {
 		// watch.Start();
 		uint64_t attr = pLexNew->keywordAttr;
 		for (int i = 0; i < KEYWORDSET_MAX; attr >>= 4, i++) {
-			const char *pKeywords = pLexNew->pKeyWords->pszKeyWords[i];
+			const char *pKeywords = pLexNew->pszKeyWords[i];
 			if (!(attr & KeywordAttr_NoLexer) && StrNotEmpty(pKeywords)) {
 				const int attribute = attr & (KeywordAttr_NoLexer - 1);
 				SciCall_SetKeywords(i | (attribute << 8), pKeywords);
@@ -2190,7 +2190,7 @@ bool MatchCPPKeyword(const char *p, int index) noexcept {
 	}
 	word[len++] = ' ';
 	word[len++] = 0;
-	p = strstr(lexCPP.pKeyWords->pszKeyWords[index], word);
+	p = strstr(lexCPP.pszKeyWords[index], word);
 	return p != nullptr;
 }
 

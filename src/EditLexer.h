@@ -72,10 +72,6 @@ struct EDITSTYLE {
 #define	MULTI_STYLE8(a, b, c, d, e, f, g, h) \
 	(MULTI_STYLE(a, b, c, d) | (static_cast<uint64_t>(MULTI_STYLE(e, f, g, h)) << 32))
 
-struct KEYWORDLIST {
-	const char * const pszKeyWords[KEYWORDSET_MAX + 1];
-};
-
 struct EDITLEXER {
 	const int iLexer;
 	const int rid;
@@ -112,7 +108,7 @@ struct EDITLEXER {
 		wchar_t *szExtensions;
 		wchar_t *szStyleBuf;
 	const wchar_t * const pszDefExt;
-	const KEYWORDLIST * const pKeyWords;
+	const char * const (&pszKeyWords)[KEYWORDSET_MAX + 1];
 	const EDITSTYLE (&Styles)[];
 
 	constexpr wchar_t *GetStyleValue(unsigned index) const noexcept {

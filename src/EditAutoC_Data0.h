@@ -1,7 +1,8 @@
-typedef const char * const NP2_KEYWORDS[4];
+#define NP2_KEYWORDS_COUNT	4
+typedef const char * const NP2_KEYWORDS[NP2_KEYWORDS_COUNT];
 
 // Doxygen
-static NP2_KEYWORDS kwDoxyDoc = {
+static const char * const kwDoxyDoc[NP2_KEYWORDS_COUNT] = {
 "a addindex addtogroup anchor arg attention author authors b brief bug c callgraph callergraph category cite class code cond copybrief copydetails copydoc copyright date def defgroup deprecated details dir docbookonly dontinclude dot dotfile e else elseif em endcode endcond enddocbookonly enddot endhtmlonly endif endinternal endlatexonly endlink endmanonly endmsc endrtfonly endsecreflist endverbatim endxmlonly enum example exception extends file fn headerfile hideinitializer htmlinclude htmlonly idlexcept if ifnot image implements include includelineno ingroup internal invariant interface latexonly li line link mainpage manonly memberof msc mscfile n name namespace nosubgrouping note overload p package page par paragraph param post pre private privatesection property protected protectedsection protocol public publicsection pure ref refitem related relates relatedalso relatesalso remark remarks result return returns retval rtfonly sa secreflist section see short showinitializer since skip skipline snippet struct subpage subsection subsubsection tableofcontents test throw throws todo tparam typedef union until var verbatim verbinclude version vhdlflow warning weakgroup xmlonly xrefitem "
 , // C#
 "inheritdoc list description item term listheader para paramref permission seealso summary typeparam typeparamref value "
@@ -12,7 +13,7 @@ nullptr
 };
 
 // XML Schema
-static NP2_KEYWORDS kwXmlSchema = {
+static const char * const kwXmlSchema[NP2_KEYWORDS_COUNT] = {
 "xs xsd schema simpleType complexType complexContent simpleContent extension restriction element unique key keyref "
 "selector field group all choice sequence any anyAttribute attribute attributeGroup include import redefine notation "
 "annotation appinfo documentation "
@@ -36,7 +37,7 @@ static NP2_KEYWORDS kwXmlSchema = {
 };
 
 // XML Stylesheet
-static NP2_KEYWORDS kwXmlStylesheet = {
+static const char * const kwXmlStylesheet[NP2_KEYWORDS_COUNT] = {
 "xsl stylesheet transform attribute-set character-map output-character decimal-format import import-schema include "
 "key namespace-alias output param preserve-space strip-space template variable "
 // instruction
@@ -61,7 +62,7 @@ static NP2_KEYWORDS kwXmlStylesheet = {
 // Apache Config
 // https://httpd.apache.org/docs/2.2/en/mod/directives.html
 // https://httpd.apache.org/docs/2.4/en/mod/directives.html
-static NP2_KEYWORDS kwApache = {
+static const char * const kwApache[NP2_KEYWORDS_COUNT] = {
 "AuthnProviderAlias AuthzProviderAlias Directory DirectoryMatch Else ElseIf Files FilesMatch If IfDefine IfModule IfVersion Limit LimitExcept Location LocationMatch Proxy ProxyMatch RequireAll RequireAny RequireNone VirtualHost "
 , // Directive
 "AcceptFilter AcceptMutex AcceptPathInfo AccessFileName Action AddAlt AddAltByEncoding AddAltByType AddCharset AddDefaultCharset AddDescription AddEncoding AddHandler AddIcon AddIconByEncoding AddIconByType AddInputFilter AddLanguage AddModuleInfo AddOutputFilter AddOutputFilterByType AddType "
@@ -93,7 +94,7 @@ nullptr
 };
 
 // Apple Property List
-static NP2_KEYWORDS kwPList = {
+static const char * const kwPList[NP2_KEYWORDS_COUNT] = {
 "plist array data date dict key real integer string "
 , nullptr, nullptr, nullptr
 };
@@ -102,7 +103,7 @@ static NP2_KEYWORDS kwPList = {
 // SVG Document
 
 
-static NP2_KEYWORDS *np2_LexKeyword;
+static NP2_KEYWORDS const *np2_LexKeyword;
 
 static inline void UpdateLexerExtraKeywords() noexcept {
 	if (np2LexLangIndex == 0) {

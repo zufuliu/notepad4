@@ -1,7 +1,7 @@
 #include "EditLexer.h"
 #include "EditStyleX.h"
 
-static KEYWORDLIST Keywords_IDL = {{
+static const char * const Keywords_IDL[] = {
 "const enum import in interface out typedef uuid "
 ,	// type keyword
 "BSTR LONG DWORD HRESULT ULONG "
@@ -22,9 +22,9 @@ static KEYWORDLIST Keywords_IDL = {{
 
 , nullptr, nullptr, nullptr, nullptr, nullptr, nullptr
 , nullptr
-}};
+};
 
-static EDITSTYLE Styles_IDL[] = {
+static const EDITSTYLE Styles_IDL[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_C_WORD, NP2StyleX_Keyword, L"fore:#0000FF" },
 	{ SCE_C_WORD2, NP2StyleX_TypeKeyword, L"fore:#0000FF" },
@@ -44,6 +44,6 @@ EDITLEXER lexIDL = {
 	SCLEX_CPP, NP2LEX_IDL,
 	EDITLEXER_HOLE(L"Interface Definition File", Styles_IDL),
 	L"idl; odl; midl",
-	&Keywords_IDL,
+	Keywords_IDL,
 	Styles_IDL
 };
