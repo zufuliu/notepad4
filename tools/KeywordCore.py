@@ -261,7 +261,6 @@ def remove_duplicate_lower(keywords, duplicate):
 def first_word_on_each_line(doc):
 	return re.findall(r'^\s*(\w+)', doc, re.MULTILINE)
 
-
 def parse_actionscript_api_file(path):
 	sections = read_api_file(path, '//')
 	keywordMap = {}
@@ -1070,6 +1069,34 @@ def parse_fsharp_api_file(path):
 		('preprocessor', keywordMap['preprocessor'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp | KeywordAttr.Special),
 		('attributes', [], KeywordAttr.NoLexer),
 		('comment tag', CSharpKeywordMap['comment tag'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp | KeywordAttr.Special),
+	]
+
+def parse_GeoGebra_api_file(path):
+	sections = read_api_file(path, '//')
+	keywordMap = {}
+	for key, doc in sections:
+		if key == 'keywords':
+			keywordMap[key] = doc.split()
+		elif key == 'constants':
+			keywordMap[key] = doc.split()
+		elif key == 'innerfunctions':
+			items = re.findall(r'^(\w+\(\)).*$', doc, re.MULTILINE)
+			keywordMap[key] = items
+		elif key == 'functions':
+			items = re.findall(r'^(\w+\(\)).*$', doc, re.MULTILINE)
+			keywordMap[key] = items
+
+	RemoveDuplicateKeyword(keywordMap, [
+		'keywords',
+		'constants',
+		'innerfunctions',
+		'functions',
+	])
+	return [
+		('keywords', keywordMap['keywords'], KeywordAttr.Special),
+		('constants', keywordMap['constants'], KeywordAttr.Special),
+		('innerfunctions', keywordMap['innerfunctions'], KeywordAttr.Special),
+		('functions', keywordMap['functions'], KeywordAttr.Special),
 	]
 
 def parse_gn_api_file(path):
