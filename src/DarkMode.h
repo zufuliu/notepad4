@@ -24,6 +24,7 @@ void DarkMode_ApplyToBars(HWND hwnd, HWND hwndToolbar, HWND hwndReBar, HWND hwnd
 void DarkMode_OnToolbarBeginAdjust() noexcept;
 void DarkMode_OnToolbarEndAdjust() noexcept;
 void DarkMode_OnThemeChanged(int newTheme) noexcept;
+int DarkMode_ResolveStyleTheme(int theme) noexcept;
 bool DarkMode_IsEnabled() noexcept;
 void DarkMode_FillDialogWithFooter(HWND hwnd, HDC hdc, HWND hwndMainArea) noexcept;
 LRESULT DarkMode_OnCtlColorDlgStaticText(HDC hdc, bool isTextEnabled) noexcept;

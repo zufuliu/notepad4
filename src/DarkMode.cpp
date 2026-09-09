@@ -37,6 +37,13 @@ static bool DarkMode_IsHighContrast() noexcept {
 		&& (highContrast.dwFlags & HCF_HIGHCONTRASTON) != 0;
 }
 
+int DarkMode_ResolveStyleTheme(int theme) noexcept {
+	if (theme == StyleTheme_System) {
+		return (!DarkMode_IsHighContrast() && dmlib::isDarkModeReg()) ? StyleTheme_Dark : StyleTheme_Light;
+	}
+	return theme;
+}
+
 static UINT DarkMode_TypeForStyleTheme(int theme) noexcept {
 	if (DarkMode_IsHighContrast()) {
 		return static_cast<UINT>(dmlib::DarkModeType::classic);

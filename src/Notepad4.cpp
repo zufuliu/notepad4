@@ -67,6 +67,9 @@ static HICON hTrayIcon = nullptr;
 static UINT uTrayIconDPI = 0;
 
 static void RefreshDarkModeUI(HWND hwnd) noexcept {
+	if (bInitDone) {
+		Style_OnStyleThemeChanged(np2StyleThemeMode);
+	}
 	DarkMode_OnThemeChanged(np2StyleTheme);
 	DarkMode_ApplyToWindow(hwnd);
 	if (bInitDone) {
@@ -2522,8 +2525,8 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 
 	CheckCmd(hmenu, IDM_VIEW_SHOW_FOLDING, bShowCodeFolding);
 	CheckCmd(hmenu, IDM_VIEW_USEDEFAULT_CODESTYLE, pLexCurrent->bUseDefaultCodeStyle);
-	i = IDM_VIEW_STYLE_THEME_DEFAULT + np2StyleTheme;
-	CheckMenuRadioItem(hmenu, IDM_VIEW_STYLE_THEME_DEFAULT, IDM_VIEW_STYLE_THEME_DARK, i, MF_BYCOMMAND);
+	i = (np2StyleThemeMode == StyleTheme_System) ? IDM_VIEW_STYLE_THEME_SYSTEM : IDM_VIEW_STYLE_THEME_LIGHT + np2StyleThemeMode;
+	CheckMenuRadioItem(hmenu, IDM_VIEW_STYLE_THEME_SYSTEM, IDM_VIEW_STYLE_THEME_DARK, i, MF_BYCOMMAND);
 
 	CheckCmd(hmenu, IDM_VIEW_WORDWRAP, fvCurFile.fWordWrap);
 	i = IDM_VIEW_FONTQUALITY_DEFAULT + iFontQuality;
@@ -3808,9 +3811,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		Style_ToggleUseDefaultCodeStyle();
 		break;
 
-	case IDM_VIEW_STYLE_THEME_DEFAULT:
+	case IDM_VIEW_STYLE_THEME_LIGHT:
 	case IDM_VIEW_STYLE_THEME_DARK:
-		Style_OnStyleThemeChanged(LOWORD(wParam) - IDM_VIEW_STYLE_THEME_DEFAULT);
+	case IDM_VIEW_STYLE_THEME_SYSTEM:
+		Style_OnStyleThemeChanged((LOWORD(wParam) == IDM_VIEW_STYLE_THEME_SYSTEM)
+			? StyleTheme_System : LOWORD(wParam) - IDM_VIEW_STYLE_THEME_LIGHT);
 		RefreshDarkModeUI(hwnd);
 		break;
 
@@ -7157,6 +7162,7 @@ bool FileSave(FileSaveFlag saveFlag) {
 				LoadSettings();
 				if (np2StyleTheme != oldStyleTheme) {
 					RefreshDarkModeUI(hwndMain);
+					Style_SetLexer(pLexCurrent, false);
 				}
 				if (bSaveRecentFiles) {
 					mruFile.Reload();
@@ -7165,10 +7171,10 @@ bool FileSave(FileSaveFlag saveFlag) {
 					mruFind.Reload();
 					mruReplace.Reload();
 				}
-				if (np2StyleTheme == StyleTheme_Default) {
+				if (np2StyleTheme == StyleTheme_Light) {
 					Style_LoadAll(static_cast<StyleLoadFlag>(StyleLoadFlag_Reload | StyleLoadFlag_Apply));
 				}
-			} else if (np2StyleTheme != StyleTheme_Default && PathEqual(szCurFile, darkStyleThemeFilePath)) {
+			} else if (np2StyleTheme != StyleTheme_Light && PathEqual(szCurFile, darkStyleThemeFilePath)) {
 				Style_LoadAll(static_cast<StyleLoadFlag>(StyleLoadFlag_Reload | StyleLoadFlag_Apply));
 			}
 		}
