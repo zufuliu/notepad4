@@ -3087,17 +3087,36 @@ static void paintStatusBar(HWND hWnd, HDC hdc, dmlib_subclass::StatusBarData& st
 
 	::FillRect(hdc, &rcClient, dmlib::getBackgroundBrush());
 
-	const auto nParts = static_cast<int>(::SendMessage(hWnd, SB_GETPARTS, 0, 0));
+	auto& themeData = statusBarData.m_themeData;
+	const bool drawSizeGrip = hasSizeGrip && themeData.ensureTheme(hWnd);
+	SIZE szGrip{};
+	if (drawSizeGrip)
+	{
+		::GetThemePartSize(themeData.getHTheme(), hdc, SP_GRIPPER, 0, &rcClient, TS_DRAW, &szGrip);
+	}
+
+	const bool isSimple = ::SendMessage(hWnd, SB_ISSIMPLE, 0, 0) != FALSE;
+	// Simple text is set with SB_SIMPLEID, but retrieved through part 0.
+	const auto nParts = isSimple ? 1 : static_cast<int>(::SendMessage(hWnd, SB_GETPARTS, 0, 0));
 	DMLIB_BUF_WSTRING str;
 	RECT rcPart{};
 	RECT rcIntersect{};
 	// no edge before size grip
 	const int iLastDiv = nParts - (hasSizeGrip ? 1 : 0);
 	// Don't draw edge if there is only one part without size grip.
-	const bool drawEdge = (nParts >= 2 || !hasSizeGrip);
+	const bool drawEdge = !isSimple && (nParts >= 2 || !hasSizeGrip);
 	for (int i = 0; i < nParts; ++i)
 	{
-		::SendMessage(hWnd, SB_GETRECT, static_cast<WPARAM>(i), reinterpret_cast<LPARAM>(&rcPart));
+		if (isSimple)
+		{
+			// SB_GETRECT only exposes normal parts, even when simple mode is active.
+			rcPart = rcClient;
+			rcPart.right -= szGrip.cx;
+		}
+		else
+		{
+			::SendMessage(hWnd, SB_GETRECT, static_cast<WPARAM>(i), reinterpret_cast<LPARAM>(&rcPart));
+		}
 		if (::IntersectRect(&rcIntersect, &rcPart, &rcClient) == FALSE)
 		{
 			continue;
@@ -3148,7 +3167,7 @@ static void paintStatusBar(HWND hWnd, HDC hdc, dmlib_subclass::StatusBarData& st
 		}
 		else
 		{
-			::DrawText(hdc, str.c_str(), -1, &rcPart, DT_SINGLELINE | DT_VCENTER | DT_LEFT);
+			::DrawText(hdc, str.c_str(), -1, &rcPart, DT_SINGLELINE | DT_VCENTER | DT_LEFT | DT_NOPREFIX);
 		}
 	}
 
@@ -3161,19 +3180,12 @@ static void paintStatusBar(HWND hWnd, HDC hdc, dmlib_subclass::StatusBarData& st
 #endif
 
 		// draw optional size grip
-	if (hasSizeGrip)
+	if (drawSizeGrip)
 	{
-		auto& themeData = statusBarData.m_themeData;
-		if (themeData.ensureTheme(hWnd))
-		{
-			const auto& hTheme = themeData.getHTheme();
-			SIZE szGrip{};
-			::GetThemePartSize(hTheme, hdc, SP_GRIPPER, 0, &rcClient, TS_DRAW, &szGrip);
-			RECT rcGrip{ rcClient };
-			rcGrip.left = rcGrip.right - szGrip.cx;
-			rcGrip.top = rcGrip.bottom - szGrip.cy;
-			::DrawThemeBackground(hTheme, hdc, SP_GRIPPER, 0, &rcGrip, nullptr);
-		}
+		RECT rcGrip{ rcClient };
+		rcGrip.left = rcGrip.right - szGrip.cx;
+		rcGrip.top = rcGrip.bottom - szGrip.cy;
+		::DrawThemeBackground(themeData.getHTheme(), hdc, SP_GRIPPER, 0, &rcGrip, nullptr);
 	}
 }
 
