@@ -232,7 +232,7 @@ void	EditWrapToColumn(int nColumn/*, int nTabWidth*/) noexcept;
 void	EditJoinLinesEx() noexcept;
 void	EditSortLines(EditSortFlag iSortFlags) noexcept;
 
-void	EditJumpTo(Sci_Line iNewLine, Sci_Position iNewCol) noexcept;
+void	EditJumpTo(Sci_Line iNewLine, Sci_Position iNewCol, int iNewColOpt) noexcept;
 void	EditSelectEx(Sci_Position iAnchorPos, Sci_Position iCurrentPos) noexcept;
 void	EditFixPositions() noexcept;
 void	EditEnsureSelectionVisible() noexcept;

@@ -250,6 +250,7 @@ static WCHAR szAutoSaveFolder[MAX_PATH];
 
 static Sci_Line iInitialLine;
 static Sci_Position iInitialColumn;
+static int iInitialColumnOpt = 0;
 static int iInitialLexer;
 
 static bool bLastCopyFromMe = false;
@@ -892,7 +893,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 
 		if (bOpened) {
 			if (flagJumpTo) { // Jump to position
-				EditJumpTo(iInitialLine, iInitialColumn);
+				EditJumpTo(iInitialLine, iInitialColumn, iInitialColumnOpt);
 			}
 			if (flagChangeNotify != TripleBoolean_NotSet) {
 				iFileWatchingMode = (flagChangeNotify == TripleBoolean_False) ? FileWatchingMode_None : FileWatchingMode_AutoReload;
@@ -937,7 +938,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 			SciCall_EndUndoAction();
 			autoCompletionConfig.bIndentText = back;
 			if (flagJumpTo) {
-				EditJumpTo(iInitialLine, iInitialColumn);
+				EditJumpTo(iInitialLine, iInitialColumn, iInitialColumnOpt);
 			} else {
 				EditEnsureSelectionVisible();
 			}
@@ -1339,7 +1340,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 			if (params->flagJumpTo) {
 				const Sci_Line iLine = params->iInitialLine ? params->iInitialLine : 1;
-				EditJumpTo(iLine, params->iInitialColumn);
+				EditJumpTo(iLine, params->iInitialColumn, params->iInitialColumnOpt);
 			}
 			if (bOpened && params->flagMatchText != MatchTextFlag_None) {
 				HandleMatchText(params->flagMatchText, lpsz, params->flagJumpTo);
@@ -1456,7 +1457,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 				iWeakSrcEncoding = iCurrentEncoding;
 				if (FileLoad(static_cast<FileLoadFlag>(FileLoadFlag_DontSave | FileLoadFlag_Reload), szCurFile)) {
 					if (bIsTail) {
-						EditJumpTo(INVALID_POSITION, 0);
+						EditJumpTo(INVALID_POSITION, 0, 0);
 					}
 				}
 			}
@@ -3061,7 +3062,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			SciCall_LineCut(mode & LineSelectionMode_VisualStudio);
 			iCurrentPos = SciCall_GetCurrentPos();
 			const Sci_Line iCurLine = SciCall_LineFromPosition(iCurrentPos);
-			EditJumpTo(iCurLine + (mode != LineSelectionMode_OldVisualStudio), iCol);
+			EditJumpTo(iCurLine + (mode != LineSelectionMode_OldVisualStudio), iCol, 0);
 		} else {
 			SciCall_Cut(false);
 		}
@@ -5705,24 +5706,35 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) noexcept {
 			}
 			break;
 
-		case L'G':
+		case L'G': {
+			const wchar_t option = opt[0];
 			state = CommandParseState_Argument;
 			if (ExtractFirstArgument(lp2, lp1, lp2)) {
 #if defined(_WIN64)
-				int64_t cord[2]{};
+				int64_t cord[3]{};
 				const UINT itok = ParseCommaList64(lp1, cord, COUNTOF(cord));
 #else
-				int cord[2]{};
+				int cord[3]{};
 				const UINT itok = ParseCommaList(lp1, cord, COUNTOF(cord));
 #endif
 				if (itok != 0) {
 					flagJumpTo = true;
 					state = CommandParseState_Consumed;
 					iInitialLine = cord[0];
-					iInitialColumn = cord[1];
+					// /G line,[column[,tabwidth]]: tabwidth: 0, compatible with previous.
+					// /g line,[character[,type]]: type: 0, characters; 1, bytes.
+					const wchar_t lowerCase = option & 0x20;
+					if (cord[1] < 0) {
+						cord[1] = 0;
+					}
+					if (cord[2] < 0) {
+						cord[2] = 0;
+					}
+					iInitialColumn = lowerCase ? -cord[1] : cord[1];
+					iInitialColumnOpt = static_cast<int>(cord[2]);
 				}
 			}
-			break;
+		} break;
 
 		case L'I':
 			flagStartAsTrayIcon = true;
@@ -6960,7 +6972,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 			SciCall_SetSel(iAnchorPos, iCurPos);
 			const Sci_Line iCurLine = iLine - SciCall_LineFromPosition(SciCall_GetCurrentPos());
 			if (abs(iCurLine) > 5) {
-				EditJumpTo(iLine, iCol);
+				EditJumpTo(iLine, iCol, 0);
 			} else {
 				SciCall_EnsureVisible(iDocTopLine);
 				const Sci_Line iNewTopLine = SciCall_GetFirstVisibleLine();
@@ -7376,6 +7388,7 @@ static void ActivatePrevWindow(HWND hwnd, LPCWSTR lpszFile) noexcept {
 
 	params->iInitialLine = iInitialLine;
 	params->iInitialColumn = iInitialColumn;
+	params->iInitialColumnOpt = iInitialColumnOpt;
 
 	params->iSrcEncoding = lpEncodingArg ? Encoding_Match(lpEncodingArg) : CPI_NONE;
 	params->flagSetEncoding = flagSetEncoding;
@@ -7627,9 +7640,9 @@ void GetRelaunchParameters(LPWSTR szParameters, LPCWSTR lpszFile, RelaunchOption
 			WCHAR tchCol[32];
 			PosToStr(line, tchLn);
 			PosToStr(col, tchCol);
-			wsprintf(tch, L" -g %s,%s", tchLn, tchCol);
+			wsprintf(tch, L" -G %s,%s", tchLn, tchCol);
 #else
-			wsprintf(tch, L" -g %d,%d", static_cast<int>(line), static_cast<int>(col));
+			wsprintf(tch, L" -G %d,%d", static_cast<int>(line), static_cast<int>(col));
 #endif
 			lstrcat(szParameters, tch);
 		}

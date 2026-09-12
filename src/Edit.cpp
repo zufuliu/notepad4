@@ -4308,15 +4308,30 @@ void EditSortLines(EditSortFlag iSortFlags) noexcept {
 //
 // EditJumpTo()
 //
-void EditJumpTo(Sci_Line iNewLine, Sci_Position iNewCol) noexcept {
+void EditJumpTo(Sci_Line iNewLine, Sci_Position iNewCol, int iNewColOpt) noexcept {
 	// Jumpt to end with line set to -1
 	if (iNewLine < 0 || iNewLine > SciCall_GetLineCount()) {
 		iNewCol = SciCall_GetLength();
 	} else {
 		--iNewLine;
 		const Sci_Position iLineEndPos = SciCall_GetLineEndPosition(iNewLine);
-		iNewCol = min(iNewCol, iLineEndPos);
-		iNewCol = SciCall_FindColumn(iNewLine, iNewCol - 1);
+		if (iNewCol < 0) { // /g, character[,type]
+			const Sci_Position iStartPos = SciCall_PositionFromLine(iNewLine);
+			iNewCol = -iNewCol;
+			if (iNewColOpt == 0) {// type: 0, characters; 1, bytes
+				--iNewCol;
+				iNewCol = SciCall(SCI_POSITIONRELATIVE, iStartPos, iNewCol);
+			} else {
+				iNewCol = SciCall_PositionBefore(iStartPos + iNewCol);
+			}
+			iNewCol = clamp(iNewCol, iStartPos, iLineEndPos);
+		} else { // /G, column[,tabWidth]
+			if (iNewColOpt > 0) {
+				// iNewCol = SciCall_FindColumnEx(iNewLine, iNewCol - 1, iNewColOpt);
+			} else {
+				iNewCol = SciCall_FindColumn(iNewLine, iNewCol - 1);
+			}
+		}
 	}
 
 	EditSelectEx(iNewCol, iNewCol);
@@ -6031,7 +6046,7 @@ static INT_PTR CALLBACK EditLineNumDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 					PostMessage(hwnd, WM_NEXTDLGCTL, AsInteger<WPARAM>(GetDlgItem(hwnd, IDC_COLNUM)), TRUE);
 				}
 			} else if (iNewLine > 0 && iNewLine <= iMaxLine) {
-				EditJumpTo(iNewLine, iNewCol);
+				EditJumpTo(iNewLine, iNewCol, 0);
 				EndDialog(hwnd, IDOK);
 			} else {
 				PostMessage(hwnd, WM_NEXTDLGCTL, AsInteger<WPARAM>(GetDlgItem(hwnd, ((iNewCol > 0) ? IDC_LINENUM : IDC_COLNUM))), TRUE);
@@ -7076,7 +7091,6 @@ void EditOpenSelection(OpenSelectionType type) {
 
 			LPWSTR lpParameters = link;
 			if (line != nullptr) {
-				// TODO: improve the code when column is actually character index
 				lpParameters = static_cast<LPWSTR>(NP2HeapAlloc(sizeof(path)));
 				wsprintf(lpParameters, L"-g %s,%s %s", line, column, link);
 			}
@@ -7840,7 +7854,7 @@ void FoldClickAt(Sci_Position pos, int mode) noexcept {
 
 	FoldPerformAction(ln, mode, FOLD_ACTION_SNIFF);
 	if (fGotoFoldPoint) {
-		EditJumpTo(ln + 1, 0);
+		EditJumpTo(ln + 1, 0, 0);
 	}
 }
 
@@ -7856,14 +7870,14 @@ void FoldAltArrow(int key, int mode) noexcept {
 			const Sci_Line lnTotal = SciCall_GetLineCount();
 			for (ln = ln + 1; ln < lnTotal; ++ln) {
 				if ((SciCall_GetFoldLevel(ln) & SC_FOLDLEVELHEADERFLAG) && SciCall_GetLineVisible(ln)) {
-					EditJumpTo(ln + 1, 0);
+					EditJumpTo(ln + 1, 0, 0);
 					return;
 				}
 			}
 		} else if (key == SCK_UP && !(mode & SCMOD_CTRL)) {// Jump to the previous visible fold point
 			for (ln = ln - 1; ln >= 0; --ln) {
 				if ((SciCall_GetFoldLevel(ln) & SC_FOLDLEVELHEADERFLAG) && SciCall_GetLineVisible(ln)) {
-					EditJumpTo(ln + 1, 0);
+					EditJumpTo(ln + 1, 0, 0);
 					return;
 				}
 			}
@@ -7976,6 +7990,6 @@ void EditGotoBlock(int menu) noexcept {
 
 	if (iLine >= 0 && iLine != iCurLine) {
 		const Sci_Position column = SciCall_GetColumn(iCurPos);
-		EditJumpTo(iLine + 1, column + 1);
+		EditJumpTo(iLine + 1, column + 1, 0);
 	}
 }
