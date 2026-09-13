@@ -64,11 +64,10 @@ struct NP2PARAMS {
 	bool	flagQuietCreate;
 	bool	flagTitleExcerpt;
 	bool	flagJumpTo;
-	bool	flagJumpToLinePos;
 	TripleBoolean	flagChangeNotify;
 	int		iInitialLexer;
 	Sci_Line		iInitialLine;
-	Sci_Position	iInitialColumn;
+	Sci_Position	iInitialLinePos;
 	int		iSrcEncoding;
 	int		flagSetEncoding;
 	int		flagSetEOLMode;

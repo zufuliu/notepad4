@@ -249,7 +249,7 @@ static int autoSaveCount = 0;
 static WCHAR szAutoSaveFolder[MAX_PATH];
 
 static Sci_Line iInitialLine;
-static Sci_Position iInitialColumn;
+static Sci_Position iInitialLinePos;
 static int iInitialLexer;
 
 static bool bLastCopyFromMe = false;
@@ -391,7 +391,6 @@ static bool	flagPasteBoard			= false;
 static int	flagSetEncoding			= 0;
 static int	flagSetEOLMode			= 0;
 static bool	flagJumpTo				= false;
-static bool	flagJumpToLinePos		= false;
 static MatchTextFlag flagMatchText	= MatchTextFlag_None;
 static TripleBoolean flagChangeNotify = TripleBoolean_NotSet;
 static bool	flagLexerSpecified		= false;
@@ -893,11 +892,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 
 		if (bOpened) {
 			if (flagJumpTo) { // Jump to position
-				if (flagJumpToLinePos) {
-					iInitialColumn = SciCall_GetColumn(SciCall_PositionFromLine(iInitialLine - 1) + iInitialColumn);
-					flagJumpToLinePos = false;
-				}
-				EditJumpTo(iInitialLine, iInitialColumn);
+				EditJumpTo(iInitialLine, iInitialLinePos);
 			}
 			if (flagChangeNotify != TripleBoolean_NotSet) {
 				iFileWatchingMode = (flagChangeNotify == TripleBoolean_False) ? FileWatchingMode_None : FileWatchingMode_AutoReload;
@@ -942,7 +937,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 			SciCall_EndUndoAction();
 			autoCompletionConfig.bIndentText = back;
 			if (flagJumpTo) {
-				EditJumpTo(iInitialLine, iInitialColumn);
+				EditJumpTo(iInitialLine, iInitialLinePos);
 			} else {
 				EditEnsureSelectionVisible();
 			}
@@ -1344,8 +1339,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 			if (params->flagJumpTo) {
 				const Sci_Line iLine = params->iInitialLine ? params->iInitialLine : 1;
-				const Sci_Position iColumn = params->flagJumpToLinePos ? params->iInitialColumn :  SciCall_GetColumn(SciCall_PositionFromLine(iLine - 1) + params->iInitialColumn);
-				EditJumpTo(iLine, iColumn);
+				EditJumpTo(iLine, params->iInitialLinePos);
 			}
 			if (bOpened && params->flagMatchText != MatchTextFlag_None) {
 				HandleMatchText(params->flagMatchText, lpsz, params->flagJumpTo);
@@ -3063,11 +3057,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		if (SciCall_IsSelectionEmpty() && iLineSelectionMode != LineSelectionMode_None) {
 			const int mode = iLineSelectionMode;
 			Sci_Position iCurrentPos = SciCall_GetCurrentPos();
-			const Sci_Position iCol = SciCall_GetColumn(iCurrentPos) + 1;
+			const Sci_Position iCol = SciCall_GetColumn(iCurrentPos);
 			SciCall_LineCut(mode & LineSelectionMode_VisualStudio);
 			iCurrentPos = SciCall_GetCurrentPos();
 			const Sci_Line iCurLine = SciCall_LineFromPosition(iCurrentPos);
-			EditJumpTo(iCurLine + (mode != LineSelectionMode_OldVisualStudio), iCol);
+			const Sci_Position iLinePos = SciCall_FindColumn(iCurLine, iCol) - SciCall_PositionFromLine(SciCall_LineFromPosition(iCurrentPos)) + 1;
+			EditJumpTo(iCurLine + (mode != LineSelectionMode_OldVisualStudio), iLinePos);
 		} else {
 			SciCall_Cut(false);
 		}
@@ -5723,10 +5718,9 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) noexcept {
 #endif
 				if (itok != 0) {
 					flagJumpTo = true;
-					flagJumpToLinePos = true;
 					state = CommandParseState_Consumed;
 					iInitialLine = cord[0];
-					iInitialColumn = cord[1];
+					iInitialLinePos = cord[1];
 				}
 			}
 			break;
@@ -6756,7 +6750,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 	Sci_Position iCurPos = 0;
 	Sci_Position iAnchorPos = 0;
 	Sci_Line iLine = 0;
-	Sci_Position iCol = 0;
+	Sci_Position iLinePos = 0;
 	Sci_Line iVisTopLine = 0;
 	Sci_Line iDocTopLine = 0;
 	int iXOffset = 0;
@@ -6769,7 +6763,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 			iCurPos = SciCall_GetCurrentPos();
 			iAnchorPos = SciCall_GetAnchor();
 			iLine = SciCall_LineFromPosition(iCurPos) + 1;
-			iCol = SciCall_GetColumn(iCurPos) + 1;
+			iLinePos = iCurPos - SciCall_PositionFromLine(SciCall_LineFromPosition(iCurPos)) + 1;
 			iVisTopLine = SciCall_GetFirstVisibleLine();
 			iDocTopLine = SciCall_DocLineFromVisible(iVisTopLine);
 			iXOffset = SciCall_GetXOffset();
@@ -6967,7 +6961,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 			SciCall_SetSel(iAnchorPos, iCurPos);
 			const Sci_Line iCurLine = iLine - SciCall_LineFromPosition(SciCall_GetCurrentPos());
 			if (abs(iCurLine) > 5) {
-				EditJumpTo(iLine, iCol);
+				EditJumpTo(iLine, iLinePos);
 			} else {
 				SciCall_EnsureVisible(iDocTopLine);
 				const Sci_Line iNewTopLine = SciCall_GetFirstVisibleLine();
@@ -7355,7 +7349,6 @@ static void ActivatePrevWindow(HWND hwnd, LPCWSTR lpszFile) noexcept {
 	params->flagQuietCreate = flagQuietCreate;
 	params->flagTitleExcerpt = false;
 	params->flagJumpTo = flagJumpTo;
-	params->flagJumpToLinePos = flagJumpToLinePos;
 	params->flagChangeNotify = flagChangeNotify;
 
 	LPWSTR lpsz = &params->wchData;
@@ -7383,7 +7376,7 @@ static void ActivatePrevWindow(HWND hwnd, LPCWSTR lpszFile) noexcept {
 	}
 
 	params->iInitialLine = iInitialLine;
-	params->iInitialColumn = iInitialColumn;
+	params->iInitialLinePos = iInitialLinePos;
 
 	params->iSrcEncoding = lpEncodingArg ? Encoding_Match(lpEncodingArg) : CPI_NONE;
 	params->flagSetEncoding = flagSetEncoding;

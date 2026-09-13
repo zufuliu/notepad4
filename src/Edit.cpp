@@ -4308,18 +4308,18 @@ void EditSortLines(EditSortFlag iSortFlags) noexcept {
 //
 // EditJumpTo()
 //
-void EditJumpTo(Sci_Line iNewLine, Sci_Position iNewCol) noexcept {
+void EditJumpTo(Sci_Line iNewLine, Sci_Position iNewPos) noexcept {
 	// Jumpt to end with line set to -1
 	if (iNewLine < 0 || iNewLine > SciCall_GetLineCount()) {
-		iNewCol = SciCall_GetLength();
+		iNewPos = SciCall_GetLength();
 	} else {
 		--iNewLine;
-		const Sci_Position iLineEndPos = SciCall_GetLineEndPosition(iNewLine);
-		iNewCol = min(iNewCol, iLineEndPos);
-		iNewCol = SciCall_FindColumn(iNewLine, iNewCol - 1);
+		--iNewPos;
+		iNewPos += SciCall_PositionFromLine(iNewLine);
+		iNewPos = min(iNewPos, SciCall_GetLineEndPosition(iNewLine));
 	}
 
-	EditSelectEx(iNewCol, iNewCol);
+	EditSelectEx(iNewPos, iNewPos);
 	SciCall_ChooseCaretX();
 }
 
@@ -6031,7 +6031,8 @@ static INT_PTR CALLBACK EditLineNumDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 					PostMessage(hwnd, WM_NEXTDLGCTL, AsInteger<WPARAM>(GetDlgItem(hwnd, IDC_COLNUM)), TRUE);
 				}
 			} else if (iNewLine > 0 && iNewLine <= iMaxLine) {
-				EditJumpTo(iNewLine, iNewCol);
+				const Sci_Position iNewPos = SciCall_FindColumn(iNewLine - 1, iNewCol - 1) - SciCall_PositionFromLine(iNewLine - 1) + 1;
+				EditJumpTo(iNewLine, iNewPos);
 				EndDialog(hwnd, IDOK);
 			} else {
 				PostMessage(hwnd, WM_NEXTDLGCTL, AsInteger<WPARAM>(GetDlgItem(hwnd, ((iNewCol > 0) ? IDC_LINENUM : IDC_COLNUM))), TRUE);
@@ -7976,6 +7977,6 @@ void EditGotoBlock(int menu) noexcept {
 
 	if (iLine >= 0 && iLine != iCurLine) {
 		const Sci_Position column = SciCall_GetColumn(iCurPos);
-		EditJumpTo(iLine + 1, column + 1);
+		EditJumpTo(iLine + 1, SciCall_FindColumn(iLine, column) - SciCall_PositionFromLine(iLine) + 1);
 	}
 }
