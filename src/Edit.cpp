@@ -6023,7 +6023,7 @@ static INT_PTR CALLBACK EditLineNumDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 			// directly goto specific position
 			if (fTranslated2 && !fTranslated) {
 				if (iNewCol > 0 && iNewCol <= iLength) {
-					--iNewCol;
+					iNewCol = SciCall_PositionBefore(iNewCol);
 					EditSelectEx(iNewCol, iNewCol);
 					SciCall_ChooseCaretX();
 					EndDialog(hwnd, IDOK);
