@@ -500,7 +500,8 @@ BEGIN
 		MENUITEM "&Применять стиль кода по умолчанию\tShift+F12",					IDM_VIEW_USEDEFAULT_CODESTYLE
 		POPUP "&Тема"
 		BEGIN
-			MENUITEM "&По умолчанию",								IDM_VIEW_STYLE_THEME_DEFAULT
+			MENUITEM "Как в с&истеме",								IDM_VIEW_STYLE_THEME_SYSTEM
+			MENUITEM "&Светлая",									IDM_VIEW_STYLE_THEME_LIGHT
 			MENUITEM "&Тёмная",									IDM_VIEW_STYLE_THEME_DARK
 		END
 		MENUITEM SEPARATOR
