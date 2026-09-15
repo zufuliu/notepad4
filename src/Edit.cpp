@@ -4315,8 +4315,14 @@ void EditJumpTo(Sci_Line iNewLine, Sci_Position iNewCol) noexcept {
 	} else {
 		--iNewLine;
 		const Sci_Position iLineEndPos = SciCall_GetLineEndPosition(iNewLine);
-		iNewCol = min(iNewCol, iLineEndPos);
-		iNewCol = SciCall_FindColumn(iNewLine, iNewCol - 1);
+		if (iNewCol < 0) { // character offset
+			const Sci_Position iStartPos = SciCall_PositionFromLine(iNewLine);
+			iNewCol = SciCall_PositionBefore(iStartPos - iNewCol);
+			iNewCol = clamp(iNewCol, iStartPos, iLineEndPos);
+		} else {
+			iNewCol = min(iNewCol, iLineEndPos);
+			iNewCol = SciCall_FindColumn(iNewLine, iNewCol - 1);
+		}
 	}
 
 	EditSelectEx(iNewCol, iNewCol);
@@ -7076,7 +7082,6 @@ void EditOpenSelection(OpenSelectionType type) {
 
 			LPWSTR lpParameters = link;
 			if (line != nullptr) {
-				// TODO: improve the code when column is actually character index
 				lpParameters = static_cast<LPWSTR>(NP2HeapAlloc(sizeof(path)));
 				wsprintf(lpParameters, L"-g %s,%s %s", line, column, link);
 			}
