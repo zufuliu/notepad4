@@ -67,7 +67,7 @@ struct NP2PARAMS {
 	TripleBoolean	flagChangeNotify;
 	int		iInitialLexer;
 	Sci_Line		iInitialLine;
-	Sci_Position	iInitialLinePos;
+	Sci_Position	iInitialColumn;
 	int		iSrcEncoding;
 	int		flagSetEncoding;
 	int		flagSetEOLMode;

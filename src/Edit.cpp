@@ -4308,18 +4308,24 @@ void EditSortLines(EditSortFlag iSortFlags) noexcept {
 //
 // EditJumpTo()
 //
-void EditJumpTo(Sci_Line iNewLine, Sci_Position iNewPos) noexcept {
+void EditJumpTo(Sci_Line iNewLine, Sci_Position iNewCol) noexcept {
 	// Jumpt to end with line set to -1
 	if (iNewLine < 0 || iNewLine > SciCall_GetLineCount()) {
-		iNewPos = SciCall_GetLength();
+		iNewCol = SciCall_GetLength();
 	} else {
 		--iNewLine;
-		--iNewPos;
-		iNewPos += SciCall_PositionFromLine(iNewLine);
-		iNewPos = min(iNewPos, SciCall_GetLineEndPosition(iNewLine));
+		const Sci_Position iLineEndPos = SciCall_GetLineEndPosition(iNewLine);
+		if (iNewCol < 0) { // character offset
+			const Sci_Position iStartPos = SciCall_PositionFromLine(iNewLine);
+			iNewCol = SciCall_PositionBefore(iStartPos - iNewCol);
+			iNewCol = clamp(iNewCol, iStartPos, iLineEndPos);
+		} else {
+			iNewCol = min(iNewCol, iLineEndPos);
+			iNewCol = SciCall_FindColumn(iNewLine, iNewCol - 1);
+		}
 	}
 
-	EditSelectEx(iNewPos, iNewPos);
+	EditSelectEx(iNewCol, iNewCol);
 	SciCall_ChooseCaretX();
 }
 
@@ -6031,8 +6037,7 @@ static INT_PTR CALLBACK EditLineNumDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 					PostMessage(hwnd, WM_NEXTDLGCTL, AsInteger<WPARAM>(GetDlgItem(hwnd, IDC_COLNUM)), TRUE);
 				}
 			} else if (iNewLine > 0 && iNewLine <= iMaxLine) {
-				const Sci_Position iNewPos = SciCall_FindColumn(iNewLine - 1, iNewCol - 1) - SciCall_PositionFromLine(iNewLine - 1) + 1;
-				EditJumpTo(iNewLine, iNewPos);
+				EditJumpTo(iNewLine, iNewCol);
 				EndDialog(hwnd, IDOK);
 			} else {
 				PostMessage(hwnd, WM_NEXTDLGCTL, AsInteger<WPARAM>(GetDlgItem(hwnd, ((iNewCol > 0) ? IDC_LINENUM : IDC_COLNUM))), TRUE);
@@ -7077,7 +7082,6 @@ void EditOpenSelection(OpenSelectionType type) {
 
 			LPWSTR lpParameters = link;
 			if (line != nullptr) {
-				// TODO: improve the code when column is actually character index
 				lpParameters = static_cast<LPWSTR>(NP2HeapAlloc(sizeof(path)));
 				wsprintf(lpParameters, L"-g %s,%s %s", line, column, link);
 			}
@@ -7977,6 +7981,6 @@ void EditGotoBlock(int menu) noexcept {
 
 	if (iLine >= 0 && iLine != iCurLine) {
 		const Sci_Position column = SciCall_GetColumn(iCurPos);
-		EditJumpTo(iLine + 1, SciCall_FindColumn(iLine, column) - SciCall_PositionFromLine(iLine) + 1);
+		EditJumpTo(iLine + 1, column + 1);
 	}
 }
