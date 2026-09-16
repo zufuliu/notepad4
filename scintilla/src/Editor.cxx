@@ -3824,7 +3824,8 @@ SelectionPosition Editor::PositionMove(Message iMessage, SelectionPosition spCar
 	case Message::CharLeftExtend:
 		if (spCaret.VirtualSpace()) {
 			spCaret.AddVirtualSpace(-1);
-		} else if (!FlagSet(virtualSpaceOptions, VirtualSpace::NoWrapLineStart) || pdoc->GetColumn(spCaret.Position()) > 0) {
+		} else if (!FlagSet(virtualSpaceOptions, VirtualSpace::NoWrapLineStart) ||
+			!pdoc->IsLineStartPosition(spCaret.Position())) {
 			spCaret.Add(-1);
 		}
 		return spCaret;
@@ -3965,7 +3966,8 @@ int Editor::HorizontalMove(Message iMessage) {
 		case Message::CharLeftExtend: // only when sel.IsRectangular() && sel.MoveExtends()
 			if (pdoc->IsLineEndPosition(spCaret.Position()) && spCaret.VirtualSpace()) {
 				spCaret.SetVirtualSpace(spCaret.VirtualSpace() - 1);
-			} else if (!FlagSet(virtualSpaceOptions, VirtualSpace::NoWrapLineStart) || pdoc->GetColumn(spCaret.Position()) > 0) {
+			} else if (!FlagSet(virtualSpaceOptions, VirtualSpace::NoWrapLineStart) ||
+				!pdoc->IsLineStartPosition(spCaret.Position())) {
 				spCaret = SelectionPosition(spCaret.Position() - 1);
 			}
 			break;
@@ -4396,9 +4398,7 @@ void Editor::Indent(bool forwards, bool lineIndent) {
 				} else {
 					const Sci::Position newColumn = std::max<Sci::Position>(0,
 						((column - 1) / pdoc->tabInChars) * pdoc->tabInChars);
-					Sci::Position newPos = caretPosition;
-					while (pdoc->GetColumn(newPos) > newColumn)
-						newPos--;
+					const Sci::Position newPos = pdoc->FindColumn(lineCurrentPos, newColumn);
 					sel.Range(r) = SelectionRange(newPos);
 				}
 			}

@@ -1703,20 +1703,17 @@ Sci::Position Document::GetColumn(Sci::Position pos) const noexcept {
 	const Sci::Line line = SciLineFromPosition(pos);
 	if (IsValidIndex(line, LinesTotal())) {
 		const Sci::Position length = LengthNoExcept();
+		pos = std::min(pos, length);
 		for (Sci::Position i = cb.LineStart(line); i < pos;) {
 			const char ch = cb.CharAt(i);
 			if (ch == '\t') {
 				column = NextTab(column, tabInChars);
 				i++;
-			} else if (ch == '\r') {
-				return column;
-			} else if (ch == '\n') {
+			} else if (ch == '\n' || ch == '\r') {
 				return column;
 			} else if (UTF8IsAscii(ch)) {
 				column++;
 				i++;
-			} else if (i >= length) {
-				return column;
 			} else {
 				column++;
 				i = NextPosition(i, 1);
@@ -1792,9 +1789,7 @@ Sci::Position Document::FindColumn(Sci::Line line, Sci::Position column) const n
 				if (columnCurrent > column)
 					return position;
 				position++;
-			} else if (ch == '\r') {
-				return position;
-			} else if (ch == '\n') {
+			} else if (ch == '\n' || ch == '\r') {
 				return position;
 			} else if (UTF8IsAscii(ch)) {
 				columnCurrent++;

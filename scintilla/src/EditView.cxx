@@ -606,9 +606,7 @@ uint32_t EditView::LayoutLine(const EditModel &model, Surface *surface, const Vi
 			validity = LineLayout::ValidLevel::lines;
 		} else if (vstyle.edgeState == EdgeVisualStyle::Background) {
 			Sci::Position edgePosition = model.pdoc->FindColumn(line, vstyle.theEdge.column);
-			if (edgePosition >= posLineStart) {
-				edgePosition -= posLineStart;
-			}
+			edgePosition -= posLineStart;
 			ll->edgeColumn = static_cast<int>(edgePosition);
 		}
 	}
