@@ -6710,14 +6710,10 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		return pdoc->MovePositionOutsideChar(PositionFromUPtr(wParam) + 1, 1, true);
 
 	case Message::PositionRelative:
-		return std::clamp<Sci::Position>(pdoc->GetRelativePosition(
-			PositionFromUPtr(wParam), lParam),
-			0, pdoc->LengthNoExcept());
+		return pdoc->GetRelativePosition(PositionFromUPtr(wParam), lParam);
 
 	case Message::PositionRelativeCodeUnits:
-		return std::clamp<Sci::Position>(pdoc->GetRelativePositionUTF16(
-			PositionFromUPtr(wParam), lParam),
-			0, pdoc->LengthNoExcept());
+		return pdoc->GetRelativePositionUTF16(PositionFromUPtr(wParam), lParam);
 
 	case Message::LineScroll:
 		ScrollTo(topLine + lParam);
