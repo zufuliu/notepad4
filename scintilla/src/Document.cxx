@@ -1727,8 +1727,8 @@ Sci::Position Document::GetColumn(Sci::Position pos) const noexcept {
 }
 
 Sci::Position Document::CountCharacters(Sci::Position startPos, Sci::Position endPos) const noexcept {
-	startPos = MovePositionOutsideChar(startPos, 1, false);
-	endPos = MovePositionOutsideChar(endPos, -1, false);
+	// startPos = MovePositionOutsideChar(startPos, 1, false);
+	// endPos = MovePositionOutsideChar(endPos, -1, false);
 	Sci::Position count = 0;
 	Sci::Position i = startPos;
 	while (i < endPos) {
@@ -1766,8 +1766,8 @@ void Document::CountCharactersAndColumns(sptr_t lParam) const noexcept {
 }
 
 Sci::Position Document::CountUTF16(Sci::Position startPos, Sci::Position endPos) const noexcept {
-	startPos = MovePositionOutsideChar(startPos, 1, false);
-	endPos = MovePositionOutsideChar(endPos, -1, false);
+	// startPos = MovePositionOutsideChar(startPos, 1, false);
+	// endPos = MovePositionOutsideChar(endPos, -1, false);
 	Sci::Position count = 0;
 	Sci::Position i = startPos;
 	while (i < endPos) {
