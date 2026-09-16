@@ -661,7 +661,7 @@ Sci::Position CellBuffer::LineStart(Sci::Line line) const noexcept {
 
 Sci::Position CellBuffer::LineEnd(Sci::Line line) const noexcept {
 	Sci::Position position = LineStart(line + 1);
-	if (line < Lines() - 1) {
+	if (IsValidIndex(line, Lines() - 1)) {
 		if (LineEndType::Unicode == GetLineEndTypes()) {
 			const unsigned char bytes[] = {
 				UCharAt(position - 3),

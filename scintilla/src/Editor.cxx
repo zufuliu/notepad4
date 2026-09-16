@@ -6604,20 +6604,19 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		return pdoc->SciLineFromPosition(PositionFromUPtr(wParam));
 
 	case Message::PositionFromLine:
-		if (PositionFromUPtr(wParam) < 0)
-			wParam = pdoc->SciLineFromPosition(SelectionStart().Position());
-		if (wParam == 0)
-			return 0; 	// Even if there is no text, there is a first line that starts at 0
-		if (LineFromUPtr(wParam) > pdoc->LinesTotal())
-			return -1;
+		// if (PositionFromUPtr(wParam) < 0)
+		// 	wParam = pdoc->SciLineFromPosition(SelectionStart().Position());
+		// if (wParam == 0)
+		// 	return 0; 	// Even if there is no text, there is a first line that starts at 0
+		// if (LineFromUPtr(wParam) > pdoc->LinesTotal())
+		// 	return -1;
 		//if (wParam > pdoc->SciLineFromPosition(pdoc->LengthNoExcept()))	// Useful test, anyway...
 		//	return -1;
 		return pdoc->LineStart(LineFromUPtr(wParam));
 
 		// Replacement of the old Scintilla interpretation of EM_LINELENGTH
 	case Message::LineLength:
-		if (LineFromUPtr(wParam) < 0 ||
-		        LineFromUPtr(wParam) > pdoc->SciLineFromPosition(pdoc->LengthNoExcept()))
+		if (!IsValidIndex(wParam, pdoc->LinesTotal()))
 			return 0;
 		return pdoc->LineStart(LineFromUPtr(wParam) + 1) - pdoc->LineStart(LineFromUPtr(wParam));
 
