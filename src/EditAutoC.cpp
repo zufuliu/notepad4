@@ -706,6 +706,10 @@ enum {
 	ErlangKeywordIndex_Directive = 1,
 	FSharpKeywordIndex_Preprocessor = 2,
 	FSharpKeywordIndex_CommentTag = 4,
+	GeoGebraKeywordIndex_Keyword = 0,
+	GeoGebraKeywordIndex_Constant = 1,
+	GeoGebraKeywordIndex_Innerfunction = 2,
+	GeoGebraKeywordIndex_Function = 3,
 	GraphVizKeywordIndex_HtmlLabel = 1,
 	GroovyKeywordIndex_Annotation = 7,
 	GroovyKeywordIndex_GroovyDoc = 9,
@@ -2511,6 +2515,7 @@ void EditToggleCommentLine(bool alternative) noexcept {
 	case NP2LEX_COFFEESCRIPT:
 	case NP2LEX_CONFIG:
 	case NP2LEX_ELIXIR:
+	case NP2LEX_GEOGEBRA:
 	case NP2LEX_GN:
 	case NP2LEX_JAMFILE:
 	case NP2LEX_JULIA:
@@ -2967,6 +2972,7 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) noexcept {
 	case NP2LEX_BATCH:
 	case NP2LEX_BLOCKDIAG:
 	case NP2LEX_CSV:
+	case NP2LEX_GEOGEBRA:
 	case NP2LEX_GRAPHVIZ:
 	case NP2LEX_LISP:
 	case NP2LEX_SMALI:
