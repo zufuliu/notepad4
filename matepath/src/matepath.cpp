@@ -671,7 +671,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 	case WM_COPYDATA: {
 		PCOPYDATASTRUCT pcds = AsPointer<PCOPYDATASTRUCT>(lParam);
 
-		if (pcds->dwData == DATA_MATEPATH_PATHARG) {
+		if (pcds->dwData == DATA_MATEPATH_PATHARG && pcds->cbData > MAX_PATH*sizeof(WCHAR)) {
 			LPCWSTR lpsz = static_cast<LPCWSTR>(pcds->lpData);
 			DisplayPath(lpsz, IDS_ERR_CMDLINE);
 		}

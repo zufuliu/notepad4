@@ -1266,7 +1266,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		// Reset Change Notify
 		//bPendingChangeNotify = false;
 
-		if (pcds->dwData == DATA_NOTEPAD4_PARAMS) {
+		if (pcds->dwData == DATA_NOTEPAD4_PARAMS && pcds->cbData >= sizeof(NP2PARAMS)) {
 			const NP2PARAMS * const params = static_cast<NP2PARAMS *>(pcds->lpData);
 
 			if (params->flagReadOnlyMode) {

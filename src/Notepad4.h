@@ -56,7 +56,6 @@ enum MatchTextFlag {
 };
 
 //==== Data Type for WM_COPYDATA ==============================================
-#define DATA_NOTEPAD4_PARAMS 0xFB10
 struct NP2PARAMS {
 	bool	flagFileSpecified;
 	bool	flagReadOnlyMode;
@@ -74,6 +73,8 @@ struct NP2PARAMS {
 	MatchTextFlag flagMatchText;
 	WCHAR wchData;
 };
+//! increase this value when change layout for NP2PARAMS
+#define DATA_NOTEPAD4_PARAMS (0xFB10 + sizeof(NP2PARAMS))
 
 //==== Toolbar Style ==========================================================
 #define WS_TOOLBAR (WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS |				\
