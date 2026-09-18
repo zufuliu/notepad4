@@ -2665,9 +2665,9 @@ void Editor::DelCharBack(bool allowLineStartDeletion) {
 		for (size_t r = 0; r < sel.Count(); r++) {
 			const Sci::Position caretPosition = sel.Range(r).caret.Position();
 			if (!RangeContainsProtected(caretPosition - 1, caretPosition)) {
-				if (sel.Range(r).caret.VirtualSpace()) {
-					sel.Range(r).caret.SetVirtualSpace(sel.Range(r).caret.VirtualSpace() - 1);
-					sel.Range(r).anchor.SetVirtualSpace(sel.Range(r).caret.VirtualSpace());
+				if (const Sci::Position virtualSpace = sel.Range(r).caret.VirtualSpace()) {
+					sel.Range(r).caret.SetVirtualSpace(virtualSpace - 1);
+					sel.Range(r).anchor.SetVirtualSpace(virtualSpace);
 				} else {
 					const Sci::Line lineCurrentPos = pdoc->SciLineFromPosition(caretPosition);
 					if (allowLineStartDeletion || (pdoc->LineStart(lineCurrentPos) != caretPosition)) {
@@ -4362,10 +4362,10 @@ void Editor::Indent(bool forwards, bool lineIndent) {
 		sel.selType = Selection::SelTypes::stream;
 	}
 	for (size_t r = 0; r < sel.Count(); r++) {
-		const Sci::Line lineOfAnchor =
-			pdoc->SciLineFromPosition(sel.Range(r).anchor.Position());
+		const Sci::Position anchorPosition = sel.Range(r).anchor.Position();
+		Sci::Line lineOfAnchor = pdoc->SciLineFromPosition(anchorPosition);
 		Sci::Position caretPosition = sel.Range(r).caret.Position();
-		const Sci::Line lineCurrentPos = pdoc->SciLineFromPosition(caretPosition);
+		Sci::Line lineCurrentPos = pdoc->SciLineFromPosition(caretPosition);
 		if (lineOfAnchor == lineCurrentPos && !lineIndent) {
 			const int indentationStep = pdoc->IndentSize();
 			if (forwards) {
@@ -4403,31 +4403,28 @@ void Editor::Indent(bool forwards, bool lineIndent) {
 				}
 			}
 		} else {	// Multiline or LineIndent
-			const Sci::Position anchorPosOnLine = sel.Range(r).anchor.Position() -
+			const Sci::Position anchorPosOnLine = anchorPosition -
 				pdoc->LineStart(lineOfAnchor);
 			const Sci::Position currentPosPosOnLine = caretPosition -
 				pdoc->LineStart(lineCurrentPos);
 			// Multiple lines selected so indent / dedent
 			const Sci::Line lineTopSel = std::min(lineOfAnchor, lineCurrentPos);
 			Sci::Line lineBottomSel = std::max(lineOfAnchor, lineCurrentPos);
-			if (pdoc->LineStart(lineBottomSel) == sel.Range(r).anchor.Position() || pdoc->LineStart(lineBottomSel) == caretPosition)
+			const Sci::Position lineStart = pdoc->LineStart(lineBottomSel);
+			if (lineStart == anchorPosition || lineStart == caretPosition)
 				lineBottomSel--;  	// If not selecting any characters on a line, do not indent
 			pdoc->Indent(forwards, lineBottomSel, lineTopSel);
 			if (lineOfAnchor < lineCurrentPos) {
-				if (currentPosPosOnLine == 0)
-					sel.Range(r) = SelectionRange(pdoc->LineStart(lineCurrentPos),
-						pdoc->LineStart(lineOfAnchor));
-				else
-					sel.Range(r) = SelectionRange(pdoc->LineStart(lineCurrentPos + 1),
-						pdoc->LineStart(lineOfAnchor));
+				if (currentPosPosOnLine != 0) {
+					lineCurrentPos += 1;
+				}
 			} else {
-				if (anchorPosOnLine == 0)
-					sel.Range(r) = SelectionRange(pdoc->LineStart(lineCurrentPos),
-						pdoc->LineStart(lineOfAnchor));
-				else
-					sel.Range(r) = SelectionRange(pdoc->LineStart(lineCurrentPos),
-						pdoc->LineStart(lineOfAnchor + 1));
+				if (anchorPosOnLine != 0) {
+					lineOfAnchor += 1;
+				}
 			}
+			sel.Range(r) = SelectionRange(pdoc->LineStart(lineCurrentPos),
+				pdoc->LineStart(lineOfAnchor));
 		}
 	}
 	sel.selType = selType;	// Restore rectangular mode
