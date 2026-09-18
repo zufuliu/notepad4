@@ -5705,7 +5705,8 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) noexcept {
 			}
 			break;
 
-		case L'G':
+		case L'G': {
+			const wchar_t option = opt[0];
 			state = CommandParseState_Argument;
 			if (ExtractFirstArgument(lp2, lp1, lp2)) {
 #if defined(_WIN64)
@@ -5719,10 +5720,11 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) noexcept {
 					flagJumpTo = true;
 					state = CommandParseState_Consumed;
 					iInitialLine = cord[0];
-					iInitialColumn = cord[1];
+					// character offset for lower case '/g', column for upper '/G'
+					iInitialColumn = (option & 0x20) ? -cord[1] : cord[1];
 				}
 			}
-			break;
+		} break;
 
 		case L'I':
 			flagStartAsTrayIcon = true;
@@ -7627,9 +7629,9 @@ void GetRelaunchParameters(LPWSTR szParameters, LPCWSTR lpszFile, RelaunchOption
 			WCHAR tchCol[32];
 			PosToStr(line, tchLn);
 			PosToStr(col, tchCol);
-			wsprintf(tch, L" -g %s,%s", tchLn, tchCol);
+			wsprintf(tch, L" -G %s,%s", tchLn, tchCol);
 #else
-			wsprintf(tch, L" -g %d,%d", static_cast<int>(line), static_cast<int>(col));
+			wsprintf(tch, L" -G %d,%d", static_cast<int>(line), static_cast<int>(col));
 #endif
 			lstrcat(szParameters, tch);
 		}
