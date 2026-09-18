@@ -660,24 +660,33 @@ Sci::Position CellBuffer::LineStart(Sci::Line line) const noexcept {
 }
 
 Sci::Position CellBuffer::LineEnd(Sci::Line line) const noexcept {
-	Sci::Position position = LineStart(line + 1);
-	if (IsValidIndex(line, Lines() - 1)) {
-		if (LineEndType::Unicode == GetLineEndTypes()) {
-			const unsigned char bytes[] = {
-				UCharAt(position - 3),
-				UCharAt(position - 2),
-				UCharAt(position - 1),
-			};
-			if (UTF8IsSeparator(bytes)) {
-				return position - UTF8SeparatorLength;
-			}
-			if (UTF8IsNEL(bytes + 1)) {
-				return position - UTF8NELLength;
+	if (line < 0) {
+		return 0;
+	}
+	Sci::Position position;
+	if (line + 1 >= Lines()) {
+		position = Length();
+	} else {
+		position = plv->LineStart(line + 1);
+		if (LineEndType::Default != utf8LineEnds) {
+			const unsigned char chPrev = UCharAt(position - 1);
+			if (!UTF8IsAscii(chPrev)) {
+				const unsigned char bytes[] = {
+					UCharAt(position - 3),
+					UCharAt(position - 2),
+					chPrev,
+				};
+				if (UTF8IsSeparator(bytes)) {
+					return position - UTF8SeparatorLength;
+				}
+				if (UTF8IsNEL(bytes + 1)) {
+					return position - UTF8NELLength;
+				}
 			}
 		}
 		position--; // Back over CR or LF
 		// When line terminator is CR+LF, may need to go back one more
-		if ((position > LineStart(line)) && (CharAt(position - 1) == '\r')) {
+		if ((CharAt(position - 1) == '\r') && (position > plv->LineStart(line))) {
 			position--;
 		}
 	}
