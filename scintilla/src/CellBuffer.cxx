@@ -53,13 +53,13 @@ struct CountWidths {
 	CountWidths operator-() const noexcept {
 		return CountWidths(-countBasePlane, -countOtherPlanes);
 	}
-	Sci::Position WidthUTF32() const noexcept {
+	[[nodiscard]] Sci::Position WidthUTF32() const noexcept {
 		// All code points take one code unit in UTF-32.
 		return countBasePlane + countOtherPlanes;
 	}
-	Sci::Position WidthUTF16() const noexcept {
+	[[nodiscard]] Sci::Position WidthUTF16() const noexcept {
 		// UTF-16 takes 2 code units for other planes
-		return countBasePlane + 2 * countOtherPlanes;
+		return countBasePlane + (2 * countOtherPlanes);
 	}
 	void CountChar(int lenChar) noexcept {
 		if (lenChar == 4) {
@@ -79,17 +79,17 @@ public:
 	virtual void InsertLines(Sci::Line line, const Sci::Position *positions, size_t lines, bool lineStart) = 0;
 	virtual void SetLineStart(Sci::Line line, Sci::Position position) noexcept = 0;
 	virtual void RemoveLine(Sci::Line line) = 0;
-	virtual Sci::Line Lines() const noexcept = 0;
+	[[nodiscard]] virtual Sci::Line Lines() const noexcept = 0;
 	virtual void AllocateLines(Sci::Line lines) = 0;
-	virtual Sci::Line LineFromPosition(Sci::Position pos) const noexcept = 0;
-	virtual Sci::Position LineStart(Sci::Line line) const noexcept = 0;
+	[[nodiscard]] virtual Sci::Line LineFromPosition(Sci::Position pos) const noexcept = 0;
+	[[nodiscard]] virtual Sci::Position LineStart(Sci::Line line) const noexcept = 0;
 	virtual void InsertCharacters(Sci::Line line, CountWidths delta) noexcept = 0;
 	virtual void SetLineCharactersWidth(Sci::Line line, CountWidths width) noexcept = 0;
-	virtual Scintilla::LineCharacterIndexType LineCharacterIndex() const noexcept = 0;
+	[[nodiscard]] virtual Scintilla::LineCharacterIndexType LineCharacterIndex() const noexcept = 0;
 	virtual bool AllocateLineCharacterIndex(Scintilla::LineCharacterIndexType lineCharacterIndex, Sci::Line lines) = 0;
 	virtual bool ReleaseLineCharacterIndex(Scintilla::LineCharacterIndexType lineCharacterIndex) = 0;
-	virtual Sci::Position IndexLineStart(Sci::Line line, Scintilla::LineCharacterIndexType lineCharacterIndex) const noexcept = 0;
-	virtual Sci::Line LineFromPositionIndex(Sci::Position pos, Scintilla::LineCharacterIndexType lineCharacterIndex) const noexcept = 0;
+	[[nodiscard]] virtual Sci::Position IndexLineStart(Sci::Line line, Scintilla::LineCharacterIndexType lineCharacterIndex) const noexcept = 0;
+	[[nodiscard]] virtual Sci::Line LineFromPositionIndex(Sci::Position pos, Scintilla::LineCharacterIndexType lineCharacterIndex) const noexcept = 0;
 	virtual ~ILineVector() = default;
 };
 
@@ -108,12 +108,10 @@ class LineStartIndex final {
 		return static_cast<POS>(pos);
 	}
 public:
-	int refCount;
-	Partitioning<POS> starts;
+	int refCount = 0;
+	// Minimal initial allocation
+	Partitioning<POS> starts{4};
 
-	LineStartIndex() : refCount(0), starts(4) {
-		// Minimal initial allocation
-	}
 	bool Allocate(Sci::Line lines) {
 		refCount++;
 		Sci::Position length = starts.Length();
@@ -131,10 +129,10 @@ public:
 		refCount--;
 		return refCount == 0;
 	}
-	bool Active() const noexcept {
+	[[nodiscard]] bool Active() const noexcept {
 		return refCount > 0;
 	}
-	Sci::Position LineWidth(Sci::Line line) const noexcept {
+	[[nodiscard]] Sci::Position LineWidth(Sci::Line line) const noexcept {
 		return starts.PositionFromPartition(line_cast(line) + 1) -
 			starts.PositionFromPartition(line_cast(line));
 	}
@@ -160,7 +158,8 @@ public:
 
 template <typename POS>
 class LineVector final : public ILineVector {
-	Partitioning<POS> starts;
+	static constexpr size_t initialSize = 0x100;
+	Partitioning<POS> starts{initialSize};
 	PerLine *perLine = nullptr;
 	LineStartIndex<POS> startsUTF16;
 	LineStartIndex<POS> startsUTF32;
@@ -184,8 +183,6 @@ class LineVector final : public ILineVector {
 	}
 
 public:
-	LineVector() : starts(256) {
-	}
 	void Init() override {
 		starts.DeleteAll();
 		if (perLine) {
@@ -255,7 +252,7 @@ public:
 			perLine->RemoveLine(line);
 		}
 	}
-	Sci::Line Lines() const noexcept override {
+	[[nodiscard]] Sci::Line Lines() const noexcept override {
 		return line_from_pos_cast(starts.Partitions());
 	}
 	void AllocateLines(Sci::Line lines) override {
@@ -269,10 +266,10 @@ public:
 			}
 		}
 	}
-	Sci::Line LineFromPosition(Sci::Position pos) const noexcept override {
+	[[nodiscard]] Sci::Line LineFromPosition(Sci::Position pos) const noexcept override {
 		return line_from_pos_cast(starts.PartitionFromPosition(pos_cast(pos)));
 	}
-	Sci::Position LineStart(Sci::Line line) const noexcept override {
+	[[nodiscard]] Sci::Position LineStart(Sci::Line line) const noexcept override {
 		return starts.PositionFromPartition(pos_cast(line));
 	}
 	void InsertCharacters(Sci::Line line, CountWidths delta) noexcept override {
@@ -294,7 +291,7 @@ public:
 		}
 	}
 
-	LineCharacterIndexType LineCharacterIndex() const noexcept override {
+	[[nodiscard]] LineCharacterIndexType LineCharacterIndex() const noexcept override {
 		return activeIndices;
 	}
 	bool AllocateLineCharacterIndex(LineCharacterIndexType lineCharacterIndex, Sci::Line lines) override {
@@ -321,27 +318,25 @@ public:
 		SetActiveIndices();
 		return activeIndicesStart != activeIndices;
 	}
-	Sci::Position IndexLineStart(Sci::Line line, LineCharacterIndexType lineCharacterIndex) const noexcept override {
+	[[nodiscard]] Sci::Position IndexLineStart(Sci::Line line, LineCharacterIndexType lineCharacterIndex) const noexcept override {
 		if (lineCharacterIndex == LineCharacterIndexType::Utf32) {
 			return startsUTF32.starts.PositionFromPartition(pos_cast(line));
-		} else {
-			return startsUTF16.starts.PositionFromPartition(pos_cast(line));
 		}
+		return startsUTF16.starts.PositionFromPartition(pos_cast(line));
 	}
-	Sci::Line LineFromPositionIndex(Sci::Position pos, LineCharacterIndexType lineCharacterIndex) const noexcept override {
+	[[nodiscard]] Sci::Line LineFromPositionIndex(Sci::Position pos, LineCharacterIndexType lineCharacterIndex) const noexcept override {
 		if (lineCharacterIndex == LineCharacterIndexType::Utf32) {
 			return line_from_pos_cast(startsUTF32.starts.PartitionFromPosition(pos_cast(pos)));
-		} else {
-			return line_from_pos_cast(startsUTF16.starts.PartitionFromPosition(pos_cast(pos)));
 		}
+		return line_from_pos_cast(startsUTF16.starts.PartitionFromPosition(pos_cast(pos)));
 	}
 };
 
 std::unique_ptr<ILineVector> LineVectorCreate(bool largeDocument) {
-	if (largeDocument)
+	if (largeDocument) {
 		return std::make_unique<LineVector<Sci::Position>>();
-	else
-		return std::make_unique<LineVector<int>>();
+	}
+	return std::make_unique<LineVector<int>>();
 }
 
 }
@@ -653,10 +648,9 @@ void CellBuffer::AllocateLines(Sci::Line lines) {
 Sci::Position CellBuffer::LineStart(Sci::Line line) const noexcept {
 	if (line < 0)
 		return 0;
-	else if (line >= Lines())
+	if (line >= Lines())
 		return Length();
-	else
-		return plv->LineStart(line);
+	return plv->LineStart(line);
 }
 
 Sci::Position CellBuffer::LineEnd(Sci::Line line) const noexcept {
@@ -1220,6 +1214,8 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 					nPositions = 0;
 				}
 				positions[nPositions++] = position + ptr - s;
+				break;
+			default:
 				break;
 			}
 		} while (ptr < end);

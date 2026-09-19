@@ -1965,8 +1965,7 @@ PEDITLEXER Style_SniffShebang(char *pchText) noexcept {
 }
 
 void Style_SniffCSV() noexcept {
-	const Sci_Line lines = SciCall_GetLineCount();
-	const Sci_Position endPos = SciCall_PositionFromLine(min<Sci_Line>(lines, 2));
+	const Sci_Position endPos = SciCall_PositionFromLine(2);
 	const char *ptr = SciCall_GetRangePointer(0, endPos);
 	if (ptr == nullptr) { // empty document
 		return;

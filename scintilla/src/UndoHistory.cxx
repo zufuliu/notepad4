@@ -104,7 +104,7 @@ size_t ScaledVector::Size() const noexcept {
 }
 
 size_t ScaledVector::ValueAt(size_t index) const noexcept {
-	return ReadValue(bytes.data() + index * element.size, element.size);
+	return ReadValue(bytes.data() + (index * element.size), element.size);
 }
 
 constexpr SizeMax ElementForValue(size_t value) noexcept {
@@ -177,12 +177,12 @@ void ScaledVector::SetValueAt(size_t index, size_t value) {
 		std::swap(bytes, bytesNew);
 		element = elementForValue;
 	}
-	WriteValue(bytes.data() + index * element.size, element.size, value);
+	WriteValue(bytes.data() + (index * element.size), element.size, value);
 }
 
 void ScaledVector::ClearValueAt(size_t index) noexcept {
 	// 0 fits in any size element so no expansion needed so no exceptions
-	WriteValue(bytes.data() + index * element.size, element.size, 0);
+	WriteValue(bytes.data() + (index * element.size), element.size, 0);
 }
 
 void ScaledVector::Clear() noexcept {

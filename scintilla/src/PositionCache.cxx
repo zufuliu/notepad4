@@ -199,37 +199,37 @@ void LineLayout::AddLineStart(Sci::Position start) noexcept {
 	lineStarts[static_cast<unsigned>(lines)] = static_cast<int>(start);
 }
 
-void LineLayout::SetBracesHighlight(Range rangeLine, const Sci::Position braces[],
+void LineLayout::SetBracesHighlight(ForwardRange rangeLine, const Sci::Position braces[],
 	unsigned char bracesMatchStyle, int xHighlight, bool ignoreStyle) noexcept {
 	if (!ignoreStyle) {
-		const Sci::Position braceOffset = braces[0] - rangeLine.start;
+		const Sci::Position braceOffset = braces[0] - rangeLine.First();
 		if (InLineRange(braceOffset, numCharsInLine)) {
 			bracePreviousStyles[0] = styles[braceOffset];
 			styles[braceOffset] = bracesMatchStyle;
 		}
 	}
 	if (!ignoreStyle) {
-		const Sci::Position braceOffset = braces[1] - rangeLine.start;
+		const Sci::Position braceOffset = braces[1] - rangeLine.First();
 		if (InLineRange(braceOffset, numCharsInLine)) {
 			bracePreviousStyles[1] = styles[braceOffset];
 			styles[braceOffset] = bracesMatchStyle;
 		}
 	}
-	if ((braces[0] >= rangeLine.start && braces[1] <= rangeLine.end) ||
-		(braces[1] >= rangeLine.start && braces[0] <= rangeLine.end)) {
+	if ((braces[0] >= rangeLine.First() && braces[1] <= rangeLine.Last()) ||
+		(braces[1] >= rangeLine.First() && braces[0] <= rangeLine.Last())) {
 		xHighlightGuide = xHighlight;
 	}
 }
 
-void LineLayout::RestoreBracesHighlight(Range rangeLine, const Sci::Position braces[], bool ignoreStyle) noexcept {
+void LineLayout::RestoreBracesHighlight(ForwardRange rangeLine, const Sci::Position braces[], bool ignoreStyle) noexcept {
 	if (!ignoreStyle) {
-		const Sci::Position braceOffset = braces[0] - rangeLine.start;
+		const Sci::Position braceOffset = braces[0] - rangeLine.First();
 		if (InLineRange(braceOffset, numCharsInLine)) {
 			styles[braceOffset] = bracePreviousStyles[0];
 		}
 	}
 	if (!ignoreStyle) {
-		const Sci::Position braceOffset = braces[1] - rangeLine.start;
+		const Sci::Position braceOffset = braces[1] - rangeLine.First();
 		if (InLineRange(braceOffset, numCharsInLine)) {
 			styles[braceOffset] = bracePreviousStyles[1];
 		}
@@ -964,12 +964,12 @@ void BreakFinder::Insert(Sci::Position val) {
 	}
 }
 
-BreakFinder::BreakFinder(const LineLayout *ll_, const Selection *psel, Range lineRange, Sci::Position posLineStart,
+BreakFinder::BreakFinder(const LineLayout *ll_, const Selection *psel, ForwardRange lineRange_, Sci::Position posLineStart,
 	XYPOSITION xStart, BreakFor breakFor, const EditModel &model, const ViewStyle *pvsDraw, uint32_t posInLine) :
 	ll(ll_),
-	nextBreak(static_cast<int>(lineRange.start)),
+	nextBreak(static_cast<int>(lineRange_.First())),
 	subBreak(-1),
-	endPos(static_cast<int>(lineRange.end)),
+	endPos(static_cast<int>(lineRange_.Last())),
 	stopPos(endPos),
 	saeCurrentPos(0),
 	saeNext(0),
@@ -981,7 +981,7 @@ BreakFinder::BreakFinder(const LineLayout *ll_, const Selection *psel, Range lin
 	// First find the first visible character
 	if (xStart > 0.0f) {
 		const int startPos = nextBreak;
-		nextBreak = ll->FindBefore(xStart, lineRange);
+		nextBreak = ll->FindBefore(xStart, Range(lineRange_));
 		// Now back to a style break
 		while ((nextBreak > startPos) && (ll->styles[nextBreak] == ll->styles[nextBreak - 1])) {
 			nextBreak--;
@@ -997,7 +997,7 @@ BreakFinder::BreakFinder(const LineLayout *ll_, const Selection *psel, Range lin
 	}
 
 	if (FlagSet(breakFor, BreakFor::Selection)) {
-		const SelectionSegment segmentLine(posLineStart, posLineStart + lineRange.end);
+		const SelectionSegment segmentLine(posLineStart, posLineStart + lineRange_.Last());
 		for (size_t r = 0; r < psel->Count(); r++) {
 			const SelectionSegment portion = psel->Range(r).Intersect(segmentLine);
 			if (!portion.Empty()) {
@@ -1264,8 +1264,8 @@ void PositionCache::MeasureWidths(Surface *surface, const Style &style, unsigned
 	PositionCacheEntry *entry = nullptr;
 	PositionCacheEntry *entry2 = nullptr;
 	const uint16_t styleNumber = styleNumber_ & UINT16_MAX;
-	constexpr size_t maxLength = 512/(sizeof(XYPOSITION) + sizeof(char));
-	if (sv.length() <= maxLength) {
+	constexpr size_t maxCachedLength = 512/(sizeof(XYPOSITION) + sizeof(char));
+	if (sv.length() <= maxCachedLength) {
 		// Only store short strings in the cache so it doesn't churn with
 		// long comments with only a single comment.
 
@@ -1308,7 +1308,8 @@ void PositionCache::MeasureWidths(Surface *surface, const Style &style, unsigned
 		}
 
 		clock++;
-		if (clock > UINT16_MAX) {
+		constexpr uint16_t clockMax = UINT16_MAX;
+		if (clock > clockMax) {
 			// Since there are only 16 bits for the clock, wrap it round and
 			// reset all cache entries so none get stuck with a high clock.
 			for (PositionCacheEntry &pce : pces) {
