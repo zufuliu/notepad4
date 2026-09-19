@@ -350,8 +350,10 @@ static const COLORREF defaultCustomColor[MAX_CUSTOM_COLOR_COUNT] = {
 static COLORREF customColor[MAX_CUSTOM_COLOR_COUNT];
 CallTipInfo callTipInfo;
 static bool bCustomColorLoaded = false;
+static bool bStyleDialogOpen = false;
 
 int		np2StyleTheme;
+int		np2StyleThemeMode = StyleTheme_System;
 static UINT fStylesModified = STYLESMODIFIED_NONE;
 static bool fWarnedNoIniFile = false;
 static int	defaultBaseFontSize = 11*SC_FONT_SIZE_MULTIPLIER; // 11 pt
@@ -794,8 +796,9 @@ void Style_Load() noexcept {
 	int iValue = section.GetInt(L"DefaultScheme", 0);
 	iDefaultLexerIndex = Style_GetMatchLexerIndex(iValue + NP2LEX_TEXTFILE);
 
-	iValue = section.GetInt(L"StyleTheme", StyleTheme_Default);
-	np2StyleTheme = clamp<int>(iValue, StyleTheme_Default, StyleTheme_Max);
+	iValue = section.GetInt(L"StyleTheme", StyleTheme_System);
+	np2StyleThemeMode = clamp<int>(iValue, StyleTheme_Light, StyleTheme_Max);
+	np2StyleTheme = DarkMode_ResolveStyleTheme(np2StyleThemeMode);
 
 	// auto select
 	bAutoSelect = section.GetBool(L"AutoSelect", true);
@@ -891,7 +894,7 @@ void Style_Save() noexcept {
 	section.SetString(L"FavoriteSchemes", favoriteSchemesConfig);
 	// default scheme
 	section.SetIntEx(L"DefaultScheme", pLexArray[iDefaultLexerIndex]->rid - NP2LEX_TEXTFILE, 0);
-	section.SetIntEx(L"StyleTheme", np2StyleTheme, StyleTheme_Default);
+	section.SetIntEx(L"StyleTheme", np2StyleThemeMode, StyleTheme_System);
 
 	// auto select
 	section.SetBoolEx(L"AutoSelect", bAutoSelect, true);
@@ -918,7 +921,7 @@ void Style_Save() noexcept {
 
 	// save changes to each theme
 	LPCWSTR themePath = GetStyleThemeFilePath();
-	if (np2StyleTheme != StyleTheme_Default) {
+	if (np2StyleTheme != StyleTheme_Light) {
 		if (!CreateIniFile(themePath)) {
 			NP2HeapFree(pIniSectionBuf);
 			MsgBoxLastError(MB_OK, IDS_CREATEINI_FAIL);
@@ -958,7 +961,7 @@ void Style_Save() noexcept {
 			for (UINT i = 0; i < iStyleCount; i++, szValue += MAX_EDITSTYLE_VALUE_SIZE) {
 				section.SetStringEx(pLex->Styles[i].pszName, szValue, pLex->Styles[i].pszDefault);
 			}
-			if (pLex == pLexCurrent && pLex->iStyleTheme == StyleTheme_Default) {
+			if (pLex == pLexCurrent && pLex->iStyleTheme == StyleTheme_Light) {
 				SaveLexTabSettings(section, pLex);
 			}
 			// delete this section if nothing changed
@@ -1152,10 +1155,12 @@ void Style_OnDPIChanged(LPCEDITLEXER pLex) noexcept {
 }
 
 void Style_OnStyleThemeChanged(int theme) noexcept {
-	if (theme == np2StyleTheme) {
+	np2StyleThemeMode = theme;
+	theme = DarkMode_ResolveStyleTheme(theme);
+	if (theme == np2StyleTheme || bStyleDialogOpen) {
 		return;
 	}
-	if (theme != StyleTheme_Default) {
+	if (theme != StyleTheme_Light) {
 		if (StrIsEmpty(darkStyleThemeFilePath)) {
 			FindDarkThemeFile(darkStyleThemeFilePath);
 		}
@@ -1167,6 +1172,13 @@ void Style_OnStyleThemeChanged(int theme) noexcept {
 	np2StyleTheme = theme;
 	bCustomColorLoaded = false;
 	Style_SetLexer(pLexCurrent, false);
+}
+
+static void Style_OnStyleDialogClosed() noexcept {
+	bStyleDialogOpen = false;
+	if (DarkMode_ResolveStyleTheme(np2StyleThemeMode) != np2StyleTheme) {
+		SendMessage(hwndMain, WM_SETTINGCHANGE, 0, 0);
+	}
 }
 
 void Style_UpdateCaret() noexcept {
@@ -3521,7 +3533,9 @@ bool Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, bool bDefaultSt
 		cf.Flags |= CF_FIXEDPITCHONLY;
 	}
 
+	DialogHook_Start(DialogRefData_CommonDialog);
 	const BOOL result = ChooseFont(&cf);
+	DialogHook_Stop();
 	if (!result || StrIsEmpty(lf.lfFaceName)) {
 		return false;
 	}
@@ -3587,12 +3601,14 @@ bool Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, bool bDefaultSt
 // Style_SetDefaultFont()
 //
 void Style_SetDefaultFont(HWND hwnd, bool bCode) noexcept {
+	bStyleDialogOpen = true;
 	const int iIdx = bCode ? GlobalStyleIndex_DefaultCode : GlobalStyleIndex_DefaultText;
 	if (Style_SelectFont(hwnd, lexGlobal.GetStyleValue(iIdx), MAX_EDITSTYLE_VALUE_SIZE, true)) {
 		fStylesModified |= STYLESMODIFIED_SOME_STYLE;
 		lexGlobal.bStyleChanged = true;
 		Style_SetLexer(pLexCurrent, false);
 	}
+	Style_OnStyleDialogClosed();
 }
 
 static COLORREF Style_ChooseColor(HWND hwnd, COLORREF color) noexcept {
@@ -3603,7 +3619,9 @@ static COLORREF Style_ChooseColor(HWND hwnd, COLORREF color) noexcept {
 	cc.rgbResult = color;
 	cc.lpCustColors = customColor;
 	cc.Flags = CC_FULLOPEN | CC_RGBINIT | CC_SOLIDCOLOR;
+	DialogHook_Start(DialogRefData_CommonDialog);
 	const BOOL result = ChooseColor(&cc);
+	DialogHook_Stop();
 	return result ? cc.rgbResult : color;
 }
 
@@ -4147,7 +4165,7 @@ static HTREEITEM Style_AddAllLexerToTreeView(HWND hwndTV, bool withStyles, bool 
 }
 
 static void Style_ResetStyle(LPCEDITLEXER pLex, const EDITSTYLE *pStyle, LPWSTR szValue) noexcept {
-	if (np2StyleTheme != StyleTheme_Default) {
+	if (np2StyleTheme != StyleTheme_Light) {
 		// reload style from external file
 		LPCWSTR themePath = GetStyleThemeFilePath();
 		WCHAR wch[MAX_EDITSTYLE_VALUE_SIZE] = L"";
@@ -4530,7 +4548,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 		case IDC_RESETALL:
 		case IDC_STYLEDEFAULT:
 			if (LOWORD(wParam) == IDC_RESETALL) {
-				if (np2StyleTheme == StyleTheme_Default) {
+				if (np2StyleTheme == StyleTheme_Light) {
 					// reset styles, extensions to built-in default
 					Style_ResetAll(true);
 				} else {
@@ -4695,6 +4713,8 @@ void Style_ConfigDlg(HWND hwnd) noexcept {
 		}
 	}
 
+	// Defer system theme switches until the style edits have been committed or restored.
+	bStyleDialogOpen = true;
 	if (IDCANCEL == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_STYLECONFIG), GetParent(hwnd), Style_ConfigDlgProc, AsInteger<LPARAM>(&param))) {
 		// Restore Styles
 		memcpy(g_AllFileExtensions, param.extBackup, ALL_FILE_EXTENSIONS_BYTE_SIZE);
@@ -4753,6 +4773,7 @@ void Style_ConfigDlg(HWND hwnd) noexcept {
 	if (param.bApply) {
 		Style_SetLexer(pLexCurrent, false);
 	}
+	Style_OnStyleDialogClosed();
 }
 
 static PEDITLEXER Lexer_GetFromTreeView(HWND hwndTV) noexcept {
