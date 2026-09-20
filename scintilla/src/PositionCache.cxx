@@ -242,7 +242,7 @@ int LineLayout::FindBefore(XYPOSITION x, Range range) const noexcept {
 	Sci::Position upper = range.end;
 	do {
 		const Sci::Position middle = (upper + lower + 1) / 2; 	// Round high
-		const XYPOSITION posMiddle = positions[middle];
+		const XYPOSITION posMiddle = GetPosition(middle);
 		if (x < posMiddle) {
 			upper = middle - 1;
 		} else {
@@ -256,11 +256,11 @@ int LineLayout::FindPositionFromX(XYPOSITION x, Range range, bool charPosition) 
 	int pos = FindBefore(x, range);
 	while (pos < range.end) {
 		if (charPosition) {
-			if (x < (positions[pos + 1])) {
+			if (x < (GetPosition(pos + 1))) {
 				return pos;
 			}
 		} else {
-			if (x < ((positions[pos] + positions[pos + 1]) / 2)) {
+			if (x < ((GetPosition(pos) + GetPosition(pos + 1)) / 2)) {
 				return pos;
 			}
 		}
@@ -276,13 +276,13 @@ Point LineLayout::PointFromPosition(int posInLine, int lineHeight, PointEnd pe) 
 		if (posInLine >= rangeSubLine.start) {
 			pt.y = static_cast<XYPOSITION>(subLine*lineHeight);
 			if (posInLine <= rangeSubLine.end) {
-				pt.x = positions[posInLine] - positions[rangeSubLine.start];
+				pt.x = GetWidth(posInLine, rangeSubLine.start);
 				if (rangeSubLine.start != 0)	// Wrapped lines may be indented
 					pt.x += wrapIndent;
 				if (FlagSet(pe, PointEnd::subLineEnd))	// Return end of first subline not start of next
 					break;
 			} else if (FlagSet(pe, PointEnd::lineEnd) && (subLine == (lines - 1))) {
-				pt.x = positions[numCharsInLine] - positions[rangeSubLine.start];
+				pt.x = GetWidth(numCharsInLine, rangeSubLine.start);
 				if (rangeSubLine.start != 0)	// Wrapped lines may be indented
 					pt.x += wrapIndent;
 			}
@@ -297,13 +297,13 @@ XYPOSITION LineLayout::XInLine(Sci::Position index) const noexcept {
 	// For positions inside line return value from positions
 	// For positions after line return last position + 1.0
 	if (index <= numCharsInLine) {
-		return positions[index];
+		return GetPosition(index);
 	}
-	return positions[numCharsInLine] + 1.0;
+	return GetPosition(numCharsInLine) + 1.0;
 }
 
 Interval LineLayout::Span(int start, int end) const noexcept {
-	return { positions[start], positions[end] };
+	return { GetPosition(start), GetPosition(end) };
 }
 
 Interval LineLayout::SpanByte(int index) const noexcept {
@@ -392,14 +392,14 @@ void LineLayout::WrapLine(const Document *pdoc, Sci::Position posLineStart, Wrap
 		lines -= 2;
 		lastLineStart = lineStarts[lines];
 		p = lastLineStart + 1;
-		startOffset += positions[lastLineStart] - wrapIndent_;
+		startOffset += GetPosition(lastLineStart) - wrapIndent_;
 	} else {
 		lines = 0;
 		wrapIndent = wrapIndent_;
 	}
 
 	while (p < lastSegmentEnd) {
-		while (p < lastSegmentEnd && positions[p + 1] < startOffset) {
+		while (p < lastSegmentEnd && GetPosition(p + 1) < startOffset) {
 			p++;
 		}
 		if (p < lastSegmentEnd) {
@@ -470,7 +470,7 @@ void LineLayout::WrapLine(const Document *pdoc, Sci::Position posLineStart, Wrap
 			}
 			AddLineStart(lastGoodBreak);
 			lastLineStart = lastGoodBreak;
-			startOffset = positions[lastLineStart];
+			startOffset = GetPosition(lastLineStart);
 			// take into account the space for start wrap mark and indent
 			startOffset += wrapWidth - wrapIndent;
 			p = lastLineStart + 1;

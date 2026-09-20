@@ -110,11 +110,23 @@ public:
 	int SCICALL FindPositionFromX(XYPOSITION x, Range range, bool charPosition) const noexcept;
 	Point PointFromPosition(int posInLine, int lineHeight, PointEnd pe) const noexcept;
 	XYPOSITION XInLine(Sci::Position index) const noexcept;
-	Interval Span(int start, int end) const noexcept;
-	Interval SpanByte(int index) const noexcept;
+	[[nodiscard]] Interval Span(int start, int end) const noexcept;
+	[[nodiscard]] Interval SpanByte(int index) const noexcept;
 	int EndLineStyle() const noexcept;
 	[[nodiscard]] int LastStyle() const noexcept;
 	void SCICALL WrapLine(const Document *pdoc, Sci::Position posLineStart, Wrap wrapState, XYPOSITION wrapWidth, XYPOSITION wrapIndent_, bool partialLine) noexcept;
+
+	// XPositions
+	[[nodiscard]] XYPOSITION *PositionsFor(unsigned index) const noexcept {
+		return positions + index;
+	}
+	template <typename T>
+	[[nodiscard]] XYPOSITION GetPosition(T index) const noexcept {
+		return positions[index];
+	}
+	[[nodiscard]] XYPOSITION GetWidth(size_t end, size_t start) const noexcept {
+		return positions[end] - positions[start];
+	}
 };
 
 struct ScreenLine final : public IScreenLine {
