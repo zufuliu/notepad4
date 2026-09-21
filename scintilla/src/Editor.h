@@ -154,7 +154,7 @@ struct WrapPending {
 };
 
 struct CaretPolicySlop {
-	Scintilla::CaretPolicy policy;
+	Scintilla::CaretPolicy policy;	// Combination from CaretPolicy::Slop, CaretPolicy::Strict, CaretPolicy::Jumps, CaretPolicy::Even
 	int slop;	// Pixels for X, lines for Y
 	CaretPolicySlop(Scintilla::CaretPolicy policy_, intptr_t slop_) noexcept :
 		policy(policy_), slop(static_cast<int>(slop_)) {}

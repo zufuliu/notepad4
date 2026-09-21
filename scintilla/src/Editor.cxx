@@ -1389,7 +1389,7 @@ Editor::XYScrollPosition Editor::XYScrollToMakeVisible(SelectionRange range, con
 				(bJump && (pt.x < rcClient.left || pt.x >= rcClient.right))) {
 				// Strict or going out of display
 				if (bEven) {
-					// centre caret
+					// Centre caret
 					newXY.xOffset += static_cast<int>(pt.x - rcClient.left - halfScreen);
 				} else {
 					// Put caret on right
@@ -2550,13 +2550,12 @@ void Editor::Clear() {
 		}
 		const UndoGroup ug(pdoc, (sel.Count() > 1) || singleVirtual);
 		for (size_t r = 0; r < sel.Count(); r++) {
-			const Sci::Position caretPosition = sel.Range(r).caret.Position();
+			Sci::Position caretPosition = sel.Range(r).caret.Position();
 			if (!RangeContainsProtected(caretPosition, caretPosition + 1)) {
-				if (sel.Range(r).Start().VirtualSpace()) {
-					if (sel.Range(r).anchor < sel.Range(r).caret)
-						sel.Range(r) = SelectionRange(RealizeVirtualSpace(caretPosition, sel.Range(r).anchor.VirtualSpace()));
-					else
-						sel.Range(r) = SelectionRange(RealizeVirtualSpace(caretPosition, sel.Range(r).caret.VirtualSpace()));
+				const SelectionPosition start = sel.Range(r).Start();
+				if (const Sci::Position virtualSpace = start.VirtualSpace()) {
+					sel.Range(r) = SelectionRange(RealizeVirtualSpace(start.Position(), virtualSpace));
+					caretPosition = sel.Range(r).caret.Position();
 				}
 				if ((sel.Count() == 1) || !pdoc->IsPositionInLineEnd(caretPosition)) {
 					pdoc->DelChar(caretPosition);
@@ -3383,7 +3382,7 @@ void Editor::ChangeCaseOfSelection(CaseMapping caseMapping) {
 			std::string_view mapped = sMapped;
 			if (mapped != text) {
 				size_t firstDifference = 0;
-				// similar to Document::TrimReplacement()
+				// Similar to Document::TrimReplacement()
 				while (!mapped.empty() && !text.empty() && mapped.front() == text.front()) {
 					firstDifference++;
 					text.remove_prefix(1);
@@ -6547,8 +6546,8 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 			const Sci::Position lineStart =
 				pdoc->LineStart(LineFromUPtr(wParam));
 			const Sci::Position lineEnd =
-				pdoc->LineStart(LineFromUPtr(wParam) + 1);
-			// not NULL terminated
+				pdoc->LineStart(LineFromUPtr(wParam + 1));
+			// not NUL terminated
 			const Sci::Position len = lineEnd - lineStart;
 			if (lParam == 0) {
 				return len;

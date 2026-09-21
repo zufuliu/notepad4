@@ -345,10 +345,6 @@ CellBuffer::CellBuffer(bool hasStyles_, bool largeDocument_) :
 	hasStyles(hasStyles_), largeDocument(largeDocument_),
 	uh{std::make_unique<UndoHistory>()},
 	plv{LineVectorCreate(largeDocument_)} {
-	readOnly = false;
-	utf8Substance = false;
-	utf8LineEnds = LineEndType::Default;
-	collectingUndo = true;
 }
 
 CellBuffer::~CellBuffer() noexcept = default;

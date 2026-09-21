@@ -34,10 +34,12 @@ using namespace Scintilla;
 using namespace Scintilla::Internal;
 
 LineMarker::LineMarker(const LineMarker &other) : LineMarkerPod(other) {
+	// Defined to avoid pxpm and image being blindly copied, not as a complete copy constructor.
 	CopyImage(other);
 }
 
 LineMarker &LineMarker::operator=(const LineMarker &other) {
+	// Defined to avoid pxpm and image being blindly copied, not as a complete assignment operator.
 	if (this != &other) {
 		static_cast<LineMarkerPod &>(*this) = other;
 		CopyImage(other);
@@ -46,7 +48,6 @@ LineMarker &LineMarker::operator=(const LineMarker &other) {
 }
 
 void LineMarker::CopyImage(const LineMarker &other) {
-	// Defined to avoid pxpm and image being blindly copied.
 	if (other.pxpm) {
 		pxpm = std::make_unique<XPM>(*other.pxpm);
 	} else {
@@ -304,7 +305,7 @@ void LineMarker::DrawFoldingMark(Surface *surface, PRectangle rcWhole, FoldPart 
 void LineMarker::AlignedPolygon(Surface *surface, const Point *pts, size_t npts) const {
 	const XYPOSITION move = strokeWidth / 2.0;
 	std::vector<Point> points;
-	std::transform(pts, pts + npts, std::back_inserter(points), [=](Point pt) noexcept {
+	std::transform(pts, pts + npts, std::back_inserter(points), [=](Point pt) noexcept ->Point {
 		return Point(pt.x + move, pt.y + move);
 	});
 	surface->Polygon(points.data(), std::size(points), FillStroke(back, fore, strokeWidth));

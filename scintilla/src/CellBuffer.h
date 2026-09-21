@@ -91,13 +91,13 @@ class CellBuffer {
 private:
 	bool hasStyles;
 	const bool largeDocument;
-	bool readOnly;
-	bool utf8Substance;
-	Scintilla::LineEndType utf8LineEnds;
+	bool readOnly = false;
+	bool utf8Substance = false;
+	Scintilla::LineEndType utf8LineEnds = Scintilla::LineEndType::Default;
 	SplitVector<char> substance;
 	SplitVector<char> style;
 
-	bool collectingUndo;
+	bool collectingUndo = true;
 	const std::unique_ptr<UndoHistory> uh;
 
 	std::unique_ptr<ChangeHistory> changeHistory;
@@ -165,7 +165,7 @@ public:
 	const char *InsertString(Sci::Position position, const char *s, Sci::Position insertLength, bool &startSequence);
 
 	/// Setting styles for positions outside the range of the buffer is safe and has no effect.
-	/// @return true if the style of a character is changed.
+	/// @return range where style of characters changed.
 	ChangedRange SetStyles(Sci::Position position, Sci::Position lengthStyle, const char *styles) noexcept;
 	ChangedRange SetStyleFor(Sci::Position position, Sci::Position lengthStyle, char styleValue) noexcept;
 

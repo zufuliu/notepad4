@@ -101,15 +101,15 @@ void LexInterface::Colourise(Sci::Position start, Sci::Position end) {
 	}
 }
 
-bool LexInterface::UseContainerLexing() const noexcept {
-	return !instance;
-}
-
 LineEndType LexInterface::LineEndTypesSupported() const noexcept {
 	if (instance) {
 		return static_cast<LineEndType>(instance->LineEndTypesSupported());
 	}
 	return LineEndType::Default;
+}
+
+bool LexInterface::UseContainerLexing() const noexcept {
+	return !instance;
 }
 
 void ActionDuration::AddSample(Sci::Position numberActions, double durationOfActions) noexcept {
@@ -654,6 +654,7 @@ Sci::Line Document::GetLastChild(Sci::Line lineParent, FoldLevel level, Sci::Lin
 	if (lastLine < 0 || lastLine > maxLine) {
 		lastLine = maxLine;
 	}
+	const Sci::Line lookLastLine = lastLine;
 	Sci::Line lineMaxSubord = lineParent;
 
 	// A fold start is commonly closely followed by its last child, but it could be a long distance,
@@ -672,7 +673,7 @@ Sci::Line Document::GetLastChild(Sci::Line lineParent, FoldLevel level, Sci::Lin
 		}
 		if (!IsSubordinate(levelStart, GetFoldLevel(lineMaxSubord + 1)))
 			break;
-		if ((lineMaxSubord >= lastLine) && !LevelIsWhitespace(GetFoldLevel(lineMaxSubord)))
+		if ((lineMaxSubord >= lookLastLine) && !LevelIsWhitespace(GetFoldLevel(lineMaxSubord)))
 			break;
 		lineMaxSubord++;
 	}
@@ -812,7 +813,7 @@ int Document::LenChar(Sci::Position pos, bool *invalid) const noexcept {
 
 bool Document::InGoodUTF8(Sci::Position pos, Sci::Position &start, Sci::Position &end) const noexcept {
 	Sci::Position trail = pos;
-	while ((trail > 0) && (pos - trail < UTF8MaxBytes) && UTF8IsTrailByte(cb.CharAt(trail - 1))) {
+	while ((trail > 0) && (pos - trail < UTF8MaxBytes) && UTF8IsTrailByte(cb.UCharAt(trail - 1))) {
 		trail--;
 	}
 	start = (trail > 0) ? trail - 1 : trail;
@@ -1158,7 +1159,8 @@ bool Document::IsDBCSDualByteAt(Sci::Position pos) const noexcept {
 
 namespace {
 
-constexpr Sci::Position NextTab(Sci::Position pos, Sci::Position tabSize) noexcept {
+template <typename T>
+constexpr T NextTab(T pos, unsigned tabSize) noexcept {
 	return ((pos / tabSize) + 1) * tabSize;
 }
 
@@ -1636,7 +1638,7 @@ void Document::DelCharBack(Sci::Position pos) {
 }
 
 int SCI_METHOD Document::GetLineIndentation(Sci_Line line) const noexcept {
-	int indent = 0;
+	unsigned indent = 0;
 	if (IsValidIndex(line, LinesTotal())) {
 		const Sci::Position lineStart = LineStart(line);
 		const Sci::Position length = LengthNoExcept();
@@ -1645,7 +1647,7 @@ int SCI_METHOD Document::GetLineIndentation(Sci_Line line) const noexcept {
 			if (ch == ' ')
 				indent++;
 			else if (ch == '\t')
-				indent = static_cast<int>(NextTab(indent, tabInChars));
+				indent = NextTab(indent, tabInChars);
 			else
 				return indent;
 		}

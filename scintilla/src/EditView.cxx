@@ -385,9 +385,9 @@ struct LayoutWorker {
 		XYPOSITION * const positions = ll->PositionsFor(ts.start + 1);
 		if (style.visible) {
 			if (ts.representation) {
+				// Tab is a special case of representation, taking a variable amount of space
+				// which will be filled in later.
 				if (ll->chars[ts.start] != '\t' || vstyle.tabDrawMode == TabDrawMode::ControlChar) {
-					// Tab is a special case of representation, taking a variable amount of space
-					// which will be filled in later.
 					XYPOSITION representationWidth = vstyle.controlCharWidth;
 					if (representationWidth <= 0.0) {
 						const Style &styleCtrl = vstyle.styles[StyleControlChar];
@@ -744,7 +744,7 @@ void EditView::UpdateBidiData(const EditModel &model, const ViewStyle &vstyle, L
 			const Representation *repr = model.reprs->RepresentationFromCharacter(std::string_view(&ll->chars[charsInLine], charWidth));
 
 			ll->bidiData->widthReprs[charsInLine] = 0.0f;
-			if (repr && ll->chars[charsInLine] != '\t' && vstyle.tabDrawMode != TabDrawMode::ControlChar) {
+			if (repr && (ll->chars[charsInLine] != '\t' || vstyle.tabDrawMode == TabDrawMode::ControlChar)) {
 				ll->bidiData->widthReprs[charsInLine] = ll->GetWidth(charsInLine + charWidth, charsInLine);
 			}
 			if (charWidth > 1) {
@@ -836,10 +836,10 @@ Range EditView::RangeDisplayLine(Surface *surface, const EditModel &model, Sci::
 SelectionPosition EditView::SPositionFromLocation(Surface *surface, const EditModel &model, PointDocument pt, bool canReturnInvalid,
 	bool charPosition, bool virtualSpace, const ViewStyle &vs, PRectangle rcClient) {
 	pt.x = pt.x - vs.textStart;
-	Sci::Line lineVisible = static_cast<int>(std::floor(pt.y / vs.lineHeight));
-	if (!canReturnInvalid && (lineVisible < 0))
-		lineVisible = 0;
-	const Sci::Line lineDoc = model.pcs->DocFromDisplay(lineVisible);
+	Sci::Line visibleLine = static_cast<int>(std::floor(pt.y / vs.lineHeight));
+	if (!canReturnInvalid && (visibleLine < 0))
+		visibleLine = 0;
+	const Sci::Line lineDoc = model.pcs->DocFromDisplay(visibleLine);
 	if (canReturnInvalid && (lineDoc < 0))
 		return SelectionPosition(Sci::invalidPosition);
 	if (lineDoc >= model.pdoc->LinesTotal())
@@ -850,7 +850,7 @@ SelectionPosition EditView::SPositionFromLocation(Surface *surface, const EditMo
 		auto const ll = RetrieveLineLayout(lineDoc, model);
 		LayoutLine(model, surface, vs, ll.get(), model.wrapWidth, LayoutLineOption::AutoUpdate);
 		const Sci::Line lineStartSet = model.pcs->DisplayFromDoc(lineDoc);
-		const int subLine = static_cast<int>(lineVisible - lineStartSet);
+		const int subLine = static_cast<int>(visibleLine - lineStartSet);
 		if (subLine < ll->lines) {
 			const Range rangeSubLine = ll->SubLineRange(subLine, LineLayout::Scope::visibleOnly);
 			const XYPOSITION subLineStart = ll->GetPosition(rangeSubLine.start);
@@ -1269,7 +1269,6 @@ void EditView::DrawEOL(Surface *surface, const EditModel &model, const ViewStyle
 	} else if (const Style &styleLast = vsDraw.styles[ll->LastStyle()]; styleLast.eolFilled) {
 		base = styleLast.back;
 	}
-
 	surface->FillRectangleAligned(rcEOLIsSelected, Fill(base.Opaque()));
 	if (drawEOLSelection && (vsDraw.selection.layer != Layer::Base)) {
 		surface->FillRectangleAligned(rcEOLIsSelected, selectionBack);
@@ -2173,9 +2172,10 @@ void DrawIndicators(Surface *surface, const EditModel &model, const ViewStyle &v
 				const Sci::Position braceOffset = model.braces[brace] - posLineStart;
 				if (braceOffset >= lineStart && braceOffset < lineEnd) {
 					if (InLineRange(braceOffset, ll->numCharsInLine)) {
-						const Sci::Position secondOffset = model.pdoc->MovePositionOutsideChar(model.braces[brace] + 1, 1) - posLineStart;
-						DrawIndicator(braceIndicator, braceOffset, braceOffset + 1, surface, vsDraw, ll, xStart, rcLine, secondOffset,
-							subLine, Indicator::State::normal, 1, model.BidirectionalEnabled(), tabWidthMinimumPixels);
+						const Sci::Position braceEnd = model.pdoc->MovePositionOutsideChar(model.braces[brace] + 1, 1) - posLineStart;
+						DrawIndicator(braceIndicator, braceOffset, braceEnd,
+							surface, vsDraw, ll, xStart, rcLine, braceEnd, subLine, Indicator::State::normal,
+							1, model.BidirectionalEnabled(), tabWidthMinimumPixels);
 					}
 				}
 			}
@@ -2758,8 +2758,8 @@ void EditView::PaintText(Surface *surfaceWindow, const EditModel &model, const V
 					rcLine.top = static_cast<XYPOSITION>(ypos);
 					rcLine.bottom = static_cast<XYPOSITION>(ypos + vsDraw.lineHeight);
 
-					const ForwardRange rangeLine(model.pdoc->LineStart(lineDoc),
-						model.pdoc->LineStart(lineDoc + 1));
+					const Sci::Position lineStart = model.pdoc->LineStart(lineDoc);
+					const ForwardRange rangeLine(lineStart, lineStart + ll->numCharsInLine);
 
 					// Highlight the current braces if any
 					ll->SetBracesHighlight(rangeLine, model.braces, static_cast<unsigned char>(model.bracesMatchStyle),
