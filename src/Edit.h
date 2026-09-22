@@ -410,6 +410,7 @@ enum {
 
 struct EditAutoCompletionConfig {
 	bool bIndentText;
+	bool bIndentAfterMarkers;
 	bool bIgnoreCase;
 	bool bLaTeXInputMethod;
 	int iCompleteOption;
