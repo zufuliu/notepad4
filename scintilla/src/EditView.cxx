@@ -682,21 +682,18 @@ uint32_t EditView::LayoutLine(const EditModel &model, Surface *surface, const Vi
 				width -= static_cast<int>(aveCharWidth); // take into account the space for end wrap mark
 			}
 			XYPOSITION wrapAddIndent = 0; // This will be added to initial indent of line
-			switch (vstyle.wrap.indentMode) {
-			case WrapIndentMode::Fixed:
+			const WrapIndentMode indentMode = vstyle.wrap.indentMode;
+			if (indentMode == WrapIndentMode::Fixed) {
 				wrapAddIndent = vstyle.wrap.visualStartIndent * aveCharWidth;
-				break;
-			case WrapIndentMode::Indent:
-				wrapAddIndent = model.pdoc->IndentSize() * aveCharWidth;
-				break;
-			case WrapIndentMode::DeepIndent:
-				wrapAddIndent = model.pdoc->IndentSize() * 2 * aveCharWidth;
-				break;
-			default:	// No additional indent for WrapIndentMode::Fixed
-				break;
+			} else if (indentMode >= WrapIndentMode::Indent) {
+				int indentWidth = model.pdoc->IndentSize();
+				if (indentMode != WrapIndentMode::Indent) {
+					indentWidth += indentWidth;
+				}
+				wrapAddIndent = indentWidth * aveCharWidth;
 			}
 			XYPOSITION wrapIndent = wrapAddIndent;
-			if (vstyle.wrap.indentMode != WrapIndentMode::Fixed) {
+			if (indentMode != WrapIndentMode::Fixed) {
 				for (int i = 0; i < ll->lastSegmentEnd; i++) {
 					if (!IsSpaceOrTab(ll->chars[i])) {
 						wrapIndent += ll->GetPosition(i); // Add line indent
@@ -1160,8 +1157,9 @@ void EditView::DrawEOL(Surface *surface, const EditModel &model, const ViewStyle
 		const ColourRGBA backgroundFill = background.value_or(vsDraw.styles[ll->LastStyle()].back);
 		surface->FillRectangleAligned(rcSegment, backgroundFill);
 		if (vsDraw.selection.visible && (vsDraw.selection.layer == Layer::Base)) {
-			const SelectionSegment virtualSpaceRange(SelectionPosition(model.pdoc->LineEnd(line)),
-				SelectionPosition(model.pdoc->LineEnd(line), virtualSpaces));
+			const Sci::Position posLineEnd = posLineStart + ll->numCharsBeforeEOL;
+			const SelectionSegment virtualSpaceRange(SelectionPosition(posLineEnd),
+				SelectionPosition(posLineEnd, virtualSpaces));
 			for (size_t r = 0; r < model.sel.Count(); r++) {
 				const SelectionSegment portion = model.sel.Range(r).Intersect(virtualSpaceRange);
 				if (!portion.Empty()) {
