@@ -1769,27 +1769,26 @@ Sci::Position Document::CountUTF16(Sci::Position startPos, Sci::Position endPos)
 	return count;
 }
 
-Sci::Position Document::FindColumn(Sci::Line line, Sci::Position column) const noexcept {
-	Sci::Position position = LineStart(line);
-	if (IsValidIndex(line, LinesTotal())) {
-		const Sci::Position length = LengthNoExcept();
-		Sci::Position columnCurrent = 0;
-		while ((columnCurrent < column) && (position < length)) {
-			const char ch = cb.CharAt(position);
-			if (ch == '\t') {
-				columnCurrent = NextTab(columnCurrent, tabInChars);
-				if (columnCurrent > column)
-					return position;
-				position++;
-			} else if (ch == '\n' || ch == '\r') {
+Sci::Position Document::FindColumn(Sci::Line line, Sci::Position column, Sci::Position endPos) const noexcept {
+	Sci::Position position = cb.LineStart(line);
+	if (endPos < 0) {
+		endPos = cb.LineEnd(line);
+	}
+
+	Sci::Position columnCurrent = 0;
+	while ((columnCurrent < column) && (position < endPos)) {
+		const char ch = cb.CharAt(position);
+		if (ch == '\t') {
+			columnCurrent = NextTab(columnCurrent, tabInChars);
+			if (columnCurrent > column)
 				return position;
-			} else if (UTF8IsAscii(ch)) {
-				columnCurrent++;
-				position++;
-			} else {
-				columnCurrent++;
-				position = NextPosition(position, 1);
-			}
+			position++;
+		} else if (UTF8IsAscii(ch)) {
+			columnCurrent++;
+			position++;
+		} else {
+			columnCurrent++;
+			position = NextPosition(position, 1);
 		}
 	}
 	return position;
@@ -1800,7 +1799,7 @@ void Document::Indent(bool forwards, Sci::Line lineBottom, Sci::Line lineTop) {
 	for (Sci::Line line = lineBottom; line >= lineTop; line--) {
 		const Sci::Position indentOfLine = GetLineIndentation(line);
 		if (forwards) {
-			if (LineStart(line) < LineEnd(line)) {
+			if (indentOfLine != 0 || LineStart(line) < LineEnd(line)) {
 				SetLineIndentation(line, indentOfLine + IndentSize());
 			}
 		} else {

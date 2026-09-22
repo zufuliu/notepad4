@@ -593,7 +593,7 @@ public:
 	Sci::Position CountCharacters(Sci::Position startPos, Sci::Position endPos) const noexcept;
 	void CountCharactersAndColumns(Scintilla::sptr_t lParam) const noexcept;
 	Sci::Position CountUTF16(Sci::Position startPos, Sci::Position endPos) const noexcept;
-	Sci::Position FindColumn(Sci::Line line, Sci::Position column) const noexcept;
+	Sci::Position FindColumn(Sci::Line line, Sci::Position column, Sci::Position endPos = -1) const noexcept;
 	void Indent(bool forwards, Sci::Line lineBottom, Sci::Line lineTop);
 	static std::string TransformLineEnds(std::string_view s, Scintilla::EndOfLine eolModeWanted);
 	void ConvertLineEnds(Scintilla::EndOfLine eolModeSet);
