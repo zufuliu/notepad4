@@ -6762,7 +6762,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 			iCurPos = SciCall_GetCurrentPos();
 			iAnchorPos = SciCall_GetAnchor();
 			iLine = SciCall_LineFromPosition(iCurPos) + 1;
-			iCol = SciCall_GetColumn(iCurPos) + 1;
+			iCol = SciCall_GetColumn(iCurPos, iLine - 1) + 1;
 			iVisTopLine = SciCall_GetFirstVisibleLine();
 			iDocTopLine = SciCall_DocLineFromVisible(iVisTopLine);
 			iXOffset = SciCall_GetXOffset();
@@ -7621,7 +7621,7 @@ void GetRelaunchParameters(LPWSTR szParameters, LPCWSTR lpszFile, RelaunchOption
 		const Sci_Position pos = SciCall_GetCurrentPos();
 		if (pos > 0) {
 			const Sci_Line line = SciCall_LineFromPosition(pos) + 1;
-			const Sci_Position col = SciCall_GetColumn(pos) + 1;
+			const Sci_Position col = SciCall_GetColumn(pos, line - 1) + 1;
 #if defined(_WIN64)
 			WCHAR tchLn[32];
 			WCHAR tchCol[32];

@@ -589,7 +589,7 @@ public:
 	int SCI_METHOD GetLineIndentation(Sci_Line line) const noexcept override;
 	Sci::Position SetLineIndentation(Sci::Line line, Sci::Position indent);
 	Sci::Position GetLineIndentPosition(Sci::Line line) const noexcept;
-	Sci::Position GetColumn(Sci::Position pos) const noexcept;
+	Sci::Position GetColumn(Sci::Position pos, Sci::Line line = -1) const noexcept;
 	Sci::Position CountCharacters(Sci::Position startPos, Sci::Position endPos) const noexcept;
 	void CountCharactersAndColumns(Scintilla::sptr_t lParam) const noexcept;
 	Sci::Position CountUTF16(Sci::Position startPos, Sci::Position endPos) const noexcept;

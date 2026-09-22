@@ -412,8 +412,8 @@ inline int SciCall_TextHeight() noexcept {
 	return static_cast<int>(SciCall(SCI_TEXTHEIGHT, 0, 0));
 }
 
-inline Sci_Position SciCall_GetColumn(Sci_Position position) noexcept {
-	return SciCall(SCI_GETCOLUMN, position, 0);
+inline Sci_Position SciCall_GetColumn(Sci_Position position, Sci_Line line = -1) noexcept {
+	return SciCall(SCI_GETCOLUMN, position, line);
 }
 
 inline Sci_Position SciCall_FindColumn(Sci_Line line, Sci_Position column) noexcept {

@@ -3029,7 +3029,7 @@ void EditAlignText(EditAlignMode nMode) noexcept {
 			}
 
 			++iLineEndPos;
-			const Sci_Position iEndCol = SciCall_GetColumn(iLineEndPos);
+			const Sci_Position iEndCol = SciCall_GetColumn(iLineEndPos, iLine);
 			const Sci_Position iIndentCol = SciCall_GetLineIndentation(iLine);
 			iMinIndent = min(iMinIndent, iIndentCol);
 			iMaxLength = max(iMaxLength, iEndCol);
@@ -3327,7 +3327,7 @@ void EditToggleLineComments(LPCWSTR pwszComment, int commentFlag) noexcept {
 			const Sci_Position iLineIndentPos = SciCall_GetLineIndentPosition(iLine);
 
 			if (iLineIndentPos != iLineEndPos) {
-				const Sci_Position iIndentColumn = SciCall_GetColumn(iLineIndentPos);
+				const Sci_Position iIndentColumn = SciCall_GetColumn(iLineIndentPos, iLine);
 				iCommentCol = min(iCommentCol, iIndentColumn);
 			}
 		}
@@ -3466,7 +3466,7 @@ void EditPadWithSpaces(bool bSkipEmpty, bool bNoUndoGroup) noexcept {
 
 		for (Sci_Line iLine = iLineStart; iLine <= iLineEnd; iLine++) {
 			const Sci_Position iPos = SciCall_GetLineEndPosition(iLine);
-			iMaxColumn = max(iMaxColumn, SciCall_GetColumn(iPos));
+			iMaxColumn = max(iMaxColumn, SciCall_GetColumn(iPos, iLine));
 		}
 	} else {
 		const Sci_Position iCurPos = SciCall_GetCurrentPos();
@@ -3475,8 +3475,8 @@ void EditPadWithSpaces(bool bSkipEmpty, bool bNoUndoGroup) noexcept {
 		iRcCurLine = SciCall_LineFromPosition(iCurPos);
 		iRcAnchorLine = SciCall_LineFromPosition(iAnchorPos);
 
-		iRcCurCol = SciCall_GetColumn(iCurPos);
-		iRcAnchorCol = SciCall_GetColumn(iAnchorPos);
+		iRcCurCol = SciCall_GetColumn(iCurPos, iRcCurLine);
+		iRcAnchorCol = SciCall_GetColumn(iAnchorPos, iRcAnchorLine);
 
 		iLineStart = 0;
 		iLineEnd = SciCall_GetLineCount() - 1;
@@ -3484,7 +3484,7 @@ void EditPadWithSpaces(bool bSkipEmpty, bool bNoUndoGroup) noexcept {
 		for (Sci_Line iLine = iLineStart; iLine <= iLineEnd; iLine++) {
 			const Sci_Position iPos = SciCall_GetLineSelEndPosition(iLine);
 			if (iPos >= 0) {
-				iMaxColumn = max(iMaxColumn, SciCall_GetColumn(iPos));
+				iMaxColumn = max(iMaxColumn, SciCall_GetColumn(iPos, iLine));
 			}
 		}
 	}
@@ -3511,7 +3511,7 @@ void EditPadWithSpaces(bool bSkipEmpty, bool bNoUndoGroup) noexcept {
 				continue;
 			}
 
-			const Sci_Position iPadLen = iMaxColumn - SciCall_GetColumn(iPos);
+			const Sci_Position iPadLen = iMaxColumn - SciCall_GetColumn(iPos, iLine);
 
 			SciCall_SetTargetRange(iPos, iPos);
 			SciCall_ReplaceTarget(iPadLen, pmszPadStr);
@@ -4092,8 +4092,8 @@ void EditSortLines(EditSortFlag iSortFlags) noexcept {
 		iRcCurLine = SciCall_LineFromPosition(iCurPos);
 		iRcAnchorLine = SciCall_LineFromPosition(iAnchorPos);
 
-		iRcCurCol = SciCall_GetColumn(iCurPos);
-		iRcAnchorCol = SciCall_GetColumn(iAnchorPos);
+		iRcCurCol = SciCall_GetColumn(iCurPos, iRcCurLine);
+		iRcAnchorCol = SciCall_GetColumn(iAnchorPos, iRcAnchorLine);
 
 		iLineStart = min(iRcCurLine, iRcAnchorLine);
 		iLineEnd = max(iRcCurLine, iRcAnchorLine);
@@ -7975,7 +7975,7 @@ void EditGotoBlock(int menu) noexcept {
 	}
 
 	if (iLine >= 0 && iLine != iCurLine) {
-		const Sci_Position column = SciCall_GetColumn(iCurPos);
+		const Sci_Position column = SciCall_GetColumn(iCurPos, iCurLine);
 		EditJumpTo(iLine + 1, column + 1);
 	}
 }

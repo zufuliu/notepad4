@@ -320,7 +320,7 @@ public:
 	void SetLineIndentation(Line line, int indentation);
 	int LineIndentation(Line line);
 	Position LineIndentPosition(Line line);
-	Position Column(Position pos);
+	Position Column(Position pos, Line line);
 	Position CountCharacters(Position start, Position end);
 	void CountCharactersAndColumns(TextToFindFull *ft);
 	Position CountCodeUnits(Position start, Position end);

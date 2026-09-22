@@ -1094,8 +1094,8 @@ Position ScintillaCall::LineIndentPosition(Line line) {
 	return Call(Message::GetLineIndentPosition, line);
 }
 
-Position ScintillaCall::Column(Position pos) {
-	return Call(Message::GetColumn, pos);
+Position ScintillaCall::Column(Position pos, Line line) {
+	return Call(Message::GetColumn, pos, line);
 }
 
 Position ScintillaCall::CountCharacters(Position start, Position end) {

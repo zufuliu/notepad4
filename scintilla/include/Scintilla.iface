@@ -1251,7 +1251,7 @@ get int GetLineIndentation=2127(line line,)
 get position GetLineIndentPosition=2128(line line,)
 
 # Retrieve the column number of a position, taking tab width into account.
-get position GetColumn=2129(position pos,)
+get position GetColumn=2129(position pos, line line)
 
 # Count characters between two positions.
 fun position CountCharacters=2633(position start, position end)
