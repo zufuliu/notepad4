@@ -117,20 +117,12 @@ Used by VSCode, Atom etc.
 #define SPI_GETWHEELSCROLLCHARS		0x006C
 #endif
 
-extern HANDLE g_hDefaultHeap;
 extern char *EditMapTextCase(int menu, const char *pszText, size_t &iSelCount, UINT cpEdit) noexcept;
 
 using namespace Scintilla;
 using namespace Scintilla::Internal;
 
 namespace {
-
-struct HeapPointerFreer {
-	template <typename T>
-	void operator()(T *ptr) const noexcept {
-		::HeapFree(g_hDefaultHeap, 0, ptr);
-	}
-};
 
 // Two idle messages SC_WIN_IDLE and SC_WORK_IDLE.
 
@@ -144,14 +136,10 @@ constexpr UINT SC_WORK_IDLE = 5002;
 
 #if _WIN32_WINNT < _WIN32_WINNT_WIN8
 using SetCoalescableTimerSig = UINT_PTR (WINAPI *)(HWND hwnd, UINT_PTR nIDEvent,
-	UINT uElapse, TIMERPROC lpTimerFunc, ULONG uToleranceDelay);
+	UINT uElapse, TIMERPROC lpTimerFunc, ULONG uToleranceDelay) noexcept;
 #endif
 
 constexpr const WCHAR *callClassName = L"CallTip";
-
-inline void SetWindowID(HWND hWnd, int identifier) noexcept {
-	::SetWindowLongPtr(hWnd, GWLP_ID, identifier);
-}
 
 constexpr POINT POINTFromLParam(sptr_t lParam) noexcept {
 	return { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
@@ -580,11 +568,13 @@ HRESULT DirectDevice::CreateDevice() noexcept {
 
 	hr = pDirect3DDevice.As(&pDXGIDevice);
 	if (FAILED(hr)) {
+		// Platform::DebugPrintf("Failed to create DXGI device 0x%lx\n", hr);
 		return hr;
 	}
 
 	hr = pD2DFactory->CreateDevice(pDXGIDevice.Get(), pDirect2DDevice.ReleaseAndGetAddressOf());
 	if (FAILED(hr)) {
+		// Platform::DebugPrintf("Failed to create D2D device 0x%lx\n", hr);
 		return hr;
 	}
 
@@ -741,13 +731,13 @@ class ScintillaWin final :
 
 	std::string EncodeWString(std::wstring_view wsv) const;
 	sptr_t DefWndProc(Message iMessage, uptr_t wParam, sptr_t lParam) noexcept override;
-	void IdleWork() override;
-	void QueueIdleWork(WorkItems items, Sci::Position upTo) noexcept override;
-	bool SetIdle(bool on) noexcept override;
 	UINT_PTR timers[static_cast<int>(TickReason::dwell) + 1]{};
 	bool FineTickerRunning(TickReason reason) const noexcept override;
 	void FineTickerStart(TickReason reason, int millis, int tolerance) noexcept override;
 	void FineTickerCancel(TickReason reason) noexcept override;
+	void IdleWork() override;
+	void QueueIdleWork(WorkItems items, Sci::Position upTo) noexcept override;
+	bool SetIdle(bool on) noexcept override;
 	void SetMouseCapture(bool on) noexcept override;
 	bool HaveMouseCapture() const noexcept override;
 	void SetTrackMouseLeaveEvent(bool on) noexcept;
@@ -765,7 +755,6 @@ class ScintillaWin final :
 	void NotifyChange() const noexcept override;
 	void NotifyFocus(bool focus) const noexcept override;
 	void SetCtrlID(int identifier) noexcept override;
-	int GetCtrlID() const noexcept override;
 	void NotifyParent(NotificationData &scn) const noexcept override;
 	void NotifyDoubleClick(Point pt, KeyMod modifiers) override;
 	std::unique_ptr<CaseFolder> CaseFolderForEncoding() const override;
@@ -2251,7 +2240,7 @@ sptr_t ScintillaWin::EditMessage(unsigned int iMessage, uptr_t wParam, sptr_t lP
 			return -1;
 		} else {
 			const FINDTEXTA *pFT = AsPointer<const FINDTEXTA *>(lParam);
-			TextToFindFull tt = { { pFT->chrg.cpMin, pFT->chrg.cpMax }, pFT->lpstrText, {} };
+			TextToFindFull tt = { { pFT->chrg.cpMin, pFT->chrg.cpMax }, pFT->lpstrText, 0, {} };
 			return ScintillaBase::WndProc(Message::FindTextFull, wParam, AsInteger<sptr_t>(&tt));
 		}
 
@@ -2260,7 +2249,7 @@ sptr_t ScintillaWin::EditMessage(unsigned int iMessage, uptr_t wParam, sptr_t lP
 			return -1;
 		} else {
 			FINDTEXTEXA *pFT = AsPointer<FINDTEXTEXA *>(lParam);
-			TextToFindFull tt = { { pFT->chrg.cpMin, pFT->chrg.cpMax }, pFT->lpstrText, {} };
+			TextToFindFull tt = { { pFT->chrg.cpMin, pFT->chrg.cpMax }, pFT->lpstrText, 0, {} };
 			const Sci::Position pos =ScintillaBase::WndProc(Message::FindTextFull, wParam, AsInteger<sptr_t>(&tt));
 			pFT->chrgText.cpMin = (pos < 0)? -1 : static_cast<LONG>(tt.chrgText.cpMin);
 			pFT->chrgText.cpMax = (pos < 0)? -1 : static_cast<LONG>(tt.chrgText.cpMax);
@@ -2492,7 +2481,7 @@ sptr_t ScintillaWin::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		switch (msg) {
 
 		case WM_CREATE:
-			ctrlID = ::GetDlgCtrlID(MainHWND());
+			ctrlID = static_cast<int>(::GetWindowLongPtr(MainHWND(), GWLP_ID));
 			UpdateBaseElements();
 			GetMouseParameters();
 			::RegisterDragDrop(MainHWND(), &dt);
@@ -2640,8 +2629,8 @@ sptr_t ScintillaWin::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 			capturedMouse = false;
 			return 0;
 
-			// These are not handled in Scintilla and it's faster to dispatch them here.
-			// Also moves time out to here so profile doesn't count lots of empty message calls.
+		// These are not handled in Scintilla and its faster to dispatch them here.
+		// Also moves time out to here so profile doesn't count lots of empty message calls.
 
 		case WM_MOVE:
 		case WM_MOUSEACTIVATE:
@@ -3020,11 +3009,9 @@ void ScintillaWin::NotifyFocus(bool focus) const noexcept {
 }
 
 void ScintillaWin::SetCtrlID(int identifier) noexcept {
-	::SetWindowID(MainHWND(), identifier);
-}
-
-int ScintillaWin::GetCtrlID() const noexcept {
-	return ::GetDlgCtrlID(MainHWND());
+	ctrlID = identifier;
+	::SetWindowLongPtr(MainHWND(), GWLP_ID, identifier);
+	// ctrlID = static_cast<int>(::GetWindowLongPtr(MainHWND(), GWLP_ID));
 }
 
 void ScintillaWin::NotifyParent(NotificationData &scn) const noexcept {
@@ -3316,7 +3303,7 @@ std::string ScintillaWin::CaseMapString(const std::string &s, CaseMapping caseMa
 	if (caseMapping >= CaseMapping::custom) {
 		size_t length = s.length();
 		const std::unique_ptr<char, HeapPointerFreer> pszText{EditMapTextCase(static_cast<int>(caseMapping), s.c_str(), length, cpDoc)};
-		if (pszText) {
+		if (pszText && static_cast<ptrdiff_t>(length) > 0) {
 			return {pszText.get(), length};
 		}
 		return s;

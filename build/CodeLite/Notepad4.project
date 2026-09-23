@@ -293,6 +293,7 @@
       <File Name="../../src/EditLexers/stlZig.cpp"/>
     </VirtualDirectory>
     <File Name="../../src/Bridge.cpp"/>
+    <File Name="../../src/DarkMode.cpp"/>
     <File Name="../../src/Dialogs.cpp"/>
     <File Name="../../src/Dlapi.cpp"/>
     <File Name="../../src/Edit.cpp"/>
@@ -305,6 +306,7 @@
   <VirtualDirectory Name="Header Files">
     <File Name="../../src/compiler.h"/>
     <File Name="../../src/config.h"/>
+    <File Name="../../src/DarkMode.h"/>
     <File Name="../../src/Dialogs.h"/>
     <File Name="../../src/Dlapi.h"/>
     <File Name="../../src/Edit.h"/>

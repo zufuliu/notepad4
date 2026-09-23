@@ -57,21 +57,21 @@ using namespace Scintilla;
 #if _WIN32_WINNT < _WIN32_WINNT_WIN10
 namespace {
 
-using GetDpiForWindowSig = UINT (WINAPI *)(HWND hwnd);
+using GetDpiForWindowSig = UINT (WINAPI *)(HWND hwnd) noexcept;
 GetDpiForWindowSig fnGetDpiForWindow = nullptr;
 
 #ifndef DPI_ENUMS_DECLARED
 #define MDT_EFFECTIVE_DPI	0
 #endif
 
-using GetDpiForMonitorSig = HRESULT (WINAPI *)(HMONITOR hmonitor, /*MONITOR_DPI_TYPE*/int dpiType, UINT *dpiX, UINT *dpiY);
+using GetDpiForMonitorSig = HRESULT (WINAPI *)(HMONITOR hmonitor, /*MONITOR_DPI_TYPE*/int dpiType, UINT *dpiX, UINT *dpiY) noexcept;
 HMODULE hShcoreDLL {};
 GetDpiForMonitorSig fnGetDpiForMonitor = nullptr;
 
-using GetSystemMetricsForDpiSig = int (WINAPI *)(int nIndex, UINT dpi);
+using GetSystemMetricsForDpiSig = int (WINAPI *)(int nIndex, UINT dpi) noexcept;
 GetSystemMetricsForDpiSig fnGetSystemMetricsForDpi = nullptr;
 
-using AdjustWindowRectExForDpiSig = BOOL (WINAPI *)(LPRECT lpRect, DWORD dwStyle, BOOL bMenu, DWORD dwExStyle, UINT dpi);
+using AdjustWindowRectExForDpiSig = BOOL (WINAPI *)(LPRECT lpRect, DWORD dwStyle, BOOL bMenu, DWORD dwExStyle, UINT dpi) noexcept;
 AdjustWindowRectExForDpiSig fnAdjustWindowRectExForDpi = nullptr;
 
 }
@@ -85,7 +85,7 @@ void Scintilla_LoadDpiForWindow(void) {
 	fnGetSystemMetricsForDpi = DLLFunction<GetSystemMetricsForDpiSig>(user32, "GetSystemMetricsForDpi");
 	fnAdjustWindowRectExForDpi = DLLFunction<AdjustWindowRectExForDpiSig>(user32, "AdjustWindowRectExForDpi");
 
-	using GetDpiForSystemSig = UINT (WINAPI *)(void);
+	using GetDpiForSystemSig = UINT (WINAPI *)(void) noexcept;
 	GetDpiForSystemSig fnGetDpiForSystem = DLLFunction<GetDpiForSystemSig>(user32, "GetDpiForSystem");
 	if (fnGetDpiForSystem) {
 		g_uSystemDPI = fnGetDpiForSystem();
@@ -380,34 +380,14 @@ HCURSOR LoadReverseArrowCursor(HCURSOR cursor, UINT dpi) noexcept {
 			// https://learn.microsoft.com/en-us/answers/questions/1315176/how-to-copy-system-cursors-properly
 			WCHAR cursorPath[MAX_PATH]{};
 			DWORD size = sizeof(cursorPath);
-			DWORD type = REG_NONE;
-#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-			status = ::RegGetValueW(hKey, nullptr, L"Arrow", RRF_RT_REG_SZ, &type, cursorPath, &size);
-			if (status == ERROR_SUCCESS && type == REG_SZ) {
+			status = ::RegGetValueW(hKey, nullptr, L"Arrow", RRF_RT_REG_SZ, nullptr, cursorPath, &size);
+			if (status == ERROR_SUCCESS) {
 				HCURSOR load = static_cast<HCURSOR>(::LoadImage({}, cursorPath, IMAGE_CURSOR, width, height, LR_LOADFROMFILE));
 				if (load) {
 					created = true;
 					cursor = load;
 				}
 			}
-#else
-			status = ::RegQueryValueExW(hKey, L"Arrow", nullptr, &type, reinterpret_cast<LPBYTE>(cursorPath), &size);
-			if (status == ERROR_SUCCESS && (type == REG_SZ || type == REG_EXPAND_SZ)) {
-				LPCWSTR path = cursorPath;
-				WCHAR expansion[MAX_PATH];
-				if (type == REG_EXPAND_SZ) {
-					size = ::ExpandEnvironmentStringsW(cursorPath, expansion, MAX_PATH);
-					if (size > 0 && size <= MAX_PATH) {
-						path = expansion;
-					}
-				}
-				HCURSOR load = static_cast<HCURSOR>(::LoadImage({}, path, IMAGE_CURSOR, width, height, LR_LOADFROMFILE));
-				if (load) {
-					created = true;
-					cursor = load;
-				}
-			}
-#endif // _WIN32_WINNT_VISTA
 		}
 		HCURSOR copy = static_cast<HCURSOR>(::CopyImage(cursor, IMAGE_CURSOR, width, height, LR_COPYFROMRESOURCE | LR_COPYRETURNORG));
 		if (copy && copy != cursor) {
@@ -718,7 +698,7 @@ void ChooseCursor(Window::Cursor curs) noexcept {
 
 }
 
-void Window::SetCursor(Cursor curs) noexcept {
+void Window::SetCursor(Cursor curs) const noexcept {
 	ChooseCursor(curs);
 }
 
@@ -804,7 +784,7 @@ void Platform::DebugPrintf(const char *format, ...) noexcept {
 	char buffer[lengthDiagnostic];
 	va_list pArguments;
 	va_start(pArguments, format);
-	vsprintf(buffer, format, pArguments);
+	vsnprintf(buffer, std::size(buffer), format, pArguments);
 	va_end(pArguments);
 	Platform::DebugDisplay(buffer);
 }
@@ -817,7 +797,7 @@ bool Platform::ShowAssertionPopUps(bool assertionPopUps_) noexcept {
 
 void Platform::Assert(const char *c, const char *file, int line) noexcept {
 	char buffer[lengthDiagnostic]{};
-	sprintf(buffer, "Assertion [%s] failed at %s %d%s", c, file, line, assertionPopUps ? "" : "\r\n");
+	snprintf(buffer, std::size(buffer), "Assertion [%s] failed at %s %d%s", c, file, line, assertionPopUps ? "" : "\r\n");
 	if (assertionPopUps) {
 		const int idButton = ::MessageBoxA({}, buffer, "Assertion failure",
 			MB_ABORTRETRYIGNORE | MB_ICONHAND | MB_SETFOREGROUND | MB_TASKMODAL);

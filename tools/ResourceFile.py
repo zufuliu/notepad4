@@ -61,6 +61,18 @@ def use_segoe_ui_font(doc):
 	style = 'FONT 9, "Segoe UI", 400, 0, 0x1'
 	return re.sub(r'FONT.+MS Shell Dlg[^\r\n]+', style, doc)
 
+@file_updater
+def remove_version_link_text(doc):
+	return re.sub(r'[ \t]+LTEXT.+IDC_(NEW_PAGE|WEBPAGE|EMAIL|MOD_PAGE|SCI_PAGE)_TEXT.+WS_DISABLED.*[\n]', '', doc)
+
+@file_updater
+def adjust_about_main_icon(doc):
+	return doc.replace('IDR_MAINWND,IDC_STATIC,7,7,20,20', 'IDR_MAINWND,IDC_STATIC,14,7,20,20')
+
+@file_updater
+def remove_use_xp_file_dialog(doc):
+	return re.sub(r'.+_USE_XP_FILE_DIALOG.*[\n]', '', doc)
+
 def update_all_resource_file(func):
 	func('../src/Notepad4.rc')
 	func('../matepath/src/matepath.rc')
@@ -74,3 +86,6 @@ def update_all_resource_file(func):
 # update_all_resource_file(add_scrollbar_style)
 # update_all_resource_file(add_thick_frame_style)
 # update_all_resource_file(use_segoe_ui_font)
+# update_all_resource_file(remove_version_link_text)
+# update_all_resource_file(adjust_about_main_icon)
+# update_all_resource_file(remove_use_xp_file_dialog)

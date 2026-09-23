@@ -56,9 +56,6 @@
 using namespace Scintilla;
 using namespace Scintilla::Internal;
 
-Caret::Caret() noexcept :
-	active(false), on(false), period(500) {}
-
 void ModelState::RememberSelectionForUndo(int index, const Selection &sel) {
 	historyForUndo.indexCurrent = index;
 	historyForUndo.ssCurrent = sel.ToString();
@@ -113,7 +110,6 @@ EditModel::EditModel() :
 	bidirectional = Bidirectional::Disabled;
 	foldFlags = FoldFlag::None;
 	foldDisplayTextStyle = FoldDisplayTextStyle::Hidden;
-	hotspot = Range(Sci::invalidPosition);
 	hotspotSingleLine = true;
 	hoverIndicatorPos = Sci::invalidPosition;
 	wrapWidth = LineLayout::wrapWidthInfinite;
@@ -187,7 +183,7 @@ MarkerMask EditModel::GetMark(Sci::Line line) const noexcept {
 
 void EditModel::EnsureModelState() {
 	if (!modelState && (undoSelectionHistoryOption != UndoSelectionHistoryOption::Disabled)) {
-		if (auto vss = pdoc->GetViewState(this)) {
+		if (const auto vss = pdoc->GetViewState(this)) {
 #if USE_RTTI
 			modelState = std::dynamic_pointer_cast<ModelState>(vss);
 #else
@@ -219,7 +215,7 @@ bool EditModel::IdleTaskTimeExpired() const noexcept {
 }
 
 void EditModel::UpdateParallelLayoutThreshold() noexcept {
-	const uint32_t idleLength = durationWrapOneUnit.ActionsInAllowedTime(0.2);
-	minParallelLayoutLength = std::max(ParallelLayoutBlockSize, idleLength/64); // (1.5ms ~ 2ms)*2
+	const uint32_t idleLength = durationWrapOneUnit.ActionsInAllowedTime(0.25);
+	minParallelLayoutLength = std::max(ParallelLayoutBlockSize, idleLength/128); // (0.5ms ~ 1ms)*2
 	maxParallelLayoutLength = idleLength*hardwareConcurrency;
 }

@@ -81,9 +81,9 @@ void LoadD2DOnce() noexcept
 	// with LOAD_LIBRARY_SEARCH_SYSTEM32.
 
 	using D2D1CreateFactorySig = HRESULT(WINAPI *)(D2D1_FACTORY_TYPE factoryType, REFIID riid,
-		CONST D2D1_FACTORY_OPTIONS *pFactoryOptions, IUnknown **factory);
+		CONST D2D1_FACTORY_OPTIONS *pFactoryOptions, IUnknown **factory) noexcept;
 	using DWriteCreateFactorySig = HRESULT(WINAPI *)(DWRITE_FACTORY_TYPE factoryType, REFIID iid,
-		IUnknown **factory);
+		IUnknown **factory) noexcept;
 
 	hDLLD2D = ::LoadLibraryEx(L"d2d1.dll", {}, kSystemLibraryLoadFlags);
 	if (hDLLD2D) {

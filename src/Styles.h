@@ -71,7 +71,7 @@ struct StyleDefinition {
 	uint16_t backIndex;
 	int charset;
 	WCHAR fontWide[LF_FACESIZE];
-	char fontFace[LF_FACESIZE * kMaxMultiByteCount];
+	char fontFace[LF_FACESIZE];
 };
 
 enum StyleLoadFlag {
@@ -90,8 +90,8 @@ void	Style_ReleaseResources() noexcept;
 void	Style_Load() noexcept;
 void	Style_Save() noexcept;
 void	Style_LoadAll(StyleLoadFlag loadFlag) noexcept;
-bool	Style_Import(HWND hwnd) noexcept;
-bool	Style_Export(HWND hwnd) noexcept;
+bool	Style_Import(HWND hwnd);
+bool	Style_Export(HWND hwnd);
 void	Style_LoadTabSettings(LPCEDITLEXER pLex) noexcept;
 void	Style_SaveTabSettings(LPCEDITLEXER pLex) noexcept;
 void	EditApplyDefaultEncoding(LPCEDITLEXER pLex, BOOL bLexerChanged) noexcept;
@@ -121,7 +121,7 @@ void	Style_UpdateCaret() noexcept;
 void	Style_SetLongLineColors() noexcept;
 void	Style_HighlightCurrentLine() noexcept;
 void	Style_ToggleUseDefaultCodeStyle() noexcept;
-LPWSTR	Style_GetOpenDlgFilterStr(bool open, LPCWSTR lpszFile, int lexers[]) noexcept;
+void	Style_GetFileDialogFilter(FileDialog &dialog, LPCWSTR lpszFile, int lexers[]) noexcept;
 
 bool	Style_StrGetFontEx(LPCWSTR lpszStyle, LPWSTR lpszFont, int cchFont, bool bDefaultStyle) noexcept;
 bool	Style_StrGetCharSet(LPCWSTR lpszStyle, int *charset) noexcept;

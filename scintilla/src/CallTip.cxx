@@ -48,7 +48,7 @@ constexpr ColourRGBA silver(0xc0, 0xc0, 0xc0);
 }
 
 CallTip::CallTip() noexcept {
-	wCallTip = nullptr;
+	wCallTip = {};
 	inCallTipMode = false;
 	posStartCallTip = 0;
 	rectUp = PRectangle(0, 0, 0, 0);
@@ -69,6 +69,7 @@ CallTip::CallTip() noexcept {
 
 	colourBG = colourBackground;
 	colourUnSel = colourTextAndArrow;
+
 	colourSel = ColourRGBA(0, 0, 0x80);
 	colourShade = black;
 	colourLight = silver;
@@ -318,8 +319,7 @@ PRectangle CallTip::CallTipStart(Sci::Position pos, Point pt, int textHeight, co
 void CallTip::CallTipCancel() noexcept {
 	inCallTipMode = false;
 	if (wCallTip.Created()) {
-		//wCallTip.Destroy();
-		wCallTip.Show(false);
+		wCallTip.Destroy();
 	}
 }
 

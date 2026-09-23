@@ -56,14 +56,13 @@ enum MatchTextFlag {
 };
 
 //==== Data Type for WM_COPYDATA ==============================================
-#define DATA_NOTEPAD4_PARAMS 0xFB10
 struct NP2PARAMS {
 	bool	flagFileSpecified;
 	bool	flagReadOnlyMode;
 	bool	flagLexerSpecified;
 	bool	flagQuietCreate;
 	bool	flagTitleExcerpt;
-	bool	flagJumpTo;
+	unsigned	flagJumpTo;
 	TripleBoolean	flagChangeNotify;
 	int		iInitialLexer;
 	Sci_Line		iInitialLine;
@@ -74,6 +73,8 @@ struct NP2PARAMS {
 	MatchTextFlag flagMatchText;
 	WCHAR wchData;
 };
+//! increase this value when change layout for NP2PARAMS
+#define DATA_NOTEPAD4_PARAMS (0xFB10 + sizeof(NP2PARAMS))
 
 //==== Toolbar Style ==========================================================
 #define WS_TOOLBAR (WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS |				\
@@ -117,10 +118,6 @@ enum {
 };
 #define STATUS_HELP			(255 | SBT_NOBORDERS)
 
-/**
- * App message used to center MessageBox to the window of the program.
- */
-#define APPM_CENTER_MESSAGE_BOX		(WM_APP + 1)
 #define APPM_CHANGENOTIFY			(WM_APP + 2)	// file change notifications
 //#define APPM_CHANGENOTIFYCLEAR	(WM_APP + 3)
 #define APPM_TRAYMESSAGE			(WM_APP + 4)	// callback message from system tray
@@ -220,9 +217,14 @@ extern WindowPositionRecord positionRecord;
 BOOL InitApplication(HINSTANCE hInstance) noexcept;
 void InitInstance(HINSTANCE hInstance, int nCmdShow);
 bool ActivatePrevInst() noexcept;
-void GetRelaunchParameters(LPWSTR szParameters, LPCWSTR lpszFile, bool newWind, bool emptyWind) noexcept;
+enum RelaunchOption {
+	RelaunchOption_None = 0,
+	RelaunchOption_NewWindow = 1,
+	RelaunchOption_EmptyWindow = 2,
+};
+void GetRelaunchParameters(LPWSTR szParameters, LPCWSTR lpszFile, RelaunchOption option) noexcept;
 bool RelaunchMultiInst() noexcept;
-bool RelaunchElevated() noexcept;
+bool RelaunchElevated();
 void SnapToDefaultPos(HWND hwnd) noexcept;
 void ShowNotifyIcon(HWND hwnd, bool bAdd) noexcept;
 void SetNotifyIconTitle(HWND hwnd) noexcept;
@@ -295,13 +297,14 @@ enum FileSaveFlag {
 	FileSaveFlag_EndSession = 16,
 	FileSaveFlag_Untitled = 32,
 	FileSaveFlag_OriginalTimestamp = 64,
+	FileSaveFlag_UpdateTimestamp = 128,
 };
 
 bool FileIO(bool fLoad, LPWSTR pszFile, FileSaveFlag flag, EditFileIOStatus &status) noexcept;
 bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile);
-bool FileSave(FileSaveFlag saveFlag) noexcept;
-BOOL OpenFileDlg(LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) noexcept;
-BOOL SaveFileDlg(FileSaveFlag saveFlag, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) noexcept;
+bool FileSave(FileSaveFlag saveFlag);
+bool OpenFileDlg(LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir);
+bool SaveFileDlg(FileSaveFlag saveFlag, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir);
 
 enum {
 	AutoSaveOption_None = 0,

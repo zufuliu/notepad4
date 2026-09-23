@@ -22,10 +22,11 @@
 // WideCharToMultiByte(), UTF8 encoding for U+0800 to U+FFFF
 #define kMaxMultiByteCount	3
 
-#define NP2_FIND_REPLACE_LIMIT	2048
+#define NP2_FIND_REPLACE_LIMIT_MRU	2048
+#define NP2_FIND_REPLACE_LIMIT_SEL	(1024*1024)
+#define NP2_FIND_REPLACE_LIMIT_EDIT	0	// INT_MAX - 1
 #define NP2_LONG_LINE_LIMIT		4096
 
-#define NP2_InvalidSearchFlags	(-1)
 #define NP2_MarkAllMultiline	0x00001000
 #define NP2_MarkAllBookmark		0x00002000
 #define NP2_MarkAllSelectAll	0x00004000
@@ -48,16 +49,48 @@ enum {
 	FindReplaceOption_TransformBackslash = 8,
 	FindReplaceOption_WildcardSearch = 16,
 	FindReplaceOption_SearchMask = 24,
+	FindReplaceOption_LastReplaceEmpty = 32,
+	FindReplaceOption_MRUSaveMask = FindReplaceOption_SearchMask | FindReplaceOption_LastReplaceEmpty,
 };
 
-struct EDITFINDREPLACE {
-	HWND	hwnd;
+enum {
+	FindReplaceStatus_None = 0,
+	FindReplaceStatus_HasFindText = 1,
+	FindReplaceStatus_ReplaceInitialized = 2,
+	FindReplaceStatus_FindUpdated = 4,
+	FindReplaceStatus_ReplaceUpdated = 8,
+	FindReplaceStatus_ReplaceClipboard = 16,
+	FindReplaceStatus_RegexStartOfLine = 32,
+	FindReplaceStatus_ReplaceCheckMask = FindReplaceStatus_FindUpdated | FindReplaceStatus_ReplaceUpdated | FindReplaceStatus_ReplaceClipboard,
+};
+
+constexpr UINT PackFindFlagOption(UINT flags, UINT option, UINT mask = FindReplaceOption_SearchMask) noexcept {
+	return flags | ((option & mask) << 10);
+}
+
+struct EditFindReplace {
 	UINT	fuFlags;
 	UINT	option;
-	char	szFind[512];
-	char	szReplace[512];
-	char	szFindUTF8[512 * kMaxMultiByteCount];
-	char	szReplaceUTF8[512 * kMaxMultiByteCount];
+	LPWSTR	wszFind;
+	LPWSTR	wszReplace;
+
+	// prepared find/replace text and flags to speedup find/replace next or previous
+	UINT	status;
+	UINT	searchFlags;
+	LPSTR	szFind;
+	LPSTR	szReplace;
+	UINT	findTextLength;
+	UINT	replaceMessage;
+	UINT	replaceLength;
+
+	bool HasFindText() const noexcept {
+		return (status & FindReplaceStatus_HasFindText);
+	}
+	bool ReplaceInitialized() const noexcept {
+		constexpr UINT mask = FindReplaceStatus_HasFindText | FindReplaceStatus_ReplaceInitialized;
+		return (status & mask) == mask;
+	}
+	bool Prepare(UINT mask) noexcept;
 };
 
 enum EditAlignMode {
@@ -127,7 +160,15 @@ bool	EditConvertText(UINT cpSource, UINT cpDest) noexcept;
 void	EditConvertToLargeMode() noexcept;
 void	EditReplaceDocument(HANDLE pdoc) noexcept;
 
-char*	EditGetClipboardText(HWND hwnd) noexcept; // LocalFree()
+enum class ClipboardTextType {
+	Unicode,
+	UnicodeBackslash,
+	DocumentBytes,
+};
+LPWSTR EditGetClipboardTextW(ClipboardTextType type, UINT &length) noexcept;
+inline char *EditGetClipboardText(UINT &length) noexcept {
+	return reinterpret_cast<char *>(EditGetClipboardTextW(ClipboardTextType::DocumentBytes, length));
+}
 void	EditCopyAppend(HWND hwnd) noexcept;
 
 constexpr int GetScintillaEOLMode(int mode) noexcept {
@@ -142,19 +183,22 @@ constexpr int GetSettingsEOLMode(int mode) noexcept {
 struct EditFileIOStatus;
 void 	EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus &status) noexcept;
 bool	EditLoadFile(LPWSTR pszFile, EditFileIOStatus &status) noexcept;
-bool	EditSaveFile(HWND hwnd, LPCWSTR pszFile, int saveFlag, EditFileIOStatus &status) noexcept;
+bool	EditSaveFile(LPCWSTR pszFile, int saveFlag, EditFileIOStatus &status) noexcept;
 
 void	EditReplaceMainSelection(Sci_Position cchText, LPCSTR pszText) noexcept;
 
+enum class EscapeMenu {
+	CxxEscape,
+	CxxUnescape,
+	HtmlEscape,
+	HtmlUnescape,
+};
+
 void	EditURLEncode(bool component) noexcept;
 void	EditURLDecode() noexcept;
-void	EditEscapeCChars(HWND hwnd) noexcept;
-void	EditUnescapeCChars(HWND hwnd) noexcept;
-void	EditEscapeXHTMLChars(HWND hwnd) noexcept;
-void	EditUnescapeXHTMLChars(HWND hwnd) noexcept;
+char*	EditEscapeChars(EscapeMenu menu, const char *pszText, size_t &iSelCount) noexcept;
 void	EditCalculateExpr(int menu);
-void	EditCharacterToHex() noexcept;
-void	EditHexToCharacter() noexcept;
+char*	EditCharacterToHex(int menu, LPCSTR lpszSelection, size_t &iSelCount, UINT cpEdit) noexcept;
 void	EditShowHex() noexcept;
 void	EditShowCharacterInfo() noexcept;
 
@@ -180,15 +224,15 @@ void	EditToggleLineComments(LPCWSTR pwszComment, int commentFlag) noexcept;
 void	EditPadWithSpaces(bool bSkipEmpty, bool bNoUndoGroup) noexcept;
 void	EditStripFirstCharacter() noexcept;
 void	EditStripLastCharacter() noexcept;
-void	EditStripTrailingBlanks(HWND hwnd, bool bIgnoreSelection) noexcept;
-void	EditStripLeadingBlanks(HWND hwnd, bool bIgnoreSelection) noexcept;
+void	EditStripTrailingBlanks(bool bIgnoreSelection) noexcept;
+void	EditStripLeadingBlanks(bool bIgnoreSelection) noexcept;
 void	EditCompressSpaces() noexcept;
 void	EditRemoveBlankLines(bool bMerge) noexcept;
 void	EditWrapToColumn(int nColumn/*, int nTabWidth*/) noexcept;
 void	EditJoinLinesEx() noexcept;
 void	EditSortLines(EditSortFlag iSortFlags) noexcept;
 
-void	EditJumpTo(Sci_Line iNewLine, Sci_Position iNewCol) noexcept;
+void	EditJumpTo(Sci_Line iNewLine, Sci_Position iNewCol, unsigned type = SC_COLUMN_DEFAULT) noexcept;
 void	EditSelectEx(Sci_Position iAnchorPos, Sci_Position iCurrentPos) noexcept;
 void	EditFixPositions() noexcept;
 void	EditEnsureSelectionVisible() noexcept;
@@ -197,26 +241,26 @@ void	EditGetExcerpt(LPWSTR lpszExcerpt, DWORD cchExcerpt) noexcept;
 
 void	EditSelectWord() noexcept;
 void	EditSelectLines(bool currentBlock, bool lineSelection) noexcept;
-void	EditSaveSelectionAsFindText(EDITFINDREPLACE *lpefr, int menu, bool findSelection) noexcept;
-HWND	EditFindReplaceDlg(HWND hwnd, EDITFINDREPLACE *lpefr, bool bReplace) noexcept;
-void	EditFindNext(const EDITFINDREPLACE *lpefr, bool fExtendSelection) noexcept;
-void	EditFindPrev(const EDITFINDREPLACE *lpefr, bool fExtendSelection) noexcept;
-void	EditFindAll(const EDITFINDREPLACE *lpefr, bool selectAll) noexcept;
-void	EditReplace(HWND hwnd, const EDITFINDREPLACE *lpefr) noexcept;
+void	EditSaveSelectionAsFindText(EditFindReplace &efr, int menu, bool findSelection) noexcept;
+HWND	EditFindReplaceDlg(HWND hwnd, EditFindReplace &efr, bool bReplace) noexcept;
+void	EditFindNext(EditFindReplace &efr, bool fExtendSelection) noexcept;
+void	EditFindPrev(EditFindReplace &efr, bool fExtendSelection) noexcept;
+void	EditFindAll(EditFindReplace &efr, bool selectAll) noexcept;
+void	EditReplace(EditFindReplace &efr) noexcept;
 enum EditReplaceAllFlag {
 	EditReplaceAllFlag_None,
 	EditReplaceAllFlag_UndoGroup,
 	EditReplaceAllFlag_ShowInfo,
 	EditReplaceAllFlag_Default,
 };
-void	EditReplaceAll(HWND hwnd, const EDITFINDREPLACE *lpefr) noexcept;
-void	EditReplaceAllInSelection(HWND hwnd, const EDITFINDREPLACE *lpefr, EditReplaceAllFlag flag = EditReplaceAllFlag_None) noexcept;
+void	EditReplaceAll(EditFindReplace &efr) noexcept;
+void	EditReplaceAllInSelection(EditFindReplace &efr, EditReplaceAllFlag flag = EditReplaceAllFlag_None) noexcept;
 bool	EditLineNumDlg(HWND hwnd) noexcept;
 void	EditModifyLinesDlg(HWND hwnd) noexcept;
 void	EditEncloseSelectionDlg(HWND hwnd) noexcept;
 void	EditInsertTagDlg(HWND hwnd) noexcept;
 void	EditInsertDateTime(bool bShort) noexcept;
-void	EditUpdateTimestampMatchTemplate(HWND hwnd) noexcept;
+void	EditUpdateTimestampMatchTemplate() noexcept;
 void	EditInsertUnicodeControlCharacter(int menu) noexcept;
 void	EditShowUnicodeControlCharacter(bool bShow) noexcept;
 bool	EditSortDlg(HWND hwnd, EditSortFlag *piSortFlags) noexcept;
@@ -267,9 +311,9 @@ struct EditMarkAll {
 	bool pending;
 	bool ignoreSelectionUpdate;
 	bool bookmarkForFindAll;
-	int markFlag;
+	UINT markFlag;
 	int incrementSize;			// increment search size
-	Sci_Position length;		// length for pszText
+	Sci_Position textLength;	// length for pszText
 	LPSTR pszText;				// pattern or text to find
 	double duration;			// search duration in milliseconds
 	Sci_Position matchCount;	// total match count
@@ -278,11 +322,11 @@ struct EditMarkAll {
 	Sci_Line prevBookmarkLine;	// previous bookmark line
 	StopWatch watch;			// used to dynamic compute increment size
 
-	void Reset(int findFlag, Sci_Position iSelCount, LPSTR text) noexcept;
+	void Reset(UINT findFlag, Sci_Position iSelCount, LPSTR text) noexcept;
 	void Clear() noexcept {
 		Reset(0, 0, nullptr);
 	}
-	void Start(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPSTR text) noexcept;
+	void Start(BOOL bChanged, UINT findFlag, Sci_Position iSelCount, LPSTR text) noexcept;
 	void Continue(HANDLE timer) noexcept;
 	void Stop() noexcept;
 	void MarkAll(BOOL bChanged, int option) noexcept;
@@ -477,12 +521,11 @@ enum {
 };
 
 struct NP2ENCODING {
-	const UINT uFlags;
 	/*const*/UINT uCodePage;
+	const uint16_t uFlags;
+	const uint16_t idsName;
 	// string format: [normal name + ','] + [lower case parse name + ',']+
 	const char * const pszParseNames;
-	const UINT idsName;
-	LPWSTR wchLabel;
 };
 
 // see UniConversion.h and https://www.unicode.org/faq/utf_bom.html
@@ -563,14 +606,14 @@ constexpr bool Encoding_IsUTF8(int iEncoding) noexcept {
 
 void	Encoding_ReleaseResources() noexcept;
 bool	EditSetNewEncoding(int iEncoding, int iNewEncoding, BOOL bNoUI) noexcept;
-void	EditOnCodePageChanged(UINT oldCodePage, bool showControlCharacter, EDITFINDREPLACE *lpefr) noexcept;
+void	EditOnCodePageChanged(UINT oldCodePage, bool showControlCharacter, EditFindReplace &efr) noexcept;
 const char* GetFoldDisplayEllipsis(UINT cpEdit, UINT acp) noexcept;
 void	Encoding_InitDefaults() noexcept;
 int 	Encoding_MapIniSetting(bool bLoad, UINT iSetting) noexcept;
-void	Encoding_GetLabel(int iEncoding) noexcept;
+LPCWSTR Encoding_GetLabel(UINT iEncoding) noexcept;
 int 	Encoding_Match(LPCWSTR pwszTest) noexcept;
 int 	Encoding_MatchA(LPCSTR pchTest) noexcept;
-bool	Encoding_IsValid(int iEncoding) noexcept;
+bool	Encoding_IsValid(UINT iEncoding) noexcept;
 int		Encoding_GetIndex(UINT codePage) noexcept;
 int		Encoding_GetAnsiIndex() noexcept;
 void	Encoding_AddToTreeView(HWND hwnd, int idSel, bool bRecodeOnly) noexcept;
@@ -604,6 +647,7 @@ LPSTR RecodeAsUTF8(LPSTR lpData, DWORD *cbData, UINT codePage, DWORD flags) noex
 int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, int *encodingFlag) noexcept;
 bool IsStringCaseSensitiveW(LPCWSTR pszTextW) noexcept;
 bool IsStringCaseSensitiveA(LPCSTR pszText) noexcept;
+UINT TransformBackslashes(char *pszInput, UINT cpEdit, const DBCSByteMask *byteMask) noexcept;
 
 //void SciInitThemes(HWND hwnd) noexcept;
 

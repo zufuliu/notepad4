@@ -8,6 +8,10 @@
 
 namespace Scintilla::Internal {
 
+constexpr bool InLineRange(size_t index, unsigned length) noexcept {
+	return index < length;
+}
+
 /**
 * A point in document space.
 * Uses double for sufficient resolution in large (>20,000,000 line) documents.
@@ -44,42 +48,41 @@ public:
  */
 class LineLayout final {
 private:
-	std::unique_ptr<int[]> lineStarts;
+	std::unique_ptr<int[], HeapPointerFreer> lineStarts;
 	/// Drawing is only performed for @a maxLineLength characters on each line.
 	Sci::Line lineNumber;
-	int lenLineStarts;
+	int lenLineStarts = 0;
 public:
-	enum {
-		wrapWidthInfinite = 0x7ffffff
-	};
+	static constexpr int wrapWidthMinimum = 20;
+	static constexpr int wrapWidthInfinite = 0x7ffffff;
 
-	int maxLineLength;
-	int lastSegmentEnd;
-	int numCharsInLine;
-	int numCharsBeforeEOL;
+	int maxLineLength = -1;
+	int lastSegmentEnd = 0;
+	int numCharsInLine = 0;
+	int numCharsBeforeEOL = 0;
 	enum class ValidLevel {
 		invalid, checkTextAndStyle, positions, lines
-	} validity;
-	int xHighlightGuide;
-	bool highlightColumn;
-	bool containsCaret;
-	unsigned char bracePreviousStyles[2];
-	int edgeColumn;
-	int caretPosition;
-	std::unique_ptr<char[]> chars;
-	std::unique_ptr<unsigned char[]> styles;
-	std::unique_ptr<XYPOSITION[]> positions;
-
+	};
+	ValidLevel validity = ValidLevel::invalid;
+	int xHighlightGuide = 0;
+	bool highlightColumn = false;
+	bool containsCaret = false;
+	unsigned char bracePreviousStyles[2]{};
+	int edgeColumn = 0;
+	int caretPosition = 0;
+	std::unique_ptr<char[], HeapPointerFreer> chars;
+	unsigned char *styles = nullptr;
+	XYPOSITION *positions = nullptr;
 	std::unique_ptr<BidiData> bidiData;
 
 	// Wrapped line support
-	int widthLine;
-	int lines;
-	XYPOSITION wrapIndent; // In pixels
+	int widthLine = wrapWidthInfinite;
+	int lines = 1;
+	XYPOSITION wrapIndent = 0; // In pixels
 
-	LineLayout(Sci::Line lineNumber_, int maxLineLength_);
-	void Resize(int maxLineLength_);
-	void Reset(Sci::Line lineNumber_, Sci::Position maxLineLength_);
+	LineLayout(Sci::Line lineNumber_, int maxLineLength_) noexcept;
+	void Resize(int maxLineLength_) noexcept;
+	void Reset(Sci::Line lineNumber_, int maxLineLength_) noexcept;
 	void EnsureBidiData();
 	void ClearPositions() const noexcept;
 	void Invalidate(ValidLevel validity_) noexcept;
@@ -99,19 +102,31 @@ public:
 	Range SubLineRange(int subLine, Scope scope) const noexcept;
 	bool InLine(int offset, int line) const noexcept;
 	int SubLineFromPosition(int posInLine, PointEnd pe) const noexcept;
-	void AddLineStart(Sci::Position start);
-	void SetBracesHighlight(Range rangeLine, const Sci::Position braces[],
+	void AddLineStart(Sci::Position start) noexcept;
+	void SetBracesHighlight(ForwardRange rangeLine, const Sci::Position braces[],
 		unsigned char bracesMatchStyle, int xHighlight, bool ignoreStyle) noexcept;
-	void RestoreBracesHighlight(Range rangeLine, const Sci::Position braces[], bool ignoreStyle) noexcept;
+	void RestoreBracesHighlight(ForwardRange rangeLine, const Sci::Position braces[], bool ignoreStyle) noexcept;
 	int SCICALL FindBefore(XYPOSITION x, Range range) const noexcept;
 	int SCICALL FindPositionFromX(XYPOSITION x, Range range, bool charPosition) const noexcept;
 	Point PointFromPosition(int posInLine, int lineHeight, PointEnd pe) const noexcept;
 	XYPOSITION XInLine(Sci::Position index) const noexcept;
-	Interval Span(int start, int end) const noexcept;
-	Interval SpanByte(int index) const noexcept;
+	[[nodiscard]] Interval Span(int start, int end) const noexcept;
+	[[nodiscard]] Interval SpanByte(int index) const noexcept;
 	int EndLineStyle() const noexcept;
 	[[nodiscard]] int LastStyle() const noexcept;
-	void SCICALL WrapLine(const Document *pdoc, Sci::Position posLineStart, Wrap wrapState, XYPOSITION wrapWidth, XYPOSITION wrapIndent_, bool partialLine);
+	void SCICALL WrapLine(const Document *pdoc, Sci::Position posLineStart, Wrap wrapState, XYPOSITION wrapWidth, XYPOSITION wrapIndent_, bool partialLine) noexcept;
+
+	// XPositions
+	[[nodiscard]] XYPOSITION *PositionsFor(unsigned index) const noexcept {
+		return positions + index;
+	}
+	template <typename T>
+	[[nodiscard]] XYPOSITION GetPosition(T index) const noexcept {
+		return positions[index];
+	}
+	[[nodiscard]] XYPOSITION GetWidth(size_t end, size_t start) const noexcept {
+		return positions[end] - positions[start];
+	}
 };
 
 struct ScreenLine final : public IScreenLine {
@@ -158,8 +173,7 @@ struct SignificantLines {
  */
 class LineLayoutCache final {
 private:
-	std::vector<std::unique_ptr<LineLayout>> shortCache;
-	std::vector<std::unique_ptr<LineLayout>> longCache;
+	std::vector<std::shared_ptr<LineLayout>> cache;
 	size_t lastCaretSlot;
 	Scintilla::LineCache level;
 	LineLayout::ValidLevel maxValidity;
@@ -179,16 +193,12 @@ public:
 	Scintilla::LineCache GetLevel() const noexcept {
 		return level;
 	}
-	LineLayout* SCICALL Retrieve(Sci::Line lineNumber, Sci::Line lineCaret, int maxChars, int styleClock_,
+	std::shared_ptr<LineLayout> SCICALL Retrieve(Sci::Line lineNumber, Sci::Line lineCaret, int maxChars, int styleClock_,
 		Sci::Line linesOnScreen, Sci::Line linesInDoc, Sci::Line topLine);
-	LineLayout* Retrieve(Sci::Line lineNumber, const SignificantLines &significantLines, int maxChars) {
+	std::shared_ptr<LineLayout> Retrieve(Sci::Line lineNumber, const SignificantLines &significantLines, int maxChars) {
 		return Retrieve(lineNumber, significantLines.lineCaret,
 			maxChars, significantLines.styleClock,
 			significantLines.linesOnScreen, significantLines.linesTotal, significantLines.lineTop);
-	}
-
-	static constexpr int UseLongCache(unsigned maxChars) noexcept {
-		return maxChars >> (20 + 1); // 2MiB
 	}
 };
 
@@ -210,6 +220,7 @@ class Representation {
 public:
 	// for Unicode control or format characters in hex code form
 	static constexpr size_t maxLength = 7;
+	static constexpr int maxByteLength = 3; // C0 control or hex code
 	char stringRep[maxLength + 1]{};
 	size_t length;
 	RepresentationAppearance appearance = RepresentationAppearance::Blob;
@@ -256,7 +267,7 @@ struct TextSegment {
 	const int start;
 	const int length;
 	const Representation * const representation;
-	int end() const noexcept {
+	[[nodiscard]] int end() const noexcept {
 		return start + length;
 	}
 };
@@ -281,13 +292,10 @@ class BreakFinder {
 public:
 	// If a whole run is longer than lengthStartSubdivision then subdivide
 	// into smaller runs at spaces or punctuation.
-	enum {
-		lengthStartSubdivision = 4096
-	};
+	static constexpr int lengthStartSubdivision = 4096;
 	// Try to make each subdivided run lengthEachSubdivision or shorter.
-	enum {
-		lengthEachSubdivision = 1024
-	};
+	static constexpr int lengthEachSubdivision = 1024;
+
 	enum class BreakFor {
 		Text = 0,
 		Selection = 1,
@@ -295,7 +303,7 @@ public:
 		ForegroundAndSelection = 3,
 		Layout = 4,
 	};
-	BreakFinder(const LineLayout *ll_, const Selection *psel, Range lineRange, Sci::Position posLineStart,
+	BreakFinder(const LineLayout *ll_, const Selection *psel, ForwardRange lineRange_, Sci::Position posLineStart,
 		XYPOSITION xStart, BreakFor breakFor, const EditModel &model, const ViewStyle *pvsDraw, uint32_t posInLine);
 	// Deleted so BreakFinder objects can not be copied.
 	BreakFinder(const BreakFinder &) = delete;
@@ -313,6 +321,7 @@ public:
 };
 
 constexpr size_t positionCacheDefaultSize = 0x400;
+constexpr unsigned positionCacheUnicode = 1 << 16;
 
 class PositionCache {
 	std::vector<PositionCacheEntry> pces { positionCacheDefaultSize };

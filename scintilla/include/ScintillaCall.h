@@ -320,7 +320,7 @@ public:
 	void SetLineIndentation(Line line, int indentation);
 	int LineIndentation(Line line);
 	Position LineIndentPosition(Line line);
-	Position Column(Position pos);
+	Position Column(Position pos, Line line);
 	Position CountCharacters(Position start, Position end);
 	void CountCharactersAndColumns(TextToFindFull *ft);
 	Position CountCodeUnits(Position start, Position end);
@@ -691,6 +691,7 @@ public:
 	Position EncodedFromUTF8(const char *utf8, char *encoded);
 	std::string EncodedFromUTF8(const char *utf8);
 	Position FindColumn(Line line, Position column);
+	Position FindColumnEx(Scintilla::ColumnType type, const CharacterRangeFull *chrg);
 	Scintilla::CaretSticky CaretSticky();
 	void SetCaretSticky(Scintilla::CaretSticky useCaretStickyBehaviour);
 	void ToggleCaretSticky();

@@ -23,6 +23,7 @@ struct TextRangeFull final {
 struct TextToFindFull final {
 	CharacterRangeFull chrg;
 	const char *lpstrText;
+	Position textLength;
 	CharacterRangeFull chrgText;
 };
 
@@ -61,7 +62,7 @@ struct NotificationData final {
 	Position position;
 	/* SCN_STYLENEEDED, SCN_DOUBLECLICK, SCN_MODIFIED, SCN_MARGINCLICK, */
 	/* SCN_MARGINRIGHTCLICK, SCN_NEEDSHOWN, SCN_DWELLSTART, SCN_DWELLEND, */
-	/* SCN_CALLTIPCLICK, */
+	/* SCN_UPDATEUI, SCN_CALLTIPCLICK, */
 	/* SCN_HOTSPOTCLICK, SCN_HOTSPOTDOUBLECLICK, SCN_HOTSPOTRELEASECLICK, */
 	/* SCN_INDICATORCLICK, SCN_INDICATORRELEASE, */
 	/* SCN_USERLISTSELECTION, SCN_AUTOCCOMPLETED, SCN_AUTOCSELECTION, */

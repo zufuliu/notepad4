@@ -957,6 +957,10 @@ typedef sptr_t (*SciFnDirectStatus)(sptr_t ptr, unsigned int iMessage, uptr_t wP
 #define SCI_SETLENGTHFORENCODE 2448
 #define SCI_ENCODEDFROMUTF8 2449
 #define SCI_FINDCOLUMN 2456
+#define SC_COLUMN_DEFAULT 0
+#define SC_COLUMN_CHARACTER 1
+#define SC_COLUMN_BYTE 2
+#define SCI_FINDCOLUMNEX 2759
 #define SC_CARETSTICKY_OFF 0
 #define SC_CARETSTICKY_ON 1
 #define SC_CARETSTICKY_WHITESPACE 2
@@ -1241,6 +1245,8 @@ typedef sptr_t (*SciFnDirectStatus)(sptr_t ptr, unsigned int iMessage, uptr_t wP
 #define SC_UPDATE_SELECTION 0x2
 #define SC_UPDATE_V_SCROLL 0x4
 #define SC_UPDATE_H_SCROLL 0x8
+#define SC_UPDATE_TEXT 0x10
+#define SC_UPDATE_LINE_COUNT 0x20
 #define SC_UPDATE_APP_CUSTOM 0x100
 #define SCEN_CHANGE 768
 #define SCEN_SETFOCUS 512
@@ -1341,6 +1347,7 @@ struct Sci_TextRangeFull {
 struct Sci_TextToFindFull {
 	struct Sci_CharacterRangeFull chrg;
 	const char *lpstrText;
+	Sci_PositionU textLength;
 	struct Sci_CharacterRangeFull chrgText;
 };
 
@@ -1378,7 +1385,7 @@ struct SCNotification {
 	Sci_Position position;
 	/* SCN_STYLENEEDED, SCN_DOUBLECLICK, SCN_MODIFIED, SCN_MARGINCLICK, */
 	/* SCN_MARGINRIGHTCLICK, SCN_NEEDSHOWN, SCN_DWELLSTART, SCN_DWELLEND, */
-	/* SCN_CALLTIPCLICK, */
+	/* SCN_UPDATEUI, SCN_CALLTIPCLICK, */
 	/* SCN_HOTSPOTCLICK, SCN_HOTSPOTDOUBLECLICK, SCN_HOTSPOTRELEASECLICK, */
 	/* SCN_INDICATORCLICK, SCN_INDICATORRELEASE, */
 	/* SCN_USERLISTSELECTION, SCN_AUTOCCOMPLETED, SCN_AUTOCSELECTION, */

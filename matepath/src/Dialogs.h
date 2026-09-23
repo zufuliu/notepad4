@@ -33,7 +33,7 @@ int MsgBox(UINT uType, UINT uIdMsg, ...) noexcept;
 #define MsgBoxWarn(uType, uIdMsg, ...)		MsgBox(MB_ICONEXCLAMATION | (uType), (uIdMsg), ##__VA_ARGS__)
 #define MsgBoxAsk(uType, uIdMsg, ...)		MsgBox(MB_ICONQUESTION | (uType), (uIdMsg), ##__VA_ARGS__)
 
-bool GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase) noexcept;
+bool GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase);
 bool GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, REFKNOWNFOLDERID iBase) noexcept;
 
 void RunDlg(HWND hwnd) noexcept;
@@ -46,7 +46,8 @@ INT_PTR OptionsPropSheet(HWND hwnd, HINSTANCE hInstance) noexcept;
 bool GetFilterDlg(HWND hwnd) noexcept;
 bool RenameFileDlg(HWND hwnd);
 bool CopyMoveDlg(HWND hwnd, UINT *wFunc);
+struct DirListItem;
 bool OpenWithDlg(HWND hwnd, const DirListItem *lpdliParam);
 bool NewDirDlg(HWND hwnd, LPWSTR pszNewDir) noexcept;
 
-INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept;
+INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);

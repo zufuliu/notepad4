@@ -7,9 +7,6 @@
 #pragma once
 
 // sdkddkver.h
-#ifndef _WIN32_WINNT_VISTA
-#define _WIN32_WINNT_VISTA				0x0600
-#endif
 #ifndef _WIN32_WINNT_WIN7
 #define _WIN32_WINNT_WIN7				0x0601
 #endif
@@ -202,14 +199,14 @@ HCURSOR LoadReverseArrowCursor(HCURSOR cursor, UINT dpi) noexcept;
 struct Painter {
 	HWND hWnd{};
 	PAINTSTRUCT ps{};
+	explicit Painter(HWND hWnd_) noexcept : hWnd(hWnd_) {
+		::BeginPaint(hWnd, &ps);
+	}
 	// Deleted so Painter objects can not be copied.
 	Painter(const Painter &) = delete;
 	Painter(Painter &&) = delete;
 	Painter &operator=(const Painter &) = delete;
 	Painter &operator=(Painter &&) = delete;
-	explicit Painter(HWND hWnd_) noexcept : hWnd(hWnd_) {
-		::BeginPaint(hWnd, &ps);
-	}
 	~Painter() {
 		::EndPaint(hWnd, &ps);
 	}

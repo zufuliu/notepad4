@@ -171,6 +171,7 @@ BEGIN
 		MENUITEM "Właśc&iwości...",					IDM_FILE_PROPERTIES
 		MENUITEM "Otwórz &folder zawierający",		IDM_FILE_OPEN_CONTAINING_FOLDER
 		MENUITEM "Utwórz skrót na pu&lpicie",		IDM_FILE_CREATELINK
+		MENUITEM "Update File Time",				IDM_FILE_UPDATE_TIMESTAMP
 		MENUITEM SEPARATOR
 		MENUITEM "Prze&glądaj...\tCtrl+M",			IDM_FILE_BROWSE
 		POPUP "Ulu&bione"
@@ -639,7 +640,6 @@ BEGIN
 				MENUITEM "中文(简体)",				IDM_LANG_CHINESE_SIMPLIFIED
 			END
 #endif
-			MENUITEM "Okna dialogowe otwierania/zapisywania w stylu &XP",IDM_SET_USE_XP_FILE_DIALOG
 		END
 		POPUP "O&pcje okna"
 		BEGIN
@@ -1075,23 +1075,18 @@ FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,142,123,50,14
     PUSHBUTTON      "Kopiuj",IDC_COPY_BUILD_INFO,198,123,50,14
-    ICON            IDR_MAINWND,IDC_STATIC,7,7,20,20
+    ICON            IDR_MAINWND,IDC_STATIC,14,7,20,20
     LTEXT           "",IDC_VERSION,45,7,200,8
     LTEXT           "",IDC_BUILD_INFO,45,18,200,16
     LTEXT           "Prawa autorskie © 2011-2026 Zufu Liu i wszyscy współautorzy.",IDC_STATIC,45,38,200,8
-    LTEXT           "",IDC_NEW_PAGE_TEXT,45,48,200,8,NOT WS_VISIBLE | WS_DISABLED
     CONTROL         "",IDC_NEW_PAGE_LINK,"SysLink",WS_TABSTOP,45,48,200,10
     LTEXT           "Prawa autorskie © 2010-2017 XhmikosR i wszyscy współautorzy.",IDC_STATIC,45,60,200,8
-    LTEXT           "",IDC_MOD_PAGE_TEXT,45,68,200,8,NOT WS_VISIBLE | WS_DISABLED
     CONTROL         "",IDC_MOD_PAGE_LINK,"SysLink",WS_TABSTOP,45,68,200,10
     LTEXT           "Prawa autorskie © 2004-2012 Florian Balmer.",IDC_STATIC,45,80,200,8
-    LTEXT           "",IDC_WEBPAGE_TEXT,45,80,200,8,NOT WS_VISIBLE | WS_DISABLED
     CONTROL         "",IDC_WEBPAGE_LINK,"SysLink",WS_TABSTOP,45,88,200,10
     LTEXT           "Skontaktuj się z Florianem Balmerem:",IDC_STATIC,45,100,114,8
-    LTEXT           "",IDC_EMAIL_TEXT,45,108,94,8,NOT WS_VISIBLE | WS_DISABLED
     CONTROL         "",IDC_EMAIL_LINK,"SysLink",WS_TABSTOP,45,108,94,10
     LTEXT           "Odwiedź stronę Scintilli:",IDC_STATIC,45,120,94,8
-    LTEXT           "",IDC_SCI_PAGE_TEXT,45,128,94,8,NOT WS_VISIBLE | WS_DISABLED
     CONTROL         "",IDC_SCI_PAGE_LINK,"SysLink",WS_TABSTOP,45,128,94,10
 END
 
@@ -1500,15 +1495,15 @@ BEGIN
     AUTOCHECKBOX    "&Pomiń puste wiersze.",IDC_MODIFY_LINE_SKIP_EMPTY,7,108,96,14,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,147,108,50,14
     PUSHBUTTON      "Anuluj",IDCANCEL,203,108,50,14
-    LTEXT           "$(L)",IDC_MODIFY_LINE_DLN_NP,7,76,21,8
-    LTEXT           "$(0L)",IDC_MODIFY_LINE_DLN_ZP,27,76,27,8
-    LTEXT           "Numer wiersza dokumentu.",IDC_MODIFY_LINE_TIP_DLN,51,76,118,8
-    LTEXT           "$(N)",IDC_MODIFY_LINE_CN_NP,7,86,22,8
-    LTEXT           "$(0N)",IDC_MODIFY_LINE_CN_ZP,27,86,25,8
-    LTEXT           "Automatyczna numeracja.",IDC_MODIFY_LINE_TIP_CN,51,86,107,8
-    LTEXT           "$(I)",IDC_MODIFY_LINE_ZCN_NP,7,96,21,8
-    LTEXT           "$(0I)",IDC_MODIFY_LINE_ZCN_ZP,27,96,25,8
-    LTEXT           "Automatyczna numeracja (od zera).",IDC_MODIFY_LINE_TIP_ZCN,51,96,125,8
+    CONTROL         "<a>$(L)</a>",IDC_MODIFY_LINE_DLN_NP,"SysLink",LWS_IGNORERETURN,7,76,21,8
+    CONTROL         "<a>$(0L)</a>",IDC_MODIFY_LINE_DLN_ZP,"SysLink",LWS_IGNORERETURN,29,76,21,8
+    LTEXT           "Numer wiersza dokumentu.",IDC_MODIFY_LINE_TIP_DLN,52,76,150,8
+    CONTROL         "<a>$(N)</a>",IDC_MODIFY_LINE_CN_NP,"SysLink",LWS_IGNORERETURN,7,86,21,8
+    CONTROL         "<a>$(0N)</a>",IDC_MODIFY_LINE_CN_ZP,"SysLink",LWS_IGNORERETURN,29,86,21,8
+    LTEXT           "Automatyczna numeracja.",IDC_MODIFY_LINE_TIP_CN,52,86,150,8
+    CONTROL         "<a>$(I)</a>",IDC_MODIFY_LINE_ZCN_NP,"SysLink",LWS_IGNORERETURN,7,96,21,8
+    CONTROL         "<a>$(0I)</a>",IDC_MODIFY_LINE_ZCN_ZP,"SysLink",LWS_IGNORERETURN,29,96,21,8
+    LTEXT           "Automatyczna numeracja (od zera).",IDC_MODIFY_LINE_TIP_ZCN,52,96,150,8
     SCROLLBAR       IDC_RESIZEGRIP2,7,108,10,10,SBS_SIZEGRIP | WS_CLIPSIBLINGS
 END
 
@@ -1547,7 +1542,7 @@ FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
     LTEXT           "",IDC_INFOBOXRECT,0,0,244,49
     ICON            IDI_INFORMATION,IDC_INFOBOXICON,7,7,20,20
-    LTEXT           "",IDC_INFOBOXTEXT,35,7,202,42
+    LTEXT           "",IDC_INFOBOXTEXT,35,7,202,42,SS_NOPREFIX | SS_EDITCONTROL
     PUSHBUTTON      "&Tak",IDYES,131,53,50,14
     PUSHBUTTON      "&Nie",IDNO,187,53,50,14
     DEFPUSHBUTTON   "OK",IDOK,131,53,50,14
@@ -1757,7 +1752,6 @@ BEGIN
 \\r\tPowrót karetki (CR, ASCII 13 / 0D)\n\
 \\t\tTabulacja pozioma (HT, ASCII 9)\n\
 \\v\tTabulacja pionowa (VT, ASCII 11 / 0B)\n\
-\\ooo\tWartość ósemkowa\n\
 \\uHHHH\tWartość szesnastkowa\n\
 \\xHH\tWartość szesnastkowa\n\
 \\\\\tUkośnik wsteczny"

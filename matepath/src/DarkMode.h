@@ -1,0 +1,22 @@
+// This file is part of Notepad4.
+// See License.txt for details about distribution and modification.
+#pragma once
+
+enum DialogRefData {
+	DialogRefData_CenterParent,
+	DialogRefData_MessageBox,
+	DialogRefData_DefaultPosition,
+	DialogRefData_CustomizeToolbar,
+	DialogRefData_PropSheetPage,
+	DialogRefData_PropSheetMain,
+	DialogRefData_MaxValue,
+};
+
+void DialogHook_Start(DWORD_PTR dwRefData) noexcept;
+void DialogHook_Stop() noexcept;
+void DarkMode_Init() noexcept;
+void DarkMode_Cleanup() noexcept;
+void DarkMode_InitDialog(HWND hwnd, DWORD_PTR dwRefData = DialogRefData_CenterParent) noexcept;
+void DarkMode_InitFileListView(HWND hwndLV, DWORD exStyle = 0) noexcept;
+void DarkMode_SetFileListViewTheme(HWND hwndLV, BOOL fullRowSelect) noexcept;
+bool DarkMode_SetFileListViewColor(HWND hwndLV, BOOL redraw) noexcept;

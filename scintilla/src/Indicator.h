@@ -18,6 +18,9 @@ struct StyleAndColour {
 	}
 };
 
+constexpr int strokeWidthScale = 100;
+constexpr int strokeWidthMax = 10 * strokeWidthScale;
+
 /**
  */
 class Indicator {
@@ -50,10 +53,11 @@ public:
 	bool OverridesTextFore() const noexcept {
 		return overrideTextFore;
 	}
-	Scintilla::IndicFlag Flags() const noexcept {
+	[[nodiscard]] Scintilla::IndicFlag Flags() const noexcept {
 		return attributes;
 	}
-	void SetFlags(Scintilla::IndicFlag attributes_) noexcept;
+	bool SetStyle(Scintilla::IndicatorStyle style) noexcept;
+	bool SetFore(ColourRGBA fore) noexcept;
 };
 
 }

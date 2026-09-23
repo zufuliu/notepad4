@@ -45,7 +45,7 @@ public:
 	WordList &operator=(const WordList &) = delete;
 	WordList &operator=(WordList &&) = delete;
 	~WordList();
-	operator bool() const noexcept {
+	explicit operator bool() const noexcept {
 		//return len != 0;
 		return words != nullptr;
 	}

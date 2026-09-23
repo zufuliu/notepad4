@@ -160,11 +160,32 @@ constexpr int GetHexDigit(int ch) noexcept {
 	return -1;
 }
 
+// NOLINTBEGIN(bugprone-reserved-identifier)
+#if defined(_MSC_VER) && !defined(_DLL)
+// Case-insensitive ASCII comparisons, see corecrt_internal.h
+extern "C" int __cdecl __ascii_memicmp(void const * lhs, void const * rhs, size_t count) noexcept;
+extern "C" int __cdecl __ascii_stricmp(char const * lhs, char const * rhs) noexcept;
+extern "C" int __cdecl __ascii_strnicmp(char const * lhs, char const * rhs, size_t count) noexcept;
+extern "C" int __cdecl __ascii_wcsicmp(const wchar_t * lhs, const wchar_t * rhs) noexcept;
+extern "C" int __cdecl __ascii_wcsnicmp(const wchar_t * lhs, const wchar_t * rhs, size_t count) noexcept;
+#else
+#define __ascii_memicmp		_memicmp
+#define __ascii_stricmp		_stricmp
+#define __ascii_strnicmp	_strnicmp
+#define __ascii_wcsicmp		_wcsicmp
+#define __ascii_wcsnicmp	_wcsnicmp
+#endif
+// NOLINTEND(bugprone-reserved-identifier)
+
 inline bool StrEqual(LPCWSTR s1, LPCWSTR s2) noexcept {
 	return wcscmp(s1, s2) == 0;
 }
 
 inline bool StrCaseEqual(LPCWSTR s1, LPCWSTR s2) noexcept {
+	return __ascii_wcsicmp(s1, s2) == 0;
+}
+
+inline bool WcsCaseEqual(LPCWSTR s1, LPCWSTR s2) noexcept {
 	return _wcsicmp(s1, s2) == 0;
 }
 
@@ -174,87 +195,407 @@ inline void StrCpyEx(T *s, const T (&t)[N]) noexcept {
 	__builtin_memcpy(s, t, N*sizeof(T));
 }
 
+template <typename T, size_t N>
+inline void StrCpyExNull(T *s, const T (&t)[N]) noexcept {
+	__builtin_memcpy(s, t, (N - 1)*sizeof(T));
+}
 #else
-template <size_t N>
+// see scintilla\lexlib\StringUtils.h
+namespace StrCopyEqualExPrivate {
+constexpr uint16_t *toU2(void *s) noexcept {
+	return (uint16_t *)(s);
+}
+constexpr uint32_t *toU4(void *s) noexcept {
+	return (uint32_t *)(s);
+}
+constexpr uint64_t *toU8(void *s) noexcept {
+	return (uint64_t *)(s);
+}
+constexpr uint16_t asU2(const char *s) noexcept {
+	return *(const uint16_t *)s;
+}
+constexpr uint32_t asU4(const void *s) noexcept {
+	return *(const uint32_t *)s;
+}
+constexpr uint64_t asU8(const void *s) noexcept {
+	return *(const uint64_t *)s;
+}
+constexpr uint32_t asU3_4M1(const char *s) noexcept {
+	return asU4(s - 1);
+}
+constexpr uint32_t asU3_2P1(const char *s) noexcept {
+	return asU4(s - 1);
+}
+}
+
+template <size_t N, size_t M = N>
 inline void StrCpyEx(char *s, const char (&t)[N]) noexcept {
-	switch (N) {
+	using namespace StrCopyEqualExPrivate;
+	switch (M) {
 	case 1:
 		s[0] = t[0];
 		break;
 	case 2:
-		*((uint16_t *)s) = *((const uint16_t *)t);
+		*toU2(s) = asU2(t);
 		break;
 	case 3:
-		*((uint16_t *)s) = *((const uint16_t *)t);
+		*toU2(s) = asU2(t);
 		s[2] = t[2];
 		break;
 	case 4:
-		*((uint32_t *)s) = *((const uint32_t *)t);
+		*toU4(s) = asU4(t);
 		break;
 	case 5:
-		*((uint32_t *)s) = *((const uint32_t *)t);
+		*toU4(s) = asU4(t);
 		s[4] = t[4];
 		break;
 	case 6:
-		*((uint32_t *)s) = *((const uint32_t *)t);
-		*((uint16_t *)(s + 4)) = *((const uint16_t *)(t + 4));
+		*toU4(s) = asU4(t);
+		*toU2(s + 4) = asU2(t + 4);
 		break;
 	case 7:
-		*((uint32_t *)s) = *((const uint32_t *)t);
-		*((uint16_t *)(s + 4)) = *((const uint16_t *)(t + 4));
+		*toU4(s) = asU4(t);
+		*toU2(s + 4) = asU2(t + 4);
+		s[6] = t[6];
+		break;
+#if defined(_WIN64)
+	case 8:
+		*toU8(s) = asU8(t);
+		break;
+	case 9:
+		*toU8(s) = asU8(t);
+		s[8] = t[8];
+		break;
+	case 10:
+		*toU8(s) = asU8(t);
+		*toU2(s + 8) = asU2(t + 8);
+		break;
+	case 11:
+		*toU8(s) = asU8(t);
+		*toU2(s + 8) = asU2(t + 8);
+		s[10] = s[11];
+		break;
+	case 12:
+		*toU8(s) = asU8(t);
+		*toU4(s + 8) = asU4(t + 8);
+		break;
+	case 13:
+		*toU8(s) = asU8(t);
+		*toU4(s + 8) = asU4(t + 8);
+		s[12] = t[12];
+		break;
+	case 14:
+		*toU8(s) = asU8(t);
+		*toU4(s + 8) = asU4(t + 8);
+		*toU2(s + 12) = asU2(t + 12);
+		break;
+	case 15:
+		*toU8(s) = asU8(t);
+		*toU4(s + 8) = asU4(t + 8);
+		*toU2(s + 12) = asU2(t + 12);
+		s[14] = t[14];
+		break;
+	case 16:
+		*toU8(s) = asU8(t);
+		*toU8(s + 8) = asU8(t + 8);
+		break;
+#else
+	case 8:
+		*toU4(s) = asU4(t);
+		*toU4(s + 4) = asU4(t + 4);
+		break;
+	case 9:
+		*toU4(s) = asU4(t);
+		*toU4(s + 4) = asU4(t + 4);
+		s[8] = t[8];
+		break;
+	case 10:
+		*toU4(s) = asU4(t);
+		*toU4(s + 4) = asU4(t + 4);
+		*toU2(s + 8) = asU2(t + 8);
+		break;
+	case 11:
+		*toU4(s) = asU4(t);
+		*toU4(s + 4) = asU4(t + 4);
+		*toU2(s + 8) = asU2(t + 8);
+		s[10] = s[11];
+		break;
+	case 12:
+		*toU4(s) = asU4(t);
+		*toU4(s + 4) = asU4(t + 4);
+		*toU4(s + 8) = asU4(t + 8);
+		break;
+	case 13:
+		*toU4(s) = asU4(t);
+		*toU4(s + 4) = asU4(t + 4);
+		*toU4(s + 8) = asU4(t + 8);
+		s[12] = t[12];
+		break;
+	case 14:
+		*toU4(s) = asU4(t);
+		*toU4(s + 4) = asU4(t + 4);
+		*toU4(s + 8) = asU4(t + 8);
+		*toU2(s + 12) = asU2(t + 12);
+		break;
+	case 15:
+		*toU4(s) = asU4(t);
+		*toU4(s + 4) = asU4(t + 4);
+		*toU4(s + 8) = asU4(t + 8);
+		*toU2(s + 12) = asU2(t + 12);
+		s[14] = t[14];
+		break;
+	case 16:
+		*toU4(s) = asU4(t);
+		*toU4(s + 4) = asU4(t + 4);
+		*toU4(s + 8) = asU4(t + 8);
+		*toU4(s + 12) = asU4(t + 12);
+		break;
+#endif
+	default:
+		memcpy(s, t, M*sizeof(char));
+		break;
+	}
+}
+
+template <size_t N, size_t M = N>
+inline void StrCpyEx(wchar_t *s, const wchar_t (&t)[N]) noexcept {
+	using namespace StrCopyEqualExPrivate;
+	switch (M) {
+	case 1:
+		s[0] = t[0];
+		break;
+	case 2:
+		*toU4(s) = asU4(t);
+		break;
+	case 3:
+		*toU4(s) = asU4(t);
+		s[2] = t[2];
+		break;
+#if defined(_WIN64)
+	case 4:
+		*toU8(s) = asU8(t);
+		break;
+	case 5:
+		*toU8(s) = asU8(t);
+		s[4] = t[4];
+		break;
+	case 6:
+		*toU8(s) = asU8(t);
+		*toU4(s + 4) = asU4(t + 4);
+		break;
+	case 7:
+		*toU8(s) = asU8(t);
+		*toU4(s + 4) = asU4(t + 4);
 		s[6] = t[6];
 		break;
 	case 8:
-		*((uint32_t *)s) = *((const uint32_t *)t);
-		*((uint32_t *)(s + 4)) = *((const uint32_t *)(t + 4));
+		*toU8(s) = asU8(t);
+		*toU8(s + 4) = asU8(t + 4);
 		break;
+#else
+	case 4:
+		*toU4(s) = asU4(t);
+		*toU4(s + 2) = asU4(t + 2);
+		break;
+	case 5:
+		*toU4(s) = asU4(t);
+		*toU4(s + 2) = asU4(t + 2);
+		s[4] = t[4];
+		break;
+	case 6:
+		*toU4(s) = asU4(t);
+		*toU4(s + 2) = asU4(t + 2);
+		*toU4(s + 4) = asU4(t + 4);
+		break;
+	case 7:
+		*toU4(s) = asU4(t);
+		*toU4(s + 2) = asU4(t + 2);
+		*toU4(s + 4) = asU4(t + 4);
+		s[6] = t[6];
+		break;
+	case 8:
+		*toU4(s) = asU4(t);
+		*toU4(s + 2) = asU4(t + 2);
+		*toU4(s + 4) = asU4(t + 4);
+		*toU4(s + 6) = asU4(t + 6);
+		break;
+#endif
 	default:
-		memcpy(s, t, N*sizeof(char));
+		memcpy(s, t, M*sizeof(wchar_t));
 		break;
 	}
 }
 
 template <size_t N>
-inline void StrCpyEx(wchar_t *s, const wchar_t (&t)[N]) noexcept {
-	switch (N) {
-	case 1:
-		s[0] = t[0];
-		break;
-	case 2:
-		*((uint32_t *)s) = *((const uint32_t *)t);
-		break;
-	case 3:
-		*((uint32_t *)s) = *((const uint32_t *)t);
-		s[2] = t[2];
-		break;
-	case 4:
-		*((uint64_t *)s) = *((const uint64_t *)t);
-		break;
-	default:
-		memcpy(s, t, N*sizeof(wchar_t));
-		break;
-	}
+inline void StrCpyExNull(char *s, const char (&t)[N]) noexcept {
+	StrCpyEx<N, N - 1>(s, t);
+}
+
+template <size_t N>
+inline void StrCpyExNull(wchar_t *s, const wchar_t (&t)[N]) noexcept {
+	StrCpyEx<N, N - 1>(s, t);
 }
 #endif
 
+#if defined(__clang__) || defined(__GNUC__) || !defined(_MSC_BUILD)
 template <typename T, size_t N>
 constexpr bool StrEqualEx(const T *s, const T (&t)[N]) noexcept {
+	// NOLINTNEXTLINE(clang-analyzer-unix.cstring.UninitializedRead)
 	return __builtin_memcmp(s, t, N*sizeof(T)) == 0;
 }
 
 template <typename T, size_t N>
 constexpr bool StrStartsWith(const T *s, const T (&t)[N]) noexcept {
+	// NOLINTNEXTLINE(clang-analyzer-unix.cstring.UninitializedRead)
 	return __builtin_memcmp(s, t, (N - 1)*sizeof(T)) == 0;
+}
+
+#else
+template <size_t N, size_t M = N>
+constexpr bool StrEqualEx(const char *s, const char (&t)[N]) noexcept {
+	using namespace StrCopyEqualExPrivate;
+	switch (M) {
+	case 1:
+		return s[0] == t[0];
+	case 2:
+		return asU2(s) == asU2(t);
+	case 3:
+		return asU2(s) == asU2(t) && s[2] == t[2];
+	case 4:
+		return asU4(s) == asU4(t);
+	case 5:
+		return asU4(s) == asU4(t) && s[4] == t[4];
+	case 6:
+		return asU4(s) == asU4(t) && asU2(s + 4) == asU2(t + 4);
+	case 7:
+		return asU4(s) == asU4(t) && asU3_4M1(s + 4) == asU3_2P1(t + 4);
+#if defined(_WIN64)
+	case 8:
+		return asU8(s) == asU8(t);
+	case 9:
+		return asU8(s) == asU8(t) && s[8] == t[8];
+	case 10:
+		return asU8(s) == asU8(t) && asU2(s + 8) == asU2(t + 8);
+	case 11:
+		return asU8(s) == asU8(t) && asU3_4M1(s + 8) == asU3_2P1(t + 8);
+	case 12:
+		return asU8(s) == asU8(t) && asU4(s + 8) == asU4(t + 8);
+	case 13:
+		return asU8(s) == asU8(t) && asU4(s + 8) == asU4(t + 8) && s[12] == t[12];
+	case 14:
+		return asU8(s) == asU8(t) && asU4(s + 8) == asU4(t + 8) && asU2(s + 12) == asU2(t + 12);
+	case 15:
+		return asU8(s) == asU8(t) && asU4(s + 8) == asU4(t + 8) && asU3_4M1(s + 12) == asU3_2P1(t + 12);
+	case 16:
+		return asU8(s) == asU8(t) && asU8(s + 8) == asU8(t + 8);
+#else
+	case 8:
+		return asU4(s) == asU4(t) && asU4(s + 4) == asU4(t + 4);
+	case 9:
+		return asU4(s) == asU4(t) && asU4(s + 4) == asU4(t + 4) && s[8] == t[8];
+	case 10:
+		return asU4(s) == asU4(t) && asU4(s + 4) == asU4(t + 4) && asU2(s + 8) == asU2(t + 8);
+	case 11:
+		return asU4(s) == asU4(t) && asU4(s + 4) == asU4(t + 4) && asU3_4M1(s + 8) == asU3_2P1(t + 8);
+	case 12:
+		return asU4(s) == asU4(t) && asU4(s + 4) == asU4(t + 4) && asU4(s + 8) == asU4(t + 8);
+	case 13:
+		return asU4(s) == asU4(t) && asU4(s + 4) == asU4(t + 4) && asU4(s + 8) == asU4(t + 8) && s[12] == t[12];
+	case 14:
+		return asU4(s) == asU4(t) && asU4(s + 4) == asU4(t + 4) && asU4(s + 8) == asU4(t + 8) && asU2(s + 12) == asU2(t + 12);
+	case 15:
+		return asU4(s) == asU4(t) && asU4(s + 4) == asU4(t + 4) && asU4(s + 8) == asU4(t + 8) && asU3_4M1(s + 12) == asU3_2P1(t + 12);
+	case 16:
+		return asU4(s) == asU4(t) && asU4(s + 4) == asU4(t + 4) && asU4(s + 8) == asU4(t + 8) && asU4(s + 12) == asU4(t + 12);
+#endif
+	default:
+		return __builtin_memcmp(s, t, M) == 0;
+	}
+}
+
+template <size_t N, size_t M = N>
+constexpr bool StrEqualEx(const wchar_t *s, const wchar_t (&t)[N]) noexcept {
+	using namespace StrCopyEqualExPrivate;
+	switch (M) {
+	case 1:
+		return s[0] == t[0];
+	case 2:
+		return asU4(s) == asU4(t);
+	case 3:
+		return asU4(s) == asU4(t) && s[2] == t[2];
+#if defined(_WIN64)
+	case 4:
+		return asU8(s) == asU8(t);
+	case 5:
+		return asU8(s) == asU8(t) && s[4] == t[4];
+	case 6:
+		return asU8(s) == asU8(t) && asU4(s + 4) == asU4(t + 4);
+	case 7:
+		return asU8(s) == asU8(t) && asU8(s + 4 - 1) == asU8(t + 4 - 1);
+	case 8:
+		return asU8(s) == asU8(t) && asU8(s + 4) == asU8(t + 4);
+	case 9:
+		return asU8(s) == asU8(t) && asU8(s + 4) == asU8(t + 4) && s[8] == t[8];
+	case 10:
+		return asU8(s) == asU8(t) && asU8(s + 4) == asU8(t + 4) && asU4(s + 8) == asU4(t + 8);
+	case 11:
+		return asU8(s) == asU8(t) && asU8(s + 4) == asU8(t + 4) && asU8(s + 8 - 1) == asU8(t + 8 - 1);
+	case 12:
+		return asU8(s) == asU8(t) && asU8(s + 4) == asU8(t + 4) && asU8(s + 8) == asU8(t + 8);
+	case 13:
+		return asU8(s) == asU8(t) && asU8(s + 4) == asU8(t + 4) && asU8(s + 8) == asU8(t + 8) && s[12] == t[12];
+	case 14:
+		return asU8(s) == asU8(t) && asU8(s + 4) == asU8(t + 4) && asU8(s + 8) == asU8(t + 8) && asU4(s + 12) == asU4(t + 12);
+	case 15:
+		return asU8(s) == asU8(t) && asU8(s + 4) == asU8(t + 4) && asU8(s + 8) == asU8(t + 8) && asU8(s + 12 - 1) == asU8(t + 12 - 1);
+	case 16:
+		return asU8(s) == asU8(t) && asU8(s + 4) == asU8(t + 4) && asU8(s + 8) == asU8(t + 8) && asU8(s + 12) == asU8(t + 12);
+#else
+	case 4:
+		return asU4(s) == asU4(t) && asU4(s + 2) == asU4(t + 2);
+	case 5:
+		return asU4(s) == asU4(t) && asU4(s + 2) == asU4(t + 2) && s[4] == t[4];
+	case 6:
+		return asU4(s) == asU4(t) && asU4(s + 2) == asU4(t + 2) && asU4(s + 4) == asU4(t + 4);
+	case 7:
+		return asU4(s) == asU4(t) && asU4(s + 2) == asU4(t + 2) && asU4(s + 4) == asU4(t + 4) && s[6] == t[6];
+	case 8:
+		return asU4(s) == asU4(t) && asU4(s + 2) == asU4(t + 2) && asU4(s + 4) == asU4(t + 4) && asU4(s + 6) == asU4(t + 6);
+#endif
+	default:
+		return __builtin_wmemcmp(s, t, M) == 0;
+	}
+}
+
+template <size_t N>
+constexpr bool StrStartsWith(const char *s, const char (&t)[N]) noexcept {
+	return StrEqualEx<N, N - 1>(s, t);
+}
+
+template <size_t N>
+constexpr bool StrStartsWith(const wchar_t *s, const wchar_t (&t)[N]) noexcept {
+	return StrEqualEx<N, N - 1>(s, t);
+}
+#endif
+
+template <size_t N>
+constexpr bool StrEqualLen(const wchar_t *s, UINT len, const wchar_t (&t)[N]) noexcept {
+	return len == N - 1 && StrStartsWith(s, t);
+}
+
+template <size_t N>
+inline bool WcsStartsWith(const wchar_t *s, const wchar_t (&t)[N]) noexcept {
+	return wcsncmp(s, t, N - 1) == 0;
 }
 
 template <size_t N>
 inline bool StrStartsWithCase(const wchar_t *s, const wchar_t (&t)[N]) noexcept {
-	return _wcsnicmp(s, t, N - 1) == 0;
+	return __ascii_wcsnicmp(s, t, N - 1) == 0;
 }
 
 template <size_t N>
 inline bool StrStartsWithCase(const char *s, const char (&t)[N]) noexcept {
-	return _strnicmp(s, t, N - 1) == 0;
+	return __ascii_strnicmp(s, t, N - 1) == 0;
 }
 
 inline bool StrToFloat(LPCWSTR str, float *value) noexcept {
@@ -387,6 +728,11 @@ inline T DLLFunction(HMODULE hModule, LPCSTR lpProcName) noexcept {
 template<typename T>
 inline T DLLFunctionEx(LPCWSTR lpDllName, LPCSTR lpProcName) noexcept {
 	return DLLFunction<T>(::GetModuleHandleW(lpDllName), lpProcName);
+}
+
+inline int GetWinCtrlID(HWND hwnd) noexcept {
+	// same as GetWindowID(), GetDlgCtrlID()
+	return static_cast<int>(::GetWindowLongPtr(hwnd, GWLP_ID));
 }
 
 #ifndef SEE_MASK_NOZONECHECKS
@@ -595,19 +941,21 @@ struct IniSectionBuilder {
 #define NP2RegSubKey_ContextMenu	L"*\\shell\\Notepad4"
 #define NP2RegSubKey_JumpList		L"Applications\\Notepad4.exe"
 
-LPWSTR Registry_GetString(HKEY hKey, LPCWSTR valueName) noexcept;
+template <DWORD cchDest>
+[[nodiscard]] inline bool Registry_GetStringEx(HKEY hKey, LPCWSTR lpSubKey, LPCWSTR valueName, WCHAR (&value)[cchDest], DWORD samDesired = RRF_RT_REG_SZ) noexcept {
+	DWORD size = cchDest * sizeof(WCHAR);
+	const LSTATUS status = RegGetValueW(hKey, lpSubKey, valueName, samDesired, nullptr, value, &size);
+	return status == ERROR_SUCCESS;
+}
 LSTATUS Registry_SetString(HKEY hKey, LPCWSTR valueName, LPCWSTR lpszText) noexcept;
 LSTATUS Registry_SetInt(HKEY hKey, LPCWSTR valueName, DWORD value) noexcept;
-#define Registry_GetDefaultString(hKey)				Registry_GetString((hKey), nullptr)
+#define Registry_GetString(hKey, valueName, value)	Registry_GetStringEx((hKey), nullptr, (valueName), (value))
+#define Registry_GetDefaultString(hKey, value)		Registry_GetStringEx((hKey), nullptr, nullptr, (value))
+#define Registry_GetSubKeyDefaultString(hKey, lpSubKey, value)	Registry_GetStringEx((hKey), (lpSubKey), nullptr, (value))
 #define Registry_SetDefaultString(hKey, lpszText)	Registry_SetString((hKey), nullptr, (lpszText))
 inline LSTATUS Registry_CreateKey(HKEY hKey, LPCWSTR lpSubKey, PHKEY phkResult, REGSAM samDesired = 0) noexcept {
 	return RegCreateKeyEx(hKey, lpSubKey, 0, nullptr, 0, KEY_WRITE | samDesired, nullptr, phkResult, nullptr);
 }
-#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-#define Registry_DeleteTree(hKey, lpSubKey)			RegDeleteTree((hKey), (lpSubKey))
-#else
-LSTATUS Registry_DeleteTree(HKEY hKey, LPCWSTR lpSubKey) noexcept;
-#endif
 
 inline bool KeyboardIsKeyDown(int key) noexcept {
 	return ::GetKeyState(key) & 0x8000;
@@ -646,8 +994,6 @@ struct BackgroundWorker {
 
 HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(LPCWSTR AppID) noexcept;
 bool IsElevated() noexcept;
-
-#define SetExplorerTheme(hwnd)		SetWindowTheme((hwnd), L"Explorer", nullptr)
 
 HBITMAP LoadBitmapFile(LPCWSTR path) noexcept;
 HBITMAP ResizeImageForDPI(HBITMAP hbmp, UINT dpi) noexcept;
@@ -897,11 +1243,10 @@ struct MRUList {
 	LPCWSTR szRegKey;
 	LPWSTR *pszItems;
 
-	void Init(LPCWSTR pszRegKey, int capacity_, int flags) noexcept;
+	void Init(LPCWSTR pszRegKey, int capacity_, int flags, bool save) noexcept;
 	void Add(LPCWSTR pszNew) noexcept;
-	void AddMultiline(LPCWSTR pszNew) noexcept;
 	void Delete(int iIndex) noexcept;
-	void DeleteFileFromStore(LPCWSTR pszFile) const noexcept;
+	void DeleteFileFromStore(LPCWSTR pszFile, int fileIndex) noexcept;
 	void Empty(bool save, bool destroy = false) noexcept;
 	void Load() noexcept;
 	void Save() const noexcept;
@@ -933,18 +1278,42 @@ DLGTEMPLATE *LoadThemedDialogTemplate(LPCWSTR lpDialogTemplateID, HINSTANCE hIns
 INT_PTR ThemedDialogBoxParam(HINSTANCE hInstance, LPCWSTR lpTemplate, HWND hWndParent, DLGPROC lpDialogFunc, LPARAM dwInitParam) noexcept;
 HWND	CreateThemedDialogParam(HINSTANCE hInstance, LPCWSTR lpTemplate, HWND hWndParent, DLGPROC lpDialogFunc, LPARAM dwInitParam) noexcept;
 
-//==== File Dialog Hook =========================================================
-UINT_PTR CALLBACK OpenSaveFileDlgHookProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) noexcept;
+enum FileDialogType {
+	FileDialogType_FileOpen = 1,
+	FileDialogType_FileSave = 2,
+	FileDialogType_ParseFilter = 4,
+	FileDialogType_OpenParseFilter = FileDialogType_FileOpen | FileDialogType_ParseFilter,
+	FileDialogType_SaveParseFilter = FileDialogType_FileSave | FileDialogType_ParseFilter,
+};
 
-//==== UnSlash Functions ======================================================
-void TransformBackslashes(char *pszInput, BOOL bRegEx, UINT cpEdit) noexcept;
+#define FileDialog_BrowseFolder		(FOS_NOCHANGEDIR | FOS_FORCEFILESYSTEM | FOS_PATHMUSTEXIST | FOS_DONTADDTORECENT | FOS_PICKFOLDERS)
+#define FileDialog_FileCommon		(FOS_NOCHANGEDIR | FOS_FORCEFILESYSTEM | FOS_PATHMUSTEXIST | FOS_DONTADDTORECENT | FOS_SHAREAWARE | FOS_NOTESTFILECREATE)
+#define FileDialog_OpenFile			(FileDialog_FileCommon | FOS_NOREADONLYRETURN | FOS_FILEMUSTEXIST)
+#define FileDialog_SaveFile			(FileDialog_FileCommon | FOS_NOREADONLYRETURN | FOS_OVERWRITEPROMPT)
+#define FileDialog_FindFile			(FileDialog_FileCommon | FOS_FILEMUSTEXIST | FOS_NODEREFERENCELINKS)
+
+struct FileDialog {
+	COMDLG_FILTERSPEC *filterSpec;
+	UINT filterCount;
+	UINT filterIndex;
+	FileDialogType dialogType;
+	DWORD dialogOptions; // FILEOPENDIALOGOPTIONS
+	LPCWSTR pszDefaultExtension;
+
+	LPWSTR Show(HWND hwndOwner, LPCWSTR lpstrInitialDir, LPCWSTR lpstrFile, UINT idsTitle = 0);
+	void ParseFilter(LPWSTR szFilter) noexcept;
+	// File Dialog Hook
+	static LRESULT CALLBACK SubProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
+};
+
 // backslash escape for C0 control character => \xHH
 #define kMaxBackslashEscapeCount	4
 // backslash escape regex meta character
 #define kMaxRegexEscapeCount		2
-bool AddBackslashA(char *pszOut, const char *pszInput) noexcept;
 bool AddBackslashW(LPWSTR pszOut, LPCWSTR pszInput) noexcept;
 void EscapeRegex(LPSTR pszOut, LPCSTR pszIn) noexcept;
+LPWSTR HeapStrDupW(LPCWSTR pszIn) noexcept;
+void HeapStrDupExW(LPWSTR &pszOut, LPCWSTR pszIn) noexcept;
 size_t Base64Encode(char *output, const uint8_t *src, size_t length, bool urlSafe) noexcept;
 size_t Base64Decode(uint8_t *output, const uint8_t *src, size_t length) noexcept;
 

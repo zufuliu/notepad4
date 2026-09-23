@@ -153,7 +153,7 @@ bool WordList::Set(const char *s, KeywordAttr attribute) {
 	memcpy(list, s, lenS + 1);
 	if (attribute & KeywordAttr_MakeLower) {
 		char *p = list;
-		char * const end = list + lenS;
+		const char * const end = list + lenS;
 #if defined(__clang__)
 		#pragma clang loop vectorize(disable)
 #elif defined(__GNUC__)

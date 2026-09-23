@@ -10,6 +10,7 @@
 #include <cmath>
 
 #include <stdexcept>
+#include <string>
 #include <string_view>
 #include <vector>
 #include <map>
@@ -33,10 +34,12 @@ using namespace Scintilla;
 using namespace Scintilla::Internal;
 
 LineMarker::LineMarker(const LineMarker &other) : LineMarkerPod(other) {
+	// Defined to avoid pxpm and image being blindly copied, not as a complete copy constructor.
 	CopyImage(other);
 }
 
 LineMarker &LineMarker::operator=(const LineMarker &other) {
+	// Defined to avoid pxpm and image being blindly copied, not as a complete assignment operator.
 	if (this != &other) {
 		static_cast<LineMarkerPod &>(*this) = other;
 		CopyImage(other);
@@ -45,7 +48,6 @@ LineMarker &LineMarker::operator=(const LineMarker &other) {
 }
 
 void LineMarker::CopyImage(const LineMarker &other) {
-	// Defined to avoid pxpm and image being blindly copied.
 	if (other.pxpm) {
 		pxpm = std::make_unique<XPM>(*other.pxpm);
 	} else {
@@ -303,7 +305,7 @@ void LineMarker::DrawFoldingMark(Surface *surface, PRectangle rcWhole, FoldPart 
 void LineMarker::AlignedPolygon(Surface *surface, const Point *pts, size_t npts) const {
 	const XYPOSITION move = strokeWidth / 2.0;
 	std::vector<Point> points;
-	std::transform(pts, pts + npts, std::back_inserter(points), [=](Point pt) noexcept {
+	std::transform(pts, pts + npts, std::back_inserter(points), [=](Point pt) noexcept ->Point {
 		return Point(pt.x + move, pt.y + move);
 	});
 	surface->Polygon(points.data(), std::size(points), FillStroke(back, fore, strokeWidth));
@@ -347,7 +349,11 @@ void LineMarker::Draw(Surface *surface, PRectangle rcWhole, const Font *fontForC
 	const XYPOSITION centreY = std::floor(centre.y);
 	const XYPOSITION dimOn2 = std::floor(minDim / 2);
 	const XYPOSITION dimOn4 = std::floor(minDim / 4);
-	const XYPOSITION armSize = dimOn2 - 2;
+	// Half-thickness of the plus/minus bars, historically 1 pixel.  Scale
+	// with strokeWidth so the symbols keep their weight when the surface
+	// is in device pixels and strokeWidth has been set to match.
+	const XYPOSITION barOn2 = std::round(std::max<XYPOSITION>(strokeWidth, 1.0));
+	const XYPOSITION armSize = dimOn2 - 2 * barOn2;
 	if (marginStyle == MarginType::Number || marginStyle == MarginType::Text || marginStyle == MarginType::RText) {
 		// On textual margins move marker to the left to try to avoid overlapping the text
 		centreX = rcWhole.left + dimOn2 + 1;
@@ -394,18 +400,18 @@ void LineMarker::Draw(Surface *surface, PRectangle rcWhole, const Font *fontForC
 
 	case MarkerSymbol::Plus: {
 		const Point pts[] = {
-			Point(centreX - armSize, centreY - 1),
-			Point(centreX - 1, centreY - 1),
-			Point(centreX - 1, centreY - armSize),
-			Point(centreX + 1, centreY - armSize),
-			Point(centreX + 1, centreY - 1),
-			Point(centreX + armSize, centreY - 1),
-			Point(centreX + armSize, centreY + 1),
-			Point(centreX + 1, centreY + 1),
-			Point(centreX + 1, centreY + armSize),
-			Point(centreX - 1, centreY + armSize),
-			Point(centreX - 1, centreY + 1),
-			Point(centreX - armSize, centreY + 1),
+			Point(centreX - armSize, centreY - barOn2),
+			Point(centreX - barOn2, centreY - barOn2),
+			Point(centreX - barOn2, centreY - armSize),
+			Point(centreX + barOn2, centreY - armSize),
+			Point(centreX + barOn2, centreY - barOn2),
+			Point(centreX + armSize, centreY - barOn2),
+			Point(centreX + armSize, centreY + barOn2),
+			Point(centreX + barOn2, centreY + barOn2),
+			Point(centreX + barOn2, centreY + armSize),
+			Point(centreX - barOn2, centreY + armSize),
+			Point(centreX - barOn2, centreY + barOn2),
+			Point(centreX - armSize, centreY + barOn2),
 		};
 		AlignedPolygon(surface, pts, std::size(pts));
 	}
@@ -413,10 +419,10 @@ void LineMarker::Draw(Surface *surface, PRectangle rcWhole, const Font *fontForC
 
 	case MarkerSymbol::Minus: {
 		const Point pts[] = {
-			Point(centreX - armSize, centreY - 1),
-			Point(centreX + armSize, centreY - 1),
-			Point(centreX + armSize, centreY + 1),
-			Point(centreX - armSize, centreY + 1),
+			Point(centreX - armSize, centreY - barOn2),
+			Point(centreX + armSize, centreY - barOn2),
+			Point(centreX + armSize, centreY + barOn2),
+			Point(centreX - armSize, centreY + barOn2),
 		};
 		AlignedPolygon(surface, pts, std::size(pts));
 	}

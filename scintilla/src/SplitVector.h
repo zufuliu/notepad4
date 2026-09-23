@@ -57,6 +57,8 @@ public:
 
 template <typename T>
 class SplitVector {
+	static constexpr size_t growthPortion = 6;
+	static constexpr size_t initialGrowSize = 8;
 	// std::vector<T> body;
 	std::vector<T, default_init_allocator<T>> body;
 	ptrdiff_t lengthBody = 0;
@@ -97,12 +99,12 @@ class SplitVector {
 	/// reallocating if more space needed.
 	void RoomFor(ptrdiff_t insertionLength) {
 		if (gapLength < insertionLength) {
-			const size_t size = body.size();
-			const size_t upper = size / 6;
+			const size_t currentSize = body.size();
+			const size_t upper = currentSize / growthPortion;
 			while (growSize < upper) {
 				growSize *= 2;
 			}
-			ReAllocate(size + insertionLength + growSize);
+			ReAllocate(currentSize + insertionLength + growSize);
 		}
 	}
 
@@ -112,21 +114,21 @@ class SplitVector {
 		lengthBody = 0;
 		part1Length = 0;
 		gapLength = 0;
-		growSize = 8;
+		growSize = initialGrowSize;
 	}
 
 public:
 	/// Construct a split buffer.
-	explicit SplitVector(size_t growSize_ = 8) noexcept : growSize{growSize_} {}
+	explicit SplitVector(size_t growSize_ = initialGrowSize) noexcept : growSize{growSize_} {}
 
-	size_t size() const noexcept {
+	[[nodiscard]] size_t size() const noexcept {
 		return body.size();
 	}
-	size_t capacity() const noexcept {
+	[[nodiscard]] size_t capacity() const noexcept {
 		return body.capacity();
 	}
 
-	size_t GetGrowSize() const noexcept {
+	[[nodiscard]] size_t GetGrowSize() const noexcept {
 		return growSize;
 	}
 
@@ -141,15 +143,15 @@ public:
 		// over allocation to simplify SplitView usage
 		constexpr size_t sentinel = (sizeof(T) == sizeof(char)) ? sizeof(int) : 0;
 		newSize += sentinel;
-		const size_t size = body.size();
-		if (newSize > size) {
+		const size_t currentSize = body.size();
+		if (newSize > currentSize) {
 #if ENABLE_SHOW_DEBUG_INFO
 			printf("before %s(%td, %zu) part1Length=%td, gapLength=%td, lengthBody=%td, growSize=%zu\n",
-				__func__, newSize, size, part1Length, gapLength, lengthBody, growSize);
+				__func__, newSize, currentSize, part1Length, gapLength, lengthBody, growSize);
 #endif
 			// Move the gap to the end
 			GapTo(lengthBody);
-			gapLength += newSize - size - sentinel;
+			gapLength += newSize - currentSize - sentinel;
 			// RoomFor implements a growth strategy but so does vector::resize so
 			// ensure vector::resize allocates exactly the amount wanted by
 			// calling reserve first.
@@ -157,14 +159,14 @@ public:
 			body.resize(newSize);
 #if ENABLE_SHOW_DEBUG_INFO
 			printf("after %s(%td, %zu) part1Length=%td, gapLength=%td, lengthBody=%td, growSize=%zu\n",
-				__func__, newSize, size, part1Length, gapLength, lengthBody, growSize);
+				__func__, newSize, currentSize, part1Length, gapLength, lengthBody, growSize);
 #endif
 		}
 	}
 
 	/// Retrieve the element at a particular position.
 	/// Retrieving positions outside the range of the buffer returns empty or 0.
-	T ValueAt(ptrdiff_t position) const noexcept {
+	[[nodiscard]] T ValueAt(ptrdiff_t position) const noexcept {
 		if (IsValidIndex(position, part1Length)) {
 			return body[position];
 		}
@@ -174,7 +176,7 @@ public:
 		return {};
 	}
 
-	const T& ValueOr(ptrdiff_t position, const T& empty) const noexcept {
+	[[nodiscard]] const T& ValueOr(ptrdiff_t position, const T& empty) const noexcept {
 		if (IsValidIndex(position, part1Length)) {
 			return body[position];
 		}
@@ -226,9 +228,8 @@ public:
 		PLATFORM_ASSERT(position >= 0 && position < lengthBody);
 		if (position < part1Length) {
 			return body[position];
-		} else {
-			return body[gapLength + position];
 		}
+		return body[gapLength + position];
 	}
 
 	/// Retrieve reference to the element at a particular position.
@@ -238,13 +239,12 @@ public:
 		PLATFORM_ASSERT(position >= 0 && position < lengthBody);
 		if (position < part1Length) {
 			return body[position];
-		} else {
-			return body[gapLength + position];
 		}
+		return body[gapLength + position];
 	}
 
 	/// Retrieve the length of the buffer.
-	ptrdiff_t Length() const noexcept {
+	[[nodiscard]] ptrdiff_t Length() const noexcept {
 		return lengthBody;
 	}
 
@@ -321,7 +321,7 @@ public:
 	}
 
 	/// Insert text into the buffer from an array.
-	void InsertFromArray(ptrdiff_t positionToInsert, const T s[], ptrdiff_t insertLength) {
+	void InsertFromArray(ptrdiff_t positionToInsert, const T *arr, ptrdiff_t insertLength) {
 		PLATFORM_ASSERT((positionToInsert >= 0) && (positionToInsert <= lengthBody));
 		if (insertLength > 0) {
 			if (!InRangeInclusive(positionToInsert, lengthBody)) {
@@ -330,9 +330,9 @@ public:
 			RoomFor(insertLength);
 			GapTo(positionToInsert);
 			if constexpr (std::is_trivially_copyable_v<T>) {
-				memcpy(body.data() + part1Length, s, insertLength*sizeof(T));
+				memcpy(body.data() + part1Length, arr, insertLength*sizeof(T));
 			} else {
-				std::copy_n(s, insertLength, body.data() + part1Length);
+				std::copy_n(arr, insertLength, body.data() + part1Length);
 			}
 			lengthBody += insertLength;
 			part1Length += insertLength;
@@ -437,7 +437,7 @@ public:
 
 	/// Return a pointer to a single element.
 	/// Does not rearrange the buffer.
-	const T *ElementPointer(ptrdiff_t position) const noexcept {
+	[[nodiscard]] const T *ElementPointer(ptrdiff_t position) const noexcept {
 		const T *data = body.data() + position;
 		if (position >= part1Length) {
 			data += gapLength;
@@ -446,7 +446,7 @@ public:
 	}
 
 	/// Return the position of the gap within the buffer.
-	ptrdiff_t GapPosition() const noexcept {
+	[[nodiscard]] ptrdiff_t GapPosition() const noexcept {
 		return part1Length;
 	}
 	ptrdiff_t GapLength() const noexcept {

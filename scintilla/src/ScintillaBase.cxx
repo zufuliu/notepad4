@@ -249,7 +249,8 @@ void ScintillaBase::DrawImeIndicator(int indicator, Sci::Position len) {
 	// Draw an indicator on the character before caret by the character bytes of len
 	// so it should be called after InsertCharacter().
 	// It does not affect caret positions.
-	if (indicator < 8 || indicator > IndicatorMax) {
+	const IndicatorNumbers ind = static_cast<IndicatorNumbers>(indicator);
+	if (ind < IndicatorNumbers::Container || ind > IndicatorNumbers::Max) {
 		return;
 	}
 	pdoc->DecorationSetCurrentIndicator(indicator);
@@ -895,7 +896,7 @@ const char *LexState::DescriptionOfStyle(int style) const noexcept {
 
 void ScintillaBase::NotifyStyleToNeeded(Sci::Position endStyleNeeded) {
 	if (!DocumentLexState()->UseContainerLexing()) {
-		const Sci::Line startStyling = pdoc->LineStartPosition(pdoc->GetEndStyled());
+		const Sci::Position startStyling = pdoc->LineStartPosition(pdoc->GetEndStyled());
 		DocumentLexState()->Colourise(startStyling, endStyleNeeded);
 		return;
 	}

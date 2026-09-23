@@ -45,6 +45,7 @@ extra_word_char: extra identifier characters excludes dot.
 ignore_word_style: word styles to be ignored for auto-completion word scanning.
 autoc_extra_keyword: [deprecated] extra keyword for auto-completion.
 auto_ident_word_style: word styles that supports auto ident.
+keyword_attr: default keyword attribute.
 plain_text_file: treat as plain text file for auto-completion.
 plain_text_style: plain text styles for auto-completion.
 string_style_range: first and last string or regex style for auto-completion.
@@ -115,6 +116,7 @@ LexerConfigMap = {
 		'escape_char_start': NoEscapeCharacter,
 		'extra_word_char': '-',
 		'plain_text_file': True,
+		'keyword_attr': KeywordAttr.NoLexer,
 	},
 	'NP2LEX_2NDTEXTFILE': {
 		'indent_based_folding': True,
@@ -122,6 +124,7 @@ LexerConfigMap = {
 		'escape_char_start': NoEscapeCharacter,
 		'extra_word_char': '-',
 		'plain_text_file': True,
+		'keyword_attr': KeywordAttr.NoLexer,
 	},
 	'NP2LEX_ANSI': {
 		'default_encoding': 'DOS-437',
@@ -131,6 +134,7 @@ LexerConfigMap = {
 		'escape_char_start': NoEscapeCharacter,
 		'extra_word_char': '-',
 		'plain_text_file': True,
+		'keyword_attr': KeywordAttr.NoLexer,
 	},
 
 	'NP2LEX_ABAQUS': {
@@ -307,11 +311,13 @@ LexerConfigMap = {
 		'line_comment_string': '#',
 		'comment_style_marker': 'SCE_CONF_COMMENT',
 		'operator_style': ['SCE_CONF_OPERATOR'],
+		'keyword_attr': KeywordAttr.NoLexer,
 	},
 	'NP2LEX_CSV': {
 		'escape_char_start': NoEscapeCharacter,
 		'extra_word_char': '-',
 		'plain_text_file': True,
+		'keyword_attr': KeywordAttr.NoLexer,
 	},
 	'NP2LEX_CPP': {
 		'cpp_style_comment': True,
@@ -403,6 +409,7 @@ LexerConfigMap = {
 		'default_fold_level': ['command', '[file]', 'diff'],
 		'escape_char_start': NoEscapeCharacter,
 		'plain_text_file': True,
+		'keyword_attr': KeywordAttr.NoLexer,
 	},
 
 	'NP2LEX_ELIXIR': {
@@ -573,6 +580,7 @@ LexerConfigMap = {
 		'comment_style_marker': 'SCE_PROPS_COMMENT',
 		'default_fold_level': ['section', 'comment'],
 		'escape_char_start': NoEscapeCharacter,
+		'keyword_attr': KeywordAttr.NoLexer,
 	},
 	'NP2LEX_INNOSETUP': {
 		'line_comment_string': [';', '//'],
@@ -1395,7 +1403,7 @@ def BuildLexerConfigContent(rid, keywordAttr):
 			output.append(f'{indent}{prefix} KeywordAttr{bit}({index}, {expr}) // {comment}')
 			prefix = '|'
 	else:
-		expr = get_enum_flag_expr(KeywordAttr.Default)
+		expr = get_enum_flag_expr(config.get('keyword_attr', KeywordAttr.Default))
 		output.append(indent + expr)
 
 	# style marker

@@ -137,6 +137,7 @@ inline bool IsSectionOptionStart(const StyleContext &sc) noexcept {
 
 constexpr bool IsSectionCommentOption(const char (&buffer)[MaxKeywordSize], size_t length) noexcept {
 	constexpr size_t comment = CStrLen("comments");
+	// NOLINTNEXTLINE(clang-analyzer-unix.cstring.UninitializedRead)
 	return length <= comment && __builtin_memcmp(buffer, "comments", length) == 0;
 }
 

@@ -3,6 +3,7 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="Source Files">
+    <File Name="../../matepath/src/DarkMode.cpp"/>
     <File Name="../../matepath/src/Dialogs.cpp"/>
     <File Name="../../matepath/src/Dlapi.cpp"/>
     <File Name="../../matepath/src/DropSource.cpp"/>
@@ -12,6 +13,7 @@
   <VirtualDirectory Name="Header Files">
     <File Name="../../matepath/src/compiler.h"/>
     <File Name="../../matepath/src/config.h"/>
+    <File Name="../../matepath/src/DarkMode.h"/>
     <File Name="../../matepath/src/Dialogs.h"/>
     <File Name="../../matepath/src/Dlapi.h"/>
     <File Name="../../matepath/src/DropSource.h"/>

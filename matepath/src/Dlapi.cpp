@@ -60,15 +60,11 @@ static inline LPCITEMIDLIST IL_Next(LPCITEMIDLIST pidl) noexcept {
 //
 void DirList_Init(HWND hwnd) noexcept {
 	// Allocate DirListData Property
-	DLDATA *lpdl = static_cast<DLDATA *>(GlobalAlloc(GPTR, sizeof(DLDATA)));
+	DLDATA *lpdl = static_cast<DLDATA *>(NP2HeapAlloc(sizeof(DLDATA)));
 	SetProp(hwnd, pDirListProp, lpdl);
 
 	// Setup dl
 	lpdl->worker.Init(hwnd);
-	lpdl->cbidl = 0;
-	lpdl->pidl = nullptr;
-	lpdl->lpsf = nullptr;
-	StrCpyEx(lpdl->szPath, L"");
 
 	SHFILEINFO shfi;
 	// Add Imagelists
@@ -84,9 +80,6 @@ void DirList_Init(HWND hwnd) noexcept {
 
 	//SHGetFileInfo(L"Icon", FILE_ATTRIBUTE_NORMAL, &shfi, sizeof(SHFILEINFO), SHGFI_USEFILEATTRIBUTES | SHGFI_SMALLICON | SHGFI_SYSICONINDEX);
 	//lpdl->iDefIconFile = shfi.iIcon;
-
-	lpdl->iDefIconFolder = 0;
-	lpdl->iDefIconFile = 0;
 }
 
 //=============================================================================
@@ -110,7 +103,7 @@ void DirList_Destroy(HWND hwnd) {
 
 	// Free DirListData Property
 	RemoveProp(hwnd, pDirListProp);
-	GlobalFree(lpdl);
+	NP2HeapFree(lpdl);
 }
 
 //=============================================================================

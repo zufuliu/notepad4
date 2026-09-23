@@ -22,7 +22,7 @@
 #include <windowsx.h>
 #include <dde.h>
 #include <ddeml.h>
-#include <dlgs.h>
+// #include <dlgs.h>
 #include <shlwapi.h>
 #include <shlobj.h>
 #include <shellapi.h>
@@ -34,6 +34,7 @@
 #include <cstdio>
 #include "config.h"
 #include "Helpers.h"
+#include "DarkMode.h"
 #include "../../scintilla/include/VectorISA.h"
 #include "../../scintilla/include/GraphicUtils.h"
 #include "Dlapi.h"
@@ -246,55 +247,19 @@ void IniSectionBuilder::SetInt(LPCWSTR key, int i) noexcept {
 }
 
 void IniSectionBuilder::SetStringEx(LPCWSTR key, LPCWSTR value, LPCWSTR lpDefault) noexcept {
-	if (!StrCaseEqual(value, lpDefault)) {
+	if (!WcsCaseEqual(value, lpDefault)) {
 		SetString(key, value);
 	}
 }
 
-LPWSTR Registry_GetString(HKEY hKey, LPCWSTR valueName) noexcept {
-	LPWSTR lpszText = nullptr;
-	DWORD type = REG_NONE;
-	DWORD size = 0;
-
-	LSTATUS status = RegQueryValueEx(hKey, valueName, nullptr, &type, nullptr, &size);
-	if (status == ERROR_SUCCESS && type == REG_SZ && size != 0) {
-		size = (size + 1)*sizeof(WCHAR);
-		lpszText = static_cast<LPWSTR>(NP2HeapAlloc(size));
-		status = RegQueryValueEx(hKey, valueName, nullptr, &type, reinterpret_cast<LPBYTE>(lpszText), &size);
-		if (status != ERROR_SUCCESS || type != REG_SZ || size == 0) {
-			NP2HeapFree(lpszText);
-			lpszText = nullptr;
-		}
-	}
-	return lpszText;
-}
-
+NP2_noinline
 LSTATUS Registry_SetString(HKEY hKey, LPCWSTR valueName, LPCWSTR lpszText) noexcept {
 	DWORD len = lstrlen(lpszText);
-	len = len ? ((len + 1)*sizeof(WCHAR)) : 0;
+	len += len != 0;
+	len *= sizeof(WCHAR);
 	const LSTATUS status = RegSetValueEx(hKey, valueName, 0, REG_SZ, reinterpret_cast<const BYTE *>(lpszText), len);
 	return status;
 }
-
-#if _WIN32_WINNT < _WIN32_WINNT_VISTA
-LSTATUS Registry_DeleteTree(HKEY hKey, LPCWSTR lpSubKey) noexcept {
-	using RegDeleteTreeSig = LSTATUS (WINAPI *)(HKEY hKey, LPCWSTR lpSubKey);
-	RegDeleteTreeSig pfnRegDeleteTree = DLLFunctionEx<RegDeleteTreeSig>(L"advapi32.dll", "RegDeleteTreeW");
-
-	LSTATUS status;
-	if (pfnRegDeleteTree != nullptr) {
-		status = pfnRegDeleteTree(hKey, lpSubKey);
-	} else {
-		status = RegDeleteKey(hKey, lpSubKey);
-		if (status != ERROR_SUCCESS && status != ERROR_FILE_NOT_FOUND) {
-			// TODO: Deleting a Key with Subkeys on Windows XP.
-			// https://docs.microsoft.com/en-us/windows/win32/sysinfo/deleting-a-key-with-subkeys
-		}
-	}
-
-	return status;
-}
-#endif
 
 UINT ParseCommaList(LPCWSTR str, int result[], UINT count) noexcept {
 	if (StrIsEmpty(str)) {
@@ -414,8 +379,8 @@ HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(LPCWSTR AppID) noexcept {
 #if _WIN32_WINNT >= _WIN32_WINNT_WIN7
 	return SetCurrentProcessExplicitAppUserModelID(AppID);
 #else
-	using SetCurrentProcessExplicitAppUserModelIDSig = HRESULT (WINAPI *)(LPCWSTR AppID);
-	SetCurrentProcessExplicitAppUserModelIDSig pfnSetCurrentProcessExplicitAppUserModelID =
+	using SetCurrentProcessExplicitAppUserModelIDSig = HRESULT (WINAPI *)(LPCWSTR AppID) noexcept;
+	auto pfnSetCurrentProcessExplicitAppUserModelID =
 		DLLFunctionEx<SetCurrentProcessExplicitAppUserModelIDSig>(L"shell32.dll", "SetCurrentProcessExplicitAppUserModelID");
 	if (pfnSetCurrentProcessExplicitAppUserModelID) {
 		return pfnSetCurrentProcessExplicitAppUserModelID(AppID);
@@ -1027,8 +992,8 @@ void SetClipData(HWND hwnd, LPCWSTR pszData) noexcept {
 		HANDLE hData = GlobalAlloc(GHND, size);
 		WCHAR *pData = static_cast<WCHAR *>(GlobalLock(hData));
 		memcpy(pData, pszData, size);
-		EmptyClipboard();
 		GlobalUnlock(hData);
+		EmptyClipboard();
 		SetClipboardData(CF_UNICODETEXT, hData);
 		CloseClipboard();
 	}
@@ -1575,6 +1540,7 @@ void StrTab2Space(LPWSTR lpsz) noexcept {
 //
 // PathFixBackslashes() - in place conversion
 //
+NP2_noinline
 bool PathFixBackslashes(LPWSTR lpsz) noexcept {
 	WCHAR *c = lpsz;
 	bool bFixed = false;
@@ -1635,7 +1601,7 @@ void FormatNumber(LPWSTR lpNumberStr, UINT value) noexcept {
 #endif
 
 	WCHAR *c = lpNumberStr + lstrlen(lpNumberStr);
-	WCHAR *end = c;
+	const WCHAR *end = c;
 	lpNumberStr += 3;
 	do {
 		c -= 3;
@@ -1779,17 +1745,17 @@ void HistoryList::Init() noexcept {
 void HistoryList::Empty() noexcept {
 	for (int i = 0; i < HISTORY_ITEMS; i++) {
 		if (pszItems[i]) {
-			LocalFree(pszItems[i]);
+			NP2HeapFree(pszItems[i]);
 			pszItems[i] = nullptr;
 		}
 	}
 }
 
-bool HistoryList::Add(LPCWSTR pszNew) noexcept {
+void HistoryList::Add(LPCWSTR pszNew) noexcept {
 	// Item to be added is equal to current item
 	if (iCurItem >= 0 && iCurItem < HISTORY_ITEMS) {
 		if (pszItems[iCurItem] != nullptr && PathEqual(pszNew, pszItems[iCurItem])) {
-			return false;
+			return;
 		}
 	}
 
@@ -1797,22 +1763,21 @@ bool HistoryList::Add(LPCWSTR pszNew) noexcept {
 		iCurItem++;
 		for (int i = iCurItem; i < HISTORY_ITEMS; i++) {
 			if (pszItems[i]) {
-				LocalFree(pszItems[i]);
+				NP2HeapFree(pszItems[i]);
 				pszItems[i] = nullptr;
 			}
 		}
 	} else {
 		// Shift
+		iCurItem = 0;
 		if (pszItems[0]) {
-			LocalFree(pszItems[0]);
+			NP2HeapFree(pszItems[0]);
 		}
 
 		memmove(AsVoidPointer(pszItems), AsVoidPointer(pszItems + 1), (HISTORY_ITEMS - 1) * sizeof(LPWSTR));
 	}
 
-	pszItems[iCurItem] = StrDup(pszNew);
-
-	return true;
+	pszItems[iCurItem] = HeapStrDupW(pszNew);
 }
 
 bool HistoryList::Forward(LPWSTR pszItem, int cItem) noexcept {
@@ -1909,7 +1874,7 @@ void MRUList::Add(LPCWSTR pszNew) noexcept {
 	}
 	if (i == MRU_MAXITEMS) {
 		--i;
-		LocalFree(pszItems[i]);
+		NP2HeapFree(pszItems[i]);
 	} else if (i == iSize) {
 		iSize += 1;
 	}
@@ -1917,7 +1882,7 @@ void MRUList::Add(LPCWSTR pszNew) noexcept {
 		pszItems[i] = pszItems[i - 1];
 	}
 	if (tchItem == nullptr) {
-		tchItem = StrDup(pszNew);
+		tchItem = HeapStrDupW(pszNew);
 	}
 	pszItems[0] = tchItem;
 }
@@ -1926,7 +1891,7 @@ void MRUList::Delete(int iIndex) noexcept {
 	if (iIndex < 0 || iIndex >= iSize) {
 		return;
 	}
-	LocalFree(pszItems[iIndex]);
+	NP2HeapFree(pszItems[iIndex]);
 	pszItems[iIndex] = nullptr;
 	iSize -= 1;
 	for (int i = iIndex; i < iSize; i++) {
@@ -1937,7 +1902,7 @@ void MRUList::Delete(int iIndex) noexcept {
 
 void MRUList::Empty(bool save) noexcept {
 	for (int i = 0; i < iSize; i++) {
-		LocalFree(pszItems[i]);
+		NP2HeapFree(pszItems[i]);
 		pszItems[i] = nullptr;
 	}
 	iSize = 0;
@@ -1958,7 +1923,7 @@ void MRUList::Load() noexcept {
 	for (UINT i = 0; i < section.count; i++) {
 		LPCWSTR tchItem = section.nodeList[i].value;
 		if (StrNotEmpty(tchItem)) {
-			pszItems[n++] = StrDup(tchItem);
+			pszItems[n++] = HeapStrDupW(tchItem);
 		}
 	}
 
@@ -2148,51 +2113,136 @@ INT_PTR ThemedDialogBoxParam(HINSTANCE hInstance, LPCWSTR lpTemplate, HWND hWndP
 	return ret;
 }
 
-//=============================================================================
-//
-// File Dialog Hook for GetOpenFileName/GetSaveFileName
-// https://docs.microsoft.com/en-us/windows/win32/dlgbox/open-and-save-as-dialog-boxes
-//
-static LRESULT CALLBACK OpenSaveFileDlgSubProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData) noexcept {
-	UNREFERENCED_PARAMETER(dwRefData);
+NP2_noinline
+void FileDialog::ParseFilter(LPWSTR szFilter) noexcept {
+	constexpr UINT maxFilterCount = 2;
+	if (filterSpec == nullptr) {
+		filterSpec = static_cast<COMDLG_FILTERSPEC *>(NP2HeapAlloc(sizeof(COMDLG_FILTERSPEC)*maxFilterCount));
+	}
 
+	LPWSTR *filterList = reinterpret_cast<LPWSTR *>(filterSpec + filterCount);
+	UINT index = 0;
+	LPWSTR psz = szFilter;
+	while (*psz) {
+		const WCHAR ch = *psz++;
+		if (ch == L'|') {
+			psz[-1] = L'\0';
+			filterList[index] = szFilter;
+			szFilter = psz;
+			index++;
+			if (index == maxFilterCount*2) {
+				break;
+			}
+		}
+	}
+	filterCount += index / 2;
+}
+
+NP2_noinline
+LPWSTR FileDialog::Show(HWND hwndOwner, LPCWSTR lpstrInitialDir, LPCWSTR lpstrFile, UINT idsTitle) {
+	IFileDialog *dialog = nullptr;
+	LPWSTR pszPath = nullptr;
+
+	const bool save = (dialogType & FileDialogType_FileSave) != 0;
+	if (SUCCEEDED(CoCreateInstance((save ? CLSID_FileSaveDialog : CLSID_FileOpenDialog), nullptr, CLSCTX_INPROC_SERVER, (save ? IID_IFileSaveDialog : IID_IFileOpenDialog), AsPPVArgs(&dialog)))) {
+		FILEOPENDIALOGOPTIONS options = 0;
+		dialog->GetOptions(&options);
+		dialog->SetOptions(options | dialogOptions);
+		WCHAR tchTemp[MAX_PATH];
+		if ((dialogOptions & FOS_PICKFOLDERS) == 0) {
+			if (dialogType & FileDialogType_ParseFilter) {
+				GetString(filterCount, tchTemp, COUNTOF(tchTemp));
+				filterCount = 0;
+				ParseFilter(tchTemp);
+			}
+			dialog->SetFileTypes(filterCount, filterSpec);
+			dialog->SetDefaultExtension(pszDefaultExtension);
+		}
+		if (idsTitle != 0) {
+			GetString(idsTitle, tchTemp, COUNTOF(tchTemp));
+			dialog->SetTitle(tchTemp);
+		}
+		if (StrNotEmpty(lpstrFile)) {
+			LPCWSTR pszName = PathFindFileName(lpstrFile);
+			if (pszName != lpstrFile) {
+				const size_t len = pszName - lpstrFile;
+				memcpy(tchTemp, lpstrFile, len*sizeof(WCHAR));
+				tchTemp[len] = '\0';
+				lpstrInitialDir = tchTemp;
+			}
+			dialog->SetFileName(pszName);
+		}
+		if (StrNotEmpty(lpstrInitialDir)) {
+			IShellItem *folder = nullptr;
+			if (SUCCEEDED(SHCreateItemFromParsingName(lpstrInitialDir, nullptr, IID_IShellItem, AsPPVArgs(&folder)))) {
+				dialog->SetFolder(folder);
+				folder->Release();
+			}
+		}
+		DialogHook_Start(AsInteger<DWORD_PTR>(dialog));
+		const HRESULT hr = dialog->Show(hwndOwner);
+		DialogHook_Stop();
+		if (SUCCEEDED(hr)) {
+			IShellItem *folder = nullptr;
+			if (SUCCEEDED(dialog->GetResult(&folder))) {
+				if (SUCCEEDED(folder->GetDisplayName(SIGDN_FILESYSPATH, &pszPath))) {
+					if ((dialogOptions & FOS_PICKFOLDERS) == 0) {
+						dialog->GetFileTypeIndex(&filterIndex);
+					}
+				}
+				folder->Release();
+			}
+		}
+		dialog->Release();
+	}
+	if (filterSpec != nullptr) {
+		NP2HeapFree(filterSpec);
+	}
+	return pszPath;
+}
+
+LRESULT CALLBACK FileDialog::SubProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData) {
 	switch (umsg) {
 	case WM_COMMAND:
-		switch (wParam) {
-		case IDOK: {
-			WCHAR szPath[MAX_PATH];
-			HWND hCmbPath = GetDlgItem(hwnd, cmb13); // cmb13: dlgs.h
-			GetWindowText(hCmbPath, szPath, MAX_PATH);
-			if (PathFixBackslashes(szPath)) {
-				SetWindowText(hCmbPath, szPath);
+		if (LOWORD(wParam) == IDOK) {
+			LPWSTR pszName = nullptr;
+			auto *dialog = AsPointer<IFileDialog *>(dwRefData);
+			if (SUCCEEDED(dialog->GetFileName(&pszName))) {
+				if (PathFixBackslashes(pszName)) {
+					dialog->SetFileName(pszName);
+					// SetDlgItemText(hwnd, cmb13, pszName); // cmb13: dlgs.h
+				}
+				CoTaskMemFree(pszName);
 			}
-		} break;
-	} break;
+		}
+		break;
 
 	case WM_NCDESTROY:
-		RemoveWindowSubclass(hwnd, OpenSaveFileDlgSubProc, uIdSubclass);
+		RemoveWindowSubclass(hwnd, FileDialog::SubProc, uIdSubclass);
 		break;
 	}
 
 	return DefSubclassProc(hwnd, umsg, wParam, lParam);
 }
 
-UINT_PTR CALLBACK OpenSaveFileDlgHookProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
-	UNREFERENCED_PARAMETER(wParam);
+LPWSTR HeapStrDupW(LPCWSTR pszIn) noexcept {
+	const UINT len = lstrlen(pszIn);
+	const size_t size = len*sizeof(WCHAR);
+	const size_t allocSize = NP2_align_up(size + sizeof(WCHAR), MEMORY_ALLOCATION_ALIGNMENT);
+	LPWSTR pszOut = static_cast<LPWSTR>(NP2HeapAlloc(allocSize));
+	return static_cast<LPWSTR>(memcpy(pszOut, pszIn, size));
+}
 
-	switch (umsg) {
-	case WM_NOTIFY: {
-		LPOFNOTIFY pOFNOTIFY = AsPointer<LPOFNOTIFY>(lParam);
-		switch (pOFNOTIFY->hdr.code) {
-		case CDN_INITDONE:
-			// OFN_OVERWRITEPROMPT is tested before OFNHookProc making "D:\d" like folder path trigger a prompt.
-			// Hook the default (parent) dialog box procedure.
-			SetWindowSubclass(GetParent(hwnd), OpenSaveFileDlgSubProc, 0, 0);
-			break;
-		}
-	} break;
+NP2_noinline
+void HeapStrDupExW(LPWSTR &pszOut, LPCWSTR pszIn) noexcept {
+	if (pszOut) {
+		NP2HeapFree(pszOut);
 	}
-	return FALSE;
+	const UINT len = lstrlen(pszIn);
+	const size_t size = len*sizeof(WCHAR);
+	const size_t allocSize = NP2_align_up(size + sizeof(WCHAR), MEMORY_ALLOCATION_ALIGNMENT);
+	pszOut = static_cast<LPWSTR>(NP2HeapAlloc(allocSize));
+	memcpy(pszOut, pszIn, size);
 }
 
 /*

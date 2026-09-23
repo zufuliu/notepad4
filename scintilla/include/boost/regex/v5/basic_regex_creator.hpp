@@ -1014,7 +1014,7 @@ int basic_regex_creator<charT, traits>::calculate_backstep(re_syntax_base* state
             else
                last_alternative_result = result;
 
-            if (stack.size())
+            if (!stack.empty())
             {
                // Skip to next alternative and calculate that as well:
                std::tie(result, state) = stack.back();

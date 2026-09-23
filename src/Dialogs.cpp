@@ -29,6 +29,7 @@
 #include "config.h"
 #include "SciCall.h"
 #include "Helpers.h"
+#include "DarkMode.h"
 #include "Notepad4.h"
 #include "Edit.h"
 #include "Styles.h"
@@ -55,7 +56,6 @@ extern bool		bAutoStripBlanks;
 extern LANGID uiLanguage;
 #endif
 extern int iWrapColumn;
-extern bool bUseXPFileDialog;
 
 static inline HWND GetMsgBoxParent() noexcept {
 	HWND hwnd = GetActiveWindow();
@@ -113,8 +113,10 @@ int MsgBox(UINT uType, UINT uIdMsg, ...) noexcept {
 	}
 
 	HWND hwnd = GetMsgBoxParent();
-	PostMessage(hwndMain, APPM_CENTER_MESSAGE_BOX, AsInteger<WPARAM>(hwnd), 0);
-	return MessageBoxEx(hwnd, szText, szTitle, uType, lang);
+	DialogHook_Start(DialogRefData_MessageBox);
+	const int result = MessageBoxEx(hwnd, szText, szTitle, uType, lang);
+	DialogHook_Stop();
+	return result;
 }
 
 //=============================================================================
@@ -148,9 +150,10 @@ void DisplayCmdLineHelp(HWND hwnd) noexcept {
 	}
 
 	if (hwnd != nullptr) {
-		PostMessage(hwndMain, APPM_CENTER_MESSAGE_BOX, AsInteger<WPARAM>(hwnd), 0);
+		DialogHook_Start(DialogRefData_MessageBox);
 	}
 	MessageBoxIndirect(&mbp);
+	DialogHook_Stop();
 }
 
 void OpenHelpLink(HWND hwnd, int cmd) noexcept {
@@ -218,48 +221,19 @@ static inline LPCWSTR GetProcessorArchitecture() noexcept {
 
 //=============================================================================
 //
-// BFFCallBack()
-//
-static int CALLBACK BFFCallBack(HWND hwnd, UINT umsg, LPARAM lParam, LPARAM lpData) noexcept {
-	UNREFERENCED_PARAMETER(lParam);
-
-	if (umsg == BFFM_INITIALIZED) {
-		SendMessage(hwnd, BFFM_SETSELECTION, TRUE, lpData);
-	}
-
-	return 0;
-}
-
-//=============================================================================
-//
 // GetDirectory()
 //
-bool GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase) noexcept {
-	WCHAR szTitle[256];
-	StrCpyEx(szTitle, L"");
-	GetString(iTitle, szTitle, COUNTOF(szTitle));
-
+bool GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase) {
 	WCHAR szBase[MAX_PATH];
 	if (StrIsEmpty(pszBase)) {
+		pszBase = szBase;
 		GetCurrentDirectory(MAX_PATH, szBase);
-	} else {
-		lstrcpy(szBase, pszBase);
 	}
 
-	BROWSEINFO bi;
-	bi.hwndOwner = hwndParent;
-	bi.pidlRoot = nullptr;
-	bi.pszDisplayName = pszFolder;
-	bi.lpszTitle = szTitle;
-	bi.ulFlags = BIF_RETURNONLYFSDIRS | BIF_NEWDIALOGSTYLE;
-	bi.lpfn = &BFFCallBack;
-	bi.lParam = AsInteger<LPARAM>(szBase);
-	bi.iImage = 0;
-
-	PIDLIST_ABSOLUTE pidl = SHBrowseForFolder(&bi);
-	if (pidl) {
-		SHGetPathFromIDList(pidl, pszFolder);
-		CoTaskMemFree(pidl);
+	FileDialog dialog {nullptr, 0, 0, FileDialogType_FileOpen, FileDialog_BrowseFolder, nullptr, };
+	if (LPWSTR pszPath = dialog.Show(hwndParent, pszBase, nullptr, iTitle)) {
+		lstrcpy(pszFolder, pszPath);
+		CoTaskMemFree(pszPath);
 		return true;
 	}
 
@@ -293,47 +267,18 @@ INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 		SendDlgItemMessage(hwnd, IDC_VERSION, WM_SETFONT, AsInteger<WPARAM>(hFontTitle), TRUE);
 		SetWindowLongPtr(hwnd, DWLP_USER, AsInteger<LONG_PTR>(hFontTitle));
 
-		if (GetDlgItem(hwnd, IDC_WEBPAGE_LINK) == nullptr) {
-			SetDlgItemText(hwnd, IDC_WEBPAGE_TEXT, VERSION_WEBPAGE_DISPLAY);
-			ShowWindow(GetDlgItem(hwnd, IDC_WEBPAGE_TEXT), SW_SHOWNORMAL);
-		} else {
-			wsprintf(wch, L"<A>%s</A>", VERSION_WEBPAGE_DISPLAY);
-			SetDlgItemText(hwnd, IDC_WEBPAGE_LINK, wch);
-		}
+		wsprintf(wch, L"<A>%s</A>", VERSION_WEBPAGE_DISPLAY);
+		SetDlgItemText(hwnd, IDC_WEBPAGE_LINK, wch);
+		wsprintf(wch, L"<A>%s</A>", VERSION_EMAIL_DISPLAY);
+		SetDlgItemText(hwnd, IDC_EMAIL_LINK, wch);
+		wsprintf(wch, L"<A>%s</A>", VERSION_MODPAGE_DISPLAY);
+		SetDlgItemText(hwnd, IDC_MOD_PAGE_LINK, wch);
+		wsprintf(wch, L"<A>%s</A>", VERSION_NEWPAGE_DISPLAY);
+		SetDlgItemText(hwnd, IDC_NEW_PAGE_LINK, wch);
+		wsprintf(wch, L"<A>%s</A>", VERSION_SCIPAGE_DISPLAY);
+		SetDlgItemText(hwnd, IDC_SCI_PAGE_LINK, wch);
 
-		if (GetDlgItem(hwnd, IDC_EMAIL_LINK) == nullptr) {
-			SetDlgItemText(hwnd, IDC_EMAIL_TEXT, VERSION_EMAIL_DISPLAY);
-			ShowWindow(GetDlgItem(hwnd, IDC_EMAIL_TEXT), SW_SHOWNORMAL);
-		} else {
-			wsprintf(wch, L"<A>%s</A>", VERSION_EMAIL_DISPLAY);
-			SetDlgItemText(hwnd, IDC_EMAIL_LINK, wch);
-		}
-
-		if (GetDlgItem(hwnd, IDC_MOD_PAGE_LINK) == nullptr) {
-			SetDlgItemText(hwnd, IDC_MOD_PAGE_LINK, VERSION_MODPAGE_DISPLAY);
-			ShowWindow(GetDlgItem(hwnd, IDC_MOD_PAGE_TEXT), SW_SHOWNORMAL);
-		} else {
-			wsprintf(wch, L"<A>%s</A>", VERSION_MODPAGE_DISPLAY);
-			SetDlgItemText(hwnd, IDC_MOD_PAGE_LINK, wch);
-		}
-
-		if (GetDlgItem(hwnd, IDC_NEW_PAGE_LINK) == nullptr) {
-			SetDlgItemText(hwnd, IDC_NEW_PAGE_TEXT, VERSION_NEWPAGE_DISPLAY);
-			ShowWindow(GetDlgItem(hwnd, IDC_NEW_PAGE_TEXT), SW_SHOWNORMAL);
-		} else {
-			wsprintf(wch, L"<A>%s</A>", VERSION_NEWPAGE_DISPLAY);
-			SetDlgItemText(hwnd, IDC_NEW_PAGE_LINK, wch);
-		}
-
-		if (GetDlgItem(hwnd, IDC_SCI_PAGE_LINK) == nullptr) {
-			SetDlgItemText(hwnd, IDC_SCI_PAGE_TEXT, VERSION_SCIPAGE_DISPLAY);
-			ShowWindow(GetDlgItem(hwnd, IDC_SCI_PAGE_TEXT), SW_SHOWNORMAL);
-		} else {
-			wsprintf(wch, L"<A>%s</A>", VERSION_SCIPAGE_DISPLAY);
-			SetDlgItemText(hwnd, IDC_SCI_PAGE_LINK, wch);
-		}
-
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 	}
 	return TRUE;
 
@@ -366,11 +311,12 @@ INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 				WCHAR tch[512];
 				LPCWSTR arch = GetProcessorArchitecture();
 				const int iEncoding = Encoding_GetIndex(mEncoding[CPI_DEFAULT].uCodePage);
-				Encoding_GetLabel(iEncoding);
+				LPCWSTR defaultEncoding = Encoding_GetLabel(iEncoding);
+				LPCWSTR currentEncoding = Encoding_GetLabel(iCurrentEncoding);
 				GetDlgItemText(hwnd, IDC_BUILD_INFO, wch, COUNTOF(wch));
 				wsprintf(tch, L"%s\n%s\nEncoding: %s, %s\nScheme: %s, %s\nSystem: %u.%u.%u %s %s\n",
 					VERSION_FILEVERSION_LONG, wch,
-					mEncoding[iCurrentEncoding].wchLabel, mEncoding[iEncoding].wchLabel,
+					currentEncoding, defaultEncoding,
 					PathFindExtension(szCurFile), pLexCurrent->pszName,
 					version.dwMajorVersion, version.dwMinorVersion, version.dwBuildNumber,
 					version.szCSDVersion, arch);
@@ -394,7 +340,7 @@ INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 //
 // RunDlgProc()
 //
-static INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
+static INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	static const DWORD controlDefinition[] = {
 		DeferCtlMoveX(IDC_RESIZEGRIP3),
 		DeferCtlMoveX(IDOK),
@@ -414,7 +360,7 @@ static INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 		Edit_SetText(hwndCtl, AsPointer<LPCWSTR>(lParam));
 		SHAutoComplete(hwndCtl, SHACF_FILESYSTEM);
 
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 	}
 	return TRUE;
 
@@ -438,25 +384,10 @@ static INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 				lstrcpy(szArg2, szArgs);
 			}
 
-			auto &szFilter = szArgs;
-			GetString(IDS_FILTER_EXE, szFilter, COUNTOF(szFilter));
-			PrepareFilterStr(szFilter);
-
-			OPENFILENAME ofn;
-			memset(&ofn, 0, sizeof(OPENFILENAME));
-			ofn.lStructSize = sizeof(OPENFILENAME);
-			ofn.hwndOwner = hwnd;
-			ofn.lpstrFilter = szFilter;
-			ofn.lpstrFile = szFile;
-			ofn.nMaxFile = COUNTOF(szFile);
-			ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT | OFN_NOTESTFILECREATE
-						| OFN_PATHMUSTEXIST | OFN_SHAREAWARE | OFN_NODEREFERENCELINKS;
-			if (bUseXPFileDialog) {
-				ofn.Flags |= OFN_EXPLORER | OFN_ENABLESIZING | OFN_ENABLEHOOK;
-				ofn.lpfnHook = OpenSaveFileDlgHookProc;
-			}
-
-			if (GetOpenFileName(&ofn)) {
+			FileDialog dialog {nullptr, IDS_FILTER_EXE, 0, FileDialogType_OpenParseFilter, FileDialog_FindFile, nullptr};
+			if (LPWSTR pszPath = dialog.Show(hwnd, nullptr, szFile)) {
+				lstrcpy(szFile, pszPath);
+				CoTaskMemFree(pszPath);
 				PathQuoteSpaces(szFile);
 				if (StrNotEmpty(szArg2)) {
 					lstrcat(szFile, L" ");
@@ -560,7 +491,18 @@ void RunDlg(HWND hwnd, LPCWSTR lpstrDefault) noexcept {
 extern WCHAR tchOpenWithDir[MAX_PATH];
 extern bool flagNoFadeHidden;
 
-static INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+namespace {
+
+struct OpenWithDlgParam {
+	LPWSTR lpDirectory;
+	int *cxFrame;
+	int *cyFrame;
+	UINT idsTitle;
+	DirListItem dli;
+};
+
+INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+	static_assert(IDC_OPENWITHDIR == IDC_FAVORITESDIR && IDC_GETOPENWITHDIR == IDC_GETFAVORITESDIR && IDC_OPENWITHDESCR == IDC_FAVORITESDESCR);
 	static const DWORD controlDefinition[] = {
 		DeferCtlMove(IDC_RESIZEGRIP3),
 		DeferCtlMove(IDOK),
@@ -573,27 +515,19 @@ static INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
-		ResizeDlg_Init(hwnd, &positionRecord.cxOpenWithDlg, &positionRecord.cyOpenWithDlg, controlDefinition, COUNTOF(controlDefinition));
+		const auto *param = AsPointer<OpenWithDlgParam *>(lParam);
+		ResizeDlg_Init(hwnd, param->cxFrame, param->cyFrame, controlDefinition, COUNTOF(controlDefinition));
 
 		HWND hwndLV = GetDlgItem(hwnd, IDC_OPENWITHDIR);
-		InitWindowCommon(hwndLV);
-		//SetExplorerTheme(hwndLV);
-		ListView_SetExtendedListViewStyle(hwndLV, /*LVS_EX_FULLROWSELECT|*/LVS_EX_DOUBLEBUFFER | LVS_EX_LABELTIP);
-
-		const LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT, LVCFMT_LEFT, 0, nullptr, -1, 0, 0, 0
-#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-			, 0, 0, 0
-#endif
-		};
-		ListView_InsertColumn(hwndLV, 0, &lvc);
+		DarkMode_InitFileListView(hwndLV);
 		DirList_Init(hwndLV);
-		DirList_Fill(hwndLV, tchOpenWithDir, DL_ALLOBJECTS, nullptr, false, flagNoFadeHidden, DS_NAME, false);
+		DirList_Fill(hwndLV, param->lpDirectory, DL_ALLOBJECTS, nullptr, false, flagNoFadeHidden, DS_NAME, false);
 		DirList_StartIconThread(hwndLV);
 		ListView_SetItemState(hwndLV, 0, LVIS_FOCUSED, LVIS_FOCUSED);
 
 		MakeBitmapButton(hwnd, IDC_GETOPENWITHDIR, g_exeInstance, IDB_OPEN_FOLDER16);
 
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 	}
 	return TRUE;
 
@@ -606,13 +540,14 @@ static INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 		LPNMHDR pnmh = AsPointer<LPNMHDR>(lParam);
 
 		if (pnmh->idFrom == IDC_OPENWITHDIR) {
+			HWND hwndLV = pnmh->hwndFrom;
 			switch (pnmh->code) {
 			case LVN_GETDISPINFO:
-				DirList_GetDispInfo(GetDlgItem(hwnd, IDC_OPENWITHDIR), lParam);
+				DirList_GetDispInfo(hwndLV, lParam);
 				break;
 
 			case LVN_DELETEITEM:
-				DirList_DeleteItem(GetDlgItem(hwnd, IDC_OPENWITHDIR), lParam);
+				DirList_DeleteItem(hwndLV, lParam);
 				break;
 
 			case LVN_ITEMCHANGED: {
@@ -622,7 +557,7 @@ static INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 			break;
 
 			case NM_DBLCLK:
-				if (ListView_GetSelectedCount(GetDlgItem(hwnd, IDC_OPENWITHDIR))) {
+				if (ListView_GetSelectedCount(hwndLV)) {
 					SendWMCommand(hwnd, IDOK);
 				}
 				break;
@@ -635,8 +570,9 @@ static INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 		switch (LOWORD(wParam)) {
 		case IDC_GETOPENWITHDIR: {
 			HWND hwndLV = GetDlgItem(hwnd, IDC_OPENWITHDIR);
-			if (GetDirectory(hwnd, IDS_OPENWITH, tchOpenWithDir, tchOpenWithDir)) {
-				DirList_Fill(hwndLV, tchOpenWithDir, DL_ALLOBJECTS, nullptr, false, flagNoFadeHidden, DS_NAME, false);
+			const auto *param = AsPointer<OpenWithDlgParam *>(GetWindowLongPtr(hwnd, DWLP_USER));
+			if (GetDirectory(hwnd, param->idsTitle, param->lpDirectory, param->lpDirectory)) {
+				DirList_Fill(hwndLV, param->lpDirectory, DL_ALLOBJECTS, nullptr, false, flagNoFadeHidden, DS_NAME, false);
 				DirList_StartIconThread(hwndLV);
 				ListView_EnsureVisible(hwndLV, 0, FALSE);
 				ListView_SetItemState(hwndLV, 0, LVIS_FOCUSED, LVIS_FOCUSED);
@@ -646,12 +582,12 @@ static INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 		break;
 
 		case IDOK: {
-			DirListItem *lpdli = AsPointer<DirListItem *>(GetWindowLongPtr(hwnd, DWLP_USER));
-			lpdli->mask = DLI_FILENAME | DLI_TYPE;
-			lpdli->ntype = DLE_NONE;
-			DirList_GetItem(GetDlgItem(hwnd, IDC_OPENWITHDIR), (-1), lpdli);
+			auto *param = AsPointer<OpenWithDlgParam *>(GetWindowLongPtr(hwnd, DWLP_USER));
+			param->dli.mask = DLI_FILENAME | DLI_TYPE;
+			param->dli.ntype = DLE_NONE;
+			DirList_GetItem(GetDlgItem(hwnd, IDC_OPENWITHDIR), (-1), &param->dli);
 
-			if (lpdli->ntype != DLE_NONE) {
+			if (param->dli.ntype != DLE_NONE) {
 				EndDialog(hwnd, IDOK);
 			} else {
 				MessageBeep(MB_OK);
@@ -670,15 +606,21 @@ static INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 	return FALSE;
 }
 
+}
+
 //=============================================================================
 //
 // OpenWithDlg()
 //
 bool OpenWithDlg(HWND hwnd, LPCWSTR lpstrFile) {
-	DirListItem dliOpenWith;
-	dliOpenWith.mask = DLI_FILENAME;
+	OpenWithDlgParam param;
+	param.lpDirectory = tchOpenWithDir;
+	param.cxFrame = &positionRecord.cxOpenWithDlg;
+	param.cyFrame = &positionRecord.cyOpenWithDlg;
+	param.idsTitle = IDS_OPENWITH;
+	param.dli.mask = DLI_FILENAME;
 
-	if (IDOK == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_OPENWITH), hwnd, OpenWithDlgProc, AsInteger<LPARAM>(&dliOpenWith))) {
+	if (IDOK == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_OPENWITH), hwnd, OpenWithDlgProc, AsInteger<LPARAM>(&param))) {
 		WCHAR szParam[MAX_PATH];
 		WCHAR wchDirectory[MAX_PATH] = L"";
 
@@ -693,7 +635,7 @@ bool OpenWithDlg(HWND hwnd, LPCWSTR lpstrFile) {
 		sei.fMask = 0;
 		sei.hwnd = hwnd;
 		sei.lpVerb = nullptr;
-		sei.lpFile = dliOpenWith.szFileName;
+		sei.lpFile = param.dli.szFileName;
 		sei.lpParameters = szParam;
 		sei.lpDirectory = wchDirectory;
 		sei.nShow = SW_SHOWNORMAL;
@@ -711,131 +653,21 @@ bool OpenWithDlg(HWND hwnd, LPCWSTR lpstrFile) {
 	return false;
 }
 
-//=============================================================================
-//
-// FavoritesDlgProc()
-//
 extern WCHAR tchFavoritesDir[MAX_PATH];
-
-static INT_PTR CALLBACK FavoritesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
-	static const DWORD controlDefinition[] = {
-		DeferCtlMove(IDC_RESIZEGRIP3),
-		DeferCtlMove(IDOK),
-		DeferCtlMove(IDCANCEL),
-		DeferCtlSize(IDC_FAVORITESDIR) | RESIZE_AUTOSIZE_USEHEADER,
-		DeferCtlMoveY(IDC_GETFAVORITESDIR),
-		DeferCtlMoveYSizeX(IDC_FAVORITESDESCR) | RESIZE_INVALIDATE_RECT,
-	};
-
-	switch (umsg) {
-	case WM_INITDIALOG: {
-		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
-		ResizeDlg_Init(hwnd, &positionRecord.cxFavoritesDlg, &positionRecord.cyFavoritesDlg, controlDefinition, COUNTOF(controlDefinition));
-
-		HWND hwndLV = GetDlgItem(hwnd, IDC_FAVORITESDIR);
-		InitWindowCommon(hwndLV);
-		//SetExplorerTheme(hwndLV);
-		ListView_SetExtendedListViewStyle(hwndLV, /*LVS_EX_FULLROWSELECT|*/LVS_EX_DOUBLEBUFFER | LVS_EX_LABELTIP);
-		const LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT, LVCFMT_LEFT, 0, nullptr, -1, 0, 0, 0
-#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-			, 0, 0, 0
-#endif
-		};
-		ListView_InsertColumn(hwndLV, 0, &lvc);
-		DirList_Init(hwndLV);
-		DirList_Fill(hwndLV, tchFavoritesDir, DL_ALLOBJECTS, nullptr, false, flagNoFadeHidden, DS_NAME, false);
-		DirList_StartIconThread(hwndLV);
-		ListView_SetItemState(hwndLV, 0, LVIS_FOCUSED, LVIS_FOCUSED);
-
-		MakeBitmapButton(hwnd, IDC_GETFAVORITESDIR, g_exeInstance, IDB_OPEN_FOLDER16);
-
-		CenterDlgInParent(hwnd);
-	}
-	return TRUE;
-
-	case WM_DESTROY:
-		DirList_Destroy(GetDlgItem(hwnd, IDC_FAVORITESDIR));
-		DeleteBitmapButton(hwnd, IDC_GETFAVORITESDIR);
-		return FALSE;
-
-	case WM_NOTIFY: {
-		LPNMHDR pnmh = AsPointer<LPNMHDR>(lParam);
-
-		if (pnmh->idFrom == IDC_FAVORITESDIR) {
-			switch (pnmh->code) {
-			case LVN_GETDISPINFO:
-				DirList_GetDispInfo(GetDlgItem(hwnd, IDC_OPENWITHDIR), lParam);
-				break;
-
-			case LVN_DELETEITEM:
-				DirList_DeleteItem(GetDlgItem(hwnd, IDC_FAVORITESDIR), lParam);
-				break;
-
-			case LVN_ITEMCHANGED: {
-				const NM_LISTVIEW *pnmlv = AsPointer<NM_LISTVIEW *>(lParam);
-				EnableWindow(GetDlgItem(hwnd, IDOK), (pnmlv->uNewState & LVIS_SELECTED));
-			}
-			break;
-
-			case NM_DBLCLK:
-				if (ListView_GetSelectedCount(GetDlgItem(hwnd, IDC_FAVORITESDIR))) {
-					SendWMCommand(hwnd, IDOK);
-				}
-				break;
-			}
-		}
-	}
-	return TRUE;
-
-	case WM_COMMAND:
-		switch (LOWORD(wParam)) {
-		case IDC_GETFAVORITESDIR: {
-			HWND hwndLV = GetDlgItem(hwnd, IDC_FAVORITESDIR);
-			if (GetDirectory(hwnd, IDS_FAVORITES, tchFavoritesDir, tchFavoritesDir)) {
-				DirList_Fill(hwndLV, tchFavoritesDir, DL_ALLOBJECTS, nullptr, false, flagNoFadeHidden, DS_NAME, false);
-				DirList_StartIconThread(hwndLV);
-				ListView_EnsureVisible(hwndLV, 0, FALSE);
-				ListView_SetItemState(hwndLV, 0, LVIS_FOCUSED, LVIS_FOCUSED);
-			}
-			PostMessage(hwnd, WM_NEXTDLGCTL, AsInteger<WPARAM>(hwndLV), TRUE);
-		}
-		break;
-
-		case IDOK: {
-			DirListItem *lpdli = AsPointer<DirListItem *>(GetWindowLongPtr(hwnd, DWLP_USER));
-			lpdli->mask = DLI_FILENAME | DLI_TYPE;
-			lpdli->ntype = DLE_NONE;
-			DirList_GetItem(GetDlgItem(hwnd, IDC_FAVORITESDIR), (-1), lpdli);
-
-			if (lpdli->ntype != DLE_NONE) {
-				EndDialog(hwnd, IDOK);
-			} else {
-				MessageBeep(MB_OK);
-			}
-		}
-		break;
-
-		case IDCANCEL:
-			EndDialog(hwnd, IDCANCEL);
-			break;
-		}
-
-		return TRUE;
-	}
-
-	return FALSE;
-}
-
 //=============================================================================
 //
 // FavoritesDlg()
 //
 bool FavoritesDlg(HWND hwnd, LPWSTR lpstrFile) noexcept {
-	DirListItem dliFavorite;
-	dliFavorite.mask = DLI_FILENAME;
+	OpenWithDlgParam param;
+	param.lpDirectory = tchFavoritesDir;
+	param.cxFrame = &positionRecord.cxFavoritesDlg;
+	param.cyFrame = &positionRecord.cyFavoritesDlg;
+	param.idsTitle = IDS_FAVORITES;
+	param.dli.mask = DLI_FILENAME;
 
-	if (IDOK == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_FAVORITES), hwnd, FavoritesDlgProc, AsInteger<LPARAM>(&dliFavorite))) {
-		lstrcpyn(lpstrFile, dliFavorite.szFileName, MAX_PATH);
+	if (IDOK == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_FAVORITES), hwnd, OpenWithDlgProc, AsInteger<LPARAM>(&param))) {
+		lstrcpyn(lpstrFile, param.dli.szFileName, MAX_PATH);
 		return true;
 	}
 
@@ -865,7 +697,7 @@ static INT_PTR CALLBACK AddToFavDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 		Edit_LimitText(hwndCtl, MAX_PATH - 1);
 		Edit_SetText(hwndCtl, AsPointer<LPCWSTR>(lParam));
 
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 	}
 	return TRUE;
 
@@ -1011,9 +843,9 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
 
 		HWND hwndLV = GetDlgItem(hwnd, IDC_FILEMRU);
-		InitWindowCommon(hwndLV);
+		DarkMode_InitFileListView(hwndLV);
 
-		BackgroundWorker *worker = static_cast<BackgroundWorker *>(GlobalAlloc(GPTR, sizeof(BackgroundWorker)));
+		BackgroundWorker *worker = static_cast<BackgroundWorker *>(NP2HeapAlloc(sizeof(BackgroundWorker)));
 		SetProp(hwnd, L"it", worker);
 		worker->Init(hwndLV);
 
@@ -1028,15 +860,6 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 							  AsPointer<HIMAGELIST>(SHGetFileInfo(L"C:\\", 0, &shfi, sizeof(SHFILEINFO), SHGFI_LARGEICON | SHGFI_SYSICONINDEX)),
 							  LVSIL_NORMAL);
 
-		//SetExplorerTheme(hwndLV);
-		ListView_SetExtendedListViewStyle(hwndLV, /*LVS_EX_FULLROWSELECT|*/LVS_EX_DOUBLEBUFFER | LVS_EX_LABELTIP);
-		const LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT, LVCFMT_LEFT, 0, nullptr, -1, 0, 0, 0
-#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-			, 0, 0, 0
-#endif
-		};
-		ListView_InsertColumn(hwndLV, 0, &lvc);
-
 		// Update view
 		SendWMCommand(hwnd, IDC_FILEMRU_UPDATE_VIEW);
 		SetDlgItemInt(hwnd, IDC_MRU_COUNT_VALUE, iMaxRecentFiles, FALSE);
@@ -1045,7 +868,7 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 			CheckDlgButton(hwnd, IDC_SAVEMRU, BST_CHECKED);
 		}
 
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 	}
 	return TRUE;
 
@@ -1053,7 +876,7 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 		BackgroundWorker *worker = static_cast<BackgroundWorker *>(GetProp(hwnd, L"it"));
 		worker->Destroy();
 		RemoveProp(hwnd, L"it");
-		GlobalFree(worker);
+		NP2HeapFree(worker);
 
 		bSaveRecentFiles = IsButtonChecked(hwnd, IDC_SAVEMRU);
 		iMaxRecentFiles = GetDlgItemInt(hwnd, IDC_MRU_COUNT_VALUE, nullptr, FALSE);
@@ -1083,7 +906,7 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 					lvi.cchTextMax = COUNTOF(tch);
 					lvi.iItem = lpdi->item.iItem;
 
-					ListView_GetItem(GetDlgItem(hwnd, IDC_FILEMRU), &lvi);
+					ListView_GetItem(pnmhdr->hwndFrom, &lvi);
 
 					DWORD dwFlags = SHGFI_SMALLICON | SHGFI_SYSICONINDEX | SHGFI_ATTRIBUTES | SHGFI_ATTR_SPECIFIED;
 					DWORD dwAttr = 0;
@@ -1131,16 +954,15 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 
 			case LVN_ITEMCHANGED:
 			case LVN_DELETEITEM:
-				EnableWindow(GetDlgItem(hwnd, IDOK), ListView_GetSelectedCount(GetDlgItem(hwnd, IDC_FILEMRU)));
+				EnableWindow(GetDlgItem(hwnd, IDOK), ListView_GetSelectedCount(pnmhdr->hwndFrom));
 				break;
 			}
 		} else if (pnmhdr->idFrom == IDC_EMPTY_MRU) {
 			if ((pnmhdr->code == NM_CLICK || pnmhdr->code == NM_RETURN)) {
-				mruFile.Empty(false);
+				mruFile.Empty(bSaveRecentFiles);
 				if (StrNotEmpty(szCurFile)) {
 					mruFile.Add(szCurFile);
 				}
-				mruFile.Save();
 				SendWMCommand(hwnd, IDC_FILEMRU_UPDATE_VIEW);
 			}
 		}
@@ -1202,8 +1024,7 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 				if (!PathIsFile(tch)) {
 					// Ask...
 					if (IDYES == MsgBoxWarn(MB_YESNO, IDS_ERR_MRUDLG)) {
-						mruFile.DeleteFileFromStore(tch);
-						mruFile.Delete(lvi.iItem);
+						mruFile.DeleteFileFromStore(tch, lvi.iItem);
 
 						// must use recreate the list, index might change...
 						//ListView_DeleteItem(hwndLV, lvi.iItem);
@@ -1265,7 +1086,7 @@ static INT_PTR CALLBACK ChangeNotifyDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 		if (bResetFileWatching) {
 			CheckDlgButton(hwnd, IDC_CHANGENOTIFY_RESET_WATCH, BST_CHECKED);
 		}
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 		return TRUE;
 
 	case WM_COMMAND:
@@ -1318,7 +1139,7 @@ static INT_PTR CALLBACK ColumnWrapDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 		SetDlgItemInt(hwnd, IDC_COLUMNWRAP, column, FALSE);
 		SendDlgItemMessage(hwnd, IDC_COLUMNWRAP, EM_LIMITTEXT, 15, 0);
 
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 	}
 	return TRUE;
 
@@ -1406,7 +1227,7 @@ static INT_PTR CALLBACK WordWrapSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 			CheckDlgButton(hwnd, IDC_WRAP_HIGHLIGHT_SUBLINE, BST_CHECKED);
 		}
 
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 	}
 	return TRUE;
 
@@ -1476,7 +1297,7 @@ static INT_PTR CALLBACK LongLineSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 			CheckRadioButton(hwnd, IDC_LONGLINE_EDGE_LINE, IDC_LONGLINE_BACK_COLOR, IDC_LONGLINE_BACK_COLOR);
 		}
 
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 	}
 	return TRUE;
 
@@ -1625,7 +1446,7 @@ static INT_PTR CALLBACK TabSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 			CheckDlgButton(hwnd, IDC_DETECT_INDENTATION, BST_CHECKED);
 		}
 
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 		if (hasFileTabSettings || !tabSettings.schemeUseGlobalTabSettings) {
 			HWND hwndCtl = GetDlgItem(hwnd, hasFileTabSettings ? IDC_FILE_TAB_WIDTH : IDC_SCHEME_TAB_WIDTH);
 			SetFocus(hwndCtl);
@@ -1762,9 +1583,8 @@ struct ENCODEDLG {
 static INT_PTR CALLBACK SelectDefEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		const int iEncoding = iDefaultEncoding;
-		Encoding_GetLabel(iEncoding);
-		SetDlgItemText(hwnd, IDC_ENCODING_LABEL, mEncoding[iEncoding].wchLabel);
+		LPCWSTR wchLabel = Encoding_GetLabel(iDefaultEncoding);
+		SetDlgItemText(hwnd, IDC_ENCODING_LABEL, wchLabel);
 
 		if (bSkipUnicodeDetection) {
 			CheckDlgButton(hwnd, IDC_NOUNICODEDETECTION, BST_CHECKED);
@@ -1785,7 +1605,7 @@ static INT_PTR CALLBACK SelectDefEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 			CheckDlgButton(hwnd, IDC_ENCODINGFROMFILEVARS, BST_CHECKED);
 		}
 
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 	}
 	return TRUE;
 
@@ -1796,9 +1616,8 @@ static INT_PTR CALLBACK SelectDefEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 		case NM_RETURN:
 			if (pnmhdr->idFrom == IDC_ENCODING_LINK) {
 				if (SelectEncodingDlg(hwndMain, &iDefaultEncoding, IDS_SELRECT_DEFAULT_ENCODING)) {
-					const int iEncoding = iDefaultEncoding;
-					Encoding_GetLabel(iEncoding);
-					SetDlgItemText(hwnd, IDC_ENCODING_LABEL, mEncoding[iEncoding].wchLabel);
+					LPCWSTR wchLabel = Encoding_GetLabel(iDefaultEncoding);
+					SetDlgItemText(hwnd, IDC_ENCODING_LABEL, wchLabel);
 				}
 			}
 			break;
@@ -1878,14 +1697,12 @@ static INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 		ImageList_AddIcon(himl, shfi.hIcon);
 
 		HWND hwndTV = GetDlgItem(hwnd, IDC_ENCODINGLIST);
-		InitWindowCommon(hwndTV);
-		TreeView_SetExtendedStyle(hwndTV, TVS_EX_DOUBLEBUFFER, TVS_EX_DOUBLEBUFFER);
-		SetExplorerTheme(hwndTV);
+		DarkMode_InitTreeView(hwndTV);
 
 		TreeView_SetImageList(hwndTV, himl, TVSIL_NORMAL);
 		Encoding_AddToTreeView(hwndTV, pdd->idEncoding, pdd->bRecodeOnly);
 
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 	}
 	return TRUE;
 
@@ -1901,7 +1718,7 @@ static INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 			switch (lpnmh->code) {
 			case NM_DBLCLK: {
 				int temp = -1;
-				if (Encoding_GetFromTreeView(GetDlgItem(hwnd, IDC_ENCODINGLIST), &temp, true)) {
+				if (Encoding_GetFromTreeView(lpnmh->hwndFrom, &temp, true)) {
 					SendWMCommand(hwnd, IDOK);
 				}
 			}
@@ -1911,7 +1728,7 @@ static INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 				LPNMTREEVIEW lpnmtv = AsPointer<LPNMTREEVIEW>(lParam);
 				EnableWindow(GetDlgItem(hwnd, IDOK), lpnmtv->itemNew.lParam != 0);
 				if (lpnmtv->itemNew.lParam == 0) {
-					TreeView_Expand(GetDlgItem(hwnd, IDC_ENCODINGLIST), lpnmtv->itemNew.hItem, TVE_EXPAND);
+					TreeView_Expand(lpnmh->hwndFrom, lpnmtv->itemNew.hItem, TVE_EXPAND);
 				}
 			}
 			break;
@@ -1996,7 +1813,7 @@ static INT_PTR CALLBACK SelectDefLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM 
 			CheckDlgButton(hwnd, IDC_AUTOSTRIPBLANKS, BST_CHECKED);
 		}
 
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 	}
 	return TRUE;
 
@@ -2062,7 +1879,7 @@ static INT_PTR CALLBACK WarnLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 		if (status->bLineEndingsDefaultNo) {
 			SendMessage(hwnd, DM_SETDEFID, IDCANCEL, 0);
 		}
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 	}
 	return TRUE;
 
@@ -2096,7 +1913,7 @@ bool WarnLineEndingDlg(HWND hwnd, EditFileIOStatus *status) noexcept {
 void InitZoomLevelComboBox(HWND hwnd, int nCtlId, int zoomLevel) noexcept {
 	WCHAR tch[16];
 	int selIndex = -1;
-	static const short levelList[] = {
+	static const uint16_t levelList[] = {
 		500, 450, 400, 350, 300, 250,
 		200, 175, 150, 125, 100, 75, 50, 25,
 	};
@@ -2131,11 +1948,7 @@ static INT_PTR CALLBACK ZoomLevelDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 	case WM_INITDIALOG: {
 		const int zoomLevel = SciCall_GetZoom();
 		InitZoomLevelComboBox(hwnd, IDC_ZOOMLEVEL, zoomLevel);
-		if (lParam) {
-			SetToRightBottom(hwnd);
-		} else {
-			CenterDlgInParent(hwnd);
-		}
+		DarkMode_InitDialog(hwnd, lParam ? DialogRefData_RightBottom : DialogRefData_CenterParent);
 	}
 	return TRUE;
 
@@ -2277,7 +2090,7 @@ static INT_PTR CALLBACK AutoCompletionSettingsDlgProc(HWND hwnd, UINT umsg, WPAR
 		mask = autoCompletionConfig.iAsmLineCommentChar;
 		CheckRadioButton(hwnd, IDC_ASM_LINE_COMMENT_SEMICOLON, IDC_ASM_LINE_COMMENT_AT, IDC_ASM_LINE_COMMENT_SEMICOLON + mask);
 
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 	}
 	return TRUE;
 
@@ -2445,7 +2258,7 @@ static INT_PTR CALLBACK AutoSaveSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 		}
 		SetDlgItemText(hwnd, IDC_AUTOSAVE_PERIOD, tch);
 
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 	};
 	return TRUE;
 
@@ -2545,12 +2358,12 @@ INT_PTR CALLBACK InfoBoxDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 		if (lpib->bDisableCheckBox) {
 			EnableWindow(GetDlgItem(hwnd, IDC_INFOBOXCHECK), FALSE);
 		}
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd, DialogRefData_MessageBox);
 	}
 	return TRUE;
 
 	case WM_CTLCOLORSTATIC: {
-		const DWORD dwId = GetWindowLong(AsPointer<HWND>(lParam), GWL_ID);
+		const DWORD dwId = GetWinCtrlID(AsPointer<HWND>(lParam));
 
 		if (dwId >= IDC_INFOBOXRECT && dwId <= IDC_INFOBOXTEXT) {
 			HDC hdc = AsPointer<HDC>(wParam);
@@ -2696,8 +2509,8 @@ enum {
 };
 
 struct SystemIntegrationInfo {
-	LPWSTR lpszText;
-	LPWSTR lpszName;
+	WCHAR lpszText[MAX_PATH/2];
+	WCHAR lpszName[MAX_PATH/2];
 };
 
 #define NP2RegSubKey_ReplaceNotepad	L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\notepad.exe"
@@ -2708,27 +2521,23 @@ struct SystemIntegrationInfo {
 #define samDesired_WOW64_64KEY	KEY_WOW64_64KEY
 #endif
 
-int GetSystemIntegrationStatus(SystemIntegrationInfo &info) noexcept {
-	int mask = 0;
+DWORD GetSystemIntegrationStatus(SystemIntegrationInfo &info) noexcept {
+	DWORD mask = 0;
 	WCHAR tchModule[MAX_PATH];
+	WCHAR command[MAX_PATH];
 	GetModuleFileName(nullptr, tchModule, COUNTOF(tchModule));
 
 	// context menu
 	HKEY hKey;
 	LSTATUS status = RegOpenKeyEx(HKEY_CLASSES_ROOT, NP2RegSubKey_ContextMenu, 0, KEY_READ, &hKey);
 	if (status == ERROR_SUCCESS) {
-		info.lpszText = Registry_GetDefaultString(hKey);
-		HKEY hSubKey;
-		status = RegOpenKeyEx(hKey, L"command", 0, KEY_READ, &hSubKey);
-		if (status == ERROR_SUCCESS) {
-			LPWSTR command = Registry_GetDefaultString(hSubKey);
-			if (command != nullptr) {
-				if (StrStrI(command, tchModule) != nullptr) {
-					mask |= SystemIntegration_ContextMenu;
-				}
-				NP2HeapFree(command);
+		if (!Registry_GetDefaultString(hKey, info.lpszText)) {
+			info.lpszText[0] = L'\0';
+		}
+		if (Registry_GetSubKeyDefaultString(hKey, L"command", command)) {
+			if (StrStrI(command, tchModule) != nullptr) {
+				mask |= SystemIntegration_ContextMenu;
 			}
-			RegCloseKey(hSubKey);
 		}
 		RegCloseKey(hKey);
 	}
@@ -2736,43 +2545,32 @@ int GetSystemIntegrationStatus(SystemIntegrationInfo &info) noexcept {
 	// jump list
 	status = RegOpenKeyEx(HKEY_CLASSES_ROOT, NP2RegSubKey_JumpList, 0, KEY_READ, &hKey);
 	if (status == ERROR_SUCCESS) {
-		info.lpszName = Registry_GetString(hKey, L"FriendlyAppName");
-		HKEY hSubKey;
-		status = RegOpenKeyEx(hKey, L"shell\\open\\command", 0, KEY_READ, &hSubKey);
-		if (status == ERROR_SUCCESS) {
-			LPWSTR command = Registry_GetDefaultString(hSubKey);
-			if (command != nullptr) {
-				LPWSTR userId = Registry_GetString(hKey, L"AppUserModelID");
-				if (userId != nullptr && StrEqual(userId, g_wchAppUserModelID) && StrStrI(command, tchModule) != nullptr) {
-					mask |= SystemIntegration_JumpList;
+		if (!Registry_GetString(hKey, L"FriendlyAppName", info.lpszName)) {
+			info.lpszName[0] = L'\0';
+		}
+		if (Registry_GetString(hKey, L"AppUserModelID", command)) {
+			if (StrEqual(command, g_wchAppUserModelID)) {
+				if (Registry_GetSubKeyDefaultString(hKey, L"shell\\open\\command", command)) {
+					if (StrStrI(command, tchModule) != nullptr) {
+						mask |= SystemIntegration_JumpList;
+					}
 				}
-				if (userId != nullptr) {
-					NP2HeapFree(userId);
-				}
-				NP2HeapFree(command);
 			}
-			RegCloseKey(hSubKey);
 		}
 		RegCloseKey(hKey);
 	}
 
 	// replace Windows Notepad
-	status = RegOpenKeyEx(HKEY_LOCAL_MACHINE, NP2RegSubKey_ReplaceNotepad, 0, KEY_QUERY_VALUE | samDesired_WOW64_64KEY, &hKey);
-	if (status == ERROR_SUCCESS) {
-		LPWSTR command = Registry_GetString(hKey, L"Debugger");
-		if (command != nullptr) {
-			if (StrStrI(command, tchModule) != nullptr) {
-				mask |= SystemIntegration_ReplaceNotepad;
-			}
-			NP2HeapFree(command);
+	if (Registry_GetStringEx(HKEY_LOCAL_MACHINE, NP2RegSubKey_ReplaceNotepad, L"Debugger", command, RRF_RT_REG_SZ | samDesired_WOW64_64KEY)) {
+		if (StrStrI(command, tchModule) != nullptr) {
+			mask |= SystemIntegration_ReplaceNotepad;
 		}
-		RegCloseKey(hKey);
 	}
 
 	return mask;
 }
 
-void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName) noexcept {
+void UpdateSystemIntegrationStatus(DWORD mask, const SystemIntegrationInfo &info) noexcept {
 	WCHAR tchModule[MAX_PATH];
 	GetModuleFileName(nullptr, tchModule, COUNTOF(tchModule));
 	WCHAR command[300];
@@ -2780,21 +2578,21 @@ void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName)
 
 	// context menu
 	// delete the old one: HKEY_CLASSES_ROOT\*\shell\Notepad4.exe
-	//Registry_DeleteTree(HKEY_CLASSES_ROOT, NP2RegSubKey_ContextMenu L".exe");
+	//RegDeleteTree(HKEY_CLASSES_ROOT, NP2RegSubKey_ContextMenu L".exe");
 	if (mask & SystemIntegration_ContextMenu) {
 		HKEY hSubKey;
 		const LSTATUS status = Registry_CreateKey(HKEY_CLASSES_ROOT, NP2RegSubKey_ContextMenu L"\\command", &hSubKey);
 		if (status == ERROR_SUCCESS) {
 			HKEY hKey;
 			RegOpenKeyEx(HKEY_CLASSES_ROOT, NP2RegSubKey_ContextMenu, 0, KEY_WRITE, &hKey);
-			Registry_SetDefaultString(hKey, lpszText);
+			Registry_SetDefaultString(hKey, info.lpszText);
 			Registry_SetString(hKey, L"icon", tchModule);
 			Registry_SetDefaultString(hSubKey, command);
 			RegCloseKey(hKey);
 			RegCloseKey(hSubKey);
 		}
 	} else {
-		Registry_DeleteTree(HKEY_CLASSES_ROOT, NP2RegSubKey_ContextMenu);
+		RegDeleteTree(HKEY_CLASSES_ROOT, NP2RegSubKey_ContextMenu);
 	}
 
 	// jump list
@@ -2805,7 +2603,7 @@ void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName)
 			HKEY hKey;
 			RegOpenKeyEx(HKEY_CLASSES_ROOT, NP2RegSubKey_JumpList, 0, KEY_WRITE, &hKey);
 			Registry_SetString(hKey, L"AppUserModelID", g_wchAppUserModelID);
-			Registry_SetString(hKey, L"FriendlyAppName", lpszName);
+			Registry_SetString(hKey, L"FriendlyAppName", info.lpszName);
 			Registry_SetDefaultString(hSubKey, command);
 			RegCloseKey(hKey);
 			RegCloseKey(hSubKey);
@@ -2816,7 +2614,7 @@ void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName)
 			}
 		}
 	} else {
-		Registry_DeleteTree(HKEY_CLASSES_ROOT, NP2RegSubKey_JumpList);
+		RegDeleteTree(HKEY_CLASSES_ROOT, NP2RegSubKey_JumpList);
 	}
 
 	// replace Windows Notepad
@@ -2834,7 +2632,7 @@ void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName)
 			WCHAR num[2] = { L'0', L'\0' };
 			for (int index = 0; index < 3; index++, num[0]++) {
 #if 1
-				Registry_DeleteTree(hKey, num);
+				RegDeleteTree(hKey, num);
 #else
 				HKEY hSubKey;
 				status = Registry_CreateKey(hKey, num, &hSubKey);
@@ -2851,7 +2649,7 @@ void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName)
 		}
 	} else if (mask & SystemIntegration_RestoreNotepad) {
 #if 0
-		Registry_DeleteTree(HKEY_LOCAL_MACHINE, NP2RegSubKey_ReplaceNotepad);
+		RegDeleteTree(HKEY_LOCAL_MACHINE, NP2RegSubKey_ReplaceNotepad);
 #else
 		// on Windows 11, all keys were created by the system, we should not delete them.
 		HKEY hKey;
@@ -2893,27 +2691,20 @@ INT_PTR CALLBACK SystemIntegrationDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		SystemIntegrationInfo info{};
-		const int mask = GetSystemIntegrationStatus(info);
+		SystemIntegrationInfo info;
+		info.lpszText[0] = L'\0';
+		info.lpszName[0] = L'\0';
+		const DWORD mask = GetSystemIntegrationStatus(info);
 		SetWindowLongPtr(hwnd, DWLP_USER, mask);
 
 		HWND hwndCtl = GetDlgItem(hwnd, IDC_CONTEXT_MENU_TEXT);
 		if (StrIsEmpty(info.lpszText)) {
-			WCHAR wch[128];
-			GetString(IDS_LINKDESCRIPTION, wch, COUNTOF(wch));
-			Edit_SetText(hwndCtl, wch);
-		} else {
-			Edit_SetText(hwndCtl, info.lpszText);
+			GetString(IDS_LINKDESCRIPTION, info.lpszText, COUNTOF(info.lpszText));
 		}
+		Edit_SetText(hwndCtl, info.lpszText);
 
 		HWND hwndName = GetDlgItem(hwnd, IDC_APPLICATION_NAME);
 		Edit_SetText(hwndName, StrIsEmpty(info.lpszName)? g_wchAppUserModelID : info.lpszName);
-		if (info.lpszText) {
-			NP2HeapFree(info.lpszText);
-		}
-		if (info.lpszName) {
-			NP2HeapFree(info.lpszName);
-		}
 
 		if (mask & SystemIntegration_ContextMenu) {
 			CheckDlgButton(hwnd, IDC_ENABLE_CONTEXT_MENU, BST_CHECKED);
@@ -2933,7 +2724,7 @@ INT_PTR CALLBACK SystemIntegrationDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 			EnableWindow(GetDlgItem(hwnd, IDC_REPLACE_WINDOWS_NOTEPAD), FALSE);
 		}
 
-		CenterDlgInParent(hwnd);
+		DarkMode_InitDialog(hwnd);
 	}
 	return TRUE;
 
@@ -2941,7 +2732,7 @@ INT_PTR CALLBACK SystemIntegrationDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 		switch (LOWORD(wParam)) {
 		case IDOK: {
 			if (IsWindowEnabled(GetDlgItem(hwnd, IDC_ENABLE_CONTEXT_MENU))) {
-				int mask = 0;
+				DWORD mask = 0;
 				if (IsButtonChecked(hwnd, IDC_ENABLE_CONTEXT_MENU)) {
 					mask |= SystemIntegration_ContextMenu;
 				}
@@ -2958,15 +2749,14 @@ INT_PTR CALLBACK SystemIntegrationDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 					}
 				}
 
-				WCHAR wchText[128];
-				GetDlgItemText(hwnd, IDC_CONTEXT_MENU_TEXT, wchText, COUNTOF(wchText));
-				TrimString(wchText);
+				SystemIntegrationInfo info;
+				GetDlgItemText(hwnd, IDC_CONTEXT_MENU_TEXT, info.lpszText, COUNTOF(info.lpszText));
+				TrimString(info.lpszText);
 
-				WCHAR wchName[128];
-				GetDlgItemText(hwnd, IDC_APPLICATION_NAME, wchName, COUNTOF(wchName));
-				TrimString(wchName);
+				GetDlgItemText(hwnd, IDC_APPLICATION_NAME, info.lpszName, COUNTOF(info.lpszName));
+				TrimString(info.lpszName);
 
-				UpdateSystemIntegrationStatus(mask, wchText, wchName);
+				UpdateSystemIntegrationStatus(mask, info);
 			}
 			EndDialog(hwnd, IDOK);
 		}

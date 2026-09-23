@@ -29,7 +29,26 @@ extern "C"
 LRESULT SCI_METHOD Scintilla_DirectFunction(HANDLE handle, UINT msg, WPARAM wParam, LPARAM lParam);
 #define SciCall(m, w, l)	Scintilla_DirectFunction(g_hScintilla, (m), (w), (l))
 
+namespace Scintilla {
+enum class CharacterClass { space, newLine, punctuation, word, cjkWord }; // ILexer.h
+
+namespace Internal {
+struct DBCSByteMask { // CharClassify.h
+	uint8_t byteMask[256];
+	bool IsLeadByte(unsigned char ch) const noexcept {
+		return byteMask[ch] & true;
+	}
+	bool IsTrailByte(unsigned char ch) const noexcept {
+		return byteMask[ch] & 2;
+	}
+};
+
+}
+}
+
 using Sci_MarkerMask = unsigned int;
+using Scintilla::CharacterClass;
+using Scintilla::Internal::DBCSByteMask;
 
 constexpr COLORREF ColorAlpha(COLORREF rgb, UINT alpha) noexcept {
 	return rgb | (alpha << 24);
@@ -127,15 +146,6 @@ inline int SciCall_GetCharacterAt(Sci_Position position) noexcept {
 	return static_cast<int>(SciCall(SCI_GETCHARACTERANDWIDTH, position, 0));
 }
 
-// same as CharacterClass in ILexer.h
-enum CharacterClass {
-	CharacterClass_Space,
-	CharacterClass_NewLine,
-	CharacterClass_Punctuation,
-	CharacterClass_Word,
-	CharacterClass_CJKWord
-};
-
 inline CharacterClass SciCall_GetCharacterClass(UINT character) noexcept {
 	return static_cast<CharacterClass>(SciCall(SCI_GETCHARACTERCLASS, character, 0));
 }
@@ -162,10 +172,6 @@ inline void SciCall_TargetWholeDocument() noexcept {
 	SciCall(SCI_TARGETWHOLEDOCUMENT, 0, 0);
 }
 
-inline void SciCall_SetSearchFlags(int searchFlags) noexcept {
-	SciCall(SCI_SETSEARCHFLAGS, searchFlags, 0);
-}
-
 inline Sci_Position SciCall_SearchInTarget(Sci_Position length, const char *text) noexcept {
 	return SciCall(SCI_SEARCHINTARGET, length, AsInteger<LPARAM>(text));
 }
@@ -178,12 +184,12 @@ inline Sci_Position SciCall_ReplaceTargetRE(Sci_Position length, const char *tex
 	return SciCall(SCI_REPLACETARGETRE, length, AsInteger<LPARAM>(text));
 }
 
-inline Sci_Position SciCall_FindTextFull(int searchFlags, Sci_TextToFindFull *ft) noexcept {
+inline Sci_Position SciCall_FindTextFull(UINT searchFlags, Sci_TextToFindFull *ft) noexcept {
 	return SciCall(SCI_FINDTEXTFULL, searchFlags, AsInteger<LPARAM>(ft));
 }
 
-inline Sci_Position SciCall_ReplaceTargetEx(BOOL regex, Sci_Position length, const char *text) noexcept {
-	return SciCall(regex ? SCI_REPLACETARGETRE : SCI_REPLACETARGET, length, AsInteger<LPARAM>(text));
+inline Sci_Position SciCall_ReplaceTargetEx(UINT msg, Sci_Position length, const char *text) noexcept {
+	return SciCall(msg, length, AsInteger<LPARAM>(text));
 }
 
 // Overtype
@@ -406,12 +412,16 @@ inline int SciCall_TextHeight() noexcept {
 	return static_cast<int>(SciCall(SCI_TEXTHEIGHT, 0, 0));
 }
 
-inline Sci_Position SciCall_GetColumn(Sci_Position position) noexcept {
-	return SciCall(SCI_GETCOLUMN, position, 0);
+inline Sci_Position SciCall_GetColumn(Sci_Position position, Sci_Line line = -1) noexcept {
+	return SciCall(SCI_GETCOLUMN, position, line);
 }
 
 inline Sci_Position SciCall_FindColumn(Sci_Line line, Sci_Position column) noexcept {
 	return SciCall(SCI_FINDCOLUMN, line, column);
+}
+
+inline Sci_Position SciCall_FindColumnEx(unsigned type, const Sci_CharacterRangeFull *chrg) noexcept {
+	return SciCall(SCI_FINDCOLUMNEX, type, AsInteger<LPARAM>(chrg));
 }
 
 inline Sci_Position SciCall_PositionFromPoint(int x, int y) noexcept {
@@ -587,10 +597,7 @@ inline void BeginWaitCursor() noexcept {
 }
 
 inline void EndWaitCursor() noexcept {
-	POINT pt;
 	SciCall_SetCursor(SC_CURSORNORMAL);
-	GetCursorPos(&pt);
-	SetCursorPos(pt.x, pt.y);
 }
 
 // Line endings
@@ -619,6 +626,10 @@ inline Sci_Position SciCall_WordStartPosition(Sci_Position position, bool onlyWo
 
 inline Sci_Position SciCall_WordEndPosition(Sci_Position position, bool onlyWordCharacters) noexcept {
 	return SciCall(SCI_WORDENDPOSITION, position, onlyWordCharacters);
+}
+
+inline Sci_Position SciCall_IsRangeWord(Sci_Position start, Sci_Position end) noexcept {
+	return SciCall(SCI_ISRANGEWORD, start, end);
 }
 
 inline void SciCall_SetCharClassesEx(int length, const unsigned char *characters) noexcept {
@@ -863,6 +874,10 @@ inline void SciCall_SetCodePage(UINT codePage) noexcept {
 
 inline UINT SciCall_GetCodePage() noexcept {
 	return static_cast<UINT>(SciCall(SCI_GETCODEPAGE, 0, 0));
+}
+
+inline UINT SciCall_GetDBCSByteMask(const DBCSByteMask* &byteMask) noexcept {
+	return static_cast<UINT>(SciCall(SCI_GETCODEPAGE, AsInteger<WPARAM>(&byteMask), 0));
 }
 
 inline void SciCall_SetTechnology(int technology) noexcept {

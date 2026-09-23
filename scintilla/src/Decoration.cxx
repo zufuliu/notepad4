@@ -161,7 +161,7 @@ Decoration<POS> *DecorationList<POS>::Create(int indicator, Sci::Position length
 	auto decoNew = std::make_unique<Decoration<POS>>(indicator);
 	decoNew->rs.InsertSpace(0, pos_cast(length));
 
-	auto it = std::lower_bound(
+	const auto it = std::lower_bound(
 		decorationList.begin(), decorationList.end(), decoNew,
 		[](const std::unique_ptr<Decoration<POS>> &a, const std::unique_ptr<Decoration<POS>> &b) noexcept {
 		return a->Indicator() < b->Indicator();

@@ -14,7 +14,7 @@ SinglyWordMap = {
 	'properties': 'property',
 	'alias': 'alias',
 }
-
+KEYWORDSET_MAX = 15
 AllKeywordAttrList = {}
 # for keyword list used in AutoC_AddSpecWord()
 SpecialKeywordIndexList = {}
@@ -68,7 +68,7 @@ def build_enum_name(comment):
 	items = [item if item[0].isupper() else item.title() for item in items]
 	return ''.join(items)
 
-def BuildKeywordContent(rid, lexer, keywordList, keywordCount=16):
+def BuildKeywordContent(rid, lexer, keywordList, reservedCount=0):
 	output = []
 	attrList = []
 	indexList = LexerKeywordIndexList.setdefault(lexer, {})
@@ -111,10 +111,11 @@ def BuildKeywordContent(rid, lexer, keywordList, keywordCount=16):
 			output.extend('"' + line + ' "' for line in lines)
 		else:
 			output.append('nullptr')
-		if index + 1 < keywordCount:
-			output.append("")
+		output.append("")
 
 		indexName = build_enum_name(comment)
+		if index >= KEYWORDSET_MAX:
+			attr |= KeywordAttr.NoLexer
 		# keyword index for lexer
 		if (attr & KeywordAttr.NoLexer) == 0 and comment != 'unused':
 			if items:
@@ -137,26 +138,28 @@ def BuildKeywordContent(rid, lexer, keywordList, keywordCount=16):
 		# keyword attribute for lexer
 		if lines and (attr & KeywordAttr.NoLexer) == 0:
 			attr |= KeywordAttr.PreSorted
-		if attr != KeywordAttr.Default:
+		if attr != KeywordAttr.Default and index <= KEYWORDSET_MAX:
 			attrList.append((index, attr, comment))
 
 	if maxKeywordLen:
 		maxKeywordLen += 2 # extra + '\0'
 		if '@' not in indexList or indexList['@'][0] < maxKeywordLen:
 			indexList['@'] = (maxKeywordLen, 0)
-	count = keywordCount - len(keywordList)
-	if count:
-		output.append(", nullptr" * count)
+	index = len(keywordList)
+	while reservedCount != 0 and index <= KEYWORDSET_MAX:
+		attrList.append((index, KeywordAttr.NoLexer, 'Code Snippet'))
+		index += 1
+		reservedCount -= 1
 	if attrList:
 		AllKeywordAttrList[rid] = attrList
 	return output, attrList
 
-def UpdateKeywordFile(rid, path, lexer, keywordList, keywordCount=16, suffix=''):
+def UpdateKeywordFile(rid, path, lexer, keywordList, reservedCount=0, suffix=''):
 	if keywordList is None:
 		return
 	attrList = []
 	if keywordList:
-		output, attrList = BuildKeywordContent(rid, lexer, keywordList, keywordCount=keywordCount)
+		output, attrList = BuildKeywordContent(rid, lexer, keywordList, reservedCount=reservedCount)
 		if len(output) > 1:
 			Regenerate(path, '//' + suffix, output)
 
@@ -2895,16 +2898,23 @@ def parse_zig_api_file(path):
 		('function', keywordMap['functions'], KeywordAttr.NoLexer),
 	]
 
-def UpdateLexerKeywordAttr(indexPath, lexerPath):
+def UpdateLexerKeywordAttr(indexPath, matchPath, lexerPath):
 	#print(SinglyWordMap)
 	output = []
+	matchIndex = []
 	if AllKeywordAttrList:
 		output.append('enum {')
+		matchIndex.append('enum {')
 		for prefix, group in sorted(SpecialKeywordIndexList.items()):
 			items = sorted(group.items(), key=lambda m: m[1])
-			output.extend(f'\t{prefix}{key} = {value},' for key, value in items)
+			lines = [f'\t{prefix}{key} = {value},' for key, value in items]
+			output.extend(lines)
+			if prefix in ('CPPKeywordIndex_'):
+				matchIndex.extend(lines)
+		matchIndex.append('};')
 		output.append('};')
 	Regenerate(indexPath, '//KeywordIndex', output)
+	Regenerate(matchPath, '//KeywordIndex', matchIndex)
 
 	for lexer, indexList in LexerKeywordIndexList.items():
 		output = []
