@@ -7479,6 +7479,11 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 	case Message::FindColumn:
 		return pdoc->FindColumn(LineFromUPtr(wParam), lParam);
 
+	case Message::FindColumnEx: {
+		const auto *chrg = AsPointer<const CharacterRangeFull *>(lParam);
+		return pdoc->FindColumn(chrg->cpMin, chrg->cpMax, -1, static_cast<ColumnType>(wParam));
+	}
+
 	case Message::SetHScrollBar:
 		if (horizontalScrollBarVisible != (wParam != 0)) {
 			horizontalScrollBarVisible = wParam != 0;

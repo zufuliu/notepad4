@@ -420,6 +420,10 @@ inline Sci_Position SciCall_FindColumn(Sci_Line line, Sci_Position column) noexc
 	return SciCall(SCI_FINDCOLUMN, line, column);
 }
 
+inline Sci_Position SciCall_FindColumnEx(unsigned type, const Sci_CharacterRangeFull *chrg) noexcept {
+	return SciCall(SCI_FINDCOLUMNEX, type, AsInteger<LPARAM>(chrg));
+}
+
 inline Sci_Position SciCall_PositionFromPoint(int x, int y) noexcept {
 	return SciCall(SCI_POSITIONFROMPOINT, x, y);
 }

@@ -2736,6 +2736,13 @@ fun position EncodedFromUTF8=2449(string utf8, stringresult encoded)
 # multi-byte characters. If beyond end of line, return line end position.
 fun position FindColumn=2456(line line, position column)
 
+enu ColumnType=SC_COLUMN_
+val SC_COLUMN_DEFAULT=0
+val SC_COLUMN_CHARACTER=1
+val SC_COLUMN_BYTE=2
+
+fun position FindColumnEx=2759(ColumnType type, charrange chrg)
+
 enu CaretSticky=SC_CARETSTICKY_
 val SC_CARETSTICKY_OFF=0
 val SC_CARETSTICKY_ON=1

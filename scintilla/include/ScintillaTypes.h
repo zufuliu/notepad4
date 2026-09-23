@@ -490,6 +490,12 @@ enum class Ordering {
 	Custom = 2,
 };
 
+enum class ColumnType {
+	Default = 0,
+	Character = 1,
+	Byte = 2,
+};
+
 enum class CaretSticky {
 	Off = 0,
 	On = 1,

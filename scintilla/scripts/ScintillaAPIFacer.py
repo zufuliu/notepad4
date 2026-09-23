@@ -29,6 +29,7 @@ typeAliases = {
 	"stringresult": "char *",
 	"textrange": "const TextRangeFull *",
 	"textrangefull": "const TextRangeFull *",
+	"charrange": "const CharacterRangeFull *",
 }
 
 basicTypes = [

@@ -1769,17 +1769,29 @@ Sci::Position Document::CountUTF16(Sci::Position startPos, Sci::Position endPos)
 	return count;
 }
 
-Sci::Position Document::FindColumn(Sci::Line line, Sci::Position column, Sci::Position endPos) const noexcept {
+Sci::Position Document::FindColumn(Sci::Line line, Sci::Position column, Sci::Position endPos, ColumnType type) const noexcept {
 	Sci::Position position = cb.LineStart(line);
 	if (endPos < 0) {
 		endPos = cb.LineEnd(line);
+	}
+	unsigned tabSize = 0;
+	if (column > 0 && (type == ColumnType::Character || type == ColumnType::Byte)) {
+		if (position + column >= endPos) {
+			position = endPos;
+		} else if (type == ColumnType::Byte || dbcsCodePage == 0) {
+			position = MovePositionOutsideChar(position + column, -1, false);
+			column = 0;
+		}
+	} else {
+		tabSize = static_cast<unsigned>(type);
+		tabSize = (tabSize > 15)? (tabSize >> 4) : tabInChars;
 	}
 
 	Sci::Position columnCurrent = 0;
 	while ((columnCurrent < column) && (position < endPos)) {
 		const char ch = cb.CharAt(position);
-		if (ch == '\t') {
-			columnCurrent = NextTab(columnCurrent, tabInChars);
+		if (ch == '\t' && tabSize != 0) {
+			columnCurrent = NextTab(columnCurrent, tabSize);
 			if (columnCurrent > column)
 				return position;
 			position++;

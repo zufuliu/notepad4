@@ -2578,6 +2578,10 @@ Position ScintillaCall::FindColumn(Line line, Position column) {
 	return Call(Message::FindColumn, line, column);
 }
 
+Position ScintillaCall::FindColumnEx(Scintilla::ColumnType type, const CharacterRangeFull *chrg) {
+	return CallConstPointer(Message::FindColumnEx, static_cast<uintptr_t>(type), chrg);
+}
+
 CaretSticky ScintillaCall::CaretSticky() {
 	return static_cast<Scintilla::CaretSticky>(Call(Message::GetCaretSticky));
 }

@@ -605,6 +605,7 @@ enum class Message {
 	SetLengthForEncode = 2448,
 	EncodedFromUTF8 = 2449,
 	FindColumn = 2456,
+	FindColumnEx = 2759,
 	GetCaretSticky = 2457,
 	SetCaretSticky = 2458,
 	ToggleCaretSticky = 2459,
