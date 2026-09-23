@@ -171,7 +171,7 @@ BEGIN
 		MENUITEM "Propriet&à...",					IDM_FILE_PROPERTIES
 		MENUITEM "Apri la cartella con&tenente",		IDM_FILE_OPEN_CONTAINING_FOLDER
 		MENUITEM "Crea collegamento sul Des&ktop",			IDM_FILE_CREATELINK
-		MENUITEM "Update File Time",				IDM_FILE_UPDATE_TIMESTAMP
+		MENUITEM "Aggiorna orario ultima modifica",				IDM_FILE_UPDATE_TIMESTAMP
 		MENUITEM SEPARATOR
 		MENUITEM "Navi&ga...\tCtrl+M",				IDM_FILE_BROWSE
 		POPUP "Prefer&iti"
