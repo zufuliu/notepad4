@@ -4308,15 +4308,21 @@ void EditSortLines(EditSortFlag iSortFlags) noexcept {
 //
 // EditJumpTo()
 //
-void EditJumpTo(Sci_Line iNewLine, Sci_Position iNewCol) noexcept {
+NP2_noinline
+void EditJumpTo(Sci_Line iNewLine, Sci_Position iNewCol, unsigned type) noexcept {
 	// Jumpt to end with line set to -1
 	if (iNewLine < 0 || iNewLine > SciCall_GetLineCount()) {
 		iNewCol = SciCall_GetLength();
 	} else {
-		--iNewLine;
-		const Sci_Position iLineEndPos = SciCall_GetLineEndPosition(iNewLine);
-		iNewCol = min(iNewCol, iLineEndPos);
-		iNewCol = SciCall_FindColumn(iNewLine, iNewCol - 1);
+		iNewLine = iNewLine? iNewLine - 1 : iNewLine;
+		if (iNewCol < 0) { // treat negative column as no tab expanding
+			type = SC_COLUMN_CHARACTER;
+			iNewCol = -iNewCol - 1;
+		} else {
+			iNewCol = iNewCol - 1;
+		}
+		const Sci_CharacterRangeFull chrg {iNewLine, iNewCol};
+		iNewCol = SciCall_FindColumnEx(type, &chrg);
 	}
 
 	EditSelectEx(iNewCol, iNewCol);
@@ -4327,6 +4333,7 @@ void EditJumpTo(Sci_Line iNewLine, Sci_Position iNewCol) noexcept {
 //
 // EditSelectEx()
 //
+NP2_noinline
 void EditSelectEx(Sci_Position iAnchorPos, Sci_Position iCurrentPos) noexcept {
 	const Sci_Line iNewLine = SciCall_LineFromPosition(iCurrentPos);
 
@@ -7076,7 +7083,7 @@ void EditOpenSelection(OpenSelectionType type) {
 
 			LPWSTR lpParameters = link;
 			if (line != nullptr) {
-				// TODO: improve the code when column is actually character index
+				// TODO: detect whether `column` is actually column or character index
 				lpParameters = static_cast<LPWSTR>(NP2HeapAlloc(sizeof(path)));
 				wsprintf(lpParameters, L"-g %s,%s %s", line, column, link);
 			}

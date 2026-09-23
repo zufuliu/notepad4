@@ -390,7 +390,7 @@ static bool	flagNewFromClipboard	= false;
 static bool	flagPasteBoard			= false;
 static int	flagSetEncoding			= 0;
 static int	flagSetEOLMode			= 0;
-static bool	flagJumpTo				= false;
+static unsigned	flagJumpTo			= FALSE;
 static MatchTextFlag flagMatchText	= MatchTextFlag_None;
 static TripleBoolean flagChangeNotify = TripleBoolean_NotSet;
 static bool	flagLexerSpecified		= false;
@@ -705,7 +705,7 @@ BOOL InitApplication(HINSTANCE hInstance) noexcept {
 }
 
 NP2_noinline
-static void HandleMatchText(MatchTextFlag flag, LPCWSTR lpszText, bool jumpTo) noexcept {
+static void HandleMatchText(MatchTextFlag flag, LPCWSTR lpszText, BOOL jumpTo) noexcept {
 	if (StrNotEmpty(lpszText) && SciCall_GetLength()) {
 		efrData.wszFind = HeapStrDupW(lpszText);
 		efrData.status |= FindReplaceStatus_HasFindText | FindReplaceStatus_FindUpdated | FindReplaceStatus_ReplaceUpdated;
@@ -892,7 +892,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 
 		if (bOpened) {
 			if (flagJumpTo) { // Jump to position
-				EditJumpTo(iInitialLine, iInitialColumn);
+				EditJumpTo(iInitialLine, iInitialColumn, flagJumpTo - TRUE);
 			}
 			if (flagChangeNotify != TripleBoolean_NotSet) {
 				iFileWatchingMode = (flagChangeNotify == TripleBoolean_False) ? FileWatchingMode_None : FileWatchingMode_AutoReload;
@@ -937,7 +937,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 			SciCall_EndUndoAction();
 			autoCompletionConfig.bIndentText = back;
 			if (flagJumpTo) {
-				EditJumpTo(iInitialLine, iInitialColumn);
+				EditJumpTo(iInitialLine, iInitialColumn, flagJumpTo - TRUE);
 			} else {
 				EditEnsureSelectionVisible();
 			}
@@ -1338,8 +1338,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			}
 
 			if (params->flagJumpTo) {
-				const Sci_Line iLine = params->iInitialLine ? params->iInitialLine : 1;
-				EditJumpTo(iLine, params->iInitialColumn);
+				EditJumpTo(params->iInitialLine, params->iInitialColumn, params->flagJumpTo - TRUE);
 			}
 			if (bOpened && params->flagMatchText != MatchTextFlag_None) {
 				HandleMatchText(params->flagMatchText, lpsz, params->flagJumpTo);
@@ -5705,24 +5704,30 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) noexcept {
 			}
 			break;
 
-		case L'G':
+		case L'G': {
+			const wchar_t option = opt[0];
 			state = CommandParseState_Argument;
 			if (ExtractFirstArgument(lp2, lp1, lp2)) {
 #if defined(_WIN64)
-				int64_t cord[2]{};
+				int64_t cord[3]{};
 				const UINT itok = ParseCommaList64(lp1, cord, COUNTOF(cord));
 #else
-				int cord[2]{};
+				int cord[3]{};
 				const UINT itok = ParseCommaList(lp1, cord, COUNTOF(cord));
 #endif
 				if (itok != 0) {
-					flagJumpTo = true;
 					state = CommandParseState_Consumed;
 					iInitialLine = cord[0];
 					iInitialColumn = cord[1];
+					if (option & 0x20) { // lower case: character, byte
+						flagJumpTo = (TRUE + SC_COLUMN_CHARACTER) + (cord[2] & TRUE);
+					} else { // upper case: column
+						const unsigned iTabWidth = min(static_cast<unsigned>(cord[2]), static_cast<unsigned>(TAB_WIDTH_MAX));
+						flagJumpTo = (TRUE + SC_COLUMN_DEFAULT) | (iTabWidth << 4);
+					}
 				}
 			}
-			break;
+		} break;
 
 		case L'I':
 			flagStartAsTrayIcon = true;
@@ -7627,9 +7632,9 @@ void GetRelaunchParameters(LPWSTR szParameters, LPCWSTR lpszFile, RelaunchOption
 			WCHAR tchCol[32];
 			PosToStr(line, tchLn);
 			PosToStr(col, tchCol);
-			wsprintf(tch, L" -g %s,%s", tchLn, tchCol);
+			wsprintf(tch, L" -G %s,%s", tchLn, tchCol);
 #else
-			wsprintf(tch, L" -g %d,%d", static_cast<int>(line), static_cast<int>(col));
+			wsprintf(tch, L" -G %d,%d", static_cast<int>(line), static_cast<int>(col));
 #endif
 			lstrcat(szParameters, tch);
 		}

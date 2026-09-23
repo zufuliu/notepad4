@@ -62,7 +62,7 @@ struct NP2PARAMS {
 	bool	flagLexerSpecified;
 	bool	flagQuietCreate;
 	bool	flagTitleExcerpt;
-	bool	flagJumpTo;
+	unsigned	flagJumpTo;
 	TripleBoolean	flagChangeNotify;
 	int		iInitialLexer;
 	Sci_Line		iInitialLine;
