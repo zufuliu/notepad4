@@ -171,6 +171,7 @@ BEGIN
 		MENUITEM "Właśc&iwości...",					IDM_FILE_PROPERTIES
 		MENUITEM "Otwórz &folder zawierający",		IDM_FILE_OPEN_CONTAINING_FOLDER
 		MENUITEM "Utwórz skrót na pu&lpicie",		IDM_FILE_CREATELINK
+		MENUITEM "Update File Time",				IDM_FILE_UPDATE_TIMESTAMP
 		MENUITEM SEPARATOR
 		MENUITEM "Prze&glądaj...\tCtrl+M",			IDM_FILE_BROWSE
 		POPUP "Ulu&bione"

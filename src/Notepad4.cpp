@@ -2338,6 +2338,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 		IDM_FILE_PROPERTIES,
 		IDM_FILE_READONLY_FILE,
 		IDM_FILE_REVERT,
+		IDM_FILE_UPDATE_TIMESTAMP,
 		IDM_RECODE_SELECT,
 	};
 	for (unsigned k = 0; k < COUNTOF(menuRequiresPath); k++) {
@@ -2700,6 +2701,13 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_FILE_SAVEORIGINALTIMESTAMP:
 		FileSave(static_cast<FileSaveFlag>(FileSaveFlag_SaveAlways | FileSaveFlag_OriginalTimestamp));
+		break;
+
+	case IDM_FILE_UPDATE_TIMESTAMP:
+		if (StrNotEmpty(szCurFile)) {
+			EditFileIOStatus status{};
+			EditSaveFile(szCurFile, FileSaveFlag_OriginalTimestamp | FileSaveFlag_UpdateTimestamp, status);
+		}
 		break;
 
 	case IDM_FILE_READONLY_FILE:

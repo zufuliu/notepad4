@@ -171,6 +171,7 @@ BEGIN
 		MENUITEM "プロパティ(&I)...",					IDM_FILE_PROPERTIES
 		MENUITEM "ファイルのあるフォルダを開く(&C)",		IDM_FILE_OPEN_CONTAINING_FOLDER
 		MENUITEM "デスクトップにショートカット(&K)",			IDM_FILE_CREATELINK
+		MENUITEM "Update File Time",				IDM_FILE_UPDATE_TIMESTAMP
 		MENUITEM SEPARATOR
 		MENUITEM "ファイラで開く(&B)...\tCtrl+M",				IDM_FILE_BROWSE
 		POPUP "お気に入り(&F)"

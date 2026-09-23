@@ -1159,7 +1159,7 @@ bool EditSaveFile(LPCWSTR pszFile, int saveFlag, EditFileIOStatus &status) noexc
 		}
 	}
 
-	if (!(saveFlag & FileSaveFlag_EndSession) && !bReadOnlyMode) {
+	if (!(saveFlag & (FileSaveFlag_EndSession | FileSaveFlag_UpdateTimestamp)) && !bReadOnlyMode) {
 		// ensure consistent line endings
 		if (bFixLineEndings) {
 			EditEnsureConsistentLineEndings();
@@ -1178,7 +1178,7 @@ bool EditSaveFile(LPCWSTR pszFile, int saveFlag, EditFileIOStatus &status) noexc
 	UINT uFlags = mEncoding[iEncoding].uFlags;
 
 	// get content and convert encoding
-	if (cbData != 0) {
+	if (cbData != 0 && !(saveFlag & FileSaveFlag_UpdateTimestamp)) {
 		if (cbData >= MAX_NON_UTF8_SIZE) {
 			// save as UTF-8 or ANSI
 			if (!(uFlags & (NCP_DEFAULT | NCP_UTF8))) {
@@ -1249,8 +1249,9 @@ bool EditSaveFile(LPCWSTR pszFile, int saveFlag, EditFileIOStatus &status) noexc
 	}
 
 	// write content
-	{
-		BOOL bWriteSuccess = SetEndOfFile(hFile);
+	BOOL bWriteSuccess = FALSE;
+	if (!(saveFlag & FileSaveFlag_UpdateTimestamp)) {
+		bWriteSuccess = SetEndOfFile(hFile);
 		DWORD dwBytesWritten;
 		// write encoding BOM
 		DWORD bom;
@@ -1271,16 +1272,24 @@ bool EditSaveFile(LPCWSTR pszFile, int saveFlag, EditFileIOStatus &status) noexc
 			dwLastIOError = GetLastError();
 			NP2HeapFree(lpData);
 		}
-		if (saveFlag & FileSaveFlag_OriginalTimestamp) {
-			SetFileInformationByHandle(hFile, FileBasicInfo, &timestamp, sizeof(timestamp));
+	}
+
+	if (saveFlag & FileSaveFlag_OriginalTimestamp) {
+		if (saveFlag & FileSaveFlag_UpdateTimestamp) {
+#if _WIN32_WINNT >= _WIN32_WINNT_WIN8
+			GetSystemTimePreciseAsFileTime(reinterpret_cast<FILETIME *>(&timestamp.LastWriteTime));
+#else
+			GetSystemTimeAsFileTime(reinterpret_cast<FILETIME *>(&timestamp.LastWriteTime));
+#endif
 		}
-		CloseHandle(hFile);
-		if (bWriteSuccess) {
-			if (!(saveFlag & FileSaveFlag_SaveCopy)) {
-				SciCall_SetSavePoint();
-			}
-			return true;
+		SetFileInformationByHandle(hFile, FileBasicInfo, &timestamp, sizeof(timestamp));
+	}
+	CloseHandle(hFile);
+	if (bWriteSuccess) {
+		if (!(saveFlag & FileSaveFlag_SaveCopy)) {
+			SciCall_SetSavePoint();
 		}
+		return true;
 	}
 
 	return false;

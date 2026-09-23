@@ -171,6 +171,7 @@ BEGIN
 		MENUITEM "Propriedade&s...",				IDM_FILE_PROPERTIES
 		MENUITEM "Abrir Pasta do Ar&quivo",			IDM_FILE_OPEN_CONTAINING_FOLDER
 		MENUITEM "Criar Ata&lho na Área de Trabalho",IDM_FILE_CREATELINK
+		MENUITEM "Update File Time",				IDM_FILE_UPDATE_TIMESTAMP
 		MENUITEM SEPARATOR
 		MENUITEM "&Navegar...\tCtrl+M",				IDM_FILE_BROWSE
 		POPUP "&Favoritos"

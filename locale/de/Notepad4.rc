@@ -171,6 +171,7 @@ BEGIN
 		MENUITEM "E&igenschaften...",					IDM_FILE_PROPERTIES
 		MENUITEM "Datei&verzeichnis öffnen",			IDM_FILE_OPEN_CONTAINING_FOLDER
 		MENUITEM "Deskto&pverknüpfung erstellen",		IDM_FILE_CREATELINK
+		MENUITEM "Update File Time",				IDM_FILE_UPDATE_TIMESTAMP
 		MENUITEM SEPARATOR
 		MENUITEM "Dateibro&wser...\tStrg+M",			IDM_FILE_BROWSE
 		POPUP "Fav&oriten"

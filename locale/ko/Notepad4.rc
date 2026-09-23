@@ -171,6 +171,7 @@ BEGIN
 		MENUITEM "속성(&I)...",											IDM_FILE_PROPERTIES
 		MENUITEM "폴더 내용 열기(&C)",									IDM_FILE_OPEN_CONTAINING_FOLDER
 		MENUITEM "바탕 화면에 링크 만들기(&K)",							IDM_FILE_CREATELINK
+		MENUITEM "Update File Time",				IDM_FILE_UPDATE_TIMESTAMP
 		MENUITEM SEPARATOR
 		MENUITEM "찾아보기(&B)...\tCtrl+M",        	 				 	IDM_FILE_BROWSE
 		POPUP "즐겨찾기(&F)"

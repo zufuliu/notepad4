@@ -171,6 +171,7 @@ BEGIN
 		MENUITEM "Propr&iétés...",					IDM_FILE_PROPERTIES
 		MENUITEM "Ouvrir le répertoire du &fichier",		IDM_FILE_OPEN_CONTAINING_FOLDER
 		MENUITEM "Créer un lien sur le bureau",			IDM_FILE_CREATELINK
+		MENUITEM "Update File Time",				IDM_FILE_UPDATE_TIMESTAMP
 		MENUITEM SEPARATOR
 		MENUITEM "Parc&ourir...\tCtrl+M",				IDM_FILE_BROWSE
 		POPUP "&Favoris"
