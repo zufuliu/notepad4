@@ -1148,23 +1148,6 @@ bool EditSaveFile(LPCWSTR pszFile, int saveFlag, EditFileIOStatus &status) noexc
 					   FILE_ATTRIBUTE_NORMAL,
 					   nullptr);
 	dwLastIOError = GetLastError();
-
-	// failure could be due to missing attributes (Windows 2000, XP)
-	if (hFile == INVALID_HANDLE_VALUE) {
-		DWORD dwAttributes = GetFileAttributes(pszFile);
-		if (dwAttributes != INVALID_FILE_ATTRIBUTES) {
-			dwAttributes = dwAttributes & (FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM);
-			hFile = CreateFile(pszFile,
-							   GENERIC_READ | GENERIC_WRITE,
-							   FILE_SHARE_READ | FILE_SHARE_WRITE,
-							   nullptr,
-							   OPEN_ALWAYS,
-							   FILE_ATTRIBUTE_NORMAL | dwAttributes,
-							   nullptr);
-			dwLastIOError = GetLastError();
-		}
-	}
-
 	if (hFile == INVALID_HANDLE_VALUE) {
 		return false;
 	}
