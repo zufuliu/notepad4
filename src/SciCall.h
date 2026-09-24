@@ -928,11 +928,11 @@ inline void SciCall_BraceBadLightIndicator(bool useSetting, int indicator) noexc
 }
 
 inline Sci_Position SciCall_BraceMatch(Sci_Position pos) noexcept {
-	return SciCall(SCI_BRACEMATCH, pos, 0);
+	return SciCall(SCI_BRACEMATCH, pos, -1);
 }
 
 inline Sci_Position SciCall_BraceMatchNext(Sci_Position pos, Sci_Position startPos) noexcept {
-	return SciCall(SCI_BRACEMATCHNEXT, pos, startPos);
+	return SciCall(SCI_BRACEMATCH, pos, startPos);
 }
 
 // Tabs and Indentation Guides

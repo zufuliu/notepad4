@@ -809,7 +809,6 @@ typedef sptr_t (*SciFnDirectStatus)(sptr_t ptr, unsigned int iMessage, uptr_t wP
 #define SCI_BRACEBADLIGHT 2352
 #define SCI_BRACEBADLIGHTINDICATOR 2499
 #define SCI_BRACEMATCH 2353
-#define SCI_BRACEMATCHNEXT 2369
 #define SCI_GETVIEWEOL 2355
 #define SCI_SETVIEWEOL 2356
 #define SCI_GETDOCPOINTER 2357

@@ -492,7 +492,6 @@ enum class Message {
 	BraceBadLight = 2352,
 	BraceBadLightIndicator = 2499,
 	BraceMatch = 2353,
-	BraceMatchNext = 2369,
 	GetViewEOL = 2355,
 	SetViewEOL = 2356,
 	GetDocPointer = 2357,

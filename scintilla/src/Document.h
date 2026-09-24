@@ -765,7 +765,7 @@ public:
 	int IndentSize() const noexcept {
 		return actualIndentInChars;
 	}
-	Sci::Position BraceMatch(Sci::Position position, Sci::Position maxReStyle, Sci::Position startPos, bool useStartPos) const noexcept;
+	Sci::Position BraceMatch(Sci::Position position, Sci::Position startPos) const noexcept;
 
 private:
 	void NotifyModifyAttempt() noexcept;

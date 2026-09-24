@@ -3042,7 +3042,7 @@ constexpr char BraceOpposite(char ch) noexcept {
 }
 
 // TODO: should be able to extend styled region to find matching brace
-Sci::Position Document::BraceMatch(Sci::Position position, Sci::Position /*maxReStyle*/, Sci::Position startPos, bool useStartPos) const noexcept {
+Sci::Position Document::BraceMatch(Sci::Position position, Sci::Position startPos) const noexcept {
 	const unsigned char chBrace = CharAt(position);
 	const unsigned char chSeek = BraceOpposite(chBrace);
 	if (chSeek == '\0') {
@@ -3051,7 +3051,7 @@ Sci::Position Document::BraceMatch(Sci::Position position, Sci::Position /*maxRe
 	const int styBrace = StyleIndexAt(position);
 	const int direction = (chBrace < chSeek) ? 1 : -1;
 	const unsigned char safeChar = asciiBackwardSafeChar;
-	position = useStartPos ? startPos : position + direction;
+	position = (startPos >= 0) ? startPos : position + direction;
 	const Sci::Position endStylePos = GetEndStyled();
 	const Sci::Position length = LengthNoExcept();
 	const SplitView cbView = cb.AllView();
