@@ -440,7 +440,7 @@
       <AdditionalOptions>/GA /Zc:threadSafeInit- -march=x86-64-v4 -Wextra -Wshadow -Wimplicit-fallthrough -Wformat=2 -Wundef -Wcomma %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
-      <MinimumRequiredVersion>6.01</MinimumRequiredVersion>
+      <MinimumRequiredVersion>10.00</MinimumRequiredVersion>
     </Link>
     <ResourceCompile>
       <PreprocessorDefinitions>_WIN64;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>

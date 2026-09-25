@@ -161,7 +161,7 @@
       <WarningLevel>Level4</WarningLevel>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalOptions>/Zc:__cplusplus /source-charset:utf-8 /wd4201 /wd4204 /wd4214 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Zc:__cplusplus /source-charset:utf-8 /wd4201 /wd4204 %(AdditionalOptions)</AdditionalOptions>
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <BuildStlModules>false</BuildStlModules>
@@ -327,7 +327,7 @@
     <ClCompile>
       <PreprocessorDefinitions>NDEBUG;WIN32;_WIN32_WINNT=0x0600;WINVER=0x0600;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
-      <AdditionalOptions>/GA /wd26429 /wd26446 /wd26472 /wd26481 /wd26482 /wd26485 /wd26486 /wd26489 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/GA /Zc:threadSafeInit- /wd26429 /wd26446 /wd26472 /wd26481 /wd26482 /wd26485 /wd26486 /wd26489 %(AdditionalOptions)</AdditionalOptions>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
@@ -340,7 +340,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='LLVMRelease|Win32'">
     <ClCompile>
       <PreprocessorDefinitions>NDEBUG;WIN32;_WIN32_WINNT=0x0600;WINVER=0x0600;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalOptions>/GA -Wextra -Wshadow -Wimplicit-fallthrough -Wformat=2 -Wundef -Wcomma %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/GA /Zc:threadSafeInit- -Wextra -Wshadow -Wimplicit-fallthrough -Wformat=2 -Wundef -Wcomma %(AdditionalOptions)</AdditionalOptions>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <MultiProcessorCompilation Condition="'$(VisualStudioVersion)'=='16.0'">false</MultiProcessorCompilation>
     </ClCompile>
@@ -355,7 +355,7 @@
     <ClCompile>
       <PreprocessorDefinitions>NDEBUG;_WIN64;_WIN32_WINNT=0x0600;WINVER=0x0600;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
-      <AdditionalOptions>/GA /wd26429 /wd26446 /wd26472 /wd26481 /wd26482 /wd26485 /wd26486 /wd26489 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/GA /Zc:threadSafeInit- /wd26429 /wd26446 /wd26472 /wd26481 /wd26482 /wd26485 /wd26486 /wd26489 %(AdditionalOptions)</AdditionalOptions>
       <CallingConvention>VectorCall</CallingConvention>
     </ClCompile>
     <Link>
@@ -369,7 +369,7 @@
     <ClCompile>
       <PreprocessorDefinitions>NDEBUG;_WIN64;_WIN32_WINNT=0x0601;WINVER=0x0601;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
-      <AdditionalOptions>/GA /wd26429 /wd26446 /wd26472 /wd26481 /wd26482 /wd26485 /wd26486 /wd26489 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/GA /Zc:threadSafeInit- /wd26429 /wd26446 /wd26472 /wd26481 /wd26482 /wd26485 /wd26486 /wd26489 %(AdditionalOptions)</AdditionalOptions>
       <CallingConvention>VectorCall</CallingConvention>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
@@ -384,7 +384,7 @@
     <ClCompile>
       <PreprocessorDefinitions>NDEBUG;_WIN64;_WIN32_WINNT=0x0A00;WINVER=0x0A00;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
-      <AdditionalOptions>/GA /wd26429 /wd26446 /wd26472 /wd26481 /wd26482 /wd26485 /wd26486 /wd26489 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/GA /Zc:threadSafeInit- /wd26429 /wd26446 /wd26472 /wd26481 /wd26482 /wd26485 /wd26486 /wd26489 %(AdditionalOptions)</AdditionalOptions>
       <CallingConvention>VectorCall</CallingConvention>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions512</EnableEnhancedInstructionSet>
     </ClCompile>
@@ -399,7 +399,7 @@
     <ClCompile>
       <PreprocessorDefinitions>NDEBUG;_WIN64;_WIN32_WINNT=0x0A00;WINVER=0x0A00;PopulationCount64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
-      <AdditionalOptions>/GA /wd26429 /wd26446 /wd26472 /wd26481 /wd26482 /wd26485 /wd26486 /wd26489 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/GA /Zc:threadSafeInit- /wd26429 /wd26446 /wd26472 /wd26481 /wd26482 /wd26485 /wd26486 /wd26489 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>gdi32.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -412,7 +412,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='LLVMRelease|x64'">
     <ClCompile>
       <PreprocessorDefinitions>NDEBUG;_WIN64;_WIN32_WINNT=0x0600;WINVER=0x0600;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalOptions>/GA -Wextra -Wshadow -Wimplicit-fallthrough -Wformat=2 -Wundef -Wcomma %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/GA /Zc:threadSafeInit- -Wextra -Wshadow -Wimplicit-fallthrough -Wformat=2 -Wundef -Wcomma %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <MinimumRequiredVersion>6.00</MinimumRequiredVersion>
@@ -424,7 +424,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='AVX2LLVMRelease|x64'">
     <ClCompile>
       <PreprocessorDefinitions>NDEBUG;_WIN64;_WIN32_WINNT=0x0601;WINVER=0x0601;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalOptions>/GA -march=x86-64-v3 -Wextra -Wshadow -Wimplicit-fallthrough -Wformat=2 -Wundef -Wcomma %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/GA /Zc:threadSafeInit- -march=x86-64-v3 -Wextra -Wshadow -Wimplicit-fallthrough -Wformat=2 -Wundef -Wcomma %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <MinimumRequiredVersion>6.01</MinimumRequiredVersion>
@@ -436,7 +436,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='AVX512LLVMRelease|x64'">
     <ClCompile>
       <PreprocessorDefinitions>NDEBUG;_WIN64;_WIN32_WINNT=0x0A00;WINVER=0x0A00;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalOptions>/GA -march=x86-64-v4 -Wextra -Wshadow -Wimplicit-fallthrough -Wformat=2 -Wundef -Wcomma %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/GA /Zc:threadSafeInit- -march=x86-64-v4 -Wextra -Wshadow -Wimplicit-fallthrough -Wformat=2 -Wundef -Wcomma %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <MinimumRequiredVersion>10.00</MinimumRequiredVersion>
@@ -448,7 +448,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='LLVMRelease|ARM64'">
     <ClCompile>
       <PreprocessorDefinitions>NDEBUG;_WIN64;_WIN32_WINNT=0x0A00;WINVER=0x0A00;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalOptions>/GA -Wextra -Wshadow -Wimplicit-fallthrough -Wformat=2 -Wundef -Wcomma %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/GA /Zc:threadSafeInit- -Wextra -Wshadow -Wimplicit-fallthrough -Wformat=2 -Wundef -Wcomma %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>gdi32.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;%(AdditionalDependencies)</AdditionalDependencies>
