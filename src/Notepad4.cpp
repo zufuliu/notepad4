@@ -66,6 +66,19 @@ static HACCEL hAccFindReplace;
 static HICON hTrayIcon = nullptr;
 static UINT uTrayIconDPI = 0;
 
+static void RefreshDarkModeUI(HWND hwnd) noexcept {
+	if (bInitDone) {
+		Style_OnStyleThemeChanged(np2StyleThemeMode);
+	}
+	DarkMode_OnThemeChanged(np2StyleTheme);
+	DarkMode_ApplyToWindow(hwnd);
+	if (bInitDone) {
+		DarkMode_BroadcastThemeChanged(hwnd);
+		RedrawWindow(hwnd, nullptr, nullptr,
+			RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN | RDW_UPDATENOW | RDW_FRAME);
+	}
+}
+
 #define TOOLBAR_COMMAND_BASE	IDT_FILE_NEW
 #define DefaultToolbarButtons	L"22 3 0 1 27 2 0 4 18 19 0 5 6 0 7 8 9 20 0 10 11 0 12 0 24 0 13 14 0 15 16 0 17"
 // NOLINTBEGIN(readability-redundant-zero-initializer)
@@ -1202,13 +1215,14 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 	case WM_SETTINGCHANGE:
 		bitmapCache.Invalidate();
-		// TODO: detect system theme and high contrast mode changes
+		RefreshDarkModeUI(hwnd);
 		SendMessage(hwndEdit, WM_SETTINGCHANGE, wParam, lParam);
 		Style_SetLexer(pLexCurrent, false); // override base elements
 		break;
 
 	case WM_SYSCOLORCHANGE:
 		bitmapCache.Invalidate();
+		RefreshDarkModeUI(hwnd);
 		SendMessage(hwndToolbar, WM_SYSCOLORCHANGE, wParam, lParam);
 		SendMessage(hwndEdit, WM_SYSCOLORCHANGE, wParam, lParam);
 		Style_SetLexer(pLexCurrent, false); // override base elements
@@ -1875,6 +1889,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	ChangeWindowMessageFilterEx(hwnd, WM_COPYDATA, MSGFLT_ADD, nullptr);
 	ChangeWindowMessageFilterEx(hwnd, 0x0049 /*WM_COPYGLOBALDATA*/, MSGFLT_ADD, nullptr);
 #endif
+	DarkMode_ApplyToWindow(hwnd);
 
 	// File MRU
 	const int flags = MRUFlags_FilePath | (static_cast<int>(flagRelativeFileMRU) * MRUFlags_RelativePath) | (static_cast<int>(flagPortableMyDocs) * MRUFlags_PortableMyDocs);
@@ -2015,6 +2030,8 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 	GetWindowRect(hwndReBar, &rc);
 	cyReBar = rc.bottom - rc.top;
 	cyReBarFrame = bIsAppThemed ? 0 : 2;
+
+	DarkMode_ApplyToBars(hwnd, hwndToolbar, hwndReBar, hwndStatus);
 }
 
 void RecreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
@@ -2079,6 +2096,7 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	}
 	SetWindowExStyle(hwndEdit, dwExStyle);
 	SetWindowPos(hwndEdit, nullptr, 0, 0, 0, 0, SWP_NOZORDER | SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE);
+	DarkMode_ApplyToWindow(hwnd);
 
 	// recreate toolbar and statusbar
 	HINSTANCE hInstance = GetWindowInstance(hwnd);
@@ -2511,8 +2529,8 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 
 	CheckCmd(hmenu, IDM_VIEW_SHOW_FOLDING, bShowCodeFolding);
 	CheckCmd(hmenu, IDM_VIEW_USEDEFAULT_CODESTYLE, pLexCurrent->bUseDefaultCodeStyle);
-	i = IDM_VIEW_STYLE_THEME_DEFAULT + np2StyleTheme;
-	CheckMenuRadioItem(hmenu, IDM_VIEW_STYLE_THEME_DEFAULT, IDM_VIEW_STYLE_THEME_DARK, i, MF_BYCOMMAND);
+	i = (np2StyleThemeMode == StyleTheme_System) ? IDM_VIEW_STYLE_THEME_SYSTEM : IDM_VIEW_STYLE_THEME_LIGHT + np2StyleThemeMode;
+	CheckMenuRadioItem(hmenu, IDM_VIEW_STYLE_THEME_SYSTEM, IDM_VIEW_STYLE_THEME_DARK, i, MF_BYCOMMAND);
 
 	CheckCmd(hmenu, IDM_VIEW_WORDWRAP, fvCurFile.fWordWrap);
 	i = IDM_VIEW_FONTQUALITY_DEFAULT + iFontQuality;
@@ -3804,9 +3822,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		Style_ToggleUseDefaultCodeStyle();
 		break;
 
-	case IDM_VIEW_STYLE_THEME_DEFAULT:
+	case IDM_VIEW_STYLE_THEME_LIGHT:
 	case IDM_VIEW_STYLE_THEME_DARK:
-		Style_OnStyleThemeChanged(LOWORD(wParam) - IDM_VIEW_STYLE_THEME_DEFAULT);
+	case IDM_VIEW_STYLE_THEME_SYSTEM:
+		Style_OnStyleThemeChanged((LOWORD(wParam) == IDM_VIEW_STYLE_THEME_SYSTEM)
+			? StyleTheme_System : LOWORD(wParam) - IDM_VIEW_STYLE_THEME_LIGHT);
+		RefreshDarkModeUI(hwnd);
 		break;
 
 	case IDM_VIEW_DEFAULT_CODE_FONT:
@@ -4932,7 +4953,12 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDC_TOOLBAR:
 		switch (pnmh->code) {
+		case TBN_BEGINADJUST:
+			DarkMode_OnToolbarBeginAdjust();
+			break;
+
 		case TBN_ENDADJUST:
+			DarkMode_OnToolbarEndAdjust();
 			UpdateToolbar();
 			break;
 
@@ -7149,7 +7175,12 @@ bool FileSave(FileSaveFlag saveFlag) {
 			InstallFileWatching(false);
 			if (PathEqual(szCurFile, szIniFile)) {
 				LoadFlags();
+				const int oldStyleTheme = np2StyleTheme;
 				LoadSettings();
+				if (np2StyleTheme != oldStyleTheme) {
+					RefreshDarkModeUI(hwndMain);
+					Style_SetLexer(pLexCurrent, false);
+				}
 				if (bSaveRecentFiles) {
 					mruFile.Reload();
 				}
@@ -7157,10 +7188,10 @@ bool FileSave(FileSaveFlag saveFlag) {
 					mruFind.Reload();
 					mruReplace.Reload();
 				}
-				if (np2StyleTheme == StyleTheme_Default) {
+				if (np2StyleTheme == StyleTheme_Light) {
 					Style_LoadAll(static_cast<StyleLoadFlag>(StyleLoadFlag_Reload | StyleLoadFlag_Apply));
 				}
-			} else if (np2StyleTheme != StyleTheme_Default && PathEqual(szCurFile, darkStyleThemeFilePath)) {
+			} else if (np2StyleTheme != StyleTheme_Light && PathEqual(szCurFile, darkStyleThemeFilePath)) {
 				Style_LoadAll(static_cast<StyleLoadFlag>(StyleLoadFlag_Reload | StyleLoadFlag_Apply));
 			}
 		}
