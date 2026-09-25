@@ -5165,6 +5165,7 @@ void LoadSettings() noexcept {
 	bShowIndentGuides = section.GetBool(L"ShowIndentGuides", false);
 
 	autoCompletionConfig.bIndentText = section.GetBool(L"AutoIndent", true);
+	autoCompletionConfig.bIndentAfterMarkers = section.GetBool(L"AutoIndentAfterMarkers", true);
 	autoCompletionConfig.iCompleteOption = section.GetInt(L"AutoCompleteOption", AutoCompletionOption_Default);
 	iValue = section.GetInt(L"AutoCompleteScope", AutoCompleteScope_Default);
 	autoCompletionConfig.fCompleteScope = iValue & 15;
@@ -5466,6 +5467,7 @@ void SaveSettings(bool bSaveSettingsNow) noexcept {
 	section.SetBoolEx(L"ShowIndentGuides", bShowIndentGuides, false);
 
 	section.SetBoolEx(L"AutoIndent", autoCompletionConfig.bIndentText, true);
+	section.SetBoolEx(L"AutoIndentAfterMarkers", autoCompletionConfig.bIndentAfterMarkers, true);
 	section.SetIntEx(L"AutoCompleteOption", autoCompletionConfig.iCompleteOption, AutoCompletionOption_Default);
 	iValue = autoCompletionConfig.fCompleteScope | (autoCompletionConfig.fScanWordScope << 4);
 	section.SetIntEx(L"AutoCompleteScope", iValue, AutoCompleteScope_Default);
