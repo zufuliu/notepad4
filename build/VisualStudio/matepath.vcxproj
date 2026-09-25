@@ -206,7 +206,6 @@
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <MinimumRequiredVersion>6.00</MinimumRequiredVersion>
     </Link>
     <ResourceCompile>
@@ -221,7 +220,6 @@
       <MultiProcessorCompilation Condition="'$(VisualStudioVersion)'=='16.0'">false</MultiProcessorCompilation>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <MinimumRequiredVersion>6.00</MinimumRequiredVersion>
     </Link>
     <ResourceCompile>
@@ -333,7 +331,6 @@
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <MinimumRequiredVersion>6.00</MinimumRequiredVersion>
     </Link>
     <ResourceCompile>
@@ -348,7 +345,6 @@
       <MultiProcessorCompilation Condition="'$(VisualStudioVersion)'=='16.0'">false</MultiProcessorCompilation>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <MinimumRequiredVersion>6.00</MinimumRequiredVersion>
     </Link>
     <ResourceCompile>

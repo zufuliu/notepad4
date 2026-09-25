@@ -418,13 +418,8 @@ bool IsElevated() noexcept {
 bool ExeNameFromWnd(HWND hwnd, LPWSTR szExeName, DWORD cchExeName) noexcept {
 	DWORD dwProcessId;
 	GetWindowThreadProcessId(hwnd, &dwProcessId);
-#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 	HANDLE hProcess = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, dwProcessId);
 	QueryFullProcessImageName(hProcess, 0, szExeName, &cchExeName);
-#else
-	HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, dwProcessId);
-	GetModuleFileNameEx(hProcess, nullptr, szExeName, cchExeName);
-#endif
 	CloseHandle(hProcess);
 	return true;
 }
