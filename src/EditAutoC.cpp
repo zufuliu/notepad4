@@ -2243,9 +2243,9 @@ void EditAutoIndent() noexcept {
 			ch = static_cast<uint8_t>(pLineBuf[iPrevLineLength - 3]);
 			iIndentLen = 1;
 		}
-		if (ch == '{' || ch == '[' || ch == '(') {
+		if (autoCompletionConfig.bIndentAfterMarkers && (ch == '{' || ch == '[' || ch == '(')) {
 			indent = AutoIndentType_IndentAndClose;
-		} else if (ch == ':') { // case label/Python
+		} else if (autoCompletionConfig.bIndentAfterMarkers && ch == ':') { // case label/Python
 			indent = AutoIndentType_IndentOnly;
 		} else if (ch == '*' || ch == '!') { // indent block comment
 			iIndentLen = iPrevLineLength - (2 + iIndentLen);
