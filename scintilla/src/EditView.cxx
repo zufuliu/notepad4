@@ -1152,9 +1152,8 @@ void EditView::DrawEOL(Surface *surface, const EditModel &model, const ViewStyle
 
 	// Fill the virtual space and show selections within it
 	if (virtualSpace > 0.0f) {
-		PRectangle rcSegment = rcLine;
-		rcSegment.left = xEol + xStart;
-		rcSegment.right = xEol + xStart + virtualSpace;
+		const Interval intervalVirtual = Interval::FromLeftAndWidth(xEol + xStart, virtualSpace);
+		PRectangle rcSegment = rcLine.WithHorizontalBounds(intervalVirtual);
 		const ColourRGBA backgroundFill = background.value_or(vsDraw.styles[ll->LastStyle()].back);
 		surface->FillRectangleAligned(rcSegment, backgroundFill);
 		if (vsDraw.selection.visible && (vsDraw.selection.layer == Layer::Base)) {
@@ -1168,8 +1167,8 @@ void EditView::DrawEOL(Surface *surface, const EditModel &model, const ViewStyle
 						subLineStart + portion.start.VirtualSpaceWidth(spaceWidth);
 					rcSegment.right = xStart + ll->GetPosition(portion.end.Position() - posLineStart) -
 						subLineStart + portion.end.VirtualSpaceWidth(spaceWidth);
-					rcSegment.left = (rcSegment.left > rcLine.left) ? rcSegment.left : rcLine.left;
-					rcSegment.right = (rcSegment.right < rcLine.right) ? rcSegment.right : rcLine.right;
+					rcSegment.left = std::max(rcSegment.left, rcLine.left);
+					rcSegment.right = std::min(rcSegment.right, rcLine.right);
 					surface->FillRectangleAligned(rcSegment, Fill(
 						SelectionBackground(model, vsDraw, model.sel.RangeType(r)).Opaque()));
 				}
@@ -2294,7 +2293,7 @@ void EditView::DrawForeground(Surface *surface, const EditModel &model, const Vi
 	const XYPOSITION xStartVisible = -horizontalOffset;
 
 	// When lineHeight is odd, dotted indent guides are drawn offset by 1 on odd lines to join together.
-	const bool offsetGuide = (lineVisible & 1) && (vsDraw.lineHeight & 1);
+	const bool offsetGuide = (lineVisible & 1) & (vsDraw.lineHeight & 1);
 
 	// Same baseline used for all text
 	const XYPOSITION ybase = rcLine.top + vsDraw.maxAscent;
@@ -2518,7 +2517,8 @@ void EditView::DrawIndentGuidesOverEmpty(Surface *surface, const EditModel &mode
 		constexpr Sci::Line maxCheck = 20;
 
 		Sci::Line lineLastWithText = line;
-		while (lineLastWithText > std::max(line - maxCheck, static_cast<Sci::Line>(0)) && model.pdoc->IsWhiteLine(lineLastWithText)) {
+		const Sci::Line before = std::max(line - maxCheck, static_cast<Sci::Line>(0));
+		while (lineLastWithText > before && model.pdoc->IsWhiteLine(lineLastWithText)) {
 			lineLastWithText--;
 		}
 		if (lineLastWithText < line) {
@@ -2541,7 +2541,8 @@ void EditView::DrawIndentGuidesOverEmpty(Surface *surface, const EditModel &mode
 		}
 
 		Sci::Line lineNextWithText = line;
-		while (lineNextWithText < std::min(line + maxCheck, model.pdoc->LinesTotal()) && model.pdoc->IsWhiteLine(lineNextWithText)) {
+		const Sci::Line after = std::min(line + maxCheck, model.pdoc->LinesTotal());
+		while (lineNextWithText < after && model.pdoc->IsWhiteLine(lineNextWithText)) {
 			lineNextWithText++;
 		}
 		if (lineNextWithText > line) {
@@ -2551,8 +2552,9 @@ void EditView::DrawIndentGuidesOverEmpty(Surface *surface, const EditModel &mode
 				model.pdoc->GetLineIndentation(lineNextWithText));
 		}
 
-		const bool offsetGuide = (lineVisible & 1) && (vsDraw.lineHeight & 1);
-		for (int indentPos = model.pdoc->IndentSize(); indentPos < indentSpace; indentPos += model.pdoc->IndentSize()) {
+		const bool offsetGuide = (lineVisible & 1) & (vsDraw.lineHeight & 1);
+		const int indentationStep = model.pdoc->IndentSize();
+		for (int indentPos = indentationStep; indentPos < indentSpace; indentPos += indentationStep) {
 			const XYPOSITION xIndent = std::floor(indentPos * vsDraw.aveCharWidth);
 			if (xIndent < xStartText) {
 				DrawIndentGuide(surface, xIndent + xStart, rcLine,	ll->xHighlightGuide == xIndent, offsetGuide);

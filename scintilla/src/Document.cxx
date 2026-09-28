@@ -1709,6 +1709,10 @@ Sci::Position Document::GetColumn(Sci::Position pos, Sci::Line line) const noexc
 			i++;
 		} else {
 			i = NextPosition(i, 1);
+			if (i > pos) {
+				// For pos inside multibyte character report column before
+				return column;
+			}
 			column++;
 		}
 	}

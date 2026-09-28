@@ -22,7 +22,7 @@
 
 namespace Scintilla::Internal {
 
-typedef double XYPOSITION;
+using XYPOSITION = double;
 
 // https://secret.club/2021/04/09/std-clamp.html
 // https://bugs.llvm.org/show_bug.cgi?id=49909
@@ -83,16 +83,16 @@ public:
 	constexpr bool operator==(const Interval &other) const noexcept {
 		return (left == other.left) && (right == other.right);
 	}
-	constexpr XYPOSITION Width() const noexcept {
+	[[nodiscard]] constexpr XYPOSITION Width() const noexcept {
 		return right - left;
 	}
-	constexpr bool Empty() const noexcept {
+	[[nodiscard]] constexpr bool Empty() const noexcept {
 		return Width() <= 0;
 	}
-	constexpr bool Intersects(Interval other) const noexcept {
+	[[nodiscard]] constexpr bool Intersects(Interval other) const noexcept {
 		return (right > other.left) && (left < other.right);
 	}
-	constexpr Interval Offset(XYPOSITION offset) const noexcept {
+	[[nodiscard]] constexpr Interval Offset(XYPOSITION offset) const noexcept {
 		return {left + offset, right + offset};
 	}
 	[[nodiscard]] static constexpr Interval FromLeftAndWidth(XYPOSITION left_, XYPOSITION width) {
@@ -135,24 +135,24 @@ public:
 		return PRectangle(left / divisor, top / divisor, right / divisor, bottom / divisor);
 	}
 
-	constexpr bool Contains(Point pt) const noexcept {
+	[[nodiscard]] constexpr bool Contains(Point pt) const noexcept {
 		return (pt.x >= left) && (pt.x <= right) &&
 			(pt.y >= top) && (pt.y <= bottom);
 	}
-	constexpr bool ContainsWholePixel(Point pt) const noexcept {
+	[[nodiscard]] constexpr bool ContainsWholePixel(Point pt) const noexcept {
 		// Does the rectangle contain all of the pixel to left/below the point
 		return (pt.x >= left) && ((pt.x + 1) <= right) &&
 			(pt.y >= top) && ((pt.y + 1) <= bottom);
 	}
-	constexpr bool Contains(PRectangle rc) const noexcept {
+	[[nodiscard]] constexpr bool Contains(PRectangle rc) const noexcept {
 		return (rc.left >= left) && (rc.right <= right) &&
 			(rc.top >= top) && (rc.bottom <= bottom);
 	}
-	constexpr bool Intersects(PRectangle other) const noexcept {
+	[[nodiscard]] constexpr bool Intersects(PRectangle other) const noexcept {
 		return (right > other.left) && (left < other.right) &&
 			(bottom > other.top) && (top < other.bottom);
 	}
-	constexpr bool Intersects(Interval horizontalBounds) const noexcept {
+	[[nodiscard]] constexpr bool Intersects(Interval horizontalBounds) const noexcept {
 		return (right > horizontalBounds.left) && (left < horizontalBounds.right);
 	}
 
@@ -163,42 +163,42 @@ public:
 		bottom += yDelta;
 	}
 
-	constexpr PRectangle Inflate(XYPOSITION xDelta, XYPOSITION yDelta) const noexcept {
+	[[nodiscard]] constexpr PRectangle Inflate(XYPOSITION xDelta, XYPOSITION yDelta) const noexcept {
 		return PRectangle(left - xDelta, top - yDelta, right + xDelta, bottom + yDelta);
 	}
-	constexpr PRectangle Inflate(int xDelta, int yDelta) const noexcept {
+	[[nodiscard]] constexpr PRectangle Inflate(int xDelta, int yDelta) const noexcept {
 		return PRectangle(left - xDelta, top - yDelta, right + xDelta, bottom + yDelta);
 	}
-	constexpr PRectangle Deflate(XYPOSITION xDelta, XYPOSITION yDelta) const noexcept {
+	[[nodiscard]] constexpr PRectangle Deflate(XYPOSITION xDelta, XYPOSITION yDelta) const noexcept {
 		return Inflate(-xDelta, -yDelta);
 	}
-	constexpr PRectangle Deflate(int xDelta, int yDelta) const noexcept {
+	[[nodiscard]] constexpr PRectangle Deflate(int xDelta, int yDelta) const noexcept {
 		return Inflate(-xDelta, -yDelta);
 	}
 
-	PRectangle WithHorizontalBounds(Interval horizontal) const noexcept {
+	[[nodiscard]] PRectangle WithHorizontalBounds(Interval horizontal) const noexcept {
 		return PRectangle(horizontal.left, top, horizontal.right, bottom);
 	}
 
-	constexpr PRectangle Inset(XYPOSITION delta) const noexcept {
+	[[nodiscard]] constexpr PRectangle Inset(XYPOSITION delta) const noexcept {
 		return PRectangle(left + delta, top + delta, right - delta, bottom - delta);
 	}
 
-	constexpr PRectangle Inset(Point delta) const noexcept {
+	[[nodiscard]] constexpr PRectangle Inset(Point delta) const noexcept {
 		return PRectangle(left + delta.x, top + delta.y, right - delta.x, bottom - delta.y);
 	}
 
-	constexpr Point Centre() const noexcept {
+	[[nodiscard]] constexpr Point Centre() const noexcept {
 		return Point((left + right) / 2, (top + bottom) / 2);
 	}
 
-	constexpr XYPOSITION Width() const noexcept {
+	[[nodiscard]] constexpr XYPOSITION Width() const noexcept {
 		return right - left;
 	}
-	constexpr XYPOSITION Height() const noexcept {
+	[[nodiscard]] constexpr XYPOSITION Height() const noexcept {
 		return bottom - top;
 	}
-	constexpr bool Empty() const noexcept {
+	[[nodiscard]] constexpr bool Empty() const noexcept {
 		return (Height() <= 0) || (Width() <= 0);
 	}
 };
@@ -255,47 +255,47 @@ public:
 		return ColourRGBA(static_cast<unsigned int>(co_) | (maximumByte << 24));
 	}
 
-	constexpr ColourRGBA WithoutAlpha() const noexcept {
+	[[nodiscard]] constexpr ColourRGBA WithoutAlpha() const noexcept {
 		return ColourRGBA(co & rgbMask);
 	}
 
-	constexpr ColourRGBA Opaque() const noexcept {
+	[[nodiscard]] constexpr ColourRGBA Opaque() const noexcept {
 		return ColourRGBA(co | (maximumByte << 24));
 	}
 
-	constexpr unsigned int AsInteger() const noexcept {
+	[[nodiscard]] constexpr unsigned int AsInteger() const noexcept {
 		return co;
 	}
 
-	constexpr unsigned int OpaqueRGB() const noexcept {
+	[[nodiscard]] constexpr unsigned int OpaqueRGB() const noexcept {
 		return co & rgbMask;
 	}
 
 	// Red, green, blue and alpha values as bytes 0..255
-	constexpr unsigned char GetRed() const noexcept {
+	[[nodiscard]] constexpr unsigned char GetRed() const noexcept {
 		return co & maximumByte;
 	}
-	constexpr unsigned char GetGreen() const noexcept {
+	[[nodiscard]] constexpr unsigned char GetGreen() const noexcept {
 		return (co >> 8) & maximumByte;
 	}
-	constexpr unsigned char GetBlue() const noexcept {
+	[[nodiscard]] constexpr unsigned char GetBlue() const noexcept {
 		return (co >> 16) & maximumByte;
 	}
-	constexpr unsigned char GetAlpha() const noexcept {
+	[[nodiscard]] constexpr unsigned char GetAlpha() const noexcept {
 		return co >> 24;
 	}
 
 	// Red, green, blue, and alpha values as float 0..1.0
-	constexpr float GetRedComponent() const noexcept {
+	[[nodiscard]] constexpr float GetRedComponent() const noexcept {
 		return ComponentAsFloat(GetRed());
 	}
-	constexpr float GetGreenComponent() const noexcept {
+	[[nodiscard]] constexpr float GetGreenComponent() const noexcept {
 		return ComponentAsFloat(GetGreen());
 	}
-	constexpr float GetBlueComponent() const noexcept {
+	[[nodiscard]] constexpr float GetBlueComponent() const noexcept {
 		return ComponentAsFloat(GetBlue());
 	}
-	constexpr float GetAlphaComponent() const noexcept {
+	[[nodiscard]] constexpr float GetAlphaComponent() const noexcept {
 		return ComponentAsFloat(GetAlpha());
 	}
 
@@ -306,11 +306,11 @@ public:
 		return co != other.co;
 	}
 
-	constexpr bool IsOpaque() const noexcept {
+	[[nodiscard]] constexpr bool IsOpaque() const noexcept {
 		return co >= 0xff000000U;
 	}
 
-	constexpr ColourRGBA MixedWith(ColourRGBA other) const noexcept {
+	[[nodiscard]] constexpr ColourRGBA MixedWith(ColourRGBA other) const noexcept {
 		const unsigned int red = (GetRed() + other.GetRed()) / 2;
 		const unsigned int green = (GetGreen() + other.GetGreen()) / 2;
 		const unsigned int blue = (GetBlue() + other.GetBlue()) / 2;
@@ -320,7 +320,7 @@ public:
 
 #if 0
 	static constexpr unsigned int Mixed(unsigned char a, unsigned char b, double proportion) noexcept {
-		return static_cast<unsigned int>(a + proportion * (b - a));
+		return static_cast<unsigned int>(a + (proportion * (b - a)));
 	}
 
 	constexpr ColourRGBA MixedWith(ColourRGBA other, double proportion) const noexcept {
@@ -361,7 +361,7 @@ public:
 	XYPOSITION width;
 	constexpr explicit Stroke(ColourRGBA colour_, XYPOSITION width_ = 1.0) noexcept :
 		colour(colour_), width(width_) {}
-	constexpr float WidthF() const noexcept {
+	[[nodiscard]] constexpr float WidthF() const noexcept {
 		return static_cast<float>(width);
 	}
 };
@@ -372,6 +372,8 @@ public:
 class Fill final {
 public:
 	ColourRGBA colour;
+	// Not explicit as used very often from simple contexts so would just be noise.
+	// NOLINTNEXTLINE(misc-explicit-constructor)
 	constexpr Fill(ColourRGBA colour_) noexcept :
 		colour(colour_) {}
 };

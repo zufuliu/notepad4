@@ -4307,7 +4307,7 @@ void EditJumpTo(Sci_Line iNewLine, Sci_Position iNewCol, unsigned type) noexcept
 		iNewCol = SciCall_GetLength();
 	} else {
 		iNewLine = iNewLine? iNewLine - 1 : iNewLine;
-		if (iNewCol < 0) { // treat negative column as no tab expanding
+		if (iNewCol < 0) { // treat negative column as no tab expansion
 			type = SC_COLUMN_CHARACTER;
 			iNewCol = -iNewCol - 1;
 		} else {
