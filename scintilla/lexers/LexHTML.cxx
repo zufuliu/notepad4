@@ -447,19 +447,6 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 		// decide what is the current state to print (depending on the script tag)
 		StateToPrint = statePrintForState(state, inScriptType);
 
-		// handle script folding
-		if (fold) {
-			if (scriptLanguage == eScriptJS) {
-				if (!AnyOf(state, SCE_HJ_COMMENTLINE, SCE_HJ_COMMENT, SCE_HJ_COMMENTDOC, SCE_HJ_DOUBLESTRING, SCE_HJ_SINGLESTRING, SCE_HJ_REGEX, SCE_HJ_TEMPLATELITERAL)) {
-					if (ch == '{' || ch == '[' || ch == '(') {
-						levelCurrent++;
-					} else if (ch == '}' || ch == ']' || ch == ')') {
-						levelCurrent--;
-					}
-				}
-			}
-		}
-
 		if ((ch == '\r' && chNext != '\n') || (ch == '\n')) {
 			// Trigger on CR only (Mac style) or either on LF from CR+LF (Dos/Win) or on LF alone (Unix)
 			// Avoid triggering two times on Dos/Win
@@ -1031,49 +1018,9 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 		case SCE_HJ_DEFAULT:
 		case SCE_HJ_START:
 		case SCE_HJ_SYMBOLS:
-			if (IsNumberStart(ch, chNext)) {
+			if (ch > ' ' || (state == SCE_HJ_START && AnyOf(ch, ' ', '\t'))) {
 				styler.ColorTo(i, StateToPrint);
-				state = SCE_HJ_NUMBER;
-			} else if (IsJsIdentifierStart(ch)) {
-				styler.ColorTo(i, StateToPrint);
-				state = SCE_HJ_WORD;
-			} else if (ch == '/' && chNext == '*') {
-				styler.ColorTo(i, StateToPrint);
-				i++;
-				levelCurrent++;
-				state = (chNext2 == '*') ? SCE_HJ_COMMENTDOC : SCE_HJ_COMMENT;
-			} else if (ch == '/' && chNext == '/') {
-				styler.ColorTo(i, StateToPrint);
-				state = SCE_HJ_COMMENTLINE;
-			} else if (ch == '/' && IsOKBeforeJSRE(chPrevNonWhite)) {
-				styler.ColorTo(i, StateToPrint);
-				state = SCE_HJ_REGEX;
-			} else if (ch == '\"') {
-				styler.ColorTo(i, StateToPrint);
-				state = SCE_HJ_DOUBLESTRING;
-			} else if (ch == '\'') {
-				styler.ColorTo(i, StateToPrint);
-				state = SCE_HJ_SINGLESTRING;
-			} else if (ch == '`') {
-				styler.ColorTo(i, StateToPrint);
-				state = SCE_HJ_TEMPLATELITERAL;
-			} else if ((ch == '<') && (chNext == '!') && (chNext2 == '-') &&
-			           styler.SafeGetCharAt(i + 3) == '-') {
-				styler.ColorTo(i, StateToPrint);
-				state = SCE_HJ_COMMENTLINE;
-			} else if ((ch == '-') && (chNext == '-') && (chNext2 == '>')) {
-				styler.ColorTo(i, StateToPrint);
-				state = SCE_HJ_COMMENTLINE;
-				i += 2;
-			} else if (isoperator(ch)) {
-				styler.ColorTo(i, StateToPrint);
-				styler.ColorTo(i + 1, statePrintForState(SCE_HJ_SYMBOLS, inScriptType));
 				state = SCE_HJ_DEFAULT;
-			} else if ((ch == ' ') || (ch == '\t')) {
-				if (state == SCE_HJ_START) {
-					styler.ColorTo(i, StateToPrint);
-					state = SCE_HJ_DEFAULT;
-				}
 			}
 			break;
 		case SCE_HJ_WORD:
@@ -1155,31 +1102,9 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 		case SCE_HB_DEFAULT:
 		case SCE_HB_START:
 		case SCE_HB_OPERATOR:
-			if (IsNumberStart(ch, chNext)) {
+			if (ch > ' ' || (state == SCE_HJ_START && AnyOf(ch, ' ', '\t'))) {
 				styler.ColorTo(i, StateToPrint);
-				state = SCE_HB_NUMBER;
-			} else if (IsIdentifierStartEx(ch)) {
-				styler.ColorTo(i, StateToPrint);
-				state = SCE_HB_WORD;
-			} else if (ch == '\'') {
-				styler.ColorTo(i, StateToPrint);
-				state = SCE_HB_COMMENTLINE;
-			} else if (ch == '\"') {
-				styler.ColorTo(i, StateToPrint);
-				state = SCE_HB_STRING;
-			} else if ((ch == '<') && (chNext == '!') && (chNext2 == '-') &&
-			           styler.SafeGetCharAt(i + 3) == '-') {
-				styler.ColorTo(i, StateToPrint);
-				state = SCE_HB_COMMENTLINE;
-			} else if (isoperator(ch)) {
-				styler.ColorTo(i, StateToPrint);
-				styler.ColorTo(i + 1, statePrintForState(SCE_HB_OPERATOR, inScriptType));
 				state = SCE_HB_DEFAULT;
-			} else if ((ch == ' ') || (ch == '\t')) {
-				if (state == SCE_HB_START) {
-					styler.ColorTo(i, StateToPrint);
-					state = SCE_HB_DEFAULT;
-				}
 			}
 			break;
 		case SCE_HB_WORD:
@@ -1222,37 +1147,52 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 
 		// Some of the above terminated their lexeme
 
-		if (state == SCE_HB_DEFAULT) {    // One of the above succeeded
-			if (ch == '\"') {
-				state = SCE_HB_STRING;
-			} else if (ch == '\'') {
-				state = SCE_HB_COMMENTLINE;
-			} else if (IsIdentifierStart(ch)) {
-				state = SCE_HB_WORD;
-			} else if (isoperator(ch)) {
-				styler.ColorTo(i + 1, statePrintForState(SCE_HB_OPERATOR, inScriptType));
-			}
-		} else if (state == SCE_HJ_DEFAULT) {    // One of the above succeeded
+		if (state == SCE_HJ_DEFAULT) {    // One of the above succeeded
 			if (ch == '/' && chNext == '*') {
 				i++;
 				levelCurrent++;
 				state = (chNext2 == '*') ? SCE_HJ_COMMENTDOC : SCE_HJ_COMMENT;
 			} else if (ch == '/' && chNext == '/') {
 				state = SCE_HJ_COMMENTLINE;
+			} else if (ch == '/' && IsOKBeforeJSRE(chPrevNonWhite)) {
+				state = SCE_HJ_REGEX;
 			} else if (ch == '\"') {
 				state = SCE_HJ_DOUBLESTRING;
 			} else if (ch == '\'') {
 				state = SCE_HJ_SINGLESTRING;
 			} else if (ch == '`') {
 				state = SCE_HJ_TEMPLATELITERAL;
+			} else if (IsNumberStart(ch, chNext)) {
+				state = SCE_HJ_NUMBER;
 			} else if (IsJsIdentifierStart(ch)) {
 				state = SCE_HJ_WORD;
-			} else if ((ch == '-') && (chNext == '-') && (chNext2 == '>')) {
-				styler.ColorTo(i, StateToPrint);
+			} else if ((ch == '<') && (chNext == '!') && (chNext2 == '-') && styler.SafeGetCharAt(i + 3) == '-') {
 				state = SCE_HJ_COMMENTLINE;
-				i += 2;
+			} else if ((ch == '-') && (chNext == '-') && (chNext2 == '>')) {
+				state = SCE_HJ_COMMENTLINE;
 			} else if (isoperator(ch)) {
+				if (ch == '{' || ch == '[' || ch == '(') {
+					levelCurrent++;
+				} else if (ch == '}' || ch == ']' || ch == ')') {
+					levelCurrent--;
+				}
 				styler.ColorTo(i + 1, statePrintForState(SCE_HJ_SYMBOLS, inScriptType));
+			}
+		} else if (state == SCE_HB_DEFAULT) {    // One of the above succeeded
+			if (ch == '\"') {
+				state = SCE_HB_STRING;
+			} else if (ch == '\'') {
+				state = SCE_HB_COMMENTLINE;
+			} if (IsNumberStart(ch, chNext)) {
+				state = SCE_HB_NUMBER;
+			} else if (IsIdentifierStartEx(ch)) {
+				state = SCE_HB_WORD;
+			} else if ((ch == '<') && (chNext == '!') && (chNext2 == '-') && styler.SafeGetCharAt(i + 3) == '-') {
+				state = SCE_HB_COMMENTLINE;
+			} else if ((ch == '-') && (chNext == '-') && (chNext2 == '>')) {
+				state = SCE_HB_COMMENTLINE;
+			} else if (isoperator(ch)) {
+				styler.ColorTo(i + 1, statePrintForState(SCE_HB_OPERATOR, inScriptType));
 			}
 		}
 	}
