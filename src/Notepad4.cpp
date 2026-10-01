@@ -8111,15 +8111,14 @@ void AutoSave_DoWork(FileSaveFlag saveFlag) noexcept {
 	}
 
 	WCHAR tchPath[MAX_PATH + 40];
-	LPCWSTR extension = L"bak";
+	LPCWSTR extension = L".bak";
 	if (Untitled) {
 		lstrcpy(tchPath, L"Untitled");
 	} else {
 		lstrcpy(tchPath, szCurFile);
 		LPWSTR lpszExt = StrChr(tchPath, L'.'); // address for first file extension
 		if (lpszExt) {
-			lpszExt[0] = L'\0';
-			extension = lpszExt + 1;
+			extension = lpszExt;
 		}
 	}
 
@@ -8130,10 +8129,14 @@ void AutoSave_DoWork(FileSaveFlag saveFlag) noexcept {
 	SYSTEMTIME lt;
 	GetLocalTime(&lt);
 	//printf("%u AutoSave at %02d:%02d:%02d.%03d\n", pid, lt.wHour, lt.wMinute, lt.wSecond, lt.wMilliseconds);
-	wsprintf(suffix, L" %04d%02d%02d %02d%02d%02d %03d%u.%s",
+	wsprintf(suffix, L" %04d%02d%02d %02d%02d%02d %03d%u%s",
 		lt.wYear, lt.wMonth, lt.wDay,
 		lt.wHour, lt.wMinute, lt.wSecond,
 		lt.wMilliseconds, pid, extension);
+	if (saveFlag == FileSaveFlag_SaveAlways) { // omit millisecond & pid for save backup
+		LPWSTR lpsz = StrRChr(suffix, nullptr, L' ');
+		lstrcpy(lpsz, extension);
+	}
 	lstrcat(tchPath, suffix);
 
 	// TODO: check free space with GetDiskFreeSpaceExW()
