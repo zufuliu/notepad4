@@ -2707,6 +2707,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		if (StrNotEmpty(szCurFile)) {
 			EditFileIOStatus status{};
 			EditSaveFile(szCurFile, FileSaveFlag_OriginalTimestamp | FileSaveFlag_UpdateTimestamp, status);
+			InstallFileWatching(false);
 		}
 		break;
 
@@ -7869,6 +7870,7 @@ void ShowNotificationMessage(WPARAM notifyPos, UINT uidMessage, ...) noexcept {
 // InstallFileWatching()
 //
 //
+NP2_noinline
 void InstallFileWatching(bool terminate) noexcept {
 	terminate = terminate || iFileWatchingMode == FileWatchingMode_None || StrIsEmpty(szCurFile);
 	// Terminate
