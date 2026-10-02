@@ -1005,7 +1005,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 		case SCE_HJ_DEFAULT:
 		case SCE_HJ_START:
 		case SCE_HJ_SYMBOLS:
-			if (ch > ' ' || (state == SCE_HJ_START && AnyOf(ch, ' ', '\t'))) {
+			if (ch > ' ') {
 				styler.ColorTo(i, StateToPrint);
 				state = SCE_HJ_DEFAULT;
 			}
@@ -1051,17 +1051,8 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			} else if (state != SCE_HJ_TEMPLATELITERAL && IsEOLChar(ch)) {
 				styler.ColorTo(i, StateToPrint);
 				if (chPrev != '\\' && (chPrev2 != '\\' || chPrev != '\r' || ch != '\n')) {
-					state = SCE_HJ_STRINGEOL;
+					state = SCE_HJ_DEFAULT;
 				}
-			}
-			break;
-		case SCE_HJ_STRINGEOL:
-			if (!IsEOLChar(ch)) {
-				styler.ColorTo(i, StateToPrint);
-				state = SCE_HJ_DEFAULT;
-			} else if (!IsEOLChar(chNext)) {
-				styler.ColorTo(i + 1, StateToPrint);
-				state = SCE_HJ_DEFAULT;
 			}
 			break;
 		case SCE_HJ_REGEX:
@@ -1089,7 +1080,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 		case SCE_HB_DEFAULT:
 		case SCE_HB_START:
 		case SCE_HB_OPERATOR:
-			if (ch > ' ' || (state == SCE_HJ_START && AnyOf(ch, ' ', '\t'))) {
+			if (ch > ' ') {
 				styler.ColorTo(i, StateToPrint);
 				state = SCE_HB_DEFAULT;
 			}
@@ -1112,21 +1103,12 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				continue;
 			} else if (IsEOLChar(ch)) {
 				styler.ColorTo(i, StateToPrint);
-				state = SCE_HB_STRINGEOL;
+				state = SCE_HB_DEFAULT;
 			}
 			break;
 		case SCE_HB_COMMENTLINE:
 			if (IsEOLChar(ch)) {
 				styler.ColorTo(i, StateToPrint);
-				state = SCE_HB_DEFAULT;
-			}
-			break;
-		case SCE_HB_STRINGEOL:
-			if (!IsEOLChar(ch)) {
-				styler.ColorTo(i, StateToPrint);
-				state = SCE_HB_DEFAULT;
-			} else if (!IsEOLChar(chNext)) {
-				styler.ColorTo(i + 1, StateToPrint);
 				state = SCE_HB_DEFAULT;
 			}
 			break;
