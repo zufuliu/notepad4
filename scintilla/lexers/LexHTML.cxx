@@ -43,7 +43,7 @@ enum {
 #define SCE_HA_JS (SCE_HJA_START - SCE_HJ_START)
 #define SCE_HA_VBS (SCE_HBA_START - SCE_HB_START)
 
-enum script_type { eScriptNone = 0, eScriptJS, eScriptVBS, eScriptXML, eScriptSGML, eScriptSGMLblock, eScriptComment };
+enum script_type { eScriptNone = 0, eScriptJS, eScriptVBS, eScriptXML, eScriptSGML, eScriptSGMLblock, };
 enum script_mode { eHtml = 0, eNonHtmlScript, eNonHtmlPreProc, eNonHtmlScriptPreProc };
 
 // Put an upper limit to bound time taken for unexpected text.
@@ -224,7 +224,7 @@ int classifyTagHTML(Sci_PositionU end, LexerWordList keywordLists, LexAccessor &
 		styler.ColorTo(end, chAttr);
 	}
 	if (chAttr == SCE_H_TAG && !customElement) {
-		if (allowScripts && StrEqual(tag, "script")) {
+		if (s[1] != '/' && allowScripts && StrEqual(tag, "script")) {
 			// check to see if this is a self-closing tag by sniffing ahead
 			bool isSelfClose = false;
 			for (Sci_PositionU cPos = end; cPos < end + maxLengthCheck; cPos++) {
@@ -240,9 +240,6 @@ int classifyTagHTML(Sci_PositionU end, LexerWordList keywordLists, LexAccessor &
 			// do not enter a script state if the tag self-closed
 			if (!isSelfClose)
 				chAttr = SCE_H_SCRIPT;
-		} else if (!isXml && StrEqual(tag, "comment")) {
-			// IE only comment tag
-			chAttr = SCE_H_COMMENT;
 		}
 	}
 	return chAttr;
@@ -283,8 +280,6 @@ constexpr int StateForScript(script_type scriptLanguage) noexcept {
 		return SCE_H_TAGUNKNOWN;
 	case eScriptSGML:
 		return SCE_H_SGML_DEFAULT;
-	case eScriptComment:
-		return SCE_H_COMMENT;
 	default :
 		return SCE_HJ_START;
 	}
@@ -376,10 +371,6 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 	int sgmlBlockLevel = (lineState >> 21);
 
 	script_type scriptLanguage = ScriptOfState(state);
-	// If eNonHtmlScript coincides with SCE_H_COMMENT, assume eScriptComment
-	if (inScriptType == eNonHtmlScript && state == SCE_H_COMMENT) {
-		scriptLanguage = eScriptComment;
-	}
 	script_type beforeLanguage = ScriptOfState(beforePreProc);
 
 	// property fold.html
@@ -484,19 +475,16 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			//case SCE_HJ_COMMENTLINE: // removed as this is a common thing done to hide
 			// the end of script marker from some JS interpreters.
 			//case SCE_HB_COMMENTLINE:
-			case SCE_HBA_COMMENTLINE:
 			case SCE_HJ_DOUBLESTRING:
 			case SCE_HJ_SINGLESTRING:
 			case SCE_HJ_TEMPLATELITERAL:
 			case SCE_HJ_REGEX:
 			case SCE_HB_STRING:
-			case SCE_HBA_STRING:
 				break;
 			default :
 				// check if the closing tag is a script tag
 				{
-					const bool match = (state == SCE_HJ_COMMENTLINE || state == SCE_HB_COMMENTLINE || isXml) ? styler.MatchLowerCase(i + 2, "script")
-						: ((state == SCE_H_COMMENT) ? styler.MatchLowerCase(i + 2, "comment") : true);
+					const bool match = (state == SCE_HJ_COMMENTLINE || state == SCE_HB_COMMENTLINE)? styler.MatchLowerCase(i + 2, "script") : true;
 					if (!match) {
 						break;
 					}
@@ -790,7 +778,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			}
 			break;
 		case SCE_H_COMMENT:
-			if ((scriptLanguage != eScriptComment) && (chPrev2 == '-') && (chPrev == '-') && (ch == '>' || (!isXml && ch == '!' && chNext == '>'))) {
+			if ((chPrev2 == '-') && (chPrev == '-') && (ch == '>' || (!isXml && ch == '!' && chNext == '>'))) {
 				// close HTML comment with --!>
 				// https://html.spec.whatwg.org/multipage/parsing.html#parse-error-incorrectly-closed-comment
 				if (ch == '!') {
@@ -838,10 +826,10 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 		case SCE_H_TAGUNKNOWN:
 			if (!IsTagContinue(ch) && !((ch == '/') && (chPrev == '<'))) {
 				int eClass = classifyTagHTML(i, keywordLists, styler, tagDontFold, isXml, allowScripts);
-				if (eClass == SCE_H_SCRIPT || eClass == SCE_H_COMMENT) {
+				if (eClass == SCE_H_SCRIPT) {
 					if (!tagClosing) {
 						inScriptType = eNonHtmlScript;
-						scriptLanguage = (eClass == SCE_H_SCRIPT) ? clientScript : eScriptComment;
+						scriptLanguage = clientScript;
 					} else {
 						scriptLanguage = eScriptNone;
 					}
