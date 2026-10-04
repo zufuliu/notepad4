@@ -478,7 +478,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			default :
 				// check if the closing tag is a script tag
 				{
-					const bool match = (state == SCE_HJ_COMMENTLINE || state == SCE_HB_COMMENTLINE)? styler.MatchLowerCase(i + 2, "script") : true;
+					const bool match = styler.MatchLowerCase(i + 2, "script");
 					if (!match) {
 						break;
 					}

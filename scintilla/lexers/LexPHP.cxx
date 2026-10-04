@@ -269,7 +269,8 @@ bool PHPLexer::HandleBlockEnd(HtmlTextBlock block) {
 		return true;
 	}
 
-	const bool match = (sc.state == js_style(SCE_JS_COMMENTLINE))? sc.styler.MatchLowerCase(sc.currentPos + 2, "script") : true;
+	const char *tag = (block == HtmlTextBlock::Script)? "script" : "style";
+	const bool match = sc.styler.MatchLowerCase(sc.currentPos + 2, tag);
 	if (match) {
 		kwType = KeywordType::None;
 		tagType = HtmlTagType::None;
