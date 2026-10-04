@@ -251,13 +251,17 @@ void PHPLexer::ClassifyHtmlTag(LexerWordList keywordLists) {
 bool PHPLexer::HandleBlockEnd(HtmlTextBlock block) {
 	if (block == HtmlTextBlock::PHP) {
 		kwType = KeywordType::None;
-		const int outer = nestedState.empty() ? SCE_H_DEFAULT : nestedState.back().state;
-		lineStateLineType = nestedState.empty() ? 0 : LineStateNestedStateLine;
-		while (!nestedState.empty()) {
-			if (nestedState.back().type == VariableType::JavaScript) {
-				break;
-			}
-			nestedState.pop_back();
+		int outer = SCE_H_DEFAULT;
+		lineStateLineType &= LineStateNestedStateLine;
+		if (!nestedState.empty() && nestedState.back().type != VariableType::JavaScript) {
+			lineStateLineType = LineStateNestedStateLine;
+			outer = nestedState.back().state;
+			do {
+				if (nestedState.back().type == VariableType::JavaScript) {
+					break;
+				}
+				nestedState.pop_back();
+			} while (!nestedState.empty());
 		}
 		sc.SetState(SCE_H_QUESTION);
 		sc.Forward();
@@ -273,8 +277,11 @@ bool PHPLexer::HandleBlockEnd(HtmlTextBlock block) {
 		propertyValue = 0;
 		parenCount = 0;
 		selectorLevel = 0;
-		lineStateLineType = nestedState.empty() ? 0 : LineStateNestedStateLine;
-		nestedState.clear();
+		lineStateLineType &= LineStateNestedStateLine;
+		if (!nestedState.empty()) {
+			lineStateLineType = LineStateNestedStateLine;
+			nestedState.clear();
+		}
 		sc.SetState(SCE_H_TAG);
 		sc.Forward();
 		return true;
