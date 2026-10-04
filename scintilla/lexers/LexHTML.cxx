@@ -45,6 +45,7 @@ enum {
 
 enum script_type { eScriptNone = 0, eScriptJS, eScriptVBS, eScriptXML, eScriptSGML, eScriptSGMLblock, };
 enum script_mode { eHtml = 0, eNonHtmlScript, eNonHtmlPreProc, eNonHtmlScriptPreProc };
+enum class TagState { None = 0, Close = -1, Open = 1 };
 
 // Put an upper limit to bound time taken for unexpected text.
 constexpr Sci_PositionU maxLengthCheck = 200;
@@ -363,13 +364,12 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 		lineState |= styler.GetPropertyInt("asp.default.language", eScriptJS) << 4;
 	}
 	script_mode inScriptType = static_cast<script_mode>((lineState >> 0) & 0x03); // 2 bits of scripting mode
-	bool tagOpened = (lineState >> 2) & 0x01; // 1 bit to know if we are in an opened tag
-	bool tagClosing = (lineState >> 3) & 0x01; // 1 bit to know if we are in a closing tag
+	TagState tagState = TagState::None;
 	bool tagDontFold = false; //some HTML tags should not be folded
 	script_type aspScript = static_cast<script_type>((lineState >> 4) & 0x0F); // 4 bits of script name
 	script_type clientScript = static_cast<script_type>((lineState >> 8) & 0x0F); // 4 bits of script name
 	int beforePreProc = (lineState >> 12) & 0xFF; // 8 bits of state
-	bool isLanguageType = (lineState >> 20) & 1; // type or language attribute for script tag
+	bool isLanguageType = false; // type or language attribute for script tag
 	int sgmlBlockLevel = (lineState >> 21);
 
 	script_type scriptLanguage = ScriptOfState(state);
@@ -386,11 +386,6 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 	//	Folding is turned on or off for scripts embedded in HTML files with this option.
 	//	The default is on.
 	constexpr bool foldHTMLPreprocessor = foldHTML;// && styler.GetPropertyBool("fold.html.preprocessor", true);
-
-	// property fold.xml.at.tag.open
-	//	Enable folding for XML at the start of open tag.
-	//	The default is on.
-	const bool foldXmlAtTagOpen = isXml & fold;// && styler.GetPropertyBool("fold.xml.at.tag.open", true);
 
 	// property lexer.xml.allow.scripts
 	//	Set to 0 to disable scripts in XML.
@@ -455,12 +450,9 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			}
 			styler.SetLineState(lineCurrent,
 			                    (static_cast<int>(inScriptType) << 0) |
-			                    (static_cast<int>(tagOpened) << 2) |
-			                    (static_cast<int>(tagClosing) << 3) |
 			                    (static_cast<int>(aspScript) << 4) |
 			                    (static_cast<int>(clientScript) << 8) |
 			                    (beforePreProc << 12) |
-			                    (static_cast<int>(isLanguageType) << 20) |
 			                    (sgmlBlockLevel << 21));
 			lineCurrent++;
 		}
@@ -499,10 +491,8 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				clientScript = eScriptJS;
 				isLanguageType = false;
 				i += 2;
-				tagClosing = true;
-				if (foldXmlAtTagOpen) {
-					levelCurrent--;
-				}
+				tagState = TagState::Close;
+				levelCurrent--;
 				continue;
 			}
 		}
@@ -658,12 +648,11 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 		case SCE_H_DEFAULT:
 			if (ch == '<') {
 				// in HTML, fold on tag open and unfold on tag close
-				tagOpened = true;
-				tagClosing = (chNext == '/');
-				if (foldXmlAtTagOpen && !AnyOf(chNext, '/', '?', '!', '-', '%')) {
+				tagState = (chNext == '/')? TagState::Close : TagState::Open;
+				if (!AnyOf(chNext, '/', '?', '!', '-', '%')) {
 					levelCurrent++;
 				}
-				if (foldXmlAtTagOpen && chNext == '/') {
+				if (chNext == '/') {
 					levelCurrent--;
 				}
 				if (chNext != '!') {
@@ -829,7 +818,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			if (!IsTagContinue(ch) && !((ch == '/') && (chPrev == '<'))) {
 				int eClass = classifyTagHTML(i, keywordLists, styler, tagDontFold, isXml, allowScripts);
 				if (eClass == SCE_H_SCRIPT) {
-					if (!tagClosing) {
+					if (tagState > TagState::None) {
 						inScriptType = eNonHtmlScript;
 						scriptLanguage = clientScript;
 					} else {
@@ -845,15 +834,10 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 					} else {
 						state = SCE_H_DEFAULT;
 					}
-					tagOpened = false;
-					if (!(foldXmlAtTagOpen || tagDontFold)) {
-						if (tagClosing) {
-							levelCurrent--;
-						} else {
-							levelCurrent++;
-						}
+					if (tagDontFold) {
+						levelCurrent -= static_cast<int>(tagState);
 					}
-					tagClosing = false;
+					tagState = TagState::None;
 				} else if (ch == '/' && chNext == '>') {
 					if (eClass == SCE_H_TAGUNKNOWN) {
 						styler.ColorTo(i + 2, SCE_H_TAGUNKNOWN);
@@ -864,13 +848,12 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 					i++;
 					ch = chNext;
 					state = SCE_H_DEFAULT;
-					tagOpened = false;
-					if (foldXmlAtTagOpen) {
-						levelCurrent--;
-					}
+					levelCurrent--;
+					tagState = TagState::None;
 				} else {
 					if (eClass != SCE_H_TAGUNKNOWN) {
 						if (eClass == SCE_H_SGML_DEFAULT) {
+							tagState = TagState::None;
 							state = SCE_H_SGML_DEFAULT;
 						} else {
 							state = SCE_H_OTHER;
@@ -892,15 +875,10 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 					} else {
 						state = SCE_H_DEFAULT;
 					}
-					tagOpened = false;
-					if (!(foldXmlAtTagOpen || tagDontFold)) {
-						if (tagClosing) {
-							levelCurrent--;
-						} else {
-							levelCurrent++;
-						}
+					if (tagDontFold) {
+						levelCurrent -= static_cast<int>(tagState);
 					}
-					tagClosing = false;
+					tagState = TagState::None;
 				} else if (ch == '=') {
 					styler.ColorTo(i + 1, SCE_H_OTHER);
 					state = SCE_H_VALUE;
@@ -918,15 +896,10 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				} else {
 					state = SCE_H_DEFAULT;
 				}
-				tagOpened = false;
-				if (!(foldXmlAtTagOpen || tagDontFold)) {
-					if (tagClosing) {
-						levelCurrent--;
-					} else {
-						levelCurrent++;
-					}
+				if (tagDontFold) {
+					levelCurrent -= static_cast<int>(tagState);
 				}
-				tagClosing = false;
+				tagState = TagState::None;
 			} else if (ch == '\"') {
 				styler.ColorTo(i, StateToPrint);
 				state = SCE_H_DOUBLESTRING;
@@ -942,16 +915,15 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				i++;
 				ch = chNext;
 				state = SCE_H_DEFAULT;
-				tagOpened = false;
-				if (foldXmlAtTagOpen) {
-					levelCurrent--;
-				}
+				levelCurrent--;
+				tagState = TagState::None;
 			} else if (ch == '?' && chNext == '>') {
 				styler.ColorTo(i, StateToPrint);
 				styler.ColorTo(i + 2, SCE_H_XMLSTART); // SCE_H_XMLEND
 				i++;
 				ch = chNext;
 				state = SCE_H_DEFAULT;
+				tagState = TagState::None;
 			} else if (IsHTMLWordChar(ch)) {
 				styler.ColorTo(i, StateToPrint);
 				state = SCE_H_ATTRIBUTE;
@@ -989,15 +961,10 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 						} else {
 							state = SCE_H_DEFAULT;
 						}
-						tagOpened = false;
-						if (!tagDontFold) {
-							if (tagClosing) {
-								levelCurrent--;
-							} else {
-								levelCurrent++;
-							}
+						if (tagDontFold) {
+							levelCurrent -= static_cast<int>(tagState);
 						}
-						tagClosing = false;
+						tagState = TagState::None;
 					} else {
 						state = SCE_H_OTHER;
 					}
