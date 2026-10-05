@@ -10,6 +10,7 @@
 
 #include <string>
 #include <string_view>
+#include <vector>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -297,13 +298,6 @@ constexpr bool IsSGMLWordChar(int ch) noexcept {
 		(IsAlphaNumeric(ch) || ch == '.' || ch == '_' || ch == ':' || ch == '!' || ch == '#');
 }
 
-constexpr bool InTagState(int state) noexcept {
-	return AnyOf(state, SCE_H_TAG, SCE_H_TAGUNKNOWN, SCE_H_SCRIPT,
-				SCE_H_ATTRIBUTE, SCE_H_ATTRIBUTEUNKNOWN,
-				SCE_H_NUMBER, SCE_H_OTHER,
-				SCE_H_DOUBLESTRING, SCE_H_SINGLESTRING);
-}
-
 constexpr bool IsHTMLWordChar(int ch) noexcept {
 	return IsAlphaNumeric(ch) || AnyOf(ch, '.', '-', '_', ':', '!', '#') || ch >= 0x80;
 }
@@ -321,23 +315,24 @@ constexpr bool IsOKBeforeJSRE(int ch) noexcept {
 	return AnyOf(ch, '(', '[', '{', '=', ',', ':', ';', '!', '%', '^', '&', '*', '|', '?', '~', '>', ' ');
 }
 
+// string interpolating state
+enum class InterpolatingType {
+	ClientJavaScript,
+	ServerJavaScript,
+};
+
+struct InterpolatingState {
+	InterpolatingType type;
+	int braceCount;
+};
+
 void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler, bool isXml) {
+	constexpr int stateMask = 1 << 2;
+	// If inside a tag, it may be a script tag, so reread from the start of line starting tag to ensure any language tags are seen
+	BacktrackToStart(styler, stateMask, startPos, length, initStyle);
+
 	int StateToPrint = initStyle;
 	int state = stateForPrintState(StateToPrint);
-
-	// If inside a tag, it may be a script tag, so reread from the start of line starting tag to ensure any language tags are seen
-	if (InTagState(state)) {
-		while (startPos != 0) {
-			state = styler.StyleIndexAt(startPos - 1);
-			if (!InTagState(state)) {
-				break;
-			}
-			const Sci_Position backLineStart = styler.LineStart(styler.GetLine(startPos - 1));
-			length += startPos - backLineStart;
-			startPos = backLineStart;
-		}
-		state = (startPos == 0) ? SCE_H_DEFAULT : state;
-	}
 
 	/* Nothing handles getting out of these, so we need not start in any of them.
 	 * As we're at line start and they can't span lines, we'll re-detect them anyway */
@@ -371,6 +366,9 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 	int beforePreProc = (lineState >> 12) & 0xFF; // 8 bits of state
 	bool isLanguageType = false; // type or language attribute for script tag
 	int sgmlBlockLevel = (lineState >> 21);
+
+	bool needsBacktrack = false;
+	std::vector<InterpolatingState> interpolatingStack;
 
 	script_type scriptLanguage = ScriptOfState(state);
 	script_type beforeLanguage = ScriptOfState(beforePreProc);
@@ -450,11 +448,13 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			}
 			styler.SetLineState(lineCurrent,
 			                    (static_cast<int>(inScriptType) << 0) |
+			                    ((needsBacktrack || tagState != TagState::None || !interpolatingStack.empty())? stateMask : 0) |
 			                    (static_cast<int>(aspScript) << 4) |
 			                    (static_cast<int>(clientScript) << 8) |
 			                    (beforePreProc << 12) |
 			                    (sgmlBlockLevel << 21));
 			lineCurrent++;
+			needsBacktrack = false;
 		}
 
 		// generic end of script processing
@@ -493,6 +493,10 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				i += 2;
 				tagState = TagState::Close;
 				levelCurrent--;
+				if (!interpolatingStack.empty()) {
+					needsBacktrack = true;
+					interpolatingStack.clear();
+				}
 				continue;
 			}
 		}
@@ -622,6 +626,15 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			if (scriptLanguage != eScriptSGML) {
 				beforePreProc = SCE_H_DEFAULT;
 				i++;
+			}
+			if (scriptLanguage == eScriptJS && !interpolatingStack.empty() && interpolatingStack.back().type != InterpolatingType::ClientJavaScript) {
+				needsBacktrack = true;
+				do {
+					if (interpolatingStack.back().type == InterpolatingType::ClientJavaScript) {
+						break;
+					}
+					interpolatingStack.pop_back();
+				} while (!interpolatingStack.empty());
 			}
 			if (ch == '%')
 				styler.ColorTo(i + 1, SCE_H_ASP);
@@ -1023,6 +1036,14 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 					state = SCE_HJ_DEFAULT;
 				}
 				styler.ColorTo(i, StateToPrint);
+			} else if (state == SCE_HJ_TEMPLATELITERAL && ch == '$' && chNext == '{') {
+				styler.ColorTo(i, StateToPrint);
+				styler.ColorTo(i + 1, statePrintForState(SCE_HJ_SYMBOLS, inScriptType));
+				const auto type = (inScriptType == eNonHtmlScript)? InterpolatingType::ClientJavaScript : InterpolatingType::ServerJavaScript;
+				interpolatingStack.push_back({type, 0}); // braceCount will be increased later
+				i++;
+				ch = chNext;
+				state = SCE_HJ_DEFAULT;
 			}
 			break;
 		case SCE_HJ_REGEX:
@@ -1109,6 +1130,17 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 					levelCurrent++;
 				} else if (ch == '}' || ch == ']' || ch == ')') {
 					levelCurrent--;
+				}
+				if (!interpolatingStack.empty()) {
+					if (ch == '{') {
+						interpolatingStack.back().braceCount += 1;
+					} else if (ch == '}') {
+						interpolatingStack.back().braceCount -= 1;
+						if (interpolatingStack.back().braceCount == 0) {
+							interpolatingStack.pop_back();
+							state = SCE_HJ_TEMPLATELITERAL;
+						}
+					}
 				}
 				styler.ColorTo(i + 1, statePrintForState(SCE_HJ_SYMBOLS, inScriptType));
 			}
