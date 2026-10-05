@@ -115,9 +115,9 @@ constexpr int GetStringQuote(int state) noexcept {
 }
 
 constexpr bool FollowExpression(int chPrevNonWhite, int stylePrevNonWhite) noexcept {
-	return chPrevNonWhite == ')' || chPrevNonWhite == ']'
+	return stylePrevNonWhite >= SCE_JS_IDENTIFIER
 		|| (stylePrevNonWhite >= SCE_JS_NUMBER && stylePrevNonWhite <= SCE_JS_OPERATOR_PF)
-		|| IsJsIdentifierChar(chPrevNonWhite);
+		|| chPrevNonWhite == ')' || chPrevNonWhite == ']';
 }
 
 constexpr bool IsRegexStart(int chPrevNonWhite, int stylePrevNonWhite) noexcept {

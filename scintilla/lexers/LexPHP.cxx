@@ -637,14 +637,13 @@ bool PHPLexer::HighlightOperator(HtmlTextBlock block, int stylePrevNonWhite) {
 }
 
 constexpr bool FollowExpression(int chPrevNonWhite, int stylePrevNonWhite) noexcept {
-	return chPrevNonWhite == ')' || chPrevNonWhite == ']'
+	return stylePrevNonWhite >= js_style(SCE_JS_IDENTIFIER)
 		|| (stylePrevNonWhite >= js_style(SCE_JS_NUMBER) && stylePrevNonWhite <= js_style(SCE_JS_OPERATOR_PF))
-		|| IsJsIdentifierChar(chPrevNonWhite);
+		|| chPrevNonWhite == ')' || chPrevNonWhite == ']';
 }
 
 constexpr bool IsRegexStart(int chPrevNonWhite, int stylePrevNonWhite) noexcept {
-	return stylePrevNonWhite < js_style(SCE_JS_DEFAULT)
-		|| stylePrevNonWhite == js_style(SCE_JS_WORD)
+	return stylePrevNonWhite == js_style(SCE_JS_WORD)
 		|| !FollowExpression(chPrevNonWhite, stylePrevNonWhite);
 }
 

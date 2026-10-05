@@ -94,13 +94,11 @@ constexpr bool IsSwiftIdentifierChar(int state, int ch) noexcept {
 }
 
 constexpr bool FollowExpression(int chPrevNonWhite, int stylePrevNonWhite) noexcept {
-	return chPrevNonWhite == ')' || chPrevNonWhite == ']'
-		|| (stylePrevNonWhite >= SCE_SWIFT_OPERATOR_PF && stylePrevNonWhite < SCE_SWIFT_DIRECTIVE)
-		|| IsIdentifierCharEx(chPrevNonWhite) || chPrevNonWhite == '`';
+	return stylePrevNonWhite >= SCE_SWIFT_OPERATOR_PF || chPrevNonWhite == ')' || chPrevNonWhite == ']';
 }
 
 constexpr bool IsRegexStart(int chPrevNonWhite, int stylePrevNonWhite) noexcept {
-	return stylePrevNonWhite == SCE_SWIFT_WORD || !FollowExpression(chPrevNonWhite, stylePrevNonWhite);
+	return AnyOf(stylePrevNonWhite, SCE_SWIFT_WORD, SCE_SWIFT_DIRECTIVE) || !FollowExpression(chPrevNonWhite, stylePrevNonWhite);
 }
 
 constexpr bool IsSpaceEquiv(int state) noexcept {

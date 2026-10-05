@@ -78,9 +78,7 @@ constexpr bool IsSpaceEquiv(int state) noexcept {
 }
 
 constexpr bool FollowExpression(int chPrevNonWhite, int stylePrevNonWhite) noexcept {
-	return chPrevNonWhite == ')' || chPrevNonWhite == ']'
-		|| (stylePrevNonWhite >= SCE_COFFEESCRIPT_OPERATOR_PF && stylePrevNonWhite < SCE_COFFEESCRIPT_WORD)
-		|| IsJsIdentifierChar(chPrevNonWhite);
+	return stylePrevNonWhite >= SCE_COFFEESCRIPT_OPERATOR_PF || chPrevNonWhite == ')' || chPrevNonWhite == ']';
 }
 
 inline bool IsRegexStart(const StyleContext &sc, int chPrevNonWhite, int stylePrevNonWhite) noexcept {
