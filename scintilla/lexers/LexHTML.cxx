@@ -124,12 +124,7 @@ constexpr bool isStringState(int state) noexcept {
 	case SCE_HJ_SINGLESTRING:
 	case SCE_HJ_REGEX:
 	case SCE_HJ_TEMPLATELITERAL:
-	case SCE_HJA_DOUBLESTRING:
-	case SCE_HJA_SINGLESTRING:
-	case SCE_HJA_REGEX:
-	case SCE_HJA_TEMPLATELITERAL:
 	case SCE_HB_STRING:
-	case SCE_HBA_STRING:
 		return true;
 	default:
 		return false;
@@ -398,16 +393,20 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 	// look back to set chPrevNonWhite properly for better regex colouring
 	if (scriptLanguage == eScriptJS && startPos > 0) {
 		Sci_Position back = startPos;
-		int style = 0;
-		while (--back) {
-			style = styler.StyleIndexAt(back);
-			if (style < SCE_HJ_DEFAULT || style > SCE_HJ_COMMENTDOC)
+		do {
+			--back;
+			int style = styler.StyleIndexAt(back);
+			if (style >= SCE_HJA_START && style <= SCE_HJA_TEMPLATELITERAL) {
+				style -= SCE_HA_JS;
+			}
+			if (style < SCE_HJ_DEFAULT || style > SCE_HJ_COMMENTDOC) {
 				// includes SCE_HJ_COMMENT & SCE_HJ_COMMENTLINE
+				if (style > SCE_HJ_COMMENTDOC) { // exclude SCE_H_TAG and SCE_H_ASP
+					chPrevNonWhite = styler.SafeGetUCharAt(back);
+				}
 				break;
-		}
-		if (style == SCE_HJ_SYMBOLS) {
-			chPrevNonWhite = styler.SafeGetUCharAt(back);
-		}
+			}
+		} while (back != 0);
 	}
 
 	styler.StartAt(startPos);
@@ -416,9 +415,9 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 	for (Sci_Position i = startPos; i < lengthDoc; i++) {
 		const int chPrev2 = chPrev;
 		chPrev = ch;
-		if (!IsASpace(ch) && state != SCE_HJ_COMMENT &&
-			state != SCE_HJ_COMMENTLINE && state != SCE_HJ_COMMENTDOC)
+		if (!IsASpace(ch) && !AnyOf(state, SCE_HJ_COMMENT, SCE_HJ_COMMENTLINE, SCE_HJ_COMMENTDOC)) {
 			chPrevNonWhite = ch;
+		}
 		ch = static_cast<unsigned char>(styler[i]);
 		int chNext = styler.SafeGetUCharAt(i + 1);
 		const int chNext2 = styler.SafeGetUCharAt(i + 2);
