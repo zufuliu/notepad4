@@ -261,7 +261,7 @@ int classifyTagHTML(Sci_PositionU end, LexerWordList keywordLists, LexAccessor &
 	return chAttr;
 }
 
-void classifyWordHTJS(Sci_PositionU end, LexerWordList keywordLists, LexAccessor &styler, script_mode inScriptType) {
+int classifyWordHTJS(Sci_PositionU end, LexerWordList keywordLists, LexAccessor &styler, script_mode inScriptType) {
 	char s[31 + 1];
 	styler.GetRange(styler.GetStartSegment(), end, s, sizeof(s));
 	int chAttr = SCE_HJ_WORD;
@@ -269,6 +269,7 @@ void classifyWordHTJS(Sci_PositionU end, LexerWordList keywordLists, LexAccessor
 		chAttr = SCE_HJ_KEYWORD;
 	}
 	styler.ColorTo(end, statePrintForJsState(chAttr, inScriptType));
+	return chAttr;
 }
 
 int classifyWordHTVB(Sci_PositionU end, LexerWordList keywordLists, LexAccessor &styler, script_mode inScriptType) {
@@ -322,9 +323,13 @@ constexpr bool IsAttributeContinue(int ch) noexcept {
 	return IsAlphaNumeric(ch) || AnyOf(ch, '.', '-', '_', ':', '!', '#', '/') || ch >= 0x80;
 }
 
-constexpr bool IsOKBeforeJSRE(int ch) noexcept {
-	// TODO: also handle + and - (except if they're part of ++ or --) and return keywords
-	return AnyOf(ch, '(', '[', '{', '=', ',', ':', ';', '!', '%', '^', '&', '*', '|', '?', '~', '>', ' ');
+constexpr bool FollowExpression(int chPrevNonWhite, int stylePrevNonWhite) noexcept {
+	return (stylePrevNonWhite >= SCE_HJ_NUMBER && stylePrevNonWhite != SCE_HJ_OPERATOR)
+		|| chPrevNonWhite == ')' || chPrevNonWhite == ']';
+}
+
+constexpr bool IsRegexStart(int chPrevNonWhite, int stylePrevNonWhite) noexcept {
+	return stylePrevNonWhite == SCE_HJ_KEYWORD || !FollowExpression(chPrevNonWhite, stylePrevNonWhite);
 }
 
 // string interpolating state
@@ -412,9 +417,10 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 	int levelPrev = styler.LevelAt(lineCurrent) & SC_FOLDLEVELNUMBERMASK;
 	int levelCurrent = levelPrev;
 
-	int chPrev = ' ';
-	int ch = ' ';
-	int chPrevNonWhite = ' ';
+	int chPrev = 0;
+	int ch = 0;
+	int chPrevNonWhite = 0;
+	int stylePrevNonWhite = SCE_H_DEFAULT;
 	// look back to set chPrevNonWhite properly for better regex colouring
 	if (scriptLanguage == eScriptJS && startPos > 0) {
 		Sci_Position back = startPos;
@@ -426,9 +432,8 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			}
 			if (style < SCE_HJ_DEFAULT || style > SCE_HJ_COMMENTDOC) {
 				// includes SCE_HJ_COMMENT & SCE_HJ_COMMENTLINE
-				if (style > SCE_HJ_COMMENTDOC) { // exclude SCE_H_TAG and SCE_H_ASP
-					chPrevNonWhite = styler.SafeGetUCharAt(back);
-				}
+				stylePrevNonWhite = style;
+				chPrevNonWhite = styler.SafeGetUCharAt(back);
 				break;
 			}
 		} while (back != 0);
@@ -441,6 +446,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 		const int chPrev2 = chPrev;
 		chPrev = ch;
 		if (!IsASpace(ch) && !AnyOf(state, SCE_HJ_COMMENT, SCE_HJ_COMMENTLINE, SCE_HJ_COMMENTDOC)) {
+			stylePrevNonWhite = state;
 			chPrevNonWhite = ch;
 		}
 		ch = static_cast<unsigned char>(styler[i]);
@@ -448,7 +454,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 
 		// Handle DBCS codepages
 		if (styler.IsLeadByte(static_cast<unsigned char>(ch))) {
-			chPrev = ' ';
+			chPrev = ch;
 			i += 1;
 			continue;
 		}
@@ -1024,7 +1030,8 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 
 		case SCE_HJ_DEFAULT:
 		case SCE_HJ_START:
-		case SCE_HJ_SYMBOLS:
+		case SCE_HJ_OPERATOR:
+		case SCE_HJ_OPERATOR_PF:
 			if (ch > ' ') {
 				styler.ColorTo(i, StateToPrint);
 				state = SCE_HJ_DEFAULT;
@@ -1038,7 +1045,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 					state = SCE_HJ_DEFAULT;
 				} else {
 					state = SCE_HJ_DEFAULT;
-					classifyWordHTJS(i, keywordLists, styler, inScriptType);
+					stylePrevNonWhite = classifyWordHTJS(i, keywordLists, styler, inScriptType);
 				}
 			}
 			break;
@@ -1075,7 +1082,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				styler.ColorTo(i, StateToPrint);
 			} else if (state == SCE_HJ_TEMPLATELITERAL && ch == '$' && chNext == '{') {
 				styler.ColorTo(i, StateToPrint);
-				styler.ColorTo(i + 1, statePrintForJsState(SCE_HJ_SYMBOLS, inScriptType));
+				styler.ColorTo(i + 1, statePrintForJsState(SCE_HJ_OPERATOR, inScriptType));
 				const auto type = (inScriptType == eNonHtmlScript)? InterpolatingType::ClientJavaScript : InterpolatingType::ServerJavaScript;
 				interpolatingStack.push_back({type, 0}); // braceCount will be increased later
 				i++;
@@ -1145,7 +1152,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				state = (styler.SafeGetUCharAt(i + 1) == '*') ? SCE_HJ_COMMENTDOC : SCE_HJ_COMMENT;
 			} else if (ch == '/' && chNext == '/') {
 				state = SCE_HJ_COMMENTLINE;
-			} else if (ch == '/' && IsOKBeforeJSRE(chPrevNonWhite)) {
+			} else if (ch == '/' && IsRegexStart(chPrevNonWhite, stylePrevNonWhite)) {
 				state = SCE_HJ_REGEX;
 			} else if (ch == '\"') {
 				state = SCE_HJ_DOUBLESTRING;
@@ -1160,10 +1167,14 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			} else if ((ch == '<' && chNext == '!') || (ch == '-' && chNext == '-') && IsHtmlComment(ch, i, styler)) {
 				state = SCE_HJ_COMMENTLINE;
 			} else if (IsAGraphic(ch)) {
+				stylePrevNonWhite = SCE_HJ_OPERATOR;
 				if (ch == '{' || ch == '[' || ch == '(') {
 					levelCurrent++;
 				} else if (ch == '}' || ch == ']' || ch == ')') {
 					levelCurrent--;
+				} else if ((ch == '+' || ch == '-') && ch == chNext) {
+					i++;
+					stylePrevNonWhite = SCE_HJ_OPERATOR_PF;
 				}
 				if (!interpolatingStack.empty()) {
 					if (ch == '{') {
@@ -1176,7 +1187,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 						}
 					}
 				}
-				styler.ColorTo(i + 1, statePrintForJsState(SCE_HJ_SYMBOLS, inScriptType));
+				styler.ColorTo(i + 1, statePrintForJsState(stylePrevNonWhite, inScriptType));
 			}
 		} else if (state == SCE_HB_DEFAULT) {    // One of the above succeeded
 			if (ch == '\"') {
