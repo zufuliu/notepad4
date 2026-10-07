@@ -392,6 +392,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 	bool isLanguageType = false; // type or language attribute for script tag
 	int sgmlBlockLevel = (lineState >> 21);
 
+	bool insideRegexRange = false;
 	bool needsBacktrack = false;
 	std::vector<InterpolatingState> interpolatingStack;
 
@@ -1091,7 +1092,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			}
 			break;
 		case SCE_HJ_REGEX:
-			if (ch == '\r' || ch == '\n' || ch == '/') {
+			if (ch == '\r' || ch == '\n' || (ch == '/' && !insideRegexRange)) {
 				if (ch == '/') {
 					while (IsLowerCase(chNext)) {   // gobble regex flags
 						i++;
@@ -1108,6 +1109,8 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 					i++;
 					ch = chNext;
 				}
+			} else if (ch == '[' || ch == ']') {
+				insideRegexRange = ch == '[';
 			}
 			break;
 
@@ -1152,7 +1155,8 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				state = (styler.SafeGetUCharAt(i + 1) == '*') ? SCE_HJ_COMMENTDOC : SCE_HJ_COMMENT;
 			} else if (ch == '/' && chNext == '/') {
 				state = SCE_HJ_COMMENTLINE;
-			} else if (ch == '/' && IsRegexStart(chPrevNonWhite, stylePrevNonWhite)) {
+			} else if (ch == '/' && !IsEOLChar(chNext) && IsRegexStart(chPrevNonWhite, stylePrevNonWhite)) {
+				insideRegexRange = false;
 				state = SCE_HJ_REGEX;
 			} else if (ch == '\"') {
 				state = SCE_HJ_DOUBLESTRING;
@@ -1164,7 +1168,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				state = SCE_HJ_NUMBER;
 			} else if (IsJsIdentifierStart(ch)) {
 				state = SCE_HJ_WORD;
-			} else if ((ch == '<' && chNext == '!') || (ch == '-' && chNext == '-') && IsHtmlComment(ch, i, styler)) {
+			} else if (((ch == '<' && chNext == '!') || (ch == '-' && chNext == '-')) && IsHtmlComment(ch, i, styler)) {
 				state = SCE_HJ_COMMENTLINE;
 			} else if (IsAGraphic(ch)) {
 				stylePrevNonWhite = SCE_HJ_OPERATOR;
@@ -1198,7 +1202,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				state = SCE_HB_NUMBER;
 			} else if (IsIdentifierStartEx(ch)) {
 				state = SCE_HB_WORD;
-			} else if ((ch == '<' && chNext == '!') || (ch == '-' && chNext == '-') && IsHtmlComment(ch, i, styler)) {
+			} else if (((ch == '<' && chNext == '!') || (ch == '-' && chNext == '-')) && IsHtmlComment(ch, i, styler)) {
 				state = SCE_HB_COMMENTLINE;
 			} else if (IsAGraphic(ch)) {
 				styler.ColorTo(i + 1, statePrintForVbsState(SCE_HB_OPERATOR, inScriptType));
