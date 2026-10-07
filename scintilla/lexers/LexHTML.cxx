@@ -51,17 +51,28 @@ enum class TagState { None = 0, Close = -1, Open = 1 };
 // Put an upper limit to bound time taken for unexpected text.
 constexpr Sci_PositionU maxLengthCheck = 200;
 
-script_type segIsScriptingIndicator(const LexAccessor &styler, Sci_PositionU start, Sci_PositionU end, script_type prevValue) {
+SCI_noinline
+script_type segIsScriptingIndicator(const LexAccessor &styler, Sci_PositionU end, script_type prevValue, script_type aspScript) {
 	char s[128];
-	styler.GetRangeLowered(start, end, s, sizeof(s));
+	styler.GetRangeLowered(styler.GetStartSegment(), end, s, sizeof(s));
 	//Platform::DebugPrintf("Scripting indicator [%s]\n", s);
-	if (strstr(s, "vbs"))
+	if (strstr(s, "java")) {
+		return eScriptJS;
+	}
+	if (strstr(s, "vb")) {
 		return eScriptVBS;
+	}
 	// https://html.spec.whatwg.org/multipage/scripting.html#attr-script-type
 	// https://mimesniff.spec.whatwg.org/#javascript-mime-type
-	if (strstr(s, "javas") || strstr(s, "ecmas") || strstr(s, "module") || strstr(s, "jscr"))
+	if (strstr(s, "script") || strstr(s, "ecma") || strstr(s, "module")) {
 		return eScriptJS;
-
+	}
+	if (strstr(s, "c#")) { // ASP.NET page language
+		return eScriptJS;
+	}
+	if (strstr(s, "server")) { // ASP.NET runat="server"
+		return aspScript;
+	}
 	return prevValue;
 }
 
@@ -149,6 +160,7 @@ constexpr bool isCommentASPState(int state) noexcept {
 		|| state == SCE_HB_COMMENTLINE;
 }
 
+SCI_noinline
 bool classifyAttribHTML(Sci_PositionU end, LexerWordList keywordLists, LexAccessor &styler, script_mode inScriptType, bool isXml) {
 	char s[MaxKeywordSize];
 	int chAttr = SCE_H_ATTRIBUTEUNKNOWN;
@@ -160,7 +172,7 @@ bool classifyAttribHTML(Sci_PositionU end, LexerWordList keywordLists, LexAccess
 	} else {
 		if (inScriptType == eNonHtmlScript) {
 			// see https://html.spec.whatwg.org/multipage/scripting.html
-			if (StrEqualsAny(s, "type", "language")) {
+			if (StrEqualsAny(s, "type", "language", "runat")) {
 				isLanguageType = true;
 			}
 		}
@@ -182,6 +194,7 @@ bool isHTMLCustomElement(const char *tag, size_t length, bool dashColon) noexcep
 	return dashColon;
 }
 
+SCI_noinline
 int classifyTagHTML(Sci_PositionU end, LexerWordList keywordLists, LexAccessor &styler, bool &tagDontFold, bool isXml, bool allowScripts) {
 	char s[63 + 1];
 	memset(s, 0, 4);
@@ -533,20 +546,27 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			if (foldHTMLPreprocessor) {
 				levelCurrent++;
 			}
-			if (chNext2 == '@') {
+			// https://jakarta.ee/specifications/pages/4.0/jakarta-server-pages-spec-4.0#jsp-syntax-grammar
+			// https://learn.microsoft.com/en-us/troubleshoot/developer/webapps/aspnet/development/inline-expressions
+			if (chNext2 == '@') { // <%@ directive %>
 				i += 2; // place as if it was the second next char treated
+				ch = chNext2;
 				state = SCE_H_ASPAT;
 				scriptLanguage = eScriptVBS;
-			} else if ((chNext2 == '-') && (styler.SafeGetCharAt(i + 3) == '-')) {
+			} else if ((chNext2 == '-') && (styler.SafeGetUCharAt(i + 3) == '-')) {
 				styler.ColorTo(i + 4, SCE_H_ASP);
 				state = SCE_H_XCCOMMENT;
 				scriptLanguage = eScriptVBS;
 				continue;
 			} else {
-				if (chNext2 == '=') {
+				// <%= expression%>, <%! JSP declaration%>
+				// ASP.NET: <%# data binding %>, <%$ expression builder %>, <%: %> Display expression (HTML encoded)
+				if (AnyOf(chNext2, '=', '!', '#', '$', ':')) {
 					i += 2; // place as if it was the second next char treated
+					ch = chNext2;
 				} else {
 					i++; // place as if it was the next char treated
+					ch = chNext;
 				}
 
 				state = StateForScript(aspScript);
@@ -554,7 +574,6 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			}
 			styler.ColorTo(i + 1, SCE_H_ASP);
 			// should be better
-			ch = styler.SafeGetUCharAt(i);
 			continue;
 		}
 
@@ -604,7 +623,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				  ((scriptLanguage != eScriptNone) && (chNext == '>') && stateAllowsTermination(state, ch))) ||
 		         ((scriptLanguage == eScriptSGML) && (ch == '>') && !AnyOf(state, SCE_H_SGML_COMMENT, SCE_H_SGML_DOUBLESTRING, SCE_H_SGML_SIMPLESTRING))) {
 			if (state == SCE_H_ASPAT) {
-				aspScript = segIsScriptingIndicator(styler, styler.GetStartSegment(), i, aspScript);
+				aspScript = segIsScriptingIndicator(styler, i, aspScript, aspScript);
 			}
 			// Bounce out of any ASP mode
 			switch (state) {
@@ -945,7 +964,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 		case SCE_H_SINGLESTRING:
 			if (ch == ((state == SCE_H_DOUBLESTRING) ? '\"' : '\'')) {
 				if (isLanguageType) {
-					scriptLanguage = segIsScriptingIndicator(styler, styler.GetStartSegment(), i, scriptLanguage);
+					scriptLanguage = segIsScriptingIndicator(styler, i, scriptLanguage, aspScript);
 					clientScript = scriptLanguage;
 					isLanguageType = false;
 				}
@@ -1148,7 +1167,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				state = SCE_HB_STRING;
 			} else if (ch == '\'') {
 				state = SCE_HB_COMMENTLINE;
-			} if (IsNumberStart(ch, chNext)) {
+			} else if (IsNumberStart(ch, chNext)) {
 				state = SCE_HB_NUMBER;
 			} else if (IsIdentifierStartEx(ch)) {
 				state = SCE_HB_WORD;
