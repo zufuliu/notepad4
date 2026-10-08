@@ -142,7 +142,14 @@ Web Source Code
 	xhtml			Extensible Hypertext Markup Language File
 	asp				Active Server Page
 	aspx			Active Server Page Extended File
+	asax			Global.asax, ASP.NET application file
+	ascx			ASP.NET User Control
+	cshtml			Razor C#
+	vbhtml			Razor VB.NET
+	razor			Razor
 	jsp				Java Server Page
+	jspf			JSP Fragment, segment
+	jspx			JSP XML Syntax
 	rhtml			ERB, HTML with embedded Ruby
 	vue				Vue Single-File Components, https://vuejs.org/guide/scaling-up/sfc.html
 	hbs				Ember Template, https://guides.emberjs.com/release/components/
