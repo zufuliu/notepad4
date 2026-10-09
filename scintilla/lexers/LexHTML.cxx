@@ -160,7 +160,8 @@ constexpr bool stateAllowsTermination(int state, int ch) noexcept {
 
 // not really well done, since it's only comments that should lex the %> and <%
 constexpr bool isCommentASPState(int state) noexcept {
-	return state == SCE_HJ_COMMENT
+	return state == SCE_H_CDATA
+		|| state == SCE_HJ_COMMENT
 		|| state == SCE_HJ_COMMENTLINE
 		|| state == SCE_HJ_COMMENTDOC
 		|| state == SCE_HB_COMMENTLINE;
@@ -399,17 +400,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 	script_type scriptLanguage = ScriptOfState(state);
 	script_type beforeLanguage = ScriptOfState(beforePreProc);
 
-	// property fold.html
-	//	Folding is turned on or off for HTML and XML files with this option.
-	//	The fold option must also be on for folding to occur.
-	constexpr bool foldHTML = true;//styler.GetPropertyBool("fold.html", true);
-
-	const bool fold = foldHTML & styler.GetPropertyInt("fold");
-
-	// property fold.html.preprocessor
-	//	Folding is turned on or off for scripts embedded in HTML files with this option.
-	//	The default is on.
-	constexpr bool foldHTMLPreprocessor = foldHTML;// && styler.GetPropertyBool("fold.html.preprocessor", true);
+	const bool fold = styler.GetPropertyBool("fold");
 
 	// property lexer.xml.allow.scripts
 	//	Set to 0 to disable scripts in XML.
@@ -418,8 +409,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 	int levelPrev = styler.LevelAt(lineCurrent) & SC_FOLDLEVELNUMBERMASK;
 	int levelCurrent = levelPrev;
 
-	int chPrev = 0;
-	int ch = 0;
+	int ch = ' '; // space to not override chPrevNonWhite
 	int chPrevNonWhite = 0;
 	int stylePrevNonWhite = SCE_H_DEFAULT;
 	// look back to set chPrevNonWhite properly for better regex colouring
@@ -444,8 +434,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 	styler.StartSegment(startPos);
 	const Sci_Position lengthDoc = startPos + length;
 	for (Sci_Position i = startPos; i < lengthDoc; i++) {
-		const int chPrev2 = chPrev;
-		chPrev = ch;
+		const int chPrev = ch;
 		if (!IsASpace(ch) && !AnyOf(state, SCE_HJ_COMMENT, SCE_HJ_COMMENTLINE, SCE_HJ_COMMENTDOC)) {
 			stylePrevNonWhite = state;
 			chPrevNonWhite = ch;
@@ -455,7 +444,6 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 
 		// Handle DBCS codepages
 		if (styler.IsLeadByte(static_cast<unsigned char>(ch))) {
-			chPrev = ch;
 			i += 1;
 			continue;
 		}
@@ -470,8 +458,9 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			if (fold) {
 				levelCurrent = sci::max(levelCurrent, SC_FOLDLEVELBASE);
 				int lev = levelPrev;
-				if ((levelCurrent > levelPrev))
+				if ((levelCurrent > levelPrev)) {
 					lev |= SC_FOLDLEVELHEADERFLAG;
+				}
 
 				styler.SetLevel(lineCurrent, lev);
 				levelPrev = levelCurrent;
@@ -551,7 +540,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 		}
 
 		// handle the start of ASP pre-processor = Non-HTML
-		else if ((ch == '<' && chNext == '%') && state != SCE_H_CDATA && !isCommentASPState(state)) {
+		else if ((ch == '<' && chNext == '%') && !isCommentASPState(state)) {
 			styler.ColorTo(i, StateToPrint);
 			beforePreProc = state;
 			if (inScriptType == eNonHtmlScript)
@@ -559,9 +548,8 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			else
 				inScriptType = eNonHtmlPreProc;
 			// fold whole script
-			if (foldHTMLPreprocessor) {
-				levelCurrent++;
-			}
+			levelCurrent++;
+
 			const int chNext2 = styler.SafeGetUCharAt(i + 2);
 			// https://jakarta.ee/specifications/pages/4.0/jakarta-server-pages-spec-4.0#jsp-syntax-grammar
 			// https://learn.microsoft.com/en-us/troubleshoot/developer/webapps/aspnet/development/inline-expressions
@@ -590,7 +578,6 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				scriptLanguage = aspScript;
 			}
 			styler.ColorTo(i + 1, SCE_H_ASP);
-			// should be better
 			continue;
 		}
 
@@ -607,13 +594,9 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				if (!isXml) {
 					// handle empty comment: <!-->, <!--->
 					// https://html.spec.whatwg.org/multipage/parsing.html#parse-error-abrupt-closing-of-empty-comment
-					chNext = styler.SafeGetUCharAt(i + 1);
-					if ((chNext == '>') || (chNext == '-' && styler.SafeGetUCharAt(i + 2) == '>')) {
-						if (chNext == '-') {
-							i += 1;
-						}
-						chPrev = '-';
-						ch = '-';
+					ch = '-';
+					if (styler.SafeGetUCharAt(i + 1) == '>') {
+						i -= 1;
 					}
 				}
 			} else if (chNext == '[' && styler.Match(i + 2, "CDATA[")) {
@@ -628,8 +611,9 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				state = (chNext == '[') ? SCE_H_SGML_DEFAULT : SCE_H_SGML_COMMAND; // wait for a pending command
 			}
 			// fold whole tag (-- when closing the tag)
-			if constexpr (foldHTMLPreprocessor || state == SCE_H_COMMENT || state == SCE_H_CDATA)
+			if (state == SCE_H_COMMENT || state == SCE_H_CDATA) {
 				levelCurrent++;
+			}
 			continue;
 		}
 
@@ -647,9 +631,6 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				break;
 			case SCE_HB_WORD:
 				classifyWordHTVB(i, keywordLists, styler, inScriptType);
-				break;
-			case SCE_H_XCCOMMENT:
-				styler.ColorTo(i, state);
 				break;
 			default :
 				styler.ColorTo(i, StateToPrint);
@@ -682,7 +663,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			else
 				inScriptType = eHtml;
 			// Unfold all scripting languages, except for XML tag
-			if (foldHTMLPreprocessor && (scriptLanguage != eScriptXML)) {
+			if ((scriptLanguage != eScriptXML)) {
 				levelCurrent--;
 			}
 			scriptLanguage = beforeLanguage;
@@ -807,20 +788,25 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			}
 			break;
 		case SCE_H_CDATA:
-			if ((chPrev2 == ']') && (chPrev == ']') && (ch == '>')) {
+			if ((chPrev == ']') && (ch == ']') && (chNext == '>')) {
+				i += 1;
 				styler.ColorTo(i + 1 - 3, StateToPrint);
-				styler.ColorTo(i + 1, SCE_H_SGML_COMMAND);
+				styler.ColorTo(i + 1, SCE_H_SGML_DEFAULT);
 				state = beforePreProc;
 				levelCurrent--;
 			}
 			break;
 		case SCE_H_COMMENT:
-			if ((chPrev2 == '-') && (chPrev == '-') && (ch == '>' || (!isXml && ch == '!' && chNext == '>'))) {
+			if ((chPrev == '-' && ch == '-') && (chNext == '>' || chNext == '!')) {
 				// close HTML comment with --!>
 				// https://html.spec.whatwg.org/multipage/parsing.html#parse-error-incorrectly-closed-comment
-				if (ch == '!') {
+				if (chNext == '!') {
+					if (styler.SafeGetUCharAt(i + 2) != '>') {
+						break;
+					}
 					i += 1;
 				}
+				i += 1;
 				styler.ColorTo(i + 1, StateToPrint);
 				state = beforePreProc;
 				levelCurrent--;
@@ -849,15 +835,12 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			}
 			break;
 		case SCE_H_ENTITY:
-			if (!IsEntityChar(ch)) {
-				styler.ColorTo(i + (ch == ';'), ((ch == ';') ? StateToPrint : SCE_H_TAGUNKNOWN));
-				state = SCE_H_DEFAULT;
-				if (ch != ';' && IsAGraphic(ch)) {
-					// Retreat one byte so the character that is invalid inside entity
-					// may start something else like a tag.
-					--i;
-					continue;
+			if (!IsEntityChar(chNext)) {
+				if (chNext == ';') {
+					i += 1;
 				}
+				styler.ColorTo(i + 1, ((chNext == ';') ? StateToPrint : SCE_H_TAGUNKNOWN));
+				state = SCE_H_DEFAULT;
 			}
 			break;
 		case SCE_H_TAGUNKNOWN:
@@ -1076,11 +1059,10 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				styler.ColorTo(i + 1, StateToPrint);
 				state = SCE_HJ_DEFAULT;
 				continue;
-			} else if (state != SCE_HJ_TEMPLATELITERAL && IsEOLChar(ch)) {
-				if (chPrev != '\\' && (chPrev2 != '\\' || chPrev != '\r' || ch != '\n')) {
-					state = SCE_HJ_DEFAULT;
-				}
-				styler.ColorTo(i, StateToPrint);
+			} else if (state != SCE_HJ_TEMPLATELITERAL && (chNext == '\r' || (chNext == '\n' && ch != '\r'))) {
+				styler.ColorTo(i + 1, StateToPrint);
+				ch = chNext;
+				state = SCE_HJ_DEFAULT;
 			} else if (state == SCE_HJ_TEMPLATELITERAL && ch == '$' && chNext == '{') {
 				styler.ColorTo(i, StateToPrint);
 				styler.ColorTo(i + 1, statePrintForJsState(SCE_HJ_OPERATOR, inScriptType));

@@ -1097,15 +1097,15 @@ bool MarkdownLexer::HandleHtmlTag(HtmlTagType tagType) {
 			sc.Advance(3);
 			// handle empty comment: <!-->, <!--->
 			// https://html.spec.whatwg.org/multipage/parsing.html#parse-error-abrupt-closing-of-empty-comment
-			if (sc.chNext == '>' || sc.MatchNext('-', '>')) {
-				sc.Forward((sc.chNext == '>') ? 2 : 3);
+			sc.chPrev = '-';
+			if (sc.chNext == '>') {
+				sc.Forward(2);
 				sc.SetState(current);
 				return true;
 			}
 		} else if (chNext == '[' && sc.styler.Match(sc.currentPos + 3, "CDATA[")) {
 			// <![CDATA[ ]]>
 			sc.SetState(SCE_H_CDATA);
-			sc.Advance(8);
 		} else if (IsAlpha(chNext)) {
 			// <!DOCTYPE html>
 			sc.SetState(SCE_H_SGML_COMMAND);
@@ -2026,13 +2026,11 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 			break;
 
 		case SCE_H_COMMENT:
-			if (sc.Match('-', '-')) {
-				do {
-					sc.Forward();
-				} while (sc.ch == '-');
+			if (sc.chPrev == '-' && sc.ch == '-' && (sc.chNext == '>' || sc.chNext == '!')) {
+				sc.Forward();
 				// close HTML comment with --!>
 				// https://html.spec.whatwg.org/multipage/parsing.html#parse-error-incorrectly-closed-comment
-				if (sc.ch == '>' || sc.Match('!', '>')) {
+				if (sc.ch == '>' || sc.chNext == '>') {
 					lexer.OnHtmlTagEnd();
 					continue;
 				}
