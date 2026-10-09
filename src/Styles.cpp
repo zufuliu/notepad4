@@ -87,6 +87,7 @@ extern EDITLEXER lexErlang;
 extern EDITLEXER lexFSharp;
 extern EDITLEXER lexFortran;
 
+extern EDITLEXER lexGeoGebra;
 extern EDITLEXER lexGN;
 extern EDITLEXER lexGo;
 extern EDITLEXER lexGradle;
@@ -205,6 +206,7 @@ static PEDITLEXER pLexArray[] = {
 	&lexFSharp,
 	&lexFortran,
 
+	&lexGeoGebra,
 	&lexGN,
 	&lexGo,
 	&lexGradle,

@@ -52,6 +52,7 @@ extern const LexerModule lmDLang;
 extern const LexerModule lmErlang;
 extern const LexerModule lmFortran;
 extern const LexerModule lmFSharp;
+extern const LexerModule lmGeoGebra;
 extern const LexerModule lmGN;
 extern const LexerModule lmGo;
 extern const LexerModule lmGraphViz;
@@ -139,6 +140,7 @@ const LexerModule * const lexerCatalogue[] = {
 	&lmErlang,
 	&lmFortran,
 	&lmFSharp,
+	&lmGeoGebra,
 	&lmGN,
 	&lmGo,
 	&lmGraphViz,
