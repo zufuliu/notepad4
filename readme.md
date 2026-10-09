@@ -17,6 +17,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 ## Changes compared to [Notepad2](https://www.flos-freeware.ch/notepad2.html) or [Notepad2-mod](https://xhmikosr.github.io/notepad2-mod/):
 
 * Support for bookmarks
+* Light, dark, and follow-system appearance under **Scheme > Style Theme**. Follow system is the default; explicit light and dark choices are saved with the settings.
 * Option to mark all occurrences of a word or selection, and show matched count
 * [Enhanced auto-completion for words and functions](https://github.com/zufuliu/notepad4/wiki/Auto-Completion-in-Notepad4)
 * [Context-based auto-completion for some words](https://github.com/zufuliu/notepad4/wiki/Auto-Completion-in-Notepad4#context-based-auto-completion)
