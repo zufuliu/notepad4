@@ -530,6 +530,7 @@ BEGIN
 			MENUITEM "Исходный код &веб-страниц",							IDM_LEXER_WEB
 			MENUITEM "&PHP",									IDM_LEXER_PHP
 			MENUITEM "&JSP",									IDM_LEXER_JSP
+			MENUITEM "JSP &XML",					IDM_LEXER_JSPX
 			MENUITEM "ASP.NET (&C#)",								IDM_LEXER_ASPX_CS
 			MENUITEM "ASP.NET (&VB.NET)",								IDM_LEXER_ASPX_VB
 			MENUITEM "ASP (V&BScript)",								IDM_LEXER_ASP_VBS
@@ -569,7 +570,7 @@ BEGIN
 			MENUITEM "&Таблица стилей XSLT",							IDM_LEXER_XSLT
 			MENUITEM "XML &DTD",									IDM_LEXER_DTD
 			MENUITEM "Список сво&йств",								IDM_LEXER_PROPERTY_LIST
-			//MENUITEM "Документ SV&G",								IDM_LEXER_SVG
+			MENUITEM "Документ SV&G",								IDM_LEXER_SVG
 		END
 	END
 	POPUP "&Настройки"

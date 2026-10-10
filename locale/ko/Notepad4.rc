@@ -529,6 +529,7 @@ BEGIN
 			MENUITEM "웹 소스코드(&W)",									IDM_LEXER_WEB
 			MENUITEM "PHP 페이지(&P)",									IDM_LEXER_PHP
 			MENUITEM "JSP 페이지(&J)",									IDM_LEXER_JSP
+			MENUITEM "JSP &XML",					IDM_LEXER_JSPX
 			MENUITEM "ASP.NET (C#)(&C)",								IDM_LEXER_ASPX_CS
 			MENUITEM "ASP.NET (VB.NET)(&V)",							IDM_LEXER_ASPX_VB
 			MENUITEM "ASP (VB스크립트)(&B)",								IDM_LEXER_ASP_VBS
@@ -568,7 +569,7 @@ BEGIN
 			MENUITEM "XSLT 스타일시트(&T)",								IDM_LEXER_XSLT
 			MENUITEM "XML DTD(&D)",										IDM_LEXER_DTD
 			MENUITEM "속성 목록(&P)",									IDM_LEXER_PROPERTY_LIST
-			//MENUITEM "SVG 문서(&G)",									IDM_LEXER_SVG
+			MENUITEM "SVG 문서(&G)",									IDM_LEXER_SVG
 		END
 	END
 	POPUP "설정(&I)"

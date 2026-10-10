@@ -2434,6 +2434,8 @@ static void Style_UpdateLexerLang(LPCEDITLEXER pLex, LPCWSTR lpszExt, LPCWSTR lp
 	case NP2LEX_HTML:
 		if (StrCaseEqual(L"jsp", lpszExt)) {
 			np2LexLangIndex = IDM_LEXER_JSP;
+		} else if (StrCaseEqual(L"jspx", lpszExt)) {
+			np2LexLangIndex = IDM_LEXER_JSPX;
 		} else if (StrCaseEqual(L"aspx", lpszExt)) {
 			np2LexLangIndex = Style_GetDocTypeLanguage();
 			if (np2LexLangIndex == 0) {
@@ -2485,8 +2487,8 @@ static void Style_UpdateLexerLang(LPCEDITLEXER pLex, LPCWSTR lpszExt, LPCWSTR lp
 			np2LexLangIndex = IDM_LEXER_DTD;
 		} else if (StrCaseEqual(L"plist", lpszExt)) {
 			np2LexLangIndex = IDM_LEXER_PROPERTY_LIST;
-		//} else if (StrCaseEqual(L"svg", lpszExt)) {
-		//	np2LexLangIndex = IDM_LEXER_SVG;
+		} else if (StrCaseEqual(L"svg", lpszExt)) {
+			np2LexLangIndex = IDM_LEXER_SVG;
 		}
 		break;
 	}
@@ -2834,6 +2836,7 @@ void Style_SetLexerByLangIndex(int lang) noexcept {
 	// Web Source Code
 	case IDM_LEXER_WEB:
 	case IDM_LEXER_JSP:
+	case IDM_LEXER_JSPX:
 	case IDM_LEXER_ASPX_CS:
 	case IDM_LEXER_ASPX_VB:
 	case IDM_LEXER_ASP_VBS:
@@ -2886,7 +2889,7 @@ void Style_SetLexerByLangIndex(int lang) noexcept {
 	case IDM_LEXER_XSLT:
 	case IDM_LEXER_DTD:
 	case IDM_LEXER_PROPERTY_LIST:
-	//case IDM_LEXER_SVG:
+	case IDM_LEXER_SVG:
 		if (lang == IDM_LEXER_XML) {
 			np2LexLangIndex = Style_GetDocTypeLanguage();
 		}
