@@ -372,7 +372,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 	bool isLanguageType = false; // type or language attribute for script tag
 	int sgmlBlockLevel = (lineState >> 21);
 
-	bool insideRegexRange = false;
+	bool insideRegexCharacterClass = false; // inside regex character class []
 	bool needsBacktrack = false;
 	std::vector<InterpolatingState> interpolatingStack;
 
@@ -1027,7 +1027,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			}
 			break;
 		case SCE_HJ_REGEX:
-			if (ch == '\r' || ch == '\n' || (ch == '/' && !insideRegexRange)) {
+			if (ch == '\r' || ch == '\n' || (ch == '/' && !insideRegexCharacterClass)) {
 				if (ch == '/') {
 					while (IsLowerCase(chNext)) {   // gobble regex flags
 						i++;
@@ -1045,7 +1045,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 					ch = chNext;
 				}
 			} else if (ch == '[' || ch == ']') {
-				insideRegexRange = ch == '[';
+				insideRegexCharacterClass = ch == '[';
 			}
 			break;
 
@@ -1091,7 +1091,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			} else if (ch == '/' && chNext == '/') {
 				state = SCE_HJ_COMMENTLINE;
 			} else if (ch == '/' && !IsEOLChar(chNext) && IsRegexStart(chPrevNonWhite, stylePrevNonWhite)) {
-				insideRegexRange = false;
+				insideRegexCharacterClass = false;
 				state = SCE_HJ_REGEX;
 			} else if (ch == '\"') {
 				state = SCE_HJ_DOUBLESTRING;

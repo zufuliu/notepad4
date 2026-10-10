@@ -795,7 +795,7 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 	}
 
 	PHPLexer lexer(startPos, lengthDoc, initStyle, styler);
-	bool insideRegexRange = false;
+	bool insideRegexCharacterClass = false; // inside regex character class []
 	StyleContext &sc = lexer.sc;
 	EscapeSequence &escSeq = lexer.escSeq;
 
@@ -1134,8 +1134,8 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			} else if (sc.ch == '\\') {
 				sc.Forward();
 			} else if (sc.ch == '[' || sc.ch == ']') {
-				insideRegexRange = sc.ch == '[';
-			} else if (sc.ch == '/' && !insideRegexRange) {
+				insideRegexCharacterClass = sc.ch == '[';
+			} else if (sc.ch == '/' && !insideRegexCharacterClass) {
 				sc.Forward();
 				// regex flags
 				while (IsLowerCase(sc.ch)) {
@@ -1324,7 +1324,7 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 						lexer.lineStateLineType = LineStateCommentLine;
 					}
 				} else if (!IsEOLChar(sc.chNext) && IsRegexStart(chPrevNonWhite, stylePrevNonWhite)) {
-					insideRegexRange = false;
+					insideRegexCharacterClass = false;
 					sc.SetState(js_style(SCE_JS_REGEX));
 				} else {
 					sc.SetState(js_style(SCE_JS_OPERATOR));
