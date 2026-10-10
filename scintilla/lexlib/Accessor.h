@@ -39,6 +39,11 @@ public:
 		return GetPropertyInt(key, N - 1, defaultValue) & true;
 	}
 
+	template <size_t N>
+	uint32_t GetPropertyAsU4(const char (&key)[N]) const {
+		return *reinterpret_cast<const uint32_t *>(GetProperty(key, N - 1));
+	}
+
 	int IndentAmount(Sci_Line line) noexcept;
 
 	[[deprecated]]
