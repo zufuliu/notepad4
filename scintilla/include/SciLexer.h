@@ -20,7 +20,6 @@
 #define SCLEX_PYTHON 2
 #define SCLEX_CPP 3
 #define SCLEX_HTML 4
-#define SCLEX_XML 5
 #define SCLEX_PERL 6
 #define SCLEX_SQL 7
 #define SCLEX_VISUALBASIC 8

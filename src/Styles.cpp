@@ -311,9 +311,33 @@ int np2LexLangIndex = 0;
 static bool tabSeparatedValue; // for TSV file
 static int iCsvOption = ('\"' << 8) | ',';
 
+namespace { // lexer option
+
+// see LexCSV
 #define CsvOption_BackslashEscape	(1 << 15)
 #define CsvOption_MergeDelimiter	(1 << 16)
 #define LexerChanged_Override		2
+
+// see LexHTML
+enum HtmlOption {
+	HtmlOption_IsXML = 1,
+	HtmlOption_AllowScript = 2, // <script></script>
+	HtmlOption_AllowStyle = 4,	// <style></style>
+	HtmlOption_AllowASP = 8,	// <% %>
+	HtmlOption_AllowJSPEL = 16,	// ${}, #{}
+	HtmlOption_AllowJSPX = 32,	// <jsp:scriptlet, expression, declaration></jsp:>
+
+	HtmlOption_JavaScript = 1 << (8 + 4),	// eScriptJS
+	HtmlOption_VBScript = 2 << (8 + 4),		// eScriptVBS
+
+	HtmlOption_HtmlBase = HtmlOption_AllowScript | HtmlOption_AllowStyle | HtmlOption_AllowASP,
+	HtmlOption_HtmlDefault = HtmlOption_HtmlBase | HtmlOption_JavaScript,
+	HtmlOption_HtmlVBScript = HtmlOption_HtmlBase | HtmlOption_VBScript,
+	HtmlOption_XmlDefault = HtmlOption_IsXML | HtmlOption_JavaScript,
+	HtmlOption_JspBase = HtmlOption_AllowScript | HtmlOption_AllowStyle | HtmlOption_AllowJSPEL | HtmlOption_JavaScript,
+};
+
+}
 
 #define STYLESMODIFIED_NONE			0
 #define STYLESMODIFIED_SOME_STYLE	1
@@ -1422,13 +1446,6 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) noexcept {
 
 		int dialect = 0;
 		switch (rid) {
-		//case NP2LEX_HTML:
-		//case NP2LEX_XML:
-		//	//SciCall_SetProperty("fold.html", "1");
-		//	//SciCall_SetProperty("fold.hypertext.comment", "1");
-		//	//SciCall_SetProperty("fold.hypertext.heredoc", "1");
-		//	break;
-
 		case NP2LEX_ACTIONSCRIPT: // enable ECMAScript For XML
 		case NP2LEX_APDL: // see LexAPDL.cxx
 		case NP2LEX_ELIXIR: // see LexErlang.cxx
@@ -1451,6 +1468,17 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) noexcept {
 
 		case NP2LEX_CSV:
 			dialect = iCsvOption;
+			break;
+
+		case NP2LEX_HTML:
+			dialect = HtmlOption_HtmlDefault;
+			if (np2LexLangIndex == IDM_LEXER_ASPX_VB || np2LexLangIndex == IDM_LEXER_ASP_VBS) {
+				dialect = HtmlOption_HtmlVBScript;
+			} else if (np2LexLangIndex == IDM_LEXER_JSP) {
+				dialect = HtmlOption_JspBase | HtmlOption_AllowASP;
+			} else if (np2LexLangIndex == IDM_LEXER_JSPX) {
+				dialect = HtmlOption_JspBase | HtmlOption_AllowJSPX | HtmlOption_IsXML;
+			}
 			break;
 
 		case NP2LEX_JAVASCRIPT: {
@@ -1481,6 +1509,13 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) noexcept {
 			static_assert(IDM_LEXER_VBS - IDM_LEXER_VBNET == 2);
 			dialect = np2LexLangIndex - IDM_LEXER_VBNET;
 		} break;
+
+		case NP2LEX_XML:
+			dialect = HtmlOption_XmlDefault;
+			if (np2LexLangIndex == IDM_LEXER_SVG) {
+				dialect = HtmlOption_XmlDefault | HtmlOption_AllowStyle;
+			}
+			break;
 		}
 
 		if (dialect > 0) {
@@ -2690,9 +2725,9 @@ bool Style_SetLexerFromFile(LPCWSTR lpszFile) noexcept {
 					}
 				}
 			}
-			if (pLexNew && (pLexNew->iLexer == SCLEX_HTML || pLexNew->iLexer == SCLEX_XML)) {
+			if (pLexNew && (pLexNew->iLexer == SCLEX_HTML)) {
 				np2LexLangIndex = Style_GetDocTypeLanguage();
-				if (pLexNew->iLexer == SCLEX_XML && np2LexLangIndex == IDM_LEXER_WEB) {
+				if (pLexNew->rid == NP2LEX_XML && np2LexLangIndex == IDM_LEXER_WEB) {
 					// xhtml: <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html>
 					pLexNew = &lexHTML;
 				}

@@ -48,6 +48,25 @@ enum script_type { eScriptNone = 0, eScriptJS, eScriptVBS, eScriptXML, eScriptSG
 enum script_mode { eHtml = 0, eNonHtmlScript, eNonHtmlPreProc, eNonHtmlScriptPreProc };
 enum class TagState { None = 0, Close = -1, Open = 1 };
 
+// first byte option, second byte default ASP page language
+enum HtmlOption {
+	HtmlOption_IsXML = 1,
+	HtmlOption_AllowScript = 2, // <script></script>
+	HtmlOption_AllowStyle = 4,	// <style></style>
+	HtmlOption_AllowASP = 8,	// <% %>
+	HtmlOption_AllowJSPEL = 16,	// ${}, #{}
+	HtmlOption_AllowJSPX = 32,	// <jsp:scriptlet, expression, declaration></jsp:>
+
+	HtmlOption_JavaScript = 1 << (8 + 4),	// eScriptJS
+	HtmlOption_VBScript = 2 << (8 + 4),		// eScriptVBS
+
+	HtmlOption_HtmlBase = HtmlOption_AllowScript | HtmlOption_AllowStyle | HtmlOption_AllowASP,
+	HtmlOption_HtmlDefault = HtmlOption_HtmlBase | HtmlOption_JavaScript,
+	HtmlOption_HtmlVBScript = HtmlOption_HtmlBase | HtmlOption_VBScript,
+	HtmlOption_XmlDefault = HtmlOption_IsXML | HtmlOption_JavaScript,
+	HtmlOption_JspBase = HtmlOption_AllowScript | HtmlOption_AllowStyle | HtmlOption_AllowJSPEL | HtmlOption_JavaScript,
+};
+
 // Put an upper limit to bound time taken for unexpected text.
 constexpr Sci_PositionU maxLengthCheck = 200;
 
@@ -169,7 +188,7 @@ constexpr bool stateTerminateScript(int state) noexcept {
 }
 
 SCI_noinline
-bool classifyAttribHTML(Sci_PositionU end, LexerWordList keywordLists, LexAccessor &styler, script_mode inScriptType, bool isXml) {
+bool classifyAttribHTML(Sci_PositionU end, LexerWordList keywordLists, LexAccessor &styler, script_mode inScriptType, HtmlOption option) {
 	char s[MaxKeywordSize];
 	int chAttr = SCE_H_ATTRIBUTEUNKNOWN;
 	bool isLanguageType = false;
@@ -184,7 +203,7 @@ bool classifyAttribHTML(Sci_PositionU end, LexerWordList keywordLists, LexAccess
 				isLanguageType = true;
 			}
 		}
-		if (isXml || keywordLists[KeywordIndex_Attribute].InList(s)) {
+		if ((option & HtmlOption_IsXML) || keywordLists[KeywordIndex_Attribute].InList(s)) {
 			chAttr = SCE_H_ATTRIBUTE;
 		}
 	}
@@ -203,7 +222,7 @@ bool isHTMLCustomElement(const char *tag, size_t length, bool dashColon) noexcep
 }
 
 SCI_noinline
-int classifyTagHTML(Sci_PositionU end, LexerWordList keywordLists, LexAccessor &styler, bool &tagDontFold, bool isXml, bool allowScripts) {
+int classifyTagHTML(Sci_PositionU end, LexerWordList keywordLists, LexAccessor &styler, bool &tagDontFold, HtmlOption option) {
 	char s[63 + 1];
 	memset(s, 0, 4);
 	const Sci_PositionU start = styler.GetStartSegment();
@@ -217,7 +236,7 @@ int classifyTagHTML(Sci_PositionU end, LexerWordList keywordLists, LexAccessor &
 	bool customElement = false;
 	if (tag[0] == '!') {
 		chAttr = SCE_H_SGML_DEFAULT;
-	} else if (isXml) {
+	} else if (option & HtmlOption_IsXML) {
 		chAttr = SCE_H_TAG;
 	} else {
 		bool dashColon = false;
@@ -242,7 +261,7 @@ int classifyTagHTML(Sci_PositionU end, LexerWordList keywordLists, LexAccessor &
 		styler.ColorTo(end, chAttr);
 	}
 	if (chAttr == SCE_H_TAG && !customElement) {
-		if (s[1] != '/' && allowScripts && StrEqual(tag, "script")) {
+		if (s[1] != '/' && (option & HtmlOption_AllowScript) && StrEqual(tag, "script")) {
 			// check to see if this is a self-closing tag by sniffing ahead
 			bool isSelfClose = false;
 			for (Sci_PositionU cPos = end; cPos < end + maxLengthCheck; cPos++) {
@@ -263,6 +282,7 @@ int classifyTagHTML(Sci_PositionU end, LexerWordList keywordLists, LexAccessor &
 	return chAttr;
 }
 
+SCI_noinline
 int classifyWordHTJS(Sci_PositionU end, LexerWordList keywordLists, LexAccessor &styler, script_mode inScriptType) {
 	char s[31 + 1];
 	styler.GetRange(styler.GetStartSegment(), end, s, sizeof(s));
@@ -274,6 +294,7 @@ int classifyWordHTJS(Sci_PositionU end, LexerWordList keywordLists, LexAccessor 
 	return chAttr;
 }
 
+SCI_noinline
 int classifyWordHTVB(Sci_PositionU end, LexerWordList keywordLists, LexAccessor &styler, script_mode inScriptType) {
 	int chAttr = SCE_HB_IDENTIFIER;
 	char s[32];
@@ -351,7 +372,7 @@ bool IsHtmlComment(int ch, Sci_Position i, LexAccessor &styler) noexcept {
 		|| (ch == '<' && chNext2 == '-' && styler.SafeGetCharAt(i + 3) == '-');
 }
 
-void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler, bool isXml) {
+void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	constexpr int backtrackMask = 1 << 2;
 	// If inside a tag, it may be a script tag, so reread from the start of line starting tag to ensure any language tags are seen
 	if (startPos != 0) {
@@ -367,6 +388,9 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 		state = SCE_H_DEFAULT;
 	}
 
+	const bool fold = styler.GetPropertyBool("fold");
+	const HtmlOption option = static_cast<HtmlOption>(styler.GetPropertyAsU4("lexer.lang"));
+
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int lineState;
 	if (lineCurrent > 0) {
@@ -378,7 +402,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 		// property asp.default.language
 		//	Script in ASP code is initially assumed to be in JavaScript.
 		//	To change this to VBScript set asp.default.language to 2.
-		lineState |= styler.GetPropertyInt("asp.default.language", eScriptJS) << 4;
+		lineState |= (option >> 8);
 	}
 
 	script_mode inScriptType = static_cast<script_mode>((lineState >> 0) & 0x03); // 2 bits of scripting mode
@@ -396,12 +420,6 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 
 	script_type scriptLanguage = ScriptOfState(state);
 	script_type beforeLanguage = ScriptOfState(beforePreProc);
-
-	const bool fold = styler.GetPropertyBool("fold");
-
-	// property lexer.xml.allow.scripts
-	//	Set to 0 to disable scripts in XML.
-	const bool allowScripts = styler.GetPropertyBool("lexer.xml.allow.scripts", true);
 
 	int levelPrev = styler.LevelAt(lineCurrent) & SC_FOLDLEVELNUMBERMASK;
 	int levelCurrent = levelPrev;
@@ -567,7 +585,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				state = SCE_H_COMMENT; // wait for a pending command
 				styler.ColorTo(i + 3, SCE_H_COMMENT);
 				i += 2; // follow styling after the --
-				if (!isXml) {
+				if (!(option & HtmlOption_IsXML)) {
 					// handle empty comment: <!-->, <!--->
 					// https://html.spec.whatwg.org/multipage/parsing.html#parse-error-abrupt-closing-of-empty-comment
 					ch = '-';
@@ -819,7 +837,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			break;
 		case SCE_H_TAGUNKNOWN:
 			if (!IsTagContinue(ch) && !((ch == '/') && (chPrev == '<'))) {
-				int eClass = classifyTagHTML(i, keywordLists, styler, tagDontFold, isXml, allowScripts);
+				int eClass = classifyTagHTML(i, keywordLists, styler, tagDontFold, option);
 				if (eClass == SCE_H_SCRIPT) {
 					if (tagState > TagState::None) {
 						inScriptType = eNonHtmlScript;
@@ -870,7 +888,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			break;
 		case SCE_H_ATTRIBUTE:
 			if (!IsAttributeContinue(ch)) {
-				isLanguageType = classifyAttribHTML(i, keywordLists, styler, inScriptType, isXml);
+				isLanguageType = classifyAttribHTML(i, keywordLists, styler, inScriptType, option);
 				if (ch == '>') {
 					styler.ColorTo(i + 1, SCE_H_TAG);
 					if (inScriptType == eNonHtmlScript) {
@@ -1186,17 +1204,6 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 	}
 }
 
-void ColouriseXMLDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
-	// Passing in true because we're lexing XML
-	ColouriseHyperTextDoc(startPos, length, initStyle, keywordLists, styler, true);
 }
 
-void ColouriseHTMLDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
-	// Passing in false because we're not lexing XML
-	ColouriseHyperTextDoc(startPos, length, initStyle, keywordLists, styler, false);
-}
-
-}
-
-extern const LexerModule lmHTML(SCLEX_HTML, ColouriseHTMLDoc, "hypertext");
-extern const LexerModule lmXML(SCLEX_XML, ColouriseXMLDoc, "xml");
+extern const LexerModule lmHTML(SCLEX_HTML, ColouriseHyperTextDoc, "html");
