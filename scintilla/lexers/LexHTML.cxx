@@ -136,16 +136,11 @@ constexpr bool IsSGMLEntityChar(int ch) noexcept {
 }
 
 constexpr bool isStringState(int state) noexcept {
-	switch (state) {
-	case SCE_HJ_DOUBLESTRING:
-	case SCE_HJ_SINGLESTRING:
-	case SCE_HJ_REGEX:
-	case SCE_HJ_TEMPLATELITERAL:
-	case SCE_HB_STRING:
-		return true;
-	default:
-		return false;
-	}
+	return state == SCE_HJ_DOUBLESTRING
+		|| state == SCE_HJ_SINGLESTRING
+		|| state == SCE_HJ_REGEX
+		|| state == SCE_HJ_TEMPLATELITERAL
+		|| state == SCE_HB_STRING;
 }
 
 constexpr bool stateAllowsTermination(int state, int ch) noexcept {
@@ -165,6 +160,12 @@ constexpr bool isCommentASPState(int state) noexcept {
 		|| state == SCE_HJ_COMMENTLINE
 		|| state == SCE_HJ_COMMENTDOC
 		|| state == SCE_HB_COMMENTLINE;
+}
+
+constexpr bool stateTerminateScript(int state) noexcept {
+	// removed SCE_HJ_COMMENTLINE and SCE_HB_COMMENTLINE as this is a common thing
+	// done to hide the end of script marker from some JS interpreters.
+	return !isStringState(state) && !AnyOf(SCE_HJ_COMMENT, SCE_HJ_COMMENTDOC);
 }
 
 SCI_noinline
@@ -362,19 +363,14 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 
 	/* Nothing handles getting out of these, so we need not start in any of them.
 	 * As we're at line start and they can't span lines, we'll re-detect them anyway */
-	switch (state) {
-		case SCE_H_QUESTION:
-		case SCE_H_XMLSTART:
-		case SCE_H_XMLEND:
-		case SCE_H_ASP:
-			state = SCE_H_DEFAULT;
-			break;
+	if (AnyOf(state, SCE_H_QUESTION, SCE_H_XMLSTART, SCE_H_XMLEND, SCE_H_ASP)) {
+		state = SCE_H_DEFAULT;
 	}
 
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int lineState;
 	if (lineCurrent > 0) {
-		lineState = styler.GetLineState(lineCurrent-1);
+		lineState = styler.GetLineState(lineCurrent - 1);
 	} else {
 		// Default client and ASP scripting language is JavaScript
 		lineState = eScriptJS << 8;
@@ -384,6 +380,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 		//	To change this to VBScript set asp.default.language to 2.
 		lineState |= styler.GetPropertyInt("asp.default.language", eScriptJS) << 4;
 	}
+
 	script_mode inScriptType = static_cast<script_mode>((lineState >> 0) & 0x03); // 2 bits of scripting mode
 	TagState tagState = TagState::None;
 	bool tagDontFold = false; //some HTML tags should not be folded
@@ -477,31 +474,10 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 		}
 
 		// generic end of script processing
-		else if ((inScriptType == eNonHtmlScript) && (ch == '<' && chNext == '/')) {
+		else if ((inScriptType == eNonHtmlScript) && (ch == '<' && chNext == '/') && stateTerminateScript(state)) {
 			// Check if it's the end of the script tag (or any other HTML tag)
-			switch (state) {
-				// in these cases, you can embed HTML tags (to confirm !!!!!!!!!!!!!!!!!!!!!!)
-			case SCE_H_DOUBLESTRING:
-			case SCE_H_SINGLESTRING:
-			case SCE_HJ_COMMENT:
-			case SCE_HJ_COMMENTDOC:
-			//case SCE_HJ_COMMENTLINE: // removed as this is a common thing done to hide
-			// the end of script marker from some JS interpreters.
-			//case SCE_HB_COMMENTLINE:
-			case SCE_HJ_DOUBLESTRING:
-			case SCE_HJ_SINGLESTRING:
-			case SCE_HJ_TEMPLATELITERAL:
-			case SCE_HJ_REGEX:
-			case SCE_HB_STRING:
-				break;
-			default :
-				// check if the closing tag is a script tag
-				{
-					const bool match = styler.MatchLowerCase(i + 2, "script");
-					if (!match) {
-						break;
-					}
-				}
+			const bool match = styler.MatchLowerCase(i + 2, "script");
+			if (match) {
 				// closing tag of the script (it's a closing HTML tag anyway)
 				styler.ColorTo(i, StateToPrint);
 				state = SCE_H_TAGUNKNOWN;
@@ -685,7 +661,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				if (chNext != '!') {
 					state = SCE_H_TAGUNKNOWN;
 				}
-				styler.ColorTo(i, StateToPrint);
+				styler.ColorTo(i, SCE_H_DEFAULT);
 			} else if (ch == '&' && (IsAlpha(chNext) || chNext == '#')) {
 				styler.ColorTo(i, SCE_H_DEFAULT);
 				state = SCE_H_ENTITY;
@@ -700,9 +676,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				styler.ColorTo(i, StateToPrint);
 				state = SCE_H_SGML_SIMPLESTRING;
 			} else if ((ch == '-') && (chPrev == '-')) {
-				if (static_cast<Sci_Position>(styler.GetStartSegment()) <= (i - 2)) {
-					styler.ColorTo(i - 1, StateToPrint);
-				}
+				styler.ColorTo(i - 1, StateToPrint);
 				state = SCE_H_SGML_COMMENT;
 			} else if (ch == '%' && IsAlpha(chNext)) {
 				styler.ColorTo(i, StateToPrint);
@@ -1200,10 +1174,8 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 		classifyWordHTVB(lengthDoc, keywordLists, styler, inScriptType);
 		break;
 	default:
-		if (static_cast<Sci_Position>(styler.GetStartSegment()) < lengthDoc) {
-			StateToPrint = statePrintForState(state, inScriptType);
-			styler.ColorTo(lengthDoc, StateToPrint);
-		}
+		StateToPrint = statePrintForState(state, inScriptType);
+		styler.ColorTo(lengthDoc, StateToPrint);
 		break;
 	}
 
