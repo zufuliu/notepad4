@@ -86,14 +86,14 @@ enum class HtmlTextBlock {
 };
 
 constexpr HtmlTextBlock GetHtmlTextBlock(int style) noexcept {
+	if (style >= SCE_PHP_DEFAULT) {
+		return HtmlTextBlock::PHP;
+	}
 	if (style >= css_style(SCE_CSS_DEFAULT)) {
 		return HtmlTextBlock::Style;
 	}
 	if (style >= js_style(SCE_JS_DEFAULT)) {
 		return HtmlTextBlock::Script;
-	}
-	if (style >= SCE_PHP_DEFAULT) {
-		return HtmlTextBlock::PHP;
 	}
 	return HtmlTextBlock::Html;
 }
@@ -140,7 +140,7 @@ struct EscapeSequence {
 		brace = false;
 		if (chNext == 'x') {
 			digitsLeft = 3;
-		} else if (IsOctalDigit(chNext) && state < SCE_PHP_LABEL) {
+		} else if (IsOctalDigit(chNext) && state >= SCE_PHP_DEFAULT) {
 			digitsLeft = 3;
 			hex = false;
 		} else if (chNext == 'u') {
@@ -653,15 +653,15 @@ constexpr bool IsSpaceEquiv(int state) noexcept {
 }
 
 constexpr int GetDefaultStyle(int state) noexcept {
-	return (state < SCE_PHP_LABEL) ? SCE_PHP_DEFAULT : js_style(SCE_JS_DEFAULT);
+	return (state >= SCE_PHP_DEFAULT) ? SCE_PHP_DEFAULT : js_style(SCE_JS_DEFAULT);
 }
 
 constexpr int GetTaskMarkerStyle(int state) noexcept {
-	return (state < SCE_PHP_LABEL) ? SCE_PHP_TASKMARKER : js_style(SCE_JS_TASKMARKER);
+	return (state >= SCE_PHP_DEFAULT) ? SCE_PHP_TASKMARKER : js_style(SCE_JS_TASKMARKER);
 }
 
 constexpr int GetCommentTagStyle(int state) noexcept {
-	return (state < SCE_PHP_LABEL) ? SCE_PHP_COMMENTTAGAT : js_style(SCE_JS_COMMENTTAGAT);
+	return (state >= SCE_PHP_DEFAULT) ? SCE_PHP_COMMENTTAGAT : js_style(SCE_JS_COMMENTTAGAT);
 }
 
 int PHPLexer::ClassifyJSWord(LexerWordList keywordLists) {
@@ -1201,7 +1201,7 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			break;
 		}
 
-		if ((sc.state < SCE_PHP_DEFAULT || sc.state > SCE_PHP_LABEL) && sc.Match('<', '?')) {
+		if ((sc.state < SCE_PHP_DEFAULT) && sc.Match('<', '?')) {
 			// sc.state is default or stream style
 			lexer.HandlePHPTag();
 		}

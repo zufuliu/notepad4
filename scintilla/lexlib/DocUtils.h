@@ -40,8 +40,6 @@ inline bool IsHtmlCommentDelimiter(const StyleContext &sc) noexcept {
 }
 
 #define SCE_H_VOID_TAG		SCE_H_TAGEND
-#define js_style(style)		((style) + SCE_PHP_LABEL + 1)
-#define css_style(style)	((style) + SCE_PHP_LABEL + SCE_JS_LABEL + 2)
 
 constexpr bool IsJsSpaceEquiv(int state) noexcept {
 	return (state >= js_style(SCE_JS_DEFAULT) && state <= js_style(SCE_JS_TASKMARKER));

@@ -562,10 +562,6 @@ static uint32_t CommentStyleMask[8];
 static uint32_t AllStringStyleMask[8];
 static uint32_t PlainTextStyleMask[8];
 
-// from scintilla/lexlib/DocUtils.h
-#define js_style(style)		((style) + SCE_PHP_LABEL + 1)
-#define css_style(style)	((style) + SCE_PHP_LABEL + SCE_JS_LABEL + 2)
-
 static inline bool IsDefaultWordChar(uint32_t ch) noexcept {
 	return BitTestEx(DefaultWordCharSet, ch);
 }
@@ -771,14 +767,14 @@ enum HtmlTextBlock {
 
 static HtmlTextBlock GetCurrentHtmlTextBlockEx(int iLexer, int iCurrentStyle) noexcept {
 	if (iLexer == SCLEX_PHPSCRIPT) {
+		if (iCurrentStyle >= SCE_PHP_DEFAULT) {
+			return HtmlTextBlock_PHP;
+		}
 		if (iCurrentStyle >= css_style(SCE_CSS_DEFAULT)) {
 			return HtmlTextBlock_CSS;
 		}
 		if (iCurrentStyle >= js_style(SCE_JS_DEFAULT)) {
 			return HtmlTextBlock_JavaScript;
-		}
-		if (iCurrentStyle >= SCE_PHP_DEFAULT) {
-			return HtmlTextBlock_PHP;
 		}
 	}
 	if (iCurrentStyle == SCE_H_CDATA) {
@@ -1055,19 +1051,19 @@ static AddWordResult AutoC_AddSpecWord(WordList &pWList, int iCurrentStyle, int 
 	LPCEDITLEXER pLex = pLexCurrent;
 	int rid = pLex->rid;
 	if (rid == NP2LEX_PHP) {
-		if (iCurrentStyle >= css_style(SCE_CSS_DEFAULT)) {
-			iCurrentStyle -= css_style(SCE_CSS_DEFAULT);
-			iPrevStyle -= css_style(SCE_CSS_DEFAULT);
-			rid = NP2LEX_CSS;
-			pLex = &lexCSS;
-		} else if (iCurrentStyle >= js_style(SCE_JS_DEFAULT)) {
+		if (iCurrentStyle < js_style(SCE_JS_DEFAULT)) {
+			rid = NP2LEX_HTML;
+			pLex = &lexHTML;
+		} else if (iCurrentStyle < css_style(SCE_CSS_DEFAULT)) {
 			iCurrentStyle -= js_style(SCE_JS_DEFAULT);
 			iPrevStyle -= js_style(SCE_JS_DEFAULT);
 			rid = NP2LEX_JAVASCRIPT;
 			pLex = &lexJavaScript;
 		} else if (iCurrentStyle < SCE_PHP_DEFAULT) {
-			rid = NP2LEX_HTML;
-			pLex = &lexHTML;
+			iCurrentStyle -= css_style(SCE_CSS_DEFAULT);
+			iPrevStyle -= css_style(SCE_CSS_DEFAULT);
+			rid = NP2LEX_CSS;
+			pLex = &lexCSS;
 		}
 	}
 

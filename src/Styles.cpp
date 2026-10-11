@@ -1814,8 +1814,8 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) noexcept {
 			if (rid == NP2LEX_MARKDOWN) {
 				SciCall_CopyStyles(STYLE_LINK, MULTI_STYLE(SCE_MARKDOWN_PLAIN_LINK, SCE_MARKDOWN_PAREN_LINK, SCE_MARKDOWN_ANGLE_LINK, 0));
 			} else {
-				Style_SetAllStyle(&lexJavaScript, SCE_PHP_LABEL + 1);
-				Style_SetAllStyle(&lexCSS, SCE_PHP_LABEL + SCE_JS_LABEL + 2);
+				Style_SetAllStyle(&lexJavaScript, SCE_STYLE_OFFSET_JS);
+				Style_SetAllStyle(&lexCSS, SCE_STYLE_OFFSET_CSS);
 			}
 			szValue = lexHTML.szStyleBuf;
 			for (UINT i = 1; i < lexHTML.iStyleCount; i++) {
