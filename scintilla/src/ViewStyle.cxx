@@ -688,12 +688,13 @@ ColourRGBA ViewStyle::WrapColour() const noexcept {
 
 // Insert new edge in sorted order.
 void ViewStyle::AddMultiEdge(int column, ColourRGBA colour) {
+	const EdgeProperties edgeNew(column, colour);
 	theMultiEdge.insert(
-		std::upper_bound(theMultiEdge.begin(), theMultiEdge.end(), column,
+		std::upper_bound(theMultiEdge.begin(), theMultiEdge.end(), edgeNew,
 		[](const EdgeProperties &a, const EdgeProperties &b) noexcept {
 			return a.column < b.column;
 		}),
-		EdgeProperties(column, colour));
+		edgeNew);
 }
 
 ColourOptional ViewStyle::ElementColour(Element element) const noexcept {

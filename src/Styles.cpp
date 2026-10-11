@@ -3387,8 +3387,8 @@ bool Style_StrGetSize(LPCWSTR lpszStyle, int *size) noexcept {
 	return false;
 }
 
-// https://docs.microsoft.com/en-us/windows/desktop/api/wingdi/ns-wingdi-taglogfontw
-// https://docs.microsoft.com/en-us/windows/desktop/api/dwrite/ne-dwrite-dwrite_font_weight
+// https://learn.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-logfontw
+// https://learn.microsoft.com/en-us/windows/win32/api/dwrite/ne-dwrite-dwrite_font_weight
 #define MIN_FONT_WEIGHT		0
 #define MAX_FONT_WEIGHT		1000
 bool Style_StrGetFontWeight(LPCWSTR lpszStyle, int *weight) noexcept {

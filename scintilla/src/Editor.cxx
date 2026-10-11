@@ -7229,11 +7229,10 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case Message::SetFontQuality:
-		vs.extraFontFlag = static_cast<FontQuality>(
-			(static_cast<int>(vs.extraFontFlag) & ~static_cast<int>(FontQuality::QualityMask)) |
-			(wParam & static_cast<int>(FontQuality::QualityMask)));
 		vs.fontsValid = false;
-		InvalidateStyleRedraw();
+		SetAppearance(vs.extraFontFlag, static_cast<FontQuality>(
+			(static_cast<int>(vs.extraFontFlag) & ~static_cast<int>(FontQuality::QualityMask)) |
+			(wParam & static_cast<int>(FontQuality::QualityMask))));
 		break;
 
 	case Message::GetFontQuality:
@@ -7899,8 +7898,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 	case Message::GetCaretLineFrame:
 		return vs.caretLine.frame;
 	case Message::SetCaretLineFrame:
-		vs.caretLine.frame = static_cast<int>(wParam);
-		InvalidateStyleRedraw();
+		SetAppearance(vs.caretLine.frame, static_cast<int>(wParam));
 		break;
 
 	case Message::GetCaretLineLayer:
@@ -8083,22 +8081,21 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 	case Message::GetSelectionLayer:
 		return static_cast<sptr_t>(vs.selection.layer);
 
-	case Message::SetCaretStyle:
-		if (static_cast<CaretStyle>(wParam) <= (CaretStyle::Block | CaretStyle::OverstrikeBlock | CaretStyle::Curses | CaretStyle::BlockAfter))
-			vs.caret.style = static_cast<CaretStyle>(wParam);
-		else
+	case Message::SetCaretStyle: {
+		CaretStyle caretStyle = static_cast<CaretStyle>(wParam);
+		if (caretStyle > (CaretStyle::Block | CaretStyle::OverstrikeBlock | CaretStyle::Curses | CaretStyle::BlockAfter)) {
 			/* Default to the line caret */
-			vs.caret.style = CaretStyle::Line;
-		InvalidateStyleRedraw();
-		break;
+			caretStyle = CaretStyle::Line;
+		}
+		SetAppearance(vs.caret.style, caretStyle);
+	} break;
 
 	case Message::GetCaretStyle:
 		return static_cast<sptr_t>(vs.caret.style);
 
 	case Message::SetCaretWidth:
 		// Windows accessibility allows 20 pixels caret width.
-		vs.caret.width = std::clamp(static_cast<int>(wParam), 0, 20);
-		InvalidateStyleRedraw();
+		SetAppearance(vs.caret.width, std::clamp(static_cast<int>(wParam), 0, 20));
 		break;
 
 	case Message::GetCaretWidth:
@@ -8390,8 +8387,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		return vs.viewEOL;
 
 	case Message::SetViewEOL:
-		vs.viewEOL = wParam != 0;
-		InvalidateStyleRedraw();
+		SetAppearance(vs.viewEOL, wParam != 0);
 		break;
 
 	case Message::SetZoom: {
@@ -8412,24 +8408,21 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		return vs.theEdge.column;
 
 	case Message::SetEdgeColumn:
-		vs.theEdge.column = static_cast<int>(wParam);
-		InvalidateStyleRedraw();
+		SetAppearance(vs.theEdge.column, static_cast<int>(wParam));
 		break;
 
 	case Message::GetEdgeMode:
 		return static_cast<sptr_t>(vs.edgeState);
 
 	case Message::SetEdgeMode:
-		vs.edgeState = static_cast<EdgeVisualStyle>(wParam);
-		InvalidateStyleRedraw();
+		SetAppearance(vs.edgeState, static_cast<EdgeVisualStyle>(wParam));
 		break;
 
 	case Message::GetEdgeColour:
 		return vs.theEdge.colour.OpaqueRGB();
 
 	case Message::SetEdgeColour:
-		vs.theEdge.colour = ColourRGBA::FromIpRGB(SPtrFromUPtr(wParam));
-		InvalidateStyleRedraw();
+		SetAppearance(vs.theEdge.colour, ColourRGBA::FromIpRGB(SPtrFromUPtr(wParam)));
 		break;
 
 	case Message::MultiEdgeAddLine:
@@ -8598,8 +8591,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		return static_cast<sptr_t>(cursorMode);
 
 	case Message::SetControlCharSymbol:
-		vs.controlCharSymbol = static_cast<int>(wParam);
-		InvalidateStyleRedraw();
+		SetAppearance(vs.controlCharSymbol, static_cast<int>(wParam));
 		break;
 
 	case Message::GetControlCharSymbol:
@@ -8663,13 +8655,11 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case Message::SetFoldMarginColour:
-		vs.foldmarginColour = OptionalColour(wParam, lParam);
-		InvalidateStyleRedraw();
+		SetAppearance(vs.foldmarginColour, OptionalColour(wParam, lParam));
 		break;
 
 	case Message::SetFoldMarginHiColour:
-		vs.foldmarginHighlightColour = OptionalColour(wParam, lParam);
-		InvalidateStyleRedraw();
+		SetAppearance(vs.foldmarginHighlightColour, OptionalColour(wParam, lParam));
 		break;
 
 	case Message::SetHotspotActiveUnderline:

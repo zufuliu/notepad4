@@ -409,7 +409,7 @@ static inline bool IsTopMost() noexcept {
 
 // temporary fix for https://github.com/zufuliu/notepad4/issues/77: force InvalidateStyleRedraw().
 static inline void InvalidateStyleRedraw() noexcept {
-	SciCall_SetViewEOL(bViewEOLs);
+	SciCall_SetCaretLineVisibleAlways(true);
 }
 
 //=============================================================================

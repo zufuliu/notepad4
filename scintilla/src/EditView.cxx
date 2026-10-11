@@ -770,9 +770,15 @@ Point EditView::LocationFromPosition(Surface *surface, const EditModel &model, S
 		lineDoc--;
 		posLineStart = model.pdoc->LineStart(lineDoc);
 	}
+	const Sci::Line lineVisible = model.pcs->DisplayFromDoc(lineDoc);
+	const XYPOSITION lineVisibleY = static_cast<XYPOSITION>((lineVisible - topLine) * vs.lineHeight);
+	const int posInLine = static_cast<int>(pos.Position() - posLineStart);
+	if ((posInLine == 0) && (pos.VirtualSpace() == 0)) {
+		// Simple case at start of document line avoids expensive LayoutLine().
+		return Point(vs.textStart - model.xOffset, lineVisibleY);
+	}
 	if (surface) {
 		auto const ll = RetrieveLineLayout(lineDoc, model);
-		const int posInLine = static_cast<int>(pos.Position() - posLineStart);
 		LayoutLine(model, surface, vs, ll.get(), model.wrapWidth, LayoutLineOption::AutoUpdate, posInLine);
 		pt = ll->PointFromPosition(posInLine, vs.lineHeight, pe);
 		pt.x += vs.textStart - model.xOffset;
@@ -799,8 +805,7 @@ Point EditView::LocationFromPosition(Surface *surface, const EditModel &model, S
 			}
 		}
 
-		const Sci::Line lineVisible = model.pcs->DisplayFromDoc(lineDoc);
-		pt.y += static_cast<XYPOSITION>((lineVisible - topLine) * vs.lineHeight);
+		pt.y += lineVisibleY;
 		pt.x += pos.VirtualSpaceWidth(vs.styles[ll->EndLineStyle()].spaceWidth);
 	}
 	return pt;
@@ -917,9 +922,13 @@ SelectionPosition EditView::SPositionFromLineX(Surface *surface, const EditModel
 Sci::Line EditView::DisplayFromPosition(Surface *surface, const EditModel &model, Sci::Position pos, const ViewStyle &vs) {
 	const Sci::Line lineDoc = model.pdoc->SciLineFromPosition(pos);
 	Sci::Line lineDisplay = model.pcs->DisplayFromDoc(lineDoc);
+	const Sci::Position posLineStart = model.pdoc->LineStart(lineDoc);
+	const int posInLine = static_cast<int>(pos - posLineStart);
+	if (posInLine == 0) {
+		// Avoid expensive LayoutLine() since first position on line is always on first display line.
+		return lineDisplay;
+	}
 	if (surface) {
-		const Sci::Position posLineStart = model.pdoc->LineStart(lineDoc);
-		const int posInLine = static_cast<int>(pos - posLineStart);
 		auto const ll = RetrieveLineLayout(lineDoc, model);
 		LayoutLine(model, surface, vs, ll.get(), model.wrapWidth, LayoutLineOption::AutoUpdate, posInLine);
 		lineDisplay--; // To make up for first increment ahead.

@@ -729,6 +729,7 @@ enum class Notification {
 
 using Position = intptr_t;
 using Line = intptr_t;
+using Pixels = int;
 using Colour = uint32_t;
 using ColourAlpha = uint32_t;
 using uptr_t = uintptr_t;
