@@ -93,7 +93,7 @@ struct WrapAppearance {
 };
 
 struct EdgeProperties {
-	int column;
+	int column = 0;
 	ColourRGBA colour;
 	constexpr EdgeProperties() noexcept = default;
 	constexpr EdgeProperties(int column_, ColourRGBA colour_) noexcept:

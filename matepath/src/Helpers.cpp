@@ -30,7 +30,6 @@
 #include <commdlg.h>
 #include <uxtheme.h>
 #include <vssym32.h>
-#include <psapi.h>
 #include <cstdio>
 #include "config.h"
 #include "Helpers.h"
