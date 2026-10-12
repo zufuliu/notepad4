@@ -636,7 +636,7 @@ static bool IsEscapeCharOrFormatSpecifier(Sci_Position before, int ch, int chPre
 
 	if (style != 0 && pLexCurrent->escapeCharacterStyle) {
 		if (stylePrev != pLexCurrent->escapeCharacterStyle) {
-			if (pLexCurrent->iLexer != SCLEX_PHPSCRIPT
+			if (pLexCurrent->iLexer != SCLEX_PHPSCRIPT || pLexCurrent->iLexer != SCLEX_HTML
 				|| !(stylePrev == js_style(SCE_JS_ESCAPECHAR) || stylePrev == css_style(SCE_CSS_ESCAPECHAR))) {
 				return false;
 			}
@@ -765,39 +765,32 @@ enum HtmlTextBlock {
 	HtmlTextBlock_CSS,
 };
 
-static HtmlTextBlock GetCurrentHtmlTextBlockEx(int iLexer, int iCurrentStyle) noexcept {
-	if (iLexer == SCLEX_PHPSCRIPT) {
-		if (iCurrentStyle >= SCE_PHP_DEFAULT) {
-			return HtmlTextBlock_PHP;
-		}
-		if (iCurrentStyle >= css_style(SCE_CSS_DEFAULT)) {
-			return HtmlTextBlock_CSS;
-		}
-		if (iCurrentStyle >= js_style(SCE_JS_DEFAULT)) {
-			return HtmlTextBlock_JavaScript;
-		}
+static constexpr HtmlTextBlock GetCurrentHtmlTextBlockEx(int iCurrentStyle) noexcept {
+	if (iCurrentStyle >= SCE_PHP_DEFAULT) {
+		return HtmlTextBlock_PHP;
+	}
+	if (iCurrentStyle >= css_style(SCE_CSS_DEFAULT)) {
+		return HtmlTextBlock_CSS;
+	}
+	if (iCurrentStyle >= js_style(SCE_JS_DEFAULT)) {
+		return HtmlTextBlock_JavaScript;
+	}
+	if (iCurrentStyle >= SCE_HB_DEFAULT) {
+		return HtmlTextBlock_VBScript;
+	}
+	if (iCurrentStyle >= SCE_H_SGML_DEFAULT) {
+		return HtmlTextBlock_SGML;
 	}
 	if (iCurrentStyle == SCE_H_CDATA) {
 		return HtmlTextBlock_CDATA;
 	}
-	if ((iCurrentStyle >= SCE_HJ_START && iCurrentStyle <= SCE_HJ_TEMPLATELITERAL)
-		|| (iCurrentStyle >= SCE_HJA_START && iCurrentStyle <= SCE_HJA_TEMPLATELITERAL)) {
-		return HtmlTextBlock_JavaScript;
-	}
-	if ((iCurrentStyle >= SCE_HB_START && iCurrentStyle <= SCE_HB_OPERATOR)
-		|| (iCurrentStyle >= SCE_HBA_START && iCurrentStyle <= SCE_HBA_OPERATOR)) {
-		return HtmlTextBlock_VBScript;
-	}
-	if ((iCurrentStyle >= SCE_H_SGML_DEFAULT && iCurrentStyle < SCE_H_SGML_BLOCK_DEFAULT)) {
-		return HtmlTextBlock_SGML;
-	}
 	return HtmlTextBlock_Tag;
 }
 
-static HtmlTextBlock GetCurrentHtmlTextBlock(int iLexer) noexcept {
+static HtmlTextBlock GetCurrentHtmlTextBlock() noexcept {
 	const Sci_Position iCurrentPos = SciCall_GetCurrentPos();
 	const int iCurrentStyle = SciCall_GetStyleIndexAt(iCurrentPos);
-	return GetCurrentHtmlTextBlockEx(iLexer, iCurrentStyle);
+	return GetCurrentHtmlTextBlockEx(iCurrentStyle);
 }
 
 void EscapeRegex(LPSTR pszOut, LPCSTR pszIn) noexcept {
@@ -990,7 +983,7 @@ static void AutoC_AddKeyword(WordList &pWList, int iCurrentStyle) noexcept {
 	// embedded script
 	LPCEDITLEXER pLex = nullptr;
 	if (iLexer == SCLEX_HTML || iLexer == SCLEX_PHPSCRIPT) {
-		const HtmlTextBlock block = GetCurrentHtmlTextBlockEx(iLexer, iCurrentStyle);
+		const HtmlTextBlock block = GetCurrentHtmlTextBlockEx(iCurrentStyle);
 		switch (block) {
 		case HtmlTextBlock_JavaScript:
 			pLex = &lexJavaScript;
@@ -1050,10 +1043,12 @@ static AddWordResult AutoC_AddSpecWord(WordList &pWList, int iCurrentStyle, int 
 
 	LPCEDITLEXER pLex = pLexCurrent;
 	int rid = pLex->rid;
-	if (rid == NP2LEX_PHP) {
+	if (rid == NP2LEX_PHP || rid == NP2LEX_HTML || rid == NP2LEX_XML) {
 		if (iCurrentStyle < js_style(SCE_JS_DEFAULT)) {
-			rid = NP2LEX_HTML;
-			pLex = &lexHTML;
+			if (rid == NP2LEX_PHP) {
+				rid = NP2LEX_HTML;
+				pLex = &lexHTML;
+			}
 		} else if (iCurrentStyle < css_style(SCE_CSS_DEFAULT)) {
 			iCurrentStyle -= js_style(SCE_JS_DEFAULT);
 			iPrevStyle -= js_style(SCE_JS_DEFAULT);
@@ -1786,7 +1781,7 @@ static bool CanAutoCloseSingleQuote(int chPrev, int iCurrentStyle) noexcept {
 			return false;
 		}
 		if (iLexer == SCLEX_HTML) {
-			if (iCurrentStyle == SCE_HB_DEFAULT || iCurrentStyle == SCE_HBA_DEFAULT) {
+			if (iCurrentStyle == SCE_HB_DEFAULT) {
 				return false; // comment
 			}
 		}
@@ -1981,7 +1976,7 @@ void EditAutoCloseXMLTag() noexcept {
 					if (style == pLexCurrent->operatorStyle || style == pLexCurrent->operatorStyle2) {
 						return;
 					}
-					if (pLexCurrent->iLexer == SCLEX_PHPSCRIPT
+					if ((pLexCurrent->iLexer == SCLEX_PHPSCRIPT || pLexCurrent->iLexer == SCLEX_HTML)
 						&& (style == js_style(SCE_JS_OPERATOR) || style == js_style(SCE_JS_OPERATOR2))) {
 						return;
 					}
@@ -2404,7 +2399,7 @@ void EditToggleCommentLine(bool alternative) noexcept {
 	case NP2LEX_HTML:
 	case NP2LEX_PHP:
 	case NP2LEX_XML: {
-		const HtmlTextBlock block = GetCurrentHtmlTextBlock(pLexCurrent->iLexer);
+		const HtmlTextBlock block = GetCurrentHtmlTextBlock();
 		switch (block) {
 		case HtmlTextBlock_VBScript:
 			pwszComment = L"'";
@@ -2686,7 +2681,7 @@ void EditToggleCommentBlock(bool alternative) noexcept {
 	case NP2LEX_HTML:
 	case NP2LEX_PHP:
 	case NP2LEX_XML: {
-		const HtmlTextBlock block = GetCurrentHtmlTextBlock(pLexCurrent->iLexer);
+		const HtmlTextBlock block = GetCurrentHtmlTextBlock();
 		switch (block) {
 		case HtmlTextBlock_Tag:
 			pwszOpen = L"<!--"; pwszClose = L"-->";
@@ -3131,28 +3126,28 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) noexcept {
 		CommentStyleMask[SCE_H_XCCOMMENT >> 5] |= (1U << (SCE_H_XCCOMMENT & 31));
 		CommentStyleMask[SCE_H_SGML_COMMENT >> 5] |= (1U << (SCE_H_SGML_COMMENT & 31));
 		CommentStyleMask[SCE_H_SGML_1ST_PARAM_COMMENT >> 5] |= (1U << (SCE_H_SGML_1ST_PARAM_COMMENT & 31));
-		CommentStyleMask[SCE_HJ_COMMENT >> 5] |= (1U << (SCE_HJ_COMMENT & 31));
-		CommentStyleMask[SCE_HJ_COMMENTLINE >> 5] |= (1U << (SCE_HJ_COMMENTLINE & 31));
-		CommentStyleMask[SCE_HJ_COMMENTDOC >> 5] |= (1U << (SCE_HJ_COMMENTDOC & 31));
-		CommentStyleMask[SCE_HJA_COMMENT >> 5] |= (1U << (SCE_HJA_COMMENT & 31));
-		CommentStyleMask[SCE_HJA_COMMENTLINE >> 5] |= (1U << (SCE_HJA_COMMENTLINE & 31));
-		CommentStyleMask[SCE_HJA_COMMENTDOC >> 5] |= (1U << (SCE_HJA_COMMENTDOC & 31));
+		CommentStyleMask[js_style(SCE_JS_COMMENTLINE) >> 5] |= (1U << (js_style(SCE_JS_COMMENTLINE) & 31));
+		CommentStyleMask[js_style(SCE_JS_COMMENTBLOCK) >> 5] |= (1U << (js_style(SCE_JS_COMMENTBLOCK) & 31));
+		CommentStyleMask[js_style(SCE_JS_COMMENTBLOCKDOC) >> 5] |= (1U << (js_style(SCE_JS_COMMENTBLOCKDOC) & 31));
+		CommentStyleMask[js_style(SCE_JS_COMMENTTAGAT) >> 5] |= (1U << (js_style(SCE_JS_COMMENTTAGAT) & 31));
+		CommentStyleMask[js_style(SCE_JS_TASKMARKER) >> 5] |= (1U << (js_style(SCE_JS_TASKMARKER) & 31));
+		CommentStyleMask[css_style(SCE_CSS_COMMENTBLOCK) >> 5] |= (1U << (css_style(SCE_CSS_COMMENTBLOCK) & 31));
+		CommentStyleMask[css_style(SCE_CSS_CDO_CDC) >> 5] |= (1U << (css_style(SCE_CSS_CDO_CDC) & 31));
 		CommentStyleMask[SCE_HB_COMMENTLINE >> 5] |= (1U << (SCE_HB_COMMENTLINE & 31));
-		CommentStyleMask[SCE_HBA_COMMENTLINE >> 5] |= (1U << (SCE_HBA_COMMENTLINE & 31));
 		AllStringStyleMask[SCE_H_DOUBLESTRING >> 5] |= (1U << (SCE_H_DOUBLESTRING & 31));
 		AllStringStyleMask[SCE_H_SINGLESTRING >> 5] |= (1U << (SCE_H_SINGLESTRING & 31));
 		AllStringStyleMask[SCE_H_SGML_DOUBLESTRING >> 5] |= (1U << (SCE_H_SGML_DOUBLESTRING & 31));
 		AllStringStyleMask[SCE_H_SGML_SIMPLESTRING >> 5] |= (1U << (SCE_H_SGML_SIMPLESTRING & 31));
-		AllStringStyleMask[SCE_HJ_DOUBLESTRING >> 5] |= (1U << (SCE_HJ_DOUBLESTRING & 31));
-		AllStringStyleMask[SCE_HJ_SINGLESTRING >> 5] |= (1U << (SCE_HJ_SINGLESTRING & 31));
-		AllStringStyleMask[SCE_HJ_REGEX >> 5] |= (1U << (SCE_HJ_REGEX & 31));
-		AllStringStyleMask[SCE_HJ_TEMPLATELITERAL >> 5] |= (1U << (SCE_HJ_TEMPLATELITERAL & 31));
-		AllStringStyleMask[SCE_HJA_DOUBLESTRING >> 5] |= (1U << (SCE_HJA_DOUBLESTRING & 31));
-		AllStringStyleMask[SCE_HJA_SINGLESTRING >> 5] |= (1U << (SCE_HJA_SINGLESTRING & 31));
-		AllStringStyleMask[SCE_HJA_REGEX >> 5] |= (1U << (SCE_HJA_REGEX & 31));
-		AllStringStyleMask[SCE_HJA_TEMPLATELITERAL >> 5] |= (1U << (SCE_HJA_TEMPLATELITERAL & 31));
+		AllStringStyleMask[js_style(SCE_JS_STRING_SQ) >> 5] |= (1U << (js_style(SCE_JS_STRING_SQ) & 31));
+		AllStringStyleMask[js_style(SCE_JS_STRING_DQ) >> 5] |= (1U << (js_style(SCE_JS_STRING_DQ) & 31));
+		AllStringStyleMask[js_style(SCE_JS_TEMPLATELITERAL) >> 5] |= (1U << (js_style(SCE_JS_TEMPLATELITERAL) & 31));
+		AllStringStyleMask[js_style(SCE_JS_REGEX) >> 5] |= (1U << (js_style(SCE_JS_REGEX) & 31));
+		AllStringStyleMask[js_style(SCE_JS_ESCAPECHAR) >> 5] |= (1U << (js_style(SCE_JS_ESCAPECHAR) & 31));
+		AllStringStyleMask[css_style(SCE_CSS_ESCAPECHAR) >> 5] |= (1U << (css_style(SCE_CSS_ESCAPECHAR) & 31));
+		AllStringStyleMask[css_style(SCE_CSS_STRING_SQ) >> 5] |= (1U << (css_style(SCE_CSS_STRING_SQ) & 31));
+		AllStringStyleMask[css_style(SCE_CSS_STRING_DQ) >> 5] |= (1U << (css_style(SCE_CSS_STRING_DQ) & 31));
+		AllStringStyleMask[css_style(SCE_CSS_URL) >> 5] |= (1U << (css_style(SCE_CSS_URL) & 31));
 		AllStringStyleMask[SCE_HB_STRING >> 5] |= (1U << (SCE_HB_STRING & 31));
-		AllStringStyleMask[SCE_HBA_STRING >> 5] |= (1U << (SCE_HBA_STRING & 31));
 		PlainTextStyleMask[SCE_H_DEFAULT >> 5] |= (1U << (SCE_H_DEFAULT & 31));
 		break;
 

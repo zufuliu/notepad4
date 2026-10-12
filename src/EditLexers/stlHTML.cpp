@@ -123,24 +123,13 @@ static const EDITSTYLE Styles_HTML[] = {
 	{ MULTI_STYLE(SCE_H_ASP, SCE_H_ASPAT, 0, 0), NP2StyleX_ASPTag, L"bold; fore:#8B008B" },
 	{ SCE_H_QUESTION, NP2StyleX_PHPTag, L"bold; fore:#8B008B" },
 
-	// JavaScript
-	{ MULTI_STYLE(SCE_HJ_START, SCE_HJ_DEFAULT, SCE_HJA_START, SCE_HJA_DEFAULT), NP2StyleX_JSDefault, L"" },
-	{ MULTI_STYLE(SCE_HJ_KEYWORD, SCE_HJA_KEYWORD, 0, 0), NP2StyleX_JSKeyword, L"bold; fore:#FF8000" },
-	{ MULTI_STYLE(SCE_HJ_COMMENT, SCE_HJ_COMMENTLINE, SCE_HJA_COMMENT, SCE_HJA_COMMENTLINE), NP2StyleX_JSComment, L"fore:#608060" },
-	{ MULTI_STYLE(SCE_HJ_COMMENTDOC, SCE_HJA_COMMENTDOC, 0, 0), NP2StyleX_JSDocComment, L"fore:#408040" },
-	{ MULTI_STYLE(SCE_HJ_DOUBLESTRING, SCE_HJ_SINGLESTRING, SCE_HJA_DOUBLESTRING, SCE_HJA_SINGLESTRING), NP2StyleX_JSString, L"fore:#008000" },
-	{ MULTI_STYLE(SCE_HJ_TEMPLATELITERAL, SCE_HJA_TEMPLATELITERAL, 0, 0), NP2StyleX_JSTemplateLiteral, L"fore:#F08000" },
-	{ MULTI_STYLE(SCE_HJ_REGEX, SCE_HJA_REGEX, 0, 0), NP2StyleX_JSRegex, L"fore:#006633; back:#FFF1A8" },
-	{ MULTI_STYLE(SCE_HJ_NUMBER, SCE_HJA_NUMBER, 0, 0), NP2StyleX_JSNumber, L"fore:#FF0000" },
-	{ MULTI_STYLE(SCE_HJ_OPERATOR, SCE_HJ_OPERATOR_PF, SCE_HJA_OPERATOR, SCE_HJA_OPERATOR_PF), NP2StyleX_JSOperator, L"fore:#B000B0" },
-
 	// VBS
-	{ MULTI_STYLE(SCE_HB_START, SCE_HB_DEFAULT, SCE_HBA_START, SCE_HBA_DEFAULT), NP2StyleX_VBSDefault, L"" },
-	{ MULTI_STYLE(SCE_HB_WORD, SCE_HBA_WORD, 0, 0), NP2StyleX_VBSKeyword, L"bold; fore:#FF8000" },
-	{ MULTI_STYLE(SCE_HB_COMMENTLINE, SCE_HBA_COMMENTLINE, 0, 0), NP2StyleX_VBSComment, L"fore:#608060" },
-	{ MULTI_STYLE(SCE_HB_STRING, SCE_HBA_STRING, 0, 0), NP2StyleX_VBSString, L"fore:#008000" },
-	{ MULTI_STYLE(SCE_HB_NUMBER, SCE_HBA_NUMBER, 0, 0), NP2StyleX_VBSNumber, L"fore:#FF0000" },
-	{ MULTI_STYLE(SCE_HB_OPERATOR, SCE_HBA_OPERATOR, 0, 0), NP2StyleX_VBSOperator, L"fore:#B000B0" },
+	{ SCE_HB_DEFAULT, NP2StyleX_VBSDefault, L"" },
+	{ SCE_HB_WORD, NP2StyleX_VBSKeyword, L"bold; fore:#FF8000" },
+	{ SCE_HB_COMMENTLINE, NP2StyleX_VBSComment, L"fore:#608060" },
+	{ SCE_HB_STRING, NP2StyleX_VBSString, L"fore:#008000" },
+	{ SCE_HB_NUMBER, NP2StyleX_VBSNumber, L"fore:#FF0000" },
+	{ SCE_HB_OPERATOR, NP2StyleX_VBSOperator, L"fore:#B000B0" },
 };
 
 EDITLEXER lexHTML = {
@@ -151,10 +140,10 @@ EDITLEXER lexHTML = {
 		TAB_WIDTH_2, INDENT_WIDTH_2,
 		(1 << 0) | (1 << 1) | (1 << 2) | (1 << 3), // level1, level2, level13, level4
 		0,
-		'\\', 0, 0,
+		'\\', css_style(SCE_CSS_ESCAPECHAR), 0,
 		0,
 		0, 0,
-		0, 0
+		css_style(SCE_CSS_OPERATOR), SCE_HB_OPERATOR
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // tag
 		| KeywordAttr32(1, KeywordAttr_PreSorted | KeywordAttr_NoAutoComp) // void tag
 		| KeywordAttr32(2, KeywordAttr_PreSorted | KeywordAttr_NoAutoComp) // JavaScript

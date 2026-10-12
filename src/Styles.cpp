@@ -1806,16 +1806,21 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) noexcept {
 			SciCall_CopyStyles(STYLE_LINK, MULTI_STYLE(SCE_REBOL_URL, SCE_REBOL_EMAIL, 0, 0));
 			break;
 
+		case NP2LEX_HTML:
+		case NP2LEX_XML:
 		case NP2LEX_MARKDOWN:
 		case NP2LEX_PHP:
-			if (!IsStyleLoaded(&lexHTML)) {
-				Style_LoadOne(&lexHTML);
-			}
 			if (rid == NP2LEX_MARKDOWN) {
 				SciCall_CopyStyles(STYLE_LINK, MULTI_STYLE(SCE_MARKDOWN_PLAIN_LINK, SCE_MARKDOWN_PAREN_LINK, SCE_MARKDOWN_ANGLE_LINK, 0));
 			} else {
 				Style_SetAllStyle(&lexJavaScript, SCE_STYLE_OFFSET_JS);
 				Style_SetAllStyle(&lexCSS, SCE_STYLE_OFFSET_CSS);
+			}
+			if (rid == NP2LEX_HTML || rid == NP2LEX_XML) {
+				break;
+			}
+			if (!IsStyleLoaded(&lexHTML)) {
+				Style_LoadOne(&lexHTML);
 			}
 			szValue = lexHTML.szStyleBuf;
 			for (UINT i = 1; i < lexHTML.iStyleCount; i++) {

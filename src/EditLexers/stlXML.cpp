@@ -50,10 +50,10 @@ EDITLEXER lexXML = {
 		TAB_WIDTH_4, INDENT_WIDTH_4,
 		(1 << 0) | (1 << 1) | (1 << 2) | (1 << 3), // level1, level2, level13, level4
 		0,
-		'\0', 0, 0,
+		'\0', css_style(SCE_CSS_ESCAPECHAR), 0,
 		0,
 		0, 0,
-		0, 0
+		css_style(SCE_CSS_OPERATOR), SCE_HB_OPERATOR
 		, KeywordAttr32(4, KeywordAttr_PreSorted) // SGML
 		| KeywordAttr32(5, KeywordAttr_NoLexer) // attribute
 		| KeywordAttr32(6, KeywordAttr_NoLexer) // value

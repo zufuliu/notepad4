@@ -13,7 +13,7 @@ def printLexHFile(f):
 	STYLE_LASTPREDEFINED = 39
 
 	htmlStyle = """
-#define SCE_STYLE_OFFSET_JS		(40)
+#define SCE_STYLE_OFFSET_JS		(SCE_HB_OPERATOR + 1)
 #define SCE_STYLE_OFFSET_CSS	(SCE_STYLE_OFFSET_JS + SCE_JS_LABEL + 1)
 #define SCE_STYLE_OFFSET_PHP	(SCE_STYLE_OFFSET_CSS + SCE_CSS_PLACEHOLDER + 1)
 #define js_style(style)		((style) + SCE_STYLE_OFFSET_JS)
@@ -21,8 +21,8 @@ def printLexHFile(f):
 #define php_style(style)	((style) + SCE_STYLE_OFFSET_PHP)
 """.strip().splitlines()
 	output = [
-		'#define STYLE_COMMENT_LINK 34', 
-		'#define STYLE_STRING_LINK 35', 
+		'#define STYLE_COMMENT_LINK 34',
+		'#define STYLE_STRING_LINK 35',
 	]
 	autoValue = 0
 	valueMap = {}
