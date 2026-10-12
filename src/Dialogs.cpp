@@ -1990,6 +1990,10 @@ static INT_PTR CALLBACK AutoCompletionSettingsDlgProc(HWND hwnd, UINT umsg, WPAR
 		if (autoCompletionConfig.bIndentText) {
 			CheckDlgButton(hwnd, IDC_AUTO_INDENT_TEXT, BST_CHECKED);
 		}
+		if (autoCompletionConfig.bIndentAfterMarkers) {
+			CheckDlgButton(hwnd, IDC_AUTO_INDENT_AFTER_MARKERS, BST_CHECKED);
+		}
+		EnableWindow(GetDlgItem(hwnd, IDC_AUTO_INDENT_AFTER_MARKERS), autoCompletionConfig.bIndentText);
 		if (mask & AutoCompletionOption_CloseTags) {
 			CheckDlgButton(hwnd, IDC_AUTO_CLOSE_TAGS, BST_CHECKED);
 		}
@@ -2098,6 +2102,7 @@ static INT_PTR CALLBACK AutoCompletionSettingsDlgProc(HWND hwnd, UINT umsg, WPAR
 		switch (LOWORD(wParam)) {
 		case IDOK: {
 			autoCompletionConfig.bIndentText = IsButtonChecked(hwnd, IDC_AUTO_INDENT_TEXT);
+			autoCompletionConfig.bIndentAfterMarkers = IsButtonChecked(hwnd, IDC_AUTO_INDENT_AFTER_MARKERS);
 
 			int mask = AutoCompletionOption_None;
 			if (IsButtonChecked(hwnd, IDC_AUTO_CLOSE_TAGS)) {
@@ -2209,6 +2214,12 @@ static INT_PTR CALLBACK AutoCompletionSettingsDlgProc(HWND hwnd, UINT umsg, WPAR
 			EndDialog(hwnd, IDOK);
 		}
 		break;
+
+		case IDC_AUTO_INDENT_TEXT:
+			if (HIWORD(wParam) == BN_CLICKED) {
+				EnableWindow(GetDlgItem(hwnd, IDC_AUTO_INDENT_AFTER_MARKERS), IsButtonChecked(hwnd, IDC_AUTO_INDENT_TEXT));
+			}
+			break;
 
 		case IDCANCEL:
 			EndDialog(hwnd, IDCANCEL);
