@@ -82,6 +82,9 @@ void ColouriseSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 	// const bool sqlAllowDottedWord = styler.GetPropertyBool("lexer.sql.allow.dotted.word", false);
 	const SqlOption option = static_cast<SqlOption>(styler.GetPropertyInt("lexer.lang", SqlOption_Default));
 
+	int visibleChars = 0;
+	int lineState = 0;
+
 	StyleContext sc(startPos, length, initStyle, styler);
 	//int styleBeforeDCKeyword = SCE_SQL_DEFAULT;
 
@@ -270,8 +273,14 @@ void ColouriseSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 				// Perhaps we should enforce that with proper property:
 				//~} else if (sc.Match('-', '-', ' ')) {
 				sc.SetState(SCE_SQL_COMMENTLINE);
+				if (visibleChars == 0) {
+					lineState = SimpleLineStateMaskLineComment;
+				}
 			} else if (sc.ch == '#' && (option & SqlOption_NumberSignComment)) {
 				sc.SetState(SCE_SQL_COMMENTLINEDOC);
+				if (visibleChars == 0) {
+					lineState = SimpleLineStateMaskLineComment;
+				}
 			} else if (sc.ch == '\'') {
 				sc.SetState(SCE_SQL_STRING_SQ);
 			} else if (sc.ch == '\"') {
@@ -279,6 +288,14 @@ void ColouriseSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 			} else if (isoperator(sc.ch)) {
 				sc.SetState(SCE_SQL_OPERATOR);
 			}
+		}
+		if (visibleChars == 0 && !isspacechar(sc.ch)) {
+			visibleChars++;
+		}
+		if (sc.atLineEnd) {
+			styler.SetLineState(sc.currentLine, lineState);
+			lineState = 0;
+			visibleChars = 0;
 		}
 		sc.Forward();
 	}
@@ -472,16 +489,13 @@ private:
 	std::vector<sql_state_t> sqlStatement;
 };
 
-constexpr bool IsStreamCommentStyle(int style) noexcept {
-	return style == SCE_SQL_COMMENT || style == SCE_SQL_COMMENTDOC;
+constexpr bool IsSpaceEquiv(int style) noexcept {
+	return style <= SCE_SQL_COMMENTLINEDOC;
 }
 
-constexpr bool IsCommentStyle (int style) noexcept {
-	return style == SCE_SQL_COMMENT || style == SCE_SQL_COMMENTDOC
-		|| style == SCE_SQL_COMMENTLINE || style == SCE_SQL_COMMENTLINEDOC;
+constexpr int GetLineCommentState(int lineState) noexcept {
+	return lineState & SimpleLineStateMaskLineComment;
 }
-
-#define IsCommentLine(line)			IsLexCommentLine(styler, line, MultiStyle(SCE_SQL_COMMENTLINE, SCE_SQL_COMMENTLINEDOC))
 
 void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList /*keywordLists*/, Accessor &styler) {
 	constexpr bool foldOnlyBegin = false;// styler.GetPropertyBool("fold.sql.only.begin", false);
@@ -491,6 +505,7 @@ void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexe
 	Sci_PositionU endPos = startPos + length;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
+	int lineCommentPrev = 0;
 	if (lineCurrent > 0) {
 		// Backtrack to previous line in case need to fix its fold status for folding block of single-line comments (i.e. '--').
 		Sci_Position lastNLPos = -1;
@@ -502,12 +517,9 @@ void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexe
 				lastNLPos = startPos;
 			} else if (ch == ';' && styler.StyleAt(startPos) == SCE_SQL_OPERATOR) {
 				bool isAllClear = true;
-				for (Sci_Position tempPos = startPos + 1;
-					tempPos < lastNLPos;
-					++tempPos) {
+				for (Sci_Position tempPos = startPos + 1; tempPos < lastNLPos; ++tempPos) {
 					const int tempStyle = styler.StyleAt(tempPos);
-					if (!IsCommentStyle(tempStyle)
-						&& tempStyle != SCE_SQL_DEFAULT) {
+					if (!IsSpaceEquiv(tempStyle)) {
 						isAllClear = false;
 						break;
 					}
@@ -519,8 +531,10 @@ void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexe
 			}
 		}
 		lineCurrent = styler.GetLine(startPos);
-		if (lineCurrent > 0)
+		if (lineCurrent > 0) {
 			levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
+			lineCommentPrev = GetLineCommentState(styler.GetLineState(lineCurrent - 1));
+		}
 	}
 	// And because folding ends at ';', keep going until we find one
 	// Otherwise if create ... view ... as is split over multiple
@@ -533,9 +547,16 @@ void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexe
 	}
 
 	int levelNext = levelCurrent;
+	int lineCommentCurrent = GetLineCommentState(styler.GetLineState(lineCurrent));
+	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
+
 	char chNext = styler[startPos];
 	int style = initStyle;
 	int styleNext = styler.StyleAt(startPos);
+	constexpr int MAX_KW_LEN = 9;	// Maximum length of folding keywords: procedure, exception
+	char s[MAX_KW_LEN + 2];
+	unsigned int wordLen = 0;
+
 	bool endFound = false;
 	constexpr bool isUnfoldingIgnored = false;
 	// this statementFound flag avoids to fold when the statement is on only one line by ignoring ELSE or ELSIF
@@ -546,15 +567,17 @@ void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexe
 		sqlStatesCurrentLine = sqlStates.ForLine(lineCurrent);
 	}
 
-	for (Sci_PositionU i = startPos; i < endPos; i++) {
+	while (startPos < endPos) {
 		const char ch = chNext;
 		const int stylePrev = style;
-		chNext = styler.SafeGetCharAt(i + 1);
+		++startPos;
+		chNext = styler[startPos];
 		style = styleNext;
-		styleNext = styler.StyleAt(i + 1);
-		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
+		styleNext = styler.StyleAt(startPos);
 
-		if (atEOL || (!IsCommentStyle(style) && ch == ';')) {
+	switch (style) {
+	case SCE_SQL_OPERATOR:
+		if (ch == ';') {
 			if (endFound) {
 				//Maybe this is the end of "EXCEPTION" BLOCK (eg. "BEGIN ... EXCEPTION ... END;")
 				sqlStatesCurrentLine = SQLStates::IntoExceptionBlock(sqlStatesCurrentLine, false);
@@ -562,8 +585,7 @@ void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexe
 			// set endFound and isUnfoldingIgnored to false if EOL is reached or ';' is found
 			endFound = false;
 			//isUnfoldingIgnored = false;
-		}
-		if ((!IsCommentStyle(style) && ch == ';')) {
+
 			if (SQLStates::IsIntoMergeStatement(sqlStatesCurrentLine)) {
 				// This is the end of "MERGE" statement.
 				if (!SQLStates::IsCaseMergeWithoutWhenFound(sqlStatesCurrentLine))
@@ -584,54 +606,52 @@ void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexe
 				}
 				sqlStatesCurrentLine = SQLStates::IntoCreateStatement(sqlStatesCurrentLine, false);
 			}
-		}
-		if (ch == ':' && chNext == '=' && !IsCommentStyle(style))
-			sqlStatesCurrentLine = SQLStates::IntoSelectStatementOrAssignment(sqlStatesCurrentLine, true);
 
-		if (IsStreamCommentStyle(style)) {
-			if (!IsStreamCommentStyle(stylePrev)) {
-				levelNext++;
-			} else if (!IsStreamCommentStyle(styleNext) && !atEOL) {
-				// Comments don't end at end of line and the next character may be unstyled.
-				levelNext--;
-			}
-		}
-		// Disable explicit folding; it can often cause problems with non-aware code
-		// MySQL needs -- comments to be followed by space or control char
-		if (atEOL && IsCommentLine(lineCurrent)) {
-			levelNext += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
-		}
-		if (style == SCE_SQL_OPERATOR) {
-			if (ch == '(') {
-				if (levelCurrent > levelNext)
-					levelCurrent--;
-				levelNext++;
-			} else if (ch == ')') {
-				levelNext--;
-			} else if constexpr (foldOnlyBegin && ch == ';') {
+			if constexpr (foldOnlyBegin && ch == ';') {
 				sqlStatesCurrentLine = SQLStates::IgnoreWhen(sqlStatesCurrentLine, false);
 			}
 		}
-		// If new keyword (cannot trigger on elseif or nullif, does less tests)
-		if (style == SCE_SQL_WORD && stylePrev != SCE_SQL_WORD) {
-			constexpr int MAX_KW_LEN = 9;	// Maximum length of folding keywords
-			char s[MAX_KW_LEN + 2];
-			unsigned int j = 0;
-			for (; j < MAX_KW_LEN + 1; j++) {
-				const char lower = UnsafeLower(styler[i + j]);
-				if (!IsLowerCase(lower)) {
-					j = MAX_KW_LEN + 1;
-					break;
-				}
-				s[j] = lower;
+		else if (ch == ':' && chNext == '=') {
+			sqlStatesCurrentLine = SQLStates::IntoSelectStatementOrAssignment(sqlStatesCurrentLine, true);
+		}
+		else if (ch == '(') {
+			if (levelCurrent > levelNext) {
+				levelCurrent--;
 			}
-			if (j == MAX_KW_LEN + 1) {
-				// Keyword too long, don't test it
-				s[0] = '\0';
-			} else {
-				s[j] = '\0';
-			}
+			levelNext++;
+		} else if (ch == ')') {
+			levelNext--;
+		}
+		break;
 
+	case SCE_SQL_COMMENT:
+	case SCE_SQL_COMMENTDOC:
+		if (style != stylePrev) {
+			levelNext++;
+		}
+		if (style != styleNext) {
+			levelNext--;
+		}
+		break;
+
+	case SCE_SQL_WORD:
+		// If new keyword (cannot trigger on elseif or nullif, does less tests)
+		if (wordLen <= MAX_KW_LEN) {
+			const char lower = UnsafeLower(ch);
+			if (!IsLowerCase(lower)) {
+				wordLen = MAX_KW_LEN + 1;
+			} else {
+				s[wordLen++] = lower;
+			}
+		}
+		if (styleNext != SCE_SQL_WORD) {
+			if (wordLen > MAX_KW_LEN) {
+				// Keyword too long, don't test it
+				wordLen = 0;
+				break;
+			}
+			s[wordLen] = '\0';
+			wordLen = 0;
 			if (!foldOnlyBegin && StrEqual(s, "select")) {
 				sqlStatesCurrentLine = SQLStates::IntoSelectStatementOrAssignment(sqlStatesCurrentLine, true);
 			} else if (StrEqual(s, "if")) {
@@ -770,18 +790,41 @@ void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexe
 				levelNext++;
 			}
 		}
-		if (atEOL || (i == endPos - 1)) {
+		break;
+	}
+
+		if (startPos == lineStartNext) {
+			if (endFound) {
+				//Maybe this is the end of "EXCEPTION" BLOCK (eg. "BEGIN ... EXCEPTION ... END;")
+				sqlStatesCurrentLine = SQLStates::IntoExceptionBlock(sqlStatesCurrentLine, false);
+			}
+			// set endFound and isUnfoldingIgnored to false if EOL is reached or ';' is found
+			endFound = false;
+			//isUnfoldingIgnored = false;
+
+			// Disable explicit folding; it can often cause problems with non-aware code
+			// MySQL needs -- comments to be followed by space or control char
+			const int lineCommentNext = GetLineCommentState(styler.GetLineState(lineCurrent + 1));
 			levelNext = sci::max(levelNext, SC_FOLDLEVELBASE);
+			if (lineCommentCurrent) {
+				levelNext += lineCommentNext - lineCommentPrev;
+			}
+
 			const int levelUse = levelCurrent;
 			int lev = levelUse | (levelNext << 16);
-			if (levelUse < levelNext)
+			if (levelUse < levelNext) {
 				lev |= SC_FOLDLEVELHEADERFLAG;
+			}
 			styler.SetLevel(lineCurrent, lev);
 			lineCurrent++;
+			lineStartNext = styler.LineStart(lineCurrent + 1);
 			levelCurrent = levelNext;
+			lineCommentPrev = lineCommentCurrent;
+			lineCommentCurrent = lineCommentNext;
 			statementFound = false;
-			if constexpr (!foldOnlyBegin)
+			if constexpr (!foldOnlyBegin) {
 				sqlStates.Set(lineCurrent, sqlStatesCurrentLine);
+			}
 		}
 	}
 }
