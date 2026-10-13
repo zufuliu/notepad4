@@ -122,6 +122,7 @@ bool IsLexLineStartsWith(LexAccessor &styler, Sci_Line line, const char *word, b
 	return false;
 }
 
+SCI_noinline
 bool IsLexCommentLine(LexAccessor &styler, Sci_Line line, int style) noexcept {
 	Sci_Position startPos = styler.LineStart(line);
 	const Sci_Position endPos = styler.LineStart(line + 1) - 1;
