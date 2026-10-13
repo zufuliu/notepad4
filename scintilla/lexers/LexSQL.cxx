@@ -57,6 +57,19 @@ constexpr bool IsANumberChar(int ch, int chPrev) noexcept {
 		|| ((ch == 'e' || ch == 'E') && IsADigit(chPrev));
 }
 
+constexpr int GetQuoteComplement(int ch) noexcept {
+	if (ch == '(') {
+		return ')';
+	}
+	if (ch == '<') {
+		return '>';
+	}
+	if (AnyOf<'[', '{'>(ch)) {
+		return ch + 2;
+	}
+	return ch;
+}
+
 /*const char * const sqlWordListDesc[] = {
 	"Keywords",
 	"Database Objects",
@@ -82,11 +95,17 @@ void ColouriseSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 	// const bool sqlAllowDottedWord = styler.GetPropertyBool("lexer.sql.allow.dotted.word", false);
 	const SqlOption option = static_cast<SqlOption>(styler.GetPropertyInt("lexer.lang", SqlOption_Default));
 
+	int qComplement = 0;
 	int visibleChars = 0;
 	int lineState = 0;
 
 	StyleContext sc(startPos, length, initStyle, styler);
 	//int styleBeforeDCKeyword = SCE_SQL_DEFAULT;
+	if (sc.currentLine > 0) {
+		lineState = styler.GetLineState(sc.currentLine - 1);
+		qComplement = lineState >> 4;
+		lineState = 0;
+	}
 
 	while (sc.More()) {
 		// Determine if the current state should terminate.
@@ -100,6 +119,7 @@ void ColouriseSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 			}
 			break;
 		case SCE_SQL_HEX2:
+		case SCE_SQL_BIT2:
 			if (sc.ch == '\"' || sc.ch == '\'') {
 				sc.ForwardSetState(SCE_SQL_DEFAULT);
 			}
@@ -109,11 +129,6 @@ void ColouriseSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 				sc.SetState(SCE_SQL_DEFAULT);
 			}
 			break;
-		case SCE_SQL_BIT2:
-			if (sc.ch == '\'') {
-				sc.ForwardSetState(SCE_SQL_DEFAULT);
-			}
-			break;
 		case SCE_SQL_NUMBER:
 			// We stop the number definition on non-numerical non-dot non-eE non-sign char
 			if (!IsANumberChar(sc.ch, sc.chPrev)) {
@@ -121,7 +136,7 @@ void ColouriseSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 			}
 			break;
 		case SCE_SQL_VARIABLE:
-			if (!(iswordchar(sc.ch) || sc.ch == '@')) {
+			if (!(IsIdentifierChar(sc.ch) || sc.ch == '@')) {
 				sc.SetState(SCE_SQL_DEFAULT);
 			}
 			break;
@@ -206,62 +221,41 @@ void ColouriseSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 				sc.ForwardSetState(SCE_SQL_DEFAULT);
 			}
 			break;
-		case SCE_SQL_QOPERATOR: {
-			// Locate the unique Q operator character
-			sc.Complete();
-			char qOperator = 0x00;
-			for (Sci_PositionU styleStartPos = sc.currentPos; styleStartPos > 0; --styleStartPos) {
-				if (styler.StyleAt(styleStartPos - 1) != SCE_SQL_QOPERATOR) {
-					qOperator = styler.SafeGetCharAt(styleStartPos + 2);
-					break;
-				}
-			}
-
-			char qComplement = 0x00;
-
-			if (qOperator == '<') {
-				qComplement = '>';
-			} else if (qOperator == '(') {
-				qComplement = ')';
-			} else if (qOperator == '{') {
-				qComplement = '}';
-			} else if (qOperator == '[') {
-				qComplement = ']';
-			} else {
-				qComplement = qOperator;
-			}
-
-			if (sc.Match(qComplement, '\'')) {
+		case SCE_SQL_QOPERATOR:
+			if (sc.chNext == '\'' && sc.ch == qComplement) {
+				qComplement = 0;
 				sc.Forward();
 				sc.ForwardSetState(SCE_SQL_DEFAULT);
 			}
-		}
-		break;
+			break;
 		}
 
 		// Determine if a new state should be entered.
 		if (sc.state == SCE_SQL_DEFAULT) {
-			if (sc.Match('q', '\'') || sc.Match('Q', '\'')) {
-				sc.SetState(SCE_SQL_QOPERATOR);
-				sc.Forward();
-			} else if (sc.ch == '0' && (sc.chNext == 'x' || sc.chNext == 'X')) {
-				sc.SetState(SCE_SQL_HEX);
-				sc.Forward();
-			} else if ((sc.ch == 'x' || sc.ch == 'X') && (sc.chNext == '\"' || sc.chNext == '\'')) {
-				sc.SetState(SCE_SQL_HEX2);
-				sc.Forward();
-			} else if (sc.ch == '0' && (sc.chNext == 'b' || sc.chNext == 'B')) {
-				sc.SetState(SCE_SQL_BIT);
-				sc.Forward();
-			} else if ((sc.ch == 'b' || sc.ch == 'B') && (sc.chNext == '\'')) {
-				sc.SetState(SCE_SQL_BIT2);
-				sc.Forward();
-			} else if (IsNumberStart(sc.ch, sc.chNext)) {
+			if (IsNumberStart(sc.ch, sc.chNext)) {
 				sc.SetState(SCE_SQL_NUMBER);
-			} else if ((sc.ch == '@' && iswordstart(sc.chNext))) {
+				if (sc.ch == '0') {
+					const int upper = UnsafeUpper(sc.chNext);
+					if (upper == 'X' || upper == 'B') {
+						sc.ChangeState((upper == 'X')? SCE_SQL_HEX : SCE_SQL_BIT);
+						sc.Forward();
+					}
+				}
+			} else if ((sc.ch == '@' && IsIdentifierStart(sc.chNext))) {
 				sc.SetState(SCE_SQL_VARIABLE);
-			} else if (iswordstart(sc.ch)) {
+			} else if (IsIdentifierStart(sc.ch)) {
 				sc.SetState(SCE_SQL_IDENTIFIER);
+				if (sc.chNext == '\'' && (sc.ch == 'q' || sc.ch == 'Q')) {
+					sc.ChangeState(SCE_SQL_QOPERATOR);
+					sc.Forward();
+					qComplement = GetQuoteComplement(sc.chNext);
+				} else if (sc.chNext == '\'' || sc.chNext == '\"') {
+					const int upper = UnsafeUpper(sc.ch);
+					if (upper == 'X' || upper == 'B') {
+						sc.ChangeState((upper == 'X')? SCE_SQL_HEX2 : SCE_SQL_BIT2);
+						sc.Forward();
+					}
+				}
 			} else if (sc.ch == '`' && (option & SqlOption_BackticksIdentifier)) {
 				sc.SetState(SCE_SQL_QUOTEDIDENTIFIER);
 			} else if (sc.Match('/', '*')) {
@@ -285,7 +279,7 @@ void ColouriseSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 				sc.SetState(SCE_SQL_STRING_SQ);
 			} else if (sc.ch == '\"') {
 				sc.SetState(SCE_SQL_STRING_DQ);
-			} else if (isoperator(sc.ch)) {
+			} else if (IsAGraphic(sc.ch)) {
 				sc.SetState(SCE_SQL_OPERATOR);
 			}
 		}
@@ -293,7 +287,7 @@ void ColouriseSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 			visibleChars++;
 		}
 		if (sc.atLineEnd) {
-			styler.SetLineState(sc.currentLine, lineState);
+			styler.SetLineState(sc.currentLine, (qComplement << 4) | lineState);
 			lineState = 0;
 			visibleChars = 0;
 		}

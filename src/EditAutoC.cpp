@@ -3393,6 +3393,7 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) noexcept {
 		CharacterPrefixMask['b' >> 5] |= (1 << ('b' & 31));
 		CharacterPrefixMask['q' >> 5] |= (1 << ('q' & 31));
 		CharacterPrefixMask['x' >> 5] |= (1 << ('x' & 31));
+		RawStringStyleMask[SCE_SQL_QOPERATOR >> 5] |= (1U << (SCE_SQL_QOPERATOR & 31));
 		IgnoreWordStyleMask[SCE_SQL_WORD >> 5] |= (1U << (SCE_SQL_WORD & 31));
 		IgnoreWordStyleMask[SCE_SQL_WORD2 >> 5] |= (1U << (SCE_SQL_WORD2 & 31));
 		IgnoreWordStyleMask[SCE_SQL_USER1 >> 5] |= (1U << (SCE_SQL_USER1 & 31));

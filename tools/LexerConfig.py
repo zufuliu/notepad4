@@ -1034,11 +1034,12 @@ LexerConfigMap = {
 		'default_fold_level': ['function'],
 		'escape_char_style': 'SCE_SQL_ESCAPECHAR',
 		'character_prefix': ['q', 'Q', 'x', 'X', 'b', 'B'],
-		'operator_style': ['SCE_SQL_OPERATOR'], # ignore q'{SCE_SQL_QOPERATOR}'
+		'operator_style': ['SCE_SQL_OPERATOR'],
 		'extra_word_char': '$@',
 		'ignore_word_style': ['SCE_SQL_WORD', 'SCE_SQL_WORD2', 'SCE_SQL_USER1', 'SCE_SQL_HEX', 'SCE_SQL_HEX2'],
 		'auto_ident_word_style': ['SCE_SQL_WORD'],
-		'string_style_range': ['SCE_SQL_STRING_DQ', 'SCE_SQL_BIT'],
+		'string_style_range': ['SCE_SQL_QOPERATOR', 'SCE_SQL_BIT'],
+		'raw_string_style': ['SCE_SQL_QOPERATOR'],
 	},
 	'NP2LEX_SWIFT': {
 		'cpp_style_comment': True,
