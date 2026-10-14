@@ -66,6 +66,12 @@ enum HtmlOption {
 	HtmlOption_JspBase = HtmlOption_AllowScript | HtmlOption_AllowStyle | HtmlOption_AllowJSPEL | HtmlOption_JavaScript,
 };
 
+enum class KeywordType {
+	None = 0,
+	JavaScriptFunction = js_style(SCE_JS_FUNCTION_DEFINITION),
+	JavaScriptClass = js_style(SCE_JS_CLASS),
+};
+
 // Put an upper limit to bound time taken for unexpected text.
 constexpr Sci_PositionU maxLengthCheck = 200;
 
@@ -110,7 +116,7 @@ constexpr script_type ScriptOfState(int state) noexcept {
 	return eScriptNone;
 }
 
-constexpr bool IsNumberChar(unsigned char ch) noexcept {
+constexpr bool IsNumberChar(int ch) noexcept {
 	return IsADigit(ch) || ch == '.' || ch == '-' || ch == '#';
 }
 
@@ -151,6 +157,11 @@ constexpr bool stateTerminateScript(int state) noexcept {
 	return !isStringState(state) && !(state >= js_style(SCE_JS_COMMENTBLOCK) && state <= js_style(SCE_JS_TASKMARKER));
 }
 
+struct HtmlLexer {
+	int chBefore = 0;
+	KeywordType kwType = KeywordType::None;
+};
+
 SCI_noinline
 bool classifyAttribHTML(Sci_PositionU end, LexerWordList keywordLists, LexAccessor &styler, script_mode inScriptType, HtmlOption option) {
 	char s[MaxKeywordSize];
@@ -158,7 +169,7 @@ bool classifyAttribHTML(Sci_PositionU end, LexerWordList keywordLists, LexAccess
 	bool isLanguageType = false;
 	const Sci_PositionU start = styler.GetStartSegment();
 	styler.GetRangeLowered(start, end, s, sizeof(s));
-	if (IsNumberChar(s[0])) {
+	if (IsNumberChar(static_cast<uint8_t>(s[0]))) {
 		chAttr = SCE_H_NUMBER;
 	} else {
 		if (inScriptType == eNonHtmlScript) {
@@ -247,7 +258,7 @@ int classifyTagHTML(Sci_PositionU end, LexerWordList keywordLists, LexAccessor &
 }
 
 SCI_noinline
-int classifyWordHTJS(Sci_PositionU end, LexerWordList keywordLists, LexAccessor &styler) {
+int classifyWordHTJS(Sci_PositionU end, int ch, int chNext, HtmlLexer &lexer, LexerWordList keywordLists, LexAccessor &styler) {
 	char s[31 + 1];
 	styler.GetRange(styler.GetStartSegment(), end, s, sizeof(s));
 	int chAttr = js_style(SCE_JS_IDENTIFIER);
@@ -255,8 +266,29 @@ int classifyWordHTJS(Sci_PositionU end, LexerWordList keywordLists, LexAccessor 
 		chAttr = js_style(SCE_JS_DIRECTIVE);
 	} else if (keywordLists[KeywordIndex_JavaScript].InList(s)) {
 		chAttr = js_style(SCE_JS_WORD);
+		lexer.kwType = KeywordType::None;
+		if (StrEqual(s, "function")) {
+			lexer.kwType = KeywordType::JavaScriptFunction;
+		} else if (StrEqual(s, "new")) {
+			lexer.kwType = KeywordType::JavaScriptClass;
+		}
 	} else if (keywordLists[KeywordIndex_JavaScriptClass].InList(s)) {
 		chAttr = js_style(SCE_JS_CLASS);
+	} else {
+		if (IsASpace(ch)) {
+			ch = chNext;
+		}
+		if (ch == '(') {
+			chAttr = js_style(SCE_JS_FUNCTION);
+			if (lexer.kwType != KeywordType::None && IsLowerCase(lexer.chBefore)) {
+				chAttr = static_cast<int>(lexer.kwType);
+			}
+		} else if (ch == ':' && AnyOf(lexer.chBefore, '{', ',')) {
+			chAttr = js_style(SCE_JS_KEY);
+		}
+	}
+	if (chAttr != js_style(SCE_JS_WORD)) {
+		lexer.kwType = KeywordType::None;
 	}
 	styler.ColorTo(end, chAttr);
 	return chAttr;
@@ -339,6 +371,7 @@ struct InterpolatingState {
 	int braceCount;
 };
 
+SCI_noinline
 bool IsHtmlComment(int ch, Sci_Position i, LexAccessor &styler) noexcept {
 	const unsigned char chNext2 = styler.SafeGetCharAt(i + 2);
 	return (ch == '-' && chNext2 == '>')
@@ -369,6 +402,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 		lineState |= (option >> 8);
 	}
 
+	HtmlLexer lexer;
 	script_mode inScriptType = static_cast<script_mode>((lineState >> 0) & 0x03); // 2 bits of scripting mode
 	TagState tagState = TagState::None;
 	bool tagDontFold = false; //some HTML tags should not be folded
@@ -399,16 +433,14 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 	int stylePrevNonWhite = SCE_H_DEFAULT;
 	// look back to set chPrevNonWhite properly for better regex colouring
 	if (scriptLanguage == eScriptJS && startPos > 0) {
-		Sci_Position back = startPos;
-		do {
-			--back;
-			const int style = styler.StyleIndexAt(back);
-			if (style < js_style(SCE_JS_DEFAULT) || style > js_style(SCE_JS_TASKMARKER)) {
-				stylePrevNonWhite = style;
-				chPrevNonWhite = styler.SafeGetUCharAt(back);
-				break;
-			}
-		} while (back != 0);
+		unsigned marker = SCE_H_DEFAULT;
+		// look back for better regex colouring
+		if (IsJsSpaceEquiv(initStyle)) {
+			marker = (js_style(SCE_JS_DEFAULT) << 8) | js_style(SCE_JS_TASKMARKER);
+		}
+		if (marker != SCE_H_DEFAULT) {
+			LookbackNonWhite(styler, startPos, marker, chPrevNonWhite, stylePrevNonWhite);
+		}
 	}
 
 	styler.StartAt(startPos);
@@ -451,6 +483,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			                    (beforePreProc << 12) |
 			                    (sgmlBlockLevel << 21));
 			lineCurrent++;
+			lexer.kwType = KeywordType::None;
 			needsBacktrack = false;
 		}
 
@@ -462,6 +495,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				// closing tag of the script (it's a closing HTML tag anyway)
 				styler.ColorTo(i, state);
 				state = SCE_H_TAGUNKNOWN;
+				lexer.kwType = KeywordType::None;
 				inScriptType = eHtml;
 				scriptLanguage = eScriptNone;
 				clientScript = eScriptJS;
@@ -585,7 +619,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			// Bounce out of any ASP mode
 			switch (state) {
 			case js_style(SCE_JS_IDENTIFIER):
-				classifyWordHTJS(i, keywordLists, styler);
+				classifyWordHTJS(i, ch, chNext, lexer, keywordLists, styler);
 				break;
 			case SCE_HB_IDENTIFIER:
 				classifyWordHTVB(i, keywordLists, styler);
@@ -869,7 +903,6 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 					tagState = TagState::None;
 				} else if (ch == '=') {
 					styler.ColorTo(i + 1, SCE_H_OTHER);
-					state = SCE_H_VALUE;
 					if (chNext == '\"') {
 						state = SCE_H_DOUBLESTRING;
 						i++;
@@ -878,6 +911,9 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 						i++;
 						ch = chNext;
 						state = SCE_H_SINGLESTRING;
+					} else {
+						lexer.chBefore = chNext;
+						state = SCE_H_VALUE;
 					}
 				} else {
 					state = SCE_H_OTHER;
@@ -905,7 +941,6 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				state = SCE_H_SINGLESTRING;
 			} else if (ch == '=') {
 				styler.ColorTo(i + 1, state);
-				state = SCE_H_VALUE;
 				if (chNext == '\"') {
 					state = SCE_H_DOUBLESTRING;
 					i++;
@@ -914,6 +949,9 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 					i++;
 					ch = chNext;
 					state = SCE_H_SINGLESTRING;
+				} else {
+					lexer.chBefore = chNext;
+					state = SCE_H_VALUE;
 				}
 			} else if (ch == '/' && chNext == '>') {
 				styler.ColorTo(i, state);
@@ -949,7 +987,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			break;
 		case SCE_H_VALUE:
 			if (IsHtmlInvalidAttrChar(ch)) {
-					if (IsNumberChar(styler.SafeGetUCharAt(styler.GetStartSegment()))) {
+					if (IsNumberChar(lexer.chBefore)) {
 						styler.ColorTo(i, SCE_H_NUMBER);
 					} else {
 						styler.ColorTo(i, state);
@@ -987,7 +1025,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 					state = js_style(SCE_JS_DEFAULT);
 				} else {
 					state = js_style(SCE_JS_DEFAULT);
-					stylePrevNonWhite = classifyWordHTJS(i, keywordLists, styler);
+					stylePrevNonWhite = classifyWordHTJS(i, ch, chNext, lexer, keywordLists, styler);
 				}
 			}
 			break;
@@ -1014,6 +1052,9 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 					i++;
 				}
 			} else if (ch == ((state == js_style(SCE_JS_STRING_DQ)) ? '\"' : ((state == js_style(SCE_JS_STRING_SQ)) ? '\'' : '`'))) {
+				if (state != js_style(SCE_JS_TEMPLATELITERAL) && chNext == ':' && AnyOf(lexer.chBefore, '{', ',')) {
+					state = js_style(SCE_JS_KEY);
+				}
 				styler.ColorTo(i + 1, state);
 				state = js_style(SCE_JS_DEFAULT);
 				continue;
@@ -1098,18 +1139,22 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				insideRegexCharacterClass = false;
 				state = js_style(SCE_JS_REGEX);
 			} else if (ch == '\"') {
+				lexer.chBefore = chPrevNonWhite;
 				state = js_style(SCE_JS_STRING_DQ);
 			} else if (ch == '\'') {
+				lexer.chBefore = chPrevNonWhite;
 				state = js_style(SCE_JS_STRING_SQ);
 			} else if (ch == '`') {
 				state = js_style(SCE_JS_TEMPLATELITERAL);
 			} else if (IsNumberStart(ch, chNext)) {
 				state = js_style(SCE_JS_NUMBER);
 			} else if (IsJsIdentifierStart(ch)) {
+				lexer.chBefore = chPrevNonWhite;
 				state = js_style(SCE_JS_IDENTIFIER);
 			} else if (((ch == '<' && chNext == '!') || (ch == '-' && chNext == '-')) && IsHtmlComment(ch, i, styler)) {
 				state = js_style(SCE_JS_COMMENTLINE);
 			} else if (IsAGraphic(ch)) {
+				lexer.kwType = KeywordType::None;
 				stylePrevNonWhite = js_style(SCE_JS_OPERATOR);
 				if (ch == '{' || ch == '[' || ch == '(') {
 					levelCurrent++;
@@ -1151,7 +1196,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 
 	switch (state) {
 	case js_style(SCE_JS_IDENTIFIER):
-		classifyWordHTJS(lengthDoc, keywordLists, styler);
+		classifyWordHTJS(lengthDoc, ch, ch, lexer, keywordLists, styler);
 		break;
 	case SCE_HB_IDENTIFIER:
 		classifyWordHTVB(lengthDoc, keywordLists, styler);

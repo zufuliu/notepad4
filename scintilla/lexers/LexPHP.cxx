@@ -70,6 +70,8 @@ enum {
 
 enum class KeywordType {
 	None = 0,
+	JavaScriptFunction = js_style(SCE_JS_FUNCTION_DEFINITION),
+	JavaScriptClass = js_style(SCE_JS_CLASS),
 	Const = SCE_PHP_WORD2,
 	Class = SCE_PHP_CLASS,
 	Interface = SCE_PHP_INTERFACE,
@@ -675,10 +677,9 @@ int PHPLexer::ClassifyJSWord(LexerWordList keywordLists) {
 		sc.ChangeState(js_style(SCE_JS_WORD));
 		kwType = KeywordType::None;
 		if (StrEqual(s, "function")) {
-			const int chNext = sc.GetLineNextChar();
-			if (IsJsIdentifierStart(chNext) || chNext == '\\') {
-				kwType = KeywordType::Function;
-			}
+			kwType = KeywordType::JavaScriptFunction;
+		} else if (StrEqual(s, "new")) {
+			kwType = KeywordType::JavaScriptClass;
 		}
 	} else if (keywordLists[KeywordIndex_JavaScriptClass].InList(s)) {
 		sc.ChangeState(js_style(SCE_JS_CLASS));
@@ -691,7 +692,10 @@ int PHPLexer::ClassifyJSWord(LexerWordList keywordLists) {
 	} else {
 		const int chNext = sc.GetDocNextChar();
 		if (chNext == '(') {
-			sc.ChangeState((kwType != KeywordType::None) ? js_style(SCE_JS_FUNCTION_DEFINITION) : js_style(SCE_JS_FUNCTION));
+			sc.ChangeState(js_style(SCE_JS_FUNCTION));
+			if (kwType != KeywordType::None && IsLowerCase(chBefore)) {
+				sc.ChangeState(static_cast<int>(kwType));
+			}
 		}
 	}
 
