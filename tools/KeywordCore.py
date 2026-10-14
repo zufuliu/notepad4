@@ -1348,6 +1348,7 @@ def parse_html_api_file(path):
 		('void tag', HtmlVoidTagList, KeywordAttr.NoAutoComp | KeywordAttr.PrefixSpace),
 		('JavaScript', JavaScriptKeywordMap['keywords'], KeywordAttr.NoAutoComp),
 		('JavaScript directive', JavaScriptKeywordMap['directive'], KeywordAttr.NoAutoComp),
+		('JavaScript class', JavaScriptKeywordMap['class'], KeywordAttr.NoAutoComp),
 		('VBScript', VBScriptKeyword, KeywordAttr.MakeLower | KeywordAttr.NoAutoComp),
 		('SGML', SGMLKeyword, KeywordAttr.Default),
 		('attribute', attributes, KeywordAttr.Special),
@@ -1971,6 +1972,7 @@ def parse_php_api_file(path):
 		('void tag', HtmlVoidTagList, KeywordAttr.NoAutoComp | KeywordAttr.PrefixSpace),
 		('JavaScript', JavaScriptKeywordMap['keywords'], KeywordAttr.NoAutoComp),
 		('JavaScript directive', JavaScriptKeywordMap['directive'], KeywordAttr.NoAutoComp),
+		('JavaScript class', JavaScriptKeywordMap['class'], KeywordAttr.NoAutoComp),
 		('phpdoc', keywordMap['phpdoc'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp | KeywordAttr.Special),
 	]
 
@@ -2864,6 +2866,7 @@ def parse_xml_api_file(path):
 		('void tag', [], KeywordAttr.Default),
 		('JavaScript', [], KeywordAttr.Default),
 		('JavaScript directive', [], KeywordAttr.Default),
+		('JavaScript class', [], KeywordAttr.Default),
 		('VBScript', [], KeywordAttr.Default),
 		('SGML', keywords, KeywordAttr.Default),
 		('attribute', attributes, KeywordAttr.NoLexer),
