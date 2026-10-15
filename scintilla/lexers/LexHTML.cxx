@@ -157,9 +157,30 @@ constexpr bool stateTerminateScript(int state) noexcept {
 	return !isStringState(state) && !(state >= js_style(SCE_JS_COMMENTBLOCK) && state <= js_style(SCE_JS_TASKMARKER));
 }
 
+struct EscapeSequence {
+	int outerState = SCE_H_DEFAULT;
+	int digitsLeft = 0;
+
+	// highlight any character as escape sequence.
+	void resetEscapeState(int state, int chNext) noexcept {
+		outerState = state;
+		digitsLeft = 1;
+		if (chNext == 'x') {
+			digitsLeft = 3;
+		} else if (chNext == 'u') {
+			digitsLeft = 5;
+		}
+	}
+	bool atEscapeEnd(int ch) noexcept {
+		--digitsLeft;
+		return digitsLeft <= 0 || !IsHexDigit(ch);
+	}
+};
+
 struct HtmlLexer {
 	int chBefore = 0;
 	KeywordType kwType = KeywordType::None;
+	EscapeSequence escSeq;
 };
 
 SCI_noinline
@@ -1017,16 +1038,17 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				state = js_style(SCE_JS_DEFAULT);
 			}
 			break;
-		case js_style(SCE_JS_IDENTIFIER):
 		case js_style(SCE_JS_NUMBER):
-			if (!(IsJsIdentifierChar(ch) || (state == js_style(SCE_JS_NUMBER) && IsNumberContinueEx(chPrev, ch, chNext)))) {
-				if (state == js_style(SCE_JS_NUMBER)) {
-					styler.ColorTo(i, state);
-					state = js_style(SCE_JS_DEFAULT);
-				} else {
-					state = js_style(SCE_JS_DEFAULT);
-					stylePrevNonWhite = classifyWordHTJS(i, ch, chNext, lexer, keywordLists, styler);
-				}
+		case SCE_HB_NUMBER:
+			if (!(IsIdentifierChar(ch) || IsNumberContinueEx(chPrev, ch, chNext))) {
+				styler.ColorTo(i, state);
+				state = lexer.escSeq.outerState;
+			}
+			break;
+		case js_style(SCE_JS_IDENTIFIER):
+			if (!IsJsIdentifierChar(ch)) {
+				state = js_style(SCE_JS_DEFAULT);
+				stylePrevNonWhite = classifyWordHTJS(i, ch, chNext, lexer, keywordLists, styler);
 			}
 			break;
 		case js_style(SCE_JS_COMMENTBLOCK):
@@ -1048,7 +1070,10 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 		case js_style(SCE_JS_STRING_SQ):
 		case js_style(SCE_JS_TEMPLATELITERAL):
 			if (ch == '\\') {
-				if (IsAGraphic(chNext)) {
+				if (chNext >= ' ') {
+					styler.ColorTo(i, state);
+					lexer.escSeq.resetEscapeState(state, chNext);
+					state = js_style(SCE_JS_ESCAPECHAR);
 					i++;
 				}
 			} else if (ch == ((state == js_style(SCE_JS_STRING_DQ)) ? '\"' : ((state == js_style(SCE_JS_STRING_SQ)) ? '\'' : '`'))) {
@@ -1070,6 +1095,14 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				i++;
 				ch = chNext;
 				state = js_style(SCE_JS_DEFAULT);
+			}
+			break;
+		case js_style(SCE_JS_ESCAPECHAR):
+			if (lexer.escSeq.atEscapeEnd(ch)) {
+				styler.ColorTo(i, state);
+				state = lexer.escSeq.outerState;
+				i -= 1;
+				continue;
 			}
 			break;
 		case js_style(SCE_JS_REGEX):
@@ -1103,14 +1136,8 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			}
 			break;
 		case SCE_HB_IDENTIFIER:
-		case SCE_HB_NUMBER:
-			if (!(IsIdentifierCharEx(ch) || (state == SCE_HB_NUMBER && IsNumberContinue(chPrev, ch, chNext)))) {
-				if (state == SCE_HB_NUMBER) {
-					styler.ColorTo(i, state);
-					state = SCE_HB_DEFAULT;
-				} else {
-					state = classifyWordHTVB(i, keywordLists, styler);
-				}
+			if (!IsIdentifierCharEx(ch)) {
+				state = classifyWordHTVB(i, keywordLists, styler);
 			}
 			break;
 		case SCE_HB_STRING:
@@ -1147,6 +1174,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			} else if (ch == '`') {
 				state = js_style(SCE_JS_TEMPLATELITERAL);
 			} else if (IsNumberStart(ch, chNext)) {
+				lexer.escSeq.outerState = js_style(SCE_JS_DEFAULT);
 				state = js_style(SCE_JS_NUMBER);
 			} else if (IsJsIdentifierStart(ch)) {
 				lexer.chBefore = chPrevNonWhite;
@@ -1183,6 +1211,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			} else if (ch == '\'') {
 				state = SCE_HB_COMMENTLINE;
 			} else if (IsNumberStart(ch, chNext)) {
+				lexer.escSeq.outerState = SCE_HB_DEFAULT;
 				state = SCE_HB_NUMBER;
 			} else if (IsIdentifierStartEx(ch)) {
 				state = SCE_HB_IDENTIFIER;
