@@ -270,7 +270,7 @@ struct EditFileIOStatus {
 	int iEOLMode;		// load output
 
 	bool bFileTooBig;	// load output
-	bool bUnicodeErr;	// load output
+	bool bUnicodeError;	// load output
 	bool bBinaryFile;	// load output
 	bool bCancelDataLoss;// save output
 

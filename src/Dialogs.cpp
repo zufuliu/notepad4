@@ -1846,9 +1846,10 @@ bool SelectDefLineEndingDlg(HWND hwnd) noexcept {
 	return iResult == IDOK;
 }
 
-extern HWND hDlgWarnLineEnding;
+static HWND hDlgWarnLineEnding;
 static INT_PTR CALLBACK WarnLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	switch (umsg) {
+	case APPM_COPYDATA:
 	case WM_INITDIALOG: {
 		hDlgWarnLineEnding = hwnd;
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
@@ -1881,7 +1882,9 @@ static INT_PTR CALLBACK WarnLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 		if (status->bLineEndingsDefaultNo) {
 			SendMessage(hwnd, DM_SETDEFID, IDCANCEL, 0);
 		}
-		DarkMode_InitDialog(hwnd);
+		if (umsg == WM_INITDIALOG) {
+			DarkMode_InitDialog(hwnd);
+		}
 	}
 	return TRUE;
 
@@ -1891,6 +1894,7 @@ static INT_PTR CALLBACK WarnLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 			EditFileIOStatus *status = AsPointer<EditFileIOStatus *>(GetWindowLongPtr(hwnd, DWLP_USER));
 			const int iEOLMode = static_cast<int>(SendDlgItemMessage(hwnd, IDC_EOLMODELIST, CB_GETCURSEL, 0, 0));
 			status->iEOLMode = GetScintillaEOLMode(iEOLMode);
+			status->bInconsistent = true;
 			bWarnLineEndings = IsButtonChecked(hwnd, IDC_WARNINCONSISTENTEOLS);
 			EndDialog(hwnd, IDOK);
 		}
@@ -1906,11 +1910,14 @@ static INT_PTR CALLBACK WarnLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 	return FALSE;
 }
 
-bool WarnLineEndingDlg(HWND hwnd, EditFileIOStatus *status) noexcept {
+void WarnLineEndingDlg(HWND hwnd, EditFileIOStatus *status) noexcept {
 	MessageBeep(MB_ICONEXCLAMATION);
-	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_WARNLINEENDS), hwnd, WarnLineEndingDlgProc, AsInteger<LPARAM>(status));
+	if (hDlgWarnLineEnding) {
+		SendMessage(hDlgWarnLineEnding, APPM_COPYDATA, 0, AsInteger<LPARAM>(status));
+		return;
+	}
+	ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_WARNLINEENDS), hwnd, WarnLineEndingDlgProc, AsInteger<LPARAM>(status));
 	hDlgWarnLineEnding = nullptr;
-	return iResult == IDOK;
 }
 
 void InitZoomLevelComboBox(HWND hwnd, int nCtlId, int zoomLevel) noexcept {

@@ -60,7 +60,6 @@ HWND	hwndEdit;
 HWND	hwndMain;
 static HMENU hmenuMain;
 HWND	hDlgFindReplace = nullptr;
-HWND	hDlgWarnLineEnding = nullptr;
 static bool bInitDone = false;
 static HACCEL hAccMain;
 static HACCEL hAccFindReplace;
@@ -6989,11 +6988,8 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 		//DisableDelayedStatusBarRedraw(); // already set in MsgSize()
 		UpdateStatusbar();
 		UpdateWindowTitle();
-		if (hDlgWarnLineEnding) {
-			SendMessage(hDlgWarnLineEnding, WM_CLOSE, 0, 0);
-		}
 		// Show warning: Unicode file loaded as ANSI
-		if (status.bUnicodeErr) {
+		if (status.bUnicodeError) {
 			MsgBoxWarn(MB_OK, IDS_ERR_UNICODE);
 		}
 		// notify binary file opened in read only mode
@@ -7008,7 +7004,9 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 			// Set default button to "No" for diff/patch and unknown file.
 			// diff/patch file may contain content from files with different line endings.
 			status.bLineEndingsDefaultNo = bUnknownFile || pLexCurrent->iLexer == SCLEX_DIFF;
-			if (WarnLineEndingDlg(hwndMain, &status)) {
+			status.bInconsistent = false;
+			WarnLineEndingDlg(hwndMain, &status);
+			if (status.bInconsistent) {
 				ConvertLineEndings(status.iEOLMode);
 			}
 		}

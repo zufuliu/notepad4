@@ -1086,7 +1086,7 @@ bool EditLoadFile(LPWSTR pszFile, EditFileIOStatus &status) noexcept {
 		if (cbData == 0) {
 			const UINT legacyACP = mEncoding[CPI_DEFAULT].uCodePage;
 			cbData = WideCharToMultiByte(legacyACP, 0, pszTextW, -1, lpDataUTF8, size, nullptr, nullptr);
-			status.bUnicodeErr = true;
+			status.bUnicodeError = true;
 		}
 		if (cbData != 0) {
 			// remove the NULL terminator.
