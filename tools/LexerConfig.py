@@ -1178,7 +1178,7 @@ LexerConfigMap = {
 	'NP2LEX_WASM': {
 		'line_comment_string': ';;',
 		'block_comment_string': ('(;', ';)'),
-		'comment_style_marker': 'SCE_WASM_TASKMARKER',
+		'comment_style_marker': 'SCE_WASM_COMMENTBLOCK',
 		'escape_char_style': 'SCE_WASM_ESCAPECHAR',
 		'operator_style': ['SCE_WASM_OPERATOR'],
 		'extra_word_char': '-@%$',
