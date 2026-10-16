@@ -2827,7 +2827,7 @@ def parse_wasm_lexer_keywords(path):
 		('keywords', keywordMap['keywords'], KeywordAttr.Default),
 		('type', keywordMap['type'], KeywordAttr.Default),
 		('instruction', keywordMap['instruction'], KeywordAttr.Default),
-		('full instruction', keywordMap['full instruction'], KeywordAttr.NoLexer),
+		('full instruction', [], KeywordAttr.NoLexer),
 	]
 
 def parse_winhex_api_file(path):
