@@ -1846,9 +1846,11 @@ bool SelectDefLineEndingDlg(HWND hwnd) noexcept {
 	return iResult == IDOK;
 }
 
+extern HWND hDlgWarnLineEnding;
 static INT_PTR CALLBACK WarnLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	switch (umsg) {
 	case WM_INITDIALOG: {
+		hDlgWarnLineEnding = hwnd;
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
 		const EditFileIOStatus * const status = AsPointer<EditFileIOStatus *>(lParam);
 
@@ -1907,6 +1909,7 @@ static INT_PTR CALLBACK WarnLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 bool WarnLineEndingDlg(HWND hwnd, EditFileIOStatus *status) noexcept {
 	MessageBeep(MB_ICONEXCLAMATION);
 	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_WARNLINEENDS), hwnd, WarnLineEndingDlgProc, AsInteger<LPARAM>(status));
+	hDlgWarnLineEnding = nullptr;
 	return iResult == IDOK;
 }
 
