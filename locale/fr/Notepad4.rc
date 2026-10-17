@@ -500,7 +500,8 @@ BEGIN
 		MENUITEM "Utiliser le stye de thème de code par défaut\tShift+F12",	IDM_VIEW_USEDEFAULT_CODESTYLE
 		POPUP "Thème de style"
 		BEGIN
-			MENUITEM "Défaut",					IDM_VIEW_STYLE_THEME_DEFAULT
+			MENUITEM "Suivre le &système",			IDM_VIEW_STYLE_THEME_SYSTEM
+			MENUITEM "&Clair",						IDM_VIEW_STYLE_THEME_LIGHT
 			MENUITEM "Sombre",						IDM_VIEW_STYLE_THEME_DARK
 		END
 		MENUITEM SEPARATOR
