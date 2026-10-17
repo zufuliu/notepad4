@@ -117,7 +117,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [Perl](tools/lang/Perl.pl), up to Perl 5.42. [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#perl)
 	* [PowerBuilder](tools/lang/PowerBuilder.srf), up to PowerBuilder 2025.
 	* [PowerShell](tools/lang/PowerShell.ps1), up to PowerShell 7.2.
-	* [Python](tools/lang/Python.py), up to Python 3.14. [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#python)
+	* [Python](tools/lang/Python.py), up to Python 3.15. [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#python)
 	* [PHP Script](tools/lang/PHP.php), up to PHP 8.5. [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#php)
 	* Windows Rescouce Script
 	* [R](tools/lang/R.r), up to R 4.2.
