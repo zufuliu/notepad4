@@ -20,6 +20,7 @@
 // #include "CharacterSet.h"
 #include "OptionSet.h"
 // #include "SubStyles.h"
+// #include "SparseState.h"
 #include "DefaultLexer.h"
 
 using namespace Lexilla;

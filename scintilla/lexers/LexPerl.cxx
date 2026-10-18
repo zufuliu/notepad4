@@ -845,11 +845,8 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 							sc.Forward();
 						}
 						if (sc.ch != '\r') {	// skip CR if CRLF
-							int i = 0;			// else append char, possibly an extended char
-							while (i < sc.width) {
-								HereDoc.Append(sc.GetRelative(i));
-								i++;
-							}
+							// else append char, possibly an extended char
+							HereDoc.Append(sc.ch);
 						}
 					}
 				} else { // an unquoted here-doc delimiter, no extended charsets
@@ -910,11 +907,9 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				if (endType == 1) {
 					sc.Forward();
 					// \ at end-of-line does not appear to have any effect, skip
-					if (sc.ch != '\r' && sc.ch != '\n')
-						sc.Forward();
-				} else if (endType == 2) {
-					if (!sc.atLineEnd)
-						sc.Forward();
+				}
+				if (!sc.atLineEnd) {
+					sc.Forward();
 				}
 			}
 			break;
@@ -1122,7 +1117,7 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 		}
 		break;
 		case SCE_PL_FORMAT: {
-			sc.Complete();
+			// sc.Complete();
 			if (sc.ch == '.') {
 				sc.Forward();
 				if (sc.atLineEnd || (sc.ch == '\r' && sc.chNext == '\n'))
@@ -1170,7 +1165,7 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 		}
 
 		// Must check end of HereDoc states here before default state is handled
-		if (HereDoc.State == 1 && sc.atLineEnd) {
+		if (HereDoc.State == 1 && sc.MatchLineEnd()) {
 			// Begin of here-doc (the line after the here-doc delimiter):
 			// Lexically, the here-doc starts from the next line after the >>, but the
 			// first line of here-doc seem to follow the style of the last EOL sequence
@@ -1199,7 +1194,7 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 			}
 			sc.SetState(st_new);
 		}
-		if (HereDoc.State == 3 && sc.atLineEnd) {
+		if (HereDoc.State == 3 && sc.MatchLineEnd()) {
 			// Start of format body.
 			HereDoc.State = 0;
 			sc.SetState(SCE_PL_FORMAT);
@@ -1535,7 +1530,7 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				sc.SetState(SCE_PL_DATASECTION);
 			} else {
 				// keep colouring defaults
-				sc.Complete();
+				// sc.Complete();
 			}
 		}
 	}
