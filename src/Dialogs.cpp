@@ -1846,10 +1846,9 @@ bool SelectDefLineEndingDlg(HWND hwnd) noexcept {
 	return iResult == IDOK;
 }
 
-static HWND hDlgWarnLineEnding;
+extern HWND hDlgWarnLineEnding;
 static INT_PTR CALLBACK WarnLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	switch (umsg) {
-	case APPM_COPYDATA:
 	case WM_INITDIALOG: {
 		hDlgWarnLineEnding = hwnd;
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
@@ -1882,9 +1881,7 @@ static INT_PTR CALLBACK WarnLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 		if (status->bLineEndingsDefaultNo) {
 			SendMessage(hwnd, DM_SETDEFID, IDCANCEL, 0);
 		}
-		if (umsg == WM_INITDIALOG) {
-			DarkMode_InitDialog(hwnd);
-		}
+		DarkMode_InitDialog(hwnd);
 	}
 	return TRUE;
 
@@ -1912,10 +1909,6 @@ static INT_PTR CALLBACK WarnLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 
 void WarnLineEndingDlg(HWND hwnd, EditFileIOStatus *status) noexcept {
 	MessageBeep(MB_ICONEXCLAMATION);
-	if (hDlgWarnLineEnding) {
-		SendMessage(hDlgWarnLineEnding, APPM_COPYDATA, 0, AsInteger<LPARAM>(status));
-		return;
-	}
 	ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_WARNLINEENDS), hwnd, WarnLineEndingDlgProc, AsInteger<LPARAM>(status));
 	hDlgWarnLineEnding = nullptr;
 }

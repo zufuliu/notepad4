@@ -60,6 +60,7 @@ HWND	hwndEdit;
 HWND	hwndMain;
 static HMENU hmenuMain;
 HWND	hDlgFindReplace = nullptr;
+HWND	hDlgWarnLineEnding = nullptr;
 static bool bInitDone = false;
 static HACCEL hAccMain;
 static HACCEL hAccFindReplace;
@@ -6988,6 +6989,10 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 		//DisableDelayedStatusBarRedraw(); // already set in MsgSize()
 		UpdateStatusbar();
 		UpdateWindowTitle();
+		if (hDlgWarnLineEnding) {
+			EndDialog(hDlgWarnLineEnding, IDCANCEL);
+			hDlgWarnLineEnding = nullptr;
+		}
 		// Show warning: Unicode file loaded as ANSI
 		if (status.bUnicodeError) {
 			MsgBoxWarn(MB_OK, IDS_ERR_UNICODE);
