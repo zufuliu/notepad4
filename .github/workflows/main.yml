@@ -122,5 +122,5 @@ jobs:
 
     - uses: actions/upload-artifact@v7
       with:
-          name: Notepad4_${{ matrix.compiler }}${{ case(matrix.compiler == 'Clang', '_mingw', '') }}_en_${{ matrix.platform }}${{ case(matrix.arch == 'ucrt', '_ucrt', '') }}
+          name: Notepad4_${{ matrix.compiler }}${{ matrix.compiler == 'Clang' && '_mingw' || '' }}_en_${{ matrix.platform }}${{ matrix.arch == 'ucrt' && '_ucrt' || '' }}
           path: 'build\Notepad4_${{ matrix.compiler }}_${{ matrix.platform }}_*.zip'
