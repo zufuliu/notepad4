@@ -2365,11 +2365,22 @@ INT_PTR CALLBACK InfoBoxDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 	}
 	return TRUE;
 
+	case WM_ERASEBKGND:
+		if (DarkMode_IsEnabled()) {
+			// Keep InfoBox's main message pane distinct from the button/footer area.
+			DarkMode_FillDialogWithFooter(hwnd, AsPointer<HDC>(wParam), GetDlgItem(hwnd, IDC_INFOBOXRECT));
+			return TRUE;
+		}
+		break;
+
 	case WM_CTLCOLORSTATIC: {
 		const DWORD dwId = GetWinCtrlID(AsPointer<HWND>(lParam));
 
 		if (dwId >= IDC_INFOBOXRECT && dwId <= IDC_INFOBOXTEXT) {
 			HDC hdc = AsPointer<HDC>(wParam);
+			if (DarkMode_IsEnabled()) {
+				return DarkMode_OnCtlColorDlgStaticText(hdc, true);
+			}
 			SetBkMode(hdc, TRANSPARENT);
 			return AsInteger<LONG_PTR>(GetSysColorBrush(COLOR_WINDOW));
 		}
