@@ -1845,7 +1845,7 @@ BEGIN
     IDS_ASK_ENCODING2       "Zamierzasz zmienić kodowanie pustego pliku z ANSI na inne. Historia zmian zostanie wyczyszczona, gdyż nie można jej zsynchronizować z nowym kodowaniem. Kontynuować?"
     IDS_ERR_ENCODINGNA      "Tablice konwersji dla wybranego kodowania nie są dostępne na tym systemie."
     IDS_ERR_UNICODE         "Błąd podczas zmiany kodowania pliku.\nDane zostaną utracone jeśli plik zostanie zapisany."
-    IDS_BINARY_FILE_OPENED  "Najprawdopodobniej nie jest to plik tekstowy, został więc otwarty w trybie tylko do odczytu,\nby zapobiec przypadkowej edycji prowadzącej do uszkodzenia pliku."
+    IDS_BINARY_FILE_OPENED  "To najprawdopodobniej nie jest plik tekstowy.\nAby zapobiec przypadkowej edycji, która mogłaby uszkodzić plik, dokument został otwarty w trybie tylko do odczytu."
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
     IDS_CHANGE_LANG_RESTART "Zmiana języka interfejsu użytkownika wymaga ponownego uruchomienia programu Notepad4, uruchomić go teraz ponownie?"
 #endif
