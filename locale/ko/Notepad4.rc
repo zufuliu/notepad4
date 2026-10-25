@@ -1775,14 +1775,14 @@ $\t줄의 끝\n\
 \\xHH\t16진수 코드 HH가 있는 문자\n\
 ?\t0회 또는 1회 선행 일치\n*\t0회 이상 선행 일치\n\
 +\t1회 이상 선행 일치\n\
-*? or +?\t""?"" 및 ""+""의 게으른 수량자\n\
+*? 또는 +?\t""?"" 및 ""+""의 게으른 수량자\n\
 (\t그룹의 시작\n\
 )\t그룹의 끝\n\
 \\n or $n\t교체 시 영역을 나타냄 (n은 1-9)\n\n\
-Boost Perl Regex Syntax:\n\
-a|b\tMatches either a or b\n\
-{n}\tMatches preceding exactly n times\n\
-{n,m}\tMatches preceding between n and m times"
+Boost Perl 정규 표현식 구문:\n\
+a|b\ta 또는 b와 일치함\n\
+{n}\t앞의 요소를 정확히 n번 일치시킴\n\
+{n,m}\t앞의 요소를 n번에서 m번 사이로 일치시킴"
 
 	IDS_WILDCARDHELP        "와일드카드 검색\n\n\
 *\t0개 이상의 문자와 일치합니다.\n\
@@ -1824,7 +1824,7 @@ BEGIN
     IDT_VIEW_TOGGLEFOLDS    "접기 전환"
     IDT_FILE_LAUNCH         "문서 실행"
     IDT_VIEW_ALWAYSONTOP    "항상 맨 위에"
-    IDT_FILE_NEWWINDOW      "New Window"
+    IDT_FILE_NEWWINDOW      "새 창"
 END
 
 STRINGTABLE
