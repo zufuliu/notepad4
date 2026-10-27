@@ -2,7 +2,7 @@
 # https://docs.astral.sh/ruff/configuration/
 # https://docs.astral.sh/ruff/settings/
 line-length = 320
-target-version = 'py313'
+target-version = 'py314'
 extend-exclude = ['bin', 'Python.py']
 
 [lint]
