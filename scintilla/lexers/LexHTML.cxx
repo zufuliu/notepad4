@@ -205,6 +205,9 @@ struct HtmlLexer {
 	int chBefore = 0;
 	KeywordType kwType = KeywordType::None;
 	EscapeSequence escSeq;
+
+	bool tagDontFold = false; // some HTML tags should not be folded
+	bool insideRegexCharacterClass = false; // inside regex character class []
 };
 
 SCI_noinline
@@ -242,7 +245,7 @@ bool isHTMLCustomElement(const char *tag, size_t length, bool dashColon) noexcep
 }
 
 SCI_noinline
-int classifyTagHTML(Sci_PositionU end, LexerWordList keywordLists, LexAccessor &styler, bool &tagDontFold, HtmlOption option) {
+int classifyTagHTML(Sci_PositionU end, LexerWordList keywordLists, LexAccessor &styler, HtmlLexer &lexer, HtmlOption option) {
 	char s[63 + 1];
 	memset(s, 0, 4);
 	const Sci_PositionU start = styler.GetStartSegment();
@@ -269,8 +272,8 @@ int classifyTagHTML(Sci_PositionU end, LexerWordList keywordLists, LexAccessor &
 			}
 			++t;
 		}
-		tagDontFold = keywordLists[KeywordIndex_VoidTag].InList(tag);
-		if (tagDontFold || keywordLists[KeywordIndex_Tag].InList(tag)) {
+		lexer.tagDontFold = keywordLists[KeywordIndex_VoidTag].InList(tag);
+		if (lexer.tagDontFold || keywordLists[KeywordIndex_Tag].InList(tag)) {
 			chAttr = SCE_H_TAG;
 		} else if (isHTMLCustomElement(tag, t - tag, dashColon)) {
 			customElement = true;
@@ -433,14 +436,12 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 	HtmlLexer lexer;
 	script_mode inScriptType = static_cast<script_mode>((lineState >> 0) & 0x03); // 2 bits of scripting mode
 	TagState tagState = TagState::None;
-	bool tagDontFold = false; //some HTML tags should not be folded
 	script_type aspScript = static_cast<script_type>((lineState >> 4) & 0x0F); // 4 bits of script name
 	script_type clientScript = static_cast<script_type>((lineState >> 8) & 0x0F); // 4 bits of script name
 	int beforePreProc = (lineState >> 12) & 0xFF; // 8 bits of state
 	bool isLanguageType = false; // type or language attribute for script tag
 	int sgmlBlockLevel = (lineState >> 21);
 
-	bool insideRegexCharacterClass = false; // inside regex character class []
 	bool needsBacktrack = false;
 	std::vector<InterpolatingState> interpolatingStack;
 
@@ -856,7 +857,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			break;
 		case SCE_H_TAGUNKNOWN:
 			if (!(kHtmlCharClass[ch] & HtmlCharMask_TagContinue) && !((ch == '/') && (chPrev == '<'))) {
-				int eClass = classifyTagHTML(i, keywordLists, styler, tagDontFold, option);
+				int eClass = classifyTagHTML(i, keywordLists, styler, lexer, option);
 				if (eClass == SCE_H_SCRIPT) {
 					if (tagState > TagState::None) {
 						inScriptType = eNonHtmlScript;
@@ -874,7 +875,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 					} else {
 						state = SCE_H_DEFAULT;
 					}
-					if (tagDontFold) {
+					if (lexer.tagDontFold) {
 						levelCurrent -= static_cast<int>(tagState);
 					}
 					tagState = TagState::None;
@@ -915,7 +916,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 					} else {
 						state = SCE_H_DEFAULT;
 					}
-					if (tagDontFold) {
+					if (lexer.tagDontFold) {
 						levelCurrent -= static_cast<int>(tagState);
 					}
 					tagState = TagState::None;
@@ -947,7 +948,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				} else {
 					state = SCE_H_DEFAULT;
 				}
-				if (tagDontFold) {
+				if (lexer.tagDontFold) {
 					levelCurrent -= static_cast<int>(tagState);
 				}
 				tagState = TagState::None;
@@ -1017,7 +1018,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 					} else {
 						state = SCE_H_DEFAULT;
 					}
-					if (tagDontFold) {
+					if (lexer.tagDontFold) {
 						levelCurrent -= static_cast<int>(tagState);
 					}
 					tagState = TagState::None;
@@ -1103,7 +1104,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			}
 			break;
 		case js_style(SCE_JS_REGEX):
-			if (ch == '\r' || ch == '\n' || (ch == '/' && !insideRegexCharacterClass)) {
+			if (ch == '\r' || ch == '\n' || (ch == '/' && !lexer.insideRegexCharacterClass)) {
 				if (ch == '/') {
 					while (IsLowerCase(chNext)) {   // gobble regex flags
 						i++;
@@ -1121,7 +1122,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 					ch = chNext;
 				}
 			} else if (ch == '[' || ch == ']') {
-				insideRegexCharacterClass = ch == '[';
+				lexer.insideRegexCharacterClass = ch == '[';
 			}
 			break;
 
@@ -1160,7 +1161,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			} else if (ch == '/' && chNext == '/') {
 				state = js_style(SCE_JS_COMMENTLINE);
 			} else if (ch == '/' && !IsEOLChar(chNext) && IsRegexStart(chPrevNonWhite, stylePrevNonWhite)) {
-				insideRegexCharacterClass = false;
+				lexer.insideRegexCharacterClass = false;
 				state = js_style(SCE_JS_REGEX);
 			} else if (ch == '\"') {
 				lexer.chBefore = chPrevNonWhite;
