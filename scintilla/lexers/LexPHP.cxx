@@ -207,7 +207,7 @@ struct PHPLexer {
 
 	int ClassifyJSWord(LexerWordList keywordLists);
 	void HighlightJsInnerString();
-	bool ClassifyCssWord();
+	int ClassifyCssWord();
 };
 
 void PHPLexer::ClassifyHtmlTag(LexerWordList keywordLists) {
@@ -615,7 +615,7 @@ bool PHPLexer::HighlightOperator(HtmlTextBlock block, int stylePrevNonWhite) {
 			parenCount = 0;
 			selectorLevel = 0;
 		} else if (AnyOf<'[', ']'>(sc.ch)) {
-			lineStateAttribute = (sc.ch & 4) ? 0 : LineStateAttributeLine;
+			lineStateAttribute = (sc.ch & 2) ? LineStateAttributeLine : 0;
 		} else if (sc.ch == '(') {
 			++parenCount;
 		} else if (sc.ch == ')') {
@@ -625,15 +625,11 @@ bool PHPLexer::HighlightOperator(HtmlTextBlock block, int stylePrevNonWhite) {
 			if (selectorLevel > 0) {
 				selectorLevel--;
 			}
-		} else if (AnyOf<':', ';'>(sc.ch) && parenCount == 0) {
-			if (sc.ch == ':') {
-				if (!IsCssProperty(stylePrevNonWhite)) {
-					propertyValue = CssLineStatePropertyValue;
-				}
-			} else {
-				if (lineStateAttribute == 0) {
-					propertyValue = 0;
-				}
+		} else if (parenCount == 0) {
+			if (sc.ch == ';' && lineStateAttribute == 0) {
+				propertyValue = 0;
+			} else if (sc.ch == ':' && !IsCssProperty(stylePrevNonWhite)) {
+				propertyValue = CssLineStatePropertyValue;
 			}
 		}
 	}
@@ -754,49 +750,50 @@ void PHPLexer::HighlightJsInnerString() {
 	}
 }
 
-bool PHPLexer::ClassifyCssWord() {
-	char s[16];
-	sc.GetCurrentLowered(s, sizeof(s));
-	if (sc.state == css_style(SCE_CSS_PSEUDOCLASS)) {
+int PHPLexer::ClassifyCssWord() {
+	int outerState = css_style(SCE_CSS_DEFAULT);
+	if (sc.state == css_style(SCE_CSS_PSEUDOCLASS) && sc.ch == '(') {
+		++selectorLevel;
+	} else if (sc.state == css_style(SCE_CSS_IDENTIFIER)) {
+		char s[16];
+		sc.GetCurrentLowered(s, sizeof(s));
+		const int chNext = sc.GetDocNextChar(sc.ch == '(');
 		if (sc.ch == '(') {
-			++selectorLevel;
+			sc.ChangeState(css_style(SCE_CSS_FUNCTION));
+			if (StrEqual(s, "url") && !AnyOf(chNext, '\'', '\"', ')')) {
+				parenCount++;
+				outerState = css_style(SCE_CSS_URL);
+				sc.SetState(css_style(SCE_CSS_OPERATOR));
+				sc.Forward();
+			}
+		} else if (chBefore == '!' && StrEqual(s, "important")) {
+			sc.ChangeState(css_style(SCE_CSS_IMPORTANT));
+		} else if (chNext == ':' && parenCount != 0) {
+			// (descriptor: value)
+			sc.ChangeState(css_style(SCE_CSS_PROPERTY));
+		} else if (chBefore == ':' || chBefore == '=' || (parenCount == 0 && propertyValue)) {
+			// [attribute = value]
+			sc.ChangeState(css_style(SCE_CSS_VALUE));
+		} else if (!propertyValue) {
+			if (lineStateAttribute) {
+				sc.ChangeState(css_style(SCE_CSS_ATTRIBUTE));
+			} else if (chBefore == '.') {
+				sc.ChangeState(css_style(SCE_CSS_CLASS));
+			} else if (chBefore == '#') {
+				sc.ChangeState(css_style(SCE_CSS_ID));
+			} else if (chNext == ':' && (chBefore == ';' || chBefore == '{')) {
+				// {property: value;}
+				propertyValue = CssLineStatePropertyValue;
+				sc.ChangeState(css_style(SCE_CSS_PROPERTY));
+			} else if (chNext != '(' && parenCount == selectorLevel) {
+				sc.ChangeState(css_style(SCE_CSS_TAG));
+			}
 		}
-		return false;
 	}
 
-	const int chNext = sc.GetDocNextChar(sc.ch == '(');
-	if (sc.ch == '(') {
-		sc.ChangeState(css_style(SCE_CSS_FUNCTION));
-		if (StrEqual(s, "url") && !AnyOf(chNext, '\'', '\"', ')')) {
-			parenCount++;
-			sc.SetState(css_style(SCE_CSS_OPERATOR));
-			sc.ForwardSetState(css_style(SCE_CSS_URL));
-			return true;
-		}
-	} else if (chBefore == '!' && StrEqual(s, "important")) {
-		sc.ChangeState(css_style(SCE_CSS_IMPORTANT));
-	} else if (chNext == ':' && parenCount != 0) {
-		// (descriptor: value)
-		sc.ChangeState(css_style(SCE_CSS_PROPERTY));
-	} else if (chBefore == ':' || chBefore == '=' || (parenCount == 0 && propertyValue)) {
-		// [attribute = value]
-		sc.ChangeState(css_style(SCE_CSS_VALUE));
-	} else if (!propertyValue) {
-		if (lineStateAttribute) {
-			sc.ChangeState(css_style(SCE_CSS_ATTRIBUTE));
-		} else if (chBefore == '.') {
-			sc.ChangeState(css_style(SCE_CSS_CLASS));
-		} else if (chBefore == '#') {
-			sc.ChangeState(css_style(SCE_CSS_ID));
-		} else if (chNext == ':' && (chBefore == ';' || chBefore == '{')) {
-			// {property: value;}
-			propertyValue = CssLineStatePropertyValue;
-			sc.ChangeState(css_style(SCE_CSS_PROPERTY));
-		} else if (parenCount == selectorLevel && !(chNext == '(')) {
-			sc.ChangeState(css_style(SCE_CSS_TAG));
-		}
-	}
-	return false;
+	const int state = sc.state;
+	sc.SetState(outerState);
+	return state;
 }
 
 void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
@@ -869,7 +866,7 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				if (sc.state == css_style(SCE_CSS_NUMBER)) {
 					if (sc.ch == '%') {
 						sc.Forward();
-					} else if (IsCssIdentifierStart(sc.ch, sc.chNext)) {
+					} else if (IsCssDimensionStart(sc.ch, sc.chNext)) {
 						sc.ChangeState(css_style(SCE_CSS_DIMENSION));
 						break;
 					}
@@ -1174,12 +1171,10 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 		case css_style(SCE_CSS_PSEUDOCLASS):
 		case css_style(SCE_CSS_PSEUDOELEMENT):
 			if (!IsCssIdentifierChar(sc.ch)) {
-				if (AnyOf(sc.state, css_style(SCE_CSS_IDENTIFIER), css_style(SCE_CSS_PSEUDOCLASS)) && lexer.ClassifyCssWord()) {
+				stylePrevNonWhite = lexer.ClassifyCssWord();
+				if (stylePrevNonWhite == css_style(SCE_CSS_OPERATOR)) {
 					continue;
 				}
-
-				stylePrevNonWhite = sc.state;
-				sc.SetState(css_style(SCE_CSS_DEFAULT));
 			}
 			break;
 

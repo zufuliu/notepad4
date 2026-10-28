@@ -80,4 +80,8 @@ constexpr bool IsCssIdentifierStart(int ch, int chNext) noexcept {
 		|| ((ch == '-' || ch == '@') && IsCssIdentifierNext(chNext));
 }
 
+constexpr bool IsCssDimensionStart(int ch, int chNext) noexcept {
+	return ch >= 0x80 || (ch == '-' && IsCssIdentifierNext(chNext));
+}
+
 }
