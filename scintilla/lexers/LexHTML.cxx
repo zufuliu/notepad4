@@ -296,7 +296,7 @@ int classifyTagHTML(Sci_PositionU end, LexerWordList keywordLists, LexAccessor &
 		styler.ColorTo(end, chAttr);
 	}
 	if (chAttr == SCE_H_TAG && !customElement && s[1] != '/') {
-		if (s[1] != '/' && (option & HtmlOption_AllowScript) && StrEqual(tag, "script")) {
+		if ((option & HtmlOption_AllowScript) && StrEqual(tag, "script")) {
 			// check to see if this is a self-closing tag by sniffing ahead
 			bool isSelfClose = false;
 			for (Sci_PositionU cPos = end; cPos < end + maxLengthCheck; cPos++) {
@@ -328,7 +328,9 @@ int classifyWordHTJS(Sci_PositionU end, int ch, int chNext, LexerWordList keywor
 	} else if (keywordLists[KeywordIndex_JavaScript].InList(s)) {
 		chAttr = js_style(SCE_JS_WORD);
 		lexer.kwType = KeywordType::None;
-		if (StrEqual(s, "function")) {
+		if (lexer.chBefore == '.') {
+			chAttr = js_style(SCE_JS_WORD2);
+		} else if (StrEqual(s, "function")) {
 			lexer.kwType = KeywordType::JavaScriptFunction;
 		} else if (StrEqual(s, "new")) {
 			lexer.kwType = KeywordType::JavaScriptClass;

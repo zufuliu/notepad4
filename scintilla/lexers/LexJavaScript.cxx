@@ -220,7 +220,9 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 						}
 					} else if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 						sc.ChangeState(SCE_JS_WORD);
-						if (StrEqualsAny(s, "class", "extends","new", "type", "as", "is")) {
+						if (chBefore == '.') {
+							sc.ChangeState(SCE_JS_WORD2);
+						} else if (StrEqualsAny(s, "class", "extends","new", "type", "as", "is")) {
 							kwType = KeywordType::Class;
 						} else if (StrEqual(s, "function")) {
 							kwType = KeywordType::Function;

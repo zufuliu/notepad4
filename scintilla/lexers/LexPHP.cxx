@@ -672,7 +672,9 @@ int PHPLexer::ClassifyJSWord(LexerWordList keywordLists) {
 	} else if (keywordLists[KeywordIndex_JavaScript].InList(s)) {
 		sc.ChangeState(js_style(SCE_JS_WORD));
 		kwType = KeywordType::None;
-		if (StrEqual(s, "function")) {
+		if (chBefore == '.') {
+			sc.ChangeState(js_style(SCE_JS_WORD2));
+		} else if (StrEqual(s, "function")) {
 			kwType = KeywordType::JavaScriptFunction;
 		} else if (StrEqual(s, "new")) {
 			kwType = KeywordType::JavaScriptClass;
