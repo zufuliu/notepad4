@@ -595,10 +595,12 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				i += 2; // place as if it was the second next char treated
 				ch = chNext2;
 				state = SCE_H_ASPAT;
+				beforeLanguage = scriptLanguage;
 				scriptLanguage = eScriptVBS;
 			} else if ((chNext2 == '-') && (styler.SafeGetUCharAt(i + 3) == '-')) {
 				styler.ColorTo(i + 4, SCE_H_ASP);
 				state = SCE_H_XCCOMMENT;
+				beforeLanguage = scriptLanguage;
 				scriptLanguage = eScriptVBS;
 				continue;
 			} else {
@@ -612,7 +614,9 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 					ch = chNext;
 				}
 
-				state = StateForScript(aspScript);
+				// state = StateForScript(aspScript);
+				state = (aspScript == eScriptVBS)? SCE_HB_DEFAULT : js_style(SCE_JS_DEFAULT);
+				beforeLanguage = scriptLanguage;
 				scriptLanguage = aspScript;
 			}
 			styler.ColorTo(i + 1, SCE_H_ASP);
