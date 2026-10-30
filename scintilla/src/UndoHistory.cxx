@@ -24,6 +24,7 @@
 #include <memory>
 
 #include "ScintillaTypes.h"
+#include "ILexer.h"
 
 #include "Debugging.h"
 

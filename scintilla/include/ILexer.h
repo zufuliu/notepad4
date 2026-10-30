@@ -17,12 +17,38 @@ enum {
 // moved from CharClassify.h
 enum class CharacterClass { space, newLine, punctuation, word, cjkWord };
 
+struct SplitView {
+	const char *segment1 = nullptr;
+	size_t length1 = 0;
+	const char *segment2 = nullptr;
+	size_t length = 0;
+
+	constexpr char operator[](size_t position) const noexcept {
+		if (position < length1) {
+			return segment1[position];
+		}
+		return segment2[position];
+	}
+	[[nodiscard]] constexpr char CharAt(size_t position, char chDefault = '\0') const noexcept {
+		if (position < length1) {
+			return segment1[position];
+		}
+		if (position < length) {
+			return segment2[position];
+		}
+		return chDefault;
+	}
+	[[nodiscard]] constexpr unsigned char UCharAt(size_t position, unsigned char chDefault = '\0') const noexcept {
+		return CharAt(position, chDefault);
+	}
+};
+
 class IDocument {
 public:
 	virtual int SCI_METHOD Version() const noexcept = 0;
 	virtual void SCI_METHOD SetErrorStatus(int status) noexcept = 0;
 	virtual Sci_Position SCI_METHOD Length() const noexcept = 0;
-	virtual void SCI_METHOD GetCharRange(char *buffer, Sci_Position position, Sci_Position lengthRetrieve) const noexcept = 0;
+	virtual void SCI_METHOD GetBufferView(SplitView &cbView, SplitView &styleView) const noexcept = 0;
 	virtual unsigned char SCI_METHOD StyleAt(Sci_Position position) const noexcept = 0;
 	virtual Sci_Line SCI_METHOD LineFromPosition(Sci_Position position) const noexcept = 0;
 	virtual Sci_Position SCI_METHOD LineStart(Sci_Line line) const noexcept = 0;

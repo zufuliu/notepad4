@@ -466,6 +466,7 @@ public:
 	Sci::Position GetRelativePositionUTF16(Sci::Position positionStart, Sci::Position characterOffset) const noexcept;
 	int SCI_METHOD GetCharacterAndWidth(Sci_Position position, Sci_Position *pWidth) const noexcept override;
 	CharacterClass SCI_METHOD GetCharacterClass(unsigned int ch) const noexcept override;
+	void SCI_METHOD GetBufferView(SplitView &cbView, SplitView &styleView) const noexcept override;
 	int SCI_METHOD CodePage() const noexcept override;
 	bool SCI_METHOD IsDBCSLeadByte(unsigned char ch) const noexcept override;
 	bool IsDBCSLeadByteNoExcept(unsigned char ch) const noexcept {
@@ -618,7 +619,7 @@ public:
 	unsigned char UCharAt(Sci::Position position) const noexcept {
 		return cb.UCharAt(position);
 	}
-	void SCI_METHOD GetCharRange(char *buffer, Sci_Position position, Sci_Position lengthRetrieve) const noexcept override {
+	void GetCharRange(char *buffer, Sci_Position position, Sci_Position lengthRetrieve) const noexcept {
 		cb.GetCharRange(buffer, position, lengthRetrieve);
 	}
 	unsigned char SCI_METHOD StyleAt(Sci_Position position) const noexcept override {

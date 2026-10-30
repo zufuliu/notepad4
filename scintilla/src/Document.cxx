@@ -1133,6 +1133,11 @@ int SCI_METHOD Document::GetCharacterAndWidth(Sci_Position position, Sci_Positio
 	return character;
 }
 
+void SCI_METHOD Document::GetBufferView(SplitView &cbView, SplitView &styleView) const noexcept {
+	cbView = cb.AllView();
+	styleView = cb.StyleView();
+}
+
 int SCI_METHOD Document::CodePage() const noexcept {
 	return dbcsCodePage;
 }

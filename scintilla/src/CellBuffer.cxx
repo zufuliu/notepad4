@@ -24,6 +24,7 @@
 //#include <type_traits>
 
 #include "ScintillaTypes.h"
+#include "ILexer.h"
 
 #include "Debugging.h"
 #include "VectorISA.h"
@@ -409,7 +410,9 @@ Sci::Position CellBuffer::GapPosition() const noexcept {
 	return substance.GapPosition();
 }
 
-SplitView CellBuffer::AllView() const noexcept {
+namespace {
+
+SplitView MakeSplitView(const SplitVector<char> &substance) noexcept {
 	const size_t length = substance.Length();
 	size_t length1 = substance.GapPosition();
 	const char *segment1 = substance.Segment1Pointer(0);
@@ -429,6 +432,16 @@ SplitView CellBuffer::AllView() const noexcept {
 		segment2,
 		length
 	};
+}
+
+}
+
+SplitView CellBuffer::AllView() const noexcept {
+	return MakeSplitView(substance);
+}
+
+SplitView CellBuffer::StyleView() const noexcept {
+	return MakeSplitView(style);
 }
 
 // The char* returned is to an allocation owned by the undo history

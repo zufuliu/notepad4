@@ -47,30 +47,6 @@ struct Action {
 	Sci::Position lenData = 0;
 };
 
-struct SplitView {
-	const char *segment1 = nullptr;
-	size_t length1 = 0;
-	const char *segment2 = nullptr;
-	size_t length = 0;
-
-	char operator[](size_t position) const noexcept {
-		if (position < length1) {
-			return segment1[position];
-		}
-		return segment2[position];
-	}
-
-	[[nodiscard]] char CharAt(size_t position) const noexcept {
-		if (position < length1) {
-			return segment1[position];
-		}
-		if (position < length) {
-			return segment2[position];
-		}
-		return '\0';
-	}
-};
-
 struct ChangedRange {
 	Sci::Position start = 0;
 	Sci::Position end = 0;
@@ -135,6 +111,7 @@ public:
 	[[nodiscard]] int CheckRange(const char *chars, const char *styles, Sci::Position position, Sci::Position rangeLength) const noexcept;
 	[[nodiscard]] Sci::Position GapPosition() const noexcept;
 	[[nodiscard]] SplitView AllView() const noexcept;
+	[[nodiscard]] SplitView StyleView() const noexcept;
 
 	[[nodiscard]] Sci::Position Length() const noexcept {
 		return substance.Length();
