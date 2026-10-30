@@ -74,8 +74,6 @@ namespace dmlib_hook
 		static size_t unhook(bool forceDetach = false) noexcept;
 	};
 
-	/// Updates highlight brush for ChooseFont dialog.
-	void updateFontBrush() noexcept;
 	/// Updates luminosity slider brush for ChooseColor dialog.
 	void updateLumSliderBrush() noexcept;
 

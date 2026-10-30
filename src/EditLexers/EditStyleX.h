@@ -86,17 +86,6 @@
 
 #define NP2StyleX_ASPTag				EDITSTYLE_HOLE(ASPTag, L"ASP Tag")
 #define NP2StyleX_PHPTag				EDITSTYLE_HOLE(PHPTag, L"PHP Tag")
-
-#define NP2StyleX_JSDefault				EDITSTYLE_HOLE(JSDefault, L"JS Default")
-#define NP2StyleX_JSComment				EDITSTYLE_HOLE(JSComment, L"JS Comment")
-#define NP2StyleX_JSKeyword				EDITSTYLE_HOLE(JSKeyword, L"JS Keyword")
-#define NP2StyleX_JSDocComment			EDITSTYLE_HOLE(JSDocComment, L"JS Doc Comment")
-#define NP2StyleX_JSString				EDITSTYLE_HOLE(JSString, L"JS String")
-#define NP2StyleX_JSRegex				EDITSTYLE_HOLE(JSRegex, L"JS Regex")
-#define NP2StyleX_JSNumber				EDITSTYLE_HOLE(JSNumber, L"JS Number")
-#define NP2StyleX_JSOperator			EDITSTYLE_HOLE(JSOperator, L"JS Operator")
-#define NP2StyleX_JSTemplateLiteral		EDITSTYLE_HOLE(JSTemplateLiteral, L"JS Template Literal")
-
 #define NP2StyleX_VBSDefault			EDITSTYLE_HOLE(VBSDefault, L"VBS Default")
 #define NP2StyleX_VBSComment			EDITSTYLE_HOLE(VBSComment, L"VBS Comment")
 #define NP2StyleX_VBSKeyword			EDITSTYLE_HOLE(VBSKeyword, L"VBS Keyword")

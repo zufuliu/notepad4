@@ -149,7 +149,7 @@ using LPCEDITLEXER = const EDITLEXER *;
 #define NP2LEX_FSHARP		63022	// SCLEX_FSHARP		F# Source
 #define NP2LEX_ASM			63023	// SCLEX_ASM		Assembler Source
 #define NP2LEX_PASCAL		63024	// SCLEX_PASCAL		Pascal Source
-#define NP2LEX_XML			63025	// SCLEX_XML		XML Document
+#define NP2LEX_XML			63025	// SCLEX_HTML		XML Document
 #define NP2LEX_HTML			63026	// SCLEX_HTML		Web Source Code
 #define NP2LEX_CSS			63027	// SCLEX_CSS		CSS Style Sheet
 #define NP2LEX_SQL			63028	// SCLEX_SQL		SQL Query

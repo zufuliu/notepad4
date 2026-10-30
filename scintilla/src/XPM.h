@@ -12,13 +12,14 @@ namespace Scintilla::Internal {
  * Hold a pixmap in XPM format.
  */
 class XPM final {
+	static constexpr size_t colourTableSize = 256;
 	int height = 1;
 	int width = 1;
 	int nColours = 1;
 	int codeTransparent = ' ';
 	std::vector<unsigned char> pixels;
-	ColourRGBA colourCodeTable[256];
-	ColourRGBA ColourFromCode(int ch) const noexcept;
+	ColourRGBA colourCodeTable[colourTableSize];
+	[[nodiscard]] ColourRGBA ColourFromCode(int ch) const noexcept;
 	void FillRun(Surface *surface, int code, int startX, int y, int x) const;
 public:
 	explicit XPM(const char *textForm);
@@ -27,13 +28,13 @@ public:
 	void Init(const char *const *linesForm);
 	/// Decompose image into runs and use FillRectangle for each run
 	void SCICALL Draw(Surface *surface, PRectangle rc);
-	constexpr int GetHeight() const noexcept {
+	[[nodiscard]] constexpr int GetHeight() const noexcept {
 		return height;
 	}
-	constexpr int GetWidth() const noexcept {
+	[[nodiscard]] constexpr int GetWidth() const noexcept {
 		return width;
 	}
-	ColourRGBA PixelAt(int x, int y) const noexcept;
+	[[nodiscard]] ColourRGBA PixelAt(int x, int y) const noexcept;
 private:
 	static std::vector<const char *>LinesFormFromTextForm(const char *textForm);
 };
@@ -50,23 +51,23 @@ public:
 	static constexpr size_t bytesPerPixel = 4;
 	RGBAImage(int width_, int height_, float scale_, const unsigned char *pixels_);
 	explicit RGBAImage(const XPM &xpm);
-	constexpr int GetHeight() const noexcept {
+	[[nodiscard]] constexpr int GetHeight() const noexcept {
 		return height;
 	}
-	constexpr int GetWidth() const noexcept {
+	[[nodiscard]] constexpr int GetWidth() const noexcept {
 		return width;
 	}
-	constexpr float GetScale() const noexcept {
+	[[nodiscard]] constexpr float GetScale() const noexcept {
 		return scale;
 	}
-	float GetScaledHeight() const noexcept {
+	[[nodiscard]] float GetScaledHeight() const noexcept {
 		return static_cast<float>(height) / scale;
 	}
-	float GetScaledWidth() const noexcept {
+	[[nodiscard]] float GetScaledWidth() const noexcept {
 		return static_cast<float>(width) / scale;
 	}
-	int CountBytes() const noexcept;
-	const unsigned char *Pixels() const noexcept;
+	[[nodiscard]] int CountBytes() const noexcept;
+	[[nodiscard]] const unsigned char *Pixels() const noexcept;
 	void SetPixel(int x, int y, ColourRGBA colour) noexcept;
 	static void BGRAFromRGBA(unsigned char *pixelsBGRA, const unsigned char *pixelsRGBA, size_t count) noexcept;
 };
@@ -87,9 +88,9 @@ public:
 	/// Get image by id.
 	RGBAImage *Get(int ident) const;
 	/// Give the largest height of the set.
-	int GetHeight() const noexcept;
+	[[nodiscard]] int GetHeight() const noexcept;
 	/// Give the largest width of the set.
-	int GetWidth() const noexcept;
+	[[nodiscard]] int GetWidth() const noexcept;
 };
 
 }

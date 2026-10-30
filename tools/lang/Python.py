@@ -1,4 +1,4 @@
-# 3.14 https://www.python.org/
+# 3.15 https://www.python.org/
 # https://ironpython.net/
 # https://www.jython.org/
 # https://cython.org/
@@ -55,17 +55,17 @@ builtins
 	bin(integer)
 	class bool(object=False)
 	breakpoint(*args, **kws)
-	class bytearray(source=b'')
+	class bytearray(source)
 	class bytearray(source, encoding)
 	class bytearray(source, encoding, errors):
-	class bytes(source=b'')
+	class bytes(source)
 	class bytes(source, encoding)
 	class bytes(source, encoding, errors):
 	callable(object)
 	chr(codepoint)
 	@classmethod
 	classmethod()
-	compile(source, filename, mode, flags=0, dont_inherit=False, optimize=-1)
+	compile(source, filename, mode, flags=0, dont_inherit=False, optimize=-1, module=None)
 	class complex(number=0)
 	class complex(real=0, imag=0)
 	class complex(string)
@@ -83,6 +83,9 @@ builtins
 	class float(number=0.0)
 	class float(string)
 	format(value, format_spec='')
+	class frozendict(**kwargs)
+	class frozendict(mapping, **kwargs)
+	class frozendict(iterable, **kwargs):
 	class frozenset(iterable=set())
 	getattr(object, name)
 	getattr(object, name, default)
@@ -129,6 +132,7 @@ builtins
 	round(number, ndigits=None)
 	class set(iterable):
 	setattr(object, name, value)
+	class sentinel(name, /, *, repr=None)
 	class slice(stop)
 	class slice(start, stop, step=None)
 	sorted(iterable, /, *, key=None, reverse=False)
@@ -193,6 +197,7 @@ __code__
 __dict__
 __annotations__
 __annotate__
+__lazy_modules__
 __kwdefaults__
 __type_params__
 
@@ -405,6 +410,7 @@ BaseException
 		EOFError
 		ExceptionGroup
 		ImportError
+			ImportCycleError
 			ModuleNotFoundError
 		LookupError
 			IndexError
@@ -542,6 +548,8 @@ str:
 bytearray:
 	fromhex(string)
 	maketrans(from, to)
+	resize(size, /)
+	take_bytes(n=None, /)
 bytes:
 	fromhex(string)
 	hex([sep[, bytes_per_sep]])
@@ -560,7 +568,7 @@ bytes:
 	rindex(sub[, start[, end]])
 	rpartition(sep)
 	startswith(prefix[, start[, end]])
-	translate(table, /, delete=b'')
+	translate(table, /, delete)
 	center(width[, fillbyte])
 	ljust(width[, fillbyte])
 	lstrip([chars])
@@ -592,7 +600,9 @@ memoryview:
 	tolist()
 	toreadonly()
 	release()
-	cast(format[, shape])
+	cast(format, shape, /)
+	count(value, /)
+	index(value, start=0, stop=sys.maxsize, /)
 	obj
 	nbytes
 	readonly
@@ -602,8 +612,6 @@ memoryview:
 	shape
 	strides
 	suboffsets
-	c_contiguous
-	f_contiguous
 	contiguous
 set:
 	isdisjoint(other)
@@ -741,6 +749,7 @@ re
 	VERBOSE
 	compile(pattern, flags=0)
 	search(pattern, string, flags=0)
+	prefixmatch(pattern, string, flags=0)
 	match(pattern, string, flags=0)
 	fullmatch(pattern, string, flags=0)
 	split(pattern, string, maxsplit=0, flags=0)
@@ -811,15 +820,12 @@ unicodedata
 	digit(chr[, default])
 	numeric(chr[, default])
 	category(chr)
-	bidirectional(chr)
 	combining(chr)
 	east_asian_width(chr)
-	mirrored(chr)
 	decomposition(chr)
 	normalize(form, unistr)
 	is_normalized(form, unistr)
 	unidata_version
-	ucd_3_2_0
 
 # Binary Data Services
 # https://docs.python.org/3/library/binary.html
@@ -852,7 +858,6 @@ codecs
 	getwriter(encoding)
 	register(search_function)
 	unregister(search_function)
-	EncodedFile(file, data_encoding, file_encoding=None, errors='strict')
 	iterencode(iterator, encoding, errors='strict', **kwargs)
 	iterdecode(iterator, encoding, errors='strict', **kwargs)
 	BOM_UTF8
@@ -1029,11 +1034,6 @@ collections
 		__missing__(key)
 		default_factory
 	namedtuple(typename, field_names, *, rename=False, defaults=None, module=None):
-		_make(iterable)
-		_asdict()
-		_replace(**kwargs)
-		_fields
-		_field_defaults
 	class OrderedDict([items]):
 		popitem(last=True)
 		move_to_end(key, last=True)
@@ -1188,29 +1188,29 @@ numbers
 math
 	# Number-theoretic and representation functions
 	ceil(x)
-	comb(n, k)
 	copysign(x, y)
 	fabs(x)
-	factorial(x)
 	floor(x)
+	fma(x, y, z)
+	fmax(x, y)
+	fmin(x, y)
 	fmod(x, y)
 	frexp(x)
 	fsum(iterable)
-	gcd(*integers)
 	isclose(a, b, *, rel_tol=1e-09, abs_tol=0.0)
 	isfinite(x)
+	isnormal(x)
+	issubnormal(x)
 	isinf(x)
 	isnan(x)
-	isqrt(n)
-	lcm(*integers)
 	ldexp(x, i)
 	modf(x)
 	nextafter(x, y)
-	perm(n, k=None)
 	prod(iterable, *, start=1)
 	remainder(x, y)
 	sumprod(p, q)
 	trunc(x)
+	signbit(x)
 	ulp(x)
 	# Power and logarithmic functions
 	cbrt(x)
@@ -1253,6 +1253,13 @@ math
 	tau
 	inf
 	nan
+math.integer
+	comb(n, k, /)
+	factorial(n, /)
+	gcd(*integers)
+	isqrt(n, /)
+	lcm(*integers)
+	perm(n, k=None, /)
 cmath
 	phase(x)
 	polar(x)
@@ -1346,15 +1353,13 @@ decimal
 	class BasicContext
 	class ExtendedContext
 	class DefaultContext
-	class Context(prec=None, rounding=None, Emin=None, Emax=None, capitals=None, clamp=None, flags=None, traps=None):
+	class Context(prec=None, rounding=None, capitals=None, clamp=None, flags=None, traps=None):
 		clear_flags()
 		clear_traps()
 		copy()
 		copy_decimal(num)
 		create_decimal(num)
 		create_decimal_from_float(f)
-		Etiny()
-		Etop()
 		abs(x)
 		add(x, y)
 		canonical(x)
@@ -1418,6 +1423,7 @@ decimal
 	MAX_EMAX
 	MIN_EMIN
 	MIN_ETINY
+	SPEC_VERSION
 	HAVE_CONTEXTVAR
 	ROUND_CEILING
 	ROUND_DOWN
@@ -1633,7 +1639,7 @@ pathlib
 		walk(top_down=True, on_error=None, follow_symlinks=False)
 
 		touch(mode=438, exist_ok=True)
-		mkdir(mode=0o777, parents=False, exist_ok=False)
+		mkdir(mode=0o777, parents=False, exist_ok=False, parent_mode=None)
 		symlink_to(target, target_is_directory=False)
 		hardlink_to(target)
 
@@ -1662,7 +1668,6 @@ os.path
 	abspath(path)
 	basename(path)
 	commonpath(paths)
-	commonprefix(list)
 	dirname(path)
 	exists(path)
 	lexists(path)
@@ -1682,6 +1687,7 @@ os.path
 	join(path, *paths)
 	normcase(path)
 	normpath(path)
+	ALL_BUT_LAST
 	ALLOW_MISSING
 	realpath(path, *, strict=False)
 	relpath(path, start=os.curdir)
@@ -1757,6 +1763,7 @@ sqlite3
 	paramstyle
 	sqlite_version
 	sqlite_version_info
+	SQLITE_KEYWORDS
 	threadsafety
 	connect(database[, timeout, detect_types, isolation_level, check_same_thread, factory, cached_statements, uri])
 	complete_statement(sql)
@@ -1837,15 +1844,11 @@ sqlite3
 # Generic Operating System Services
 # https://docs.python.org/3/library/allos.html
 os
-	# exception error
 	name
 	# Process Parameters
-	ctermid()
 	environ
-	environb
 	reload_environ()
 	chdir(path)
-	fchdir(fd)
 	getcwd()
 	fsencode(filename)
 	fsdecode(filename)
@@ -1853,171 +1856,10 @@ os
 	class PathLike:
 		__fspath__()
 	getenv(key, default=None)
-	getenvb(key, default=None)
 	get_exec_path(env=None)
-	getegid()
-	geteuid()
-	getgid()
-	getgrouplist(user, group)
-	getgroups()
-	getlogin()
-	getpgid(pid)
-	getpgrp()
-	getpid()
-	getppid()
-	getpriority(which, who)
-	PRIO_PROCESS
-	PRIO_PGRP
-	PRIO_USER
-	getresuid()
-	getresgid()
-	getuid()
-	initgroups(username, gid)
 	putenv(key, value)
-	setegid(egid)
-	seteuid(euid)
-	setgid(gid)
-	setgroups(groups)
-	setns(fd, nstype=0)
-	setpgrp()
-	setpgid(pid, pgrp)
-	setpriority(which, who, priority)
-	setregid(rgid, egid)
-	setresgid(rgid, egid, sgid)
-	setresuid(ruid, euid, suid)
-	setreuid(ruid, euid)
-	getsid(pid)
-	setsid()
-	setuid(uid)
 	strerror(code)
-	supports_bytes_environ
-	umask(mask)
-	uname()
 	unsetenv(key)
-	unshare(flags)
-	# File Object Creation
-	fdopen(fd, *args, **kwargs)
-	# File Descriptor Operations
-	close(fd)
-	closerange(fd_low, fd_high)
-	copy_file_range(src, dst, count, offset_src=None, offset_dst=None)
-	device_encoding(fd)
-	dup(fd)
-	dup2(fd, fd2, inheritable=True)
-	fchmod(fd, mode)
-	fchown(fd, uid, gid)
-	fdatasync(fd)
-	fpathconf(fd, name)
-	fstat(fd)
-	fstatvfs(fd)
-	fsync(fd)
-	ftruncate(fd, length)
-	get_blocking(fd)
-	grantpt(fd)
-	isatty(fd)
-	lockf(fd, cmd, len)
-	F_LOCK
-	F_TLOCK
-	F_ULOCK
-	F_TEST
-	login_tty(fd, /)
-	lseek(fd, pos, how)
-	SEEK_SET
-	SEEK_CUR
-	SEEK_END
-	SEEK_HOLE
-	SEEK_DATA
-	open(path, flags, mode=511, *, dir_fd=None)
-	O_RDONLY
-	O_WRONLY
-	O_RDWR
-	O_APPEND
-	O_CREAT
-	O_EXCL
-	O_TRUNC
-
-	O_DSYNC
-	O_RSYNC
-	O_SYNC
-	O_NDELAY
-	O_NONBLOCK
-	O_NOCTTY
-	O_CLOEXEC
-
-	O_BINARY
-	O_NOINHERIT
-	O_SHORT_LIVED
-	O_TEMPORARY
-	O_RANDOM
-	O_SEQUENTIAL
-	O_TEXT
-
-	O_EVTONLY
-	O_FSYNC
-	O_SYMLINK
-	O_NOFOLLOW_ANY
-
-	O_ASYNC
-	O_DIRECT
-	O_DIRECTORY
-	O_NOFOLLOW
-	O_NOATIME
-	O_PATH
-	O_TMPFILE
-	O_SHLOCK
-	O_EXLOCK
-	openpty()
-	pipe()
-	pipe2(flags)
-	posix_fallocate(fd, offset, len)
-	posix_fadvise(fd, offset, len, advice)
-	POSIX_FADV_NORMAL
-	POSIX_FADV_SEQUENTIAL
-	POSIX_FADV_RANDOM
-	POSIX_FADV_NOREUSE
-	POSIX_FADV_WILLNEED
-	POSIX_FADV_DONTNEED
-	pread(fd, n, offset)
-	posix_openpt(oflag)
-	preadv(fd, buffers, offset, flags=0)
-	RWF_NOWAIT
-	RWF_HIPRI
-	ptsname(fd)
-	pwrite(fd, str, offset)
-	pwritev(fd, buffers, offset, flags=0)
-	RWF_DSYNC
-	RWF_SYNC
-	RWF_APPEND
-	read(fd, n)
-	readinto(fd, buffer, /)
-	sendfile(out_fd, in_fd, offset, count)
-	sendfile(out_fd, in_fd, offset, count, headers=(), trailers=(), flags=0)
-	set_blocking(fd, blocking)
-	SF_NODISKIO
-	SF_MNOWAIT
-	SF_SYNC
-	SF_NOCACHE
-	splice(src, dst, count, offset_src=None, offset_dst=None)
-	SPLICE_F_MOVE
-	SPLICE_F_NONBLOCK
-	SPLICE_F_MORE
-	readv(fd, buffers)
-	tcgetpgrp(fd)
-	tcsetpgrp(fd, pg)
-	ttyname(fd)
-	unlockpt(fd)
-	write(fd, str)
-	writev(fd, buffers)
-	# Querying the size of a terminal
-	get_terminal_size(fd=STDOUT_FILENO)
-	class terminal_size::
-		columns
-		lines
-	# Inheritance of File Descriptors
-	get_inheritable(fd)
-	set_inheritable(fd, inheritable)
-	get_handle_inheritable(handle)
-	set_handle_inheritable(handle, inheritable)
 	# Files and Directories
 	access(path, mode, *, dir_fd=None, effective_ids=False, follow_symlinks=True)
 	F_OK
@@ -2025,31 +1867,16 @@ os
 	W_OK
 	X_OK
 	chdir(path)
-	chflags(path, flags, *, follow_symlinks=True)
 	chmod(path, mode, *, dir_fd=None, follow_symlinks=True)
 	chown(path, uid, gid, *, dir_fd=None, follow_symlinks=True)
 	chroot(path)
-	fchdir(fd)
 	getcwd()
-	getcwdb()
-	lchflags(path, flags)
-	lchmod(path, mode)
-	lchown(path, uid, gid)
 	link(src, dst, *, src_dir_fd=None, dst_dir_fd=None, follow_symlinks=True)
 	listdir(path='.')
-	listdrives()
-	listmounts(volume)
-	listvolumes()
 	lstat(path, *, dir_fd=None)
 	mkdir(path, mode=511, *, dir_fd=None)
-	makedirs(name, mode=511, exist_ok=False)
-	mkfifo(path, mode=438, *, dir_fd=None)
-	mknod(path, mode=384, device=0, *, dir_fd=None)
-	major(device)
-	minor(device)
-	makedev(major, minor)
-	pathconf(path, name)
-	pathconf_names
+	makedirs(name, mode=511, exist_ok=False, parent_mode=None)
+	NODEV
 	readlink(path, *, dir_fd=None)
 	remove(path, *, dir_fd=None)
 	removedirs(name)
@@ -2097,185 +1924,30 @@ os
 		st_type
 		st_file_attributes
 		st_reparse_tag
-	statvfs(path)
-	supports_dir_fd
-	supports_effective_ids
-	supports_fd
-	supports_follow_symlinks
 	symlink(src, dst, target_is_directory=False, *, dir_fd=None)
-	sync()
 	truncate(path, length)
 	unlink(path, *, dir_fd=None)
 	utime(path, times=None, *, [ns, ]dir_fd=None, follow_symlinks=True)
 	walk(top, topdown=True, onerror=None, followlinks=False)
-	fwalk(top='.', topdown=True, onerror=None, *, follow_symlinks=False, dir_fd=None)
-	memfd_create(name[, flags=os.MFD_CLOEXEC])
-	MFD_CLOEXEC
-	MFD_ALLOW_SEALING
-	MFD_HUGETLB
-	MFD_HUGE_SHIFT
-	MFD_HUGE_MASK
-	MFD_HUGE_64KB
-	MFD_HUGE_512KB
-	MFD_HUGE_1MB
-	MFD_HUGE_2MB
-	MFD_HUGE_8MB
-	MFD_HUGE_16MB
-	MFD_HUGE_32MB
-	MFD_HUGE_256MB
-	MFD_HUGE_512MB
-	MFD_HUGE_1GB
-	MFD_HUGE_2GB
-	MFD_HUGE_16GB
-	eventfd(initval[, flags=os.EFD_CLOEXEC])
-	eventfd_read(fd)
-	eventfd_write(fd, value)
-	EFD_CLOEXEC
-	EFD_NONBLOCK
-	EFD_SEMAPHORE
-	# Timer File Descriptors
-	# Linux extended attributes
-	getxattr(path, attribute, *, follow_symlinks=True)
-	listxattr(path=None, *, follow_symlinks=True)
-	removexattr(path, attribute, *, follow_symlinks=True)
-	setxattr(path, attribute, value, flags=0, *, follow_symlinks=True)
-	XATTR_SIZE_MAX
-	XATTR_CREATE
-	XATTR_REPLACE
 	# Process Management
 	abort()
-	add_dll_directory(path)
-	execl(path, arg0, arg1, ...)
-	execle(path, arg0, arg1, ..., env)
-	execlp(file, arg0, arg1, ...)
-	execlpe(file, arg0, arg1, ..., env)
-	execv(path, args)
-	execve(path, args, env)
-	execvp(file, args)
-	execvpe(file, args, env)
-	_exit(n)
-	EX_OK
-	EX_USAGE
-	EX_DATAERR
-	EX_NOINPUT
-	EX_NOUSER
-	EX_NOHOST
-	EX_UNAVAILABLE
-	EX_SOFTWARE
-	EX_OSERR
-	EX_OSFILE
-	EX_CANTCREAT
-	EX_IOERR
-	EX_TEMPFAIL
-	EX_PROTOCOL
-	EX_NOPERM
-	EX_CONFIG
-	EX_NOTFOUND
-	fork()
-	forkpty()
 	kill(pid, sig)
-	killpg(pgid, sig)
-	nice(increment)
-	pidfd_open(pid, flags=0)
-	plock(op)
-	posix_spawn(path, argv, env, *, file_actions=None, setpgroup=None, resetids=False, setsid=False, setsigmask=(), setsigdef=(), scheduler=None)
-	POSIX_SPAWN_OPEN
-	POSIX_SPAWN_CLOSE
-	POSIX_SPAWN_DUP2
-	posix_spawnp(path, argv, env, *, file_actions=None, setpgroup=None, resetids=False, setsid=False, setsigmask=(), setsigdef=(), scheduler=None)
-	register_at_fork(*, before=None, after_in_parent=None, after_in_child=None)
-	P_NOWAIT
-	P_NOWAITO
-	P_WAIT
-	P_DETACH
-	P_OVERLAY
 	startfile(path[, operation][, arguments][, cwd][, show_cmd])
 	system(command)
-	times():
-		user
-		system
-		children_user
-		children_system
-		elapsed
-	wait()
-	waitid(idtype, id, options)
-	P_PID
-	P_PGID
-	P_ALL
-	P_PIDFD
-	WEXITED
-	WSTOPPED
-	WNOWAIT
-	CLD_EXITED
-	CLD_KILLED
-	CLD_DUMPED
-	CLD_TRAPPED
-	CLD_STOPPED
-	CLD_CONTINUED
-	waitpid(pid, options)
-	wait3(options)
-	wait4(pid, options)
-	waitstatus_to_exitcode(status)
-	WNOHANG
-	WCONTINUED
-	WUNTRACED
-	WCOREDUMP(status)
-	WIFCONTINUED(status)
-	WIFSTOPPED(status)
-	WIFSIGNALED(status)
-	WIFEXITED(status)
-	WEXITSTATUS(status)
-	WSTOPSIG(status)
-	WTERMSIG(status)
-	# Interface to the scheduler
-	SCHED_OTHER
-	SCHED_BATCH
-	SCHED_DEADLINE
-	SCHED_IDLE
-	SCHED_NORMAL
-	SCHED_SPORADIC
-	SCHED_FIFO
-	SCHED_RR
-	SCHED_RESET_ON_FORK
-	class sched_param(sched_priority)
-	sched_get_priority_min(policy)
-	sched_get_priority_max(policy)
-	sched_setscheduler(pid, policy, param)
-	sched_getscheduler(pid)
-	sched_setparam(pid, param)
-	sched_getparam(pid)
-	sched_rr_get_interval(pid)
-	sched_yield()
-	sched_setaffinity(pid, mask)
-	sched_getaffinity(pid)
 	# Miscellaneous System Information
-	confstr(name)
-	confstr_names
 	cpu_count()
-	getloadavg()
 	process_cpu_count()
-	sysconf(name)
-	sysconf_names
 	curdir
 	pardir
 	sep
 	altsep
+	extsep
 	pathsep
 	defpath
 	linesep
 	devnull
-	RTLD_LAZY
-	RTLD_NOW
-	RTLD_GLOBAL
-	RTLD_LOCAL
-	RTLD_NODELETE
-	RTLD_NOLOAD
-	RTLD_DEEPBIND
 	# Random numbers
-	getrandom(size, flags=0)
 	urandom(size)
-	GRND_NONBLOCK
-	GRND_RANDOM
 io
 	DEFAULT_BUFFER_SIZE
 	open(file, mode='r', buffering=- 1, encoding=None, errors=None, newline=None, closefd=True, opener=None)
@@ -2403,7 +2075,7 @@ time
 	timezone
 	tzname
 argparse:
-	class ArgumentParser(prog=None, usage=None, description=None, epilog=None, parents=[], formatter_class=argparse.HelpFormatter, prefix_chars='-', fromfile_prefix_chars=None, argument_default=None, conflict_handler='error', add_help=True, allow_abbrev=True, exit_on_error=True, suggest_on_error=False, color=True):
+	class ArgumentParser(prog=None, usage=None, description=None, epilog=None, parents=[], formatter_class=argparse.HelpFormatter, prefix_chars='-', fromfile_prefix_chars=None, argument_default=None, conflict_handler='error', add_help=True, allow_abbrev=True, exit_on_error=True, suggest_on_error=True, color=True):
 		add_argument(name or flags...[, action][, nargs][, const][, default][, type][, choices][, required][, help][, metavar][, dest])
 		parse_args(args=None, namespace=None)
 		add_subparsers([title][, description][, prog][, parser_class][, action][, option_string][, dest][, required][, help][, metavar])
@@ -2509,8 +2181,11 @@ logging
 		style
 		level
 		stream
+		handlers
 		force
+		encoding
 		errors
+		formatter
 	shutdown()
 	setLoggerClass(klass)
 	setLogRecordFactory(factory)
@@ -2586,6 +2261,7 @@ asyncio
 	create_task(coro, *, name=None)
 	class TaskGroup:
 		create_task(coro, *, name=None, context=None)
+		cancel()
 	sleep(delay, result=None)
 	timeout(delay)
 	class Timeout:
@@ -2720,9 +2396,9 @@ asyncio
 json
 	dump(obj, fp, *, skipkeys=False, ensure_ascii=True, check_circular=True, allow_nan=True, cls=None, indent=None, separators=None, default=None, sort_keys=False, **kw)
 	dumps(obj, *, skipkeys=False, ensure_ascii=True, check_circular=True, allow_nan=True, cls=None, indent=None, separators=None, default=None, sort_keys=False, **kw)
-	load(fp, *, cls=None, object_hook=None, parse_float=None, parse_int=None, parse_constant=None, object_pairs_hook=None, **kw)
+	load(fp, *, cls=None, object_hook=None, parse_float=None, parse_int=None, parse_constant=None, object_pairs_hook=None, array_hook=None, **kw)
 	loads(s, *, cls=None, object_hook=None, parse_float=None, parse_int=None, parse_constant=None, object_pairs_hook=None, **kw)
-	class JSONDecoder(*, object_hook=None, parse_float=None, parse_int=None, parse_constant=None, strict=True, object_pairs_hook=None):
+	class JSONDecoder(*, object_hook=None, parse_float=None, parse_int=None, parse_constant=None, strict=True, object_pairs_hook=None, array_hook=None):
 		decode(s)
 		raw_decode(s)
 	class JSONEncoder(*, skipkeys=False, ensure_ascii=True, check_circular=True, allow_nan=True, sort_keys=False, indent=None, separators=None, default=None):
@@ -2736,22 +2412,12 @@ json
 		lineno
 		colno
 base64
-	b64encode(s, altchars=None)
-	b64decode(s, altchars=None, validate=False)
+	b64encode(s, altchars=None, padded=True, wrapcol=0)
+	b64decode(s, altchars=None, validate=False, ignorechars, padded=True, canonical=False)
 	standard_b64encode(s)
 	standard_b64decode(s)
-	urlsafe_b64encode(s)
-	urlsafe_b64decode(s)
-	b32encode(s)
-	b32decode(s, casefold=False, map01=None)
-	b32hexencode(s)
-	b32hexdecode(s, casefold=False)
-	b16encode(s)
-	b16decode(s, casefold=False)
-	a85encode(b, *, foldspaces=False, wrapcol=0, pad=False, adobe=False)
-	a85decode(b, *, foldspaces=False, adobe=False, ignorechars=b' \t\n\r\x0b')
-	b85encode(b, pad=False)
-	b85decode(b)
+	urlsafe_b64encode(s, padded=True)
+	urlsafe_b64decode(s, padded=False)
 
 # Internet Protocols and Support
 # https://docs.python.org/3/library/internet.html
@@ -2769,11 +2435,11 @@ urllib.parse
 		port
 	parse_qs(qs, keep_blank_values=False, strict_parsing=False, encoding='utf-8', errors='replace', max_num_fields=None, separator='&')
 	parse_qsl(qs, keep_blank_values=False, strict_parsing=False, encoding='utf-8', errors='replace', max_num_fields=None, separator='&')
-	urlunparse(parts)
-	urlsplit(urlstring, scheme='', allow_fragments=True)
-	urlunsplit(parts)
+	urlunparse(parts, keep_empty)
+	urlsplit(urlstring, scheme='', allow_fragments=True, missing_as_none=False)
+	urlunsplit(parts, keep_empty)
 	urljoin(base, url, allow_fragments=True)
-	urldefrag(url)
+	urldefrag(url, missing_as_none=False)
 	unwrap(url)
 	class DefragResult(url, fragment)
 	class ParseResult(scheme, netloc, path, params, query, fragment)
@@ -2828,6 +2494,7 @@ uuid
 # Python Runtime Services
 # https://docs.python.org/3/library/python.html
 sys
+	abi_info
 	abiflags
 	addaudithook(hook)
 	argv
@@ -2838,11 +2505,7 @@ sys
 	builtin_module_names
 	call_tracing(func, args)
 	copyright
-	_clear_type_cache()
-	_current_frames()
-	_current_exceptions()
 	breakpointhook()
-	_debugmallocstats()
 	dllhandle
 	displayhook(value)
 	dont_write_bytecode
@@ -2867,12 +2530,12 @@ sys
 	getfilesystemencoding()
 	getfilesystemencodeerrors()
 	get_int_max_str_digits()
+	get_lazy_imports()
+	get_lazy_imports_filter()
 	getrefcount(object)
 	getrecursionlimit()
 	getsizeof(object[, default])
 	getswitchinterval()
-	_getframe([depth])
-	_getframemodulename([depth])
 	getprofile()
 	gettrace()
 	getwindowsversion()
@@ -2889,6 +2552,7 @@ sys
 	last_type
 	last_value
 	last_traceback
+	lazy_modules
 	maxsize
 	maxunicode
 	meta_path
@@ -2904,6 +2568,8 @@ sys
 	ps2
 	setdlopenflags(n)
 	set_int_max_str_digits(n)
+	set_lazy_imports(mode)
+	set_lazy_imports_filter(filter)
 	setprofile(profilefunc)
 	setrecursionlimit(limit)
 	setswitchinterval(interval)
@@ -2930,7 +2596,6 @@ sys
 	warnoptions
 	winver
 	monitoring
-	_xoptions
 warnings
 	warn(message, category=None, stacklevel=1, source=None)
 	warn_explicit(message, category, filename, lineno, module=None, registry=None, module_globals=None, source=None)
@@ -2948,7 +2613,7 @@ dataclasses
 	fields(class_or_instance)
 	asdict(instance, *, dict_factory=dict)
 	astuple(instance, *, tuple_factory=tuple)
-	make_dataclass(cls_name, fields, *, bases=(), namespace=None, init=True, repr=True, eq=True, order=False, unsafe_hash=False, frozen=False, match_args=True, kw_only=False, slots=False, weakref_slot=False)
+	make_dataclass(cls_name, fields, *, bases=(), namespace=None, init=True, repr=True, eq=True, order=False, unsafe_hash=False, frozen=False, match_args=True, kw_only=False, slots=False, weakref_slot=False, module=None, decorator=dataclass)
 	replace(instance, /, **changes)
 	is_dataclass(class_or_instance)
 	MISSING

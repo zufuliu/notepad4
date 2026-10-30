@@ -568,11 +568,13 @@ HRESULT DirectDevice::CreateDevice() noexcept {
 
 	hr = pDirect3DDevice.As(&pDXGIDevice);
 	if (FAILED(hr)) {
+		// Platform::DebugPrintf("Failed to create DXGI device 0x%lx\n", hr);
 		return hr;
 	}
 
 	hr = pD2DFactory->CreateDevice(pDXGIDevice.Get(), pDirect2DDevice.ReleaseAndGetAddressOf());
 	if (FAILED(hr)) {
+		// Platform::DebugPrintf("Failed to create D2D device 0x%lx\n", hr);
 		return hr;
 	}
 
@@ -2451,12 +2453,10 @@ sptr_t ScintillaWin::SciMessage(Message iMessage, uptr_t wParam, sptr_t lParam) 
 
 	case Message::SetBidirectional:
 		if (technology == Technology::Default) {
-			bidirectional = Bidirectional::Disabled;
+			SetAppearance(bidirectional, Bidirectional::Disabled);
 		} else if (static_cast<Bidirectional>(wParam) <= Bidirectional::R2L) {
-			bidirectional = static_cast<Bidirectional>(wParam);
+			SetAppearance(bidirectional, static_cast<Bidirectional>(wParam));
 		}
-		// Invalidate all cached information including layout.
-		InvalidateStyleRedraw();
 		break;
 
 	case Message::TargetAsUTF8:
@@ -2627,8 +2627,8 @@ sptr_t ScintillaWin::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 			capturedMouse = false;
 			return 0;
 
-			// These are not handled in Scintilla and it's faster to dispatch them here.
-			// Also moves time out to here so profile doesn't count lots of empty message calls.
+		// These are not handled in Scintilla and its faster to dispatch them here.
+		// Also moves time out to here so profile doesn't count lots of empty message calls.
 
 		case WM_MOVE:
 		case WM_MOUSEACTIVATE:

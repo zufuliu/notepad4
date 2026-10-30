@@ -32,15 +32,9 @@ enum {
 	CsvRowGroup = 100,
 };
 
-inline uint32_t asU4(const char *s) noexcept {
-	// return atoi(s);
-	return *reinterpret_cast<const uint32_t *>(s);
-}
-
 void ColouriseCSVDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList /*keywordLists*/, Accessor &styler) {
 	const bool fold = styler.GetPropertyBool("fold");
-	const char * const option = styler.GetProperty("lexer.lang");
-	const uint32_t csvOption = asU4(option);
+	const uint32_t csvOption = styler.GetPropertyAsU4("lexer.lang");
 	const uint8_t delimiter = csvOption & 0xff;
 	const uint8_t quoteChar = (csvOption >> 8) & 0x7f;
 

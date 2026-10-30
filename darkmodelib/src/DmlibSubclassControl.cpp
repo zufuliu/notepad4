@@ -47,6 +47,192 @@ static constexpr int CP_DROPDOWNITEM = 9; // for some reason mingw use only enum
 #endif
 
 /**
+ * @brief Draws checkbox or radio buttons glyph.
+ *
+ * Simulates `::DrawThemeBackground`. Intended for Windows 10.
+ *
+ * @param[in]   hdc         Device context for drawing.
+ * @param[in]   iPartId     Part ID (`BP_CHECKBOX`, `BP_RADIOBUTTON`, etc.).
+ * @param[in]   iStateId    State ID (`CBS_CHECKEDHOT`, `RBS_UNCHECKEDNORMAL`, etc.).
+ * @param[in]   rect        Coordinates where to draw.
+ *
+ * @see renderButton()
+ */
+static bool drawCheckRadioGlyph(HDC hdc, int iPartId, int iStateId, const RECT& rect) noexcept
+{
+	if (hdc == nullptr || (iPartId != BP_CHECKBOX && iPartId != BP_RADIOBUTTON))
+	{
+		return false;
+	}
+
+	const int savedDC = ::SaveDC(hdc);
+	if (savedDC == 0)
+	{
+		return false;
+	}
+
+	const struct DCState
+	{
+		HDC m_hdc = nullptr;
+		int m_savedDC = 0;
+
+		explicit DCState(HDC hdc, int saved) noexcept
+			: m_hdc(hdc), m_savedDC(saved)
+		{}
+
+		DCState(const DCState&) = delete;
+		DCState& operator=(const DCState&) = delete;
+		DCState(DCState&&) = delete;
+		DCState& operator=(DCState&&) = delete;
+
+		~DCState()
+		{
+			::RestoreDC(m_hdc, m_savedDC);
+		}
+	} restoreDC{ hdc, savedDC };
+
+	bool checked = false;
+	bool mixed = false;
+	COLORREF color = 0;
+
+	// Corresponding RBS_* constants have the same numeric values as CBS_* states.
+	switch (iStateId)
+	{
+		case CBS_UNCHECKEDNORMAL:
+		{
+			color = dmlib::getTextColor();
+			break;
+		}
+
+		case CBS_CHECKEDNORMAL:
+		{
+			color = dmlib::getTextColor();
+			checked = true;
+			break;
+		}
+
+		case CBS_MIXEDNORMAL:
+		{
+			color = dmlib::getTextColor();
+			mixed = true;
+			break;
+		}
+
+		case CBS_UNCHECKEDHOT:
+		case CBS_UNCHECKEDPRESSED:
+		{
+			color = dmlib::getLinkTextColor();
+			break;
+		}
+
+		case CBS_CHECKEDHOT:
+		case CBS_CHECKEDPRESSED:
+		{
+			color = dmlib::getLinkTextColor();
+			checked = true;
+			break;
+		}
+
+		case CBS_MIXEDHOT:
+		case CBS_MIXEDPRESSED:
+		{
+			color = dmlib::getLinkTextColor();
+			mixed = true;
+			break;
+		}
+
+		case CBS_UNCHECKEDDISABLED:
+		{
+			color = dmlib::getDisabledTextColor();
+			break;
+		}
+
+		case CBS_CHECKEDDISABLED:
+		{
+			color = dmlib::getDisabledTextColor();
+			checked = true;
+			break;
+		}
+
+		case CBS_MIXEDDISABLED:
+		{
+			color = dmlib::getDisabledTextColor();
+			mixed = true;
+			break;
+		}
+
+		default:
+		{
+			return false;
+		}
+	}
+
+	const int width = rect.right - rect.left;
+	const int height = rect.bottom - rect.top;
+	const auto side = std::min<int>(width, height);
+
+	if (side <= 0)
+	{
+		return false;
+	}
+
+	const int x = rect.left + ((width - side) / 2);
+	const int y = rect.top + ((height - side) / 2);
+
+	const auto inset = std::max<int>(3, side / 4);
+
+	::SetDCBrushColor(hdc, color);
+	::SetDCPenColor(hdc, color);
+
+	::SelectObject(hdc, ::GetStockObject(NULL_BRUSH));
+	::SelectObject(hdc, ::GetStockObject(DC_PEN));
+
+	if (iPartId == BP_RADIOBUTTON)
+	{
+		::Ellipse(hdc, x, y, x + side, y + side);
+
+		if (checked)
+		{
+			::SelectObject(hdc, ::GetStockObject(DC_BRUSH));
+			::Ellipse(hdc, x + inset, y + inset, x + side - inset, y + side - inset);
+		}
+	}
+	else // checkbox
+	{
+		::Rectangle(hdc, x, y, x + side, y + side);
+
+		if (mixed)
+		{
+			const auto dashWidth = std::max<int>(1, side - (2 * inset));
+			const auto dashHeight = std::max<int>(1, dashWidth / 4);
+			const int dashTop = y + ((side - dashHeight) / 2);
+
+			::SelectObject(hdc, ::GetStockObject(DC_BRUSH));
+			::Rectangle(hdc, x + inset, dashTop, x + inset + dashWidth, dashTop + dashHeight);
+		}
+		else if (checked)
+		{
+			const int sideHalf = (side / 2);
+
+			const int cx = x + sideHalf;
+			const int cy = y + sideHalf;
+			const int half = sideHalf - inset;
+			const auto penWidth = std::max<int>(2, side / 8);
+
+			const auto hPen = dmlib_paint::GdiObject{ hdc, ::CreatePen(PS_SOLID, penWidth, color) };
+
+			::MoveToEx(hdc, cx - half, cy - half, nullptr);
+			::LineTo(hdc, cx + half, cy + half);
+
+			::MoveToEx(hdc, cx + half, cy - half, nullptr);
+			::LineTo(hdc, cx - half, cy + half);
+		}
+	}
+
+	return true;
+}
+
+/**
  * @brief Draws a themed owner drawn checkbox, radio, or tri-state button (excluding push-like buttons).
  *
  * Internally used by @ref paintButton to draw visual elements such as checkbox glyphs
@@ -61,8 +247,8 @@ static constexpr int CP_DROPDOWNITEM = 9; // for some reason mingw use only enum
  * @param[in]   hWnd        Handle to the button control.
  * @param[in]   hdc         Device context for drawing.
  * @param[in]   hTheme      Active visual style theme handle.
- * @param[in]   iPartID     Part ID (`BP_CHECKBOX`, `BP_RADIOBUTTON`, etc.).
- * @param[in]   iStateID    State ID (`CBS_CHECKEDHOT`, `RBS_UNCHECKEDNORMAL`, etc.).
+ * @param[in]   iPartId     Part ID (`BP_CHECKBOX`, `BP_RADIOBUTTON`, etc.).
+ * @param[in]   iStateId    State ID (`CBS_CHECKEDHOT`, `RBS_UNCHECKEDNORMAL`, etc.).
  *
  * @see paintButton()
  */
@@ -70,8 +256,8 @@ static void renderButton(
 	HWND hWnd,
 	HDC hdc,
 	HTHEME hTheme,
-	int iPartID,
-	int iStateID
+	int iPartId,
+	int iStateId
 ) DMLIB_BUF_NOEXCEPT
 {
 	// Font part
@@ -79,7 +265,7 @@ static void renderButton(
 	HFONT hFont = nullptr;
 	bool isFontCreated = false;
 	LOGFONT lf{};
-	if (SUCCEEDED(::GetThemeFont(hTheme, hdc, iPartID, iStateID, TMT_FONT, &lf)))
+	if (SUCCEEDED(::GetThemeFont(hTheme, hdc, iPartId, iStateId, TMT_FONT, &lf)))
 	{
 		hFont = ::CreateFontIndirectW(&lf);
 		isFontCreated = true;
@@ -149,10 +335,10 @@ static void renderButton(
 	::GetWindowTextW(hWnd, buffer.data(), static_cast<int>(buffer.length()));
 
 	SIZE szBox{};
-	::GetThemePartSize(hTheme, hdc, iPartID, iStateID, nullptr, TS_DRAW, &szBox);
+	::GetThemePartSize(hTheme, hdc, iPartId, iStateId, nullptr, TS_DRAW, &szBox);
 
 	RECT rcText{};
-	::GetThemeBackgroundContentRect(hTheme, hdc, iPartID, iStateID, &rcClient, &rcText);
+	::GetThemeBackgroundContentRect(hTheme, hdc, iPartId, iStateId, &rcClient, &rcText);
 
 	RECT rcBackground{ rcClient };
 	if (!isMultiline)
@@ -164,14 +350,18 @@ static void renderButton(
 	rcText.left = rcBackground.right + 3;
 
 	::DrawThemeParentBackground(hWnd, hdc, &rcClient);
-	::DrawThemeBackground(hTheme, hdc, iPartID, iStateID, &rcBackground, nullptr); // draw box
+
+	if (dmlib::isAtLeastWindows11() || !drawCheckRadioGlyph(hdc, iPartId, iStateId, rcBackground))
+	{
+		::DrawThemeBackground(hTheme, hdc, iPartId, iStateId, &rcBackground, nullptr); // draw box
+	}
 
 	DTTOPTS dtto{};
 	dtto.dwSize = sizeof(DTTOPTS);
 	dtto.dwFlags = DTT_TEXTCOLOR;
 	dtto.crText = (::IsWindowEnabled(hWnd) == FALSE) ? dmlib::getDisabledTextColor() : dmlib::getTextColor();
 
-	::DrawThemeTextEx(hTheme, hdc, iPartID, iStateID, buffer.c_str(), -1, dtFlags, &rcText, &dtto);
+	::DrawThemeTextEx(hTheme, hdc, iPartId, iStateId, buffer.c_str(), -1, dtFlags, &rcText, &dtto);
 
 	// Focus rect
 
@@ -179,7 +369,7 @@ static void renderButton(
 	if (((nState & BST_FOCUS) == BST_FOCUS) && ((uiState & UISF_HIDEFOCUS) != UISF_HIDEFOCUS))
 	{
 		dtto.dwFlags |= DTT_CALCRECT;
-		::DrawThemeTextEx(hTheme, hdc, iPartID, iStateID, buffer.c_str(), -1, dtFlags | DT_CALCRECT, &rcText, &dtto);
+		::DrawThemeTextEx(hTheme, hdc, iPartId, iStateId, buffer.c_str(), -1, dtFlags | DT_CALCRECT, &rcText, &dtto);
 		const RECT rcFocus{ rcText.left - 1, rcText.top, rcText.right + 1, rcText.bottom + 1 };
 		::DrawFocusRect(hdc, &rcFocus);
 	}
@@ -376,7 +566,7 @@ LRESULT CALLBACK dmlib_subclass::ButtonSubclass(
 		case WM_NCDESTROY:
 		{
 			::RemoveWindowSubclass(hWnd, ButtonSubclass, uIdSubclass);
-			std::unique_ptr<ButtonData> u_ptrData(pButtonData);
+			auto u_ptrData = std::unique_ptr<ButtonData>(pButtonData);
 			u_ptrData.reset();
 			break;
 		}
@@ -635,7 +825,7 @@ LRESULT CALLBACK dmlib_subclass::GroupboxSubclass(
 		case WM_NCDESTROY:
 		{
 			::RemoveWindowSubclass(hWnd, GroupboxSubclass, uIdSubclass);
-			std::unique_ptr<ButtonData> u_ptrData(pButtonData);
+			auto u_ptrData = std::unique_ptr<ButtonData>(pButtonData);
 			u_ptrData.reset();
 			break;
 		}
@@ -1186,7 +1376,7 @@ LRESULT CALLBACK dmlib_subclass::UpDownSubclass(
 		case WM_NCDESTROY:
 		{
 			::RemoveWindowSubclass(hWnd, UpDownSubclass, uIdSubclass);
-			std::unique_ptr<UpDownData> u_ptrData(pUpDownData);
+			auto u_ptrData = std::unique_ptr<UpDownData>(pUpDownData);
 			u_ptrData.reset();
 			break;
 		}
@@ -1591,7 +1781,7 @@ LRESULT CALLBACK dmlib_subclass::TabPaintSubclass(
 		case WM_NCDESTROY:
 		{
 			::RemoveWindowSubclass(hWnd, TabPaintSubclass, uIdSubclass);
-			std::unique_ptr<TabData> u_ptrData(pTabData);
+			auto u_ptrData = std::unique_ptr<TabData>(pTabData);
 			u_ptrData.reset();
 			break;
 		}
@@ -1795,7 +1985,7 @@ LRESULT CALLBACK dmlib_subclass::CustomBorderSubclass(
 		case WM_NCDESTROY:
 		{
 			::RemoveWindowSubclass(hWnd, CustomBorderSubclass, uIdSubclass);
-			std::unique_ptr<BorderMetricsData> u_ptrData(pBorderMetricsData);
+			auto u_ptrData = std::unique_ptr<BorderMetricsData>(pBorderMetricsData);
 			u_ptrData.reset();
 			break;
 		}
@@ -1942,13 +2132,18 @@ static int getComboBoxStateAndRect(HWND hWnd, RECT& rcClient) noexcept
  * @param[in]       hWnd            Handle to the combo box control.
  * @param[in]       hdc             Device context to draw into.
  * @param[in,out]   comboBoxData    Reference to the combo box' theme and style data.
- * @param[in]       iStateID        State of the combo box.
+ * @param[in]       iStateId        State of the combo box.
  *
  * @see ComboBoxData
  * @see paintComboBox()
  * @see renderComboBoxList()
  */
-static void renderComboBoxEdit(HWND hWnd, HDC hdc, dmlib_subclass::ComboBoxData& comboBoxData, int iStateID) noexcept
+static void renderComboBoxEdit(
+	HWND hWnd,
+	HDC hdc,
+	dmlib_subclass::ComboBoxData& comboBoxData,
+	int iStateId
+) noexcept
 {
 	auto& themeData = comboBoxData.m_themeData;
 	const auto& hTheme = themeData.getHTheme();
@@ -1964,8 +2159,8 @@ static void renderComboBoxEdit(HWND hWnd, HDC hdc, dmlib_subclass::ComboBoxData&
 	::GetClientRect(hWnd, &rcClient);
 	::DrawThemeParentBackground(hWnd, hdc, &rcClient); // to avoid unpainted corners in some cases on Windows 11
 
-	const bool isDisabled = iStateID == CBXSR_DISABLED;
-	const bool isHot = iStateID == CBXSR_HOT;
+	const bool isDisabled = iStateId == CBXSR_DISABLED;
+	const bool isHot = iStateId == CBXSR_HOT;
 
 	bool hasFocus = false;
 
@@ -2064,7 +2259,7 @@ static void renderComboBoxEdit(HWND hWnd, HDC hdc, dmlib_subclass::ComboBoxData&
  * @param[in]       hWnd            Handle to the combo box control.
  * @param[in]       hdc             Device context to draw into.
  * @param[in,out]   comboBoxData    Reference to the combo box' theme and style data.
- * @param[in]       iStateID        State of the combo box.
+ * @param[in]       iStateId        State of the combo box.
  *
  * @see ComboBoxData
  * @see paintComboBox()
@@ -2074,7 +2269,7 @@ static void renderComboBoxList(
 	HWND hWnd,
 	HDC hdc,
 	dmlib_subclass::ComboBoxData& comboBoxData,
-	int iStateID
+	int iStateId
 ) DMLIB_BUF_NOEXCEPT
 {
 	auto& themeData = comboBoxData.m_themeData;
@@ -2094,8 +2289,8 @@ static void renderComboBoxList(
 	RECT rcArrow{ cbi.rcButton };
 	rcArrow.left -= 1;
 
-	const bool isDisabled = iStateID == CBXSR_DISABLED;
-	const bool isHot = iStateID == CBXSR_HOT;
+	const bool isDisabled = iStateId == CBXSR_DISABLED;
+	const bool isHot = iStateId == CBXSR_HOT;
 
 	const HBRUSH hBrush = getBrushFromState(isDisabled, isHot);
 	const COLORREF clrText = isDisabled ? dmlib::getDisabledTextColor() : dmlib::getTextColor();
@@ -2148,7 +2343,7 @@ static void renderComboBoxList(
 					dtto.dwFlags = DTT_TEXTCOLOR;
 					dtto.crText = clrText;
 
-					::DrawThemeTextEx(hTheme, hdc, CP_DROPDOWNITEM, iStateID, buffer.c_str(), -1, dtFlags, &rcText, &dtto);
+					::DrawThemeTextEx(hTheme, hdc, CP_DROPDOWNITEM, iStateId, buffer.c_str(), -1, dtFlags, &rcText, &dtto);
 				}
 				else
 				{
@@ -2199,22 +2394,27 @@ static void renderComboBoxList(
  * @param[in]       hWnd            Handle to the combo box control.
  * @param[in]       hdc             Device context to draw into.
  * @param[in,out]   comboBoxData    Reference to the combo box' theme and style data.
- * @param[in]       iStateID        State of the combo box.
+ * @param[in]       iStateId        State of the combo box.
  *
  * @see ComboBoxData
  * @see paintComboBox()
  * @see renderComboBoxEdit()
  * @see renderComboBoxList()
  */
-static void renderComboBox(HWND hWnd, HDC hdc, dmlib_subclass::ComboBoxData& comboBoxData, int iStateID) DMLIB_BUF_NOEXCEPT
+static void renderComboBox(
+	HWND hWnd,
+	HDC hdc,
+	dmlib_subclass::ComboBoxData& comboBoxData,
+	int iStateId
+) DMLIB_BUF_NOEXCEPT
 {
 	if (comboBoxData.m_cbStyle == CBS_DROPDOWNLIST)
 	{
-		renderComboBoxList(hWnd, hdc, comboBoxData, iStateID);
+		renderComboBoxList(hWnd, hdc, comboBoxData, iStateId);
 	}
 	else
 	{
-		renderComboBoxEdit(hWnd, hdc, comboBoxData, iStateID);
+		renderComboBoxEdit(hWnd, hdc, comboBoxData, iStateId);
 	}
 }
 
@@ -2328,7 +2528,7 @@ LRESULT CALLBACK dmlib_subclass::ComboBoxSubclass(
 		case WM_NCDESTROY:
 		{
 			::RemoveWindowSubclass(hWnd, ComboBoxSubclass, uIdSubclass);
-			std::unique_ptr<ComboBoxData> u_ptrData(pComboboxData);
+			auto u_ptrData = std::unique_ptr<ComboBoxData>(pComboboxData);
 			u_ptrData.reset();
 			break;
 		}
@@ -2920,7 +3120,7 @@ LRESULT CALLBACK dmlib_subclass::HeaderSubclass(
 		case WM_NCDESTROY:
 		{
 			::RemoveWindowSubclass(hWnd, HeaderSubclass, uIdSubclass);
-			std::unique_ptr<HeaderData> u_ptrData(pHeaderData);
+			auto u_ptrData = std::unique_ptr<HeaderData>(pHeaderData);
 			u_ptrData.reset();
 			break;
 		}
@@ -3152,15 +3352,15 @@ static void paintStatusBar(HWND hWnd, HDC hdc, dmlib_subclass::StatusBarData& st
 		{
 			const auto id = static_cast<UINT>(::GetDlgCtrlID(hWnd));
 			DRAWITEMSTRUCT dis{
-				0
-				, 0
-				, static_cast<UINT>(i)
-				, ODA_DRAWENTIRE
-				, id
-				, hWnd
-				, hdc
-				, rcPart
-				, static_cast<ULONG_PTR>(retValText)
+				0,
+				id,
+				static_cast<UINT>(i),
+				0,
+				0,
+				hWnd,
+				hdc,
+				rcPart,
+				static_cast<ULONG_PTR>(retValText)
 			};
 
 			::SendMessage(::GetParent(hWnd), WM_DRAWITEM, id, reinterpret_cast<LPARAM>(&dis));
@@ -3221,7 +3421,7 @@ LRESULT CALLBACK dmlib_subclass::StatusBarSubclass(
 		case WM_NCDESTROY:
 		{
 			::RemoveWindowSubclass(hWnd, StatusBarSubclass, uIdSubclass);
-			std::unique_ptr<StatusBarData> u_ptrData(pStatusBarData);
+			auto u_ptrData = std::unique_ptr<StatusBarData>(pStatusBarData);
 			u_ptrData.reset();
 			break;
 		}
@@ -3422,7 +3622,7 @@ LRESULT CALLBACK dmlib_subclass::ProgressBarSubclass(
 		case WM_NCDESTROY:
 		{
 			::RemoveWindowSubclass(hWnd, ProgressBarSubclass, uIdSubclass);
-			std::unique_ptr<ProgressBarData> u_ptrData(pProgressBarData);
+			auto u_ptrData = std::unique_ptr<ProgressBarData>(pProgressBarData);
 			u_ptrData.reset();
 			break;
 		}
@@ -3521,7 +3721,7 @@ LRESULT CALLBACK dmlib_subclass::StaticTextSubclass(
 		case WM_NCDESTROY:
 		{
 			::RemoveWindowSubclass(hWnd, StaticTextSubclass, uIdSubclass);
-			std::unique_ptr<StaticTextData> u_ptrData(pStaticTextData);
+			auto u_ptrData = std::unique_ptr<StaticTextData>(pStaticTextData);
 			u_ptrData.reset();
 			break;
 		}

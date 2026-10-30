@@ -531,9 +531,25 @@ constexpr bool StrEqualEx(const wchar_t *s, const wchar_t (&t)[N]) noexcept {
 	case 6:
 		return asU8(s) == asU8(t) && asU4(s + 4) == asU4(t + 4);
 	case 7:
-		return asU8(s) == asU8(t) && asU4(s + 4) == asU4(t + 4) && s[6] == t[6];
+		return asU8(s) == asU8(t) && asU8(s + 4 - 1) == asU8(t + 4 - 1);
 	case 8:
 		return asU8(s) == asU8(t) && asU8(s + 4) == asU8(t + 4);
+	case 9:
+		return asU8(s) == asU8(t) && asU8(s + 4) == asU8(t + 4) && s[8] == t[8];
+	case 10:
+		return asU8(s) == asU8(t) && asU8(s + 4) == asU8(t + 4) && asU4(s + 8) == asU4(t + 8);
+	case 11:
+		return asU8(s) == asU8(t) && asU8(s + 4) == asU8(t + 4) && asU8(s + 8 - 1) == asU8(t + 8 - 1);
+	case 12:
+		return asU8(s) == asU8(t) && asU8(s + 4) == asU8(t + 4) && asU8(s + 8) == asU8(t + 8);
+	case 13:
+		return asU8(s) == asU8(t) && asU8(s + 4) == asU8(t + 4) && asU8(s + 8) == asU8(t + 8) && s[12] == t[12];
+	case 14:
+		return asU8(s) == asU8(t) && asU8(s + 4) == asU8(t + 4) && asU8(s + 8) == asU8(t + 8) && asU4(s + 12) == asU4(t + 12);
+	case 15:
+		return asU8(s) == asU8(t) && asU8(s + 4) == asU8(t + 4) && asU8(s + 8) == asU8(t + 8) && asU8(s + 12 - 1) == asU8(t + 12 - 1);
+	case 16:
+		return asU8(s) == asU8(t) && asU8(s + 4) == asU8(t + 4) && asU8(s + 8) == asU8(t + 8) && asU8(s + 12) == asU8(t + 12);
 #else
 	case 4:
 		return asU4(s) == asU4(t) && asU4(s + 2) == asU4(t + 2);
@@ -547,7 +563,7 @@ constexpr bool StrEqualEx(const wchar_t *s, const wchar_t (&t)[N]) noexcept {
 		return asU4(s) == asU4(t) && asU4(s + 2) == asU4(t + 2) && asU4(s + 4) == asU4(t + 4) && asU4(s + 6) == asU4(t + 6);
 #endif
 	default:
-		return __builtin_memcmp(s, t, M*sizeof(wchar_t)) == 0;
+		return __builtin_wmemcmp(s, t, M) == 0;
 	}
 }
 
@@ -561,6 +577,11 @@ constexpr bool StrStartsWith(const wchar_t *s, const wchar_t (&t)[N]) noexcept {
 	return StrEqualEx<N, N - 1>(s, t);
 }
 #endif
+
+template <size_t N>
+constexpr bool StrEqualLen(const wchar_t *s, UINT len, const wchar_t (&t)[N]) noexcept {
+	return len == N - 1 && StrStartsWith(s, t);
+}
 
 template <size_t N>
 inline bool WcsStartsWith(const wchar_t *s, const wchar_t (&t)[N]) noexcept {

@@ -29,7 +29,7 @@
 					 (WS_CLIPCHILDREN | WS_POPUP))
 
 //==== Data Type for WM_COPYDATA ==============================================
-#define DATA_MATEPATH_PATHARG 0xFB30
+#define DATA_MATEPATH_PATHARG (0xFB30 + sizeof(void *))
 
 //==== ComboBox Control =======================================================
 //#define WC_COMBOBOX L"ComboBox"

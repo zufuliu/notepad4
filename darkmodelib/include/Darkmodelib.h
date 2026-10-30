@@ -32,7 +32,7 @@
 #endif
 
 #ifdef DMLIB_DLL
-	#if defined(DMLIB_EXPORTS)
+	#ifdef DMLIB_EXPORTS
 		#define DMLIB_API __declspec(dllexport)
 	#else
 		#define DMLIB_API __declspec(dllimport)
@@ -300,7 +300,7 @@ namespace dmlib
 	 */
 	DMLIB_API void setSysColor(int nIndex, COLORREF color);
 
-	/// Updates custom color brushes for ChooseFont and ChooseColor dialogs.
+	/// Updates custom color brush for ChooseColor dialog.
 	DMLIB_API void updateCommonDlgsBrushes();
 
 	// ========================================================================

@@ -74,7 +74,7 @@ struct ChangeLog {
 	void DeleteRangeSavingHistory(Sci::Position position, Sci::Position deleteLength);
 	void SetSavePoint();
 
-	Sci::Position Length() const noexcept;
+	[[nodiscard]] Sci::Position Length() const noexcept;
 	[[nodiscard]] size_t DeletionCount(Sci::Position start, Sci::Position length) const noexcept;
 	void Check() const noexcept;
 };
@@ -114,7 +114,7 @@ public:
 
 	// Testing - not used by Scintilla
 	[[nodiscard]] size_t DeletionCount(Sci::Position start, Sci::Position length) const noexcept;
-	EditionSet DeletionsAt(Sci::Position pos) const;
+	[[nodiscard]] EditionSet DeletionsAt(Sci::Position pos) const;
 	void Check() const noexcept;
 };
 

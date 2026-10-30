@@ -593,6 +593,7 @@ class CaseConverter final : public ICaseConverter {
 	struct CharacterConversion {
 		int character = 0;
 		ConversionString conversion;
+		// Empty case: NUL -> "".
 		constexpr CharacterConversion() noexcept = default;
 		CharacterConversion(int character_, const char *conversion_) noexcept : character(character_) {
 			memcpy(conversion.conversion, conversion_, maxConversionLength + 1);

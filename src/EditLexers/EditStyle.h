@@ -63,17 +63,6 @@
 
 #define NP2STYLE_ASPTag					63272
 #define NP2STYLE_PHPTag					63273
-
-#define NP2STYLE_JSDefault				63301
-#define NP2STYLE_JSComment				63302
-#define NP2STYLE_JSKeyword				63303
-#define NP2STYLE_JSDocComment			63304
-#define NP2STYLE_JSString				63305
-#define NP2STYLE_JSRegex				63306
-#define NP2STYLE_JSNumber				63307
-#define NP2STYLE_JSOperator				63308
-#define NP2STYLE_JSTemplateLiteral		63309
-
 #define NP2STYLE_VBSDefault				63321
 #define NP2STYLE_VBSComment				63322
 #define NP2STYLE_VBSKeyword				63323

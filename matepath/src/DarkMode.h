@@ -18,3 +18,5 @@ void DarkMode_Init() noexcept;
 void DarkMode_Cleanup() noexcept;
 void DarkMode_InitDialog(HWND hwnd, DWORD_PTR dwRefData = DialogRefData_CenterParent) noexcept;
 void DarkMode_InitFileListView(HWND hwndLV, DWORD exStyle = 0) noexcept;
+void DarkMode_SetFileListViewTheme(HWND hwndLV, BOOL fullRowSelect) noexcept;
+bool DarkMode_SetFileListViewColor(HWND hwndLV, BOOL redraw) noexcept;

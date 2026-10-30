@@ -14,7 +14,7 @@ SinglyWordMap = {
 	'properties': 'property',
 	'alias': 'alias',
 }
-LexerKeywordCount = 15
+KEYWORDSET_MAX = 15
 AllKeywordAttrList = {}
 # for keyword list used in AutoC_AddSpecWord()
 SpecialKeywordIndexList = {}
@@ -114,7 +114,7 @@ def BuildKeywordContent(rid, lexer, keywordList, reservedCount=0):
 		output.append("")
 
 		indexName = build_enum_name(comment)
-		if index > LexerKeywordCount:
+		if index >= KEYWORDSET_MAX:
 			attr |= KeywordAttr.NoLexer
 		# keyword index for lexer
 		if (attr & KeywordAttr.NoLexer) == 0 and comment != 'unused':
@@ -138,7 +138,7 @@ def BuildKeywordContent(rid, lexer, keywordList, reservedCount=0):
 		# keyword attribute for lexer
 		if lines and (attr & KeywordAttr.NoLexer) == 0:
 			attr |= KeywordAttr.PreSorted
-		if attr != KeywordAttr.Default:
+		if attr != KeywordAttr.Default and index <= KEYWORDSET_MAX:
 			attrList.append((index, attr, comment))
 
 	if maxKeywordLen:
@@ -146,7 +146,7 @@ def BuildKeywordContent(rid, lexer, keywordList, reservedCount=0):
 		if '@' not in indexList or indexList['@'][0] < maxKeywordLen:
 			indexList['@'] = (maxKeywordLen, 0)
 	index = len(keywordList)
-	while reservedCount != 0:
+	while reservedCount != 0 and index <= KEYWORDSET_MAX:
 		attrList.append((index, KeywordAttr.NoLexer, 'Code Snippet'))
 		index += 1
 		reservedCount -= 1
@@ -1347,6 +1347,8 @@ def parse_html_api_file(path):
 		('tag', keywords, KeywordAttr.Special),
 		('void tag', HtmlVoidTagList, KeywordAttr.NoAutoComp | KeywordAttr.PrefixSpace),
 		('JavaScript', JavaScriptKeywordMap['keywords'], KeywordAttr.NoAutoComp),
+		('JavaScript directive', JavaScriptKeywordMap['directive'], KeywordAttr.NoAutoComp),
+		('JavaScript class', JavaScriptKeywordMap['class'], KeywordAttr.NoAutoComp),
 		('VBScript', VBScriptKeyword, KeywordAttr.MakeLower | KeywordAttr.NoAutoComp),
 		('SGML', SGMLKeyword, KeywordAttr.Default),
 		('attribute', attributes, KeywordAttr.Special),
@@ -1969,6 +1971,8 @@ def parse_php_api_file(path):
 		('misc', keywordMap['misc'], KeywordAttr.NoLexer),
 		('void tag', HtmlVoidTagList, KeywordAttr.NoAutoComp | KeywordAttr.PrefixSpace),
 		('JavaScript', JavaScriptKeywordMap['keywords'], KeywordAttr.NoAutoComp),
+		('JavaScript directive', JavaScriptKeywordMap['directive'], KeywordAttr.NoAutoComp),
+		('JavaScript class', JavaScriptKeywordMap['class'], KeywordAttr.NoAutoComp),
 		('phpdoc', keywordMap['phpdoc'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp | KeywordAttr.Special),
 	]
 
@@ -2823,7 +2827,7 @@ def parse_wasm_lexer_keywords(path):
 		('keywords', keywordMap['keywords'], KeywordAttr.Default),
 		('type', keywordMap['type'], KeywordAttr.Default),
 		('instruction', keywordMap['instruction'], KeywordAttr.Default),
-		('full instruction', keywordMap['full instruction'], KeywordAttr.NoLexer),
+		('full instruction', [], KeywordAttr.NoLexer),
 	]
 
 def parse_winhex_api_file(path):
@@ -2861,6 +2865,8 @@ def parse_xml_api_file(path):
 		('tag', [], KeywordAttr.Default),
 		('void tag', [], KeywordAttr.Default),
 		('JavaScript', [], KeywordAttr.Default),
+		('JavaScript directive', [], KeywordAttr.Default),
+		('JavaScript class', [], KeywordAttr.Default),
 		('VBScript', [], KeywordAttr.Default),
 		('SGML', keywords, KeywordAttr.Default),
 		('attribute', attributes, KeywordAttr.NoLexer),

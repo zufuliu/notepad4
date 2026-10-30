@@ -401,8 +401,11 @@ size_t dmlib_hook::GetSysColor::unhook(bool forceDetach) noexcept
 static HookData<decltype(&::GetThemeColor)> g_hookDataGetThemeColor{};
 static HookData<decltype(&::DrawThemeBackgroundEx)> g_hookDataDrawThemeBackgroundEx{};
 
-static COLORREF g_mainInstructionTextClr = RGB(153, 235, 255);
-static COLORREF g_otherTextClr = RGB(255, 255, 255);
+static constexpr COLORREF kMainTextClr = RGB(153, 235, 255);
+static constexpr COLORREF kOtherTextClr = RGB(255, 255, 255);
+
+static COLORREF g_mainTextClr = kMainTextClr;
+static COLORREF g_otherTextClr = kOtherTextClr;
 
 static HTHEME g_hDarkTheme = nullptr;
 
@@ -427,7 +430,7 @@ extern "C"
 			{
 				case TDLG_MAININSTRUCTIONPANE:
 				{
-					*pColor = g_mainInstructionTextClr;
+					*pColor = g_mainTextClr;
 					return S_OK;
 				}
 
@@ -468,8 +471,8 @@ static constexpr std::uint16_t kDrawThemeBackgroundExOrdinal = 47;
 static constexpr COLORREF kMainPaneBgClr = RGB(44, 44, 44);
 static constexpr COLORREF kFooterBgClr = RGB(32, 32, 32);
 
-static HBRUSH g_hBrushBg = nullptr;
-static HBRUSH g_hBrushBgFooter = nullptr;
+static COLORREF g_mainPaneBgClr = kMainPaneBgClr;
+static COLORREF g_footerBgClr = kFooterBgClr;
 
 extern "C"
 {
@@ -491,14 +494,18 @@ extern "C"
 		{
 			case TDLG_PRIMARYPANEL:
 			{
-				::FillRect(hdc, pRect, g_hBrushBg);
+				const COLORREF oldClr = ::SetDCBrushColor(hdc, g_mainPaneBgClr);
+				::FillRect(hdc, pRect, static_cast<HBRUSH>(::GetStockObject(DC_BRUSH)));
+				::SetDCBrushColor(hdc, oldClr);
 				break;
 			}
 
 			case TDLG_SECONDARYPANEL:
 			case TDLG_FOOTNOTEPANE:
 			{
-				::FillRect(hdc, &pOptions->rcClip, g_hBrushBgFooter);
+				const COLORREF oldClr = ::SetDCBrushColor(hdc, g_footerBgClr);
+				::FillRect(hdc, &pOptions->rcClip, static_cast<HBRUSH>(::GetStockObject(DC_BRUSH)));
+				::SetDCBrushColor(hdc, oldClr);
 				break;
 			}
 
@@ -518,44 +525,31 @@ extern "C"
  */
 bool dmlib_hook::TaskDlgTheme::hook() noexcept
 {
-	COLORREF clrMain = kMainPaneBgClr;
-	COLORREF clrFooter = kFooterBgClr;
-
 	if (dmlib_win32api::IsWindows11() && g_hDarkTheme == nullptr)
 	{
 		g_hDarkTheme = ::OpenThemeData(nullptr, L"DarkMode_Explorer::TaskDialog");
 		if (g_hDarkTheme != nullptr)
 		{
-			if (FAILED(::GetThemeColor(g_hDarkTheme, TDLG_PRIMARYPANEL, 0, TMT_FILLCOLOR, &clrMain)))
+			if (FAILED(::GetThemeColor(g_hDarkTheme, TDLG_PRIMARYPANEL, 0, TMT_FILLCOLOR, &g_mainPaneBgClr)))
 			{
-				clrMain = kMainPaneBgClr;
+				g_mainPaneBgClr = kMainPaneBgClr;
 			}
 
-			if (FAILED(::GetThemeColor(g_hDarkTheme, TDLG_FOOTNOTEPANE, 0, TMT_FILLCOLOR, &clrFooter)))
+			if (FAILED(::GetThemeColor(g_hDarkTheme, TDLG_FOOTNOTEPANE, 0, TMT_FILLCOLOR, &g_footerBgClr)))
 			{
-				clrFooter = kFooterBgClr;
+				g_footerBgClr = kFooterBgClr;
 			}
 
 			if (FAILED(::GetThemeColor(g_hDarkTheme, TDLG_PRIMARYPANEL, 0, TMT_TEXTCOLOR, &g_otherTextClr)))
 			{
-				g_otherTextClr = RGB(255, 255, 255);
+				g_otherTextClr = kOtherTextClr;
 			}
 
-			if (FAILED(::GetThemeColor(g_hDarkTheme, TDLG_MAININSTRUCTIONPANE, 0, TMT_TEXTCOLOR, &g_mainInstructionTextClr)))
+			if (FAILED(::GetThemeColor(g_hDarkTheme, TDLG_MAININSTRUCTIONPANE, 0, TMT_TEXTCOLOR, &g_mainTextClr)))
 			{
-				g_mainInstructionTextClr = RGB(153, 235, 255);
+				g_mainTextClr = kMainTextClr;
 			}
 		}
-	}
-
-	if (g_hBrushBg == nullptr)
-	{
-		g_hBrushBg = ::CreateSolidBrush(clrMain);
-	}
-
-	if (g_hBrushBgFooter == nullptr)
-	{
-		g_hBrushBgFooter = ::CreateSolidBrush(clrFooter);
 	}
 
 	return
@@ -593,18 +587,6 @@ size_t dmlib_hook::TaskDlgTheme::unhook(bool forceDetach) noexcept
 		g_hDarkTheme = nullptr;
 	}
 
-	if (g_hBrushBg != nullptr && g_hookDataDrawThemeBackgroundEx.m_ref == 0)
-	{
-		::DeleteObject(g_hBrushBg);
-		g_hBrushBg = nullptr;
-	}
-
-	if (g_hBrushBgFooter != nullptr && g_hookDataDrawThemeBackgroundEx.m_ref == 0)
-	{
-		::DeleteObject(g_hBrushBgFooter);
-		g_hBrushBgFooter = nullptr;
-	}
-
 	return count;
 }
 
@@ -616,21 +598,7 @@ static HookData<decltype(&::GetSysColorBrush)> g_hookDataClrGetSysColorBrush{};
 
 static HookData<decltype(&::MessageBoxW)> g_hookDataFontMessageBoxW{};
 
-static HBRUSH g_hBrushFontHighlight = nullptr;
 static HBRUSH g_hBrushClrLum = nullptr;
-
-/**
- * @brief Updates highlight brush for ChooseFont dialog.
- */
-void dmlib_hook::updateFontBrush() noexcept
-{
-	if (g_hBrushFontHighlight != nullptr)
-	{
-		::DeleteObject(g_hBrushFontHighlight);
-		g_hBrushFontHighlight = nullptr;
-	}
-	g_hBrushFontHighlight = ::CreateSolidBrush(kAccentBlue);
-}
 
 /**
  * @brief Updates luminosity slider brush for ChooseColor dialog.
@@ -730,8 +698,10 @@ extern "C"
 
 			case COLOR_HIGHLIGHT + 1:
 			{
-				hBrush = g_hBrushFontHighlight;
-				break;
+				const COLORREF oldClr = ::SetDCBrushColor(hDC, kAccentBlue);
+				const auto retVal = g_hookDataFontFillRect.m_trueFn(hDC, lprc, static_cast<HBRUSH>(::GetStockObject(DC_BRUSH)));
+				::SetDCBrushColor(hDC, oldClr);
+				return retVal;
 			}
 
 			default:
@@ -820,8 +790,6 @@ size_t dmlib_hook::FontGetSysColor::unhook(bool forceDetach) noexcept
  */
 bool dmlib_hook::FontFillRect::hook() noexcept
 {
-	dmlib_hook::updateFontBrush();
-
 	return
 		HookFunction<decltype(&::FillRect)>(
 			g_hookDataFontFillRect,
@@ -843,15 +811,7 @@ bool dmlib_hook::FontFillRect::hook() noexcept
  */
 size_t dmlib_hook::FontFillRect::unhook(bool forceDetach) noexcept
 {
-	const auto count = UnhookFunction(g_hookDataFontFillRect, forceDetach);
-
-	if (g_hBrushFontHighlight != nullptr)
-	{
-		::DeleteObject(g_hBrushFontHighlight);
-		g_hBrushFontHighlight = nullptr;
-	}
-
-	return count;
+	return UnhookFunction(g_hookDataFontFillRect, forceDetach);
 }
 
 /**

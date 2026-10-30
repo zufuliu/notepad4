@@ -70,13 +70,14 @@ private:
 		stepPartition = partitionDownTo;
 	}
 
+	static constexpr size_t initialGrowSize = 8;
 public:
-	explicit Partitioning(size_t growSize = 8): body(growSize) {
+	explicit Partitioning(size_t growSize = initialGrowSize): body(growSize) {
 		body.Insert(0, 0);	// This value stays 0 for ever
 		body.Insert(1, 0);	// This is the end of the first partition and will be the start of the second
 	}
 
-	T Partitions() const noexcept {
+	[[nodiscard]] T Partitions() const noexcept {
 		return static_cast<T>(body.Length()) - 1;
 	}
 
@@ -86,7 +87,7 @@ public:
 		body.ReAllocate(newSize + 2);
 	}
 
-	T Length() const noexcept {
+	[[nodiscard]] T Length() const noexcept {
 		//return PositionFromPartition(Partitions());
 		if (body.Length()) {
 			const ptrdiff_t partition = body.Length() - 1;
@@ -136,13 +137,14 @@ public:
 	}
 
 	void InsertText(T partitionInsert, T delta) noexcept {
+		constexpr ptrdiff_t closePortion = 10;
 		// Point all the partitions after the insertion point further along in the buffer
 		if (stepLength != 0) {
 			if (partitionInsert >= stepPartition) {
 				// Fill in up to the new insertion point
 				ApplyStep(partitionInsert);
 				stepLength += delta;
-			} else if (partitionInsert >= (stepPartition - body.Length() / 10)) {
+			} else if (partitionInsert >= (stepPartition - (body.Length() / closePortion))) {
 				// Close to step but before so move step back
 				BackStep(partitionInsert);
 				stepLength += delta;
@@ -167,7 +169,7 @@ public:
 		body.Delete(partition);
 	}
 
-	T PositionFromPartition(T partition) const noexcept {
+	[[nodiscard]] T PositionFromPartition(T partition) const noexcept {
 		PLATFORM_ASSERT(partition >= 0);
 		PLATFORM_ASSERT(partition < body.Length());
 		const ptrdiff_t lengthBody = body.Length();
@@ -181,7 +183,7 @@ public:
 	}
 
 	/// Return value in range [0 .. Partitions() - 1] even for arguments outside interval
-	T PartitionFromPosition(T pos) const noexcept {
+	[[nodiscard]] T PartitionFromPosition(T pos) const noexcept {
 		if (body.Length() <= 1)
 			return 0;
 		//if (pos >= Length())

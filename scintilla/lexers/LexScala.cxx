@@ -93,9 +93,7 @@ constexpr bool IsSpaceEquiv(int state) noexcept {
 }
 
 constexpr bool FollowExpression(int chPrevNonWhite, int stylePrevNonWhite) noexcept {
-	return chPrevNonWhite == ')' || chPrevNonWhite == ']'
-		|| (stylePrevNonWhite >= SCE_SCALA_OPERATOR_PF && stylePrevNonWhite <= SCE_SCALA_IDENTIFIER)
-		|| IsScalaIdentifierChar(chPrevNonWhite);
+	return stylePrevNonWhite >= SCE_SCALA_OPERATOR_PF || chPrevNonWhite == ')' || chPrevNonWhite == ']';
 }
 
 inline bool IsXmlTagStart(const StyleContext &sc, int chPrevNonWhite, int stylePrevNonWhite) noexcept {

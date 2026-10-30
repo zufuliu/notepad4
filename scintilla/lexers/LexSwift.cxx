@@ -94,13 +94,11 @@ constexpr bool IsSwiftIdentifierChar(int state, int ch) noexcept {
 }
 
 constexpr bool FollowExpression(int chPrevNonWhite, int stylePrevNonWhite) noexcept {
-	return chPrevNonWhite == ')' || chPrevNonWhite == ']'
-		|| (stylePrevNonWhite >= SCE_SWIFT_OPERATOR_PF && stylePrevNonWhite < SCE_SWIFT_DIRECTIVE)
-		|| IsIdentifierCharEx(chPrevNonWhite) || chPrevNonWhite == '`';
+	return stylePrevNonWhite >= SCE_SWIFT_OPERATOR_PF || chPrevNonWhite == ')' || chPrevNonWhite == ']';
 }
 
 constexpr bool IsRegexStart(int chPrevNonWhite, int stylePrevNonWhite) noexcept {
-	return stylePrevNonWhite == SCE_SWIFT_WORD || !FollowExpression(chPrevNonWhite, stylePrevNonWhite);
+	return AnyOf(stylePrevNonWhite, SCE_SWIFT_WORD, SCE_SWIFT_DIRECTIVE) || !FollowExpression(chPrevNonWhite, stylePrevNonWhite);
 }
 
 constexpr bool IsSpaceEquiv(int state) noexcept {
@@ -122,7 +120,7 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 	int chBefore = 0;
 	int chPrevNonWhite = 0;
 	int stylePrevNonWhite = SCE_SWIFT_DEFAULT;
-	bool insideRegexRange = false; // inside regex character range []
+	bool insideRegexCharacterClass = false; // inside regex character class []
 	EscapeSequence escSeq;
 
 	if (startPos != 0) {
@@ -338,8 +336,8 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			} else if (sc.ch == '\\') {
 				sc.Forward();
 			} else if (sc.ch == '[' || sc.ch == ']') {
-				insideRegexRange = sc.ch == '[';
-			} else if (sc.ch == '/' && !insideRegexRange && (sc.state == SCE_SWIFT_REGEX || sc.chNext == '#')) {
+				insideRegexCharacterClass = sc.ch == '[';
+			} else if (sc.ch == '/' && !insideRegexCharacterClass && (sc.state == SCE_SWIFT_REGEX || sc.chNext == '#')) {
 				if (sc.state == SCE_SWIFT_REGEX_ED) {
 					const int count = GetMatchedDelimiterCount(styler, sc.currentPos + 1, '#');
 					if (count != delimiterCount) {
@@ -384,7 +382,7 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					continue;
 				}
 				if (sc.chNext > ' ' && IsRegexStart(chPrevNonWhite, stylePrevNonWhite)) {
-					insideRegexRange = false;
+					insideRegexCharacterClass = false;
 					sc.SetState(SCE_SWIFT_REGEX);
 				} else {
 					sc.SetState(SCE_SWIFT_OPERATOR);
@@ -407,7 +405,7 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			} else if (sc.ch == '#') {
 				const auto [count, chNext] = GetMatchedDelimiterCountEx(styler, sc.currentPos, '#');
 				if (chNext == '\"' || chNext == '/') {
-					insideRegexRange = false;
+					insideRegexCharacterClass = false;
 					delimiterCount = count;
 					sc.SetState((chNext == '/') ? SCE_SWIFT_REGEX_ED : SCE_SWIFT_STRING_ED);
 					sc.Advance(count);

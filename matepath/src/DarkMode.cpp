@@ -15,6 +15,13 @@
 #include "DarkMode.h"
 #include "Dialogs.h"
 
+extern bool bDefColorNoFilter;
+extern bool bDefColorFilter;
+extern COLORREF colorNoFilter;
+extern COLORREF colorFilter;
+extern WCHAR tchFilter[128];
+extern bool bNegFilter;
+
 namespace { // DialogHook
 
 struct DialogHook {
@@ -104,4 +111,26 @@ void DarkMode_InitFileListView(HWND hwndLV, DWORD exStyle) noexcept {
 	lvc.mask = LVCF_FMT | LVCF_TEXT;
 	lvc.fmt = LVCFMT_LEFT;
 	ListView_InsertColumn(hwndLV, 0, &lvc);
+}
+
+void DarkMode_SetFileListViewTheme(HWND hwndLV, BOOL fullRowSelect) noexcept {
+	LPCWSTR theme = fullRowSelect ? L"Explorer" : L"Listview";
+	SetWindowTheme(hwndLV, theme, nullptr);
+}
+
+NP2_noinline
+bool DarkMode_SetFileListViewColor(HWND hwndLV, BOOL redraw) noexcept {
+	COLORREF color = GetSysColor(COLOR_WINDOWTEXT);
+	bool hasFilter = false;
+	if (bNegFilter || !StrEqualEx(tchFilter, L"*.*")) {
+		hasFilter = true;
+		color = bDefColorFilter ? color : colorFilter;
+	} else {
+		color = bDefColorNoFilter ? color : colorNoFilter;
+	}
+	ListView_SetTextColor(hwndLV, color);
+	if (redraw) {
+		ListView_RedrawItems(hwndLV, 0, ListView_GetItemCount(hwndLV) - 1);
+	}
+	return hasFilter;
 }

@@ -171,6 +171,7 @@ BEGIN
 		MENUITEM "Właśc&iwości...",					IDM_FILE_PROPERTIES
 		MENUITEM "Otwórz &folder zawierający",		IDM_FILE_OPEN_CONTAINING_FOLDER
 		MENUITEM "Utwórz skrót na pu&lpicie",		IDM_FILE_CREATELINK
+		MENUITEM "Aktualizuj czas pliku",			IDM_FILE_UPDATE_TIMESTAMP
 		MENUITEM SEPARATOR
 		MENUITEM "Prze&glądaj...\tCtrl+M",			IDM_FILE_BROWSE
 		POPUP "Ulu&bione"
@@ -529,6 +530,7 @@ BEGIN
 			MENUITEM "Strona &internetowa",			IDM_LEXER_WEB
 			MENUITEM "Strona &PHP",					IDM_LEXER_PHP
 			MENUITEM "Strona &JSP",					IDM_LEXER_JSP
+			MENUITEM "JSP &XML",					IDM_LEXER_JSPX
 			MENUITEM "ASP.NET (&C#)",				IDM_LEXER_ASPX_CS
 			MENUITEM "ASP.NET (&VB.NET)",			IDM_LEXER_ASPX_VB
 			MENUITEM "ASP (V&BScript)",				IDM_LEXER_ASP_VBS
@@ -568,7 +570,7 @@ BEGIN
 			MENUITEM "Arkusz stylów XSL&T",			IDM_LEXER_XSLT
 			MENUITEM "Definicja &DTD XML",			IDM_LEXER_DTD
 			MENUITEM "Lista &właściwości",			IDM_LEXER_PROPERTY_LIST
-			//MENUITEM "Dokument SV&G",				IDM_LEXER_SVG
+			MENUITEM "Dokument SV&G",				IDM_LEXER_SVG
 		END
 	END
 	POPUP "&Ustawienia"
@@ -1844,7 +1846,7 @@ BEGIN
     IDS_ASK_ENCODING2       "Zamierzasz zmienić kodowanie pustego pliku z ANSI na inne. Historia zmian zostanie wyczyszczona, gdyż nie można jej zsynchronizować z nowym kodowaniem. Kontynuować?"
     IDS_ERR_ENCODINGNA      "Tablice konwersji dla wybranego kodowania nie są dostępne na tym systemie."
     IDS_ERR_UNICODE         "Błąd podczas zmiany kodowania pliku.\nDane zostaną utracone jeśli plik zostanie zapisany."
-    IDS_BINARY_FILE_OPENED  "Najprawdopodobniej nie jest to plik tekstowy, został więc otwarty w trybie tylko do odczytu,\nby zapobiec przypadkowej edycji prowadzącej do uszkodzenia pliku."
+    IDS_BINARY_FILE_OPENED  "To najprawdopodobniej nie jest plik tekstowy.\nAby zapobiec przypadkowej edycji, która mogłaby uszkodzić plik, dokument został otwarty w trybie tylko do odczytu."
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
     IDS_CHANGE_LANG_RESTART "Zmiana języka interfejsu użytkownika wymaga ponownego uruchomienia programu Notepad4, uruchomić go teraz ponownie?"
 #endif

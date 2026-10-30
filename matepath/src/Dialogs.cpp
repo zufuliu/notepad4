@@ -1192,16 +1192,8 @@ INT_PTR OptionsPropSheet(HWND hwnd, HINSTANCE hInstance) noexcept {
 			exStyle |= LVS_EX_FULLROWSELECT;
 		}
 		ListView_SetExtendedListViewStyleEx(hwndDirList, mask, exStyle);
-		SetWindowTheme(hwndDirList, ((exStyle & LVS_EX_FULLROWSELECT) ? L"Explorer" : L"Listview"), nullptr);
-
-		COLORREF color = GetSysColor(COLOR_WINDOWTEXT);
-		if (!StrEqualEx(tchFilter, L"*.*") || bNegFilter) {
-			color = bDefColorFilter ? color : colorFilter;
-		} else {
-			color = bDefColorNoFilter ? color : colorNoFilter;
-		}
-		ListView_SetTextColor(hwndDirList, color);
-		ListView_RedrawItems(hwndDirList, 0, ListView_GetItemCount(hwndDirList) - 1);
+		DarkMode_SetFileListViewTheme(hwndDirList, exStyle & LVS_EX_FULLROWSELECT);
+		DarkMode_SetFileListViewColor(hwndDirList, true);
 	}
 
 	return nResult;

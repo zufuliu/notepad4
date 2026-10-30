@@ -220,31 +220,7 @@ public:
 		ColorTo(pos + 1, chAttr);
 	}
 #endif
-	SCI_noinline
-	void ColorTo(Sci_PositionU endPos_, int chAttr) {
-		// Only perform styling for non empty range [startSeg, endPos_)
-		assert(endPos_ >= startSeg && endPos_ <= static_cast<Sci_PositionU>(Length()));
-		if (endPos_ > startSeg) {
-			Sci_PositionU len = endPos_ - startSeg;
-			if (validLen + len >= bufferSize) {
-				Flush();
-			}
-			assert((startPosStyling + validLen + len) <= static_cast<Sci_PositionU>(Length()));
-			const auto attr = static_cast<unsigned char>(chAttr);
-			startSeg += len;
-			if (validLen + len < bufferSize) {
-				unsigned char *ptr = styleBuf + validLen;
-				validLen += len;
-				do {
-					*ptr++ = attr;
-					--len;
-				} while (len != 0);
-			} else {
-				// Too big for buffer so send directly
-				pAccess->SetStyleFor(len, attr);
-			}
-		}
-	}
+	void ColorTo(Sci_PositionU endPos_, unsigned chAttr);
 	void SetLevel(Sci_Line line, int level) {
 		pAccess->SetLevel(line, level);
 	}

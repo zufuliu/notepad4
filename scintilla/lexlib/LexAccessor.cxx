@@ -75,6 +75,32 @@ void LexAccessor::GetRangeLowered(Sci_PositionU startPos_, Sci_PositionU endPos_
 	GetRangeLowered(startPos_, endPos_, s.data(), len + 1);
 }
 
+SCI_noinline
+void LexAccessor::ColorTo(Sci_PositionU endPos_, unsigned chAttr) {
+	// Only perform styling for non empty range [startSeg, endPos_)
+	assert(endPos_ >= startSeg && endPos_ <= static_cast<Sci_PositionU>(Length()));
+	if (endPos_ > startSeg) {
+		Sci_PositionU len = endPos_ - startSeg;
+		if (validLen + len >= bufferSize) {
+			Flush();
+		}
+		assert((startPosStyling + validLen + len) <= static_cast<Sci_PositionU>(Length()));
+		const auto attr = static_cast<unsigned char>(chAttr);
+		startSeg += len;
+		if (validLen + len < bufferSize) {
+			unsigned char *ptr = styleBuf + validLen;
+			validLen += len;
+			do {
+				*ptr++ = attr;
+				--len;
+			} while (len != 0);
+		} else {
+			// Too big for buffer so send directly
+			pAccess->SetStyleFor(len, attr);
+		}
+	}
+}
+
 Sci_Position LexLineSkipSpaceTab(LexAccessor &styler, Sci_Line line) noexcept {
 	Sci_Position startPos = styler.LineStart(line);
 	const Sci_Position endPos = styler.LineStart(line + 1) - 1;
@@ -122,6 +148,7 @@ bool IsLexLineStartsWith(LexAccessor &styler, Sci_Line line, const char *word, b
 	return false;
 }
 
+SCI_noinline
 bool IsLexCommentLine(LexAccessor &styler, Sci_Line line, int style) noexcept {
 	Sci_Position startPos = styler.LineStart(line);
 	const Sci_Position endPos = styler.LineStart(line + 1) - 1;

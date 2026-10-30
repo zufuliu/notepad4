@@ -1035,7 +1035,7 @@ bool MaybeBinaryFile(const uint8_t *ptr, DWORD length, int *encodingFlag) noexce
 			if ((mask & (mask - 1)) != 0) {
 				result |= 2;
 			}
-			if ((count >= 8) || IsC0ControlChar(*ptr)) {
+			if ((count >= 8) || (ptr < end && IsC0ControlChar(*ptr))) {
 				result |= 1;
 			}
 			if (result == 3) {

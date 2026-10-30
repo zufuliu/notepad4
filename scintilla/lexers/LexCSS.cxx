@@ -126,7 +126,7 @@ void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 
 		case SCE_CSS_NUMBER:
 			if (!IsDecimalNumber(sc.chPrev, sc.ch, sc.chNext)) {
-				if (IsCssIdentifierStart(sc.ch, sc.chNext)) {
+				if (IsCssDimensionStart(sc.ch, sc.chNext)) {
 					sc.ChangeState(SCE_CSS_DIMENSION);
 				} else {
 					if (sc.ch == '%') {
@@ -207,7 +207,7 @@ void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 								} else {
 									sc.ChangeState(SCE_CSS_UNKNOWN_PROPERTY);
 								}
-							} else if (parenCount == selectorLevel && !(chNext == '(')) {
+							} else if (chNext != '(' && parenCount == selectorLevel) {
 								sc.ChangeState(SCE_CSS_TAG);
 							}
 						}

@@ -80,7 +80,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [HTML](tools/lang/html.html), up to [WHATWG](https://html.spec.whatwg.org/multipage/) May 2026. [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#html)
 		* ASP
 		* ASP.NET
-		* JSP
+		* JSP and JSP XML Syntax
 		* PHP
 	* INI Configuration File
 	* [Inno Setup](tools/lang/InnoSetup.iss), up to Inno Setup 6.2.
@@ -118,7 +118,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [Perl](tools/lang/Perl.pl), up to Perl 5.42. [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#perl)
 	* [PowerBuilder](tools/lang/PowerBuilder.srf), up to PowerBuilder 2025.
 	* [PowerShell](tools/lang/PowerShell.ps1), up to PowerShell 7.2.
-	* [Python](tools/lang/Python.py), up to Python 3.14. [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#python)
+	* [Python](tools/lang/Python.py), up to Python 3.15. [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#python)
 	* [PHP Script](tools/lang/PHP.php), up to PHP 8.5. [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#php)
 	* Windows Rescouce Script
 	* [R](tools/lang/R.r), up to R 4.2.
@@ -156,6 +156,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* [XML Stylesheet](https://www.w3.org/Style/XSL/)
 		* SGML and DTD
 		* Apple Property List
+		* [SVG](https://www.w3.org/TR/SVG2/)
 	* [YAML Document](https://yaml.org/)
 	* [Zig](tools/lang/Zig.zig), up to Zig 0.13.
 	* Many Others

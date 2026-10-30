@@ -11,12 +11,16 @@
 
 #include <string>
 #include <string_view>
+// #include <vector>
 #include <map>
 
 #include "ILexer.h"
 #include "Scintilla.h"
 
+// #include "CharacterSet.h"
 #include "OptionSet.h"
+// #include "SubStyles.h"
+// #include "SparseState.h"
 #include "DefaultLexer.h"
 
 using namespace Lexilla;

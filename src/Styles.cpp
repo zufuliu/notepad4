@@ -311,9 +311,33 @@ int np2LexLangIndex = 0;
 static bool tabSeparatedValue; // for TSV file
 static int iCsvOption = ('\"' << 8) | ',';
 
+namespace { // lexer option
+
+// see LexCSV
 #define CsvOption_BackslashEscape	(1 << 15)
 #define CsvOption_MergeDelimiter	(1 << 16)
 #define LexerChanged_Override		2
+
+// see LexHTML
+enum HtmlOption {
+	HtmlOption_IsXML = 1,
+	HtmlOption_AllowScript = 2, // <script></script>
+	HtmlOption_AllowStyle = 4,	// <style></style>
+	HtmlOption_AllowASP = 8,	// <% %>
+	HtmlOption_AllowJSPEL = 16,	// ${}, #{}
+	HtmlOption_AllowJSPX = 32,	// <jsp:scriptlet, expression, declaration></jsp:>
+
+	HtmlOption_JavaScript = 1 << (8 + 4),	// eScriptJS
+	HtmlOption_VBScript = 2 << (8 + 4),		// eScriptVBS
+
+	HtmlOption_HtmlBase = HtmlOption_AllowScript | HtmlOption_AllowStyle | HtmlOption_AllowASP,
+	HtmlOption_HtmlDefault = HtmlOption_HtmlBase | HtmlOption_JavaScript,
+	HtmlOption_HtmlVBScript = HtmlOption_HtmlBase | HtmlOption_VBScript,
+	HtmlOption_XmlDefault = HtmlOption_IsXML | HtmlOption_JavaScript,
+	HtmlOption_JspBase = HtmlOption_AllowScript | HtmlOption_AllowStyle | HtmlOption_AllowJSPEL | HtmlOption_JavaScript,
+};
+
+}
 
 #define STYLESMODIFIED_NONE			0
 #define STYLESMODIFIED_SOME_STYLE	1
@@ -1434,13 +1458,6 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) noexcept {
 
 		int dialect = 0;
 		switch (rid) {
-		//case NP2LEX_HTML:
-		//case NP2LEX_XML:
-		//	//SciCall_SetProperty("fold.html", "1");
-		//	//SciCall_SetProperty("fold.hypertext.comment", "1");
-		//	//SciCall_SetProperty("fold.hypertext.heredoc", "1");
-		//	break;
-
 		case NP2LEX_ACTIONSCRIPT: // enable ECMAScript For XML
 		case NP2LEX_APDL: // see LexAPDL.cxx
 		case NP2LEX_ELIXIR: // see LexErlang.cxx
@@ -1463,6 +1480,17 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) noexcept {
 
 		case NP2LEX_CSV:
 			dialect = iCsvOption;
+			break;
+
+		case NP2LEX_HTML:
+			dialect = HtmlOption_HtmlDefault;
+			if (np2LexLangIndex == IDM_LEXER_ASPX_VB || np2LexLangIndex == IDM_LEXER_ASP_VBS) {
+				dialect = HtmlOption_HtmlVBScript;
+			} else if (np2LexLangIndex == IDM_LEXER_JSP) {
+				dialect = HtmlOption_JspBase | HtmlOption_AllowASP;
+			} else if (np2LexLangIndex == IDM_LEXER_JSPX) {
+				dialect = HtmlOption_JspBase | HtmlOption_AllowJSPX | HtmlOption_IsXML;
+			}
 			break;
 
 		case NP2LEX_JAVASCRIPT: {
@@ -1493,6 +1521,13 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) noexcept {
 			static_assert(IDM_LEXER_VBS - IDM_LEXER_VBNET == 2);
 			dialect = np2LexLangIndex - IDM_LEXER_VBNET;
 		} break;
+
+		case NP2LEX_XML:
+			dialect = HtmlOption_XmlDefault;
+			if (np2LexLangIndex == IDM_LEXER_SVG) {
+				dialect = HtmlOption_XmlDefault | HtmlOption_AllowStyle;
+			}
+			break;
 		}
 
 		if (dialect > 0) {
@@ -1783,16 +1818,21 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) noexcept {
 			SciCall_CopyStyles(STYLE_LINK, MULTI_STYLE(SCE_REBOL_URL, SCE_REBOL_EMAIL, 0, 0));
 			break;
 
+		case NP2LEX_HTML:
+		case NP2LEX_XML:
 		case NP2LEX_MARKDOWN:
 		case NP2LEX_PHP:
-			if (!IsStyleLoaded(&lexHTML)) {
-				Style_LoadOne(&lexHTML);
-			}
 			if (rid == NP2LEX_MARKDOWN) {
 				SciCall_CopyStyles(STYLE_LINK, MULTI_STYLE(SCE_MARKDOWN_PLAIN_LINK, SCE_MARKDOWN_PAREN_LINK, SCE_MARKDOWN_ANGLE_LINK, 0));
 			} else {
-				Style_SetAllStyle(&lexJavaScript, SCE_PHP_LABEL + 1);
-				Style_SetAllStyle(&lexCSS, SCE_PHP_LABEL + SCE_JS_LABEL + 2);
+				Style_SetAllStyle(&lexJavaScript, SCE_STYLE_OFFSET_JS);
+				Style_SetAllStyle(&lexCSS, SCE_STYLE_OFFSET_CSS);
+			}
+			if (rid == NP2LEX_HTML || rid == NP2LEX_XML) {
+				break;
+			}
+			if (!IsStyleLoaded(&lexHTML)) {
+				Style_LoadOne(&lexHTML);
 			}
 			szValue = lexHTML.szStyleBuf;
 			for (UINT i = 1; i < lexHTML.iStyleCount; i++) {
@@ -1977,8 +2017,7 @@ PEDITLEXER Style_SniffShebang(char *pchText) noexcept {
 }
 
 void Style_SniffCSV() noexcept {
-	const Sci_Line lines = SciCall_GetLineCount();
-	const Sci_Position endPos = SciCall_PositionFromLine(min<Sci_Line>(lines, 2));
+	const Sci_Position endPos = SciCall_PositionFromLine(2);
 	const char *ptr = SciCall_GetRangePointer(0, endPos);
 	if (ptr == nullptr) { // empty document
 		return;
@@ -2447,6 +2486,8 @@ static void Style_UpdateLexerLang(LPCEDITLEXER pLex, LPCWSTR lpszExt, LPCWSTR lp
 	case NP2LEX_HTML:
 		if (StrCaseEqual(L"jsp", lpszExt)) {
 			np2LexLangIndex = IDM_LEXER_JSP;
+		} else if (StrCaseEqual(L"jspx", lpszExt)) {
+			np2LexLangIndex = IDM_LEXER_JSPX;
 		} else if (StrCaseEqual(L"aspx", lpszExt)) {
 			np2LexLangIndex = Style_GetDocTypeLanguage();
 			if (np2LexLangIndex == 0) {
@@ -2498,8 +2539,8 @@ static void Style_UpdateLexerLang(LPCEDITLEXER pLex, LPCWSTR lpszExt, LPCWSTR lp
 			np2LexLangIndex = IDM_LEXER_DTD;
 		} else if (StrCaseEqual(L"plist", lpszExt)) {
 			np2LexLangIndex = IDM_LEXER_PROPERTY_LIST;
-		//} else if (StrCaseEqual(L"svg", lpszExt)) {
-		//	np2LexLangIndex = IDM_LEXER_SVG;
+		} else if (StrCaseEqual(L"svg", lpszExt)) {
+			np2LexLangIndex = IDM_LEXER_SVG;
 		}
 		break;
 	}
@@ -2701,9 +2742,9 @@ bool Style_SetLexerFromFile(LPCWSTR lpszFile) noexcept {
 					}
 				}
 			}
-			if (pLexNew && (pLexNew->iLexer == SCLEX_HTML || pLexNew->iLexer == SCLEX_XML)) {
+			if (pLexNew && (pLexNew->iLexer == SCLEX_HTML)) {
 				np2LexLangIndex = Style_GetDocTypeLanguage();
-				if (pLexNew->iLexer == SCLEX_XML && np2LexLangIndex == IDM_LEXER_WEB) {
+				if (pLexNew->rid == NP2LEX_XML && np2LexLangIndex == IDM_LEXER_WEB) {
 					// xhtml: <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html>
 					pLexNew = &lexHTML;
 				}
@@ -2847,6 +2888,7 @@ void Style_SetLexerByLangIndex(int lang) noexcept {
 	// Web Source Code
 	case IDM_LEXER_WEB:
 	case IDM_LEXER_JSP:
+	case IDM_LEXER_JSPX:
 	case IDM_LEXER_ASPX_CS:
 	case IDM_LEXER_ASPX_VB:
 	case IDM_LEXER_ASP_VBS:
@@ -2899,7 +2941,7 @@ void Style_SetLexerByLangIndex(int lang) noexcept {
 	case IDM_LEXER_XSLT:
 	case IDM_LEXER_DTD:
 	case IDM_LEXER_PROPERTY_LIST:
-	//case IDM_LEXER_SVG:
+	case IDM_LEXER_SVG:
 		if (lang == IDM_LEXER_XML) {
 			np2LexLangIndex = Style_GetDocTypeLanguage();
 		}
@@ -3362,8 +3404,8 @@ bool Style_StrGetSize(LPCWSTR lpszStyle, int *size) noexcept {
 	return false;
 }
 
-// https://docs.microsoft.com/en-us/windows/desktop/api/wingdi/ns-wingdi-taglogfontw
-// https://docs.microsoft.com/en-us/windows/desktop/api/dwrite/ne-dwrite-dwrite_font_weight
+// https://learn.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-logfontw
+// https://learn.microsoft.com/en-us/windows/win32/api/dwrite/ne-dwrite-dwrite_font_weight
 #define MIN_FONT_WEIGHT		0
 #define MAX_FONT_WEIGHT		1000
 bool Style_StrGetFontWeight(LPCWSTR lpszStyle, int *weight) noexcept {

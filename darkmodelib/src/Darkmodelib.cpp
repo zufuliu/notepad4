@@ -1026,11 +1026,10 @@ void dmlib::setSysColor(int nIndex, COLORREF color)
 	dmlib_hook::setMySysColor(nIndex, color);
 }
 /**
- * @brief Updates custom color brushes for ChooseFont and ChooseColor dialogs.
+ * @brief Updates custom color brush for ChooseColor dialog.
  */
 void dmlib::updateCommonDlgsBrushes()
 {
-	dmlib_hook::updateFontBrush();
 	dmlib_hook::updateLumSliderBrush();
 }
 

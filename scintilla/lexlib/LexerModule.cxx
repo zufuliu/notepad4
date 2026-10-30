@@ -104,7 +104,6 @@ extern const LexerModule lmVim;
 extern const LexerModule lmVisualBasic;
 extern const LexerModule lmWASM;
 extern const LexerModule lmWinHex;
-extern const LexerModule lmXML;
 extern const LexerModule lmYAML;
 extern const LexerModule lmZig;
 
@@ -191,7 +190,6 @@ const LexerModule * const lexerCatalogue[] = {
 	&lmVisualBasic,
 	&lmWASM,
 	&lmWinHex,
-	&lmXML,
 	&lmYAML,
 	&lmZig,
 

@@ -169,8 +169,9 @@ int findPrevLexeme(const LexAccessor &styler, Sci_PositionU &bk, int &style) noe
 	while (bk > 0) {	// find extent of lexeme
 		if (styler.StyleAt(bk - 1) == style) {
 			bk--; sz++;
-		} else
+		} else {
 			break;
+		}
 	}
 	return sz;
 }
@@ -219,8 +220,9 @@ int styleCheckIdentifier(LexAccessor &styler, Sci_PositionU bk) noexcept {
 			// test for "->" and "::"
 			if (styler.Match(bk - 1, "->") || styler.Match(bk - 1, "::"))
 				return 2;
-		} else
+		} else {
 			return 3;	// bare identifier
+		}
 		bk--;
 	}
 	return 0;
@@ -277,13 +279,15 @@ bool styleCheckSubPrototype(LexAccessor &styler, Sci_PositionU bk) {
 				if (len2 == 9 && styler.Match(pos2, "prototype")) {	// ':' 'prototype'
 					if (state == SUB_BEGIN) {
 						state = SUB_HAS_PROTO;
-					} else
+					} else {
 						break;
+					}
 				} else {	// ':' <attribute>
 					if (state == SUB_HAS_PROTO || state == SUB_HAS_ATTRIB) {
 						state = SUB_HAS_ATTRIB;
-					} else
+					} else {
 						break;
+					}
 				}
 			} else
 				break;
@@ -291,27 +295,31 @@ bool styleCheckSubPrototype(LexAccessor &styler, Sci_PositionU bk) {
 			styler.Match(pos1, "::")) {	// '::'
 			if (style2 == SCE_PL_IDENTIFIER) {	// '::' <identifier>
 				state = SUB_HAS_MODULE;
-			} else
+			} else {
 				break;
+			}
 		} else if ((style1 == SCE_PL_WORD || style1 == SCE_PL_IDENTIFIER) &&
 				((len1 == 3 && styler.Match(pos1, "sub")) || 	// 'sub'
 				(len1 == 6 && styler.Match(pos1, "method")))) {	// or 'method
 			if (style2 == SCE_PL_IDENTIFIER) {	// ('sub' | 'method') <identifier>
 				state = SUB_HAS_SUB;
-			} else
+			} else {
 				break;
-		} else
+			}
+		} else {
 			break;
+		}
 		bk = pos1;			// set position for finding next lexeme pair
 		if (bk > 0) bk--;
 	} while (state != SUB_HAS_SUB);
 	return (state == SUB_HAS_SUB);
 }
 
-int actualNumStyle(int numberStyle) noexcept {
+constexpr int actualNumStyle(int numberStyle) noexcept {
 	if (numberStyle == PERLNUM_VECTOR || numberStyle == PERLNUM_V_VECTOR) {
 		return SCE_PL_STRING_DQ;
-	} else if (numberStyle == PERLNUM_BAD) {
+	}
+	if (numberStyle == PERLNUM_BAD) {
 		return SCE_PL_ERROR;
 	}
 	return SCE_PL_NUMBER;
@@ -354,7 +362,8 @@ int InputSymbolScan(StyleContext &sc) noexcept {
 	while ((c = sc.GetRelativeCharacter(++sLen)) != 0) {
 		if (c == '\r' || c == '\n') {
 			return 0;
-		} else if (c == '>') {
+		}
+		if (c == '>') {
 			if (sc.Match('<', '=', '>'))	// '<=>' case
 				return 0;
 			return sLen;
@@ -410,8 +419,9 @@ void InterpolateSegment(StyleContext &sc, int maxSeg, bool isPattern = false) {
 			if (braces) {
 				if ((maxSeg > sLen) && (sc.GetRelativeCharacter(sLen) == '}')) {	// } end for {word}
 					sLen++;
-				} else
+				} else {
 					isVar = false;
+				}
 			}
 		}
 		if (!isVar && (maxSeg > 1)) {	// $- or @-specific variable patterns
@@ -728,13 +738,13 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 					} else if (numState == PERLNUM_HEX) {
 						if (dotCount <= 1 && IsHexDigit(sc.chNext)) {
 							break;	// hex with one dot is a hex float
-						} else {
-							sc.SetState(SCE_PL_OPERATOR);
-							break;
 						}
-						// hex then dot (go through)
-					} else if (IsADigit(sc.chNext))	// vectors
+						sc.SetState(SCE_PL_OPERATOR);
 						break;
+						// hex then dot (go through)
+					} else if (IsADigit(sc.chNext)) {	// vectors
+						break;
+					}
 					// vector then dot (go through)
 				}
 			} else if (sc.ch == '_') {
@@ -747,8 +757,9 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 						sc.Forward();
 					}
 					break;
-				} else if (IsADigit(sc.ch))
+				} else if (IsADigit(sc.ch)) {
 					break;
+				}
 				// number then word (go through)
 			} else if (numState == PERLNUM_HEX) {
 				if (sc.ch == 'P' || sc.ch == 'p') {	// hex float exponent, sign
@@ -757,8 +768,9 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 						sc.Forward();
 					}
 					break;
-				} else if (IsHexDigit(sc.ch))
+				} else if (IsHexDigit(sc.ch)) {
 					break;
+				}
 				// hex or hex float then word (go through)
 			} else if (numState == PERLNUM_VECTOR || numState == PERLNUM_V_VECTOR) {
 				if (IsADigit(sc.ch))	// vector
@@ -845,11 +857,8 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 							sc.Forward();
 						}
 						if (sc.ch != '\r') {	// skip CR if CRLF
-							int i = 0;			// else append char, possibly an extended char
-							while (i < sc.width) {
-								HereDoc.Append(sc.GetRelative(i));
-								i++;
-							}
+							// else append char, possibly an extended char
+							HereDoc.Append(sc.ch);
 						}
 					}
 				} else { // an unquoted here-doc delimiter, no extended charsets
@@ -910,11 +919,9 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				if (endType == 1) {
 					sc.Forward();
 					// \ at end-of-line does not appear to have any effect, skip
-					if (sc.ch != '\r' && sc.ch != '\n')
-						sc.Forward();
-				} else if (endType == 2) {
-					if (!sc.atLineEnd)
-						sc.Forward();
+				}
+				if (!sc.atLineEnd) {
+					sc.Forward();
 				}
 			}
 			break;
@@ -941,8 +948,9 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 					}
 					if (pod == SCE_PL_POD) {	// truncate verbatim POD early
 						sc.SetState(SCE_PL_POD);
-					} else
+					} else {
 						fw = fw2;
+					}
 				}
 			} else {
 				if (pod == SCE_PL_POD_VERB	// still part of current paragraph
@@ -982,8 +990,9 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 							Quote.Rep--;
 							break;
 						}
-					} else if (c == Quote.Up)
+					} else if (c == Quote.Up) {
 						Quote.Count++;
+					}
 					sLen++;
 				}
 				if (sLen > 0) {	// process non-empty segments
@@ -1022,8 +1031,9 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 							// Keep going
 						} else if (c == '#' && IsASpaceOrTab(sc.GetRelativeCharacter(sLen - 1))) {
 							endType = 3;
-						} else
+						} else {
 							Quote.Open(c);
+						}
 						break;
 					} else if (c == Quote.Down) {
 						Quote.Count--;
@@ -1037,20 +1047,23 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 							break;
 					} else if (c == Quote.Up) {
 						Quote.Count++;
-					} else if (IsASpace(c))
+					} else if (IsASpace(c)) {
 						break;
+					}
 					sLen++;
 				}
 				if (sLen > 0) {	// process non-empty segments
 					if (sc.state == SCE_PL_REGSUBST && Quote.Up != '\'') {
 						InterpolateSegment(sc, sLen, isPattern);
-					} else		// non-interpolated path
+					} else {		// non-interpolated path
 						sc.Forward(sLen);
+					}
 				}
 				if (endType == 2) {
 					sc.Forward();
-				} else if (endType == 3)
+				} else if (endType == 3) {
 					sc.SetState(SCE_PL_DEFAULT);
+				}
 			}
 			break;
 		case SCE_PL_STRING_Q:
@@ -1077,8 +1090,9 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 						if (Quote.Count == 0) {
 							endType = 3; break;
 						}
-					} else if (c == Quote.Up)
+					} else if (c == Quote.Up) {
 						Quote.Count++;
+					}
 					sLen++;
 				}
 				if (sLen > 0) {	// process non-empty segments
@@ -1102,8 +1116,9 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				}
 				if (endType == 2) {
 					sc.Forward();
-				} else if (endType == 3)
+				} else if (endType == 3) {
 					sc.ForwardSetState(SCE_PL_DEFAULT);
+				}
 			}
 			break;
 		case SCE_PL_SUB_PROTOTYPE: {
@@ -1122,7 +1137,7 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 		}
 		break;
 		case SCE_PL_FORMAT: {
-			sc.Complete();
+			// sc.Complete();
 			if (sc.ch == '.') {
 				sc.Forward();
 				if (sc.atLineEnd || (sc.ch == '\r' && sc.chNext == '\n'))
@@ -1133,6 +1148,9 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 		}
 		break;
 		case SCE_PL_ERROR:
+			if (sc.MatchLineEnd()) {
+				sc.SetState(SCE_PL_DEFAULT);
+			}
 			break;
 		}
 		// Needed for specific continuation styles (one follows the other)
@@ -1170,7 +1188,7 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 		}
 
 		// Must check end of HereDoc states here before default state is handled
-		if (HereDoc.State == 1 && sc.atLineEnd) {
+		if (HereDoc.State == 1 && sc.MatchLineEnd()) {
 			// Begin of here-doc (the line after the here-doc delimiter):
 			// Lexically, the here-doc starts from the next line after the >>, but the
 			// first line of here-doc seem to follow the style of the last EOL sequence
@@ -1199,7 +1217,7 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 			}
 			sc.SetState(st_new);
 		}
-		if (HereDoc.State == 3 && sc.atLineEnd) {
+		if (HereDoc.State == 3 && sc.MatchLineEnd()) {
 			// Start of format body.
 			HereDoc.State = 0;
 			sc.SetState(SCE_PL_FORMAT);
@@ -1535,7 +1553,7 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				sc.SetState(SCE_PL_DATASECTION);
 			} else {
 				// keep colouring defaults
-				sc.Complete();
+				// sc.Complete();
 			}
 		}
 	}

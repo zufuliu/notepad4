@@ -809,7 +809,6 @@ typedef sptr_t (*SciFnDirectStatus)(sptr_t ptr, unsigned int iMessage, uptr_t wP
 #define SCI_BRACEBADLIGHT 2352
 #define SCI_BRACEBADLIGHTINDICATOR 2499
 #define SCI_BRACEMATCH 2353
-#define SCI_BRACEMATCHNEXT 2369
 #define SCI_GETVIEWEOL 2355
 #define SCI_SETVIEWEOL 2356
 #define SCI_GETDOCPOINTER 2357
@@ -957,6 +956,10 @@ typedef sptr_t (*SciFnDirectStatus)(sptr_t ptr, unsigned int iMessage, uptr_t wP
 #define SCI_SETLENGTHFORENCODE 2448
 #define SCI_ENCODEDFROMUTF8 2449
 #define SCI_FINDCOLUMN 2456
+#define SC_COLUMN_DEFAULT 0
+#define SC_COLUMN_CHARACTER 1
+#define SC_COLUMN_BYTE 2
+#define SCI_FINDCOLUMNEX 2759
 #define SC_CARETSTICKY_OFF 0
 #define SC_CARETSTICKY_ON 1
 #define SC_CARETSTICKY_WHITESPACE 2

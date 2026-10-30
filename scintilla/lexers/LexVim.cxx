@@ -82,7 +82,7 @@ void ColouriseVimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 	int logicalVisibleChars = 0;
 	KeywordType kwType = KeywordType::None;
 	bool preferRegex = false;
-	bool insideRegexRange = false; // inside regex character range []
+	bool insideRegexCharacterClass = false; // inside regex character class []
 	EscapeSequence escSeq;
 
 	StyleContext sc(startPos, lengthDoc, initStyle, styler);
@@ -188,8 +188,8 @@ void ColouriseVimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			} else if (sc.ch == '\\') {
 				sc.Forward();
 			} else if (sc.ch == '[' || sc.ch == ']') {
-				insideRegexRange = sc.ch == '[';
-			} else if (sc.ch == '/' && !insideRegexRange) {
+				insideRegexCharacterClass = sc.ch == '[';
+			} else if (sc.ch == '/' && !insideRegexCharacterClass) {
 				sc.ForwardSetState(SCE_VIM_DEFAULT);
 			}
 			break;
@@ -248,7 +248,7 @@ void ColouriseVimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 					sc.ForwardSetState(SCE_VIM_OPERATOR);
 				}
 			} else if (sc.ch == '/' && preferRegex && !IsEOLChar(sc.chNext)) {
-				insideRegexRange = false;
+				insideRegexCharacterClass = false;
 				sc.SetState(SCE_VIM_REGEX);
 			} else if (IsAGraphic(sc.ch)) {
 				sc.SetState(SCE_VIM_OPERATOR);

@@ -22,7 +22,19 @@ static const char * const Keywords_HTML[] = {
 "false finally for function get globalThis if import in instanceof let new null of return set static super switch "
 "this throw true try typeof undefined var void while with yield "
 
-, // 3 VBScript
+, // 3 JavaScript directive
+"__dirname __filename as export exports from import module require "
+
+, // 4 JavaScript class
+"ActiveXObject AggregateError Array ArrayBuffer AsyncFunction AsyncGeneratorFunction Atomics "
+"BigInt BigInt64Array BigUint64Array Boolean DataView Date Debug Document Enumerator Error EvalError EventTarget "
+"FinalizationRegistry Float16Array Float32Array Float64Array FormData Function GeneratorFunction "
+"Int16Array Int32Array Int8Array Iterator JSON Map Math Number Object Promise Proxy "
+"RangeError ReferenceError Reflect RegExp Set SharedArrayBuffer String Symbol SyntaxError TypeError "
+"URIError Uint16Array Uint32Array Uint8Array Uint8ClampedArray VBArray WScript WeakMap WeakRef WeakSet Worker "
+"XMLHttpRequest "
+
+, // 5 VBScript
 "Alias And As Attribute Begin Boolean ByRef Byte ByVal Call Case Char Class Compare Const Continue Currency "
 "Decimal Declare Default Dim Do Double "
 "Each Else ElseIf Empty End EndIf Enum Eqv Erase Error Event Execute ExecuteGlobal Exit Explicit "
@@ -32,11 +44,11 @@ static const char * const Keywords_HTML[] = {
 "Select Set Shared Single Static Step Stop String Sub Then To True Type TypeOf Unload Until Variant "
 "Wend While With WithEvents Xor "
 
-, // 4 SGML
+, // 6 SGML
 "ANY ATTLIST CDATA DOCTYPE ELEMENT EMPTY ENTITIES ENTITY FIXED ID IDREF IDREFS IGNORE IMPLIED INCLUDE "
 "NDATA NMTOKEN NMTOKENS NOTATION PCDATA PUBLIC REQUIRED SGML SYSTEM doctype "
 
-, // 5 attribute
+, // 7 attribute
 "^aria- ^data- "
 "abbr accept accept-charset accesskey action align alink allow allowfullscreen allowtransparency alpha alt archive "
 "as async autocapitalize autocomplete autocorrect autofocus autoplay axis "
@@ -77,7 +89,7 @@ static const char * const Keywords_HTML[] = {
 "valign value valuetype version vlink vocab vspace width wrap writingsuggestions "
 "xml:base xml:lang xmlns xmlns:xsi xsi:schemaLocation "
 
-, // 6 value
+, // 8 value
 "GET POST UTF-8 _blank _parent _self _top "
 "about allow-downloads allow-forms allow-modals allow-orientation-lock "
 "allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts "
@@ -123,25 +135,13 @@ static const EDITSTYLE Styles_HTML[] = {
 	{ MULTI_STYLE(SCE_H_ASP, SCE_H_ASPAT, 0, 0), NP2StyleX_ASPTag, L"bold; fore:#8B008B" },
 	{ SCE_H_QUESTION, NP2StyleX_PHPTag, L"bold; fore:#8B008B" },
 
-	// JavaScript
-	{ MULTI_STYLE(SCE_HJ_START, SCE_HJ_DEFAULT, SCE_HJA_START, SCE_HJA_DEFAULT), NP2StyleX_JSDefault, L"" },
-	{ MULTI_STYLE(SCE_HJ_KEYWORD, SCE_HJA_KEYWORD, 0, 0), NP2StyleX_JSKeyword, L"bold; fore:#FF8000" },
-	{ MULTI_STYLE(SCE_HJ_COMMENT, SCE_HJ_COMMENTLINE, SCE_HJA_COMMENT, SCE_HJA_COMMENTLINE), NP2StyleX_JSComment, L"fore:#608060" },
-	{ MULTI_STYLE(SCE_HJ_COMMENTDOC, SCE_HJA_COMMENTDOC, 0, 0), NP2StyleX_JSDocComment, L"fore:#408040" },
-	{ MULTI_STYLE(SCE_HJ_DOUBLESTRING, SCE_HJ_SINGLESTRING, SCE_HJA_DOUBLESTRING, SCE_HJA_SINGLESTRING), NP2StyleX_JSString, L"fore:#008000" },
-	// omited styles: SCE_HJ_STRINGEOL, SCE_HJA_STRINGEOL => backslash before line ending for string continuation
-	{ MULTI_STYLE(SCE_HJ_TEMPLATELITERAL, SCE_HJA_TEMPLATELITERAL, 0, 0), NP2StyleX_JSTemplateLiteral, L"fore:#F08000" },
-	{ MULTI_STYLE(SCE_HJ_REGEX, SCE_HJA_REGEX, 0, 0), NP2StyleX_JSRegex, L"fore:#006633; back:#FFF1A8" },
-	{ MULTI_STYLE(SCE_HJ_NUMBER, SCE_HJA_NUMBER, 0, 0), NP2StyleX_JSNumber, L"fore:#FF0000" },
-	{ MULTI_STYLE(SCE_HJ_SYMBOLS, SCE_HJA_SYMBOLS, 0, 0), NP2StyleX_JSOperator, L"fore:#B000B0" },
-
 	// VBS
-	{ MULTI_STYLE(SCE_HB_START, SCE_HB_DEFAULT, SCE_HBA_START, SCE_HBA_DEFAULT), NP2StyleX_VBSDefault, L"" },
-	{ MULTI_STYLE(SCE_HB_WORD, SCE_HBA_WORD, 0, 0), NP2StyleX_VBSKeyword, L"bold; fore:#FF8000" },
-	{ MULTI_STYLE(SCE_HB_COMMENTLINE, SCE_HBA_COMMENTLINE, 0, 0), NP2StyleX_VBSComment, L"fore:#608060" },
-	{ MULTI_STYLE(SCE_HB_STRING, SCE_HB_STRINGEOL, SCE_HBA_STRING, SCE_HBA_STRINGEOL), NP2StyleX_VBSString, L"fore:#008000" },
-	{ MULTI_STYLE(SCE_HB_NUMBER, SCE_HBA_NUMBER, 0, 0), NP2StyleX_VBSNumber, L"fore:#FF0000" },
-	{ MULTI_STYLE(SCE_HB_OPERATOR, SCE_HBA_OPERATOR, 0, 0), NP2StyleX_VBSOperator, L"fore:#B000B0" },
+	{ SCE_HB_DEFAULT, NP2StyleX_VBSDefault, L"" },
+	{ SCE_HB_WORD, NP2StyleX_VBSKeyword, L"bold; fore:#FF8000" },
+	{ SCE_HB_COMMENTLINE, NP2StyleX_VBSComment, L"fore:#608060" },
+	{ SCE_HB_STRING, NP2StyleX_VBSString, L"fore:#008000" },
+	{ SCE_HB_NUMBER, NP2StyleX_VBSNumber, L"fore:#FF0000" },
+	{ SCE_HB_OPERATOR, NP2StyleX_VBSOperator, L"fore:#B000B0" },
 };
 
 EDITLEXER lexHTML = {
@@ -152,22 +152,24 @@ EDITLEXER lexHTML = {
 		TAB_WIDTH_2, INDENT_WIDTH_2,
 		(1 << 0) | (1 << 1) | (1 << 2) | (1 << 3), // level1, level2, level13, level4
 		0,
-		'\\', 0, 0,
+		'\\', css_style(SCE_CSS_ESCAPECHAR), 0,
 		0,
 		0, 0,
-		0, 0
+		css_style(SCE_CSS_OPERATOR), SCE_HB_OPERATOR
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // tag
 		| KeywordAttr32(1, KeywordAttr_PreSorted | KeywordAttr_NoAutoComp) // void tag
 		| KeywordAttr32(2, KeywordAttr_PreSorted | KeywordAttr_NoAutoComp) // JavaScript
-		| KeywordAttr32(3, KeywordAttr_MakeLower | KeywordAttr_PreSorted | KeywordAttr_NoAutoComp) // VBScript
-		| KeywordAttr32(4, KeywordAttr_PreSorted) // SGML
-		| KeywordAttr32(5, KeywordAttr_PreSorted) // attribute
-		| KeywordAttr32(6, KeywordAttr_NoLexer) // value
+		| KeywordAttr32(3, KeywordAttr_PreSorted | KeywordAttr_NoAutoComp) // JavaScript directive
+		| KeywordAttr32(4, KeywordAttr_PreSorted | KeywordAttr_NoAutoComp) // JavaScript class
+		| KeywordAttr32(5, KeywordAttr_MakeLower | KeywordAttr_PreSorted | KeywordAttr_NoAutoComp) // VBScript
+		| KeywordAttr32(6, KeywordAttr_PreSorted) // SGML
+		| KeywordAttr64(7, KeywordAttr_PreSorted) // attribute
+		| KeywordAttr64(8, KeywordAttr_NoLexer) // value
 		, 0,
 		0, 0,
 //Settings--Autogenerated -- end of section automatically generated
 	EDITLEXER_HOLE(L"Web Source Code", Keywords_HTML, Styles_HTML),
-	L"html; htm; shtml; xhtml; asp; aspx; jsp; rhtml; vue; hbs; svelte; mht; htd; htt; hta; htc; cfm; tpl; jd",
+	L"html; htm; shtml; xhtml; asp; aspx; asax; ascx; cshtml; vbhtml; razor; jsp; jspf; jspx; rhtml; vue; hbs; svelte; mht; htd; htt; hta; htc; cfm; tpl; jd",
 	Keywords_HTML,
 	Styles_HTML
 };

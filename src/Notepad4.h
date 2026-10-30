@@ -56,14 +56,13 @@ enum MatchTextFlag {
 };
 
 //==== Data Type for WM_COPYDATA ==============================================
-#define DATA_NOTEPAD4_PARAMS 0xFB10
 struct NP2PARAMS {
 	bool	flagFileSpecified;
 	bool	flagReadOnlyMode;
 	bool	flagLexerSpecified;
 	bool	flagQuietCreate;
 	bool	flagTitleExcerpt;
-	bool	flagJumpTo;
+	unsigned	flagJumpTo;
 	TripleBoolean	flagChangeNotify;
 	int		iInitialLexer;
 	Sci_Line		iInitialLine;
@@ -74,6 +73,8 @@ struct NP2PARAMS {
 	MatchTextFlag flagMatchText;
 	WCHAR wchData;
 };
+//! increase this value when change layout for NP2PARAMS
+#define DATA_NOTEPAD4_PARAMS (0xFB10 + sizeof(NP2PARAMS))
 
 //==== Toolbar Style ==========================================================
 #define WS_TOOLBAR (WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS |				\
@@ -269,7 +270,7 @@ struct EditFileIOStatus {
 	int iEOLMode;		// load output
 
 	bool bFileTooBig;	// load output
-	bool bUnicodeErr;	// load output
+	bool bUnicodeError;	// load output
 	bool bBinaryFile;	// load output
 	bool bCancelDataLoss;// save output
 
@@ -296,6 +297,7 @@ enum FileSaveFlag {
 	FileSaveFlag_EndSession = 16,
 	FileSaveFlag_Untitled = 32,
 	FileSaveFlag_OriginalTimestamp = 64,
+	FileSaveFlag_UpdateTimestamp = 128,
 };
 
 bool FileIO(bool fLoad, LPWSTR pszFile, FileSaveFlag flag, EditFileIOStatus &status) noexcept;

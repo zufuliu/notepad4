@@ -171,6 +171,7 @@ BEGIN
 		MENUITEM "Propr&iétés...",					IDM_FILE_PROPERTIES
 		MENUITEM "Ouvrir le répertoire du &fichier",		IDM_FILE_OPEN_CONTAINING_FOLDER
 		MENUITEM "Créer un lien sur le bureau",			IDM_FILE_CREATELINK
+		MENUITEM "Update File Time",				IDM_FILE_UPDATE_TIMESTAMP
 		MENUITEM SEPARATOR
 		MENUITEM "Parc&ourir...\tCtrl+M",				IDM_FILE_BROWSE
 		POPUP "&Favoris"
@@ -529,6 +530,7 @@ BEGIN
 			MENUITEM "Code source Web",			IDM_LEXER_WEB
 			MENUITEM "&Page PHP",					IDM_LEXER_PHP
 			MENUITEM "&Page JSP",					IDM_LEXER_JSP
+			MENUITEM "JSP &XML",					IDM_LEXER_JSPX
 			MENUITEM "ASP.NET (&C#)",				IDM_LEXER_ASPX_CS
 			MENUITEM "ASP.NET (&VB.NET)",			IDM_LEXER_ASPX_VB
 			MENUITEM "ASP (V&BScript)",				IDM_LEXER_ASP_VBS
@@ -568,7 +570,7 @@ BEGIN
 			MENUITEM "Feuille de style XSLT",			IDM_LEXER_XSLT
 			MENUITEM "DTD XML",					IDM_LEXER_DTD
 			MENUITEM "Liste de propriétés",				IDM_LEXER_PROPERTY_LIST
-			//MENUITEM "Document SV&G",				IDM_LEXER_SVG
+			MENUITEM "Document SV&G",				IDM_LEXER_SVG
 		END
 	END
 	POPUP "&Réglages"

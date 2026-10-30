@@ -1846,9 +1846,11 @@ bool SelectDefLineEndingDlg(HWND hwnd) noexcept {
 	return iResult == IDOK;
 }
 
+extern HWND hDlgWarnLineEnding;
 static INT_PTR CALLBACK WarnLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept {
 	switch (umsg) {
 	case WM_INITDIALOG: {
+		hDlgWarnLineEnding = hwnd;
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
 		const EditFileIOStatus * const status = AsPointer<EditFileIOStatus *>(lParam);
 
@@ -1889,6 +1891,7 @@ static INT_PTR CALLBACK WarnLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 			EditFileIOStatus *status = AsPointer<EditFileIOStatus *>(GetWindowLongPtr(hwnd, DWLP_USER));
 			const int iEOLMode = static_cast<int>(SendDlgItemMessage(hwnd, IDC_EOLMODELIST, CB_GETCURSEL, 0, 0));
 			status->iEOLMode = GetScintillaEOLMode(iEOLMode);
+			status->bInconsistent = true;
 			bWarnLineEndings = IsButtonChecked(hwnd, IDC_WARNINCONSISTENTEOLS);
 			EndDialog(hwnd, IDOK);
 		}
@@ -1904,10 +1907,10 @@ static INT_PTR CALLBACK WarnLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 	return FALSE;
 }
 
-bool WarnLineEndingDlg(HWND hwnd, EditFileIOStatus *status) noexcept {
+void WarnLineEndingDlg(HWND hwnd, EditFileIOStatus *status) noexcept {
 	MessageBeep(MB_ICONEXCLAMATION);
-	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_WARNLINEENDS), hwnd, WarnLineEndingDlgProc, AsInteger<LPARAM>(status));
-	return iResult == IDOK;
+	ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_WARNLINEENDS), hwnd, WarnLineEndingDlgProc, AsInteger<LPARAM>(status));
+	hDlgWarnLineEnding = nullptr;
 }
 
 void InitZoomLevelComboBox(HWND hwnd, int nCtlId, int zoomLevel) noexcept {

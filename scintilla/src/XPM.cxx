@@ -99,7 +99,8 @@ XPM::XPM(const char *const *linesForm) {
 void XPM::Init(const char *textForm) {
 	// Test done is two parts to avoid possibility of overstepping the memory
 	// if memcmp implemented strangely. Must be 4 bytes at least at destination.
-	if ((0 == memcmp(textForm, "/* X", 4)) && (0 == memcmp(textForm, "/* XPM */", 9))) {
+	constexpr size_t lengthXPMMarker = 9;
+	if ((0 == memcmp(textForm, "/* X", 4)) && (0 == memcmp(textForm, "/* XPM */", lengthXPMMarker))) {
 		// Build the lines form out of the text form
 		std::vector<const char *> linesForm = LinesFormFromTextForm(textForm);
 		if (!linesForm.empty()) {
@@ -151,7 +152,7 @@ void XPM::Init(const char *const *linesForm) {
 		const char *lform = linesForm[y + nColours + 1];
 		const size_t len = MeasureLength(lform);
 		for (size_t x = 0; x < len; x++) {
-			pixels[y * width + x] = lform[x];
+			pixels[(y * width) + x] = lform[x];
 		}
 	}
 }
@@ -161,13 +162,13 @@ void XPM::Draw(Surface *surface, PRectangle rc) {
 		return;
 	}
 	// Centre the pixmap
-	const int startY = static_cast<int>(rc.top + (rc.Height() - height) / 2);
-	const int startX = static_cast<int>(rc.left + (rc.Width() - width) / 2);
+	const int startY = static_cast<int>(rc.top + ((rc.Height() - height) / 2));
+	const int startX = static_cast<int>(rc.left + ((rc.Width() - width) / 2));
 	for (int y = 0; y < height; y++) {
 		int prevCode = 0;
 		int xStartRun = 0;
 		for (int x = 0; x < width; x++) {
-			const int code = pixels[y * width + x];
+			const int code = pixels[(y * width) + x];
 			if (code != prevCode) {
 				FillRun(surface, prevCode, startX + xStartRun, startY + y, startX + x);
 				xStartRun = x;
@@ -181,9 +182,9 @@ void XPM::Draw(Surface *surface, PRectangle rc) {
 ColourRGBA XPM::PixelAt(int x, int y) const noexcept {
 	if (pixels.empty() || !IsPixelIndex(x, width) || !IsPixelIndex(y, height)) {
 		// Out of bounds -> transparent black
-		return ColourRGBA(0, 0, 0, 0);
+		return {};
 	}
-	const int code = pixels[y * width + x];
+	const int code = pixels[(y * width) + x];
 	return ColourFromCode(code);
 }
 
@@ -252,7 +253,7 @@ const unsigned char *RGBAImage::Pixels() const noexcept {
 }
 
 void RGBAImage::SetPixel(int x, int y, ColourRGBA colour) noexcept {
-	unsigned char *pixel = pixelBytes.data() + (y*width + x) * 4;
+	unsigned char *pixel = pixelBytes.data() + ((y*width) + x) * 4;
 	// RGBA
 	pixel[0] = colour.GetRed();
 	pixel[1] = colour.GetGreen();

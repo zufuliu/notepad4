@@ -1086,7 +1086,7 @@ bool EditLoadFile(LPWSTR pszFile, EditFileIOStatus &status) noexcept {
 		if (cbData == 0) {
 			const UINT legacyACP = mEncoding[CPI_DEFAULT].uCodePage;
 			cbData = WideCharToMultiByte(legacyACP, 0, pszTextW, -1, lpDataUTF8, size, nullptr, nullptr);
-			status.bUnicodeErr = true;
+			status.bUnicodeError = true;
 		}
 		if (cbData != 0) {
 			// remove the NULL terminator.
@@ -1148,23 +1148,6 @@ bool EditSaveFile(LPCWSTR pszFile, int saveFlag, EditFileIOStatus &status) noexc
 					   FILE_ATTRIBUTE_NORMAL,
 					   nullptr);
 	dwLastIOError = GetLastError();
-
-	// failure could be due to missing attributes (Windows 2000, XP)
-	if (hFile == INVALID_HANDLE_VALUE) {
-		DWORD dwAttributes = GetFileAttributes(pszFile);
-		if (dwAttributes != INVALID_FILE_ATTRIBUTES) {
-			dwAttributes = dwAttributes & (FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM);
-			hFile = CreateFile(pszFile,
-							   GENERIC_READ | GENERIC_WRITE,
-							   FILE_SHARE_READ | FILE_SHARE_WRITE,
-							   nullptr,
-							   OPEN_ALWAYS,
-							   FILE_ATTRIBUTE_NORMAL | dwAttributes,
-							   nullptr);
-			dwLastIOError = GetLastError();
-		}
-	}
-
 	if (hFile == INVALID_HANDLE_VALUE) {
 		return false;
 	}
@@ -1176,7 +1159,7 @@ bool EditSaveFile(LPCWSTR pszFile, int saveFlag, EditFileIOStatus &status) noexc
 		}
 	}
 
-	if (!(saveFlag & FileSaveFlag_EndSession) && !bReadOnlyMode) {
+	if (!(saveFlag & (FileSaveFlag_EndSession | FileSaveFlag_UpdateTimestamp)) && !bReadOnlyMode) {
 		// ensure consistent line endings
 		if (bFixLineEndings) {
 			EditEnsureConsistentLineEndings();
@@ -1195,7 +1178,7 @@ bool EditSaveFile(LPCWSTR pszFile, int saveFlag, EditFileIOStatus &status) noexc
 	UINT uFlags = mEncoding[iEncoding].uFlags;
 
 	// get content and convert encoding
-	if (cbData != 0) {
+	if (cbData != 0 && !(saveFlag & FileSaveFlag_UpdateTimestamp)) {
 		if (cbData >= MAX_NON_UTF8_SIZE) {
 			// save as UTF-8 or ANSI
 			if (!(uFlags & (NCP_DEFAULT | NCP_UTF8))) {
@@ -1266,8 +1249,9 @@ bool EditSaveFile(LPCWSTR pszFile, int saveFlag, EditFileIOStatus &status) noexc
 	}
 
 	// write content
-	{
-		BOOL bWriteSuccess = SetEndOfFile(hFile);
+	BOOL bWriteSuccess = FALSE;
+	if (!(saveFlag & FileSaveFlag_UpdateTimestamp)) {
+		bWriteSuccess = SetEndOfFile(hFile);
 		DWORD dwBytesWritten;
 		// write encoding BOM
 		DWORD bom;
@@ -1288,16 +1272,24 @@ bool EditSaveFile(LPCWSTR pszFile, int saveFlag, EditFileIOStatus &status) noexc
 			dwLastIOError = GetLastError();
 			NP2HeapFree(lpData);
 		}
-		if (saveFlag & FileSaveFlag_OriginalTimestamp) {
-			SetFileInformationByHandle(hFile, FileBasicInfo, &timestamp, sizeof(timestamp));
+	}
+
+	if (saveFlag & FileSaveFlag_OriginalTimestamp) {
+		if (saveFlag & FileSaveFlag_UpdateTimestamp) {
+#if _WIN32_WINNT >= _WIN32_WINNT_WIN8
+			GetSystemTimePreciseAsFileTime(reinterpret_cast<FILETIME *>(&timestamp.LastWriteTime));
+#else
+			GetSystemTimeAsFileTime(reinterpret_cast<FILETIME *>(&timestamp.LastWriteTime));
+#endif
 		}
-		CloseHandle(hFile);
-		if (bWriteSuccess) {
-			if (!(saveFlag & FileSaveFlag_SaveCopy)) {
-				SciCall_SetSavePoint();
-			}
-			return true;
+		SetFileInformationByHandle(hFile, FileBasicInfo, &timestamp, sizeof(timestamp));
+	}
+	CloseHandle(hFile);
+	if (bWriteSuccess) {
+		if (!(saveFlag & FileSaveFlag_SaveCopy)) {
+			SciCall_SetSavePoint();
 		}
+		return true;
 	}
 
 	return false;
@@ -3029,7 +3021,7 @@ void EditAlignText(EditAlignMode nMode) noexcept {
 			}
 
 			++iLineEndPos;
-			const Sci_Position iEndCol = SciCall_GetColumn(iLineEndPos);
+			const Sci_Position iEndCol = SciCall_GetColumn(iLineEndPos, iLine);
 			const Sci_Position iIndentCol = SciCall_GetLineIndentation(iLine);
 			iMinIndent = min(iMinIndent, iIndentCol);
 			iMaxLength = max(iMaxLength, iEndCol);
@@ -3327,7 +3319,7 @@ void EditToggleLineComments(LPCWSTR pwszComment, int commentFlag) noexcept {
 			const Sci_Position iLineIndentPos = SciCall_GetLineIndentPosition(iLine);
 
 			if (iLineIndentPos != iLineEndPos) {
-				const Sci_Position iIndentColumn = SciCall_GetColumn(iLineIndentPos);
+				const Sci_Position iIndentColumn = SciCall_GetColumn(iLineIndentPos, iLine);
 				iCommentCol = min(iCommentCol, iIndentColumn);
 			}
 		}
@@ -3466,7 +3458,7 @@ void EditPadWithSpaces(bool bSkipEmpty, bool bNoUndoGroup) noexcept {
 
 		for (Sci_Line iLine = iLineStart; iLine <= iLineEnd; iLine++) {
 			const Sci_Position iPos = SciCall_GetLineEndPosition(iLine);
-			iMaxColumn = max(iMaxColumn, SciCall_GetColumn(iPos));
+			iMaxColumn = max(iMaxColumn, SciCall_GetColumn(iPos, iLine));
 		}
 	} else {
 		const Sci_Position iCurPos = SciCall_GetCurrentPos();
@@ -3475,8 +3467,8 @@ void EditPadWithSpaces(bool bSkipEmpty, bool bNoUndoGroup) noexcept {
 		iRcCurLine = SciCall_LineFromPosition(iCurPos);
 		iRcAnchorLine = SciCall_LineFromPosition(iAnchorPos);
 
-		iRcCurCol = SciCall_GetColumn(iCurPos);
-		iRcAnchorCol = SciCall_GetColumn(iAnchorPos);
+		iRcCurCol = SciCall_GetColumn(iCurPos, iRcCurLine);
+		iRcAnchorCol = SciCall_GetColumn(iAnchorPos, iRcAnchorLine);
 
 		iLineStart = 0;
 		iLineEnd = SciCall_GetLineCount() - 1;
@@ -3484,7 +3476,7 @@ void EditPadWithSpaces(bool bSkipEmpty, bool bNoUndoGroup) noexcept {
 		for (Sci_Line iLine = iLineStart; iLine <= iLineEnd; iLine++) {
 			const Sci_Position iPos = SciCall_GetLineSelEndPosition(iLine);
 			if (iPos >= 0) {
-				iMaxColumn = max(iMaxColumn, SciCall_GetColumn(iPos));
+				iMaxColumn = max(iMaxColumn, SciCall_GetColumn(iPos, iLine));
 			}
 		}
 	}
@@ -3511,7 +3503,7 @@ void EditPadWithSpaces(bool bSkipEmpty, bool bNoUndoGroup) noexcept {
 				continue;
 			}
 
-			const Sci_Position iPadLen = iMaxColumn - SciCall_GetColumn(iPos);
+			const Sci_Position iPadLen = iMaxColumn - SciCall_GetColumn(iPos, iLine);
 
 			SciCall_SetTargetRange(iPos, iPos);
 			SciCall_ReplaceTarget(iPadLen, pmszPadStr);
@@ -4092,8 +4084,8 @@ void EditSortLines(EditSortFlag iSortFlags) noexcept {
 		iRcCurLine = SciCall_LineFromPosition(iCurPos);
 		iRcAnchorLine = SciCall_LineFromPosition(iAnchorPos);
 
-		iRcCurCol = SciCall_GetColumn(iCurPos);
-		iRcAnchorCol = SciCall_GetColumn(iAnchorPos);
+		iRcCurCol = SciCall_GetColumn(iCurPos, iRcCurLine);
+		iRcAnchorCol = SciCall_GetColumn(iAnchorPos, iRcAnchorLine);
 
 		iLineStart = min(iRcCurLine, iRcAnchorLine);
 		iLineEnd = max(iRcCurLine, iRcAnchorLine);
@@ -4308,15 +4300,21 @@ void EditSortLines(EditSortFlag iSortFlags) noexcept {
 //
 // EditJumpTo()
 //
-void EditJumpTo(Sci_Line iNewLine, Sci_Position iNewCol) noexcept {
+NP2_noinline
+void EditJumpTo(Sci_Line iNewLine, Sci_Position iNewCol, unsigned type) noexcept {
 	// Jumpt to end with line set to -1
 	if (iNewLine < 0 || iNewLine > SciCall_GetLineCount()) {
 		iNewCol = SciCall_GetLength();
 	} else {
-		--iNewLine;
-		const Sci_Position iLineEndPos = SciCall_GetLineEndPosition(iNewLine);
-		iNewCol = min(iNewCol, iLineEndPos);
-		iNewCol = SciCall_FindColumn(iNewLine, iNewCol - 1);
+		iNewLine = iNewLine? iNewLine - 1 : iNewLine;
+		if (iNewCol < 0) { // treat negative column as no tab expansion
+			type = SC_COLUMN_CHARACTER;
+			iNewCol = -iNewCol - 1;
+		} else {
+			iNewCol = iNewCol - 1;
+		}
+		const Sci_CharacterRangeFull chrg {iNewLine, iNewCol};
+		iNewCol = SciCall_FindColumnEx(type, &chrg);
 	}
 
 	EditSelectEx(iNewCol, iNewCol);
@@ -4327,6 +4325,7 @@ void EditJumpTo(Sci_Line iNewLine, Sci_Position iNewCol) noexcept {
 //
 // EditSelectEx()
 //
+NP2_noinline
 void EditSelectEx(Sci_Position iAnchorPos, Sci_Position iCurrentPos) noexcept {
 	const Sci_Line iNewLine = SciCall_LineFromPosition(iCurrentPos);
 
@@ -6023,7 +6022,7 @@ static INT_PTR CALLBACK EditLineNumDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 			// directly goto specific position
 			if (fTranslated2 && !fTranslated) {
 				if (iNewCol > 0 && iNewCol <= iLength) {
-					--iNewCol;
+					iNewCol = SciCall_PositionBefore(iNewCol);
 					EditSelectEx(iNewCol, iNewCol);
 					SciCall_ChooseCaretX();
 					EndDialog(hwnd, IDOK);
@@ -6320,7 +6319,7 @@ static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam
 						if (*pwCur == L'>' && pwCur[-1] != L'/') {
 							wchIns[cchIns] = L' ';
 							wchIns[cchIns + 1] = L'\0';
-							if (cchIns > 3 && cchIns < 15 && (pLexCurrent->iLexer != SCLEX_XML)) {
+							if (cchIns > 3 && cchIns < 15 && (pLexCurrent->rid != NP2LEX_XML)) {
 								char tag[16]; // HTML void tag except <p>
 #if NP2_USE_SSE2
 								const __m128i *mm = reinterpret_cast<const __m128i *>(wchIns);
@@ -7076,7 +7075,7 @@ void EditOpenSelection(OpenSelectionType type) {
 
 			LPWSTR lpParameters = link;
 			if (line != nullptr) {
-				// TODO: improve the code when column is actually character index
+				// TODO: detect whether `column` is actually column or character index
 				lpParameters = static_cast<LPWSTR>(NP2HeapAlloc(sizeof(path)));
 				wsprintf(lpParameters, L"-g %s,%s %s", line, column, link);
 			}
@@ -7975,7 +7974,7 @@ void EditGotoBlock(int menu) noexcept {
 	}
 
 	if (iLine >= 0 && iLine != iCurLine) {
-		const Sci_Position column = SciCall_GetColumn(iCurPos);
+		const Sci_Position column = SciCall_GetColumn(iCurPos, iCurLine);
 		EditJumpTo(iLine + 1, column + 1);
 	}
 }

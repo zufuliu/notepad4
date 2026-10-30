@@ -4,8 +4,6 @@ PROJ = matepath
 NAME = $(BINFOLDER)/$(PROJ).exe
 OBJDIR = $(BINFOLDER)/obj/$(PROJ)
 SRCDIR = ../../$(PROJ)/src
-# for Win32 XP build
-LDLIBS += -lpsapi
 
 # c_src = $(wildcard $(SRCDIR)/*.c)
 # c_obj = $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.obj,$(c_src))

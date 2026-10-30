@@ -220,7 +220,7 @@ static int	iOpacityLevel		= 75;
 static bool	flagPosParam		= false;
 
 static inline bool HasFilter() noexcept {
-	return !StrEqualEx(tchFilter, L"*.*") || bNegFilter;
+	return bNegFilter || !StrEqualEx(tchFilter, L"*.*");
 }
 
 //=============================================================================
@@ -324,11 +324,15 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 #endif
 #if _WIN32_WINNT < _WIN32_WINNT_VISTA
 	// Set the Windows version global variable
+	OSVERSIONINFOW version;
+	version.dwOSVersionInfoSize = sizeof(version);
+	version.dwMajorVersion = 0;
+	version.dwMinorVersion = 0;
 	NP2_COMPILER_WARNING_PUSH
 	NP2_IGNORE_WARNING_DEPRECATED_DECLARATIONS
-	g_uWinVer = LOWORD(GetVersion());
+	GetVersionEx(&version);
 	NP2_COMPILER_WARNING_POP
-	g_uWinVer = MAKEWORD(HIBYTE(g_uWinVer), LOBYTE(g_uWinVer));
+	g_uWinVer = (version.dwMajorVersion << 8) | version.dwMinorVersion;
 #endif
 
 	g_hDefaultHeap = GetProcessHeap();
@@ -586,14 +590,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		SendMessage(hwndToolbar, WM_SYSCOLORCHANGE, wParam, lParam);
 		const LRESULT lret = DefWindowProc(hwnd, umsg, wParam, lParam);
 
-		COLORREF color = GetSysColor(COLOR_WINDOWTEXT);
-		if (HasFilter()) {
-			color = bDefColorFilter ? color : colorFilter;
-		} else {
-			color = bDefColorNoFilter ? color : colorNoFilter;
-		}
-		ListView_SetTextColor(hwndDirList, color);
-		ListView_RedrawItems(hwndDirList, 0, ListView_GetItemCount(hwndDirList) - 1);
+		DarkMode_SetFileListViewColor(hwndDirList, true);
 		return lret;
 	}
 
@@ -674,7 +671,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 	case WM_COPYDATA: {
 		PCOPYDATASTRUCT pcds = AsPointer<PCOPYDATASTRUCT>(lParam);
 
-		if (pcds->dwData == DATA_MATEPATH_PATHARG) {
+		if (pcds->dwData == DATA_MATEPATH_PATHARG && pcds->cbData > MAX_PATH*sizeof(WCHAR)) {
 			LPCWSTR lpsz = static_cast<LPCWSTR>(pcds->lpData);
 			DisplayPath(lpsz, IDS_ERR_CMDLINE);
 		}
@@ -1071,7 +1068,7 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	DWORD dwExStyle = GetWindowExStyle(hwndDirList);
 	if (IsAppThemed()) {
 		dwExStyle &= ~WS_EX_CLIENTEDGE;
-		SetWindowTheme(hwndDirList, (bFullRowSelect ? L"Explorer" : L"Listview"), nullptr);
+		DarkMode_SetFileListViewTheme(hwndDirList, bFullRowSelect);
 	} else {
 		dwExStyle |= WS_EX_CLIENTEDGE;
 	}
@@ -2234,15 +2231,8 @@ bool ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, bool bUpdateHistory) {
 		GetCurrentDirectory(COUNTOF(szCurDir), szCurDir);
 		SetWindowPathTitle(hwnd, szCurDir);
 
-		COLORREF color = GetSysColor(COLOR_WINDOWTEXT);
-		const bool has = HasFilter();
-		if (has) {
-			color = bDefColorFilter ? color : colorFilter;
-		} else {
-			color = bDefColorNoFilter ? color : colorNoFilter;
-		}
-		Toolbar_SetButtonImage(hwndToolbar, IDT_VIEW_FILTER, (has ? TB_DEL_FILTER_BMP : TB_ADD_FILTER_BMP));
-		ListView_SetTextColor(hwndDirList, color);
+		const bool hasFilter = DarkMode_SetFileListViewColor(hwndDirList, false);
+		Toolbar_SetButtonImage(hwndToolbar, IDT_VIEW_FILTER, (hasFilter ? TB_DEL_FILTER_BMP : TB_ADD_FILTER_BMP));
 
 		const int cItems = DirList_Fill(hwndDirList, szCurDir, dwFillMask, tchFilter, bNegFilter, flagNoFadeHidden, nSortFlags, fSortRev);
 		DirList_StartIconThread(hwndDirList);
