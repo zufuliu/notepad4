@@ -90,7 +90,7 @@ bool IsYAMLText(StyleContext &sc, int braceCount, LexerWordList keywordLists) {
 }
 
 bool IsYAMLTextBlockEnd(int state, int &indentCount, int textIndentCount,
-	Sci_Position pos, Sci_Position lineStartNext, LexAccessor &styler) noexcept {
+	Sci_Position pos, Sci_Position lineStartNext, const LexAccessor &styler) noexcept {
 	const Sci_Position endPos = styler.Length();
 	do {
 		char ch = '\n';

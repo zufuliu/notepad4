@@ -108,7 +108,7 @@ constexpr bool IsFormatSpecifier(char ch) noexcept {
 }
 
 // https://search.r-project.org/R/refmans/base/html/sprintf.html
-Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &styler, bool insideUrl) noexcept {
+Sci_Position CheckFormatSpecifier(const StyleContext &sc, const LexAccessor &styler, bool insideUrl) noexcept {
 	if (sc.chNext == '%') {
 		return 2;
 	}

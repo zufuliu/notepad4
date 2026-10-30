@@ -250,7 +250,7 @@ void SetFoldInPreprocessorLevelFlag(int &lineFoldStateCurrent, unsigned int nest
 	lineFoldStateCurrent |= nestLevel & stateFoldInPreprocessorLevelMask;
 }
 
-void ClassifyPascalPreprocessorFoldPoint(int &levelCurrent, int &lineFoldStateCurrent, Sci_PositionU startPos, LexAccessor &styler) noexcept {
+void ClassifyPascalPreprocessorFoldPoint(int &levelCurrent, int &lineFoldStateCurrent, Sci_PositionU startPos, const LexAccessor &styler) noexcept {
 	const CharacterSet setWord(CharacterSet::setAlpha);
 
 	char s[16];	// Size of the longest possible keyword + one additional character + null
@@ -276,7 +276,7 @@ void ClassifyPascalPreprocessorFoldPoint(int &levelCurrent, int &lineFoldStateCu
 
 void ClassifyPascalWordFoldPoint(const CharacterSet &setWord, int &levelCurrent, int &lineFoldStateCurrent,
 	Sci_Position startPos, Sci_PositionU endPos,
-	Sci_PositionU lastStart, Sci_PositionU currentPos, LexAccessor &styler) noexcept {
+	Sci_PositionU lastStart, Sci_PositionU currentPos, const LexAccessor &styler) noexcept {
 	char s[16];
 
 	styler.GetRangeLowered(lastStart, currentPos + 1, s, sizeof(s));

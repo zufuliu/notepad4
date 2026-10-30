@@ -98,7 +98,7 @@ bool isPerlKeyword(const LexAccessor &styler, Sci_PositionU start, Sci_PositionU
 	return keywords.InList(s);
 }
 
-int disambiguateBareword(LexAccessor &styler, Sci_PositionU bk, Sci_PositionU fw,
+int disambiguateBareword(const LexAccessor &styler, Sci_PositionU bk, Sci_PositionU fw,
 	int backFlag, Sci_PositionU backPos, Sci_PositionU endPos) noexcept {
 	// identifiers are recognized by Perl as barewords under some
 	// conditions, the following attempts to do the disambiguation
@@ -176,7 +176,7 @@ int findPrevLexeme(const LexAccessor &styler, Sci_PositionU &bk, int &style) noe
 	return sz;
 }
 
-int styleBeforeBracePair(LexAccessor &styler, Sci_PositionU bk) noexcept {
+int styleBeforeBracePair(const LexAccessor &styler, Sci_PositionU bk) noexcept {
 	// backtrack to find open '{' corresponding to a '}', balanced
 	// return significant style to be tested for '/' disambiguation
 	int braceCount = 1;
@@ -203,7 +203,7 @@ int styleBeforeBracePair(LexAccessor &styler, Sci_PositionU bk) noexcept {
 	return SCE_PL_DEFAULT;
 }
 
-int styleCheckIdentifier(LexAccessor &styler, Sci_PositionU bk) noexcept {
+int styleCheckIdentifier(const LexAccessor &styler, Sci_PositionU bk) noexcept {
 	// backtrack to classify sub-styles of identifier under test
 	// return sub-style to be tested for '/' disambiguation
 	if (styler.SafeGetCharAt(bk) == '>')	// inputsymbol, like <foo>
@@ -228,7 +228,7 @@ int styleCheckIdentifier(LexAccessor &styler, Sci_PositionU bk) noexcept {
 	return 0;
 }
 
-int podLineScan(LexAccessor &styler, Sci_PositionU &pos, Sci_PositionU endPos) noexcept {
+int podLineScan(const LexAccessor &styler, Sci_PositionU &pos, Sci_PositionU endPos) noexcept {
 	// forward scan the current line to classify line for POD style
 	int state = -1;
 	while (pos < endPos) {
@@ -338,7 +338,7 @@ constexpr int opposite(int ch) noexcept {
 	return ch;
 }
 
-bool IsPackageLine(LexAccessor &styler, Sci_Line line) noexcept {
+bool IsPackageLine(const LexAccessor &styler, Sci_Line line) noexcept {
 	const Sci_Position pos = styler.LineStart(line);
 	const int style = styler.StyleAt(pos);
 	if (style == SCE_PL_WORD && styler.Match(pos, "package")) {
@@ -347,7 +347,7 @@ bool IsPackageLine(LexAccessor &styler, Sci_Line line) noexcept {
 	return false;
 }
 
-int PodHeadingLevel(LexAccessor &styler, Sci_Position pos) noexcept {
+int PodHeadingLevel(const LexAccessor &styler, Sci_Position pos) noexcept {
 	const int lvl = styler.SafeGetUCharAt(pos + 5);
 	if (lvl >= '1' && lvl <= '4') {
 		return lvl - '0';
@@ -355,7 +355,7 @@ int PodHeadingLevel(LexAccessor &styler, Sci_Position pos) noexcept {
 	return 0;
 }
 
-int InputSymbolScan(StyleContext &sc) noexcept {
+int InputSymbolScan(const StyleContext &sc) noexcept {
 	// forward scan for matching > on same line; file handles
 	int c;
 	int sLen = 0;

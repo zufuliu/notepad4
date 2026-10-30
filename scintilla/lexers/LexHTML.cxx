@@ -109,7 +109,7 @@ constexpr uint8_t kHtmlCharClass[256] = {
 // Put an upper limit to bound time taken for unexpected text.
 constexpr Sci_PositionU maxLengthCheck = 200;
 
-int GetDocNextChar(int chNext, Sci_Position startPos, LexAccessor &styler) noexcept {
+int GetDocNextChar(int chNext, Sci_Position startPos, const LexAccessor &styler) noexcept {
 	if (!IsWhiteSpace(chNext)) {
 		return chNext;
 	}
@@ -504,7 +504,7 @@ struct InterpolatingState {
 };
 
 SCI_noinline
-bool IsHtmlComment(int ch, Sci_Position i, LexAccessor &styler) noexcept {
+bool IsHtmlComment(int ch, Sci_Position i, const LexAccessor &styler) noexcept {
 	const unsigned char chNext2 = styler.SafeGetCharAt(i + 2);
 	return (ch == '-' && chNext2 == '>')
 		|| (ch == '<' && chNext2 == '-' && styler.SafeGetCharAt(i + 3) == '-');

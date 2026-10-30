@@ -41,7 +41,7 @@ constexpr int GetStringQuote(int state) noexcept {
 	return state*5 + 4;
 }
 
-bool IsJsonProperty(LexAccessor &styler, Sci_PositionU startPos, uint8_t chNext) noexcept {
+bool IsJsonProperty(const LexAccessor &styler, Sci_PositionU startPos, uint8_t chNext) noexcept {
 	if (chNext == ':') {
 		return true;
 	}

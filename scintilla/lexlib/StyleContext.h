@@ -135,14 +135,14 @@ public:
 #if 0
 	[[deprecated]]
 	int GetRelativeChar(Sci_Position n, char chDefault) const noexcept {
-		return styler.SafeGetCharAt(currentPos + n, chDefault);
+		return styler.SafeGetUCharAt(currentPos + n, chDefault);
 	}
 	[[deprecated]]
 	int GetRelative(Sci_Position n, char chDefault) const noexcept {
 		return styler.SafeGetUCharAt(currentPos + n, chDefault);
 	}
 #endif
-	int GetRelativeCharacter(Sci_Position n) noexcept {
+	int GetRelativeCharacter(Sci_Position n) const noexcept {
 		if (n == 0) {
 			return ch;
 		}
@@ -300,6 +300,6 @@ public:
 
 bool HighlightTaskMarker(StyleContext &sc, int &visibleChars, int visibleCharsBefore, int markerStyle);
 
-bool IsCppInDefine(LexAccessor &styler, Sci_Position currentPos) noexcept;
+bool IsCppInDefine(const LexAccessor &styler, Sci_Position currentPos) noexcept;
 
 }

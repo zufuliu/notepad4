@@ -123,7 +123,7 @@ constexpr bool IsDateTimeFormatSpecifier(char ch) noexcept {
 		'R', 'T', 'r', 'D', 'F', 'c'); // date/time
 }
 
-Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &styler, bool insideUrl) noexcept {
+Sci_Position CheckFormatSpecifier(const StyleContext &sc, const LexAccessor &styler, bool insideUrl) noexcept {
 	if (sc.chNext == '%') {
 		return 2;
 	}
@@ -176,7 +176,7 @@ Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &styler, b
 	return 0;
 }
 
-inline bool MatchSealed(LexAccessor &styler, Sci_PositionU pos) noexcept {
+inline bool MatchSealed(const LexAccessor &styler, Sci_PositionU pos) noexcept {
 	if (styler.Match(pos, "ealed")) {
 		const uint8_t ch = styler[pos + CStrLen("ealed")];
 		return ch <= ' ' || ch == '/'; // space or comment

@@ -162,7 +162,7 @@ constexpr bool IsFormatSpecifier(char ch) noexcept {
 }
 
 // https://dlang.org/phobos/std_format.html
-Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &styler, bool insideUrl) noexcept {
+Sci_Position CheckFormatSpecifier(const StyleContext &sc, const LexAccessor &styler, bool insideUrl) noexcept {
 	if (sc.chNext == '%' || sc.chNext == '(' || sc.chNext == '|' || sc.chNext == ')') {
 		return 2;
 	}

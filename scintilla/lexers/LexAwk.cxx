@@ -125,7 +125,7 @@ constexpr bool IsTimeFormatSpecifier(int ch, char chNext) noexcept {
 		|| (ch == 'O' && AnyOf(chNext, 'd', 'e', 'H', 'I', 'm', 'M', 'S', 'u', 'U', 'V', 'w', 'W', 'y'));
 }
 
-Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &styler, bool insideUrl) noexcept {
+Sci_Position CheckFormatSpecifier(const StyleContext &sc, const LexAccessor &styler, bool insideUrl) noexcept {
 	if (sc.chNext == '%') {
 		return 2;
 	}

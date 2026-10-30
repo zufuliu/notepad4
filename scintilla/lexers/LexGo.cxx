@@ -114,7 +114,7 @@ constexpr bool IsFormatSpecifier(char ch) noexcept {
 					'x', 'X');
 }
 
-Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &styler, bool insideUrl) noexcept {
+Sci_Position CheckFormatSpecifier(const StyleContext &sc, const LexAccessor &styler, bool insideUrl) noexcept {
 	if (sc.chNext == '%') {
 		return 2;
 	}
@@ -191,7 +191,7 @@ Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &styler, b
 	return 0;
 }
 
-inline int DetectIdentifierType(LexAccessor &styler, GoFunction funcState, int chNext, Sci_Position startPos, Sci_Position lineStartCurrent) noexcept {
+inline int DetectIdentifierType(const LexAccessor &styler, GoFunction funcState, int chNext, Sci_Position startPos, Sci_Position lineStartCurrent) noexcept {
 	if (((funcState == GoFunction::Caller || funcState == GoFunction::Return) && (chNext == ')' || chNext == ','))
 		|| (funcState > GoFunction::Name && chNext == '{')) {
 		// func (identifier *Type) (Type, error)

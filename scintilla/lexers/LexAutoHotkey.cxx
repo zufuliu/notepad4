@@ -157,7 +157,7 @@ constexpr bool IsFormatSpecifier(char ch) noexcept {
 					'x', 'X');
 }
 
-inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &styler) noexcept {
+inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, const LexAccessor &styler) noexcept {
 	if (sc.chNext == '}') {
 		return 2;
 	}
@@ -238,7 +238,7 @@ bool HighlightBrace(StyleContext &sc, int &outerStyle) {
 	return false;
 }
 
-inline bool ScanHotKey(const StyleContext &sc, LexAccessor &styler, Sci_PositionU &length) noexcept {
+inline bool ScanHotKey(const StyleContext &sc, const LexAccessor &styler, Sci_PositionU &length) noexcept {
 	char chPrev = '\0';
 	int count = 1;
 	int modifier = 1;

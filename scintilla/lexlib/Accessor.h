@@ -44,12 +44,14 @@ public:
 		return *reinterpret_cast<const uint32_t *>(GetProperty(key, N - 1));
 	}
 
-	int IndentAmount(Sci_Line line) noexcept;
+	int IndentAmount(Sci_Line line) const noexcept;
 
+#if 0
 	[[deprecated]]
-	int IndentAmount(Sci_Line line, [[maybe_unused]] int *flags, [[maybe_unused]] PFNIsCommentLeader pfnIsCommentLeader = nullptr) noexcept {
+	int IndentAmount(Sci_Line line, [[maybe_unused]] int *flags, [[maybe_unused]] PFNIsCommentLeader pfnIsCommentLeader = nullptr) const noexcept {
 		return IndentAmount(line);
 	}
+#endif
 };
 
 }

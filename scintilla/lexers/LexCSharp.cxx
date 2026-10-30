@@ -159,7 +159,7 @@ constexpr bool IsInvalidFormatSpecifier(int ch) noexcept {
 	return (ch >= '\0' && ch < ' ') || ch == '\"' || ch == '{' || ch == '}';
 }
 
-inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &styler) noexcept {
+inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, const LexAccessor &styler) noexcept {
 	Sci_PositionU pos = sc.currentPos;
 	char ch = styler[pos];
 	// [,alignment]

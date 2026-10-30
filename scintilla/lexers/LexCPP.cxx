@@ -707,7 +707,7 @@ void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 	sc.Complete();
 }
 
-bool IsCppDefineLine(LexAccessor &styler, Sci_Line line, Sci_Position &DefinePos) noexcept {
+bool IsCppDefineLine(const LexAccessor &styler, Sci_Line line, Sci_Position &DefinePos) noexcept {
 	Sci_Position pos = styler.LineStart(line);
 	const Sci_Position endPos = styler.LineStart(line + 1) - 1;
 	pos = LexSkipSpaceTab(styler, pos, endPos);
@@ -725,7 +725,7 @@ bool IsCppDefineLine(LexAccessor &styler, Sci_Line line, Sci_Position &DefinePos
 }
 
 // also used in LexAsm.cxx
-bool Lexilla::IsCppInDefine(LexAccessor &styler, Sci_Position currentPos) noexcept {
+bool Lexilla::IsCppInDefine(const LexAccessor &styler, Sci_Position currentPos) noexcept {
 	Sci_Line line = styler.GetLine(currentPos);
 	Sci_Position pos;
 	if (IsCppDefineLine(styler, line, pos)) {
@@ -743,7 +743,7 @@ bool Lexilla::IsCppInDefine(LexAccessor &styler, Sci_Position currentPos) noexce
 
 namespace {
 
-bool IsCppFoldingLine(LexAccessor &styler, Sci_Line line, int kind) noexcept {
+bool IsCppFoldingLine(const LexAccessor &styler, Sci_Line line, int kind) noexcept {
 	if (line < 0) {
 		return false;
 	}
@@ -794,7 +794,7 @@ constexpr bool IsInnerCommentStyle(int style) noexcept {
 		|| style == SCE_C_COMMENTDOC_TAG
 		|| style == SCE_C_COMMENTDOC_TAG_XML;
 }
-bool IsOpenBraceLine(LexAccessor &styler, Sci_Line line) noexcept {
+bool IsOpenBraceLine(const LexAccessor &styler, Sci_Line line) noexcept {
 	// above line
 	Sci_Position startPos = styler.LineStart(line - 1);
 	Sci_Position endPos = styler.LineStart(line) - 1;
