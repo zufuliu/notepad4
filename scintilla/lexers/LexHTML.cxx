@@ -109,6 +109,7 @@ constexpr uint8_t kHtmlCharClass[256] = {
 // Put an upper limit to bound time taken for unexpected text.
 constexpr Sci_PositionU maxLengthCheck = 200;
 
+SCI_noinline
 int GetDocNextChar(int chNext, Sci_Position startPos, const LexAccessor &styler) noexcept {
 	if (!IsWhiteSpace(chNext)) {
 		return chNext;
@@ -455,6 +456,18 @@ int classifyWordHTVB(Sci_PositionU end, LexerWordList keywordLists, LexAccessor 
 		return SCE_HB_COMMENTLINE;
 	else
 		return SCE_HB_DEFAULT;
+}
+
+SCI_noinline
+int classifyWordSGML(Sci_PositionU end, LexerWordList keywordLists, LexAccessor &styler) {
+	int chAttr = SCE_H_SGML_ERROR;
+	char s[15 + 1];
+	styler.GetRange(styler.GetStartSegment(), end, s, sizeof(s));
+	if (keywordLists[KeywordIndex_SGML].InList(s)) {
+		chAttr = SCE_H_SGML_1ST_PARAM;
+		styler.ColorTo(end, SCE_H_SGML_COMMAND);
+	}
+	return chAttr;
 }
 
 // Return the first state to reach when entering a scripting language
@@ -860,14 +873,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			break;
 		case SCE_H_SGML_COMMAND:
 			if (!(kHtmlCharClass[ch] & HtmlCharMask_SGMLWordChar)) {
-				char s[15 + 1];
-				styler.GetRange(styler.GetStartSegment(), i, s, sizeof(s));
-				if (keywordLists[KeywordIndex_SGML].InList(s)) {
-					styler.ColorTo(i, state);
-					state = SCE_H_SGML_1ST_PARAM;
-				} else {
-					state = SCE_H_SGML_ERROR;
-				}
+				state = classifyWordSGML(i, keywordLists, styler);
 			}
 			break;
 		case SCE_H_SGML_1ST_PARAM:
@@ -1276,7 +1282,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			if (!((kHtmlCharClass[ch] & HtmlCharMask_IdentifierCharEx) || ch == '-')) {
 				state = classifyWordCSS(i, state, ch, chNext, styler, lexer);
 				levelCurrent += state >> 16;
-				chPrevNonWhite = state & 0xff;
+				stylePrevNonWhite = state & 0xff;
 				state = (state >> 8) & 0xff;
 			}
 			break;

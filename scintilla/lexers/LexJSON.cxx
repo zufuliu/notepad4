@@ -41,7 +41,7 @@ constexpr int GetStringQuote(int state) noexcept {
 	return state*5 + 4;
 }
 
-bool IsJsonProperty(const LexAccessor &styler, Sci_PositionU startPos, uint8_t chNext) noexcept {
+bool IsJsonProperty(uint8_t chNext, Sci_PositionU startPos, const LexAccessor &styler) noexcept {
 	if (chNext == ':') {
 		return true;
 	}
@@ -133,7 +133,7 @@ void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				buf[wordLen] = '\0';
 				if (keywordLists[0].InList(buf)) {
 					state = SCE_JSON_KEYWORD;
-				} else if (ch == ':' || (ch <= ' ' && IsJsonProperty(styler, startPos, chNext))) {
+				} else if (ch == ':' || (ch <= ' ' && IsJsonProperty(chNext, startPos, styler))) {
 					state = SCE_JSON_PROPERTYNAME;
 				}
 				styler.ColorTo(currentPos, state);
@@ -176,7 +176,7 @@ void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					continue;
 				}
 			} else if (ch == GetStringQuote(state)) {
-				if (chNext == ':' || IsJsonProperty(styler, startPos, chNext)) {
+				if (chNext == ':' || IsJsonProperty(chNext, startPos, styler)) {
 					state = SCE_JSON_PROPERTYNAME;
 				}
 				styler.ColorTo(startPos, state);
