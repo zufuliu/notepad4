@@ -2369,8 +2369,6 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	i = IDM_LINEENDINGS_CRLF + iCurrentEOLMode;
 	CheckMenuRadioItem(hmenu, IDM_LINEENDINGS_CRLF, IDM_LINEENDINGS_LF, i, MF_BYCOMMAND);
 
-	EnableCmd(hmenu, IDM_FILE_RECENT, (mruFile.iSize > 0));
-
 	EnableCmd(hmenu, IDM_EDIT_UNDO, SciCall_CanUndo());
 	EnableCmd(hmenu, IDM_EDIT_REDO, SciCall_CanRedo());
 
@@ -2902,24 +2900,21 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	break;
 
 	case IDT_FILE_OPENFAV:
-	case IDM_FILE_OPENFAV:
-		if (FileSave(FileSaveFlag_Ask)) {
-			WCHAR tchSelItem[MAX_PATH];
+	case IDM_FILE_OPENFAV: {
+		WCHAR tchSelItem[MAX_PATH];
+		if (FavoritesDlg(hwnd, tchSelItem)) {
+			PathGetLnkPath(tchSelItem, tchSelItem);
+			if (PathIsDirectory(tchSelItem)) {
+				WCHAR tchFile[MAX_PATH];
 
-			if (FavoritesDlg(hwnd, tchSelItem)) {
-				PathGetLnkPath(tchSelItem, tchSelItem);
-				if (PathIsDirectory(tchSelItem)) {
-					WCHAR tchFile[MAX_PATH];
-
-					if (OpenFileDlg(tchFile, COUNTOF(tchFile), tchSelItem)) {
-						FileLoad(FileLoadFlag_DontSave, tchFile);
-					}
-				} else {
-					FileLoad(FileLoadFlag_DontSave, tchSelItem);
+				if (OpenFileDlg(tchFile, COUNTOF(tchFile), tchSelItem)) {
+					FileLoad(FileLoadFlag_Default, tchFile);
 				}
+			} else {
+				FileLoad(FileLoadFlag_Default, tchSelItem);
 			}
 		}
-		break;
+	} break;
 
 	case IDT_FILE_ADDTOFAV:
 	case IDM_FILE_ADDTOFAV:
@@ -2948,16 +2943,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	}
 	break;
 
-	case IDM_FILE_RECENT:
-		if (mruFile.iSize > 0) {
-			if (FileSave(FileSaveFlag_Ask)) {
-				WCHAR tchFile[MAX_PATH];
-				if (FileMRUDlg(hwnd, tchFile)) {
-					FileLoad(FileLoadFlag_DontSave, tchFile);
-				}
-			}
+	case IDM_FILE_RECENT: {
+		WCHAR tchFile[MAX_PATH];
+		if (FileMRUDlg(hwnd, tchFile)) {
+			FileLoad(FileLoadFlag_Default, tchFile);
 		}
-		break;
+	} break;
 
 	case IDT_FILE_EXIT:
 	case IDM_FILE_EXIT:
@@ -4622,8 +4613,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 					if (IDYES == MsgBoxWarn(MB_YESNO, IDS_ERR_MRUDLG)) {
 						mruFile.DeleteFileFromStore(path, index);
 					}
-				} else if (FileSave(FileSaveFlag_Ask)) {
-					FileLoad(FileLoadFlag_DontSave, path);
+				} else {
+					FileLoad(FileLoadFlag_Default, path);
 				}
 			}
 		}
