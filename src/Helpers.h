@@ -1231,6 +1231,7 @@ enum {
 	MRUFlags_QuoteValue = 2,
 	MRUFlags_RelativePath = 4,
 	MRUFlags_PortableMyDocs = 8,
+	MRUStatus_Loaded = 16,
 };
 
 // num=path\0
@@ -1245,6 +1246,9 @@ struct MRUList {
 
 	bool Initialized() const noexcept {
 		return pszItems != nullptr;
+	}
+	bool Loaded() const noexcept {
+		return iFlags & MRUStatus_Loaded;
 	}
 	void Init(LPCWSTR pszRegKey, int capacity_, int flags, bool save) noexcept;
 	void Add(LPCWSTR pszNew) noexcept;

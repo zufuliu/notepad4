@@ -2343,6 +2343,7 @@ void ComboBox_AddStringA2W(UINT uCP, HWND hwnd, LPCSTR lpString) noexcept {
 //
 // MRU functions
 //
+NP2_noinline
 void MRUList::Init(LPCWSTR pszRegKey, int capacity_, int flags, bool save) noexcept {
 	iSize = 0;
 	capacity = capacity_;
@@ -2452,7 +2453,7 @@ void MRUList::Load() noexcept {
 	WCHAR * const pIniSectionBuf = section.Init(capacity, cchIniSection);
 	LoadIniSection(szRegKey, pIniSectionBuf, cchIniSection);
 	section.ParseArray(pIniSectionBuf, iFlags & MRUFlags_QuoteValue);
-	UINT n = 0;
+	UINT n = iSize;
 
 	for (UINT i = 0; i < section.count; i++) {
 		LPCWSTR tchItem = section.nodeList[i].value;
@@ -2467,6 +2468,7 @@ void MRUList::Load() noexcept {
 		}
 	}
 
+	iFlags |= MRUStatus_Loaded;
 	iSize = n;
 	section.Free();
 }

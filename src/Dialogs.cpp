@@ -861,13 +861,14 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 							  LVSIL_NORMAL);
 
 		// Update view
-		SendWMCommand(hwnd, IDC_FILEMRU_UPDATE_VIEW);
-		SetDlgItemInt(hwnd, IDC_MRU_COUNT_VALUE, iMaxRecentFiles, FALSE);
-
 		if (bSaveRecentFiles) {
 			CheckDlgButton(hwnd, IDC_SAVEMRU, BST_CHECKED);
+			if (!mruFile.Loaded()) {
+				mruFile.Load();
+			}
 		}
-
+		SendWMCommand(hwnd, IDC_FILEMRU_UPDATE_VIEW);
+		SetDlgItemInt(hwnd, IDC_MRU_COUNT_VALUE, iMaxRecentFiles, FALSE);
 		DarkMode_InitDialog(hwnd);
 	}
 	return TRUE;

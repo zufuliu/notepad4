@@ -1879,7 +1879,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 
 	// File MRU
 	const int flags = MRUFlags_FilePath | (static_cast<int>(flagRelativeFileMRU) * MRUFlags_RelativePath) | (static_cast<int>(flagPortableMyDocs) * MRUFlags_PortableMyDocs);
-	mruFile.Init(MRU_KEY_RECENT_FILES, iMaxRecentFiles, flags, bSaveRecentFiles);
+	mruFile.Init(MRU_KEY_RECENT_FILES, iMaxRecentFiles, flags, false);
 	return 0;
 }
 
@@ -4953,6 +4953,9 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			HMENU subMenu = nullptr;
 			if (lpTbNotify->iItem == IDT_FILE_OPEN) {
 				static_assert(IDM_RECENT_HISTORY_START + MRU_MAXITEMS == IDM_RECENT_HISTORY_END);
+				if (bSaveRecentFiles && !mruFile.Loaded()) {
+					mruFile.Load();
+				}
 				if (mruFile.iSize <= 0) {
 					return TBDDRET_TREATPRESSED;
 				}
