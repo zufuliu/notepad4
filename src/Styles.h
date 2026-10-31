@@ -83,7 +83,9 @@ enum StyleLoadFlag {
 
 extern PEDITLEXER pLexCurrent;
 extern int np2LexLangIndex;
+// Keep the resolved light/dark theme separate from the saved appearance mode.
 extern int np2StyleTheme;
+extern int np2StyleThemeMode;
 extern WCHAR darkStyleThemeFilePath[MAX_PATH];
 
 void	Style_ReleaseResources() noexcept;
