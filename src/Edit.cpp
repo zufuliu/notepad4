@@ -4796,6 +4796,10 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		if (!toggle) {
 			hasFindText = CopySelectionAsFindText(hwndFind, efr, true);
 		}
+		if (!mruFind.Initialized()) {
+			mruFind.Init(MRU_KEY_RECENT_FIND, MRU_MAXITEMS, MRUFlags_QuoteValue, bSaveFindReplace);
+			mruReplace.Init(MRU_KEY_RECENT_REPLACE, MRU_MAXITEMS, MRUFlags_QuoteValue, bSaveFindReplace);
+		}
 		SetFindReplaceText(hwndFind, efr.wszFind, mruFind, toggle);
 		if (hwndRepl) {
 			SetFindReplaceText(hwndRepl, efr.wszReplace, mruReplace, (efr.option & FindReplaceOption_LastReplaceEmpty) | TRUE);

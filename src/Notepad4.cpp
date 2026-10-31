@@ -1880,8 +1880,6 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	// File MRU
 	const int flags = MRUFlags_FilePath | (static_cast<int>(flagRelativeFileMRU) * MRUFlags_RelativePath) | (static_cast<int>(flagPortableMyDocs) * MRUFlags_PortableMyDocs);
 	mruFile.Init(MRU_KEY_RECENT_FILES, iMaxRecentFiles, flags, bSaveRecentFiles);
-	mruFind.Init(MRU_KEY_RECENT_FIND, MRU_MAXITEMS, MRUFlags_QuoteValue, bSaveFindReplace);
-	mruReplace.Init(MRU_KEY_RECENT_REPLACE, MRU_MAXITEMS, MRUFlags_QuoteValue, bSaveFindReplace);
 	return 0;
 }
 
@@ -7161,7 +7159,7 @@ bool FileSave(FileSaveFlag saveFlag) {
 				if (bSaveRecentFiles) {
 					mruFile.Reload();
 				}
-				if (bSaveFindReplace) {
+				if (bSaveFindReplace && mruFind.Initialized()) {
 					mruFind.Reload();
 					mruReplace.Reload();
 				}

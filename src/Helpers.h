@@ -1243,6 +1243,9 @@ struct MRUList {
 	LPCWSTR szRegKey;
 	LPWSTR *pszItems;
 
+	bool Initialized() const noexcept {
+		return pszItems != nullptr;
+	}
 	void Init(LPCWSTR pszRegKey, int capacity_, int flags, bool save) noexcept;
 	void Add(LPCWSTR pszNew) noexcept;
 	void Delete(int iIndex) noexcept;
