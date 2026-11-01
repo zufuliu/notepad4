@@ -1,5 +1,5 @@
-// 2026 https://www.w3.org/TR/CSS/ 26 March 2026
-// 2026-03-16 https://drafts.csswg.org/
+// 2026 https://www.w3.org/TR/CSS/ 22 June 2026
+// 2026-10-30 https://drafts.csswg.org/
 // https://github.com/w3c/csswg-drafts/
 // https://www.w3.org/Style/CSS/current-work
 // https://www.w3.org/Style/CSS/all-properties
@@ -8,7 +8,7 @@
 
 // CSS 2.2 https://www.w3.org/TR/CSS22/ 12 April 2016
 @charset ;
-// https://www.w3.org/TR/css-syntax-3/ 24 December 2021
+// https://www.w3.org/TR/css-syntax-3/ 1 October 2026
 !important
 
 // CSS Anchor Positioning Module Level 2 https://www.w3.org/TR/css-anchor-position-2/ 21 October 2025
@@ -49,6 +49,36 @@ from to
 	animation-timeline: auto | none | scroll() | view();
 	animation:;
 }
+
+// Animation Triggers https://www.w3.org/TR/animation-triggers-1/ 20 October 2026
+{
+	trigger-scope: none | all;
+	timeline-trigger-name: none;
+	timeline-trigger-source: none | auto | scroll() | view();
+	timeline-trigger-activation-range:;
+	timeline-trigger-activation-range-start: normal;
+	timeline-trigger-activation-range-end: normal;
+	timeline-trigger-active-range:;
+	timeline-trigger-active-range-start: auto | normal;
+	timeline-trigger-active-range-end: auto | normal;
+	timeline-trigger-range:;
+	timeline-trigger: none;
+	event-trigger-name: none;
+	event-trigger-source: none;
+	event-trigger: none;
+	animation-trigger: none | play | play-once | play-forwards | play-backwards | pause | reset | replay;
+}
+click()
+dblclick()
+pointerenter()
+pointerleave()
+pointerup()
+pointerdown()
+focusin()
+focusout()
+input()
+change()
+keypress()
 
 // CSS Backgrounds Module Level 4 https://www.w3.org/TR/css-backgrounds-4/ 25 November 2025
 // CSS Backgrounds and Borders Module Level 3 https://www.w3.org/TR/css-backgrounds-3/ 11 March 2024
@@ -307,7 +337,7 @@ from to
 	padding: inherit;
 }
 
-// CSS Box Alignment Module Level 3 https://www.w3.org/TR/css-align-3/ 30 January 2026
+// CSS Box Alignment Module Level 3 https://www.w3.org/TR/css-align-3/ 8 October 2026
 {
 	align-content: normal | first | last | baseline | space-between | space-around | space-evenly | stretch | unsafe | safe | center | start | end | flex-start | flex-end;
 	justify-content: normal | space-between | space-around | space-evenly | stretch | unsafe | safe | center | start | end | flex-start | flex-end | left | right;
@@ -324,32 +354,40 @@ from to
 	align-content: normal;
 	justify-content: normal | left | right;
 	place-content: normal;
-
-	row-gap: normal;
-	grid-row-gap: normal;
-	gap:;
-	column-gap: normal;
-	grid-column-gap: normal;
-	grid-gap:;
 }
 
-// CSS Box Sizing Module Level 4 https://www.w3.org/TR/css-sizing-4/ 20 May 2021
-// CSS Box Sizing Module Level 3 https://www.w3.org/TR/css-sizing-3/ 17 December 2021
+// CSS Box Sizing Module Level 4 https://www.w3.org/TR/css-sizing-4/ 4 September 2026
+// CSS Box Sizing Module Level 3 https://www.w3.org/TR/css-sizing-3/ 4 September 2026
 {
-	width: auto | min-content | max-content | fit-content();
+	size:;
+	min-size:;
+	max-size:;
+	width: auto | min-content | max-content | fit-content() | calc-size();
 	height: auto | min-content | max-content | fit-content();
+	inline-size:;
+	block-size:;
+
 	min-width: auto | min-content | max-content | fit-content();
 	min-height: auto | min-content | max-content | fit-content();
+	min-inline-size:;
+	min-block-size:;
+
 	max-width: auto | min-content | max-content | fit-content();
 	max-height: auto | min-content | max-content | fit-content();
+	max-inline-size:;
+	max-block-size:;
+
 	box-sizing: content-box | border-box;
-	column-width: auto | min-content | max-content | fit-content();
+	column-width: auto | stretch | min-content | max-content | fit-content();
 	aspect-ratio: auto;
+
 	contain-intrinsic-width: none | auto;
 	contain-intrinsic-height: none | auto;
 	contain-intrinsic-block-size: none | auto;
 	contain-intrinsic-inline-size: none | auto;
 	contain-intrinsic-size: none | auto;
+
+	frame-sizing: auto | content-width | content-height | content-block-size | content-inline-size;
 	min-intrinsic-sizing: legacy | zero-if-scroll | zero-if-extrinsic;
 }
 
@@ -369,8 +407,8 @@ initial inherit unset revert revert-layer
 @scope {}
 :scope
 
-// CSS Color Module Level 5 https://www.w3.org/TR/css-color-5/ 7 May 2026
-// CSS Color Module Level 4 https://www.w3.org/TR/css-color-4/ 2 May 2026
+// CSS Color Module Level 5 https://www.w3.org/TR/css-color-5/ 29 October 2026
+// CSS Color Module Level 4 https://www.w3.org/TR/css-color-4/ 29 October 2026
 // CSS Color Module Level 3 https://www.w3.org/TR/css-color-3/ 18 January 2022
 // Colors and Backgrounds https://www.w3.org/TR/CSS22/colors.html
 {
@@ -392,10 +430,11 @@ initial inherit unset revert revert-layer
 	color-adjust:;
 }
 
-// CSS Color HDR Module Level 1 https://www.w3.org/TR/css-color-hdr-1/ 3 March 2026
+// CSS Color HDR Module Level 1 https://www.w3.org/TR/css-color-hdr-1/ 26 October 2026
 {
-	dynamic-range-limit: standard | high | constrained-high | dynamic-range-limit-mix();
+	dynamic-range-limit: standard | no-limit | constrained | dynamic-range-limit-mix();
 }
+color-hdr()
 
 // Compositing and Blending Level 1 https://www.w3.org/TR/compositing-1/ 21 March 2024
 {
@@ -489,7 +528,7 @@ var()
 }
 
 // CSS Display Module Level 4 https://www.w3.org/TR/css-display-4/ 6 November 2025
-// CSS Display Module Level 3 https://www.w3.org/TR/css-display-3/ 30 March 2023
+// CSS Display Module Level 3 https://www.w3.org/TR/css-display-3/ 5 June 2026
 {
 	display: block | inline | run-in | flow | flow-root | table | flex | grid | ruby | flow | flow-root | list-item | table-row-group | table-header-group | table-footer-group | table-row | table-cell | table-column-group | table-column | table-caption | ruby-base | ruby-text | ruby-base-container |
  ruby-text-container | contents | none | inline-block | inline-table | inline-flex | inline-grid;
@@ -575,8 +614,8 @@ env()
 	align-content: flex-start | flex-end | center | space-between | space-around | stretch;
 }
 
-// CSS Fonts Module Level 5 https://www.w3.org/TR/css-fonts-5/ 3 March 2026
-// CSS Fonts Module Level 4 https://www.w3.org/TR/css-fonts-4/ 22 April 2026
+// CSS Fonts Module Level 5 https://www.w3.org/TR/css-fonts-5/ 13 September 2026
+// CSS Fonts Module Level 4 https://www.w3.org/TR/css-fonts-4/ 22 October 2026
 // CSS Fonts Module Level 3 https://www.w3.org/TR/css-fonts-3/ 20 September 2018
 // Fonts https://www.w3.org/TR/CSS22/fonts.html
 {
@@ -691,20 +730,30 @@ control-value()
 returns
 type()
 
-// CSS Gap Decorations Module Level 1 https://www.w3.org/TR/css-gaps-1/ 27 February 2026
+// CSS Gap Decorations Module Level 1 https://www.w3.org/TR/css-gaps-1/ 24 June 2026
 {
+	row-gap:;
+	column-gap:;
+	gap:;
+
 	column-rule-break: none | spanning-item | intersection;
 	row-rule-break:;
 	rule-break:;
 
-	column-rule-edge-inset-start:;
-	column-rule-edge-inset-end:;
-	column-rule-interior-inset-start:;
-	column-rule-interior-inset-end:;
-	row-rule-edge-inset-start:;
-	row-rule-edge-inset-end:;
-	row-rule-interior-inset-start:;
-	row-rule-interior-inset-end:;
+	column-rule-inset-cap-start:;
+	column-rule-inset-cap-end:;
+	column-rule-inset-junction-start:;
+	column-rule-inset-junction-end:;
+	column-rule-inset-cap:;
+	column-rule-inset-junction:;
+	row-rule-inset-cap-start:;
+	row-rule-inset-cap-end:;
+	row-rule-inset-junction-start:;
+	row-rule-inset-junction-end:;
+	row-rule-inset-cap:;
+	row-rule-inset-junction:;
+	rule-inset-cap:;
+	rule-inset-junction:;
 
 	column-rule-inset-start:;
 	column-rule-inset-end:;
@@ -712,13 +761,6 @@ type()
 	row-rule-inset-end:;
 	rule-inset-start:;
 	rule-inset-end:;
-
-	column-rule-edge-inset:;
-	column-rule-interior-inset:;
-	row-rule-edge-inset:;
-	row-rule-interior-inset:;
-	rule-edge-inset:;
-	rule-interior-inset:;
 
 	column-rule-inset:;
 	row-rule-inset:;
@@ -810,7 +852,7 @@ type()
 }
 auto-areas auto-fit
 
-// CSS Image Animation Module Level 1 https://www.w3.org/TR/css-image-animation-1/ 9 April 2026
+// CSS Image Animation Module Level 1 https://www.w3.org/TR/css-image-animation-1/ 21 October 2026
 :animated-image
 {
 	image-animation: normal | paused | stopped | running;
@@ -859,6 +901,11 @@ stripes()
 	line-grid: match-parent | create;
 	line-snap: none | baseline | contain;
 	box-snap: none | block-start | block-end | center | first-baseline | last-baseline;
+}
+
+// CSS Linked Parameters Module Level 1 https://www.w3.org/TR/css-link-params-1/ 14 July 2026
+{
+	link-parameters: none;
 }
 
 // CSS Lists and Counters Module Level 3 https://www.w3.org/TR/css-lists-3/ 17 November 2020
@@ -1521,8 +1568,8 @@ view()
 	chains: none;
 }
 
-// CSS Text Module Level 4 https://www.w3.org/TR/css-text-4/ 29 May 2024
-// CSS Text Module Level 3 https://www.w3.org/TR/css-text-3/ 30 September 2024
+// CSS Text Module Level 4 https://www.w3.org/TR/css-text-4/ 14 August 2026
+// CSS Text Module Level 3 https://www.w3.org/TR/css-text-3/ 14 August 2026
 // Text https://www.w3.org/TR/CSS22/text.html
 {
 	text-transform: none | capitalize | uppercase | lowercase | full-width | full-size-kana | math-auto;
@@ -1542,7 +1589,6 @@ view()
 	hyphenate-limit-lines: no-limit;
 	hyphenate-limit-last: none | always | column | page | spread;
 	overflow-wrap: normal | break-word | anywhere;
-	word-wrap: normal | break-word | anywhere;
 
 	text-wrap-mode: wrap | nowrap;
 	text-wrap-style: auto| balance | stable | pretty;
@@ -1761,7 +1807,7 @@ aural speech
 	speak-header: once | always;
 }
 
-// Compatibility https://compat.spec.whatwg.org/ 15 March 2026
+// Compatibility https://compat.spec.whatwg.org/ 28 October 2026
 {
 	touch-action: auto | none | pan-x | pan-left | pan-right | pan-y | pan-up | pan-down | pinch-zoom | manipulation;
 }

@@ -78,12 +78,12 @@ def find_new_css_properties(properties, descriptors, lang, draft=True):
 	with open(lang, encoding='utf-8') as fd:
 		doc = fd.read()
 	existing = set(re.findall(r'$\s*([\w\-]+):', doc, re.MULTILINE))
-	existing -= set('''grid-column-gap grid-gap grid-row-gap
+	existing -= set('''
 	max-aspect-ratio max-device-aspect-ratio max-device-height max-device-width max-resolution
 	min-aspect-ratio min-device-aspect-ratio min-device-height min-device-width min-resolution
 	'''.split())
-	print('new css properties:', ':;\n'.join(sorted(properties - existing)) + ':;')
-	print('unknown css properties:', ':;\n'.join(sorted(existing - properties)) + ':;')
+	print('new css properties:', ':;\n\t'.join(sorted(properties - existing)) + ':;')
+	print('unknown css properties:', ':;\n\t'.join(sorted(existing - properties)) + ':;')
 
 def find_updated_css_drafts(since, path):
 	os.chdir(path)
@@ -199,7 +199,7 @@ def find_new_texinfo_commands(path, lang):
 		fd.write(f'@{doc}\n')
 
 # https://github.com/w3c/csswg-drafts/
-# find_updated_css_drafts('2026-05-16', r'H:\Libs\csswg-drafts')
+# find_updated_css_drafts('2026-10-30', r'H:\Libs\csswg-drafts')
 # https://www.w3.org/Style/CSS/all-properties.en.json
 # dump_all_css_properties('all-properties.en.json', 'property', 'title', 'url')
 # https://www.w3.org/Style/CSS/all-descriptors.en.json
