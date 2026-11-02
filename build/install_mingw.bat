@@ -21,9 +21,9 @@ IF /I "%~1" == "ucrt" (
   )
 ) ELSE IF /I "%~1" == "i686" (
   IF /I "%~2" == "Clang" (
-    pacman -S --needed --noconfirm --noprogressbar mingw-w64-i686-gcc mingw-w64-i686-make mingw-w64-i686-clang mingw-w64-i686-lld mingw-w64-i686-llvm-tools
+    pacman -S --needed --noconfirm --noprogressbar mingw-w64-i686-gcc mingw-w64-ucrt-x86_64-make mingw-w64-i686-clang mingw-w64-i686-lld mingw-w64-i686-llvm-tools
   ) ELSE (
-    pacman -S --needed --noconfirm --noprogressbar mingw-w64-i686-gcc mingw-w64-i686-make
+    pacman -S --needed --noconfirm --noprogressbar mingw-w64-i686-gcc mingw-w64-ucrt-x86_64-make
   )
 ) ELSE IF /I "%~1" == "llvm" (
   @rem for CI purpose only, the result binary is dynamic linked against api-ms-win-crt*.dll instead of msvcrt.dll
