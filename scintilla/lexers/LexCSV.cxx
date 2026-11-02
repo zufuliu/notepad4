@@ -35,8 +35,8 @@ enum {
 void ColouriseCSVDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList /*keywordLists*/, Accessor &styler) {
 	const bool fold = styler.GetPropertyBool("fold");
 	const uint32_t csvOption = styler.GetPropertyAsU4("lexer.lang");
-	const uint8_t delimiter = csvOption & 0xff;
-	const uint8_t quoteChar = (csvOption >> 8) & 0x7f;
+	const int delimiter = csvOption & 0xff;
+	const int quoteChar = (csvOption >> 8) & 0x7f;
 
 	bool quoted = false;
 	int rows = CsvRowGroup - 1;
@@ -53,17 +53,22 @@ void ColouriseCSVDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 
 	assert(startPos == static_cast<Sci_PositionU>(styler.LineStart(lineCurrent)));
 	styler.StartAt(startPos);
-	styler.StartSegment(startPos);
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
 	const Sci_PositionU endPos = startPos + lengthDoc;
+	Sci_PositionU validLen = 0;
 
-	uint8_t chPrev = 0;
-	uint8_t chPrevNonWhite = delimiter;
+	int chPrev = 0;
+	int chPrevNonWhite = delimiter;
+	uint8_t styleBuf[4096];
+
 	while (startPos < endPos) {
-		const uint8_t ch = styler[startPos++];
+		const int ch = static_cast<uint8_t>(styler[startPos]);
+		styleBuf[validLen++] = static_cast<uint8_t>(initStyle);
+		startPos++;
 		if (quoted) {
 			if (ch == quoteChar) {
 				if (static_cast<uint8_t>(styler[startPos]) == quoteChar) {
+					styleBuf[validLen++] = static_cast<uint8_t>(initStyle);
 					startPos++;
 				} else {
 					quoted = false;
@@ -72,8 +77,7 @@ void ColouriseCSVDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 		} else {
 			if (ch == delimiter) {
 				chPrevNonWhite = ch;
-				styler.ColorTo(startPos - 1, initStyle);
-				styler.ColorTo(startPos, SCE_CSV_DELIMITER);
+				styleBuf[validLen - 1] = SCE_CSV_DELIMITER;
 				if (ch != chPrev || (csvOption & CsvOption_MergeDelimiter) == 0) {
 					++initStyle;
 					if (initStyle == SCE_CSV_DELIMITER) {
@@ -85,6 +89,7 @@ void ColouriseCSVDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 					quoted = true;
 				} else if (ch == '=' && static_cast<uint8_t>(styler[startPos]) == quoteChar) {
 					quoted = true;
+					styleBuf[validLen++] = static_cast<uint8_t>(initStyle);
 					startPos++;
 				}
 			}
@@ -94,10 +99,12 @@ void ColouriseCSVDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 		if (ch > ' ') {
 			chPrevNonWhite = ch;
 			if (ch == '\\' && (csvOption & CsvOption_BackslashEscape) != 0) {
+				styleBuf[validLen++] = static_cast<uint8_t>(initStyle);
 				startPos++;
 			}
-			if (styler.IsLeadByte(ch)) {
+			if (styler.IsLeadByte(static_cast<uint8_t>(ch))) {
 				// ignore trail byte in DBCS character
+				styleBuf[validLen++] = static_cast<uint8_t>(initStyle);
 				startPos++;
 			}
 		}
@@ -115,17 +122,22 @@ void ColouriseCSVDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 
 			chPrev = 0;
 			chPrevNonWhite = delimiter;
-			styler.ColorTo(startPos, initStyle);
 			const int lineState = quoted ? initStyle : 0;
 			initStyle = quoted ? initStyle : SCE_CSV_COLUMN_0;
 			styler.SetLineState(lineCurrent, lineState);
 			lineCurrent++;
 			lineStartNext = styler.LineStart(lineCurrent + 1);
 		}
+		if (validLen >= sizeof(styleBuf) - 4) {
+			styler.MultiByteAccess()->SetStyles(validLen, styleBuf);
+			validLen = 0;
+		}
 	}
 
 	// Colourise remaining document
-	styler.ColorTo(endPos, initStyle);
+	if (validLen != 0) {
+		styler.MultiByteAccess()->SetStyles(validLen, styleBuf);
+	}
 }
 
 }
