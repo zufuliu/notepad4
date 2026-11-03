@@ -878,7 +878,7 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 		case SCE_PL_HERE_QQ:
 		case SCE_PL_HERE_QX:
 			// also implies HereDoc.State == 2
-			sc.Complete();
+			// sc.Complete();
 			if (HereDoc.StripIndent) {
 				// skip whitespace
 				while (IsASpaceOrTab(sc.ch))
@@ -1354,6 +1354,7 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				bool hereDocSpace = false;		// for: SCALAR [whitespace] '<<'
 				Sci_PositionU bk = (sc.currentPos > 0) ? sc.currentPos - 1 : 0;
 				sc.Complete();
+				styler.Flush();
 				if (styler.StyleAt(bk) == SCE_PL_DEFAULT)
 					hereDocSpace = true;
 				skipWhitespaceComment(styler, bk);

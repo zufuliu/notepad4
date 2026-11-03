@@ -63,7 +63,7 @@ public:
 #else
 		styler.ColorTo(currentPos, state);
 #endif
-		styler.Flush();
+		// styler.Flush();
 	}
 	bool More() const noexcept {
 		return currentPos < endPos;
