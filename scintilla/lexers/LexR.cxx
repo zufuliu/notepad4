@@ -24,6 +24,7 @@ using namespace Lexilla;
 namespace {
 
 // https://search.r-project.org/R/refmans/base/html/Quotes.html
+// https://github.com/r-devel/r-svn/blob/main/src/main/gram.y
 struct EscapeSequence {
 	int outerState = SCE_R_DEFAULT;
 	int digitsLeft = 0;
@@ -319,7 +320,7 @@ void ColouriseRDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 				sc.SetState(SCE_R_IDENTIFIER);
 			} else if (sc.ch == '%') {
 				sc.SetState(SCE_R_INFIX);
-			} else if (IsAGraphic(sc.ch) && sc.ch != '\\') {
+			} else if (IsAGraphic(sc.ch)) {
 				sc.SetState(SCE_R_OPERATOR);
 			}
 		}

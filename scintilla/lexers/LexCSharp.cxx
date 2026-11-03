@@ -683,7 +683,7 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 					chBeforeIdentifier = chPrevNonWhite;
 				}
 				sc.SetState(SCE_CSHARP_IDENTIFIER);
-			} else if (IsAGraphic(sc.ch) && sc.ch != '\\') {
+			} else if (IsAGraphic(sc.ch)) {
 				const bool interpolating = !nestedState.empty();
 				sc.SetState(interpolating ? SCE_CSHARP_OPERATOR2 : SCE_CSHARP_OPERATOR);
 				if (sc.ch == '(' || sc.ch == '[') {

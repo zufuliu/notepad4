@@ -537,7 +537,7 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				} else {
 					sc.SetState(SCE_JS_OPERATOR);
 				}
-			} else if (IsAGraphic(sc.ch) && sc.ch != '\\') {
+			} else if (IsAGraphic(sc.ch)) {
 				const bool interpolating = !nestedState.empty();
 				sc.SetState(interpolating ? SCE_JS_OPERATOR2 : SCE_JS_OPERATOR);
 				if (interpolating && AnyOf<'{', '}'>(sc.ch)) {
