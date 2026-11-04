@@ -7197,7 +7197,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		if (PositionFromUPtr(wParam) < 0)
 			errorStatus = Status::Failure;
 		else
-			pdoc->SetStyleFor(PositionFromUPtr(wParam), static_cast<unsigned char>(lParam));
+			pdoc->SetStyleFor(PositionFromUPtr(wParam), static_cast<int>(lParam));
 		break;
 
 	case Message::SetStylingEx:             // Specify a complete styling buffer

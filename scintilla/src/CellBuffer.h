@@ -144,7 +144,7 @@ public:
 	/// Setting styles for positions outside the range of the buffer is safe and has no effect.
 	/// @return range where style of characters changed.
 	ChangedRange SetStyles(Sci::Position position, Sci::Position lengthStyle, const char *styles) noexcept;
-	ChangedRange SetStyleFor(Sci::Position position, Sci::Position lengthStyle, char styleValue) noexcept;
+	ChangedRange SetStyleFor(Sci::Position position, Sci::Position lengthStyle, int styleValue) noexcept;
 
 	const char *DeleteChars(Sci::Position position, Sci::Position deleteLength, bool &startSequence);
 

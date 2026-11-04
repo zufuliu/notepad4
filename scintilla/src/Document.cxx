@@ -2562,7 +2562,7 @@ void SCI_METHOD Document::StartStyling(Sci_Position position) noexcept {
 	endStyled = position;
 }
 
-bool SCI_METHOD Document::SetStyleFor(Sci_Position length, unsigned char style) {
+bool SCI_METHOD Document::SetStyleFor(Sci_Position length, int style) {
 	if (length <= 0 || enteredStyling != 0 || !cb.HasStyles()) {
 		return false;
 	}

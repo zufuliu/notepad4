@@ -489,8 +489,9 @@ void CopyBytes(char *data, const char *styles, Sci::Position length, ChangedRang
 }
 
 template <bool segment1>
-void SetBytes(char *data, char styleValue, Sci::Position length, ChangedRange &range, Sci::Position offset) noexcept {
+void SetBytes(char *data, int style, Sci::Position length, ChangedRange &range, Sci::Position offset) noexcept {
 	Sci::Position index = 0;
+	const char styleValue = static_cast<char>(style);
 	while (index < length && data[index] == styleValue) {
 		++index;
 	}
@@ -500,7 +501,7 @@ void SetBytes(char *data, char styleValue, Sci::Position length, ChangedRange &r
 	}
 	if (index <= length) {
 		++length;
-		memset(data + index, static_cast<unsigned char>(styleValue), length - index);
+		memset(data + index, style, length - index);
 		if (segment1 || range.Empty()) {
 			range.start = index + offset;
 		}
@@ -531,7 +532,7 @@ ChangedRange CellBuffer::SetStyles(Sci::Position position, Sci::Position lengthS
 	return range;
 }
 
-ChangedRange CellBuffer::SetStyleFor(Sci::Position position, Sci::Position lengthStyle, char styleValue) noexcept {
+ChangedRange CellBuffer::SetStyleFor(Sci::Position position, Sci::Position lengthStyle, int styleValue) noexcept {
 	ChangedRange range;
 	Sci::Position range1Length = 0;
 	const Sci::Position part1Length = style.GapPosition();

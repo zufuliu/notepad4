@@ -705,7 +705,7 @@ public:
 	int CharacterCategoryOptimization() const noexcept;
 #endif
 	void SCI_METHOD StartStyling(Sci_Position position) noexcept override;
-	bool SCI_METHOD SetStyleFor(Sci_Position length, unsigned char style) override;
+	bool SCI_METHOD SetStyleFor(Sci_Position length, int style) override;
 	bool SCI_METHOD SetStyles(Sci_Position length, const unsigned char *styles) override;
 	Sci::Position GetEndStyled() const noexcept {
 		return endStyled;
