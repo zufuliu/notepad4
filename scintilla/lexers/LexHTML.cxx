@@ -626,7 +626,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			                    (static_cast<int>(inScriptType) << 0) |
 			                    (static_cast<int>(lexer.propertyValue) << 2) |
 			                    (static_cast<int>(lexer.attributeSelector) << 3) |
-			                    ((needsBacktrack || tagState != TagState::None || lexer.parenCount != 0 || lexer.selectorLevel != 0 || !interpolatingStack.empty())? backtrackMask : 0) |
+			                    ((tagState != TagState::None || !interpolatingStack.empty() || needsBacktrack || lexer.parenCount != 0 || lexer.selectorLevel != 0)? backtrackMask : 0) |
 			                    (static_cast<int>(aspScript) << 4) |
 			                    (static_cast<int>(clientScript) << 8) |
 			                    (beforePreProc << 12) |
@@ -653,10 +653,13 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				i += 2;
 				tagState = TagState::Close;
 				levelCurrent--;
-				lexer.resetCssState();
 				if (!interpolatingStack.empty()) {
 					needsBacktrack = true;
 					interpolatingStack.clear();
+				}
+				if (lexer.propertyValue || lexer.attributeSelector || lexer.parenCount != 0 || lexer.selectorLevel != 0) {
+					needsBacktrack = true;
+					lexer.resetCssState();
 				}
 				continue;
 			}
