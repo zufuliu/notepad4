@@ -256,7 +256,7 @@ bool classifyAttribHTML(Sci_PositionU end, LexerWordList keywordLists, LexAccess
 	const Sci_PositionU start = styler.GetStartSegment();
 	styler.GetRangeLowered(start, end, s, sizeof(s));
 	if (IsNumberChar(static_cast<uint8_t>(s[0]))) {
-		chAttr = SCE_H_NUMBER;
+		chAttr = SCE_H_VALUE;
 	} else {
 		if (inScriptType == eNonHtmlScript) {
 			// see https://html.spec.whatwg.org/multipage/scripting.html
@@ -1050,7 +1050,6 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 						ch = chNext;
 						state = SCE_H_SINGLESTRING;
 					} else {
-						lexer.chBefore = chNext;
 						state = SCE_H_VALUE;
 					}
 				} else {
@@ -1088,7 +1087,6 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 					ch = chNext;
 					state = SCE_H_SINGLESTRING;
 				} else {
-					lexer.chBefore = chNext;
 					state = SCE_H_VALUE;
 				}
 			} else if (ch == '/' && chNext == '>') {
@@ -1127,11 +1125,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			break;
 		case SCE_H_VALUE:
 			if (IsHtmlInvalidAttrChar(ch)) {
-				if (IsNumberChar(lexer.chBefore)) {
-					styler.ColorTo(i, SCE_H_NUMBER);
-				} else {
-					styler.ColorTo(i, state);
-				}
+				styler.ColorTo(i, state);
 				if (ch == '>') {
 					styler.ColorTo(i + 1, SCE_H_TAG);
 					if (inScriptType == eNonHtmlScript) {
