@@ -19,10 +19,10 @@ class LexAccessor {
 	Scintilla::SplitView cbView;
 	Scintilla::SplitView styleView;
 	const EncodingType encodingType;
-	unsigned char styleBuf[bufferSize];
 	Sci_PositionU validLen = 0;
 	Sci_PositionU startSeg = 0;
 	Sci_Position startPosStyling = 0;
+	unsigned char styleBuf[bufferSize];
 
 	static constexpr EncodingType EncodingTypeForCodePage(int codePage) noexcept {
 		return (codePage == 65001) ? EncodingType::unicode : (codePage ? EncodingType::dbcs : EncodingType::eightBit);

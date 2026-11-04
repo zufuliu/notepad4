@@ -87,19 +87,26 @@ void LexAccessor::ColorTo(Sci_PositionU endPos_, unsigned chAttr) {
 	assert(endPos_ >= startSeg && endPos_ <= static_cast<Sci_PositionU>(Length()));
 	if (endPos_ > startSeg) {
 		Sci_PositionU len = endPos_ - startSeg;
-		if (validLen + len >= bufferSize) {
-			Flush();
+		if (validLen + len >= bufferSize && validLen != 0) {
+			// Flush();
+			pAccess->SetStyles(validLen, styleBuf);
+			startPosStyling += validLen;
+			validLen = 0;
 		}
 		assert((startPosStyling + validLen + len) <= static_cast<Sci_PositionU>(Length()));
 		startSeg += len;
 		if (validLen + len < bufferSize) {
 			unsigned char *ptr = styleBuf + validLen;
 			validLen += len;
-			const auto attr = static_cast<unsigned char>(chAttr);
-			do {
-				*ptr++ = attr;
-				--len;
-			} while (len != 0);
+			if (len < 32) [[likely]] {
+				const auto attr = static_cast<unsigned char>(chAttr);
+				do {
+					*ptr++ = attr;
+					--len;
+				} while (len != 0);
+			} else {
+				memset(ptr, chAttr, len);
+			}
 		} else {
 			// Too big for buffer so send directly
 			pAccess->SetStyleFor(len, chAttr);
