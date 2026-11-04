@@ -1178,7 +1178,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			}
 			break;
 		case js_style(SCE_JS_IDENTIFIER):
-			if (!((kHtmlCharClass[ch] & HtmlCharMask_IdentifierCharEx) || ch == '$')) {
+			if (!((kHtmlCharClass[ch] & HtmlCharMask_IdentifierCharEx) || ch == '$' || (ch == '\\' && chNext == 'u'))) {
 				state = js_style(SCE_JS_DEFAULT);
 				stylePrevNonWhite = classifyWordHTJS(i, ch, chNext, keywordLists, styler, lexer);
 			}
@@ -1348,7 +1348,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			if (ch == '/' && chNext == '*') {
 				i++;
 				levelCurrent++;
-				state = (styler.SafeGetUCharAt(i + 1) == '*') ? js_style(SCE_JS_COMMENTBLOCKDOC) : js_style(SCE_JS_COMMENTBLOCK);
+				state = (styler[i + 1] == '*') ? js_style(SCE_JS_COMMENTBLOCKDOC) : js_style(SCE_JS_COMMENTBLOCK);
 			} else if (ch == '/' && chNext == '/') {
 				state = js_style(SCE_JS_COMMENTLINE);
 			} else if (ch == '/' && !IsEOLChar(chNext) && IsRegexStart(chPrevNonWhite, stylePrevNonWhite)) {
@@ -1365,7 +1365,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			} else if (IsNumberStart(ch, chNext)) {
 				lexer.escSeq.outerState = js_style(SCE_JS_DEFAULT);
 				state = js_style(SCE_JS_NUMBER);
-			} else if ((kHtmlCharClass[static_cast<unsigned>(ch)] & HtmlCharMask_IdentifierStartEx) || ch == '$' || ch == '#') {
+			} else if ((kHtmlCharClass[static_cast<unsigned>(ch)] & HtmlCharMask_IdentifierStartEx) || ch == '$' || ch == '#' || (ch == '\\' && chNext == 'u')) {
 				lexer.chBefore = chPrevNonWhite;
 				state = js_style(SCE_JS_IDENTIFIER);
 			} else if (((ch == '<' && chNext == '!') || (ch == '-' && chNext == '-')) && IsHtmlComment(ch, i, styler)) {
@@ -1409,7 +1409,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				state = css_style(SCE_CSS_NUMBER);
 			} else if (chNext == '+' && UnsafeLower(ch) == 'u'
 				&& lexer.propertyValue && (chPrevNonWhite == ':' || chPrevNonWhite == ',')
-				&& IsCssUnicodeRangeChar(styler.SafeGetUCharAt(i + 2))) {
+				&& IsCssUnicodeRangeChar(static_cast<uint8_t>(styler[i + 2]))) {
 				lexer.escSeq.digitsLeft = 7;
 				i++;
 				state = css_style(SCE_CSS_UNICODE_RANGE);
@@ -1420,7 +1420,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				|| ((ch == '-' || ch == '@') && IsCssWordNext(chNext))) {
 				lexer.chBefore = chPrevNonWhite;
 				state = (ch == '@')? css_style(SCE_CSS_AT_RULE) : css_style(SCE_CSS_IDENTIFIER);
-			} else if (ch == ':' && chNext == ':' && IsCssWordNext(styler.SafeGetUCharAt(i + 2))) {
+			} else if (ch == ':' && chNext == ':' && IsCssWordNext(static_cast<uint8_t>(styler[i + 2]))) {
 				state = css_style(SCE_CSS_PSEUDOELEMENT);
 				i += 2;
 			} else if (ch == ':' && !IsCssProperty(stylePrevNonWhite)
