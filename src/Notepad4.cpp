@@ -2849,20 +2849,16 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDT_FILE_PRINT:
 	case IDM_FILE_PRINT: {
 		SHFILEINFO shfi;
-		WCHAR *pszTitle;
-		WCHAR tchUntitled[128];
 		const auto action = (LOWORD(wParam) == IDM_FILE_PRINT)? static_cast<NotepadReplacementAction>(lParam) : NotepadReplacementAction_None;
 
 		if (StrNotEmpty(szCurFile)) {
 			SHGetFileInfo2(szCurFile, 0, &shfi, sizeof(SHFILEINFO), SHGFI_DISPLAYNAME);
-			pszTitle = shfi.szDisplayName;
 		} else {
-			GetString(IDS_UNTITLED, tchUntitled, COUNTOF(tchUntitled));
-			pszTitle = tchUntitled;
+			GetString(IDS_UNTITLED, shfi.szDisplayName, COUNTOF(shfi.szDisplayName));
 		}
 
-		if (!EditPrint(hwndEdit, pszTitle, static_cast<int>(action) & TRUE)) {
-			MsgBoxWarn(MB_OK, IDS_PRINT_ERROR, pszTitle);
+		if (!EditPrint(hwndEdit, shfi.szDisplayName, static_cast<int>(action) & TRUE)) {
+			MsgBoxWarn(MB_OK, IDS_PRINT_ERROR, shfi.szDisplayName);
 		} else if (action > NotepadReplacementAction_Default) {
 			SendWMCommand(hwnd, IDM_FILE_EXIT);
 		}
@@ -3521,20 +3517,17 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case CMD_COPYFILENAME:
 	case CMD_COPYPATHNAME: {
 		SHFILEINFO shfi;
-		WCHAR *pszInsert;
-		WCHAR tchUntitled[MAX_PATH];
+		WCHAR *pszInsert = shfi.szDisplayName;
 
 		const int cmd = LOWORD(wParam);
 		if (StrNotEmpty(szCurFile)) {
 			if (cmd == IDM_EDIT_INSERT_FILENAME || cmd == CMD_COPYFILENAME || cmd == CMD_INSERTFILENAME_NOEXT || cmd == CMD_COPYFILENAME_NOEXT) {
 				SHGetFileInfo2(szCurFile, 0, &shfi, sizeof(SHFILEINFO), SHGFI_DISPLAYNAME);
-				pszInsert = shfi.szDisplayName;
 			} else {
 				pszInsert = szCurFile;
 			}
 		} else {
-			GetString(IDS_UNTITLED, tchUntitled, COUNTOF(tchUntitled));
-			pszInsert = tchUntitled;
+			GetString(IDS_UNTITLED, shfi.szDisplayName, COUNTOF(shfi.szDisplayName));
 		}
 		if (cmd == CMD_INSERTFILENAME_NOEXT || cmd == CMD_COPYFILENAME_NOEXT) {
 			PathRemoveExtension(pszInsert);

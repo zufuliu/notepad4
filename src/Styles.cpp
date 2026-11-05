@@ -1334,7 +1334,7 @@ static bool Style_StrGetAttributeEx(LPCWSTR lpszStyle, LPCWSTR key, int keyLen) 
 #define Style_StrGetOverline(lpszStyle)			Style_StrGetAttribute((lpszStyle), L"overline")
 #define Style_StrGetEOLFilled(lpszStyle)		Style_StrGetAttribute((lpszStyle), L"eolfilled")
 
-// set default colors to avoid showing white (COLOR_WINDOW or COLOR_3DFACE) window or margin while loading big file.
+// set default colors to avoid showing white (COLOR_WINDOW or COLOR_3DFACE) window or margin while loading large file.
 void Style_InitDefaultColor() noexcept {
 	PEDITLEXER pLexNew = pLexArray[iDefaultLexerIndex];
 	const int index = pLexNew->bUseDefaultCodeStyle ? GlobalStyleIndex_DefaultCode : GlobalStyleIndex_DefaultText;
@@ -4085,12 +4085,10 @@ static HTREEITEM Style_AddAllLexerToTreeView(HWND hwndTV, bool withStyles, bool 
 	// folder icon
 	SHGetFileInfo(L"Icon", FILE_ATTRIBUTE_DIRECTORY, &shfi, sizeof(SHFILEINFO), iconFlags);
 
-	WCHAR szTitle[128];
-
 	TVINSERTSTRUCT tvis;
 	memset(&tvis, 0, sizeof(TVINSERTSTRUCT));
 	tvis.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM | TVIF_STATE;
-	tvis.item.pszText = szTitle;
+	tvis.item.pszText = shfi.szDisplayName;
 	tvis.item.iImage = shfi.iIcon;
 	tvis.item.iSelectedImage = shfi.iIcon;
 	tvis.item.lParam = 0; // group
@@ -4119,10 +4117,10 @@ static HTREEITEM Style_AddAllLexerToTreeView(HWND hwndTV, bool withStyles, bool 
 		HTREEITEM hParent = nullptr;
 		if (group != SchemeGroup_Global) {
 			if (group == SchemeGroup_Favorite) {
-				GetString(IDS_FAVORITE_SCHEMES_TITLE, szTitle, COUNTOF(szTitle));
+				GetString(IDS_FAVORITE_SCHEMES_TITLE, shfi.szDisplayName, COUNTOF(shfi.szDisplayName));
 			} else {
-				szTitle[0] = static_cast<WCHAR>(group);
-				szTitle[1] = L'\0';
+				shfi.szDisplayName[0] = static_cast<WCHAR>(group);
+				shfi.szDisplayName[1] = L'\0';
 			}
 
 			tvis.hInsertAfter = hInsertAfter;

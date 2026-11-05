@@ -36,9 +36,9 @@ struct DLDATA {
 	bool bNoFadeHidden;			// Flag passed from GetDispInfo()
 	LPITEMIDLIST pidl;			// Directory Id
 	LPSHELLFOLDER lpsf;			// IShellFolder Interface to pidl
-	WCHAR szPath[MAX_PATH];		// Pathname to Directory Id
 	int iDefIconFolder;			// Default Folder Icon
 	int iDefIconFile;			// Default File Icon
+	WCHAR szPath[MAX_PATH];		// Pathname to Directory Id
 };
 
 //==== Property Name ==========================================================
@@ -164,18 +164,16 @@ int DirList_Fill(HWND hwnd, LPCWSTR lpszDir, DWORD grfFlags, LPCWSTR lpszFileSpe
 	lvi.cchTextMax = MAX_PATH;
 	lvi.iImage = I_IMAGECALLBACK;
 
-	WCHAR wszDir[MAX_PATH];
-	lstrcpy(wszDir, lpszDir);
-
 	// Get Desktop Folder
 	LPSHELLFOLDER lpsfDesktop = nullptr;
 	PIDLIST_RELATIVE pidl = nullptr;
 	LPSHELLFOLDER lpsf = nullptr;
 	if (S_OK == SHGetDesktopFolder(&lpsfDesktop)) {
-		// Convert wszDir into a pidl
+		// Convert lpszDir into a pidl
+		lstrcpy(shfi.szDisplayName, lpszDir);
 		ULONG chParsed = 0;
 		ULONG dwAttributes = 0;
-		if (S_OK == lpsfDesktop->ParseDisplayName(hwnd, nullptr, wszDir, &chParsed, &pidl, &dwAttributes)) {
+		if (S_OK == lpsfDesktop->ParseDisplayName(hwnd, nullptr, shfi.szDisplayName, &chParsed, &pidl, &dwAttributes)) {
 			// Bind pidl to IShellFolder
 			if (S_OK == lpsfDesktop->BindToObject(pidl, nullptr, IID_IShellFolder, AsPPVArgs(&lpsf))) {
 				// Create an Enumeration object for lpsf

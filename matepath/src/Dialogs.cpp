@@ -60,8 +60,7 @@ int MsgBox(UINT uType, UINT uIdMsg, ...) noexcept {
 	wvsprintf(szText, szBuf, va);
 	va_end(va);
 
-	WCHAR szTitle[128];
-	GetString(IDS_APPTITLE, szTitle, COUNTOF(szTitle));
+	GetString(IDS_APPTITLE, szBuf, COUNTOF(szBuf));
 
 	uType |= MB_SETFOREGROUND;
 	if (bWindowLayoutRTL) {
@@ -76,7 +75,7 @@ int MsgBox(UINT uType, UINT uIdMsg, ...) noexcept {
 
 	HWND hwnd = GetMsgBoxParent();
 	DialogHook_Start(DialogRefData_MessageBox);
-	const int result = MessageBoxEx(hwnd, szText, szTitle, uType, lang);
+	const int result = MessageBoxEx(hwnd, szText, szBuf, uType, lang);
 	DialogHook_Stop();
 	return result;
 }

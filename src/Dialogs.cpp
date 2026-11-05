@@ -67,7 +67,7 @@ static inline HWND GetMsgBoxParent() noexcept {
 // MsgBox()
 //
 int MsgBox(UINT uType, UINT uIdMsg, ...) noexcept {
-	WCHAR szBuf[1024];
+	WCHAR szBuf[1024 - 128];
 	WCHAR szText[1024];
 
 	GetString(uIdMsg, szBuf, COUNTOF(szBuf));
@@ -104,8 +104,7 @@ int MsgBox(UINT uType, UINT uIdMsg, ...) noexcept {
 		}
 	}
 
-	WCHAR szTitle[128];
-	GetString(IDS_APPTITLE, szTitle, COUNTOF(szTitle));
+	GetString(IDS_APPTITLE, szBuf, COUNTOF(szBuf));
 
 	uType |= MB_SETFOREGROUND;
 	if (bWindowLayoutRTL) {
@@ -114,7 +113,7 @@ int MsgBox(UINT uType, UINT uIdMsg, ...) noexcept {
 
 	HWND hwnd = GetMsgBoxParent();
 	DialogHook_Start(DialogRefData_MessageBox);
-	const int result = MessageBoxEx(hwnd, szText, szTitle, uType, lang);
+	const int result = MessageBoxEx(hwnd, szText, szBuf, uType, lang);
 	DialogHook_Stop();
 	return result;
 }
@@ -2410,7 +2409,7 @@ INT_PTR InfoBox(UINT uType, LPCWSTR lpstrSetting, UINT uidMessage, ...) noexcept
 		return (uType == MB_YESNO) ? IDYES : IDOK;
 	}
 
-	WCHAR wchFormat[512];
+	WCHAR wchFormat[512 + 256];
 	GetString(uidMessage, wchFormat, COUNTOF(wchFormat));
 
 	WCHAR lpstrMessage[1024];
