@@ -92,6 +92,20 @@ def findAPIHoles():
 			print_holes('deprecated:', pattern, ifaceDoc)
 		print('unused:', sorted(set(holes) - set(values)))
 
+def findCssJsStyle(name, doc):
+	items = set(re.findall(r'(css|js)_style\s*\(\s*(SCE_\w+)', doc))
+	items = [f'{key}_style({value})' for key, value in items if not value.startswith(f'SCE_{key.upper()}_')]
+	if items:
+		print(name, 'mixed style:', ', '.join(sorted(items)))
+
+def checkCssJsStyle():
+	for path in ('../../tools/LexerConfig.py', '../../src/EditAutoC.cpp'):
+		name = os.path.basename(path)
+
+		with open(path, encoding='utf-8') as fd:
+			doc = fd.read()
+		findCssJsStyle(name, doc)
+
 def checkLexerDefinition():
 	ifaceDoc, _ = readIFace('../include/SciLexer.iface')
 
@@ -151,5 +165,9 @@ def checkLexerDefinition():
 		if unknown := items - prefix:
 			print(name, 'unknown style:', ', '.join(sorted(unknown)))
 
+		if name in ('LexHTML.cxx', 'LexPHP.cxx'):
+			findCssJsStyle(name, doc)
+
 findAPIHoles()
 checkLexerDefinition()
+checkCssJsStyle()
