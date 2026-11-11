@@ -1094,6 +1094,18 @@ inline void SciCall_IndicatorFillRange(Sci_Position start, Sci_Position length) 
 	SciCall(SCI_INDICATORFILLRANGE, start, length);
 }
 
+inline int SciCall_IndicatorValueAt(int indicator, Sci_Position pos) noexcept {
+	return static_cast<int>(SciCall(SCI_INDICATORVALUEAT, indicator, pos));
+}
+
+inline Sci_Position SciCall_IndicatorStart(int indicator, Sci_Position pos) noexcept {
+	return SciCall(SCI_INDICATORSTART, indicator, pos);
+}
+
+inline Sci_Position SciCall_IndicatorEnd(int indicator, Sci_Position pos) noexcept {
+	return SciCall(SCI_INDICATOREND, indicator, pos);
+}
+
 // Autocompletion
 
 inline void SciCall_AutoCShow(Sci_Position lengthEntered, const char *itemList) noexcept {

@@ -6818,6 +6818,12 @@ char *EditGetStringAroundCaret(LPCSTR delimiters, UINT textLength) noexcept {
 		return nullptr;
 	}
 
+	if (const int value = SciCall_IndicatorValueAt(INDICATOR_LINK, iCurrentPos)) {
+		iLineStart = SciCall_IndicatorStart(INDICATOR_LINK, iCurrentPos);
+		iLineEnd = SciCall_IndicatorEnd(INDICATOR_LINK, iCurrentPos);
+		return EditGetTextRange(iLineStart, iLineEnd);
+	}
+
 	const int style = SciCall_GetStyleIndexAt(iCurrentPos);
 	if (SciCall_StyleGetHotSpot(style)) {
 		iLineStart = iCurrentPos - 1;
@@ -6866,7 +6872,8 @@ char *EditGetStringAroundCaret(LPCSTR delimiters, UINT textLength) noexcept {
 	Sci_Position iStartPos = iLineStart;
 	Sci_Position iEndPos = iLineEnd;
 	ft.chrg.cpMax = iLineEnd;
-	ft.lpstrText = "\\(\\w*:?\\.*/";
+	ft.lpstrText = "\\]\\(.";
+	ft.textLength = CSTRLEN("\\]\\(.");
 	while (iStartPos < iEndPos) {
 		ft.chrg.cpMin = iStartPos;
 		Sci_Position iPos = SciCall_FindTextFull(findFlag, &ft);
@@ -6874,8 +6881,8 @@ char *EditGetStringAroundCaret(LPCSTR delimiters, UINT textLength) noexcept {
 			break;
 		}
 
-		iStartPos = iPos + 1;
-		iPos = SciCall_BraceMatchNext(iPos, ft.chrgText.cpMax);
+		iStartPos = iPos + 2;
+		iPos = SciCall_BraceMatchNext(iPos + 1, ft.chrgText.cpMax);
 		iEndPos = (iPos < 0) ? iLineEnd : iPos;
 		if (iCurrentPos >= iStartPos && iCurrentPos <= iEndPos) {
 			iLineStart = iStartPos;
