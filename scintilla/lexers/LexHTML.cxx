@@ -493,11 +493,6 @@ constexpr bool IsRegexStart(int chPrevNonWhite, int stylePrevNonWhite) noexcept 
 	return stylePrevNonWhite == js_style(SCE_JS_WORD) || !FollowExpression(chPrevNonWhite, stylePrevNonWhite);
 }
 
-constexpr bool IsSpaceEquiv(int state) noexcept {
-	return (state > js_style(SCE_JS_DEFAULT) && state <= js_style(SCE_JS_TASKMARKER))
-		|| (state > css_style(SCE_CSS_DEFAULT) && state <= css_style(SCE_CSS_CDO_CDC));
-}
-
 // string interpolating state
 enum class InterpolatingType {
 	ClientJavaScript,
@@ -588,10 +583,6 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 	const Sci_Position lengthDoc = startPos + length;
 	for (Sci_Position i = startPos; i < lengthDoc; i++) {
 		const int chPrev = ch;
-		if (!IsASpace(ch) && !IsSpaceEquiv(state)) {
-			stylePrevNonWhite = state;
-			chPrevNonWhite = ch;
-		}
 		ch = static_cast<unsigned char>(styler[i]);
 		int chNext = static_cast<unsigned char>(styler[i + 1]);
 
@@ -643,6 +634,8 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				scriptLanguage = eScriptNone;
 				clientScript = eScriptJS;
 				isLanguageType = false;
+				chPrevNonWhite = ' ';
+				stylePrevNonWhite = SCE_H_DEFAULT;
 				i += 2;
 				tagState = TagState::Close;
 				levelCurrent--;
@@ -770,6 +763,8 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			// Bounce out of any ASP mode
 			styler.ColorTo(i, state);
 			state = beforePreProc;
+			chPrevNonWhite = ' ';
+			stylePrevNonWhite = SCE_H_DEFAULT;
 			if (scriptLanguage != eScriptSGML) {
 				beforePreProc = SCE_H_DEFAULT;
 				i++;
@@ -1365,6 +1360,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				state = js_style(SCE_JS_COMMENTLINE);
 			} else if (IsAGraphic(ch)) {
 				lexer.kwType = KeywordType::None;
+				chPrevNonWhite = ch;
 				stylePrevNonWhite = js_style(SCE_JS_OPERATOR);
 				if (ch == '{' || ch == '[' || ch == '(') {
 					levelCurrent++;
@@ -1386,6 +1382,10 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 					}
 				}
 				styler.ColorTo(i + 1, stylePrevNonWhite);
+			}
+			if (state > js_style(SCE_JS_TASKMARKER)) {
+				chPrevNonWhite = ch;
+				stylePrevNonWhite = state;
 			}
 		} else if (state == css_style(SCE_CSS_DEFAULT)) {
 			if (ch == '/' && chNext == '*') {
@@ -1445,8 +1445,13 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 						lexer.propertyValue = true;
 					}
 				}
+				chPrevNonWhite = ch;
 				stylePrevNonWhite = css_style(SCE_CSS_OPERATOR);
 				styler.ColorTo(i + 1, css_style(SCE_CSS_OPERATOR));
+			}
+			if (state > css_style(SCE_CSS_CDO_CDC)) {
+				chPrevNonWhite = ch;
+				stylePrevNonWhite = state;
 			}
 		} else if (state == SCE_HB_DEFAULT) {    // One of the above succeeded
 			if (ch == '\"') {
