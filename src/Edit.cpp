@@ -4882,7 +4882,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		HWND hwndRepl = GetDlgItem(hwnd, IDC_REPLACETEXT);
 		auto &efr = *AsPointer<EditFindReplace *>(GetWindowLongPtr(hwnd, DWLP_USER));
 
-		const bool hasFindText = CopySelectionAsFindText(hwnd, efr, false);
+		const bool hasFindText = CopySelectionAsFindText(hwndFind, efr, false);
 		CheckDlgButton(hwnd, IDC_FINDTRANSFORMBS, (efr.option & FindReplaceOption_TransformBackslash) ? BST_CHECKED : BST_UNCHECKED);
 		// focus on replace box when selected text is not empty.
 		PostMessage(hwnd, WM_NEXTDLGCTL, AsInteger<WPARAM>((hasFindText && hwndRepl)? hwndRepl : hwndFind), TRUE);
