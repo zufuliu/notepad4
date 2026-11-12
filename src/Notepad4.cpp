@@ -735,6 +735,125 @@ static void HandleMatchText(MatchTextFlag flag, LPCWSTR lpszText, BOOL jumpTo) n
 	}
 }
 
+// Retrieve file paths from clipboard in CFSTR_SHELLIDLIST format (e.g. copied from Windows Explorer)
+static char *GetClipboardShellPaths(UINT *pLength = nullptr) {
+	static const UINT cfShellIDList = ::RegisterClipboardFormat(CFSTR_SHELLIDLIST);
+	if (cfShellIDList == 0 || !::IsClipboardFormatAvailable(cfShellIDList)) {
+		return nullptr;
+	}
+
+	IDataObject *pDataObj = nullptr;
+	if (FAILED(::OleGetClipboard(&pDataObj)) || pDataObj == nullptr) {
+		return nullptr;
+	}
+
+	char *pszResult = nullptr;
+	FORMATETC fmtetc = { static_cast<CLIPFORMAT>(cfShellIDList), nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
+	STGMEDIUM stgmed{};
+	if (SUCCEEDED(pDataObj->GetData(&fmtetc, &stgmed))) {
+		const CIDA *pCida = static_cast<const CIDA *>(::GlobalLock(stgmed.hGlobal));
+		if (pCida != nullptr && pCida->cidl > 0) {
+			LPWSTR *paths = static_cast<LPWSTR *>(NP2HeapAlloc(pCida->cidl * sizeof(LPWSTR)));
+			if (paths != nullptr) {
+				const auto *pBase = reinterpret_cast<const BYTE *>(pCida);
+				PCIDLIST_ABSOLUTE pidlParent = reinterpret_cast<PCIDLIST_ABSOLUTE>(pBase + pCida->aoffset[0]);
+
+				UINT count = 0;
+				size_t totalWchars = 0;
+				for (UINT i = 1; i <= pCida->cidl; ++i) {
+					PCUIDLIST_RELATIVE pidlChild = reinterpret_cast<PCUIDLIST_RELATIVE>(pBase + pCida->aoffset[i]);
+					PIDLIST_ABSOLUTE pidlFull = ILCombine(pidlParent, pidlChild);
+					if (pidlFull != nullptr) {
+						PWSTR pszPath = nullptr;
+						if (SUCCEEDED(SHGetNameFromIDList(pidlFull, SIGDN_FILESYSPATH, &pszPath)) && pszPath != nullptr) {
+							paths[count++] = pszPath;
+							totalWchars += lstrlen(pszPath);
+						}
+						ILFree(pidlFull);
+					}
+				}
+
+				if (count > 0) {
+					LPCWSTR pszEol = L"\r\n";
+					UINT eolLen = 2;
+					if (iCurrentEOLMode == SC_EOL_LF) {
+						pszEol = L"\n";
+						eolLen = 1;
+					} else if (iCurrentEOLMode == SC_EOL_CR) {
+						pszEol = L"\r";
+						eolLen = 1;
+					}
+					totalWchars += (count - 1) * eolLen;
+
+					LPWSTR wszBuffer = static_cast<LPWSTR>(NP2HeapAlloc((totalWchars + 1) * sizeof(WCHAR)));
+					if (wszBuffer != nullptr) {
+						LPWSTR pDst = wszBuffer;
+						for (UINT i = 0; i < count; ++i) {
+							if (i > 0) {
+								memcpy(pDst, pszEol, eolLen * sizeof(WCHAR));
+								pDst += eolLen;
+							}
+							const int len = lstrlen(paths[i]);
+							memcpy(pDst, paths[i], len * sizeof(WCHAR));
+							pDst += len;
+						}
+						*pDst = L'\0';
+
+						const UINT cpEdit = SciCall_GetCodePage();
+						const int cchLen = ::WideCharToMultiByte(cpEdit, 0, wszBuffer, static_cast<int>(totalWchars), nullptr, 0, nullptr, nullptr);
+						if (cchLen > 0) {
+							pszResult = static_cast<char *>(NP2HeapAlloc(cchLen + 1));
+							if (pszResult != nullptr) {
+								::WideCharToMultiByte(cpEdit, 0, wszBuffer, static_cast<int>(totalWchars), pszResult, cchLen, nullptr, nullptr);
+								pszResult[cchLen] = '\0';
+								if (pLength != nullptr) {
+									*pLength = static_cast<UINT>(cchLen);
+								}
+							}
+						}
+						NP2HeapFree(wszBuffer);
+					}
+				}
+
+				for (UINT i = 0; i < count; ++i) {
+					::CoTaskMemFree(paths[i]);
+				}
+				NP2HeapFree(paths);
+			}
+		}
+		::GlobalUnlock(stgmed.hGlobal);
+		::ReleaseStgMedium(&stgmed);
+	}
+
+	pDataObj->Release();
+	return pszResult;
+}
+
+static inline bool CanPaste() noexcept {
+	if (SciCall_CanPaste()) {
+		return true;
+	}
+	if (!SciCall_GetReadOnly()) {
+		static const UINT cfShellIDList = ::RegisterClipboardFormat(CFSTR_SHELLIDLIST);
+		return cfShellIDList != 0 && ::IsClipboardFormatAvailable(cfShellIDList);
+	}
+	return false;
+}
+
+static void EditPaste(bool asBinary) {
+	if (SciCall_CanPaste()) {
+		SciCall_Paste(asBinary);
+		return;
+	}
+	if (!SciCall_GetReadOnly()) {
+		char *pszPaths = GetClipboardShellPaths();
+		if (pszPaths != nullptr) {
+			SciCall_ReplaceSel(pszPaths);
+			NP2HeapFree(pszPaths);
+		}
+	}
+}
+
 //=============================================================================
 //
 // InitInstance()
@@ -925,7 +1044,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 
 	// Check for /c [if no file is specified] -- even if a file is specified
 	if (flagNewFromClipboard) {
-		if (SciCall_CanPaste()) {
+		if (CanPaste()) {
 			const bool back = autoCompletionConfig.bIndentText;
 			autoCompletionConfig.bIndentText = false;
 			SciCall_DocumentEnd();
@@ -933,7 +1052,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 			if (SciCall_GetLength() != 0) {
 				SciCall_NewLine();
 			}
-			SciCall_Paste(false);
+			EditPaste(false);
 			SciCall_NewLine();
 			SciCall_EndUndoAction();
 			autoCompletionConfig.bIndentText = back;
@@ -2490,7 +2609,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 		EnableCmd(hmenu, menuRequiresSelection[k], hasSel);
 	}
 
-	const bool canPaste = SciCall_CanPaste();
+	const bool canPaste = CanPaste();
 	EnableCmd(hmenu, IDM_EDIT_PASTE, canPaste);
 	//EnableCmd(hmenu, IDM_EDIT_PASTE_BINARY, canPaste);
 	EnableCmd(hmenu, IDM_EDIT_SWAP, hasSel || canPaste);
@@ -3098,19 +3217,22 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDT_EDIT_PASTE:
 	case IDM_EDIT_PASTE:
 	//case IDM_EDIT_PASTE_BINARY:
-		SciCall_Paste(LOWORD(wParam) == IDM_EDIT_PASTE_BINARY);
+		EditPaste(LOWORD(wParam) == IDM_EDIT_PASTE_BINARY);
 		break;
 
 	case IDM_EDIT_SWAP:
 		if (SciCall_IsSelectionEmpty()) {
 			const Sci_Position iPos = SciCall_GetCurrentPos();
-			SciCall_Paste(false);
+			EditPaste(false);
 			const Sci_Position iNewPos = SciCall_GetCurrentPos();
 			SciCall_SetSel(iPos, iNewPos);
 			SendWMCommand(hwnd, IDM_EDIT_CLEARCLIPBOARD);
 		} else {
 			UINT len = 0;
 			char *pClip = EditGetClipboardText(len);
+			if (pClip == nullptr) {
+				pClip = GetClipboardShellPaths(&len);
+			}
 			if (pClip == nullptr) {
 				break;
 			}
@@ -6414,7 +6536,7 @@ void UpdateToolbar() noexcept {
 	EnableTool(IDT_FILE_SAVE, IsDocumentModified());
 	EnableTool(IDT_EDIT_UNDO, SciCall_CanUndo());
 	EnableTool(IDT_EDIT_REDO, SciCall_CanRedo());
-	EnableTool(IDT_EDIT_PASTE, SciCall_CanPaste());
+	EnableTool(IDT_EDIT_PASTE, CanPaste());
 
 	const bool nonEmpty = SciCall_GetLength() != 0;
 	EnableTool(IDT_EDIT_CUT, nonEmpty);
@@ -7998,7 +8120,7 @@ void CALLBACK PasteBoardTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTi
 			return;
 		}
 		dwClipboardSequenceNumber = sequence;
-		if (SciCall_CanPaste()) {
+		if (CanPaste()) {
 			const bool back = autoCompletionConfig.bIndentText;
 			autoCompletionConfig.bIndentText = false;
 			SciCall_DocumentEnd();
@@ -8006,7 +8128,7 @@ void CALLBACK PasteBoardTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTi
 			if (SciCall_GetLength() != 0) {
 				SciCall_NewLine();
 			}
-			SciCall_Paste(false);
+			EditPaste(false);
 			const Sci_Position length = SciCall_GetLength();
 			const int ch = SciCall_GetCharAt(length - 1);
 			if (!IsEOLChar(ch)) {
