@@ -500,7 +500,7 @@ BEGIN
 		MENUITEM "Utiliser le stye de thème de code par défaut\tShift+F12",	IDM_VIEW_USEDEFAULT_CODESTYLE
 		POPUP "Thème de style"
 		BEGIN
-			MENUITEM "Défaut",					IDM_VIEW_STYLE_THEME_DEFAULT
+			MENUITEM "Light",					IDM_VIEW_STYLE_THEME_LIGHT
 			MENUITEM "Sombre",						IDM_VIEW_STYLE_THEME_DARK
 		END
 		MENUITEM SEPARATOR
@@ -2044,7 +2044,7 @@ BEGIN
 	IDS_EOLMODENAME_LF				"Unix/macOS (LF)"
 	IDS_EOLMODENAME_CR				"Mac OS classique (CR)"
 
-	IDS_CONFIG_THEME_TITLE_DEFAULT	"Configurer le thème par défaut"
+	IDS_CONFIG_THEME_TITLE_LIGHT	"Configurer le thème Light"
 	IDS_CONFIG_THEME_TITLE_DARK		"Configurer le thème sombre"
 	IDS_FAVORITE_SCHEMES_TITLE		"Thème favoris"
 	IDS_CUSTOMIZE_SCHEMES_HELP		"Les extensions de fichiers doivent être séparéespar un point virgule (;)\r\n\

@@ -500,8 +500,8 @@ BEGIN
 		MENUITEM "기본 코드 스타일 사용(&U)\tShift+F12",					IDM_VIEW_USEDEFAULT_CODESTYLE
 		POPUP "테마 스타일(&Y)"
 		BEGIN
-			MENUITEM "기본값(&D)",										IDM_VIEW_STYLE_THEME_DEFAULT
-			MENUITEM "어두운(&K)",										IDM_VIEW_STYLE_THEME_DARK
+			MENUITEM "Light(&L)",										IDM_VIEW_STYLE_THEME_LIGHT
+			MENUITEM "어두운(&D)",										IDM_VIEW_STYLE_THEME_DARK
 		END
 		MENUITEM SEPARATOR
 		POPUP "텍스트 파일(&T)"
@@ -2044,7 +2044,7 @@ BEGIN
 	IDS_EOLMODENAME_LF				"Unix/macOS (LF)"
 	IDS_EOLMODENAME_CR				"클래식 macOS (CR)"
 
-	IDS_CONFIG_THEME_TITLE_DEFAULT	"구성표 사용자 정의 - 기본 테마"
+	IDS_CONFIG_THEME_TITLE_LIGHT	"구성표 사용자 정의 - Light Theme"
 	IDS_CONFIG_THEME_TITLE_DARK		"구성표 사용자 정의 - 어두운 테마"
 	IDS_FAVORITE_SCHEMES_TITLE		"즐겨찾기"
 	IDS_CUSTOMIZE_SCHEMES_HELP		"확장자는 세미콜론(;)으로 구분되어야 합니다.\r\n\

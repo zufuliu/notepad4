@@ -500,7 +500,7 @@ BEGIN
 		MENUITEM "Użyj d&omyślnego stylu kodu\tShift+F12",IDM_VIEW_USEDEFAULT_CODESTYLE
 		POPUP "Motyw st&ylu"
 		BEGIN
-			MENUITEM "&Domyślny",					IDM_VIEW_STYLE_THEME_DEFAULT
+			MENUITEM "&Light",					IDM_VIEW_STYLE_THEME_LIGHT
 			MENUITEM "&Ciemny",						IDM_VIEW_STYLE_THEME_DARK
 		END
 		MENUITEM SEPARATOR
@@ -2044,7 +2044,7 @@ BEGIN
 	IDS_EOLMODENAME_LF				"Unix/macOS (LF)"
 	IDS_EOLMODENAME_CR				"Klasyczny Mac OS (CR)"
 
-	IDS_CONFIG_THEME_TITLE_DEFAULT	"Dostosuj schematy - motyw domyślny"
+	IDS_CONFIG_THEME_TITLE_LIGHT	"Dostosuj schematy - motyw Light"
 	IDS_CONFIG_THEME_TITLE_DARK		"Dostosuj schematy - motyw ciemny"
 	IDS_FAVORITE_SCHEMES_TITLE		"Ulubione schematy"
 	IDS_CUSTOMIZE_SCHEMES_HELP		"Rozszerzenia nazw plików muszą być oddzielone średnikiem (;)\r\n\

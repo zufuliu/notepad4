@@ -500,7 +500,7 @@ BEGIN
 		MENUITEM "&Usa lo stile predefinito per il codice\tShift+F12",	IDM_VIEW_USEDEFAULT_CODESTYLE
 		POPUP "St&ile Tema"
 		BEGIN
-			MENUITEM "&Predefinito",					IDM_VIEW_STYLE_THEME_DEFAULT
+			MENUITEM "&Light",					IDM_VIEW_STYLE_THEME_LIGHT
 			MENUITEM "&Scuro",						IDM_VIEW_STYLE_THEME_DARK
 		END
 		MENUITEM SEPARATOR
@@ -2044,7 +2044,7 @@ BEGIN
 	IDS_EOLMODENAME_LF				"Unix/macOS (LF)"
 	IDS_EOLMODENAME_CR				"Mac OS Classico (CR)"
 
-	IDS_CONFIG_THEME_TITLE_DEFAULT	"Personalizza Schemi - Tema Predefinito"
+	IDS_CONFIG_THEME_TITLE_LIGHT	"Personalizza Schemi - Tema Light"
 	IDS_CONFIG_THEME_TITLE_DARK		"Personalizza Schemi - Tema scuro"
 	IDS_FAVORITE_SCHEMES_TITLE		"Schemi Preferiti"
 	IDS_CUSTOMIZE_SCHEMES_HELP		"Le estensioni dei file devono essere separate da un punto e virgola (;)\r\n\

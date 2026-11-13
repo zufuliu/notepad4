@@ -501,7 +501,7 @@ BEGIN
 		MENUITEM "&Применять стиль кода по умолчанию\tShift+F12",					IDM_VIEW_USEDEFAULT_CODESTYLE
 		POPUP "&Тема"
 		BEGIN
-			MENUITEM "&По умолчанию",								IDM_VIEW_STYLE_THEME_DEFAULT
+			MENUITEM "&Light",								IDM_VIEW_STYLE_THEME_LIGHT
 			MENUITEM "&Тёмная",									IDM_VIEW_STYLE_THEME_DARK
 		END
 		MENUITEM SEPARATOR
@@ -2045,7 +2045,7 @@ BEGIN
 	IDS_EOLMODENAME_LF			"Unix/macOS (LF)"
 	IDS_EOLMODENAME_CR			"Классическая Mac OS (CR)"
 
-	IDS_CONFIG_THEME_TITLE_DEFAULT		"Настройка схем - Тема по умолчанию"
+	IDS_CONFIG_THEME_TITLE_LIGHT		"Настройка схем - Light"
 	IDS_CONFIG_THEME_TITLE_DARK		"Настройка схем - Тёмная тема"
 	IDS_FAVORITE_SCHEMES_TITLE		"Избранные схемы"
 	IDS_CUSTOMIZE_SCHEMES_HELP		"Расширения файлов должны быть разделены точкой с запятой (;).\r\n\

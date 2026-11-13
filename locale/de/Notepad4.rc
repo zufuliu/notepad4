@@ -500,7 +500,7 @@ BEGIN
 		MENUITEM "Nutze Standard &Code Stil\tShift+F12",IDM_VIEW_USEDEFAULT_CODESTYLE
 		POPUP "Th&eme Stil"
 		BEGIN
-			MENUITEM "&Standard",					IDM_VIEW_STYLE_THEME_DEFAULT
+			MENUITEM "&Light",					IDM_VIEW_STYLE_THEME_LIGHT
 			MENUITEM "&Dunkel",						IDM_VIEW_STYLE_THEME_DARK
 		END
 		MENUITEM SEPARATOR
@@ -2048,7 +2048,7 @@ BEGIN
 	IDS_EOLMODENAME_LF				"Unix/macOS (LF)"
 	IDS_EOLMODENAME_CR				"Classic Mac OS (CR)"
 
-	IDS_CONFIG_THEME_TITLE_DEFAULT	"Schema anpassen - Standard Theme"
+	IDS_CONFIG_THEME_TITLE_LIGHT	"Schema anpassen - Light Theme"
 	IDS_CONFIG_THEME_TITLE_DARK		"Schema anpassen - Dark Theme"
 	IDS_FAVORITE_SCHEMES_TITLE		"Schemafavoriten"
 	IDS_CUSTOMIZE_SCHEMES_HELP		"Erweiterungen müssen durch ein Semikolon getrennt sein (;)\r\n\

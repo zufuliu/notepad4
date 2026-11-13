@@ -22,6 +22,7 @@
 
 enum {
 	StyleTheme_Default = 0,
+	StyleTheme_Light = 0,
 	StyleTheme_Dark = 1,
 	StyleTheme_Max = StyleTheme_Dark,
 };

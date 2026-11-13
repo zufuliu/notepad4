@@ -500,8 +500,8 @@ BEGIN
 		MENUITEM "&Use Default Code Style\tShift+F12",IDM_VIEW_USEDEFAULT_CODESTYLE
 		POPUP "St&yle Theme"
 		BEGIN
-			MENUITEM "&Default",					IDM_VIEW_STYLE_THEME_DEFAULT
-			MENUITEM "Dar&k",						IDM_VIEW_STYLE_THEME_DARK
+			MENUITEM "&Light",						IDM_VIEW_STYLE_THEME_LIGHT
+			MENUITEM "&Dark",						IDM_VIEW_STYLE_THEME_DARK
 		END
 		MENUITEM SEPARATOR
 		POPUP "&Text File"
@@ -2044,7 +2044,7 @@ BEGIN
 	IDS_EOLMODENAME_LF				"Unix/macOS (LF)"
 	IDS_EOLMODENAME_CR				"Classic Mac OS (CR)"
 
-	IDS_CONFIG_THEME_TITLE_DEFAULT	"Customize Schemes - Default Theme"
+	IDS_CONFIG_THEME_TITLE_LIGHT	"Customize Schemes - Light Theme"
 	IDS_CONFIG_THEME_TITLE_DARK		"Customize Schemes - Dark Theme"
 	IDS_FAVORITE_SCHEMES_TITLE		"Favorite Schemes"
 	IDS_CUSTOMIZE_SCHEMES_HELP		"Filename extensions must be separated by semicolon (;)\r\n\
