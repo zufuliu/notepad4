@@ -3646,12 +3646,15 @@ bool Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, bool bDefaultSt
 // Style_SetDefaultFont()
 //
 void Style_SetDefaultFont(HWND hwndOwner, bool bCode) noexcept {
+	bStyleDialogOpen = true;
 	const int iIdx = bCode ? GlobalStyleIndex_DefaultCode : GlobalStyleIndex_DefaultText;
 	if (Style_SelectFont(hwndOwner, lexGlobal.GetStyleValue(iIdx), MAX_EDITSTYLE_VALUE_SIZE, true)) {
 		fStylesModified |= STYLESMODIFIED_SOME_STYLE;
 		lexGlobal.bStyleChanged = true;
 		Style_SetLexer(pLexCurrent, false);
 	}
+	bStyleDialogOpen = false;
+	Style_OnStyleThemeChanged(hwndOwner, styleThemeSetting);
 }
 
 static COLORREF Style_ChooseColor(HWND hwnd, COLORREF color) noexcept {
