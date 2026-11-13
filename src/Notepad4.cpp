@@ -59,6 +59,7 @@ static HMONITOR hCurrentMonitor = nullptr;
 HWND	hwndEdit;
 HWND	hwndMain;
 static HMENU hmenuMain;
+HTHEME hThemeMenu = nullptr;
 HWND	hDlgFindReplace = nullptr;
 HWND	hDlgWarnLineEnding = nullptr;
 static bool bInitDone = false;
@@ -433,6 +434,9 @@ static void CleanUpResources(bool initialized) noexcept {
 	Scintilla_ReleaseResources();
 	DarkMode_Cleanup();
 
+	if (hThemeMenu) {
+		CloseThemeData(hThemeMenu);
+	}
 	if (hTrayIcon) {
 		DestroyIcon(hTrayIcon);
 	}
@@ -536,16 +540,17 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
 	g_exeInstance = hInstance;
 #endif
-#if _WIN32_WINNT < _WIN32_WINNT_WIN8
 	// Set the Windows version global variable
 	OSVERSIONINFOW version;
 	version.dwOSVersionInfoSize = sizeof(version);
 	version.dwMajorVersion = 0;
 	version.dwMinorVersion = 0;
+	version.dwBuildNumber = 0;
 	NP2_COMPILER_WARNING_PUSH
 	NP2_IGNORE_WARNING_DEPRECATED_DECLARATIONS
 	GetVersionEx(&version);
 	NP2_COMPILER_WARNING_POP
+#if _WIN32_WINNT < _WIN32_WINNT_WIN8
 	g_uWinVer = (version.dwMajorVersion << 8) | version.dwMinorVersion;
 #endif
 
@@ -644,9 +649,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 #endif
 	Scintilla_RegisterClasses(hInstance);
 
+	DarkMode_Init(version);
 	// Load Settings
 	LoadSettings();
-	DarkMode_Init();
+	if (DarkMode_IsActive()) {
+		DarkMode_SetAppDarkMode(TRUE);
+	}
 
 	if (!InitApplication(hInstance)) {
 		CleanUpResources(false);
@@ -1110,13 +1118,19 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 	case WM_MOUSEACTIVATE:
 	case WM_NCHITTEST:
 	case WM_NCCALCSIZE:
-	case WM_NCPAINT:
 	case WM_PAINT:
 	case WM_ERASEBKGND:
 	case WM_NCMOUSEMOVE:
 	case WM_NCLBUTTONDOWN:
 	case WM_WINDOWPOSCHANGING:
 		return DefWindowProc(hwnd, umsg, wParam, lParam);
+
+	case WM_NCACTIVATE:
+	case WM_NCPAINT: {
+		const LRESULT result = DefWindowProc(hwnd, umsg, wParam, lParam);
+		DarkMode_DrawUAHMenuNCBottomLine(hwnd);
+		return result;
+	}
 
 	case WM_WINDOWPOSCHANGED: {
 		HMONITOR monitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
@@ -1203,7 +1217,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 	case WM_SETTINGCHANGE:
 		bitmapCache.Invalidate();
-		// TODO: detect system theme and high contrast mode changes
+		DarkMode_HandleSettingChange(hwnd, lParam);
 		SendMessage(hwndEdit, WM_SETTINGCHANGE, wParam, lParam);
 		Style_SetLexer(pLexCurrent, false); // override base elements
 		break;
@@ -1412,6 +1426,10 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			SetMenu(hwnd, enter ? hmenuMain : nullptr);
 		}
 		return wParam;
+
+	case WM_UAHDRAWMENU:
+	case WM_UAHDRAWMENUITEM:
+		return DarkMode_DrawUAHMenu(hwnd, umsg, wParam, lParam);
 
 	case WM_NOTIFY:
 		return MsgNotify(hwnd, wParam, lParam);
@@ -1718,6 +1736,9 @@ void EditCreate(HWND hwndParent) noexcept {
 	hwndEdit = hwnd;
 	InitScintillaHandle(hwnd);
 	//SciInitThemes(hwnd);
+	if (DarkMode_IsActive()) {
+		DarkMode_UseDarkScrollBar(hwnd);
+	}
 	if (bEditLayoutRTL) {
 		SetWindowLayoutRTL(hwnd, true);
 	}
@@ -1845,6 +1866,9 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	g_uCurrentDPI = GetWindowDPI(hwnd);
 	hmenuMain = GetMenu(hwnd);
 	hCurrentMonitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
+	if (DarkMode_IsActive()) {
+		DarkMode_SetDarkTitleBar(hwnd, TRUE);
+	}
 	Style_DetectBaseFontSize(hCurrentMonitor);
 
 	// Setup edit control
@@ -2014,6 +2038,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 	GetWindowRect(hwndReBar, &rc);
 	cyReBar = rc.bottom - rc.top;
 	cyReBarFrame = bIsAppThemed ? 0 : 2;
+	DarkMode_ApplyToBars(hwndToolbar, hwndStatus);
 }
 
 void RecreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
@@ -2036,6 +2061,10 @@ void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	const Sci_Line iVisTopLine = SciCall_GetFirstVisibleLine();
 	const Sci_Line iDocTopLine = SciCall_DocLineFromVisible(iVisTopLine);
 
+	if (hThemeMenu) {
+		CloseThemeData(hThemeMenu);
+		hThemeMenu = nullptr;
+	}
 	bitmapCache.Invalidate();
 	// recreate toolbar and statusbar
 	RecreateBars(hwnd, g_hInstance);
@@ -2069,6 +2098,10 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	UNREFERENCED_PARAMETER(wParam);
 	UNREFERENCED_PARAMETER(lParam);
 
+	if (hThemeMenu) {
+		CloseThemeData(hThemeMenu);
+		hThemeMenu = nullptr;
+	}
 	// reinitialize edit frame
 	DWORD dwExStyle = GetWindowExStyle(hwndEdit);
 	if (IsAppThemed()) {
@@ -3791,7 +3824,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_VIEW_STYLE_THEME_SYSTEM:
 	case IDM_VIEW_STYLE_THEME_LIGHT:
 	case IDM_VIEW_STYLE_THEME_DARK:
-		Style_OnStyleThemeChanged(LOWORD(wParam) - IDM_VIEW_STYLE_THEME_LIGHT);
+		Style_OnStyleThemeChanged(hwnd, LOWORD(wParam) - IDM_VIEW_STYLE_THEME_LIGHT);
 		break;
 
 	case IDM_VIEW_DEFAULT_CODE_FONT:
@@ -4917,7 +4950,11 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDC_TOOLBAR:
 		switch (pnmh->code) {
+		case TBN_BEGINADJUST:
+			DarkMode_OnToolbarBeginAdjust();
+			break;
 		case TBN_ENDADJUST:
+			DarkMode_OnToolbarEndAdjust();
 			UpdateToolbar();
 			break;
 
@@ -4981,6 +5018,15 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			DestroyMenu(hmenu);
 		}
 		return FALSE;
+
+		case NM_CUSTOMDRAW:
+			return DarkMode_ToolbarCustomDraw(lParam);
+		}
+		break;
+
+	case IDC_REBAR:
+		if (pnmh->code == NM_CUSTOMDRAW) {
+			return DarkMode_RebarCustomDraw(lParam);
 		}
 		break;
 
@@ -7142,6 +7188,7 @@ bool FileSave(FileSaveFlag saveFlag) {
 			}
 			InstallFileWatching(false);
 			if (PathEqual(szCurFile, szIniFile)) {
+				const UINT previous = g_DarkModeStatus;
 				LoadFlags();
 				LoadSettings();
 				if (bSaveRecentFiles) {
@@ -7150,6 +7197,9 @@ bool FileSave(FileSaveFlag saveFlag) {
 				if (bSaveFindReplace && mruFind.Initialized()) {
 					mruFind.Reload();
 					mruReplace.Reload();
+				}
+				if (previous != g_DarkModeStatus) {
+					DarkMode_OnDarkModeChange(hwndMain);
 				}
 				if (styleThemeActive == StyleTheme_Light) {
 					Style_LoadAll(static_cast<StyleLoadFlag>(StyleLoadFlag_Reload | StyleLoadFlag_Apply));

@@ -77,7 +77,7 @@ static const TBBUTTON tbbMainWnd[] =
 };
 // NOLINTEND(readability-redundant-zero-initializer)
 
-static HWND hwndDriveBox;
+HWND hwndDriveBox;
 HWND	hwndDirList;
 HWND	hwndMain;
 static HICON hTrayIcon = nullptr;
@@ -323,16 +323,17 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
 	g_exeInstance = hInstance;
 #endif
-#if _WIN32_WINNT < _WIN32_WINNT_VISTA
 	// Set the Windows version global variable
 	OSVERSIONINFOW version;
 	version.dwOSVersionInfoSize = sizeof(version);
 	version.dwMajorVersion = 0;
 	version.dwMinorVersion = 0;
+	version.dwBuildNumber = 0;
 	NP2_COMPILER_WARNING_PUSH
 	NP2_IGNORE_WARNING_DEPRECATED_DECLARATIONS
 	GetVersionEx(&version);
 	NP2_COMPILER_WARNING_POP
+#if _WIN32_WINNT < _WIN32_WINNT_VISTA
 	g_uWinVer = (version.dwMajorVersion << 8) | version.dwMinorVersion;
 #endif
 
@@ -377,9 +378,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	LoadDpiForWindow();
 #endif
 
+	DarkMode_Init(version);
 	// Load Settings
 	LoadSettings();
-	DarkMode_Init();
+	if (DarkMode_IsActive()) {
+		DarkMode_SetAppDarkMode(TRUE);
+	}
 
 	if (!InitApplication(hInstance)) {
 		CleanUpResources(false);
@@ -584,6 +588,10 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 	case WM_DPICHANGED:
 		MsgDPIChanged(hwnd, wParam, lParam);
+		break;
+
+	case WM_SETTINGCHANGE:
+		DarkMode_HandleSettingChange(hwnd, lParam);
 		break;
 
 	// update colors of DirList manually
@@ -813,6 +821,9 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	UNREFERENCED_PARAMETER(wParam);
 	hwndMain = hwnd;
 	g_uCurrentDPI = GetWindowDPI(hwnd);
+	if (DarkMode_IsActive()) {
+		DarkMode_SetDarkTitleBar(hwnd, TRUE);
+	}
 	HINSTANCE hInstance = (AsPointer<LPCREATESTRUCT>(lParam))->hInstance;
 	const DWORD dwExStyle = IsAppThemed() ? 0 : WS_EX_CLIENTEDGE;
 	hwndDirList = CreateWindowEx(
@@ -852,6 +863,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 
 	// Window Initialization
 	// DriveBox
+	DarkMode_SetDriveBoxTheme(hwndDriveBox, FALSE);
 	DriveBox_Init(hwndDriveBox);
 	ComboBox_SetExtendedUI(hwndDriveBox, TRUE);
 	// DirList
@@ -1018,6 +1030,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 
 	cyReBarFrame = bIsAppThemed ? 0 : 2;
 	cyDriveBoxFrame = bIsAppThemed ? 0 : 2;
+	DarkMode_ApplyToBars(hwndToolbar, hwndStatus);
 }
 
 void RecreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
@@ -2140,7 +2153,11 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDC_TOOLBAR:
 		switch (pnmh->code) {
+		case TBN_BEGINADJUST:
+			DarkMode_OnToolbarBeginAdjust();
+			break;
 		case TBN_ENDADJUST:
+			DarkMode_OnToolbarEndAdjust();
 			mHistory.UpdateToolbar(hwndToolbar, IDT_HISTORY_BACK, IDT_HISTORY_FORWARD);
 			Toolbar_SetButtonImage(hwndToolbar, IDT_VIEW_FILTER, HasFilter() ? TB_DEL_FILTER_BMP : TB_ADD_FILTER_BMP);
 			break;
@@ -2164,6 +2181,15 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		case TBN_RESET:
 			Toolbar_SetButtons(hwndToolbar, DefaultToolbarButtons, tbbMainWnd, COUNTOF(tbbMainWnd));
 			return FALSE;
+
+		case NM_CUSTOMDRAW:
+			return DarkMode_ToolbarCustomDraw(lParam);
+		}
+		break;
+
+	case IDC_REBAR:
+		if (pnmh->code == NM_CUSTOMDRAW) {
+			return DarkMode_RebarCustomDraw(lParam);
 		}
 		break;
 
@@ -2477,7 +2503,9 @@ void LoadSettings() noexcept {
 
 	iValue = section.GetInt(L"StyleTheme", StyleTheme_AppDefault);
 	iValue = min<int>(iValue, StyleTheme_Max);
+	iValue = (iValue < StyleTheme_Light)? StyleTheme_System : iValue;
 	styleThemeSetting = iValue;
+	DarkMode_ResolveStyleTheme(iValue);
 
 	iValue = section.GetInt(L"EscFunction", EscFunction_None);
 	iEscFunction = clamp(static_cast<EscFunction>(iValue), EscFunction_None, EscFunction_Exit);

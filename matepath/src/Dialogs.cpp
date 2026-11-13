@@ -567,6 +567,7 @@ static INT_PTR CALLBACK GeneralPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 		if (bReuseWindow) {
 			CheckDlgButton(hwnd, IDC_REUSEWINDOW, BST_CHECKED);
 		}
+		DarkMode_InitDialog(hwnd, DialogRefData_PropSheetPage);
 		return TRUE;
 
 	case WM_NOTIFY:
@@ -659,6 +660,7 @@ static INT_PTR CALLBACK AdvancedPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 			EnableWindow(GetDlgItem(hwnd, IDC_ESCMIN), FALSE);
 			EnableWindow(GetDlgItem(hwnd, IDC_ESCEXIT), FALSE);
 		}
+		DarkMode_InitDialog(hwnd, DialogRefData_PropSheetPage);
 		return TRUE;
 
 	case WM_COMMAND:
@@ -789,6 +791,7 @@ INT_PTR CALLBACK ItemsPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPara
 		ComboBox_SetCurSel(hwndCtl, languageResID - IDS_LANG_USER_DEFAULT);
 		ComboBox_SetExtendedUI(hwndCtl, TRUE);
 #endif
+		DarkMode_InitDialog(hwnd, DialogRefData_PropSheetPage);
 	}
 	return TRUE;
 
@@ -824,7 +827,9 @@ INT_PTR CALLBACK ItemsPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPara
 			cc.lpCustColors = colorCustom;
 			cc.Flags = CC_RGBINIT | CC_SOLIDCOLOR;
 
+			DialogHook_Start(DialogRefData_ChooseColor);
 			const BOOL result = ChooseColor(&cc);
+			DialogHook_Stop();
 			if (result) {
 				if (LOWORD(wParam) == IDC_COLOR_PICK1) {
 					DeleteObject(m_hbrNoFilter);
@@ -1038,6 +1043,7 @@ INT_PTR CALLBACK ProgPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 			EnableWindow(GetDlgItem(hwnd, IDC_ENABLE_JUMP_LIST), FALSE);
 			Edit_SetReadOnly(hwndName, TRUE);
 		}
+		DarkMode_InitDialog(hwnd, DialogRefData_PropSheetPage);
 	}
 	return TRUE;
 
@@ -1190,8 +1196,9 @@ INT_PTR OptionsPropSheet(HWND hwnd, HINSTANCE hInstance) noexcept {
 	psh.nStartPage  = 0;
 	psh.ppsp        = psp;
 
+	DialogHook_Start(DialogRefData_PropSheetMain);
 	const INT_PTR nResult = PropertySheet(&psh);
-
+	DialogHook_Stop();
 	for (UINT index = 0; index < COUNTOF(psp); index++) {
 		NP2HeapFree(const_cast<DLGTEMPLATE *>(psp[index].pResource));
 	}
@@ -1209,8 +1216,14 @@ INT_PTR OptionsPropSheet(HWND hwnd, HINSTANCE hInstance) noexcept {
 			exStyle |= LVS_EX_FULLROWSELECT;
 		}
 		ListView_SetExtendedListViewStyleEx(hwndDirList, mask, exStyle);
-		DarkMode_SetFileListViewTheme(hwndDirList, exStyle & LVS_EX_FULLROWSELECT);
-		DarkMode_SetFileListViewColor(hwndDirList, true);
+		const UINT previous = g_DarkModeStatus;
+		DarkMode_ResolveStyleTheme(styleThemeSetting);
+		if (previous != g_DarkModeStatus) {
+			DarkMode_OnDarkModeChange(hwnd);
+		} else {
+			DarkMode_SetFileListViewTheme(hwndDirList, exStyle & LVS_EX_FULLROWSELECT);
+			DarkMode_SetFileListViewColor(hwndDirList, true);
+		}
 	}
 
 	return nResult;

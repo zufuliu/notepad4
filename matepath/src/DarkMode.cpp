@@ -1,5 +1,15 @@
 // This file is part of Notepad4.
 // See License.txt for details about distribution and modification.
+/*
+dark mode implementation based on following library and article:
+https://github.com/ysc3839/win32-darkmode
+https://github.com/ozone10/win32-darkmodelib
+UAHMenuBar	https://github.com/adzm/win32-custom-menubar-aero-theme
+
+https://www.zabkat.com/blog/darkmode-listview.htm
+https://www.zabkat.com/blog/bpic/dark_themes.txt
+https://github.com/nptr/msstyleEditor
+*/
 
 #include <windows.h>
 #include <windowsx.h>
@@ -10,17 +20,1301 @@
 #include <uxtheme.h>
 #include <vsstyle.h>
 #include <vssym32.h>
-#include "config.h"
+// #include "config.h"
 #include "Helpers.h"
 #include "DarkMode.h"
+#include "matepath.h"
 #include "Dialogs.h"
 
+extern HWND hwndMain;
+extern HWND hwndDriveBox;
+extern HWND hwndDirList;
+extern int styleThemeSetting;
+extern bool bFullRowSelect;
 extern bool bDefColorNoFilter;
 extern bool bDefColorFilter;
 extern COLORREF colorNoFilter;
 extern COLORREF colorFilter;
 extern WCHAR tchFilter[128];
 extern bool bNegFilter;
+UINT g_DarkModeStatus = DarkModeStatus_None;
+
+namespace { // API
+
+enum class IMMERSIVE_HC_CACHE_MODE {
+	IHCM_USE_CACHED_VALUE,
+	IHCM_REFRESH
+};
+
+// 1903 18362
+enum class PreferredAppMode {
+	Default,
+	AllowDark,
+	ForceDark,
+	ForceLight,
+	Max
+};
+
+enum WINDOWCOMPOSITIONATTRIB {
+	WCA_UNDEFINED = 0,
+	WCA_NCRENDERING_ENABLED = 1,
+	WCA_NCRENDERING_POLICY = 2,
+	WCA_TRANSITIONS_FORCEDISABLED = 3,
+	WCA_ALLOW_NCPAINT = 4,
+	WCA_CAPTION_BUTTON_BOUNDS = 5,
+	WCA_NONCLIENT_RTL_LAYOUT = 6,
+	WCA_FORCE_ICONIC_REPRESENTATION = 7,
+	WCA_EXTENDED_FRAME_BOUNDS = 8,
+	WCA_HAS_ICONIC_BITMAP = 9,
+	WCA_THEME_ATTRIBUTES = 10,
+	WCA_NCRENDERING_EXILED = 11,
+	WCA_NCADORNMENTINFO = 12,
+	WCA_EXCLUDED_FROM_LIVEPREVIEW = 13,
+	WCA_VIDEO_OVERLAY_ACTIVE = 14,
+	WCA_FORCE_ACTIVEWINDOW_APPEARANCE = 15,
+	WCA_DISALLOW_PEEK = 16,
+	WCA_CLOAK = 17,
+	WCA_CLOAKED = 18,
+	WCA_ACCENT_POLICY = 19,
+	WCA_FREEZE_REPRESENTATION = 20,
+	WCA_EVER_UNCLOAKED = 21,
+	WCA_VISUAL_OWNER = 22,
+	WCA_HOLOGRAPHIC = 23,
+	WCA_EXCLUDED_FROM_DDA = 24,
+	WCA_PASSIVEUPDATEMODE = 25,
+	WCA_USEDARKMODECOLORS = 26,
+	WCA_LAST = 27
+};
+
+struct WINDOWCOMPOSITIONATTRIBDATA {
+	WINDOWCOMPOSITIONATTRIB Attrib;
+	PVOID pvData;
+	SIZE_T cbData;
+};
+
+// constexpr DWORD DWMWA_USE_IMMERSIVE_DARK_MODE = 20;
+// using DwmSetWindowAttributeSig = HRESULT (WINAPI *)(HWND hwnd, DWORD dwAttribute, LPCVOID pvAttribute, DWORD cbAttribute) noexcept;
+using SetWindowCompositionAttributeSig = BOOL (WINAPI *)(HWND hwnd, WINDOWCOMPOSITIONATTRIBDATA*) noexcept;
+// 1809 17763
+using AllowDarkModeForWindowSig = BOOL (WINAPI *)(HWND hwnd, BOOL allow) noexcept; // ordinal 133
+using FlushMenuThemesSig = void (WINAPI *)() noexcept; // ordinal 136
+using RefreshImmersiveColorPolicyStateSig = void (WINAPI *)() noexcept; // ordinal 104
+using IsDarkModeAllowedForWindowSig = BOOL (WINAPI *)(HWND hwnd) noexcept; // ordinal 137
+using GetIsImmersiveColorUsingHighContrastSig = BOOL (WINAPI *)(IMMERSIVE_HC_CACHE_MODE mode) noexcept; // ordinal 106
+// 1903 18362
+using SetPreferredAppModeSig = PreferredAppMode (WINAPI *)(PreferredAppMode appMode) noexcept; // ordinal 135, in 1903
+
+// DwmSetWindowAttributeSig fnDwmSetWindowAttribute = nullptr;
+SetWindowCompositionAttributeSig fnSetWindowCompositionAttribute = nullptr;
+AllowDarkModeForWindowSig fnAllowDarkModeForWindow = nullptr;
+SetPreferredAppModeSig fnSetPreferredAppMode = nullptr;
+FlushMenuThemesSig fnFlushMenuThemes = nullptr;
+RefreshImmersiveColorPolicyStateSig fnRefreshImmersiveColorPolicyState = nullptr;
+IsDarkModeAllowedForWindowSig fnIsDarkModeAllowedForWindow = nullptr;
+GetIsImmersiveColorUsingHighContrastSig fnGetIsImmersiveColorUsingHighContrast = nullptr;
+
+constexpr DWORD win10Build1809 = 17763;
+constexpr DWORD win10Build1903 = 18362;
+// constexpr DWORD win10Build2004 = 19041;
+constexpr DWORD win11Build21H2 = 22000;
+constexpr DWORD win11Build24H2 = 26100;
+constexpr DWORD win11Build25H2 = 26200;
+
+constexpr bool CheckBuildNumber(DWORD buildNumber) noexcept {
+	return buildNumber >= win10Build1809;
+}
+
+LPCWSTR getDarkModeThemeName() noexcept {
+	return DarkMode_SupportDarkTheme() ? L"DarkMode_DarkTheme" : L"DarkMode_Explorer";
+}
+
+bool IsColorSchemeChangeMessage(LPARAM lParam) noexcept {
+	return lParam == SPI_SETHIGHCONTRAST || (!IS_INTRESOURCE(lParam) && StrCaseEqual(AsPointer<LPCWSTR>(lParam), L"ImmersiveColorSet"));
+}
+
+bool DarkMode_AppsUseDarkMode() noexcept {
+	if (DarkMode_IsSupported()) {
+		// fnShouldAppsUseDarkMode (ordinal 132) is not reliable on 1903+?
+		DWORD size = sizeof(DWORD);
+		DWORD mode = FALSE;
+		const auto status = RegGetValueW(HKEY_CURRENT_USER, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", L"AppsUseLightTheme", RRF_RT_REG_DWORD, nullptr, &mode, &size);
+		if (status == ERROR_SUCCESS && mode == FALSE) {
+			HIGHCONTRASTW highContrast{};
+			highContrast.cbSize = sizeof(highContrast);
+			if (SystemParametersInfo(SPI_GETHIGHCONTRAST, sizeof(highContrast), &highContrast, FALSE)) {
+				return (highContrast.dwFlags & HCF_HIGHCONTRASTON) == 0;
+			}
+			return true;
+		}
+	}
+	return false;
+}
+
+}
+
+namespace { // Color
+
+enum {
+	DarkColor_BackgroundColor = RGB(0x2D, 0x2D, 0x2D),
+	DarkColor_CtrlBackgroundColor = RGB(0x38, 0x38, 0x38),
+	DarkColor_HotBackgroundColor = RGB(0x45, 0x45, 0x45),
+	DarkColor_DlgBackgroundColor = RGB(0x25, 0x25, 0x26),
+	DarkColor_ErrorBackgroundColor = DarkColor_BackgroundColor,
+
+	DarkColor_EdgeColor = RGB(0x55, 0x55, 0x55),
+	DarkColor_HotEdgeColor = RGB(0x9B, 0x9B, 0x9B),
+	DarkColor_DisabledEdgeColor = RGB(0x48, 0x48, 0x48),
+	DarkColor_HighlightColor = RGB(0x60, 0xCD, 0xFF),
+
+	DarkColor_TextColor = RGB(0xD4, 0xD4, 0xD4),
+	DarkColor_DarkerTextColor = RGB(0xC0, 0xC0, 0xC0),
+	DarkColor_DisabledTextColor = RGB(0x80, 0x80, 0x80),
+	DarkColor_LinkTextColor = RGB(0x60, 0xCD, 0xFF),
+
+	DarkColor_ViewTextColor = DarkColor_TextColor,
+	DarkColor_ViewBackgroundColor = RGB(0x1E, 0x1E, 0x1E),
+	DarkColor_GridLinesColor = RGB(0x3C, 0x3C, 0x3C),
+	DarkColor_HeaderDividerColor = RGB(0x64, 0x64, 0x64),
+
+	DarkColor_HeaderTextColor = DarkColor_TextColor,
+	DarkColor_HeaderBackgroundColor = DarkColor_BackgroundColor,
+	DarkColor_HeaderHotBackgroundColor = DarkColor_HotBackgroundColor,
+	DarkColor_HeaderEdgeColor = DarkColor_EdgeColor,
+
+	DarkColor_WINDOWTEXT = DarkColor_TextColor,
+	DarkColor_WINDOW = DarkColor_ViewBackgroundColor,
+	DarkColor_BTNFACE = DarkColor_GridLinesColor,
+};
+
+enum {
+	DarkBrush_BackgroundBrush,
+	DarkBrush_CtrlBackgroundBrush,
+	DarkBrush_HotBackgroundBrush,
+	DarkBrush_DlgBackgroundBrush,
+	DarkBrush_EdgeBrush,
+	DarkBrush_HotEdgeBrush,
+	DarkPen_EdgePen,
+	DarkPen_HotEdgePen,
+	DarkBrushPen_Total,
+};
+
+HGDIOBJ darkObject[DarkBrushPen_Total]{};
+void InitDarkBrushAndPen() noexcept {
+	darkObject[DarkBrush_BackgroundBrush] = CreateSolidBrush(DarkColor_BackgroundColor);
+	darkObject[DarkBrush_CtrlBackgroundBrush] = CreateSolidBrush(DarkColor_CtrlBackgroundColor);
+	darkObject[DarkBrush_HotBackgroundBrush] = CreateSolidBrush(DarkColor_HotBackgroundColor);
+	darkObject[DarkBrush_DlgBackgroundBrush] = CreateSolidBrush(DarkColor_DlgBackgroundColor);
+	darkObject[DarkBrush_EdgeBrush] = CreateSolidBrush(DarkColor_EdgeColor);
+	darkObject[DarkBrush_HotEdgeBrush] = CreateSolidBrush(DarkColor_HotEdgeColor);
+	darkObject[DarkPen_EdgePen] = CreatePen(PS_SOLID, 1, DarkColor_EdgeColor);
+	darkObject[DarkPen_HotEdgePen] = CreatePen(PS_SOLID, 1, DarkColor_HotEdgeColor);
+}
+
+HBRUSH GetDarkBrush(UINT index) noexcept {
+	return static_cast<HBRUSH>(darkObject[index]);
+}
+
+HPEN GetDarkPen(UINT index) noexcept {
+	return static_cast<HPEN>(darkObject[index]);
+}
+
+}
+
+namespace { // Paint
+
+enum {
+	TabBarItemTextBufferSize = 128,
+	ButtonTextBufferSize = MAX_PATH,
+	GroupBoxTextBufferSize = MAX_PATH,
+	StatusBarItemTextBufferSize = MAX_PATH,
+};
+
+constexpr int kWin11CornerRoundness = 4;
+constexpr wchar_t kTriangleDown = 0x23F7; // U+23F7 Black Medium Down-Pointing Triangle
+
+[[nodiscard]] bool isRectValid(const RECT& rc) noexcept {
+	return rc.right > rc.left && rc.bottom > rc.top;
+}
+
+[[nodiscard]] bool isAnimationEnabled() noexcept {
+	BOOL isEnabled = FALSE;
+	return SystemParametersInfo(SPI_GETCLIENTAREAANIMATION, 0, &isEnabled, FALSE) && isEnabled;
+}
+
+void paintRoundRect(HDC hdc, const RECT &rect, HPEN hPen, HBRUSH hBrush, int width, int height) noexcept {
+	HBRUSH holdBrush = SelectBrush(hdc, hBrush);
+	HPEN oldPen = SelectPen(hdc, hPen);
+	RoundRect(hdc, rect.left, rect.top, rect.right, rect.bottom, width, height);
+	SelectObject(hdc, holdBrush);
+	SelectBrush(hdc, oldPen);
+}
+
+void paintFrameRect(HDC hdc, const RECT &rect, HPEN hPen) noexcept {
+	paintRoundRect(hdc, rect, hPen, static_cast<HBRUSH>(GetStockObject(NULL_BRUSH)), 0, 0);
+}
+
+void paintRect(HDC hdc, const RECT &rect, HPEN hPen, HBRUSH hBrush) noexcept {
+	paintRoundRect(hdc, rect, hPen, hBrush, 0, 0);
+}
+
+void paintRoundFrameRect(HDC hdc, const RECT &rect, HPEN hPen, int width, int height) noexcept {
+	paintRoundRect(hdc, rect, hPen, static_cast<HBRUSH>(GetStockObject(NULL_BRUSH)), width, height);
+}
+
+HBRUSH getBrushFromState(bool isDisabled, bool isHot) noexcept {
+	if (isDisabled) {
+		return GetDarkBrush(DarkBrush_DlgBackgroundBrush);
+	}
+	if (isHot) {
+		return GetDarkBrush(DarkBrush_HotBackgroundBrush);
+	}
+	return GetDarkBrush(DarkBrush_CtrlBackgroundBrush);
+}
+
+struct BufferedPaint {
+	HDC hMemDC = nullptr;
+	HBITMAP hMemBmp = nullptr;
+	HBITMAP hOldBmp = nullptr;
+	SIZE szBuffer{};
+	bool ensureBuffer(HDC hdc, const RECT &rcClient) noexcept {
+		const int width = rcClient.right - rcClient.left;
+		const int height = rcClient.bottom - rcClient.top;
+		if (szBuffer.cx != width || szBuffer.cy != height) {
+			releaseBuffer();
+			hMemDC = CreateCompatibleDC(hdc);
+			hMemBmp = CreateCompatibleBitmap(hdc, width, height);
+			hOldBmp = static_cast<HBITMAP>(SelectObject(hMemDC, hMemBmp));
+			szBuffer = { width, height };
+		}
+		return hMemDC != nullptr && hMemBmp != nullptr;
+	}
+	void releaseBuffer() const noexcept {
+		if (hMemDC != nullptr) {
+			SelectObject(hMemDC, hOldBmp);
+			DeleteObject(hMemBmp);
+			DeleteDC(hMemDC);
+		}
+	}
+	NP2_noinline
+	bool BeginPaint(HWND hwnd, HDC hdc, const PAINTSTRUCT &ps, RECT &rcClient) {
+		if (isRectValid(ps.rcPaint)) {
+			GetClientRect(hwnd, &rcClient);
+			if (ensureBuffer(hdc, rcClient)) {
+				SaveDC(hMemDC);
+				IntersectClipRect(hMemDC,
+					ps.rcPaint.left, ps.rcPaint.top,
+					ps.rcPaint.right, ps.rcPaint.bottom
+				);
+				return true;
+			}
+		}
+		return false;
+	}
+	void EndPaint(HDC hdc, const PAINTSTRUCT &ps) const noexcept {
+		RestoreDC(hMemDC, -1);
+		BitBlt(hdc,
+			ps.rcPaint.left, ps.rcPaint.top,
+			ps.rcPaint.right - ps.rcPaint.left,
+			ps.rcPaint.bottom - ps.rcPaint.top,
+			hMemDC,
+			ps.rcPaint.left, ps.rcPaint.top,
+			SRCCOPY);
+	}
+};
+
+}
+
+namespace { // Button, GroupBox
+
+constexpr bool buttonNeedsSubclass(DWORD type) noexcept {
+	return type == BS_GROUPBOX
+		|| type == BS_CHECKBOX || type == BS_AUTOCHECKBOX
+		|| type == BS_3STATE || type == BS_AUTO3STATE
+		|| type == BS_RADIOBUTTON || type == BS_AUTORADIOBUTTON;
+}
+
+constexpr bool isGroupBox(UINT_PTR uIdSubclass) noexcept {
+	return uIdSubclass == BS_GROUPBOX;
+}
+
+void renderButton(HWND hwnd, HDC hdc, HTHEME hTheme, DWORD style, DWORD nState, int iPartId, int iStateId, COLORREF textColor) noexcept {
+	bool isFontCreated = false;
+	HFONT hFont = nullptr;
+	LOGFONT lf;
+	if (SUCCEEDED(GetThemeFont(hTheme, hdc, iPartId, iStateId, TMT_FONT, &lf))) {
+		hFont = CreateFontIndirect(&lf);
+		isFontCreated = hFont != nullptr;
+	}
+	if (!isFontCreated) {
+		hFont = GetWindowFont(hwnd);
+	}
+
+	DWORD dtFlags = DT_LEFT;
+	if (style & BS_MULTILINE) {
+		dtFlags |= DT_WORDBREAK;
+	} else {
+		dtFlags |= DT_SINGLELINE;
+	}
+	if (style & BS_CENTER) {
+		dtFlags |= DT_CENTER;
+	} else if (style & BS_RIGHT) {
+		dtFlags |= DT_RIGHT;
+	}
+	if ((style & BS_VCENTER) != 0 || (style & (BS_MULTILINE | BS_BOTTOM | BS_TOP)) == 0) {
+		dtFlags |= DT_VCENTER;
+	} else if (style & BS_BOTTOM) {
+		dtFlags |= DT_BOTTOM;
+	}
+
+	const auto uiState = static_cast<DWORD>(SendMessage(hwnd, WM_QUERYUISTATE, 0, 0));
+	// hide prefix
+	if ((uiState & UISF_HIDEACCEL) != 0) {
+		dtFlags |= DT_HIDEPREFIX;
+	}
+
+	// Text and box part
+	WCHAR buffer[ButtonTextBufferSize];
+	memset(buffer, 0, sizeof(int));
+	const int bufferLen = GetWindowText(hwnd, buffer, COUNTOF(buffer));
+	RECT rcClient{};
+	GetClientRect(hwnd, &rcClient);
+
+	SIZE szBox{};
+	GetThemePartSize(hTheme, hdc, iPartId, iStateId, nullptr, TS_DRAW, &szBox);
+
+	RECT rcText{};
+	GetThemeBackgroundContentRect(hTheme, hdc, iPartId, iStateId, &rcClient, &rcText);
+
+	RECT rcBackground{ rcClient };
+	if (!(style & BS_MULTILINE)) {
+		rcBackground.top += (rcText.bottom - rcText.top - szBox.cy) / 2;
+	}
+	rcBackground.bottom = rcBackground.top + szBox.cy;
+	rcBackground.right = rcBackground.left + szBox.cx;
+	rcText.left = rcBackground.right + 3;
+
+	HFONT hOldFont = SelectFont(hdc, hFont);
+	DrawThemeParentBackground(hwnd, hdc, &rcClient);
+	DrawThemeBackground(hTheme, hdc, iPartId, iStateId, &rcBackground, nullptr); // draw box
+
+	DTTOPTS dtto{};
+	dtto.dwSize = sizeof(DTTOPTS);
+	dtto.dwFlags = DTT_TEXTCOLOR;
+	dtto.crText = textColor;
+	DrawThemeTextEx(hTheme, hdc, iPartId, iStateId, buffer, bufferLen, dtFlags, &rcText, &dtto);
+
+	// Focus rect
+	if (((nState & BST_FOCUS) == BST_FOCUS) && ((uiState & UISF_HIDEFOCUS) == 0)) {
+		dtto.dwFlags |= DTT_CALCRECT;
+		DrawThemeTextEx(hTheme, hdc, iPartId, iStateId, buffer, bufferLen, dtFlags | DT_CALCRECT, &rcText, &dtto);
+		const RECT rcFocus{ rcText.left - 1, rcText.top, rcText.right + 1, rcText.bottom + 1 };
+		DrawFocusRect(hdc, &rcFocus);
+	}
+
+	SelectFont(hdc, hOldFont);
+	if (isFontCreated) {
+		DeleteObject(hFont);
+	}
+}
+
+DWORD paintButton(HWND hwnd, HDC hdc, HTHEME hTheme, DWORD prevStateId) noexcept {
+	const DWORD style = GetWindowStyle(hwnd);
+	const BOOL isEnabled = IsWindowEnabled(hwnd);
+	const auto nState = static_cast<DWORD>(SendMessage(hwnd, BM_GETSTATE, 0, 0));
+	const COLORREF textColor = isEnabled ? DarkColor_TextColor : DarkColor_DisabledTextColor;
+
+	int iPartId = 0;
+	DWORD iStateId = 0;
+
+	// `enum CHECKBOXSTATES` in vsstyle.h
+	constexpr int checkedOffset = CBS_CHECKEDNORMAL - CBS_UNCHECKEDNORMAL;
+	constexpr int mixedOffset = CBS_MIXEDNORMAL - CBS_UNCHECKEDNORMAL;
+
+	switch (style & BS_TYPEMASK) {
+	case BS_CHECKBOX:
+	case BS_AUTOCHECKBOX:
+	case BS_3STATE:
+	case BS_AUTO3STATE:
+		iPartId = BP_CHECKBOX;
+		if (!isEnabled) {
+			iStateId = CBS_UNCHECKEDDISABLED;
+		} else if ((nState & BST_PUSHED) == BST_PUSHED) {
+			iStateId = CBS_UNCHECKEDPRESSED;
+		} else if ((nState & BST_HOT) == BST_HOT) {
+			iStateId = CBS_UNCHECKEDHOT;
+		} else {
+			iStateId = CBS_UNCHECKEDNORMAL;
+		}
+		if ((nState & BST_CHECKED) == BST_CHECKED) {
+			iStateId += checkedOffset;
+		} else if ((nState & BST_INDETERMINATE) == BST_INDETERMINATE) {
+			iStateId += mixedOffset;
+		}
+		break;
+
+	case BS_RADIOBUTTON:
+	case BS_AUTORADIOBUTTON:
+		iPartId = BP_RADIOBUTTON;
+		if (!isEnabled) {
+			iStateId = RBS_UNCHECKEDDISABLED;
+		} else if ((nState & BST_PUSHED) == BST_PUSHED) {
+			iStateId = RBS_UNCHECKEDPRESSED;
+		} else if ((nState & BST_HOT) == BST_HOT) {
+			iStateId = RBS_UNCHECKEDHOT;
+		} else {
+			iStateId = RBS_UNCHECKEDNORMAL;
+		}
+		if ((nState & BST_CHECKED) == BST_CHECKED) {
+			iStateId += RBS_CHECKEDNORMAL - RBS_UNCHECKEDNORMAL;
+		}
+		break;
+
+	default: // should never happen
+		iPartId = BP_CHECKBOX;
+		iStateId = CBS_UNCHECKEDDISABLED;
+		break;
+	}
+
+	if (!isAnimationEnabled()) {
+		renderButton(hwnd, hdc, hTheme, style, nState, iPartId, iStateId, textColor);
+		return iStateId;
+	}
+
+	if (BufferedPaintRenderAnimation(hwnd, hdc)) {
+		return prevStateId;
+	}
+
+	// Animation part - hover transition
+	BP_ANIMATIONPARAMS animParams{};
+	animParams.cbSize = sizeof(BP_ANIMATIONPARAMS);
+	animParams.style = BPAS_LINEAR;
+	if (iStateId != prevStateId) {
+		GetThemeTransitionDuration(hTheme, iPartId, prevStateId, iStateId, TMT_TRANSITIONDURATIONS, &animParams.dwDuration);
+	}
+
+	RECT rcClient{};
+	GetClientRect(hwnd, &rcClient);
+
+	HDC hdcFrom = nullptr;
+	HDC hdcTo = nullptr;
+	if (HANIMATIONBUFFER hbpAnimation = BeginBufferedAnimation(hwnd, hdc, &rcClient, BPBF_COMPATIBLEBITMAP, nullptr, &animParams, &hdcFrom, &hdcTo)) {
+		if (hdcFrom != nullptr) {
+			renderButton(hwnd, hdcFrom, hTheme, style, nState, iPartId, prevStateId, textColor);
+		}
+		if (hdcTo != nullptr) {
+			renderButton(hwnd, hdcTo, hTheme, style, nState, iPartId, iStateId, textColor);
+		}
+		EndBufferedAnimation(hbpAnimation, TRUE);
+	} else {
+		renderButton(hwnd, hdc, hTheme, style, nState, iPartId, iStateId, textColor);
+	}
+	return iStateId;
+}
+
+void paintGroupBox(HWND hwnd, HDC hdc, HTHEME hTheme) noexcept {
+	const DWORD style = GetWindowStyle(hwnd);
+	const BOOL isEnabled = IsWindowEnabled(hwnd);
+	constexpr int iPartId = BP_GROUPBOX;
+	const int iStateId = isEnabled ? GBS_NORMAL : GBS_DISABLED;
+
+	bool isFontCreated = false;
+	HFONT hFont = nullptr;
+	LOGFONT lf;
+	if (SUCCEEDED(GetThemeFont(hTheme, hdc, iPartId, iStateId, TMT_FONT, &lf))) {
+		hFont = CreateFontIndirect(&lf);
+		isFontCreated = hFont != nullptr;
+	}
+	if (!isFontCreated) {
+		hFont = GetWindowFont(hwnd);
+	}
+
+	WCHAR buffer[GroupBoxTextBufferSize];
+	memset(buffer, 0, sizeof(int));
+	const int bufferLen = GetWindowText(hwnd, buffer, COUNTOF(buffer));
+	const bool isCenter = (style & BS_CENTER) != 0;
+	RECT rcClient{};
+	GetClientRect(hwnd, &rcClient);
+	rcClient.bottom -= 1;
+
+	RECT rcText{ rcClient };
+	RECT rcBackground{ rcClient };
+	int textLen = bufferLen;
+	if (textLen == 0) {
+		// There is no text, use "M" to get metrics to move top edge down
+		textLen = 1;
+		buffer[0] = L'M';
+		buffer[1] = L'\0';
+	}
+
+	// Text rectangle part
+	SIZE szText{};
+	HFONT hOldFont = SelectFont(hdc, hFont);
+	GetTextExtentPoint32(hdc, buffer, textLen, &szText);
+	rcBackground.top += szText.cy / 2U;
+	if (bufferLen != 0) {
+		const int centerPosX = isCenter ? ((rcClient.right - rcClient.left - szText.cx) / 2) : 7;
+		rcText.left += centerPosX;
+		rcText.bottom = rcText.top + szText.cy;
+		rcText.right = rcText.left + szText.cx + 4;
+		ExcludeClipRect(hdc, rcText.left, rcText.top, rcText.right, rcText.bottom);
+	}
+
+	RECT rcContent = rcBackground;
+	GetThemeBackgroundContentRect(hTheme, hdc, BP_GROUPBOX, iStateId, &rcBackground, &rcContent);
+	ExcludeClipRect(hdc, rcContent.left, rcContent.top, rcContent.right, rcContent.bottom);
+	paintFrameRect(hdc, rcBackground, GetDarkPen(DarkPen_EdgePen)); // main frame
+	SelectClipRgn(hdc, nullptr);
+
+	// Text part
+	if (bufferLen != 0) {
+		InflateRect(&rcText, -2, 0);
+		DTTOPTS dtto{};
+		dtto.dwSize = sizeof(DTTOPTS);
+		dtto.dwFlags = DTT_TEXTCOLOR;
+		dtto.crText = isEnabled ? DarkColor_TextColor : DarkColor_DisabledTextColor;
+		DWORD dtFlags = isCenter ? (DT_CENTER | DT_SINGLELINE) : (DT_LEFT | DT_SINGLELINE);
+		if (SendMessage(hwnd, WM_QUERYUISTATE, 0, 0) != 0) {
+			dtFlags |= DT_HIDEPREFIX;
+		}
+		DrawThemeTextEx(hTheme, hdc, BP_GROUPBOX, iStateId, buffer, bufferLen, dtFlags, &rcText, &dtto);
+	}
+
+	SelectFont(hdc, hOldFont);
+	if (isFontCreated) {
+		DeleteObject(hFont);
+	}
+}
+
+LRESULT CALLBACK ButtonSubclass(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData) noexcept {
+	if (umsg == WM_NCDESTROY) {
+		RemoveWindowSubclass(hwnd, ButtonSubclass, uIdSubclass);
+	} else if (DarkMode_IsActive()) {
+		switch (umsg) {
+		case WM_ERASEBKGND:
+			return TRUE;
+
+		case WM_PRINTCLIENT:
+		case WM_PAINT:
+			if (auto hTheme = OpenThemeData(hwnd, VSCLASS_BUTTON)) {
+				PAINTSTRUCT ps{};
+				auto hdc = AsPointer<HDC>(wParam);
+				if (hdc == nullptr) {
+					hdc = BeginPaint(hwnd, &ps);
+				}
+				if (isGroupBox(uIdSubclass)) {
+					paintGroupBox(hwnd, hdc, hTheme);
+				} else {
+					const DWORD prevStateId = static_cast<DWORD>(dwRefData);
+					const DWORD iStateId = paintButton(hwnd, hdc, hTheme, prevStateId);
+					if (iStateId != prevStateId) {
+						SetWindowSubclass(hwnd, ButtonSubclass, uIdSubclass, iStateId);
+					}
+				}
+				if (ps.hdc != nullptr) {
+					EndPaint(hwnd, &ps);
+				}
+				CloseThemeData(hTheme);
+				return 0;
+			}
+			break;
+
+		case WM_SIZE:
+		case WM_DESTROY:
+			if (!isGroupBox(uIdSubclass) && isAnimationEnabled()) {
+				BufferedPaintStopAllAnimations(hwnd);
+			}
+			break;
+
+		case WM_ENABLE:
+			if (isGroupBox(uIdSubclass)) {
+				RedrawWindow(hwnd, nullptr, nullptr, RDW_INVALIDATE);
+			} else {
+				// Skip the button's normal WNDPROC so it won't redraw out of WM_PAINT
+				const auto result = DefSubclassProc(hwnd, umsg, wParam, lParam);
+				InvalidateRect(hwnd, nullptr, FALSE);
+				return result;
+			}
+			break;
+
+		case WM_UPDATEUISTATE:
+			if (!isGroupBox(uIdSubclass) && (HIWORD(wParam) & (UISF_HIDEACCEL | UISF_HIDEFOCUS)) != 0) {
+				InvalidateRect(hwnd, nullptr, FALSE);
+			}
+			break;
+
+		default:
+			break;
+		}
+	}
+	return DefSubclassProc(hwnd, umsg, wParam, lParam);
+}
+
+}
+
+namespace { // TabControl
+
+void paintTabItem(HWND hwnd, HDC hdc, RECT &rcItem, DWORD nStyle, int i, int iSelTab, int nTabs, const POINT &ptCursor) noexcept {
+	RECT rcFrame{ rcItem };
+
+	const BOOL isHot = PtInRect(&rcItem, ptCursor);
+	const bool isSelectedTab = (i == iSelTab);
+	constexpr LONG paddingTop = 0;
+
+	InflateRect(&rcItem, -1, -1);
+	rcItem.right += 1;
+
+	WCHAR buffer[TabBarItemTextBufferSize]; // label
+	memset(buffer, 0, sizeof(int));
+	TCITEMW tci{};
+	tci.mask = TCIF_TEXT | TCIF_STATE;
+	tci.dwStateMask = TCIS_HIGHLIGHTED;
+	tci.pszText = buffer;
+	tci.cchTextMax = COUNTOF(buffer);
+
+	TabCtrl_GetItem(hwnd, i, &tci);
+
+	RECT rcText{ rcItem };
+	if ((nStyle & TCS_BUTTONS) != 0) {
+		if ((tci.dwState & TCIS_HIGHLIGHTED) != 0) {
+			FillRect(hdc, &rcItem, GetDarkBrush(DarkBrush_HotBackgroundBrush));
+			SetTextColor(hdc, DarkColor_LinkTextColor);
+		} else {
+			FillRect(hdc, &rcItem, GetDarkBrush(DarkBrush_DlgBackgroundBrush));
+			SetTextColor(hdc, DarkColor_DarkerTextColor);
+		}
+		FrameRect(hdc, &rcFrame, GetDarkBrush(DarkBrush_HotEdgeBrush));
+	} else {
+		OffsetRect(&rcText, 0, 1);
+		SetTextColor(hdc, (isHot || isSelectedTab) ? DarkColor_TextColor : DarkColor_DarkerTextColor);
+
+		if (isSelectedTab) {
+			OffsetRect(&rcText, 0, -1);
+			rcFrame.bottom += 1;
+			rcFrame.left -= 2;
+		} else if ((i - 1) == iSelTab) {
+			rcFrame.top += paddingTop;
+		} else {
+			rcFrame.top += paddingTop;
+			rcFrame.left -= 1;
+		}
+
+		if (i != nTabs - 1) {
+			rcFrame.right += 1;
+		}
+	}
+
+	paintRect(hdc, rcFrame, GetDarkPen(DarkPen_EdgePen), getBrushFromState(isSelectedTab, isHot));
+	DrawText(hdc, tci.pszText, -1, &rcText, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+
+	// Draw focus keyboard cue
+	if (!isSelectedTab || GetFocus() != hwnd) {
+		return;
+	}
+
+	const auto uiState = static_cast<DWORD>(SendMessage(hwnd, WM_QUERYUISTATE, 0, 0));
+	if ((uiState & UISF_HIDEFOCUS) == 0) {
+		if (DarkMode_IsWindows11()) {
+			rcFrame.top += (paddingTop + 1);
+		}
+		InflateRect(&rcFrame, -2, -1);
+		DrawFocusRect(hdc, &rcFrame);
+	}
+}
+
+void paintTab(HWND hwnd, HDC hdc, const RECT &rect) noexcept {
+	FillRect(hdc, &rect, GetDarkBrush(DarkBrush_DlgBackgroundBrush));
+
+	const auto iSelTab = TabCtrl_GetCurSel(hwnd);
+	const auto nTabs = TabCtrl_GetItemCount(hwnd);
+	int iTab = iSelTab;
+
+	const DWORD nStyle = GetWindowStyle(hwnd);
+	if ((nStyle & TCS_BUTTONS) != 0) {
+		iTab = nTabs - 1;
+	}
+
+	RECT rcSelTab{};
+	TabCtrl_GetItemRect(hwnd, iTab, &rcSelTab);
+
+	ExcludeClipRect(hdc, rcSelTab.left, rcSelTab.top, rcSelTab.right, rcSelTab.bottom);
+	rcSelTab.bottom -= 1;
+
+	const int roundness = DarkMode_IsWindows11() ? kWin11CornerRoundness : 0;
+	const RECT rcCont{ rect.left, rcSelTab.bottom, rect.right, rect.bottom };
+	HPEN hPen = GetDarkPen(DarkPen_EdgePen);
+	paintRoundFrameRect(hdc, rcCont, hPen, roundness, roundness);
+
+	HFONT hFont = GetWindowFont(hwnd);
+	const auto oldPen = SelectPen(hdc, hPen);
+	const auto hOldFont = SelectFont(hdc, hFont);
+
+	auto holdClip = CreateRectRgn(0, 0, 0, 0);
+	if (GetClipRgn(hdc, holdClip) != 1) {
+		DeleteObject(holdClip);
+		holdClip = nullptr;
+	}
+
+	POINT ptCursor{};
+	GetCursorPos(&ptCursor);
+	ScreenToClient(hwnd, &ptCursor);
+
+	SetBkMode(hdc, TRANSPARENT);
+
+	for (int i = 0; i < nTabs; ++i) {
+		RECT rcItem{};
+		TabCtrl_GetItemRect(hwnd, i, &rcItem);
+#if 0
+		if ((nStyle & TCS_OWNERDRAWFIXED) != 0) {
+			const DRAWITEMSTRUCT dis{
+				ODT_TAB
+				, 0
+				, static_cast<UINT>(i)
+				, ODA_DRAWENTIRE
+				, ODS_DEFAULT
+				, hwnd
+				, hdc
+				, rcItem
+				, 0
+			};
+
+			SetTextColor(hdc, (iSelTab == i) ? DarkColor_TextColor : DarkColor_DarkerTextColor);
+			SendMessage(GetParent(hwnd), WM_DRAWITEM, 0, AsInteger<LPARAM>(&dis));
+			continue;
+		}
+#endif
+
+		RECT rcIntersect{};
+		if (!IntersectRect(&rcIntersect, &rect, &rcItem)) {
+			continue; // Skip to the next iteration when there is no intersection
+		}
+
+		const RECT rcTmp{ rcItem.left - 2, rcItem.top, rcItem.right + 1, rcItem.bottom };
+		HRGN hClip = CreateRectRgnIndirect(&rcTmp);
+		SelectClipRgn(hdc, hClip);
+
+		paintTabItem(hwnd, hdc, rcItem, nStyle, i, iSelTab, nTabs, ptCursor);
+
+		SelectClipRgn(hdc, holdClip);
+		DeleteObject(hClip);
+	}
+
+	SelectClipRgn(hdc, holdClip);
+	SelectPen(hdc, oldPen);
+	SelectFont(hdc, hOldFont);
+	if (holdClip != nullptr) {
+		DeleteObject(holdClip);
+	}
+}
+
+LRESULT CALLBACK TabPaintSubclass(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData) noexcept {
+	auto * const paint = AsPointer<BufferedPaint *>(dwRefData);
+	if (umsg == WM_NCDESTROY) {
+		RemoveWindowSubclass(hwnd, TabPaintSubclass, uIdSubclass);
+	} else if (DarkMode_IsActive()) {
+		switch (umsg) {
+		case WM_ERASEBKGND:
+			return TRUE;
+
+		case WM_PAINT: {
+			PAINTSTRUCT ps{};
+			RECT rcClient{};
+			HDC hdc = BeginPaint(hwnd, &ps);
+			if (paint->BeginPaint(hwnd, hdc, ps, rcClient)) {
+				paintTab(hwnd, paint->hMemDC, rcClient);
+				paint->EndPaint(hdc, ps);
+			}
+			EndPaint(hwnd, &ps);
+			return 0;
+		}
+
+		case WM_UPDATEUISTATE:
+			if ((HIWORD(wParam) & (UISF_HIDEACCEL | UISF_HIDEFOCUS)) != 0) {
+				InvalidateRect(hwnd, nullptr, FALSE);
+			}
+			break;
+
+		default:
+			break;
+		}
+	}
+	return DefSubclassProc(hwnd, umsg, wParam, lParam);
+}
+
+}
+
+namespace { // StatusBar, ResizeGrip
+
+void paintStatusBar(HWND hwnd, HDC hdc) noexcept {
+	struct {
+		int horizontal = 0; // horizontal not used
+		int vertical = 0;
+		int between = 0;
+	} borders{};
+
+	SendMessage(hwnd, SB_GETBORDERS, 0, AsInteger<LPARAM>(&borders));
+
+	const auto oldPen = SelectPen(hdc, GetDarkPen(DarkPen_EdgePen));
+	const auto hFont = GetWindowFont(hwnd);
+	const auto hOldFont = SelectFont(hdc, hFont);
+
+	SetBkMode(hdc, TRANSPARENT);
+	SetTextColor(hdc, DarkColor_TextColor);
+
+	RECT rcClient{};
+	GetClientRect(hwnd, &rcClient);
+	FillRect(hdc, &rcClient, GetDarkBrush(DarkBrush_BackgroundBrush));
+
+	constexpr bool hasSizeGrip = true; // no WS_MAXIMIZEBOX
+	const bool isSimple = SendMessage(hwnd, SB_ISSIMPLE, 0, 0) != FALSE;
+	// Simple text is set with SB_SIMPLEID, but retrieved through part 0.
+	const auto nParts = isSimple ? 1 : static_cast<int>(SendMessage(hwnd, SB_GETPARTS, 0, 0));
+
+	SIZE szGrip{};
+	HTHEME hTheme = nullptr;
+	if (hasSizeGrip) {
+		hTheme = OpenThemeData(hwnd, VSCLASS_STATUS);
+		if (hTheme) {
+			GetThemePartSize(hTheme, hdc, SP_GRIPPER, 0, &rcClient, TS_DRAW, &szGrip);
+		}
+	}
+
+	RECT rcPart{};
+	RECT rcIntersect{};
+	// no edge before size grip
+	const int iLastDiv = nParts - (hasSizeGrip ? 1 : 0);
+	// Don't draw edge if there is only one part without size grip.
+	const bool drawEdge = !isSimple && (nParts >= 2 || !hasSizeGrip);
+	for (int i = 0; i < nParts; ++i) {
+		if (isSimple) {
+			// SB_GETRECT only exposes normal parts, even when simple mode is active.
+			rcPart = rcClient;
+			rcPart.right -= szGrip.cx;
+		} else {
+			SendMessage(hwnd, SB_GETRECT, i, AsInteger<LPARAM>(&rcPart));
+		}
+		if (!IntersectRect(&rcIntersect, &rcPart, &rcClient)) {
+			continue;
+		}
+
+		if (drawEdge && (i < iLastDiv)) {
+			const POINT edges[] = {
+				{ rcPart.right - borders.between, rcPart.top + 1 },
+				{ rcPart.right - borders.between, rcPart.bottom - 3 }
+			};
+			Polyline(hdc, edges, COUNTOF(edges));
+		}
+
+		rcPart.left += borders.between;
+		rcPart.right -= borders.vertical;
+
+		WCHAR str[StatusBarItemTextBufferSize];
+		memset(str, 0, sizeof(int));
+		const LRESULT retValLen = SendMessage(hwnd, SB_GETTEXT, i, AsInteger<LPARAM>(str));
+		const DWORD cchText = LOWORD(retValLen);
+		str[cchText] = L'\0';
+
+		DrawText(hdc, str, cchText, &rcPart, DT_SINGLELINE | DT_VCENTER | DT_LEFT | DT_NOPREFIX);
+	}
+
+#if 0 // for horizontal edge
+	const POINT edgeHor[] = {
+		{rcClient.left, rcClient.top},
+		{rcClient.right, rcClient.top}
+	};
+	Polyline(hdc, edgeHor, COUNTOF(edgeHor));
+#endif
+
+	// draw optional size grip
+	if (hTheme) {
+		RECT rcGrip{ rcClient };
+		rcGrip.left = rcGrip.right - szGrip.cx;
+		rcGrip.top = rcGrip.bottom - szGrip.cy;
+		DrawThemeBackground(hTheme, hdc, SP_GRIPPER, 0, &rcGrip, nullptr);
+		CloseThemeData(hTheme);
+	}
+
+	SelectPen(hdc, oldPen);
+	SelectFont(hdc, hOldFont);
+}
+
+void paintResizeGrip(HWND hwnd, HDC hdc) noexcept {
+	RECT rc{};
+	GetClientRect(hwnd, &rc);
+	FillRect(hdc, &rc, GetDarkBrush(DarkBrush_DlgBackgroundBrush));
+
+	// Dialog grips are scrollbar controls; use the same themed gripper as the status bar.
+	if (HTHEME hTheme = OpenThemeData(hwnd, VSCLASS_STATUS)) {
+		SIZE szGrip{};
+		GetThemePartSize(hTheme, hdc, SP_GRIPPER, 0, &rc, TS_DRAW, &szGrip);
+		RECT rcGrip{ rc };
+		rcGrip.left = rcGrip.right - szGrip.cx;
+		rcGrip.top = rcGrip.bottom - szGrip.cy;
+		DrawThemeBackground(hTheme, hdc, SP_GRIPPER, 0, &rcGrip, nullptr);
+		CloseThemeData(hTheme);
+	}
+}
+
+LRESULT CALLBACK StatusBarSubclass(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData) noexcept {
+	auto * const paint = AsPointer<BufferedPaint *>(dwRefData);
+	if (umsg == WM_NCDESTROY) {
+		RemoveWindowSubclass(hwnd, StatusBarSubclass, uIdSubclass);
+		paint->releaseBuffer();
+		NP2HeapFree(paint);
+	} else if (DarkMode_IsActive()) {
+		switch (umsg) {
+		case WM_ERASEBKGND:
+			return TRUE;
+
+		case WM_PAINT: {
+			PAINTSTRUCT ps{};
+			RECT rcClient{};
+			HDC hdc = BeginPaint(hwnd, &ps);
+			if (paint->BeginPaint(hwnd, hdc, ps, rcClient)) {
+				paintStatusBar(hwnd, paint->hMemDC);
+				paint->EndPaint(hdc, ps);
+			}
+			EndPaint(hwnd, &ps);
+			return 0;
+		}
+
+		default:
+			break;
+		}
+	}
+	return DefSubclassProc(hwnd, umsg, wParam, lParam);
+}
+
+LRESULT CALLBACK ResizeGripSubclass(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData) noexcept {
+	UNREFERENCED_PARAMETER(dwRefData);
+	if (umsg == WM_NCDESTROY) {
+		RemoveWindowSubclass(hwnd, ResizeGripSubclass, uIdSubclass);
+	} else if (DarkMode_IsActive()) {
+		switch (umsg) {
+		case WM_ERASEBKGND:
+			return TRUE;
+
+		case WM_PRINTCLIENT:
+		case WM_PAINT: {
+			PAINTSTRUCT ps{};
+			auto hdc = AsPointer<HDC>(wParam);
+			if (hdc == nullptr) {
+				hdc = BeginPaint(hwnd, &ps);
+			}
+			paintResizeGrip(hwnd, hdc);
+			if (ps.hdc != nullptr) {
+				EndPaint(hwnd, &ps);
+			}
+			return 0;
+		}
+
+		default:
+			break;
+		}
+	}
+	return DefSubclassProc(hwnd, umsg, wParam, lParam);
+}
+
+}
+
+namespace { // Rebar, Toolbar
+
+LRESULT prePaintToolbarItem(LPNMTBCUSTOMDRAW lptbcd) noexcept {
+	// Set colors
+	lptbcd->hbrMonoDither = GetDarkBrush(DarkBrush_BackgroundBrush);
+	lptbcd->hbrLines = GetDarkBrush(DarkBrush_EdgeBrush);
+	lptbcd->hpenLines = GetDarkPen(DarkPen_EdgePen);
+	lptbcd->clrText = DarkColor_DarkerTextColor;
+	lptbcd->clrTextHighlight = DarkColor_TextColor;
+	lptbcd->clrBtnFace = DarkColor_BackgroundColor;
+	lptbcd->clrBtnHighlight = DarkColor_CtrlBackgroundColor;
+	lptbcd->clrHighlightHotTrack = DarkColor_HotBackgroundColor;
+	lptbcd->nStringBkMode = TRANSPARENT;
+	lptbcd->nHLStringBkMode = TRANSPARENT;
+
+	// Get styles and rectangles
+	const bool isHot = (lptbcd->nmcd.uItemState & CDIS_HOT) == CDIS_HOT;
+	const bool isChecked = (lptbcd->nmcd.uItemState & CDIS_CHECKED) == CDIS_CHECKED;
+
+	RECT rcItem{ lptbcd->nmcd.rc };
+	RECT rcDrop{};
+
+	TBBUTTONINFOW tbi{};
+	tbi.cbSize = sizeof(TBBUTTONINFOW);
+	tbi.dwMask = TBIF_IMAGE | TBIF_STYLE;
+	HWND hwnd = lptbcd->nmcd.hdr.hwndFrom;
+	SendMessage(hwnd, TB_GETBUTTONINFO, lptbcd->nmcd.dwItemSpec, AsInteger<LPARAM>(&tbi));
+
+	const bool isIcon = tbi.iImage != I_IMAGENONE;
+	const bool isDropDown = ((tbi.fsStyle & BTNS_DROPDOWN) != 0) && isIcon; // has 2 "buttons"
+	if (isDropDown) {
+		const auto idx = SendMessage(hwnd, TB_COMMANDTOINDEX, lptbcd->nmcd.dwItemSpec, 0);
+		SendMessage(hwnd, TB_GETITEMDROPDOWNRECT, static_cast<WPARAM>(idx), AsInteger<LPARAM>(&rcDrop));
+		rcItem.right = rcDrop.left;
+	}
+
+	// Paint part
+	if (isHot || isChecked) { // hot must have higher priority to overwrite checked state
+		HPEN pen = isHot ? GetDarkPen(DarkPen_HotEdgePen) : GetDarkPen(DarkPen_EdgePen);
+		HBRUSH brush = isHot ? GetDarkBrush(DarkBrush_HotBackgroundBrush) : GetDarkBrush(DarkBrush_CtrlBackgroundBrush);
+		constexpr UINT maskHot = ~static_cast<UINT>(CDIS_CHECKED | CDIS_HOT); // clears states to use custom highlight;
+		constexpr UINT maskChecked = ~static_cast<UINT>(CDIS_CHECKED); // clears state to use custom highlight
+		lptbcd->nmcd.uItemState &= (isHot ? maskHot : maskChecked);
+
+		HDC hdc = lptbcd->nmcd.hdc;
+		if (!isIcon) {
+			FillRect(hdc, &rcItem, brush);
+		} else {
+			const int roundness = DarkMode_IsWindows11() ? kWin11CornerRoundness + 1 : 0;
+			paintRoundRect(hdc, rcItem, pen, brush, roundness, roundness);
+			if (isDropDown) {
+				paintRoundRect(hdc, rcDrop, pen, brush, roundness, roundness);
+			}
+		}
+	}
+
+	LRESULT retVal = TBCDRF_USECDCOLORS;
+	if ((lptbcd->nmcd.uItemState & CDIS_SELECTED) != 0) {
+		retVal |= TBCDRF_NOBACKGROUND;
+	}
+	if (isDropDown) {
+		retVal |= CDRF_NOTIFYPOSTPAINT;
+	}
+
+	return retVal;
+}
+
+LRESULT postPaintToolbarItem(const NMTBCUSTOMDRAW *lptbcd) noexcept {
+	TBBUTTONINFOW tbi{};
+	tbi.cbSize = sizeof(TBBUTTONINFOW);
+	tbi.dwMask = TBIF_IMAGE;
+	HWND hwnd = lptbcd->nmcd.hdr.hwndFrom;
+	const auto dwItemSpec = lptbcd->nmcd.dwItemSpec;
+	SendMessage(hwnd, TB_GETBUTTONINFO, dwItemSpec, AsInteger<LPARAM>(&tbi));
+
+	if (tbi.iImage == I_IMAGENONE) {
+		return CDRF_DODEFAULT;
+	}
+
+	RECT rcArrow{};
+	const auto idx = SendMessage(hwnd, TB_COMMANDTOINDEX, dwItemSpec, 0);
+	SendMessage(hwnd, TB_GETITEMDROPDOWNRECT, static_cast<WPARAM>(idx), AsInteger<LPARAM>(&rcArrow));
+	rcArrow.left += 1;
+	rcArrow.bottom -= MulDiv(3, g_uCurrentDPI, USER_DEFAULT_SCREEN_DPI);
+
+	HDC hdc = lptbcd->nmcd.hdc;
+	SetBkMode(hdc, TRANSPARENT);
+	SetTextColor(hdc, DarkColor_TextColor);
+
+	HFONT hFont = GetWindowFont(hwnd);
+	HFONT hOldFont = SelectFont(hdc, hFont);
+	constexpr UINT dtFlags = DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_NOCLIP | DT_NOPREFIX;
+	constexpr WCHAR text[] = {kTriangleDown, L'\0'};
+	DrawText(hdc, text, 1, &rcArrow, dtFlags);
+	SelectFont(hdc, hOldFont);
+
+	return CDRF_DODEFAULT;
+}
+
+}
+
+LRESULT DarkMode_RebarCustomDraw(LPARAM lParam) noexcept {
+	if (DarkMode_IsActive()) {
+		auto * const lpnmcd = AsPointer<LPNMCUSTOMDRAW>(lParam);
+		if (lpnmcd->dwDrawStage == CDDS_PREPAINT) {
+			FillRect(lpnmcd->hdc, &lpnmcd->rc, GetDarkBrush(DarkBrush_DlgBackgroundBrush));
+			return CDRF_SKIPDEFAULT;
+		}
+	}
+	return FALSE;
+}
+
+LRESULT DarkMode_ToolbarCustomDraw(LPARAM lParam) noexcept {
+	if (DarkMode_IsActive()) {
+		auto * const lptbcd = AsPointer<LPNMTBCUSTOMDRAW>(lParam);
+		switch (lptbcd->nmcd.dwDrawStage) {
+		case CDDS_PREPAINT:
+			FillRect(lptbcd->nmcd.hdc, &lptbcd->nmcd.rc, GetDarkBrush(DarkBrush_BackgroundBrush));
+			return CDRF_NOTIFYITEMDRAW | CDRF_NOTIFYPOSTPAINT;
+
+		case CDDS_ITEMPREPAINT:
+			return prePaintToolbarItem(lptbcd);
+
+		case CDDS_ITEMPOSTPAINT:
+			return postPaintToolbarItem(lptbcd);
+
+		default:
+			break;
+		}
+	}
+	return FALSE;
+}
+
+namespace { // Window
+
+LRESULT CALLBACK DarkDialogProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData) noexcept {
+	if (umsg == WM_NCDESTROY) {
+		RemoveWindowSubclass(hwnd, DarkDialogProc, uIdSubclass);
+	} else if (DarkMode_IsActive()) {
+		switch (umsg) {
+		case WM_CTLCOLORSTATIC:
+		case WM_CTLCOLORDLG:
+		case WM_CTLCOLORLISTBOX:
+		// case WM_CTLCOLORBTN:
+		// case WM_CTLCOLORMSGBOX:
+		case WM_CTLCOLOREDIT: {
+			COLORREF back = DarkColor_DlgBackgroundColor;
+			UINT index = DarkBrush_DlgBackgroundBrush;
+			if (umsg == WM_CTLCOLOREDIT || umsg == WM_CTLCOLORLISTBOX) {
+				back = DarkColor_CtrlBackgroundColor;
+				index = DarkBrush_CtrlBackgroundBrush;
+			} else if (umsg == WM_CTLCOLORSTATIC) {
+				auto lpDialogFunc = AsPointer<WNDPROC>(GetWindowLongPtr(hwnd, DWLP_DLGPROC));
+				static_assert(sizeof(INT_PTR) == sizeof(LRESULT));
+				if (const auto result = CallWindowProc(lpDialogFunc, hwnd, umsg, wParam, lParam)) {
+					if (dwRefData == DialogRefData_MessageBox) {
+						back = DarkColor_BackgroundColor;
+						index = DarkBrush_BackgroundBrush;
+					} else {
+						return result;
+					}
+				}
+			}
+
+			HDC hdc = AsPointer<HDC>(wParam);
+			SetTextColor(hdc, DarkColor_TextColor);
+			SetBkColor(hdc, back);
+			return AsInteger<LONG_PTR>(GetDarkBrush(index));
+		}
+
+		case WM_PRINTCLIENT:
+			return TRUE;
+
+		case WM_PAINT:
+			if (dwRefData == DialogRefData_MessageBox) {
+				PAINTSTRUCT ps{};
+				HDC hdc = BeginPaint(hwnd, &ps);
+				RECT rc{};
+				rc.bottom = 26;
+				MapDialogRect(hwnd, &rc);
+				const int bottom = rc.bottom;
+				rc = ps.rcPaint;
+				rc.bottom -= bottom;
+				FillRect(hdc, &rc, GetDarkBrush(DarkBrush_BackgroundBrush));
+				rc.top = rc.bottom;
+				rc.bottom += bottom;
+				FillRect(hdc, &rc, GetDarkBrush(DarkBrush_DlgBackgroundBrush));
+				EndPaint(hwnd, &ps);
+				return 0;
+			}
+			break;
+
+		case WM_NOTIFY:
+			break;
+
+		default:
+			break;
+		}
+	}
+	return DefSubclassProc(hwnd, umsg, wParam, lParam);
+}
+
+enum DarkEnumFlag {
+	DarkEnumFlag_None = 0,
+	DarkEnumFlag_Active = 1,
+	DarkEnumFlag_NeedDarkTheme = 2,
+	DarkEnumFlag_HandleTreeList = 4,
+};
+
+struct DarkEnumParam {
+	LPCWSTR theme;
+	LPCWSTR treeListTheme;
+	UINT flag;
+	COLORREF textColor;
+	COLORREF backColor;
+};
+
+BOOL CALLBACK DarkEnumChildProc(HWND hwnd, LPARAM lParam) noexcept {
+	WCHAR className[16]{};
+	const UINT len = GetClassName(hwnd, className, COUNTOF(className));
+	const DarkEnumParam &enumParam = *AsPointer<const DarkEnumParam *>(lParam);
+	LPCWSTR theme = enumParam.theme;
+	if (StrEqualLen(className, len, WC_BUTTON)) {
+		SetWindowTheme(hwnd, theme, nullptr);
+		if (enumParam.flag & DarkEnumFlag_NeedDarkTheme) {
+			const DWORD style = GetWindowStyle(hwnd);
+			if ((style & BS_PUSHLIKE) == 0 && buttonNeedsSubclass(style & BS_TYPEMASK)) {
+				SetWindowSubclass(hwnd, ButtonSubclass, style & BS_TYPEMASK, 0);
+			}
+		}
+	} else if (StrEqualLen(className, len, WC_EDIT)) {
+		if (enumParam.flag & DarkEnumFlag_NeedDarkTheme) {
+			const DWORD style = GetWindowStyle(hwnd);
+			if ((style & (WS_HSCROLL | WS_VSCROLL)) == 0) {
+				theme = L"DarkMode_CFD";
+			}
+		}
+		SetWindowTheme(hwnd, theme, nullptr);
+	} else if (StrEqualLen(className, len, WC_LISTBOX)) {
+		SetWindowTheme(hwnd, theme, nullptr);
+	} else if (StrEqualLen(className, len, WC_COMBOBOX)) {
+		COMBOBOXINFO info;
+		info.cbSize = sizeof(COMBOBOXINFO);
+		if (GetComboBoxInfo(hwnd, &info)) {
+			SetWindowTheme(info.hwndList, theme, nullptr);
+		}
+		if (enumParam.flag & DarkEnumFlag_NeedDarkTheme) {
+			theme = L"DarkMode_CFD";
+		}
+		SetWindowTheme(hwnd, theme, nullptr);
+	} else if (StrEqualLen(className, len, WC_SCROLLBAR)) {
+		SetWindowTheme(hwnd, theme, nullptr);
+		SetWindowSubclass(hwnd, ResizeGripSubclass, 0, 0);
+	} else if (StrEqualLen(className, len, WC_TABCONTROL)) {
+		if (!(enumParam.flag & (DarkEnumFlag_Active | DarkEnumFlag_NeedDarkTheme))) {
+			SetWindowTheme(hwnd, theme, nullptr);
+		} else {
+			auto * const paint = static_cast<BufferedPaint *>(NP2HeapAlloc(sizeof(BufferedPaint)));
+			SetWindowSubclass(hwnd, TabPaintSubclass, 0, AsInteger<DWORD_PTR>(paint));
+		}
+		if (HWND hwndCtrl = TabCtrl_GetToolTips(hwnd)) {
+			SetWindowTheme(hwndCtrl, theme, nullptr);
+		}
+	} else if ((enumParam.flag & DarkEnumFlag_HandleTreeList) && StrEqualLen(className, len, WC_LISTVIEW)) {
+		theme = enumParam.treeListTheme;
+		const COLORREF textColor = enumParam.textColor;
+		const COLORREF backColor = enumParam.backColor;
+		SetWindowTheme(hwnd, theme, nullptr);
+		ListView_SetTextColor(hwnd, textColor);
+		ListView_SetTextBkColor(hwnd, backColor);
+		ListView_SetBkColor(hwnd, backColor);
+		if (HWND hwndCtrl = ListView_GetToolTips(hwnd)) {
+			SetWindowTheme(hwndCtrl, theme, nullptr);
+		}
+	// } else if (StrEqualLen(className, len, L"#32770")) {
+	// 	// TODO: ignore controls inside PropSheetPage
+	// 	return FALSE;
+	}
+	return TRUE;
+}
+
+BOOL CALLBACK RefreshTopLevelProc(HWND hwnd, LPARAM lParam) noexcept {
+	if (hwnd != hwndMain) {
+		DWORD_PTR dwRefData = 0;
+		const BOOL managed = GetWindowSubclass(hwnd, DarkDialogProc, 0, &dwRefData);
+		if (managed || GetWindowInstance(hwnd) == g_hInstance) {
+			if (!managed) {
+				SetWindowSubclass(hwnd, DarkDialogProc, 0, dwRefData);
+			}
+			const DarkEnumParam &enumParam = *AsPointer<const DarkEnumParam *>(lParam);
+			DarkMode_SetDarkTitleBar(hwnd, enumParam.flag & DarkEnumFlag_Active);
+			EnumChildWindows(hwnd, DarkEnumChildProc, lParam);
+			RedrawWindow(hwnd, nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN | RDW_UPDATENOW | RDW_FRAME);
+		}
+	}
+	return TRUE;
+}
+
+}
 
 namespace { // DialogHook
 
@@ -82,14 +1376,189 @@ void DialogHook_Stop() noexcept {
 	dialogHook.Stop();
 }
 
-void DarkMode_Init() noexcept {
+void DarkMode_Init(const OSVERSIONINFOW &version) noexcept {
+	const DWORD buildNumber = version.dwBuildNumber;
+	if (version.dwMajorVersion == 10 && version.dwMinorVersion == 0 && CheckBuildNumber(buildNumber)) {
+		fnSetWindowCompositionAttribute = DLLFunctionEx<SetWindowCompositionAttributeSig>(L"user32.dll", "SetWindowCompositionAttribute");
+		HMODULE hUxtheme = GetModuleHandleW(L"uxtheme.dll");
+		fnRefreshImmersiveColorPolicyState = DLLFunction<RefreshImmersiveColorPolicyStateSig>(hUxtheme, MAKEINTRESOURCEA(104));
+		fnGetIsImmersiveColorUsingHighContrast = DLLFunction<GetIsImmersiveColorUsingHighContrastSig>(hUxtheme, MAKEINTRESOURCEA(106));
+		fnAllowDarkModeForWindow = DLLFunction<AllowDarkModeForWindowSig>(hUxtheme, MAKEINTRESOURCEA(133));
+
+		fnSetPreferredAppMode = DLLFunction<SetPreferredAppModeSig>(hUxtheme, MAKEINTRESOURCEA(135));
+		fnFlushMenuThemes = DLLFunction<FlushMenuThemesSig>(hUxtheme, MAKEINTRESOURCEA(136));
+		fnIsDarkModeAllowedForWindow = DLLFunction<IsDarkModeAllowedForWindowSig>(hUxtheme, MAKEINTRESOURCEA(137));
+
+		if (fnRefreshImmersiveColorPolicyState &&
+			fnGetIsImmersiveColorUsingHighContrast &&
+			fnAllowDarkModeForWindow &&
+			fnSetPreferredAppMode &&
+			fnFlushMenuThemes &&
+			fnIsDarkModeAllowedForWindow) {
+			g_DarkModeStatus = DarkModeStatus_Supported;
+
+			if (buildNumber > win11Build25H2) {
+				g_DarkModeStatus |= DarkModeStatus_IsWindows11 | DarkModeStatus_SupportDarkTheme;
+			} else if (buildNumber >= win11Build24H2) {
+				g_DarkModeStatus |= DarkModeStatus_IsWindows11;
+				constexpr DWORD minWin11Revision = 6899; // 2025-10-14
+				DWORD size = sizeof(DWORD);
+				DWORD revision = 0;
+				const auto status = RegGetValueW(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", L"UBR", RRF_RT_REG_DWORD, nullptr, &revision, &size);
+				if (status == ERROR_SUCCESS && revision >= minWin11Revision) {
+					g_DarkModeStatus |= DarkModeStatus_SupportDarkTheme;
+				}
+			} else if (buildNumber >= win11Build21H2) {
+				g_DarkModeStatus |= DarkModeStatus_IsWindows11;
+			} else if (buildNumber < win10Build1903) {
+				g_DarkModeStatus |= DarkModeStatus_PriorWindows10_1903;
+			}
+			// if (buildNumber >= win10Build2004) {
+			// 	fnDwmSetWindowAttribute = DLLFunctionEx<DwmSetWindowAttributeSig>(L"dwmapi.dll", "DwmSetWindowAttribute");
+			// }
+		}
+	}
+}
+
+NP2_noinline
+void DarkMode_SetAppDarkMode(BOOL dark) noexcept {
+	if (dark) {
+		if (!(g_DarkModeStatus & DarkModeStatus_PriorWindows10_1903)) {
+			dark = static_cast<BOOL>(PreferredAppMode::ForceDark);
+		}
+		if (!(g_DarkModeStatus & DarkModeStatus_GlobalInitialized)) {
+			g_DarkModeStatus |= DarkModeStatus_GlobalInitialized;
+			InitDarkBrushAndPen();
+		}
+	}
+	fnSetPreferredAppMode(static_cast<PreferredAppMode>(dark));
+	fnFlushMenuThemes();
+}
+
+NP2_noinline
+void DarkMode_SetDarkTitleBar(HWND hwnd, BOOL dark) noexcept {
+	// if (fnDwmSetWindowAttribute) {
+	// 	fnDwmSetWindowAttribute(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE, &dark, sizeof(dark));
+	// } else
+	{
+		fnAllowDarkModeForWindow(hwnd, dark);
+		if (dark) {
+			dark = fnIsDarkModeAllowedForWindow(hwnd);
+		}
+		if (g_DarkModeStatus & DarkModeStatus_PriorWindows10_1903) {
+			SetPropW(hwnd, L"UseImmersiveDarkModeColors", AsPointer<HANDLE>(static_cast<INT_PTR>(dark)));
+		} else if (fnSetWindowCompositionAttribute) {
+			WINDOWCOMPOSITIONATTRIBDATA data = { WCA_USEDARKMODECOLORS, &dark, sizeof(dark) };
+			fnSetWindowCompositionAttribute(hwnd, &data);
+		}
+	}
+	if (!DarkMode_IsWindows11()) {
+		// flash the window to fix title bar paint on Win10
+		SendMessage(hwnd, WM_NCACTIVATE, FALSE, 0);
+		SendMessage(hwnd, WM_NCACTIVATE, TRUE, 0);
+	}
 }
 
 void DarkMode_Cleanup() noexcept {
+	for (auto obj : darkObject) {
+		if (obj) {
+			DeleteObject(obj);
+		}
+	}
+}
+
+void DarkMode_HandleSettingChange(HWND hwnd, LPARAM lParam) noexcept {
+	if (DarkMode_IsSupported() && IsColorSchemeChangeMessage(lParam)) {
+		fnRefreshImmersiveColorPolicyState();
+		fnGetIsImmersiveColorUsingHighContrast(IMMERSIVE_HC_CACHE_MODE::IHCM_REFRESH);
+		const UINT previous = g_DarkModeStatus;
+		DarkMode_ResolveStyleTheme(styleThemeSetting);
+		if (previous != g_DarkModeStatus) {
+			DarkMode_OnDarkModeChange(hwnd);
+		}
+	}
+}
+
+NP2_noinline
+void DarkMode_ResolveStyleTheme(int theme) noexcept {
+	if (theme < StyleTheme_Light) {
+		theme = DarkMode_AppsUseDarkMode()? StyleTheme_Dark : StyleTheme_Light;
+	}
+	if (theme != StyleTheme_Light && DarkMode_IsSupported()) {
+		g_DarkModeStatus |= DarkModeStatus_Active;
+	} else {
+		g_DarkModeStatus &= ~DarkModeStatus_Active;
+	}
+}
+
+NP2_noinline
+void DarkMode_OnDarkModeChange(HWND hwnd) noexcept {
+	const BOOL dark = DarkMode_IsActive();
+	DarkEnumParam param {};
+	if (dark) {
+		param.theme = getDarkModeThemeName();
+		param.treeListTheme = L"DarkMode_Explorer";
+		param.textColor = DarkColor_ViewTextColor;
+		param.backColor = DarkColor_ViewBackgroundColor;
+		param.flag = DarkMode_SupportDarkTheme()? (DarkEnumFlag_Active | DarkEnumFlag_HandleTreeList) : (DarkEnumFlag_Active | DarkEnumFlag_HandleTreeList | DarkEnumFlag_NeedDarkTheme);
+	} else {
+		param.theme = L"Explorer";
+		param.treeListTheme = L"Explorer";
+		param.flag = DarkEnumFlag_HandleTreeList;
+		param.textColor = GetSysColor(COLOR_WINDOWTEXT);
+		param.backColor = GetSysColor(COLOR_WINDOW);
+	}
+
+	DarkMode_SetAppDarkMode(dark);
+	DarkMode_SetDarkTitleBar(hwnd, dark);
+	MsgThemeChanged(hwnd, 0, 0);
+	DarkMode_SetFileListViewTheme(hwndDirList, bFullRowSelect);
+	DarkMode_SetFileListViewColor(hwndDirList, TRUE);
+	DarkMode_SetDriveBoxTheme(hwndDriveBox, TRUE);
+	RedrawWindow(hwnd, nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN | RDW_UPDATENOW | RDW_FRAME);
+	EnumThreadWindows(GetCurrentThreadId(), RefreshTopLevelProc, AsInteger<LPARAM>(&param));
+}
+
+void DarkMode_ApplyToBars(HWND hwndToolbar, HWND hwndStatus) noexcept {
+	if (DarkMode_IsActive()) {
+		COLORSCHEME scheme{};
+		scheme.dwSize = sizeof(COLORSCHEME);
+		scheme.clrBtnHighlight = DarkColor_BackgroundColor;
+		scheme.clrBtnShadow = DarkColor_BackgroundColor;
+		SendMessage(hwndToolbar, TB_SETCOLORSCHEME, 0, AsInteger<LPARAM>(&scheme));
+		if (auto hwndCtrl = SendMessage(hwndToolbar, TB_GETTOOLTIPS, 0, 0)) {
+			SetWindowTheme(AsPointer<HWND>(hwndCtrl), L"DarkMode_Explorer", nullptr);
+		}
+		auto * const paint = static_cast<BufferedPaint *>(NP2HeapAlloc(sizeof(BufferedPaint)));
+		SetWindowSubclass(hwndStatus, StatusBarSubclass, 0, AsInteger<DWORD_PTR>(paint));
+	}
+}
+
+void DarkMode_OnToolbarBeginAdjust() noexcept {
+	DialogHook_Start(DialogRefData_CustomizeToolbar);
+}
+
+void DarkMode_OnToolbarEndAdjust() noexcept {
+	DialogHook_Stop();
 }
 
 NP2_noinline
 void DarkMode_InitDialog(HWND hwnd, DWORD_PTR dwRefData) noexcept {
+	if (DarkMode_IsActive()) {
+		DarkEnumParam param {};
+		param.theme = getDarkModeThemeName();
+		param.treeListTheme = L"DarkMode_Explorer";
+		param.textColor = DarkColor_ViewTextColor;
+		param.backColor = DarkColor_ViewBackgroundColor;
+		param.flag = DarkMode_SupportDarkTheme()? DarkEnumFlag_Active : (DarkEnumFlag_Active | DarkEnumFlag_NeedDarkTheme);
+
+		DarkMode_SetDarkTitleBar(hwnd, TRUE);
+		SetWindowSubclass(hwnd, DarkDialogProc, 0, dwRefData);
+		EnumChildWindows(hwnd, DarkEnumChildProc, AsInteger<LPARAM>(&param));
+	} else if (DarkMode_IsSupported() && (dwRefData == DialogRefData_MessageBox || dwRefData > DialogRefData_DefaultPosition)) {
+		// subclass system dialog to allow toggle dark mode
+		SetWindowSubclass(hwnd, DarkDialogProc, 0, dwRefData);
+	}
 	if (dwRefData < DialogRefData_DefaultPosition) {
 		CenterDlgInParent(hwnd);
 		if (dwRefData == DialogRefData_MessageBox) {
@@ -103,7 +1572,15 @@ void DarkMode_InitFileListView(HWND hwndLV, DWORD exStyle) noexcept {
 	InitWindowCommon(hwndLV);
 	exStyle |= LVS_EX_DOUBLEBUFFER | LVS_EX_LABELTIP;
 	ListView_SetExtendedListViewStyle(hwndLV, exStyle);
-	if (exStyle & LVS_EX_FULLROWSELECT) {
+	if (DarkMode_IsActive()) {
+		ListView_SetTextColor(hwndLV, DarkColor_ViewTextColor);
+		ListView_SetTextBkColor(hwndLV, DarkColor_ViewBackgroundColor);
+		ListView_SetBkColor(hwndLV, DarkColor_ViewBackgroundColor);
+		SetWindowTheme(hwndLV, L"DarkMode_Explorer", nullptr);
+		if (HWND hwndCtrl = ListView_GetToolTips(hwndLV)) {
+			SetWindowTheme(hwndCtrl, L"DarkMode_Explorer", nullptr);
+		}
+	} else if (exStyle & LVS_EX_FULLROWSELECT) {
 		SetWindowTheme(hwndLV, L"Explorer", nullptr);
 	}
 
@@ -113,14 +1590,30 @@ void DarkMode_InitFileListView(HWND hwndLV, DWORD exStyle) noexcept {
 	ListView_InsertColumn(hwndLV, 0, &lvc);
 }
 
+NP2_noinline
 void DarkMode_SetFileListViewTheme(HWND hwndLV, BOOL fullRowSelect) noexcept {
-	LPCWSTR theme = fullRowSelect ? L"Explorer" : L"Listview";
+	LPCWSTR theme;
+	COLORREF backColor;
+	const BOOL dark = DarkMode_IsActive();
+	if (dark) {
+		theme = L"DarkMode_Explorer";
+		backColor = DarkColor_ViewBackgroundColor;
+	} else {
+		theme = fullRowSelect ? L"Explorer" : L"Listview";
+		backColor = GetSysColor(COLOR_WINDOW);
+	}
 	SetWindowTheme(hwndLV, theme, nullptr);
+	if (HWND hwndCtrl = ListView_GetToolTips(hwndLV)) {
+		theme = dark ? L"DarkMode_Explorer" : L"Explorer";
+		SetWindowTheme(hwndCtrl, theme, nullptr);
+	}
+	ListView_SetTextBkColor(hwndLV, backColor);
+	ListView_SetBkColor(hwndLV, backColor);
 }
 
 NP2_noinline
 bool DarkMode_SetFileListViewColor(HWND hwndLV, BOOL redraw) noexcept {
-	COLORREF color = GetSysColor(COLOR_WINDOWTEXT);
+	COLORREF color = DarkMode_IsActive()? DarkColor_ViewTextColor : GetSysColor(COLOR_WINDOWTEXT);
 	bool hasFilter = false;
 	if (bNegFilter || !StrEqualEx(tchFilter, L"*.*")) {
 		hasFilter = true;
@@ -133,4 +1626,28 @@ bool DarkMode_SetFileListViewColor(HWND hwndLV, BOOL redraw) noexcept {
 		ListView_RedrawItems(hwndLV, 0, ListView_GetItemCount(hwndLV) - 1);
 	}
 	return hasFilter;
+}
+
+NP2_noinline
+void DarkMode_SetDriveBoxTheme(HWND hwnd, BOOL reset) noexcept {
+	if (reset || DarkMode_IsActive()) {
+		LPCWSTR theme;
+		const BOOL dark = DarkMode_IsActive();
+		if (dark) {
+			theme = DarkMode_SupportDarkTheme() ? L"DarkMode_DarkTheme" : L"DarkMode_CFD";
+		} else {
+			theme = L"Explorer";
+		}
+		// SendMessage(hwnd, CBEM_SETWINDOWTHEME, 0, AsInteger<LPARAM>(theme));
+		HWND hwndBox = AsPointer<HWND>(SendMessage(hwnd, CBEM_GETCOMBOCONTROL, 0, 0));
+		SetWindowTheme(hwndBox, theme, nullptr);
+#if 0
+		COMBOBOXINFO info;
+		info.cbSize = sizeof(COMBOBOXINFO);
+		if (GetComboBoxInfo(hwndBox, &info)) {
+			theme = dark ? L"DarkMode_Explorer" : L"Explorer";
+			SetWindowTheme(info.hwndList, theme, nullptr);
+		}
+#endif
+	}
 }

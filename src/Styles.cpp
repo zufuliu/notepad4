@@ -374,6 +374,7 @@ static const COLORREF defaultCustomColor[MAX_CUSTOM_COLOR_COUNT] = {
 static COLORREF customColor[MAX_CUSTOM_COLOR_COUNT];
 CallTipInfo callTipInfo;
 static bool bCustomColorLoaded = false;
+static bool bStyleDialogOpen = false;
 
 int		styleThemeActive;
 int		styleThemeSetting;
@@ -821,7 +822,9 @@ void Style_Load() noexcept {
 
 	iValue = section.GetInt(L"StyleTheme", StyleTheme_AppDefault);
 	iValue = min<int>(iValue, StyleTheme_Max);
+	iValue = (iValue < StyleTheme_Light)? StyleTheme_System : iValue;
 	styleThemeSetting = iValue;
+	iValue = DarkMode_ResolveStyleTheme(iValue);
 	styleThemeActive = iValue;
 
 	// auto select
@@ -1179,9 +1182,15 @@ void Style_OnDPIChanged(LPCEDITLEXER pLex) noexcept {
 }
 
 NP2_noinline
-void Style_OnStyleThemeChanged(int theme) noexcept {
+void Style_OnStyleThemeChanged(HWND hwndOwner, int theme) noexcept {
 	styleThemeSetting = theme;
-	if (theme == styleThemeActive) {
+	const UINT previous = g_DarkModeStatus;
+	theme = DarkMode_ResolveStyleTheme(theme);
+	if (previous != g_DarkModeStatus) {
+		DarkMode_OnDarkModeChange(hwndOwner);
+	}
+	if (theme == styleThemeActive || bStyleDialogOpen) {
+		// Defer editor theme change until the style changes have been committed or restored.
 		return;
 	}
 	if (theme != StyleTheme_Light) {
@@ -3569,7 +3578,9 @@ bool Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, bool bDefaultSt
 		cf.Flags |= CF_FIXEDPITCHONLY;
 	}
 
+	DialogHook_Start(DialogRefData_ChooseFont);
 	const BOOL result = ChooseFont(&cf);
+	DialogHook_Stop();
 	if (!result || StrIsEmpty(lf.lfFaceName)) {
 		return false;
 	}
@@ -3651,7 +3662,9 @@ static COLORREF Style_ChooseColor(HWND hwnd, COLORREF color) noexcept {
 	cc.rgbResult = color;
 	cc.lpCustColors = customColor;
 	cc.Flags = CC_FULLOPEN | CC_RGBINIT | CC_SOLIDCOLOR;
+	DialogHook_Start(DialogRefData_ChooseColor);
 	const BOOL result = ChooseColor(&cc);
+	DialogHook_Stop();
 	return result ? cc.rgbResult : color;
 }
 
@@ -4741,6 +4754,7 @@ void Style_ConfigDlg(HWND hwndOwner) noexcept {
 		}
 	}
 
+	bStyleDialogOpen = true;
 	if (IDCANCEL == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_STYLECONFIG), hwndOwner, Style_ConfigDlgProc, AsInteger<LPARAM>(&param))) {
 		// Restore Styles
 		memcpy(g_AllFileExtensions, param.extBackup, ALL_FILE_EXTENSIONS_BYTE_SIZE);
@@ -4799,6 +4813,8 @@ void Style_ConfigDlg(HWND hwndOwner) noexcept {
 	if (param.bApply) {
 		Style_SetLexer(pLexCurrent, false);
 	}
+	bStyleDialogOpen = false;
+	Style_OnStyleThemeChanged(hwndOwner, styleThemeSetting);
 }
 
 static PEDITLEXER Lexer_GetFromTreeView(HWND hwndTV) noexcept {

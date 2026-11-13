@@ -169,6 +169,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 * Improved support for NFO ANSI art
 * Support various [Windows system integration](https://github.com/zufuliu/notepad4/wiki/System-Integration)
 * Support high DPI display with HD version
+* Support [dark mode UI](https://github.com/ozone10/win32-darkmodelib) on Windows 10 and later system
 * Support rendering using Direct2D DirectWrite, and switch between GDI and Direct2D
 * Support font ligature with font like [FiraCode](https://github.com/tonsky/FiraCode) in Direct2D mode
 * Support color font (Windows 8.1 and above) in Direct2D mode, useful to display color [Emoji](https://unicode.org/emoji/charts/full-emoji-list.html) 😊 and others

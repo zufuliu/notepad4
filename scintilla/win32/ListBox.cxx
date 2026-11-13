@@ -31,6 +31,7 @@
 #include <commctrl.h>
 #include <windowsx.h>
 #include <shlwapi.h>
+#include <uxtheme.h>
 
 #include "ScintillaTypes.h"
 #include "ILexer.h"
@@ -50,6 +51,7 @@
 
 using namespace Scintilla;
 using namespace Scintilla::Internal;
+extern UINT g_DarkModeStatus;
 
 namespace {
 
@@ -873,6 +875,9 @@ LRESULT ListBoxX::WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam
 			hinstanceParent,
 			nullptr);
 		::SetWindowSubclass(lb, ListProc, 0, AsInteger<DWORD_PTR>(this));
+		if (g_DarkModeStatus & TRUE) {
+			::SetWindowTheme(lb, L"DarkMode_Explorer", nullptr);
+		}
 	}
 	break;
 

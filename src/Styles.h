@@ -101,7 +101,7 @@ void	InitAutoCompletionCache(LPCEDITLEXER pLex) noexcept;
 void	Style_DetectBaseFontSize(HMONITOR hMonitor) noexcept;
 HFONT	Style_CreateCodeFont(UINT dpi) noexcept;
 void	Style_OnDPIChanged(LPCEDITLEXER pLex) noexcept;
-void	Style_OnStyleThemeChanged(int theme) noexcept;
+void	Style_OnStyleThemeChanged(HWND hwndOwner, int theme) noexcept;
 void	Style_InitDefaultColor() noexcept;
 void	Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) noexcept;
 bool	Style_SetLexerFromFile(LPCWSTR lpszFile) noexcept;
