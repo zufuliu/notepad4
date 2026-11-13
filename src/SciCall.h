@@ -19,6 +19,8 @@
 #include "Scintilla.h"
 #include "compiler.h"
 
+#define SCI_SET_OLE_DRAGDROP (WM_USER + 0xFE)
+
 extern HANDLE g_hScintilla;
 
 inline void InitScintillaHandle(HWND hwnd) noexcept {
@@ -1524,4 +1526,8 @@ inline void SciCall_SetCommandEvents(bool commandEvents) noexcept {
 
 inline void SciCall_SetMouseDwellTime(int periodMilliseconds) noexcept {
 	SciCall(SCI_SETMOUSEDWELLTIME, periodMilliseconds, 0);
+}
+
+inline void SciCall_SetOleDragDrop(bool isEnabled) noexcept {
+	SciCall(SCI_SET_OLE_DRAGDROP, isEnabled, 0);
 }
