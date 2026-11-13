@@ -113,6 +113,7 @@
 #define IDC_COLOR_SAMP2					106
 #define IDC_COLOR_PICK2					107
 #define IDC_LANGUAGE_LIST				108
+#define IDC_APP_THEME_LIST				109
 // Locations
 #define IDPP_PROG						113
 #define IDC_QUICKVIEW					100
@@ -150,6 +151,7 @@
 #define IDS_NUMFILES					10001
 #define IDS_NUMFILES_FILTER				10002
 #define IDS_SAVEFILE					10003
+#define IDS_APP_THEME_LIST				10004
 #define IDS_SEARCHEXE					11000
 #define IDS_GETQUICKVIEWER				11001
 #define IDS_GETTARGET					11002

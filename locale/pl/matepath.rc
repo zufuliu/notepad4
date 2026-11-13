@@ -420,8 +420,9 @@ CAPTION "Wygląd"
 FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
     ICON            IDI_ITEMS,IDC_STATIC,10,10,20,20
-    LTEXT           "Wygląd matepath.",IDC_STATIC,40,15,160,8
-    GROUPBOX        "Wygląd elementów listy katalogów",IDC_STATIC,10,41,205,109
+    LTEXT           "Wygląd matepath.",IDC_STATIC,40,15,122,8
+    COMBOBOX        IDC_APP_THEME_LIST,162,15,60,50,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Wygląd elementów listy katalogów",IDC_STATIC,10,41,212,109
     LTEXT           "Użyj tego koloru tekstu, gdy NIE WYBRANO FILTRA:",IDC_STATIC,20,54,170,8
     AUTORADIOBUTTON "Domyślny kolor &okna.",IDC_COLOR_DEF1,20,68,96,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "&Kolor użytkownika:",IDC_COLOR_CUST1,20,82,67,10,WS_TABSTOP
@@ -542,6 +543,7 @@ BEGIN
 	IDS_NUMFILES			"%s obiekt(y)"
 	IDS_NUMFILES_FILTER		"%s obiekt(y) | Filtr"
 	IDS_SAVEFILE			"Zapisywanie ""%s""..."
+	IDS_APP_THEME_LIST		"Follow System|Light|Dark"
     IDS_LINKDESCRIPTION     "Otwórz w programie matepath"
 END
 

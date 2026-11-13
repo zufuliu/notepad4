@@ -108,6 +108,14 @@ enum TargetApplicationMode {
 	TargetApplicationMode_UseDDE,
 };
 
+enum {
+	StyleTheme_System = -1,
+	StyleTheme_Light = 0,
+	StyleTheme_Dark = 1,
+	StyleTheme_Max = StyleTheme_Dark,
+	StyleTheme_AppDefault = StyleTheme_System,
+};
+
 #define INI_SECTION_NAME_MATEPATH			L"matepath"
 #define INI_SECTION_NAME_SETTINGS			L"Settings"
 #define INI_SECTION_NAME_FLAGS				L"Settings2"

@@ -420,8 +420,9 @@ CAPTION "Appearance"
 FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
     ICON            IDI_ITEMS,IDC_STATIC,10,10,21,20
-    LTEXT           "Appearance of matepath.",IDC_STATIC,40,15,160,8
-    GROUPBOX        "Appearance of items in directory list",IDC_STATIC,10,41,205,109
+    LTEXT           "Appearance of matepath.",IDC_STATIC,40,15,122,8
+    COMBOBOX        IDC_APP_THEME_LIST,162,15,60,50,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Appearance of items in directory list",IDC_STATIC,10,41,212,109
     LTEXT           "Use this text color when NO FILTER is SET:",IDC_STATIC,20,54,170,8
     AUTORADIOBUTTON "Default &windows color.",IDC_COLOR_DEF1,20,68,96,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "Custom &color:",IDC_COLOR_CUST1,20,82,60,10,WS_TABSTOP
@@ -542,6 +543,7 @@ BEGIN
 	IDS_NUMFILES			"%s Object(s)"
 	IDS_NUMFILES_FILTER		"%s Object(s) | Filter"
 	IDS_SAVEFILE			"Saving ""%s""..."
+	IDS_APP_THEME_LIST		"Follow System|Light|Dark"
     IDS_LINKDESCRIPTION     "Open in matepath"
 END
 

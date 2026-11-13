@@ -119,6 +119,7 @@ static bool bShowStatusbar;
 static bool bShowDriveBox;
 
 WCHAR		tchFilter[DL_FILTER_BUFSIZE];
+int			styleThemeSetting;
 bool		bNegFilter;
 bool		bDefColorNoFilter;
 bool		bDefColorFilter;
@@ -2474,6 +2475,10 @@ void LoadSettings() noexcept {
 	bTransparentMode = section.GetBool(L"TransparentMode", false);
 	bWindowLayoutRTL = section.GetBool(L"WindowLayoutRTL", false);
 
+	iValue = section.GetInt(L"StyleTheme", StyleTheme_AppDefault);
+	iValue = min<int>(iValue, StyleTheme_Max);
+	styleThemeSetting = iValue;
+
 	iValue = section.GetInt(L"EscFunction", EscFunction_None);
 	iEscFunction = clamp(static_cast<EscFunction>(iValue), EscFunction_None, EscFunction_Exit);
 
@@ -2646,6 +2651,7 @@ void SaveSettings(bool bSaveSettingsNow) noexcept {
 	section.SetBoolEx(L"MinimizeToTray", bMinimizeToTray, false);
 	section.SetBoolEx(L"TransparentMode", bTransparentMode, false);
 	section.SetBoolEx(L"WindowLayoutRTL", bWindowLayoutRTL, false);
+	section.SetIntEx(L"StyleTheme", styleThemeSetting, StyleTheme_AppDefault);
 	section.SetIntEx(L"EscFunction", static_cast<int>(iEscFunction), EscFunction_None);
 
 	section.SetIntEx(L"FillMask", dwFillMask, DL_ALLOBJECTS);

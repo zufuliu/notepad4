@@ -420,8 +420,9 @@ CAPTION "表示"
 FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
     ICON            IDI_ITEMS,IDC_STATIC,10,10,21,20
-    LTEXT           "matepath の表示",IDC_STATIC,40,15,160,8
-    GROUPBOX        "一覧項目の表示",IDC_STATIC,10,41,205,109
+    LTEXT           "matepath の表示",IDC_STATIC,40,15,122,8
+    COMBOBOX        IDC_APP_THEME_LIST,162,15,60,50,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "一覧項目の表示",IDC_STATIC,10,41,212,109
     LTEXT           "フィルター未使用時の文字色:",IDC_STATIC,20,54,170,8
     AUTORADIOBUTTON "標準設定(&W)",IDC_COLOR_DEF1,20,68,96,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "カスタム(&C):",IDC_COLOR_CUST1,20,82,60,10,WS_TABSTOP
@@ -543,6 +544,7 @@ BEGIN
 	IDS_NUMFILES			"%s 項目"
 	IDS_NUMFILES_FILTER		"%s 項目 | フィルター使用"
 	IDS_SAVEFILE			"保存中 ""%s""..."
+	IDS_APP_THEME_LIST		"Follow System|Light|Dark"
     IDS_LINKDESCRIPTION     "matepath で開く"
 END
 

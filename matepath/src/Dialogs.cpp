@@ -715,6 +715,7 @@ static INT_PTR CALLBACK AdvancedPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 //  ItemsPageProc
 //
 //
+extern int styleThemeSetting;
 extern bool     bDefColorNoFilter;
 extern bool     bDefColorFilter;
 extern COLORREF colorNoFilter;
@@ -762,9 +763,25 @@ INT_PTR CALLBACK ItemsPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPara
 			CheckRadioButton(hwnd, IDC_COLOR_DEF2, IDC_COLOR_CUST2, IDC_COLOR_CUST2);
 		}
 
+		HWND hwndCtl = GetDlgItem(hwnd, IDC_APP_THEME_LIST);
+		WCHAR szText[256];
+		GetString(IDS_APP_THEME_LIST, szText, COUNTOF(szText));
+		lstrcat(szText, L"|");
+		LPWSTR p1 = szText;
+		LPWSTR p2;
+		while ((p2 = StrChr(p1, L'|')) != nullptr) {
+			*p2++ = L'\0';
+			if (*p1) {
+				ComboBox_AddString(hwndCtl, p1);
+			}
+			p1 = p2;
+		}
+
+		ComboBox_SetCurSel(hwndCtl, styleThemeSetting + 1);
+		ComboBox_SetExtendedUI(hwndCtl, TRUE);
+
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
-		HWND hwndCtl = GetDlgItem(hwnd, IDC_LANGUAGE_LIST);
-		WCHAR szText[128];
+		hwndCtl = GetDlgItem(hwnd, IDC_LANGUAGE_LIST);
 		for (UINT rid = IDS_LANG_USER_DEFAULT; rid <= IDS_LANG_LAST_LANGUAGE; rid++) {
 			GetString(rid, szText, COUNTOF(szText));
 			ComboBox_AddString(hwndCtl, szText);
@@ -836,6 +853,7 @@ INT_PTR CALLBACK ItemsPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPara
 			colorNoFilter = m_colorNoFilter;
 			colorFilter = m_colorFilter;
 
+			styleThemeSetting = static_cast<int>(SendDlgItemMessage(hwnd, IDC_APP_THEME_LIST, CB_GETCURSEL, 0, 0)) - 1;
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
 			SetUILanguage(static_cast<int>(SendDlgItemMessage(hwnd, IDC_LANGUAGE_LIST, CB_GETCURSEL, 0, 0)) + IDS_LANG_USER_DEFAULT);
 #endif
