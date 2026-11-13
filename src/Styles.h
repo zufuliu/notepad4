@@ -114,7 +114,7 @@ LPCWSTR Style_GetCurrentLexerName(LPWSTR lpszName, int cchName) noexcept;
 void	Style_SetLexerByLangIndex(int lang) noexcept;
 void	Style_UpdateSchemeMenu(HMENU hmenu) noexcept;
 
-void	Style_SetDefaultFont(HWND hwnd, bool bCode) noexcept;
+void	Style_SetDefaultFont(HWND hwndOwner, bool bCode) noexcept;
 void	Style_SetIndentGuides(bool bShow) noexcept;
 void	Style_SetBookmark() noexcept;
 void	Style_UpdateCaret() noexcept;
@@ -153,6 +153,6 @@ bool	Style_SelectColor(HWND hwnd, LPWSTR lpszStyle, int cchStyle, bool bFore) no
 void	Style_SetStyles(int iStyle, LPCWSTR lpszStyle) noexcept;
 
 int 	Style_GetLexerIconId(LPCEDITLEXER pLex, DWORD iconFlags) noexcept;
-void	Style_ConfigDlg(HWND hwnd) noexcept;
-void	Style_SelectLexerDlg(HWND hwnd, bool favorite) noexcept;
+void	Style_ConfigDlg(HWND hwndOwner) noexcept;
+void	Style_SelectLexerDlg(HWND hwndOwner, bool favorite) noexcept;
 bool	SelectCSVOptionsDlg() noexcept;

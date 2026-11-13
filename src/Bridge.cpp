@@ -118,11 +118,11 @@ void EditPrintInit() noexcept {
 //
 // EditPrint() - Code from SciTEWin::Print()
 //
-bool EditPrint(HWND hwnd, LPCWSTR pszDocTitle, BOOL bDefault) noexcept {
+bool EditPrint(HWND hwndOwner, LPCWSTR pszDocTitle, BOOL bDefault) noexcept {
 	PRINTDLG pdlg;
 	memset(&pdlg, 0, sizeof(PRINTDLG));
 	pdlg.lStructSize = sizeof(PRINTDLG);
-	pdlg.hwndOwner = GetParent(hwnd);
+	pdlg.hwndOwner = hwndOwner;
 	pdlg.Flags = PD_USEDEVMODECOPIES | PD_ALLPAGES | PD_RETURNDC;
 	pdlg.nFromPage = 1;
 	pdlg.nToPage = 1;
@@ -558,7 +558,7 @@ static UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam, LPA
 	return 0;
 }
 
-void EditPrintSetup(HWND hwnd) noexcept {
+void EditPrintSetup(HWND hwndOwner) noexcept {
 	DLGTEMPLATE *pDlgTemplate = LoadThemedDialogTemplate(MAKEINTRESOURCE(IDD_PAGESETUP), g_hInstance);
 
 	PAGESETUPDLG pdlg;
@@ -567,7 +567,7 @@ void EditPrintSetup(HWND hwnd) noexcept {
 	pdlg.Flags = PSD_ENABLEPAGESETUPHOOK | PSD_ENABLEPAGESETUPTEMPLATEHANDLE;
 	pdlg.lpfnPageSetupHook = PageSetupHook;
 	pdlg.hPageSetupTemplate = pDlgTemplate;
-	pdlg.hwndOwner = GetParent(hwnd);
+	pdlg.hwndOwner = hwndOwner;
 	pdlg.hInstance = g_hInstance;
 
 	EditPrintInit();

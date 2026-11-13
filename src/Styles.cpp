@@ -3629,9 +3629,9 @@ bool Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, bool bDefaultSt
 //
 // Style_SetDefaultFont()
 //
-void Style_SetDefaultFont(HWND hwnd, bool bCode) noexcept {
+void Style_SetDefaultFont(HWND hwndOwner, bool bCode) noexcept {
 	const int iIdx = bCode ? GlobalStyleIndex_DefaultCode : GlobalStyleIndex_DefaultText;
-	if (Style_SelectFont(hwnd, lexGlobal.GetStyleValue(iIdx), MAX_EDITSTYLE_VALUE_SIZE, true)) {
+	if (Style_SelectFont(hwndOwner, lexGlobal.GetStyleValue(iIdx), MAX_EDITSTYLE_VALUE_SIZE, true)) {
 		fStylesModified |= STYLESMODIFIED_SOME_STYLE;
 		lexGlobal.bStyleChanged = true;
 		Style_SetLexer(pLexCurrent, false);
@@ -4710,7 +4710,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 //
 // Style_ConfigDlg()
 //
-void Style_ConfigDlg(HWND hwnd) noexcept {
+void Style_ConfigDlg(HWND hwndOwner) noexcept {
 	StyleConfigDlgParam param;
 
 	Style_LoadAll(StyleLoadFlag_Default);
@@ -4736,7 +4736,7 @@ void Style_ConfigDlg(HWND hwnd) noexcept {
 		}
 	}
 
-	if (IDCANCEL == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_STYLECONFIG), GetParent(hwnd), Style_ConfigDlgProc, AsInteger<LPARAM>(&param))) {
+	if (IDCANCEL == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_STYLECONFIG), hwndOwner, Style_ConfigDlgProc, AsInteger<LPARAM>(&param))) {
 		// Restore Styles
 		memcpy(g_AllFileExtensions, param.extBackup, ALL_FILE_EXTENSIONS_BYTE_SIZE);
 		memcpy(customColor, param.colorBackup, MAX_CUSTOM_COLOR_COUNT * sizeof(COLORREF));
@@ -5228,10 +5228,10 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 //
 // Style_SelectLexerDlg()
 //
-void Style_SelectLexerDlg(HWND hwnd, bool favorite) noexcept {
+void Style_SelectLexerDlg(HWND hwndOwner, bool favorite) noexcept {
 	const LPCEDITLEXER pLex = pLexCurrent;
 	const int langIndex = np2LexLangIndex;
-	if (IDOK == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_STYLESELECT), GetParent(hwnd), Style_SelectLexerDlgProc, favorite)) {
+	if (IDOK == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_STYLESELECT), hwndOwner, Style_SelectLexerDlgProc, favorite)) {
 		if (!favorite && (pLex != pLexCurrent || langIndex != np2LexLangIndex)) {
 			if (pLexCurrent->iLexer == SCLEX_CSV) {
 				SelectCSVOptionsDlg();

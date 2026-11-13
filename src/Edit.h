@@ -169,7 +169,7 @@ LPWSTR EditGetClipboardTextW(ClipboardTextType type, UINT &length) noexcept;
 inline char *EditGetClipboardText(UINT &length) noexcept {
 	return reinterpret_cast<char *>(EditGetClipboardTextW(ClipboardTextType::DocumentBytes, length));
 }
-void	EditCopyAppend(HWND hwnd) noexcept;
+void	EditCopyAppend(HWND hwndOwner) noexcept;
 
 constexpr int GetScintillaEOLMode(int mode) noexcept {
 	constexpr UINT mask = (SC_EOL_CRLF << 2*0) | (SC_EOL_LF << 2*1) | (SC_EOL_CR << 2*2);
@@ -242,7 +242,7 @@ void	EditGetExcerpt(LPWSTR lpszExcerpt, DWORD cchExcerpt) noexcept;
 void	EditSelectWord() noexcept;
 void	EditSelectLines(bool currentBlock, bool lineSelection) noexcept;
 void	EditSaveSelectionAsFindText(EditFindReplace &efr, int menu, bool findSelection) noexcept;
-HWND	EditFindReplaceDlg(HWND hwnd, EditFindReplace &efr, bool bReplace) noexcept;
+HWND	EditFindReplaceDlg(HWND hwndOwner, EditFindReplace &efr, bool bReplace) noexcept;
 void	EditFindNext(EditFindReplace &efr, bool fExtendSelection) noexcept;
 void	EditFindPrev(EditFindReplace &efr, bool fExtendSelection) noexcept;
 void	EditFindAll(EditFindReplace &efr, bool selectAll) noexcept;
@@ -255,7 +255,7 @@ enum EditReplaceAllFlag {
 };
 void	EditReplaceAll(EditFindReplace &efr) noexcept;
 void	EditReplaceAllInSelection(EditFindReplace &efr, EditReplaceAllFlag flag = EditReplaceAllFlag_None) noexcept;
-bool	EditLineNumDlg(HWND hwnd) noexcept;
+bool	EditLineNumDlg(HWND hwndOwner) noexcept;
 void	EditModifyLinesDlg(HWND hwnd) noexcept;
 void	EditEncloseSelectionDlg(HWND hwnd) noexcept;
 void	EditInsertTagDlg(HWND hwnd) noexcept;
@@ -278,8 +278,8 @@ enum OpenSelectionType {
 void EditOpenSelection(OpenSelectionType type);
 
 // in Bridge.cpp
-bool	EditPrint(HWND hwnd, LPCWSTR pszDocTitle, BOOL bDefault) noexcept;
-void	EditPrintSetup(HWND hwnd) noexcept;
+bool	EditPrint(HWND hwndOwner, LPCWSTR pszDocTitle, BOOL bDefault) noexcept;
+void	EditPrintSetup(HWND hwndOwner) noexcept;
 void	EditDumpDocumentStyledText(LPCWSTR lpszFile);
 void	EditFormatCode(int menu) noexcept;
 

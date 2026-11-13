@@ -2843,7 +2843,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_FILE_PAGESETUP:
-		EditPrintSetup(hwndEdit);
+		EditPrintSetup(hwnd);
 		break;
 
 	case IDT_FILE_PRINT:
@@ -2857,7 +2857,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			GetString(IDS_UNTITLED, shfi.szDisplayName, COUNTOF(shfi.szDisplayName));
 		}
 
-		if (!EditPrint(hwndEdit, shfi.szDisplayName, static_cast<int>(action) & TRUE)) {
+		if (!EditPrint(hwnd, shfi.szDisplayName, static_cast<int>(action) & TRUE)) {
 			MsgBoxWarn(MB_OK, IDS_PRINT_ERROR, shfi.szDisplayName);
 		} else if (action > NotepadReplacementAction_Default) {
 			SendWMCommand(hwnd, IDM_FILE_EXIT);
@@ -3091,7 +3091,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_EDIT_COPYADD:
 		bLastCopyFromMe = true;
-		EditCopyAppend(hwndEdit);
+		EditCopyAppend(hwnd);
 		UpdateToolbar();
 		break;
 
@@ -3687,12 +3687,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_EDIT_REPLACE: {
 		const bool bReplace = (LOWORD(wParam) == IDM_EDIT_REPLACE) || (LOWORD(wParam) == IDT_EDIT_REPLACE);
 		if (hDlgFindReplace == nullptr) {
-			hDlgFindReplace = EditFindReplaceDlg(hwndEdit, efrData, bReplace);
+			hDlgFindReplace = EditFindReplaceDlg(hwnd, efrData, bReplace);
 		} else {
 			if (bReplace != (GetDlgItem(hDlgFindReplace, IDC_REPLACETEXT) != nullptr)) {
 				SendWMCommand(hDlgFindReplace, IDC_TOGGLEFINDREPLACE);
 				DestroyWindow(hDlgFindReplace);
-				hDlgFindReplace = EditFindReplaceDlg(hwndEdit, efrData, bReplace);
+				hDlgFindReplace = EditFindReplaceDlg(hwnd, efrData, bReplace);
 			} else {
 				SetForegroundWindow(hDlgFindReplace);
 				SendMessage(hDlgFindReplace, APPM_COPYDATA, 0, 0);
@@ -3757,7 +3757,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_EDIT_GOTOLINE:
-		EditLineNumDlg(hwndEdit);
+		EditLineNumDlg(hwnd);
 		break;
 
 	//case IDM_EDIT_NAVIGATE_BACKWARD:
@@ -3776,12 +3776,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDT_VIEW_SCHEME:
 	case IDM_VIEW_SCHEME:
 	case IDM_VIEW_SCHEME_FAVORITE:
-		Style_SelectLexerDlg(hwndEdit, LOWORD(wParam) == IDM_VIEW_SCHEME_FAVORITE);
+		Style_SelectLexerDlg(hwnd, LOWORD(wParam) == IDM_VIEW_SCHEME_FAVORITE);
 		break;
 
 	case IDT_VIEW_SCHEMECONFIG:
 	case IDM_VIEW_SCHEME_CONFIG:
-		Style_ConfigDlg(hwndEdit);
+		Style_ConfigDlg(hwnd);
 		break;
 
 	case IDM_VIEW_USEDEFAULT_CODESTYLE:
@@ -3795,7 +3795,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_VIEW_DEFAULT_CODE_FONT:
 	case IDM_VIEW_DEFAULT_TEXT_FONT:
-		Style_SetDefaultFont(hwndEdit, LOWORD(wParam) == IDM_VIEW_DEFAULT_CODE_FONT);
+		Style_SetDefaultFont(hwnd, LOWORD(wParam) == IDM_VIEW_DEFAULT_CODE_FONT);
 		break;
 
 	case IDT_VIEW_WORDWRAP:
@@ -5005,7 +5005,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			LPNMMOUSE pnmm = AsPointer<LPNMMOUSE>(lParam);
 			switch (pnmm->dwItemSpec) {
 			case StatusItem_Line:
-				EditLineNumDlg(hwndEdit);
+				EditLineNumDlg(hwnd);
 				return TRUE;
 
 			case StatusItem_Find:

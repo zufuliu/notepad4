@@ -363,7 +363,7 @@ LPWSTR EditGetClipboardTextW(ClipboardTextType type, UINT &length) noexcept {
 //
 // EditCopyAppend()
 //
-void EditCopyAppend(HWND hwnd) noexcept {
+void EditCopyAppend(HWND hwndOwner) noexcept {
 	if (!IsClipboardFormatAvailable(CF_UNICODETEXT)) {
 		SciCall_Copy(false);
 		return;
@@ -393,7 +393,7 @@ void EditCopyAppend(HWND hwnd) noexcept {
 	WCHAR * const pszTextW = reinterpret_cast<WCHAR *>(pszText + cchText);
 	UINT cchTextW = MultiByteToWideChar(cpEdit, 0, pszText, -1, pszTextW, static_cast<int>(cchText));
 
-	if (cchTextW > 1 && OpenClipboard(GetParent(hwnd))) {
+	if (cchTextW > 1 && OpenClipboard(hwndOwner)) {
 		HANDLE hOld = GetClipboardData(CF_UNICODETEXT);
 		LPCWSTR pszOld = static_cast<LPCWSTR>(GlobalLock(hOld));
 
@@ -5194,10 +5194,10 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 //
 // EditFindReplaceDlg()
 //
-HWND EditFindReplaceDlg(HWND hwnd, EditFindReplace &efr, bool bReplace) noexcept {
+HWND EditFindReplaceDlg(HWND hwndOwner, EditFindReplace &efr, bool bReplace) noexcept {
 	HWND hDlg = CreateThemedDialogParam(g_hInstance,
 								   bReplace ? MAKEINTRESOURCE(IDD_REPLACE) : MAKEINTRESOURCE(IDD_FIND),
-								   GetParent(hwnd),
+								   hwndOwner,
 								   EditFindReplaceDlgProc,
 								   AsInteger<LPARAM>(&efr));
 
@@ -6057,8 +6057,8 @@ static INT_PTR CALLBACK EditLineNumDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 //
 // EditLinenumDlg()
 //
-bool EditLineNumDlg(HWND hwnd) noexcept {
-	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_LINENUM), GetParent(hwnd), EditLineNumDlgProc, 0);
+bool EditLineNumDlg(HWND hwndOwner) noexcept {
+	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_LINENUM), hwndOwner, EditLineNumDlgProc, 0);
 	return iResult == IDOK;
 }
 

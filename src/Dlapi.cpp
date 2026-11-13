@@ -546,11 +546,12 @@ bool DirList_PropertyDlg(HWND hwnd, int iItem) {
 	LV_ITEMDATA *lplvid = AsPointer<LV_ITEMDATA *>(lvi.lParam);
 	LPCONTEXTMENU lpcm;
 
-	if (S_OK == lplvid->lpsf->GetUIObjectOf(GetParent(hwnd), 1, reinterpret_cast<PCUITEMID_CHILD_ARRAY>(&lplvid->pidl), IID_IContextMenu, nullptr, AsPPVArgs(&lpcm))) {
+	HWND hwndOwner = GetParent(hwnd);
+	if (S_OK == lplvid->lpsf->GetUIObjectOf(hwndOwner, 1, reinterpret_cast<PCUITEMID_CHILD_ARRAY>(&lplvid->pidl), IID_IContextMenu, nullptr, AsPPVArgs(&lpcm))) {
 		CMINVOKECOMMANDINFO cmi;
 		cmi.cbSize = sizeof(CMINVOKECOMMANDINFO);
 		cmi.fMask = 0;
-		cmi.hwnd = GetParent(hwnd);
+		cmi.hwnd = hwndOwner;
 		cmi.lpVerb = "properties";
 		cmi.lpParameters = nullptr;
 		cmi.lpDirectory = nullptr;
@@ -892,11 +893,12 @@ bool DriveBox_PropertyDlg(HWND hwnd) {
 	const DC_ITEMDATA * const lpdcid = AsPointer<const DC_ITEMDATA *>(cbei.lParam);
 	LPCONTEXTMENU lpcm;
 
-	if (S_OK == lpdcid->lpsf->GetUIObjectOf(GetParent(hwnd), 1, reinterpret_cast<PCUITEMID_CHILD_ARRAY>(&lpdcid->pidl), IID_IContextMenu, nullptr, AsPPVArgs(&lpcm))) {
+	HWND hwndOwner = GetParent(hwnd);
+	if (S_OK == lpdcid->lpsf->GetUIObjectOf(hwndOwner, 1, reinterpret_cast<PCUITEMID_CHILD_ARRAY>(&lpdcid->pidl), IID_IContextMenu, nullptr, AsPPVArgs(&lpcm))) {
 		CMINVOKECOMMANDINFO cmi;
 		cmi.cbSize = sizeof(CMINVOKECOMMANDINFO);
 		cmi.fMask = 0;
-		cmi.hwnd = GetParent(hwnd);
+		cmi.hwnd = hwndOwner;
 		cmi.lpVerb = "properties";
 		cmi.lpParameters = nullptr;
 		cmi.lpDirectory = nullptr;
