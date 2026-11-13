@@ -375,7 +375,8 @@ static COLORREF customColor[MAX_CUSTOM_COLOR_COUNT];
 CallTipInfo callTipInfo;
 static bool bCustomColorLoaded = false;
 
-int		np2StyleTheme;
+int		styleThemeActive;
+int		styleThemeSetting;
 static UINT fStylesModified = STYLESMODIFIED_NONE;
 static bool fWarnedNoIniFile = false;
 static int	defaultBaseFontSize = 11*SC_FONT_SIZE_MULTIPLIER; // 11 pt
@@ -651,11 +652,11 @@ void Style_ReleaseResources() noexcept {
 }
 
 static inline bool IsStyleLoaded(LPCEDITLEXER pLex) noexcept {
-	return pLex->iStyleTheme == np2StyleTheme && pLex->szStyleBuf != nullptr;
+	return pLex->iStyleTheme == styleThemeActive && pLex->szStyleBuf != nullptr;
 }
 
 static inline LPCWSTR GetStyleThemeFilePath() noexcept {
-	return (np2StyleTheme == StyleTheme_Dark) ? darkStyleThemeFilePath : szIniFile;
+	return (styleThemeActive == StyleTheme_Light) ? szIniFile : darkStyleThemeFilePath;
 }
 
 static inline void FindDarkThemeFile(LPWSTR lpszIniFile) noexcept {
@@ -693,7 +694,7 @@ static inline void SaveLexTabSettings(IniSectionBuilder &section, LPCEDITLEXER p
 }
 
 static void Style_LoadOneEx(PEDITLEXER pLex, IniSectionParser &section, WCHAR *pIniSectionBuf, int cchIniSection) noexcept {
-	pLex->iStyleTheme = static_cast<uint8_t>(np2StyleTheme);
+	pLex->iStyleTheme = static_cast<uint8_t>(styleThemeActive);
 	LPCWSTR themePath = GetStyleThemeFilePath();
 	GetPrivateProfileSection(pLex->pszName, pIniSectionBuf, cchIniSection, themePath);
 
@@ -818,8 +819,10 @@ void Style_Load() noexcept {
 	int iValue = section.GetInt(L"DefaultScheme", 0);
 	iDefaultLexerIndex = Style_GetMatchLexerIndex(iValue + NP2LEX_TEXTFILE);
 
-	iValue = section.GetInt(L"StyleTheme", StyleTheme_Default);
-	np2StyleTheme = clamp<int>(iValue, StyleTheme_Default, StyleTheme_Max);
+	iValue = section.GetInt(L"StyleTheme", StyleTheme_AppDefault);
+	iValue = min<int>(iValue, StyleTheme_Max);
+	styleThemeSetting = iValue;
+	styleThemeActive = iValue;
 
 	// auto select
 	bAutoSelect = section.GetBool(L"AutoSelect", true);
@@ -838,7 +841,7 @@ void Style_Load() noexcept {
 		}
 	}
 
-	if (np2StyleTheme == StyleTheme_Dark && StrIsEmpty(darkStyleThemeFilePath)) {
+	if (styleThemeActive != StyleTheme_Light && StrIsEmpty(darkStyleThemeFilePath)) {
 		FindDarkThemeFile(darkStyleThemeFilePath);
 	}
 
@@ -915,7 +918,7 @@ void Style_Save() noexcept {
 	section.SetString(L"FavoriteSchemes", favoriteSchemesConfig);
 	// default scheme
 	section.SetIntEx(L"DefaultScheme", pLexArray[iDefaultLexerIndex]->rid - NP2LEX_TEXTFILE, 0);
-	section.SetIntEx(L"StyleTheme", np2StyleTheme, StyleTheme_Default);
+	section.SetIntEx(L"StyleTheme", styleThemeSetting, StyleTheme_AppDefault);
 
 	// auto select
 	section.SetBoolEx(L"AutoSelect", bAutoSelect, true);
@@ -942,7 +945,7 @@ void Style_Save() noexcept {
 
 	// save changes to each theme
 	LPCWSTR themePath = GetStyleThemeFilePath();
-	if (np2StyleTheme != StyleTheme_Default) {
+	if (styleThemeActive != StyleTheme_Light) {
 		if (!CreateIniFile(themePath)) {
 			NP2HeapFree(pIniSectionBuf);
 			MsgBoxLastError(MB_OK, IDS_CREATEINI_FAIL);
@@ -982,7 +985,7 @@ void Style_Save() noexcept {
 			for (UINT i = 0; i < iStyleCount; i++, szValue += MAX_EDITSTYLE_VALUE_SIZE) {
 				section.SetStringEx(pLex->Styles[i].pszName, szValue, pLex->Styles[i].pszDefault);
 			}
-			if (pLex == pLexCurrent && pLex->iStyleTheme == StyleTheme_Default) {
+			if (pLex == pLexCurrent && pLex->iStyleTheme == StyleTheme_Light) {
 				SaveLexTabSettings(section, pLex);
 			}
 			// delete this section if nothing changed
@@ -1175,11 +1178,13 @@ void Style_OnDPIChanged(LPCEDITLEXER pLex) noexcept {
 	} while (iMarkerIDs);
 }
 
+NP2_noinline
 void Style_OnStyleThemeChanged(int theme) noexcept {
-	if (theme == np2StyleTheme) {
+	styleThemeSetting = theme;
+	if (theme == styleThemeActive) {
 		return;
 	}
-	if (theme != StyleTheme_Default) {
+	if (theme != StyleTheme_Light) {
 		if (StrIsEmpty(darkStyleThemeFilePath)) {
 			FindDarkThemeFile(darkStyleThemeFilePath);
 		}
@@ -1188,7 +1193,7 @@ void Style_OnStyleThemeChanged(int theme) noexcept {
 	if (fStylesModified) {
 		SaveSettingsNow(true, true);
 	}
-	np2StyleTheme = theme;
+	styleThemeActive = theme;
 	bCustomColorLoaded = false;
 	Style_SetLexer(pLexCurrent, false);
 }
@@ -1691,12 +1696,12 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) noexcept {
 		if (Style_StrGetForeColor(szValue, &rgb)) {
 			foreColor = rgb;
 		} else {
-			foreColor = (np2StyleTheme == StyleTheme_Dark) ? FoldingMarkerLineColorDark : FoldingMarkerLineColorDefault;
+			foreColor = (styleThemeActive == StyleTheme_Light) ? FoldingMarkerLineColorDefault : FoldingMarkerLineColorDark;
 		}
 		if (Style_StrGetBackColor(szValue, &rgb)) {
 			fillColor = rgb;
 		} else {
-			fillColor = (np2StyleTheme == StyleTheme_Dark) ? FoldingMarkerFillColorDark : FoldingMarkerFillColorDefault;
+			fillColor = (styleThemeActive == StyleTheme_Light) ? FoldingMarkerFillColorDefault : FoldingMarkerFillColorDark;
 		}
 
 		szValue = lexGlobal.GetStyleValue(GlobalStyleIndex_CodeFolding);
@@ -4188,7 +4193,7 @@ static HTREEITEM Style_AddAllLexerToTreeView(HWND hwndTV, bool withStyles, bool 
 }
 
 static void Style_ResetStyle(LPCEDITLEXER pLex, const EDITSTYLE *pStyle, LPWSTR szValue) noexcept {
-	if (np2StyleTheme != StyleTheme_Default) {
+	if (styleThemeActive != StyleTheme_Light) {
 		// reload style from external file
 		LPCWSTR themePath = GetStyleThemeFilePath();
 		WCHAR wch[MAX_EDITSTYLE_VALUE_SIZE] = L"";
@@ -4247,7 +4252,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 		ResizeDlg_InitY2(hwnd, &positionRecord.cxStyleCustomizeDlg, &positionRecord.cyStyleCustomizeDlg, controlDefinition, COUNTOF(controlDefinition) - 1, 50);
 
 		WCHAR szTitle[1024];
-		const UINT idsTitle = (np2StyleTheme == StyleTheme_Light) ? IDS_CONFIG_THEME_TITLE_LIGHT : IDS_CONFIG_THEME_TITLE_DARK;
+		const UINT idsTitle = (styleThemeActive == StyleTheme_Light) ? IDS_CONFIG_THEME_TITLE_LIGHT : IDS_CONFIG_THEME_TITLE_DARK;
 		GetString(idsTitle, szTitle, COUNTOF(szTitle));
 		SetWindowText(hwnd, szTitle);
 
@@ -4571,7 +4576,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 		case IDC_RESETALL:
 		case IDC_STYLEDEFAULT:
 			if (LOWORD(wParam) == IDC_RESETALL) {
-				if (np2StyleTheme == StyleTheme_Default) {
+				if (styleThemeActive == StyleTheme_Light) {
 					// reset styles, extensions to built-in default
 					Style_ResetAll(true);
 				} else {

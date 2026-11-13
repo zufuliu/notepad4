@@ -83,7 +83,8 @@ enum StyleLoadFlag {
 
 extern PEDITLEXER pLexCurrent;
 extern int np2LexLangIndex;
-extern int np2StyleTheme;
+extern int styleThemeActive;
+extern int styleThemeSetting;
 extern WCHAR darkStyleThemeFilePath[MAX_PATH];
 
 void	Style_ReleaseResources() noexcept;

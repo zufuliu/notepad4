@@ -2508,7 +2508,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 
 	CheckCmd(hmenu, IDM_VIEW_SHOW_FOLDING, bShowCodeFolding);
 	CheckCmd(hmenu, IDM_VIEW_USEDEFAULT_CODESTYLE, pLexCurrent->bUseDefaultCodeStyle);
-	i = IDM_VIEW_STYLE_THEME_LIGHT + np2StyleTheme;
+	i = IDM_VIEW_STYLE_THEME_LIGHT + styleThemeSetting;
 	CheckMenuRadioItem(hmenu, IDM_VIEW_STYLE_THEME_LIGHT, IDM_VIEW_STYLE_THEME_DARK, i, MF_BYCOMMAND);
 
 	CheckCmd(hmenu, IDM_VIEW_WORDWRAP, fvCurFile.fWordWrap);
@@ -7150,10 +7150,10 @@ bool FileSave(FileSaveFlag saveFlag) {
 					mruFind.Reload();
 					mruReplace.Reload();
 				}
-				if (np2StyleTheme == StyleTheme_Default) {
+				if (styleThemeActive == StyleTheme_Light) {
 					Style_LoadAll(static_cast<StyleLoadFlag>(StyleLoadFlag_Reload | StyleLoadFlag_Apply));
 				}
-			} else if (np2StyleTheme != StyleTheme_Default && PathEqual(szCurFile, darkStyleThemeFilePath)) {
+			} else if (styleThemeActive != StyleTheme_Light && PathEqual(szCurFile, darkStyleThemeFilePath)) {
 				Style_LoadAll(static_cast<StyleLoadFlag>(StyleLoadFlag_Reload | StyleLoadFlag_Apply));
 			}
 		}
