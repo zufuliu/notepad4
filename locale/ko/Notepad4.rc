@@ -500,6 +500,7 @@ BEGIN
 		MENUITEM "기본 코드 스타일 사용(&U)\tShift+F12",					IDM_VIEW_USEDEFAULT_CODESTYLE
 		POPUP "테마 스타일(&Y)"
 		BEGIN
+			MENUITEM "Follow &System",				IDM_VIEW_STYLE_THEME_SYSTEM
 			MENUITEM "Light(&L)",										IDM_VIEW_STYLE_THEME_LIGHT
 			MENUITEM "어두운(&D)",										IDM_VIEW_STYLE_THEME_DARK
 		END

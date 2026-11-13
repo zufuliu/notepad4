@@ -2508,8 +2508,8 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 
 	CheckCmd(hmenu, IDM_VIEW_SHOW_FOLDING, bShowCodeFolding);
 	CheckCmd(hmenu, IDM_VIEW_USEDEFAULT_CODESTYLE, pLexCurrent->bUseDefaultCodeStyle);
-	i = IDM_VIEW_STYLE_THEME_LIGHT + styleThemeSetting;
-	CheckMenuRadioItem(hmenu, IDM_VIEW_STYLE_THEME_LIGHT, IDM_VIEW_STYLE_THEME_DARK, i, MF_BYCOMMAND);
+	i = IDM_VIEW_STYLE_THEME_SYSTEM + 1 + styleThemeSetting;
+	CheckMenuRadioItem(hmenu, IDM_VIEW_STYLE_THEME_SYSTEM, IDM_VIEW_STYLE_THEME_DARK, i, MF_BYCOMMAND);
 
 	CheckCmd(hmenu, IDM_VIEW_WORDWRAP, fvCurFile.fWordWrap);
 	i = IDM_VIEW_FONTQUALITY_DEFAULT + iFontQuality;
@@ -3788,6 +3788,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		Style_ToggleUseDefaultCodeStyle();
 		break;
 
+	case IDM_VIEW_STYLE_THEME_SYSTEM:
 	case IDM_VIEW_STYLE_THEME_LIGHT:
 	case IDM_VIEW_STYLE_THEME_DARK:
 		Style_OnStyleThemeChanged(LOWORD(wParam) - IDM_VIEW_STYLE_THEME_LIGHT);

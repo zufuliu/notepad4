@@ -500,6 +500,7 @@ BEGIN
 		MENUITEM "&Usa lo stile predefinito per il codice\tShift+F12",	IDM_VIEW_USEDEFAULT_CODESTYLE
 		POPUP "St&ile Tema"
 		BEGIN
+			MENUITEM "Follow &System",				IDM_VIEW_STYLE_THEME_SYSTEM
 			MENUITEM "&Light",					IDM_VIEW_STYLE_THEME_LIGHT
 			MENUITEM "&Scuro",						IDM_VIEW_STYLE_THEME_DARK
 		END

@@ -500,6 +500,7 @@ BEGIN
 		MENUITEM "Użyj d&omyślnego stylu kodu\tShift+F12",IDM_VIEW_USEDEFAULT_CODESTYLE
 		POPUP "Motyw st&ylu"
 		BEGIN
+			MENUITEM "Follow &System",				IDM_VIEW_STYLE_THEME_SYSTEM
 			MENUITEM "&Light",					IDM_VIEW_STYLE_THEME_LIGHT
 			MENUITEM "&Ciemny",						IDM_VIEW_STYLE_THEME_DARK
 		END
