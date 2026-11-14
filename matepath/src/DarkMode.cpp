@@ -1271,7 +1271,7 @@ BOOL CALLBACK DarkEnumChildProc(HWND hwnd, LPARAM lParam) noexcept {
 	} else if (StrEqualLen(className, len, WC_TABCONTROL)) {
 		if (!(enumParam.flag & (DarkEnumFlag_Active | DarkEnumFlag_NeedDarkTheme))) {
 			SetWindowTheme(hwnd, theme, nullptr);
-		} else {
+		} else if (!GetWindowSubclass(hwnd, TabPaintSubclass, 0, nullptr)) {
 			auto * const paint = static_cast<BufferedPaint *>(NP2HeapAlloc(sizeof(BufferedPaint)));
 			SetWindowSubclass(hwnd, TabPaintSubclass, 0, AsInteger<DWORD_PTR>(paint));
 		}
