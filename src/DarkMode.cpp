@@ -7,8 +7,7 @@ https://github.com/ozone10/win32-darkmodelib
 UAHMenuBar	https://github.com/adzm/win32-custom-menubar-aero-theme
 
 https://www.zabkat.com/blog/darkmode-listview.htm
-https://www.zabkat.com/blog/bpic/dark_themes.txt
-https://github.com/nptr/msstyleEditor
+https://github.com/zufuliu/notepad4-test/tree/main/darkmode
 */
 
 #include <windows.h>
@@ -1222,7 +1221,7 @@ enum DarkEnumFlag {
 
 struct DarkEnumParam {
 	LPCWSTR theme;
-	LPCWSTR treeListTheme;
+	LPCWSTR explorerTheme;
 	UINT flag;
 	COLORREF textColor;
 	COLORREF backColor;
@@ -1265,7 +1264,7 @@ BOOL CALLBACK DarkEnumChildProc(HWND hwnd, LPARAM lParam) noexcept {
 		SetWindowTheme(hwnd, theme, nullptr);
 		SetWindowSubclass(hwnd, ResizeGripSubclass, 0, 0);
 	} else if ((enumParam.flag & DarkEnumFlag_HandleTreeList) && StrEqualLen(className, len, WC_TREEVIEW)) {
-		theme = enumParam.treeListTheme;
+		theme = enumParam.explorerTheme;
 		const COLORREF textColor = enumParam.textColor;
 		const COLORREF backColor = enumParam.backColor;
 		SetWindowTheme(hwnd, theme, nullptr);
@@ -1275,7 +1274,7 @@ BOOL CALLBACK DarkEnumChildProc(HWND hwnd, LPARAM lParam) noexcept {
 			SetWindowTheme(hwndCtrl, theme, nullptr);
 		}
 	} else if ((enumParam.flag & DarkEnumFlag_HandleTreeList) && StrEqualLen(className, len, WC_LISTVIEW)) {
-		theme = enumParam.treeListTheme;
+		theme = enumParam.explorerTheme;
 		const COLORREF textColor = enumParam.textColor;
 		const COLORREF backColor = enumParam.backColor;
 		SetWindowTheme(hwnd, theme, nullptr);
@@ -1490,13 +1489,13 @@ void DarkMode_OnDarkModeChange(HWND hwnd) noexcept {
 	DarkEnumParam param {};
 	if (dark) {
 		param.theme = getDarkModeThemeName();
-		param.treeListTheme = L"DarkMode_Explorer";
+		param.explorerTheme = L"DarkMode_Explorer";
 		param.textColor = DarkColor_ViewTextColor;
 		param.backColor = DarkColor_ViewBackgroundColor;
 		param.flag = DarkMode_SupportDarkTheme()? (DarkEnumFlag_Active | DarkEnumFlag_HandleTreeList) : (DarkEnumFlag_Active | DarkEnumFlag_HandleTreeList | DarkEnumFlag_NeedDarkTheme);
 	} else {
 		param.theme = L"Explorer";
-		param.treeListTheme = L"Explorer";
+		param.explorerTheme = L"Explorer";
 		param.flag = DarkEnumFlag_HandleTreeList;
 		param.textColor = GetSysColor(COLOR_WINDOWTEXT);
 		param.backColor = GetSysColor(COLOR_WINDOW);
@@ -1538,7 +1537,7 @@ void DarkMode_InitDialog(HWND hwnd, DWORD_PTR dwRefData) noexcept {
 	if (DarkMode_IsActive()) {
 		DarkEnumParam param {};
 		param.theme = getDarkModeThemeName();
-		param.treeListTheme = L"DarkMode_Explorer";
+		param.explorerTheme = L"DarkMode_Explorer";
 		param.textColor = DarkColor_ViewTextColor;
 		param.backColor = DarkColor_ViewBackgroundColor;
 		param.flag = DarkMode_SupportDarkTheme()? DarkEnumFlag_Active : (DarkEnumFlag_Active | DarkEnumFlag_NeedDarkTheme);
