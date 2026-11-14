@@ -1407,14 +1407,24 @@ void Document::HighlightUrl(Sci_PositionU startPos, Sci_Position length, const u
 						constexpr int kMaxSchemeNameLength = 32;
 						Sci_PositionU pos = startPos - 5;
 						while (true) {
-							ch = cbView[pos];
-							if (pos == backPos || pos + kMaxSchemeNameLength < startPos || !(kUrlCharClass[ch] & UrlCharMask_SchemeName) || StyleIndexAt(pos) != initStyle) {
+							if (pos == backPos || pos + kMaxSchemeNameLength < startPos) {
 								break;
 							}
+							ch = cbView[pos];
+							if (!(kUrlCharClass[ch] & UrlCharMask_SchemeName)) {
+								break;
+							}
+							if (StyleIndexAt(pos) != initStyle) {
+								++pos;
+								ch = chPrev;
+								break;
+							}
+							chPrev = ch;
 							--pos;
 						}
 						if (IsDBCSLeadByte(ch)) {
 							++pos;
+							ch = chPrev;
 						}
 						chPrev = '\0';
 						while (pos < startPos && !IsAlpha(ch)) {
