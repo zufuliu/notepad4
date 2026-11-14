@@ -1261,7 +1261,6 @@ BOOL CALLBACK DarkEnumChildProc(HWND hwnd, LPARAM lParam) noexcept {
 		}
 		SetWindowTheme(hwnd, theme, nullptr);
 	} else if (StrEqualLen(className, len, WC_SCROLLBAR)) {
-		SetWindowTheme(hwnd, theme, nullptr);
 		SetWindowSubclass(hwnd, ResizeGripSubclass, 0, 0);
 	} else if ((enumParam.flag & DarkEnumFlag_HandleTreeList) && StrEqualLen(className, len, WC_TREEVIEW)) {
 		theme = enumParam.explorerTheme;

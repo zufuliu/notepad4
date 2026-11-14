@@ -809,6 +809,8 @@ LRESULT CALLBACK TabPaintSubclass(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 	auto * const paint = AsPointer<BufferedPaint *>(dwRefData);
 	if (umsg == WM_NCDESTROY) {
 		RemoveWindowSubclass(hwnd, TabPaintSubclass, uIdSubclass);
+		paint->releaseBuffer();
+		NP2HeapFree(paint);
 	} else if (DarkMode_IsActive()) {
 		switch (umsg) {
 		case WM_ERASEBKGND:
@@ -1266,7 +1268,6 @@ BOOL CALLBACK DarkEnumChildProc(HWND hwnd, LPARAM lParam) noexcept {
 		}
 		SetWindowTheme(hwnd, theme, nullptr);
 	} else if (StrEqualLen(className, len, WC_SCROLLBAR)) {
-		SetWindowTheme(hwnd, theme, nullptr);
 		SetWindowSubclass(hwnd, ResizeGripSubclass, 0, 0);
 	} else if (StrEqualLen(className, len, WC_TABCONTROL)) {
 		if (!(enumParam.flag & (DarkEnumFlag_Active | DarkEnumFlag_NeedDarkTheme))) {
