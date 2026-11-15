@@ -1407,9 +1407,6 @@ void Document::HighlightUrl(Sci_PositionU startPos, Sci_Position length, const u
 						constexpr int kMaxSchemeNameLength = 32;
 						Sci_PositionU pos = startPos - 5;
 						while (true) {
-							if (pos == backPos || pos + kMaxSchemeNameLength < startPos) {
-								break;
-							}
 							ch = cbView[pos];
 							if (!(kUrlCharClass[ch] & UrlCharMask_SchemeName)) {
 								break;
@@ -1417,6 +1414,9 @@ void Document::HighlightUrl(Sci_PositionU startPos, Sci_Position length, const u
 							if (StyleIndexAt(pos) != initStyle) {
 								++pos;
 								ch = chPrev;
+								break;
+							}
+							if (pos == backPos || pos + kMaxSchemeNameLength < startPos) {
 								break;
 							}
 							chPrev = ch;
@@ -1489,7 +1489,8 @@ void Document::HighlightUrl(Sci_PositionU startPos, Sci_Position length, const u
 				}
 				if (invalid) {
 					const int offset = (!punctuation || ch == '/' || (ch == ')' && parenCount == 0)) ? 0 : 1;
-					DecorationFillRange(backPos, 1, startPos - backPos - offset);
+					const Sci::Position linkLen = startPos - backPos - offset;
+					DecorationFillRange(backPos, 1, linkLen);
 					backPos = startPos;
 					result = AutoLink::None;
 					break;
