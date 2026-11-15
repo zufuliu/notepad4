@@ -263,11 +263,11 @@ BEGIN
     ICON            IDR_MAINWND,IDC_STATIC,14,7,20,20
     LTEXT           "",IDC_VERSION,45,7,200,8
     LTEXT           "",IDC_BUILD_INFO,45,18,200,8
-    LTEXT           "Copyright © 2011-2026 Zufu Liu and all contributors.",IDC_STATIC,45,30,200,8
+    LTEXT           "Copyright © 2011-2026 &Zufu Liu and all contributors.",IDC_STATIC,45,30,200,8
     CONTROL         "",IDC_NEW_PAGE_LINK,"SysLink",WS_TABSTOP,45,40,200,10
-    LTEXT           "Copyright © 1996-2012 Florian Balmer.",IDC_STATIC,45,52,200,8
+    LTEXT           "Copyright © 1996-2012 &Florian Balmer.",IDC_STATIC,45,52,200,8
     CONTROL         "",IDC_WEBPAGE_LINK,"SysLink",WS_TABSTOP,45,60,200,10
-    LTEXT           "Contact Florian Balmer:",IDC_STATIC,45,72,94,8
+    LTEXT           "Contact Florian &Balmer:",IDC_STATIC,45,72,94,8
     CONTROL         "",IDC_EMAIL_LINK,"SysLink",WS_TABSTOP,45,80,94,10
 END
 
@@ -330,7 +330,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "Rename"
 FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
-    LTEXT           "Current:",IDC_STATIC,7,9,28,8,SS_RIGHT
+    LTEXT           "&Current:",IDC_STATIC,7,9,28,8,SS_RIGHT
     EDITTEXT        IDC_OLDNAME,39,7,126,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
     LTEXT           "&New:",IDC_STATIC,7,27,28,8,SS_RIGHT
     EDITTEXT        IDC_NEWNAME,39,26,126,14,ES_AUTOHSCROLL
@@ -356,7 +356,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "Copy/Move"
 FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
-    LTEXT           "Source:",IDC_STATIC,7,7,26,8
+    LTEXT           "&Source:",IDC_STATIC,7,7,26,8
     EDITTEXT        IDC_SOURCE,7,18,216,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
     LTEXT           "&Destination:",IDC_STATIC,7,37,40,8
     COMBOBOX        IDC_DESTINATION,7,48,199,105,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
@@ -377,7 +377,7 @@ FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
     ICON            IDI_OPTIONS,IDC_STATIC,10,10,20,20
     LTEXT           "Specify general program settings for matepath.",IDC_STATIC,40,15,200,8
-    AUTOCHECKBOX    "Open file in same target application window.",IDC_OPENFILE_SAME_WINDOW,10,34,190,10,WS_TABSTOP
+    AUTOCHECKBOX    "&Open file in same target application window.",IDC_OPENFILE_SAME_WINDOW,10,34,190,10,WS_TABSTOP
     AUTOCHECKBOX    "&Allow single mouse-click to open objects.",IDC_SINGLECLICK,10,46,190,10,WS_TABSTOP
     AUTOCHECKBOX    "&Enable track selection.",IDC_TRACKSELECT,10,58,100,10,WS_TABSTOP
     AUTOCHECKBOX    "Enable &full row selection.",IDC_FULLROWSELECT,10,70,120,10,WS_TABSTOP
@@ -420,21 +420,21 @@ CAPTION "Appearance"
 FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
     ICON            IDI_ITEMS,IDC_STATIC,10,10,21,20
-    LTEXT           "Appearance of matepath.",IDC_STATIC,40,15,122,8
+    LTEXT           "Appearance of &matepath.",IDC_STATIC,40,15,122,8
     COMBOBOX        IDC_APP_THEME_LIST,162,15,60,50,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "Appearance of items in directory list",IDC_STATIC,10,41,212,109
     LTEXT           "Use this text color when NO FILTER is SET:",IDC_STATIC,20,54,170,8
     AUTORADIOBUTTON "Default &windows color.",IDC_COLOR_DEF1,20,68,96,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "Custom &color:",IDC_COLOR_CUST1,20,82,60,10,WS_TABSTOP
     EDITTEXT        IDC_COLOR_SAMP1,85,80,30,14,ES_AUTOHSCROLL | WS_DISABLED
-    PUSHBUTTON      "Pick Color...",IDC_COLOR_PICK1,120,80,60,14
+    PUSHBUTTON      "&Pick Color...",IDC_COLOR_PICK1,120,80,60,14
     LTEXT           "Use this text color when a FILTER is ACTIVE:",IDC_STATIC,20,105,180,8
     AUTORADIOBUTTON "D&efault windows color.",IDC_COLOR_DEF2,20,120,95,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "C&ustom color:",IDC_COLOR_CUST2,20,133,60,10,WS_TABSTOP
     EDITTEXT        IDC_COLOR_SAMP2,86,130,30,14,ES_AUTOHSCROLL | WS_DISABLED
-    PUSHBUTTON      "Pick Color...",IDC_COLOR_PICK2,120,130,60,14
+    PUSHBUTTON      "P&ick Color...",IDC_COLOR_PICK2,120,130,60,14
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
-    LTEXT           "Language:",IDC_STATIC,10,157,38,10
+    LTEXT           "&Language:",IDC_STATIC,10,157,38,10
     COMBOBOX        IDC_LANGUAGE_LIST,50,154,82,100,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
 #endif
 END
@@ -453,11 +453,11 @@ BEGIN
     EDITTEXT        IDC_FAVORITES,10,87,191,14,ES_AUTOHSCROLL
     PUSHBUTTON      "",IDC_BROWSE_F,204,87,14,14,BS_BITMAP
     GROUPBOX        "System Integration (requires Administrator privileges)",IDC_GROUP_SYSTEM_INTEGRATION,7,111,218,72
-    AUTOCHECKBOX    "Add matepath to Windows Explorer's context menu.",IDC_ENABLE_CONTEXT_MENU,14,124,204,10,WS_TABSTOP
-    LTEXT           "Context menu text:",IDC_STATIC,28,139,70,8
+    AUTOCHECKBOX    "&Add matepath to Windows Explorer's context menu.",IDC_ENABLE_CONTEXT_MENU,14,124,204,10,WS_TABSTOP
+    LTEXT           "Context &menu text:",IDC_STATIC,28,139,70,8
     EDITTEXT        IDC_CONTEXT_MENU_TEXT,100,136,118,14,ES_AUTOHSCROLL | WS_TABSTOP
-    AUTOCHECKBOX    "Enable Taskbar Jump List.",IDC_ENABLE_JUMP_LIST,14,152,204,10,WS_TABSTOP
-    LTEXT           "Application name:",IDC_STATIC,28,167,70,8
+    AUTOCHECKBOX    "Enable Taskbar &Jump List.",IDC_ENABLE_JUMP_LIST,14,152,204,10,WS_TABSTOP
+    LTEXT           "Application &name:",IDC_STATIC,28,167,70,8
     EDITTEXT        IDC_APPLICATION_NAME,100,164,118,14,ES_AUTOHSCROLL | WS_TABSTOP
 END
 
@@ -466,18 +466,18 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "Target Application"
 FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
-    AUTORADIOBUTTON "Don't use any specific target application, simply launch the selected file.",IDC_LAUNCH,7,7,260,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "Use the following target application:",IDC_TARGET,7,21,160,10,WS_TABSTOP
+    AUTORADIOBUTTON "&Don't use any specific target application, simply launch the selected file.",IDC_LAUNCH,7,7,260,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "&Use the following target application:",IDC_TARGET,7,21,160,10,WS_TABSTOP
     LTEXT           "Specify the action if the target applicatoin is already running:",IDC_STATIC,7,64,260,8
     EDITTEXT        IDC_TARGETPATH,20,35,226,14,ES_AUTOHSCROLL
     PUSHBUTTON      "",IDC_BROWSE,251,35,14,14,BS_BITMAP
-    AUTORADIOBUTTON "None, run target application each time a file is opened.",IDC_ALWAYSRUN,7,78,240,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "Send a file open message to target application window:",IDC_SENDDROPMSG,7,92,194,10,WS_TABSTOP
-    AUTORADIOBUTTON "Execute the following DDE command:",IDC_USEDDE,7,106,160,10,WS_TABSTOP
-    PUSHBUTTON      "Find Window...",IDC_FINDWIN,204,91,60,14
-    LTEXT           "Message:",IDC_STATIC,19,124,42,8,SS_RIGHT
-    LTEXT           "Application:",IDC_STATIC,19,145,42,8,SS_RIGHT
-    LTEXT           "Topic:",IDC_STATIC,19,165,42,8,SS_RIGHT
+    AUTORADIOBUTTON "&None, run target application each time a file is opened.",IDC_ALWAYSRUN,7,78,240,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "&Send a file open message to target application window:",IDC_SENDDROPMSG,7,92,194,10,WS_TABSTOP
+    AUTORADIOBUTTON "&Execute the following DDE command:",IDC_USEDDE,7,106,160,10,WS_TABSTOP
+    PUSHBUTTON      "Find &Window...",IDC_FINDWIN,204,91,60,14
+    LTEXT           "&Message:",IDC_STATIC,19,124,42,8,SS_RIGHT
+    LTEXT           "&Application:",IDC_STATIC,19,145,42,8,SS_RIGHT
+    LTEXT           "&Topic:",IDC_STATIC,19,165,42,8,SS_RIGHT
     EDITTEXT        IDC_DDEMSG,65,122,200,14,ES_AUTOHSCROLL
     EDITTEXT        IDC_DDEAPP,65,142,200,14,ES_AUTOHSCROLL
     EDITTEXT        IDC_DDETOPIC,65,162,200,14,ES_AUTOHSCROLL
