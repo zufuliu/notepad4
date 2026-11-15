@@ -1503,7 +1503,7 @@ void DarkMode_OnDarkModeChange(HWND hwnd) noexcept {
 	DarkMode_SetAppDarkMode(dark);
 	DarkMode_SetDarkTitleBar(hwnd, dark);
 	MsgThemeChanged(hwnd, 0, 0);
-	SetWindowTheme(hwndEdit, (dark? L"DarkMode_Explorer" : L"Explorer"), nullptr);
+	SetWindowTheme(hwndEdit, param.explorerTheme, nullptr);
 	RedrawWindow(hwnd, nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN | RDW_UPDATENOW | RDW_FRAME);
 	EnumThreadWindows(GetCurrentThreadId(), RefreshTopLevelProc, AsInteger<LPARAM>(&param));
 }

@@ -510,7 +510,7 @@ BEGIN
 			MENUITEM "Arquivo de &Texto",			IDM_LEXER_TEXTFILE
 			MENUITEM "Segundo Arquivo de Te&xto",	IDM_LEXER_2NDTEXTFILE
 		END
-		MENUITEM "Arquivo CSV...",					IDM_LEXER_CSV
+		MENUITEM "Arqu&ivo CSV...",					IDM_LEXER_CSV
 		POPUP "Folha de Estilo &CSS"
 		BEGIN
 			MENUITEM "Folha de Estilo &CSS",		IDM_LEXER_CSS
@@ -545,7 +545,7 @@ BEGIN
 		END
 		POPUP "&Matemática"
 		BEGIN
-			MENUITEM "Mathematica",					IDM_LEXER_MATHEMATICA
+			MENUITEM "M&athematica",					IDM_LEXER_MATHEMATICA
 			MENUITEM "&MATLAB",						IDM_LEXER_MATLAB
 			MENUITEM "&Octave",						IDM_LEXER_OCTAVE
 			MENUITEM "&Scilab",						IDM_LEXER_SCILAB
@@ -775,7 +775,7 @@ BEGIN
 			MENUITEM "Remover Escape de Caracteres HTML/&XML\tAlt+Shift+H",	IDM_EDIT_XHTML_UNESCAPE_CHAR
 			MENUITEM SEPARATOR
 			MENUITEM "Codificar &URL\tCtrl+Shift+E",				IDM_EDIT_URLENCODE
-			MENUITEM "Codificar Componente de URL",					IDM_EDIT_URLCOMPONENTENCODE
+			MENUITEM "Codificar C&omponente de URL",					IDM_EDIT_URLCOMPONENTENCODE
 			MENUITEM "Decodificar UR&L\tCtrl+Shift+R",				IDM_EDIT_URLDECODE
 		END
 	END

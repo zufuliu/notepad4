@@ -510,7 +510,7 @@ BEGIN
 			MENUITEM "Fichier de texte",					IDM_LEXER_TEXTFILE
 			MENUITEM "Deuxième fichier de texte",				IDM_LEXER_2NDTEXTFILE
 		END
-		MENUITEM "Fichier CSV...",						IDM_LEXER_CSV
+		MENUITEM "Fich&ier CSV...",						IDM_LEXER_CSV
 		POPUP "CSS Style Sheet"
 		BEGIN
 			MENUITEM "&CSS Style Sheet",			IDM_LEXER_CSS
@@ -545,7 +545,7 @@ BEGIN
 		END
 		POPUP "&Math"
 		BEGIN
-			MENUITEM "Mathematica",					IDM_LEXER_MATHEMATICA
+			MENUITEM "M&athematica",					IDM_LEXER_MATHEMATICA
 			MENUITEM "&MATLAB",						IDM_LEXER_MATLAB
 			MENUITEM "&Octave",						IDM_LEXER_OCTAVE
 			MENUITEM "&Scilab",						IDM_LEXER_SCILAB
@@ -775,7 +775,7 @@ BEGIN
 			MENUITEM "Rétablir les caractères HTML/&XML\tAlt+Shift+H",	IDM_EDIT_XHTML_UNESCAPE_CHAR
 			MENUITEM SEPARATOR
 			MENUITEM "Encodage des &URL\tCtrl+Shift+E",				IDM_EDIT_URLENCODE
-			MENUITEM "URL Component Encode",					IDM_EDIT_URLCOMPONENTENCODE
+			MENUITEM "URL C&omponent Encode",					IDM_EDIT_URLCOMPONENTENCODE
 			MENUITEM "Décodage des UR&L\tCtrl+Shift+R",				IDM_EDIT_URLDECODE
 		END
 	END
