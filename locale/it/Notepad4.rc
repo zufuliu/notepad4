@@ -1616,33 +1616,33 @@ CAPTION "Impostazioni Autocompletamento"
 FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
     GROUPBOX        "",IDC_STATIC,7,7,218,98
-    AUTOCHECKBOX    "Autocompletamento parole durante la digitazione",IDC_AUTO_COMPLETE_WORD,14,6,160,10,WS_TABSTOP
-    LTEXT           "Elementi visibili nell'elenco di completamento:",IDC_STATIC,14,18,148,10,SS_RIGHT
+    AUTOCHECKBOX    "&Autocompletamento parole durante la digitazione",IDC_AUTO_COMPLETE_WORD,14,6,160,10,WS_TABSTOP
+    LTEXT           "Elementi visibili nell'&elenco di completamento:",IDC_STATIC,14,18,148,10,SS_RIGHT
     EDITTEXT        IDC_AUTOC_VISIBLE_ITEM_COUNT,166,16,50,12,ES_NUMBER | WS_TABSTOP
-    LTEXT           "Lunghezza minima della parola:",IDC_STATIC,14,34,148,10,SS_RIGHT
+    LTEXT           "&Lunghezza minima della parola:",IDC_STATIC,14,34,148,10,SS_RIGHT
     EDITTEXT        IDC_AUTOC_MIN_WORD_LENGTH,166,32,50,12,ES_NUMBER | WS_TABSTOP
-    LTEXT           "Lunghezza minima del numero (senza prefisso):",IDC_STATIC,14,50,148,10,SS_RIGHT
+    LTEXT           "Lunghezza minima del &numero (senza prefisso):",IDC_STATIC,14,50,148,10,SS_RIGHT
     EDITTEXT        IDC_AUTOC_MIN_NUMBER_LENGTH,166,48,50,12,ES_NUMBER | WS_TABSTOP
-    AUTOCHECKBOX    "Scansione delle parole nel documento ogni:",IDC_AUTOC_SCAN_DOCUMENT_WORDS,14,68,150,10,WS_TABSTOP
+    AUTOCHECKBOX    "Scansione delle parole nel &documento ogni:",IDC_AUTOC_SCAN_DOCUMENT_WORDS,14,68,150,10,WS_TABSTOP
     EDITTEXT        IDC_AUTOC_SCAN_WORDS_TIMEOUT,166,64,50,12,WS_TABSTOP
-    AUTOCHECKBOX    "Utilizza solo le parole del documento corrente.",IDC_AUTOC_ONLY_DOCUMENT_WORDS,14,80,200,10,WS_TABSTOP
-    AUTOCHECKBOX    "Attiva il completamento solo in modalità IME inglese.",IDC_AUTOC_ENGLISH_IME_ONLY,14,92,200,10,WS_TABSTOP
+    AUTOCHECKBOX    "Utilizza solo le parole del documento &corrente.",IDC_AUTOC_ONLY_DOCUMENT_WORDS,14,80,200,10,WS_TABSTOP
+    AUTOCHECKBOX    "Attiva il completamento solo in modalità IME in&glese.",IDC_AUTOC_ENGLISH_IME_ONLY,14,92,200,10,WS_TABSTOP
 
     GROUPBOX        "Autocompleta parole in:",IDC_STATIC,7,111,218,26
     AUTOCHECKBOX    "Commenti",IDC_AUTO_COMPLETE_INSIDE_COMMONT,14,123,65,10,WS_TABSTOP
     AUTOCHECKBOX    "Stringhe",IDC_AUTO_COMPLETE_INSIDE_STRING,85,123,65,10,WS_TABSTOP
     AUTOCHECKBOX    "Testi semplici",IDC_AUTO_COMPLETE_INSIDE_PLAINTEXT,156,123,65,10,WS_TABSTOP
     GROUPBOX        "Tasti per applicare l'autocompletamento (usa Esc per annullare)",IDC_STATIC,7,143,218,44
-    AUTOCHECKBOX    "Invio",IDC_AUTOC_FILLUP_ENTER,14,155,65,10,WS_TABSTOP
-    AUTOCHECKBOX    "Tab",IDC_AUTOC_FILLUP_TAB,85,155,65,10,WS_TABSTOP
-    AUTOCHECKBOX    "Spazio",IDC_AUTOC_FILLUP_SPACE,156,155,65,10,WS_TABSTOP
-    AUTOCHECKBOX    "Punteggiatura:",IDC_AUTOC_FILLUP_PUNCTUATION,14,173,55,10,WS_TABSTOP
+    AUTOCHECKBOX    "&Invio",IDC_AUTOC_FILLUP_ENTER,14,155,65,10,WS_TABSTOP
+    AUTOCHECKBOX    "&Tab",IDC_AUTOC_FILLUP_TAB,85,155,65,10,WS_TABSTOP
+    AUTOCHECKBOX    "&Spazio",IDC_AUTOC_FILLUP_SPACE,156,155,65,10,WS_TABSTOP
+    AUTOCHECKBOX    "&Punteggiatura:",IDC_AUTOC_FILLUP_PUNCTUATION,14,173,55,10,WS_TABSTOP
     EDITTEXT        IDC_AUTOC_FILLUP_PUNCTUATION_LIST,72,170,144,12,WS_TABSTOP
 
-    AUTOCHECKBOX    "Indenta automaticamente testo.",IDC_AUTO_INDENT_TEXT,231,7,200,10,WS_TABSTOP
-    AUTOCHECKBOX    "Chiudi automaticamente i tag HTML and XML.",IDC_AUTO_CLOSE_TAGS,231,19,200,10,WS_TABSTOP
-    AUTOCHECKBOX    "Inserisci automaticamente 1 spazio dopo la virgola (,) se opportuno.",IDC_AUTO_INSERT_SPACE_COMMA,231,31,222,10,WS_TABSTOP
-    AUTOCHECKBOX    "Inserisci 1 spazio dopo il marcatore di commento nella linea.",IDC_AUTO_INSERT_SPACE_COMMENT,231,43,222,10,WS_TABSTOP
+    AUTOCHECKBOX    "Indenta automaticamente test&o.",IDC_AUTO_INDENT_TEXT,231,7,200,10,WS_TABSTOP
+    AUTOCHECKBOX    "Chiudi automaticamente i tag &HTML and XML.",IDC_AUTO_CLOSE_TAGS,231,19,200,10,WS_TABSTOP
+    AUTOCHECKBOX    "Inserisci automaticamente 1 spazio dopo la &virgola (,) se opportuno.",IDC_AUTO_INSERT_SPACE_COMMA,231,31,222,10,WS_TABSTOP
+    AUTOCHECKBOX    "Inserisci &1 spazio dopo il marcatore di commento nella linea.",IDC_AUTO_INSERT_SPACE_COMMENT,231,43,222,10,WS_TABSTOP
     GROUPBOX        "Chiudi automaticamente parentesi graffe e virgolette",IDC_STATIC,231,56,218,49
     AUTOCHECKBOX    "( )",IDC_AUTO_INSERT_PARENTHESIS,238,68,40,10,WS_TABSTOP
     AUTOCHECKBOX    "{ }",IDC_AUTO_INSERT_BRACE,290,68,40,10,WS_TABSTOP
