@@ -582,6 +582,8 @@ HRESULT DirectDevice::CreateDevice() noexcept {
 }
 #endif // _WIN32_WINNT >= _WIN32_WINNT_WIN7
 
+#define SCI_SET_OLE_DRAGDROP (WM_USER + 0xFE)
+
 /**
  */
 class ScintillaWin final :
@@ -846,6 +848,9 @@ public:
 	}
 
 private:
+	bool oleDragDropRegistered = false;
+	void SetOleDragDrop(bool enable) noexcept;
+
 	// For use in creating a system caret
 	[[nodiscard]] bool HasCaretSizeChanged() const noexcept;
 	BOOL CreateSystemCaret();
@@ -933,7 +938,7 @@ void ScintillaWin::Finalise() noexcept {
 	}
 	SetIdle(false);
 	DropRenderTarget();
-	::RevokeDragDrop(MainHWND());
+	SetOleDragDrop(false);
 }
 
 namespace {
@@ -1188,6 +1193,11 @@ bool ScintillaWin::DragThreshold(Point ptStart, Point ptNow) const noexcept {
 }
 
 void ScintillaWin::StartDrag() {
+	const bool tempOleReg = !oleDragDropRegistered;
+	if (tempOleReg) {
+		SetOleDragDrop(true);
+	}
+
 	inDragDrop = DragDrop::dragging;
 	DWORD dwEffect = 0;
 	dropWentOutside = true;
@@ -1207,6 +1217,10 @@ void ScintillaWin::StartDrag() {
 	}
 	inDragDrop = DragDrop::none;
 	SetDragPosition(SelectionPosition(Sci::invalidPosition));
+
+	if (tempOleReg) {
+		SetOleDragDrop(false);
+	}
 }
 
 KeyMod ScintillaWin::MouseModifiers(uptr_t wParam) noexcept {
@@ -2482,7 +2496,7 @@ sptr_t ScintillaWin::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 			ctrlID = static_cast<int>(::GetWindowLongPtr(MainHWND(), GWLP_ID));
 			UpdateBaseElements();
 			GetMouseParameters();
-			::RegisterDragDrop(MainHWND(), &dt);
+			SetOleDragDrop(true);
 			break;
 
 		case WM_COMMAND:
@@ -2685,6 +2699,10 @@ sptr_t ScintillaWin::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		case EM_GETZOOM:
 		case EM_SETZOOM:
 			return EditMessage(msg, wParam, lParam);
+
+		case SCI_SET_OLE_DRAGDROP:
+			SetOleDragDrop(wParam != 0);
+			return 0;
 		}
 
 		iMessage = SciMessageFromEM(msg);
@@ -4504,6 +4522,21 @@ bool ScintillaWin::Unregister() noexcept {
 		callClassAtom = 0;
 	}
 	return result;
+}
+
+void ScintillaWin::SetOleDragDrop(bool enable) noexcept {
+	if (enable) {
+		if (!oleDragDropRegistered) {
+			if (SUCCEEDED(::RegisterDragDrop(MainHWND(), &dt))) {
+				oleDragDropRegistered = true;
+			}
+		}
+	} else {
+		if (oleDragDropRegistered) {
+			::RevokeDragDrop(MainHWND());
+			oleDragDropRegistered = false;
+		}
+	}
 }
 
 bool ScintillaWin::HasCaretSizeChanged() const noexcept {
