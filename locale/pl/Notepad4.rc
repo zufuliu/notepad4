@@ -1216,7 +1216,7 @@ FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
     LTEXT           "Kodowanie &domyślne:",IDC_STATIC,7,7,195,8
     EDITTEXT        IDC_ENCODING_LABEL,7,20,195,14,ES_READONLY | ES_AUTOHSCROLL | WS_TABSTOP
-    CONTROL         "<a>Kliknij, by &wybrać kodowanie domyślne.</a>",IDC_ENCODING_LINK,"SysLink",WS_TABSTOP,7,38,195,10
+    CONTROL         "<a>Kliknij, by wybrać kodowanie domyślne.</a>",IDC_ENCODING_LINK,"SysLink",WS_TABSTOP,7,38,195,10
     AUTOCHECKBOX    "Wyłącz rozpoznawanie kodowania &Unicode (UTF-16) metodą statystyczną.",IDC_NOUNICODEDETECTION,7,52,195,10,WS_TABSTOP
     AUTOCHECKBOX    "Otwieraj 7-bitowe pliki &ASCII jako UTF-8.",IDC_ASCIIASUTF8,7,62,195,10,WS_TABSTOP
     AUTOCHECKBOX    "Otwieraj pliki ANSI (o nieznanym kodowaniu) jako UTF-&8.",IDC_ANSIASUTF8,7,72,195,10,WS_TABSTOP

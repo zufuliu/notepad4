@@ -1217,7 +1217,7 @@ FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
     LTEXT           "&Кодировка по умолчанию:",IDC_STATIC,7,7,195,8
     EDITTEXT        IDC_ENCODING_LABEL,7,20,235,14,ES_READONLY | ES_AUTOHSCROLL | WS_TABSTOP
-    CONTROL         "<a>Нажмите здесь, чтобы &выбрать кодировку по умолчанию</a>",IDC_ENCODING_LINK,"SysLink",WS_TABSTOP,7,38,195,10
+    CONTROL         "<a>Нажмите здесь, чтобы выбрать кодировку по умолчанию</a>",IDC_ENCODING_LINK,"SysLink",WS_TABSTOP,7,38,195,10
     AUTOCHECKBOX    "Без статистического обнаружения &Юникода (UTF-16)",IDC_NOUNICODEDETECTION,7,52,195,10,WS_TABSTOP
     AUTOCHECKBOX    "Открывать 7-бит &ASCII-файлы в режиме UTF-8",IDC_ASCIIASUTF8,7,62,195,10,WS_TABSTOP
     AUTOCHECKBOX    "Открывать ANSI-файлы (неизвестная кодировка) в режиме UTF-&8",IDC_ANSIASUTF8,7,72,230,10,WS_TABSTOP

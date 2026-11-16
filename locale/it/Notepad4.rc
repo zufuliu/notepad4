@@ -1159,7 +1159,7 @@ BEGIN
     AUTOCHECKBOX    "Segnalibro abbinato a linea",IDC_FINDALLBOOKMARK,132,102,91,10,WS_TABSTOP
     AUTOCHECKBOX    "Usa Boost Regex",IDC_FIND_CXXREGEX,132,114,90,10,WS_TABSTOP
     AUTOCHECKBOX    "Usa font monospa&ziato",IDC_USEMONOSPACEDFONT,132,126,90,10,WS_TABSTOP
-    CONTROL         "<a>V&ai a Trova (Ctrl+F)</a>",IDC_TOGGLEFINDREPLACE, "SysLink",WS_TABSTOP,140,139,80,10
+    CONTROL         "<a>Vai a Trova (Ctrl+F)</a>",IDC_TOGGLEFINDREPLACE, "SysLink",WS_TABSTOP,140,139,80,10
     CONTROL         "<a>Salva Posizione</a>",IDC_SAVEPOSITION,"SysLink",WS_TABSTOP,223,126,60,10
     CONTROL         "<a>Resetta Posizione</a>",IDC_RESETPOSITION,"SysLink",WS_TABSTOP,223,138,60,10
     SCROLLBAR       IDC_RESIZEGRIP2,230,138,10,10,SBS_SIZEGRIP | WS_CLIPSIBLINGS
@@ -1216,7 +1216,7 @@ FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
     LTEXT           "Codifica predefinita:",IDC_STATIC,7,7,195,8
     EDITTEXT        IDC_ENCODING_LABEL,7,20,195,14,ES_READONLY | ES_AUTOHSCROLL | WS_TABSTOP
-    CONTROL         "<a>Clicca qui per &selezionare la codifica predefinita.</a>",IDC_ENCODING_LINK,"SysLink",WS_TABSTOP,7,38,195,10
+    CONTROL         "<a>Clicca qui per selezionare la codifica predefinita.</a>",IDC_ENCODING_LINK,"SysLink",WS_TABSTOP,7,38,195,10
     AUTOCHECKBOX    "Salta il rilevamento statistico e &Unicode (UTF-16).",IDC_NOUNICODEDETECTION,7,52,195,10,WS_TABSTOP
     AUTOCHECKBOX    "Apri file &ASCII a 7 bit in modalità UTF-8.",IDC_ASCIIASUTF8,7,62,195,10,WS_TABSTOP
     AUTOCHECKBOX    "Apri i file ANSI (codifica sconosciuta) in modalità UTF-&8.",IDC_ANSIASUTF8,7,72,195,10,WS_TABSTOP

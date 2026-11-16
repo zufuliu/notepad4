@@ -1216,7 +1216,7 @@ FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
     LTEXT           "기본 인코딩(&D):",IDC_STATIC,7,7,195,8
     EDITTEXT        IDC_ENCODING_LABEL,7,20,195,14,ES_READONLY | ES_AUTOHSCROLL | WS_TABSTOP
-    CONTROL         "<a>기본 인코딩을 선택하려면 여기를 클릭하세요(&S).</a>",IDC_ENCODING_LINK,"SysLink",WS_TABSTOP,7,38,195,10
+    CONTROL         "<a>기본 인코딩을 선택하려면 여기를 클릭하세요.</a>",IDC_ENCODING_LINK,"SysLink",WS_TABSTOP,7,38,195,10
     AUTOCHECKBOX    "통계적 유니코드 (UTF-16) 감지 건너뛰기(&U)",IDC_NOUNICODEDETECTION,7,52,195,10,WS_TABSTOP
     AUTOCHECKBOX    "UTF-8 모드에서 7비트 ASCII 파일 열기(&A)",IDC_ASCIIASUTF8,7,62,195,10,WS_TABSTOP
     AUTOCHECKBOX    "UTF-8 모드에서 ANSI (알 수 없는 인코딩) 파일 열기(&8)",IDC_ANSIASUTF8,7,72,195,10,WS_TABSTOP
