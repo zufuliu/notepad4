@@ -767,7 +767,7 @@ BEGIN
 		END
 		POPUP "Narzędzia &Web"
 		BEGIN
-			MENUITEM "&Skompresuj &kod CSS/JS/JSON",		IDM_EDIT_CODE_COMPRESS
+			MENUITEM "&Skompresuj kod CSS/JS/JSON",		IDM_EDIT_CODE_COMPRESS
 			MENUITEM "&Popraw formatowanie CSS/JS/JSON",	IDM_EDIT_CODE_PRETTY
 			MENUITEM SEPARATOR
 			MENUITEM "&Wyznacz wartość wyrażenia JS",			CMD_EVALUATE_JS_EXPR

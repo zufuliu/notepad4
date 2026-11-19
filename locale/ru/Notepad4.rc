@@ -733,7 +733,7 @@ BEGIN
 			MENUITEM "Вы&числить выражение",							CMD_CALCULATE_EXPR
 			MENUITEM SEPARATOR
 			MENUITEM "&Найти в Google",								CMD_ONLINE_SEARCH_GOOGLE
-			MENUITEM "Н&айти в &Bing",								CMD_ONLINE_SEARCH_BING
+			MENUITEM "Н&айти в Bing",								CMD_ONLINE_SEARCH_BING
 			MENUITEM "На&йти в Википедии",								CMD_ONLINE_SEARCH_WIKI
 			MENUITEM SEPARATOR
 			MENUITEM "Своё действие &1\tCtrl+Shift+1",						CMD_CUSTOM_ACTION1
