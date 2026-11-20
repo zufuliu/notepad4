@@ -763,6 +763,7 @@ static int CALLBACK EnumFontFamExProc(CONST LOGFONT *plf, CONST TEXTMETRIC *ptm,
 	return FALSE;
 }
 
+NP2_noinline
 BOOL IsFontAvailable(LPCWSTR lpszFontName) noexcept {
 	BOOL fFound = FALSE;
 

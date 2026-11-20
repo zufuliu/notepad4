@@ -556,24 +556,15 @@ static inline UINT GetLexerStyleControlMask(int rid, int index) noexcept {
 }
 
 static inline void FindSystemDefaultCodeFont() noexcept {
-	LPCWSTR const commonCodeFontName[] = {
-		L"DejaVu Sans Mono",
-		L"Cascadia Mono",
-		L"Consolas",			// Vista and above
-		//L"Source Code Pro",
-		//L"Liberation Mono",
-		//L"Droid Sans Mono",
-		//L"Inconsolata",		// alternative to Consolas
-	};
-
-	for (UINT i = 0; i < COUNTOF(commonCodeFontName); i++) {
-		LPCWSTR fontName = commonCodeFontName[i];
-		if (IsFontAvailable(fontName)) {
-			lstrcpy(systemCodeFontName, fontName);
-			return;
-		}
+	LPCWSTR fontName;
+	if (IsFontAvailable(L"DejaVu Sans Mono")) {
+		fontName = L"DejaVu Sans Mono";
+	} else if (IsFontAvailable(L"Cascadia Mono")) {
+		fontName = L"Cascadia Mono";
+	} else {
+		fontName = L"Consolas";
 	}
-	lstrcpy(systemCodeFontName, L"Courier New");
+	lstrcpy(systemCodeFontName, fontName);
 }
 
 static inline void FindSystemDefaultTextFont() noexcept {
