@@ -1118,6 +1118,10 @@ LRESULT postPaintToolbarItem(const NMTBCUSTOMDRAW *lptbcd) noexcept {
 
 }
 
+COLORREF DarkMode_GetRebarBackColor() noexcept {
+	return DarkMode_IsActive()? DarkColor_DlgBackgroundColor : GetSysColor(COLOR_3DFACE);
+}
+
 LRESULT DarkMode_RebarCustomDraw(LPARAM lParam) noexcept {
 	if (DarkMode_IsActive()) {
 		auto * const lpnmcd = AsPointer<LPNMCUSTOMDRAW>(lParam);

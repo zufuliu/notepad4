@@ -1948,9 +1948,10 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 
 	if (internalBitmap) {
 		HBITMAP hbmpCopy = static_cast<HBITMAP>(CopyImage(hbmp, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION));
+		const COLORREF backColor = DarkMode_GetRebarBackColor();
 		// StopWatch watch;
 		// watch.Start();
-		const bool fProcessed = BitmapAlphaBlend(hbmpCopy, GetSysColor(COLOR_3DFACE), 0x60);
+		const bool fProcessed = BitmapAlphaBlend(hbmpCopy, backColor, 0x80);
 		// watch.Stop();
 		// watch.ShowLog("BitmapAlphaBlend");
 		if (fProcessed) {

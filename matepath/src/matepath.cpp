@@ -943,7 +943,8 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 
 	if (internalBitmap) {
 		HBITMAP hbmpCopy = static_cast<HBITMAP>(CopyImage(hbmp, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION));
-		const bool fProcessed = BitmapAlphaBlend(hbmpCopy, GetSysColor(COLOR_3DFACE), 0x60);
+		const COLORREF backColor = DarkMode_GetRebarBackColor();
+		const bool fProcessed = BitmapAlphaBlend(hbmpCopy, backColor, 0x80);
 		if (fProcessed) {
 			himl = ImageList_Create(bmp.bmHeight, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
 			ImageList_AddMasked(himl, hbmpCopy, CLR_DEFAULT);

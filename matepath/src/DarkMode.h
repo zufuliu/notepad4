@@ -50,6 +50,7 @@ void DarkMode_OnDarkModeChange(HWND hwnd) noexcept;
 void DarkMode_ApplyToBars(HWND hwndToolbar, HWND hwndStatus) noexcept;
 void DarkMode_OnToolbarBeginAdjust() noexcept;
 void DarkMode_OnToolbarEndAdjust() noexcept;
+COLORREF DarkMode_GetRebarBackColor() noexcept;
 LRESULT DarkMode_RebarCustomDraw(LPARAM lParam) noexcept;
 LRESULT DarkMode_ToolbarCustomDraw(LPARAM lParam) noexcept;
 void DarkMode_InitDialog(HWND hwnd, DWORD_PTR dwRefData = DialogRefData_CenterParent) noexcept;
