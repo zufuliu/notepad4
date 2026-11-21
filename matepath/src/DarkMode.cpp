@@ -40,11 +40,6 @@ UINT g_DarkModeStatus = DarkModeStatus_None;
 
 namespace { // API
 
-enum class IMMERSIVE_HC_CACHE_MODE {
-	IHCM_USE_CACHED_VALUE,
-	IHCM_REFRESH
-};
-
 // 1903 18362
 enum class PreferredAppMode {
 	Default,
@@ -99,7 +94,6 @@ using AllowDarkModeForWindowSig = BOOL (WINAPI *)(HWND hwnd, BOOL allow) noexcep
 using FlushMenuThemesSig = void (WINAPI *)() noexcept; // ordinal 136
 using RefreshImmersiveColorPolicyStateSig = void (WINAPI *)() noexcept; // ordinal 104
 using IsDarkModeAllowedForWindowSig = BOOL (WINAPI *)(HWND hwnd) noexcept; // ordinal 137
-using GetIsImmersiveColorUsingHighContrastSig = BOOL (WINAPI *)(IMMERSIVE_HC_CACHE_MODE mode) noexcept; // ordinal 106
 // 1903 18362
 using SetPreferredAppModeSig = PreferredAppMode (WINAPI *)(PreferredAppMode appMode) noexcept; // ordinal 135, in 1903
 
@@ -110,7 +104,6 @@ SetPreferredAppModeSig fnSetPreferredAppMode = nullptr;
 FlushMenuThemesSig fnFlushMenuThemes = nullptr;
 RefreshImmersiveColorPolicyStateSig fnRefreshImmersiveColorPolicyState = nullptr;
 IsDarkModeAllowedForWindowSig fnIsDarkModeAllowedForWindow = nullptr;
-GetIsImmersiveColorUsingHighContrastSig fnGetIsImmersiveColorUsingHighContrast = nullptr;
 
 constexpr DWORD win10Build1809 = 17763;
 constexpr DWORD win10Build1903 = 18362;
@@ -128,7 +121,7 @@ LPCWSTR getDarkModeThemeName() noexcept {
 }
 
 bool IsColorSchemeChangeMessage(LPARAM lParam) noexcept {
-	return lParam == SPI_SETHIGHCONTRAST || (!IS_INTRESOURCE(lParam) && StrCaseEqual(AsPointer<LPCWSTR>(lParam), L"ImmersiveColorSet"));
+	return !IS_INTRESOURCE(lParam) && StrCaseEqual(AsPointer<LPCWSTR>(lParam), L"ImmersiveColorSet");
 }
 
 bool DarkMode_AppsUseDarkMode() noexcept {
@@ -138,11 +131,6 @@ bool DarkMode_AppsUseDarkMode() noexcept {
 		DWORD mode = FALSE;
 		const auto status = RegGetValueW(HKEY_CURRENT_USER, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", L"AppsUseLightTheme", RRF_RT_REG_DWORD, nullptr, &mode, &size);
 		if (status == ERROR_SUCCESS && mode == FALSE) {
-			HIGHCONTRASTW highContrast{};
-			highContrast.cbSize = sizeof(highContrast);
-			if (SystemParametersInfo(SPI_GETHIGHCONTRAST, sizeof(highContrast), &highContrast, FALSE)) {
-				return (highContrast.dwFlags & HCF_HIGHCONTRASTON) == 0;
-			}
 			return true;
 		}
 	}
@@ -168,7 +156,7 @@ enum {
 	DarkColor_TextColor = RGB(0xD4, 0xD4, 0xD4),
 	DarkColor_DarkerTextColor = RGB(0xC0, 0xC0, 0xC0),
 	DarkColor_DisabledTextColor = RGB(0x80, 0x80, 0x80),
-	DarkColor_LinkTextColor = RGB(0x60, 0xCD, 0xFF),
+	DarkColor_LinkTextColor = RGB(0x56, 0x9C, 0xD6),
 
 	DarkColor_ViewTextColor = DarkColor_TextColor,
 	DarkColor_ViewBackgroundColor = RGB(0x1E, 0x1E, 0x1E),
@@ -1168,25 +1156,33 @@ LRESULT CALLBACK DarkDialogProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 		// case WM_CTLCOLORMSGBOX:
 		case WM_CTLCOLOREDIT: {
 			COLORREF back = DarkColor_DlgBackgroundColor;
+			COLORREF text = DarkColor_TextColor;
 			UINT index = DarkBrush_DlgBackgroundBrush;
 			if (umsg == WM_CTLCOLOREDIT || umsg == WM_CTLCOLORLISTBOX) {
 				back = DarkColor_CtrlBackgroundColor;
 				index = DarkBrush_CtrlBackgroundBrush;
 			} else if (umsg == WM_CTLCOLORSTATIC) {
-				auto lpDialogFunc = AsPointer<WNDPROC>(GetWindowLongPtr(hwnd, DWLP_DLGPROC));
-				static_assert(sizeof(INT_PTR) == sizeof(LRESULT));
-				if (const auto result = CallWindowProc(lpDialogFunc, hwnd, umsg, wParam, lParam)) {
-					if (dwRefData == DialogRefData_MessageBox) {
-						back = DarkColor_BackgroundColor;
-						index = DarkBrush_BackgroundBrush;
-					} else {
-						return result;
+				HWND hwndCtrl = AsPointer<HWND>(lParam);
+				WCHAR className[16]{};
+				const UINT len = GetClassName(hwndCtrl, className, COUNTOF(className));
+				if (StrEqualLen(className, len, WC_LINK)) {
+					text = IsWindowEnabled(hwndCtrl) ? DarkColor_LinkTextColor : DarkColor_DisabledTextColor;
+				} else {
+					auto lpDialogFunc = AsPointer<WNDPROC>(GetWindowLongPtr(hwnd, DWLP_DLGPROC));
+					static_assert(sizeof(INT_PTR) == sizeof(LRESULT));
+					if (const auto result = CallWindowProc(lpDialogFunc, hwnd, umsg, wParam, lParam)) {
+						if (dwRefData == DialogRefData_MessageBox) {
+							back = DarkColor_BackgroundColor;
+							index = DarkBrush_BackgroundBrush;
+						} else {
+							return result;
+						}
 					}
 				}
 			}
 
 			HDC hdc = AsPointer<HDC>(wParam);
-			SetTextColor(hdc, DarkColor_TextColor);
+			SetTextColor(hdc, text);
 			SetBkColor(hdc, back);
 			return AsInteger<LONG_PTR>(GetDarkBrush(index));
 		}
@@ -1202,11 +1198,13 @@ LRESULT CALLBACK DarkDialogProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 				rc.bottom = 26;
 				MapDialogRect(hwnd, &rc);
 				const int bottom = rc.bottom;
-				rc = ps.rcPaint;
-				rc.bottom -= bottom;
+				// Keep the footer anchored to the client during partial repaints.
+				GetClientRect(hwnd, &rc);
+				const LONG clientBottom = rc.bottom;
+				rc.bottom = max<LONG>(rc.top, rc.bottom - bottom);
 				FillRect(hdc, &rc, GetDarkBrush(DarkBrush_BackgroundBrush));
 				rc.top = rc.bottom;
-				rc.bottom += bottom;
+				rc.bottom = clientBottom;
 				FillRect(hdc, &rc, GetDarkBrush(DarkBrush_DlgBackgroundBrush));
 				EndPaint(hwnd, &ps);
 				return 0;
@@ -1261,6 +1259,14 @@ BOOL CALLBACK DarkEnumChildProc(HWND hwnd, LPARAM lParam) noexcept {
 		SetWindowTheme(hwnd, theme, nullptr);
 	} else if (StrEqualLen(className, len, WC_LISTBOX)) {
 		SetWindowTheme(hwnd, theme, nullptr);
+	} else if (StrEqualLen(className, len, WC_LINK)) {
+		LITEM item{};
+		item.mask = LIF_ITEMINDEX | LIF_STATE;
+		item.stateMask = LIS_DEFAULTCOLORS;
+		item.state = (enumParam.flag & DarkEnumFlag_Active) ? LIS_DEFAULTCOLORS : 0;
+		while (SendMessage(hwnd, LM_SETITEM, 0, AsInteger<LPARAM>(&item))) {
+			++item.iLink;
+		}
 	} else if (StrEqualLen(className, len, WC_COMBOBOX)) {
 		COMBOBOXINFO info;
 		info.cbSize = sizeof(COMBOBOXINFO);
@@ -1386,7 +1392,6 @@ void DarkMode_Init(const OSVERSIONINFOW &version) noexcept {
 		fnSetWindowCompositionAttribute = DLLFunctionEx<SetWindowCompositionAttributeSig>(L"user32.dll", "SetWindowCompositionAttribute");
 		HMODULE hUxtheme = GetModuleHandleW(L"uxtheme.dll");
 		fnRefreshImmersiveColorPolicyState = DLLFunction<RefreshImmersiveColorPolicyStateSig>(hUxtheme, MAKEINTRESOURCEA(104));
-		fnGetIsImmersiveColorUsingHighContrast = DLLFunction<GetIsImmersiveColorUsingHighContrastSig>(hUxtheme, MAKEINTRESOURCEA(106));
 		fnAllowDarkModeForWindow = DLLFunction<AllowDarkModeForWindowSig>(hUxtheme, MAKEINTRESOURCEA(133));
 
 		fnSetPreferredAppMode = DLLFunction<SetPreferredAppModeSig>(hUxtheme, MAKEINTRESOURCEA(135));
@@ -1394,7 +1399,6 @@ void DarkMode_Init(const OSVERSIONINFOW &version) noexcept {
 		fnIsDarkModeAllowedForWindow = DLLFunction<IsDarkModeAllowedForWindowSig>(hUxtheme, MAKEINTRESOURCEA(137));
 
 		if (fnRefreshImmersiveColorPolicyState &&
-			fnGetIsImmersiveColorUsingHighContrast &&
 			fnAllowDarkModeForWindow &&
 			fnSetPreferredAppMode &&
 			fnFlushMenuThemes &&
@@ -1474,7 +1478,6 @@ void DarkMode_Cleanup() noexcept {
 void DarkMode_HandleSettingChange(HWND hwnd, LPARAM lParam) noexcept {
 	if (DarkMode_IsSupported() && IsColorSchemeChangeMessage(lParam)) {
 		fnRefreshImmersiveColorPolicyState();
-		fnGetIsImmersiveColorUsingHighContrast(IMMERSIVE_HC_CACHE_MODE::IHCM_REFRESH);
 		const UINT previous = g_DarkModeStatus;
 		DarkMode_ResolveStyleTheme(styleThemeSetting);
 		if (previous != g_DarkModeStatus) {
@@ -1507,7 +1510,7 @@ void DarkMode_OnDarkModeChange(HWND hwnd) noexcept {
 		param.flag = DarkMode_SupportDarkTheme()? (DarkEnumFlag_Active | DarkEnumFlag_HandleTreeList) : (DarkEnumFlag_Active | DarkEnumFlag_HandleTreeList | DarkEnumFlag_NeedDarkTheme);
 	} else {
 		param.theme = L"Explorer";
-		param.explorerTheme = L"Explorer";
+		param.explorerTheme = param.theme;
 		param.flag = DarkEnumFlag_HandleTreeList;
 		param.textColor = GetSysColor(COLOR_WINDOWTEXT);
 		param.backColor = GetSysColor(COLOR_WINDOW);
