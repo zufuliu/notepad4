@@ -749,6 +749,42 @@ bool VerifyContrast(COLORREF cr1, COLORREF cr2) noexcept {
 #endif
 }
 
+void MakeDarkModeBitmap(HBITMAP hbmp) noexcept {
+	BITMAP bmp;
+	if (!GetObject(hbmp, sizeof(BITMAP), &bmp) || bmp.bmBitsPixel != 32 || bmp.bmBits == nullptr) {
+		return;
+	}
+
+	const ULONG count = bmp.bmWidth * bmp.bmHeight;
+	RGBQUAD *prgba = static_cast<RGBQUAD *>(bmp.bmBits);
+
+	for (ULONG x = 0; x < count; ++x) {
+		const int alpha = prgba[x].rgbReserved;
+		if (alpha == 0) {
+			continue;
+		}
+
+		const int red = prgba[x].rgbRed;
+		const int green = prgba[x].rgbGreen;
+		const int blue = prgba[x].rgbBlue;
+
+		const int maxChroma = max(max(red, green), blue);
+		const int minChroma = min(min(red, green), blue);
+		const int effectiveChroma = (maxChroma - minChroma) * 2;
+		if (effectiveChroma >= alpha) {
+			continue; // Preserve colorful icons
+		}
+
+		// Invert lightness for achromatic lines/fills (capped at ~88% to avoid glare)
+		const int targetSum = (alpha * 225) / 255;
+		const int delta = ((targetSum - (maxChroma + minChroma)) * (alpha - effectiveChroma)) / alpha;
+
+		prgba[x].rgbRed = static_cast<BYTE>(clamp(red + delta, 0, alpha));
+		prgba[x].rgbGreen = static_cast<BYTE>(clamp(green + delta, 0, alpha));
+		prgba[x].rgbBlue = static_cast<BYTE>(clamp(blue + delta, 0, alpha));
+	}
+}
+
 //=============================================================================
 //
 // IsFontAvailable()

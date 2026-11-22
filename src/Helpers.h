@@ -1005,6 +1005,7 @@ bool BitmapMergeAlpha(HBITMAP hbmp, COLORREF crDest) noexcept;
 bool BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha) noexcept;
 bool BitmapGrayScale(HBITMAP hbmp) noexcept;
 bool VerifyContrast(COLORREF cr1, COLORREF cr2) noexcept;
+void MakeDarkModeBitmap(HBITMAP hbmp) noexcept;
 BOOL IsFontAvailable(LPCWSTR lpszFontName) noexcept;
 
 void SetClipData(HWND hwnd, LPCWSTR pszData) noexcept;
