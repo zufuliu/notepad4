@@ -34,11 +34,6 @@ UINT g_DarkModeStatus = DarkModeStatus_None;
 
 namespace { // API
 
-enum class IMMERSIVE_HC_CACHE_MODE {
-	IHCM_USE_CACHED_VALUE,
-	IHCM_REFRESH
-};
-
 // 1903 18362
 enum class PreferredAppMode {
 	Default,
@@ -93,7 +88,6 @@ using AllowDarkModeForWindowSig = BOOL (WINAPI *)(HWND hwnd, BOOL allow) noexcep
 using FlushMenuThemesSig = void (WINAPI *)() noexcept; // ordinal 136
 using RefreshImmersiveColorPolicyStateSig = void (WINAPI *)() noexcept; // ordinal 104
 using IsDarkModeAllowedForWindowSig = BOOL (WINAPI *)(HWND hwnd) noexcept; // ordinal 137
-using GetIsImmersiveColorUsingHighContrastSig = BOOL (WINAPI *)(IMMERSIVE_HC_CACHE_MODE mode) noexcept; // ordinal 106
 // 1903 18362
 using SetPreferredAppModeSig = PreferredAppMode (WINAPI *)(PreferredAppMode appMode) noexcept; // ordinal 135, in 1903
 
@@ -104,7 +98,6 @@ SetPreferredAppModeSig fnSetPreferredAppMode = nullptr;
 FlushMenuThemesSig fnFlushMenuThemes = nullptr;
 RefreshImmersiveColorPolicyStateSig fnRefreshImmersiveColorPolicyState = nullptr;
 IsDarkModeAllowedForWindowSig fnIsDarkModeAllowedForWindow = nullptr;
-GetIsImmersiveColorUsingHighContrastSig fnGetIsImmersiveColorUsingHighContrast = nullptr;
 
 constexpr DWORD win10Build1809 = 17763;
 constexpr DWORD win10Build1903 = 18362;
@@ -122,7 +115,7 @@ LPCWSTR getDarkModeThemeName() noexcept {
 }
 
 bool IsColorSchemeChangeMessage(LPARAM lParam) noexcept {
-	return lParam == SPI_SETHIGHCONTRAST || (!IS_INTRESOURCE(lParam) && StrCaseEqual(AsPointer<LPCWSTR>(lParam), L"ImmersiveColorSet"));
+	return !IS_INTRESOURCE(lParam) && StrCaseEqual(AsPointer<LPCWSTR>(lParam), L"ImmersiveColorSet");
 }
 
 bool DarkMode_AppsUseDarkMode() noexcept {
@@ -132,11 +125,6 @@ bool DarkMode_AppsUseDarkMode() noexcept {
 		DWORD mode = FALSE;
 		const auto status = RegGetValueW(HKEY_CURRENT_USER, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", L"AppsUseLightTheme", RRF_RT_REG_DWORD, nullptr, &mode, &size);
 		if (status == ERROR_SUCCESS && mode == FALSE) {
-			HIGHCONTRASTW highContrast{};
-			highContrast.cbSize = sizeof(highContrast);
-			if (SystemParametersInfo(SPI_GETHIGHCONTRAST, sizeof(highContrast), &highContrast, FALSE)) {
-				return (highContrast.dwFlags & HCF_HIGHCONTRASTON) == 0;
-			}
 			return true;
 		}
 	}
@@ -1376,7 +1364,6 @@ void DarkMode_Init(const OSVERSIONINFOW &version) noexcept {
 		fnSetWindowCompositionAttribute = DLLFunctionEx<SetWindowCompositionAttributeSig>(L"user32.dll", "SetWindowCompositionAttribute");
 		HMODULE hUxtheme = GetModuleHandleW(L"uxtheme.dll");
 		fnRefreshImmersiveColorPolicyState = DLLFunction<RefreshImmersiveColorPolicyStateSig>(hUxtheme, MAKEINTRESOURCEA(104));
-		fnGetIsImmersiveColorUsingHighContrast = DLLFunction<GetIsImmersiveColorUsingHighContrastSig>(hUxtheme, MAKEINTRESOURCEA(106));
 		fnAllowDarkModeForWindow = DLLFunction<AllowDarkModeForWindowSig>(hUxtheme, MAKEINTRESOURCEA(133));
 
 		fnSetPreferredAppMode = DLLFunction<SetPreferredAppModeSig>(hUxtheme, MAKEINTRESOURCEA(135));
@@ -1384,7 +1371,6 @@ void DarkMode_Init(const OSVERSIONINFOW &version) noexcept {
 		fnIsDarkModeAllowedForWindow = DLLFunction<IsDarkModeAllowedForWindowSig>(hUxtheme, MAKEINTRESOURCEA(137));
 
 		if (fnRefreshImmersiveColorPolicyState &&
-			fnGetIsImmersiveColorUsingHighContrast &&
 			fnAllowDarkModeForWindow &&
 			fnSetPreferredAppMode &&
 			fnFlushMenuThemes &&
@@ -1468,7 +1454,6 @@ void DarkMode_HandleSettingChange(HWND hwnd, LPARAM lParam) noexcept {
 	}
 	if (DarkMode_IsSupported() && IsColorSchemeChangeMessage(lParam)) {
 		fnRefreshImmersiveColorPolicyState();
-		fnGetIsImmersiveColorUsingHighContrast(IMMERSIVE_HC_CACHE_MODE::IHCM_REFRESH);
 		Style_OnStyleThemeChanged(hwnd, styleThemeSetting);
 	}
 }
