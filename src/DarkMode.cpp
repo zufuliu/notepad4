@@ -150,7 +150,7 @@ enum {
 	DarkColor_TextColor = RGB(0xD4, 0xD4, 0xD4),
 	DarkColor_DarkerTextColor = RGB(0xC0, 0xC0, 0xC0),
 	DarkColor_DisabledTextColor = RGB(0x80, 0x80, 0x80),
-	DarkColor_LinkTextColor = RGB(0x60, 0xCD, 0xFF),
+	DarkColor_LinkTextColor = RGB(0x56, 0x9C, 0xD6),
 
 	DarkColor_ViewTextColor = DarkColor_TextColor,
 	DarkColor_ViewBackgroundColor = RGB(0x1E, 0x1E, 0x1E),
@@ -1149,25 +1149,33 @@ LRESULT CALLBACK DarkDialogProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 		// case WM_CTLCOLORMSGBOX:
 		case WM_CTLCOLOREDIT: {
 			COLORREF back = DarkColor_DlgBackgroundColor;
+			COLORREF text = DarkColor_TextColor;
 			UINT index = DarkBrush_DlgBackgroundBrush;
 			if (umsg == WM_CTLCOLOREDIT || umsg == WM_CTLCOLORLISTBOX) {
 				back = DarkColor_CtrlBackgroundColor;
 				index = DarkBrush_CtrlBackgroundBrush;
 			} else if (umsg == WM_CTLCOLORSTATIC) {
-				auto lpDialogFunc = AsPointer<WNDPROC>(GetWindowLongPtr(hwnd, DWLP_DLGPROC));
-				static_assert(sizeof(INT_PTR) == sizeof(LRESULT));
-				if (const auto result = CallWindowProc(lpDialogFunc, hwnd, umsg, wParam, lParam)) {
-					if (dwRefData == DialogRefData_MessageBox) {
-						back = DarkColor_BackgroundColor;
-						index = DarkBrush_BackgroundBrush;
-					} else {
-						return result;
+				HWND hwndCtrl = AsPointer<HWND>(lParam);
+				WCHAR className[16]{};
+				const UINT len = GetClassName(hwndCtrl, className, COUNTOF(className));
+				if (StrEqualLen(className, len, WC_LINK)) {
+					text = IsWindowEnabled(hwndCtrl) ? DarkColor_LinkTextColor : DarkColor_DisabledTextColor;
+				} else {
+					auto lpDialogFunc = AsPointer<WNDPROC>(GetWindowLongPtr(hwnd, DWLP_DLGPROC));
+					static_assert(sizeof(INT_PTR) == sizeof(LRESULT));
+					if (const auto result = CallWindowProc(lpDialogFunc, hwnd, umsg, wParam, lParam)) {
+						if (dwRefData == DialogRefData_MessageBox) {
+							back = DarkColor_BackgroundColor;
+							index = DarkBrush_BackgroundBrush;
+						} else {
+							return result;
+						}
 					}
 				}
 			}
 
 			HDC hdc = AsPointer<HDC>(wParam);
-			SetTextColor(hdc, DarkColor_TextColor);
+			SetTextColor(hdc, text);
 			SetBkColor(hdc, back);
 			return AsInteger<LONG_PTR>(GetDarkBrush(index));
 		}
@@ -1213,6 +1221,15 @@ enum DarkEnumFlag {
 	DarkEnumFlag_HandleTreeList = 4,
 };
 
+struct LinkItemLite {
+	UINT mask;
+	int iLink;
+	UINT state;
+	UINT stateMask;
+	// exclude unused szID and szUrl to reduce stack usage
+};
+static_assert(sizeof(LinkItemLite) == offsetof(LITEM, szID));
+
 struct DarkEnumParam {
 	LPCWSTR theme;
 	LPCWSTR explorerTheme;
@@ -1244,6 +1261,14 @@ BOOL CALLBACK DarkEnumChildProc(HWND hwnd, LPARAM lParam) noexcept {
 		SetWindowTheme(hwnd, theme, nullptr);
 	} else if (StrEqualLen(className, len, WC_LISTBOX)) {
 		SetWindowTheme(hwnd, theme, nullptr);
+	} else if (StrEqualLen(className, len, WC_LINK)) {
+		LinkItemLite item{};
+		item.mask = LIF_ITEMINDEX | LIF_STATE;
+		item.stateMask = LIS_DEFAULTCOLORS;
+		item.state = (enumParam.flag & DarkEnumFlag_Active) * LIS_DEFAULTCOLORS;
+		while (SendMessage(hwnd, LM_SETITEM, 0, AsInteger<LPARAM>(&item))) {
+			++item.iLink;
+		}
 	} else if (StrEqualLen(className, len, WC_COMBOBOX)) {
 		COMBOBOXINFO info;
 		info.cbSize = sizeof(COMBOBOXINFO);
