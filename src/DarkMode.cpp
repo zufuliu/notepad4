@@ -1183,11 +1183,13 @@ LRESULT CALLBACK DarkDialogProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 				rc.bottom = 26;
 				MapDialogRect(hwnd, &rc);
 				const int bottom = rc.bottom;
-				rc = ps.rcPaint;
-				rc.bottom -= bottom;
+				// Keep the footer anchored to the client during partial repaints.
+				GetClientRect(hwnd, &rc);
+				const LONG clientBottom = rc.bottom;
+				rc.bottom = max<LONG>(rc.top, rc.bottom - bottom);
 				FillRect(hdc, &rc, GetDarkBrush(DarkBrush_BackgroundBrush));
 				rc.top = rc.bottom;
-				rc.bottom += bottom;
+				rc.bottom = clientBottom;
 				FillRect(hdc, &rc, GetDarkBrush(DarkBrush_DlgBackgroundBrush));
 				EndPaint(hwnd, &ps);
 				return 0;
