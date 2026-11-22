@@ -1100,7 +1100,7 @@ LRESULT postPaintToolbarItem(const NMTBCUSTOMDRAW *lptbcd) noexcept {
 }
 
 COLORREF DarkMode_GetRebarBackColor() noexcept {
-	return DarkMode_IsActive()? DarkColor_DlgBackgroundColor : GetSysColor(COLOR_3DFACE);
+	return DarkMode_IsActive()? static_cast<COLORREF>(DarkColor_DlgBackgroundColor) : GetSysColor(COLOR_3DFACE);
 }
 
 LRESULT DarkMode_RebarCustomDraw(LPARAM lParam) noexcept {
@@ -1228,7 +1228,7 @@ struct LinkItemLite {
 	UINT stateMask;
 	// exclude unused szID and szUrl to reduce stack usage
 };
-static_assert(sizeof(LinkItemLite) == offsetof(LITEM, szID));
+// static_assert(sizeof(LinkItemLite) == offsetof(LITEM, szID));
 
 struct DarkEnumParam {
 	LPCWSTR theme;

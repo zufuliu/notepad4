@@ -6818,7 +6818,7 @@ char *EditGetStringAroundCaret(LPCSTR delimiters, UINT textLength) noexcept {
 		return nullptr;
 	}
 
-	if (const int value = SciCall_IndicatorValueAt(INDICATOR_LINK, iCurrentPos)) {
+	if (SciCall_IndicatorValueAt(INDICATOR_LINK, iCurrentPos) != 0) {
 		iLineStart = SciCall_IndicatorStart(INDICATOR_LINK, iCurrentPos);
 		iLineEnd = SciCall_IndicatorEnd(INDICATOR_LINK, iCurrentPos);
 		return EditGetTextRange(iLineStart, iLineEnd);

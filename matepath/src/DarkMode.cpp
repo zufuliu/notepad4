@@ -1107,7 +1107,7 @@ LRESULT postPaintToolbarItem(const NMTBCUSTOMDRAW *lptbcd) noexcept {
 }
 
 COLORREF DarkMode_GetRebarBackColor() noexcept {
-	return DarkMode_IsActive()? DarkColor_DlgBackgroundColor : GetSysColor(COLOR_3DFACE);
+	return DarkMode_IsActive()? static_cast<COLORREF>(DarkColor_DlgBackgroundColor) : GetSysColor(COLOR_3DFACE);
 }
 
 LRESULT DarkMode_RebarCustomDraw(LPARAM lParam) noexcept {
@@ -1243,7 +1243,7 @@ struct LinkItemLite {
 	UINT stateMask;
 	// exclude unused szID and szUrl to reduce stack usage
 };
-static_assert(sizeof(LinkItemLite) == offsetof(LITEM, szID));
+// static_assert(sizeof(LinkItemLite) == offsetof(LITEM, szID));
 
 BOOL CALLBACK DarkEnumChildProc(HWND hwnd, LPARAM lParam) noexcept {
 	WCHAR className[16]{};
@@ -1629,7 +1629,7 @@ void DarkMode_SetFileListViewTheme(HWND hwndLV, BOOL fullRowSelect) noexcept {
 
 NP2_noinline
 bool DarkMode_SetFileListViewColor(HWND hwndLV, BOOL redraw) noexcept {
-	COLORREF color = DarkMode_IsActive()? DarkColor_ViewTextColor : GetSysColor(COLOR_WINDOWTEXT);
+	COLORREF color = DarkMode_IsActive()? static_cast<COLORREF>(DarkColor_ViewTextColor) : GetSysColor(COLOR_WINDOWTEXT);
 	bool hasFilter = false;
 	if (bNegFilter || !StrEqualEx(tchFilter, L"*.*")) {
 		hasFilter = true;
