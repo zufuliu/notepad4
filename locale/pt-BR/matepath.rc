@@ -103,23 +103,23 @@ IDR_MAINWND MENU
 BEGIN
 	POPUP "+"
 	BEGIN
-		MENUITEM "&Abrir (Same Window)",			IDM_FILE_OPENSAME
-		MENUITEM "Abrir (N&ew Window)",			IDM_FILE_OPENNEW
+		MENUITEM "&Abrir (Mesma Janela)",			IDM_FILE_OPENSAME
+		MENUITEM "Abrir (Nova &Janela)",			IDM_FILE_OPENNEW
 		MENUITEM "&Executar...",						IDM_FILE_RUN
 		MENUITEM "&Lançar",						IDM_FILE_LAUNCH
 		MENUITEM "&Visão geral",					IDM_FILE_QUICKVIEW
 		MENUITEM "Abra &com...",				IDM_FILE_OPENWITH
 		MENUITEM "&Copiar nome do arquivo",				IDM_POP_COPY_FILENAME
-		MENUITEM "Copiar nome do pa&th",				IDM_POP_COPY_PATHNAME
+		MENUITEM "Copiar &Caminho",				IDM_POP_COPY_PATHNAME
 		MENUITEM SEPARATOR
-		MENUITEM "Mostrar no explorer",			IDM_FILE_EXPLORER
-		MENUITEM "Criar Lin&k...",				IDM_FILE_CREATELINK
+		MENUITEM "Mostrar no Explorador de Arquivos",			IDM_FILE_EXPLORER
+		MENUITEM "Criar &Atalho...",				IDM_FILE_CREATELINK
 		MENUITEM "&Salvar Como...",					IDM_FILE_SAVEAS
 		MENUITEM "Copiar/&Mover...",				IDM_FILE_COPYMOVE
 		MENUITEM "&Deletar...",					IDM_FILE_DELETE
 		MENUITEM "Re&nomear...",					IDM_FILE_RENAME
 		MENUITEM SEPARATOR
-		MENUITEM "&Propiedades",					IDM_FILE_PROPERTIES
+		MENUITEM "&Propriedades",					IDM_FILE_PROPERTIES
 	END
 	POPUP "+"
 	BEGIN
@@ -136,22 +136,22 @@ BEGIN
 		END
 		POPUP "Organizar"
 		BEGIN
-			MENUITEM "by &Nome",				IDM_SORT_NAME
-			MENUITEM "by &tamanho",				IDM_SORT_SIZE
-			MENUITEM "by &Tipo",				IDM_SORT_TYPE
-			MENUITEM "by &Data",				IDM_SORT_DATE
+			MENUITEM "por &Nome",				IDM_SORT_NAME
+			MENUITEM "por &Tamanho",				IDM_SORT_SIZE
+			MENUITEM "por &Tipo",				IDM_SORT_TYPE
+			MENUITEM "por &Data",				IDM_SORT_DATE
 			MENUITEM SEPARATOR
 			MENUITEM "&Reverso",				IDM_SORT_REVERSE
 		END
 		MENUITEM SEPARATOR
-		MENUITEM "Abrir no &Explorer",			IDM_FILE_EXPLORER
+		MENUITEM "Abrir no &Explorador de Arquivos",			IDM_FILE_EXPLORER
 		MENUITEM "Vá para &Favoritos",				IDM_VIEW_FAVORITES
 		MENUITEM "&Abrir Favoritos",				IDM_VIEW_EDITFAVORITES
 		MENUITEM "&Diretório...",				IDM_FILE_CHANGEDIR
 		MENUITEM "&Vá para...",					IDM_FILE_GOTO
 		MENUITEM SEPARATOR
-		MENUITEM "Mostrar Drivers",				IDM_VIEW_DRIVEBOX
-		MENUITEM "&Mantenha-se atualizado",				IDM_VIEW_ALWAYSONTOP
+		MENUITEM "Mostrar Unidades",				IDM_VIEW_DRIVEBOX
+		MENUITEM "Manter sempre no &topo",				IDM_VIEW_ALWAYSONTOP
 		MENUITEM SEPARATOR
 		MENUITEM "Salvar Configurações",				IDM_VIEW_SAVESETTINGS
 		MENUITEM "Setup alvo...",			IDM_VIEW_FINDTARGET
@@ -160,17 +160,17 @@ BEGIN
 	POPUP "+"
 	BEGIN
 		MENUITEM "&Diretório...",				IDM_FILE_CHANGEDIR
-		MENUITEM "Drive & Propriedades",			IDM_FILE_DRIVEPROP
+		MENUITEM "Propriedades da &Unidade",			IDM_FILE_DRIVEPROP
 		MENUITEM SEPARATOR
 		MENUITEM "Mostrar Dri&ves",				IDM_VIEW_DRIVEBOX
 	END
 	POPUP "+"
 	BEGIN
-		MENUITEM "Mostrar &Toolbar",				IDM_VIEW_TOOLBAR
-		MENUITEM "&Customizar Toolbar...",		IDM_VIEW_CUSTOMIZETB
-		MENUITEM "&Escala Automática da Toolbar",			IDM_VIEW_AUTO_SCALE_TOOLBAR
+		MENUITEM "Mostrar Barra de &Ferramentas",				IDM_VIEW_TOOLBAR
+		MENUITEM "&Personalizar Barra de Ferramentas...",		IDM_VIEW_CUSTOMIZETB
+		MENUITEM "Ajustar &automaticamente a barra de ferramentas",			IDM_VIEW_AUTO_SCALE_TOOLBAR
 #if NP2_ENABLE_HIDPI_IMAGE_RESOURCE
-		MENUITEM "Usar Too&lbar Grande",			IDM_VIEW_USE_LARGE_TOOLBAR
+		MENUITEM "Usar Barra de Ferramentas &Grande",			IDM_VIEW_USE_LARGE_TOOLBAR
 #endif
 		MENUITEM "Mostrar &Barra de Status",				IDM_VIEW_STATUSBAR
 	END
@@ -361,7 +361,7 @@ BEGIN
     LTEXT           "&Destino:",IDC_STATIC,7,37,40,8
     COMBOBOX        IDC_DESTINATION,7,48,199,105,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "",IDC_BROWSEDESTINATION,210,48,13,13
-    CONTROL         "<a>Clear Recent History</a>",IDC_EMPTY_MRU,"SysLink",WS_TABSTOP,154,37,70,10
+    CONTROL         "<a>Limpar histórico recente</a>",IDC_EMPTY_MRU,"SysLink",WS_TABSTOP,154,37,70,10
     LTEXT           "Ação:",IDC_STATIC,7,72,24,8
     AUTORADIOBUTTON "&Copiar",IDC_FUNCCOPY,35,71,33,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "&Mover",IDC_FUNCMOVE,68,71,33,10,WS_TABSTOP
@@ -386,10 +386,10 @@ BEGIN
     AUTOCHECKBOX    "Mantenha a janela do Matepath sempre visível.",IDC_ALWAYSONTOP,10,109,150,10,WS_TABSTOP
     AUTOCHECKBOX    "Minimizar para a bandeja do sistema (clique para reativar).",IDC_MINIMIZETOTRAY,10,121,200,10,WS_TABSTOP
     AUTOCHECKBOX    "Tente reutilizar a janela existente quando o matepath for iniciado.",IDC_REUSEWINDOW,10,133,220,10,WS_TABSTOP
-    CONTROL         "<a>Clear window position history</a>",IDC_CLEARWINPOS,"SysLink",WS_TABSTOP,20,145,103,12
+    CONTROL         "<a>Limpar histórico da posição da janela</a>",IDC_CLEARWINPOS,"SysLink",WS_TABSTOP,20,145,103,12
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,161,205,1
     AUTOCHECKBOX    "Salvar configurações ao sair.",IDC_SAVESETTINGS,10,170,100,10,WS_TABSTOP
-    CONTROL         "<a>About matepath</a>",IDC_ABOUT,"SysLink",WS_TABSTOP,130,170,80,12
+    CONTROL         "<a>Sobre o matepath</a>",IDC_ABOUT,"SysLink",WS_TABSTOP,130,170,80,12
 END
 
 IDPP_ADVANCED DIALOGEX 0, 0, 232, 185
@@ -402,14 +402,14 @@ BEGIN
     LTEXT           "Especifique as configurações avançadas do programa para o matepath.",IDC_STATIC,40,15,200,8
     AUTOCHECKBOX    "&Usar diretório de inicialização:",IDC_STARTUPDIR,10,46,104,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "Mais usados e usados recentemente.",IDC_GOTOMRU,114,46,90,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON """&Favorites"" folder.",IDC_GOTOFAV,114,58,90,10,WS_TABSTOP
+    AUTORADIOBUTTON "Pasta de ""&Favoritos"".",IDC_GOTOFAV,114,58,90,10,WS_TABSTOP
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,76,205,1
     AUTOCHECKBOX    "Limpar o atributo somente leitura dos arquivos salvos.",IDC_CLEARREADONLY,10,85,172,10,WS_TABSTOP
     AUTOCHECKBOX    "Renomear arquivos copiados em caso de conflito de nomes.",IDC_RENAMEONCOLLISION,10,97,164,10,WS_TABSTOP
     AUTOCHECKBOX    "Mova os arquivos excluídos para a lixeira.",IDC_USERECYCLEBIN,10,109,160,10,WS_TABSTOP
     AUTOCHECKBOX    "Não confirme a exclusão do arquivo (não recomendado).",IDC_NOCONFIRMDELETE,10,121,184,10,WS_TABSTOP
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,139,205,1
-    AUTOCHECKBOX    "Enable ""&Esc"" key to...",IDC_ESCFUNCTION,10,148,104,10,WS_GROUP | WS_TABSTOP
+    AUTOCHECKBOX    "Habilitar a tecla ""&Esc"" para...",IDC_ESCFUNCTION,10,148,104,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "Minimizar janela.",IDC_ESCMIN,114,148,74,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "sair do matepath.",IDC_ESCEXIT,114,160,66,10,WS_TABSTOP
 END
@@ -494,8 +494,8 @@ BEGIN
     ICON            IDI_CROSS1,IDC_CROSSCURSOR,7,7,21,20,SS_CENTERIMAGE
     LTEXT           "Arraste a mira sobre a janela que deseja selecionar como novo alvo ou pressione Esc para cancelar.",IDC_FINDWINDESC,35,7,168,22
     EDITTEXT        IDC_WINTITLE,7,35,196,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
-    LTEXT           "Window Class",IDC_WINCLASS,7,60,45,8,NOT WS_VISIBLE
-    LTEXT           "Window Module",IDC_WINMODULE,7,70,51,8,NOT WS_VISIBLE
+    LTEXT           "Classe da janela",IDC_WINCLASS,7,60,45,8,NOT WS_VISIBLE
+    LTEXT           "Módulo da janela",IDC_WINMODULE,7,70,51,8,NOT WS_VISIBLE
     DEFPUSHBUTTON   "OK",IDOK,97,64,50,14,WS_DISABLED
     PUSHBUTTON      "Cancelar",IDCANCEL,153,64,50,14
     SCROLLBAR       IDC_RESIZEGRIP5,7,64,10,10,SBS_SIZEGRIP | WS_CLIPSIBLINGS
@@ -540,10 +540,10 @@ END
 STRINGTABLE
 BEGIN
 	IDS_APPTITLE			"matepath"
-	IDS_NUMFILES			"%s Object(s)"
-	IDS_NUMFILES_FILTER		"%s Object(s) | Filter"
+	IDS_NUMFILES			"%s objeto(s)"
+	IDS_NUMFILES_FILTER		"%s objeto(s) | Filtro"
 	IDS_SAVEFILE			"Salvando ""%s""..."
-	IDS_APP_THEME_LIST		"Follow System|Light|Dark"
+	IDS_APP_THEME_LIST		"Seguir o sistema|Claro|Escuro"
     IDS_LINKDESCRIPTION     "Abrir no matePath"
 END
 
@@ -586,9 +586,9 @@ BEGIN
     IDS_GETTARGET           "Encontrar Editor"
     IDS_NEWFILE             "Novo arquivo"
     IDS_FILTER_ALL          "Todos os arquivos (*.*)|*.*|"
-    IDS_FILTER_EXE          "Arquivos executáveis (*.exe;*.com;*.bat;*.lnk;*.pif)|*.exe;*.com;*.bat;*.lnk;*.pif|All Files (*.*)|*.*|"
+    IDS_FILTER_EXE          "Arquivos executáveis (*.exe;*.com;*.bat;*.lnk;*.pif)|*.exe;*.com;*.bat;*.lnk;*.pif|Todos os arquivos (*.*)|*.*|"
     IDS_GETDIRECTORY        "Selecione um novo diretório."
-    IDS_FAVORITES           "Especifique os ""Favoritos"" diretório."
+    IDS_FAVORITES           "Especifique a pasta de ""Favoritos""."
 END
 
 STRINGTABLE
@@ -602,7 +602,7 @@ END
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
 STRINGTABLE
 BEGIN
-	IDS_LANG_USER_DEFAULT			"Linguagem do sistema"
+	IDS_LANG_USER_DEFAULT			"Idioma do sistema"
 	IDS_LANG_ENGLISH_US				"English"
 	IDS_LANG_CHINESE_SIMPLIFIED		"简体中文"
 	IDS_LANG_CHINESE_TRADITIONAL	"繁體中文"
