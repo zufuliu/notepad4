@@ -31,7 +31,7 @@ namespace {
 // Note that ColouriseDiffLine analyzes only the first DIFF_BUFFER_START_SIZE
 // characters of each line to classify the line.
 
-inline int ColouriseDiffLine(const char (&lineBuffer)[DIFF_BUFFER_START_SIZE]) noexcept {
+inline int StyleForLine(const char (&lineBuffer)[DIFF_BUFFER_START_SIZE]) noexcept {
 	// It is needed to remember the current state to recognize starting
 	// comment lines before the first "diff " or "--- ". If a real
 	// difference starts then each line starting with ' ' is a whitespace
@@ -131,7 +131,7 @@ void ColouriseDiffDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 	while (lineCurrent <= maxLines) {
 		char lineBuffer[DIFF_BUFFER_START_SIZE];
 		styler.GetRange(lineStartCurrent, lineStartNext, lineBuffer, sizeof(lineBuffer));
-		const int lineType = ColouriseDiffLine(lineBuffer);
+		const int lineType = StyleForLine(lineBuffer);
 		if (initStyle != lineType) {
 			styler.ColorTo(lineStartCurrent, initStyle);
 			initStyle = lineType;

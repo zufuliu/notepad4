@@ -1642,6 +1642,43 @@ void Document::DelCharBack(Sci::Position pos) {
 	}
 }
 
+Sci::Position Document::BackSpace(Sci::Position caretPosition, bool allowLineStartDeletion) {
+	// Returns valid position only for complex cases where changing indentation may have
+	// replaced text so the automatic selection movement may be wrong.
+	const Sci::Line lineCurrentPos = SciLineFromPosition(caretPosition);
+	if (allowLineStartDeletion || (LineStart(lineCurrentPos) != caretPosition)) {
+		const char chPrev = CharAt(caretPosition - 1);
+		if (IsSpaceOrTab(chPrev)) {
+			const Sci::Position column = GetColumn(caretPosition, lineCurrentPos);
+			const int indentation = GetLineIndentation(lineCurrentPos);
+			if (column > 0 && (column <= indentation || chPrev == ' ')) {
+				const int indentationStep = IndentSize();
+				Sci::Position indentationChange = column % indentationStep;
+				if (indentationChange == 0) {
+					indentationChange = indentationStep;
+				}
+				if (column <= indentation && (backspaceUnindents & 1)) {
+					return SetLineIndentation(lineCurrentPos, indentation - indentationChange);
+				}
+				if (indentationChange > 1 && (backspaceUnindents & 2)) {
+					const Sci_Position minPos = std::max(lineCurrentPos, caretPosition - indentationChange);
+					Sci::Position pos = caretPosition - 1;
+					while (pos >= minPos && CharAt(pos) == ' ') {
+						--pos;
+					}
+					++pos;
+					if (pos == minPos) {
+						DeleteChars(pos, indentationChange);
+						return pos;
+					}
+				}
+			}
+		}
+		DelCharBack(caretPosition);
+	}
+	return Sci::invalidPosition;
+}
+
 int SCI_METHOD Document::GetLineIndentation(Sci_Line line) const noexcept {
 	unsigned indent = 0;
 	if (IsValidIndex(line, LinesTotal())) {

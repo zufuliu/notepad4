@@ -620,10 +620,9 @@ public:
 		const auto it = std::lower_bound(characters.begin(), characters.end(), character);
 		if (it == characters.end())
 			return nullptr;
-		else if (*it == character)
+		if (*it == character)
 			return conversions[it - characters.begin()].conversion;
-		else
-			return nullptr;
+		return nullptr;
 	}
 	size_t CaseConvertString(char *converted, size_t sizeConverted, const char *mixed, size_t lenMixed) const override {
 		size_t lenConverted = 0;

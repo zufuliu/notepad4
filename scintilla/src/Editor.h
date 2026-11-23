@@ -453,7 +453,6 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	void ChangeSize();
 
 	void FilterSelections() noexcept;
-	Sci::Position RealizeVirtualSpace(Sci::Position position, Sci::Position virtualSpace);
 	SelectionPosition RealizeVirtualSpace(SelectionPosition position);
 	void AddChar(char ch);
 	virtual void InsertCharacter(std::string_view sv, Scintilla::CharacterSource charSource);
@@ -479,7 +478,6 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	void RestoreSelection(Sci::Position newPos, UndoRedo history);
 	virtual void Undo();
 	virtual void Redo();
-	bool BackspaceUnindent(Sci::Position lineCurrentPos, Sci::Position caretPosition, Sci::Position *posSelect);
 	void DelCharBack(bool allowLineStartDeletion);
 	/*virtual*/ void ClaimSelection() const noexcept;
 

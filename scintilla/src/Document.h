@@ -612,6 +612,7 @@ public:
 
 	void DelChar(Sci::Position pos);
 	void DelCharBack(Sci::Position pos);
+	Sci::Position BackSpace(Sci::Position caretPosition, bool allowLineStartDeletion);
 
 	char CharAt(Sci::Position position) const noexcept {
 		return cb.CharAt(position);

@@ -72,6 +72,7 @@ struct SelectionSegment {
 	SelectionPosition start;
 	SelectionPosition end;
 	constexpr SelectionSegment() noexcept = default;
+	constexpr explicit SelectionSegment(SelectionPosition single) noexcept : start(single), end(single) {}
 	constexpr SelectionSegment(SelectionPosition a, SelectionPosition b) noexcept {
 		if (a < b) {
 			start = a;
@@ -158,6 +159,7 @@ struct SelectionRange {
 	void Truncate(Sci::Position length) noexcept;
 	// If range is all virtual collapse to start of virtual space
 	void MinimizeVirtualSpace() noexcept;
+	bool BackSpaceVirtual() noexcept;
 	[[nodiscard]] char *ToString(char *p) const noexcept;
 };
 

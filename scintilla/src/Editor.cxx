@@ -2141,23 +2141,20 @@ void Editor::ChangeSize() {
 	}
 }
 
-Sci::Position Editor::RealizeVirtualSpace(Sci::Position position, Sci::Position virtualSpace) {
-	if (virtualSpace > 0) {
-		const Sci::Line line = pdoc->SciLineFromPosition(position);
-		const Sci::Position indent = pdoc->GetLineIndentPosition(line);
-		if (indent == position) {
-			return pdoc->SetLineIndentation(line, pdoc->GetLineIndentation(line) + virtualSpace);
-		}
-		const std::string spaceText(virtualSpace, ' ');
-		const Sci::Position lengthInserted = pdoc->InsertString(position, spaceText);
-		position += lengthInserted;
+// Return the new position with no virtual space
+SCI_noinline
+SelectionPosition Editor::RealizeVirtualSpace(const SelectionPosition position) {
+	if (position.VirtualSpace() == 0) {
+		return position;
 	}
-	return position;
-}
-
-SelectionPosition Editor::RealizeVirtualSpace(SelectionPosition position) {
-	// Return the new position with no virtual space
-	return SelectionPosition(RealizeVirtualSpace(position.Position(), position.VirtualSpace()));
+	const Sci::Line line = pdoc->SciLineFromPosition(position.Position());
+	const Sci::Position indent = pdoc->GetLineIndentPosition(line);
+	if (indent == position.Position()) {
+		return SelectionPosition(pdoc->SetLineIndentation(line, pdoc->GetLineIndentation(line) + position.VirtualSpace()));
+	}
+	const std::string spaceText(position.VirtualSpace(), ' ');
+	const Sci::Position lengthInserted = pdoc->InsertString(position.Position(), spaceText);
+	return SelectionPosition(position.Position() + lengthInserted);
 }
 
 void Editor::AddChar(char ch) {
@@ -2226,7 +2223,8 @@ void Editor::InsertCharacter(std::string_view sv, CharacterSource charSource) {
 						}
 					}
 				}
-				positionInsert = RealizeVirtualSpace(positionInsert, currentSel->caret.VirtualSpace());
+				const SelectionPosition selInsert = RealizeVirtualSpace(currentSel->Start());
+				positionInsert = selInsert.Position();
 				if (text.empty()) {
 					const Sci::Position lengthInserted = pdoc->InsertString(positionInsert, sv);
 					if (lengthInserted > 0) {
@@ -2324,7 +2322,7 @@ void Editor::ClearBeforeTentativeStart() {
 	for (size_t r = 0; r < sel.Count(); r++) {
 		if (!RangeContainsProtected(sel.Range(r))) {
 			ClearSelectionRange(sel.Range(r));
-			RealizeVirtualSpace(sel.Range(r).caret.Position(), sel.Range(r).caret.VirtualSpace());
+			RealizeVirtualSpace(sel.Range(r).caret);
 			sel.Range(r).ClearVirtualSpace();
 		}
 	}
@@ -2332,8 +2330,7 @@ void Editor::ClearBeforeTentativeStart() {
 
 void Editor::InsertPaste(std::string_view text) {
 	if (multiPasteMode == MultiPaste::Once) {
-		SelectionPosition selStart = sel.Start();
-		selStart = RealizeVirtualSpace(selStart);
+		const SelectionPosition selStart = RealizeVirtualSpace(sel.Start());
 		const Sci::Position lengthInserted = pdoc->InsertString(selStart.Position(), text);
 		if (lengthInserted > 0) {
 			SetEmptySelection(selStart.Position() + lengthInserted);
@@ -2342,12 +2339,11 @@ void Editor::InsertPaste(std::string_view text) {
 		// MultiPaste::Each
 		for (size_t r = 0; r < sel.Count(); r++) {
 			if (!RangeContainsProtected(sel.Range(r))) {
-				Sci::Position positionInsert = sel.Range(r).Start().Position();
 				ClearSelectionRange(sel.Range(r));
-				positionInsert = RealizeVirtualSpace(positionInsert, sel.Range(r).caret.VirtualSpace());
-				const Sci::Position lengthInserted = pdoc->InsertString(positionInsert, text);
+				const SelectionPosition selStart = RealizeVirtualSpace(sel.Range(r).caret);
+				const Sci::Position lengthInserted = pdoc->InsertString(selStart.Position(), text);
 				if (lengthInserted > 0) {
-					sel.Range(r) = SelectionRange(positionInsert + lengthInserted);
+					sel.Range(r) = SelectionRange(selStart.Position() + lengthInserted);
 				}
 				sel.Range(r).ClearVirtualSpace();
 			}
@@ -2621,42 +2617,6 @@ void Editor::Redo() {
 	}
 }
 
-bool Editor::BackspaceUnindent(Sci::Position lineCurrentPos, Sci::Position caretPosition, Sci::Position *posSelect) {
-	const char chPrev = pdoc->CharAt(caretPosition - 1);
-	if (!IsSpaceOrTab(chPrev)) {
-		return false;
-	}
-
-	const Sci::Position column = pdoc->GetColumn(caretPosition, lineCurrentPos);
-	const int indentation = pdoc->GetLineIndentation(lineCurrentPos);
-	if (column > 0 && (column <= indentation || chPrev == ' ')) {
-		const int indentationStep = pdoc->IndentSize();
-		Sci::Position indentationChange = column % indentationStep;
-		if (indentationChange == 0) {
-			indentationChange = indentationStep;
-		}
-		if (column <= indentation && (pdoc->backspaceUnindents & 1)) {
-			//const UndoGroup ugInner(pdoc);
-			*posSelect = pdoc->SetLineIndentation(lineCurrentPos, indentation - indentationChange);
-			return true;
-		}
-		if (indentationChange > 1 && (pdoc->backspaceUnindents & 2)) {
-			const Sci_Position minPos = std::max(lineCurrentPos, caretPosition - indentationChange);
-			Sci::Position pos = caretPosition - 1;
-			while (pos >= minPos && pdoc->CharAt(pos) == ' ') {
-				--pos;
-			}
-			++pos;
-			if (pos == minPos) {
-				pdoc->DeleteChars(pos, indentationChange);
-				*posSelect = pos;
-				return true;
-			}
-		}
-	}
-	return false;
-}
-
 void Editor::DelCharBack(bool allowLineStartDeletion) {
 	RefreshStyleData();
 	if (!sel.IsRectangular())
@@ -2668,19 +2628,11 @@ void Editor::DelCharBack(bool allowLineStartDeletion) {
 		for (size_t r = 0; r < sel.Count(); r++) {
 			const Sci::Position caretPosition = sel.Range(r).caret.Position();
 			if (!RangeContainsProtected(caretPosition - 1, caretPosition)) {
-				if (const Sci::Position virtualSpace = sel.Range(r).caret.VirtualSpace()) {
-					sel.Range(r).caret.SetVirtualSpace(virtualSpace - 1);
-					sel.Range(r).anchor.SetVirtualSpace(sel.Range(r).caret.VirtualSpace());
-				} else {
-					const Sci::Line lineCurrentPos = pdoc->SciLineFromPosition(caretPosition);
-					if (allowLineStartDeletion || (pdoc->LineStart(lineCurrentPos) != caretPosition)) {
-						Sci::Position posSelect;
-						if (BackspaceUnindent(lineCurrentPos, caretPosition, &posSelect)) {
-							// SetEmptySelection
-							sel.Range(r) = SelectionRange(posSelect);
-						} else {
-							pdoc->DelCharBack(caretPosition);
-						}
+				if (!sel.Range(r).BackSpaceVirtual()) {
+					const Sci::Position posSelect = pdoc->BackSpace(caretPosition, allowLineStartDeletion);
+					if (posSelect >= 0) {
+						// SetEmptySelection
+						sel.Range(r) = SelectionRange(posSelect);
 					}
 				}
 			} else {
@@ -6088,9 +6040,7 @@ Sci::Position Editor::ReplaceTarget(Message iMessage, uptr_t wParam, sptr_t lPar
 	}
 
 	// Realize virtual space of target start
-	const Sci::Position startAfterSpaceInsertion = RealizeVirtualSpace(replaceRange.start.Position(), replaceRange.start.VirtualSpace());
-	replaceRange.start.SetPosition(startAfterSpaceInsertion);
-	replaceRange.end = replaceRange.start;
+	replaceRange = SelectionSegment(RealizeVirtualSpace(replaceRange.start));
 
 	// Insert the new text
 	const Sci::Position lengthInserted = pdoc->InsertString(replaceRange.start.Position(), text);

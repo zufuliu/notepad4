@@ -775,6 +775,8 @@ const uint16_t CatTableRLE_BMP[] = {
 
 constexpr int maxUnicode = 0x10ffff;
 constexpr int maskCategory = 0x1F;
+constexpr int shiftCategory = 5;
+constexpr int denseSize = 0x100;	// Optimize the first 256 characters.
 
 }
 
@@ -794,7 +796,7 @@ CharacterCategory CategoriseCharacter(int character) noexcept {
 	if (character < 0 || character > maxUnicode) {
 		return ccCn;
 	}
-	const int baseValue = character * (maskCategory + 1) + maskCategory;
+	const int baseValue = (character * (maskCategory + 1)) + maskCategory;
 	const int *placeAfter = std::lower_bound(catRanges, std::end(catRanges), baseValue);
 	return static_cast<CharacterCategory>(*(placeAfter - 1) & maskCategory);
 }
@@ -958,7 +960,7 @@ bool IsXidContinue(int character) noexcept {
 }
 
 CharacterCategoryMap::CharacterCategoryMap() {
-	Optimize(256);
+	Optimize(denseSize);
 }
 
 int CharacterCategoryMap::Size() const noexcept {
@@ -967,7 +969,7 @@ int CharacterCategoryMap::Size() const noexcept {
 
 void CharacterCategoryMap::Optimize(int countCharacters) {
 #if CharacterCategoryUseRangeList
-	int characters = std::clamp(countCharacters, 256, maxUnicode + 1);
+	int characters = std::clamp(countCharacters, denseSize, maxUnicode + 1);
 	dense.resize(characters);
 
 	int index = 1;
@@ -976,7 +978,7 @@ void CharacterCategoryMap::Optimize(int countCharacters) {
 	do {
 		const int next = catRanges[index++];
 		const unsigned char category = current & maskCategory;
-		const int count = std::min((next >> 5) - (current >> 5), characters);
+		const int count = std::min((next >> shiftCategory) - (current >> shiftCategory), characters);
 		current = next;
 		memset(p, category, count);
 		p += count;
@@ -984,7 +986,7 @@ void CharacterCategoryMap::Optimize(int countCharacters) {
 	} while (characters != 0);
 #else
 	// only support BMP, see ExpandRLE() in CharClassify.cxx
-	int characters = std::clamp(countCharacters, 256, 0xffff + 1);
+	int characters = std::clamp(countCharacters, denseSize, 0xffff + 1);
 	dense.resize(characters);
 
 	int index = 0;
@@ -992,7 +994,7 @@ void CharacterCategoryMap::Optimize(int countCharacters) {
 	do {
 		const int current = CatTableRLE_BMP[index++];
 		const unsigned char category = current & maskCategory;
-		const int count = std::min(current >> 5, characters);
+		const int count = std::min(current >> shiftCategory, characters);
 		memset(p, category, count);
 		p += count;
 		characters -= count;

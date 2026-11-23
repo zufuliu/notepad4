@@ -12,10 +12,8 @@ namespace Lexilla {
 enum class EncodingType { eightBit, unicode, dbcs };
 
 class LexAccessor {
-	enum {
-		bufferSize = 4096,
-	};
 	Scintilla::IDocument * const pAccess;
+	static constexpr Sci_PositionU bufferSize = 4096;
 	Scintilla::SplitView cbView;
 	Scintilla::SplitView styleView;
 	const EncodingType encodingType;
