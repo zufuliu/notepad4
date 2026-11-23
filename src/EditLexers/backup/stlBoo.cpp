@@ -1,4 +1,4 @@
-static KEYWORDLIST Keywords_BOO = {{
+static const char * const Keywords_BOO[] = {
 "namespace assembly "
 "abstract virtual override new static final transient "
 "protected private public internal partial struct interface enum callable of "
@@ -24,4 +24,4 @@ nullptr
 
 , nullptr, nullptr, nullptr, nullptr, nullptr, nullptr
 , nullptr
-}};
+};

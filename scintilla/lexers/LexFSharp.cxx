@@ -80,7 +80,7 @@ constexpr bool IsPercentFormatSpecifier(char ch) noexcept {
 					'x', 'X');
 }
 
-inline Sci_Position CheckPercentFormatSpecifier(const StyleContext &sc, LexAccessor &styler, bool insideUrl) noexcept {
+inline Sci_Position CheckPercentFormatSpecifier(const StyleContext &sc, const LexAccessor &styler, bool insideUrl) noexcept {
 	if (sc.chNext == '%') {
 		return 2;
 	}

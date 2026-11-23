@@ -194,7 +194,7 @@ constexpr bool IsInvalidMappingKey(char ch) noexcept {
 	return (ch >= 0 && ch < 32) || AnyOf(ch, '(', ')', '\'', '\"', '\\', '{', '}', '%', '$', '\x7F');
 }
 
-Sci_Position CheckPercentFormatSpecifier(const StyleContext &sc, LexAccessor &styler, Sci_Position &keyLen, bool insideUrl) noexcept {
+Sci_Position CheckPercentFormatSpecifier(const StyleContext &sc, const LexAccessor &styler, Sci_Position &keyLen, bool insideUrl) noexcept {
 	if (sc.chNext == '%') {
 		return 2;
 	}
@@ -306,7 +306,7 @@ inline bool IsPyFormattedStringEnd(const StyleContext &sc, int braceCount) noexc
 		|| (sc.ch == '=' && !AnyOf(sc.chPrev, '<', '>', '=', '!'));
 }
 
-Sci_Position CheckBraceFormatSpecifier(const StyleContext &sc, LexAccessor &styler) noexcept {
+Sci_Position CheckBraceFormatSpecifier(const StyleContext &sc, const LexAccessor &styler) noexcept {
 	Sci_PositionU pos = sc.currentPos;
 	// ["!" conversion]
 	if (sc.ch == '!' && IsConversionChar(sc.chNext)) {
@@ -379,7 +379,7 @@ constexpr bool IsMatchExpressionStart(int ch, int chNext) noexcept {
 		|| (chNext != '=' && AnyOf(ch, '*', '+', '-', '~', '(', '[', '{'));
 }
 
-bool IsSoftKeyword(const char *s, const StyleContext &sc, LexAccessor &styler) noexcept {
+bool IsSoftKeyword(const char *s, const StyleContext &sc, const LexAccessor &styler) noexcept {
 	// match expression
 	// case pattern
 	// type identifier

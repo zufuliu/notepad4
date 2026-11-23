@@ -63,7 +63,7 @@ constexpr bool IsLLVMIdentifierChar(int ch) {
 	return IsIdentifierChar(ch) || ch == '-' || ch == '.' || ch == '$';
 }
 
-int CheckLLVMVarType(StyleContext &sc, KeywordType kwType) noexcept {
+int CheckLLVMVarType(const StyleContext &sc, KeywordType kwType) noexcept {
 	int state = sc.state;
 	if (kwType == KeywordType::Label || sc.ch == ':') {
 		state = SCE_LLVM_LABEL;

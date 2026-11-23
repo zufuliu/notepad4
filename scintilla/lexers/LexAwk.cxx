@@ -125,7 +125,7 @@ constexpr bool IsTimeFormatSpecifier(int ch, char chNext) noexcept {
 		|| (ch == 'O' && AnyOf(chNext, 'd', 'e', 'H', 'I', 'm', 'M', 'S', 'u', 'U', 'V', 'w', 'W', 'y'));
 }
 
-Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &styler, bool insideUrl) noexcept {
+Sci_Position CheckFormatSpecifier(const StyleContext &sc, const LexAccessor &styler, bool insideUrl) noexcept {
 	if (sc.chNext == '%') {
 		return 2;
 	}
@@ -189,9 +189,7 @@ Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &styler, b
 }
 
 constexpr bool FollowExpression(int chPrevNonWhite, int stylePrevNonWhite) noexcept {
-	return chPrevNonWhite == ')' || chPrevNonWhite == ']'
-		|| (stylePrevNonWhite >= SCE_AWK_OPERATOR_PF && stylePrevNonWhite < SCE_AWK_WORD)
-		|| IsIdentifierChar(chPrevNonWhite);
+	return stylePrevNonWhite >= SCE_AWK_OPERATOR_PF || chPrevNonWhite == ')' || chPrevNonWhite == ']';
 }
 
 constexpr bool IsRegexStart(int chPrevNonWhite, int stylePrevNonWhite) noexcept {
@@ -201,7 +199,7 @@ constexpr bool IsRegexStart(int chPrevNonWhite, int stylePrevNonWhite) noexcept 
 void ColouriseAwkDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	int lineStateLineType = 0;
 	int lineContinuation = 0;
-	bool insideRegexRange = false; // inside regex character range []
+	bool insideRegexCharacterClass = false; // inside regex character class []
 	bool insideUrl = false;
 
 	KeywordType kwType = KeywordType::None;
@@ -329,8 +327,8 @@ void ColouriseAwkDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 					sc.Forward();
 				}
 			} else if (sc.ch == '[' || sc.ch == ']') {
-				insideRegexRange = sc.ch == '[';
-			} else if (sc.ch == '/' && !insideRegexRange) {
+				insideRegexCharacterClass = sc.ch == '[';
+			} else if (sc.ch == '/' && !insideRegexCharacterClass) {
 				sc.ForwardSetState(SCE_AWK_DEFAULT);
 			}
 			break;
@@ -349,7 +347,7 @@ void ColouriseAwkDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 					lineStateLineType = AwkLineStateMaskLineComment;
 				}
 			} else if (sc.Match('@', '/')) {
-				insideRegexRange = false;
+				insideRegexCharacterClass = false;
 				sc.SetState(SCE_AWK_REGEX);
 				sc.Forward();
 			} else if (sc.ch == '\"') {
@@ -367,14 +365,14 @@ void ColouriseAwkDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				}
 			} else if (sc.ch == '/') {
 				if (!IsEOLChar(sc.chNext) && IsRegexStart(chPrevNonWhite, stylePrevNonWhite)) {
-					insideRegexRange = false;
+					insideRegexCharacterClass = false;
 					sc.SetState(SCE_AWK_REGEX);
 				} else {
 					sc.SetState(SCE_AWK_OPERATOR);
 				}
 			} else if (sc.ch == '$' && IsIdentifierChar(sc.chNext)) {
 				sc.SetState(SCE_AWK_VARIABLE);
-			} else if (IsAGraphic(sc.ch) && sc.ch != '\\') {
+			} else if (IsAGraphic(sc.ch)) {
 				sc.SetState(SCE_AWK_OPERATOR);
 			}
 		}

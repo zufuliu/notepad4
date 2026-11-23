@@ -159,7 +159,7 @@ constexpr bool IsInvalidFormatSpecifier(int ch) noexcept {
 	return (ch >= '\0' && ch < ' ') || ch == '\"' || ch == '{' || ch == '}';
 }
 
-inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &styler) noexcept {
+inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, const LexAccessor &styler) noexcept {
 	Sci_PositionU pos = sc.currentPos;
 	char ch = styler[pos];
 	// [,alignment]
@@ -683,7 +683,7 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 					chBeforeIdentifier = chPrevNonWhite;
 				}
 				sc.SetState(SCE_CSHARP_IDENTIFIER);
-			} else if (IsAGraphic(sc.ch) && sc.ch != '\\') {
+			} else if (IsAGraphic(sc.ch)) {
 				const bool interpolating = !nestedState.empty();
 				sc.SetState(interpolating ? SCE_CSHARP_OPERATOR2 : SCE_CSHARP_OPERATOR);
 				if (sc.ch == '(' || sc.ch == '[') {

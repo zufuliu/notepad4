@@ -137,6 +137,44 @@ def GenerateUnicodeControlCharacters():
 		utf8str = ''.join(f'\\x{b:02x}' for b in utf8bytes)
 		print(utf8str, f'U+{ord(ucc):04X}', unicodedata.category(ucc), UnicodeData.getCharacterName(ucc))
 
+def GenerateHtmlCharClass():
+	HtmlCharMask_TagContinue = 1 << 0
+	HtmlCharMask_AttributeContinue = 1 << 1
+	HtmlCharMask_HTMLWordChar = 1 << 2
+	HtmlCharMask_SGMLWordChar = 1 << 3
+	HtmlCharMask_IdentifierStartEx = 1 << 4
+	HtmlCharMask_IdentifierCharEx = 1 << 5
+	HtmlCharMask_EntityChar = 1 << 6
+	HtmlCharMask_SGMLEntityChar = 1 << 7
+
+	table = [0] * 128
+	for i in range(0x21, 0x80):
+		ch = chr(i)
+		mask = 0
+		if ch.isalpha() or ch == '_':
+			mask = 0xff
+		elif ch.isdigit():
+			mask = 0xff ^ HtmlCharMask_IdentifierStartEx
+		else:
+			if ch in '.-:!#[]':
+				mask |= HtmlCharMask_TagContinue
+			if ch in '.-:!#/':
+				mask |= HtmlCharMask_AttributeContinue
+			if ch in '.-:!#':
+				mask |= HtmlCharMask_HTMLWordChar
+			if ch in '.:!#':
+				mask |= HtmlCharMask_SGMLWordChar
+			if ch in '#.-:':
+				mask |= HtmlCharMask_EntityChar
+			if ch in '.-':
+				mask |= HtmlCharMask_SGMLEntityChar
+		table[i] = mask
+
+	mask = 0xff ^ (HtmlCharMask_EntityChar | HtmlCharMask_SGMLEntityChar)
+	table.extend([mask]*128)
+	lines = MultiStageTable.dumpArray(table, 16)
+	Regenerate("../lexers/LexHTML.cxx", "//", lines)
+
 def GenerateJsonCharClass():
 	operator = "{}[]:,+-"
 
@@ -237,5 +275,6 @@ def GenerateUrlCharClass():
 if __name__ == '__main__':
 	#GenerateUTF8Table()
 	GenerateUnicodeControlCharacters()
+	GenerateHtmlCharClass()
 	GenerateJsonCharClass()
 	GenerateUrlCharClass()

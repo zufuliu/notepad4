@@ -39,12 +39,19 @@ public:
 		return GetPropertyInt(key, N - 1, defaultValue) & true;
 	}
 
-	int IndentAmount(Sci_Line line) noexcept;
+	template <size_t N>
+	uint32_t GetPropertyAsU4(const char (&key)[N]) const {
+		return *reinterpret_cast<const uint32_t *>(GetProperty(key, N - 1));
+	}
 
+	int IndentAmount(Sci_Line line) const noexcept;
+
+#if 0
 	[[deprecated]]
-	int IndentAmount(Sci_Line line, [[maybe_unused]] int *flags, [[maybe_unused]] PFNIsCommentLeader pfnIsCommentLeader = nullptr) noexcept {
+	int IndentAmount(Sci_Line line, [[maybe_unused]] int *flags, [[maybe_unused]] PFNIsCommentLeader pfnIsCommentLeader = nullptr) const noexcept {
 		return IndentAmount(line);
 	}
+#endif
 };
 
 }

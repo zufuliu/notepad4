@@ -86,7 +86,7 @@ constexpr bool isQestionMarkChar(char chNext, char chNext2) noexcept {
 	return !IsASpace(chNext);
 }
 
-Sci_Position GetEscapeSequenceLength(LexAccessor &styler, Sci_Position pos, char &chNext, char chNext2) noexcept {
+Sci_Position GetEscapeSequenceLength(const LexAccessor &styler, Sci_Position pos, char &chNext, char chNext2) noexcept {
 	// https://docs.ruby-lang.org/en/master/syntax/literals_rdoc.html#escape-sequences
 	Sci_Position width = 1;
 	if (isHighBitChar(chNext)) {
@@ -125,7 +125,7 @@ Sci_Position GetEscapeSequenceLength(LexAccessor &styler, Sci_Position pos, char
 
 #define MAX_KEYWORD_LENGTH 7 // module
 
-bool followsDot(Sci_PositionU pos, LexAccessor &styler) noexcept {
+bool followsDot(Sci_PositionU pos, const LexAccessor &styler) noexcept {
 	while (pos > 1) {
 		--pos;
 		const int style = styler.BufferStyleAt(pos);
@@ -231,7 +231,7 @@ int ClassifyWordRb(Sci_PositionU end, char ch, char chNext, LexerWordList keywor
 // and then check for leading white space
 
 // Precondition: the here-doc target can be indented
-bool lookingAtHereDocDelim(LexAccessor &styler, Sci_Position pos, const char *HereDocDelim) noexcept {
+bool lookingAtHereDocDelim(const LexAccessor &styler, Sci_Position pos, const char *HereDocDelim) noexcept {
 	if (!styler.Match(pos, HereDocDelim)) {
 		return false;
 	}
@@ -278,7 +278,7 @@ void advance_char(Sci_Position &i, char &ch, char &chNext, char chNext2) noexcep
 }
 
 // precondition: pos points to one after the EOL char
-bool currLineContainsHereDelims(Sci_Position pos, LexAccessor &styler) noexcept {
+bool currLineContainsHereDelims(Sci_Position pos, const LexAccessor &styler) noexcept {
 	for (; pos > 0; pos--) {
 		const char ch = styler[pos];
 		if (IsEOLChar(ch)) {
@@ -425,7 +425,7 @@ bool sureThisIsHeredoc(Sci_Position iPrev, LexAccessor &styler) {
 
 // Routine that saves us from allocating a buffer for the here-doc target
 // targetEndPos points one past the end of the current target
-bool haveTargetMatch(Sci_Position currPos, Sci_Position lengthDoc, Sci_Position targetStartPos, Sci_Position targetEndPos, LexAccessor &styler) noexcept {
+bool haveTargetMatch(Sci_Position currPos, Sci_Position lengthDoc, Sci_Position targetStartPos, Sci_Position targetEndPos, const LexAccessor &styler) noexcept {
 	if (lengthDoc - currPos < targetEndPos - targetStartPos) {
 		return false;
 	}
@@ -441,7 +441,7 @@ bool haveTargetMatch(Sci_Position currPos, Sci_Position lengthDoc, Sci_Position 
 
 // Finds the start position of the expression containing @p pos
 // @p min_pos should be a known expression start, e.g. the start of the line
-Sci_Position findExpressionStart(Sci_Position pos, Sci_Position min_pos, LexAccessor &styler) noexcept {
+Sci_Position findExpressionStart(Sci_Position pos, Sci_Position min_pos, const LexAccessor &styler) noexcept {
 	int depth = 0;
 	for (; pos > min_pos; pos -= 1) {
 		const int style = styler.StyleAt(pos - 1);
@@ -646,7 +646,7 @@ bool sureThisIsNotHeredoc(Sci_Position lt2StartPos, LexAccessor &styler) {
 // move to the start of the first line that is not in a
 // multi-line construct
 
-void synchronizeDocStart(Sci_PositionU &startPos, Sci_Position &length, int &initStyle, LexAccessor &styler) noexcept {
+void synchronizeDocStart(Sci_PositionU &startPos, Sci_Position &length, int &initStyle, const LexAccessor &styler) noexcept {
 #if 0
 	const int style = styler.StyleAt(startPos);
 	switch (style) {

@@ -2,8 +2,7 @@
 // 1.8 https://github.com/microsoft/TypeScript/blob/main/doc/
 
 //! keywords		===========================================================
-// textToKeywordObj https://github.com/microsoft/TypeScript/blob/main/src/compiler/scanner.ts
-// textToKeyword https://github.com/microsoft/typescript-go/blob/main/internal/scanner/scanner.go
+// textToKeyword https://github.com/microsoft/TypeScript/tree/main/tsc/internal/scanner/scanner.go
 abstract accessor as assert asserts async await
 break
 case catch class const constructor continue

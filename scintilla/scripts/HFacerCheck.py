@@ -23,12 +23,34 @@ def readIFace(path):
 		ifaceDoc = ifaceDoc[:index]
 	return ifaceDoc, doc
 
+def findUsedMsg(valMap, path):
+	with open(path, encoding='utf-8') as fd:
+		doc = fd.read()
+	start = doc.find('::WndProc(Message ')
+	end = doc.find('\tdefault:', start)
+	doc = doc[start:end]
+	items = re.findall('\tcase Message::(\\w+)', doc)
+	unused = []
+	output = []
+	for name in items:
+		if name in valMap:
+			value = valMap[name]
+			output.append(f'\t{value} {name},')
+		else:
+			unused.append(name)
+
+	tag = os.path.basename(path)
+	print(f'{tag} used {len(output)}:\n', '\n'.join(sorted(output)))
+	if unused:
+		print(f'{tag} unused:', ', '.join(sorted(unused)))
+
 def findAPIHoles():
 	ifaceDoc, backup = readIFace('../include/Scintilla.iface')
 
 	# find unused or duplicate API message number
 	pattern = r'(fun|get|set)\s+(?P<type>\w+)\s+(?P<name>\w+)\s*=\s*(?P<value>\d+)'
 	valList = {} # {value: [name]}
+	valMap = {}
 	result = re.findall(pattern, ifaceDoc)
 	for item in result:
 		name = item[2]
@@ -37,12 +59,17 @@ def findAPIHoles():
 		if values:
 			print(f'duplicate value: {value} {name} {" ".join(values)}')
 		values.append(name)
+		assert name not in valMap
+		valMap[name] = value
 
 	allVals = sorted(valList.keys())
 	print('all values:', allVals)
 	allVals = [item for item in allVals if item < 3000]
 	holes = findHoles(allVals)
 	print('min, max and holes:', allVals[0], allVals[-1], holes)
+
+	# findUsedMsg(valMap, '../src/ScintillaBase.cxx')
+	# findUsedMsg(valMap, '../src/Editor.cxx')
 
 	if holes:
 		values = []
@@ -54,8 +81,8 @@ def findAPIHoles():
 				if value in holes:
 					name = item[2]
 					values.append(value)
-					output.append(f'{value} {name}')
-			print(tag, ', '.join(sorted(output)))
+					output.append(f'\t{value} {name},')
+			print(tag, '\n'.join(sorted(output)))
 
 		ifaceDoc = backup
 		print_holes('used:', r'#\s*' + pattern, ifaceDoc)
@@ -64,6 +91,20 @@ def findAPIHoles():
 			ifaceDoc = ifaceDoc[index:]
 			print_holes('deprecated:', pattern, ifaceDoc)
 		print('unused:', sorted(set(holes) - set(values)))
+
+def findCssJsStyle(name, doc):
+	items = set(re.findall(r'(css|js)_style\s*\(\s*(SCE_\w+)', doc))
+	items = [f'{key}_style({value})' for key, value in items if not value.startswith(f'SCE_{key.upper()}_')]
+	if items:
+		print(name, 'mixed style:', ', '.join(sorted(items)))
+
+def checkCssJsStyle():
+	for path in ('../../tools/LexerConfig.py', '../../src/EditAutoC.cpp'):
+		name = os.path.basename(path)
+
+		with open(path, encoding='utf-8') as fd:
+			doc = fd.read()
+		findCssJsStyle(name, doc)
 
 def checkLexerDefinition():
 	ifaceDoc, _ = readIFace('../include/SciLexer.iface')
@@ -124,5 +165,9 @@ def checkLexerDefinition():
 		if unknown := items - prefix:
 			print(name, 'unknown style:', ', '.join(sorted(unknown)))
 
+		if name in ('LexHTML.cxx', 'LexPHP.cxx'):
+			findCssJsStyle(name, doc)
+
 findAPIHoles()
 checkLexerDefinition()
+checkCssJsStyle()

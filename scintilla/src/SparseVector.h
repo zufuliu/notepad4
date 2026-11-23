@@ -29,38 +29,36 @@ public:
 		values.InsertEmpty(0, 2);
 	}
 
-	Sci::Position Length() const noexcept {
+	[[nodiscard]] Sci::Position Length() const noexcept {
 		return starts.Length();
 	}
 
-	Sci::Position Elements() const noexcept {
+	[[nodiscard]] Sci::Position Elements() const noexcept {
 		return starts.Partitions();
 	}
 
-	Sci::Position PositionOfElement(Sci::Position element) const noexcept {
+	[[nodiscard]] Sci::Position PositionOfElement(Sci::Position element) const noexcept {
 		return starts.PositionFromPartition(element);
 	}
 
-	Sci::Position ElementFromPosition(Sci::Position position) const noexcept {
+	[[nodiscard]] Sci::Position ElementFromPosition(Sci::Position position) const noexcept {
 		if (position < Length()) {
 			return starts.PartitionFromPosition(position);
-		} else {
-			return starts.Partitions();
 		}
+		return starts.Partitions();
 	}
 
-	T ValueAt(Sci::Position position) const noexcept {
+	[[nodiscard]] T ValueAt(Sci::Position position) const noexcept {
 		assert(position <= Length());
 		const Sci::Position partition = ElementFromPosition(position);
 		const Sci::Position startPartition = starts.PositionFromPartition(partition);
 		if (startPartition == position) {
 			return values.ValueAt(partition);
-		} else {
-			return {};
 		}
+		return {};
 	}
 
-	const T& ValueOr(Sci::Position position, const T& empty) const noexcept {
+	[[nodiscard]] const T& ValueOr(Sci::Position position, const T& empty) const noexcept {
 		assert(position <= Length());
 		const Sci::Position partition = ElementFromPosition(position);
 		const Sci::Position startPartition = starts.PositionFromPartition(partition);
@@ -70,7 +68,7 @@ public:
 		return empty;
 	}
 
-	T Extract(Sci::Position position) {
+	[[nodiscard]] T Extract(Sci::Position position) {
 		// Move value currently at position; clear and remove position; return value.
 		// Doesn't remove position at start or end.
 		assert(position <= Length());
@@ -106,6 +104,7 @@ public:
 		} else {
 			if (position == startPartition) {
 				// Already a value at this position, so replace
+				// ClearValue(partition);
 				values.SetValueAt(partition, std::forward<ParamType>(value));
 			} else {
 				// Insert a new element
@@ -218,7 +217,7 @@ public:
 		Check();
 	}
 
-	Sci::Position PositionNext(Sci::Position start) const noexcept {
+	[[nodiscard]] Sci::Position PositionNext(Sci::Position start) const noexcept {
 		const Sci::Position element = ElementFromPosition(start);
 		if (element < Elements()) {
 			return PositionOfElement(element + 1);
@@ -226,7 +225,7 @@ public:
 		return Length() + 1;	// Out of bounds to terminate
 	}
 
-	Sci::Position IndexAfter(Sci::Position position) const noexcept {
+	[[nodiscard]] Sci::Position IndexAfter(Sci::Position position) const noexcept {
 		assert(position < Length());
 		if (position < 0)
 			return 0;

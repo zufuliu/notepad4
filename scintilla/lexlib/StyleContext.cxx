@@ -80,6 +80,7 @@ bool StyleContext::MatchLowerCase(const char *s) const noexcept {
 	return true;
 }
 
+SCI_noinline
 int StyleContext::GetDocNextChar(bool ignoreCurrent) const noexcept {
 	if (!ignoreCurrent && !IsWhiteSpace(ch)) {
 		return ch;
@@ -96,6 +97,7 @@ int StyleContext::GetDocNextChar(bool ignoreCurrent) const noexcept {
 	}
 }
 
+SCI_noinline
 int StyleContext::GetLineNextChar(bool ignoreCurrent) const noexcept {
 	if (!ignoreCurrent && !IsWhiteSpace(ch)) {
 		return ch;
@@ -117,6 +119,7 @@ int StyleContext::GetLineNextChar(bool ignoreCurrent) const noexcept {
 	return '\0';
 }
 
+SCI_noinline
 int StyleContext::GetLineNextCharEx(Sci_PositionU &pos, bool ignoreCurrent) const noexcept {
 	pos = currentPos;
 	if (!ignoreCurrent && !IsWhiteSpace(ch)) {

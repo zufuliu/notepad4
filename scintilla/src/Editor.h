@@ -154,7 +154,7 @@ struct WrapPending {
 };
 
 struct CaretPolicySlop {
-	Scintilla::CaretPolicy policy;
+	Scintilla::CaretPolicy policy;	// Combination from CaretPolicy::Slop, CaretPolicy::Strict, CaretPolicy::Jumps, CaretPolicy::Even
 	int slop;	// Pixels for X, lines for Y
 	CaretPolicySlop(Scintilla::CaretPolicy policy_, intptr_t slop_) noexcept :
 		policy(policy_), slop(static_cast<int>(slop_)) {}
@@ -358,6 +358,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	void RedrawSelMargin(Sci::Line line = -1, bool allAfter = false) noexcept;
 	PRectangle RectangleFromRange(Range r, int overlap) const noexcept;
 	void InvalidateRange(Sci::Position start, Sci::Position end) noexcept;
+	void InvalidateRange(ForwardRange range) noexcept;
 
 	bool UserVirtualSpace() const noexcept {
 		return (FlagSet(virtualSpaceOptions, Scintilla::VirtualSpace::UserAccessible));
@@ -452,7 +453,6 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	void ChangeSize();
 
 	void FilterSelections() noexcept;
-	Sci::Position RealizeVirtualSpace(Sci::Position position, Sci::Position virtualSpace);
 	SelectionPosition RealizeVirtualSpace(SelectionPosition position);
 	void AddChar(char ch);
 	virtual void InsertCharacter(std::string_view sv, Scintilla::CharacterSource charSource);
@@ -478,7 +478,6 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	void RestoreSelection(Sci::Position newPos, UndoRedo history);
 	virtual void Undo();
 	virtual void Redo();
-	bool BackspaceUnindent(Sci::Position lineCurrentPos, Sci::Position caretPosition, Sci::Position *posSelect);
 	void DelCharBack(bool allowLineStartDeletion);
 	/*virtual*/ void ClaimSelection() const noexcept;
 
@@ -642,7 +641,8 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 
 	bool PositionIsHotspot(Sci::Position position) const noexcept;
 	bool SCICALL PointIsHotspot(Point pt);
-	void SetHotSpotRange(const Point *pt);
+	void ClearHotSpotRange() noexcept;
+	void SetHotSpotRange(Point pt);
 	void SetHoverIndicatorPosition(Sci::Position position) noexcept;
 	void SCICALL SetHoverIndicatorPoint(Point pt);
 

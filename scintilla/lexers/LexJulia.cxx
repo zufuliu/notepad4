@@ -108,7 +108,7 @@ constexpr bool IsFormatSpecifier(char ch) noexcept {
 
 // https://docs.julialang.org/en/v1/stdlib/Printf/#Printf.@sprintf
 // https://en.cppreference.com/w/c/io/fprintf
-Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &styler, bool insideUrl) noexcept {
+Sci_Position CheckFormatSpecifier(const StyleContext &sc, const LexAccessor &styler, bool insideUrl) noexcept {
 	if (sc.chNext == '%') {
 		return 2;
 	}

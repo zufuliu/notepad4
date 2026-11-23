@@ -119,7 +119,7 @@ bool GetSendKey(const char *szLine, char *szKey) noexcept {
 }
 
 // Routine to check the last "none comment" character on a line to see if it's a continuation
-bool IsContinuationLine(LexAccessor &styler, Sci_Line szLine) noexcept {
+bool IsContinuationLine(const LexAccessor &styler, Sci_Line szLine) noexcept {
 	const Sci_Position nsPos = styler.LineStart(szLine);
 	Sci_Position nePos = styler.LineStart(szLine + 1) - 2;
 	//int stylech = styler.StyleAt(nsPos);
@@ -550,7 +550,7 @@ constexpr bool IsStreamCommentStyle(int style) noexcept {
 
 // Routine to find first none space on the current line and return its Style
 // needed for comment lines not starting on pos 1
-int GetStyleFirstWord(LexAccessor &styler, Sci_Line szLine) noexcept {
+int GetStyleFirstWord(const LexAccessor &styler, Sci_Line szLine) noexcept {
 	Sci_Position nsPos = styler.LineStart(szLine);
 	const Sci_Position nePos = styler.LineStart(szLine + 1) - 1;
 	while (isspacechar(styler.SafeGetCharAt(nsPos)) && nsPos < nePos) {

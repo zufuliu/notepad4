@@ -93,7 +93,7 @@ constexpr bool IsBraceFormatSpecifier(char ch) noexcept {
 					'x', 'X');
 }
 
-inline Sci_Position CheckBraceFormatSpecifier(const StyleContext &sc, LexAccessor &styler) noexcept {
+inline Sci_Position CheckBraceFormatSpecifier(const StyleContext &sc, const LexAccessor &styler) noexcept {
 	Sci_PositionU pos = sc.currentPos + 1;
 	char ch = styler[pos];
 	// [[fill] align]

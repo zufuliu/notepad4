@@ -63,7 +63,7 @@ constexpr bool InsideTex(int lineState) noexcept {
 	return (lineState & TexinfoLineStateTeXMask) != 0;
 }
 
-void HandleBlockEnd(StyleContext &sc, LexAccessor &styler, int &lineState) {
+void HandleBlockEnd(StyleContext &sc, const LexAccessor &styler, int &lineState) {
 	if (styler[sc.currentPos + 2] == 'n' && styler[sc.currentPos + 3] == 'd') {
 		static constexpr char wordList[][12] = {
 			"tex",

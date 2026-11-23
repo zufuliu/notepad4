@@ -171,6 +171,7 @@ BEGIN
 		MENUITEM "Właśc&iwości...",					IDM_FILE_PROPERTIES
 		MENUITEM "Otwórz &folder zawierający",		IDM_FILE_OPEN_CONTAINING_FOLDER
 		MENUITEM "Utwórz skrót na pu&lpicie",		IDM_FILE_CREATELINK
+		MENUITEM "Aktualizuj czas pliku",			IDM_FILE_UPDATE_TIMESTAMP
 		MENUITEM SEPARATOR
 		MENUITEM "Prze&glądaj...\tCtrl+M",			IDM_FILE_BROWSE
 		POPUP "Ulu&bione"
@@ -499,7 +500,8 @@ BEGIN
 		MENUITEM "Użyj d&omyślnego stylu kodu\tShift+F12",IDM_VIEW_USEDEFAULT_CODESTYLE
 		POPUP "Motyw st&ylu"
 		BEGIN
-			MENUITEM "&Domyślny",					IDM_VIEW_STYLE_THEME_DEFAULT
+			MENUITEM "Dostosuj do &systemu",		IDM_VIEW_STYLE_THEME_SYSTEM
+			MENUITEM "&Jasny",						IDM_VIEW_STYLE_THEME_LIGHT
 			MENUITEM "&Ciemny",						IDM_VIEW_STYLE_THEME_DARK
 		END
 		MENUITEM SEPARATOR
@@ -528,6 +530,7 @@ BEGIN
 			MENUITEM "Strona &internetowa",			IDM_LEXER_WEB
 			MENUITEM "Strona &PHP",					IDM_LEXER_PHP
 			MENUITEM "Strona &JSP",					IDM_LEXER_JSP
+			MENUITEM "JSP &XML",					IDM_LEXER_JSPX
 			MENUITEM "ASP.NET (&C#)",				IDM_LEXER_ASPX_CS
 			MENUITEM "ASP.NET (&VB.NET)",			IDM_LEXER_ASPX_VB
 			MENUITEM "ASP (V&BScript)",				IDM_LEXER_ASP_VBS
@@ -567,7 +570,7 @@ BEGIN
 			MENUITEM "Arkusz stylów XSL&T",			IDM_LEXER_XSLT
 			MENUITEM "Definicja &DTD XML",			IDM_LEXER_DTD
 			MENUITEM "Lista &właściwości",			IDM_LEXER_PROPERTY_LIST
-			//MENUITEM "Dokument SV&G",				IDM_LEXER_SVG
+			MENUITEM "Dokument SV&G",				IDM_LEXER_SVG
 		END
 	END
 	POPUP "&Ustawienia"
@@ -764,7 +767,7 @@ BEGIN
 		END
 		POPUP "Narzędzia &Web"
 		BEGIN
-			MENUITEM "&Skompresuj &kod CSS/JS/JSON",		IDM_EDIT_CODE_COMPRESS
+			MENUITEM "&Skompresuj kod CSS/JS/JSON",		IDM_EDIT_CODE_COMPRESS
 			MENUITEM "&Popraw formatowanie CSS/JS/JSON",	IDM_EDIT_CODE_PRETTY
 			MENUITEM SEPARATOR
 			MENUITEM "&Wyznacz wartość wyrażenia JS",			CMD_EVALUATE_JS_EXPR
@@ -1077,15 +1080,15 @@ BEGIN
     ICON            IDR_MAINWND,IDC_STATIC,14,7,20,20
     LTEXT           "",IDC_VERSION,45,7,200,8
     LTEXT           "",IDC_BUILD_INFO,45,18,200,16
-    LTEXT           "Prawa autorskie © 2011-2026 Zufu Liu i wszyscy współautorzy.",IDC_STATIC,45,38,200,8
+    LTEXT           "Prawa autorskie © 2011-2026 &Zufu Liu i wszyscy współautorzy.",IDC_STATIC,45,38,200,8
     CONTROL         "",IDC_NEW_PAGE_LINK,"SysLink",WS_TABSTOP,45,48,200,10
-    LTEXT           "Prawa autorskie © 2010-2017 XhmikosR i wszyscy współautorzy.",IDC_STATIC,45,60,200,8
+    LTEXT           "Prawa autorskie © 2010-2017 &XhmikosR i wszyscy współautorzy.",IDC_STATIC,45,60,200,8
     CONTROL         "",IDC_MOD_PAGE_LINK,"SysLink",WS_TABSTOP,45,68,200,10
-    LTEXT           "Prawa autorskie © 2004-2012 Florian Balmer.",IDC_STATIC,45,80,200,8
+    LTEXT           "Prawa autorskie © 2004-2012 &Florian Balmer.",IDC_STATIC,45,80,200,8
     CONTROL         "",IDC_WEBPAGE_LINK,"SysLink",WS_TABSTOP,45,88,200,10
-    LTEXT           "Skontaktuj się z Florianem Balmerem:",IDC_STATIC,45,100,114,8
+    LTEXT           "Skontaktuj się z Florianem &Balmerem:",IDC_STATIC,45,100,114,8
     CONTROL         "",IDC_EMAIL_LINK,"SysLink",WS_TABSTOP,45,108,94,10
-    LTEXT           "Odwiedź stronę Scintilli:",IDC_STATIC,45,120,94,8
+    LTEXT           "Odwiedź stronę &Scintilli:",IDC_STATIC,45,120,94,8
     CONTROL         "",IDC_SCI_PAGE_LINK,"SysLink",WS_TABSTOP,45,128,94,10
 END
 
@@ -1213,7 +1216,7 @@ FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
     LTEXT           "Kodowanie &domyślne:",IDC_STATIC,7,7,195,8
     EDITTEXT        IDC_ENCODING_LABEL,7,20,195,14,ES_READONLY | ES_AUTOHSCROLL | WS_TABSTOP
-    CONTROL         "<a>Kliknij, by &wybrać kodowanie domyślne.</a>",IDC_ENCODING_LINK,"SysLink",WS_TABSTOP,7,38,195,10
+    CONTROL         "<a>Kliknij, by wybrać kodowanie domyślne.</a>",IDC_ENCODING_LINK,"SysLink",WS_TABSTOP,7,38,195,10
     AUTOCHECKBOX    "Wyłącz rozpoznawanie kodowania &Unicode (UTF-16) metodą statystyczną.",IDC_NOUNICODEDETECTION,7,52,195,10,WS_TABSTOP
     AUTOCHECKBOX    "Otwieraj 7-bitowe pliki &ASCII jako UTF-8.",IDC_ASCIIASUTF8,7,62,195,10,WS_TABSTOP
     AUTOCHECKBOX    "Otwieraj pliki ANSI (o nieznanym kodowaniu) jako UTF-&8.",IDC_ANSIASUTF8,7,72,195,10,WS_TABSTOP
@@ -1843,7 +1846,7 @@ BEGIN
     IDS_ASK_ENCODING2       "Zamierzasz zmienić kodowanie pustego pliku z ANSI na inne. Historia zmian zostanie wyczyszczona, gdyż nie można jej zsynchronizować z nowym kodowaniem. Kontynuować?"
     IDS_ERR_ENCODINGNA      "Tablice konwersji dla wybranego kodowania nie są dostępne na tym systemie."
     IDS_ERR_UNICODE         "Błąd podczas zmiany kodowania pliku.\nDane zostaną utracone jeśli plik zostanie zapisany."
-    IDS_BINARY_FILE_OPENED  "Najprawdopodobniej nie jest to plik tekstowy, został więc otwarty w trybie tylko do odczytu,\nby zapobiec przypadkowej edycji prowadzącej do uszkodzenia pliku."
+    IDS_BINARY_FILE_OPENED  "To najprawdopodobniej nie jest plik tekstowy.\nAby zapobiec przypadkowej edycji, która mogłaby uszkodzić plik, dokument został otwarty w trybie tylko do odczytu."
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
     IDS_CHANGE_LANG_RESTART "Zmiana języka interfejsu użytkownika wymaga ponownego uruchomienia programu Notepad4, uruchomić go teraz ponownie?"
 #endif
@@ -2042,7 +2045,7 @@ BEGIN
 	IDS_EOLMODENAME_LF				"Unix/macOS (LF)"
 	IDS_EOLMODENAME_CR				"Klasyczny Mac OS (CR)"
 
-	IDS_CONFIG_THEME_TITLE_DEFAULT	"Dostosuj schematy - motyw domyślny"
+	IDS_CONFIG_THEME_TITLE_LIGHT	"Dostosuj schematy - motyw jasny"
 	IDS_CONFIG_THEME_TITLE_DARK		"Dostosuj schematy - motyw ciemny"
 	IDS_FAVORITE_SCHEMES_TITLE		"Ulubione schematy"
 	IDS_CUSTOMIZE_SCHEMES_HELP		"Rozszerzenia nazw plików muszą być oddzielone średnikiem (;)\r\n\

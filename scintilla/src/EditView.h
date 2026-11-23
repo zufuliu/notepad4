@@ -123,7 +123,7 @@ public:
 	bool LinesOverlap() const noexcept;
 
 	void ClearAllTabstops() noexcept;
-	XYPOSITION SCICALL NextTabstopPos(Sci::Line line, XYPOSITION x, XYPOSITION tabWidth) const noexcept;
+	[[nodiscard]] XYPOSITION SCICALL NextTabstopPos(Sci::Line line, XYPOSITION x, XYPOSITION tabWidth) const noexcept;
 	bool ClearTabstops(Sci::Line line) const noexcept;
 	bool AddTabstop(Sci::Line line, int x);
 	int GetNextTabstop(Sci::Line line, int x) const noexcept;
@@ -161,7 +161,7 @@ private:
 		Sci::Line lineDoc, int xOrigin, PRectangle rcLine, int subLine) const;
 	void SCICALL DrawIndentGuide(Surface *surface, XYPOSITION start, PRectangle rcSegment, bool highlight, bool offset) const;
 	void SCICALL DrawForeground(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll,
-		int xStart, PRectangle rcLine, int subLine, Sci::Line lineVisible, Range lineRange, Sci::Position posLineStart,
+		int xStart, PRectangle rcLine, int subLine, Sci::Line lineVisible, ForwardRange lineRange, Sci::Position posLineStart,
 		ColourOptional background) const;
 	void SCICALL DrawIndentGuidesOverEmpty(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll,
 		Sci::Line line, int xStart, PRectangle rcLine, int subLine, Sci::Line lineVisible) const;

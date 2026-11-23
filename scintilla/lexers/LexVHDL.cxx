@@ -302,7 +302,7 @@ enum class CodeFolding {
 	Units,
 };
 
-bool FindCodeFolding(LexAccessor &styler, CodeFolding folding, Sci_PositionU startPos) noexcept {
+bool FindCodeFolding(const LexAccessor &styler, CodeFolding folding, Sci_PositionU startPos) noexcept {
 	const Sci_PositionU endPos = styler.Length();
 	int style = SCE_VHDL_DEFAULT;
 	for (; startPos < endPos; startPos++) {

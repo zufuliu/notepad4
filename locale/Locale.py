@@ -2,6 +2,7 @@
 import sys
 import os.path
 import re
+import json
 import shutil
 import uuid
 import subprocess
@@ -244,15 +245,25 @@ class StringExtractor:
 		value = line[begin:index]
 		return value, begin, index, stop
 
-	def build_hint(self, escape_sequence, format_specifier, access_key):
-		hint = ''
+	def build_hint(self, item, escape_sequence, format_specifier, access_key, width=''):
+		hint = [item['comment']]
 		if access_key:
-			hint += ', access key: ' + ', '.join(access_key)
+			access_key = ' '.join(access_key)
+			item['access_key'] = access_key
+			hint.append(', access key: ')
+			hint.append(access_key)
 		if escape_sequence:
-			hint += ', escape sequence: ' + ', '.join(sorted(escape_sequence))
+			escape_sequence = ''.join(sorted(escape_sequence))
+			item['escape_sequence'] = escape_sequence
+			hint.append(', escape sequence: ')
+			hint.append(escape_sequence)
 		if format_specifier:
-			hint += ', format specifier: ' + ', '.join(sorted(format_specifier))
-		return hint
+			format_specifier = ' '.join(sorted(format_specifier))
+			item['format_specifier'] = format_specifier
+			hint.append(', format specifier: ')
+			hint.append(format_specifier)
+		hint.append(width)
+		item['comment'] = ''.join(hint)
 
 	def parse_resource_item(self, lineno, line, block_items):
 		if not self.is_line_changed(lineno, lineno):
@@ -262,35 +273,45 @@ class StringExtractor:
 		format_specifier = set()
 		access_key = []
 		value, begin, index, _ = self.scan_string(line, escape_sequence, format_specifier, access_key, True)
-		if not any(ch.isalpha() for ch in value):
+		if not value or len(value) <= 2:
 			return None
 
 		# type "string", id
 		word = line[:begin].strip()
+		if word == 'POPUP' and value == '"+"':
+			return None
 		if not word.isidentifier():
+			if not line.startswith('FONT '):
+				print(f'ignore {lineno}', line)
 			return None
 
 		rcid = ''
+		width = ''
 		begin = line.find(',', index)
 		if begin > 0:
 			index = line.find(',', begin + 1)
 			if index > 0:
 				rcid = line[begin + 1:index].strip()
+				match = re.search(r',\s*\d+\s*,\s*\d+\s*,(\d+)\s*,\s*\d+', line)
+				width = int(match.group(1))
+				minCount = width >> 2
+				maxCount = minCount + (minCount >> 1)
+				width = f', width: {width}, character: {minCount} {maxCount}'
 			else:
 				rcid = line[begin + 1:].strip()
 			assert rcid.isidentifier()
 
 		if word == 'CAPTION':
-			return f'{word} {value}'
+			return value
+		if word == 'MENUITEM' and not rcid:
+			print(f'no menu id {lineno} {line}')
 		if len(access_key) > 1:
-			print(f'multiple access keys {lineno} {word} {rcid}', access_key)
+			print(f'multiple access keys {lineno}', access_key, line)
 
 		comment = f'// {lineno} {word} {rcid}'.strip()
-		comment += self.build_hint(escape_sequence, format_specifier, access_key)
-		block_items.append({
-			'value': value,
-			'comment': comment
-		})
+		item = {'id': rcid, 'type': word, 'value': value, 'comment': comment, }
+		self.build_hint(item, escape_sequence, format_specifier, access_key, width)
+		block_items.append(item)
 		return None
 
 	def parse_string_table_item(self, lineno, line, block_items):
@@ -321,11 +342,9 @@ class StringExtractor:
 			print(f'multiple access keys {start} {rcid}', access_key)
 
 		comment = f'// {start} {rcid}'
-		comment += self.build_hint(escape_sequence, format_specifier, access_key)
-		block_items.append({
-			'value': value,
-			'comment': comment
-		})
+		item = {'id': rcid, 'value': value, 'comment': comment, }
+		self.build_hint(item, escape_sequence, format_specifier, access_key)
+		block_items.append(item)
 		return lineno
 
 	def extract(self, path, reversion, out_path=None):
@@ -406,13 +425,9 @@ class StringExtractor:
 		if string_list:
 			self.save(string_list, out_path)
 
-	def save(self, string_list, out_path=None):
-		if not out_path:
-			path, ext = os.path.splitext(self.path)
-			out_path = path + '-string' + ext
-
-		print('save:', out_path)
-		with open(out_path, 'w', encoding='utf-8') as fd:
+	def save_string_list(self, path, string_list):
+		print('save:', path)
+		with open(path, 'w', encoding='utf-8') as fd:
 			fd.write("//! Ignore line starts with //, it's a comment line.\n")
 			fd.write("//! Please don't translate escape sequence or format specifiers.\n")
 			if self.reversion:
@@ -424,13 +439,194 @@ class StringExtractor:
 				fd.write(block['name'] + '\n')
 				caption = block['caption']
 				if caption:
-					fd.write(caption + '\n')
+					fd.write(f'CAPTION {caption}\n')
 
-				fd.write('BEGIN' + '\n')
+				fd.write('BEGIN\n')
 				for item in block['items']:
-					fd.write('\t' + item['comment'] + '\n')
-					fd.write('\t' + item['value'] + '\n')
-				fd.write('END' + '\n\n')
+					fd.write(f"\t{item['comment']}\n")
+					fd.write(f"\t{item['value']}\n")
+				fd.write('END\n\n')
+
+	def save(self, string_list, out_path=None):
+		if not out_path:
+			path, ext = os.path.splitext(self.path)
+			out_path = path + '-string' + ext
+
+		self.save_string_list(out_path, string_list)
+		out_path = os.path.splitext(out_path)[0] + '.json'
+		print('save:', out_path)
+		with open(out_path, 'w', encoding='utf-8') as fd:
+			fd.write(json.dumps(string_list, indent='\t', ensure_ascii=False))
+
+
+	def init_translate(self, language):
+		self.reversion = ''
+		self.language = language
+		language = language[:2]
+		self.is_cjk = language in ('ja', 'ko', 'zh')
+		self.is_latin = language not in ('ja', 'ko', 'zh', 'ru')
+		self.ignore_ok = language not in ('ko', 'zh')
+		self.single_word = set("""Notepad4 matepath Zufu Liu Florian Balmer XhmikosR Scintilla
+Apache
+Base64 Big5 Big5-HKSCS Bing Boost
+ClearType
+Direct2D Direct3D
+Esc
+GitHub GitLab Google
+JavaScript Johab JScript
+LaTeX Less
+Mac macOS Markdown Mathematica
+Octave
+Pandoc Perl
+RegExp
+Scilab Shebang Shell Shift-JIS
+TypeScript
+Unicode Unix US-Canada
+VBScript
+Windows
+7-bit abc a-z ms ns us uHHHH xHH
+""".split())
+		self.dual_word = set([
+			('ANSI', 'Art'),
+			('Direct2D', 'Retain'),
+			('EBCDIC', 'Greek'), ('EBCDIC', 'Intl'),
+			('Property', 'List'),
+			('US-Canada', 'Euro'),
+			('Notepad4', 'ini'), ('matepath', 'ini'),
+			('Visual', 'Basic'), ('Visual', 'Studio'),
+		])
+		self.dual_start = set(item[0] for item in self.dual_word)
+
+	def check_word(self, text, match, word, previous, rctype):
+		if not any(ch.islower() for ch in word):
+			if word == 'OK' and not self.ignore_ok:
+				return True
+			return False # all upper case or digits
+		if word in self.single_word or re.fullmatch(r'Windows-\d+', word) or re.fullmatch(r'Latin-\d+', word):
+			return False # encoding name
+		start, end = match.span()
+		if len(word) == 3 and word.islower() and text[start - 2:start] == '*.':
+			return False # file extension
+		before = text[start - 1]
+		after = text[end]
+		if after == '+' and before in '(+\t' and word in ('Ctrl', 'Alt', 'Shift'):
+			return False # key name
+		if before == '+' and word in ('Back', 'Del', 'Tab', 'Space', 'Up', 'Down') and previous in ('Ctrl', 'Alt', 'Shift'):
+			return False # key name
+		if before == '\t' and after == '"' and rctype == 'MENUITEM' and word in ('Delete', 'Del', 'Tab'):
+			return False # key name
+		if (previous, word) in self.dual_word:
+			return 3
+		if word in self.dual_start:
+			return 2
+		return True
+
+	def find_word(self, text, rctype, iterator=None):
+		if not iterator:
+			iterator = re.finditer(r'[\w\-]{2,}', text)
+		items = []
+		previous = ''
+		dual = False
+		for match in iterator:
+			word = match.group(0)
+			result = self.check_word(text, match, word, previous, rctype)
+			if dual and result != 3:
+				items.append(previous.lower())
+			if result == 1:
+				items.append(word.lower())
+			dual = result == 2
+			previous = word
+		if dual:
+			items.append(previous.lower())
+		return items
+
+	def check_translate(self, origin, target, rctype=''):
+		iterator = None if self.is_latin else re.finditer(r'[a-zA-Z0-9\u0080-\u036F\-]{2,}', target)
+		missing = self.find_word(target, rctype, iterator)
+		if not missing:
+			return False
+		if not self.is_latin:
+			return True
+		source = set(self.find_word(origin, rctype))
+		missing = set(missing)
+		same = source & missing
+		if same:
+			return True
+		return False
+
+	def get_item_string(self, item):
+		value = item['value']
+		if 'access_key' in item:
+			value = value.replace('&', '')
+		if 'escape_sequence' in item:
+			escape_sequence = item['escape_sequence'].split()
+			for escape in escape_sequence:
+				value = value.replace(escape, '\t')
+		if 'format_specifier' in item:
+			format_specifier = item['format_specifier'].split()
+			for specifier in format_specifier:
+				value = value.replace(specifier, ' ')
+		value = re.sub(r'(https?://[\w/.:?]+)', ' ', value)
+		return value
+
+	def find_untranslated_string(self, src, path):
+		filename = os.path.basename(path)
+		print('read:', src)
+		with open(src, encoding='utf-8') as fd:
+			source_list = json.load(fd)
+		print('read:', path)
+		with open(path, encoding='utf-8') as fd:
+			string_list = json.load(fd)
+		if len(source_list) != len(string_list):
+			print(f'block count diff: {len(source_list)} => {len(string_list)} {self.language} {filename}')
+
+		changed_lines = []
+		total = 0
+		for block_index, src_block in enumerate(source_list):
+			block = string_list[block_index]
+			block_name = src_block['name']
+			source = src_block['items']
+			items = block['items']
+			if len(source) != len(items):
+				print(f"items count diff: {len(source)} => {len(items)} {block_name} {block['comment']}")
+
+			updated = []
+			for index, src_item in enumerate(source):
+				item = items[index]
+				rcid = src_item['id']
+				if rcid != item['id']:
+					print(f"id diff: {rcid} => {item['id']} {item['comment']}")
+				rctype = src_item.get('type', '')
+				word = item.get('type', '')
+				if rctype != word:
+					print(f"type diff: {rctype} => {word} {item['comment']}")
+
+				origin = self.get_item_string(src_item)
+				value = self.get_item_string(item)
+				if self.check_translate(origin, value, rctype):
+					total += 1
+					updated.append(item)
+				if self.is_cjk:
+					origin = src_item.get('access_key', '')
+					value = item.get('access_key', '')
+					if origin != value:
+						print(f"access key diff {rcid}: [{origin}] => [{value}] {item['comment']}")
+
+			caption = src_block['caption']
+			change = False
+			if caption:
+				title = block['caption']
+				if self.check_translate(caption, title):
+					change = True
+					total += 1
+			if change or updated:
+				block['items'] = updated
+				changed_lines.append(block)
+
+		print('untranslated:', len(changed_lines), total, filename)
+		if changed_lines:
+			path = path.replace('-string.json', '-new.rc')
+			self.save_string_list(path, changed_lines)
 
 def extract_resource_string(language, reversion):
 	print(f'{app}: extract updated string for {language} since {reversion}.')
@@ -445,6 +641,17 @@ def extract_resource_string(language, reversion):
 		extractor.extract(path, reversion)
 		path = os.path.join(folder, 'Notepad4.rc')
 		extractor.extract(path, reversion)
+
+def find_untranslated_string(language):
+	extractor = StringExtractor()
+	extractor.init_translate(language)
+	folder = os.path.join(localeDir, language)
+	matepath_dest = os.path.join(folder, 'matepath-string.json')
+	path = matepath_src.replace('.rc', '-string.json')
+	extractor.find_untranslated_string(path, matepath_dest)
+	path = notepad4_src.replace('.rc', '-string.json')
+	notepad4_dest = os.path.join(folder, 'Notepad4-string.json')
+	extractor.find_untranslated_string(path, notepad4_dest)
 
 
 def show_help():
@@ -483,6 +690,8 @@ def main(argv):
 			return
 		reversion = argv[3] if len(argv) > 3 else ''
 		extract_resource_string(language, reversion)
+	elif action == 'trans' and language != 'en':
+		find_untranslated_string(language)
 	else:
 		show_help()
 

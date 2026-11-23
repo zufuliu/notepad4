@@ -490,6 +490,12 @@ enum class Ordering {
 	Custom = 2,
 };
 
+enum class ColumnType {
+	Default = 0,
+	Character = 1,
+	Byte = 2,
+};
+
 enum class CaretSticky {
 	Off = 0,
 	On = 1,
@@ -723,6 +729,7 @@ enum class Notification {
 
 using Position = intptr_t;
 using Line = intptr_t;
+using Pixels = int;
 using Colour = uint32_t;
 using ColourAlpha = uint32_t;
 using uptr_t = uintptr_t;

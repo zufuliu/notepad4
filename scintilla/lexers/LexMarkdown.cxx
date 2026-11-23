@@ -132,7 +132,7 @@ constexpr int GetIndentChild(uint32_t lineState) noexcept {
 	return lineState >> 24;
 }
 
-inline uint8_t GetCharAfterSpace(LexAccessor &styler, Sci_PositionU &startPos, int count) noexcept {
+inline uint8_t GetCharAfterSpace(const LexAccessor &styler, Sci_PositionU &startPos, int count) noexcept {
 	Sci_PositionU pos = startPos;
 	uint8_t ch = styler.SafeGetCharAt(pos);
 	while (ch == ' ' && count != 0) {
@@ -310,7 +310,7 @@ struct MarkdownLexer {
 };
 
 // 4.1 Thematic breaks
-bool CheckThematicBreak(LexAccessor &styler, Sci_PositionU pos, int delimiter) noexcept {
+bool CheckThematicBreak(const LexAccessor &styler, Sci_PositionU pos, int delimiter) noexcept {
 	int count = 1;
 	while (true) {
 		const uint8_t ch = styler[++pos];
@@ -327,7 +327,7 @@ bool CheckThematicBreak(LexAccessor &styler, Sci_PositionU pos, int delimiter) n
 }
 
 // 4.2 ATX headings
-int CheckATXHeading(LexAccessor &styler, Sci_PositionU pos) noexcept {
+int CheckATXHeading(const LexAccessor &styler, Sci_PositionU pos) noexcept {
 	int level = 1;
 	while (true) {
 		const uint8_t ch = styler[++pos];
@@ -344,7 +344,7 @@ int CheckATXHeading(LexAccessor &styler, Sci_PositionU pos) noexcept {
 }
 
 // 4.3 Setext headings
-int CheckSetextHeading(LexAccessor &styler, Sci_PositionU pos) noexcept {
+int CheckSetextHeading(const LexAccessor &styler, Sci_PositionU pos) noexcept {
 	const uint8_t marker = GetCharAfterSpace(styler, pos, 3);
 	if (marker == '=' || marker == '-') {
 		uint8_t ch;
@@ -361,7 +361,7 @@ int CheckSetextHeading(LexAccessor &styler, Sci_PositionU pos) noexcept {
 	return 0;
 }
 
-int GetBlockStyle(LexAccessor &styler, Sci_Line line, uint32_t lineState) noexcept {
+int GetBlockStyle(const LexAccessor &styler, Sci_Line line, uint32_t lineState) noexcept {
 	Sci_PositionU pos = styler.LineStart(line);
 	const int indentCount = GetIndentCount(lineState);
 	if (indentCount < 4) {
@@ -441,7 +441,7 @@ void MarkdownLexer::HighlightDelimiterRow() {
 	}
 }
 
-OrderedListType CheckOrderedList(LexAccessor &styler, Sci_PositionU pos, int current, int chNext) noexcept {
+OrderedListType CheckOrderedList(const LexAccessor &styler, Sci_PositionU pos, int current, int chNext) noexcept {
 	if (current == '#') { // Pandoc
 		if (chNext == '.') {
 			const uint8_t after = styler[pos + 2];
@@ -785,7 +785,7 @@ SeekStatus MarkdownLexer::HighlightEmphasis(uint32_t lineState, int visibleChars
 }
 
 // 4.7 Link reference definitions
-inline bool IsLinkReferenceDefinition(LexAccessor &styler, Sci_Line line, Sci_PositionU startPos) noexcept {
+inline bool IsLinkReferenceDefinition(const LexAccessor &styler, Sci_Line line, Sci_PositionU startPos) noexcept {
 	Sci_PositionU pos = styler.LineStart(line);
 	const uint8_t ch = GetCharAfterSpace(styler, pos, 3);
 	return ch == '[' && pos == startPos;
@@ -1097,15 +1097,15 @@ bool MarkdownLexer::HandleHtmlTag(HtmlTagType tagType) {
 			sc.Advance(3);
 			// handle empty comment: <!-->, <!--->
 			// https://html.spec.whatwg.org/multipage/parsing.html#parse-error-abrupt-closing-of-empty-comment
-			if (sc.chNext == '>' || sc.MatchNext('-', '>')) {
-				sc.Forward((sc.chNext == '>') ? 2 : 3);
+			sc.chPrev = '-';
+			if (sc.chNext == '>') {
+				sc.Forward(2);
 				sc.SetState(current);
 				return true;
 			}
 		} else if (chNext == '[' && sc.styler.Match(sc.currentPos + 3, "CDATA[")) {
 			// <![CDATA[ ]]>
 			sc.SetState(SCE_H_CDATA);
-			sc.Advance(8);
 		} else if (IsAlpha(chNext)) {
 			// <!DOCTYPE html>
 			sc.SetState(SCE_H_SGML_COMMAND);
@@ -2026,13 +2026,11 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 			break;
 
 		case SCE_H_COMMENT:
-			if (sc.Match('-', '-')) {
-				do {
-					sc.Forward();
-				} while (sc.ch == '-');
+			if (sc.chPrev == '-' && sc.ch == '-' && (sc.chNext == '>' || sc.chNext == '!')) {
+				sc.Forward();
 				// close HTML comment with --!>
 				// https://html.spec.whatwg.org/multipage/parsing.html#parse-error-incorrectly-closed-comment
-				if (sc.ch == '>' || sc.Match('!', '>')) {
+				if (sc.ch == '>' || sc.chNext == '>') {
 					lexer.OnHtmlTagEnd();
 					continue;
 				}

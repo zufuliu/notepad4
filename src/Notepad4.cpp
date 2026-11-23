@@ -59,7 +59,9 @@ static HMONITOR hCurrentMonitor = nullptr;
 HWND	hwndEdit;
 HWND	hwndMain;
 static HMENU hmenuMain;
+HTHEME hThemeMenu = nullptr;
 HWND	hDlgFindReplace = nullptr;
+HWND	hDlgWarnLineEnding = nullptr;
 static bool bInitDone = false;
 static HACCEL hAccMain;
 static HACCEL hAccFindReplace;
@@ -69,7 +71,12 @@ static UINT uTrayIconDPI = 0;
 #define TOOLBAR_COMMAND_BASE	IDT_FILE_NEW
 #define DefaultToolbarButtons	L"22 3 0 1 27 2 0 4 18 19 0 5 6 0 7 8 9 20 0 10 11 0 12 0 24 0 13 14 0 15 16 0 17"
 // NOLINTBEGIN(readability-redundant-zero-initializer)
-static TBBUTTON tbbMainWnd[] = {
+#if NP2_ENABLE_CUSTOMIZE_TOOLBAR_LABELS
+static TBBUTTON tbbMainWnd[] =
+#else
+static const TBBUTTON tbbMainWnd[] =
+#endif
+{
 	{0, 	0, 					0, 				 TBSTYLE_SEP, {0}, 0, 0},
 	{0, 	IDT_FILE_NEW, 		TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
 	{1, 	IDT_FILE_OPEN, 		TBSTATE_ENABLED, BTNS_DROPDOWN, {0}, 0, 0},
@@ -106,7 +113,7 @@ WCHAR szExeRealPath[MAX_PATH];
 static bool bSaveSettings;
 bool	bSaveRecentFiles;
 int iMaxRecentFiles;
-static bool bSaveFindReplace;
+bool bSaveFindReplace;
 static WCHAR tchLastSaveCopyDir[MAX_PATH];
 WCHAR	tchOpenWithDir[MAX_PATH];
 WCHAR	tchFavoritesDir[MAX_PATH];
@@ -385,7 +392,7 @@ static bool	flagNewFromClipboard	= false;
 static bool	flagPasteBoard			= false;
 static int	flagSetEncoding			= 0;
 static int	flagSetEOLMode			= 0;
-static bool	flagJumpTo				= false;
+static unsigned	flagJumpTo			= FALSE;
 static MatchTextFlag flagMatchText	= MatchTextFlag_None;
 static TripleBoolean flagChangeNotify = TripleBoolean_NotSet;
 static bool	flagLexerSpecified		= false;
@@ -404,7 +411,7 @@ static inline bool IsTopMost() noexcept {
 
 // temporary fix for https://github.com/zufuliu/notepad4/issues/77: force InvalidateStyleRedraw().
 static inline void InvalidateStyleRedraw() noexcept {
-	SciCall_SetViewEOL(bViewEOLs);
+	SciCall_SetCaretLineVisibleAlways(true);
 }
 
 //=============================================================================
@@ -427,6 +434,9 @@ static void CleanUpResources(bool initialized) noexcept {
 	Scintilla_ReleaseResources();
 	DarkMode_Cleanup();
 
+	if (hThemeMenu) {
+		CloseThemeData(hThemeMenu);
+	}
 	if (hTrayIcon) {
 		DestroyIcon(hTrayIcon);
 	}
@@ -497,6 +507,22 @@ static LONG WINAPI TopLevelHandler(EXCEPTION_POINTERS *ep) {
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nShowCmd) {
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
+	// HANDLE startEvent = OpenEventW(EVENT_MODIFY_STATE, TRUE, L"startup-time-event");
+	// SetEvent(startEvent);
+	// CloseHandle(startEvent);
+	// RestrictDLLPath() from SciTEWin.cxx, only load system or full path DLL
+#if _WIN32_WINNT >= _WIN32_WINNT_WIN8
+	SetDefaultDllDirectories(LOAD_LIBRARY_SEARCH_SYSTEM32);
+#else
+	using SetDefaultDllDirectoriesSig = BOOL (WINAPI *)(DWORD DirectoryFlags) noexcept;
+	if (auto fnSetDefaultDllDirectories = DLLFunctionEx<SetDefaultDllDirectoriesSig>(L"kernel32.dll", "SetDefaultDllDirectories")) {
+		kSystemLibraryLoadFlags = LOAD_LIBRARY_SEARCH_SYSTEM32;
+		fnSetDefaultDllDirectories(LOAD_LIBRARY_SEARCH_SYSTEM32);
+	} else {
+		SetDllDirectory(L""); // remove current directory from the DLL search path
+	}
+#endif
+
 #if 0 // used for Clang UBSan or printing debug message on console.
 	if (AttachConsole(ATTACH_PARENT_PROCESS)) {
 		SetConsoleCtrlHandler(ConsoleHandlerRoutine, TRUE);
@@ -514,13 +540,18 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
 	g_exeInstance = hInstance;
 #endif
-#if _WIN32_WINNT < _WIN32_WINNT_WIN8
 	// Set the Windows version global variable
+	OSVERSIONINFOW version;
+	version.dwOSVersionInfoSize = sizeof(version);
+	version.dwMajorVersion = 0;
+	version.dwMinorVersion = 0;
+	version.dwBuildNumber = 0;
 	NP2_COMPILER_WARNING_PUSH
 	NP2_IGNORE_WARNING_DEPRECATED_DECLARATIONS
-	g_uWinVer = LOWORD(GetVersion());
+	GetVersionEx(&version);
 	NP2_COMPILER_WARNING_POP
-	g_uWinVer = MAKEWORD(HIBYTE(g_uWinVer), LOBYTE(g_uWinVer));
+#if _WIN32_WINNT < _WIN32_WINNT_WIN8
+	g_uWinVer = (version.dwMajorVersion << 8) | version.dwMinorVersion;
 #endif
 
 	g_hDefaultHeap = GetProcessHeap();
@@ -603,11 +634,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 	msgTaskbarCreated = RegisterWindowMessage(L"TaskbarCreated");
 
-#if _WIN32_WINNT < _WIN32_WINNT_WIN8
-	// see LoadD2D() in PlatWin.cxx
-	kSystemLibraryLoadFlags = (DLLFunctionEx<FARPROC>(L"kernel32.dll", "SetDefaultDllDirectories") != nullptr) ? LOAD_LIBRARY_SEARCH_SYSTEM32 : 0;
-#endif
-
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
 	hResDLL = LoadLocalizedResourceDLL(uiLanguage, WC_NOTEPAD4 L".dll");
 	if (hResDLL) {
@@ -623,9 +649,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 #endif
 	Scintilla_RegisterClasses(hInstance);
 
+	DarkMode_Init(version);
 	// Load Settings
 	LoadSettings();
-	DarkMode_Init();
+	if (DarkMode_IsActive()) {
+		DarkMode_SetAppDarkMode(TRUE);
+	}
 
 	if (!InitApplication(hInstance)) {
 		CleanUpResources(false);
@@ -685,7 +714,7 @@ BOOL InitApplication(HINSTANCE hInstance) noexcept {
 }
 
 NP2_noinline
-static void HandleMatchText(MatchTextFlag flag, LPCWSTR lpszText, bool jumpTo) noexcept {
+static void HandleMatchText(MatchTextFlag flag, LPCWSTR lpszText, BOOL jumpTo) noexcept {
 	if (StrNotEmpty(lpszText) && SciCall_GetLength()) {
 		efrData.wszFind = HeapStrDupW(lpszText);
 		efrData.status |= FindReplaceStatus_HasFindText | FindReplaceStatus_FindUpdated | FindReplaceStatus_ReplaceUpdated;
@@ -815,7 +844,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	}
 
 	HWND hwnd = CreateWindowEx(
-				   0,
+				   WS_EX_ACCEPTFILES,
 				   wchWndClass,
 				   WC_NOTEPAD4,
 				   WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
@@ -838,7 +867,6 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	}
 	if (!flagStartAsTrayIcon) {
 		ShowWindow(hwnd, wi.max ? SW_SHOWMAXIMIZED : nCmdShow);
-		UpdateWindow(hwnd);
 	} else {
 		ShowWindow(hwnd, SW_HIDE); // trick ShowWindow()
 		ShowNotifyIcon(hwnd, true);
@@ -855,6 +883,8 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	bool bFileLoadCalled = false;
 	// Pathname parameter
 	if (lpFileArg /*&& !flagNewFromClipboard*/) {
+		// paint main window to avoid blank window while loading large file
+		UpdateWindow(hwnd);
 
 		// Open from Directory
 		if (PathIsDirectory(lpFileArg)) {
@@ -871,7 +901,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 
 		if (bOpened) {
 			if (flagJumpTo) { // Jump to position
-				EditJumpTo(iInitialLine, iInitialColumn);
+				EditJumpTo(iInitialLine, iInitialColumn, flagJumpTo - TRUE);
 			}
 			if (flagChangeNotify != TripleBoolean_NotSet) {
 				iFileWatchingMode = (flagChangeNotify == TripleBoolean_False) ? FileWatchingMode_None : FileWatchingMode_AutoReload;
@@ -916,7 +946,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 			SciCall_EndUndoAction();
 			autoCompletionConfig.bIndentText = back;
 			if (flagJumpTo) {
-				EditJumpTo(iInitialLine, iInitialColumn);
+				EditJumpTo(iInitialLine, iInitialColumn, flagJumpTo - TRUE);
 			} else {
 				EditEnsureSelectionVisible();
 			}
@@ -1088,13 +1118,19 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 	case WM_MOUSEACTIVATE:
 	case WM_NCHITTEST:
 	case WM_NCCALCSIZE:
-	case WM_NCPAINT:
 	case WM_PAINT:
 	case WM_ERASEBKGND:
 	case WM_NCMOUSEMOVE:
 	case WM_NCLBUTTONDOWN:
 	case WM_WINDOWPOSCHANGING:
 		return DefWindowProc(hwnd, umsg, wParam, lParam);
+
+	case WM_NCACTIVATE:
+	case WM_NCPAINT: {
+		const LRESULT result = DefWindowProc(hwnd, umsg, wParam, lParam);
+		DarkMode_DrawUAHMenuNCBottomLine(hwnd);
+		return result;
+	}
 
 	case WM_WINDOWPOSCHANGED: {
 		HMONITOR monitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
@@ -1117,7 +1153,6 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			AutoSave_Stop(TRUE);
 			// Terminate file watching
 			InstallFileWatching(true);
-			DragAcceptFiles(hwnd, FALSE);
 
 			// Terminate clipboard watching
 			if (flagPasteBoard) {
@@ -1182,7 +1217,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 	case WM_SETTINGCHANGE:
 		bitmapCache.Invalidate();
-		// TODO: detect system theme and high contrast mode changes
+		DarkMode_HandleSettingChange(hwnd, lParam);
 		SendMessage(hwndEdit, WM_SETTINGCHANGE, wParam, lParam);
 		Style_SetLexer(pLexCurrent, false); // override base elements
 		break;
@@ -1246,7 +1281,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		// Reset Change Notify
 		//bPendingChangeNotify = false;
 
-		if (pcds->dwData == DATA_NOTEPAD4_PARAMS) {
+		if (pcds->dwData == DATA_NOTEPAD4_PARAMS && pcds->cbData >= sizeof(NP2PARAMS)) {
 			const NP2PARAMS * const params = static_cast<NP2PARAMS *>(pcds->lpData);
 
 			if (params->flagReadOnlyMode) {
@@ -1318,8 +1353,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			}
 
 			if (params->flagJumpTo) {
-				const Sci_Line iLine = params->iInitialLine ? params->iInitialLine : 1;
-				EditJumpTo(iLine, params->iInitialColumn);
+				EditJumpTo(params->iInitialLine, params->iInitialColumn, params->flagJumpTo - TRUE);
 			}
 			if (bOpened && params->flagMatchText != MatchTextFlag_None) {
 				HandleMatchText(params->flagMatchText, lpsz, params->flagJumpTo);
@@ -1392,6 +1426,10 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			SetMenu(hwnd, enter ? hmenuMain : nullptr);
 		}
 		return wParam;
+
+	case WM_UAHDRAWMENU:
+	case WM_UAHDRAWMENUITEM:
+		return DarkMode_DrawUAHMenu(hwnd, umsg, wParam, lParam);
 
 	case WM_NOTIFY:
 		return MsgNotify(hwnd, wParam, lParam);
@@ -1698,6 +1736,9 @@ void EditCreate(HWND hwndParent) noexcept {
 	hwndEdit = hwnd;
 	InitScintillaHandle(hwnd);
 	//SciInitThemes(hwnd);
+	if (DarkMode_IsActive()) {
+		DarkMode_UseDarkScrollBar(hwnd);
+	}
 	if (bEditLayoutRTL) {
 		SetWindowLayoutRTL(hwnd, true);
 	}
@@ -1825,6 +1866,9 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	g_uCurrentDPI = GetWindowDPI(hwnd);
 	hmenuMain = GetMenu(hwnd);
 	hCurrentMonitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
+	if (DarkMode_IsActive()) {
+		DarkMode_SetDarkTitleBar(hwnd, TRUE);
+	}
 	Style_DetectBaseFontSize(hCurrentMonitor);
 
 	// Setup edit control
@@ -1856,13 +1900,10 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	ChangeWindowMessageFilterEx(hwnd, WM_COPYDATA, MSGFLT_ADD, nullptr);
 	ChangeWindowMessageFilterEx(hwnd, 0x0049 /*WM_COPYGLOBALDATA*/, MSGFLT_ADD, nullptr);
 #endif
-	DragAcceptFiles(hwnd, TRUE);
 
 	// File MRU
 	const int flags = MRUFlags_FilePath | (static_cast<int>(flagRelativeFileMRU) * MRUFlags_RelativePath) | (static_cast<int>(flagPortableMyDocs) * MRUFlags_PortableMyDocs);
-	mruFile.Init(MRU_KEY_RECENT_FILES, iMaxRecentFiles, flags);
-	mruFind.Init(MRU_KEY_RECENT_FIND, MRU_MAXITEMS, MRUFlags_QuoteValue);
-	mruReplace.Init(MRU_KEY_RECENT_REPLACE, MRU_MAXITEMS, MRUFlags_QuoteValue);
+	mruFile.Init(MRU_KEY_RECENT_FILES, iMaxRecentFiles, flags, false);
 	return 0;
 }
 
@@ -1907,9 +1948,10 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 
 	if (internalBitmap) {
 		HBITMAP hbmpCopy = static_cast<HBITMAP>(CopyImage(hbmp, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION));
+		const COLORREF backColor = DarkMode_GetRebarBackColor();
 		// StopWatch watch;
 		// watch.Start();
-		const bool fProcessed = BitmapAlphaBlend(hbmpCopy, GetSysColor(COLOR_3DFACE), 0x60);
+		const bool fProcessed = BitmapAlphaBlend(hbmpCopy, backColor, 0x80);
 		// watch.Stop();
 		// watch.ShowLog("BitmapAlphaBlend");
 		if (fProcessed) {
@@ -1997,6 +2039,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
 	GetWindowRect(hwndReBar, &rc);
 	cyReBar = rc.bottom - rc.top;
 	cyReBarFrame = bIsAppThemed ? 0 : 2;
+	DarkMode_ApplyToBars(hwndToolbar, hwndStatus);
 }
 
 void RecreateBars(HWND hwnd, HINSTANCE hInstance) noexcept {
@@ -2019,6 +2062,10 @@ void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	const Sci_Line iVisTopLine = SciCall_GetFirstVisibleLine();
 	const Sci_Line iDocTopLine = SciCall_DocLineFromVisible(iVisTopLine);
 
+	if (hThemeMenu) {
+		CloseThemeData(hThemeMenu);
+		hThemeMenu = nullptr;
+	}
 	bitmapCache.Invalidate();
 	// recreate toolbar and statusbar
 	RecreateBars(hwnd, g_hInstance);
@@ -2052,6 +2099,10 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 	UNREFERENCED_PARAMETER(wParam);
 	UNREFERENCED_PARAMETER(lParam);
 
+	if (hThemeMenu) {
+		CloseThemeData(hThemeMenu);
+		hThemeMenu = nullptr;
+	}
 	// reinitialize edit frame
 	DWORD dwExStyle = GetWindowExStyle(hwndEdit);
 	if (IsAppThemed()) {
@@ -2132,8 +2183,7 @@ void UpdateStatusBarCache(int item) noexcept {
 		break;
 
 	case StatusItem_Encoding:
-		Encoding_GetLabel(iCurrentEncoding);
-		cachedStatusItem.pszEncoding = mEncoding[iCurrentEncoding].wchLabel;
+		cachedStatusItem.pszEncoding = Encoding_GetLabel(iCurrentEncoding);
 		break;
 
 	case StatusItem_EolMode:
@@ -2321,6 +2371,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 		IDM_FILE_PROPERTIES,
 		IDM_FILE_READONLY_FILE,
 		IDM_FILE_REVERT,
+		IDM_FILE_UPDATE_TIMESTAMP,
 		IDM_RECODE_SELECT,
 	};
 	for (unsigned k = 0; k < COUNTOF(menuRequiresPath); k++) {
@@ -2351,8 +2402,6 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 
 	i = IDM_LINEENDINGS_CRLF + iCurrentEOLMode;
 	CheckMenuRadioItem(hmenu, IDM_LINEENDINGS_CRLF, IDM_LINEENDINGS_LF, i, MF_BYCOMMAND);
-
-	EnableCmd(hmenu, IDM_FILE_RECENT, (mruFile.iSize > 0));
 
 	EnableCmd(hmenu, IDM_EDIT_UNDO, SciCall_CanUndo());
 	EnableCmd(hmenu, IDM_EDIT_REDO, SciCall_CanRedo());
@@ -2493,8 +2542,8 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 
 	CheckCmd(hmenu, IDM_VIEW_SHOW_FOLDING, bShowCodeFolding);
 	CheckCmd(hmenu, IDM_VIEW_USEDEFAULT_CODESTYLE, pLexCurrent->bUseDefaultCodeStyle);
-	i = IDM_VIEW_STYLE_THEME_DEFAULT + np2StyleTheme;
-	CheckMenuRadioItem(hmenu, IDM_VIEW_STYLE_THEME_DEFAULT, IDM_VIEW_STYLE_THEME_DARK, i, MF_BYCOMMAND);
+	i = IDM_VIEW_STYLE_THEME_SYSTEM + 1 + styleThemeSetting;
+	CheckMenuRadioItem(hmenu, IDM_VIEW_STYLE_THEME_SYSTEM, IDM_VIEW_STYLE_THEME_DARK, i, MF_BYCOMMAND);
 
 	CheckCmd(hmenu, IDM_VIEW_WORDWRAP, fvCurFile.fWordWrap);
 	i = IDM_VIEW_FONTQUALITY_DEFAULT + iFontQuality;
@@ -2685,6 +2734,14 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		FileSave(static_cast<FileSaveFlag>(FileSaveFlag_SaveAlways | FileSaveFlag_OriginalTimestamp));
 		break;
 
+	case IDM_FILE_UPDATE_TIMESTAMP:
+		if (StrNotEmpty(szCurFile)) {
+			EditFileIOStatus status{};
+			EditSaveFile(szCurFile, FileSaveFlag_OriginalTimestamp | FileSaveFlag_UpdateTimestamp, status);
+			InstallFileWatching(false);
+		}
+		break;
+
 	case IDM_FILE_READONLY_FILE:
 		if (StrNotEmpty(szCurFile)) {
 			DWORD dwFileAttributes = GetFileAttributes(szCurFile);
@@ -2820,26 +2877,22 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_FILE_PAGESETUP:
-		EditPrintSetup(hwndEdit);
+		EditPrintSetup(hwnd);
 		break;
 
 	case IDT_FILE_PRINT:
 	case IDM_FILE_PRINT: {
 		SHFILEINFO shfi;
-		WCHAR *pszTitle;
-		WCHAR tchUntitled[128];
 		const auto action = (LOWORD(wParam) == IDM_FILE_PRINT)? static_cast<NotepadReplacementAction>(lParam) : NotepadReplacementAction_None;
 
 		if (StrNotEmpty(szCurFile)) {
 			SHGetFileInfo2(szCurFile, 0, &shfi, sizeof(SHFILEINFO), SHGFI_DISPLAYNAME);
-			pszTitle = shfi.szDisplayName;
 		} else {
-			GetString(IDS_UNTITLED, tchUntitled, COUNTOF(tchUntitled));
-			pszTitle = tchUntitled;
+			GetString(IDS_UNTITLED, shfi.szDisplayName, COUNTOF(shfi.szDisplayName));
 		}
 
-		if (!EditPrint(hwndEdit, pszTitle, static_cast<int>(action) & TRUE)) {
-			MsgBoxWarn(MB_OK, IDS_PRINT_ERROR, pszTitle);
+		if (!EditPrint(hwnd, shfi.szDisplayName, static_cast<int>(action) & TRUE)) {
+			MsgBoxWarn(MB_OK, IDS_PRINT_ERROR, shfi.szDisplayName);
 		} else if (action > NotepadReplacementAction_Default) {
 			SendWMCommand(hwnd, IDM_FILE_EXIT);
 		}
@@ -2877,24 +2930,21 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	break;
 
 	case IDT_FILE_OPENFAV:
-	case IDM_FILE_OPENFAV:
-		if (FileSave(FileSaveFlag_Ask)) {
-			WCHAR tchSelItem[MAX_PATH];
+	case IDM_FILE_OPENFAV: {
+		WCHAR tchSelItem[MAX_PATH];
+		if (FavoritesDlg(hwnd, tchSelItem)) {
+			PathGetLnkPath(tchSelItem, tchSelItem);
+			if (PathIsDirectory(tchSelItem)) {
+				WCHAR tchFile[MAX_PATH];
 
-			if (FavoritesDlg(hwnd, tchSelItem)) {
-				PathGetLnkPath(tchSelItem, tchSelItem);
-				if (PathIsDirectory(tchSelItem)) {
-					WCHAR tchFile[MAX_PATH];
-
-					if (OpenFileDlg(tchFile, COUNTOF(tchFile), tchSelItem)) {
-						FileLoad(FileLoadFlag_DontSave, tchFile);
-					}
-				} else {
-					FileLoad(FileLoadFlag_DontSave, tchSelItem);
+				if (OpenFileDlg(tchFile, COUNTOF(tchFile), tchSelItem)) {
+					FileLoad(FileLoadFlag_Default, tchFile);
 				}
+			} else {
+				FileLoad(FileLoadFlag_Default, tchSelItem);
 			}
 		}
-		break;
+	} break;
 
 	case IDT_FILE_ADDTOFAV:
 	case IDM_FILE_ADDTOFAV:
@@ -2923,16 +2973,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	}
 	break;
 
-	case IDM_FILE_RECENT:
-		if (mruFile.iSize > 0) {
-			if (FileSave(FileSaveFlag_Ask)) {
-				WCHAR tchFile[MAX_PATH];
-				if (FileMRUDlg(hwnd, tchFile)) {
-					FileLoad(FileLoadFlag_DontSave, tchFile);
-				}
-			}
+	case IDM_FILE_RECENT: {
+		WCHAR tchFile[MAX_PATH];
+		if (FileMRUDlg(hwnd, tchFile)) {
+			FileLoad(FileLoadFlag_Default, tchFile);
 		}
-		break;
+	} break;
 
 	case IDT_FILE_EXIT:
 	case IDM_FILE_EXIT:
@@ -3079,7 +3125,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_EDIT_COPYADD:
 		bLastCopyFromMe = true;
-		EditCopyAppend(hwndEdit);
+		EditCopyAppend(hwnd);
 		UpdateToolbar();
 		break;
 
@@ -3412,7 +3458,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		if (sep != nullptr) {
 			strncpy(msz, enc, min<size_t>(sep - enc, COUNTOF(msz) - 1));
 		} else {
-			WideCharToMultiByte(CP_UTF8, 0, mEncoding[iCurrentEncoding].wchLabel, -1, msz, COUNTOF(msz), nullptr, nullptr);
+			WideCharToMultiByte(CP_UTF8, 0, cachedStatusItem.pszEncoding, -1, msz, COUNTOF(msz), nullptr, nullptr);
 		}
 		if (pLexCurrent->iLexer == SCLEX_PYTHON || pLexCurrent->iLexer == SCLEX_RUBY) {
 			const Sci_Position iCurrentPos = SciCall_GetCurrentPos();
@@ -3505,20 +3551,17 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case CMD_COPYFILENAME:
 	case CMD_COPYPATHNAME: {
 		SHFILEINFO shfi;
-		WCHAR *pszInsert;
-		WCHAR tchUntitled[MAX_PATH];
+		WCHAR *pszInsert = shfi.szDisplayName;
 
 		const int cmd = LOWORD(wParam);
 		if (StrNotEmpty(szCurFile)) {
 			if (cmd == IDM_EDIT_INSERT_FILENAME || cmd == CMD_COPYFILENAME || cmd == CMD_INSERTFILENAME_NOEXT || cmd == CMD_COPYFILENAME_NOEXT) {
 				SHGetFileInfo2(szCurFile, 0, &shfi, sizeof(SHFILEINFO), SHGFI_DISPLAYNAME);
-				pszInsert = shfi.szDisplayName;
 			} else {
 				pszInsert = szCurFile;
 			}
 		} else {
-			GetString(IDS_UNTITLED, tchUntitled, COUNTOF(tchUntitled));
-			pszInsert = tchUntitled;
+			GetString(IDS_UNTITLED, shfi.szDisplayName, COUNTOF(shfi.szDisplayName));
 		}
 		if (cmd == CMD_INSERTFILENAME_NOEXT || cmd == CMD_COPYFILENAME_NOEXT) {
 			PathRemoveExtension(pszInsert);
@@ -3678,12 +3721,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_EDIT_REPLACE: {
 		const bool bReplace = (LOWORD(wParam) == IDM_EDIT_REPLACE) || (LOWORD(wParam) == IDT_EDIT_REPLACE);
 		if (hDlgFindReplace == nullptr) {
-			hDlgFindReplace = EditFindReplaceDlg(hwndEdit, efrData, bReplace);
+			hDlgFindReplace = EditFindReplaceDlg(hwnd, efrData, bReplace);
 		} else {
 			if (bReplace != (GetDlgItem(hDlgFindReplace, IDC_REPLACETEXT) != nullptr)) {
 				SendWMCommand(hDlgFindReplace, IDC_TOGGLEFINDREPLACE);
 				DestroyWindow(hDlgFindReplace);
-				hDlgFindReplace = EditFindReplaceDlg(hwndEdit, efrData, bReplace);
+				hDlgFindReplace = EditFindReplaceDlg(hwnd, efrData, bReplace);
 			} else {
 				SetForegroundWindow(hDlgFindReplace);
 				SendMessage(hDlgFindReplace, APPM_COPYDATA, 0, 0);
@@ -3748,7 +3791,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_EDIT_GOTOLINE:
-		EditLineNumDlg(hwndEdit);
+		EditLineNumDlg(hwnd);
 		break;
 
 	//case IDM_EDIT_NAVIGATE_BACKWARD:
@@ -3767,26 +3810,27 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDT_VIEW_SCHEME:
 	case IDM_VIEW_SCHEME:
 	case IDM_VIEW_SCHEME_FAVORITE:
-		Style_SelectLexerDlg(hwndEdit, LOWORD(wParam) == IDM_VIEW_SCHEME_FAVORITE);
+		Style_SelectLexerDlg(hwnd, LOWORD(wParam) == IDM_VIEW_SCHEME_FAVORITE);
 		break;
 
 	case IDT_VIEW_SCHEMECONFIG:
 	case IDM_VIEW_SCHEME_CONFIG:
-		Style_ConfigDlg(hwndEdit);
+		Style_ConfigDlg(hwnd);
 		break;
 
 	case IDM_VIEW_USEDEFAULT_CODESTYLE:
 		Style_ToggleUseDefaultCodeStyle();
 		break;
 
-	case IDM_VIEW_STYLE_THEME_DEFAULT:
+	case IDM_VIEW_STYLE_THEME_SYSTEM:
+	case IDM_VIEW_STYLE_THEME_LIGHT:
 	case IDM_VIEW_STYLE_THEME_DARK:
-		Style_OnStyleThemeChanged(LOWORD(wParam) - IDM_VIEW_STYLE_THEME_DEFAULT);
+		Style_OnStyleThemeChanged(hwnd, LOWORD(wParam) - IDM_VIEW_STYLE_THEME_LIGHT);
 		break;
 
 	case IDM_VIEW_DEFAULT_CODE_FONT:
 	case IDM_VIEW_DEFAULT_TEXT_FONT:
-		Style_SetDefaultFont(hwndEdit, LOWORD(wParam) == IDM_VIEW_DEFAULT_CODE_FONT);
+		Style_SetDefaultFont(hwnd, LOWORD(wParam) == IDM_VIEW_DEFAULT_CODE_FONT);
 		break;
 
 	case IDT_VIEW_WORDWRAP:
@@ -4595,11 +4639,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			if (path) {
 				if (!PathIsFile(path)) {
 					if (IDYES == MsgBoxWarn(MB_YESNO, IDS_ERR_MRUDLG)) {
-						mruFile.DeleteFileFromStore(path);
-						mruFile.Delete(index);
+						mruFile.DeleteFileFromStore(path, index);
 					}
-				} else if (FileSave(FileSaveFlag_Ask)) {
-					FileLoad(FileLoadFlag_DontSave, path);
+				} else {
+					FileLoad(FileLoadFlag_Default, path);
 				}
 			}
 		}
@@ -4908,7 +4951,11 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDC_TOOLBAR:
 		switch (pnmh->code) {
+		case TBN_BEGINADJUST:
+			DarkMode_OnToolbarBeginAdjust();
+			break;
 		case TBN_ENDADJUST:
+			DarkMode_OnToolbarEndAdjust();
 			UpdateToolbar();
 			break;
 
@@ -4938,6 +4985,9 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			HMENU subMenu = nullptr;
 			if (lpTbNotify->iItem == IDT_FILE_OPEN) {
 				static_assert(IDM_RECENT_HISTORY_START + MRU_MAXITEMS == IDM_RECENT_HISTORY_END);
+				if (bSaveRecentFiles && !mruFile.Loaded()) {
+					mruFile.Load();
+				}
 				if (mruFile.iSize <= 0) {
 					return TBDDRET_TREATPRESSED;
 				}
@@ -4969,6 +5019,15 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			DestroyMenu(hmenu);
 		}
 		return FALSE;
+
+		case NM_CUSTOMDRAW:
+			return DarkMode_ToolbarCustomDraw(lParam);
+		}
+		break;
+
+	case IDC_REBAR:
+		if (pnmh->code == NM_CUSTOMDRAW) {
+			return DarkMode_RebarCustomDraw(lParam);
 		}
 		break;
 
@@ -4994,7 +5053,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			LPNMMOUSE pnmm = AsPointer<LPNMMOUSE>(lParam);
 			switch (pnmm->dwItemSpec) {
 			case StatusItem_Line:
-				EditLineNumDlg(hwndEdit);
+				EditLineNumDlg(hwnd);
 				return TRUE;
 
 			case StatusItem_Find:
@@ -5688,24 +5747,30 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) noexcept {
 			}
 			break;
 
-		case L'G':
+		case L'G': {
+			const wchar_t option = opt[0];
 			state = CommandParseState_Argument;
 			if (ExtractFirstArgument(lp2, lp1, lp2)) {
 #if defined(_WIN64)
-				int64_t cord[2]{};
+				int64_t cord[3]{};
 				const UINT itok = ParseCommaList64(lp1, cord, COUNTOF(cord));
 #else
-				int cord[2]{};
+				int cord[3]{};
 				const UINT itok = ParseCommaList(lp1, cord, COUNTOF(cord));
 #endif
 				if (itok != 0) {
-					flagJumpTo = true;
 					state = CommandParseState_Consumed;
 					iInitialLine = cord[0];
 					iInitialColumn = cord[1];
+					if (option & 0x20) { // lower case: character, byte
+						flagJumpTo = (TRUE + SC_COLUMN_CHARACTER) + (cord[2] & TRUE);
+					} else { // upper case: column
+						const unsigned iTabWidth = min(static_cast<unsigned>(cord[2]), static_cast<unsigned>(TAB_WIDTH_MAX));
+						flagJumpTo = (TRUE + SC_COLUMN_DEFAULT) | (iTabWidth << 4);
+					}
 				}
 			}
-			break;
+		} break;
 
 		case L'I':
 			flagStartAsTrayIcon = true;
@@ -6297,7 +6362,9 @@ void FindIniFile() noexcept {
 		memcpy(lpszIniFile, tchModule, nameIndex*sizeof(WCHAR));
 		lstrcpy(&lpszIniFile[nameIndex], L"Notepad4.ini");
 	}
-	if (!PathIsFile(lpszIniFile)) {
+	WIN32_FILE_ATTRIBUTE_DATA data;
+	BOOL success = GetFileAttributesEx(lpszIniFile, GetFileExInfoStandard, &data);
+	if (!success) {
 		if (!portable) {
 			SHCreateDirectoryEx(nullptr, appData, nullptr);
 		}
@@ -6313,6 +6380,10 @@ void FindIniFile() noexcept {
 		lstrcpy(&source[nameIndex], L"Notepad4 DarkTheme.ini-default");
 		PathAppend(appData, L"Notepad4 DarkTheme.ini");
 		CopyFile(source, appData, TRUE);
+		success = GetFileAttributesEx(lpszIniFile, GetFileExInfoStandard, &data);
+	}
+	if (success && (data.nFileSizeLow >= 2 || data.nFileSizeHigh != 0 || (data.dwFileAttributes & (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_READONLY)) != 0)) {
+		return;
 	}
 
 	// inline CreateIniFile() to avoid slow directory creation
@@ -6331,7 +6402,20 @@ void FindIniFile() noexcept {
 }
 
 bool CreateIniFile(LPCWSTR lpszIniFile) noexcept {
-	if (StrNotEmpty(lpszIniFile)) {
+	if (StrIsEmpty(lpszIniFile)) {
+		return false;
+	}
+	WIN32_FILE_ATTRIBUTE_DATA data;
+	const BOOL success = GetFileAttributesEx(lpszIniFile, GetFileExInfoStandard, &data);
+	if (success) {
+		if ((data.dwFileAttributes & (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_READONLY)) != 0) {
+			return false;
+		}
+		if (data.nFileSizeLow >= 2 || data.nFileSizeHigh != 0) {
+			return true;
+		}
+	}
+	{
 		WCHAR *pwchTail = StrRChr(lpszIniFile, nullptr, L'\\');
 
 		if (pwchTail != nullptr) {
@@ -6726,7 +6810,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 			iCurPos = SciCall_GetCurrentPos();
 			iAnchorPos = SciCall_GetAnchor();
 			iLine = SciCall_LineFromPosition(iCurPos) + 1;
-			iCol = SciCall_GetColumn(iCurPos) + 1;
+			iCol = SciCall_GetColumn(iCurPos, iLine - 1) + 1;
 			iVisTopLine = SciCall_GetFirstVisibleLine();
 			iDocTopLine = SciCall_DocLineFromVisible(iVisTopLine);
 			iXOffset = SciCall_GetXOffset();
@@ -6938,8 +7022,12 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 		//DisableDelayedStatusBarRedraw(); // already set in MsgSize()
 		UpdateStatusbar();
 		UpdateWindowTitle();
+		if (hDlgWarnLineEnding) {
+			EndDialog(hDlgWarnLineEnding, IDCANCEL);
+			hDlgWarnLineEnding = nullptr;
+		}
 		// Show warning: Unicode file loaded as ANSI
-		if (status.bUnicodeErr) {
+		if (status.bUnicodeError) {
 			MsgBoxWarn(MB_OK, IDS_ERR_UNICODE);
 		}
 		// notify binary file opened in read only mode
@@ -6954,7 +7042,9 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 			// Set default button to "No" for diff/patch and unknown file.
 			// diff/patch file may contain content from files with different line endings.
 			status.bLineEndingsDefaultNo = bUnknownFile || pLexCurrent->iLexer == SCLEX_DIFF;
-			if (WarnLineEndingDlg(hwndMain, &status)) {
+			status.bInconsistent = false;
+			WarnLineEndingDlg(hwndMain, &status);
+			if (status.bInconsistent) {
 				ConvertLineEndings(status.iEOLMode);
 			}
 		}
@@ -7099,15 +7189,23 @@ bool FileSave(FileSaveFlag saveFlag) {
 			}
 			InstallFileWatching(false);
 			if (PathEqual(szCurFile, szIniFile)) {
+				const UINT previous = g_DarkModeStatus;
 				LoadFlags();
 				LoadSettings();
-				mruFile.Reload();
-				mruFind.Reload();
-				mruReplace.Reload();
-				if (np2StyleTheme == StyleTheme_Default) {
+				if (bSaveRecentFiles) {
+					mruFile.Reload();
+				}
+				if (bSaveFindReplace && mruFind.Initialized()) {
+					mruFind.Reload();
+					mruReplace.Reload();
+				}
+				if (previous != g_DarkModeStatus) {
+					DarkMode_OnDarkModeChange(hwndMain);
+				}
+				if (styleThemeActive == StyleTheme_Light) {
 					Style_LoadAll(static_cast<StyleLoadFlag>(StyleLoadFlag_Reload | StyleLoadFlag_Apply));
 				}
-			} else if (np2StyleTheme != StyleTheme_Default && PathEqual(szCurFile, darkStyleThemeFilePath)) {
+			} else if (styleThemeActive != StyleTheme_Light && PathEqual(szCurFile, darkStyleThemeFilePath)) {
 				Style_LoadAll(static_cast<StyleLoadFlag>(StyleLoadFlag_Reload | StyleLoadFlag_Apply));
 			}
 		}
@@ -7581,15 +7679,15 @@ void GetRelaunchParameters(LPWSTR szParameters, LPCWSTR lpszFile, RelaunchOption
 		const Sci_Position pos = SciCall_GetCurrentPos();
 		if (pos > 0) {
 			const Sci_Line line = SciCall_LineFromPosition(pos) + 1;
-			const Sci_Position col = SciCall_GetColumn(pos) + 1;
+			const Sci_Position col = SciCall_GetColumn(pos, line - 1) + 1;
 #if defined(_WIN64)
 			WCHAR tchLn[32];
 			WCHAR tchCol[32];
 			PosToStr(line, tchLn);
 			PosToStr(col, tchCol);
-			wsprintf(tch, L" -g %s,%s", tchLn, tchCol);
+			wsprintf(tch, L" -G %s,%s", tchLn, tchCol);
 #else
-			wsprintf(tch, L" -g %d,%d", static_cast<int>(line), static_cast<int>(col));
+			wsprintf(tch, L" -G %d,%d", static_cast<int>(line), static_cast<int>(col));
 #endif
 			lstrcat(szParameters, tch);
 		}
@@ -7816,6 +7914,7 @@ void ShowNotificationMessage(WPARAM notifyPos, UINT uidMessage, ...) noexcept {
 // InstallFileWatching()
 //
 //
+NP2_noinline
 void InstallFileWatching(bool terminate) noexcept {
 	terminate = terminate || iFileWatchingMode == FileWatchingMode_None || StrIsEmpty(szCurFile);
 	// Terminate
@@ -7840,7 +7939,7 @@ void InstallFileWatching(bool terminate) noexcept {
 		PathRemoveFileSpec(tchDirectory);
 
 		// Save data of current file
-		WIN32_FIND_DATA data;
+		WIN32_FILE_ATTRIBUTE_DATA data;
 		if (GetFileAttributesEx(szCurFile, GetFileExInfoStandard, &data)) {
 			memcpy(&fdCurFile, &data.ftLastWriteTime, sizeof(fdCurFile));
 		} else {
@@ -7863,7 +7962,7 @@ void InstallFileWatching(bool terminate) noexcept {
 
 static inline bool IsCurrentFileChangedOutsideApp() noexcept {
 	// Check if the file has been changed
-	WIN32_FIND_DATA fdUpdated;
+	WIN32_FILE_ATTRIBUTE_DATA fdUpdated;
 	if (!GetFileAttributesEx(szCurFile, GetFileExInfoStandard, &fdUpdated)) {
 		// The current file has been removed
 		return true;
@@ -8058,15 +8157,14 @@ void AutoSave_DoWork(FileSaveFlag saveFlag) noexcept {
 	}
 
 	WCHAR tchPath[MAX_PATH + 40];
-	LPCWSTR extension = L"bak";
+	LPCWSTR extension = L".bak";
 	if (Untitled) {
 		lstrcpy(tchPath, L"Untitled");
 	} else {
 		lstrcpy(tchPath, szCurFile);
 		LPWSTR lpszExt = StrChr(tchPath, L'.'); // address for first file extension
 		if (lpszExt) {
-			lpszExt[0] = L'\0';
-			extension = lpszExt + 1;
+			extension = lpszExt;
 		}
 	}
 
@@ -8077,10 +8175,14 @@ void AutoSave_DoWork(FileSaveFlag saveFlag) noexcept {
 	SYSTEMTIME lt;
 	GetLocalTime(&lt);
 	//printf("%u AutoSave at %02d:%02d:%02d.%03d\n", pid, lt.wHour, lt.wMinute, lt.wSecond, lt.wMilliseconds);
-	wsprintf(suffix, L" %04d%02d%02d %02d%02d%02d %03d%u.%s",
+	wsprintf(suffix, L" %04d%02d%02d %02d%02d%02d %03d%u%s",
 		lt.wYear, lt.wMonth, lt.wDay,
 		lt.wHour, lt.wMinute, lt.wSecond,
 		lt.wMilliseconds, pid, extension);
+	if (saveFlag == FileSaveFlag_SaveAlways) { // omit millisecond & pid for save backup
+		LPWSTR lpsz = StrRChr(suffix, nullptr, L' ');
+		lstrcpy(lpsz, extension);
+	}
 	lstrcat(tchPath, suffix);
 
 	// TODO: check free space with GetDiskFreeSpaceExW()

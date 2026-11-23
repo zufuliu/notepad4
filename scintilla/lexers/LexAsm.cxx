@@ -324,7 +324,7 @@ void ColouriseAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 constexpr bool IsAsmDefaultStyle(int style) noexcept {
 	return style == SCE_ASM_DEFAULT || style == SCE_ASM_IDENTIFIER;
 }
-bool IsEquLine(LexAccessor &styler, Sci_Line line) noexcept {
+bool IsEquLine(const LexAccessor &styler, Sci_Line line) noexcept {
 	if (line < 0) {
 		return false;
 	}
@@ -338,7 +338,7 @@ bool IsEquLine(LexAccessor &styler, Sci_Line line) noexcept {
 	}
 	return false;
 }
-bool IsAsmDefineLine(LexAccessor &styler, Sci_Line line) noexcept {
+bool IsAsmDefineLine(const LexAccessor &styler, Sci_Line line) noexcept {
 	if (line < 0) {
 		return false;
 	}

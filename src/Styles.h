@@ -83,7 +83,8 @@ enum StyleLoadFlag {
 
 extern PEDITLEXER pLexCurrent;
 extern int np2LexLangIndex;
-extern int np2StyleTheme;
+extern int styleThemeActive;
+extern int styleThemeSetting;
 extern WCHAR darkStyleThemeFilePath[MAX_PATH];
 
 void	Style_ReleaseResources() noexcept;
@@ -100,7 +101,7 @@ void	InitAutoCompletionCache(LPCEDITLEXER pLex) noexcept;
 void	Style_DetectBaseFontSize(HMONITOR hMonitor) noexcept;
 HFONT	Style_CreateCodeFont(UINT dpi) noexcept;
 void	Style_OnDPIChanged(LPCEDITLEXER pLex) noexcept;
-void	Style_OnStyleThemeChanged(int theme) noexcept;
+void	Style_OnStyleThemeChanged(HWND hwndOwner, int theme) noexcept;
 void	Style_InitDefaultColor() noexcept;
 void	Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) noexcept;
 bool	Style_SetLexerFromFile(LPCWSTR lpszFile) noexcept;
@@ -114,7 +115,7 @@ LPCWSTR Style_GetCurrentLexerName(LPWSTR lpszName, int cchName) noexcept;
 void	Style_SetLexerByLangIndex(int lang) noexcept;
 void	Style_UpdateSchemeMenu(HMENU hmenu) noexcept;
 
-void	Style_SetDefaultFont(HWND hwnd, bool bCode) noexcept;
+void	Style_SetDefaultFont(HWND hwndOwner, bool bCode) noexcept;
 void	Style_SetIndentGuides(bool bShow) noexcept;
 void	Style_SetBookmark() noexcept;
 void	Style_UpdateCaret() noexcept;
@@ -153,6 +154,6 @@ bool	Style_SelectColor(HWND hwnd, LPWSTR lpszStyle, int cchStyle, bool bFore) no
 void	Style_SetStyles(int iStyle, LPCWSTR lpszStyle) noexcept;
 
 int 	Style_GetLexerIconId(LPCEDITLEXER pLex, DWORD iconFlags) noexcept;
-void	Style_ConfigDlg(HWND hwnd) noexcept;
-void	Style_SelectLexerDlg(HWND hwnd, bool favorite) noexcept;
+void	Style_ConfigDlg(HWND hwndOwner) noexcept;
+void	Style_SelectLexerDlg(HWND hwndOwner, bool favorite) noexcept;
 bool	SelectCSVOptionsDlg() noexcept;

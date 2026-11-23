@@ -60,8 +60,7 @@ int MsgBox(UINT uType, UINT uIdMsg, ...) noexcept {
 	wvsprintf(szText, szBuf, va);
 	va_end(va);
 
-	WCHAR szTitle[128];
-	GetString(IDS_APPTITLE, szTitle, COUNTOF(szTitle));
+	GetString(IDS_APPTITLE, szBuf, COUNTOF(szBuf));
 
 	uType |= MB_SETFOREGROUND;
 	if (bWindowLayoutRTL) {
@@ -76,7 +75,7 @@ int MsgBox(UINT uType, UINT uIdMsg, ...) noexcept {
 
 	HWND hwnd = GetMsgBoxParent();
 	DialogHook_Start(DialogRefData_MessageBox);
-	const int result = MessageBoxEx(hwnd, szText, szTitle, uType, lang);
+	const int result = MessageBoxEx(hwnd, szText, szBuf, uType, lang);
 	DialogHook_Stop();
 	return result;
 }
@@ -568,6 +567,7 @@ static INT_PTR CALLBACK GeneralPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 		if (bReuseWindow) {
 			CheckDlgButton(hwnd, IDC_REUSEWINDOW, BST_CHECKED);
 		}
+		DarkMode_InitDialog(hwnd, DialogRefData_PropSheetPage);
 		return TRUE;
 
 	case WM_NOTIFY:
@@ -660,6 +660,7 @@ static INT_PTR CALLBACK AdvancedPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 			EnableWindow(GetDlgItem(hwnd, IDC_ESCMIN), FALSE);
 			EnableWindow(GetDlgItem(hwnd, IDC_ESCEXIT), FALSE);
 		}
+		DarkMode_InitDialog(hwnd, DialogRefData_PropSheetPage);
 		return TRUE;
 
 	case WM_COMMAND:
@@ -716,6 +717,7 @@ static INT_PTR CALLBACK AdvancedPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 //  ItemsPageProc
 //
 //
+extern int styleThemeSetting;
 extern bool     bDefColorNoFilter;
 extern bool     bDefColorFilter;
 extern COLORREF colorNoFilter;
@@ -763,9 +765,25 @@ INT_PTR CALLBACK ItemsPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPara
 			CheckRadioButton(hwnd, IDC_COLOR_DEF2, IDC_COLOR_CUST2, IDC_COLOR_CUST2);
 		}
 
+		HWND hwndCtl = GetDlgItem(hwnd, IDC_APP_THEME_LIST);
+		WCHAR szText[256];
+		GetString(IDS_APP_THEME_LIST, szText, COUNTOF(szText));
+		lstrcat(szText, L"|");
+		LPWSTR p1 = szText;
+		LPWSTR p2;
+		while ((p2 = StrChr(p1, L'|')) != nullptr) {
+			*p2++ = L'\0';
+			if (*p1) {
+				ComboBox_AddString(hwndCtl, p1);
+			}
+			p1 = p2;
+		}
+
+		ComboBox_SetCurSel(hwndCtl, styleThemeSetting + 1);
+		ComboBox_SetExtendedUI(hwndCtl, TRUE);
+
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
-		HWND hwndCtl = GetDlgItem(hwnd, IDC_LANGUAGE_LIST);
-		WCHAR szText[128];
+		hwndCtl = GetDlgItem(hwnd, IDC_LANGUAGE_LIST);
 		for (UINT rid = IDS_LANG_USER_DEFAULT; rid <= IDS_LANG_LAST_LANGUAGE; rid++) {
 			GetString(rid, szText, COUNTOF(szText));
 			ComboBox_AddString(hwndCtl, szText);
@@ -773,6 +791,7 @@ INT_PTR CALLBACK ItemsPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPara
 		ComboBox_SetCurSel(hwndCtl, languageResID - IDS_LANG_USER_DEFAULT);
 		ComboBox_SetExtendedUI(hwndCtl, TRUE);
 #endif
+		DarkMode_InitDialog(hwnd, DialogRefData_PropSheetPage);
 	}
 	return TRUE;
 
@@ -808,7 +827,9 @@ INT_PTR CALLBACK ItemsPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPara
 			cc.lpCustColors = colorCustom;
 			cc.Flags = CC_RGBINIT | CC_SOLIDCOLOR;
 
+			DialogHook_Start(DialogRefData_ChooseColor);
 			const BOOL result = ChooseColor(&cc);
+			DialogHook_Stop();
 			if (result) {
 				if (LOWORD(wParam) == IDC_COLOR_PICK1) {
 					DeleteObject(m_hbrNoFilter);
@@ -837,6 +858,7 @@ INT_PTR CALLBACK ItemsPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPara
 			colorNoFilter = m_colorNoFilter;
 			colorFilter = m_colorFilter;
 
+			styleThemeSetting = static_cast<int>(SendDlgItemMessage(hwnd, IDC_APP_THEME_LIST, CB_GETCURSEL, 0, 0)) - 1;
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
 			SetUILanguage(static_cast<int>(SendDlgItemMessage(hwnd, IDC_LANGUAGE_LIST, CB_GETCURSEL, 0, 0)) + IDS_LANG_USER_DEFAULT);
 #endif
@@ -1021,6 +1043,7 @@ INT_PTR CALLBACK ProgPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 			EnableWindow(GetDlgItem(hwnd, IDC_ENABLE_JUMP_LIST), FALSE);
 			Edit_SetReadOnly(hwndName, TRUE);
 		}
+		DarkMode_InitDialog(hwnd, DialogRefData_PropSheetPage);
 	}
 	return TRUE;
 
@@ -1173,8 +1196,9 @@ INT_PTR OptionsPropSheet(HWND hwnd, HINSTANCE hInstance) noexcept {
 	psh.nStartPage  = 0;
 	psh.ppsp        = psp;
 
+	DialogHook_Start(DialogRefData_PropSheetMain);
 	const INT_PTR nResult = PropertySheet(&psh);
-
+	DialogHook_Stop();
 	for (UINT index = 0; index < COUNTOF(psp); index++) {
 		NP2HeapFree(const_cast<DLGTEMPLATE *>(psp[index].pResource));
 	}
@@ -1192,16 +1216,14 @@ INT_PTR OptionsPropSheet(HWND hwnd, HINSTANCE hInstance) noexcept {
 			exStyle |= LVS_EX_FULLROWSELECT;
 		}
 		ListView_SetExtendedListViewStyleEx(hwndDirList, mask, exStyle);
-		SetWindowTheme(hwndDirList, ((exStyle & LVS_EX_FULLROWSELECT) ? L"Explorer" : L"Listview"), nullptr);
-
-		COLORREF color = GetSysColor(COLOR_WINDOWTEXT);
-		if (!StrEqualEx(tchFilter, L"*.*") || bNegFilter) {
-			color = bDefColorFilter ? color : colorFilter;
+		const UINT previous = g_DarkModeStatus;
+		DarkMode_ResolveStyleTheme(styleThemeSetting);
+		if (previous != g_DarkModeStatus) {
+			DarkMode_OnDarkModeChange(hwnd);
 		} else {
-			color = bDefColorNoFilter ? color : colorNoFilter;
+			DarkMode_SetFileListViewTheme(hwndDirList, exStyle & LVS_EX_FULLROWSELECT);
+			DarkMode_SetFileListViewColor(hwndDirList, true);
 		}
-		ListView_SetTextColor(hwndDirList, color);
-		ListView_RedrawItems(hwndDirList, 0, ListView_GetItemCount(hwndDirList) - 1);
 	}
 
 	return nResult;

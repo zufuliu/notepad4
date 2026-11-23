@@ -33,7 +33,7 @@ public:
 
 	explicit Range(Sci::Position pos = 0) noexcept :
 		start(pos), end(pos) {}
-	Range(Sci::Position start_, Sci::Position end_) noexcept :
+	constexpr Range(Sci::Position start_, Sci::Position end_) noexcept :
 		start(start_), end(end_) {}
 
 	bool operator==(const Range &other) const noexcept {
@@ -46,10 +46,6 @@ public:
 
 	[[nodiscard]] bool Empty() const noexcept {
 		return start == end;
-	}
-
-	[[nodiscard]] Sci::Position Length() const noexcept {
-		return std::abs(end - start);
 	}
 
 	[[nodiscard]] Sci::Position First() const noexcept {
@@ -86,6 +82,52 @@ public:
 			Contains(other.end) ||
 			other.Contains(start) ||
 			other.Contains(end);
+	}
+};
+
+/**
+ * The ForwardRange class represents a range of text in a document.
+ * It is ordered so that the start is always less than or equal to the end.
+ */
+class ForwardRange {
+	Sci::Position start = 0;
+	Sci::Position end = 0;
+public:
+	constexpr ForwardRange() noexcept = default;
+
+	constexpr ForwardRange(Sci::Position start_, Sci::Position end_) noexcept :
+		start(start_), end(end_) {
+		PLATFORM_ASSERT(start_ <= end_);
+	}
+
+	explicit constexpr ForwardRange(const Range &range) noexcept :
+		start(range.start), end(range.end) {
+		PLATFORM_ASSERT(start <= end);
+	}
+
+	explicit constexpr operator Range() const noexcept {
+		return { start, end };
+	}
+
+	bool operator==(const ForwardRange &other) const noexcept {
+		return (start == other.start) && (end == other.end);
+	}
+
+	[[nodiscard]] bool Empty() const noexcept {
+		return start == end;
+	}
+
+	[[nodiscard]] Sci::Position First() const noexcept {
+		return start;
+	}
+
+	[[nodiscard]] Sci::Position Last() const noexcept {
+		return end;
+	}
+
+	// Is the character after pos within the range?
+	[[nodiscard]] bool ContainsCharacter(Sci::Position pos) const noexcept {
+		return (pos >= start && pos < end);
 	}
 };
 
@@ -352,9 +394,10 @@ public:
 	/// Can also be SC_CP_UTF8 to enable UTF-8 mode
 	int dbcsCodePage = Scintilla::CpUtf8;
 	Scintilla::LineEndType lineEndBitSet = Scintilla::LineEndType::Default;
-	int tabInChars = 8;
+	static constexpr int standardTabSize = 8;
+	int tabInChars = standardTabSize;
 	int indentInChars = 0;
-	int actualIndentInChars = 8;
+	int actualIndentInChars = standardTabSize;
 	bool useTabs = true;
 	bool tabIndents = true;
 	uint8_t backspaceUnindents = false;
@@ -423,6 +466,7 @@ public:
 	Sci::Position GetRelativePositionUTF16(Sci::Position positionStart, Sci::Position characterOffset) const noexcept;
 	int SCI_METHOD GetCharacterAndWidth(Sci_Position position, Sci_Position *pWidth) const noexcept override;
 	CharacterClass SCI_METHOD GetCharacterClass(unsigned int ch) const noexcept override;
+	void SCI_METHOD GetBufferView(SplitView &cbView, SplitView &styleView) const noexcept override;
 	int SCI_METHOD CodePage() const noexcept override;
 	bool SCI_METHOD IsDBCSLeadByte(unsigned char ch) const noexcept override;
 	bool IsDBCSLeadByteNoExcept(unsigned char ch) const noexcept {
@@ -546,11 +590,11 @@ public:
 	int SCI_METHOD GetLineIndentation(Sci_Line line) const noexcept override;
 	Sci::Position SetLineIndentation(Sci::Line line, Sci::Position indent);
 	Sci::Position GetLineIndentPosition(Sci::Line line) const noexcept;
-	Sci::Position GetColumn(Sci::Position pos) const noexcept;
+	Sci::Position GetColumn(Sci::Position pos, Sci::Line line = -1) const noexcept;
 	Sci::Position CountCharacters(Sci::Position startPos, Sci::Position endPos) const noexcept;
 	void CountCharactersAndColumns(Scintilla::sptr_t lParam) const noexcept;
 	Sci::Position CountUTF16(Sci::Position startPos, Sci::Position endPos) const noexcept;
-	Sci::Position FindColumn(Sci::Line line, Sci::Position column) const noexcept;
+	Sci::Position FindColumn(Sci::Line line, Sci::Position column, Sci::Position endPos = -1, Scintilla::ColumnType type = Scintilla::ColumnType::Default) const noexcept;
 	void Indent(bool forwards, Sci::Line lineBottom, Sci::Line lineTop);
 	static std::string TransformLineEnds(std::string_view s, Scintilla::EndOfLine eolModeWanted);
 	void ConvertLineEnds(Scintilla::EndOfLine eolModeSet);
@@ -568,6 +612,7 @@ public:
 
 	void DelChar(Sci::Position pos);
 	void DelCharBack(Sci::Position pos);
+	Sci::Position BackSpace(Sci::Position caretPosition, bool allowLineStartDeletion);
 
 	char CharAt(Sci::Position position) const noexcept {
 		return cb.CharAt(position);
@@ -575,7 +620,7 @@ public:
 	unsigned char UCharAt(Sci::Position position) const noexcept {
 		return cb.UCharAt(position);
 	}
-	void SCI_METHOD GetCharRange(char *buffer, Sci_Position position, Sci_Position lengthRetrieve) const noexcept override {
+	void GetCharRange(char *buffer, Sci_Position position, Sci_Position lengthRetrieve) const noexcept {
 		cb.GetCharRange(buffer, position, lengthRetrieve);
 	}
 	unsigned char SCI_METHOD StyleAt(Sci_Position position) const noexcept override {
@@ -601,7 +646,6 @@ public:
 	int MarkerNumberFromLine(Sci::Line line, int which) const noexcept;
 	int MarkerHandleFromLine(Sci::Line line, int which) const noexcept;
 	Sci_Position SCI_METHOD LineStart(Sci_Line line) const noexcept override;
-	[[nodiscard]] Range LineRange(Sci::Line line) const noexcept;
 	bool IsLineStartPosition(Sci::Position position) const noexcept;
 	Sci_Position SCI_METHOD LineEnd(Sci_Line line) const noexcept override;
 	Sci::Position LineStartPosition(Sci::Position position) const noexcept;
@@ -662,7 +706,7 @@ public:
 	int CharacterCategoryOptimization() const noexcept;
 #endif
 	void SCI_METHOD StartStyling(Sci_Position position) noexcept override;
-	bool SCI_METHOD SetStyleFor(Sci_Position length, unsigned char style) override;
+	bool SCI_METHOD SetStyleFor(Sci_Position length, int style) override;
 	bool SCI_METHOD SetStyles(Sci_Position length, const unsigned char *styles) override;
 	Sci::Position GetEndStyled() const noexcept {
 		return endStyled;
@@ -723,7 +767,7 @@ public:
 	int IndentSize() const noexcept {
 		return actualIndentInChars;
 	}
-	Sci::Position BraceMatch(Sci::Position position, Sci::Position maxReStyle, Sci::Position startPos, bool useStartPos) const noexcept;
+	Sci::Position BraceMatch(Sci::Position position, Sci::Position startPos) const noexcept;
 
 private:
 	void NotifyModifyAttempt() noexcept;
@@ -760,14 +804,8 @@ public:
 	UndoGroup &operator=(UndoGroup &&) = delete;
 	~UndoGroup() {
 		if (groupNeeded) {
-			// EndUndoAction can throw as it allocates but throw in destructor is fatal.
-			// To fix this UndoHistory should allocate any memory needed by EndUndoAction
-			// beforehand or change EndUndoAction to not require allocation.
 			pdoc->EndUndoAction();
 		}
-	}
-	[[nodiscard]] constexpr bool Needed() const noexcept {
-		return groupNeeded;
 	}
 };
 

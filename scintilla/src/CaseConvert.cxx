@@ -593,6 +593,7 @@ class CaseConverter final : public ICaseConverter {
 	struct CharacterConversion {
 		int character = 0;
 		ConversionString conversion;
+		// Empty case: NUL -> "".
 		constexpr CharacterConversion() noexcept = default;
 		CharacterConversion(int character_, const char *conversion_) noexcept : character(character_) {
 			memcpy(conversion.conversion, conversion_, maxConversionLength + 1);
@@ -619,10 +620,9 @@ public:
 		const auto it = std::lower_bound(characters.begin(), characters.end(), character);
 		if (it == characters.end())
 			return nullptr;
-		else if (*it == character)
+		if (*it == character)
 			return conversions[it - characters.begin()].conversion;
-		else
-			return nullptr;
+		return nullptr;
 	}
 	size_t CaseConvertString(char *converted, size_t sizeConverted, const char *mixed, size_t lenMixed) const override {
 		size_t lenConverted = 0;

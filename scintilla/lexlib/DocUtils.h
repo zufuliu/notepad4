@@ -40,8 +40,6 @@ inline bool IsHtmlCommentDelimiter(const StyleContext &sc) noexcept {
 }
 
 #define SCE_H_VOID_TAG		SCE_H_TAGEND
-#define js_style(style)		((style) + SCE_PHP_LABEL + 1)
-#define css_style(style)	((style) + SCE_PHP_LABEL + SCE_JS_LABEL + 2)
 
 constexpr bool IsJsSpaceEquiv(int state) noexcept {
 	return (state >= js_style(SCE_JS_DEFAULT) && state <= js_style(SCE_JS_TASKMARKER));
@@ -80,6 +78,10 @@ constexpr bool IsCssIdentifierChar(int ch) noexcept {
 constexpr bool IsCssIdentifierStart(int ch, int chNext) noexcept {
 	return IsIdentifierStartEx(ch)
 		|| ((ch == '-' || ch == '@') && IsCssIdentifierNext(chNext));
+}
+
+constexpr bool IsCssDimensionStart(int ch, int chNext) noexcept {
+	return ch >= 0x80 || (ch == '-' && IsCssIdentifierNext(chNext));
 }
 
 }

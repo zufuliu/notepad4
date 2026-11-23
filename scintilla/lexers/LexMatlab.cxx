@@ -40,37 +40,37 @@ bool IsLineCommentStart(int lexType, const StyleContext &sc, int visibleChars) n
 		|| (ch == '/' && chNext == '/'); // Scilab
 }
 
-bool IsNestedCommentStart(int lexType, int ch, int chNext, int visibleChars, LexAccessor &styler, Sci_PositionU currentPos) noexcept {
+bool IsNestedCommentStart(int lexType, int ch, int chNext, int visibleChars, const LexAccessor &styler, Sci_PositionU currentPos) noexcept {
 	return visibleChars == 0 && chNext == '{'
 		&& ((lexType == LEX_MATLAB && ch == '%') || (lexType == LEX_OCTAVE && (ch == '%' || ch == '#')))
 		&& IsLexSpaceToEOL(styler, currentPos + 2);
 }
 
-bool IsNestedCommentEnd(int lexType, int ch, int chNext, int visibleChars, LexAccessor &styler, Sci_PositionU currentPos) noexcept {
+bool IsNestedCommentEnd(int lexType, int ch, int chNext, int visibleChars, const LexAccessor &styler, Sci_PositionU currentPos) noexcept {
 	return visibleChars == 0 && chNext == '}'
 		&& ((lexType == LEX_MATLAB && ch == '%') || (lexType == LEX_OCTAVE && (ch == '%' || ch == '#')))
 		&& IsLexSpaceToEOL(styler, currentPos + 2);
 }
 
-bool IsBlockCommentStart(int lexType, int ch, int chNext, int visibleChars, LexAccessor &styler, Sci_PositionU currentPos) noexcept {
+bool IsBlockCommentStart(int lexType, int ch, int chNext, int visibleChars, const LexAccessor &styler, Sci_PositionU currentPos) noexcept {
 	return IsNestedCommentStart(lexType, ch, chNext, visibleChars, styler, currentPos)
 		|| (ch == '/' && chNext == '*'); // Scilab
 }
 
-bool IsBlockCommentEnd(int lexType, int ch, int chNext, int visibleChars, LexAccessor &styler, Sci_PositionU currentPos) noexcept {
+bool IsBlockCommentEnd(int lexType, int ch, int chNext, int visibleChars, const LexAccessor &styler, Sci_PositionU currentPos) noexcept {
 	return IsNestedCommentEnd(lexType, ch, chNext, visibleChars, styler, currentPos)
 		|| (ch == '*' && chNext == '/'); // Scilab
 }
 
-bool IsBlockCommentStart(int lexType, StyleContext &sc, int visibleChars) noexcept {
+bool IsBlockCommentStart(int lexType, const StyleContext &sc, int visibleChars) noexcept {
 	return IsBlockCommentStart(lexType, sc.ch, sc.chNext, visibleChars, sc.styler, sc.currentPos);
 }
 
-bool IsBlockCommentEnd(int lexType, StyleContext &sc, int visibleChars) noexcept {
+bool IsBlockCommentEnd(int lexType, const StyleContext &sc, int visibleChars) noexcept {
 	return IsBlockCommentEnd(lexType, sc.ch, sc.chNext, visibleChars, sc.styler, sc.currentPos);
 }
 
-bool IsNestedCommentStart(int lexType, StyleContext &sc, int visibleChars) noexcept {
+bool IsNestedCommentStart(int lexType, const StyleContext &sc, int visibleChars) noexcept {
 	return IsNestedCommentStart(lexType, sc.ch, sc.chNext, visibleChars, sc.styler, sc.currentPos);
 }
 

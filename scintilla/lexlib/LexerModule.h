@@ -11,10 +11,10 @@ namespace Lexilla {
 class Accessor;
 class WordList;
 
-typedef const WordList (&LexerWordList)[KEYWORDSET_MAX];
+using LexerWordList = const WordList (&)[KEYWORDSET_MAX];
 
-typedef void (*LexerFunction)(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler);
-typedef Scintilla::ILexer5 *(*LexerFactoryFunction)();
+using LexerFunction = void (*)(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler);
+using LexerFactoryFunction = Scintilla::ILexer5 *(*)();
 
 /**
  * A LexerModule is responsible for lexing and folding a particular language.
@@ -50,11 +50,11 @@ public:
 		languageName(languageName_) {
 	}
 
-	constexpr int GetLanguage() const noexcept {
+	[[nodiscard]] constexpr int GetLanguage() const noexcept {
 		return language;
 	}
 
-	Scintilla::ILexer5 *Create() const;
+	[[nodiscard]] Scintilla::ILexer5 *Create() const;
 
 	static const LexerModule *Find(int language_) noexcept;
 };

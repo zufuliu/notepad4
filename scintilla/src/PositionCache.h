@@ -103,18 +103,30 @@ public:
 	bool InLine(int offset, int line) const noexcept;
 	int SubLineFromPosition(int posInLine, PointEnd pe) const noexcept;
 	void AddLineStart(Sci::Position start) noexcept;
-	void SetBracesHighlight(Range rangeLine, const Sci::Position braces[],
+	void SetBracesHighlight(ForwardRange rangeLine, const Sci::Position braces[],
 		unsigned char bracesMatchStyle, int xHighlight, bool ignoreStyle) noexcept;
-	void RestoreBracesHighlight(Range rangeLine, const Sci::Position braces[], bool ignoreStyle) noexcept;
+	void RestoreBracesHighlight(ForwardRange rangeLine, const Sci::Position braces[], bool ignoreStyle) noexcept;
 	int SCICALL FindBefore(XYPOSITION x, Range range) const noexcept;
 	int SCICALL FindPositionFromX(XYPOSITION x, Range range, bool charPosition) const noexcept;
 	Point PointFromPosition(int posInLine, int lineHeight, PointEnd pe) const noexcept;
 	XYPOSITION XInLine(Sci::Position index) const noexcept;
-	Interval Span(int start, int end) const noexcept;
-	Interval SpanByte(int index) const noexcept;
+	[[nodiscard]] Interval Span(int start, int end) const noexcept;
+	[[nodiscard]] Interval SpanByte(int index) const noexcept;
 	int EndLineStyle() const noexcept;
 	[[nodiscard]] int LastStyle() const noexcept;
 	void SCICALL WrapLine(const Document *pdoc, Sci::Position posLineStart, Wrap wrapState, XYPOSITION wrapWidth, XYPOSITION wrapIndent_, bool partialLine) noexcept;
+
+	// XPositions
+	[[nodiscard]] XYPOSITION *PositionsFor(unsigned index) const noexcept {
+		return positions + index;
+	}
+	template <typename T>
+	[[nodiscard]] XYPOSITION GetPosition(T index) const noexcept {
+		return positions[index];
+	}
+	[[nodiscard]] XYPOSITION GetWidth(size_t end, size_t start) const noexcept {
+		return positions[end] - positions[start];
+	}
 };
 
 struct ScreenLine final : public IScreenLine {
@@ -255,7 +267,7 @@ struct TextSegment {
 	const int start;
 	const int length;
 	const Representation * const representation;
-	int end() const noexcept {
+	[[nodiscard]] int end() const noexcept {
 		return start + length;
 	}
 };
@@ -280,13 +292,10 @@ class BreakFinder {
 public:
 	// If a whole run is longer than lengthStartSubdivision then subdivide
 	// into smaller runs at spaces or punctuation.
-	enum {
-		lengthStartSubdivision = 4096
-	};
+	static constexpr int lengthStartSubdivision = 4096;
 	// Try to make each subdivided run lengthEachSubdivision or shorter.
-	enum {
-		lengthEachSubdivision = 1024
-	};
+	static constexpr int lengthEachSubdivision = 1024;
+
 	enum class BreakFor {
 		Text = 0,
 		Selection = 1,
@@ -294,7 +303,7 @@ public:
 		ForegroundAndSelection = 3,
 		Layout = 4,
 	};
-	BreakFinder(const LineLayout *ll_, const Selection *psel, Range lineRange, Sci::Position posLineStart,
+	BreakFinder(const LineLayout *ll_, const Selection *psel, ForwardRange lineRange_, Sci::Position posLineStart,
 		XYPOSITION xStart, BreakFor breakFor, const EditModel &model, const ViewStyle *pvsDraw, uint32_t posInLine);
 	// Deleted so BreakFinder objects can not be copied.
 	BreakFinder(const BreakFinder &) = delete;

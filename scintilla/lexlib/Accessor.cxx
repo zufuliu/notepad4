@@ -33,7 +33,7 @@ int Accessor::GetPropertyInt(const char *key, size_t keyLen, int defaultValue) c
 	return props.GetInt(key, keyLen, defaultValue);
 }
 
-int Accessor::IndentAmount(Sci_Line line) noexcept {
+int Accessor::IndentAmount(Sci_Line line) const noexcept {
 	const Sci_Position end = Length();
 	Sci_Position pos = LineStart(line);
 

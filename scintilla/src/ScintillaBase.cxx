@@ -270,8 +270,7 @@ void ScintillaBase::AutoCompleteInsert(Sci::Position startPos, Sci::Position rem
 		// MultiAutoComplete::Each
 		for (size_t r = 0; r < sel.Count(); r++) {
 			if (!RangeContainsProtected(sel.Range(r))) {
-				Sci::Position positionInsert = sel.Range(r).Start().Position();
-				positionInsert = RealizeVirtualSpace(positionInsert, sel.Range(r).caret.VirtualSpace());
+				Sci::Position positionInsert = RealizeVirtualSpace(sel.Range(r).Start()).Position();
 				if (positionInsert - removeLen >= 0) {
 					positionInsert -= removeLen;
 					pdoc->DeleteChars(positionInsert, removeLen);
@@ -1408,13 +1407,23 @@ void Document::HighlightUrl(Sci_PositionU startPos, Sci_Position length, const u
 						Sci_PositionU pos = startPos - 5;
 						while (true) {
 							ch = cbView[pos];
-							if (pos == backPos || pos + kMaxSchemeNameLength < startPos || !(kUrlCharClass[ch] & UrlCharMask_SchemeName) || StyleIndexAt(pos) != initStyle) {
+							if (!(kUrlCharClass[ch] & UrlCharMask_SchemeName)) {
 								break;
 							}
+							if (StyleIndexAt(pos) != initStyle) {
+								++pos;
+								ch = chPrev;
+								break;
+							}
+							if (pos == backPos || pos + kMaxSchemeNameLength < startPos) {
+								break;
+							}
+							chPrev = ch;
 							--pos;
 						}
 						if (IsDBCSLeadByte(ch)) {
 							++pos;
+							ch = chPrev;
 						}
 						chPrev = '\0';
 						while (pos < startPos && !IsAlpha(ch)) {
@@ -1479,7 +1488,8 @@ void Document::HighlightUrl(Sci_PositionU startPos, Sci_Position length, const u
 				}
 				if (invalid) {
 					const int offset = (!punctuation || ch == '/' || (ch == ')' && parenCount == 0)) ? 0 : 1;
-					DecorationFillRange(backPos, 1, startPos - backPos - offset);
+					const Sci::Position linkLen = startPos - backPos - offset;
+					DecorationFillRange(backPos, 1, linkLen);
 					backPos = startPos;
 					result = AutoLink::None;
 					break;

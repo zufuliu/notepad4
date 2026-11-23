@@ -93,7 +93,7 @@ constexpr bool IsSpaceEquiv(int state) noexcept {
 
 void ColouriseHaxeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	int lineStateLineType = 0;
-	bool insideRegexRange = false; // inside regex character range []
+	bool insideRegexCharacterClass = false; // inside regex character class []
 
 	KeywordType kwType = KeywordType::None;
 	int chBeforeIdentifier = 0;
@@ -255,8 +255,8 @@ void ColouriseHaxeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			if (sc.ch == '\\') {
 				sc.Forward();
 			} else if (sc.ch == '[' || sc.ch == ']') {
-				insideRegexRange = sc.ch == '[';
-			} else if (sc.ch == '/' && !insideRegexRange) {
+				insideRegexCharacterClass = sc.ch == '[';
+			} else if (sc.ch == '/' && !insideRegexCharacterClass) {
 				sc.Forward();
 				// regex flags
 				while (IsLowerCase(sc.ch)) {
@@ -310,7 +310,7 @@ void ColouriseHaxeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				}
 				continue;
 			} else if (sc.Match('~', '/')) {
-				insideRegexRange = false;
+				insideRegexCharacterClass = false;
 				sc.SetState(SCE_HAXE_REGEX);
 				sc.Forward();
 			} else if ( sc.ch == '\'') {

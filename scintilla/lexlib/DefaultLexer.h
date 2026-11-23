@@ -19,6 +19,10 @@ class DefaultLexer : public Scintilla::ILexer5 {
 	OptionSetInterface *osi = nullptr;
 public:
 	DefaultLexer(const char *languageName_, int language_) noexcept;
+	DefaultLexer(const DefaultLexer &) = delete;
+	DefaultLexer(DefaultLexer &&) = delete;
+	DefaultLexer &operator=(const DefaultLexer &) = delete;
+	DefaultLexer &operator=(DefaultLexer &&) = delete;
 	virtual ~DefaultLexer();
 	void SetOptionSet(OptionSetInterface *osi_) noexcept {
 		this->osi = osi_;

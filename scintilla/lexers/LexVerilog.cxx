@@ -111,7 +111,7 @@ constexpr bool IsFormatSpecifier(char ch) noexcept {
 					'x', 'X');
 }
 
-inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &styler, bool insideUrl) noexcept {
+inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, const LexAccessor &styler, bool insideUrl) noexcept {
 	if (sc.chNext == '%') {
 		return 2;
 	}
@@ -148,7 +148,7 @@ inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &st
 	return 0;
 }
 
-inline bool FindClockingEvent(LexAccessor &styler, Sci_PositionU startPos, Sci_PositionU endPos) noexcept {
+inline bool FindClockingEvent(const LexAccessor &styler, Sci_PositionU startPos, Sci_PositionU endPos) noexcept {
 	// clocking [clocking_identifier] clocking_event
 	enum class ClockingState {
 		BeforeIdentifier,

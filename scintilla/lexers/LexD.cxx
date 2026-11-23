@@ -162,7 +162,7 @@ constexpr bool IsFormatSpecifier(char ch) noexcept {
 }
 
 // https://dlang.org/phobos/std_format.html
-Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &styler, bool insideUrl) noexcept {
+Sci_Position CheckFormatSpecifier(const StyleContext &sc, const LexAccessor &styler, bool insideUrl) noexcept {
 	if (sc.chNext == '%' || sc.chNext == '(' || sc.chNext == '|' || sc.chNext == ')') {
 		return 2;
 	}
@@ -599,7 +599,7 @@ void ColouriseDDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 			} else if (IsIdentifierStartEx(sc.ch)) {
 				chBefore = chPrevNonWhite;
 				sc.SetState(SCE_D_IDENTIFIER);
-			} else if (IsAGraphic(sc.ch) && sc.ch != '\\') {
+			} else if (IsAGraphic(sc.ch)) {
 				sc.SetState(SCE_D_OPERATOR);
 				if (asmState == InlineAssembler::Keyword && sc.ch == '{') {
 					const int chNext = sc.GetDocNextChar(true);

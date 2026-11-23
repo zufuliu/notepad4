@@ -317,7 +317,7 @@ inline bool IsFoldWord(const char *word) noexcept {
 		|| StrEqualsAny(word, "tableswitch", "lookupswitch", "constant-pool", "attribute");
 }
 // field/parameter with annotation?
-bool IsAnnotationLine(LexAccessor &styler, Sci_Line line) noexcept {
+bool IsAnnotationLine(const LexAccessor &styler, Sci_Line line) noexcept {
 	Sci_Line scan_line = 10;
 	while (scan_line-- > 0) {
 		const Sci_Position startPos = styler.LineStart(line);

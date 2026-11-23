@@ -51,7 +51,7 @@ bool	SelectEncodingDlg(HWND hwnd, int *pidREncoding, UINT uidLabel) noexcept;
 bool	SelectDefLineEndingDlg(HWND hwnd) noexcept;
 
 struct EditFileIOStatus;
-bool	WarnLineEndingDlg(HWND hwnd, EditFileIOStatus *status) noexcept;
+void	WarnLineEndingDlg(HWND hwnd, EditFileIOStatus *status) noexcept;
 void	InitZoomLevelComboBox(HWND hwnd, int nCtlId, int zoomLevel) noexcept;
 bool	GetZoomLevelComboBoxValue(HWND hwnd, int nCtrId, int *zoomLevel) noexcept;
 void	ZoomLevelDlg(HWND hwnd, bool bBottom) noexcept;

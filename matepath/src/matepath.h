@@ -29,7 +29,7 @@
 					 (WS_CLIPCHILDREN | WS_POPUP))
 
 //==== Data Type for WM_COPYDATA ==============================================
-#define DATA_MATEPATH_PATHARG 0xFB30
+#define DATA_MATEPATH_PATHARG (0xFB30 + sizeof(void *))
 
 //==== ComboBox Control =======================================================
 //#define WC_COMBOBOX L"ComboBox"
@@ -106,6 +106,14 @@ enum TargetApplicationMode {
 	TargetApplicationMode_None = 0,
 	TargetApplicationMode_SendMsg,
 	TargetApplicationMode_UseDDE,
+};
+
+enum {
+	StyleTheme_System = -1,
+	StyleTheme_Light = 0,
+	StyleTheme_Dark = 1,
+	StyleTheme_Max = StyleTheme_Dark,
+	StyleTheme_AppDefault = StyleTheme_System,
 };
 
 #define INI_SECTION_NAME_MATEPATH			L"matepath"

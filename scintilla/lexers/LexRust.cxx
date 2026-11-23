@@ -90,7 +90,7 @@ constexpr bool IsStringStyle(int state) noexcept {
 }
 
 // https://doc.rust-lang.org/std/fmt/#syntax
-Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &styler) noexcept {
+Sci_Position CheckFormatSpecifier(const StyleContext &sc, const LexAccessor &styler) noexcept {
 	Sci_PositionU pos = sc.currentPos + 1; // ':'
 	char ch = static_cast<char>(sc.chNext);
 	// [[fill] align]

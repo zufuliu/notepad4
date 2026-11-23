@@ -104,7 +104,7 @@ EXIT /B
 
 
 :Sub_GCC_i686
-SET "PATH=C:\msys64\mingw32\bin;C:\msys64\usr\bin;%PATH%"
+SET "PATH=C:\msys64\mingw32\bin;C:\msys64\ucrt64\bin;C:\msys64\usr\bin;%PATH%"
 IF "%CLANG%" == "1" (
     mingw32-make CLANG=1 LTO=1 %JOBS% %ACTION%
 ) ELSE (

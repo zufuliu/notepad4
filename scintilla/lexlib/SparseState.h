@@ -18,10 +18,10 @@ class SparseState {
 		constexpr State(Sci_Position position_, T value_) noexcept :
 			position(position_), value(std::move(value_)) {
 		}
-		inline bool operator<(const State &other) const noexcept {
+		bool operator<(const State &other) const noexcept {
 			return position < other.position;
 		}
-		inline bool operator==(const State &other) const noexcept {
+		bool operator==(const State &other) const noexcept {
 			return (position == other.position) && (value == other.value);
 		}
 	};
@@ -53,12 +53,11 @@ public:
 		typename stateVector::iterator low = Find(position);
 		if (low == states.end()) {
 			return states[states.size() - 1].value;
-		} else {
-			if (low->position > position) {
-				--low;
-			}
-			return low->value;
 		}
+		if (low->position > position) {
+			--low;
+		}
+		return low->value;
 	}
 	bool Delete(Sci_Position position) {
 		const typename stateVector::iterator low = Find(position);
@@ -68,7 +67,12 @@ public:
 		}
 		return false;
 	}
-	size_t size() const noexcept {
+	[[nodiscard]] T StartAt(Sci_Position position) {
+		// Called to restart lexing from a line, so truncate state on or after this line then return the state before this line
+		Delete(position);
+		return ValueAt(position);
+	}
+	[[nodiscard]] size_t size() const noexcept {
 		return states.size();
 	}
 

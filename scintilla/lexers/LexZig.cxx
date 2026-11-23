@@ -83,7 +83,7 @@ constexpr bool IsFormatArgument(int ch, FormatArgument fmtArgument) noexcept {
 	return IsADigit(ch) || (fmtArgument == FormatArgument::Identifier && IsIdentifierCharEx(ch));
 }
 
-inline Sci_Position CheckBraceFormatSpecifier(const StyleContext &sc, LexAccessor &styler) noexcept {
+inline Sci_Position CheckBraceFormatSpecifier(const StyleContext &sc, const LexAccessor &styler) noexcept {
 	Sci_PositionU pos = sc.currentPos;
 	char ch = static_cast<char>(sc.ch);
 	// [specifier]

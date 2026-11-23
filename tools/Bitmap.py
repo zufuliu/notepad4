@@ -830,7 +830,7 @@ class Bitmap:
 				break
 
 		if not best:
-			best = sorted(value for value in reduced.values() if value[0] < colorCount)[-1]
+			best = max(value for value in reduced.values() if value[0] < colorCount)
 		reduced = dict((key, value[0]) for key, value in reduced.items())
 		return reduced, *best
 

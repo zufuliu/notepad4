@@ -263,11 +263,11 @@ BEGIN
     ICON            IDR_MAINWND,IDC_STATIC,14,7,20,20
     LTEXT           "",IDC_VERSION,45,7,200,8
     LTEXT           "",IDC_BUILD_INFO,45,18,200,8
-    LTEXT           "Copyright © 2011-2026 Zufu Liu and all contributors.",IDC_STATIC,45,30,200,8
+    LTEXT           "Copyright © 2011-2026 &Zufu Liu and all contributors.",IDC_STATIC,45,30,200,8
     CONTROL         "",IDC_NEW_PAGE_LINK,"SysLink",WS_TABSTOP,45,40,200,10
-    LTEXT           "Copyright © 1996-2012 Florian Balmer.",IDC_STATIC,45,52,200,8
+    LTEXT           "Copyright © 1996-2012 &Florian Balmer.",IDC_STATIC,45,52,200,8
     CONTROL         "",IDC_WEBPAGE_LINK,"SysLink",WS_TABSTOP,45,60,200,10
-    LTEXT           "Contact Florian Balmer:",IDC_STATIC,45,72,94,8
+    LTEXT           "Contact Florian &Balmer:",IDC_STATIC,45,72,94,8
     CONTROL         "",IDC_EMAIL_LINK,"SysLink",WS_TABSTOP,45,80,94,10
 END
 
@@ -330,7 +330,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "Renomear"
 FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
-    LTEXT           "Atual:",IDC_STATIC,7,9,28,8,SS_RIGHT
+    LTEXT           "&Atual:",IDC_STATIC,7,9,28,8,SS_RIGHT
     EDITTEXT        IDC_OLDNAME,39,7,126,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
     LTEXT           "&Novo:",IDC_STATIC,7,27,28,8,SS_RIGHT
     EDITTEXT        IDC_NEWNAME,39,26,126,14,ES_AUTOHSCROLL
@@ -356,7 +356,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "Copiar/Mover"
 FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
-    LTEXT           "Fonte:",IDC_STATIC,7,7,26,8
+    LTEXT           "&Fonte:",IDC_STATIC,7,7,26,8
     EDITTEXT        IDC_SOURCE,7,18,216,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
     LTEXT           "&Destino:",IDC_STATIC,7,37,40,8
     COMBOBOX        IDC_DESTINATION,7,48,199,105,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
@@ -420,8 +420,9 @@ CAPTION "Aparência"
 FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
     ICON            IDI_ITEMS,IDC_STATIC,10,10,21,20
-    LTEXT           "Aparência do matepath.",IDC_STATIC,40,15,160,8
-    GROUPBOX        "Aparência dos itens na lista de diretórios",IDC_STATIC,10,41,205,109
+    LTEXT           "Aparência do matepath.",IDC_STATIC,40,15,122,8
+    COMBOBOX        IDC_APP_THEME_LIST,162,15,60,50,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Aparência dos itens na lista de diretórios",IDC_STATIC,10,41,212,109
     LTEXT           "Use esta cor de texto quando NENHUM FILTRO estiver ATIVADO:",IDC_STATIC,20,54,170,8
     AUTORADIOBUTTON "Cor padrão do Windows.",IDC_COLOR_DEF1,20,68,96,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "Personalizado e cor:",IDC_COLOR_CUST1,20,82,60,10,WS_TABSTOP
@@ -542,6 +543,7 @@ BEGIN
 	IDS_NUMFILES			"%s Object(s)"
 	IDS_NUMFILES_FILTER		"%s Object(s) | Filter"
 	IDS_SAVEFILE			"Salvando ""%s""..."
+	IDS_APP_THEME_LIST		"Follow System|Light|Dark"
     IDS_LINKDESCRIPTION     "Abrir no matePath"
 END
 

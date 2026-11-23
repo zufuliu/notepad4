@@ -171,6 +171,7 @@ BEGIN
 		MENUITEM "Propriet&à...",					IDM_FILE_PROPERTIES
 		MENUITEM "Apri la cartella con&tenente",		IDM_FILE_OPEN_CONTAINING_FOLDER
 		MENUITEM "Crea collegamento sul Des&ktop",			IDM_FILE_CREATELINK
+		MENUITEM "Aggiorna orario ultima modifica",				IDM_FILE_UPDATE_TIMESTAMP
 		MENUITEM SEPARATOR
 		MENUITEM "Navi&ga...\tCtrl+M",				IDM_FILE_BROWSE
 		POPUP "Prefer&iti"
@@ -499,7 +500,8 @@ BEGIN
 		MENUITEM "&Usa lo stile predefinito per il codice\tShift+F12",	IDM_VIEW_USEDEFAULT_CODESTYLE
 		POPUP "St&ile Tema"
 		BEGIN
-			MENUITEM "&Predefinito",					IDM_VIEW_STYLE_THEME_DEFAULT
+			MENUITEM "Follow &System",				IDM_VIEW_STYLE_THEME_SYSTEM
+			MENUITEM "&Light",					IDM_VIEW_STYLE_THEME_LIGHT
 			MENUITEM "&Scuro",						IDM_VIEW_STYLE_THEME_DARK
 		END
 		MENUITEM SEPARATOR
@@ -508,7 +510,7 @@ BEGIN
 			MENUITEM "&File di testo",					IDM_LEXER_TEXTFILE
 			MENUITEM "&2° File di testo",				IDM_LEXER_2NDTEXTFILE
 		END
-		MENUITEM "File CS&V...",						IDM_LEXER_CSV
+		MENUITEM "F&ile CSV...",						IDM_LEXER_CSV
 		POPUP "Foglio di stile C&SS"
 		BEGIN
 			MENUITEM "Foglio di stile &CSS",			IDM_LEXER_CSS
@@ -528,6 +530,7 @@ BEGIN
 			MENUITEM "Codice Sorgente &Web",			IDM_LEXER_WEB
 			MENUITEM "Pagina &PHP",					IDM_LEXER_PHP
 			MENUITEM "Pagina &JSP",					IDM_LEXER_JSP
+			MENUITEM "JSP &XML",					IDM_LEXER_JSPX
 			MENUITEM "ASP.NET (&C#)",				IDM_LEXER_ASPX_CS
 			MENUITEM "ASP.NET (&VB.NET)",			IDM_LEXER_ASPX_VB
 			MENUITEM "ASP (V&BScript)",				IDM_LEXER_ASP_VBS
@@ -542,7 +545,7 @@ BEGIN
 		END
 		POPUP "&Math"
 		BEGIN
-			MENUITEM "Mathematica",					IDM_LEXER_MATHEMATICA
+			MENUITEM "M&athematica",					IDM_LEXER_MATHEMATICA
 			MENUITEM "&MATLAB",						IDM_LEXER_MATLAB
 			MENUITEM "&Octave",						IDM_LEXER_OCTAVE
 			MENUITEM "&Scilab",						IDM_LEXER_SCILAB
@@ -567,7 +570,7 @@ BEGIN
 			MENUITEM "Foglio di stile XSL&T",	IDM_LEXER_XSLT
 			MENUITEM "XML &DTD",					IDM_LEXER_DTD
 			MENUITEM "Lista &Propriertà",				IDM_LEXER_PROPERTY_LIST
-			//MENUITEM "SV&G Document",				IDM_LEXER_SVG
+			MENUITEM "SV&G Document",				IDM_LEXER_SVG
 		END
 	END
 	POPUP "&Impostazioni"
@@ -772,7 +775,7 @@ BEGIN
 			MENUITEM "Rimuovi Caratteri Escape HTML/&XML\tAlt+Shift+H",	IDM_EDIT_XHTML_UNESCAPE_CHAR
 			MENUITEM SEPARATOR
 			MENUITEM "Codifica &URL\tCtrl+Shift+E",				IDM_EDIT_URLENCODE
-			MENUITEM "Codifica componente URL",					IDM_EDIT_URLCOMPONENTENCODE
+			MENUITEM "Codifica c&omponente URL",					IDM_EDIT_URLCOMPONENTENCODE
 			MENUITEM "Decodifica UR&L\tCtrl+Shift+R",				IDM_EDIT_URLDECODE
 		END
 	END
@@ -1077,15 +1080,15 @@ BEGIN
     ICON            IDR_MAINWND,IDC_STATIC,14,7,20,20
     LTEXT           "",IDC_VERSION,45,7,200,8
     LTEXT           "",IDC_BUILD_INFO,45,18,200,16
-    LTEXT           "Copyright © 2011-2026 Zufu Liu e tutti i contributori.",IDC_STATIC,45,38,200,8
+    LTEXT           "Copyright © 2011-2026 &Zufu Liu e tutti i contributori.",IDC_STATIC,45,38,200,8
     CONTROL         "",IDC_NEW_PAGE_LINK,"SysLink",WS_TABSTOP,45,48,200,10
-    LTEXT           "Copyright © 2010-2017 XhmikosR e tutti i contributori.",IDC_STATIC,45,60,200,8
+    LTEXT           "Copyright © 2010-2017 &XhmikosR e tutti i contributori.",IDC_STATIC,45,60,200,8
     CONTROL         "",IDC_MOD_PAGE_LINK,"SysLink",WS_TABSTOP,45,68,200,10
-    LTEXT           "Copyright © 2004-2012 Florian Balmer.",IDC_STATIC,45,80,200,8
+    LTEXT           "Copyright © 2004-2012 &Florian Balmer.",IDC_STATIC,45,80,200,8
     CONTROL         "",IDC_WEBPAGE_LINK,"SysLink",WS_TABSTOP,45,88,200,10
-    LTEXT           "Contatta Florian Balmer:",IDC_STATIC,45,100,94,8
+    LTEXT           "Contatta Florian &Balmer:",IDC_STATIC,45,100,94,8
     CONTROL         "",IDC_EMAIL_LINK,"SysLink",WS_TABSTOP,45,108,94,10
-    LTEXT           "Visita il sito web Scintilla:",IDC_STATIC,45,120,94,8
+    LTEXT           "Visita il sito web &Scintilla:",IDC_STATIC,45,120,94,8
     CONTROL         "",IDC_SCI_PAGE_LINK,"SysLink",WS_TABSTOP,45,128,94,10
 END
 
@@ -1156,7 +1159,7 @@ BEGIN
     AUTOCHECKBOX    "Segnalibro abbinato a linea",IDC_FINDALLBOOKMARK,132,102,91,10,WS_TABSTOP
     AUTOCHECKBOX    "Usa Boost Regex",IDC_FIND_CXXREGEX,132,114,90,10,WS_TABSTOP
     AUTOCHECKBOX    "Usa font monospa&ziato",IDC_USEMONOSPACEDFONT,132,126,90,10,WS_TABSTOP
-    CONTROL         "<a>V&ai a Trova (Ctrl+F)</a>",IDC_TOGGLEFINDREPLACE, "SysLink",WS_TABSTOP,140,139,80,10
+    CONTROL         "<a>Vai a Trova (Ctrl+F)</a>",IDC_TOGGLEFINDREPLACE, "SysLink",WS_TABSTOP,140,139,80,10
     CONTROL         "<a>Salva Posizione</a>",IDC_SAVEPOSITION,"SysLink",WS_TABSTOP,223,126,60,10
     CONTROL         "<a>Resetta Posizione</a>",IDC_RESETPOSITION,"SysLink",WS_TABSTOP,223,138,60,10
     SCROLLBAR       IDC_RESIZEGRIP2,230,138,10,10,SBS_SIZEGRIP | WS_CLIPSIBLINGS
@@ -1213,7 +1216,7 @@ FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
     LTEXT           "Codifica predefinita:",IDC_STATIC,7,7,195,8
     EDITTEXT        IDC_ENCODING_LABEL,7,20,195,14,ES_READONLY | ES_AUTOHSCROLL | WS_TABSTOP
-    CONTROL         "<a>Clicca qui per &selezionare la codifica predefinita.</a>",IDC_ENCODING_LINK,"SysLink",WS_TABSTOP,7,38,195,10
+    CONTROL         "<a>Clicca qui per selezionare la codifica predefinita.</a>",IDC_ENCODING_LINK,"SysLink",WS_TABSTOP,7,38,195,10
     AUTOCHECKBOX    "Salta il rilevamento statistico e &Unicode (UTF-16).",IDC_NOUNICODEDETECTION,7,52,195,10,WS_TABSTOP
     AUTOCHECKBOX    "Apri file &ASCII a 7 bit in modalità UTF-8.",IDC_ASCIIASUTF8,7,62,195,10,WS_TABSTOP
     AUTOCHECKBOX    "Apri i file ANSI (codifica sconosciuta) in modalità UTF-&8.",IDC_ANSIASUTF8,7,72,195,10,WS_TABSTOP
@@ -1613,33 +1616,33 @@ CAPTION "Impostazioni Autocompletamento"
 FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
     GROUPBOX        "",IDC_STATIC,7,7,218,98
-    AUTOCHECKBOX    "Autocompletamento parole durante la digitazione",IDC_AUTO_COMPLETE_WORD,14,6,160,10,WS_TABSTOP
-    LTEXT           "Elementi visibili nell'elenco di completamento:",IDC_STATIC,14,18,148,10,SS_RIGHT
+    AUTOCHECKBOX    "&Autocompletamento parole durante la digitazione",IDC_AUTO_COMPLETE_WORD,14,6,160,10,WS_TABSTOP
+    LTEXT           "Elementi visibili nell'&elenco di completamento:",IDC_STATIC,14,18,148,10,SS_RIGHT
     EDITTEXT        IDC_AUTOC_VISIBLE_ITEM_COUNT,166,16,50,12,ES_NUMBER | WS_TABSTOP
-    LTEXT           "Lunghezza minima della parola:",IDC_STATIC,14,34,148,10,SS_RIGHT
+    LTEXT           "&Lunghezza minima della parola:",IDC_STATIC,14,34,148,10,SS_RIGHT
     EDITTEXT        IDC_AUTOC_MIN_WORD_LENGTH,166,32,50,12,ES_NUMBER | WS_TABSTOP
-    LTEXT           "Lunghezza minima del numero (senza prefisso):",IDC_STATIC,14,50,148,10,SS_RIGHT
+    LTEXT           "Lunghezza minima del &numero (senza prefisso):",IDC_STATIC,14,50,148,10,SS_RIGHT
     EDITTEXT        IDC_AUTOC_MIN_NUMBER_LENGTH,166,48,50,12,ES_NUMBER | WS_TABSTOP
-    AUTOCHECKBOX    "Scansione delle parole nel documento ogni:",IDC_AUTOC_SCAN_DOCUMENT_WORDS,14,68,150,10,WS_TABSTOP
+    AUTOCHECKBOX    "Scansione delle parole nel &documento ogni:",IDC_AUTOC_SCAN_DOCUMENT_WORDS,14,68,150,10,WS_TABSTOP
     EDITTEXT        IDC_AUTOC_SCAN_WORDS_TIMEOUT,166,64,50,12,WS_TABSTOP
-    AUTOCHECKBOX    "Utilizza solo le parole del documento corrente.",IDC_AUTOC_ONLY_DOCUMENT_WORDS,14,80,200,10,WS_TABSTOP
-    AUTOCHECKBOX    "Attiva il completamento solo in modalità IME inglese.",IDC_AUTOC_ENGLISH_IME_ONLY,14,92,200,10,WS_TABSTOP
+    AUTOCHECKBOX    "Utilizza solo le parole del documento &corrente.",IDC_AUTOC_ONLY_DOCUMENT_WORDS,14,80,200,10,WS_TABSTOP
+    AUTOCHECKBOX    "Attiva il completamento solo in modalità IME in&glese.",IDC_AUTOC_ENGLISH_IME_ONLY,14,92,200,10,WS_TABSTOP
 
     GROUPBOX        "Autocompleta parole in:",IDC_STATIC,7,111,218,26
     AUTOCHECKBOX    "Commenti",IDC_AUTO_COMPLETE_INSIDE_COMMONT,14,123,65,10,WS_TABSTOP
     AUTOCHECKBOX    "Stringhe",IDC_AUTO_COMPLETE_INSIDE_STRING,85,123,65,10,WS_TABSTOP
     AUTOCHECKBOX    "Testi semplici",IDC_AUTO_COMPLETE_INSIDE_PLAINTEXT,156,123,65,10,WS_TABSTOP
     GROUPBOX        "Tasti per applicare l'autocompletamento (usa Esc per annullare)",IDC_STATIC,7,143,218,44
-    AUTOCHECKBOX    "Invio",IDC_AUTOC_FILLUP_ENTER,14,155,65,10,WS_TABSTOP
-    AUTOCHECKBOX    "Tab",IDC_AUTOC_FILLUP_TAB,85,155,65,10,WS_TABSTOP
-    AUTOCHECKBOX    "Spazio",IDC_AUTOC_FILLUP_SPACE,156,155,65,10,WS_TABSTOP
-    AUTOCHECKBOX    "Punteggiatura:",IDC_AUTOC_FILLUP_PUNCTUATION,14,173,55,10,WS_TABSTOP
+    AUTOCHECKBOX    "&Invio",IDC_AUTOC_FILLUP_ENTER,14,155,65,10,WS_TABSTOP
+    AUTOCHECKBOX    "&Tab",IDC_AUTOC_FILLUP_TAB,85,155,65,10,WS_TABSTOP
+    AUTOCHECKBOX    "&Spazio",IDC_AUTOC_FILLUP_SPACE,156,155,65,10,WS_TABSTOP
+    AUTOCHECKBOX    "&Punteggiatura:",IDC_AUTOC_FILLUP_PUNCTUATION,14,173,55,10,WS_TABSTOP
     EDITTEXT        IDC_AUTOC_FILLUP_PUNCTUATION_LIST,72,170,144,12,WS_TABSTOP
 
-    AUTOCHECKBOX    "Indenta automaticamente testo.",IDC_AUTO_INDENT_TEXT,231,7,200,10,WS_TABSTOP
-    AUTOCHECKBOX    "Chiudi automaticamente i tag HTML and XML.",IDC_AUTO_CLOSE_TAGS,231,19,200,10,WS_TABSTOP
-    AUTOCHECKBOX    "Inserisci automaticamente 1 spazio dopo la virgola (,) se opportuno.",IDC_AUTO_INSERT_SPACE_COMMA,231,31,222,10,WS_TABSTOP
-    AUTOCHECKBOX    "Inserisci 1 spazio dopo il marcatore di commento nella linea.",IDC_AUTO_INSERT_SPACE_COMMENT,231,43,222,10,WS_TABSTOP
+    AUTOCHECKBOX    "Indenta automaticamente test&o.",IDC_AUTO_INDENT_TEXT,231,7,200,10,WS_TABSTOP
+    AUTOCHECKBOX    "Chiudi automaticamente i tag &HTML and XML.",IDC_AUTO_CLOSE_TAGS,231,19,200,10,WS_TABSTOP
+    AUTOCHECKBOX    "Inserisci automaticamente 1 spazio dopo la &virgola (,) se opportuno.",IDC_AUTO_INSERT_SPACE_COMMA,231,31,222,10,WS_TABSTOP
+    AUTOCHECKBOX    "Inserisci &1 spazio dopo il marcatore di commento nella linea.",IDC_AUTO_INSERT_SPACE_COMMENT,231,43,222,10,WS_TABSTOP
     GROUPBOX        "Chiudi automaticamente parentesi graffe e virgolette",IDC_STATIC,231,56,218,49
     AUTOCHECKBOX    "( )",IDC_AUTO_INSERT_PARENTHESIS,238,68,40,10,WS_TABSTOP
     AUTOCHECKBOX    "{ }",IDC_AUTO_INSERT_BRACE,290,68,40,10,WS_TABSTOP
@@ -2042,7 +2045,7 @@ BEGIN
 	IDS_EOLMODENAME_LF				"Unix/macOS (LF)"
 	IDS_EOLMODENAME_CR				"Mac OS Classico (CR)"
 
-	IDS_CONFIG_THEME_TITLE_DEFAULT	"Personalizza Schemi - Tema Predefinito"
+	IDS_CONFIG_THEME_TITLE_LIGHT	"Personalizza Schemi - Tema Light"
 	IDS_CONFIG_THEME_TITLE_DARK		"Personalizza Schemi - Tema scuro"
 	IDS_FAVORITE_SCHEMES_TITLE		"Schemi Preferiti"
 	IDS_CUSTOMIZE_SCHEMES_HELP		"Le estensioni dei file devono essere separate da un punto e virgola (;)\r\n\

@@ -37,12 +37,9 @@ struct DLDATA {
 	bool bNoFadeHidden;			// Flag passed from GetDispInfo()
 	LPITEMIDLIST pidl;			// Directory Id
 	LPSHELLFOLDER lpsf;			// IShellFolder Interface to pidl
-	WCHAR szPath[MAX_PATH];		// Pathname to Directory Id
 	int iDefIconFolder;			// Default Folder Icon
 	int iDefIconFile;			// Default File Icon
-	HANDLE hExitThread;			// Flag is set when Icon Thread should terminate
-	HANDLE hTerminatedThread;	// Flag is set when Icon Thread has terminated
-	HANDLE hIconThread;
+	WCHAR szPath[MAX_PATH];		// Pathname to Directory Id
 };
 
 //==== Property Name ==========================================================
@@ -163,18 +160,16 @@ int DirList_Fill(HWND hwnd, LPCWSTR lpszDir, DWORD grfFlags, LPCWSTR lpszFileSpe
 	lvi.cchTextMax = MAX_PATH;
 	lvi.iImage = I_IMAGECALLBACK;
 
-	WCHAR wszDir[MAX_PATH];
-	lstrcpy(wszDir, lpszDir);
-
 	// Get Desktop Folder
 	LPSHELLFOLDER lpsfDesktop = nullptr;
 	PIDLIST_RELATIVE pidl = nullptr;
 	LPSHELLFOLDER lpsf = nullptr;
 	if (S_OK == SHGetDesktopFolder(&lpsfDesktop)) {
-		// Convert wszDir into a pidl
+		// Convert lpszDir into a pidl
+		lstrcpy(shfi.szDisplayName, lpszDir);
 		ULONG chParsed = 0;
 		ULONG dwAttributes = 0;
-		if (S_OK == lpsfDesktop->ParseDisplayName(hwnd, nullptr, wszDir, &chParsed, &pidl, &dwAttributes)) {
+		if (S_OK == lpsfDesktop->ParseDisplayName(hwnd, nullptr, shfi.szDisplayName, &chParsed, &pidl, &dwAttributes)) {
 			// Bind pidl to IShellFolder
 			if (S_OK == lpsfDesktop->BindToObject(pidl, nullptr, IID_IShellFolder, AsPPVArgs(&lpsf))) {
 				// Create an Enumeration object for lpsf
@@ -543,11 +538,12 @@ bool DirList_PropertyDlg(HWND hwnd, int iItem) {
 	LV_ITEMDATA *lplvid = AsPointer<LV_ITEMDATA *>(lvi.lParam);
 	LPCONTEXTMENU lpcm;
 
-	if (S_OK == lplvid->lpsf->GetUIObjectOf(GetParent(hwnd), 1, reinterpret_cast<PCUITEMID_CHILD_ARRAY>(&lplvid->pidl), IID_IContextMenu, nullptr, AsPPVArgs(&lpcm))) {
+	HWND hwndOwner = GetParent(hwnd);
+	if (S_OK == lplvid->lpsf->GetUIObjectOf(hwndOwner, 1, reinterpret_cast<PCUITEMID_CHILD_ARRAY>(&lplvid->pidl), IID_IContextMenu, nullptr, AsPPVArgs(&lpcm))) {
 		CMINVOKECOMMANDINFO cmi;
 		cmi.cbSize = sizeof(CMINVOKECOMMANDINFO);
 		cmi.fMask = 0;
-		cmi.hwnd = GetParent(hwnd);
+		cmi.hwnd = hwndOwner;
 		cmi.lpVerb = "properties";
 		cmi.lpParameters = nullptr;
 		cmi.lpDirectory = nullptr;
@@ -584,7 +580,8 @@ void DirList_DoDragDrop(HWND hwnd, LPARAM lParam) {
 	if (ListView_GetItem(hwnd, &lvi)) {
 		LV_ITEMDATA *lplvid = AsPointer<LV_ITEMDATA *>(lvi.lParam);
 		LPDATAOBJECT lpdo;
-		if (SUCCEEDED(lplvid->lpsf->GetUIObjectOf(GetParent(hwnd), 1, reinterpret_cast<PCUITEMID_CHILD_ARRAY>(&lplvid->pidl), IID_IDataObject, nullptr, AsPPVArgs(&lpdo)))) {
+		HWND hwndOwner = GetParent(hwnd);
+		if (SUCCEEDED(lplvid->lpsf->GetUIObjectOf(hwndOwner, 1, reinterpret_cast<PCUITEMID_CHILD_ARRAY>(&lplvid->pidl), IID_IDataObject, nullptr, AsPPVArgs(&lpdo)))) {
 			CDropSource lpds;
 			DWORD dwEffect;
 
@@ -933,11 +930,12 @@ bool DriveBox_PropertyDlg(HWND hwnd) {
 	const DC_ITEMDATA * const lpdcid = AsPointer<const DC_ITEMDATA *>(cbei.lParam);
 	LPCONTEXTMENU lpcm;
 
-	if (S_OK == lpdcid->lpsf->GetUIObjectOf(GetParent(hwnd), 1, reinterpret_cast<PCUITEMID_CHILD_ARRAY>(&lpdcid->pidl), IID_IContextMenu, nullptr, AsPPVArgs(&lpcm))) {
+	HWND hwndOwner = GetParent(hwnd);
+	if (S_OK == lpdcid->lpsf->GetUIObjectOf(hwndOwner, 1, reinterpret_cast<PCUITEMID_CHILD_ARRAY>(&lpdcid->pidl), IID_IContextMenu, nullptr, AsPPVArgs(&lpcm))) {
 		CMINVOKECOMMANDINFO cmi;
 		cmi.cbSize = sizeof(CMINVOKECOMMANDINFO);
 		cmi.fMask = 0;
-		cmi.hwnd = GetParent(hwnd);
+		cmi.hwnd = hwndOwner;
 		cmi.lpVerb = "properties";
 		cmi.lpParameters = nullptr;
 		cmi.lpDirectory = nullptr;

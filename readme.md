@@ -51,7 +51,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* [C Standard Library](tools/lang/C.c), up to C23.
 		* [C++ STL](tools/lang/CPP.cpp), up to C++23.
 	* [Cangjie (仓颉)](tools/lang/Cangjie.cj), up to Cangjie 2025.
-	* [CSS Style Sheet](tools/lang/CSS.css), up to May 2026.
+	* [CSS Style Sheet](tools/lang/CSS.css), up to October 2026.
 		* [SCSS Style Sheet](tools/lang/SCSS.scss), up to Dart Sass 1.50.
 		* [Less Style Sheet](tools/lang/Less.less), up to Less 4.1.
 		* [HSS Style Sheet](tools/lang/HSS.hss)
@@ -76,10 +76,10 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [Groovy](tools/lang/Groovy.groovy), up to Groovy 5.0.
 	* [Haskell](tools/lang/Haskell.hs), up to GHC 9.6.
 	* [Haxe](tools/lang/Haxe.hx), up to Haxe 4.3.
-	* [HTML](tools/lang/html.html), up to [WHATWG](https://html.spec.whatwg.org/multipage/) May 2026. [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#html)
+	* [HTML](tools/lang/html.html), up to [WHATWG](https://html.spec.whatwg.org/multipage/) October 2026. [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#html)
 		* ASP
 		* ASP.NET
-		* JSP
+		* JSP and JSP XML Syntax
 		* PHP
 	* INI Configuration File
 	* [Inno Setup](tools/lang/InnoSetup.iss), up to Inno Setup 6.2.
@@ -117,7 +117,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [Perl](tools/lang/Perl.pl), up to Perl 5.42. [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#perl)
 	* [PowerBuilder](tools/lang/PowerBuilder.srf), up to PowerBuilder 2025.
 	* [PowerShell](tools/lang/PowerShell.ps1), up to PowerShell 7.2.
-	* [Python](tools/lang/Python.py), up to Python 3.14. [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#python)
+	* [Python](tools/lang/Python.py), up to Python 3.15. [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#python)
 	* [PHP Script](tools/lang/PHP.php), up to PHP 8.5. [Screenshots](https://github.com/zufuliu/notepad4/wiki/Screenshots#php)
 	* Windows Rescouce Script
 	* [R](tools/lang/R.r), up to R 4.2.
@@ -155,6 +155,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* [XML Stylesheet](https://www.w3.org/Style/XSL/)
 		* SGML and DTD
 		* Apple Property List
+		* [SVG](https://www.w3.org/TR/SVG2/)
 	* [YAML Document](https://yaml.org/)
 	* [Zig](tools/lang/Zig.zig), up to Zig 0.13.
 	* Many Others
@@ -168,6 +169,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 * Improved support for NFO ANSI art
 * Support various [Windows system integration](https://github.com/zufuliu/notepad4/wiki/System-Integration)
 * Support high DPI display with HD version
+* Support [dark mode UI](https://github.com/ozone10/win32-darkmodelib) on Windows 10 and later system
 * Support rendering using Direct2D DirectWrite, and switch between GDI and Direct2D
 * Support font ligature with font like [FiraCode](https://github.com/tonsky/FiraCode) in Direct2D mode
 * Support color font (Windows 8.1 and above) in Direct2D mode, useful to display color [Emoji](https://unicode.org/emoji/charts/full-emoji-list.html) 😊 and others
@@ -208,7 +210,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [French](https://github.com/zufuliu/notepad4/tree/main/locale/fr) by [@VoilierBleu](https://github.com/VoilierBleu)
 	* [Italiano](https://github.com/zufuliu/notepad4/tree/main/locale/it) by [@Matteo-Nigro](https://github.com/Matteo-Nigro)
 	* [Polish](https://github.com/zufuliu/notepad4/tree/main/locale/pl) by [@kbabol](https://github.com/kbabol) and [@miroslaw-zylewicz](https://github.com/miroslaw-zylewicz)
-	* [Português (Brasil)](https://github.com/zufuliu/notepad4/tree/main/locale/pt-BR) by [@DAVIDVS-PR1MVS](https://github.com/DAVIDVS-PR1MVS)
+	* [Português (Brasil)](https://github.com/zufuliu/notepad4/tree/main/locale/pt-BR) by [@MrDaveun](https://github.com/MrDaveun)
 	* [Русский](https://github.com/zufuliu/notepad4/tree/main/locale/ru) by [@tretdm](https://github.com/tretdm) and [@Dimmitrius](https://github.com/Dimmitrius)
 	* [日本語](https://github.com/zufuliu/notepad4/tree/main/locale/ja) by [@maboroshin](https://github.com/maboroshin)
 	* [中文 (繁體)](https://github.com/zufuliu/notepad4/tree/main/locale/zh-Hant)

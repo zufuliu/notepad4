@@ -84,12 +84,12 @@ namespace Scintilla::Internal {
 // Underlying the implementation of the platform classes are platform specific types.
 // Sometimes these need to be passed around by client code so they are defined here
 
-typedef void *SurfaceID;
-typedef void *WindowID;
-typedef void *MenuID;
-typedef void *TickerID;
-typedef void *Function;
-typedef void *IdlerID;
+using SurfaceID = void *;
+using WindowID = void *;
+using MenuID = void *;
+using TickerID = void *;
+using Function = void *;
+using IdlerID = void *;
 
 /**
  * Font management.
@@ -110,13 +110,13 @@ struct FontParameters {
 
 	constexpr explicit FontParameters(
 		const char *faceName_,
-		XYPOSITION size_ = 10,
-		Scintilla::FontWeight weight_ = Scintilla::FontWeight::Normal,
-		Scintilla::FontStretch stretch_ = Scintilla::FontStretch::Normal,
-		bool italic_ = false,
-		Scintilla::FontQuality extraFontFlag_ = Scintilla::FontQuality::QualityDefault,
-		Scintilla::Technology technology_ = Scintilla::Technology::Default,
-		Scintilla::CharacterSet characterSet_ = Scintilla::CharacterSet::Default,
+		XYPOSITION size_,
+		Scintilla::FontWeight weight_,
+		Scintilla::FontStretch stretch_,
+		bool italic_,
+		Scintilla::FontQuality extraFontFlag_,
+		Scintilla::Technology technology_,
+		Scintilla::CharacterSet characterSet_,
 		const char *localeName_ = localeNameDefault) noexcept :
 
 		faceName(faceName_),

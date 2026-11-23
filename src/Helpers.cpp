@@ -749,6 +749,42 @@ bool VerifyContrast(COLORREF cr1, COLORREF cr2) noexcept {
 #endif
 }
 
+void MakeDarkModeBitmap(HBITMAP hbmp) noexcept {
+	BITMAP bmp;
+	if (!GetObject(hbmp, sizeof(BITMAP), &bmp) || bmp.bmBitsPixel != 32 || bmp.bmBits == nullptr) {
+		return;
+	}
+
+	const ULONG count = bmp.bmWidth * bmp.bmHeight;
+	RGBQUAD *prgba = static_cast<RGBQUAD *>(bmp.bmBits);
+
+	for (ULONG x = 0; x < count; ++x) {
+		const int alpha = prgba[x].rgbReserved;
+		if (alpha == 0) {
+			continue;
+		}
+
+		const int red = prgba[x].rgbRed;
+		const int green = prgba[x].rgbGreen;
+		const int blue = prgba[x].rgbBlue;
+
+		const int maxChroma = max(max(red, green), blue);
+		const int minChroma = min(min(red, green), blue);
+		const int effectiveChroma = (maxChroma - minChroma) * 2;
+		if (effectiveChroma >= alpha) {
+			continue; // Preserve colorful icons
+		}
+
+		// Invert lightness for achromatic lines/fills (capped at ~88% to avoid glare)
+		const int targetSum = (alpha * 225) / 255;
+		const int delta = ((targetSum - (maxChroma + minChroma)) * (alpha - effectiveChroma)) / alpha;
+
+		prgba[x].rgbRed = static_cast<BYTE>(clamp(red + delta, 0, alpha));
+		prgba[x].rgbGreen = static_cast<BYTE>(clamp(green + delta, 0, alpha));
+		prgba[x].rgbBlue = static_cast<BYTE>(clamp(blue + delta, 0, alpha));
+	}
+}
+
 //=============================================================================
 //
 // IsFontAvailable()
@@ -763,6 +799,7 @@ static int CALLBACK EnumFontFamExProc(CONST LOGFONT *plf, CONST TEXTMETRIC *ptm,
 	return FALSE;
 }
 
+NP2_noinline
 BOOL IsFontAvailable(LPCWSTR lpszFontName) noexcept {
 	BOOL fFound = FALSE;
 
@@ -2343,13 +2380,16 @@ void ComboBox_AddStringA2W(UINT uCP, HWND hwnd, LPCSTR lpString) noexcept {
 //
 // MRU functions
 //
-void MRUList::Init(LPCWSTR pszRegKey, int capacity_, int flags) noexcept {
+NP2_noinline
+void MRUList::Init(LPCWSTR pszRegKey, int capacity_, int flags, bool save) noexcept {
 	iSize = 0;
 	capacity = capacity_;
 	iFlags = flags;
 	szRegKey = pszRegKey;
 	pszItems = static_cast<LPWSTR *>(NP2HeapAlloc(sizeof(LPWSTR) * capacity_));
-	Load();
+	if (save) {
+		Load();
+	}
 }
 
 static inline bool MRU_Equal(int flags, LPCWSTR psz1, LPCWSTR psz2) noexcept {
@@ -2402,9 +2442,9 @@ void MRUList::Delete(int iIndex) noexcept {
 	}
 }
 
-void MRUList::DeleteFileFromStore(LPCWSTR pszFile) const noexcept {
+void MRUList::DeleteFileFromStore(LPCWSTR pszFile, int fileIndex) noexcept {
 	MRUList mruStore;
-	mruStore.Init(szRegKey, capacity, iFlags);
+	mruStore.Init(szRegKey, capacity, iFlags, true);
 	int deleted = 0;
 
 	for (int index = 0; index < mruStore.iSize; ) {
@@ -2425,6 +2465,7 @@ void MRUList::DeleteFileFromStore(LPCWSTR pszFile) const noexcept {
 	mruStore.iSize -= deleted;
 	mruStore.Save();
 	mruStore.Empty(false, true);
+	Delete(fileIndex);
 }
 
 void MRUList::Empty(bool save, bool destroy) noexcept {
@@ -2449,7 +2490,7 @@ void MRUList::Load() noexcept {
 	WCHAR * const pIniSectionBuf = section.Init(capacity, cchIniSection);
 	LoadIniSection(szRegKey, pIniSectionBuf, cchIniSection);
 	section.ParseArray(pIniSectionBuf, iFlags & MRUFlags_QuoteValue);
-	UINT n = 0;
+	UINT n = iSize;
 
 	for (UINT i = 0; i < section.count; i++) {
 		LPCWSTR tchItem = section.nodeList[i].value;
@@ -2464,6 +2505,7 @@ void MRUList::Load() noexcept {
 		}
 	}
 
+	iFlags |= MRUStatus_Loaded;
 	iSize = n;
 	section.Free();
 }
@@ -2501,14 +2543,14 @@ void MRUList::Save() const noexcept {
 
 void MRUList::Reload() noexcept {
 	Empty(false, true);
-	Init(szRegKey, capacity, iFlags);
+	Init(szRegKey, capacity, iFlags, true);
 }
 
 void MRUList::MergeSave(bool keep, bool destroy) noexcept {
 	if (keep && iSize > 0) {
 		LPWSTR * const current = pszItems;
 		const int count = iSize;
-		Init(szRegKey, capacity, iFlags);
+		Init(szRegKey, capacity, iFlags, true);
 		for (int i = count - 1; i >= 0; i--) {
 			LPWSTR path = current[i];
 			Add(path);
@@ -2518,7 +2560,7 @@ void MRUList::MergeSave(bool keep, bool destroy) noexcept {
 		Save();
 	}
 	if (destroy) {
-		Empty(!keep, true);
+		Empty(false, true);
 	}
 }
 

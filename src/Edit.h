@@ -169,7 +169,7 @@ LPWSTR EditGetClipboardTextW(ClipboardTextType type, UINT &length) noexcept;
 inline char *EditGetClipboardText(UINT &length) noexcept {
 	return reinterpret_cast<char *>(EditGetClipboardTextW(ClipboardTextType::DocumentBytes, length));
 }
-void	EditCopyAppend(HWND hwnd) noexcept;
+void	EditCopyAppend(HWND hwndOwner) noexcept;
 
 constexpr int GetScintillaEOLMode(int mode) noexcept {
 	constexpr UINT mask = (SC_EOL_CRLF << 2*0) | (SC_EOL_LF << 2*1) | (SC_EOL_CR << 2*2);
@@ -232,7 +232,7 @@ void	EditWrapToColumn(int nColumn/*, int nTabWidth*/) noexcept;
 void	EditJoinLinesEx() noexcept;
 void	EditSortLines(EditSortFlag iSortFlags) noexcept;
 
-void	EditJumpTo(Sci_Line iNewLine, Sci_Position iNewCol) noexcept;
+void	EditJumpTo(Sci_Line iNewLine, Sci_Position iNewCol, unsigned type = SC_COLUMN_DEFAULT) noexcept;
 void	EditSelectEx(Sci_Position iAnchorPos, Sci_Position iCurrentPos) noexcept;
 void	EditFixPositions() noexcept;
 void	EditEnsureSelectionVisible() noexcept;
@@ -242,7 +242,7 @@ void	EditGetExcerpt(LPWSTR lpszExcerpt, DWORD cchExcerpt) noexcept;
 void	EditSelectWord() noexcept;
 void	EditSelectLines(bool currentBlock, bool lineSelection) noexcept;
 void	EditSaveSelectionAsFindText(EditFindReplace &efr, int menu, bool findSelection) noexcept;
-HWND	EditFindReplaceDlg(HWND hwnd, EditFindReplace &efr, bool bReplace) noexcept;
+HWND	EditFindReplaceDlg(HWND hwndOwner, EditFindReplace &efr, bool bReplace) noexcept;
 void	EditFindNext(EditFindReplace &efr, bool fExtendSelection) noexcept;
 void	EditFindPrev(EditFindReplace &efr, bool fExtendSelection) noexcept;
 void	EditFindAll(EditFindReplace &efr, bool selectAll) noexcept;
@@ -255,7 +255,7 @@ enum EditReplaceAllFlag {
 };
 void	EditReplaceAll(EditFindReplace &efr) noexcept;
 void	EditReplaceAllInSelection(EditFindReplace &efr, EditReplaceAllFlag flag = EditReplaceAllFlag_None) noexcept;
-bool	EditLineNumDlg(HWND hwnd) noexcept;
+bool	EditLineNumDlg(HWND hwndOwner) noexcept;
 void	EditModifyLinesDlg(HWND hwnd) noexcept;
 void	EditEncloseSelectionDlg(HWND hwnd) noexcept;
 void	EditInsertTagDlg(HWND hwnd) noexcept;
@@ -278,8 +278,8 @@ enum OpenSelectionType {
 void EditOpenSelection(OpenSelectionType type);
 
 // in Bridge.cpp
-bool	EditPrint(HWND hwnd, LPCWSTR pszDocTitle, BOOL bDefault) noexcept;
-void	EditPrintSetup(HWND hwnd) noexcept;
+bool	EditPrint(HWND hwndOwner, LPCWSTR pszDocTitle, BOOL bDefault) noexcept;
+void	EditPrintSetup(HWND hwndOwner) noexcept;
 void	EditDumpDocumentStyledText(LPCWSTR lpszFile);
 void	EditFormatCode(int menu) noexcept;
 
@@ -521,12 +521,11 @@ enum {
 };
 
 struct NP2ENCODING {
-	const UINT uFlags;
 	/*const*/UINT uCodePage;
+	const uint16_t uFlags;
+	const uint16_t idsName;
 	// string format: [normal name + ','] + [lower case parse name + ',']+
 	const char * const pszParseNames;
-	const UINT idsName;
-	LPWSTR wchLabel;
 };
 
 // see UniConversion.h and https://www.unicode.org/faq/utf_bom.html
@@ -611,10 +610,10 @@ void	EditOnCodePageChanged(UINT oldCodePage, bool showControlCharacter, EditFind
 const char* GetFoldDisplayEllipsis(UINT cpEdit, UINT acp) noexcept;
 void	Encoding_InitDefaults() noexcept;
 int 	Encoding_MapIniSetting(bool bLoad, UINT iSetting) noexcept;
-void	Encoding_GetLabel(int iEncoding) noexcept;
+LPCWSTR Encoding_GetLabel(UINT iEncoding) noexcept;
 int 	Encoding_Match(LPCWSTR pwszTest) noexcept;
 int 	Encoding_MatchA(LPCSTR pchTest) noexcept;
-bool	Encoding_IsValid(int iEncoding) noexcept;
+bool	Encoding_IsValid(UINT iEncoding) noexcept;
 int		Encoding_GetIndex(UINT codePage) noexcept;
 int		Encoding_GetAnsiIndex() noexcept;
 void	Encoding_AddToTreeView(HWND hwnd, int idSel, bool bRecodeOnly) noexcept;

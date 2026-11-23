@@ -23,12 +23,14 @@ typeAliases = {
 	"int": "int",
 	"keymod": "int",
 	"line": "Line",
+	"pixels": "Pixels",
 	"pointer": "void *",
 	"position": "Position",
 	"string": "const char *",
 	"stringresult": "char *",
 	"textrange": "const TextRangeFull *",
 	"textrangefull": "const TextRangeFull *",
+	"charrange": "const CharacterRangeFull *",
 }
 
 basicTypes = [
