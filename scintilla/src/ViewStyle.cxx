@@ -75,7 +75,7 @@ void FontRealised::Realise(Surface &surface, int zoomLevel, Technology technolog
 	//measurements.aveCharWidth = surface.AverageCharWidth(font.get());
 	measurements.spaceWidth = surface.WidthText(font.get(), " ");
 
-	/*if (fs.checkMonospaced)*/ {
+	{
 		// "Ay" is normally strongly kerned and "fi" may be a ligature
 		constexpr std::string_view allASCIIGraphic("Ayfi"
 		// python: ''.join(chr(ch) for ch in range(32, 127))

@@ -6207,9 +6207,6 @@ void Editor::StyleSetMessage(Message iMessage, uptr_t wParam, sptr_t lParam) {
 			indicator.hoverUnderline = enabled;
 		}
 		break;
-	// case Message::StyleSetCheckMonospaced:
-	// 	vs.styles[wParam].checkMonospaced = lParam != 0;
-	// 	break;
 	default:
 		break;
 	}
@@ -6255,8 +6252,6 @@ sptr_t Editor::StyleGetMessage(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		return StringResult(lParam, vs.styles[wParam].invisibleRepresentation);
 	case Message::StyleGetHotSpot:
 		return vs.styles[wParam].hotspot;
-	// case Message::StyleGetCheckMonospaced:
-	// 	return vs.styles[wParam].checkMonospaced ? 1 : 0;
 	default:
 		break;
 	}
@@ -7762,7 +7757,6 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 	case Message::StyleSetVisible:
 	case Message::StyleSetChangeable:
 	case Message::StyleSetHotSpot:
-	// case Message::StyleSetCheckMonospaced:
 	case Message::StyleSetInvisibleRepresentation:
 		StyleSetMessage(iMessage, wParam, lParam);
 		break;
@@ -7784,7 +7778,6 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 	case Message::StyleGetVisible:
 	case Message::StyleGetChangeable:
 	case Message::StyleGetHotSpot:
-	// case Message::StyleGetCheckMonospaced:
 	case Message::StyleGetInvisibleRepresentation:
 		return StyleGetMessage(iMessage, wParam, lParam);
 
