@@ -9,6 +9,7 @@
 #include <cmath>
 
 #include <stdexcept>
+#include <compare>
 #include <string_view>
 #include <vector>
 #include <map>
@@ -22,6 +23,7 @@
 #include "Geometry.h"
 #include "Platform.h"
 
+#include "CharacterSet.h"
 #include "Indicator.h"
 #include "XPM.h"
 
@@ -29,12 +31,18 @@ using namespace Scintilla;
 using namespace Scintilla::Internal;
 
 void Indicator::Draw(Surface *surface, PRectangle rc, PRectangle rcLine, PRectangle rcCharacter, State state, int value) const {
+	constexpr XYPOSITION minimumWidth = 0.0001;
+	constexpr XYPOSITION minimumWidthPoint = 0.1;
 	StyleAndColour sacDraw = sacNormal;
 	if (FlagSet(Flags(), IndicFlag::ValueFore)) {
 		sacDraw.fore = ColourRGBA::FromRGB(value & static_cast<int>(IndicValue::Mask));
 	}
 	if (state == State::hover) {
 		sacDraw = sacHover;
+	}
+	if ((rc.Width() < minimumWidth) && !Lexilla::AnyOf(sacDraw.style, IndicatorStyle::Point, IndicatorStyle::PointCharacter, IndicatorStyle::PointTop)) {
+		// Using rc and too thin to see
+		return;
 	}
 
 	const int pixelDivisions = surface->PixelDivisions();
@@ -116,14 +124,15 @@ void Indicator::Draw(Surface *surface, PRectangle rc, PRectangle rcLine, PRectan
 	break;
 
 	case IndicatorStyle::TT: {
+		constexpr XYPOSITION minimumPitch = 4.0;
 		surface->SetClip(rcClip);
 		const XYPOSITION yLine = ymid;
-		XYPOSITION x = rcAligned.left + 5.0f;
-		const XYPOSITION pitch = 4 + strokeWidth;
+		XYPOSITION x = rcAligned.left + minimumPitch + 1.0f;
+		const XYPOSITION pitch = minimumPitch + strokeWidth;
 		while (x < rc.right + pitch) {
 			const PRectangle line(x-pitch, yLine, x, yLine + strokeWidth);
 			surface->FillRectangle(line, sacDraw.fore);
-			const PRectangle tail(x - 2 - strokeWidth, yLine + strokeWidth, x - 2, yLine + strokeWidth * 2);
+			const PRectangle tail(x - 2 - strokeWidth, yLine + strokeWidth, x - 2, yLine + (strokeWidth * 2));
 			surface->FillRectangle(tail, sacDraw.fore);
 			x++;
 			x += pitch;
@@ -185,6 +194,7 @@ void Indicator::Draw(Surface *surface, PRectangle rc, PRectangle rcLine, PRectan
 		const Surface::GradientOptions options = Surface::GradientOptions::topToBottom;
 		const ColourRGBA start(sacDraw.fore, fillAlpha);
 		const ColourRGBA end(sacDraw.fore, 0);
+		constexpr XYPOSITION half = 0.5;
 		std::vector<ColourStop> stops;
 		switch (sacDraw.style) {
 		case IndicatorStyle::Gradient:
@@ -193,7 +203,7 @@ void Indicator::Draw(Surface *surface, PRectangle rc, PRectangle rcLine, PRectan
 			break;
 		case IndicatorStyle::GradientCentre:
 			stops.emplace_back(0.0f, end);
-			stops.emplace_back(0.5f, start);
+			stops.emplace_back(half, start);
 			stops.emplace_back(1.0f, end);
 			break;
 		default:
@@ -263,7 +273,7 @@ void Indicator::Draw(Surface *surface, PRectangle rc, PRectangle rcLine, PRectan
 
 	case IndicatorStyle::Point:
 	case IndicatorStyle::PointCharacter:
-		if (rcCharacter.Width() >= 0.1) {
+		if (rcCharacter.Width() >= minimumWidthPoint) {
 			const XYPOSITION pixelHeight = std::floor(rc.Height());	// 1 pixel onto next line if multiphase
 			const XYPOSITION x = (sacDraw.style == IndicatorStyle::Point) ? (rcCharacter.left) : ((rcCharacter.right + rcCharacter.left) / 2);
 			// 0.5f is to hit midpoint of pixels:
@@ -279,7 +289,7 @@ void Indicator::Draw(Surface *surface, PRectangle rc, PRectangle rcLine, PRectan
 		break;
 
 	case IndicatorStyle::PointTop:
-		if (rcCharacter.Width() >= 0.1) {
+		if (rcCharacter.Width() >= minimumWidthPoint) {
 			const XYPOSITION pixelHeight = std::floor(rc.Height());	// 1 pixel onto previous line if multiphase
 			const XYPOSITION x = rcCharacter.left;
 			// 0.5f is to hit midpoint of pixels:

@@ -11,7 +11,7 @@ namespace Scintilla::Internal {
 class XPM;
 class RGBAImage;
 
-typedef void (*DrawLineMarkerFn)(Surface *surface, PRectangle rcWhole, const Font *fontForCharacter, int part, Scintilla::MarginType marginStyle, const void *lineMarker);
+using DrawLineMarkerFn = void (*)(Surface *surface, PRectangle rcWhole, const Font *fontForCharacter, int part, Scintilla::MarginType marginStyle, const void *lineMarker);
 
 struct LineMarkerPod {
 	Scintilla::MarkerSymbol markType = Scintilla::MarkerSymbol::Circle;

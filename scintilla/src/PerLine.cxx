@@ -12,6 +12,7 @@
 
 #include <stdexcept>
 #include <utility>
+#include <compare>
 #include <string_view>
 #include <vector>
 #include <forward_list>
@@ -33,8 +34,6 @@
 #include "PerLine.h"
 
 using namespace Scintilla::Internal;
-
-MarkerHandleSet::MarkerHandleSet() noexcept = default;
 
 bool MarkerHandleSet::Empty() const noexcept {
 	return mhList.empty();
@@ -545,7 +544,7 @@ bool LineTabstops::AddTabstop(Sci::Line line, int x) {
 	TabstopList *tl = tabstops[line].get();
 	if (tl) {
 		// tabstop positions are kept in order - insert in the right place
-		const auto it = std::lower_bound(tl->begin(), tl->end(), x);
+		const auto it = std::ranges::lower_bound(*tl, x);
 		// don't insert duplicates
 		if (it == tl->end() || *it != x) {
 			tl->insert(it, x);

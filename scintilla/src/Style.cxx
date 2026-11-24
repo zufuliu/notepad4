@@ -9,6 +9,7 @@
 
 #include <stdexcept>
 #include <utility>
+#include <compare>
 #include <string_view>
 #include <vector>
 #include <optional>
@@ -26,14 +27,7 @@ using namespace Scintilla;
 using namespace Scintilla::Internal;
 
 bool FontSpecification::operator==(const FontSpecification &other) const noexcept {
-	return fontName == other.fontName
-		&& size == other.size
-		&& weight == other.weight
-		&& stretch == other.stretch
-		&& italic == other.italic
-		// && checkMonospaced == other.checkMonospaced
-		&& characterSet == other.characterSet
-		&& extraFontFlag == other.extraFontFlag;
+	return __builtin_memcmp(this, &other, sizeof(other)) == 0;
 }
 
 bool FontSpecification::operator<(const FontSpecification &other) const noexcept {

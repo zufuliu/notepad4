@@ -127,7 +127,7 @@ struct SelectionRange {
 	[[nodiscard]] Sci::Position Length() const noexcept;
 	// Sci::Position Width() const;	// Like Length but takes virtual space into account
 	bool operator ==(const SelectionRange &other) const noexcept {
-		return caret == other.caret && anchor == other.anchor;
+		return __builtin_memcmp(this, &other, sizeof(other)) == 0;
 	}
 	bool operator <(const SelectionRange &other) const noexcept {
 		return caret < other.caret || ((caret == other.caret) && (anchor < other.anchor));

@@ -303,7 +303,7 @@ constexpr int GetHexDigit(unsigned char ch) noexcept {
 	return -1;
 }
 
-constexpr int GetHexValue(unsigned char ch1, unsigned char ch2) noexcept {
+constexpr int ValueFromHexPair(unsigned char ch1, unsigned char ch2) noexcept {
 	return (GetHexDigit(ch1) << 4) | GetHexDigit(ch2);
 }
 
@@ -413,7 +413,7 @@ int RESearch::GetBackslashExpression(const char *pattern, int &incr) noexcept {
 	case xHH: { // 'x'
 		const unsigned char hd1 = pattern[1];
 		const unsigned char hd2 = pattern[2];
-		const int hexValue = GetHexValue(hd1, hd2);
+		const int hexValue = ValueFromHexPair(hd1, hd2);
 		if (hexValue >= 0) {
 			result = hexValue;
 			incr = 2;	// Must skip the digits

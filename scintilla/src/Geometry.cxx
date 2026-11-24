@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <cmath>
 
+#include <compare>
 #include <algorithm>
 
 #include "Geometry.h"

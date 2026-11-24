@@ -15,6 +15,7 @@
 
 #include <stdexcept>
 #include <utility>
+#include <compare>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -955,7 +956,7 @@ void SpecialRepresentations::SetDefaultRepresentations(int dbcsCodePage) {
 void BreakFinder::Insert(Sci::Position val) {
 	const int posInLine = static_cast<int>(val);
 	if (posInLine > nextBreak) {
-		const auto it = std::lower_bound(selAndEdge.begin(), selAndEdge.end(), posInLine);
+		const auto it = std::ranges::lower_bound(selAndEdge, posInLine);
 		if (it == selAndEdge.end()) {
 			selAndEdge.push_back(posInLine);
 		} else if (*it != posInLine) {

@@ -13,6 +13,7 @@
 
 #include <stdexcept>
 #include <utility>
+#include <compare>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -136,13 +137,13 @@ void FontRealised::Realise(Surface &surface, int zoomLevel, Technology technolog
 		}
 #elif 0
 		std::adjacent_difference(positions.begin(), positions.end(), positions.begin());
-		const auto [minIt, maxIt] = std::minmax_element(positions.begin(), positions.end());
+		const auto [minIt, maxIt] = std::ranges::minmax_element(positions);
 		const XYPOSITION maxWidth = *maxIt;
 		const XYPOSITION minWidth = *minIt;
 #else
 		std::adjacent_difference(positions.begin(), positions.end(), positions.begin());
-		const XYPOSITION maxWidth = *std::max_element(positions.begin(), positions.end());
-		const XYPOSITION minWidth = *std::min_element(positions.begin(), positions.end());
+		const XYPOSITION maxWidth = *std::ranges::max_element(positions);
+		const XYPOSITION minWidth = *std::ranges::min_element(positions);
 #endif
 		// const double duration = period.Duration()*1e3;
 		// printf("%4d:%s duration=%.6f, max=%f, min=%f\n", fs.size, fs.fontName, duration, maxWidth, minWidth);
@@ -690,7 +691,7 @@ ColourRGBA ViewStyle::WrapColour() const noexcept {
 void ViewStyle::AddMultiEdge(int column, ColourRGBA colour) {
 	const EdgeProperties edgeNew(column, colour);
 	theMultiEdge.insert(
-		std::upper_bound(theMultiEdge.begin(), theMultiEdge.end(), edgeNew,
+		std::ranges::upper_bound(theMultiEdge, edgeNew,
 		[](const EdgeProperties &a, const EdgeProperties &b) noexcept {
 			return a.column < b.column;
 		}),

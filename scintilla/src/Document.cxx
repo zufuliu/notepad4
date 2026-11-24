@@ -17,6 +17,7 @@
 #include <stdexcept>
 #include <new>
 #include <utility>
+#include <compare>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -194,7 +195,7 @@ void Document::Init() {
 }
 
 bool Document::IsActive() const noexcept {
-	return std::any_of(std::begin(perLineData), std::end(perLineData),
+	return std::ranges::any_of(perLineData,
 	[](const auto &pl) noexcept {
 		return pl->IsActive();
 	});
@@ -2869,7 +2870,7 @@ void SCI_METHOD Document::DecorationFillRange(Sci_Position position, int value, 
 
 bool Document::AddWatcher(DocWatcher *watcher, void *userData) {
 	const WatcherWithUserData wwud(watcher, userData);
-	const auto it = std::find(watchers.begin(), watchers.end(), wwud);
+	const auto it = std::ranges::find(watchers, wwud);
 	if (it != watchers.end())
 		return false;
 	watchers.push_back(wwud);
@@ -2880,7 +2881,8 @@ bool Document::RemoveWatcher(DocWatcher *watcher, void *userData) noexcept {
 	try {
 		// This can never fail as WatcherWithUserData constructor and == are noexcept
 		// but std::find is not noexcept.
-		const auto it = std::find(watchers.begin(), watchers.end(), WatcherWithUserData(watcher, userData));
+		const WatcherWithUserData wwud(watcher, userData);
+		const auto it = std::ranges::find(watchers, wwud);
 		if (it != watchers.end()) {
 			watchers.erase(it);
 			return true;

@@ -718,13 +718,14 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	}
 
 public:
-	~Editor() override;
-
 	// Deleted so Editor objects can not be copied.
 	Editor(const Editor &) = delete;
 	Editor(Editor &&) = delete;
 	Editor &operator=(const Editor &) = delete;
 	Editor &operator=(Editor &&) = delete;
+
+	~Editor() override;
+
 	// Public so the COM thunks can access it.
 	bool IsUnicodeMode() const noexcept;
 	// Public so scintilla_send_message can use it.

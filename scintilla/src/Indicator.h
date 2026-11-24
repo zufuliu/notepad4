@@ -25,6 +25,8 @@ constexpr int strokeWidthMax = 10 * strokeWidthScale;
  */
 class Indicator {
 public:
+	static constexpr int fillAlphaDefault = 30;
+	static constexpr int outlineAlphaDefault = 50;
 	enum class State {
 		normal, hover
 	};
@@ -34,12 +36,12 @@ public:
 	bool overrideTextFore = false;
 	bool under = false;
 	bool hoverUnderline = false;
-	int fillAlpha = 30;
-	int outlineAlpha = 50;
+	int fillAlpha = fillAlphaDefault;
+	int outlineAlpha = outlineAlphaDefault;
 	Scintilla::IndicFlag attributes = Scintilla::IndicFlag::None;
 	XYPOSITION strokeWidth = 1.0f;
 	constexpr Indicator() noexcept = default;
-	explicit constexpr Indicator(Scintilla::IndicatorStyle style_, ColourRGBA fore_ = black, bool under_ = false, int fillAlpha_ = 30, int outlineAlpha_ = 50) noexcept :
+	explicit constexpr Indicator(Scintilla::IndicatorStyle style_, ColourRGBA fore_ = black, bool under_ = false, int fillAlpha_ = fillAlphaDefault, int outlineAlpha_ = outlineAlphaDefault) noexcept :
 		sacNormal(style_, fore_), sacHover(style_, fore_), under(under_), fillAlpha(fillAlpha_), outlineAlpha(outlineAlpha_) {}
 	void SCICALL Draw(Surface *surface, PRectangle rc, PRectangle rcLine, PRectangle rcCharacter, State state, int value) const;
 
@@ -47,10 +49,10 @@ public:
 		dynamic = hoverUnderline || !(sacNormal == sacHover);
 		overrideTextFore = sacNormal.style == Scintilla::IndicatorStyle::TextFore || sacHover.style == Scintilla::IndicatorStyle::TextFore;
 	}
-	bool IsDynamic() const noexcept {
+	[[nodiscard]] bool IsDynamic() const noexcept {
 		return dynamic;
 	}
-	bool OverridesTextFore() const noexcept {
+	[[nodiscard]] bool OverridesTextFore() const noexcept {
 		return overrideTextFore;
 	}
 	[[nodiscard]] Scintilla::IndicFlag Flags() const noexcept {

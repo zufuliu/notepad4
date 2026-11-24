@@ -18,6 +18,7 @@
 
 #include <stdexcept>
 #include <utility>
+#include <compare>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -213,7 +214,7 @@ FontWin::FontWin(const FontParameters &fp) {
 	// The negative is to allow for leading
 	lf.lfHeight = -std::abs(std::lround(fp.size));
 	lf.lfWeight = static_cast<LONG>(fp.weight);
-	lf.lfItalic = fp.italic ? 1 : 0;
+	lf.lfItalic = static_cast<BYTE>(fp.italic);
 	lf.lfCharSet = static_cast<BYTE>(fp.characterSet);
 	lf.lfQuality = Win32MapFontQuality(fp.extraFontFlag);
 	UTF16FromUTF8(fp.faceName, lf.lfFaceName, LF_FACESIZE);
@@ -1146,7 +1147,7 @@ void ScreenLineLayout::FillTextLayoutFormats(const IScreenLine *screenLine, IDWr
 std::wstring ScreenLineLayout::ReplaceRepresentation(std::string_view text) {
 	const TextWide wideText(text, CpUtf8);
 	std::wstring ws(wideText.data(), wideText.length());
-	std::replace(ws.begin(), ws.end(), L'\t', L'X');
+	std::ranges::replace(ws, L'\t', L'X');
 	return ws;
 }
 

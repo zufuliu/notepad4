@@ -25,7 +25,6 @@ class MarkerHandleSet {
 	std::forward_list<MarkerHandleNumber> mhList;
 
 public:
-	MarkerHandleSet() noexcept;
 	bool Empty() const noexcept;
 	MarkerMask MarkValue() const noexcept;	///< Bit set of marker numbers.
 	bool Contains(int handle) const noexcept;
@@ -39,9 +38,8 @@ public:
 class LineMarkers final : public PerLine {
 	SplitVector<std::unique_ptr<MarkerHandleSet>> markers;
 	/// Handles are allocated sequentially and should never have to be reused as 32 bit ints are very big.
-	int handleCurrent;
+	int handleCurrent = 0;
 public:
-	LineMarkers() noexcept : handleCurrent(0) {}
 	void Init() override;
 	bool IsActive() const noexcept override;
 	void InsertLine(Sci::Line line) override;
@@ -63,7 +61,6 @@ class LineLevels final : public PerLine {
 	SplitVector<int> levels;
 	Scintilla::FoldLevel GetFoldLevel(Sci::Line line) const noexcept;
 public:
-	LineLevels() noexcept = default;
 	void Init() override;
 	bool IsActive() const noexcept override;
 	void InsertLine(Sci::Line line) override;
@@ -80,7 +77,6 @@ public:
 class LineState final : public PerLine {
 	SplitVector<int> lineStates;
 public:
-	LineState() noexcept = default;
 	void Init() override;
 	bool IsActive() const noexcept override;
 	void InsertLine(Sci::Line line) override;
@@ -94,8 +90,6 @@ public:
 class LineAnnotation : public PerLine {
 	SplitVector<std::unique_ptr<char[]>> annotations;
 public:
-	LineAnnotation() noexcept = default;
-
 	[[nodiscard]] bool Empty() const noexcept;
 	void Init() override;
 	bool IsActive() const noexcept override;
@@ -120,7 +114,6 @@ using TabstopList = std::vector<int>;
 class LineTabstops : public PerLine {
 	SplitVector<std::unique_ptr<TabstopList>> tabstops;
 public:
-	LineTabstops() noexcept = default;
 	void Init() override;
 	bool IsActive() const noexcept override;
 	void InsertLine(Sci::Line line) override;

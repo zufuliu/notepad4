@@ -102,7 +102,7 @@ struct FontParameters {
 	XYPOSITION size;
 	Scintilla::FontWeight weight;
 	Scintilla::FontStretch stretch;
-	bool italic;
+	int italic;
 	Scintilla::FontQuality extraFontFlag;
 	Scintilla::Technology technology;
 	Scintilla::CharacterSet characterSet;
@@ -113,7 +113,7 @@ struct FontParameters {
 		XYPOSITION size_,
 		Scintilla::FontWeight weight_,
 		Scintilla::FontStretch stretch_,
-		bool italic_,
+		int italic_,
 		Scintilla::FontQuality extraFontFlag_,
 		Scintilla::Technology technology_,
 		Scintilla::CharacterSet characterSet_,

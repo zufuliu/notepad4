@@ -15,6 +15,7 @@
 
 #include <stdexcept>
 #include <utility>
+#include <compare>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -6144,7 +6145,7 @@ void Editor::StyleSetMessage(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 	case Message::StyleSetItalic:
 		vs.fontsValid = false;
-		vs.styles[wParam].italic = lParam != 0;
+		vs.styles[wParam].italic = static_cast<int>(lParam);
 		break;
 	case Message::StyleSetEOLFilled:
 		vs.styles[wParam].eolFilled = lParam != 0;
@@ -6229,7 +6230,7 @@ sptr_t Editor::StyleGetMessage(Message iMessage, uptr_t wParam, sptr_t lParam) {
 	case Message::StyleGetStretch:
 		return static_cast<sptr_t>(vs.styles[wParam].stretch);
 	case Message::StyleGetItalic:
-		return vs.styles[wParam].italic ? 1 : 0;
+		return vs.styles[wParam].italic;
 	case Message::StyleGetEOLFilled:
 		return vs.styles[wParam].eolFilled ? 1 : 0;
 	case Message::StyleGetSize:

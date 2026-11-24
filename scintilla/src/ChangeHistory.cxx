@@ -12,6 +12,7 @@
 
 #include <stdexcept>
 #include <utility>
+#include <compare>
 #include <vector>
 #include <algorithm>
 #include <memory>

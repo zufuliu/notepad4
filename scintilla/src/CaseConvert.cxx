@@ -12,6 +12,7 @@
 #include <cstring>
 
 #include <stdexcept>
+#include <compare>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -617,7 +618,7 @@ public:
 		characterToConversion.emplace_back(character, conversion);
 	}
 	const char *Find(int character) const {
-		const auto it = std::lower_bound(characters.begin(), characters.end(), character);
+		const auto it = std::ranges::lower_bound(characters, character);
 		if (it == characters.end())
 			return nullptr;
 		if (*it == character)

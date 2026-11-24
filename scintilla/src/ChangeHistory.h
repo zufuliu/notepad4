@@ -33,7 +33,7 @@ struct EditionCount {
 	int count;
 	// Used in tests.
 	constexpr bool operator==(const EditionCount &other) const noexcept {
-		return (edition == other.edition) && (count == other.count);
+		return __builtin_memcmp(this, &other, sizeof(other)) == 0;
 	}
 };
 

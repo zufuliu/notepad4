@@ -13,6 +13,7 @@
 
 #include <stdexcept>
 //#include <system_error>
+#include <compare>
 #include <utility>
 #include <string>
 #include <string_view>

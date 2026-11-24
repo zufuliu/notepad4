@@ -155,7 +155,7 @@ void AutoComplete::SetList(const char *list) {
 
 	const Sorter IndexSort(this, list);
 	FillSortMatrix(sortMatrix, static_cast<unsigned>(IndexSort.indices.size() / 2));
-	std::sort(sortMatrix.begin(), sortMatrix.end(), IndexSort);
+	std::ranges::sort(sortMatrix, IndexSort);
 	if (autoSort == Ordering::Custom || sortMatrix.size() < 2) {
 		lb->SetList(list, separator, typesep);
 		PLATFORM_ASSERT(lb->Length() == static_cast<int>(sortMatrix.size()));

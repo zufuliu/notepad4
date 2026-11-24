@@ -10,7 +10,7 @@ namespace Scintilla::Internal {
 
 void DrawWrapMarker(Surface *surface, PRectangle rcPlace, bool isEndMarker, ColourRGBA wrapColour);
 
-typedef void (*DrawWrapMarkerFn)(Surface *surface, PRectangle rcPlace, bool isEndMarker, ColourRGBA wrapColour);
+using DrawWrapMarkerFn = void (*)(Surface *surface, PRectangle rcPlace, bool isEndMarker, ColourRGBA wrapColour);
 
 /**
 * MarginView draws the margins.

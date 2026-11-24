@@ -16,6 +16,7 @@
 
 #include <stdexcept>
 #include <utility>
+#include <compare>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -1047,7 +1048,7 @@ inline std::string_view ControlCharacterString(unsigned char ch) noexcept {
 // Draw inverted text in a filled rectangle but omit the 4 corner pixels so appears rounded.
 void DrawTextBlob(Surface *surface, const ViewStyle &vsDraw, PRectangle rcSegment,
 	std::string_view text, ColourRGBA textBack, ColourRGBA textFore, bool fillBackground) {
-	if (rcSegment.Empty())
+	if (rcSegment.Empty() || (rcSegment.Width() < epsilon))
 		return;
 	if (fillBackground) {
 		surface->FillRectangleAligned(rcSegment, Fill(textBack));

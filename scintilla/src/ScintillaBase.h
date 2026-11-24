@@ -100,13 +100,14 @@ protected:
 	void NotifyStyleToNeeded(Sci::Position endStyleNeeded) override;
 
 public:
-	~ScintillaBase() override;
-
 	// Deleted so ScintillaBase objects can not be copied.
 	ScintillaBase(const ScintillaBase &) = delete;
 	ScintillaBase(ScintillaBase &&) = delete;
 	ScintillaBase &operator=(const ScintillaBase &) = delete;
 	ScintillaBase &operator=(ScintillaBase &&) = delete;
+
+	~ScintillaBase() override;
+
 	// Public so scintilla_send_message can use it
 	Scintilla::sptr_t WndProc(Scintilla::Message iMessage, Scintilla::uptr_t wParam, Scintilla::sptr_t lParam) override;
 };

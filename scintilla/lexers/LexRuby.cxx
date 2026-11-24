@@ -627,7 +627,8 @@ bool sureThisIsNotHeredoc(Sci_Position lt2StartPos, LexAccessor &styler) {
 	// Just look at the start of each line
 	Sci_Line last_line = styler.GetLine(lengthDoc - 1);
 	// But don't go too far
-	last_line = sci::min(last_line, lineStart + 50);
+	constexpr Sci_Position look_ahead_max = 50;
+	last_line = sci::min(last_line, lineStart + look_ahead_max);
 	for (Sci_Line line_num = lineStart + 1; line_num <= last_line; line_num++) {
 		j = styler.LineStart(line_num);
 		if (allow_indent) {
@@ -760,20 +761,20 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 	// list.  Keep in mind this code will be called every time the lexer
 	// is invoked.
 
-#define INNER_STRINGS_MAX_COUNT 5
+	constexpr int innerStringsCount = 5;
 	class InnerExpression {
 		// These vars track our instances of "...#{,,,%Q<..#{,,,}...>,,,}..."
-		int inner_string_types[INNER_STRINGS_MAX_COUNT] {};
+		int inner_string_types[innerStringsCount] {};
 		// Track # braces when we push a new #{ thing
-		int inner_expn_brace_counts[INNER_STRINGS_MAX_COUNT] {};
-		QuoteCls inner_quotes[INNER_STRINGS_MAX_COUNT];
+		int inner_expn_brace_counts[innerStringsCount] {};
+		QuoteCls inner_quotes[innerStringsCount];
 		int inner_string_count = 0;
 
 	public:
 		int brace_counts = 0;	// Number of #{ ... } things within an expression
 
 		bool canEnter() const noexcept {
-			return inner_string_count < INNER_STRINGS_MAX_COUNT;
+			return inner_string_count < innerStringsCount;
 		}
 		bool canExit() const noexcept {
 			return inner_string_count > 0;

@@ -13,6 +13,7 @@
 #include <cmath>
 
 #include <stdexcept>
+#include <compare>
 #include <string>
 #include <string_view>
 #include <vector>

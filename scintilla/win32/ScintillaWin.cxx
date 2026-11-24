@@ -17,6 +17,7 @@
 #include <stdexcept>
 #include <new>
 #include <utility>
+#include <compare>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -438,7 +439,7 @@ public:
 		// The negative is to allow for leading
 		lf.lfHeight = -::MulDiv(sizeZoomed, dpi, pointsPerInch*FontSizeMultiplier);
 		lf.lfWeight = static_cast<LONG>(vs.styles[style].weight);
-		lf.lfItalic = vs.styles[style].italic;
+		lf.lfItalic = static_cast<BYTE>(vs.styles[style].italic);
 		lf.lfCharSet = DEFAULT_CHARSET;
 		lf.lfQuality = Win32MapFontQuality(vs.extraFontFlag);
 #if 1
