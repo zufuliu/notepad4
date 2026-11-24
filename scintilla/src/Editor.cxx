@@ -6232,7 +6232,7 @@ sptr_t Editor::StyleGetMessage(Message iMessage, uptr_t wParam, sptr_t lParam) {
 	case Message::StyleGetItalic:
 		return vs.styles[wParam].italic;
 	case Message::StyleGetEOLFilled:
-		return vs.styles[wParam].eolFilled ? 1 : 0;
+		return vs.styles[wParam].eolFilled;
 	case Message::StyleGetSize:
 		return vs.styles[wParam].size / FontSizeMultiplier;
 	case Message::StyleGetSizeFractional:
@@ -6240,21 +6240,21 @@ sptr_t Editor::StyleGetMessage(Message iMessage, uptr_t wParam, sptr_t lParam) {
 	case Message::StyleGetFont:
 		return StringResult(lParam, vs.styles[wParam].fontName);
 	case Message::StyleGetUnderline:
-		return vs.styles[wParam].underline ? 1 : 0;
+		return vs.styles[wParam].underline;
 	case Message::StyleGetStrike:
-		return vs.styles[wParam].strike ? 1 : 0;
+		return vs.styles[wParam].strike;
 	case Message::StyleGetCase:
 		return static_cast<sptr_t>(vs.styles[wParam].caseForce);
 	case Message::StyleGetCharacterSet:
 		return static_cast<sptr_t>(vs.styles[wParam].characterSet);
 	case Message::StyleGetVisible:
-		return vs.styles[wParam].visible ? 1 : 0;
+		return vs.styles[wParam].visible;
 	case Message::StyleGetChangeable:
-		return vs.styles[wParam].changeable ? 1 : 0;
+		return vs.styles[wParam].changeable;
 	case Message::StyleGetInvisibleRepresentation:
 		return StringResult(lParam, vs.styles[wParam].invisibleRepresentation);
 	case Message::StyleGetHotSpot:
-		return vs.styles[wParam].hotspot ? 1 : 0;
+		return vs.styles[wParam].hotspot;
 	// case Message::StyleGetCheckMonospaced:
 	// 	return vs.styles[wParam].checkMonospaced ? 1 : 0;
 	default:
@@ -6480,7 +6480,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case Message::CanUndo:
-		return (pdoc->CanUndo() && !pdoc->IsReadOnly()) ? 1 : 0;
+		return pdoc->CanUndo() && !pdoc->IsReadOnly();
 
 	case Message::EmptyUndoBuffer:
 		pdoc->DeleteUndoHistory();
@@ -7041,7 +7041,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		return 0;
 
 	case Message::CanRedo:
-		return (pdoc->CanRedo() && !pdoc->IsReadOnly()) ? 1 : 0;
+		return pdoc->CanRedo() && !pdoc->IsReadOnly();
 
 	case Message::MarkerLineFromHandle:
 		return pdoc->LineFromHandle(static_cast<int>(wParam));
@@ -7698,7 +7698,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 
 	case Message::GetMarginSensitiveN:
 		if (ValidMargin(wParam))
-			return vs.ms[wParam].sensitive ? 1 : 0;
+			return vs.ms[wParam].sensitive;
 		else
 			return 0;
 
@@ -8464,7 +8464,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		return 0;
 
 	case Message::SelectionIsRectangle:
-		return sel.selType == Selection::SelTypes::rectangle ? 1 : 0;
+		return sel.selType == Selection::SelTypes::rectangle;
 
 	case Message::SetSelectionMode:
 		SetSelectionMode(wParam, true);
@@ -8503,7 +8503,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case Message::GetOvertype:
-		return inOverstrike ? 1 : 0;
+		return inOverstrike;
 
 	case Message::SetFocus:
 		SetFocusState(wParam != 0);
@@ -8619,7 +8619,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case Message::GetHotspotActiveUnderline:
-		return vs.hotspotUnderline ? 1 : 0;
+		return vs.hotspotUnderline;
 
 	case Message::SetHotspotSingleLine:
 		hotspotSingleLine = wParam != 0;
@@ -8627,14 +8627,14 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case Message::GetHotspotSingleLine:
-		return hotspotSingleLine ? 1 : 0;
+		return hotspotSingleLine;
 
 	case Message::SetPasteConvertEndings:
 		convertPastes = wParam != 0;
 		break;
 
 	case Message::GetPasteConvertEndings:
-		return convertPastes ? 1 : 0;
+		return convertPastes;
 
 	case Message::GetCharacterPointer:
 		return AsInteger<sptr_t>(pdoc->BufferPointer());
