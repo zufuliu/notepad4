@@ -16,6 +16,8 @@ https://github.com/zufuliu/notepad4-test/tree/main/darkmode
 #include <shlobj.h>
 #include <shellapi.h>
 #include <commctrl.h>
+#include <commdlg.h>
+#include <dlgs.h>
 #include <uxtheme.h>
 #include <vsstyle.h>
 #include <vssym32.h>
@@ -1135,13 +1137,183 @@ LRESULT DarkMode_ToolbarCustomDraw(LPARAM lParam) noexcept {
 	return FALSE;
 }
 
+#include "DarkDialogRows.h"
+
 namespace { // Window
 
+// Let the native chooser select the row font, localized style, and type icon.
+bool DrawNativeFontRow(HWND dialog, const DRAWITEMSTRUCT &item) noexcept {
+	if (item.itemState & ODS_SELECTED) {
+		return false; // Windows already uses the system selection colors.
+	}
+	HDC dc = nullptr;
+	BP_PAINTPARAMS params{sizeof(BP_PAINTPARAMS)};
+	params.dwFlags = BPPF_NOCLIP;
+	const auto buffer = BeginBufferedPaint(item.hDC, &item.rcItem, BPBF_TOPDOWNDIB, &params, &dc);
+	if (!buffer) {
+		return false;
+	}
+	RGBQUAD *pixels = nullptr;
+	int stride = 0;
+	if (FAILED(GetBufferedPaintBits(buffer, &pixels, &stride))) {
+		EndBufferedPaint(buffer, FALSE);
+		return false;
+	}
+	DRAWITEMSTRUCT native = item;
+	native.hDC = dc;
+	native.itemAction = ODA_DRAWENTIRE;
+	SelectObject(dc, GetCurrentObject(item.hDC, OBJ_FONT));
+	FillRect(dc, &native.rcItem, GetSysColorBrush(COLOR_WINDOW));
+	DefSubclassProc(dialog, WM_DRAWITEM, native.CtlID, AsInteger<LPARAM>(&native));
+	GdiFlush();
+
+	// Map the native ink coverage onto the dialog's neutral dark palette.
+	const int paper = GetRValue(GetSysColor(COLOR_WINDOW));
+	const int ink = GetRValue(GetSysColor(COLOR_WINDOWTEXT));
+	if (paper == ink) {
+		EndBufferedPaint(buffer, FALSE);
+		return false;
+	}
+	const int darkPaper = GetRValue(DarkColor_CtrlBackgroundColor);
+	const int darkInk = GetRValue((item.itemState & ODS_DISABLED) ? DarkColor_DisabledTextColor : DarkColor_TextColor);
+	BYTE tone[256];
+	for (int i = 0; i < 256; ++i) {
+		const int value = darkPaper + (i - paper)*(darkInk - darkPaper)/(ink - paper);
+		tone[i] = static_cast<BYTE>(value < 0 ? 0 : value > 255 ? 255 : value);
+	}
+	const int width = item.rcItem.right - item.rcItem.left;
+	for (int y = item.rcItem.top; y < item.rcItem.bottom; ++y, pixels += stride) {
+		for (int x = 0; x < width; ++x) {
+			auto &pixel = pixels[x];
+			pixel.rgbRed = tone[pixel.rgbRed];
+			pixel.rgbGreen = tone[pixel.rgbGreen];
+			pixel.rgbBlue = tone[pixel.rgbBlue];
+		}
+	}
+	return SUCCEEDED(EndBufferedPaint(buffer, TRUE));
+}
+
+COLORREF GetChooseFontColor(HWND combo, WPARAM index) noexcept {
+	const auto data = static_cast<ULONG_PTR>(SendMessage(combo, CB_GETITEMDATA, index, 0));
+	// The native color combo stores RGB values, including the initial custom color.
+	return data <= RGB(255, 255, 255) ? static_cast<COLORREF>(data) : CLR_INVALID;
+}
+
+bool DrawChooseFontRow(HWND dialog, const DRAWITEMSTRUCT &item) noexcept {
+	if (item.CtlType != ODT_COMBOBOX || item.CtlID < cmb1 || item.CtlID > cmb5
+		|| (item.CtlID <= cmb3 && (item.itemState & ODS_COMBOBOXEDIT)) || GetDlgItem(dialog, item.CtlID) != item.hwndItem
+		|| !(GetWindowStyle(item.hwndItem) & CBS_HASSTRINGS)) {
+		return false;
+	}
+	if (item.itemID == UINT(-1)) {
+		return item.CtlID >= cmb4 && PaintDialogRow(item, L"");
+	}
+	if (item.CtlID == cmb1 || item.CtlID == cmb2) {
+		return DrawNativeFontRow(dialog, item);
+	}
+	WCHAR text[256];
+	if (!ReadDialogRowText(item, true, text, COUNTOF(text))) {
+		return false;
+	}
+
+	const COLORREF swatch = item.CtlID == cmb4 ? GetChooseFontColor(item.hwndItem, item.itemID) : CLR_INVALID;
+	return PaintDialogRow(item, text, nullptr, -1, swatch);
+}
+
+void DrawChooseFontSample(HWND dialog, const RECT *paintRect = nullptr) noexcept {
+	const HWND sample = GetDlgItem(dialog, stc5);
+	RECT rect{};
+	if (!sample || !GetWindowRect(sample, &rect)) {
+		return;
+	}
+	MapWindowPoints(nullptr, dialog, reinterpret_cast<POINT *>(&rect), 2);
+	RECT clip = rect;
+	if (paintRect && !IntersectRect(&clip, &rect, paintRect)) {
+		return;
+	}
+	if (SendDlgItemMessage(dialog, cmb1, CB_GETCURSEL, 0, 0) == CB_ERR
+		|| SendDlgItemMessage(dialog, cmb2, CB_GETCURSEL, 0, 0) == CB_ERR) {
+		// A pending edit keeps the previous sample until Windows repaints it.
+		if (paintRect) {
+			if (HDC dc = GetDC(dialog)) {
+				FillRect(dc, &clip, GetDarkBrush(DarkBrush_CtrlBackgroundBrush));
+				ReleaseDC(dialog, dc);
+			}
+		}
+		return;
+	}
+	WCHAR text[128];
+	if (!GetWindowText(sample, text, COUNTOF(text))) {
+		return;
+	}
+	LOGFONT font{};
+	SendMessage(dialog, WM_CHOOSEFONT_GETLOGFONT, 0, AsInteger<LPARAM>(&font));
+	const HFONT previewFont = font.lfFaceName[0] ? CreateFontIndirect(&font) : nullptr;
+	if (!previewFont) {
+		return;
+	}
+
+	const HWND combo = GetDlgItem(dialog, cmb4);
+	const auto selected = SendMessage(combo, CB_GETCURSEL, 0, 0);
+	const COLORREF chosen = selected == CB_ERR ? CLR_INVALID : GetChooseFontColor(combo, selected);
+	if (HDC dc = GetDC(dialog)) {
+		IntersectClipRect(dc, clip.left, clip.top, clip.right, clip.bottom);
+		const auto oldFont = SelectObject(dc, previewFont);
+		FONTSIGNATURE signature{};
+		const int charset = GetTextCharsetInfo(dc, &signature, 0);
+		// The native chooser can substitute a script-specific sample for stc5.
+		// Keep that rendering when the current script or face needs it.
+		if (charset != ANSI_CHARSET || !(signature.fsUsb[0] & 1)) {
+			SelectObject(dc, oldFont);
+			ReleaseDC(dialog, dc);
+			DeleteObject(previewFont);
+			return;
+		}
+		FillRect(dc, &rect, GetDarkBrush(DarkBrush_CtrlBackgroundBrush));
+		SetBkMode(dc, TRANSPARENT);
+		const COLORREF color = chosen == CLR_INVALID ? DarkColor_TextColor : chosen;
+		constexpr UINT format = DT_SINGLELINE | DT_CENTER | DT_VCENTER | DT_NOPREFIX;
+		const int brightness = 299*GetRValue(color) + 587*GetGValue(color) + 114*GetBValue(color);
+		if (brightness < 120000) {
+			// Keep dark samples visible while showing the actual color inside the outline.
+			SetTextColor(dc, DarkColor_DisabledTextColor);
+			constexpr POINT offsets[] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+			for (const POINT offset : offsets) {
+				RECT outline = rect;
+				OffsetRect(&outline, offset.x, offset.y);
+				DrawText(dc, text, -1, &outline, format);
+			}
+		}
+		SetTextColor(dc, color);
+		DrawText(dc, text, -1, &rect, format);
+		SelectObject(dc, oldFont);
+		ReleaseDC(dialog, dc);
+	}
+	DeleteObject(previewFont);
+}
+
 LRESULT CALLBACK DarkDialogProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData) noexcept {
+	if ((umsg == WM_SETTINGCHANGE || umsg == WM_SYSCOLORCHANGE)
+		&& (dwRefData == DialogRefData_ChooseFont || dwRefData == DialogRefData_CustomizeToolbar)) {
+		const LRESULT result = DefSubclassProc(hwnd, umsg, wParam, lParam);
+		RedrawWindow(hwnd, nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN);
+		return result;
+	}
 	if (umsg == WM_NCDESTROY) {
 		RemoveWindowSubclass(hwnd, DarkDialogProc, uIdSubclass);
 	} else if (DarkMode_IsActive()) {
 		switch (umsg) {
+		case WM_DRAWITEM:
+			if ((dwRefData == DialogRefData_ChooseFont || dwRefData == DialogRefData_CustomizeToolbar)
+				&& !UseSystemDialogColors()) {
+				const auto &item = *AsPointer<const DRAWITEMSTRUCT *>(lParam);
+				const bool painted = dwRefData == DialogRefData_ChooseFont
+					? DrawChooseFontRow(hwnd, item) : DrawToolbarCustomizationRow(hwnd, item);
+				if (painted) {
+					return TRUE;
+				}
+			}
+			break;
 		case WM_CTLCOLORSTATIC:
 		case WM_CTLCOLORDLG:
 		case WM_CTLCOLORLISTBOX:
@@ -1151,6 +1323,11 @@ LRESULT CALLBACK DarkDialogProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 			COLORREF back = DarkColor_DlgBackgroundColor;
 			COLORREF text = DarkColor_TextColor;
 			UINT index = DarkBrush_DlgBackgroundBrush;
+			if (umsg == WM_CTLCOLORLISTBOX
+				&& (dwRefData == DialogRefData_ChooseFont || dwRefData == DialogRefData_CustomizeToolbar)
+				&& UseSystemDialogColors()) {
+				break;
+			}
 			if (umsg == WM_CTLCOLOREDIT || umsg == WM_CTLCOLORLISTBOX) {
 				back = DarkColor_CtrlBackgroundColor;
 				index = DarkBrush_CtrlBackgroundBrush;
@@ -1184,6 +1361,13 @@ LRESULT CALLBACK DarkDialogProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 			return TRUE;
 
 		case WM_PAINT:
+			if (dwRefData == DialogRefData_ChooseFont && !UseSystemDialogColors()) {
+				RECT update{};
+				GetUpdateRect(hwnd, &update, FALSE);
+				const LRESULT result = DefSubclassProc(hwnd, umsg, wParam, lParam);
+				DrawChooseFontSample(hwnd, &update);
+				return result;
+			}
 			if (dwRefData == DialogRefData_MessageBox) {
 				PAINTSTRUCT ps{};
 				HDC hdc = BeginPaint(hwnd, &ps);
@@ -1201,6 +1385,16 @@ LRESULT CALLBACK DarkDialogProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 				FillRect(hdc, &rc, GetDarkBrush(DarkBrush_DlgBackgroundBrush));
 				EndPaint(hwnd, &ps);
 				return 0;
+			}
+			break;
+
+		case WM_COMMAND:
+			if (dwRefData == DialogRefData_ChooseFont && !UseSystemDialogColors()
+				&& ((LOWORD(wParam) >= cmb1 && LOWORD(wParam) <= cmb5)
+					|| LOWORD(wParam) == chx1 || LOWORD(wParam) == chx2)) {
+				const LRESULT result = DefSubclassProc(hwnd, umsg, wParam, lParam);
+				DrawChooseFontSample(hwnd);
+				return result;
 			}
 			break;
 
@@ -1537,14 +1731,6 @@ void DarkMode_ApplyToBars(HWND hwndToolbar, HWND hwndStatus) noexcept {
 		auto * const paint = static_cast<BufferedPaint *>(NP2HeapAlloc(sizeof(BufferedPaint)));
 		SetWindowSubclass(hwndStatus, StatusBarSubclass, 0, AsInteger<DWORD_PTR>(paint));
 	}
-}
-
-void DarkMode_OnToolbarBeginAdjust() noexcept {
-	DialogHook_Start(DialogRefData_CustomizeToolbar);
-}
-
-void DarkMode_OnToolbarEndAdjust() noexcept {
-	DialogHook_Stop();
 }
 
 NP2_noinline
