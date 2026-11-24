@@ -356,7 +356,7 @@ constexpr int GetTableLevel(int lineState) noexcept {
 // code folding based on LexProps
 void FoldTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/, LexerWordList /*keywordLists*/, Accessor &styler) {
 	const Sci_Line endPos = startPos + lengthDoc;
-	const Sci_Line maxLines = styler.GetLine((endPos == styler.Length()) ? endPos : endPos - 1);
+	const Sci_Line maxLines = styler.GetLine(endPos - 1);
 
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 

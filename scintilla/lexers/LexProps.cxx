@@ -42,23 +42,22 @@ void ColourisePropsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 	//	can be used for RFC2822 text where indentation is used for continuation lines.
 	constexpr bool allowInitialSpaces = true; //styler.GetPropertyBool("lexer.lang", true);
 
-	const Sci_Position endPos = startPos + lengthDoc;
-	const Sci_Line maxLines = styler.GetLine((endPos == styler.Length()) ? endPos : endPos - 1);
+	const Sci_PositionU endPos = startPos + lengthDoc;
 
 	styler.StartAt(startPos);
 	styler.StartSegment(startPos);
 
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	Sci_PositionU lineStartCurrent = styler.LineStart(lineCurrent);
-	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
 
 #if !ENABLE_FOLD_PROPS_COMMENT
 	const bool fold = styler.GetPropertyBool("fold");
 	int prevLevel = (lineCurrent > 0) ? styler.LevelAt(lineCurrent - 1) : SC_FOLDLEVELBASE;
 #endif
 
-	while (lineCurrent <= maxLines) {
+	while (lineStartCurrent < endPos) {
 		Sci_PositionU i = lineStartCurrent;
+		const Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
 		unsigned char ch = styler[i];
 		if constexpr (allowInitialSpaces) {
 			const Sci_PositionU lineEndPos = lineStartNext - 1;
@@ -135,14 +134,13 @@ void ColourisePropsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 #endif
 		lineStartCurrent = lineStartNext;
 		lineCurrent++;
-		lineStartNext = styler.LineStart(lineCurrent + 1);
 	}
 }
 
 #if ENABLE_FOLD_PROPS_COMMENT
 void FoldPropsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/, LexerWordList /*keywordLists*/, Accessor &styler) {
 	const Sci_Position endPos = startPos + lengthDoc;
-	const Sci_Line maxLines = styler.GetLine((endPos == styler.Length()) ? endPos : endPos - 1);
+	const Sci_Line maxLines = styler.GetLine(endPos - 1);
 
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 

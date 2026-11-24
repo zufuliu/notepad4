@@ -443,7 +443,7 @@ struct FoldLineState {
 void FoldYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/, LexerWordList /*keywordLists*/, Accessor &styler) {
 	const Sci_Position maxPos = startPos + lengthDoc;
 	const Sci_Line docLines = styler.GetLine(styler.Length());
-	const Sci_Line maxLines = (maxPos == styler.Length()) ? docLines : styler.GetLine(maxPos - 1);
+	const Sci_Line maxLines = styler.GetLine(maxPos - 1);
 
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	FoldLineState stateCurrent(styler.GetLineState(lineCurrent));

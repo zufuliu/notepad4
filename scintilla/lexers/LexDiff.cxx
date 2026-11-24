@@ -119,17 +119,16 @@ void ColouriseDiffDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 	styler.StartAt(startPos);
 	styler.StartSegment(startPos);
-	const Sci_Position endPos = startPos + lengthDoc;
-	const Sci_Line maxLines = styler.GetLine((endPos == styler.Length()) ? endPos : endPos - 1);
+	const Sci_PositionU endPos = startPos + lengthDoc;
 
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int prevLevel = (lineCurrent > 0) ? styler.LevelAt(lineCurrent - 1) : SC_FOLDLEVELBASE;
 
 	Sci_PositionU lineStartCurrent = styler.LineStart(lineCurrent);
-	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
 
-	while (lineCurrent <= maxLines) {
+	while (lineStartCurrent < endPos) {
 		char lineBuffer[DIFF_BUFFER_START_SIZE];
+		const Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
 		styler.GetRange(lineStartCurrent, lineStartNext, lineBuffer, sizeof(lineBuffer));
 		const int lineType = StyleForLine(lineBuffer);
 		if (initStyle != lineType) {
@@ -161,7 +160,6 @@ void ColouriseDiffDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 		lineStartCurrent = lineStartNext;
 		lineCurrent++;
-		lineStartNext = styler.LineStart(lineCurrent + 1);
 	}
 
 	styler.ColorTo(endPos, initStyle);

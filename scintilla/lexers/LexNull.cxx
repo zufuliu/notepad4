@@ -50,7 +50,7 @@ void FoldNullDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle
 	}
 
 	const Sci_Line docLines = styler.GetLine(styler.Length());	// Available last line
-	const Sci_Line maxLines = (maxPos == styler.Length()) ? docLines : styler.GetLine(maxPos - 1);	// Requested last line
+	const Sci_Line maxLines = styler.GetLine(maxPos - 1);	// Requested last line
 
 	// Backtrack to previous non-blank line so we can determine indent level
 	// for any white space lines

@@ -349,7 +349,7 @@ void ColouriseLaTeXDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 
 void FoldLaTeXDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/, LexerWordList /*keywordLists*/, Accessor &styler) {
 	const Sci_Position endPos = startPos + length;
-	const Sci_Line maxLines = styler.GetLine((endPos == styler.Length()) ? endPos : endPos - 1);
+	const Sci_Line maxLines = styler.GetLine(endPos - 1);
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	uint32_t lineStatePrev = 0;
