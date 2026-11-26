@@ -243,6 +243,9 @@ struct BufferedPaint {
 		if (szBuffer.cx != width || szBuffer.cy != height) {
 			releaseBuffer();
 			hMemDC = CreateCompatibleDC(hdc);
+			if (hMemDC == nullptr) {
+				return false;
+			}
 			hMemBmp = CreateCompatibleBitmap(hdc, width, height);
 			hOldBmp = static_cast<HBITMAP>(SelectObject(hMemDC, hMemBmp));
 			szBuffer = { width, height };
