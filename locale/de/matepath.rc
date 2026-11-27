@@ -543,7 +543,7 @@ BEGIN
 	IDS_NUMFILES			"%s Objekt(e)"
 	IDS_NUMFILES_FILTER		"%s Objekt(e) | Filter"
 	IDS_SAVEFILE			"Speichere ""%s""..."
-	IDS_APP_THEME_LIST		"Follow System|Light|Dark"
+	IDS_APP_THEME_LIST		"Systemeinstellung|Hell|Dunkel"
     IDS_LINKDESCRIPTION     "Öffnen in matepath"
 END
 
