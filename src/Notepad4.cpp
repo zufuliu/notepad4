@@ -743,6 +743,34 @@ static void HandleMatchText(MatchTextFlag flag, LPCWSTR lpszText, BOOL jumpTo) n
 	}
 }
 
+static bool IsUacEnabled() noexcept {
+	using RtlQueryElevationFlags_t = LONG(NTAPI *)(DWORD * pFlags);
+	static const auto pRtlQueryElevationFlags = reinterpret_cast<RtlQueryElevationFlags_t>(
+		::GetProcAddress(::GetModuleHandleW(L"ntdll.dll"), "RtlQueryElevationFlags"));
+
+	constexpr DWORD ELEVATION_UAC_ENABLED = 0x1;
+	DWORD dwFlags = 0;
+
+	if (pRtlQueryElevationFlags && pRtlQueryElevationFlags(&dwFlags) == 0) {
+		return (dwFlags & ELEVATION_UAC_ENABLED) != 0;
+	}
+
+	DWORD dwEnableLUA = 1;
+	DWORD dwSize = sizeof(dwEnableLUA);
+	if (::RegGetValueW(
+			HKEY_LOCAL_MACHINE,
+			L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System",
+			L"EnableLUA",
+			RRF_RT_REG_DWORD,
+			nullptr,
+			&dwEnableLUA,
+			&dwSize) == ERROR_SUCCESS) {
+		return (dwEnableLUA != 0);
+	}
+
+	return false;
+}
+
 //=============================================================================
 //
 // InitInstance()
@@ -1743,6 +1771,7 @@ void EditCreate(HWND hwndParent) noexcept {
 		SetWindowLayoutRTL(hwnd, true);
 	}
 
+	SciCall_SetOleDragDrop(!(fIsElevated && IsUacEnabled()));
 	Style_InitDefaultColor();
 	SciCall_SetTechnology(iRenderingTechnology);
 	SciCall_SetBidirectional(iBidirectional);
@@ -1894,12 +1923,33 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) noexcept {
 		nullptr);
 
 	// Drag & Drop
-#if 0//_WIN32_WINNT >= _WIN32_WINNT_WIN7
 	// enable drop file onto non-client area for elevated Notepad4
-	ChangeWindowMessageFilterEx(hwnd, WM_DROPFILES, MSGFLT_ADD, nullptr);
-	ChangeWindowMessageFilterEx(hwnd, WM_COPYDATA, MSGFLT_ADD, nullptr);
-	ChangeWindowMessageFilterEx(hwnd, 0x0049 /*WM_COPYGLOBALDATA*/, MSGFLT_ADD, nullptr);
-#endif
+	if (IsVistaAndAbove() && fIsElevated && IsUacEnabled()) {
+		constexpr UINT WM_COPYGLOBALDATA = 0x0049;
+		HMODULE hDll = ::GetModuleHandleW(L"user32.dll");
+		if (hDll) {
+			if (IsWin7AndAbove()) {
+				using MESSAGEFILTERFUNCEX = BOOL(WINAPI *)(HWND hWnd, UINT message, DWORD action, VOID * pChangeFilterStruct);
+				const auto funcEx = reinterpret_cast<MESSAGEFILTERFUNCEX>(::GetProcAddress(hDll, "ChangeWindowMessageFilterEx"));
+				if (funcEx) {
+					constexpr DWORD kMsgFltAllow = 1; // MSGFLT_ALLOW
+					funcEx(hwnd, WM_COPYDATA, kMsgFltAllow, nullptr);
+					if (funcEx(hwnd, WM_DROPFILES, kMsgFltAllow, nullptr)) {
+						funcEx(hwnd, WM_COPYGLOBALDATA, kMsgFltAllow, nullptr);
+					}
+				}
+			} else {
+				using MESSAGEFILTERFUNC = BOOL(WINAPI *)(UINT message, DWORD dwFlag);
+				const auto func = reinterpret_cast<MESSAGEFILTERFUNC>(::GetProcAddress(hDll, "ChangeWindowMessageFilter"));
+				if (func) {
+					func(WM_COPYDATA, MSGFLT_ADD);
+					if (func(WM_DROPFILES, MSGFLT_ADD)) {
+						func(WM_COPYGLOBALDATA, MSGFLT_ADD);
+					}
+				}
+			}
+		}
+	}
 
 	// File MRU
 	const int flags = MRUFlags_FilePath | (static_cast<int>(flagRelativeFileMRU) * MRUFlags_RelativePath) | (static_cast<int>(flagPortableMyDocs) * MRUFlags_PortableMyDocs);
