@@ -4952,10 +4952,10 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDC_TOOLBAR:
 		switch (pnmh->code) {
 		case TBN_BEGINADJUST:
-			DarkMode_OnToolbarBeginAdjust();
+			DialogHook_Start(DialogRefData_CustomizeToolbar);
 			break;
 		case TBN_ENDADJUST:
-			DarkMode_OnToolbarEndAdjust();
+			DialogHook_Stop();
 			UpdateToolbar();
 			break;
 

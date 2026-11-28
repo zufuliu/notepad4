@@ -2155,10 +2155,10 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDC_TOOLBAR:
 		switch (pnmh->code) {
 		case TBN_BEGINADJUST:
-			DarkMode_OnToolbarBeginAdjust();
+			DialogHook_Start(DialogRefData_CustomizeToolbar);
 			break;
 		case TBN_ENDADJUST:
-			DarkMode_OnToolbarEndAdjust();
+			DialogHook_Stop();
 			mHistory.UpdateToolbar(hwndToolbar, IDT_HISTORY_BACK, IDT_HISTORY_FORWARD);
 			Toolbar_SetButtonImage(hwndToolbar, IDT_VIEW_FILTER, HasFilter() ? TB_DEL_FILTER_BMP : TB_ADD_FILTER_BMP);
 			break;

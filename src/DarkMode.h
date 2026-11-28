@@ -8,8 +8,8 @@ enum DialogRefData {
 	DialogRefData_RightBottom,
 	DialogRefData_DefaultPosition,
 	DialogRefData_CustomizeToolbar,
-	DialogRefData_ChooseColor,
 	DialogRefData_ChooseFont,
+	DialogRefData_ChooseColor,
 	DialogRefData_PrintPageSetup,
 	DialogRefData_MaxValue,
 };
@@ -51,8 +51,6 @@ void DarkMode_HandleSettingChange(HWND hwnd, LPARAM lParam) noexcept;
 int DarkMode_ResolveStyleTheme(int theme) noexcept;
 void DarkMode_OnDarkModeChange(HWND hwnd) noexcept;
 void DarkMode_ApplyToBars(HWND hwndToolbar, HWND hwndStatus) noexcept;
-void DarkMode_OnToolbarBeginAdjust() noexcept;
-void DarkMode_OnToolbarEndAdjust() noexcept;
 LRESULT DarkMode_DrawUAHMenu(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) noexcept;
 void DarkMode_DrawUAHMenuNCBottomLine(HWND hwnd) noexcept;
 COLORREF DarkMode_GetRebarBackColor() noexcept;

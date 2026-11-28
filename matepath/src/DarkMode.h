@@ -7,6 +7,7 @@ enum DialogRefData {
 	DialogRefData_MessageBox,
 	DialogRefData_DefaultPosition,
 	DialogRefData_CustomizeToolbar,
+	DialogRefData_ComboBoxEx, // not dialog
 	DialogRefData_ChooseColor,
 	DialogRefData_ChooseFont,
 	DialogRefData_PropSheetPage,
@@ -48,8 +49,6 @@ void DarkMode_HandleSettingChange(HWND hwnd, LPARAM lParam) noexcept;
 void DarkMode_ResolveStyleTheme(int theme) noexcept;
 void DarkMode_OnDarkModeChange(HWND hwnd) noexcept;
 void DarkMode_ApplyToBars(HWND hwndToolbar, HWND hwndStatus) noexcept;
-void DarkMode_OnToolbarBeginAdjust() noexcept;
-void DarkMode_OnToolbarEndAdjust() noexcept;
 COLORREF DarkMode_GetRebarBackColor() noexcept;
 LRESULT DarkMode_RebarCustomDraw(LPARAM lParam) noexcept;
 LRESULT DarkMode_ToolbarCustomDraw(LPARAM lParam) noexcept;

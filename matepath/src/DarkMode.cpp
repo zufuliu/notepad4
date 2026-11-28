@@ -1147,6 +1147,66 @@ LRESULT DarkMode_ToolbarCustomDraw(LPARAM lParam) noexcept {
 
 namespace { // Window
 
+HRESULT DarkDialogDrawItem(HWND hwnd, LPARAM lParam) noexcept {
+	const auto &drawItem = *AsPointer<const DRAWITEMSTRUCT *>(lParam);
+	if ((drawItem.itemState & (ODS_SELECTED | ODS_COMBOBOXEDIT)) && (drawItem.CtlType == ODT_COMBOBOX || GetFocus() == drawItem.hwndItem)) {
+		return S_FALSE; // Windows already uses the system selection colors.
+	}
+	constexpr COLORREF backColor = RGB(0xFF, 0xFF, 0xFF);
+	if (GetSysColor(COLOR_WINDOW) != backColor) {
+		return S_FALSE;
+	}
+
+	HDC hMemDC = nullptr;
+	BP_PAINTPARAMS params{};
+	params.cbSize = sizeof(BP_PAINTPARAMS);
+	params.dwFlags = BPPF_NOCLIP;
+	const auto paint = BeginBufferedPaint(drawItem.hDC, &drawItem.rcItem, BPBF_TOPDOWNDIB, &params, &hMemDC);
+	if (!paint) {
+		return S_FALSE;
+	}
+	RGBQUAD *pixels = nullptr;
+	int stride = 0;
+	if (GetBufferedPaintBits(paint, &pixels, &stride) != S_OK) {
+		EndBufferedPaint(paint, FALSE);
+		return S_FALSE;
+	}
+
+	DRAWITEMSTRUCT native = drawItem;
+	native.hDC = hMemDC;
+	native.itemAction = ODA_DRAWENTIRE;
+	SelectObject(hMemDC, GetCurrentObject(drawItem.hDC, OBJ_FONT));
+	DefSubclassProc(hwnd, WM_DRAWITEM, native.CtlID, AsInteger<LPARAM>(&native));
+
+	// Map the native color coverage onto the dialog's neutral dark palette.
+	const int height = native.rcItem.bottom - native.rcItem.top;
+	const ULONG count = stride*height;
+	constexpr BYTE darkBack = GetRValue(DarkColor_CtrlBackgroundColor);
+	const UINT darkText = ((native.itemState & ODS_DISABLED)? GetRValue(DarkColor_DisabledTextColor) : GetRValue(DarkColor_TextColor)) - darkBack;
+
+	for (ULONG x = 0; x < count; x++) {
+		auto &pixel = pixels[0];
+		++pixels;
+		if (pixel.rgbReserved == 0) {
+			*reinterpret_cast<COLORREF *>(&pixel) ^= backColor;
+			pixel.rgbRed = static_cast<BYTE>(darkBack + ((pixel.rgbRed * darkText) >> 8));
+			pixel.rgbGreen = static_cast<BYTE>(darkBack + ((pixel.rgbGreen * darkText) >> 8));
+			pixel.rgbBlue = static_cast<BYTE>(darkBack + ((pixel.rgbBlue * darkText) >> 8));
+		} else if (pixel.rgbReserved != 255) {
+			// image alpha merge with white background => alpha merge with darkBack
+			const BYTE delta = ((0xFF ^ darkBack) * (255 ^ pixel.rgbReserved)) >> 8;
+			pixel.rgbRed -= delta;
+			pixel.rgbGreen -= delta;
+			pixel.rgbBlue -= delta;
+		}
+	}
+	if (native.itemState & ODS_SELECTED) {
+		// draw selection rectangle
+		FrameRect(hMemDC, &native.rcItem, GetSysColorBrush(COLOR_HIGHLIGHT));
+	}
+	return EndBufferedPaint(paint, TRUE);
+}
+
 LRESULT CALLBACK DarkDialogProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData) noexcept {
 	if (umsg == WM_NCDESTROY) {
 		RemoveWindowSubclass(hwnd, DarkDialogProc, uIdSubclass);
@@ -1191,7 +1251,10 @@ LRESULT CALLBACK DarkDialogProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 		}
 
 		case WM_PRINTCLIENT:
-			return TRUE;
+			if (dwRefData != DialogRefData_ComboBoxEx) {
+				return TRUE;
+			}
+			break;
 
 		case WM_PAINT:
 			if (dwRefData == DialogRefData_MessageBox) {
@@ -1214,7 +1277,12 @@ LRESULT CALLBACK DarkDialogProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 			}
 			break;
 
-		case WM_NOTIFY:
+		case WM_DRAWITEM:
+			if (dwRefData == DialogRefData_CustomizeToolbar || dwRefData == DialogRefData_ComboBoxEx) {
+				if (DarkDialogDrawItem(hwnd, lParam) == S_OK) {
+					return TRUE;
+				}
+			}
 			break;
 
 		default:
@@ -1553,14 +1621,6 @@ void DarkMode_ApplyToBars(HWND hwndToolbar, HWND hwndStatus) noexcept {
 	}
 }
 
-void DarkMode_OnToolbarBeginAdjust() noexcept {
-	DialogHook_Start(DialogRefData_CustomizeToolbar);
-}
-
-void DarkMode_OnToolbarEndAdjust() noexcept {
-	DialogHook_Stop();
-}
-
 NP2_noinline
 void DarkMode_InitDialog(HWND hwnd, DWORD_PTR dwRefData) noexcept {
 	if (DarkMode_IsActive()) {
@@ -1654,6 +1714,8 @@ void DarkMode_SetDriveBoxTheme(HWND hwnd, BOOL reset) noexcept {
 		const BOOL dark = DarkMode_IsActive();
 		if (dark) {
 			theme = DarkMode_SupportDarkTheme() ? L"DarkMode_DarkTheme" : L"DarkMode_CFD";
+			// override WM_DRAWITEM
+			SetWindowSubclass(hwnd, DarkDialogProc, 0, DialogRefData_ComboBoxEx);
 		} else {
 			theme = L"Explorer";
 		}

@@ -19,6 +19,7 @@ https://github.com/zufuliu/notepad4-test/tree/main/darkmode
 #include <uxtheme.h>
 #include <vsstyle.h>
 #include <vssym32.h>
+#include <dlgs.h>
 // #include "config.h"
 #include "Sci_Position.h"
 #include "Helpers.h"
@@ -1140,6 +1141,79 @@ LRESULT DarkMode_ToolbarCustomDraw(LPARAM lParam) noexcept {
 
 namespace { // Window
 
+constexpr UINT cmbFontColor = cmb4;
+HRESULT DarkDialogDrawItem(HWND hwnd, LPARAM lParam) noexcept {
+	const auto &drawItem = *AsPointer<const DRAWITEMSTRUCT *>(lParam);
+	if ((drawItem.itemState & ODS_SELECTED) && (drawItem.CtlType == ODT_COMBOBOX || GetFocus() == drawItem.hwndItem)) {
+		return S_FALSE; // Windows already uses the system selection colors.
+	}
+	constexpr COLORREF backColor = RGB(0xFF, 0xFF, 0xFF);
+	if (GetSysColor(COLOR_WINDOW) != backColor) {
+		return S_FALSE;
+	}
+
+	HDC hMemDC = nullptr;
+	BP_PAINTPARAMS params{};
+	params.cbSize = sizeof(BP_PAINTPARAMS);
+	params.dwFlags = BPPF_NOCLIP;
+	const auto paint = BeginBufferedPaint(drawItem.hDC, &drawItem.rcItem, BPBF_TOPDOWNDIB, &params, &hMemDC);
+	if (!paint) {
+		return S_FALSE;
+	}
+	RGBQUAD *pixels = nullptr;
+	int stride = 0;
+	if (GetBufferedPaintBits(paint, &pixels, &stride) != S_OK) {
+		EndBufferedPaint(paint, FALSE);
+		return S_FALSE;
+	}
+
+	DRAWITEMSTRUCT native = drawItem;
+	native.hDC = hMemDC;
+	native.itemAction = ODA_DRAWENTIRE;
+	SelectObject(hMemDC, GetCurrentObject(drawItem.hDC, OBJ_FONT));
+	DefSubclassProc(hwnd, WM_DRAWITEM, native.CtlID, AsInteger<LPARAM>(&native));
+
+	// Map the native color coverage onto the dialog's neutral dark palette.
+	const int height = native.rcItem.bottom - native.rcItem.top;
+	int cxExclude = 0;
+	int cyExclude = 0;
+	if (native.CtlType == ODT_COMBOBOX && native.CtlID == cmbFontColor) {
+		const UINT dpi = GetWindowDPI(hwnd);
+		cxExclude = MulDiv(28, dpi, USER_DEFAULT_SCREEN_DPI) + ((native.itemState & ODS_COMBOBOXEDIT)? 5 : 3);
+		cyExclude = height - 1;
+	}
+
+	constexpr BYTE darkBack = GetRValue(DarkColor_CtrlBackgroundColor);
+	const UINT darkText = ((native.itemState & ODS_DISABLED)? GetRValue(DarkColor_DisabledTextColor) : GetRValue(DarkColor_TextColor)) - darkBack;
+
+	for (int y = 0; y < height; y++) {
+		for (int x = 0; x < stride; x++) {
+			auto &pixel = pixels[0];
+			++pixels;
+			if (pixel.rgbReserved == 0) {
+				if (x != 0 && x < cxExclude && y != 0 && y < cyExclude) {
+					continue;
+				}
+				*reinterpret_cast<COLORREF *>(&pixel) ^= backColor;
+				pixel.rgbRed = static_cast<BYTE>(darkBack + ((pixel.rgbRed * darkText) >> 8));
+				pixel.rgbGreen = static_cast<BYTE>(darkBack + ((pixel.rgbGreen * darkText) >> 8));
+				pixel.rgbBlue = static_cast<BYTE>(darkBack + ((pixel.rgbBlue * darkText) >> 8));
+			} else if (pixel.rgbReserved != 255) {
+				// image alpha merge with white background => alpha merge with darkBack
+				const BYTE delta = ((0xFF ^ darkBack) * (255 ^ pixel.rgbReserved)) >> 8;
+				pixel.rgbRed -= delta;
+				pixel.rgbGreen -= delta;
+				pixel.rgbBlue -= delta;
+			}
+		}
+	}
+	if (native.itemState & ODS_SELECTED) {
+		// draw selection rectangle
+		FrameRect(hMemDC, &native.rcItem, GetSysColorBrush(COLOR_HIGHLIGHT));
+	}
+	return EndBufferedPaint(paint, TRUE);
+}
+
 LRESULT CALLBACK DarkDialogProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData) noexcept {
 	if (umsg == WM_NCDESTROY) {
 		RemoveWindowSubclass(hwnd, DarkDialogProc, uIdSubclass);
@@ -1207,7 +1281,12 @@ LRESULT CALLBACK DarkDialogProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 			}
 			break;
 
-		case WM_NOTIFY:
+		case WM_DRAWITEM:
+			if (dwRefData == DialogRefData_CustomizeToolbar || dwRefData == DialogRefData_ChooseFont) {
+				if (DarkDialogDrawItem(hwnd, lParam) == S_OK) {
+					return TRUE;
+				}
+			}
 			break;
 
 		default:
@@ -1540,14 +1619,6 @@ void DarkMode_ApplyToBars(HWND hwndToolbar, HWND hwndStatus) noexcept {
 		auto * const paint = static_cast<BufferedPaint *>(NP2HeapAlloc(sizeof(BufferedPaint)));
 		SetWindowSubclass(hwndStatus, StatusBarSubclass, 0, AsInteger<DWORD_PTR>(paint));
 	}
-}
-
-void DarkMode_OnToolbarBeginAdjust() noexcept {
-	DialogHook_Start(DialogRefData_CustomizeToolbar);
-}
-
-void DarkMode_OnToolbarEndAdjust() noexcept {
-	DialogHook_Stop();
 }
 
 NP2_noinline
