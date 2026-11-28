@@ -1145,13 +1145,27 @@ LRESULT DarkMode_ToolbarCustomDraw(LPARAM lParam) noexcept {
 	return FALSE;
 }
 
+#include "../../src/DarkDialogRows.h"
+
 namespace { // Window
 
 LRESULT CALLBACK DarkDialogProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData) noexcept {
+	if ((umsg == WM_SETTINGCHANGE || umsg == WM_SYSCOLORCHANGE)
+		&& dwRefData == DialogRefData_CustomizeToolbar) {
+		const LRESULT result = DefSubclassProc(hwnd, umsg, wParam, lParam);
+		RedrawWindow(hwnd, nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN);
+		return result;
+	}
 	if (umsg == WM_NCDESTROY) {
 		RemoveWindowSubclass(hwnd, DarkDialogProc, uIdSubclass);
 	} else if (DarkMode_IsActive()) {
 		switch (umsg) {
+		case WM_DRAWITEM:
+			if (dwRefData == DialogRefData_CustomizeToolbar && !UseSystemDialogColors()
+				&& DrawToolbarCustomizationRow(hwnd, *AsPointer<const DRAWITEMSTRUCT *>(lParam))) {
+				return TRUE;
+			}
+			break;
 		case WM_CTLCOLORSTATIC:
 		case WM_CTLCOLORDLG:
 		case WM_CTLCOLORLISTBOX:
@@ -1161,6 +1175,10 @@ LRESULT CALLBACK DarkDialogProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 			COLORREF back = DarkColor_DlgBackgroundColor;
 			COLORREF text = DarkColor_TextColor;
 			UINT index = DarkBrush_DlgBackgroundBrush;
+			if (umsg == WM_CTLCOLORLISTBOX && dwRefData == DialogRefData_CustomizeToolbar
+				&& UseSystemDialogColors()) {
+				break;
+			}
 			if (umsg == WM_CTLCOLOREDIT || umsg == WM_CTLCOLORLISTBOX) {
 				back = DarkColor_CtrlBackgroundColor;
 				index = DarkBrush_CtrlBackgroundBrush;
@@ -1551,14 +1569,6 @@ void DarkMode_ApplyToBars(HWND hwndToolbar, HWND hwndStatus) noexcept {
 		auto * const paint = static_cast<BufferedPaint *>(NP2HeapAlloc(sizeof(BufferedPaint)));
 		SetWindowSubclass(hwndStatus, StatusBarSubclass, 0, AsInteger<DWORD_PTR>(paint));
 	}
-}
-
-void DarkMode_OnToolbarBeginAdjust() noexcept {
-	DialogHook_Start(DialogRefData_CustomizeToolbar);
-}
-
-void DarkMode_OnToolbarEndAdjust() noexcept {
-	DialogHook_Stop();
 }
 
 NP2_noinline
